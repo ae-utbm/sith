@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="style.css" />
+    <title>{% block title %}Bienvenue sur le Sith de l'AE!{% endblock %}</title>
+</head>
+
+<body>
+    <header>
+        {% block header %}
+        {% if user %}Hello, {{ user.username }}!{% endif %}
+        <ul>
+            <li><a href="{% url 'core:register' %}">Register</a></li>
+            <li><a href="{% url 'core:login' %}">Login</a></li>
+            <li><a href="{% url 'core:logout' %}">Logout</a></li>
+        </ul>
+        {% endblock %}
+    </header>
+
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        {% block footer %}
+        Site réalisé par des gens biens
+        {% endblock %}
+    </footer>
+</body>
+</html>

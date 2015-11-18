@@ -1,4 +1,8 @@
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django import forms
+from django.contrib.auth import logout, login, authenticate
+import logging
+
 from .models import User
 
 class RegisteringForm(UserCreationForm):
@@ -6,4 +10,36 @@ class RegisteringForm(UserCreationForm):
     required_css_class = 'required'
     class Meta:
         model = User
-        fields = ('username', 'email',)
+        fields = ('first_name', 'last_name', 'email')
+
+    def save(self, commit=True):
+        user = super(RegisteringForm, self).save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        user.generate_username()
+        if commit:
+            user.save()
+        return user
+
+class LoginForm(AuthenticationForm):
+    def login(self):
+        u = authenticate(username=self.request.POST['username'],
+                         password=self.request.POST['password'])
+        if u is not None:
+            if u.is_active:
+                login(self.request, u)
+                logging.debug("Logging in "+u)
+            else:
+                raise forms.ValidationError(
+                        self.error_messages['invalid_login'],
+                        code='inactive',
+                        params={'username': self.username_field.verbose_name},
+                    )
+        else:
+            logging.debug("Login failed")
+            raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': self.username_field.verbose_name},
+                )
+
+

@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.contrib.auth import logout as auth_logout
 
 from .models import User
-from .forms import RegisteringForm
+from .forms import RegisteringForm, LoginForm
 
 import logging
 
@@ -11,22 +12,30 @@ logging.basicConfig(level=logging.DEBUG)
 def index(request):
     return HttpResponse("Hello, world. You're at the core index.")
 
-def login(request):
-    return HttpResponse("Login page")
-
 def register(request):
     if request.method == 'POST':
-        logging.debug("Registering "+request.POST['username'])
         form = RegisteringForm(request.POST)
         if form.is_valid():
-            u = User(username=request.POST['username'], password=request.POST['password1'], email="guy@plop.guy")
-            u.save()
-            return render(request, "sith/register.html", {'username': u.get_username(),
-                                                          'form': RegisteringForm().as_ul()})
-        else:
-            return render(request, "sith/register.html", {'form': form.as_ul()})
-    form = RegisteringForm()
-    return render(request, "sith/register.html", {'form': form.as_ul()})
+            logging.debug("Registering "+form.cleaned_data['first_name']+form.cleaned_data['last_name'])
+            u = form.save()
+            form = RegisteringForm()
+    else:
+        form = RegisteringForm()
+    return render(request, "core/register.html", {'title': 'Register a user', 'form': form.as_p()})
 
-def guy(request):
-    return HttpResponse("Guyuguyguygé")
+def login(request):
+    if request.method == 'POST':
+        try:
+            form = LoginForm(request)
+            form.login()
+            # TODO redirect to profile when done
+            return redirect('index')
+        except Exception as e:
+            logging.debug(e)
+    else:
+        form = LoginForm()
+    return render(request, "core/login.html", {'title': 'Login', 'form': form.as_p()})
+
+def logout(request):
+    auth_logout(request)
+    return redirect('core:index')

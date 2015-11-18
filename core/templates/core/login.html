@@ -1,0 +1,14 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="{% url 'core:login' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <p><input type="submit" value="Login!" /></p>
+</form>
+{% endblock %}
+
