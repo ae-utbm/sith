@@ -1,0 +1,13 @@
+<h1>Register a user</h1>
+
+{% if username %}
+You registered successfully, {{ username }}!
+{% endif %}
+
+<form action="{% url 'sith:register' %}" method="post">
+    {% csrf_token %}
+    <ul>
+    {{ form }}
+    <li><input type="submit" value="Register!" /></li>
+    </ul>
+</form>
