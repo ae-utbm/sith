@@ -40,6 +40,11 @@ def register(request):
     return render(request, "core/register.html", context)
 
 def login(request):
+    """
+    The login view
+
+    Needs to be improve with correct handling of form exceptions
+    """
     context = {'title': 'Login'}
     if request.method == 'POST':
         try:
@@ -57,15 +62,27 @@ def login(request):
     return render(request, "core/login.html", context)
 
 def logout(request):
+    """
+    The logout view:w
+    """
     auth_logout(request)
     return redirect('core:index')
 
 def user(request, user_id=None):
+    context = {'title': 'View a user'}
     if user_id == None:
-        return render(request, "core/user.html", {'user_list': User.objects.all})
-    user = get_object_or_404(User, pk=user_id)
-    return render(request, "core/user.html", {'profile': user})
+        context['user_list'] = User.objects.all
+        return render(request, "core/user.html", context)
+    context['profile'] = get_object_or_404(User, pk=user_id)
+    return render(request, "core/user.html", context)
 
-def user_edit(request, user_id):
-    pass
+def user_edit(request, user_id=None):
+    user_id = int(user_id)
+    context = {'title': 'Edit a user'}
+    if user_id is not None:
+        user_id = int(user_id)
+        if request.user.is_authenticated() and (request.user.pk == user_id or request.user.is_superuser):
+            context['profile'] = get_object_or_404(User, pk=user_id)
+            return render(request, "core/edit_user.html", context)
+    return user(request, user_id)
 

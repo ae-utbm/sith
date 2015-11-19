@@ -13,6 +13,9 @@ User list
 {% if profile %}
 <h3>User Profile</h3>
 <p><a href="{% url 'core:user_list' %}">Back to list</a></p>
+{% if user.is_superuser or user.id == profile.id %}
+<p><a href="{% url 'core:user_edit' profile.id %}">Edit</a></p>
+{% endif %}
 <p>You're seeing the profile of <strong>{{ profile.get_display_name }}</strong></p>
 {% endif %}
 

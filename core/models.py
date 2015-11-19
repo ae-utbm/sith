@@ -105,7 +105,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.username = user_name
         return user_name
 
-class Page:
-    pass
+class Page(models.Model):
+    name = models.CharField(_('page name'), max_length=30, blank=False)
+    full_name = models.CharField(_("full name"), max_length=255, blank=False)
+    content = models.TextField(_("page content"), blank=True)
+    revision = models.PositiveIntegerField(_("current revision"), default=1)
+    is_locked = models.BooleanField(_("page mutex"), default=False)
 
+    class Meta:
+        permissions = (
+            ("can_edit", "Can edit the page"),
+            ("can_view", "Can view the page"),
+        )
+
+    def __str__(self):
+        return self.full_name
 
