@@ -74,6 +74,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         "Returns the short name for the user."
         return self.first_name
 
+    def get_display_name(self):
+        """
+        Returns the display name of the user.
+        A nickname if possible, otherwise, the full name
+        """
+        if self.nick_name != "":
+            return self.nick_name
+        return self.get_full_name()
+
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
         Sends an email to this User.

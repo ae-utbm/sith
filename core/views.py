@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import logout as auth_logout
 
@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the core index.")
+    return render(request, "core/index.html", {'title': 'Bienvenue!'})
 
 def register(request):
     if request.method == 'POST':
@@ -39,3 +39,13 @@ def login(request):
 def logout(request):
     auth_logout(request)
     return redirect('core:index')
+
+def user(request, user_id=None):
+    if user_id == None:
+        return render(request, "core/user.html", {'user_list': User.objects.all})
+    user = get_object_or_404(User, pk=user_id)
+    return render(request, "core/user.html", {'profile': user})
+
+def user_edit(request, user_id):
+    pass
+
