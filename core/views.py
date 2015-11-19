@@ -9,8 +9,17 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-def index(request):
-    return render(request, "core/index.html", {'title': 'Bienvenue!'})
+# This is a global default context that can be used everywhere and provide default basic values
+# It needs to be completed by every function using templates
+#context = {'title': 'Bienvenue!',
+#           'tests': '',
+#          }
+
+def index(request, context=None):
+    if context == None:
+        return render(request, "core/index.html", {'title': 'Bienvenue!'})
+    else:
+        return render(request, "core/index.html", context)
 
 def register(request):
     context = {'title': 'Register a user'}
@@ -20,24 +29,32 @@ def register(request):
             logging.debug("Registering "+form.cleaned_data['first_name']+form.cleaned_data['last_name'])
             u = form.save()
             context['user_registered'] = u
+            context['tests'] = 'TEST_REGISTER_USER_FORM_OK'
             form = RegisteringForm()
+        else:
+            context['error'] = 'Erreur'
+            context['tests'] = 'TEST_REGISTER_USER_FORM_FAIL'
     else:
         form = RegisteringForm()
     context['form'] = form.as_p()
     return render(request, "core/register.html", context)
 
 def login(request):
+    context = {'title': 'Login'}
     if request.method == 'POST':
         try:
             form = LoginForm(request)
             form.login()
-            # TODO redirect to profile when done
-            return redirect('index')
+            context['tests'] = 'LOGIN_OK'
+            return render(request, 'core/index.html', context)
         except Exception as e:
             logging.debug(e)
+            context['error'] = "Login failed"
+            context['tests'] = 'LOGIN_FAIL'
     else:
         form = LoginForm()
-    return render(request, "core/login.html", {'title': 'Login', 'form': form.as_p()})
+    context['form'] = form.as_p()
+    return render(request, "core/login.html", context)
 
 def logout(request):
     auth_logout(request)

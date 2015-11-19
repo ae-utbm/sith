@@ -18,6 +18,9 @@
     </header>
 
     <div id="content">
+        {% if error %}
+            {{ error }}
+        {% endif %}
         {% block content %}{% endblock %}
     </div>
 
@@ -26,5 +29,10 @@
         Site réalisé par des gens biens
         {% endblock %}
     </footer>
+    <!--
+    {% block tests %}
+        {{ tests }}
+    {% endblock %}
+    -->
 </body>
 </html>

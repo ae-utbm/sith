@@ -27,7 +27,7 @@ class LoginForm(AuthenticationForm):
         if u is not None:
             if u.is_active:
                 login(self.request, u)
-                logging.debug("Logging in "+u)
+                logging.debug("Logging in "+str(u))
             else:
                 raise forms.ValidationError(
                         self.error_messages['invalid_login'],

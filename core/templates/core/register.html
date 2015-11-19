@@ -10,7 +10,6 @@ Welcome {{ user_registered.get_display_name }}!
 You successfully registred and you will soon receive a confirmation mail.
 
 Your username is {{ user_registered.username }}.
-<!-- TEST_REGISTER_USER_FORM_OK -->
 {% endif %}
 
 <form action="{% url 'core:register' %}" method="post">
