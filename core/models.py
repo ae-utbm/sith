@@ -34,7 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('first name'), max_length=30)
     last_name = models.CharField(_('last name'), max_length=30)
     email = models.EmailField(_('email address'), unique=True)
-    date_of_birth = models.DateTimeField(_('date of birth'), default="1970-01-01")
+    date_of_birth = models.DateTimeField(_('date of birth'), default="1970-01-01T00:00:00+01:00")
     nick_name = models.CharField(max_length=30, blank=True)
     is_staff = models.BooleanField(
         _('staff status'),

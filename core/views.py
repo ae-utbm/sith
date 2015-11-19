@@ -13,15 +13,18 @@ def index(request):
     return render(request, "core/index.html", {'title': 'Bienvenue!'})
 
 def register(request):
+    context = {'title': 'Register a user'}
     if request.method == 'POST':
         form = RegisteringForm(request.POST)
         if form.is_valid():
             logging.debug("Registering "+form.cleaned_data['first_name']+form.cleaned_data['last_name'])
             u = form.save()
+            context['user_registered'] = u
             form = RegisteringForm()
     else:
         form = RegisteringForm()
-    return render(request, "core/register.html", {'title': 'Register a user', 'form': form.as_p()})
+    context['form'] = form.as_p()
+    return render(request, "core/register.html", context)
 
 def login(request):
     if request.method == 'POST':
