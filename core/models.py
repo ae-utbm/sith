@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserM
 from django.utils.translation import ugettext_lazy as _
 from django.core import validators
 from django.utils import timezone
+from datetime import datetime
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
@@ -12,7 +13,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     but some fields are required, and the username is generated automatically with the
     name of the user (see generate_username()).
 
-    Added field: nick_name
+    Added field: nick_name, date_of_birth
     Required fields: email, first_name, last_name, date_of_birth
     """
     username = models.CharField(
@@ -34,7 +35,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('first name'), max_length=30)
     last_name = models.CharField(_('last name'), max_length=30)
     email = models.EmailField(_('email address'), unique=True)
-    date_of_birth = models.DateTimeField(_('date of birth'), default="1970-01-01T00:00:00+01:00")
+    date_of_birth = models.DateTimeField(_('date of birth'), default=timezone.make_aware(datetime(1942, 6, 12)))
     nick_name = models.CharField(max_length=30, blank=True)
     is_staff = models.BooleanField(
         _('staff status'),
