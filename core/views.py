@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import logout as auth_logout
+from django.db import models
 
-from .models import User
-from .forms import RegisteringForm, LoginForm
+from .models import User, Page
+from .forms import RegisteringForm, LoginForm, PageForm
 
 import logging
 
@@ -85,4 +86,33 @@ def user_edit(request, user_id=None):
             context['profile'] = get_object_or_404(User, pk=user_id)
             return render(request, "core/edit_user.html", context)
     return user(request, user_id)
+
+def page(request, page_name=None):
+    context = {'title': 'View a Page'}
+    if page_name == None:
+        context['page_list'] = Page.objects.all
+        return render(request, "core/page.html", context)
+    try:
+        context['page'] = Page.objects.filter(name=page_name).get()
+        context['title'] = context['page'].title
+        context['test'] = "PAGE_FOUND"
+    except Page.DoesNotExist:
+        context['title'] = "This page does not exist"
+        context['new_page'] = page_name
+        context['test'] = "PAGE_NOT_FOUND"
+    return render(request, "core/page.html", context)
+
+def page_edit(request, page_name=None):
+    context = {'title': 'Edit a page',
+               'page_name': page_name}
+    p = Page.objects.filter(name=page_name).first()
+    if p == None:
+        p = Page(name=page_name)
+    if request.method == 'POST':
+        f = PageForm(request.POST, instance=p)
+        if f.is_valid():
+            f.save()
+            context['test'] = "PAGE_SAVED"
+    context['page_form'] = PageForm(instance=p).as_p()
+    return render(request, 'core/page.html', context)
 

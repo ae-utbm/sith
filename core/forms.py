@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth import logout, login, authenticate
 import logging
 
-from .models import User
+from .models import User, Page
 
 class RegisteringForm(UserCreationForm):
     error_css_class = 'error'
@@ -41,5 +41,16 @@ class LoginForm(AuthenticationForm):
                     code='invalid_login',
                     params={'username': self.username_field.verbose_name},
                 )
+
+class PageForm(forms.ModelForm):
+    class Meta:
+        model = Page
+        fields = ['name', 'title', 'content', ]
+
+    def save(self, commit=True):
+        page = super(PageForm, self).save(commit=False)
+        if commit:
+            page.save()
+        return page
 
 
