@@ -13,6 +13,7 @@ class UserRegistrationTest(SimpleTestCase):
         response = c.post(reverse('core:register'), {'first_name': 'Guy',
                                                      'last_name': 'Carlier',
                                                      'email': 'guy@git.an',
+                                                     'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
                                                     })
@@ -27,6 +28,7 @@ class UserRegistrationTest(SimpleTestCase):
         response = c.post(reverse('core:register'), {'first_name': 'Guy',
                                                      'last_name': 'Carlier',
                                                      'email': 'bibou@git.an',
+                                                     'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop2',
                                                     })
@@ -41,6 +43,7 @@ class UserRegistrationTest(SimpleTestCase):
         response = c.post(reverse('core:register'), {'first_name': 'Guy',
                                                      'last_name': 'Carlier',
                                                      'email': 'bibou.git.an',
+                                                     'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
                                                     })
@@ -55,6 +58,22 @@ class UserRegistrationTest(SimpleTestCase):
         response = c.post(reverse('core:register'), {'first_name': 'Guy',
                                                      'last_name': '',
                                                      'email': 'bibou@git.an',
+                                                     'date_of_birth': '12/6/1942',
+                                                     'password1': 'plop',
+                                                     'password2': 'plop',
+                                                    })
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue('TEST_REGISTER_USER_FORM_FAIL' in str(response.content))
+
+    def test_register_user_form_fail_missing_date_of_birth(self):
+        """
+        Should not register a user correctly
+        """
+        c = Client()
+        response = c.post(reverse('core:register'), {'first_name': '',
+                                                     'last_name': 'Carlier',
+                                                     'email': 'bibou@git.an',
+                                                     'date_of_birth': '',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
                                                     })
@@ -69,6 +88,7 @@ class UserRegistrationTest(SimpleTestCase):
         response = c.post(reverse('core:register'), {'first_name': '',
                                                      'last_name': 'Carlier',
                                                      'email': 'bibou@git.an',
+                                                     'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
                                                     })
@@ -83,12 +103,14 @@ class UserRegistrationTest(SimpleTestCase):
         c.post(reverse('core:register'), {'first_name': 'Guy',
                                           'last_name': 'Carlier',
                                           'email': 'bibou@git.an',
+                                          'date_of_birth': '12/6/1942',
                                           'password1': 'plop',
                                           'password2': 'plop',
                                          })
         response = c.post(reverse('core:register'), {'first_name': 'Bibou',
                                                      'last_name': 'Carlier',
                                                      'email': 'bibou@git.an',
+                                                     'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
                                                     })
@@ -103,6 +125,7 @@ class UserRegistrationTest(SimpleTestCase):
         c.post(reverse('core:register'), {'first_name': 'Guy',
                                           'last_name': 'Carlier',
                                           'email': 'bibou@git.an',
+                                          'date_of_birth': '12/6/1942',
                                           'password1': 'plop',
                                           'password2': 'plop',
                                          })
@@ -118,6 +141,7 @@ class UserRegistrationTest(SimpleTestCase):
         c.post(reverse('core:register'), {'first_name': 'Guy',
                                           'last_name': 'Carlier',
                                           'email': 'bibou@git.an',
+                                          'date_of_birth': '12/6/1942',
                                           'password1': 'plop',
                                           'password2': 'plop',
                                          })

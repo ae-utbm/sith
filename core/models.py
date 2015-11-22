@@ -35,7 +35,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('first name'), max_length=30)
     last_name = models.CharField(_('last name'), max_length=30)
     email = models.EmailField(_('email address'), unique=True)
-    date_of_birth = models.DateTimeField(_('date of birth'), default=timezone.make_aware(datetime(1942, 6, 12)))
+    date_of_birth = models.DateTimeField(_('date of birth'))
     nick_name = models.CharField(max_length=30, blank=True)
     is_staff = models.BooleanField(
         _('staff status'),
@@ -55,7 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+    REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'date_of_birth']
 
     class Meta:
         verbose_name = _('user')

@@ -10,7 +10,7 @@ class RegisteringForm(UserCreationForm):
     required_css_class = 'required'
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email')
+        fields = ('first_name', 'last_name', 'email', 'date_of_birth')
 
     def save(self, commit=True):
         user = super(RegisteringForm, self).save(commit=False)
