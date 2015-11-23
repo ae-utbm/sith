@@ -93,7 +93,8 @@ def page(request, page_name=None):
         context['page_list'] = Page.objects.all
         return render(request, "core/page.html", context)
     try:
-        context['page'] = Page.objects.filter(name=page_name).get()
+        context['view_page'] = True
+        context['page'] = Page.objects.filter(full_name=page_name).get()
         context['title'] = context['page'].title
         context['test'] = "PAGE_FOUND"
     except Page.DoesNotExist:
@@ -111,8 +112,14 @@ def page_edit(request, page_name=None):
     if request.method == 'POST':
         f = PageForm(request.POST, instance=p)
         if f.is_valid():
+            print("TROLL")
             f.save()
             context['test'] = "PAGE_SAVED"
+        else:
+            context['test'] = "PAGE_NOT_SAVED"
+    else:
+        context['test'] = "POST_NOT_RECEIVED"
+    context['page'] = p
     context['page_form'] = PageForm(instance=p).as_p()
     return render(request, 'core/page.html', context)
 

@@ -108,12 +108,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Page(models.Model):
+    full_name = models.CharField(_('page full name'), max_length=30, blank=False, primary_key=True)
     name = models.CharField(_('page name'), max_length=30, blank=False)
     title = models.CharField(_("page title"), max_length=255, blank=True)
     content = models.TextField(_("page content"), blank=True)
     revision = models.PositiveIntegerField(_("current revision"), default=1)
     is_locked = models.BooleanField(_("page mutex"), default=False)
-    children = models.ForeignKey('self', related_name="parent", null=True)
+    parent = models.ForeignKey('self', related_name="children", null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
         permissions = (
@@ -122,10 +123,8 @@ class Page(models.Model):
         )
 
     def __str__(self):
-        return self.name
+        return self.full_name
 
     def get_display_name(self):
-        return self.name
+        return self.full_name
 
-    #def get(self, *args):
-    #    return self.__dict__
