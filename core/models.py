@@ -109,7 +109,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Page(models.Model):
-    full_name = models.CharField(_('page full name'), max_length=30, blank=False, primary_key=True)
     name = models.CharField(_('page name'), max_length=30, blank=False)
     title = models.CharField(_("page title"), max_length=255, blank=True)
     content = models.TextField(_("page content"), blank=True)
@@ -147,18 +146,7 @@ class Page(models.Model):
         """
         if '/' in self.name:
             self.name = self.name.split('/')[-1]
-        if self.full_name is None or self.full_name == "":
-            if self.parent is None:
-                self.full_name = self.name
-            else:
-                self.full_name = self.parent.get_full_name()+'/'+self.name
-        self.full_name.strip('/')
-        if self.full_name.split('/')[-1] != self.name:
-            self.full_name = '/'.join(['/'.join(self.full_name.split('/')[:-1]), self.name])
-        #if Page.objects.filter(name=self.name, parent=self.parent).exists():
-        #    raise ValidationError("Duplicate Page")
         super(Page, self).clean()
-        print("fullname: "+self.full_name)
         print("name: "+self.name)
 
     def save(self, *args, **kwargs):
@@ -169,8 +157,10 @@ class Page(models.Model):
         return self.get_full_name()
 
     def get_full_name(self):
-        return self.full_name
+        if self.parent is None:
+            return self.name
+        return '/'.join([self.parent.get_full_name(), self.name])
 
     def get_display_name(self):
-        return self.full_name
+        return self.get_full_name()
 

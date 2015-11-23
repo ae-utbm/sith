@@ -108,6 +108,8 @@ def page_edit(request, page_name=None):
                'page_name': page_name}
     p = Page.get_page_by_full_name(page_name)
     if p == None:
+        # TODO: guess page name by splitting on '/'
+        # Same for the parent, try to guess
         p = Page(name=page_name)
     if request.method == 'POST':
         f = PageForm(request.POST, instance=p)
