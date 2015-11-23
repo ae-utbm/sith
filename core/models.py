@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.utils.translation import ugettext_lazy as _
-from django.core import validators
 from django.utils import timezone
+from django.core import validators
+from django.core.exceptions import ValidationError
 from datetime import datetime
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -117,12 +118,57 @@ class Page(models.Model):
     parent = models.ForeignKey('self', related_name="children", null=True, blank=True, on_delete=models.SET_NULL)
 
     class Meta:
+        unique_together = ('name', 'parent')
         permissions = (
             ("can_edit", "Can edit the page"),
             ("can_view", "Can view the page"),
         )
 
+    @staticmethod
+    def get_page_by_full_name(name):
+        parent_name = '/'.join(name.split('/')[:-1])
+        name = name.split('/')[-1]
+        if parent_name == "":
+            qs = Page.objects.filter(name=name, parent=None)
+        else:
+            qs = Page.objects.filter(name=name, parent__name=parent_name)
+        return qs.first()
+
+    def __init__(self, *args, **kwargs):
+        super(Page, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        """
+        This function maintains coherence between full_name, name, and parent.full_name
+        Be careful modifying it, it could break the entire page table!
+
+        This function is mandatory since Django does not support compound primary key,
+        otherwise, Page class would have had PRIMARY_KEY(name, parent)
+        """
+        if '/' in self.name:
+            self.name = self.name.split('/')[-1]
+        if self.full_name is None or self.full_name == "":
+            if self.parent is None:
+                self.full_name = self.name
+            else:
+                self.full_name = self.parent.get_full_name()+'/'+self.name
+        self.full_name.strip('/')
+        if self.full_name.split('/')[-1] != self.name:
+            self.full_name = '/'.join(['/'.join(self.full_name.split('/')[:-1]), self.name])
+        #if Page.objects.filter(name=self.name, parent=self.parent).exists():
+        #    raise ValidationError("Duplicate Page")
+        super(Page, self).clean()
+        print("fullname: "+self.full_name)
+        print("name: "+self.name)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Page, self).save(*args, **kwargs)
+
     def __str__(self):
+        return self.get_full_name()
+
+    def get_full_name(self):
         return self.full_name
 
     def get_display_name(self):

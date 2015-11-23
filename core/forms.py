@@ -43,9 +43,13 @@ class LoginForm(AuthenticationForm):
                 )
 
 class PageForm(forms.ModelForm):
-    #parent = forms.ModelChoiceField(queryset=Page.objects.all())
-    #def __init__(self, *args, **kwargs):
-    #    super(PageForm, self).__init__(*args, **kwargs)
+    error_css_class = 'error'
+    required_css_class = 'required'
+    parent = forms.ModelChoiceField(queryset=Page.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        super(PageForm, self).__init__(*args, **kwargs)
+        self.fields['parent'].required = False
 
     class Meta:
         model = Page
@@ -53,11 +57,6 @@ class PageForm(forms.ModelForm):
 
     def save(self, commit=True):
         page = super(PageForm, self).save(commit=False)
-        if self.cleaned_data['parent'] is not None:
-            page.full_name = '/'.join([self.cleaned_data['parent'].full_name, self.cleaned_data['name']])
-        else:
-            page.full_name = self.cleaned_data['name']
-        page.name = self.cleaned_data['name'].split('/')[-1]
         if commit:
             page.save()
         return page

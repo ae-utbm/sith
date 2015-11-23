@@ -92,12 +92,12 @@ def page(request, page_name=None):
     if page_name == None:
         context['page_list'] = Page.objects.all
         return render(request, "core/page.html", context)
-    try:
+    context['page'] = Page.get_page_by_full_name(page_name)
+    if context['page'] is not None:
         context['view_page'] = True
-        context['page'] = Page.objects.filter(full_name=page_name).get()
         context['title'] = context['page'].title
         context['test'] = "PAGE_FOUND"
-    except Page.DoesNotExist:
+    else:
         context['title'] = "This page does not exist"
         context['new_page'] = page_name
         context['test'] = "PAGE_NOT_FOUND"
@@ -106,20 +106,20 @@ def page(request, page_name=None):
 def page_edit(request, page_name=None):
     context = {'title': 'Edit a page',
                'page_name': page_name}
-    p = Page.objects.filter(name=page_name).first()
+    p = Page.get_page_by_full_name(page_name)
     if p == None:
         p = Page(name=page_name)
     if request.method == 'POST':
         f = PageForm(request.POST, instance=p)
         if f.is_valid():
-            print("TROLL")
             f.save()
-            context['test'] = "PAGE_SAVED"
+            context['tests'] = "PAGE_SAVED"
         else:
-            context['test'] = "PAGE_NOT_SAVED"
+            context['tests'] = "PAGE_NOT_SAVED"
     else:
-        context['test'] = "POST_NOT_RECEIVED"
+        context['tests'] = "POST_NOT_RECEIVED"
+        f = PageForm(instance=p)
     context['page'] = p
-    context['page_form'] = PageForm(instance=p).as_p()
+    context['page_form'] = f.as_p()
     return render(request, 'core/page.html', context)
 
