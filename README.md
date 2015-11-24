@@ -7,6 +7,10 @@ To start working on the project, just run the following commands:
     cd Sith
     python3 manage.py migrate
 
+To load some initial data in the core:
+
+    python3 manage.py loaddata core/fixtures/*.json
+
 You will be prompted for your Gitlab account, so you need some.
 
 To start the debug server, just run `python3 manage.py runserver`
