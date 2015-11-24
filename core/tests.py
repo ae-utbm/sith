@@ -2,8 +2,8 @@ from django.test import SimpleTestCase, Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 
-from .models import User
-from .forms import RegisteringForm, LoginForm
+from core.models import User
+from core.views.forms import RegisteringForm, LoginForm
 
 class UserRegistrationTest(SimpleTestCase):
     def setUp(self):

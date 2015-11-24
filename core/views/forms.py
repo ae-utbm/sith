@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth import logout, login, authenticate
 import logging
 
-from .models import User, Page
+from core.models import User, Page
 
 class RegisteringForm(UserCreationForm):
     error_css_class = 'error'
