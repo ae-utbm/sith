@@ -65,6 +65,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
+    def to_dict(self):
+        return self.__dict__
+
+    def get_profile(self):
+        return {
+            "last_name": self.last_name,
+            "first_name": self.first_name,
+            "nick_name": self.nick_name,
+            "date_of_birth": self.date_of_birth,
+        }
+
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.

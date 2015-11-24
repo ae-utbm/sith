@@ -42,12 +42,19 @@ class LoginForm(AuthenticationForm):
                     params={'username': self.username_field.verbose_name},
                 )
 
-class EditUserForm(UserChangeForm):
+class UserEditForm(UserChangeForm):
     error_css_class = 'error'
     required_css_class = 'required'
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'date_of_birth', 'groups', 'user_permissions')
+        fields = ('first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', 'groups', 'user_permissions',)
+
+    def __init__(self, *args, **kwargs):
+        super(UserEditForm, self).__init__(*args, **kwargs)
+
+    def clean_password(self):
+        """We never handle password in this form"""
+        return
 
 
 class PagePropForm(forms.ModelForm):

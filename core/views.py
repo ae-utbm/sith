@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import logout as auth_logout
 from django.db import models
+from django.contrib.auth.forms import PasswordChangeForm
 
 from .models import User, Page
-from .forms import RegisteringForm, LoginForm, EditUserForm, PageEditForm, PagePropForm
+from .forms import RegisteringForm, LoginForm, UserEditForm, PageEditForm, PagePropForm
 
 import logging
 
@@ -89,8 +90,19 @@ def user_edit(request, user_id=None):
     if user_id is not None:
         user_id = int(user_id)
         if request.user.is_authenticated() and (request.user.pk == user_id or request.user.is_superuser):
-            context['profile'] = get_object_or_404(User, pk=user_id)
-            context['user_form'] = EditUserForm(instance=context['profile']).as_p()
+            p = get_object_or_404(User, pk=user_id)
+            if request.method == 'POST':
+                f = UserEditForm(request.POST, instance=p)
+                # Saving user
+                if f.is_valid():
+                    f.save()
+                    context['tests'] = "USER_SAVED"
+                else:
+                    context['tests'] = "USER_NOT_SAVED"
+            else:
+                f = UserEditForm(instance=p)
+            context['profile'] = p
+            context['user_form'] = f.as_p()
             return render(request, "core/edit_user.html", context)
     return user(request, user_id)
 

@@ -17,6 +17,7 @@ User list
 <p><a href="{% url 'core:user_edit' profile.id %}">Edit</a></p>
 {% endif %}
 <p>You're seeing the profile of <strong>{{ profile.get_display_name }}</strong></p>
+<p>{{ profile.nick_name }}</p>
 {% endif %}
 
 {% if user_list %}
