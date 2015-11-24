@@ -1,8 +1,11 @@
 # This file contains all the views that concern the user model
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.forms import PasswordChangeForm
 import logging
 
-from core.views.forms import RegisteringForm, LoginForm
+from core.views.forms import RegisteringForm, LoginForm, UserEditForm
+from core.models import User
 
 def register(request):
     context = {'title': 'Register a user'}

@@ -174,6 +174,21 @@ class Page(models.Model):
                 code='duplicate',
             )
         super(Page, self).clean()
+        if self.parent is not None and self in self.get_parent_list():
+            raise ValidationError(
+                _('Loop in page tree'),
+                code='loop',
+            )
+
+    def get_parent_list(self):
+        l = []
+        p = self.parent
+        while p is not None:
+            l.append(p)
+            p = p.parent
+        return l
+
+
 
     def save(self, *args, **kwargs):
         self.full_clean()

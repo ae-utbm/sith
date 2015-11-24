@@ -1,11 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from django.contrib.auth import logout as auth_logout
 from django.db import models
-from django.contrib.auth.forms import PasswordChangeForm
-
-from core.models import User, Page
-from core.views.forms import RegisteringForm, LoginForm, UserEditForm, PageEditForm, PagePropForm
 
 import logging
 
