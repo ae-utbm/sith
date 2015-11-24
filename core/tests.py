@@ -148,3 +148,64 @@ class UserRegistrationTest(SimpleTestCase):
         response = c.post(reverse('core:login'), {'username': 'gcarlier', 'password': 'guy'})
         self.assertTrue(response.status_code == 200)
         self.assertTrue('LOGIN_FAIL' in str(response.content))
+
+    def test_create_page_ok(self):
+        """
+        Should create a page correctly
+        """
+        c = Client()
+        response = c.post(reverse('core:page_edit', kwargs={'page_name': 'guy'}), {'parent': '',
+                                                                                   'name': 'guy',
+                                                                                   'title': 'Guy',
+                                                                                   'Content': 'Guyéuyuyé',
+                                                                                  })
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue('PAGE_SAVED' in str(response.content))
+
+    def test_create_child_page_ok(self):
+        """
+        Should create a page correctly
+        """
+        c = Client()
+        c.post(reverse('core:page_edit', kwargs={'page_name': 'guy'}), {'parent': '',
+                                                                        'name': 'guy',
+                                                                        'title': 'Guy',
+                                                                        'Content': 'Guyéuyuyé',
+                                                                       })
+        response = c.post(reverse('core:page_edit', kwargs={'page_name': 'guy/bibou'}), {'parent': '1',
+                                                                                         'name': 'bibou',
+                                                                                         'title': 'Bibou',
+                                                                                         'Content':
+                                                                                         'Bibibibiblblblblblbouuuuuuuuu',
+                                                                                        })
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue('PAGE_SAVED' in str(response.content))
+
+    def test_access_child_page_ok(self):
+        """
+        Should display a page correctly
+        """
+        c = Client()
+        c.post(reverse('core:page_edit', kwargs={'page_name': 'guy'}), {'parent': '',
+                                                                        'name': 'guy',
+                                                                        'title': 'Guy',
+                                                                        'Content': 'Guyéuyuyé',
+                                                                       })
+        c.post(reverse('core:page_edit', kwargs={'page_name': 'guy/bibou'}), {'parent': '1',
+                                                                              'name': 'bibou',
+                                                                              'title': 'Bibou',
+                                                                              'Content':
+                                                                              'Bibibibiblblblblblbouuuuuuuuu',
+                                                                             })
+        response = c.get(reverse('core:page', kwargs={'page_name': 'guy/bibou'}))
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue('PAGE_FOUND : Bibou' in str(response.content))
+
+    def test_access_page_not_found(self):
+        """
+        Should not display a page correctly
+        """
+        c = Client()
+        response = c.get(reverse('core:page', kwargs={'page_name': 'swagg'}))
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue('PAGE_NOT_FOUND' in str(response.content))

@@ -64,12 +64,15 @@ def login(request):
 
 def logout(request):
     """
-    The logout view:w
+    The logout view
     """
     auth_logout(request)
     return redirect('core:index')
 
 def user(request, user_id=None):
+    """
+    Display a user's profile
+    """
     context = {'title': 'View a user'}
     if user_id == None:
         context['user_list'] = User.objects.all
@@ -78,6 +81,9 @@ def user(request, user_id=None):
     return render(request, "core/user.html", context)
 
 def user_edit(request, user_id=None):
+    """
+    This view allows a user, or the allowed users to modify a profile
+    """
     user_id = int(user_id)
     context = {'title': 'Edit a user'}
     if user_id is not None:
@@ -88,6 +94,9 @@ def user_edit(request, user_id=None):
     return user(request, user_id)
 
 def page(request, page_name=None):
+    """
+    This view displays a page or the link to create it if 404
+    """
     context = {'title': 'View a Page'}
     if page_name == None:
         context['page_list'] = Page.objects.all
@@ -96,21 +105,30 @@ def page(request, page_name=None):
     if context['page'] is not None:
         context['view_page'] = True
         context['title'] = context['page'].title
-        context['test'] = "PAGE_FOUND"
+        context['tests'] = "PAGE_FOUND : "+context['page'].title
     else:
         context['title'] = "This page does not exist"
         context['new_page'] = page_name
-        context['test'] = "PAGE_NOT_FOUND"
+        context['tests'] = "PAGE_NOT_FOUND"
     return render(request, "core/page.html", context)
 
 def page_edit(request, page_name=None):
+    """
+    page_edit view, able to create a page, save modifications, and display the page ModelForm
+    """
     context = {'title': 'Edit a page',
                'page_name': page_name}
     p = Page.get_page_by_full_name(page_name)
+    # New page
     if p == None:
-        # TODO: guess page name by splitting on '/'
-        # Same for the parent, try to guess
-        p = Page(name=page_name)
+        parent_name = '/'.join(page_name.split('/')[:-1])
+        name = page_name.split('/')[-1]
+        if parent_name == "":
+            p = Page(name=name)
+        else:
+            parent = Page.get_page_by_full_name(parent_name)
+            p = Page(name=name, parent=parent)
+    # Saving page
     if request.method == 'POST':
         f = PageForm(request.POST, instance=p)
         if f.is_valid():
@@ -118,6 +136,7 @@ def page_edit(request, page_name=None):
             context['tests'] = "PAGE_SAVED"
         else:
             context['tests'] = "PAGE_NOT_SAVED"
+    # Default: display the edit form without change
     else:
         context['tests'] = "POST_NOT_RECEIVED"
         f = PageForm(instance=p)

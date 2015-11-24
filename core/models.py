@@ -109,12 +109,25 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Page(models.Model):
+    """
+    The page class to build a Wiki
+    Each page may have a parent and it's URL is of the form my.site/page/<grd_pa>/<parent>/<mypage>
+    It has an ID field, but don't use it, since it's only there for DB part, and because compound primary key is
+    awkward!
+    Prefere querying pages with Page.get_page_by_full_name()
+
+    Be careful with the full_name attribute: this field may not be valid until you call save(). It's made for fast
+    query, but don't rely on it when playing with a Page object, use get_full_name() instead!
+    """
     name = models.CharField(_('page name'), max_length=30, blank=False)
     title = models.CharField(_("page title"), max_length=255, blank=True)
     content = models.TextField(_("page content"), blank=True)
     revision = models.PositiveIntegerField(_("current revision"), default=1)
     is_locked = models.BooleanField(_("page mutex"), default=False)
     parent = models.ForeignKey('self', related_name="children", null=True, blank=True, on_delete=models.SET_NULL)
+    # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
+    # playing with a Page object, use get_full_name() instead!
+    full_name = models.CharField(_('page name'), max_length=255, blank=True)
 
     class Meta:
         unique_together = ('name', 'parent')
@@ -125,38 +138,43 @@ class Page(models.Model):
 
     @staticmethod
     def get_page_by_full_name(name):
-        parent_name = '/'.join(name.split('/')[:-1])
-        name = name.split('/')[-1]
-        if parent_name == "":
-            qs = Page.objects.filter(name=name, parent=None)
-        else:
-            qs = Page.objects.filter(name=name, parent__name=parent_name)
-        return qs.first()
+        """
+        Quicker to get a page with that method rather than building the request every time
+        """
+        return Page.objects.filter(full_name=name).first()
 
     def __init__(self, *args, **kwargs):
         super(Page, self).__init__(*args, **kwargs)
 
     def clean(self):
         """
-        This function maintains coherence between full_name, name, and parent.full_name
-        Be careful modifying it, it could break the entire page table!
-
-        This function is mandatory since Django does not support compound primary key,
-        otherwise, Page class would have had PRIMARY_KEY(name, parent)
+        Cleans up only the name for the moment, but this can be used to make any treatment before saving the object
         """
         if '/' in self.name:
             self.name = self.name.split('/')[-1]
+        if Page.objects.exclude(pk=self.pk).filter(full_name=self.get_full_name()).exists():
+            raise ValidationError(
+                _('Duplicate page'),
+                code='duplicate',
+            )
         super(Page, self).clean()
-        print("name: "+self.name)
 
     def save(self, *args, **kwargs):
         self.full_clean()
+        # This reset the full_name just before saving to maintain a coherent field quicker for queries than the
+        # recursive method
+        self.full_name = self.get_full_name()
         super(Page, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.get_full_name()
 
     def get_full_name(self):
+        """
+        Computes the real full_name of the page based on its name and its parent's name
+        You can and must rely on this function when working on a page object that is not freshly fetched from the DB
+        (For example when treating a Page object coming from a form)
+        """
         if self.parent is None:
             return self.name
         return '/'.join([self.parent.get_full_name(), self.name])
