@@ -1,10 +1,17 @@
 from django.test import SimpleTestCase, Client
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import Group
 
 from .models import User
 from .forms import RegisteringForm, LoginForm
 
 class UserRegistrationTest(SimpleTestCase):
+    def setUp(self):
+        try:
+            Group.objects.create(name="root")
+        except:
+            pass
+
     def test_register_user_form_ok(self):
         """
         Should register a user correctly
@@ -209,3 +216,8 @@ class UserRegistrationTest(SimpleTestCase):
         response = c.get(reverse('core:page', kwargs={'page_name': 'swagg'}))
         self.assertTrue(response.status_code == 200)
         self.assertTrue('PAGE_NOT_FOUND' in str(response.content))
+
+#TODO: many tests on the pages:
+#   - renaming a page
+#   - changing a page's parent --> check that page's children's full_name
+#   - changing the different groups of the page

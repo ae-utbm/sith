@@ -11,5 +11,10 @@ Edit {{ profile.get_display_name }}
 <h3>Edit user</h3>
 <p><a href="{% url 'core:user_profile' profile.id %}">Back to profile</a></p>
 <p>You're editing the profile of <strong>{{ profile.get_display_name }}</strong></p>
+<form action="{% url 'core:user_edit' profile.id %}" method="post">
+    {% csrf_token %}
+    {{ user_form }}
+    <p><input type="submit" value="Save!" /></p>
+</form>
 {% endif %}
 {% endblock %}

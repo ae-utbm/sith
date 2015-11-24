@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^page/$', views.page, name='page_list'),
     url(r'^page/(?P<page_name>[a-z0-9/]*)/$', views.page, name='page'),
     url(r'^page/(?P<page_name>[a-z0-9/]*)/edit$', views.page_edit, name='page_edit'),
+    url(r'^page/(?P<page_name>[a-z0-9/]*)/prop$', views.page_prop, name='page_prop'),
 ]
 

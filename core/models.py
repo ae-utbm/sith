@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
@@ -130,11 +130,15 @@ class Page(models.Model):
     # playing with a Page object, use get_full_name() instead!
     full_name = models.CharField(_('page name'), max_length=255, blank=True)
 
+    owner_group = models.ForeignKey(Group, related_name="owned_pages", default=1)
+    edit_group = models.ForeignKey(Group, related_name="editable_pages", default=1)
+    view_group = models.ForeignKey(Group, related_name="viewable_pages", default=1)
+
     class Meta:
         unique_together = ('name', 'parent')
         permissions = (
-            ("can_edit", "Can edit the page"),
-            ("can_view", "Can view the page"),
+            #("can_edit", "Can edit the page"),
+            #("can_view", "Can view the page"),
         )
 
     @staticmethod
