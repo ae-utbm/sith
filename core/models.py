@@ -120,6 +120,7 @@ class Page(models.Model):
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
     """
     name = models.CharField(_('page name'), max_length=30, blank=False)
+# TODO: move title and content to PageRev class with a OneToOne field
     title = models.CharField(_("page title"), max_length=255, blank=True)
     content = models.TextField(_("page content"), blank=True)
     revision = models.PositiveIntegerField(_("current revision"), default=1)
@@ -163,7 +164,10 @@ class Page(models.Model):
         self.full_clean()
         # This reset the full_name just before saving to maintain a coherent field quicker for queries than the
         # recursive method
+        # It also update all the children to maintain correct names
         self.full_name = self.get_full_name()
+        for c in self.children.all():
+            c.save()
         super(Page, self).save(*args, **kwargs)
 
     def __str__(self):
