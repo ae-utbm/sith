@@ -9,7 +9,7 @@ To start working on the project, just run the following commands:
 
 To load some initial data in the core:
 
-    python3 manage.py loaddata users pages
+    python3 manage.py loaddata users groups pages
 
 You will be prompted for your Gitlab account, so you need some.
 
