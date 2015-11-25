@@ -12,11 +12,17 @@ def page(request, page_name=None):
     if page_name == None:
         context['page_list'] = Page.objects.all
         return render(request, "core/page.html", context)
-    context['page'] = Page.get_page_by_full_name(page_name)
-    if context['page'] is not None:
+    p = Page.get_page_by_full_name(page_name)
+    if p is not None:
         context['view_page'] = True
-        context['title'] = context['page'].title
-        context['tests'] = "PAGE_FOUND : "+context['page'].title
+        if request.user.has_perm('can_view', p):
+            context['title'] = p.title
+            context['page'] = p
+            context['tests'] = "PAGE_FOUND : "+p.title
+        else:
+            context['title'] = "Access denied"
+            context['tests'] = "PAGE_FOUND_BUT_DENIED"
+            context['page'] = Page(title="Denied", content="You have no access to this page")
     else:
         context['title'] = "This page does not exist"
         context['new_page'] = page_name

@@ -149,7 +149,7 @@ class Page(models.Model):
         unique_together = ('name', 'parent')
         permissions = (
             #("can_edit", "Can edit the page"),
-            #("can_view", "Can view the page"),
+            ("can_view", "Can view the page"),
         )
 
     @staticmethod
