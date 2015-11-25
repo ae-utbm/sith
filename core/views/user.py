@@ -1,13 +1,50 @@
 # This file contains all the views that concern the user model
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import logout as auth_logout
-from django.contrib.auth import views
+from django.contrib.auth import logout as auth_logout, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.urlresolvers import reverse
 import logging
 
 from core.views.forms import RegisteringForm, LoginForm, UserEditForm
 from core.models import User
+
+def login(request):
+    """
+    The login view
+
+    Needs to be improve with correct handling of form exceptions
+    """
+    return views.login(request, template_name="core/login.html")
+
+def logout(request):
+    """
+    The logout view
+    """
+    return views.logout_then_login(request)
+
+def password_change(request):
+    """
+    Allows a user to change its password
+    """
+    return views.password_change(request, template_name="core/password_change.html")
+
+def password_change_done(request):
+    """
+    Allows a user to change its password
+    """
+    return views.password_change_done(request, template_name="core/password_change_done.html")
+
+def password_reset_confirm(request):
+    pass
+
+def password_reset_complete(request):
+    pass
+
+def password_reset_done(request):
+    pass
+
+def password_reset(request):
+    pass
 
 def register(request):
     context = {'title': 'Register a user'}
@@ -26,20 +63,6 @@ def register(request):
         form = RegisteringForm()
     context['form'] = form.as_p()
     return render(request, "core/register.html", context)
-
-def login(request):
-    """
-    The login view
-
-    Needs to be improve with correct handling of form exceptions
-    """
-    return views.login(request, template_name="core/login.html")
-
-def logout(request):
-    """
-    The logout view
-    """
-    return views.logout_then_login(request)
 
 def user(request, user_id=None):
     """
