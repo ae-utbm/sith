@@ -1,7 +1,9 @@
 # This file contains all the views that concern the user model
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import views
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core.urlresolvers import reverse
 import logging
 
 from core.views.forms import RegisteringForm, LoginForm, UserEditForm
@@ -31,28 +33,13 @@ def login(request):
 
     Needs to be improve with correct handling of form exceptions
     """
-    context = {'title': 'Login'}
-    if request.method == 'POST':
-        try:
-            form = LoginForm(request)
-            form.login()
-            context['tests'] = 'LOGIN_OK'
-            return render(request, 'core/index.html', context)
-        except Exception as e:
-            logging.debug(e)
-            context['error'] = "Login failed"
-            context['tests'] = 'LOGIN_FAIL'
-    else:
-        form = LoginForm()
-    context['form'] = form.as_p()
-    return render(request, "core/login.html", context)
+    return views.login(request, template_name="core/login.html")
 
 def logout(request):
     """
     The logout view
     """
-    auth_logout(request)
-    return redirect('core:index')
+    return views.logout_then_login(request)
 
 def user(request, user_id=None):
     """
