@@ -1,0 +1,21 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    Page list
+{% endblock %}
+
+{% block content %}
+    {% if page_list %}
+        <h3>Page list</h3>
+        <ul>
+            {% for p in page_list %}
+                <li><a href="{% url 'core:page' p.get_full_name %}">{{ p.get_display_name }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        There is no page in this website.
+    {% endif %}
+{% endblock %}
+
+
+

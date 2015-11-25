@@ -1,0 +1,13 @@
+{% extends "core/page.html" %}
+
+{% block page %}
+    <h2>Edit page</h2>
+    <form action="{% url 'core:page_edit' page_name=page.get_full_name %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p><input type="submit" value="Save!" /></p>
+    </form>
+{% endblock %}
+
+
+

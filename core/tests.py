@@ -161,7 +161,7 @@ class UserRegistrationTest(SimpleTestCase):
         Should create a page correctly
         """
         c = Client()
-        response = c.post(reverse('core:page_edit', kwargs={'page_name': 'guy'}), {'parent': '',
+        response = c.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
                                                                                    'name': 'guy',
                                                                                    'title': 'Guy',
                                                                                    'Content': 'Guyéuyuyé',
@@ -174,12 +174,12 @@ class UserRegistrationTest(SimpleTestCase):
         Should create a page correctly
         """
         c = Client()
-        c.post(reverse('core:page_edit', kwargs={'page_name': 'guy'}), {'parent': '',
+        c.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
                                                                         'name': 'guy',
                                                                         'title': 'Guy',
                                                                         'Content': 'Guyéuyuyé',
                                                                        })
-        response = c.post(reverse('core:page_edit', kwargs={'page_name': 'guy/bibou'}), {'parent': '1',
+        response = c.post(reverse('core:page_prop', kwargs={'page_name': 'guy/bibou'}), {'parent': '1',
                                                                                          'name': 'bibou',
                                                                                          'title': 'Bibou',
                                                                                          'Content':
@@ -193,12 +193,12 @@ class UserRegistrationTest(SimpleTestCase):
         Should display a page correctly
         """
         c = Client()
-        c.post(reverse('core:page_edit', kwargs={'page_name': 'guy'}), {'parent': '',
+        c.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
                                                                         'name': 'guy',
                                                                         'title': 'Guy',
                                                                         'Content': 'Guyéuyuyé',
                                                                        })
-        c.post(reverse('core:page_edit', kwargs={'page_name': 'guy/bibou'}), {'parent': '1',
+        c.post(reverse('core:page_prop', kwargs={'page_name': 'guy/bibou'}), {'parent': '1',
                                                                               'name': 'bibou',
                                                                               'title': 'Bibou',
                                                                               'Content':

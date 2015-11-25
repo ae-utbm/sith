@@ -1,0 +1,16 @@
+{% extends "core/page.html" %}
+
+{% block page %}
+    <h3>Page</h3>
+    <p><a href="{% url 'core:page_list' %}">Back to list</a></p>
+    {% if user.is_superuser %}
+        <p><a href="{% url 'core:page_edit' page.get_full_name %}">Edit</a></p>
+        <p><a href="{% url 'core:page_prop' page.get_full_name %}">Prop</a></p>
+    {% endif %}
+    <p>You're seeing the page <strong>{{ page.get_display_name }}</strong></p>
+    <h3>{{ page.title }}</h3>
+    <p>{{ page.content }}</p>
+{% endblock %}
+
+
+

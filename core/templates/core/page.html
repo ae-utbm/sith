@@ -6,48 +6,16 @@
     {% elif page_list %}
         Page list
     {% else %}
-        {{ title }}
+        Not found
     {% endif %}
 {% endblock %}
 
 {% block content %}
-    {% if view_page %}
-        <h3>Page</h3>
-        <p><a href="{% url 'core:page_list' %}">Back to list</a></p>
-        {% if user.is_superuser %}
-            <p><a href="{% url 'core:page_edit' page.get_full_name %}">Edit</a></p>
-            <p><a href="{% url 'core:page_prop' page.get_full_name %}">Prop</a></p>
-        {% endif %}
-        <p>You're seeing the page <strong>{{ page.get_display_name }}</strong></p>
-        <h3>{{ page.title }}</h3>
-        <p>{{ page.content }}</p>
-    {% elif page_list %}
-        <h3>Page list</h3>
-        <ul>
-            {% for p in page_list %}
-                <li><a href="{% url 'core:page' p.get_full_name %}">{{ p.get_display_name }}</a></li>
-            {% endfor %}
-        </ul>
-    {% elif new_page %}
-        <h2>{{ title }}</h2>
-        <p><a href="{% url 'core:page_prop' new_page %}">Create it?</a></p>
-    {% elif page_prop %}
-        <h2>Page properties</h2>
-        <form action="{% url 'core:page_prop' page_name=page.get_full_name %}" method="post">
-            {% csrf_token %}
-            {{ page_prop }}
-            <p><input type="submit" value="Save!" /></p>
-        </form>
-    {% elif page_edit %}
-        <h2>Edit page</h2>
-        <form action="{% url 'core:page_edit' page_name=page.get_full_name %}" method="post">
-            {% csrf_token %}
-            {{ page_edit }}
-            <p><input type="submit" value="Save!" /></p>
-        </form>
+    {% if page %}
+        {% block page %}
+        {% endblock %}
     {% else %}
-        There is no page in this website.
+        <h2>Page does not exist</h2>
+        <p><a href="{% url 'core:page_prop' new_page %}">Create it?</a></p>
     {% endif %}
 {% endblock %}
-
-

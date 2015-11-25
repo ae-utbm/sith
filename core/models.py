@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from datetime import datetime
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -188,8 +189,6 @@ class Page(models.Model):
             p = p.parent
         return l
 
-
-
     def save(self, *args, **kwargs):
         self.full_clean()
         # This reset the full_name just before saving to maintain a coherent field quicker for queries than the
@@ -199,6 +198,12 @@ class Page(models.Model):
         for c in self.children.all():
             c.save()
         super(Page, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        """
+        This is needed for black magic powered UpdateView's children
+        """
+        return reverse('core:page', kwargs={'page_name': self.full_name})
 
     def __str__(self):
         return self.get_full_name()
