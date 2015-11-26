@@ -39,6 +39,7 @@ class PagePropView(UpdateView):
     def get_object(self):
         page_name = self.kwargs['page_name']
         p = Page.get_page_by_full_name(page_name)
+        # Create the page if it does not exists
         if p == None:
             parent_name = '/'.join(page_name.split('/')[:-1])
             name = page_name.split('/')[-1]

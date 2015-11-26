@@ -36,27 +36,37 @@ def password_change_done(request):
     return views.password_change_done(request, template_name="core/password_change_done.html")
 
 def password_reset(request):
+    """
+    Allows someone to enter an email adresse for resetting password
+    """
     return views.password_reset(request,
                                 template_name="core/password_reset.html",
                                 email_template_name="core/password_reset_email.html",
-                                post_reset_redirect="core:password_reset",
+                                post_reset_redirect="core:password_reset_done",
                                )
 
 def password_reset_done(request):
-    return views.password_reset_done(request)
-    pass
+    """
+    Confirm that the reset email has been sent
+    """
+    return views.password_reset_done(request, template_name="core/password_reset_done.html")
 
 def password_reset_confirm(request, uidb64=None, token=None):
+    """
+    Provide a reset password formular
+    """
     return views.password_reset_confirm(request, uidb64=uidb64, token=token,
                                         post_reset_redirect="core:password_reset_complete",
                                         template_name="core/password_reset_confirm.html",
                                        )
 
 def password_reset_complete(request):
+    """
+    Confirm the password has sucessfully been reset
+    """
     return views.password_reset_complete(request,
                                          template_name="core/password_reset_complete.html",
                                         )
-    pass
 
 def register(request):
     context = {'title': 'Register a user'}
