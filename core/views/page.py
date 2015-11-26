@@ -2,6 +2,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView
+from django.contrib.auth.decorators import login_required, permission_required
+from django.utils.decorators import method_decorator
 
 from core.models import Page
 
@@ -14,6 +16,10 @@ class PageListView(ListView):
 
 class PageView(DetailView):
     model = Page
+
+    @method_decorator(permission_required('core.can_view'))
+    def dispatch(self, *args, **kwargs):
+        return super(PageView, self).dispatch(*args, **kwargs)
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])

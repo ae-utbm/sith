@@ -17,6 +17,9 @@ urlpatterns = [
     url(r'^reset/done/$', password_reset_complete, name='password_reset_complete'),
     url(r'^register$', register, name='register'),
 
+    url(r'^group/$', GroupListView.as_view(), name='group_list'),
+    url(r'^group/(?P<group_id>[0-9]+)/$', GroupEditView.as_view(), name='group_edit'),
+
     url(r'^user/$', UserListView.as_view(), name='user_list'),
     url(r'^user/(?P<user_id>[0-9]+)/$', UserView.as_view(), name='user_profile'),
     url(r'^user/(?P<user_id>[0-9]+)/edit$', UserUpdateProfileView.as_view(), name='user_edit'),

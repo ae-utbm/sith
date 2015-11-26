@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group as AuthGroup
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
@@ -125,6 +125,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.username = user_name
         return user_name
 
+class Group(AuthGroup):
+    def get_absolute_url(self):
+        """
+        This is needed for black magic powered UpdateView's children
+        """
+        return reverse('core:group_edit', kwargs={'group_id': self.pk})
 
 class Page(models.Model):
     """
@@ -226,4 +232,5 @@ class Page(models.Model):
 
     def get_display_name(self):
         return self.get_full_name()
+
 
