@@ -63,6 +63,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
+    def get_absolute_url(self):
+        """
+        This is needed for black magic powered UpdateView's children
+        """
+        return reverse('core:user_profile', kwargs={'user_id': self.pk})
+
     def __str__(self):
         return self.username
 

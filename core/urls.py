@@ -17,9 +17,10 @@ urlpatterns = [
     url(r'^reset/done/$', password_reset_complete, name='password_reset_complete'),
     url(r'^register$', register, name='register'),
 
-    url(r'^user/$', user, name='user_list'),
-    url(r'^user/(?P<user_id>[0-9]+)/$', user, name='user_profile'),
-    url(r'^user/(?P<user_id>[0-9]+)/edit$', user_edit, name='user_edit'),
+    url(r'^user/$', UserListView.as_view(), name='user_list'),
+    url(r'^user/(?P<user_id>[0-9]+)/$', UserView.as_view(), name='user_profile'),
+    url(r'^user/(?P<user_id>[0-9]+)/edit$', UserUpdateProfileView.as_view(), name='user_edit'),
+    url(r'^user/(?P<user_id>[0-9]+)/groups$', UserUpdateGroupsView.as_view(), name='user_groups'),
     url(r'^page/$', PageListView.as_view(), name='page_list'),
     url(r'^page/(?P<page_name>[a-z0-9/]*)/$', PageView.as_view(), name='page'),
     url(r'^page/(?P<page_name>[a-z0-9/]*)/edit$', PageEditView.as_view(), name='page_edit'),

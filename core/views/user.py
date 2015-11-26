@@ -1,12 +1,12 @@
 # This file contains all the views that concern the user model
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout as auth_logout, views
-from django.contrib.auth.forms import PasswordChangeForm
 from django.core.urlresolvers import reverse
-from django.core.mail import send_mail
+from django.views.generic.edit import UpdateView
+from django.views.generic import ListView, DetailView
 import logging
 
-from core.views.forms import RegisteringForm, LoginForm, UserEditForm
+from core.views.forms import RegisteringForm, UserGroupsForm
 from core.models import User
 
 def login(request):
@@ -68,6 +68,7 @@ def password_reset_complete(request):
                                          template_name="core/password_reset_complete.html",
                                         )
 
+
 def register(request):
     context = {'title': 'Register a user'}
     if request.method == 'POST':
@@ -86,38 +87,35 @@ def register(request):
     context['form'] = form.as_p()
     return render(request, "core/register.html", context)
 
-def user(request, user_id=None):
+class UserView(DetailView):
     """
     Display a user's profile
     """
-    context = {'title': 'View a user'}
-    if user_id == None:
-        context['user_list'] = User.objects.all
-        return render(request, "core/user.html", context)
-    context['profile'] = get_object_or_404(User, pk=user_id)
-    return render(request, "core/user.html", context)
+    model = User
+    pk_url_kwarg = "user_id"
+    context_object_name = "profile"
 
-def user_edit(request, user_id=None):
+class UserListView(ListView):
     """
-    This view allows a user, or the allowed users to modify a profile
+    Displays the user list
     """
-    user_id = int(user_id)
-    context = {'title': 'Edit a user'}
-    if user_id is not None:
-        user_id = int(user_id)
-        if request.user.is_authenticated() and (request.user.pk == user_id or request.user.is_superuser):
-            p = get_object_or_404(User, pk=user_id)
-            if request.method == 'POST':
-                f = UserEditForm(request.POST, instance=p)
-                # Saving user
-                if f.is_valid():
-                    f.save()
-                    context['tests'] = "USER_SAVED"
-                else:
-                    context['tests'] = "USER_NOT_SAVED"
-            else:
-                f = UserEditForm(instance=p)
-            context['profile'] = p
-            context['user_form'] = f.as_p()
-            return render(request, "core/edit_user.html", context)
-    return user(request, user_id)
+    model = User
+
+class UserUpdateProfileView(UpdateView):
+    """
+    Edit a user's profile
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    template_name = "core/user_edit.html"
+    fields = ('first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', )
+
+class UserUpdateGroupsView(UpdateView):
+    """
+    Edit a user's groups
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    template_name = "core/user_groups.html"
+    form_class = UserGroupsForm
+

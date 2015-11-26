@@ -10,7 +10,7 @@
         {% block header %}
         {% if user.is_authenticated %}Hello, {{ user.username }}!{% endif %}
         <ul>
-            <li><a href="">Register</a></li>
+            <li><a href="{% url 'core:register' %}">Register</a></li>
             <li><a href="{% url 'core:login' %}">Login</a></li>
             <li><a href="{% url 'core:logout' %}">Logout</a></li>
             <li><a href="{% url 'core:user_list' %}">Users</a></li>

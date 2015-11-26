@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+User list
+{% endblock %}
+
+{% block content %}
+<h3>User list</h3>
+<ul>
+{% for u in user_list %}
+<li><a href="{% url 'core:user_profile' u.id %}">{{ u.get_display_name }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
+
