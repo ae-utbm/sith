@@ -101,7 +101,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Auth configuration
+
 AUTH_USER_MODEL = 'core.User'
 LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
 LOGIN_REDIRECT_URL = '/'
+DEFAULT_FROM_EMAIL="bibou@git.an"
+
+# Email
+EMAIL_HOST="localhost"
+EMAIL_PORT=25

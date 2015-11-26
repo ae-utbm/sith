@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout as auth_logout, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
 import logging
 
 from core.views.forms import RegisteringForm, LoginForm, UserEditForm
@@ -26,7 +27,7 @@ def password_change(request):
     """
     Allows a user to change its password
     """
-    return views.password_change(request, template_name="core/password_change.html")
+    return views.password_change(request, template_name="core/password_change.html", post_change_redirect=reverse("core:password_change_done"))
 
 def password_change_done(request):
     """
@@ -34,16 +35,27 @@ def password_change_done(request):
     """
     return views.password_change_done(request, template_name="core/password_change_done.html")
 
-def password_reset_confirm(request):
-    pass
-
-def password_reset_complete(request):
-    pass
+def password_reset(request):
+    return views.password_reset(request,
+                                template_name="core/password_reset.html",
+                                email_template_name="core/password_reset_email.html",
+                                post_reset_redirect="core:password_reset",
+                               )
 
 def password_reset_done(request):
+    return views.password_reset_done(request)
     pass
 
-def password_reset(request):
+def password_reset_confirm(request, uidb64=None, token=None):
+    return views.password_reset_confirm(request, uidb64=uidb64, token=token,
+                                        post_reset_redirect="core:password_reset_complete",
+                                        template_name="core/password_reset_confirm.html",
+                                       )
+
+def password_reset_complete(request):
+    return views.password_reset_complete(request,
+                                         template_name="core/password_reset_complete.html",
+                                        )
     pass
 
 def register(request):
