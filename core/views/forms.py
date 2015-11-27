@@ -44,6 +44,12 @@ class PagePropForm(forms.ModelForm):
             'view_group': CheckboxSelectMultiple,
         }
 
+    def __init__(self, *arg, **kwargs):
+        super(PagePropForm, self).__init__(*arg, **kwargs)
+        self.fields['edit_group'].required = False
+        self.fields['view_group'].required = False
+
+
 class GroupEditForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'
