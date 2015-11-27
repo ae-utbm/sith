@@ -33,6 +33,17 @@ class UserGroupsForm(forms.ModelForm):
             'user_permissions': CheckboxSelectMultiple,
         }
 
+class PagePropForm(forms.ModelForm):
+    error_css_class = 'error'
+    required_css_class = 'required'
+    class Meta:
+        model = Page
+        fields = ['parent', 'name', 'owner_group', 'edit_group', 'view_group', ]
+        widgets = {
+            'edit_group': CheckboxSelectMultiple,
+            'view_group': CheckboxSelectMultiple,
+        }
+
 class GroupEditForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'

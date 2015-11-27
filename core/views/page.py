@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 
 from core.models import Page
+from core.views.forms import PagePropForm
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 
 class PageListView(ListView):
     model = Page
@@ -14,12 +16,23 @@ class PageListView(ListView):
         context = super(PageListView, self).get_context_data(**kwargs)
         return context
 
-class PageView(DetailView):
-    model = Page
+# Define some right management callable for user_passes_test
+def user_can_view(as_view):
+    def guy(*arg, **kwargs):
+        res = self.as_view(*arg, **kwargs)
 
-    @method_decorator(permission_required('core.can_view'))
-    def dispatch(self, *args, **kwargs):
-        return super(PageView, self).dispatch(*args, **kwargs)
+        user = self.request.user
+        obj = self.page
+        for g in obj.view_group.all():
+            if g in user.groups.all():
+                print("Allowed")
+                return res
+        print("Not allowed")
+        return res
+    return guy
+
+class PageView(CanViewMixin, DetailView):
+    model = Page
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
@@ -34,13 +47,10 @@ class PageView(DetailView):
             context['new_page'] = self.kwargs['page_name']
         return context
 
-class PagePropView(UpdateView):
+class PagePropView(CanEditPropMixin, UpdateView):
     model = Page
-    fields = ['parent', 'name', 'owner_group', 'edit_group', 'view_group', ]
+    form_class = PagePropForm
     template_name_suffix = '_prop'
-
-    def __init__(self, *args, **kwargs):
-        super(PagePropView, self).__init__(*args, **kwargs)
 
     def get_object(self):
         page_name = self.kwargs['page_name']
@@ -66,7 +76,7 @@ class PagePropView(UpdateView):
             context['new_page'] = self.kwargs['page_name']
         return context
 
-class PageEditView(UpdateView):
+class PageEditView(CanEditMixin, UpdateView):
     model = Page
     fields = ['title', 'content',]
     template_name_suffix = '_edit'

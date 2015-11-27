@@ -154,9 +154,11 @@ class Page(models.Model):
     # playing with a Page object, use get_full_name() instead!
     full_name = models.CharField(_('page name'), max_length=255, blank=True)
 
+# TODO: Rightable abstract class from which every object with right needed will be able to be child of
+# Put thoses 3 attributes there
     owner_group = models.ForeignKey(Group, related_name="owned_pages", default=1)
-    edit_group = models.ForeignKey(Group, related_name="editable_pages", default=1)
-    view_group = models.ForeignKey(Group, related_name="viewable_pages", default=1)
+    edit_group = models.ManyToManyField(Group, related_name="editable_pages", default=1)
+    view_group = models.ManyToManyField(Group, related_name="viewable_pages", default=1)
 
     class Meta:
         unique_together = ('name', 'parent')
