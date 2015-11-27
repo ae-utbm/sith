@@ -151,10 +151,7 @@ class Page(GroupManagedObject, models.Model):
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
     """
     name = models.CharField(_('page name'), max_length=30, blank=False)
-# TODO: move title and content to PageRev class with a OneToOne field
-    title = models.CharField(_("page title"), max_length=255, blank=True)
-    content = models.TextField(_("page content"), blank=True)
-    revision = models.PositiveIntegerField(_("current revision"), default=1)
+    revision = models.OneToOneField('PageRevision')
     is_locked = models.BooleanField(_("page mutex"), default=False)
     parent = models.ForeignKey('self', related_name="children", null=True, blank=True, on_delete=models.SET_NULL)
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
@@ -178,6 +175,10 @@ class Page(GroupManagedObject, models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Page, self).__init__(*args, **kwargs)
+        if self.revision is None:
+            self.revision = PageRevision()
+            self.revision.save()
+
 
     def clean(self):
         """
@@ -190,6 +191,8 @@ class Page(GroupManagedObject, models.Model):
                 _('Duplicate page'),
                 code='duplicate',
             )
+        if self.revision is not None:
+            self.revision = PageRevision(self.revision)
         super(Page, self).clean()
         if self.parent is not None and self in self.get_parent_list():
             raise ValidationError(
@@ -237,4 +240,10 @@ class Page(GroupManagedObject, models.Model):
     def get_display_name(self):
         return self.get_full_name()
 
+
+class PageRevision(models.Model):
+# TODO: move title and content to PageRev class with a OneToOne field
+    title = models.CharField(_("page title"), max_length=255, blank=True)
+    content = models.TextField(_("page content"), blank=True)
+    parent_page = models.ForeignKey(Page, related_name="revisions", null=False, blank=False)
 
