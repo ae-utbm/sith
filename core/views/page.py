@@ -5,7 +5,7 @@ from django.views.generic.edit import UpdateView
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 
-from core.models import Page, PageRevision
+from core.models import Page
 from core.views.forms import PagePropForm
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 
@@ -60,17 +60,17 @@ class PagePropView(CanEditPropMixin, UpdateView):
             parent_name = '/'.join(page_name.split('/')[:-1])
             name = page_name.split('/')[-1]
             if parent_name == "":
-                p = Page(name=name, revision=PageRevision())
+                p = Page(name=name)
             else:
                 parent = Page.get_page_by_full_name(parent_name)
-                p = Page(name=name, parent=parent, revision=PageRevision())
+                p = Page(name=name, parent=parent)
         self.page = p
         return self.page
 
     def get_context_data(self, **kwargs):
         context = super(PagePropView, self).get_context_data(**kwargs)
         if "page" in context.keys():
-            context['tests'] = "PAGE_FOUND : "+context['page'].revision.title
+            context['tests'] = "PAGE_FOUND : "+context['page'].title
         else:
             context['tests'] = "PAGE_NOT_FOUND"
             context['new_page'] = self.kwargs['page_name']
@@ -78,7 +78,7 @@ class PagePropView(CanEditPropMixin, UpdateView):
 
 class PageEditView(CanEditMixin, UpdateView):
     model = Page
-    fields = ['revision.title', 'revision.content',]
+    fields = ['title', 'content',]
     template_name_suffix = '_edit'
 
     def get_object(self):
@@ -88,7 +88,7 @@ class PageEditView(CanEditMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(PageEditView, self).get_context_data(**kwargs)
         if "page" in context.keys():
-            context['tests'] = "PAGE_FOUND : "+context['page'].revision.title
+            context['tests'] = "PAGE_FOUND : "+context['page'].title
         else:
             context['tests'] = "PAGE_NOT_FOUND"
             context['new_page'] = self.kwargs['page_name']
