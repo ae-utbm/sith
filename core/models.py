@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
@@ -139,6 +139,18 @@ class GroupManagedObject(models.Model):
     class Meta:
         abstract = True
 
+class LockError(Exception):
+    """There was a lock error on the object"""
+    pass
+
+class AlreadyLocked(LockError):
+    """The object is already locked"""
+    pass
+
+class NotLocked(LockError):
+    """The object is not locked"""
+    pass
+
 class Page(GroupManagedObject, models.Model):
     """
     The page class to build a Wiki
@@ -151,11 +163,11 @@ class Page(GroupManagedObject, models.Model):
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
     """
     name = models.CharField(_('page name'), max_length=30, blank=False)
-    is_locked = models.BooleanField(_("page mutex"), default=False)
     parent = models.ForeignKey('self', related_name="children", null=True, blank=True, on_delete=models.SET_NULL)
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
     full_name = models.CharField(_('page name'), max_length=255, blank=True)
+    lock_mutex = {}
 
 
     class Meta:
@@ -202,6 +214,11 @@ class Page(GroupManagedObject, models.Model):
         return l
 
     def save(self, *args, **kwargs):
+        """
+        Performs some needed actions before and after saving a page in database
+        """
+        if not self.is_locked():
+            raise NotLocked("The page is not locked and thus can not be saved")
         self.full_clean()
         # This reset the full_name just before saving to maintain a coherent field quicker for queries than the
         # recursive method
@@ -210,6 +227,53 @@ class Page(GroupManagedObject, models.Model):
         for c in self.children.all():
             c.save()
         super(Page, self).save(*args, **kwargs)
+        self.unset_lock()
+
+    def is_locked(self):
+        """
+        Is True if the page is locked, False otherwise
+        This is where the timeout is handled, so a locked page for which the timeout is reach will be unlocked and this
+        function will return False
+        """
+        if self.pk not in Page.lock_mutex.keys():
+            # print("Page mutex does not exists")
+            return False
+        if (timezone.now()-Page.lock_mutex[self.pk]['time']) > timedelta(seconds=5):
+            # print("Lock timed out")
+            self.unset_lock()
+            return False
+        return True
+
+    def set_lock(self, user):
+        """
+        Sets a lock on the current page or raise an AlreadyLocked exception
+        """
+        if self.is_locked() and self.get_lock()['user'] != user:
+            raise AlreadyLocked("The page is already locked by someone else")
+        Page.lock_mutex[self.pk] = {'user': user,
+                                    'time': timezone.now()}
+        # print("Locking page")
+
+    def set_lock_recursive(self, user):
+        """
+        Locks recursively all the child pages for editing properties
+        """
+        for p in self.children.all():
+            p.set_lock_recursive(user)
+        self.set_lock(user)
+
+    def unset_lock(self):
+        """Always try to unlock, even if there is no lock"""
+        Page.lock_mutex.pop(self.pk, None)
+        # print("Unlocking page")
+
+    def get_lock(self):
+        """
+        Returns the page's mutex containing the time and the user in a dict
+        """
+        if self.is_locked():
+            return Page.lock_mutex[self.pk]
+        raise NotLocked("The page is not locked and thus can not return its mutex")
 
     def get_absolute_url(self):
         """
@@ -252,4 +316,8 @@ class PageRev(models.Model):
     def __str__(self):
         return str(self.__dict__)
 
+    def save(self, *args, **kwargs):
+        super(PageRev, self).save(*args, **kwargs)
+        # Don't forget to unlock, otherwise, people will have to wait for the page's timeout
+        self.page.unset_lock()
 

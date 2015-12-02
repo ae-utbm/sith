@@ -5,7 +5,7 @@ from django.views.generic.edit import UpdateView
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 
-from core.models import Page, PageRev
+from core.models import Page, PageRev, LockError
 from core.views.forms import PagePropForm
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 
@@ -77,6 +77,10 @@ class PagePropView(CanEditPropMixin, UpdateView):
                 parent = Page.get_page_by_full_name(parent_name)
                 p = Page(name=name, parent=parent)
         self.page = p
+        try:
+            self.page.set_lock_recursive(self.request.user)
+        except LockError as e:
+            raise e
         return self.page
 
     def get_context_data(self, **kwargs):
@@ -98,6 +102,10 @@ class PageEditView(CanEditMixin, UpdateView):
                 rev = PageRev(author=request.user)
                 rev.save()
                 self.page.revisions.add(rev)
+            try:
+                self.page.set_lock(self.request.user)
+            except LockError as e:
+                raise e
             return self.page.revisions.all().last()
         return None
 
@@ -110,17 +118,13 @@ class PageEditView(CanEditMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        form.instance.author = self.request.user
-        form.instance.page = self.page
+        # TODO : factor that, but first make some tests
         rev = form.instance
         new_rev = PageRev(title=rev.title,
                           content=rev.content,
                           )
         new_rev.author = self.request.user
         new_rev.page = self.page
-        print(form.instance)
-        new_rev.save()
         form.instance = new_rev
-        print(form.instance)
         return super(PageEditView, self).form_valid(form)
 
