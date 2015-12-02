@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 
 from core.models import User
-from core.views.forms import RegisteringForm, LoginForm
+#from core.views.forms import RegisteringForm, LoginForm
 
 class UserRegistrationTest(SimpleTestCase):
     def setUp(self):
@@ -137,8 +137,8 @@ class UserRegistrationTest(SimpleTestCase):
                                           'password2': 'plop',
                                          })
         response = c.post(reverse('core:login'), {'username': 'gcarlier', 'password': 'plop'})
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue('LOGIN_OK' in str(response.content))
+        self.assertTrue(response.status_code == 302)
+        #self.assertTrue('Hello, world' in str(response.content))
 
     def test_login_fail(self):
         """
@@ -154,7 +154,14 @@ class UserRegistrationTest(SimpleTestCase):
                                          })
         response = c.post(reverse('core:login'), {'username': 'gcarlier', 'password': 'guy'})
         self.assertTrue(response.status_code == 200)
-        self.assertTrue('LOGIN_FAIL' in str(response.content))
+        self.assertTrue('Please try again' in str(response.content))
+
+class PageHandlingTest(SimpleTestCase):
+    def setUp(self):
+        try:
+            Group.objects.create(name="root")
+        except:
+            pass
 
     def test_create_page_ok(self):
         """
@@ -163,8 +170,7 @@ class UserRegistrationTest(SimpleTestCase):
         c = Client()
         response = c.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
                                                                                    'name': 'guy',
-                                                                                   'title': 'Guy',
-                                                                                   'Content': 'Guyéuyuyé',
+                                                                                   'owner_group': '1',
                                                                                   })
         self.assertTrue(response.status_code == 200)
         self.assertTrue('PAGE_SAVED' in str(response.content))
@@ -176,14 +182,11 @@ class UserRegistrationTest(SimpleTestCase):
         c = Client()
         c.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
                                                                         'name': 'guy',
-                                                                        'title': 'Guy',
-                                                                        'Content': 'Guyéuyuyé',
+                                                                        'owner_group': 1,
                                                                        })
         response = c.post(reverse('core:page_prop', kwargs={'page_name': 'guy/bibou'}), {'parent': '1',
                                                                                          'name': 'bibou',
-                                                                                         'title': 'Bibou',
-                                                                                         'Content':
-                                                                                         'Bibibibiblblblblblbouuuuuuuuu',
+                                                                                         'owner_group': 1,
                                                                                         })
         self.assertTrue(response.status_code == 200)
         self.assertTrue('PAGE_SAVED' in str(response.content))
@@ -215,7 +218,7 @@ class UserRegistrationTest(SimpleTestCase):
         c = Client()
         response = c.get(reverse('core:page', kwargs={'page_name': 'swagg'}))
         self.assertTrue(response.status_code == 200)
-        self.assertTrue('PAGE_NOT_FOUND' in str(response.content))
+        self.assertTrue('<a href="/page/swagg/prop">Create it?</a>' in str(response.content))
 
 #TODO: many tests on the pages:
 #   - renaming a page
