@@ -7,9 +7,16 @@
         <p><a href="{% url 'core:page_edit' page.get_full_name %}">Edit</a></p>
         <p><a href="{% url 'core:page_prop' page.get_full_name %}">Prop</a></p>
     {% endif %}
-    <p>You're seeing the page <strong>{{ page.get_display_name }}</strong></p>
-    <h3>{{ page.title }}</h3>
-    <p>{{ page.content }}</p>
+    <p>You're seeing the page <strong>{{ page.get_display_name }}</strong> -
+    <a href="{% url 'core:page_hist' page.get_full_name %}">History</a></p>
+    {% if rev %}
+        <h4>This may not be the last update, you are seeing revision {{ rev.id }}!</h4>
+        <h3>{{ rev.title }}</h3>
+        <p>{{ rev.content }}</p>
+    {% else %}
+        <h3>{{ page.revisions.last.title }}</h3>
+        <p>{{ page.revisions.last.content }}</p>
+    {% endif %}
 {% endblock %}
 
 

@@ -24,9 +24,12 @@ urlpatterns = [
     url(r'^user/(?P<user_id>[0-9]+)/$', UserView.as_view(), name='user_profile'),
     url(r'^user/(?P<user_id>[0-9]+)/edit$', UserUpdateProfileView.as_view(), name='user_edit'),
     url(r'^user/(?P<user_id>[0-9]+)/groups$', UserUpdateGroupsView.as_view(), name='user_groups'),
+
     url(r'^page/$', PageListView.as_view(), name='page_list'),
-    url(r'^page/(?P<page_name>[a-z0-9/]*)/$', PageView.as_view(), name='page'),
     url(r'^page/(?P<page_name>[a-z0-9/]*)/edit$', PageEditView.as_view(), name='page_edit'),
     url(r'^page/(?P<page_name>[a-z0-9/]*)/prop$', PagePropView.as_view(), name='page_prop'),
+    url(r'^page/(?P<page_name>[a-z0-9/]*)/hist$', PageHistView.as_view(), name='page_hist'),
+    url(r'^page/(?P<page_name>[a-z0-9/]*)/rev/(?P<rev>[0-9]+)/', PageRevView.as_view(), name='page_rev'),
+    url(r'^page/(?P<page_name>[a-z0-9/]*)/$', PageView.as_view(), name='page'),
 ]
 

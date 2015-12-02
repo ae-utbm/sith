@@ -5,7 +5,7 @@ from django.views.generic.edit import UpdateView
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 
-from core.models import Page
+from core.models import Page, PageRev
 from core.views.forms import PagePropForm
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 
@@ -16,21 +16,6 @@ class PageListView(ListView):
         context = super(PageListView, self).get_context_data(**kwargs)
         return context
 
-# Define some right management callable for user_passes_test
-def user_can_view(as_view):
-    def guy(*arg, **kwargs):
-        res = self.as_view(*arg, **kwargs)
-
-        user = self.request.user
-        obj = self.page
-        for g in obj.view_group.all():
-            if g in user.groups.all():
-                print("Allowed")
-                return res
-        print("Not allowed")
-        return res
-    return guy
-
 class PageView(CanViewMixin, DetailView):
     model = Page
 
@@ -40,10 +25,37 @@ class PageView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PageView, self).get_context_data(**kwargs)
-        if "page" in context.keys():
-            context['tests'] = "PAGE_FOUND : "+context['page'].title
+        if "page" not in context.keys():
+            context['new_page'] = self.kwargs['page_name']
+        return context
+
+class PageHistView(CanViewMixin, DetailView):
+    model = Page
+    template_name_suffix = '_hist'
+
+    def get_object(self):
+        self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
+        return self.page
+
+class PageRevView(CanViewMixin, DetailView):
+    model = Page
+    template_name = 'core/page_detail.html'
+
+    def get_object(self):
+        self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
+        return self.page
+
+    def get_context_data(self, **kwargs):
+        context = super(PageRevView, self).get_context_data(**kwargs)
+        if self.page is not None:
+            context['page'] = self.page
+            try:
+                rev = self.page.revisions.get(id=self.kwargs['rev'])
+                context['rev'] = rev
+            except:
+            # By passing, the template will just display the normal page without taking revision into account
+                pass
         else:
-            context['tests'] = "PAGE_NOT_FOUND"
             context['new_page'] = self.kwargs['page_name']
         return context
 
@@ -69,28 +81,46 @@ class PagePropView(CanEditPropMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(PagePropView, self).get_context_data(**kwargs)
-        if "page" in context.keys():
-            context['tests'] = "PAGE_FOUND : "+context['page'].title
-        else:
-            context['tests'] = "PAGE_NOT_FOUND"
+        if "page" not in context.keys():
             context['new_page'] = self.kwargs['page_name']
         return context
 
 class PageEditView(CanEditMixin, UpdateView):
-    model = Page
+    model = PageRev
     fields = ['title', 'content',]
     template_name_suffix = '_edit'
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
-        return self.page
+        if self.page is not None:
+            # First edit
+            if self.page.revisions.all() is None:
+                rev = PageRev(author=request.user)
+                rev.save()
+                self.page.revisions.add(rev)
+            return self.page.revisions.all().last()
+        return None
 
     def get_context_data(self, **kwargs):
         context = super(PageEditView, self).get_context_data(**kwargs)
-        if "page" in context.keys():
-            context['tests'] = "PAGE_FOUND : "+context['page'].title
+        if self.page is not None:
+            context['page'] = self.page
         else:
-            context['tests'] = "PAGE_NOT_FOUND"
             context['new_page'] = self.kwargs['page_name']
         return context
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.page = self.page
+        rev = form.instance
+        new_rev = PageRev(title=rev.title,
+                          content=rev.content,
+                          )
+        new_rev.author = self.request.user
+        new_rev.page = self.page
+        print(form.instance)
+        new_rev.save()
+        form.instance = new_rev
+        print(form.instance)
+        return super(PageEditView, self).form_valid(form)
 

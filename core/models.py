@@ -151,10 +151,6 @@ class Page(GroupManagedObject, models.Model):
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
     """
     name = models.CharField(_('page name'), max_length=30, blank=False)
-# TODO: move title and content to PageRev class with a OneToOne field
-    title = models.CharField(_("page title"), max_length=255, blank=True)
-    content = models.TextField(_("page content"), blank=True)
-    revision = models.PositiveIntegerField(_("current revision"), default=1)
     is_locked = models.BooleanField(_("page mutex"), default=False)
     parent = models.ForeignKey('self', related_name="children", null=True, blank=True, on_delete=models.SET_NULL)
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
@@ -236,5 +232,24 @@ class Page(GroupManagedObject, models.Model):
 
     def get_display_name(self):
         return self.get_full_name()
+
+class PageRev(models.Model):
+    title = models.CharField(_("page title"), max_length=255, blank=True)
+    content = models.TextField(_("page content"), blank=True)
+    date = models.DateTimeField(_('date'), auto_now=True)
+    author = models.ForeignKey(User, related_name='page_rev')
+    page = models.ForeignKey(Page, related_name='revisions')
+
+    class Meta:
+        ordering = ['date',]
+
+    def get_absolute_url(self):
+        """
+        This is needed for black magic powered UpdateView's children
+        """
+        return reverse('core:page', kwargs={'page_name': self.page.full_name})
+
+    def __str__(self):
+        return str(self.__dict__)
 
 
