@@ -7,6 +7,13 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from datetime import datetime, timedelta
 
+class Group(AuthGroup):
+    def get_absolute_url(self):
+        """
+        This is needed for black magic powered UpdateView's children
+        """
+        return reverse('core:group_edit', kwargs={'group_id': self.pk})
+
 class User(AbstractBaseUser, PermissionsMixin):
     """
     Defines the base user class, useable in every app
@@ -53,6 +60,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    owner_group = models.ForeignKey(Group, related_name="owned_user", default=1)
+    edit_group = models.ManyToManyField(Group, related_name="editable_user", blank=True)
+    view_group = models.ManyToManyField(Group, related_name="viewable_user", blank=True)
 
     objects = UserManager()
 
@@ -125,20 +135,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.username = user_name
         return user_name
 
-class Group(AuthGroup):
-    def get_absolute_url(self):
-        """
-        This is needed for black magic powered UpdateView's children
-        """
-        return reverse('core:group_edit', kwargs={'group_id': self.pk})
-
-class GroupManagedObject(models.Model):
-    owner_group = models.ForeignKey(Group, related_name="owned_object", default=1)
-    edit_group = models.ManyToManyField(Group, related_name="editable_object")
-    view_group = models.ManyToManyField(Group, related_name="viewable_object")
-    class Meta:
-        abstract = True
-
 class LockError(Exception):
     """There was a lock error on the object"""
     pass
@@ -151,7 +147,7 @@ class NotLocked(LockError):
     """The object is not locked"""
     pass
 
-class Page(GroupManagedObject, models.Model):
+class Page(models.Model):
     """
     The page class to build a Wiki
     Each page may have a parent and it's URL is of the form my.site/page/<grd_pa>/<parent>/<mypage>
@@ -167,6 +163,9 @@ class Page(GroupManagedObject, models.Model):
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
     full_name = models.CharField(_('page name'), max_length=255, blank=True)
+    owner_group = models.ForeignKey(Group, related_name="owned_page", default=1)
+    edit_group = models.ManyToManyField(Group, related_name="editable_page", blank=True)
+    view_group = models.ManyToManyField(Group, related_name="viewable_page", blank=True)
     lock_mutex = {}
 
 

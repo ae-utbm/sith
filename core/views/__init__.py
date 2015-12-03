@@ -37,6 +37,8 @@ class CanEditMixin(CanEditPropMixin):
         for g in obj.edit_group.all():
             if user.groups.filter(name=g.name).exists():
                 return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
+        if isinstance(obj, User) and obj == user:
+                return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
         return HttpResponseForbidden("403, Forbidden")
 
 class CanViewMixin(CanEditMixin):

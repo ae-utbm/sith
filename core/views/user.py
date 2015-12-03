@@ -6,6 +6,7 @@ from django.views.generic.edit import UpdateView
 from django.views.generic import ListView, DetailView
 import logging
 
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from core.views.forms import RegisteringForm, UserGroupsForm
 from core.models import User
 
@@ -87,7 +88,7 @@ def register(request):
     context['form'] = form.as_p()
     return render(request, "core/register.html", context)
 
-class UserView(DetailView):
+class UserView(CanViewMixin, DetailView):
     """
     Display a user's profile
     """
@@ -101,7 +102,7 @@ class UserListView(ListView):
     """
     model = User
 
-class UserUpdateProfileView(UpdateView):
+class UserUpdateProfileView(CanEditMixin, UpdateView):
     """
     Edit a user's profile
     """
@@ -110,7 +111,7 @@ class UserUpdateProfileView(UpdateView):
     template_name = "core/user_edit.html"
     fields = ('first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', )
 
-class UserUpdateGroupsView(UpdateView):
+class UserUpdateGroupsView(CanEditPropMixin, UpdateView):
     """
     Edit a user's groups
     """
