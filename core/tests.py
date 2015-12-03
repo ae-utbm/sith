@@ -1,11 +1,18 @@
-from django.test import SimpleTestCase, Client
+from django.test import SimpleTestCase, Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 
 from core.models import User
 #from core.views.forms import RegisteringForm, LoginForm
 
-class UserRegistrationTest(SimpleTestCase):
+"""
+to run these tests :
+    python3 manage.py test
+"""
+
+
+
+class UserRegistrationTest(TestCase):
     def setUp(self):
         try:
             Group.objects.create(name="root")
@@ -156,7 +163,7 @@ class UserRegistrationTest(SimpleTestCase):
         self.assertTrue(response.status_code == 200)
         self.assertTrue('Please try again' in str(response.content))
 
-class PageHandlingTest(SimpleTestCase):
+class PageHandlingTest(TestCase):
     def setUp(self):
         try:
             Group.objects.create(name="root")
