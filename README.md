@@ -5,7 +5,10 @@ To start working on the project, just run the following commands:
 
     git clone https://ae-dev.utbm.fr/ae/Sith.git
     cd Sith
-    python3 manage.py migrate
+    virtualenv --clear --python=python3 env_sith
+    source env_sith/bin/activate
+    pip install -r requirements.txt
+    ./manage.py migrate
 
 To load some initial data in the core:
 
