@@ -3,6 +3,8 @@ from django.http import HttpResponseForbidden
 from django.core.exceptions import PermissionDenied
 from django.views.generic.base import View
 
+from core.models import Group
+
 # TODO: see models.py's TODO!
 class CanEditPropMixin(View):
     """
