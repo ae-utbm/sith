@@ -16,6 +16,9 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+handler403 = "core.views.forbidden"
+handler404 = "core.views.not_found"
+
 urlpatterns = [
     url(r'^', include('core.urls', namespace="core", app_name="core")),
     url(r'^admin/', include(admin.site.urls)),
