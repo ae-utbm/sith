@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+    {{ user.get_display_name }}'s tools
+{% endblock %}
+
+{% block content %}
+<h3>User Tools</h3>
+<p><a href="{% url 'core:user_profile' user.id %}">Back to profile</a></p>
+
+<ul>
+{% if perms.core.add_group %}
+    <li><a href="{% url 'core:group_list' %}">Groups</a></li>
+{% endif %}
+</ul>
+
+{% endblock %}
+
+
+

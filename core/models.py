@@ -72,6 +72,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
+        permissions = (
+            ("change_prop_user", "Can change the user's properties (groups, ...)"),
+        )
 
     def get_absolute_url(self):
         """
@@ -139,11 +142,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Determine if the object is owned by the user
         """
-        # TODO: add permission scale validation, to allow some groups other than superuser to manipulate
+        # TODO: add permission (class) scale validation, to allow some groups other than superuser to manipulate
         # all objects of a class if they are in the right group
+        # example: something like user.has_perm("change_"+obj.__class__)
         if not hasattr(obj, "owner_group"):
             return False
-        if self.is_superuser or self.groups.filter(name=obj.owner_group.name).exists():
+        print(str(obj.__class__))
+        print(str(obj.__class__).lower().split('.')[-1])
+        if self.is_superuser or self.groups.filter(name=obj.owner_group.name).exists() or self.has_perm("change_prop_"+str(obj.__class__).lower().split('.')[-1]):
             return True
         return False
 
@@ -158,6 +164,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         for g in obj.edit_group.all():
             if self.groups.filter(name=g.name).exists():
                 return True
+        if isinstance(obj, User) and obj == self:
+            return True
         return False
 
     def can_view(self, obj):
@@ -171,8 +179,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         for g in obj.view_group.all():
             if self.groups.filter(name=g.name).exists():
                 return True
-        if isinstance(obj, User) and obj == self:
-            return True
         return False
 
 class LockError(Exception):
@@ -212,7 +218,6 @@ class Page(models.Model):
     class Meta:
         unique_together = ('name', 'parent')
         permissions = (
-            #("can_edit", "Can edit the page"),
             ("can_view", "Can view the page"),
         )
 

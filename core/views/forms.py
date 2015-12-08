@@ -27,10 +27,12 @@ class UserGroupsForm(forms.ModelForm):
     required_css_class = 'required'
     class Meta:
         model = User
-        fields = ['groups', 'user_permissions',]
+        fields = ['edit_group', 'view_group', 'groups', 'user_permissions',]
         widgets = {
             'groups': CheckboxSelectMultiple,
             'user_permissions': CheckboxSelectMultiple,
+            'edit_group': CheckboxSelectMultiple,
+            'view_group': CheckboxSelectMultiple,
         }
 
 class PagePropForm(forms.ModelForm):

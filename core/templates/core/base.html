@@ -10,12 +10,20 @@
         {% block header %}
         {% if user.is_authenticated %}Hello, {{ user.username }}!{% endif %}
         <ul>
+            {% if not user.is_authenticated %}
             <li><a href="{% url 'core:register' %}">Register</a></li>
             <li><a href="{% url 'core:login' %}">Login</a></li>
+            {% else %}
             <li><a href="{% url 'core:logout' %}">Logout</a></li>
+            {% endif %}
+        </ul>
+        {% if user.is_authenticated %}
+        <ul>
+            <li><a href="{% url 'core:user_profile' user.id %}">Profile</a></li>
             <li><a href="{% url 'core:user_list' %}">Users</a></li>
             <li><a href="{% url 'core:page_list' %}">Pages</a></li>
         </ul>
+        {% endif %}
         {% endblock %}
     </header>
 
