@@ -3,8 +3,10 @@
 {% block page %}
     <h3>Page</h3>
     <p><a href="{% url 'core:page_list' %}">Back to list</a></p>
-    {% if user.is_superuser %}
+    {% if can_edit %}
         <p><a href="{% url 'core:page_edit' page.get_full_name %}">Edit</a></p>
+    {% endif %}
+    {% if can_edit_prop %}
         <p><a href="{% url 'core:page_prop' page.get_full_name %}">Prop</a></p>
     {% endif %}
     <p>You're seeing the page <strong>{{ page.get_display_name }}</strong> -

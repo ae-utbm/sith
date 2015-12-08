@@ -135,6 +135,46 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.username = user_name
         return user_name
 
+    def is_owner(self, obj):
+        """
+        Determine if the object is owned by the user
+        """
+        # TODO: add permission scale validation, to allow some groups other than superuser to manipulate
+        # all objects of a class if they are in the right group
+        if not hasattr(obj, "owner_group"):
+            return False
+        if self.is_superuser or self.groups.filter(name=obj.owner_group.name).exists():
+            return True
+        return False
+
+    def can_edit(self, obj):
+        """
+        Determine if the object can be edited by the user
+        """
+        if not hasattr(obj, "edit_group"):
+            return False
+        if self.is_owner(obj):
+            return True
+        for g in obj.edit_group.all():
+            if self.groups.filter(name=g.name).exists():
+                return True
+        return False
+
+    def can_view(self, obj):
+        """
+        Determine if the object can be viewed by the user
+        """
+        if not hasattr(obj, "view_group"):
+            return False
+        if self.can_edit(obj):
+            return True
+        for g in obj.view_group.all():
+            if self.groups.filter(name=g.name).exists():
+                return True
+        if isinstance(obj, User) and obj == self:
+            return True
+        return False
+
 class LockError(Exception):
     """There was a lock error on the object"""
     pass
@@ -237,7 +277,7 @@ class Page(models.Model):
         if self.pk not in Page.lock_mutex.keys():
             # print("Page mutex does not exists")
             return False
-        if (timezone.now()-Page.lock_mutex[self.pk]['time']) > timedelta(seconds=5):
+        if (timezone.now()-Page.lock_mutex[self.pk]['time']) > timedelta(minutes=5):
             # print("Lock timed out")
             self.unset_lock()
             return False
@@ -251,7 +291,7 @@ class Page(models.Model):
             raise AlreadyLocked("The page is already locked by someone else")
         Page.lock_mutex[self.pk] = {'user': user,
                                     'time': timezone.now()}
-        print("Locking page")
+        # print("Locking page")
 
     def set_lock_recursive(self, user):
         """
@@ -264,7 +304,7 @@ class Page(models.Model):
     def unset_lock(self):
         """Always try to unlock, even if there is no lock"""
         Page.lock_mutex.pop(self.pk, None)
-        print("Unlocking page")
+        # print("Unlocking page")
 
     def get_lock(self):
         """
@@ -322,6 +362,8 @@ class PageRev(models.Model):
             return self.page.edit_group
         elif attr == "view_group":
             return self.page.view_group
+        elif attr == "unset_lock":
+            return self.page.unset_lock
         else:
             return object.__getattribute__(self, attr)
 

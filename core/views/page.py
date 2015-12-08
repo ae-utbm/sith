@@ -27,6 +27,11 @@ class PageView(CanViewMixin, DetailView):
         context = super(PageView, self).get_context_data(**kwargs)
         if "page" not in context.keys():
             context['new_page'] = self.kwargs['page_name']
+        if self.request.user.is_owner(self.object):
+            context['can_edit_prop'] = True
+        if self.request.user.can_edit(self.object):
+            context['can_edit'] = True
+
         return context
 
 class PageHistView(CanViewMixin, DetailView):

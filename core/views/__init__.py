@@ -23,63 +23,40 @@ class CanEditPropMixin(View):
     """
     def dispatch(self, request, *arg, **kwargs):
         res = super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
-        obj = self.object
-        user = self.request.user
-        if obj is None:
+        if self.object is None or self.request.user.is_owner(self.object):
             return res
-        # TODO: add permission scale validation, to allow some groups other than superuser to manipulate
-        # all objects of a class if they are in the right group
-        if user.is_superuser or user.groups.filter(name=obj.owner_group.name).exists():
-            return res
-        print("Guyuy")
-        self.object.unset_lock()
+        try: # Always unlock when 403
+            self.object.unset_lock()
+        except: pass
         raise PermissionDenied
-        return HttpResponseForbidden("403, Forbidden")
 
-class CanEditMixin(CanEditPropMixin):
+class CanEditMixin(View):
     """
     This view makes exactly the same this as its direct parent, but checks the group on the edit_group field of the
     object
     """
     def dispatch(self, request, *arg, **kwargs):
         # TODO: WIP: fix permissions with exceptions!
-        try:
-            res = super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
+        res = super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
+        if self.object is None or self.request.user.can_edit(self.object):
             return res
-        except PermissionDenied:
-            pass
-        res = super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
-        obj = self.object
-        user = self.request.user
-        if obj is None:
-            return res
-        for g in obj.edit_group.all():
-            if user.groups.filter(name=g.name).exists():
-                return res
-        if isinstance(obj, User) and obj == user:
-            return res
+        try: # Always unlock when 403
+            self.object.unset_lock()
+        except: pass
         raise PermissionDenied
-        return HttpResponseForbidden("403, Forbidden")
 
-class CanViewMixin(CanEditMixin):
+class CanViewMixin(View):
     """
     This view still makes exactly the same this as its direct parent, but checks the group on the view_group field of
     the object
     """
     def dispatch(self, request, *arg, **kwargs):
-        try:
-            res = super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
+        res = super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
+        if self.object is None or self.request.user.can_view(self.object):
             return res
-        except PermissionDenied:
-            pass
-        res = super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
-        obj = self.object
-        user = self.request.user
-        if obj is None:
-            return res
-        for g in obj.view_group.all():
-            if user.groups.filter(name=g.name).exists():
-                return res
+        try: # Always unlock when 403
+            self.object.unset_lock()
+        except: pass
         raise PermissionDenied
 
 from .user import *
