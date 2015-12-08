@@ -251,7 +251,7 @@ class Page(models.Model):
             raise AlreadyLocked("The page is already locked by someone else")
         Page.lock_mutex[self.pk] = {'user': user,
                                     'time': timezone.now()}
-        # print("Locking page")
+        print("Locking page")
 
     def set_lock_recursive(self, user):
         """
@@ -264,7 +264,7 @@ class Page(models.Model):
     def unset_lock(self):
         """Always try to unlock, even if there is no lock"""
         Page.lock_mutex.pop(self.pk, None)
-        # print("Unlocking page")
+        print("Unlocking page")
 
     def get_lock(self):
         """

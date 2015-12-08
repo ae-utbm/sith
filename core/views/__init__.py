@@ -1,7 +1,7 @@
 
 from django.shortcuts import render
 from django.http import HttpResponseForbidden
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.views.generic.base import View
 
 from core.models import Group
@@ -31,6 +31,8 @@ class CanEditPropMixin(View):
         # all objects of a class if they are in the right group
         if user.is_superuser or user.groups.filter(name=obj.owner_group.name).exists():
             return res
+        print("Guyuy")
+        self.object.unset_lock()
         raise PermissionDenied
         return HttpResponseForbidden("403, Forbidden")
 
@@ -43,19 +45,19 @@ class CanEditMixin(CanEditPropMixin):
         # TODO: WIP: fix permissions with exceptions!
         try:
             res = super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
+            return res
         except PermissionDenied:
             pass
-        except:
-            return res
+        res = super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
         obj = self.object
         user = self.request.user
         if obj is None:
             return res
         for g in obj.edit_group.all():
             if user.groups.filter(name=g.name).exists():
-                return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
+                return res
         if isinstance(obj, User) and obj == user:
-            return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
+            return res
         raise PermissionDenied
         return HttpResponseForbidden("403, Forbidden")
 
@@ -67,19 +69,18 @@ class CanViewMixin(CanEditMixin):
     def dispatch(self, request, *arg, **kwargs):
         try:
             res = super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
+            return res
         except PermissionDenied:
             pass
-        except:
-            return res
+        res = super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
         obj = self.object
         user = self.request.user
         if obj is None:
             return res
         for g in obj.view_group.all():
             if user.groups.filter(name=g.name).exists():
-                return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
+                return res
         raise PermissionDenied
-        return HttpResponseForbidden("403, Forbidden")
 
 from .user import *
 from .page import *
