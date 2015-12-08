@@ -315,6 +315,16 @@ class PageRev(models.Model):
     def __str__(self):
         return str(self.__dict__)
 
+    def __getattribute__(self, attr):
+        if attr == "owner_group":
+            return self.page.owner_group
+        elif attr == "edit_group":
+            return self.page.edit_group
+        elif attr == "view_group":
+            return self.page.view_group
+        else:
+            return object.__getattribute__(self, attr)
+
     def save(self, *args, **kwargs):
         super(PageRev, self).save(*args, **kwargs)
         # Don't forget to unlock, otherwise, people will have to wait for the page's timeout
