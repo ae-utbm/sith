@@ -111,7 +111,7 @@ class PageEditView(CanEditMixin, UpdateView):
                 self.page.set_lock(self.request.user)
             except LockError as e:
                 raise e
-            return self.page.revisions.all().last()
+            return self.page.revisions.last()
         return None
 
     def get_context_data(self, **kwargs):

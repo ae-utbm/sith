@@ -347,6 +347,13 @@ class Page(models.Model):
         return self.get_full_name()
 
 class PageRev(models.Model):
+    """
+    This is the true content of the page.
+    Each page object has a revisions field that is a list of PageRev, ordered by date.
+    my_page.revisions.last() gives the PageRev object that is the most up-to-date, and thus,
+    is the real content of the page.
+    The content is in PageRev.title and PageRev.content .
+    """
     title = models.CharField(_("page title"), max_length=255, blank=True)
     content = models.TextField(_("page content"), blank=True)
     date = models.DateTimeField(_('date'), auto_now=True)
