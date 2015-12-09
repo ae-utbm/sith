@@ -22,7 +22,7 @@ class RegisteringForm(UserCreationForm):
         return user
 
 
-class UserGroupsForm(forms.ModelForm):
+class UserPropForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'
     class Meta:

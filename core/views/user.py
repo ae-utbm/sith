@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
-from core.views.forms import RegisteringForm, UserGroupsForm
+from core.views.forms import RegisteringForm, UserPropForm
 from core.models import User
 
 def login(request):
@@ -111,14 +111,14 @@ class UserUpdateProfileView(CanEditMixin, UpdateView):
     template_name = "core/user_edit.html"
     fields = ('first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', )
 
-class UserUpdateGroupsView(CanEditPropMixin, UpdateView):
+class UserUpdatePropView(CanEditPropMixin, UpdateView):
     """
     Edit a user's groups
     """
     model = User
     pk_url_kwarg = "user_id"
-    template_name = "core/user_groups.html"
-    form_class = UserGroupsForm
+    template_name = "core/user_prop.html"
+    form_class = UserPropForm
 
 class UserToolsView(TemplateView):
     """
