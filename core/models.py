@@ -72,8 +72,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
+        # Add permissions like this to allow automatic permission validation in is_owner&co
+        # model: change_prop_<class_name>
+        #        view_<class_name>
         permissions = (
             ("change_prop_user", "Can change the user's properties (groups, ...)"),
+            ("view_user", "Can view user's profile"),
         )
 
     def get_absolute_url(self):
@@ -142,14 +146,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Determine if the object is owned by the user
         """
-        # TODO: add permission (class) scale validation, to allow some groups other than superuser to manipulate
-        # all objects of a class if they are in the right group
-        # example: something like user.has_perm("change_"+obj.__class__)
         if not hasattr(obj, "owner_group"):
             return False
-        print(str(obj.__class__))
-        print(str(obj.__class__).lower().split('.')[-1])
-        if self.is_superuser or self.groups.filter(name=obj.owner_group.name).exists() or self.has_perm("change_prop_"+str(obj.__class__).lower().split('.')[-1]):
+        if (self.is_superuser or self.groups.filter(name=obj.owner_group.name).exists() or
+            self.has_perm(obj.__class__.__module__.split('.')[0]+".change_prop_"+obj.__class__.__name__.lower())):
             return True
         return False
 
@@ -166,6 +166,8 @@ class User(AbstractBaseUser, PermissionsMixin):
                 return True
         if isinstance(obj, User) and obj == self:
             return True
+        if self.has_perm(obj.__class__.__module__.split('.')[0]+".change_"+obj.__class__.__name__.lower()):
+            return True
         return False
 
     def can_view(self, obj):
@@ -179,6 +181,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         for g in obj.view_group.all():
             if self.groups.filter(name=g.name).exists():
                 return True
+        if self.has_perm(obj.__class__.__module__.split('.')[0]+".view_"+obj.__class__.__name__.lower()):
+            return True
         return False
 
 class LockError(Exception):
@@ -218,7 +222,8 @@ class Page(models.Model):
     class Meta:
         unique_together = ('name', 'parent')
         permissions = (
-            ("can_view", "Can view the page"),
+            ("change_prop_page", "Can change the page's properties (groups, ...)"),
+            ("view_page", "Can view the page"),
         )
 
     @staticmethod
