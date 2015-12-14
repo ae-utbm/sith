@@ -27,7 +27,16 @@ class UserPropForm(forms.ModelForm):
     required_css_class = 'required'
     class Meta:
         model = User
-        fields = ['edit_group', 'view_group', 'groups', 'user_permissions',]
+        fields = ['groups', 'edit_group', 'view_group']
+        labels = {
+            'edit_group': "Edit profile group",
+            'view_group': "View profile group",
+        }
+        help_texts = {
+            'edit_group': "Groups that can edit this user's profile",
+            'view_group': "Groups that can view this user's profile",
+            'groups': "Which groups this user belongs to",
+        }
         widgets = {
             'groups': CheckboxSelectMultiple,
             'user_permissions': CheckboxSelectMultiple,
