@@ -1,10 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group as AuthGroup
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group as AuthGroup, AnonymousUser as AuthAnonymousUser
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from datetime import datetime, timedelta
 
 class Group(AuthGroup):
@@ -60,14 +61,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    owner_group = models.ForeignKey(Group, related_name="owned_user", default=1)
+    owner_group = models.ForeignKey(Group, related_name="owned_user",
+                                    default=settings.AE_GROUPS['root']['id'])
     edit_group = models.ManyToManyField(Group, related_name="editable_user", blank=True)
     view_group = models.ManyToManyField(Group, related_name="viewable_user", blank=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'date_of_birth']
+    REQUIRED_FIELDS = ['email', 'date_of_birth']
 
     class Meta:
         verbose_name = _('user')
@@ -149,7 +151,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         if not hasattr(obj, "owner_group"):
             return False
         if (self.is_superuser or self.groups.filter(name=obj.owner_group.name).exists() or
-            self.has_perm(obj.__class__.__module__.split('.')[0]+".change_prop_"+obj.__class__.__name__.lower())):
+            self.has_perm(obj.__class__.__module__.split('.')[0]+".change_prop_"+obj.__class__.__name__.lower()) or
+            self.groups.filter(id=settings.AE_GROUPS['root']['id']).exists()):
             return True
         return False
 
@@ -185,6 +188,21 @@ class User(AbstractBaseUser, PermissionsMixin):
             return True
         return False
 
+class AnonymousUser(AuthAnonymousUser):
+    def __init__(self, request):
+        super(AnonymousUser, self).__init__()
+
+    def is_owner(self, obj):
+        return False
+
+    def can_edit(self, obj):
+        return False
+
+    def can_view(self, obj):
+        if obj.view_group.filter(pk=settings.AE_GROUPS['public']['id']).exists():
+            return True
+        return False
+
 class LockError(Exception):
     """There was a lock error on the object"""
     pass
@@ -213,7 +231,8 @@ class Page(models.Model):
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
     full_name = models.CharField(_('page name'), max_length=255, blank=True)
-    owner_group = models.ForeignKey(Group, related_name="owned_page", default=1)
+    owner_group = models.ForeignKey(Group, related_name="owned_page",
+                                    default=settings.AE_GROUPS['root']['id'])
     edit_group = models.ManyToManyField(Group, related_name="editable_page", blank=True)
     view_group = models.ManyToManyField(Group, related_name="viewable_page", blank=True)
     lock_mutex = {}

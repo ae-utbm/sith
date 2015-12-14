@@ -49,6 +49,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'core.middleware.AuthenticationMiddleware',
 )
 
 ROOT_URLCONF = 'sith.urls'
@@ -105,6 +106,7 @@ STATIC_URL = '/static/'
 # Auth configuration
 
 AUTH_USER_MODEL = 'core.User'
+AUTH_ANONYMOUS_MODEL = 'core.models.AnonymousUser'
 LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
 LOGIN_REDIRECT_URL = '/'
@@ -113,3 +115,24 @@ DEFAULT_FROM_EMAIL="bibou@git.an"
 # Email
 EMAIL_HOST="localhost"
 EMAIL_PORT=25
+
+# AE configuration
+AE_GROUPS = {
+    'root': {
+        'id': 1,
+        'name': "root",
+    },
+    'board': {
+        'id': 2,
+        'name': "ae_bureau",
+    },
+    'members': {
+        'id': 3,
+        'name': "ae_membres",
+    },
+    'public': {
+        'id': 4,
+        'name': "not_registered_users",
+    },
+}
+
