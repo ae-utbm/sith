@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'ae',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -117,6 +118,9 @@ EMAIL_HOST="localhost"
 EMAIL_PORT=25
 
 # AE configuration
+# Define the date in the year serving as reference for the subscriptions calendar
+# (month, day)
+AE_START_DATE = (8, 15) # 15th August
 AE_GROUPS = {
     'root': {
         'id': 1,
@@ -136,3 +140,28 @@ AE_GROUPS = {
     },
 }
 
+AE_PAYMENT_METHOD = [('cheque', 'Chèque'),
+                     ('cash', 'Espèce'),
+                     ('other', 'Autre'),
+                    ]
+
+# Subscription durations are in semestres (should be settingized)
+AE_SUBSCRIPTIONS = {
+    'Un semestre': {
+        'price': 15,
+        'duration': 1,
+    },
+    'Deux semestres': {
+        'price': 28,
+        'duration': 2,
+    },
+    'Cursus Tronc Commun': {
+        'price': 45,
+        'duration': 4,
+    },
+    'Cursus Branche': {
+        'price': 45,
+        'duration': 6,
+    },
+# To be completed....
+}

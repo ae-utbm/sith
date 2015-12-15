@@ -21,5 +21,6 @@ handler404 = "core.views.not_found"
 
 urlpatterns = [
     url(r'^', include('core.urls', namespace="core", app_name="core")),
+    url(r'^ae/', include('ae.urls', namespace="ae", app_name="ae")),
     url(r'^admin/', include(admin.site.urls)),
 ]
