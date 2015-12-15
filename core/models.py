@@ -60,7 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
     owner_group = models.ForeignKey(Group, related_name="owned_user",
                                     default=settings.AE_GROUPS['root']['id'])
     edit_group = models.ManyToManyField(Group, related_name="editable_user", blank=True)
