@@ -1,8 +1,12 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <link rel="stylesheet" href="style.css" />
+    {% block head %}
     <title>{% block title %}Bienvenue sur le Sith de l'AE!{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'core/style.css' %}">
+    <script src="{% static 'core/script.js' %}"></script>
+    {% endblock %}
 </head>
 
 <body>
