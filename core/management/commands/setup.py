@@ -38,7 +38,7 @@ class Command(BaseCommand):
                      is_superuser=False, is_staff=False)
             u.set_password("plop")
             u.save()
-            p = Page(name='aide_syntaxe')
+            p = Page(name='Aide_sur_la_syntaxe')
             p.set_lock(s)
             p.save()
             PageRev(page=p, title="Aide sur la syntaxe", author=s, content="""
