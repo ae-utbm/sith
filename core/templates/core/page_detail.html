@@ -1,4 +1,5 @@
 {% extends "core/page.html" %}
+{% load renderer %}
 
 {% block page %}
     <h3>Page</h3>
@@ -14,10 +15,10 @@
     {% if rev %}
         <h4>This may not be the last update, you are seeing revision {{ rev.id }}!</h4>
         <h3>{{ rev.title }}</h3>
-        <p>{{ rev.content }}</p>
+        <p>{{ rev.content|markdown }}</p>
     {% else %}
         <h3>{{ page.revisions.last.title }}</h3>
-        <p>{{ page.revisions.last.content }}</p>
+        <p>{{ page.revisions.last.content|markdown }}</p>
     {% endif %}
 {% endblock %}
 

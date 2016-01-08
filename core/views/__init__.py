@@ -13,7 +13,6 @@ def not_found(request):
     return render(request, "core/404.html")
 
 
-# TODO: see models.py's TODO!
 class CanEditPropMixin(View):
     """
     This view is made to protect any child view that would be showing some properties of an object that are restricted

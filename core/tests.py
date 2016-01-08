@@ -232,6 +232,36 @@ class PageHandlingTest(TestCase):
         self.assertTrue(response.status_code == 200)
         self.assertTrue('<a href="/page/swagg/prop">Create it?</a>' in str(response.content))
 
+
+    def test_create_page_markdown_safe(self):
+        """
+        Should format the markdown and escape html correctly
+        """
+        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
+                                                                        'name': 'guy',
+                                                                        'owner_group': '1',
+                                                                       })
+        r = self.client.post(reverse('core:page_edit', kwargs={'page_name': 'guy'}),
+                {
+                    'title': 'Bibou',
+                    'content':
+                    '''Guy *bibou*
+
+http://git.an
+
+# Swag
+
+<guy>Bibou</guy>
+
+<script>alert('Guy');</script>
+''',
+                    })
+        response = self.client.get(reverse('core:page', kwargs={'page_name': 'guy'}))
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue('<p>Guy <em>bibou</em></p>\\n<p><a href="http://git.an">http://git.an</a></p>\\n' +
+                '<h1>Swag</h1>\\n<p>&lt;guy&gt;Bibou&lt;/guy&gt;</p>\\n' +
+                '<p>&lt;script&gt;alert(&#39;Guy&#39;);&lt;/script&gt;</p>' in str(response.content))
+
 #TODO: many tests on the pages:
 #   - renaming a page
 #   - changing a page's parent --> check that page's children's full_name
