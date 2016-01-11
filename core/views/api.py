@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from core.templatetags.renderer import markdown
+from django.http import HttpResponse
 
 def render_markdown(request):
-    return render(request, 'core/api/markdown.html', context={'text': request.GET['text']})
+    return HttpResponse(markdown(request.GET['text']))

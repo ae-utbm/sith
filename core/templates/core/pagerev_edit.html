@@ -2,6 +2,17 @@
 
 {% block head %}
 {{ block.super }}
+<script>
+function make_preview() {
+    $.ajax({
+        url: "{% url 'core:api_markdown' %}",
+        method: "GET",
+        data: { text: $("#id_content").val() }
+    }).done(function (msg) {
+        $("#preview").html(msg);
+    });
+}
+</script>
 {% endblock %}
 
 {% block page %}
@@ -9,9 +20,11 @@
     <form action="{% url 'core:page_edit' page_name=page.get_full_name %}" method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        {# TODO:  NOW THAT WE HAVE JAVASCRIPT, MAKE A PREVISUALISATION BUTTON USING api/markdown?text=guyguyguy #}
+        <p><input type="button" value="Preview" onclick="javascript:make_preview();" /></p>
         <p><input type="submit" value="Save!" /></p>
     </form>
+    <div id="preview">
+    </div>
 {% endblock %}
 
 
