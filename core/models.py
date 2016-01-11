@@ -223,14 +223,14 @@ class Page(models.Model):
     awkward!
     Prefere querying pages with Page.get_page_by_full_name()
 
-    Be careful with the full_name attribute: this field may not be valid until you call save(). It's made for fast
+    Be careful with the _full_name attribute: this field may not be valid until you call save(). It's made for fast
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
     """
     name = models.CharField(_('page name'), max_length=30, blank=False)
     parent = models.ForeignKey('self', related_name="children", null=True, blank=True, on_delete=models.SET_NULL)
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
-    full_name = models.CharField(_('page name'), max_length=255, blank=True)
+    _full_name = models.CharField(_('page name'), max_length=255, blank=True)
     owner_group = models.ForeignKey(Group, related_name="owned_page",
                                     default=settings.AE_GROUPS['root']['id'])
     edit_group = models.ManyToManyField(Group, related_name="editable_page", blank=True)
@@ -250,7 +250,7 @@ class Page(models.Model):
         """
         Quicker to get a page with that method rather than building the request every time
         """
-        return Page.objects.filter(full_name=name).first()
+        return Page.objects.filter(_full_name=name).first()
 
     def __init__(self, *args, **kwargs):
         super(Page, self).__init__(*args, **kwargs)
@@ -261,7 +261,7 @@ class Page(models.Model):
         """
         if '/' in self.name:
             self.name = self.name.split('/')[-1]
-        if Page.objects.exclude(pk=self.pk).filter(full_name=self.get_full_name()).exists():
+        if Page.objects.exclude(pk=self.pk).filter(_full_name=self.get_full_name()).exists():
             raise ValidationError(
                 _('Duplicate page'),
                 code='duplicate',
@@ -288,10 +288,10 @@ class Page(models.Model):
         if not self.is_locked():
             raise NotLocked("The page is not locked and thus can not be saved")
         self.full_clean()
-        # This reset the full_name just before saving to maintain a coherent field quicker for queries than the
+        # This reset the _full_name just before saving to maintain a coherent field quicker for queries than the
         # recursive method
         # It also update all the children to maintain correct names
-        self.full_name = self.get_full_name()
+        self._full_name = self.get_full_name()
         for c in self.children.all():
             c.save()
         super(Page, self).save(*args, **kwargs)
@@ -347,7 +347,7 @@ class Page(models.Model):
         """
         This is needed for black magic powered UpdateView's children
         """
-        return reverse('core:page', kwargs={'page_name': self.full_name})
+        return reverse('core:page', kwargs={'page_name': self._full_name})
 
     def __str__(self):
         return self.get_full_name()
@@ -386,7 +386,7 @@ class PageRev(models.Model):
         """
         This is needed for black magic powered UpdateView's children
         """
-        return reverse('core:page', kwargs={'page_name': self.page.full_name})
+        return reverse('core:page', kwargs={'page_name': self.page._full_name})
 
     def __str__(self):
         return str(self.__dict__)
