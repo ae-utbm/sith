@@ -1,9 +1,9 @@
-from django.test import SimpleTestCase, Client, TestCase
+from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
+from django.core.management import call_command
 
 from core.models import User, Group
-#from core.views.forms import RegisteringForm, LoginForm
 
 """
 to run these tests :
@@ -16,8 +16,8 @@ class UserRegistrationTest(TestCase):
     def setUp(self):
         try:
             Group.objects.create(name="root")
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     def test_register_user_form_ok(self):
         """
@@ -169,22 +169,23 @@ class PageHandlingTest(TestCase):
             Group.objects.create(name="root")
             u = User(username='root', last_name="", first_name="Bibou",
                      email="ae.info@utbm.fr",
-                     date_of_birth="1942-06-12T00:00:00+01:00",
+                     date_of_birth="1942-06-12",
                      is_superuser=True, is_staff=True)
             u.set_password("plop")
             u.save()
             self.client.login(username='root', password='plop')
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     def test_create_page_ok(self):
         """
         Should create a page correctly
         """
-        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
-                                                                                  'name': 'guy',
-                                                                                  'owner_group': '1',
-                                                                                 })
+        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {
+            'parent': '',
+            'name': 'guy',
+            'owner_group': 1,
+            })
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'guy'}))
         self.assertTrue(response.status_code == 200)
         self.assertTrue("<strong>guy</strong>" in str(response.content))
@@ -193,14 +194,16 @@ class PageHandlingTest(TestCase):
         """
         Should create a page correctly
         """
-        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
-                                                                        'name': 'guy',
-                                                                        'owner_group': '1',
-                                                                       })
-        response = self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy/bibou'}), {'parent': '1',
-                                                                                         'name': 'bibou',
-                                                                                         'owner_group': '1',
-                                                                                        })
+        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {
+            'parent': '',
+            'name': 'guy',
+            'owner_group': '1',
+            })
+        response = self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy/bibou'}), {
+            'parent': '1',
+            'name': 'bibou',
+            'owner_group': '1',
+            })
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'guy/bibou'}))
         self.assertTrue(response.status_code == 200)
         self.assertTrue("<strong>guy/bibou</strong>" in str(response.content))
@@ -209,17 +212,19 @@ class PageHandlingTest(TestCase):
         """
         Should display a page correctly
         """
-        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
-                                                                        'name': 'guy',
-                                                                        'title': 'Guy',
-                                                                        'Content': 'Guyéuyuyé',
-                                                                       })
-        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy/bibou'}), {'parent': '1',
-                                                                              'name': 'bibou',
-                                                                              'title': 'Bibou',
-                                                                              'Content':
-                                                                              'Bibibibiblblblblblbouuuuuuuuu',
-                                                                             })
+        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {
+            'parent': '',
+            'name': 'guy',
+            'title': 'Guy',
+            'Content': 'Guyéuyuyé',
+            })
+        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy/bibou'}), {
+            'parent': '1',
+            'name': 'bibou',
+            'title': 'Bibou',
+            'Content':
+            'Bibibibiblblblblblbouuuuuuuuu',
+            })
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'guy/bibou'}))
         self.assertTrue(response.status_code == 200)
         #self.assertTrue('PAGE_FOUND : Bibou' in str(response.content))
@@ -237,12 +242,12 @@ class PageHandlingTest(TestCase):
         """
         Should format the markdown and escape html correctly
         """
-        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {'parent': '',
-                                                                        'name': 'guy',
-                                                                        'owner_group': '1',
-                                                                       })
-        r = self.client.post(reverse('core:page_edit', kwargs={'page_name': 'guy'}),
-                {
+        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {
+            'parent': '',
+            'name': 'guy',
+            'owner_group': '1',
+            })
+        r = self.client.post(reverse('core:page_edit', kwargs={'page_name': 'guy'}), {
                     'title': 'Bibou',
                     'content':
                     '''Guy *bibou*
