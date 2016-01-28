@@ -2,7 +2,10 @@ import os
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
 from django.conf import settings
+
+
 from core.models import Group, User, Page, PageRev
+from accounting.models import Customer, GeneralJournal, ProductType, Product
 
 class Command(BaseCommand):
     help = "Set up a new instance of the Sith AE"
@@ -13,8 +16,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             os.unlink(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'db.sqlite3'))
-        except:
-            pass
+            os.mkdir(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))+'/data')
+        except Exception as e:
+            print(e)
         call_command('migrate')
         u = User(username='root', last_name="", first_name="Bibou",
                  email="ae.info@utbm.fr",
@@ -44,4 +48,12 @@ class Command(BaseCommand):
             PageRev(page=p, title="Aide sur la syntaxe", author=s, content="""
 Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 """).save()
+
+            # Accounting test values:
+            Customer(user=s, account_id="6568j").save()
+            p = ProductType(name="Bières bouteilles")
+            p.save()
+            Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",
+                    special_selling_price="1.6").save()
+            GeneralJournal(start_date="2015-06-12", name="A15").save()
 

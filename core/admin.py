@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Page, Group
+from core.models import User, Page, Group
 
 
 admin.site.register(User)

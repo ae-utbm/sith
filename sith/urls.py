@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf.urls.static import static
+from django.conf import settings
 
 handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
@@ -23,4 +25,4 @@ urlpatterns = [
     url(r'^', include('core.urls', namespace="core", app_name="core")),
     url(r'^ae/', include('ae.urls', namespace="ae", app_name="ae")),
     url(r'^admin/', include(admin.site.urls)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: remove me for production!!!

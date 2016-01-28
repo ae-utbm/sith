@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'core',
     'ae',
+    'accounting',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -98,6 +99,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Medias
+MEDIA_ROOT = './data/'
+MEDIA_URL = '/data/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
