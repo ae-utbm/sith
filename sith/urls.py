@@ -23,6 +23,6 @@ handler404 = "core.views.not_found"
 
 urlpatterns = [
     url(r'^', include('core.urls', namespace="core", app_name="core")),
-    url(r'^ae/', include('ae.urls', namespace="ae", app_name="ae")),
+    url(r'^subscription/', include('subscription.urls', namespace="asso", app_name="subscription")),
     url(r'^admin/', include(admin.site.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: remove me for production!!!

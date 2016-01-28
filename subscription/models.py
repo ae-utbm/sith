@@ -20,17 +20,38 @@ class Member(models.Model):
     def is_subscribed(self):
         return self.subscriptions.last().is_valid_now()
 
+    def __str__(self):
+        return self.user.username
+
 class Subscription(models.Model):
     member = models.ForeignKey(Member, related_name='subscriptions')
     subscription_type = models.CharField(_('subscription type'),
                                          max_length=255,
-                                         choices=((k.lower().replace(' ', '-'), k) for k in sorted(settings.AE_SUBSCRIPTIONS.keys())))
+                                         choices=((k, v['name']) for k,v in sorted(settings.AE_SUBSCRIPTIONS.items())))
     subscription_start = models.DateField(_('subscription start'))
     subscription_end = models.DateField(_('subscription end'))
     payment_method = models.CharField(_('payment method'), max_length=255, choices=settings.AE_PAYMENT_METHOD)
 
+    def save(self, *args, **kwargs):
+        """
+        This makes the Subscription to be updated with right dates with respect to date.today() each time you save the
+        Subscription object.
+        It means that you must be careful when modifying old Subscription, because you could make
+        someone that had no more valid subscription to get one again!
+
+        TODO: FIXME by putting it in the right function that would be triggered only when using the right Form!!!!
+        """
+        self.subscription_start = self.compute_start()
+        self.subscription_end = self.compute_end(
+                duration=settings.AE_SUBSCRIPTIONS[self.subscription_type]['duration'],
+                start=self.subscription_start)
+        super(Subscription, self).save(*args, **kwargs)
+
     class Meta:
         ordering = ['subscription_start',]
+
+    def __str__(self):
+        return self.member.user.username+' - '+str(self.pk)
 
     @staticmethod
     def compute_start(d=date.today()):

@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
-    'ae',
+    'subscription',
     'accounting',
 )
 
@@ -151,19 +151,23 @@ AE_PAYMENT_METHOD = [('cheque', 'Chèque'),
 
 # Subscription durations are in semestres (should be settingized)
 AE_SUBSCRIPTIONS = {
-    'Un semestre': {
+    'un-semestre': {
+        'name': 'Un semestre',
         'price': 15,
         'duration': 1,
     },
-    'Deux semestres': {
+    'deux-semestres': {
+        'name': 'Deux semestres',
         'price': 28,
         'duration': 2,
     },
-    'Cursus Tronc Commun': {
+    'cursus-tronc-commun': {
+        'name': 'Cursus Tronc Commun',
         'price': 45,
         'duration': 4,
     },
-    'Cursus Branche': {
+    'cursus-branche': {
+        'name': 'Cursus Branche',
         'price': 45,
         'duration': 6,
     },

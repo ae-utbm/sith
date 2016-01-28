@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 
-from ae.views import *
+from subscription.views import *
 
 urlpatterns = [
     # Subscription views

@@ -4,7 +4,7 @@ from django import forms
 from django.forms import Select
 from django.conf import settings
 
-from ae.models import Member, Subscription
+from subscription.models import Member, Subscription
 from core.views import CanEditMixin, CanEditPropMixin, CanViewMixin
 
 class SubscriptionForm(forms.ModelForm):
@@ -17,5 +17,5 @@ class SubscriptionForm(forms.ModelForm):
 
 
 class NewSubscription(CanEditMixin, CreateView):
-    template_name = 'ae/subscription.html'
+    template_name = 'subscription/subscription.html'
     form_class = SubscriptionForm
