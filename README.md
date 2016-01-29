@@ -1,5 +1,6 @@
 ## Sith AE
 
+### Get started
 
 To start working on the project, just run the following commands:
 
@@ -10,16 +11,17 @@ To start working on the project, just run the following commands:
     pip install -r requirements.txt
     ./manage.py setup
 
-To load some initial data in the core:
+To start the simple development server, just run `python3 manage.py runserver`
 
-    python3 manage.py loaddata users groups pages
+### Generating documentation
 
-You will be prompted for your Gitlab account, so you need some.
+There is a Doxyfile at the root of the project, meaning that if you have Doxygen, you can run `doxygen Doxyfile` to
+generate a complete HTML documentation that will be available in the *./doc/html/* folder.
 
-To start the debug server, just run `python3 manage.py runserver`
-
-#### Dependencies:
+### Dependencies:
   * Django 1.8
+  * Pillow
 
-The development is done with sqlite, but it is advised to set a more robust
-DBMS for production (Postgresql for example)
+The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
+
+
