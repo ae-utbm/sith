@@ -42,6 +42,7 @@ class CanEditMixin(View):
         try: # Always unlock when 403
             self.object.unset_lock()
         except: pass
+        print("CanEditMixin 403")
         raise PermissionDenied
 
 class CanViewMixin(View):
@@ -56,6 +57,7 @@ class CanViewMixin(View):
         try: # Always unlock when 403
             self.object.unset_lock()
         except: pass
+        print("CanViewMixin 403")
         raise PermissionDenied
 
 from .user import *

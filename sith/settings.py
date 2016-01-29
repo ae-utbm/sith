@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'club',
     'subscription',
     'accounting',
 )
@@ -122,6 +123,11 @@ EMAIL_HOST="localhost"
 EMAIL_PORT=25
 
 # AE configuration
+AE_MAIN_CLUB = {
+        'name': "AE",
+        'unix_name': "ae",
+        'address': "6 Boulevard Anatole France, 90000 Belfort"
+        }
 # Define the date in the year serving as reference for the subscriptions calendar
 # (month, day)
 AE_START_DATE = (8, 15) # 15th August
@@ -173,3 +179,16 @@ AE_SUBSCRIPTIONS = {
     },
 # To be completed....
 }
+
+CLUB_ROLES = {
+        10: 'Président',
+        9: 'Vice-Président',
+        8: 'Vice-Président',
+        7: 'Trésorier',
+        5: 'Responsable com',
+        4: 'Secrétaire',
+        3: 'Responsable info',
+        2: 'Membre du bureau',
+        1: 'Membre actif',
+        0: 'Membre',
+        }

@@ -6,6 +6,7 @@ from django.conf import settings
 
 from core.models import Group, User, Page, PageRev
 from accounting.models import Customer, GeneralJournal, ProductType, Product
+from club.models import Club
 
 class Command(BaseCommand):
     help = "Set up a new instance of the Sith AE"
@@ -28,6 +29,10 @@ class Command(BaseCommand):
         u.save()
         for g in settings.AE_GROUPS.values():
             Group(id=g['id'], name=g['name']).save()
+        Club(name=settings.AE_MAIN_CLUB['name'], unix_name=settings.AE_MAIN_CLUB['unix_name'],
+                address=settings.AE_MAIN_CLUB['address']).save()
+
+        # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
         if not options['prod']:
             print("Dev mode, adding some test data")
             s = User(username='skia', last_name="Kia", first_name="S'",

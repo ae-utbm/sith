@@ -4,13 +4,13 @@ from django import forms
 from django.forms import Select
 from django.conf import settings
 
-from subscription.models import Member, Subscription
+from subscription.models import Subscriber, Subscription
 from core.views import CanEditMixin, CanEditPropMixin, CanViewMixin
 
 class SubscriptionForm(forms.ModelForm):
     class Meta:
         model = Subscription
-        fields = ['subscription_type', 'payment_method']
+        fields = ['member', 'subscription_type', 'payment_method']
         #widgets = {
         #    'subscription_type': Select(choices={(k.lower(), k+" - "+str(v['price'])+"€"+str(Subscription.compute_end(2))) for k,v in settings.AE_SUBSCRIPTIONS.items()}),
         #}

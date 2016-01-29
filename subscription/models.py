@@ -3,6 +3,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 
 from core.models import User
 
@@ -14,23 +16,32 @@ def validate_payment(value):
     if value not in settings.AE_PAYMENT_METHOD:
         raise ValidationError(_('Bad payment method'))
 
-class Member(models.Model):
-    user = models.OneToOneField(User, primary_key=True)
+class Subscriber(User):
+    class Meta:
+        proxy = True
 
     def is_subscribed(self):
         return self.subscriptions.last().is_valid_now()
 
-    def __str__(self):
-        return self.user.username
-
 class Subscription(models.Model):
-    member = models.ForeignKey(Member, related_name='subscriptions')
+    member = models.ForeignKey(Subscriber, related_name='subscriptions')
     subscription_type = models.CharField(_('subscription type'),
                                          max_length=255,
                                          choices=((k, v['name']) for k,v in sorted(settings.AE_SUBSCRIPTIONS.items())))
     subscription_start = models.DateField(_('subscription start'))
     subscription_end = models.DateField(_('subscription end'))
     payment_method = models.CharField(_('payment method'), max_length=255, choices=settings.AE_PAYMENT_METHOD)
+
+    class Meta:
+        permissions = (
+                ('change_subscription', 'Can make someone become a subscriber'),
+                ('view_subscription', 'Can view who is a subscriber'),
+                )
+
+    def clean(self):
+        for s in Subscription.objects.filter(member=self.member).exclude(pk=self.pk).all():
+            if s.is_valid_now():
+                raise ValidationError(_('You can not subscribe many time for the same period'))
 
     def save(self, *args, **kwargs):
         """
@@ -50,8 +61,11 @@ class Subscription(models.Model):
     class Meta:
         ordering = ['subscription_start',]
 
+    def get_absolute_url(self):
+        return reverse('core:user_profile', kwargs={'user_id': self.member.pk})
+
     def __str__(self):
-        return self.member.user.username+' - '+str(self.pk)
+        return self.member.username+' - '+str(self.pk)
 
     @staticmethod
     def compute_start(d=date.today()):

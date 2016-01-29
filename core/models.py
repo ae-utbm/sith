@@ -160,13 +160,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Determine if the object can be edited by the user
         """
-        if not hasattr(obj, "edit_group"):
-            return False
         if self.is_owner(obj):
             return True
-        for g in obj.edit_group.all():
-            if self.groups.filter(name=g.name).exists():
-                return True
+        if hasattr(obj, "edit_group"):
+            for g in obj.edit_group.all():
+                if self.groups.filter(name=g.name).exists():
+                    return True
         if isinstance(obj, User) and obj == self:
             return True
         if self.has_perm(obj.__class__.__module__.split('.')[0]+".change_"+obj.__class__.__name__.lower()):
@@ -177,13 +176,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Determine if the object can be viewed by the user
         """
-        if not hasattr(obj, "view_group"):
-            return False
         if self.can_edit(obj):
             return True
-        for g in obj.view_group.all():
-            if self.groups.filter(name=g.name).exists():
-                return True
+        if hasattr(obj, "view_group"):
+            for g in obj.view_group.all():
+                if self.groups.filter(name=g.name).exists():
+                    return True
         if self.has_perm(obj.__class__.__module__.split('.')[0]+".view_"+obj.__class__.__name__.lower()):
             return True
         return False
