@@ -1,4 +1,4 @@
-{% extends "core/base.html" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
 User list
@@ -8,7 +8,7 @@ User list
 <h3>User list</h3>
 <ul>
 {% for u in user_list %}
-<li><a href="{% url 'core:user_profile' u.id %}">{{ u.get_display_name }}</a></li>
+<li><a href="{{ url('core:user_profile', user_id=u.id) }}">{{ u.get_display_name() }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

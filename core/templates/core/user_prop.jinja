@@ -1,10 +1,10 @@
-{% extends "core/base.html" %}
+{% extends "core/base.jinja" %}
 
 {% block content %}
-    <h2>Edit user profile</h2>
+    <h2>Edit user groups for {{ profile.get_full_name() }}</h2>
     <form action="" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form.as_p() }}
         <p><input type="submit" value="Update" /></p>
     </form>
 {% endblock %}

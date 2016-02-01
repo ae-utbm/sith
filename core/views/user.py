@@ -16,7 +16,7 @@ def login(request):
 
     Needs to be improve with correct handling of form exceptions
     """
-    return views.login(request, template_name="core/login.html")
+    return views.login(request, template_name="core/login.jinja")
 
 def logout(request):
     """
@@ -28,21 +28,21 @@ def password_change(request):
     """
     Allows a user to change its password
     """
-    return views.password_change(request, template_name="core/password_change.html", post_change_redirect=reverse("core:password_change_done"))
+    return views.password_change(request, template_name="core/password_change.jinja", post_change_redirect=reverse("core:password_change_done"))
 
 def password_change_done(request):
     """
     Allows a user to change its password
     """
-    return views.password_change_done(request, template_name="core/password_change_done.html")
+    return views.password_change_done(request, template_name="core/password_change_done.jinja")
 
 def password_reset(request):
     """
     Allows someone to enter an email adresse for resetting password
     """
     return views.password_reset(request,
-                                template_name="core/password_reset.html",
-                                email_template_name="core/password_reset_email.html",
+                                template_name="core/password_reset.jinja",
+                                email_template_name="core/password_reset_email.jinja",
                                 post_reset_redirect="core:password_reset_done",
                                )
 
@@ -50,7 +50,7 @@ def password_reset_done(request):
     """
     Confirm that the reset email has been sent
     """
-    return views.password_reset_done(request, template_name="core/password_reset_done.html")
+    return views.password_reset_done(request, template_name="core/password_reset_done.jinja")
 
 def password_reset_confirm(request, uidb64=None, token=None):
     """
@@ -58,7 +58,7 @@ def password_reset_confirm(request, uidb64=None, token=None):
     """
     return views.password_reset_confirm(request, uidb64=uidb64, token=token,
                                         post_reset_redirect="core:password_reset_complete",
-                                        template_name="core/password_reset_confirm.html",
+                                        template_name="core/password_reset_confirm.jinja",
                                        )
 
 def password_reset_complete(request):
@@ -66,7 +66,7 @@ def password_reset_complete(request):
     Confirm the password has sucessfully been reset
     """
     return views.password_reset_complete(request,
-                                         template_name="core/password_reset_complete.html",
+                                         template_name="core/password_reset_complete.jinja",
                                         )
 
 
@@ -86,7 +86,7 @@ def register(request):
     else:
         form = RegisteringForm()
     context['form'] = form.as_p()
-    return render(request, "core/register.html", context)
+    return render(request, "core/register.jinja", context)
 
 class UserView(CanViewMixin, DetailView):
     """
@@ -95,12 +95,14 @@ class UserView(CanViewMixin, DetailView):
     model = User
     pk_url_kwarg = "user_id"
     context_object_name = "profile"
+    template_name = "core/user_detail.jinja"
 
 class UserListView(ListView):
     """
     Displays the user list
     """
     model = User
+    template_name = "core/user_list.jinja"
 
 class UserUpdateProfileView(CanEditMixin, UpdateView):
     """
@@ -108,7 +110,7 @@ class UserUpdateProfileView(CanEditMixin, UpdateView):
     """
     model = User
     pk_url_kwarg = "user_id"
-    template_name = "core/user_edit.html"
+    template_name = "core/user_edit.jinja"
     fields = ('first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', )
 
 class UserUpdatePropView(CanEditPropMixin, UpdateView):
@@ -117,11 +119,12 @@ class UserUpdatePropView(CanEditPropMixin, UpdateView):
     """
     model = User
     pk_url_kwarg = "user_id"
-    template_name = "core/user_prop.html"
+    template_name = "core/user_prop.jinja"
     form_class = UserPropForm
+    context_object_name = "profile"
 
 class UserToolsView(TemplateView):
     """
     Displays the logged user's tools
     """
-    template_name = "core/user_tools.html"
+    template_name = "core/user_tools.jinja"

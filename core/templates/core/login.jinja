@@ -1,4 +1,4 @@
-{% extends "core/base.html" %}
+{% extends "core/base.jinja" %}
 
 {% block content %}
 
@@ -7,7 +7,7 @@
 {% endif %}
 
 {% if next %}
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated() %}
     <p>Your account doesn't have access to this page. To proceed,
     please login with an account that has access.</p>
     {% else %}
@@ -15,15 +15,15 @@
     {% endif %}
 {% endif %}
 
-<form method="post" action="{% url 'core:login' %}">
+<form method="post" action="{{ url('core:login') }}">
 {% csrf_token %}
 <table>
 <tr>
-    <td>{{ form.username.label_tag }}</td>
+    <td>{{ form.username.label_tag() }}</td>
     <td>{{ form.username }}</td>
 </tr>
 <tr>
-    <td>{{ form.password.label_tag }}</td>
+    <td>{{ form.password.label_tag() }}</td>
     <td>{{ form.password }}</td>
 </tr>
 </table>
@@ -33,6 +33,6 @@
 </form>
 
 {# Assumes you setup the password_reset view in your URLconf #}
-<p><a href="{% url 'core:password_reset' %}">Lost password?</a></p>
+<p><a href="{{ url('core:password_reset') }}">Lost password?</a></p>
 
 {% endblock %}

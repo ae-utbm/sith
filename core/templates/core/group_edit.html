@@ -1,11 +1,11 @@
-{% extends "core/base.html" %}
+{% extends "core/base.jinja" %}
 
 {% block content %}
-<p><a href="{% url 'core:group_list' %}">Back to list</a></p>
+<p><a href="{{ url('core:group_list') }}">Back to list</a></p>
     <h2>Edit group</h2>
     <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+        {{ csrf_input }}
+        {{ form.as_p() }}
         <p><input type="submit" value="Update" /></p>
     </form>
 {% endblock %}

@@ -7,10 +7,10 @@ from django.views.generic.base import View
 from core.models import Group
 
 def forbidden(request):
-    return render(request, "core/403.html")
+    return render(request, "core/403.jinja")
 
 def not_found(request):
-    return render(request, "core/404.html")
+    return render(request, "core/404.jinja")
 
 
 class CanEditPropMixin(View):

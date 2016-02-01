@@ -1,4 +1,4 @@
-{% extends "core/base.html" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
 Group list
@@ -8,7 +8,7 @@ Group list
 <h3>Group list</h3>
 <ul>
 {% for g in group_list %}
-<li><a href="{% url 'core:group_edit' g.id %}">{{ g.name }}</a></li>
+<li><a href="{{ url('core:group_edit', kwargs={'group_id': g.id} }}">{{ g.name }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

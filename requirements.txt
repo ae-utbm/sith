@@ -1,3 +1,4 @@
 # Django 1.8 LTS is required, version 1.9 is not supported
 Django >=1.8,<1.9
 Pillow
+django-jinja

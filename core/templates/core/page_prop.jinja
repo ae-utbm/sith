@@ -1,10 +1,10 @@
-{% extends "core/page.html" %}
+{% extends "core/page.jinja" %}
 
 {% block content %}
     <h2>Page properties</h2>
     <form action="" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form.as_p() }}
         <p><input type="submit" value="Save!" /></p>
     </form>
 {% endblock %}

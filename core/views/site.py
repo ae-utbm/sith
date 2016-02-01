@@ -4,7 +4,7 @@ from django.db import models
 
 def index(request, context=None):
     if context == None:
-        return render(request, "core/index.html", {'title': 'Bienvenue!'})
+        return render(request, "core/index.jinja", {'title': 'Bienvenue!'})
     else:
-        return render(request, "core/index.html", context)
+        return render(request, "core/index.jinja", context)
 

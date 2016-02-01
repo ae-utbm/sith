@@ -11,6 +11,7 @@ from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 
 class PageListView(ListView):
     model = Page
+    template_name = 'core/page_list.jinja'
 
     def get_context_data(self, **kwargs):
         context = super(PageListView, self).get_context_data(**kwargs)
@@ -18,6 +19,7 @@ class PageListView(ListView):
 
 class PageView(CanViewMixin, DetailView):
     model = Page
+    template_name = 'core/page_detail.jinja'
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
@@ -36,7 +38,7 @@ class PageView(CanViewMixin, DetailView):
 
 class PageHistView(CanViewMixin, DetailView):
     model = Page
-    template_name_suffix = '_hist'
+    template_name = 'core/page_hist.jinja'
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
@@ -44,7 +46,7 @@ class PageHistView(CanViewMixin, DetailView):
 
 class PageRevView(CanViewMixin, DetailView):
     model = Page
-    template_name = 'core/page_detail.html'
+    template_name = 'core/page_detail.jinja'
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
@@ -67,7 +69,7 @@ class PageRevView(CanViewMixin, DetailView):
 class PagePropView(CanEditPropMixin, UpdateView):
     model = Page
     form_class = PagePropForm
-    template_name_suffix = '_prop'
+    template_name = 'core/page_prop.jinja'
 
     def get_object(self):
         page_name = self.kwargs['page_name']
@@ -97,7 +99,7 @@ class PagePropView(CanEditPropMixin, UpdateView):
 class PageEditView(CanEditMixin, UpdateView):
     model = PageRev
     fields = ['title', 'content',]
-    template_name_suffix = '_edit'
+    template_name = 'core/pagerev_edit.jinja'
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])

@@ -1,8 +1,8 @@
-{% extends "core/base.html" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
     {% if page %}
-        {{ page.get_display_name }}
+        {{ page.get_display_name() }}
     {% elif page_list %}
         Page list
     {% else %}
@@ -16,6 +16,6 @@
         {% endblock %}
     {% else %}
         <h2>Page does not exist</h2>
-        <p><a href="{% url 'core:page_prop' new_page %}">Create it?</a></p>
+        <p><a href="{{ url('core:page_prop', page_name=new_page) }}">Create it?</a></p>
     {% endif %}
 {% endblock %}

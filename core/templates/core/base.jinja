@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% block head %}
+    <title>{% block title %}Bienvenue sur le Sith de l'AE!{% endblock %}</title>
+    <link rel="stylesheet" href="{{ static('core/style.css') }}">
+    <script src="{{ static('core/script.js') }}"></script>
+    <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+    {% endblock %}
+</head>
+
+<body>
+    <header>
+        {% block header %}
+        {% if user.is_authenticated() %}Hello, {{ user.username }}!{% endif %}
+        <ul>
+            {% if not user.is_authenticated() %}
+            <li><a href="{{ url('core:register') }}">Register</a></li>
+            <li><a href="{{ url('core:login') }}">Login</a></li>
+            {% else %}
+            <li><a href="{{ url('core:logout') }}">Logout</a></li>
+            {% endif %}
+        </ul>
+        {% if user.is_authenticated() %}
+        <ul>
+            <li><a href="{{ url('core:user_profile', user_id=user.id) }}">Profile</a></li>
+            <li><a href="{{ url('core:user_list') }}">Users</a></li>
+            <li><a href="{{ url('core:page_list') }}">Pages</a></li>
+        </ul>
+        {% endif %}
+        {% endblock %}
+    </header>
+
+    <div id="content">
+        {% if error %}
+            {{ error }}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        {% block footer %}
+        Site réalisé par des gens biens
+        {% endblock %}
+    </footer>
+</body>
+</html>
