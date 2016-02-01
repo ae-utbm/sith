@@ -7,6 +7,7 @@ from django.conf import settings
 from core.models import Group, User, Page, PageRev
 from accounting.models import Customer, GeneralJournal, ProductType, Product
 from club.models import Club
+from subscription.models import Subscription, Subscriber
 
 class Command(BaseCommand):
     help = "Set up a new instance of the Sith AE"
@@ -61,4 +62,8 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",
                     special_selling_price="1.6").save()
             GeneralJournal(start_date="2015-06-12", name="A15").save()
+
+            # Subscription
+            Subscription(member=Subscriber.objects.filter(pk=s.pk).first(), subscription_type=list(settings.AE_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.AE_PAYMENT_METHOD[0]).save()
 
