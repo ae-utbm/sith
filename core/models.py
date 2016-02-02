@@ -8,6 +8,8 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from datetime import datetime, timedelta
 
+import unicodedata
+
 class Group(AuthGroup):
     def get_absolute_url(self):
         """
@@ -134,7 +136,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         For example: Guy Carlier gives gcarlier, and gcarlier1 if the first one exists
         Returns the generated username
         """
-        user_name = str(self.first_name[0]+self.last_name).lower()
+        def remove_accents(data):
+            return ''.join(x for x in unicodedata.normalize('NFKD', data) if \
+            unicodedata.category(x)[0] == 'L').lower()
+        user_name = remove_accents(self.first_name[0]+self.last_name).encode('ascii', 'ignore').decode('utf-8')
         un_set = [u.username for u in User.objects.all()]
         if user_name in un_set:
             i = 1
