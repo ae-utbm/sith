@@ -6,13 +6,13 @@
 <h1>{{ title }}</h1>
 
 {% if user_registered %}
-Welcome {{ user_registered.get_display_name }}!
+Welcome {{ user_registered.get_display_name() }}!
 You successfully registred and you will soon receive a confirmation mail.
 
 Your username is {{ user_registered.username }}.
 {% endif %}
 
-<form action="{% url 'core:register' %}" method="post">
+<form action="{{ url('core:register') }}" method="post">
     {% csrf_token %}
     {{ form }}
     <p><input type="submit" value="Register!" /></p>
