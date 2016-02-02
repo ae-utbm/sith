@@ -1,0 +1,27 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+    <h3>Club</h3>
+    <p><a href="{{ url('club:club_list') }}">Back to list</a></p>
+    {% if user.can_edit(club) %}
+        <p><a href="{{ url('club:club_edit', club_id=club.pk) }}">Edit</a></p>
+        <p><a href="{{ url('club:club_members', club_id=club.pk) }}">Edit members</a></p>
+    {% endif %}
+    {% if user.is_owner(club) or user.membership.filter(end_date=None).filter(club=club.id).first() is not none %}
+        <p><a href="{{ url('club:club_prop', club_id=club.pk) }}">Prop</a>
+    TODO FIXME: this code sucks and is just a test!
+    We need something really easy to manage the views rights regarding the subscribing status and the membership of
+    someone!
+        </p>
+    {% endif %}
+    <h3>{{ club.name }}</h3>
+    <p>{{ club.address }}</p>
+    <ul>
+        {% for m in club.members.all() %}
+        <li>{{ m }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+
+

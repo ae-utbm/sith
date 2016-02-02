@@ -3,8 +3,9 @@ from django.core import validators
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 
-from core.models import User
+from core.models import User, Group
 
 # Create your models here.
 
@@ -28,6 +29,10 @@ class Club(models.Model):
             )
     address = models.CharField(_('address'), max_length=254)
     # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
+    owner_group = models.ForeignKey(Group, related_name="owned_club",
+                                    default=settings.AE_GROUPS['root']['id'])
+    edit_group = models.ManyToManyField(Group, related_name="editable_club", blank=True)
+    view_group = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
@@ -44,6 +49,9 @@ class Club(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('club:club_view', kwargs={'club_id': self.id})
 
 class Membership(models.Model):
     """

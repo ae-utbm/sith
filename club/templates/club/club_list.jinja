@@ -1,0 +1,33 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+    Club list
+{% endblock %}
+
+{% macro display_club(club) -%}
+    <li><a href="{{ url('club:club_view', club_id=club.id) }}">{{ club.name }}</a>
+        {%- if club.children.all()|length != 0 %}
+        <ul>
+            {%- for c in club.children.all() %}
+                {{ display_club(c) }}
+            {%- endfor %}
+        </ul>
+        {%- endif -%}
+    </li>
+{%- endmacro %}
+
+{% block content %}
+    {% if club_list %}
+        <h3>Club list</h3>
+        <ul>
+            {%- for c in club_list if c.parent is none %}
+                {{ display_club(c) }}
+            {%- endfor %}
+        </ul>
+    {% else %}
+        There is no club in this website.
+    {% endif %}
+{% endblock %}
+
+
+

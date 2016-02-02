@@ -30,8 +30,9 @@ class Command(BaseCommand):
         u.save()
         for g in settings.AE_GROUPS.values():
             Group(id=g['id'], name=g['name']).save()
-        Club(name=settings.AE_MAIN_CLUB['name'], unix_name=settings.AE_MAIN_CLUB['unix_name'],
-                address=settings.AE_MAIN_CLUB['address']).save()
+        ae = Club(name=settings.AE_MAIN_CLUB['name'], unix_name=settings.AE_MAIN_CLUB['unix_name'],
+                address=settings.AE_MAIN_CLUB['address'])
+        ae.save()
 
         # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
         if not options['prod']:
@@ -67,3 +68,12 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             Subscription(member=Subscriber.objects.filter(pk=s.pk).first(), subscription_type=list(settings.AE_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.AE_PAYMENT_METHOD[0]).save()
 
+            Club(name="Bibo'UT", unix_name="bibout",
+                    address="46 de la Boustifaille", parent=ae).save()
+            guyut = Club(name="Guy'UT", unix_name="guyut",
+                    address="42 de la Boustifaille", parent=ae)
+            guyut.save()
+            Club(name="Woenzel'UT", unix_name="woenzel",
+                    address="Woenzel", parent=guyut).save()
+            Club(name="BdF", unix_name="bdf",
+                    address="Guyéuéyuéyuyé").save()
