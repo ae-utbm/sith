@@ -81,5 +81,8 @@ class Membership(models.Model):
                 " - "+str(_('past member')) if self.end_date is not None else ""
                 )
 
+    def get_absolute_url(self):
+        return reverse('club:club_members', kwargs={'club_id': self.club.id})
+
 
 

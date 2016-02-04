@@ -1,11 +1,16 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-    <h2>Edit club</h2>
+    <h2>Club members</h2>
+    <ul>
+        {% for m in club.members.all() %}
+        <li>{{ m }}</li>
+        {% endfor %}
+    </ul>
     <form action="{{ url('club:club_members', club_id=club.id) }}" method="post">
         {% csrf_token %}
         {{ form.as_p() }}
-        <p><input type="submit" value="Save!" /></p>
+        <p><input type="submit" value="Add" /></p>
     </form>
 {% endblock %}
 
