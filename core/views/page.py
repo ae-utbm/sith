@@ -9,7 +9,7 @@ from core.models import Page, PageRev, LockError
 from core.views.forms import PagePropForm
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 
-class PageListView(ListView):
+class PageListView(CanViewMixin, ListView):
     model = Page
     template_name = 'core/page_list.jinja'
 

@@ -12,6 +12,20 @@ def forbidden(request):
 def not_found(request):
     return render(request, "core/404.jinja")
 
+def can_edit_prop(obj, user):
+    if obj is None or user.is_owner(obj):
+        return True
+    return False
+
+def can_edit(obj, user):
+    if obj is None or user.can_edit(obj):
+        return True
+    return can_edit_prop(obj, user)
+
+def can_view(obj, user):
+    if obj is None or user.can_view(obj):
+        return True
+    return can_edit(obj, user)
 
 class CanEditPropMixin(View):
     """
@@ -22,8 +36,11 @@ class CanEditPropMixin(View):
     """
     def dispatch(self, request, *arg, **kwargs):
         res = super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
-        if ((hasattr(self, 'object') and (self.object is None or self.request.user.is_owner(self.object))) or
-            (hasattr(self, 'object_list') and (self.object_list is None or self.object_list is [] or self.request.user.is_owner(self.object_list[0])))):
+        if hasattr(self, 'object'):
+            obj = self.object
+        elif hasattr(self, 'object_list'):
+            obj = self.object_list[0] if self.object_list else None
+        if can_edit_prop(obj, self.request.user):
             return res
         try: # Always unlock when 403
             self.object.unset_lock()
@@ -32,35 +49,38 @@ class CanEditPropMixin(View):
 
 class CanEditMixin(View):
     """
-    This view makes exactly the same this as its direct parent, but checks the group on the edit_group field of the
+    This view makes exactly the same this as its direct parent, but checks the group on the edit_groups field of the
     object
     """
     def dispatch(self, request, *arg, **kwargs):
-        # TODO: WIP: fix permissions with exceptions!
         res = super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
-        if ((hasattr(self, 'object') and (self.object is None or self.request.user.can_edit(self.object))) or
-            (hasattr(self, 'object_list') and (self.object_list is None or self.object_list is [] or self.request.user.can_edit(self.object_list[0])))):
+        if hasattr(self, 'object'):
+            obj = self.object
+        elif hasattr(self, 'object_list'):
+            obj = self.object_list[0] if self.object_list else None
+        if can_edit(obj, self.request.user):
             return res
         try: # Always unlock when 403
             self.object.unset_lock()
         except: pass
-        print("CanEditMixin 403")
         raise PermissionDenied
 
 class CanViewMixin(View):
     """
-    This view still makes exactly the same this as its direct parent, but checks the group on the view_group field of
+    This view still makes exactly the same this as its direct parent, but checks the group on the view_groups field of
     the object
     """
     def dispatch(self, request, *arg, **kwargs):
         res = super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
-        if ((hasattr(self, 'object') and (self.object is None or self.request.user.can_view(self.object))) or
-            (hasattr(self, 'object_list') and (self.object_list is None or self.object_list is [] or self.request.user.can_view(self.object_list[0])))):
+        if hasattr(self, 'object'):
+            obj = self.object
+        elif hasattr(self, 'object_list'):
+            obj = self.object_list[0] if self.object_list else None
+        if can_view(obj, self.request.user):
             return res
         try: # Always unlock when 403
             self.object.unset_lock()
         except: pass
-        print("CanViewMixin 403")
         raise PermissionDenied
 
 from .user import *

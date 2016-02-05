@@ -93,6 +93,11 @@ TEMPLATES = [
             "filters": {
                 "markdown": "core.templatetags.renderer.markdown",
             },
+            "globals": {
+                "can_edit_prop": "core.views.can_edit_prop",
+                "can_edit": "core.views.can_edit",
+                "can_view": "core.views.can_view",
+            },
             "bytecode_cache": {
                 "name": "default",
                 "backend": "django_jinja.cache.BytecodeCache",
@@ -228,12 +233,11 @@ AE_SUBSCRIPTIONS = {
 CLUB_ROLES = {
         10: 'Président',
         9: 'Vice-Président',
-        8: 'Vice-Président',
         7: 'Trésorier',
         5: 'Responsable com',
         4: 'Secrétaire',
         3: 'Responsable info',
         2: 'Membre du bureau',
         1: 'Membre actif',
-        0: 'Membre',
+        0: 'Curieux',
         }

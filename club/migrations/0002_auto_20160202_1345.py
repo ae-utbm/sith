@@ -14,12 +14,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='club',
-            name='edit_group',
+            name='edit_groups',
             field=models.ManyToManyField(to='core.Group', blank=True, related_name='editable_club'),
         ),
         migrations.AddField(
             model_name='club',
-            name='view_group',
+            name='view_groups',
             field=models.ManyToManyField(to='core.Group', blank=True, related_name='viewable_club'),
         ),
     ]

@@ -54,10 +54,10 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
                 ('name', models.CharField(max_length=30, verbose_name='page name')),
                 ('_full_name', models.CharField(max_length=255, verbose_name='page name', blank=True)),
-                ('edit_group', models.ManyToManyField(to='core.Group', related_name='editable_page', blank=True)),
+                ('edit_groups', models.ManyToManyField(to='core.Group', related_name='editable_page', blank=True)),
                 ('owner_group', models.ForeignKey(to='core.Group', related_name='owned_page', default=1)),
                 ('parent', models.ForeignKey(to='core.Page', on_delete=django.db.models.deletion.SET_NULL, null=True, related_name='children', blank=True)),
-                ('view_group', models.ManyToManyField(to='core.Group', related_name='viewable_page', blank=True)),
+                ('view_groups', models.ManyToManyField(to='core.Group', related_name='viewable_page', blank=True)),
             ],
             options={
                 'permissions': (('change_prop_page', "Can change the page's properties (groups, ...)"), ('view_page', 'Can view the page')),
@@ -79,7 +79,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='user',
-            name='edit_group',
+            name='edit_groups',
             field=models.ManyToManyField(to='core.Group', related_name='editable_user', blank=True),
         ),
         migrations.AddField(
@@ -99,7 +99,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='user',
-            name='view_group',
+            name='view_groups',
             field=models.ManyToManyField(to='core.Group', related_name='viewable_user', blank=True),
         ),
         migrations.AlterUniqueTogether(

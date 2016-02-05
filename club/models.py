@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
 from core.models import User, Group
+from subscription.models import Subscriber
 
 # Create your models here.
 
@@ -31,8 +32,8 @@ class Club(models.Model):
     # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
     owner_group = models.ForeignKey(Group, related_name="owned_club",
                                     default=settings.AE_GROUPS['root']['id'])
-    edit_group = models.ManyToManyField(Group, related_name="editable_club", blank=True)
-    view_group = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
+    edit_groups = models.ManyToManyField(Group, related_name="editable_club", blank=True)
+    view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
@@ -52,6 +53,38 @@ class Club(models.Model):
 
     def get_absolute_url(self):
         return reverse('club:club_view', kwargs={'club_id': self.id})
+
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be super edited by the given user
+        """
+        if user.groups.filter(name=settings.AE_GROUPS['board']['name']).exists():
+            return True
+        return False
+
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        ms = self.get_membership_for(user)
+        if ms is not None and ms.role >= 7:
+            return True
+        return False
+
+    def can_be_viewed_by(self, user):
+        """
+        Method to see if that object can be seen by the given user
+        """
+        sub = Subscriber.objects.filter(pk=user.pk).first()
+        if sub is None:
+            return False
+        return sub.is_subscribed()
+
+    def get_membership_for(self, user):
+        """
+        Returns the current membership the given user
+        """
+        return self.members.filter(user=user.id).filter(end_date=None).first()
 
 class Membership(models.Model):
     """

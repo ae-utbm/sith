@@ -20,8 +20,12 @@ class Subscriber(User):
     class Meta:
         proxy = True
 
+    def __init__(self, *args, **kwargs):
+        super(Subscriber, self).__init__(*args, **kwargs)
+
     def is_subscribed(self):
-        return self.subscriptions.last().is_valid_now()
+        s = self.subscriptions.last()
+        return s.is_valid_now() if s is not None else False
 
 class Subscription(models.Model):
     member = models.ForeignKey(Subscriber, related_name='subscriptions')

@@ -65,8 +65,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateField(_('date joined'), auto_now_add=True)
     owner_group = models.ForeignKey(Group, related_name="owned_user",
                                     default=settings.AE_GROUPS['root']['id'])
-    edit_group = models.ManyToManyField(Group, related_name="editable_user", blank=True)
-    view_group = models.ManyToManyField(Group, related_name="viewable_user", blank=True)
+    edit_groups = models.ManyToManyField(Group, related_name="editable_user", blank=True)
+    view_groups = models.ManyToManyField(Group, related_name="viewable_user", blank=True)
 
     objects = UserManager()
 
@@ -159,6 +159,8 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.has_perm(obj.__class__.__module__.split('.')[0]+".change_prop_"+obj.__class__.__name__.lower()) or
             self.groups.filter(id=settings.AE_GROUPS['root']['id']).exists()):
             return True
+        if hasattr(obj, "is_owned_by") and obj.is_owned_by(self):
+            return True
         return False
 
     def can_edit(self, obj):
@@ -167,11 +169,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         if self.is_owner(obj):
             return True
-        if hasattr(obj, "edit_group"):
-            for g in obj.edit_group.all():
+        if hasattr(obj, "edit_groups"):
+            for g in obj.edit_groups.all():
                 if self.groups.filter(name=g.name).exists():
                     return True
         if isinstance(obj, User) and obj == self:
+            return True
+        if hasattr(obj, "can_be_edited_by") and obj.can_be_edited_by(self):
             return True
         if self.has_perm(obj.__class__.__module__.split('.')[0]+".change_"+obj.__class__.__name__.lower()):
             return True
@@ -183,10 +187,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         if self.can_edit(obj):
             return True
-        if hasattr(obj, "view_group"):
-            for g in obj.view_group.all():
+        if hasattr(obj, "view_groups"):
+            for g in obj.view_groups.all():
                 if self.groups.filter(name=g.name).exists():
                     return True
+        if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
+            return True
         if self.has_perm(obj.__class__.__module__.split('.')[0]+".view_"+obj.__class__.__name__.lower()):
             return True
         return False
@@ -202,7 +208,7 @@ class AnonymousUser(AuthAnonymousUser):
         return False
 
     def can_view(self, obj):
-        if obj.view_group.filter(pk=settings.AE_GROUPS['public']['id']).exists():
+        if obj.view_groups.filter(pk=settings.AE_GROUPS['public']['id']).exists():
             return True
         return False
 
@@ -236,8 +242,8 @@ class Page(models.Model):
     _full_name = models.CharField(_('page name'), max_length=255, blank=True)
     owner_group = models.ForeignKey(Group, related_name="owned_page",
                                     default=settings.AE_GROUPS['root']['id'])
-    edit_group = models.ManyToManyField(Group, related_name="editable_page", blank=True)
-    view_group = models.ManyToManyField(Group, related_name="viewable_page", blank=True)
+    edit_groups = models.ManyToManyField(Group, related_name="editable_page", blank=True)
+    view_groups = models.ManyToManyField(Group, related_name="viewable_page", blank=True)
     lock_mutex = {}
 
 
@@ -397,10 +403,10 @@ class PageRev(models.Model):
     def __getattribute__(self, attr):
         if attr == "owner_group":
             return self.page.owner_group
-        elif attr == "edit_group":
-            return self.page.edit_group
-        elif attr == "view_group":
-            return self.page.view_group
+        elif attr == "edit_groups":
+            return self.page.edit_groups
+        elif attr == "view_groups":
+            return self.page.view_groups
         elif attr == "unset_lock":
             return self.page.unset_lock
         else:

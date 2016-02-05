@@ -27,21 +27,21 @@ class UserPropForm(forms.ModelForm):
     required_css_class = 'required'
     class Meta:
         model = User
-        fields = ['groups', 'edit_group', 'view_group']
+        fields = ['groups', 'edit_groups', 'view_groups']
         labels = {
-            'edit_group': "Edit profile group",
-            'view_group': "View profile group",
+            'edit_groups': "Edit profile group",
+            'view_groups': "View profile group",
         }
         help_texts = {
-            'edit_group': "Groups that can edit this user's profile",
-            'view_group': "Groups that can view this user's profile",
+            'edit_groups': "Groups that can edit this user's profile",
+            'view_groups': "Groups that can view this user's profile",
             'groups': "Which groups this user belongs to",
         }
         widgets = {
             'groups': CheckboxSelectMultiple,
             'user_permissions': CheckboxSelectMultiple,
-            'edit_group': CheckboxSelectMultiple,
-            'view_group': CheckboxSelectMultiple,
+            'edit_groups': CheckboxSelectMultiple,
+            'view_groups': CheckboxSelectMultiple,
         }
 
 class PagePropForm(forms.ModelForm):
@@ -49,16 +49,16 @@ class PagePropForm(forms.ModelForm):
     required_css_class = 'required'
     class Meta:
         model = Page
-        fields = ['parent', 'name', 'owner_group', 'edit_group', 'view_group', ]
+        fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ]
         widgets = {
-            'edit_group': CheckboxSelectMultiple,
-            'view_group': CheckboxSelectMultiple,
+            'edit_groups': CheckboxSelectMultiple,
+            'view_groups': CheckboxSelectMultiple,
         }
 
     def __init__(self, *arg, **kwargs):
         super(PagePropForm, self).__init__(*arg, **kwargs)
-        self.fields['edit_group'].required = False
-        self.fields['view_group'].required = False
+        self.fields['edit_groups'].required = False
+        self.fields['view_groups'].required = False
 
 
 class GroupEditForm(forms.ModelForm):
