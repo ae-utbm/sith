@@ -42,7 +42,7 @@ class ClubMemberForm(forms.ModelForm):
         """
         ret = super(ClubMemberForm, self).clean()
         ms = self.instance.club.get_membership_for(self._user)
-        if ms is not None and ms.role >= self.cleaned_data['role']:
+        if (ms is not None and ms.role >= self.cleaned_data['role']) or self._user.is_superuser:
             return ret
         raise ValidationError("You do not have the permission to do that")
 

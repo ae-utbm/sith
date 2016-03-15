@@ -58,7 +58,7 @@ class Club(models.Model):
         """
         Method to see if that object can be super edited by the given user
         """
-        if user.groups.filter(name=settings.AE_GROUPS['board']['name']).exists():
+        if user.is_in_group(settings.AE_GROUPS['board']['name']):
             return True
         return False
 
@@ -116,6 +116,4 @@ class Membership(models.Model):
 
     def get_absolute_url(self):
         return reverse('club:club_members', kwargs={'club_id': self.club.id})
-
-
 

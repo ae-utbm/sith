@@ -96,6 +96,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def to_dict(self):
         return self.__dict__
 
+    def is_in_group(self, group_name):
+        """If the user is in the group passed in argument (as string)"""
+        return self.groups.filter(name=group_name).exists()
+
     def get_profile(self):
         return {
             "last_name": self.last_name,
