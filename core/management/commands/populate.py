@@ -17,17 +17,26 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        u = User(username='root', last_name="", first_name="Bibou",
+        root = User(username='root', last_name="", first_name="Bibou",
                  email="ae.info@utbm.fr",
                  date_of_birth="1942-06-12",
                  is_superuser=True, is_staff=True)
-        u.set_password("plop")
-        u.save()
+        root.set_password("plop")
+        root.save()
         for g in settings.AE_GROUPS.values():
             Group(id=g['id'], name=g['name']).save()
         ae = Club(name=settings.AE_MAIN_CLUB['name'], unix_name=settings.AE_MAIN_CLUB['unix_name'],
                 address=settings.AE_MAIN_CLUB['address'])
         ae.save()
+        p = Page(name='Index')
+        p.set_lock(root)
+        p.save()
+        p.view_groups=[settings.AE_GROUPS['public']['id']]
+        p.set_lock(root)
+        p.save()
+        PageRev(page=p, title="Wiki index", author=root, content="""
+Welcome to the wiki page!
+""").save()
 
         # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
         if not options['prod']:
@@ -53,14 +62,12 @@ class Command(BaseCommand):
             r.save()
             # Adding syntax help page
             p = Page(name='Aide_sur_la_syntaxe')
-            p.set_lock(s)
             p.save()
             PageRev(page=p, title="Aide sur la syntaxe", author=s, content="""
 Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 """).save()
             # Adding README
             p = Page(name='README')
-            p.set_lock(s)
             p.save()
             p.view_groups=[settings.AE_GROUPS['public']['id']]
             p.set_lock(s)

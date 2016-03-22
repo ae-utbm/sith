@@ -12,10 +12,10 @@
 {% if request.user.id == profile.id %}
     <li><a href="{{ url('core:user_tools') }}">Tools</a></li>
 {% endif %}
-{% if user.has_perms('core.change_user') or user.id == profile.id %}
+{% if can_edit(profile, request.user) or user.id == profile.id %}
     <li><a href="{{ url('core:user_edit', user_id=profile.id) }}">Edit</a></li>
 {% endif %}
-{% if user.has_perms('core.change_prop_user') %}
+{% if can_edit_prop(profile, request.user) %}
     <li><a href="{{ url('core:user_prop', user_id=profile.id) }}">Props</a></li>
 {% endif %}
 </ul>

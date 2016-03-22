@@ -98,6 +98,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def is_in_group(self, group_name):
         """If the user is in the group passed in argument (as string)"""
+        if group_name == settings.AE_GROUPS['public']['name']:
+            return True
+        if group_name == settings.AE_GROUPS['members']['name']: # We check the subscription if asked
+            try:
+                from subscription import Subscriber
+                s = Subscriber.objects.filter(pk=self.pk).first()
+                if s is not None and s.is_subscribed():
+                    return True
+                else:
+                    return False
+            except Exception as e:
+                print(e)
         return self.groups.filter(name=group_name).exists()
 
     def get_profile(self):
@@ -159,7 +171,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         if not hasattr(obj, "owner_group"):
             return False
-        if (self.is_superuser or self.groups.filter(name=obj.owner_group.name).exists() or
+        if (self.is_superuser or self.is_in_group(obj.owner_group.name) or
             self.has_perm(obj.__class__.__module__.split('.')[0]+".change_prop_"+obj.__class__.__name__.lower()) or
             self.groups.filter(id=settings.AE_GROUPS['root']['id']).exists()):
             return True
@@ -175,7 +187,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             return True
         if hasattr(obj, "edit_groups"):
             for g in obj.edit_groups.all():
-                if self.groups.filter(name=g.name).exists():
+                if self.is_in_group(g.name):
                     return True
         if isinstance(obj, User) and obj == self:
             return True
@@ -193,7 +205,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             return True
         if hasattr(obj, "view_groups"):
             for g in obj.view_groups.all():
-                if self.groups.filter(name=g.name).exists():
+                if self.is_in_group(g.name):
                     return True
         if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
             return True
