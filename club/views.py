@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from club.models import Club, Membership
+from sith.settings import AE_GROUPS
 
 class ClubListView(CanViewMixin, ListView):
     """
@@ -41,7 +42,7 @@ class ClubMemberForm(forms.ModelForm):
         """
         ret = super(ClubMemberForm, self).clean()
         ms = self.instance.club.get_membership_for(self._user)
-        if (ms is not None and ms.role >= self.cleaned_data['role']) or self._user.is_superuser:
+        if (ms is not None and ms.role >= self.cleaned_data['role']) or self._user.is_in_group(AE_GROUPS['board']['name']) or self._user.is_superuser:
             return ret
         raise ValidationError("You do not have the permission to do that")
 
