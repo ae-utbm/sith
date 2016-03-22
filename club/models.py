@@ -106,7 +106,10 @@ class Membership(models.Model):
     description = models.CharField(_('description'), max_length=30, null=False, blank=True)
 
     def clean(self):
-        if Membership.objects.filter(user=self.user).filter(club=self.club).filter(end_date=None).exclude(pk=self.pk).exists():
+        sub = Subscriber.objects.filter(pk=self.user.pk).first()
+        if sub is None or not sub.is_subscribed():
+            raise ValidationError(_('User must be subscriber to take part to a club'))
+        if Membership.objects.filter(user=self.user).filter(club=self.club).filter(end_date=None).exists():
             raise ValidationError(_('User is already member of that club'))
 
     def __str__(self):
