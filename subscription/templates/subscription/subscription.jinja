@@ -1,0 +1,14 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+New subscription
+{% endblock %}
+
+{% block content %}
+<h3>New subscription</h3>
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="Save!" /></p>
+</form>
+{% endblock %}

@@ -35,6 +35,7 @@ class Subscription(models.Model):
     subscription_start = models.DateField(_('subscription start'))
     subscription_end = models.DateField(_('subscription end'))
     payment_method = models.CharField(_('payment method'), max_length=255, choices=settings.AE_PAYMENT_METHOD)
+    # TODO add location!
 
     class Meta:
         permissions = (
@@ -111,6 +112,9 @@ class Subscription(models.Model):
         # This can certainly be simplified, but it works like this
         return start.replace(month=(start.month+6*duration)%12,
                              year=start.year+int(duration/2)+(1 if start.month > 6 and duration%2 == 1 else 0))
+
+    def can_be_edited_by(self, user):
+        return user.is_in_group(settings.AE_GROUPS['board']['name']) or user.is_in_group(settings.AE_GROUPS['root']['name'])
 
     def is_valid_now(self):
         return self.subscription_start <= date.today() and date.today() <= self.subscription_end

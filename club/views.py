@@ -8,7 +8,6 @@ from django.core.exceptions import ValidationError
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from club.models import Club, Membership
-from subscription.views import SubscriberMixin
 
 class ClubListView(CanViewMixin, ListView):
     """

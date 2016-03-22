@@ -201,6 +201,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             return True
         return False
 
+    def can_be_edited_by(self, user):
+        return user.is_in_group(settings.AE_GROUPS['board']['name']) or user.is_in_group(settings.AE_GROUPS['root']['name'])
+
+
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):
         super(AnonymousUser, self).__init__()

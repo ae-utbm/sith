@@ -10,23 +10,20 @@ from subscription.models import Subscriber, Subscription
 from core.views import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.models import User
 
-class SubscriberMixin(View):
-    def dispatch(self, request, *arg, **kwargs):
-        res = super(SubscriberMixin, self).dispatch(request, *arg, **kwargs)
-        subscriber = Subscriber.objects.filter(pk=request.user.pk).first()
-        if subscriber is not None and subscriber.is_subscribed():
-            return ret
-        raise PermissionDenied
+def get_subscriber(user):
+    s = Subscriber.objects.filter(pk=user.pk).first()
+    return s
 
 class SubscriptionForm(forms.ModelForm):
     class Meta:
         model = Subscription
         fields = ['member', 'subscription_type', 'payment_method']
-        #widgets = {
-        #    'subscription_type': Select(choices={(k.lower(), k+" - "+str(v['price'])+"€"+str(Subscription.compute_end(2))) for k,v in settings.AE_SUBSCRIPTIONS.items()}),
-        #}
-
 
 class NewSubscription(CanEditMixin, CreateView):
-    template_name = 'subscription/subscription.html'
+    template_name = 'subscription/subscription.jinja'
     form_class = SubscriptionForm
+
+    def get_initial(self):
+        if 'member' in self.request.GET.keys():
+            return {'member': self.request.GET['member']}
+        return {}

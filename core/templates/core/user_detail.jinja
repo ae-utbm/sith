@@ -24,8 +24,16 @@
 You're seeing the profile of <strong>{{ profile.get_full_name() }}</strong><br/>
 <strong>{{ profile.nick_name }}</strong><br/>
 <em>{{ profile.date_of_birth|date("d/m/Y") }}</em>
-
 </p>
+
+<p>
+{% if get_subscriber(profile).is_subscribed() %}
+User is subscriber until {{ get_subscriber(profile).subscriptions.last().subscription_end }}
+{% else %}
+User is not subscribed. <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">New subscription</a>
+{% endif %}
+</p>
+
 {% endblock %}
 
 
