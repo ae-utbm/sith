@@ -72,7 +72,6 @@ class CanViewMixin(View):
     """
     def dispatch(self, request, *arg, **kwargs):
         res = super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
-        print("GUYGUYGUYGUYGUY")
         if hasattr(self, 'object'):
             obj = self.object
         elif hasattr(self, 'object_list'):

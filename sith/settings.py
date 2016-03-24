@@ -243,3 +243,7 @@ CLUB_ROLES = {
         1: 'Membre actif',
         0: 'Curieux',
         }
+
+# This corresponds to the maximum role a user can freely subscribe to
+# In this case, MAXIMUM_FREE_ROLE=1 means that a user can set himself as "Membre actif" or "Curieux", but not higher
+MAXIMUM_FREE_ROLE=1

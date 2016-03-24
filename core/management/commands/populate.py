@@ -47,6 +47,8 @@ Welcome to the wiki page!
                      date_of_birth="1942-06-12")
             s.set_password("plop")
             s.save()
+            s.view_groups=[settings.AE_GROUPS['members']['id']]
+            s.save()
             # Adding user Guy
             u = User(username='guy', last_name="Carlier", first_name="Guy",
                      email="guy@git.an",
@@ -54,11 +56,15 @@ Welcome to the wiki page!
                      is_superuser=False, is_staff=False)
             u.set_password("plop")
             u.save()
+            u.view_groups=[settings.AE_GROUPS['members']['id']]
+            u.save()
             # Adding user Richard Batsbak
             r = User(username='rbatsbak', last_name="Batsbak", first_name="Richard",
                      email="richard@git.an",
                      date_of_birth="1982-06-12")
             r.set_password("plop")
+            r.save()
+            r.view_groups=[settings.AE_GROUPS['members']['id']]
             r.save()
             # Adding syntax help page
             p = Page(name='Aide_sur_la_syntaxe')
