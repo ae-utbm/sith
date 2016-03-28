@@ -39,7 +39,7 @@ class Customer(models.Model):
 class ProductType(models.Model):
     """
     This describes a product type
-    Useful only for categorizing, changes are made at the product level
+    Useful only for categorizing, changes are made at the product level for now
     """
     name = models.CharField(_('name'), max_length=30)
     description = models.TextField(_('description'), null=True, blank=True)

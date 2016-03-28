@@ -1,0 +1,11 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+    <h3>Counter</h3>
+    <h4>{{ counter }}</h4>
+    <p><strong>Club: </strong> {{ counter.club }}</p>
+    <p><strong>Products: </strong> {{ counter.products.all() }}</p>
+{% endblock %}
+
+
+

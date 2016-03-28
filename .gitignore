@@ -4,3 +4,4 @@ db.sqlite3
 .DS_Store
 env_sith
 doc/html
+data/

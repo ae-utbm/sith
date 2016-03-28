@@ -101,7 +101,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         if group_name == settings.AE_GROUPS['public']['name']:
             return True
         if group_name == settings.AE_GROUPS['members']['name']: # We check the subscription if asked
-            try:
+            try: # TODO: change for a test in settings.INSTALLED_APP
                 from subscription import Subscriber
                 s = Subscriber.objects.filter(pk=self.pk).first()
                 if s is not None and s.is_subscribed():
@@ -110,6 +110,16 @@ class User(AbstractBaseUser, PermissionsMixin):
                     return False
             except Exception as e:
                 print(e)
+                return False
+        if group_name[-6:] == "-board":
+            try: # TODO: change for a test in settings.INSTALLED_APP
+                from club.models import Club
+                name = group_name[:-6]
+                c = Club.objects.filter(unix_name=name).first()
+                return c.get_membership_for(self).role >= 2
+            except Exception as e:
+                print(e)
+                return False
         return self.groups.filter(name=group_name).exists()
 
     def get_profile(self):

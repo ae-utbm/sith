@@ -1,0 +1,21 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+    Counter list
+{% endblock %}
+
+{% block content %}
+    {% if counter_list %}
+        <h3>Counter list</h3>
+        <ul>
+            {% for c in counter_list  %}
+                <li><a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        There is no counters in this website.
+    {% endif %}
+{% endblock %}
+
+
+

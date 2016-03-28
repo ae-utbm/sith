@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'club',
     'subscription',
     'accounting',
+    'counter',
 )
 
 MIDDLEWARE_CLASSES = (

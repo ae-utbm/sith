@@ -48,6 +48,7 @@ Welcome to the wiki page!
             s.set_password("plop")
             s.save()
             s.view_groups=[settings.AE_GROUPS['members']['id']]
+            s.groups=[settings.AE_GROUPS['board']['id']]
             s.save()
             # Adding user Guy
             u = User(username='guy', last_name="Carlier", first_name="Guy",
