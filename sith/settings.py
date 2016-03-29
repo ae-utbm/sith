@@ -191,11 +191,11 @@ AE_GROUPS = {
     },
     'board': {
         'id': 2,
-        'name': "ae_bureau",
+        'name': "ae-board",
     },
     'members': {
         'id': 3,
-        'name': "ae_membres",
+        'name': "ae-members",
     },
     'public': {
         'id': 4,

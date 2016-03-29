@@ -14,7 +14,7 @@
 {% endif %}
 {% if user.is_in_group(settings.AE_GROUPS['root']['name']) or user.is_in_group(settings.AE_GROUPS['board']['name']) %}
     <li><a href="{{ url('subscription:subscription') }}">Subscriptions</a></li>
-    <li><a href="{{ url('counter:list') }}">Counters management</a></li>
+    <li><a href="{{ url('counter:admin_list') }}">Counters management</a></li>
 {% endif %}
 </ul>
 

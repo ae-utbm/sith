@@ -1,15 +1,18 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-    Counter list
+    Counter admin list
 {% endblock %}
 
 {% block content %}
+    <p><a href="{{ url('counter:new') }}">New counter</a></p>
     {% if counter_list %}
-        <h3>Counter list</h3>
+        <h3>Counter admin list</h3>
         <ul>
             {% for c in counter_list  %}
-                <li><a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a></li>
+            <li><a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
+                <a href="{{ url('counter:admin', counter_id=c.id) }}">Edit</a> -
+                <a href="{{ url('counter:delete', counter_id=c.id) }}">Delete</a></li>
             {% endfor %}
         </ul>
     {% else %}

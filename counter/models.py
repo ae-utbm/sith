@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from club.models import Club
 from accounting.models import Product
@@ -10,6 +11,9 @@ class Counter(models.Model):
     name = models.CharField(_('name'), max_length=30)
     club = models.ForeignKey(Club, related_name="counters")
     products = models.ManyToManyField(Product, related_name="counters", blank=True)
+    type = models.CharField(_('subscription type'),
+            max_length=255,
+            choices=[('BAR',_('Bar')), ('OFFICE',_('Office'))]) # TODO: add _ to translate
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
 
@@ -20,3 +24,9 @@ class Counter(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('counter:details', kwargs={'counter_id': self.id})
+
+    def can_be_viewed_by(self, user):
+        return user.is_in_group(settings.AE_GROUPS['board']['name'])

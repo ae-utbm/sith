@@ -6,7 +6,7 @@ from django.conf import settings
 
 from core.models import Group, User, Page, PageRev
 from accounting.models import Customer, GeneralJournal, ProductType, Product
-from club.models import Club
+from club.models import Club, Membership
 from subscription.models import Subscription, Subscriber
 
 class Command(BaseCommand):
@@ -48,7 +48,6 @@ Welcome to the wiki page!
             s.set_password("plop")
             s.save()
             s.view_groups=[settings.AE_GROUPS['members']['id']]
-            s.groups=[settings.AE_GROUPS['board']['id']]
             s.save()
             # Adding user Guy
             u = User(username='guy', last_name="Carlier", first_name="Guy",
@@ -98,12 +97,19 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     address="Woenzel", parent=guyut).save()
             Club(name="BdF", unix_name="bdf",
                     address="Guyéuéyuéyuyé").save()
+            Membership(user=s, club=ae, role=3, description="").save()
 
             # Accounting test values:
             Customer(user=s, account_id="6568j").save()
             p = ProductType(name="Bières bouteilles")
             p.save()
             Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",
+                    special_selling_price="1.6").save()
+            Product(name="Chimay", code="CBLE", product_type=p, purchase_price="1.50", selling_price="1.7",
+                    special_selling_price="1.6").save()
+            Product(name="Corsendonk", code="CORS", product_type=p, purchase_price="1.50", selling_price="1.7",
+                    special_selling_price="1.6").save()
+            Product(name="Carolus", code="CARO", product_type=p, purchase_price="1.50", selling_price="1.7",
                     special_selling_price="1.6").save()
             GeneralJournal(start_date="2015-06-12", name="A15").save()
 
