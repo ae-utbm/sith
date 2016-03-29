@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group as AuthGroup, AnonymousUser as AuthAnonymousUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group as AuthGroup, GroupManager as AuthGroupManager, AnonymousUser as AuthAnonymousUser
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
@@ -10,12 +10,39 @@ from datetime import datetime, timedelta
 
 import unicodedata
 
+class RealGroupManager(AuthGroupManager):
+    def get_queryset(self):
+        return super(RealGroupManager, self).get_queryset().filter(is_meta=False)
+
+class MetaGroupManager(AuthGroupManager):
+    def get_queryset(self):
+        return super(MetaGroupManager, self).get_queryset().filter(is_meta=True)
+
 class Group(AuthGroup):
+    is_meta = models.BooleanField(
+        _('meta group status'),
+        default=False,
+        help_text=_('Whether a group is a meta group or not'),
+    )
     def get_absolute_url(self):
         """
         This is needed for black magic powered UpdateView's children
         """
         return reverse('core:group_edit', kwargs={'group_id': self.pk})
+
+class MetaGroup(Group):
+    objects = MetaGroupManager()
+    class Meta:
+        proxy = True
+
+    def __init__(self, *args, **kwargs):
+        super(MetaGroup, self).__init__(*args, **kwargs)
+        self.is_meta = True
+
+class RealGroup(Group):
+    objects = RealGroupManager()
+    class Meta:
+        proxy = True
 
 class User(AbstractBaseUser, PermissionsMixin):
     """

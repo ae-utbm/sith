@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Subscription',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
-                ('subscription_type', models.CharField(choices=[('cursus-branche', 'Cursus Branche'), ('cursus-tronc-commun', 'Cursus Tronc Commun'), ('deux-semestres', 'Deux semestres'), ('un-semestre', 'Un semestre')], max_length=255, verbose_name='subscription type')),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('subscription_type', models.CharField(max_length=255, verbose_name='subscription type', choices=[('cursus-branche', 'Cursus Branche'), ('cursus-tronc-commun', 'Cursus Tronc Commun'), ('deux-semestres', 'Deux semestres'), ('un-semestre', 'Un semestre')])),
                 ('subscription_start', models.DateField(verbose_name='subscription start')),
                 ('subscription_end', models.DateField(verbose_name='subscription end')),
-                ('payment_method', models.CharField(choices=[('cheque', 'Chèque'), ('cash', 'Espèce'), ('other', 'Autre')], max_length=255, verbose_name='payment method')),
+                ('payment_method', models.CharField(max_length=255, verbose_name='payment method', choices=[('cheque', 'Chèque'), ('cash', 'Espèce'), ('other', 'Autre')])),
             ],
             options={
                 'ordering': ['subscription_start'],
@@ -40,6 +40,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='subscription',
             name='member',
-            field=models.ForeignKey(related_name='subscriptions', to='subscription.Subscriber'),
+            field=models.ForeignKey(to='subscription.Subscriber', related_name='subscriptions'),
         ),
     ]

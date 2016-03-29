@@ -4,7 +4,7 @@ from django.contrib.auth import logout, login, authenticate
 from django.forms import CheckboxSelectMultiple
 import logging
 
-from core.models import User, Page, Group
+from core.models import User, Page, RealGroup
 
 class RegisteringForm(UserCreationForm):
     error_css_class = 'error'
@@ -65,7 +65,7 @@ class GroupEditForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'
     class Meta:
-        model = Group
+        model = RealGroup
         fields = ['name', 'permissions',]
         widgets = {
             'permissions': CheckboxSelectMultiple,

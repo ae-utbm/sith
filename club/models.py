@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
-from core.models import User, Group
+from core.models import User, MetaGroup, Group
 from subscription.models import Subscriber
 
 # Create your models here.
@@ -47,6 +47,11 @@ class Club(models.Model):
 
     def clean(self):
         self.check_loop()
+
+    def save(self):
+        super(Club, self).save()
+        MetaGroup(name=self.unix_name+"-board").save()
+        MetaGroup(name=self.unix_name+"-members").save()
 
     def __str__(self):
         return self.name

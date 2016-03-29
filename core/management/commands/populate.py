@@ -23,11 +23,11 @@ class Command(BaseCommand):
                  is_superuser=True, is_staff=True)
         root.set_password("plop")
         root.save()
-        for g in settings.AE_GROUPS.values():
-            Group(id=g['id'], name=g['name']).save()
         ae = Club(name=settings.AE_MAIN_CLUB['name'], unix_name=settings.AE_MAIN_CLUB['unix_name'],
                 address=settings.AE_MAIN_CLUB['address'])
         ae.save()
+        for g in settings.AE_GROUPS.values():
+            Group(id=g['id'], name=g['name']).save()
         p = Page(name='Index')
         p.set_lock(root)
         p.save()
