@@ -31,7 +31,7 @@ class Club(models.Model):
     address = models.CharField(_('address'), max_length=254)
     # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
     owner_group = models.ForeignKey(Group, related_name="owned_club",
-                                    default=settings.AE_GROUPS['root']['id'])
+                                    default=settings.SITH_GROUPS['root']['id'])
     edit_groups = models.ManyToManyField(Group, related_name="editable_club", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
 
@@ -50,8 +50,8 @@ class Club(models.Model):
 
     def save(self):
         super(Club, self).save()
-        MetaGroup(name=self.unix_name+"-board").save()
-        MetaGroup(name=self.unix_name+"-members").save()
+        MetaGroup(name=self.unix_name+settings.SITH_BOARD_SUFFIX).save()
+        MetaGroup(name=self.unix_name+settings.SITH_MEMBER_SUFFIX).save()
 
     def __str__(self):
         return self.name
@@ -63,7 +63,7 @@ class Club(models.Model):
         """
         Method to see if that object can be super edited by the given user
         """
-        if user.is_in_group(settings.AE_GROUPS['board']['name']):
+        if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
             return True
         return False
 

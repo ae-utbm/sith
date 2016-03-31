@@ -9,11 +9,11 @@ from django.core.urlresolvers import reverse
 from core.models import User
 
 def validate_type(value):
-    if value not in settings.AE_SUBSCRIPTIONS.keys():
+    if value not in settings.SITH_SUBSCRIPTIONS.keys():
         raise ValidationError(_('Bad subscription type'))
 
 def validate_payment(value):
-    if value not in settings.AE_PAYMENT_METHOD:
+    if value not in settings.SITH_PAYMENT_METHOD:
         raise ValidationError(_('Bad payment method'))
 
 class Subscriber(User):
@@ -31,10 +31,10 @@ class Subscription(models.Model):
     member = models.ForeignKey(Subscriber, related_name='subscriptions')
     subscription_type = models.CharField(_('subscription type'),
                                          max_length=255,
-                                         choices=((k, v['name']) for k,v in sorted(settings.AE_SUBSCRIPTIONS.items())))
+                                         choices=((k, v['name']) for k,v in sorted(settings.SITH_SUBSCRIPTIONS.items())))
     subscription_start = models.DateField(_('subscription start'))
     subscription_end = models.DateField(_('subscription end'))
-    payment_method = models.CharField(_('payment method'), max_length=255, choices=settings.AE_PAYMENT_METHOD)
+    payment_method = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_PAYMENT_METHOD)
     # TODO add location!
 
     class Meta:
@@ -59,7 +59,7 @@ class Subscription(models.Model):
         """
         self.subscription_start = self.compute_start()
         self.subscription_end = self.compute_end(
-                duration=settings.AE_SUBSCRIPTIONS[self.subscription_type]['duration'],
+                duration=settings.SITH_SUBSCRIPTIONS[self.subscription_type]['duration'],
                 start=self.subscription_start)
         super(Subscription, self).save(*args, **kwargs)
 
@@ -76,16 +76,16 @@ class Subscription(models.Model):
     def compute_start(d=date.today()):
         """
         This function computes the start date of the subscription with respect to the given date (default is today),
-        and the start date given in settings.AE_START_DATE.
+        and the start date given in settings.SITH_START_DATE.
         It takes the nearest past start date.
-        Exemples: with AE_START_DATE = (8, 15)
+        Exemples: with SITH_START_DATE = (8, 15)
             Today      -> Start date
             2015-03-17 -> 2015-02-15
             2015-01-11 -> 2014-08-15
         """
         today = d
         year = today.year
-        start = date(year, settings.AE_START_DATE[0], settings.AE_START_DATE[1])
+        start = date(year, settings.SITH_START_DATE[0], settings.SITH_START_DATE[1])
         start2 = start.replace(month=(start.month+6)%12)
         if start > start2:
             start, start2 = start2, start
@@ -114,7 +114,7 @@ class Subscription(models.Model):
                              year=start.year+int(duration/2)+(1 if start.month > 6 and duration%2 == 1 else 0))
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.AE_GROUPS['board']['name']) or user.is_in_group(settings.AE_GROUPS['root']['name'])
+        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name'])
 
     def is_valid_now(self):
         return self.subscription_start <= date.today() and date.today() <= self.subscription_end

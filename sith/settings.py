@@ -176,40 +176,38 @@ EMAIL_HOST="localhost"
 EMAIL_PORT=25
 
 # AE configuration
-AE_MAIN_CLUB = {
+SITH_MAIN_CLUB = {
         'name': "AE",
         'unix_name': "ae",
         'address': "6 Boulevard Anatole France, 90000 Belfort"
         }
 # Define the date in the year serving as reference for the subscriptions calendar
 # (month, day)
-AE_START_DATE = (8, 15) # 15th August
-AE_GROUPS = {
+SITH_START_DATE = (8, 15) # 15th August
+SITH_GROUPS = {
     'root': {
         'id': 1,
         'name': "root",
     },
-    'board': {
-        'id': 2,
-        'name': "ae-board",
-    },
-    'members': {
-        'id': 3,
-        'name': "ae-members",
-    },
     'public': {
-        'id': 4,
+        'id': 2,
         'name': "not_registered_users",
     },
 }
 
-AE_PAYMENT_METHOD = [('cheque', 'Chèque'),
+SITH_BOARD_SUFFIX="-board"
+SITH_MEMBER_SUFFIX="-members"
+
+SITH_MAIN_BOARD_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_BOARD_SUFFIX
+SITH_MAIN_MEMBERS_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_MEMBER_SUFFIX
+
+SITH_PAYMENT_METHOD = [('cheque', 'Chèque'),
                      ('cash', 'Espèce'),
                      ('other', 'Autre'),
                     ]
 
 # Subscription durations are in semestres (should be settingized)
-AE_SUBSCRIPTIONS = {
+SITH_SUBSCRIPTIONS = {
     'un-semestre': {
         'name': 'Un semestre',
         'price': 15,

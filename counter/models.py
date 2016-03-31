@@ -13,13 +13,13 @@ class Counter(models.Model):
     products = models.ManyToManyField(Product, related_name="counters", blank=True)
     type = models.CharField(_('subscription type'),
             max_length=255,
-            choices=[('BAR',_('Bar')), ('OFFICE',_('Office'))]) # TODO: add _ to translate
+            choices=[('BAR',_('Bar')), ('OFFICE',_('Office'))])
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
 
     def __getattribute__(self, name):
         if name == "owner_group":
-            return Group(name=self.club.unix_name+"-board")
+            return Group(name=self.club.unix_name+settings.SITH_BOARD_SUFFIX)
         return object.__getattribute__(self, name)
 
     def __str__(self):
@@ -29,4 +29,4 @@ class Counter(models.Model):
         return reverse('counter:details', kwargs={'counter_id': self.id})
 
     def can_be_viewed_by(self, user):
-        return user.is_in_group(settings.AE_GROUPS['board']['name'])
+        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)

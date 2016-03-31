@@ -23,15 +23,15 @@ class Command(BaseCommand):
                  is_superuser=True, is_staff=True)
         root.set_password("plop")
         root.save()
-        ae = Club(name=settings.AE_MAIN_CLUB['name'], unix_name=settings.AE_MAIN_CLUB['unix_name'],
-                address=settings.AE_MAIN_CLUB['address'])
-        ae.save()
-        for g in settings.AE_GROUPS.values():
+        for g in settings.SITH_GROUPS.values():
             Group(id=g['id'], name=g['name']).save()
+        ae = Club(name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
+                address=settings.SITH_MAIN_CLUB['address'])
+        ae.save()
         p = Page(name='Index')
         p.set_lock(root)
         p.save()
-        p.view_groups=[settings.AE_GROUPS['public']['id']]
+        p.view_groups=[settings.SITH_GROUPS['public']['id']]
         p.set_lock(root)
         p.save()
         PageRev(page=p, title="Wiki index", author=root, content="""
@@ -47,7 +47,7 @@ Welcome to the wiki page!
                      date_of_birth="1942-06-12")
             s.set_password("plop")
             s.save()
-            s.view_groups=[settings.AE_GROUPS['members']['id']]
+            s.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             s.save()
             # Adding user Guy
             u = User(username='guy', last_name="Carlier", first_name="Guy",
@@ -56,7 +56,7 @@ Welcome to the wiki page!
                      is_superuser=False, is_staff=False)
             u.set_password("plop")
             u.save()
-            u.view_groups=[settings.AE_GROUPS['members']['id']]
+            u.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             u.save()
             # Adding user Richard Batsbak
             r = User(username='rbatsbak', last_name="Batsbak", first_name="Richard",
@@ -64,7 +64,7 @@ Welcome to the wiki page!
                      date_of_birth="1982-06-12")
             r.set_password("plop")
             r.save()
-            r.view_groups=[settings.AE_GROUPS['members']['id']]
+            r.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             r.save()
             # Adding syntax help page
             p = Page(name='Aide_sur_la_syntaxe')
@@ -75,17 +75,19 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             # Adding README
             p = Page(name='README')
             p.save()
-            p.view_groups=[settings.AE_GROUPS['public']['id']]
+            p.view_groups=[settings.SITH_GROUPS['public']['id']]
             p.set_lock(s)
             p.save()
             with open(os.path.join(root_path)+'/README.md', 'r') as rm:
                 PageRev(page=p, title="REAMDE", author=s, content=rm.read()).save()
 
             # Subscription
-            Subscription(member=Subscriber.objects.filter(pk=s.pk).first(), subscription_type=list(settings.AE_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.AE_PAYMENT_METHOD[0]).save()
-            Subscription(member=Subscriber.objects.filter(pk=r.pk).first(), subscription_type=list(settings.AE_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.AE_PAYMENT_METHOD[0]).save()
+            ## Skia
+            Subscription(member=Subscriber.objects.filter(pk=s.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_PAYMENT_METHOD[0]).save()
+            ## Richard
+            Subscription(member=Subscriber.objects.filter(pk=r.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_PAYMENT_METHOD[0]).save()
 
             # Clubs
             Club(name="Bibo'UT", unix_name="bibout",

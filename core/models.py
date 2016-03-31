@@ -91,7 +91,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     date_joined = models.DateField(_('date joined'), auto_now_add=True)
     owner_group = models.ForeignKey(Group, related_name="owned_user",
-                                    default=settings.AE_GROUPS['root']['id'])
+                                    default=settings.SITH_GROUPS['root']['id'])
     edit_groups = models.ManyToManyField(Group, related_name="editable_user", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_user", blank=True)
 
@@ -125,9 +125,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def is_in_group(self, group_name):
         """If the user is in the group passed in argument (as string)"""
-        if group_name == settings.AE_GROUPS['public']['name']:
+        if group_name == settings.SITH_GROUPS['public']['name']:
             return True
-        if group_name == settings.AE_GROUPS['members']['name']: # We check the subscription if asked
+        if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked
             try: # TODO: change for a test in settings.INSTALLED_APP
                 from subscription import Subscriber
                 s = Subscriber.objects.filter(pk=self.pk).first()
@@ -138,7 +138,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             except Exception as e:
                 print(e)
                 return False
-        if group_name[-6:] == "-board":
+        if group_name[-6:] == settings.SITH_BOARD_SUFFIX:
             try: # TODO: change for a test in settings.INSTALLED_APP
                 from club.models import Club
                 name = group_name[:-6]
@@ -210,7 +210,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             return False
         if (self.is_superuser or self.is_in_group(obj.owner_group.name) or
             self.has_perm(obj.__class__.__module__.split('.')[0]+".change_prop_"+obj.__class__.__name__.lower()) or
-            self.groups.filter(id=settings.AE_GROUPS['root']['id']).exists()):
+            self.groups.filter(id=settings.SITH_GROUPS['root']['id']).exists()):
             return True
         if hasattr(obj, "is_owned_by") and obj.is_owned_by(self):
             return True
@@ -251,7 +251,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return False
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.AE_GROUPS['board']['name']) or user.is_in_group(settings.AE_GROUPS['root']['name'])
+        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name'])
 
 
 class AnonymousUser(AuthAnonymousUser):
@@ -265,7 +265,7 @@ class AnonymousUser(AuthAnonymousUser):
         return False
 
     def can_view(self, obj):
-        if obj.view_groups.filter(pk=settings.AE_GROUPS['public']['id']).exists():
+        if obj.view_groups.filter(pk=settings.SITH_GROUPS['public']['id']).exists():
             return True
         return False
 
@@ -298,7 +298,7 @@ class Page(models.Model):
     # playing with a Page object, use get_full_name() instead!
     _full_name = models.CharField(_('page name'), max_length=255, blank=True)
     owner_group = models.ForeignKey(Group, related_name="owned_page",
-                                    default=settings.AE_GROUPS['root']['id'])
+                                    default=settings.SITH_GROUPS['root']['id'])
     edit_groups = models.ManyToManyField(Group, related_name="editable_page", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_page", blank=True)
     lock_mutex = {}

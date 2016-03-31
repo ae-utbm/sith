@@ -4,6 +4,7 @@ from counter.views import *
 
 urlpatterns = [
     url(r'^(?P<counter_id>[0-9]+)$', CounterDetail.as_view(), name='details'),
+    url(r'^(?P<counter_id>[0-9]+)/login$', CounterLogin.as_view(), name='login'),
     url(r'^admin/(?P<counter_id>[0-9]+)$', CounterEditView.as_view(), name='admin'),
     url(r'^admin$', CounterListView.as_view(), name='admin_list'),
     url(r'^admin/new$', CounterCreateView.as_view(), name='new'),

@@ -41,10 +41,10 @@ class ClubTest(TestCase):
         self.assertTrue(response.status_code == 200)
         self.assertTrue("<li>Woenzel&#39;UT - rbatsbak - Vice-Pr" in str(response.content))
 
-    def test_create_add_user_to_club_from_skia_fail(self):
+    def test_create_add_user_to_club_from_richard_fail(self):
         self.client.login(username='root', password='plop')
         self.client.post(reverse("club:club_members", kwargs={"club_id":4}), {"user": 2, "role": 3})
-        self.client.login(username='skia', password='plop')
+        self.client.login(username='rbatsbak', password='plop')
         response = self.client.post(reverse("club:club_members", kwargs={"club_id":4}), {"user": 4, "role": 10})
         self.assertTrue(response.status_code == 200)
         self.assertTrue("<li>You do not have the permission to do that</li>" in str(response.content))

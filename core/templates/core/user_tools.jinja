@@ -9,10 +9,10 @@
 <p><a href="{{ url('core:user_profile', user_id=request.user.id) }}">Back to profile</a></p>
 
 <ul>
-{% if user.is_in_group(settings.AE_GROUPS['root']['name']) %}
+{% if user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
     <li><a href="{{ url('core:group_list') }}">Groups</a></li>
 {% endif %}
-{% if user.is_in_group(settings.AE_GROUPS['root']['name']) or user.is_in_group(settings.AE_GROUPS['board']['name']) %}
+{% if user.is_in_group(settings.SITH_GROUPS['root']['name']) or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
     <li><a href="{{ url('subscription:subscription') }}">Subscriptions</a></li>
     <li><a href="{{ url('counter:admin_list') }}">Counters management</a></li>
 {% endif %}
