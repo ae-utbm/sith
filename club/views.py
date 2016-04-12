@@ -94,6 +94,6 @@ class ClubEditPropView(CanEditPropMixin, UpdateView):
     """
     model = Club
     pk_url_kwarg = "club_id"
-    fields = ['name', 'parent']
+    fields = ['name', 'unix_name', 'parent']
     template_name = 'club/club_edit_prop.jinja'
 

@@ -3,6 +3,7 @@ from django.core import validators
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.core.urlresolvers import reverse
 
 from core.models import User, MetaGroup, Group
@@ -50,8 +51,12 @@ class Club(models.Model):
 
     def save(self):
         super(Club, self).save()
-        MetaGroup(name=self.unix_name+settings.SITH_BOARD_SUFFIX).save()
-        MetaGroup(name=self.unix_name+settings.SITH_MEMBER_SUFFIX).save()
+        try:
+            MetaGroup(name=self.unix_name+settings.SITH_BOARD_SUFFIX).save()
+            MetaGroup(name=self.unix_name+settings.SITH_MEMBER_SUFFIX).save()
+        except IntegrityError as e:
+            # Groups already exists
+            pass
 
     def __str__(self):
         return self.name
