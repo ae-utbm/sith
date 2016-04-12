@@ -246,3 +246,6 @@ CLUB_ROLES = {
 # This corresponds to the maximum role a user can freely subscribe to
 # In this case, MAXIMUM_FREE_ROLE=1 means that a user can set himself as "Membre actif" or "Curieux", but not higher
 MAXIMUM_FREE_ROLE=1
+
+# Minutes to timeout the logged barmen
+SITH_BARMAN_TIMEOUT=20
