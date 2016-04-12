@@ -16,6 +16,7 @@ class Counter(models.Model):
             choices=[('BAR',_('Bar')), ('OFFICE',_('Office'))])
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
+    barmen_session = {}
 
     def __getattribute__(self, name):
         if name == "owner_group":
