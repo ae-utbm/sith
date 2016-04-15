@@ -1,0 +1,46 @@
+{% extends "core/base.jinja" %}
+
+{% macro barman_logout_link(user) %}
+<form method="post" action="{{ url('counter:logout', counter_id=counter.id) }}" class="inline">
+    {% csrf_token %}
+    <input type="hidden" name="user_id" value="{{ user.id }}">
+    <button type="submit" name="submit_param" value="submit_value" class="link-button">{{ user.get_display_name() }}</button>
+</form>
+{% endmacro %}
+
+{% block content %}
+    <h3>Counter</h3>
+    <h4>{{ counter }}</h4>
+    <p><strong>Club: </strong> {{ counter.club }}</p>
+    <p><strong>Products: </strong> {{ counter.products.all() }}</p>
+
+
+    <div>
+        {% if barmen %}
+        <p>Enter client code:</p>
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id) }}">
+            {% csrf_token %}
+            {{ form.as_p() }}
+        <input type="submit" value="CLICK" />
+        </form>
+        {% else %}
+        <p>Please, login</p>
+        {% endif %}
+    </div>
+    <div>
+        <h3>Barman: </h3>
+        <ul>
+        {% for b in barmen %}
+            <li>{{ barman_logout_link(b) }}</li>
+        {% endfor %}
+        </ul>
+        <form method="post" action="{{ url('counter:login', counter_id=counter.id) }}">
+            {% csrf_token %}
+            {{ login_form.as_p() }}
+        <input type="submit" value="login" />
+        </form>
+    </div>
+{% endblock %}
+
+
+

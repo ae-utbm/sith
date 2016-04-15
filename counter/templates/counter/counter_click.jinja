@@ -14,26 +14,6 @@
     <p><strong>Club: </strong> {{ counter.club }}</p>
     <p><strong>Products: </strong> {{ counter.products.all() }}</p>
 
-    <div>
-        <h3>Barman: </h3>
-        <ul>
-        {% for b in barmen %}
-            <li>{{ barman_logout_link(b) }}</li>
-        {% endfor %}
-        </ul>
-        <form method="post" action="{{ url('counter:login', counter_id=counter.id) }}">
-            {% csrf_token %}
-            {{ login_form.as_p() }}
-        <input type="submit" value="login" />
-        </form>
-    </div>
-    <div>
-        {% if barmen %}
-        <p>Enter client code:</p>
-        {% else %}
-        <p>Please, login</p>
-        {% endif %}
-    </div>
 {% endblock %}
 
 

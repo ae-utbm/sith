@@ -1,26 +1,32 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, RedirectView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
 from django.conf import settings
+from django import forms
 
 from datetime import timedelta
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from subscription.models import Subscriber
+from accounting.models import Customer
 from counter.models import Counter
 
-class CounterDetail(DetailView):
+class GetUserForm(forms.Form):
+    username = forms.CharField(label="Name", max_length=64, required=False)
+
+class CounterMain(DetailView, FormMixin):
     """
     The public (barman) view
     """
     model = Counter
-    template_name = 'counter/counter_detail.jinja'
+    template_name = 'counter/counter_main.jinja'
     pk_url_kwarg = "counter_id"
+    form_class = GetUserForm
 
     def get_context_data(self, **kwargs):
         """
@@ -28,21 +34,38 @@ class CounterDetail(DetailView):
 
         Also handle the timeout
         """
-        context = super(CounterDetail, self).get_context_data(**kwargs)
-        context['login_form'] = AuthenticationForm()
-        print(self.object.id)
-        print(list(Counter.barmen_session.keys()))
+        kwargs = super(CounterMain, self).get_context_data(**kwargs)
+        kwargs['login_form'] = AuthenticationForm()
+        kwargs['form'] = self.get_form()
+        print(kwargs)
         if str(self.object.id) in list(Counter.barmen_session.keys()):
             if (timezone.now() - Counter.barmen_session[str(self.object.id)]['time']) < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
-                context['barmen'] = []
+                kwargs['barmen'] = []
                 for b in Counter.barmen_session[str(self.object.id)]['users']:
-                    context['barmen'].append(Subscriber.objects.filter(id=b).first())
+                    kwargs['barmen'].append(Subscriber.objects.filter(id=b).first())
                 Counter.barmen_session[str(self.object.id)]['time'] = timezone.now()
             else:
                 Counter.barmen_session[str(self.object.id)]['users'] = {}
         else:
-            context['barmen'] = []
-        return context
+            kwargs['barmen'] = []
+        return kwargs
+
+class CounterClick(DetailView, ProcessFormView, FormMixin):
+    """
+    The click view
+    """
+    model = Counter # TODO change that to a basket class
+    template_name = 'counter/counter_click.jinja'
+    pk_url_kwarg = "counter_id"
+    form_class = GetUserForm
+
+    def post(self, request, *args, **kwargs):
+        # TODO: handle the loading of a user, to display the click view
+        # TODO: Do the form and the template for the click view
+        return super(CounterClick, self).post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
 
 class CounterLogin(RedirectView):
     """
