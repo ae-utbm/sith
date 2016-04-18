@@ -13,7 +13,7 @@ from datetime import timedelta
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from subscription.models import Subscriber
-from accounting.models import Customer
+from accounting.models import Customer, Product
 from counter.models import Counter
 
 class GetUserForm(forms.Form):
@@ -84,19 +84,56 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
     def get_success_url(self):
         return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
 
+class BasketForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        print(kwargs)
+        super(BasketForm, self).__init__(*args, **kwargs)
+        for p in kwargs['initial']['counter'].products.all(): # TODO: filter on the allowed products for this counter
+            self.fields[p.id] = forms.IntegerField(label=p.name, required=False)
+            # TODO ^: add some extra infos for the products (price, or ID to load infos dynamically)
+
+    def clean(self):
+        cleaned_data = super(BasketForm, self).clean()
+        total = 0
+        for pid,q in cleaned_data.items():
+            p = Product.objects.filter(id=pid).first()
+            total += (q or 0)*p.selling_price
+        print(total)
+
 class CounterClick(DetailView, ProcessFormView, FormMixin):
     """
     The click view
     """
-    model = Counter # TODO change that to a basket class
+    model = Counter
     template_name = 'counter/counter_click.jinja'
     pk_url_kwarg = "counter_id"
-    form_class = GetUserForm
+    form_class = BasketForm
+    prefix = "prod"
+
+    def get(self, request, *args, **kwargs):
+        self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
+        return super(CounterClick, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        # TODO: handle the loading of a user, to display the click view
-        # TODO: Do the form and the template for the click view
+        self.object = self.get_object()
+        self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
         return super(CounterClick, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        return super(CounterClick, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super(CounterClick, self).get_form_kwargs()
+        kwargs['initial'].update({'counter': self.object, 'customer': self.customer})
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        """
+        """
+        kwargs = super(CounterClick, self).get_context_data(**kwargs)
+        kwargs['customer'] = self.customer
+        kwargs['form'] = self.get_form()
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
@@ -139,6 +176,8 @@ class CounterLogout(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse_lazy('counter:details', args=args, kwargs=kwargs)
+
+## Counter admin views
 
 class CounterListView(CanViewMixin, ListView):
     """

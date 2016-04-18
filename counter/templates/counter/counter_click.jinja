@@ -14,6 +14,15 @@
     <p><strong>Club: </strong> {{ counter.club }}</p>
     <p><strong>Products: </strong> {{ counter.products.all() }}</p>
 
+    <div>
+        Customer: {{ customer }}
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            {{ form.as_p() }}
+        <input type="submit" value="CLICK" />
+        </form>
+    </div>
+
 {% endblock %}
 
 
