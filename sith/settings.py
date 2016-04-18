@@ -57,6 +57,8 @@ MIDDLEWARE_CLASSES = (
     'core.middleware.AuthenticationMiddleware',
 )
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
 ROOT_URLCONF = 'sith.urls'
 
 TEMPLATES = [

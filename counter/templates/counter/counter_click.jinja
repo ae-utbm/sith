@@ -1,10 +1,18 @@
 {% extends "core/base.jinja" %}
 
-{% macro barman_logout_link(user) %}
-<form method="post" action="{{ url('counter:logout', counter_id=counter.id) }}" class="inline">
+{% macro add_product(id, content) %}
+<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="inline" style="display:inline">
     {% csrf_token %}
-    <input type="hidden" name="user_id" value="{{ user.id }}">
-    <button type="submit" name="submit_param" value="submit_value" class="link-button">{{ user.get_display_name() }}</button>
+    <input type="hidden" name="action" value="add_product">
+    <button type="submit" name="product_id" value="{{ id }}"> {{ content }} </button>
+</form>
+{% endmacro %}
+
+{% macro del_product(id, content) %}
+<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="inline" style="display:inline">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="del_product">
+    <button type="submit" name="product_id" value="{{ id }}"> {{ content }} </button>
 </form>
 {% endmacro %}
 
@@ -12,15 +20,30 @@
     <h3>Counter</h3>
     <h4>{{ counter }}</h4>
     <p><strong>Club: </strong> {{ counter.club }}</p>
-    <p><strong>Products: </strong> {{ counter.products.all() }}</p>
 
     <div>
-        Customer: {{ customer }}
+        <p>Customer: {{ customer }}</p>
+        <p>Basket: </p>
+        <ul>
+        {% for id,qte in request.session['basket'].items() %}
+            <li>{{ del_product(id, '-') }} {{ qte }} {{ add_product(id, '+') }} {{ counter.products.filter(id=id).first().name }}</li>
+        {% endfor %}
+        </ul>
         <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
             {% csrf_token %}
-            {{ form.as_p() }}
-        <input type="submit" value="CLICK" />
+            <input type="hidden" name="action" value="finish">
+            <input type="submit" value="Finish" />
         </form>
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="cancel">
+            <input type="submit" value="Cancel" />
+        </form>
+        <p><strong>Products: </strong>
+        {% for p in counter.products.all() %}
+            {{ add_product(p.id, p.name) }}
+        {% endfor %}
+        </p>
     </div>
 
 {% endblock %}

@@ -5,6 +5,7 @@ from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.forms import AuthenticationForm
+from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django.conf import settings
 from django import forms
@@ -100,43 +101,77 @@ class BasketForm(forms.Form):
             total += (q or 0)*p.selling_price
         print(total)
 
-class CounterClick(DetailView, ProcessFormView, FormMixin):
+class CounterClick(DetailView):
     """
     The click view
+    This is a detail view not to have to worry about loading the counter
+    Everything is made by hand in the post method
     """
     model = Counter
     template_name = 'counter/counter_click.jinja'
     pk_url_kwarg = "counter_id"
-    form_class = BasketForm
-    prefix = "prod"
 
     def get(self, request, *args, **kwargs):
+        """Simple get view"""
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
+        if 'basket' not in request.session.keys():
+            request.session['basket'] = {}
         return super(CounterClick, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        """ Handle the many possibilities of the post request """
         self.object = self.get_object()
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
-        return super(CounterClick, self).post(request, *args, **kwargs)
+        if 'basket' not in request.session.keys():
+            request.session['basket'] = {}
 
-    def form_valid(self, form):
-        return super(CounterClick, self).form_valid(form)
+        if 'add_product' in request.POST['action']:
+            self.add_product(request)
+        elif 'del_product' in request.POST['action']:
+            self.del_product(request)
+        elif 'cancel' in request.POST['action']:
+            return self.cancel(request)
+        elif 'finish' in request.POST['action']:
+            return self.finish(request)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
-    def get_form_kwargs(self):
-        kwargs = super(CounterClick, self).get_form_kwargs()
-        kwargs['initial'].update({'counter': self.object, 'customer': self.customer})
-        return kwargs
+    def add_product(self, request):
+        """ Add a product to the basket """
+        if str(request.POST['product_id']) in request.session['basket']:
+            request.session['basket'][str(request.POST['product_id'])] += 1
+        else:
+            request.session['basket'][str(request.POST['product_id'])] = 1
+        request.session.modified = True
+
+    def del_product(self, request):
+        """ Delete a product from the basket """
+        if str(request.POST['product_id']) in request.session['basket']:
+            request.session['basket'][str(request.POST['product_id'])] -= 1
+            if request.session['basket'][str(request.POST['product_id'])] <= 0:
+                del request.session['basket'][str(request.POST['product_id'])]
+        else:
+            request.session['basket'][str(request.POST['product_id'])] = 0
+        request.session.modified = True
+
+    def finish(self, request):
+        """ Finish the click session, and validate the basket """
+        # TODO: handle the basket
+        kwargs = {'counter_id': self.object.id}
+        del request.session['basket']
+        return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))
+
+    def cancel(self, request):
+        """ Cancel the click session """
+        kwargs = {'counter_id': self.object.id}
+        del request.session['basket']
+        return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))
 
     def get_context_data(self, **kwargs):
-        """
-        """
+        """ Add customer to the context """
         kwargs = super(CounterClick, self).get_context_data(**kwargs)
         kwargs['customer'] = self.customer
-        kwargs['form'] = self.get_form()
         return kwargs
-
-    def get_success_url(self):
-        return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
 
 class CounterLogin(RedirectView):
     """
