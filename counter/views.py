@@ -17,27 +17,50 @@ from accounting.models import Customer
 from counter.models import Counter
 
 class GetUserForm(forms.Form):
-    username = forms.CharField(label="Name", max_length=64, required=False)
+    """
+    The Form class aims at providing a valid user_id field in its cleaned data, in order to pass it to some view,
+    reverse function, or any other use.
 
-class CounterMain(DetailView, FormMixin):
+    The Form implements a nice JS widget allowing the user to type a customer account id, or search the database with
+    some nickname, first name, or last name (TODO)
+    """
+    code = forms.CharField(label="Code", max_length=64, required=False)
+    id = forms.IntegerField(label="ID", required=False)
+# TODO: add a nice JS widget to search for users
+
+    def clean(self):
+        cleaned_data = super(GetUserForm, self).clean()
+        user = None
+        if cleaned_data['code'] != "":
+            user = Customer.objects.filter(account_id=cleaned_data['code']).first()
+        elif cleaned_data['id'] is not None:
+            user = Customer.objects.filter(user=cleaned_data['id']).first()
+        if user is None:
+            raise forms.ValidationError("User not found")
+        cleaned_data['user_id'] = user.user.id
+        return cleaned_data
+
+class CounterMain(DetailView, ProcessFormView, FormMixin):
     """
     The public (barman) view
     """
     model = Counter
     template_name = 'counter/counter_main.jinja'
     pk_url_kwarg = "counter_id"
-    form_class = GetUserForm
+    form_class = GetUserForm # Form to enter a client code and get the corresponding user id
 
     def get_context_data(self, **kwargs):
         """
-        Get the barman list for the template
+        We handle here the login form for the barman
 
         Also handle the timeout
         """
+        if self.request.method == 'POST':
+            self.object = self.get_object()
         kwargs = super(CounterMain, self).get_context_data(**kwargs)
+# TODO: make some checks on the counter type, in order not to make the AuthenticationForm if there is no need to
         kwargs['login_form'] = AuthenticationForm()
         kwargs['form'] = self.get_form()
-        print(kwargs)
         if str(self.object.id) in list(Counter.barmen_session.keys()):
             if (timezone.now() - Counter.barmen_session[str(self.object.id)]['time']) < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
                 kwargs['barmen'] = []
@@ -49,6 +72,17 @@ class CounterMain(DetailView, FormMixin):
         else:
             kwargs['barmen'] = []
         return kwargs
+
+    def form_valid(self, form):
+        """
+        We handle here the redirection, passing the user id of the asked customer
+        """
+        self.kwargs['user_id'] = form.cleaned_data['user_id']
+        return super(CounterMain, self).form_valid(form)
+
+
+    def get_success_url(self):
+        return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
 
 class CounterClick(DetailView, ProcessFormView, FormMixin):
     """
@@ -79,7 +113,6 @@ class CounterLogin(RedirectView):
         Register the logged user as barman for this counter
         """
         self.counter_id = kwargs['counter_id']
-# TODO: make some checks on the counter type
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = Subscriber.objects.filter(username=form.cleaned_data['username']).first()

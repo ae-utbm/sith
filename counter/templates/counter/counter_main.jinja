@@ -18,7 +18,7 @@
     <div>
         {% if barmen %}
         <p>Enter client code:</p>
-        <form method="post" action="{{ url('counter:click', counter_id=counter.id) }}">
+        <form method="post" action="{{ url('counter:details', counter_id=counter.id) }}">
             {% csrf_token %}
             {{ form.as_p() }}
         <input type="submit" value="CLICK" />
