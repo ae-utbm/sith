@@ -69,7 +69,7 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
                     kwargs['barmen'].append(Subscriber.objects.filter(id=b).first())
                 Counter.barmen_session[str(self.object.id)]['time'] = timezone.now()
             else:
-                Counter.barmen_session[str(self.object.id)]['users'] = {}
+                Counter.barmen_session[str(self.object.id)]['users'] = set()
         else:
             kwargs['barmen'] = []
         return kwargs
