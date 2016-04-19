@@ -7,10 +7,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils import timezone
-from django.conf import settings
 from django import forms
 
-from datetime import timedelta
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from subscription.models import Subscriber
@@ -62,16 +60,7 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
 # TODO: make some checks on the counter type, in order not to make the AuthenticationForm if there is no need to
         kwargs['login_form'] = AuthenticationForm()
         kwargs['form'] = self.get_form()
-        if str(self.object.id) in list(Counter.barmen_session.keys()):
-            if (timezone.now() - Counter.barmen_session[str(self.object.id)]['time']) < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
-                kwargs['barmen'] = []
-                for b in Counter.barmen_session[str(self.object.id)]['users']:
-                    kwargs['barmen'].append(Subscriber.objects.filter(id=b).first())
-                Counter.barmen_session[str(self.object.id)]['time'] = timezone.now()
-            else:
-                Counter.barmen_session[str(self.object.id)]['users'] = set()
-        else:
-            kwargs['barmen'] = []
+        kwargs['barmen'] = Counter.get_barmen_list(self.object.id)
         return kwargs
 
     def form_valid(self, form):
@@ -114,14 +103,19 @@ class CounterClick(DetailView):
     def get(self, request, *args, **kwargs):
         """Simple get view"""
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
-        if 'basket' not in request.session.keys():
+        ret = super(CounterClick, self).get(request, *args, **kwargs)
+        if len(Counter.get_barmen_list(self.object.id)) < 1: # Check that at least one barman is logged in
+            return self.cancel(request) # Otherwise, go to main view
+        if 'basket' not in request.session.keys(): # Init the basket session entry
             request.session['basket'] = {}
-        return super(CounterClick, self).get(request, *args, **kwargs)
+        return ret
 
     def post(self, request, *args, **kwargs):
         """ Handle the many possibilities of the post request """
         self.object = self.get_object()
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
+        if len(Counter.get_barmen_list(self.object.id)) < 1: # Check that at least one barman is logged in
+            return self.cancel(request)
         if 'basket' not in request.session.keys():
             request.session['basket'] = {}
 
@@ -138,20 +132,22 @@ class CounterClick(DetailView):
 
     def add_product(self, request):
         """ Add a product to the basket """
-        if str(request.POST['product_id']) in request.session['basket']:
-            request.session['basket'][str(request.POST['product_id'])] += 1
+        pid = str(request.POST['product_id'])
+        if pid in request.session['basket']:
+            request.session['basket'][pid] += 1
         else:
-            request.session['basket'][str(request.POST['product_id'])] = 1
+            request.session['basket'][pid] = 1
         request.session.modified = True
 
     def del_product(self, request):
         """ Delete a product from the basket """
-        if str(request.POST['product_id']) in request.session['basket']:
-            request.session['basket'][str(request.POST['product_id'])] -= 1
-            if request.session['basket'][str(request.POST['product_id'])] <= 0:
-                del request.session['basket'][str(request.POST['product_id'])]
+        pid = str(request.POST['product_id'])
+        if pid in request.session['basket']:
+            request.session['basket'][pid] -= 1
+            if request.session['basket'][pid] <= 0:
+                del request.session['basket'][pid]
         else:
-            request.session['basket'][str(request.POST['product_id'])] = 0
+            request.session['basket'][pid] = 0
         request.session.modified = True
 
     def finish(self, request):
@@ -164,7 +160,7 @@ class CounterClick(DetailView):
     def cancel(self, request):
         """ Cancel the click session """
         kwargs = {'counter_id': self.object.id}
-        del request.session['basket']
+        request.session.pop('basket', None)
         return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))
 
     def get_context_data(self, **kwargs):

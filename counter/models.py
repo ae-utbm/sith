@@ -1,11 +1,15 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.conf import settings
 from django.core.urlresolvers import reverse
+
+from datetime import timedelta
 
 from club.models import Club
 from accounting.models import Product
 from core.models import Group
+from subscription.models import Subscriber
 
 class Counter(models.Model):
     name = models.CharField(_('name'), max_length=30)
@@ -31,3 +35,16 @@ class Counter(models.Model):
 
     def can_be_viewed_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
+
+    def get_barmen_list(counter_id):
+        bl = []
+        counter_id = str(counter_id)
+        if counter_id in list(Counter.barmen_session.keys()):
+            if (timezone.now() - Counter.barmen_session[counter_id]['time']) < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
+                for b in Counter.barmen_session[counter_id]['users']:
+                    bl.append(Subscriber.objects.filter(id=b).first())
+                Counter.barmen_session[counter_id]['time'] = timezone.now()
+            else:
+                Counter.barmen_session[counter_id]['users'] = set()
+        return bl
+
