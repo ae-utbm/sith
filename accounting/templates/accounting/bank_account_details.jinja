@@ -1,0 +1,22 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+    <h2>View account</h2>
+    <ul>
+    {% for k,v in object.__dict__.items() %}
+        <li>{{ k }} - {{ v }}</li>
+    {% endfor %}
+    </ul>
+    <p><a href="{{ url('accounting:club_new') }}">New club account</a></p>
+    <ul>
+    {% for c in object.club_accounts.all() %}
+        <li><a href="{{ url('accounting:club_details', c_account_id=c.id) }}">{{ c }}</a> -
+            <a href="{{ url('accounting:club_edit', c_account_id=c.id) }}">Edit</a> -
+            <a href="{{ url('accounting:club_delete', c_account_id=c.id) }}">Delete</a></li>
+    {% endfor %}
+    </ul>
+
+{% endblock %}
+
+
+

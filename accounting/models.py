@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -71,6 +72,9 @@ class BankAccount(models.Model):
     rib = models.CharField(_('rib'), max_length=255, blank=True)
     number = models.CharField(_('account number'), max_length=255, blank=True)
 
+    def get_absolute_url(self):
+        return reverse('accounting:bank_details', kwargs={'b_account_id': self.id})
+
     def __str__(self):
         return self.name
 
@@ -78,6 +82,9 @@ class ClubAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
     club = models.OneToOneField(Club, related_name="club_accounts")
     bank_account = models.ForeignKey(BankAccount, related_name="club_accounts")
+
+    def get_absolute_url(self):
+        return reverse('accounting:club_details', kwargs={'c_account_id': self.id})
 
     def __str__(self):
         return self.name
@@ -103,7 +110,7 @@ class AccountingType(models.Model):
     """
     code = models.CharField(_('code'), max_length=16) # TODO: add number validator
     label = models.CharField(_('label'), max_length=60)
-    movement_type = models.CharField(_('movement type'), choices=[('credit', 'Credit'), ('debit', 'Debit'), ('neutral', 'Neutral')])
+    movement_type = models.CharField(_('movement type'), choices=[('credit', 'Credit'), ('debit', 'Debit'), ('neutral', 'Neutral')], max_length=12)
 
 class Operation(models.Model):
     """

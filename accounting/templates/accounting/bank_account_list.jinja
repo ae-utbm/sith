@@ -1,0 +1,24 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+    Bank account list
+{% endblock %}
+
+{% block content %}
+    <p><a href="{{ url('accounting:bank_new') }}">New bank account</a></p>
+    {% if bankaccount_list %}
+        <h3>Bank account list</h3>
+        <ul>
+            {% for a in bankaccount_list  %}
+            <li><a href="{{ url('accounting:bank_details', b_account_id=a.id) }}">{{ a }}</a> -
+                <a href="{{ url('accounting:bank_edit', b_account_id=a.id) }}">Edit</a> -
+                <a href="{{ url('accounting:bank_delete', b_account_id=a.id) }}">Delete</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        There is no accounts in this website.
+    {% endif %}
+{% endblock %}
+
+
+
