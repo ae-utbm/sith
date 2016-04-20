@@ -128,24 +128,25 @@ class User(AbstractBaseUser, PermissionsMixin):
         if group_name == settings.SITH_GROUPS['public']['name']:
             return True
         if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked
-            try: # TODO: change for a test in settings.INSTALLED_APP
+            if 'subscription' in settings.INSTALLED_APPS:
                 from subscription import Subscriber
                 s = Subscriber.objects.filter(pk=self.pk).first()
                 if s is not None and s.is_subscribed():
                     return True
                 else:
                     return False
-            except Exception as e:
-                print(e)
+            else:
                 return False
         if group_name[-6:] == settings.SITH_BOARD_SUFFIX:
-            try: # TODO: change for a test in settings.INSTALLED_APP
+            if 'club' in settings.INSTALLED_APPS:
                 from club.models import Club
                 name = group_name[:-6]
                 c = Club.objects.filter(unix_name=name).first()
-                return c.get_membership_for(self).role >= 2
-            except Exception as e:
-                print(e)
+                mem = c.get_membership_for(self)
+                if mem:
+                    return mem.role >= 2
+                return False
+            else:
                 return False
         return self.groups.filter(name=group_name).exists()
 

@@ -40,7 +40,6 @@ Welcome to the wiki page!
 
         # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
         if not options['prod']:
-            print("Dev mode, adding some test data")
             # Adding user Skia
             s = User(username='skia', last_name="Kia", first_name="S'",
                      email="skia@git.an",
@@ -95,14 +94,14 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             guyut = Club(name="Guy'UT", unix_name="guyut",
                     address="42 de la Boustifaille", parent=ae)
             guyut.save()
-            troll = Club(name="Troll Penché", unix_name="troll",
-                    address="Terre Du Milieu", parent=ae)
-            troll.save()
             Club(name="Woenzel'UT", unix_name="woenzel",
                     address="Woenzel", parent=guyut).save()
             Club(name="BdF", unix_name="bdf",
                     address="Guyéuéyuéyuyé").save()
             Membership(user=s, club=ae, role=3, description="").save()
+            troll = Club(name="Troll Penché", unix_name="troll",
+                    address="Terre Du Milieu", parent=ae)
+            troll.save()
 
             # Accounting test values:
             Customer(user=s, account_id="6568j").save()
