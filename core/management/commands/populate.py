@@ -5,7 +5,7 @@ from django.conf import settings
 
 
 from core.models import Group, User, Page, PageRev
-from accounting.models import Customer, GeneralJournal, ProductType, Product
+from accounting.models import Customer, GeneralJournal, ProductType, Product, BankAccount, ClubAccount, Operation
 from club.models import Club, Membership
 from subscription.models import Subscription, Subscriber
 
@@ -84,10 +84,10 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             # Subscription
             ## Skia
             Subscription(member=Subscriber.objects.filter(pk=s.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_PAYMENT_METHOD[0]).save()
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
             ## Richard
             Subscription(member=Subscriber.objects.filter(pk=r.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_PAYMENT_METHOD[0]).save()
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
 
             # Clubs
             Club(name="Bibo'UT", unix_name="bibout",
@@ -95,6 +95,9 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             guyut = Club(name="Guy'UT", unix_name="guyut",
                     address="42 de la Boustifaille", parent=ae)
             guyut.save()
+            troll = Club(name="Troll Penché", unix_name="troll",
+                    address="Terre Du Milieu", parent=ae)
+            troll.save()
             Club(name="Woenzel'UT", unix_name="woenzel",
                     address="Woenzel", parent=guyut).save()
             Club(name="BdF", unix_name="bdf",
@@ -113,5 +116,11 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     special_selling_price="1.6").save()
             Product(name="Carolus", code="CARO", product_type=p, purchase_price="1.50", selling_price="1.7",
                     special_selling_price="1.6").save()
-            GeneralJournal(start_date="2015-06-12", name="A15").save()
+            BankAccount(name="AE TG").save()
+            BankAccount(name="Carte AE").save()
+            ba = BankAccount(name="AE TI")
+            ba.save()
+            ca = ClubAccount(name="Troll Penché", bank_account=ba, club=troll)
+            ca.save()
+
 

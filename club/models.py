@@ -111,8 +111,8 @@ class Membership(models.Model):
     club = models.ForeignKey(Club, related_name="members", null=False, blank=False)
     start_date = models.DateField(_('start date'), auto_now=True)
     end_date = models.DateField(_('end date'), null=True, blank=True)
-    role = models.IntegerField(_('role'), choices=sorted(settings.CLUB_ROLES.items()),
-            default=sorted(settings.CLUB_ROLES.items())[0][0])
+    role = models.IntegerField(_('role'), choices=sorted(settings.SITH_CLUB_ROLES.items()),
+            default=sorted(settings.SITH_CLUB_ROLES.items())[0][0])
     description = models.CharField(_('description'), max_length=30, null=False, blank=True)
 
     def clean(self):
@@ -123,7 +123,7 @@ class Membership(models.Model):
             raise ValidationError(_('User is already member of that club'))
 
     def __str__(self):
-        return self.club.name+' - '+self.user.username+' - '+settings.CLUB_ROLES[self.role]+str(
+        return self.club.name+' - '+self.user.username+' - '+settings.SITH_CLUB_ROLES[self.role]+str(
                 " - "+str(_('past member')) if self.end_date is not None else ""
                 )
 

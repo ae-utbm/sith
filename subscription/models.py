@@ -13,7 +13,7 @@ def validate_type(value):
         raise ValidationError(_('Bad subscription type'))
 
 def validate_payment(value):
-    if value not in settings.SITH_PAYMENT_METHOD:
+    if value not in settings.SITH_SUBSCRIPTION_PAYMENT_METHOD:
         raise ValidationError(_('Bad payment method'))
 
 class Subscriber(User):
@@ -34,7 +34,7 @@ class Subscription(models.Model):
                                          choices=((k, v['name']) for k,v in sorted(settings.SITH_SUBSCRIPTIONS.items())))
     subscription_start = models.DateField(_('subscription start'))
     subscription_end = models.DateField(_('subscription end'))
-    payment_method = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_PAYMENT_METHOD)
+    payment_method = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD)
     # TODO add location!
 
     class Meta:

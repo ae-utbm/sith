@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from club.models import Club, Membership
-from sith.settings import MAXIMUM_FREE_ROLE, SITH_MAIN_BOARD_GROUP
+from sith.settings import SITH_MAXIMUM_FREE_ROLE, SITH_MAIN_BOARD_GROUP
 
 class ClubListView(CanViewMixin, ListView):
     """
@@ -42,7 +42,7 @@ class ClubMemberForm(forms.ModelForm):
         """
         ret = super(ClubMemberForm, self).clean()
         ms = self.instance.club.get_membership_for(self._user)
-        if (self.cleaned_data['role'] <= MAXIMUM_FREE_ROLE or
+        if (self.cleaned_data['role'] <= SITH_MAXIMUM_FREE_ROLE or
             (ms is not None and ms.role >= self.cleaned_data['role']) or
             self._user.is_in_group(SITH_MAIN_BOARD_GROUP) or
             self._user.is_superuser):

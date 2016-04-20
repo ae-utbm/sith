@@ -201,10 +201,18 @@ SITH_MEMBER_SUFFIX="-members"
 SITH_MAIN_BOARD_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_BOARD_SUFFIX
 SITH_MAIN_MEMBERS_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_MEMBER_SUFFIX
 
-SITH_PAYMENT_METHOD = [('cheque', 'Chèque'),
-                     ('cash', 'Espèce'),
-                     ('other', 'Autre'),
-                    ]
+SITH_ACCOUNTING_PAYMENT_METHOD = [
+        ('cheque', 'Chèque'),
+        ('cash', 'Espèce'),
+        ('transfert', 'Virement'),
+        ('card', 'Carte banquaire'),
+        ]
+
+SITH_SUBSCRIPTION_PAYMENT_METHOD = [
+        ('cheque', 'Chèque'),
+        ('cash', 'Espèce'),
+        ('other', 'Autre'),
+        ]
 
 # Subscription durations are in semestres (should be settingized)
 SITH_SUBSCRIPTIONS = {
@@ -231,7 +239,7 @@ SITH_SUBSCRIPTIONS = {
 # To be completed....
 }
 
-CLUB_ROLES = {
+SITH_CLUB_ROLES = {
         10: 'Président',
         9: 'Vice-Président',
         7: 'Trésorier',
@@ -244,8 +252,8 @@ CLUB_ROLES = {
         }
 
 # This corresponds to the maximum role a user can freely subscribe to
-# In this case, MAXIMUM_FREE_ROLE=1 means that a user can set himself as "Membre actif" or "Curieux", but not higher
-MAXIMUM_FREE_ROLE=1
+# In this case, SITH_MAXIMUM_FREE_ROLE=1 means that a user can set himself as "Membre actif" or "Curieux", but not higher
+SITH_MAXIMUM_FREE_ROLE=1
 
 # Minutes to timeout the logged barmen
 SITH_BARMAN_TIMEOUT=20

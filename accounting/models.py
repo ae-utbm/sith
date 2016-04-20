@@ -1,8 +1,10 @@
 from django.db import models
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from decimal import Decimal
 from core.models import User
+from club.models import Club
 
 class CurrencyField(models.DecimalField):
     """
@@ -64,31 +66,58 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+class BankAccount(models.Model):
+    name = models.CharField(_('name'), max_length=30)
+    rib = models.CharField(_('rib'), max_length=255, blank=True)
+    number = models.CharField(_('account number'), max_length=255, blank=True)
+
+    def __str__(self):
+        return self.name
+
+class ClubAccount(models.Model):
+    name = models.CharField(_('name'), max_length=30)
+    club = models.OneToOneField(Club, related_name="club_accounts")
+    bank_account = models.ForeignKey(BankAccount, related_name="club_accounts")
+
+    def __str__(self):
+        return self.name
+
 class GeneralJournal(models.Model):
     """
-    Class storing all the invoices for a period of time
+    Class storing all the operations for a period of time
     """
     start_date = models.DateField(_('start date'))
     end_date = models.DateField(_('end date'), null=True, blank=True, default=None)
     name = models.CharField(_('name'), max_length=30)
     closed = models.BooleanField(_('is closed'), default=False)
-    # When clubs are done: ForeignKey(Proprietary)
+    club_account = models.ForeignKey(ClubAccount, related_name="journals", null=False)
 
     def __str__(self):
         return self.name
 
-
-class GenericInvoice(models.Model):
+class AccountingType(models.Model):
     """
-    This class is a generic invoice, made to be extended with some special cases (eg: for the internal accounting, payment
-    system, etc...)
+    Class describing the accounting types.
+
+    Thoses are numbers used in accounting to classify operations
+    """
+    code = models.CharField(_('code'), max_length=16) # TODO: add number validator
+    label = models.CharField(_('label'), max_length=60)
+    movement_type = models.CharField(_('movement type'), choices=[('credit', 'Credit'), ('debit', 'Debit'), ('neutral', 'Neutral')])
+
+class Operation(models.Model):
+    """
+    An operation is a line in the journal, a debit or a credit
     """
     journal = models.ForeignKey(GeneralJournal, related_name="invoices", null=False)
-    name = models.CharField(_('name'), max_length=100)
+    date = models.DateField(_('date'))
+    remark = models.TextField(_('remark'), max_length=255)
+    mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)
+    cheque_number = models.IntegerField(_('cheque number'))
+    invoice = models.FileField(upload_to='invoices', null=True, blank=True)
+    done = models.BooleanField(_('is done'), default=False)
+    type = models.ForeignKey(AccountingType, related_name="operations")
 
     def __str__(self):
         return self.journal.name+' - '+self.name
 
-
-# TODO: CountingInvoice in Counting app extending GenericInvoice
-#       - ManyToMany Product
