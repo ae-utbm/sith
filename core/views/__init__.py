@@ -1,16 +1,16 @@
 
 from django.shortcuts import render
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.views.generic.base import View
 
 from core.models import Group
 
 def forbidden(request):
-    return render(request, "core/403.jinja")
+    return HttpResponseForbidden(render(request, "core/403.jinja"))
 
 def not_found(request):
-    return render(request, "core/404.jinja")
+    return HttpResponseNotFound(render(request, "core/404.jinja"))
 
 def can_edit_prop(obj, user):
     if obj is None or user.is_owner(obj):
