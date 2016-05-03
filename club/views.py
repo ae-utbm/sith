@@ -97,3 +97,13 @@ class ClubEditPropView(CanEditPropMixin, UpdateView):
     fields = ['name', 'unix_name', 'parent']
     template_name = 'club/club_edit_prop.jinja'
 
+
+class ClubCreateView(CanEditPropMixin, CreateView):
+    """
+    Create a club (for the Sith admin)
+    """
+    model = Club
+    pk_url_kwarg = "club_id"
+    fields = ['name', 'unix_name', 'parent']
+    template_name = 'club/club_edit_prop.jinja'
+

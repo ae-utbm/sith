@@ -48,6 +48,24 @@ Welcome to the wiki page!
             s.save()
             s.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             s.save()
+            # Adding user public
+            public = User(username='public', last_name="Not subscribed", first_name="Public",
+                     email="public@git.an",
+                     date_of_birth="1942-06-12",
+                     is_superuser=False, is_staff=False)
+            public.set_password("plop")
+            public.save()
+            public.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            public.save()
+            # Adding user Subscriber
+            subscriber = User(username='subscriber', last_name="User", first_name="Subscribed",
+                     email="Subscribed@git.an",
+                     date_of_birth="1942-06-12",
+                     is_superuser=False, is_staff=False)
+            subscriber.set_password("plop")
+            subscriber.save()
+            subscriber.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            subscriber.save()
             # Adding user Guy
             u = User(username='guy', last_name="Carlier", first_name="Guy",
                      email="guy@git.an",
@@ -86,6 +104,9 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
             ## Richard
             Subscription(member=Subscriber.objects.filter(pk=r.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
+            ## Subscriber
+            Subscription(member=Subscriber.objects.filter(pk=subscriber.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
 
             # Clubs

@@ -2,7 +2,7 @@
 
 {% block content %}
     <h2>Edit club properties</h2>
-    <form action="{{ url('club:club_prop', club_id=club.id) }}" method="post">
+    <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p() }}
         <p><input type="submit" value="Save!" /></p>

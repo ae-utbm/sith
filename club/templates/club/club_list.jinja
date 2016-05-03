@@ -17,6 +17,9 @@
 {%- endmacro %}
 
 {% block content %}
+    {% if user.is_superuser or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+        <p><a href="{{ url('club:club_new') }}">New club</a></p>
+    {% endif %}
     {% if club_list %}
         <h3>Club list</h3>
         <ul>
