@@ -66,7 +66,7 @@ class BankAccountCreateView(CanEditMixin, CreateView):
     fields = ['name', 'rib', 'number']
     template_name = 'accounting/account_edit.jinja'
 
-class BankAccountDeleteView(CanEditMixin, DeleteView):
+class BankAccountDeleteView(CanEditMixin, DeleteView): # TODO change Delete to Close
     """
     Delete a bank account (for the admins)
     """
@@ -102,7 +102,7 @@ class ClubAccountCreateView(CanEditMixin, CreateView):
     fields = ['name', 'club', 'bank_account']
     template_name = 'accounting/account_edit.jinja'
 
-class ClubAccountDeleteView(CanEditMixin, DeleteView):
+class ClubAccountDeleteView(CanEditMixin, DeleteView): # TODO change Delete to Close
     """
     Delete a club account (for the admins)
     """

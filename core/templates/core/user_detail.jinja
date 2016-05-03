@@ -9,9 +9,6 @@
 <p><a href="{{ url('core:user_list') }}">Back to list</a></p>
 
 <ul>
-{% if request.user.id == profile.id %}
-    <li><a href="{{ url('core:user_tools') }}">Tools</a></li>
-{% endif %}
 {% if can_edit(profile, request.user) or user.id == profile.id %}
     <li><a href="{{ url('core:user_edit', user_id=profile.id) }}">Edit</a></li>
 {% endif %}
