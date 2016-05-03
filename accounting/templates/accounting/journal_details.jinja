@@ -1,0 +1,22 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+<h2>View journal: {{ object.name }}</h2>
+    <ul>
+    {% for k,v in object.__dict__.items() %}
+        <li>{{ k }} - {{ v }}</li>
+    {% endfor %}
+    </ul>
+    <p><a href="{{ url('accounting:op_new') }}">New operation</a></p>
+    <ul>
+    {% for o in object.operations.all() %}
+    <li>
+        <a href="{{ url('accounting:op_edit', op_id=o.id) }}">{{ o }}</a>
+    </li>
+    {% endfor %}
+    </ul>
+
+{% endblock %}
+
+
+

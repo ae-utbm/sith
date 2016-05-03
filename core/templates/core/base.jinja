@@ -24,6 +24,7 @@
         {% if user.is_authenticated() %}
         <ul>
             <li><a href="{{ url('core:user_profile', user_id=user.id) }}">Profile</a></li>
+            <li><a href="{{ url('core:user_tools') }}">Tools</a></li>
             <li><a href="{{ url('core:user_list') }}">Users</a></li>
             <li><a href="{{ url('core:page', page_name="Index") }}">Pages</a></li>
             <li><a href="{{ url('club:club_list') }}">Clubs</a></li>

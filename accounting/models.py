@@ -39,7 +39,19 @@ class Customer(models.Model):
     def __str__(self):
         return self.user.username
 
-class ProductType(models.Model):
+class AccountingMixin():
+    """
+    Mixin providing the rights managment for all accounting classes
+    """
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        return False
+
+class ProductType(models.Model, AccountingMixin):
     """
     This describes a product type
     Useful only for categorizing, changes are made at the product level for now
@@ -51,7 +63,7 @@ class ProductType(models.Model):
     def __str__(self):
         return self.name
 
-class Product(models.Model):
+class Product(models.Model, AccountingMixin):
     """
     This describes a product, with all its related informations
     """
@@ -67,7 +79,7 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class BankAccount(models.Model):
+class BankAccount(models.Model, AccountingMixin):
     name = models.CharField(_('name'), max_length=30)
     rib = models.CharField(_('rib'), max_length=255, blank=True)
     number = models.CharField(_('account number'), max_length=255, blank=True)
@@ -78,7 +90,7 @@ class BankAccount(models.Model):
     def __str__(self):
         return self.name
 
-class ClubAccount(models.Model):
+class ClubAccount(models.Model, AccountingMixin):
     name = models.CharField(_('name'), max_length=30)
     club = models.OneToOneField(Club, related_name="club_accounts")
     bank_account = models.ForeignKey(BankAccount, related_name="club_accounts")
@@ -89,7 +101,7 @@ class ClubAccount(models.Model):
     def __str__(self):
         return self.name
 
-class GeneralJournal(models.Model):
+class GeneralJournal(models.Model, AccountingMixin):
     """
     Class storing all the operations for a period of time
     """
@@ -99,10 +111,13 @@ class GeneralJournal(models.Model):
     closed = models.BooleanField(_('is closed'), default=False)
     club_account = models.ForeignKey(ClubAccount, related_name="journals", null=False)
 
+    def get_absolute_url(self):
+        return reverse('accounting:journal_details', kwargs={'j_id': self.id})
+
     def __str__(self):
         return self.name
 
-class AccountingType(models.Model):
+class AccountingType(models.Model, AccountingMixin):
     """
     Class describing the accounting types.
 
@@ -112,11 +127,17 @@ class AccountingType(models.Model):
     label = models.CharField(_('label'), max_length=60)
     movement_type = models.CharField(_('movement type'), choices=[('credit', 'Credit'), ('debit', 'Debit'), ('neutral', 'Neutral')], max_length=12)
 
-class Operation(models.Model):
+    def get_absolute_url(self):
+        return reverse('accounting:type_list')
+
+    def __str__(self):
+        return self.movement_type+" - "+self.code+" - "+self.label
+
+class Operation(models.Model, AccountingMixin):
     """
     An operation is a line in the journal, a debit or a credit
     """
-    journal = models.ForeignKey(GeneralJournal, related_name="invoices", null=False)
+    journal = models.ForeignKey(GeneralJournal, related_name="operations", null=False)
     date = models.DateField(_('date'))
     remark = models.TextField(_('remark'), max_length=255)
     mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)
@@ -125,6 +146,9 @@ class Operation(models.Model):
     done = models.BooleanField(_('is done'), default=False)
     type = models.ForeignKey(AccountingType, related_name="operations")
 
+    def get_absolute_url(self):
+        return reverse('accounting:journal_details', kwargs={'j_id': self.journal.id})
+
     def __str__(self):
-        return self.journal.name+' - '+self.name
+        return str(self.id)+" - "+str(self.date)
 

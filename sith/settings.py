@@ -189,9 +189,13 @@ SITH_GROUPS = {
         'id': 1,
         'name': "root",
     },
-    'public': {
+    'accounting-admin': {
         'id': 2,
-        'name': "not_registered_users",
+        'name': "accounting-admin",
+    },
+    'public': {
+        'id': 3,
+        'name': "not-registered-users",
     },
 }
 

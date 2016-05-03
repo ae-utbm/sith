@@ -9,6 +9,7 @@ admin.site.register(Product)
 admin.site.register(BankAccount)
 admin.site.register(ClubAccount)
 admin.site.register(GeneralJournal)
+admin.site.register(AccountingType)
 admin.site.register(Operation)
 
 

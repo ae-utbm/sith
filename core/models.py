@@ -266,7 +266,9 @@ class AnonymousUser(AuthAnonymousUser):
         return False
 
     def can_view(self, obj):
-        if obj.view_groups.filter(pk=settings.SITH_GROUPS['public']['id']).exists():
+        if hasattr(obj, 'view_groups') and obj.view_groups.filter(pk=settings.SITH_GROUPS['public']['id']).exists():
+            return True
+        if hasattr(obj, 'can_be_viewed_by') and obj.can_be_viewed_by(self):
             return True
         return False
 

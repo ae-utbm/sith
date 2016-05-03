@@ -9,8 +9,12 @@
     </ul>
     <p><a href="{{ url('accounting:journal_new') }}">New journal</a></p>
     <ul>
-    {% for c in object.journals.all() %}
-    <li>{{ c }}</li>
+    {% for j in object.journals.all() %}
+    <li>
+        <a href="{{ url('accounting:journal_details', j_id=j.id) }}">{{ j }}</a> -
+        <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">Edit</a>
+
+    </li>
     {% endfor %}
     </ul>
 
