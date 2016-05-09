@@ -5,7 +5,7 @@ from django.conf import settings
 
 
 from core.models import Group, User, Page, PageRev
-from accounting.models import Customer, GeneralJournal, ProductType, Product, BankAccount, ClubAccount, Operation
+from accounting.models import Customer, GeneralJournal, ProductType, Product, BankAccount, ClubAccount, Operation, AccountingType
 from club.models import Club, Membership
 from subscription.models import Subscription, Subscriber
 
@@ -41,13 +41,13 @@ Welcome to the wiki page!
         # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
         if not options['prod']:
             # Adding user Skia
-            s = User(username='skia', last_name="Kia", first_name="S'",
+            skia = User(username='skia', last_name="Kia", first_name="S'",
                      email="skia@git.an",
                      date_of_birth="1942-06-12")
-            s.set_password("plop")
-            s.save()
-            s.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
-            s.save()
+            skia.set_password("plop")
+            skia.save()
+            skia.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            skia.save()
             # Adding user public
             public = User(username='public', last_name="Not subscribed", first_name="Public",
                      email="public@git.an",
@@ -66,6 +66,16 @@ Welcome to the wiki page!
             subscriber.save()
             subscriber.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             subscriber.save()
+            # Adding user Comptable
+            comptable = User(username='comptable', last_name="Able", first_name="Compte",
+                     email="compta@git.an",
+                     date_of_birth="1942-06-12",
+                     is_superuser=False, is_staff=False)
+            comptable.set_password("plop")
+            comptable.save()
+            comptable.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            comptable.groups=[Group.objects.filter(name=settings.SITH_GROUPS['accounting-admin']['name']).first().id]
+            comptable.save()
             # Adding user Guy
             u = User(username='guy', last_name="Carlier", first_name="Guy",
                      email="guy@git.an",
@@ -86,21 +96,24 @@ Welcome to the wiki page!
             # Adding syntax help page
             p = Page(name='Aide_sur_la_syntaxe')
             p.save()
-            PageRev(page=p, title="Aide sur la syntaxe", author=s, content="""
+            PageRev(page=p, title="Aide sur la syntaxe", author=skia, content="""
 Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 """).save()
             # Adding README
             p = Page(name='README')
             p.save()
             p.view_groups=[settings.SITH_GROUPS['public']['id']]
-            p.set_lock(s)
+            p.set_lock(skia)
             p.save()
             with open(os.path.join(root_path)+'/README.md', 'r') as rm:
-                PageRev(page=p, title="REAMDE", author=s, content=rm.read()).save()
+                PageRev(page=p, title="REAMDE", author=skia, content=rm.read()).save()
 
             # Subscription
             ## Skia
-            Subscription(member=Subscriber.objects.filter(pk=s.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+            Subscription(member=Subscriber.objects.filter(pk=skia.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
+            ## Comptable
+            Subscription(member=Subscriber.objects.filter(pk=comptable.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
             ## Richard
             Subscription(member=Subscriber.objects.filter(pk=r.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
@@ -119,28 +132,29 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     address="Woenzel", parent=guyut).save()
             Club(name="BdF", unix_name="bdf",
                     address="Guyéuéyuéyuyé").save()
-            Membership(user=s, club=ae, role=3, description="").save()
+            Membership(user=skia, club=ae, role=3, description="").save()
             troll = Club(name="Troll Penché", unix_name="troll",
                     address="Terre Du Milieu", parent=ae)
             troll.save()
 
             # Accounting test values:
-            Customer(user=s, account_id="6568j").save()
+            Customer(user=skia, account_id="6568j").save()
             p = ProductType(name="Bières bouteilles")
             p.save()
             Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6").save()
+                    special_selling_price="1.6", club=ae).save()
             Product(name="Chimay", code="CBLE", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6").save()
+                    special_selling_price="1.6", club=ae).save()
             Product(name="Corsendonk", code="CORS", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6").save()
+                    special_selling_price="1.6", club=ae).save()
             Product(name="Carolus", code="CARO", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6").save()
-            BankAccount(name="AE TG").save()
-            BankAccount(name="Carte AE").save()
-            ba = BankAccount(name="AE TI")
+                    special_selling_price="1.6", club=ae).save()
+            BankAccount(name="AE TG", club=ae).save()
+            BankAccount(name="Carte AE", club=ae).save()
+            ba = BankAccount(name="AE TI", club=ae)
             ba.save()
             ca = ClubAccount(name="Troll Penché", bank_account=ba, club=troll)
             ca.save()
-
+            AccountingType(code=666, label="Guy credit", movement_type='credit').save()
+            AccountingType(code=4000, label="Guy debit", movement_type='debit').save()
 

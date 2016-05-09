@@ -39,19 +39,7 @@ class Customer(models.Model):
     def __str__(self):
         return self.user.username
 
-class AccountingMixin():
-    """
-    Mixin providing the rights managment for all accounting classes
-    """
-    def can_be_edited_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
-            return True
-        return False
-
-class ProductType(models.Model, AccountingMixin):
+class ProductType(models.Model):
     """
     This describes a product type
     Useful only for categorizing, changes are made at the product level for now
@@ -60,10 +48,18 @@ class ProductType(models.Model, AccountingMixin):
     description = models.TextField(_('description'), null=True, blank=True)
     icon = models.ImageField(upload_to='products', null=True, blank=True)
 
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        return False
+
     def __str__(self):
         return self.name
 
-class Product(models.Model, AccountingMixin):
+class Product(models.Model):
     """
     This describes a product, with all its related informations
     """
@@ -75,14 +71,35 @@ class Product(models.Model, AccountingMixin):
     selling_price = CurrencyField(_('selling price'))
     special_selling_price = CurrencyField(_('special selling price'))
     icon = models.ImageField(upload_to='products', null=True, blank=True)
+    club = models.ForeignKey(Club, related_name="products")
+
+    def is_owned_by(self, user): # TODO do this for all models
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        return False
 
     def __str__(self):
         return self.name
 
-class BankAccount(models.Model, AccountingMixin):
+class BankAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
     rib = models.CharField(_('rib'), max_length=255, blank=True)
     number = models.CharField(_('account number'), max_length=255, blank=True)
+    club = models.ForeignKey(Club, related_name="bank_accounts")
+
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        m = self.club.get_membership_for(user)
+        if m is not None and m.role >= 7:
+            return True
+        return False
 
     def get_absolute_url(self):
         return reverse('accounting:bank_details', kwargs={'b_account_id': self.id})
@@ -90,10 +107,27 @@ class BankAccount(models.Model, AccountingMixin):
     def __str__(self):
         return self.name
 
-class ClubAccount(models.Model, AccountingMixin):
+class ClubAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
-    club = models.OneToOneField(Club, related_name="club_accounts")
+    club = models.OneToOneField(Club, related_name="club_account")
     bank_account = models.ForeignKey(BankAccount, related_name="club_accounts")
+
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        return False
+
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        m = self.club.get_membership_for(user)
+        if m is not None and m.role >= 7:
+            return True
+        return False
 
     def get_absolute_url(self):
         return reverse('accounting:club_details', kwargs={'c_account_id': self.id})
@@ -101,7 +135,7 @@ class ClubAccount(models.Model, AccountingMixin):
     def __str__(self):
         return self.name
 
-class GeneralJournal(models.Model, AccountingMixin):
+class GeneralJournal(models.Model):
     """
     Class storing all the operations for a period of time
     """
@@ -111,13 +145,29 @@ class GeneralJournal(models.Model, AccountingMixin):
     closed = models.BooleanField(_('is closed'), default=False)
     club_account = models.ForeignKey(ClubAccount, related_name="journals", null=False)
 
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        return False
+
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if self.club_account.can_be_edited_by(user):
+            return True
+        return False
+
     def get_absolute_url(self):
         return reverse('accounting:journal_details', kwargs={'j_id': self.id})
 
     def __str__(self):
         return self.name
 
-class AccountingType(models.Model, AccountingMixin):
+class AccountingType(models.Model):
     """
     Class describing the accounting types.
 
@@ -127,13 +177,21 @@ class AccountingType(models.Model, AccountingMixin):
     label = models.CharField(_('label'), max_length=60)
     movement_type = models.CharField(_('movement type'), choices=[('credit', 'Credit'), ('debit', 'Debit'), ('neutral', 'Neutral')], max_length=12)
 
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        return False
+
     def get_absolute_url(self):
         return reverse('accounting:type_list')
 
     def __str__(self):
         return self.movement_type+" - "+self.code+" - "+self.label
 
-class Operation(models.Model, AccountingMixin):
+class Operation(models.Model):
     """
     An operation is a line in the journal, a debit or a credit
     """
@@ -145,6 +203,26 @@ class Operation(models.Model, AccountingMixin):
     invoice = models.FileField(upload_to='invoices', null=True, blank=True)
     done = models.BooleanField(_('is done'), default=False)
     type = models.ForeignKey(AccountingType, related_name="operations")
+
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        m = self.journal.club_account.get_membership_for(user)
+        if m is not None and m.role >= 7:
+            return True
+        return False
+
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if self.journal.can_be_edited_by(user):
+            return True
+        return False
+
 
     def get_absolute_url(self):
         return reverse('accounting:journal_details', kwargs={'j_id': self.journal.id})

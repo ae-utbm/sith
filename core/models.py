@@ -207,13 +207,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Determine if the object is owned by the user
         """
-        if not hasattr(obj, "owner_group"):
-            return False
-        if (self.is_superuser or self.is_in_group(obj.owner_group.name) or
-            self.has_perm(obj.__class__.__module__.split('.')[0]+".change_prop_"+obj.__class__.__name__.lower()) or
-            self.groups.filter(id=settings.SITH_GROUPS['root']['id']).exists()):
-            return True
         if hasattr(obj, "is_owned_by") and obj.is_owned_by(self):
+            return True
+        if hasattr(obj, "owner_group") and self.is_in_group(obj.owner_group.name):
+            return False
+        if self.is_superuser or self.is_in_group(settings.SITH_GROUPS['root']['name']):
             return True
         return False
 
@@ -231,8 +229,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             return True
         if hasattr(obj, "can_be_edited_by") and obj.can_be_edited_by(self):
             return True
-        if self.has_perm(obj.__class__.__module__.split('.')[0]+".change_"+obj.__class__.__name__.lower()):
-            return True
         return False
 
     def can_view(self, obj):
@@ -246,8 +242,6 @@ class User(AbstractBaseUser, PermissionsMixin):
                 if self.is_in_group(g.name):
                     return True
         if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
-            return True
-        if self.has_perm(obj.__class__.__module__.split('.')[0]+".view_"+obj.__class__.__name__.lower()):
             return True
         return False
 

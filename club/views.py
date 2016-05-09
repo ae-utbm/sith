@@ -25,6 +25,14 @@ class ClubView(CanViewMixin, DetailView):
     pk_url_kwarg = "club_id"
     template_name = 'club/club_detail.jinja'
 
+class ClubToolsView(CanViewMixin, DetailView):
+    """
+    Tools page of a Club
+    """
+    model = Club
+    pk_url_kwarg = "club_id"
+    template_name = 'club/club_tools.jinja'
+
 class ClubMemberForm(forms.ModelForm):
     """
     Form handling the members of a club

@@ -24,7 +24,7 @@ class AccountingTypeEditView(CanViewMixin, UpdateView):
     fields = ['code', 'label', 'movement_type']
     template_name = 'accounting/account_edit.jinja'
 
-class AccountingTypeCreateView(CanEditMixin, CreateView):
+class AccountingTypeCreateView(CanEditPropMixin, CreateView):
     """
     Create an accounting type (for the admins)
     """
@@ -58,7 +58,7 @@ class BankAccountDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "b_account_id"
     template_name = 'accounting/bank_account_details.jinja'
 
-class BankAccountCreateView(CanEditMixin, CreateView):
+class BankAccountCreateView(CanEditPropMixin, CreateView):
     """
     Create a bank account (for the admins)
     """
@@ -66,7 +66,7 @@ class BankAccountCreateView(CanEditMixin, CreateView):
     fields = ['name', 'rib', 'number']
     template_name = 'accounting/account_edit.jinja'
 
-class BankAccountDeleteView(CanEditMixin, DeleteView): # TODO change Delete to Close
+class BankAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete to Close
     """
     Delete a bank account (for the admins)
     """
@@ -94,7 +94,7 @@ class ClubAccountDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "c_account_id"
     template_name = 'accounting/club_account_details.jinja'
 
-class ClubAccountCreateView(CanEditMixin, CreateView):
+class ClubAccountCreateView(CanEditPropMixin, CreateView):
     """
     Create a club account (for the admins)
     """
@@ -102,7 +102,7 @@ class ClubAccountCreateView(CanEditMixin, CreateView):
     fields = ['name', 'club', 'bank_account']
     template_name = 'accounting/account_edit.jinja'
 
-class ClubAccountDeleteView(CanEditMixin, DeleteView): # TODO change Delete to Close
+class ClubAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete to Close
     """
     Delete a club account (for the admins)
     """
