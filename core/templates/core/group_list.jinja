@@ -6,9 +6,11 @@ Group list
 
 {% block content %}
 <h3>Group list</h3>
+<p><a href="{{ url('core:group_new') }}">New group</a></p>
 <ul>
 {% for g in realgroup_list %}
-<li><a href="{{ url('core:group_edit', group_id=g.id) }}">{{ g.name }}</a></li>
+<li><a href="{{ url('core:group_edit', group_id=g.id) }}">{{ g.name }}</a> - {{ g.description }} -
+    <a href="{{ url('core:group_delete', group_id=g.id) }}">Delete</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

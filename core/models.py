@@ -24,11 +24,12 @@ class Group(AuthGroup):
         default=False,
         help_text=_('Whether a group is a meta group or not'),
     )
+    description = models.CharField(_('description'), max_length=60)
     def get_absolute_url(self):
         """
         This is needed for black magic powered UpdateView's children
         """
-        return reverse('core:group_edit', kwargs={'group_id': self.pk})
+        return reverse('core:group_list')
 
 class MetaGroup(Group):
     objects = MetaGroupManager()
@@ -148,6 +149,8 @@ class User(AbstractBaseUser, PermissionsMixin):
                 return False
             else:
                 return False
+        if group_name == settings.SITH_GROUPS['root']['name'] and self.is_superuser:
+            return True
         return self.groups.filter(name=group_name).exists()
 
     def get_profile(self):

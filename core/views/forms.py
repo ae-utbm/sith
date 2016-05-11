@@ -60,14 +60,3 @@ class PagePropForm(forms.ModelForm):
         self.fields['edit_groups'].required = False
         self.fields['view_groups'].required = False
 
-
-class GroupEditForm(forms.ModelForm):
-    error_css_class = 'error'
-    required_css_class = 'required'
-    class Meta:
-        model = RealGroup
-        fields = ['name', 'permissions',]
-        widgets = {
-            'permissions': CheckboxSelectMultiple,
-        }
-

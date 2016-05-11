@@ -18,7 +18,9 @@ urlpatterns = [
 
     # Group handling
     url(r'^group/$', GroupListView.as_view(), name='group_list'),
+    url(r'^group/new$', GroupCreateView.as_view(), name='group_new'),
     url(r'^group/(?P<group_id>[0-9]+)/$', GroupEditView.as_view(), name='group_edit'),
+    url(r'^group/(?P<group_id>[0-9]+)/delete$', GroupDeleteView.as_view(), name='group_delete'),
 
     # User views
     url(r'^user/$', UserListView.as_view(), name='user_list'),
