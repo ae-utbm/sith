@@ -12,8 +12,7 @@ from django import forms
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from subscription.models import Subscriber
-from accounting.models import Customer, Product
-from counter.models import Counter
+from counter.models import Counter, Customer, Product
 
 class GetUserForm(forms.Form):
     """

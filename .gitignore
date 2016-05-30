@@ -2,6 +2,6 @@ db.sqlite3
 *.pyc
 *__pycache__*
 .DS_Store
-env_sith
+env/
 doc/html
 data/

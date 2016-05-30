@@ -3,7 +3,6 @@ from django.views.generic import ListView
 from django.core.urlresolvers import reverse_lazy
 
 from core.models import RealGroup
-from core.views.forms import GroupEditForm
 from core.views import CanEditMixin
 
 class GroupListView(CanEditMixin, ListView):

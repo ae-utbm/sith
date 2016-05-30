@@ -24,65 +24,6 @@ class CurrencyField(models.DecimalField):
         except AttributeError:
            return None
 
-class Customer(models.Model):
-    """
-    This class extends a user to make a customer. It adds some basic customers informations, such as the accound ID, and
-    is used by other accounting classes as reference to the customer, rather than using User
-    """
-    user = models.OneToOneField(User, primary_key=True)
-    account_id = models.CharField(_('account id'), max_length=10, unique=True)
-
-    class Meta:
-        verbose_name = _('customer')
-        verbose_name_plural = _('customers')
-
-    def __str__(self):
-        return self.user.username
-
-class ProductType(models.Model):
-    """
-    This describes a product type
-    Useful only for categorizing, changes are made at the product level for now
-    """
-    name = models.CharField(_('name'), max_length=30)
-    description = models.TextField(_('description'), null=True, blank=True)
-    icon = models.ImageField(upload_to='products', null=True, blank=True)
-
-    def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
-            return True
-        return False
-
-    def __str__(self):
-        return self.name
-
-class Product(models.Model):
-    """
-    This describes a product, with all its related informations
-    """
-    name = models.CharField(_('name'), max_length=30)
-    description = models.TextField(_('description'), blank=True)
-    product_type = models.ForeignKey(ProductType, related_name='products', null=True, blank=True)
-    code = models.CharField(_('code'), max_length=10)
-    purchase_price = CurrencyField(_('purchase price'))
-    selling_price = CurrencyField(_('selling price'))
-    special_selling_price = CurrencyField(_('special selling price'))
-    icon = models.ImageField(upload_to='products', null=True, blank=True)
-    club = models.ForeignKey(Club, related_name="products")
-
-    def is_owned_by(self, user): # TODO do this for all models
-        """
-        Method to see if that object can be edited by the given user
-        """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
-            return True
-        return False
-
-    def __str__(self):
-        return self.name
 
 class BankAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
@@ -196,6 +137,7 @@ class Operation(models.Model):
     An operation is a line in the journal, a debit or a credit
     """
     journal = models.ForeignKey(GeneralJournal, related_name="operations", null=False)
+    amount = CurrencyField(_('amount'))
     date = models.DateField(_('date'))
     remark = models.TextField(_('remark'), max_length=255)
     mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)

@@ -4,11 +4,6 @@ from django.core.management import call_command
 from django.conf import settings
 
 
-from core.models import Group, User, Page, PageRev
-from accounting.models import Customer, GeneralJournal, ProductType, Product
-from club.models import Club
-from subscription.models import Subscription, Subscriber
-
 class Command(BaseCommand):
     help = "Set up a new instance of the Sith AE"
 

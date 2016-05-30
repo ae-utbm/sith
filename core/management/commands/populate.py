@@ -5,9 +5,10 @@ from django.conf import settings
 
 
 from core.models import Group, User, Page, PageRev
-from accounting.models import Customer, GeneralJournal, ProductType, Product, BankAccount, ClubAccount, Operation, AccountingType
+from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operation, AccountingType
 from club.models import Club, Membership
 from subscription.models import Subscription, Subscriber
+from counter.models import Customer, ProductType, Product
 
 class Command(BaseCommand):
     help = "Populate a new instance of the Sith AE"
