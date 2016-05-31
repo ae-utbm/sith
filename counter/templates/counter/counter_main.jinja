@@ -16,6 +16,17 @@
 
 
     <div>
+        <h3>Sellings</h3>
+        {% if last_basket %}
+            <h4>Last selling: </h4>
+            <p>Client: {{ last_customer }}, new amount: {{ new_customer_amount }} €.</p>
+            <ul>
+            {% for s in last_basket %}
+                <li>{{ s }}</li>
+            {% endfor %}
+            </ul>
+            <p><strong>Total: {{ last_total }} €</strong></p>
+        {% endif %}
         {% if barmen %}
         <p>Enter client code:</p>
         <form method="post" action="{{ url('counter:details', counter_id=counter.id) }}">

@@ -140,6 +140,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 
             # Counters
             Customer(user=skia, account_id="6568j", amount=0).save()
+            Customer(user=r, account_id="4000", amount=0).save()
             p = ProductType(name="Bières bouteilles")
             p.save()
             barb = Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",

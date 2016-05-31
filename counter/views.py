@@ -60,6 +60,11 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         kwargs['login_form'] = AuthenticationForm()
         kwargs['form'] = self.get_form()
         kwargs['barmen'] = Counter.get_barmen_list(self.object.id)
+        if 'last_basket' in self.request.session.keys():
+            kwargs['last_basket'] = self.request.session.pop('last_basket')
+            kwargs['last_customer'] = self.request.session.pop('last_customer')
+            kwargs['last_total'] = self.request.session.pop('last_total')
+            kwargs['new_customer_amount'] = self.request.session.pop('new_customer_amount')
         return kwargs
 
     def form_valid(self, form):
@@ -69,25 +74,8 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         self.kwargs['user_id'] = form.cleaned_data['user_id']
         return super(CounterMain, self).form_valid(form)
 
-
     def get_success_url(self):
         return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
-
-class BasketForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        print(kwargs)
-        super(BasketForm, self).__init__(*args, **kwargs)
-        for p in kwargs['initial']['counter'].products.all(): # TODO: filter on the allowed products for this counter
-            self.fields[p.id] = forms.IntegerField(label=p.name, required=False)
-            # TODO ^: add some extra infos for the products (price, or ID to load infos dynamically)
-
-    def clean(self):
-        cleaned_data = super(BasketForm, self).clean()
-        total = 0
-        for pid,q in cleaned_data.items():
-            p = Product.objects.filter(id=pid).first()
-            total += (q or 0)*p.selling_price
-        print(total)
 
 class CounterClick(DetailView):
     """
@@ -151,13 +139,33 @@ class CounterClick(DetailView):
 
     def finish(self, request):
         """ Finish the click session, and validate the basket """
+        if self.customer in Counter.get_barmen_list(self.object.id):
+            seller = self.customer.user
+            barman = True
+        else:
+            seller = Counter.get_random_barman(self.object.id)
+            barman = False
+        total = 0
+        kwargs = {
+                'counter_id': self.object.id,
+                }
+        request.session['last_basket'] = []
         for pid,qty in request.session['basket'].items():
             p = Product.objects.filter(pk=pid).first()
-            s = Selling(product=p, counter=self.object, unit_price=p.selling_price,
-                   quantity=qty, seller=Counter.get_random_barman(self.object.id), customer=self.customer)
+            if barman:
+                uprice = p.special_selling_price
+            else:
+                uprice = p.selling_price
+            total += uprice
+            request.session['last_basket'].append("%d x %s" % (qty, p.name))
+            s = Selling(product=p, counter=self.object, unit_price=uprice,
+                   quantity=qty, seller=seller, customer=self.customer)
             s.save()
-        kwargs = {'counter_id': self.object.id}
+        request.session['last_customer'] = self.customer.user.get_display_name()
+        request.session['last_total'] = str(total)
+        request.session['new_customer_amount'] = str(self.customer.amount)
         del request.session['basket']
+        request.session.modified = True
         return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))
 
     def cancel(self, request):

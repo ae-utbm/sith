@@ -22,7 +22,7 @@
     <p><strong>Club: </strong> {{ counter.club }}</p>
 
     <div>
-        <p>Customer: {{ customer }}</p>
+        <p>Customer: {{ customer.user.get_display_name() }}, {{ customer.amount }} €</p>
         <p>Basket: </p>
         <ul>
         {% for id,qte in request.session['basket'].items() %}

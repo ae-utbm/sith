@@ -269,6 +269,9 @@ class AnonymousUser(AuthAnonymousUser):
             return True
         return False
 
+    def get_display_name(self):
+        return _("Visitor")
+
 class LockError(Exception):
     """There was a lock error on the object"""
     pass
