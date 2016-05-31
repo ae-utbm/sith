@@ -181,7 +181,7 @@ class PageHandlingTest(TestCase):
         """
         Should create a page correctly
         """
-        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {
+        self.client.post(reverse('core:page_new'), {
             'parent': '',
             'name': 'guy',
             'owner_group': 1,
@@ -194,12 +194,12 @@ class PageHandlingTest(TestCase):
         """
         Should create a page correctly
         """
-        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {
+        self.client.post(reverse('core:page_new'), {
             'parent': '',
             'name': 'guy',
             'owner_group': '1',
             })
-        response = self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy/bibou'}), {
+        response = self.client.post(reverse('core:page_new'), {
             'parent': '1',
             'name': 'bibou',
             'owner_group': '1',
@@ -235,14 +235,13 @@ class PageHandlingTest(TestCase):
         """
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'swagg'}))
         self.assertTrue(response.status_code == 200)
-        self.assertTrue('<a href="/page/swagg/prop">Create it?</a>' in str(response.content))
-
+        self.assertTrue('<a href="/page/create?page=swagg">Create it?</a>' in str(response.content))
 
     def test_create_page_markdown_safe(self):
         """
         Should format the markdown and escape html correctly
         """
-        self.client.post(reverse('core:page_prop', kwargs={'page_name': 'guy'}), {
+        self.client.post(reverse('core:page_new'), {
             'parent': '',
             'name': 'guy',
             'owner_group': '1',

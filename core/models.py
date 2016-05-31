@@ -213,7 +213,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         if hasattr(obj, "is_owned_by") and obj.is_owned_by(self):
             return True
         if hasattr(obj, "owner_group") and self.is_in_group(obj.owner_group.name):
-            return False
+            return True
         if self.is_superuser or self.is_in_group(settings.SITH_GROUPS['root']['name']):
             return True
         return False

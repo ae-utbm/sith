@@ -1,9 +1,11 @@
 # This file contains all the views that concern the page model
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, CreateView
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
+from django.forms.models import modelform_factory
+from django.forms import CheckboxSelectMultiple
 
 from core.models import Page, PageRev, LockError
 from core.views.forms import PagePropForm
@@ -29,11 +31,6 @@ class PageView(CanViewMixin, DetailView):
         context = super(PageView, self).get_context_data(**kwargs)
         if "page" not in context.keys():
             context['new_page'] = self.kwargs['page_name']
-        if self.request.user.is_owner(self.object):
-            context['can_edit_prop'] = True
-        if self.request.user.can_edit(self.object):
-            context['can_edit'] = True
-
         return context
 
 class PageHistView(CanViewMixin, DetailView):
@@ -66,35 +63,66 @@ class PageRevView(CanViewMixin, DetailView):
             context['new_page'] = self.kwargs['page_name']
         return context
 
-class PagePropView(CanEditPropMixin, UpdateView):
+class PageCreateView(CanEditPropMixin, CreateView):
     model = Page
-    form_class = PagePropForm
+    form_class = modelform_factory(Page,
+            fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
+            widgets={
+                'edit_groups':CheckboxSelectMultiple,
+                'view_groups':CheckboxSelectMultiple,
+                })
     template_name = 'core/page_prop.jinja'
 
-    def get_object(self):
-        page_name = self.kwargs['page_name']
-        p = Page.get_page_by_full_name(page_name)
-        # Create the page if it does not exists
-        if p == None:
+    def get_initial(self):
+        init = {}
+        if 'page' in self.request.GET.keys():
+            page_name = self.request.GET['page']
             parent_name = '/'.join(page_name.split('/')[:-1])
-            name = page_name.split('/')[-1]
-            if parent_name == "":
-                p = Page(name=name)
-            else:
-                parent = Page.get_page_by_full_name(parent_name)
-                p = Page(name=name, parent=parent)
-        self.page = p
+            parent = Page.get_page_by_full_name(parent_name)
+            if parent is not None:
+                init['parent'] = parent.id
+            init['name'] = page_name.split('/')[-1]
+        return init
+
+    def get_context_data(self, **kwargs):
+        context = super(PageCreateView, self).get_context_data(**kwargs)
+        print(context)
+        context['new_page'] = True
+        return context
+
+    def form_valid(self, form):
+        form.instance.set_lock(self.request.user)
+        return super(PageCreateView, self).form_valid(form)
+
+class PagePropView(CanEditPropMixin, UpdateView):
+    model = Page
+    form_class = modelform_factory(Page,
+            fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
+            widgets={
+                'edit_groups':CheckboxSelectMultiple,
+                'view_groups':CheckboxSelectMultiple,
+                })
+    template_name = 'core/page_prop.jinja'
+    slug_field = '_full_name'
+    slug_url_kwarg = 'page_name'
+
+    def get_object(self):
+        o = super(PagePropView, self).get_object()
+        # Create the page if it does not exists
+        #if p == None:
+        #    parent_name = '/'.join(page_name.split('/')[:-1])
+        #    name = page_name.split('/')[-1]
+        #    if parent_name == "":
+        #        p = Page(name=name)
+        #    else:
+        #        parent = Page.get_page_by_full_name(parent_name)
+        #        p = Page(name=name, parent=parent)
+        self.page = o
         try:
             self.page.set_lock_recursive(self.request.user)
         except LockError as e:
             raise e
         return self.page
-
-    def get_context_data(self, **kwargs):
-        context = super(PagePropView, self).get_context_data(**kwargs)
-        if "page" not in context.keys():
-            context['new_page'] = self.kwargs['page_name']
-        return context
 
 class PageEditView(CanEditMixin, UpdateView):
     model = PageRev

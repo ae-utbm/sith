@@ -31,6 +31,7 @@ urlpatterns = [
 
     # Page views
     url(r'^page/$', PageListView.as_view(), name='page_list'),
+    url(r'^page/create$', PageCreateView.as_view(), name='page_new'),
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/edit$', PageEditView.as_view(), name='page_edit'),
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/prop$', PagePropView.as_view(), name='page_prop'),
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/hist$', PageHistView.as_view(), name='page_hist'),

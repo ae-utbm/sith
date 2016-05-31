@@ -5,6 +5,8 @@
         {{ page.get_display_name() }}
     {% elif page_list %}
         Page list
+    {% elif new_page %}
+        Create page
     {% else %}
         Not found
     {% endif %}
@@ -16,6 +18,6 @@
         {% endblock %}
     {% else %}
         <h2>Page does not exist</h2>
-        <p><a href="{{ url('core:page_prop', page_name=new_page) }}">Create it?</a></p>
+        <p><a href="{{ url('core:page_new') }}?page={{ request.resolver_match.kwargs['page_name'] }}">Create it?</a></p>
     {% endif %}
 {% endblock %}
