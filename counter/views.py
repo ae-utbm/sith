@@ -12,7 +12,7 @@ from django import forms
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from subscription.models import Subscriber
-from counter.models import Counter, Customer, Product
+from counter.models import Counter, Customer, Product, Selling, Refilling
 
 class GetUserForm(forms.Form):
     """
@@ -151,7 +151,11 @@ class CounterClick(DetailView):
 
     def finish(self, request):
         """ Finish the click session, and validate the basket """
-        # TODO: handle the basket
+        for pid,qty in request.session['basket'].items():
+            p = Product.objects.filter(pk=pid).first()
+            s = Selling(product=p, counter=self.object, unit_price=p.selling_price,
+                   quantity=qty, seller=Counter.get_random_barman(self.object.id), customer=self.customer)
+            s.save()
         kwargs = {'counter_id': self.object.id}
         del request.session['basket']
         return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))

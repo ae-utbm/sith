@@ -218,6 +218,11 @@ SITH_SUBSCRIPTION_PAYMENT_METHOD = [
         ('other', 'Autre'),
         ]
 
+SITH_COUNTER_PAYMENT_METHOD = [
+        ('cheque', 'Chèque'),
+        ('cash', 'Espèce'),
+        ]
+
 # Subscription durations are in semestres (should be settingized)
 SITH_SUBSCRIPTIONS = {
     'un-semestre': {

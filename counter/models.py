@@ -18,6 +18,7 @@ class Customer(models.Model):
     """
     user = models.OneToOneField(User, primary_key=True)
     account_id = models.CharField(_('account id'), max_length=10, unique=True)
+    amount = CurrencyField(_('amount'))
 
     class Meta:
         verbose_name = _('customer')
@@ -108,9 +109,64 @@ class Counter(models.Model):
                 Counter.barmen_session[counter_id]['users'] = set()
         return bl
 
+    def get_random_barman(counter_id): # TODO: improve this function
+        bl = Counter.get_barmen_list(counter_id)
+        return bl[0]
+
+class Refilling(models.Model):
+    """
+    Handle the refilling
+    """
+    counter = models.ForeignKey(Counter, related_name="refillings", blank=False)
+    amount = CurrencyField(_('amount'))
+    operator = models.ForeignKey(User, related_name="refill_operators", blank=False)
+    customer = models.ForeignKey(Customer, related_name="refill_customers", blank=False)
+    date = models.DateTimeField(_('date'), auto_now=True)
+    payment_method = models.CharField(_('payment method'), max_length=255,
+            choices=settings.SITH_COUNTER_PAYMENT_METHOD)
+    # TODO: add the bank if the payment is made by cheque
+
+    def __str__(self):
+        return "Refilling: %f for %s" % (self.amount, self.customer.user.get_display_name())
+
+    # def get_absolute_url(self):
+    #     return reverse('counter:details', kwargs={'counter_id': self.id})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        self.customer.amount += self.quantity * self.unit_price
+        self.customer.save()
+        super(Selling, self).save(*args, **kwargs)
+
+class Selling(models.Model):
+    """
+    Handle the sellings
+    """
+    product = models.ForeignKey(Product, related_name="sellings", blank=False)
+    counter = models.ForeignKey(Counter, related_name="sellings", blank=False)
+    unit_price = CurrencyField(_('unit price'))
+    quantity = models.IntegerField(_('quantity'))
+    seller = models.ForeignKey(User, related_name="sellers", blank=False)
+    customer = models.ForeignKey(Customer, related_name="customers", blank=False)
+    date = models.DateTimeField(_('date'), auto_now=True)
+
+    def __str__(self):
+        return "Selling: %d x %s (%f) for %s" % (self.quantity, self.product.name,
+                self.quantity*self.unit_price, self.customer.user.get_display_name())
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        self.customer.amount -= self.quantity * self.unit_price
+        self.customer.save()
+        super(Selling, self).save(*args, **kwargs)
+
+    # def get_absolute_url(self):
+    #     return reverse('counter:details', kwargs={'counter_id': self.id})
+
 
 # TODO:
 # une classe Vente
 # foreign key vers comptoir, vendeur, client, produit, mais stocker le prix du produit, pour gerer les maj de prix
 # une classe Rechargement
 # foreign key vers comptoir, vendeur, client, plus montant
+

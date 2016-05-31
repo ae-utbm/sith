@@ -8,7 +8,7 @@ from core.models import Group, User, Page, PageRev
 from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operation, AccountingType
 from club.models import Club, Membership
 from subscription.models import Subscription, Subscriber
-from counter.models import Customer, ProductType, Product
+from counter.models import Customer, ProductType, Product, Counter
 
 class Command(BaseCommand):
     help = "Populate a new instance of the Sith AE"
@@ -138,18 +138,27 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     address="Terre Du Milieu", parent=ae)
             troll.save()
 
-            # Accounting test values:
-            Customer(user=skia, account_id="6568j").save()
+            # Counters
+            Customer(user=skia, account_id="6568j", amount=0).save()
             p = ProductType(name="Bières bouteilles")
             p.save()
-            Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6", club=ae).save()
-            Product(name="Chimay", code="CBLE", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6", club=ae).save()
+            barb = Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",
+                    special_selling_price="1.6", club=ae)
+            barb.save()
+            cble = Product(name="Chimay Bleue", code="CBLE", product_type=p, purchase_price="1.50", selling_price="1.7",
+                    special_selling_price="1.6", club=ae)
+            cble.save()
             Product(name="Corsendonk", code="CORS", product_type=p, purchase_price="1.50", selling_price="1.7",
                     special_selling_price="1.6", club=ae).save()
             Product(name="Carolus", code="CARO", product_type=p, purchase_price="1.50", selling_price="1.7",
                     special_selling_price="1.6", club=ae).save()
+            mde = Counter(name="MDE", club=ae, type="BAR")
+            mde.save()
+            mde.products.add(barb)
+            mde.products.add(cble)
+            mde.save()
+
+            # Accounting test values:
             BankAccount(name="AE TG", club=ae).save()
             BankAccount(name="Carte AE", club=ae).save()
             ba = BankAccount(name="AE TI", club=ae)
