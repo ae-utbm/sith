@@ -26,7 +26,8 @@
         <p>Basket: </p>
         <ul>
         {% for id,qte in request.session['basket'].items() %}
-            <li>{{ del_product(id, '-') }} {{ qte }} {{ add_product(id, '+') }} {{ counter.products.filter(id=id).first().name }}</li>
+            {% set product = counter.products.filter(id=id).first() %}
+            <li>{{ del_product(id, '-') }} {{ qte }} {{ add_product(id, '+') }} {{ product.name }}</li>
         {% endfor %}
         </ul>
         <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">

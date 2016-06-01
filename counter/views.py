@@ -117,21 +117,47 @@ class CounterClick(DetailView):
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
+    def is_barman_price(self, ):
+        if self.customer in Counter.get_barmen_list(self.object.id):
+            return True
+        else:
+            return False
+
+    def get_price(self, pid):
+        p = Product.objects.filter(pk=pid).first()
+        if self.is_barman_price():
+            price = p.special_selling_price
+        else:
+            price = p.selling_price
+        print("Price: %s" % price)
+        return price
+
+
+    def sum_basket(self, request):
+        total = 0
+        for pid,infos in request.session['basket'].items():
+            total += infos['price'] * infos['qty']
+        print("Total: %s" % total)
+        return total
+
     def add_product(self, request):
         """ Add a product to the basket """
         pid = str(request.POST['product_id'])
+        price = self.get_price(pid)
+        if self.customer.amount - (self.sum_basket(request)+price) < 0:
+            return
         if pid in request.session['basket']:
-            request.session['basket'][pid] += 1
+            request.session['basket'][pid]['qty'] += 1
         else:
-            request.session['basket'][pid] = 1
+            request.session['basket'][pid] = {'qty': 1, 'price': price}
         request.session.modified = True
 
     def del_product(self, request):
         """ Delete a product from the basket """
         pid = str(request.POST['product_id'])
         if pid in request.session['basket']:
-            request.session['basket'][pid] -= 1
-            if request.session['basket'][pid] <= 0:
+            request.session['basket'][pid]['qty'] -= 1
+            if request.session['basket'][pid]['qty'] <= 0:
                 del request.session['basket'][pid]
         else:
             request.session['basket'][pid] = 0
@@ -139,24 +165,20 @@ class CounterClick(DetailView):
 
     def finish(self, request):
         """ Finish the click session, and validate the basket """
-        if self.customer in Counter.get_barmen_list(self.object.id):
+        if self.is_barman_price():
             seller = self.customer.user
-            barman = True
         else:
             seller = Counter.get_random_barman(self.object.id)
-            barman = False
         total = 0
-        kwargs = {
-                'counter_id': self.object.id,
-                }
         request.session['last_basket'] = []
         for pid,qty in request.session['basket'].items():
+            # This duplicates code for DB optimization (prevent to load many times the same object)
             p = Product.objects.filter(pk=pid).first()
-            if barman:
+            if self.is_barman_price():
                 uprice = p.special_selling_price
             else:
                 uprice = p.selling_price
-            total += uprice
+            total += uprice * qty
             request.session['last_basket'].append("%d x %s" % (qty, p.name))
             s = Selling(product=p, counter=self.object, unit_price=uprice,
                    quantity=qty, seller=seller, customer=self.customer)
@@ -166,6 +188,9 @@ class CounterClick(DetailView):
         request.session['new_customer_amount'] = str(self.customer.amount)
         del request.session['basket']
         request.session.modified = True
+        kwargs = {
+                'counter_id': self.object.id,
+                }
         return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))
 
     def cancel(self, request):
