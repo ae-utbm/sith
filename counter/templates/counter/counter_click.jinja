@@ -23,13 +23,18 @@
 
     <div>
         <p>Customer: {{ customer.user.get_display_name() }}, {{ customer.amount }} €</p>
+        {% if request.session['not_enough'] %}
+            <p><strong>Not enough money</strong></p>
+        {% endif %}
         <p>Basket: </p>
         <ul>
-        {% for id,qte in request.session['basket'].items() %}
+        {% for id,infos in request.session['basket'].items() %}
             {% set product = counter.products.filter(id=id).first() %}
-            <li>{{ del_product(id, '-') }} {{ qte }} {{ add_product(id, '+') }} {{ product.name }}</li>
+            {% set s = infos['qty'] * infos['price'] / 100 %}
+            <li>{{ del_product(id, '-') }} {{ infos['qty'] }} {{ add_product(id, '+') }} {{ product.name }}: {{ "%0.2f"|format(s) }} €</li>
         {% endfor %}
         </ul>
+        <p><strong>Total: {{ "%0.2f"|format(basket_total) }} €</strong></p>
         <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
             {% csrf_token %}
             <input type="hidden" name="action" value="finish">
