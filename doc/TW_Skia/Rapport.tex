@@ -66,22 +66,75 @@
 
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
+\par
+Il y a longtemps, au début des années 2000, l'Association des Étudiants a mis en place un site internet qui n'a eu de
+cesse d'évoluer au fil des ans. Grâce aux différents contributeurs qui s'y sont plongés, et qui ont pu y ajouter leurs
+fonctionnalités plus ou moins utiles, le site possède désormais un ensemble de fonctionnalité impressionnant.
+\par
+De la comptabilité à la gestion de la laverie, en passant par le forum ou le Matmatronch', le site de l'AE prend
+actuellement en charge la quasi totalité de la gestion de l'argent, et c'est là un de ces rôles les plus importants.
+\par
+Mais les vieilles technologies qu'il emploie, et le maintient plus ou moins aléatoire, en font un outil très difficile à
+maintenir à l'heure actuelle, et le besoin d'une refonte s'imposait de plus en plus.
+\par
+Le choix de technologies récentes, maintenues, et éprouvée a donc été fait, et le développement a pu commencer dès
+Novembre 2015, avec l'objectif d'une mise en production dans l'été 2016, au moins dans une version incluant
+l'intégralité des fonctions liées à l'argent, qui sont les plus critiques.
 
-\chapter{Choix technologiques}
-\label{cha:choix_technologiques}
+\chapter{Les technologies}
+\label{cha:les_technologies}
+\par
+C'est là un des choix les plus important lors d'un tel projet, puisqu'il se fait au début, et qu'il n'est ensuite plus
+possible de revenir en arrière. Le PHP vieillissant, et
+piègeux\footnote{\url{https://eev.ee/blog/2012/04/09/php-a-fractal-of-bad-design/}} a donc été mis de côté au profit
+d'un language plus stable, le Python dans sa version 3.
 
 \section{Django}
 \label{sec:django}
+\par
+Django est un framework web pour Python, commencé en XXXX, et fournissant un grand nombre de fonctionnalités pour
+développer un site rapidement et simplement. Cela inclut entre autre un serveur Web, pour les échanges HTTP, un parseur
+d'URL, pour le routage des différentes URI du site, un ORM\footnote{Object Relational Model} pour la gestion de la base
+de donnée, ou encore un moteur de template, pour les rendus HTML.
+
+\subsection{Les modèles avec l'ORM}
+\label{sub:les_modèles_avec_l_orm}
+
+\subsubsection{Le modèle en lui même}
+\label{ssub:Le modèle en lui même}
+
+\subsubsection{Les migrations}
+\label{ssub:Les migrations}
+
+
+\subsection{Les vues}
+\label{sub:les_vues}
+
+\subsubsection{Les URL}
+\label{ssub:Les URL}
+
+\subsubsection{Les fonctions de vue}
+\label{ssub:Les fonctions de vue}
+
+\subsubsection{Des vues basées sur des classes}
+\label{ssub:Des vues basées sur des classes}
 
 \section{Jinja2}
 \label{sec:jinja2}
+
+% TODO: bases des templates Jinja2
 
 
 \chapter{Organisation du projet}
 \label{cha:organisation_du_projet}
 
+\section{Le repertoire `sith`}
+\label{sec:le_repertoire_sith}
 
+\subsection{Les options}
+\label{sub:les_options}
 
+% settings.py
 
 \chapter{Les applications}
 \label{cha:les_applications}
