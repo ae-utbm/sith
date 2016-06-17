@@ -1,0 +1,160 @@
+%%
+%
+% Skia
+% skia@libskia.so
+%
+%%
+
+\documentclass[a4paper]{report}
+
+%packages
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage{graphicx}\graphicspath{{pix/}}
+\usepackage{float}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{fancyhdr}
+%Options: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
+\usepackage[Bjornstrup]{fncychap}
+\usepackage[procnames]{listings}
+\usepackage[colorlinks=true,linkcolor=black]{hyperref}
+\usepackage{pdfpages}
+\usepackage{titlesec, blindtext, color}
+
+%pdf metadata
+\hypersetup{
+    unicode=true,
+    colorlinks=true,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black,
+    pdfauthor={Skia <skia@libskia.so>},
+    pdftitle={},
+    pdfcreator={pdftex},
+    pdfsubject={},
+    pdfkeywords={},
+}
+
+
+\definecolor{keywords}{RGB}{200,0,90}
+\definecolor{comments}{RGB}{0,0,113}
+\definecolor{red}{RGB}{160,0,0}
+\definecolor{green}{RGB}{0,150,0}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    numbers=left,
+    numberstyle=\color{red},
+    keywordstyle=\color{keywords},
+    commentstyle=\color{comments},
+    stringstyle=\color{green},
+    showstringspaces=false,
+}
+
+%inner meta
+\title{Architecture de Sith: le nouveau site AE}
+\author{Skia (Florent JACQUET)}
+\date{\today}
+
+\begin{document}
+
+\tableofcontents
+\listoffigures
+
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+\chapter{Choix technologiques}
+\label{cha:choix_technologiques}
+
+\section{Django}
+\label{sec:django}
+
+\section{Jinja2}
+\label{sec:jinja2}
+
+
+\chapter{Organisation du projet}
+\label{cha:organisation_du_projet}
+
+
+
+
+\chapter{Les applications}
+\label{cha:les_applications}
+
+\section{Core}
+\label{sec:core}
+
+\section{Subscription}
+\label{sec:subscription}
+
+\section{Accounting}
+\label{sec:accounting}
+
+\section{Counter}
+\label{sec:counter}
+
+\section{Club}
+\label{sec:club}
+
+
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+\appendix
+\addtolength{\textheight}{60mm}
+\part*{Annexes}
+\addtolength{\topmargin}{-50mm}
+\definecolor{gray75}{gray}{0.75}
+\newcommand{\hsp}{\hspace{20pt}}
+\titleformat{\chapter}[block]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}[\vskip -2em]
+
+% \chapter{Classe python}
+% \label{python_class}
+% \begin{figure}[H]
+% \begin{lstlisting}[language=python,morekeywords={True,False}]
+% host_to_host = Table("host_to_host", Base.metadata,
+%     Column("cluster_id", Integer, ForeignKey("host.host_id"), primary_key=True),
+%     Column("node_id", Integer, ForeignKey("host.host_id"), primary_key=True)
+% )
+% class Host(Base):
+%     __tablename__ = 'host'
+%     host_id = Column(Integer, primary_key=True, nullable=False)
+%     groups = Column(String(30), ForeignKey("env.name"))
+%     name = Column(String(30), unique=True, nullable=False,
+%                     default="UNKNOWN HOST")
+%     address = Column(String(30), nullable=False, default="0.0.0.0")
+%     alias = Column(String(30), nullable=True, default="")
+%     state = Column(String(10), nullable=False, default=0)
+%     num_services = Column(Integer, nullable=False, default=0)
+%     num_services_crit = Column(Integer, nullable=False, default=0)
+%     num_services_unknown = Column(Integer, nullable=False, default=0)
+%     num_services_warn = Column(Integer, nullable=False, default=0)
+%     scheduled_downtime_depth = Column(Integer, nullable=False, default=0)
+%     _json_extra = Column(Text, nullable=True)
+%     _last_time = Column(DateTime, server_default=func.now(),
+%                             onupdate=func.current_timestamp())
+%     _location = Column(String(4), nullable=True)
+%     _nodes = relationship("Host",
+%                           backref="_clusters",
+%                           secondary=host_to_host,
+%                           primaryjoin=host_id==host_to_host.c.cluster_id,
+%                           secondaryjoin=host_id==host_to_host.c.node_id,
+%                          )
+% \end{lstlisting}
+% \caption{Classe python}
+% \end{figure}
+% \par
+% On voit bien que l'on définit les attributs de la classe à la manière des colonnes d'une table dans une base de
+% donnée.
+% \par
+% On met aussi ici en place une relation \emph{Many To Many} entre les Hosts à l'aide de la table de jointure définie
+% juste avant: \emph{host\_to\_host}.
+
+\end{document}
+
+%s/ \(SQLalchemy\|SQLite\)/ \\emph{\1}/
