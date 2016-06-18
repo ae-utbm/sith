@@ -12,6 +12,7 @@
 \usepackage[francais]{babel}
 \usepackage{graphicx}\graphicspath{{pix/}}
 \usepackage{float}
+\usepackage{scrextend}
 \usepackage[T1]{fontenc}
 \usepackage{color}
 \usepackage{fancyhdr}
@@ -39,15 +40,21 @@
 
 
 \definecolor{keywords}{RGB}{200,0,90}
-\definecolor{comments}{RGB}{0,0,113}
+\definecolor{comments}{RGB}{50,50,253}
 \definecolor{red}{RGB}{160,0,0}
-\definecolor{green}{RGB}{0,150,0}
+\definecolor{brown}{RGB}{160,100,100}
+\definecolor{green}{RGB}{0,200,0}
+\definecolor{darkgreen}{RGB}{0,130,0}
+\definecolor{gray}{RGB}{100,100,100}
 
 \lstset{
     language=Python,
     basicstyle=\ttfamily\small,
+    morekeywords={True,False},
+    morestring=[s][\color{darkgreen}]{r'}{'},
+    morestring=[s][\color{brown}]{"""}{"""},
     numbers=left,
-    numberstyle=\color{red},
+    numberstyle=\color{gray},
     keywordstyle=\color{keywords},
     commentstyle=\color{comments},
     stringstyle=\color{green},
@@ -66,46 +73,140 @@
 
 \chapter*{Introduction}
 \addcontentsline{toc}{chapter}{Introduction}
-\par
-Il y a longtemps, au début des années 2000, l'Association des Étudiants a mis en place un site internet qui n'a eu de
+\par Il y a longtemps, au début des années 2000, l'Association des Étudiants a mis en place un site internet qui n'a eu de
 cesse d'évoluer au fil des ans. Grâce aux différents contributeurs qui s'y sont plongés, et qui ont pu y ajouter leurs
 fonctionnalités plus ou moins utiles, le site possède désormais un ensemble de fonctionnalité impressionnant.
-\par
-De la comptabilité à la gestion de la laverie, en passant par le forum ou le Matmatronch', le site de l'AE prend
+\par De la comptabilité à la gestion de la laverie, en passant par le forum ou le Matmatronch', le site de l'AE prend
 actuellement en charge la quasi totalité de la gestion de l'argent, et c'est là un de ces rôles les plus importants.
-\par
-Mais les vieilles technologies qu'il emploie, et le maintient plus ou moins aléatoire, en font un outil très difficile à
+\par Mais les vieilles technologies qu'il emploie, et le maintient plus ou moins aléatoire, en font un outil très difficile à
 maintenir à l'heure actuelle, et le besoin d'une refonte s'imposait de plus en plus.
-\par
-Le choix de technologies récentes, maintenues, et éprouvée a donc été fait, et le développement a pu commencer dès
+\par Le choix de technologies récentes, maintenues, et éprouvée a donc été fait, et le développement a pu commencer dès
 Novembre 2015, avec l'objectif d'une mise en production dans l'été 2016, au moins dans une version incluant
 l'intégralité des fonctions liées à l'argent, qui sont les plus critiques.
 
 \chapter{Les technologies}
 \label{cha:les_technologies}
-\par
-C'est là un des choix les plus important lors d'un tel projet, puisqu'il se fait au début, et qu'il n'est ensuite plus
+\par C'est là un des choix les plus important lors d'un tel projet, puisqu'il se fait au début, et qu'il n'est ensuite plus
 possible de revenir en arrière. Le PHP vieillissant, et
 piègeux\footnote{\url{https://eev.ee/blog/2012/04/09/php-a-fractal-of-bad-design/}} a donc été mis de côté au profit
 d'un language plus stable, le Python dans sa version 3.
 
+\section{Python3}
+\label{sec:python3}
+\par Le site étant développé en Python, il est impératif d'avoir un environnement de développement approprié à ce
+language. L'outil \verb#virtualenv# permet d'installer un environnement Python de manière locale, sans avoir besoin des
+droits root pour installer des packages. De plus cela permet d'avoir sur sa machine plusieurs environnements différents,
+adaptés à chaque projet, avec chacun des versions différentes des même paquets.
+\par La procédure pour installer son \verb#virtualenv# est décrite dans le fichier \verb#README# situé à la racine du
+projet.
+
 \section{Django}
 \label{sec:django}
-\par
-Django est un framework web pour Python, commencé en XXXX, et fournissant un grand nombre de fonctionnalités pour
+\par Django est un framework web pour Python, apparu en 2005, et fournissant un grand nombre de fonctionnalités pour
 développer un site rapidement et simplement. Cela inclut entre autre un serveur Web, pour les échanges HTTP, un parseur
-d'URL, pour le routage des différentes URI du site, un ORM\footnote{Object Relational Model} pour la gestion de la base
+d'URL, pour le routage des différentes URI du site, un ORM\footnote{Object-Relational Mapper} pour la gestion de la base
 de donnée, ou encore un moteur de template, pour les rendus HTML.
+\par La version 1.8 de Django a été choisie pour le développement de ce projet, car c'est une version LTS (Long Term
+Support), c'est à dire qu'elle restera stable et maintenue plus longtemps que les autres (au moins jusqu'en Avril 2018).
+\par La documentation est disponible à cette addresse: \url{https://docs.djangoproject.com/en/1.8/}. Bien que ce rapport
+présente dans les grandes lignes le fonctionnement de Django, il n'est pas et ne se veut pas exhaustif, et la
+documentation restera donc toujours la référence à ce sujet.
+
+\subsection{Le fichier de management et l'organisation d'un projet}
+\label{sub:Le fichier de management et l'organisation d'un projet}
+
+\par Lors de la création d'un projet Django, plusieurs fichiers sont créés. Ces fichiers sont essentiels pour le projet,
+mais ne contiennent en général pas de code à proprement parler. Ce n'est pas là qu'on y développe quoi que ce soit.
+
+\subsubsection{manage.py}
+\label{ssub:manage.py}
+
+\par Le fichier \verb-manage.py-, situé à la racine, permet de lancer toutes les tâches d'administration du site. Parmis
+elles:
+\begin{itemize}
+    \item \textbf{startapp} \\
+        Créer une application
+    \item \textbf{makemigration} \\
+        Parser les modèles pour créer les fichiers de migration de la base de donnée
+    \item \textbf{migrate} \\
+        Appliquer les migrations sur la base de données
+    \item \textbf{runserver} \\
+        Pour lancer le serveur Web, et donc le site en lui même
+\end{itemize}
+
+\subsubsection{Un premier dossier}
+\label{ssub:Un premier dossier}
+\par Un premier dossier est toujours créé, du nom du projet, et contenant plusieurs fichiers: \verb#settings.py#,
+\verb#urls.py#, et \verb#wsgi.py#.
+
 
 \subsection{Les modèles avec l'ORM}
 \label{sub:les_modèles_avec_l_orm}
 
 \subsubsection{Le modèle en lui même}
 \label{ssub:Le modèle en lui même}
+\par Rien ne vaudra un bon exemple pour comprendre comment sont construits les modèles avec Django:
+\begin{addmargin}[-7em]{0em}
+\begin{lstlisting}
+class Club(models.Model): # (1)
+    """
+    The Club class, made as a tree to allow nice tidy organization
+    """ # (2)
+    name = models.CharField(_('name'), max_length=30) # (3)
+    parent = models.ForeignKey('Club', related_name='children', null=True, blank=True) # (4)
+    unix_name = models.CharField(_('unix name'), max_length=30, unique=True,
+            validators=[ # (5)
+                validators.RegexValidator(
+                    r'^[a-z0-9][a-z0-9._-]*[a-z0-9]$',
+                    _('Enter a valid unix name. This value may contain only '
+                        'letters, numbers ./-/_ characters.')
+                    ),
+                ],
+            error_messages={ # (6)
+                'unique': _("A club with that unix name already exists."),
+                },
+            )
+    address = models.CharField(_('address'), max_length=254)
+    email = models.EmailField(_('email address'), unique=True)
+    owner_group = models.ForeignKey(Group, related_name="owned_club",
+                                    default=settings.SITH_GROUPS['root']['id']) # (7)
+    edit_groups = models.ManyToManyField(Group, related_name="editable_club", blank=True) # (8)
+    view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
+\end{lstlisting}
+\end{addmargin}
+\par Explications:
+\begin{description}
+    \item[(1)] Un modèle hérite toujours de \verb#models.Model#. Il peut y avoir des intermédiaires, mais \verb#Model#
+        sera toujours en haut.
+    \item[(2)] Toujours penser à commenter le modèle.
+    \item[(3)] Un premier attribut: \verb#name#, de type \verb#CharField#. Il constitue une colonne dans la base de
+        donnée une fois que \verb#./manage.py migrate# a été appliqué.
+    \item[(4)] Une \verb#ForeignKey#, l'une des relations les plus utilisée. \verb#related_name# précise le nom qui sert
+        de retour vers cette classe depuis la classe pointée. Ici, elle est même récursive, puisque l'on pointe vers la
+        classe que l'on est en train de définir, ce qui donne au final une structure d'arbre.
+    \item[(5)] On peut toujours préciser des \verb#validators#, afin que le modèle soit contraint, et que Django
+        maintienne toujours des informations cohérentes dans la base.
+    \item[(6)] Un message d'erreur peut être précisé pour expliciter à l'utilisateur les problèmes rencontrés.
+    \item[(7)] On utilise ici le champ \verb#default# pour préciser une valeur par défaut au modèle, et celui-ci est
+        affecté à une valeur contenue dans les \verb#settings# de Django.
+    \item[(8)] Les \verb#ManyToManyField# permettent de générer automatiquement une table intermédiaire de manière
+        transparente afin d'avoir des relations doubles dans les deux classes mises en jeu.
+    \item[OneToOneField] Il n'est pas présent dans ce modèle, mais est très utilisé pour étendre une table avec des
+        informations supplémentaires sans toucher à la table originale.
+    \item[PRIMARY KEY] Les plus observateurs d'entre vous auront remarqué qu'il n'y a pas ici de \verb#PRIMARY KEY# de précisé. En
+        effet, Django s'en occupe automatiquement en rajoutant un champ \verb#id# jouant ce rôle. On peut alors y
+        accèder en l'appelant par son nom, \verb#id# la plupart du temps, sauf s'il a été personnalisé, ou bien par
+        l'attribut générique \verb#pk#, toujours présent pour désigner la \verb#PRIMARY KEY# d'un modèle, quelle qu'elle
+        soit.
+\end{description}
 
 \subsubsection{Les migrations}
 \label{ssub:Les migrations}
-
+\par Les migrations sont à lancer à chaque fois que l'on modifie un modèle. Elles permettent de conserver la base de
+donnée tout en la faisant évoluer dans sa structure, pour ajouter ou supprimer une colonne dans une table par exemple.
+\par Lancer la commande \verb#./manage.py makemigration [nom de l'appli]# va permettre de générer un fichier Python
+automatiquement, qui sera mis à la suite des précédents, et qui sera appliqué sur la base au moment du lancement de
+\verb#./manage.py migrate#.
 
 \subsection{Les vues}
 \label{sub:les_vues}
