@@ -4,8 +4,8 @@ all: rapport clean
 
 rapport: Rapport.tex
 	@echo "Compiling "$<
-	$(CC) $<
-	$(CC) $<
+	$(CC) -shell-escape $<
+	$(CC) -shell-escape $<
 
 clean:
 	@echo "Cleaning folder"
