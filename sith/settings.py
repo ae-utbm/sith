@@ -65,7 +65,6 @@ TEMPLATES = [
         "BACKEND": "django_jinja.backend.Jinja2",
         "APP_DIRS": True,
         "OPTIONS": {
-            # Match the template names ending in .html but not the ones in the admin folder.
             "match_extension": ".jinja",
             "app_dirname": "templates",
             "newstyle_gettext": True,

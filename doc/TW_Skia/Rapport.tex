@@ -308,35 +308,37 @@ tous les autres.
 \subsection{Exemple de template Jinja2}
 \label{sub:exemple_de_template_jinja2}
 
-
-\begin{addmargin}[-7em]{0em}
+\begin{addmargin}[-4em]{0em}
     \begin{minted}{jinja}
-{% extends "core/base.jinja" %}
+{% extends "core/base.jinja" %} {# (1) #}
 
-{% block title %}
-    {{ user.get_display_name() }}'s tools
+{% block title %} {# (2) #}
+    {{ user.get_display_name() }}'s tools {# (3) #}
 {% endblock %}
 
 {% block content %}
 <h3>User Tools</h3>
-<p><a href="{{ url('core:user_profile', user_id=request.user.id) }}">Back to profile</a></p>
+<p><a href="{{ url('core:user_profile', user_id=request.user.id) }}{# (4) #}">
+    Back to profile</a>
+</p>
 
 <h4>Sith management</h4>
 <ul>
-{% if user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+{% if user.is_in_group(settings.SITH_GROUPS['root']['name']) %} {# (5) #}
     <li><a href="{{ url('core:group_list') }}">Groups</a></li>
 {% endif %}
 {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) %}
     <li><a href="{{ url('accounting:bank_list') }}">Accounting</a></li>
 {% endif %}
-{% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+{% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or
+    user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
     <li><a href="{{ url('subscription:subscription') }}">Subscriptions</a></li>
     <li><a href="{{ url('counter:admin_list') }}">Counters management</a></li>
 {% endif %}
 </ul>
 <h4>Clubs</h4>
 <ul>
-    {% for m in user.membership.filter(end_date=None).all() %}
+    {% for m in user.membership.filter(end_date=None).all() %} {# (6) #}
     <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
     {% endfor %}
 </ul>
@@ -344,20 +346,60 @@ tous les autres.
     \end{minted}
 \end{addmargin}
 
+\begin{description}
+    \item[(1)] Nous faisons ici une extension d'un template existant afin de bénéficier des blocs déjà défini, et afin
+        d'intégrer le contenu de ce template dans celui déjà défini.
+    \item[(2)] \verb#title# est un bloc défini dans le template \verb#base.jinja#. Le redéfinir joue alors le même rôle
+        qu'une surcharge de méthode dans de l'héritage, et permet de remplacer le contenu du bloc, tout en conservant sa
+        place dans le template parent.
+    \item[(3)] La variable \verb#user# faisant ici partie du contexte, nous pouvons donc appeler une de ses méthodes
+        pour obtenir un contenu dynamiquement.
+    \item[(4)] L'appel à la fonction \verb#url()# permet de résoudre la route afin d'obtenir l'adresse appropriée en
+        fonction des arguments passé. Cette fonction fait généralement partie du contexte global, et est donc accessible
+        dans tous les templates.
+    \item[(5)] Les structures conditionnelles permettent d'afficher ou pas un élément en fonction de la valeur d'une
+        variable ou du retour d'une fonction.
+    \item[(6)] Le \verb#for# permet, comme en Python, d'itérer sur les éléments d'une liste. Ici, on fait même une
+        requête via l'ORM de \emph{Django} en utilisant un filtre pour obtenir directement des valeurs depuis la base de
+        donnée de manière transparente.
+\end{description}
 
-% TODO: bases des templates Jinja2
-
+\subsection{Le contexte}
+\label{sub:le_contexte}
+\par Le contexte dans lequel le template s'execute influe beaucoup sur la capacité de \emph{Jinja} à s'adapter
+dynamiquement au contenu. Plus on a de variables disponibles, plus on va pouvoir générer un contenu s'y adaptant.
+\par Il est possible de définir le contexte global, et donc ce qui est accessible dans tous les templates, comme il est
+possible d'ajouter manuellement et spécifiquement des variables au contexte pour un template particulier, dans une vue
+particulière.
 
 \chapter{Organisation du projet}
 \label{cha:organisation_du_projet}
 
-\section{Le repertoire `sith`}
-\label{sec:le_repertoire_sith}
+\par Après cette présentations des différentes technologies employées dans le projet, passons maintenant à une partie plus
+spécifique à Sith en lui même.
 
-\subsection{Les options}
-\label{sub:les_options}
+\section{Les options spécifiques}
+\label{sec:les_options_sp_cifiques}
 
-% settings.py
+\subsection{Django-jinja}
+\label{sub:django_jinja}
+\par \emph{Jinja} n'étant pas inclus de base dans \emph{Django}, le paquet \emph{Django-jinja} a été mis en place afin
+de bénéficier au mieux des performances de chacun, comme les filtres personnalisés de \emph{Django} dans la puissance des
+macros de \emph{Jinja}. Tout cela se trouve dans la variable \verb#TEMPLATES#.
+\par \emph{Jinja} a été ajouté afin de s'occuper uniquement des fichiers ayant l'extension \verb#.jinja# dans les
+dossiers \verb#templates# de chaque application.
+\par
+% TODO parler des variables ajoutées au contexte global
+
+\section{Les commandes ajoutées}
+\label{sec:les_commandes_ajout_es}
+
+\subsection{setup}
+\label{sub:setup}
+
+\subsection{populate}
+\label{sub:populate}
+
 
 \chapter{Les applications}
 \label{cha:les_applications}
