@@ -2,8 +2,10 @@ from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.shortcuts import render
 from django.core.urlresolvers import reverse_lazy
+from django.forms.models import modelform_factory
+from django.forms import HiddenInput
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType
 
 # Accounting types
@@ -113,13 +115,13 @@ class ClubAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete 
 
 # Journal views
 
-class JournalCreateView(CanEditMixin, CreateView):
+class JournalCreateView(CanCreateMixin, CreateView): # FIXME: anonymous user has been able to create a journal
     """
     Create a general journal
     """
     model = GeneralJournal
-    fields = ['name', 'start_date', 'club_account']
     template_name = 'accounting/account_edit.jinja'
+    fields = ['name', 'start_date', 'club_account']
 
 class JournalDetailView(CanViewMixin, DetailView):
     """
@@ -145,7 +147,7 @@ class OperationCreateView(CanEditMixin, CreateView):
     Create an operation
     """
     model = Operation
-    fields = ['journal', 'date', 'cheque_number', 'type']
+    fields = ['amount', 'journal', 'date', 'cheque_number', 'type']
     template_name = 'accounting/account_edit.jinja'
 
 class OperationEditView(CanViewMixin, UpdateView):

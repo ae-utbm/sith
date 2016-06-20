@@ -27,7 +27,7 @@ class CurrencyField(models.DecimalField):
 
 class BankAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
-    rib = models.CharField(_('rib'), max_length=255, blank=True)
+    iban = models.CharField(_('iban'), max_length=255, blank=True)
     number = models.CharField(_('account number'), max_length=255, blank=True)
     club = models.ForeignKey(Club, related_name="bank_accounts")
 
@@ -85,6 +85,23 @@ class GeneralJournal(models.Model):
     name = models.CharField(_('name'), max_length=30)
     closed = models.BooleanField(_('is closed'), default=False)
     club_account = models.ForeignKey(ClubAccount, related_name="journals", null=False)
+    amount = CurrencyField(_('amount'), default=0)
+
+    def __init__(self, *args, **kwargs):
+        super(GeneralJournal, self).__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        if self.id == None:
+            amount = 0
+        super(GeneralJournal, self).save(*args, **kwargs)
+
+    def can_be_created_by(user):
+        """
+        Method to see if an object can be created by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']): # TODO: add the treasurer of the club
+            return True
+        return False
 
     def is_owned_by(self, user):
         """

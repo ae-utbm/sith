@@ -4,7 +4,9 @@
     <h3>Club tools</h3>
     <p><a href="{{ url('club:club_view', club_id=object.id) }}">Back to club</a></p>
     <ul>
-        <li><a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object }}</a></li>
+        {% if object.club_account %}
+            <li>Accouting: <a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object }}</a></li>
+        {% endif %}
     </ul>
 {% endblock %}
 

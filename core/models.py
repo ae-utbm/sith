@@ -130,7 +130,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             return True
         if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked
             if 'subscription' in settings.INSTALLED_APPS:
-                from subscription import Subscriber
+                from subscription.models import Subscriber
                 s = Subscriber.objects.filter(pk=self.pk).first()
                 if s is not None and s.is_subscribed():
                     return True
@@ -255,6 +255,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):
         super(AnonymousUser, self).__init__()
+
+    def is_in_group(self, group_name):
+        """
+        The anonymous user is only the public group
+        """
+        if group_name == settings.SITH_GROUPS['public']['name']:
+            return True
+        return False
 
     def is_owner(self, obj):
         return False
