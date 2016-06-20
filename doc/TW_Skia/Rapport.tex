@@ -388,36 +388,136 @@ de bénéficier au mieux des performances de chacun, comme les filtres personnal
 macros de \emph{Jinja}. Tout cela se trouve dans la variable \verb#TEMPLATES#.
 \par \emph{Jinja} a été ajouté afin de s'occuper uniquement des fichiers ayant l'extension \verb#.jinja# dans les
 dossiers \verb#templates# de chaque application.
-\par
-% TODO parler des variables ajoutées au contexte global
+\par Un certain nombre de variables et fonctions ont été ajoutés au contexte global. Parmis elles, l'ensemble des
+filtres que \emph{Django} fournit, mais aussi un filtre pour passer de \emph{Markdown} à \emph{HTML}, l'ensemble du
+contenu de \verb#settings#, et enfin des fonction utiles dont voici la liste:
+\begin{itemize}
+    \item \textbf{can\_edit\_prop} permet, en fonction d'une variable \verb#user# et d'un objet, de savoir si
+        l'utilisateur donnée peut modifier les propriétés de cet objet.
+    \item \textbf{can\_edit} permet, en fonction d'une variable \verb#user# et d'un objet, de savoir si
+        l'utilisateur donnée peut éditer l'objet.
+    \item \textbf{can\_view} permet, en fonction d'une variable \verb#user# et d'un objet, de savoir si
+        l'utilisateur donnée peut voir l'objet.
+    \item \textbf{get\_subscriber} permet à partir d'un utilisateur d'obtenir son équivalent en objet \verb#subscriber#,
+        afin de vérifier l'état de sa cotisation.
+\end{itemize}
+
+\subsection{Liste des variables définies dans \textbf{settings.py}}
+\label{sub:liste_des_variables_d_finies_dans_settings.py}
+\begin{itemize}
+    \item \textbf{SITH\_MAIN\_CLUB} \\
+        Définit le club principal, en général propriétaire du site. Les membres du bureau de ce club auront accès à la
+        plupart des outils d'administration, droits que les autres clubs ne confèrent pas. Dans notre cas, c'est bien
+        évidemment l'AE elle même qui est définit ici.
+    \item \textbf{SITH\_START\_DATE} \\
+        Définit la date de début du semestre. Plusieurs fonctions se basent dessus, notamment pour remettre à jour
+        certains compteurs semestriel, ou pour les dates de début de certains types de cotisation comme la cotisation au
+        cursus.
+    \item \textbf{SITH\_GROUPS} \\
+        Définit les groupes nécessaires au fonctionnement du site, comme le groupe \verb#root#, les groupes
+        administrateurs de certains outils spécifiques comme la comptabilité, ou le groupe \verb#public#.
+    \item \textbf{SITH\_BOARD\_SUFFIX} \\
+        Définit le suffixe appliqué à chaque nom de club pour constituer le groupe des membres du bureau de ce club.
+    \item \textbf{SITH\_MEMBER\_SUFFIX} \\
+        Définit le suffixe appliqué à chaque nom de club pour constituer le groupe des membres de ce club.
+    \item \textbf{SITH\_MAIN\_BOARD\_GROUP} \\
+        Définit le nom du groupe constituant le bureau de l'association principale, pour éviter de le recalculer à
+        chaque fois. Il est définit en fonction des précédentes variable et ne devrait jamais être affecté à la main.
+    \item \textbf{SITH\_MAIN\_MEMBERS\_GROUP} \\
+        Définit le nom du groupe constituant les membres de l'association principale, pour éviter de le recalculer à
+        chaque fois. Il est définit en fonction des précédentes variable et ne devrait jamais être affecté à la main.
+    \item \textbf{SITH\_ACCOUNTING\_PAYMENT\_METHOD} \\
+        Définit les méthodes de paiement pour la comptabilité.
+    \item \textbf{SITH\_SUBSCRIPTION\_PAYMENT\_METHOD} \\
+        Définit les méthodes de paiement pour les cotisations.
+    \item \textbf{SITH\_COUNTER\_PAYMENT\_METHOD} \\
+        Définit les méthodes de paiement pour les comptoirs.
+    \item \textbf{SITH\_SUBSCRIPTIONS} \\
+        Définit les différentes cotisations possibles.
+    \item \textbf{SITH\_CLUB\_ROLES} \\
+        Définit les différentes postes possibles dans les clubs, ainsi que leur hiérarchie.
+    \item \textbf{SITH\_MAXIMUM\_FREE\_ROLE} \\
+        Définit jusqu'à quel rôle un utilisateur lambda peut s'ajouter seul dans un club sans requérir de droits
+        particuliers. Cela permet par exemple de s'ajouter à des mailings lists.
+    \item \textbf{SITH\_BARMAN\_TIMEOUT} \\
+        Définit au bout de combien de minutes d'inactivité les barmans sont déconnectés d'un comptoir.
+\end{itemize}
+
 
 \section{Les commandes ajoutées}
 \label{sec:les_commandes_ajout_es}
+\par Si cela ne suffit, il est possible d'enrichir de nouvelles commandes le script \verb#manage.py#. Cela a été fait
+pour \emph{Sith}, afin de pouvoir très rapidement déployer un environnement en ayant déjà les quelques données
+nécéssaires au fonctionnement du projet, comme le groupe \verb#root# par exemple.
 
 \subsection{setup}
 \label{sub:setup}
+\par La fonction \verb#setup# s'occupe simplement de supprimer le fichier \verb#db.sqlite3#, qui est le fichier de base
+de donnée utilisé pour le développement, et relance une procédure de migration pour reconstruire une base de donnée
+propre avant de la peupler.
+\par Cette commande permet donc de s'assurer que la base de donnée utilisée est neuve et non corrompue.
 
 \subsection{populate}
 \label{sub:populate}
-
+\par \verb#populate# permet de remplir la base de donnée avec dans un premier temps les données \textbf{nécéssaires} au
+bon fonctionnement du site. Cela comprend un superutilisateur, les groupes définis dans \verb#settings.SITH_GROUPS#,
+dont le groupe \verb#root# fait partie, une première page de Wiki, ainsi qu'un club racine, l'AE dans notre cas.
+\par Cette fonction prend un éventuel argument, \verb#--prod#, qui lui permet de mettre en place le strict minimum
+énoncé précédemment. Sinon, elle continue en ajoutant un certain nombre de données pratiques pour le développement,
+comme un certain nombre d'utilisateurs avec différents droits, de nouvelles pages dans le Wiki, de nouveaux clubs, des
+comptoirs et des produits, ainsi que des données de comptabilité.
+\par L'argument \verb#--prod# peut, en outre, être passé directement depuis la fonction \verb#setup#.
 
 \chapter{Les applications}
 \label{cha:les_applications}
+\par Chaque application va être détaillée ici. Cela permet de mettre en valeur le rôle de chacune, et de signaler les
+éventuelles particularités qui peuvent s'y trouver.
 
 \section{Core}
 \label{sec:core}
+\subsection{Résumé}
+\label{sub:r_sum_}
+\par L'application \emph{Core} est de loin la plus importante de toutes. C'est elle qui gère les utilisateurs ainsi que
+leurs droits. Le CMS y est aussi définit pour tout ce qui est pages de Wiki, pages statiques, ou l'ajout du filtre
+\verb#markdown# pour les templates.
+\subsection{Liste des modèles}
+\label{sub:liste_des_mod_les}
 
 \section{Subscription}
 \label{sec:subscription}
+\subsection{Résumé}
+\label{sub:r_sum_}
+
+\subsection{Liste des modèles}
+\label{sub:liste_des_mod_les}
+
 
 \section{Accounting}
 \label{sec:accounting}
+\subsection{Résumé}
+\label{sub:r_sum_}
+
+\subsection{Liste des modèles}
+\label{sub:liste_des_mod_les}
+
 
 \section{Counter}
 \label{sec:counter}
+\subsection{Résumé}
+\label{sub:r_sum_}
+
+\subsection{Liste des modèles}
+\label{sub:liste_des_mod_les}
+
 
 \section{Club}
 \label{sec:club}
+\subsection{Résumé}
+\label{sub:r_sum_}
+
+\subsection{Liste des modèles}
+\label{sub:liste_des_mod_les}
+
 
 
 \chapter*{Conclusion}
