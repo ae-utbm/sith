@@ -59,8 +59,7 @@
 
 \tableofcontents
 
-\chapter*{Introduction}
-\addcontentsline{toc}{chapter}{Introduction}
+\chapter{Introduction}
 \par Il y a longtemps, au début des années 2000, l'Association des Étudiants a mis en place un site internet qui n'a eu de
 cesse d'évoluer au fil des ans. Grâce aux différents contributeurs qui s'y sont plongés, et qui ont pu y ajouter leurs
 fonctionnalités plus ou moins utiles, le site possède désormais un ensemble de fonctionnalité impressionnant.
@@ -71,6 +70,10 @@ maintenir à l'heure actuelle, et le besoin d'une refonte s'imposait de plus en 
 \par Le choix de technologies récentes, maintenues, et éprouvée a donc été fait, et le développement a pu commencer dès
 Novembre 2015, avec l'objectif d'une mise en production dans l'été 2016, au moins dans une version incluant
 l'intégralité des fonctions liées à l'argent, qui sont les plus critiques.
+\par Soutenant les projets libres, j'ai décidé de placer le projet sous licence MIT, assurant ainsi une pérénité aux
+source. Si quelqu'un dans le futur souhaite le relicencier sous GPL ou autre, cela reste possible, mais je n'impose au
+départ que très peu de restrictions \footnote{La seule condition en réalité, est de toujours garder à sa place une copie
+de la licence originale, à savoir le fichier LICENSE à la racine du site.} .
 
 \chapter{Les technologies}
 \label{cha:les_technologies}
@@ -480,99 +483,223 @@ comptoirs et des produits, ainsi que des données de comptabilité.
 \par L'application \emph{Core} est de loin la plus importante de toutes. C'est elle qui gère les utilisateurs ainsi que
 leurs droits. Le CMS y est aussi définit pour tout ce qui est pages de Wiki, pages statiques, ou l'ajout du filtre
 \verb#markdown# pour les templates.
+
 \subsection{Liste des modèles}
 \label{sub:liste_des_mod_les}
+\begin{itemize}
+    \item \textbf{Group} \\
+        Ce modèle se subdivise en deux: RealGroup et MetaGroup, décrivant respectivement un vrai groupe géré à la main
+        dans la liste des groupes, et un meta-groupe, géré automatiquement, en général par les clubs, ou bien par les
+        cotisations.
+    \item \textbf{User} \\
+        Le modèle des utilisateurs, qui est ensuite décliné ou référencé dans beaucoup d'applications pour les
+        utilisations spécifiques. C'est toutefois ici que sont déclarés les fonctions de gestion des droits des
+        utilisateurs, afin de pouvoir les utiliser partout ailleurs.
+    \item \textbf{AnonymousUser} \\
+        Cette classe n'est pas un modèle stocké en base, puisqu'elle sert à instancier la variable \verb#user#
+        lorsqu'aucun utilisateur n'est connecté au site.
+    \item \textbf{Page} \\
+        Décrit une entité page, servant dans le Wiki ou pour les pages statiques du site. Cette classe s'occupe des
+        méta-données de la page, comme ses droits, mais son contenu est en réalité stocké dans un objet \verb#PageRev#.
+    \item \textbf{PageRev} \\
+        Décrit une révision de page. Utiliser une autre classe avec une \verb#ForeignKey# permet de gérer facilement un
+        historique des révisions.
+\end{itemize}
+
+\subsection{La gestion des droits}
+\label{sub:la_gestion_des_droits}
+\par La gestion des droits est implémentée de manière globale dans l'application Core.
+\par On trouve en effet dans \verb#views/__init__.py# un certain nombre de mixins \footnote{Un mixin est, en
+\emph{Django}, un terme désignant une classe abstraite qui ne peut pas servir de parente seule. Elle permet de
+surcharger certaines méthodes d'une autre classe abstraite afin de l'adapter à un comportement plus spécifique, mais
+reste totalement inutile quand elle est seule. La gestion des droits est un bon exemple puisqu'elle ne s'occupe pas
+vraiment de traitement des données comme les autres vues le ferait, elle permet simplement d'ajouter une condition à une
+autre classe où cette dernière renverrait un \emph{403 Forbidden} }  s'occupant de cela, en se basant sur
+un modèle général permettant de rendre compatible rapidement n'importe quel modèle que l'on voudrait protéger. Il suffit
+alors de déclarer dans la classe une certain nombre de méthodes et/ou d'attributs, le reste étant simplement déjà pris
+en charge par les mixins suivants:
+\begin{itemize}
+    \item \textbf{CanCreateMixin} \\
+        Cette classe est à mettre en parente d'une classe héritant de \verb#CreateView#, afin d'empêcher quelqu'un
+        n'ayant pas les droits de créer un objet.\\
+        Méthode correspondante à créer dans les modèles: \\
+        \verb#def can_be_created_by(user):# \\
+        (Attention, ce n'est pas une méthode prenant \verb#self# en premier paramètre!)
+    \item \textbf{CanEditPropMixin} \\
+        Cette classe protège l'objet pour l'édition avancée. Par exemple: éditer les droits sur une page, ou éditer les
+        droits accordé à un utilisateur. \\
+        Attribut correspondant à créer dans les modèles: \\
+        \verb#owner_group = models.ForeignKey(Group, # \\
+        \verb#     related_name="owned_user", default=settings.SITH_GROUPS['root']['id'])# \\
+        Méthode correspondante à créer dans les modèles: \\
+        \verb#def is_owned_by(self, user):# \\
+    \item \textbf{CanEditMixin} \\
+        Cette classe protège l'objet pour l'édition non avancée. Par exemple: éditer une page, ou éditer le profil d'un
+        utilisateur. \\
+        Attribut correspondant à créer dans les modèles: \\
+        \verb#edit_groups = models.ManyToManyField(Group, # \\
+        \verb#     related_name="editable_user", blank=True)# \\
+        Méthode correspondante à créer dans les modèles: \\
+        \verb#def can_be_edited_by(self, user):# \\
+    \item \textbf{CanEditPropMixin} \\
+        Cette classe protège l'objet pour la vue. Par exemple: consulter une page, ou voir le profil d'un utilisateur. \\
+        Attribut correspondant à créer dans les modèles: \\
+        \verb#view_groups = models.ManyToManyField(Group, # \\
+        \verb#     related_name="viewable_user", blank=True)# \\
+        Méthode correspondante à créer dans les modèles: \\
+        \verb#def can_be_viewed_by(self, user):# \\
+\end{itemize}
+\par Pour savoir si l'on doit implémenter les méthodes, les attributs, ou les deux, il faut simplement se poser la
+question de savoir si l'objet en question requiert une gestion des droits à l'échelle de la classe ou à l'échelle de
+l'objet, et si cette gestion peut être calculé par de la logique.
+\par Si on a besoin d'une gestion pour la classe, ou si du code peut être implémenter pour déterminer qui peut avoir tel
+droit, alors la méthode suffira. Mais si on a besoin d'une gestion au niveau de l'objet, alors il faudra certainement
+recourir aux attributs.
+\par Exemples:
+\begin{itemize}
+    \item Les comptes en banques sont gérés uniquement par les personnes faisant partie du groupe \verb#admin-compta#.
+        Ils ont donc tous les même droits, c'est une gestion au niveau de la classe, donc les méthodes suffisent.
+    \item Les classeurs de comptabilité sont gérés par les trésoriers des clubs, ils n'ont pas tous les même droits,
+        mais cela peut tout de même se calculer en fonction des postes dans les clubs correspondants. On a donc besoin
+        des méthodes uniquement.
+    \item Les pages n'appartiennent pas forcément à un club, ni à une quelconque entité, mais ont tout de même besoin de
+        gestion des droits au niveau de l'objet. L'ajout des attributs est donc nécessaire pour pouvoir gérer cela au
+        cas par cas.
+\end{itemize}
 
 \section{Subscription}
 \label{sec:subscription}
 \subsection{Résumé}
 \label{sub:r_sum_}
+\par Cette application étend le modèle \verb#User# pour y ajouter le support des cotisations. Elle fournit également les
+interfaces de cotisation.
 
 \subsection{Liste des modèles}
 \label{sub:liste_des_mod_les}
-
+\begin{itemize}
+    \item \textbf{Subscriber} \\
+        Un modèle proxy de \verb#User# fournissant les méthodes pour rapidement savoir si l'utilisateur est cotisant ou
+        non.
+    \item \textbf{Subscription} \\
+        Un modèle cotisation, pour stocker ces dernières. Cette classe fait automatiquement les calculs de début et de
+        fin de cotisation en fonction de la date du jour, du type de cotisation, et de la durée en semestre de
+        cotisation.
+\end{itemize}
 
 \section{Accounting}
 \label{sec:accounting}
 \subsection{Résumé}
 \label{sub:r_sum_}
+\par Cette application sert à gérer à la comptabilité. Elle est architecturée de façon hiérarchique, avec en haut, les
+comptes bancaires réels, qui contiennent eux des comptes de clubs, permettant de les diviser en plusieurs petits comptes
+en interne, et enfin les classeurs de trésorerie, propres à chaque compte club, permettant de faire les comptes en
+triant par semestre.
+\par De plus, cette application définit un nouveau type de champ dans la base de donnée: le champ \verb#CurrencyField#,
+permettant de stocker de valeurs monétaires.
 
 \subsection{Liste des modèles}
 \label{sub:liste_des_mod_les}
-
+\begin{itemize}
+    \item \textbf{BankAccount} \\
+        Le modèle des comptes bancaires.
+    \item \textbf{ClubAccount} \\
+        Le modèle des comptes clubs.
+    \item \textbf{GeneralJournal} \\
+        Le modèle des classeurs de comptabilité, généralement semestriels, mais ils peuvent toutefois fonctionner en
+        année pour les activités plus longues comme le Gala.
+    \item \textbf{AccountingType} \\
+        Le modèle pour stocker les types comptables, servant à remplir les opérations.
+    \item \textbf{Operation} \\
+        Le modèle des opérations, servant à remplir les classeurs comptables. Un opération peut être un débit ou un
+        crédit, et permet ensuite d'éditer des factures, par exemple.
+\end{itemize}
 
 \section{Counter}
 \label{sec:counter}
 \subsection{Résumé}
 \label{sub:r_sum_}
+\par Cette application s'occupe de la gestion des comptoirs. Elle définit ainsi des produits, et ajoute également le
+support du compte AE pour les utilisateurs.
 
 \subsection{Liste des modèles}
 \label{sub:liste_des_mod_les}
+\begin{itemize}
+    \item \textbf{Customer} \\
+        Ce modèle étend l'utilisateur pour lui rajouter un compte AE. Il est lié à la classe \verb#User# par un
+        \verb#OneToOneField#.
+    \item \textbf{ProductType} \\
+        Ce modèle ajoute des types de produits afin de catégoriser ces derniers.
+    \item \textbf{Product} \\
+        Ce modèle décrit les produits pouvant être vendus dans les différents comptoirs.
+    \item \textbf{Counter} \\
+        Ce modèle décrit les comptoirs, qui permettent de générer des recharges de compte et des ventes de produits.
+    \item \textbf{Refilling} \\
+        Ce modèle permet de stocker les rechargements de compte.
+    \item \textbf{Selling} \\
+        Ce modèle permet d'enregistrer toutes les ventes de produits.
+\end{itemize}
 
 
 \section{Club}
 \label{sec:club}
 \subsection{Résumé}
 \label{sub:r_sum_}
+\par Cette application permet de générer les clubs et les adhésions des utilisateur à ceux-ci.
 
 \subsection{Liste des modèles}
 \label{sub:liste_des_mod_les}
+\begin{itemize}
+    \item \textbf{Club} \\
+        Le modèle des clubs.
+    \item \textbf{Membership} \\
+        Le modèle des adhésions. Stocker cela dans un modèle à part permet de conserver un historique des personnes
+        ayant eu un rôle quelconque dans un club quelconque.
+\end{itemize}
 
 
 
-\chapter*{Conclusion}
-\addcontentsline{toc}{chapter}{Conclusion}
+\chapter{Conclusion}
+\par Encore une fois, ce rapport ne se veut absolument pas exhaustif sur quoi que ce soit.
+\par Concernant \emph{Python}, \emph{Django}, ou \emph{Jinja}, les documentations respectives sont toujours très bien
+faites, et permettront de répondre à toutes les questions techniques concernant les technologies.
+\par Concernant le projet \emph{Sith} en lui-même, ce rapport n'est pas non plus exhaustif. Pour cela, lire le code des
+différentes sections sera le meilleur moyen de comprendre le fonctionnement des différentes fonctions. Pour obtenir plus
+rapidement un résumé à jour des sources, le fichier \verb#Doxyfile# présent à la racine du site permet de regénérer de
+la documentation exhaustive rapidement à l'aide de \emph{Doxygen} (voir la section correspondante dans le README).
+\par J'espère toutefois que même s'il n'est pas complet, ce rapport permettra à tout futur contributeur de rentrer plus
+rapidement dans le projet.
+\par L'idéal serait également de maintenir à jour ce rapport du mieux possible en même temps que le développement
+avance, même si je ne me fais guère d'illusions en pratique.
 
-\appendix
-\addtolength{\textheight}{60mm}
-\part*{Annexes}
-\addtolength{\topmargin}{-50mm}
-\definecolor{gray75}{gray}{0.75}
-\newcommand{\hsp}{\hspace{20pt}}
-\titleformat{\chapter}[block]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}[\vskip -2em]
+\section{Pour le futur...}
+\label{sec:pour_le_futur}
+\par En l'état actuel des choses, un grand nombre d'éléments sont encore manquants au site:
+\begin{itemize}
+    \item Une API REST pour pouvoir facilement intégrer d'autres outils autour du site.
+    \item Du CSS, pour qu'il soit un peu plus joli à regarder.
+    \item Du Javascript, et particulièrement de l'AJAX pour améliorer l'ergonomie de certaines pages.
+    \item Un grand nombre de vues pour aider à gérer les données plus efficacement, ou à les gérer tout court dans
+        certains cas.
+    \item Quelques applications utiles à qui existent sur le site actuel, mais que je n'ai pas encore eu le temps de
+        développer: un forum, une galerie de photos, une gestion basique des fichiers pour uploader des documents dans
+        les pages ou le forum, un système de news, une newsletter (Weekmail), une gestion des sondages et des élections,
+        etc...
+\end{itemize}
 
-% \chapter{Classe python}
-% \label{python_class}
-% \begin{figure}[H]
-% \begin{lstlisting}[language=python,morekeywords={True,False}]
-% host_to_host = Table("host_to_host", Base.metadata,
-%     Column("cluster_id", Integer, ForeignKey("host.host_id"), primary_key=True),
-%     Column("node_id", Integer, ForeignKey("host.host_id"), primary_key=True)
-% )
-% class Host(Base):
-%     __tablename__ = 'host'
-%     host_id = Column(Integer, primary_key=True, nullable=False)
-%     groups = Column(String(30), ForeignKey("env.name"))
-%     name = Column(String(30), unique=True, nullable=False,
-%                     default="UNKNOWN HOST")
-%     address = Column(String(30), nullable=False, default="0.0.0.0")
-%     alias = Column(String(30), nullable=True, default="")
-%     state = Column(String(10), nullable=False, default=0)
-%     num_services = Column(Integer, nullable=False, default=0)
-%     num_services_crit = Column(Integer, nullable=False, default=0)
-%     num_services_unknown = Column(Integer, nullable=False, default=0)
-%     num_services_warn = Column(Integer, nullable=False, default=0)
-%     scheduled_downtime_depth = Column(Integer, nullable=False, default=0)
-%     _json_extra = Column(Text, nullable=True)
-%     _last_time = Column(DateTime, server_default=func.now(),
-%                             onupdate=func.current_timestamp())
-%     _location = Column(String(4), nullable=True)
-%     _nodes = relationship("Host",
-%                           backref="_clusters",
-%                           secondary=host_to_host,
-%                           primaryjoin=host_id==host_to_host.c.cluster_id,
-%                           secondaryjoin=host_id==host_to_host.c.node_id,
-%                          )
-% \end{lstlisting}
-% \caption{Classe python}
-% \end{figure}
-% \par
-% On voit bien que l'on définit les attributs de la classe à la manière des colonnes d'une table dans une base de
-% donnée.
-% \par
-% On met aussi ici en place une relation \emph{Many To Many} entre les Hosts à l'aide de la table de jointure définie
-% juste avant: \emph{host\_to\_host}.
+\section{Apports personnels}
+\label{sec:apports_personnels}
+\par Même s'il est vrai que j'ai beaucoup appris en développement ce site, cela reste avant tout un travail de quantité
+plus que de qualité: on définit des modèles, puis les vues correspondantes en terminant par les templates, et on répète
+l'opération pour l'application suivante.
+\par Mais j'ai tout de même pu mettre en place de l'intégration continue pour ce projet, ce qui a été certes, très
+rapide, mais toutefois très enrichissant, étant donnée que ces méthodes sont très en vogue ces derniers temps.
+\par J'ai également pu me familiariser d'avantage avec le fonctionnement d'un ORM, et la magie noire que cela permet de
+faire \footnote{Je trouve toujours magique de pouvoir faire une requête SQL au milieu d'un template sans que cela
+paraisse affreux :)}.
+\par Enfin, j'espère que ce projet va, en plus d'être correctement mené au bout, pouvoir être repris par la suite par
+les futurs membres de l'équipe info de l'AE, et pourquoi pas par d'autre contributeurs...
+\vskip 3em
+\emph{Skia <skia@libskia.so> - 2016}
 
 \end{document}
 
-%s/ \(SQLalchemy\|SQLite\)/ \\emph{\1}/
