@@ -132,7 +132,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             Club(name="Woenzel'UT", unix_name="woenzel",
                     address="Woenzel", parent=guyut).save()
             Club(name="BdF", unix_name="bdf",
-                    address="Guyéuéyuéyuyé").save()
+                    address="6 Bd Anatole France").save()
             Membership(user=skia, club=ae, role=3, description="").save()
             troll = Club(name="Troll Penché", unix_name="troll",
                     address="Terre Du Milieu", parent=ae)
@@ -166,6 +166,6 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             ba.save()
             ca = ClubAccount(name="Troll Penché", bank_account=ba, club=troll)
             ca.save()
-            AccountingType(code=666, label="Guy credit", movement_type='credit').save()
-            AccountingType(code=4000, label="Guy debit", movement_type='debit').save()
+            AccountingType(code=756, label="Someone gave us money", movement_type='credit').save()
+            AccountingType(code=8570, label="Had to pay for food", movement_type='debit').save()
 

@@ -1,6 +1,10 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
+<p>
+<a href="{{ url('accounting:bank_list') }}">Accounting</a> >
+{{ object.name }}
+</p>
     <h2>View account</h2>
     <ul>
     {% for k,v in object.__dict__.items() %}

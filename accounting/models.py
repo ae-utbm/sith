@@ -86,6 +86,7 @@ class GeneralJournal(models.Model):
     closed = models.BooleanField(_('is closed'), default=False)
     club_account = models.ForeignKey(ClubAccount, related_name="journals", null=False)
     amount = CurrencyField(_('amount'), default=0)
+    effective_amount = CurrencyField(_('effective_amount'), default=0)
 
     def __init__(self, *args, **kwargs):
         super(GeneralJournal, self).__init__(*args, **kwargs)
@@ -125,6 +126,70 @@ class GeneralJournal(models.Model):
     def __str__(self):
         return self.name
 
+    def update_amounts(self):
+        self.amount = 0
+        self.effective_amount = 0
+        for o in self.operations.all():
+            if o.type == "credit":
+                if o.done:
+                    self.effective_amount += o.amount
+                self.amount += o.amount
+            else:
+                if o.done:
+                    self.effective_amount -= o.amount
+                self.amount -= o.amount
+        self.save()
+
+class Operation(models.Model):
+    """
+    An operation is a line in the journal, a debit or a credit
+    """
+    journal = models.ForeignKey(GeneralJournal, related_name="operations", null=False)
+    amount = CurrencyField(_('amount'))
+    date = models.DateField(_('date'))
+    label = models.CharField(_('label'), max_length=50)
+    remark = models.TextField(_('remark'), max_length=255)
+    mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)
+    cheque_number = models.IntegerField(_('cheque number'), default=-1)
+    invoice = models.FileField(upload_to='invoices', null=True, blank=True)
+    done = models.BooleanField(_('is done'), default=False)
+    accounting_type = models.ForeignKey('AccountingType', related_name="operations")
+    type = models.CharField(_('operation type'), max_length=8, choices=[
+        ('debit', _('Debit')),
+        ('credit', _('Credit')),
+        ])
+
+    def save(self):
+        super(Operation, self).save()
+        self.journal.update_amounts()
+
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        m = self.journal.club_account.get_membership_for(user)
+        if m is not None and m.role >= 7:
+            return True
+        return False
+
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if self.journal.can_be_edited_by(user):
+            return True
+        return False
+
+    def get_absolute_url(self):
+        return reverse('accounting:journal_details', kwargs={'j_id': self.journal.id})
+
+    def __str__(self):
+        return "%d | %s | %d € | %s | %s | %s" % (
+                self.id, self.type, self.amount, self.date, self.accounting_type, self.done,
+                )
+
 class AccountingType(models.Model):
     """
     Class describing the accounting types.
@@ -148,44 +213,4 @@ class AccountingType(models.Model):
 
     def __str__(self):
         return self.movement_type+" - "+self.code+" - "+self.label
-
-class Operation(models.Model):
-    """
-    An operation is a line in the journal, a debit or a credit
-    """
-    journal = models.ForeignKey(GeneralJournal, related_name="operations", null=False)
-    amount = CurrencyField(_('amount'))
-    date = models.DateField(_('date'))
-    remark = models.TextField(_('remark'), max_length=255)
-    mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)
-    cheque_number = models.IntegerField(_('cheque number'))
-    invoice = models.FileField(upload_to='invoices', null=True, blank=True)
-    done = models.BooleanField(_('is done'), default=False)
-    type = models.ForeignKey(AccountingType, related_name="operations")
-
-    def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
-            return True
-        m = self.journal.club_account.get_membership_for(user)
-        if m is not None and m.role >= 7:
-            return True
-        return False
-
-    def can_be_edited_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
-        if self.journal.can_be_edited_by(user):
-            return True
-        return False
-
-
-    def get_absolute_url(self):
-        return reverse('accounting:journal_details', kwargs={'j_id': self.journal.id})
-
-    def __str__(self):
-        return str(self.id)+" - "+str(self.date)
 

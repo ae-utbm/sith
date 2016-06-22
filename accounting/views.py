@@ -147,7 +147,7 @@ class OperationCreateView(CanEditMixin, CreateView):
     Create an operation
     """
     model = Operation
-    fields = ['amount', 'journal', 'date', 'cheque_number', 'type']
+    fields = ['type', 'amount', 'label', 'remark', 'journal', 'date', 'cheque_number', 'accounting_type', 'done']
     template_name = 'accounting/account_edit.jinja'
 
 class OperationEditView(CanViewMixin, UpdateView):
@@ -156,6 +156,6 @@ class OperationEditView(CanViewMixin, UpdateView):
     """
     model = Operation
     pk_url_kwarg = "op_id"
-    fields = ['journal', 'date', 'cheque_number', 'type']
+    fields = ['amount', 'label', 'remark', 'date', 'cheque_number', 'accounting_type', 'done']
     template_name = 'accounting/account_edit.jinja'
 
