@@ -26,7 +26,7 @@ class AccountingTypeEditView(CanViewMixin, UpdateView):
     fields = ['code', 'label', 'movement_type']
     template_name = 'accounting/account_edit.jinja'
 
-class AccountingTypeCreateView(CanEditPropMixin, CreateView):
+class AccountingTypeCreateView(CanEditPropMixin, CreateView): # TODO: move to CanCreateMixin
     """
     Create an accounting type (for the admins)
     """
@@ -60,7 +60,7 @@ class BankAccountDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "b_account_id"
     template_name = 'accounting/bank_account_details.jinja'
 
-class BankAccountCreateView(CanEditPropMixin, CreateView):
+class BankAccountCreateView(CanEditPropMixin, CreateView): # TODO: move to CanCreateMixin
     """
     Create a bank account (for the admins)
     """
@@ -96,7 +96,7 @@ class ClubAccountDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "c_account_id"
     template_name = 'accounting/club_account_details.jinja'
 
-class ClubAccountCreateView(CanEditPropMixin, CreateView):
+class ClubAccountCreateView(CanEditPropMixin, CreateView): # TODO: move to CanCreateMixin
     """
     Create a club account (for the admins)
     """
@@ -115,7 +115,7 @@ class ClubAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete 
 
 # Journal views
 
-class JournalCreateView(CanCreateMixin, CreateView): # FIXME: anonymous user has been able to create a journal
+class JournalCreateView(CanCreateMixin, CreateView):
     """
     Create a general journal
     """
@@ -142,7 +142,7 @@ class JournalEditView(CanEditMixin, UpdateView):
 
 # Operation views
 
-class OperationCreateView(CanEditMixin, CreateView):
+class OperationCreateView(CanEditMixin, CreateView): # TODO: move to CanCreateMixin
     """
     Create an operation
     """
