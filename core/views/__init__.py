@@ -12,11 +12,6 @@ def forbidden(request):
 def not_found(request):
     return HttpResponseNotFound(render(request, "core/404.jinja"))
 
-def can_create(mod, user):
-    if mod.can_be_created_by(user):
-        return True
-    return False
-
 def can_edit_prop(obj, user):
     if obj is None or user.is_owner(obj):
         return True
@@ -37,12 +32,10 @@ class CanCreateMixin(View):
     This view is made to protect any child view that would create an object, and thus, that can not be protected by any
     of the following mixin
     """
-    def dispatch(self, request, *arg, **kwargs):
-        res = super(CanCreateMixin, self).dispatch(request, *arg, **kwargs)
-        if hasattr(self, 'model'):
-            mod = self.model
-        if can_create(mod, self.request.user):
-            return res
+    def form_valid(self, form):
+        obj = form.instance
+        if can_edit_prop(obj, self.request.user):
+            return super(CanCreateMixin, self).form_valid(form)
         raise PermissionDenied
 
 class CanEditPropMixin(View):

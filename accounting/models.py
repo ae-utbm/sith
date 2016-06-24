@@ -88,34 +88,12 @@ class GeneralJournal(models.Model):
     amount = CurrencyField(_('amount'), default=0)
     effective_amount = CurrencyField(_('effective_amount'), default=0)
 
-    def __init__(self, *args, **kwargs):
-        super(GeneralJournal, self).__init__(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        if self.id == None:
-            amount = 0
-        super(GeneralJournal, self).save(*args, **kwargs)
-
-    def can_be_created_by(user):
-        """
-        Method to see if an object can be created by the given user
-        """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']): # TODO: add the treasurer of the club
-            return True
-        return False
-
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
         """
         if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
             return True
-        return False
-
-    def can_be_edited_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
         if self.club_account.can_be_edited_by(user):
             return True
         return False
@@ -165,7 +143,7 @@ class Operation(models.Model):
         """
         if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
             return True
-        m = self.journal.club_account.get_membership_for(user)
+        m = self.journal.club_account.club.get_membership_for(user)
         if m is not None and m.role >= 7:
             return True
         return False
@@ -182,8 +160,8 @@ class Operation(models.Model):
         return reverse('accounting:journal_details', kwargs={'j_id': self.journal.id})
 
     def __str__(self):
-        return "%d | %d € | %s | %s | %s" % (
-                self.id, self.amount, self.date, self.accounting_type, self.done,
+        return "%d € | %s | %s | %s" % (
+                self.amount, self.date, self.accounting_type, self.done,
                 )
 
 class AccountingType(models.Model):

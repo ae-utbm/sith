@@ -26,7 +26,7 @@ class AccountingTypeEditView(CanViewMixin, UpdateView):
     fields = ['code', 'label', 'movement_type']
     template_name = 'core/edit.jinja'
 
-class AccountingTypeCreateView(CanEditPropMixin, CreateView): # TODO: move to CanCreateMixin
+class AccountingTypeCreateView(CanCreateMixin, CreateView):
     """
     Create an accounting type (for the admins)
     """
@@ -60,7 +60,7 @@ class BankAccountDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "b_account_id"
     template_name = 'accounting/bank_account_details.jinja'
 
-class BankAccountCreateView(CanEditPropMixin, CreateView): # TODO: move to CanCreateMixin
+class BankAccountCreateView(CanCreateMixin, CreateView):
     """
     Create a bank account (for the admins)
     """
@@ -96,7 +96,7 @@ class ClubAccountDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "c_account_id"
     template_name = 'accounting/club_account_details.jinja'
 
-class ClubAccountCreateView(CanEditPropMixin, CreateView): # TODO: move to CanCreateMixin
+class ClubAccountCreateView(CanCreateMixin, CreateView):
     """
     Create a club account (for the admins)
     """
@@ -158,7 +158,7 @@ class JournalEditView(CanEditMixin, UpdateView):
 
 # Operation views
 
-class OperationCreateView(CanEditMixin, CreateView): # TODO: move to CanCreateMixin
+class OperationCreateView(CanCreateMixin, CreateView):
     """
     Create an operation
     """
