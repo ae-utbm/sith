@@ -153,7 +153,7 @@ class JournalEditView(CanEditMixin, UpdateView):
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
-    fields = ['name', 'start_date', 'club_account']
+    fields = ['name', 'start_date', 'end_date', 'club_account', 'closed']
     template_name = 'core/edit.jinja'
 
 # Operation views
@@ -177,7 +177,7 @@ class OperationCreateView(CanCreateMixin, CreateView):
                 ret['journal'] = obj.id
         return ret
 
-class OperationEditView(CanViewMixin, UpdateView):
+class OperationEditView(CanEditMixin, UpdateView):
     """
     An edit view, working as detail for the moment
     """

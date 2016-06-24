@@ -8,7 +8,11 @@
 {{ object.name }}
 </p>
     <p><strong>Amount: </strong>{{ object.amount }} € - <strong>Effective amount: </strong>{{ object.effective_amount }} €</p>
+    {% if object.closed %}
+    <p>Journal is closed, you can not create operation</p>
+    {% else %}
     <p><a href="{{ url('accounting:op_new') }}?parent={{ object.id }}">New operation</a></p>
+    {% endif %}
     <table>
         <tr>
             <td>Nb</td>
@@ -16,7 +20,7 @@
             <td>Label</td>
             <td>Amount</td>
             <td>Payment mode</td>
-            <!-- <td>Target</td> -->
+            <!-- TODO: <td>Target</td> -->
             <td>Code</td>
             <td>Nature</td>
             <td>Done</td>
@@ -38,7 +42,11 @@
             <td>No</td>
             {% endif %}
             <td>{{ o.remark }}</td>
-            <td><a href="{{ url('accounting:op_edit', op_id=o.id) }}">Edit</a></td>
+            <td>
+                {% if not o.journal.closed %}
+                <a href="{{ url('accounting:op_edit', op_id=o.id) }}">Edit</a>
+                {% endif %}
+            </td>
         </tr>
     {% endfor %}
     </table>

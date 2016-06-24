@@ -70,6 +70,12 @@ class ClubAccount(models.Model):
             return True
         return False
 
+    def has_open_journal(self):
+        for j in self.journals.all():
+            if not j.closed:
+                return True
+        return False
+
     def get_absolute_url(self):
         return reverse('accounting:club_details', kwargs={'c_account_id': self.id})
 
@@ -143,6 +149,8 @@ class Operation(models.Model):
         """
         if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
             return True
+        if self.journal.closed:
+            return False
         m = self.journal.club_account.club.get_membership_for(user)
         if m is not None and m.role >= 7:
             return True
@@ -152,7 +160,7 @@ class Operation(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if self.journal.can_be_edited_by(user):
+        if self.is_owned_by(user):
             return True
         return False
 

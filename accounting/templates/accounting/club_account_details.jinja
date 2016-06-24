@@ -11,16 +11,41 @@
         <li>{{ k }} - {{ v }}</li>
     {% endfor %}
     </ul>
-    <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">New journal</a></p>
-    <ul>
+    {% if not object.has_open_journal() %}
+        <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">New journal</a></p>
+    {% else %}
+        <p>You can not create new journal while you still have one opened</p>
+    {% endif %}
+    <table>
+        <tr>
+            <td>Name</td>
+            <td>Start</td>
+            <td>End</td>
+            <td>Amount</td>
+            <td>Effective amount</td>
+            <td>Closed</td>
+        </tr>
     {% for j in object.journals.all() %}
-    <li>
-        <a href="{{ url('accounting:journal_details', j_id=j.id) }}">{{ j }}</a> -
-        <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">Edit</a>
-
-    </li>
+    <tr>
+        <td>{{ j.name }}</td>
+        <td>{{ j.start_date }}</td>
+        {% if j.end_date %}
+            <td>{{ j.end_date }}</td>
+        {% else %}
+            <td> - </td>
+        {% endif %}
+        <td>{{ j.amount }} €</td>
+        <td>{{ j.effective_amount }} €</td>
+        {% if j.closed %}
+        <td>Yes</td>
+        {% else %}
+        <td>No</td>
+        {% endif %}
+        <td> <a href="{{ url('accounting:journal_details', j_id=j.id) }}">View</a>
+        <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">Edit</a> </td>
+    </tr>
     {% endfor %}
-    </ul>
+    </table>
 
 {% endblock %}
 
