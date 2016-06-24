@@ -24,7 +24,7 @@ class AccountingTypeEditView(CanViewMixin, UpdateView):
     model = AccountingType
     pk_url_kwarg = "type_id"
     fields = ['code', 'label', 'movement_type']
-    template_name = 'accounting/account_edit.jinja'
+    template_name = 'core/edit.jinja'
 
 class AccountingTypeCreateView(CanEditPropMixin, CreateView): # TODO: move to CanCreateMixin
     """
@@ -32,7 +32,7 @@ class AccountingTypeCreateView(CanEditPropMixin, CreateView): # TODO: move to Ca
     """
     model = AccountingType
     fields = ['code', 'label', 'movement_type']
-    template_name = 'accounting/account_edit.jinja'
+    template_name = 'core/create.jinja'
 
 # BankAccount views
 
@@ -49,8 +49,8 @@ class BankAccountEditView(CanViewMixin, UpdateView):
     """
     model = BankAccount
     pk_url_kwarg = "b_account_id"
-    fields = ['name', 'rib', 'number']
-    template_name = 'accounting/account_edit.jinja'
+    fields = ['name', 'iban', 'number']
+    template_name = 'core/edit.jinja'
 
 class BankAccountDetailView(CanViewMixin, DetailView):
     """
@@ -65,8 +65,8 @@ class BankAccountCreateView(CanEditPropMixin, CreateView): # TODO: move to CanCr
     Create a bank account (for the admins)
     """
     model = BankAccount
-    fields = ['name', 'rib', 'number']
-    template_name = 'accounting/account_edit.jinja'
+    fields = ['name', 'iban', 'number']
+    template_name = 'core/create.jinja'
 
 class BankAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete to Close
     """
@@ -86,7 +86,7 @@ class ClubAccountEditView(CanViewMixin, UpdateView):
     model = ClubAccount
     pk_url_kwarg = "c_account_id"
     fields = ['name', 'club', 'bank_account']
-    template_name = 'accounting/account_edit.jinja'
+    template_name = 'core/edit.jinja'
 
 class ClubAccountDetailView(CanViewMixin, DetailView):
     """
@@ -102,7 +102,15 @@ class ClubAccountCreateView(CanEditPropMixin, CreateView): # TODO: move to CanCr
     """
     model = ClubAccount
     fields = ['name', 'club', 'bank_account']
-    template_name = 'accounting/account_edit.jinja'
+    template_name = 'core/create.jinja'
+
+    def get_initial(self):
+        ret = super(ClubAccountCreateView, self).get_initial()
+        if 'parent' in self.request.GET.keys():
+            obj = BankAccount.objects.filter(id=int(self.request.GET['parent'])).first()
+            if obj is not None:
+                ret['bank_account'] = obj.id
+        return ret
 
 class ClubAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete to Close
     """
@@ -120,8 +128,16 @@ class JournalCreateView(CanCreateMixin, CreateView):
     Create a general journal
     """
     model = GeneralJournal
-    template_name = 'accounting/account_edit.jinja'
     fields = ['name', 'start_date', 'club_account']
+    template_name = 'core/create.jinja'
+
+    def get_initial(self):
+        ret = super(JournalCreateView, self).get_initial()
+        if 'parent' in self.request.GET.keys():
+            obj = ClubAccount.objects.filter(id=int(self.request.GET['parent'])).first()
+            if obj is not None:
+                ret['club_account'] = obj.id
+        return ret
 
 class JournalDetailView(CanViewMixin, DetailView):
     """
@@ -138,7 +154,7 @@ class JournalEditView(CanEditMixin, UpdateView):
     model = GeneralJournal
     pk_url_kwarg = "j_id"
     fields = ['name', 'start_date', 'club_account']
-    template_name = 'accounting/account_edit.jinja'
+    template_name = 'core/edit.jinja'
 
 # Operation views
 
@@ -147,8 +163,19 @@ class OperationCreateView(CanEditMixin, CreateView): # TODO: move to CanCreateMi
     Create an operation
     """
     model = Operation
-    fields = ['type', 'amount', 'label', 'remark', 'journal', 'date', 'cheque_number', 'accounting_type', 'done']
-    template_name = 'accounting/account_edit.jinja'
+    # fields = ['type', 'amount', 'label', 'remark', 'journal', 'date', 'cheque_number', 'accounting_type', 'done']
+    form_class = modelform_factory(Operation,
+            fields=['amount', 'label', 'remark', 'journal', 'date', 'cheque_number', 'accounting_type', 'done'],
+            widgets={'journal': HiddenInput})
+    template_name = 'core/create.jinja'
+
+    def get_initial(self):
+        ret = super(OperationCreateView, self).get_initial()
+        if 'parent' in self.request.GET.keys():
+            obj = GeneralJournal.objects.filter(id=int(self.request.GET['parent'])).first()
+            if obj is not None:
+                ret['journal'] = obj.id
+        return ret
 
 class OperationEditView(CanViewMixin, UpdateView):
     """
@@ -157,5 +184,5 @@ class OperationEditView(CanViewMixin, UpdateView):
     model = Operation
     pk_url_kwarg = "op_id"
     fields = ['amount', 'label', 'remark', 'date', 'cheque_number', 'accounting_type', 'done']
-    template_name = 'accounting/account_edit.jinja'
+    template_name = 'core/edit.jinja'
 

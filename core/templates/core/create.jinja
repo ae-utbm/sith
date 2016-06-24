@@ -1,13 +1,14 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-    <h2>Edit account</h2>
+    <h2>Create</h2>
     <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p() }}
         <p><input type="submit" value="Save!" /></p>
     </form>
 {% endblock %}
+
 
 
 

@@ -8,7 +8,7 @@
 {{ object.name }}
 </p>
     <p><strong>Amount: </strong>{{ object.amount }} € - <strong>Effective amount: </strong>{{ object.effective_amount }} €</p>
-    <p><a href="{{ url('accounting:op_new') }}">New operation</a></p>
+    <p><a href="{{ url('accounting:op_new') }}?parent={{ object.id }}">New operation</a></p>
     <table>
         <tr>
             <td>Nb</td>

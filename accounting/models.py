@@ -130,7 +130,7 @@ class GeneralJournal(models.Model):
         self.amount = 0
         self.effective_amount = 0
         for o in self.operations.all():
-            if o.type == "credit":
+            if o.accounting_type.movement_type == "credit":
                 if o.done:
                     self.effective_amount += o.amount
                 self.amount += o.amount
@@ -154,10 +154,6 @@ class Operation(models.Model):
     invoice = models.FileField(upload_to='invoices', null=True, blank=True)
     done = models.BooleanField(_('is done'), default=False)
     accounting_type = models.ForeignKey('AccountingType', related_name="operations")
-    type = models.CharField(_('operation type'), max_length=8, choices=[
-        ('debit', _('Debit')),
-        ('credit', _('Credit')),
-        ])
 
     def save(self):
         super(Operation, self).save()
@@ -186,8 +182,8 @@ class Operation(models.Model):
         return reverse('accounting:journal_details', kwargs={'j_id': self.journal.id})
 
     def __str__(self):
-        return "%d | %s | %d € | %s | %s | %s" % (
-                self.id, self.type, self.amount, self.date, self.accounting_type, self.done,
+        return "%d | %d € | %s | %s | %s" % (
+                self.id, self.amount, self.date, self.accounting_type, self.done,
                 )
 
 class AccountingType(models.Model):

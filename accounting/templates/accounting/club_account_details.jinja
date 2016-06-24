@@ -11,7 +11,7 @@
         <li>{{ k }} - {{ v }}</li>
     {% endfor %}
     </ul>
-    <p><a href="{{ url('accounting:journal_new') }}">New journal</a></p>
+    <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">New journal</a></p>
     <ul>
     {% for j in object.journals.all() %}
     <li>
