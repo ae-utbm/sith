@@ -127,16 +127,16 @@ class Refilling(models.Model):
     # TODO: add the bank if the payment is made by cheque
 
     def __str__(self):
-        return "Refilling: %f for %s" % (self.amount, self.customer.user.get_display_name())
+        return "Refilling: %.2f for %s" % (self.amount, self.customer.user.get_display_name())
 
     # def get_absolute_url(self):
     #     return reverse('counter:details', kwargs={'counter_id': self.id})
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        self.customer.amount += self.quantity * self.unit_price
+        self.customer.amount += self.amount
         self.customer.save()
-        super(Selling, self).save(*args, **kwargs)
+        super(Refilling, self).save(*args, **kwargs)
 
 class Selling(models.Model):
     """

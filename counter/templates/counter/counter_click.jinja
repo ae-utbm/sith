@@ -22,7 +22,20 @@
     <p><strong>Club: </strong> {{ counter.club }}</p>
 
     <div>
-        <p>Customer: {{ customer.user.get_display_name() }}, {{ customer.amount }} €</p>
+        <h5>Customer</h5>
+        <p>{{ customer.user.get_display_name() }}, {{ customer.amount }} €</p>
+    </div>
+    <div>
+        <h5>Refilling</h5>
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="refill">
+            <input type="input" name="amount" value=""/>
+            <input type="submit" value="Go" />
+        </form>
+    </div>
+    <div>
+        <h5>Selling</h5>
         {% if request.session['not_enough'] %}
             <p><strong>Not enough money</strong></p>
         {% endif %}

@@ -64,6 +64,7 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         kwargs = super(CounterMain, self).get_context_data(**kwargs)
 # TODO: make some checks on the counter type, in order not to make the AuthenticationForm if there is no need to
         kwargs['login_form'] = AuthenticationForm()
+        kwargs['login_form'].fields['username'].widget.attrs['autofocus'] = True
         kwargs['form'] = self.get_form()
         kwargs['barmen'] = Counter.get_barmen_list(self.object.id)
         if 'last_basket' in self.request.session.keys():
@@ -120,6 +121,8 @@ class CounterClick(DetailView):
             self.add_product(request)
         elif 'del_product' in request.POST['action']:
             self.del_product(request)
+        elif 'refill' in request.POST['action']:
+            self.refill(request)
         elif 'code' in request.POST['action']:
             return self.parse_code(request)
         elif 'cancel' in request.POST['action']:
@@ -232,6 +235,17 @@ class CounterClick(DetailView):
         kwargs = {'counter_id': self.object.id}
         request.session.pop('basket', None)
         return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))
+
+    def refill(self, request):
+        """Refill the customer's account"""
+        if self.is_barman_price():
+            operator = self.customer.user
+        else:
+            operator = Counter.get_random_barman(self.object.id)
+        amount = float(request.POST['amount'])
+        s = Refilling(counter=self.object, operator=operator, customer=self.customer,
+                amount=amount, payment_method="cash")
+        s.save()
 
     def get_context_data(self, **kwargs):
         """ Add customer to the context """
