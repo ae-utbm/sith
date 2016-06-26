@@ -26,6 +26,12 @@
         {% if request.session['not_enough'] %}
             <p><strong>Not enough money</strong></p>
         {% endif %}
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="code">
+            <input type="input" name="code" value="" autofocus />
+            <input type="submit" value="Go" />
+        </form>
         <p>Basket: </p>
         <ul>
         {% for id,infos in request.session['basket'].items() %}

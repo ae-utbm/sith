@@ -8,7 +8,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
+import re
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from subscription.models import Subscriber
@@ -22,9 +24,13 @@ class GetUserForm(forms.Form):
     The Form implements a nice JS widget allowing the user to type a customer account id, or search the database with
     some nickname, first name, or last name (TODO)
     """
-    code = forms.CharField(label="Code", max_length=64, required=False)
+    code = forms.CharField(label="Code", max_length=10, required=False)
     id = forms.IntegerField(label="ID", required=False)
 # TODO: add a nice JS widget to search for users
+
+    def as_p(self):
+        self.fields['code'].widget.attrs['autofocus'] = True
+        return super(GetUserForm, self).as_p()
 
     def clean(self):
         cleaned_data = super(GetUserForm, self).clean()
@@ -114,6 +120,8 @@ class CounterClick(DetailView):
             self.add_product(request)
         elif 'del_product' in request.POST['action']:
             self.del_product(request)
+        elif 'code' in request.POST['action']:
+            return self.parse_code(request)
         elif 'cancel' in request.POST['action']:
             return self.cancel(request)
         elif 'finish' in request.POST['action']:
@@ -121,7 +129,7 @@ class CounterClick(DetailView):
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
-    def is_barman_price(self, ):
+    def is_barman_price(self):
         if self.customer.user.id in [s.id for s in Counter.get_barmen_list(self.object.id)]:
             return True
         else:
@@ -141,20 +149,21 @@ class CounterClick(DetailView):
             total += infos['price'] * infos['qty']
         return total / 100
 
-    def add_product(self, request, q = 1):
+    def add_product(self, request, q = 1, p=None):
         """ Add a product to the basket """
-        pid = str(request.POST['product_id'])
+        pid = p or str(request.POST['product_id'])
         price = self.get_price(pid)
         total = self.sum_basket(request)
-        if self.customer.amount < (total + float(price)):
+        if self.customer.amount < (total + q*float(price)):
             request.session['not_enough'] = True
-            return
+            return False
         if pid in request.session['basket']:
             request.session['basket'][pid]['qty'] += q
         else:
             request.session['basket'][pid] = {'qty': q, 'price': int(price*100)}
         request.session['not_enough'] = False
         request.session.modified = True
+        return True
 
     def del_product(self, request):
         """ Delete a product from the basket """
@@ -166,6 +175,29 @@ class CounterClick(DetailView):
         else:
             request.session['basket'][pid] = 0
         request.session.modified = True
+
+    def parse_code(self, request):
+        """Parse the string entered by the barman"""
+        string = str(request.POST['code']).upper()
+        if string == _("FIN"):
+            return self.finish(request)
+        elif string == _("ANN"):
+            return self.cancel(request)
+        regex = re.compile(r"^((?P<nb>[0-9]+)X)?(?P<code>[A-Z0-9]+)$")
+        m = regex.match(string)
+        if m is not None:
+            nb = m.group('nb')
+            code = m.group('code')
+            if nb is None:
+                nb = 1
+            else:
+                nb = int(nb)
+            p = Product.objects.filter(code=code).first()
+            if p is not None:
+                while nb > 0 and not self.add_product(request, nb, p.id):
+                    nb -= 1
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def finish(self, request):
         """ Finish the click session, and validate the basket """
