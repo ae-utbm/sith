@@ -20,9 +20,6 @@ class Subscriber(User):
     class Meta:
         proxy = True
 
-    def __init__(self, *args, **kwargs):
-        super(Subscriber, self).__init__(*args, **kwargs)
-
     def is_subscribed(self):
         s = self.subscriptions.last()
         return s.is_valid_now() if s is not None else False
@@ -47,21 +44,6 @@ class Subscription(models.Model):
         for s in Subscription.objects.filter(member=self.member).exclude(pk=self.pk).all():
             if s.is_valid_now():
                 raise ValidationError(_('You can not subscribe many time for the same period'))
-
-    def save(self, *args, **kwargs):
-        """
-        This makes the Subscription to be updated with right dates with respect to date.today() each time you save the
-        Subscription object.
-        It means that you must be careful when modifying old Subscription, because you could make
-        someone that had no more valid subscription to get one again!
-
-        TODO: FIXME by putting it in the right function that would be triggered only when using the right Form!!!!
-        """
-        self.subscription_start = self.compute_start()
-        self.subscription_end = self.compute_end(
-                duration=settings.SITH_SUBSCRIPTIONS[self.subscription_type]['duration'],
-                start=self.subscription_start)
-        super(Subscription, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ['subscription_start',]

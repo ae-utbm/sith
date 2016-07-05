@@ -19,7 +19,7 @@ class SubscriptionForm(forms.ModelForm):
         model = Subscription
         fields = ['member', 'subscription_type', 'payment_method']
 
-class NewSubscription(CanEditMixin, CreateView):
+class NewSubscription(CanEditMixin, CreateView): # TODO: this must be able to create a new user if needed
     template_name = 'subscription/subscription.jinja'
     form_class = SubscriptionForm
 
@@ -27,3 +27,11 @@ class NewSubscription(CanEditMixin, CreateView):
         if 'member' in self.request.GET.keys():
             return {'member': self.request.GET['member']}
         return {}
+
+    def form_valid(self, form):
+        form.instance.subscription_start = Subscription.compute_start()
+        form.instance.subscription_end = Subscription.compute_end(
+                duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'],
+                start=form.instance.subscription_start
+                )
+        return super(NewSubscription, self).form_valid(form)
