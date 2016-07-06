@@ -41,9 +41,14 @@ class Subscription(models.Model):
                 )
 
     def clean(self):
-        for s in Subscription.objects.filter(member=self.member).exclude(pk=self.pk).all():
-            if s.is_valid_now():
-                raise ValidationError(_('You can not subscribe many time for the same period'))
+        try:
+            for s in Subscription.objects.filter(member=self.member).exclude(pk=self.pk).all():
+                if s.is_valid_now():
+                    raise ValidationError(_("You can not subscribe many time for the same period"))
+        except: # This should not happen, because the form should have handled the data before, but sadly, it still
+                # calls the model validation :'(
+                # TODO see SubscriptionForm's clean method
+            raise ValidationError(_("You are trying to create a subscription without member"))
 
     class Meta:
         ordering = ['subscription_start',]
@@ -52,7 +57,11 @@ class Subscription(models.Model):
         return reverse('core:user_profile', kwargs={'user_id': self.member.pk})
 
     def __str__(self):
-        return self.member.username+' - '+str(self.pk)
+        if hasattr(self, "member") and self.member is not None:
+            return self.member.username+' - '+str(self.pk)
+        else:
+            return 'No user - '+str(self.pk)
+
 
     @staticmethod
     def compute_start(d=date.today()):

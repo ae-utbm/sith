@@ -119,7 +119,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return reverse('core:user_profile', kwargs={'user_id': self.pk})
 
     def __str__(self):
-        return self.username
+        return "User: " + self.username
 
     def to_dict(self):
         return self.__dict__
