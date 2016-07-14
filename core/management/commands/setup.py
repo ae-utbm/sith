@@ -13,10 +13,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         try:
-            os.unlink(os.path.join(root_path, 'db.sqlite3'))
             os.mkdir(os.path.join(root_path)+'/data')
         except Exception as e:
             print(e)
+        call_command('flush')
         call_command('migrate')
         if options['prod']:
             call_command('populate', '--prod')

@@ -50,13 +50,10 @@ class Club(models.Model):
         self.check_loop()
 
     def save(self):
-        super(Club, self).save()
-        try:
+        if self.id is None:
             MetaGroup(name=self.unix_name+settings.SITH_BOARD_SUFFIX).save()
             MetaGroup(name=self.unix_name+settings.SITH_MEMBER_SUFFIX).save()
-        except IntegrityError as e:
-            # Groups already exists
-            pass
+        super(Club, self).save()
 
     def __str__(self):
         return self.name

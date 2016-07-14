@@ -1,9 +1,11 @@
 import os
 from datetime import date
+from io import StringIO
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
 from django.conf import settings
+from django.db import connection
 
 
 from core.models import Group, User, Page, PageRev
@@ -19,15 +21,21 @@ class Command(BaseCommand):
         parser.add_argument('--prod', action="store_true")
 
     def handle(self, *args, **options):
+        os.environ['DJANGO_COLORS'] = 'nocolor'
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        for g in settings.SITH_GROUPS.values():
+            Group(id=g['id'], name=g['name']).save()
+        sqlcmd = StringIO()
+        call_command("sqlsequencereset", "core", "auth", stdout=sqlcmd)
+        cursor = connection.cursor()
+        print(sqlcmd.getvalue())
+        cursor.execute(sqlcmd.getvalue())
         root = User(username='root', last_name="", first_name="Bibou",
                  email="ae.info@utbm.fr",
                  date_of_birth="1942-06-12",
                  is_superuser=True, is_staff=True)
         root.set_password("plop")
         root.save()
-        for g in settings.SITH_GROUPS.values():
-            Group(id=g['id'], name=g['name']).save()
         ae = Club(name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
                 address=settings.SITH_MAIN_CLUB['address'])
         ae.save()
