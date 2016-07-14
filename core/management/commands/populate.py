@@ -1,4 +1,6 @@
 import os
+from datetime import date
+
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
 from django.conf import settings
@@ -111,17 +113,37 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 
             # Subscription
             ## Skia
-            Subscription(member=Subscriber.objects.filter(pk=skia.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
+            s = Subscription(member=Subscriber.objects.filter(pk=skia.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                    start=s.subscription_start)
+            s.save()
             ## Comptable
-            Subscription(member=Subscriber.objects.filter(pk=comptable.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
+            s = Subscription(member=Subscriber.objects.filter(pk=comptable.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                    start=s.subscription_start)
+            s.save()
             ## Richard
-            Subscription(member=Subscriber.objects.filter(pk=r.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
+            s = Subscription(member=Subscriber.objects.filter(pk=r.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                    start=s.subscription_start)
+            s.save()
             ## Subscriber
-            Subscription(member=Subscriber.objects.filter(pk=subscriber.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0]).save()
+            s = Subscription(member=Subscriber.objects.filter(pk=subscriber.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                    start=s.subscription_start)
+            s.save()
 
             # Clubs
             Club(name="Bibo'UT", unix_name="bibout",
