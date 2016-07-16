@@ -117,7 +117,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             p.set_lock(skia)
             p.save()
             with open(os.path.join(root_path)+'/README.md', 'r') as rm:
-                PageRev(page=p, title="REAMDE", author=skia, content=rm.read()).save()
+                PageRev(page=p, title="README", author=skia, content=rm.read()).save()
 
             # Subscription
             ## Skia

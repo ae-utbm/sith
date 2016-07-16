@@ -1,9 +1,161 @@
-body {
-    background: #EEE;
+/*--------------------------------GENERAL------------------------------*/
+body{
+    background-color:#EEE;
+    position: relative;
+    width: 100%;
+    font-family: sans-serif;
+}
+/*--------------------------------HEADER-------------------------------*/
+#logo {
+    margin-left: 5%;
+}
+header {
+    display: block;
+    position: absolute;
+    top : 0px;
+    right : 8%;
+    left: 40%;
+    background-color:#DDD;
+    height: 3em;
+}
+header a {
+    display: inline-block;
+    color: inherit;
+    text-decoration: none;
+    padding: 1em;
+}
+header a:hover {
+    color: #2D3;
 }
 
-div {
-    box-shadow: 2px 2px 10px #888888;
+/*---------------------------------NAV---------------------------------*/
+nav {
+    display: block;
+    width: 90%;
+    margin: 0px auto;
+    background: grey;
+    color: white;
+}
+
+nav a {
+    color: white;
+    font-style: normal;
+    font-weight: bolder;
+    text-decoration: none;
+    display: inline-block;
+    padding: 20px;
+}
+nav a:hover {
+    background: purple;
+}
+
+/*--------------------------------CONTENT------------------------------*/
+#content {
+    width: 88%;
+    margin: 0px auto;
+    padding: 1em 1%;
+    background: white;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    margin-top: 0.5em;
+}
+
+h1 {
+    font-size: 160%;
+    margin-left: 50px;
+}
+
+h2 {
+    font-size: 150%;
+    margin-left: 40px;
+}
+
+h3 {
+    font-size: 140%;
+    margin-left: 30px;
+}
+
+h4 {
+    font-size: 130%;
+    margin-left: 20px;
+}
+
+h5 {
+    font-size: 120%;
+    margin-left: 10px;
+}
+
+h6 {
+    font-size: 110%;
+    margin-left: 0px;
+}
+
+p, pre {
+    margin-top: 1em;
+    margin-left: 0px;
+}
+
+ul, ol {
+    margin-top: 1em;
+	list-style-type: disc;
+    margin-left: 25px;
+}
+
+.edit-bar {
+    display: block;
+    margin: 4px;
+}
+.edit-bar a {
+    display: inline-block;
+    margin: 4px;
+}
+
+/*-----------------------------USER PROFILE----------------------------*/
+.user_profile {
+}
+/*---------------------------------PAGE--------------------------------*/
+.page_content {
+    display: block;
     margin: 10px;
     padding: 10px;
+    background: white;
+}
+
+.page_content code {
+    font-family: monospace;
+    color: white;
+    background: black;
+    display: inline-block;
+    padding: 4px;
+    line-height: 120%;
+}
+
+/*--------------------------------FOOTER-------------------------------*/
+footer{
+    text-align: center;
+}
+
+/*--------------------------------MODALE-------------------------------*/
+.form-wrapper {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #DDD;
+    opacity: 0.8;
+    padding: 15px;
+    border-radius: 4px;
+}
+.form-wrapper>form {
+    display: inline-block;
+    position: absolute;
+    padding: 15px;
+    border-radius: 4px;
+    left: 30%;
+    top: 40%;
+    background-color: white;
 }

@@ -32,7 +32,7 @@
         <form method="post" action="{{ url('counter:details', counter_id=counter.id) }}">
             {% csrf_token %}
             {{ form.as_p() }}
-        <input type="submit" value="CLICK" />
+            <p><input type="submit" value="VALIDATE" /></p>
         </form>
         {% else %}
         <p>Please, login</p>
@@ -48,7 +48,7 @@
         <form method="post" action="{{ url('counter:login', counter_id=counter.id) }}">
             {% csrf_token %}
             {{ login_form.as_p() }}
-        <input type="submit" value="login" />
+            <p><input type="submit" value="LOGIN" /></p>
         </form>
     </div>
 {% endblock %}

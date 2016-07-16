@@ -5,24 +5,25 @@
 {% endblock %}
 
 {% block content %}
-<h3>User Profile</h3>
-<p><a href="{{ url('core:user_list') }}">Back to list</a></p>
-
-<ul>
+<div class="edit-bar">
 {% if can_edit(profile, request.user) or user.id == profile.id %}
-    <li><a href="{{ url('core:user_edit', user_id=profile.id) }}">Edit</a></li>
+    <a href="{{ url('core:user_edit', user_id=profile.id) }}">Edit</a>
 {% endif %}
 {% if can_edit_prop(profile, request.user) %}
-    <li><a href="{{ url('core:user_prop', user_id=profile.id) }}">Props</a></li>
+    <a href="{{ url('core:user_prop', user_id=profile.id) }}">Props</a>
 {% endif %}
-</ul>
+</div>
 
-<p>
-You're seeing the profile of <strong>{{ profile.get_full_name() }}</strong><br/>
-<strong>{{ profile.nick_name }}</strong><br/>
-<em>{{ profile.date_of_birth|date("d/m/Y") }}</em>
-</p>
+<h3>User Profile</h3>
 
+<hr>
+<div class="user_profile">
+<h4>{{ profile.get_full_name() }}</h4>
+<p>{{ profile.nick_name }}</p>
+<p>Born: {{ profile.date_of_birth|date("d/m/Y") }}</p>
+</div>
+
+{% if user.membership.filter(end_date=None).exists() %}
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
 User is subscriber until {{ get_subscriber(profile).subscriptions.last().subscription_end }}
@@ -30,6 +31,7 @@ User is subscriber until {{ get_subscriber(profile).subscriptions.last().subscri
 User is not subscribed. <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">New subscription</a>
 {% endif %}
 </p>
+{% endif %}
 
 {% endblock %}
 

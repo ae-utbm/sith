@@ -11,13 +11,14 @@
     {% endif %}
     <p>You're seeing the page <strong>{{ page.get_display_name() }}</strong> -
     <a href="{{ url('core:page_hist', page_name=page.get_full_name()) }}">History</a></p>
+    <hr>
     {% if rev %}
         <h4>This may not be the last update, you are seeing revision {{ rev.id }}!</h4>
         <h3>{{ rev.title }}</h3>
-        <p>{{ rev.content|markdown }}</p>
+        <div class="page_content">{{ rev.content|markdown }}</div>
     {% else %}
         <h3>{{ page.revisions.last().title }}</h3>
-        <p>{{ page.revisions.last().content|markdown }}</p>
+        <div class="page_content">{{ page.revisions.last().content|markdown }}</div>
     {% endif %}
 {% endblock %}
 
