@@ -154,7 +154,8 @@ class CounterClick(DetailView):
 
     def add_product(self, request, q = 1, p=None):
         """ Add a product to the basket """
-        pid = p or str(request.POST['product_id'])
+        pid = p or request.POST['product_id']
+        pid = str(pid)
         price = self.get_price(pid)
         total = self.sum_basket(request)
         if self.customer.amount < (total + q*float(price)):
