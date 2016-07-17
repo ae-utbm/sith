@@ -45,7 +45,7 @@ class RealGroup(Group):
     class Meta:
         proxy = True
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser):
     """
     Defines the base user class, useable in every app
 
@@ -91,26 +91,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateField(_('date joined'), auto_now_add=True)
-    owner_group = models.ForeignKey(Group, related_name="owned_user",
-                                    default=settings.SITH_GROUPS['root']['id'])
-    edit_groups = models.ManyToManyField(Group, related_name="editable_user", blank=True)
-    view_groups = models.ManyToManyField(Group, related_name="viewable_user", blank=True)
+    is_superuser = models.BooleanField(
+        _('superuser'),
+        default=False,
+        help_text=_(
+            'Designates whether this user is a superuser. '
+        ),
+    )
+    groups = models.ManyToManyField(RealGroup, related_name='users', blank=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
     # REQUIRED_FIELDS = ['email']
-
-    class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
-        # Add permissions like this to allow automatic permission validation in is_owner&co
-        # model: change_prop_<class_name>
-        #        view_<class_name>
-        permissions = (
-            ("change_prop_user", "Can change the user's properties (groups, ...)"),
-            ("view_user", "Can view user's profile"),
-        )
 
     def get_absolute_url(self):
         """

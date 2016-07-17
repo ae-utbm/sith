@@ -5,6 +5,8 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.views.generic.edit import UpdateView
 from django.views.generic import ListView, DetailView, TemplateView
+from django.forms.models import modelform_factory
+from django.forms import CheckboxSelectMultiple
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
@@ -114,14 +116,15 @@ class UserUpdateProfileView(CanEditMixin, UpdateView):
     template_name = "core/user_edit.jinja"
     fields = ('first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', )
 
-class UserUpdatePropView(CanEditPropMixin, UpdateView):
+class UserUpdateGroupView(CanEditPropMixin, UpdateView):
     """
     Edit a user's groups
     """
     model = User
     pk_url_kwarg = "user_id"
-    template_name = "core/user_prop.jinja"
-    form_class = UserPropForm
+    template_name = "core/user_group.jinja"
+    form_class = modelform_factory(User, fields=['groups'],
+            widgets={'groups':CheckboxSelectMultiple})
     context_object_name = "profile"
 
 class UserToolsView(TemplateView):

@@ -27,7 +27,7 @@ urlpatterns = [
     url(r'^user/$', UserListView.as_view(), name='user_list'),
     url(r'^user/(?P<user_id>[0-9]+)/$', UserView.as_view(), name='user_profile'),
     url(r'^user/(?P<user_id>[0-9]+)/edit$', UserUpdateProfileView.as_view(), name='user_edit'),
-    url(r'^user/(?P<user_id>[0-9]+)/prop$', UserUpdatePropView.as_view(), name='user_prop'),
+    url(r'^user/(?P<user_id>[0-9]+)/groups$', UserUpdateGroupView.as_view(), name='user_groups'),
     url(r'^user/tools/$', UserToolsView.as_view(), name='user_tools'),
     url(r'^user/(?P<user_id>[0-9]+)/account$', UserAccountView.as_view(), name='user_account'),
 

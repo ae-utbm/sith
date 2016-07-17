@@ -11,7 +11,7 @@ class RegisteringForm(UserCreationForm):
     required_css_class = 'required'
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'date_of_birth')
+        fields = ('first_name', 'last_name', 'email')
 
     def save(self, commit=True):
         user = super(RegisteringForm, self).save(commit=False)
@@ -27,21 +27,12 @@ class UserPropForm(forms.ModelForm):
     required_css_class = 'required'
     class Meta:
         model = User
-        fields = ['groups', 'edit_groups', 'view_groups']
-        labels = {
-            'edit_groups': "Edit profile group",
-            'view_groups': "View profile group",
-        }
+        fields = ['groups']
         help_texts = {
-            'edit_groups': "Groups that can edit this user's profile",
-            'view_groups': "Groups that can view this user's profile",
             'groups': "Which groups this user belongs to",
         }
         widgets = {
             'groups': CheckboxSelectMultiple,
-            'user_permissions': CheckboxSelectMultiple,
-            'edit_groups': CheckboxSelectMultiple,
-            'view_groups': CheckboxSelectMultiple,
         }
 
 class PagePropForm(forms.ModelForm):

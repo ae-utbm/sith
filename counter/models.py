@@ -85,7 +85,7 @@ class Counter(models.Model):
 
     def __getattribute__(self, name):
         if name == "owner_group":
-            return Group(name=self.club.unix_name+settings.SITH_BOARD_SUFFIX)
+            return Group.objects.filter(name=self.club.unix_name+settings.SITH_BOARD_SUFFIX).first()
         return object.__getattribute__(self, name)
 
     def __str__(self):
@@ -93,6 +93,9 @@ class Counter(models.Model):
 
     def get_absolute_url(self):
         return reverse('counter:details', kwargs={'counter_id': self.id})
+
+    def can_be_edited_by(self, user):
+        return user.is_in_group(settings.SITH_GROUPS['counter-admin']['name'])
 
     def can_be_viewed_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)

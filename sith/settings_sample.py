@@ -180,21 +180,34 @@ SITH_MAIN_CLUB = {
         'unix_name': "ae",
         'address': "6 Boulevard Anatole France, 90000 Belfort"
         }
+
+# Bar managers
+SITH_BAR_MANAGER = {
+        'name': "BdF",
+        'unix_name': "bdf",
+        'address': "6 Boulevard Anatole France, 90000 Belfort"
+        }
+
 # Define the date in the year serving as reference for the subscriptions calendar
 # (month, day)
 SITH_START_DATE = (8, 15) # 15th August
+
 SITH_GROUPS = {
     'root': {
         'id': 1,
-        'name': "root",
-    },
-    'accounting-admin': {
-        'id': 2,
-        'name': "accounting-admin",
+        'name': "Root",
     },
     'public': {
+        'id': 2,
+        'name': "Not registered users",
+    },
+    'accounting-admin': {
         'id': 3,
-        'name': "not-registered-users",
+        'name': "Accounting admin",
+    },
+    'counter-admin': {
+        'id': 4,
+        'name': "Counter admin",
     },
 }
 
@@ -215,6 +228,12 @@ SITH_SUBSCRIPTION_PAYMENT_METHOD = [
         ('cheque', 'Chèque'),
         ('cash', 'Espèce'),
         ('other', 'Autre'),
+        ]
+
+SITH_COUNTER_BARS = [
+        (1, "Foyer"),
+        (2, "MDE"),
+        (3, "La Gommette"),
         ]
 
 SITH_COUNTER_PAYMENT_METHOD = [

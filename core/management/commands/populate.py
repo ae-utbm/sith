@@ -20,25 +20,38 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--prod', action="store_true")
 
+    def reset_index(self, *args):
+        sqlcmd = StringIO()
+        call_command("sqlsequencereset", *args, stdout=sqlcmd)
+        cursor = connection.cursor()
+        cursor.execute(sqlcmd.getvalue())
+
     def handle(self, *args, **options):
         os.environ['DJANGO_COLORS'] = 'nocolor'
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         for g in settings.SITH_GROUPS.values():
             Group(id=g['id'], name=g['name']).save()
-        sqlcmd = StringIO()
-        call_command("sqlsequencereset", "core", "auth", stdout=sqlcmd)
-        cursor = connection.cursor()
-        print(sqlcmd.getvalue())
-        cursor.execute(sqlcmd.getvalue())
+        self.reset_index("core", "auth")
         root = User(username='root', last_name="", first_name="Bibou",
                  email="ae.info@utbm.fr",
                  date_of_birth="1942-06-12",
                  is_superuser=True, is_staff=True)
         root.set_password("plop")
         root.save()
-        ae = Club(name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
+        main_club = Club(name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
                 address=settings.SITH_MAIN_CLUB['address'])
-        ae.save()
+        main_club.save()
+        bar_club = Club(name=settings.SITH_BAR_MANAGER['name'], unix_name=settings.SITH_BAR_MANAGER['unix_name'],
+                address=settings.SITH_BAR_MANAGER['address'])
+        bar_club.save()
+        for b in settings.SITH_COUNTER_BARS:
+            g = Group(name=b[1]+" admin")
+            g.save()
+            c = Counter(id=b[0], name=b[1], club=bar_club, type='BAR')
+            c.save()
+            c.edit_groups = [g]
+            c.save()
+        self.reset_index("counter")
         p = Page(name='Index')
         p.set_lock(root)
         p.save()
@@ -77,6 +90,16 @@ Welcome to the wiki page!
             subscriber.save()
             subscriber.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             subscriber.save()
+            # Adding user Counter admin
+            counter = User(username='counter', last_name="Ter", first_name="Coun",
+                     email="counter@git.an",
+                     date_of_birth="1942-06-12",
+                     is_superuser=False, is_staff=False)
+            counter.set_password("plop")
+            counter.save()
+            counter.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            counter.groups=[Group.objects.filter(name=settings.SITH_GROUPS['counter-admin']['name']).first().id]
+            counter.save()
             # Adding user Comptable
             comptable = User(username='comptable', last_name="Able", first_name="Compte",
                      email="compta@git.an",
@@ -155,17 +178,15 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 
             # Clubs
             Club(name="Bibo'UT", unix_name="bibout",
-                    address="46 de la Boustifaille", parent=ae).save()
+                    address="46 de la Boustifaille", parent=main_club).save()
             guyut = Club(name="Guy'UT", unix_name="guyut",
-                    address="42 de la Boustifaille", parent=ae)
+                    address="42 de la Boustifaille", parent=main_club)
             guyut.save()
             Club(name="Woenzel'UT", unix_name="woenzel",
                     address="Woenzel", parent=guyut).save()
-            Club(name="BdF", unix_name="bdf",
-                    address="6 Bd Anatole France").save()
-            Membership(user=skia, club=ae, role=3, description="").save()
+            Membership(user=skia, club=main_club, role=3, description="").save()
             troll = Club(name="Troll Penché", unix_name="troll",
-                    address="Terre Du Milieu", parent=ae)
+                    address="Terre Du Milieu", parent=main_club)
             troll.save()
 
             # Counters
@@ -174,25 +195,24 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             p = ProductType(name="Bières bouteilles")
             p.save()
             barb = Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6", club=ae)
+                    special_selling_price="1.6", club=main_club)
             barb.save()
             cble = Product(name="Chimay Bleue", code="CBLE", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6", club=ae)
+                    special_selling_price="1.6", club=main_club)
             cble.save()
             Product(name="Corsendonk", code="CORS", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6", club=ae).save()
+                    special_selling_price="1.6", club=main_club).save()
             Product(name="Carolus", code="CARO", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6", club=ae).save()
-            mde = Counter(name="MDE", club=ae, type="BAR")
-            mde.save()
+                    special_selling_price="1.6", club=main_club).save()
+            mde = Counter.objects.filter(name="MDE").first()
             mde.products.add(barb)
             mde.products.add(cble)
             mde.save()
 
             # Accounting test values:
-            BankAccount(name="AE TG", club=ae).save()
-            BankAccount(name="Carte AE", club=ae).save()
-            ba = BankAccount(name="AE TI", club=ae)
+            BankAccount(name="AE TG", club=main_club).save()
+            BankAccount(name="Carte AE", club=main_club).save()
+            ba = BankAccount(name="AE TI", club=main_club)
             ba.save()
             ca = ClubAccount(name="Troll Penché", bank_account=ba, club=troll)
             ca.save()

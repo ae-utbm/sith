@@ -12,14 +12,27 @@
 {% if user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
     <li><a href="{{ url('core:group_list') }}">Groups</a></li>
 {% endif %}
+{% if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']) %}
+    <li><a href="{{ url('counter:admin_list') }}">Counters management</a></li>
+{% endif %}
 {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) %}
     <li><a href="{{ url('accounting:bank_list') }}">Accounting</a></li>
 {% endif %}
 {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
     <li><a href="{{ url('subscription:subscription') }}">Subscriptions</a></li>
-    <li><a href="{{ url('counter:admin_list') }}">Counters management</a></li>
 {% endif %}
 </ul>
+
+<h4>Counters</h4>
+<ul>
+{% for b in settings.SITH_COUNTER_BARS %}
+    {% if user.is_in_group(b[1]+" admin") %}
+        <li><a href="{{ url('counter:details', counter_id=b[0]) }}">{{ b[1] }}</a> -
+            <a href="{{ url('counter:admin', counter_id=b[0]) }}">Edit</a></li>
+    {% endif %}
+{% endfor %}
+</ul>
+
 <h4>Clubs</h4>
 <ul>
     {% for m in user.membership.filter(end_date=None).all() %}

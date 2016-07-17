@@ -11,8 +11,7 @@
         <ul>
             {% for c in counter_list  %}
             <li><a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
-                <a href="{{ url('counter:admin', counter_id=c.id) }}">Edit</a> -
-                <a href="{{ url('counter:delete', counter_id=c.id) }}">Delete</a></li>
+                <a href="{{ url('counter:admin', counter_id=c.id) }}">Edit</a></li>
             {% endfor %}
         </ul>
     {% else %}

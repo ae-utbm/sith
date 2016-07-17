@@ -8,7 +8,7 @@
     <a href="{{ url('core:user_edit', user_id=profile.id) }}">Edit</a>
 {% endif %}
 {% if can_edit_prop(profile, request.user) %}
-    <a href="{{ url('core:user_prop', user_id=profile.id) }}">Props</a>
+    <a href="{{ url('core:user_groups', user_id=profile.id) }}">Groups</a>
 {% endif %}
 {% if (profile == request.user
        or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
