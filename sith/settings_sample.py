@@ -222,6 +222,13 @@ SITH_COUNTER_PAYMENT_METHOD = [
         ('cash', 'Espèce'),
         ]
 
+SITH_COUNTER_BANK = [
+        ('other', 'Autre'),
+        ('la-poste', 'La Poste'),
+        ('credit-agricole', 'Credit Agricole'),
+        ('credit-mutuel', 'Credit Mutuel'),
+        ]
+
 # Subscription durations are in semestres (should be settingized)
 SITH_SUBSCRIPTIONS = {
     'un-semestre': {

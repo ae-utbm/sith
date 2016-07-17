@@ -29,8 +29,8 @@
         <h5>Refilling</h5>
         <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
             {% csrf_token %}
+            {{ refill_form.as_p() }}
             <input type="hidden" name="action" value="refill">
-            <input type="input" name="amount" value=""/>
             <input type="submit" value="Go" />
         </form>
     </div>

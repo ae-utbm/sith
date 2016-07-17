@@ -123,8 +123,9 @@ class Refilling(models.Model):
     customer = models.ForeignKey(Customer, related_name="refill_customers", blank=False)
     date = models.DateTimeField(_('date'), auto_now=True)
     payment_method = models.CharField(_('payment method'), max_length=255,
-            choices=settings.SITH_COUNTER_PAYMENT_METHOD)
-    # TODO: add the bank if the payment is made by cheque
+            choices=settings.SITH_COUNTER_PAYMENT_METHOD, default='cash')
+    bank = models.CharField(_('bank'), max_length=255,
+            choices=settings.SITH_COUNTER_BANK, default='other')
 
     def __str__(self):
         return "Refilling: %.2f for %s" % (self.amount, self.customer.user.get_display_name())

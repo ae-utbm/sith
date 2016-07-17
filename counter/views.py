@@ -44,6 +44,13 @@ class GetUserForm(forms.Form):
         cleaned_data['user_id'] = user.user.id
         return cleaned_data
 
+class RefillForm(forms.ModelForm):
+    error_css_class = 'error'
+    required_css_class = 'required'
+    class Meta:
+        model = Refilling
+        fields = ['amount', 'payment_method', 'bank']
+
 class CounterMain(DetailView, ProcessFormView, FormMixin):
     """
     The public (barman) view
@@ -101,6 +108,7 @@ class CounterClick(DetailView):
             request.session['basket'] = {}
             request.session['basket_total'] = 0
         request.session['not_enough'] = False
+        self.refill_form = None
         ret = super(CounterClick, self).get(request, *args, **kwargs)
         if len(Counter.get_barmen_list(self.object.id)) < 1: # Check that at least one barman is logged in
             return self.cancel(request) # Otherwise, go to main view
@@ -110,6 +118,7 @@ class CounterClick(DetailView):
         """ Handle the many possibilities of the post request """
         self.object = self.get_object()
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
+        self.refill_form = None
         if len(Counter.get_barmen_list(self.object.id)) < 1: # Check that at least one barman is logged in
             return self.cancel(request)
         if 'basket' not in request.session.keys():
@@ -243,16 +252,21 @@ class CounterClick(DetailView):
             operator = self.customer.user
         else:
             operator = Counter.get_random_barman(self.object.id)
-        amount = float(request.POST['amount'])
-        s = Refilling(counter=self.object, operator=operator, customer=self.customer,
-                amount=amount, payment_method="cash")
-        s.save()
+        form = RefillForm(request.POST)
+        if form.is_valid():
+            form.instance.counter = self.object
+            form.instance.operator = operator
+            form.instance.customer = self.customer
+            form.instance.save()
+        else:
+            self.refill_form = form
 
     def get_context_data(self, **kwargs):
         """ Add customer to the context """
         kwargs = super(CounterClick, self).get_context_data(**kwargs)
         kwargs['customer'] = self.customer
         kwargs['basket_total'] = self.sum_basket(self.request)
+        kwargs['refill_form'] = self.refill_form or RefillForm()
         return kwargs
 
 class CounterLogin(RedirectView):
