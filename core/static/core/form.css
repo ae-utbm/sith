@@ -9,8 +9,8 @@ button,
 textarea
 {
     margin: 0;
-    border: 0;
-    padding: 0;
+    border: 1px solid;
+    padding: 4px;
     display: inline-block;
     vertical-align: middle;
     white-space: normal;
