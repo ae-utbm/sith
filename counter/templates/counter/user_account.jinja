@@ -1,0 +1,16 @@
+{% extends "core/user_base.jinja" %}
+
+{% block title %}
+    {{ profile.get_display_name() }}'s account
+{% endblock %}
+
+{% block infos %}
+<h3>User account</h3>
+<p>{{ customer.refillings.all() }}</p>
+<p>{{ customer.buyings.all() }}</p>
+
+
+{% endblock %}
+
+
+

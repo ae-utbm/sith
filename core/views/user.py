@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout as auth_logout, views
 from django.core.urlresolvers import reverse
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.views.generic.edit import UpdateView
 from django.views.generic import ListView, DetailView, TemplateView
 import logging

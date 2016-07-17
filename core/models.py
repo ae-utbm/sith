@@ -280,6 +280,14 @@ class AnonymousUser(AuthAnonymousUser):
     def get_display_name(self):
         return _("Visitor")
 
+class Preferences(models.Model):
+    user = models.OneToOneField(User, related_name="preferences")
+    show_my_stats = models.BooleanField(
+        _('define if we show a users stats'),
+        default=False,
+        help_text=_('Show your account statistics to others'),
+    )
+
 class LockError(Exception):
     """There was a lock error on the object"""
     pass

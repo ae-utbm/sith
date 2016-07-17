@@ -119,8 +119,8 @@ class Refilling(models.Model):
     """
     counter = models.ForeignKey(Counter, related_name="refillings", blank=False)
     amount = CurrencyField(_('amount'))
-    operator = models.ForeignKey(User, related_name="refill_operators", blank=False)
-    customer = models.ForeignKey(Customer, related_name="refill_customers", blank=False)
+    operator = models.ForeignKey(User, related_name="refillings_as_operator", blank=False)
+    customer = models.ForeignKey(Customer, related_name="refillings", blank=False)
     date = models.DateTimeField(_('date'), auto_now=True)
     payment_method = models.CharField(_('payment method'), max_length=255,
             choices=settings.SITH_COUNTER_PAYMENT_METHOD, default='cash')
@@ -147,8 +147,8 @@ class Selling(models.Model):
     counter = models.ForeignKey(Counter, related_name="sellings", blank=False)
     unit_price = CurrencyField(_('unit price'))
     quantity = models.IntegerField(_('quantity'))
-    seller = models.ForeignKey(User, related_name="sellers", blank=False)
-    customer = models.ForeignKey(Customer, related_name="customers", blank=False)
+    seller = models.ForeignKey(User, related_name="sellings_as_operator", blank=False)
+    customer = models.ForeignKey(Customer, related_name="buyings", blank=False)
     date = models.DateTimeField(_('date'), auto_now=True)
 
     def __str__(self):

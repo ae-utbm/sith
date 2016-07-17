@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
 
 from core.views import *
+from counter.views import UserAccountView
 
 urlpatterns = [
     url(r'^$', index, name='index'),
@@ -28,6 +29,7 @@ urlpatterns = [
     url(r'^user/(?P<user_id>[0-9]+)/edit$', UserUpdateProfileView.as_view(), name='user_edit'),
     url(r'^user/(?P<user_id>[0-9]+)/prop$', UserUpdatePropView.as_view(), name='user_prop'),
     url(r'^user/tools/$', UserToolsView.as_view(), name='user_tools'),
+    url(r'^user/(?P<user_id>[0-9]+)/account$', UserAccountView.as_view(), name='user_account'),
 
     # Page views
     url(r'^page/$', PageListView.as_view(), name='page_list'),

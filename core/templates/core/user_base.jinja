@@ -1,0 +1,29 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+<div>{{ profile.get_display_name() }}</div>
+<div class="tool-bar">
+<a href="{{ url('core:user_profile', user_id=profile.id) }}">Infos</a>
+{% if can_edit(profile, request.user) or user.id == profile.id %}
+    <a href="{{ url('core:user_edit', user_id=profile.id) }}">Edit</a>
+{% endif %}
+{% if can_edit_prop(profile, request.user) %}
+    <a href="{{ url('core:user_prop', user_id=profile.id) }}">Props</a>
+{% endif %}
+{% if (profile == request.user
+       or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
+       or request.user.is_in_group(settings.SITH_GROUPS['root']['name'])) %}
+    <a href="{{ url('core:user_account', user_id=profile.id) }}">Account</a>
+{% endif %}
+<hr>
+</div>
+
+<div>
+{% block infos %}
+{% endblock %}
+</div>
+
+{% endblock %}
+
+
+
