@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -52,6 +53,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'core.middleware.AuthenticationMiddleware',
@@ -152,6 +154,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, "locale"),
+)
+
 # Medias
 MEDIA_ROOT = './data/'
 MEDIA_URL = '/data/'
@@ -218,16 +224,16 @@ SITH_MAIN_BOARD_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_BOARD_SUFFIX
 SITH_MAIN_MEMBERS_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_MEMBER_SUFFIX
 
 SITH_ACCOUNTING_PAYMENT_METHOD = [
-        ('cheque', 'Chèque'),
-        ('cash', 'Espèce'),
-        ('transfert', 'Virement'),
-        ('card', 'Carte banquaire'),
+        ('cheque', _('Check')),
+        ('cash', _('Cash')),
+        ('transfert', _('Transfert')),
+        ('card', _('Credit card')),
         ]
 
 SITH_SUBSCRIPTION_PAYMENT_METHOD = [
-        ('cheque', 'Chèque'),
-        ('cash', 'Espèce'),
-        ('other', 'Autre'),
+        ('cheque', _('Check')),
+        ('cash', _('Cash')),
+        ('other', _('Other')),
         ]
 
 SITH_COUNTER_BARS = [
@@ -237,8 +243,8 @@ SITH_COUNTER_BARS = [
         ]
 
 SITH_COUNTER_PAYMENT_METHOD = [
-        ('cheque', 'Chèque'),
-        ('cash', 'Espèce'),
+        ('cheque', _('Check')),
+        ('cash', _('Cash')),
         ]
 
 SITH_COUNTER_BANK = [
@@ -251,22 +257,22 @@ SITH_COUNTER_BANK = [
 # Subscription durations are in semestres (should be settingized)
 SITH_SUBSCRIPTIONS = {
     'un-semestre': {
-        'name': 'Un semestre',
+        'name': _('One semester'),
         'price': 15,
         'duration': 1,
     },
     'deux-semestres': {
-        'name': 'Deux semestres',
+        'name': _('Two semesters'),
         'price': 28,
         'duration': 2,
     },
     'cursus-tronc-commun': {
-        'name': 'Cursus Tronc Commun',
+        'name': _('Common core cursus'),
         'price': 45,
         'duration': 4,
     },
     'cursus-branche': {
-        'name': 'Cursus Branche',
+        'name': _('Branch cursus'),
         'price': 45,
         'duration': 6,
     },
@@ -274,15 +280,15 @@ SITH_SUBSCRIPTIONS = {
 }
 
 SITH_CLUB_ROLES = {
-        10: 'Président',
-        9: 'Vice-Président',
-        7: 'Trésorier',
-        5: 'Responsable com',
-        4: 'Secrétaire',
-        3: 'Responsable info',
-        2: 'Membre du bureau',
-        1: 'Membre actif',
-        0: 'Curieux',
+        10: _('President'),
+        9: _('Vice-President'),
+        7: _('Treasurer'),
+        5: _('Communication supervisor'),
+        4: _('Secretary'),
+        3: _('IT supervisor'),
+        2: _('Board member'),
+        1: _('Active member'),
+        0: _('Curious'),
         }
 
 # This corresponds to the maximum role a user can freely subscribe to

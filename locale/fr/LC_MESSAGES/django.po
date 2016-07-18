@@ -1,0 +1,433 @@
+# Sith AE french translation file
+# Copyright (C) 2016
+# This file is distributed under the same license as the Sith package.
+# Skia <skia@libskia.so>, 2016
+#
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-07-18 15:44+0000\n"
+"PO-Revision-Date: 2016-07-18\n"
+"Last-Translator: Skia <skia@libskia.so>\n"
+"Language-Team: AE info <ae.info@utbm.fr>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: accounting/models.py:29 accounting/models.py:52 accounting/models.py:91
+#: club/models.py:18 counter/models.py:35 counter/models.py:54
+#: counter/models.py:76
+msgid "name"
+msgstr "nom"
+
+#: accounting/models.py:30
+msgid "iban"
+msgstr "IBAN"
+
+#: accounting/models.py:31
+msgid "account number"
+msgstr "numero de compte"
+
+#: accounting/models.py:89 club/models.py:109 counter/models.py:211
+msgid "start date"
+msgstr "date de début"
+
+#: accounting/models.py:90 club/models.py:110 counter/models.py:212
+msgid "end date"
+msgstr "date de fin"
+
+#: accounting/models.py:92
+msgid "is closed"
+msgstr "est fermé"
+
+#: accounting/models.py:94 accounting/models.py:132 counter/models.py:21
+#: counter/models.py:159
+msgid "amount"
+msgstr "montant"
+
+#: accounting/models.py:95
+msgid "effective_amount"
+msgstr "montant effectif"
+
+#: accounting/models.py:133 core/models.py:456 counter/models.py:162
+#: counter/models.py:190
+msgid "date"
+msgstr "date"
+
+#: accounting/models.py:134 accounting/models.py:182
+msgid "label"
+msgstr "intitulé"
+
+#: accounting/models.py:135
+msgid "remark"
+msgstr "remarque"
+
+#: accounting/models.py:136 counter/models.py:163 subscription/models.py:34
+msgid "payment method"
+msgstr "méthode de paiement"
+
+#: accounting/models.py:137
+msgid "cheque number"
+msgstr "numéro de chèque"
+
+#: accounting/models.py:139
+msgid "is done"
+msgstr "est fait"
+
+#: accounting/models.py:181 counter/models.py:57
+msgid "code"
+msgstr "code"
+
+#: accounting/models.py:183
+msgid "movement type"
+msgstr "type de mouvement"
+
+#: club/models.py:20
+msgid "unix name"
+msgstr "nom unix"
+
+#: club/models.py:24
+msgid ""
+"Enter a valid unix name. This value may contain only letters, numbers ./-/_ "
+"characters."
+msgstr ""
+"Entrez un nom UNIX valide. Cette valeur peut contenir uniquement des "
+"lettres, des nombres, et les caractères ./-/_"
+
+#: club/models.py:29
+msgid "A club with that unix name already exists."
+msgstr "Un club avec ce nom UNIX existe déjà."
+
+#: club/models.py:32
+msgid "address"
+msgstr "Adresse"
+
+#: club/models.py:45
+msgid "You can not make loops in clubs"
+msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
+
+#: club/models.py:111
+msgid "role"
+msgstr "rôle"
+
+#: club/models.py:113 core/models.py:27 counter/models.py:36
+#: counter/models.py:55
+msgid "description"
+msgstr "description"
+
+#: club/models.py:118
+msgid "User must be subscriber to take part to a club"
+msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
+
+#: club/models.py:120
+msgid "User is already member of that club"
+msgstr "L'utilisateur est déjà membre de ce club"
+
+#: club/models.py:124
+msgid "past member"
+msgstr "Anciens membres"
+
+#: core/models.py:23
+msgid "meta group status"
+msgstr "Status du meta-groupe"
+
+#: core/models.py:25
+msgid "Whether a group is a meta group or not"
+msgstr "Si un groupe est un meta-groupe ou pas"
+
+#: core/models.py:60
+msgid "username"
+msgstr "nom d'utilisateur"
+
+#: core/models.py:63
+msgid "Required. 254 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Requis. Pas plus de 254 caractères. Uniquement des lettres, numéros, et @/./"
+"+/-/_"
+
+#: core/models.py:67
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"Entrez un nom d'utilisateur correct. Uniquement des lettres, numéros, et @/./"
+"+/-/_"
+
+#: core/models.py:72
+msgid "A user with that username already exists."
+msgstr "Un utilisateur de ce nom existe déjà"
+
+#: core/models.py:75
+msgid "first name"
+msgstr "Prénom"
+
+#: core/models.py:76
+msgid "last name"
+msgstr "Nom"
+
+#: core/models.py:77
+msgid "email address"
+msgstr "adresse email"
+
+#: core/models.py:78
+msgid "date of birth"
+msgstr "date de naissance"
+
+#: core/models.py:81
+msgid "staff status"
+msgstr "status \"staff\""
+
+#: core/models.py:83
+msgid "Designates whether the user can log into this admin site."
+msgstr "Est-ce que l'utilisateur peut se logger à la partie admin du site."
+
+#: core/models.py:86
+msgid "active"
+msgstr "actif"
+
+#: core/models.py:89
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Est-ce que l'utilisateur doit être traité comme actif. Déselectionnez au "
+"lieu de supprimer les comptes."
+
+#: core/models.py:93
+msgid "date joined"
+msgstr "date d'inscription"
+
+#: core/models.py:95
+msgid "superuser"
+msgstr "super-utilisateur"
+
+#: core/models.py:98
+msgid "Designates whether this user is a superuser. "
+msgstr "Est-ce que l'utilisateur est super-utilisateur."
+
+#: core/models.py:274
+msgid "Visitor"
+msgstr "Visiteur"
+
+#: core/models.py:279
+msgid "define if we show a users stats"
+msgstr "Definit si l'on montre les statistiques de l'utilisateur"
+
+#: core/models.py:281
+msgid "Show your account statistics to others"
+msgstr "Montrez vos statistiques de compte aux autres"
+
+#: core/models.py:307 core/models.py:311
+msgid "page name"
+msgstr "nom de la page"
+
+#: core/models.py:344
+msgid "Duplicate page"
+msgstr "Duppliquer la page"
+
+#: core/models.py:350
+msgid "Loop in page tree"
+msgstr "Boucle dans l'arborescence des pages"
+
+#: core/models.py:454
+msgid "page title"
+msgstr "titre de la page"
+
+#: core/models.py:455
+msgid "page content"
+msgstr "contenu de la page"
+
+#: core/templates/core/password_reset_email.jinja:2
+#, python-format
+# msgid ""
+# "You're receiving this email because you requested a password reset for your "
+# "user account at %(site_name)s."
+# msgstr ""
+# "Vous avez reçu cet email parce que vous avez demandé une réinitialisation du "
+# "mot de passe pour votre compte sur le site %(site_name)."
+
+#: core/templates/core/password_reset_email.jinja:4
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+"Merci de vous rendre sur la page suivante et de choisir un nouveau mot de "
+"passe :"
+
+#: core/templates/core/password_reset_email.jinja:8
+msgid "Your username, in case you've forgotten: "
+msgstr "Votre nom d'utilisateur, en cas d'oubli :"
+
+#: core/templates/core/password_reset_email.jinja:10
+msgid "Thanks for using our site! "
+msgstr "Merci d'utiliser notre site!"
+
+#: core/templates/core/password_reset_email.jinja:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "L'équipe de %(site_name)s"
+
+#: counter/models.py:20
+msgid "account id"
+msgstr "numéro de compte"
+
+#: counter/models.py:24
+msgid "customer"
+msgstr "client"
+
+#: counter/models.py:25
+msgid "customers"
+msgstr "clients"
+
+#: counter/models.py:58
+msgid "purchase price"
+msgstr "prix d'achat"
+
+#: counter/models.py:59
+msgid "selling price"
+msgstr "prix de vente"
+
+#: counter/models.py:60
+msgid "special selling price"
+msgstr "prix de vente spécial"
+
+#: counter/models.py:79 subscription/models.py:29
+msgid "subscription type"
+msgstr "type d'inscription"
+
+#: counter/models.py:81
+msgid "Bar"
+msgstr "Bar"
+
+#: counter/models.py:81
+msgid "Office"
+msgstr "Bureau"
+
+#: counter/models.py:165
+msgid "bank"
+msgstr "banque"
+
+#: counter/models.py:186
+msgid "unit price"
+msgstr "prix unitaire"
+
+#: counter/models.py:187
+msgid "quantity"
+msgstr "quantité"
+
+#: counter/views.py:194
+msgid "END"
+msgstr "FIN"
+
+#: counter/views.py:196
+msgid "CAN"
+msgstr "ANN"
+
+#: sith/settings.py:227 sith/settings.py:234 sith/settings.py:246
+#: sith/settings_sample.py:227 sith/settings_sample.py:234
+#: sith/settings_sample.py:246
+msgid "Check"
+msgstr "Chèque"
+
+#: sith/settings.py:228 sith/settings.py:235 sith/settings.py:247
+#: sith/settings_sample.py:228 sith/settings_sample.py:235
+#: sith/settings_sample.py:247
+msgid "Cash"
+msgstr "Espèces"
+
+#: sith/settings.py:229 sith/settings_sample.py:229
+msgid "Transfert"
+msgstr "Virement"
+
+#: sith/settings.py:230 sith/settings_sample.py:230
+msgid "Credit card"
+msgstr "Carte banquaire"
+
+#: sith/settings.py:236 sith/settings_sample.py:236
+msgid "Other"
+msgstr "Autre"
+
+#: sith/settings.py:260 sith/settings_sample.py:260
+msgid "One semester"
+msgstr "Un semestre"
+
+#: sith/settings.py:265 sith/settings_sample.py:265
+msgid "Two semesters"
+msgstr "Deux semestres"
+
+#: sith/settings.py:270 sith/settings_sample.py:270
+msgid "Common core cursus"
+msgstr "Cursus tronc commun"
+
+#: sith/settings.py:275 sith/settings_sample.py:275
+msgid "Branch cursus"
+msgstr "Cursus branche"
+
+#: sith/settings.py:283 sith/settings_sample.py:283
+msgid "President"
+msgstr "Président"
+
+#: sith/settings.py:284 sith/settings_sample.py:284
+msgid "Vice-President"
+msgstr "Vice-Président"
+
+#: sith/settings.py:285 sith/settings_sample.py:285
+msgid "Treasurer"
+msgstr "Trésorier"
+
+#: sith/settings.py:286 sith/settings_sample.py:286
+msgid "Communication supervisor"
+msgstr "Responsable com"
+
+#: sith/settings.py:287 sith/settings_sample.py:287
+msgid "Secretary"
+msgstr "Secrétaire"
+
+#: sith/settings.py:288 sith/settings_sample.py:288
+msgid "IT supervisor"
+msgstr "Responsable info"
+
+#: sith/settings.py:289 sith/settings_sample.py:289
+msgid "Board member"
+msgstr "Membre du bureau"
+
+#: sith/settings.py:290 sith/settings_sample.py:290
+msgid "Active member"
+msgstr "Membre actif"
+
+#: sith/settings.py:291 sith/settings_sample.py:291
+msgid "Curious"
+msgstr "Curieux"
+
+#: subscription/models.py:13
+msgid "Bad subscription type"
+msgstr "Mauvais type de cotisation"
+
+#: subscription/models.py:17
+msgid "Bad payment method"
+msgstr "Mauvais type de paiement"
+
+#: subscription/models.py:32
+msgid "subscription start"
+msgstr "début de la cotisation"
+
+#: subscription/models.py:33
+msgid "subscription end"
+msgstr "fin de la cotisation"
+
+#: subscription/models.py:47
+msgid "You can not subscribe many time for the same period"
+msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
+
+#: subscription/models.py:51
+msgid "You are trying to create a subscription without member"
+msgstr "Vous essayez de créer une cotisation sans membre"
+
+#: subscription/views.py:41
+msgid "A user with that email address already exists"
+msgstr "Un utilisateur avec cette adresse email existe déjà"
+
+#: subscription/views.py:56
+msgid "You must either choose an existing user or create a new one properly"
+msgstr ""
+"Vous devez soit choisir un utilisateur existant, ou en créer un proprement."

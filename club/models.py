@@ -120,7 +120,7 @@ class Membership(models.Model):
             raise ValidationError(_('User is already member of that club'))
 
     def __str__(self):
-        return self.club.name+' - '+self.user.username+' - '+settings.SITH_CLUB_ROLES[self.role]+str(
+        return self.club.name+' - '+self.user.username+' - '+str(settings.SITH_CLUB_ROLES[self.role])+str(
                 " - "+str(_('past member')) if self.end_date is not None else ""
                 )
 

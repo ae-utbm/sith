@@ -191,9 +191,9 @@ class CounterClick(DetailView):
     def parse_code(self, request):
         """Parse the string entered by the barman"""
         string = str(request.POST['code']).upper()
-        if string == _("FIN"):
+        if string == _("END"):
             return self.finish(request)
-        elif string == _("ANN"):
+        elif string == _("CAN"):
             return self.cancel(request)
         regex = re.compile(r"^((?P<nb>[0-9]+)X)?(?P<code>[A-Z0-9]+)$")
         m = regex.match(string)
