@@ -112,7 +112,7 @@ class User(AbstractBaseUser):
         return reverse('core:user_profile', kwargs={'user_id': self.pk})
 
     def __str__(self):
-        return "User: " + self.username
+        return self.username
 
     def to_dict(self):
         return self.__dict__

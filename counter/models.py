@@ -100,15 +100,50 @@ class Counter(models.Model):
     def can_be_viewed_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
 
+    def add_barman(counter_id, user_id):
+        """
+        Logs a barman in to the given counter
+        A user is stored as a tuple with its login time
+        """
+        counter_id = int(counter_id)
+        user_id = int(user_id)
+        if counter_id not in Counter.barmen_session.keys():
+            Counter.barmen_session[counter_id] = {'users': {(user_id, timezone.now())}, 'time': timezone.now()}
+        else:
+            Counter.barmen_session[counter_id]['users'].add((user_id, timezone.now()))
+
+    def del_barman(counter_id, user_id):
+        """
+        Logs a barman out and store its permanency
+        """
+        counter_id = int(counter_id)
+        user_id = int(user_id)
+        user_tuple = None
+        for t in Counter.barmen_session[counter_id]['users']:
+            if t[0] == user_id: user_tuple = t
+        Counter.barmen_session[counter_id]['users'].remove(user_tuple)
+        u = User.objects.filter(id=user_id).first()
+        c = Counter.objects.filter(id=counter_id).first()
+        Permanency(user=u, counter=c, start=user_tuple[1], end=Counter.barmen_session[counter_id]['time']).save()
+
     def get_barmen_list(counter_id):
+        """
+        Returns the barman list as list of Subscriber
+
+        Also handle the timeout of the barmen
+        """
         bl = []
-        counter_id = str(counter_id)
+        counter_id = int(counter_id)
         if counter_id in list(Counter.barmen_session.keys()):
+            for b in Counter.barmen_session[counter_id]['users']:
+                # Reminder: user is stored as a tuple with its login time
+                bl.append(Subscriber.objects.filter(id=b[0]).first())
             if (timezone.now() - Counter.barmen_session[counter_id]['time']) < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
-                for b in Counter.barmen_session[counter_id]['users']:
-                    bl.append(Subscriber.objects.filter(id=b).first())
                 Counter.barmen_session[counter_id]['time'] = timezone.now()
             else:
+                for b in bl:
+                    Counter.del_barman(counter_id, b.id)
+                bl = []
                 Counter.barmen_session[counter_id]['users'] = set()
         return bl
 
@@ -166,6 +201,19 @@ class Selling(models.Model):
 
     # def get_absolute_url(self):
     #     return reverse('counter:details', kwargs={'counter_id': self.id})
+
+class Permanency(models.Model):
+    """
+    This class aims at storing a traceability of who was barman where and when
+    """
+    user = models.ForeignKey(User, related_name="permanencies")
+    counter = models.ForeignKey(Counter, related_name="permanencies")
+    start = models.DateTimeField(_('start date'))
+    end = models.DateTimeField(_('end date'))
+
+    def __str__(self):
+        return "%s in %s from %s to %s" % (self.user, self.counter,
+                self.start.strftime("%Y-%m-%d %H:%M:%S"), self.end.strftime("%Y-%m-%d %H:%M:%S"))
 
 
 # TODO:

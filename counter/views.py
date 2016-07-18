@@ -64,8 +64,6 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
     def get_context_data(self, **kwargs):
         """
         We handle here the login form for the barman
-
-        Also handle the timeout
         """
         if self.request.method == 'POST':
             self.object = self.get_object()
@@ -285,10 +283,7 @@ class CounterLogin(RedirectView):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = Subscriber.objects.filter(username=form.cleaned_data['username']).first()
-            if self.counter_id not in Counter.barmen_session.keys():
-                Counter.barmen_session[self.counter_id] = {'users': {user.id}, 'time': timezone.now()}
-            else:
-                Counter.barmen_session[self.counter_id]['users'].add(user.id)
+            Counter.add_barman(self.counter_id, user.id)
         else:
             print("Error logging the barman") # TODO handle that nicely
         return super(CounterLogin, self).post(request, *args, **kwargs)
@@ -303,7 +298,7 @@ class CounterLogout(RedirectView):
         Unregister the user from the barman
         """
         self.counter_id = kwargs['counter_id']
-        Counter.barmen_session[str(self.counter_id)]['users'].remove(int(request.POST['user_id']))
+        Counter.del_barman(self.counter_id, request.POST['user_id'])
         return super(CounterLogout, self).post(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
