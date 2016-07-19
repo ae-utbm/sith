@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from datetime import timedelta
+from random import randrange
 
 from club.models import Club
 from accounting.models import CurrencyField
@@ -26,6 +27,9 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def generate_account_id():
+        return randrange(0, 4000) # TODO: improve me!
 
 class ProductType(models.Model):
     """

@@ -35,10 +35,7 @@ class Subscription(models.Model):
     # TODO add location!
 
     class Meta:
-        permissions = (
-                ('change_subscription', 'Can make someone become a subscriber'),
-                ('view_subscription', 'Can view who is a subscriber'),
-                )
+        ordering = ['subscription_start',]
 
     def clean(self):
         try:
@@ -50,8 +47,11 @@ class Subscription(models.Model):
                 # TODO see SubscriptionForm's clean method
             raise ValidationError(_("You are trying to create a subscription without member"))
 
-    class Meta:
-        ordering = ['subscription_start',]
+    def save(self):
+        super(Subscription, self).save()
+        from counter.models import Customer
+        if not Customer.objects.filter(user=self.member).exists():
+            Customer(user=self.member, account_id=Customer.generate_account_id(), amount=0).save()
 
     def get_absolute_url(self):
         return reverse('core:user_profile', kwargs={'user_id': self.member.pk})
