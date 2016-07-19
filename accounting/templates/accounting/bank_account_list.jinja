@@ -1,23 +1,23 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-    Bank account list
+{% trans %}Bank account list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <p><a href="{{ url('accounting:type_list') }}">Manage accounting types</a></p>
-    <p><a href="{{ url('accounting:bank_new') }}">New bank account</a></p>
+    <p><a href="{{ url('accounting:type_list') }}">{% trans %}Manage accounting types{% endtrans %}</a></p>
+    <p><a href="{{ url('accounting:bank_new') }}">{% trans %}New bank account{% endtrans %}</a></p>
     {% if bankaccount_list %}
-        <h3>Bank account list</h3>
+    <h3>{% trans %}Bank account list{% endtrans %}</h3>
         <ul>
             {% for a in bankaccount_list  %}
             <li><a href="{{ url('accounting:bank_details', b_account_id=a.id) }}">{{ a }}</a> -
-                <a href="{{ url('accounting:bank_edit', b_account_id=a.id) }}">Edit</a> -
-                <a href="{{ url('accounting:bank_delete', b_account_id=a.id) }}">Delete</a></li>
+                <a href="{{ url('accounting:bank_edit', b_account_id=a.id) }}">{% trans %}Edit{% endtrans %}</a> -
+                <a href="{{ url('accounting:bank_delete', b_account_id=a.id) }}">{% trans %}Delete{% endtrans %}</a></li>
             {% endfor %}
         </ul>
     {% else %}
-        There is no accounts in this website.
+    {% trans %}There is no accounts in this website.{% endtrans %}
     {% endif %}
 {% endblock %}
 

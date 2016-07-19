@@ -1,33 +1,34 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-<p>
-<a href="{{ url('accounting:bank_list') }}">Accounting</a> >
-<a href="{{ url('accounting:bank_details', b_account_id=object.club_account.bank_account.id) }}">{{object.club_account.bank_account }}</a> >
-<a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object.club_account }}</a> >
-{{ object.name }}
-</p>
-    <p><strong>Amount: </strong>{{ object.amount }} € - <strong>Effective amount: </strong>{{ object.effective_amount }} €</p>
+    <p>
+    <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
+    <a href="{{ url('accounting:bank_details', b_account_id=object.club_account.bank_account.id) }}">{{object.club_account.bank_account }}</a> >
+    <a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object.club_account }}</a> >
+    {{ object.name }}
+    </p>
+    <p><strong>{% trans %}Amount: {% endtrans %}</strong>{{ object.amount }} € -
+    <strong>{% trans %}Effective amount: {% endtrans %}</strong>{{ object.effective_amount }} €</p>
     {% if object.closed %}
-    <p>Journal is closed, you can not create operation</p>
+    <p>{% trans %}Journal is closed, you can not create operation{% endtrans %}</p>
     {% else %}
-    <p><a href="{{ url('accounting:op_new') }}?parent={{ object.id }}">New operation</a></p>
+    <p><a href="{{ url('accounting:op_new') }}?parent={{ object.id }}">{% trans %}New operation{% endtrans %}</a></p>
     {% endif %}
     <table>
         <tr>
-            <td>Nb</td>
-            <td>Date</td>
-            <td>Label</td>
-            <td>Amount</td>
-            <td>Payment mode</td>
+            <td>{% trans %}Nb{% endtrans %}</td>
+            <td>{% trans %}Date{% endtrans %}</td>
+            <td>{% trans %}Label{% endtrans %}</td>
+            <td>{% trans %}Amount{% endtrans %}</td>
+            <td>{% trans %}Payment mode{% endtrans %}</td>
             <!-- TODO: <td>Target</td> -->
-            <td>Code</td>
-            <td>Nature</td>
-            <td>Done</td>
-            <td>Comment</td>
-            <td>Actions</td>
+            <td>{% trans %}Code{% endtrans %}</td>
+            <td>{% trans %}Nature{% endtrans %}</td>
+            <td>{% trans %}Done{% endtrans %}</td>
+            <td>{% trans %}Comment{% endtrans %}</td>
+            <td>{% trans %}Actions{% endtrans %}</td>
         </tr>
-    {% for o in object.operations.all() %}
+        {% for o in object.operations.all() %}
         <tr>
             <td>{{ o.id }}</td>
             <td>{{ o.date }}</td>
@@ -37,21 +38,17 @@
             <td>{{ o.accounting_type.code }}</td>
             <td>{{ o.accounting_type.label }}</td>
             {% if o.done %}
-            <td>Yes</td>
+            <td>{% trans %}Yes{% endtrans %}</td>
             {% else %}
-            <td>No</td>
+            <td>{% trans %}No{% endtrans %}</td>
             {% endif %}
             <td>{{ o.remark }}</td>
             <td>
                 {% if not o.journal.closed %}
-                <a href="{{ url('accounting:op_edit', op_id=o.id) }}">Edit</a>
+                <a href="{{ url('accounting:op_edit', op_id=o.id) }}">{% trans %}Edit{% endtrans %}</a>
                 {% endif %}
             </td>
         </tr>
-    {% endfor %}
+        {% endfor %}
     </table>
-
 {% endblock %}
-
-
-

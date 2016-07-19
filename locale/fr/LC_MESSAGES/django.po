@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-18 15:44+0000\n"
+"POT-Creation-Date: 2016-07-19 17:00+0000\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -84,6 +84,172 @@ msgstr "code"
 msgid "movement type"
 msgstr "type de mouvement"
 
+#: accounting/templates/accounting/accountingtype_list.jinja:4
+#: accounting/templates/accounting/accountingtype_list.jinja:10
+msgid "Accounting type list"
+msgstr "Liste des types comptable"
+
+#: accounting/templates/accounting/accountingtype_list.jinja:8
+msgid "New accounting type"
+msgstr "Nouveau type comptable"
+
+#: accounting/templates/accounting/accountingtype_list.jinja:17
+msgid "There is no types in this website."
+msgstr "Il n'y a pas de types comptable dans ce site web."
+
+#: accounting/templates/accounting/bank_account_details.jinja:5
+#: accounting/templates/accounting/club_account_details.jinja:5
+#: accounting/templates/accounting/journal_details.jinja:5
+#: core/templates/core/user_tools.jinja:19
+msgid "Accounting"
+msgstr "Comptabilité"
+
+#: accounting/templates/accounting/bank_account_details.jinja:8
+msgid "View account"
+msgstr "Voir le compte"
+
+#: accounting/templates/accounting/bank_account_details.jinja:9
+msgid "New club account"
+msgstr "Nouveau compte club"
+
+#: accounting/templates/accounting/bank_account_details.jinja:13
+#: accounting/templates/accounting/bank_account_list.jinja:15
+#: accounting/templates/accounting/club_account_details.jinja:45
+#: accounting/templates/accounting/journal_details.jinja:48
+#: club/templates/club/club_detail.jinja:7
+#: core/templates/core/page_detail.jinja:7
+#: core/templates/core/user_base.jinja:8
+#: core/templates/core/user_tools.jinja:31
+#: counter/templates/counter/counter_list.jinja:14
+msgid "Edit"
+msgstr "Éditer"
+
+#: accounting/templates/accounting/bank_account_details.jinja:14
+#: accounting/templates/accounting/bank_account_list.jinja:16
+#: core/templates/core/group_list.jinja:13
+msgid "Delete"
+msgstr "Supprimer"
+
+#: accounting/templates/accounting/bank_account_list.jinja:4
+#: accounting/templates/accounting/bank_account_list.jinja:11
+msgid "Bank account list"
+msgstr "Liste des comptes en banque"
+
+#: accounting/templates/accounting/bank_account_list.jinja:8
+msgid "Manage accounting types"
+msgstr "Gérer les types comptable"
+
+#: accounting/templates/accounting/bank_account_list.jinja:9
+msgid "New bank account"
+msgstr "Nouveau compte en banque"
+
+#: accounting/templates/accounting/bank_account_list.jinja:20
+msgid "There is no accounts in this website."
+msgstr "Il n'y a pas de comptes dans ce site web."
+
+#: accounting/templates/accounting/club_account_details.jinja:8
+msgid "View account:"
+msgstr "Voir le compte:"
+
+#: accounting/templates/accounting/club_account_details.jinja:15
+msgid "New journal"
+msgstr "Nouveau classeur"
+
+#: accounting/templates/accounting/club_account_details.jinja:17
+msgid "You can not create new journal while you still have one opened"
+msgstr "Vous ne pouvez pas créer de journal tant qu'il y en a un d'ouvert"
+
+#: accounting/templates/accounting/club_account_details.jinja:21
+msgid "Name"
+msgstr "Nom"
+
+#: accounting/templates/accounting/club_account_details.jinja:22
+msgid "Start"
+msgstr "Début"
+
+#: accounting/templates/accounting/club_account_details.jinja:23
+msgid "End"
+msgstr "Fin"
+
+#: accounting/templates/accounting/club_account_details.jinja:24
+#: accounting/templates/accounting/journal_details.jinja:22
+msgid "Amount"
+msgstr "Montant"
+
+#: accounting/templates/accounting/club_account_details.jinja:25
+msgid "Effective amount"
+msgstr "Montant effectif"
+
+#: accounting/templates/accounting/club_account_details.jinja:26
+msgid "Closed"
+msgstr "Fermé"
+
+#: accounting/templates/accounting/club_account_details.jinja:40
+#: accounting/templates/accounting/journal_details.jinja:41
+msgid "Yes"
+msgstr "Oui"
+
+#: accounting/templates/accounting/club_account_details.jinja:42
+#: accounting/templates/accounting/journal_details.jinja:43
+msgid "No"
+msgstr "Non"
+
+#: accounting/templates/accounting/club_account_details.jinja:44
+msgid "View"
+msgstr "Voir"
+
+#: accounting/templates/accounting/journal_details.jinja:10
+msgid "Amount: "
+msgstr "Montant: "
+
+#: accounting/templates/accounting/journal_details.jinja:11
+msgid "Effective amount: "
+msgstr "Montant effectif: "
+
+#: accounting/templates/accounting/journal_details.jinja:13
+msgid "Journal is closed, you can not create operation"
+msgstr "Le classeur est fermé, vous ne pouvez pas créer d'opération"
+
+#: accounting/templates/accounting/journal_details.jinja:15
+msgid "New operation"
+msgstr "Nouvelle opération"
+
+#: accounting/templates/accounting/journal_details.jinja:19
+msgid "Nb"
+msgstr "No"
+
+#: accounting/templates/accounting/journal_details.jinja:20
+msgid "Date"
+msgstr "Date"
+
+#: accounting/templates/accounting/journal_details.jinja:21
+msgid "Label"
+msgstr "Intitulé"
+
+#: accounting/templates/accounting/journal_details.jinja:23
+msgid "Payment mode"
+msgstr "Méthode de paiement"
+
+#: accounting/templates/accounting/journal_details.jinja:25
+msgid "Code"
+msgstr "Code"
+
+#: accounting/templates/accounting/journal_details.jinja:26
+msgid "Nature"
+msgstr "Nature"
+
+#: accounting/templates/accounting/journal_details.jinja:27
+msgid "Done"
+msgstr "Effectué"
+
+#: accounting/templates/accounting/journal_details.jinja:28
+msgid "Comment"
+msgstr "Commentaire"
+
+#: accounting/templates/accounting/journal_details.jinja:29
+msgid "Actions"
+msgstr "Actions"
+
 #: club/models.py:20
 msgid "unix name"
 msgstr "nom unix"
@@ -108,6 +274,14 @@ msgstr "Adresse"
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
+#: club/models.py:107
+msgid "user"
+msgstr "nom d'utilisateur"
+
+#: club/models.py:108
+msgid "club"
+msgstr "club"
+
 #: club/models.py:111
 msgid "role"
 msgstr "rôle"
@@ -129,9 +303,74 @@ msgstr "L'utilisateur est déjà membre de ce club"
 msgid "past member"
 msgstr "Anciens membres"
 
+#: club/templates/club/club_detail.jinja:4
+msgid "Club"
+msgstr "Club"
+
+#: club/templates/club/club_detail.jinja:5
+#: core/templates/core/group_edit.jinja:4
+#: core/templates/core/page_detail.jinja:5
+msgid "Back to list"
+msgstr "Retour à la liste"
+
+#: club/templates/club/club_detail.jinja:10
+#: core/templates/core/page_detail.jinja:10
+msgid "Prop"
+msgstr "Propriétés"
+
+#: club/templates/club/club_detail.jinja:14
+msgid "Members"
+msgstr "Membres"
+
+#: club/templates/club/club_edit.jinja:4
+msgid "Edit club"
+msgstr "Éditer le club"
+
+#: club/templates/club/club_edit.jinja:8
+#: club/templates/club/club_edit_prop.jinja:8
+#: core/templates/core/create.jinja:8 core/templates/core/edit.jinja:8
+#: core/templates/core/page_prop.jinja:8
+#: core/templates/core/pagerev_edit.jinja:24
+#: counter/templates/counter/counter_edit.jinja:8
+#: subscription/templates/subscription/subscription.jinja:12
+msgid "Save"
+msgstr "Sauver"
+
+#: club/templates/club/club_edit_prop.jinja:4
+msgid "Edit club properties"
+msgstr "Éditer les propriétés du club"
+
+#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
+msgid "Club list"
+msgstr "Liste des clubs"
+
+#: club/templates/club/club_list.jinja:21
+msgid "New club"
+msgstr "Nouveau club"
+
+#: club/templates/club/club_list.jinja:31
+msgid "There is no club in this website."
+msgstr "Il n'y a pas de club dans ce site web."
+
+#: club/templates/club/club_members.jinja:4
+msgid "Club members"
+msgstr "Membres du club"
+
+#: club/templates/club/club_members.jinja:13
+msgid "Add"
+msgstr "Ajouter"
+
+#: club/templates/club/club_tools.jinja:4
+msgid "Club tools"
+msgstr "Outils du club"
+
+#: club/templates/club/club_tools.jinja:8
+msgid "Counters:"
+msgstr "Comptoirs:"
+
 #: core/models.py:23
 msgid "meta group status"
-msgstr "Status du meta-groupe"
+msgstr "status du meta-groupe"
 
 #: core/models.py:25
 msgid "Whether a group is a meta group or not"
@@ -239,14 +478,249 @@ msgstr "titre de la page"
 msgid "page content"
 msgstr "contenu de la page"
 
+#: core/templates/core/403.jinja:5
+msgid "403, Forbidden"
+msgstr "403. Non autorisé"
+
+#: core/templates/core/404.jinja:5
+msgid "404, Not Found"
+msgstr "404. Non trouvé"
+
+#: core/templates/core/base.jinja:5
+msgid "Welcome!"
+msgstr "Bienvenue!"
+
+#: core/templates/core/base.jinja:15
+msgid "Logo"
+msgstr "Logo"
+
+#: core/templates/core/base.jinja:19
+#: core/templates/core/password_reset_complete.jinja:5
+msgid "Login"
+msgstr "Connexion"
+
+#: core/templates/core/base.jinja:20 core/templates/core/register.jinja:18
+msgid "Register"
+msgstr "S'enregister"
+
+#: core/templates/core/base.jinja:23
+msgid "Tools"
+msgstr "Outils"
+
+#: core/templates/core/base.jinja:24
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: core/templates/core/base.jinja:29
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: core/templates/core/base.jinja:30
+msgid "Pages"
+msgstr "Pages"
+
+#: core/templates/core/base.jinja:31 core/templates/core/user_tools.jinja:36
+msgid "Clubs"
+msgstr "Clubs"
+
+#: core/templates/core/base.jinja:44
+msgid "Site made by good people"
+msgstr "Site réalisé par des gens biens"
+
+#: core/templates/core/create.jinja:4
+msgid "Create"
+msgstr "Créer"
+
+#: core/templates/core/delete_confirm.jinja:4
+msgid "Delete confirmation"
+msgstr "Confirmation de suppression"
+
+#: core/templates/core/delete_confirm.jinja:6
+#, python-format
+msgid "Are you sure you want to delete \"%(obj)s\"?"
+msgstr "Êtes-vous sûr de vouloir supprimer \"%(obj)s\" ?"
+
+#: core/templates/core/delete_confirm.jinja:7
+msgid "Confirm"
+msgstr "Confirmation"
+
+#: core/templates/core/delete_confirm.jinja:8
+#: counter/templates/counter/counter_click.jinja:65
+msgid "Cancel"
+msgstr "Annuler"
+
+#: core/templates/core/edit.jinja:4
+#, python-format
+msgid "Edit %(obj)s"
+msgstr "Éditer %(obj)s"
+
+#: core/templates/core/group_edit.jinja:5
+msgid "Edit group"
+msgstr "Éditer le groupe"
+
+#: core/templates/core/group_edit.jinja:9 core/templates/core/user_edit.jinja:8
+#: core/templates/core/user_group.jinja:8
+msgid "Update"
+msgstr "Mettre à jour"
+
+#: core/templates/core/group_list.jinja:4
+#: core/templates/core/group_list.jinja:8
+msgid "Group list"
+msgstr "Liste des groupes"
+
+#: core/templates/core/group_list.jinja:9
+msgid "New group"
+msgstr "Nouveau groupe"
+
+#: core/templates/core/index.jinja:6
+msgid "Hello, world. You're at the core index using Jinja2."
+msgstr "Hello, world! Vous êtes sur la page d'accueil utilisant Jinja2."
+
+#: core/templates/core/login.jinja:6
+msgid "Your username and password didn't match. Please try again."
+msgstr ""
+"Votre nom d'utilisateur et votre mot de passe ne correspondent pas. Merci de "
+"réessayer."
+
+#: core/templates/core/login.jinja:11
+msgid ""
+"Your account doesn't have access to this page. To proceed,\n"
+"    please login with an account that has access."
+msgstr ""
+"Votre compte n'a pas accès à cette page. Merci de vous identifier avec un "
+"compte qui a accès."
+
+#: core/templates/core/login.jinja:14
+msgid "Please login to see this page."
+msgstr "Merci de vous identifier pour voir cette page."
+
+#: core/templates/core/login.jinja:31
+#: counter/templates/counter/counter_main.jinja:51
+msgid "login"
+msgstr "login"
+
+#: core/templates/core/login.jinja:36
+msgid "Lost password?"
+msgstr "Mot de passe perdu ?"
+
+#: core/templates/core/page.jinja:7 core/templates/core/page_list.jinja:4
+#: core/templates/core/page_list.jinja:9
+msgid "Page list"
+msgstr "Liste des pages"
+
+#: core/templates/core/page.jinja:9
+msgid "Create page"
+msgstr "Créer une page"
+
+#: core/templates/core/page.jinja:11
+msgid "Not found"
+msgstr "Non trouvé"
+
+#: core/templates/core/page.jinja:20
+msgid "Page does not exist"
+msgstr "La page n'existe pas."
+
+#: core/templates/core/page.jinja:22
+msgid "Create it?"
+msgstr "La créer ?"
+
+#: core/templates/core/page_detail.jinja:4
+msgid "Page"
+msgstr "Page"
+
+#: core/templates/core/page_detail.jinja:12
+#, python-format
+msgid "You're seeing the page %(page_name)s"
+msgstr "Vous consultez la page %(page_name)s"
+
+#: core/templates/core/page_detail.jinja:13
+msgid "History"
+msgstr "Historique"
+
+#: core/templates/core/page_detail.jinja:16
+#, python-format
+msgid "This may not be the last update, you are seeing revision %(rev_id)s!"
+msgstr ""
+"Ceci n'est peut-être pas la dernière version de la page. Vous consultez la "
+"version %(rev_id)s."
+
+#: core/templates/core/page_hist.jinja:4
+msgid "Page history"
+msgstr "Historique de la page"
+
+#: core/templates/core/page_hist.jinja:5
+msgid "Back to page"
+msgstr "Retour à la page"
+
+#: core/templates/core/page_hist.jinja:6
+msgid "You're seeing the history of page %(page_name)s"
+msgstr "Vous consultez l'historique de la page %(page_name)s"
+
+#: core/templates/core/page_list.jinja:16
+msgid "There is no page in this website."
+msgstr "Il n'y a pas de page sur ce site web."
+
+#: core/templates/core/page_prop.jinja:4
+msgid "Page properties"
+msgstr "Propriétés de la page"
+
+#: core/templates/core/pagerev_edit.jinja:19
+msgid "Edit page"
+msgstr "Éditer la page"
+
+#: core/templates/core/pagerev_edit.jinja:23
+msgid "Preview"
+msgstr "Prévisualiser"
+
+#: core/templates/core/password_change.jinja:8
+msgid "Change"
+msgstr "Changer"
+
+#: core/templates/core/password_change_done.jinja:4
+msgid "You successfully changed your password!"
+msgstr "Vous avez correctement changé votre mot de passe !"
+
+#: core/templates/core/password_reset.jinja:7
+#: core/templates/core/password_reset_confirm.jinja:7
+msgid "Reset"
+msgstr "Reset"
+
+#: core/templates/core/password_reset_complete.jinja:4
+msgid "You successfully reset your password!"
+msgstr "Vous avez correctement réinitialisé votre mot de passe !"
+
+#: core/templates/core/password_reset_done.jinja:4
+msgid "Password reset sent"
+msgstr "Réinitialisation de mot de passe envoyée"
+
+#: core/templates/core/password_reset_done.jinja:7
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should\n"
+"receive them shortly."
+msgstr ""
+"Nous vous avons envoyé les instructions pour réinitialiser votre mot de "
+"passe par email, si un compte avec l'email entré existe effectivement.\n"
+"Vous devriez les recevoir rapidement."
+
+#: core/templates/core/password_reset_done.jinja:12
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam\n"
+"folder."
+msgstr ""
+"Si vous ne recevez pas d'email, assurez-vous d'avoir correctement entré "
+"l'adresse email avec laquelle vous vous êtes inscrit, et vérifiez votre "
+"dossier de spam."
+
 #: core/templates/core/password_reset_email.jinja:2
 #, python-format
-# msgid ""
-# "You're receiving this email because you requested a password reset for your "
-# "user account at %(site_name)s."
-# msgstr ""
-# "Vous avez reçu cet email parce que vous avez demandé une réinitialisation du "
-# "mot de passe pour votre compte sur le site %(site_name)."
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Vous avez reçu cet email parce que vous avez demandé une réinitialisation du "
+"mot de passe pour votre compte sur le site %(site_name)s."
 
 #: core/templates/core/password_reset_email.jinja:4
 msgid "Please go to the following page and choose a new password:"
@@ -260,12 +734,120 @@ msgstr "Votre nom d'utilisateur, en cas d'oubli :"
 
 #: core/templates/core/password_reset_email.jinja:10
 msgid "Thanks for using our site! "
-msgstr "Merci d'utiliser notre site!"
+msgstr "Merci d'utiliser notre site !"
 
 #: core/templates/core/password_reset_email.jinja:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "L'équipe de %(site_name)s"
+
+#: core/templates/core/register.jinja:3 core/templates/core/register.jinja:6
+msgid "Register a user"
+msgstr "Enregistrer un utilisateur"
+
+#: core/templates/core/register.jinja:9
+#, python-format
+msgid "Welcome %(user_name)s!"
+msgstr "Bienvenue, %(user_name)s!"
+
+#: core/templates/core/register.jinja:10
+msgid ""
+"You successfully registred and you will soon receive a confirmation mail."
+msgstr ""
+"Vous vous êtes correctement enregistré, et vous devriez recevoir rapidement "
+"un email de confirmation."
+
+#: core/templates/core/register.jinja:12
+#, python-format
+msgid "Your username is %(username)s."
+msgstr "Votre nom d'utilisateur est %(username)s."
+
+#: core/templates/core/user_base.jinja:6
+msgid "Infos"
+msgstr "Infos"
+
+#: core/templates/core/user_base.jinja:11
+#: core/templates/core/user_tools.jinja:13
+msgid "Groups"
+msgstr "Groupes"
+
+#: core/templates/core/user_base.jinja:16
+msgid "Account"
+msgstr "Compte"
+
+#: core/templates/core/user_detail.jinja:4
+#, python-format
+msgid "%(user_name)s's profile"
+msgstr "Profil de %(user_name)s"
+
+#: core/templates/core/user_detail.jinja:8
+msgid "User Profile"
+msgstr "Profil de l'utilisateur"
+
+#: core/templates/core/user_detail.jinja:13
+msgid "Born: "
+msgstr "Né le : "
+
+#: core/templates/core/user_detail.jinja:20
+#, python-format
+msgid ""
+"\n"
+"User is subscriber until %(subscription_end)s"
+msgstr ""
+"\n"
+"L'utilisateur est cotisant jusqu'au %(subscription_end)s"
+
+#: core/templates/core/user_detail.jinja:23
+msgid "User is not subscribed. "
+msgstr "L'utilisateur n'est pas cotisant."
+
+#: core/templates/core/user_detail.jinja:24
+#: subscription/templates/subscription/subscription.jinja:4
+#: subscription/templates/subscription/subscription.jinja:8
+msgid "New subscription"
+msgstr "Nouvelle cotisation"
+
+#: core/templates/core/user_edit.jinja:4
+msgid "Edit user profile"
+msgstr "Éditer le profil de l'utilisateur"
+
+#: core/templates/core/user_edit.jinja:11
+msgid "Change my password"
+msgstr "Changer mon mot de passe"
+
+#: core/templates/core/user_group.jinja:4
+#, python-format
+msgid "Edit user groups for %(user_name)s"
+msgstr "Éditer les groupes pour %(user_name)s"
+
+#: core/templates/core/user_list.jinja:4 core/templates/core/user_list.jinja:8
+msgid "User list"
+msgstr "Liste d'utilisateurs"
+
+#: core/templates/core/user_tools.jinja:4
+#, python-format
+msgid "%(user_name)s's tools"
+msgstr "Outils de %(user_name)s"
+
+#: core/templates/core/user_tools.jinja:8
+msgid "User Tools"
+msgstr "Outils utilisateurs"
+
+#: core/templates/core/user_tools.jinja:10
+msgid "Sith management"
+msgstr "Gestion de Sith"
+
+#: core/templates/core/user_tools.jinja:16
+msgid "Counters management"
+msgstr "Gestion des comptoirs"
+
+#: core/templates/core/user_tools.jinja:22
+msgid "Subscriptions"
+msgstr "Cotisations"
+
+#: core/templates/core/user_tools.jinja:26
+msgid "Counters"
+msgstr "Comptoirs"
 
 #: counter/models.py:20
 msgid "account id"
@@ -314,6 +896,113 @@ msgstr "prix unitaire"
 #: counter/models.py:187
 msgid "quantity"
 msgstr "quantité"
+
+#: counter/templates/counter/counter_click.jinja:20
+#: counter/templates/counter/counter_main.jinja:12
+msgid "Counter"
+msgstr "Comptoir"
+
+#: counter/templates/counter/counter_click.jinja:22
+#: counter/templates/counter/counter_main.jinja:14
+msgid "Club: "
+msgstr "Club : "
+
+#: counter/templates/counter/counter_click.jinja:25
+msgid "Customer"
+msgstr "Client"
+
+#: counter/templates/counter/counter_click.jinja:29
+msgid "Refilling"
+msgstr "Rechargement"
+
+#: counter/templates/counter/counter_click.jinja:34
+#: counter/templates/counter/counter_click.jinja:46
+msgid "Go"
+msgstr "Valider"
+
+#: counter/templates/counter/counter_click.jinja:38
+msgid "Selling"
+msgstr "Vente"
+
+#: counter/templates/counter/counter_click.jinja:40
+msgid "Not enough money"
+msgstr "Solde insuffisant"
+
+#: counter/templates/counter/counter_click.jinja:48
+msgid "Basket: "
+msgstr "Panier : "
+
+#: counter/templates/counter/counter_click.jinja:56
+#: counter/templates/counter/counter_main.jinja:28
+msgid "Total: "
+msgstr "Total : "
+
+#: counter/templates/counter/counter_click.jinja:60
+msgid "Finish"
+msgstr "Terminer"
+
+#: counter/templates/counter/counter_click.jinja:67
+#: counter/templates/counter/counter_main.jinja:15
+msgid "Products: "
+msgstr "Produits : "
+
+#: counter/templates/counter/counter_edit.jinja:4
+msgid "Edit counter"
+msgstr "Éditer le comptoir"
+
+#: counter/templates/counter/counter_list.jinja:4
+#: counter/templates/counter/counter_list.jinja:10
+msgid "Counter admin list"
+msgstr "Liste des comptoirs"
+
+#: counter/templates/counter/counter_list.jinja:8
+msgid "New counter"
+msgstr "Nouveau comptoir"
+
+#: counter/templates/counter/counter_list.jinja:18
+msgid "There is no counters in this website."
+msgstr "Il n'y a pas de comptoirs dans ce site web."
+
+#: counter/templates/counter/counter_main.jinja:19
+msgid "Sellings"
+msgstr "Ventes"
+
+#: counter/templates/counter/counter_main.jinja:21
+msgid "Last selling: "
+msgstr "Dernière vente : "
+
+#: counter/templates/counter/counter_main.jinja:22
+msgid "Client: "
+msgstr "Client : "
+
+#: counter/templates/counter/counter_main.jinja:22
+msgid "New amount: "
+msgstr "Nouveau montant : "
+
+#: counter/templates/counter/counter_main.jinja:31
+msgid "Enter client code:"
+msgstr "Entrez un code client : "
+
+#: counter/templates/counter/counter_main.jinja:35
+msgid "validate"
+msgstr "valider"
+
+#: counter/templates/counter/counter_main.jinja:38
+msgid "Please, login"
+msgstr "Merci de vous identifier"
+
+#: counter/templates/counter/counter_main.jinja:42
+msgid "Barman: "
+msgstr "Barman : "
+
+#: counter/templates/counter/user_account.jinja:4
+#, python-format
+msgid "%(user_name)s's account"
+msgstr "Compte de %(user_name)s"
+
+#: counter/templates/counter/user_account.jinja:8
+msgid "User account"
+msgstr "Compte utilisateur"
 
 #: counter/views.py:194
 msgid "END"

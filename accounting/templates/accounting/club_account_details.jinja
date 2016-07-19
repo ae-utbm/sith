@@ -1,53 +1,49 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-<p>
-<a href="{{ url('accounting:bank_list') }}">Accounting</a> >
-<a href="{{ url('accounting:bank_details', b_account_id=object.bank_account.id) }}">{{object.bank_account }}</a> >
-{{ object }}
-<h2>View account: {{ object.name }}</h2>
+    <p>
+    <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
+    <a href="{{ url('accounting:bank_details', b_account_id=object.bank_account.id) }}">{{object.bank_account }}</a> >
+    {{ object }}
+    <h2>{% trans %}View account:{% endtrans %} {{ object.name }}</h2>
     <ul>
-    {% for k,v in object.__dict__.items() %}
+        {% for k,v in object.__dict__.items() %}
         <li>{{ k }} - {{ v }}</li>
-    {% endfor %}
+        {% endfor %}
     </ul>
     {% if not object.has_open_journal() %}
-        <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">New journal</a></p>
+    <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">{% trans %}New journal{% endtrans %}</a></p>
     {% else %}
-        <p>You can not create new journal while you still have one opened</p>
+    <p>{% trans %}You can not create new journal while you still have one opened{% endtrans %}</p>
     {% endif %}
     <table>
         <tr>
-            <td>Name</td>
-            <td>Start</td>
-            <td>End</td>
-            <td>Amount</td>
-            <td>Effective amount</td>
-            <td>Closed</td>
+            <td>{% trans %}Name{% endtrans %}</td>
+            <td>{% trans %}Start{% endtrans %}</td>
+            <td>{% trans %}End{% endtrans %}</td>
+            <td>{% trans %}Amount{% endtrans %}</td>
+            <td>{% trans %}Effective amount{% endtrans %}</td>
+            <td>{% trans %}Closed{% endtrans %}</td>
         </tr>
-    {% for j in object.journals.all() %}
-    <tr>
-        <td>{{ j.name }}</td>
-        <td>{{ j.start_date }}</td>
-        {% if j.end_date %}
+        {% for j in object.journals.all() %}
+        <tr>
+            <td>{{ j.name }}</td>
+            <td>{{ j.start_date }}</td>
+            {% if j.end_date %}
             <td>{{ j.end_date }}</td>
-        {% else %}
+            {% else %}
             <td> - </td>
-        {% endif %}
-        <td>{{ j.amount }} €</td>
-        <td>{{ j.effective_amount }} €</td>
-        {% if j.closed %}
-        <td>Yes</td>
-        {% else %}
-        <td>No</td>
-        {% endif %}
-        <td> <a href="{{ url('accounting:journal_details', j_id=j.id) }}">View</a>
-        <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">Edit</a> </td>
-    </tr>
-    {% endfor %}
+            {% endif %}
+            <td>{{ j.amount }} €</td>
+            <td>{{ j.effective_amount }} €</td>
+            {% if j.closed %}
+            <td>{% trans %}Yes{% endtrans %}</td>
+            {% else %}
+            <td>{% trans %}No{% endtrans %}</td>
+            {% endif %}
+            <td> <a href="{{ url('accounting:journal_details', j_id=j.id) }}">{% trans %}View{% endtrans %}</a>
+                <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">{% trans %}Edit{% endtrans %}</a> </td>
+        </tr>
+        {% endfor %}
     </table>
-
 {% endblock %}
-
-
-

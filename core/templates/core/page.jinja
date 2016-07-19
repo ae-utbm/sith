@@ -1,23 +1,24 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-    {% if page %}
-        {{ page.get_display_name() }}
-    {% elif page_list %}
-        Page list
-    {% elif new_page %}
-        Create page
-    {% else %}
-        Not found
-    {% endif %}
+{% if page %}
+{{ page.get_display_name() }}
+{% elif page_list %}
+{% trans %}Page list{% endtrans %}
+{% elif new_page %}
+{% trans %}Create page{% endtrans %}
+{% else %}
+{% trans %}Not found{% endtrans %}
+{% endif %}
 {% endblock %}
 
 {% block content %}
-    {% if page %}
-        {% block page %}
-        {% endblock %}
-    {% else %}
-        <h2>Page does not exist</h2>
-        <p><a href="{{ url('core:page_new') }}?page={{ request.resolver_match.kwargs['page_name'] }}">Create it?</a></p>
-    {% endif %}
+{% if page %}
+{% block page %}
+{% endblock %}
+{% else %}
+<h2>{% trans %}Page does not exist{% endtrans %}</h2>
+<p><a href="{{ url('core:page_new') }}?page={{ request.resolver_match.kwargs['page_name'] }}">
+    {% trans %}Create it?{% endtrans %}</a></p>
+{% endif %}
 {% endblock %}

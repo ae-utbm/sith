@@ -1,20 +1,20 @@
 {% extends "core/base.jinja" %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{% trans %}Register a user{% endtrans %}{% endblock %}
 
 {% block content %}
-<h1>{{ title }}</h1>
+<h1>{% trans %}Register a user{% endtrans %}</h1>
 
 {% if user_registered %}
-Welcome {{ user_registered.get_display_name() }}!
-You successfully registred and you will soon receive a confirmation mail.
+{% trans user_name=user_registered.get_display_name() %}Welcome {{ user_name }}!{% endtrans %}
+{% trans %}You successfully registred and you will soon receive a confirmation mail.{% endtrans %}
 
-Your username is {{ user_registered.username }}.
+{% trans username=user_registered.username %}Your username is {{ username }}.{% endtrans %}
 {% endif %}
 
 <form action="{{ url('core:register') }}" method="post">
     {% csrf_token %}
     {{ form }}
-    <p><input type="submit" value="Register!" /></p>
+    <p><input type="submit" value="{% trans %}Register{% endtrans %}" /></p>
 </form>
 {% endblock %}

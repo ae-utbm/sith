@@ -1,15 +1,13 @@
 {% extends "core/user_base.jinja" %}
 
 {% block title %}
-    {{ profile.get_display_name() }}'s account
+{% trans user_name=profile.get_display_name() %}{{ user_name }}'s account{% endtrans %}
 {% endblock %}
 
 {% block infos %}
-<h3>User account</h3>
+<h3>{% trans %}User account{% endtrans %}</h3>
 <p>{{ customer.refillings.all() }}</p>
 <p>{{ customer.buyings.all() }}</p>
-
-
 {% endblock %}
 
 

@@ -1,23 +1,20 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-    Accounting type list
+{% trans %}Accounting type list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <p><a href="{{ url('accounting:type_new') }}">New accounting type</a></p>
+    <p><a href="{{ url('accounting:type_new') }}">{% trans %}New accounting type{% endtrans %}</a></p>
     {% if accountingtype_list %}
-        <h3>Accounting type list</h3>
-        <ul>
-            {% for a in accountingtype_list  %}
-            <li><a href="{{ url('accounting:type_edit', type_id=a.id) }}">{{ a }}</a></li>
-            {% endfor %}
-        </ul>
+    <h3>{% trans %}Accounting type list{% endtrans %}</h3>
+    <ul>
+        {% for a in accountingtype_list  %}
+        <li><a href="{{ url('accounting:type_edit', type_id=a.id) }}">{{ a }}</a></li>
+        {% endfor %}
+    </ul>
     {% else %}
-        There is no types in this website.
+    {% trans %}There is no types in this website.{% endtrans %}
     {% endif %}
 {% endblock %}
-
-
-
 

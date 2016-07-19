@@ -9,37 +9,37 @@
 {% endmacro %}
 
 {% block content %}
-    <h3>Counter</h3>
+<h3>{% trans %}Counter{% endtrans %}</h3>
     <h4>{{ counter }}</h4>
-    <p><strong>Club: </strong> {{ counter.club }}</p>
-    <p><strong>Products: </strong> {{ counter.products.all() }}</p>
+    <p><strong>{% trans %}Club: {% endtrans %}</strong> {{ counter.club }}</p>
+    <p><strong>{% trans %}Products: {% endtrans %}</strong> {{ counter.products.all() }}</p>
 
 
     <div>
-        <h3>Sellings</h3>
+        <h3>{% trans %}Sellings{% endtrans %}</h3>
         {% if last_basket %}
-            <h4>Last selling: </h4>
-            <p>Client: {{ last_customer }}, new amount: {{ new_customer_amount }} €.</p>
+        <h4>{% trans %}Last selling: {% endtrans %}</h4>
+        <p>{% trans %}Client: {% endtrans %}{{ last_customer }} - {% trans %}New amount: {% endtrans %}{{ new_customer_amount }} €.</p>
             <ul>
             {% for s in last_basket %}
                 <li>{{ s }}</li>
             {% endfor %}
             </ul>
-            <p><strong>Total: {{ last_total }} €</strong></p>
+            <p><strong>{% trans %}Total: {% endtrans %}{{ last_total }} €</strong></p>
         {% endif %}
         {% if barmen %}
-        <p>Enter client code:</p>
+        <p>{% trans %}Enter client code:{% endtrans %}</p>
         <form method="post" action="{{ url('counter:details', counter_id=counter.id) }}">
             {% csrf_token %}
             {{ form.as_p() }}
-            <p><input type="submit" value="VALIDATE" /></p>
+            <p><input type="submit" value="{% trans %}validate{% endtrans %}" /></p>
         </form>
         {% else %}
-        <p>Please, login</p>
+        <p>{% trans %}Please, login{% endtrans %}</p>
         {% endif %}
     </div>
     <div>
-        <h3>Barman: </h3>
+        <h3>{% trans %}Barman: {% endtrans %}</h3>
         <ul>
         {% for b in barmen %}
             <li>{{ barman_logout_link(b) }}</li>
@@ -48,7 +48,7 @@
         <form method="post" action="{{ url('counter:login', counter_id=counter.id) }}">
             {% csrf_token %}
             {{ login_form.as_p() }}
-            <p><input type="submit" value="LOGIN" /></p>
+            <p><input type="submit" value="{% trans %}login{% endtrans %}" /></p>
         </form>
     </div>
 {% endblock %}

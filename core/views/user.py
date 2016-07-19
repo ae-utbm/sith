@@ -74,7 +74,7 @@ def password_reset_complete(request):
 
 
 def register(request):
-    context = {'title': 'Register a user'}
+    context = {}
     if request.method == 'POST':
         form = RegisteringForm(request.POST)
         if form.is_valid():

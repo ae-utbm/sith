@@ -1,12 +1,12 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-    <h2>Delete confirmation</h2>
-    <form action="" method="post">{% csrf_token %}
-        <p>Are you sure you want to delete "{{ object }}"?</p>
-        <input type="submit" value="Confirm" />
-        <input type="submit" name="cancel" value="Cancel" />
-    </form>
+<h2>{% trans %}Delete confirmation{% endtrans %}</h2>
+<form action="" method="post">{% csrf_token %}
+    <p>{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}</p>
+    <input type="submit" value="{% trans %}Confirm{% endtrans %}" />
+    <input type="submit" name="cancel" value="{% trans %}Cancel{% endtrans %}" />
+</form>
 {% endblock %}
 
 

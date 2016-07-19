@@ -1,25 +1,27 @@
 {% extends "core/user_base.jinja" %}
 
 {% block title %}
-    {{ profile.get_display_name() }}'s profile
+{% trans user_name=profile.get_display_name() %}{{ user_name }}'s profile{% endtrans %}
 {% endblock %}
 
 {% block infos %}
-<h3>User Profile</h3>
+<h3>{% trans %}User Profile{% endtrans %}</h3>
 
 <div class="user_profile">
-<h4>{{ profile.get_full_name() }}</h4>
-<p>{{ profile.nick_name }}</p>
-<p>Born: {{ profile.date_of_birth|date("d/m/Y") }}</p>
+    <h4>{{ profile.get_full_name() }}</h4>
+    <p>{{ profile.nick_name }}</p>
+    <p>{% trans %}Born: {% endtrans %}{{ profile.date_of_birth|date("d/m/Y") }}</p>
 </div>
 
 {% if user.membership.filter(end_date=None).exists() %}
 {# if the user is member of a club, he can view the subscription state #}
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
-User is subscriber until {{ get_subscriber(profile).subscriptions.last().subscription_end }}
+{% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}
+User is subscriber until {{ subscription_end }}{% endtrans %}
 {% else %}
-User is not subscribed. <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">New subscription</a>
+{% trans %}User is not subscribed. {% endtrans %}
+<a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>
 {% endif %}
 </p>
 {% endif %}

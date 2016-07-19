@@ -1,22 +1,22 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-    Counter admin list
+{% trans %}Counter admin list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <p><a href="{{ url('counter:new') }}">New counter</a></p>
-    {% if counter_list %}
-        <h3>Counter admin list</h3>
-        <ul>
-            {% for c in counter_list  %}
-            <li><a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
-                <a href="{{ url('counter:admin', counter_id=c.id) }}">Edit</a></li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        There is no counters in this website.
-    {% endif %}
+<p><a href="{{ url('counter:new') }}">{% trans %}New counter{% endtrans %}</a></p>
+{% if counter_list %}
+<h3>{% trans %}Counter admin list{% endtrans %}</h3>
+<ul>
+    {% for c in counter_list  %}
+    <li><a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
+        <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+{% trans %}There is no counters in this website.{% endtrans %}
+{% endif %}
 {% endblock %}
 
 

@@ -1,14 +1,14 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-New subscription
+{% trans %}New subscription{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>New subscription</h3>
+<h3>{% trans %}New subscription{% endtrans %}</h3>
 <form action="" method="post">
     {% csrf_token %}
     {{ form.as_p() }}
-    <p><input type="submit" value="Save!" /></p>
+    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
 {% endblock %}

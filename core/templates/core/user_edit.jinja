@@ -1,15 +1,15 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-    <h2>Edit user profile</h2>
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p() }}
-        <p><input type="submit" value="Update" /></p>
-    </form>
-    {% if form.instance == user %}
-        <p><a href="{{ url('core:password_change') }}">Change my password</a></p>
-    {% endif %}
+<h2>{% trans %}Edit user profile{% endtrans %}</h2>
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>
+</form>
+{% if form.instance == user %}
+<p><a href="{{ url('core:password_change') }}">{% trans %}Change my password{% endtrans %}</a></p>
+{% endif %}
 {% endblock %}
 
 

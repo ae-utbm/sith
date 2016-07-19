@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-    <h2>Club members</h2>
+    <h2>{% trans %}Club members{% endtrans %}</h2>
     <ul>
         {% for m in club.members.all() %}
         <li>{{ m }}</li>
@@ -10,7 +10,7 @@
     <form action="{{ url('club:club_members', club_id=club.id) }}" method="post">
         {% csrf_token %}
         {{ form.as_p() }}
-        <p><input type="submit" value="Add" /></p>
+        <p><input type="submit" value="{% trans %}Add{% endtrans %}" /></p>
     </form>
 {% endblock %}
 

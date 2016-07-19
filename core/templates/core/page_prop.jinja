@@ -1,12 +1,12 @@
 {% extends "core/page.jinja" %}
 
 {% block content %}
-    <h2>Page properties</h2>
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p() }}
-        <p><input type="submit" value="Save!" /></p>
-    </form>
+<h2>{% trans %}Page properties{% endtrans %}</h2>
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+</form>
 {% endblock %}
 
 

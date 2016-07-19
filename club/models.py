@@ -74,7 +74,7 @@ class Club(models.Model):
         Method to see if that object can be edited by the given user
         """
         ms = self.get_membership_for(user)
-        if ms is not None and ms.role >= 7:
+        if ms is not None:
             return True
         return False
 
@@ -104,8 +104,8 @@ class Membership(models.Model):
     A User is currently member of all the Clubs where its Membership has an end_date set to null/None.
     Otherwise, it's a past membership kept because it can be very useful to see who was in which Club in the past.
     """
-    user = models.ForeignKey(User, related_name="membership", null=False, blank=False)
-    club = models.ForeignKey(Club, related_name="members", null=False, blank=False)
+    user = models.ForeignKey(User, verbose_name=_('user'), related_name="membership", null=False, blank=False)
+    club = models.ForeignKey(Club, verbose_name=_('club'), related_name="members", null=False, blank=False)
     start_date = models.DateField(_('start date'), auto_now=True)
     end_date = models.DateField(_('end date'), null=True, blank=True)
     role = models.IntegerField(_('role'), choices=sorted(settings.SITH_CLUB_ROLES.items()),

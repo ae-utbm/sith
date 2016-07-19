@@ -1,17 +1,17 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-    <h3>Club</h3>
-    <p><a href="{{ url('club:club_list') }}">Back to list</a></p>
+    <h3>{% trans %}Club{% endtrans %}</h3>
+    <p><a href="{{ url('club:club_list') }}">{% trans %}Back to list{% endtrans %}</a></p>
     {% if can_edit(club, user) %}
-        <p><a href="{{ url('club:club_edit', club_id=club.pk) }}">Edit</a></p>
+    <p><a href="{{ url('club:club_edit', club_id=club.pk) }}">{% trans %}Edit{% endtrans %}</a></p>
     {% endif %}
     {% if can_edit_prop(club, user) %}
-        <p><a href="{{ url('club:club_prop', club_id=club.pk) }}">Prop</a>
-        </p>
+    <p><a href="{{ url('club:club_prop', club_id=club.pk) }}">{% trans %}Prop{% endtrans %}</a>
+    </p>
     {% endif %}
     {% if can_view(club, user) %}
-        <p><a href="{{ url('club:club_members', club_id=club.pk) }}">Members</a></p>
+    <p><a href="{{ url('club:club_members', club_id=club.pk) }}">{% trans %}Members{% endtrans %}</a></p>
     {% endif %}
     <h3>{{ club.name }}</h3>
     <p>{{ club.address }}</p>

@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-    Club list
+{% trans %}Club list{% endtrans %}
 {% endblock %}
 
 {% macro display_club(club) -%}
@@ -18,17 +18,17 @@
 
 {% block content %}
     {% if user.is_superuser or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
-        <p><a href="{{ url('club:club_new') }}">New club</a></p>
+    <p><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></p>
     {% endif %}
     {% if club_list %}
-        <h3>Club list</h3>
-        <ul>
-            {%- for c in club_list if c.parent is none %}
-                {{ display_club(c) }}
-            {%- endfor %}
-        </ul>
+    <h3>{% trans %}Club list{% endtrans %}</h3>
+    <ul>
+        {%- for c in club_list if c.parent is none %}
+        {{ display_club(c) }}
+        {%- endfor %}
+    </ul>
     {% else %}
-        There is no club in this website.
+    {% trans %}There is no club in this website.{% endtrans %}
     {% endif %}
 {% endblock %}
 
