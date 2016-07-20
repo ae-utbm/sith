@@ -105,6 +105,12 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = 'username'
     # REQUIRED_FIELDS = ['email']
 
+    def has_module_perms(self, package_name):
+        return self.is_active
+
+    def has_perm(self, perm, obj=None):
+        return self.is_active and self.is_superuser
+
     def get_absolute_url(self):
         """
         This is needed for black magic powered UpdateView's children
