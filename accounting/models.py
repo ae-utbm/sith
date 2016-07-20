@@ -1,7 +1,10 @@
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
+from django.db.models import Count
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.template import defaultfilters
 
 from decimal import Decimal
 from core.models import User
@@ -128,6 +131,7 @@ class Operation(models.Model):
     """
     An operation is a line in the journal, a debit or a credit
     """
+    number = models.IntegerField(_('number'))
     journal = models.ForeignKey(GeneralJournal, related_name="operations", null=False)
     amount = CurrencyField(_('amount'))
     date = models.DateField(_('date'))
@@ -139,7 +143,19 @@ class Operation(models.Model):
     done = models.BooleanField(_('is done'), default=False)
     accounting_type = models.ForeignKey('AccountingType', related_name="operations")
 
+    class Meta:
+        unique_together = ('number', 'journal')
+        ordering = ['-number']
+
+    def clean(self):
+        super(Operation, self).clean()
+        if self.date < self.journal.start_date:
+            raise ValidationError(_("""The date can not be before the start date of the journal, which is
+%(start_date)s.""") % {'start_date': defaultfilters.date(self.journal.start_date, settings.DATE_FORMAT)})
+
     def save(self):
+        if self.number is None:
+            self.number = self.journal.operations.count() + 1
         super(Operation, self).save()
         self.journal.update_amounts()
 

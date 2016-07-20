@@ -17,6 +17,7 @@
     <p>{% trans %}You can not create new journal while you still have one opened{% endtrans %}</p>
     {% endif %}
     <table>
+        <thead>
         <tr>
             <td>{% trans %}Name{% endtrans %}</td>
             <td>{% trans %}Start{% endtrans %}</td>
@@ -24,7 +25,10 @@
             <td>{% trans %}Amount{% endtrans %}</td>
             <td>{% trans %}Effective amount{% endtrans %}</td>
             <td>{% trans %}Closed{% endtrans %}</td>
+            <td>{% trans %}Actions{% endtrans %}</td>
         </tr>
+        </thead>
+        <tbody>
         {% for j in object.journals.all() %}
         <tr>
             <td>{{ j.name }}</td>
@@ -45,5 +49,6 @@
                 <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">{% trans %}Edit{% endtrans %}</a> </td>
         </tr>
         {% endfor %}
+        </tbody>
     </table>
 {% endblock %}

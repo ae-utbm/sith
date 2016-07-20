@@ -180,9 +180,3 @@ select[multiple]
     vertical-align: top;
 }
 
-/* Tables
------------------------------------------------*/
-tbody>tr{
-    display: block;
-    margin: 3px;
-}

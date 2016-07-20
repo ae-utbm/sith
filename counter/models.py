@@ -65,7 +65,7 @@ class Product(models.Model):
     icon = models.ImageField(upload_to='products', null=True, blank=True)
     club = models.ForeignKey(Club, related_name="products")
 
-    def is_owned_by(self, user): # TODO do this for all models
+    def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
         """

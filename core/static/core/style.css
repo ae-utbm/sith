@@ -111,6 +111,24 @@ ul, ol {
     display: inline-block;
     margin: 4px;
 }
+table {
+    width: 100%;
+}
+td {
+    padding: 4px;
+    border: solid 1px black;
+    border-collapse: collapse;
+}
+thead {
+    font-weight: bold;
+}
+tbody>tr:nth-child(even) {
+    background: lightgrey;
+}
+tbody>tr:hover {
+    background: yellow;
+    width: 100%;
+}
 
 /*-----------------------------USER PROFILE----------------------------*/
 .user_profile {

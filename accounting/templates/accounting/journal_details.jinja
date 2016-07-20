@@ -15,6 +15,7 @@
     <p><a href="{{ url('accounting:op_new') }}?parent={{ object.id }}">{% trans %}New operation{% endtrans %}</a></p>
     {% endif %}
     <table>
+        <thead>
         <tr>
             <td>{% trans %}Nb{% endtrans %}</td>
             <td>{% trans %}Date{% endtrans %}</td>
@@ -28,9 +29,11 @@
             <td>{% trans %}Comment{% endtrans %}</td>
             <td>{% trans %}Actions{% endtrans %}</td>
         </tr>
+        </thead>
+        <tbody>
         {% for o in object.operations.all() %}
         <tr>
-            <td>{{ o.id }}</td>
+            <td>{{ o.number }}</td>
             <td>{{ o.date }}</td>
             <td>{{ o.label }}</td>
             <td>{{ o.amount }} €</td>
@@ -50,5 +53,6 @@
             </td>
         </tr>
         {% endfor %}
+        </tbody>
     </table>
 {% endblock %}
