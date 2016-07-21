@@ -6,6 +6,7 @@
 
 {% block infos %}
 <h3>{% trans %}User account{% endtrans %}</h3>
+<p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 <p>{{ customer.refillings.all() }}</p>
 <p>{{ customer.buyings.all() }}</p>
 {% endblock %}

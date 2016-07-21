@@ -10,6 +10,7 @@ from django.utils import timezone
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.db import DataError, transaction
 
 import re
 
@@ -218,31 +219,34 @@ class CounterClick(DetailView):
 
     def finish(self, request):
         """ Finish the click session, and validate the basket """
-        if self.is_barman_price():
-            seller = self.customer.user
-        else:
-            seller = Counter.get_random_barman(self.object.id)
-        request.session['last_basket'] = []
-        for pid,infos in request.session['basket'].items():
-            # This duplicates code for DB optimization (prevent to load many times the same object)
-            p = Product.objects.filter(pk=pid).first()
+        with transaction.atomic():
             if self.is_barman_price():
-                uprice = p.special_selling_price
+                seller = self.customer.user
             else:
-                uprice = p.selling_price
-            request.session['last_basket'].append("%d x %s" % (infos['qty'], p.name))
-            s = Selling(product=p, counter=self.object, unit_price=uprice,
-                   quantity=infos['qty'], seller=seller, customer=self.customer)
-            s.save()
-        request.session['last_customer'] = self.customer.user.get_display_name()
-        request.session['last_total'] = "%0.2f" % self.sum_basket(request)
-        request.session['new_customer_amount'] = str(self.customer.amount)
-        del request.session['basket']
-        request.session.modified = True
-        kwargs = {
-                'counter_id': self.object.id,
-                }
-        return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))
+                seller = Counter.get_random_barman(self.object.id)
+            request.session['last_basket'] = []
+            for pid,infos in request.session['basket'].items():
+                # This duplicates code for DB optimization (prevent to load many times the same object)
+                p = Product.objects.filter(pk=pid).first()
+                if self.is_barman_price():
+                    uprice = p.special_selling_price
+                else:
+                    uprice = p.selling_price
+                if uprice * infos['qty'] > self.customer.amount:
+                    raise DataError(_("You have not enough money to buy all the basket"))
+                request.session['last_basket'].append("%d x %s" % (infos['qty'], p.name))
+                s = Selling(product=p, counter=self.object, unit_price=uprice,
+                       quantity=infos['qty'], seller=seller, customer=self.customer)
+                s.save()
+            request.session['last_customer'] = self.customer.user.get_display_name()
+            request.session['last_total'] = "%0.2f" % self.sum_basket(request)
+            request.session['new_customer_amount'] = str(self.customer.amount)
+            del request.session['basket']
+            request.session.modified = True
+            kwargs = {
+                    'counter_id': self.object.id,
+                    }
+            return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))
 
     def cancel(self, request):
         """ Cancel the click session """
