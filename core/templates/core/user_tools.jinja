@@ -7,6 +7,7 @@
 {% block content %}
 <h3>{% trans %}User Tools{% endtrans %}</h3>
 
+<hr>
 <h4>{% trans %}Sith management{% endtrans %}</h4>
 <ul>
     {% if user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
@@ -23,6 +24,7 @@
     {% endif %}
 </ul>
 
+<hr>
 <h4>{% trans %}Counters{% endtrans %}</h4>
 <ul>
     {% for b in settings.SITH_COUNTER_BARS %}
@@ -33,7 +35,23 @@
     {% endfor %}
 </ul>
 
-<h4>{% trans %}Clubs{% endtrans %}</h4>
+<hr>
+<h4>{% trans %}Accounting{% endtrans %}</h4>
+<ul>
+    {% for m in user.membership.filter(end_date=None).filter(role__gte=7).all() %}
+    {% for b in m.club.bank_accounts.all() %}
+    <li><strong>{% trans %}Bank account: {% endtrans %}</strong>
+        <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b.club }}</a></li>
+    {% endfor %}
+    {% if m.club.club_account %}
+    <li><strong>{% trans %}Club account: {% endtrans %}</strong>
+        <a href="{{ url('accounting:club_details', c_account_id=m.club.club_account.id) }}">{{ m.club.club_account }}</a></li>
+    {% endif %}
+    {% endfor %}
+</ul>
+
+<hr>
+<h4>{% trans %}Club tools{% endtrans %}</h4>
 <ul>
     {% for m in user.membership.filter(end_date=None).all() %}
     <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>

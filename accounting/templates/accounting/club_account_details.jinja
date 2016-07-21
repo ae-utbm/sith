@@ -5,12 +5,7 @@
     <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
     <a href="{{ url('accounting:bank_details', b_account_id=object.bank_account.id) }}">{{object.bank_account }}</a> >
     {{ object }}
-    <h2>{% trans %}View account:{% endtrans %} {{ object.name }}</h2>
-    <ul>
-        {% for k,v in object.__dict__.items() %}
-        <li>{{ k }} - {{ v }}</li>
-        {% endfor %}
-    </ul>
+    <h2>{% trans %}Club account:{% endtrans %} {{ object.name }}</h2>
     {% if not object.has_open_journal() %}
     <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">{% trans %}New journal{% endtrans %}</a></p>
     {% else %}

@@ -65,7 +65,7 @@ class BankAccountCreateView(CanCreateMixin, CreateView):
     Create a bank account (for the admins)
     """
     model = BankAccount
-    fields = ['name', 'iban', 'number']
+    fields = ['name', 'club', 'iban', 'number']
     template_name = 'core/create.jinja'
 
 class BankAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete to Close
@@ -163,9 +163,8 @@ class OperationCreateView(CanCreateMixin, CreateView):
     Create an operation
     """
     model = Operation
-    # fields = ['type', 'amount', 'label', 'remark', 'journal', 'date', 'cheque_number', 'accounting_type', 'done']
     form_class = modelform_factory(Operation,
-            fields=['amount', 'label', 'remark', 'journal', 'date', 'cheque_number', 'accounting_type', 'done'],
+            fields=['amount', 'label', 'remark', 'journal', 'date', 'mode', 'cheque_number', 'accounting_type', 'done'],
             widgets={'journal': HiddenInput})
     template_name = 'core/create.jinja'
 
@@ -183,6 +182,6 @@ class OperationEditView(CanEditMixin, UpdateView):
     """
     model = Operation
     pk_url_kwarg = "op_id"
-    fields = ['amount', 'label', 'remark', 'date', 'cheque_number', 'accounting_type', 'done']
+    fields = ['amount', 'label', 'remark', 'date', 'mode', 'cheque_number', 'accounting_type', 'done']
     template_name = 'core/edit.jinja'
 
