@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^club/', include('club.urls', namespace="club", app_name="club")),
     url(r'^counter/', include('counter.urls', namespace="counter", app_name="counter")),
     url(r'^accounting/', include('accounting.urls', namespace="accounting", app_name="accounting")),
+    url(r'^eboutic/', include('eboutic.urls', namespace="eboutic", app_name="eboutic")),
     url(r'^admin/', include(admin.site.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: remove me for production!!!

@@ -38,6 +38,7 @@
         <p>{% trans %}Please, login{% endtrans %}</p>
         {% endif %}
     </div>
+    {% if counter.type == 'BAR' %}
     <div>
         <h3>{% trans %}Barman: {% endtrans %}</h3>
         <ul>
@@ -51,6 +52,7 @@
             <p><input type="submit" value="{% trans %}login{% endtrans %}" /></p>
         </form>
     </div>
+    {% endif %}
 {% endblock %}
 
 

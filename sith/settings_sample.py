@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'subscription',
     'accounting',
     'counter',
+    'eboutic',
 )
 
 MIDDLEWARE_CLASSES = (

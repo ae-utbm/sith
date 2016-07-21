@@ -25,6 +25,7 @@
     <h5>{% trans %}Customer{% endtrans %}</h5>
     <p>{{ customer.user.get_display_name() }}, {{ customer.amount }} €</p>
 </div>
+{% if counter.type == 'BAR' %}
 <div>
     <h5>{% trans %}Refilling{% endtrans %}</h5>
     <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
@@ -34,6 +35,7 @@
         <input type="submit" value="{% trans %}Go{% endtrans %}" />
     </form>
 </div>
+{% endif %}
 <div>
     <h5>{% trans %}Selling{% endtrans %}</h5>
     {% if request.session['not_enough'] %}
@@ -47,7 +49,7 @@
     </form>
     <p>{% trans %}Basket: {% endtrans %}</p>
     <ul>
-        {% for id,infos in request.session['basket'].items() %}
+        {% for id,infos in request.session['basket']|dictsort %}
         {% set product = counter.products.filter(id=id).first() %}
         {% set s = infos['qty'] * infos['price'] / 100 %}
         <li>{{ del_product(id, '-') }} {{ infos['qty'] }} {{ add_product(id, '+') }} {{ product.name }}: {{ "%0.2f"|format(s) }} €</li>

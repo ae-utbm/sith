@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-21 12:08+0200\n"
+"POT-Creation-Date: 2016-07-21 17:39+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -113,8 +113,7 @@ msgstr "Il n'y a pas de types comptable dans ce site web."
 #: accounting/templates/accounting/bank_account_details.jinja:5
 #: accounting/templates/accounting/club_account_details.jinja:5
 #: accounting/templates/accounting/journal_details.jinja:5
-#: core/templates/core/user_tools.jinja:20
-#: core/templates/core/user_tools.jinja:39
+#: core/templates/core/user_tools.jinja:36
 msgid "Accounting"
 msgstr "Comptabilité"
 
@@ -147,7 +146,7 @@ msgstr "Nouveau compte club"
 #: club/templates/club/club_detail.jinja:7
 #: core/templates/core/page_detail.jinja:7
 #: core/templates/core/user_base.jinja:8
-#: core/templates/core/user_tools.jinja:33
+#: core/templates/core/user_tools.jinja:30
 #: counter/templates/counter/counter_list.jinja:14
 msgid "Edit"
 msgstr "Éditer"
@@ -865,16 +864,20 @@ msgid "Sith management"
 msgstr "Gestion de Sith"
 
 #: core/templates/core/user_tools.jinja:17
-msgid "Counters management"
-msgstr "Gestion des comptoirs"
-
-#: core/templates/core/user_tools.jinja:23
 msgid "Subscriptions"
 msgstr "Cotisations"
 
-#: core/templates/core/user_tools.jinja:28
+#: core/templates/core/user_tools.jinja:22
 msgid "Counters"
 msgstr "Comptoirs"
+
+#: core/templates/core/user_tools.jinja:25
+msgid "General counters management"
+msgstr "Gestion générale des comptoirs"
+
+#: core/templates/core/user_tools.jinja:39
+msgid "General accounting"
+msgstr "Comptabilité générale"
 
 #: core/templates/core/user_tools.jinja:47
 msgid "Club account: "
@@ -1152,8 +1155,3 @@ msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
 
-#~ msgid "View account"
-#~ msgstr "Voir le compte"
-
-#~ msgid "View account:"
-#~ msgstr "Voir le compte:"

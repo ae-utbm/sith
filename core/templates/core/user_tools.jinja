@@ -13,12 +13,6 @@
     {% if user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
     <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
     {% endif %}
-    {% if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']) %}
-    <li><a href="{{ url('counter:admin_list') }}">{% trans %}Counters management{% endtrans %}</a></li>
-    {% endif %}
-    {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) %}
-    <li><a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a></li>
-    {% endif %}
     {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
     <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
     {% endif %}
@@ -27,6 +21,9 @@
 <hr>
 <h4>{% trans %}Counters{% endtrans %}</h4>
 <ul>
+    {% if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+    <li><a href="{{ url('counter:admin_list') }}">{% trans %}General counters management{% endtrans %}</a></li>
+    {% endif %}
     {% for b in settings.SITH_COUNTER_BARS %}
     {% if user.is_in_group(b[1]+" admin") %}
     <li><a href="{{ url('counter:details', counter_id=b[0]) }}">{{ b[1] }}</a> -
@@ -38,6 +35,9 @@
 <hr>
 <h4>{% trans %}Accounting{% endtrans %}</h4>
 <ul>
+    {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+    <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
+    {% endif %}
     {% for m in user.membership.filter(end_date=None).filter(role__gte=7).all() %}
     {% for b in m.club.bank_accounts.all() %}
     <li><strong>{% trans %}Bank account: {% endtrans %}</strong>

@@ -10,7 +10,6 @@ from random import randrange
 from club.models import Club
 from accounting.models import CurrencyField
 from core.models import Group, User
-from subscription.models import Subscriber
 
 class Customer(models.Model):
     """
@@ -82,7 +81,7 @@ class Counter(models.Model):
     products = models.ManyToManyField(Product, related_name="counters", blank=True)
     type = models.CharField(_('subscription type'),
             max_length=255,
-            choices=[('BAR',_('Bar')), ('OFFICE',_('Office'))])
+            choices=[('BAR',_('Bar')), ('OFFICE',_('Office')), ('EBOUTIC',_('Eboutic'))])
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
     barmen_session = {}
@@ -132,7 +131,7 @@ class Counter(models.Model):
 
     def get_barmen_list(counter_id):
         """
-        Returns the barman list as list of Subscriber
+        Returns the barman list as list of User
 
         Also handle the timeout of the barmen
         """
@@ -141,7 +140,7 @@ class Counter(models.Model):
         if counter_id in list(Counter.barmen_session.keys()):
             for b in Counter.barmen_session[counter_id]['users']:
                 # Reminder: user is stored as a tuple with its login time
-                bl.append(Subscriber.objects.filter(id=b[0]).first())
+                bl.append(User.objects.filter(id=b[0]).first())
             if (timezone.now() - Counter.barmen_session[counter_id]['time']) < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
                 Counter.barmen_session[counter_id]['time'] = timezone.now()
             else:
@@ -151,9 +150,9 @@ class Counter(models.Model):
                 Counter.barmen_session[counter_id]['users'] = set()
         return bl
 
-    def get_random_barman(counter_id): # TODO: improve this function
+    def get_random_barman(counter_id):
         bl = Counter.get_barmen_list(counter_id)
-        return bl[0]
+        return bl[randrange(0, len(bl))]
 
 class Refilling(models.Model):
     """

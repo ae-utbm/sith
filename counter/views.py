@@ -72,7 +72,10 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         kwargs['login_form'] = AuthenticationForm()
         kwargs['login_form'].fields['username'].widget.attrs['autofocus'] = True
         kwargs['form'] = self.get_form()
-        kwargs['barmen'] = Counter.get_barmen_list(self.object.id)
+        if self.object.type == 'BAR':
+            kwargs['barmen'] = Counter.get_barmen_list(self.object.id)
+        elif self.request.user.is_authenticated():
+            kwargs['barmen'] = [self.request.user]
         if 'last_basket' in self.request.session.keys():
             kwargs['last_basket'] = self.request.session.pop('last_basket')
             kwargs['last_customer'] = self.request.session.pop('last_customer')
@@ -109,8 +112,10 @@ class CounterClick(DetailView):
         request.session['not_enough'] = False
         self.refill_form = None
         ret = super(CounterClick, self).get(request, *args, **kwargs)
-        if len(Counter.get_barmen_list(self.object.id)) < 1: # Check that at least one barman is logged in
-            return self.cancel(request) # Otherwise, go to main view
+        if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
+                (self.object.type == "BAR" and
+                len(Counter.get_barmen_list(self.object.id)) < 1)): # Check that at least one barman is logged in
+            ret = self.cancel(request) # Otherwise, go to main view
         return ret
 
     def post(self, request, *args, **kwargs):
@@ -173,7 +178,7 @@ class CounterClick(DetailView):
             request.session['basket'][pid]['qty'] += q
         else:
             request.session['basket'][pid] = {'qty': q, 'price': int(price*100)}
-        request.session['not_enough'] = False
+        request.session['not_enough'] = False # Reset not_enough to save the session
         request.session.modified = True
         return True
 
@@ -283,7 +288,8 @@ class CounterLogin(RedirectView):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = Subscriber.objects.filter(username=form.cleaned_data['username']).first()
-            Counter.add_barman(self.counter_id, user.id)
+            if user.is_subscribed():
+                Counter.add_barman(self.counter_id, user.id)
         else:
             print("Error logging the barman") # TODO handle that nicely
         return super(CounterLogin, self).post(request, *args, **kwargs)
