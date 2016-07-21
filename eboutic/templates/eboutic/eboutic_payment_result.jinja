@@ -1,0 +1,19 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+<h3>{% trans %}Eboutic{% endtrans %}</h3>
+
+<div>
+    {% if not_enough %}
+    {% trans %}Payment failed{% endtrans %}
+    {% else %}
+    {% trans %}Payment successful{% endtrans %}
+    {% endif %}
+</div>
+
+{% endblock %}
+
+
+
+
+

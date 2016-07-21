@@ -1,0 +1,42 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+<h3>{% trans %}Eboutic{% endtrans %}</h3>
+
+<div>
+    <p>{% trans %}Basket: {% endtrans %}</p>
+    <table>
+        <thead>
+            <tr>
+                <td>Article</td>
+                <td>Quantity</td>
+                <td>Unit price</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in basket.items.all() %}
+            <tr>
+                <td>{{ item.product_name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.product_unit_price }} €</td>
+            </tr>
+            {% endfor %}
+        <tbody>
+    </table>
+    <form method="post" action="{{ url('eboutic:command') }}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="pay_with_credit_card">
+        <input type="submit" value="{% trans %}Pay with credit card{% endtrans %}" />
+    </form>
+    <form method="post" action="{{ url('eboutic:pay_with_sith') }}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="pay_with_sith_account">
+        <input type="submit" value="{% trans %}Pay with Sith account{% endtrans %}" />
+    </form>
+</div>
+
+{% endblock %}
+
+
+
+

@@ -129,6 +129,12 @@ tbody>tr:hover {
     background: yellow;
     width: 100%;
 }
+#basket {
+    width: 40%;
+    background: lightgrey;
+    float: right;
+    padding: 10px;
+}
 
 /*-----------------------------USER PROFILE----------------------------*/
 .user_profile {

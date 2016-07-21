@@ -1,0 +1,49 @@
+{% extends "core/base.jinja" %}
+
+{% macro add_product(id, content) %}
+<form method="post" action="{{ url('eboutic:main') }}" class="inline" style="display:inline">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add_product">
+    <button type="submit" name="product_id" value="{{ id }}"> {{ content }} </button>
+</form>
+{% endmacro %}
+
+{% macro del_product(id, content) %}
+<form method="post" action="{{ url('eboutic:main') }}" class="inline" style="display:inline">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="del_product">
+    <button type="submit" name="product_id" value="{{ id }}"> {{ content }} </button>
+</form>
+{% endmacro %}
+
+{% block content %}
+<h3>{% trans %}Eboutic{% endtrans %}</h3>
+
+<div id="basket">
+    <p>{% trans %}Basket: {% endtrans %}</p>
+    <ul>
+        {% for id,infos in request.session['basket']|dictsort %}
+        {% set product = eboutic.products.filter(id=id).first() %}
+        {% set s = infos['qty'] * infos['price'] / 100 %}
+        <li>{{ del_product(id, '-') }} {{ infos['qty'] }} {{ add_product(id, '+') }} {{ product.name }}: {{ "%0.2f"|format(s) }} €</li>
+        {% endfor %}
+    </ul>
+    <p><strong>{% trans %}Total: {% endtrans %}{{ "%0.2f"|format(basket_total) }} €</strong></p>
+    <form method="post" action="{{ url('eboutic:command') }}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="ask_payment">
+        <input type="submit" value="{% trans %}Proceed to command{% endtrans %}" />
+    </form>
+</div>
+<div>
+    <p><strong>{% trans %}Products: {% endtrans %}</strong>
+    {% for p in eboutic.products.all() %}
+    {{ add_product(p.id, p.name) }}
+    {% endfor %}
+    </p>
+</div>
+
+{% endblock %}
+
+
+
