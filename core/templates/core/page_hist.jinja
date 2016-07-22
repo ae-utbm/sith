@@ -2,14 +2,16 @@
 
 {% block page %}
 <h3>{% trans %}Page history{% endtrans %}</h3>
-<p><a href="{{ url('core:page', page.get_full_name()) }}">{% trans %}Back to page{% endtrans %}</a></p>
-<p>{% trans page_name=page.get_display_name() %}You're seeing the history of page {{ page_name }}{% endtrans %}</p>
+<p>{% trans page_name=page.name %}You're seeing the history of page "{{ page_name }}"{% endtrans %}</p>
 <ul>
+    {% for r in (page.revisions.all()|sort(attribute='date', reverse=True)) %}
+    {% if loop.index < 2 %}
     <li><a href="{{ url('core:page', page_name=page.get_full_name()) }}">
             last - {{ page.revisions.last().author }} - {{ page.revisions.last().date|date('Y-m-d H:i') }}</a></li>
-    {% for r in (page.revisions.all()|sort(attribute='date', reverse=True))[1:] %}
+    {% else %}
     <li><a href="{{ url('core:page_rev', page_name=page.get_full_name(), rev=r['id']) }}">
             {{ r['author'] }} - {{ r['date']|date('Y-m-d H:i') }}</a></li>
+    {% endif %}
     {% endfor %}
 </ul>
 {% endblock %}

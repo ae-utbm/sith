@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-21 17:39+0200\n"
+"POT-Creation-Date: 2016-07-22 01:47+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: accounting/models.py:32 accounting/models.py:55 accounting/models.py:94
-#: club/models.py:18 counter/models.py:39 counter/models.py:58
-#: counter/models.py:80
+#: club/models.py:18 counter/models.py:38 counter/models.py:57
+#: counter/models.py:79
 msgid "name"
 msgstr "nom"
 
@@ -30,11 +30,11 @@ msgstr "IBAN"
 msgid "account number"
 msgstr "numero de compte"
 
-#: accounting/models.py:92 club/models.py:109 counter/models.py:215
+#: accounting/models.py:92 club/models.py:109 counter/models.py:214
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:93 club/models.py:110 counter/models.py:216
+#: accounting/models.py:93 club/models.py:110 counter/models.py:215
 msgid "end date"
 msgstr "date de fin"
 
@@ -42,8 +42,8 @@ msgstr "date de fin"
 msgid "is closed"
 msgstr "est fermé"
 
-#: accounting/models.py:97 accounting/models.py:136 counter/models.py:22
-#: counter/models.py:163
+#: accounting/models.py:97 accounting/models.py:136 counter/models.py:21
+#: counter/models.py:162
 msgid "amount"
 msgstr "montant"
 
@@ -55,8 +55,8 @@ msgstr "montant effectif"
 msgid "number"
 msgstr "numéro"
 
-#: accounting/models.py:137 core/models.py:462 counter/models.py:166
-#: counter/models.py:194
+#: accounting/models.py:137 core/models.py:462 counter/models.py:165
+#: counter/models.py:193 eboutic/models.py:17 eboutic/models.py:30
 msgid "date"
 msgstr "date"
 
@@ -68,7 +68,8 @@ msgstr "intitulé"
 msgid "remark"
 msgstr "remarque"
 
-#: accounting/models.py:140 counter/models.py:167 subscription/models.py:34
+#: accounting/models.py:140 counter/models.py:166 eboutic/models.py:32
+#: subscription/models.py:34
 msgid "payment method"
 msgstr "méthode de paiement"
 
@@ -89,7 +90,7 @@ msgstr ""
 "La date ne peut pas être avant la date de début du journal, qui est\n"
 "%(start_date)s."
 
-#: accounting/models.py:197 counter/models.py:61
+#: accounting/models.py:197 counter/models.py:60
 msgid "code"
 msgstr "code"
 
@@ -143,8 +144,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_list.jinja:15
 #: accounting/templates/accounting/club_account_details.jinja:44
 #: accounting/templates/accounting/journal_details.jinja:51
-#: club/templates/club/club_detail.jinja:7
-#: core/templates/core/page_detail.jinja:7
+#: club/templates/club/club_detail.jinja:7 core/templates/core/page.jinja:30
 #: core/templates/core/user_base.jinja:8
 #: core/templates/core/user_tools.jinja:30
 #: counter/templates/counter/counter_list.jinja:14
@@ -227,10 +227,12 @@ msgid "No"
 msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:43
+#: core/templates/core/page.jinja:27
 msgid "View"
 msgstr "Voir"
 
 #: accounting/templates/accounting/journal_details.jinja:10
+#: counter/templates/counter/user_account.jinja:9
 msgid "Amount: "
 msgstr "Montant: "
 
@@ -302,7 +304,7 @@ msgstr "Adresse"
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
-#: club/models.py:107
+#: club/models.py:107 eboutic/models.py:16 eboutic/models.py:29
 msgid "user"
 msgstr "nom d'utilisateur"
 
@@ -314,8 +316,8 @@ msgstr "club"
 msgid "role"
 msgstr "rôle"
 
-#: club/models.py:113 core/models.py:27 counter/models.py:40
-#: counter/models.py:59
+#: club/models.py:113 core/models.py:27 counter/models.py:39
+#: counter/models.py:58
 msgid "description"
 msgstr "description"
 
@@ -337,12 +339,10 @@ msgstr "Club"
 
 #: club/templates/club/club_detail.jinja:5
 #: core/templates/core/group_edit.jinja:4
-#: core/templates/core/page_detail.jinja:5
 msgid "Back to list"
 msgstr "Retour à la liste"
 
-#: club/templates/club/club_detail.jinja:10
-#: core/templates/core/page_detail.jinja:10
+#: club/templates/club/club_detail.jinja:10 core/templates/core/page.jinja:33
 msgid "Prop"
 msgstr "Propriétés"
 
@@ -574,7 +574,7 @@ msgid "Confirm"
 msgstr "Confirmation"
 
 #: core/templates/core/delete_confirm.jinja:8
-#: counter/templates/counter/counter_click.jinja:65
+#: counter/templates/counter/counter_click.jinja:67
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -624,7 +624,7 @@ msgid "Please login to see this page."
 msgstr "Merci de vous identifier pour voir cette page."
 
 #: core/templates/core/login.jinja:31
-#: counter/templates/counter/counter_main.jinja:51
+#: counter/templates/counter/counter_main.jinja:52
 msgid "login"
 msgstr "login"
 
@@ -645,28 +645,19 @@ msgstr "Créer une page"
 msgid "Not found"
 msgstr "Non trouvé"
 
-#: core/templates/core/page.jinja:20
-msgid "Page does not exist"
-msgstr "La page n'existe pas."
-
-#: core/templates/core/page.jinja:22
-msgid "Create it?"
-msgstr "La créer ?"
-
-#: core/templates/core/page_detail.jinja:4
-msgid "Page"
-msgstr "Page"
-
-#: core/templates/core/page_detail.jinja:12
-#, python-format
-msgid "You're seeing the page %(page_name)s"
-msgstr "Vous consultez la page %(page_name)s"
-
-#: core/templates/core/page_detail.jinja:13
+#: core/templates/core/page.jinja:28
 msgid "History"
 msgstr "Historique"
 
-#: core/templates/core/page_detail.jinja:16
+#: core/templates/core/page.jinja:43
+msgid "Page does not exist"
+msgstr "La page n'existe pas."
+
+#: core/templates/core/page.jinja:45
+msgid "Create it?"
+msgstr "La créer ?"
+
+#: core/templates/core/page_detail.jinja:5
 #, python-format
 msgid "This may not be the last update, you are seeing revision %(rev_id)s!"
 msgstr ""
@@ -678,13 +669,8 @@ msgid "Page history"
 msgstr "Historique de la page"
 
 #: core/templates/core/page_hist.jinja:5
-msgid "Back to page"
-msgstr "Retour à la page"
-
-#: core/templates/core/page_hist.jinja:6
-#, python-format
-msgid "You're seeing the history of page %(page_name)s"
-msgstr "Vous consultez l'historique de la page %(page_name)s"
+msgid "You're seeing the history of page \"%(page_name)s\""
+msgstr "Vous consultez l'historique de la page \"%(page_name)s\""
 
 #: core/templates/core/page_list.jinja:16
 msgid "There is no page in this website."
@@ -883,51 +869,57 @@ msgstr "Comptabilité générale"
 msgid "Club account: "
 msgstr "Compte club : "
 
-#: counter/models.py:21
+#: counter/models.py:20
 msgid "account id"
 msgstr "numéro de compte"
 
-#: counter/models.py:25
+#: counter/models.py:24
 msgid "customer"
 msgstr "client"
 
-#: counter/models.py:26
+#: counter/models.py:25
 msgid "customers"
 msgstr "clients"
 
-#: counter/models.py:62
+#: counter/models.py:61
 msgid "purchase price"
 msgstr "prix d'achat"
 
-#: counter/models.py:63
+#: counter/models.py:62
 msgid "selling price"
 msgstr "prix de vente"
 
-#: counter/models.py:64
+#: counter/models.py:63
 msgid "special selling price"
 msgstr "prix de vente spécial"
 
-#: counter/models.py:83 subscription/models.py:29
+#: counter/models.py:82 subscription/models.py:29
 msgid "subscription type"
 msgstr "type d'inscription"
 
-#: counter/models.py:85
+#: counter/models.py:84
 msgid "Bar"
 msgstr "Bar"
 
-#: counter/models.py:85
+#: counter/models.py:84
 msgid "Office"
 msgstr "Bureau"
 
-#: counter/models.py:169
+#: counter/models.py:84 eboutic/templates/eboutic/eboutic_main.jinja:20
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:4
+#: eboutic/templates/eboutic/eboutic_payment_result.jinja:4
+msgid "Eboutic"
+msgstr "Eboutic"
+
+#: counter/models.py:168
 msgid "bank"
 msgstr "banque"
 
-#: counter/models.py:190
+#: counter/models.py:189 eboutic/models.py:55
 msgid "unit price"
 msgstr "prix unitaire"
 
-#: counter/models.py:191
+#: counter/models.py:190 eboutic/models.py:56
 msgid "quantity"
 msgstr "quantité"
 
@@ -945,38 +937,42 @@ msgstr "Club : "
 msgid "Customer"
 msgstr "Client"
 
-#: counter/templates/counter/counter_click.jinja:29
+#: counter/templates/counter/counter_click.jinja:30
 msgid "Refilling"
 msgstr "Rechargement"
 
-#: counter/templates/counter/counter_click.jinja:34
-#: counter/templates/counter/counter_click.jinja:46
+#: counter/templates/counter/counter_click.jinja:35
+#: counter/templates/counter/counter_click.jinja:48
 msgid "Go"
 msgstr "Valider"
 
-#: counter/templates/counter/counter_click.jinja:38
+#: counter/templates/counter/counter_click.jinja:40
 msgid "Selling"
 msgstr "Vente"
 
-#: counter/templates/counter/counter_click.jinja:40
+#: counter/templates/counter/counter_click.jinja:42
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
-#: counter/templates/counter/counter_click.jinja:48
+#: counter/templates/counter/counter_click.jinja:50
+#: eboutic/templates/eboutic/eboutic_main.jinja:23
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:7
 msgid "Basket: "
 msgstr "Panier : "
 
-#: counter/templates/counter/counter_click.jinja:56
+#: counter/templates/counter/counter_click.jinja:58
 #: counter/templates/counter/counter_main.jinja:28
+#: eboutic/templates/eboutic/eboutic_main.jinja:31
 msgid "Total: "
 msgstr "Total : "
 
-#: counter/templates/counter/counter_click.jinja:60
+#: counter/templates/counter/counter_click.jinja:62
 msgid "Finish"
 msgstr "Terminer"
 
-#: counter/templates/counter/counter_click.jinja:67
+#: counter/templates/counter/counter_click.jinja:69
 #: counter/templates/counter/counter_main.jinja:15
+#: eboutic/templates/eboutic/eboutic_main.jinja:39
 msgid "Products: "
 msgstr "Produits : "
 
@@ -1025,7 +1021,7 @@ msgstr "valider"
 msgid "Please, login"
 msgstr "Merci de vous identifier"
 
-#: counter/templates/counter/counter_main.jinja:42
+#: counter/templates/counter/counter_main.jinja:43
 msgid "Barman: "
 msgstr "Barman : "
 
@@ -1038,87 +1034,139 @@ msgstr "Compte de %(user_name)s"
 msgid "User account"
 msgstr "Compte utilisateur"
 
-#: counter/views.py:194
+#: counter/views.py:200
 msgid "END"
 msgstr "FIN"
 
-#: counter/views.py:196
+#: counter/views.py:202
 msgid "CAN"
 msgstr "ANN"
 
-#: sith/settings.py:227 sith/settings.py:234 sith/settings.py:246
-#: sith/settings_sample.py:227 sith/settings_sample.py:234
-#: sith/settings_sample.py:246
-msgid "Check"
-msgstr "Chèque"
+#: counter/views.py:236
+msgid "You have not enough money to buy all the basket"
+msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
+
+#: eboutic/models.py:31 sith/settings.py:231 sith/settings_sample.py:231
+msgid "Credit card"
+msgstr "Carte banquaire"
+
+#: eboutic/models.py:31
+msgid "Sith account"
+msgstr "Compte utilisateur"
+
+#: eboutic/models.py:33
+msgid "validated"
+msgstr "validé"
+
+#: eboutic/models.py:44
+msgid "Invoice already validated"
+msgstr "Facture déjà validée"
+
+#: eboutic/models.py:54
+msgid "product name"
+msgstr "nom du produit"
+
+#: eboutic/models.py:65
+msgid "basket"
+msgstr "panier"
+
+#: eboutic/models.py:68
+msgid "invoice"
+msgstr "facture"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja:35
+msgid "Proceed to command"
+msgstr "Procéder à la commande"
+
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:29
+msgid "Pay with credit card"
+msgstr "Payer avec une carte banquaire"
+
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:34
+msgid "Pay with Sith account"
+msgstr "Payer avec un compte AE"
+
+#: eboutic/templates/eboutic/eboutic_payment_result.jinja:8
+msgid "Payment failed"
+msgstr "Méthode de paiement"
+
+#: eboutic/templates/eboutic/eboutic_payment_result.jinja:10
+msgid "Payment successful"
+msgstr "Méthode de paiement"
+
+#: eboutic/views.py:117
+msgid "You have not enough money to buy the basket"
+msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
 #: sith/settings.py:228 sith/settings.py:235 sith/settings.py:247
 #: sith/settings_sample.py:228 sith/settings_sample.py:235
 #: sith/settings_sample.py:247
+msgid "Check"
+msgstr "Chèque"
+
+#: sith/settings.py:229 sith/settings.py:236 sith/settings.py:248
+#: sith/settings_sample.py:229 sith/settings_sample.py:236
+#: sith/settings_sample.py:248
 msgid "Cash"
 msgstr "Espèces"
 
-#: sith/settings.py:229 sith/settings_sample.py:229
+#: sith/settings.py:230 sith/settings_sample.py:230
 msgid "Transfert"
 msgstr "Virement"
 
-#: sith/settings.py:230 sith/settings_sample.py:230
-msgid "Credit card"
-msgstr "Carte banquaire"
-
-#: sith/settings.py:236 sith/settings_sample.py:236
+#: sith/settings.py:237 sith/settings_sample.py:237
 msgid "Other"
 msgstr "Autre"
 
-#: sith/settings.py:260 sith/settings_sample.py:260
+#: sith/settings.py:261 sith/settings_sample.py:261
 msgid "One semester"
 msgstr "Un semestre"
 
-#: sith/settings.py:265 sith/settings_sample.py:265
+#: sith/settings.py:266 sith/settings_sample.py:266
 msgid "Two semesters"
 msgstr "Deux semestres"
 
-#: sith/settings.py:270 sith/settings_sample.py:270
+#: sith/settings.py:271 sith/settings_sample.py:271
 msgid "Common core cursus"
 msgstr "Cursus tronc commun"
 
-#: sith/settings.py:275 sith/settings_sample.py:275
+#: sith/settings.py:276 sith/settings_sample.py:276
 msgid "Branch cursus"
 msgstr "Cursus branche"
 
-#: sith/settings.py:283 sith/settings_sample.py:283
+#: sith/settings.py:284 sith/settings_sample.py:284
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:284 sith/settings_sample.py:284
+#: sith/settings.py:285 sith/settings_sample.py:285
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:285 sith/settings_sample.py:285
+#: sith/settings.py:286 sith/settings_sample.py:286
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:286 sith/settings_sample.py:286
+#: sith/settings.py:287 sith/settings_sample.py:287
 msgid "Communication supervisor"
 msgstr "Responsable com"
 
-#: sith/settings.py:287 sith/settings_sample.py:287
+#: sith/settings.py:288 sith/settings_sample.py:288
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:288 sith/settings_sample.py:288
+#: sith/settings.py:289 sith/settings_sample.py:289
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:289 sith/settings_sample.py:289
+#: sith/settings.py:290 sith/settings_sample.py:290
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:290 sith/settings_sample.py:290
+#: sith/settings.py:291 sith/settings_sample.py:291
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:291 sith/settings_sample.py:291
+#: sith/settings.py:292 sith/settings_sample.py:292
 msgid "Curious"
 msgstr "Curieux"
 
@@ -1155,3 +1203,11 @@ msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
 
+#~ msgid "Page"
+#~ msgstr "Page"
+
+#~ msgid "You're seeing the page %(page_name)s"
+#~ msgstr "Vous consultez la page %(page_name)s"
+
+#~ msgid "Back to page"
+#~ msgstr "Retour à la page"

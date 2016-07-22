@@ -55,6 +55,7 @@ nav a:hover {
     margin: 0px auto;
     padding: 1em 1%;
     background: white;
+    overflow: auto;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -128,6 +129,12 @@ tbody>tr:nth-child(even) {
 tbody>tr:hover {
     background: yellow;
     width: 100%;
+}
+.tool-bar {
+    overflow: auto;
+}
+.tools {
+    float: right;
 }
 #basket {
     width: 40%;

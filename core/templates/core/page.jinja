@@ -12,7 +12,32 @@
 {% endif %}
 {% endblock %}
 
+{% macro print_page_name(page) %}
+{% if page %}
+{{ print_page_name(page.parent) }} >
+<a href="{{ url('core:page', page_name=page.get_full_name()) }}">{{ page.name }}</a>
+{% endif %}
+{% endmacro %}
+
 {% block content %}
+{{ print_page_name(page) }}
+
+<div class="tool-bar">
+    <div class="tools">
+        {% if page %}
+        <a href="{{ url('core:page', page.get_full_name()) }}">{% trans %}View{% endtrans %}</a>
+        <a href="{{ url('core:page_hist', page_name=page.get_full_name()) }}">{% trans %}History{% endtrans %}</a>
+        {% if can_edit(page, user) %}
+        <a href="{{ url('core:page_edit', page_name=page.get_full_name()) }}">{% trans %}Edit{% endtrans %}</a>
+        {% endif %}
+        {% if can_edit_prop(page, user) %}
+        <a href="{{ url('core:page_prop', page_name=page.get_full_name()) }}">{% trans %}Prop{% endtrans %}</a>
+        {% endif %}
+        {% endif %}
+    </div>
+</div>
+<hr>
+
 {% if page %}
 {% block page %}
 {% endblock %}

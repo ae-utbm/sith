@@ -1,22 +1,24 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-<div>{{ profile.get_display_name() }}</div>
 <div class="tool-bar">
-    <a href="{{ url('core:user_profile', user_id=profile.id) }}">{% trans %}Infos{% endtrans %}</a>
-    {% if can_edit(profile, request.user) or user.id == profile.id %}
-    <a href="{{ url('core:user_edit', user_id=profile.id) }}">{% trans %}Edit{% endtrans %}</a>
-    {% endif %}
-    {% if can_edit_prop(profile, request.user) %}
-    <a href="{{ url('core:user_groups', user_id=profile.id) }}">{% trans %}Groups{% endtrans %}</a>
-    {% endif %}
-    {% if (profile == request.user
-    or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
-    or request.user.is_in_group(settings.SITH_GROUPS['root']['name'])) %}
-    <a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Account{% endtrans %}</a>
-    {% endif %}
-    <hr>
+    <div class="tools">
+        <a href="{{ url('core:user_profile', user_id=profile.id) }}">{% trans %}Infos{% endtrans %}</a>
+        {% if can_edit(profile, request.user) or user.id == profile.id %}
+        <a href="{{ url('core:user_edit', user_id=profile.id) }}">{% trans %}Edit{% endtrans %}</a>
+        {% endif %}
+        {% if can_edit_prop(profile, request.user) %}
+        <a href="{{ url('core:user_groups', user_id=profile.id) }}">{% trans %}Groups{% endtrans %}</a>
+        {% endif %}
+        {% if (profile == request.user
+        or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
+        or request.user.is_in_group(settings.SITH_GROUPS['root']['name'])) %}
+        <a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Account{% endtrans %}</a>
+        {% endif %}
+    </div>
+    <h5>{{ profile.get_display_name() }}</h5>
 </div>
+<hr>
 
 <div>
     {% block infos %}
