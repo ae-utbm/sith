@@ -1088,11 +1088,11 @@ msgstr "Payer avec un compte AE"
 
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:8
 msgid "Payment failed"
-msgstr "Méthode de paiement"
+msgstr "Le paiement a échoué"
 
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:10
 msgid "Payment successful"
-msgstr "Méthode de paiement"
+msgstr "Le paiement a été effectué"
 
 #: eboutic/views.py:117
 msgid "You have not enough money to buy the basket"
