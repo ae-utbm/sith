@@ -124,12 +124,20 @@ class CounterClick(DetailView):
         self.object = self.get_object()
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
         self.refill_form = None
-        if len(Counter.get_barmen_list(self.object.id)) < 1: # Check that at least one barman is logged in
+        if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
+                (self.object.type == "BAR" and
+                len(Counter.get_barmen_list(self.object.id)) < 1)): # Check that at least one barman is logged in
             return self.cancel(request)
         if 'basket' not in request.session.keys():
             request.session['basket'] = {}
             request.session['basket_total'] = 0
         request.session['not_enough'] = False
+        if self.object.type != "BAR":
+            self.operator = request.user
+        elif self.is_barman_price():
+            self.operator = self.customer.user
+        else:
+            self.operator = Counter.get_random_barman(self.object.id)
 
         if 'add_product' in request.POST['action']:
             self.add_product(request)
@@ -147,7 +155,7 @@ class CounterClick(DetailView):
         return self.render_to_response(context)
 
     def is_barman_price(self):
-        if self.customer.user.id in [s.id for s in Counter.get_barmen_list(self.object.id)]:
+        if self.object.type == "BAR" and self.customer.user.id in [s.id for s in Counter.get_barmen_list(self.object.id)]:
             return True
         else:
             return False
@@ -210,7 +218,7 @@ class CounterClick(DetailView):
                 nb = 1
             else:
                 nb = int(nb)
-            p = Product.objects.filter(code=code).first()
+            p = self.object.products.filter(code=code).first()
             if p is not None:
                 while nb > 0 and not self.add_product(request, nb, p.id):
                     nb -= 1
@@ -220,10 +228,6 @@ class CounterClick(DetailView):
     def finish(self, request):
         """ Finish the click session, and validate the basket """
         with transaction.atomic():
-            if self.is_barman_price():
-                seller = self.customer.user
-            else:
-                seller = Counter.get_random_barman(self.object.id)
             request.session['last_basket'] = []
             for pid,infos in request.session['basket'].items():
                 # This duplicates code for DB optimization (prevent to load many times the same object)
@@ -236,7 +240,7 @@ class CounterClick(DetailView):
                     raise DataError(_("You have not enough money to buy all the basket"))
                 request.session['last_basket'].append("%d x %s" % (infos['qty'], p.name))
                 s = Selling(product=p, counter=self.object, unit_price=uprice,
-                       quantity=infos['qty'], seller=seller, customer=self.customer)
+                       quantity=infos['qty'], seller=self.operator, customer=self.customer)
                 s.save()
             request.session['last_customer'] = self.customer.user.get_display_name()
             request.session['last_total'] = "%0.2f" % self.sum_basket(request)
@@ -256,14 +260,10 @@ class CounterClick(DetailView):
 
     def refill(self, request):
         """Refill the customer's account"""
-        if self.is_barman_price():
-            operator = self.customer.user
-        else:
-            operator = Counter.get_random_barman(self.object.id)
         form = RefillForm(request.POST)
         if form.is_valid():
             form.instance.counter = self.object
-            form.instance.operator = operator
+            form.instance.operator = self.operator
             form.instance.customer = self.customer
             form.instance.save()
         else:

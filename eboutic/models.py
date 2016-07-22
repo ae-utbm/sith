@@ -5,10 +5,6 @@ from accounting.models import CurrencyField
 from counter.models import Counter, Product
 from core.models import User
 
-class Eboutic(Counter):
-    class Meta:
-        proxy = True
-
 class Basket(models.Model):
     """
     Basket is built when the user validate its session basket and asks for payment

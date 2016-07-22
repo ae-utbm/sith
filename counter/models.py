@@ -95,6 +95,8 @@ class Counter(models.Model):
         return self.name
 
     def get_absolute_url(self):
+        if self.type == "EBOUTIC":
+            return reverse('eboutic:main')
         return reverse('counter:details', kwargs={'counter_id': self.id})
 
     def can_be_edited_by(self, user):

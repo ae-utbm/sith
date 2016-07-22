@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-22 01:47+0200\n"
+"POT-Creation-Date: 2016-07-22 13:32+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -30,11 +30,11 @@ msgstr "IBAN"
 msgid "account number"
 msgstr "numero de compte"
 
-#: accounting/models.py:92 club/models.py:109 counter/models.py:214
+#: accounting/models.py:92 club/models.py:109 counter/models.py:216
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:93 club/models.py:110 counter/models.py:215
+#: accounting/models.py:93 club/models.py:110 counter/models.py:217
 msgid "end date"
 msgstr "date de fin"
 
@@ -43,7 +43,7 @@ msgid "is closed"
 msgstr "est fermé"
 
 #: accounting/models.py:97 accounting/models.py:136 counter/models.py:21
-#: counter/models.py:162
+#: counter/models.py:164
 msgid "amount"
 msgstr "montant"
 
@@ -55,8 +55,8 @@ msgstr "montant effectif"
 msgid "number"
 msgstr "numéro"
 
-#: accounting/models.py:137 core/models.py:462 counter/models.py:165
-#: counter/models.py:193 eboutic/models.py:17 eboutic/models.py:30
+#: accounting/models.py:137 core/models.py:462 counter/models.py:167
+#: counter/models.py:195 eboutic/models.py:13 eboutic/models.py:26
 msgid "date"
 msgstr "date"
 
@@ -68,7 +68,7 @@ msgstr "intitulé"
 msgid "remark"
 msgstr "remarque"
 
-#: accounting/models.py:140 counter/models.py:166 eboutic/models.py:32
+#: accounting/models.py:140 counter/models.py:168 eboutic/models.py:28
 #: subscription/models.py:34
 msgid "payment method"
 msgstr "méthode de paiement"
@@ -144,10 +144,11 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_list.jinja:15
 #: accounting/templates/accounting/club_account_details.jinja:44
 #: accounting/templates/accounting/journal_details.jinja:51
-#: club/templates/club/club_detail.jinja:7 core/templates/core/page.jinja:30
+#: club/templates/club/club_detail.jinja:7 core/templates/core/page.jinja:31
 #: core/templates/core/user_base.jinja:8
 #: core/templates/core/user_tools.jinja:30
-#: counter/templates/counter/counter_list.jinja:14
+#: counter/templates/counter/counter_list.jinja:15
+#: counter/templates/counter/counter_list.jinja:18
 msgid "Edit"
 msgstr "Éditer"
 
@@ -227,7 +228,7 @@ msgid "No"
 msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:43
-#: core/templates/core/page.jinja:27
+#: core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
 
@@ -304,7 +305,7 @@ msgstr "Adresse"
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
-#: club/models.py:107 eboutic/models.py:16 eboutic/models.py:29
+#: club/models.py:107 eboutic/models.py:12 eboutic/models.py:25
 msgid "user"
 msgstr "nom d'utilisateur"
 
@@ -342,7 +343,7 @@ msgstr "Club"
 msgid "Back to list"
 msgstr "Retour à la liste"
 
-#: club/templates/club/club_detail.jinja:10 core/templates/core/page.jinja:33
+#: club/templates/club/club_detail.jinja:10 core/templates/core/page.jinja:34
 msgid "Prop"
 msgstr "Propriétés"
 
@@ -545,14 +546,18 @@ msgid "Users"
 msgstr "Utilisateurs"
 
 #: core/templates/core/base.jinja:30
+msgid "Wiki"
+msgstr ""
+
+#: core/templates/core/base.jinja:31
 msgid "Pages"
 msgstr "Pages"
 
-#: core/templates/core/base.jinja:31
+#: core/templates/core/base.jinja:32
 msgid "Clubs"
 msgstr "Clubs"
 
-#: core/templates/core/base.jinja:44
+#: core/templates/core/base.jinja:45
 msgid "Site made by good people"
 msgstr "Site réalisé par des gens biens"
 
@@ -624,7 +629,7 @@ msgid "Please login to see this page."
 msgstr "Merci de vous identifier pour voir cette page."
 
 #: core/templates/core/login.jinja:31
-#: counter/templates/counter/counter_main.jinja:52
+#: counter/templates/counter/counter_main.jinja:48
 msgid "login"
 msgstr "login"
 
@@ -645,15 +650,15 @@ msgstr "Créer une page"
 msgid "Not found"
 msgstr "Non trouvé"
 
-#: core/templates/core/page.jinja:28
+#: core/templates/core/page.jinja:29
 msgid "History"
 msgstr "Historique"
 
-#: core/templates/core/page.jinja:43
+#: core/templates/core/page.jinja:45
 msgid "Page does not exist"
 msgstr "La page n'existe pas."
 
-#: core/templates/core/page.jinja:45
+#: core/templates/core/page.jinja:47
 msgid "Create it?"
 msgstr "La créer ?"
 
@@ -669,6 +674,7 @@ msgid "Page history"
 msgstr "Historique de la page"
 
 #: core/templates/core/page_hist.jinja:5
+#, python-format
 msgid "You're seeing the history of page \"%(page_name)s\""
 msgstr "Vous consultez l'historique de la page \"%(page_name)s\""
 
@@ -911,25 +917,23 @@ msgstr "Bureau"
 msgid "Eboutic"
 msgstr "Eboutic"
 
-#: counter/models.py:168
+#: counter/models.py:170
 msgid "bank"
 msgstr "banque"
 
-#: counter/models.py:189 eboutic/models.py:55
+#: counter/models.py:191 eboutic/models.py:51
 msgid "unit price"
 msgstr "prix unitaire"
 
-#: counter/models.py:190 eboutic/models.py:56
+#: counter/models.py:192 eboutic/models.py:52
 msgid "quantity"
 msgstr "quantité"
 
 #: counter/templates/counter/counter_click.jinja:20
-#: counter/templates/counter/counter_main.jinja:12
 msgid "Counter"
 msgstr "Comptoir"
 
 #: counter/templates/counter/counter_click.jinja:22
-#: counter/templates/counter/counter_main.jinja:14
 msgid "Club: "
 msgstr "Club : "
 
@@ -961,7 +965,7 @@ msgid "Basket: "
 msgstr "Panier : "
 
 #: counter/templates/counter/counter_click.jinja:58
-#: counter/templates/counter/counter_main.jinja:28
+#: counter/templates/counter/counter_main.jinja:24
 #: eboutic/templates/eboutic/eboutic_main.jinja:31
 msgid "Total: "
 msgstr "Total : "
@@ -971,7 +975,6 @@ msgid "Finish"
 msgstr "Terminer"
 
 #: counter/templates/counter/counter_click.jinja:69
-#: counter/templates/counter/counter_main.jinja:15
 #: eboutic/templates/eboutic/eboutic_main.jinja:39
 msgid "Products: "
 msgstr "Produits : "
@@ -989,39 +992,43 @@ msgstr "Liste des comptoirs"
 msgid "New counter"
 msgstr "Nouveau comptoir"
 
-#: counter/templates/counter/counter_list.jinja:18
+#: counter/templates/counter/counter_list.jinja:23
 msgid "There is no counters in this website."
 msgstr "Il n'y a pas de comptoirs dans ce site web."
 
-#: counter/templates/counter/counter_main.jinja:19
+#: counter/templates/counter/counter_main.jinja:12
+msgid "%(counter_name)s counter"
+msgstr "Comptoir %(counter_name)s"
+
+#: counter/templates/counter/counter_main.jinja:15
 msgid "Sellings"
 msgstr "Ventes"
 
-#: counter/templates/counter/counter_main.jinja:21
+#: counter/templates/counter/counter_main.jinja:17
 msgid "Last selling: "
 msgstr "Dernière vente : "
 
-#: counter/templates/counter/counter_main.jinja:22
+#: counter/templates/counter/counter_main.jinja:18
 msgid "Client: "
 msgstr "Client : "
 
-#: counter/templates/counter/counter_main.jinja:22
+#: counter/templates/counter/counter_main.jinja:18
 msgid "New amount: "
 msgstr "Nouveau montant : "
 
-#: counter/templates/counter/counter_main.jinja:31
+#: counter/templates/counter/counter_main.jinja:27
 msgid "Enter client code:"
 msgstr "Entrez un code client : "
 
-#: counter/templates/counter/counter_main.jinja:35
+#: counter/templates/counter/counter_main.jinja:31
 msgid "validate"
 msgstr "valider"
 
-#: counter/templates/counter/counter_main.jinja:38
+#: counter/templates/counter/counter_main.jinja:34
 msgid "Please, login"
 msgstr "Merci de vous identifier"
 
-#: counter/templates/counter/counter_main.jinja:43
+#: counter/templates/counter/counter_main.jinja:39
 msgid "Barman: "
 msgstr "Barman : "
 
@@ -1034,43 +1041,43 @@ msgstr "Compte de %(user_name)s"
 msgid "User account"
 msgstr "Compte utilisateur"
 
-#: counter/views.py:200
+#: counter/views.py:208
 msgid "END"
 msgstr "FIN"
 
-#: counter/views.py:202
+#: counter/views.py:210
 msgid "CAN"
 msgstr "ANN"
 
-#: counter/views.py:236
+#: counter/views.py:240
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: eboutic/models.py:31 sith/settings.py:231 sith/settings_sample.py:231
+#: eboutic/models.py:27 sith/settings.py:231 sith/settings_sample.py:231
 msgid "Credit card"
 msgstr "Carte banquaire"
 
-#: eboutic/models.py:31
+#: eboutic/models.py:27
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: eboutic/models.py:33
+#: eboutic/models.py:29
 msgid "validated"
 msgstr "validé"
 
-#: eboutic/models.py:44
+#: eboutic/models.py:40
 msgid "Invoice already validated"
 msgstr "Facture déjà validée"
 
-#: eboutic/models.py:54
+#: eboutic/models.py:50
 msgid "product name"
 msgstr "nom du produit"
 
-#: eboutic/models.py:65
+#: eboutic/models.py:61
 msgid "basket"
 msgstr "panier"
 
-#: eboutic/models.py:68
+#: eboutic/models.py:64
 msgid "invoice"
 msgstr "facture"
 
@@ -1094,7 +1101,7 @@ msgstr "Le paiement a échoué"
 msgid "Payment successful"
 msgstr "Le paiement a été effectué"
 
-#: eboutic/views.py:117
+#: eboutic/views.py:116
 msgid "You have not enough money to buy the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
@@ -1202,6 +1209,9 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
+
+#~ msgid "%(c)s counter"
+#~ msgstr "Comptoir %(c)s"
 
 #~ msgid "Page"
 #~ msgstr "Page"

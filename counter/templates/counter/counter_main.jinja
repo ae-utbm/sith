@@ -9,11 +9,7 @@
 {% endmacro %}
 
 {% block content %}
-<h3>{% trans %}Counter{% endtrans %}</h3>
-    <h4>{{ counter }}</h4>
-    <p><strong>{% trans %}Club: {% endtrans %}</strong> {{ counter.club }}</p>
-    <p><strong>{% trans %}Products: {% endtrans %}</strong> {{ counter.products.all() }}</p>
-
+<h3>{% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}</h3>
 
     <div>
         <h3>{% trans %}Sellings{% endtrans %}</h3>

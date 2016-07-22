@@ -1,15 +1,14 @@
 from django.shortcuts import render
 
 from django.core.urlresolvers import reverse_lazy
-from eboutic.models import Eboutic
 from django.views.generic import TemplateView, View
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.db import transaction, DataError
 from django.utils.translation import ugettext as _
 
-from counter.models import Product, Customer
-from eboutic.models import Basket, Invoice, Eboutic, BasketItem, InvoiceItem
+from counter.models import Product, Customer, Counter
+from eboutic.models import Basket, Invoice, BasketItem, InvoiceItem
 
 # Create your views here.
 class EbouticMain(TemplateView):
@@ -69,7 +68,7 @@ class EbouticMain(TemplateView):
     def get_context_data(self, **kwargs):
         kwargs = super(EbouticMain, self).get_context_data(**kwargs)
         kwargs['basket_total'] = EbouticMain.sum_basket(self.request)
-        kwargs['eboutic'] = Eboutic.objects.filter(type="EBOUTIC").first()
+        kwargs['eboutic'] = Counter.objects.filter(type="EBOUTIC").first()
         return kwargs
 
 class EbouticCommand(TemplateView):

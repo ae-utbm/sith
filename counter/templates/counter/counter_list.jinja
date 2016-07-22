@@ -10,8 +10,13 @@
 <h3>{% trans %}Counter admin list{% endtrans %}</h3>
 <ul>
     {% for c in counter_list  %}
+    {% if c.type == "EBOUTIC" %}
+    <li><a href="{{ url('eboutic:main') }}">{{ c }}</a> -
+        <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a></li>
+    {% else %}
     <li><a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
         <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a></li>
+    {% endif %}
     {% endfor %}
 </ul>
 {% else %}
