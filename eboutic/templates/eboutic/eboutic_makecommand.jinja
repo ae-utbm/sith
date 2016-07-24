@@ -23,9 +23,10 @@
             {% endfor %}
         <tbody>
     </table>
-    <form method="post" action="{{ url('eboutic:command') }}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="pay_with_credit_card">
+    <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}">
+        {% for (field_name,field_value) in et_request.items() -%}
+        <input type="hidden" name="{{ field_name }}" value="{{ field_value }}">
+        {% endfor %}
         <input type="submit" value="{% trans %}Pay with credit card{% endtrans %}" />
     </form>
     <form method="post" action="{{ url('eboutic:pay_with_sith') }}">

@@ -1,11 +1,17 @@
-from django.shortcuts import render
+from collections import OrderedDict
+from datetime import datetime
+import hmac
+import base64
+from OpenSSL import crypto
 
+from django.shortcuts import render
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import TemplateView, View
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.db import transaction, DataError
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 from counter.models import Product, Customer, Counter
 from eboutic.models import Basket, Invoice, BasketItem, InvoiceItem
@@ -74,15 +80,17 @@ class EbouticMain(TemplateView):
 class EbouticCommand(TemplateView):
     template_name = 'eboutic/eboutic_makecommand.jinja'
 
+    def get(self, request, *args, **kwargs):
+        return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
+
     def post(self, request, *args, **kwargs):
         if 'basket' not in request.session.keys():
             return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
-        if 'ask_payment' in request.POST['action']:
-            if self.ask_payment(request):
-                kwargs['basket'] = self.basket
+        if self.make_basket(request):
+            kwargs['basket'] = self.basket
         return self.render_to_response(self.get_context_data(**kwargs))
 
-    def ask_payment(self, request):
+    def make_basket(self, request):
         b = None
         if 'basket_id' in request.session.keys():
             b = Basket.objects.filter(id=request.session['basket_id']).first()
@@ -98,6 +106,24 @@ class EbouticCommand(TemplateView):
                     quantity=infos['qty'], product_unit_price=infos['price']/100).save()
         self.basket = b
         return True
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(EbouticCommand, self).get_context_data(**kwargs)
+        kwargs['et_request'] = OrderedDict()
+        kwargs['et_request']['PBX_SITE'] = settings.SITH_EBOUTIC_PBX_SITE
+        kwargs['et_request']['PBX_RANG'] = settings.SITH_EBOUTIC_PBX_RANG
+        kwargs['et_request']['PBX_IDENTIFIANT'] = settings.SITH_EBOUTIC_PBX_IDENTIFIANT
+        kwargs['et_request']['PBX_TOTAL'] = int(self.basket.get_total()*100)
+        kwargs['et_request']['PBX_DEVISE'] = 978 # This is Euro. ET support only this value anyway
+        kwargs['et_request']['PBX_CMD'] = "CMD_"+str(self.basket.id)
+        kwargs['et_request']['PBX_PORTEUR'] = self.basket.user.email
+        kwargs['et_request']['PBX_RETOUR'] = "Amount:M;BasketID:R;Auto:A;Error:E;Sig:K"
+        kwargs['et_request']['PBX_HASH'] = "SHA512"
+        kwargs['et_request']['PBX_TIME'] = str(datetime.now().replace(microsecond=0).isoformat('T'))
+        kwargs['et_request']['PBX_HMAC'] = hmac.new(settings.SITH_EBOUTIC_HMAC_KEY,
+                bytes("&".join(["%s=%s"%(k,v) for k,v in kwargs['et_request'].items()]), 'utf-8'),
+                "sha512").hexdigest().upper()
+        return kwargs
 
 class EbouticPayWithSith(TemplateView):
     template_name = 'eboutic/eboutic_payment_result.jinja'
@@ -131,5 +157,29 @@ class EbouticPayWithSith(TemplateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
 class EtransactionAutoAnswer(View):
-    def get(self, request, *args, **kwargs): # TODO implement CA's API
+    def get(self, request, *args, **kwargs):
+        # test URL:
+# http://127.0.0.1:8000/eboutic/et_autoanswer?Amount=guy&BasketID=4000&Auto=42&Error=00000&Sig=OeKzrHyh9XgjWY8zN2N/Itsg70y3/RRxOTYlW8zx8fDeMwv10LVo6BHB0NTY0WEv/gNY1uNjYEW8IGLz4HzvPcR4w7vsM7dTkSWDvGhVpA57LydRqyQVu6CjY1SL71s4htZRN6XZrexCJag8IBNUOj8rvEu4EdFKqUOQlxU4W3c=
+        if (not 'Amount' in request.GET.keys() or
+            not 'BasketID' in request.GET.keys() or
+            not 'Auto' in request.GET.keys() or
+            not 'Error' in request.GET.keys() or
+            not 'Sig' in request.GET.keys()):
+            return HttpResponse(status=400)
+        key = crypto.load_publickey(crypto.FILETYPE_PEM, settings.SITH_EBOUTIC_PUB_KEY)
+        cert = crypto.X509()
+        cert.set_pubkey(key)
+
+        sig = base64.b64decode(request.GET['Sig'])
+        print(sig)
+        print('&'.join(request.META['QUERY_STRING'].split('&')[:-1]))
+        try:
+            crypto.verify(cert, sig, '&'.join(request.META['QUERY_STRING'].split('&')[:-1]), "sha1")
+        except:
+            print("Bad signature")
+            return HttpResponse(status=400)
+        if request.GET['Error'] == "00000":
+            print("OK")
+        else:
+            print("FAIL")
         return HttpResponse()

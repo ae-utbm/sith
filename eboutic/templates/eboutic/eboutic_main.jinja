@@ -31,7 +31,6 @@
     <p><strong>{% trans %}Total: {% endtrans %}{{ "%0.2f"|format(basket_total) }} €</strong></p>
     <form method="post" action="{{ url('eboutic:command') }}">
         {% csrf_token %}
-        <input type="hidden" name="action" value="ask_payment">
         <input type="submit" value="{% trans %}Proceed to command{% endtrans %}" />
     </form>
 </div>
