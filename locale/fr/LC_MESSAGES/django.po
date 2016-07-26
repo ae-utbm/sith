@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-22 13:32+0200\n"
+"POT-Creation-Date: 2016-07-27 00:05+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -56,7 +56,7 @@ msgid "number"
 msgstr "numéro"
 
 #: accounting/models.py:137 core/models.py:462 counter/models.py:167
-#: counter/models.py:195 eboutic/models.py:13 eboutic/models.py:26
+#: counter/models.py:195 eboutic/models.py:13 eboutic/models.py:46
 msgid "date"
 msgstr "date"
 
@@ -68,7 +68,7 @@ msgstr "intitulé"
 msgid "remark"
 msgstr "remarque"
 
-#: accounting/models.py:140 counter/models.py:168 eboutic/models.py:28
+#: accounting/models.py:140 counter/models.py:168 eboutic/models.py:48
 #: subscription/models.py:34
 msgid "payment method"
 msgstr "méthode de paiement"
@@ -201,6 +201,8 @@ msgstr "Fin"
 
 #: accounting/templates/accounting/club_account_details.jinja:20
 #: accounting/templates/accounting/journal_details.jinja:23
+#: counter/templates/counter/user_account.jinja:17
+#: counter/templates/counter/user_account.jinja:63
 msgid "Amount"
 msgstr "Montant"
 
@@ -254,6 +256,9 @@ msgid "Nb"
 msgstr "No"
 
 #: accounting/templates/accounting/journal_details.jinja:21
+#: counter/templates/counter/user_account.jinja:15
+#: counter/templates/counter/user_account.jinja:36
+#: counter/templates/counter/user_account.jinja:61
 msgid "Date"
 msgstr "Date"
 
@@ -305,7 +310,7 @@ msgstr "Adresse"
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
-#: club/models.py:107 eboutic/models.py:12 eboutic/models.py:25
+#: club/models.py:107 eboutic/models.py:12 eboutic/models.py:45
 msgid "user"
 msgstr "nom d'utilisateur"
 
@@ -369,7 +374,8 @@ msgstr "Sauver"
 msgid "Edit club properties"
 msgstr "Éditer les propriétés du club"
 
-#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4
+#: club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -547,7 +553,7 @@ msgstr "Utilisateurs"
 
 #: core/templates/core/base.jinja:30
 msgid "Wiki"
-msgstr ""
+msgstr "Wiki"
 
 #: core/templates/core/base.jinja:31
 msgid "Pages"
@@ -592,7 +598,8 @@ msgstr "Éditer %(obj)s"
 msgid "Edit group"
 msgstr "Éditer le groupe"
 
-#: core/templates/core/group_edit.jinja:9 core/templates/core/user_edit.jinja:8
+#: core/templates/core/group_edit.jinja:9
+#: core/templates/core/user_edit.jinja:8
 #: core/templates/core/user_group.jinja:8
 msgid "Update"
 msgstr "Mettre à jour"
@@ -921,11 +928,11 @@ msgstr "Eboutic"
 msgid "bank"
 msgstr "banque"
 
-#: counter/models.py:191 eboutic/models.py:51
+#: counter/models.py:191 eboutic/models.py:78
 msgid "unit price"
 msgstr "prix unitaire"
 
-#: counter/models.py:192 eboutic/models.py:52
+#: counter/models.py:192 eboutic/models.py:79
 msgid "quantity"
 msgstr "quantité"
 
@@ -966,7 +973,7 @@ msgstr "Panier : "
 
 #: counter/templates/counter/counter_click.jinja:58
 #: counter/templates/counter/counter_main.jinja:24
-#: eboutic/templates/eboutic/eboutic_main.jinja:31
+#: eboutic/templates/eboutic/eboutic_main.jinja:30
 msgid "Total: "
 msgstr "Total : "
 
@@ -975,7 +982,7 @@ msgid "Finish"
 msgstr "Terminer"
 
 #: counter/templates/counter/counter_click.jinja:69
-#: eboutic/templates/eboutic/eboutic_main.jinja:39
+#: eboutic/templates/eboutic/eboutic_main.jinja:37
 msgid "Products: "
 msgstr "Produits : "
 
@@ -997,6 +1004,7 @@ msgid "There is no counters in this website."
 msgstr "Il n'y a pas de comptoirs dans ce site web."
 
 #: counter/templates/counter/counter_main.jinja:12
+#, python-format
 msgid "%(counter_name)s counter"
 msgstr "Comptoir %(counter_name)s"
 
@@ -1041,6 +1049,39 @@ msgstr "Compte de %(user_name)s"
 msgid "User account"
 msgstr "Compte utilisateur"
 
+#: counter/templates/counter/user_account.jinja:11
+msgid "Refillings"
+msgstr "Rechargements"
+
+#: counter/templates/counter/user_account.jinja:16
+#: counter/templates/counter/user_account.jinja:37
+msgid "Barman"
+msgstr "Barman"
+
+#: counter/templates/counter/user_account.jinja:32
+msgid "Buyings"
+msgstr "Achats"
+
+#: counter/templates/counter/user_account.jinja:38
+msgid "Product"
+msgstr "Produit"
+
+#: counter/templates/counter/user_account.jinja:39
+msgid "Quantity"
+msgstr "Quantité"
+
+#: counter/templates/counter/user_account.jinja:40
+msgid "Total"
+msgstr "Total"
+
+#: counter/templates/counter/user_account.jinja:57
+msgid "Invoices"
+msgstr "Factures"
+
+#: counter/templates/counter/user_account.jinja:62
+msgid "Items"
+msgstr "Articles"
+
 #: counter/views.py:208
 msgid "END"
 msgstr "FIN"
@@ -1053,43 +1094,56 @@ msgstr "ANN"
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: eboutic/models.py:27 sith/settings.py:231 sith/settings_sample.py:231
+#: eboutic/models.py:47 sith/settings.py:243 sith/settings_sample.py:231
 msgid "Credit card"
 msgstr "Carte banquaire"
 
-#: eboutic/models.py:27
+#: eboutic/models.py:47
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: eboutic/models.py:29
+#: eboutic/models.py:49
 msgid "validated"
 msgstr "validé"
 
-#: eboutic/models.py:40
+#: eboutic/models.py:59
 msgid "Invoice already validated"
 msgstr "Facture déjà validée"
 
-#: eboutic/models.py:50
+#: eboutic/models.py:75
+msgid "product id"
+msgstr "ID du produit"
+
+#: eboutic/models.py:76
 msgid "product name"
 msgstr "nom du produit"
 
-#: eboutic/models.py:61
+#: eboutic/models.py:77
+msgid "product type"
+msgstr "type du produit"
+
+#: eboutic/models.py:88
 msgid "basket"
 msgstr "panier"
 
-#: eboutic/models.py:64
+#: eboutic/models.py:91
 msgid "invoice"
 msgstr "facture"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:35
+#: eboutic/templates/eboutic/eboutic_main.jinja:33
 msgid "Proceed to command"
 msgstr "Procéder à la commande"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:29
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:31
 msgid "Pay with credit card"
 msgstr "Payer avec une carte banquaire"
 
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:34
+msgid ""
+"AE account payment disabled because your basket contains refilling items."
+msgstr "Paiement par compte AE désactivé parce que votre panier contient des bons de rechargement."
+
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:39
 msgid "Pay with Sith account"
 msgstr "Payer avec un compte AE"
 
@@ -1101,79 +1155,83 @@ msgstr "Le paiement a échoué"
 msgid "Payment successful"
 msgstr "Le paiement a été effectué"
 
-#: eboutic/views.py:116
-msgid "You have not enough money to buy the basket"
+#: eboutic/templates/eboutic/eboutic_payment_result.jinja:12
+msgid "Return to eboutic"
+msgstr "Retourner à l'eboutic"
+
+#: eboutic/views.py:131
+msgid "You do not have enough money to buy the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: sith/settings.py:228 sith/settings.py:235 sith/settings.py:247
+#: sith/settings.py:240 sith/settings.py:247 sith/settings.py:259
 #: sith/settings_sample.py:228 sith/settings_sample.py:235
 #: sith/settings_sample.py:247
 msgid "Check"
 msgstr "Chèque"
 
-#: sith/settings.py:229 sith/settings.py:236 sith/settings.py:248
+#: sith/settings.py:241 sith/settings.py:248 sith/settings.py:260
 #: sith/settings_sample.py:229 sith/settings_sample.py:236
 #: sith/settings_sample.py:248
 msgid "Cash"
 msgstr "Espèces"
 
-#: sith/settings.py:230 sith/settings_sample.py:230
+#: sith/settings.py:242 sith/settings_sample.py:230
 msgid "Transfert"
 msgstr "Virement"
 
-#: sith/settings.py:237 sith/settings_sample.py:237
+#: sith/settings.py:249 sith/settings_sample.py:237
 msgid "Other"
 msgstr "Autre"
 
-#: sith/settings.py:261 sith/settings_sample.py:261
+#: sith/settings.py:273 sith/settings_sample.py:261
 msgid "One semester"
 msgstr "Un semestre"
 
-#: sith/settings.py:266 sith/settings_sample.py:266
+#: sith/settings.py:278 sith/settings_sample.py:266
 msgid "Two semesters"
 msgstr "Deux semestres"
 
-#: sith/settings.py:271 sith/settings_sample.py:271
+#: sith/settings.py:283 sith/settings_sample.py:271
 msgid "Common core cursus"
 msgstr "Cursus tronc commun"
 
-#: sith/settings.py:276 sith/settings_sample.py:276
+#: sith/settings.py:288 sith/settings_sample.py:276
 msgid "Branch cursus"
 msgstr "Cursus branche"
 
-#: sith/settings.py:284 sith/settings_sample.py:284
+#: sith/settings.py:296 sith/settings_sample.py:284
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:285 sith/settings_sample.py:285
+#: sith/settings.py:297 sith/settings_sample.py:285
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:286 sith/settings_sample.py:286
+#: sith/settings.py:298 sith/settings_sample.py:286
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:287 sith/settings_sample.py:287
+#: sith/settings.py:299 sith/settings_sample.py:287
 msgid "Communication supervisor"
 msgstr "Responsable com"
 
-#: sith/settings.py:288 sith/settings_sample.py:288
+#: sith/settings.py:300 sith/settings_sample.py:288
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:289 sith/settings_sample.py:289
+#: sith/settings.py:301 sith/settings_sample.py:289
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:290 sith/settings_sample.py:290
+#: sith/settings.py:302 sith/settings_sample.py:290
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:291 sith/settings_sample.py:291
+#: sith/settings.py:303 sith/settings_sample.py:291
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:292 sith/settings_sample.py:292
+#: sith/settings.py:304 sith/settings_sample.py:292
 msgid "Curious"
 msgstr "Curieux"
 

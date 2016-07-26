@@ -7,6 +7,7 @@
 {% block infos %}
 <h3>{% trans %}User account{% endtrans %}</h3>
 <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
+{% if customer.refillings.exists() %}
 <h4>{% trans %}Refillings{% endtrans %}</h4>
 <table>
     <thead>
@@ -26,6 +27,8 @@
 {% endfor %}
     </tbody>
 </table>
+{% endif %}
+{% if customer.buyings.exists() %}
 <h4>{% trans %}Buyings{% endtrans %}</h4>
 <table>
     <thead>
@@ -49,6 +52,8 @@
 {% endfor %}
     </tbody>
 </table>
+{% endif %}
+{% if customer.user.invoices.exists() %}
 <h4>{% trans %}Invoices{% endtrans %}</h4>
 <table>
     <thead>
@@ -74,6 +79,7 @@
 {% endfor %}
     </tbody>
 </table>
+{% endif %}
 {% endblock %}
 
 
