@@ -134,12 +134,14 @@ class EbouticPayWithSith(TemplateView):
                 if 'basket_id' not in request.session.keys() or not request.user.is_authenticated():
                     return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
                 b = Basket.objects.filter(id=request.session['basket_id']).first()
-                c = Customer.objects.filter(user__id=request.user.id).first()
-                if b is None or c is None:
+                if b is None:
+                    return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
+                c = Customer.objects.filter(user__id=b.user.id).first()
+                if c is None:
                     return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
                 kwargs['not_enough'] = True
                 if c.amount < b.get_total():
-                    raise DataError(_("You have not enough money to buy the basket"))
+                    raise DataError(_("You do not have enough money to buy the basket"))
                 else:
                     i = Invoice()
                     i.user = b.user
@@ -158,28 +160,33 @@ class EbouticPayWithSith(TemplateView):
 
 class EtransactionAutoAnswer(View):
     def get(self, request, *args, **kwargs):
-        # test URL:
-# http://127.0.0.1:8000/eboutic/et_autoanswer?Amount=guy&BasketID=4000&Auto=42&Error=00000&Sig=OeKzrHyh9XgjWY8zN2N/Itsg70y3/RRxOTYlW8zx8fDeMwv10LVo6BHB0NTY0WEv/gNY1uNjYEW8IGLz4HzvPcR4w7vsM7dTkSWDvGhVpA57LydRqyQVu6CjY1SL71s4htZRN6XZrexCJag8IBNUOj8rvEu4EdFKqUOQlxU4W3c=
         if (not 'Amount' in request.GET.keys() or
             not 'BasketID' in request.GET.keys() or
             not 'Auto' in request.GET.keys() or
             not 'Error' in request.GET.keys() or
             not 'Sig' in request.GET.keys()):
-            return HttpResponse(status=400)
+            return HttpResponse("Bad arguments", status=400)
         key = crypto.load_publickey(crypto.FILETYPE_PEM, settings.SITH_EBOUTIC_PUB_KEY)
         cert = crypto.X509()
         cert.set_pubkey(key)
-
         sig = base64.b64decode(request.GET['Sig'])
-        print(sig)
-        print('&'.join(request.META['QUERY_STRING'].split('&')[:-1]))
         try:
             crypto.verify(cert, sig, '&'.join(request.META['QUERY_STRING'].split('&')[:-1]), "sha1")
         except:
-            print("Bad signature")
-            return HttpResponse(status=400)
+            return HttpResponse("Bad signature", status=400)
         if request.GET['Error'] == "00000":
-            print("OK")
+            with transaction.atomic():
+                b = Basket.objects.filter(id=request.GET['BasketID']).first()
+                if b is None:
+                    return HttpResponse("Basket does not exists", status=400)
+                i = Invoice()
+                i.user = b.user
+                i.payment_method = "CREDIT_CARD"
+                i.save()
+                for it in b.items.all():
+                    InvoiceItem(invoice=i, product_name=it.product_name,
+                            product_unit_price=it.product_unit_price, quantity=it.quantity).save()
+                i.validate()
+            return HttpResponse("Payment validated")
         else:
-            print("FAIL")
-        return HttpResponse()
+            return HttpResponse("Payment failed with error: "+request.GET['Error'])

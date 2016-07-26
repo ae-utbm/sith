@@ -41,8 +41,8 @@ class Invoice(models.Model):
         if self.payment_method == "SITH_ACCOUNT":
             self.user.customer.amount -= self.get_total()
             self.user.customer.save()
-            self.validated = True
-            self.save()
+        self.validated = True
+        self.save()
 
 
 
