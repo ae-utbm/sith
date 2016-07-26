@@ -7,16 +7,36 @@ from core.models import User
 
 class Basket(models.Model):
     """
-    Basket is built when the user validate its session basket and asks for payment
+    Basket is built when the user connects to an eboutic page
     """
     user = models.ForeignKey(User, related_name='baskets', verbose_name=_('user'), blank=False)
     date = models.DateTimeField(_('date'), auto_now=True)
+
+    def add_product(self, p, q = 1):
+        item = self.items.filter(product_id=p.id).first()
+        if item is None:
+            BasketItem(basket=self, product_id=p.id, product_name=p.name, type=p.product_type.name,
+                    quantity=q, product_unit_price=p.selling_price).save()
+        else:
+            item.quantity += q
+            item.save()
+
+    def del_product(self, p, q = 1):
+        item = self.items.filter(product_id=p.id).first()
+        if item is not None:
+            item.quantity -= q
+            item.save()
+        if item.quantity <= 0:
+            item.delete()
 
     def get_total(self):
         total = 0
         for i in self.items.all():
             total += i.quantity * i.product_unit_price
         return total
+
+    def __str__(self):
+        return "Basket (%d items)" % self.items.all().count()
 
 class Invoice(models.Model):
     """
@@ -49,6 +69,7 @@ class Invoice(models.Model):
         self.save()
 
 class AbstractBaseItem(models.Model):
+    product_id = models.IntegerField(_('product id'))
     product_name = models.CharField(_('product name'), max_length=255)
     type = models.CharField(_('product type'), max_length=255)
     product_unit_price = CurrencyField(_('unit price'))

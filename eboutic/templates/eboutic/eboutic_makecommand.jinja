@@ -23,17 +23,22 @@
             {% endfor %}
         <tbody>
     </table>
+    <p><strong>Total: </strong>{{ basket.get_total() }} €</p>
     <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}">
         {% for (field_name,field_value) in et_request.items() -%}
         <input type="hidden" name="{{ field_name }}" value="{{ field_value }}">
         {% endfor %}
         <input type="submit" value="{% trans %}Pay with credit card{% endtrans %}" />
     </form>
+    {% if basket.items.filter(type="REFILLING").exists() %}
+    <p>{% trans %}AE account payment disabled because your basket contains refilling items.{% endtrans %}</p>
+    {% else %}
     <form method="post" action="{{ url('eboutic:pay_with_sith') }}">
         {% csrf_token %}
         <input type="hidden" name="action" value="pay_with_sith_account">
         <input type="submit" value="{% trans %}Pay with Sith account{% endtrans %}" />
     </form>
+    {% endif %}
 </div>
 
 {% endblock %}

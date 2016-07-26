@@ -22,13 +22,12 @@
 <div id="basket">
     <p>{% trans %}Basket: {% endtrans %}</p>
     <ul>
-        {% for id,infos in request.session['basket']|dictsort %}
-        {% set product = eboutic.products.filter(id=id).first() %}
-        {% set s = infos['qty'] * infos['price'] / 100 %}
-        <li>{{ del_product(id, '-') }} {{ infos['qty'] }} {{ add_product(id, '+') }} {{ product.name }}: {{ "%0.2f"|format(s) }} €</li>
+        {% for i in basket.items.all()|sort(attribute='id') %}
+        <li>{{ del_product(i.product_id, '-') }} {{ i.quantity }}
+        {{ add_product(i.product_id, '+') }} {{ i.product_name }}: {{ "%0.2f"|format(i.product_unit_price*i.quantity) }} €</li>
         {% endfor %}
     </ul>
-    <p><strong>{% trans %}Total: {% endtrans %}{{ "%0.2f"|format(basket_total) }} €</strong></p>
+    <p><strong>{% trans %}Total: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong></p>
     <form method="post" action="{{ url('eboutic:command') }}">
         {% csrf_token %}
         <input type="submit" value="{% trans %}Proceed to command{% endtrans %}" />
