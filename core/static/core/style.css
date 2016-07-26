@@ -119,6 +119,10 @@ td {
     padding: 4px;
     border: solid 1px black;
     border-collapse: collapse;
+    vertical-align: top;
+}
+td>ul {
+    margin-top: 0px;
 }
 thead {
     font-weight: bold;

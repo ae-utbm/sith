@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from datetime import datetime
+import pytz
 import hmac
 import base64
 from OpenSSL import crypto
@@ -84,6 +85,8 @@ class EbouticCommand(TemplateView):
         return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
 
     def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs))
         if 'basket' not in request.session.keys():
             return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
         if self.make_basket(request):
@@ -102,7 +105,8 @@ class EbouticCommand(TemplateView):
         request.session.modified = True
         b.items.all().delete()
         for pid,infos in request.session['basket'].items():
-            BasketItem(basket=b, product_name=Product.objects.filter(id=int(pid)).first().name,
+            p = Product.objects.filter(id=int(pid)).first()
+            BasketItem(basket=b, product_name=p.name, type=p.product_type.name,
                     quantity=infos['qty'], product_unit_price=infos['price']/100).save()
         self.basket = b
         return True
@@ -115,10 +119,12 @@ class EbouticCommand(TemplateView):
         kwargs['et_request']['PBX_IDENTIFIANT'] = settings.SITH_EBOUTIC_PBX_IDENTIFIANT
         kwargs['et_request']['PBX_TOTAL'] = int(self.basket.get_total()*100)
         kwargs['et_request']['PBX_DEVISE'] = 978 # This is Euro. ET support only this value anyway
-        kwargs['et_request']['PBX_CMD'] = "CMD_"+str(self.basket.id)
+        kwargs['et_request']['PBX_CMD'] = self.basket.id
         kwargs['et_request']['PBX_PORTEUR'] = self.basket.user.email
         kwargs['et_request']['PBX_RETOUR'] = "Amount:M;BasketID:R;Auto:A;Error:E;Sig:K"
         kwargs['et_request']['PBX_HASH'] = "SHA512"
+        kwargs['et_request']['PBX_TYPEPAIEMENT'] = "CARTE"
+        kwargs['et_request']['PBX_TYPECARTE'] = "CB"
         kwargs['et_request']['PBX_TIME'] = str(datetime.now().replace(microsecond=0).isoformat('T'))
         kwargs['et_request']['PBX_HMAC'] = hmac.new(settings.SITH_EBOUTIC_HMAC_KEY,
                 bytes("&".join(["%s=%s"%(k,v) for k,v in kwargs['et_request'].items()]), 'utf-8'),
@@ -148,7 +154,7 @@ class EbouticPayWithSith(TemplateView):
                     i.payment_method = "SITH_ACCOUNT"
                     i.save()
                     for it in b.items.all():
-                        InvoiceItem(invoice=i, product_name=it.product_name,
+                        InvoiceItem(invoice=i, product_name=it.product_name, type=it.type,
                                 product_unit_price=it.product_unit_price, quantity=it.quantity).save()
                     i.validate()
                     kwargs['not_enough'] = False
@@ -184,9 +190,10 @@ class EtransactionAutoAnswer(View):
                 i.payment_method = "CREDIT_CARD"
                 i.save()
                 for it in b.items.all():
-                    InvoiceItem(invoice=i, product_name=it.product_name,
+                    InvoiceItem(invoice=i, product_name=it.product_name, type=it.type,
                             product_unit_price=it.product_unit_price, quantity=it.quantity).save()
                 i.validate()
+                b.delete()
             return HttpResponse("Payment validated")
         else:
             return HttpResponse("Payment failed with error: "+request.GET['Error'])

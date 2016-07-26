@@ -3,3 +3,5 @@ Django >=1.8,<1.9
 Pillow
 mistune
 django-jinja
+pyopenssl
+pytz

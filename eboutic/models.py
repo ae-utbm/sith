@@ -28,7 +28,6 @@ class Invoice(models.Model):
             max_length=20, verbose_name=_('payment method'))
     validated = models.BooleanField(_("validated"), default=False)
 
-
     def get_total(self):
         total = 0
         for i in self.items.all():
@@ -41,13 +40,17 @@ class Invoice(models.Model):
         if self.payment_method == "SITH_ACCOUNT":
             self.user.customer.amount -= self.get_total()
             self.user.customer.save()
+        else:
+            for i in self.items.filter(type="REFILLING").all():
+                self.user.customer.amount += i.product_unit_price * i.quantity
+            self.user.customer.save()
+
         self.validated = True
         self.save()
 
-
-
 class AbstractBaseItem(models.Model):
     product_name = models.CharField(_('product name'), max_length=255)
+    type = models.CharField(_('product type'), max_length=255)
     product_unit_price = CurrencyField(_('unit price'))
     quantity = models.IntegerField(_('quantity'))
 
