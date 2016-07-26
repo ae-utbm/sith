@@ -2,7 +2,7 @@ from django.db import models, DataError
 from django.utils.translation import ugettext_lazy as _
 
 from accounting.models import CurrencyField
-from counter.models import Counter, Product
+from counter.models import Counter, Product, Customer
 from core.models import User
 
 class Basket(models.Model):
@@ -57,6 +57,9 @@ class Invoice(models.Model):
     def validate(self, *args, **kwargs):
         if self.validated:
             raise DataError(_("Invoice already validated"))
+        from counter.models import Customer
+        if not Customer.objects.filter(user=self.user).exists():
+            Customer(user=self.user, account_id=Customer.generate_account_id(), amount=0).save()
         if self.payment_method == "SITH_ACCOUNT":
             self.user.customer.amount -= self.get_total()
             self.user.customer.save()
