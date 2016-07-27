@@ -16,7 +16,7 @@ import re
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from subscription.models import Subscriber
-from counter.models import Counter, Customer, Product, Selling, Refilling
+from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType
 
 class GetUserForm(forms.Form):
     """
@@ -42,7 +42,7 @@ class GetUserForm(forms.Form):
         elif cleaned_data['id'] is not None:
             user = Customer.objects.filter(user=cleaned_data['id']).first()
         if user is None:
-            raise forms.ValidationError("User not found")
+            raise forms.ValidationError(_("User not found"))
         cleaned_data['user_id'] = user.user.id
         return cleaned_data
 
@@ -69,7 +69,6 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         if self.request.method == 'POST':
             self.object = self.get_object()
         kwargs = super(CounterMain, self).get_context_data(**kwargs)
-# TODO: make some checks on the counter type, in order not to make the AuthenticationForm if there is no need to
         kwargs['login_form'] = AuthenticationForm()
         kwargs['login_form'].fields['username'].widget.attrs['autofocus'] = True
         kwargs['form'] = self.get_form()
@@ -353,6 +352,30 @@ class CounterDeleteView(CanEditMixin, DeleteView):
 
 # Product management
 
+class ProductTypeListView(ListView):
+    """
+    A list view for the admins
+    """
+    model = ProductType
+    template_name = 'counter/producttype_list.jinja'
+
+class ProductTypeCreateView(CreateView):
+    """
+    A create view for the admins
+    """
+    model = ProductType
+    fields = ['name', 'description', 'icon']
+    template_name = 'core/create.jinja'
+
+class ProductTypeEditView(UpdateView):
+    """
+    An edit view for the admins
+    """
+    model = ProductType
+    template_name = 'core/edit.jinja'
+    fields = ['name', 'description', 'icon']
+    pk_url_kwarg = "type_id"
+
 class ProductListView(ListView):
     """
     A list view for the admins
@@ -365,15 +388,17 @@ class ProductCreateView(CreateView):
     A create view for the admins
     """
     model = Product
-    template_name = 'core/edit.jinja'
+    fields = ['name', 'description', 'product_type', 'code', 'purchase_price',
+            'selling_price', 'special_selling_price', 'icon', 'club']
+    template_name = 'core/create.jinja'
 
 class ProductEditView(UpdateView):
     """
     An edit view for the admins
     """
     model = Product
-    form_class = modelform_factory(Product, fields=['name', 'description', 'product_type', 'code', 'purchase_price',
-        'selling_price', 'special_selling_price', 'icon', 'club'])
+    fields = ['name', 'description', 'product_type', 'code', 'purchase_price',
+            'selling_price', 'special_selling_price', 'icon', 'club']
     pk_url_kwarg = "product_id"
     template_name = 'core/edit.jinja'
     # TODO: add management of the 'counters' ForeignKey
@@ -391,8 +416,8 @@ class UserAccountView(DetailView):
     def dispatch(self, request, *arg, **kwargs):
         res = super(UserAccountView, self).dispatch(request, *arg, **kwargs)
         if (self.object.user == request.user
-            or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
-            or request.user.is_in_group(settings.SITH_GROUPS['root']['name'])):
+                or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
+                or request.user.is_in_group(settings.SITH_GROUPS['root']['name'])):
             return res
         raise PermissionDenied
 

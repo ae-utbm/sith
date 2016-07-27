@@ -14,7 +14,7 @@
     {% else %}
     <li><a href="{{ url('core:page_rev', page_name=page.get_full_name(), rev=r['id']) }}">{{ r.revision }}</a> -
     {{ user_profile_link(r.author) }} -
-    {{ page.revisions.last().date|localtime|date(DATETIME_FORMAT) }} {{ page.revisions.last().date|localtime|time(DATETIME_FORMAT) }}</a></li>
+    {{ r.date|localtime|date(DATETIME_FORMAT) }} {{ r.date|localtime|time(DATETIME_FORMAT) }}</a></li>
     {% endif %}
 {% endfor %}
 </ul>

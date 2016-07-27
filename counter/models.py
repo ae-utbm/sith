@@ -39,6 +39,9 @@ class ProductType(models.Model):
     description = models.TextField(_('description'), null=True, blank=True)
     icon = models.ImageField(upload_to='products', null=True, blank=True)
 
+    class Meta:
+        verbose_name = _('product type')
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -49,6 +52,9 @@ class ProductType(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('counter:producttype_list')
 
 class Product(models.Model):
     """
@@ -63,6 +69,9 @@ class Product(models.Model):
     special_selling_price = CurrencyField(_('special selling price'))
     icon = models.ImageField(upload_to='products', null=True, blank=True)
     club = models.ForeignKey(Club, related_name="products")
+
+    class Meta:
+        verbose_name = _('product')
 
     def is_owned_by(self, user):
         """
@@ -88,6 +97,9 @@ class Counter(models.Model):
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
     barmen_session = {}
+
+    class Meta:
+        verbose_name = _('counter')
 
     def __getattribute__(self, name):
         if name == "owner_group":
@@ -173,6 +185,9 @@ class Refilling(models.Model):
     bank = models.CharField(_('bank'), max_length=255,
             choices=settings.SITH_COUNTER_BANK, default='other')
 
+    class Meta:
+        verbose_name = _("refilling")
+
     def __str__(self):
         return "Refilling: %.2f for %s" % (self.amount, self.customer.user.get_display_name())
 
@@ -197,6 +212,9 @@ class Selling(models.Model):
     customer = models.ForeignKey(Customer, related_name="buyings", blank=False)
     date = models.DateTimeField(_('date'), auto_now=True)
 
+    class Meta:
+        verbose_name = _("selling")
+
     def __str__(self):
         return "Selling: %d x %s (%f) for %s" % (self.quantity, self.product.name,
                 self.quantity*self.unit_price, self.customer.user.get_display_name())
@@ -219,14 +237,11 @@ class Permanency(models.Model):
     start = models.DateTimeField(_('start date'))
     end = models.DateTimeField(_('end date'))
 
+    class Meta:
+        verbose_name = _("permanency")
+
     def __str__(self):
         return "%s in %s from %s to %s" % (self.user, self.counter,
                 self.start.strftime("%Y-%m-%d %H:%M:%S"), self.end.strftime("%Y-%m-%d %H:%M:%S"))
 
-
-# TODO:
-# une classe Vente
-# foreign key vers comptoir, vendeur, client, produit, mais stocker le prix du produit, pour gerer les maj de prix
-# une classe Rechargement
-# foreign key vers comptoir, vendeur, client, plus montant
 

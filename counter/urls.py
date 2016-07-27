@@ -14,6 +14,9 @@ urlpatterns = [
     url(r'^admin/product/list$', ProductListView.as_view(), name='product_list'),
     url(r'^admin/product/create$', ProductCreateView.as_view(), name='new_product'),
     url(r'^admin/product/(?P<product_id>[0-9]+)$', ProductEditView.as_view(), name='product_edit'),
+    url(r'^admin/producttype/list$', ProductTypeListView.as_view(), name='producttype_list'),
+    url(r'^admin/producttype/create$', ProductTypeCreateView.as_view(), name='new_producttype'),
+    url(r'^admin/producttype/(?P<type_id>[0-9]+)$', ProductTypeEditView.as_view(), name='producttype_edit'),
 ]
 
 
