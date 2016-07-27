@@ -457,6 +457,7 @@ class PageRev(models.Model):
     is the real content of the page.
     The content is in PageRev.title and PageRev.content .
     """
+    revision = models.IntegerField(_("revision"))
     title = models.CharField(_("page title"), max_length=255, blank=True)
     content = models.TextField(_("page content"), blank=True)
     date = models.DateTimeField(_('date'), auto_now=True)
@@ -488,6 +489,8 @@ class PageRev(models.Model):
             return object.__getattribute__(self, attr)
 
     def save(self, *args, **kwargs):
+        if self.revision is None:
+            self.revision = self.page.revisions.all().count() + 1
         super(PageRev, self).save(*args, **kwargs)
         # Don't forget to unlock, otherwise, people will have to wait for the page's timeout
         self.page.unset_lock()

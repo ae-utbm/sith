@@ -1,0 +1,23 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Product list{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<p><a href="{{ url('counter:new_product') }}">{% trans %}New product{% endtrans %}</a></p>
+{% if product_list %}
+<h3>{% trans %}Product list{% endtrans %}</h3>
+<ul>
+    {% for p in product_list  %}
+    <li><a href="{{ url('counter:product_edit', product_id=p.id) }}">{{ p }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+{% trans %}There is no products in this website.{% endtrans %}
+{% endif %}
+{% endblock %}
+
+
+
+

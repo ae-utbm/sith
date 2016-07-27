@@ -351,6 +351,33 @@ class CounterDeleteView(CanEditMixin, DeleteView):
     template_name = 'core/delete_confirm.jinja'
     success_url = reverse_lazy('counter:admin_list')
 
+# Product management
+
+class ProductListView(ListView):
+    """
+    A list view for the admins
+    """
+    model = Product
+    template_name = 'counter/product_list.jinja'
+
+class ProductCreateView(CreateView):
+    """
+    A create view for the admins
+    """
+    model = Product
+    template_name = 'core/edit.jinja'
+
+class ProductEditView(UpdateView):
+    """
+    An edit view for the admins
+    """
+    model = Product
+    form_class = modelform_factory(Product, fields=['name', 'description', 'product_type', 'code', 'purchase_price',
+        'selling_price', 'special_selling_price', 'icon', 'club'])
+    pk_url_kwarg = "product_id"
+    template_name = 'core/edit.jinja'
+    # TODO: add management of the 'counters' ForeignKey
+
 # User accounting infos
 
 class UserAccountView(DetailView):

@@ -75,6 +75,9 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('counter:product_list')
+
 class Counter(models.Model):
     name = models.CharField(_('name'), max_length=30)
     club = models.ForeignKey(Club, related_name="counters")

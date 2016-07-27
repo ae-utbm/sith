@@ -2,7 +2,7 @@
 
 {% block page %}
 {% if rev %}
-<h4>{% trans rev_id=rev.id %}This may not be the last update, you are seeing revision {{ rev_id }}!{% endtrans %}</h4>
+<h4>{% trans rev_id=rev.revision %}This may not be the last update, you are seeing revision {{ rev_id }}!{% endtrans %}</h4>
 <h3>{{ rev.title }}</h3>
 <div class="page_content">{{ rev.content|markdown }}</div>
 {% else %}

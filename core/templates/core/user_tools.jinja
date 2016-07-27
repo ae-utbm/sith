@@ -23,6 +23,7 @@
 <ul>
     {% if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
     <li><a href="{{ url('counter:admin_list') }}">{% trans %}General counters management{% endtrans %}</a></li>
+    <li><a href="{{ url('counter:product_list') }}">{% trans %}General products management{% endtrans %}</a></li>
     {% endif %}
     {% for b in settings.SITH_COUNTER_BARS %}
     {% if user.is_in_group(b[1]+" admin") %}

@@ -10,14 +10,14 @@ from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from club.models import Club, Membership
 from sith.settings import SITH_MAXIMUM_FREE_ROLE, SITH_MAIN_BOARD_GROUP
 
-class ClubListView(CanViewMixin, ListView):
+class ClubListView(ListView):
     """
     List the Clubs
     """
     model = Club
     template_name = 'club/club_list.jinja'
 
-class ClubView(CanViewMixin, DetailView):
+class ClubView(DetailView):
     """
     Front page of a Club
     """
