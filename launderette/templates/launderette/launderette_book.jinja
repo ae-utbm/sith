@@ -4,13 +4,38 @@
 {% trans %}Launderette{% endtrans %}
 {% endblock %}
 
+{% macro choose(date) %}
+<form method="post" action="{{ url('launderette:book_slot', launderette_id=launderette.id) }}" class="inline" style="display:inline">
+    {% csrf_token %}
+    <button type="submit" name="slot" value="{{ localtime(date).isoformat() }}"> {% trans %}Choose{% endtrans %} </button>
+</form>
+{% endmacro %}
+
+
 {% block content %}
 {% if request.user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP) %}
-<ul>
-    {% for l in launderette_list  %}
-    <li><a href="{{ url('launderette:book_slot', launderette_id=l.id) }}">{{ l }}</a></li>
-    {% endfor %}
-</ul>
+<table>
+    <thead>
+        <tr>
+            {% for day in planning.keys() %}
+            <th>{{ day|date('l') }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(0, 24) %}
+        <tr>
+            {% for hours in planning.values() %}
+            <td>
+                {% if hours[i] %}
+                {{ hours[i]|localtime|time(TIME_FORMAT) }} {{ choose(hours[i]) }}
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endif %}
 {% endblock %}
 

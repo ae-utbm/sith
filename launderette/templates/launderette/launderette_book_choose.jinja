@@ -1,0 +1,21 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Launderette{% endtrans %}
+{% endblock %}
+
+{% block content %}
+{% if request.user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP) %}
+<ul>
+    {% for l in launderette_list  %}
+    <li><a href="{{ url('launderette:book_slot', launderette_id=l.id) }}">{{ l }}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
+
+
+
+
+
+

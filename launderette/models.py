@@ -48,6 +48,9 @@ class Machine(models.Model):
             return True
         return False
 
+    def __str__(self):
+        return "%s - Launderette: %s - Working: %s" % (self.name, self.launderette, self.is_working)
+
 class Token(models.Model):
     name = models.IntegerField(_('name'))
     launderette = models.ForeignKey(Launderette, related_name='tokens', verbose_name=_('launderette'))
@@ -68,9 +71,16 @@ class Slot(models.Model):
     start_date = models.DateTimeField(_('start date'))
     type = models.CharField(_('type'), max_length=10, choices=[('WASHING', _('Washing')), ('DRYING', _('Drying'))])
     machine = models.ForeignKey(Machine, related_name='slots', verbose_name=_('machine'))
-    token = models.ForeignKey(Token, related_name='slots', verbose_name=_('token'))
+    token = models.ForeignKey(Token, related_name='slots', verbose_name=_('token'), blank=True, null=True)
     user = models.ForeignKey(Subscriber, related_name='slots', verbose_name=_('user'))
+
+    class Meta:
+        verbose_name = _('Slot')
 
     def full_clean(self):
         return super(Slot, self).full_clean()
+
+    def __str__(self):
+        return str(self.user) + " - " + str(self.start_date)
+
 
