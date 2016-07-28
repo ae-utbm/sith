@@ -14,7 +14,7 @@ from django.db import DataError, transaction
 
 import re
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from subscription.models import Subscriber
 from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType
 
@@ -352,14 +352,14 @@ class CounterDeleteView(CanEditMixin, DeleteView):
 
 # Product management
 
-class ProductTypeListView(ListView):
+class ProductTypeListView(CanViewMixin, ListView):
     """
     A list view for the admins
     """
     model = ProductType
     template_name = 'counter/producttype_list.jinja'
 
-class ProductTypeCreateView(CreateView):
+class ProductTypeCreateView(CanCreateMixin, CreateView):
     """
     A create view for the admins
     """
@@ -367,7 +367,7 @@ class ProductTypeCreateView(CreateView):
     fields = ['name', 'description', 'icon']
     template_name = 'core/create.jinja'
 
-class ProductTypeEditView(UpdateView):
+class ProductTypeEditView(CanEditPropMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -376,14 +376,14 @@ class ProductTypeEditView(UpdateView):
     fields = ['name', 'description', 'icon']
     pk_url_kwarg = "type_id"
 
-class ProductListView(ListView):
+class ProductListView(CanViewMixin, ListView):
     """
     A list view for the admins
     """
     model = Product
     template_name = 'counter/product_list.jinja'
 
-class ProductCreateView(CreateView):
+class ProductCreateView(CanCreateMixin, CreateView):
     """
     A create view for the admins
     """
@@ -392,7 +392,7 @@ class ProductCreateView(CreateView):
             'selling_price', 'special_selling_price', 'icon', 'club']
     template_name = 'core/create.jinja'
 
-class ProductEditView(UpdateView):
+class ProductEditView(CanEditPropMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -413,7 +413,7 @@ class UserAccountView(DetailView):
     pk_url_kwarg = "user_id"
     template_name = "counter/user_account.jinja"
 
-    def dispatch(self, request, *arg, **kwargs):
+    def dispatch(self, request, *arg, **kwargs): # Manually validates the rights
         res = super(UserAccountView, self).dispatch(request, *arg, **kwargs)
         if (self.object.user == request.user
                 or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
