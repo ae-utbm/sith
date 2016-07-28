@@ -66,7 +66,8 @@ class NewSubscription(CanEditMixin, CreateView): # TODO: this must be able to cr
         return {}
 
     def form_valid(self, form):
-        form.instance.subscription_start = Subscription.compute_start()
+        form.instance.subscription_start = Subscription.compute_start(
+                duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'])
         form.instance.subscription_end = Subscription.compute_end(
                 duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'],
                 start=form.instance.subscription_start

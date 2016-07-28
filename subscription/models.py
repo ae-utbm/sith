@@ -64,7 +64,7 @@ class Subscription(models.Model):
 
 
     @staticmethod
-    def compute_start(d=date.today()):
+    def compute_start(d=date.today(), duration=1):
         """
         This function computes the start date of the subscription with respect to the given date (default is today),
         and the start date given in settings.SITH_START_DATE.
@@ -74,6 +74,8 @@ class Subscription(models.Model):
             2015-03-17 -> 2015-02-15
             2015-01-11 -> 2014-08-15
         """
+        if duration <= 2: # Sliding subscriptions for 1 or 2 semesters
+            return d
         today = d
         year = today.year
         start = date(year, settings.SITH_START_DATE[0], settings.SITH_START_DATE[1])
@@ -99,10 +101,15 @@ class Subscription(models.Model):
             2015-09-18 - 4 -> 2017-09-18
         """
         if start is None:
-            start = Subscription.compute_start()
+            start = Subscription.compute_start(duration=duration)
         # This can certainly be simplified, but it works like this
-        return start.replace(month=(start.month+6*duration)%12,
+        try:
+            return start.replace(month=(start.month-1+6*duration)%12+1,
                              year=start.year+int(duration/2)+(1 if start.month > 6 and duration%2 == 1 else 0))
+        except ValueError as e:
+            return start.replace(day=1, month=(start.month+6*duration)%12+1,
+                             year=start.year+int(duration/2)+(1 if start.month > 6 and duration%2 == 1 else 0))
+
 
     def can_be_edited_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name'])
@@ -110,10 +117,10 @@ class Subscription(models.Model):
     def is_valid_now(self):
         return self.subscription_start <= date.today() and date.today() <= self.subscription_end
 
-def guy_test(date):
-    print(str(date)+" -> "+str(Subscription.compute_start(date)))
-def bibou_test(duration, date=None):
-    print(str(date)+" - "+str(duration)+" -> "+str(Subscription.compute_end(duration, date)))
+def guy_test(date, duration=4):
+    print(str(date)+" - "+str(duration)+" -> "+str(Subscription.compute_start(date, duration)))
+def bibou_test(duration, date=date.today()):
+    print(str(date)+" - "+str(duration)+" -> "+str(Subscription.compute_end(duration, Subscription.compute_start(date, duration))))
 def guy():
     guy_test(date(2015, 7, 11))
     guy_test(date(2015, 8, 11))
@@ -124,6 +131,15 @@ def guy():
     guy_test(date(2015, 8, 17))
     guy_test(date(2015, 9, 17))
     print('='*80)
+    guy_test(date(2015, 7, 11), 1)
+    guy_test(date(2015, 8, 11), 2)
+    guy_test(date(2015, 2, 17), 3)
+    guy_test(date(2015, 3, 17), 4)
+    guy_test(date(2015, 1, 11), 1)
+    guy_test(date(2015, 2, 11), 2)
+    guy_test(date(2015, 8, 17), 3)
+    guy_test(date(2015, 9, 17), 4)
+    print('='*80)
     bibou_test(1, date(2015, 2, 18))
     bibou_test(2, date(2015, 2, 18))
     bibou_test(3, date(2015, 2, 18))
@@ -132,6 +148,10 @@ def guy():
     bibou_test(2, date(2015, 9, 18))
     bibou_test(3, date(2015, 9, 18))
     bibou_test(4, date(2015, 9, 18))
+    print('='*80)
+    bibou_test(2, date(2000, 2, 29))
+    bibou_test(1, date(2000, 5, 31))
+    bibou_test(1, date(2000, 7, 31))
     bibou_test(1)
     bibou_test(2)
     bibou_test(3)
