@@ -166,6 +166,11 @@ tbody>tr:hover {
     padding: 4px;
     line-height: 120%;
 }
+textarea {
+    white-space: pre;
+    width: 98%;
+    margin-top: 10px;
+}
 
 /*--------------------------------FOOTER-------------------------------*/
 footer{

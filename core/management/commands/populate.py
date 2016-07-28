@@ -52,6 +52,7 @@ class Command(BaseCommand):
             c.edit_groups = [g]
             c.save()
         self.reset_index("counter")
+        Counter(name="Eboutic", club=main_club, type='EBOUTIC').save()
         p = Page(name='Index')
         p.set_lock(root)
         p.save()
@@ -132,6 +133,18 @@ Welcome to the wiki page!
             p.save()
             PageRev(page=p, title="Aide sur la syntaxe", author=skia, content="""
 Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
+""").save()
+            p = Page(name='Services')
+            p.save()
+            p.set_lock(skia)
+            p.view_groups=[settings.SITH_GROUPS['public']['id']]
+            p.save()
+            PageRev(page=p, title="Services", author=skia, content="""
+|   |   |   |
+| :---: | :---: | :---: |
+| [Eboutic](/eboutic) | [Laverie](/launderette) | Matmat |
+| SAS | Weekmail | Forum|
+
 """).save()
             # Adding README
             p = Page(name='README')

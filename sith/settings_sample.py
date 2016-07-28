@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'accounting',
     'counter',
     'eboutic',
+    'launderette',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -215,9 +216,17 @@ SITH_GROUPS = {
         'id': 3,
         'name': "Accounting admin",
     },
-    'counter-admin': {
+    'communication-admin': {
         'id': 4,
+        'name': "Communication admin",
+    },
+    'counter-admin': {
+        'id': 5,
         'name': "Counter admin",
+    },
+    'launderette-admin': {
+        'id': 6,
+        'name': "Launderette admin",
     },
 }
 

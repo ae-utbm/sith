@@ -1,0 +1,24 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Product type list{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<p><a href="{{ url('counter:new_producttype') }}">{% trans %}New product type{% endtrans %}</a></p>
+{% if producttype_list %}
+<h3>{% trans %}Product type list{% endtrans %}</h3>
+<ul>
+    {% for t in producttype_list  %}
+    <li><a href="{{ url('counter:producttype_edit', type_id=t.id) }}">{{ t }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+{% trans %}There is no product types in this website.{% endtrans %}
+{% endif %}
+{% endblock %}
+
+
+
+
+

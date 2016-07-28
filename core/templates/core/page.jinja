@@ -15,7 +15,7 @@
 {% macro print_page_name(page) %}
 {% if page %}
 {{ print_page_name(page.parent) }} >
-<a href="{{ url('core:page', page_name=page.get_full_name()) }}">{{ page.name }}</a>
+<a href="{{ url('core:page', page_name=page.get_full_name()) }}">{{ page.get_display_name() }}</a>
 {% endif %}
 {% endmacro %}
 

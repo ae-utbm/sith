@@ -447,7 +447,7 @@ class Page(models.Model):
         return '/'.join([self.parent.get_full_name(), self.name])
 
     def get_display_name(self):
-        return self.get_full_name()
+        return self.revisions.last().title
 
 class PageRev(models.Model):
     """
