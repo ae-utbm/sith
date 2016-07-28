@@ -7,7 +7,7 @@ To start working on the project, just run the following commands:
     git clone https://ae-dev.utbm.fr/ae/Sith.git
     cd Sith
     virtualenv --clear --python=python3 env
-    source env_sith/bin/activate
+    source env/bin/activate
     pip install -r requirements.txt
     ./manage.py setup
 
@@ -20,6 +20,9 @@ generate a complete HTML documentation that will be available in the *./doc/html
 
 ### Dependencies:
 See requirements.txt
+
+You may need to install some dev libraries like `libssl-dev`, `libjpeg-dev`, or `zlib1g-dev` to install all the
+requiered dependancies with pip.
 
 The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
 

@@ -149,6 +149,7 @@ def guy():
     bibou_test(3, date(2015, 9, 18))
     bibou_test(4, date(2015, 9, 18))
     print('='*80)
+    bibou_test(1, date(2000, 2, 29))
     bibou_test(2, date(2000, 2, 29))
     bibou_test(1, date(2000, 5, 31))
     bibou_test(1, date(2000, 7, 31))
