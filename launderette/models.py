@@ -35,6 +35,7 @@ class Launderette(models.Model):
 class Machine(models.Model):
     name = models.CharField(_('name'), max_length=30)
     launderette = models.ForeignKey(Launderette, related_name='machines', verbose_name=_('launderette'))
+    type = models.CharField(_('type'), max_length=10, choices=[('WASHING', _('Washing')), ('DRYING', _('Drying'))])
     is_working = models.BooleanField(_('is working'), default=True)
 
     class Meta:
@@ -49,12 +50,16 @@ class Machine(models.Model):
         return False
 
     def __str__(self):
-        return "%s - Launderette: %s - Working: %s" % (self.name, self.launderette, self.is_working)
+        return "%s %s" % (self._meta.verbose_name, self.name)
+
+    def get_absolute_url(self):
+        return reverse('launderette:launderette_details', kwargs={"launderette_id": self.launderette.id})
 
 class Token(models.Model):
     name = models.IntegerField(_('name'))
     launderette = models.ForeignKey(Launderette, related_name='tokens', verbose_name=_('launderette'))
     type = models.CharField(_('type'), max_length=10, choices=[('WASHING', _('Washing')), ('DRYING', _('Drying'))])
+    start_date = models.DateTimeField(_('start date'))
 
     class Meta:
         verbose_name = _('Token')
@@ -81,6 +86,7 @@ class Slot(models.Model):
         return super(Slot, self).full_clean()
 
     def __str__(self):
-        return str(self.user) + " - " + str(self.start_date)
+        return "User: %s - Date: %s - Type: %s - Machine: %s - Token: %s" % (self.user, self.start_date, self.get_type_display(),
+                self.machine.name, self.token)
 
 

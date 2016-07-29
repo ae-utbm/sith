@@ -5,7 +5,14 @@
 {% endblock %}
 
 {% block content %}
-Admin
+<h3>{% trans %}Machines{% endtrans %}</h3>
+<p><a href="{{ url('launderette:machine_new') }}?launderette={{ launderette.id }}">{% trans %}New machine{% endtrans %}</a></p>
+<ul>
+    {% for m in launderette.machines.all() %}
+    <li><a href="{{ url('launderette:machine_edit', machine_id=m.id) }}">{{ m }}</a> -
+        <a href="{{ url('launderette:machine_delete', machine_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></li>
+    {% endfor %}
+</ul>
 {% endblock %}
 
 

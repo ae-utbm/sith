@@ -16,12 +16,17 @@
     {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
     <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
     {% endif %}
+    <h5>{% trans %}Launderette{% endtrans %}</h5>
+    {% if user.is_in_group(settings.SITH_GROUPS['launderette-admin']['name']) %}
+    <li><a href="{{ url('launderette:launderette_list') }}">{% trans %}Launderette{% endtrans %}</a></li>
+    {% endif %}
 </ul>
 
 <hr>
 <h4>{% trans %}Counters{% endtrans %}</h4>
 <ul>
     {% if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+    <h5>{% trans %}General management{% endtrans %}</h5>
     <li><a href="{{ url('counter:admin_list') }}">{% trans %}General counters management{% endtrans %}</a></li>
     <li><a href="{{ url('counter:product_list') }}">{% trans %}Products management{% endtrans %}</a></li>
     <li><a href="{{ url('counter:producttype_list') }}">{% trans %}Products type management{% endtrans %}</a></li>

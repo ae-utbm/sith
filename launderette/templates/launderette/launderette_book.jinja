@@ -7,13 +7,29 @@
 {% macro choose(date) %}
 <form method="post" action="{{ url('launderette:book_slot', launderette_id=launderette.id) }}" class="inline" style="display:inline">
     {% csrf_token %}
-    <button type="submit" name="slot" value="{{ localtime(date).isoformat() }}"> {% trans %}Choose{% endtrans %} </button>
+    <input type="hidden" name="slot_type" value="{{ slot_type }}">
+    <button type="submit" name="slot" value="{{ date.isoformat() }}">{% trans %}Choose{% endtrans %}</button>
 </form>
 {% endmacro %}
 
 
 {% block content %}
-{% if request.user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP) %}
+<h3>{{ launderette }}</h3>
+<p>
+<form method="post" action="{{ url('launderette:book_slot', launderette_id=launderette.id) }}"
+                    class="inline" style="display:inline">
+    {% csrf_token %}
+    <button type="submit" name="slot_type" value="BOTH" {% if slot_type == "BOTH" -%}style="background: #FF0"{% endif %}>{% trans %}Washing and drying{% endtrans %}</button>
+</form>
+<form method="post" action="{{ url('launderette:book_slot', launderette_id=launderette.id) }}" class="inline" style="display:inline">
+    {% csrf_token %}
+    <button type="submit" name="slot_type" value="WASHING" {% if slot_type == "WASHING" -%}style="background: #FF0"{% endif %}>{% trans %}Washing{% endtrans %}</button>
+</form>
+<form method="post" action="{{ url('launderette:book_slot', launderette_id=launderette.id) }}" class="inline" style="display:inline">
+    {% csrf_token %}
+    <button type="submit" name="slot_type" value="DRYING" {% if slot_type == "DRYING" -%}style="background: #FF0"{% endif %}>{% trans %}Drying{% endtrans %}</button>
+</form>
+</p>
 <table>
     <thead>
         <tr>
@@ -28,7 +44,7 @@
             {% for hours in planning.values() %}
             <td>
                 {% if hours[i] %}
-                {{ hours[i]|localtime|time(TIME_FORMAT) }} {{ choose(hours[i]) }}
+                {{ hours[i]|time(TIME_FORMAT) }} {{ choose(hours[i]) }}
                 {% endif %}
             </td>
             {% endfor %}
@@ -36,7 +52,6 @@
         {% endfor %}
     </tbody>
 </table>
-{% endif %}
 {% endblock %}
 
 

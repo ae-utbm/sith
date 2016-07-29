@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-28 20:02+0200\n"
+"POT-Creation-Date: 2016-07-29 12:46+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: accounting/models.py:32 accounting/models.py:55 accounting/models.py:94
 #: club/models.py:18 counter/models.py:38 counter/models.py:63
 #: counter/models.py:91 launderette/models.py:12 launderette/models.py:36
-#: launderette/models.py:52
+#: launderette/models.py:59
 msgid "name"
 msgstr "nom"
 
@@ -32,7 +32,7 @@ msgid "account number"
 msgstr "numero de compte"
 
 #: accounting/models.py:92 club/models.py:109 counter/models.py:237
-#: launderette/models.py:68
+#: launderette/models.py:62 launderette/models.py:76
 msgid "start date"
 msgstr "date de début"
 
@@ -116,12 +116,12 @@ msgstr "Il n'y a pas de types comptable dans ce site web."
 #: accounting/templates/accounting/bank_account_details.jinja:5
 #: accounting/templates/accounting/club_account_details.jinja:5
 #: accounting/templates/accounting/journal_details.jinja:5
-#: core/templates/core/user_tools.jinja:38
+#: core/templates/core/user_tools.jinja:43
 msgid "Accounting"
 msgstr "Comptabilité"
 
 #: accounting/templates/accounting/bank_account_details.jinja:8
-#: core/templates/core/user_tools.jinja:45
+#: core/templates/core/user_tools.jinja:50
 msgid "Bank account: "
 msgstr "Compte en banque : "
 
@@ -148,7 +148,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/journal_details.jinja:51
 #: club/templates/club/club_detail.jinja:7 core/templates/core/page.jinja:31
 #: core/templates/core/user_base.jinja:8
-#: core/templates/core/user_tools.jinja:32
+#: core/templates/core/user_tools.jinja:37
 #: counter/templates/counter/counter_list.jinja:15
 #: counter/templates/counter/counter_list.jinja:18
 #: launderette/templates/launderette/launderette_list.jinja:14
@@ -158,6 +158,7 @@ msgstr "Éditer"
 #: accounting/templates/accounting/bank_account_details.jinja:19
 #: accounting/templates/accounting/bank_account_list.jinja:16
 #: core/templates/core/group_list.jinja:13
+#: launderette/templates/launderette/launderette_detail.jinja:13
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -206,8 +207,6 @@ msgstr "Fin"
 #: accounting/templates/accounting/journal_details.jinja:23
 #: counter/templates/counter/user_account.jinja:17
 #: counter/templates/counter/user_account.jinja:63
-#: launderette/templates/launderette/user_account.jinja:17
-#: launderette/templates/launderette/user_account.jinja:63
 msgid "Amount"
 msgstr "Montant"
 
@@ -241,7 +240,6 @@ msgstr "Voir"
 
 #: accounting/templates/accounting/journal_details.jinja:10
 #: counter/templates/counter/user_account.jinja:9
-#: launderette/templates/launderette/user_account.jinja:9
 msgid "Amount: "
 msgstr "Montant: "
 
@@ -265,9 +263,6 @@ msgstr "No"
 #: counter/templates/counter/user_account.jinja:15
 #: counter/templates/counter/user_account.jinja:36
 #: counter/templates/counter/user_account.jinja:61
-#: launderette/templates/launderette/user_account.jinja:15
-#: launderette/templates/launderette/user_account.jinja:36
-#: launderette/templates/launderette/user_account.jinja:61
 msgid "Date"
 msgstr "Date"
 
@@ -320,7 +315,7 @@ msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
 #: club/models.py:107 eboutic/models.py:12 eboutic/models.py:45
-#: launderette/models.py:72
+#: launderette/models.py:80
 msgid "user"
 msgstr "nom d'utilisateur"
 
@@ -376,7 +371,6 @@ msgstr "Éditer le club"
 #: core/templates/core/page_prop.jinja:8
 #: core/templates/core/pagerev_edit.jinja:24
 #: counter/templates/counter/counter_edit.jinja:8
-#: launderette/templates/launderette/counter_edit.jinja:8
 #: subscription/templates/subscription/subscription.jinja:12
 msgid "Save"
 msgstr "Sauver"
@@ -406,7 +400,7 @@ msgid "Add"
 msgstr "Ajouter"
 
 #: club/templates/club/club_tools.jinja:4
-#: core/templates/core/user_tools.jinja:56
+#: core/templates/core/user_tools.jinja:61
 msgid "Club tools"
 msgstr "Outils club"
 
@@ -605,7 +599,6 @@ msgstr "Confirmation"
 
 #: core/templates/core/delete_confirm.jinja:8
 #: counter/templates/counter/counter_click.jinja:67
-#: launderette/templates/launderette/counter_click.jinja:67
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -656,7 +649,6 @@ msgstr "Merci de vous identifier pour voir cette page."
 
 #: core/templates/core/login.jinja:22
 #: counter/templates/counter/counter_main.jinja:48
-#: launderette/templates/launderette/counter_main.jinja:48
 msgid "login"
 msgstr "login"
 
@@ -890,27 +882,39 @@ msgstr "Gestion de Sith"
 msgid "Subscriptions"
 msgstr "Cotisations"
 
-#: core/templates/core/user_tools.jinja:22
+#: core/templates/core/user_tools.jinja:19
+#: core/templates/core/user_tools.jinja:21 launderette/models.py:16
+#: launderette/templates/launderette/launderette_book.jinja:4
+#: launderette/templates/launderette/launderette_book_choose.jinja:4
+#: launderette/templates/launderette/launderette_main.jinja:4
+msgid "Launderette"
+msgstr "Laverie"
+
+#: core/templates/core/user_tools.jinja:26
 msgid "Counters"
 msgstr "Comptoirs"
 
-#: core/templates/core/user_tools.jinja:25
+#: core/templates/core/user_tools.jinja:29
+msgid "General management"
+msgstr "Gestion générale"
+
+#: core/templates/core/user_tools.jinja:30
 msgid "General counters management"
 msgstr "Gestion générale des comptoirs"
 
-#: core/templates/core/user_tools.jinja:26
+#: core/templates/core/user_tools.jinja:31
 msgid "Products management"
 msgstr "Gestion des produits"
 
-#: core/templates/core/user_tools.jinja:27
+#: core/templates/core/user_tools.jinja:32
 msgid "Products type management"
 msgstr "Gestion des types de produit"
 
-#: core/templates/core/user_tools.jinja:41
+#: core/templates/core/user_tools.jinja:46
 msgid "General accounting"
 msgstr "Comptabilité générale"
 
-#: core/templates/core/user_tools.jinja:49
+#: core/templates/core/user_tools.jinja:54
 msgid "Club account: "
 msgstr "Compte club : "
 
@@ -993,70 +997,56 @@ msgid "permanency"
 msgstr "permanence"
 
 #: counter/templates/counter/counter_click.jinja:20
-#: launderette/templates/launderette/counter_click.jinja:20
 msgid "Counter"
 msgstr "Comptoir"
 
 #: counter/templates/counter/counter_click.jinja:22
-#: launderette/templates/launderette/counter_click.jinja:22
 msgid "Club: "
 msgstr "Club : "
 
 #: counter/templates/counter/counter_click.jinja:25
-#: launderette/templates/launderette/counter_click.jinja:25
 msgid "Customer"
 msgstr "Client"
 
 #: counter/templates/counter/counter_click.jinja:30
-#: launderette/templates/launderette/counter_click.jinja:30
 msgid "Refilling"
 msgstr "Rechargement"
 
 #: counter/templates/counter/counter_click.jinja:35
 #: counter/templates/counter/counter_click.jinja:48
-#: launderette/templates/launderette/counter_click.jinja:35
-#: launderette/templates/launderette/counter_click.jinja:48
 msgid "Go"
 msgstr "Valider"
 
 #: counter/templates/counter/counter_click.jinja:40
-#: launderette/templates/launderette/counter_click.jinja:40
 msgid "Selling"
 msgstr "Vente"
 
 #: counter/templates/counter/counter_click.jinja:42
-#: launderette/templates/launderette/counter_click.jinja:42
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
 #: counter/templates/counter/counter_click.jinja:50
 #: eboutic/templates/eboutic/eboutic_main.jinja:23
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:7
-#: launderette/templates/launderette/counter_click.jinja:50
 msgid "Basket: "
 msgstr "Panier : "
 
 #: counter/templates/counter/counter_click.jinja:58
 #: counter/templates/counter/counter_main.jinja:24
 #: eboutic/templates/eboutic/eboutic_main.jinja:30
-#: launderette/templates/launderette/counter_click.jinja:58
-#: launderette/templates/launderette/counter_main.jinja:24
 msgid "Total: "
 msgstr "Total : "
 
 #: counter/templates/counter/counter_click.jinja:62
-#: launderette/templates/launderette/counter_click.jinja:62
 msgid "Finish"
 msgstr "Terminer"
 
 #: counter/templates/counter/counter_click.jinja:69
 #: eboutic/templates/eboutic/eboutic_main.jinja:37
-#: launderette/templates/launderette/counter_click.jinja:69
 msgid "Products: "
 msgstr "Produits : "
 
 #: counter/templates/counter/counter_edit.jinja:4
-#: launderette/templates/launderette/counter_edit.jinja:4
 msgid "Edit counter"
 msgstr "Éditer le comptoir"
 
@@ -1074,135 +1064,107 @@ msgid "There is no counters in this website."
 msgstr "Il n'y a pas de comptoirs dans ce site web."
 
 #: counter/templates/counter/counter_main.jinja:12
-#: launderette/templates/launderette/counter_main.jinja:12
 #, python-format
 msgid "%(counter_name)s counter"
 msgstr "Comptoir %(counter_name)s"
 
 #: counter/templates/counter/counter_main.jinja:15
-#: launderette/templates/launderette/counter_main.jinja:15
 msgid "Sellings"
 msgstr "Ventes"
 
 #: counter/templates/counter/counter_main.jinja:17
-#: launderette/templates/launderette/counter_main.jinja:17
 msgid "Last selling: "
 msgstr "Dernière vente : "
 
 #: counter/templates/counter/counter_main.jinja:18
-#: launderette/templates/launderette/counter_main.jinja:18
 msgid "Client: "
 msgstr "Client : "
 
 #: counter/templates/counter/counter_main.jinja:18
-#: launderette/templates/launderette/counter_main.jinja:18
 msgid "New amount: "
 msgstr "Nouveau montant : "
 
 #: counter/templates/counter/counter_main.jinja:27
-#: launderette/templates/launderette/counter_main.jinja:27
 msgid "Enter client code:"
 msgstr "Entrez un code client : "
 
 #: counter/templates/counter/counter_main.jinja:31
-#: launderette/templates/launderette/counter_main.jinja:31
 msgid "validate"
 msgstr "valider"
 
 #: counter/templates/counter/counter_main.jinja:34
-#: launderette/templates/launderette/counter_main.jinja:34
 msgid "Please, login"
 msgstr "Merci de vous identifier"
 
 #: counter/templates/counter/counter_main.jinja:39
-#: launderette/templates/launderette/counter_main.jinja:39
 msgid "Barman: "
 msgstr "Barman : "
 
 #: counter/templates/counter/product_list.jinja:4
 #: counter/templates/counter/product_list.jinja:10
-#: launderette/templates/launderette/product_list.jinja:4
-#: launderette/templates/launderette/product_list.jinja:10
 msgid "Product list"
 msgstr "Liste des produits"
 
 #: counter/templates/counter/product_list.jinja:8
-#: launderette/templates/launderette/product_list.jinja:8
 msgid "New product"
 msgstr "Nouveau produit"
 
 #: counter/templates/counter/product_list.jinja:17
-#: launderette/templates/launderette/product_list.jinja:17
 msgid "There is no products in this website."
 msgstr "Il n'y a pas de produits dans ce site web."
 
 #: counter/templates/counter/producttype_list.jinja:4
 #: counter/templates/counter/producttype_list.jinja:10
-#: launderette/templates/launderette/producttype_list.jinja:4
-#: launderette/templates/launderette/producttype_list.jinja:10
 msgid "Product type list"
 msgstr "Liste des types de produit"
 
 #: counter/templates/counter/producttype_list.jinja:8
-#: launderette/templates/launderette/producttype_list.jinja:8
 msgid "New product type"
 msgstr "Nouveau type de produit"
 
 #: counter/templates/counter/producttype_list.jinja:17
-#: launderette/templates/launderette/producttype_list.jinja:17
 msgid "There is no product types in this website."
 msgstr "Il n'y a pas de types de produit dans ce site web."
 
 #: counter/templates/counter/user_account.jinja:4
-#: launderette/templates/launderette/user_account.jinja:4
 #, python-format
 msgid "%(user_name)s's account"
 msgstr "Compte de %(user_name)s"
 
 #: counter/templates/counter/user_account.jinja:8
-#: launderette/templates/launderette/user_account.jinja:8
 msgid "User account"
 msgstr "Compte utilisateur"
 
 #: counter/templates/counter/user_account.jinja:11
-#: launderette/templates/launderette/user_account.jinja:11
 msgid "Refillings"
 msgstr "Rechargements"
 
 #: counter/templates/counter/user_account.jinja:16
 #: counter/templates/counter/user_account.jinja:37
-#: launderette/templates/launderette/user_account.jinja:16
-#: launderette/templates/launderette/user_account.jinja:37
 msgid "Barman"
 msgstr "Barman"
 
 #: counter/templates/counter/user_account.jinja:32
-#: launderette/templates/launderette/user_account.jinja:32
 msgid "Buyings"
 msgstr "Achats"
 
 #: counter/templates/counter/user_account.jinja:38
-#: launderette/templates/launderette/user_account.jinja:38
 msgid "Product"
 msgstr "Produit"
 
 #: counter/templates/counter/user_account.jinja:39
-#: launderette/templates/launderette/user_account.jinja:39
 msgid "Quantity"
 msgstr "Quantité"
 
 #: counter/templates/counter/user_account.jinja:40
-#: launderette/templates/launderette/user_account.jinja:40
 msgid "Total"
 msgstr "Total"
 
 #: counter/templates/counter/user_account.jinja:57
-#: launderette/templates/launderette/user_account.jinja:57
 msgid "Invoices"
 msgstr "Factures"
 
 #: counter/templates/counter/user_account.jinja:62
-#: launderette/templates/launderette/user_account.jinja:62
 msgid "Items"
 msgstr "Articles"
 
@@ -1293,51 +1255,67 @@ msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 msgid "sellers"
 msgstr "vendeurs"
 
-#: launderette/models.py:16
-#: launderette/templates/launderette/launderette_book.jinja:4
-#: launderette/templates/launderette/launderette_main.jinja:4
-msgid "Launderette"
-msgstr "Laverie"
-
-#: launderette/models.py:37 launderette/models.py:53
+#: launderette/models.py:37 launderette/models.py:60
 msgid "launderette"
 msgstr "laverie"
 
-#: launderette/models.py:38
-msgid "is working"
-msgstr "est HS"
-
-#: launderette/models.py:41
-msgid "Machine"
-msgstr "Machine"
-
-#: launderette/models.py:54 launderette/models.py:69
+#: launderette/models.py:38 launderette/models.py:61 launderette/models.py:77
 msgid "type"
 msgstr "type"
 
-#: launderette/models.py:54 launderette/models.py:69
+#: launderette/models.py:38 launderette/models.py:61 launderette/models.py:77
+#: launderette/templates/launderette/launderette_book.jinja:26
 msgid "Washing"
 msgstr "Lavage"
 
-#: launderette/models.py:54 launderette/models.py:69
+#: launderette/models.py:38 launderette/models.py:61 launderette/models.py:77
+#: launderette/templates/launderette/launderette_book.jinja:30
 msgid "Drying"
 msgstr "Séchage"
 
-#: launderette/models.py:57
+#: launderette/models.py:39
+msgid "is working"
+msgstr "fonctionne"
+
+#: launderette/models.py:42
+msgid "Machine"
+msgstr "Machine"
+
+#: launderette/models.py:65
 msgid "Token"
 msgstr "Jeton"
 
-#: launderette/models.py:70
+#: launderette/models.py:78
 msgid "machine"
 msgstr "machine"
 
-#: launderette/models.py:71
+#: launderette/models.py:79
 msgid "token"
 msgstr "jeton"
+
+#: launderette/models.py:83
+msgid "Slot"
+msgstr "Créneau"
+
+#: launderette/templates/launderette/launderette_book.jinja:11
+msgid "Choose"
+msgstr "Choisir"
+
+#: launderette/templates/launderette/launderette_book.jinja:22
+msgid "Washing and drying"
+msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_detail.jinja:4
 msgid "Launderette admin"
 msgstr "Gestion de la laverie"
+
+#: launderette/templates/launderette/launderette_detail.jinja:8
+msgid "Machines"
+msgstr "Machines"
+
+#: launderette/templates/launderette/launderette_detail.jinja:9
+msgid "New machine"
+msgstr "Nouvelle machine"
 
 #: launderette/templates/launderette/launderette_list.jinja:4
 #: launderette/templates/launderette/launderette_list.jinja:10
