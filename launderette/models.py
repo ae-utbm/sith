@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from core.models import User
-from counter.models import Counter
+from counter.models import Counter, Product
 from subscription.models import Subscriber
 from subscription.views import get_subscriber
 
@@ -26,8 +26,8 @@ class Launderette(models.Model):
         return False
 
     def can_be_edited_by(self, user):
-        sub = get_subscriber(request.user)
-        return sub in self.sellers.all()
+        sub = get_subscriber(user)
+        return sub in self.counter.sellers.all()
 
     def can_be_viewed_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
@@ -65,8 +65,8 @@ class Token(models.Model):
     name = models.CharField(_('name'), max_length=5)
     launderette = models.ForeignKey(Launderette, related_name='tokens', verbose_name=_('launderette'))
     type = models.CharField(_('type'), max_length=10, choices=[('WASHING', _('Washing')), ('DRYING', _('Drying'))])
-    borrow_date = models.DateTimeField(_('borrow date'), null=True)
-    user = models.ForeignKey(Subscriber, related_name='tokens', verbose_name=_('user'))
+    borrow_date = models.DateTimeField(_('borrow date'), null=True, blank=True)
+    user = models.ForeignKey(Subscriber, related_name='tokens', verbose_name=_('user'), null=True, blank=True)
 
     class Meta:
         verbose_name = _('Token')

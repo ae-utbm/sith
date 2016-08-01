@@ -4,7 +4,7 @@ import pytz
 
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin
+from django.views.generic.edit import UpdateView, CreateView, DeleteView, BaseFormView
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.utils.translation import ugettext as _
@@ -13,6 +13,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
 from django.db import transaction
 from django import forms
+from django.template import defaultfilters
+from django.utils import formats
 
 from core.models import Page
 from club.models import Club
@@ -145,7 +147,7 @@ class LaunderetteDetailView(CanEditPropMixin, DetailView):
     pk_url_kwarg = "launderette_id"
     template_name = 'launderette/launderette_detail.jinja'
 
-class LaunderetteMainClickView(DetailView, ProcessFormView, FormMixin):
+class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
     """The click page of the launderette"""
     model = Launderette
     pk_url_kwarg = "launderette_id"
@@ -156,47 +158,68 @@ class LaunderetteMainClickView(DetailView, ProcessFormView, FormMixin):
         """
         We handle here the login form for the barman
         """
-        if self.request.method == 'POST':
-            self.object = self.get_object()
         kwargs = super(LaunderetteMainClickView, self).get_context_data(**kwargs)
         kwargs['counter'] = self.object.counter
         kwargs['form'] = self.get_form()
         kwargs['barmen'] = [self.request.user]
         if 'last_basket' in self.request.session.keys():
-            kwargs['last_basket'] = self.request.session.pop('last_basket')
-            kwargs['last_customer'] = self.request.session.pop('last_customer')
-            kwargs['last_total'] = self.request.session.pop('last_total')
-            kwargs['new_customer_amount'] = self.request.session.pop('new_customer_amount')
+            kwargs['last_basket'] = self.request.session.pop('last_basket', None)
+            kwargs['last_customer'] = self.request.session.pop('last_customer', None)
+            kwargs['last_total'] = self.request.session.pop('last_total', None)
+            kwargs['new_customer_amount'] = self.request.session.pop('new_customer_amount', None)
         return kwargs
 
     def form_valid(self, form):
         """
         We handle here the redirection, passing the user id of the asked customer
         """
+        self.object = self.get_object()
         self.kwargs['user_id'] = form.cleaned_data['user_id']
         return super(LaunderetteMainClickView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('launderette:click', args=self.args, kwargs=self.kwargs)
 
-class LaunderetteClickView(CanEditMixin, DetailView):
+class ClickTokenForm(forms.BaseForm):
+    pass
+
+class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
     """The click page of the launderette"""
     model = Launderette
     pk_url_kwarg = "launderette_id"
     template_name = 'launderette/launderette_click.jinja'
 
-    def generate_form(self):
+    def get_form_class(self):
         fields = OrderedDict()
-        for s in self.subscriber.slots.all():
-            fields["%s-%s-%s-%s" % (s.user, s.start_date, s.type, s.machine)] = forms.CharField(max_length=5,
-                    label="%s - %s" % (s.get_type_display(), s.start_date))
-        return type('ClickForm', (forms.BaseForm,), { 'base_fields': fields })()
+        kwargs = {}
+        def clean_field_factory(field_name, slot):
+            def clean_field(self2):
+                t_name = str(self2.data[field_name])
+                if t_name != "":
+                    t = Token.objects.filter(name=str(self2.data[field_name]), type=slot.type, launderette=self.object).first()
+                    if t is None:
+                        raise forms.ValidationError(_("Token not found"))
+            return clean_field
+        for s in self.subscriber.slots.filter(token=None).all():
+            field_name = "slot-%s" % (str(s.id))
+            fields[field_name] = forms.CharField(max_length=5, required=False,
+                    label="%s - %s" % (s.get_type_display(), defaultfilters.date(s.start_date, "j N Y H:i")))
+            # XXX l10n settings.DATETIME_FORMAT did'nt work here :/
+
+            kwargs["clean_"+field_name] = clean_field_factory(field_name, s)
+
+        def clean_form(self2):
+            raise forms.ValidationError(_("Not enough money"))
+            return self2.cleaned_data
+
+        kwargs['base_fields'] = fields
+        kwargs['clean'] = clean_form
+        return type('ClickForm', (ClickTokenForm,), kwargs)
 
     def get(self, request, *args, **kwargs):
         """Simple get view"""
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
         self.subscriber = get_subscriber(self.customer.user)
-        request.session['not_enough'] = False
         return super(LaunderetteClickView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -204,20 +227,29 @@ class LaunderetteClickView(CanEditMixin, DetailView):
         self.object = self.get_object()
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
         self.subscriber = get_subscriber(self.customer.user)
-        request.session['not_enough'] = False
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
+        return super(LaunderetteClickView, self).post(request, *args, **kwargs)
 
+    def form_valid(self, form):
+        """
+        We handle here the redirection, passing the user id of the asked customer
+        """
+        self.request.session['last_basket'] = ["GUY"]
+        return super(LaunderetteClickView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         """
         We handle here the login form for the barman
         """
         kwargs = super(LaunderetteClickView, self).get_context_data(**kwargs)
+        if 'form' not in kwargs.keys():
+            kwargs['form'] = self.get_form()
         kwargs['counter'] = self.object.counter
         kwargs['customer'] = self.customer
-        kwargs['form'] = self.generate_form()
         return kwargs
+
+    def get_success_url(self):
+        self.kwargs.pop('user_id', None)
+        return reverse_lazy('launderette:main_click', args=self.args, kwargs=self.kwargs)
 
 
 

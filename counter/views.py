@@ -327,8 +327,10 @@ class CounterEditView(CanEditPropMixin, UpdateView):
     Edit a counter's main informations (for the counter's admin)
     """
     model = Counter
-    form_class = modelform_factory(Counter, fields=['name', 'club', 'type', 'products'],
-            widgets={'products':CheckboxSelectMultiple})
+    form_class = modelform_factory(Counter, fields=['name', 'club', 'type', 'sellers', 'products'],
+            widgets={
+                'products':CheckboxSelectMultiple,
+                'sellers':CheckboxSelectMultiple})
     pk_url_kwarg = "counter_id"
     template_name = 'counter/counter_edit.jinja'
 

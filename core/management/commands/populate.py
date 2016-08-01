@@ -71,7 +71,7 @@ Welcome to the wiki page!
         p.set_lock(root)
         p.save()
         p.set_lock(root)
-        PageRev(page=p, title="", author=root, content="").save()
+        PageRev(page=p, title="Laverie", author=root, content="Fonctionnement de la laverie").save()
 
         # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
         if not options['prod']:

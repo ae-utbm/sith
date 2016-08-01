@@ -60,7 +60,7 @@ class CanEditPropMixin(View):
 
 class CanEditMixin(View):
     """
-    This view makes exactly the same this as its direct parent, but checks the group on the edit_groups field of the
+    This view makes exactly the same thing as its direct parent, but checks the group on the edit_groups field of the
     object
     """
     def dispatch(self, request, *arg, **kwargs):
@@ -78,7 +78,7 @@ class CanEditMixin(View):
 
 class CanViewMixin(View):
     """
-    This view still makes exactly the same this as its direct parent, but checks the group on the view_groups field of
+    This view still makes exactly the same thing as its direct parent, but checks the group on the view_groups field of
     the object
     """
     def dispatch(self, request, *arg, **kwargs):
