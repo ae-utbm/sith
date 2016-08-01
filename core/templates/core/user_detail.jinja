@@ -17,8 +17,7 @@
 {# if the user is member of a club, he can view the subscription state #}
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
-{% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}
-User is subscriber until {{ subscription_end }}{% endtrans %}
+{% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}User is subscriber until {{ subscription_end }}{% endtrans %}
 {% else %}
 {% trans %}User is not subscribed. {% endtrans %}
 <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>

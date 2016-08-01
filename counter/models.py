@@ -1,8 +1,9 @@
-from django.db import models
+from django.db import models, DataError
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.forms import ValidationError
 
 from datetime import timedelta
 from random import randrange
@@ -31,6 +32,11 @@ class Customer(models.Model):
 
     def generate_account_id():
         return randrange(0, 4000) # TODO: improve me!
+
+    def save(self, *args, **kwargs):
+        if self.amount < 0:
+            raise ValidationError(_("Not enough money"))
+        super(Customer, self).save(*args, **kwargs)
 
 class ProductType(models.Model):
     """
@@ -190,6 +196,7 @@ class Refilling(models.Model):
             choices=settings.SITH_COUNTER_PAYMENT_METHOD, default='cash')
     bank = models.CharField(_('bank'), max_length=255,
             choices=settings.SITH_COUNTER_BANK, default='other')
+    is_validated = models.BooleanField(_('is validated'), default=False)
 
     class Meta:
         verbose_name = _("refilling")
@@ -202,37 +209,40 @@ class Refilling(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        self.customer.amount += self.amount
-        self.customer.save()
+        if not self.is_validated:
+            self.customer.amount += self.amount
+            self.customer.save()
+            self.is_validated = True
         super(Refilling, self).save(*args, **kwargs)
 
 class Selling(models.Model):
     """
     Handle the sellings
     """
-    product = models.ForeignKey(Product, related_name="sellings", blank=False)
+    label = models.CharField(_("label"), max_length=30)
+    product = models.ForeignKey(Product, related_name="sellings", null=True, blank=True)
     counter = models.ForeignKey(Counter, related_name="sellings", blank=False)
     unit_price = CurrencyField(_('unit price'))
     quantity = models.IntegerField(_('quantity'))
     seller = models.ForeignKey(User, related_name="sellings_as_operator", blank=False)
     customer = models.ForeignKey(Customer, related_name="buyings", blank=False)
     date = models.DateTimeField(_('date'), auto_now=True)
+    is_validated = models.BooleanField(_('is validated'), default=False)
 
     class Meta:
         verbose_name = _("selling")
 
     def __str__(self):
-        return "Selling: %d x %s (%f) for %s" % (self.quantity, self.product.name,
+        return "Selling: %d x %s (%f) for %s" % (self.quantity, self.label,
                 self.quantity*self.unit_price, self.customer.user.get_display_name())
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        self.customer.amount -= self.quantity * self.unit_price
-        self.customer.save()
+        if not self.is_validated:
+            self.customer.amount -= self.quantity * self.unit_price
+            self.customer.save()
+            self.is_validated = True
         super(Selling, self).save(*args, **kwargs)
-
-    # def get_absolute_url(self):
-    #     return reverse('counter:details', kwargs={'counter_id': self.id})
 
 class Permanency(models.Model):
     """

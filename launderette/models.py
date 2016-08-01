@@ -80,6 +80,9 @@ class Token(models.Model):
             return True
         return False
 
+    def __str__(self):
+        return self.__class__._meta.verbose_name + " " + self.get_type_display() + " #" + self.name + " (" + self.launderette.name + ")"
+
 class Slot(models.Model):
     start_date = models.DateTimeField(_('start date'))
     type = models.CharField(_('type'), max_length=10, choices=[('WASHING', _('Washing')), ('DRYING', _('Drying'))])
@@ -90,9 +93,6 @@ class Slot(models.Model):
     class Meta:
         verbose_name = _('Slot')
         ordering = ['start_date']
-
-    def full_clean(self):
-        return super(Slot, self).full_clean()
 
     def __str__(self):
         return "User: %s - Date: %s - Type: %s - Machine: %s - Token: %s" % (self.user, self.start_date, self.get_type_display(),

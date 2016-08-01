@@ -13,9 +13,11 @@ from django.conf import settings
 from django.db import DataError, transaction
 
 import re
+from datetime import date, timedelta
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from subscription.models import Subscriber
+from subscription.views import get_subscriber
 from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType
 
 class GetUserForm(forms.Form):
@@ -28,7 +30,7 @@ class GetUserForm(forms.Form):
     """
     code = forms.CharField(label="Code", max_length=10, required=False)
     id = forms.IntegerField(label="ID", required=False)
-# TODO: add a nice JS widget to search for users
+    # TODO: add a nice JS widget to search for users
 
     def as_p(self):
         self.fields['code'].widget.attrs['autofocus'] = True
@@ -36,14 +38,16 @@ class GetUserForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(GetUserForm, self).clean()
-        user = None
+        cus = None
         if cleaned_data['code'] != "":
-            user = Customer.objects.filter(account_id=cleaned_data['code']).first()
+            cus = Customer.objects.filter(account_id=cleaned_data['code']).first()
         elif cleaned_data['id'] is not None:
-            user = Customer.objects.filter(user=cleaned_data['id']).first()
-        if user is None:
+            cus = Customer.objects.filter(user=cleaned_data['id']).first()
+        sub = get_subscriber(cus.user) if cus is not None else None
+        if cus is None or sub is None or (date.today() - sub.subscriptions.last().subscription_end) > timedelta(days=90):
             raise forms.ValidationError(_("User not found"))
-        cleaned_data['user_id'] = user.user.id
+        cleaned_data['user_id'] = cus.user.id
+        cleaned_data['user'] = cus.user
         return cleaned_data
 
 class RefillForm(forms.ModelForm):
@@ -238,7 +242,7 @@ class CounterClick(DetailView):
                 if uprice * infos['qty'] > self.customer.amount:
                     raise DataError(_("You have not enough money to buy all the basket"))
                 request.session['last_basket'].append("%d x %s" % (infos['qty'], p.name))
-                s = Selling(product=p, counter=self.object, unit_price=uprice,
+                s = Selling(label=p.name, product=p, counter=self.object, unit_price=uprice,
                        quantity=infos['qty'], seller=self.operator, customer=self.customer)
                 s.save()
             request.session['last_customer'] = self.customer.user.get_display_name()
