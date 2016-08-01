@@ -25,7 +25,7 @@
         {% endif %}
         {% if barmen %}
         <p>{% trans %}Enter client code:{% endtrans %}</p>
-        <form method="post" action="{{ url('counter:details', counter_id=counter.id) }}">
+        <form method="post" action="">
             {% csrf_token %}
             {{ form.as_p() }}
             <p><input type="submit" value="{% trans %}validate{% endtrans %}" /></p>

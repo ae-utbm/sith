@@ -1,0 +1,17 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{{ counter }}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}</h3>
+    <div>
+        Counter: {{ counter }}
+        <form method="post" action="{{ url('launderette:click', launderette_id=launderette.id, user_id=customer.user.id) }}" class="inline" style="display:inline">
+            {% csrf_token %}
+            {{ form.as_p() }}
+            <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
+        </form>
+    </div>
+{% endblock %}

@@ -322,7 +322,7 @@ class CounterListView(CanViewMixin, ListView):
     model = Counter
     template_name = 'counter/counter_list.jinja'
 
-class CounterEditView(CanEditMixin, UpdateView):
+class CounterEditView(CanEditPropMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's admin)
     """
@@ -352,7 +352,7 @@ class CounterDeleteView(CanEditMixin, DeleteView):
 
 # Product management
 
-class ProductTypeListView(CanViewMixin, ListView):
+class ProductTypeListView(CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
@@ -376,7 +376,7 @@ class ProductTypeEditView(CanEditPropMixin, UpdateView):
     fields = ['name', 'description', 'icon']
     pk_url_kwarg = "type_id"
 
-class ProductListView(CanViewMixin, ListView):
+class ProductListView(CanEditPropMixin, ListView):
     """
     A list view for the admins
     """

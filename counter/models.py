@@ -10,6 +10,8 @@ from random import randrange
 from club.models import Club
 from accounting.models import CurrencyField
 from core.models import Group, User
+from subscription.models import Subscriber
+from subscription.views import get_subscriber
 
 class Customer(models.Model):
     """
@@ -94,6 +96,7 @@ class Counter(models.Model):
     type = models.CharField(_('subscription type'),
             max_length=255,
             choices=[('BAR',_('Bar')), ('OFFICE',_('Office')), ('EBOUTIC',_('Eboutic'))])
+    sellers = models.ManyToManyField(Subscriber, verbose_name=_('sellers'), related_name='counters', blank=True)
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
     barmen_session = {}
@@ -102,8 +105,8 @@ class Counter(models.Model):
         verbose_name = _('counter')
 
     def __getattribute__(self, name):
-        if name == "owner_group":
-            return Group.objects.filter(name=self.club.unix_name+settings.SITH_BOARD_SUFFIX).first()
+        if name == "edit_groups":
+            return Group.objects.filter(name=self.club.unix_name+settings.SITH_BOARD_SUFFIX).all()
         return object.__getattribute__(self, name)
 
     def __str__(self):
@@ -114,11 +117,14 @@ class Counter(models.Model):
             return reverse('eboutic:main')
         return reverse('counter:details', kwargs={'counter_id': self.id})
 
-    def can_be_edited_by(self, user):
+    def is_owned_by(self, user):
         return user.is_in_group(settings.SITH_GROUPS['counter-admin']['name'])
 
     def can_be_viewed_by(self, user):
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
+        if self.type == "BAR" or self.type == "EBOUTIC":
+            return True
+        sub = get_subscriber(request.user)
+        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or sub in self.sellers
 
     def add_barman(counter_id, user_id):
         """

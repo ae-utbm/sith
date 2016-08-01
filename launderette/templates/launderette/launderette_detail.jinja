@@ -5,6 +5,15 @@
 {% endblock %}
 
 {% block content %}
+<h3>{% trans %}Selling{% endtrans %}</h3>
+<p><a href="{{ url('launderette:main_click', launderette_id=launderette.id) }}">{% trans %}Sell{% endtrans %}</a></p>
+<h3>{% trans %}Tokens{% endtrans %}</h3>
+<ul>
+    {% for t in launderette.tokens.all() %}
+    <li>{{ t }}</li>
+    {% endfor %}
+</ul>
+<hr>
 <h3>{% trans %}Machines{% endtrans %}</h3>
 <p><a href="{{ url('launderette:machine_new') }}?launderette={{ launderette.id }}">{% trans %}New machine{% endtrans %}</a></p>
 <ul>

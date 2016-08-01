@@ -86,7 +86,6 @@ class PageCreateView(CanEditPropMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(PageCreateView, self).get_context_data(**kwargs)
-        print(context)
         context['new_page'] = True
         return context
 

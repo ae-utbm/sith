@@ -44,6 +44,10 @@ class Command(BaseCommand):
         bar_club = Club(name=settings.SITH_BAR_MANAGER['name'], unix_name=settings.SITH_BAR_MANAGER['unix_name'],
                 address=settings.SITH_BAR_MANAGER['address'])
         bar_club.save()
+        launderette_club = Club(name=settings.SITH_LAUNDERETTE_MANAGER['name'],
+                unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name'],
+                address=settings.SITH_LAUNDERETTE_MANAGER['address'])
+        launderette_club.save()
         for b in settings.SITH_COUNTER_BARS:
             g = Group(name=b[1]+" admin")
             g.save()
@@ -62,6 +66,12 @@ class Command(BaseCommand):
         PageRev(page=p, title="Wiki index", author=root, content="""
 Welcome to the wiki page!
 """).save()
+
+        p = Page(name="launderette")
+        p.set_lock(root)
+        p.save()
+        p.set_lock(root)
+        PageRev(page=p, title="", author=root, content="").save()
 
         # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
         if not options['prod']:

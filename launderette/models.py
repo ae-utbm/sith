@@ -4,13 +4,15 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from core.models import User
+from counter.models import Counter
 from subscription.models import Subscriber
+from subscription.views import get_subscriber
 
 # Create your models here.
 
 class Launderette(models.Model):
     name = models.CharField(_('name'), max_length=30)
-    sellers = models.ManyToManyField(Subscriber, verbose_name=_('sellers'), related_name='launderettes', blank=True)
+    counter = models.OneToOneField(Counter, verbose_name=_('counter'), related_name='launderette')
 
     class Meta:
         verbose_name = _('Launderette')
@@ -22,6 +24,10 @@ class Launderette(models.Model):
         if user.is_in_group(settings.SITH_GROUPS['launderette-admin']['name']):
             return True
         return False
+
+    def can_be_edited_by(self, user):
+        sub = get_subscriber(request.user)
+        return sub in self.sellers.all()
 
     def can_be_viewed_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
@@ -56,13 +62,15 @@ class Machine(models.Model):
         return reverse('launderette:launderette_details', kwargs={"launderette_id": self.launderette.id})
 
 class Token(models.Model):
-    name = models.IntegerField(_('name'))
+    name = models.CharField(_('name'), max_length=5)
     launderette = models.ForeignKey(Launderette, related_name='tokens', verbose_name=_('launderette'))
     type = models.CharField(_('type'), max_length=10, choices=[('WASHING', _('Washing')), ('DRYING', _('Drying'))])
-    start_date = models.DateTimeField(_('start date'))
+    borrow_date = models.DateTimeField(_('borrow date'), null=True)
+    user = models.ForeignKey(Subscriber, related_name='tokens', verbose_name=_('user'))
 
     class Meta:
         verbose_name = _('Token')
+        unique_together = ('name', 'launderette', 'type')
 
     def is_owned_by(self, user):
         """
@@ -81,6 +89,7 @@ class Slot(models.Model):
 
     class Meta:
         verbose_name = _('Slot')
+        ordering = ['start_date']
 
     def full_clean(self):
         return super(Slot, self).full_clean()
