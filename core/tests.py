@@ -161,7 +161,7 @@ class UserRegistrationTest(TestCase):
                                          })
         response = c.post(reverse('core:login'), {'username': 'gcarlier', 'password': 'guy'})
         self.assertTrue(response.status_code == 200)
-        self.assertTrue('Please try again' in str(response.content))
+        self.assertTrue('<ul class="errorlist nonfield">' in str(response.content))
 
 class PageHandlingTest(TestCase):
     def setUp(self):
@@ -188,7 +188,7 @@ class PageHandlingTest(TestCase):
             })
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'guy'}))
         self.assertTrue(response.status_code == 200)
-        self.assertTrue("<strong>guy</strong>" in str(response.content))
+        self.assertTrue('<a href="/page/guy/hist">' in str(response.content))
 
     def test_create_child_page_ok(self):
         """
@@ -206,7 +206,7 @@ class PageHandlingTest(TestCase):
             })
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'guy/bibou'}))
         self.assertTrue(response.status_code == 200)
-        self.assertTrue("<strong>guy/bibou</strong>" in str(response.content))
+        self.assertTrue('<a href="/page/guy/bibou/">' in str(response.content))
 
     def test_access_child_page_ok(self):
         """
@@ -227,7 +227,6 @@ class PageHandlingTest(TestCase):
             })
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'guy/bibou'}))
         self.assertTrue(response.status_code == 200)
-        #self.assertTrue('PAGE_FOUND : Bibou' in str(response.content))
 
     def test_access_page_not_found(self):
         """
@@ -235,7 +234,7 @@ class PageHandlingTest(TestCase):
         """
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'swagg'}))
         self.assertTrue(response.status_code == 200)
-        self.assertTrue('<a href="/page/create?page=swagg">Create it?</a>' in str(response.content))
+        self.assertTrue('<a href="/page/create?page=swagg">' in str(response.content))
 
     def test_create_page_markdown_safe(self):
         """

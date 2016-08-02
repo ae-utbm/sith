@@ -13,7 +13,7 @@
     <p>{% trans %}Born: {% endtrans %}{{ profile.date_of_birth|date("d/m/Y") }}</p>
 </div>
 
-{% if user.membership.filter(end_date=None).exists() %}
+{% if user.membership.filter(end_date=None).exists() or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
 {# if the user is member of a club, he can view the subscription state #}
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
