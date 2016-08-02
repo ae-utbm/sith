@@ -199,6 +199,13 @@ SITH_BAR_MANAGER = {
         'address': "6 Boulevard Anatole France, 90000 Belfort"
         }
 
+# Launderette managers
+SITH_LAUNDERETTE_MANAGER = {
+        'name': "Laverie",
+        'unix_name': "laverie",
+        'address': "6 Boulevard Anatole France, 90000 Belfort"
+        }
+
 # Define the date in the year serving as reference for the subscriptions calendar
 # (month, day)
 SITH_START_DATE = (8, 15) # 15th August
@@ -321,3 +328,8 @@ SITH_EBOUTIC_PUB_KEY = ""
 with open('./sith/et_keys/pubkey.pem') as f:
     SITH_EBOUTIC_PUB_KEY = f.read()
 
+# Launderette variables
+SITH_LAUNDERETTE_PRICES = {
+        'WASHING': 1.0,
+        'DRYING': 0.75,
+        }
