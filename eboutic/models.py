@@ -59,7 +59,8 @@ class Invoice(models.Model):
             raise DataError(_("Invoice already validated"))
         from counter.models import Customer
         if not Customer.objects.filter(user=self.user).exists():
-            Customer(user=self.user, account_id=Customer.generate_account_id(), amount=0).save()
+            number = Customer.objects.last().account_id[:-1]
+            Customer(user=self.user, account_id=Customer.generate_account_id(number), amount=0).save()
         if self.payment_method == "SITH_ACCOUNT":
             self.user.customer.amount -= self.get_total()
             self.user.customer.save()

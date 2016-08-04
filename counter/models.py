@@ -6,7 +6,8 @@ from django.core.urlresolvers import reverse
 from django.forms import ValidationError
 
 from datetime import timedelta
-from random import randrange
+import random
+import string
 
 from club.models import Club
 from accounting.models import CurrencyField
@@ -26,12 +27,17 @@ class Customer(models.Model):
     class Meta:
         verbose_name = _('customer')
         verbose_name_plural = _('customers')
+        ordering = ['account_id',]
 
     def __str__(self):
         return self.user.username
 
-    def generate_account_id():
-        return randrange(0, 4000) # TODO: improve me!
+    def generate_account_id(number):
+        number = str(number)
+        letter = random.choice(string.ascii_lowercase)
+        while Customer.objects.filter(account_id=number+letter).exists():
+            letter = random.choice(string.ascii_lowercase)
+        return number+letter
 
     def save(self, *args, **kwargs):
         if self.amount < 0:

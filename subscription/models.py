@@ -51,7 +51,7 @@ class Subscription(models.Model):
         super(Subscription, self).save()
         from counter.models import Customer
         if not Customer.objects.filter(user=self.member).exists():
-            Customer(user=self.member, account_id=Customer.generate_account_id(), amount=0).save()
+            Customer(user=self.member, account_id=Customer.generate_account_id(self.id), amount=0).save()
 
     def get_absolute_url(self):
         return reverse('core:user_profile', kwargs={'user_id': self.member.pk})
