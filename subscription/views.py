@@ -19,7 +19,7 @@ def get_subscriber(user):
 class SubscriptionForm(forms.ModelForm):
     class Meta:
         model = Subscription
-        fields = ['member', 'subscription_type', 'payment_method']
+        fields = ['member', 'subscription_type', 'payment_method', 'location']
 
     def __init__(self, *args, **kwargs):
         super(SubscriptionForm, self).__init__(*args, **kwargs)
@@ -29,6 +29,7 @@ class SubscriptionForm(forms.ModelForm):
         self.fields['email'] = forms.EmailField()
         self.fields.move_to_end('subscription_type')
         self.fields.move_to_end('payment_method')
+        self.fields.move_to_end('location')
 
     def clean(self):
         cleaned_data = super(SubscriptionForm, self).clean()
@@ -56,7 +57,7 @@ class SubscriptionForm(forms.ModelForm):
             raise ValidationError(_("You must either choose an existing user or create a new one properly"))
         return cleaned_data
 
-class NewSubscription(CanEditMixin, CreateView): # TODO: this must be able to create a new user if needed
+class NewSubscription(CanEditMixin, CreateView):
     template_name = 'subscription/subscription.jinja'
     form_class = SubscriptionForm
 

@@ -257,6 +257,12 @@ SITH_SUBSCRIPTION_PAYMENT_METHOD = [
         ('other', _('Other')),
         ]
 
+SITH_SUBSCRIPTION_LOCATIONS = [
+        ('BELFORT', _('Belfort')),
+        ('SEVENANS', _('Sevenans')),
+        ('MONTBELIARD', _('Montbéliard')),
+        ]
+
 SITH_COUNTER_BARS = [
         (1, "Foyer"),
         (2, "MDE"),
