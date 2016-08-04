@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import binascii
 from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -323,7 +324,7 @@ SITH_EBOUTIC_ET_URL = "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_page
 SITH_EBOUTIC_PBX_SITE = "1520411"
 SITH_EBOUTIC_PBX_RANG = "01"
 SITH_EBOUTIC_PBX_IDENTIFIANT = "650995411"
-SITH_EBOUTIC_HMAC_KEY = bytes("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF", 'utf-8')
+SITH_EBOUTIC_HMAC_KEY = binascii.unhexlify("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF")
 SITH_EBOUTIC_PUB_KEY = ""
 with open('./sith/et_keys/pubkey.pem') as f:
     SITH_EBOUTIC_PUB_KEY = f.read()
