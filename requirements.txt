@@ -5,3 +5,4 @@ mistune
 django-jinja
 pyopenssl
 pytz
+djangorestframework

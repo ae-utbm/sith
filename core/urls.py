@@ -39,7 +39,4 @@ urlpatterns = [
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/rev/(?P<rev>[0-9]+)/', PageRevView.as_view(), name='page_rev'),
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/$', PageView.as_view(), name='page'),
 
-    # API
-    url(r'^api/markdown$', render_markdown, name='api_markdown'),
 ]
-
