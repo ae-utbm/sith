@@ -189,6 +189,12 @@ class Counter(models.Model):
         bl = Counter.get_barmen_list(counter_id)
         return bl[randrange(0, len(bl))]
 
+    def is_open(self):
+        response = False
+        if len(Counter.get_barmen_list(self.id)) > 0:
+            response = True
+        return response
+
 class Refilling(models.Model):
     """
     Handle the refilling

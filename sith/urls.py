@@ -29,6 +29,6 @@ urlpatterns = [
     url(r'^accounting/', include('accounting.urls', namespace="accounting", app_name="accounting")),
     url(r'^eboutic/', include('eboutic.urls', namespace="eboutic", app_name="eboutic")),
     url(r'^launderette/', include('launderette.urls', namespace="launderette", app_name="launderette")),
-    url(r'^api/', include('api.urls', namespace="api", app_name="api")),
+    url(r'^api/v1/', include('api.urls', namespace="api", app_name="api")),
     url(r'^admin/', include(admin.site.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: remove me for production!!!

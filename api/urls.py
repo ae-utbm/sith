@@ -5,6 +5,7 @@ from rest_framework import routers
 
 # Router config
 router = routers.DefaultRouter()
+router.register(r'counter', CounterViewSet, base_name='api_counter')
 
 urlpatterns = [
 
