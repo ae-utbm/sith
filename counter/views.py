@@ -409,28 +409,3 @@ class ProductEditView(CanEditPropMixin, UpdateView):
     template_name = 'core/edit.jinja'
     # TODO: add management of the 'counters' ForeignKey
 
-# User accounting infos
-
-class UserAccountView(DetailView):
-    """
-    Display a user's account
-    """
-    model = Customer
-    pk_url_kwarg = "user_id"
-    template_name = "counter/user_account.jinja"
-
-    def dispatch(self, request, *arg, **kwargs): # Manually validates the rights
-        res = super(UserAccountView, self).dispatch(request, *arg, **kwargs)
-        if (self.object.user == request.user
-                or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
-                or request.user.is_in_group(settings.SITH_GROUPS['root']['name'])):
-            return res
-        raise PermissionDenied
-
-    def get_context_data(self, **kwargs):
-        kwargs = super(UserAccountView, self).get_context_data(**kwargs)
-        kwargs['profile'] = self.object.user
-        # TODO: add list of month where account has activity
-        return kwargs
-
-

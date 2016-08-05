@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block infos %}
+{% if customer %}
 <h3>{% trans %}User account{% endtrans %}</h3>
 <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 {% if customer.refillings.exists() %}
@@ -79,6 +80,9 @@
 {% endfor %}
     </tbody>
 </table>
+{% endif %}
+{% else %}
+<p>{% trans %}User has no account{% endtrans %}</p>
 {% endif %}
 {% endblock %}
 

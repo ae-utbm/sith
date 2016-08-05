@@ -7,6 +7,7 @@ from django.views.generic.edit import UpdateView
 from django.views.generic import ListView, DetailView, TemplateView
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
+from django.conf import settings
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
@@ -132,3 +133,31 @@ class UserToolsView(TemplateView):
     Displays the logged user's tools
     """
     template_name = "core/user_tools.jinja"
+
+class UserAccountView(DetailView):
+    """
+    Display a user's account
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    template_name = "core/user_account.jinja"
+
+    def dispatch(self, request, *arg, **kwargs): # Manually validates the rights
+        res = super(UserAccountView, self).dispatch(request, *arg, **kwargs)
+        if (self.object == request.user
+                or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
+                or request.user.is_in_group(settings.SITH_GROUPS['root']['name'])):
+            return res
+        raise PermissionDenied
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserAccountView, self).get_context_data(**kwargs)
+        kwargs['profile'] = self.object
+        try:
+            kwargs['customer'] = self.object.customer
+        except:
+            pass
+        # TODO: add list of month where account has activity
+        return kwargs
+
+
