@@ -30,13 +30,13 @@ class CounterViewSet(viewsets.ModelViewSet):
     @list_route()
     def bar(self, request):
         """
-            Return all counters (api/v1/counter/all)
+            Return all counters (api/v1/counter/bar)
         """
         self.queryset = Counter.objects.filter(type="BAR")
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
 
-    @detail_route(methods=['GET'])
+    @detail_route()
     def id(self, request, pk=None):
         """
             Get by id (api/v1/{nk}/id)
