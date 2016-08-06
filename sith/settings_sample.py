@@ -336,6 +336,7 @@ with open('./sith/et_keys/pubkey.pem') as f:
     SITH_EBOUTIC_PUB_KEY = f.read()
 
 # Launderette variables
+SITH_LAUNDERETTE_MACHINE_TYPES = [('WASHING', _('Washing')), ('DRYING', _('Drying'))]
 SITH_LAUNDERETTE_PRICES = {
         'WASHING': 1.0,
         'DRYING': 0.75,

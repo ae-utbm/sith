@@ -10,7 +10,7 @@
 <h3>{% trans %}Launderette admin list{% endtrans %}</h3>
 <ul>
     {% for l in launderette_list  %}
-    <li><a href="{{ url('launderette:launderette_details', launderette_id=l.id) }}">{{ l }}</a> -
+    <li><a href="{{ url('launderette:launderette_admin', launderette_id=l.id) }}">{{ l }}</a> -
         <a href="{{ url('launderette:launderette_edit', launderette_id=l.id) }}">{% trans %}Edit{% endtrans %}</a></li>
     {% endfor %}
 </ul>

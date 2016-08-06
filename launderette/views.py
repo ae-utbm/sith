@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from django.utils import dateparse
 from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
-from django.db import transaction
+from django.db import transaction, DataError
 from django import forms
 from django.template import defaultfilters
 from django.utils import formats
@@ -142,11 +142,82 @@ class LaunderetteCreateView(CanCreateMixin, CreateView):
         form.instance.counter = c
         return super(LaunderetteCreateView, self).form_valid(form)
 
-class LaunderetteDetailView(CanEditPropMixin, DetailView):
+class ManageTokenForm(forms.Form):
+    action = forms.ChoiceField(choices=[("BACK", _("Back")), ("ADD", _("Add")), ("DEL", _("Delete"))], label=_("Action"))
+    token_type = forms.ChoiceField(choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES, label=_("Type"))
+    tokens = forms.CharField(max_length=512, widget=forms.widgets.Textarea, label=_("Tokens, separated by spaces"))
+
+    def process(self, launderette):
+        cleaned_data = self.cleaned_data
+        token_list = cleaned_data['tokens'].strip(" ").split(" ")
+        token_type = cleaned_data['token_type']
+        self.data = {}
+        if cleaned_data['action'] == "BACK":
+            for t in token_list:
+                try:
+                    tok = Token.objects.filter(launderette=launderette, type=token_type, name=t).first()
+                    tok.borrow_date = None
+                    tok.user = None
+                    tok.save()
+                except:
+                    self.add_error(None, _("Token %(token_name)s does not exists") % {'token_name': t})
+        elif cleaned_data['action'] == "ADD":
+            for t in token_list:
+                try:
+                    Token(launderette=launderette, type=token_type, name=t).save()
+                except DataError as e:
+                    self.add_error(None, e)
+                except:
+                    self.add_error(None, _("Token %(token_name)s already exists") % {'token_name': t})
+        elif cleaned_data['action'] == "DEL":
+            for t in token_list:
+                try:
+                    Token.objects.filter(launderette=launderette, type=token_type, name=t).delete()
+                except:
+                    self.add_error(None, _("Token %(token_name)s does not exists") % {'token_name': t})
+
+class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
     """The admin page of the launderette"""
     model = Launderette
     pk_url_kwarg = "launderette_id"
-    template_name = 'launderette/launderette_detail.jinja'
+    template_name = 'launderette/launderette_admin.jinja'
+    form_class = ManageTokenForm
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super(LaunderetteAdminView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        return super(LaunderetteAdminView, self).post(request, *args, **kwargs)
+        form.launderette = self.object
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        """
+        We handle here the redirection, passing the user id of the asked customer
+        """
+        form.process(self.object)
+        if form.is_valid():
+            return super(LaunderetteAdminView, self).form_valid(form)
+        else:
+            return super(LaunderetteAdminView, self).form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        """
+        We handle here the login form for the barman
+        """
+        kwargs = super(LaunderetteAdminView, self).get_context_data(**kwargs)
+        if self.request.method == "GET":
+            kwargs['form'] = self.get_form()
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('launderette:launderette_admin', args=self.args, kwargs=self.kwargs)
 
 class GetLaunderetteUserForm(GetUserForm):
     def clean(self):

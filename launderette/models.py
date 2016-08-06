@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, DataError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -41,7 +41,7 @@ class Launderette(models.Model):
 class Machine(models.Model):
     name = models.CharField(_('name'), max_length=30)
     launderette = models.ForeignKey(Launderette, related_name='machines', verbose_name=_('launderette'))
-    type = models.CharField(_('type'), max_length=10, choices=[('WASHING', _('Washing')), ('DRYING', _('Drying'))])
+    type = models.CharField(_('type'), max_length=10, choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES)
     is_working = models.BooleanField(_('is working'), default=True)
 
     class Meta:
@@ -59,18 +59,25 @@ class Machine(models.Model):
         return "%s %s" % (self._meta.verbose_name, self.name)
 
     def get_absolute_url(self):
-        return reverse('launderette:launderette_details', kwargs={"launderette_id": self.launderette.id})
+        return reverse('launderette:launderette_admin', kwargs={"launderette_id": self.launderette.id})
 
 class Token(models.Model):
     name = models.CharField(_('name'), max_length=5)
     launderette = models.ForeignKey(Launderette, related_name='tokens', verbose_name=_('launderette'))
-    type = models.CharField(_('type'), max_length=10, choices=[('WASHING', _('Washing')), ('DRYING', _('Drying'))])
+    type = models.CharField(_('type'), max_length=10, choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES)
     borrow_date = models.DateTimeField(_('borrow date'), null=True, blank=True)
     user = models.ForeignKey(Subscriber, related_name='tokens', verbose_name=_('user'), null=True, blank=True)
 
     class Meta:
         verbose_name = _('Token')
         unique_together = ('name', 'launderette', 'type')
+        ordering = ['type', 'name']
+
+    def save(self, *args, **kwargs):
+        if self.name == "":
+            raise DataError(_("Token name can not be blank"))
+        else:
+            super(Token, self).save(*args, **kwargs)
 
     def is_owned_by(self, user):
         """
@@ -85,7 +92,7 @@ class Token(models.Model):
 
 class Slot(models.Model):
     start_date = models.DateTimeField(_('start date'))
-    type = models.CharField(_('type'), max_length=10, choices=[('WASHING', _('Washing')), ('DRYING', _('Drying'))])
+    type = models.CharField(_('type'), max_length=10, choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES)
     machine = models.ForeignKey(Machine, related_name='slots', verbose_name=_('machine'))
     token = models.ForeignKey(Token, related_name='slots', verbose_name=_('token'), blank=True, null=True)
     user = models.ForeignKey(Subscriber, related_name='slots', verbose_name=_('user'))
