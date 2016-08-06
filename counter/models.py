@@ -164,14 +164,14 @@ class Counter(models.Model):
         c = Counter.objects.filter(id=counter_id).first()
         Permanency(user=u, counter=c, start=user_tuple[1], end=Counter.barmen_session[counter_id]['time']).save()
 
-    def get_barmen_list(counter_id):
+    def get_barmen_list(self):
         """
         Returns the barman list as list of User
 
         Also handle the timeout of the barmen
         """
         bl = []
-        counter_id = int(counter_id)
+        counter_id = self.id
         if counter_id in list(Counter.barmen_session.keys()):
             for b in Counter.barmen_session[counter_id]['users']:
                 # Reminder: user is stored as a tuple with its login time
@@ -185,15 +185,18 @@ class Counter(models.Model):
                 Counter.barmen_session[counter_id]['users'] = set()
         return bl
 
-    def get_random_barman(counter_id):
-        bl = Counter.get_barmen_list(counter_id)
+    def get_random_barman(self):
+        bl = self.get_barmen_list()
         return bl[randrange(0, len(bl))]
 
     def is_open(self):
         response = False
-        if len(Counter.get_barmen_list(self.id)) > 0:
+        if len(self.get_barmen_list()) > 0:
             response = True
         return response
+
+    def barman_list(self):
+        return [b.id for b in self.get_barmen_list()]
 
 class Refilling(models.Model):
     """

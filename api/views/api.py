@@ -1,13 +1,13 @@
-from . import serializers
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.decorators import list_route
 
-from django.shortcuts import get_object_or_404
 from core.templatetags.renderer import markdown
 from counter.models import Counter
+from api.views import serializers
 
 
 @api_view(['GET'])
@@ -30,7 +30,7 @@ class CounterViewSet(viewsets.ModelViewSet):
     @list_route()
     def bar(self, request):
         """
-            Return all counters (api/v1/counter/bar)
+            Return all bars (api/v1/counter/bar)
         """
         self.queryset = Counter.objects.filter(type="BAR")
         serializer = self.get_serializer(self.queryset, many=True)

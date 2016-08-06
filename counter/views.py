@@ -77,7 +77,7 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         kwargs['login_form'].fields['username'].widget.attrs['autofocus'] = True
         kwargs['form'] = self.get_form()
         if self.object.type == 'BAR':
-            kwargs['barmen'] = Counter.get_barmen_list(self.object.id)
+            kwargs['barmen'] = self.object.get_barmen_list()
         elif self.request.user.is_authenticated():
             kwargs['barmen'] = [self.request.user]
         if 'last_basket' in self.request.session.keys():
@@ -118,7 +118,7 @@ class CounterClick(DetailView):
         ret = super(CounterClick, self).get(request, *args, **kwargs)
         if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
                 (self.object.type == "BAR" and
-                len(Counter.get_barmen_list(self.object.id)) < 1)): # Check that at least one barman is logged in
+                len(self.object.get_barmen_list()) < 1)): # Check that at least one barman is logged in
             ret = self.cancel(request) # Otherwise, go to main view
         return ret
 
@@ -129,7 +129,7 @@ class CounterClick(DetailView):
         self.refill_form = None
         if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
                 (self.object.type == "BAR" and
-                len(Counter.get_barmen_list(self.object.id)) < 1)): # Check that at least one barman is logged in
+                len(self.object.get_barmen_list()) < 1)): # Check that at least one barman is logged in
             return self.cancel(request)
         if 'basket' not in request.session.keys():
             request.session['basket'] = {}
@@ -140,7 +140,7 @@ class CounterClick(DetailView):
         elif self.is_barman_price():
             self.operator = self.customer.user
         else:
-            self.operator = Counter.get_random_barman(self.object.id)
+            self.operator = self.object.get_random_barman()
 
         if 'add_product' in request.POST['action']:
             self.add_product(request)
@@ -158,7 +158,7 @@ class CounterClick(DetailView):
         return self.render_to_response(context)
 
     def is_barman_price(self):
-        if self.object.type == "BAR" and self.customer.user.id in [s.id for s in Counter.get_barmen_list(self.object.id)]:
+        if self.object.type == "BAR" and self.customer.user.id in [s.id for s in self.object.get_barmen_list()]:
             return True
         else:
             return False
