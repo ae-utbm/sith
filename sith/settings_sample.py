@@ -51,7 +51,6 @@ INSTALLED_APPS = (
     'counter',
     'eboutic',
     'launderette',
-    'rest_framework',
     'api',
 )
 
