@@ -24,7 +24,7 @@ class RightManagedModelViewSet(viewsets.ModelViewSet):
         try:
             if (request.method == 'GET' and can_view(obj, user)):
                 return res
-            elif (request.method == 'PUSH' and can_edit(obj, user)):
+            elif (request.method != 'GET' and can_edit(obj, user)):
                 return res
         except: pass # To prevent bug with Anonymous user
         raise PermissionDenied
