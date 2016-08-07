@@ -35,13 +35,15 @@ class EbouticMain(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs))
+            return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs) + "?next=" +
+                    request.path)
         self.make_basket(request)
         return super(EbouticMain, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs))
+            return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs) + "?next=" +
+                    request.path)
         self.make_basket(request)
         if 'add_product' in request.POST['action']:
             self.add_product(request)
@@ -77,12 +79,14 @@ class EbouticCommand(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs))
+            return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs) + "?next=" +
+                    request.path)
         return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs))
+            return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs) + "?next=" +
+                    request.path)
         if 'basket_id' not in request.session.keys():
             return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
         self.basket = Basket.objects.filter(id=request.session['basket_id']).first()

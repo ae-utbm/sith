@@ -1,8 +1,10 @@
-{% extends "core/base.jinja" %}
+{% extends "core/login.jinja" %}
 
 {% block content %}
 
 <h3>{% trans %}403, Forbidden{% endtrans %}</h3>
+
+{{ super() }}
 
 {% endblock %}
 
