@@ -6,6 +6,9 @@ from rest_framework import routers
 # Router config
 router = routers.DefaultRouter()
 router.register(r'counter', CounterViewSet, base_name='api_counter')
+router.register(r'user', UserViewSet, base_name='api_user')
+router.register(r'club', ClubViewSet, base_name='api_club')
+router.register(r'group', GroupViewSet, base_name='api_group')
 
 urlpatterns = [
 
