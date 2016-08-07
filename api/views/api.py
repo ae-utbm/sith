@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -7,7 +9,7 @@ from rest_framework.decorators import list_route
 
 from core.templatetags.renderer import markdown
 from counter.models import Counter
-from core.models import User, Group
+from core.models import User, RealGroup
 from club.models import Club
 from api.views import serializers
 from api.views import RightManagedModelViewSet
@@ -42,10 +44,21 @@ class CounterViewSet(RightManagedModelViewSet):
 class UserViewSet(RightManagedModelViewSet):
     """
         Manage Users (api/v1/user/)
+        Only show active users
     """
 
     serializer_class = serializers.UserRead
-    queryset = User.objects.all()
+    queryset = User.objects.filter(is_active=True)
+
+    @list_route()
+    def birthday(self, request):
+        """
+            Return all users born today (api/v1/user/birstdays)
+        """
+        date = datetime.datetime.today()
+        self.queryset = self.queryset.filter(date_of_birth=date)
+        serializer = self.get_serializer(self.queryset, many=True)
+        return Response(serializer.data)
 
 
 class ClubViewSet(RightManagedModelViewSet):
@@ -62,4 +75,4 @@ class GroupViewSet(RightManagedModelViewSet):
     """
 
     serializer_class = serializers.GroupRead
-    queryset = Group.objects.all()
+    queryset = RealGroup.objects.all()
