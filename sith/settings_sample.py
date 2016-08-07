@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django_jinja',
+    'rest_framework',
     'core',
     'club',
     'subscription',
@@ -50,6 +51,7 @@ INSTALLED_APPS = (
     'counter',
     'eboutic',
     'launderette',
+    'api',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -245,16 +247,16 @@ SITH_MAIN_BOARD_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_BOARD_SUFFIX
 SITH_MAIN_MEMBERS_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_MEMBER_SUFFIX
 
 SITH_ACCOUNTING_PAYMENT_METHOD = [
-        ('cheque', _('Check')),
-        ('cash', _('Cash')),
-        ('transfert', _('Transfert')),
-        ('card', _('Credit card')),
+        ('CHEQUE', _('Check')),
+        ('CASH', _('Cash')),
+        ('TRANSFert', _('Transfert')),
+        ('CARD', _('Credit card')),
         ]
 
 SITH_SUBSCRIPTION_PAYMENT_METHOD = [
-        ('cheque', _('Check')),
-        ('cash', _('Cash')),
-        ('other', _('Other')),
+        ('CHEQUE', _('Check')),
+        ('CASH', _('Cash')),
+        ('OTHER', _('Other')),
         ]
 
 SITH_SUBSCRIPTION_LOCATIONS = [
@@ -270,15 +272,15 @@ SITH_COUNTER_BARS = [
         ]
 
 SITH_COUNTER_PAYMENT_METHOD = [
-        ('cheque', _('Check')),
-        ('cash', _('Cash')),
+        ('CHEQUE', _('Check')),
+        ('CASH', _('Cash')),
         ]
 
 SITH_COUNTER_BANK = [
-        ('other', 'Autre'),
-        ('la-poste', 'La Poste'),
-        ('credit-agricole', 'Credit Agricole'),
-        ('credit-mutuel', 'Credit Mutuel'),
+        ('OTHER', 'Autre'),
+        ('LA-POSTE', 'La Poste'),
+        ('CREDIT-AGRICOLE', 'Credit Agricole'),
+        ('CREDIT-MUTUEL', 'Credit Mutuel'),
         ]
 
 # Subscription durations are in semestres (should be settingized)
