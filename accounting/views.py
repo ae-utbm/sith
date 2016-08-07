@@ -6,7 +6,7 @@ from django.forms.models import modelform_factory
 from django.forms import HiddenInput
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
-from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType
+from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company
 
 # Accounting types
 
@@ -164,7 +164,8 @@ class OperationCreateView(CanCreateMixin, CreateView):
     """
     model = Operation
     form_class = modelform_factory(Operation,
-            fields=['amount', 'label', 'remark', 'journal', 'date', 'mode', 'cheque_number', 'accounting_type', 'done'],
+            fields=['amount', 'label', 'remark', 'journal', 'target_type', 'target_id', 'target_label', 'date', 'mode',
+                'cheque_number', 'invoice', 'accounting_type', 'done'],
             widgets={'journal': HiddenInput})
     template_name = 'core/create.jinja'
 
@@ -182,6 +183,26 @@ class OperationEditView(CanEditMixin, UpdateView):
     """
     model = Operation
     pk_url_kwarg = "op_id"
-    fields = ['amount', 'label', 'remark', 'date', 'mode', 'cheque_number', 'accounting_type', 'done']
+    fields = ['amount', 'label', 'remark', 'target_type', 'target_id', 'target_label', 'date', 'mode', 'cheque_number',
+            'invoice', 'accounting_type', 'done']
+    template_name = 'core/edit.jinja'
+
+# Company views
+
+class CompanyCreateView(CanCreateMixin, CreateView):
+    """
+    Create a company
+    """
+    model = Company
+    fields = ['name']
+    template_name = 'core/create.jinja'
+
+class CompanyEditView(CanCreateMixin, UpdateView):
+    """
+    Edit a company
+    """
+    model = Company
+    pk_url_kwarg = "co_id"
+    fields = ['name']
     template_name = 'core/edit.jinja'
 

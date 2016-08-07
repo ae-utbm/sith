@@ -1,5 +1,5 @@
 import os
-from datetime import date
+from datetime import date, datetime
 from io import StringIO
 
 from django.core.management.base import BaseCommand, CommandError
@@ -9,7 +9,7 @@ from django.db import connection
 
 
 from core.models import Group, User, Page, PageRev
-from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operation, AccountingType
+from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operation, AccountingType, Company
 from club.models import Club, Membership
 from subscription.models import Subscription, Subscriber
 from counter.models import Customer, ProductType, Product, Counter
@@ -239,6 +239,18 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             ba.save()
             ca = ClubAccount(name="Troll Penché", bank_account=ba, club=troll)
             ca.save()
-            AccountingType(code=756, label="Someone gave us money", movement_type='credit').save()
-            AccountingType(code=8570, label="Had to pay for food", movement_type='debit').save()
+            gj = GeneralJournal(name="A16", start_date=date.today(), club_account=ca)
+            gj.save()
+            credit = AccountingType(code=74, label="Someone gave us money", movement_type='credit')
+            credit.save()
+            debit = AccountingType(code=607, label="Had to pay a beer", movement_type='debit')
+            debit.save()
+            Operation(journal=gj, date=date.today(), amount=666.42, label="Satanic answer",
+                    remark="An answer to life...", mode="CASH", done=True, accounting_type=credit, target_type="USER",
+                    target_id=skia.id).save()
+            Operation(journal=gj, date=date.today(), amount=42, label="Answer",
+                    remark="An answer to life...", mode="CASH", done=False, accounting_type=debit, target_type="CLUB",
+                    target_id=bar_club.id).save()
+            woenzco = Company(name="Woenzel & co")
+            woenzco.save()
 

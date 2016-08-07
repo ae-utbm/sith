@@ -27,6 +27,19 @@ class CurrencyField(models.DecimalField):
         except AttributeError:
            return None
 
+# Accounting classes
+
+class Company(models.Model):
+    name = models.CharField(_('name'), max_length=60)
+
+    class Meta:
+        verbose_name = _("company")
+
+    def get_absolute_url(self):
+        return reverse('accounting:co_edit', kwargs={'co_id': self.id})
+
+    def get_display_name(self):
+        return self.name
 
 class BankAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
@@ -85,6 +98,10 @@ class ClubAccount(models.Model):
     def __str__(self):
         return self.name
 
+    def get_display_name(self):
+        return _("%(club_account)s on %(bank_account)s") % {"club_account": self.name, "bank_account": self.bank_account}
+
+
 class GeneralJournal(models.Model):
     """
     Class storing all the operations for a period of time
@@ -139,19 +156,45 @@ class Operation(models.Model):
     remark = models.TextField(_('remark'), max_length=255)
     mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)
     cheque_number = models.IntegerField(_('cheque number'), default=-1)
-    invoice = models.FileField(upload_to='invoices', null=True, blank=True)
+    invoice = models.FileField(upload_to='invoices', verbose_name=_("invoice"), null=True, blank=True)
     done = models.BooleanField(_('is done'), default=False)
-    accounting_type = models.ForeignKey('AccountingType', related_name="operations")
+    accounting_type = models.ForeignKey('AccountingType', related_name="operations", verbose_name=_("accounting type"))
+    target_type = models.CharField(_('target type'), max_length=10,
+            choices=[('USER', _('User')), ('CLUB', _('Club')), ('ACCOUNT', _('Account')), ('COMPANY', _('Company')), ('OTHER', _('Other'))])
+    target_id = models.IntegerField(_('target id'), null=True, blank=True)
+    target_label = models.CharField(_('target label'), max_length=32, default="", blank=True)
 
     class Meta:
         unique_together = ('number', 'journal')
         ordering = ['-number']
+
+    def __getattribute__(self, attr):
+        if attr == "target":
+            return self.get_target()
+        else:
+            return object.__getattribute__(self, attr)
 
     def clean(self):
         super(Operation, self).clean()
         if self.date < self.journal.start_date:
             raise ValidationError(_("""The date can not be before the start date of the journal, which is
 %(start_date)s.""") % {'start_date': defaultfilters.date(self.journal.start_date, settings.DATE_FORMAT)})
+        if self.target_type != "OTHER" and self.get_target() is None:
+            raise ValidationError(_("Target does not exists"))
+        if self.target_type == "OTHER" and self.target_label == "":
+            raise ValidationError(_("Please add a target label if you set no existing target"))
+
+    def get_target(self):
+        tar = None
+        if self.target_type == "USER":
+            tar = User.objects.filter(id=self.target_id).first()
+        elif self.target_type == "CLUB":
+            tar = Club.objects.filter(id=self.target_id).first()
+        elif self.target_type == "ACCOUNT":
+            tar = ClubAccount.objects.filter(id=self.target_id).first()
+        elif self.target_type == "COMPANY":
+            tar = Company.objects.filter(id=self.target_id).first()
+        return tar
 
     def save(self):
         if self.number is None:
@@ -198,6 +241,9 @@ class AccountingType(models.Model):
     label = models.CharField(_('label'), max_length=60)
     movement_type = models.CharField(_('movement type'), choices=[('credit', 'Credit'), ('debit', 'Debit'), ('neutral', 'Neutral')], max_length=12)
 
+    class Meta:
+        verbose_name = _("accounting type")
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -211,4 +257,3 @@ class AccountingType(models.Model):
 
     def __str__(self):
         return self.movement_type+" - "+self.code+" - "+self.label
-

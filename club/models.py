@@ -61,6 +61,9 @@ class Club(models.Model):
     def get_absolute_url(self):
         return reverse('club:club_view', kwargs={'club_id': self.id})
 
+    def get_display_name(self):
+        return self.name
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be super edited by the given user

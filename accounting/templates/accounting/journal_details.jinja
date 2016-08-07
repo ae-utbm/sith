@@ -22,7 +22,7 @@
             <td>{% trans %}Label{% endtrans %}</td>
             <td>{% trans %}Amount{% endtrans %}</td>
             <td>{% trans %}Payment mode{% endtrans %}</td>
-            <!-- TODO: <td>Target</td> -->
+            <td>{% trans %}Target{% endtrans %}</td>
             <td>{% trans %}Code{% endtrans %}</td>
             <td>{% trans %}Nature{% endtrans %}</td>
             <td>{% trans %}Done{% endtrans %}</td>
@@ -37,7 +37,12 @@
             <td>{{ o.date }}</td>
             <td>{{ o.label }}</td>
             <td>{{ o.amount }} €</td>
-            <td>{{ o.mode }}</td>
+            <td>{{ o.get_mode_display() }}</td>
+            {% if o.target_type == "OTHER" %}
+            <td>{{ o.target_label }}</td>
+            {% else %}
+            <td><a href="{{ o.target.get_absolute_url() }}">{{ o.target.get_display_name() }}</a></td>
+            {% endif %}
             <td>{{ o.accounting_type.code }}</td>
             <td>{{ o.accounting_type.label }}</td>
             {% if o.done %}
