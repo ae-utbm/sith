@@ -38,6 +38,18 @@ class Launderette(models.Model):
     def get_absolute_url(self):
         return reverse('launderette:launderette_list')
 
+    def get_machine_list(self):
+        return Machine.objects.filter(launderette_id=self.id)
+
+    def machine_list(self):
+        return [m.id for m in self.get_machine_list()]
+
+    def get_token_list(self):
+        return Token.objects.filter(launderette_id=self.id)
+
+    def token_list(self):
+        return [t.id for t in self.get_token_list()]
+
 class Machine(models.Model):
     name = models.CharField(_('name'), max_length=30)
     launderette = models.ForeignKey(Launderette, related_name='machines', verbose_name=_('launderette'))
@@ -89,6 +101,12 @@ class Token(models.Model):
 
     def __str__(self):
         return self.__class__._meta.verbose_name + " " + self.get_type_display() + " #" + self.name + " (" + self.launderette.name + ")"
+
+    def is_avaliable(self):
+        if not self.borrow_date and not self.user:
+            return True
+        else:
+            return False
 
 class Slot(models.Model):
     start_date = models.DateTimeField(_('start date'))

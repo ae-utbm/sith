@@ -11,6 +11,8 @@ from core.templatetags.renderer import markdown
 from counter.models import Counter
 from core.models import User, RealGroup
 from club.models import Club
+from launderette.models import Launderette, Machine, Token
+
 from api.views import serializers
 from api.views import RightManagedModelViewSet
 
@@ -76,3 +78,63 @@ class GroupViewSet(RightManagedModelViewSet):
 
     serializer_class = serializers.GroupRead
     queryset = RealGroup.objects.all()
+
+class LaunderettePlaceViewSet(RightManagedModelViewSet):
+    """
+        Manage Launderette (api/v1/launderette/place/)
+    """
+
+    serializer_class = serializers.LaunderettePlaceRead
+    queryset = Launderette.objects.all()
+
+class LaunderetteMachineViewSet(RightManagedModelViewSet):
+    """
+        Manage Washing Machines (api/v1/launderette/machine/)
+    """
+
+    serializer_class = serializers.LaunderetteMachineRead
+    queryset = Machine.objects.all()
+
+class LaunderetteTokenViewSet(RightManagedModelViewSet):
+    """
+        Manage Launderette's tokens (api/v1/launderette/token/)
+    """
+
+    serializer_class = serializers.LaunderetteTokenRead
+    queryset = Token.objects.all()
+
+    @list_route()
+    def washing(self, request):
+        """
+            Return all washing tokens (api/v1/launderette/token/washing)
+        """
+        self.queryset = self.queryset.filter(type='WASHING')
+        serializer = self.get_serializer(self.queryset, many=True)
+        return Response(serializer.data)
+
+    @list_route()
+    def drying(self, request):
+        """
+            Return all drying tokens (api/v1/launderette/token/drying)
+        """
+        self.queryset = self.queryset.filter(type='DRYING')
+        serializer = self.get_serializer(self.queryset, many=True)
+        return Response(serializer.data)
+
+    @list_route()
+    def avaliable(self, request):
+        """
+            Return all avaliable tokens (api/v1/launderette/token/avaliable)
+        """
+        self.queryset = self.queryset.filter(borrow_date__isnull=True, user__isnull=True)
+        serializer = self.get_serializer(self.queryset, many=True)
+        return Response(serializer.data)
+
+    @list_route()
+    def unavaliable(self, request):
+        """
+            Return all unavaliable tokens (api/v1/launderette/token/unavaliable)
+        """
+        self.queryset = self.queryset.filter(borrow_date__isnull=False, user__isnull=False)
+        serializer = self.get_serializer(self.queryset, many=True)
+        return Response(serializer.data)
