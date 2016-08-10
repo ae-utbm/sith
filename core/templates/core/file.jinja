@@ -26,6 +26,12 @@
 
 <div class="tool-bar">
     <div class="tools">
+        <div>
+            {% set home = user.home %}
+            {% if home %}
+            <a href="{{ url('core:file_detail', home.id, popup) }}">{% trans %}My files{% endtrans %}</a>
+            {% endif %}
+        </div>
         {% if file %}
         <a href="{{ url('core:file_detail', file.id, popup) }}">{% trans %}View{% endtrans %}</a>
         {% if can_edit(file, user) %}

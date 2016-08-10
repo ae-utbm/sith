@@ -3,10 +3,10 @@ from django.core import validators
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
 
-from core.models import User, MetaGroup, Group
+from core.models import User, MetaGroup, Group, SithFile
 from subscription.models import Subscriber
 
 # Create your models here.
@@ -35,6 +35,7 @@ class Club(models.Model):
                                     default=settings.SITH_GROUPS['root']['id'])
     edit_groups = models.ManyToManyField(Group, related_name="editable_club", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
+    home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True)
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
@@ -49,11 +50,45 @@ class Club(models.Model):
     def clean(self):
         self.check_loop()
 
-    def save(self):
-        if self.id is None:
-            MetaGroup(name=self.unix_name+settings.SITH_BOARD_SUFFIX).save()
-            MetaGroup(name=self.unix_name+settings.SITH_MEMBER_SUFFIX).save()
-        super(Club, self).save()
+    def _change_unixname(self, new_name):
+        c = Club.objects.filter(unix_name=new_name).first()
+        if c is None:
+            if self.home:
+                self.home.name = new_name
+                self.home.save()
+        else:
+            raise ValidationError(_("A club with that unix_name already exists"))
+
+    def make_home(self):
+        if not self.home:
+            home_root = SithFile.objects.filter(parent=None, name="clubs").first()
+            root = User.objects.filter(username="root").first()
+            if home_root and root:
+                home = SithFile(parent=home_root, name=self.unix_name, owner=root)
+                home.save()
+                self.home = home
+                self.save()
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            creation = False
+            if self.id is None:
+                creation = True
+            else:
+                old = Club.objects.filter(id=self.id).first()
+                if old.unix_name != self.unix_name:
+                    self._change_unixname(self.unix_name)
+            super(Club, self).save(*args, **kwargs)
+            if creation:
+                board = MetaGroup(name=self.unix_name+settings.SITH_BOARD_SUFFIX)
+                board.save()
+                member = MetaGroup(name=self.unix_name+settings.SITH_MEMBER_SUFFIX)
+                member.save()
+                subscribers = Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()
+                self.make_home()
+                self.home.edit_groups = [board]
+                self.home.view_groups = [member, subscribers]
+                self.home.save()
 
     def __str__(self):
         return self.name

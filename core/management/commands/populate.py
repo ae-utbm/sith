@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db import connection
 
 
-from core.models import Group, User, Page, PageRev
+from core.models import Group, User, Page, PageRev, SithFile
 from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operation, AccountingType, Company
 from club.models import Club, Membership
 from subscription.models import Subscription, Subscriber
@@ -38,6 +38,10 @@ class Command(BaseCommand):
                  is_superuser=True, is_staff=True)
         root.set_password("plop")
         root.save()
+        home_root = SithFile(parent=None, name="users", is_folder=True, owner=root)
+        home_root.save()
+        club_root = SithFile(parent=None, name="clubs", is_folder=True, owner=root)
+        club_root.save()
         main_club = Club(name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
                 address=settings.SITH_MAIN_CLUB['address'])
         main_club.save()
@@ -57,6 +61,12 @@ class Command(BaseCommand):
             c.save()
         self.reset_index("counter")
         Counter(name="Eboutic", club=main_club, type='EBOUTIC').save()
+
+        home_root.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
+        club_root.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
+        home_root.save()
+        club_root.save()
+
         p = Page(name='Index')
         p.set_lock(root)
         p.save()

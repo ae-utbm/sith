@@ -39,7 +39,9 @@
 
 <p><a href="{{ url('core:download', file_id=file.id) }}">{% trans %}Download{% endtrans %}</a></p>
 {% endif %}
+{% if not file.home_of and not file.home_of_club and file.parent %}
 <p><a href="{{ url('core:file_delete', file_id=file.id, popup=popup) }}">{% trans %}Delete{% endtrans %}</a></p>
+{% endif %}
 {% endblock %}
 
 

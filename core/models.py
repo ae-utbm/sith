@@ -6,6 +6,7 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.db import transaction
 from datetime import datetime, timedelta
 
 import unicodedata
@@ -99,6 +100,7 @@ class User(AbstractBaseUser):
         ),
     )
     groups = models.ManyToManyField(RealGroup, related_name='users', blank=True)
+    home = models.OneToOneField('SithFile', related_name='home_of', verbose_name=_("home"), null=True, blank=True)
 
     objects = UserManager()
 
@@ -156,6 +158,32 @@ class User(AbstractBaseUser):
         if group_name == settings.SITH_GROUPS['root']['name'] and self.is_superuser:
             return True
         return self.groups.filter(name=group_name).exists()
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            if self.id:
+                old = User.objects.filter(id=self.id).first()
+                if old.username != self.username:
+                    self._change_username(self.username)
+            super(User, self).save(*args, **kwargs)
+
+    def make_home(self):
+        if self.home is None:
+            home_root = SithFile.objects.filter(parent=None, name="users").first()
+            if home_root is not None:
+                home = SithFile(parent=home_root, name=self.username, owner=self)
+                home.save()
+                self.home = home
+                self.save()
+
+    def _change_username(self, new_name):
+        u = User.objects.filter(username=new_name).first()
+        if u is None:
+            if self.home:
+                self.home.name = new_name
+                self.home.save()
+        else:
+            raise ValidationError(_("A user with that username already exists"))
 
     def get_profile(self):
         return {

@@ -62,27 +62,9 @@ class AddFileForm(forms.Form):
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") %
                         {'file_name': f, 'msg': str(e.message)})
 
-class FileListView(ListView, FormMixin):
+class FileListView(ListView):
     template_name = 'core/file_list.jinja'
     context_object_name = "file_list"
-    form_class = AddFileForm
-
-    def get(self, request, *args, **kwargs):
-        self.form = self.get_form()
-        return super(FileListView, self).get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object_list = self.get_queryset()
-        self.form = self.get_form()
-        files = request.FILES.getlist('file_field')
-        if request.user.is_authenticated() and request.user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) and self.form.is_valid():
-            self.form.process(parent=None, owner=request.user, files=files)
-            if self.form.is_valid():
-                return super(FileListView, self).form_valid(self.form)
-        return self.form_invalid(self.form)
-
-    def get_success_url(self):
-        return reverse('core:file_list', kwargs={'popup': self.kwargs['popup'] or ""})
 
     def get_queryset(self):
         return SithFile.objects.filter(parent=None)
@@ -90,7 +72,6 @@ class FileListView(ListView, FormMixin):
     def get_context_data(self, **kwargs):
         kwargs = super(FileListView, self).get_context_data(**kwargs)
         kwargs['popup'] = ""
-        kwargs['form'] = self.form
         if self.kwargs['popup']:
             kwargs['popup'] = 'popup'
         return kwargs
