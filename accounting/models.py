@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.template import defaultfilters
 
 from decimal import Decimal
-from core.models import User
+from core.models import User, SithFile
 from club.models import Club
 
 class CurrencyField(models.DecimalField):
@@ -156,7 +156,7 @@ class Operation(models.Model):
     remark = models.TextField(_('remark'), max_length=255)
     mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)
     cheque_number = models.IntegerField(_('cheque number'), default=-1)
-    invoice = models.FileField(upload_to='invoices', verbose_name=_("invoice"), null=True, blank=True)
+    invoice = models.ForeignKey(SithFile, related_name='operations', verbose_name=_("invoice"), null=True, blank=True)
     done = models.BooleanField(_('is done'), default=False)
     accounting_type = models.ForeignKey('AccountingType', related_name="operations", verbose_name=_("accounting type"))
     target_type = models.CharField(_('target type'), max_length=10,

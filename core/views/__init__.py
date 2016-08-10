@@ -98,5 +98,6 @@ class CanViewMixin(View):
 
 from .user import *
 from .page import *
+from .files import *
 from .site import *
 from .group import *

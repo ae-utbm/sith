@@ -1,0 +1,29 @@
+{% extends "core/file.jinja" %}
+
+{% block content %}
+{{ super() }}
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Add{% endtrans %}"></p>
+</form>
+{% if file_list %}
+<h3>{% trans %}File list{% endtrans %}</h3>
+<ul>
+    {% for f in file_list %}
+    <li>
+        {% if f.is_folder %}
+        &#x1f4c1;
+        {% else %}
+        &#128462;
+        {% endif %}
+        <a href="{{ url('core:file_detail', file_id=f.id, popup=popup) }}">{{ f.name }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>{% trans %}There is no file in this website.{% endtrans %}</p>
+{% endif %}
+{% endblock %}
+
+
+

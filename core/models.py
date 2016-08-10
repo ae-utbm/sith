@@ -287,6 +287,108 @@ class Preferences(models.Model):
         help_text=_('Show your account statistics to others'),
     )
 
+def get_directory(instance, filename):
+    return './{0}/{1}'.format(instance.get_parent_path(), filename)
+
+class SithFile(models.Model):
+    name = models.CharField(_('file name'), max_length=30, blank=False)
+    parent = models.ForeignKey('self', related_name="children", verbose_name=_("parent"), null=True, blank=True)
+    file = models.FileField(upload_to=get_directory, verbose_name=_("file"), null=True, blank=True)
+    owner = models.ForeignKey(User, related_name="owned_files", verbose_name=_("owner"))
+    edit_groups = models.ManyToManyField(Group, related_name="editable_files", verbose_name=_("edit group"), blank=True)
+    view_groups = models.ManyToManyField(Group, related_name="viewable_files", verbose_name=_("view group"), blank=True)
+    is_folder = models.BooleanField(_("is folder"), default=True)
+    mime_type = models.CharField(_('mime type'), max_length=30)
+    size = models.IntegerField(_("size"), default=0)
+    date = models.DateTimeField(_('date'), auto_now=True)
+
+    class Meta:
+        verbose_name = _("file")
+
+    def is_owned_by(self, user):
+        return user.id == self.owner.id
+
+    def delete(self):
+        for c in self.children.all():
+            c.delete()
+        self.file.delete()
+        return super(SithFile, self).delete()
+
+    def clean(self):
+        """
+        Cleans up the file
+        """
+        super(SithFile, self).clean()
+        if '/' in self.name:
+            raise ValidationError(_("Character '/' not authorized in name"))
+        if self == self.parent:
+            raise ValidationError(
+                _('Loop in folder tree'),
+                code='loop',
+            )
+        if (self == self.parent or (self.parent is not None and self in self.get_parent_list())):
+            raise ValidationError(
+                _('Loop in folder tree'),
+                code='loop',
+            )
+        if self.parent and self.parent.is_file:
+            raise ValidationError(_('You can not make a file be a children of a non folder file'))
+        if ((self.parent is None and SithFile.objects.exclude(id=self.id).filter(parent=None, name=self.name).exists()) or
+                (self.parent and self.parent.children.exclude(id=self.id).filter(name=self.name).exists())):
+            raise ValidationError(
+                _('Duplicate file'),
+                code='duplicate',
+            )
+        if self.is_folder:
+            try:
+                self.file.delete()
+            except: pass
+            self.file = None
+            self.mime_type = "inode/directory"
+        if self.is_file and (self.file is None or self.file == ""):
+            raise ValidationError(_("You must provide a file"))
+
+    def save(self, *args, **kwargs):
+        copy_rights = False
+        if self.id is None:
+            copy_rights = True
+        super(SithFile, self).save(*args, **kwargs)
+        if copy_rights:
+            self.copy_rights()
+
+    def copy_rights(self):
+        """Copy, if possible, the rights of the parent folder"""
+        if self.parent is not None:
+            self.edit_groups = self.parent.edit_groups.all()
+            self.view_groups = self.parent.view_groups.all()
+            self.save()
+
+    def __getattribute__(self, attr):
+        if attr == "is_file":
+            return not self.is_folder
+        else:
+            return object.__getattribute__(self, attr)
+
+    def __str__(self):
+        if self.is_folder:
+            return _("Folder: ") + self.name
+        else:
+            return _("File: ") + self.name
+
+    def get_parent_list(self):
+        l = []
+        p = self.parent
+        while p is not None:
+            l.append(p)
+            p = p.parent
+        return l
+
+    def get_parent_path(self):
+        return '/'.join([p.name for p in self.get_parent_list()])
+
+    def get_display_name(self):
+        return self.name
+
 class LockError(Exception):
     """There was a lock error on the object"""
     pass
@@ -311,16 +413,15 @@ class Page(models.Model):
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
     """
     name = models.CharField(_('page name'), max_length=30, blank=False)
-    parent = models.ForeignKey('self', related_name="children", null=True, blank=True, on_delete=models.SET_NULL)
+    parent = models.ForeignKey('self', related_name="children", verbose_name=_("parent"), null=True, blank=True, on_delete=models.SET_NULL)
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
     _full_name = models.CharField(_('page name'), max_length=255, blank=True)
-    owner_group = models.ForeignKey(Group, related_name="owned_page",
+    owner_group = models.ForeignKey(Group, related_name="owned_page", verbose_name=_("owner group"),
                                     default=settings.SITH_GROUPS['root']['id'])
-    edit_groups = models.ManyToManyField(Group, related_name="editable_page", blank=True)
-    view_groups = models.ManyToManyField(Group, related_name="viewable_page", blank=True)
+    edit_groups = models.ManyToManyField(Group, related_name="editable_page", verbose_name=_("edit group"), blank=True)
+    view_groups = models.ManyToManyField(Group, related_name="viewable_page", verbose_name=_("view group"), blank=True)
     lock_mutex = {}
-
 
     class Meta:
         unique_together = ('name', 'parent')

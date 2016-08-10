@@ -8,9 +8,9 @@ select,
 button,
 textarea
 {
-    margin: 0;
-    border: 1px solid;
-    padding: 4px;
+    margin: 1px;
+    border: none;
+    padding: 1px;
     display: inline-block;
     vertical-align: middle;
     white-space: normal;

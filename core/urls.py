@@ -30,6 +30,15 @@ urlpatterns = [
     url(r'^user/tools/$', UserToolsView.as_view(), name='user_tools'),
     url(r'^user/(?P<user_id>[0-9]+)/account$', UserAccountView.as_view(), name='user_account'),
 
+    # File views
+    # url(r'^file/add/(?P<popup>popup)?$', FileCreateView.as_view(), name='file_new'),
+    url(r'^file/(?P<popup>popup)?$', FileListView.as_view(), name='file_list'),
+    url(r'^file/(?P<file_id>[0-9]+)/(?P<popup>popup)?$', FileView.as_view(), name='file_detail'),
+    url(r'^file/(?P<file_id>[0-9]+)/edit/(?P<popup>popup)?$', FileEditView.as_view(), name='file_edit'),
+    url(r'^file/(?P<file_id>[0-9]+)/prop/(?P<popup>popup)?$', FileEditPropView.as_view(), name='file_prop'),
+    url(r'^file/(?P<file_id>[0-9]+)/delete/(?P<popup>popup)?$', FileDeleteView.as_view(), name='file_delete'),
+    url(r'^file/(?P<file_id>[0-9]+)/download$', send_file, name='download'),
+
     # Page views
     url(r'^page/$', PageListView.as_view(), name='page_list'),
     url(r'^page/create$', PageCreateView.as_view(), name='page_new'),

@@ -6,14 +6,15 @@
         <link rel="stylesheet" href="{{ static('core/base.css') }}">
         <link rel="stylesheet" href="{{ static('core/form.css') }}">
         <link rel="stylesheet" href="{{ static('core/style.css') }}">
-        <script src="{{ static('core/script.js') }}"></script>
+        <link rel="stylesheet" href="{{ static('core/multiple-select.css') }}">
+        <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
         {% endblock %}
     </head>
 
     <body>
+        {% block header %}
         <div id="logo"><a href="{{ url('core:index') }}"><img src="{{ static('core/img/logo.png') }}"
                                                               alt="{% trans %}Logo{% endtrans %}" /></a></div>
-        {% block header %}
         <header>
             {% if not user.is_authenticated() %}
             <a href="{{ url('core:login') }}">{% trans %}Login{% endtrans %}</a> |
@@ -25,6 +26,7 @@
             {% endif %}
         </header>
         {% endblock %}
+        {% block nav %}
         <nav>
             <a href="{{ url('core:user_list') }}">{% trans %}Users{% endtrans %}</a>
             <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
@@ -32,6 +34,7 @@
             <a href="{{ url('club:club_list') }}">{% trans %}Clubs{% endtrans %}</a>
             <a href="{{ url('core:page', "Services") }}">{% trans %}Services{% endtrans %}</a>
         </nav>
+        {% endblock %}
 
         <div id="content">
             {% if error %}
@@ -51,5 +54,24 @@
             {{ tests }}
             {% endblock %}
         -->
+        <script src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>
+        <script src="{{ static('core/js/ui/jquery-ui.min.js') }}"></script>
+        <script src="{{ static('core/js/multiple-select.js') }}"></script>
+        <script src="{{ static('core/js/script.js') }}"></script>
+        <script>
+    $('select').multipleSelect({
+        filter: true,
+        single: true,
+        {% if not popup %}
+        position: 'top',
+        {% endif %}
+    });
+    $('select[multiple=multiple]').multipleSelect({
+        filter: true,
+        {% if not popup %}
+        position: 'top',
+        {% endif %}
+    });
+        </script>
     </body>
 </html>

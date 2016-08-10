@@ -27,6 +27,7 @@
             <td>{% trans %}Nature{% endtrans %}</td>
             <td>{% trans %}Done{% endtrans %}</td>
             <td>{% trans %}Comment{% endtrans %}</td>
+            <td>{% trans %}File{% endtrans %}</td>
             <td>{% trans %}Actions{% endtrans %}</td>
         </tr>
         </thead>
@@ -51,6 +52,11 @@
             <td>{% trans %}No{% endtrans %}</td>
             {% endif %}
             <td>{{ o.remark }}</td>
+            {% if o.invoice %}
+            <td><a href="{{ url('core:download') + '?file=' + o.invoice.name }}">{{ o.invoice.name }}</a></td>
+            {% else %}
+            <td>-</td>
+            {% endif %}
             <td>
                 {% if not o.journal.closed %}
                 <a href="{{ url('accounting:op_edit', op_id=o.id) }}">{% trans %}Edit{% endtrans %}</a>

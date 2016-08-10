@@ -1,0 +1,45 @@
+{% extends "core/file.jinja" %}
+
+
+{% block file %}
+<h3>
+{% if file.is_folder %}
+&#x1f4c1;
+{% else %}
+&#128462;
+{% endif %}
+{{ file.get_display_name() }}
+</h3>
+<p>{% trans %}Owner: {% endtrans %}{{ file.owner.get_display_name() }}</p>
+{% if file.is_folder %}
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Add{% endtrans %}"></p>
+</form>
+<ul>
+    {% for f in file.children.order_by('-is_folder', 'name').all() %}
+    <li>
+        {% if f.is_folder %}
+        &#x1f4c1;
+        {% else %}
+        &#128462;
+        {% endif %}
+        <a href="{{ url('core:file_detail', file_id=f.id, popup=popup) }}">{{ f.get_display_name() }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>{% trans %}Real name: {% endtrans %}{{ file.file.name.split('/')[-1] }}</p>
+<p>{% trans %}Date: {% endtrans %}{{ file.date|localtime|date(DATETIME_FORMAT) }} -
+{{ file.date|localtime|time(DATETIME_FORMAT) }}</p>
+<p>{% trans %}Type: {% endtrans %}{{ file.mime_type }}</p>
+<p>{% trans %}Size: {% endtrans %}{{ file.size }} {% trans %}bytes{% endtrans %}</p>
+
+<p><a href="{{ url('core:download', file_id=file.id) }}">{% trans %}Download{% endtrans %}</a></p>
+{% endif %}
+<p><a href="{{ url('core:file_delete', file_id=file.id, popup=popup) }}">{% trans %}Delete{% endtrans %}</a></p>
+{% endblock %}
+
+
+
+

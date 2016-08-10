@@ -32,3 +32,4 @@ urlpatterns = [
     url(r'^api/v1/', include('api.urls', namespace="api", app_name="api")),
     url(r'^admin/', include(admin.site.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: remove me for production!!!
+

@@ -5,7 +5,7 @@
 <script>
 function make_preview() {
     $.ajax({
-        url: "{{ url('core:api_markdown') }}",
+        url: "{{ url('api:api_markdown') }}",
         method: "GET",
         data: { text: $("#id_content").val() }
     }).done(function (msg) {

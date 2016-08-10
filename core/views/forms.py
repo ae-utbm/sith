@@ -1,7 +1,8 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
 from django import forms
 from django.contrib.auth import logout, login, authenticate
-from django.forms import CheckboxSelectMultiple
+from django.forms import CheckboxSelectMultiple, Select
+from django.utils.translation import ugettext as _
 import logging
 
 from core.models import User, Page, RealGroup
@@ -50,4 +51,14 @@ class PagePropForm(forms.ModelForm):
         super(PagePropForm, self).__init__(*arg, **kwargs)
         self.fields['edit_groups'].required = False
         self.fields['view_groups'].required = False
+
+class SelectFile(Select):
+    def render(self, name, value, attrs=None):
+        output = '<span class="choose_file_widget" title="%(title)s">%(content)s</span>' % {
+                'title': _("Choose file"),
+                'content': super(SelectFile, self).render(name, value, attrs),
+                }
+        output += '<span class="choose_file_button">' + _("Choose file") + '</span>'
+        print(output)
+        return output
 

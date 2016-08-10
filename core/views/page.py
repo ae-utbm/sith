@@ -15,10 +15,6 @@ class PageListView(CanViewMixin, ListView):
     model = Page
     template_name = 'core/page_list.jinja'
 
-    def get_context_data(self, **kwargs):
-        context = super(PageListView, self).get_context_data(**kwargs)
-        return context
-
 class PageView(CanViewMixin, DetailView):
     model = Page
     template_name = 'core/page_detail.jinja'

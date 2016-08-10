@@ -27,6 +27,12 @@ header a:hover {
     color: #2D3;
 }
 
+#popupheader {
+    width: 88%;
+    margin: 0px auto;
+    padding: 0.3em 1%;
+}
+
 /*---------------------------------NAV---------------------------------*/
 nav {
     display: block;
@@ -54,7 +60,6 @@ nav a:hover {
     margin: 0px auto;
     padding: 1em 1%;
     background: white;
-    overflow: auto;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -177,6 +182,9 @@ footer{
 }
 
 /*--------------------------------MODALE-------------------------------*/
+.choose_file_widget {
+    display: inline;
+}
 .form-wrapper {
     display: inline-block;
     position: absolute;
