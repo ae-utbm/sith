@@ -137,17 +137,22 @@ class User(AbstractBaseUser):
                     return False
             else:
                 return False
-        if group_name[-6:] == settings.SITH_BOARD_SUFFIX:
-            if 'club' in settings.INSTALLED_APPS:
-                from club.models import Club
-                name = group_name[:-6]
-                c = Club.objects.filter(unix_name=name).first()
-                mem = c.get_membership_for(self)
-                if mem:
-                    return mem.role >= 2
-                return False
-            else:
-                return False
+        if group_name[-len(settings.SITH_BOARD_SUFFIX):] == settings.SITH_BOARD_SUFFIX:
+            from club.models import Club
+            name = group_name[:-len(settings.SITH_BOARD_SUFFIX)]
+            c = Club.objects.filter(unix_name=name).first()
+            mem = c.get_membership_for(self)
+            if mem:
+                return mem.role > settings.SITH_MAXIMUM_FREE_ROLE
+            return False
+        if group_name[-len(settings.SITH_MEMBER_SUFFIX):] == settings.SITH_MEMBER_SUFFIX:
+            from club.models import Club
+            name = group_name[:-len(settings.SITH_MEMBER_SUFFIX)]
+            c = Club.objects.filter(unix_name=name).first()
+            mem = c.get_membership_for(self)
+            if mem:
+                return True
+            return False
         if group_name == settings.SITH_GROUPS['root']['name'] and self.is_superuser:
             return True
         return self.groups.filter(name=group_name).exists()

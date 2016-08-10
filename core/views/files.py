@@ -62,7 +62,7 @@ class AddFileForm(forms.Form):
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") %
                         {'file_name': f, 'msg': str(e.message)})
 
-class FileListView(CanViewMixin, ListView, FormMixin):
+class FileListView(ListView, FormMixin):
     template_name = 'core/file_list.jinja'
     context_object_name = "file_list"
     form_class = AddFileForm
@@ -75,7 +75,7 @@ class FileListView(CanViewMixin, ListView, FormMixin):
         self.object_list = self.get_queryset()
         self.form = self.get_form()
         files = request.FILES.getlist('file_field')
-        if self.form.is_valid():
+        if request.user.is_authenticated() and request.user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) and self.form.is_valid():
             self.form.process(parent=None, owner=request.user, files=files)
             if self.form.is_valid():
                 return super(FileListView, self).form_valid(self.form)
@@ -141,7 +141,7 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
             kwargs['popup'] = 'popup'
         return kwargs
 
-class FileView(CanEditMixin, DetailView, FormMixin):
+class FileView(CanViewMixin, DetailView, FormMixin):
     """This class handle the upload of new files into a folder"""
     model = SithFile
     pk_url_kwarg = "file_id"
@@ -157,7 +157,7 @@ class FileView(CanEditMixin, DetailView, FormMixin):
         self.object = self.get_object()
         self.form = self.get_form()
         files = request.FILES.getlist('file_field')
-        if self.form.is_valid():
+        if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
             self.form.process(parent=self.object, owner=request.user, files=files)
             if self.form.is_valid():
                 return super(FileView, self).form_valid(self.form)

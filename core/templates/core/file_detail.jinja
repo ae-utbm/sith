@@ -12,11 +12,13 @@
 </h3>
 <p>{% trans %}Owner: {% endtrans %}{{ file.owner.get_display_name() }}</p>
 {% if file.is_folder %}
+{% if user.can_edit(file) %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Add{% endtrans %}"></p>
 </form>
+{% endif %}
 <ul>
     {% for f in file.children.order_by('-is_folder', 'name').all() %}
     <li>

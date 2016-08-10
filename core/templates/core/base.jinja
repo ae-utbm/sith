@@ -13,6 +13,7 @@
 
     <body>
         {% block header %}
+        {% if not popup %}
         <div id="logo"><a href="{{ url('core:index') }}"><img src="{{ static('core/img/logo.png') }}"
                                                               alt="{% trans %}Logo{% endtrans %}" /></a></div>
         <header>
@@ -25,8 +26,12 @@
             <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
             {% endif %}
         </header>
+        {% else %}
+        <div id="popupheader">{{ user.get_display_name() }}</div>
+        {% endif %}
         {% endblock %}
         {% block nav %}
+        {% if not popup %}
         <nav>
             <a href="{{ url('core:user_list') }}">{% trans %}Users{% endtrans %}</a>
             <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
@@ -34,6 +39,7 @@
             <a href="{{ url('club:club_list') }}">{% trans %}Clubs{% endtrans %}</a>
             <a href="{{ url('core:page', "Services") }}">{% trans %}Services{% endtrans %}</a>
         </nav>
+        {% endif %}
         {% endblock %}
 
         <div id="content">
@@ -59,8 +65,7 @@
         <script src="{{ static('core/js/multiple-select.js') }}"></script>
         <script src="{{ static('core/js/script.js') }}"></script>
         <script>
-    $('select').multipleSelect({
-        filter: true,
+    $('select:not([multiple])').multipleSelect({
         single: true,
         {% if not popup %}
         position: 'top',

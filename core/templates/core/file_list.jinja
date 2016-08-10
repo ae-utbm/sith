@@ -2,11 +2,13 @@
 
 {% block content %}
 {{ super() }}
+{% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Add{% endtrans %}"></p>
 </form>
+{% endif %}
 {% if file_list %}
 <h3>{% trans %}File list{% endtrans %}</h3>
 <ul>

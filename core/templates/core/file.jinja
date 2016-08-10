@@ -21,20 +21,6 @@
 {% endif %}
 {% endmacro %}
 
-{% block header %}
-{% if popup != "" %}
-<div id="popupheader">{{ user.get_display_name() }}</div>
-{% else %}
-{{ super() }}
-{% endif %}
-{% endblock %}
-{% block nav %}
-{% if popup != "" %}
-{% else %}
-{{ super() }}
-{% endif %}
-{% endblock %}
-
 {% block content %}
 {{ print_file_name(file) }}
 

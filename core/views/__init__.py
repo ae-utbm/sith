@@ -9,7 +9,7 @@ from core.models import Group
 
 def forbidden(request):
     return HttpResponseForbidden(render(request, "core/403.jinja", context={'next': request.path, 'form':
-        AuthenticationForm()}))
+        AuthenticationForm(), 'popup': request.resolver_match.kwargs['popup'] or ""}))
 
 def not_found(request):
     return HttpResponseNotFound(render(request, "core/404.jinja"))
