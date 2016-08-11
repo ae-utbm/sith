@@ -148,12 +148,12 @@ class User(AbstractBaseUser):
         ("HUMAN", _("Humanities")),
         ("NA", _("N/A")),
         ], default="NA")
-    dpt_option = models.CharField(_("dpt option"), max_length=32, default="")
-    semester = models.CharField(_("semester"), max_length=5, default="")
-    quote = models.CharField(_("quote"), max_length=64, default="")
-    school = models.CharField(_("school"), max_length=32, default="")
+    dpt_option = models.CharField(_("dpt option"), max_length=32, null=True, blank=True)
+    semester = models.CharField(_("semester"), max_length=5, null=True, blank=True)
+    quote = models.CharField(_("quote"), max_length=64, null=True, blank=True)
+    school = models.CharField(_("school"), max_length=32, null=True, blank=True)
     promo = models.IntegerField(_("promo"), validators=[validate_promo], null=True, blank=True)
-    forum_signature = models.TextField(_("forum signature"), max_length=256, default="")
+    forum_signature = models.TextField(_("forum signature"), max_length=256, null=True, blank=True)
     # TODO: add phone numbers with https://github.com/stefanfoulis/django-phonenumber-field
 
     objects = UserManager()
