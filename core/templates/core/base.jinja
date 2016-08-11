@@ -60,23 +60,25 @@
             {{ tests }}
             {% endblock %}
         -->
+        {% block script %}
         <script src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>
         <script src="{{ static('core/js/ui/jquery-ui.min.js') }}"></script>
         <script src="{{ static('core/js/multiple-select.js') }}"></script>
         <script src="{{ static('core/js/script.js') }}"></script>
         <script>
-    $('select:not([multiple])').multipleSelect({
-        single: true,
-        {% if not popup %}
-        position: 'top',
-        {% endif %}
-    });
-    $('select[multiple=multiple]').multipleSelect({
-        filter: true,
-        {% if not popup %}
-        position: 'top',
-        {% endif %}
-    });
+$('.select_single').multipleSelect({
+    single: true,
+    {% if not popup %}
+    position: 'top',
+    {% endif %}
+});
+$('.select_multiple').multipleSelect({
+    filter: true,
+    {% if not popup %}
+    position: 'top',
+    {% endif %}
+});
         </script>
+        {% endblock %}
     </body>
 </html>

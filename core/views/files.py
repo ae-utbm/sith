@@ -37,7 +37,7 @@ def send_file(request, file_id):
         response['Content-Disposition'] = 'inline; filename="%s"' % f.name
         return response
 
-class AddFileForm(forms.Form):
+class AddFilesForm(forms.Form):
     folder_name = forms.CharField(label=_("Add a new folder"), max_length=30, required=False)
     file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}), label=_("Files"),
             required=False)
@@ -128,7 +128,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
     pk_url_kwarg = "file_id"
     template_name = 'core/file_detail.jinja'
     context_object_name = "file"
-    form_class = AddFileForm
+    form_class = AddFilesForm
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()

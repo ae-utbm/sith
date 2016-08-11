@@ -118,12 +118,16 @@ ul, ol {
 }
 table {
     width: 100%;
+    font-size: 0.90em;
 }
 td {
     padding: 4px;
     border: solid 1px black;
     border-collapse: collapse;
     vertical-align: top;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 0;
 }
 td>ul {
     margin-top: 0px;
@@ -152,7 +156,27 @@ tbody>tr:hover {
 }
 
 /*-----------------------------USER PROFILE----------------------------*/
-.user_profile {
+#user_profile {
+    width: 80%;
+    margin: 0px auto;
+    padding: 10px;
+    overflow: auto;
+}
+#user_profile h4 { border-bottom: 1px solid grey; max-width: 60%; }
+#user_profile #pictures {
+   width: 30%;
+   float: right;
+   font-style: italic;
+}
+#user_profile #nickname {
+   font-style: italic;
+}
+#user_profile #pictures img {
+   max-width: 96%;
+   max-height: 96%;
+}
+#user_profile .promo_pict {
+   height: 45px;
 }
 /*---------------------------------PAGE--------------------------------*/
 .page_content {

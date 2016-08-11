@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import transaction
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import unicodedata
 
@@ -46,6 +46,15 @@ class RealGroup(Group):
     class Meta:
         proxy = True
 
+def validate_promo(value):
+    start_year = settings.SITH_SCHOOL_START_YEAR
+    delta = (date.today()+timedelta(days=180)).year - start_year
+    if value < 0 or delta < value:
+        raise ValidationError(
+            _('%(value)s is not a valid promo (between 0 and %(end)s)'),
+            params={'value': value, 'end': delta},
+        )
+
 class User(AbstractBaseUser):
     """
     Defines the base user class, useable in every app
@@ -77,7 +86,7 @@ class User(AbstractBaseUser):
     last_name = models.CharField(_('last name'), max_length=30)
     email = models.EmailField(_('email address'), unique=True)
     date_of_birth = models.DateField(_('date of birth'), blank=True, null=True)
-    nick_name = models.CharField(max_length=30, blank=True)
+    nick_name = models.CharField(_('nick name'), max_length=30, blank=True)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -101,6 +110,51 @@ class User(AbstractBaseUser):
     )
     groups = models.ManyToManyField(RealGroup, related_name='users', blank=True)
     home = models.OneToOneField('SithFile', related_name='home_of', verbose_name=_("home"), null=True, blank=True)
+    profile_pict = models.OneToOneField('SithFile', related_name='profile_of', verbose_name=_("profile"), null=True, blank=True)
+    avatar_pict = models.OneToOneField('SithFile', related_name='avatar_of', verbose_name=_("avatar"), null=True, blank=True)
+    scrub_pict = models.OneToOneField('SithFile', related_name='scrub_of', verbose_name=_("scrub"), null=True, blank=True)
+    sex = models.CharField(_("sex"), max_length=10, choices=[("MAN", _("Man")), ("WOMAN", _("Woman"))], default="MAN")
+    tshirt_size = models.CharField(_("tshirt size"), max_length=5, choices=[
+        ("-", _("-")),
+        ("XS", _("XS")),
+        ("S", _("S")),
+        ("M", _("M")),
+        ("L", _("L")),
+        ("XL", _("XL")),
+        ("XXL", _("XXL")),
+        ("XXXL", _("XXXL")),
+        ], default="M")
+    role = models.CharField(_("role"), max_length=15, choices=[
+        ("STUDENT", _("Student")),
+        ("ADMINISTRATIVE", _("Administrative agent")),
+        ("TEACHER", _("Teacher")),
+        ("AGENT", _("Agent")),
+        ("DOCTOR", _("Doctor")),
+        ("FORMER STUDENT", _("Former student")),
+        ("SERVICE", _("Service")),
+        ], default="STUDENT")
+    department = models.CharField(_("department"), max_length=15, choices=[
+        ("TC", _("TC")),
+        ("IMSI", _("IMSI")),
+        ("IMAP", _("IMAP")),
+        ("INFO", _("INFO")),
+        ("GI", _("GI")),
+        ("E", _("E")),
+        ("EE", _("EE")),
+        ("GESC", _("GESC")),
+        ("GMC", _("GMC")),
+        ("MC", _("MC")),
+        ("EDIM", _("EDIM")),
+        ("HUMAN", _("Humanities")),
+        ("NA", _("N/A")),
+        ], default="NA")
+    dpt_option = models.CharField(_("dpt option"), max_length=32, default="")
+    semester = models.CharField(_("semester"), max_length=5, default="")
+    quote = models.CharField(_("quote"), max_length=64, default="")
+    school = models.CharField(_("school"), max_length=32, default="")
+    promo = models.IntegerField(_("promo"), validators=[validate_promo], null=True, blank=True)
+    forum_signature = models.TextField(_("forum signature"), max_length=256, default="")
+    # TODO: add phone numbers with https://github.com/stefanfoulis/django-phonenumber-field
 
     objects = UserManager()
 
@@ -341,6 +395,15 @@ class SithFile(models.Model):
     def is_owned_by(self, user):
         return user.id == self.owner.id
 
+    def can_be_viewed_by(self, user):
+        if hasattr(self, 'profile_of'):
+            return user.can_view(self.profile_of)
+        if hasattr(self, 'avatar_of'):
+            return user.can_view(self.avatar_of)
+        if hasattr(self, 'scrub_of'):
+            return user.can_view(self.scrub_of)
+        return False
+
     def delete(self):
         for c in self.children.all():
             c.delete()
@@ -421,6 +484,9 @@ class SithFile(models.Model):
 
     def get_display_name(self):
         return self.name
+
+    def get_download_url(self):
+        return reverse('core:download', kwargs={'file_id': self.id})
 
 class LockError(Exception):
     """There was a lock error on the object"""

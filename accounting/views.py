@@ -4,10 +4,9 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse_lazy
 from django.forms.models import modelform_factory
 from django.forms import HiddenInput
-from django.forms.extras.widgets import SelectDateWidget
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
-from core.views.forms import SelectFile
+from core.views.forms import SelectFile, SelectDate
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company
 
 # Accounting types
@@ -168,7 +167,7 @@ class OperationCreateView(CanCreateMixin, CreateView):
     form_class = modelform_factory(Operation,
             fields=['amount', 'label', 'remark', 'journal', 'target_type', 'target_id', 'target_label', 'date', 'mode',
                 'cheque_number', 'invoice', 'accounting_type', 'done'],
-            widgets={'journal': HiddenInput, 'date': SelectDateWidget})
+            widgets={'journal': HiddenInput, 'date': SelectDate})
     template_name = 'core/create.jinja'
 
     def get_initial(self):
@@ -188,7 +187,7 @@ class OperationEditView(CanEditMixin, UpdateView):
     form_class = modelform_factory(Operation,
             fields = ['amount', 'label', 'remark', 'target_type', 'target_id', 'target_label', 'date', 'mode', 'cheque_number',
                     'invoice', 'accounting_type', 'done'],
-            widgets={'date': SelectDateWidget, 'invoice': SelectFile})
+            widgets={'date': SelectDate, 'invoice': SelectFile})
     template_name = 'core/edit.jinja'
 
 # Company views

@@ -42,8 +42,18 @@
 {% if not file.home_of and not file.home_of_club and file.parent %}
 <p><a href="{{ url('core:file_delete', file_id=file.id, popup=popup) }}">{% trans %}Delete{% endtrans %}</a></p>
 {% endif %}
+{% if popup %}
+{% endif %}
 {% endblock %}
 
+{% block script %}
+{{ super() }}
+{% if popup and file.is_file %}
+<script>
+parent.$("#file_id").replaceWith('<span id="file_id" value="{{ file.id }}">{{ file.name }}</span>');
+</script>
+{% endif %}
+{% endblock %}
 
 
 

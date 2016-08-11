@@ -8,8 +8,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from core.models import Group
 
 def forbidden(request):
-    return HttpResponseForbidden(render(request, "core/403.jinja", context={'next': request.path, 'form':
-        AuthenticationForm(), 'popup': request.resolver_match.kwargs['popup'] or ""}))
+    try:
+        return HttpResponseForbidden(render(request, "core/403.jinja", context={'next': request.path, 'form':
+            AuthenticationForm(), 'popup': request.resolver_match.kwargs['popup'] or ""}))
+    except:
+        return HttpResponseForbidden(render(request, "core/403.jinja", context={'next': request.path, 'form': AuthenticationForm()}))
 
 def not_found(request):
     return HttpResponseNotFound(render(request, "core/404.jinja"))

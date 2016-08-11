@@ -214,6 +214,9 @@ SITH_LAUNDERETTE_MANAGER = {
 # (month, day)
 SITH_START_DATE = (8, 15) # 15th August
 
+# Used to determine the valid promos
+SITH_SCHOOL_START_YEAR = 1999
+
 SITH_GROUPS = {
     'root': {
         'id': 1,

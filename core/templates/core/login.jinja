@@ -21,7 +21,9 @@
 
 <form method="post" action="{{ url('core:login') }}">
 {% csrf_token %}
-{{ form.as_p() }}
+<p>{{ form.username.errors }}<label for="{{ form.username.name }}">{{ form.username.label }}
+</label><input id="id_username" maxlength="254" name="username" type="text" autofocus="autofocus" /></p>
+<p>{{ form.password.errors }}<label for="{{ form.password.name }}">{{ form.password.label }}</label>{{ form.password }}</p>
 <input type="hidden" name="next" value="{{ next }}">
 <p><input type="submit" value="{% trans %}login{% endtrans %}"></p>
 </form>

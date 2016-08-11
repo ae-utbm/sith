@@ -53,7 +53,7 @@
             {% endif %}
             <td>{{ o.remark }}</td>
             {% if o.invoice %}
-            <td><a href="{{ url('core:download') + '?file=' + o.invoice.name }}">{{ o.invoice.name }}</a></td>
+            <td><a href="{{ url('core:download', file_id=o.invoice.id) }}">{{ o.invoice.name }}</a></td>
             {% else %}
             <td>-</td>
             {% endif %}

@@ -11,7 +11,7 @@ from django.conf import settings
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
-from core.views.forms import RegisteringForm, UserPropForm
+from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm
 from core.models import User
 
 def login(request):
@@ -115,7 +115,31 @@ class UserUpdateProfileView(CanEditMixin, UpdateView):
     model = User
     pk_url_kwarg = "user_id"
     template_name = "core/user_edit.jinja"
-    fields = ('first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', )
+    form_class = UserProfileForm
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.form = self.get_form()
+        if self.form.instance.profile_pict and not request.user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
+            self.form.fields.pop('profile_pict', None)
+        return self.render_to_response(self.get_context_data(form=self.form))
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.form = self.get_form()
+        if self.form.instance.profile_pict and not request.user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
+            self.form.fields.pop('profile_pict', None)
+        files = request.FILES.items()
+        self.form.process(files)
+        if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
+            return super(UserUpdateProfileView, self).form_valid(self.form)
+        return self.form_invalid(self.form)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserUpdateProfileView, self).get_context_data(**kwargs)
+        kwargs['profile'] = self.form.instance
+        kwargs['form'] = self.form
+        return kwargs
 
 class UserUpdateGroupView(CanEditPropMixin, UpdateView):
     """

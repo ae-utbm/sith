@@ -2,6 +2,11 @@
 Super Form Reset
 ----------------------------------------------------------------------------------------------------*/
 
+form {
+    margin: 0px auto;
+    width: 60%;
+}
+
 input,
 label,
 select,
@@ -20,6 +25,10 @@ textarea
     /* Browsers have different default form fonts */
     font-size: 13px;
     font-family: Arial;
+}
+
+label {
+    min-width: 50%;
 }
 
 /* Remove the stupid outer glow in Webkit */
@@ -70,7 +79,8 @@ input[type=tel],
 input[type=text],
 input[type=time],
 input[type=url],
-input[type=week]
+input[type=week],
+textarea
 {
     background-color: white;
     border: 1px solid black;

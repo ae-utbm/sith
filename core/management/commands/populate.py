@@ -38,6 +38,7 @@ class Command(BaseCommand):
                  is_superuser=True, is_staff=True)
         root.set_password("plop")
         root.save()
+        SithFile(parent=None, name="profiles", is_folder=True, owner=root).save()
         home_root = SithFile(parent=None, name="users", is_folder=True, owner=root)
         home_root.save()
         club_root = SithFile(parent=None, name="clubs", is_folder=True, owner=root)
