@@ -158,6 +158,12 @@ class UserToolsView(TemplateView):
     """
     template_name = "core/user_tools.jinja"
 
+    def get_context_data(self, **kwargs):
+        from launderette.models import Launderette
+        kwargs = super(UserToolsView, self).get_context_data(**kwargs)
+        kwargs['launderettes'] = Launderette.objects.all()
+        return kwargs
+
 class UserAccountView(DetailView):
     """
     Display a user's account

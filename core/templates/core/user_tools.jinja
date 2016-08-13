@@ -16,10 +16,6 @@
     {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
     <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
     {% endif %}
-    <h5>{% trans %}Launderette{% endtrans %}</h5>
-    {% if user.is_in_group(settings.SITH_GROUPS['launderette-admin']['name']) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
-    <li><a href="{{ url('launderette:launderette_list') }}">{% trans %}Launderette{% endtrans %}</a></li>
-    {% endif %}
 </ul>
 
 <hr>

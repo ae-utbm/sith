@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-SITE_ID = 1
+SITE_ID = 4000
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -167,6 +167,8 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, "locale"),
 )
 
+PHONENUMBER_DEFAULT_REGION = "FR"
+
 # Medias
 MEDIA_ROOT = './data/'
 MEDIA_URL = '/data/'
@@ -188,6 +190,9 @@ DEFAULT_FROM_EMAIL="bibou@git.an"
 # Email
 EMAIL_HOST="localhost"
 EMAIL_PORT=25
+
+SITH_URL = "ae-taiste.utbm.fr"
+SITH_NAME = "AE taiste"
 
 # AE configuration
 SITH_MAIN_CLUB = {

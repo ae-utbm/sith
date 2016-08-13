@@ -3,10 +3,11 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from core.models import User
 from counter.models import Counter, Product
+from core.models import User
 from subscription.models import Subscriber
 from subscription.views import get_subscriber
+from club.models import Club
 
 # Create your models here.
 
@@ -21,13 +22,18 @@ class Launderette(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['launderette-admin']['name']):
+        launderette_club = Club.objects.filter(unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name']).first()
+        m = launderette_club.get_membership_for(user)
+        if m and m.role >= 9:
             return True
         return False
 
     def can_be_edited_by(self, user):
-        sub = get_subscriber(user)
-        return sub in self.counter.sellers.all()
+        launderette_club = Club.objects.filter(unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name']).first()
+        m = launderette_club.get_membership_for(user)
+        if m and m.role >= 2:
+            return True
+        return False
 
     def can_be_viewed_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
@@ -63,7 +69,9 @@ class Machine(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['launderette-admin']['name']):
+        launderette_club = Club.objects.filter(unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name']).first()
+        m = launderette_club.get_membership_for(user)
+        if m and m.role >= 9:
             return True
         return False
 
@@ -95,7 +103,9 @@ class Token(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['launderette-admin']['name']):
+        launderette_club = Club.objects.filter(unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name']).first()
+        m = launderette_club.get_membership_for(user)
+        if m and m.role >= 9:
             return True
         return False
 

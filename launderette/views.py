@@ -143,13 +143,15 @@ class LaunderetteCreateView(CanCreateMixin, CreateView):
         return super(LaunderetteCreateView, self).form_valid(form)
 
 class ManageTokenForm(forms.Form):
-    action = forms.ChoiceField(choices=[("BACK", _("Back")), ("ADD", _("Add")), ("DEL", _("Delete"))], label=_("Action"))
-    token_type = forms.ChoiceField(choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES, label=_("Type"))
+    action = forms.ChoiceField(choices=[("BACK", _("Back")), ("ADD", _("Add")), ("DEL", _("Delete"))], initial="BACK",
+            label=_("Action"), widget=forms.RadioSelect)
+    token_type = forms.ChoiceField(choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES, label=_("Type"), initial="WASHING",
+            widget=forms.RadioSelect)
     tokens = forms.CharField(max_length=512, widget=forms.widgets.Textarea, label=_("Tokens, separated by spaces"))
 
     def process(self, launderette):
         cleaned_data = self.cleaned_data
-        token_list = cleaned_data['tokens'].strip(" ").split(" ")
+        token_list = cleaned_data['tokens'].strip(" \n\r").split(" ")
         token_type = cleaned_data['token_type']
         self.data = {}
         if cleaned_data['action'] == "BACK":

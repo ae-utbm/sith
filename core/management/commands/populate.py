@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
 from django.conf import settings
 from django.db import connection
+from django.contrib.sites.models import Site
 
 
 from core.models import Group, User, Page, PageRev, SithFile
@@ -28,6 +29,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         os.environ['DJANGO_COLORS'] = 'nocolor'
+        Site(id=4000, domain=settings.SITH_URL, name=settings.SITH_NAME).save()
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         for g in settings.SITH_GROUPS.values():
             Group(id=g['id'], name=g['name']).save()

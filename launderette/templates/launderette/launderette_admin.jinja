@@ -19,9 +19,19 @@
 <hr>
 <h3>{% trans %}Tokens{% endtrans %}</h3>
 <p>
-<form method="post" action="">
+<form method="post" action="" id="token_form">
     {% csrf_token %}
-    {{ form.as_p() }}
+    <p>{{ form.action.errors }}<label for="{{ form.action.name }}">{{ form.action.label }}</label>
+    {% for c in form.action %}
+        {{ c }}
+    {% endfor %}
+    </p>
+    <p>{{ form.token_type.errors }}<label for="{{ form.token_type.name }}">{{ form.token_type.label }}</label>
+    {% for c in form.token_type %}
+        {{ c }}
+    {% endfor %}
+    </p>
+    {{ form.tokens }}
     <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
 </form>
 </p>
