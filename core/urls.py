@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^login/$', login, name='login'),
     url(r'^logout/$', logout, name='logout'),
     url(r'^password_change/$', password_change, name='password_change'),
+    url(r'^password_change/(?P<user_id>[0-9]+)$', password_root_change, name='password_root_change'),
     url(r'^password_change/done$', password_change_done, name='password_change_done'),
     url(r'^password_reset/$', password_reset, name='password_reset'),
     url(r'^password_reset/done$', password_reset_done, name='password_reset_done'),

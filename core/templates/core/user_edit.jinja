@@ -28,6 +28,8 @@
     {% endif %}
     {% if form.instance == user %}
     <p><a href="{{ url('core:password_change') }}">{% trans %}Change my password{% endtrans %}</a></p>
+    {% elif user.is_root() %}
+    <p><a href="{{ url('core:password_root_change', user_id=form.instance.id) }}">{% trans %}Change user password{% endtrans %}</a></p>
     {% endif %}
 </form>
 {% endblock %}

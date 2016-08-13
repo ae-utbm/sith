@@ -223,6 +223,9 @@ class User(AbstractBaseUser):
             return True
         return self.groups.filter(name=group_name).exists()
 
+    def is_root(self):
+        return self.is_superuser or self.groups.filter(name=settings.SITH_GROUPS['root']['name']).exists()
+
     def save(self, *args, **kwargs):
         with transaction.atomic():
             if self.id:

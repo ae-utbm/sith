@@ -3,10 +3,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout as auth_logout, views
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.http import Http404
 from django.views.generic.edit import UpdateView
 from django.views.generic import ListView, DetailView, TemplateView
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
+from django.template.response import TemplateResponse
 from django.conf import settings
 import logging
 
@@ -39,6 +41,24 @@ def password_change_done(request):
     Allows a user to change its password
     """
     return views.password_change_done(request, template_name="core/password_change_done.jinja")
+
+def password_root_change(request, user_id):
+    """
+    Allows a root user to change someone's password
+    """
+    if not request.user.is_superuser and not request.user.is_in_group(settings.SITH_GROUPS['root']['name']):
+        raise PermissionDenied
+    user = User.objects.filter(id=user_id).first()
+    if not user:
+        raise Http404("User not found")
+    if request.method == "POST":
+        form = views.SetPasswordForm(user=user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("core:password_change_done")
+    else:
+        form = views.SetPasswordForm(user=user)
+    return TemplateResponse(request, "core/password_change.jinja", {'form': form, 'target': user})
 
 def password_reset(request):
     """
