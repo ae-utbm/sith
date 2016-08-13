@@ -32,7 +32,7 @@ class Command(BaseCommand):
         for g in settings.SITH_GROUPS.values():
             Group(id=g['id'], name=g['name']).save()
         self.reset_index("core", "auth")
-        root = User(username='root', last_name="", first_name="Bibou",
+        root = User(id=0, username='root', last_name="", first_name="Bibou",
                  email="ae.info@utbm.fr",
                  date_of_birth="1942-06-12",
                  is_superuser=True, is_staff=True)
@@ -76,6 +76,19 @@ class Command(BaseCommand):
         p.save()
         PageRev(page=p, title="Wiki index", author=root, content="""
 Welcome to the wiki page!
+""").save()
+
+        p = Page(name="services")
+        p.set_lock(root)
+        p.save()
+        p.view_groups=[settings.SITH_GROUPS['public']['id']]
+        p.set_lock(root)
+        PageRev(page=p, title="Services", author=root, content="""
+|   |   |   |
+| :---: | :---: | :---: | :---: |
+| [Eboutic](/eboutic) | [Laverie](/launderette) | Matmat | [Fichiers](/file) |
+| SAS | Weekmail | Forum | |
+
 """).save()
 
         p = Page(name="launderette")

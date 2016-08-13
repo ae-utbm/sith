@@ -1,5 +1,9 @@
 {% extends "core/user_base.jinja" %}
 
+{% block title %}
+{% trans %}Edit user{% endtrans %}
+{% endblock %}
+
 {% block infos %}
 <h2>{% trans %}Edit user profile{% endtrans %}</h2>
 <form action="" method="post" enctype="multipart/form-data">

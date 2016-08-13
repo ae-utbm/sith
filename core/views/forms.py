@@ -5,9 +5,12 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import logout, login, authenticate
 from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput
 from django.utils.translation import ugettext as _
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
+
 import logging
 
 from core.models import User, Page, RealGroup, SithFile
+
 
 # Widgets
 
@@ -67,6 +70,26 @@ class RegisteringForm(UserCreationForm):
             user.save()
         return user
 
+# Image utils
+
+from io import BytesIO
+from PIL import Image
+
+def scale_dimension(width, height, long_edge):
+    if width > height:
+        ratio = long_edge * 1. / width
+    else:
+        ratio = long_edge * 1. / height
+    return int(width * ratio), int(height * ratio)
+
+def resize_image(im, edge, format):
+    from django.core.files.base import ContentFile
+    (w, h) = im.size
+    (width, height) = scale_dimension(w, h, long_edge=edge)
+    content = BytesIO()
+    im.resize((width, height), Image.ANTIALIAS).save(fp=content, format=format, dpi=[72, 72])
+    return ContentFile(content.getvalue())
+
 class UserProfileForm(forms.ModelForm):
     """
     Form handling the user profile, managing the files
@@ -76,13 +99,16 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', 'profile_pict', 'avatar_pict',
-                'scrub_pict', 'sex', 'tshirt_size', 'role', 'department', 'dpt_option', 'semester', 'quote', 'school',
-                'promo', 'forum_signature']
+                'scrub_pict', 'sex', 'second_email', 'address', 'parent_address', 'phone', 'parent_phone',
+                'tshirt_size', 'role', 'department', 'dpt_option', 'semester', 'quote', 'school', 'promo',
+                'forum_signature']
         widgets = {
                 'date_of_birth': SelectDate,
                 'profile_pict': forms.ClearableFileInput,
                 'avatar_pict': forms.ClearableFileInput,
                 'scrub_pict': forms.ClearableFileInput,
+                'phone': PhoneNumberInternationalFallbackWidget,
+                'parent_phone': PhoneNumberInternationalFallbackWidget,
                 }
         labels = {
                 'profile_pict': _("Profile: you need to be visible on the picture, in order to be recognized (e.g. by the barmen)"),
@@ -111,13 +137,12 @@ class UserProfileForm(forms.ModelForm):
         parent = SithFile.objects.filter(parent=None, name="profiles").first()
         for field,f in files:
             with transaction.atomic():
-                new_file = SithFile(parent=parent, name=self.generate_name(field, f), file=f, owner=self.instance, is_folder=False,
-                        mime_type=f.content_type, size=f._size)
                 try:
-                    if not (f.content_type == "image/jpeg" or
-                            f.content_type == "image/png" or
-                            f.content_type == "image/gif"):
-                        raise ValidationError(_("Bad image format, only jpeg, png, and gif are accepted"))
+                    im = Image.open(BytesIO(f.read()))
+                    new_file = SithFile(parent=parent, name=self.generate_name(field, f),
+                            file=resize_image(im, 400, f.content_type.split('/')[-1]),
+                            owner=self.instance, is_folder=False, mime_type=f.content_type, size=f._size)
+                    new_file.file.name = new_file.name
                     old = SithFile.objects.filter(parent=parent, name=new_file.name).first()
                     if old:
                         old.delete()
@@ -129,6 +154,10 @@ class UserProfileForm(forms.ModelForm):
                     self._errors.pop(field, None)
                     self.add_error(field, _("Error uploading file %(file_name)s: %(msg)s") %
                             {'file_name': f, 'msg': str(e.message)})
+                except IOError:
+                    self._errors.pop(field, None)
+                    self.add_error(field, _("Error uploading file %(file_name)s: %(msg)s") %
+                            {'file_name': f, 'msg': _("Bad image format, only jpeg, png, and gif are accepted")})
         self._post_clean()
 
 class UserPropForm(forms.ModelForm):

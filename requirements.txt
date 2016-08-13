@@ -6,3 +6,4 @@ django-jinja
 pyopenssl
 pytz
 djangorestframework
+django-phonenumber-field

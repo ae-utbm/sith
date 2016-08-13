@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import transaction
+from phonenumber_field.modelfields import PhoneNumberField
+
 from datetime import datetime, timedelta, date
 
 import unicodedata
@@ -82,11 +84,11 @@ class User(AbstractBaseUser):
             'unique': _("A user with that username already exists."),
         },
     )
-    first_name = models.CharField(_('first name'), max_length=30)
-    last_name = models.CharField(_('last name'), max_length=30)
+    first_name = models.CharField(_('first name'), max_length=64)
+    last_name = models.CharField(_('last name'), max_length=64)
     email = models.EmailField(_('email address'), unique=True)
     date_of_birth = models.DateField(_('date of birth'), blank=True, null=True)
-    nick_name = models.CharField(_('nick name'), max_length=30, blank=True)
+    nick_name = models.CharField(_('nick name'), max_length=64, null=True, blank=True)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -101,6 +103,7 @@ class User(AbstractBaseUser):
         ),
     )
     date_joined = models.DateField(_('date joined'), auto_now_add=True)
+    last_update = models.DateField(_('last update'), auto_now=True)
     is_superuser = models.BooleanField(
         _('superuser'),
         default=False,
@@ -110,9 +113,12 @@ class User(AbstractBaseUser):
     )
     groups = models.ManyToManyField(RealGroup, related_name='users', blank=True)
     home = models.OneToOneField('SithFile', related_name='home_of', verbose_name=_("home"), null=True, blank=True)
-    profile_pict = models.OneToOneField('SithFile', related_name='profile_of', verbose_name=_("profile"), null=True, blank=True)
-    avatar_pict = models.OneToOneField('SithFile', related_name='avatar_of', verbose_name=_("avatar"), null=True, blank=True)
-    scrub_pict = models.OneToOneField('SithFile', related_name='scrub_of', verbose_name=_("scrub"), null=True, blank=True)
+    profile_pict = models.OneToOneField('SithFile', related_name='profile_of', verbose_name=_("profile"), null=True,
+            blank=True, on_delete=models.SET_NULL)
+    avatar_pict = models.OneToOneField('SithFile', related_name='avatar_of', verbose_name=_("avatar"), null=True,
+            blank=True, on_delete=models.SET_NULL)
+    scrub_pict = models.OneToOneField('SithFile', related_name='scrub_of', verbose_name=_("scrub"), null=True,
+            blank=True, on_delete=models.SET_NULL)
     sex = models.CharField(_("sex"), max_length=10, choices=[("MAN", _("Man")), ("WOMAN", _("Woman"))], default="MAN")
     tshirt_size = models.CharField(_("tshirt size"), max_length=5, choices=[
         ("-", _("-")),
@@ -123,7 +129,7 @@ class User(AbstractBaseUser):
         ("XL", _("XL")),
         ("XXL", _("XXL")),
         ("XXXL", _("XXXL")),
-        ], default="M")
+        ], default="-")
     role = models.CharField(_("role"), max_length=15, choices=[
         ("STUDENT", _("Student")),
         ("ADMINISTRATIVE", _("Administrative agent")),
@@ -132,7 +138,7 @@ class User(AbstractBaseUser):
         ("DOCTOR", _("Doctor")),
         ("FORMER STUDENT", _("Former student")),
         ("SERVICE", _("Service")),
-        ], default="STUDENT")
+        ], blank=True, default="")
     department = models.CharField(_("department"), max_length=15, choices=[
         ("TC", _("TC")),
         ("IMSI", _("IMSI")),
@@ -145,16 +151,20 @@ class User(AbstractBaseUser):
         ("GMC", _("GMC")),
         ("MC", _("MC")),
         ("EDIM", _("EDIM")),
-        ("HUMAN", _("Humanities")),
+        ("HUMA", _("Humanities")),
         ("NA", _("N/A")),
-        ], default="NA")
-    dpt_option = models.CharField(_("dpt option"), max_length=32, null=True, blank=True)
-    semester = models.CharField(_("semester"), max_length=5, null=True, blank=True)
-    quote = models.CharField(_("quote"), max_length=64, null=True, blank=True)
-    school = models.CharField(_("school"), max_length=32, null=True, blank=True)
+        ], default="NA", blank=True)
+    dpt_option = models.CharField(_("dpt option"), max_length=32, blank=True, default="")
+    semester = models.CharField(_("semester"), max_length=5, blank=True, default="")
+    quote = models.CharField(_("quote"), max_length=256, blank=True, default="")
+    school = models.CharField(_("school"), max_length=80, blank=True, default="")
     promo = models.IntegerField(_("promo"), validators=[validate_promo], null=True, blank=True)
-    forum_signature = models.TextField(_("forum signature"), max_length=256, null=True, blank=True)
-    # TODO: add phone numbers with https://github.com/stefanfoulis/django-phonenumber-field
+    forum_signature = models.TextField(_("forum signature"), max_length=256, blank=True, default="")
+    second_email = models.EmailField(_('second email address'), null=True, blank=True)
+    phone = PhoneNumberField(_("phone"), null=True, blank=True)
+    parent_phone = PhoneNumberField(_("parent phone"), null=True, blank=True)
+    address = models.CharField(_("address"), max_length=128, blank=True, default="")
+    parent_address = models.CharField(_("parent address"), max_length=128, blank=True, default="")
 
     objects = UserManager()
 
@@ -217,7 +227,7 @@ class User(AbstractBaseUser):
         with transaction.atomic():
             if self.id:
                 old = User.objects.filter(id=self.id).first()
-                if old.username != self.username:
+                if old and old.username != self.username:
                     self._change_username(self.username)
             super(User, self).save(*args, **kwargs)
 
@@ -263,8 +273,8 @@ class User(AbstractBaseUser):
         Returns the display name of the user.
         A nickname if possible, otherwise, the full name
         """
-        if self.nick_name != "":
-            return self.nick_name
+        if self.nick_name:
+            return "%s (%s)" % (self.get_full_name(), self.nick_name)
         return self.get_full_name()
 
     def email_user(self, subject, message, from_email=None, **kwargs):
@@ -463,7 +473,7 @@ class SithFile(models.Model):
         if attr == "is_file":
             return not self.is_folder
         else:
-            return object.__getattribute__(self, attr)
+            return super(SithFile, self).__getattribute__(attr)
 
     def __str__(self):
         if self.is_folder:

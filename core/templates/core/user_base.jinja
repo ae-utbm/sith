@@ -2,6 +2,7 @@
 
 {% block content %}
 <div class="tool-bar">
+    <div>{{ profile.get_display_name() }}</div>
     <div class="tools">
         <a href="{{ url('core:user_profile', user_id=profile.id) }}">{% trans %}Infos{% endtrans %}</a>
         {% if can_edit(profile, request.user) or user.id == profile.id %}
@@ -16,7 +17,6 @@
         <a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Account{% endtrans %}</a>
         {% endif %}
     </div>
-    <h5>{{ profile.get_display_name() }}</h5>
 </div>
 <hr>
 
