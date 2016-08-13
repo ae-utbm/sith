@@ -16,7 +16,7 @@
     <h3>{{ club.name }}</h3>
     <p>{{ club.address }}</p>
     <ul>
-        {% for m in club.members.all() %}
+        {% for m in club.members.filter(end_date=None).all() %}
         <li>{{ m }}</li>
         {% endfor %}
     </ul>

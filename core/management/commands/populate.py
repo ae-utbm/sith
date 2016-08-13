@@ -43,13 +43,13 @@ class Command(BaseCommand):
         home_root.save()
         club_root = SithFile(parent=None, name="clubs", is_folder=True, owner=root)
         club_root.save()
-        main_club = Club(name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
+        main_club = Club(id=1, name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
                 address=settings.SITH_MAIN_CLUB['address'])
         main_club.save()
-        bar_club = Club(name=settings.SITH_BAR_MANAGER['name'], unix_name=settings.SITH_BAR_MANAGER['unix_name'],
+        bar_club = Club(id=2, name=settings.SITH_BAR_MANAGER['name'], unix_name=settings.SITH_BAR_MANAGER['unix_name'],
                 address=settings.SITH_BAR_MANAGER['address'])
         bar_club.save()
-        launderette_club = Club(name=settings.SITH_LAUNDERETTE_MANAGER['name'],
+        launderette_club = Club(id=84, name=settings.SITH_LAUNDERETTE_MANAGER['name'],
                 unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name'],
                 address=settings.SITH_LAUNDERETTE_MANAGER['address'])
         launderette_club.save()

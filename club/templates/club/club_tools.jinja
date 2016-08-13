@@ -19,6 +19,9 @@
     {% if object.club_account %}
     <li>Accouting: <a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object }}</a></li>
     {% endif %}
+    {% if object.unix_name == settings.SITH_LAUNDERETTE_MANAGER['unix_name'] %}
+    <li><a href="{{ url('launderette:launderette_list') }}">{% trans %}Launderette{% endtrans %}</a></li>
+    {% endif %}
 </ul>
 {% endblock %}
 

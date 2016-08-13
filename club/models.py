@@ -15,7 +15,7 @@ class Club(models.Model):
     """
     The Club class, made as a tree to allow nice tidy organization
     """
-    name = models.CharField(_('name'), max_length=30)
+    name = models.CharField(_('name'), max_length=64)
     parent = models.ForeignKey('Club', related_name='children', null=True, blank=True)
     unix_name = models.CharField(_('unix name'), max_length=30, unique=True,
             validators=[
@@ -72,10 +72,10 @@ class Club(models.Model):
     def save(self, *args, **kwargs):
         with transaction.atomic():
             creation = False
-            if self.id is None:
+            old = Club.objects.filter(id=self.id).first()
+            if not old:
                 creation = True
             else:
-                old = Club.objects.filter(id=self.id).first()
                 if old.unix_name != self.unix_name:
                     self._change_unixname(self.unix_name)
             super(Club, self).save(*args, **kwargs)
@@ -148,7 +148,7 @@ class Membership(models.Model):
     end_date = models.DateField(_('end date'), null=True, blank=True)
     role = models.IntegerField(_('role'), choices=sorted(settings.SITH_CLUB_ROLES.items()),
             default=sorted(settings.SITH_CLUB_ROLES.items())[0][0])
-    description = models.CharField(_('description'), max_length=30, null=False, blank=True)
+    description = models.CharField(_('description'), max_length=128, null=False, blank=True)
 
     def clean(self):
         sub = Subscriber.objects.filter(pk=self.user.pk).first()
