@@ -25,6 +25,7 @@ urlpatterns = [
 
     # User views
     url(r'^user/$', UserListView.as_view(), name='user_list'),
+    url(r'^user/(?P<user_id>[0-9]+)/mini$', UserMiniView.as_view(), name='user_profile_mini'),
     url(r'^user/(?P<user_id>[0-9]+)/$', UserView.as_view(), name='user_profile'),
     url(r'^user/(?P<user_id>[0-9]+)/edit$', UserUpdateProfileView.as_view(), name='user_edit'),
     url(r'^user/(?P<user_id>[0-9]+)/groups$', UserUpdateGroupView.as_view(), name='user_groups'),

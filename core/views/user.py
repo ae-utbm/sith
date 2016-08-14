@@ -121,6 +121,15 @@ class UserView(CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_detail.jinja"
 
+class UserMiniView(CanViewMixin, DetailView):
+    """
+    Display a user's profile
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    context_object_name = "profile"
+    template_name = "core/user_mini.jinja"
+
 class UserListView(ListView):
     """
     Displays the user list

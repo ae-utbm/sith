@@ -50,7 +50,6 @@ class SelectFile(TextInput):
                 'name': name,
                 }
         output += '<span name="' + name + '" class="choose_file_button">' + _("Choose file") + '</span>'
-        print(output)
         return output
 
 # Forms

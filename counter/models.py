@@ -30,7 +30,7 @@ class Customer(models.Model):
         ordering = ['account_id',]
 
     def __str__(self):
-        return self.user.username
+        return "%s - %s" % (self.user.username, self.account_id)
 
     def generate_account_id(number):
         number = str(number)

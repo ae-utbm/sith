@@ -243,10 +243,6 @@ SITH_GROUPS = {
         'id': 5,
         'name': "Counter admin",
     },
-    'launderette-admin': {
-        'id': 6,
-        'name': "Launderette admin",
-    },
 }
 
 SITH_BOARD_SUFFIX="-bureau"
@@ -256,15 +252,17 @@ SITH_MAIN_BOARD_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_BOARD_SUFFIX
 SITH_MAIN_MEMBERS_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_MEMBER_SUFFIX
 
 SITH_ACCOUNTING_PAYMENT_METHOD = [
-        ('CHEQUE', _('Check')),
+        ('CHECK', _('Check')),
         ('CASH', _('Cash')),
-        ('TRANSFert', _('Transfert')),
+        ('TRANSFERT', _('Transfert')),
         ('CARD', _('Credit card')),
         ]
 
 SITH_SUBSCRIPTION_PAYMENT_METHOD = [
-        ('CHEQUE', _('Check')),
+        ('CHECK', _('Check')),
+        ('CARD', _('Credit card')),
         ('CASH', _('Cash')),
+        ('EBOUTIC', _('Eboutic')),
         ('OTHER', _('Other')),
         ]
 
@@ -281,7 +279,7 @@ SITH_COUNTER_BARS = [
         ]
 
 SITH_COUNTER_PAYMENT_METHOD = [
-        ('CHEQUE', _('Check')),
+        ('CHECK', _('Check')),
         ('CASH', _('Cash')),
         ]
 
@@ -292,7 +290,8 @@ SITH_COUNTER_BANK = [
         ('CREDIT-MUTUEL', 'Credit Mutuel'),
         ]
 
-# Subscription durations are in semestres (should be settingized)
+# Subscription durations are in semestres
+# Be careful, modifying this parameter will need a migration to be applied
 SITH_SUBSCRIPTIONS = {
     'un-semestre': {
         'name': _('One semester'),
@@ -313,6 +312,41 @@ SITH_SUBSCRIPTIONS = {
         'name': _('Branch cursus'),
         'price': 45,
         'duration': 6,
+    },
+    'cursus-alternant': {
+        'name': _('Branch cursus'),
+        'price': 30,
+        'duration': 6,
+    },
+    'membre-honoraire': {
+        'name': _('Honorary member'),
+        'price': 0,
+        'duration': 666,
+    },
+    'assidu': {
+        'name': _('Assidu member'),
+        'price': 0,
+        'duration': 2,
+    },
+    'amicale/doceo': {
+        'name': _('Amicale/DOCEO member'),
+        'price': 0,
+        'duration': 2,
+    },
+    'reseau-ut': {
+        'name': _('UT network member'),
+        'price': 0,
+        'duration': 1,
+    },
+    'crous': {
+        'name': _('CROUS member'),
+        'price': 0,
+        'duration': 2,
+    },
+    'sbarro/esta': {
+        'name': _('Sbarro/ESTA member'),
+        'price': 15,
+        'duration': 2,
     },
 # To be completed....
 }

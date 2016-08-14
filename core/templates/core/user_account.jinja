@@ -71,7 +71,7 @@
         <td>
             <ul>
                 {% for it in i.items.all() %}
-                <li>{{ it.product_name }} - {{ it.product_unit_price }} €</li>
+                <li>{{ it.quantity }} x {{ it.product_name }} - {{ it.product_unit_price }} €</li>
                 {% endfor %}
             </ul>
         </td>

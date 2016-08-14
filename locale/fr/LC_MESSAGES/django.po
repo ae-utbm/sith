@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-13 17:14+0200\n"
+"POT-Creation-Date: 2016-08-14 16:36+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -66,7 +66,7 @@ msgstr "montant effectif"
 msgid "number"
 msgstr "numéro"
 
-#: accounting/models.py:154 core/models.py:403 core/models.py:679
+#: accounting/models.py:154 core/models.py:404 core/models.py:680
 #: counter/models.py:209 counter/models.py:244 eboutic/models.py:13
 #: eboutic/models.py:46
 msgid "date"
@@ -122,7 +122,7 @@ msgstr "Compte"
 msgid "Company"
 msgstr "Entreprise"
 
-#: accounting/models.py:163 sith/settings.py:278 sith/settings_sample.py:268
+#: accounting/models.py:163 sith/settings.py:280 sith/settings_sample.py:266
 msgid "Other"
 msgstr "Autre"
 
@@ -766,113 +766,113 @@ msgstr "téléphone des parents"
 msgid "parent address"
 msgstr "adresse des parents"
 
-#: core/models.py:253
+#: core/models.py:254
 msgid "A user with that username already exists"
 msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 
-#: core/models.py:380
+#: core/models.py:381
 msgid "Visitor"
 msgstr "Visiteur"
 
-#: core/models.py:385
+#: core/models.py:386
 msgid "define if we show a users stats"
 msgstr "Definit si l'on montre les statistiques de l'utilisateur"
 
-#: core/models.py:387
+#: core/models.py:388
 msgid "Show your account statistics to others"
 msgstr "Montrez vos statistiques de compte aux autres"
 
-#: core/models.py:394
+#: core/models.py:395
 msgid "file name"
 msgstr "nom du fichier"
 
-#: core/models.py:395 core/models.py:528
+#: core/models.py:396 core/models.py:529
 msgid "parent"
 msgstr "parent"
 
-#: core/models.py:396 core/models.py:406
+#: core/models.py:397 core/models.py:407
 msgid "file"
 msgstr "fichier"
 
-#: core/models.py:397
+#: core/models.py:398
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:398 core/models.py:534
+#: core/models.py:399 core/models.py:535
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:399 core/models.py:535
+#: core/models.py:400 core/models.py:536
 msgid "view group"
 msgstr "groupe de vue"
 
-#: core/models.py:400
+#: core/models.py:401
 msgid "is folder"
 msgstr "est un dossier"
 
-#: core/models.py:401
+#: core/models.py:402
 msgid "mime type"
 msgstr "type mime"
 
-#: core/models.py:402
+#: core/models.py:403
 msgid "size"
 msgstr "taille"
 
-#: core/models.py:432
+#: core/models.py:433
 msgid "Character '/' not authorized in name"
 msgstr "Le caractère '/' n'est pas autorisé dans les noms de fichier"
 
-#: core/models.py:435 core/models.py:440
+#: core/models.py:436 core/models.py:441
 msgid "Loop in folder tree"
 msgstr "Boucle dans l'arborescence des dossiers"
 
-#: core/models.py:444
+#: core/models.py:445
 msgid "You can not make a file be a children of a non folder file"
 msgstr ""
 "Vous ne pouvez pas mettre un fichier enfant de quelque chose qui n'est pas "
 "un dossier"
 
-#: core/models.py:448
+#: core/models.py:449
 msgid "Duplicate file"
 msgstr "Un fichier de ce nom existe déjà"
 
-#: core/models.py:458
+#: core/models.py:459
 msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
-#: core/models.py:483
+#: core/models.py:484
 msgid "Folder: "
 msgstr "Dossier : "
 
-#: core/models.py:485
+#: core/models.py:486
 msgid "File: "
 msgstr "Fichier : "
 
-#: core/models.py:527 core/models.py:531
+#: core/models.py:528 core/models.py:532
 msgid "page name"
 msgstr "nom de la page"
 
-#: core/models.py:532
+#: core/models.py:533
 msgid "owner group"
 msgstr "groupe propriétaire"
 
-#: core/models.py:563
+#: core/models.py:564
 msgid "Duplicate page"
 msgstr "Une page de ce nom existe déjà"
 
-#: core/models.py:569
+#: core/models.py:570
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:676
+#: core/models.py:677
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:677
+#: core/models.py:678
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:678
+#: core/models.py:679
 msgid "page content"
 msgstr "contenu de la page"
 
@@ -931,7 +931,7 @@ msgstr "Services"
 
 #: core/templates/core/base.jinja:55
 msgid "Site made by good people"
-msgstr "Site réalisé par des gens biens"
+msgstr "Site réalisé par des gens bons"
 
 #: core/templates/core/create.jinja:4
 #, python-format
@@ -1411,7 +1411,7 @@ msgstr "Ajouter un nouveau dossier"
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py:62 core/views/forms.py:155 core/views/forms.py:159
+#: core/views/files.py:62 core/views/forms.py:154 core/views/forms.py:158
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoie du fichier %(file_name)s : %(msg)s"
@@ -1420,7 +1420,7 @@ msgstr "Erreur d'envoie du fichier %(file_name)s : %(msg)s"
 msgid "Choose file"
 msgstr "Choisir un fichier"
 
-#: core/views/forms.py:114
+#: core/views/forms.py:113
 msgid ""
 "Profile: you need to be visible on the picture, in order to be recognized (e."
 "g. by the barmen)"
@@ -1428,15 +1428,15 @@ msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
 
-#: core/views/forms.py:115
+#: core/views/forms.py:114
 msgid "Avatar: used on the forum"
 msgstr "Avatar : utilisé sur le forum"
 
-#: core/views/forms.py:116
+#: core/views/forms.py:115
 msgid "Scrub: let other know how your scrub looks like!"
 msgstr "Blouse : montrez aux autres à quoi ressemble votre blouse !"
 
-#: core/views/forms.py:160
+#: core/views/forms.py:159
 msgid "Bad image format, only jpeg, png, and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, et gif sont acceptés"
 
@@ -1491,6 +1491,7 @@ msgstr "Bureau"
 #: counter/models.py:110 eboutic/templates/eboutic/eboutic_main.jinja:20
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:4
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:4
+#: sith/settings.py:279 sith/settings_sample.py:265
 msgid "Eboutic"
 msgstr "Eboutic"
 
@@ -1676,7 +1677,8 @@ msgstr "ANN"
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: eboutic/models.py:47 sith/settings.py:272 sith/settings_sample.py:262
+#: eboutic/models.py:47 sith/settings.py:272 sith/settings.py:277
+#: sith/settings_sample.py:258 sith/settings_sample.py:263
 msgid "Credit card"
 msgstr "Carte banquaire"
 
@@ -1824,12 +1826,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:26
-#: sith/settings.py:360 sith/settings_sample.py:350
+#: sith/settings.py:398 sith/settings_sample.py:384
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:30
-#: sith/settings.py:360 sith/settings_sample.py:350
+#: sith/settings.py:398 sith/settings_sample.py:384
 msgid "Drying"
 msgstr "Séchage"
 
@@ -1884,83 +1886,108 @@ msgstr "L'utilisateur n'a pas réservé de créneau"
 msgid "Token not found"
 msgstr "Jeton non trouvé"
 
-#: sith/settings.py:269 sith/settings.py:276 sith/settings.py:294
-#: sith/settings_sample.py:259 sith/settings_sample.py:266
-#: sith/settings_sample.py:284
+#: sith/settings.py:269 sith/settings.py:276 sith/settings.py:296
+#: sith/settings_sample.py:255 sith/settings_sample.py:262
+#: sith/settings_sample.py:282
 msgid "Check"
 msgstr "Chèque"
 
-#: sith/settings.py:270 sith/settings.py:277 sith/settings.py:295
-#: sith/settings_sample.py:260 sith/settings_sample.py:267
-#: sith/settings_sample.py:285
+#: sith/settings.py:270 sith/settings.py:278 sith/settings.py:297
+#: sith/settings_sample.py:256 sith/settings_sample.py:264
+#: sith/settings_sample.py:283
 msgid "Cash"
 msgstr "Espèces"
 
-#: sith/settings.py:271 sith/settings_sample.py:261
+#: sith/settings.py:271 sith/settings_sample.py:257
 msgid "Transfert"
 msgstr "Virement"
 
-#: sith/settings.py:282 sith/settings_sample.py:272
+#: sith/settings.py:284 sith/settings_sample.py:270
 msgid "Belfort"
 msgstr "Belfort"
 
-#: sith/settings.py:283 sith/settings_sample.py:273
+#: sith/settings.py:285 sith/settings_sample.py:271
 msgid "Sevenans"
 msgstr "Sevenans"
 
-#: sith/settings.py:284 sith/settings_sample.py:274
+#: sith/settings.py:286 sith/settings_sample.py:272
 msgid "Montbéliard"
 msgstr "Montbéliard"
 
-#: sith/settings.py:308 sith/settings_sample.py:298
+#: sith/settings.py:311 sith/settings_sample.py:297
 msgid "One semester"
 msgstr "Un semestre"
 
-#: sith/settings.py:313 sith/settings_sample.py:303
+#: sith/settings.py:316 sith/settings_sample.py:302
 msgid "Two semesters"
 msgstr "Deux semestres"
 
-#: sith/settings.py:318 sith/settings_sample.py:308
+#: sith/settings.py:321 sith/settings_sample.py:307
 msgid "Common core cursus"
 msgstr "Cursus tronc commun"
 
-#: sith/settings.py:323 sith/settings_sample.py:313
+#: sith/settings.py:326 sith/settings.py:331 sith/settings_sample.py:312
+#: sith/settings_sample.py:317
 msgid "Branch cursus"
 msgstr "Cursus branche"
 
-#: sith/settings.py:331 sith/settings_sample.py:321
+#: sith/settings.py:336 sith/settings_sample.py:322
+msgid "Honorary member"
+msgstr "Membre honoraire"
+
+#: sith/settings.py:341 sith/settings_sample.py:327
+msgid "Assidu member"
+msgstr "Membre d'Assidu"
+
+#: sith/settings.py:346 sith/settings_sample.py:332
+msgid "Amicale/DOCEO member"
+msgstr "Membre de l'Amicale/DOCEO"
+
+#: sith/settings.py:351 sith/settings_sample.py:337
+msgid "UT network member"
+msgstr "Cotisant du réseau UT"
+
+#: sith/settings.py:356 sith/settings_sample.py:342
+msgid "CROUS member"
+msgstr "Membres du CROUS"
+
+#: sith/settings.py:361 sith/settings_sample.py:347
+msgid "Sbarro/ESTA member"
+msgstr "Membre de Sbarro ou de l'ESTA"
+
+#: sith/settings.py:369 sith/settings_sample.py:355
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:332 sith/settings_sample.py:322
+#: sith/settings.py:370 sith/settings_sample.py:356
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:333 sith/settings_sample.py:323
+#: sith/settings.py:371 sith/settings_sample.py:357
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:334 sith/settings_sample.py:324
+#: sith/settings.py:372 sith/settings_sample.py:358
 msgid "Communication supervisor"
 msgstr "Responsable com"
 
-#: sith/settings.py:335 sith/settings_sample.py:325
+#: sith/settings.py:373 sith/settings_sample.py:359
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:336 sith/settings_sample.py:326
+#: sith/settings.py:374 sith/settings_sample.py:360
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:337 sith/settings_sample.py:327
+#: sith/settings.py:375 sith/settings_sample.py:361
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:338 sith/settings_sample.py:328
+#: sith/settings.py:376 sith/settings_sample.py:362
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:339 sith/settings_sample.py:329
+#: sith/settings.py:377 sith/settings_sample.py:363
 msgid "Curious"
 msgstr "Curieux"
 

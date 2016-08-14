@@ -6,9 +6,41 @@
 
 {% block content %}
 <h3>{% trans %}New subscription{% endtrans %}</h3>
-<form action="" method="post">
+<div id="user_info"></div>
+<form action="" method="post" id="subscription_form">
     {% csrf_token %}
-    {{ form.as_p() }}
+    <p>{{ form.member.errors }}<label for="{{ form.member.name }}">{{ form.member.label }}</label> {{ form.member }}</p>
+    <div id="new_member">
+        <p>{{ form.last_name.errors }}<label for="{{ form.last_name.name }}">{{ form.last_name.label }}</label> {{ form.last_name }}</p>
+        <p>{{ form.first_name.errors }}<label for="{{ form.first_name.name }}">{{ form.first_name.label }}</label> {{ form.first_name }}</p>
+        <p>{{ form.email.errors }}<label for="{{ form.email.name }}">{{ form.email.label }}</label> {{ form.email }}</p>
+    </div>
+    <p>{{ form.subscription_type.errors }}<label for="{{ form.subscription_type.name }}">{{ form.subscription_type.label }}</label> {{ form.subscription_type }}</p>
+    <p>{{ form.payment_method.errors }}<label for="{{ form.payment_method.name }}">{{ form.payment_method.label }}</label> {{
+    form.payment_method }}</p>
+    <p>{{ form.location.errors }}<label for="{{ form.location.name }}">{{ form.location.label }}</label> {{ form.location }}</p>
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+<script type="text/javascript" charset="utf-8">
+$( function() {
+    select = $("#subscription_form select[name=member]");
+    member_block = $("#subscription_form #new_member");
+    user_info = $("#user_info");
+    function display_new_member() {
+        if (select.val()) {
+            member_block.hide();
+            user_info.load("/user/"+select.val()+"/mini");
+        } else {
+            member_block.show();
+            user_info.empty();
+        }
+    }
+    select.on("change", display_new_member);
+    display_new_member();
+} );
+</script>
 {% endblock %}

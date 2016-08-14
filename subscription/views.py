@@ -63,8 +63,8 @@ class NewSubscription(CanEditMixin, CreateView):
 
     def get_initial(self):
         if 'member' in self.request.GET.keys():
-            return {'member': self.request.GET['member']}
-        return {}
+            return {'member': self.request.GET['member'], 'subscription_type': 'deux-semestres'}
+        return {'subscription_type': 'deux-semestres'}
 
     def form_valid(self, form):
         form.instance.subscription_start = Subscription.compute_start(

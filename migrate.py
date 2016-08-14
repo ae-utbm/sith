@@ -16,6 +16,8 @@ from django.db import connection
 
 from core.models import User, SithFile
 from club.models import Club, Membership
+from counter.models import Customer
+from subscription.models import Subscription, Subscriber
 
 db = MySQLdb.connect(
         host="ae-db",
@@ -87,15 +89,15 @@ def migrate_users():
     c.execute("""
     SELECT *
     FROM utilisateurs utl
-    JOIN utl_etu ue
+    LEFT JOIN utl_etu ue
     ON ue.id_utilisateur = utl.id_utilisateur
-    JOIN utl_etu_utbm ueu
+    LEFT JOIN utl_etu_utbm ueu
     ON ueu.id_utilisateur = utl.id_utilisateur
-    JOIN utl_extra uxtra
+    LEFT JOIN utl_extra uxtra
     ON uxtra.id_utilisateur = utl.id_utilisateur
-    JOIN loc_ville ville
+    LEFT JOIN loc_ville ville
     ON utl.id_ville = ville.id_ville
-    -- WHERE utl.id_utilisateur > 9000
+    -- WHERE utl.id_utilisateur = 9248
     """)
     User.objects.filter(id__gt=0).delete()
     print("Users deleted")
@@ -237,12 +239,88 @@ def migrate_club_memberships():
                 print("FAIL for club membership %s: %s" % (m['id_asso'], repr(e)))
     cur.close()
 
+def migrate_subscriptions():
+    LOCATION = {
+            5: "SEVENANS",
+            6: "BELFORT",
+            9: "MONTBELIARD",
+            None: "SEVENANS",
+            }
+    TYPE = {
+            0: 'un-semestre',
+            1: 'deux-semestres',
+            2: 'cursus-tronc-commun',
+            3: 'cursus-branche',
+            4: 'membre-honoraire',
+            5: 'assidu',
+            6: 'amicale/doceo',
+            7: 'reseau-ut',
+            8: 'crous',
+            9: 'sbarro/esta',
+            10: 'cursus-alternant',
+            None: 'un-semestre',
+            }
+    PAYMENT = {
+            1: "CHECK",
+            2: "CARD",
+            3: "CASH",
+            4: "OTHER",
+            5: "EBOUTIC",
+            0: "OTHER",
+            }
+    cur = db.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+    SELECT *
+    FROM ae_cotisations
+    """)
+
+    Subscription.objects.all().delete()
+    print("Subscriptions deleted")
+    Customer.objects.all().delete()
+    print("Customers deleted")
+    for r in cur.fetchall():
+        try:
+            user = Subscriber.objects.filter(id=r['id_utilisateur']).first()
+            if user:
+                new = Subscription(
+                        id=r['id_cotisation'],
+                        member=user,
+                        subscription_start=r['date_cotis'],
+                        subscription_end=r['date_fin_cotis'],
+                        subscription_type=TYPE[r['type_cotis']],
+                        payment_method=PAYMENT[r['mode_paiement_cotis']],
+                        location=LOCATION[r['id_comptoir']],
+                        )
+                new.save()
+        except Exception as e:
+                print("FAIL for subscription %s: %s" % (r['id_cotisation'], repr(e)))
+    cur.close()
+
+def update_customer_account():
+    cur = db.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute("""
+    SELECT *
+    FROM ae_carte carte
+    JOIN ae_cotisations cotis
+    ON carte.id_cotisation = cotis.id_cotisation
+    """)
+    for r in cur.fetchall():
+        try:
+            user = Customer.objects.filter(user_id=r['id_utilisateur']).first()
+            if user:
+                user.account_id = str(r['id_carte_ae']) + r['cle_carteae'].lower()
+                user.save()
+        except Exception as e:
+                print("FAIL to update customer account for %s: %s" % (r['id_cotisation'], repr(e)))
+    cur.close()
 
 def main():
-    # migrate_users()
-    # migrate_profile_pict()
-    # migrate_clubs()
+    migrate_users()
+    migrate_profile_pict()
+    migrate_clubs()
     migrate_club_memberships()
+    migrate_subscriptions()
+    update_customer_account()
 
 if __name__ == "__main__":
     main()
