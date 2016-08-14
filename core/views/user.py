@@ -46,7 +46,7 @@ def password_root_change(request, user_id):
     """
     Allows a root user to change someone's password
     """
-    if not request.user.is_superuser and not request.user.is_in_group(settings.SITH_GROUPS['root']['name']):
+    if not request.user.is_root:
         raise PermissionDenied
     user = User.objects.filter(id=user_id).first()
     if not user:
@@ -196,7 +196,7 @@ class UserAccountView(DetailView):
         res = super(UserAccountView, self).dispatch(request, *arg, **kwargs)
         if (self.object == request.user
                 or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
-                or request.user.is_in_group(settings.SITH_GROUPS['root']['name'])):
+                or request.user.is_root):
             return res
         raise PermissionDenied
 

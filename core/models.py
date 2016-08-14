@@ -223,6 +223,7 @@ class User(AbstractBaseUser):
             return True
         return self.groups.filter(name=group_name).exists()
 
+    @property
     def is_root(self):
         return self.is_superuser or self.groups.filter(name=settings.SITH_GROUPS['root']['name']).exists()
 
@@ -348,7 +349,7 @@ class User(AbstractBaseUser):
         return False
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name'])
+        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
 
 
 class AnonymousUser(AuthAnonymousUser):

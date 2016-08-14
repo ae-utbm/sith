@@ -10,10 +10,10 @@
 <hr>
 <h4>{% trans %}Sith management{% endtrans %}</h4>
 <ul>
-    {% if user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+    {% if user.is_root %}
     <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
     {% endif %}
-    {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+    {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root %}
     <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
     {% endif %}
 </ul>
@@ -21,7 +21,7 @@
 <hr>
 <h4>{% trans %}Counters{% endtrans %}</h4>
 <ul>
-    {% if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+    {% if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']) or user.is_root %}
     <h5>{% trans %}General management{% endtrans %}</h5>
     <li><a href="{{ url('counter:admin_list') }}">{% trans %}General counters management{% endtrans %}</a></li>
     <li><a href="{{ url('counter:product_list') }}">{% trans %}Products management{% endtrans %}</a></li>
@@ -38,7 +38,7 @@
 <hr>
 <h4>{% trans %}Accounting{% endtrans %}</h4>
 <ul>
-    {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) or user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+    {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) or user.is_root %}
     <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
     {% endif %}
     {% for m in user.membership.filter(end_date=None).filter(role__gte=7).all() %}
