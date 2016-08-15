@@ -1,5 +1,9 @@
 {% extends "core/base.jinja" %}
 
+{% block title %}
+{% trans name=form.instance.__class__._meta.verbose_name %}Create {{ name }}{% endtrans %}
+{% endblock %}
+
 {% block content %}
 <h2>{% trans name=form.instance.__class__._meta.verbose_name %}Create {{ name }}{% endtrans %}</h2>
 <form action="" method="post">

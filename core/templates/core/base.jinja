@@ -5,9 +5,9 @@
         <title>{% block title %}{% trans %}Welcome!{% endtrans %}{% endblock %}</title>
         <link rel="stylesheet" href="{{ static('core/base.css') }}">
         <link rel="stylesheet" href="{{ static('core/form.css') }}">
-        <link rel="stylesheet" href="{{ static('core/style.css') }}">
         <link rel="stylesheet" href="{{ static('core/multiple-select.css') }}">
         <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
+        <link rel="stylesheet" href="{{ static('core/style.css') }}">
         {% endblock %}
     </head>
 
@@ -50,11 +50,13 @@
             {% endblock %}
         </div>
 
+        {% if not popup %}
         <footer>
             {% block footer %}
             {% trans %}Site made by good people{% endtrans %}
             {% endblock %}
         </footer>
+        {% endif %}
         <!--
             {% block tests %}
             {{ tests }}

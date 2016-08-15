@@ -48,11 +48,12 @@
 
 {% block script %}
 {{ super() }}
-{% if popup and file.is_file %}
 <script>
-parent.$("#file_id").replaceWith('<span id="file_id" value="{{ file.id }}">{{ file.name }}</span>');
-</script>
+{% if popup and file.is_file %}
+parent.$("#file_id").replaceWith('<div id="file_id" value="{{ file.id }}">{{ file.name }}</div>');
+parent.$(".ui-dialog-buttonpane button").button("option", "disabled", false);
 {% endif %}
+</script>
 {% endblock %}
 
 

@@ -167,7 +167,7 @@ class OperationCreateView(CanCreateMixin, CreateView):
     form_class = modelform_factory(Operation,
             fields=['amount', 'label', 'remark', 'journal', 'target_type', 'target_id', 'target_label', 'date', 'mode',
                 'cheque_number', 'invoice', 'accounting_type', 'done'],
-            widgets={'journal': HiddenInput, 'date': SelectDate})
+            widgets={'journal': HiddenInput, 'date': SelectDate, 'invoice': SelectFile})
     template_name = 'core/create.jinja'
 
     def get_initial(self):

@@ -156,6 +156,11 @@ tbody>tr:hover {
     float: right;
     padding: 10px;
 }
+#user_info {
+    width: 40%;
+    margin: 0px auto;
+    background: lightgrey;
+}
 
 /*-----------------------------USER PROFILE----------------------------*/
 #user_profile {
@@ -213,7 +218,12 @@ footer{
 
 /*--------------------------------MODALE-------------------------------*/
 .choose_file_widget {
-    display: inline;
+    display: none;
+}
+.ui-dialog .ui-dialog-buttonpane {
+    bottom: 0px;
+    position: absolute;
+    width: 97%;
 }
 .form-wrapper {
     display: inline-block;
