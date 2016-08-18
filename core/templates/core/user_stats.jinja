@@ -1,0 +1,18 @@
+{% extends "core/user_base.jinja" %}
+
+{% block title %}
+{% trans user_name=profile.get_display_name() %}{{ user_name }}'s stats{% endtrans %}
+{% endblock %}
+
+{% block infos %}
+    {% if profile.permanencies %}
+    <div>
+        <h3>Permanencies</h3>
+        <p>
+        {{ total_time }}
+        </p>
+    </div>
+    {% endif %}
+{% endblock %}
+
+

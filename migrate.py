@@ -18,7 +18,7 @@ from django.forms import ValidationError
 
 from core.models import User, SithFile
 from club.models import Club, Membership
-from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType
+from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType, Permanency
 from subscription.models import Subscription, Subscriber
 from eboutic.models import Invoice, InvoiceItem
 
@@ -539,6 +539,28 @@ def migrate_sellings():
             print("FAIL to migrate selling %s: %s" % (r['id_facture'], repr(e)))
     cur.close()
 
+def migrate_permanencies():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_tracking
+    """)
+    Permanency.objects.all().delete()
+    print("Permanencies deleted")
+    for r in cur:
+        try:
+            counter = Counter.objects.filter(id=r['id_comptoir']).first()
+            user = User.objects.filter(id=r['id_utilisateur']).first()
+            new = Permanency(
+                    user=user,
+                    counter=counter,
+                    start=r['logged_time'].replace(tzinfo=timezone('Europe/Paris')),
+                    end=r['closed_time'].replace(tzinfo=timezone('Europe/Paris')),
+                    )
+            new.save()
+        except Exception as e:
+            print("FAIL to migrate permanency: %s" % (repr(e)))
+    cur.close()
 
 def main():
     # migrate_users()
@@ -551,10 +573,11 @@ def main():
     # migrate_typeproducts()
     # migrate_products()
     # migrate_products_to_counter()
-    reset_customer_amount()
-    migrate_invoices()
-    migrate_refillings()
-    migrate_sellings()
+    # reset_customer_amount()
+    # migrate_invoices()
+    # migrate_refillings()
+    # migrate_sellings()
+    # migrate_permanencies()
     reset_index('core', 'counter')
 
 if __name__ == "__main__":

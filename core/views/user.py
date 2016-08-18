@@ -10,6 +10,8 @@ from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.template.response import TemplateResponse
 from django.conf import settings
+
+from datetime import timedelta
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
@@ -120,6 +122,20 @@ class UserView(CanViewMixin, DetailView):
     pk_url_kwarg = "user_id"
     context_object_name = "profile"
     template_name = "core/user_detail.jinja"
+
+class UserStatsView(CanViewMixin, DetailView):
+    """
+    Display a user's stats
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    context_object_name = "profile"
+    template_name = "core/user_stats.jinja"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserStatsView, self).get_context_data(**kwargs)
+        kwargs['total_time'] = sum([p.end-p.start for p in self.object.permanencies.all()], timedelta())
+        return kwargs
 
 class UserMiniView(CanViewMixin, DetailView):
     """

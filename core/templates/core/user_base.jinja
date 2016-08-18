@@ -5,6 +5,7 @@
     <div>{{ profile.get_display_name() }}</div>
     <div class="tools">
         <a href="{{ url('core:user_profile', user_id=profile.id) }}">{% trans %}Infos{% endtrans %}</a>
+        <a href="{{ url('core:user_stats', user_id=profile.id) }}">{% trans %}Stats{% endtrans %}</a>
         {% if can_edit(profile, request.user) or user.id == profile.id %}
         <a href="{{ url('core:user_edit', user_id=profile.id) }}">{% trans %}Edit{% endtrans %}</a>
         {% endif %}
