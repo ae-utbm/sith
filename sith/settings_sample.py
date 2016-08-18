@@ -273,9 +273,9 @@ SITH_SUBSCRIPTION_LOCATIONS = [
         ]
 
 SITH_COUNTER_BARS = [
-        (1, "Foyer"),
-        (2, "MDE"),
-        (3, "La Gommette"),
+        (1, "MDE"),
+        (2, "Foyer"),
+        (35, "La Gommette"),
         ]
 
 SITH_COUNTER_PAYMENT_METHOD = [
@@ -285,9 +285,15 @@ SITH_COUNTER_PAYMENT_METHOD = [
 
 SITH_COUNTER_BANK = [
         ('OTHER', 'Autre'),
-        ('LA-POSTE', 'La Poste'),
-        ('CREDIT-AGRICOLE', 'Credit Agricole'),
+        ('SOCIETE-GENERALE', 'Société générale'),
+        ('BANQUE-POPULAIRE', 'Banque populaire'),
+        ('BNP', 'BNP'),
+        ('CAISSE-EPARGNE', 'Caisse d\'épargne'),
+        ('CIC', 'CIC'),
+        ('CREDIT-AGRICOLE', 'Crédit Agricole'),
         ('CREDIT-MUTUEL', 'Credit Mutuel'),
+        ('CREDIT-LYONNAIS', 'Credit Lyonnais'),
+        ('LA-POSTE', 'La Poste'),
         ]
 
 # Subscription durations are in semestres

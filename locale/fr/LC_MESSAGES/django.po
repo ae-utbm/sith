@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-14 16:36+0200\n"
+"POT-Creation-Date: 2016-08-15 21:41+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -444,11 +444,11 @@ msgstr "Éditer le club"
 
 #: club/templates/club/club_edit.jinja:8
 #: club/templates/club/club_edit_prop.jinja:8
-#: core/templates/core/create.jinja:8 core/templates/core/edit.jinja:12
+#: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:12
 #: core/templates/core/file_edit.jinja:8 core/templates/core/page_prop.jinja:8
 #: core/templates/core/pagerev_edit.jinja:24
 #: counter/templates/counter/counter_edit.jinja:8
-#: subscription/templates/subscription/subscription.jinja:12
+#: subscription/templates/subscription/subscription.jinja:22
 msgid "Save"
 msgstr "Sauver"
 
@@ -929,11 +929,11 @@ msgstr "Clubs"
 msgid "Services"
 msgstr "Services"
 
-#: core/templates/core/base.jinja:55
+#: core/templates/core/base.jinja:56
 msgid "Site made by good people"
 msgstr "Site réalisé par des gens bons"
 
-#: core/templates/core/create.jinja:4
+#: core/templates/core/create.jinja:4 core/templates/core/create.jinja.py:8
 #, python-format
 msgid "Create %(name)s"
 msgstr "Créer %(name)s"
@@ -1274,10 +1274,12 @@ msgstr "Profil de %(user_name)s"
 
 #: core/templates/core/user_detail.jinja:12
 #: core/templates/core/user_edit.jinja:15
+#: core/templates/core/user_mini.jinja:4
 msgid "Profile"
 msgstr "Profil"
 
 #: core/templates/core/user_detail.jinja:21
+#: core/templates/core/user_mini.jinja:12
 msgid "Born: "
 msgstr "Né le : "
 
@@ -1286,6 +1288,7 @@ msgid "Option: "
 msgstr "Filière : "
 
 #: core/templates/core/user_detail.jinja:32
+#: core/templates/core/user_mini.jinja:16
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -1476,9 +1479,9 @@ msgstr "prix de vente spécial"
 msgid "product"
 msgstr "produit"
 
-#: counter/models.py:108 subscription/models.py:29
-msgid "subscription type"
-msgstr "type d'inscription"
+#: counter/models.py:108
+msgid "counter type"
+msgstr "type de comptoir"
 
 #: counter/models.py:110
 msgid "Bar"
@@ -1998,6 +2001,10 @@ msgstr "Mauvais type de cotisation"
 #: subscription/models.py:17
 msgid "Bad payment method"
 msgstr "Mauvais type de paiement"
+
+#: subscription/models.py:29
+msgid "subscription type"
+msgstr "type d'inscription"
 
 #: subscription/models.py:32
 msgid "subscription start"

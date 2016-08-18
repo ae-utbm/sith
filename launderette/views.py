@@ -291,7 +291,7 @@ class ClickTokenForm(forms.BaseForm):
                     t.borrow_date = datetime.now().replace(tzinfo=pytz.UTC)
                     t.save()
                     price = settings.SITH_LAUNDERETTE_PRICES[t.type]
-                    s = Selling(label="Jeton "+t.get_type_display()+" N°"+t.name, product=None, counter=counter, unit_price=price,
+                    s = Selling(label="Jeton "+t.get_type_display()+" N°"+t.name, club=counter.club, product=None, counter=counter, unit_price=price,
                             quantity=1, seller=operator, customer=customer)
                     s.save()
                     total += price

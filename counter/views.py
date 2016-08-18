@@ -242,7 +242,7 @@ class CounterClick(DetailView):
                 if uprice * infos['qty'] > self.customer.amount:
                     raise DataError(_("You have not enough money to buy all the basket"))
                 request.session['last_basket'].append("%d x %s" % (infos['qty'], p.name))
-                s = Selling(label=p.name, product=p, counter=self.object, unit_price=uprice,
+                s = Selling(label=p.name, product=p, club=p.club, counter=self.object, unit_price=uprice,
                        quantity=infos['qty'], seller=self.operator, customer=self.customer)
                 s.save()
             request.session['last_customer'] = self.customer.user.get_display_name()
@@ -336,7 +336,7 @@ class CounterEditView(CanEditPropMixin, UpdateView):
                 'products':CheckboxSelectMultiple,
                 'sellers':CheckboxSelectMultiple})
     pk_url_kwarg = "counter_id"
-    template_name = 'counter/counter_edit.jinja'
+    template_name = 'core/edit.jinja'
 
 class CounterCreateView(CanEditMixin, CreateView):
     """
@@ -345,7 +345,7 @@ class CounterCreateView(CanEditMixin, CreateView):
     model = Counter
     form_class = modelform_factory(Counter, fields=['name', 'club', 'type', 'products'],
             widgets={'products':CheckboxSelectMultiple})
-    template_name = 'counter/counter_edit.jinja'
+    template_name = 'core/create.jinja'
 
 class CounterDeleteView(CanEditMixin, DeleteView):
     """

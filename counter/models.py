@@ -74,10 +74,10 @@ class Product(models.Model):
     """
     This describes a product, with all its related informations
     """
-    name = models.CharField(_('name'), max_length=30)
+    name = models.CharField(_('name'), max_length=64)
     description = models.TextField(_('description'), blank=True)
     product_type = models.ForeignKey(ProductType, related_name='products', null=True, blank=True)
-    code = models.CharField(_('code'), max_length=10)
+    code = models.CharField(_('code'), max_length=16, blank=True)
     purchase_price = CurrencyField(_('purchase price'))
     selling_price = CurrencyField(_('selling price'))
     special_selling_price = CurrencyField(_('special selling price'))
@@ -105,7 +105,7 @@ class Counter(models.Model):
     name = models.CharField(_('name'), max_length=30)
     club = models.ForeignKey(Club, related_name="counters")
     products = models.ManyToManyField(Product, related_name="counters", blank=True)
-    type = models.CharField(_('subscription type'),
+    type = models.CharField(_('counter type'),
             max_length=255,
             choices=[('BAR',_('Bar')), ('OFFICE',_('Office')), ('EBOUTIC',_('Eboutic'))])
     sellers = models.ManyToManyField(Subscriber, verbose_name=_('sellers'), related_name='counters', blank=True)
@@ -208,9 +208,9 @@ class Refilling(models.Model):
     customer = models.ForeignKey(Customer, related_name="refillings", blank=False)
     date = models.DateTimeField(_('date'), auto_now=True)
     payment_method = models.CharField(_('payment method'), max_length=255,
-            choices=settings.SITH_COUNTER_PAYMENT_METHOD, default='cash')
+            choices=settings.SITH_COUNTER_PAYMENT_METHOD, default='CASH')
     bank = models.CharField(_('bank'), max_length=255,
-            choices=settings.SITH_COUNTER_BANK, default='other')
+            choices=settings.SITH_COUNTER_BANK, default='OTHER')
     is_validated = models.BooleanField(_('is validated'), default=False)
 
     class Meta:
@@ -234,9 +234,10 @@ class Selling(models.Model):
     """
     Handle the sellings
     """
-    label = models.CharField(_("label"), max_length=30)
+    label = models.CharField(_("label"), max_length=64)
     product = models.ForeignKey(Product, related_name="sellings", null=True, blank=True)
     counter = models.ForeignKey(Counter, related_name="sellings", blank=False)
+    club = models.ForeignKey(Club, related_name="sellings", blank=False)
     unit_price = CurrencyField(_('unit price'))
     quantity = models.IntegerField(_('quantity'))
     seller = models.ForeignKey(User, related_name="sellings_as_operator", blank=False)

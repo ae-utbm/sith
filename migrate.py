@@ -3,6 +3,7 @@ import os
 import django
 import random
 from io import StringIO
+from pytz import timezone
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "sith.settings"
 os.environ['DJANGO_COLORS'] = 'nocolor'
@@ -12,11 +13,12 @@ from django.db import IntegrityError
 from django.conf import settings
 from django.core.management import call_command
 from django.db import connection
+from django.forms import ValidationError
 
 
 from core.models import User, SithFile
 from club.models import Club, Membership
-from counter.models import Customer
+from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType
 from subscription.models import Subscription, Subscriber
 
 db = MySQLdb.connect(
@@ -85,7 +87,7 @@ def migrate_users():
             email = "no_email_%s@git.an" % random.randrange(4000, 40000)
         return email
 
-    c = db.cursor(MySQLdb.cursors.DictCursor)
+    c = db.cursor(MySQLdb.cursors.SSDictCursor)
     c.execute("""
     SELECT *
     FROM utilisateurs utl
@@ -97,7 +99,7 @@ def migrate_users():
     ON uxtra.id_utilisateur = utl.id_utilisateur
     LEFT JOIN loc_ville ville
     ON utl.id_ville = ville.id_ville
-    -- WHERE utl.id_utilisateur = 9248
+    -- WHERE utl.id_utilisateur = 9360
     """)
     User.objects.filter(id__gt=0).delete()
     print("Users deleted")
@@ -178,7 +180,7 @@ def migrate_profile_pict():
                 print(repr(e))
 
 def migrate_clubs():
-    cur = db.cursor(MySQLdb.cursors.DictCursor)
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
     cur.execute("""
     SELECT *
     FROM asso asso
@@ -213,7 +215,7 @@ def migrate_clubs():
     cur.close()
 
 def migrate_club_memberships():
-    cur = db.cursor(MySQLdb.cursors.DictCursor)
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
     cur.execute("""
     SELECT *
     FROM asso_membre
@@ -268,7 +270,7 @@ def migrate_subscriptions():
             5: "EBOUTIC",
             0: "OTHER",
             }
-    cur = db.cursor(MySQLdb.cursors.DictCursor)
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
     cur.execute("""
     SELECT *
     FROM ae_cotisations
@@ -297,7 +299,7 @@ def migrate_subscriptions():
     cur.close()
 
 def update_customer_account():
-    cur = db.cursor(MySQLdb.cursors.DictCursor)
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
     cur.execute("""
     SELECT *
     FROM ae_carte carte
@@ -314,13 +316,185 @@ def update_customer_account():
                 print("FAIL to update customer account for %s: %s" % (r['id_cotisation'], repr(e)))
     cur.close()
 
+def migrate_counters():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_comptoir
+    """)
+    Counter.objects.all().delete()
+    for r in cur.fetchall():
+        try:
+            club = Club.objects.filter(id=r['id_assocpt']).first()
+            new = Counter(
+                    id=r['id_comptoir'],
+                    name=to_unicode(r['nom_cpt']),
+                    club=club,
+                    type="OFFICE",
+                    )
+            new.save()
+        except Exception as e:
+                print("FAIL to migrate counter %s: %s" % (r['id_comptoir'], repr(e)))
+    cur.close()
+
+def migrate_refillings():
+    BANK = {
+            0: "OTHER",
+            1: "SOCIETE-GENERALE",
+            2: "BANQUE-POPULAIRE",
+            3: "BNP",
+            4: "CAISSE-EPARGNE",
+            5: "CIC",
+            6: "CREDIT-AGRICOLE",
+            7: "CREDIT-MUTUEL",
+            8: "CREDIT-LYONNAIS",
+            9: "LA-POSTE",
+            100: "OTHER",
+            None: "OTHER",
+            }
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_rechargements
+    """)
+    Refilling.objects.all().delete()
+    print("Refillings deleted")
+    for c in Customer.objects.all():
+        c.amount = 0
+        c.save()
+    print("Customer amount reset")
+    fail = 100
+    root_cust = Customer.objects.filter(user__id=0).first()
+    mde = Counter.objects.filter(id=1).first()
+    for r in cur.fetchall():
+        try:
+            cust = Customer.objects.filter(user__id=r['id_utilisateur']).first()
+            user = User.objects.filter(id=r['id_utilisateur']).first()
+            if not cust:
+                if not user:
+                    cust = root_cust
+                else:
+                    cust = Customer(user=user, amount=0, account_id=Customer.generate_account_id(fail))
+                    cust.save()
+                    fail += 1
+            op = User.objects.filter(id=r['id_utilisateur_operateur']).first()
+            counter = Counter.objects.filter(id=r['id_comptoir']).first()
+            new = Refilling(
+                    id=r['id_rechargement'],
+                    counter=counter or mde,
+                    customer=cust,
+                    operator=op or root_cust.user,
+                    amount=r['montant_rech']/100,
+                    bank=BANK[r['banque_rech']],
+                    )
+            for f in new._meta.local_fields:
+                if f.name == "date":
+                    f.auto_now = False
+            new.date = r['date_rech'].replace(tzinfo=timezone('Europe/Paris'))
+            new.save()
+        except Exception as e:
+                print("FAIL to migrate refilling %s for %s: %s" % (r['id_rechargement'], r['id_utilisateur'], repr(e)))
+    cur.close()
+
+def migrate_typeproducts():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_type_produit
+    """)
+    ProductType.objects.all().delete()
+    print("Product types deleted")
+    for r in cur.fetchall():
+        try:
+            new = ProductType(
+                    id=r['id_typeprod'],
+                    name=to_unicode(r['nom_typeprod']),
+                    description=to_unicode(r['description_typeprod']),
+                    )
+            new.save()
+        except Exception as e:
+                print("FAIL to migrate product type %s: %s" % (r['nom_typeprod'], repr(e)))
+    cur.close()
+
+def migrate_products():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_produits
+    """)
+    Product.objects.all().delete()
+    print("Product deleted")
+    for r in cur.fetchall():
+        try:
+            type = ProductType.objects.filter(id=r['id_typeprod']).first()
+            club = Club.objects.filter(id=r['id_assocpt']).first()
+            new = Product(
+                    id=r['id_produit'],
+                    product_type=type,
+                    name=to_unicode(r['nom_prod']),
+                    description=to_unicode(r['description_prod']),
+                    code=to_unicode(r['cbarre_prod']),
+                    purchase_price=r['prix_achat_prod'],
+                    selling_price=r['prix_vente_prod'],
+                    special_selling_price=r['prix_vente_barman_prod'],
+                    club=club,
+                    )
+            new.save()
+        except Exception as e:
+                print("FAIL to migrate product %s: %s" % (r['nom_prod'], repr(e)))
+    cur.close()
+
+def migrate_sellings():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_vendu ven
+    LEFT JOIN cpt_debitfacture fac
+    ON ven.id_facture = fac.id_facture
+    WHERE fac.mode_paiement = 'AE'
+    """)
+    Selling.objects.all().delete()
+    print("Selling deleted")
+    for r in cur:
+        try:
+            product = Product.objects.filter(id=r['id_produit']).first()
+            club = Club.objects.filter(id=r['id_assocpt']).first()
+            counter = Counter.objects.filter(id=r['id_comptoir']).first()
+            op = User.objects.filter(id=r['id_utilisateur']).first()
+            customer = Customer.objects.filter(user__id=r['id_utilisateur_client']).first()
+            new = Selling(
+                    label=product.name,
+                    counter=counter,
+                    club=club,
+                    product=product,
+                    seller=op,
+                    customer=customer,
+                    unit_price=r['prix_unit']/100,
+                    quantity=r['quantite'],
+                    )
+            for f in new._meta.local_fields:
+                if f.name == "date":
+                    f.auto_now = False
+            new.date = r['date_facture'].replace(tzinfo=timezone('Europe/Paris'))
+            new.save()
+        except ValidationError as e:
+            print(repr(e) + " for %s (%s)" % (customer, customer.user.id))
+        except Exception as e:
+            print("FAIL to migrate selling %s: %s" % (r['id_facture'], repr(e)))
+    cur.close()
+
 def main():
-    migrate_users()
-    migrate_profile_pict()
-    migrate_clubs()
-    migrate_club_memberships()
-    migrate_subscriptions()
-    update_customer_account()
+    # migrate_users()
+    # migrate_profile_pict()
+    # migrate_clubs()
+    # migrate_club_memberships()
+    # migrate_subscriptions()
+    # update_customer_account()
+    # migrate_counters()
+    migrate_refillings()
+    migrate_typeproducts()
+    migrate_products()
+    migrate_sellings()
 
 if __name__ == "__main__":
     main()

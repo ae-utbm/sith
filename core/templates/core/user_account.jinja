@@ -22,7 +22,7 @@
     {% for i in customer.refillings.all() %}
         <tr>
         <td>{{ i.date|localtime|date(DATETIME_FORMAT) }} - {{ i.date|localtime|time(DATETIME_FORMAT) }}</td>
-        <td>{{ i.operator }}</td>
+        <td><a href="{{ i.operator.get_absolute_url() }}">{{ i.operator.get_display_name() }}</a></td>
         <td>{{ i.amount }} €</td>
     </tr>
 {% endfor %}
