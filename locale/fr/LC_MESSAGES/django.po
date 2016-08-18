@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-15 21:41+0200\n"
+"POT-Creation-Date: 2016-08-18 17:40+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -40,12 +40,12 @@ msgstr "numero de compte"
 msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
-#: accounting/models.py:109 club/models.py:147 counter/models.py:268
+#: accounting/models.py:109 club/models.py:147 counter/models.py:271
 #: launderette/models.py:122
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:110 club/models.py:148 counter/models.py:269
+#: accounting/models.py:110 club/models.py:148 counter/models.py:272
 msgid "end date"
 msgstr "date de fin"
 
@@ -67,8 +67,8 @@ msgid "number"
 msgstr "numéro"
 
 #: accounting/models.py:154 core/models.py:404 core/models.py:680
-#: counter/models.py:209 counter/models.py:244 eboutic/models.py:13
-#: eboutic/models.py:46
+#: counter/models.py:209 counter/models.py:245 eboutic/models.py:14
+#: eboutic/models.py:47
 msgid "date"
 msgstr "date"
 
@@ -80,8 +80,8 @@ msgstr "intitulé"
 msgid "remark"
 msgstr "remarque"
 
-#: accounting/models.py:157 counter/models.py:210 eboutic/models.py:48
-#: subscription/models.py:34
+#: accounting/models.py:157 counter/models.py:210 counter/models.py:247
+#: eboutic/models.py:49 subscription/models.py:34
 msgid "payment method"
 msgstr "méthode de paiement"
 
@@ -89,7 +89,7 @@ msgstr "méthode de paiement"
 msgid "cheque number"
 msgstr "numéro de chèque"
 
-#: accounting/models.py:159 eboutic/models.py:92
+#: accounting/models.py:159 eboutic/models.py:119
 msgid "invoice"
 msgstr "facture"
 
@@ -268,8 +268,8 @@ msgstr "Fin"
 
 #: accounting/templates/accounting/club_account_details.jinja:20
 #: accounting/templates/accounting/journal_details.jinja:23
-#: core/templates/core/user_account.jinja:18
-#: core/templates/core/user_account.jinja:64
+#: core/templates/core/user_account.jinja:19
+#: core/templates/core/user_account.jinja:72
 msgid "Amount"
 msgstr "Montant"
 
@@ -324,13 +324,13 @@ msgstr "No"
 
 #: accounting/templates/accounting/journal_details.jinja:21
 #: core/templates/core/user_account.jinja:16
-#: core/templates/core/user_account.jinja:37
-#: core/templates/core/user_account.jinja:62
+#: core/templates/core/user_account.jinja:41
+#: core/templates/core/user_account.jinja:70
 msgid "Date"
 msgstr "Date"
 
 #: accounting/templates/accounting/journal_details.jinja:22
-#: core/templates/core/user_account.jinja:39
+#: core/templates/core/user_account.jinja:44
 msgid "Label"
 msgstr "Intitulé"
 
@@ -394,7 +394,7 @@ msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:145 eboutic/models.py:12 eboutic/models.py:45
+#: club/models.py:145 eboutic/models.py:13 eboutic/models.py:46
 #: launderette/models.py:89 launderette/models.py:126
 msgid "user"
 msgstr "nom d'utilisateur"
@@ -447,7 +447,6 @@ msgstr "Éditer le club"
 #: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:12
 #: core/templates/core/file_edit.jinja:8 core/templates/core/page_prop.jinja:8
 #: core/templates/core/pagerev_edit.jinja:24
-#: counter/templates/counter/counter_edit.jinja:8
 #: subscription/templates/subscription/subscription.jinja:22
 msgid "Save"
 msgstr "Sauver"
@@ -1234,31 +1233,43 @@ msgid "Refillings"
 msgstr "Rechargements"
 
 #: core/templates/core/user_account.jinja:17
-#: core/templates/core/user_account.jinja:38
+#: core/templates/core/user_account.jinja:42
+#: counter/templates/counter/counter_click.jinja:24
+msgid "Counter"
+msgstr "Comptoir"
+
+#: core/templates/core/user_account.jinja:18
+#: core/templates/core/user_account.jinja:43
 msgid "Barman"
 msgstr "Barman"
 
-#: core/templates/core/user_account.jinja:33
-msgid "Buyings"
-msgstr "Achats"
+#: core/templates/core/user_account.jinja:20
+#: core/templates/core/user_account.jinja:47
+#: core/templates/core/user_account.jinja:73
+msgid "Payment method"
+msgstr "Méthode de paiement"
 
-#: core/templates/core/user_account.jinja:40
+#: core/templates/core/user_account.jinja:37
+msgid "Account buyings"
+msgstr "Achat sur compte utilisateur"
+
+#: core/templates/core/user_account.jinja:45
 msgid "Quantity"
 msgstr "Quantité"
 
-#: core/templates/core/user_account.jinja:41
+#: core/templates/core/user_account.jinja:46
 msgid "Total"
 msgstr "Total"
 
-#: core/templates/core/user_account.jinja:58
-msgid "Invoices"
-msgstr "Factures"
+#: core/templates/core/user_account.jinja:66
+msgid "Eboutic invoices"
+msgstr "Facture eboutic"
 
-#: core/templates/core/user_account.jinja:63
+#: core/templates/core/user_account.jinja:71
 msgid "Items"
 msgstr "Articles"
 
-#: core/templates/core/user_account.jinja:85
+#: core/templates/core/user_account.jinja:95
 msgid "User has no account"
 msgstr "L'utilisateur n'a pas de compte"
 
@@ -1459,7 +1470,7 @@ msgstr "clients"
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
-#: counter/models.py:57 eboutic/models.py:78
+#: counter/models.py:57
 msgid "product type"
 msgstr "type du produit"
 
@@ -1491,8 +1502,9 @@ msgstr "Bar"
 msgid "Office"
 msgstr "Bureau"
 
-#: counter/models.py:110 eboutic/templates/eboutic/eboutic_main.jinja:20
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:4
+#: counter/models.py:110 eboutic/templates/eboutic/eboutic_main.jinja:4
+#: eboutic/templates/eboutic/eboutic_main.jinja:24
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:8
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:4
 #: sith/settings.py:279 sith/settings_sample.py:265
 msgid "Eboutic"
@@ -1510,7 +1522,7 @@ msgstr "comptoir"
 msgid "bank"
 msgstr "banque"
 
-#: counter/models.py:214 counter/models.py:245
+#: counter/models.py:214 counter/models.py:246
 msgid "is validated"
 msgstr "est validé"
 
@@ -1518,25 +1530,31 @@ msgstr "est validé"
 msgid "refilling"
 msgstr "rechargement"
 
-#: counter/models.py:240 eboutic/models.py:79
+#: counter/models.py:241 eboutic/models.py:106
 msgid "unit price"
 msgstr "prix unitaire"
 
-#: counter/models.py:241 eboutic/models.py:80
+#: counter/models.py:242 eboutic/models.py:107
 msgid "quantity"
 msgstr "quantité"
 
-#: counter/models.py:248
+#: counter/models.py:248 eboutic/models.py:48
+msgid "Sith account"
+msgstr "Compte utilisateur"
+
+#: counter/models.py:248 eboutic/models.py:48 sith/settings.py:272
+#: sith/settings.py:277 sith/settings.py:298 sith/settings_sample.py:258
+#: sith/settings_sample.py:263 sith/settings_sample.py:284
+msgid "Credit card"
+msgstr "Carte banquaire"
+
+#: counter/models.py:251
 msgid "selling"
 msgstr "vente"
 
-#: counter/models.py:272
+#: counter/models.py:275
 msgid "permanency"
 msgstr "permanence"
-
-#: counter/templates/counter/counter_click.jinja:24
-msgid "Counter"
-msgstr "Comptoir"
 
 #: counter/templates/counter/counter_click.jinja:26
 msgid "Club: "
@@ -1563,14 +1581,14 @@ msgid "Selling"
 msgstr "Vente"
 
 #: counter/templates/counter/counter_click.jinja:54
-#: eboutic/templates/eboutic/eboutic_main.jinja:23
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:7
+#: eboutic/templates/eboutic/eboutic_main.jinja:27
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:11
 msgid "Basket: "
 msgstr "Panier : "
 
 #: counter/templates/counter/counter_click.jinja:62
 #: counter/templates/counter/counter_main.jinja:24
-#: eboutic/templates/eboutic/eboutic_main.jinja:30
+#: eboutic/templates/eboutic/eboutic_main.jinja:34
 msgid "Total: "
 msgstr "Total : "
 
@@ -1579,13 +1597,9 @@ msgid "Finish"
 msgstr "Terminer"
 
 #: counter/templates/counter/counter_click.jinja:73
-#: eboutic/templates/eboutic/eboutic_main.jinja:37
+#: eboutic/templates/eboutic/eboutic_main.jinja:41
 msgid "Products: "
 msgstr "Produits : "
-
-#: counter/templates/counter/counter_edit.jinja:4
-msgid "Edit counter"
-msgstr "Éditer le comptoir"
 
 #: counter/templates/counter/counter_list.jinja:4
 #: counter/templates/counter/counter_list.jinja:10
@@ -1664,67 +1678,66 @@ msgstr "Nouveau type de produit"
 msgid "There is no product types in this website."
 msgstr "Il n'y a pas de types de produit dans ce site web."
 
-#: counter/views.py:48
+#: counter/views.py:49
 msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
-#: counter/views.py:211
+#: counter/views.py:212
 msgid "END"
 msgstr "FIN"
 
-#: counter/views.py:213
+#: counter/views.py:214
 msgid "CAN"
 msgstr "ANN"
 
-#: counter/views.py:243
+#: counter/views.py:244
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: eboutic/models.py:47 sith/settings.py:272 sith/settings.py:277
-#: sith/settings_sample.py:258 sith/settings_sample.py:263
-msgid "Credit card"
-msgstr "Carte banquaire"
-
-#: eboutic/models.py:47
-msgid "Sith account"
-msgstr "Compte utilisateur"
-
-#: eboutic/models.py:49
+#: eboutic/models.py:50
 msgid "validated"
 msgstr "validé"
 
-#: eboutic/models.py:59
+#: eboutic/models.py:60
 msgid "Invoice already validated"
 msgstr "Facture déjà validée"
 
-#: eboutic/models.py:76
+#: eboutic/models.py:103
 msgid "product id"
 msgstr "ID du produit"
 
-#: eboutic/models.py:77
+#: eboutic/models.py:104
 msgid "product name"
 msgstr "nom du produit"
 
-#: eboutic/models.py:89
+#: eboutic/models.py:105
+msgid "product type id"
+msgstr "id du type du produit"
+
+#: eboutic/models.py:116
 msgid "basket"
 msgstr "panier"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:33
+#: eboutic/templates/eboutic/eboutic_main.jinja:37
 msgid "Proceed to command"
 msgstr "Procéder à la commande"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:31
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:4
+msgid "Basket state"
+msgstr "État du panier"
+
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:35
 msgid "Pay with credit card"
 msgstr "Payer avec une carte banquaire"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:34
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:38
 msgid ""
 "AE account payment disabled because your basket contains refilling items."
 msgstr ""
 "Paiement par compte AE désactivé parce que votre panier contient des bons de "
 "rechargement."
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:39
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:43
 msgid "Pay with Sith account"
 msgstr "Payer avec un compte AE"
 
@@ -1829,12 +1842,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:26
-#: sith/settings.py:398 sith/settings_sample.py:384
+#: sith/settings.py:408 sith/settings_sample.py:394
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:30
-#: sith/settings.py:398 sith/settings_sample.py:384
+#: sith/settings.py:408 sith/settings_sample.py:394
 msgid "Drying"
 msgstr "Séchage"
 
@@ -1917,80 +1930,80 @@ msgstr "Sevenans"
 msgid "Montbéliard"
 msgstr "Montbéliard"
 
-#: sith/settings.py:311 sith/settings_sample.py:297
+#: sith/settings.py:321 sith/settings_sample.py:307
 msgid "One semester"
 msgstr "Un semestre"
 
-#: sith/settings.py:316 sith/settings_sample.py:302
+#: sith/settings.py:326 sith/settings_sample.py:312
 msgid "Two semesters"
 msgstr "Deux semestres"
 
-#: sith/settings.py:321 sith/settings_sample.py:307
+#: sith/settings.py:331 sith/settings_sample.py:317
 msgid "Common core cursus"
 msgstr "Cursus tronc commun"
 
-#: sith/settings.py:326 sith/settings.py:331 sith/settings_sample.py:312
-#: sith/settings_sample.py:317
+#: sith/settings.py:336 sith/settings.py:341 sith/settings_sample.py:322
+#: sith/settings_sample.py:327
 msgid "Branch cursus"
 msgstr "Cursus branche"
 
-#: sith/settings.py:336 sith/settings_sample.py:322
+#: sith/settings.py:346 sith/settings_sample.py:332
 msgid "Honorary member"
 msgstr "Membre honoraire"
 
-#: sith/settings.py:341 sith/settings_sample.py:327
+#: sith/settings.py:351 sith/settings_sample.py:337
 msgid "Assidu member"
 msgstr "Membre d'Assidu"
 
-#: sith/settings.py:346 sith/settings_sample.py:332
+#: sith/settings.py:356 sith/settings_sample.py:342
 msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO"
 
-#: sith/settings.py:351 sith/settings_sample.py:337
+#: sith/settings.py:361 sith/settings_sample.py:347
 msgid "UT network member"
 msgstr "Cotisant du réseau UT"
 
-#: sith/settings.py:356 sith/settings_sample.py:342
+#: sith/settings.py:366 sith/settings_sample.py:352
 msgid "CROUS member"
 msgstr "Membres du CROUS"
 
-#: sith/settings.py:361 sith/settings_sample.py:347
+#: sith/settings.py:371 sith/settings_sample.py:357
 msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA"
 
-#: sith/settings.py:369 sith/settings_sample.py:355
+#: sith/settings.py:379 sith/settings_sample.py:365
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:370 sith/settings_sample.py:356
+#: sith/settings.py:380 sith/settings_sample.py:366
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:371 sith/settings_sample.py:357
+#: sith/settings.py:381 sith/settings_sample.py:367
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:372 sith/settings_sample.py:358
+#: sith/settings.py:382 sith/settings_sample.py:368
 msgid "Communication supervisor"
 msgstr "Responsable com"
 
-#: sith/settings.py:373 sith/settings_sample.py:359
+#: sith/settings.py:383 sith/settings_sample.py:369
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:374 sith/settings_sample.py:360
+#: sith/settings.py:384 sith/settings_sample.py:370
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:375 sith/settings_sample.py:361
+#: sith/settings.py:385 sith/settings_sample.py:371
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:376 sith/settings_sample.py:362
+#: sith/settings.py:386 sith/settings_sample.py:372
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:377 sith/settings_sample.py:363
+#: sith/settings.py:387 sith/settings_sample.py:373
 msgid "Curious"
 msgstr "Curieux"
 
@@ -2035,5 +2048,3 @@ msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
 
-#~ msgid "User Profile"
-#~ msgstr "Profil de l'utilisateur"

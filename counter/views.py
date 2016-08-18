@@ -44,7 +44,8 @@ class GetUserForm(forms.Form):
         elif cleaned_data['id'] is not None:
             cus = Customer.objects.filter(user=cleaned_data['id']).first()
         sub = get_subscriber(cus.user) if cus is not None else None
-        if cus is None or sub is None or (date.today() - sub.subscriptions.last().subscription_end) > timedelta(days=90):
+        if (cus is None or sub is None or not sub.subscriptions.last() or
+            (date.today() - sub.subscriptions.last().subscription_end) > timedelta(days=90)):
             raise forms.ValidationError(_("User not found"))
         cleaned_data['user_id'] = cus.user.id
         cleaned_data['user'] = cus.user

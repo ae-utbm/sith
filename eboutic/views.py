@@ -14,10 +14,9 @@ from django.db import transaction, DataError
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
-from counter.models import Product, Customer, Counter
+from counter.models import Product, Customer, Counter, ProductType, Selling
 from eboutic.models import Basket, Invoice, BasketItem, InvoiceItem
 
-# Create your views here.
 class EbouticMain(TemplateView):
     template_name = 'eboutic/eboutic_main.jinja'
 
@@ -72,6 +71,7 @@ class EbouticMain(TemplateView):
         kwargs = super(EbouticMain, self).get_context_data(**kwargs)
         kwargs['basket'] = self.basket
         kwargs['eboutic'] = Counter.objects.filter(type="EBOUTIC").first()
+        kwargs['categories'] = ProductType.objects.all()
         return kwargs
 
 class EbouticCommand(TemplateView):
@@ -125,7 +125,7 @@ class EbouticPayWithSith(TemplateView):
                 if 'basket_id' not in request.session.keys() or not request.user.is_authenticated():
                     return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
                 b = Basket.objects.filter(id=request.session['basket_id']).first()
-                if b is None or b.items.filter(type="REFILLING").exists():
+                if b is None or b.items.filter(type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING).exists():
                     return HttpResponseRedirect(reverse_lazy('eboutic:main', args=self.args, kwargs=kwargs))
                 c = Customer.objects.filter(user__id=b.user.id).first()
                 if c is None:
@@ -134,14 +134,20 @@ class EbouticPayWithSith(TemplateView):
                 if c.amount < b.get_total():
                     raise DataError(_("You do not have enough money to buy the basket"))
                 else:
-                    i = Invoice()
-                    i.user = b.user
-                    i.payment_method = "SITH_ACCOUNT"
-                    i.save()
+                    eboutic = Counter.objects.filter(type="EBOUTIC").first()
                     for it in b.items.all():
-                        InvoiceItem(invoice=i, product_id=it.product_id, product_name=it.product_name, type=it.type,
-                                product_unit_price=it.product_unit_price, quantity=it.quantity).save()
-                    i.validate()
+                        product = Product.objects.filter(id=it.product_id).first()
+                        Selling(
+                                label=it.product_name,
+                                counter=eboutic,
+                                club=product.club,
+                                product=product,
+                                seller=c.user,
+                                customer=c,
+                                unit_price=it.product_unit_price,
+                                quantity=it.quantity,
+                                payment_method="SITH_ACCOUNT",
+                                ).save()
                     b.delete()
                     kwargs['not_enough'] = False
                     request.session.pop('basket_id', None)
@@ -172,10 +178,10 @@ class EtransactionAutoAnswer(View):
                     return HttpResponse("Basket does not exists", status=400)
                 i = Invoice()
                 i.user = b.user
-                i.payment_method = "CREDIT_CARD"
+                i.payment_method = "CARD"
                 i.save()
                 for it in b.items.all():
-                    InvoiceItem(invoice=i, product_id=it.product_id, product_name=it.product_name, type=it.type,
+                    InvoiceItem(invoice=i, product_id=it.product_id, product_name=it.product_name, type_id=it.type_id,
                         product_unit_price=it.product_unit_price, quantity=it.quantity).save()
                 i.validate()
                 b.delete()

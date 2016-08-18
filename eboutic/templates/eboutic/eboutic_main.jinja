@@ -1,5 +1,9 @@
 {% extends "core/base.jinja" %}
 
+{% block title %}
+{% trans %}Eboutic{% endtrans %}
+{% endblock %}
+
 {% macro add_product(id, content) %}
 <form method="post" action="{{ url('eboutic:main') }}" class="inline" style="display:inline">
     {% csrf_token %}
@@ -34,11 +38,14 @@
     </form>
 </div>
 <div>
-    <p><strong>{% trans %}Products: {% endtrans %}</strong>
-    {% for p in eboutic.products.all() %}
-    {{ add_product(p.id, p.name) }}
+    {% for t in categories %}
+    {% if eboutic.products.filter(product_type=t).exists() %}
+        <h5>{{ t }}</h5>
+        {% for p in eboutic.products.filter(product_type=t).all() %}
+        {{ add_product(p.id, p.name) }}
+        {% endfor %}
+    {% endif %}
     {% endfor %}
-    </p>
 </div>
 
 {% endblock %}

@@ -281,6 +281,7 @@ SITH_COUNTER_BARS = [
 SITH_COUNTER_PAYMENT_METHOD = [
         ('CHECK', _('Check')),
         ('CASH', _('Cash')),
+        ('CARD', _('Credit card')),
         ]
 
 SITH_COUNTER_BANK = [
@@ -295,6 +296,9 @@ SITH_COUNTER_BANK = [
         ('CREDIT-LYONNAIS', 'Credit Lyonnais'),
         ('LA-POSTE', 'La Poste'),
         ]
+
+# Defines which product type is the refilling type, and thus increases the account amount
+SITH_COUNTER_PRODUCTTYPE_REFILLING = 11
 
 # Subscription durations are in semestres
 # Be careful, modifying this parameter will need a migration to be applied

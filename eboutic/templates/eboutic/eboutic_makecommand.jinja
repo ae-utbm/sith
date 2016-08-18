@@ -1,5 +1,9 @@
 {% extends "core/base.jinja" %}
 
+{% block title %}
+{% trans %}Basket state{% endtrans %}
+{% endblock %}
+
 {% block content %}
 <h3>{% trans %}Eboutic{% endtrans %}</h3>
 
@@ -30,7 +34,7 @@
         {% endfor %}
         <input type="submit" value="{% trans %}Pay with credit card{% endtrans %}" />
     </form>
-    {% if basket.items.filter(type="REFILLING").exists() %}
+    {% if basket.items.filter(type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING).exists() %}
     <p>{% trans %}AE account payment disabled because your basket contains refilling items.{% endtrans %}</p>
     {% else %}
     <form method="post" action="{{ url('eboutic:pay_with_sith') }}">

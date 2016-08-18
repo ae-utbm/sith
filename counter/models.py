@@ -5,7 +5,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.forms import ValidationError
 
-from datetime import timedelta
+from datetime import timedelta, datetime
+from pytz import timezone
 import random
 import string
 
@@ -206,7 +207,7 @@ class Refilling(models.Model):
     amount = CurrencyField(_('amount'))
     operator = models.ForeignKey(User, related_name="refillings_as_operator", blank=False)
     customer = models.ForeignKey(Customer, related_name="refillings", blank=False)
-    date = models.DateTimeField(_('date'), auto_now=True)
+    date = models.DateTimeField(_('date'))
     payment_method = models.CharField(_('payment method'), max_length=255,
             choices=settings.SITH_COUNTER_PAYMENT_METHOD, default='CASH')
     bank = models.CharField(_('bank'), max_length=255,
@@ -223,6 +224,8 @@ class Refilling(models.Model):
     #     return reverse('counter:details', kwargs={'counter_id': self.id})
 
     def save(self, *args, **kwargs):
+        if not self.date:
+            self.date = datetime.now().replace(tzinfo=timezone(settings.TIME_ZONE))
         self.full_clean()
         if not self.is_validated:
             self.customer.amount += self.amount
@@ -235,14 +238,16 @@ class Selling(models.Model):
     Handle the sellings
     """
     label = models.CharField(_("label"), max_length=64)
-    product = models.ForeignKey(Product, related_name="sellings", null=True, blank=True)
-    counter = models.ForeignKey(Counter, related_name="sellings", blank=False)
-    club = models.ForeignKey(Club, related_name="sellings", blank=False)
+    product = models.ForeignKey(Product, related_name="sellings", null=True, blank=True, on_delete=models.SET_NULL)
+    counter = models.ForeignKey(Counter, related_name="sellings", null=True, blank=False, on_delete=models.SET_NULL)
+    club = models.ForeignKey(Club, related_name="sellings", null=True, blank=False, on_delete=models.SET_NULL)
     unit_price = CurrencyField(_('unit price'))
     quantity = models.IntegerField(_('quantity'))
-    seller = models.ForeignKey(User, related_name="sellings_as_operator", blank=False)
-    customer = models.ForeignKey(Customer, related_name="buyings", blank=False)
-    date = models.DateTimeField(_('date'), auto_now=True)
+    seller = models.ForeignKey(User, related_name="sellings_as_operator", null=True, blank=False, on_delete=models.SET_NULL)
+    customer = models.ForeignKey(Customer, related_name="buyings", null=True, blank=False, on_delete=models.SET_NULL)
+    date = models.DateTimeField(_('date'))
+    payment_method = models.CharField(_('payment method'), max_length=255,
+            choices=[('SITH_ACCOUNT', _('Sith account')), ('CARD', _('Credit card'))], default='SITH_ACCOUNT')
     is_validated = models.BooleanField(_('is validated'), default=False)
 
     class Meta:
@@ -253,6 +258,8 @@ class Selling(models.Model):
                 self.quantity*self.unit_price, self.customer.user.get_display_name())
 
     def save(self, *args, **kwargs):
+        if not self.date:
+            self.date = datetime.now().replace(tzinfo=timezone(settings.TIME_ZONE))
         self.full_clean()
         if not self.is_validated:
             self.customer.amount -= self.quantity * self.unit_price

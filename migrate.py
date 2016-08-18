@@ -20,6 +20,7 @@ from core.models import User, SithFile
 from club.models import Club, Membership
 from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType
 from subscription.models import Subscription, Subscriber
+from eboutic.models import Invoice, InvoiceItem
 
 db = MySQLdb.connect(
         host="ae-db",
@@ -142,7 +143,6 @@ def migrate_users():
         except Exception as e:
             print("FAIL for user %s: %s" % (u['id_utilisateur'], repr(e)))
     c.close()
-    reset_index('core')
 
 def migrate_profile_pict():
     PROFILE_ROOT = "/data/matmatronch/"
@@ -357,8 +357,8 @@ def migrate_refillings():
     SELECT *
     FROM cpt_rechargements
     """)
-    Refilling.objects.all().delete()
-    print("Refillings deleted")
+    Refilling.objects.filter(payment_method="SITH_ACCOUNT").delete()
+    print("Sith account refillings deleted")
     for c in Customer.objects.all():
         c.amount = 0
         c.save()
@@ -386,11 +386,8 @@ def migrate_refillings():
                     operator=op or root_cust.user,
                     amount=r['montant_rech']/100,
                     bank=BANK[r['banque_rech']],
+                    date=r['date_rech'].replace(tzinfo=timezone('Europe/Paris')),
                     )
-            for f in new._meta.local_fields:
-                if f.name == "date":
-                    f.auto_now = False
-            new.date = r['date_rech'].replace(tzinfo=timezone('Europe/Paris'))
             new.save()
         except Exception as e:
                 print("FAIL to migrate refilling %s for %s: %s" % (r['id_rechargement'], r['id_utilisateur'], repr(e)))
@@ -434,15 +431,71 @@ def migrate_products():
                     name=to_unicode(r['nom_prod']),
                     description=to_unicode(r['description_prod']),
                     code=to_unicode(r['cbarre_prod']),
-                    purchase_price=r['prix_achat_prod'],
-                    selling_price=r['prix_vente_prod'],
-                    special_selling_price=r['prix_vente_barman_prod'],
+                    purchase_price=r['prix_achat_prod']/100,
+                    selling_price=r['prix_vente_prod']/100,
+                    special_selling_price=r['prix_vente_barman_prod']/100,
                     club=club,
                     )
             new.save()
         except Exception as e:
                 print("FAIL to migrate product %s: %s" % (r['nom_prod'], repr(e)))
     cur.close()
+
+def migrate_products_to_counter():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_mise_en_vente
+    """)
+    for r in cur:
+        try:
+            product = Product.objects.filter(id=r['id_produit']).first()
+            counter = Counter.objects.filter(id=r['id_comptoir']).first()
+            counter.products.add(product)
+            counter.save()
+        except Exception as e:
+                print("FAIL to set product %s in counter %s: %s" % (product, counter, repr(e)))
+    cur.close()
+
+def migrate_invoices():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_vendu ven
+    LEFT JOIN cpt_debitfacture fac
+    ON ven.id_facture = fac.id_facture
+    WHERE fac.mode_paiement = 'SG'
+    """)
+    Invoice.objects.all().delete()
+    print("Invoices deleted")
+    Refilling.objects.filter(payment_method="CARD").delete()
+    print("Card refillings deleted")
+    Selling.objects.filter(payment_method="CARD").delete()
+    print("Card sellings deleted")
+    root = User.objects.filter(id=0).first()
+    for r in cur:
+        try:
+            product = Product.objects.filter(id=r['id_produit']).first()
+            user = User.objects.filter(id=r['id_utilisateur_client']).first()
+            i = Invoice.objects.filter(id=r['id_facture']).first() or Invoice(id=r['id_facture'])
+            i.user = user or root
+            for f in i._meta.local_fields:
+                if f.name == "date":
+                    f.auto_now = False
+            i.date = r['date_facture'].replace(tzinfo=timezone('Europe/Paris'))
+            i.save()
+            InvoiceItem(invoice=i, product_id=product.id, product_name=product.name, type_id=product.product_type.id,
+                    product_unit_price=r['prix_unit']/100, quantity=r['quantite']).save()
+        except ValidationError as e:
+            print(repr(e) + " for %s (%s)" % (customer, customer.user.id))
+        except Exception as e:
+            print("FAIL to migrate invoice %s: %s" % (r['id_facture'], repr(e)))
+    cur.close()
+    for i in Invoice.objects.all():
+        for f in i._meta.local_fields:
+            if f.name == "date":
+                f.auto_now = False
+        i.validate()
 
 def migrate_sellings():
     cur = db.cursor(MySQLdb.cursors.SSDictCursor)
@@ -453,8 +506,8 @@ def migrate_sellings():
     ON ven.id_facture = fac.id_facture
     WHERE fac.mode_paiement = 'AE'
     """)
-    Selling.objects.all().delete()
-    print("Selling deleted")
+    Selling.objects.filter(payment_method="SITH_ACCOUNT").delete()
+    print("Sith account selling deleted")
     for r in cur:
         try:
             product = Product.objects.filter(id=r['id_produit']).first()
@@ -471,17 +524,16 @@ def migrate_sellings():
                     customer=customer,
                     unit_price=r['prix_unit']/100,
                     quantity=r['quantite'],
+                    payment_method="SITH_ACCOUNT",
+                    date=r['date_facture'].replace(tzinfo=timezone('Europe/Paris')),
                     )
-            for f in new._meta.local_fields:
-                if f.name == "date":
-                    f.auto_now = False
-            new.date = r['date_facture'].replace(tzinfo=timezone('Europe/Paris'))
             new.save()
         except ValidationError as e:
             print(repr(e) + " for %s (%s)" % (customer, customer.user.id))
         except Exception as e:
             print("FAIL to migrate selling %s: %s" % (r['id_facture'], repr(e)))
     cur.close()
+
 
 def main():
     # migrate_users()
@@ -491,10 +543,13 @@ def main():
     # migrate_subscriptions()
     # update_customer_account()
     # migrate_counters()
+    # migrate_typeproducts()
+    # migrate_products()
+    # migrate_products_to_counter()
+    migrate_invoices()
     migrate_refillings()
-    migrate_typeproducts()
-    migrate_products()
     migrate_sellings()
+    reset_index('core', 'counter')
 
 if __name__ == "__main__":
     main()
