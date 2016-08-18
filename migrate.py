@@ -337,6 +337,15 @@ def migrate_counters():
                 print("FAIL to migrate counter %s: %s" % (r['id_comptoir'], repr(e)))
     cur.close()
 
+def reset_customer_amount():
+    Refilling.objects.all().delete()
+    Selling.objects.all().delete()
+    Invoice.objects.all().delete()
+    for c in Customer.objects.all():
+        c.amount = 0
+        c.save()
+    print("Customer amount reset")
+
 def migrate_refillings():
     BANK = {
             0: "OTHER",
@@ -359,10 +368,6 @@ def migrate_refillings():
     """)
     Refilling.objects.filter(payment_method="SITH_ACCOUNT").delete()
     print("Sith account refillings deleted")
-    for c in Customer.objects.all():
-        c.amount = 0
-        c.save()
-    print("Customer amount reset")
     fail = 100
     root_cust = Customer.objects.filter(user__id=0).first()
     mde = Counter.objects.filter(id=1).first()
@@ -546,6 +551,7 @@ def main():
     # migrate_typeproducts()
     # migrate_products()
     # migrate_products_to_counter()
+    reset_customer_amount()
     migrate_invoices()
     migrate_refillings()
     migrate_sellings()

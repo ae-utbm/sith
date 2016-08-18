@@ -17,6 +17,8 @@ urlpatterns = [
     url(r'^admin/producttype/list$', ProductTypeListView.as_view(), name='producttype_list'),
     url(r'^admin/producttype/create$', ProductTypeCreateView.as_view(), name='new_producttype'),
     url(r'^admin/producttype/(?P<type_id>[0-9]+)$', ProductTypeEditView.as_view(), name='producttype_edit'),
+    url(r'^admin/selling/(?P<selling_id>[0-9]+)/delete$', SellingDeleteView.as_view(), name='selling_delete'),
+    url(r'^admin/refilling/(?P<refilling_id>[0-9]+)/delete$', RefillingDeleteView.as_view(), name='refilling_delete'),
 ]
 
 

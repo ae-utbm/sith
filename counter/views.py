@@ -410,3 +410,26 @@ class ProductEditView(CanEditPropMixin, UpdateView):
     template_name = 'core/edit.jinja'
     # TODO: add management of the 'counters' ForeignKey
 
+
+class RefillingDeleteView(CanEditPropMixin, DeleteView):
+    """
+    Delete a refilling (for the admins)
+    """
+    model = Refilling
+    pk_url_kwarg = "refilling_id"
+    template_name = 'core/delete_confirm.jinja'
+
+    def get_success_url(self):
+        return reverse_lazy('core:user_account', kwargs={'user_id': self.object.customer.user.id})
+
+class SellingDeleteView(CanEditPropMixin, DeleteView):
+    """
+    Delete a selling (for the admins)
+    """
+    model = Selling
+    pk_url_kwarg = "selling_id"
+    template_name = 'core/delete_confirm.jinja'
+
+    def get_success_url(self):
+        return reverse_lazy('core:user_account', kwargs={'user_id': self.object.customer.user.id})
+

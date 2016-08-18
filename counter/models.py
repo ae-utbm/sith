@@ -5,8 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.forms import ValidationError
 
-from datetime import timedelta, datetime
-from pytz import timezone
+from datetime import timedelta
 import random
 import string
 
@@ -188,7 +187,7 @@ class Counter(models.Model):
 
     def get_random_barman(self):
         bl = self.get_barmen_list()
-        return bl[randrange(0, len(bl))]
+        return bl[random.randrange(0, len(bl))]
 
     def is_open(self):
         response = False
@@ -220,12 +219,20 @@ class Refilling(models.Model):
     def __str__(self):
         return "Refilling: %.2f for %s" % (self.amount, self.customer.user.get_display_name())
 
+    def is_owned_by(self, user):
+        return user.can_edit(self.counter) and self.payment_method != "CARD"
+
     # def get_absolute_url(self):
     #     return reverse('counter:details', kwargs={'counter_id': self.id})
 
+    def delete(self, *args, **kwargs):
+        self.customer.amount -= self.amount
+        self.customer.save()
+        super(Refilling, self).delete(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         if not self.date:
-            self.date = datetime.now().replace(tzinfo=timezone(settings.TIME_ZONE))
+            self.date = timezone.now()
         self.full_clean()
         if not self.is_validated:
             self.customer.amount += self.amount
@@ -257,9 +264,17 @@ class Selling(models.Model):
         return "Selling: %d x %s (%f) for %s" % (self.quantity, self.label,
                 self.quantity*self.unit_price, self.customer.user.get_display_name())
 
+    def is_owned_by(self, user):
+        return user.can_edit(self.counter) and self.payment_method != "CARD"
+
+    def delete(self, *args, **kwargs):
+        self.customer.amount += self.quantity * self.unit_price
+        self.customer.save()
+        super(Selling, self).delete(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         if not self.date:
-            self.date = datetime.now().replace(tzinfo=timezone(settings.TIME_ZONE))
+            self.date = timezone.now()
         self.full_clean()
         if not self.is_validated:
             self.customer.amount -= self.quantity * self.unit_price
