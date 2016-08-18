@@ -104,7 +104,7 @@ def migrate_users():
     User.objects.filter(id__gt=0).delete()
     print("Users deleted")
 
-    for u in c.fetchall():
+    for u in c:
         try:
             new = User(
                     id=u['id_utilisateur'],
@@ -192,7 +192,7 @@ def migrate_clubs():
     # for k,v in club.items():
     #     print("%40s | %40s" % (k, v))
 
-    for c in cur.fetchall():
+    for c in cur:
         try:
             new = Club(
                     id=c['id_asso'],
@@ -207,7 +207,7 @@ def migrate_clubs():
     SELECT *
     FROM asso
     """)
-    for c in cur.fetchall():
+    for c in cur:
         club = Club.objects.filter(id=c['id_asso']).first()
         parent = Club.objects.filter(id=c['id_asso_parent']).first()
         club.parent = parent
@@ -223,7 +223,7 @@ def migrate_club_memberships():
 
     Membership.objects.all().delete()
     print("Memberships deleted")
-    for m in cur.fetchall():
+    for m in cur:
         try:
             club = Club.objects.filter(id=m['id_asso']).first()
             user = User.objects.filter(id=m['id_utilisateur']).first()
@@ -280,7 +280,7 @@ def migrate_subscriptions():
     print("Subscriptions deleted")
     Customer.objects.all().delete()
     print("Customers deleted")
-    for r in cur.fetchall():
+    for r in cur:
         try:
             user = Subscriber.objects.filter(id=r['id_utilisateur']).first()
             if user:
@@ -306,7 +306,7 @@ def update_customer_account():
     JOIN ae_cotisations cotis
     ON carte.id_cotisation = cotis.id_cotisation
     """)
-    for r in cur.fetchall():
+    for r in cur:
         try:
             user = Customer.objects.filter(user_id=r['id_utilisateur']).first()
             if user:
@@ -323,7 +323,7 @@ def migrate_counters():
     FROM cpt_comptoir
     """)
     Counter.objects.all().delete()
-    for r in cur.fetchall():
+    for r in cur:
         try:
             club = Club.objects.filter(id=r['id_assocpt']).first()
             new = Counter(
@@ -366,7 +366,7 @@ def migrate_refillings():
     fail = 100
     root_cust = Customer.objects.filter(user__id=0).first()
     mde = Counter.objects.filter(id=1).first()
-    for r in cur.fetchall():
+    for r in cur:
         try:
             cust = Customer.objects.filter(user__id=r['id_utilisateur']).first()
             user = User.objects.filter(id=r['id_utilisateur']).first()
@@ -404,7 +404,7 @@ def migrate_typeproducts():
     """)
     ProductType.objects.all().delete()
     print("Product types deleted")
-    for r in cur.fetchall():
+    for r in cur:
         try:
             new = ProductType(
                     id=r['id_typeprod'],
@@ -424,7 +424,7 @@ def migrate_products():
     """)
     Product.objects.all().delete()
     print("Product deleted")
-    for r in cur.fetchall():
+    for r in cur:
         try:
             type = ProductType.objects.filter(id=r['id_typeprod']).first()
             club = Club.objects.filter(id=r['id_assocpt']).first()
