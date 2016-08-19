@@ -29,19 +29,25 @@ class ManageModelMixin:
         serializer = self.get_serializer(self.queryset)
         return Response(serializer.data)
 
-class RightReadOnlyModelViewSet(ManageModelMixin, viewsets.ReadOnlyModelViewSet):
+class RightModelViewSet(ManageModelMixin, viewsets.ModelViewSet):
 
     def dispatch(self, request, *arg, **kwargs):
-        res = super(RightReadOnlyModelViewSet,
+        res = super(RightModelViewSet,
                     self).dispatch(request, *arg, **kwargs)
         obj = self.queryset
         user = self.request.user
         try:
-            if (check_if(obj, user, can_view)):
+            if (request.method == 'GET' and check_if(obj, user, can_view)):
+                return res
+            if (request.method != 'GET' and check_if(obj, user, can_edit)):
                 return res
         except: pass # To prevent bug with Anonymous user
         raise PermissionDenied
 
 
 from .api import *
-from .serializers import *
+from .counter import *
+from .user import *
+from .club import *
+from .group import *
+from .launderette import *
