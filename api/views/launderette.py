@@ -9,10 +9,12 @@ from api.views import RightModelViewSet
 class LaunderettePlaceSerializer(serializers.ModelSerializer):
 
     machine_list = serializers.ListField(
-        child=serializers.IntegerField()
+        child=serializers.IntegerField(),
+        read_only=True
     )
     token_list = serializers.ListField(
-        child=serializers.IntegerField()
+        child=serializers.IntegerField(),
+        read_only=True
     )
 
     class Meta:
@@ -24,7 +26,7 @@ class LaunderetteMachineSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Machine
-        fields = ('id', 'name', 'is_working', 'launderette')
+        fields = ('id', 'name', 'type', 'is_working', 'launderette')
 
 class LaunderetteTokenSerializer(serializers.ModelSerializer):
 
