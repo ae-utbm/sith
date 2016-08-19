@@ -18,21 +18,25 @@ def index(request, context=None):
 def search(query, as_json=False):
     result = {'users': None, 'clubs': None}
     if query:
-        nicks = User.objects.filter(nick_name__icontains=query).all()
-        users = User.objects.filter(Q(first_name__icontains=query) | Q(last_name__icontains=query)).all()
+        exact_nick = User.objects.filter(nick_name__iexact=query).all()
+        nicks = User.objects.filter(nick_name__icontains=query).exclude(id__in=exact_nick).all()
+        users = User.objects.filter(Q(first_name__icontains=query) |
+                Q(last_name__icontains=query)).exclude(id__in=exact_nick).exclude(id__in=nicks).all()
         clubs = Club.objects.filter(name__icontains=query).all()
         nicks = nicks[:5]
         users = users[:5]
         clubs = clubs[:5]
         if as_json: # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
+            exact_nick = json.loads(serializers.serialize('json', exact_nick, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
             nicks = json.loads(serializers.serialize('json', nicks, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
             users = json.loads(serializers.serialize('json', users, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
             clubs = json.loads(serializers.serialize('json', clubs, fields=('name')))
         else:
-            nicks = list(nicks.all())
-            users = list(users.all())
-            clubs = list(clubs.all())
-        result['users'] = nicks + users
+            exact_nick = list(exact_nick)
+            nicks = list(nicks)
+            users = list(users)
+            clubs = list(clubs)
+        result['users'] = exact_nick + nicks + users
         result['clubs'] = clubs
     return result
 
