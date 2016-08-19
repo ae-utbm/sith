@@ -26,7 +26,11 @@ header a {
 header a:hover {
     color: #2D3;
 }
-
+header form {
+    display: inline-block;
+    padding: 1em;
+    width: 150px;
+}
 #popupheader {
     width: 88%;
     margin: 0px auto;
@@ -184,6 +188,24 @@ tbody>tr:hover {
 }
 #user_profile .promo_pict {
    height: 45px;
+}
+.mini_profile_link {
+    display: block;
+    text-decoration: none;
+}
+.mini_profile_link span {
+    display: inline-block;
+    width: 50px;
+    vertical-align: middle;
+}
+.mini_profile_link em {
+    vertical-align: middle;
+}
+.mini_profile_link img {
+    max-width: 40px;
+    max-height: 60px;
+    margin: 2px auto;
+    display: block;
 }
 /*---------------------------------PAGE--------------------------------*/
 .page_content {

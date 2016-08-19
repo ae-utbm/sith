@@ -513,13 +513,17 @@ def migrate_sellings():
     """)
     Selling.objects.filter(payment_method="SITH_ACCOUNT").delete()
     print("Sith account selling deleted")
+    ae = Club.objects.filter(unix_name="ae").first()
+    mde = Counter.objects.filter(id=1).first()
+    root = User.objects.filter(id=0).first()
+    beer = Product.objects.filter(id=1).first()
     for r in cur:
         try:
-            product = Product.objects.filter(id=r['id_produit']).first()
-            club = Club.objects.filter(id=r['id_assocpt']).first()
-            counter = Counter.objects.filter(id=r['id_comptoir']).first()
-            op = User.objects.filter(id=r['id_utilisateur']).first()
-            customer = Customer.objects.filter(user__id=r['id_utilisateur_client']).first()
+            product = Product.objects.filter(id=r['id_produit']).first() or beer
+            club = Club.objects.filter(id=r['id_assocpt']).first() or ae
+            counter = Counter.objects.filter(id=r['id_comptoir']).first() or mde
+            op = User.objects.filter(id=r['id_utilisateur']).first() or root
+            customer = Customer.objects.filter(user__id=r['id_utilisateur_client']).first() or root.customer
             new = Selling(
                     label=product.name,
                     counter=counter,
@@ -570,6 +574,7 @@ def main():
     # migrate_subscriptions()
     # update_customer_account()
     # migrate_counters()
+    # migrate_permanencies()
     # migrate_typeproducts()
     # migrate_products()
     # migrate_products_to_counter()
@@ -577,7 +582,6 @@ def main():
     # migrate_invoices()
     # migrate_refillings()
     # migrate_sellings()
-    # migrate_permanencies()
     reset_index('core', 'counter')
 
 if __name__ == "__main__":

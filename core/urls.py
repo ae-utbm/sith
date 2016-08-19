@@ -4,6 +4,8 @@ from core.views import *
 
 urlpatterns = [
     url(r'^$', index, name='index'),
+    url(r'^search/$', search_view, name='search'),
+    url(r'^search_json/$', search_json, name='search_json'),
 
     # Login and co
     url(r'^login/$', login, name='login'),
@@ -50,5 +52,4 @@ urlpatterns = [
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/hist$', PageHistView.as_view(), name='page_hist'),
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/rev/(?P<rev>[0-9]+)/', PageRevView.as_view(), name='page_rev'),
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/$', PageView.as_view(), name='page'),
-
 ]

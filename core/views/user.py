@@ -134,7 +134,14 @@ class UserStatsView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserStatsView, self).get_context_data(**kwargs)
-        kwargs['total_time'] = sum([p.end-p.start for p in self.object.permanencies.all()], timedelta())
+        from counter.models import Counter
+        foyer = Counter.objects.filter(name="Foyer").first()
+        mde = Counter.objects.filter(name="MDE").first()
+        gommette = Counter.objects.filter(name="La Gommette").first()
+        kwargs['total_perm_time'] = sum([p.end-p.start for p in self.object.permanencies.all()], timedelta())
+        kwargs['total_foyer_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=foyer)], timedelta())
+        kwargs['total_mde_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=mde)], timedelta())
+        kwargs['total_gommette_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=gommette)], timedelta())
         return kwargs
 
 class UserMiniView(CanViewMixin, DetailView):
