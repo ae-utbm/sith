@@ -7,6 +7,10 @@ from django.db.models.query import QuerySet
 from core.views import can_view, can_edit
 
 def check_if(obj, user, test):
+    """
+        Detect if it's a single object or a queryset
+        aply a given test on individual object and return global permission
+    """
     if (isinstance(obj, QuerySet)):
         for o in obj:
             if (test(o, user) is False):
@@ -15,8 +19,7 @@ def check_if(obj, user, test):
     else:
         return test(obj, user)
 
-class RightManagedModelViewSet(viewsets.ReadOnlyModelViewSet):
-
+class ManageModelMixin:
     @detail_route()
     def id(self, request, pk=None):
         """
@@ -26,8 +29,10 @@ class RightManagedModelViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(self.queryset)
         return Response(serializer.data)
 
+class RightReadOnlyModelViewSet(ManageModelMixin, viewsets.ReadOnlyModelViewSet):
+
     def dispatch(self, request, *arg, **kwargs):
-        res = super(RightManagedModelViewSet,
+        res = super(RightReadOnlyModelViewSet,
                     self).dispatch(request, *arg, **kwargs)
         obj = self.queryset
         user = self.request.user

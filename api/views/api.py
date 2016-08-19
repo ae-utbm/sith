@@ -14,7 +14,7 @@ from club.models import Club
 from launderette.models import Launderette, Machine, Token
 
 from api.views import serializers
-from api.views import RightManagedModelViewSet
+from api.views import RightReadOnlyModelViewSet
 
 @api_view(['GET'])
 def RenderMarkdown(request):
@@ -25,7 +25,7 @@ def RenderMarkdown(request):
         return Response(markdown(request.GET['text']))
 
 
-class CounterViewSet(RightManagedModelViewSet):
+class CounterViewSet(RightReadOnlyModelViewSet):
     """
         Manage Counters (api/v1/counter/)
     """
@@ -43,7 +43,7 @@ class CounterViewSet(RightManagedModelViewSet):
         return Response(serializer.data)
 
 
-class UserViewSet(RightManagedModelViewSet):
+class UserViewSet(RightReadOnlyModelViewSet):
     """
         Manage Users (api/v1/user/)
         Only show active users
@@ -63,7 +63,7 @@ class UserViewSet(RightManagedModelViewSet):
         return Response(serializer.data)
 
 
-class ClubViewSet(RightManagedModelViewSet):
+class ClubViewSet(RightReadOnlyModelViewSet):
     """
         Manage Clubs (api/v1/club/)
     """
@@ -71,7 +71,7 @@ class ClubViewSet(RightManagedModelViewSet):
     serializer_class = serializers.ClubRead
     queryset = Club.objects.all()
 
-class GroupViewSet(RightManagedModelViewSet):
+class GroupViewSet(RightReadOnlyModelViewSet):
     """
         Manage Groups (api/v1/group/)
     """
@@ -79,7 +79,7 @@ class GroupViewSet(RightManagedModelViewSet):
     serializer_class = serializers.GroupRead
     queryset = RealGroup.objects.all()
 
-class LaunderettePlaceViewSet(RightManagedModelViewSet):
+class LaunderettePlaceViewSet(RightReadOnlyModelViewSet):
     """
         Manage Launderette (api/v1/launderette/place/)
     """
@@ -87,7 +87,7 @@ class LaunderettePlaceViewSet(RightManagedModelViewSet):
     serializer_class = serializers.LaunderettePlaceRead
     queryset = Launderette.objects.all()
 
-class LaunderetteMachineViewSet(RightManagedModelViewSet):
+class LaunderetteMachineViewSet(RightReadOnlyModelViewSet):
     """
         Manage Washing Machines (api/v1/launderette/machine/)
     """
@@ -95,7 +95,7 @@ class LaunderetteMachineViewSet(RightManagedModelViewSet):
     serializer_class = serializers.LaunderetteMachineRead
     queryset = Machine.objects.all()
 
-class LaunderetteTokenViewSet(RightManagedModelViewSet):
+class LaunderetteTokenViewSet(RightReadOnlyModelViewSet):
     """
         Manage Launderette's tokens (api/v1/launderette/token/)
     """
