@@ -2,6 +2,7 @@ import MySQLdb
 import os
 import django
 import random
+import datetime
 from io import StringIO
 from pytz import timezone
 
@@ -361,17 +362,27 @@ def migrate_refillings():
             100: "OTHER",
             None: "OTHER",
             }
+    PAYMENT = {
+            2: "CARD",
+            1: "CASH",
+            0: "CHECK",
+            }
     cur = db.cursor(MySQLdb.cursors.SSDictCursor)
     cur.execute("""
     SELECT *
     FROM cpt_rechargements
     """)
-    Refilling.objects.filter(payment_method="SITH_ACCOUNT").delete()
-    print("Sith account refillings deleted")
-    fail = 100
     root_cust = Customer.objects.filter(user__id=0).first()
     mde = Counter.objects.filter(id=1).first()
+    threshold_date = datetime.datetime(year=2006, month=3, day=21, hour=22, minute=17)
+    Refilling.objects.filter(payment_method="CASH").delete()
+    Refilling.objects.filter(payment_method="CHECK").delete()
+    Refilling.objects.filter(date__lte=threshold_date.replace(tzinfo=timezone('Europe/Paris'))).delete()
+    print("Sith account refillings deleted")
+    fail = 100
     for r in cur:
+        if r['type_paiement_rech'] == 2 and r['date_rech'] > threshold_date:
+            continue # There are no invoices before threshold_date when paid with credit card
         try:
             cust = Customer.objects.filter(user__id=r['id_utilisateur']).first()
             user = User.objects.filter(id=r['id_utilisateur']).first()
@@ -390,6 +401,7 @@ def migrate_refillings():
                     customer=cust,
                     operator=op or root_cust.user,
                     amount=r['montant_rech']/100,
+                    payment_method=PAYMENT[r['type_paiement_rech']],
                     bank=BANK[r['banque_rech']],
                     date=r['date_rech'].replace(tzinfo=timezone('Europe/Paris')),
                     )
@@ -513,6 +525,10 @@ def migrate_sellings():
     """)
     Selling.objects.filter(payment_method="SITH_ACCOUNT").delete()
     print("Sith account selling deleted")
+    for c in Customer.objects.all():
+        c.amount = sum([r.amount for r in c.refillings.all()])
+        c.save()
+    print("Customer amount reset to sum of refillings")
     ae = Club.objects.filter(unix_name="ae").first()
     mde = Counter.objects.filter(id=1).first()
     root = User.objects.filter(id=0).first()
@@ -580,8 +596,8 @@ def main():
     # migrate_products_to_counter()
     # reset_customer_amount()
     # migrate_invoices()
-    # migrate_refillings()
-    # migrate_sellings()
+    migrate_refillings()
+    migrate_sellings()
     reset_index('core', 'counter')
 
 if __name__ == "__main__":
