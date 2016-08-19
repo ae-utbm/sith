@@ -15,36 +15,57 @@ from club.models import Club
 def index(request, context=None):
     return render(request, "core/index.jinja")
 
-def search(query, as_json=False):
-    result = {'users': None, 'clubs': None}
+def search_user(query, as_json=False):
+    users = []
     if query:
         exact_nick = User.objects.filter(nick_name__iexact=query).all()
         nicks = User.objects.filter(nick_name__icontains=query).exclude(id__in=exact_nick).all()
         users = User.objects.filter(Q(first_name__icontains=query) |
                 Q(last_name__icontains=query)).exclude(id__in=exact_nick).exclude(id__in=nicks).all()
-        clubs = Club.objects.filter(name__icontains=query).all()
         nicks = nicks[:5]
         users = users[:5]
-        clubs = clubs[:5]
         if as_json: # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
             exact_nick = json.loads(serializers.serialize('json', exact_nick, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
             nicks = json.loads(serializers.serialize('json', nicks, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
             users = json.loads(serializers.serialize('json', users, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
-            clubs = json.loads(serializers.serialize('json', clubs, fields=('name')))
         else:
             exact_nick = list(exact_nick)
             nicks = list(nicks)
             users = list(users)
+        users = exact_nick + nicks + users
+    return users
+
+def search_club(query, as_json=False):
+    clubs = []
+    if query:
+        clubs = Club.objects.filter(name__icontains=query).all()
+        clubs = clubs[:5]
+        if as_json: # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
+            clubs = json.loads(serializers.serialize('json', clubs, fields=('name')))
+        else:
             clubs = list(clubs)
-        result['users'] = exact_nick + nicks + users
-        result['clubs'] = clubs
-    return result
+    return clubs
 
 @login_required
 def search_view(request):
-    return render(request, "core/search.jinja", context={'result': search(request.GET.get('query', ''))})
+    result = {
+            'users': search_user(request.GET.get('query', '')),
+            'clubs': search_club(request.GET.get('query', '')),
+            }
+    return render(request, "core/search.jinja", context={'result': result})
+
+@login_required
+def search_user_json(request):
+    result = {
+            'users': search_user(request.GET.get('query', ''), True),
+            }
+    return JsonResponse(result)
 
 @login_required
 def search_json(request):
-    return JsonResponse(search(request.GET.get('query', ''), True))
+    result = {
+            'users': search_user(request.GET.get('query', ''), True),
+            'clubs': search_club(request.GET.get('query', ''), True),
+            }
+    return JsonResponse(result)
 

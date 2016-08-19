@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django_jinja',
     'rest_framework',
+    'ajax_select',
     'core',
     'club',
     'subscription',

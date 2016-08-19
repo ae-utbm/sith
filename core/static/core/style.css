@@ -160,22 +160,31 @@ tbody>tr:hover {
     float: right;
     padding: 10px;
 }
+#user_info_container {
+}
 #user_info {
+    float: right;
+    padding: 5px;
     width: 40%;
     margin: 0px auto;
     background: lightgrey;
 }
 
 /*-----------------------------USER PROFILE----------------------------*/
-#user_profile {
+#user_profile_container {
     width: 80%;
+    margin: 0px auto;
+}
+#user_profile {
+    width: 100%;
     margin: 0px auto;
     padding: 10px;
     overflow: auto;
 }
 #user_profile h4 { border-bottom: 1px solid grey; max-width: 60%; }
 #user_profile #pictures {
-   width: 30%;
+   max-width: 250px;
+   max-height: 300px;
    float: right;
    font-style: italic;
 }
@@ -238,7 +247,14 @@ footer{
     text-align: center;
 }
 
-/*--------------------------------MODALE-------------------------------*/
+/*---------------------------------FORMS-------------------------------*/
+form {
+    margin: 0px auto;
+    width: 60%;
+}
+label {
+    display: block;
+}
 .choose_file_widget {
     display: none;
 }
@@ -247,24 +263,10 @@ footer{
     position: absolute;
     width: 97%;
 }
-.form-wrapper {
-    display: inline-block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #DDD;
-    opacity: 0.8;
-    padding: 15px;
-    border-radius: 4px;
+#user_edit * {
+    text-align: center;
+
 }
-.form-wrapper>form {
-    display: inline-block;
-    position: absolute;
-    padding: 15px;
-    border-radius: 4px;
-    left: 30%;
-    top: 40%;
-    background-color: white;
+#user_edit img {
+    width: 100px;
 }

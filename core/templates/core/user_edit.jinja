@@ -6,19 +6,19 @@
 
 {% block infos %}
 <h2>{% trans %}Edit user profile{% endtrans %}</h2>
-<form action="" method="post" enctype="multipart/form-data">
+<form action="" method="post" enctype="multipart/form-data" id="user_edit">
     {% csrf_token %}
     {% for field in form %}
     <p>{{ field.errors }}<label for="{{ field.name }}">{{ field.label }}
     {%- if field.name == "profile_pict" and form.instance.profile_pict -%}
     <br>{% trans %}Current profile: {% endtrans %}
-    <img src="{{ form.instance.profile_pict.get_download_url() }}" title="{% trans %}Profile{% endtrans %}" width="50px" /><br>
+    <img src="{{ form.instance.profile_pict.get_download_url() }}" title="{% trans %}Profile{% endtrans %}" /><br>
     {%- elif field.name == "avatar_pict" and form.instance.avatar_pict -%}
     <br>{% trans %}Current avatar: {% endtrans %}
-    <img src="{{ form.instance.avatar_pict.get_download_url() }}" title="{% trans %}Avatar{% endtrans %}" width="50px" /><br>
+    <img src="{{ form.instance.avatar_pict.get_download_url() }}" title="{% trans %}Avatar{% endtrans %}" /><br>
     {%- elif field.name == "scrub_pict" and form.instance.scrub_pict -%}
     <br>{% trans %}Current scrub: {% endtrans %}
-    <img src="{{ form.instance.scrub_pict.get_download_url() }}" title="{% trans %}Scrub{% endtrans %}" width="50px" /><br>
+    <img src="{{ form.instance.scrub_pict.get_download_url() }}" title="{% trans %}Scrub{% endtrans %}" /><br>
     {%- endif %}</label> {{ field }}</p>
     {% endfor %}
     <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>

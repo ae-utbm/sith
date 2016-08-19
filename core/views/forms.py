@@ -52,6 +52,20 @@ class SelectFile(TextInput):
         output += '<span name="' + name + '" class="choose_file_button">' + _("Choose file") + '</span>'
         return output
 
+class SelectUser(TextInput):
+    def render(self, name, value, attrs=None):
+        if attrs:
+            attrs['class'] = "select_user"
+        else:
+            attrs = {'class': "select_user"}
+        output = '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>' % {
+                'content': super(SelectUser, self).render(name, value, attrs),
+                'title': _("Choose user"),
+                'name': name,
+                }
+        output += '<span name="' + name + '" class="choose_user_button">' + _("Choose user") + '</span>'
+        return output
+
 # Forms
 
 class RegisteringForm(UserCreationForm):

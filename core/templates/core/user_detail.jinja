@@ -6,31 +6,33 @@
 
 {% block infos %}
 
-<div id="user_profile">
-    <div id="pictures">
-        {% if profile.profile_pict %}
-        <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" />
+<div id="user_profile_container">
+    <div id="user_profile">
+        <div id="pictures">
+            {% if profile.profile_pict %}
+            <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" />
+            {% endif %}
+            <p><em>{{ profile.quote }}</em></p>
+        </div>
+        <h4>{{ profile.get_full_name() }}</h4>
+        {% if profile.nick_name %}
+        <p id="nickname">&laquo; {{ profile.nick_name }} &raquo;</p>
         {% endif %}
-        <p><em>{{ profile.quote }}</em></p>
+        {% if profile.date_of_birth %}
+        <p>{% trans %}Born: {% endtrans %}{{ profile.date_of_birth|date("d/m/Y") }}</p>
+        {% endif %}
+        {% if profile.department != "NA" %}
+        <p>{{ profile.department }}{{ profile.semester }}
+        {% endif %}
+        {% if profile.dpt_option %}
+        <br>{% trans %}Option: {% endtrans %}{{ profile.dpt_option }}
+        {% endif %}
+        </p>
+        {% if profile.promo %}
+        <p><img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}" alt="Promo {{ profile.promo }}" class="promo_pict" />
+        {% trans %}Promo: {% endtrans %}{{ profile.promo }}</p>
+        {% endif %}
     </div>
-    <h4>{{ profile.get_full_name() }}</h4>
-    {% if profile.nick_name %}
-    <p id="nickname">&laquo; {{ profile.nick_name }} &raquo;</p>
-    {% endif %}
-    {% if profile.date_of_birth %}
-    <p>{% trans %}Born: {% endtrans %}{{ profile.date_of_birth|date("d/m/Y") }}</p>
-    {% endif %}
-    {% if profile.department != "NA" %}
-    <p>{{ profile.department }}{{ profile.semester }}
-    {% endif %}
-    {% if profile.dpt_option %}
-    <br>{% trans %}Option: {% endtrans %}{{ profile.dpt_option }}
-    {% endif %}
-    </p>
-    {% if profile.promo %}
-    <p><img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}" alt="Promo {{ profile.promo }}" class="promo_pict" />
-    {% trans %}Promo: {% endtrans %}{{ profile.promo }}</p>
-    {% endif %}
 </div>
 
 {% if user.membership.filter(end_date=None).exists() or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}

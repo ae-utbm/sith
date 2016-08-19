@@ -541,7 +541,7 @@ def migrate_sellings():
             op = User.objects.filter(id=r['id_utilisateur']).first() or root
             customer = Customer.objects.filter(user__id=r['id_utilisateur_client']).first() or root.customer
             new = Selling(
-                    label=product.name,
+                    label=product.name or "Produit supprimé",
                     counter=counter,
                     club=club,
                     product=product,

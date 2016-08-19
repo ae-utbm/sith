@@ -1,4 +1,6 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import user_mini_profile %}
+
 
 {% macro add_product(id, content) %}
 <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="inline" style="display:inline">
@@ -21,13 +23,12 @@
 {% endblock %}
 
 {% block content %}
-<h3>{% trans %}Counter{% endtrans %}</h3>
 <h4>{{ counter }}</h4>
-<p><strong>{% trans %}Club: {% endtrans %}</strong> {{ counter.club }}</p>
 
-<div>
+<div id="user_info">
     <h5>{% trans %}Customer{% endtrans %}</h5>
-    <p>{{ customer.user.get_display_name() }}, {{ customer.amount }} €</p>
+    {{ user_mini_profile(customer.user) }}
+    <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 </div>
 {% if counter.type == 'BAR' %}
 <div>
@@ -48,7 +49,7 @@
     <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
         {% csrf_token %}
         <input type="hidden" name="action" value="code">
-        <input type="input" name="code" value="" autofocus />
+        <input type="input" name="code" value="" autofocus id="code_field"/>
         <input type="submit" value="{% trans %}Go{% endtrans %}" />
     </form>
     <p>{% trans %}Basket: {% endtrans %}</p>
@@ -77,6 +78,46 @@
     </p>
 </div>
 
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script>
+$( function() {
+    var products = [
+    {% for p in counter.products.all() %}
+        {
+            value: "{{ p.code }}",
+            label: "{{ p.name }}",
+            tags: "{{ p.code }} {{ p.name }}",
+        },
+    {% endfor %}
+    ];
+    var quantity = "";
+    var search = "";
+    var pattern = /^(\d+x)?(.*)/i;
+    $( "#code_field" ).autocomplete({
+        select: function (event, ui) {
+            event.preventDefault();
+            $("#code_field").val(quantity + ui.item.value);
+        },
+        focus: function (event, ui) {
+            event.preventDefault();
+            $("#code_field").val(quantity + ui.item.value);
+        },
+        source: function( request, response ) {
+            var res = pattern.exec(request.term);
+            quantity = res[1] || "";
+            search = res[2];
+            var matcher = new RegExp( $.ui.autocomplete.escapeRegex( search ), "i" );
+            response($.grep( products, function( value ) {
+                value = value.tags;
+                return matcher.test( value );
+            }));
+        },
+    });
+});
+</script>
 {% endblock %}
 
 

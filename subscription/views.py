@@ -8,6 +8,8 @@ from django import forms
 from django.forms import Select
 from django.conf import settings
 
+from ajax_select.fields import AutoCompleteSelectField
+
 from subscription.models import Subscriber, Subscription
 from core.views import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.models import User
@@ -20,6 +22,7 @@ class SubscriptionForm(forms.ModelForm):
     class Meta:
         model = Subscription
         fields = ['member', 'subscription_type', 'payment_method', 'location']
+    member = AutoCompleteSelectField('users', required=False, help_text=None)
 
     def __init__(self, *args, **kwargs):
         super(SubscriptionForm, self).__init__(*args, **kwargs)
@@ -31,8 +34,15 @@ class SubscriptionForm(forms.ModelForm):
         self.fields.move_to_end('payment_method')
         self.fields.move_to_end('location')
 
+    def clean_member(self):
+        subscriber = self.cleaned_data.get("member")
+        if subscriber:
+            subscriber = Subscriber.objects.filter(id=subscriber.id).first()
+        return subscriber
+
     def clean(self):
         cleaned_data = super(SubscriptionForm, self).clean()
+        print(cleaned_data)
         if (cleaned_data.get("member") is None
                 and "last_name" not in self.errors.as_data()
                 and "first_name" not in self.errors.as_data()

@@ -27,16 +27,18 @@
     {{ super() }}
 <script type="text/javascript" charset="utf-8">
 $( function() {
-    select = $("#subscription_form select[name=member]");
+    select = $("#id_member");
     member_block = $("#subscription_form #new_member");
     user_info = $("#user_info");
     function display_new_member() {
         if (select.val()) {
             member_block.hide();
             user_info.load("/user/"+select.val()+"/mini");
+            user_info.show();
         } else {
             member_block.show();
             user_info.empty();
+            user_info.hide();
         }
     }
     select.on("change", display_new_member);

@@ -351,6 +351,20 @@ class User(AbstractBaseUser):
     def can_be_edited_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
 
+    def get_mini_item(self):
+        return """
+    <div class="mini_profile_link" >
+    <span>
+    <img src="%s" alt="%s" />
+    </span>
+    <em>%s</em>
+    </a>
+    """ % (
+            self.profile_pict.get_download_url() if self.profile_pict else "/static/core/img/na.gif",
+            _("Profile"),
+            self.get_display_name(),
+            )
+
 
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):

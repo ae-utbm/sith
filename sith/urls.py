@@ -17,6 +17,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
+from ajax_select import urls as ajax_select_urls
 
 handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
@@ -31,5 +32,6 @@ urlpatterns = [
     url(r'^launderette/', include('launderette.urls', namespace="launderette", app_name="launderette")),
     url(r'^api/v1/', include('api.urls', namespace="api", app_name="api")),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^ajax_select/', include(ajax_select_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: remove me for production!!!
 

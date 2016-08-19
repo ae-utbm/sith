@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^$', index, name='index'),
     url(r'^search/$', search_view, name='search'),
     url(r'^search_json/$', search_json, name='search_json'),
+    url(r'^search_user/$', search_user_json, name='search_user'),
 
     # Login and co
     url(r'^login/$', login, name='login'),

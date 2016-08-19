@@ -14,8 +14,11 @@ from django.db import DataError, transaction
 
 import re
 from datetime import date, timedelta
+from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
+from ajax_select import make_ajax_form, make_ajax_field
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from core.views.forms import SelectUser
 from subscription.models import Subscriber
 from subscription.views import get_subscriber
 from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType
@@ -29,8 +32,7 @@ class GetUserForm(forms.Form):
     some nickname, first name, or last name (TODO)
     """
     code = forms.CharField(label="Code", max_length=10, required=False)
-    id = forms.IntegerField(label="ID", required=False)
-    # TODO: add a nice JS widget to search for users
+    id = AutoCompleteSelectField('users', required=False, label=_("Select user"), help_text=None)
 
     def as_p(self):
         self.fields['code'].widget.attrs['autofocus'] = True
@@ -327,15 +329,31 @@ class CounterListView(CanViewMixin, ListView):
     model = Counter
     template_name = 'counter/counter_list.jinja'
 
-class CounterEditView(CanEditPropMixin, UpdateView):
+class CounterEditForm(forms.ModelForm):
+    class Meta:
+        model = Counter
+        fields = ['sellers', 'products']
+    sellers = make_ajax_field(Counter, 'sellers', 'users', show_help_text=False)
+    products = make_ajax_field(Counter, 'products', 'products')
+
+class CounterEditView(CanEditMixin, UpdateView):
+    """
+    Edit a counter's main informations (for the counter's manager)
+    """
+    model = Counter
+    form_class = CounterEditForm
+    pk_url_kwarg = "counter_id"
+    template_name = 'counter/counter_edit.jinja'
+
+    def get_success_url(self):
+        return reverse_lazy('counter:admin', kwargs={'counter_id': self.object.id})
+
+class CounterEditPropView(CanEditPropMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's admin)
     """
     model = Counter
-    form_class = modelform_factory(Counter, fields=['name', 'club', 'type', 'sellers', 'products'],
-            widgets={
-                'products':CheckboxSelectMultiple,
-                'sellers':CheckboxSelectMultiple})
+    form_class = modelform_factory(Counter, fields=['name', 'club', 'type'])
     pk_url_kwarg = "counter_id"
     template_name = 'core/edit.jinja'
 
@@ -399,13 +417,20 @@ class ProductCreateView(CanCreateMixin, CreateView):
             'selling_price', 'special_selling_price', 'icon', 'club']
     template_name = 'core/create.jinja'
 
+class ProductEditForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'product_type', 'code', 'purchase_price',
+                'selling_price', 'special_selling_price', 'icon', 'club']
+    counters = make_ajax_field(Product, 'counters', 'counters', show_help_text=False, label='Counters', help_text="Guy",
+            required=False) # TODO FIXME
+
 class ProductEditView(CanEditPropMixin, UpdateView):
     """
     An edit view for the admins
     """
     model = Product
-    fields = ['name', 'description', 'product_type', 'code', 'purchase_price',
-            'selling_price', 'special_selling_price', 'icon', 'club']
+    form_class = ProductEditForm
     pk_url_kwarg = "product_id"
     template_name = 'core/edit.jinja'
     # TODO: add management of the 'counters' ForeignKey
