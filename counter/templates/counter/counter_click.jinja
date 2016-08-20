@@ -60,7 +60,12 @@
         {% for id,infos in request.session['basket']|dictsort %}
         {% set product = counter.products.filter(id=id).first() %}
         {% set s = infos['qty'] * infos['price'] / 100 %}
-        <li>{{ del_product(id, '-') }} {{ infos['qty'] }} {{ add_product(id, '+') }} {{ product.name }}: {{ "%0.2f"|format(s) }} €</li>
+        <li>{{ del_product(id, '-') }} {{ infos['qty'] + infos['bonus_qty'] }} {{ add_product(id, '+') }}
+        {{ product.name }}: {{ "%0.2f"|format(s) }} €
+        {% if infos['bonus_qty'] %}
+            P
+        {% endif %}
+        </li>
         {% endfor %}
     </ul>
     <p><strong>{% trans %}Total: {% endtrans %}{{ "%0.2f"|format(basket_total) }} €</strong></p>

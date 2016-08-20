@@ -78,6 +78,11 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         kwargs = super(CounterMain, self).get_context_data(**kwargs)
         kwargs['login_form'] = AuthenticationForm()
         kwargs['login_form'].fields['username'].widget.attrs['autofocus'] = True
+        kwargs['login_form'].cleaned_data = {} # add_error fails if there are no cleaned_data
+        if "credentials" in self.request.GET:
+            kwargs['login_form'].add_error(None, _("Bad credentials"))
+        if "subscription" in self.request.GET:
+            kwargs['login_form'].add_error(None, _("User is not subscriber"))
         kwargs['form'] = self.get_form()
         if self.object.type == 'BAR':
             kwargs['barmen'] = self.object.get_barmen_list()
@@ -185,6 +190,13 @@ class CounterClick(DetailView):
             total += infos['price'] * infos['qty']
         return total / 100
 
+    def get_total_quantity_for_pid(self, request, pid):
+        pid = str(pid)
+        try:
+            return request.session['basket'][pid]['qty'] + request.session['basket'][pid]['bonus_qty']
+        except:
+            return 0
+
     def add_product(self, request, q = 1, p=None):
         """
         Add a product to the basket
@@ -195,16 +207,23 @@ class CounterClick(DetailView):
         pid = str(pid)
         price = self.get_price(pid)
         total = self.sum_basket(request)
-        if self.customer.amount < (total + q*float(price)):
+        product = self.get_product(pid)
+        bq = 0 # Bonus quantity, for trays
+        if product.tray: # Handle the tray to adjust the quantity q to add and the bonus quantity bq
+            total_qty_mod_6 = self.get_total_quantity_for_pid(request, pid) % 6
+            bq = int((total_qty_mod_6 + q) / 6) # Integer division
+            q -= bq
+        if self.customer.amount < (total + q*float(price)): # Check for enough money
             request.session['not_enough'] = True
             return False
-        if self.customer.user.get_age() < self.get_product(pid).limit_age:
+        if self.customer.user.get_age() < product.limit_age: # Check if affordable
             request.session['too_young'] = True
             return False
-        if pid in request.session['basket']:
+        if pid in request.session['basket']: # Add if already in basket
             request.session['basket'][pid]['qty'] += q
-        else:
-            request.session['basket'][pid] = {'qty': q, 'price': int(price*100)}
+            request.session['basket'][pid]['bonus_qty'] += bq
+        else: # or create if not
+            request.session['basket'][pid] = {'qty': q, 'price': int(price*100), 'bonus_qty': bq}
         request.session['not_enough'] = False # Reset not_enough to save the session
         request.session['too_young'] = False
         request.session.modified = True
@@ -213,12 +232,16 @@ class CounterClick(DetailView):
     def del_product(self, request):
         """ Delete a product from the basket """
         pid = str(request.POST['product_id'])
+        product = self.get_product(pid)
         if pid in request.session['basket']:
-            request.session['basket'][pid]['qty'] -= 1
+            if product.tray and (self.get_total_quantity_for_pid(request, pid) % 6 == 0) and request.session['basket'][pid]['bonus_qty']:
+                request.session['basket'][pid]['bonus_qty'] -= 1
+            else:
+                request.session['basket'][pid]['qty'] -= 1
             if request.session['basket'][pid]['qty'] <= 0:
                 del request.session['basket'][pid]
         else:
-            request.session['basket'][pid] = 0
+            request.session['basket'][pid] = None
         request.session.modified = True
 
     def parse_code(self, request):
@@ -257,10 +280,14 @@ class CounterClick(DetailView):
                     uprice = p.selling_price
                 if uprice * infos['qty'] > self.customer.amount:
                     raise DataError(_("You have not enough money to buy all the basket"))
-                request.session['last_basket'].append("%d x %s" % (infos['qty'], p.name))
+                request.session['last_basket'].append("%d x %s" % (infos['qty']+infos['bonus_qty'], p.name))
                 s = Selling(label=p.name, product=p, club=p.club, counter=self.object, unit_price=uprice,
                        quantity=infos['qty'], seller=self.operator, customer=self.customer)
                 s.save()
+                if infos['bonus_qty']:
+                    s = Selling(label=p.name + " (Plateau)", product=p, club=p.club, counter=self.object, unit_price=0,
+                           quantity=infos['bonus_qty'], seller=self.operator, customer=self.customer)
+                    s.save()
             request.session['last_customer'] = self.customer.user.get_display_name()
             request.session['last_total'] = "%0.2f" % self.sum_basket(request)
             request.session['new_customer_amount'] = str(self.customer.amount)
@@ -309,16 +336,19 @@ class CounterLogin(RedirectView):
         """
         self.counter_id = kwargs['counter_id']
         form = AuthenticationForm(request, data=request.POST)
+        self.errors = []
         if form.is_valid():
             user = Subscriber.objects.filter(username=form.cleaned_data['username']).first()
             if user.is_subscribed():
                 Counter.add_barman(self.counter_id, user.id)
+            else:
+                self.errors += ["subscription"]
         else:
-            print("Error logging the barman") # TODO handle that nicely
+            self.errors += ["credentials"]
         return super(CounterLogin, self).post(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse_lazy('counter:details', args=args, kwargs=kwargs)
+        return reverse_lazy('counter:details', args=args, kwargs=kwargs)+"?"+'&'.join(self.errors)
 
 class CounterLogout(RedirectView):
     permanent = False
