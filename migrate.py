@@ -83,7 +83,6 @@ def migrate_users():
             }
 
     def get_random_free_email():
-        id = random.randrange(4000)
         email = "no_email_%s@git.an" % random.randrange(4000, 40000)
         while User.objects.filter(email=email).exists():
             email = "no_email_%s@git.an" % random.randrange(4000, 40000)
@@ -602,10 +601,10 @@ def main():
     migrate_products()
     migrate_products_to_counter()
     # reset_customer_amount()
-    migrate_invoices()
     migrate_refillings()
+    migrate_invoices()
     migrate_sellings()
-    # reset_index('core', 'counter', 'subscription')
+    reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
 
 if __name__ == "__main__":
     main()

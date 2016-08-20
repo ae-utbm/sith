@@ -183,10 +183,10 @@ tbody>tr:hover {
 }
 #user_profile h4 { border-bottom: 1px solid grey; max-width: 60%; }
 #user_profile #left_column {
-    max-width: 59%;
+    width: 59%;
 }
 #user_profile #right_column {
-    max-width: 40%;
+    width: 40%;
     float: right;
     font-style: italic;
 }

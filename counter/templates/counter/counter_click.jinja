@@ -46,6 +46,9 @@
     {% if request.session['too_young'] %}
     <p><strong>{% trans %}Too young for that product{% endtrans %}</strong></p>
     {% endif %}
+    {% if request.session['not_allowed'] %}
+    <p><strong>{% trans %}Not allowed for that product{% endtrans %}</strong></p>
+    {% endif %}
     {% if request.session['not_enough'] %}
     <p><strong>{% trans %}Not enough money{% endtrans %}</strong></p>
     {% endif %}
@@ -79,11 +82,16 @@
         <input type="hidden" name="action" value="cancel">
         <input type="submit" value="{% trans %}Cancel{% endtrans %}" />
     </form>
-    <p><strong>{% trans %}Products: {% endtrans %}</strong>
-    {% for p in counter.products.all() %}
-    {{ add_product(p.id, p.name) }}
+    <div><strong>{% trans %}Products: {% endtrans %}</strong>
+    {% for t in categories %}
+    {% if counter.products.filter(product_type=t).exists() %}
+        <h5>{{ t }}</h5>
+        {% for p in counter.products.filter(product_type=t).all() %}
+        {{ add_product(p.id, p.name) }}
+        {% endfor %}
+    {% endif %}
     {% endfor %}
-    </p>
+    </div>
 </div>
 
 {% endblock %}

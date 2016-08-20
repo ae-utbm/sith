@@ -55,9 +55,12 @@ class EbouticMain(TemplateView):
         """ Add a product to the basket """
         try:
             p = Product.objects.filter(id=int(request.POST['product_id'])).first()
-            self.basket.add_product(p)
-        except:
-            pass
+            for g in p.buying_groups.all():
+                if request.user.is_in_group(g.name):
+                    self.basket.add_product(p)
+                    break
+        except Exception as e:
+            print(repr(e))
 
     def del_product(self, request):
         """ Delete a product from the basket """

@@ -11,7 +11,9 @@
         <div id="right_column">
             <div id="pictures">
                 {% if profile.profile_pict %}
-                <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" />
+                <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
+                {% else %}
+                <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
                 {% endif %}
             </div>
             <p id="quote"><em>{{ profile.quote }}</em></p>
@@ -53,4 +55,23 @@
 
 {% endblock %}
 
+{% block script %}
+{{ super() }}
+<script>
+$( function() {
+    var keys = [];
+    var pattern = "71,85,89,71,85,89";
+    $(document).keydown(function (e) {
+        keys.push(e.keyCode);
+        if (keys.toString()==pattern) {
+                keys = [];
+                $("#right_column img").attr("src", "{{ static('core/img/yug.jpg') }}");
+        }
+        if (keys.length==6) {
+            keys.shift();
+        }
+    });
+} );
+</script>
+{% endblock %}
 

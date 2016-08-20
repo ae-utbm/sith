@@ -76,15 +76,19 @@ class Product(models.Model):
     """
     name = models.CharField(_('name'), max_length=64)
     description = models.TextField(_('description'), blank=True)
-    product_type = models.ForeignKey(ProductType, related_name='products', null=True, blank=True)
+    product_type = models.ForeignKey(ProductType, related_name='products', verbose_name=_("product type"), null=True, blank=True,
+            on_delete=models.SET_NULL)
     code = models.CharField(_('code'), max_length=16, blank=True)
     purchase_price = CurrencyField(_('purchase price'))
     selling_price = CurrencyField(_('selling price'))
     special_selling_price = CurrencyField(_('special selling price'))
-    icon = models.ImageField(upload_to='products', null=True, blank=True)
-    club = models.ForeignKey(Club, related_name="products")
+    icon = models.ImageField(upload_to='products', null=True, blank=True, verbose_name=_("icon"))
+    club = models.ForeignKey(Club, related_name="products", verbose_name=_("club"))
     limit_age = models.IntegerField(_('limit age'), default=0)
     tray = models.BooleanField(_('tray price'), default=False)
+    parent_product = models.ForeignKey('self', related_name='children_products', verbose_name=_("parent product"), null=True,
+            blank=True, on_delete=models.SET_NULL)
+    buying_groups = models.ManyToManyField(Group, related_name='products', verbose_name=_("buying groups"))
 
     class Meta:
         verbose_name = _('product')

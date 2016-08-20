@@ -25,7 +25,7 @@
             <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a> |
             <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
             <form action="{{ url('core:search') }}" method="GET">
-                <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" />
+                <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" id="search" />
                 <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />
             </form>
             {% endif %}
@@ -94,6 +94,13 @@ $('.select_date').datepicker({
     monthNamesShort: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].monthNamesShort,
     monthNames: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].monthNames,
 }).datepicker( $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"] );
+$(document).keydown(function (e) {
+    if ($(e.target).is('input')) { return }
+    if (e.keyCode == 83) {
+        $("#search").focus();
+        return false;
+    }
+});
         </script>
         {% endblock %}
     </body>

@@ -123,6 +123,7 @@ class CounterClick(DetailView):
             request.session['basket_total'] = 0
         request.session['not_enough'] = False
         request.session['too_young'] = False
+        request.session['not_allowed'] = False
         self.refill_form = None
         ret = super(CounterClick, self).get(request, *args, **kwargs)
         if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
@@ -145,6 +146,7 @@ class CounterClick(DetailView):
             request.session['basket_total'] = 0
         request.session['not_enough'] = False
         request.session['too_young'] = False
+        request.session['not_allowed'] = False
         if self.object.type != "BAR":
             self.operator = request.user
         elif self.is_barman_price():
@@ -208,6 +210,13 @@ class CounterClick(DetailView):
         price = self.get_price(pid)
         total = self.sum_basket(request)
         product = self.get_product(pid)
+        can_buy = False
+        for g in product.buying_groups.all():
+            if request.user.is_in_group(g.name):
+                can_buy = True
+        if not can_buy:
+            request.session['not_allowed'] = True
+            return False
         bq = 0 # Bonus quantity, for trays
         if product.tray: # Handle the tray to adjust the quantity q to add and the bonus quantity bq
             total_qty_mod_6 = self.get_total_quantity_for_pid(request, pid) % 6
@@ -224,8 +233,6 @@ class CounterClick(DetailView):
             request.session['basket'][pid]['bonus_qty'] += bq
         else: # or create if not
             request.session['basket'][pid] = {'qty': q, 'price': int(price*100), 'bonus_qty': bq}
-        request.session['not_enough'] = False # Reset not_enough to save the session
-        request.session['too_young'] = False
         request.session.modified = True
         return True
 
@@ -321,6 +328,7 @@ class CounterClick(DetailView):
         kwargs['customer'] = self.customer
         kwargs['basket_total'] = self.sum_basket(self.request)
         kwargs['refill_form'] = self.refill_form or RefillForm()
+        kwargs['categories'] = ProductType.objects.all()
         return kwargs
 
 class CounterLogin(RedirectView):
@@ -451,22 +459,41 @@ class ProductListView(CanEditPropMixin, ListView):
     model = Product
     template_name = 'counter/product_list.jinja'
 
+class ProductEditForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'product_type', 'code', 'parent_product', 'buying_groups', 'purchase_price',
+                'selling_price', 'special_selling_price', 'icon', 'club', 'limit_age', 'tray']
+    parent_product = AutoCompleteSelectField('products', show_help_text=False, label=_("Parent product"), required=False)
+    buying_groups = AutoCompleteSelectMultipleField('groups', show_help_text=False, help_text="", label=_("Buying groups"))
+    club = AutoCompleteSelectField('clubs', show_help_text=False)
+    counters = AutoCompleteSelectMultipleField('counters', show_help_text=False, help_text="", label=_("Counters"), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(ProductEditForm, self).__init__(*args, **kwargs)
+        if self.instance.id:
+            self.fields['counters'].initial = [str(c.id) for c in self.instance.counters.all()]
+
+    def save(self, *args, **kwargs):
+        ret = super(ProductEditForm, self).save(*args, **kwargs)
+        if self.fields['counters'].initial:
+            for cid in self.fields['counters'].initial:
+                c = Counter.objects.filter(id=int(cid)).first()
+                c.products.remove(self.instance)
+                c.save()
+        for cid in self.cleaned_data['counters']:
+            c = Counter.objects.filter(id=int(cid)).first()
+            c.products.add(self.instance)
+            c.save()
+        return ret
+
 class ProductCreateView(CanCreateMixin, CreateView):
     """
     A create view for the admins
     """
     model = Product
-    fields = ['name', 'description', 'product_type', 'code', 'purchase_price',
-            'selling_price', 'special_selling_price', 'icon', 'club']
+    form_class = ProductEditForm
     template_name = 'core/create.jinja'
-
-class ProductEditForm(forms.ModelForm):
-    class Meta:
-        model = Product
-        fields = ['name', 'description', 'product_type', 'code', 'purchase_price',
-                'selling_price', 'special_selling_price', 'icon', 'club', 'limit_age', 'tray']
-    counters = make_ajax_field(Product, 'counters', 'counters', show_help_text=False, label='Counters', help_text="Guy",
-            required=False) # TODO FIXME
 
 class ProductEditView(CanEditPropMixin, UpdateView):
     """
@@ -476,8 +503,6 @@ class ProductEditView(CanEditPropMixin, UpdateView):
     form_class = ProductEditForm
     pk_url_kwarg = "product_id"
     template_name = 'core/edit.jinja'
-    # TODO: add management of the 'counters' ForeignKey
-
 
 class RefillingDeleteView(CanEditPropMixin, DeleteView):
     """
