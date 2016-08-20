@@ -83,6 +83,8 @@ class Product(models.Model):
     special_selling_price = CurrencyField(_('special selling price'))
     icon = models.ImageField(upload_to='products', null=True, blank=True)
     club = models.ForeignKey(Club, related_name="products")
+    limit_age = models.IntegerField(_('limit age'), default=0)
+    tray = models.BooleanField(_('tray price'), default=False)
 
     class Meta:
         verbose_name = _('product')

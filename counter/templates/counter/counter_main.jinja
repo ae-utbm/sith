@@ -8,6 +8,10 @@
 </form>
 {% endmacro %}
 
+{% block title %}
+{% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}
+{% endblock %}
+
 {% block content %}
 <h3>{% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}</h3>
 

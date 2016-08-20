@@ -43,6 +43,9 @@
 {% endif %}
 <div>
     <h5>{% trans %}Selling{% endtrans %}</h5>
+    {% if request.session['too_young'] %}
+    <p><strong>{% trans %}Too young for that product{% endtrans %}</strong></p>
+    {% endif %}
     {% if request.session['not_enough'] %}
     <p><strong>{% trans %}Not enough money{% endtrans %}</strong></p>
     {% endif %}

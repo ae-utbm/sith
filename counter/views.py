@@ -117,6 +117,7 @@ class CounterClick(DetailView):
             request.session['basket'] = {}
             request.session['basket_total'] = 0
         request.session['not_enough'] = False
+        request.session['too_young'] = False
         self.refill_form = None
         ret = super(CounterClick, self).get(request, *args, **kwargs)
         if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
@@ -138,6 +139,7 @@ class CounterClick(DetailView):
             request.session['basket'] = {}
             request.session['basket_total'] = 0
         request.session['not_enough'] = False
+        request.session['too_young'] = False
         if self.object.type != "BAR":
             self.operator = request.user
         elif self.is_barman_price():
@@ -166,8 +168,11 @@ class CounterClick(DetailView):
         else:
             return False
 
+    def get_product(self, pid):
+        return Product.objects.filter(pk=int(pid)).first()
+
     def get_price(self, pid):
-        p = Product.objects.filter(pk=pid).first()
+        p = self.get_product(pid)
         if self.is_barman_price():
             price = p.special_selling_price
         else:
@@ -181,7 +186,11 @@ class CounterClick(DetailView):
         return total / 100
 
     def add_product(self, request, q = 1, p=None):
-        """ Add a product to the basket """
+        """
+        Add a product to the basket
+        q is the quantity passed as integer
+        p is the product id, passed as an integer
+        """
         pid = p or request.POST['product_id']
         pid = str(pid)
         price = self.get_price(pid)
@@ -189,11 +198,15 @@ class CounterClick(DetailView):
         if self.customer.amount < (total + q*float(price)):
             request.session['not_enough'] = True
             return False
+        if self.customer.user.get_age() < self.get_product(pid).limit_age:
+            request.session['too_young'] = True
+            return False
         if pid in request.session['basket']:
             request.session['basket'][pid]['qty'] += q
         else:
             request.session['basket'][pid] = {'qty': q, 'price': int(price*100)}
         request.session['not_enough'] = False # Reset not_enough to save the session
+        request.session['too_young'] = False
         request.session.modified = True
         return True
 
@@ -421,7 +434,7 @@ class ProductEditForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'description', 'product_type', 'code', 'purchase_price',
-                'selling_price', 'special_selling_price', 'icon', 'club']
+                'selling_price', 'special_selling_price', 'icon', 'club', 'limit_age', 'tray']
     counters = make_ajax_field(Product, 'counters', 'counters', show_help_text=False, label='Counters', help_text="Guy",
             required=False) # TODO FIXME
 

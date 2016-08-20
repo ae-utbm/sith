@@ -69,6 +69,7 @@
         {% block script %}
         <script src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>
         <script src="{{ static('core/js/ui/jquery-ui.min.js') }}"></script>
+        <script src="{{ static('core/js/ui/i18n/datepicker-fr.js') }}"></script>
         <script src="{{ static('core/js/multiple-select.js') }}"></script>
         <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
         <script src="{{ static('core/js/script.js') }}"></script>
@@ -85,6 +86,14 @@ $('.select_multiple').multipleSelect({
     position: 'top',
     {% endif %}
 });
+$('.select_date').datepicker({
+    changeMonth: true,
+    changeYear: true,
+    dayNamesShort: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].dayNamesShort,
+    dayNames: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].dayNames,
+    monthNamesShort: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].monthNamesShort,
+    monthNames: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].monthNames,
+}).datepicker( $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"] );
         </script>
         {% endblock %}
     </body>

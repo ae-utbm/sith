@@ -4,15 +4,8 @@
 
 {% macro user_link_with_pict(user) -%}
 <a href="{{ url("core:user_profile", user_id=user.id) }}" class="mini_profile_link" >
-    <span>
-    {% if user.profile_pict %}
-    <img src="{{ user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" />
-    {% else %}
-    <img src="{{ static('core/img/na.gif') }}" alt="{% trans %}Profile{% endtrans %}" />
-    {% endif %}
-    </span>
-    <em>{{ user.get_display_name() }}</em>
-    </a>
+    {{ user.get_mini_item()|safe }}
+</a>
 {%- endmacro %}
 
 {% macro user_mini_profile(user) %}
@@ -27,7 +20,7 @@
     <p id="nickname">&laquo; {{ user.nick_name }} &raquo;</p>
     {% endif %}
     {% if user.date_of_birth %}
-    <p>{% trans %}Born: {% endtrans %}{{ user.date_of_birth|date("d/m/Y") }}</p>
+        <p>{% trans %}Born: {% endtrans %}{{ user.date_of_birth|date("d/m/Y") }} ({{ user.get_age() }})</p>
     {% endif %}
     {% if user.promo %}
     <p><img src="{{ static('core/img/promo_%02d.png' % user.promo) }}" alt="Promo {{ user.promo }}" class="promo_pict" />

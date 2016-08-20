@@ -35,8 +35,4 @@ $( function() {
         popup.html('<iframe src="/file/popup" width="100%" height="95%"></iframe><div id="file_id" value="null" />');
         popup.dialog({title: $(this).text()}).dialog( "open" );
     });
-    $('.select_date').datepicker({
-        changeMonth: true,
-        changeYear: true
-    });
 } );

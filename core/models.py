@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import transaction
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.utils.html import escape
 from phonenumber_field.modelfields import PhoneNumberField
 
 from datetime import datetime, timedelta, date
@@ -281,6 +283,12 @@ class User(AbstractBaseUser):
             return "%s (%s)" % (self.get_full_name(), self.nick_name)
         return self.get_full_name()
 
+    def get_age(self):
+        """
+        Returns the age
+        """
+        return timezone.now().year - self.date_of_birth.year
+
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
         Sends an email to this User.
@@ -360,9 +368,9 @@ class User(AbstractBaseUser):
     <em>%s</em>
     </a>
     """ % (
-            self.profile_pict.get_download_url() if self.profile_pict else "/static/core/img/na.gif",
+            self.profile_pict.get_download_url() if self.profile_pict else staticfiles_storage.url("core/img/na.gif"),
             _("Profile"),
-            self.get_display_name(),
+            escape(self.get_display_name()),
             )
 
 

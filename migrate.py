@@ -452,6 +452,8 @@ def migrate_products():
                     selling_price=r['prix_vente_prod']/100,
                     special_selling_price=r['prix_vente_barman_prod']/100,
                     club=club,
+                    limit_age=r['mineur'] or 0,
+                    tray=bool(r['plateau']),
                     )
             new.save()
         except Exception as e:
@@ -554,7 +556,9 @@ def migrate_sellings():
                     )
             new.save()
         except ValidationError as e:
-            print(repr(e) + " for %s (%s)" % (customer, customer.user.id))
+            print(repr(e) + " for %s (%s), assigning to root" % (customer, customer.user.id))
+            new.customer = root.customer
+            new.save()
         except Exception as e:
             print("FAIL to migrate selling %s: %s" % (r['id_facture'], repr(e)))
     cur.close()
@@ -592,12 +596,12 @@ def main():
     # migrate_counters()
     # migrate_permanencies()
     # migrate_typeproducts()
-    # migrate_products()
-    # migrate_products_to_counter()
+    migrate_products()
+    migrate_products_to_counter()
     # reset_customer_amount()
     # migrate_invoices()
-    migrate_refillings()
-    migrate_sellings()
+    # migrate_refillings()
+    # migrate_sellings()
     reset_index('core', 'counter')
 
 if __name__ == "__main__":
