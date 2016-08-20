@@ -59,7 +59,6 @@ class ProductsLookup(LookupChannel):
     model = Product
 
     def get_query(self, q, request):
-        print(request.__dict__)
         return (self.model.objects.filter(name__icontains=q) | self.model.objects.filter(code__icontains=q))[:50]
 
     def format_item_display(self, item):

@@ -42,7 +42,6 @@ class SubscriptionForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(SubscriptionForm, self).clean()
-        print(cleaned_data)
         if (cleaned_data.get("member") is None
                 and "last_name" not in self.errors.as_data()
                 and "first_name" not in self.errors.as_data()

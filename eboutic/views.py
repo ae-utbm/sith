@@ -59,8 +59,8 @@ class EbouticMain(TemplateView):
                 if request.user.is_in_group(g.name):
                     self.basket.add_product(p)
                     break
-        except Exception as e:
-            print(repr(e))
+        except:
+            pass
 
     def del_product(self, request):
         """ Delete a product from the basket """

@@ -57,7 +57,6 @@ class AddFilesForm(forms.Form):
             try:
                 new_file.clean()
                 new_file.save()
-                print(f.__dict__)
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") %
                         {'file_name': f, 'msg': str(e.message)})
