@@ -110,7 +110,7 @@ p, pre {
 ul, ol {
     margin-top: 1em;
     margin-bottom: 1em;
-	list-style-type: disc;
+    list-style-type: disc;
     margin-left: 25px;
 }
 
@@ -182,21 +182,28 @@ tbody>tr:hover {
     overflow: auto;
 }
 #user_profile h4 { border-bottom: 1px solid grey; max-width: 60%; }
+#user_profile #left_column {
+    max-width: 59%;
+}
+#user_profile #right_column {
+    max-width: 40%;
+    float: right;
+    font-style: italic;
+}
 #user_profile #pictures {
-   max-width: 250px;
-   max-height: 300px;
-   float: right;
-   font-style: italic;
+    max-width: 250px;
+    max-height: 300px;
+    margin: 0px auto;
 }
 #user_profile #nickname {
-   font-style: italic;
+    font-style: italic;
 }
 #user_profile #pictures img {
-   max-width: 96%;
-   max-height: 96%;
+    max-width: 96%;
+    max-height: 96%;
 }
 #user_profile .promo_pict {
-   height: 45px;
+    height: 45px;
 }
 .mini_profile_link {
     display: block;

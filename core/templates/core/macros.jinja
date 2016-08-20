@@ -10,21 +10,26 @@
 
 {% macro user_mini_profile(user) %}
 <div id="user_profile">
-    <div id="pictures">
-        {% if user.profile_pict %}
-        <img src="{{ user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" />
+
+    <div id="right_column">
+        <div id="pictures">
+            {% if user.profile_pict %}
+            <img src="{{ user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" />
+            {% endif %}
+        </div>
+    </div>
+    <div id="left_column">
+        <p>{{ user.get_full_name() }}</p>
+        {% if user.nick_name %}
+        <p id="nickname">&laquo; {{ user.nick_name }} &raquo;</p>
+        {% endif %}
+        {% if user.date_of_birth %}
+            <p>{% trans %}Born: {% endtrans %}{{ user.date_of_birth|date("d/m/Y") }} ({{ user.get_age() }})</p>
+        {% endif %}
+        {% if user.promo %}
+        <p><img src="{{ static('core/img/promo_%02d.png' % user.promo) }}" alt="Promo {{ user.promo }}" class="promo_pict" />
+        {% trans %}Promo: {% endtrans %}{{ user.promo }}</p>
         {% endif %}
     </div>
-    <p>{{ user.get_full_name() }}</p>
-    {% if user.nick_name %}
-    <p id="nickname">&laquo; {{ user.nick_name }} &raquo;</p>
-    {% endif %}
-    {% if user.date_of_birth %}
-        <p>{% trans %}Born: {% endtrans %}{{ user.date_of_birth|date("d/m/Y") }} ({{ user.get_age() }})</p>
-    {% endif %}
-    {% if user.promo %}
-    <p><img src="{{ static('core/img/promo_%02d.png' % user.promo) }}" alt="Promo {{ user.promo }}" class="promo_pict" />
-    {% trans %}Promo: {% endtrans %}{{ user.promo }}</p>
-    {% endif %}
 </div>
 {%- endmacro %}
