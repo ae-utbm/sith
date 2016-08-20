@@ -337,6 +337,9 @@ def migrate_counters():
         except Exception as e:
                 print("FAIL to migrate counter %s: %s" % (r['id_comptoir'], repr(e)))
     cur.close()
+    eboutic = Counter.objects.filter(id=3).first()
+    eboutic.type = "EBOUTIC"
+    eboutic.save()
 
 def reset_customer_amount():
     Refilling.objects.all().delete()
@@ -543,7 +546,7 @@ def migrate_sellings():
             op = User.objects.filter(id=r['id_utilisateur']).first() or root
             customer = Customer.objects.filter(user__id=r['id_utilisateur_client']).first() or root.customer
             new = Selling(
-                    label=product.name or "Produit supprimé",
+                    label=product.name or "Produit inexistant",
                     counter=counter,
                     club=club,
                     product=product,
@@ -587,22 +590,22 @@ def migrate_permanencies():
     cur.close()
 
 def main():
-    # migrate_users()
-    # migrate_profile_pict()
-    # migrate_clubs()
-    # migrate_club_memberships()
-    # migrate_subscriptions()
-    # update_customer_account()
-    # migrate_counters()
-    # migrate_permanencies()
-    # migrate_typeproducts()
+    migrate_users()
+    migrate_profile_pict()
+    migrate_clubs()
+    migrate_club_memberships()
+    migrate_subscriptions()
+    update_customer_account()
+    migrate_counters()
+    migrate_permanencies()
+    migrate_typeproducts()
     migrate_products()
     migrate_products_to_counter()
     # reset_customer_amount()
-    # migrate_invoices()
-    # migrate_refillings()
-    # migrate_sellings()
-    reset_index('core', 'counter')
+    migrate_invoices()
+    migrate_refillings()
+    migrate_sellings()
+    # reset_index('core', 'counter', 'subscription')
 
 if __name__ == "__main__":
     main()
