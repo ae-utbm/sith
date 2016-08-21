@@ -91,7 +91,14 @@
     <h5>{{ t }}</h5>
     <div id="cat_{{ t }}">
         {% for p in counter.products.filter(product_type=t).all() -%}
-            {{ add_product(p.id, "<strong>%s</strong><hr>%s €<br>%s" % (p.name, p.selling_price, p.code)) }}
+            {% set file = None %}
+            {% if p.icon %}
+                {% set file = p.icon.url %}
+            {% else %}
+                {% set file = static('core/img/na.gif') %}
+            {% endif %}
+            {% set prod = '<strong>%s</strong><hr><img src="%s" /><span>%s €<br>%s</span>' % (p.name, file, p.selling_price, p.code) %}
+                {{ add_product(p.id, prod) }}
         {%- endfor %}
     </div>
     {%- endif -%}

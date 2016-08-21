@@ -5,6 +5,7 @@ import random
 import datetime
 from io import StringIO
 from pytz import timezone
+from os import listdir
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "sith.settings"
 os.environ['DJANGO_COLORS'] = 'nocolor'
@@ -15,6 +16,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.db import connection
 from django.forms import ValidationError
+from django.core.files import File
 
 
 from core.models import User, SithFile
@@ -146,9 +148,6 @@ def migrate_users():
 
 def migrate_profile_pict():
     PROFILE_ROOT = "/data/matmatronch/"
-
-    from os import listdir
-    from django.core.files import File
 
     profile = SithFile.objects.filter(parent=None, name="profiles").first()
     profile.children.all().delete()
@@ -400,7 +399,7 @@ def migrate_refillings():
             new = Refilling(
                     id=r['id_rechargement'],
                     counter=counter or mde,
-                    customer=cust,
+                    customer=cust or root_cust,
                     operator=op or root_cust.user,
                     amount=r['montant_rech']/100,
                     payment_method=PAYMENT[r['type_paiement_rech']],
@@ -461,6 +460,27 @@ def migrate_products():
         except Exception as e:
                 print("FAIL to migrate product %s: %s" % (r['nom_prod'], repr(e)))
     cur.close()
+
+def migrate_product_pict():
+    FILE_ROOT = "/data/files/"
+
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_produits
+    WHERE id_file IS NOT NULL
+    """)
+    for r in cur:
+        print(r['nom_prod'])
+        try:
+            prod = Product.objects.filter(id=r['id_produit']).first()
+            if prod:
+                f = File(open(FILE_ROOT + '/' + str(r['id_file']) + ".1", 'rb'))
+                f.name = prod.name
+                prod.icon = f
+                prod.save()
+        except Exception as e:
+            print(repr(e))
 
 def migrate_products_to_counter():
     cur = db.cursor(MySQLdb.cursors.SSDictCursor)
@@ -558,9 +578,7 @@ def migrate_sellings():
                     )
             new.save()
         except ValidationError as e:
-            print(repr(e) + " for %s (%s), assigning to root" % (customer, customer.user.id))
-            new.customer = root.customer
-            new.save()
+            print(repr(e) + " for %s (%s)" % (customer, customer.user.id))
         except Exception as e:
             print("FAIL to migrate selling %s: %s" % (r['id_facture'], repr(e)))
     cur.close()
@@ -599,9 +617,11 @@ def main():
     migrate_permanencies()
     migrate_typeproducts()
     migrate_products()
+    migrate_product_pict()
     migrate_products_to_counter()
-    # reset_customer_amount()
+    reset_customer_amount()
     migrate_refillings()
+    reset_index('counter')
     migrate_invoices()
     migrate_sellings()
     reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')

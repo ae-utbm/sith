@@ -288,10 +288,19 @@ label {
 }
 .form_button {
     width: 150px;
-    height: 100px;
+    height: 120px;
     padding: 2px;
     display: inline-block;
     font-size: 0.8em;
+}
+.form_button span {
+    width: 70px;
+    float: right;
+}
+.form_button img {
+    max-width: 50px;
+    max-height: 50px;
+    float: left;
 }
 .form_button strong {
     font-weight: bold;
