@@ -160,6 +160,15 @@ tbody>tr:hover {
     float: right;
     padding: 10px;
 }
+#products {
+    width: 90%;
+    margin: 0px auto;
+    overflow: auto;
+}
+#bar_ui {
+    float: left;
+    min-width: 57%;
+}
 #user_info_container {
 }
 #user_info {
@@ -276,4 +285,20 @@ label {
 }
 #user_edit img {
     width: 100px;
+}
+.form_button {
+    width: 150px;
+    height: 100px;
+    padding: 2px;
+    display: inline-block;
+    font-size: 0.8em;
+}
+.form_button strong {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+.form_button button {
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
 }

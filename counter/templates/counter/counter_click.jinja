@@ -3,15 +3,15 @@
 
 
 {% macro add_product(id, content) %}
-<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="inline" style="display:inline">
+<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="form_button">
     {% csrf_token %}
     <input type="hidden" name="action" value="add_product">
-    <button type="submit" name="product_id" value="{{ id }}"> {{ content }} </button>
+    <button type="submit" name="product_id" value="{{ id }}"> {{ content|safe }} </button>
 </form>
 {% endmacro %}
 
 {% macro del_product(id, content) %}
-<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="inline" style="display:inline">
+<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="form_button">
     {% csrf_token %}
     <input type="hidden" name="action" value="del_product">
     <button type="submit" name="product_id" value="{{ id }}"> {{ content }} </button>
@@ -30,68 +30,72 @@
     {{ user_mini_profile(customer.user) }}
     <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 </div>
-{% if counter.type == 'BAR' %}
-<div>
-    <h5>{% trans %}Refilling{% endtrans %}</h5>
-    <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-        {% csrf_token %}
-        {{ refill_form.as_p() }}
-        <input type="hidden" name="action" value="refill">
-        <input type="submit" value="{% trans %}Go{% endtrans %}" />
-    </form>
-</div>
-{% endif %}
-<div>
+<div id="bar_ui">
     <h5>{% trans %}Selling{% endtrans %}</h5>
-    {% if request.session['too_young'] %}
-    <p><strong>{% trans %}Too young for that product{% endtrans %}</strong></p>
-    {% endif %}
-    {% if request.session['not_allowed'] %}
-    <p><strong>{% trans %}Not allowed for that product{% endtrans %}</strong></p>
-    {% endif %}
-    {% if request.session['not_enough'] %}
-    <p><strong>{% trans %}Not enough money{% endtrans %}</strong></p>
-    {% endif %}
-    <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="code">
-        <input type="input" name="code" value="" autofocus id="code_field"/>
-        <input type="submit" value="{% trans %}Go{% endtrans %}" />
-    </form>
-    <p>{% trans %}Basket: {% endtrans %}</p>
-    <ul>
-        {% for id,infos in request.session['basket']|dictsort %}
-        {% set product = counter.products.filter(id=id).first() %}
-        {% set s = infos['qty'] * infos['price'] / 100 %}
-        <li>{{ del_product(id, '-') }} {{ infos['qty'] + infos['bonus_qty'] }} {{ add_product(id, '+') }}
-        {{ product.name }}: {{ "%0.2f"|format(s) }} €
-        {% if infos['bonus_qty'] %}
-            P
+    <div>
+        {% if request.session['too_young'] %}
+        <p><strong>{% trans %}Too young for that product{% endtrans %}</strong></p>
         {% endif %}
-        </li>
-        {% endfor %}
-    </ul>
-    <p><strong>{% trans %}Total: {% endtrans %}{{ "%0.2f"|format(basket_total) }} €</strong></p>
-    <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="finish">
-        <input type="submit" value="{% trans %}Finish{% endtrans %}" />
-    </form>
-    <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="cancel">
-        <input type="submit" value="{% trans %}Cancel{% endtrans %}" />
-    </form>
-    <div><strong>{% trans %}Products: {% endtrans %}</strong>
-    {% for t in categories %}
-    {% if counter.products.filter(product_type=t).exists() %}
-        <h5>{{ t }}</h5>
-        {% for p in counter.products.filter(product_type=t).all() %}
-        {{ add_product(p.id, p.name) }}
-        {% endfor %}
-    {% endif %}
-    {% endfor %}
+        {% if request.session['not_allowed'] %}
+        <p><strong>{% trans %}Not allowed for that product{% endtrans %}</strong></p>
+        {% endif %}
+        {% if request.session['not_enough'] %}
+        <p><strong>{% trans %}Not enough money{% endtrans %}</strong></p>
+        {% endif %}
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="code">
+            <input type="input" name="code" value="" autofocus id="code_field"/>
+            <input type="submit" value="{% trans %}Go{% endtrans %}" />
+        </form>
+        <p>{% trans %}Basket: {% endtrans %}</p>
+        <ul>
+            {% for id,infos in request.session['basket']|dictsort %}
+            {% set product = counter.products.filter(id=id).first() %}
+            {% set s = infos['qty'] * infos['price'] / 100 %}
+            <li>{{ del_product(id, '-') }} {{ infos['qty'] + infos['bonus_qty'] }} {{ add_product(id, '+') }}
+            {{ product.name }}: {{ "%0.2f"|format(s) }} €
+            {% if infos['bonus_qty'] %}
+                P
+            {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        <p><strong>{% trans %}Total: {% endtrans %}{{ "%0.2f"|format(basket_total) }} €</strong></p>
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="finish">
+            <input type="submit" value="{% trans %}Finish{% endtrans %}" />
+        </form>
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="cancel">
+            <input type="submit" value="{% trans %}Cancel{% endtrans %}" />
+        </form>
     </div>
+    {% if counter.type == 'BAR' %}
+    <h5>{% trans %}Refilling{% endtrans %}</h5>
+    <div>
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            {{ refill_form.as_p() }}
+            <input type="hidden" name="action" value="refill">
+            <input type="submit" value="{% trans %}Go{% endtrans %}" />
+        </form>
+    </div>
+    {% endif %}
+</div>
+<div id="products">
+    {% for t in categories -%}
+    {%- if counter.products.filter(product_type=t).exists() -%}
+    <h5>{{ t }}</h5>
+    <div id="cat_{{ t }}">
+        {% for p in counter.products.filter(product_type=t).all() -%}
+            {{ add_product(p.id, "<strong>%s</strong><hr>%s €<br>%s" % (p.name, p.selling_price, p.code)) }}
+        {%- endfor %}
+    </div>
+    {%- endif -%}
+    {%- endfor %}
 </div>
 
 {% endblock %}
@@ -101,13 +105,13 @@
 <script>
 $( function() {
     var products = [
-    {% for p in counter.products.all() %}
+    {% for p in counter.products.all() -%}
         {
             value: "{{ p.code }}",
             label: "{{ p.name }}",
             tags: "{{ p.code }} {{ p.name }}",
         },
-    {% endfor %}
+    {%- endfor %}
     ];
     var quantity = "";
     var search = "";
@@ -132,6 +136,14 @@ $( function() {
             }));
         },
     });
+});
+$( function() {
+    $("#bar_ui").accordion({
+        heightStyle: "content",
+        });
+    $("#products").accordion({
+        heightStyle: "content",
+        });
 });
 </script>
 {% endblock %}
