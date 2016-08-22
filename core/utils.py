@@ -2,6 +2,9 @@
 
 from io import BytesIO
 from PIL import Image
+# from exceptions import IOError
+import PIL
+from django.core.files.base import ContentFile
 
 def scale_dimension(width, height, long_edge):
     if width > height:
@@ -11,10 +14,14 @@ def scale_dimension(width, height, long_edge):
     return int(width * ratio), int(height * ratio)
 
 def resize_image(im, edge, format): # TODO move that into a utils file
-    from django.core.files.base import ContentFile
     (w, h) = im.size
     (width, height) = scale_dimension(w, h, long_edge=edge)
     content = BytesIO()
-    im.resize((width, height), Image.ANTIALIAS).save(fp=content, format=format, dpi=[72, 72])
+    im = im.resize((width, height), PIL.Image.ANTIALIAS)
+    try:
+        im.save(fp=content, format=format.upper(), quality=90, optimize=True, progressive=True)
+    except IOError:
+        PIL.ImageFile.MAXBLOCK = im.size[0] * im.size[1]
+        im.save(fp=content, format=format.upper(), quality=90, optimize=True, progressive=True)
     return ContentFile(content.getvalue())
 
