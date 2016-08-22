@@ -58,7 +58,7 @@ class Subscription(models.Model):
         self.member.make_home()
 
     def get_absolute_url(self):
-        return reverse('core:user_profile', kwargs={'user_id': self.member.pk})
+        return reverse('core:user_edit', kwargs={'user_id': self.member.pk})
 
     def __str__(self):
         if hasattr(self, "member") and self.member is not None:

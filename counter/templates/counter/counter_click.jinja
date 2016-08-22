@@ -86,10 +86,17 @@
     {% endif %}
 </div>
 <div id="products">
+    <ul>
+        {% for t in categories -%}
+        {%- if counter.products.filter(product_type=t).exists() -%}
+        <li><a href="#cat_{{ t|slugify }}">{{ t }}</a></li>
+        {%- endif -%}
+        {%- endfor %}
+    </ul>
     {% for t in categories -%}
     {%- if counter.products.filter(product_type=t).exists() -%}
-    <h5>{{ t }}</h5>
-    <div id="cat_{{ t }}">
+    <div id="cat_{{ t|slugify }}">
+        <h5>{{ t }}</h5>
         {% for p in counter.products.filter(product_type=t).all() -%}
             {% set file = None %}
             {% if p.icon %}
@@ -148,9 +155,7 @@ $( function() {
     $("#bar_ui").accordion({
         heightStyle: "content",
         });
-    $("#products").accordion({
-        heightStyle: "content",
-        });
+    $("#products").tabs();
 });
 </script>
 {% endblock %}

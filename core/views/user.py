@@ -1,8 +1,9 @@
 # This file contains all the views that concern the user model
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout as auth_logout, views
+from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.http import Http404
 from django.views.generic.edit import UpdateView
 from django.views.generic import ListView, DetailView, TemplateView
@@ -16,7 +17,7 @@ import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm
-from core.models import User
+from core.models import User, SithFile
 
 def login(request):
     """
@@ -159,6 +160,35 @@ class UserListView(ListView):
     """
     model = User
     template_name = "core/user_list.jinja"
+
+class UserUploadProfilePictView(CanEditMixin, DetailView):
+    """
+    Handle the upload of the profile picture taken with webcam in navigator
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    template_name = "core/user_edit.jinja"
+
+    def post(self, request, *args, **kwargs):
+        from core.utils import resize_image
+        from io import BytesIO
+        from PIL import Image
+        self.object = self.get_object()
+        if self.object.profile_pict:
+            raise ValidationError(_("User already has a profile picture"))
+        print(request.FILES['new_profile_pict'])
+        f = request.FILES['new_profile_pict']
+        parent = SithFile.objects.filter(parent=None, name="profiles").first()
+        name = str(self.object.id) + "_profile.jpg" # Webcamejs uploads JPGs
+        im = Image.open(BytesIO(f.read()))
+        new_file = SithFile(parent=parent, name=name,
+                file=resize_image(im, 400, f.content_type.split('/')[-1]),
+                owner=self.object, is_folder=False, mime_type=f.content_type, size=f._size)
+        new_file.file.name = name
+        new_file.save()
+        self.object.profile_pict = new_file
+        self.object.save()
+        return redirect("core:user_edit", user_id=self.object.id)
 
 class UserUpdateProfileView(CanEditMixin, UpdateView):
     """

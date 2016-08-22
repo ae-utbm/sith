@@ -10,9 +10,21 @@
     {% csrf_token %}
     {% for field in form %}
     <p>{{ field.errors }}<label for="{{ field.name }}">{{ field.label }}
-    {%- if field.name == "profile_pict" and form.instance.profile_pict -%}
+    {%- if field.name == "profile_pict" -%}
     <br>{% trans %}Current profile: {% endtrans %}
+    {% if form.instance.profile_pict %}
     <img src="{{ form.instance.profile_pict.get_download_url() }}" title="{% trans %}Profile{% endtrans %}" /><br>
+    {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
+    <a href="{{ url('core:file_delete', file_id=form.instance.profile_pict.id, popup="") }}">{% trans %}Delete{% endtrans %}</a>
+    {% endif %}
+    {% else %}
+    <img src="{{ static('core/img/unknown.jpg') }}" title="-" crossOrigin="Anonymous" id="new_profile"/><br>
+    <div id="take_picture">
+        <div id="camera_canvas" style="width:320; height:240; margin: 0px auto;"></div>
+        <a href="javascript:void(take_snapshot())">{% trans %}Take picture{% endtrans %}</a>
+    </div>
+    <p>
+    {% endif %}<br>
     {%- elif field.name == "avatar_pict" and form.instance.avatar_pict -%}
     <br>{% trans %}Current avatar: {% endtrans %}
     <img src="{{ form.instance.avatar_pict.get_download_url() }}" title="{% trans %}Avatar{% endtrans %}" /><br>
@@ -34,6 +46,39 @@
 </form>
 {% endblock %}
 
+{% block script %}
+    {{ super() }}
+    {% if not form.instance.profile_pict %}
+    <script src="{{ static('core/js/webcam.js') }}"></script>
+    <script language="JavaScript">
+        Webcam.set({
+                width: 320,
+                height: 240,
+                dest_width: 320,
+                dest_height: 240,
+                image_format: 'jpeg',
+                jpeg_quality: 90,
+                force_flash: false
+            });
+        Webcam.attach( '#camera_canvas' );
+
+        function take_snapshot() {
+            var data_uri = Webcam.snap();
+            var url = "{{ url('core:user_profile_upload', user_id=form.instance.id) }}";
+            Webcam.upload( data_uri, url, function(code, text) {
+                            if (code == 200) {
+                                $('#new_profile').attr('src', data_uri);
+                                $('#take_picture').remove();
+                                $('#id_profile_pict').remove();
+                            } else {
+                                console.log("Unknown error: ");
+                                console.log(text);
+                            }
+                        }, "new_profile_pict", {name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'});
+        }
+    </script>
+    {% endif %}
+{% endblock %}
 
 
 
