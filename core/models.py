@@ -167,6 +167,7 @@ class User(AbstractBaseUser):
     parent_phone = PhoneNumberField(_("parent phone"), null=True, blank=True)
     address = models.CharField(_("address"), max_length=128, blank=True, default="")
     parent_address = models.CharField(_("parent address"), max_length=128, blank=True, default="")
+    is_subscriber_viewable = models.BooleanField(_("is subscriber viewable"), default=True)
 
     objects = UserManager()
 
@@ -358,6 +359,9 @@ class User(AbstractBaseUser):
 
     def can_be_edited_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
+
+    def can_be_viewed_by(self, user):
+        return (user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP) and self.is_subscriber_viewable) or user.is_root
 
     def get_mini_item(self):
         return """

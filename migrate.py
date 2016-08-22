@@ -132,6 +132,7 @@ def migrate_users():
                     parent_address=(to_unicode(u['adresse_parents']) + ", " + to_unicode(u['cpostal_parents']) + " " + to_unicode(u['ville_parents'])),
                     phone=u['tel_portable_utl'] or "",
                     parent_phone=u['tel_parents'] or "",
+                    is_subscriber_viewable=bool(u['publique_utl']),
             )
             new.generate_username()
             new.save()
@@ -602,24 +603,23 @@ def migrate_permanencies():
     cur.close()
 
 def main():
-    # migrate_users()
-    # migrate_profile_pict()
-    # migrate_clubs()
-    # migrate_club_memberships()
-    # migrate_subscriptions()
-    # update_customer_account()
-    # migrate_counters()
-    # migrate_permanencies()
-    # migrate_typeproducts()
-    # migrate_products()
-    # migrate_product_pict()
-    # migrate_products_to_counter()
+    migrate_users()
+    migrate_profile_pict()
+    migrate_clubs()
+    migrate_club_memberships()
+    migrate_subscriptions()
+    update_customer_account()
+    migrate_counters()
+    migrate_permanencies()
+    migrate_typeproducts()
+    migrate_products()
+    migrate_product_pict()
+    migrate_products_to_counter()
     # reset_customer_amount()
-    # migrate_invoices()
-    # migrate_refillings()
-    # migrate_sellings()
-    reset_index('core')
-    # reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
+    migrate_invoices()
+    migrate_refillings()
+    migrate_sellings()
+    reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
 
 if __name__ == "__main__":
     main()

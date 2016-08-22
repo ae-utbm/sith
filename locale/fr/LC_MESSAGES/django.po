@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-20 21:11+0200\n"
+"POT-Creation-Date: 2016-08-22 18:13+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -66,7 +66,7 @@ msgstr "montant effectif"
 msgid "number"
 msgstr "numéro"
 
-#: accounting/models.py:154 core/models.py:426 core/models.py:702
+#: accounting/models.py:154 core/models.py:430 core/models.py:706
 #: counter/models.py:215 counter/models.py:261 eboutic/models.py:14
 #: eboutic/models.py:47
 msgid "date"
@@ -218,6 +218,7 @@ msgstr "Éditer"
 #: accounting/templates/accounting/bank_account_list.jinja:16
 #: core/templates/core/file_detail.jinja:43
 #: core/templates/core/group_list.jinja:13
+#: core/templates/core/user_edit.jinja:18
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:146
 msgid "Delete"
@@ -767,120 +768,124 @@ msgstr "téléphone des parents"
 msgid "parent address"
 msgstr "adresse des parents"
 
-#: core/models.py:256
+#: core/models.py:170
+msgid "is subscriber viewable"
+msgstr "profil visible par les cotisants"
+
+#: core/models.py:257
 msgid "A user with that username already exists"
 msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 
-#: core/models.py:372 core/templates/core/macros.jinja:17
+#: core/models.py:376 core/templates/core/macros.jinja:17
 #: core/templates/core/user_detail.jinja:14
 #: core/templates/core/user_detail.jinja:16
-#: core/templates/core/user_edit.jinja:15
+#: core/templates/core/user_edit.jinja:16
 msgid "Profile"
 msgstr "Profil"
 
-#: core/models.py:403
+#: core/models.py:407
 msgid "Visitor"
 msgstr "Visiteur"
 
-#: core/models.py:408
+#: core/models.py:412
 msgid "define if we show a users stats"
 msgstr "Definit si l'on montre les statistiques de l'utilisateur"
 
-#: core/models.py:410
+#: core/models.py:414
 msgid "Show your account statistics to others"
 msgstr "Montrez vos statistiques de compte aux autres"
 
-#: core/models.py:417
+#: core/models.py:421
 msgid "file name"
 msgstr "nom du fichier"
 
-#: core/models.py:418 core/models.py:551
+#: core/models.py:422 core/models.py:555
 msgid "parent"
 msgstr "parent"
 
-#: core/models.py:419 core/models.py:429
+#: core/models.py:423 core/models.py:433
 msgid "file"
 msgstr "fichier"
 
-#: core/models.py:420
+#: core/models.py:424
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:421 core/models.py:557
+#: core/models.py:425 core/models.py:561
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:422 core/models.py:558
+#: core/models.py:426 core/models.py:562
 msgid "view group"
 msgstr "groupe de vue"
 
-#: core/models.py:423
+#: core/models.py:427
 msgid "is folder"
 msgstr "est un dossier"
 
-#: core/models.py:424
+#: core/models.py:428
 msgid "mime type"
 msgstr "type mime"
 
-#: core/models.py:425
+#: core/models.py:429
 msgid "size"
 msgstr "taille"
 
-#: core/models.py:455
+#: core/models.py:459
 msgid "Character '/' not authorized in name"
 msgstr "Le caractère '/' n'est pas autorisé dans les noms de fichier"
 
-#: core/models.py:458 core/models.py:463
+#: core/models.py:462 core/models.py:467
 msgid "Loop in folder tree"
 msgstr "Boucle dans l'arborescence des dossiers"
 
-#: core/models.py:467
+#: core/models.py:471
 msgid "You can not make a file be a children of a non folder file"
 msgstr ""
 "Vous ne pouvez pas mettre un fichier enfant de quelque chose qui n'est pas "
 "un dossier"
 
-#: core/models.py:471
+#: core/models.py:475
 msgid "Duplicate file"
 msgstr "Un fichier de ce nom existe déjà"
 
-#: core/models.py:481
+#: core/models.py:485
 msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
-#: core/models.py:506
+#: core/models.py:510
 msgid "Folder: "
 msgstr "Dossier : "
 
-#: core/models.py:508
+#: core/models.py:512
 msgid "File: "
 msgstr "Fichier : "
 
-#: core/models.py:550 core/models.py:554
+#: core/models.py:554 core/models.py:558
 msgid "page name"
 msgstr "nom de la page"
 
-#: core/models.py:555
+#: core/models.py:559
 msgid "owner group"
 msgstr "groupe propriétaire"
 
-#: core/models.py:586
+#: core/models.py:590
 msgid "Duplicate page"
 msgstr "Une page de ce nom existe déjà"
 
-#: core/models.py:592
+#: core/models.py:596
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:699
+#: core/models.py:703
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:700
+#: core/models.py:704
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:701
+#: core/models.py:705
 msgid "page content"
 msgstr "contenu de la page"
 
@@ -970,7 +975,7 @@ msgstr "Confirmation"
 
 #: core/templates/core/delete_confirm.jinja:14
 #: core/templates/core/file_delete_confirm.jinja:14
-#: counter/templates/counter/counter_click.jinja:83
+#: counter/templates/counter/counter_click.jinja:73
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -1039,7 +1044,7 @@ msgid "Edit group"
 msgstr "Éditer le groupe"
 
 #: core/templates/core/group_edit.jinja:9
-#: core/templates/core/user_edit.jinja:24
+#: core/templates/core/user_edit.jinja:36
 #: core/templates/core/user_group.jinja:8
 msgid "Update"
 msgstr "Mettre à jour"
@@ -1347,35 +1352,39 @@ msgstr "Éditer le profil de l'utilisateur"
 msgid "Current profile: "
 msgstr "Profil actuel : "
 
-#: core/templates/core/user_edit.jinja:17
+#: core/templates/core/user_edit.jinja:24
+msgid "Take picture"
+msgstr ""
+
+#: core/templates/core/user_edit.jinja:29
 msgid "Current avatar: "
 msgstr "Avatar actuel : "
 
-#: core/templates/core/user_edit.jinja:18
+#: core/templates/core/user_edit.jinja:30
 msgid "Avatar"
 msgstr "Avatar"
 
-#: core/templates/core/user_edit.jinja:20
+#: core/templates/core/user_edit.jinja:32
 msgid "Current scrub: "
 msgstr "Blouse actuelle : "
 
-#: core/templates/core/user_edit.jinja:21
+#: core/templates/core/user_edit.jinja:33
 msgid "Scrub"
 msgstr "Blouse"
 
-#: core/templates/core/user_edit.jinja:25
+#: core/templates/core/user_edit.jinja:37
 msgid "Username: "
 msgstr "Nom d'utilisateur : "
 
-#: core/templates/core/user_edit.jinja:27
+#: core/templates/core/user_edit.jinja:39
 msgid "Account number: "
 msgstr "Numero de compte : "
 
-#: core/templates/core/user_edit.jinja:30
+#: core/templates/core/user_edit.jinja:42
 msgid "Change my password"
 msgstr "Changer mon mot de passe"
 
-#: core/templates/core/user_edit.jinja:32
+#: core/templates/core/user_edit.jinja:44
 msgid "Change user password"
 msgstr "Changer le mot de passe"
 
@@ -1414,7 +1423,7 @@ msgstr "Gestion de Sith"
 msgid "Subscriptions"
 msgstr "Cotisations"
 
-#: core/templates/core/user_tools.jinja:22 counter/views.py:468
+#: core/templates/core/user_tools.jinja:22 counter/views.py:470
 msgid "Counters"
 msgstr "Comptoirs"
 
@@ -1451,7 +1460,7 @@ msgstr "Ajouter un nouveau dossier"
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py:62 core/views/forms.py:168 core/views/forms.py:172
+#: core/views/files.py:61 core/views/forms.py:152 core/views/forms.py:156
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoie du fichier %(file_name)s : %(msg)s"
@@ -1464,7 +1473,7 @@ msgstr "Choisir un fichier"
 msgid "Choose user"
 msgstr "Choisir un utilisateur"
 
-#: core/views/forms.py:127
+#: core/views/forms.py:111
 msgid ""
 "Profile: you need to be visible on the picture, in order to be recognized (e."
 "g. by the barmen)"
@@ -1472,17 +1481,21 @@ msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
 
-#: core/views/forms.py:128
+#: core/views/forms.py:112
 msgid "Avatar: used on the forum"
 msgstr "Avatar : utilisé sur le forum"
 
-#: core/views/forms.py:129
+#: core/views/forms.py:113
 msgid "Scrub: let other know how your scrub looks like!"
 msgstr "Blouse : montrez aux autres à quoi ressemble votre blouse !"
 
-#: core/views/forms.py:173
+#: core/views/forms.py:157
 msgid "Bad image format, only jpeg, png, and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, et gif sont acceptés"
+
+#: core/views/user.py:178
+msgid "User already has a profile picture"
+msgstr ""
 
 #: counter/models.py:24
 msgid "account id"
@@ -1496,7 +1509,7 @@ msgstr "client"
 msgid "customers"
 msgstr "clients"
 
-#: counter/models.py:44 counter/templates/counter/counter_click.jinja:53
+#: counter/models.py:44 counter/templates/counter/counter_click.jinja:43
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
@@ -1610,49 +1623,45 @@ msgstr "permanence"
 msgid "Customer"
 msgstr "Client"
 
-#: counter/templates/counter/counter_click.jinja:35
-msgid "Refilling"
-msgstr "Rechargement"
+#: counter/templates/counter/counter_click.jinja:34
+#: launderette/templates/launderette/launderette_admin.jinja:8
+msgid "Selling"
+msgstr "Vente"
+
+#: counter/templates/counter/counter_click.jinja:37
+msgid "Too young for that product"
+msgstr "Trop jeune pour ce produit"
 
 #: counter/templates/counter/counter_click.jinja:40
-#: counter/templates/counter/counter_click.jinja:59
+msgid "Not allowed for that product"
+msgstr "Non autorisé pour ce produit"
+
+#: counter/templates/counter/counter_click.jinja:49
+#: counter/templates/counter/counter_click.jinja:83
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:14
 msgid "Go"
 msgstr "Valider"
 
-#: counter/templates/counter/counter_click.jinja:45
-#: launderette/templates/launderette/launderette_admin.jinja:8
-msgid "Selling"
-msgstr "Vente"
-
-#: counter/templates/counter/counter_click.jinja:47
-msgid "Too young for that product"
-msgstr "Trop jeune pour ce produit"
-
-#: counter/templates/counter/counter_click.jinja:50
-msgid "Not allowed for that product"
-msgstr "Non autorisé pour ce produit"
-
-#: counter/templates/counter/counter_click.jinja:61
+#: counter/templates/counter/counter_click.jinja:51
 #: eboutic/templates/eboutic/eboutic_main.jinja:27
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:11
 msgid "Basket: "
 msgstr "Panier : "
 
-#: counter/templates/counter/counter_click.jinja:74
+#: counter/templates/counter/counter_click.jinja:64
 #: counter/templates/counter/counter_main.jinja:28
 #: eboutic/templates/eboutic/eboutic_main.jinja:34
 msgid "Total: "
 msgstr "Total : "
 
-#: counter/templates/counter/counter_click.jinja:78
+#: counter/templates/counter/counter_click.jinja:68
 msgid "Finish"
 msgstr "Terminer"
 
-#: counter/templates/counter/counter_click.jinja:85
-msgid "Products: "
-msgstr "Produits : "
+#: counter/templates/counter/counter_click.jinja:77
+msgid "Refilling"
+msgstr "Rechargement"
 
 #: counter/templates/counter/counter_list.jinja:4
 #: counter/templates/counter/counter_list.jinja:10
@@ -1752,23 +1761,23 @@ msgstr "Mauvais identifiants"
 msgid "User is not subscriber"
 msgstr "L'utilisateur n'est pas cotisant."
 
-#: counter/views.py:253
+#: counter/views.py:257
 msgid "END"
 msgstr "FIN"
 
-#: counter/views.py:255
+#: counter/views.py:259
 msgid "CAN"
 msgstr "ANN"
 
-#: counter/views.py:285
+#: counter/views.py:289
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: counter/views.py:465
+#: counter/views.py:467
 msgid "Parent product"
 msgstr "Produit parent"
 
-#: counter/views.py:466
+#: counter/views.py:468
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
@@ -1831,7 +1840,7 @@ msgstr "Le paiement a été effectué"
 msgid "Return to eboutic"
 msgstr "Retourner à l'eboutic"
 
-#: eboutic/views.py:136
+#: eboutic/views.py:138
 msgid "You do not have enough money to buy the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
@@ -2117,14 +2126,17 @@ msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 msgid "You are trying to create a subscription without member"
 msgstr "Vous essayez de créer une cotisation sans membre"
 
-#: subscription/views.py:52
+#: subscription/views.py:51
 msgid "A user with that email address already exists"
 msgstr "Un utilisateur avec cette adresse email existe déjà"
 
-#: subscription/views.py:67
+#: subscription/views.py:66
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
+
+#~ msgid "Products: "
+#~ msgstr "Produits : "
 
 #~ msgid "Club: "
 #~ msgstr "Club : "
