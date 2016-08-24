@@ -4,6 +4,8 @@ from core.views import *
 
 urlpatterns = [
     url(r'^$', index, name='index'),
+
+    # Search
     url(r'^search/$', search_view, name='search'),
     url(r'^search_json/$', search_json, name='search_json'),
     url(r'^search_user/$', search_user_json, name='search_user'),

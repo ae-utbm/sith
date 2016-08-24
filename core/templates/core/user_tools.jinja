@@ -41,16 +41,17 @@
     {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) or user.is_root %}
     <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
     {% endif %}
-    {% for m in user.membership.filter(end_date=None).filter(role__gte=7).all() %}
-    {% for b in m.club.bank_accounts.all() %}
+    {% for m in user.membership.filter(end_date=None).filter(role__gte=7).all() -%}
+    {%- for b in m.club.bank_accounts.all() %}
     <li><strong>{% trans %}Bank account: {% endtrans %}</strong>
-        <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b.club }}</a></li>
-    {% endfor %}
-    {% if m.club.club_account %}
-    <li><strong>{% trans %}Club account: {% endtrans %}</strong>
-        <a href="{{ url('accounting:club_details', c_account_id=m.club.club_account.id) }}">{{ m.club.club_account }}</a></li>
-    {% endif %}
-    {% endfor %}
+        <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b }}</a></li>
+    {%- endfor %}
+    {% if m.club.club_account.exists() -%}
+        {% for ca in m.club.club_account.all() %}
+        <li><strong>{% trans %}Club account: {% endtrans %}</strong> <a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca }}</a></li>
+        {%- endfor %}
+    {%- endif -%}
+    {%- endfor %}
 </ul>
 
 <hr>

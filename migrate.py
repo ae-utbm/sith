@@ -24,6 +24,7 @@ from club.models import Club, Membership
 from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType, Permanency
 from subscription.models import Subscription, Subscriber
 from eboutic.models import Invoice, InvoiceItem
+from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType
 
 db = MySQLdb.connect(
         host="ae-db",
@@ -467,7 +468,6 @@ def migrate_product_pict():
     WHERE id_file IS NOT NULL
     """)
     for r in cur:
-        print(r['nom_prod'])
         try:
             prod = Product.objects.filter(id=r['id_produit']).first()
             if prod:
@@ -602,24 +602,241 @@ def migrate_permanencies():
             print("FAIL to migrate permanency: %s" % (repr(e)))
     cur.close()
 
+### Accounting
+
+def migrate_bank_accounts():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpta_cpbancaire
+    """)
+    BankAccount.objects.all().delete()
+    print("Bank accounts deleted")
+    ae = Club.objects.filter(unix_name='ae').first()
+    for r in cur:
+        try:
+            new = BankAccount(
+                    id=r['id_cptbc'],
+                    club=ae,
+                    name=to_unicode(r['nom_cptbc']),
+                    )
+            new.save()
+        except Exception as e:
+            print("FAIL to migrate bank account: %s" % (repr(e)))
+    cur.close()
+
+def migrate_club_accounts():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpta_cpasso
+    """)
+    ClubAccount.objects.all().delete()
+    print("Club accounts deleted")
+    ae = Club.objects.filter(id=1).first()
+    for r in cur:
+        try:
+            club = Club.objects.filter(id=r['id_asso']).first() or ae
+            bank_acc = BankAccount.objects.filter(id=r['id_cptbc']).first()
+            new = ClubAccount(
+                    id=r['id_cptasso'],
+                    club=club,
+                    name=club.name[:30],
+                    bank_account=bank_acc,
+                    )
+            new.save()
+        except Exception as e:
+            print("FAIL to migrate club account: %s" % (repr(e)))
+    cur.close()
+
+def migrate_journals():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpta_classeur
+    """)
+    GeneralJournal.objects.all().delete()
+    print("General journals deleted")
+    for r in cur:
+        try:
+            club_acc = ClubAccount.objects.filter(id=r['id_cptasso']).first()
+            new = GeneralJournal(
+                    id=r['id_classeur'],
+                    club_account=club_acc,
+                    name=to_unicode(r['nom_classeur']),
+                    start_date=r['date_debut_classeur'],
+                    end_date=r['date_fin_classeur'],
+                    closed=bool(r['ferme']),
+                    )
+            new.save()
+        except Exception as e:
+            print("FAIL to migrate general journal: %s" % (repr(e)))
+    cur.close()
+
+def migrate_accounting_types():
+    MOVEMENT = {
+            -1: "DEBIT",
+            0: "NEUTRAL",
+            1: "CREDIT",
+            }
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpta_op_plcptl
+    """)
+    AccountingType.objects.all().delete()
+    print("Accounting types deleted")
+    for r in cur:
+        try:
+            new = AccountingType(
+                    id=r['id_opstd'],
+                    code=str(r['code_plan']),
+                    label=to_unicode(r['libelle_plan']).capitalize(),
+                    movement_type=MOVEMENT[r['type_mouvement']],
+                    )
+            new.save()
+        except Exception as e:
+            print("FAIL to migrate accounting type: %s" % (repr(e)))
+    cur.close()
+
+def migrate_simpleaccounting_types():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpta_op_clb
+    WHERE id_asso IS NULL
+    """)
+    SimplifiedAccountingType.objects.all().delete()
+    print("Simple accounting types deleted")
+    for r in cur:
+        try:
+            at = AccountingType.objects.filter(id=r['id_opstd']).first()
+            new = SimplifiedAccountingType(
+                    id=r['id_opclb'],
+                    label=to_unicode(r['libelle_opclb']).capitalize(),
+                    accounting_type=at,
+                    )
+            new.save()
+        except Exception as e:
+            print("FAIL to migrate simple type: %s" % (repr(e)))
+    cur.close()
+
+def migrate_operations():
+    MODE = {
+            1: "CHECK",
+            2: "CASH",
+            3: "TRANSFERT",
+            4: "CARD",
+            0: "CASH",
+            None: "CASH",
+            }
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpta_operation
+    """)
+    Operation.objects.all().delete()
+    print("Operation deleted")
+    for r in cur:
+        try:
+            simple_type = None
+            accounting_type = None
+            if r['id_opclb']:
+                simple_type = SimplifiedAccountingType.objects.filter(id=r['id_opclb']).first()
+            if r['id_opstd']:
+                accounting_type = AccountingType.objects.filter(id=r['id_opstd']).first()
+            if not accounting_type and simple_type:
+                accounting_type = simple_type.accounting_type
+            if not accounting_type:
+                accounting_type = AccountingType.objects.filter(movement_type="NEUTRAL").first()
+            journal = GeneralJournal.objects.filter(id=r['id_classeur']).first()
+            def get_target_type():
+                if r['id_utilisateur']:
+                    return "USER"
+                if r['id_asso']:
+                    return "CLUB"
+                if r['id_ent']:
+                    return "COMPANY"
+                if r['id_classeur']:
+                    return "ACCOUNT"
+            def get_target_id():
+                return int(r['id_utilisateur'] or r['id_asso'] or r['id_ent'] or r['id_classeur']) or None
+            new = Operation(
+                    id=r['id_op'],
+                    journal=journal,
+                    amount=r['montant_op']/100,
+                    date=r['date_op'] or journal.end_date,
+                    remark=to_unicode(r['commentaire_op']),
+                    mode=MODE[r['mode_op']],
+                    cheque_number=str(r['num_cheque_op']),
+                    done=bool(r['op_effctue']),
+                    simpleaccounting_type=simple_type,
+                    accounting_type=accounting_type,
+                    target_type=get_target_type(),
+                    target_id=get_target_id(),
+                    target_label="-",
+                    )
+            try:
+                new.clean()
+            except:
+                new.target_id = get_target_id()
+                new.target_type = "OTHER"
+            new.save()
+        except Exception as e:
+            print("FAIL to migrate operation: %s" % (repr(e)))
+    cur.close()
+
+def make_operation_links():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpta_operation
+    """)
+    for r in cur:
+        if r['id_op_liee']:
+            try:
+                op1 = Operation.objects.filter(id=r['id_op']).first()
+                op2 = Operation.objects.filter(id=r['id_op_liee']).first()
+                op1.linked_operation = op2
+                op1.save()
+                op2.linked_operation = op1
+                op2.save()
+            except Exception as e:
+                print("FAIL to link operations: %s" % (repr(e)))
+    cur.close()
+
 def main():
-    migrate_users()
-    migrate_profile_pict()
-    migrate_clubs()
-    migrate_club_memberships()
-    migrate_subscriptions()
-    update_customer_account()
-    migrate_counters()
-    migrate_permanencies()
-    migrate_typeproducts()
-    migrate_products()
-    migrate_product_pict()
-    migrate_products_to_counter()
+    start = datetime.datetime.now()
+    print("Start at %s" % start)
+    # migrate_users()
+    # migrate_profile_pict()
+    # migrate_clubs()
+    # migrate_club_memberships()
+    # migrate_subscriptions()
+    # update_customer_account()
+    # migrate_counters()
+    # migrate_permanencies()
+    # migrate_typeproducts()
+    # migrate_products()
+    # migrate_product_pict()
+    # migrate_products_to_counter()
     # reset_customer_amount()
-    migrate_invoices()
-    migrate_refillings()
-    migrate_sellings()
-    reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
+    # migrate_invoices()
+    # migrate_refillings()
+    # migrate_sellings()
+    # reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
+    # migrate_accounting_types()
+    # migrate_simpleaccounting_types()
+    # migrate_bank_accounts()
+    # migrate_club_accounts()
+    # migrate_journals()
+    # migrate_operations()
+    make_operation_links()
+    end = datetime.datetime.now()
+    print("End at %s" % end)
+    print("Running time: %s" % (end-start))
+
+
 
 if __name__ == "__main__":
     main()

@@ -8,7 +8,7 @@
     <li><a href="{{ url('club:club_view', club_id=club.id) }}">{{ club.name }}</a>
         {%- if club.children.all()|length != 0 %}
         <ul>
-            {%- for c in club.children.all() %}
+            {%- for c in club.children.order_by('name') %}
                 {{ display_club(c) }}
             {%- endfor %}
         </ul>
@@ -23,7 +23,7 @@
     {% if club_list %}
     <h3>{% trans %}Club list{% endtrans %}</h3>
     <ul>
-        {%- for c in club_list if c.parent is none %}
+        {%- for c in club_list.order_by('name') if c.parent is none %}
         {{ display_club(c) }}
         {%- endfor %}
     </ul>

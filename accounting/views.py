@@ -4,10 +4,49 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse_lazy
 from django.forms.models import modelform_factory
 from django.forms import HiddenInput
+from django import forms
+
+from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from core.views.forms import SelectFile, SelectDate
-from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company
+from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType
+
+# Main accounting view
+
+class BankAccountListView(CanViewMixin, ListView):
+    """
+    A list view for the admins
+    """
+    model = BankAccount
+    template_name = 'accounting/bank_account_list.jinja'
+    ordering = ['name']
+
+# Simplified accounting types
+
+class SimplifiedAccountingTypeListView(CanViewMixin, ListView):
+    """
+    A list view for the admins
+    """
+    model = SimplifiedAccountingType
+    template_name = 'accounting/simplifiedaccountingtype_list.jinja'
+
+class SimplifiedAccountingTypeEditView(CanViewMixin, UpdateView):
+    """
+    An edit view for the admins
+    """
+    model = SimplifiedAccountingType
+    pk_url_kwarg = "type_id"
+    fields = ['label', 'accounting_type']
+    template_name = 'core/edit.jinja'
+
+class SimplifiedAccountingTypeCreateView(CanCreateMixin, CreateView):
+    """
+    Create an accounting type (for the admins)
+    """
+    model = SimplifiedAccountingType
+    fields = ['label', 'accounting_type']
+    template_name = 'core/create.jinja'
 
 # Accounting types
 
@@ -37,20 +76,13 @@ class AccountingTypeCreateView(CanCreateMixin, CreateView):
 
 # BankAccount views
 
-class BankAccountListView(CanViewMixin, ListView):
-    """
-    A list view for the admins
-    """
-    model = BankAccount
-    template_name = 'accounting/bank_account_list.jinja'
-
 class BankAccountEditView(CanViewMixin, UpdateView):
     """
     An edit view for the admins
     """
     model = BankAccount
     pk_url_kwarg = "b_account_id"
-    fields = ['name', 'iban', 'number']
+    fields = ['name', 'iban', 'number', 'club']
     template_name = 'core/edit.jinja'
 
 class BankAccountDetailView(CanViewMixin, DetailView):
@@ -129,7 +161,8 @@ class JournalCreateView(CanCreateMixin, CreateView):
     Create a general journal
     """
     model = GeneralJournal
-    fields = ['name', 'start_date', 'club_account']
+    form_class = modelform_factory(GeneralJournal, fields=['name', 'start_date', 'club_account'],
+            widgets={ 'start_date': SelectDate, })
     template_name = 'core/create.jinja'
 
     def get_initial(self):
@@ -159,16 +192,82 @@ class JournalEditView(CanEditMixin, UpdateView):
 
 # Operation views
 
+class OperationForm(forms.ModelForm):
+    class Meta:
+        model = Operation
+        fields = ['amount', 'remark', 'journal', 'target_type', 'target_id', 'target_label', 'date', 'mode',
+            'cheque_number', 'invoice', 'simpleaccounting_type', 'accounting_type', 'done']
+        widgets = {
+                'journal': HiddenInput,
+                'target_id': HiddenInput,
+                'date': SelectDate,
+                'invoice': SelectFile,
+                'target_type': forms.RadioSelect,
+                }
+    user = AutoCompleteSelectField('users', help_text=None, required=False)
+    club_account = AutoCompleteSelectField('club_accounts', help_text=None, required=False)
+    club = AutoCompleteSelectField('clubs', help_text=None, required=False)
+    company = AutoCompleteSelectField('companies', help_text=None, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(OperationForm, self).__init__(*args, **kwargs)
+        if self.instance.target_type == "USER":
+            self.fields['user'].initial = self.instance.target_id
+        elif self.instance.target_type == "ACCOUNT":
+            self.fields['club_account'].initial = self.instance.target_id
+        elif self.instance.target_type == "CLUB":
+            self.fields['club'].initial = self.instance.target_id
+        elif self.instance.target_type == "COMPANY":
+            self.fields['company'].initial = self.instance.target_id
+
+    def clean(self):
+        self.cleaned_data = super(OperationForm, self).clean()
+        print(self.errors)
+        if self.cleaned_data['target_type'] == "USER":
+            self.cleaned_data['target_id'] = self.cleaned_data['user'].id
+        elif self.cleaned_data['target_type'] == "ACCOUNT":
+            self.cleaned_data['target_id'] = self.cleaned_data['club_account'].id
+        elif self.cleaned_data['target_type'] == "CLUB":
+            self.cleaned_data['target_id'] = self.cleaned_data['club'].id
+        elif self.cleaned_data['target_type'] == "COMPANY":
+            self.cleaned_data['target_id'] = self.cleaned_data['company'].id
+        return self.cleaned_data
+
+    def save(self):
+        ret = super(OperationForm, self).save()
+        if self.instance.target_type == "ACCOUNT" and not self.instance.linked_operation and self.instance.target.has_open_journal():
+            inst = self.instance
+            club_account = inst.target
+            acc_type = AccountingType.objects.exclude(movement_type="NEUTRAL").exclude(
+                    movement_type=inst.accounting_type.movement_type).first() # Select a random opposite accounting type
+            op = Operation(
+                    journal=club_account.get_open_journal(),
+                    amount=inst.amount,
+                    date=inst.date,
+                    remark=inst.remark,
+                    mode=inst.mode,
+                    cheque_number=inst.cheque_number,
+                    invoice=inst.invoice,
+                    done=False, # Has to be checked by hand
+                    simpleaccounting_type=None,
+                    accounting_type=acc_type,
+                    target_type="ACCOUNT",
+                    target_id=inst.journal.club_account.id,
+                    target_label="",
+                    linked_operation=inst,
+                    )
+            op.save()
+            self.instance.linked_operation = op
+            self.save()
+        return ret
+
 class OperationCreateView(CanCreateMixin, CreateView):
     """
     Create an operation
     """
     model = Operation
-    form_class = modelform_factory(Operation,
-            fields=['amount', 'label', 'remark', 'journal', 'target_type', 'target_id', 'target_label', 'date', 'mode',
-                'cheque_number', 'invoice', 'accounting_type', 'done'],
-            widgets={'journal': HiddenInput, 'date': SelectDate, 'invoice': SelectFile})
-    template_name = 'core/create.jinja'
+    form_class = OperationForm
+    template_name = 'accounting/operation_edit.jinja'
 
     def get_initial(self):
         ret = super(OperationCreateView, self).get_initial()
@@ -184,11 +283,8 @@ class OperationEditView(CanEditMixin, UpdateView):
     """
     model = Operation
     pk_url_kwarg = "op_id"
-    form_class = modelform_factory(Operation,
-            fields = ['amount', 'label', 'remark', 'target_type', 'target_id', 'target_label', 'date', 'mode', 'cheque_number',
-                    'invoice', 'accounting_type', 'done'],
-            widgets={'date': SelectDate, 'invoice': SelectFile})
-    template_name = 'core/edit.jinja'
+    form_class = OperationForm
+    template_name = 'accounting/operation_edit.jinja'
 
 # Company views
 

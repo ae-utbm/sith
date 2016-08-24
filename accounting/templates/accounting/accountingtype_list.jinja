@@ -5,6 +5,11 @@
 {% endblock %}
 
 {% block content %}
+    <p>
+    <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
+    {% trans %}Accounting types{% endtrans %}
+    </p>
+    <hr>
     <p><a href="{{ url('accounting:type_new') }}">{% trans %}New accounting type{% endtrans %}</a></p>
     {% if accountingtype_list %}
     <h3>{% trans %}Accounting type list{% endtrans %}</h3>

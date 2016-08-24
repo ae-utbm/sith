@@ -5,15 +5,24 @@
 {% endblock %}
 
 {% block content %}
+    <h4>
+    {% trans %}Accounting{% endtrans %}
+    </h4>
+    {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) %}
+    <p><a href="{{ url('accounting:simple_type_list') }}">{% trans %}Manage simplified types{% endtrans %}</a></p>
     <p><a href="{{ url('accounting:type_list') }}">{% trans %}Manage accounting types{% endtrans %}</a></p>
     <p><a href="{{ url('accounting:bank_new') }}">{% trans %}New bank account{% endtrans %}</a></p>
+    {% endif %}
     {% if bankaccount_list %}
     <h3>{% trans %}Bank account list{% endtrans %}</h3>
         <ul>
-            {% for a in bankaccount_list  %}
-            <li><a href="{{ url('accounting:bank_details', b_account_id=a.id) }}">{{ a }}</a> -
-                <a href="{{ url('accounting:bank_edit', b_account_id=a.id) }}">{% trans %}Edit{% endtrans %}</a> -
-                <a href="{{ url('accounting:bank_delete', b_account_id=a.id) }}">{% trans %}Delete{% endtrans %}</a></li>
+            {% for a in object_list  %}
+            <li><a href="{{ url('accounting:bank_details', b_account_id=a.id) }}">{{ a }}</a>
+                - <a href="{{ url('accounting:bank_edit', b_account_id=a.id) }}">{% trans %}Edit{% endtrans %}</a>
+                {% if user.is_root %}
+                - <a href="{{ url('accounting:bank_delete', b_account_id=a.id) }}">{% trans %}Delete{% endtrans %}</a>
+                {% endif %}
+            </li>
             {% endfor %}
         </ul>
     {% else %}

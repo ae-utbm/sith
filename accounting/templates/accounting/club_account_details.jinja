@@ -1,10 +1,16 @@
 {% extends "core/base.jinja" %}
 
+{% block title %}
+{% trans %}Club account:{% endtrans %} {{ object.name }}
+{% endblock %}
+
 {% block content %}
     <p>
     <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
     <a href="{{ url('accounting:bank_details', b_account_id=object.bank_account.id) }}">{{object.bank_account }}</a> >
     {{ object }}
+    </p>
+    <hr>
     <h2>{% trans %}Club account:{% endtrans %} {{ object.name }}</h2>
     {% if not object.has_open_journal() %}
     <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">{% trans %}New journal{% endtrans %}</a></p>

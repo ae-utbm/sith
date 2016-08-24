@@ -4,6 +4,7 @@ from core.views.site import search_user
 from core.models import User, Group
 from club.models import Club
 from counter.models import Product, Counter
+from accounting.models import ClubAccount, Company
 
 @register('users')
 class UsersLookup(LookupChannel):
@@ -60,6 +61,26 @@ class ProductsLookup(LookupChannel):
 
     def get_query(self, q, request):
         return (self.model.objects.filter(name__icontains=q) | self.model.objects.filter(code__icontains=q))[:50]
+
+    def format_item_display(self, item):
+        return item.name
+
+@register('club_accounts')
+class ClubAccountLookup(LookupChannel):
+    model = ClubAccount
+
+    def get_query(self, q, request):
+        return self.model.objects.filter(name__icontains=q)[:50]
+
+    def format_item_display(self, item):
+        return item.name
+
+@register('companies')
+class CompaniesLookup(LookupChannel):
+    model = Company
+
+    def get_query(self, q, request):
+        return self.model.objects.filter(name__icontains=q)[:50]
 
     def format_item_display(self, item):
         return item.name

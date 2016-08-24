@@ -1,5 +1,9 @@
 {% extends "core/base.jinja" %}
 
+{% block title %}
+{% trans %}General journal:{% endtrans %} {{ object.name }}
+{% endblock %}
+
 {% block content %}
     <p>
     <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
@@ -7,6 +11,8 @@
     <a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object.club_account }}</a> >
     {{ object.name }}
     </p>
+    <hr>
+    <h2>{% trans %}General journal:{% endtrans %} {{ object.name }}</h2>
     <p><strong>{% trans %}Amount: {% endtrans %}</strong>{{ object.amount }} € -
     <strong>{% trans %}Effective amount: {% endtrans %}</strong>{{ object.effective_amount }} €</p>
     {% if object.closed %}
@@ -19,7 +25,6 @@
         <tr>
             <td>{% trans %}Nb{% endtrans %}</td>
             <td>{% trans %}Date{% endtrans %}</td>
-            <td>{% trans %}Label{% endtrans %}</td>
             <td>{% trans %}Amount{% endtrans %}</td>
             <td>{% trans %}Payment mode{% endtrans %}</td>
             <td>{% trans %}Target{% endtrans %}</td>
@@ -36,7 +41,6 @@
         <tr>
             <td>{{ o.number }}</td>
             <td>{{ o.date }}</td>
-            <td>{{ o.label }}</td>
             <td>{{ o.amount }} €</td>
             <td>{{ o.get_mode_display() }}</td>
             {% if o.target_type == "OTHER" %}

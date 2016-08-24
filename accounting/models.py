@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from django.core import validators
 from django.db.models import Count
 from django.db import models
 from django.conf import settings
@@ -45,7 +46,7 @@ class BankAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
     iban = models.CharField(_('iban'), max_length=255, blank=True)
     number = models.CharField(_('account number'), max_length=255, blank=True)
-    club = models.ForeignKey(Club, related_name="bank_accounts")
+    club = models.ForeignKey(Club, related_name="bank_accounts", verbose_name=_("club"))
 
     def is_owned_by(self, user):
         """
@@ -66,8 +67,8 @@ class BankAccount(models.Model):
 
 class ClubAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
-    club = models.OneToOneField(Club, related_name="club_account")
-    bank_account = models.ForeignKey(BankAccount, related_name="club_accounts")
+    club = models.ForeignKey(Club, related_name="club_account", verbose_name=_("club"))
+    bank_account = models.ForeignKey(BankAccount, related_name="club_accounts", verbose_name=_("bank account"))
 
     def is_owned_by(self, user):
         """
@@ -92,6 +93,9 @@ class ClubAccount(models.Model):
                 return True
         return False
 
+    def get_open_journal(self):
+        return self.journals.filter(closed=False).first()
+
     def get_absolute_url(self):
         return reverse('accounting:club_details', kwargs={'c_account_id': self.id})
 
@@ -108,9 +112,9 @@ class GeneralJournal(models.Model):
     """
     start_date = models.DateField(_('start date'))
     end_date = models.DateField(_('end date'), null=True, blank=True, default=None)
-    name = models.CharField(_('name'), max_length=30)
+    name = models.CharField(_('name'), max_length=40)
     closed = models.BooleanField(_('is closed'), default=False)
-    club_account = models.ForeignKey(ClubAccount, related_name="journals", null=False)
+    club_account = models.ForeignKey(ClubAccount, related_name="journals", null=False, verbose_name=_("club account"))
     amount = CurrencyField(_('amount'), default=0)
     effective_amount = CurrencyField(_('effective_amount'), default=0)
 
@@ -134,7 +138,7 @@ class GeneralJournal(models.Model):
         self.amount = 0
         self.effective_amount = 0
         for o in self.operations.all():
-            if o.accounting_type.movement_type == "credit":
+            if o.accounting_type.movement_type == "CREDIT":
                 if o.done:
                     self.effective_amount += o.amount
                 self.amount += o.amount
@@ -149,20 +153,24 @@ class Operation(models.Model):
     An operation is a line in the journal, a debit or a credit
     """
     number = models.IntegerField(_('number'))
-    journal = models.ForeignKey(GeneralJournal, related_name="operations", null=False)
+    journal = models.ForeignKey(GeneralJournal, related_name="operations", null=False, verbose_name=_("journal"))
     amount = CurrencyField(_('amount'))
     date = models.DateField(_('date'))
-    label = models.CharField(_('label'), max_length=50)
-    remark = models.TextField(_('remark'), max_length=255)
+    remark = models.CharField(_('comment'), max_length=128)
     mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)
-    cheque_number = models.IntegerField(_('cheque number'), default=-1)
+    cheque_number = models.CharField(_('cheque number'), max_length=32, default="", null=True, blank=True)
     invoice = models.ForeignKey(SithFile, related_name='operations', verbose_name=_("invoice"), null=True, blank=True)
     done = models.BooleanField(_('is done'), default=False)
-    accounting_type = models.ForeignKey('AccountingType', related_name="operations", verbose_name=_("accounting type"))
+    simpleaccounting_type = models.ForeignKey('SimplifiedAccountingType', related_name="operations",
+            verbose_name=_("simple type"), null=True, blank=True)
+    accounting_type = models.ForeignKey('AccountingType', related_name="operations",
+            verbose_name=_("accounting type"), null=True, blank=True)
     target_type = models.CharField(_('target type'), max_length=10,
             choices=[('USER', _('User')), ('CLUB', _('Club')), ('ACCOUNT', _('Account')), ('COMPANY', _('Company')), ('OTHER', _('Other'))])
     target_id = models.IntegerField(_('target id'), null=True, blank=True)
     target_label = models.CharField(_('target label'), max_length=32, default="", blank=True)
+    linked_operation = models.OneToOneField('self', related_name='operation_linked_to', verbose_name=_("linked operation"),
+            null=True, blank=True, default=None)
 
     class Meta:
         unique_together = ('number', 'journal')
@@ -183,6 +191,14 @@ class Operation(models.Model):
             raise ValidationError(_("Target does not exists"))
         if self.target_type == "OTHER" and self.target_label == "":
             raise ValidationError(_("Please add a target label if you set no existing target"))
+        if not self.accounting_type and not self.simpleaccounting_type:
+            raise ValidationError(_("You need to provide ether a simplified accounting type or a standard accounting type"))
+        if self.simpleaccounting_type:
+            self.accounting_type = self.simpleaccounting_type.accounting_type
+
+    @property
+    def target(self):
+        return self.get_target()
 
     def get_target(self):
         tar = None
@@ -237,9 +253,13 @@ class AccountingType(models.Model):
 
     Thoses are numbers used in accounting to classify operations
     """
-    code = models.CharField(_('code'), max_length=16) # TODO: add number validator
-    label = models.CharField(_('label'), max_length=60)
-    movement_type = models.CharField(_('movement type'), choices=[('credit', 'Credit'), ('debit', 'Debit'), ('neutral', 'Neutral')], max_length=12)
+    code = models.CharField(_('code'), max_length=16,
+            validators=[
+                validators.RegexValidator(r'^[0-9]*$', _('An accounting type code contains only numbers')),
+                ],
+            )
+    label = models.CharField(_('label'), max_length=128)
+    movement_type = models.CharField(_('movement type'), choices=[('CREDIT', 'Credit'), ('DEBIT', 'Debit'), ('NEUTRAL', 'Neutral')], max_length=12)
 
     class Meta:
         verbose_name = _("accounting type")
@@ -256,4 +276,29 @@ class AccountingType(models.Model):
         return reverse('accounting:type_list')
 
     def __str__(self):
-        return self.movement_type+" - "+self.code+" - "+self.label
+        return self.code+" - "+self.movement_type+" - "+self.label
+
+class SimplifiedAccountingType(models.Model):
+    """
+    Class describing the simplified accounting types.
+    """
+    label = models.CharField(_('label'), max_length=128)
+    accounting_type = models.ForeignKey(AccountingType, related_name="simplified_types",
+            verbose_name=_("simplified accounting types"))
+
+    class Meta:
+        verbose_name = _("simplified type")
+
+    @property
+    def movement_type(self):
+        return self.accounting_type.movement_type
+
+    def get_movement_type_display(self):
+        return self.accounting_type.get_movement_type_display()
+
+    def get_absolute_url(self):
+        return reverse('accounting:simple_type_list')
+
+    def __str__(self):
+        return self.label+" - "+self.accounting_type.code+" - "+self.get_movement_type_display()
+

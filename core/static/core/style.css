@@ -36,6 +36,11 @@ header form {
     margin: 0px auto;
     padding: 0.3em 1%;
 }
+#language_chooser {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+}
 
 /*---------------------------------NAV---------------------------------*/
 nav {

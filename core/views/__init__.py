@@ -99,6 +99,17 @@ class CanViewMixin(View):
         except: pass
         raise PermissionDenied
 
+    def get_context_data(self, **kwargs):
+        context = super(CanViewMixin, self).get_context_data(**kwargs)
+        if hasattr(self, 'object_list'):
+            ba_list = list(self.object_list)
+            l = []
+            for ba in ba_list:
+                if self.request.user.can_view(ba):
+                    l.append(ba)
+            context['object_list'] = l
+        return context
+
 from .user import *
 from .page import *
 from .files import *

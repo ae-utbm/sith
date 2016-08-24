@@ -4,6 +4,10 @@ from accounting.views import *
 
 urlpatterns = [
     # Accounting types
+    url(r'^simple_type$', SimplifiedAccountingTypeListView.as_view(), name='simple_type_list'),
+    url(r'^simple_type/create$', SimplifiedAccountingTypeCreateView.as_view(), name='simple_type_new'),
+    url(r'^simple_type/(?P<type_id>[0-9]+)/edit$', SimplifiedAccountingTypeEditView.as_view(), name='simple_type_edit'),
+    # Accounting types
     url(r'^type$', AccountingTypeListView.as_view(), name='type_list'),
     url(r'^type/create$', AccountingTypeCreateView.as_view(), name='type_new'),
     url(r'^type/(?P<type_id>[0-9]+)/edit$', AccountingTypeEditView.as_view(), name='type_edit'),
