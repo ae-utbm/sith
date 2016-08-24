@@ -7,6 +7,8 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.template import defaultfilters
 
+from phonenumber_field.modelfields import PhoneNumberField
+
 from decimal import Decimal
 from core.models import User, SithFile
 from club.models import Club
@@ -32,6 +34,13 @@ class CurrencyField(models.DecimalField):
 
 class Company(models.Model):
     name = models.CharField(_('name'), max_length=60)
+    street = models.CharField(_('street'), max_length=60, blank=True)
+    city = models.CharField(_('city'), max_length=60, blank=True)
+    postcode = models.CharField(_('postcode'), max_length=10, blank=True)
+    country = models.CharField(_('country'), max_length=32, blank=True)
+    phone = PhoneNumberField(_('phone'), blank=True)
+    email = models.EmailField(_('email'), blank=True)
+    website = models.CharField(_('website'), max_length=64, blank=True)
 
     class Meta:
         verbose_name = _("company")

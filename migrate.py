@@ -604,6 +604,32 @@ def migrate_permanencies():
 
 ### Accounting
 
+def migrate_companies():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM entreprise
+    """)
+    Company.objects.all().delete()
+    print("Company deleted")
+    for r in cur:
+        try:
+            new = Company(
+                    id=r['id_ent'],
+                    name=to_unicode(r['nom_entreprise']),
+                    street=to_unicode(r['rue_entreprise']),
+                    city=to_unicode(r['ville_entreprise']),
+                    postcode=to_unicode(r['cpostal_entreprise']),
+                    country=to_unicode(r['pays_entreprise']),
+                    phone=to_unicode(r['telephone_entreprise']),
+                    email=to_unicode(r['email_entreprise']),
+                    website=to_unicode(r['siteweb_entreprise']),
+                    )
+            new.save()
+        except Exception as e:
+            print("FAIL to migrate company: %s" % (repr(e)))
+    cur.close()
+
 def migrate_bank_accounts():
     cur = db.cursor(MySQLdb.cursors.SSDictCursor)
     cur.execute("""
@@ -838,6 +864,7 @@ def main():
     migrate_refillings()
     migrate_sellings()
     # Accounting
+    migrate_companies()
     migrate_accounting_types()
     migrate_simpleaccounting_types()
     migrate_bank_accounts()

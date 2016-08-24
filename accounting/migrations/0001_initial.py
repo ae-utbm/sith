@@ -2,53 +2,58 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import django.core.validators
 import accounting.models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0001_initial'),
-        ('club', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='AccountingType',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('code', models.CharField(verbose_name='code', max_length=16)),
-                ('label', models.CharField(verbose_name='label', max_length=60)),
-                ('movement_type', models.CharField(verbose_name='movement type', choices=[('credit', 'Credit'), ('debit', 'Debit'), ('neutral', 'Neutral')], max_length=12)),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('code', models.CharField(max_length=16, verbose_name='code', validators=[django.core.validators.RegexValidator('^[0-9]*$', 'An accounting type code contains only numbers')])),
+                ('label', models.CharField(max_length=128, verbose_name='label')),
+                ('movement_type', models.CharField(choices=[('CREDIT', 'Credit'), ('DEBIT', 'Debit'), ('NEUTRAL', 'Neutral')], max_length=12, verbose_name='movement type')),
             ],
             options={
                 'verbose_name': 'accounting type',
+                'ordering': ['movement_type', 'code'],
             },
         ),
         migrations.CreateModel(
             name='BankAccount',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('name', models.CharField(verbose_name='name', max_length=30)),
-                ('iban', models.CharField(blank=True, verbose_name='iban', max_length=255)),
-                ('number', models.CharField(blank=True, verbose_name='account number', max_length=255)),
-                ('club', models.ForeignKey(related_name='bank_accounts', to='club.Club')),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('name', models.CharField(max_length=30, verbose_name='name')),
+                ('iban', models.CharField(max_length=255, blank=True, verbose_name='iban')),
+                ('number', models.CharField(max_length=255, blank=True, verbose_name='account number')),
             ],
+            options={
+                'verbose_name': 'Bank account',
+                'ordering': ['club', 'name'],
+            },
         ),
         migrations.CreateModel(
             name='ClubAccount',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('name', models.CharField(verbose_name='name', max_length=30)),
-                ('bank_account', models.ForeignKey(related_name='club_accounts', to='accounting.BankAccount')),
-                ('club', models.OneToOneField(related_name='club_account', to='club.Club')),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('name', models.CharField(max_length=30, verbose_name='name')),
             ],
+            options={
+                'verbose_name': 'Club account',
+                'ordering': ['bank_account', 'name'],
+            },
         ),
         migrations.CreateModel(
             name='Company',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('name', models.CharField(verbose_name='name', max_length=60)),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('name', models.CharField(max_length=60, verbose_name='name')),
             ],
             options={
                 'verbose_name': 'company',
@@ -57,41 +62,49 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='GeneralJournal',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
                 ('start_date', models.DateField(verbose_name='start date')),
-                ('end_date', models.DateField(default=None, null=True, verbose_name='end date', blank=True)),
-                ('name', models.CharField(verbose_name='name', max_length=30)),
-                ('closed', models.BooleanField(default=False, verbose_name='is closed')),
-                ('amount', accounting.models.CurrencyField(default=0, decimal_places=2, max_digits=12, verbose_name='amount')),
-                ('effective_amount', accounting.models.CurrencyField(default=0, decimal_places=2, max_digits=12, verbose_name='effective_amount')),
-                ('club_account', models.ForeignKey(related_name='journals', to='accounting.ClubAccount')),
+                ('end_date', models.DateField(null=True, verbose_name='end date', default=None, blank=True)),
+                ('name', models.CharField(max_length=40, verbose_name='name')),
+                ('closed', models.BooleanField(verbose_name='is closed', default=False)),
+                ('amount', accounting.models.CurrencyField(decimal_places=2, default=0, verbose_name='amount', max_digits=12)),
+                ('effective_amount', accounting.models.CurrencyField(decimal_places=2, default=0, verbose_name='effective_amount', max_digits=12)),
             ],
+            options={
+                'verbose_name': 'General journal',
+                'ordering': ['-start_date'],
+            },
         ),
         migrations.CreateModel(
             name='Operation',
             fields=[
-                ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
                 ('number', models.IntegerField(verbose_name='number')),
                 ('amount', accounting.models.CurrencyField(decimal_places=2, max_digits=12, verbose_name='amount')),
                 ('date', models.DateField(verbose_name='date')),
-                ('label', models.CharField(verbose_name='label', max_length=50)),
-                ('remark', models.TextField(verbose_name='remark', max_length=255)),
-                ('mode', models.CharField(verbose_name='payment method', choices=[('CHEQUE', 'Check'), ('CASH', 'Cash'), ('TRANSFert', 'Transfert'), ('CARD', 'Credit card')], max_length=255)),
-                ('cheque_number', models.IntegerField(default=-1, verbose_name='cheque number')),
-                ('done', models.BooleanField(default=False, verbose_name='is done')),
-                ('target_type', models.CharField(verbose_name='target type', choices=[('USER', 'User'), ('CLUB', 'Club'), ('ACCOUNT', 'Account'), ('COMPANY', 'Company'), ('OTHER', 'Other')], max_length=10)),
+                ('remark', models.CharField(max_length=128, verbose_name='comment')),
+                ('mode', models.CharField(choices=[('CHECK', 'Check'), ('CASH', 'Cash'), ('TRANSFERT', 'Transfert'), ('CARD', 'Credit card')], max_length=255, verbose_name='payment method')),
+                ('cheque_number', models.CharField(max_length=32, null=True, verbose_name='cheque number', default='', blank=True)),
+                ('done', models.BooleanField(verbose_name='is done', default=False)),
+                ('target_type', models.CharField(choices=[('USER', 'User'), ('CLUB', 'Club'), ('ACCOUNT', 'Account'), ('COMPANY', 'Company'), ('OTHER', 'Other')], max_length=10, verbose_name='target type')),
                 ('target_id', models.IntegerField(null=True, verbose_name='target id', blank=True)),
-                ('target_label', models.CharField(default='', blank=True, verbose_name='target label', max_length=32)),
-                ('accounting_type', models.ForeignKey(verbose_name='accounting type', related_name='operations', to='accounting.AccountingType')),
-                ('invoice', models.ForeignKey(verbose_name='invoice', related_name='operations', blank=True, null=True, to='core.SithFile')),
-                ('journal', models.ForeignKey(related_name='operations', to='accounting.GeneralJournal')),
+                ('target_label', models.CharField(max_length=32, blank=True, verbose_name='target label', default='')),
+                ('accounting_type', models.ForeignKey(null=True, related_name='operations', verbose_name='accounting type', to='accounting.AccountingType', blank=True)),
             ],
             options={
                 'ordering': ['-number'],
             },
         ),
-        migrations.AlterUniqueTogether(
-            name='operation',
-            unique_together=set([('number', 'journal')]),
+        migrations.CreateModel(
+            name='SimplifiedAccountingType',
+            fields=[
+                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('label', models.CharField(max_length=128, verbose_name='label')),
+                ('accounting_type', models.ForeignKey(verbose_name='simplified accounting types', to='accounting.AccountingType', related_name='simplified_types')),
+            ],
+            options={
+                'verbose_name': 'simplified type',
+                'ordering': ['accounting_type__movement_type', 'accounting_type__code'],
+            },
         ),
     ]
