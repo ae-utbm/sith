@@ -34,6 +34,16 @@
         <div id="popupheader">{{ user.get_display_name() }}</div>
         {% endif %}
         {% endblock %}
+
+        <div id="language_chooser">
+            {% for language in LANGUAGES %}
+            <form action="{{ url('set_language') }}" method="post">{% csrf_token %}
+                <input name="language" value="{{ language[0] }}" type="hidden" />
+                <input type="submit" value="{{ language[1]}}" />
+            </form>
+            {% endfor %}
+        </div>
+
         {% block nav %}
         {% if not popup %}
         <nav>

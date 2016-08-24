@@ -33,5 +33,6 @@ urlpatterns = [
     url(r'^api/v1/', include('api.urls', namespace="api", app_name="api")),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ajax_select/', include(ajax_select_urls)),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: remove me for production!!!
 

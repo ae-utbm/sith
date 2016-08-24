@@ -156,6 +156,11 @@ DATABASES = {
 
 LANGUAGE_CODE = 'fr-FR'
 
+LANGUAGES = [
+        ('en', _('English')),
+        ('fr', _('French')),
+        ]
+
 TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
