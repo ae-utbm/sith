@@ -48,6 +48,10 @@ class BankAccount(models.Model):
     number = models.CharField(_('account number'), max_length=255, blank=True)
     club = models.ForeignKey(Club, related_name="bank_accounts", verbose_name=_("club"))
 
+    class Meta:
+        verbose_name = _("Bank account")
+        ordering = ['club', 'name']
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -69,6 +73,10 @@ class ClubAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
     club = models.ForeignKey(Club, related_name="club_account", verbose_name=_("club"))
     bank_account = models.ForeignKey(BankAccount, related_name="club_accounts", verbose_name=_("bank account"))
+
+    class Meta:
+        verbose_name = _("Club account")
+        ordering = ['bank_account', 'name']
 
     def is_owned_by(self, user):
         """
@@ -117,6 +125,10 @@ class GeneralJournal(models.Model):
     club_account = models.ForeignKey(ClubAccount, related_name="journals", null=False, verbose_name=_("club account"))
     amount = CurrencyField(_('amount'), default=0)
     effective_amount = CurrencyField(_('effective_amount'), default=0)
+
+    class Meta:
+        verbose_name = _("General journal")
+        ordering = ['-start_date']
 
     def is_owned_by(self, user):
         """
@@ -259,10 +271,12 @@ class AccountingType(models.Model):
                 ],
             )
     label = models.CharField(_('label'), max_length=128)
-    movement_type = models.CharField(_('movement type'), choices=[('CREDIT', 'Credit'), ('DEBIT', 'Debit'), ('NEUTRAL', 'Neutral')], max_length=12)
+    movement_type = models.CharField(_('movement type'), choices=[('CREDIT', _('Credit')), ('DEBIT', _('Debit')),
+            ('NEUTRAL', _('Neutral'))], max_length=12)
 
     class Meta:
         verbose_name = _("accounting type")
+        ordering = ['movement_type', 'code']
 
     def is_owned_by(self, user):
         """
@@ -276,7 +290,7 @@ class AccountingType(models.Model):
         return reverse('accounting:type_list')
 
     def __str__(self):
-        return self.code+" - "+self.movement_type+" - "+self.label
+        return self.code+" - "+self.get_movement_type_display()+" - "+self.label
 
 class SimplifiedAccountingType(models.Model):
     """
@@ -288,6 +302,7 @@ class SimplifiedAccountingType(models.Model):
 
     class Meta:
         verbose_name = _("simplified type")
+        ordering = ['accounting_type__movement_type', 'accounting_type__code']
 
     @property
     def movement_type(self):
@@ -300,5 +315,5 @@ class SimplifiedAccountingType(models.Model):
         return reverse('accounting:simple_type_list')
 
     def __str__(self):
-        return self.label+" - "+self.accounting_type.code+" - "+self.get_movement_type_display()
+        return self.get_movement_type_display()+" - "+self.accounting_type.code+" - "+self.label
 

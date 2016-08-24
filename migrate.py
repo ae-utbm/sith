@@ -730,10 +730,18 @@ def migrate_operations():
             0: "CASH",
             None: "CASH",
             }
+    MOVEMENT_TYPE = {
+            -1: "DEBIT",
+            0: "NEUTRAL",
+            1: "CREDIT",
+            None: "NEUTRAL",
+            }
     cur = db.cursor(MySQLdb.cursors.SSDictCursor)
     cur.execute("""
     SELECT *
-    FROM cpta_operation
+    FROM cpta_operation op
+    LEFT JOIN cpta_op_clb clb
+    ON op.id_opclb = clb.id_opclb
     """)
     Operation.objects.all().delete()
     print("Operation deleted")
@@ -748,7 +756,7 @@ def migrate_operations():
             if not accounting_type and simple_type:
                 accounting_type = simple_type.accounting_type
             if not accounting_type:
-                accounting_type = AccountingType.objects.filter(movement_type="NEUTRAL").first()
+                accounting_type = AccountingType.objects.filter(movement_type=MOVEMENT_TYPE[r['type_mouvement']]).first()
             journal = GeneralJournal.objects.filter(id=r['id_classeur']).first()
             def get_target_type():
                 if r['id_utilisateur']:
@@ -808,35 +816,39 @@ def make_operation_links():
 def main():
     start = datetime.datetime.now()
     print("Start at %s" % start)
-    # migrate_users()
-    # migrate_profile_pict()
-    # migrate_clubs()
-    # migrate_club_memberships()
-    # migrate_subscriptions()
-    # update_customer_account()
-    # migrate_counters()
-    # migrate_permanencies()
-    # migrate_typeproducts()
-    # migrate_products()
-    # migrate_product_pict()
-    # migrate_products_to_counter()
-    # reset_customer_amount()
-    # migrate_invoices()
-    # migrate_refillings()
-    # migrate_sellings()
-    # reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
-    # migrate_accounting_types()
-    # migrate_simpleaccounting_types()
-    # migrate_bank_accounts()
-    # migrate_club_accounts()
-    # migrate_journals()
-    # migrate_operations()
+    # Core
+    migrate_users()
+    migrate_profile_pict()
+    # Club
+    migrate_clubs()
+    migrate_club_memberships()
+    # Subscriptions
+    migrate_subscriptions()
+    # Counters
+    update_customer_account()
+    migrate_counters()
+    migrate_permanencies()
+    migrate_typeproducts()
+    migrate_products()
+    migrate_product_pict()
+    migrate_products_to_counter()
+    reset_customer_amount()
+    migrate_invoices()
+    reset_index('counter')
+    migrate_refillings()
+    migrate_sellings()
+    # Accounting
+    migrate_accounting_types()
+    migrate_simpleaccounting_types()
+    migrate_bank_accounts()
+    migrate_club_accounts()
+    migrate_journals()
+    migrate_operations()
     make_operation_links()
+    reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
     end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end-start))
-
-
 
 if __name__ == "__main__":
     main()

@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from ajax_select import register, LookupChannel
 
 from core.views.site import search_user
@@ -6,8 +7,13 @@ from club.models import Club
 from counter.models import Product, Counter
 from accounting.models import ClubAccount, Company
 
+class RightManagedLookupChannel(LookupChannel):
+    def check_auth(self, request):
+        if not request.user.subscribed:
+            raise PermissionDenied
+
 @register('users')
-class UsersLookup(LookupChannel):
+class UsersLookup(RightManagedLookupChannel):
     model = User
 
     def get_query(self, q, request):
@@ -20,7 +26,7 @@ class UsersLookup(LookupChannel):
         return item.get_display_name()
 
 @register('groups')
-class GroupsLookup(LookupChannel):
+class GroupsLookup(RightManagedLookupChannel):
     model = Group
 
     def get_query(self, q, request):
@@ -33,7 +39,7 @@ class GroupsLookup(LookupChannel):
         return item.name
 
 @register('clubs')
-class ClubLookup(LookupChannel):
+class ClubLookup(RightManagedLookupChannel):
     model = Club
 
     def get_query(self, q, request):
@@ -46,7 +52,7 @@ class ClubLookup(LookupChannel):
         return item.name
 
 @register('counters')
-class CountersLookup(LookupChannel):
+class CountersLookup(RightManagedLookupChannel):
     model = Counter
 
     def get_query(self, q, request):
@@ -56,7 +62,7 @@ class CountersLookup(LookupChannel):
         return item.name
 
 @register('products')
-class ProductsLookup(LookupChannel):
+class ProductsLookup(RightManagedLookupChannel):
     model = Product
 
     def get_query(self, q, request):
@@ -66,7 +72,7 @@ class ProductsLookup(LookupChannel):
         return item.name
 
 @register('club_accounts')
-class ClubAccountLookup(LookupChannel):
+class ClubAccountLookup(RightManagedLookupChannel):
     model = ClubAccount
 
     def get_query(self, q, request):
@@ -76,7 +82,7 @@ class ClubAccountLookup(LookupChannel):
         return item.name
 
 @register('companies')
-class CompaniesLookup(LookupChannel):
+class CompaniesLookup(RightManagedLookupChannel):
     model = Company
 
     def get_query(self, q, request):

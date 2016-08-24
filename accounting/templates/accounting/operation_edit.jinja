@@ -5,6 +5,14 @@
 {% endblock %}
 
 {% block content %}
+<p>
+<a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
+<a href="{{ url('accounting:bank_details', b_account_id=object.club_account.bank_account.id) }}">{{object.club_account.bank_account }}</a> >
+<a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object.club_account }}</a> >
+<a href="{{ url('accounting:journal_details', j_id=object.id) }}">{{ object.name }}</a> >
+{% trans %}Edit operation{% endtrans %}
+</p>
+<hr>
 <h2>{% trans %}Edit operation{% endtrans %}</h2>
 <form action="" method="post">
     {% csrf_token %}
@@ -12,24 +20,12 @@
     {{ form.target_id }}
     <p>{{ form.amount.errors }}<label for="{{ form.amount.name }}">{{ form.amount.label }}</label> {{ form.amount }}</p>
     <p>{{ form.remark.errors }}<label for="{{ form.remark.name }}">{{ form.remark.label }}</label> {{ form.remark }}</p>
-    <p>{{ form.target_type.errors }}<label for="{{ form.target_type.name }}">{{ form.target_type.label }}</label> </p>
-    {% for choice in form.target_type %}
-        {% if choice.choice_value != "" %}
-        {{ choice }}
-        {% if choice.choice_value == "USER" %}
-            {{ form.user }}
-        {% elif choice.choice_value == "CLUB" %}
-            {{ form.club }}
-        {% elif choice.choice_value == "ACCOUNT" %}
-            {{ form.club_account }}
-        {% elif choice.choice_value == "COMPANY" %}
-            {{ form.company }}
-        {% elif choice.choice_value == "OTHER" %}
-            {{ form.target_label }}
-        {% endif %}
-        {% else %}
-        {% endif %}
-    {% endfor %}
+    <p>{{ form.target_type.errors }}<label for="{{ form.target_type.name }}">{{ form.target_type.label }}</label> {{ form.target_type }}</p>
+        {{ form.user }}
+        {{ form.club }}
+        {{ form.club_account }}
+        {{ form.company }}
+        {{ form.target_label }}
     <p>{{ form.date.errors }}<label for="{{ form.date.name }}">{{ form.date.label }}</label> {{ form.date }}</p>
     <p>{{ form.mode.errors }}<label for="{{ form.mode.name }}">{{ form.mode.label }}</label> {{ form.mode }}</p>
     <p>{{ form.cheque_number.errors }}<label for="{{ form.cheque_number.name }}">{{ form.cheque_number.label }}</label> {{
@@ -48,7 +44,55 @@
     {{ super() }}
 <script>
 $( function() {
-} );
+        var target_type = $('#id_target_type');
+        var user = $('#id_user_wrapper');
+        var club = $('#id_club_wrapper');
+        var club_account = $('#id_club_account_wrapper');
+        var company = $('#id_company_wrapper');
+        var other = $('#id_target_label');
+        function update_targets () {
+            if (target_type.val() == "USER") {
+                console.log(user);
+                user.show();
+                club.hide();
+                club_account.hide();
+                company.hide();
+                other.hide();
+            } else if (target_type.val() == "ACCOUNT") {
+                club_account.show();
+                user.hide();
+                club.hide();
+                company.hide();
+                other.hide();
+            } else if (target_type.val() == "CLUB") {
+                club.show();
+                user.hide();
+                club_account.hide();
+                company.hide();
+                other.hide();
+            } else if (target_type.val() == "COMPANY") {
+                company.show();
+                user.hide();
+                club_account.hide();
+                club.hide();
+                other.hide();
+            } else if (target_type.val() == "OTHER") {
+                other.show();
+                user.hide();
+                club.hide();
+                club_account.hide();
+                company.hide();
+            } else {
+                company.hide();
+                user.hide();
+                club_account.hide();
+                club.hide();
+                other.hide();
+            }
+        }
+        update_targets();
+        target_type.change(update_targets);
+        } );
 </script>
 {% endblock %}
 

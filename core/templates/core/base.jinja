@@ -38,6 +38,7 @@
         <div id="language_chooser">
             {% for language in LANGUAGES %}
             <form action="{{ url('set_language') }}" method="post">{% csrf_token %}
+                <input name="next" value="{{ request.path }}" type="hidden" />
                 <input name="language" value="{{ language[0] }}" type="hidden" />
                 <input type="submit" value="{{ language[1]}}" />
             </form>

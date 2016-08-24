@@ -202,7 +202,6 @@ class OperationForm(forms.ModelForm):
                 'target_id': HiddenInput,
                 'date': SelectDate,
                 'invoice': SelectFile,
-                'target_type': forms.RadioSelect,
                 }
     user = AutoCompleteSelectField('users', help_text=None, required=False)
     club_account = AutoCompleteSelectField('club_accounts', help_text=None, required=False)
@@ -272,10 +271,17 @@ class OperationCreateView(CanCreateMixin, CreateView):
     def get_initial(self):
         ret = super(OperationCreateView, self).get_initial()
         if 'parent' in self.request.GET.keys():
-            obj = GeneralJournal.objects.filter(id=int(self.request.GET['parent'])).first()
-            if obj is not None:
-                ret['journal'] = obj.id
+            self.journal = GeneralJournal.objects.filter(id=int(self.request.GET['parent'])).first()
+            if self.journal is not None:
+                ret['journal'] = self.journal.id
         return ret
+
+    def get_context_data(self, **kwargs):
+        """ Add journal to the context """
+        kwargs = super(OperationCreateView, self).get_context_data(**kwargs)
+        if self.journal:
+            kwargs['object'] = self.journal
+        return kwargs
 
 class OperationEditView(CanEditMixin, UpdateView):
     """
@@ -285,6 +291,12 @@ class OperationEditView(CanEditMixin, UpdateView):
     pk_url_kwarg = "op_id"
     form_class = OperationForm
     template_name = 'accounting/operation_edit.jinja'
+
+    def get_context_data(self, **kwargs):
+        """ Add journal to the context """
+        kwargs = super(OperationCreateView, self).get_context_data(**kwargs)
+        kwargs['object'] = self.object.journal
+        return kwargs
 
 # Company views
 

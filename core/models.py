@@ -377,10 +377,17 @@ class User(AbstractBaseUser):
             escape(self.get_display_name()),
             )
 
+    @property
+    def subscribed(self):
+        return self.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
 
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):
         super(AnonymousUser, self).__init__()
+
+    @property
+    def subscribed(self):
+        return False
 
     def is_in_group(self, group_name):
         """

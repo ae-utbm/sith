@@ -11,6 +11,9 @@
     </p>
     <hr>
     <h2>{% trans %}Bank account: {% endtrans %}{{ object.name }}</h2>
+    {% if user.is_root and not object.club_accounts.exists() %}
+    <a href="{{ url('accounting:bank_delete', b_account_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
+    {% endif %}
     <h4>{% trans %}Infos{% endtrans %}</h4>
     <ul>
         <li><strong>{% trans %}IBAN: {% endtrans %}</strong>{{ object.iban }}</li>
@@ -21,9 +24,6 @@
     {% for c in object.club_accounts.all() %}
         <li><a href="{{ url('accounting:club_details', c_account_id=c.id) }}">{{ c }}</a>
             - <a href="{{ url('accounting:club_edit', c_account_id=c.id) }}">{% trans %}Edit{% endtrans %}</a>
-            {% if user.is_root %}
-            - <a href="{{ url('accounting:club_delete', c_account_id=c.id) }}">{% trans %}Delete{% endtrans %}</a>
-            {% endif %}
             </li>
     {% endfor %}
     </ul>

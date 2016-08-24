@@ -19,9 +19,6 @@
             {% for a in object_list  %}
             <li><a href="{{ url('accounting:bank_details', b_account_id=a.id) }}">{{ a }}</a>
                 - <a href="{{ url('accounting:bank_edit', b_account_id=a.id) }}">{% trans %}Edit{% endtrans %}</a>
-                {% if user.is_root %}
-                - <a href="{{ url('accounting:bank_delete', b_account_id=a.id) }}">{% trans %}Delete{% endtrans %}</a>
-                {% endif %}
             </li>
             {% endfor %}
         </ul>
