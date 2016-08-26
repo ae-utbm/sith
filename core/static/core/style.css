@@ -291,6 +291,12 @@ label {
 #user_edit img {
     width: 100px;
 }
+#cash_summary_form label {
+    display: inline;
+}
+.inline {
+    display: inline;
+}
 .form_button {
     width: 150px;
     height: 120px;

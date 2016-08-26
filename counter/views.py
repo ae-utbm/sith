@@ -19,9 +19,10 @@ from ajax_select import make_ajax_form, make_ajax_field
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from core.views.forms import SelectUser
+from core.models import User
 from subscription.models import Subscriber
 from subscription.views import get_subscriber
-from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType
+from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType, CashRegisterSummary, CashRegisterSummaryItem
 
 class GetUserForm(forms.Form):
     """
@@ -212,7 +213,7 @@ class CounterClick(DetailView):
         product = self.get_product(pid)
         can_buy = False
         for g in product.buying_groups.all():
-            if request.user.is_in_group(g.name):
+            if self.customer.user.is_in_group(g.name):
                 can_buy = True
         if not can_buy:
             request.session['not_allowed'] = True
@@ -343,12 +344,13 @@ class CounterLogin(RedirectView):
         Register the logged user as barman for this counter
         """
         self.counter_id = kwargs['counter_id']
+        self.counter = Counter.objects.filter(id=kwargs['counter_id']).first()
         form = AuthenticationForm(request, data=request.POST)
         self.errors = []
         if form.is_valid():
-            user = Subscriber.objects.filter(username=form.cleaned_data['username']).first()
-            if user.is_subscribed():
-                Counter.add_barman(self.counter_id, user.id)
+            user = User.objects.filter(username=form.cleaned_data['username']).first()
+            if user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP) and not user in self.counter.get_barmen_list():
+                self.counter.add_barman(user)
             else:
                 self.errors += ["subscription"]
         else:
@@ -364,8 +366,9 @@ class CounterLogout(RedirectView):
         """
         Unregister the user from the barman
         """
-        self.counter_id = kwargs['counter_id']
-        Counter.del_barman(self.counter_id, request.POST['user_id'])
+        self.counter = Counter.objects.filter(id=kwargs['counter_id']).first()
+        user = User.objects.filter(id=request.POST['user_id']).first()
+        self.counter.del_barman(user)
         return super(CounterLogout, self).post(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
@@ -384,8 +387,8 @@ class CounterEditForm(forms.ModelForm):
     class Meta:
         model = Counter
         fields = ['sellers', 'products']
-    sellers = make_ajax_field(Counter, 'sellers', 'users', show_help_text=False)
-    products = make_ajax_field(Counter, 'products', 'products')
+    sellers = make_ajax_field(Counter, 'sellers', 'users', help_text="")
+    products = make_ajax_field(Counter, 'products', 'products', help_text="")
 
 class CounterEditView(CanEditMixin, UpdateView):
     """
@@ -394,7 +397,7 @@ class CounterEditView(CanEditMixin, UpdateView):
     model = Counter
     form_class = CounterEditForm
     pk_url_kwarg = "counter_id"
-    template_name = 'counter/counter_edit.jinja'
+    template_name = 'core/edit.jinja'
 
     def get_success_url(self):
         return reverse_lazy('counter:admin', kwargs={'counter_id': self.object.id})

@@ -109,15 +109,14 @@ class Product(models.Model):
 
 class Counter(models.Model):
     name = models.CharField(_('name'), max_length=30)
-    club = models.ForeignKey(Club, related_name="counters")
-    products = models.ManyToManyField(Product, related_name="counters", blank=True)
+    club = models.ForeignKey(Club, related_name="counters", verbose_name=_("club"))
+    products = models.ManyToManyField(Product, related_name="counters", verbose_name=_("products"), blank=True)
     type = models.CharField(_('counter type'),
             max_length=255,
             choices=[('BAR',_('Bar')), ('OFFICE',_('Office')), ('EBOUTIC',_('Eboutic'))])
     sellers = models.ManyToManyField(Subscriber, verbose_name=_('sellers'), related_name='counters', blank=True)
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
-    barmen_session = {}
 
     class Meta:
         verbose_name = _('counter')
@@ -144,31 +143,21 @@ class Counter(models.Model):
         sub = get_subscriber(request.user)
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or sub in self.sellers
 
-    def add_barman(counter_id, user_id):
+    def add_barman(self, user):
         """
         Logs a barman in to the given counter
         A user is stored as a tuple with its login time
         """
-        counter_id = int(counter_id)
-        user_id = int(user_id)
-        if counter_id not in Counter.barmen_session.keys():
-            Counter.barmen_session[counter_id] = {'users': {(user_id, timezone.now())}, 'time': timezone.now()}
-        else:
-            Counter.barmen_session[counter_id]['users'].add((user_id, timezone.now()))
+        Permanency(user=user, counter=self, start=timezone.now(), end=None).save()
 
-    def del_barman(counter_id, user_id):
+    def del_barman(self, user):
         """
         Logs a barman out and store its permanency
         """
-        counter_id = int(counter_id)
-        user_id = int(user_id)
-        user_tuple = None
-        for t in Counter.barmen_session[counter_id]['users']:
-            if t[0] == user_id: user_tuple = t
-        Counter.barmen_session[counter_id]['users'].remove(user_tuple)
-        u = User.objects.filter(id=user_id).first()
-        c = Counter.objects.filter(id=counter_id).first()
-        Permanency(user=u, counter=c, start=user_tuple[1], end=Counter.barmen_session[counter_id]['time']).save()
+        perm = Permanency.objects.filter(counter=self, user=user, end=None).all()
+        for p in perm:
+            p.end = p.activity
+            p.save()
 
     def get_barmen_list(self):
         """
@@ -176,19 +165,15 @@ class Counter(models.Model):
 
         Also handle the timeout of the barmen
         """
+        pl = Permanency.objects.filter(counter=self, end=None).all()
         bl = []
-        counter_id = self.id
-        if counter_id in list(Counter.barmen_session.keys()):
-            for b in Counter.barmen_session[counter_id]['users']:
-                # Reminder: user is stored as a tuple with its login time
-                bl.append(User.objects.filter(id=b[0]).first())
-            if (timezone.now() - Counter.barmen_session[counter_id]['time']) < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
-                Counter.barmen_session[counter_id]['time'] = timezone.now()
+        for p in pl:
+            if timezone.now() - p.activity < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
+                p.save() # Update activity
+                bl.append(p.user)
             else:
-                for b in bl:
-                    Counter.del_barman(counter_id, b.id)
-                bl = []
-                Counter.barmen_session[counter_id]['users'] = set()
+                p.end = p.activity
+                p.save()
         return bl
 
     def get_random_barman(self):
@@ -292,10 +277,11 @@ class Permanency(models.Model):
     """
     This class aims at storing a traceability of who was barman where and when
     """
-    user = models.ForeignKey(User, related_name="permanencies")
-    counter = models.ForeignKey(Counter, related_name="permanencies")
+    user = models.ForeignKey(User, related_name="permanencies", verbose_name=_("user"))
+    counter = models.ForeignKey(Counter, related_name="permanencies", verbose_name=_("counter"))
     start = models.DateTimeField(_('start date'))
-    end = models.DateTimeField(_('end date'))
+    end = models.DateTimeField(_('end date'), null=True)
+    activity = models.DateTimeField(_('last activity date'), auto_now=True)
 
     class Meta:
         verbose_name = _("permanency")
