@@ -389,6 +389,10 @@ class AnonymousUser(AuthAnonymousUser):
     def subscribed(self):
         return False
 
+    @property
+    def is_root(self):
+        return False
+
     def is_in_group(self, group_name):
         """
         The anonymous user is only the public group
