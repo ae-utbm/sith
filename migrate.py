@@ -636,6 +636,7 @@ def migrate_counter():
                         user=user,
                         counter=counter,
                         start=r['logged_time'].replace(tzinfo=timezone('Europe/Paris')),
+                        activity=r['logged_time'].replace(tzinfo=timezone('Europe/Paris')),
                         end=r['closed_time'].replace(tzinfo=timezone('Europe/Paris')),
                         )
                 new.save()

@@ -10,4 +10,5 @@ admin.site.register(Counter)
 admin.site.register(Refilling)
 admin.site.register(Selling)
 admin.site.register(Permanency)
+admin.site.register(CashRegisterSummary)
 

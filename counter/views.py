@@ -529,3 +529,96 @@ class SellingDeleteView(CanEditPropMixin, DeleteView):
     def get_success_url(self):
         return reverse_lazy('core:user_account', kwargs={'user_id': self.object.customer.user.id})
 
+# Cash register summaries
+
+class CashRegisterSummaryForm(forms.Form):
+    """
+    Provide the cash summary form
+    """
+    ten_cents = forms.IntegerField(label=_("10 cents"), required=False)
+    twenty_cents = forms.IntegerField(label=_("20 cents"), required=False)
+    fifty_cents = forms.IntegerField(label=_("50 cents"), required=False)
+    one_euro = forms.IntegerField(label=_("1 euro"), required=False)
+    two_euros = forms.IntegerField(label=_("2 euros"), required=False)
+    five_euros = forms.IntegerField(label=_("5 euros"), required=False)
+    ten_euros = forms.IntegerField(label=_("10 euros"), required=False)
+    twenty_euros = forms.IntegerField(label=_("20 euros"), required=False)
+    fifty_euros = forms.IntegerField(label=_("50 euros"), required=False)
+    hundred_euros = forms.IntegerField(label=_("100 euros"), required=False)
+    check_1_value = forms.DecimalField(label=_("Check amount"), required=False)
+    check_1_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
+    check_2_value = forms.DecimalField(label=_("Check amount"), required=False)
+    check_2_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
+    check_3_value = forms.DecimalField(label=_("Check amount"), required=False)
+    check_3_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
+    check_4_value = forms.DecimalField(label=_("Check amount"), required=False)
+    check_4_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
+    check_5_value = forms.DecimalField(label=_("Check amount"), required=False)
+    check_5_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
+    comment = forms.CharField(label=_("Comment"), required=False)
+    emptied = forms.BooleanField(label=_("Emptied"), required=False)
+
+    def save(self, counter):
+        cd = self.cleaned_data
+        summary = CashRegisterSummary(
+                counter=counter,
+                user=counter.get_random_barman(),
+                comment=cd['comment'],
+                emptied=cd['emptied'],
+                )
+        summary.save()
+        # Cash
+        if cd['ten_cents']: CashRegisterSummaryItem(cash_summary=summary, value=0.1, quantity=cd['ten_cents']).save()
+        if cd['twenty_cents']: CashRegisterSummaryItem(cash_summary=summary, value=0.2, quantity=cd['twenty_cents']).save()
+        if cd['fifty_cents']: CashRegisterSummaryItem(cash_summary=summary, value=0.5, quantity=cd['fifty_cents']).save()
+        if cd['one_euro']: CashRegisterSummaryItem(cash_summary=summary, value=1, quantity=cd['one_euro']).save()
+        if cd['two_euros']: CashRegisterSummaryItem(cash_summary=summary, value=2, quantity=cd['two_euros']).save()
+        if cd['five_euros']: CashRegisterSummaryItem(cash_summary=summary, value=5, quantity=cd['five_euros']).save()
+        if cd['ten_euros']: CashRegisterSummaryItem(cash_summary=summary, value=10, quantity=cd['ten_euros']).save()
+        if cd['twenty_euros']: CashRegisterSummaryItem(cash_summary=summary, value=20, quantity=cd['twenty_euros']).save()
+        if cd['fifty_euros']: CashRegisterSummaryItem(cash_summary=summary, value=50, quantity=cd['fifty_euros']).save()
+        if cd['hundred_euros']: CashRegisterSummaryItem(cash_summary=summary, value=100, quantity=cd['hundred_euros']).save()
+        # Checks
+        if cd['check_1_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_1_value'], quantity=cd['check_1_quantity']).save()
+        if cd['check_2_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_2_value'], quantity=cd['check_2_quantity']).save()
+        if cd['check_3_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_3_value'], quantity=cd['check_3_quantity']).save()
+        if cd['check_4_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_4_value'], quantity=cd['check_4_quantity']).save()
+        if cd['check_5_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_5_value'], quantity=cd['check_5_quantity']).save()
+        if summary.items.count() < 1:
+            summary.delete()
+
+class CounterCashSummaryView(CanViewMixin, DetailView):
+    """
+    Provide the cash summary form
+    """
+    model = Counter
+    pk_url_kwarg = "counter_id"
+    template_name = 'counter/cash_register_summary.jinja'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if len(self.object.get_barmen_list()) < 1:
+            return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
+                kwargs={'counter_id': self.object.id}))
+        self.form = CashRegisterSummaryForm()
+        return super(CounterCashSummaryView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if len(self.object.get_barmen_list()) < 1:
+            return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
+                kwargs={'counter_id': self.object.id}))
+        self.form = CashRegisterSummaryForm(request.POST)
+        if self.form.is_valid():
+            self.form.save(self.object)
+            return HttpResponseRedirect(self.get_success_url())
+        return super(CounterCashSummaryView, self).get(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('counter:details', kwargs={'counter_id': self.object.id})
+
+    def get_context_data(self, **kwargs):
+        """ Add form to the context """
+        kwargs = super(CounterCashSummaryView, self).get_context_data(**kwargs)
+        kwargs['form'] = self.form
+        return kwargs

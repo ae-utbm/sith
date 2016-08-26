@@ -39,13 +39,14 @@
         {% endif %}
     </div>
     {% if counter.type == 'BAR' %}
+    {% if barmen %}
+    <p><a href="{{ url('counter:cash_summary', counter_id=counter.id) }}">{% trans %}Make a cash register summary{% endtrans %}</a></p>
+    {% endif %}
     <div>
         <h3>{% trans %}Barman: {% endtrans %}</h3>
-        <ul>
         {% for b in barmen %}
-            <li>{{ barman_logout_link(b) }}</li>
+        <p>{{ barman_logout_link(b) }}</p>
         {% endfor %}
-        </ul>
         <form method="post" action="{{ url('counter:login', counter_id=counter.id) }}">
             {% csrf_token %}
             {{ login_form.as_p() }}

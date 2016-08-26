@@ -2,16 +2,16 @@
 {% from "core/macros.jinja" import user_mini_profile %}
 
 
-{% macro add_product(id, content) %}
-<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="form_button">
+{% macro add_product(id, content, class="") %}
+<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="{{ class }}">
     {% csrf_token %}
     <input type="hidden" name="action" value="add_product">
     <button type="submit" name="product_id" value="{{ id }}"> {{ content|safe }} </button>
 </form>
 {% endmacro %}
 
-{% macro del_product(id, content) %}
-<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="form_button">
+{% macro del_product(id, content, class="") %}
+<form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="{{ class }}">
     {% csrf_token %}
     <input type="hidden" name="action" value="del_product">
     <button type="submit" name="product_id" value="{{ id }}"> {{ content }} </button>
@@ -53,7 +53,7 @@
             {% for id,infos in request.session['basket']|dictsort %}
             {% set product = counter.products.filter(id=id).first() %}
             {% set s = infos['qty'] * infos['price'] / 100 %}
-            <li>{{ del_product(id, '-') }} {{ infos['qty'] + infos['bonus_qty'] }} {{ add_product(id, '+') }}
+            <li>{{ del_product(id, '-', "inline") }} {{ infos['qty'] + infos['bonus_qty'] }} {{ add_product(id, '+', "inline") }}
             {{ product.name }}: {{ "%0.2f"|format(s) }} €
             {% if infos['bonus_qty'] %}
                 P
@@ -105,7 +105,7 @@
                 {% set file = static('core/img/na.gif') %}
             {% endif %}
             {% set prod = '<strong>%s</strong><hr><img src="%s" /><span>%s €<br>%s</span>' % (p.name, file, p.selling_price, p.code) %}
-                {{ add_product(p.id, prod) }}
+                {{ add_product(p.id, prod, "form_button") }}
         {%- endfor %}
     </div>
     {%- endif -%}

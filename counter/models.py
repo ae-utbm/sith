@@ -287,7 +287,39 @@ class Permanency(models.Model):
         verbose_name = _("permanency")
 
     def __str__(self):
-        return "%s in %s from %s to %s" % (self.user, self.counter,
-                self.start.strftime("%Y-%m-%d %H:%M:%S"), self.end.strftime("%Y-%m-%d %H:%M:%S"))
+        return "%s in %s from %s" % (self.user, self.counter,
+                self.start.strftime("%Y-%m-%d %H:%M:%S"))
 
+class CashRegisterSummary(models.Model):
+    user = models.ForeignKey(User, related_name="cash_summaries", verbose_name=_("user"))
+    counter = models.ForeignKey(Counter, related_name="cash_summaries", verbose_name=_("counter"))
+    date = models.DateTimeField(_('date'))
+    comment = models.TextField(_('comment'), null=True, blank=True)
+    emptied = models.BooleanField(_('emptied'), default=False)
+
+    class Meta:
+        verbose_name = _("cash register summary")
+
+    def __str__(self):
+        return "At %s by %s - Total: %s €" % (self.counter, self.user, self.get_total())
+
+    def get_total(self):
+        t = 0
+        for it in self.items.all():
+            t += it.quantity * it.value
+        return t
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.date = timezone.now()
+        return super(CashRegisterSummary, self).save(*args, **kwargs)
+
+class CashRegisterSummaryItem(models.Model):
+    cash_summary = models.ForeignKey(CashRegisterSummary, related_name="items", verbose_name=_("cash summary"))
+    value = CurrencyField(_("value"))
+    quantity = models.IntegerField(_('quantity'), default=0)
+    check = models.BooleanField(_('check'), default=False)
+
+    class Meta:
+        verbose_name = _("cash register summary item")
 
