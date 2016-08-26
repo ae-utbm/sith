@@ -657,6 +657,35 @@ def migrate_counter():
     migrate_refillings()
     migrate_sellings()
 
+def check_accounts():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM utilisateurs
+    """)
+    mde = Counter.objects.filter(id=1).first()
+    ae = Club.objects.filter(unix_name='ae').first()
+    root = User.objects.filter(id=0).first()
+    for r in cur:
+        if r['montant_compte'] and r['montant_compte'] > 0:
+            try:
+                cust = Customer.objects.filter(user__id=r['id_utilisateur']).first()
+                if int(cust.amount * 100) != r['montant_compte']:
+                    print("Adding %s to %s's account" % (float(cust.amount) - (r['montant_compte']/100)))
+                    new = Selling(
+                            label="Ajustement migration base de donnée",
+                            counter=mde,
+                            club=ae,
+                            product=None,
+                            seller=root,
+                            customer=cust,
+                            unit_price=float(cust.amount) - (r['montant_compte']/100.),
+                            quantity=1,
+                            payment_method="SITH_ACCOUNT",
+                            )
+                    new.save()
+            except Exception as e:
+                print("FAIL to adjust user account: %s" % (repr(e)))
 ### Accounting
 
 def migrate_accounting():
@@ -923,15 +952,16 @@ def migrate_accounting():
 def main():
     print("Start at %s" % start)
     # Core
-    migrate_core()
+    # migrate_core()
     # Club
-    migrate_club()
+    # migrate_club()
     # Subscriptions
-    migrate_subscriptions()
+    # migrate_subscriptions()
     # Counters
-    migrate_counter()
+    # migrate_counter()
+    check_accounts()
     # Accounting
-    migrate_accounting()
+    # migrate_accounting()
     reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
     end = datetime.datetime.now()
     print("End at %s" % end)
