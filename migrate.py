@@ -953,16 +953,16 @@ def migrate_accounting():
 def main():
     print("Start at %s" % start)
     # Core
-    # migrate_core()
+    migrate_core()
     # Club
-    # migrate_club()
+    migrate_club()
     # Subscriptions
-    # migrate_subscriptions()
+    migrate_subscriptions()
     # Counters
-    # migrate_counter()
+    migrate_counter()
     check_accounts()
     # Accounting
-    # migrate_accounting()
+    migrate_accounting()
     reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
     end = datetime.datetime.now()
     print("End at %s" % end)

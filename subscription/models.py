@@ -8,6 +8,9 @@ from django.core.urlresolvers import reverse
 
 from core.models import User
 
+import MySQLdb
+
+
 def validate_type(value):
     if value not in settings.SITH_SUBSCRIPTIONS.keys():
         raise ValidationError(_('Bad subscription type'))
@@ -24,6 +27,19 @@ class Subscriber(User):
         s = self.subscriptions.last()
         return s.is_valid_now() if s is not None else False
 
+    def save(self):
+        super(Subscriber, self).save()
+        try:
+            db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
+            c = db.cursor()
+            c.execute("""INSERT INTO utilisateurs (nom_utl, prenom_utl, email_utl, hash_utl) VALUES
+            (%s, %s, %s, %s)""", (self.last_name, self.first_name, self.email, "valid", ))
+        except Exception as e:
+            with open("/home/sith/user_fail.log", "a") as f:
+                print("FAIL to add user %s (%s %s - %s) to old site" % (self.id, self.first_name, self.last_name,
+                    self.email), file=f)
+                print("Reason: %s" % (repr(e)), file=f)
+
 class Subscription(models.Model):
     member = models.ForeignKey(Subscriber, related_name='subscriptions')
     subscription_type = models.CharField(_('subscription type'),
@@ -34,7 +50,6 @@ class Subscription(models.Model):
     payment_method = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD)
     location = models.CharField(choices=settings.SITH_SUBSCRIPTION_LOCATIONS,
             max_length=20, verbose_name=_('location'))
-    # TODO add location!
 
     class Meta:
         ordering = ['subscription_start',]
@@ -56,6 +71,44 @@ class Subscription(models.Model):
             last_id = Customer.objects.count() + 5195 # Number to keep a continuity with the old site
             Customer(user=self.member, account_id=Customer.generate_account_id(last_id+1), amount=0).save()
         self.member.make_home()
+        try:
+            LOCATION = {
+                    "SEVENANS": 5,
+                    "BELFORT": 6,
+                    "MONTBELIARD": 9,
+                    }
+            TYPE = {
+                    'un-semestre'                 : 0,
+                    'deux-semestres'              : 1,
+                    'cursus-tronc-commun'         : 2,
+                    'cursus-branche'              : 3,
+                    'membre-honoraire'            : 4,
+                    'assidu'                      : 5,
+                    'amicale/doceo'               : 6,
+                    'reseau-ut'                   : 7,
+                    'crous'                       : 8,
+                    'sbarro/esta'                 : 9,
+                    'cursus-alternant'           : 10,
+                    }
+            PAYMENT = {
+                    "CHECK"           :  1,
+                    "CARD"            :  2,
+                    "CASH"            :  3,
+                    "OTHER"           :  4,
+                    "EBOUTIC"         :  5,
+                    "OTHER"           :  0,
+                    }
+
+            db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
+            c = db.cursor()
+            c.execute("""INSERT INTO ae_cotisations (id_utilisateur, date_cotis, date_fin_cotis, mode_paiement_cotis,
+            type_cotis, id_comptoir) VALUES (%s, %s, %s, %s, %s, %s)""", (self.member.id, self.subscription_start,
+                self.subscription_end, PAYMENT[self.payment_method], TYPE[self.subscription_type],
+                LOCATION[self.location]))
+        except Exception as e:
+            with open("/home/sith/subscription_fail.log", "a") as f:
+                print("FAIL to add subscription to %s to old site" % (self.member), file=f)
+                print("Reason: %s" % (repr(e)), file=f)
 
     def get_absolute_url(self):
         return reverse('core:user_edit', kwargs={'user_id': self.member.pk})
