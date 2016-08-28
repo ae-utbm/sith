@@ -672,7 +672,7 @@ def check_accounts():
             try:
                 cust = Customer.objects.filter(user__id=r['id_utilisateur']).first()
                 if int(cust.amount * 100) != r['montant_compte']:
-                    print("Adding %s to %s's account" % (float(cust.amount) - (r['montant_compte']/100)))
+                    print("Adding %s to %s's account" % (float(cust.amount) - (r['montant_compte']/100), cust.user))
                     new = Selling(
                             label="Ajustement migration base de donnée",
                             counter=mde,

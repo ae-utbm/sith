@@ -108,6 +108,7 @@ $('.select_date').datepicker({
 $(document).keydown(function (e) {
     if ($(e.target).is('input')) { return }
     if ($(e.target).is('textarea')) { return }
+    if ($(e.target).is('select')) { return }
     if (e.keyCode == 83) {
         $("#search").focus();
         return false;
