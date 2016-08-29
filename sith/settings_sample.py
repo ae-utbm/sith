@@ -109,7 +109,6 @@ TEMPLATES = [
                 "can_edit_prop": "core.views.can_edit_prop",
                 "can_edit": "core.views.can_edit",
                 "can_view": "core.views.can_view",
-                "send_file": "core.views.send_file",
                 "get_subscriber": "subscription.views.get_subscriber",
                 "settings": "sith.settings",
             },
@@ -407,4 +406,13 @@ SITH_LAUNDERETTE_MACHINE_TYPES = [('WASHING', _('Washing')), ('DRYING', _('Dryin
 SITH_LAUNDERETTE_PRICES = {
         'WASHING': 1.0,
         'DRYING': 0.75,
+        }
+
+OLD_MYSQL_INFOS = {
+        'host': 'ae-db',
+        'user': "my_user",
+        'passwd': "password",
+        'db': "ae2-db",
+        'charset': 'utf8',
+        'use_unicode': True,
         }
