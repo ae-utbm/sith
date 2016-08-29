@@ -135,6 +135,9 @@ class Counter(models.Model):
         return reverse('counter:details', kwargs={'counter_id': self.id})
 
     def is_owned_by(self, user):
+        mem = self.club.get_membership_for(user)
+        if mem and mem.role >= 7:
+            return True
         return user.is_in_group(settings.SITH_GROUPS['counter-admin']['name'])
 
     def can_be_viewed_by(self, user):
@@ -211,10 +214,7 @@ class Refilling(models.Model):
         return "Refilling: %.2f for %s" % (self.amount, self.customer.user.get_display_name())
 
     def is_owned_by(self, user):
-        return user.can_edit(self.counter) and self.payment_method != "CARD"
-
-    # def get_absolute_url(self):
-    #     return reverse('counter:details', kwargs={'counter_id': self.id})
+        return user.is_owner(self.counter) and self.payment_method != "CARD"
 
     def delete(self, *args, **kwargs):
         self.customer.amount -= self.amount
@@ -256,7 +256,7 @@ class Selling(models.Model):
                 self.quantity*self.unit_price, self.customer.user.get_display_name())
 
     def is_owned_by(self, user):
-        return user.can_edit(self.counter) and self.payment_method != "CARD"
+        return user.is_owner(self.counter) and self.payment_method != "CARD"
 
     def delete(self, *args, **kwargs):
         self.customer.amount += self.quantity * self.unit_price
