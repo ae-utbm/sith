@@ -231,12 +231,29 @@ class User(AbstractBaseUser):
         return self.is_superuser or self.groups.filter(name=settings.SITH_GROUPS['root']['name']).exists()
 
     def save(self, *args, **kwargs):
+        create = False
         with transaction.atomic():
             if self.id:
                 old = User.objects.filter(id=self.id).first()
                 if old and old.username != self.username:
                     self._change_username(self.username)
+            else:
+                create = True
             super(User, self).save(*args, **kwargs)
+            if create: # Create user on the old site: TODO remove me!
+                import MySQLdb
+                try:
+                    db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
+                    c = db.cursor()
+                    c.execute("""INSERT INTO utilisateurs (id_utilisateur, nom_utl, prenom_utl, email_utl, hash_utl, ae_utl) VALUES
+                    (%s, %s, %s, %s, %s, %s)""", (self.id, self.last_name, self.first_name, self.email, "valid", "0"))
+                    db.commit()
+                except Exception as e:
+                    with open(settings.BASE_DIR+"/user_fail.log", "a") as f:
+                        print("FAIL to add user %s (%s %s - %s) to old site" % (self.id, self.first_name, self.last_name,
+                            self.email), file=f)
+                        print("Reason: %s" % (repr(e)), file=f)
+                    db.rollback()
 
     def make_home(self):
         if self.home is None:

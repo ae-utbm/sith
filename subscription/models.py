@@ -29,16 +29,18 @@ class Subscriber(User):
 
     def save(self):
         super(Subscriber, self).save()
-        try:
+        try: # Create user on the old site: TODO remove me!
             db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
             c = db.cursor()
-            c.execute("""INSERT INTO utilisateurs (nom_utl, prenom_utl, email_utl, hash_utl) VALUES
-            (%s, %s, %s, %s)""", (self.last_name, self.first_name, self.email, "valid", ))
+            c.execute("""INSERT INTO utilisateurs (id_utilisateur, nom_utl, prenom_utl, email_utl, hash_utl, ae_utl) VALUES
+            (%s, %s, %s, %s, %s, %s)""", (self.id, self.last_name, self.first_name, self.email, "valid", "1"))
+            db.commit()
         except Exception as e:
-            with open("/home/sith/user_fail.log", "a") as f:
+            with open(settings.BASE_DIR+"/user_fail.log", "a") as f:
                 print("FAIL to add user %s (%s %s - %s) to old site" % (self.id, self.first_name, self.last_name,
                     self.email), file=f)
                 print("Reason: %s" % (repr(e)), file=f)
+            db.rollback()
 
 class Subscription(models.Model):
     member = models.ForeignKey(Subscriber, related_name='subscriptions')
@@ -71,7 +73,7 @@ class Subscription(models.Model):
             last_id = Customer.objects.count() + 5195 # Number to keep a continuity with the old site
             Customer(user=self.member, account_id=Customer.generate_account_id(last_id+1), amount=0).save()
         self.member.make_home()
-        try:
+        try: # Create subscription on the old site: TODO remove me!
             LOCATION = {
                     "SEVENANS": 5,
                     "BELFORT": 6,
@@ -105,10 +107,12 @@ class Subscription(models.Model):
             type_cotis, id_comptoir) VALUES (%s, %s, %s, %s, %s, %s)""", (self.member.id, self.subscription_start,
                 self.subscription_end, PAYMENT[self.payment_method], TYPE[self.subscription_type],
                 LOCATION[self.location]))
+            db.commit()
         except Exception as e:
-            with open("/home/sith/subscription_fail.log", "a") as f:
+            with open(settings.BASE_DIR+"/subscription_fail.log", "a") as f:
                 print("FAIL to add subscription to %s to old site" % (self.member), file=f)
                 print("Reason: %s" % (repr(e)), file=f)
+            db.rollback()
 
     def get_absolute_url(self):
         return reverse('core:user_edit', kwargs={'user_id': self.member.pk})
