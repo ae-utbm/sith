@@ -1768,7 +1768,7 @@ msgstr "Compte utilisateur"
 #: sith/settings.py:310 sith/settings_sample.py:265
 #: sith/settings_sample.py:270 sith/settings_sample.py:292
 msgid "Credit card"
-msgstr "Carte banquaire"
+msgstr "Carte bancaire"
 
 #: counter/models.py:252
 msgid "selling"
@@ -2061,7 +2061,7 @@ msgstr "État du panier"
 
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:35
 msgid "Pay with credit card"
-msgstr "Payer avec une carte banquaire"
+msgstr "Payer avec une carte bancaire"
 
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:38
 msgid ""

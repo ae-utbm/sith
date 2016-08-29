@@ -66,9 +66,15 @@ class SubscriptionForm(forms.ModelForm):
             raise ValidationError(_("You must either choose an existing user or create a new one properly"))
         return cleaned_data
 
-class NewSubscription(CanEditMixin, CreateView):
+class NewSubscription(CreateView):
     template_name = 'subscription/subscription.jinja'
     form_class = SubscriptionForm
+
+    def dispatch(self, request, *arg, **kwargs):
+        res = super(NewSubscription, self).dispatch(request, *arg, **kwargs)
+        if request.user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
+            return res
+        raise PermissionDenied
 
     def get_initial(self):
         if 'member' in self.request.GET.keys():

@@ -48,7 +48,9 @@
 {% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}
 {% else %}
 {% trans %}Not subscribed{% endtrans %}
+{% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
 <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>
+{% endif %}
 {% endif %}
 </p>
 {% endif %}
