@@ -55,6 +55,8 @@ class EbouticMain(TemplateView):
         """ Add a product to the basket """
         try:
             p = Product.objects.filter(id=int(request.POST['product_id'])).first()
+            if not p.buying_groups.exists():
+                self.basket.add_product(p)
             for g in p.buying_groups.all():
                 if request.user.is_in_group(g.name):
                     self.basket.add_product(p)

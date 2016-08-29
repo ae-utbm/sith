@@ -41,13 +41,13 @@
     </div>
 </div>
 
-{% if user.membership.filter(end_date=None).exists() or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
+{% if user.membership.filter(end_date=None).exists() or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user == profile %}
 {# if the user is member of a club, he can view the subscription state #}
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
-{% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}User is subscriber until {{ subscription_end }}{% endtrans %}
+{% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}
 {% else %}
-{% trans %}User is not subscribed. {% endtrans %}
+{% trans %}Not subscribed{% endtrans %}
 <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>
 {% endif %}
 </p>

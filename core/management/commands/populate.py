@@ -55,6 +55,7 @@ class Command(BaseCommand):
                 unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name'],
                 address=settings.SITH_LAUNDERETTE_MANAGER['address'])
         launderette_club.save()
+        self.reset_index("club")
         for b in settings.SITH_COUNTER_BARS:
             g = Group(name=b[1]+" admin")
             g.save()
@@ -271,10 +272,10 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             credit.save()
             debit = AccountingType(code=607, label="Had to pay a beer", movement_type='debit')
             debit.save()
-            Operation(journal=gj, date=date.today(), amount=666.42, label="Satanic answer",
+            Operation(journal=gj, date=date.today(), amount=666.42,
                     remark="An answer to life...", mode="CASH", done=True, accounting_type=credit, target_type="USER",
                     target_id=skia.id).save()
-            Operation(journal=gj, date=date.today(), amount=42, label="Answer",
+            Operation(journal=gj, date=date.today(), amount=42,
                     remark="An answer to life...", mode="CASH", done=False, accounting_type=debit, target_type="CLUB",
                     target_id=bar_club.id).save()
             woenzco = Company(name="Woenzel & co")

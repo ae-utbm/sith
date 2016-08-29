@@ -212,9 +212,12 @@ class CounterClick(DetailView):
         total = self.sum_basket(request)
         product = self.get_product(pid)
         can_buy = False
-        for g in product.buying_groups.all():
-            if self.customer.user.is_in_group(g.name):
-                can_buy = True
+        if not product.buying_groups.exists():
+            can_buy = True
+        else:
+            for g in product.buying_groups.all():
+                if self.customer.user.is_in_group(g.name):
+                    can_buy = True
         if not can_buy:
             request.session['not_allowed'] = True
             return False
