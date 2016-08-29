@@ -294,7 +294,7 @@ class OperationEditView(CanEditMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         """ Add journal to the context """
-        kwargs = super(OperationCreateView, self).get_context_data(**kwargs)
+        kwargs = super(OperationEditView, self).get_context_data(**kwargs)
         kwargs['object'] = self.object.journal
         return kwargs
 
