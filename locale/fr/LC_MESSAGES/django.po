@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-29 03:08+0200\n"
+"POT-Creation-Date: 2016-08-29 03:22+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1200,8 +1200,8 @@ msgid "New group"
 msgstr "Nouveau groupe"
 
 #: core/templates/core/index.jinja:7
-msgid "Hello, world. You're at the core index using Jinja2."
-msgstr "Hello, world! Vous êtes sur la page d'accueil utilisant Jinja2."
+msgid "Welcome to the new AE's website!"
+msgstr "Bienvenue sur le nouveau site de l'AE ! "
 
 #: core/templates/core/login.jinja:10
 msgid "Your username and password didn't match. Please try again."
@@ -2388,6 +2388,9 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
+
+#~ msgid "Hello, world. You're at the core index using Jinja2."
+#~ msgstr "Hello, world! Vous êtes sur la page d'accueil utilisant Jinja2."
 
 #~ msgid "Pages"
 #~ msgstr "Pages"
