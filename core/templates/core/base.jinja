@@ -48,11 +48,15 @@
         {% block nav %}
         {% if not popup %}
         <nav>
-            <a href="{{ url('core:user_list') }}">{% trans %}Users{% endtrans %}</a>
+            <a href="https://ae.utbm.fr/">{% trans %}Main{% endtrans %}</a>
+            <a href="https://ae.utbm.fr/matmatronch/">{% trans %}Matmatronch{% endtrans %}</a>
             <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
-            <a href="{{ url('core:page_list') }}">{% trans %}Pages{% endtrans %}</a>
-            <a href="{{ url('club:club_list') }}">{% trans %}Clubs{% endtrans %}</a>
+            <a href="https://ae.utbm.fr/sas2/">{% trans %}SAS{% endtrans %}</a>
+            <a href="https://ae.utbm.fr/forum2/">{% trans %}Forum{% endtrans %}</a>
             <a href="{{ url('core:page', "services") }}">{% trans %}Services{% endtrans %}</a>
+            <a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a>
+            <a href="https://ae.utbm.fr/article.php?name=liens">{% trans %}Sponsors{% endtrans %}</a>
+            <a href="https://ae.utbm.fr/article.php?name=docs:index">{% trans %}Help{% endtrans %}</a>
         </nav>
         {% endif %}
         {% endblock %}

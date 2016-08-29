@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-29 02:59+0200\n"
+"POT-Creation-Date: 2016-08-29 03:08+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1055,27 +1055,44 @@ msgstr "Déconnexion"
 msgid "Search"
 msgstr "Recherche"
 
-#: core/templates/core/base.jinja:51 core/templates/core/search.jinja:10
-msgid "Users"
-msgstr "Utilisateurs"
+#: core/templates/core/base.jinja:51
+msgid "Main"
+msgstr "Accueil"
 
 #: core/templates/core/base.jinja:52
+msgid "Matmatronch"
+msgstr "Matmatronch"
+
+#: core/templates/core/base.jinja:53
 msgid "Wiki"
 msgstr "Wiki"
 
-#: core/templates/core/base.jinja:53
-msgid "Pages"
-msgstr "Pages"
-
-#: core/templates/core/base.jinja:54 core/templates/core/search.jinja:18
-msgid "Clubs"
-msgstr "Clubs"
+#: core/templates/core/base.jinja:54
+msgid "SAS"
+msgstr "SAS"
 
 #: core/templates/core/base.jinja:55
+msgid "Forum"
+msgstr "Forum"
+
+#: core/templates/core/base.jinja:56
 msgid "Services"
 msgstr "Services"
 
-#: core/templates/core/base.jinja:71
+#: core/templates/core/base.jinja:57 core/templates/core/file.jinja:20
+#: core/views/files.py:42
+msgid "Files"
+msgstr "Fichiers"
+
+#: core/templates/core/base.jinja:58
+msgid "Sponsors"
+msgstr "Partenaires"
+
+#: core/templates/core/base.jinja:59
+msgid "Help"
+msgstr "Aide"
+
+#: core/templates/core/base.jinja:75
 msgid "Site made by good people"
 msgstr "Site réalisé par des gens bons"
 
@@ -1126,10 +1143,6 @@ msgstr "Nouveau fichier"
 #: core/templates/core/file.jinja:11 core/templates/core/page.jinja:11
 msgid "Not found"
 msgstr "Non trouvé"
-
-#: core/templates/core/file.jinja:20 core/views/files.py:42
-msgid "Files"
-msgstr "Fichiers"
 
 #: core/templates/core/file.jinja:32
 msgid "My files"
@@ -1383,6 +1396,14 @@ msgstr "Votre nom d'utilisateur est %(username)s."
 msgid "Search result"
 msgstr "Résultat de la recherche"
 
+#: core/templates/core/search.jinja:10
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: core/templates/core/search.jinja:18
+msgid "Clubs"
+msgstr "Clubs"
+
 #: core/templates/core/user_account.jinja:4
 #, python-format
 msgid "%(user_name)s's account"
@@ -1458,6 +1479,7 @@ msgid "Option: "
 msgstr "Filière : "
 
 #: core/templates/core/user_detail.jinja:48
+#, python-format
 msgid "Subscribed until %(subscription_end)s"
 msgstr "Cotisant jusqu'au %(subscription_end)s"
 
@@ -2366,3 +2388,6 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
+
+#~ msgid "Pages"
+#~ msgstr "Pages"
