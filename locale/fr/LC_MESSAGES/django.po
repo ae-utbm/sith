@@ -2273,44 +2273,44 @@ msgstr "Montbéliard"
 
 #: sith/settings.py:337 sith/settings_sample.py:319
 msgid "One semester"
-msgstr "Un semestre"
+msgstr "Un semestre, 15 €"
 
 #: sith/settings.py:342 sith/settings_sample.py:324
 msgid "Two semesters"
-msgstr "Deux semestres"
+msgstr "Deux semestres, 28 €"
 
 #: sith/settings.py:347 sith/settings_sample.py:329
 msgid "Common core cursus"
-msgstr "Cursus tronc commun"
+msgstr "Cursus tronc commun, 45 €"
 
 #: sith/settings.py:352 sith/settings.py:357 sith/settings_sample.py:334
 #: sith/settings_sample.py:339
 msgid "Branch cursus"
-msgstr "Cursus branche"
+msgstr "Cursus branche, 45 €"
 
 #: sith/settings.py:362 sith/settings_sample.py:344
 msgid "Honorary member"
-msgstr "Membre honoraire"
+msgstr "Membre honoraire, 0 €"
 
 #: sith/settings.py:367 sith/settings_sample.py:349
 msgid "Assidu member"
-msgstr "Membre d'Assidu"
+msgstr "Membre d'Assidu, 0 €"
 
 #: sith/settings.py:372 sith/settings_sample.py:354
 msgid "Amicale/DOCEO member"
-msgstr "Membre de l'Amicale/DOCEO"
+msgstr "Membre de l'Amicale/DOCEO, 0 €"
 
 #: sith/settings.py:377 sith/settings_sample.py:359
 msgid "UT network member"
-msgstr "Cotisant du réseau UT"
+msgstr "Cotisant du réseau UT, 0 €"
 
 #: sith/settings.py:382 sith/settings_sample.py:364
 msgid "CROUS member"
-msgstr "Membres du CROUS"
+msgstr "Membres du CROUS, 0 €"
 
 #: sith/settings.py:387 sith/settings_sample.py:369
 msgid "Sbarro/ESTA member"
-msgstr "Membre de Sbarro ou de l'ESTA"
+msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
 
 #: sith/settings.py:395 sith/settings_sample.py:377
 msgid "President"
