@@ -78,6 +78,7 @@ class Subscription(models.Model):
                     "SEVENANS": 5,
                     "BELFORT": 6,
                     "MONTBELIARD": 9,
+                    "EBOUTIC": 5,
                     }
             TYPE = {
                     'un-semestre'                 : 0,
