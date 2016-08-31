@@ -124,6 +124,11 @@ class UserView(CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_detail.jinja"
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "infos"
+        return kwargs
+
 class UserStatsView(CanViewMixin, DetailView):
     """
     Display a user's stats
@@ -143,6 +148,7 @@ class UserStatsView(CanViewMixin, DetailView):
         kwargs['total_foyer_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=foyer)], timedelta())
         kwargs['total_mde_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=mde)], timedelta())
         kwargs['total_gommette_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=gommette)], timedelta())
+        kwargs['tab'] = "stats"
         return kwargs
 
 class UserMiniView(CanViewMixin, DetailView):
@@ -221,6 +227,7 @@ class UserUpdateProfileView(CanEditMixin, UpdateView):
         kwargs = super(UserUpdateProfileView, self).get_context_data(**kwargs)
         kwargs['profile'] = self.form.instance
         kwargs['form'] = self.form
+        kwargs['tab'] = "edit"
         return kwargs
 
 class UserUpdateGroupView(CanEditPropMixin, UpdateView):
@@ -234,6 +241,11 @@ class UserUpdateGroupView(CanEditPropMixin, UpdateView):
             widgets={'groups':CheckboxSelectMultiple})
     context_object_name = "profile"
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserUpdateGroupView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "groups"
+        return kwargs
+
 class UserToolsView(TemplateView):
     """
     Displays the logged user's tools
@@ -244,6 +256,8 @@ class UserToolsView(TemplateView):
         from launderette.models import Launderette
         kwargs = super(UserToolsView, self).get_context_data(**kwargs)
         kwargs['launderettes'] = Launderette.objects.all()
+        kwargs['profile'] = self.request.user
+        kwargs['tab'] = "tools"
         return kwargs
 
 class UserAccountView(DetailView):
@@ -270,6 +284,7 @@ class UserAccountView(DetailView):
         except:
             pass
         # TODO: add list of month where account has activity
+        kwargs['tab'] = "account"
         return kwargs
 
 

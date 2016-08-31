@@ -4,22 +4,53 @@
 <div class="tool-bar">
     <div>{{ profile.get_display_name() }}</div>
     <div class="tools">
-        <a href="{{ url('core:user_profile', user_id=profile.id) }}">{% trans %}Infos{% endtrans %}</a>
-        <a href="{{ url('core:user_stats', user_id=profile.id) }}">{% trans %}Stats{% endtrans %}</a>
+
+        <a href="{{ url('core:user_profile', user_id=profile.id) }}"
+            {%- if tab == "infos" -%}
+                class="selected_tab"
+            {%- endif -%}
+        >{% trans %}Infos{% endtrans %}</a>
+
+        <a href="{{ url('core:user_tools') }}"
+            {%- if tab == "tools" -%}
+                class="selected_tab"
+            {%- endif -%}
+        >{% trans %}Tools{% endtrans %}</a>
+
+        <a href="{{ url('core:user_stats', user_id=profile.id) }}"
+            {%- if tab == "stats" -%}
+                class="selected_tab"
+            {%- endif -%}
+        >{% trans %}Stats{% endtrans %}</a>
+
         {% if can_edit(profile, request.user) or user.id == profile.id %}
-        <a href="{{ url('core:user_edit', user_id=profile.id) }}">{% trans %}Edit{% endtrans %}</a>
+        <a href="{{ url('core:user_edit', user_id=profile.id) }}"
+            {%- if tab == "edit" -%}
+                class="selected_tab"
+            {%- endif -%}
+        >{% trans %}Edit{% endtrans %}</a>
         {% endif %}
+
         {% if can_edit_prop(profile, request.user) %}
-        <a href="{{ url('core:user_groups', user_id=profile.id) }}">{% trans %}Groups{% endtrans %}</a>
+        <a href="{{ url('core:user_groups', user_id=profile.id) }}"
+            {%- if tab == "groups" -%}
+                class="selected_tab"
+            {%- endif -%}
+        >{% trans %}Groups{% endtrans %}</a>
         {% endif %}
+
         {% if profile.customer and (profile == request.user
         or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
         or request.user.is_root) %}
-        <a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Account{% endtrans %} ({{ profile.customer.amount }}€)</a>
+        <a href="{{ url('core:user_account', user_id=profile.id) }}"
+            {%- if tab == "account" -%}
+                class="selected_tab"
+            {%- endif -%}
+        >{% trans %}Account{% endtrans %} ({{ profile.customer.amount }}€)</a>
         {% endif %}
     </div>
+    <hr>
 </div>
-<hr>
 
 <div>
     {% block infos %}

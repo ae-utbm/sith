@@ -162,9 +162,19 @@ tbody>tr:hover {
 }
 .tool-bar {
     overflow: auto;
+    padding: 4px;
 }
 .tools {
     float: right;
+    padding: 6px;
+    overflow: hidden;
+    border: 1px solid grey;
+}
+.tools a {
+    padding: 10px;
+}
+.selected_tab {
+    background: lightgrey;
 }
 #basket {
     width: 40%;
