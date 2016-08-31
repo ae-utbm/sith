@@ -5,6 +5,12 @@ body{
     width: 100%;
     font-family: sans-serif;
 }
+a {
+    text-decoration: none;
+    color: #265C83;
+}
+a:hover   { color: #7FDBFF; }
+a:active  { color: #007BE6; }
 /*--------------------------------HEADER-------------------------------*/
 #logo {
     margin-left: 5%;
@@ -24,7 +30,7 @@ header a {
     padding: 1em;
 }
 header a:hover {
-    color: #2D3;
+    color: #265C83;
 }
 header form {
     display: inline-block;
@@ -61,6 +67,7 @@ nav a {
 }
 nav a:hover {
     background: purple;
+    color: white;
 }
 
 /*--------------------------------CONTENT------------------------------*/
