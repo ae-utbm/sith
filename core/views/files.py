@@ -58,8 +58,7 @@ class AddFilesForm(forms.Form):
                 new_file.clean()
                 new_file.save()
             except Exception as e:
-                self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") %
-                        {'file_name': f, 'msg': str(e.message)})
+                self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
 
 class FileListView(ListView):
     template_name = 'core/file_list.jinja'

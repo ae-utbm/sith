@@ -446,7 +446,7 @@ def get_directory(instance, filename):
     return './{0}/{1}'.format(instance.get_parent_path(), filename)
 
 class SithFile(models.Model):
-    name = models.CharField(_('file name'), max_length=30, blank=False)
+    name = models.CharField(_('file name'), max_length=256, blank=False)
     parent = models.ForeignKey('self', related_name="children", verbose_name=_("parent"), null=True, blank=True)
     file = models.FileField(upload_to=get_directory, verbose_name=_("file"), null=True, blank=True)
     owner = models.ForeignKey(User, related_name="owned_files", verbose_name=_("owner"))
