@@ -15,7 +15,7 @@
         {% if profile.customer and (profile == request.user
         or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
         or request.user.is_root) %}
-        <a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Account{% endtrans %}</a>
+        <a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Account{% endtrans %} ({{ profile.customer.amount }}€)</a>
         {% endif %}
     </div>
 </div>
