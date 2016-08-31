@@ -166,12 +166,11 @@ tbody>tr:hover {
 }
 .tools {
     float: right;
-    padding: 6px;
-    overflow: hidden;
     border: 1px solid grey;
 }
 .tools a {
     padding: 10px;
+    display: inline-block;
 }
 .selected_tab {
     background: lightgrey;
