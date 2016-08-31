@@ -3,16 +3,16 @@ from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.views.generic.base import View
-from django.contrib.auth.forms import AuthenticationForm
 
 from core.models import Group
+from core.views.forms import LoginForm
 
 def forbidden(request):
     try:
         return HttpResponseForbidden(render(request, "core/403.jinja", context={'next': request.path, 'form':
-            AuthenticationForm(), 'popup': request.resolver_match.kwargs['popup'] or ""}))
+            LoginForm(), 'popup': request.resolver_match.kwargs['popup'] or ""}))
     except:
-        return HttpResponseForbidden(render(request, "core/403.jinja", context={'next': request.path, 'form': AuthenticationForm()}))
+        return HttpResponseForbidden(render(request, "core/403.jinja", context={'next': request.path, 'form': LoginForm()}))
 
 def not_found(request):
     return HttpResponseNotFound(render(request, "core/404.jinja"))

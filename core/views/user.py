@@ -16,7 +16,7 @@ from datetime import timedelta
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
-from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm
+from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm
 from core.models import User, SithFile
 
 def login(request):
@@ -25,7 +25,7 @@ def login(request):
 
     Needs to be improve with correct handling of form exceptions
     """
-    return views.login(request, template_name="core/login.jinja")
+    return views.login(request, template_name="core/login.jinja", authentication_form=LoginForm)
 
 def logout(request):
     """

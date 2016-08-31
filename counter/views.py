@@ -4,7 +4,6 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView, Proces
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.core.urlresolvers import reverse_lazy
-from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django import forms
@@ -18,7 +17,7 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from ajax_select import make_ajax_form, make_ajax_field
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
-from core.views.forms import SelectUser
+from core.views.forms import SelectUser, LoginForm
 from core.models import User
 from subscription.models import Subscriber
 from subscription.views import get_subscriber
@@ -77,7 +76,7 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         if self.request.method == 'POST':
             self.object = self.get_object()
         kwargs = super(CounterMain, self).get_context_data(**kwargs)
-        kwargs['login_form'] = AuthenticationForm()
+        kwargs['login_form'] = LoginForm()
         kwargs['login_form'].fields['username'].widget.attrs['autofocus'] = True
         kwargs['login_form'].cleaned_data = {} # add_error fails if there are no cleaned_data
         if "credentials" in self.request.GET:
@@ -348,7 +347,7 @@ class CounterLogin(RedirectView):
         """
         self.counter_id = kwargs['counter_id']
         self.counter = Counter.objects.filter(id=kwargs['counter_id']).first()
-        form = AuthenticationForm(request, data=request.POST)
+        form = LoginForm(request, data=request.POST)
         self.errors = []
         if form.is_valid():
             user = User.objects.filter(username=form.cleaned_data['username']).first()

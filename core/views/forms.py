@@ -8,6 +8,7 @@ from django.utils.translation import ugettext as _
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 
 import logging
+import re
 
 from core.models import User, Page, RealGroup, SithFile
 
@@ -67,6 +68,23 @@ class SelectUser(TextInput):
         return output
 
 # Forms
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *arg, **kwargs):
+        if 'data' in kwargs.keys():
+            from counter.models import Customer
+            data = kwargs['data'].copy()
+            account_code = re.compile(r"^[0-9]+[A-Za-z]$")
+            if account_code.match(data['username']):
+                user = Customer.objects.filter(account_id=data['username']).first().user
+            elif '@' in data['username']:
+                user = User.objects.filter(email=data['username']).first()
+            else:
+                user = User.objects.filter(username=data['username']).first()
+            data['username'] = user.username
+            kwargs['data'] = data
+        super(LoginForm, self).__init__(*arg, **kwargs)
+        self.fields['username'].label = _("Username, email, or account number")
 
 class RegisteringForm(UserCreationForm):
     error_css_class = 'error'
