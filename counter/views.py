@@ -463,6 +463,7 @@ class ProductListView(CanEditPropMixin, ListView):
     """
     model = Product
     template_name = 'counter/product_list.jinja'
+    ordering = ['name']
 
 class ProductEditForm(forms.ModelForm):
     class Meta:
@@ -470,7 +471,7 @@ class ProductEditForm(forms.ModelForm):
         fields = ['name', 'description', 'product_type', 'code', 'parent_product', 'buying_groups', 'purchase_price',
                 'selling_price', 'special_selling_price', 'icon', 'club', 'limit_age', 'tray']
     parent_product = AutoCompleteSelectField('products', show_help_text=False, label=_("Parent product"), required=False)
-    buying_groups = AutoCompleteSelectMultipleField('groups', show_help_text=False, help_text="", label=_("Buying groups"))
+    buying_groups = AutoCompleteSelectMultipleField('groups', show_help_text=False, help_text="", label=_("Buying groups"), required=False)
     club = AutoCompleteSelectField('clubs', show_help_text=False)
     counters = AutoCompleteSelectMultipleField('counters', show_help_text=False, help_text="", label=_("Counters"), required=False)
 

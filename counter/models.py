@@ -88,7 +88,7 @@ class Product(models.Model):
     tray = models.BooleanField(_('tray price'), default=False)
     parent_product = models.ForeignKey('self', related_name='children_products', verbose_name=_("parent product"), null=True,
             blank=True, on_delete=models.SET_NULL)
-    buying_groups = models.ManyToManyField(Group, related_name='products', verbose_name=_("buying groups"))
+    buying_groups = models.ManyToManyField(Group, related_name='products', verbose_name=_("buying groups"), blank=True)
 
     class Meta:
         verbose_name = _('product')
