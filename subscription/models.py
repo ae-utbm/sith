@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.contrib.auth.forms import PasswordResetForm
 
 from core.models import User
 
@@ -70,8 +71,12 @@ class Subscription(models.Model):
         super(Subscription, self).save()
         from counter.models import Customer
         if not Customer.objects.filter(user=self.member).exists():
-            last_id = Customer.objects.count() + 5195 # Number to keep a continuity with the old site
+            last_id = Customer.objects.count() + 1504 # Number to keep a continuity with the old site
             Customer(user=self.member, account_id=Customer.generate_account_id(last_id+1), amount=0).save()
+            form = PasswordResetForm({'email': self.member.email})
+            if form.is_valid():
+                form.save(use_https=True, email_template_name='core/new_user_email.jinja',
+                        subject_template_name='core/new_user_email_subject.jinja', from_email="ae@utbm.fr")
         self.member.make_home()
         try: # Create subscription on the old site: TODO remove me!
             LOCATION = {

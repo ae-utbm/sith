@@ -9,6 +9,7 @@ from django.forms import Select
 from django.conf import settings
 
 from ajax_select.fields import AutoCompleteSelectField
+import random
 
 from subscription.models import Subscriber, Subscription
 from core.views import CanEditMixin, CanEditPropMixin, CanViewMixin
@@ -54,6 +55,7 @@ class SubscriptionForm(forms.ModelForm):
                         first_name = self.cleaned_data.get("first_name"),
                         email = self.cleaned_data.get("email"))
                 u.generate_username()
+                u.set_password(str(random.randrange(1000000, 10000000)))
                 u.save()
                 cleaned_data["member"] = u
         elif cleaned_data.get("member") is not None:
