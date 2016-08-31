@@ -45,7 +45,8 @@
 {# if the user is member of a club, he can view the subscription state #}
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
-{% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}
+{% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
+{% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}
 {% else %}
 {% trans %}Not subscribed{% endtrans %}
 {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}

@@ -1,12 +1,22 @@
 {% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
 
 {% block content %}
     <h2>{% trans %}Club members{% endtrans %}</h2>
-    <ul>
-        {% for m in club.members.all() %}
-        <li>{{ m }}</li>
+    <table>
+        <thead>
+            <td>{% trans %}User{% endtrans %}</td>
+            <td>{% trans %}Role{% endtrans %}</td>
+        </thead>
+        <tbody>
+        {% for m in club.members.filter(end_date=None).order_by('-role').all() %}
+            <tr>
+                <td>{{ user_profile_link(m.user) }}</td>
+                <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+            </tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
     <form action="{{ url('club:club_members', club_id=club.id) }}" method="post">
         {% csrf_token %}
         {{ form.as_p() }}

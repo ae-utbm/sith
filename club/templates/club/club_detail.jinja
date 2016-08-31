@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
 
 {% block content %}
     <h3>{% trans %}Club{% endtrans %}</h3>
@@ -15,11 +16,20 @@
     {% endif %}
     <h3>{{ club.name }}</h3>
     <p>{{ club.address }}</p>
-    <ul>
-        {% for m in club.members.filter(end_date=None).all() %}
-        <li>{{ m }}</li>
+    <table>
+        <thead>
+            <td>{% trans %}User{% endtrans %}</td>
+            <td>{% trans %}Role{% endtrans %}</td>
+        </thead>
+        <tbody>
+        {% for m in club.members.filter(end_date=None).order_by('-role').all() %}
+            <tr>
+                <td>{{ user_profile_link(m.user) }}</td>
+                <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+            </tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
 {% endblock %}
 
 
