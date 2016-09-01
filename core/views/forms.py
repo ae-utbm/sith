@@ -75,14 +75,15 @@ class LoginForm(AuthenticationForm):
             from counter.models import Customer
             data = kwargs['data'].copy()
             account_code = re.compile(r"^[0-9]+[A-Za-z]$")
-            if account_code.match(data['username']):
-                user = Customer.objects.filter(account_id=data['username']).first().user
-            elif '@' in data['username']:
-                user = User.objects.filter(email=data['username']).first()
-            else:
-                user = User.objects.filter(username=data['username']).first()
-            if user:
+            try:
+                if account_code.match(data['username']):
+                    user = Customer.objects.filter(account_id__iexact=data['username']).first().user
+                elif '@' in data['username']:
+                    user = User.objects.filter(email__iexact=data['username']).first()
+                else:
+                    user = User.objects.filter(username=data['username']).first()
                 data['username'] = user.username
+            except: pass
             kwargs['data'] = data
         super(LoginForm, self).__init__(*arg, **kwargs)
         self.fields['username'].label = _("Username, email, or account number")
