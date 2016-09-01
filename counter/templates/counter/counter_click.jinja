@@ -39,6 +39,9 @@
         {% if request.session['not_allowed'] %}
         <p><strong>{% trans %}Not allowed for that product{% endtrans %}</strong></p>
         {% endif %}
+        {% if request.session['no_age'] %}
+        <p><strong>{% trans %}No date of birth provided{% endtrans %}</strong></p>
+        {% endif %}
         {% if request.session['not_enough'] %}
         <p><strong>{% trans %}Not enough money{% endtrans %}</strong></p>
         {% endif %}

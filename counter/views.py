@@ -121,9 +121,10 @@ class CounterClick(DetailView):
         if 'basket' not in request.session.keys(): # Init the basket session entry
             request.session['basket'] = {}
             request.session['basket_total'] = 0
-        request.session['not_enough'] = False
+        request.session['not_enough'] = False # Reset every variable
         request.session['too_young'] = False
         request.session['not_allowed'] = False
+        request.session['no_age'] = False
         self.refill_form = None
         ret = super(CounterClick, self).get(request, *args, **kwargs)
         if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
@@ -144,9 +145,10 @@ class CounterClick(DetailView):
         if 'basket' not in request.session.keys():
             request.session['basket'] = {}
             request.session['basket_total'] = 0
-        request.session['not_enough'] = False
+        request.session['not_enough'] = False # Reset every variable
         request.session['too_young'] = False
         request.session['not_allowed'] = False
+        request.session['no_age'] = False
         if self.object.type != "BAR":
             self.operator = request.user
         elif self.is_barman_price():
@@ -228,7 +230,10 @@ class CounterClick(DetailView):
         if self.customer.amount < (total + q*float(price)): # Check for enough money
             request.session['not_enough'] = True
             return False
-        if self.customer.user.get_age() < product.limit_age: # Check if affordable
+        if product.limit_age >= 18 and not self.customer.user.date_of_birth:
+            request.session['no_age'] = True
+            return False
+        if self.customer.user.date_of_birth and self.customer.user.get_age() < product.limit_age: # Check if affordable
             request.session['too_young'] = True
             return False
         if pid in request.session['basket']: # Add if already in basket
