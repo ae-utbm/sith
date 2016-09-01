@@ -461,6 +461,8 @@ class SithFile(models.Model):
         verbose_name = _("file")
 
     def is_owned_by(self, user):
+        if hasattr(self, 'profile_of') and user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
+            return True
         return user.id == self.owner.id
 
     def can_be_viewed_by(self, user):

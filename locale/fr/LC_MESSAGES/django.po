@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-31 18:24+0200\n"
+"POT-Creation-Date: 2016-09-01 11:17+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1251,7 +1251,8 @@ msgid ""
 "You're receiving this email because you subscribed to the UTBM student "
 "association."
 msgstr ""
-"Vous avez reçu cet email parce que vous avez cotisé à l'Association des Étudiants de l'UTBM."
+"Vous avez reçu cet email parce que vous avez cotisé à l'Association des "
+"Étudiants de l'UTBM."
 
 #: core/templates/core/new_user_email.jinja:4
 #: core/templates/core/password_reset_email.jinja:4
@@ -1269,10 +1270,11 @@ msgid ""
 "You also got a new account that will be useful to purchase products in the "
 "living areas and on the Eboutic."
 msgstr ""
-"Un compte vous a également été créé, qui vous servira notamment à consommer dans les lieux de vie "
-"ou sur l'Eboutic."
+"Un compte vous a également été créé, qui vous servira notamment à consommer "
+"dans les lieux de vie ou sur l'Eboutic."
 
 #: core/templates/core/new_user_email.jinja:10
+#, python-format
 msgid "Here is your account number: %(account)s"
 msgstr "Voici votre numéro de compte AE : %(account)s"
 
@@ -2330,10 +2332,14 @@ msgstr "Deux semestres, 28 €"
 msgid "Common core cursus"
 msgstr "Cursus tronc commun, 45 €"
 
-#: sith/settings.py:344 sith/settings.py:349 sith/settings_sample.py:333
+#: sith/settings.py:344 sith/settings_sample.py:333
 #: sith/settings_sample.py:338
 msgid "Branch cursus"
 msgstr "Cursus branche, 45 €"
+
+#: sith/settings.py:349
+msgid "Alternating cursus"
+msgstr "Cursus alternant, 30 €"
 
 #: sith/settings.py:354 sith/settings_sample.py:343
 msgid "Honorary member"
@@ -2435,4 +2441,3 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
-
