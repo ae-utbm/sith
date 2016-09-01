@@ -11,11 +11,13 @@
             {%- endif -%}
         >{% trans %}Infos{% endtrans %}</a>
 
+        {% if profile == user %}
         <a href="{{ url('core:user_tools') }}"
             {%- if tab == "tools" -%}
                 class="selected_tab"
             {%- endif -%}
         >{% trans %}Tools{% endtrans %}</a>
+        {% endif %}
 
         <a href="{{ url('core:user_stats', user_id=profile.id) }}"
             {%- if tab == "stats" -%}

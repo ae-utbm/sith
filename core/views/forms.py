@@ -81,7 +81,8 @@ class LoginForm(AuthenticationForm):
                 user = User.objects.filter(email=data['username']).first()
             else:
                 user = User.objects.filter(username=data['username']).first()
-            data['username'] = user.username
+            if user:
+                data['username'] = user.username
             kwargs['data'] = data
         super(LoginForm, self).__init__(*arg, **kwargs)
         self.fields['username'].label = _("Username, email, or account number")
