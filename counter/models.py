@@ -97,7 +97,7 @@ class Product(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) or user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']):
             return True
         return False
 

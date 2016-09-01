@@ -42,7 +42,7 @@ class GetUserForm(forms.Form):
         cleaned_data = super(GetUserForm, self).clean()
         cus = None
         if cleaned_data['code'] != "":
-            cus = Customer.objects.filter(account_id=cleaned_data['code']).first()
+            cus = Customer.objects.filter(account_id__iexact=cleaned_data['code']).first()
         elif cleaned_data['id'] is not None:
             cus = Customer.objects.filter(user=cleaned_data['id']).first()
         sub = get_subscriber(cus.user) if cus is not None else None

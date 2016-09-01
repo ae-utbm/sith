@@ -38,8 +38,8 @@ class Subscriber(User):
             db.commit()
         except Exception as e:
             with open(settings.BASE_DIR+"/user_fail.log", "a") as f:
-                print("FAIL to add user %s (%s %s - %s) to old site" % (self.id, self.first_name, self.last_name,
-                    self.email), file=f)
+                print("FAIL to add user %s (%s %s - %s) to old site" % (self.id, self.first_name.encode('utf-8'),
+                    self.last_name.encode('utf-8'), self.email), file=f)
                 print("Reason: %s" % (repr(e)), file=f)
             db.rollback()
 
