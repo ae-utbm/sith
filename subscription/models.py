@@ -29,19 +29,23 @@ class Subscriber(User):
         return s.is_valid_now() if s is not None else False
 
     def save(self):
+        create = False
+        if not self.id:
+            create = True
         super(Subscriber, self).save()
-        try: # Create user on the old site: TODO remove me!
-            db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
-            c = db.cursor()
-            c.execute("""INSERT INTO utilisateurs (id_utilisateur, nom_utl, prenom_utl, email_utl, hash_utl, ae_utl) VALUES
-            (%s, %s, %s, %s, %s, %s)""", (self.id, self.last_name, self.first_name, self.email, "valid", "1"))
-            db.commit()
-        except Exception as e:
-            with open(settings.BASE_DIR+"/user_fail.log", "a") as f:
-                print("FAIL to add user %s (%s %s - %s) to old site" % (self.id, self.first_name.encode('utf-8'),
-                    self.last_name.encode('utf-8'), self.email), file=f)
-                print("Reason: %s" % (repr(e)), file=f)
-            db.rollback()
+        if create:
+            try: # Create user on the old site: TODO remove me!
+                db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
+                c = db.cursor()
+                c.execute("""INSERT INTO utilisateurs (id_utilisateur, nom_utl, prenom_utl, email_utl, hash_utl, ae_utl) VALUES
+                (%s, %s, %s, %s, %s, %s)""", (self.id, self.last_name, self.first_name, self.email, "valid", "1"))
+                db.commit()
+            except Exception as e:
+                with open(settings.BASE_DIR+"/user_fail.log", "a") as f:
+                    print("FAIL to add user %s (%s %s - %s) to old site" % (self.id, self.first_name.encode('utf-8'),
+                        self.last_name.encode('utf-8'), self.email), file=f)
+                    print("Reason: %s" % (repr(e)), file=f)
+                db.rollback()
 
 class Subscription(models.Model):
     member = models.ForeignKey(Subscriber, related_name='subscriptions')
