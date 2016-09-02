@@ -32,6 +32,11 @@
             {% if profile.dpt_option %}
             <br>{% trans %}Option: {% endtrans %}{{ profile.dpt_option }}
             {% endif %}
+            {% if profile.phone %}
+            <p>
+            {{ profile.phone }}
+            </p>
+            {% endif %}
             </p>
             {% if profile.promo %}
             <p><img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}" alt="Promo {{ profile.promo }}" class="promo_pict" />
@@ -46,7 +51,14 @@
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
 {% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
-{% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}
+{% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}<br/>
+{% if get_subscriber(profile).tokens.exists() %}
+<ul>
+{% for i in get_subscriber(profile).tokens.all() %}
+    <li>{{ i }}</li>
+{% endfor %}
+</ul>
+{% endif %}
 {% else %}
 {% trans %}Not subscribed{% endtrans %}
 {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}

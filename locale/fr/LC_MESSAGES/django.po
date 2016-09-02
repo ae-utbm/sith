@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-02 12:26+0200\n"
+"POT-Creation-Date: 2016-09-02 19:31+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -179,7 +179,7 @@ msgstr "Compte"
 msgid "Company"
 msgstr "Entreprise"
 
-#: accounting/models.py:190 sith/settings.py:287 sith/settings_sample.py:272
+#: accounting/models.py:190 sith/settings.py:283 sith/settings_sample.py:272
 msgid "Other"
 msgstr "Autre"
 
@@ -653,17 +653,17 @@ msgid "username"
 msgstr "nom d'utilisateur"
 
 #: core/models.py:77
-msgid "Required. 254 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 254 characters or fewer. Letters, digits and ./+/-/_ only."
 msgstr ""
-"Requis. Pas plus de 254 caractères. Uniquement des lettres, numéros, et @/./"
+"Requis. Pas plus de 254 caractères. Uniquement des lettres, numéros, et ./"
 "+/-/_"
 
 #: core/models.py:81
 msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
+"Enter a valid username. This value may contain only letters, numbers and ./"
 "+/-/_ characters."
 msgstr ""
-"Entrez un nom d'utilisateur correct. Uniquement des lettres, numéros, et @/./"
+"Entrez un nom d'utilisateur correct. Uniquement des lettres, numéros, et ./"
 "+/-/_"
 
 #: core/models.py:86
@@ -1249,7 +1249,7 @@ msgid "Born: "
 msgstr "Né le : "
 
 #: core/templates/core/macros.jinja:31
-#: core/templates/core/user_detail.jinja:38
+#: core/templates/core/user_detail.jinja:43
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -1529,21 +1529,21 @@ msgstr "Profil de %(user_name)s"
 msgid "Option: "
 msgstr "Filière : "
 
-#: core/templates/core/user_detail.jinja:48
+#: core/templates/core/user_detail.jinja:53
 #, python-format
 msgid "Subscribed until %(subscription_end)s"
 msgstr "Cotisant jusqu'au %(subscription_end)s"
 
-#: core/templates/core/user_detail.jinja:49
+#: core/templates/core/user_detail.jinja:54
 #: core/templates/core/user_edit.jinja:39
 msgid "Account number: "
 msgstr "Numero de compte : "
 
-#: core/templates/core/user_detail.jinja:51
+#: core/templates/core/user_detail.jinja:63
 msgid "Not subscribed"
 msgstr "Non cotisant"
 
-#: core/templates/core/user_detail.jinja:53
+#: core/templates/core/user_detail.jinja:65
 #: subscription/templates/subscription/subscription.jinja:4
 #: subscription/templates/subscription/subscription.jinja:8
 msgid "New subscription"
@@ -1782,7 +1782,7 @@ msgstr "Bureau"
 #: eboutic/templates/eboutic/eboutic_main.jinja:24
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:8
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:4
-#: sith/settings.py:286 sith/settings.py:294 sith/settings_sample.py:271
+#: sith/settings.py:282 sith/settings.py:290 sith/settings_sample.py:271
 #: sith/settings_sample.py:279
 msgid "Eboutic"
 msgstr "Eboutic"
@@ -1820,8 +1820,8 @@ msgstr "quantité"
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: counter/models.py:248 sith/settings.py:279 sith/settings.py:284
-#: sith/settings.py:306 sith/settings_sample.py:264
+#: counter/models.py:248 sith/settings.py:275 sith/settings.py:280
+#: sith/settings.py:302 sith/settings_sample.py:264
 #: sith/settings_sample.py:269 sith/settings_sample.py:291
 msgid "Credit card"
 msgstr "Carte bancaire"
@@ -2231,12 +2231,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:26
-#: sith/settings.py:420 sith/settings_sample.py:405
+#: sith/settings.py:416 sith/settings_sample.py:405
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:30
-#: sith/settings.py:420 sith/settings_sample.py:405
+#: sith/settings.py:416 sith/settings_sample.py:405
 msgid "Drying"
 msgstr "Séchage"
 
@@ -2291,116 +2291,120 @@ msgstr "L'utilisateur n'a pas réservé de créneau"
 msgid "Token not found"
 msgstr "Jeton non trouvé"
 
-#: sith/settings.py:174 sith/settings_sample.py:160
+#: sith/settings.py:170 sith/settings_sample.py:160
 msgid "English"
 msgstr "Anglais"
 
-#: sith/settings.py:175 sith/settings_sample.py:161
+#: sith/settings.py:171 sith/settings_sample.py:161
 msgid "French"
 msgstr "Français"
 
-#: sith/settings.py:276 sith/settings.py:283 sith/settings.py:304
+#: sith/settings.py:272 sith/settings.py:279 sith/settings.py:300
 #: sith/settings_sample.py:261 sith/settings_sample.py:268
 #: sith/settings_sample.py:289
 msgid "Check"
 msgstr "Chèque"
 
-#: sith/settings.py:277 sith/settings.py:285 sith/settings.py:305
+#: sith/settings.py:273 sith/settings.py:281 sith/settings.py:301
 #: sith/settings_sample.py:262 sith/settings_sample.py:270
 #: sith/settings_sample.py:290
 msgid "Cash"
 msgstr "Espèces"
 
-#: sith/settings.py:278 sith/settings_sample.py:263
+#: sith/settings.py:274 sith/settings_sample.py:263
 msgid "Transfert"
 msgstr "Virement"
 
-#: sith/settings.py:291 sith/settings_sample.py:276
+#: sith/settings.py:287 sith/settings_sample.py:276
 msgid "Belfort"
 msgstr "Belfort"
 
-#: sith/settings.py:292 sith/settings_sample.py:277
+#: sith/settings.py:288 sith/settings_sample.py:277
 msgid "Sevenans"
 msgstr "Sevenans"
 
-#: sith/settings.py:293 sith/settings_sample.py:278
+#: sith/settings.py:289 sith/settings_sample.py:278
 msgid "Montbéliard"
 msgstr "Montbéliard"
 
-#: sith/settings.py:333 sith/settings_sample.py:318
+#: sith/settings.py:329 sith/settings_sample.py:318
 msgid "One semester"
 msgstr "Un semestre, 15 €"
 
-#: sith/settings.py:338 sith/settings_sample.py:323
+#: sith/settings.py:334 sith/settings_sample.py:323
 msgid "Two semesters"
 msgstr "Deux semestres, 28 €"
 
-#: sith/settings.py:343 sith/settings_sample.py:328
+#: sith/settings.py:339 sith/settings_sample.py:328
 msgid "Common core cursus"
 msgstr "Cursus tronc commun, 45 €"
 
-#: sith/settings.py:348 sith/settings.py:353 sith/settings_sample.py:333
+#: sith/settings.py:344 sith/settings_sample.py:333
 #: sith/settings_sample.py:338
 msgid "Branch cursus"
 msgstr "Cursus branche, 45 €"
 
-#: sith/settings.py:358 sith/settings_sample.py:343
+#: sith/settings.py:349
+msgid "Alternating cursus"
+msgstr "Cursus alternant, 30 €"
+
+#: sith/settings.py:354 sith/settings_sample.py:343
 msgid "Honorary member"
 msgstr "Membre honoraire, 0 €"
 
-#: sith/settings.py:363 sith/settings_sample.py:348
+#: sith/settings.py:359 sith/settings_sample.py:348
 msgid "Assidu member"
 msgstr "Membre d'Assidu, 0 €"
 
-#: sith/settings.py:368 sith/settings_sample.py:353
+#: sith/settings.py:364 sith/settings_sample.py:353
 msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO, 0 €"
 
-#: sith/settings.py:373 sith/settings_sample.py:358
+#: sith/settings.py:369 sith/settings_sample.py:358
 msgid "UT network member"
 msgstr "Cotisant du réseau UT, 0 €"
 
-#: sith/settings.py:378 sith/settings_sample.py:363
+#: sith/settings.py:374 sith/settings_sample.py:363
 msgid "CROUS member"
 msgstr "Membres du CROUS, 0 €"
 
-#: sith/settings.py:383 sith/settings_sample.py:368
+#: sith/settings.py:379 sith/settings_sample.py:368
 msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
 
-#: sith/settings.py:391 sith/settings_sample.py:376
+#: sith/settings.py:387 sith/settings_sample.py:376
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:392 sith/settings_sample.py:377
+#: sith/settings.py:388 sith/settings_sample.py:377
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:393 sith/settings_sample.py:378
+#: sith/settings.py:389 sith/settings_sample.py:378
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:394 sith/settings_sample.py:379
+#: sith/settings.py:390 sith/settings_sample.py:379
 msgid "Communication supervisor"
 msgstr "Responsable com"
 
-#: sith/settings.py:395 sith/settings_sample.py:380
+#: sith/settings.py:391 sith/settings_sample.py:380
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:396 sith/settings_sample.py:381
+#: sith/settings.py:392 sith/settings_sample.py:381
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:397 sith/settings_sample.py:382
+#: sith/settings.py:393 sith/settings_sample.py:382
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:398 sith/settings_sample.py:383
+#: sith/settings.py:394 sith/settings_sample.py:383
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:399 sith/settings_sample.py:384
+#: sith/settings.py:395 sith/settings_sample.py:384
 msgid "Curious"
 msgstr "Curieux"
 
@@ -2444,9 +2448,6 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
-
-#~ msgid "Alternating cursus"
-#~ msgstr "Cursus alternant, 30 €"
 
 #~ msgid "You are trying to create a subscription without member"
 #~ msgstr "Vous essayez de créer une cotisation sans membre"

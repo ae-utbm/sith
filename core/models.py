@@ -74,12 +74,12 @@ class User(AbstractBaseUser):
         _('username'),
         max_length=254,
         unique=True,
-        help_text=_('Required. 254 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+        help_text=_('Required. 254 characters or fewer. Letters, digits and ./+/-/_ only.'),
         validators=[
             validators.RegexValidator(
-                r'^[\w.@+-]+$',
+                r'^[\w.+-]+$',
                 _('Enter a valid username. This value may contain only '
-                  'letters, numbers ' 'and @/./+/-/_ characters.')
+                  'letters, numbers ' 'and ./+/-/_ characters.')
             ),
         ],
         error_messages={
