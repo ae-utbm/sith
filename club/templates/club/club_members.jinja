@@ -1,18 +1,20 @@
-{% extends "core/base.jinja" %}
+{% extends "club/club_base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link %}
 
-{% block content %}
+{% block club %}
     <h2>{% trans %}Club members{% endtrans %}</h2>
     <table>
         <thead>
             <td>{% trans %}User{% endtrans %}</td>
             <td>{% trans %}Role{% endtrans %}</td>
+            <td>{% trans %}Description{% endtrans %}</td>
         </thead>
         <tbody>
         {% for m in club.members.filter(end_date=None).order_by('-role').all() %}
             <tr>
                 <td>{{ user_profile_link(m.user) }}</td>
                 <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+                <td>{{ m.description }}</td>
             </tr>
         {% endfor %}
         </tbody>

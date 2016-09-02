@@ -25,6 +25,11 @@ class ClubView(DetailView):
     pk_url_kwarg = "club_id"
     template_name = 'club/club_detail.jinja'
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "infos"
+        return kwargs
+
 class ClubToolsView(CanEditMixin, DetailView):
     """
     Tools page of a Club
@@ -32,6 +37,11 @@ class ClubToolsView(CanEditMixin, DetailView):
     model = Club
     pk_url_kwarg = "club_id"
     template_name = 'club/club_tools.jinja'
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubToolsView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "tools"
+        return kwargs
 
 class ClubMemberForm(forms.ModelForm):
     """
@@ -41,7 +51,7 @@ class ClubMemberForm(forms.ModelForm):
     required_css_class = 'required'
     class Meta:
         model = Membership
-        fields = ['user', 'role']
+        fields = ['user', 'role', 'description']
 
     def clean(self):
         """
@@ -87,6 +97,11 @@ class ClubMembersView(CanViewMixin, UpdateView):
         form._user = self.request.user
         return form
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubMembersView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "members"
+        return kwargs
+
 class ClubEditView(CanEditMixin, UpdateView):
     """
     Edit a Club's main informations (for the club's members)
@@ -95,6 +110,11 @@ class ClubEditView(CanEditMixin, UpdateView):
     pk_url_kwarg = "club_id"
     fields = ['address']
     template_name = 'club/club_edit.jinja'
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubEditView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "edit"
+        return kwargs
 
 class ClubEditPropView(CanEditPropMixin, UpdateView):
     """
@@ -105,6 +125,10 @@ class ClubEditPropView(CanEditPropMixin, UpdateView):
     fields = ['name', 'unix_name', 'parent']
     template_name = 'club/club_edit_prop.jinja'
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubEditPropView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "props"
+        return kwargs
 
 class ClubCreateView(CanEditPropMixin, CreateView):
     """

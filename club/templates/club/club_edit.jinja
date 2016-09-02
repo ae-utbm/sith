@@ -1,6 +1,6 @@
-{% extends "core/base.jinja" %}
+{% extends "club/club_base.jinja" %}
 
-{% block content %}
+{% block club %}
     <h2>{% trans %}Edit club{% endtrans %}</h2>
     <form action="{{ url('club:club_edit', club_id=club.id) }}" method="post">
         {% csrf_token %}

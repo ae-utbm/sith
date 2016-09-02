@@ -1,35 +1,8 @@
-{% extends "core/base.jinja" %}
+{% extends "club/club_base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link %}
 
-{% block content %}
+{% block club %}
     <h3>{% trans %}Club{% endtrans %}</h3>
-    <p><a href="{{ url('club:club_list') }}">{% trans %}Back to list{% endtrans %}</a></p>
-    {% if can_edit(club, user) %}
-    <p><a href="{{ url('club:club_edit', club_id=club.pk) }}">{% trans %}Edit{% endtrans %}</a></p>
-    {% endif %}
-    {% if can_edit_prop(club, user) %}
-    <p><a href="{{ url('club:club_prop', club_id=club.pk) }}">{% trans %}Prop{% endtrans %}</a>
-    </p>
-    {% endif %}
-    {% if can_view(club, user) %}
-    <p><a href="{{ url('club:club_members', club_id=club.pk) }}">{% trans %}Members{% endtrans %}</a></p>
-    {% endif %}
-    <h3>{{ club.name }}</h3>
-    <p>{{ club.address }}</p>
-    <table>
-        <thead>
-            <td>{% trans %}User{% endtrans %}</td>
-            <td>{% trans %}Role{% endtrans %}</td>
-        </thead>
-        <tbody>
-        {% for m in club.members.filter(end_date=None).order_by('-role').all() %}
-            <tr>
-                <td>{{ user_profile_link(m.user) }}</td>
-                <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 {% endblock %}
 
 
