@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 
 from core.models import User, MetaGroup, Group, SithFile
 from subscription.models import Subscriber
@@ -103,9 +104,7 @@ class Club(models.Model):
         """
         Method to see if that object can be super edited by the given user
         """
-        if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
-            return True
-        return False
+        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
 
     def can_be_edited_by(self, user):
         """
@@ -144,7 +143,7 @@ class Membership(models.Model):
     """
     user = models.ForeignKey(User, verbose_name=_('user'), related_name="membership", null=False, blank=False)
     club = models.ForeignKey(Club, verbose_name=_('club'), related_name="members", null=False, blank=False)
-    start_date = models.DateField(_('start date'), auto_now=True)
+    start_date = models.DateField(_('start date'))
     end_date = models.DateField(_('end date'), null=True, blank=True)
     role = models.IntegerField(_('role'), choices=sorted(settings.SITH_CLUB_ROLES.items()),
             default=sorted(settings.SITH_CLUB_ROLES.items())[0][0])
@@ -157,10 +156,30 @@ class Membership(models.Model):
         if Membership.objects.filter(user=self.user).filter(club=self.club).filter(end_date=None).exists():
             raise ValidationError(_('User is already member of that club'))
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.start_date = timezone.now()
+        return super(Membership, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.club.name+' - '+self.user.username+' - '+str(settings.SITH_CLUB_ROLES[self.role])+str(
                 " - "+str(_('past member')) if self.end_date is not None else ""
                 )
+
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be super edited by the given user
+        """
+        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
+
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.membership:
+            ms = user.membership.filter(club=self.club, end_date=None).first()
+            return (ms and ms.role >= self.role) or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
+        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
 
     def get_absolute_url(self):
         return reverse('club:club_members', kwargs={'club_id': self.club.id})

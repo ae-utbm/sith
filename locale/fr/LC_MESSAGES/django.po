@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-02 19:31+0200\n"
+"POT-Creation-Date: 2016-09-02 21:18+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: accounting/models.py:36 accounting/models.py:55 accounting/models.py:82
-#: accounting/models.py:132 club/models.py:18 counter/models.py:52
+#: accounting/models.py:132 club/models.py:19 counter/models.py:52
 #: counter/models.py:77 counter/models.py:111 launderette/models.py:15
 #: launderette/models.py:60 launderette/models.py:85
 msgid "name"
@@ -63,7 +63,7 @@ msgstr "IBAN"
 msgid "account number"
 msgstr "numero de compte"
 
-#: accounting/models.py:58 accounting/models.py:83 club/models.py:146
+#: accounting/models.py:58 accounting/models.py:83 club/models.py:145
 #: counter/models.py:86 counter/models.py:112
 msgid "club"
 msgstr "club"
@@ -85,12 +85,12 @@ msgstr "Compte club"
 msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
-#: accounting/models.py:130 club/models.py:147 counter/models.py:282
+#: accounting/models.py:130 club/models.py:146 counter/models.py:282
 #: launderette/models.py:122
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:131 club/models.py:148 counter/models.py:283
+#: accounting/models.py:131 club/models.py:147 counter/models.py:283
 msgid "end date"
 msgstr "date de fin"
 
@@ -163,6 +163,7 @@ msgid "target type"
 msgstr "type de cible"
 
 #: accounting/models.py:190 club/templates/club/club_members.jinja:8
+#: club/templates/club/club_old_members.jinja:8
 #: launderette/templates/launderette/launderette_admin.jinja:44
 msgid "User"
 msgstr "Utilisateur"
@@ -324,7 +325,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_list.jinja:21
 #: accounting/templates/accounting/club_account_details.jinja:53
 #: accounting/templates/accounting/journal_details.jinja:66
-#: club/templates/club/club_base.jinja:34 core/templates/core/file.jinja:38
+#: club/templates/club/club_base.jinja:42 core/templates/core/file.jinja:38
 #: core/templates/core/page.jinja:31 core/templates/core/user_base.jinja:33
 #: core/templates/core/user_tools.jinja:33
 #: counter/templates/counter/counter_list.jinja:20
@@ -507,11 +508,11 @@ msgstr "Types simplifiés"
 msgid "New simplified type"
 msgstr "Nouveau type simplifié"
 
-#: club/models.py:20
+#: club/models.py:21
 msgid "unix name"
 msgstr "nom unix"
 
-#: club/models.py:24
+#: club/models.py:25
 msgid ""
 "Enter a valid unix name. This value may contain only letters, numbers ./-/_ "
 "characters."
@@ -519,50 +520,50 @@ msgstr ""
 "Entrez un nom UNIX valide. Cette valeur peut contenir uniquement des "
 "lettres, des nombres, et les caractères ./-/_"
 
-#: club/models.py:29
+#: club/models.py:30
 msgid "A club with that unix name already exists."
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:32 core/models.py:168
+#: club/models.py:33 core/models.py:168
 msgid "address"
 msgstr "Adresse"
 
-#: club/models.py:38 core/models.py:117
+#: club/models.py:39 core/models.py:117
 msgid "home"
 msgstr "home"
 
-#: club/models.py:46
+#: club/models.py:47
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
-#: club/models.py:60
+#: club/models.py:61
 msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:145 counter/models.py:280 counter/models.py:294
+#: club/models.py:144 counter/models.py:280 counter/models.py:294
 #: eboutic/models.py:14 eboutic/models.py:47 launderette/models.py:89
 #: launderette/models.py:126
 msgid "user"
 msgstr "nom d'utilisateur"
 
-#: club/models.py:149 core/models.py:135
+#: club/models.py:148 core/models.py:135
 msgid "role"
 msgstr "rôle"
 
-#: club/models.py:151 core/models.py:32 counter/models.py:53
+#: club/models.py:150 core/models.py:32 counter/models.py:53
 #: counter/models.py:78
 msgid "description"
 msgstr "description"
 
-#: club/models.py:156
+#: club/models.py:155
 msgid "User must be subscriber to take part to a club"
 msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
 
-#: club/models.py:158
+#: club/models.py:157
 msgid "User is already member of that club"
 msgstr "L'utilisateur est déjà membre de ce club"
 
-#: club/models.py:162
+#: club/models.py:166
 msgid "past member"
 msgstr "Anciens membres"
 
@@ -570,12 +571,16 @@ msgstr "Anciens membres"
 msgid "Members"
 msgstr "Membres"
 
-#: club/templates/club/club_base.jinja:26 core/templates/core/base.jinja:25
+#: club/templates/club/club_base.jinja:26
+msgid "Old members"
+msgstr "Anciens membres"
+
+#: club/templates/club/club_base.jinja:34 core/templates/core/base.jinja:25
 #: core/templates/core/user_base.jinja:19
 msgid "Tools"
 msgstr "Outils"
 
-#: club/templates/club/club_base.jinja:42
+#: club/templates/club/club_base.jinja:50
 #: counter/templates/counter/counter_list.jinja:23
 msgid "Props"
 msgstr "Propriétés"
@@ -606,17 +611,40 @@ msgid "Club members"
 msgstr "Membres du club"
 
 #: club/templates/club/club_members.jinja:9
+#: club/templates/club/club_old_members.jinja:9
 msgid "Role"
 msgstr "Rôle"
 
 #: club/templates/club/club_members.jinja:10
+#: club/templates/club/club_old_members.jinja:10
 msgid "Description"
 msgstr "Description"
 
-#: club/templates/club/club_members.jinja:25
+#: club/templates/club/club_members.jinja:11
+#: launderette/templates/launderette/launderette_admin.jinja:45
+msgid "Since"
+msgstr "Depuis"
+
+#: club/templates/club/club_members.jinja:21
+msgid "Mark as old"
+msgstr "Marquer comme ancien"
+
+#: club/templates/club/club_members.jinja:30
 #: core/templates/core/file_detail.jinja:19 launderette/views.py:146
 msgid "Add"
 msgstr "Ajouter"
+
+#: club/templates/club/club_old_members.jinja:5
+msgid "Club old members"
+msgstr "Anciens membres du club"
+
+#: club/templates/club/club_old_members.jinja:11
+msgid "From"
+msgstr "Du"
+
+#: club/templates/club/club_old_members.jinja:12
+msgid "To"
+msgstr "Au"
 
 #: club/templates/club/club_tools.jinja:4
 #: core/templates/core/user_tools.jinja:58
@@ -2218,10 +2246,6 @@ msgstr "Jetons"
 msgid "Type"
 msgstr "Type"
 
-#: launderette/templates/launderette/launderette_admin.jinja:45
-msgid "Since"
-msgstr "Depuis"
-
 #: launderette/templates/launderette/launderette_book.jinja:11
 msgid "Choose"
 msgstr "Choisir"
@@ -2448,6 +2472,3 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
-
-#~ msgid "You are trying to create a subscription without member"
-#~ msgstr "Vous essayez de créer une cotisation sans membre"

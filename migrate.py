@@ -26,14 +26,7 @@ from subscription.models import Subscription, Subscriber
 from eboutic.models import Invoice, InvoiceItem
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType
 
-db = MySQLdb.connect(
-        host="ae-db",
-        user="taiste_rw",
-        passwd=input("password: "),
-        db="ae2-taiste",
-        charset='utf8',
-        use_unicode=True)
-
+db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
 start = datetime.datetime.now()
 
 def reset_index(*args):
@@ -245,6 +238,7 @@ def migrate_club():
                 user = User.objects.filter(id=m['id_utilisateur']).first()
                 if club and user:
                     new = Membership(
+                            id=Membership.objects.count()+1,
                             club=club,
                             user=user,
                             start_date=m['date_debut'],
@@ -259,7 +253,7 @@ def migrate_club():
         print("Clubs memberships migrated at %s" % datetime.datetime.now())
         print("Running time: %s" % (datetime.datetime.now()-start))
 
-    migrate_clubs()
+    # migrate_clubs()
     migrate_club_memberships()
 
 def migrate_subscriptions():
@@ -953,18 +947,18 @@ def migrate_accounting():
 def main():
     print("Start at %s" % start)
     # Core
-    migrate_core()
+    # migrate_core()
     # Club
-    migrate_club()
+    # migrate_club()
     # Subscriptions
-    migrate_subscriptions()
+    # migrate_subscriptions()
     # Counters
-    migrate_counter()
-    check_accounts()
+    # migrate_counter()
+    # check_accounts()
     # Accounting
-    migrate_accounting()
+    # migrate_accounting()
     reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
-    end = datetime.datetime.now()
+    # end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end-start))
 

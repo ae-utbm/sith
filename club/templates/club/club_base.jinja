@@ -19,6 +19,14 @@
         {% endif %}
 
         {% if can_view(club, user) %}
+        <a href="{{ url('club:club_old_members', club_id=club.pk) }}"
+            {%- if tab == "elderlies" -%}
+                class="selected_tab"
+            {%- endif -%}
+        >{% trans %}Old members{% endtrans %}</a>
+        {% endif %}
+
+        {% if can_view(club, user) %}
         <a href="{{ url('club:tools', club_id=club.id) }}"
             {%- if tab == "tools" -%}
                 class="selected_tab"

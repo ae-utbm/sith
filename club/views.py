@@ -4,7 +4,9 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from django.forms import CheckboxSelectMultiple
 from django.core.exceptions import ValidationError
-
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+from django.utils import timezone
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
 from club.models import Club, Membership
@@ -102,6 +104,19 @@ class ClubMembersView(CanViewMixin, UpdateView):
         kwargs['tab'] = "members"
         return kwargs
 
+class ClubOldMembersView(CanViewMixin, DetailView):
+    """
+    Old members of a club
+    """
+    model = Club
+    pk_url_kwarg = "club_id"
+    template_name = 'club/club_old_members.jinja'
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubOldMembersView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "elderlies"
+        return kwargs
+
 class ClubEditView(CanEditMixin, UpdateView):
     """
     Edit a Club's main informations (for the club's members)
@@ -138,4 +153,21 @@ class ClubCreateView(CanEditPropMixin, CreateView):
     pk_url_kwarg = "club_id"
     fields = ['name', 'unix_name', 'parent']
     template_name = 'club/club_edit_prop.jinja'
+
+class MembershipSetOldView(CanEditMixin, DetailView):
+    """
+    Set a membership as beeing old
+    """
+    model = Membership
+    pk_url_kwarg = "membership_id"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.end_date = timezone.now()
+        self.object.save()
+        return HttpResponseRedirect(reverse('club:club_members', args=self.args, kwargs={'club_id': self.object.club.id}))
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return HttpResponseRedirect(reverse('club:club_members', args=self.args, kwargs={'club_id': self.object.club.id}))
 

@@ -2,33 +2,27 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 
 {% block club %}
-    <h2>{% trans %}Club members{% endtrans %}</h2>
+    <h2>{% trans %}Club old members{% endtrans %}</h2>
     <table>
         <thead>
             <td>{% trans %}User{% endtrans %}</td>
             <td>{% trans %}Role{% endtrans %}</td>
             <td>{% trans %}Description{% endtrans %}</td>
-            <td>{% trans %}Since{% endtrans %}</td>
+            <td>{% trans %}From{% endtrans %}</td>
+            <td>{% trans %}To{% endtrans %}</td>
         </thead>
         <tbody>
-        {% for m in club.members.filter(end_date=None).order_by('-role').all() %}
+        {% for m in club.members.exclude(end_date=None).order_by('-role', '-end_date').all() %}
             <tr>
                 <td>{{ user_profile_link(m.user) }}</td>
                 <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
                 <td>{{ m.description }}</td>
                 <td>{{ m.start_date }}</td>
-                {% if m.can_be_edited_by(user) %}
-                <td><a href="{{ url('club:membership_set_old', membership_id=m.id) }}">{% trans %}Mark as old{% endtrans %}</a></td>
-                {% endif %}
+                <td>{{ m.end_date }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-    <form action="{{ url('club:club_members', club_id=club.id) }}" method="post">
-        {% csrf_token %}
-        {{ form.as_p() }}
-        <p><input type="submit" value="{% trans %}Add{% endtrans %}" /></p>
-    </form>
 {% endblock %}
 
 
