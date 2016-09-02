@@ -48,6 +48,8 @@ class SubscriptionForm(forms.ModelForm):
                 and "first_name" not in self.errors.as_data()
                 and "email" not in self.errors.as_data()):
             self.errors.pop("member", None)
+            if self.errors:
+                return cleaned_data
             if Subscriber.objects.filter(email=cleaned_data.get("email")).first() is not None:
                 self.add_error("email", ValidationError(_("A user with that email address already exists")))
             else:

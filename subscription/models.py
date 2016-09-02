@@ -69,7 +69,7 @@ class Subscription(models.Model):
         except: # This should not happen, because the form should have handled the data before, but sadly, it still
                 # calls the model validation :'(
                 # TODO see SubscriptionForm's clean method
-            raise ValidationError(_("You are trying to create a subscription without member"))
+            raise ValidationError(_("Subscription error"))
 
     def save(self):
         super(Subscription, self).save()

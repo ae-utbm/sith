@@ -9,6 +9,7 @@
 <div id="user_info"></div>
 <form action="" method="post" id="subscription_form">
     {% csrf_token %}
+    {{ form.non_field_errors() }}
     <p>{{ form.member.errors }}<label for="{{ form.member.name }}">{{ form.member.label }}</label> {{ form.member }}</p>
     <div id="new_member">
         <p>{{ form.first_name.errors }}<label for="{{ form.first_name.name }}">{{ form.first_name.label }}</label> {{ form.first_name }}</p>
