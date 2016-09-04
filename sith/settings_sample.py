@@ -111,6 +111,7 @@ TEMPLATES = [
                 "can_view": "core.views.can_view",
                 "get_subscriber": "subscription.views.get_subscriber",
                 "settings": "sith.settings",
+                "Counter": "counter.models.Counter",
             },
             "bytecode_cache": {
                 "name": "default",

@@ -184,10 +184,7 @@ class Counter(models.Model):
         return bl[random.randrange(0, len(bl))]
 
     def is_open(self):
-        response = False
-        if len(self.get_barmen_list()) > 0:
-            response = True
-        return response
+        return len(self.get_barmen_list()) > 0:
 
     def barman_list(self):
         return [b.id for b in self.get_barmen_list()]

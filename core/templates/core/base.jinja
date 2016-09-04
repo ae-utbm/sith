@@ -21,6 +21,18 @@
             <a href="{{ url('core:login') }}">{% trans %}Login{% endtrans %}</a> |
             <a href="{{ url('core:register') }}">{% trans %}Register{% endtrans %}</a>
             {% else %}
+            <ul>
+            {% for bar in Counter.objects.filter(type="BAR").all() %}
+                <li>
+                {% if bar.is_open() %}
+                    <span style="color: green">&#x2713;</span>
+                {% else %}
+                    <span style="color: red">&#10007;</span>
+                {% endif %}
+                    {{ bar }}
+                </li>
+            {% endfor %}
+            </ul>
             <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a> |
             <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a> |
             <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
@@ -40,7 +52,7 @@
             <form action="{{ url('set_language') }}" method="post">{% csrf_token %}
                 <input name="next" value="{{ request.path }}" type="hidden" />
                 <input name="language" value="{{ language[0] }}" type="hidden" />
-                <input type="submit" value="{{ language[1]}}" />
+                <input type="submit" value="{{ language[0]|upper }}" />
             </form>
             {% endfor %}
         </div>

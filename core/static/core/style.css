@@ -20,8 +20,15 @@ header {
     position: absolute;
     top : 0px;
     right : 8%;
-    left: 40%;
     background-color:#DDD;
+    margin: 0 10px;
+    padding: 0 10px;
+}
+header ul {
+    display: inline-block;
+    list-style-type: none;
+    margin: 0px;
+    vertical-align: middle;
 }
 header a {
     display: inline-block;
