@@ -66,7 +66,8 @@ class ProductsLookup(RightManagedLookupChannel):
     model = Product
 
     def get_query(self, q, request):
-        return (self.model.objects.filter(name__icontains=q) | self.model.objects.filter(code__icontains=q))[:50]
+        return (self.model.objects.filter(name__icontains=q) |
+                self.model.objects.filter(code__icontains=q)).filter(archived=False)[:50]
 
     def format_item_display(self, item):
         return item.name

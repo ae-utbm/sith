@@ -1,21 +1,46 @@
-{% extends "core/base.jinja" %}
+{% extends "counter/counter_base.jinja" %}
 
 {% block title %}
 {% trans %}Counter admin list{% endtrans %}
 {% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <p><a href="{{ url('counter:new') }}">{% trans %}New counter{% endtrans %}</a></p>
 {% if counter_list %}
 <h3>{% trans %}Counter admin list{% endtrans %}</h3>
+<h4>{% trans %}Eboutic{% endtrans %}</h4>
 <ul>
-    {% for c in counter_list  %}
-        <li>
-    {% if c.type == "EBOUTIC" %}
-        <a href="{{ url('eboutic:main') }}">{{ c }}</a> -
-    {% else %}
-        <a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
+    {% for c in counter_list.filter(type="EBOUTIC").order_by('name')  %}
+    <li>
+    <a href="{{ url('eboutic:main') }}">{{ c }}</a> -
+    {% if user.can_edit(c) %}
+    <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a> -
     {% endif %}
+    {% if user.is_owner(c) %}
+    <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a>
+    {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+<h4>{% trans %}Bars{% endtrans %}</h4>
+<ul>
+    {% for c in counter_list.filter(type="BAR").order_by('name')  %}
+    <li>
+    <a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
+    {% if user.can_edit(c) %}
+    <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a> -
+    {% endif %}
+    {% if user.is_owner(c) %}
+    <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a>
+    {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+<h4>{% trans %}Offices{% endtrans %}</h4>
+<ul>
+    {% for c in counter_list.exclude(type="BAR").exclude(type="EBOUTIC").order_by('name')  %}
+    <li>
+    <a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
     {% if user.can_edit(c) %}
     <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a> -
     {% endif %}

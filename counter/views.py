@@ -390,6 +390,11 @@ class CounterListView(CanViewMixin, ListView):
     model = Counter
     template_name = 'counter/counter_list.jinja'
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(CounterListView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "counters"
+        return kwargs
+
 class CounterEditForm(forms.ModelForm):
     class Meta:
         model = Counter
@@ -445,6 +450,11 @@ class ProductTypeListView(CanEditPropMixin, ListView):
     model = ProductType
     template_name = 'counter/producttype_list.jinja'
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(ProductTypeListView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "product_types"
+        return kwargs
+
 class ProductTypeCreateView(CanCreateMixin, CreateView):
     """
     A create view for the admins
@@ -462,19 +472,39 @@ class ProductTypeEditView(CanEditPropMixin, UpdateView):
     fields = ['name', 'description', 'icon']
     pk_url_kwarg = "type_id"
 
+class ProductArchivedListView(CanEditPropMixin, ListView):
+    """
+    A list view for the admins
+    """
+    model = Product
+    template_name = 'counter/product_list.jinja'
+    queryset = Product.objects.filter(archived=True)
+    ordering = ['name']
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ProductArchivedListView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "archive"
+        return kwargs
+
 class ProductListView(CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
     model = Product
     template_name = 'counter/product_list.jinja'
+    queryset = Product.objects.filter(archived=False)
     ordering = ['name']
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ProductListView, self).get_context_data(**kwargs)
+        kwargs['tab'] = "products"
+        return kwargs
 
 class ProductEditForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'description', 'product_type', 'code', 'parent_product', 'buying_groups', 'purchase_price',
-                'selling_price', 'special_selling_price', 'icon', 'club', 'limit_age', 'tray']
+                'selling_price', 'special_selling_price', 'icon', 'club', 'limit_age', 'tray', 'archived']
     parent_product = AutoCompleteSelectField('products', show_help_text=False, label=_("Parent product"), required=False)
     buying_groups = AutoCompleteSelectMultipleField('groups', show_help_text=False, help_text="", label=_("Buying groups"), required=False)
     club = AutoCompleteSelectField('clubs', show_help_text=False)

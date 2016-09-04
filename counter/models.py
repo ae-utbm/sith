@@ -89,6 +89,7 @@ class Product(models.Model):
     parent_product = models.ForeignKey('self', related_name='children_products', verbose_name=_("parent product"), null=True,
             blank=True, on_delete=models.SET_NULL)
     buying_groups = models.ManyToManyField(Group, related_name='products', verbose_name=_("buying groups"), blank=True)
+    archived = models.BooleanField(_("archived"), default=False)
 
     class Meta:
         verbose_name = _('product')
@@ -184,7 +185,7 @@ class Counter(models.Model):
         return bl[random.randrange(0, len(bl))]
 
     def is_open(self):
-        return len(self.get_barmen_list()) > 0:
+        return len(self.get_barmen_list()) > 0
 
     def barman_list(self):
         return [b.id for b in self.get_barmen_list()]
