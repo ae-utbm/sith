@@ -305,7 +305,9 @@ class User(AbstractBaseUser):
         """
         Returns the age
         """
-        return timezone.now().year - self.date_of_birth.year
+        today = timezone.now()
+        born = self.date_of_birth
+        return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
