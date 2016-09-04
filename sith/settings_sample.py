@@ -18,7 +18,6 @@ from django.utils.translation import ugettext_lazy as _
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 os.environ['HTTPS'] = "off"
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -195,6 +194,7 @@ LOGIN_REDIRECT_URL = '/'
 DEFAULT_FROM_EMAIL="bibou@git.an"
 
 # Email
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST="localhost"
 EMAIL_PORT=25
 
