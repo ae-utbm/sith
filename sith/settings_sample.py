@@ -17,13 +17,8 @@ from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DEV_ENV = True
-
-if (DEV_ENV):
-    os.environ['HTTPS'] = "off"
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    os.environ['HTTPS'] = "on"
+os.environ['HTTPS'] = "off"
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
