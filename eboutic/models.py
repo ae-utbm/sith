@@ -93,36 +93,6 @@ class Invoice(models.Model):
                         date=self.date,
                         )
                 new.save()
-            if i.product_id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
-                s = Subscriber.objects.filter(id=self.user.id).first()
-                sub = Subscription(
-                        member=s,
-                        subscription_type='un-semestre',
-                        payment_method="EBOUTIC",
-                        location="EBOUTIC",
-                        )
-                sub.subscription_start = Subscription.compute_start()
-                sub.subscription_start = Subscription.compute_start(
-                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
-                sub.subscription_end = Subscription.compute_end(
-                        duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
-                        start=sub.subscription_start)
-                sub.save()
-            elif i.product_id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS:
-                s = Subscriber.objects.filter(id=self.user.id).first()
-                sub = Subscription(
-                        member=s,
-                        subscription_type='deux-semestres',
-                        payment_method="EBOUTIC",
-                        location="EBOUTIC",
-                        )
-                sub.subscription_start = Subscription.compute_start()
-                sub.subscription_start = Subscription.compute_start(
-                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
-                sub.subscription_end = Subscription.compute_end(
-                        duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
-                        start=sub.subscription_start)
-                sub.save()
         self.validated = True
         self.save()
 
