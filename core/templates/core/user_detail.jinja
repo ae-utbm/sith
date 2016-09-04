@@ -1,10 +1,10 @@
-{% extends "core/user_base.jinja" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s profile{% endtrans %}
 {% endblock %}
 
-{% block infos %}
+{% block content %}
 
 <div id="user_profile_container">
     <div id="user_profile">

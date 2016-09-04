@@ -7,10 +7,52 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.utils.translation import ugettext as _
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
 from club.models import Club, Membership
 from sith.settings import SITH_MAXIMUM_FREE_ROLE, SITH_MAIN_BOARD_GROUP
+
+class ClubTabsMixin(TabedViewMixin):
+    def get_tabs_title(self):
+        return self.object.get_display_name()
+
+    def get_list_of_tabs(self):
+        tab_list = []
+        tab_list.append({
+                    'url': reverse('club:club_view', kwargs={'club_id': self.object.id}),
+                    'slug': 'infos',
+                    'name': _("Infos"),
+                    })
+        if self.request.user.can_view(self.object):
+            tab_list.append({
+                        'url': reverse('club:club_members', kwargs={'club_id': self.object.id}),
+                        'slug': 'members',
+                        'name': _("Members"),
+                        })
+            tab_list.append({
+                        'url': reverse('club:club_old_members', kwargs={'club_id': self.object.id}),
+                        'slug': 'elderlies',
+                        'name': _("Old members"),
+                        })
+        if self.request.user.can_edit(self.object):
+            tab_list.append({
+                        'url': reverse('club:tools', kwargs={'club_id': self.object.id}),
+                        'slug': 'tools',
+                        'name': _("Tools"),
+                        })
+            tab_list.append({
+                        'url': reverse('club:club_edit', kwargs={'club_id': self.object.id}),
+                        'slug': 'edit',
+                        'name': _("Edit"),
+                        })
+        if self.request.user.is_owner(self.object):
+            tab_list.append({
+                        'url': reverse('club:club_prop', kwargs={'club_id': self.object.id}),
+                        'slug': 'props',
+                        'name': _("Props"),
+                        })
+        return tab_list
 
 class ClubListView(ListView):
     """
@@ -19,31 +61,23 @@ class ClubListView(ListView):
     model = Club
     template_name = 'club/club_list.jinja'
 
-class ClubView(DetailView):
+class ClubView(ClubTabsMixin, DetailView):
     """
     Front page of a Club
     """
     model = Club
     pk_url_kwarg = "club_id"
     template_name = 'club/club_detail.jinja'
+    current_tab = "infos"
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(ClubView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "infos"
-        return kwargs
-
-class ClubToolsView(CanEditMixin, DetailView):
+class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
     """
     Tools page of a Club
     """
     model = Club
     pk_url_kwarg = "club_id"
     template_name = 'club/club_tools.jinja'
-
-    def get_context_data(self, **kwargs):
-        kwargs = super(ClubToolsView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "tools"
-        return kwargs
+    current_tab = "tools"
 
 class ClubMemberForm(forms.ModelForm):
     """
@@ -76,7 +110,7 @@ class ClubMemberForm(forms.ModelForm):
         ret = super(ClubMemberForm, self).save(*args, **kwargs)
         return self.instance.club
 
-class ClubMembersView(CanViewMixin, UpdateView):
+class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
     """
     View of a club's members
     """
@@ -84,6 +118,7 @@ class ClubMembersView(CanViewMixin, UpdateView):
     pk_url_kwarg = "club_id"
     form_class = ClubMemberForm
     template_name = 'club/club_members.jinja'
+    current_tab = "members"
 
     def get_form(self):
         """
@@ -99,51 +134,34 @@ class ClubMembersView(CanViewMixin, UpdateView):
         form._user = self.request.user
         return form
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(ClubMembersView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "members"
-        return kwargs
-
-class ClubOldMembersView(CanViewMixin, DetailView):
+class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
     """
     Old members of a club
     """
     model = Club
     pk_url_kwarg = "club_id"
     template_name = 'club/club_old_members.jinja'
+    current_tab = "elderlies"
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(ClubOldMembersView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "elderlies"
-        return kwargs
-
-class ClubEditView(CanEditMixin, UpdateView):
+class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
     """
     Edit a Club's main informations (for the club's members)
     """
     model = Club
     pk_url_kwarg = "club_id"
     fields = ['address']
-    template_name = 'club/club_edit.jinja'
+    template_name = 'core/edit.jinja'
+    current_tab = "edit"
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(ClubEditView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "edit"
-        return kwargs
-
-class ClubEditPropView(CanEditPropMixin, UpdateView):
+class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
     """
     Edit the properties of a Club object (for the Sith admins)
     """
     model = Club
     pk_url_kwarg = "club_id"
     fields = ['name', 'unix_name', 'parent']
-    template_name = 'club/club_edit_prop.jinja'
-
-    def get_context_data(self, **kwargs):
-        kwargs = super(ClubEditPropView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "props"
-        return kwargs
+    template_name = 'core/edit.jinja'
+    current_tab = "props"
 
 class ClubCreateView(CanEditPropMixin, CreateView):
     """
@@ -152,7 +170,7 @@ class ClubCreateView(CanEditPropMixin, CreateView):
     model = Club
     pk_url_kwarg = "club_id"
     fields = ['name', 'unix_name', 'parent']
-    template_name = 'club/club_edit_prop.jinja'
+    template_name = 'core/edit.jinja'
 
 class MembershipSetOldView(CanEditMixin, DetailView):
     """

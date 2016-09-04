@@ -74,6 +74,22 @@
         {% endblock %}
 
         <div id="content">
+            {% if list_of_tabs %}
+            <div class="tool-bar">
+                <div>{{ tabs_title }}</div>
+                <div class="tools">
+                    {% for t in list_of_tabs %}
+                    <a href="{{ t.url }}"
+                        {%- if current_tab == t.slug -%}
+                            class="selected_tab"
+                        {%- endif -%}
+                    >{{ t.name }}</a>
+                    {% endfor %}
+                </div>
+                <hr>
+            </div>
+            {% endif %}
+
             {% if error %}
             {{ error }}
             {% endif %}

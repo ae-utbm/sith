@@ -15,7 +15,7 @@ from django.conf import settings
 from datetime import timedelta
 import logging
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
 from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm
 from core.models import User, SithFile
 
@@ -96,7 +96,6 @@ def password_reset_complete(request):
                                          template_name="core/password_reset_complete.jinja",
                                         )
 
-
 def register(request):
     context = {}
     if request.method == 'POST':
@@ -115,7 +114,53 @@ def register(request):
     context['form'] = form.as_p()
     return render(request, "core/register.jinja", context)
 
-class UserView(CanViewMixin, DetailView):
+class UserTabsMixin(TabedViewMixin):
+    def get_tabs_title(self):
+        return self.object.get_display_name()
+
+    def get_list_of_tabs(self):
+        tab_list = []
+        tab_list.append({
+                    'url': reverse('core:user_profile', kwargs={'user_id': self.object.id}),
+                    'slug': 'infos',
+                    'name': _("Infos"),
+                    })
+        if self.request.user == self.object:
+            tab_list.append({
+                        'url': reverse('core:user_tools'),
+                        'slug': 'tools',
+                        'name': _("Tools"),
+                        })
+        tab_list.append({
+                    'url': reverse('core:user_stats', kwargs={'user_id': self.object.id}),
+                    'slug': 'stats',
+                    'name': _("Stats"),
+                    })
+        if self.request.user.can_edit(self.object):
+            tab_list.append({
+                        'url': reverse('core:user_edit', kwargs={'user_id': self.object.id}),
+                        'slug': 'edit',
+                        'name': _("Edit"),
+                        })
+        if self.request.user.is_owner(self.object):
+            tab_list.append({
+                        'url': reverse('core:user_groups', kwargs={'user_id': self.object.id}),
+                        'slug': 'groups',
+                        'name': _("Groups"),
+                        })
+        try:
+            if (self.object.customer and (self.object == self.request.user
+                or self.request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
+                or self.request.user.is_root)):
+                tab_list.append({
+                            'url': reverse('core:user_account', kwargs={'user_id': self.object.id}),
+                            'slug': 'account',
+                            'name': _("Account")+" (%s €)" % self.object.customer.amount,
+                            })
+        except: pass
+        return tab_list
+
+class UserView(UserTabsMixin, CanViewMixin, DetailView):
     """
     Display a user's profile
     """
@@ -123,13 +168,9 @@ class UserView(CanViewMixin, DetailView):
     pk_url_kwarg = "user_id"
     context_object_name = "profile"
     template_name = "core/user_detail.jinja"
+    current_tab = 'infos'
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(UserView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "infos"
-        return kwargs
-
-class UserStatsView(CanViewMixin, DetailView):
+class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     """
     Display a user's stats
     """
@@ -137,6 +178,7 @@ class UserStatsView(CanViewMixin, DetailView):
     pk_url_kwarg = "user_id"
     context_object_name = "profile"
     template_name = "core/user_stats.jinja"
+    current_tab = 'stats'
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserStatsView, self).get_context_data(**kwargs)
@@ -148,7 +190,6 @@ class UserStatsView(CanViewMixin, DetailView):
         kwargs['total_foyer_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=foyer)], timedelta())
         kwargs['total_mde_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=mde)], timedelta())
         kwargs['total_gommette_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=gommette)], timedelta())
-        kwargs['tab'] = "stats"
         return kwargs
 
 class UserMiniView(CanViewMixin, DetailView):
@@ -196,7 +237,7 @@ class UserUploadProfilePictView(CanEditMixin, DetailView):
         self.object.save()
         return redirect("core:user_edit", user_id=self.object.id)
 
-class UserUpdateProfileView(CanEditMixin, UpdateView):
+class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     """
     Edit a user's profile
     """
@@ -204,6 +245,7 @@ class UserUpdateProfileView(CanEditMixin, UpdateView):
     pk_url_kwarg = "user_id"
     template_name = "core/user_edit.jinja"
     form_class = UserProfileForm
+    current_tab = "edit"
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -227,10 +269,9 @@ class UserUpdateProfileView(CanEditMixin, UpdateView):
         kwargs = super(UserUpdateProfileView, self).get_context_data(**kwargs)
         kwargs['profile'] = self.form.instance
         kwargs['form'] = self.form
-        kwargs['tab'] = "edit"
         return kwargs
 
-class UserUpdateGroupView(CanEditPropMixin, UpdateView):
+class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     """
     Edit a user's groups
     """
@@ -240,33 +281,32 @@ class UserUpdateGroupView(CanEditPropMixin, UpdateView):
     form_class = modelform_factory(User, fields=['groups'],
             widgets={'groups':CheckboxSelectMultiple})
     context_object_name = "profile"
+    current_tab = "groups"
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(UserUpdateGroupView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "groups"
-        return kwargs
-
-class UserToolsView(TemplateView):
+class UserToolsView(UserTabsMixin, TemplateView):
     """
     Displays the logged user's tools
     """
     template_name = "core/user_tools.jinja"
+    current_tab = "tools"
 
     def get_context_data(self, **kwargs):
+        self.object = self.request.user
         from launderette.models import Launderette
         kwargs = super(UserToolsView, self).get_context_data(**kwargs)
         kwargs['launderettes'] = Launderette.objects.all()
         kwargs['profile'] = self.request.user
-        kwargs['tab'] = "tools"
+        kwargs['object'] = self.request.user
         return kwargs
 
-class UserAccountView(DetailView):
+class UserAccountView(UserTabsMixin, DetailView):
     """
     Display a user's account
     """
     model = User
     pk_url_kwarg = "user_id"
     template_name = "core/user_account.jinja"
+    current_tab = "account"
 
     def dispatch(self, request, *arg, **kwargs): # Manually validates the rights
         res = super(UserAccountView, self).dispatch(request, *arg, **kwargs)
@@ -284,7 +324,6 @@ class UserAccountView(DetailView):
         except:
             pass
         # TODO: add list of month where account has activity
-        kwargs['tab'] = "account"
         return kwargs
 
 

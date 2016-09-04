@@ -1,10 +1,10 @@
-{% extends "counter/counter_base.jinja" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
 {% trans %}Product type list{% endtrans %}
 {% endblock %}
 
-{% block admin_content %}
+{% block content %}
 <p><a href="{{ url('counter:new_producttype') }}">{% trans %}New product type{% endtrans %}</a></p>
 {% if producttype_list %}
 <h3>{% trans %}Product type list{% endtrans %}</h3>

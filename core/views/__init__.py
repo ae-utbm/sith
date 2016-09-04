@@ -1,7 +1,7 @@
 
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ImproperlyConfigured
 from django.views.generic.base import View
 
 from core.models import Group
@@ -110,8 +110,39 @@ class CanViewMixin(View):
             context['object_list'] = l
         return context
 
+class TabedViewMixin(View):
+    """
+    This view provide the basic functions for displaying tabs in the template
+    """
+    def get_tabs_title(self):
+        try:
+            return self.tabs_title
+        except:
+            raise ImproperlyConfigured("tabs_title is required")
+
+    def get_current_tab(self):
+        try:
+            return self.current_tab
+        except:
+            raise ImproperlyConfigured("current_tab is required")
+
+    def get_list_of_tabs(self):
+        try:
+            return self.list_of_tabs
+        except:
+            raise ImproperlyConfigured("list_of_tabs is required")
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TabedViewMixin, self).get_context_data(**kwargs)
+        kwargs['tabs_title'] = self.get_tabs_title()
+        kwargs['current_tab'] = self.get_current_tab()
+        kwargs['list_of_tabs'] = self.get_list_of_tabs()
+        return kwargs
+
 from .user import *
 from .page import *
 from .files import *
 from .site import *
 from .group import *
+
+

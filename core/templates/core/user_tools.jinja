@@ -1,10 +1,10 @@
-{% extends "core/user_base.jinja" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
 {% trans user_name=user.get_display_name() %}{{ user_name }}'s tools{% endtrans %}
 {% endblock %}
 
-{% block infos %}
+{% block content %}
 <h3>{% trans %}User Tools{% endtrans %}</h3>
 
 <hr>

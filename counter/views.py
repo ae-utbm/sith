@@ -16,7 +16,7 @@ from datetime import date, timedelta
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from ajax_select import make_ajax_form, make_ajax_field
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectUser, LoginForm
 from core.models import User
 from subscription.models import Subscriber
@@ -383,17 +383,38 @@ class CounterLogout(RedirectView):
 
 ## Counter admin views
 
-class CounterListView(CanViewMixin, ListView):
+class CounterTabsMixin(TabedViewMixin):
+    tabs_title = _("Counter administration")
+    list_of_tabs = [
+            {
+                'url': reverse_lazy('counter:admin_list'),
+                'slug': 'counters',
+                'name': _("Counters"),
+                },
+            {
+                'url': reverse_lazy('counter:product_list'),
+                'slug': 'products',
+                'name': _("Products"),
+                },
+            {
+                'url': reverse_lazy('counter:product_list_archived'),
+                'slug': 'archive',
+                'name': _("Archived products"),
+                },
+            {
+                'url': reverse_lazy('counter:producttype_list'),
+                'slug': 'product_types',
+                'name': _("Product types"),
+                },
+            ]
+
+class CounterListView(CounterTabsMixin, CanViewMixin, ListView):
     """
     A list view for the admins
     """
     model = Counter
     template_name = 'counter/counter_list.jinja'
-
-    def get_context_data(self, **kwargs):
-        kwargs = super(CounterListView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "counters"
-        return kwargs
+    current_tab = "counters"
 
 class CounterEditForm(forms.ModelForm):
     class Meta:
@@ -402,7 +423,7 @@ class CounterEditForm(forms.ModelForm):
     sellers = make_ajax_field(Counter, 'sellers', 'users', help_text="")
     products = make_ajax_field(Counter, 'products', 'products', help_text="")
 
-class CounterEditView(CanEditMixin, UpdateView):
+class CounterEditView(CounterTabsMixin, CanEditMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's manager)
     """
@@ -410,11 +431,12 @@ class CounterEditView(CanEditMixin, UpdateView):
     form_class = CounterEditForm
     pk_url_kwarg = "counter_id"
     template_name = 'core/edit.jinja'
+    current_tab = "counters"
 
     def get_success_url(self):
         return reverse_lazy('counter:admin', kwargs={'counter_id': self.object.id})
 
-class CounterEditPropView(CanEditPropMixin, UpdateView):
+class CounterEditPropView(CounterTabsMixin, CanEditPropMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's admin)
     """
@@ -422,8 +444,9 @@ class CounterEditPropView(CanEditPropMixin, UpdateView):
     form_class = modelform_factory(Counter, fields=['name', 'club', 'type'])
     pk_url_kwarg = "counter_id"
     template_name = 'core/edit.jinja'
+    current_tab = "counters"
 
-class CounterCreateView(CanEditMixin, CreateView):
+class CounterCreateView(CounterTabsMixin, CanEditMixin, CreateView):
     """
     Create a counter (for the admins)
     """
@@ -431,8 +454,9 @@ class CounterCreateView(CanEditMixin, CreateView):
     form_class = modelform_factory(Counter, fields=['name', 'club', 'type', 'products'],
             widgets={'products':CheckboxSelectMultiple})
     template_name = 'core/create.jinja'
+    current_tab = "counters"
 
-class CounterDeleteView(CanEditMixin, DeleteView):
+class CounterDeleteView(CounterTabsMixin, CanEditMixin, DeleteView):
     """
     Delete a counter (for the admins)
     """
@@ -440,30 +464,28 @@ class CounterDeleteView(CanEditMixin, DeleteView):
     pk_url_kwarg = "counter_id"
     template_name = 'core/delete_confirm.jinja'
     success_url = reverse_lazy('counter:admin_list')
+    current_tab = "counters"
 
 # Product management
 
-class ProductTypeListView(CanEditPropMixin, ListView):
+class ProductTypeListView(CounterTabsMixin, CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
     model = ProductType
     template_name = 'counter/producttype_list.jinja'
+    current_tab = "product_types"
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(ProductTypeListView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "product_types"
-        return kwargs
-
-class ProductTypeCreateView(CanCreateMixin, CreateView):
+class ProductTypeCreateView(CounterTabsMixin, CanCreateMixin, CreateView):
     """
     A create view for the admins
     """
     model = ProductType
     fields = ['name', 'description', 'icon']
     template_name = 'core/create.jinja'
+    current_tab = "products"
 
-class ProductTypeEditView(CanEditPropMixin, UpdateView):
+class ProductTypeEditView(CounterTabsMixin, CanEditPropMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -471,8 +493,9 @@ class ProductTypeEditView(CanEditPropMixin, UpdateView):
     template_name = 'core/edit.jinja'
     fields = ['name', 'description', 'icon']
     pk_url_kwarg = "type_id"
+    current_tab = "products"
 
-class ProductArchivedListView(CanEditPropMixin, ListView):
+class ProductArchivedListView(CounterTabsMixin, CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
@@ -480,13 +503,9 @@ class ProductArchivedListView(CanEditPropMixin, ListView):
     template_name = 'counter/product_list.jinja'
     queryset = Product.objects.filter(archived=True)
     ordering = ['name']
+    current_tab = "archive"
 
-    def get_context_data(self, **kwargs):
-        kwargs = super(ProductArchivedListView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "archive"
-        return kwargs
-
-class ProductListView(CanEditPropMixin, ListView):
+class ProductListView(CounterTabsMixin, CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
@@ -494,11 +513,7 @@ class ProductListView(CanEditPropMixin, ListView):
     template_name = 'counter/product_list.jinja'
     queryset = Product.objects.filter(archived=False)
     ordering = ['name']
-
-    def get_context_data(self, **kwargs):
-        kwargs = super(ProductListView, self).get_context_data(**kwargs)
-        kwargs['tab'] = "products"
-        return kwargs
+    current_tab = "products"
 
 class ProductEditForm(forms.ModelForm):
     class Meta:
@@ -528,15 +543,16 @@ class ProductEditForm(forms.ModelForm):
             c.save()
         return ret
 
-class ProductCreateView(CanCreateMixin, CreateView):
+class ProductCreateView(CounterTabsMixin, CanCreateMixin, CreateView):
     """
     A create view for the admins
     """
     model = Product
     form_class = ProductEditForm
     template_name = 'core/create.jinja'
+    current_tab = "products"
 
-class ProductEditView(CanEditPropMixin, UpdateView):
+class ProductEditView(CounterTabsMixin, CanEditPropMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -544,6 +560,7 @@ class ProductEditView(CanEditPropMixin, UpdateView):
     form_class = ProductEditForm
     pk_url_kwarg = "product_id"
     template_name = 'core/edit.jinja'
+    current_tab = "products"
 
 class RefillingDeleteView(CanEditPropMixin, DeleteView):
     """

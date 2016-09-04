@@ -1,6 +1,6 @@
-{% extends "club/club_base.jinja" %}
+{% extends "core/base.jinja" %}
 
-{% block club %}
+{% block content %}
 <h3>{% trans %}Club tools{% endtrans %}</h3>
 <div>
     {% if object.counters.filter(type="OFFICE")|count > 0 %}

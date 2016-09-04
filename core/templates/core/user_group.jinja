@@ -1,6 +1,6 @@
-{% extends "core/user_base.jinja" %}
+{% extends "core/base.jinja" %}
 
-{% block infos %}
+{% block content %}
 <h2>{% trans user_name=profile.get_full_name() %}Edit user groups for {{ user_name }}{% endtrans %}</h2>
 <form action="" method="post">
     {% csrf_token %}

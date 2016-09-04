@@ -1,10 +1,10 @@
-{% extends "core/user_base.jinja" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s account{% endtrans %}
 {% endblock %}
 
-{% block infos %}
+{% block content %}
 {% if customer %}
 <h3>{% trans %}User account{% endtrans %}</h3>
 <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>

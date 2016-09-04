@@ -1,10 +1,10 @@
-{% extends "core/user_base.jinja" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s stats{% endtrans %}
 {% endblock %}
 
-{% block infos %}
+{% block content %}
     {% if profile.permanencies %}
     <div>
         <h3>{% trans %}Permanencies{% endtrans %}</h3>

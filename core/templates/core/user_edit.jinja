@@ -1,10 +1,10 @@
-{% extends "core/user_base.jinja" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
 {% trans %}Edit user{% endtrans %}
 {% endblock %}
 
-{% block infos %}
+{% block content %}
 <h2>{% trans %}Edit user profile{% endtrans %}</h2>
 <form action="" method="post" enctype="multipart/form-data" id="user_edit">
     {% csrf_token %}

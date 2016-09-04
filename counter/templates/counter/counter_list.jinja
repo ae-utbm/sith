@@ -1,10 +1,10 @@
-{% extends "counter/counter_base.jinja" %}
+{% extends "core/base.jinja" %}
 
 {% block title %}
 {% trans %}Counter admin list{% endtrans %}
 {% endblock %}
 
-{% block admin_content %}
+{% block content %}
 <p><a href="{{ url('counter:new') }}">{% trans %}New counter{% endtrans %}</a></p>
 {% if counter_list %}
 <h3>{% trans %}Counter admin list{% endtrans %}</h3>
