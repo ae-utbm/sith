@@ -17,7 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-os.environ['HTTPS'] = "on"
+os.environ['HTTPS'] = "off"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -195,6 +195,7 @@ LOGIN_REDIRECT_URL = '/'
 DEFAULT_FROM_EMAIL="bibou@git.an"
 
 # Email
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST="localhost"
 EMAIL_PORT=25
 
@@ -409,6 +410,7 @@ SITH_LAUNDERETTE_PRICES = {
         'DRYING': 0.75,
         }
 
+IS_OLD_MYSQL_PRESENT = False
 OLD_MYSQL_INFOS = {
         'host': 'ae-db',
         'user': "my_user",

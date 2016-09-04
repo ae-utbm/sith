@@ -240,7 +240,7 @@ class User(AbstractBaseUser):
             else:
                 create = True
             super(User, self).save(*args, **kwargs)
-            if create: # Create user on the old site: TODO remove me!
+            if create and settings.IS_OLD_MYSQL_PRESENT: # Create user on the old site: TODO remove me!
                 import MySQLdb
                 try:
                     db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
