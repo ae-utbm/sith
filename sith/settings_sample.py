@@ -338,7 +338,7 @@ SITH_SUBSCRIPTIONS = {
         'duration': 6,
     },
     'cursus-alternant': {
-        'name': _('Branch cursus'),
+        'name': _('Alternating cursus'),
         'price': 30,
         'duration': 6,
     },
