@@ -7,3 +7,5 @@ pyopenssl
 pytz
 djangorestframework
 django-phonenumber-field
+django-ajax-selects
+mysqlclient

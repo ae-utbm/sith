@@ -12,7 +12,8 @@ from django.forms import CheckboxSelectMultiple
 from django.template.response import TemplateResponse
 from django.conf import settings
 
-from datetime import timedelta
+from django.utils import timezone
+from datetime import timedelta, datetime, date
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
@@ -316,11 +317,38 @@ class UserAccountView(UserTabsMixin, DetailView):
             return res
         raise PermissionDenied
 
+    def expense_by_month(self):
+        stats = []
+        joined = self.object.date_joined.year
+
+        years = datetime.now().year - joined
+
+        years = range(0, years + 1)
+        months = range(1, 12)
+
+        for y in years:
+            stats.append([])
+            for m in months:
+                q = self.object.customer.buyings.filter(
+                    date__year=joined + y,
+                    date__month=m,
+                )
+                stats[y].append(
+                    (
+                        sum([p.unit_price * p.quantity for p in q]),
+                        date(joined + y, m, 17)
+                    )
+                )
+
+        print(stats)
+        return stats
+
     def get_context_data(self, **kwargs):
         kwargs = super(UserAccountView, self).get_context_data(**kwargs)
         kwargs['profile'] = self.object
         try:
             kwargs['customer'] = self.object.customer
+            kwargs['selling_months'] = self.expense_by_month()
         except:
             pass
         # TODO: add list of month where account has activity

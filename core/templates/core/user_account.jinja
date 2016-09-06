@@ -95,6 +95,29 @@
     </tbody>
 </table>
 {% endif %}
+<h4>{% trans %}Account buyings{% endtrans %}</h4>
+<table>
+    <thead>
+        <tr>
+            <td>{% trans %}Year{% endtrans %}</td>
+            <td>{% trans %}Month{% endtrans %}</td>
+            <td>{% trans %}Total{% endtrans %}</td>
+        </tr>
+    </thead>
+    <tbody>
+    {% for array in selling_months %}
+        {% for tuple in array %}
+            {% if tuple[0] != 0 %}
+            <tr>
+                <td>{{ tuple[1].year }}</td>
+                <td>{{ tuple[1]|date("E") }}</td>
+                <td>{{ tuple[0] }} €</td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+    </tbody>
+</table>
 {% else %}
 <p>{% trans %}User has no account{% endtrans %}</p>
 {% endif %}
