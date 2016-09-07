@@ -19,7 +19,7 @@
                                                               alt="{% trans %}Logo{% endtrans %}" /></a></div>
         <header>
             {% if not user.is_authenticated() %}
-            <a href="{{ url('core:login') }}">{% trans %}Login{% endtrans %}</a> |
+            <a href="{{ url('core:login') }}">{% trans %}Login{% endtrans %}</a>
             <a href="{{ url('core:register') }}">{% trans %}Register{% endtrans %}</a>
             {% else %}
             <ul>
@@ -34,8 +34,8 @@
                 </li>
             {% endfor %}
             </ul>
-            <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a> |
-            <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a> |
+            <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
+            <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
             <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
             <form action="{{ url('core:search') }}" method="GET">
                 <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" id="search" />
