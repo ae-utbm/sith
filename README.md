@@ -21,8 +21,8 @@ generate a complete HTML documentation that will be available in the *./doc/html
 ### Dependencies:
 See requirements.txt
 
-You may need to install some dev libraries like `libssl-dev`, `libjpeg-dev`, or `zlib1g-dev` to install all the
-requiered dependancies with pip.
+You may need to install some dev libraries like `libmysqlclient-dev`, `libssl-dev`, `libjpeg-dev`, or `zlib1g-dev` to install all the
+requiered dependancies with pip. You may also need `mysql-client`.
 
 The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
 
