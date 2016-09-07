@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import show_slots, show_tokens %}
 
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s profile{% endtrans %}
@@ -58,23 +59,9 @@
     {% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
     {% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}<br/>
     {# Shows tokens bought by the user #}
-    {% if get_subscriber(profile).tokens.exists() %}
-        <h5>{% trans %}Tokens{% endtrans %}</h5>
-        <ul>
-        {% for i in get_subscriber(profile).tokens.all() %}
-            <li>{{ i }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+    {{ show_tokens(profile) }}
     {# Shows slots took by the user #}
-    {% if get_subscriber(profile).slots.exists() %}
-        <h5>{% trans %}Slot{% endtrans %}</h5>
-        <ul>
-        {% for i in get_subscriber(profile).slots.all() %}
-            <li>{{ i.get_type_display() }} - {{i.machine.launderette }}, {{ i.start_date|localtime|date("l j") }} : {{ i.start_date|localtime|time(DATETIME_FORMAT) }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+    {{ show_slots(profile) }}
 {% else %}
     {% trans %}Not subscribed{% endtrans %}
     {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}

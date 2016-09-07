@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import show_slots, show_tokens %}
 
 {% block title %}
 {% trans %}Launderette{% endtrans %}
@@ -52,10 +53,6 @@
         {% endfor %}
     </tbody>
 </table>
+{{ show_slots(user) }}
+{{ show_tokens(user) }}
 {% endblock %}
-
-
-
-
-
-
