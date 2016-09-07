@@ -37,6 +37,11 @@
             {{ profile.phone }}
             </p>
             {% endif %}
+            {% if profile.address %}
+            <p>
+            {{ profile.address }}
+            </p>
+            {% endif %}
             </p>
             {% if profile.promo %}
             <p><img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}" alt="Promo {{ profile.promo }}" class="promo_pict" />
