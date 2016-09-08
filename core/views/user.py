@@ -327,28 +327,22 @@ class UserAccountView(UserAccountBase):
 
     def expense_by_month(self, obj, calc):
         stats = []
-        joined = self.object.date_joined.year
 
-        years = datetime.now().year - joined
-
-        years = range(0, years + 1)
-        months = range(1, 12)
-
-        for y in years:
+        for year in obj.datetimes('date', 'year', order='ASC'):
             stats.append([])
-            for m in months:
+            i = 0
+            for month in obj.filter(date__year=year.year).datetimes(
+                'date', 'month', order='ASC'):
                 q = obj.filter(
-                    date__year=joined + y,
-                    date__month=m,
+                    date__year=month.year,
+                    date__month=month.month
                 )
-                stats[y].append(
-                    (
-                        sum([calc(p) for p in q]),
-                        date(joined + y, m, 17)
-                    )
-                )
+                stats[i].append((
+                    sum([calc(p) for p in q]),
+                    month
+                ))
+            i += 1
 
-        print(stats)
         return stats
 
     def buyings_calc(self, query):
