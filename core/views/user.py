@@ -328,11 +328,11 @@ class UserAccountView(UserAccountBase):
     def expense_by_month(self, obj, calc):
         stats = []
 
-        for year in obj.datetimes('date', 'year', order='ASC'):
+        for year in obj.datetimes('date', 'year', order='DESC'):
             stats.append([])
             i = 0
             for month in obj.filter(date__year=year.year).datetimes(
-                'date', 'month', order='ASC'):
+                'date', 'month', order='DESC'):
                 q = obj.filter(
                     date__year=month.year,
                     date__month=month.month
@@ -391,6 +391,8 @@ class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
     def get_context_data(self, **kwargs):
         kwargs = super(UserAccountDetailView, self).get_context_data(**kwargs)
         kwargs['profile'] = self.object
+        kwargs['year'] = self.get_year()
+        kwargs['month'] = self.get_month()
         try:
             kwargs['customer'] = self.object.customer
         except:
