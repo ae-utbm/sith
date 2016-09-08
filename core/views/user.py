@@ -345,17 +345,11 @@ class UserAccountView(UserAccountBase):
 
         return stats
 
-    def buyings_calc(self, query):
-        return query.unit_price * query.quantity
-
     def invoices_calc(self, query):
         t = 0
         for it in query.items.all():
             t += it.quantity * it.product_unit_price
         return t
-
-    def refilling_calc(self, query):
-        return query.amount
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserAccountView, self).get_context_data(**kwargs)
@@ -364,7 +358,7 @@ class UserAccountView(UserAccountBase):
             kwargs['customer'] = self.object.customer
             kwargs['buyings_month'] = self.expense_by_month(
                 self.object.customer.buyings,
-                self.buyings_calc
+                (lambda q: q.unit_price * q.quantity)
             )
             kwargs['invoices_month'] = self.expense_by_month(
                 self.object.customer.user.invoices,
@@ -372,7 +366,7 @@ class UserAccountView(UserAccountBase):
             )
             kwargs['refilling_month'] = self.expense_by_month(
                 self.object.customer.refillings,
-                self.refilling_calc
+                (lambda q: q.amount)
             )
         except:
             pass
