@@ -151,6 +151,7 @@ class UserTabsMixin(TabedViewMixin):
         try:
             if (self.object.customer and (self.object == self.request.user
                 or self.request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
+                or self.request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
                 or self.request.user.is_root)):
                 tab_list.append({
                             'url': reverse('core:user_account', kwargs={'user_id': self.object.id}),
@@ -312,6 +313,7 @@ class UserAccountView(UserTabsMixin, DetailView):
         res = super(UserAccountView, self).dispatch(request, *arg, **kwargs)
         if (self.object == request.user
                 or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
+                or request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
                 or request.user.is_root):
             return res
         raise PermissionDenied

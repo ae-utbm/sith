@@ -81,8 +81,8 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         kwargs['login_form'].cleaned_data = {} # add_error fails if there are no cleaned_data
         if "credentials" in self.request.GET:
             kwargs['login_form'].add_error(None, _("Bad credentials"))
-        if "subscription" in self.request.GET:
-            kwargs['login_form'].add_error(None, _("User is not subscriber"))
+        if "sellers" in self.request.GET:
+            kwargs['login_form'].add_error(None, _("User is not barman"))
         kwargs['form'] = self.get_form()
         if self.object.type == 'BAR':
             kwargs['barmen'] = self.object.get_barmen_list()
@@ -356,10 +356,10 @@ class CounterLogin(RedirectView):
         self.errors = []
         if form.is_valid():
             user = User.objects.filter(username=form.cleaned_data['username']).first()
-            if user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP) and not user in self.counter.get_barmen_list():
+            if user in self.counter.sellers.all() and not user in self.counter.get_barmen_list():
                 self.counter.add_barman(user)
             else:
-                self.errors += ["subscription"]
+                self.errors += ["sellers"]
         else:
             self.errors += ["credentials"]
         return super(CounterLogin, self).post(request, *args, **kwargs)
