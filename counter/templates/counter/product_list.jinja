@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{% if tab == "products" %}
+{% if current_tab == "products" %}
 <p><a href="{{ url('counter:new_product') }}">{% trans %}New product{% endtrans %}</a></p>
 {% endif %}
 {% if product_list %}

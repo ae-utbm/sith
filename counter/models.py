@@ -269,7 +269,7 @@ class Selling(models.Model):
             self.customer.amount -= self.quantity * self.unit_price
             self.customer.save()
             self.is_validated = True
-        if self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
+        if self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
             s = Subscriber.objects.filter(id=self.customer.user.id).first()
             sub = Subscription(
                     member=s,
@@ -284,7 +284,7 @@ class Selling(models.Model):
                     duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
                     start=sub.subscription_start)
             sub.save()
-        elif self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS:
+        elif self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS:
             s = Subscriber.objects.filter(id=self.customer.user.id).first()
             sub = Subscription(
                     member=s,
