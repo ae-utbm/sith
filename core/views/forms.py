@@ -3,7 +3,7 @@ from django import forms
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth import logout, login, authenticate
-from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput
+from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput, DateTimeInput
 from django.utils.translation import ugettext as _
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 
@@ -30,6 +30,14 @@ class SelectMultiple(Select):
         else:
             attrs = {'class': "select_multiple"}
         return super(SelectMultiple, self).render(name, value, attrs)
+
+class SelectDateTime(DateTimeInput):
+    def render(self, name, value, attrs=None):
+        if attrs:
+            attrs['class'] = "select_datetime"
+        else:
+            attrs = {'class': "select_datetime"}
+        return super(SelectDateTime, self).render(name, value, attrs)
 
 class SelectDate(DateInput):
     def render(self, name, value, attrs=None):

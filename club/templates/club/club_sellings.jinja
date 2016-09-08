@@ -1,0 +1,46 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+
+{% block content %}
+<h3>{% trans %}Sellings{% endtrans %}</h3>
+<form action="" method="get">
+    {% csrf_token %}
+    {{ form }}
+    <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>
+</form>
+<p>
+{% trans %}Quantity: {% endtrans %}{{ result.count() }} {% trans %}units{% endtrans %}<br/>
+{% trans %}Total: {% endtrans %}{{ total }} €
+</p>
+<table>
+    <thead>
+        <tr>
+            <td>{% trans %}Date{% endtrans %}</td>
+            <td>{% trans %}Counter{% endtrans %}</td>
+            <td>{% trans %}Barman{% endtrans %}</td>
+            <td>{% trans %}Customer{% endtrans %}</td>
+            <td>{% trans %}Label{% endtrans %}</td>
+            <td>{% trans %}Quantity{% endtrans %}</td>
+            <td>{% trans %}Total{% endtrans %}</td>
+            <td>{% trans %}Payment method{% endtrans %}</td>
+        </tr>
+    </thead>
+    <tbody>
+    {% for s in result %}
+        <tr>
+            <td>{{ s.date|localtime|date(DATETIME_FORMAT) }} {{ s.date|localtime|time(DATETIME_FORMAT) }}</td>
+            <td>{{ s.counter }}</td>
+            <td><a href="{{ s.seller.get_absolute_url() }}">{{ s.seller.get_display_name() }}</a></td>
+            <td><a href="{{ s.customer.user.get_absolute_url() }}">{{ s.customer.user.get_display_name() }}</a></td>
+            <td>{{ s.label }}</td>
+            <td>{{ s.quantity }}</td>
+            <td>{{ s.quantity * s.unit_price }} €</td>
+            <td>{{ s.get_payment_method_display() }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+
+

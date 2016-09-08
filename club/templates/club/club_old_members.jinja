@@ -12,7 +12,7 @@
             <td>{% trans %}To{% endtrans %}</td>
         </thead>
         <tbody>
-        {% for m in club.members.exclude(end_date=None).order_by('-role', '-end_date').all() %}
+        {% for m in club.members.exclude(end_date=None).order_by('-role', 'description', '-end_date').all() %}
             <tr>
                 <td>{{ user_profile_link(m.user) }}</td>
                 <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>

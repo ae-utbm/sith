@@ -17,7 +17,12 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.i18n import javascript_catalog
 from ajax_select import urls as ajax_select_urls
+
+js_info_dict = {
+    'packages': ('sith',),
+}
 
 handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
@@ -34,5 +39,6 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ajax_select/', include(ajax_select_urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: remove me for production!!!
 

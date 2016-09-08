@@ -8,10 +8,15 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext as _
+from django.conf import settings
+
+from datetime import timedelta
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
+from core.views.forms import SelectDate, SelectSingle, SelectDateTime
 from club.models import Club, Membership
 from sith.settings import SITH_MAXIMUM_FREE_ROLE, SITH_MAIN_BOARD_GROUP
+from counter.models import Product, Selling, Counter
 
 class ClubTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
@@ -45,6 +50,11 @@ class ClubTabsMixin(TabedViewMixin):
                         'url': reverse('club:club_edit', kwargs={'club_id': self.object.id}),
                         'slug': 'edit',
                         'name': _("Edit"),
+                        })
+            tab_list.append({
+                        'url': reverse('club:club_sellings', kwargs={'club_id': self.object.id}),
+                        'slug': 'sellings',
+                        'name': _("Sellings"),
                         })
         if self.request.user.is_owner(self.object):
             tab_list.append({
@@ -142,6 +152,47 @@ class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
     pk_url_kwarg = "club_id"
     template_name = 'club/club_old_members.jinja'
     current_tab = "elderlies"
+
+class SellingsFormBase(forms.Form):
+    begin_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Begin date"), required=False, widget=SelectDateTime)
+    end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"), required=False, widget=SelectDateTime)
+    counter = forms.ModelChoiceField(Counter.objects.order_by('name').all(), label=_("Counter"), required=False)
+
+class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
+    """
+    Sellings of a club
+    """
+    model = Club
+    pk_url_kwarg = "club_id"
+    template_name = 'club/club_sellings.jinja'
+    current_tab = "sellings"
+
+    def get_form_class(self):
+        kwargs = {
+                'product': forms.ModelChoiceField(self.object.products.order_by('name').all(), label=_("Product"), required=False)
+                }
+        return type('SellingsForm', (SellingsFormBase,), kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubSellingView, self).get_context_data(**kwargs)
+        form = self.get_form_class()(self.request.GET, initial={'begin_date': timezone.now()-timedelta(days=7)})
+        # form = self.get_form_class()(initial={'begin_date': timezone.now()-timedelta(days=7)})
+        qs = Selling.objects.filter(club=self.object)
+        if form.is_valid():
+            if form.cleaned_data['begin_date']:
+                qs = qs.filter(date__gte=form.cleaned_data['begin_date'])
+            if form.cleaned_data['end_date']:
+                qs = qs.filter(date__lte=form.cleaned_data['end_date'])
+            if form.cleaned_data['counter']:
+                qs = qs.filter(counter=form.cleaned_data['counter'])
+            if form.cleaned_data['product']:
+                qs = qs.filter(product__id=form.cleaned_data['product'].id)
+            kwargs['result'] = qs.all().order_by('-id')
+            kwargs['total'] = sum([s.quantity * s.unit_price for s in qs.all()])
+        else:
+            kwargs['result'] = qs[:0]
+        kwargs['form'] = form
+        return kwargs
 
 class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
     """

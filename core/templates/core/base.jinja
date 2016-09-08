@@ -5,6 +5,7 @@
         <title>{% block title %}{% trans %}Welcome!{% endtrans %}{% endblock %}</title>
         <link rel="stylesheet" href="{{ static('core/base.css') }}">
         <link rel="stylesheet" href="{{ static('core/multiple-select.css') }}">
+        <link rel="stylesheet" href="{{ static('core/jquery.datetimepicker.min.css') }}">
         <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
         <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
         <link rel="stylesheet" href="{{ static('core/style.css') }}">
@@ -113,8 +114,10 @@
         <script src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>
         <script src="{{ static('core/js/ui/jquery-ui.min.js') }}"></script>
         <script src="{{ static('core/js/ui/i18n/datepicker-fr.js') }}"></script>
+        <script src="{{ static('core/js/jquery.datetimepicker.full.min.js') }}"></script>
         <script src="{{ static('core/js/multiple-select.js') }}"></script>
         <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
+        <script src="{{ url('javascript-catalog') }}"></script>
         <script src="{{ static('core/js/script.js') }}"></script>
         <script>
 $('.select_single').multipleSelect({
@@ -146,6 +149,10 @@ $(document).keydown(function (e) {
         return false;
     }
 });
+jQuery.datetimepicker.setLocale('{{ request.LANGUAGE_CODE|lower }}');
+$('.select_datetime').datetimepicker({
+        format: 'Y-m-d H:i:s',
+        });
         </script>
         {% endblock %}
     </body>
