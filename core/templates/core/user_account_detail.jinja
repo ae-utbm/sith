@@ -8,6 +8,7 @@
 {% if customer %}
 <h3>{% trans %}User account{% endtrans %}</h3>
 <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
+<p><a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Back{% endtrans %}</a></p>
 {% if customer.refillings.exists() %}
 <h4>{% trans %}Refillings{% endtrans %}</h4>
 <table>
@@ -101,5 +102,5 @@
 {% else %}
 <p>{% trans %}User has no account{% endtrans %}</p>
 {% endif %}
-<p><a href="{{ url('core:user_account', user_id=profile.id) }}">Retour</a></p>
+<p><a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Back{% endtrans %}</a></p>
 {% endblock %}
