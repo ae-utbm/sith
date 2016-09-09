@@ -33,3 +33,25 @@
     </div>
 </div>
 {%- endmacro %}
+
+{% macro show_slots(user) %}
+    {% if get_subscriber(user).slots.exists() %}
+        <h5>{% trans %}Slot{% endtrans %}</h5>
+        <ul>
+        {% for i in get_subscriber(user).slots.all() %}
+            <li>{{ i.get_type_display() }} - {{i.machine.launderette }}, {{ i.start_date|localtime|date("l j") }} : {{ i.start_date|localtime|time(DATETIME_FORMAT) }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}
+
+{% macro show_tokens(user) %}
+    {% if get_subscriber(user).tokens.exists() %}
+        <h5>{% trans %}Tokens{% endtrans %}</h5>
+        <ul>
+        {% for i in get_subscriber(user).tokens.all() %}
+            <li>{{ i }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}

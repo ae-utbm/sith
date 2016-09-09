@@ -11,8 +11,10 @@ from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.template.response import TemplateResponse
 from django.conf import settings
+from django.views.generic.dates import YearMixin, MonthMixin
 
-from datetime import timedelta
+from django.utils import timezone
+from datetime import timedelta, datetime, date
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
@@ -300,17 +302,17 @@ class UserToolsView(UserTabsMixin, TemplateView):
         kwargs['object'] = self.request.user
         return kwargs
 
-class UserAccountView(UserTabsMixin, DetailView):
+class UserAccountBase(UserTabsMixin, DetailView):
     """
-    Display a user's account
+    Base class for UserAccount
     """
+
     model = User
     pk_url_kwarg = "user_id"
-    template_name = "core/user_account.jinja"
     current_tab = "account"
 
     def dispatch(self, request, *arg, **kwargs): # Manually validates the rights
-        res = super(UserAccountView, self).dispatch(request, *arg, **kwargs)
+        res = super(UserAccountBase, self).dispatch(request, *arg, **kwargs)
         if (self.object == request.user
                 or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
                 or request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
@@ -318,14 +320,78 @@ class UserAccountView(UserTabsMixin, DetailView):
             return res
         raise PermissionDenied
 
+class UserAccountView(UserAccountBase):
+    """
+    Display a user's account
+    """
+
+    template_name = "core/user_account.jinja"
+
+    def expense_by_month(self, obj, calc):
+        stats = []
+
+        for year in obj.datetimes('date', 'year', order='DESC'):
+            stats.append([])
+            i = 0
+            for month in obj.filter(date__year=year.year).datetimes(
+                'date', 'month', order='DESC'):
+                q = obj.filter(
+                    date__year=month.year,
+                    date__month=month.month
+                )
+                stats[i].append((
+                    sum([calc(p) for p in q]),
+                    month
+                ))
+            i += 1
+
+        return stats
+
+    def invoices_calc(self, query):
+        t = 0
+        for it in query.items.all():
+            t += it.quantity * it.product_unit_price
+        return t
+
     def get_context_data(self, **kwargs):
         kwargs = super(UserAccountView, self).get_context_data(**kwargs)
         kwargs['profile'] = self.object
         try:
             kwargs['customer'] = self.object.customer
+            kwargs['buyings_month'] = self.expense_by_month(
+                self.object.customer.buyings,
+                (lambda q: q.unit_price * q.quantity)
+            )
+            kwargs['invoices_month'] = self.expense_by_month(
+                self.object.customer.user.invoices,
+                self.invoices_calc
+            )
+            kwargs['refilling_month'] = self.expense_by_month(
+                self.object.customer.refillings,
+                (lambda q: q.amount)
+            )
         except:
             pass
         # TODO: add list of month where account has activity
         return kwargs
 
 
+
+class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
+    """
+    Display a user's account for month
+    """
+
+    template_name = "core/user_account_detail.jinja"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserAccountDetailView, self).get_context_data(**kwargs)
+        kwargs['profile'] = self.object
+        kwargs['year'] = self.get_year()
+        kwargs['month'] = self.get_month()
+        try:
+            kwargs['customer'] = self.object.customer
+        except:
+            pass
+        kwargs['tab'] = "account"
+        return kwargs

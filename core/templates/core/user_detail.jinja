@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import show_slots, show_tokens %}
 
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s profile{% endtrans %}
@@ -37,6 +38,11 @@
             {{ profile.phone }}
             </p>
             {% endif %}
+            {% if profile.address %}
+            <p>
+            {{ profile.address }}
+            </p>
+            {% endif %}
             </p>
             {% if profile.promo %}
             <p><img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}" alt="Promo {{ profile.promo }}" class="promo_pict" />
@@ -50,22 +56,19 @@
 {# if the user is member of a club, he can view the subscription state #}
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
-{% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
-{% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}<br/>
-{% if get_subscriber(profile).tokens.exists() %}
-<ul>
-{% for i in get_subscriber(profile).tokens.all() %}
-    <li>{{ i }}</li>
-{% endfor %}
-</ul>
-{% endif %}
+    {% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
+    {% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}<br/>
+    {# Shows tokens bought by the user #}
+    {{ show_tokens(profile) }}
+    {# Shows slots took by the user #}
+    {{ show_slots(profile) }}
 {% else %}
-{% trans %}Not subscribed{% endtrans %}
-{% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
-<a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>
-{% endif %}
-{% endif %}
-</p>
+    {% trans %}Not subscribed{% endtrans %}
+    {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
+        <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>
+        {% endif %}
+    {% endif %}
+    </p>
 {% endif %}
 
 {% endblock %}

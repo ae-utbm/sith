@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^user/(?P<user_id>[0-9]+)/groups$', UserUpdateGroupView.as_view(), name='user_groups'),
     url(r'^user/tools/$', UserToolsView.as_view(), name='user_tools'),
     url(r'^user/(?P<user_id>[0-9]+)/account$', UserAccountView.as_view(), name='user_account'),
+    url(r'^user/(?P<user_id>[0-9]+)/account/(?P<year>[0-9]+)/(?P<month>[0-9]+)$', UserAccountDetailView.as_view(), name='user_account_detail'),
     url(r'^user/(?P<user_id>[0-9]+)/stats$', UserStatsView.as_view(), name='user_stats'),
 
     # File views
