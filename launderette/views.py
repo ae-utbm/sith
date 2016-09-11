@@ -8,7 +8,7 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView, BaseFo
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.utils.translation import ugettext as _
-from django.utils import dateparse
+from django.utils import dateparse, timezone
 from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
 from django.db import transaction, DataError
@@ -319,7 +319,7 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
                         raise forms.ValidationError(_("Token not found"))
                     return t
             return clean_field
-        for s in self.subscriber.slots.filter(token=None).all():
+        for s in self.subscriber.slots.filter(token=None, start_date__gte=timezone.now().replace(tzinfo=None)).all():
             field_name = "slot-%s" % (str(s.id))
             fields[field_name] = forms.CharField(max_length=5, required=False,
                     label="%s - %s" % (s.get_type_display(), defaultfilters.date(s.start_date, "j N Y H:i")))

@@ -111,8 +111,10 @@ TEMPLATES = [
                 "can_view": "core.views.can_view",
                 "get_subscriber": "subscription.views.get_subscriber",
                 "settings": "sith.settings",
+                "Launderette": "launderette.models.Launderette",
                 "Counter": "counter.models.Counter",
                 "ProductType": "counter.models.ProductType",
+                "timezone": "django.utils.timezone",
             },
             "bytecode_cache": {
                 "name": "default",

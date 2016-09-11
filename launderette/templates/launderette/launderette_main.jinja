@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-{% if request.user.is_root %}
+{% if request.user.can_edit(page) %}
 <p><a href="{{ url('core:page_edit', page_name=page.get_full_name()) }}">{% trans %}Edit presentation page{% endtrans %}</a></p>
 {% endif %}
 {% if request.user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP) %}

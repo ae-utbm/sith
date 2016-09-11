@@ -3,17 +3,21 @@
 {% block content %}
 <h3>{% trans %}Club tools{% endtrans %}</h3>
 <div>
-    {% if object.counters.filter(type="OFFICE")|count > 0 %}
     <h4>{% trans %}Counters:{% endtrans %}</h4>
     <ul>
+    {% if object.unix_name == settings.SITH_LAUNDERETTE_MANAGER['unix_name'] %}
+    {% for l in Launderette.objects.all() %}
+        <li><a href="{{ url('launderette:main_click', launderette_id=l.id) }}">{{ l }}</a></li>
+    {% endfor %}
+    {% elif object.counters.filter(type="OFFICE")|count > 0 %}
         {% for c in object.counters.filter(type="OFFICE") %}
         <li>{{ c }}:
             <a href="{{ url('counter:details', counter_id=c.id) }}">View</a>
             <a href="{{ url('counter:admin', counter_id=c.id) }}">Edit</a>
         </li>
         {% endfor %}
-    </ul>
     {% endif %}
+    </ul>
     {% if object.club_account.exists() %}
         <h4>{% trans %}Accouting: {% endtrans %}</h4>
         <ul>

@@ -7,7 +7,6 @@
 {% block content %}
 <h3>{% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}</h3>
     <div>
-        Counter: {{ counter }}
         <form method="post" action="" class="inline" style="display:inline">
             {% csrf_token %}
             {{ form.as_p() }}
