@@ -175,10 +175,11 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(ClubSellingView, self).get_context_data(**kwargs)
-        form = self.get_form_class()(self.request.GET, initial={'begin_date': timezone.now()-timedelta(days=7)})
-        # form = self.get_form_class()(initial={'begin_date': timezone.now()-timedelta(days=7)})
+        form = self.get_form_class()(self.request.GET)
         qs = Selling.objects.filter(club=self.object)
         if form.is_valid():
+            if not len([v for v in form.cleaned_data.values() if v is not None]):
+                qs = Selling.objects.filter(id=-1)
             if form.cleaned_data['begin_date']:
                 qs = qs.filter(date__gte=form.cleaned_data['begin_date'])
             if form.cleaned_data['end_date']:
