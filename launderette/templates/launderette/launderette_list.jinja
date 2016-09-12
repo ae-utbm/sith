@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block content %}
+{% if user.is_root %}
 <p><a href="{{ url('launderette:launderette_new') }}">{% trans %}New launderette{% endtrans %}</a></p>
+{% endif %}
 {% if launderette_list %}
 <h3>{% trans %}Launderette admin list{% endtrans %}</h3>
 <ul>
