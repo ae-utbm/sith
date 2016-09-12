@@ -1,0 +1,21 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+
+{% block title %}
+{% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}</h3>
+    {% if counter.type == 'BAR' %}
+    <h4>{% trans %}Barman list{% endtrans %}</h4>
+    <ul>
+        {% for b in counter.get_barmen_list() %}
+        <li>{{ user_profile_link(b) }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock %}
+
+
+

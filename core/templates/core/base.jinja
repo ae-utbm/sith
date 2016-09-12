@@ -25,12 +25,14 @@
             <ul>
             {% for bar in Counter.objects.filter(type="BAR").all() %}
                 <li>
+                <a href="{{ url('counter:activity', counter_id=bar.id) }}" style="padding: 0px">
                 {% if bar.is_open() %}
                     <span style="color: green">&#x2713;</span>
                 {% else %}
                     <span style="color: red">&#10007;</span>
                 {% endif %}
                     {{ bar }}
+                </a>
                 </li>
             {% endfor %}
             </ul>

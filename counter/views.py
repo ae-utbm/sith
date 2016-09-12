@@ -75,6 +75,7 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         """
         if self.request.method == 'POST':
             self.object = self.get_object()
+        self.object.update_activity()
         kwargs = super(CounterMain, self).get_context_data(**kwargs)
         kwargs['login_form'] = LoginForm()
         kwargs['login_form'].fields['username'].widget.attrs['autofocus'] = True
@@ -677,3 +678,12 @@ class CounterCashSummaryView(CanViewMixin, DetailView):
         kwargs = super(CounterCashSummaryView, self).get_context_data(**kwargs)
         kwargs['form'] = self.form
         return kwargs
+
+class CounterActivityView(DetailView):
+    """
+    Show the bar activity
+    """
+    model = Counter
+    pk_url_kwarg = "counter_id"
+    template_name = 'counter/activity.jinja'
+

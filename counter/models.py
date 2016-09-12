@@ -173,7 +173,6 @@ class Counter(models.Model):
         bl = []
         for p in pl:
             if timezone.now() - p.activity < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
-                p.save() # Update activity
                 bl.append(p.user)
             else:
                 p.end = p.activity
@@ -181,13 +180,26 @@ class Counter(models.Model):
         return bl
 
     def get_random_barman(self):
+        """
+        Return a random user being currently a barman
+        """
         bl = self.get_barmen_list()
         return bl[random.randrange(0, len(bl))]
+
+    def update_activity(self):
+        """
+        Update the barman activity to prevent timeout
+        """
+        for p in Permanency.objects.filter(counter=self, end=None).all():
+            p.save() # Update activity
 
     def is_open(self):
         return len(self.get_barmen_list()) > 0
 
     def barman_list(self):
+        """
+        Returns the barman id list
+        """
         return [b.id for b in self.get_barmen_list()]
 
 class Refilling(models.Model):
@@ -315,8 +327,11 @@ class Permanency(models.Model):
         verbose_name = _("permanency")
 
     def __str__(self):
-        return "%s in %s from %s" % (self.user, self.counter,
-                self.start.strftime("%Y-%m-%d %H:%M:%S"))
+        return "%s in %s from %s (last activity: %s) to %s" % (self.user, self.counter,
+                self.start.strftime("%Y-%m-%d %H:%M:%S"),
+                self.activity.strftime("%Y-%m-%d %H:%M:%S"),
+                self.end.strftime("%Y-%m-%d %H:%M:%S") if self.end else "",
+                )
 
 class CashRegisterSummary(models.Model):
     user = models.ForeignKey(User, related_name="cash_summaries", verbose_name=_("user"))
