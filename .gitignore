@@ -6,4 +6,4 @@ db.sqlite3
 env/
 doc/html
 data/
-sith/settings.py
+sith/settings_custom.py

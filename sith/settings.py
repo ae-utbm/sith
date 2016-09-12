@@ -26,9 +26,9 @@ os.environ['HTTPS'] = "off"
 SECRET_KEY = '(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -202,8 +202,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST="localhost"
 EMAIL_PORT=25
 
-SITH_URL = "ae-taiste.utbm.fr"
-SITH_NAME = "AE taiste"
+SITH_URL = "my.url.git.an"
+SITH_NAME = "Sith website"
 
 # AE configuration
 SITH_MAIN_CLUB = {
@@ -398,9 +398,9 @@ SITH_BARMAN_TIMEOUT=20
 
 # ET variables
 SITH_EBOUTIC_ET_URL = "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
-SITH_EBOUTIC_PBX_SITE = "1520411"
-SITH_EBOUTIC_PBX_RANG = "01"
-SITH_EBOUTIC_PBX_IDENTIFIANT = "650995411"
+SITH_EBOUTIC_PBX_SITE = "4000666"
+SITH_EBOUTIC_PBX_RANG = "42"
+SITH_EBOUTIC_PBX_IDENTIFIANT = "123456789"
 SITH_EBOUTIC_HMAC_KEY = binascii.unhexlify("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF")
 SITH_EBOUTIC_PUB_KEY = ""
 with open('./sith/et_keys/pubkey.pem') as f:
@@ -422,3 +422,8 @@ OLD_MYSQL_INFOS = {
         'charset': 'utf8',
         'use_unicode': True,
         }
+
+try:
+    from .settings_custom import *
+except:
+    print("Custom settings failed")
