@@ -1,0 +1,58 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+
+{% block title %}
+{% trans %}Cash register summary list{% endtrans %}
+{% endblock %}
+
+{% block content %}
+{% if cashsummary_list %}
+<h3>{% trans %}Cash register summary list{% endtrans %}</h3>
+<h5>{% trans %}Theoric sums{% endtrans %}</h5>
+<h6>{% trans %}Refillings{% endtrans %}</h6>
+<p>
+{% for b,s in refilling_sums.items() %}
+    {{ b }}: {{ s }} €<br/>
+{% endfor %}
+</p>
+<h6>{% trans %}Cash register summaries{% endtrans %}</h6>
+<p>
+{% for b,s in summaries_sums.items() %}
+    {{ b }}: {{ s }} €<br/>
+{% endfor %}
+</p>
+<table>
+    <thead>
+        <tr>
+            <td>{% trans %}User{% endtrans %}</td>
+            <td>{% trans %}Counter{% endtrans %}</td>
+            <td>{% trans %}Date{% endtrans %}</td>
+            <td>{% trans %}Total{% endtrans %}</td>
+            <td>{% trans %}Emptied{% endtrans %}</td>
+            <td>{% trans %}Comment{% endtrans %}</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in cashsummary_list.order_by('-date')  %}
+        <tr>
+        <td>{{ user_profile_link(c.user) }}</td>
+        <td>{{ c.counter }}</td>
+        <td>{{ c.date|localtime|date(DATETIME_FORMAT) }} - {{ c.date|localtime|time(DATETIME_FORMAT) }}</td>
+        <td>{{ c.get_total() }} €</td>
+        {% if c.emptied %}
+        <td>{% trans %}yes{% endtrans %}</td>
+        {% else %}
+        <td></td>
+        {% endif %}
+        <td>{{ c.comment }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+{% trans %}There is no cash register summary in this website.{% endtrans %}
+{% endif %}
+{% endblock %}
+
+
+

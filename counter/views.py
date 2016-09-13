@@ -12,7 +12,8 @@ from django.conf import settings
 from django.db import DataError, transaction
 
 import re
-from datetime import date, timedelta
+import pytz
+from datetime import date, timedelta, datetime
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from ajax_select import make_ajax_form, make_ajax_field
 
@@ -407,6 +408,11 @@ class CounterTabsMixin(TabedViewMixin):
                 'slug': 'product_types',
                 'name': _("Product types"),
                 },
+            {
+                'url': reverse_lazy('counter:cash_summary_list'),
+                'slug': 'cash_summary',
+                'name': _("Cash register summaries"),
+                },
             ]
 
 class CounterListView(CounterTabsMixin, CanViewMixin, ListView):
@@ -687,3 +693,24 @@ class CounterActivityView(DetailView):
     pk_url_kwarg = "counter_id"
     template_name = 'counter/activity.jinja'
 
+class CashSummaryListView(CanEditPropMixin, CounterTabsMixin, ListView):
+    """Display a list of cash summaries"""
+    model = CashRegisterSummary
+    template_name = 'counter/cash_summary_list.jinja'
+    context_object_name = "cashsummary_list"
+    current_tab = "cash_summary"
+
+    def get_context_data(self, **kwargs):
+        """ Add sums to the context """
+        kwargs = super(CashSummaryListView, self).get_context_data(**kwargs)
+        kwargs['summaries_sums'] = {}
+        kwargs['refilling_sums'] = {}
+        for c in Counter.objects.filter(type="BAR").all():
+            last_summary = CashRegisterSummary.objects.filter(counter=c, emptied=True).order_by('-date').first()
+            if last_summary:
+                last_date = last_summary.date
+            else:
+                last_date = datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC) # My birth date should be old enough
+            kwargs['summaries_sums'][c.name] = sum([s.get_total() for s in CashRegisterSummary.objects.filter(counter=c, date__gt=last_date).all()])
+            kwargs['refilling_sums'][c.name] = sum([s.amount for s in Refilling.objects.filter(counter=c, date__gt=last_date).all()])
+        return kwargs

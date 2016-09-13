@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^admin$', CounterListView.as_view(), name='admin_list'),
     url(r'^admin/new$', CounterCreateView.as_view(), name='new'),
     url(r'^admin/delete/(?P<counter_id>[0-9]+)$', CounterDeleteView.as_view(), name='delete'),
+    url(r'^admin/cash_summary/list$', CashSummaryListView.as_view(), name='cash_summary_list'),
     url(r'^admin/product/list$', ProductListView.as_view(), name='product_list'),
     url(r'^admin/product/list_archived$', ProductArchivedListView.as_view(), name='product_list_archived'),
     url(r'^admin/product/create$', ProductCreateView.as_view(), name='new_product'),

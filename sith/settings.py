@@ -122,7 +122,7 @@ TEMPLATES = [
                 "enabled": False,
             },
             "autoescape": True,
-            "auto_reload": DEBUG,
+            "auto_reload": True,
             "translation_engine": "django.utils.translation",
         }
     },

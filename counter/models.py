@@ -346,6 +346,14 @@ class CashRegisterSummary(models.Model):
     def __str__(self):
         return "At %s by %s - Total: %s €" % (self.counter, self.user, self.get_total())
 
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']):
+            return True
+        return False
+
     def get_total(self):
         t = 0
         for it in self.items.all():
