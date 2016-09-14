@@ -9,7 +9,6 @@ from django.contrib.auth.forms import PasswordResetForm
 
 from core.models import User
 
-import MySQLdb
 
 
 def validate_type(value):
@@ -35,6 +34,7 @@ class Subscriber(User):
         super(Subscriber, self).save()
         if create and settings.IS_OLD_MYSQL_PRESENT:
             try: # Create user on the old site: TODO remove me!
+                import MySQLdb
                 db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
                 c = db.cursor()
                 c.execute("""INSERT INTO utilisateurs (id_utilisateur, nom_utl, prenom_utl, email_utl, hash_utl, ae_utl) VALUES
@@ -83,6 +83,7 @@ class Subscription(models.Model):
                         subject_template_name='core/new_user_email_subject.jinja', from_email="ae@utbm.fr")
         self.member.make_home()
         if settings.IS_OLD_MYSQL_PRESENT:
+            import MySQLdb
             try: # Create subscription on the old site: TODO remove me!
                 LOCATION = {
                         "SEVENANS": 5,
