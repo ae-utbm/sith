@@ -42,7 +42,7 @@
     {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) or user.is_root %}
     <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
     {% endif %}
-    {% for m in user.membership.filter(end_date=None).filter(role__gte=7).all() -%}
+    {% for m in user.memberships.filter(end_date=None).filter(role__gte=7).all() -%}
     {%- for b in m.club.bank_accounts.all() %}
     <li><strong>{% trans %}Bank account: {% endtrans %}</strong>
         <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b }}</a></li>
@@ -58,7 +58,7 @@
 <hr>
 <h4>{% trans %}Club tools{% endtrans %}</h4>
 <ul>
-    {% for m in user.membership.filter(end_date=None).all() %}
+    {% for m in user.memberships.filter(end_date=None).all() %}
     <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
     {% endfor %}
 </ul>

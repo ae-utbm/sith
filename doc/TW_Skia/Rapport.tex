@@ -341,7 +341,7 @@ tous les autres.
 </ul>
 <h4>Clubs</h4>
 <ul>
-    {% for m in user.membership.filter(end_date=None).all() %} {# (6) #}
+    {% for m in user.memberships.filter(end_date=None).all() %} {# (6) #}
     <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
     {% endfor %}
 </ul>

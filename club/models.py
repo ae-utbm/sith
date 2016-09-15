@@ -141,7 +141,7 @@ class Membership(models.Model):
     A User is currently member of all the Clubs where its Membership has an end_date set to null/None.
     Otherwise, it's a past membership kept because it can be very useful to see who was in which Club in the past.
     """
-    user = models.ForeignKey(User, verbose_name=_('user'), related_name="membership", null=False, blank=False)
+    user = models.ForeignKey(User, verbose_name=_('user'), related_name="memberships", null=False, blank=False)
     club = models.ForeignKey(Club, verbose_name=_('club'), related_name="members", null=False, blank=False)
     start_date = models.DateField(_('start date'))
     end_date = models.DateField(_('end date'), null=True, blank=True)
@@ -176,8 +176,8 @@ class Membership(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.membership:
-            ms = user.membership.filter(club=self.club, end_date=None).first()
+        if user.memberships:
+            ms = user.memberships.filter(club=self.club, end_date=None).first()
             return (ms and ms.role >= self.role) or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
 
