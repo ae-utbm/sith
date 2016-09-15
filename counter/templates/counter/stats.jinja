@@ -31,9 +31,11 @@
                 <td>{{ customer.user.get_display_name() }}</td>
                 <td>{{ customer.user.promo or '' }}</td>
                 <td>
-                {% for m in customer.user.membership.filter(club__parent=None, end_date=None).all() %}
+                {% for m in customer.user.memberships.filter(club__parent=None, end_date=None,
+                        role__gt=settings.SITH_MAXIMUM_FREE_ROLE).all() -%}
+                    {%- if loop.index>1 -%}, {% endif -%}
                     {{ m.club.name }}
-                {% endfor %}
+                {%- endfor %}
                 </td>
                 <td>{{ r.selling_sum }} €</td>
                 <td>{{ '%.2f'|format(100 * r.selling_sum / total_sellings) }}</td>
