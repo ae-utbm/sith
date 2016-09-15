@@ -20,6 +20,7 @@ import logging
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
 from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm
 from core.models import User, SithFile
+from subscription.models import Subscription
 
 def login(request):
     """
@@ -189,10 +190,17 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
         foyer = Counter.objects.filter(name="Foyer").first()
         mde = Counter.objects.filter(name="MDE").first()
         gommette = Counter.objects.filter(name="La Gommette").first()
+        semester_start=Subscription.compute_start(d=date.today(), duration=3)
         kwargs['total_perm_time'] = sum([p.end-p.start for p in self.object.permanencies.all()], timedelta())
         kwargs['total_foyer_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=foyer)], timedelta())
         kwargs['total_mde_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=mde)], timedelta())
         kwargs['total_gommette_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=gommette)], timedelta())
+        kwargs['total_foyer_buyings'] = sum([b.unit_price*b.quantity for b in
+            self.object.customer.buyings.filter(counter=foyer, date__gte=semester_start)])
+        kwargs['total_mde_buyings'] = sum([b.unit_price*b.quantity for b in self.object.customer.buyings.filter(counter=mde,
+            date__gte=semester_start)])
+        kwargs['total_gommette_buyings'] = sum([b.unit_price*b.quantity for b in
+            self.object.customer.buyings.filter(counter=gommette, date__gte=semester_start)])
         return kwargs
 
 class UserMiniView(CanViewMixin, DetailView):

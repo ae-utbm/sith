@@ -152,7 +152,6 @@ td {
     vertical-align: top;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 0;
 }
 td>ul {
     margin-top: 0px;
@@ -165,7 +164,9 @@ tbody>tr:nth-child(even) {
 }
 tbody>tr:hover {
     background: yellow;
-    width: 100%;
+}
+tbody>tr.highlight {
+    background: orange;
 }
 .tool-bar {
     overflow: auto;

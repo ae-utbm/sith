@@ -20,9 +20,10 @@ from ajax_select import make_ajax_form, make_ajax_field
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectUser, LoginForm
 from core.models import User
-from subscription.models import Subscriber
+from subscription.models import Subscriber, Subscription
 from subscription.views import get_subscriber
 from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType, CashRegisterSummary, CashRegisterSummaryItem
+from accounting.models import CurrencyField
 
 class GetUserForm(forms.Form):
     """
@@ -692,6 +693,36 @@ class CounterActivityView(DetailView):
     model = Counter
     pk_url_kwarg = "counter_id"
     template_name = 'counter/activity.jinja'
+
+class CounterStatView(DetailView):
+    """
+    Show the bar stats
+    """
+    model = Counter
+    pk_url_kwarg = "counter_id"
+    template_name = 'counter/stats.jinja'
+
+    def get_context_data(self, **kwargs):
+        """ Add stats to the context """
+        from django.db.models import Sum, Case, When, F, DecimalField
+        kwargs = super(CounterStatView, self).get_context_data(**kwargs)
+        kwargs['Customer'] = Customer
+        semester_start = Subscription.compute_start(d=date.today(), duration=3)
+        kwargs['total_sellings'] = Selling.objects.filter(date__gte=semester_start,
+                counter=self.object).aggregate(total_sellings=Sum(F('quantity')*F('unit_price'),
+                    output_field=CurrencyField()))['total_sellings']
+        kwargs['top'] = Selling.objects.values('customer__user').annotate(
+                selling_sum=Sum(
+                    Case(When(counter=self.object,
+                            date__gte=semester_start,
+                            unit_price__gt=0,
+                        then=F('unit_price')*F('quantity')),
+                        output_field=CurrencyField()
+                        )
+                    )
+                ).exclude(selling_sum=None).order_by('-selling_sum').all()[:100]
+        return kwargs
+
 
 class CashSummaryListView(CanEditPropMixin, CounterTabsMixin, ListView):
     """Display a list of cash summaries"""

@@ -15,6 +15,7 @@
     <a href="{{ url('eboutic:main') }}">{{ c }}</a> -
     {% if user.can_edit(c) %}
     <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a> -
+    <a href="{{ url('counter:stats', counter_id=c.id) }}">{% trans %}Stats{% endtrans %}</a> -
     {% endif %}
     {% if user.is_owner(c) %}
     <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a>
@@ -29,6 +30,7 @@
     <a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
     {% if user.can_edit(c) %}
     <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a> -
+    <a href="{{ url('counter:stats', counter_id=c.id) }}">{% trans %}Stats{% endtrans %}</a> -
     {% endif %}
     {% if user.is_owner(c) %}
     <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a>
@@ -43,6 +45,7 @@
     <a href="{{ url('counter:details', counter_id=c.id) }}">{{ c }}</a> -
     {% if user.can_edit(c) %}
     <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a> -
+    <a href="{{ url('counter:stats', counter_id=c.id) }}">{% trans %}Stats{% endtrans %}</a> -
     {% endif %}
     {% if user.is_owner(c) %}
     <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a>

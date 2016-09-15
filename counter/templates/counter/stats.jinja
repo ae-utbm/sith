@@ -1,0 +1,47 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+
+{% block title %}
+{% trans counter_name=counter %}{{ counter_name }} stats{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans counter_name=counter %}{{ counter_name }} stats{% endtrans %}</h3>
+    <h4>{% trans counter_name=counter.name %}Top 100 {{ counter_name }}{% endtrans %}</h4>
+    <table>
+        <thead>
+            <tr>
+                <td>{% trans %}Nb{% endtrans %}</td>
+                <td>{% trans %}User{% endtrans %}</td>
+                <td>{% trans %}Promo{% endtrans %}</td>
+                <td>{% trans %}Clubs{% endtrans %}</td>
+                <td>{% trans %}Total{% endtrans %}</td>
+                <td>{% trans %}Percentage{% endtrans %}</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for r in top %}
+            {% set customer=Customer.objects.filter(user__id=r.customer__user).first() %}
+            {% if customer.user == user %}
+            <tr class="highlight">
+            {% else %}
+            <tr>
+            {% endif %}
+                <td>{{ loop.index }}</td>
+                <td>{{ customer.user.get_display_name() }}</td>
+                <td>{{ customer.user.promo or '' }}</td>
+                <td>
+                {% for m in customer.user.membership.filter(club__parent=None, end_date=None).all() %}
+                    {{ m.club.name }}
+                {% endfor %}
+                </td>
+                <td>{{ r.selling_sum }} €</td>
+                <td>{{ '%.2f'|format(100 * r.selling_sum / total_sellings) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+
+
