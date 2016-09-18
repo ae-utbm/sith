@@ -57,7 +57,9 @@
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
     {% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
+    {% if user == profile or user.is_root %}
     {% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}<br/>
+    {% endif %}
     {# Shows tokens bought by the user #}
     {{ show_tokens(profile) }}
     {# Shows slots took by the user #}
