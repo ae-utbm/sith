@@ -944,6 +944,24 @@ def migrate_accounting():
     migrate_operations()
     make_operation_links()
 
+def migrate_godfathers():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM parrains
+    """)
+    for r in cur:
+        try:
+            father = User.objects.filter(id=r['id_utilisateur']).first()
+            child = User.objects.filter(id=r['id_utilisateur_fillot']).first()
+            father.godchildren.add(child)
+            father.save()
+        except Exception as e:
+            print("FAIL to migrate godfathering: %s" % (repr(e)))
+    cur.close()
+    print("Godfathers migrated at %s" % datetime.datetime.now())
+    print("Running time: %s" % (datetime.datetime.now()-start))
+
 def main():
     print("Start at %s" % start)
     # Core
@@ -957,8 +975,9 @@ def main():
     # check_accounts()
     # Accounting
     # migrate_accounting()
-    reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
-    # end = datetime.datetime.now()
+    migrate_godfathers()
+    # reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
+    end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end-start))
 

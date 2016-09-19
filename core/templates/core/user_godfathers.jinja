@@ -1,0 +1,29 @@
+{% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import user_link_with_pict %}
+
+{% block title %}
+{% trans user_name=profile.get_display_name() %}{{ user_name }}'s godfathers{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <h4>{% trans %}Godfathers{% endtrans %}</h4>
+    <ul>
+        {% for u in profile.godfathers.all() %}
+            <li>{{ user_link_with_pict(u) }}</li>
+        {% endfor %}
+    </ul>
+    <h4>{% trans %}Godchildren{% endtrans %}</h4>
+    <ul>
+        {% for u in profile.godchildren.all() %}
+            <li>{{ user_link_with_pict(u) }}</li>
+        {% endfor %}
+    </ul>
+    {% if profile == user %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p() }}
+        <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+    </form>
+    {% endif %}
+{% endblock %}
+

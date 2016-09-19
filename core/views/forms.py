@@ -6,6 +6,7 @@ from django.contrib.auth import logout, login, authenticate
 from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput, DateTimeInput
 from django.utils.translation import ugettext as _
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
+from ajax_select.fields import AutoCompleteSelectField
 
 import logging
 import re
@@ -197,6 +198,10 @@ class UserPropForm(forms.ModelForm):
         widgets = {
             'groups': CheckboxSelectMultiple,
         }
+
+class UserGodfathersForm(forms.Form):
+    type = forms.ChoiceField(choices=[('godfather', _("Godfather")), ('godchild', _("Godchild"))], label=_("Add"))
+    user = AutoCompleteSelectField('users', required=True, label=_("Select user"), help_text=None)
 
 class PagePropForm(forms.ModelForm):
     error_css_class = 'error'

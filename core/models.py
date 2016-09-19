@@ -168,6 +168,7 @@ class User(AbstractBaseUser):
     address = models.CharField(_("address"), max_length=128, blank=True, default="")
     parent_address = models.CharField(_("parent address"), max_length=128, blank=True, default="")
     is_subscriber_viewable = models.BooleanField(_("is subscriber viewable"), default=True)
+    godfathers = models.ManyToManyField('User', related_name='godchildren', blank=True)
 
     objects = UserManager()
 

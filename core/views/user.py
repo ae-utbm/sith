@@ -18,7 +18,7 @@ from datetime import timedelta, datetime, date
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
-from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm
+from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm, UserGodfathersForm
 from core.models import User, SithFile
 from subscription.models import Subscription
 
@@ -128,6 +128,11 @@ class UserTabsMixin(TabedViewMixin):
                     'slug': 'infos',
                     'name': _("Infos"),
                     })
+        tab_list.append({
+                    'url': reverse('core:user_godfathers', kwargs={'user_id': self.object.id}),
+                    'slug': 'godfather',
+                    'name': _("Godfathers"),
+                    })
         if self.request.user == self.object:
             tab_list.append({
                         'url': reverse('core:user_tools'),
@@ -173,6 +178,37 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_detail.jinja"
     current_tab = 'infos'
+
+class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
+    """
+    Display a user's godfathers
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    context_object_name = "profile"
+    template_name = "core/user_godfathers.jinja"
+    current_tab = 'godfathers'
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.form = UserGodfathersForm(request.POST)
+        if self.form.is_valid() and self.form.cleaned_data['user'] != self.object:
+            if self.form.cleaned_data['type'] == 'godfather':
+                self.object.godfathers.add(self.form.cleaned_data['user'])
+                self.object.save()
+            else:
+                self.object.godchildren.add(self.form.cleaned_data['user'])
+                self.object.save()
+            self.form = UserGodfathersForm()
+        return super(UserGodfathersView, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserGodfathersView, self).get_context_data(**kwargs)
+        try:
+            kwargs['form'] = self.form
+        except:
+            kwargs['form'] = UserGodfathersForm()
+        return kwargs
 
 class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     """
