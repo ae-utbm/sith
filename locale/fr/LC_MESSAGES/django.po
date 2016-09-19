@@ -1828,11 +1828,11 @@ msgstr "Mauvais format d'image, seuls les jpeg, png, et gif sont acceptés"
 
 #: core/views/forms.py:203
 msgid "Godfather"
-msgstr ""
+msgstr "Parrain"
 
 #: core/views/forms.py:203
 msgid "Godchild"
-msgstr ""
+msgstr "Fillot"
 
 #: core/views/forms.py:204 counter/views.py:37
 msgid "Select user"

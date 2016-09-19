@@ -130,7 +130,7 @@ class UserTabsMixin(TabedViewMixin):
                     })
         tab_list.append({
                     'url': reverse('core:user_godfathers', kwargs={'user_id': self.object.id}),
-                    'slug': 'godfather',
+                    'slug': 'godfathers',
                     'name': _("Godfathers"),
                     })
         if self.request.user == self.object:
