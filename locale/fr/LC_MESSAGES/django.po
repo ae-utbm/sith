@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-15 11:21+0200\n"
+"POT-Creation-Date: 2016-09-19 20:31+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -123,7 +123,7 @@ msgstr "numéro"
 msgid "journal"
 msgstr "classeur"
 
-#: accounting/models.py:179 core/models.py:460 core/models.py:738
+#: accounting/models.py:179 core/models.py:461 core/models.py:739
 #: counter/models.py:213 counter/models.py:256 counter/models.py:339
 #: eboutic/models.py:15 eboutic/models.py:48
 msgid "date"
@@ -174,7 +174,7 @@ msgstr "Utilisateur"
 msgid "Club"
 msgstr "Club"
 
-#: accounting/models.py:190 core/views/user.py:162
+#: accounting/models.py:190 core/views/user.py:167
 msgid "Account"
 msgstr "Compte"
 
@@ -327,7 +327,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/club_account_details.jinja:53
 #: accounting/templates/accounting/journal_details.jinja:66 club/views.py:52
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
-#: core/templates/core/user_tools.jinja:34 core/views/user.py:146
+#: core/templates/core/user_tools.jinja:34 core/views/user.py:151
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:32
 #: counter/templates/counter/counter_list.jinja:47
@@ -494,6 +494,7 @@ msgstr "Éditer l'opération"
 #: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:12
 #: core/templates/core/file_edit.jinja:8 core/templates/core/page_prop.jinja:8
 #: core/templates/core/pagerev_edit.jinja:24
+#: core/templates/core/user_godfathers.jinja:25
 #: counter/templates/counter/cash_register_summary.jinja:22
 #: subscription/templates/subscription/subscription.jinja:23
 msgid "Save"
@@ -608,7 +609,8 @@ msgid "Mark as old"
 msgstr "Marquer comme ancien"
 
 #: club/templates/club/club_members.jinja:30
-#: core/templates/core/file_detail.jinja:19 launderette/views.py:146
+#: core/templates/core/file_detail.jinja:19 core/views/forms.py:203
+#: launderette/views.py:146
 msgid "Add"
 msgstr "Ajouter"
 
@@ -715,7 +717,7 @@ msgstr "Membres"
 msgid "Old members"
 msgstr "Anciens membres"
 
-#: club/views.py:47 core/templates/core/base.jinja:40 core/views/user.py:135
+#: club/views.py:47 core/templates/core/base.jinja:40 core/views/user.py:140
 msgid "Tools"
 msgstr "Outils"
 
@@ -1012,120 +1014,120 @@ msgstr "adresse des parents"
 msgid "is subscriber viewable"
 msgstr "profil visible par les cotisants"
 
-#: core/models.py:274
+#: core/models.py:275
 msgid "A user with that username already exists"
 msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 
-#: core/models.py:395 core/templates/core/macros.jinja:17
+#: core/models.py:396 core/templates/core/macros.jinja:17
 #: core/templates/core/user_detail.jinja:15
 #: core/templates/core/user_detail.jinja:17
 #: core/templates/core/user_edit.jinja:16
 msgid "Profile"
 msgstr "Profil"
 
-#: core/models.py:437
+#: core/models.py:438
 msgid "Visitor"
 msgstr "Visiteur"
 
-#: core/models.py:442
+#: core/models.py:443
 msgid "define if we show a users stats"
 msgstr "Definit si l'on montre les statistiques de l'utilisateur"
 
-#: core/models.py:444
+#: core/models.py:445
 msgid "Show your account statistics to others"
 msgstr "Montrez vos statistiques de compte aux autres"
 
-#: core/models.py:451
+#: core/models.py:452
 msgid "file name"
 msgstr "nom du fichier"
 
-#: core/models.py:452 core/models.py:587
+#: core/models.py:453 core/models.py:588
 msgid "parent"
 msgstr "parent"
 
-#: core/models.py:453 core/models.py:463
+#: core/models.py:454 core/models.py:464
 msgid "file"
 msgstr "fichier"
 
-#: core/models.py:454
+#: core/models.py:455
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:455 core/models.py:593
+#: core/models.py:456 core/models.py:594
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:456 core/models.py:594
+#: core/models.py:457 core/models.py:595
 msgid "view group"
 msgstr "groupe de vue"
 
-#: core/models.py:457
+#: core/models.py:458
 msgid "is folder"
 msgstr "est un dossier"
 
-#: core/models.py:458
+#: core/models.py:459
 msgid "mime type"
 msgstr "type mime"
 
-#: core/models.py:459
+#: core/models.py:460
 msgid "size"
 msgstr "taille"
 
-#: core/models.py:491
+#: core/models.py:492
 msgid "Character '/' not authorized in name"
 msgstr "Le caractère '/' n'est pas autorisé dans les noms de fichier"
 
-#: core/models.py:494 core/models.py:499
+#: core/models.py:495 core/models.py:500
 msgid "Loop in folder tree"
 msgstr "Boucle dans l'arborescence des dossiers"
 
-#: core/models.py:503
+#: core/models.py:504
 msgid "You can not make a file be a children of a non folder file"
 msgstr ""
 "Vous ne pouvez pas mettre un fichier enfant de quelque chose qui n'est pas "
 "un dossier"
 
-#: core/models.py:507
+#: core/models.py:508
 msgid "Duplicate file"
 msgstr "Un fichier de ce nom existe déjà"
 
-#: core/models.py:517
+#: core/models.py:518
 msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
-#: core/models.py:542
+#: core/models.py:543
 msgid "Folder: "
 msgstr "Dossier : "
 
-#: core/models.py:544
+#: core/models.py:545
 msgid "File: "
 msgstr "Fichier : "
 
-#: core/models.py:586 core/models.py:590
+#: core/models.py:587 core/models.py:591
 msgid "page name"
 msgstr "nom de la page"
 
-#: core/models.py:591
+#: core/models.py:592
 msgid "owner group"
 msgstr "groupe propriétaire"
 
-#: core/models.py:622
+#: core/models.py:623
 msgid "Duplicate page"
 msgstr "Une page de ce nom existe déjà"
 
-#: core/models.py:628
+#: core/models.py:629
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:735
+#: core/models.py:736
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:736
+#: core/models.py:737
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:737
+#: core/models.py:738
 msgid "page content"
 msgstr "contenu de la page"
 
@@ -1689,6 +1691,18 @@ msgstr "Changer mon mot de passe"
 msgid "Change user password"
 msgstr "Changer le mot de passe"
 
+#: core/templates/core/user_godfathers.jinja:5
+msgid "%(user_name)s's godfathers"
+msgstr "Parrains de %(user_name)s"
+
+#: core/templates/core/user_godfathers.jinja:9 core/views/user.py:134
+msgid "Godfathers"
+msgstr "Parrains"
+
+#: core/templates/core/user_godfathers.jinja:15
+msgid "Godchildren"
+msgstr "Fillots"
+
 #: core/templates/core/user_group.jinja:4
 #, python-format
 msgid "Edit user groups for %(user_name)s"
@@ -1724,7 +1738,7 @@ msgstr "Outils utilisateurs"
 msgid "Sith management"
 msgstr "Gestion de Sith"
 
-#: core/templates/core/user_tools.jinja:14 core/views/user.py:152
+#: core/templates/core/user_tools.jinja:14 core/views/user.py:157
 msgid "Groups"
 msgstr "Groupes"
 
@@ -1775,24 +1789,24 @@ msgstr "Ajouter un nouveau dossier"
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py:61 core/views/forms.py:180 core/views/forms.py:184
+#: core/views/files.py:61 core/views/forms.py:181 core/views/forms.py:185
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoie du fichier %(file_name)s : %(msg)s"
 
-#: core/views/forms.py:58 core/views/forms.py:61
+#: core/views/forms.py:59 core/views/forms.py:62
 msgid "Choose file"
 msgstr "Choisir un fichier"
 
-#: core/views/forms.py:72 core/views/forms.py:75
+#: core/views/forms.py:73 core/views/forms.py:76
 msgid "Choose user"
 msgstr "Choisir un utilisateur"
 
-#: core/views/forms.py:97
+#: core/views/forms.py:98
 msgid "Username, email, or account number"
 msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
-#: core/views/forms.py:139
+#: core/views/forms.py:140
 msgid ""
 "Profile: you need to be visible on the picture, in order to be recognized (e."
 "g. by the barmen)"
@@ -1800,25 +1814,37 @@ msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
 
-#: core/views/forms.py:140
+#: core/views/forms.py:141
 msgid "Avatar: used on the forum"
 msgstr "Avatar : utilisé sur le forum"
 
-#: core/views/forms.py:141
+#: core/views/forms.py:142
 msgid "Scrub: let other know how your scrub looks like!"
 msgstr "Blouse : montrez aux autres à quoi ressemble votre blouse !"
 
-#: core/views/forms.py:185
+#: core/views/forms.py:186
 msgid "Bad image format, only jpeg, png, and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, et gif sont acceptés"
 
-#: core/views/user.py:140 counter/templates/counter/counter_list.jinja:18
+#: core/views/forms.py:203
+msgid "Godfather"
+msgstr ""
+
+#: core/views/forms.py:203
+msgid "Godchild"
+msgstr ""
+
+#: core/views/forms.py:204 counter/views.py:37
+msgid "Select user"
+msgstr "Choisir un utilisateur"
+
+#: core/views/user.py:145 counter/templates/counter/counter_list.jinja:18
 #: counter/templates/counter/counter_list.jinja:33
 #: counter/templates/counter/counter_list.jinja:48
 msgid "Stats"
 msgstr "Stats"
 
-#: core/views/user.py:236
+#: core/views/user.py:272
 msgid "User already has a profile picture"
 msgstr "L'utilisateur a déjà une photo de profil"
 
@@ -2139,10 +2165,12 @@ msgstr "Il n'y a pas de types de produit dans ce site web."
 
 #: counter/templates/counter/stats.jinja:5
 #: counter/templates/counter/stats.jinja:9
+#, python-format
 msgid "%(counter_name)s stats"
 msgstr "Stats sur %(counter_name)s"
 
 #: counter/templates/counter/stats.jinja:10
+#, python-format
 msgid "Top 100 %(counter_name)s"
 msgstr "Top 100 %(counter_name)s"
 
@@ -2153,10 +2181,6 @@ msgstr "Promo"
 #: counter/templates/counter/stats.jinja:19
 msgid "Percentage"
 msgstr "Pourcentage"
-
-#: counter/views.py:37
-msgid "Select user"
-msgstr "Choisir un utilisateur"
 
 #: counter/views.py:53
 msgid "User not found"
