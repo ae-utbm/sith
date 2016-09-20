@@ -19,15 +19,17 @@ header {
     display: block;
     position: absolute;
     top : 0px;
-    right : 8%;
+    right : 2%;
     background-color:#DDD;
     margin: 0 10px;
     padding: 0 10px;
+    border-radius: 0 0 10px 10px;
 }
 header ul {
     display: inline-block;
     list-style-type: none;
     margin: 0px;
+    padding-right: 3px;
     vertical-align: middle;
 }
 header a {
@@ -51,8 +53,15 @@ header form {
 }
 #language_chooser {
     position: absolute;
+    text-align: center;
     left: 5px;
     top: 5px;
+}
+
+#language_chooser input {
+    margin: 2px;
+    width: 3em;
+    height: 2em;
 }
 
 /*---------------------------------NAV---------------------------------*/
@@ -73,7 +82,7 @@ nav a {
     padding: 20px;
 }
 nav a:hover {
-    background: purple;
+    background: #535353;
     color: white;
 }
 
@@ -147,7 +156,8 @@ table {
 }
 td {
     padding: 4px;
-    border: solid 1px black;
+    margin: 5px;
+    border: solid 1px darkgrey;
     border-collapse: collapse;
     vertical-align: top;
     overflow: hidden;
@@ -163,10 +173,8 @@ tbody>tr:nth-child(even) {
     background: lightgrey;
 }
 tbody>tr:hover {
-    background: yellow;
-}
-tbody>tr.highlight {
-    background: orange;
+    background: darkgrey;
+    width: 100%;
 }
 .tool-bar {
     overflow: auto;
