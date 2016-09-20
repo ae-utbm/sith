@@ -9,13 +9,15 @@
     <h4>{% trans %}Godfathers{% endtrans %}</h4>
     <ul>
         {% for u in profile.godfathers.all() %}
-            <li>{{ user_link_with_pict(u) }}</li>
+            <li> <a href="{{ url("core:user_godfathers", user_id=u.id) }}" class="mini_profile_link" >
+                {{ u.get_mini_item()|safe }} </a> </li>
         {% endfor %}
     </ul>
     <h4>{% trans %}Godchildren{% endtrans %}</h4>
     <ul>
         {% for u in profile.godchildren.all() %}
-            <li>{{ user_link_with_pict(u) }}</li>
+            <li> <a href="{{ url("core:user_godfathers", user_id=u.id) }}" class="mini_profile_link" >
+                {{ u.get_mini_item()|safe }} </a> </li>
         {% endfor %}
     </ul>
     {% if profile == user %}

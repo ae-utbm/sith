@@ -31,7 +31,8 @@
     {% for b in settings.SITH_COUNTER_BARS %}
     {% if user.is_in_group(b[1]+" admin") %}
     <li><a href="{{ url('counter:details', counter_id=b[0]) }}">{{ b[1] }}</a> -
-        <a href="{{ url('counter:admin', counter_id=b[0]) }}">{% trans %}Edit{% endtrans %}</a></li>
+        <a href="{{ url('counter:admin', counter_id=b[0]) }}">{% trans %}Edit{% endtrans %}</a> -
+        <a href="{{ url('counter:stats', counter_id=b[0]) }}">{% trans %}Stats{% endtrans %}</a></li>
     {% endif %}
     {% endfor %}
 </ul>
