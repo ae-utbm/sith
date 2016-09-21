@@ -44,6 +44,14 @@ class Customer(models.Model):
             raise ValidationError(_("Not enough money"))
         super(Customer, self).save(*args, **kwargs)
 
+    def recompute_amount(self):
+        self.amount = 0
+        for r in self.refillings.all():
+            self.amount += r.amount
+        for s in self.buyings.filter(payment_method="SITH_ACCOUNT"):
+            self.amount -= s.quantity * s.unit_price
+            self.save()
+
 class ProductType(models.Model):
     """
     This describes a product type

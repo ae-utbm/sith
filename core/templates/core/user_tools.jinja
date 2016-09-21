@@ -12,6 +12,7 @@
 <ul>
     {% if user.is_root %}
     <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
+    <li><a href="{{ url('rootplace:merge') }}">{% trans %}Merge users{% endtrans %}</a></li>
     {% endif %}
     {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root %}
     <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>

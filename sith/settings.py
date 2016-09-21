@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'eboutic',
     'launderette',
     'api',
+    'rootplace',
 )
 
 MIDDLEWARE_CLASSES = (

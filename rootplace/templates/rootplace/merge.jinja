@@ -1,0 +1,14 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Merge users{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <h3>{% trans %}Merge two users{% endtrans %}</h3>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p() }}
+        <p><input type="submit" value="{% trans %}Merge{% endtrans %}" /></p>
+    </form>
+{% endblock %}

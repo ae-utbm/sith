@@ -29,6 +29,7 @@ handler404 = "core.views.not_found"
 
 urlpatterns = [
     url(r'^', include('core.urls', namespace="core", app_name="core")),
+    url(r'^rootplace/', include('rootplace.urls', namespace="rootplace", app_name="rootplace")),
     url(r'^subscription/', include('subscription.urls', namespace="subscription", app_name="subscription")),
     url(r'^club/', include('club.urls', namespace="club", app_name="club")),
     url(r'^counter/', include('counter.urls', namespace="counter", app_name="counter")),
