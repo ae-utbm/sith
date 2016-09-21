@@ -227,10 +227,10 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
         mde = Counter.objects.filter(name="MDE").first()
         gommette = Counter.objects.filter(name="La Gommette").first()
         semester_start=Subscription.compute_start(d=date.today(), duration=3)
-        kwargs['total_perm_time'] = sum([p.end-p.start for p in self.object.permanencies.all()], timedelta())
-        kwargs['total_foyer_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=foyer)], timedelta())
-        kwargs['total_mde_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=mde)], timedelta())
-        kwargs['total_gommette_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=gommette)], timedelta())
+        kwargs['total_perm_time'] = sum([p.end-p.start for p in self.object.permanencies.exclude(end=None)], timedelta())
+        kwargs['total_foyer_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=foyer).exclude(end=None)], timedelta())
+        kwargs['total_mde_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=mde).exclude(end=None)], timedelta())
+        kwargs['total_gommette_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=gommette).exclude(end=None)], timedelta())
         kwargs['total_foyer_buyings'] = sum([b.unit_price*b.quantity for b in
             self.object.customer.buyings.filter(counter=foyer, date__gte=semester_start)])
         kwargs['total_mde_buyings'] = sum([b.unit_price*b.quantity for b in self.object.customer.buyings.filter(counter=mde,
