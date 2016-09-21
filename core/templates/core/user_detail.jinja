@@ -59,8 +59,6 @@
     {% if user == profile or user.is_root or user.is_office %}
         {% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
         {% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}<br/>
-    {% endif %}
-    {% if user == profile or user.is_root or user.is_office or user.is_launderette %}
         {# Shows tokens bought by the user #}
         {{ show_tokens(profile) }}
         {# Shows slots took by the user #}
