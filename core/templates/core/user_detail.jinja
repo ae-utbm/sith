@@ -56,9 +56,11 @@
 {# if the user is member of a club, he can view the subscription state #}
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
-    {% if user == profile or user.is_root or user.is_office %}
+    {% if user == profile or user.is_root or user.is_board_member %}
         {% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
         {% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}<br/>
+    {% endif %}
+    {% if user == profile or user.is_root or user.is_board_member or user.is_launderette_manager %}
         {# Shows tokens bought by the user #}
         {{ show_tokens(profile) }}
         {# Shows slots took by the user #}
