@@ -222,7 +222,8 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserStatsView, self).get_context_data(**kwargs)
-        from counter.models import Counter
+        from counter.models import Counter, Product, Selling
+        from django.db.models import Sum
         foyer = Counter.objects.filter(name="Foyer").first()
         mde = Counter.objects.filter(name="MDE").first()
         gommette = Counter.objects.filter(name="La Gommette").first()
@@ -237,6 +238,8 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
             date__gte=semester_start)])
         kwargs['total_gommette_buyings'] = sum([b.unit_price*b.quantity for b in
             self.object.customer.buyings.filter(counter=gommette, date__gte=semester_start)])
+        kwargs['top_product'] = self.object.customer.buyings.values('product__name').annotate(
+                product_sum=Sum('quantity')).exclude(product_sum=None).order_by('-product_sum').all()[:10]
         return kwargs
 
 class UserMiniView(CanViewMixin, DetailView):

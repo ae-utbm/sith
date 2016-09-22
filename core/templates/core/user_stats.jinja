@@ -6,20 +6,37 @@
 
 {% block content %}
     {% if profile.permanencies %}
+    <h3>{% trans %}Permanencies{% endtrans %}</h3>
     <div>
-        <h3>{% trans %}Permanencies{% endtrans %}</h3>
         <p>Total: {{ total_perm_time }}</p>
         <p>Foyer: {{ total_foyer_time }}</p>
         <p>MDE: {{ total_mde_time }}</p>
         <p>La Gommette: {{ total_gommette_time }}</p>
     </div>
     {% endif %}
+    <h3>{% trans %}Buyings{% endtrans %}</h3>
     <div>
-        <h3>{% trans %}Buyings{% endtrans %}</h3>
         <p>Foyer: {{ total_foyer_buyings }} €</p>
         <p>MDE: {{ total_mde_buyings }} €</p>
         <p>La Gommette: {{ total_gommette_buyings }} €</p>
     </div>
+    <h3>{% trans %}Product top 10{% endtrans %}</h3>
+    <table>
+        <thead>
+            <tr>
+                <td>{% trans %}Product{% endtrans %}</td>
+                <td>{% trans %}Quantity{% endtrans %}</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in top_product %}
+            <tr>
+                <td>{{ p['product__name'] }}</td>
+                <td>{{ p['product_sum'] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 
