@@ -234,7 +234,12 @@ class User(AbstractBaseUser):
     @property
     def is_office(self):
         from club.models import Club
-        return Club.objects.filter(unix_name='ae').first().get_membership_for(self)
+        return Club.objects.filter(unix_name=settings.SITH_MAIN_CLUB['unix_name']).first().get_membership_for(self)
+
+    @property
+    def is_launderette(self):
+        from club.models import Club
+        return Club.objects.filter(unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name']).first().get_membership_for(self)
 
     def save(self, *args, **kwargs):
         create = False
