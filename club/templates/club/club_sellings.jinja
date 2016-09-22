@@ -36,6 +36,9 @@
             <td>{{ s.quantity }}</td>
             <td>{{ s.quantity * s.unit_price }} €</td>
             <td>{{ s.get_payment_method_display() }}</td>
+            {% if s.is_owned_by(user) %}
+                <td><a href="{{ url('counter:selling_delete', selling_id=s.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>

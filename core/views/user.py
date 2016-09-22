@@ -439,3 +439,4 @@ class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
             pass
         kwargs['tab'] = "account"
         return kwargs
+
