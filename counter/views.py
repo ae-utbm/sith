@@ -104,7 +104,7 @@ class CounterMain(DetailView, CheckTokenMixin, ProcessFormView, FormMixin):
         kwargs['form'] = self.get_form()
         kwargs['form'].cleaned_data = {} # same as above
         if "bad_location" in self.request.GET:
-            kwargs['form'].add_error(None, _("Bad location"))
+            kwargs['form'].add_error(None, _("Bad location, someone is already logged in somewhere else"))
         if self.object.type == 'BAR':
             kwargs['barmen'] = self.object.get_barmen_list()
         elif self.request.user.is_authenticated():
