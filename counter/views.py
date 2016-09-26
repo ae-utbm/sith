@@ -62,7 +62,14 @@ class RefillForm(forms.ModelForm):
         model = Refilling
         fields = ['amount', 'payment_method', 'bank']
 
-class CounterMain(DetailView, ProcessFormView, FormMixin):
+class CheckTokenMixin:
+    def post(self, request, *args, **kwargs):
+        if not ('counter_token' in self.request.session.keys() and self.request.session['counter_token'] == self.object.token):
+            return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
+                kwargs={'counter_id': self.object.id})+'?bad_location')
+        return super(CheckTokenMixin, self).post(request, *args, **kwargs)
+
+class CounterMain(DetailView, CheckTokenMixin, ProcessFormView, FormMixin):
     """
     The public (barman) view
     """
@@ -70,6 +77,14 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
     template_name = 'counter/counter_main.jinja'
     pk_url_kwarg = "counter_id"
     form_class = GetUserForm # Form to enter a client code and get the corresponding user id
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.type == "BAR" and not ('counter_token' in self.request.session.keys() and
+                self.request.session['counter_token'] == self.object.token): # Check the token to avoid the bar to be stolen
+            return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
+                kwargs={'counter_id': self.object.id})+'?bad_location')
+        return super(CounterMain, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """
@@ -87,6 +102,9 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
         if "sellers" in self.request.GET:
             kwargs['login_form'].add_error(None, _("User is not barman"))
         kwargs['form'] = self.get_form()
+        kwargs['form'].cleaned_data = {} # same as above
+        if "bad_location" in self.request.GET:
+            kwargs['form'].add_error(None, _("Bad location"))
         if self.object.type == 'BAR':
             kwargs['barmen'] = self.object.get_barmen_list()
         elif self.request.user.is_authenticated():
@@ -108,7 +126,7 @@ class CounterMain(DetailView, ProcessFormView, FormMixin):
     def get_success_url(self):
         return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
 
-class CounterClick(DetailView):
+class CounterClick(DetailView, CheckTokenMixin):
     """
     The click view
     This is a detail view not to have to worry about loading the counter
@@ -145,6 +163,10 @@ class CounterClick(DetailView):
                 (self.object.type == "BAR" and
                 len(self.object.get_barmen_list()) < 1)): # Check that at least one barman is logged in
             return self.cancel(request)
+        if self.object.type == "BAR" and not ('counter_token' in self.request.session.keys() and
+                self.request.session['counter_token'] == self.object.token): # Also check the token to avoid the bar to be stolen
+            return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
+                kwargs={'counter_id': self.object.id})+'?bad_location')
         if 'basket' not in request.session.keys():
             request.session['basket'] = {}
             request.session['basket_total'] = 0
@@ -346,7 +368,7 @@ class CounterLogin(RedirectView):
     """
     Handle the login of a barman
 
-    Logged barmen are stored in the class-wide variable 'barmen_session', in the Counter model
+    Logged barmen are stored in the Permanency model
     """
     permanent = False
     def post(self, request, *args, **kwargs):
@@ -360,6 +382,9 @@ class CounterLogin(RedirectView):
         if form.is_valid():
             user = User.objects.filter(username=form.cleaned_data['username']).first()
             if user in self.counter.sellers.all() and not user in self.counter.get_barmen_list():
+                if len(self.counter.get_barmen_list()) <= 0:
+                    self.counter.gen_token()
+                    request.session['counter_token'] = self.counter.token
                 self.counter.add_barman(user)
             else:
                 self.errors += ["sellers"]

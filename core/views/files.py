@@ -27,7 +27,12 @@ def send_file(request, file_id):
     f = SithFile.objects.filter(id=file_id).first()
     if f is None or f.is_folder:
         return not_found(request)
-    if not can_view(f, request.user):
+    from counter.models import Counter
+    if not (can_view(f, request.user) or
+            ('counter_token' in request.session.keys() and
+                request.session['counter_token'] and # check if not null for counters that have no token set
+                Counter.objects.filter(token=request.session['counter_token']).exists())
+            ):
         raise PermissionDenied
     name = f.file.name
     with open(settings.MEDIA_ROOT + name, 'rb') as filename:

@@ -31,6 +31,7 @@
         <p>{% trans %}Enter client code:{% endtrans %}</p>
         <form method="post" action="">
             {% csrf_token %}
+            <input type="hidden" name="counter_token" value="{{ counter.token }}" />
             {{ form.as_p() }}
             <p><input type="submit" value="{% trans %}validate{% endtrans %}" /></p>
         </form>

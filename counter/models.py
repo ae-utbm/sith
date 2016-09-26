@@ -126,6 +126,7 @@ class Counter(models.Model):
     sellers = models.ManyToManyField(Subscriber, verbose_name=_('sellers'), related_name='counters', blank=True)
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
+    token = models.CharField(_('token'), max_length=30, null=True, blank=True)
 
     class Meta:
         verbose_name = _('counter')
@@ -154,6 +155,11 @@ class Counter(models.Model):
             return True
         sub = get_subscriber(request.user)
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or sub in self.sellers
+
+    def gen_token(self):
+        """Generate a new token for this counter"""
+        self.token = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(30))
+        self.save()
 
     def add_barman(self, user):
         """
