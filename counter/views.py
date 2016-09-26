@@ -4,6 +4,7 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView, Proces
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.core.urlresolvers import reverse_lazy
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from django import forms
@@ -722,6 +723,16 @@ class CounterStatView(DetailView):
                     )
                 ).exclude(selling_sum=None).order_by('-selling_sum').all()[:100]
         return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        res = super(CounterStatView, self).dispatch(request, *args, **kwargs)
+        # help(self.object)
+        if (request.user.is_root
+            or request.user.is_board_member
+            or self.object.is_owned_by(request.user)
+            ):
+            return res
+        raise PermissionDenied
 
 
 class CashSummaryListView(CanEditPropMixin, CounterTabsMixin, ListView):
