@@ -273,7 +273,6 @@ class UserUploadProfilePictView(CanEditMixin, DetailView):
         self.object = self.get_object()
         if self.object.profile_pict:
             raise ValidationError(_("User already has a profile picture"))
-        print(request.FILES['new_profile_pict'])
         f = request.FILES['new_profile_pict']
         parent = SithFile.objects.filter(parent=None, name="profiles").first()
         name = str(self.object.id) + "_profile.jpg" # Webcamejs uploads JPGs

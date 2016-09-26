@@ -221,7 +221,6 @@ class OperationForm(forms.ModelForm):
 
     def clean(self):
         self.cleaned_data = super(OperationForm, self).clean()
-        print(self.errors)
         if self.cleaned_data['target_type'] == "USER":
             self.cleaned_data['target_id'] = self.cleaned_data['user'].id
         elif self.cleaned_data['target_type'] == "ACCOUNT":
