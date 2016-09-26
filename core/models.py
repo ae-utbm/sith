@@ -231,6 +231,16 @@ class User(AbstractBaseUser):
     def is_root(self):
         return self.is_superuser or self.groups.filter(name=settings.SITH_GROUPS['root']['name']).exists()
 
+    @property
+    def is_board_member(self):
+        from club.models import Club
+        return Club.objects.filter(unix_name=settings.SITH_MAIN_CLUB['unix_name']).first().get_membership_for(self)
+
+    @property
+    def is_launderette_manager(self):
+        from club.models import Club
+        return Club.objects.filter(unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name']).first().get_membership_for(self)
+
     def save(self, *args, **kwargs):
         create = False
         with transaction.atomic():
