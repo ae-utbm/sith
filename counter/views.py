@@ -695,7 +695,7 @@ class CounterActivityView(DetailView):
     pk_url_kwarg = "counter_id"
     template_name = 'counter/activity.jinja'
 
-class CounterStatView(DetailView):
+class CounterStatView(DetailView, CanEditMixin):
     """
     Show the bar stats
     """
@@ -725,13 +725,15 @@ class CounterStatView(DetailView):
         return kwargs
 
     def dispatch(self, request, *args, **kwargs):
-        res = super(CounterStatView, self).dispatch(request, *args, **kwargs)
-        # help(self.object)
-        if (request.user.is_root
-            or request.user.is_board_member
-            or self.object.is_owned_by(request.user)
-            ):
-            return res
+        try:
+            return super(CounterStatView, self).dispatch(request, *args, **kwargs)
+        except:
+            try:
+                if (request.user.is_root
+                    or request.user.is_board_member
+                    or self.object.is_owned_by(request.user)):
+                    return super(CanEditMixin, self).dispatch(request, *args, **kwargs)
+            except:pass
         raise PermissionDenied
 
 
