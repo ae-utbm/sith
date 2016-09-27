@@ -728,12 +728,10 @@ class CounterStatView(DetailView, CanEditMixin):
         try:
             return super(CounterStatView, self).dispatch(request, *args, **kwargs)
         except:
-            try:
-                if (request.user.is_root
-                    or request.user.is_board_member
-                    or self.object.is_owned_by(request.user)):
-                    return super(CanEditMixin, self).dispatch(request, *args, **kwargs)
-            except:pass
+            if (request.user.is_root
+                or request.user.is_board_member
+                or self.object.is_owned_by(request.user)):
+                return super(CanEditMixin, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
 

@@ -423,6 +423,14 @@ class AnonymousUser(AuthAnonymousUser):
     def is_root(self):
         return False
 
+    @property
+    def is_board_member(self):
+        return False
+
+    @property
+    def is_launderette_manager(self):
+        return False
+
     def is_in_group(self, group_name):
         """
         The anonymous user is only the public group
