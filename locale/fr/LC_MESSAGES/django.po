@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-26 11:22+0200\n"
+"POT-Creation-Date: 2016-09-28 10:08+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -302,6 +302,8 @@ msgstr "Compte en banque : "
 #: core/templates/core/group_list.jinja:13
 #: core/templates/core/user_account_detail.jinja:67
 #: core/templates/core/user_edit.jinja:18
+#: counter/templates/counter/last_ops.jinja:29
+#: counter/templates/counter/last_ops.jinja:59
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:146
 msgid "Delete"
@@ -388,6 +390,7 @@ msgstr "Fin"
 #: accounting/templates/accounting/journal_details.jinja:28
 #: core/templates/core/user_account_detail.jinja:20
 #: core/templates/core/user_account_detail.jinja:81
+#: counter/templates/counter/last_ops.jinja:17
 msgid "Amount"
 msgstr "Montant"
 
@@ -454,6 +457,8 @@ msgstr "No"
 #: core/templates/core/user_account_detail.jinja:46
 #: core/templates/core/user_account_detail.jinja:79
 #: counter/templates/counter/cash_summary_list.jinja:29
+#: counter/templates/counter/last_ops.jinja:14
+#: counter/templates/counter/last_ops.jinja:39
 msgid "Date"
 msgstr "Date"
 
@@ -478,7 +483,7 @@ msgid "Done"
 msgstr "Effectué"
 
 #: accounting/templates/accounting/journal_details.jinja:34
-#: counter/templates/counter/cash_summary_list.jinja:32 counter/views.py:646
+#: counter/templates/counter/cash_summary_list.jinja:32 counter/views.py:697
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -630,6 +635,7 @@ msgstr "Au"
 
 #: club/templates/club/club_sellings.jinja:5 club/views.py:57
 #: counter/templates/counter/counter_main.jinja:19
+#: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
 
@@ -655,29 +661,35 @@ msgstr "Total : "
 #: club/templates/club/club_sellings.jinja:19 club/views.py:159
 #: core/templates/core/user_account_detail.jinja:18
 #: core/templates/core/user_account_detail.jinja:47
-#: counter/templates/counter/cash_summary_list.jinja:28
+#: counter/templates/counter/cash_summary_list.jinja:28 counter/views.py:74
 msgid "Counter"
 msgstr "Comptoir"
 
 #: club/templates/club/club_sellings.jinja:20
 #: core/templates/core/user_account_detail.jinja:19
 #: core/templates/core/user_account_detail.jinja:48
+#: counter/templates/counter/last_ops.jinja:15
+#: counter/templates/counter/last_ops.jinja:40
 msgid "Barman"
 msgstr "Barman"
 
 #: club/templates/club/club_sellings.jinja:21
 #: counter/templates/counter/counter_click.jinja:29
+#: counter/templates/counter/last_ops.jinja:16
+#: counter/templates/counter/last_ops.jinja:41
 msgid "Customer"
 msgstr "Client"
 
 #: club/templates/club/club_sellings.jinja:22
 #: core/templates/core/user_account_detail.jinja:49
+#: counter/templates/counter/last_ops.jinja:42
 msgid "Label"
 msgstr "Intitulé"
 
 #: club/templates/club/club_sellings.jinja:23
 #: core/templates/core/user_account_detail.jinja:50
 #: core/templates/core/user_stats.jinja:28
+#: counter/templates/counter/last_ops.jinja:43
 msgid "Quantity"
 msgstr "Quantité"
 
@@ -685,6 +697,7 @@ msgstr "Quantité"
 #: core/templates/core/user_account.jinja:9
 #: core/templates/core/user_account_detail.jinja:51
 #: counter/templates/counter/cash_summary_list.jinja:30
+#: counter/templates/counter/last_ops.jinja:44
 #: counter/templates/counter/stats.jinja:18
 msgid "Total"
 msgstr "Total"
@@ -692,6 +705,8 @@ msgstr "Total"
 #: club/templates/club/club_sellings.jinja:25
 #: core/templates/core/user_account_detail.jinja:21
 #: core/templates/core/user_account_detail.jinja:52
+#: counter/templates/counter/last_ops.jinja:18
+#: counter/templates/counter/last_ops.jinja:45
 msgid "Payment method"
 msgstr "Méthode de paiement"
 
@@ -1342,7 +1357,7 @@ msgid "Please login to see this page."
 msgstr "Merci de vous identifier pour voir cette page."
 
 #: core/templates/core/login.jinja:28
-#: counter/templates/counter/counter_main.jinja:54
+#: counter/templates/counter/counter_main.jinja:55
 msgid "login"
 msgstr "login"
 
@@ -1594,6 +1609,7 @@ msgstr "Compte utilisateur"
 #: core/templates/core/user_account.jinja:38
 #: core/templates/core/user_account_detail.jinja:13
 #: counter/templates/counter/cash_summary_list.jinja:12
+#: counter/templates/counter/last_ops.jinja:10
 msgid "Refillings"
 msgstr "Rechargements"
 
@@ -1759,8 +1775,8 @@ msgstr "Fusionner deux utilisateurs"
 msgid "Subscriptions"
 msgstr "Cotisations"
 
-#: core/templates/core/user_tools.jinja:23 counter/views.py:420
-#: counter/views.py:559
+#: core/templates/core/user_tools.jinja:23 counter/views.py:445
+#: counter/views.py:584
 msgid "Counters"
 msgstr "Comptoirs"
 
@@ -1781,7 +1797,7 @@ msgid "Product types management"
 msgstr "Gestion des types de produit"
 
 #: core/templates/core/user_tools.jinja:30
-#: counter/templates/counter/cash_summary_list.jinja:18 counter/views.py:440
+#: counter/templates/counter/cash_summary_list.jinja:18 counter/views.py:465
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
 
@@ -1854,7 +1870,7 @@ msgstr "Parrain"
 msgid "Godchild"
 msgstr "Fillot"
 
-#: core/views/forms.py:204 counter/views.py:37
+#: core/views/forms.py:204 counter/views.py:38
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
@@ -2036,7 +2052,7 @@ msgid "Barman list"
 msgstr "Barmans"
 
 #: counter/templates/counter/cash_register_summary.jinja:8
-#: counter/templates/counter/counter_main.jinja:44
+#: counter/templates/counter/counter_main.jinja:45
 msgid "Make a cash register summary"
 msgstr "Faire un relevé de caisse"
 
@@ -2049,7 +2065,7 @@ msgstr "Liste des relevés de caisse"
 msgid "Theoric sums"
 msgstr "Sommes théoriques"
 
-#: counter/templates/counter/cash_summary_list.jinja:31 counter/views.py:647
+#: counter/templates/counter/cash_summary_list.jinja:31 counter/views.py:698
 msgid "Emptied"
 msgstr "Coffre vidé"
 
@@ -2151,9 +2167,19 @@ msgstr "valider"
 msgid "Please, login"
 msgstr "Merci de vous identifier"
 
-#: counter/templates/counter/counter_main.jinja:47
+#: counter/templates/counter/counter_main.jinja:44
+msgid "Display last operations"
+msgstr "Dernières opérations"
+
+#: counter/templates/counter/counter_main.jinja:48
 msgid "Barman: "
 msgstr "Barman : "
+
+#: counter/templates/counter/last_ops.jinja:5
+#: counter/templates/counter/last_ops.jinja:9
+#, python-format
+msgid "%(counter_name)s last operations"
+msgstr "Dernières opérations sur %(counter_name)s"
 
 #: counter/templates/counter/product_list.jinja:4
 #: counter/templates/counter/product_list.jinja:12
@@ -2200,105 +2226,113 @@ msgstr "Promo"
 msgid "Percentage"
 msgstr "Pourcentage"
 
-#: counter/views.py:53
+#: counter/views.py:54
 msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
-#: counter/views.py:101
+#: counter/views.py:79
+msgid "Cash summary"
+msgstr "Relevé de caisse"
+
+#: counter/views.py:84
+msgid "Last operations"
+msgstr "Dernières opérations"
+
+#: counter/views.py:125
 msgid "Bad credentials"
 msgstr "Mauvais identifiants"
 
-#: counter/views.py:103
+#: counter/views.py:127
 msgid "User is not barman"
 msgstr "L'utilisateur n'est pas barman."
 
-#: counter/views.py:107
+#: counter/views.py:131
 msgid "Bad location, someone is already logged in somewhere else"
 msgstr "Mauvais comptoir, quelqu'un est déjà connecté ailleurs"
 
-#: counter/views.py:290
+#: counter/views.py:315
 msgid "END"
 msgstr "FIN"
 
-#: counter/views.py:292
+#: counter/views.py:317
 msgid "CAN"
 msgstr "ANN"
 
-#: counter/views.py:322
+#: counter/views.py:347
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: counter/views.py:415
+#: counter/views.py:440
 msgid "Counter administration"
 msgstr "Administration des comptoirs"
 
-#: counter/views.py:425
+#: counter/views.py:450
 msgid "Products"
 msgstr "Produits"
 
-#: counter/views.py:430
+#: counter/views.py:455
 msgid "Archived products"
 msgstr "Produits archivés"
 
-#: counter/views.py:435
+#: counter/views.py:460
 msgid "Product types"
 msgstr "Types de produit"
 
-#: counter/views.py:556
+#: counter/views.py:581
 msgid "Parent product"
 msgstr "Produit parent"
 
-#: counter/views.py:557
+#: counter/views.py:582
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
-#: counter/views.py:626
+#: counter/views.py:677
 msgid "10 cents"
 msgstr "10 centimes"
 
-#: counter/views.py:627
+#: counter/views.py:678
 msgid "20 cents"
 msgstr "20 centimes"
 
-#: counter/views.py:628
+#: counter/views.py:679
 msgid "50 cents"
 msgstr "50 centimes"
 
-#: counter/views.py:629
+#: counter/views.py:680
 msgid "1 euro"
 msgstr "1 €"
 
-#: counter/views.py:630
+#: counter/views.py:681
 msgid "2 euros"
 msgstr "2 €"
 
-#: counter/views.py:631
+#: counter/views.py:682
 msgid "5 euros"
 msgstr "5 €"
 
-#: counter/views.py:632
+#: counter/views.py:683
 msgid "10 euros"
 msgstr "10 €"
 
-#: counter/views.py:633
+#: counter/views.py:684
 msgid "20 euros"
 msgstr "20 €"
 
-#: counter/views.py:634
+#: counter/views.py:685
 msgid "50 euros"
 msgstr "50 €"
 
-#: counter/views.py:635
+#: counter/views.py:686
 msgid "100 euros"
 msgstr "100 €"
 
-#: counter/views.py:636 counter/views.py:638 counter/views.py:640
-#: counter/views.py:642 counter/views.py:644
+#: counter/views.py:687 counter/views.py:689 counter/views.py:691
+#: counter/views.py:693 counter/views.py:695
 msgid "Check amount"
 msgstr "Montant du chèque"
 
-#: counter/views.py:637 counter/views.py:639 counter/views.py:641
-#: counter/views.py:643 counter/views.py:645
+#: counter/views.py:688 counter/views.py:690 counter/views.py:692
+#: counter/views.py:694 counter/views.py:696
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
@@ -2434,12 +2468,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:412
+#: sith/settings.py:415
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:412
+#: sith/settings.py:415
 msgid "Drying"
 msgstr "Séchage"
 
@@ -2658,4 +2692,3 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
-

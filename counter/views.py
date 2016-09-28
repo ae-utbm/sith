@@ -1,9 +1,10 @@
 from django.shortcuts import render
+from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.utils import timezone
@@ -63,6 +64,29 @@ class RefillForm(forms.ModelForm):
         model = Refilling
         fields = ['amount', 'payment_method', 'bank']
 
+class CounterTabsMixin(TabedViewMixin):
+    def get_tabs_title(self):
+        return self.object
+    def get_list_of_tabs(self):
+        tab_list = []
+        tab_list.append({
+            'url': reverse_lazy('counter:details', kwargs={'counter_id': self.object.id}),
+            'slug': 'counter',
+            'name': _("Counter"),
+            })
+        if self.object.type == "BAR":
+            tab_list.append({
+                'url': reverse_lazy('counter:cash_summary', kwargs={'counter_id': self.object.id}),
+                'slug': 'cash_summary',
+                'name': _("Cash summary"),
+                })
+            tab_list.append({
+                'url': reverse_lazy('counter:last_ops', kwargs={'counter_id': self.object.id}),
+                'slug': 'last_ops',
+                'name': _("Last operations"),
+                })
+        return tab_list
+
 class CheckTokenMixin:
     def post(self, request, *args, **kwargs):
         if not ('counter_token' in self.request.session.keys() and self.request.session['counter_token'] == self.object.token):
@@ -70,7 +94,7 @@ class CheckTokenMixin:
                 kwargs={'counter_id': self.object.id})+'?bad_location')
         return super(CheckTokenMixin, self).post(request, *args, **kwargs)
 
-class CounterMain(DetailView, CheckTokenMixin, ProcessFormView, FormMixin):
+class CounterMain(CounterTabsMixin, DetailView, CheckTokenMixin, ProcessFormView, FormMixin):
     """
     The public (barman) view
     """
@@ -78,6 +102,7 @@ class CounterMain(DetailView, CheckTokenMixin, ProcessFormView, FormMixin):
     template_name = 'counter/counter_main.jinja'
     pk_url_kwarg = "counter_id"
     form_class = GetUserForm # Form to enter a client code and get the corresponding user id
+    current_tab = "counter"
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -127,7 +152,7 @@ class CounterMain(DetailView, CheckTokenMixin, ProcessFormView, FormMixin):
     def get_success_url(self):
         return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
 
-class CounterClick(DetailView, CheckTokenMixin):
+class CounterClick(CounterTabsMixin, DetailView, CheckTokenMixin):
     """
     The click view
     This is a detail view not to have to worry about loading the counter
@@ -136,6 +161,7 @@ class CounterClick(DetailView, CheckTokenMixin):
     model = Counter
     template_name = 'counter/counter_click.jinja'
     pk_url_kwarg = "counter_id"
+    current_tab = "counter"
 
     def get(self, request, *args, **kwargs):
         """Simple get view"""
@@ -412,7 +438,7 @@ class CounterLogout(RedirectView):
 
 ## Counter admin views
 
-class CounterTabsMixin(TabedViewMixin):
+class CounterAdminTabsMixin(TabedViewMixin):
     tabs_title = _("Counter administration")
     list_of_tabs = [
             {
@@ -442,7 +468,7 @@ class CounterTabsMixin(TabedViewMixin):
                 },
             ]
 
-class CounterListView(CounterTabsMixin, CanViewMixin, ListView):
+class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
     """
     A list view for the admins
     """
@@ -457,7 +483,7 @@ class CounterEditForm(forms.ModelForm):
     sellers = make_ajax_field(Counter, 'sellers', 'users', help_text="")
     products = make_ajax_field(Counter, 'products', 'products', help_text="")
 
-class CounterEditView(CounterTabsMixin, CanEditMixin, UpdateView):
+class CounterEditView(CounterAdminTabsMixin, CanEditMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's manager)
     """
@@ -470,7 +496,7 @@ class CounterEditView(CounterTabsMixin, CanEditMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('counter:admin', kwargs={'counter_id': self.object.id})
 
-class CounterEditPropView(CounterTabsMixin, CanEditPropMixin, UpdateView):
+class CounterEditPropView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's admin)
     """
@@ -480,7 +506,7 @@ class CounterEditPropView(CounterTabsMixin, CanEditPropMixin, UpdateView):
     template_name = 'core/edit.jinja'
     current_tab = "counters"
 
-class CounterCreateView(CounterTabsMixin, CanEditMixin, CreateView):
+class CounterCreateView(CounterAdminTabsMixin, CanEditMixin, CreateView):
     """
     Create a counter (for the admins)
     """
@@ -490,7 +516,7 @@ class CounterCreateView(CounterTabsMixin, CanEditMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "counters"
 
-class CounterDeleteView(CounterTabsMixin, CanEditMixin, DeleteView):
+class CounterDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteView):
     """
     Delete a counter (for the admins)
     """
@@ -502,7 +528,7 @@ class CounterDeleteView(CounterTabsMixin, CanEditMixin, DeleteView):
 
 # Product management
 
-class ProductTypeListView(CounterTabsMixin, CanEditPropMixin, ListView):
+class ProductTypeListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
@@ -510,7 +536,7 @@ class ProductTypeListView(CounterTabsMixin, CanEditPropMixin, ListView):
     template_name = 'counter/producttype_list.jinja'
     current_tab = "product_types"
 
-class ProductTypeCreateView(CounterTabsMixin, CanCreateMixin, CreateView):
+class ProductTypeCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
     """
     A create view for the admins
     """
@@ -519,7 +545,7 @@ class ProductTypeCreateView(CounterTabsMixin, CanCreateMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductTypeEditView(CounterTabsMixin, CanEditPropMixin, UpdateView):
+class ProductTypeEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -529,7 +555,7 @@ class ProductTypeEditView(CounterTabsMixin, CanEditPropMixin, UpdateView):
     pk_url_kwarg = "type_id"
     current_tab = "products"
 
-class ProductArchivedListView(CounterTabsMixin, CanEditPropMixin, ListView):
+class ProductArchivedListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
@@ -539,7 +565,7 @@ class ProductArchivedListView(CounterTabsMixin, CanEditPropMixin, ListView):
     ordering = ['name']
     current_tab = "archive"
 
-class ProductListView(CounterTabsMixin, CanEditPropMixin, ListView):
+class ProductListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
@@ -577,7 +603,7 @@ class ProductEditForm(forms.ModelForm):
             c.save()
         return ret
 
-class ProductCreateView(CounterTabsMixin, CanCreateMixin, CreateView):
+class ProductCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
     """
     A create view for the admins
     """
@@ -586,7 +612,7 @@ class ProductCreateView(CounterTabsMixin, CanCreateMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductEditView(CounterTabsMixin, CanEditPropMixin, UpdateView):
+class ProductEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -596,7 +622,7 @@ class ProductEditView(CounterTabsMixin, CanEditPropMixin, UpdateView):
     template_name = 'core/edit.jinja'
     current_tab = "products"
 
-class RefillingDeleteView(CanEditPropMixin, DeleteView):
+class RefillingDeleteView(DeleteView):
     """
     Delete a refilling (for the admins)
     """
@@ -604,10 +630,23 @@ class RefillingDeleteView(CanEditPropMixin, DeleteView):
     pk_url_kwarg = "refilling_id"
     template_name = 'core/delete_confirm.jinja'
 
-    def get_success_url(self):
-        return reverse_lazy('core:user_account', kwargs={'user_id': self.object.customer.user.id})
+    def dispatch(self, request, *args, **kwargs):
+        """
+        We have here a very particular right handling, we can't inherit from CanEditPropMixin
+        """
+        self.object = self.get_object()
+        if (timezone.now() - self.object.date <= timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT) and
+                'counter_token' in request.session.keys() and
+                request.session['counter_token'] and # check if not null for counters that have no token set
+                Counter.objects.filter(token=request.session['counter_token']).exists()):
+            self.success_url = reverse('counter:details', kwargs={'counter_id': self.object.counter.id})
+            return super(RefillingDeleteView, self).dispatch(request, *args, **kwargs)
+        elif self.object.is_owned_by(request.user):
+            self.success_url = reverse('core:user_account', kwargs={'user_id': self.object.customer.user.id})
+            return super(RefillingDeleteView, self).dispatch(request, *args, **kwargs)
+        raise PermissionDenied
 
-class SellingDeleteView(CanEditPropMixin, DeleteView):
+class SellingDeleteView(DeleteView):
     """
     Delete a selling (for the admins)
     """
@@ -615,8 +654,21 @@ class SellingDeleteView(CanEditPropMixin, DeleteView):
     pk_url_kwarg = "selling_id"
     template_name = 'core/delete_confirm.jinja'
 
-    def get_success_url(self):
-        return reverse_lazy('core:user_account', kwargs={'user_id': self.object.customer.user.id})
+    def dispatch(self, request, *args, **kwargs):
+        """
+        We have here a very particular right handling, we can't inherit from CanEditPropMixin
+        """
+        self.object = self.get_object()
+        if (timezone.now() - self.object.date <= timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT) and
+                'counter_token' in request.session.keys() and
+                request.session['counter_token'] and # check if not null for counters that have no token set
+                Counter.objects.filter(token=request.session['counter_token']).exists()):
+            self.success_url = reverse('counter:details', kwargs={'counter_id': self.object.counter.id})
+            return super(SellingDeleteView, self).dispatch(request, *args, **kwargs)
+        elif self.object.is_owned_by(request.user):
+            self.success_url = reverse('core:user_account', kwargs={'user_id': self.object.customer.user.id})
+            return super(SellingDeleteView, self).dispatch(request, *args, **kwargs)
+        raise PermissionDenied
 
 # Cash register summaries
 
@@ -676,27 +728,61 @@ class CashRegisterSummaryForm(forms.Form):
         if summary.items.count() < 1:
             summary.delete()
 
-class CounterCashSummaryView(CanViewMixin, DetailView):
+class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
+    """
+    Provide the last operations to allow barmen to delete them
+    """
+    model = Counter
+    pk_url_kwarg = "counter_id"
+    template_name = 'counter/last_ops.jinja'
+    current_tab = "last_ops"
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        We have here again a very particular right handling
+        """
+        self.object = self.get_object()
+        if (self.object.get_barmen_list() and 'counter_token' in request.session.keys() and
+            request.session['counter_token'] and # check if not null for counters that have no token set
+            Counter.objects.filter(token=request.session['counter_token']).exists()):
+            return super(CounterLastOperationsView, self).dispatch(request, *args, **kwargs)
+        return HttpResponseRedirect(reverse('counter:details', kwargs={'counter_id': self.object.id})+'?bad_location')
+
+    def get_context_data(self, **kwargs):
+        """Add form to the context """
+        kwargs = super(CounterLastOperationsView, self).get_context_data(**kwargs)
+        threshold = timezone.now() - timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT)
+        kwargs['last_refillings'] = self.object.refillings.filter(date__gte=threshold).all()
+        kwargs['last_sellings'] = self.object.sellings.filter(date__gte=threshold).all()
+        return kwargs
+
+class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
     """
     Provide the cash summary form
     """
     model = Counter
     pk_url_kwarg = "counter_id"
     template_name = 'counter/cash_register_summary.jinja'
+    current_tab = "cash_summary"
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        We have here again a very particular right handling
+        """
+        self.object = self.get_object()
+        if (self.object.get_barmen_list() and 'counter_token' in request.session.keys() and
+            request.session['counter_token'] and # check if not null for counters that have no token set
+            Counter.objects.filter(token=request.session['counter_token']).exists()):
+            return super(CounterCashSummaryView, self).dispatch(request, *args, **kwargs)
+        return HttpResponseRedirect(reverse('counter:details', kwargs={'counter_id': self.object.id})+'?bad_location')
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if len(self.object.get_barmen_list()) < 1:
-            return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
-                kwargs={'counter_id': self.object.id}))
         self.form = CashRegisterSummaryForm()
         return super(CounterCashSummaryView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if len(self.object.get_barmen_list()) < 1:
-            return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
-                kwargs={'counter_id': self.object.id}))
         self.form = CashRegisterSummaryForm(request.POST)
         if self.form.is_valid():
             self.form.save(self.object)
@@ -760,7 +846,7 @@ class CounterStatView(DetailView, CanEditMixin):
         raise PermissionDenied
 
 
-class CashSummaryListView(CanEditPropMixin, CounterTabsMixin, ListView):
+class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
     """Display a list of cash summaries"""
     model = CashRegisterSummary
     template_name = 'counter/cash_summary_list.jinja'

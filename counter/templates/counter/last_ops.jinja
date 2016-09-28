@@ -1,0 +1,67 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+
+{% block title %}
+{% trans counter_name=counter %}{{ counter_name }} last operations{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans counter_name=counter %}{{ counter_name }} last operations{% endtrans %}</h3>
+<h4>{% trans %}Refillings{% endtrans %}</h4>
+<table>
+    <thead>
+        <tr>
+            <td>{% trans %}Date{% endtrans %}</td>
+            <td>{% trans %}Barman{% endtrans %}</td>
+            <td>{% trans %}Customer{% endtrans %}</td>
+            <td>{% trans %}Amount{% endtrans %}</td>
+            <td>{% trans %}Payment method{% endtrans %}</td>
+        </tr>
+    </thead>
+    <tbody>
+    {% for i in last_refillings %}
+        <tr>
+            <td>{{ i.date|localtime|date(DATETIME_FORMAT) }} - {{ i.date|localtime|time(DATETIME_FORMAT) }}</td>
+            <td><a href="{{ i.operator.get_absolute_url() }}">{{ i.operator.get_display_name() }}</a></td>
+            <td><a href="{{ i.customer.user.get_absolute_url() }}">{{ i.customer.user.get_display_name() }}</a></td>
+            <td>{{ i.amount }} €</td>
+            <td>{{ i.get_payment_method_display() }}</td>
+            <td><a href="{{ url('counter:refilling_delete', refilling_id=i.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+
+<h4>{% trans %}Sellings{% endtrans %}</h4>
+<table>
+    <thead>
+        <tr>
+            <td>{% trans %}Date{% endtrans %}</td>
+            <td>{% trans %}Barman{% endtrans %}</td>
+            <td>{% trans %}Customer{% endtrans %}</td>
+            <td>{% trans %}Label{% endtrans %}</td>
+            <td>{% trans %}Quantity{% endtrans %}</td>
+            <td>{% trans %}Total{% endtrans %}</td>
+            <td>{% trans %}Payment method{% endtrans %}</td>
+        </tr>
+    </thead>
+    <tbody>
+    {% for i in last_sellings %}
+        <tr>
+            <td>{{ i.date|localtime|date(DATETIME_FORMAT) }} - {{ i.date|localtime|time(DATETIME_FORMAT) }}</td>
+            <td><a href="{{ i.seller.get_absolute_url() }}">{{ i.seller.get_display_name() }}</a></td>
+            <td><a href="{{ i.customer.user.get_absolute_url() }}">{{ i.customer.user.get_display_name() }}</a></td>
+            <td>{{ i.label }}</td>
+            <td>{{ i.quantity }}</td>
+            <td>{{ i.quantity * i.unit_price }} €</td>
+            <td>{{ i.get_payment_method_display() }}</td>
+            <td><a href="{{ url('counter:selling_delete', selling_id=i.id) }}?next={{ url('counter:details',
+            counter_id=counter.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+
+

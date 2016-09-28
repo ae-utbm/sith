@@ -398,6 +398,9 @@ SITH_MAXIMUM_FREE_ROLE=1
 # Minutes to timeout the logged barmen
 SITH_BARMAN_TIMEOUT=20
 
+# Minutes to delete the last operations
+SITH_LAST_OPERATIONS_LIMIT=5
+
 # ET variables
 SITH_EBOUTIC_ET_URL = "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
 SITH_EBOUTIC_PBX_SITE = "4000666"

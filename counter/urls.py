@@ -5,6 +5,7 @@ from counter.views import *
 urlpatterns = [
     url(r'^(?P<counter_id>[0-9]+)$', CounterMain.as_view(), name='details'),
     url(r'^(?P<counter_id>[0-9]+)/click/(?P<user_id>[0-9]+)$', CounterClick.as_view(), name='click'),
+    url(r'^(?P<counter_id>[0-9]+)/last_ops$', CounterLastOperationsView.as_view(), name='last_ops'),
     url(r'^(?P<counter_id>[0-9]+)/cash_summary$', CounterCashSummaryView.as_view(), name='cash_summary'),
     url(r'^(?P<counter_id>[0-9]+)/activity$', CounterActivityView.as_view(), name='activity'),
     url(r'^(?P<counter_id>[0-9]+)/stats$', CounterStatView.as_view(), name='stats'),

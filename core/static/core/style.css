@@ -176,6 +176,9 @@ tbody>tr:hover {
     background: darkgrey;
     width: 100%;
 }
+.highlight {
+    background: orange;
+}
 .tool-bar {
     overflow: auto;
     padding: 4px;
