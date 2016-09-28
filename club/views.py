@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.conf import settings
+from ajax_select.fields import AutoCompleteSelectField
 
 from datetime import timedelta
 
@@ -98,20 +99,7 @@ class ClubMemberForm(forms.ModelForm):
     class Meta:
         model = Membership
         fields = ['user', 'role', 'description']
-
-    def clean(self):
-        """
-        Validates the permissions
-        e.g.: the president can add anyone anywhere, but a member can not make someone become president
-        """
-        ret = super(ClubMemberForm, self).clean()
-        ms = self.instance.club.get_membership_for(self._user)
-        if (self.cleaned_data['role'] <= SITH_MAXIMUM_FREE_ROLE or
-            (ms is not None and ms.role >= self.cleaned_data['role']) or
-            self._user.is_in_group(SITH_MAIN_BOARD_GROUP) or
-            self._user.is_superuser):
-            return ret
-        raise ValidationError("You do not have the permission to do that")
+    user = AutoCompleteSelectField('users', required=True, label=_("Select user"), help_text=None)
 
     def save(self, *args, **kwargs):
         """
@@ -140,9 +128,27 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
             form.instance = Membership.objects.filter(club=self.object).filter(user=form.data.get('user')).filter(end_date=None).first()
         if form.instance is None: # Instanciate a new membership
             form.instance = Membership(club=self.object, user=self.request.user)
-        form.initial = {'user': self.request.user}
-        form._user = self.request.user
+        # form.initial = {'user': self.request.user}
+        # form._user = self.request.user
         return form
+
+    def post(self, request, *args, **kwargs):
+        """
+            Check user rights
+        """
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            ms = self.object.get_membership_for(request.user)
+            if (form.cleaned_data['role'] <= SITH_MAXIMUM_FREE_ROLE or
+                (ms is not None and ms.role >= form.cleaned_data['role']) or
+                request.user.is_board_member or
+                request.user.is_root):
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+        else:
+            return self.form_invalid(form)
 
 class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
     """
