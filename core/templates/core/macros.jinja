@@ -35,7 +35,7 @@
 {%- endmacro %}
 
 {% macro show_slots(user) %}
-    {% if get_subscriber(user).slots.exists() %}
+    {% if get_subscriber(user).slots.filter(start_date__gte=timezone.now()).exists() %}
         <h5>{% trans %}Slot{% endtrans %}</h5>
         <ul>
         {% for i in get_subscriber(user).slots.filter(start_date__gte=timezone.now().replace(tzinfo=None)).all() %}
