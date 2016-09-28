@@ -142,8 +142,8 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
             ms = self.object.get_membership_for(request.user)
             if (form.cleaned_data['role'] <= SITH_MAXIMUM_FREE_ROLE or
                 (ms is not None and ms.role >= form.cleaned_data['role']) or
-                request.user.is_in_group(SITH_MAIN_BOARD_GROUP) or
-                request.user.is_root or request.user.is_board_member):
+                request.user.is_board_member or
+                request.user.is_root):
                 return self.form_valid(form)
             else:
                 return self.form_invalid(form)
