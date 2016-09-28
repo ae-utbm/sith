@@ -7,14 +7,14 @@ from club.models import Club
 from counter.models import Product, Counter
 from accounting.models import ClubAccount, Company
 
-def is_token(request):
+def check_token(request):
     return ('counter_token' in request.session.keys() and
         request.session['counter_token'] and
         Counter.objects.filter(token=request.session['counter_token']).exists())
 
 class RightManagedLookupChannel(LookupChannel):
     def check_auth(self, request):
-        if not request.user.subscribed and not is_token(request):
+        if not request.user.subscribed and not check_token(request):
             raise PermissionDenied
 
 @register('users')
