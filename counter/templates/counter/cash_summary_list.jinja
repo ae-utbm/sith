@@ -45,6 +45,7 @@
         <td></td>
         {% endif %}
         <td>{{ c.comment }}</td>
+        <td><a href="{{ url('counter:cash_summary_edit', cashsummary_id=c.id) }}">{% trans %}Edit{% endtrans %}</td>
         </tr>
         {% endfor %}
     </tbody>

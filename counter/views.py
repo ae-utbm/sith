@@ -692,15 +692,46 @@ class CashRegisterSummaryForm(forms.Form):
     comment = forms.CharField(label=_("Comment"), required=False)
     emptied = forms.BooleanField(label=_("Emptied"), required=False)
 
-    def save(self, counter):
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.pop('instance', None)
+        super(CashRegisterSummaryForm, self).__init__(*args, **kwargs)
+        if instance:
+            self.fields['ten_cents'].initial = instance.ten_cents.quantity if instance.ten_cents else 0
+            self.fields['twenty_cents'].initial = instance.twenty_cents.quantity if instance.twenty_cents else 0
+            self.fields['fifty_cents'].initial = instance.fifty_cents.quantity if instance.fifty_cents else 0
+            self.fields['one_euro'].initial = instance.one_euro.quantity if instance.one_euro else 0
+            self.fields['two_euros'].initial = instance.two_euros.quantity if instance.two_euros else 0
+            self.fields['five_euros'].initial = instance.five_euros.quantity if instance.five_euros else 0
+            self.fields['ten_euros'].initial = instance.ten_euros.quantity if instance.ten_euros else 0
+            self.fields['twenty_euros'].initial = instance.twenty_euros.quantity if instance.twenty_euros else 0
+            self.fields['fifty_euros'].initial = instance.fifty_euros.quantity if instance.fifty_euros else 0
+            self.fields['hundred_euros'].initial = instance.hundred_euros.quantity if instance.hundred_euros else 0
+            self.fields['check_1_quantity'].initial = instance.check_1.quantity if instance.check_1 else 0
+            self.fields['check_2_quantity'].initial = instance.check_2.quantity if instance.check_2 else 0
+            self.fields['check_3_quantity'].initial = instance.check_3.quantity if instance.check_3 else 0
+            self.fields['check_4_quantity'].initial = instance.check_4.quantity if instance.check_4 else 0
+            self.fields['check_5_quantity'].initial = instance.check_5.quantity if instance.check_5 else 0
+            self.fields['check_1_value'].initial = instance.check_1.value if instance.check_1 else 0
+            self.fields['check_2_value'].initial = instance.check_2.value if instance.check_2 else 0
+            self.fields['check_3_value'].initial = instance.check_3.value if instance.check_3 else 0
+            self.fields['check_4_value'].initial = instance.check_4.value if instance.check_4 else 0
+            self.fields['check_5_value'].initial = instance.check_5.value if instance.check_5 else 0
+            self.fields['comment'].initial = instance.comment
+            self.fields['emptied'].initial = instance.emptied
+            self.instance = instance
+        else:
+            self.instance = None
+
+    def save(self, counter=None):
         cd = self.cleaned_data
-        summary = CashRegisterSummary(
+        summary = self.instance or CashRegisterSummary(
                 counter=counter,
                 user=counter.get_random_barman(),
-                comment=cd['comment'],
-                emptied=cd['emptied'],
                 )
+        summary.comment = cd['comment']
+        summary.emptied = cd['emptied']
         summary.save()
+        summary.items.all().delete()
         # Cash
         if cd['ten_cents']: CashRegisterSummaryItem(cash_summary=summary, value=0.1, quantity=cd['ten_cents']).save()
         if cd['twenty_cents']: CashRegisterSummaryItem(cash_summary=summary, value=0.2, quantity=cd['twenty_cents']).save()
@@ -713,11 +744,16 @@ class CashRegisterSummaryForm(forms.Form):
         if cd['fifty_euros']: CashRegisterSummaryItem(cash_summary=summary, value=50, quantity=cd['fifty_euros']).save()
         if cd['hundred_euros']: CashRegisterSummaryItem(cash_summary=summary, value=100, quantity=cd['hundred_euros']).save()
         # Checks
-        if cd['check_1_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_1_value'], quantity=cd['check_1_quantity']).save()
-        if cd['check_2_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_2_value'], quantity=cd['check_2_quantity']).save()
-        if cd['check_3_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_3_value'], quantity=cd['check_3_quantity']).save()
-        if cd['check_4_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_4_value'], quantity=cd['check_4_quantity']).save()
-        if cd['check_5_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_5_value'], quantity=cd['check_5_quantity']).save()
+        if cd['check_1_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_1_value'],
+                quantity=cd['check_1_quantity'], check=True).save()
+        if cd['check_2_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_2_value'],
+                quantity=cd['check_2_quantity'], check=True).save()
+        if cd['check_3_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_3_value'],
+                quantity=cd['check_3_quantity'], check=True).save()
+        if cd['check_4_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_4_value'],
+                quantity=cd['check_4_quantity'], check=True).save()
+        if cd['check_5_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_5_value'],
+                quantity=cd['check_5_quantity'], check=True).save()
         if summary.items.count() < 1:
             summary.delete()
 
@@ -838,6 +874,17 @@ class CounterStatView(DetailView, CanEditMixin):
                 return super(CanEditMixin, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
+class CashSummaryEditView(CanEditPropMixin, CounterAdminTabsMixin, UpdateView):
+    """Edit cash summaries"""
+    model = CashRegisterSummary
+    template_name = 'counter/cash_register_summary.jinja'
+    context_object_name = "cashsummary"
+    pk_url_kwarg = "cashsummary_id"
+    form_class = CashRegisterSummaryForm
+    current_tab = "cash_summary"
+
+    def get_success_url(self):
+        return reverse('counter:cash_summary_list')
 
 class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
     """Display a list of cash summaries"""
@@ -860,3 +907,4 @@ class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
             kwargs['summaries_sums'][c.name] = sum([s.get_total() for s in CashRegisterSummary.objects.filter(counter=c, date__gt=last_date).all()])
             kwargs['refilling_sums'][c.name] = sum([s.amount for s in Refilling.objects.filter(counter=c, date__gt=last_date).all()])
         return kwargs
+

@@ -360,6 +360,42 @@ class CashRegisterSummary(models.Model):
     def __str__(self):
         return "At %s by %s - Total: %s €" % (self.counter, self.user, self.get_total())
 
+    def __getattribute__(self, name):
+        if name[:5] == 'check':
+            checks = self.items.filter(check=True).order_by('value').all()
+        if name == 'ten_cents':
+            return self.items.filter(value=0.1, check=False).first()
+        elif name == 'twenty_cents':
+            return self.items.filter(value=0.2, check=False).first()
+        elif name == 'fifty_cents':
+            return self.items.filter(value=0.5, check=False).first()
+        elif name == 'one_euro':
+            return self.items.filter(value=1, check=False).first()
+        elif name == 'two_euros':
+            return self.items.filter(value=2, check=False).first()
+        elif name == 'five_euros':
+            return self.items.filter(value=5, check=False).first()
+        elif name == 'ten_euros':
+            return self.items.filter(value=10, check=False).first()
+        elif name == 'twenty_euros':
+            return self.items.filter(value=20, check=False).first()
+        elif name == 'fifty_euros':
+            return self.items.filter(value=50, check=False).first()
+        elif name == 'hundred_euros':
+            return self.items.filter(value=100, check=False).first()
+        elif name == 'check_1':
+            return checks[0] if 0 < len(checks) else None
+        elif name == 'check_2':
+            return checks[1] if 1 < len(checks) else None
+        elif name == 'check_3':
+            return checks[2] if 2 < len(checks) else None
+        elif name == 'check_4':
+            return checks[3] if 3 < len(checks) else None
+        elif name == 'check_5':
+            return checks[4] if 4 < len(checks) else None
+        else:
+            return object.__getattribute__(self, name)
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -378,6 +414,9 @@ class CashRegisterSummary(models.Model):
         if not self.id:
             self.date = timezone.now()
         return super(CashRegisterSummary, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('counter:cash_summary_list')
 
 class CashRegisterSummaryItem(models.Model):
     cash_summary = models.ForeignKey(CashRegisterSummary, related_name="items", verbose_name=_("cash summary"))
