@@ -1,0 +1,34 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Invoices call{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans %}Invoices call{% endtrans %}</h3>
+<form method="get" action="">
+    <select name="month">
+        {% for m in months %}
+        <option value="{{ m|date("Y-m") }}">{{ m|date("Y-m") }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="{% trans %}Go{% endtrans %}" />
+</form>
+<table>
+    <thead>
+        <td>{% trans %}Club{% endtrans %}</td>
+        <td>{% trans %}Sum{% endtrans %}</td>
+    </thead>
+    <tbody>
+    {% for i in sums %}
+        <tr>
+            <td>{{ i['club__name'] }}</td>
+            <td>{{ i['selling_sum'] }} €</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+
+

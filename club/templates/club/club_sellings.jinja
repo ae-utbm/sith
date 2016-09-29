@@ -30,8 +30,16 @@
         <tr>
             <td>{{ s.date|localtime|date(DATETIME_FORMAT) }} {{ s.date|localtime|time(DATETIME_FORMAT) }}</td>
             <td>{{ s.counter }}</td>
+            {% if s.seller %}
             <td><a href="{{ s.seller.get_absolute_url() }}">{{ s.seller.get_display_name() }}</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            {% if s.customer %}
             <td><a href="{{ s.customer.user.get_absolute_url() }}">{{ s.customer.user.get_display_name() }}</a></td>
+            {% else %}
+            <td></td>
+            {% endif %}
             <td>{{ s.label }}</td>
             <td>{{ s.quantity }}</td>
             <td>{{ s.quantity * s.unit_price }} €</td>

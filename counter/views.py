@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.core.exceptions import PermissionDenied
-from django.views.generic import ListView, DetailView, RedirectView
+from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
@@ -459,6 +459,11 @@ class CounterAdminTabsMixin(TabedViewMixin):
                 'slug': 'cash_summary',
                 'name': _("Cash register summaries"),
                 },
+            {
+                'url': reverse_lazy('counter:invoices_call'),
+                'slug': 'invoices_call',
+                'name': _("Invoices call"),
+                },
             ]
 
 class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
@@ -908,3 +913,29 @@ class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
             kwargs['refilling_sums'][c.name] = sum([s.amount for s in Refilling.objects.filter(counter=c, date__gt=last_date).all()])
         return kwargs
 
+class InvoiceCallView(CounterAdminTabsMixin, TemplateView):
+    template_name = 'counter/invoices_call.jinja'
+    current_tab = 'invoices_call'
+
+    def get_context_data(self, **kwargs):
+        """ Add sums to the context """
+        kwargs = super(InvoiceCallView, self).get_context_data(**kwargs)
+        kwargs['months'] = Selling.objects.datetimes('date', 'month', order='DESC')
+        start_date = None
+        end_date = None
+        try:
+            start_date = datetime.strptime(self.request.GET['month'], '%Y-%m')
+        except:
+            start_date = datetime(year=timezone.now().year, month=(timezone.now().month+10)%12+1, day=1)
+        end_date = (start_date + timedelta(days=32)).replace(day=1, hour=0, minute=0, microsecond=0)
+        from django.db.models import Sum, Case, When, F, DecimalField
+        kwargs['sums'] = Selling.objects.values('club__name').annotate(selling_sum=Sum(
+            Case(When(date__gte=start_date,
+                date__lt=end_date,
+                then=F('unit_price')*F('quantity')),
+                output_field=CurrencyField()
+                )
+            )).exclude(selling_sum=None).order_by('-selling_sum')
+        return kwargs
+
+                #).exclude(selling_sum=None).order_by('-selling_sum').all()[:100]

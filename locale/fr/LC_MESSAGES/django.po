@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-29 16:18+0200\n"
+"POT-Creation-Date: 2016-09-29 18:19+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -171,6 +171,7 @@ msgid "User"
 msgstr "Utilisateur"
 
 #: accounting/models.py:190 club/templates/club/club_detail.jinja:5
+#: counter/templates/counter/invoices_call.jinja:19
 msgid "Club"
 msgstr "Club"
 
@@ -297,7 +298,7 @@ msgstr "Compte en banque : "
 
 #: accounting/templates/accounting/bank_account_details.jinja:15
 #: accounting/templates/accounting/club_account_details.jinja:16
-#: club/templates/club/club_sellings.jinja:40
+#: club/templates/club/club_sellings.jinja:48
 #: core/templates/core/file_detail.jinja:43
 #: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:61
 #: core/templates/core/user_account_detail.jinja:67
@@ -484,7 +485,7 @@ msgid "Done"
 msgstr "Effectué"
 
 #: accounting/templates/accounting/journal_details.jinja:34
-#: counter/templates/counter/cash_summary_list.jinja:32 counter/views.py:692
+#: counter/templates/counter/cash_summary_list.jinja:32 counter/views.py:697
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -1725,20 +1726,16 @@ msgid "Godfathers"
 msgstr "Parrains"
 
 #: core/templates/core/user_godfathers.jinja:18
-#, fuzzy
-#| msgid "Godfathers"
 msgid "No godfathers"
-msgstr "Parrains"
+msgstr "Pas de parrains"
 
 #: core/templates/core/user_godfathers.jinja:21
 msgid "Godchildren"
 msgstr "Fillots"
 
 #: core/templates/core/user_godfathers.jinja:29
-#, fuzzy
-#| msgid "Godchildren"
 msgid "No godchildren"
-msgstr "Fillots"
+msgstr "Pas de fillots"
 
 #: core/templates/core/user_group.jinja:4
 #, python-format
@@ -1793,7 +1790,7 @@ msgid "Subscriptions"
 msgstr "Cotisations"
 
 #: core/templates/core/user_tools.jinja:23 counter/views.py:440
-#: counter/views.py:579
+#: counter/views.py:584
 msgid "Counters"
 msgstr "Comptoirs"
 
@@ -2077,7 +2074,7 @@ msgstr "Liste des relevés de caisse"
 msgid "Theoric sums"
 msgstr "Sommes théoriques"
 
-#: counter/templates/counter/cash_summary_list.jinja:31 counter/views.py:693
+#: counter/templates/counter/cash_summary_list.jinja:31 counter/views.py:698
 msgid "Emptied"
 msgstr "Coffre vidé"
 
@@ -2108,6 +2105,7 @@ msgstr "Pas de date de naissance renseigné"
 
 #: counter/templates/counter/counter_click.jinja:52
 #: counter/templates/counter/counter_click.jinja:86
+#: counter/templates/counter/invoices_call.jinja:15
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
 msgid "Go"
@@ -2182,6 +2180,15 @@ msgstr "Merci de vous identifier"
 #: counter/templates/counter/counter_main.jinja:44
 msgid "Barman: "
 msgstr "Barman : "
+
+#: counter/templates/counter/invoices_call.jinja:4
+#: counter/templates/counter/invoices_call.jinja:8 counter/views.py:465
+msgid "Invoices call"
+msgstr "Appels à facture"
+
+#: counter/templates/counter/invoices_call.jinja:20
+msgid "Sum"
+msgstr "Somme"
 
 #: counter/templates/counter/last_ops.jinja:5
 #: counter/templates/counter/last_ops.jinja:9
@@ -2290,61 +2297,61 @@ msgstr "Produits archivés"
 msgid "Product types"
 msgstr "Types de produit"
 
-#: counter/views.py:576
+#: counter/views.py:581
 msgid "Parent product"
 msgstr "Produit parent"
 
-#: counter/views.py:577
+#: counter/views.py:582
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
-#: counter/views.py:672
+#: counter/views.py:677
 msgid "10 cents"
 msgstr "10 centimes"
 
-#: counter/views.py:673
+#: counter/views.py:678
 msgid "20 cents"
 msgstr "20 centimes"
 
-#: counter/views.py:674
+#: counter/views.py:679
 msgid "50 cents"
 msgstr "50 centimes"
 
-#: counter/views.py:675
+#: counter/views.py:680
 msgid "1 euro"
 msgstr "1 €"
 
-#: counter/views.py:676
+#: counter/views.py:681
 msgid "2 euros"
 msgstr "2 €"
 
-#: counter/views.py:677
+#: counter/views.py:682
 msgid "5 euros"
 msgstr "5 €"
 
-#: counter/views.py:678
+#: counter/views.py:683
 msgid "10 euros"
 msgstr "10 €"
 
-#: counter/views.py:679
+#: counter/views.py:684
 msgid "20 euros"
 msgstr "20 €"
 
-#: counter/views.py:680
+#: counter/views.py:685
 msgid "50 euros"
 msgstr "50 €"
 
-#: counter/views.py:681
+#: counter/views.py:686
 msgid "100 euros"
 msgstr "100 €"
 
-#: counter/views.py:682 counter/views.py:684 counter/views.py:686
-#: counter/views.py:688 counter/views.py:690
+#: counter/views.py:687 counter/views.py:689 counter/views.py:691
+#: counter/views.py:693 counter/views.py:695
 msgid "Check amount"
 msgstr "Montant du chèque"
 
-#: counter/views.py:683 counter/views.py:685 counter/views.py:687
-#: counter/views.py:689 counter/views.py:691
+#: counter/views.py:688 counter/views.py:690 counter/views.py:692
+#: counter/views.py:694 counter/views.py:696
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 

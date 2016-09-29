@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^admin$', CounterListView.as_view(), name='admin_list'),
     url(r'^admin/new$', CounterCreateView.as_view(), name='new'),
     url(r'^admin/delete/(?P<counter_id>[0-9]+)$', CounterDeleteView.as_view(), name='delete'),
+    url(r'^admin/invoices_call$', InvoiceCallView.as_view(), name='invoices_call'),
     url(r'^admin/cash_summary/list$', CashSummaryListView.as_view(), name='cash_summary_list'),
     url(r'^admin/cash_summary/(?P<cashsummary_id>[0-9]+)$', CashSummaryEditView.as_view(), name='cash_summary_edit'),
     url(r'^admin/product/list$', ProductListView.as_view(), name='product_list'),
