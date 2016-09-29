@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.http import Http404
 from django.views.generic.edit import UpdateView
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, DeleteView
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.template.response import TemplateResponse
@@ -178,6 +178,22 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_detail.jinja"
     current_tab = 'infos'
+
+
+def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
+    user = User.objects.get(id=user_id)
+    if ((user == request.user) or
+         request.user.is_root or
+         request.user.is_board_member):
+        ud = get_object_or_404(User, id=godfather_id)
+        if is_father == "True":
+            user.godfathers.remove(ud)
+        else:
+            user.godchildren.remove(ud)
+    else:
+        raise PermissionDenied
+    return redirect('core:user_godfathers', user_id=user_id)
+
 
 class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
     """
