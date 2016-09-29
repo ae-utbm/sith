@@ -1,26 +1,34 @@
 {% extends "core/base.jinja" %}
-{% from "core/macros.jinja" import user_link_with_pict %}
+{% from "core/macros.jinja" import user_link_with_pict, delete_godfather %}
 
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s godfathers{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <h4>{% trans %}Godfathers{% endtrans %}</h4>
-    <ul>
-        {% for u in profile.godfathers.all() %}
-            <li> <a href="{{ url("core:user_godfathers", user_id=u.id) }}" class="mini_profile_link" >
-                {{ u.get_mini_item()|safe }} </a> </li>
-        {% endfor %}
-    </ul>
-    <h4>{% trans %}Godchildren{% endtrans %}</h4>
-    <ul>
-        {% for u in profile.godchildren.all() %}
-            <li> <a href="{{ url("core:user_godfathers", user_id=u.id) }}" class="mini_profile_link" >
-                {{ u.get_mini_item()|safe }} </a> </li>
-        {% endfor %}
-    </ul>
-    {% if profile == user %}
+    {% if profile.godfathers.exists() %}
+        <h4>{% trans %}Godfathers{% endtrans %}</h4>
+        <ul>
+            {% for u in profile.godfathers.all() %}
+                <li> <a href="{{ url("core:user_godfathers", user_id=u.id) }}" class="mini_profile_link" >
+                    {{ u.get_mini_item()|safe }} </a>{{ delete_godfather(user, profile, u, True) }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>{% trans %}No godfathers{% endtrans %}
+    {% endif %}
+    {% if profile.godchildren.exists() %}
+        <h4>{% trans %}Godchildren{% endtrans %}</h4>
+        <ul>
+            {% for u in profile.godchildren.all() %}
+                <li> <a href="{{ url("core:user_godfathers", user_id=u.id) }}" class="mini_profile_link" >
+                    {{ u.get_mini_item()|safe }} </a>{{ delete_godfather(user, profile, u, False) }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>{% trans %}No godchildren{% endtrans %}
+    {% endif %}
+    {% if profile == user  or user.is_root %}
     <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p() }}
