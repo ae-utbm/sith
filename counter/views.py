@@ -87,14 +87,7 @@ class CounterTabsMixin(TabedViewMixin):
                 })
         return tab_list
 
-class CheckTokenMixin:
-    def post(self, request, *args, **kwargs):
-        if not ('counter_token' in self.request.session.keys() and self.request.session['counter_token'] == self.object.token):
-            return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
-                kwargs={'counter_id': self.object.id})+'?bad_location')
-        return super(CheckTokenMixin, self).post(request, *args, **kwargs)
-
-class CounterMain(CounterTabsMixin, DetailView, CheckTokenMixin, ProcessFormView, FormMixin):
+class CounterMain(CounterTabsMixin, DetailView, ProcessFormView, FormMixin):
     """
     The public (barman) view
     """
@@ -152,7 +145,7 @@ class CounterMain(CounterTabsMixin, DetailView, CheckTokenMixin, ProcessFormView
     def get_success_url(self):
         return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
 
-class CounterClick(CounterTabsMixin, DetailView, CheckTokenMixin):
+class CounterClick(CounterTabsMixin, DetailView):
     """
     The click view
     This is a detail view not to have to worry about loading the counter
