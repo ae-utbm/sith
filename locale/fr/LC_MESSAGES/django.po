@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-29 18:19+0200\n"
+"POT-Creation-Date: 2016-09-29 18:31+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -171,7 +171,7 @@ msgid "User"
 msgstr "Utilisateur"
 
 #: accounting/models.py:190 club/templates/club/club_detail.jinja:5
-#: counter/templates/counter/invoices_call.jinja:19
+#: counter/templates/counter/invoices_call.jinja:20
 msgid "Club"
 msgstr "Club"
 
@@ -2105,7 +2105,7 @@ msgstr "Pas de date de naissance renseigné"
 
 #: counter/templates/counter/counter_click.jinja:52
 #: counter/templates/counter/counter_click.jinja:86
-#: counter/templates/counter/invoices_call.jinja:15
+#: counter/templates/counter/invoices_call.jinja:16
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
 msgid "Go"
@@ -2181,12 +2181,20 @@ msgstr "Merci de vous identifier"
 msgid "Barman: "
 msgstr "Barman : "
 
-#: counter/templates/counter/invoices_call.jinja:4
-#: counter/templates/counter/invoices_call.jinja:8 counter/views.py:465
+#: counter/templates/counter/invoices_call.jinja:4 counter/views.py:465
 msgid "Invoices call"
 msgstr "Appels à facture"
 
-#: counter/templates/counter/invoices_call.jinja:20
+#: counter/templates/counter/invoices_call.jinja:8
+#, python-format
+msgid "Invoices call for %(date)s"
+msgstr "Appels à facture pour %(date)s"
+
+#: counter/templates/counter/invoices_call.jinja:9
+msgid "Choose another month: "
+msgstr "Choisir un autre mois : "
+
+#: counter/templates/counter/invoices_call.jinja:21
 msgid "Sum"
 msgstr "Somme"
 

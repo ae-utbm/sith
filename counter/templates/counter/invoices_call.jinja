@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block content %}
-<h3>{% trans %}Invoices call{% endtrans %}</h3>
+<h3>{% trans date=start_date|date("F Y") %}Invoices call for {{ date }}{% endtrans %}</h3>
+<p>{% trans %}Choose another month: {% endtrans %}</p>
 <form method="get" action="">
     <select name="month">
         {% for m in months %}
