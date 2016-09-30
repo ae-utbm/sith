@@ -927,6 +927,7 @@ class InvoiceCallView(CounterAdminTabsMixin, TemplateView):
             start_date = datetime.strptime(self.request.GET['month'], '%Y-%m')
         except:
             start_date = datetime(year=timezone.now().year, month=(timezone.now().month+10)%12+1, day=1)
+        start_date = start_date.replace(tzinfo=pytz.UTC)
         end_date = (start_date + timedelta(days=32)).replace(day=1, hour=0, minute=0, microsecond=0)
         from django.db.models import Sum, Case, When, F, DecimalField
         kwargs['start_date'] = start_date
