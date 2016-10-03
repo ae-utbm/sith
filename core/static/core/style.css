@@ -142,6 +142,10 @@ ul, ol {
     margin-left: 25px;
 }
 
+code {
+    font-family: monospace;
+}
+
 .edit-bar {
     display: block;
     margin: 4px;

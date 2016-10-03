@@ -14,14 +14,14 @@
 <h4>{{ t }}</h4>
 <ul>
     {% for p in product_list.filter(product_type=t).all().order_by('name') %}
-    <li><a href="{{ url('counter:product_edit', product_id=p.id) }}">{{ p }}</a></li>
+    <li><a href="{{ url('counter:product_edit', product_id=p.id) }}">{{ p }} ({{ p.code }})</a></li>
     {% endfor %}
 </ul>
 {% endfor %}
 <h4>{% trans %}Uncategorized{% endtrans %}</h4>
 <ul>
     {% for p in product_list.filter(product_type=None).all().order_by('name') %}
-    <li><a href="{{ url('counter:product_edit', product_id=p.id) }}">{{ p }}</a></li>
+    <li><a href="{{ url('counter:product_edit', product_id=p.id) }}">{{ p }} ({{ p.code }})</a></li>
     {% endfor %}
 </ul>
 {% else %}
