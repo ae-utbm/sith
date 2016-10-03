@@ -196,6 +196,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
                 qs = qs.filter(product__id=form.cleaned_data['product'].id)
             kwargs['result'] = qs.all().order_by('-id')
             kwargs['total'] = sum([s.quantity * s.unit_price for s in qs.all()])
+            kwargs['total_quantity'] = sum([s.quantity for s in qs.all()])
         else:
             kwargs['result'] = qs[:0]
         kwargs['form'] = form
