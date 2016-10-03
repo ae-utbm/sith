@@ -8,6 +8,8 @@ from django.forms import ValidationError
 from datetime import timedelta
 import random
 import string
+import os
+import base64
 
 from club.models import Club
 from accounting.models import CurrencyField
@@ -282,6 +284,9 @@ class Selling(models.Model):
     def is_owned_by(self, user):
         return user.is_owner(self.counter) and self.payment_method != "CARD"
 
+    def can_be_viewed_by(self, user):
+        return user == self.customer.user
+
     def delete(self, *args, **kwargs):
         self.customer.amount += self.quantity * self.unit_price
         self.customer.save()
@@ -426,4 +431,35 @@ class CashRegisterSummaryItem(models.Model):
 
     class Meta:
         verbose_name = _("cash register summary item")
+
+class Eticket(models.Model):
+    """
+    Eticket can be linked to a product an allows PDF generation
+    """
+    product = models.OneToOneField(Product, related_name='eticket', verbose_name=_("product"))
+    banner = models.ImageField(upload_to='etickets', null=True, blank=True, verbose_name=_("banner"))
+    event_date = models.DateField(_('event date'), null=True, blank=True)
+    event_title = models.CharField(_('event title'), max_length=64, null=True, blank=True)
+    secret = models.CharField(_('secret'), max_length=64, unique=True)
+
+    def __str__(self):
+        return "%s" % (self.product.name)
+
+    def get_absolute_url(self):
+        return reverse('counter:eticket_list')
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.secret = base64.b64encode(os.urandom(32))
+        return super(Eticket, self).save(*args, **kwargs)
+
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        return user.is_in_group(settings.SITH_GROUPS['counter-admin']['name'])
+
+    def get_hash(self, string):
+        import hashlib, hmac
+        return hmac.new(bytes(self.secret, 'utf-8'), bytes(string, 'utf-8'), hashlib.sha1).hexdigest()
 

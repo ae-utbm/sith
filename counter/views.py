@@ -6,7 +6,7 @@ from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django import forms
 from django.utils.translation import ugettext_lazy as _
@@ -20,11 +20,11 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from ajax_select import make_ajax_form, make_ajax_field
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
-from core.views.forms import SelectUser, LoginForm
+from core.views.forms import SelectUser, LoginForm, SelectDate
 from core.models import User
 from subscription.models import Subscriber, Subscription
 from subscription.views import get_subscriber
-from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType, CashRegisterSummary, CashRegisterSummaryItem
+from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType, CashRegisterSummary, CashRegisterSummaryItem, Eticket
 from accounting.models import CurrencyField
 
 class GetUserForm(forms.Form):
@@ -463,6 +463,11 @@ class CounterAdminTabsMixin(TabedViewMixin):
                 'url': reverse_lazy('counter:invoices_call'),
                 'slug': 'invoices_call',
                 'name': _("Invoices call"),
+                },
+            {
+                'url': reverse_lazy('counter:eticket_list'),
+                'slug': 'etickets',
+                'name': _("Etickets"),
                 },
             ]
 
@@ -940,4 +945,105 @@ class InvoiceCallView(CounterAdminTabsMixin, TemplateView):
             )).exclude(selling_sum=None).order_by('-selling_sum')
         return kwargs
 
-                #).exclude(selling_sum=None).order_by('-selling_sum').all()[:100]
+class EticketListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
+    """
+    A list view for the admins
+    """
+    model = Eticket
+    template_name = 'counter/eticket_list.jinja'
+    ordering = ['id']
+    current_tab = "etickets"
+
+class EticketForm(forms.ModelForm):
+    class Meta:
+        model = Eticket
+        fields = ['product', 'banner', 'event_title', 'event_date']
+        widgets = {
+                'event_date': SelectDate,
+                }
+    product = AutoCompleteSelectField('products', show_help_text=False, label=_("Product"), required=True)
+
+class EticketCreateView(CounterAdminTabsMixin, CanEditPropMixin, CreateView):
+    """
+    Create an eticket
+    """
+    model = Eticket
+    template_name = 'core/create.jinja'
+    form_class = EticketForm
+    current_tab = "etickets"
+
+class EticketEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+    """
+    Edit an eticket
+    """
+    model = Eticket
+    template_name = 'core/edit.jinja'
+    form_class = EticketForm
+    pk_url_kwarg = "eticket_id"
+    current_tab = "etickets"
+
+class EticketPDFView(CanViewMixin, DetailView):
+    """
+    Display the PDF of an eticket
+    """
+    model = Selling
+    pk_url_kwarg = "selling_id"
+
+    def get(self, request, *args, **kwargs):
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.utils import ImageReader
+        from reportlab.lib.units import cm
+        from reportlab.graphics.shapes import Drawing
+        from reportlab.graphics.barcode.qr import QrCodeWidget
+        from reportlab.graphics import renderPDF
+        self.object = self.get_object()
+        eticket = self.object.product.eticket
+        user = self.object.customer.user
+        code = "%s %s %s" % (self.object.customer.user.id, self.object.quantity, self.object.product.id)
+        code += " " + eticket.get_hash(code)[:8].upper()
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="eticket.pdf"'
+        p = canvas.Canvas(response)
+        p.setTitle("Eticket")
+        im = ImageReader("core/static/core/img/eticket.jpg")
+        width, height = im.getSize()
+        size = max(width, height)
+        width = 8 * cm * width / size
+        height = 8 * cm * height / size
+        p.drawImage(im, 10 * cm, 25 * cm, width, height)
+        if eticket.banner:
+            im = ImageReader(eticket.banner)
+            width, height = im.getSize()
+            size = max(width, height)
+            width = 6 * cm * width / size
+            height = 6 * cm * height / size
+            p.drawImage(im, 1 * cm, 25 * cm, width, height)
+        if user.profile_pict:
+            im = ImageReader(user.profile_pict.file)
+            width, height = im.getSize()
+            size = max(width, height)
+            width = 150 * width / size
+            height = 150 * height / size
+            p.drawImage(im, 10.5 * cm - width / 2, 16 * cm, width, height)
+        if eticket.event_title:
+            p.setFont("Helvetica-Bold", 20)
+            p.drawCentredString(10.5 * cm, 23.6 * cm, eticket.event_title)
+        if eticket.event_date:
+            p.setFont("Helvetica-Bold", 16)
+            p.drawCentredString(10.5 * cm, 22.6 * cm, eticket.event_date.strftime("%d %b %Y"))
+        p.setFont("Helvetica-Bold", 14)
+        p.drawCentredString(10.5 * cm, 15 * cm, user.get_display_name())
+        p.setFont("Courier-Bold", 14)
+        qrcode = QrCodeWidget(code)
+        bounds = qrcode.getBounds()
+        width = bounds[2] - bounds[0]
+        height = bounds[3] - bounds[1]
+        d = Drawing(260, 260, transform=[260./width, 0, 0, 260./height, 0, 0])
+        d.add(qrcode)
+        renderPDF.draw(d, p, 10.5 * cm - 130, 6.1 * cm)
+        p.drawCentredString(10.5 * cm, 6 * cm, code)
+
+        p.showPage()
+        p.save()
+        return response
+

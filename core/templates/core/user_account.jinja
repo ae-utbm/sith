@@ -46,6 +46,14 @@
 <h4>{% trans %}Eboutic invoices{% endtrans %}</h4>
     {{ monthly(invoices_month) }}
 {% endif %}
+{% if etickets %}
+<h4>{% trans %}Etickets{% endtrans %}</h4>
+    <ul>
+    {% for s in etickets %}
+    <li><a href="{{ url('counter:eticket_pdf', selling_id=s.id) }}">{{ s.quantity }} x {{ s.product.eticket }}</a></li>
+    {% endfor %}
+    </ul>
+{% endif %}
 {% else %}
 <p>{% trans %}User has no account{% endtrans %}</p>
 {% endif %}

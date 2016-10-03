@@ -368,7 +368,6 @@ class UserAccountBase(UserTabsMixin, DetailView):
     """
     Base class for UserAccount
     """
-
     model = User
     pk_url_kwarg = "user_id"
     current_tab = "account"
@@ -386,7 +385,6 @@ class UserAccountView(UserAccountBase):
     """
     Display a user's account
     """
-
     template_name = "core/user_account.jinja"
 
     def expense_by_month(self, obj, calc):
@@ -406,7 +404,6 @@ class UserAccountView(UserAccountBase):
                     month
                 ))
             i += 1
-
         return stats
 
     def invoices_calc(self, query):
@@ -432,18 +429,15 @@ class UserAccountView(UserAccountBase):
                 self.object.customer.refillings,
                 (lambda q: q.amount)
             )
+            kwargs['etickets'] = self.object.customer.buyings.exclude(product__eticket=None).all()
         except:
             pass
-        # TODO: add list of month where account has activity
         return kwargs
-
-
 
 class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
     """
     Display a user's account for month
     """
-
     template_name = "core/user_account_detail.jinja"
 
     def get_context_data(self, **kwargs):
