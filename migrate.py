@@ -21,7 +21,7 @@ from django.core.files import File
 
 from core.models import User, SithFile
 from club.models import Club, Membership
-from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType, Permanency
+from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType, Permanency, Eticket
 from subscription.models import Subscription, Subscriber
 from eboutic.models import Invoice, InvoiceItem
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType
@@ -962,6 +962,36 @@ def migrate_godfathers():
     print("Godfathers migrated at %s" % datetime.datetime.now())
     print("Running time: %s" % (datetime.datetime.now()-start))
 
+def migrate_etickets():
+    FILE_ROOT = "/data/files/"
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM cpt_etickets
+    """)
+    Eticket.objects.all().delete()
+    for r in cur:
+        try:
+            p = Product.objects.filter(id=r['id_produit']).first()
+            try:
+                f = File(open(FILE_ROOT + '/' + str(r['banner']) + ".1", 'rb'))
+            except:
+                f = None
+            e = Eticket(
+                    product=p,
+                    secret=to_unicode(r['secret']),
+                    banner=f,
+                    event_title=p.name,
+                    )
+            e.save()
+            e.secret=to_unicode(r['secret'])
+            e.save()
+        except Exception as e:
+            print("FAIL to migrate eticket: %s" % (repr(e)))
+    cur.close()
+    print("Etickets migrated at %s" % datetime.datetime.now())
+    print("Running time: %s" % (datetime.datetime.now()-start))
+
 def main():
     print("Start at %s" % start)
     # Core
@@ -975,7 +1005,8 @@ def main():
     # check_accounts()
     # Accounting
     # migrate_accounting()
-    migrate_godfathers()
+    # migrate_godfathers()
+    migrate_etickets()
     # reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
     end = datetime.datetime.now()
     print("End at %s" % end)

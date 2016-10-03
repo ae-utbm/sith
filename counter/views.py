@@ -999,7 +999,7 @@ class EticketPDFView(CanViewMixin, DetailView):
         self.object = self.get_object()
         eticket = self.object.product.eticket
         user = self.object.customer.user
-        code = "%s %s %s" % (self.object.customer.user.id, self.object.quantity, self.object.product.id)
+        code = "%s %s %s" % (self.object.customer.user.id, self.object.product.id, self.object.quantity)
         code += " " + eticket.get_hash(code)[:8].upper()
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'filename="eticket.pdf"'
@@ -1030,7 +1030,7 @@ class EticketPDFView(CanViewMixin, DetailView):
             p.drawCentredString(10.5 * cm, 23.6 * cm, eticket.event_title)
         if eticket.event_date:
             p.setFont("Helvetica-Bold", 16)
-            p.drawCentredString(10.5 * cm, 22.6 * cm, eticket.event_date.strftime("%d %b %Y"))
+            p.drawCentredString(10.5 * cm, 22.6 * cm, eticket.event_date.strftime("%d %b %Y")) # FIXME with a locale
         p.setFont("Helvetica-Bold", 14)
         p.drawCentredString(10.5 * cm, 15 * cm, user.get_display_name())
         p.setFont("Courier-Bold", 14)
