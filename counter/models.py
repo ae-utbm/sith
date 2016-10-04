@@ -113,7 +113,7 @@ class Product(models.Model):
         return False
 
     def __str__(self):
-        return self.name
+        return "%s (%s)" % (self.name, self.code)
 
     def get_absolute_url(self):
         return reverse('counter:product_list')

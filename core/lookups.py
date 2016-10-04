@@ -75,7 +75,7 @@ class ProductsLookup(RightManagedLookupChannel):
                 self.model.objects.filter(code__icontains=q)).filter(archived=False)[:50]
 
     def format_item_display(self, item):
-        return item.name
+        return "%s (%s)" % (item.name, item.code)
 
 @register('club_accounts')
 class ClubAccountLookup(RightManagedLookupChannel):
