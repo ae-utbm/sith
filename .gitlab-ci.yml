@@ -1,5 +1,4 @@
 test:
   script:
-  - cp sith/settings_sample.py sith/settings.py
   - pip install -r requirements.txt
   - python manage.py test
