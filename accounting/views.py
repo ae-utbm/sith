@@ -209,8 +209,10 @@ class OperationForm(forms.ModelForm):
     company = AutoCompleteSelectField('companies', help_text=None, required=False)
 
     def __init__(self, *args, **kwargs):
+        club_account = kwargs.pop('club_account', None)
         super(OperationForm, self).__init__(*args, **kwargs)
-        self.fields['label'].queryset = self.instance.journal.club_account.labels.order_by('name').all()
+        if club_account:
+            self.fields['label'].queryset = club_account.labels.order_by('name').all()
         if self.instance.target_type == "USER":
             self.fields['user'].initial = self.instance.target_id
         elif self.instance.target_type == "ACCOUNT":
@@ -268,12 +270,15 @@ class OperationCreateView(CanCreateMixin, CreateView):
     form_class = OperationForm
     template_name = 'accounting/operation_edit.jinja'
 
+    def get_form(self, form_class=None):
+        self.journal = GeneralJournal.objects.filter(id=self.kwargs['j_id']).first()
+        ca = self.journal.club_account if self.journal else None
+        return self.form_class(club_account=ca, **self.get_form_kwargs())
+
     def get_initial(self):
         ret = super(OperationCreateView, self).get_initial()
-        if 'parent' in self.request.GET.keys():
-            self.journal = GeneralJournal.objects.filter(id=int(self.request.GET['parent'])).first()
-            if self.journal is not None:
-                ret['journal'] = self.journal.id
+        if self.journal is not None:
+            ret['journal'] = self.journal.id
         return ret
 
     def get_context_data(self, **kwargs):
