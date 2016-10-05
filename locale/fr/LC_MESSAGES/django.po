@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-03 19:24+0200\n"
+"POT-Creation-Date: 2016-10-05 11:46+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: accounting/models.py:36 accounting/models.py:55 accounting/models.py:82
-#: accounting/models.py:132 club/models.py:19 counter/models.py:62
+#: accounting/models.py:141 club/models.py:19 counter/models.py:62
 #: counter/models.py:87 counter/models.py:122 launderette/models.py:15
 #: launderette/models.py:60 launderette/models.py:85
 msgid "name"
@@ -80,89 +80,94 @@ msgstr "compte en banque"
 msgid "Club account"
 msgstr "Compte club"
 
-#: accounting/models.py:123
+#: accounting/models.py:132
 #, python-format
 msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
-#: accounting/models.py:130 club/models.py:146 counter/models.py:341
+#: accounting/models.py:139 club/models.py:146 counter/models.py:341
 #: launderette/models.py:122
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:131 club/models.py:147 counter/models.py:342
+#: accounting/models.py:140 club/models.py:147 counter/models.py:342
 msgid "end date"
 msgstr "date de fin"
 
-#: accounting/models.py:133
+#: accounting/models.py:142
 msgid "is closed"
 msgstr "est fermé"
 
-#: accounting/models.py:134
+#: accounting/models.py:143 accounting/models.py:346
 msgid "club account"
 msgstr "compte club"
 
-#: accounting/models.py:135 accounting/models.py:178 counter/models.py:27
+#: accounting/models.py:144 accounting/models.py:190 counter/models.py:27
 #: counter/models.py:226
 msgid "amount"
 msgstr "montant"
 
-#: accounting/models.py:136
+#: accounting/models.py:145
 msgid "effective_amount"
 msgstr "montant effectif"
 
-#: accounting/models.py:139
+#: accounting/models.py:148
 msgid "General journal"
 msgstr "Classeur"
 
-#: accounting/models.py:176
+#: accounting/models.py:188
 msgid "number"
 msgstr "numéro"
 
-#: accounting/models.py:177
+#: accounting/models.py:189
 msgid "journal"
 msgstr "classeur"
 
-#: accounting/models.py:179 core/models.py:479 core/models.py:757
+#: accounting/models.py:191 core/models.py:479 core/models.py:757
 #: counter/models.py:229 counter/models.py:272 counter/models.py:358
 #: eboutic/models.py:15 eboutic/models.py:48
 msgid "date"
 msgstr "date"
 
-#: accounting/models.py:180 counter/models.py:359
+#: accounting/models.py:192 counter/models.py:359
 msgid "comment"
 msgstr "commentaire"
 
-#: accounting/models.py:181 counter/models.py:230 counter/models.py:273
+#: accounting/models.py:193 counter/models.py:230 counter/models.py:273
 #: subscription/models.py:57
 msgid "payment method"
 msgstr "méthode de paiement"
 
-#: accounting/models.py:182
+#: accounting/models.py:194
 msgid "cheque number"
 msgstr "numéro de chèque"
 
-#: accounting/models.py:183 eboutic/models.py:116
+#: accounting/models.py:195 eboutic/models.py:116
 msgid "invoice"
 msgstr "facture"
 
-#: accounting/models.py:184
+#: accounting/models.py:196
 msgid "is done"
 msgstr "est fait"
 
-#: accounting/models.py:186
+#: accounting/models.py:198
 msgid "simple type"
 msgstr "type simplifié"
 
-#: accounting/models.py:188 accounting/models.py:287
+#: accounting/models.py:200 accounting/models.py:301
 msgid "accounting type"
 msgstr "type comptable"
 
-#: accounting/models.py:189
+#: accounting/models.py:202 accounting/models.py:296 accounting/models.py:322
+#: accounting/models.py:345 counter/models.py:264
+msgid "label"
+msgstr "intitulé"
+
+#: accounting/models.py:203
 msgid "target type"
 msgstr "type de cible"
 
-#: accounting/models.py:190 club/templates/club/club_members.jinja:8
+#: accounting/models.py:204 club/templates/club/club_members.jinja:8
 #: club/templates/club/club_old_members.jinja:8
 #: counter/templates/counter/cash_summary_list.jinja:27
 #: counter/templates/counter/stats.jinja:15
@@ -170,36 +175,36 @@ msgstr "type de cible"
 msgid "User"
 msgstr "Utilisateur"
 
-#: accounting/models.py:190 club/templates/club/club_detail.jinja:5
+#: accounting/models.py:204 club/templates/club/club_detail.jinja:5
 #: counter/templates/counter/invoices_call.jinja:20
 msgid "Club"
 msgstr "Club"
 
-#: accounting/models.py:190 core/views/user.py:167
+#: accounting/models.py:204 core/views/user.py:167
 msgid "Account"
 msgstr "Compte"
 
-#: accounting/models.py:190
+#: accounting/models.py:204
 msgid "Company"
 msgstr "Entreprise"
 
-#: accounting/models.py:190 sith/settings.py:279
+#: accounting/models.py:204 sith/settings.py:279
 msgid "Other"
 msgstr "Autre"
 
-#: accounting/models.py:191
+#: accounting/models.py:205
 msgid "target id"
 msgstr "id de la cible"
 
-#: accounting/models.py:192
+#: accounting/models.py:206
 msgid "target label"
 msgstr "nom de la cible"
 
-#: accounting/models.py:193
+#: accounting/models.py:207
 msgid "linked operation"
 msgstr "opération liée"
 
-#: accounting/models.py:209
+#: accounting/models.py:223
 #, python-format
 msgid ""
 "The date can not be before the start date of the journal, which is\n"
@@ -208,16 +213,16 @@ msgstr ""
 "La date ne peut pas être avant la date de début du journal, qui est\n"
 "%(start_date)s."
 
-#: accounting/models.py:212
+#: accounting/models.py:226
 msgid "Target does not exists"
 msgstr "La cible n'existe pas."
 
-#: accounting/models.py:214
+#: accounting/models.py:228
 msgid "Please add a target label if you set no existing target"
 msgstr ""
 "Merci d'ajouter un nom de cible si vous ne spécifiez pas de cible existante"
 
-#: accounting/models.py:216
+#: accounting/models.py:230
 msgid ""
 "You need to provide ether a simplified accounting type or a standard "
 "accounting type"
@@ -225,39 +230,35 @@ msgstr ""
 "Vous devez fournir soit un type comptable simplifié ou un type comptable "
 "standard"
 
-#: accounting/models.py:277 counter/models.py:91
+#: accounting/models.py:291 counter/models.py:91
 msgid "code"
 msgstr "code"
 
-#: accounting/models.py:279
+#: accounting/models.py:293
 msgid "An accounting type code contains only numbers"
 msgstr "Un code comptable ne contient que des numéros"
 
-#: accounting/models.py:282 accounting/models.py:308 counter/models.py:264
-msgid "label"
-msgstr "intitulé"
-
-#: accounting/models.py:283
+#: accounting/models.py:297
 msgid "movement type"
 msgstr "type de mouvement"
 
-#: accounting/models.py:283
+#: accounting/models.py:297
 msgid "Credit"
 msgstr "Crédit"
 
-#: accounting/models.py:283
+#: accounting/models.py:297
 msgid "Debit"
 msgstr "Débit"
 
-#: accounting/models.py:284
+#: accounting/models.py:298
 msgid "Neutral"
 msgstr "Neutre"
 
-#: accounting/models.py:310
+#: accounting/models.py:324
 msgid "simplified accounting types"
 msgstr "type simplifié"
 
-#: accounting/models.py:313
+#: accounting/models.py:327
 msgid "simplified type"
 msgstr "type simplifié"
 
@@ -271,6 +272,7 @@ msgstr "Liste des types comptable"
 #: accounting/templates/accounting/bank_account_list.jinja:9
 #: accounting/templates/accounting/club_account_details.jinja:9
 #: accounting/templates/accounting/journal_details.jinja:9
+#: accounting/templates/accounting/label_list.jinja:9
 #: accounting/templates/accounting/operation_edit.jinja:9
 #: accounting/templates/accounting/simplifiedaccountingtype_list.jinja:9
 #: core/templates/core/user_tools.jinja:42
@@ -298,6 +300,7 @@ msgstr "Compte en banque : "
 
 #: accounting/templates/accounting/bank_account_details.jinja:15
 #: accounting/templates/accounting/club_account_details.jinja:16
+#: accounting/templates/accounting/label_list.jinja:21
 #: club/templates/club/club_sellings.jinja:48
 #: core/templates/core/file_detail.jinja:43
 #: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:61
@@ -329,7 +332,7 @@ msgstr "Nouveau compte club"
 
 #: accounting/templates/accounting/bank_account_details.jinja:26
 #: accounting/templates/accounting/bank_account_list.jinja:21
-#: accounting/templates/accounting/club_account_details.jinja:53
+#: accounting/templates/accounting/club_account_details.jinja:55
 #: accounting/templates/accounting/journal_details.jinja:66 club/views.py:53
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
 #: core/templates/core/user_tools.jinja:35 core/views/user.py:151
@@ -367,28 +370,39 @@ msgstr "Il n'y a pas de comptes dans ce site web."
 msgid "Club account:"
 msgstr "Compte club : "
 
+#: accounting/templates/accounting/club_account_details.jinja:18
+#: accounting/templates/accounting/label_list.jinja:15
+msgid "New label"
+msgstr "Nouvelle étiquette"
+
 #: accounting/templates/accounting/club_account_details.jinja:19
+#: accounting/templates/accounting/label_list.jinja:4
+#: accounting/templates/accounting/label_list.jinja:17
+msgid "Label list"
+msgstr "Liste des étiquettes"
+
+#: accounting/templates/accounting/club_account_details.jinja:21
 msgid "New journal"
 msgstr "Nouveau classeur"
 
-#: accounting/templates/accounting/club_account_details.jinja:21
+#: accounting/templates/accounting/club_account_details.jinja:23
 msgid "You can not create new journal while you still have one opened"
 msgstr "Vous ne pouvez pas créer de journal tant qu'il y en a un d'ouvert"
 
-#: accounting/templates/accounting/club_account_details.jinja:26
+#: accounting/templates/accounting/club_account_details.jinja:28
 #: launderette/templates/launderette/launderette_admin.jinja:43
 msgid "Name"
 msgstr "Nom"
 
-#: accounting/templates/accounting/club_account_details.jinja:27
+#: accounting/templates/accounting/club_account_details.jinja:29
 msgid "Start"
 msgstr "Début"
 
-#: accounting/templates/accounting/club_account_details.jinja:28
+#: accounting/templates/accounting/club_account_details.jinja:30
 msgid "End"
 msgstr "Fin"
 
-#: accounting/templates/accounting/club_account_details.jinja:29
+#: accounting/templates/accounting/club_account_details.jinja:31
 #: accounting/templates/accounting/journal_details.jinja:28
 #: core/templates/core/user_account_detail.jinja:20
 #: core/templates/core/user_account_detail.jinja:81
@@ -396,30 +410,30 @@ msgstr "Fin"
 msgid "Amount"
 msgstr "Montant"
 
-#: accounting/templates/accounting/club_account_details.jinja:30
+#: accounting/templates/accounting/club_account_details.jinja:32
 msgid "Effective amount"
 msgstr "Montant effectif"
 
-#: accounting/templates/accounting/club_account_details.jinja:31
+#: accounting/templates/accounting/club_account_details.jinja:33
 msgid "Closed"
 msgstr "Fermé"
 
-#: accounting/templates/accounting/club_account_details.jinja:32
+#: accounting/templates/accounting/club_account_details.jinja:34
 #: accounting/templates/accounting/journal_details.jinja:36
 msgid "Actions"
 msgstr "Actions"
 
-#: accounting/templates/accounting/club_account_details.jinja:48
+#: accounting/templates/accounting/club_account_details.jinja:50
 #: accounting/templates/accounting/journal_details.jinja:54
 msgid "Yes"
 msgstr "Oui"
 
-#: accounting/templates/accounting/club_account_details.jinja:50
+#: accounting/templates/accounting/club_account_details.jinja:52
 #: accounting/templates/accounting/journal_details.jinja:56
 msgid "No"
 msgstr "Non"
 
-#: accounting/templates/accounting/club_account_details.jinja:52
+#: accounting/templates/accounting/club_account_details.jinja:54
 #: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
@@ -493,13 +507,21 @@ msgstr "Commentaire"
 msgid "File"
 msgstr "Fichier"
 
+#: accounting/templates/accounting/label_list.jinja:14
+msgid "Back to club account"
+msgstr "Retour au compte club"
+
+#: accounting/templates/accounting/label_list.jinja:26
+msgid "There is no label in this club account."
+msgstr "Il n'y a pas d'étiquette dans ce compte club."
+
 #: accounting/templates/accounting/operation_edit.jinja:4
 #: accounting/templates/accounting/operation_edit.jinja:13
 #: accounting/templates/accounting/operation_edit.jinja:16
 msgid "Edit operation"
 msgstr "Éditer l'opération"
 
-#: accounting/templates/accounting/operation_edit.jinja:39
+#: accounting/templates/accounting/operation_edit.jinja:40
 #: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:12
 #: core/templates/core/file_edit.jinja:8 core/templates/core/page_prop.jinja:8
 #: core/templates/core/pagerev_edit.jinja:24
@@ -581,7 +603,8 @@ msgstr "L'utilisateur est déjà membre de ce club"
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4
+#: club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -685,7 +708,7 @@ msgstr "Client"
 #: core/templates/core/user_account_detail.jinja:49
 #: counter/templates/counter/last_ops.jinja:42
 msgid "Label"
-msgstr "Intitulé"
+msgstr "Étiquette"
 
 #: club/templates/club/club_sellings.jinja:23
 #: core/templates/core/user_account_detail.jinja:50
@@ -1371,11 +1394,13 @@ msgstr "login"
 msgid "Lost password?"
 msgstr "Mot de passe perdu ?"
 
-#: core/templates/core/macros.jinja:27 core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:27
+#: core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:31 core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:31
+#: core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -1586,7 +1611,8 @@ msgstr "Résultat de la recherche"
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: core/templates/core/search.jinja:18 counter/templates/counter/stats.jinja:17
+#: core/templates/core/search.jinja:18
+#: counter/templates/counter/stats.jinja:17
 msgid "Clubs"
 msgstr "Clubs"
 

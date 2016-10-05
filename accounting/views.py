@@ -10,7 +10,7 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from core.views.forms import SelectFile, SelectDate
-from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType
+from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
 
 # Main accounting view
 
@@ -196,7 +196,7 @@ class OperationForm(forms.ModelForm):
     class Meta:
         model = Operation
         fields = ['amount', 'remark', 'journal', 'target_type', 'target_id', 'target_label', 'date', 'mode',
-            'cheque_number', 'invoice', 'simpleaccounting_type', 'accounting_type', 'done']
+            'cheque_number', 'invoice', 'simpleaccounting_type', 'accounting_type', 'label', 'done']
         widgets = {
                 'journal': HiddenInput,
                 'target_id': HiddenInput,
@@ -210,6 +210,7 @@ class OperationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(OperationForm, self).__init__(*args, **kwargs)
+        self.fields['label'].queryset = self.instance.journal.club_account.labels.order_by('name').all()
         if self.instance.target_type == "USER":
             self.fields['user'].initial = self.instance.target_id
         elif self.instance.target_type == "ACCOUNT":
@@ -315,4 +316,40 @@ class CompanyEditView(CanCreateMixin, UpdateView):
     pk_url_kwarg = "co_id"
     fields = ['name']
     template_name = 'core/edit.jinja'
+
+# Label views
+
+class LabelListView(CanViewMixin, DetailView):
+    model = ClubAccount
+    pk_url_kwarg = "clubaccount_id"
+    template_name = 'accounting/label_list.jinja'
+
+class LabelCreateView(CanEditMixin, CreateView): # FIXME we need to check the rights before creating the object
+    model = Label
+    form_class = modelform_factory(Label, fields=['name', 'club_account'], widgets={
+        'club_account': HiddenInput,
+        })
+    template_name = 'core/create.jinja'
+
+    def get_initial(self):
+        ret = super(LabelCreateView, self).get_initial()
+        if 'parent' in self.request.GET.keys():
+            obj = ClubAccount.objects.filter(id=int(self.request.GET['parent'])).first()
+            if obj is not None:
+                ret['club_account'] = obj.id
+        return ret
+
+class LabelEditView(CanEditMixin, UpdateView):
+    model = Label
+    pk_url_kwarg = "label_id"
+    fields = ['name']
+    template_name = 'core/edit.jinja'
+
+class LabelDeleteView(CanEditMixin, DeleteView):
+    model = Label
+    pk_url_kwarg = "label_id"
+    template_name = 'core/delete_confirm.jinja'
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
 

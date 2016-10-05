@@ -32,6 +32,11 @@ urlpatterns = [
     # Companies
     url(r'^company/create$', CompanyCreateView.as_view(), name='co_new'),
     url(r'^company/(?P<co_id>[0-9]+)$', CompanyEditView.as_view(), name='co_edit'),
+    # Labels
+    url(r'^label/new$', LabelCreateView.as_view(), name='label_new'),
+    url(r'^label/(?P<clubaccount_id>[0-9]+)$', LabelListView.as_view(), name='label_list'),
+    url(r'^label/(?P<label_id>[0-9]+)/edit$', LabelEditView.as_view(), name='label_edit'),
+    url(r'^label/(?P<label_id>[0-9]+)/delete$', LabelDeleteView.as_view(), name='label_delete'),
 ]
 
 

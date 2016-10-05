@@ -24,7 +24,7 @@ from club.models import Club, Membership
 from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType, Permanency, Eticket
 from subscription.models import Subscription, Subscriber
 from eboutic.models import Invoice, InvoiceItem
-from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType
+from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
 
 db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
 start = datetime.datetime.now()
@@ -839,6 +839,30 @@ def migrate_accounting():
         print("Simple accounting types migrated at %s" % datetime.datetime.now())
         print("Running time: %s" % (datetime.datetime.now()-start))
 
+    def migrate_labels():
+        cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+        cur.execute("""
+        SELECT *
+        FROM cpta_libelle
+        WHERE id_asso IS NOT NULL
+        """)
+        Label.objects.all().delete()
+        print("Labels deleted")
+        for r in cur:
+            try:
+                club_accounts = ClubAccount.objects.filter(club__id=r['id_asso']).all()
+                for ca in club_accounts:
+                    new = Label(
+                            club_account=ca,
+                            name=to_unicode(r['nom_libelle']),
+                            )
+                    new.save()
+            except Exception as e:
+                print("FAIL to migrate label: %s" % (repr(e)))
+        cur.close()
+        print("Labels migrated at %s" % datetime.datetime.now())
+        print("Running time: %s" % (datetime.datetime.now()-start))
+
     def migrate_operations():
         MODE = {
                 1: "CHECK",
@@ -860,6 +884,8 @@ def migrate_accounting():
         FROM cpta_operation op
         LEFT JOIN cpta_op_clb clb
         ON op.id_opclb = clb.id_opclb
+        LEFT JOIN cpta_libelle lab
+        ON op.id_libelle = lab.id_libelle
         """)
         Operation.objects.all().delete()
         print("Operation deleted")
@@ -867,6 +893,7 @@ def migrate_accounting():
             try:
                 simple_type = None
                 accounting_type = None
+                label = None
                 if r['id_opclb']:
                     simple_type = SimplifiedAccountingType.objects.filter(id=r['id_opclb']).first()
                 if r['id_opstd']:
@@ -876,6 +903,8 @@ def migrate_accounting():
                 if not accounting_type:
                     accounting_type = AccountingType.objects.filter(movement_type=MOVEMENT_TYPE[r['type_mouvement']]).first()
                 journal = GeneralJournal.objects.filter(id=r['id_classeur']).first()
+                if r['id_libelle']:
+                    label = journal.club_account.labels.filter(name=to_unicode(r['nom_libelle'])).first()
                 def get_target_type():
                     if r['id_utilisateur']:
                         return "USER"
@@ -901,6 +930,7 @@ def migrate_accounting():
                         target_type=get_target_type(),
                         target_id=get_target_id(),
                         target_label="-",
+                        label=label,
                         )
                 try:
                     new.clean()
@@ -940,6 +970,7 @@ def migrate_accounting():
     migrate_simpleaccounting_types()
     migrate_bank_accounts()
     migrate_club_accounts()
+    migrate_labels()
     migrate_journals()
     migrate_operations()
     make_operation_links()
@@ -970,6 +1001,7 @@ def migrate_etickets():
     FROM cpt_etickets
     """)
     Eticket.objects.all().delete()
+    print("Etickets deleted")
     for r in cur:
         try:
             p = Product.objects.filter(id=r['id_produit']).first()
@@ -1004,9 +1036,9 @@ def main():
     # migrate_counter()
     # check_accounts()
     # Accounting
-    # migrate_accounting()
+    migrate_accounting()
     # migrate_godfathers()
-    migrate_etickets()
+    # migrate_etickets()
     # reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
     end = datetime.datetime.now()
     print("End at %s" % end)

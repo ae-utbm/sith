@@ -15,6 +15,8 @@
     {% if user.is_root and not object.journals.exists() %}
     <a href="{{ url('accounting:club_delete', c_account_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
     {% endif %}
+    <p><a href="{{ url('accounting:label_new') }}?parent={{ object.id }}">{% trans %}New label{% endtrans %}</a></p>
+    <p><a href="{{ url('accounting:label_list', clubaccount_id=object.id) }}">{% trans %}Label list{% endtrans %}</a></p>
     {% if not object.has_open_journal() %}
     <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">{% trans %}New journal{% endtrans %}</a></p>
     {% else %}

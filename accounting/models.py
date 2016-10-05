@@ -100,7 +100,16 @@ class ClubAccount(models.Model):
         Method to see if that object can be edited by the given user
         """
         m = self.club.get_membership_for(user)
-        if m is not None and m.role >= 7:
+        if m and m.role == 7:
+            return True
+        return False
+
+    def can_be_viewed_by(self, user):
+        """
+        Method to see if that object can be viewed by the given user
+        """
+        m = self.club.get_membership_for(user)
+        if m and m.role >= 7:
             return True
         return False
 
@@ -149,6 +158,9 @@ class GeneralJournal(models.Model):
             return True
         return False
 
+    def can_be_viewed_by(self, user):
+        return self.club_account.can_be_edited_by(user)
+
     def get_absolute_url(self):
         return reverse('accounting:journal_details', kwargs={'j_id': self.id})
 
@@ -186,6 +198,8 @@ class Operation(models.Model):
             verbose_name=_("simple type"), null=True, blank=True)
     accounting_type = models.ForeignKey('AccountingType', related_name="operations",
             verbose_name=_("accounting type"), null=True, blank=True)
+    label = models.ForeignKey('Label', related_name="operations",
+            verbose_name=_("label"), null=True, blank=True, on_delete=models.SET_NULL)
     target_type = models.CharField(_('target type'), max_length=10,
             choices=[('USER', _('User')), ('CLUB', _('Club')), ('ACCOUNT', _('Account')), ('COMPANY', _('Company')), ('OTHER', _('Other'))])
     target_id = models.IntegerField(_('target id'), null=True, blank=True)
@@ -325,4 +339,27 @@ class SimplifiedAccountingType(models.Model):
 
     def __str__(self):
         return self.get_movement_type_display()+" - "+self.accounting_type.code+" - "+self.label
+
+class Label(models.Model):
+    """Label allow a club to sort its operations"""
+    name = models.CharField(_('label'), max_length=64)
+    club_account = models.ForeignKey(ClubAccount, related_name="labels", verbose_name=_("club account"))
+
+    class Meta:
+        unique_together = ('name', 'club_account')
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.club_account.name)
+
+    def get_absolute_url(self):
+        return reverse('accounting:label_list', kwargs={'clubaccount_id': self.club_account.id})
+
+    def is_owned_by(self, user):
+        return self.club_account.is_owned_by(user)
+
+    def can_be_edited_by(self, user):
+        return self.club_account.can_be_edited_by(user)
+
+    def can_be_viewed_by(self, user):
+        return self.club_account.can_be_viewed_by(user)
 

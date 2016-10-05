@@ -25,6 +25,7 @@
         <tr>
             <td>{% trans %}Nb{% endtrans %}</td>
             <td>{% trans %}Date{% endtrans %}</td>
+            <td>{% trans %}Label{% endtrans %}</td>
             <td>{% trans %}Amount{% endtrans %}</td>
             <td>{% trans %}Payment mode{% endtrans %}</td>
             <td>{% trans %}Target{% endtrans %}</td>
@@ -41,6 +42,7 @@
         <tr>
             <td>{{ o.number }}</td>
             <td>{{ o.date }}</td>
+            <td>{{ o.label or "" }}</td>
             <td>{{ o.amount }} €</td>
             <td>{{ o.get_mode_display() }}</td>
             {% if o.target_type == "OTHER" %}

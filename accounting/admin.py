@@ -9,5 +9,6 @@ admin.site.register(GeneralJournal)
 admin.site.register(AccountingType)
 admin.site.register(SimplifiedAccountingType)
 admin.site.register(Operation)
+admin.site.register(Label)
 
 
