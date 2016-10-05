@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^user/(?P<user_id>[0-9]+)/godfathers/(?P<godfather_id>[0-9]+)/(?P<is_father>(True)|(False))/delete$', DeleteUserGodfathers, name='user_godfathers_delete'),
     url(r'^user/(?P<user_id>[0-9]+)/edit$', UserUpdateProfileView.as_view(), name='user_edit'),
     url(r'^user/(?P<user_id>[0-9]+)/profile_upload$', UserUploadProfilePictView.as_view(), name='user_profile_upload'),
+    url(r'^user/(?P<user_id>[0-9]+)/clubs$', UserClubView.as_view(), name='user_clubs'),
     url(r'^user/(?P<user_id>[0-9]+)/groups$', UserUpdateGroupView.as_view(), name='user_groups'),
     url(r'^user/tools/$', UserToolsView.as_view(), name='user_tools'),
     url(r'^user/(?P<user_id>[0-9]+)/account$', UserAccountView.as_view(), name='user_account'),

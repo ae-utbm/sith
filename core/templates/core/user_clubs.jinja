@@ -1,0 +1,24 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+	{% trans user_name=profile.get_display_name() %}{{ user_name }}'s club(s){% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans%}Club(s){% endtrans %}</h3>
+
+<h4>{% trans%}Current club(s){% endtrans %}</h4>
+<ul>
+    {% for m in profile.memberships.filter(end_date=None).all() %}
+	<li><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></li>
+    {% endfor %}
+</ul>
+
+<h4>{% trans%}Old club(s){% endtrans %}</h4>
+<ul>
+    {% for m in profile.memberships.exclude(end_date=None).all() %}
+	<li><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
