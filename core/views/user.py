@@ -20,6 +20,7 @@ import logging
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
 from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm, UserGodfathersForm
 from core.models import User, SithFile
+from club.models import Club
 from subscription.models import Subscription
 
 def login(request):
@@ -149,6 +150,12 @@ class UserTabsMixin(TabedViewMixin):
                         'url': reverse('core:user_edit', kwargs={'user_id': self.object.id}),
                         'slug': 'edit',
                         'name': _("Edit"),
+                        })
+        if self.request.user.can_view(self.object):
+            tab_list.append({
+                        'url': reverse('core:user_clubs', kwargs={'user_id': self.object.id}),
+                        'slug': 'clubs',
+                        'name': _("Clubs"),
                         })
         if self.request.user.is_owner(self.object):
             tab_list.append({
@@ -335,6 +342,16 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
         kwargs['profile'] = self.form.instance
         kwargs['form'] = self.form
         return kwargs
+
+class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
+    """
+    Display the user's club(s)
+    """
+    model = User
+    context_object_name = "profile"
+    pk_url_kwarg = "user_id"
+    template_name = "core/user_clubs.jinja"
+    current_tab = "clubs"
 
 class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     """

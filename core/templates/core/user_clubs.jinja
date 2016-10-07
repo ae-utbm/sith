@@ -1,0 +1,62 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+	{% trans user_name=profile.get_display_name() %}{{ user_name }}'s club(s){% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans%}Club(s){% endtrans %}</h3>
+<br>
+<h4>{% trans%}Current club(s) :{% endtrans %}</h4>
+<br>
+<table>
+    <thead>
+    	<tr>
+    		<td>{% trans %}User{% endtrans %}</td>
+	        <td>{% trans %}Role{% endtrans %}</td>
+	        <td>{% trans %}Description{% endtrans %}</td>
+	        <td>{% trans %}Since{% endtrans %}</td>
+    	</tr>
+    </thead>
+    <tbody>
+	    {% for m in profile.memberships.filter(end_date=None).all() %}
+        <tr>
+            <td><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></td>
+            <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+            <td>{{ m.description }}</td>
+            <td>{{ m.start_date }}</td>
+            {% if m.can_be_edited_by(user) %}
+            <td><a href="{{ url('club:membership_set_old', membership_id=m.id) }}">{% trans %}Mark as old{% endtrans %}</a></td>
+            {% endif %}
+        </tr>
+    	{% endfor %}
+    </tbody>
+</table>
+<br>
+<h4>{% trans%}Old club(s) :{% endtrans %}</h4>
+<br>
+<table>
+    <thead>
+    	<tr>
+    		<td>{% trans %}User{% endtrans %}</td>
+	        <td>{% trans %}Role{% endtrans %}</td>
+	        <td>{% trans %}Description{% endtrans %}</td>
+	        <td>{% trans %}From{% endtrans %}</td>
+	        <td>{% trans %}To{% endtrans %}</td>
+
+    	</tr>
+    </thead>
+    <tbody>
+	    {% for m in profile.memberships.exclude(end_date=None).all() %}
+        <tr>
+            <td><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></td>
+            <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+            <td>{{ m.description }}</td>
+            <td>{{ m.start_date }}</td>
+            <td>{{ m.end_date }}</td>
+        </tr>
+    	{% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
