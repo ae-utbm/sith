@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from "core/macros.jinja" import user_mini_profile %}
+{% from "core/macros.jinja" import user_mini_profile, user_subscription %}
 
 
 {% macro add_product(id, content, class="") %}
@@ -28,6 +28,7 @@
 <div id="user_info">
     <h5>{% trans %}Customer{% endtrans %}</h5>
     {{ user_mini_profile(customer.user) }}
+    {{ user_subscription(customer.user) }}
     <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 </div>
 <div id="bar_ui">
