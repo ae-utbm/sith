@@ -34,6 +34,11 @@
 </div>
 {%- endmacro %}
 
+{% macro user_subscription(user) %}
+        {% trans subscription_end=get_subscriber(user).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
+        {% trans %}Account number: {% endtrans %}{{ user.customer.account_id }}<br/>
+{%- endmacro %}
+
 {% macro show_slots(user) %}
     {% if get_subscriber(user).slots.filter(start_date__gte=timezone.now()).exists() %}
         <h5>{% trans %}Slot{% endtrans %}</h5>

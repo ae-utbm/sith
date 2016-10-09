@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from "core/macros.jinja" import show_slots, show_tokens %}
+{% from "core/macros.jinja" import show_slots, show_tokens, user_subscription %}
 
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s profile{% endtrans %}
@@ -56,8 +56,7 @@
 <p>
 {% if get_subscriber(profile).is_subscribed() %}
     {% if user == profile or user.is_root or user.is_board_member %}
-        {% trans subscription_end=get_subscriber(profile).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
-        {% trans %}Account number: {% endtrans %}{{ profile.customer.account_id }}<br/>
+        {{ user_subscription(profile) }}
     {% endif %}
     {% if user == profile or user.is_root or user.is_board_member or user.is_launderette_manager %}
         {# Shows tokens bought by the user #}
