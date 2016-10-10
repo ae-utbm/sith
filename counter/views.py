@@ -20,7 +20,7 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from ajax_select import make_ajax_form, make_ajax_field
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
-from core.views.forms import SelectUser, LoginForm, SelectDate
+from core.views.forms import SelectUser, LoginForm, SelectDate, SelectDateTime
 from core.models import User
 from subscription.models import Subscriber, Subscription
 from subscription.views import get_subscriber
@@ -896,6 +896,10 @@ class CashSummaryEditView(CanEditPropMixin, CounterAdminTabsMixin, UpdateView):
     def get_success_url(self):
         return reverse('counter:cash_summary_list')
 
+class CashSummaryFormBase(forms.Form):
+    begin_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Begin date"), required=False, widget=SelectDateTime)
+    end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"), required=False, widget=SelectDateTime)
+
 class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
     """Display a list of cash summaries"""
     model = CashRegisterSummary
@@ -906,16 +910,29 @@ class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
     def get_context_data(self, **kwargs):
         """ Add sums to the context """
         kwargs = super(CashSummaryListView, self).get_context_data(**kwargs)
+        form = CashSummaryFormBase(self.request.GET)
+        kwargs['form'] = form
         kwargs['summaries_sums'] = {}
         kwargs['refilling_sums'] = {}
         for c in Counter.objects.filter(type="BAR").all():
-            last_summary = CashRegisterSummary.objects.filter(counter=c, emptied=True).order_by('-date').first()
-            if last_summary:
-                last_date = last_summary.date
+            refillings = Refilling.objects.filter(counter=c)
+            cashredistersummaries = CashRegisterSummary.objects.filter(counter=c)
+            if form.is_valid() and form.cleaned_data['begin_date']:
+                refillings = refillings.filter(date__gte=form.cleaned_data['begin_date'])
+                cashredistersummaries = cashredistersummaries.filter(date__gte=form.cleaned_data['begin_date'])
             else:
-                last_date = datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC) # My birth date should be old enough
-            kwargs['summaries_sums'][c.name] = sum([s.get_total() for s in CashRegisterSummary.objects.filter(counter=c, date__gt=last_date).all()])
-            kwargs['refilling_sums'][c.name] = sum([s.amount for s in Refilling.objects.filter(counter=c, date__gt=last_date).all()])
+                last_summary = CashRegisterSummary.objects.filter(counter=c, emptied=True).order_by('-date').first()
+                if last_summary:
+                    refillings = refillings.filter(date__gte=last_summary.date)
+                    cashredistersummaries = cashredistersummaries.filter(date__gte=last_summary.date)
+                else:
+                    refillings = refillings.filter(date__gte=datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC)) # My birth date should be old enough
+                    cashredistersummaries = cashredistersummaries.filter(date__gte=datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC))
+            if form.is_valid() and form.cleaned_data['end_date']:
+                refillings = refillings.filter(date__lte=form.cleaned_data['end_date'])
+                cashredistersummaries = cashredistersummaries.filter(date__lte=form.cleaned_data['end_date'])
+            kwargs['summaries_sums'][c.name] = sum([s.get_total() for s in cashredistersummaries.all()])
+            kwargs['refilling_sums'][c.name] = sum([s.amount for s in refillings.all()])
         return kwargs
 
 class InvoiceCallView(CounterAdminTabsMixin, TemplateView):

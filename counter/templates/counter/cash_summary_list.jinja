@@ -7,6 +7,11 @@
 
 {% block content %}
 {% if cashsummary_list %}
+<form action="" method="get">
+    {% csrf_token %}
+    {{ form }}
+    <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>
+</form>
 <h3>{% trans %}Cash register summary list{% endtrans %}</h3>
 <h5>{% trans %}Theoric sums{% endtrans %}</h5>
 <h6>{% trans %}Refillings{% endtrans %}</h6>
