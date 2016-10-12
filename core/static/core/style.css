@@ -154,6 +154,11 @@ code {
     display: inline-block;
     margin: 4px;
 }
+.important {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: red;
+}
 table {
     width: 100%;
     font-size: 0.90em;
