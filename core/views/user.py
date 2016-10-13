@@ -140,11 +140,6 @@ class UserTabsMixin(TabedViewMixin):
                         'slug': 'tools',
                         'name': _("Tools"),
                         })
-        tab_list.append({
-                    'url': reverse('core:user_stats', kwargs={'user_id': self.object.id}),
-                    'slug': 'stats',
-                    'name': _("Stats"),
-                    })
         if self.request.user.can_edit(self.object):
             tab_list.append({
                         'url': reverse('core:user_edit', kwargs={'user_id': self.object.id}),
@@ -168,6 +163,11 @@ class UserTabsMixin(TabedViewMixin):
                 or self.request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
                 or self.request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
                 or self.request.user.is_root)):
+                tab_list.append({
+                            'url': reverse('core:user_stats', kwargs={'user_id': self.object.id}),
+                            'slug': 'stats',
+                            'name': _("Stats"),
+                            })
                 tab_list.append({
                             'url': reverse('core:user_account', kwargs={'user_id': self.object.id}),
                             'slug': 'account',
@@ -322,8 +322,14 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
-        if self.form.instance.profile_pict and not request.user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
+        if self.form.instance.profile_pict and not (request.user.is_board_member or request.user.is_root):
             self.form.fields.pop('profile_pict', None)
+        if self.form.instance.date_of_birth and not (request.user.is_board_member or request.user.is_root):
+            self.form.fields.pop('date_of_birth')
+        if self.form.instance.first_name and not (request.user.is_board_member or request.user.is_root):
+            self.form.fields.pop('first_name')
+        if self.form.instance.last_name and not (request.user.is_board_member or request.user.is_root):
+            self.form.fields.pop('last_name')
         return self.render_to_response(self.get_context_data(form=self.form))
 
     def post(self, request, *args, **kwargs):
