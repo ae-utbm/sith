@@ -140,11 +140,6 @@ class UserTabsMixin(TabedViewMixin):
                         'slug': 'tools',
                         'name': _("Tools"),
                         })
-        tab_list.append({
-                    'url': reverse('core:user_stats', kwargs={'user_id': self.object.id}),
-                    'slug': 'stats',
-                    'name': _("Stats"),
-                    })
         if self.request.user.can_edit(self.object):
             tab_list.append({
                         'url': reverse('core:user_edit', kwargs={'user_id': self.object.id}),
@@ -168,6 +163,11 @@ class UserTabsMixin(TabedViewMixin):
                 or self.request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
                 or self.request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
                 or self.request.user.is_root)):
+                tab_list.append({
+                            'url': reverse('core:user_stats', kwargs={'user_id': self.object.id}),
+                            'slug': 'stats',
+                            'name': _("Stats"),
+                            })
                 tab_list.append({
                             'url': reverse('core:user_account', kwargs={'user_id': self.object.id}),
                             'slug': 'account',
@@ -318,19 +318,23 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     template_name = "core/user_edit.jinja"
     form_class = UserProfileForm
     current_tab = "edit"
+    edit_once = ['profile_pict', 'date_of_birth', 'first_name', 'last_name']
+
+    def remove_once_edited_fields(self, request):
+        for i in self.edit_once:
+            if getattr(self.form.instance, i) and not (request.user.is_board_member or request.user.is_root):
+                self.form.fields.pop(i, None)
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
-        if self.form.instance.profile_pict and not request.user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
-            self.form.fields.pop('profile_pict', None)
+        self.remove_once_edited_fields(request)
         return self.render_to_response(self.get_context_data(form=self.form))
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
-        if self.form.instance.profile_pict and not request.user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
-            self.form.fields.pop('profile_pict', None)
+        self.remove_once_edited_fields(request)
         files = request.FILES.items()
         self.form.process(files)
         if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
