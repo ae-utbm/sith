@@ -278,6 +278,9 @@ class CounterClick(CounterTabsMixin, DetailView):
         if product.limit_age >= 18 and not self.customer.user.date_of_birth:
             request.session['no_age'] = True
             return False
+        if product.limit_age >= 18 and self.customer.user.is_banned_alcohol:
+            request.session['not_allowed'] = True
+            return False
         if self.customer.user.date_of_birth and self.customer.user.get_age() < product.limit_age: # Check if affordable
             request.session['too_young'] = True
             return False

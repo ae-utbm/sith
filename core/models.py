@@ -169,6 +169,13 @@ class User(AbstractBaseUser):
     parent_address = models.CharField(_("parent address"), max_length=128, blank=True, default="")
     is_subscriber_viewable = models.BooleanField(_("is subscriber viewable"), default=True)
     godfathers = models.ManyToManyField('User', related_name='godchildren', blank=True)
+    is_banned_alcohol = models.BooleanField(
+        _('banned from buying alcohol'),
+        default=False,
+        help_text=_(
+            'Designates whether this user is denyed from buying alchool. '
+        ),
+    )
 
     objects = UserManager()
 
