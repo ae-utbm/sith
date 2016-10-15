@@ -1019,7 +1019,8 @@ class EticketPDFView(CanViewMixin, DetailView):
         self.object = self.get_object()
         eticket = self.object.product.eticket
         user = self.object.customer.user
-        code = "%s %s %s" % (self.object.customer.user.id, self.object.product.id, self.object.quantity)
+        print(self.object)
+        code = "%s %s %s %s" % (self.object.customer.user.id, self.object.product.id, self.object.id, self.object.quantity)
         code += " " + eticket.get_hash(code)[:8].upper()
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'filename="eticket.pdf"'
