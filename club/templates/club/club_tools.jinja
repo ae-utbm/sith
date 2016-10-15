@@ -22,7 +22,7 @@
         <h4>{% trans %}Accouting: {% endtrans %}</h4>
         <ul>
         {% for ca in object.club_account.all() %}
-            <li><a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca }}</a></li>
+            <li><a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca.get_display_name() }}</a></li>
         {% endfor %}
         </ul>
     {% endif %}
