@@ -127,7 +127,7 @@ class UserProfileForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', 'profile_pict', 'avatar_pict',
                 'scrub_pict', 'sex', 'second_email', 'address', 'parent_address', 'phone', 'parent_phone',
                 'tshirt_size', 'role', 'department', 'dpt_option', 'semester', 'quote', 'school', 'promo',
-                'forum_signature', 'is_subscriber_viewable', 'is_banned_alcohol']
+                'forum_signature', 'is_subscriber_viewable']
         widgets = {
                 'date_of_birth': SelectDate,
                 'profile_pict': forms.ClearableFileInput,

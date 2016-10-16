@@ -319,7 +319,7 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     form_class = UserProfileForm
     current_tab = "edit"
     edit_once = ['profile_pict', 'date_of_birth', 'first_name', 'last_name']
-    board_only = ['is_banned_alcohol']
+    board_only = []
 
     def remove_restricted_fields(self, request):
         """
