@@ -63,6 +63,9 @@ class RefillForm(forms.ModelForm):
     class Meta:
         model = Refilling
         fields = ['amount', 'payment_method', 'bank']
+        widgets = {
+            'amount': forms.NumberInput(attrs={'class':'focus'},)
+        }
 
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):

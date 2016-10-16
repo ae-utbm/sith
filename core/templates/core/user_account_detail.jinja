@@ -9,35 +9,6 @@
 <h3>{% trans %}User account{% endtrans %}</h3>
 <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 <p><a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Back{% endtrans %}</a></p>
-{% if customer.refillings.exists() %}
-<h4>{% trans %}Refillings{% endtrans %}</h4>
-<table>
-    <thead>
-        <tr>
-            <td>{% trans %}Date{% endtrans %}</td>
-            <td>{% trans %}Counter{% endtrans %}</td>
-            <td>{% trans %}Barman{% endtrans %}</td>
-            <td>{% trans %}Amount{% endtrans %}</td>
-            <td>{% trans %}Payment method{% endtrans %}</td>
-        </tr>
-    </thead>
-    <tbody>
-    {% for i in customer.refillings.order_by('-date').filter(
-        date__year=year, date__month=month) %}
-        <tr>
-        <td>{{ i.date|localtime|date(DATETIME_FORMAT) }} - {{ i.date|localtime|time(DATETIME_FORMAT) }}</td>
-        <td>{{ i.counter }}</td>
-        <td><a href="{{ i.operator.get_absolute_url() }}">{{ i.operator.get_display_name() }}</a></td>
-        <td>{{ i.amount }} €</td>
-        <td>{{ i.get_payment_method_display() }}</td>
-        {% if i.is_owned_by(user) %}
-            <td><a href="{{ url('counter:refilling_delete', refilling_id=i.id) }}">Delete</a></td>
-        {% endif %}
-    </tr>
-{% endfor %}
-    </tbody>
-</table>
-{% endif %}
 {% if customer.buyings.exists() %}
 <h4>{% trans %}Account buyings{% endtrans %}</h4>
 <table>
@@ -65,6 +36,35 @@
         <td>{{ i.get_payment_method_display() }}</td>
         {% if i.is_owned_by(user) %}
             <td><a href="{{ url('counter:selling_delete', selling_id=i.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+        {% endif %}
+    </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% if customer.refillings.exists() %}
+<h4>{% trans %}Refillings{% endtrans %}</h4>
+<table>
+    <thead>
+        <tr>
+            <td>{% trans %}Date{% endtrans %}</td>
+            <td>{% trans %}Counter{% endtrans %}</td>
+            <td>{% trans %}Barman{% endtrans %}</td>
+            <td>{% trans %}Amount{% endtrans %}</td>
+            <td>{% trans %}Payment method{% endtrans %}</td>
+        </tr>
+    </thead>
+    <tbody>
+    {% for i in customer.refillings.order_by('-date').filter(
+        date__year=year, date__month=month) %}
+        <tr>
+        <td>{{ i.date|localtime|date(DATETIME_FORMAT) }} - {{ i.date|localtime|time(DATETIME_FORMAT) }}</td>
+        <td>{{ i.counter }}</td>
+        <td><a href="{{ i.operator.get_absolute_url() }}">{{ i.operator.get_display_name() }}</a></td>
+        <td>{{ i.amount }} €</td>
+        <td>{{ i.get_payment_method_display() }}</td>
+        {% if i.is_owned_by(user) %}
+            <td><a href="{{ url('counter:refilling_delete', refilling_id=i.id) }}">Delete</a></td>
         {% endif %}
     </tr>
 {% endfor %}
