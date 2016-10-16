@@ -223,10 +223,10 @@ class Counter(models.Model):
 
     def is_inactive(self):
         """
-        Returns True if the counter self is inactive from 10 minutes, else False 
+        Returns True if the counter self is inactive from 5 minutes, else False 
         """
         if (self.is_open()):
-            return ((timezone.now() - self.permanencies.model.objects.order_by('-activity').first().activity) > datetime.timedelta(minutes=10))
+            return ((timezone.now() - self.permanencies.model.objects.order_by('-activity').first().activity) > datetime.timedelta(minutes=5))
         else:
             return False
 
