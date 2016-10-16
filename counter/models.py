@@ -11,6 +11,7 @@ import random
 import string
 import os
 import base64
+import datetime
 
 from club.models import Club
 from accounting.models import CurrencyField
@@ -219,6 +220,15 @@ class Counter(models.Model):
 
     def is_open(self):
         return len(self.get_barmen_list()) > 0
+
+    def is_inactive(self):
+        """
+        Returns True if the counter self is inactive from 5 minutes, else False 
+        """
+        if (self.is_open()):
+            return ((timezone.now() - self.permanencies.model.objects.order_by('-activity').first().activity) > datetime.timedelta(minutes=5))
+        else:
+            return False
 
     def barman_list(self):
         """
