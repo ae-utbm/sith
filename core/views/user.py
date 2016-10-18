@@ -427,10 +427,10 @@ class UserAccountView(UserAccountBase):
                     date__year=month.year,
                     date__month=month.month
                 )
-                stats[i].append((
-                    sum([calc(p) for p in q]),
-                    month
-                ))
+                stats[i].append({
+                    'sum':sum([calc(p) for p in q]),
+                    'date':month
+                })
             i += 1
         return stats
 

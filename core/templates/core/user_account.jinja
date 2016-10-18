@@ -12,13 +12,13 @@
         </thead>
         <tbody>
         {% for array in obj %}
-            {% for tuple in array %}
-                {% if tuple[0] != 0 %}
-                {% set link=url('core:user_account_detail', user_id=profile.id, year=tuple[1].year, month=tuple[1].month) %}
+            {% for dict in array %}
+                {% if dict['sum'] != 0 %}
+                {% set link=url('core:user_account_detail', user_id=profile.id, year=dict['date'].year, month=dict['date'].month) %}
                 <tr>
-                    <td><a href="{{ link }}">{{ tuple[1].year }}</a></td>
-                    <td><a href="{{ link }}">{{ tuple[1]|date("E") }}</a></td>
-                    <td><a href="{{ link }}">{{ tuple[0] }} €</a></td>
+                    <td><a href="{{ link }}">{{ dict['date'].year }}</a></td>
+                    <td><a href="{{ link }}">{{ dict['date']|date("E") }}</a></td>
+                    <td><a href="{{ link }}">{{ dict['sum'] }} €</a></td>
                 </tr>
                 {% endif %}
             {% endfor %}
