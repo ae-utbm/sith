@@ -243,11 +243,11 @@ class User(AbstractBaseUser):
 
     @property
     def is_banned_alcohol(self):
-        return self.groups.filter(name=settings.SITH_GROUPS['banned-alcohol']['name']).exists()
+        return self.is_in_group(settings.SITH_GROUPS['banned-alcohol']['name'])
 
     @property
     def is_banned_counter(self):
-        return self.groups.filter(name=settings.SITH_GROUPS['banned-from-counters']['name']).exists()
+        return self.is_in_group(settings.SITH_GROUPS['banned-from-counters']['name'])
 
     def save(self, *args, **kwargs):
         create = False
@@ -437,6 +437,14 @@ class AnonymousUser(AuthAnonymousUser):
 
     @property
     def is_launderette_manager(self):
+        return False
+
+    @property
+    def is_banned_alcohol(self):
+        return False
+
+    @property
+    def is_banned_conuter(self):
         return False
 
     def is_in_group(self, group_name):
