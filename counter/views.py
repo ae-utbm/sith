@@ -923,8 +923,8 @@ class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
             else:
                 last_summary = CashRegisterSummary.objects.filter(counter=c, emptied=True).order_by('-date').first()
                 if last_summary:
-                    refillings = refillings.filter(date__gte=last_summary.date)
-                    cashredistersummaries = cashredistersummaries.filter(date__gte=last_summary.date)
+                    refillings = refillings.filter(date__gt=last_summary.date)
+                    cashredistersummaries = cashredistersummaries.filter(date__gt=last_summary.date)
                 else:
                     refillings = refillings.filter(date__gte=datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC)) # My birth date should be old enough
                     cashredistersummaries = cashredistersummaries.filter(date__gte=datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC))
