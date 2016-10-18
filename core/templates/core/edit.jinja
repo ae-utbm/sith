@@ -1,11 +1,19 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
+{% if object %}
 {% trans obj=object %}Edit {{ obj }}{% endtrans %}
+{% else %}
+{% trans %}Save{% endtrans %}
+{% endif %}
 {% endblock %}
 
 {% block content %}
+{% if object %}
 <h2>{% trans obj=object %}Edit {{ obj }}{% endtrans %}</h2>
+{% else %}
+<h2>{% trans %}Save{% endtrans %}</h2>
+{% endif %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p() }}
