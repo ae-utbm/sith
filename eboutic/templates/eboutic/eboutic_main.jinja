@@ -4,11 +4,11 @@
 {% trans %}Eboutic{% endtrans %}
 {% endblock %}
 
-{% macro add_product(id, content) %}
-<form method="post" action="{{ url('eboutic:main') }}" class="inline" style="display:inline">
+{% macro add_product(id, content, class="") %}
+<form method="post" action="{{ url('eboutic:main') }}" class="inline {{ class }}">
     {% csrf_token %}
     <input type="hidden" name="action" value="add_product">
-    <button type="submit" name="product_id" value="{{ id }}"> {{ content }} </button>
+    <button type="submit" name="product_id" value="{{ id }}"> {{ content|safe }} </button>
 </form>
 {% endmacro %}
 
@@ -42,7 +42,14 @@
     {% if eboutic.products.filter(product_type=t).exists() %}
         <h5>{{ t }}</h5>
         {% for p in eboutic.products.filter(product_type=t).all() %}
-        {{ add_product(p.id, p.name) }}
+            {% set file = None %}
+            {% if p.icon %}
+                {% set file = p.icon.url %}
+            {% else %}
+                {% set file = static('core/img/na.gif') %}
+            {% endif %}
+            {% set prod = '<strong>%s</strong><hr><img src="%s" /><span>%s €</span>' % (p.name, file, p.selling_price) %}
+        {{ add_product(p.id, prod, "form_button") }}
         {% endfor %}
     {% endif %}
     {% endfor %}
