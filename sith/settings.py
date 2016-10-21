@@ -256,6 +256,18 @@ SITH_GROUPS = {
         'id': 5,
         'name': "Counter admin",
     },
+    'banned-alcohol': {
+        'id': 6,
+        'name': "Banned from buying alcohol",
+    },
+    'banned-from-counters': {
+        'id': 7,
+        'name': "Banned from counters",
+    },
+    'banned-to-subscribe': {
+        'id': 8,
+        'name': "Banned to subscribe",
+    }
 }
 
 SITH_BOARD_SUFFIX="-bureau"

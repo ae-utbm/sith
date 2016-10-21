@@ -241,6 +241,14 @@ class User(AbstractBaseUser):
         from club.models import Club
         return Club.objects.filter(unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name']).first().get_membership_for(self)
 
+    @property
+    def is_banned_alcohol(self):
+        return self.is_in_group(settings.SITH_GROUPS['banned-alcohol']['name'])
+
+    @property
+    def is_banned_counter(self):
+        return self.is_in_group(settings.SITH_GROUPS['banned-from-counters']['name'])
+
     def save(self, *args, **kwargs):
         create = False
         with transaction.atomic():
@@ -429,6 +437,14 @@ class AnonymousUser(AuthAnonymousUser):
 
     @property
     def is_launderette_manager(self):
+        return False
+
+    @property
+    def is_banned_alcohol(self):
+        return False
+
+    @property
+    def is_banned_conuter(self):
         return False
 
     def is_in_group(self, group_name):

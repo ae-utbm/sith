@@ -63,6 +63,9 @@ class RefillForm(forms.ModelForm):
     class Meta:
         model = Refilling
         fields = ['amount', 'payment_method', 'bank']
+        widgets = {
+            'amount': forms.NumberInput(attrs={'class':'focus'},)
+        }
 
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
@@ -277,6 +280,12 @@ class CounterClick(CounterTabsMixin, DetailView):
             return False
         if product.limit_age >= 18 and not self.customer.user.date_of_birth:
             request.session['no_age'] = True
+            return False
+        if product.limit_age >= 18 and self.customer.user.is_banned_alcohol:
+            request.session['not_allowed'] = True
+            return False
+        if self.customer.user.is_banned_counter:
+            request.session['not_allowed'] = True
             return False
         if self.customer.user.date_of_birth and self.customer.user.get_age() < product.limit_age: # Check if affordable
             request.session['too_young'] = True
@@ -1016,7 +1025,7 @@ class EticketPDFView(CanViewMixin, DetailView):
         self.object = self.get_object()
         eticket = self.object.product.eticket
         user = self.object.customer.user
-        code = "%s %s %s" % (self.object.customer.user.id, self.object.product.id, self.object.quantity)
+        code = "%s %s %s %s" % (self.object.customer.user.id, self.object.product.id, self.object.id, self.object.quantity)
         code += " " + eticket.get_hash(code)[:8].upper()
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'filename="eticket.pdf"'

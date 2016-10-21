@@ -319,22 +319,29 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     form_class = UserProfileForm
     current_tab = "edit"
     edit_once = ['profile_pict', 'date_of_birth', 'first_name', 'last_name']
+    board_only = []
 
-    def remove_once_edited_fields(self, request):
+    def remove_restricted_fields(self, request):
+        """
+        Removes edit_once and board_only fields
+        """
         for i in self.edit_once:
             if getattr(self.form.instance, i) and not (request.user.is_board_member or request.user.is_root):
+                self.form.fields.pop(i, None)
+        for i in self.board_only:
+            if not (request.user.is_board_member or request.user.is_root):
                 self.form.fields.pop(i, None)
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
-        self.remove_once_edited_fields(request)
+        self.remove_restricted_fields(request)
         return self.render_to_response(self.get_context_data(form=self.form))
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
-        self.remove_once_edited_fields(request)
+        self.remove_restricted_fields(request)
         files = request.FILES.items()
         self.form.process(files)
         if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
@@ -420,10 +427,10 @@ class UserAccountView(UserAccountBase):
                     date__year=month.year,
                     date__month=month.month
                 )
-                stats[i].append((
-                    sum([calc(p) for p in q]),
-                    month
-                ))
+                stats[i].append({
+                    'sum':sum([calc(p) for p in q]),
+                    'date':month
+                })
             i += 1
         return stats
 
