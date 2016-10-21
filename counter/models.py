@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.forms import ValidationError
+from django.contrib.sites.shortcuts import get_current_site
 
 from datetime import timedelta
 import random
@@ -53,6 +54,15 @@ class Customer(models.Model):
         for s in self.buyings.filter(payment_method="SITH_ACCOUNT"):
             self.amount -= s.quantity * s.unit_price
             self.save()
+
+    def get_absolute_url(self):
+        return reverse('core:user_account', kwargs={'user_id': self.user.pk})
+
+    def get_full_url(self):
+        request = None
+        full_url = ''.join(['http://', settings.SITH_URL, self.get_absolute_url()])
+        return full_url
+
 
 class ProductType(models.Model):
     """
@@ -292,6 +302,32 @@ class Selling(models.Model):
         self.customer.save()
         super(Selling, self).delete(*args, **kwargs)
 
+    def send_mail_customer(self):
+        subject = _('Eticket bought for the event %(event)s') % {'event': self.product.name}
+        message_html = _(
+            "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
+        ) % {
+            'event': self.product.name,
+            'url':''.join((
+                    '<a href="',
+                    self.customer.get_full_url(),
+                    '">',
+                    self.customer.get_full_url(),
+                    '</a>'
+                ))
+        }
+        message_txt = _(
+            "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
+        ) % {
+            'event': self.product.name,
+            'url': self.customer.get_full_url(),
+        }
+        self.customer.user.email_user(
+            subject,
+            message_txt,
+            html_message=message_html 
+        )
+
     def save(self, *args, **kwargs):
         if not self.date:
             self.date = timezone.now()
@@ -330,6 +366,10 @@ class Selling(models.Model):
                     duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
                     start=sub.subscription_start)
             sub.save()
+        try:
+            if self.product.eticket:
+                self.send_mail_customer()
+        except:pass
         super(Selling, self).save(*args, **kwargs)
 
 class Permanency(models.Model):

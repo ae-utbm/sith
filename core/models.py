@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.mail import send_mail
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group as AuthGroup, GroupManager as AuthGroupManager, AnonymousUser as AuthAnonymousUser
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -332,6 +333,8 @@ class User(AbstractBaseUser):
         """
         Sends an email to this User.
         """
+        if from_email is None:
+            from_email = settings.DEFAULT_FROM_EMAIL
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def generate_username(self):
