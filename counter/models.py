@@ -301,7 +301,7 @@ class Selling(models.Model):
         super(Selling, self).delete(*args, **kwargs)
 
     def send_mail_customer(self):
-        event = self.product.eticket.event_title
+        event = self.product.eticket.event_title or _("Unknown event")
         subject = _('Eticket bought for the event %(event)s') % {'event': event}
         message_html = _(
             "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
