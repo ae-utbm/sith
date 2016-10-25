@@ -59,9 +59,7 @@ class Customer(models.Model):
         return reverse('core:user_account', kwargs={'user_id': self.user.pk})
 
     def get_full_url(self):
-        request = None
-        full_url = ''.join(['http://', settings.SITH_URL, self.get_absolute_url()])
-        return full_url
+        return ''.join(['https://', settings.SITH_URL, self.get_absolute_url()])
 
 
 class ProductType(models.Model):
@@ -303,11 +301,12 @@ class Selling(models.Model):
         super(Selling, self).delete(*args, **kwargs)
 
     def send_mail_customer(self):
-        subject = _('Eticket bought for the event %(event)s') % {'event': self.product.name}
+        event = self.product.eticket.event_title
+        subject = _('Eticket bought for the event %(event)s') % {'event': event}
         message_html = _(
             "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
         ) % {
-            'event': self.product.name,
+            'event': event,
             'url':''.join((
                     '<a href="',
                     self.customer.get_full_url(),
@@ -319,7 +318,7 @@ class Selling(models.Model):
         message_txt = _(
             "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
         ) % {
-            'event': self.product.name,
+            'event': event,
             'url': self.customer.get_full_url(),
         }
         self.customer.user.email_user(
@@ -369,7 +368,7 @@ class Selling(models.Model):
         try:
             if self.product.eticket:
                 self.send_mail_customer()
-        except:pass
+        except: pass
         super(Selling, self).save(*args, **kwargs)
 
 class Permanency(models.Model):
