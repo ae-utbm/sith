@@ -16,11 +16,10 @@
     </ul>
     {% endif %}
 
-
-    <h5>{% trans %}Legend{% endtrans %}</h5>
+<h5>{% trans %}Legend{% endtrans %}</h5>
 	<span style="color: green">&#x2713;</span> : {% trans %}counter is open, there's at least one barman connected{% endtrans %}
 	<br>
-    <span style="color: orange">&#x3f;</span> : {% trans %}counter is open but not active, the last sale was done at least 10 minutes ago {% endtrans %}
+    <span style="color: orange">&#x3f;</span> : {% trans  minutes=settings.SITH_COUNTER_MINUTE_INACTIVE %}counter is open but not active, the last sale was done at least {{ minutes }} minutes ago {% endtrans %}
     <br>
     <span style="color: red">&#10007;</span> : {% trans %}counter is not open : no one is connected{% endtrans %}
 {% endblock %}

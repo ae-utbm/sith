@@ -223,12 +223,9 @@ class Counter(models.Model):
 
     def is_inactive(self):
         """
-        Returns True if the counter self is inactive from 10 minutes, else False 
+        Returns True if the counter self is inactive from SITH_COUNTER_MINUTE_INACTIVE's value minutes, else False 
         """
-        if (self.is_open()):
-            return ((timezone.now() - self.permanencies.model.objects.order_by('-activity').first().activity) > datetime.timedelta(minutes=10))
-        else:
-            return False
+        return self.is_open() and ((timezone.now() - self.permanencies.order_by('-activity').first().activity) > datetime.timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE))
 
     def barman_list(self):
         """

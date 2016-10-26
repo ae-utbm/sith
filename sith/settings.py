@@ -191,7 +191,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = './static/'
 
 # Auth configuration
-
 AUTH_USER_MODEL = 'core.User'
 AUTH_ANONYMOUS_MODEL = 'core.models.AnonymousUser'
 LOGIN_URL = '/login'
@@ -412,6 +411,9 @@ SITH_BARMAN_TIMEOUT=20
 
 # Minutes to delete the last operations
 SITH_LAST_OPERATIONS_LIMIT=5
+
+# Minutes for a counter to be inactive
+SITH_COUNTER_MINUTE_INACTIVE=10 
 
 # ET variables
 SITH_EBOUTIC_ET_URL = "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
