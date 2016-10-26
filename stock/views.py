@@ -53,6 +53,45 @@ class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
 	model = Stock
 	form_class = StockEditForm
 	pk_url_kwarg = "stock_id"
+	current_tab = "stocks"
+
+	def get_context_data(self, **kwargs):
+		context = super(StockItemList, self).get_context_data(**kwargs)
+		if 'stock' in self.request.GET.keys():
+			context['stock'] = Stock.objects.filter(id=self.request.GET['stock']).first()
+		return context
+
+class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
+	"""
+	A list view for the admins
+	"""
+	model = Stock
+	template_name = 'stock/stock_list.jinja'
+	current_tab = "stocks"
+
+
+class StockEditForm(forms.ModelForm):
+	"""
+	A form to change stock's characteristics
+	"""
+	class Meta:
+		model = Stock
+		fields = ['name', 'counter']
+			
+	def __init__(self, *args, **kwargs):
+		super(StockEditForm, self).__init__(*args, **kwargs)
+
+	def save(self, *args, **kwargs):
+		return super(StockEditForm, self).save(*args, **kwargs)
+		
+
+class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+	"""
+	An edit view for the stock
+	"""
+	model = Stock
+	form_class = StockEditForm
+	pk_url_kwarg = "stock_id"
 	template_name = 'core/edit.jinja'
 	current_tab = "stocks"
 
@@ -119,3 +158,8 @@ class StockShoppingListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 		if 'stock_id' in self.kwargs.keys():
 			ret['stock'] = Stock.objects.filter(id=self.kwargs['stock_id']).first();
 		return ret
+
+class StockItemOutEditView(CounterAdminTabsMixin, CanViewMixin, UpdateView):
+	"""
+	docstring for StockItemOutList
+	"""
