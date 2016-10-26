@@ -195,7 +195,13 @@ class User(AbstractBaseUser):
         return self.__dict__
 
     def is_in_group(self, group_name):
-        """If the user is in the group passed in argument (as string)"""
+        """If the user is in the group passed in argument (as string or by id)"""
+        if isinstance(group_name, int): # Handle the case where group_name is an ID
+            g = Group.objects.filter(id=group_name).first()
+            if g:
+                group_name = g.name
+            else:
+                return False
         if group_name == settings.SITH_GROUPS['public']['name']:
             return True
         if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked

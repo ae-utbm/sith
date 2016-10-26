@@ -45,6 +45,7 @@ class Command(BaseCommand):
         home_root.save()
         club_root = SithFile(parent=None, name="clubs", is_folder=True, owner=root)
         club_root.save()
+        SithFile(parent=None, name="SAS", is_folder=True, owner=root).save()
         main_club = Club(id=1, name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
                 address=settings.SITH_MAIN_CLUB['address'])
         main_club.save()
@@ -191,6 +192,14 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                 PageRev(page=p, title="README", author=skia, content=rm.read()).save()
 
             # Subscription
+            ## Root
+            s = Subscription(member=Subscriber.objects.filter(pk=root.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                    start=s.subscription_start)
+            s.save()
             ## Skia
             s = Subscription(member=Subscriber.objects.filter(pk=skia.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])

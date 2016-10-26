@@ -19,13 +19,13 @@ import os
 from core.models import SithFile
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, can_view, not_found
 
-def send_file(request, file_id):
+def send_file(request, file_id, file_class=SithFile):
     """
     Send a file through Django without loading the whole file into
     memory at once. The FileWrapper will turn the file object into an
     iterator for chunks of 8KB.
     """
-    f = SithFile.objects.filter(id=file_id).first()
+    f = file_class.objects.filter(id=file_id).first()
     if f is None or f.is_folder:
         return not_found(request)
     from counter.models import Counter

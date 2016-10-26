@@ -203,6 +203,19 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST="localhost"
 EMAIL_PORT=25
 
+# Below this line, only Sith-specific variables are defined
+
+IS_OLD_MYSQL_PRESENT = False
+OLD_MYSQL_INFOS = {
+        'host': 'ae-db',
+        'user': "my_user",
+        'passwd': "password",
+        'db': "ae2-db",
+        'charset': 'utf8',
+        'use_unicode': True,
+        }
+
+
 SITH_URL = "my.url.git.an"
 SITH_NAME = "Sith website"
 
@@ -413,7 +426,7 @@ SITH_BARMAN_TIMEOUT=20
 SITH_LAST_OPERATIONS_LIMIT=5
 
 # Minutes for a counter to be inactive
-SITH_COUNTER_MINUTE_INACTIVE=10 
+SITH_COUNTER_MINUTE_INACTIVE=10
 
 # ET variables
 SITH_EBOUTIC_ET_URL = "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
@@ -430,16 +443,6 @@ SITH_LAUNDERETTE_MACHINE_TYPES = [('WASHING', _('Washing')), ('DRYING', _('Dryin
 SITH_LAUNDERETTE_PRICES = {
         'WASHING': 1.0,
         'DRYING': 0.75,
-        }
-
-IS_OLD_MYSQL_PRESENT = False
-OLD_MYSQL_INFOS = {
-        'host': 'ae-db',
-        'user': "my_user",
-        'passwd': "password",
-        'db': "ae2-db",
-        'charset': 'utf8',
-        'use_unicode': True,
         }
 
 try:
