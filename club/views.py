@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from ajax_select.fields import AutoCompleteSelectField
 
