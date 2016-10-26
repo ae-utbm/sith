@@ -584,6 +584,11 @@ class SithFile(models.Model):
         else:
             return super(SithFile, self).__getattribute__(attr)
 
+    @property
+    def as_picture(self):
+        from sas.models import Picture
+        return Picture.objects.filter(id=self.id).first()
+
     def __str__(self):
         if self.is_folder:
             return _("Folder: ") + self.name

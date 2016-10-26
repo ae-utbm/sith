@@ -1,0 +1,28 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}SAS{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{{ sithfile.get_display_name() }}</h3>
+<div>
+    {% for a in sithfile.children.filter(is_folder=True).all() %}
+    <div style="display: inline-block; border: solid 1px black;">
+        <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
+    </div>
+    {% endfor %}
+</div>
+<div>
+    {% for a in sithfile.children.filter(mime_type__in=['image/jpeg', 'image/png']).all() %}
+    {% if a.as_picture.can_be_viewed_by(user) %}
+    <div style="display: inline-block; border: solid 1px black;">
+        <a href="{{ url("sas:picture", picture_id=a.id) }}">
+            <img src="{{ a.as_picture.get_download_url() }}" alt="{{ a.get_display_name() }}" style="width: 50px"/>
+        </a>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}
+

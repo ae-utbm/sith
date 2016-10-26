@@ -1,0 +1,16 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}SAS{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans %}SAS{% endtrans %}</h3>
+<div>
+    {% for a in root_file.children.filter(is_folder=True).all() %}
+    <div style="display: inline-block; border: solid 1px black;">
+        <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

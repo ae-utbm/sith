@@ -1,0 +1,16 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}SAS{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{{ picture.get_display_name() }}</h3>
+<div style="float: right">
+    PREV / NEXT
+</div>
+<div>
+    <img src="{{ picture.get_download_url() }}" alt="{{ picture.get_display_name() }}" style="width: 90%"/>
+</div>
+{% endblock %}
+
