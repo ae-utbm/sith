@@ -8,3 +8,14 @@ class Stock(models.Model):
 		
 	def __str__(self):
         return self.name
+
+class StockItem(models.Model):
+	""" The StockItem class, element of the stock """
+	name = models.CharField(_('name'), max_length=64)
+	unit_quantity = models.IntegerField(_('unit quantity'), default=0)
+	effective_quantity = models.IntegerField(_('effective quantity'), default=0)
+	stock_owner = models.ForeignKey(Stock, related_name="stock_owner")
+
+	def __str__(self):
+		return self.name
+
