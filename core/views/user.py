@@ -274,7 +274,7 @@ class UserMiniView(CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_mini.jinja"
 
-class UserListView(ListView):
+class UserListView(ListView, CanEditPropMixin):
     """
     Displays the user list
     """
