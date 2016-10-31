@@ -1,13 +1,15 @@
 from django.db import models
-from django.counter import Counter
+from django.utils.translation import ugettext_lazy as _
+
+from counter.models import Counter
 
 class Stock(models.Model):
 	""" The Stock class, this one is used to know how many products are left for a specific counter """
 	name = models.CharField(_('name'), max_length=64)
 	counter = models.OneToOneField(Counter, verbose_name=_('counter'), related_name='stock')
-		
+
 	def __str__(self):
-        return self.name
+		return "%s (%s)" % (self.name, self.counter)
 
 class StockItem(models.Model):
 	""" The StockItem class, element of the stock """
@@ -17,5 +19,5 @@ class StockItem(models.Model):
 	stock_owner = models.ForeignKey(Stock, related_name="stock_owner")
 
 	def __str__(self):
-		return self.name
+		return "%s (%s)" % (self.name, self.stock_owner)
 

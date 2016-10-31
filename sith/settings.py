@@ -59,6 +59,7 @@ INSTALLED_APPS = (
     'sas',
     'com',
     'election',
+    'stock',
 )
 
 MIDDLEWARE_CLASSES = (
