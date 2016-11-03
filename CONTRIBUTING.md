@@ -24,10 +24,10 @@ Avec cette commande, tu clones le sith AE dans le dossier courant.
 
 Maintenant, faut passer le sith en mode debug dans le fichier de settings personnalisé.
 
-    cat "DEBUG=True" > sith/settings_custom.py
-    cat 'SITH_URL = "localhost:8000"'% >> sith/settings_custom.py
+    echo "DEBUG=True" > sith/settings_custom.py
+    echo 'SITH_URL = "localhost:8000"'% >> sith/settings_custom.py
 
-Enfin, il s'aggit de créer la base de donnée de test
+Enfin, il s'agit de créer la base de donnée de test lors de la première utilisation
 
    ./manage.py setup
    répondre no
