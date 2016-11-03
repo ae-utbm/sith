@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-25 21:49+0200\n"
+"POT-Creation-Date: 2016-11-03 11:48+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -277,7 +277,7 @@ msgstr "Liste des types comptable"
 #: accounting/templates/accounting/label_list.jinja:9
 #: accounting/templates/accounting/operation_edit.jinja:9
 #: accounting/templates/accounting/simplifiedaccountingtype_list.jinja:9
-#: core/templates/core/user_tools.jinja:43
+#: core/templates/core/user_tools.jinja:42
 msgid "Accounting"
 msgstr "Comptabilité"
 
@@ -296,7 +296,7 @@ msgstr "Il n'y a pas de types comptable dans ce site web."
 
 #: accounting/templates/accounting/bank_account_details.jinja:4
 #: accounting/templates/accounting/bank_account_details.jinja:13
-#: core/templates/core/user_tools.jinja:50
+#: core/templates/core/user_tools.jinja:49
 msgid "Bank account: "
 msgstr "Compte en banque : "
 
@@ -337,7 +337,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/club_account_details.jinja:55
 #: accounting/templates/accounting/journal_details.jinja:70 club/views.py:53
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
-#: core/templates/core/user_tools.jinja:36 core/views/user.py:147
+#: core/templates/core/user_tools.jinja:35 core/views/user.py:147
 #: counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:32
@@ -400,11 +400,9 @@ msgstr "Nom"
 
 #: accounting/templates/accounting/club_account_details.jinja:29
 msgid "Start"
-msgstr ""
+msgstr "Début"
 
 #: accounting/templates/accounting/club_account_details.jinja:30
-#, fuzzy
-#| msgid "End"
 msgid "End"
 msgstr "Fin"
 
@@ -535,8 +533,7 @@ msgid "Edit operation"
 msgstr "Éditer l'opération"
 
 #: accounting/templates/accounting/operation_edit.jinja:40
-#: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:7
-#: core/templates/core/edit.jinja.py:15 core/templates/core/edit.jinja:20
+#: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:12
 #: core/templates/core/file_edit.jinja:8 core/templates/core/page_prop.jinja:8
 #: core/templates/core/pagerev_edit.jinja:24
 #: core/templates/core/user_godfathers.jinja:35
@@ -622,7 +619,6 @@ msgid "Club list"
 msgstr "Liste des clubs"
 
 #: club/templates/club/club_list.jinja:21
-#: core/templates/core/user_tools.jinja:19
 msgid "New club"
 msgstr "Nouveau club"
 
@@ -645,10 +641,8 @@ msgstr "Rôle"
 #: club/templates/club/club_old_members.jinja:10
 #: core/templates/core/user_clubs.jinja:17
 #: core/templates/core/user_clubs.jinja:43
-#, fuzzy
-#| msgid "description"
 msgid "Description"
-msgstr "description"
+msgstr "Description"
 
 #: club/templates/club/club_members.jinja:11
 #: core/templates/core/user_clubs.jinja:18
@@ -754,7 +748,7 @@ msgid "Payment method"
 msgstr "Méthode de paiement"
 
 #: club/templates/club/club_tools.jinja:4
-#: core/templates/core/user_tools.jinja:62
+#: core/templates/core/user_tools.jinja:61
 msgid "Club tools"
 msgstr "Outils club"
 
@@ -1198,8 +1192,6 @@ msgid "page content"
 msgstr "contenu de la page"
 
 #: core/templates/core/403.jinja:5
-#, fuzzy
-#| msgid "403, Forbidden"
 msgid "403, Forbidden"
 msgstr "403. Non autorisé"
 
@@ -1229,8 +1221,6 @@ msgid "Logout"
 msgstr "Déconnexion"
 
 #: core/templates/core/base.jinja:43 core/templates/core/base.jinja.py:44
-#, fuzzy
-#| msgid "Search"
 msgid "Search"
 msgstr "Recherche"
 
@@ -1304,7 +1294,7 @@ msgstr "Confirmation"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: core/templates/core/edit.jinja:5 core/templates/core/edit.jinja.py:13
+#: core/templates/core/edit.jinja:4 core/templates/core/edit.jinja.py:8
 #: core/templates/core/file_edit.jinja:4
 #: counter/templates/counter/cash_register_summary.jinja:4
 #, python-format
@@ -1312,10 +1302,8 @@ msgid "Edit %(obj)s"
 msgstr "Éditer %(obj)s"
 
 #: core/templates/core/file.jinja:7 core/templates/core/file_list.jinja:6
-#, fuzzy
-#| msgid "Files"
 msgid "File list"
-msgstr "Fichiers"
+msgstr "Liste des fichiers"
 
 #: core/templates/core/file.jinja:9
 msgid "New file"
@@ -1503,10 +1491,8 @@ msgid "History"
 msgstr "Historique"
 
 #: core/templates/core/page.jinja:45
-#, fuzzy
-#| msgid "Target does not exists"
 msgid "Page does not exist"
-msgstr "La cible n'existe pas."
+msgstr "La page n'existe pas."
 
 #: core/templates/core/page.jinja:47
 msgid "Create it?"
@@ -1520,10 +1506,8 @@ msgstr ""
 "version %(rev_id)s."
 
 #: core/templates/core/page_hist.jinja:6
-#, fuzzy
-#| msgid "Page list"
 msgid "Page history"
-msgstr "Liste des pages"
+msgstr "Historique de la page"
 
 #: core/templates/core/page_hist.jinja:7
 #, python-format
@@ -1657,8 +1641,6 @@ msgid "Year"
 msgstr "Année"
 
 #: core/templates/core/user_account.jinja:9
-#, fuzzy
-#| msgid "Month"
 msgid "Month"
 msgstr "Mois"
 
@@ -1692,7 +1674,7 @@ msgstr "Facture eboutic"
 
 #: core/templates/core/user_account.jinja:53 counter/views.py:479
 msgid "Etickets"
-msgstr ""
+msgstr "Etickets"
 
 #: core/templates/core/user_account.jinja:64
 #: core/templates/core/user_account_detail.jinja:103
@@ -1718,10 +1700,8 @@ msgid "Club(s)"
 msgstr "Clubs"
 
 #: core/templates/core/user_clubs.jinja:10
-#, fuzzy
-#| msgid "Current scrub: "
 msgid "Current club(s) :"
-msgstr "Blouse actuelle : "
+msgstr "Clubs actuels : "
 
 #: core/templates/core/user_clubs.jinja:36
 msgid "Old club(s) :"
@@ -1863,44 +1843,44 @@ msgstr "Fusionner deux utilisateurs"
 msgid "Subscriptions"
 msgstr "Cotisations"
 
-#: core/templates/core/user_tools.jinja:24 counter/views.py:449
+#: core/templates/core/user_tools.jinja:23 counter/views.py:449
 #: counter/views.py:598
 msgid "Counters"
 msgstr "Comptoirs"
 
-#: core/templates/core/user_tools.jinja:27
+#: core/templates/core/user_tools.jinja:26
 msgid "General management"
 msgstr "Gestion générale"
 
-#: core/templates/core/user_tools.jinja:28
+#: core/templates/core/user_tools.jinja:27
 msgid "General counters management"
 msgstr "Gestion générale des comptoirs"
 
-#: core/templates/core/user_tools.jinja:29
+#: core/templates/core/user_tools.jinja:28
 msgid "Products management"
 msgstr "Gestion des produits"
 
-#: core/templates/core/user_tools.jinja:30
+#: core/templates/core/user_tools.jinja:29
 msgid "Product types management"
 msgstr "Gestion des types de produit"
 
-#: core/templates/core/user_tools.jinja:31
+#: core/templates/core/user_tools.jinja:30
 #: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:469
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
 
-#: core/templates/core/user_tools.jinja:37 core/views/user.py:169
+#: core/templates/core/user_tools.jinja:36 core/views/user.py:169
 #: counter/templates/counter/counter_list.jinja:18
 #: counter/templates/counter/counter_list.jinja:33
 #: counter/templates/counter/counter_list.jinja:48
 msgid "Stats"
 msgstr "Stats"
 
-#: core/templates/core/user_tools.jinja:46
+#: core/templates/core/user_tools.jinja:45
 msgid "General accounting"
 msgstr "Comptabilité générale"
 
-#: core/templates/core/user_tools.jinja:55
+#: core/templates/core/user_tools.jinja:54
 msgid "Club account: "
 msgstr "Compte club : "
 
@@ -2096,12 +2076,12 @@ msgstr "vente"
 
 #: counter/models.py:304
 msgid "Unknown event"
-msgstr "Évènement inconnu"
+msgstr "Événement inconnu"
 
 #: counter/models.py:305
 #, python-format
 msgid "Eticket bought for the event %(event)s"
-msgstr "Achat d'eticket pour l'évènement %(event)s"
+msgstr "Eticket acheté pour l'événement %(event)s"
 
 #: counter/models.py:307 counter/models.py:319
 #, python-format
@@ -2109,8 +2089,8 @@ msgid ""
 "You bought an eticket for the event %(event)s.\n"
 "You can download it on this page %(url)s."
 msgstr ""
-"Vous avez acheté un eticket pour l'évènement %(event)s.\n"
-"Vous pouvez le télécharger en visitant cette page %(url)s"
+"Vous avez acheté un Eticket pour l'événement %(event)s.\n"
+"Vous pouvez le télécharger sur cette page: %(url)s"
 
 #: counter/models.py:382
 msgid "last activity date"
@@ -2320,8 +2300,6 @@ msgid "Choose another month: "
 msgstr "Choisir un autre mois : "
 
 #: counter/templates/counter/invoices_call.jinja:21
-#, fuzzy
-#| msgid "Sum"
 msgid "Sum"
 msgstr "Somme"
 
@@ -2846,238 +2824,3 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
-
-#, fuzzy
-#~| msgid "Page history"
-#~ msgid "Page source"
-#~ msgstr "Historique de la page"
-
-#, fuzzy
-#~| msgid "location"
-#~ msgid "Syndication"
-#~ msgstr "lieu"
-
-#, fuzzy
-#~| msgid "second email address"
-#~ msgid "Enter a valid email address."
-#~ msgstr "adresse email secondaire"
-
-#, fuzzy
-#~| msgid ""
-#~| "Enter a valid username. This value may contain only letters, numbers "
-#~| "and ./+/-/_ characters."
-#~ msgid ""
-#~ "Enter a valid 'slug' consisting of letters, numbers, underscores or "
-#~ "hyphens."
-#~ msgstr ""
-#~ "Entrez un nom d'utilisateur correct. Uniquement des lettres, numéros, "
-#~ "et ./+/-/_"
-
-#, fuzzy
-#~| msgid "A user with that email address already exists"
-#~ msgid "%(model_name)s with this %(field_labels)s already exists."
-#~ msgstr "Un utilisateur avec cette adresse email existe déjà"
-
-#, fuzzy
-#~| msgid "Token name can not be blank"
-#~ msgid "This field cannot be blank."
-#~ msgstr "Le nom du jeton ne peut pas être vide"
-
-#, fuzzy
-#~| msgid "number"
-#~ msgid "Decimal number"
-#~ msgstr "numéro"
-
-#, fuzzy
-#~| msgid "Description"
-#~ msgid "Duration"
-#~ msgstr "Description"
-
-#, fuzzy
-#~| msgid "email address"
-#~ msgid "Email address"
-#~ msgstr "adresse email"
-
-#, fuzzy
-#~| msgid "File list"
-#~ msgid "File path"
-#~ msgstr "Liste des fichiers"
-
-#, fuzzy
-#~| msgid "account number"
-#~ msgid "Floating point number"
-#~ msgstr "numero de compte"
-
-#, fuzzy
-#~| msgid "address"
-#~ msgid "IPv4 address"
-#~ msgstr "Adresse"
-
-#, fuzzy
-#~| msgid "address"
-#~ msgid "IP address"
-#~ msgstr "Adresse"
-
-#, fuzzy
-#~| msgid "account number"
-#~ msgid "Enter a number."
-#~ msgstr "numero de compte"
-
-#, fuzzy
-#~| msgid "Current club(s) :"
-#~ msgid "Currently"
-#~ msgstr "Clubs actuels : "
-
-#, fuzzy
-#~| msgid "M"
-#~ msgid "PM"
-#~ msgstr "M"
-
-#, fuzzy
-#~| msgid "M"
-#~ msgid "AM"
-#~ msgstr "M"
-
-#, fuzzy
-#~| msgid "Month"
-#~ msgid "Mon"
-#~ msgstr "Mois"
-
-#, fuzzy
-#~| msgid "Start"
-#~ msgid "Sat"
-#~ msgstr "Début"
-
-#, fuzzy
-#~| msgid "Man"
-#~ msgid "May"
-#~ msgstr "Homme"
-
-#, fuzzy
-#~| msgid "past member"
-#~ msgid "September"
-#~ msgstr "Anciens membres"
-
-#, fuzzy
-#~| msgid "Members"
-#~ msgid "November"
-#~ msgstr "Membres"
-
-#, fuzzy
-#~| msgid "Members"
-#~ msgid "December"
-#~ msgstr "Membres"
-
-#, fuzzy
-#~| msgid "Man"
-#~ msgid "jan"
-#~ msgstr "Homme"
-
-#, fuzzy
-#~| msgid "Bar"
-#~ msgid "mar"
-#~ msgstr "Bar"
-
-#, fuzzy
-#~| msgid "Bar"
-#~ msgid "apr"
-#~ msgstr "Bar"
-
-#, fuzzy
-#~| msgid "company"
-#~ msgid "may"
-#~ msgstr "entreprise"
-
-#, fuzzy
-#~| msgid "journal"
-#~ msgid "jun"
-#~ msgstr "classeur"
-
-#, fuzzy
-#~| msgid "journal"
-#~ msgid "jul"
-#~ msgstr "classeur"
-
-#, fuzzy
-#~| msgid "sex"
-#~ msgid "sep"
-#~ msgstr "sexe"
-
-#, fuzzy
-#~| msgid "Doctor"
-#~ msgid "oct"
-#~ msgstr "Doctorant"
-
-#, fuzzy
-#~| msgid "Search"
-#~ msgctxt "abbrev. month"
-#~ msgid "March"
-#~ msgstr "Recherche"
-
-#, fuzzy
-#~| msgid "Man"
-#~ msgctxt "abbrev. month"
-#~ msgid "May"
-#~ msgstr "Homme"
-
-#, fuzzy
-#~| msgid "Search"
-#~ msgctxt "alt. month"
-#~ msgid "March"
-#~ msgstr "Recherche"
-
-#, fuzzy
-#~| msgid "Man"
-#~ msgctxt "alt. month"
-#~ msgid "May"
-#~ msgstr "Homme"
-
-#, fuzzy
-#~| msgid "past member"
-#~ msgctxt "alt. month"
-#~ msgid "September"
-#~ msgstr "Anciens membres"
-
-#, fuzzy
-#~| msgid "Members"
-#~ msgctxt "alt. month"
-#~ msgid "November"
-#~ msgstr "Membres"
-
-#, fuzzy
-#~| msgid "Members"
-#~ msgctxt "alt. month"
-#~ msgid "December"
-#~ msgstr "Membres"
-
-#, fuzzy
-#~| msgid "Page does not exist"
-#~ msgid "\"%(path)s\" does not exist"
-#~ msgstr "La page n'existe pas."
-
-#, fuzzy
-#~| msgid "Create it?"
-#~ msgid "Create "
-#~ msgstr "La créer ?"
-
-#, fuzzy
-#~| msgid "Create it?"
-#~ msgid "Create"
-#~ msgstr "La créer ?"
-
-#, fuzzy
-#~| msgid "Designates whether this user is a superuser. "
-#~ msgid "Designates whether this user is denyed from buying alchool. "
-#~ msgstr "Est-ce que l'utilisateur est super-utilisateur."
-
-#~ msgid "Last name"
-#~ msgstr "Nom"
-
-#~ msgid "First name"
-#~ msgstr "Prénom"
-
-#~ msgid "Nick name"
-#~ msgstr "Surnom"
-
-#~ msgid "Display last operations"
-#~ msgstr "Dernières opérations"
