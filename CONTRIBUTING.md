@@ -29,3 +29,7 @@ Et pour lancer le sith, tu fais `python3 manage.py runserver`
 
 Voilà, c'est le sith AE. Il y a des issues dans le gitlab qui sont à régler. Si tu as un domaine qui t'intéresse, une appli que tu voudrais développer dessus, n'hésites pas et contacte-nous.
 Va, et que l'AE soit avec toi.
+
+Sites et doc cools :
+
+[Classy Class-Based Views](http://ccbv.co.uk/projects/Django/1.8/)
