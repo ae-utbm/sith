@@ -37,6 +37,12 @@ class CanCreateMixin(View):
     This view is made to protect any child view that would create an object, and thus, that can not be protected by any
     of the following mixin
     """
+    def dispatch(self, request, *arg, **kwargs):
+        res = super(CanCreateMixin, self).dispatch(request, *arg, **kwargs)
+        if not request.user.is_authenticated():
+            raise PermissionDenied
+        return res
+
     def form_valid(self, form):
         obj = form.instance
         if can_edit_prop(obj, self.request.user):

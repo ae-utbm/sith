@@ -167,15 +167,14 @@ Welcome to the wiki page!
             r.save()
             # Adding syntax help page
             p = Page(name='Aide_sur_la_syntaxe')
-            p.save()
+            p.save(force_lock=True)
             PageRev(page=p, title="Aide sur la syntaxe", author=skia, content="""
 Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 """).save()
             p = Page(name='Services')
-            p.save()
-            p.set_lock(skia)
+            p.save(force_lock=True)
             p.view_groups=[settings.SITH_GROUPS['public']['id']]
-            p.save()
+            p.save(force_lock=True)
             PageRev(page=p, title="Services", author=skia, content="""
 |   |   |   |
 | :---: | :---: | :---: |
@@ -185,10 +184,9 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 """).save()
             # Adding README
             p = Page(name='README')
-            p.save()
+            p.save(force_lock=True)
             p.view_groups=[settings.SITH_GROUPS['public']['id']]
-            p.set_lock(skia)
-            p.save()
+            p.save(force_lock=True)
             with open(os.path.join(root_path)+'/README.md', 'r') as rm:
                 PageRev(page=p, title="README", author=skia, content=rm.read()).save()
 

@@ -9,7 +9,7 @@ from django.forms import CheckboxSelectMultiple
 
 from core.models import Page, PageRev, LockError
 from core.views.forms import PagePropForm
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 
 class PageListView(CanViewMixin, ListView):
     model = Page
@@ -59,7 +59,7 @@ class PageRevView(CanViewMixin, DetailView):
             context['new_page'] = self.kwargs['page_name']
         return context
 
-class PageCreateView(CanEditPropMixin, CreateView):
+class PageCreateView(CanCreateMixin, CreateView):
     model = Page
     form_class = modelform_factory(Page,
             fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],

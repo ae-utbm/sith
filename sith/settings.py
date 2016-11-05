@@ -442,5 +442,6 @@ OLD_MYSQL_INFOS = {
 
 try:
     from .settings_custom import *
+    print("Custom settings imported")
 except:
     print("Custom settings failed")

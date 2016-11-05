@@ -630,7 +630,8 @@ class Page(models.Model):
                                     default=settings.SITH_GROUPS['root']['id'])
     edit_groups = models.ManyToManyField(Group, related_name="editable_page", verbose_name=_("edit group"), blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_page", verbose_name=_("view group"), blank=True)
-    lock_mutex = {}
+    lock_user = models.ForeignKey(User, related_name="locked_pages", verbose_name=_("lock user"), blank=True, null=True, default=None)
+    lock_timeout = models.DateTimeField(_('lock_timeout'), null=True, blank=True, default=None)
 
     class Meta:
         unique_together = ('name', 'parent')
@@ -679,7 +680,9 @@ class Page(models.Model):
         """
         Performs some needed actions before and after saving a page in database
         """
-        if not self.is_locked():
+        locked = kwargs.pop('force_lock', False)
+        if not locked: locked = self.is_locked()
+        if not locked:
             raise NotLocked("The page is not locked and thus can not be saved")
         self.full_clean()
         # This reset the _full_name just before saving to maintain a coherent field quicker for queries than the
@@ -697,23 +700,20 @@ class Page(models.Model):
         This is where the timeout is handled, so a locked page for which the timeout is reach will be unlocked and this
         function will return False
         """
-        if self.pk not in Page.lock_mutex.keys():
-            # print("Page mutex does not exists")
-            return False
-        if (timezone.now()-Page.lock_mutex[self.pk]['time']) > timedelta(minutes=5):
+        if self.lock_timeout and (timezone.now() - self.lock_timeout > timedelta(minutes=5)):
             # print("Lock timed out")
             self.unset_lock()
-            return False
-        return True
+        return self.lock_user and self.lock_timeout and (timezone.now() - self.lock_timeout < timedelta(minutes=5))
 
     def set_lock(self, user):
         """
         Sets a lock on the current page or raise an AlreadyLocked exception
         """
-        if self.is_locked() and self.get_lock()['user'] != user:
+        if self.is_locked() and self.get_lock() != user:
             raise AlreadyLocked("The page is already locked by someone else")
-        Page.lock_mutex[self.pk] = {'user': user,
-                                    'time': timezone.now()}
+        self.lock_user = user
+        self.lock_timeout = timezone.now()
+        super(Page, self).save()
         # print("Locking page")
 
     def set_lock_recursive(self, user):
@@ -726,16 +726,18 @@ class Page(models.Model):
 
     def unset_lock(self):
         """Always try to unlock, even if there is no lock"""
-        Page.lock_mutex.pop(self.pk, None)
+        self.lock_user = None
+        self.lock_timeout = None
+        super(Page, self).save()
         # print("Unlocking page")
 
     def get_lock(self):
         """
         Returns the page's mutex containing the time and the user in a dict
         """
-        if self.is_locked():
-            return Page.lock_mutex[self.pk]
-        raise NotLocked("The page is not locked and thus can not return its mutex")
+        if self.lock_user:
+            return self.lock_user
+        raise NotLocked("The page is not locked and thus can not return its user")
 
     def get_absolute_url(self):
         """
