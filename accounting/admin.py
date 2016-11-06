@@ -10,5 +10,6 @@ admin.site.register(AccountingType)
 admin.site.register(SimplifiedAccountingType)
 admin.site.register(Operation)
 admin.site.register(Label)
+admin.site.register(Company)
 
 

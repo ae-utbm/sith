@@ -51,6 +51,9 @@ class Company(models.Model):
     def get_display_name(self):
         return self.name
 
+    def __str__(self):
+        return self.name
+
 class BankAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
     iban = models.CharField(_('iban'), max_length=255, blank=True)
