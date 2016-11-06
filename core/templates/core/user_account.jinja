@@ -69,7 +69,9 @@
 {{ super() }}
 <script>
 $(function(){
-    $("#drop").accordion();
+    $("#drop").accordion({
+        heightStyle: "content"
+    });
 });
 </script>
 {% endblock %}

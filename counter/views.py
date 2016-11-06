@@ -1058,7 +1058,7 @@ class EticketPDFView(CanViewMixin, DetailView):
             p.setFont("Helvetica-Bold", 16)
             p.drawCentredString(10.5 * cm, 22.6 * cm, eticket.event_date.strftime("%d %b %Y")) # FIXME with a locale
         p.setFont("Helvetica-Bold", 14)
-        p.drawCentredString(10.5 * cm, 15 * cm, ''.join((user.get_display_name()," : ",str(self.object.quantity)," ",str(_("people(s)")))))
+        p.drawCentredString(10.5 * cm, 15 * cm, "%s : %d %s" % (user.get_display_name(), self.object.quantity, str(_("people(s)"))))
         p.setFont("Courier-Bold", 14)
         qrcode = QrCodeWidget(code)
         bounds = qrcode.getBounds()
