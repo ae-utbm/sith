@@ -18,16 +18,23 @@ Ensuite, tu fais :
 Avec cette commande, tu clones le sith AE dans le dossier courant.
 
     cd Sith
-    virtualenv --clear --python=python3 env_sith`
+    virtualenv --clear --python=python3 env_sith
     source env_sith/bin/activate
     pip install -r requirements.txt
-    
-Pour avoir un peu de contenu dans le sith :
-    python3 manage.py loaddata users groups pages
+
+Maintenant, faut passer le sith en mode debug dans le fichier de settings personnalisé.
+
+    echo "DEBUG=True" > sith/settings_custom.py
+    echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
+
+Enfin, il s'agit de créer la base de donnée de test lors de la première utilisation
+
+	./manage.py setup
+	répondre no
 
 Et pour lancer le sith, tu fais `python3 manage.py runserver`
 
-Voilà, c'est le sith AE. Il y a des issues dans le gitlab qui sont à régler. Si tu as un domaine qui t'intéresse, une appli que tu voudrais développer dessus, n'hésites pas et contacte-nous.
+Voilà, c'est le sith AE. Il y a des issues dans le gitlab qui sont à régler. Si tu as un domaine qui t'intéresse, une appli que tu voudrais développer, n'hésites pas et contacte-nous.
 Va, et que l'AE soit avec toi.
 
 Sites et doc cools
