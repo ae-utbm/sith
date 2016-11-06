@@ -161,7 +161,7 @@ class UserRegistrationTest(TestCase):
                                          })
         response = c.post(reverse('core:login'), {'username': 'gcarlier', 'password': 'guy'})
         self.assertTrue(response.status_code == 200)
-        self.assertTrue('<ul class="errorlist nonfield">' in str(response.content))
+        self.assertTrue("""<p>Votre nom d\\'utilisateur et votre mot de passe ne correspondent pas. Merci de r\\xc3\\xa9essayer.</p>""" in str(response.content))
 
 class PageHandlingTest(TestCase):
     def setUp(self):

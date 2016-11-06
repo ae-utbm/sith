@@ -146,6 +146,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
                 request.user.is_root):
                 return self.form_valid(form)
             else:
+                form.add_error(None, _("You do not have the permission to do that"))
                 return self.form_invalid(form)
         else:
             return self.form_invalid(form)
