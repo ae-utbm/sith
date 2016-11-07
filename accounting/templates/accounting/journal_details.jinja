@@ -37,6 +37,7 @@
             <td>{% trans %}Comment{% endtrans %}</td>
             <td>{% trans %}File{% endtrans %}</td>
             <td>{% trans %}Actions{% endtrans %}</td>
+            <td>{% trans %}PDF{% endtrans %}</td>
         </tr>
         </thead>
         <tbody>
@@ -70,6 +71,7 @@
                 <a href="{{ url('accounting:op_edit', op_id=o.id) }}">{% trans %}Edit{% endtrans %}</a>
                 {% endif %}
             </td>
+            <td><a href="{{ url('accounting:op_pdf', op_id=o.id) }}">{% trans %}Generate{% endtrans %}</a></td>
         </tr>
         {% endfor %}
         </tbody>
