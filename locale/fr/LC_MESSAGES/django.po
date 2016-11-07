@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-03 16:28+0100\n"
+"POT-Creation-Date: 2016-11-07 22:00+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -123,7 +123,7 @@ msgstr "numéro"
 msgid "journal"
 msgstr "classeur"
 
-#: accounting/models.py:194 core/models.py:498 core/models.py:776
+#: accounting/models.py:194 core/models.py:498 core/models.py:778
 #: counter/models.py:237 counter/models.py:280 counter/models.py:397
 #: eboutic/models.py:15 eboutic/models.py:48
 msgid "date"
@@ -277,7 +277,7 @@ msgstr "Liste des types comptable"
 #: accounting/templates/accounting/label_list.jinja:9
 #: accounting/templates/accounting/operation_edit.jinja:9
 #: accounting/templates/accounting/simplifiedaccountingtype_list.jinja:9
-#: core/templates/core/user_tools.jinja:42
+#: core/templates/core/user_tools.jinja:43
 msgid "Accounting"
 msgstr "Comptabilité"
 
@@ -296,14 +296,14 @@ msgstr "Il n'y a pas de types comptable dans ce site web."
 
 #: accounting/templates/accounting/bank_account_details.jinja:4
 #: accounting/templates/accounting/bank_account_details.jinja:13
-#: core/templates/core/user_tools.jinja:49
+#: core/templates/core/user_tools.jinja:50
 msgid "Bank account: "
 msgstr "Compte en banque : "
 
 #: accounting/templates/accounting/bank_account_details.jinja:15
 #: accounting/templates/accounting/club_account_details.jinja:16
 #: accounting/templates/accounting/label_list.jinja:21
-#: club/templates/club/club_sellings.jinja:48
+#: club/templates/club/club_sellings.jinja:53
 #: core/templates/core/file_detail.jinja:43
 #: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:66
 #: core/templates/core/user_account_detail.jinja:38
@@ -316,7 +316,7 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: accounting/templates/accounting/bank_account_details.jinja:17
-#: club/views.py:31 core/views/user.py:130
+#: club/views.py:32 core/views/user.py:130
 msgid "Infos"
 msgstr "Infos"
 
@@ -335,9 +335,9 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_details.jinja:26
 #: accounting/templates/accounting/bank_account_list.jinja:21
 #: accounting/templates/accounting/club_account_details.jinja:55
-#: accounting/templates/accounting/journal_details.jinja:70 club/views.py:53
+#: accounting/templates/accounting/journal_details.jinja:70 club/views.py:54
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
-#: core/templates/core/user_tools.jinja:35 core/views/user.py:147
+#: core/templates/core/user_tools.jinja:36 core/views/user.py:147
 #: counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:32
@@ -472,7 +472,7 @@ msgid "Nb"
 msgstr "No"
 
 #: accounting/templates/accounting/journal_details.jinja:29
-#: club/templates/club/club_sellings.jinja:18
+#: club/templates/club/club_sellings.jinja:23
 #: core/templates/core/user_account_detail.jinja:17
 #: core/templates/core/user_account_detail.jinja:50
 #: core/templates/core/user_account_detail.jinja:79
@@ -483,7 +483,7 @@ msgid "Date"
 msgstr "Date"
 
 #: accounting/templates/accounting/journal_details.jinja:30
-#: club/templates/club/club_sellings.jinja:22
+#: club/templates/club/club_sellings.jinja:27
 #: core/templates/core/user_account_detail.jinja:20
 #: counter/templates/counter/last_ops.jinja:42
 msgid "Label"
@@ -533,7 +533,8 @@ msgid "Edit operation"
 msgstr "Éditer l'opération"
 
 #: accounting/templates/accounting/operation_edit.jinja:40
-#: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:12
+#: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:7
+#: core/templates/core/edit.jinja.py:15 core/templates/core/edit.jinja:20
 #: core/templates/core/file_edit.jinja:8 core/templates/core/page_prop.jinja:8
 #: core/templates/core/pagerev_edit.jinja:24
 #: core/templates/core/user_godfathers.jinja:35
@@ -619,6 +620,7 @@ msgid "Club list"
 msgstr "Liste des clubs"
 
 #: club/templates/club/club_list.jinja:21
+#: core/templates/core/user_tools.jinja:19
 msgid "New club"
 msgstr "Nouveau club"
 
@@ -675,7 +677,7 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:58
+#: club/templates/club/club_sellings.jinja:5 club/views.py:59
 #: counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
@@ -686,29 +688,33 @@ msgstr "Ventes"
 msgid "Show"
 msgstr "Montrer"
 
-#: club/templates/club/club_sellings.jinja:12
+#: club/templates/club/club_sellings.jinja:10
+msgid "Download as cvs"
+msgstr "Télécharger en csv"
+
+#: club/templates/club/club_sellings.jinja:13
 msgid "Quantity: "
 msgstr "Quantité : "
 
-#: club/templates/club/club_sellings.jinja:12
+#: club/templates/club/club_sellings.jinja:13
 msgid "units"
 msgstr "unités"
 
-#: club/templates/club/club_sellings.jinja:13
+#: club/templates/club/club_sellings.jinja:14
 #: counter/templates/counter/counter_click.jinja:70
 #: counter/templates/counter/counter_main.jinja:28
 #: eboutic/templates/eboutic/eboutic_main.jinja:34
 msgid "Total: "
 msgstr "Total : "
 
-#: club/templates/club/club_sellings.jinja:19 club/views.py:165
+#: club/templates/club/club_sellings.jinja:24 club/views.py:166
 #: core/templates/core/user_account_detail.jinja:18
 #: core/templates/core/user_account_detail.jinja:51
 #: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:78
 msgid "Counter"
 msgstr "Comptoir"
 
-#: club/templates/club/club_sellings.jinja:20
+#: club/templates/club/club_sellings.jinja:25
 #: core/templates/core/user_account_detail.jinja:19
 #: core/templates/core/user_account_detail.jinja:52
 #: counter/templates/counter/last_ops.jinja:15
@@ -716,21 +722,21 @@ msgstr "Comptoir"
 msgid "Barman"
 msgstr "Barman"
 
-#: club/templates/club/club_sellings.jinja:21
+#: club/templates/club/club_sellings.jinja:26
 #: counter/templates/counter/counter_click.jinja:29
 #: counter/templates/counter/last_ops.jinja:16
 #: counter/templates/counter/last_ops.jinja:41
 msgid "Customer"
 msgstr "Client"
 
-#: club/templates/club/club_sellings.jinja:23
+#: club/templates/club/club_sellings.jinja:28
 #: core/templates/core/user_account_detail.jinja:21
 #: core/templates/core/user_stats.jinja:28
 #: counter/templates/counter/last_ops.jinja:43
 msgid "Quantity"
 msgstr "Quantité"
 
-#: club/templates/club/club_sellings.jinja:24
+#: club/templates/club/club_sellings.jinja:29
 #: core/templates/core/user_account.jinja:10
 #: core/templates/core/user_account_detail.jinja:22
 #: counter/templates/counter/cash_summary_list.jinja:35
@@ -739,7 +745,7 @@ msgstr "Quantité"
 msgid "Total"
 msgstr "Total"
 
-#: club/templates/club/club_sellings.jinja:25
+#: club/templates/club/club_sellings.jinja:30
 #: core/templates/core/user_account_detail.jinja:23
 #: core/templates/core/user_account_detail.jinja:54
 #: counter/templates/counter/last_ops.jinja:18
@@ -748,7 +754,7 @@ msgid "Payment method"
 msgstr "Méthode de paiement"
 
 #: club/templates/club/club_tools.jinja:4
-#: core/templates/core/user_tools.jinja:61
+#: core/templates/core/user_tools.jinja:62
 msgid "Club tools"
 msgstr "Outils club"
 
@@ -764,37 +770,37 @@ msgstr "Comptabilité : "
 msgid "Manage launderettes"
 msgstr "Gestion des laveries"
 
-#: club/views.py:37
+#: club/views.py:38
 msgid "Members"
 msgstr "Membres"
 
-#: club/views.py:42
+#: club/views.py:43
 msgid "Old members"
 msgstr "Anciens membres"
 
-#: club/views.py:48 core/templates/core/base.jinja:40 core/views/user.py:141
+#: club/views.py:49 core/templates/core/base.jinja:40 core/views/user.py:141
 msgid "Tools"
 msgstr "Outils"
 
-#: club/views.py:64 counter/templates/counter/counter_list.jinja:21
+#: club/views.py:65 counter/templates/counter/counter_list.jinja:21
 #: counter/templates/counter/counter_list.jinja:36
 #: counter/templates/counter/counter_list.jinja:51
 msgid "Props"
 msgstr "Propriétés"
 
-#: club/views.py:102 core/views/forms.py:204 counter/views.py:39
+#: club/views.py:103 core/views/forms.py:204 counter/views.py:39
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
-#: club/views.py:163 counter/views.py:909
+#: club/views.py:164 counter/views.py:909
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:164 counter/views.py:910
+#: club/views.py:165 counter/views.py:910
 msgid "End date"
 msgstr "Date de fin"
 
-#: club/views.py:178 core/templates/core/user_stats.jinja:27
+#: club/views.py:179 core/templates/core/user_stats.jinja:27
 #: counter/views.py:990
 msgid "Product"
 msgstr "Produit"
@@ -1171,23 +1177,33 @@ msgstr "nom de la page"
 msgid "owner group"
 msgstr "groupe propriétaire"
 
-#: core/models.py:660
+#: core/models.py:633
+#, fuzzy
+#| msgid "Select user"
+msgid "lock user"
+msgstr "Choisir un utilisateur"
+
+#: core/models.py:634
+msgid "lock_timeout"
+msgstr ""
+
+#: core/models.py:661
 msgid "Duplicate page"
 msgstr "Une page de ce nom existe déjà"
 
-#: core/models.py:666
+#: core/models.py:667
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:773
+#: core/models.py:775
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:774
+#: core/models.py:776
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:775
+#: core/models.py:777
 msgid "page content"
 msgstr "contenu de la page"
 
@@ -1294,7 +1310,7 @@ msgstr "Confirmation"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: core/templates/core/edit.jinja:4 core/templates/core/edit.jinja.py:8
+#: core/templates/core/edit.jinja:5 core/templates/core/edit.jinja.py:13
 #: core/templates/core/file_edit.jinja:4
 #: counter/templates/counter/cash_register_summary.jinja:4
 #, python-format
@@ -1843,44 +1859,44 @@ msgstr "Fusionner deux utilisateurs"
 msgid "Subscriptions"
 msgstr "Cotisations"
 
-#: core/templates/core/user_tools.jinja:23 counter/views.py:449
+#: core/templates/core/user_tools.jinja:24 counter/views.py:449
 #: counter/views.py:598
 msgid "Counters"
 msgstr "Comptoirs"
 
-#: core/templates/core/user_tools.jinja:26
+#: core/templates/core/user_tools.jinja:27
 msgid "General management"
 msgstr "Gestion générale"
 
-#: core/templates/core/user_tools.jinja:27
+#: core/templates/core/user_tools.jinja:28
 msgid "General counters management"
 msgstr "Gestion générale des comptoirs"
 
-#: core/templates/core/user_tools.jinja:28
+#: core/templates/core/user_tools.jinja:29
 msgid "Products management"
 msgstr "Gestion des produits"
 
-#: core/templates/core/user_tools.jinja:29
+#: core/templates/core/user_tools.jinja:30
 msgid "Product types management"
 msgstr "Gestion des types de produit"
 
-#: core/templates/core/user_tools.jinja:30
+#: core/templates/core/user_tools.jinja:31
 #: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:469
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
 
-#: core/templates/core/user_tools.jinja:36 core/views/user.py:169
+#: core/templates/core/user_tools.jinja:37 core/views/user.py:169
 #: counter/templates/counter/counter_list.jinja:18
 #: counter/templates/counter/counter_list.jinja:33
 #: counter/templates/counter/counter_list.jinja:48
 msgid "Stats"
 msgstr "Stats"
 
-#: core/templates/core/user_tools.jinja:45
+#: core/templates/core/user_tools.jinja:46
 msgid "General accounting"
 msgstr "Comptabilité générale"
 
-#: core/templates/core/user_tools.jinja:54
+#: core/templates/core/user_tools.jinja:55
 msgid "Club account: "
 msgstr "Compte club : "
 
