@@ -6,6 +6,11 @@
 
 {% block content %}
 <h3>{{ sithfile.get_display_name() }}</h3>
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Upload{% endtrans %}" /></p>
+</form>
 <div>
     {% for a in sithfile.children.filter(is_folder=True).all() %}
     <div style="display: inline-block; border: solid 1px black;">

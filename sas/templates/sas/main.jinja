@@ -6,6 +6,11 @@
 
 {% block content %}
 <h3>{% trans %}SAS{% endtrans %}</h3>
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Create{% endtrans %}" /></p>
+</form>
 <div>
     {% for a in root_file.children.filter(is_folder=True).all() %}
     <div style="display: inline-block; border: solid 1px black;">

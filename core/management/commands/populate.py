@@ -46,6 +46,7 @@ class Command(BaseCommand):
         club_root = SithFile(parent=None, name="clubs", is_folder=True, owner=root)
         club_root.save()
         SithFile(parent=None, name="SAS", is_folder=True, owner=root).save()
+        Group(name="SAS admin").save()
         main_club = Club(id=1, name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
                 address=settings.SITH_MAIN_CLUB['address'])
         main_club.save()
@@ -275,9 +276,9 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             ca.save()
             gj = GeneralJournal(name="A16", start_date=date.today(), club_account=ca)
             gj.save()
-            credit = AccountingType(code=74, label="Someone gave us money", movement_type='credit')
+            credit = AccountingType(code=74, label="Someone gave us money", movement_type='CREDIT')
             credit.save()
-            debit = AccountingType(code=607, label="Had to pay a beer", movement_type='debit')
+            debit = AccountingType(code=607, label="Had to pay a beer", movement_type='DEBIT')
             debit.save()
             Operation(journal=gj, date=date.today(), amount=666.42,
                     remark="An answer to life...", mode="CASH", done=True, accounting_type=credit, target_type="USER",
