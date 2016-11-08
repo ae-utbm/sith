@@ -1,5 +1,5 @@
 from django.shortcuts import render
-# from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin, FormView
 from django.utils.translation import ugettext as _
@@ -31,7 +31,8 @@ class SASForm(forms.Form):
             self.add_error(None, _("Error creating album %(album)s: %(msg)s") %
                     {'album': self.cleaned_data['album_name'], 'msg': str(e.message)})
         for f in files:
-            new_file = Picture(parent=parent, name=f.name, file=f, owner=owner, mime_type=f.content_type, size=f._size)
+            new_file = Picture(parent=parent, name=f.name, file=f, owner=owner, mime_type=f.content_type, size=f._size,
+                    is_folder=False)
             try:
                 new_file.clean()
                 # TODO: generate thumbnail
@@ -42,7 +43,7 @@ class SASForm(forms.Form):
 class SASMainView(FormView):
     form_class = SASForm
     template_name = "sas/main.jinja"
-    # success_url = reverse_lazy('sas:main')
+    success_url = reverse_lazy('sas:main')
 
     def post(self, request, *args, **kwargs):
         self.form = self.get_form()
@@ -67,8 +68,9 @@ class PictureView(DetailView, CanViewMixin):
 def send_pict(request, picture_id):
     return send_file(request, picture_id, Picture)
 
-class AlbumView(CanViewMixin, FormMixin, DetailView):
+class AlbumView(CanViewMixin, DetailView, FormMixin):
     model = Album
+    form_class = SASForm
     pk_url_kwarg = "album_id"
     template_name = "sas/album.jinja"
 
@@ -77,13 +79,25 @@ class AlbumView(CanViewMixin, FormMixin, DetailView):
         return super(AlbumView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        print('GUY')
         self.object = self.get_object()
         self.form = self.get_form()
+        parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist('images')
-        if request.user.is_authenticated() and request.user.is_in_group('ae-member') and self.form.is_valid():
-            self.form.process(parent=self.object, owner=request.user, files=files)
+        if request.user.is_authenticated() and request.user.is_in_group('ae-membres'):
             if self.form.is_valid():
-                return super(AlbumView, self).form_valid(self.form)
+                self.form.process(parent=parent, owner=request.user, files=files)
+                if self.form.is_valid():
+                    return super(AlbumView, self).form_valid(self.form)
+        else:
+            self.form.add_error(None, _("You have do not have permission to do that"))
         return self.form_invalid(self.form)
 
+    def get_success_url(self):
+        return reverse_lazy('sas:album', kwargs={'album_id': self.object.id})
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(AlbumView, self).get_context_data(**kwargs)
+        kwargs['form'] = self.form
+        return kwargs
 
