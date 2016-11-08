@@ -54,5 +54,5 @@ class ClubTest(TestCase):
         self.client.login(username='rbatsbak', password='plop')
         response = self.client.post(reverse("club:club_members", kwargs={"club_id":self.bdf.id}), {"user": self.skia.id, "role": 10})
         self.assertTrue(response.status_code == 200)
-        self.assertTrue("<li>You do not have the permission to do that</li>" in str(response.content))
+        self.assertTrue("<li>Vous n&#39;avez pas la permission de faire cela</li>" in str(response.content))
 
