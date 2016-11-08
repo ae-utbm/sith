@@ -4,10 +4,11 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from django.forms import CheckboxSelectMultiple
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _t
 from django.conf import settings
 from ajax_select.fields import AutoCompleteSelectField
 
@@ -202,6 +203,36 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
             kwargs['result'] = qs[:0]
         kwargs['form'] = form
         return kwargs
+
+class ClubSellingCSVView(ClubSellingView):
+    """
+    Generate sellings in csv for a given period
+    """
+
+    def get(self, request, *args, **kwargs):
+        import csv
+        response = HttpResponse(content_type='text/csv')
+        self.object = self.get_object()
+        name = _("Sellings") + "_" + self.object.name + ".csv"
+        response['Content-Disposition'] = 'filename=' + name
+        kwargs = self.get_context_data(**kwargs)
+        writer = csv.writer(response, delimiter=";", lineterminator='\n', quoting=csv.QUOTE_ALL)
+
+        writer.writerow([_t('Date'),_t('Counter'),_t('Barman'),_t('Customer'),_t('Label'),
+                         _t('Quantity'), _t('Total'),_t('Payment method')])
+        for o in kwargs['result']:
+            row = [o.date, o.counter]
+            if o.seller:
+                row.append(o.seller.get_display_name())
+            else: row.append('')
+            if o.customer:
+                row.append(o.customer.user.get_display_name())
+            else: row.append('')
+            row = row +[o.label, o.quantity, o.quantity * o.unit_price,
+                       o.get_payment_method_display()]
+            writer.writerow(row)
+
+        return response
 
 class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
     """
