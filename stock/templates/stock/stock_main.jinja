@@ -1,1 +1,11 @@
-TOTO
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{{stock}}
+{% endblock %}
+
+{% block content %}
+<h3>{{stock}}</h3>
+<a href="{{ url('stock:new_item', stock_id=stock.id) }}">{{stock.name}}</a>
+{% endblock %}
+
