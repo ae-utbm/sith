@@ -1,6 +1,7 @@
 db.sqlite3
 *.log
 *.pyc
+*.mo
 *__pycache__*
 .DS_Store
 env/
