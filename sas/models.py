@@ -17,7 +17,7 @@ class Picture(SithFile):
         return user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID)
 
     def can_be_viewed_by(self, user):
-        return self.can_be_edited_by(user) or (self.is_in_sas and self.is_authorized and
+        return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
                 user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP))
 
     def get_download_url(self):
@@ -36,7 +36,7 @@ class Album(SithFile):
         return user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID)
 
     def can_be_viewed_by(self, user):
-        return self.can_be_edited_by(user) or (self.is_in_sas and self.is_authorized and
+        return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
                 user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP))
 
     def get_absolute_url(self):

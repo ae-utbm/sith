@@ -448,7 +448,7 @@ SITH_LAUNDERETTE_PRICES = {
 
 # SAS variables
 SITH_SAS_ROOT_DIR_ID = 4
-SITH_SAS_ADMIN_GROUP_ID = 26
+SITH_SAS_ADMIN_GROUP_ID = 9
 
 try:
     from .settings_custom import *

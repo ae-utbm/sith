@@ -6,16 +6,27 @@
 
 {% block content %}
 <h3>{% trans %}SAS{% endtrans %}</h3>
+{% if user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p() }}
+    {{ form.non_field_errors() }}
+    <p>{{ form.album_name.errors }}<label for="{{ form.album_name.name }}">{{ form.album_name.label }}</label>
+    {{ form.album_name }}</p>
     <p><input type="submit" value="{% trans %}Create{% endtrans %}" /></p>
 </form>
+{% endif %}
 <div>
     {% for a in root_file.children.filter(is_folder=True).all() %}
-    <div style="display: inline-block; border: solid 1px black;">
+    {% if a.is_moderated %}
+    <div style="display: inline-block; border: solid 1px black; text-align: center">
         <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
     </div>
+    {% elif user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
+    <div style="display: inline-block; border: solid 1px red; text-align: center">
+        <p><a href="{{ url('core:file_moderate', file_id=a.id) }}?next={{ url('sas:moderation') }}">Moderate</a> or <a href="">Delete</a></p>
+        <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
+    </div>
+    {% endif %}
     {% endfor %}
 </div>
 {% endblock %}

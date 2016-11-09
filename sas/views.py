@@ -12,7 +12,7 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectUser, LoginForm, SelectDate, SelectDateTime
 from core.views.files import send_file
-from core.models import SithFile
+from core.models import SithFile, User
 
 from sas.models import Picture, Album
 
@@ -21,10 +21,10 @@ class SASForm(forms.Form):
     images = forms.ImageField(widget=forms.ClearableFileInput(attrs={'multiple': True}), label=_("Upload images"),
             required=False)
 
-    def process(self, parent, owner, files):
+    def process(self, parent, owner, files, automodere=False):
         try:
             if self.cleaned_data['album_name'] != "":
-                album = Album(parent=parent, name=self.cleaned_data['album_name'], owner=owner)
+                album = Album(parent=parent, name=self.cleaned_data['album_name'], owner=owner, is_moderated=automodere)
                 album.clean()
                 album.save()
         except Exception as e:
@@ -32,7 +32,7 @@ class SASForm(forms.Form):
                     {'album': self.cleaned_data['album_name'], 'msg': str(e.message)})
         for f in files:
             new_file = Picture(parent=parent, name=f.name, file=f, owner=owner, mime_type=f.content_type, size=f._size,
-                    is_folder=False)
+                    is_folder=False, is_moderated=automodere)
             try:
                 new_file.clean()
                 # TODO: generate thumbnail
@@ -49,10 +49,14 @@ class SASMainView(FormView):
         self.form = self.get_form()
         parent = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
         files = request.FILES.getlist('images')
-        if request.user.is_authenticated() and request.user.is_in_group('ae-membres') and self.form.is_valid():
-            self.form.process(parent=parent, owner=request.user, files=files)
+        root = User.objects.filter(username="root").first()
+        if request.user.is_authenticated() and request.user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID):
             if self.form.is_valid():
-                return super(SASMainView, self).form_valid(self.form)
+                self.form.process(parent=parent, owner=root, files=files, automodere=True)
+                if self.form.is_valid():
+                    return super(SASMainView, self).form_valid(self.form)
+        else:
+            self.form.add_error(None, _("You do not have the permission to do that"))
         return self.form_invalid(self.form)
 
     def get_context_data(self, **kwargs):
@@ -79,7 +83,6 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         return super(AlbumView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        print('GUY')
         self.object = self.get_object()
         self.form = self.get_form()
         parent = SithFile.objects.filter(id=self.object.id).first()
@@ -90,7 +93,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
                 if self.form.is_valid():
                     return super(AlbumView, self).form_valid(self.form)
         else:
-            self.form.add_error(None, _("You have do not have permission to do that"))
+            self.form.add_error(None, _("You do not have the permission to do that"))
         return self.form_invalid(self.form)
 
     def get_success_url(self):
@@ -100,4 +103,15 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         kwargs = super(AlbumView, self).get_context_data(**kwargs)
         kwargs['form'] = self.form
         return kwargs
+
+# Admin views
+
+class ModerationView(TemplateView):
+    template_name = "sas/moderation.jinja"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ModerationView, self).get_context_data(**kwargs)
+        kwargs['pictures'] = [p for p in Picture.objects.filter(is_moderated=False).all() if p.is_in_sas]
+        return kwargs
+
 
