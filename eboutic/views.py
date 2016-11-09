@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import TemplateView, View
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.exceptions import SuspiciousOperation
 from django.shortcuts import render
 from django.db import transaction, DataError
 from django.utils.translation import ugettext as _
@@ -177,20 +178,23 @@ class EtransactionAutoAnswer(View):
         except:
             return HttpResponse("Bad signature", status=400)
         if request.GET['Error'] == "00000":
-            with transaction.atomic():
-                b = Basket.objects.filter(id=request.GET['BasketID']).first()
-                if b is None:
-                    return HttpResponse("Basket does not exists", status=400)
-                i = Invoice()
-                i.user = b.user
-                i.payment_method = "CARD"
-                i.save()
-                for it in b.items.all():
-                    InvoiceItem(invoice=i, product_id=it.product_id, product_name=it.product_name, type_id=it.type_id,
-                        product_unit_price=it.product_unit_price, quantity=it.quantity).save()
-                i.validate()
-                b.delete()
+            try:
+                with transaction.atomic():
+                    b = Basket.objects.filter(id=request.GET['BasketID']).first()
+                    if b is None:
+                        raise SuspiciousOperation("Basket does not exists")
+                    i = Invoice()
+                    i.user = b.user
+                    i.payment_method = "CARD"
+                    i.save()
+                    for it in b.items.all():
+                        InvoiceItem(invoice=i, product_id=it.product_id, product_name=it.product_name, type_id=it.type_id,
+                            product_unit_price=it.product_unit_price, quantity=it.quantity).save()
+                    i.validate()
+                    b.delete()
+            except Exception as e:
+                return HttpResponse("Payment failed with error: "+repr(e), status=400)
             return HttpResponse()
         else:
-            return HttpResponse("Payment failed with error: "+request.GET['Error'])
+            return HttpResponse("Payment failed with error: "+request.GET['Error'], status=400)
 
