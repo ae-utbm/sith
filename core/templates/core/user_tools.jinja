@@ -58,6 +58,15 @@
     {%- endfor %}
 </ul>
 
+{% if user.is_in_group(settings.SITH_GROUPS['communication-admin']['id']) %}
+<hr>
+<h4>{% trans %}Communication{% endtrans %}</h4>
+<ul>
+    <li><a href="{{ url('core:file_moderation') }}">{% trans %}Moderate files{% endtrans %}</a></li>
+</ul>
+{% endif %}
+
+
 <hr>
 <h4>{% trans %}Club tools{% endtrans %}</h4>
 <ul>

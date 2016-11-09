@@ -483,7 +483,7 @@ class Preferences(models.Model):
     )
 
 def get_directory(instance, filename):
-    return './{0}/{1}'.format(instance.get_parent_path(), filename)
+    return '.{0}/{1}'.format(instance.get_parent_path(), filename)
 
 class SithFile(models.Model):
     name = models.CharField(_('file name'), max_length=256, blank=False)
@@ -496,12 +496,15 @@ class SithFile(models.Model):
     mime_type = models.CharField(_('mime type'), max_length=30)
     size = models.IntegerField(_("size"), default=0)
     date = models.DateTimeField(_('date'), auto_now=True)
+    is_moderated = models.BooleanField(_("is moderated"), default=False)
 
     class Meta:
         verbose_name = _("file")
 
     def is_owned_by(self, user):
         if hasattr(self, 'profile_of') and user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
+            return True
+        if user.is_in_group(settings.SITH_GROUPS['communication-admin']['id']):
             return True
         return user.id == self.owner.id
 
@@ -590,7 +593,7 @@ class SithFile(models.Model):
         return l
 
     def get_parent_path(self):
-        return '/'.join([p.name for p in self.get_parent_list()])
+        return '/' + '/'.join([p.name for p in self.get_parent_list()])
 
     def get_display_name(self):
         return self.name

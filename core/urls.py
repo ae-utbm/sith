@@ -50,6 +50,8 @@ urlpatterns = [
     url(r'^file/(?P<file_id>[0-9]+)/edit/(?P<popup>popup)?$', FileEditView.as_view(), name='file_edit'),
     url(r'^file/(?P<file_id>[0-9]+)/prop/(?P<popup>popup)?$', FileEditPropView.as_view(), name='file_prop'),
     url(r'^file/(?P<file_id>[0-9]+)/delete/(?P<popup>popup)?$', FileDeleteView.as_view(), name='file_delete'),
+    url(r'^file/moderation$', FileModerationView.as_view(), name='file_moderation'),
+    url(r'^file/(?P<file_id>[0-9]+)/moderate?$', FileModerateView.as_view(), name='file_moderate'),
     url(r'^file/(?P<file_id>[0-9]+)/download$', send_file, name='download'),
 
     # Page views

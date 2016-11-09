@@ -1,7 +1,8 @@
 # This file contains all the views that concern the page model
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, FormMixin, DeleteView
+from django.views.generic.detail import SingleObjectMixin
 from django.contrib.auth.decorators import login_required, permission_required
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
@@ -86,7 +87,7 @@ class FileEditView(CanEditMixin, UpdateView):
     context_object_name = "file"
 
     def get_form_class(self):
-        fields = ['name']
+        fields = ['name', 'is_moderated']
         if self.object.is_file:
             fields = ['file'] + fields
         return modelform_factory(SithFile, fields=fields)
@@ -166,6 +167,8 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
 
     def get_success_url(self):
         self.object.file.delete() # Doing it here or overloading delete() is the same, so let's do it here
+        if 'next' in self.request.GET.keys():
+            return self.request.GET['next']
         if self.object.parent is None:
             return reverse('core:file_list', kwargs={'popup': self.kwargs['popup'] or ""})
         return reverse('core:file_detail', kwargs={'file_id': self.object.parent.id, 'popup': self.kwargs['popup'] or ""})
@@ -176,4 +179,24 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
         if self.kwargs['popup']:
             kwargs['popup'] = 'popup'
         return kwargs
+
+class FileModerationView(TemplateView):
+    template_name = "core/file_moderation.jinja"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(FileModerationView, self).get_context_data(**kwargs)
+        kwargs['files'] = SithFile.objects.filter(is_moderated=False).all()
+        return kwargs
+
+class FileModerateView(CanEditPropMixin, SingleObjectMixin):
+    model = SithFile
+    pk_url_kwarg = "file_id"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.is_moderated = True
+        self.object.save()
+        if 'next' in self.request.GET.keys():
+            return redirect(self.request.GET['next'])
+        return redirect('core:file_moderation')
 

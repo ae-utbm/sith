@@ -8,6 +8,7 @@
 <h2>{% trans %}Edit user profile{% endtrans %}</h2>
 <form action="" method="post" enctype="multipart/form-data" id="user_edit">
     {% csrf_token %}
+    {{ form.non_field_errors() }}
     {% for field in form %}
     <p>{{ field.errors }}<label for="{{ field.name }}">{{ field.label }}
     {%- if field.name == "profile_pict" -%}
