@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
+
 
 from counter.models import Counter
 
@@ -10,6 +12,9 @@ class Stock(models.Model):
 
 	def __str__(self):
 		return "%s (%s)" % (self.name, self.counter)
+
+	def get_absolute_url(self):
+		return reverse('stock:list')
 
 class StockItem(models.Model):
 	""" The StockItem class, element of the stock """

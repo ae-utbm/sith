@@ -1,0 +1,23 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Stock list{% endtrans %}
+{% endblock %}
+
+{% block content %}
+{% if stock_list %}
+<h3>{% trans %}Stock list{% endtrans %}</h3>
+<ul>
+    {% for s in stock_list.order_by('name')  %}
+    <li>
+    	{% if user.can_edit(s) %}
+    	<a href="{{ url('stock:main', stock_id=s.id) }}">{{s}}</a>
+    	- <a href="{{ url('stock:edit', stock_id=s.id) }}">Edit</a>
+    	{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+{% trans %}There is no stocks in this website.{% endtrans %}
+{% endif %}
+{% endblock %}

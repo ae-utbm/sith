@@ -31,14 +31,14 @@
     {% if user.can_edit(c) %}
     <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a> -
     <a href="{{ url('counter:stats', counter_id=c.id) }}">{% trans %}Stats{% endtrans %}</a> -
+    {%if c.stock %}
+    <a href="{{ url('stock:main', stock_id=c.stock.id) }}">Stock</a> -
+    {% else %}
+    <a href="{{ url('stock:new', counter_id=c.id) }}">{% trans %}Create new stock{% endtrans%}</a> -
+    {% endif %}
     {% endif %}
     {% if user.is_owner(c) %}
-    <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a> -
-    {%if c.stock %}
-    <a href="{{ url('stock:main', stock_id=c.stock.id) }}">{{c.stock}}</a>
-    {% else %}
-    <a href="{{ url('stock:new', counter_id=c.id) }}">{% trans %}Create new stock{% endtrans%}</a>
-    {% endif %}
+    <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a>
     {% endif %}
     </li>
     {% endfor %}

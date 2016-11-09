@@ -6,6 +6,6 @@
 
 {% block content %}
 <h3>{{stock}}</h3>
-<a href="{{ url('stock:new_item', stock_id=stock.id) }}">{{stock.name}}</a>
+<a href="{{ url('stock:new_item', stock_id=stock.id) }}">{% trans %}New Item{% endtrans %}</a>
 {% endblock %}
 

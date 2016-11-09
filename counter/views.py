@@ -444,6 +444,11 @@ class CounterAdminTabsMixin(TabedViewMixin):
     tabs_title = _("Counter administration")
     list_of_tabs = [
             {
+                'url': reverse_lazy('stock:list'),
+                'slug': 'stocks',
+                'name': _("Stocks"),
+                },
+            {
                 'url': reverse_lazy('counter:admin_list'),
                 'slug': 'counters',
                 'name': _("Counters"),
