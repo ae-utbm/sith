@@ -55,8 +55,7 @@
         </tr>
     </thead>
     <tbody>
-    {% for i in customer.refillings.order_by('-date').filter(
-        date__year=year, date__month=month) %}
+    {% for i in customer.refillings.order_by('-date').filter( date__year=year, date__month=month) %}
         <tr>
         <td>{{ i.date|localtime|date(DATETIME_FORMAT) }} - {{ i.date|localtime|time(DATETIME_FORMAT) }}</td>
         <td>{{ i.counter }}</td>

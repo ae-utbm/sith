@@ -223,7 +223,7 @@ class Counter(models.Model):
 
     def is_inactive(self):
         """
-        Returns True if the counter self is inactive from SITH_COUNTER_MINUTE_INACTIVE's value minutes, else False 
+        Returns True if the counter self is inactive from SITH_COUNTER_MINUTE_INACTIVE's value minutes, else False
         """
         return self.is_open() and ((timezone.now() - self.permanencies.order_by('-activity').first().activity) > datetime.timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE))
 
@@ -303,8 +303,9 @@ class Selling(models.Model):
         return user == self.customer.user
 
     def delete(self, *args, **kwargs):
-        self.customer.amount += self.quantity * self.unit_price
-        self.customer.save()
+        if self.payment_method == "SITH_ACCOUNT":
+            self.customer.amount += self.quantity * self.unit_price
+            self.customer.save()
         super(Selling, self).delete(*args, **kwargs)
 
     def send_mail_customer(self):
@@ -331,7 +332,7 @@ class Selling(models.Model):
         self.customer.user.email_user(
             subject,
             message_txt,
-            html_message=message_html 
+            html_message=message_html
         )
 
     def save(self, *args, **kwargs):
