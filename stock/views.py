@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin
 from django.utils.translation import ugettext_lazy as _
@@ -39,7 +39,7 @@ class StockEditForm(forms.ModelForm):
 	"""
 	class Meta:
 		model = Stock
-		fields = ['name']
+		fields = ['name', 'counter']
 			
 	def __init__(self, *args, **kwargs):
 		super(StockEditForm, self).__init__(*args, **kwargs)
@@ -80,6 +80,12 @@ class StockItemCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
 	template_name = 'core/create.jinja'
 	pk_url_kwarg = "stock_id"
 	current_tab = "stocks"
-	
+
+	def get_initial(self):
+		ret = super(StockItemCreateView, self).get_initial()
+		if 'stock' in self.request.GET.keys():
+			ret['stock_owner'] = self.request.GET['stock']
+		return ret
+
 	def get_success_url(self):
 		return reverse_lazy('stock:main', kwargs={'stock_id': self.object.stock_owner.id})
