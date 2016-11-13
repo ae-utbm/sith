@@ -1,0 +1,15 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans s=stock %}{{stock}}{% endtrans %}
+{% endblock %}
+
+{% block content %}
+{% if current_tab == "stocks" %}
+	<p><a href="{{ url('stock:new_item', stock_id=stock.id)}}?stock={{stock.id}}">{% trans %}New item{% endtrans %}</a></p>
+{% endif %}
+<h3>{% trans s=stock %}{{stock}}{% endtrans %}</h3>
+
+
+
+{% endblock %}
