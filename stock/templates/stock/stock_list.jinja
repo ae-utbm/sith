@@ -11,7 +11,7 @@
     {% for s in stock_list.order_by('name')  %}
     <li>
     	{% if user.can_edit(s) %}
-    	<a href="{{ url('stock:items_list', stock_id=s.id)}}?stock={{s.id}}">{{s}}</a>
+    	<a href="{{ url('stock:items_list', stock_id=s.id)}}">{{s}}</a>
     	- <a href="{{ url('stock:edit', stock_id=s.id) }}">Edit</a>
     	{% endif %}
     </li>

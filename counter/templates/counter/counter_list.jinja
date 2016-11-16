@@ -32,9 +32,9 @@
     <a href="{{ url('counter:admin', counter_id=c.id) }}">{% trans %}Edit{% endtrans %}</a> -
     <a href="{{ url('counter:stats', counter_id=c.id) }}">{% trans %}Stats{% endtrans %}</a> -
     {%if c.stock %}
-    <a href="{{ url('stock:items_list', stock_id=c.stock.id)}}?stock={{c.stock.id}}">Stock</a> -
+    <a href="{{ url('stock:items_list', stock_id=c.stock.id)}}">Stock</a> -
     {% else %}
-    <a href="{{url('stock:new', counter_id=c.id)}}?counter={{c.id}}">{% trans %}Create new stock{% endtrans%}</a> -
+    <a href="{{url('stock:new', counter_id=c.id)}}">{% trans %}Create new stock{% endtrans%}</a> -
     {% endif %}
     {% endif %}
     {% if user.is_owner(c) %}

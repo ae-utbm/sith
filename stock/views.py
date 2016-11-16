@@ -15,18 +15,18 @@ from stock.models import Stock, StockItem
 
 class StockMain(CounterAdminTabsMixin, CanCreateMixin, DetailView):
 	"""
-	The stock view for the counter owner
+	The stockitems list view for the counter owner
 	"""
-	model = StockItem
+	model = Stock
 	template_name = 'stock/stock_item_list.jinja'
 	pk_url_kwarg = "stock_id"
 	current_tab = "stocks"
 
-	def get_context_data(self, **kwargs):
-		context = super(StockItemList, self).get_context_data(**kwargs)
-		if 'stock' in self.request.GET.keys():
-			context['stock'] = Stock.objects.filter(id=self.request.GET['stock']).first()
-		return context
+	#def get_context_data(self, **kwargs):
+	#	context = super(StockItemList, self).get_context_data(**kwargs)
+	#	if 'stock' in self.request.GET.keys():
+	#		context['stock'] = Stock.objects.filter(id=self.request.GET['stock']).first()
+	#	return context
 
 class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 	"""
@@ -39,7 +39,7 @@ class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 
 class StockEditForm(forms.ModelForm):
 	"""
-	docstring for StockEditForm"forms.ModelForm
+	A form to change stock's characteristics
 	"""
 	class Meta:
 		model = Stock
@@ -54,11 +54,22 @@ class StockEditForm(forms.ModelForm):
 
 class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
 	"""
-	A edit view for the stock
+	An edit view for the stock
 	"""
 	model = Stock
 	form_class = StockEditForm
 	pk_url_kwarg = "stock_id"
+	template_name = 'core/edit.jinja'
+	current_tab = "stocks"
+
+
+class StockItemEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+	"""
+	An edit view for a stock item
+	"""
+	model = StockItem
+	form_class = modelform_factory(StockItem, fields=['name', 'unit_quantity', 'effective_quantity', 'type', 'stock_owner'])
+	pk_url_kwarg = "item_id"
 	template_name = 'core/edit.jinja'
 	current_tab = "stocks"
 
@@ -76,8 +87,8 @@ class StockCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
 
 	def get_initial(self):
 		ret = super(StockCreateView, self).get_initial()
-		if 'counter' in self.request.GET.keys():
-			ret['counter'] = self.request.GET['counter']
+		if 'counter_id' in self.kwargs.keys():
+			ret['counter'] = self.kwargs['counter_id']
 		return ret
 		
 class StockItemCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
@@ -93,9 +104,11 @@ class StockItemCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
 
 	def get_initial(self):
 		ret = super(StockItemCreateView, self).get_initial()
-		if 'stock' in self.request.GET.keys():
-			ret['stock_owner'] = self.request.GET['stock']
+		if 'stock_id' in self.kwargs.keys():
+			ret['stock_owner'] = self.kwargs['stock_id']
 		return ret
 
 	def get_success_url(self):
-		return reverse_lazy('stock:main', kwargs={'stock_id': self.object.stock_owner.id})
+		return reverse_lazy('stock:items_list', kwargs={'stock_id':self.object.stock_owner.id}) + '?stock=' + str(self.object.stock_owner.id)
+
+			

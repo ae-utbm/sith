@@ -22,13 +22,15 @@ class StockItem(models.Model):
 	The StockItem class, element of the stock
 	"""
 	name = models.CharField(_('name'), max_length=64)
-	unit_quantity = models.IntegerField(_('unit quantity'), default=0, help_text='number of beer in one crate (equal one for barrels)')
-	effective_quantity = models.IntegerField(_('effective quantity'), default=0, help_text='total number of bottle/barrel')
-	type = models.ForeignKey(ProductType, related_name="stockItem_type", verbose_name=_("type"), null=True, blank=True,
+	unit_quantity = models.IntegerField(_('unit quantity'), default=0, help_text='number of element in one box')
+	effective_quantity = models.IntegerField(_('effective quantity'), default=0, help_text='number of box')
+	type = models.ForeignKey(ProductType, related_name="stock_items", verbose_name=_("type"), null=True, blank=True,
 		on_delete=models.SET_NULL)
-	stock_owner = models.ForeignKey(Stock, related_name="stock_owner")
+	stock_owner = models.ForeignKey(Stock, related_name="items")
 
 
 	def __str__(self):
-		return "%s (%s)" % (self.name, self.stock_owner)
+		return "%s (%s)" % (self.name, self.effective_quantity)
 
+	def get_absolute_url(self):
+		return reverse('stock:items_list', kwargs={'stock_id':self.stock_owner.id})
