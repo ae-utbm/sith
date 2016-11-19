@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from core.models import SithFile, User
 
@@ -23,6 +24,12 @@ class Picture(SithFile):
     def get_download_url(self):
         return reverse('sas:download', kwargs={'picture_id': self.id})
 
+    def get_next(self):
+        return self.parent.children.exclude(is_moderated=False, asked_for_removal=True).filter(id__gt=self.id).order_by('id').first()
+
+    def get_previous(self):
+        return self.parent.children.exclude(is_moderated=False, asked_for_removal=True).filter(id__lt=self.id).order_by('id').last()
+
 class Album(SithFile):
     class Meta:
         proxy = True
@@ -42,3 +49,13 @@ class Album(SithFile):
     def get_absolute_url(self):
         return reverse('sas:album', kwargs={'album_id': self.id})
 
+class PeoplePictureRelation(models.Model):
+    """
+    The PeoplePictureRelation class makes the connection between User and Picture
+
+    """
+    user = models.ForeignKey(User, verbose_name=_('user'), related_name="pictures", null=False, blank=False)
+    picture = models.ForeignKey(Picture, verbose_name=_('picture'), related_name="people", null=False, blank=False)
+
+    class Meta:
+        unique_together = ['user', 'picture']

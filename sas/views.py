@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.core.urlresolvers import reverse_lazy
+from django.shortcuts import render, redirect
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin, FormView
 from django.utils.translation import ugettext as _
@@ -8,14 +8,14 @@ from django.conf import settings
 from django import forms
 from django.core.exceptions import PermissionDenied
 
-from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
+from ajax_select import make_ajax_form, make_ajax_field
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectUser, LoginForm, SelectDate, SelectDateTime
 from core.views.files import send_file
 from core.models import SithFile, User
 
-from sas.models import Picture, Album
+from sas.models import Picture, Album, PeoplePictureRelation
 
 class SASForm(forms.Form):
     album_name = forms.CharField(label=_("Add a new album"), max_length=30, required=False)
@@ -41,6 +41,13 @@ class SASForm(forms.Form):
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
 
+class RelationForm(forms.ModelForm):
+    class Meta:
+        model = PeoplePictureRelation
+        fields = ['picture', 'user']
+        widgets = {'picture': forms.HiddenInput}
+    user = make_ajax_field(PeoplePictureRelation, 'user', 'users', help_text="")
+
 class SASMainView(FormView):
     form_class = SASForm
     template_name = "sas/main.jinja"
@@ -65,10 +72,50 @@ class SASMainView(FormView):
         kwargs['root_file'] = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
         return kwargs
 
-class PictureView(DetailView, CanViewMixin):
+class PictureView(CanViewMixin, DetailView, FormMixin):
     model = Picture
+    form_class = RelationForm
     pk_url_kwarg = "picture_id"
     template_name = "sas/picture.jinja"
+
+    def get_initial(self):
+        return {'picture': self.object}
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.form = self.get_form()
+        if 'remove_user' in request.GET.keys():
+            try:
+                user = User.objects.filter(id=int(request.GET['remove_user'])).first()
+                if user.id == request.user.id or request.user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID):
+                    r = PeoplePictureRelation.objects.filter(user=user, picture=self.object).delete()
+            except: pass
+        if 'ask_removal' in request.GET.keys():
+            self.object.is_moderated = False
+            self.object.asked_for_removal = True
+            self.object.save()
+            return redirect("sas:album", album_id=self.object.parent.id)
+        return super(PictureView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.form = self.get_form()
+        if request.user.is_authenticated() and request.user.is_in_group('ae-membres'):
+            if self.form.is_valid():
+                PeoplePictureRelation(user=self.form.cleaned_data['user'],
+                        picture=self.form.cleaned_data['picture']).save()
+                return super(PictureView, self).form_valid(self.form)
+        else:
+            self.form.add_error(None, _("You do not have the permission to do that"))
+        return self.form_invalid(self.form)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(PictureView, self).get_context_data(**kwargs)
+        kwargs['form'] = self.form
+        return kwargs
+
+    def get_success_url(self):
+        return reverse('sas:picture', kwargs={'picture_id': self.object.id})
 
 def send_pict(request, picture_id):
     return send_file(request, picture_id, Picture)
@@ -98,7 +145,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         return self.form_invalid(self.form)
 
     def get_success_url(self):
-        return reverse_lazy('sas:album', kwargs={'album_id': self.object.id})
+        return reverse('sas:album', kwargs={'album_id': self.object.id})
 
     def get_context_data(self, **kwargs):
         kwargs = super(AlbumView, self).get_context_data(**kwargs)
@@ -120,6 +167,7 @@ class ModerationView(TemplateView):
                             pict.delete()
                         elif v == "moderate":
                             pict.is_moderated = True
+                            pict.asked_for_removal = False
                             pict.save()
                     except: pass
             return super(ModerationView, self).get(request, *args, **kwargs)

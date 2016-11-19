@@ -6,11 +6,6 @@
 
 {% block content %}
 <h3>{{ album.get_display_name() }}</h3>
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p() }}
-    <p><input type="submit" value="{% trans %}Upload{% endtrans %}" /></p>
-</form>
 <div>
     {% for a in album.children.filter(is_folder=True, is_moderated=True).all() %}
     <div style="display: inline-block; border: solid 1px black;">
@@ -22,13 +17,18 @@
     {# for a in album.children.filter(mime_type__in=['image/jpeg', 'image/png']).all() #}
     {% for p in album.children.filter(is_folder=False, is_moderated=True).all() %}
     {% if p.as_picture.can_be_viewed_by(user) %}
-    <div style="display: inline-block; border: solid 1px black;">
-        <a href="{{ url("sas:picture", picture_id=p.id) }}">
-            <img src="{{ p.as_picture.get_download_url() }}" alt="{{ p.get_display_name() }}" style="width: 50px"/>
+    <div style="display: inline-block; border: solid 1px black; width: 9%; margin: 0.1%">
+        <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
+            <img src="{{ p.as_picture.get_download_url() }}" alt="{{ p.get_display_name() }}" style="max-width: 100%"/>
         </a>
     </div>
     {% endif %}
     {% endfor %}
 </div>
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Upload{% endtrans %}" /></p>
+</form>
 {% endblock %}
 

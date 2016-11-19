@@ -58,6 +58,8 @@ class CanEditPropMixin(View):
     """
     def dispatch(self, request, *arg, **kwargs):
         res = super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
+        if res.__class__.status_code == 302:
+            return res
         if hasattr(self, 'object'):
             obj = self.object
         elif hasattr(self, 'object_list'):
@@ -76,6 +78,8 @@ class CanEditMixin(View):
     """
     def dispatch(self, request, *arg, **kwargs):
         res = super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
+        if res.__class__.status_code == 302:
+            return res
         if hasattr(self, 'object'):
             obj = self.object
         elif hasattr(self, 'object_list'):
@@ -94,6 +98,8 @@ class CanViewMixin(View):
     """
     def dispatch(self, request, *arg, **kwargs):
         res = super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
+        if res.__class__.status_code == 302:
+            return res
         if hasattr(self, 'object'):
             obj = self.object
         elif hasattr(self, 'object_list'):

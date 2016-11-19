@@ -23,6 +23,9 @@
             {% trans %}Owner: {% endtrans %}{{ p.owner.get_display_name() }}<br/>
             {% trans %}Date: {% endtrans %}{{ p.date|date(DATE_FORMAT) }} {{ p.date|time(TIME_FORMAT) }}<br/>
         </p>
+        {% if p.asked_for_removal %}
+        <p class="important">{% trans %}Asked for removal{% endtrans %}</p>
+        {% endif %}
         <p>
         <input type="radio" name="action_{{ p.id }}" id="m_{{ p.id }}" value="moderate"/>
         <a href="{{ url('core:file_moderate', file_id=p.id) }}?next={{ url('sas:moderation') }}">{% trans %}Moderate{% endtrans %}</a>

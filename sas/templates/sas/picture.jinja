@@ -1,16 +1,97 @@
 {% extends "core/base.jinja" %}
 
+{% block head %}
+{{ super() }}
+<style>
+#prev, #next {
+    display: inline-block;
+    width: 42%;
+    margin: 0.5%;
+    border: solid 1px grey;
+    overflow: auto;
+    background: #333;
+}
+#prev img, #next img {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+</style>
+{% endblock %}
+
 {% block title %}
 {% trans %}SAS{% endtrans %}
 {% endblock %}
 
+{% macro print_path(file) %}
+{% if file %}
+{{ print_path(file.parent) }}
+<a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> >
+{% endif %}
+{% endmacro %}
+
 {% block content %}
+{{ print_path(picture.parent) }} {{ picture.get_display_name() }}
 <h3>{{ picture.get_display_name() }}</h3>
-<div style="float: right">
-    PREV / NEXT
+<div style="display: inline-block; width: 89%; background: #333;" id="pict">
+    <img src="{{ picture.get_download_url() }}" alt="{{ picture.get_display_name() }}" style="width: 90%; display: block; margin: auto"/>
 </div>
-<div>
-    <img src="{{ picture.get_download_url() }}" alt="{{ picture.get_display_name() }}" style="width: 90%"/>
+<div style="display: inline-block; width: 10%; vertical-align: top;">
+    <div>
+        <div id="prev">
+        {% if picture.get_previous() %}
+        <a href="{{ url("sas:picture", picture_id=picture.get_previous().id) }}#pict">
+            <img src="{{ picture.get_previous().as_picture.get_download_url() }}" alt="{{ picture.get_previous().get_display_name() }}" />
+        </a>
+        {% endif %}
+        </div>
+        <div id="next">
+        {% if picture.get_next() %}
+        <a href="{{ url("sas:picture", picture_id=picture.get_next().id) }}#pict">
+            <img src="{{ picture.get_next().as_picture.get_download_url() }}" alt="{{ picture.get_next().get_display_name() }}" />
+        </a>
+        {% endif %}
+        </div>
+    </div>
+    <div>
+        <ul>
+            {% for r in picture.people.all() %}
+            <li>
+                <a href="{{ r.user.get_absolute_url() }}">{{ r.user.get_display_name() }}</a>
+                {% if user == r.user or user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
+                <a href="?remove_user={{ r.user.id }}">{% trans %}Delete{% endtrans %}</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p() }}
+            <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
+        </form>
+    </div>
+    <p style="font-size: smaller;">
+        <a href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
+    </p>
 </div>
 {% endblock %}
 
+{% block script %}
+{{ super() }}
+<script>
+$( function() {
+    $(document).keydown(function (e) {
+        if (e.keyCode == 37) {
+            console.log("prev");
+            $('#prev a')[0].click();
+        } else if (e.keyCode == 39) {
+            console.log("next");
+            $('#next a')[0].click();
+        }
+    });
+} );
+</script>
+{% endblock %}

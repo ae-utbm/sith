@@ -503,6 +503,7 @@ class SithFile(models.Model):
     size = models.IntegerField(_("size"), default=0)
     date = models.DateTimeField(_('date'), auto_now=True)
     is_moderated = models.BooleanField(_("is moderated"), default=False)
+    asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
 
     class Meta:
         verbose_name = _("file")
