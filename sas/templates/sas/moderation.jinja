@@ -7,6 +7,7 @@
 {% block content %}
 <h3>{% trans %}SAS moderation{% endtrans %}</h3>
 <div>
+    <form action="" method="get" enctype="multipart/form-data">
     {% for p in pictures %}
     <div style="margin: 2px; padding: 2px; border: solid 1px red; text-align: center">
         {% if p.is_folder %}
@@ -22,9 +23,17 @@
             {% trans %}Owner: {% endtrans %}{{ p.owner.get_display_name() }}<br/>
             {% trans %}Date: {% endtrans %}{{ p.date|date(DATE_FORMAT) }} {{ p.date|time(TIME_FORMAT) }}<br/>
         </p>
-        <p><a href="{{ url('core:file_moderate', file_id=p.id) }}?next={{ url('sas:moderation') }}">{% trans %}Moderate{% endtrans %}</a> -
-        <a href="{{ url('core:file_delete', file_id=p.id) }}?next={{ url('sas:moderation') }}">{% trans %}Delete{% endtrans %}</a></p>
+        <p>
+        <input type="radio" name="action_{{ p.id }}" id="m_{{ p.id }}" value="moderate"/>
+        <a href="{{ url('core:file_moderate', file_id=p.id) }}?next={{ url('sas:moderation') }}">{% trans %}Moderate{% endtrans %}</a>
+        </p>
+        <p>
+        <input type="radio" name="action_{{ p.id }}" id="m_{{ p.id }}" value="delete"/>
+        <a href="{{ url('core:file_delete', file_id=p.id) }}?next={{ url('sas:moderation') }}">{% trans %}Delete{% endtrans %}</a>
+        </p>
     </div>
     {% endfor %}
+    <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
+    </form>
 </div>
 {% endblock %}

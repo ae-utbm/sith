@@ -58,13 +58,16 @@
     {%- endfor %}
 </ul>
 
-{% if user.is_in_group(settings.SITH_GROUPS['communication-admin']['id']) %}
 <hr>
 <h4>{% trans %}Communication{% endtrans %}</h4>
 <ul>
+    {% if user.is_in_group(settings.SITH_GROUPS['communication-admin']['id']) %}
     <li><a href="{{ url('core:file_moderation') }}">{% trans %}Moderate files{% endtrans %}</a></li>
+    {% endif %}
+    {% if user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
+    <li><a href="{{ url('sas:moderation') }}">{% trans %}Moderate pictures{% endtrans %}</a></li>
+    {% endif %}
 </ul>
-{% endif %}
 
 
 <hr>

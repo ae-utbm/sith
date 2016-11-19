@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.conf import settings
 from django import forms
+from django.core.exceptions import PermissionDenied
 
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 
@@ -109,9 +110,24 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
 class ModerationView(TemplateView):
     template_name = "sas/moderation.jinja"
 
+    def get(self, request, *args, **kwargs):
+        if request.user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID):
+            for k,v in request.GET.items():
+                if k[:7] == "action_":
+                    try:
+                        pict = Picture.objects.filter(id=int(k[7:])).first()
+                        if v == "delete":
+                            pict.delete()
+                        elif v == "moderate":
+                            pict.is_moderated = True
+                            pict.save()
+                    except: pass
+            return super(ModerationView, self).get(request, *args, **kwargs)
+        raise PermissionDenied
+
     def get_context_data(self, **kwargs):
         kwargs = super(ModerationView, self).get_context_data(**kwargs)
-        kwargs['pictures'] = [p for p in Picture.objects.filter(is_moderated=False).all() if p.is_in_sas]
+        kwargs['pictures'] = [p for p in Picture.objects.filter(is_moderated=False).order_by('id') if p.is_in_sas]
         return kwargs
 
 
