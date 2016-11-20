@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% macro print_path(file) %}
-{% if file %}
+{% if file and file.parent %}
 {{ print_path(file.parent) }}
 <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> >
 {% endif %}
@@ -13,7 +13,7 @@
 
 
 {% block content %}
-{{ print_path(album.parent) }} {{ album.get_display_name() }}
+<a href="{{ url('sas:main') }}">SAS</a> > {{ print_path(album.parent) }} {{ album.get_display_name() }}
 <h3>{{ album.get_display_name() }}</h3>
 <div>
     {% for a in album.children.filter(is_folder=True, is_moderated=True).all() %}

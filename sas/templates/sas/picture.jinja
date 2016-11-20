@@ -25,14 +25,14 @@
 {% endblock %}
 
 {% macro print_path(file) %}
-{% if file %}
+{% if file and file.parent %}
 {{ print_path(file.parent) }}
 <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> >
 {% endif %}
 {% endmacro %}
 
 {% block content %}
-{{ print_path(picture.parent) }} {{ picture.get_display_name() }}
+<a href="{{ url('sas:main') }}">SAS</a> > {{ print_path(picture.parent) }} {{ picture.get_display_name() }}
 <h3>{{ picture.get_display_name() }}</h3>
 <div style="display: inline-block; width: 89%; background: #333; border: solid #333 2px;" id="pict">
     {% if is_vertical %}
