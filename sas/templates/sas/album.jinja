@@ -50,3 +50,32 @@
 </form>
 {% endblock %}
 
+{% block script %}
+{{ super() }}
+<script>
+$("form").submit(function (event) {
+    event.preventDefault();
+    var formData = new FormData($(this)[0]);
+    var formKeys    = formData.keys();
+    var formEntries = formData.entries();
+
+    $.ajax({
+        url: '',
+        type: 'POST',
+        data: formData,
+        async: false,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (returndata) {
+            alert("Upload OK!");
+        },
+        error: function () {
+            alert("Upload failed");
+        }
+    });
+
+    return false;
+});
+</script>
+{% endblock %}
