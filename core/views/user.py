@@ -134,6 +134,11 @@ class UserTabsMixin(TabedViewMixin):
                     'slug': 'godfathers',
                     'name': _("Godfathers"),
                     })
+        tab_list.append({
+                    'url': reverse('core:user_pictures', kwargs={'user_id': self.object.id}),
+                    'slug': 'pictures',
+                    'name': _("Pictures"),
+                    })
         if self.request.user == self.object:
             tab_list.append({
                         'url': reverse('core:user_tools'),
@@ -201,6 +206,15 @@ def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
         raise PermissionDenied
     return redirect('core:user_godfathers', user_id=user_id)
 
+class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
+    """
+    Display a user's pictures
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    context_object_name = "profile"
+    template_name = "core/user_pictures.jinja"
+    current_tab = 'pictures'
 
 class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
     """
