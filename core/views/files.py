@@ -19,7 +19,7 @@ import os
 from core.models import SithFile
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, can_view, not_found
 
-def send_file(request, file_id, file_class=SithFile):
+def send_file(request, file_id, file_class=SithFile, file_attr="file"):
     """
     Send a file through Django without loading the whole file into
     memory at once. The FileWrapper will turn the file object into an
@@ -35,7 +35,7 @@ def send_file(request, file_id, file_class=SithFile):
                 Counter.objects.filter(token=request.session['counter_token']).exists())
             ):
         raise PermissionDenied
-    name = f.file.name
+    name = f.__getattribute__(file_attr).name
     with open(settings.MEDIA_ROOT + name, 'rb') as filename:
         wrapper = FileWrapper(filename)
         response = HttpResponse(wrapper, content_type=f.mime_type)

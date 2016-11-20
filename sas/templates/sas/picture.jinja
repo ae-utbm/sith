@@ -35,21 +35,21 @@
 {{ print_path(picture.parent) }} {{ picture.get_display_name() }}
 <h3>{{ picture.get_display_name() }}</h3>
 <div style="display: inline-block; width: 89%; background: #333;" id="pict">
-    <img src="{{ picture.get_download_url() }}" alt="{{ picture.get_display_name() }}" style="width: 90%; display: block; margin: auto"/>
+    <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}" style="width: 90%; display: block; margin: auto"/>
 </div>
 <div style="display: inline-block; width: 10%; vertical-align: top;">
     <div>
         <div id="prev">
         {% if picture.get_previous() %}
         <a href="{{ url("sas:picture", picture_id=picture.get_previous().id) }}#pict">
-            <img src="{{ picture.get_previous().as_picture.get_download_url() }}" alt="{{ picture.get_previous().get_display_name() }}" />
+            <img src="{{ picture.get_previous().as_picture.get_download_thumb_url() }}" alt="{{ picture.get_previous().get_display_name() }}" />
         </a>
         {% endif %}
         </div>
         <div id="next">
         {% if picture.get_next() %}
         <a href="{{ url("sas:picture", picture_id=picture.get_next().id) }}#pict">
-            <img src="{{ picture.get_next().as_picture.get_download_url() }}" alt="{{ picture.get_next().get_display_name() }}" />
+            <img src="{{ picture.get_next().as_picture.get_download_thumb_url() }}" alt="{{ picture.get_next().get_display_name() }}" />
         </a>
         {% endif %}
         </div>
@@ -73,6 +73,9 @@
             <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
         </form>
     </div>
+    <p>
+        <a href="{{ picture.get_download_url() }}">{% trans %}HD version{% endtrans %}</a>
+    </p>
     <p style="font-size: smaller;">
         <a href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
     </p>

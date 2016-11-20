@@ -23,6 +23,9 @@ class SASForm(forms.Form):
             required=False)
 
     def process(self, parent, owner, files, automodere=False):
+        from core.utils import resize_image
+        from io import BytesIO
+        from PIL import Image
         try:
             if self.cleaned_data['album_name'] != "":
                 album = Album(parent=parent, name=self.cleaned_data['album_name'], owner=owner, is_moderated=automodere)
@@ -36,8 +39,15 @@ class SASForm(forms.Form):
                     is_folder=False, is_moderated=automodere)
             try:
                 new_file.clean()
-                # TODO: generate thumbnail
+                im = Image.open(BytesIO(f.read()))
+                thumb = resize_image(im, 200, f.content_type.split('/')[-1])
+                compressed = resize_image(im, 600, f.content_type.split('/')[-1])
+                new_file.thumbnail = thumb
+                new_file.thumbnail.name = new_file.name
+                new_file.compressed = compressed
+                new_file.compressed.name = new_file.name
                 new_file.save()
+                print(new_file.compressed)
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
 
@@ -119,6 +129,12 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
 
 def send_pict(request, picture_id):
     return send_file(request, picture_id, Picture)
+
+def send_compressed(request, picture_id):
+    return send_file(request, picture_id, Picture, "compressed")
+
+def send_thumb(request, picture_id):
+    return send_file(request, picture_id, Picture, "thumbnail")
 
 class AlbumView(CanViewMixin, DetailView, FormMixin):
     model = Album

@@ -36,7 +36,8 @@ class Club(models.Model):
                                     default=settings.SITH_GROUPS['root']['id'])
     edit_groups = models.ManyToManyField(Group, related_name="editable_club", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
-    home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True)
+    home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True,
+            on_delete=models.SET_NULL)
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""

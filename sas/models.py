@@ -24,6 +24,12 @@ class Picture(SithFile):
     def get_download_url(self):
         return reverse('sas:download', kwargs={'picture_id': self.id})
 
+    def get_download_compressed_url(self):
+        return reverse('sas:download_compressed', kwargs={'picture_id': self.id})
+
+    def get_download_thumb_url(self):
+        return reverse('sas:download_thumb', kwargs={'picture_id': self.id})
+
     def get_next(self):
         return self.parent.children.exclude(is_moderated=False, asked_for_removal=True).filter(id__gt=self.id).order_by('id').first()
 

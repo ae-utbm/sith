@@ -28,7 +28,7 @@
     {% if p.as_picture.can_be_viewed_by(user) %}
     <div style="display: inline-block; border: solid 1px black; width: 9%; margin: 0.1%">
         <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
-            <img src="{{ p.as_picture.get_download_url() }}" alt="{{ p.get_display_name() }}" style="max-width: 100%"/>
+            <img src="{{ p.as_picture.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" style="max-width: 100%"/>
         </a>
     </div>
     {% endif %}

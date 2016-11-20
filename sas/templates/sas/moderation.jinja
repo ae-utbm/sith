@@ -17,7 +17,7 @@
         {% endif %}
         <p>
             <a href="{{ url("sas:picture", picture_id=p.id) }}">
-                <img src="{{ url('sas:download', picture_id=p.id) }}" alt="{{ p.name }}" style="width: 100px">
+                <img src="{{ p.get_download_thumb_url() }}" alt="{{ p.name }}" style="width: 100px">
             </a><br/>
             {% trans %}Full name: {% endtrans %}{{ p.get_parent_path()+'/'+p.name }}<br/>
             {% trans %}Owner: {% endtrans %}{{ p.owner.get_display_name() }}<br/>

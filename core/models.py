@@ -115,7 +115,8 @@ class User(AbstractBaseUser):
         ),
     )
     groups = models.ManyToManyField(RealGroup, related_name='users', blank=True)
-    home = models.OneToOneField('SithFile', related_name='home_of', verbose_name=_("home"), null=True, blank=True)
+    home = models.OneToOneField('SithFile', related_name='home_of', verbose_name=_("home"), null=True, blank=True,
+            on_delete=models.SET_NULL)
     profile_pict = models.OneToOneField('SithFile', related_name='profile_of', verbose_name=_("profile"), null=True,
             blank=True, on_delete=models.SET_NULL)
     avatar_pict = models.OneToOneField('SithFile', related_name='avatar_of', verbose_name=_("avatar"), null=True,
@@ -491,10 +492,18 @@ class Preferences(models.Model):
 def get_directory(instance, filename):
     return '.{0}/{1}'.format(instance.get_parent_path(), filename)
 
+def get_compressed_directory(instance, filename):
+    return '.{0}/compressed/{1}'.format(instance.get_parent_path(), filename)
+
+def get_thumbnail_directory(instance, filename):
+    return '.{0}/thumbnail/{1}'.format(instance.get_parent_path(), filename)
+
 class SithFile(models.Model):
     name = models.CharField(_('file name'), max_length=256, blank=False)
     parent = models.ForeignKey('self', related_name="children", verbose_name=_("parent"), null=True, blank=True)
     file = models.FileField(upload_to=get_directory, verbose_name=_("file"), null=True, blank=True)
+    compressed = models.FileField(upload_to=get_compressed_directory, verbose_name=_("compressed file"), null=True, blank=True)
+    thumbnail = models.FileField(upload_to=get_thumbnail_directory, verbose_name=_("thumbnail"), null=True, blank=True)
     owner = models.ForeignKey(User, related_name="owned_files", verbose_name=_("owner"))
     edit_groups = models.ManyToManyField(Group, related_name="editable_files", verbose_name=_("edit group"), blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_files", verbose_name=_("view group"), blank=True)
@@ -528,6 +537,10 @@ class SithFile(models.Model):
         for c in self.children.all():
             c.delete()
         self.file.delete()
+        if self.compressed:
+            self.compressed.delete()
+        if self.thumbnail:
+            self.thumbnail.delete()
         return super(SithFile, self).delete()
 
     def clean(self):
@@ -605,7 +618,7 @@ class SithFile(models.Model):
         return l
 
     def get_parent_path(self):
-        return '/' + '/'.join([p.name for p in self.get_parent_list()])
+        return '/' + '/'.join([p.name for p in self.get_parent_list()[::-1]])
 
     def get_display_name(self):
         return self.name

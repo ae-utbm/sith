@@ -13,7 +13,7 @@ def scale_dimension(width, height, long_edge):
         ratio = long_edge * 1. / height
     return int(width * ratio), int(height * ratio)
 
-def resize_image(im, edge, format): # TODO move that into a utils file
+def resize_image(im, edge, format):
     (w, h) = im.size
     (width, height) = scale_dimension(w, h, long_edge=edge)
     content = BytesIO()
