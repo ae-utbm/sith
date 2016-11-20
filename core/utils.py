@@ -1,7 +1,7 @@
 # Image utils
 
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ExifTags
 # from exceptions import IOError
 import PIL
 from django.core.files.base import ContentFile
@@ -25,3 +25,16 @@ def resize_image(im, edge, format):
         im.save(fp=content, format=format.upper(), quality=90, optimize=True, progressive=True)
     return ContentFile(content.getvalue())
 
+def exif_auto_rotate(image):
+    for orientation in ExifTags.TAGS.keys() :
+        if ExifTags.TAGS[orientation]=='Orientation' : break
+    exif=dict(image._getexif().items())
+
+    if   exif[orientation] == 3 :
+        image=image.rotate(180, expand=True)
+    elif exif[orientation] == 6 :
+        image=image.rotate(270, expand=True)
+    elif exif[orientation] == 8 :
+        image=image.rotate(90, expand=True)
+
+    return image

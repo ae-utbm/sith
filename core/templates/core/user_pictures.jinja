@@ -12,7 +12,7 @@
 {% for r in user.pictures.exclude(picture=None).filter(picture__parent=album) %}
 <div style="display: inline-block; border: solid 1px black; width: 9%; margin: 0.1%">
     <a href="{{ url("sas:picture", picture_id=r.picture.id) }}#pict">
-        <img src="{{ r.picture.as_picture.get_download_url() }}" alt="{{ r.picture.get_display_name() }}" style="max-width: 100%"/>
+        <img src="{{ r.picture.as_picture.get_download_thumb_url() }}" alt="{{ r.picture.get_display_name() }}" style="max-width: 100%"/>
     </a>
 </div>
 {% endfor %}

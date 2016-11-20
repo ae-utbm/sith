@@ -10,12 +10,16 @@ from django.core.exceptions import PermissionDenied
 
 from ajax_select import make_ajax_form, make_ajax_field
 
+from io import BytesIO
+from PIL import Image
+
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectUser, LoginForm, SelectDate, SelectDateTime
 from core.views.files import send_file
 from core.models import SithFile, User
 
 from sas.models import Picture, Album, PeoplePictureRelation
+from core.utils import resize_image, exif_auto_rotate
 
 class SASForm(forms.Form):
     album_name = forms.CharField(label=_("Add a new album"), max_length=30, required=False)
@@ -23,9 +27,6 @@ class SASForm(forms.Form):
             required=False)
 
     def process(self, parent, owner, files, automodere=False):
-        from core.utils import resize_image
-        from io import BytesIO
-        from PIL import Image
         try:
             if self.cleaned_data['album_name'] != "":
                 album = Album(parent=parent, name=self.cleaned_data['album_name'], owner=owner, is_moderated=automodere)
@@ -40,14 +41,19 @@ class SASForm(forms.Form):
             try:
                 new_file.clean()
                 im = Image.open(BytesIO(f.read()))
+                try:
+                    im = exif_auto_rotate(im)
+                except: pass
+                file = resize_image(im, max(im.size), f.content_type.split('/')[-1])
                 thumb = resize_image(im, 200, f.content_type.split('/')[-1])
                 compressed = resize_image(im, 600, f.content_type.split('/')[-1])
+                new_file.file = file
+                new_file.file.name = new_file.name
                 new_file.thumbnail = thumb
                 new_file.thumbnail.name = new_file.name
                 new_file.compressed = compressed
                 new_file.compressed.name = new_file.name
                 new_file.save()
-                print(new_file.compressed)
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
 
@@ -94,6 +100,10 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
+        if 'rotate_right' in request.GET.keys():
+            self.object.rotate(270)
+        if 'rotate_left' in request.GET.keys():
+            self.object.rotate(90)
         if 'remove_user' in request.GET.keys():
             try:
                 user = User.objects.filter(id=int(request.GET['remove_user'])).first()
@@ -122,6 +132,9 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
     def get_context_data(self, **kwargs):
         kwargs = super(PictureView, self).get_context_data(**kwargs)
         kwargs['form'] = self.form
+        im = Image.open(BytesIO(self.object.file.read()))
+        (w, h) = im.size
+        kwargs['is_vertical'] = (w / h) < 1
         return kwargs
 
     def get_success_url(self):

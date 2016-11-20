@@ -30,6 +30,19 @@ class Picture(SithFile):
     def get_download_thumb_url(self):
         return reverse('sas:download_thumb', kwargs={'picture_id': self.id})
 
+    def rotate(self, degree):
+        from PIL import Image
+        from io import BytesIO
+        from django.core.files.base import ContentFile
+        for attr in ['file', 'compressed', 'thumbnail']:
+            if self.__getattribute__(attr):
+                im = Image.open(BytesIO(self.__getattribute__(attr).read()))
+                new_image = BytesIO()
+                im = im.rotate(degree, expand=True)
+                im.save(fp=new_image, format=self.mime_type.split('/')[-1].upper(), quality=90, optimize=True, progressive=True)
+                self.__getattribute__(attr).save(self.name, ContentFile(new_image.getvalue()))
+                self.save()
+
     def get_next(self):
         return self.parent.children.exclude(is_moderated=False, asked_for_removal=True).filter(id__gt=self.id).order_by('id').first()
 

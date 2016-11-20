@@ -34,8 +34,12 @@
 {% block content %}
 {{ print_path(picture.parent) }} {{ picture.get_display_name() }}
 <h3>{{ picture.get_display_name() }}</h3>
-<div style="display: inline-block; width: 89%; background: #333;" id="pict">
-    <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}" style="width: 90%; display: block; margin: auto"/>
+<div style="display: inline-block; width: 89%; background: #333; border: solid #333 2px;" id="pict">
+    {% if is_vertical %}
+    <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}" style="width: 60%; display: block; margin: auto"/>
+    {% else %}
+    <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}" style="width: 100%; display: block; margin: auto"/>
+    {% endif %}
 </div>
 <div style="display: inline-block; width: 10%; vertical-align: top;">
     <div>
@@ -77,7 +81,9 @@
         <a href="{{ picture.get_download_url() }}">{% trans %}HD version{% endtrans %}</a>
     </p>
     <p style="font-size: smaller;">
-        <a href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
+        <a href="?rotate_left">{% trans %}Rotate left{% endtrans %}</a><br>
+        <a href="?rotate_right">{% trans %}Rotate right{% endtrans %}</a><br>
+        <a href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a><br>
     </p>
 </div>
 {% endblock %}

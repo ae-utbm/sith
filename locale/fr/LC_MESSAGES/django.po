@@ -1950,7 +1950,7 @@ msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 #: sas/views.py:41
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
-msgstr "Erreur d'envoie du fichier %(file_name)s : %(msg)s"
+msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 
 #: core/views/forms.py:59 core/views/forms.py:62
 msgid "Choose file"
