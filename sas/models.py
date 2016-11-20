@@ -8,6 +8,7 @@ from PIL import Image
 from io import BytesIO
 
 from core.models import SithFile, User
+from core.utils import resize_image, exif_auto_rotate
 
 class Picture(SithFile):
     class Meta:
@@ -40,6 +41,22 @@ class Picture(SithFile):
     def get_download_thumb_url(self):
         return reverse('sas:download_thumb', kwargs={'picture_id': self.id})
 
+    def generate_thumbnails(self):
+        im = Image.open(BytesIO(self.file.read()))
+        try:
+            im = exif_auto_rotate(im)
+        except: pass
+        file = resize_image(im, max(im.size), self.mime_type.split('/')[-1])
+        thumb = resize_image(im, 200, self.mime_type.split('/')[-1])
+        compressed = resize_image(im, 600, self.mime_type.split('/')[-1])
+        self.file = file
+        self.file.name = self.name
+        self.thumbnail = thumb
+        self.thumbnail.name = self.name
+        self.compressed = compressed
+        self.compressed.name = self.name
+        self.save()
+
     def rotate(self, degree):
         for attr in ['file', 'compressed', 'thumbnail']:
             if self.__getattribute__(attr):
@@ -51,10 +68,12 @@ class Picture(SithFile):
                 self.save()
 
     def get_next(self):
-        return self.parent.children.exclude(is_moderated=False, asked_for_removal=True).filter(id__gt=self.id).order_by('id').first()
+        return self.parent.children.filter(is_moderated=True, asked_for_removal=False, is_folder=False,
+                id__gt=self.id).order_by('id').first()
 
     def get_previous(self):
-        return self.parent.children.exclude(is_moderated=False, asked_for_removal=True).filter(id__lt=self.id).order_by('id').last()
+        return self.parent.children.filter(is_moderated=True, asked_for_removal=False, is_folder=False,
+                id__lt=self.id).order_by('id').last()
 
 class Album(SithFile):
     class Meta:

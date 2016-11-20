@@ -19,7 +19,6 @@ from core.views.files import send_file
 from core.models import SithFile, User
 
 from sas.models import Picture, Album, PeoplePictureRelation
-from core.utils import resize_image, exif_auto_rotate
 
 class SASForm(forms.Form):
     album_name = forms.CharField(label=_("Add a new album"), max_length=30, required=False)
@@ -40,19 +39,7 @@ class SASForm(forms.Form):
                     is_folder=False, is_moderated=automodere)
             try:
                 new_file.clean()
-                im = Image.open(BytesIO(f.read()))
-                try:
-                    im = exif_auto_rotate(im)
-                except: pass
-                file = resize_image(im, max(im.size), f.content_type.split('/')[-1])
-                thumb = resize_image(im, 200, f.content_type.split('/')[-1])
-                compressed = resize_image(im, 600, f.content_type.split('/')[-1])
-                new_file.file = file
-                new_file.file.name = new_file.name
-                new_file.thumbnail = thumb
-                new_file.thumbnail.name = new_file.name
-                new_file.compressed = compressed
-                new_file.compressed.name = new_file.name
+                new_file.generate_thumbnails()
                 new_file.save()
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
