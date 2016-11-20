@@ -2,6 +2,10 @@ from django.db import models
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.core.files.base import ContentFile
+
+from PIL import Image
+from io import BytesIO
 
 from core.models import SithFile, User
 
@@ -13,6 +17,12 @@ class Picture(SithFile):
     def is_in_sas(self):
         sas = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
         return sas in self.get_parent_list()
+
+    @property
+    def is_vertical(self):
+        im = Image.open(BytesIO(self.file.read()))
+        (w, h) = im.size
+        return (w / h) < 1
 
     def can_be_edited_by(self, user):
         return user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID)
@@ -31,9 +41,6 @@ class Picture(SithFile):
         return reverse('sas:download_thumb', kwargs={'picture_id': self.id})
 
     def rotate(self, degree):
-        from PIL import Image
-        from io import BytesIO
-        from django.core.files.base import ContentFile
         for attr in ['file', 'compressed', 'thumbnail']:
             if self.__getattribute__(attr):
                 im = Image.open(BytesIO(self.__getattribute__(attr).read()))

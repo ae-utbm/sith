@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-20 13:39+0100\n"
+"POT-Creation-Date: 2016-11-20 23:05+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -313,7 +313,7 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:59
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:146 sas/templates/sas/moderation.jinja:35
-#: sas/templates/sas/picture.jinja:67
+#: sas/templates/sas/picture.jinja:71
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -781,6 +781,7 @@ msgid "Old members"
 msgstr "Anciens membres"
 
 #: club/views.py:49 core/templates/core/base.jinja:44 core/views/user.py:146
+#: sas/templates/sas/picture.jinja:83
 msgid "Tools"
 msgstr "Outils"
 
@@ -1274,7 +1275,7 @@ msgstr "Wiki"
 
 #: core/templates/core/base.jinja:73 sas/templates/sas/album.jinja:4
 #: sas/templates/sas/main.jinja:4 sas/templates/sas/main.jinja.py:8
-#: sas/templates/sas/picture.jinja:24
+#: sas/templates/sas/picture.jinja:25
 msgid "SAS"
 msgstr "SAS"
 
@@ -1859,6 +1860,7 @@ msgid "User list"
 msgstr "Liste d'utilisateurs"
 
 #: core/templates/core/user_pictures.jinja:5
+#, python-format
 msgid "%(user_name)s's pictures"
 msgstr "Photos de %(user_name)s"
 
@@ -2300,7 +2302,7 @@ msgstr "Pas de date de naissance renseigné"
 #: counter/templates/counter/invoices_call.jinja:16
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
-#: sas/templates/sas/moderation.jinja:39 sas/templates/sas/picture.jinja:77
+#: sas/templates/sas/moderation.jinja:39 sas/templates/sas/picture.jinja:79
 msgid "Go"
 msgstr "Valider"
 
@@ -2781,11 +2783,16 @@ msgstr "Utilisateur qui sera supprimé"
 msgid "picture"
 msgstr "photo"
 
-#: sas/templates/sas/album.jinja:40
+#: sas/templates/sas/album.jinja:25 sas/templates/sas/album.jinja.py:27
+#: sas/templates/sas/main.jinja:17 sas/templates/sas/main.jinja.py:19
+msgid "preview"
+msgstr "miniature"
+
+#: sas/templates/sas/album.jinja:59
 msgid "Upload"
 msgstr "Envoyer"
 
-#: sas/templates/sas/main.jinja:15
+#: sas/templates/sas/main.jinja:39
 msgid "Create"
 msgstr "Créer"
 
@@ -2797,19 +2804,23 @@ msgstr "Modération du SAS"
 msgid "Asked for removal"
 msgstr "Retrait demandé"
 
-#: sas/templates/sas/picture.jinja:81
+#: sas/templates/sas/picture.jinja:65
+msgid "People"
+msgstr "Personne(s)"
+
+#: sas/templates/sas/picture.jinja:85
 msgid "HD version"
 msgstr "Version HD"
 
-#: sas/templates/sas/picture.jinja:84
+#: sas/templates/sas/picture.jinja:88
 msgid "Rotate left"
 msgstr "Tourner vers la gauche"
 
-#: sas/templates/sas/picture.jinja:85
+#: sas/templates/sas/picture.jinja:89
 msgid "Rotate right"
 msgstr "Tourner vers la droite"
 
-#: sas/templates/sas/picture.jinja:86
+#: sas/templates/sas/picture.jinja:90
 msgid "Ask for removal"
 msgstr "Demander le retrait"
 
@@ -2825,6 +2836,10 @@ msgstr "Envoyer les images"
 #, python-format
 msgid "Error creating album %(album)s: %(msg)s"
 msgstr "Erreur de création de l'album %(album)s : %(msg)s"
+
+#: sas/views.py:65
+msgid "Add user"
+msgstr "Ajouter une personne"
 
 #: sith/settings.py:166
 msgid "English"

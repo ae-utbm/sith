@@ -6,6 +6,30 @@
 
 {% block content %}
 <h3>{% trans %}SAS{% endtrans %}</h3>
+<hr>
+<div>
+    {% for a in root_file.children.filter(is_folder=True).all() %}
+    {% if a.is_moderated %}
+    <a href="{{ url("sas:album", album_id=a.id) }}">
+    <div class="album">
+        <div>
+        {% if a.children.filter(is_folder=False, is_moderated=True).exists() %}
+        <img src="{{ a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() }}" alt="{% trans %}preview{% endtrans %}">
+        {% else %}
+        <img src="{{ static('core/img/sas.jpg') }}" alt="{% trans %}preview{% endtrans %}">
+        {% endif %}
+        </div>
+        {{ a.name }}
+    </div>
+    </a>
+    {% elif user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
+    <div style="display: inline-block; border: solid 1px red; text-align: center">
+        <p><a href="{{ url('core:file_moderate', file_id=a.id) }}?next={{ url('sas:moderation') }}">Moderate</a> or <a href="">Delete</a></p>
+        <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
 {% if user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -15,18 +39,4 @@
     <p><input type="submit" value="{% trans %}Create{% endtrans %}" /></p>
 </form>
 {% endif %}
-<div>
-    {% for a in root_file.children.filter(is_folder=True).all() %}
-    {% if a.is_moderated %}
-    <div style="display: inline-block; border: solid 1px black; text-align: center">
-        <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
-    </div>
-    {% elif user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
-    <div style="display: inline-block; border: solid 1px red; text-align: center">
-        <p><a href="{{ url('core:file_moderate', file_id=a.id) }}?next={{ url('sas:moderation') }}">Moderate</a> or <a href="">Delete</a></p>
-        <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
-    </div>
-    {% endif %}
-    {% endfor %}
-</div>
 {% endblock %}

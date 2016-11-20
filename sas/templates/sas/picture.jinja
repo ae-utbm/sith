@@ -6,16 +6,18 @@
 #prev, #next {
     display: inline-block;
     width: 42%;
+    height: 100px;
     margin: 0.5%;
     border: solid 1px grey;
-    overflow: auto;
-    background: #333;
+    overflow: hidden;
+    background: #aaa;
+    text-align: center;
 }
 #prev img, #next img {
     display: block;
     margin: auto;
+    max-height: 80%;
     max-width: 100%;
-    max-height: 100%;
 }
 </style>
 {% endblock %}
@@ -34,18 +36,12 @@
 {% block content %}
 <a href="{{ url('sas:main') }}">SAS</a> > {{ print_path(picture.parent) }} {{ picture.get_display_name() }}
 <h3>{{ picture.get_display_name() }}</h3>
-<div style="display: inline-block; width: 89%; background: #333; border: solid #333 2px;" id="pict">
-    {% if is_vertical %}
-    <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}" style="width: 60%; display: block; margin: auto"/>
-    {% else %}
-    <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}" style="width: 100%; display: block; margin: auto"/>
-    {% endif %}
-</div>
-<div style="display: inline-block; width: 10%; vertical-align: top;">
+<div style="display: inline-block; width: 19%; vertical-align: top; overflow: hidden; float: right">
     <div>
         <div id="prev">
         {% if picture.get_previous() %}
         <a href="{{ url("sas:picture", picture_id=picture.get_previous().id) }}#pict">
+            &larr;
             <img src="{{ picture.get_previous().as_picture.get_download_thumb_url() }}" alt="{{ picture.get_previous().get_display_name() }}" />
         </a>
         {% endif %}
@@ -53,12 +49,14 @@
         <div id="next">
         {% if picture.get_next() %}
         <a href="{{ url("sas:picture", picture_id=picture.get_next().id) }}#pict">
+            &rarr;
             <img src="{{ picture.get_next().as_picture.get_download_thumb_url() }}" alt="{{ picture.get_next().get_display_name() }}" />
         </a>
         {% endif %}
         </div>
     </div>
     <div>
+        <h5>{% trans %}People{% endtrans %}</h5>
         <ul>
             {% for r in picture.people.all() %}
             <li>
@@ -69,22 +67,30 @@
             </li>
             {% endfor %}
         </ul>
-    </div>
-    <div>
-        <form action="" method="post" enctype="multipart/form-data">
+        <form action="" method="post" enctype="multipart/form-data" style="margin: 0px;">
             {% csrf_token %}
             {{ form.as_p() }}
             <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
         </form>
     </div>
-    <p>
-        <a href="{{ picture.get_download_url() }}">{% trans %}HD version{% endtrans %}</a>
-    </p>
-    <p style="font-size: smaller;">
-        <a href="?rotate_left">{% trans %}Rotate left{% endtrans %}</a><br>
-        <a href="?rotate_right">{% trans %}Rotate right{% endtrans %}</a><br>
-        <a href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a><br>
-    </p>
+    <div>
+        <h5>{% trans %}Tools{% endtrans %}</h5>
+        <p>
+            <a href="{{ picture.get_download_url() }}">{% trans %}HD version{% endtrans %}</a>
+        </p>
+        <p style="font-size: smaller;">
+            <a href="?rotate_left">{% trans %}Rotate left{% endtrans %}</a><br>
+            <a href="?rotate_right">{% trans %}Rotate right{% endtrans %}</a><br>
+            <a href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a><br>
+        </p>
+    </div>
+</div>
+<div style="display: inline-block; width: 80%; background: #333; border: solid #333 2px;" id="pict">
+    {% if picture.is_vertical %}
+    <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}" style="width: 60%; display: block; margin: auto"/>
+    {% else %}
+    <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}" style="width: 100%; display: block; margin: auto"/>
+    {% endif %}
 </div>
 {% endblock %}
 

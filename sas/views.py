@@ -62,7 +62,7 @@ class RelationForm(forms.ModelForm):
         model = PeoplePictureRelation
         fields = ['picture', 'user']
         widgets = {'picture': forms.HiddenInput}
-    user = make_ajax_field(PeoplePictureRelation, 'user', 'users', help_text="")
+    user = make_ajax_field(PeoplePictureRelation, 'user', 'users', label=_("Add user"))
 
 class SASMainView(FormView):
     form_class = SASForm
@@ -132,9 +132,6 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
     def get_context_data(self, **kwargs):
         kwargs = super(PictureView, self).get_context_data(**kwargs)
         kwargs['form'] = self.form
-        im = Image.open(BytesIO(self.object.file.read()))
-        (w, h) = im.size
-        kwargs['is_vertical'] = (w / h) < 1
         return kwargs
 
     def get_success_url(self):
@@ -166,7 +163,8 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         files = request.FILES.getlist('images')
         if request.user.is_authenticated() and request.user.is_in_group('ae-membres'):
             if self.form.is_valid():
-                self.form.process(parent=parent, owner=request.user, files=files)
+                self.form.process(parent=parent, owner=request.user, files=files,
+                        automodere=request.user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID))
                 if self.form.is_valid():
                     return super(AlbumView, self).form_valid(self.form)
         else:

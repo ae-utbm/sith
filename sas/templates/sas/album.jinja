@@ -15,20 +15,29 @@
 {% block content %}
 <a href="{{ url('sas:main') }}">SAS</a> > {{ print_path(album.parent) }} {{ album.get_display_name() }}
 <h3>{{ album.get_display_name() }}</h3>
+<hr>
 <div>
     {% for a in album.children.filter(is_folder=True, is_moderated=True).all() %}
-    <div style="display: inline-block; border: solid 1px black;">
-        <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
+    <a href="{{ url("sas:album", album_id=a.id) }}" style="display: inline-block">
+    <div class="album">
+        <div>
+        {% if a.children.filter(is_folder=False, is_moderated=True).exists() %}
+        <img src="{{ a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() }}" alt="{% trans %}preview{% endtrans %}">
+        {% else %}
+        <img src="{{ static('core/img/sas.jpg') }}" alt="{% trans %}preview{% endtrans %}">
+        {% endif %}
+        </div>
+        {{ a.name }}
     </div>
+    </a>
     {% endfor %}
 </div>
 <div>
-    {# for a in album.children.filter(mime_type__in=['image/jpeg', 'image/png']).all() #}
     {% for p in album.children.filter(is_folder=False, is_moderated=True).all() %}
     {% if p.as_picture.can_be_viewed_by(user) %}
-    <div style="display: inline-block; border: solid 1px black; width: 9%; margin: 0.1%">
+    <div class="picture">
         <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
-            <img src="{{ p.as_picture.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" style="max-width: 100%"/>
+            <img src="{{ p.as_picture.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" />
         </a>
     </div>
     {% endif %}
