@@ -72,7 +72,7 @@ $("form").submit(function (event) {
         this.insertBefore(errorlist, this.firstElementChild);
     }
 
-    while(errorlist.childElementCount > 0) 
+    while(errorlist.childElementCount > 0)
         errorlist.removeChild(errorlist.firstElementChild);
 
     var progress;
@@ -96,7 +96,7 @@ $("form").submit(function (event) {
             processData: false,
             contentType: false,
             success: onSuccess
-        })
+        });
     }
 
     var images = formData.getAll('images');
@@ -141,7 +141,10 @@ $("form").submit(function (event) {
     }
 
     function onSuccess(image, data, status, jqXHR) {
-        var errors = Array.from($(data).find('.errorlist.nonfield')[0].children);
+        if ($(data).find('.errorlist.nonfield')[0])
+            var errors = Array.from($(data).find('.errorlist.nonfield')[0].children);
+        else
+            var errors = []
         while(errors.length > 0)
             errorlist.appendChild(errors.shift());
         progress.value = ++completeCount / imagesCount;
