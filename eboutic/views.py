@@ -180,7 +180,7 @@ class EtransactionAutoAnswer(View):
         if request.GET['Error'] == "00000":
             try:
                 with transaction.atomic():
-                    b = Basket.objects.filter(id=request.GET['BasketID']).first()
+                    b = Basket.objects.select_for_update().filter(id=request.GET['BasketID']).first()
                     if b is None:
                         raise SuspiciousOperation("Basket does not exists")
                     i = Invoice()
