@@ -25,6 +25,7 @@ from counter.models import Customer, Counter, Selling, Refilling, Product, Produ
 from subscription.models import Subscription, Subscriber
 from eboutic.models import Invoice, InvoiceItem
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
+from sas.models import Album, Picture
 
 db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
 start = datetime.datetime.now()
@@ -1024,6 +1025,73 @@ def migrate_etickets():
     print("Etickets migrated at %s" % datetime.datetime.now())
     print("Running time: %s" % (datetime.datetime.now()-start))
 
+def migrate_sas():
+    album_link = {}
+    picture_link = {}
+    FILE_ROOT = "/data/sas/"
+    Album.objects.filter(is_in_sas=True).delete()
+    print("Album/Pictures deleted")
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM sas_cat_photos
+    """)
+    root = User.objects.filter(username="root").first()
+    for r in cur:
+        try:
+            a = Album(name=to_unicode(r['nom_catph']), owner=root, is_moderated=True, parent=None)
+            a.save()
+            album_link[str(r['id_catph'])] = a.id
+        except Exception as e:
+            print("FAIL to migrate Album: %s" % (repr(e)))
+    cur.execute("""
+    SELECT *
+    FROM sas_cat_photos
+    """)
+    for r in cur:
+        try:
+            p = Album.objects.filter(id=album_link[r['id_catph_parent']]).first()
+            a = Album.objects.filter(id=album_link[r['id_catph']]).first()
+            a.parent = p
+            a.save()
+        except: pass
+    print("Album migrated at %s" % datetime.datetime.now())
+    print("Running time: %s" % (datetime.datetime.now()-start))
+    # cur.execute("""
+    # SELECT *
+    # FROM sas_photos
+    # """)
+    # for r in cur:
+    #     try:
+    #         user = User.objects.filter(id=r['id_utilisateur']).first() or root
+    #         parent = Album.objects.filter(id=album_link[str(r['id_catph'])]).first()
+
+    #         p = Picture(
+    #                 name=to_unicode(str(r['id_photo'])),
+    #                 owner=user,
+    #                 is_moderated=True,
+    #                 is_folder=False,
+    #                 mime_type="image/jpeg",
+    #                 parent=parent
+    #                 )
+    #         for f in p._meta.local_fields:
+    #             if f.name == "date":
+    #                 f.auto_now = False
+    #         p.date = r['date_ajout_ph'].replace(tzinfo=timezone('Europe/Paris'))
+    #         p.save()
+    #         picture_link[str(r['id_photo'])] = p.id
+    #     except Exception as e:
+    #         print("FAIL to migrate Picture: %s" % (repr(e)))
+    cur.close()
+    print("SAS migrated at %s" % datetime.datetime.now())
+    print("Running time: %s" % (datetime.datetime.now()-start))
+
+    # try:
+    #     f = File(open(FILE_ROOT + '/' + str(r['banner']) + ".1", 'rb'))
+    # except:
+    #     f = None
+
+
 def main():
     print("Start at %s" % start)
     # Core
@@ -1036,10 +1104,12 @@ def main():
     # migrate_counter()
     # check_accounts()
     # Accounting
-    migrate_accounting()
+    # migrate_accounting()
     # migrate_godfathers()
     # migrate_etickets()
     # reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
+    migrate_sas()
+    reset_index('core', 'sas')
     end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end-start))
