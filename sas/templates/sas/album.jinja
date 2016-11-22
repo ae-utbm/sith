@@ -52,4 +52,102 @@
 
 {% block script %}
 {{ super() }}
+<script>
+$("form").submit(function (event) {
+    var formData = new FormData($(this)[0]);
+
+    if(formData.get('album_name') === '' && formData.get('images').name === '')
+        return false;
+
+    if(formData.get('images').name === '') {
+        return true;
+    }
+
+    event.preventDefault();
+
+    var errorlist;
+    if((errorlist = this.querySelector('ul.errorlist.nonfield')) === null) {
+        errorlist = document.createElement('ul');
+        errorlist.classList.add('errorlist', 'nonfield');
+        this.insertBefore(errorlist, this.firstElementChild);
+    }
+
+    while(errorlist.childElementCount > 0) 
+        errorlist.removeChild(errorlist.firstElementChild);
+
+    var progress;
+    if((progress = this.querySelector('progress')) === null) {
+        progress = document.createElement('progress');
+        progress.value = 0;
+        var p = document.createElement('p');
+        p.appendChild(progress);
+        this.insertBefore(p, this.lastElementChild);
+    }
+
+    var dataHolder;
+
+    if(formData.get('album_name') !== '') {
+        dataHolder = new FormData();
+        dataHolder.set('csrfmiddlewaretoken', '{{ csrf_token }}');
+        dataHolder.set('album_name', formData.get('album_name'));
+        $.ajax({
+            method: 'POST',
+            data: dataHolder,
+            processData: false,
+            contentType: false,
+            success: onSuccess
+        })
+    }
+
+    var images = formData.getAll('images');
+    var imagesCount = images.length;
+    var completeCount = 0;
+
+    var poolSize = 5;
+    var imagePool = [];
+
+    while(images.length > 0 && imagePool.length < poolSize) {
+        var image = images.shift();
+        imagePool.push(image);
+        sendImage(image);
+    }
+
+    function sendImage(image) {
+        dataHolder = new FormData();
+        dataHolder.set('csrfmiddlewaretoken', '{{ csrf_token }}');
+        dataHolder.set('images', image);
+
+        $.ajax({
+            method: 'POST',
+            data: dataHolder,
+            processData: false,
+            contentType: false,
+        })
+            .done(onSuccess.bind(undefined, image))
+            .always(next.bind(undefined, image));
+    }
+
+    function next(image, status, jqXHR) {
+        var index;
+        if(index = imagePool.indexOf(image) !== -1) {
+            imagePool.splice(index, 1);
+        }
+        var nextImage;
+        if(nextImage = images.shift()) {
+            imagePool.push(nextImage);
+
+            sendImage(nextImage);
+        }
+    }
+
+    function onSuccess(image, data, status, jqXHR) {
+        var errors = Array.from($(data).find('.errorlist.nonfield')[0].children);
+        while(errors.length > 0)
+            errorlist.appendChild(errors.shift());
+        progress.value = ++completeCount / imagesCount;
+        if(progress.value === 1 && errorlist.children.length === 0)
+            document.location.reload()
+    }
+});
+</script>
 {% endblock %}
