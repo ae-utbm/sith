@@ -513,6 +513,7 @@ class SithFile(models.Model):
     date = models.DateTimeField(_('date'), auto_now=True)
     is_moderated = models.BooleanField(_("is moderated"), default=False)
     asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
+    is_in_sas = models.BooleanField(_("is in the SAS"), default=False)
 
     class Meta:
         verbose_name = _("file")
@@ -578,6 +579,8 @@ class SithFile(models.Model):
             raise ValidationError(_("You must provide a file"))
 
     def save(self, *args, **kwargs):
+        sas = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
+        self.is_in_sas = sas in self.get_parent_list()
         copy_rights = False
         if self.id is None:
             copy_rights = True

@@ -33,7 +33,7 @@ class SASForm(forms.Form):
                 album.save()
         except Exception as e:
             self.add_error(None, _("Error creating album %(album)s: %(msg)s") %
-                    {'album': self.cleaned_data['album_name'], 'msg': str(e.message)})
+                    {'album': self.cleaned_data['album_name'], 'msg': repr(e)})
         for f in files:
             new_file = Picture(parent=parent, name=f.name, file=f, owner=owner, mime_type=f.content_type, size=f._size,
                     is_folder=False, is_moderated=automodere)
@@ -189,7 +189,7 @@ class ModerationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(ModerationView, self).get_context_data(**kwargs)
-        kwargs['pictures'] = [p for p in Picture.objects.filter(is_moderated=False).order_by('id') if p.is_in_sas]
+        kwargs['pictures'] = Picture.objects.filter(is_moderated=False, is_in_sas=True).order_by('id')
         return kwargs
 
 
