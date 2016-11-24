@@ -13,7 +13,7 @@ from stock.models import Stock, StockItem
 
 
 
-class StockMain(CounterAdminTabsMixin, CanCreateMixin, DetailView):
+class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):
 	"""
 	The stockitems list view for the counter owner
 	"""
@@ -21,12 +21,6 @@ class StockMain(CounterAdminTabsMixin, CanCreateMixin, DetailView):
 	template_name = 'stock/stock_item_list.jinja'
 	pk_url_kwarg = "stock_id"
 	current_tab = "stocks"
-
-	#def get_context_data(self, **kwargs):
-	#	context = super(StockItemList, self).get_context_data(**kwargs)
-	#	if 'stock' in self.request.GET.keys():
-	#		context['stock'] = Stock.objects.filter(id=self.request.GET['stock']).first()
-	#	return context
 
 class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 	"""
@@ -94,8 +88,7 @@ class StockCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
 class StockItemCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
 	"""
 	A create view for a new StockItem
-	"""
-			
+	"""	
 	model = StockItem
 	form_class = modelform_factory(StockItem, fields=['name', 'unit_quantity', 'effective_quantity', 'type', 'stock_owner'])
 	template_name = 'core/create.jinja'
@@ -109,6 +102,20 @@ class StockItemCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
 		return ret
 
 	def get_success_url(self):
-		return reverse_lazy('stock:items_list', kwargs={'stock_id':self.object.stock_owner.id}) + '?stock=' + str(self.object.stock_owner.id)
+		return reverse_lazy('stock:items_list', kwargs={'stock_id':self.object.stock_owner.id})
 
-			
+
+class StockShoppingListView(CounterAdminTabsMixin, CanViewMixin, ListView):
+	"""
+	A list view for the people to know the item to buy
+	"""
+	model = Stock
+	template_name = "stock/stock_shopping_list.jinja"
+	pk_url_kwarg = "stock_id"
+	current_tab = "stocks"
+
+	def get_context_data(self):
+		ret = super(StockShoppingListView, self).get_context_data()
+		if 'stock_id' in self.kwargs.keys():
+			ret['stock'] = Stock.objects.filter(id=self.kwargs['stock_id']).first();
+		return ret

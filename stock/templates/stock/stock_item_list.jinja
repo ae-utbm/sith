@@ -7,6 +7,7 @@
 {% block content %}
 {% if current_tab == "stocks" %}
 	<p><a href="{{ url('stock:new_item', stock_id=stock.id)}}">{% trans %}New item{% endtrans %}</a></p>
+	<h5><a href="{{ url('stock:shopping_list', stock_id=stock.id)}}">{% trans %}Shopping list{% endtrans %}</a></h5>
 {% endif %}
 {% if stock %}
 <h3>{{ stock }}</h3>

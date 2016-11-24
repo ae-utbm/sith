@@ -12,5 +12,5 @@ urlpatterns = [
     url(r'^(?P<stock_id>[0-9]+)$', StockItemList.as_view(), name='items_list'),
     url(r'^(?P<stock_id>[0-9]+)/stockItem/newItem$', StockItemCreateView.as_view(), name='new_item'),
     url(r'^stockItem/(?P<item_id>[0-9]+)/edit$', StockItemEditView.as_view(), name='edit_item'),
-
+    url(r'^(?P<stock_id>[0-9]+)/shopping$', StockShoppingListView.as_view(), name='shopping_list'),
 ]
