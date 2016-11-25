@@ -11,7 +11,7 @@ from django.utils import timezone
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django.db import DataError, transaction
+from django.db import DataError, transaction, models
 
 import re
 import pytz
@@ -23,7 +23,8 @@ from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMi
 from core.views.forms import SelectUser, LoginForm, SelectDate, SelectDateTime
 from core.models import User
 from subscription.models import Subscription
-from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType, CashRegisterSummary, CashRegisterSummaryItem, Eticket
+from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType, \
+        CashRegisterSummary, CashRegisterSummaryItem, Eticket, Permanency
 from accounting.models import CurrencyField
 
 class GetUserForm(forms.Form):
@@ -866,6 +867,7 @@ class CounterStatView(DetailView, CanEditMixin):
         from django.db.models import Sum, Case, When, F, DecimalField
         kwargs = super(CounterStatView, self).get_context_data(**kwargs)
         kwargs['Customer'] = Customer
+        kwargs['User'] = User
         semester_start = Subscription.compute_start(d=date.today(), duration=3)
         kwargs['total_sellings'] = Selling.objects.filter(date__gte=semester_start,
                 counter=self.object).aggregate(total_sellings=Sum(F('quantity')*F('unit_price'),
@@ -880,6 +882,28 @@ class CounterStatView(DetailView, CanEditMixin):
                         )
                     )
                 ).exclude(selling_sum=None).order_by('-selling_sum').all()[:100]
+        kwargs['top_barman'] = Permanency.objects.values('user').annotate(
+                perm_sum=Sum(
+                    Case(When(counter=self.object,
+                            end__gt=datetime(year=1999, month=1, day=1),
+                        then=F('end')-F('start')),
+                        output_field=models.DateTimeField()
+                        )
+                    )
+                ).exclude(perm_sum=None).order_by('-perm_sum').all()[:100]
+        kwargs['top_barman_semester'] = Permanency.objects.values('user').annotate(
+                perm_sum=Sum(
+                    Case(When(counter=self.object,
+                            start__gt=semester_start,
+                            end__gt=datetime(year=1999, month=1, day=1),
+                        then=F('end')-F('start')),
+                        output_field=models.DateTimeField()
+                        )
+                    )
+                ).exclude(perm_sum=None).order_by('-perm_sum').all()[:100]
+
+        kwargs['sith_date']=settings.SITH_START_DATE[0]
+        kwargs['semester_start']=semester_start
         return kwargs
 
     def dispatch(self, request, *args, **kwargs):

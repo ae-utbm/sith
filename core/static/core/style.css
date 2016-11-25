@@ -222,6 +222,7 @@ tbody>tr:hover {
 }
 .highlight {
     background: orange;
+    font-weight: bold;
 }
 .tool-bar {
     overflow: auto;

@@ -43,6 +43,56 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <h4>{% trans counter_name=counter.name %}Top 100 barman {{ counter_name }}{% endtrans %}</h4>
+    <table>
+        <thead>
+            <tr>
+                <td>{% trans %}Nb{% endtrans %}</td>
+                <td>{% trans %}User{% endtrans %}</td>
+                <td>{% trans %}Time{% endtrans %}</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for r in top_barman_semester %}
+            {% set u=User.objects.filter(id=r.user).first() %}
+            {% if u == user %}
+            <tr class="highlight">
+            {% else %}
+            <tr>
+            {% endif %}
+                <td>{{ loop.index }}</td>
+                <td>{{ u.get_display_name() }}</td>
+                <td>{{ r.perm_sum }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <h4>{% trans counter_name=counter.name %}Top 100 barman {{ counter_name }} (all semesters){% endtrans %}</h4>
+    <table>
+        <thead>
+            <tr>
+                <td>{% trans %}Nb{% endtrans %}</td>
+                <td>{% trans %}User{% endtrans %}</td>
+                <td>{% trans %}Time{% endtrans %}</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for r in top_barman %}
+            {% set u=User.objects.filter(id=r.user).first() %}
+            {% if u == user %}
+            <tr class="highlight">
+            {% else %}
+            <tr>
+            {% endif %}
+                <td>{{ loop.index }}</td>
+                <td>{{ u.get_display_name() }}</td>
+                <td>{{ r.perm_sum }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 
