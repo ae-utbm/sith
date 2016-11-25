@@ -1,0 +1,49 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Club stats{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if club_list %}
+    <h3>{% trans %}Club stats{% endtrans %}</h3>
+    <form action="" method="GET">
+        {% csrf_token %}
+        <p>
+        <select name="branch">
+            {% for b in settings.SITH_PROFILE_DEPARTMENTS %}
+                <option value="{{ b[0] }}">{{ b[0] }}</option>
+            {% endfor %}
+        </select>
+        </p>
+        <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <td>Club</td>
+                <td>Member number</td>
+                <td>Old member number</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for c in club_list.order_by('id') %}
+            {% set members = c.members.all() %}
+            {% if request.GET['branch'] %}
+            {% set members = members.filter(user__department=request.GET['branch']) %}
+            {% endif %}
+            <tr>
+                <td>{{ c.get_display_name() }}</td>
+                <td>{{ members.filter(end_date=None, role__gt=settings.SITH_MAXIMUM_FREE_ROLE).count() }}</td>
+                <td>{{ members.exclude(end_date=None, role__gt=settings.SITH_MAXIMUM_FREE_ROLE).count() }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    {% trans %}There is no club in this website.{% endtrans %}
+    {% endif %}
+{% endblock %}
+
+
+

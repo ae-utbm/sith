@@ -143,21 +143,8 @@ class User(AbstractBaseUser):
         ("FORMER STUDENT", _("Former student")),
         ("SERVICE", _("Service")),
         ], blank=True, default="")
-    department = models.CharField(_("department"), max_length=15, choices=[
-        ("TC", _("TC")),
-        ("IMSI", _("IMSI")),
-        ("IMAP", _("IMAP")),
-        ("INFO", _("INFO")),
-        ("GI", _("GI")),
-        ("E", _("E")),
-        ("EE", _("EE")),
-        ("GESC", _("GESC")),
-        ("GMC", _("GMC")),
-        ("MC", _("MC")),
-        ("EDIM", _("EDIM")),
-        ("HUMA", _("Humanities")),
-        ("NA", _("N/A")),
-        ], default="NA", blank=True)
+    department = models.CharField(_("department"), max_length=15, choices=settings.SITH_PROFILE_DEPARTMENTS,
+            default="NA", blank=True)
     dpt_option = models.CharField(_("dpt option"), max_length=32, blank=True, default="")
     semester = models.CharField(_("semester"), max_length=5, blank=True, default="")
     quote = models.CharField(_("quote"), max_length=256, blank=True, default="")

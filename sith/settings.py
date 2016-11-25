@@ -282,6 +282,22 @@ SITH_MEMBER_SUFFIX="-membres"
 SITH_MAIN_BOARD_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_BOARD_SUFFIX
 SITH_MAIN_MEMBERS_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_MEMBER_SUFFIX
 
+SITH_PROFILE_DEPARTMENTS = [
+        ("TC", _("TC")),
+        ("IMSI", _("IMSI")),
+        ("IMAP", _("IMAP")),
+        ("INFO", _("INFO")),
+        ("GI", _("GI")),
+        ("E", _("E")),
+        ("EE", _("EE")),
+        ("GESC", _("GESC")),
+        ("GMC", _("GMC")),
+        ("MC", _("MC")),
+        ("EDIM", _("EDIM")),
+        ("HUMA", _("Humanities")),
+        ("NA", _("N/A")),
+        ]
+
 SITH_ACCOUNTING_PAYMENT_METHOD = [
         ('CHECK', _('Check')),
         ('CASH', _('Cash')),

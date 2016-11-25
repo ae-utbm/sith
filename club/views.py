@@ -1,6 +1,6 @@
 from django import forms
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView
 from django.forms import CheckboxSelectMultiple
 from django.core.exceptions import ValidationError
@@ -17,6 +17,7 @@ from datetime import timedelta
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
 from core.views.forms import SelectDate, SelectSingle, SelectDateTime
 from club.models import Club, Membership
+from core.models import User
 from sith.settings import SITH_MAXIMUM_FREE_ROLE, SITH_MAIN_BOARD_GROUP
 from counter.models import Product, Selling, Counter
 
@@ -283,3 +284,10 @@ class MembershipSetOldView(CanEditMixin, DetailView):
         self.object = self.get_object()
         return HttpResponseRedirect(reverse('club:club_members', args=self.args, kwargs={'club_id': self.object.club.id}))
 
+class ClubStatView(TemplateView):
+    template_name="club/stats.jinja"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubStatView, self).get_context_data(**kwargs)
+        kwargs['club_list'] = Club.objects.all()
+        return kwargs
