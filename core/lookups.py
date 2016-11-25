@@ -2,7 +2,7 @@ from django.core.exceptions import PermissionDenied
 from ajax_select import register, LookupChannel
 
 from core.views.site import search_user
-from core.models import User, Group
+from core.models import User, Group, SithFile
 from club.models import Club
 from counter.models import Product, Counter
 from accounting.models import ClubAccount, Company
@@ -76,6 +76,13 @@ class ProductsLookup(RightManagedLookupChannel):
 
     def format_item_display(self, item):
         return "%s (%s)" % (item.name, item.code)
+
+@register('files')
+class SithFileLookup(RightManagedLookupChannel):
+    model = SithFile
+
+    def get_query(self, q, request):
+        return self.model.objects.filter(name__icontains=q)[:50]
 
 @register('club_accounts')
 class ClubAccountLookup(RightManagedLookupChannel):

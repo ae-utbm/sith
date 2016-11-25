@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -35,6 +36,9 @@ class Picture(SithFile):
 
     def get_download_thumb_url(self):
         return reverse('sas:download_thumb', kwargs={'picture_id': self.id})
+
+    def get_absolute_url(self):
+        return reverse('sas:picture', kwargs={'picture_id': self.id})
 
     def generate_thumbnails(self):
         im = Image.open(BytesIO(self.file.read()))
@@ -94,3 +98,6 @@ class PeoplePictureRelation(models.Model):
 
     class Meta:
         unique_together = ['user', 'picture']
+
+    def __str__(self):
+        return self.user.get_display_name() + " - " + str(self.picture)

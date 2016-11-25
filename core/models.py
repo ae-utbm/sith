@@ -317,7 +317,9 @@ class User(AbstractBaseUser):
 
     def get_short_name(self):
         "Returns the short name for the user."
-        return self.first_name
+        if self.nick_name:
+            return self.nick_name
+        return self.first_name + " " + self.last_name
 
     def get_display_name(self):
         """
@@ -501,16 +503,16 @@ def get_thumbnail_directory(instance, filename):
 class SithFile(models.Model):
     name = models.CharField(_('file name'), max_length=256, blank=False)
     parent = models.ForeignKey('self', related_name="children", verbose_name=_("parent"), null=True, blank=True)
-    file = models.FileField(upload_to=get_directory, verbose_name=_("file"), null=True, blank=True)
-    compressed = models.FileField(upload_to=get_compressed_directory, verbose_name=_("compressed file"), null=True, blank=True)
-    thumbnail = models.FileField(upload_to=get_thumbnail_directory, verbose_name=_("thumbnail"), null=True, blank=True)
+    file = models.FileField(upload_to=get_directory, verbose_name=_("file"), max_length=256, null=True, blank=True)
+    compressed = models.FileField(upload_to=get_compressed_directory, verbose_name=_("compressed file"), max_length=256, null=True, blank=True)
+    thumbnail = models.FileField(upload_to=get_thumbnail_directory, verbose_name=_("thumbnail"), max_length=256, null=True, blank=True)
     owner = models.ForeignKey(User, related_name="owned_files", verbose_name=_("owner"))
     edit_groups = models.ManyToManyField(Group, related_name="editable_files", verbose_name=_("edit group"), blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_files", verbose_name=_("view group"), blank=True)
     is_folder = models.BooleanField(_("is folder"), default=True)
     mime_type = models.CharField(_('mime type'), max_length=30)
     size = models.IntegerField(_("size"), default=0)
-    date = models.DateTimeField(_('date'), auto_now=True)
+    date = models.DateTimeField(_('date'), default=timezone.now)
     is_moderated = models.BooleanField(_("is moderated"), default=False)
     asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
     is_in_sas = models.BooleanField(_("is in the SAS"), default=False)
@@ -628,6 +630,9 @@ class SithFile(models.Model):
 
     def get_download_url(self):
         return reverse('core:download', kwargs={'file_id': self.id})
+
+    def __str__(self):
+        return self.get_parent_path() + "/" + self.name
 
 class LockError(Exception):
     """There was a lock error on the object"""

@@ -314,10 +314,11 @@ textarea {
     text-align: center;
     padding: 5px;
     width: 200px;
-    height: 133px;
+    height: 140px;
     background: #eee;
     box-shadow: black 2px 2px 10px;
     margin: 10px;
+    vertical-align: top;
 }
 
 .album img {

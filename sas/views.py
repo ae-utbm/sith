@@ -5,6 +5,7 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView, Proces
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.conf import settings
+from django.forms.models import modelform_factory
 from django import forms
 from django.core.exceptions import PermissionDenied
 
@@ -192,4 +193,27 @@ class ModerationView(TemplateView):
         kwargs['pictures'] = Picture.objects.filter(is_moderated=False, is_in_sas=True).order_by('id')
         return kwargs
 
+class PictureEditForm(forms.ModelForm):
+    class Meta:
+        model = Picture
+        fields=['name', 'parent']
+    parent = make_ajax_field(Picture, 'parent', 'files', help_text="")
+
+class AlbumEditForm(forms.ModelForm):
+    class Meta:
+        model = Album
+        fields=['name', 'parent']
+    parent = make_ajax_field(Album, 'parent', 'files', help_text="")
+
+class PictureEditView(UpdateView):
+    model=Picture
+    form_class=PictureEditForm
+    template_name='core/edit.jinja'
+    pk_url_kwarg = "picture_id"
+
+class AlbumEditView(UpdateView):
+    model=Album
+    form_class=AlbumEditForm
+    template_name='core/edit.jinja'
+    pk_url_kwarg = "album_id"
 

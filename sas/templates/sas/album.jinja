@@ -15,6 +15,7 @@
 {% block content %}
 <a href="{{ url('sas:main') }}">SAS</a> > {{ print_path(album.parent) }} {{ album.get_display_name() }}
 <h3>{{ album.get_display_name() }}</h3>
+<a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a><br>
 <hr>
 <div>
     {% for a in album.children.filter(is_folder=True, is_moderated=True).all() %}
@@ -33,7 +34,7 @@
     {% endfor %}
 </div>
 <div>
-    {% for p in album.children.filter(is_folder=False, is_moderated=True).all() %}
+    {% for p in album.children.filter(is_folder=False, is_moderated=True).order_by('id') %}
     {% if p.as_picture.can_be_viewed_by(user) %}
     <div class="picture">
         <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">

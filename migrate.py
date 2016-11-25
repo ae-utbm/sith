@@ -25,7 +25,7 @@ from counter.models import Customer, Counter, Selling, Refilling, Product, Produ
 from subscription.models import Subscription, Subscriber
 from eboutic.models import Invoice, InvoiceItem
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
-from sas.models import Album, Picture
+from sas.models import Album, Picture, PeoplePictureRelation
 
 db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
 start = datetime.datetime.now()
@@ -1029,7 +1029,7 @@ def migrate_sas():
     album_link = {}
     picture_link = {}
     FILE_ROOT = "/data/sas/"
-    Album.objects.filter(is_in_sas=True).delete()
+    SithFile.objects.filter(id__gt=18886).delete()
     print("Album/Pictures deleted")
     cur = db.cursor(MySQLdb.cursors.SSDictCursor)
     cur.execute("""
@@ -1044,44 +1044,74 @@ def migrate_sas():
             album_link[str(r['id_catph'])] = a.id
         except Exception as e:
             print("FAIL to migrate Album: %s" % (repr(e)))
+    print("Album moved, need to make the tree")
     cur.execute("""
     SELECT *
     FROM sas_cat_photos
     """)
     for r in cur:
         try:
-            p = Album.objects.filter(id=album_link[r['id_catph_parent']]).first()
-            a = Album.objects.filter(id=album_link[r['id_catph']]).first()
+            p = Album.objects.filter(id=album_link[str(r['id_catph_parent'])]).first()
+            a = Album.objects.filter(id=album_link[str(r['id_catph'])]).first()
             a.parent = p
             a.save()
         except: pass
     print("Album migrated at %s" % datetime.datetime.now())
     print("Running time: %s" % (datetime.datetime.now()-start))
-    # cur.execute("""
-    # SELECT *
-    # FROM sas_photos
-    # """)
-    # for r in cur:
-    #     try:
-    #         user = User.objects.filter(id=r['id_utilisateur']).first() or root
-    #         parent = Album.objects.filter(id=album_link[str(r['id_catph'])]).first()
+    cur.execute("""
+    SELECT *
+    FROM sas_photos
+    """)
+    for r in cur:
+        try:
+            user = User.objects.filter(id=r['id_utilisateur']).first() or root
+            parent = Album.objects.filter(id=album_link[str(r['id_catph'])]).first()
 
-    #         p = Picture(
-    #                 name=to_unicode(str(r['id_photo'])),
-    #                 owner=user,
-    #                 is_moderated=True,
-    #                 is_folder=False,
-    #                 mime_type="image/jpeg",
-    #                 parent=parent
-    #                 )
-    #         for f in p._meta.local_fields:
-    #             if f.name == "date":
-    #                 f.auto_now = False
-    #         p.date = r['date_ajout_ph'].replace(tzinfo=timezone('Europe/Paris'))
-    #         p.save()
-    #         picture_link[str(r['id_photo'])] = p.id
-    #     except Exception as e:
-    #         print("FAIL to migrate Picture: %s" % (repr(e)))
+            file_name = FILE_ROOT
+            if r['date_prise_vue']:
+                file_name += r['date_prise_vue'].strftime("%Y/%m/%d")
+            else:
+                file_name += '/'.join(["1970", "01", "01"])
+            file_name += "/" + str(r['id_photo']) + ".jpg"
+
+            file = File(open(file_name, "rb"))
+            file.name = str(r['id_photo']) + ".jpg"
+
+            p = Picture(
+                    name=to_unicode(str(r['id_photo'])) + ".jpg",
+                    owner=user,
+                    is_moderated=True,
+                    is_folder=False,
+                    mime_type="image/jpeg",
+                    parent=parent,
+                    file=file,
+                    )
+            if r['date_prise_vue']:
+                p.date = r['date_prise_vue'].replace(tzinfo=timezone('Europe/Paris'))
+            else:
+                p.date = r['date_ajout_ph'].replace(tzinfo=timezone('Europe/Paris'))
+            for f in p._meta.local_fields:
+                if f.name == "date":
+                    f.auto_now = False
+            p.generate_thumbnails()
+            db2 = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
+            cur2 = db2.cursor(MySQLdb.cursors.SSDictCursor)
+            cur2.execute("""
+            SELECT *
+            FROM sas_personnes_photos
+            WHERE id_photo = %s
+            """, (r['id_photo'], ))
+            for r2 in cur2:
+                try:
+                    u = User.objects.filter(id=r2['id_utilisateur']).first()
+                    if u:
+                        PeoplePictureRelation(user=u, picture=p).save()
+                except:
+                    print("Fail to associate user %d to picture %d" % (r2['id_utilisateur'], p.id))
+            picture_link[str(r['id_photo'])] = p.id
+        except Exception as e:
+            pass
+            print("FAIL to migrate Picture: %s" % (repr(e)))
     cur.close()
     print("SAS migrated at %s" % datetime.datetime.now())
     print("Running time: %s" % (datetime.datetime.now()-start))
