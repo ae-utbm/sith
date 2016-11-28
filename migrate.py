@@ -1029,8 +1029,9 @@ def migrate_sas():
     album_link = {}
     picture_link = {}
     FILE_ROOT = "/data/sas/"
-    SithFile.objects.filter(id__gt=18886).delete()
+    SithFile.objects.filter(id__gte=18892).delete()
     print("Album/Pictures deleted")
+    reset_index('core', 'sas')
     cur = db.cursor(MySQLdb.cursors.SSDictCursor)
     cur.execute("""
     SELECT *
@@ -1058,61 +1059,75 @@ def migrate_sas():
         except: pass
     print("Album migrated at %s" % datetime.datetime.now())
     print("Running time: %s" % (datetime.datetime.now()-start))
-    cur.execute("""
-    SELECT *
-    FROM sas_photos
-    """)
-    for r in cur:
-        try:
-            user = User.objects.filter(id=r['id_utilisateur']).first() or root
-            parent = Album.objects.filter(id=album_link[str(r['id_catph'])]).first()
-
-            file_name = FILE_ROOT
-            if r['date_prise_vue']:
-                file_name += r['date_prise_vue'].strftime("%Y/%m/%d")
-            else:
-                file_name += '/'.join(["1970", "01", "01"])
-            file_name += "/" + str(r['id_photo']) + ".jpg"
-
-            file = File(open(file_name, "rb"))
-            file.name = str(r['id_photo']) + ".jpg"
-
-            p = Picture(
-                    name=to_unicode(str(r['id_photo'])) + ".jpg",
-                    owner=user,
-                    is_moderated=True,
-                    is_folder=False,
-                    mime_type="image/jpeg",
-                    parent=parent,
-                    file=file,
-                    )
-            if r['date_prise_vue']:
-                p.date = r['date_prise_vue'].replace(tzinfo=timezone('Europe/Paris'))
-            else:
-                p.date = r['date_ajout_ph'].replace(tzinfo=timezone('Europe/Paris'))
-            for f in p._meta.local_fields:
-                if f.name == "date":
-                    f.auto_now = False
-            p.generate_thumbnails()
-            db2 = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
-            cur2 = db2.cursor(MySQLdb.cursors.SSDictCursor)
-            cur2.execute("""
-            SELECT *
-            FROM sas_personnes_photos
-            WHERE id_photo = %s
-            """, (r['id_photo'], ))
-            for r2 in cur2:
-                try:
-                    u = User.objects.filter(id=r2['id_utilisateur']).first()
-                    if u:
-                        PeoplePictureRelation(user=u, picture=p).save()
-                except:
-                    print("Fail to associate user %d to picture %d" % (r2['id_utilisateur'], p.id))
-            picture_link[str(r['id_photo'])] = p.id
-        except Exception as e:
-            pass
-            print("FAIL to migrate Picture: %s" % (repr(e)))
+    with open("albums.link", "w") as f:
+        f.write(str(album_link))
     cur.close()
+    finished = False
+    chunk = 0
+    while not finished:
+        cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+        cur.execute("""
+        SELECT *
+        FROM sas_photos
+        ORDER BY 'id_photo'
+        LIMIT %s, 1000
+        """, (chunk*1000, ))
+        has_result = False
+        for r in cur:
+            try:
+                user = User.objects.filter(id=r['id_utilisateur']).first() or root
+                parent = Album.objects.filter(id=album_link[str(r['id_catph'])]).first()
+
+                file_name = FILE_ROOT
+                if r['date_prise_vue']:
+                    file_name += r['date_prise_vue'].strftime("%Y/%m/%d")
+                else:
+                    file_name += '/'.join(["1970", "01", "01"])
+                file_name += "/" + str(r['id_photo']) + ".jpg"
+
+                file = File(open(file_name, "rb"))
+                file.name = (str(r['id_photo']) + ".jpg").encode('utf-8')
+
+                p = Picture(
+                        name=(to_unicode(str(r['id_photo'])) + ".jpg").encode('utf-8'),
+                        owner=user,
+                        is_moderated=True,
+                        is_folder=False,
+                        mime_type="image/jpeg",
+                        parent=parent,
+                        file=file,
+                        )
+                if r['date_prise_vue']:
+                    p.date = r['date_prise_vue'].replace(tzinfo=timezone('Europe/Paris'))
+                else:
+                    p.date = r['date_ajout_ph'].replace(tzinfo=timezone('Europe/Paris'))
+                for f in p._meta.local_fields:
+                    if f.name == "date":
+                        f.auto_now = False
+                p.generate_thumbnails()
+                p.save()
+                db2 = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
+                cur2 = db2.cursor(MySQLdb.cursors.SSDictCursor)
+                cur2.execute("""
+                SELECT *
+                FROM sas_personnes_photos
+                WHERE id_photo = %s
+                """, (r['id_photo'], ))
+                for r2 in cur2:
+                    try:
+                        u = User.objects.filter(id=r2['id_utilisateur']).first()
+                        if u:
+                            PeoplePictureRelation(user=u, picture=p).save()
+                    except:
+                        print("Fail to associate user %d to picture %d" % (r2['id_utilisateur'], p.id))
+                has_result = True
+            except Exception as e:
+                print("FAIL to migrate Picture: %s" % (repr(e)))
+        cur.close()
+        print("Chunk %d migrated at %s" % (chunk, str(datetime.datetime.now())))
+        print("Running time: %s" % (datetime.datetime.now()-start))
+        chunk += 1
+        finished = not has_result
     print("SAS migrated at %s" % datetime.datetime.now())
     print("Running time: %s" % (datetime.datetime.now()-start))
 
