@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-29 11:25+0100\n"
+"POT-Creation-Date: 2016-11-29 12:34+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -244,11 +244,11 @@ msgstr "Un code comptable ne contient que des numéros"
 msgid "movement type"
 msgstr "type de mouvement"
 
-#: accounting/models.py:300
+#: accounting/models.py:300 accounting/views.py:383
 msgid "Credit"
 msgstr "Crédit"
 
-#: accounting/models.py:300
+#: accounting/models.py:300 accounting/views.py:383
 msgid "Debit"
 msgstr "Débit"
 
@@ -337,7 +337,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_details.jinja:26
 #: accounting/templates/accounting/bank_account_list.jinja:21
 #: accounting/templates/accounting/club_account_details.jinja:55
-#: accounting/templates/accounting/journal_details.jinja:70 club/views.py:54
+#: accounting/templates/accounting/journal_details.jinja:71 club/views.py:54
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
 #: core/templates/core/user_tools.jinja:36 core/views/user.py:152
 #: counter/templates/counter/cash_summary_list.jinja:53
@@ -403,9 +403,11 @@ msgstr "Nom"
 
 #: accounting/templates/accounting/club_account_details.jinja:29
 msgid "Start"
-msgstr "Début"
+msgstr ""
 
 #: accounting/templates/accounting/club_account_details.jinja:30
+#, fuzzy
+#| msgid "End"
 msgid "End"
 msgstr "Fin"
 
@@ -431,12 +433,12 @@ msgid "Actions"
 msgstr "Actions"
 
 #: accounting/templates/accounting/club_account_details.jinja:50
-#: accounting/templates/accounting/journal_details.jinja:58
+#: accounting/templates/accounting/journal_details.jinja:59
 msgid "Yes"
 msgstr "Oui"
 
 #: accounting/templates/accounting/club_account_details.jinja:52
-#: accounting/templates/accounting/journal_details.jinja:60
+#: accounting/templates/accounting/journal_details.jinja:61
 msgid "No"
 msgstr "Non"
 
@@ -455,7 +457,7 @@ msgstr "Classeur : "
 #: core/templates/core/user_account_detail.jinja:10
 #: counter/templates/counter/counter_click.jinja:32
 msgid "Amount: "
-msgstr "Montant: "
+msgstr "Montant : "
 
 #: accounting/templates/accounting/journal_details.jinja:19
 msgid "Effective amount: "
@@ -521,6 +523,14 @@ msgstr "Commentaire"
 msgid "File"
 msgstr "Fichier"
 
+#: accounting/templates/accounting/journal_details.jinja:40
+msgid "PDF"
+msgstr ""
+
+#: accounting/templates/accounting/journal_details.jinja:74
+msgid "Generate"
+msgstr "Générer"
+
 #: accounting/templates/accounting/label_list.jinja:14
 msgid "Back to club account"
 msgstr "Retour au compte club"
@@ -559,6 +569,45 @@ msgstr "Types simplifiés"
 msgid "New simplified type"
 msgstr "Nouveau type simplifié"
 
+#: accounting/views.py:360 accounting/views.py:366
+msgid "Operation"
+msgstr "Opération"
+
+#: accounting/views.py:366
+msgid "Journal"
+msgstr "Classeur"
+
+#: accounting/views.py:377
+msgid "Financial proof: "
+msgstr "Justificatif de libellé : "
+
+#: accounting/views.py:378
+#, python-format
+msgid "Club: %(club_name)s"
+msgstr "Club : %(club_name)s"
+
+#: accounting/views.py:379
+#, python-format
+msgid "Label: %(op_label)s"
+msgstr "Libellé : %(op_label)s"
+
+#: accounting/views.py:385
+#, python-format
+msgid "Amount: %(amount).2f €"
+msgstr "Montant : %(amount).2f €"
+
+#: accounting/views.py:397
+msgid "Debtor"
+msgstr "Débiteur"
+
+#: accounting/views.py:397
+msgid "Creditor"
+msgstr "Créditeur"
+
+#: accounting/views.py:399
+msgid "Comment:"
+msgstr "Commentaire :"
+
 #: club/models.py:21
 msgid "unix name"
 msgstr "nom unix"
@@ -593,7 +642,7 @@ msgstr "Un club avec ce nom UNIX existe déjà."
 
 #: club/models.py:145 counter/models.py:386 counter/models.py:403
 #: eboutic/models.py:14 eboutic/models.py:47 launderette/models.py:89
-#: launderette/models.py:126 sas/models.py:96
+#: launderette/models.py:126 sas/models.py:98
 msgid "user"
 msgstr "nom d'utilisateur"
 
@@ -646,8 +695,10 @@ msgstr "Rôle"
 #: club/templates/club/club_old_members.jinja:10
 #: core/templates/core/user_clubs.jinja:17
 #: core/templates/core/user_clubs.jinja:43
+#, fuzzy
+#| msgid "description"
 msgid "Description"
-msgstr "Description"
+msgstr "description"
 
 #: club/templates/club/club_members.jinja:11
 #: core/templates/core/user_clubs.jinja:18
@@ -1234,6 +1285,8 @@ msgid "page content"
 msgstr "contenu de la page"
 
 #: core/templates/core/403.jinja:5
+#, fuzzy
+#| msgid "403, Forbidden"
 msgid "403, Forbidden"
 msgstr "403. Non autorisé"
 
@@ -1366,8 +1419,10 @@ msgid "Edit %(obj)s"
 msgstr "Éditer %(obj)s"
 
 #: core/templates/core/file.jinja:7 core/templates/core/file_list.jinja:6
+#, fuzzy
+#| msgid "Files"
 msgid "File list"
-msgstr "Liste des fichiers"
+msgstr "Fichiers"
 
 #: core/templates/core/file.jinja:9
 msgid "New file"
@@ -1575,8 +1630,10 @@ msgid "History"
 msgstr "Historique"
 
 #: core/templates/core/page.jinja:45
+#, fuzzy
+#| msgid "Target does not exists"
 msgid "Page does not exist"
-msgstr "La page n'existe pas."
+msgstr "La cible n'existe pas."
 
 #: core/templates/core/page.jinja:47
 msgid "Create it?"
@@ -1725,6 +1782,8 @@ msgid "Year"
 msgstr "Année"
 
 #: core/templates/core/user_account.jinja:9
+#, fuzzy
+#| msgid "Month"
 msgid "Month"
 msgstr "Mois"
 
@@ -1784,8 +1843,10 @@ msgid "Club(s)"
 msgstr "Clubs"
 
 #: core/templates/core/user_clubs.jinja:10
+#, fuzzy
+#| msgid "Current scrub: "
 msgid "Current club(s) :"
-msgstr "Clubs actuels : "
+msgstr "Blouse actuelle : "
 
 #: core/templates/core/user_clubs.jinja:36
 msgid "Old club(s) :"
@@ -2428,6 +2489,8 @@ msgid "Choose another month: "
 msgstr "Choisir un autre mois : "
 
 #: counter/templates/counter/invoices_call.jinja:21
+#, fuzzy
+#| msgid "Sum"
 msgid "Sum"
 msgstr "Somme"
 
@@ -2804,7 +2867,7 @@ msgstr "Utilisateur qui sera conservé"
 msgid "User that will be deleted"
 msgstr "Utilisateur qui sera supprimé"
 
-#: sas/models.py:97
+#: sas/models.py:99
 msgid "picture"
 msgstr "photo"
 
@@ -3018,3 +3081,321 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
+
+#, fuzzy
+#~| msgid "Nature"
+#~ msgid "Nature bilan: "
+#~ msgstr "Nature"
+
+#, fuzzy
+#~| msgid "linked operation"
+#~ msgid "Nature of operation"
+#~ msgstr "opération liée"
+
+#, fuzzy
+#~| msgid "location"
+#~ msgid "Syndication"
+#~ msgstr "lieu"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid value."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid URL."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid integer."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid email address."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid ""
+#~| "Enter a valid username. This value may contain only letters, numbers "
+#~| "and ./+/-/_ characters."
+#~ msgid ""
+#~ "Enter a valid 'slug' consisting of letters, numbers, underscores or "
+#~ "hyphens."
+#~ msgstr ""
+#~ "Entrez un nom d'utilisateur correct. Uniquement des lettres, numéros, "
+#~ "et ./+/-/_"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid IPv4 address."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid IPv6 address."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid IPv4 or IPv6 address."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "A user with that email address already exists"
+#~ msgid "%(model_name)s with this %(field_labels)s already exists."
+#~ msgstr "Un utilisateur avec cette adresse email existe déjà"
+
+#, fuzzy
+#~| msgid "Token name can not be blank"
+#~ msgid "This field cannot be null."
+#~ msgstr "Le nom du jeton ne peut pas être vide"
+
+#, fuzzy
+#~| msgid "Token name can not be blank"
+#~ msgid "This field cannot be blank."
+#~ msgstr "Le nom du jeton ne peut pas être vide"
+
+#, fuzzy
+#~| msgid "A user with that email address already exists"
+#~ msgid "%(model_name)s with this %(field_label)s already exists."
+#~ msgstr "Un utilisateur avec cette adresse email existe déjà"
+
+#, fuzzy
+#~| msgid "number"
+#~ msgid "Decimal number"
+#~ msgstr "numéro"
+
+#, fuzzy
+#~| msgid "Description"
+#~ msgid "Duration"
+#~ msgstr "Description"
+
+#, fuzzy
+#~| msgid "email address"
+#~ msgid "Email address"
+#~ msgstr "adresse email"
+
+#, fuzzy
+#~| msgid "File list"
+#~ msgid "File path"
+#~ msgstr "Liste des fichiers"
+
+#, fuzzy
+#~| msgid "account number"
+#~ msgid "Floating point number"
+#~ msgstr "numero de compte"
+
+#, fuzzy
+#~| msgid "address"
+#~ msgid "IPv4 address"
+#~ msgstr "Adresse"
+
+#, fuzzy
+#~| msgid "address"
+#~ msgid "IP address"
+#~ msgstr "Adresse"
+
+#, fuzzy
+#~| msgid "A user with that email address already exists"
+#~ msgid "%(model)s instance with %(field)s %(value)r does not exist."
+#~ msgstr "Un utilisateur avec cette adresse email existe déjà"
+
+#, fuzzy
+#~| msgid "account number"
+#~ msgid "Enter a whole number."
+#~ msgstr "numero de compte"
+
+#, fuzzy
+#~| msgid "account number"
+#~ msgid "Enter a number."
+#~ msgstr "numero de compte"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid date."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid time."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid date/time."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid duration."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a list of values."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "Enter a valid UUID."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "Current club(s) :"
+#~ msgid "Currently"
+#~ msgstr "Clubs actuels : "
+
+#, fuzzy
+#~| msgid "Unknown event"
+#~ msgid "Unknown"
+#~ msgstr "Événement inconnu"
+
+#, fuzzy
+#~| msgid "M"
+#~ msgid "PM"
+#~ msgstr "M"
+
+#, fuzzy
+#~| msgid "M"
+#~ msgid "AM"
+#~ msgstr "M"
+
+#, fuzzy
+#~| msgid "Month"
+#~ msgid "Mon"
+#~ msgstr "Mois"
+
+#, fuzzy
+#~| msgid "Start"
+#~ msgid "Sat"
+#~ msgstr "Début"
+
+#, fuzzy
+#~| msgid "Search"
+#~ msgid "March"
+#~ msgstr "Recherche"
+
+#, fuzzy
+#~| msgid "Man"
+#~ msgid "May"
+#~ msgstr "Homme"
+
+#, fuzzy
+#~| msgid "past member"
+#~ msgid "September"
+#~ msgstr "Anciens membres"
+
+#, fuzzy
+#~| msgid "Members"
+#~ msgid "November"
+#~ msgstr "Membres"
+
+#, fuzzy
+#~| msgid "Members"
+#~ msgid "December"
+#~ msgstr "Membres"
+
+#, fuzzy
+#~| msgid "Man"
+#~ msgid "jan"
+#~ msgstr "Homme"
+
+#, fuzzy
+#~| msgid "Bar"
+#~ msgid "mar"
+#~ msgstr "Bar"
+
+#, fuzzy
+#~| msgid "Bar"
+#~ msgid "apr"
+#~ msgstr "Bar"
+
+#, fuzzy
+#~| msgid "company"
+#~ msgid "may"
+#~ msgstr "entreprise"
+
+#, fuzzy
+#~| msgid "journal"
+#~ msgid "jun"
+#~ msgstr "classeur"
+
+#, fuzzy
+#~| msgid "journal"
+#~ msgid "jul"
+#~ msgstr "classeur"
+
+#, fuzzy
+#~| msgid "sex"
+#~ msgid "sep"
+#~ msgstr "sexe"
+
+#, fuzzy
+#~| msgid "Doctor"
+#~ msgid "oct"
+#~ msgstr "Doctorant"
+
+#, fuzzy
+#~| msgid "Search"
+#~ msgctxt "abbrev. month"
+#~ msgid "March"
+#~ msgstr "Recherche"
+
+#, fuzzy
+#~| msgid "Man"
+#~ msgctxt "abbrev. month"
+#~ msgid "May"
+#~ msgstr "Homme"
+
+#, fuzzy
+#~| msgid "Search"
+#~ msgctxt "alt. month"
+#~ msgid "March"
+#~ msgstr "Recherche"
+
+#, fuzzy
+#~| msgid "Man"
+#~ msgctxt "alt. month"
+#~ msgid "May"
+#~ msgstr "Homme"
+
+#, fuzzy
+#~| msgid "past member"
+#~ msgctxt "alt. month"
+#~ msgid "September"
+#~ msgstr "Anciens membres"
+
+#, fuzzy
+#~| msgid "Members"
+#~ msgctxt "alt. month"
+#~ msgid "November"
+#~ msgstr "Membres"
+
+#, fuzzy
+#~| msgid "Members"
+#~ msgctxt "alt. month"
+#~ msgid "December"
+#~ msgstr "Membres"
+
+#, fuzzy
+#~| msgid "second email address"
+#~ msgid "This is not a valid IPv6 address."
+#~ msgstr "adresse email secondaire"
+
+#, fuzzy
+#~| msgid "Page does not exist"
+#~ msgid "\"%(path)s\" does not exist"
+#~ msgstr "La page n'existe pas."
+
+#, fuzzy
+#~| msgid "Club"
+#~ msgid "Club:"
+#~ msgstr "Club"
+
+#, fuzzy
+#~| msgid "Debit"
+#~ msgid "Debitor"
+#~ msgstr "Débiteur"

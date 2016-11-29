@@ -5,6 +5,10 @@ from django.core.urlresolvers import reverse_lazy
 from django.forms.models import modelform_factory
 from django.forms import HiddenInput
 from django import forms
+from django.http import HttpResponseRedirect, HttpResponse
+from django.utils.translation import ugettext as _
+from django.conf import settings
+
 
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 
@@ -190,6 +194,7 @@ class JournalEditView(CanEditMixin, UpdateView):
     fields = ['name', 'start_date', 'end_date', 'club_account', 'closed']
     template_name = 'core/edit.jinja'
 
+
 # Operation views
 
 class OperationForm(forms.ModelForm):
@@ -303,6 +308,125 @@ class OperationEditView(CanEditMixin, UpdateView):
         kwargs['object'] = self.object.journal
         return kwargs
 
+class OperationPDFView(CanViewMixin, DetailView):
+    """
+    Display the PDF of a given operation
+    """
+
+    model = Operation
+    pk_url_kwarg = "op_id"
+
+    def get(self, request, *args, **kwargs):
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.units import cm
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import letter
+        from reportlab.lib.utils import ImageReader
+        from reportlab.graphics.shapes import Drawing
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.pdfbase import pdfmetrics
+
+        pdfmetrics.registerFont(TTFont('DejaVu', 'DejaVuSerif.ttf'))
+
+
+
+        self.object = self.get_object()
+        amount = self.object.amount
+        remark = self.object.remark
+        nature = self.object.accounting_type.movement_type
+        num = self.object.number
+        date = self.object.date
+        mode = self.object.mode
+        cheque_number = self.object.cheque_number
+        club_name = self.object.journal.club_account.name
+        ti = self.object.journal.name
+        op_label = self.object.label
+        club_address = self.object.journal.club_account.club.address
+        id_op = self.object.id
+
+        if self.object.target_type == "OTHER":
+            target = self.object.target_label
+        else:
+            target = self.object.target.get_display_name()
+
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="op-%d(%s_on_%s).pdf"'  %(num, ti, club_name)
+        p = canvas.Canvas(response)
+
+        p.setFont('DejaVu', 12)
+
+        p.setTitle("%s %d" % (_("Operation"), num))
+        width, height = letter
+        im = ImageReader("core/static/core/img/logo.jpg")
+        iw, ih = im.getSize()
+        p.drawImage(im, 40, height - 50, width=iw/2, height=ih/2)
+ 
+        labelStr = [["%s %s - %s %s" % (_("Journal"), ti, _("Operation"), num)]]
+
+        label = Table(labelStr, colWidths=[150], rowHeights=[20])
+        
+        label.setStyle(TableStyle([
+                                ('ALIGN',(0,0),(-1,-1),'CENTER'),
+                                ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                ]))
+        w, h = label.wrapOn(label, 0, 0)
+        label.drawOn(p, width-180, height)
+
+        p.drawString(90, height - 100, _("Financial proof: ") + "OP%010d" % (id_op)) #Justificatif du libellé
+        p.drawString(90, height - 130, _("Club: %(club_name)s") % ({"club_name": club_name}))
+        p.drawString(90, height - 160, _("Label: %(op_label)s") % {"op_label": op_label if op_label != None else ""})
+
+        data = []
+        
+        data += [["%s" % (_("Credit").upper() if nature == 'CREDIT' else _("Debit").upper())]]
+
+        data += [[_("Amount: %(amount).2f €") % {"amount": amount}]]
+        
+        payment_mode = ""
+        for m in settings.SITH_ACCOUNTING_PAYMENT_METHOD:
+            if m[0] == mode:
+                payment_mode += "[\u00D7]"
+            else:
+                payment_mode += "[  ]"
+            payment_mode += " %s\n" %(m[1])
+
+        data += [[payment_mode]]
+        
+        data += [["%s : %s" % (_("Debtor") if nature == 'CREDIT' else _("Creditor"), target), ""]]
+
+        data += [["%s \n%s" % (_("Comment:"), remark)]]
+        
+        t = Table(data, colWidths=[(width-90*2)/2]*2, rowHeights=[20, 20, 70, 20, 80])
+        t.setStyle(TableStyle([
+                        ('ALIGN',(0,0),(-1,-1),'CENTER'),
+                        ('VALIGN',(-2,-1),(-1,-1),'TOP'),
+                        ('VALIGN',(0,0),(-1,-2),'MIDDLE'),
+                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                        ('SPAN', (0, 0), (1, 0)), # line DEBIT/CREDIT
+                        ('SPAN', (0, 1), (1, 1)), # line amount
+                        ('SPAN',(-2, -1), (-1,-1)), # line comment
+                        ('SPAN', (0, -2), (-1, -2)), # line creditor/debtor
+                        ('SPAN', (0, 2), (1, 2)), # line payment_mode
+                        ('ALIGN',(0, 2), (1, 2),'LEFT'), # line payment_mode
+                        ('ALIGN', (-2, -1), (-1, -1), 'LEFT'),
+                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                        ]))
+
+        w, h = t.wrapOn(p, 0, 0)
+
+        t.drawOn(p, 90, 350)
+
+
+
+        p.drawCentredString(10.5 * cm, 2 * cm, club_name)
+        p.drawCentredString(10.5 * cm, 1 * cm, club_address)
+
+        p.showPage()
+        p.save()
+        return response
+
 # Company views
 
 class CompanyCreateView(CanCreateMixin, CreateView):
@@ -357,4 +481,3 @@ class LabelDeleteView(CanEditMixin, DeleteView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
-
