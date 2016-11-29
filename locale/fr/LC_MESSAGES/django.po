@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-28 11:18+0100\n"
+"POT-Creation-Date: 2016-11-29 11:25+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1305,27 +1305,27 @@ msgstr "Partenaires"
 msgid "Help"
 msgstr "Aide"
 
-#: core/templates/core/base.jinja:108
+#: core/templates/core/base.jinja:109
 msgid "Contacts"
 msgstr "Contacts"
 
-#: core/templates/core/base.jinja:108
-msgid "Legal Mentions"
-msgstr "Mentions Légales"
+#: core/templates/core/base.jinja:110
+msgid "Legal notices"
+msgstr "Mentions légales"
 
-#: core/templates/core/base.jinja:108
-msgid "Intellectual Property"
-msgstr "Propriété Intellectuelle"
+#: core/templates/core/base.jinja:111
+msgid "Intellectual property"
+msgstr "Propriété intellectuelle"
 
-#: core/templates/core/base.jinja:108
+#: core/templates/core/base.jinja:112
 msgid "Help & Documentation"
 msgstr "Aide & Documentation"
 
-#: core/templates/core/base.jinja:108
+#: core/templates/core/base.jinja:113
 msgid "R&D"
 msgstr "R&D"
 
-#: core/templates/core/base.jinja:109
+#: core/templates/core/base.jinja:115
 msgid "Site made by good people"
 msgstr "Site réalisé par des gens bons"
 

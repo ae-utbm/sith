@@ -105,7 +105,13 @@
         {% if not popup %}
         <footer>
             {% block footer %}
-            <div><a href="https://ae.utbm.fr/article.php?name=contacts">{% trans %}Contacts{% endtrans %}</a> <a href="https://ae.utbm.fr/article.php?name=legals">{% trans %}Legal Mentions{% endtrans %}</a> <a href="https://ae.utbm.fr/copyright_agent.php">{% trans %}Intellectual Property{% endtrans %}</a> <a href="https://ae.utbm.fr/article.php?name=docs:index">{% trans %}Help & Documentation{% endtrans %}</a> <a href="https://ae.utbm.fr/article.php?name=rd">{% trans %}R&D{% endtrans %}</a></div>
+            <div>
+                <a href="https://ae.utbm.fr/article.php?name=contacts">{% trans %}Contacts{% endtrans %}</a>
+                <a href="https://ae.utbm.fr/article.php?name=legals">{% trans %}Legal notices{% endtrans %}</a>
+                <a href="https://ae.utbm.fr/copyright_agent.php">{% trans %}Intellectual property{% endtrans %}</a>
+                <a href="https://ae.utbm.fr/article.php?name=docs:index">{% trans %}Help & Documentation{% endtrans %}</a>
+                <a href="https://ae.utbm.fr/article.php?name=rd">{% trans %}R&D{% endtrans %}</a>
+            </div>
             {% trans %}Site made by good people{% endtrans %}
             {% endblock %}
         </footer>
