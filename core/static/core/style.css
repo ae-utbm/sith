@@ -349,6 +349,15 @@ footer{
     text-align: center;
 }
 
+footer div{
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+footer a{
+    margin-left: 20px;
+}
+
 /*---------------------------------FORMS-------------------------------*/
 form {
     margin: 0px auto;
