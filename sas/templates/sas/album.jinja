@@ -18,7 +18,7 @@
 <a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a><br>
 <hr>
 <div>
-    {% for a in album.children.filter(is_folder=True, is_moderated=True).all() %}
+    {% for a in album.children.filter(is_folder=True, is_moderated=True).order_by('-id') %}
     <a href="{{ url("sas:album", album_id=a.id) }}" style="display: inline-block">
     <div class="album">
         <div>

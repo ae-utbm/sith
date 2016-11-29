@@ -17,9 +17,11 @@ class Picture(SithFile):
 
     @property
     def is_vertical(self):
-        im = Image.open(BytesIO(self.file.read()))
-        (w, h) = im.size
-        return (w / h) < 1
+        with open(settings.MEDIA_ROOT + self.file.name).encode('utf-8'), 'rb') as f:
+            im = Image.open(BytesIO(f.read()))
+            (w, h) = im.size
+            return (w / h) < 1
+        return False
 
     def can_be_edited_by(self, user):
         return user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID)

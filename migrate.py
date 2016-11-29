@@ -1086,10 +1086,10 @@ def migrate_sas():
                 file_name += "/" + str(r['id_photo']) + ".jpg"
 
                 file = File(open(file_name, "rb"))
-                file.name = (str(r['id_photo']) + ".jpg").encode('utf-8')
+                file.name = str(r['id_photo']) + ".jpg"
 
                 p = Picture(
-                        name=(to_unicode(str(r['id_photo'])) + ".jpg").encode('utf-8'),
+                        name=str(r['id_photo']) + ".jpg",
                         owner=user,
                         is_moderated=True,
                         is_folder=False,
