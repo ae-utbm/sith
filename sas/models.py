@@ -17,7 +17,7 @@ class Picture(SithFile):
 
     @property
     def is_vertical(self):
-        with open(settings.MEDIA_ROOT + self.file.name).encode('utf-8'), 'rb') as f:
+        with open((settings.MEDIA_ROOT + self.file.name).encode('utf-8'), 'rb') as f:
             im = Image.open(BytesIO(f.read()))
             (w, h) = im.size
             return (w / h) < 1
