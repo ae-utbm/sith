@@ -38,6 +38,8 @@ urlpatterns = [
     url(r'^label/(?P<clubaccount_id>[0-9]+)$', LabelListView.as_view(), name='label_list'),
     url(r'^label/(?P<label_id>[0-9]+)/edit$', LabelEditView.as_view(), name='label_edit'),
     url(r'^label/(?P<label_id>[0-9]+)/delete$', LabelDeleteView.as_view(), name='label_delete'),
+    # User account
+    url(r'^refound/account$', RefoundAccountView.as_view(), name='refound_account'),
 ]
 
 

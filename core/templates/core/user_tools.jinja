@@ -43,6 +43,7 @@
 <h4>{% trans %}Accounting{% endtrans %}</h4>
 <ul>
     {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) or user.is_root %}
+    <li><a href="{{ url('accounting:refound_account') }}">{% trans %}Refound Account{% endtrans %}</a></li>
     <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
     {% endif %}
     {% for m in user.memberships.filter(end_date=None).filter(role__gte=7).all() -%}
