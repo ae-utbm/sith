@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-29 12:34+0100\n"
+"POT-Creation-Date: 2016-11-29 15:16+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -296,7 +296,7 @@ msgstr "Il n'y a pas de types comptable dans ce site web."
 
 #: accounting/templates/accounting/bank_account_details.jinja:4
 #: accounting/templates/accounting/bank_account_details.jinja:13
-#: core/templates/core/user_tools.jinja:50
+#: core/templates/core/user_tools.jinja:51
 msgid "Bank account: "
 msgstr "Compte en banque : "
 
@@ -515,7 +515,7 @@ msgid "Done"
 msgstr "Effectué"
 
 #: accounting/templates/accounting/journal_details.jinja:37
-#: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:711
+#: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:712
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -555,6 +555,16 @@ msgstr "Éditer l'opération"
 #: subscription/templates/subscription/subscription.jinja:23
 msgid "Save"
 msgstr "Sauver"
+
+#: accounting/templates/accounting/refound_account.jinja:4
+#: accounting/templates/accounting/refound_account.jinja:8
+#: accounting/views.py:399
+msgid "Refound account"
+msgstr "Remboursement de compte"
+
+#: accounting/templates/accounting/refound_account.jinja:12
+msgid "Refound"
+msgstr "Rembourser"
 
 #: accounting/templates/accounting/simplifiedaccountingtype_list.jinja:4
 #: accounting/templates/accounting/simplifiedaccountingtype_list.jinja:15
@@ -607,6 +617,10 @@ msgstr "Créditeur"
 #: accounting/views.py:399
 msgid "Comment:"
 msgstr "Commentaire :"
+
+#: accounting/views.py:491
+msgid "Refound this account"
+msgstr "Rembourser ce compte"
 
 #: club/models.py:21
 msgid "unix name"
@@ -808,7 +822,7 @@ msgid "Payment method"
 msgstr "Méthode de paiement"
 
 #: club/templates/club/club_tools.jinja:4
-#: core/templates/core/user_tools.jinja:74
+#: core/templates/core/user_tools.jinja:75
 msgid "Club tools"
 msgstr "Outils club"
 
@@ -851,16 +865,16 @@ msgstr "Choisir un utilisateur"
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
-#: club/views.py:165 counter/views.py:909
+#: club/views.py:165 counter/views.py:910
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:166 counter/views.py:910
+#: club/views.py:166 counter/views.py:911
 msgid "End date"
 msgstr "Date de fin"
 
 #: club/views.py:180 core/templates/core/user_stats.jinja:27
-#: counter/views.py:990
+#: counter/views.py:991
 msgid "Product"
 msgstr "Produit"
 
@@ -2027,22 +2041,26 @@ msgid "Stats"
 msgstr "Stats"
 
 #: core/templates/core/user_tools.jinja:46
+msgid "Refound Account"
+msgstr "Rembourser un compte"
+
+#: core/templates/core/user_tools.jinja:47
 msgid "General accounting"
 msgstr "Comptabilité générale"
 
-#: core/templates/core/user_tools.jinja:55
+#: core/templates/core/user_tools.jinja:56
 msgid "Club account: "
 msgstr "Compte club : "
 
-#: core/templates/core/user_tools.jinja:62
+#: core/templates/core/user_tools.jinja:63
 msgid "Communication"
 msgstr "Communication"
 
-#: core/templates/core/user_tools.jinja:65
+#: core/templates/core/user_tools.jinja:66
 msgid "Moderate files"
 msgstr "Modérer les fichiers"
 
-#: core/templates/core/user_tools.jinja:68
+#: core/templates/core/user_tools.jinja:69
 msgid "Moderate pictures"
 msgstr "Modérer les photos"
 
@@ -2351,7 +2369,7 @@ msgstr "Liste des relevés de caisse"
 msgid "Theoric sums"
 msgstr "Sommes théoriques"
 
-#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:712
+#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:713
 msgid "Emptied"
 msgstr "Coffre vidé"
 
@@ -2609,57 +2627,57 @@ msgstr "Produit parent"
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
-#: counter/views.py:691
+#: counter/views.py:692
 msgid "10 cents"
 msgstr "10 centimes"
 
-#: counter/views.py:692
+#: counter/views.py:693
 msgid "20 cents"
 msgstr "20 centimes"
 
-#: counter/views.py:693
+#: counter/views.py:694
 msgid "50 cents"
 msgstr "50 centimes"
 
-#: counter/views.py:694
+#: counter/views.py:695
 msgid "1 euro"
 msgstr "1 €"
 
-#: counter/views.py:695
+#: counter/views.py:696
 msgid "2 euros"
 msgstr "2 €"
 
-#: counter/views.py:696
+#: counter/views.py:697
 msgid "5 euros"
 msgstr "5 €"
 
-#: counter/views.py:697
+#: counter/views.py:698
 msgid "10 euros"
 msgstr "10 €"
 
-#: counter/views.py:698
+#: counter/views.py:699
 msgid "20 euros"
 msgstr "20 €"
 
-#: counter/views.py:699
+#: counter/views.py:700
 msgid "50 euros"
 msgstr "50 €"
 
-#: counter/views.py:700
+#: counter/views.py:701
 msgid "100 euros"
 msgstr "100 €"
 
-#: counter/views.py:701 counter/views.py:703 counter/views.py:705
-#: counter/views.py:707 counter/views.py:709
+#: counter/views.py:702 counter/views.py:704 counter/views.py:706
+#: counter/views.py:708 counter/views.py:710
 msgid "Check amount"
 msgstr "Montant du chèque"
 
-#: counter/views.py:702 counter/views.py:704 counter/views.py:706
-#: counter/views.py:708 counter/views.py:710
+#: counter/views.py:703 counter/views.py:705 counter/views.py:707
+#: counter/views.py:709 counter/views.py:711
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
-#: counter/views.py:1061
+#: counter/views.py:1062
 msgid "people(s)"
 msgstr "personne(s)"
 

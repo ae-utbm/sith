@@ -67,6 +67,7 @@ class Command(BaseCommand):
             c.save()
         self.reset_index("counter")
         Counter(name="Eboutic", club=main_club, type='EBOUTIC').save()
+        Counter(name="AE", club=main_club, type='OFFICE').save()
 
         home_root.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
         club_root.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]

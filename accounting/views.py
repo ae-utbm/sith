@@ -1,9 +1,13 @@
 from django.views.generic import ListView, DetailView, RedirectView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
 from django.shortcuts import render
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
+from django.utils.translation import ugettext_lazy as _
 from django.forms.models import modelform_factory
+from django.core.exceptions import PermissionDenied
 from django.forms import HiddenInput
+from django.db import transaction
+from django.conf import settings
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
@@ -15,6 +19,7 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from core.views.forms import SelectFile, SelectDate
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
+from counter.models import Counter, Selling
 
 # Main accounting view
 
@@ -481,3 +486,49 @@ class LabelDeleteView(CanEditMixin, DeleteView):
 
     def get_success_url(self):
         return self.object.get_absolute_url()
+
+class CloseCustomerAccountForm(forms.Form):
+    user = AutoCompleteSelectField('users', label=_('Refound this account'), help_text=None, required=True)
+
+class RefoundAccountView(FormView):
+    """
+    Create a selling with the same amount than the current user money
+    """
+    template_name = "accounting/refound_account.jinja"
+    form_class = CloseCustomerAccountForm
+
+    def permission(self, user):
+        if user.is_root or user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+            return True
+        else:
+            raise PermissionDenied
+
+    def dispatch(self, request, *arg, **kwargs):
+        res = super(RefoundAccountView, self).dispatch(request, *arg, **kwargs)
+        if self.permission(request.user):
+            return res
+
+    def post(self, request, *arg, **kwargs):
+        self.operator = request.user
+        if self.permission(request.user):
+            return super(RefoundAccountView, self).post(self, request, *arg, **kwargs)
+
+    def form_valid(self, form):
+        self.customer = form.cleaned_data['user']
+        self.create_selling()
+        return super(RefoundAccountView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('accounting:refound_account')
+
+    def create_selling(self):
+        with transaction.atomic():
+            uprice = self.customer.customer.amount
+            main_club_counter = Counter.objects.filter(club__unix_name=settings.SITH_MAIN_CLUB['unix_name'],
+                                                       type='OFFICE').first()
+            main_club = main_club_counter.club
+            s = Selling(label=_('Refound account'), unit_price=uprice,
+                        quantity=1, seller=self.operator,
+                        customer=self.customer.customer,
+                        club=main_club, counter=main_club_counter)
+            s.save()

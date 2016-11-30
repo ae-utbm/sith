@@ -1,0 +1,14 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Refound account{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <h3>{% trans %}Refound account{% endtrans %}</h3>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p() }}
+        <p><input type="submit" value="{% trans %}Refound{% endtrans %}" /></p>
+    </form>
+{% endblock %}
