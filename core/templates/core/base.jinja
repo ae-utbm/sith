@@ -85,7 +85,7 @@
                 <div class="tools">
                     {% for t in list_of_tabs %}
                     <a href="{{ t.url }}"
-                        {%- if current_tab == t.slug -%}
+                        {%- if current_tab == t.slug %}
                             class="selected_tab"
                         {%- endif -%}
                     >{{ t.name }}</a>

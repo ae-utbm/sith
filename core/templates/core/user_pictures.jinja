@@ -6,19 +6,27 @@
 {% endblock %}
 
 {% block content %}
-{% for r in profile.pictures.exclude(picture=None).values('user__pictures__picture__parent').distinct() %}
-<div style="padding: 10px">
-    {% set album = profile.pictures.filter(picture__parent=r['user__pictures__picture__parent']).first().picture.parent %}
-    <h4>{{ album.name }}</h4>
-    <hr>
-    {% for r in profile.pictures.exclude(picture=None).filter(picture__parent=album).order_by('id') %}
-    <div class="picture">
-        <a href="{{ url("sas:picture", picture_id=r.picture.id) }}#pict">
-            <img src="{{ r.picture.as_picture.get_download_thumb_url() }}" alt="{{ r.picture.get_display_name() }}" style="max-width: 100%"/>
-        </a>
+{% set album = None %}
+{% set new_album = True %}
+{% for r in profile.pictures.exclude(picture=None).order_by('-picture__parent__id', 'id') -%}
+    {%- if album != r.picture.parent %}
+        {%- if album %}
     </div>
-    {% endfor %}
-</div>
-{% endfor %}
+        {% endif -%}
+    {% set new_album = True %}
+    {% set album = r.picture.parent %}
+    <div style="padding: 10px">
+        <h4>{{ album.name }}</h4>
+        <hr>
+    {% else %}
+        {% set new_album = False %}
+    {%- endif %}
+        <div class="picture">
+            <a href="{{ url("sas:picture", picture_id=r.picture.id) }}#pict">
+                <img src="{{ r.picture.as_picture.get_download_thumb_url() }}" alt="{{ r.picture.get_display_name() }}" style="max-width: 100%"/>
+            </a>
+        </div>
+{%- endfor %}
+    </div>
 {% endblock %}
 
