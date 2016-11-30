@@ -60,13 +60,13 @@ class Picture(SithFile):
 
     def rotate(self, degree):
         for attr in ['file', 'compressed', 'thumbnail']:
-            if self.__getattribute__(attr):
-                im = Image.open(BytesIO(self.__getattribute__(attr).read()))
-                new_image = BytesIO()
-                im = im.rotate(degree, expand=True)
-                im.save(fp=new_image, format=self.mime_type.split('/')[-1].upper(), quality=90, optimize=True, progressive=True)
-                self.__getattribute__(attr).save(self.name, ContentFile(new_image.getvalue()))
-                self.save()
+            name = self.__getattribute__(attr).name
+            with open((settings.MEDIA_ROOT + name).encode('utf-8'), 'r+b') as file:
+                if file:
+                    im = Image.open(BytesIO(file.read()))
+                    file.seek(0)
+                    im = im.rotate(degree, expand=True)
+                    im.save(fp=file, format=self.mime_type.split('/')[-1].upper(), quality=90, optimize=True, progressive=True)
 
     def get_next(self):
         return self.parent.children.filter(is_moderated=True, asked_for_removal=False, is_folder=False,
@@ -89,6 +89,9 @@ class Album(SithFile):
 
     def get_absolute_url(self):
         return reverse('sas:album', kwargs={'album_id': self.id})
+
+    def get_download_url(self):
+        return reverse('sas:download', kwargs={'picture_id': self.id})
 
 class PeoplePictureRelation(models.Model):
     """
