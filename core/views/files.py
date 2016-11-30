@@ -26,7 +26,7 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
     iterator for chunks of 8KB.
     """
     f = file_class.objects.filter(id=file_id).first()
-    if f is None or f.is_folder:
+    if f is None or not f.file:
         return not_found(request)
     from counter.models import Counter
     if not (can_view(f, request.user) or

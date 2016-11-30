@@ -202,16 +202,16 @@ class PictureEditForm(forms.ModelForm):
 class AlbumEditForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields=['name', 'parent']
+        fields=['name', 'file', 'parent']
     parent = make_ajax_field(Album, 'parent', 'files', help_text="")
 
-class PictureEditView(UpdateView):
+class PictureEditView(CanEditMixin, UpdateView):
     model=Picture
     form_class=PictureEditForm
     template_name='core/edit.jinja'
     pk_url_kwarg = "picture_id"
 
-class AlbumEditView(UpdateView):
+class AlbumEditView(CanEditMixin, UpdateView):
     model=Album
     form_class=AlbumEditForm
     template_name='core/edit.jinja'

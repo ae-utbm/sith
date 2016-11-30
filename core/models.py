@@ -572,10 +572,14 @@ class SithFile(models.Model):
                 code='duplicate',
             )
         if self.is_folder:
-            try:
-                self.file.delete()
-            except: pass
-            self.file = None
+            if self.file:
+                try:
+                    import imghdr
+                    if imghdr.what(None, self.file.read()) not in ['gif', 'png', 'jpeg']:
+                        self.file.delete()
+                        self.file = None
+                except:
+                    self.file = None
             self.mime_type = "inode/directory"
         if self.is_file and (self.file is None or self.file == ""):
             raise ValidationError(_("You must provide a file"))
