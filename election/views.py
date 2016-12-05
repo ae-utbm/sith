@@ -17,3 +17,14 @@ class ElectionsListView(CanViewMixin, ListView):
     """
     model = Election
     template_name = 'election/election_list.jinja'
+
+
+class ElectionDetailView(CanViewMixin, DetailView):
+    """
+    Details an election responsability by responsability
+    """
+    model = Election
+    template_name = 'election/election_detail.jinja'
+    pk_url_kwarg = "election_id"
+
+# Forms
