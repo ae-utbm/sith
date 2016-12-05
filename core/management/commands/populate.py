@@ -15,6 +15,8 @@ from club.models import Club, Membership
 from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
 from com.models import Sith
+from election.models import Election, Responsability, Candidate
+
 
 class Command(BaseCommand):
     help = "Populate a new instance of the Sith AE"
@@ -122,6 +124,14 @@ Welcome to the wiki page!
             skia.save()
             skia.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             skia.save()
+            # Adding user sli
+            sli = User(username='sli', last_name="Li", first_name="S",
+                       email="sli@git.an",
+                       date_of_birth="1942-06-12")
+            sli.set_password("plop")
+            sli.save()
+            skia.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            sli.save()
             # Adding user public
             public = User(username='public', last_name="Not subscribed", first_name="Public",
                      email="public@git.an",
@@ -213,6 +223,14 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             s.save()
             ## Skia
             s = Subscription(member=User.objects.filter(pk=skia.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                    start=s.subscription_start)
+            s.save()
+            ## Sli
+            s = Subscription(member=Subscriber.objects.filter(pk=sli.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -329,5 +347,12 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     target_label=op[7], cheque_number=op[8])
                 operation.clean()
                 operation.save()
-                   
+
+            # Create an election
+            el = Election(title="Élection 2017", description="La roue tourne", start_date='1942-06-12 10:28:45', end_date='7942-06-12 10:28:45')
+            el.save()
+            resp = Responsability(election=el, title="Co Respo Info", description="Ghetto++")
+            resp.save()
+            cand = Candidate(responsability=resp, subscriber=skia)
+            cand.save()
 

@@ -58,6 +58,7 @@ INSTALLED_APPS = (
     'rootplace',
     'sas',
     'com',
+    'election',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -1,0 +1,13 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Election list{% endtrans %}
+{% endblock %}
+
+{% block content %}
+	{% for el in object_list %}
+		{% if el.is_active %}
+			<p>{{el}}</p>
+		{% endif %}
+	{% endfor %}
+{% endblock %}
