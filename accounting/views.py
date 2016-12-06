@@ -19,7 +19,7 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from core.views.forms import SelectFile, SelectDate
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
-from counter.models import Counter, Selling
+from counter.models import Counter, Selling, Product
 
 # Main accounting view
 
@@ -524,11 +524,11 @@ class RefoundAccountView(FormView):
     def create_selling(self):
         with transaction.atomic():
             uprice = self.customer.customer.amount
-            main_club_counter = Counter.objects.filter(club__unix_name=settings.SITH_MAIN_CLUB['unix_name'],
-                                                       type='OFFICE').first()
+            main_club_counter = Counter.objects.get(name=settings.SITH_COUNTER_REFOUND[1])
             main_club = main_club_counter.club
             s = Selling(label=_('Refound account'), unit_price=uprice,
                         quantity=1, seller=self.operator,
                         customer=self.customer.customer,
-                        club=main_club, counter=main_club_counter)
+                        club=main_club, counter=main_club_counter,
+                        product=Product.objects.get(code=settings.SITH_COUNTER_REFOUND_PRODUCT[1]))
             s.save()

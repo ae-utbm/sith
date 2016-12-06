@@ -29,6 +29,8 @@
     <li><a href="{{ url('counter:product_list') }}">{% trans %}Products management{% endtrans %}</a></li>
     <li><a href="{{ url('counter:producttype_list') }}">{% trans %}Product types management{% endtrans %}</a></li>
     <li><a href="{{ url('counter:cash_summary_list') }}">{% trans %}Cash register summaries{% endtrans %}</a></li>
+    <li><a href="{{ url('counter:invoices_call') }}">{% trans %}Invoices call{% endtrans %}</a></li>
+    <li><a href="{{ url('counter:eticket_list') }}">{% trans %}Etickets{% endtrans %}</a></li>
     {% endif %}
     {% for b in settings.SITH_COUNTER_BARS %}
     {% if user.is_in_group(b[1]+" admin") %}

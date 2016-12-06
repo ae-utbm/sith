@@ -313,6 +313,10 @@ SITH_COUNTER_BANK = [
         ('LA-POSTE', 'La Poste'),
         ]
 
+SITH_COUNTER_REFOUND = (88, 'Carte AE')
+
+SITH_COUNTER_REFOUND_PRODUCT = (1899, 'REMBOURS', 'Remboursement')
+
 # Defines which product type is the refilling type, and thus increases the account amount
 SITH_COUNTER_PRODUCTTYPE_REFILLING = 11
 
