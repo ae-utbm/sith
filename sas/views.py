@@ -10,6 +10,7 @@ from django import forms
 from django.core.exceptions import PermissionDenied
 
 from ajax_select import make_ajax_form, make_ajax_field
+from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 
 from io import BytesIO
 from PIL import Image
@@ -48,9 +49,9 @@ class SASForm(forms.Form):
 class RelationForm(forms.ModelForm):
     class Meta:
         model = PeoplePictureRelation
-        fields = ['picture', 'user']
+        fields = ['picture']
         widgets = {'picture': forms.HiddenInput}
-    user = make_ajax_field(PeoplePictureRelation, 'user', 'users', label=_("Add user"))
+    users = AutoCompleteSelectMultipleField('users', show_help_text=False, help_text="", label=_("Add user"), required=False)
 
 class SASMainView(FormView):
     form_class = SASForm
@@ -110,8 +111,10 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
         self.form = self.get_form()
         if request.user.is_authenticated() and request.user.is_in_group('ae-membres'):
             if self.form.is_valid():
-                PeoplePictureRelation(user=self.form.cleaned_data['user'],
-                        picture=self.form.cleaned_data['picture']).save()
+                for uid in self.form.cleaned_data['users']:
+                    u = User.objects.filter(id=uid).first()
+                    PeoplePictureRelation(user=u,
+                            picture=self.form.cleaned_data['picture']).save()
                 return super(PictureView, self).form_valid(self.form)
         else:
             self.form.add_error(None, _("You do not have the permission to do that"))
