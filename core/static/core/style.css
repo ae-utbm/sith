@@ -1,7 +1,6 @@
 /*--------------------------------GENERAL------------------------------*/
 body{
     background-color:#EEE;
-    background: url('img/dragon.png') bottom left fixed no-repeat, url('img/background.jpg') repeat;
     position: relative;
     width: 100%;
     font-family: sans-serif;
@@ -15,9 +14,6 @@ a:active  { color: #007BE6; }
 /*--------------------------------HEADER-------------------------------*/
 #logo {
     margin-left: 5%;
-}
-#logo img {
-    width: 500px;
 }
 header {
     display: block;
@@ -74,7 +70,6 @@ nav {
     width: 90%;
     margin: 0px auto;
     background: grey;
-    background: rgba(100, 100, 100, 0.8);
     color: white;
 }
 
@@ -96,7 +91,7 @@ nav a:hover {
     width: 88%;
     margin: 0px auto;
     padding: 1em 1%;
-    background: rgba(255, 255, 255, 0.8);
+    background: white;
     overflow: auto;
 }
 
