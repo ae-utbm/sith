@@ -13,14 +13,14 @@
 	<p>{% trans %}End :{% endtrans %} {{object.end_date}}</p>
 	{% for resp in object.responsability.all() %}
 		<h2>{{resp.title}}</h2>
-		{% for user in resp.candidate.all() %}
-			<a href="{{url('core:user_profile', user_id=user.subscriber.id)}}"><h3>{{user.subscriber.first_name}} {{user.subscriber.last_name}} ({{user.subscriber.nick_name}})</h3></a>
-			{% if user.subscriber.profile_pict %}
-				<img src="{{user.subscriber.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}"/>
+		{% for candidate in resp.candidate.all() %}
+			<a href="{{url('core:user_profile', user_id=candidate.user.id)}}"><h3>{{candidate.user.first_name}} {{candidate.user.last_name}} ({{candidate.user.nick_name}})</h3></a>
+			{% if candidate.user.profile_pict %}
+				<img src="{{candidate.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}"/>
 			{% endif %}
-			{% if user.program %}
+			{% if candidate.program %}
 				<h4>Programme</h4>
-				<p>{{user.program}}</p>
+				<p>{{candidate.program}}</p>
 			{% endif %}
 		{% endfor %}
 	{% endfor %}

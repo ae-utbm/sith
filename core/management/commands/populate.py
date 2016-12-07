@@ -349,10 +349,10 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                 operation.save()
 
             # Create an election
-            el = Election(title="Élection 2017", description="La roue tourne", start_date='1942-06-12 10:28:45', end_date='7942-06-12 10:28:45')
+            el = Election(title="Élection 2017", description="La roue tourne", start_proposal='1942-06-12 10:28:45', end_proposal='2042-06-12 10:28:45',start_date='1942-06-12 10:28:45', end_date='7942-06-12 10:28:45')
             el.save()
             resp = Responsability(election=el, title="Co Respo Info", description="Ghetto++")
             resp.save()
-            cand = Candidate(responsability=resp, subscriber=skia)
+            cand = Candidate(responsability=resp, user=skia)
             cand.save()
 
