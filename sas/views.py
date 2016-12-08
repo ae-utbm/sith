@@ -18,7 +18,7 @@ from PIL import Image
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectUser, LoginForm, SelectDate, SelectDateTime
 from core.views.files import send_file
-from core.models import SithFile, User
+from core.models import SithFile, User, Notification, RealGroup
 
 from sas.models import Picture, Album, PeoplePictureRelation
 
@@ -28,11 +28,13 @@ class SASForm(forms.Form):
             required=False)
 
     def process(self, parent, owner, files, automodere=False):
+        notif = False
         try:
             if self.cleaned_data['album_name'] != "":
                 album = Album(parent=parent, name=self.cleaned_data['album_name'], owner=owner, is_moderated=automodere)
                 album.clean()
                 album.save()
+                notif = True
         except Exception as e:
             self.add_error(None, _("Error creating album %(album)s: %(msg)s") %
                     {'album': self.cleaned_data['album_name'], 'msg': repr(e)})
@@ -43,8 +45,14 @@ class SASForm(forms.Form):
                 new_file.clean()
                 new_file.generate_thumbnails()
                 new_file.save()
+                notif = True
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
+        if notif:
+            for u in RealGroup.objects.filter(id=settings.SITH_SAS_ADMIN_GROUP_ID).first().users.all():
+                if not u.notifications.filter(type="SAS_MODERATION").exists():
+                    Notification(user=u, text=_("New pictures/album to be moderated in the SAS"),
+                            url=reverse("sas:moderation"), type="SAS_MODERATION").save()
 
 class RelationForm(forms.ModelForm):
     class Meta:
@@ -115,6 +123,9 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
                     u = User.objects.filter(id=uid).first()
                     PeoplePictureRelation(user=u,
                             picture=self.form.cleaned_data['picture']).save()
+                    if not u.notifications.filter(type="NEW_PICTURES").exists():
+                        Notification(user=u, text=_("You've been identified on some pictures"),
+                                url=reverse("core:user_pictures", kwargs={'user_id': u.id}), type="NEW_PICTURES").save()
                 return super(PictureView, self).form_valid(self.form)
         else:
             self.form.add_error(None, _("You do not have the permission to do that"))

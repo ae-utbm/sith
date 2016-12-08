@@ -850,3 +850,11 @@ class PageRev(models.Model):
         # Don't forget to unlock, otherwise, people will have to wait for the page's timeout
         self.page.unset_lock()
 
+class Notification(models.Model):
+    user = models.ForeignKey(User, related_name='notifications')
+    url = models.CharField(_("url"), max_length=255)
+    text = models.CharField(_("text"), max_length=512)
+    type = models.CharField(_("text"), max_length=16, choices=settings.SITH_NOTIFICATIONS, blank=True, null=True)
+    date = models.DateTimeField(_('date'), default=timezone.now)
+
+

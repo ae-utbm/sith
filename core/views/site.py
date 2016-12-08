@@ -9,11 +9,18 @@ import os
 import json
 from itertools import chain
 
-from core.models import User
+from core.models import User, Notification
 from club.models import Club
 
 def index(request, context=None):
     return render(request, "core/index.jinja")
+
+def notification(request, notif_id):
+    notif = Notification.objects.filter(id=notif_id).first()
+    if notif:
+        notif.delete()
+        return redirect(notif.url)
+    return redirect("/")
 
 def search_user(query, as_json=False):
     users = []

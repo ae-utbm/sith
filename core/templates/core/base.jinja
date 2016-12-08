@@ -39,6 +39,17 @@
             {% endfor %}
             </ul>
             <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
+            {% if user.notifications.exists() %}
+            <a href="#" onclick="display_notif()">&#x1f514; ({{ user.notifications.count() }})</a>
+            <ul id="notif">
+                {% for n in user.notifications.order_by('-id') %}
+                <li><a href="{{ url("core:notification", notif_id=n.id) }}">
+                        <span style="font-size: small; ">{{ n.date|date(DATE_FORMAT) }} {{
+                            n.date|time(DATETIME_FORMAT) }}</span><br>
+                        {{ n.text }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
             <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
             <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
             <form action="{{ url('core:search') }}" method="GET">

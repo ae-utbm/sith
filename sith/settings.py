@@ -248,6 +248,8 @@ SITH_START_DATE = (8, 15) # 15th August
 # Used to determine the valid promos
 SITH_SCHOOL_START_YEAR = 1999
 
+SITH_GROUP_ROOT_ID = 1
+
 SITH_GROUPS = {
     'root': {
         'id': 1,
@@ -449,6 +451,12 @@ SITH_LAUNDERETTE_PRICES = {
 # SAS variables
 SITH_SAS_ROOT_DIR_ID = 4
 SITH_SAS_ADMIN_GROUP_ID = 9
+
+SITH_NOTIFICATIONS = [
+        ('FILE_MODERATION', _("File moderation")),
+        ('SAS_MODERATION', _("SAS moderation")),
+        ('NEW_PICTURES', _("New pictures")),
+        ]
 
 try:
     from .settings_custom import *

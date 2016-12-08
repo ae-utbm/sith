@@ -63,6 +63,14 @@ header form {
     width: 3em;
     height: 2em;
 }
+#notif {
+    display: none;
+    position: fixed;
+    background: lightgrey;
+}
+#notif li:hover {
+    background: #bcc;
+}
 
 /*---------------------------------NAV---------------------------------*/
 nav {

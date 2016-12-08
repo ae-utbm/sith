@@ -16,7 +16,7 @@ from django import forms
 
 import os
 
-from core.models import SithFile
+from core.models import SithFile, RealGroup, Notification
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, can_view, not_found
 
 def send_file(request, file_id, file_class=SithFile, file_attr="file"):
@@ -49,11 +49,13 @@ class AddFilesForm(forms.Form):
             required=False)
 
     def process(self, parent, owner, files):
+        notif = False
         try:
             if self.cleaned_data['folder_name'] != "":
                 folder = SithFile(parent=parent, name=self.cleaned_data['folder_name'], owner=owner)
                 folder.clean()
                 folder.save()
+                notif = True
         except Exception as e:
             self.add_error(None, _("Error creating folder %(folder_name)s: %(msg)s") %
                     {'folder_name': self.cleaned_data['folder_name'], 'msg': str(e.message)})
@@ -63,8 +65,15 @@ class AddFilesForm(forms.Form):
             try:
                 new_file.clean()
                 new_file.save()
+                notif = True
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
+        if notif:
+            for u in RealGroup.objects.filter(id=settings.SITH_SAS_ADMIN_GROUP_ID).first().users.all():
+                if not u.notifications.filter(type="FILE_MODERATION").exists():
+                    Notification(user=u, text=_("New files to be moderated"),
+                            url=reverse("core:file_moderation"), type="FILE_MODERATION").save()
+
 
 class FileListView(ListView):
     template_name = 'core/file_list.jinja'

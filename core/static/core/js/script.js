@@ -36,3 +36,7 @@ $( function() {
         popup.dialog({title: $(this).text()}).dialog( "open" );
     });
 } );
+
+function display_notif() {
+    $('#notif').toggle();
+}
