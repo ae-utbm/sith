@@ -38,7 +38,7 @@ class Basket(models.Model):
         return total
 
     def __str__(self):
-        return "Basket (%d items)" % self.items.all().count()
+        return "%s's basket (%d items)" % (self.user, self.items.all().count())
 
 class Invoice(models.Model):
     """

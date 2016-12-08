@@ -152,7 +152,7 @@ $("form").submit(function (event) {
             errorlist.appendChild(errors.shift());
         progress.value = ++completeCount / imagesCount;
         if(progress.value === 1 && errorlist.children.length === 0)
-            document.location.reload()
+            document.location.reload(true)
     }
 });
 </script>
