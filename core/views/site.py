@@ -23,7 +23,7 @@ def search_user(query, as_json=False):
         users = User.objects.filter(Q(first_name__icontains=query) |
                 Q(last_name__icontains=query)).exclude(id__in=exact_nick).exclude(id__in=nicks).all()
         nicks = nicks[:5]
-        users = users[:5]
+        users = users[:50]
         if as_json: # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
             exact_nick = json.loads(serializers.serialize('json', exact_nick, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
             nicks = json.loads(serializers.serialize('json', nicks, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
