@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.core import serializers
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView
 
 import os
 import json
@@ -15,10 +16,18 @@ from club.models import Club
 def index(request, context=None):
     return render(request, "core/index.jinja")
 
+class NotificationList(ListView):
+    model = Notification
+    template_name = "core/notification_list.jinja"
+
+    def get_queryset(self):
+        return self.request.user.notifications.order_by('-id')[:20]
+
 def notification(request, notif_id):
     notif = Notification.objects.filter(id=notif_id).first()
     if notif:
-        notif.delete()
+        notif.viewed = True
+        notif.save()
         return redirect(notif.url)
     return redirect("/")
 

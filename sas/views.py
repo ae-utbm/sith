@@ -51,8 +51,7 @@ class SASForm(forms.Form):
         if notif:
             for u in RealGroup.objects.filter(id=settings.SITH_SAS_ADMIN_GROUP_ID).first().users.all():
                 if not u.notifications.filter(type="SAS_MODERATION").exists():
-                    Notification(user=u, text=_("New pictures/album to be moderated in the SAS"),
-                            url=reverse("sas:moderation"), type="SAS_MODERATION").save()
+                    Notification(user=u, url=reverse("sas:moderation"), type="SAS_MODERATION").save()
 
 class RelationForm(forms.ModelForm):
     class Meta:
@@ -124,8 +123,7 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
                     PeoplePictureRelation(user=u,
                             picture=self.form.cleaned_data['picture']).save()
                     if not u.notifications.filter(type="NEW_PICTURES").exists():
-                        Notification(user=u, text=_("You've been identified on some pictures"),
-                                url=reverse("core:user_pictures", kwargs={'user_id': u.id}), type="NEW_PICTURES").save()
+                        Notification(user=u, url=reverse("core:user_pictures", kwargs={'user_id': u.id}), type="NEW_PICTURES").save()
                 return super(PictureView, self).form_valid(self.form)
         else:
             self.form.add_error(None, _("You do not have the permission to do that"))

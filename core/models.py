@@ -853,8 +853,13 @@ class PageRev(models.Model):
 class Notification(models.Model):
     user = models.ForeignKey(User, related_name='notifications')
     url = models.CharField(_("url"), max_length=255)
-    text = models.CharField(_("text"), max_length=512)
-    type = models.CharField(_("text"), max_length=16, choices=settings.SITH_NOTIFICATIONS, blank=True, null=True)
+    param = models.CharField(_("param"), max_length=128, default="")
+    type = models.CharField(_("type"), max_length=32, choices=settings.SITH_NOTIFICATIONS, default="GENERIC")
     date = models.DateTimeField(_('date'), default=timezone.now)
+    viewed = models.BooleanField(_('viewed'), default=False)
 
+    def __str__(self):
+        if self.param:
+            return self.get_type_display() % self.param
+        return self.get_type_display()
 

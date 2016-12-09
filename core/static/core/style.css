@@ -67,6 +67,7 @@ header form {
     display: none;
     position: fixed;
     background: lightgrey;
+    text-align: center;
 }
 #notif li:hover {
     background: #bcc;
@@ -288,6 +289,11 @@ tbody>tr:hover {
     max-height: 60px;
     margin: 2px auto;
     display: block;
+}
+#notifications li {
+    padding: 5px;
+    margin: 2px;
+    list-style: none;
 }
 #moderation div {
     margin: 2px;

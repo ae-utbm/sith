@@ -1,0 +1,24 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Notification list{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans %}Notification list{% endtrans %}</h3>
+<ul id="notifications">
+{% for n in notification_list %}
+    {% if n.viewed %}
+    <li>
+    {% else %}
+    <li style="background: lightgrey;">
+    {% endif %}
+        <a href="{{ url("core:notification", notif_id=n.id) }}">
+        <span style="font-size: small; ">{{ n.date|date(DATE_FORMAT) }} {{
+            n.date|time(DATETIME_FORMAT) }}</span><br>
+        {{ n }}</a>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}
+

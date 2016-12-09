@@ -4,6 +4,7 @@ from core.views import *
 
 urlpatterns = [
     url(r'^$', index, name='index'),
+    url(r'^notifications$', NotificationList.as_view(), name='notification_list'),
     url(r'^notification/(?P<notif_id>[0-9]+)$', notification, name='notification'),
 
     # Search

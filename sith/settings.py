@@ -453,9 +453,12 @@ SITH_SAS_ROOT_DIR_ID = 4
 SITH_SAS_ADMIN_GROUP_ID = 9
 
 SITH_NOTIFICATIONS = [
-        ('FILE_MODERATION', _("File moderation")),
-        ('SAS_MODERATION', _("SAS moderation")),
-        ('NEW_PICTURES', _("New pictures")),
+        ('FILE_MODERATION', _("New files to be moderated")),
+        ('SAS_MODERATION', _("New pictures/album to be moderated in the SAS")),
+        ('NEW_PICTURES', _("You've been identified on some pictures")),
+        ('REFILLING', _("You just refilled of %s €")),
+        ('SELLING', _("You just bought %s")),
+        ('GENERIC', _("You have a notification")),
         ]
 
 try:

@@ -270,11 +270,10 @@ class Refilling(models.Model):
             self.customer.amount += self.amount
             self.customer.save()
             self.is_validated = True
-        Notification(
-                user=self.customer.user,
-                url=reverse('core:user_account_detail',
+        Notification(user=self.customer.user, url=reverse('core:user_account_detail',
                     kwargs={'user_id': self.customer.user.id, 'year': self.date.year, 'month': self.date.month}),
-                text=_("You just refilled of %(amount)s €") % {'amount': self.amount}
+                param=str(self.amount),
+                type="REFILLING",
                 ).save()
         super(Refilling, self).save(*args, **kwargs)
 
@@ -387,9 +386,9 @@ class Selling(models.Model):
                 user=self.customer.user,
                 url=reverse('core:user_account_detail',
                     kwargs={'user_id': self.customer.user.id, 'year': self.date.year, 'month': self.date.month}),
-                text=_("You just bought %(quantity)d %(product_name)s") % {'quantity': self.quantity, 'product_name': self.label}
+                param="%d x %s" % (self.quantity, self.label),
+                type="SELLING",
                 ).save()
-
         super(Selling, self).save(*args, **kwargs)
 
 class Permanency(models.Model):

@@ -95,7 +95,7 @@
 {% if picture.is_moderated %}
 <div id="pict">
 {% else %}
-<div id="pict" style="border: solid #f00 2px;">
+<div id="pict" style="border: solid #f00 2px; box-shadow: red 0px 0px 5px">
 {% set next = picture.get_next() %}
 {% if not next %}
     {% set next = url('sas:moderation') %}
