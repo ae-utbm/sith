@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-09 15:43+0100\n"
+"POT-Creation-Date: 2016-12-09 18:03+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -312,7 +312,7 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:29
 #: counter/templates/counter/last_ops.jinja:59
 #: launderette/templates/launderette/launderette_admin.jinja:16
-#: launderette/views.py:146 sas/templates/sas/moderation.jinja:35
+#: launderette/views.py:146 sas/templates/sas/moderation.jinja:36
 #: sas/templates/sas/picture.jinja:66
 msgid "Delete"
 msgstr "Supprimer"
@@ -1457,7 +1457,7 @@ msgstr "Propriétés"
 
 #: core/templates/core/file_detail.jinja:13
 #: core/templates/core/file_moderation.jinja:20
-#: sas/templates/sas/moderation.jinja:23
+#: sas/templates/sas/moderation.jinja:24
 msgid "Owner: "
 msgstr "Propriétaire : "
 
@@ -1467,7 +1467,7 @@ msgstr "Nom réel : "
 
 #: core/templates/core/file_detail.jinja:35
 #: core/templates/core/file_moderation.jinja:21
-#: sas/templates/sas/moderation.jinja:24 sas/templates/sas/picture.jinja:79
+#: sas/templates/sas/moderation.jinja:25 sas/templates/sas/picture.jinja:79
 msgid "Date: "
 msgstr "Date : "
 
@@ -1489,7 +1489,7 @@ msgstr "Télécharger"
 
 #: core/templates/core/file_detail.jinja:46
 #: core/templates/core/file_moderation.jinja:23
-#: sas/templates/sas/moderation.jinja:31
+#: sas/templates/sas/moderation.jinja:32
 msgid "Moderate"
 msgstr "Modérer"
 
@@ -1503,7 +1503,7 @@ msgid "File moderation"
 msgstr "Modération des fichiers"
 
 #: core/templates/core/file_moderation.jinja:19
-#: sas/templates/sas/moderation.jinja:22
+#: sas/templates/sas/moderation.jinja:23
 msgid "Full name: "
 msgstr "Nom complet : "
 
@@ -2417,7 +2417,7 @@ msgstr "Pas de date de naissance renseigné"
 #: counter/templates/counter/invoices_call.jinja:16
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
-#: sas/templates/sas/moderation.jinja:43 sas/templates/sas/picture.jinja:74
+#: sas/templates/sas/moderation.jinja:44 sas/templates/sas/picture.jinja:74
 msgid "Go"
 msgstr "Valider"
 
@@ -2917,11 +2917,19 @@ msgstr "Créer"
 msgid "SAS moderation"
 msgstr "Modération du SAS"
 
-#: sas/templates/sas/moderation.jinja:27
+#: sas/templates/sas/moderation.jinja:15
+msgid "Album"
+msgstr "Album"
+
+#: sas/templates/sas/moderation.jinja:17
+msgid "Picture"
+msgstr "Photo"
+
+#: sas/templates/sas/moderation.jinja:28
 msgid "Asked for removal"
 msgstr "Retrait demandé"
 
-#: sas/templates/sas/moderation.jinja:39
+#: sas/templates/sas/moderation.jinja:40
 msgid "Do nothing"
 msgstr "Ne rien faire"
 

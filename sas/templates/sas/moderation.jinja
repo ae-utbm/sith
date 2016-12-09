@@ -6,19 +6,19 @@
 
 {% block content %}
 <h3>{% trans %}SAS moderation{% endtrans %}</h3>
-<div>
+<div id="moderation">
     <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% for p in pictures %}
-    <div style="margin: 2px; padding: 2px; border: solid 1px red; text-align: center">
+    <div style="">
         {% if p.is_folder %}
-        <strong>Album</strong>
+            <strong>{% trans %}Album{% endtrans %}</strong>
         {% else %}
-        <strong>Picture</strong>
+            <strong>{% trans %}Picture{% endtrans %}</strong>
         {% endif %}
         <p>
             <a href="{{ url("sas:picture", picture_id=p.id) }}">
-                <img src="{{ p.get_download_thumb_url() }}" alt="{{ p.name }}" style="width: 100px">
+                <img src="{{ p.get_download_compressed_url() }}" alt="{{ p.name }}">
             </a><br/>
             {% trans %}Full name: {% endtrans %}{{ p.get_parent_path()+'/'+p.name }}<br/>
             {% trans %}Owner: {% endtrans %}{{ p.owner.get_display_name() }}<br/>
