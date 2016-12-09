@@ -7,7 +7,8 @@
 {% block content %}
 <h3>{% trans %}SAS moderation{% endtrans %}</h3>
 <div>
-    <form action="" method="get" enctype="multipart/form-data">
+    <form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
     {% for p in pictures %}
     <div style="margin: 2px; padding: 2px; border: solid 1px red; text-align: center">
         {% if p.is_folder %}
@@ -27,12 +28,16 @@
         <p class="important">{% trans %}Asked for removal{% endtrans %}</p>
         {% endif %}
         <p>
-        <input type="radio" name="action_{{ p.id }}" id="m_{{ p.id }}" value="moderate"/>
+        <input type="radio" name="a_{{ p.id }}" id="m_{{ p.id }}" value="moderate"/>
         <a href="{{ url('core:file_moderate', file_id=p.id) }}?next={{ url('sas:moderation') }}">{% trans %}Moderate{% endtrans %}</a>
         </p>
         <p>
-        <input type="radio" name="action_{{ p.id }}" id="m_{{ p.id }}" value="delete"/>
+        <input type="radio" name="a_{{ p.id }}" id="m_{{ p.id }}" value="delete"/>
         <a href="{{ url('core:file_delete', file_id=p.id) }}?next={{ url('sas:moderation') }}">{% trans %}Delete{% endtrans %}</a>
+        </p>
+        <p>
+        <input type="radio" name="a_{{ p.id }}" id="m_{{ p.id }}" value="nothing" checked/>
+        {% trans %}Do nothing{% endtrans %}
         </p>
     </div>
     {% endfor %}

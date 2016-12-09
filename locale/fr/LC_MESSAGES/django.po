@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-08 19:39+0100\n"
+"POT-Creation-Date: 2016-12-09 15:43+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -304,7 +304,6 @@ msgstr "Compte en banque : "
 #: accounting/templates/accounting/club_account_details.jinja:16
 #: accounting/templates/accounting/label_list.jinja:21
 #: club/templates/club/club_sellings.jinja:49
-#: com/templates/com/moderation.jinja:35 com/templates/com/picture.jinja:66
 #: core/templates/core/file_detail.jinja:43
 #: core/templates/core/file_moderation.jinja:24
 #: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:66
@@ -319,8 +318,7 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: accounting/templates/accounting/bank_account_details.jinja:17
-#: club/views.py:32 com/templates/com/picture.jinja:78 core/views/user.py:130
-#: sas/templates/sas/picture.jinja:78
+#: club/views.py:32 core/views/user.py:130 sas/templates/sas/picture.jinja:78
 msgid "Infos"
 msgstr "Infos"
 
@@ -340,7 +338,6 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_list.jinja:21
 #: accounting/templates/accounting/club_account_details.jinja:55
 #: accounting/templates/accounting/journal_details.jinja:71 club/views.py:54
-#: com/templates/com/album.jinja:18 com/templates/com/picture.jinja:88
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
 #: core/templates/core/user_tools.jinja:36 core/views/user.py:152
 #: counter/templates/counter/cash_summary_list.jinja:53
@@ -682,7 +679,8 @@ msgstr "L'utilisateur est déjà membre de ce club"
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4
+#: club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -744,8 +742,8 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:59 club/views.py:216
-#: counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:59
+#: club/views.py:216 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
@@ -845,8 +843,7 @@ msgstr "Membres"
 msgid "Old members"
 msgstr "Anciens membres"
 
-#: club/views.py:49 com/templates/com/picture.jinja:83
-#: core/templates/core/base.jinja:53 core/views/user.py:146
+#: club/views.py:49 core/templates/core/base.jinja:53 core/views/user.py:146
 #: sas/templates/sas/picture.jinja:83
 msgid "Tools"
 msgstr "Outils"
@@ -877,98 +874,6 @@ msgstr "Date de fin"
 #: counter/views.py:990
 msgid "Product"
 msgstr "Produit"
-
-#: com/templates/com/album.jinja:4 com/templates/com/main.jinja:4
-#: com/templates/com/main.jinja.py:8 com/templates/com/picture.jinja:26
-#: core/templates/core/base.jinja:82 sas/templates/sas/album.jinja:4
-#: sas/templates/sas/main.jinja:4 sas/templates/sas/main.jinja.py:8
-#: sas/templates/sas/picture.jinja:26
-msgid "SAS"
-msgstr "SAS"
-
-#: com/templates/com/album.jinja:26 com/templates/com/album.jinja.py:28
-#: com/templates/com/album.jinja:30 com/templates/com/main.jinja:17
-#: com/templates/com/main.jinja.py:19 com/templates/com/main.jinja:21
-#: sas/templates/sas/album.jinja:26 sas/templates/sas/album.jinja.py:28
-#: sas/templates/sas/album.jinja:30 sas/templates/sas/main.jinja:17
-#: sas/templates/sas/main.jinja.py:19 sas/templates/sas/main.jinja:21
-msgid "preview"
-msgstr "miniature"
-
-#: com/templates/com/album.jinja:52 sas/templates/sas/album.jinja:52
-msgid "Upload"
-msgstr "Envoyer"
-
-#: com/templates/com/main.jinja:41 sas/templates/sas/main.jinja:41
-msgid "Create"
-msgstr "Créer"
-
-#: com/templates/com/moderation.jinja:4 com/templates/com/moderation.jinja:8
-#: sas/templates/sas/moderation.jinja:4 sas/templates/sas/moderation.jinja:8
-#: sith/settings.py:457
-msgid "SAS moderation"
-msgstr "Modération du SAS"
-
-#: com/templates/com/moderation.jinja:22
-#: core/templates/core/file_moderation.jinja:19
-#: sas/templates/sas/moderation.jinja:22
-msgid "Full name: "
-msgstr "Nom complet : "
-
-#: com/templates/com/moderation.jinja:23
-#: core/templates/core/file_detail.jinja:13
-#: core/templates/core/file_moderation.jinja:20
-#: sas/templates/sas/moderation.jinja:23
-msgid "Owner: "
-msgstr "Propriétaire : "
-
-#: com/templates/com/moderation.jinja:24 com/templates/com/picture.jinja:79
-#: core/templates/core/file_detail.jinja:35
-#: core/templates/core/file_moderation.jinja:21
-#: sas/templates/sas/moderation.jinja:24 sas/templates/sas/picture.jinja:79
-msgid "Date: "
-msgstr "Date : "
-
-#: com/templates/com/moderation.jinja:27 sas/templates/sas/moderation.jinja:27
-msgid "Asked for removal"
-msgstr "Retrait demandé"
-
-#: com/templates/com/moderation.jinja:31
-#: core/templates/core/file_detail.jinja:46
-#: core/templates/core/file_moderation.jinja:23
-#: sas/templates/sas/moderation.jinja:31
-msgid "Moderate"
-msgstr "Modérer"
-
-#: com/templates/com/moderation.jinja:39 com/templates/com/picture.jinja:74
-#: counter/templates/counter/counter_click.jinja:55
-#: counter/templates/counter/counter_click.jinja:103
-#: counter/templates/counter/invoices_call.jinja:16
-#: launderette/templates/launderette/launderette_admin.jinja:35
-#: launderette/templates/launderette/launderette_click.jinja:13
-#: sas/templates/sas/moderation.jinja:39 sas/templates/sas/picture.jinja:74
-msgid "Go"
-msgstr "Valider"
-
-#: com/templates/com/picture.jinja:60 sas/templates/sas/picture.jinja:60
-msgid "People"
-msgstr "Personne(s)"
-
-#: com/templates/com/picture.jinja:85 sas/templates/sas/picture.jinja:85
-msgid "HD version"
-msgstr "Version HD"
-
-#: com/templates/com/picture.jinja:89 sas/templates/sas/picture.jinja:89
-msgid "Rotate left"
-msgstr "Tourner vers la gauche"
-
-#: com/templates/com/picture.jinja:90 sas/templates/sas/picture.jinja:90
-msgid "Rotate right"
-msgstr "Tourner vers la droite"
-
-#: com/templates/com/picture.jinja:91 sas/templates/sas/picture.jinja:91
-msgid "Ask for removal"
-msgstr "Demander le retrait"
 
 #: core/models.py:29
 msgid "meta group status"
@@ -1443,6 +1348,12 @@ msgstr "Matmatronch"
 msgid "Wiki"
 msgstr "Wiki"
 
+#: core/templates/core/base.jinja:82 sas/templates/sas/album.jinja:4
+#: sas/templates/sas/main.jinja:4 sas/templates/sas/main.jinja.py:8
+#: sas/templates/sas/picture.jinja:26
+msgid "SAS"
+msgstr "SAS"
+
 #: core/templates/core/base.jinja:83
 msgid "Forum"
 msgstr "Forum"
@@ -1544,9 +1455,21 @@ msgstr "Mes fichiers"
 msgid "Prop"
 msgstr "Propriétés"
 
+#: core/templates/core/file_detail.jinja:13
+#: core/templates/core/file_moderation.jinja:20
+#: sas/templates/sas/moderation.jinja:23
+msgid "Owner: "
+msgstr "Propriétaire : "
+
 #: core/templates/core/file_detail.jinja:34
 msgid "Real name: "
 msgstr "Nom réel : "
+
+#: core/templates/core/file_detail.jinja:35
+#: core/templates/core/file_moderation.jinja:21
+#: sas/templates/sas/moderation.jinja:24 sas/templates/sas/picture.jinja:79
+msgid "Date: "
+msgstr "Date : "
 
 #: core/templates/core/file_detail.jinja:37
 msgid "Type: "
@@ -1564,6 +1487,12 @@ msgstr "octets"
 msgid "Download"
 msgstr "Télécharger"
 
+#: core/templates/core/file_detail.jinja:46
+#: core/templates/core/file_moderation.jinja:23
+#: sas/templates/sas/moderation.jinja:31
+msgid "Moderate"
+msgstr "Modérer"
+
 #: core/templates/core/file_list.jinja:19
 msgid "There is no file in this website."
 msgstr "Il n'y a pas de fichier sur ce site web."
@@ -1572,6 +1501,11 @@ msgstr "Il n'y a pas de fichier sur ce site web."
 #: core/templates/core/file_moderation.jinja:8 sith/settings.py:456
 msgid "File moderation"
 msgstr "Modération des fichiers"
+
+#: core/templates/core/file_moderation.jinja:19
+#: sas/templates/sas/moderation.jinja:22
+msgid "Full name: "
+msgstr "Nom complet : "
 
 #: core/templates/core/group_edit.jinja:4
 msgid "Back to list"
@@ -1627,11 +1561,13 @@ msgstr "login"
 msgid "Lost password?"
 msgstr "Mot de passe perdu ?"
 
-#: core/templates/core/macros.jinja:27 core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:27
+#: core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:31 core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:31
+#: core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -2476,6 +2412,15 @@ msgstr "Non autorisé pour ce produit"
 msgid "No date of birth provided"
 msgstr "Pas de date de naissance renseigné"
 
+#: counter/templates/counter/counter_click.jinja:55
+#: counter/templates/counter/counter_click.jinja:103
+#: counter/templates/counter/invoices_call.jinja:16
+#: launderette/templates/launderette/launderette_admin.jinja:35
+#: launderette/templates/launderette/launderette_click.jinja:13
+#: sas/templates/sas/moderation.jinja:43 sas/templates/sas/picture.jinja:74
+msgid "Go"
+msgstr "Valider"
+
 #: counter/templates/counter/counter_click.jinja:57
 #: eboutic/templates/eboutic/eboutic_main.jinja:27
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:11
@@ -2953,6 +2898,53 @@ msgstr "Utilisateur qui sera supprimé"
 msgid "picture"
 msgstr "photo"
 
+#: sas/templates/sas/album.jinja:26 sas/templates/sas/album.jinja.py:28
+#: sas/templates/sas/album.jinja:30 sas/templates/sas/main.jinja:17
+#: sas/templates/sas/main.jinja.py:19 sas/templates/sas/main.jinja:21
+msgid "preview"
+msgstr "miniature"
+
+#: sas/templates/sas/album.jinja:52
+msgid "Upload"
+msgstr "Envoyer"
+
+#: sas/templates/sas/main.jinja:41
+msgid "Create"
+msgstr "Créer"
+
+#: sas/templates/sas/moderation.jinja:4 sas/templates/sas/moderation.jinja:8
+#: sith/settings.py:457
+msgid "SAS moderation"
+msgstr "Modération du SAS"
+
+#: sas/templates/sas/moderation.jinja:27
+msgid "Asked for removal"
+msgstr "Retrait demandé"
+
+#: sas/templates/sas/moderation.jinja:39
+msgid "Do nothing"
+msgstr "Ne rien faire"
+
+#: sas/templates/sas/picture.jinja:60
+msgid "People"
+msgstr "Personne(s)"
+
+#: sas/templates/sas/picture.jinja:85
+msgid "HD version"
+msgstr "Version HD"
+
+#: sas/templates/sas/picture.jinja:89
+msgid "Rotate left"
+msgstr "Tourner vers la gauche"
+
+#: sas/templates/sas/picture.jinja:90
+msgid "Rotate right"
+msgstr "Tourner vers la droite"
+
+#: sas/templates/sas/picture.jinja:91
+msgid "Ask for removal"
+msgstr "Demander le retrait"
+
 #: sas/views.py:26
 msgid "Add a new album"
 msgstr "Ajouter un nouvel album"
@@ -3134,4 +3126,3 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
-

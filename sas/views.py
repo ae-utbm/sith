@@ -189,9 +189,9 @@ class ModerationView(TemplateView):
     def get(self, request, *args, **kwargs):
         if request.user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID):
             for k,v in request.GET.items():
-                if k[:7] == "action_":
+                if k[:2] == "a_":
                     try:
-                        pict = Picture.objects.filter(id=int(k[7:])).first()
+                        pict = Picture.objects.filter(id=int(k[2:])).first()
                         if v == "delete":
                             pict.delete()
                         elif v == "moderate":
@@ -201,6 +201,9 @@ class ModerationView(TemplateView):
                     except: pass
             return super(ModerationView, self).get(request, *args, **kwargs)
         raise PermissionDenied
+
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(ModerationView, self).get_context_data(**kwargs)
