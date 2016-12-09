@@ -194,7 +194,7 @@ class FileModerationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(FileModerationView, self).get_context_data(**kwargs)
-        kwargs['files'] = SithFile.objects.filter(is_moderated=False).all()
+        kwargs['files'] = SithFile.objects.filter(is_moderated=False)[:100]
         return kwargs
 
 class FileModerateView(CanEditPropMixin, SingleObjectMixin):

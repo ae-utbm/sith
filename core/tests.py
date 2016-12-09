@@ -269,3 +269,30 @@ http://git.an
 #   - renaming a page
 #   - changing a page's parent --> check that page's children's full_name
 #   - changing the different groups of the page
+
+class FileHandlingTest(TestCase):
+    def setUp(self):
+        try:
+            call_command("populate")
+            self.subscriber = User.objects.filter(username="subscriber").first()
+            self.client.login(username='subscriber', password='plop')
+        except Exception as e:
+            print(e)
+
+    def test_create_folder_home(self):
+        response = self.client.post(reverse("core:file_detail", kwargs={"file_id":self.subscriber.home.id}),
+                {"folder_name": "GUY_folder_test"})
+        self.assertTrue(response.status_code == 302)
+        response = self.client.get(reverse("core:file_detail", kwargs={"file_id":self.subscriber.home.id}))
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue("GUY_folder_test</a>" in str(response.content))
+
+    def test_upload_file_home(self):
+        with open("/bin/ls", "rb") as f:
+            response = self.client.post(reverse("core:file_detail", kwargs={"file_id":self.subscriber.home.id}),
+                    {"file_field": f})
+        self.assertTrue(response.status_code == 302)
+        response = self.client.get(reverse("core:file_detail", kwargs={"file_id":self.subscriber.home.id}))
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue("ls</a>" in str(response.content))
+
