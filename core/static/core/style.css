@@ -298,6 +298,12 @@ tbody>tr:hover {
 #moderation img {
     width: 500px;
 }
+#pict {
+    display: inline-block;
+    width: 80%;
+    background: #333;
+    border: solid #333 2px;
+}
 /*---------------------------------PAGE--------------------------------*/
 .page_content {
     display: block;

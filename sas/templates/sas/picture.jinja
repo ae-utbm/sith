@@ -92,7 +92,23 @@
         </p>
     </div>
 </div>
-<div style="display: inline-block; width: 80%; background: #333; border: solid #333 2px;" id="pict">
+{% if picture.is_moderated %}
+<div id="pict">
+{% else %}
+<div id="pict" style="border: solid #f00 2px;">
+{% set next = picture.get_next() %}
+{% if not next %}
+    {% set next = url('sas:moderation') %}
+{% else %}
+    {% set next = next.get_absolute_url() + "#pict" %}
+{% endif %}
+<div style="background: lightgrey; padding: 2px;">
+    <a href="{{ url('core:file_moderate', file_id=picture.id) }}?next={{ next }}">
+        {% trans %}Moderate{% endtrans %}</a> |
+    <a href="{{ url('core:file_delete', file_id=picture.id) }}?next={{ next }}">
+        {% trans %}Delete{% endtrans %}</a>
+</div>
+{% endif %}
     {% if picture.is_vertical %}
     <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}" style="width: 60%; display: block; margin: auto"/>
     {% else %}
