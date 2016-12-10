@@ -8,7 +8,7 @@
     <h4>
     {% trans %}Accounting{% endtrans %}
     </h4>
-    {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) %}
+    {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
     <p><a href="{{ url('accounting:simple_type_list') }}">{% trans %}Manage simplified types{% endtrans %}</a></p>
     <p><a href="{{ url('accounting:type_list') }}">{% trans %}Manage accounting types{% endtrans %}</a></p>
     <p><a href="{{ url('accounting:bank_new') }}">{% trans %}New bank account{% endtrans %}</a></p>

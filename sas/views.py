@@ -49,7 +49,7 @@ class SASForm(forms.Form):
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
         if notif:
-            for u in RealGroup.objects.filter(id=settings.SITH_SAS_ADMIN_GROUP_ID).first().users.all():
+            for u in RealGroup.objects.filter(id=settings.SITH_GROUP_SAS_ADMIN_ID).first().users.all():
                 if not u.notifications.filter(type="SAS_MODERATION").exists():
                     Notification(user=u, url=reverse("sas:moderation"), type="SAS_MODERATION").save()
 
@@ -70,7 +70,7 @@ class SASMainView(FormView):
         parent = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
         files = request.FILES.getlist('images')
         root = User.objects.filter(username="root").first()
-        if request.user.is_authenticated() and request.user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID):
+        if request.user.is_authenticated() and request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
             if self.form.is_valid():
                 self.form.process(parent=parent, owner=root, files=files, automodere=True)
                 if self.form.is_valid():
@@ -103,7 +103,7 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
         if 'remove_user' in request.GET.keys():
             try:
                 user = User.objects.filter(id=int(request.GET['remove_user'])).first()
-                if user.id == request.user.id or request.user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID):
+                if user.id == request.user.id or request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
                     r = PeoplePictureRelation.objects.filter(user=user, picture=self.object).delete()
             except: pass
         if 'ask_removal' in request.GET.keys():
@@ -164,7 +164,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         if request.user.is_authenticated() and request.user.is_in_group('ae-membres'):
             if self.form.is_valid():
                 self.form.process(parent=parent, owner=request.user, files=files,
-                        automodere=request.user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID))
+                        automodere=request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID))
                 if self.form.is_valid():
                     return super(AlbumView, self).form_valid(self.form)
         else:
@@ -185,7 +185,7 @@ class ModerationView(TemplateView):
     template_name = "sas/moderation.jinja"
 
     def get(self, request, *args, **kwargs):
-        if request.user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID):
+        if request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
             for k,v in request.GET.items():
                 if k[:2] == "a_":
                     try:

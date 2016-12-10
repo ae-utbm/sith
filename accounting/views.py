@@ -367,11 +367,11 @@ class OperationPDFView(CanViewMixin, DetailView):
         im = ImageReader("core/static/core/img/logo.jpg")
         iw, ih = im.getSize()
         p.drawImage(im, 40, height - 50, width=iw/2, height=ih/2)
- 
+
         labelStr = [["%s %s - %s %s" % (_("Journal"), ti, _("Operation"), num)]]
 
         label = Table(labelStr, colWidths=[150], rowHeights=[20])
-        
+
         label.setStyle(TableStyle([
                                 ('ALIGN',(0,0),(-1,-1),'CENTER'),
                                 ('BOX', (0,0), (-1,-1), 0.25, colors.black),
@@ -384,11 +384,11 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.drawString(90, height - 160, _("Label: %(op_label)s") % {"op_label": op_label if op_label != None else ""})
 
         data = []
-        
+
         data += [["%s" % (_("Credit").upper() if nature == 'CREDIT' else _("Debit").upper())]]
 
         data += [[_("Amount: %(amount).2f €") % {"amount": amount}]]
-        
+
         payment_mode = ""
         for m in settings.SITH_ACCOUNTING_PAYMENT_METHOD:
             if m[0] == mode:
@@ -398,11 +398,11 @@ class OperationPDFView(CanViewMixin, DetailView):
             payment_mode += " %s\n" %(m[1])
 
         data += [[payment_mode]]
-        
+
         data += [["%s : %s" % (_("Debtor") if nature == 'CREDIT' else _("Creditor"), target), ""]]
 
         data += [["%s \n%s" % (_("Comment:"), remark)]]
-        
+
         t = Table(data, colWidths=[(width-90*2)/2]*2, rowHeights=[20, 20, 70, 20, 80])
         t.setStyle(TableStyle([
                         ('ALIGN',(0,0),(-1,-1),'CENTER'),
@@ -498,7 +498,7 @@ class RefoundAccountView(FormView):
     form_class = CloseCustomerAccountForm
 
     def permission(self, user):
-        if user.is_root or user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+        if user.is_root or user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         else:
             raise PermissionDenied

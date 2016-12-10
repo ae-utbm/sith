@@ -197,13 +197,15 @@ class User(AbstractBaseUser):
 
     def is_in_group(self, group_name):
         """If the user is in the group passed in argument (as string or by id)"""
+        group_id = 0
         if isinstance(group_name, int): # Handle the case where group_name is an ID
             g = Group.objects.filter(id=group_name).first()
             if g:
                 group_name = g.name
+                group_id = g.id
             else:
                 return False
-        if group_name == settings.SITH_GROUPS['public']['name']:
+        if group_id == settings.SITH_GROUP_PUBLIC_ID:
             return True
         if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked
             if 'subscription' in settings.INSTALLED_APPS:
@@ -231,13 +233,13 @@ class User(AbstractBaseUser):
             if mem:
                 return True
             return False
-        if group_name == settings.SITH_GROUPS['root']['name'] and self.is_superuser:
+        if group_id == settings.SITH_GROUP_ROOT_ID and self.is_superuser:
             return True
         return self.groups.filter(name=group_name).exists()
 
     @property
     def is_root(self):
-        return self.is_superuser or self.groups.filter(name=settings.SITH_GROUPS['root']['name']).exists()
+        return self.is_superuser or self.groups.filter(id=settings.SITH_GROUP_ROOT_ID).exists()
 
     @property
     def is_board_member(self):
@@ -251,11 +253,11 @@ class User(AbstractBaseUser):
 
     @property
     def is_banned_alcohol(self):
-        return self.is_in_group(settings.SITH_GROUPS['banned-alcohol']['name'])
+        return self.is_in_group(settings.SITH_GROUP_BANNED_ALCOHOL_ID)
 
     @property
     def is_banned_counter(self):
-        return self.is_in_group(settings.SITH_GROUPS['banned-from-counters']['name'])
+        return self.is_in_group(settings.SITH_GROUP_BANNED_COUNTER_ID)
 
     def save(self, *args, **kwargs):
         create = False
@@ -373,7 +375,7 @@ class User(AbstractBaseUser):
             return True
         if hasattr(obj, "owner_group") and self.is_in_group(obj.owner_group.name):
             return True
-        if self.is_superuser or self.is_in_group(settings.SITH_GROUPS['root']['name']):
+        if self.is_superuser or self.is_in_group(settings.SITH_GROUP_ROOT_ID):
             return True
         return False
 
@@ -463,7 +465,15 @@ class AnonymousUser(AuthAnonymousUser):
         """
         The anonymous user is only the public group
         """
-        if group_name == settings.SITH_GROUPS['public']['name']:
+        group_id = 0
+        if isinstance(group_name, int): # Handle the case where group_name is an ID
+            g = Group.objects.filter(id=group_name).first()
+            if g:
+                group_name = g.name
+                group_id = g.id
+            else:
+                return False
+        if group_id == settings.SITH_GROUP_PUBLIC_ID:
             return True
         return False
 
@@ -474,7 +484,7 @@ class AnonymousUser(AuthAnonymousUser):
         return False
 
     def can_view(self, obj):
-        if hasattr(obj, 'view_groups') and obj.view_groups.filter(pk=settings.SITH_GROUPS['public']['id']).exists():
+        if hasattr(obj, 'view_groups') and obj.view_groups.filter(id=settings.SITH_GROUP_PUBLIC_ID).exists():
             return True
         if hasattr(obj, 'can_be_viewed_by') and obj.can_be_viewed_by(self):
             return True
@@ -523,7 +533,7 @@ class SithFile(models.Model):
     def is_owned_by(self, user):
         if hasattr(self, 'profile_of') and user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
             return True
-        if user.is_in_group(settings.SITH_GROUPS['communication-admin']['id']):
+        if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID):
             return True
         return user.id == self.owner.id
 
@@ -667,7 +677,7 @@ class Page(models.Model):
     # playing with a Page object, use get_full_name() instead!
     _full_name = models.CharField(_('page name'), max_length=255, blank=True)
     owner_group = models.ForeignKey(Group, related_name="owned_page", verbose_name=_("owner group"),
-                                    default=settings.SITH_GROUPS['root']['id'])
+                                    default=settings.SITH_GROUP_ROOT_ID)
     edit_groups = models.ManyToManyField(Group, related_name="editable_page", verbose_name=_("edit group"), blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_page", verbose_name=_("view group"), blank=True)
     lock_user = models.ForeignKey(User, related_name="locked_pages", verbose_name=_("lock user"), blank=True, null=True, default=None)

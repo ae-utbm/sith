@@ -249,41 +249,17 @@ SITH_START_DATE = (8, 15) # 15th August
 SITH_SCHOOL_START_YEAR = 1999
 
 SITH_GROUP_ROOT_ID = 1
+SITH_GROUP_PUBLIC_ID = 2
+SITH_GROUP_ACCOUNTING_ADMIN_ID = 3
+SITH_GROUP_COM_ADMIN_ID = 4
+SITH_GROUP_COUNTER_ADMIN_ID = 5
+SITH_GROUP_BANNED_ALCOHOL_ID = 6
+SITH_GROUP_BANNED_COUNTER_ID = 7
+SITH_GROUP_BANNED_SUBSCRIPTION_ID = 8
+SITH_GROUP_SAS_ADMIN_ID = 9
 
-SITH_GROUPS = {
-    'root': {
-        'id': 1,
-        'name': "Root",
-    },
-    'public': {
-        'id': 2,
-        'name': "Not registered users",
-    },
-    'accounting-admin': {
-        'id': 3,
-        'name': "Accounting admin",
-    },
-    'communication-admin': {
-        'id': 4,
-        'name': "Communication admin",
-    },
-    'counter-admin': {
-        'id': 5,
-        'name': "Counter admin",
-    },
-    'banned-alcohol': {
-        'id': 6,
-        'name': "Banned from buying alcohol",
-    },
-    'banned-from-counters': {
-        'id': 7,
-        'name': "Banned from counters",
-    },
-    'banned-to-subscribe': {
-        'id': 8,
-        'name': "Banned to subscribe",
-    }
-}
+# SAS variables
+SITH_SAS_ROOT_DIR_ID = 4
 
 SITH_BOARD_SUFFIX="-bureau"
 SITH_MEMBER_SUFFIX="-membres"
@@ -447,10 +423,6 @@ SITH_LAUNDERETTE_PRICES = {
         'WASHING': 1.0,
         'DRYING': 0.75,
         }
-
-# SAS variables
-SITH_SAS_ROOT_DIR_ID = 4
-SITH_SAS_ADMIN_GROUP_ID = 9
 
 SITH_NOTIFICATIONS = [
         ('FILE_MODERATION', _("New files to be moderated")),

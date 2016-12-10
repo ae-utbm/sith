@@ -23,7 +23,7 @@
 <hr>
 <h4>{% trans %}Counters{% endtrans %}</h4>
 <ul>
-    {% if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']) or user.is_root %}
+    {% if user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID) or user.is_root %}
     <h5>{% trans %}General management{% endtrans %}</h5>
     <li><a href="{{ url('counter:admin_list') }}">{% trans %}General counters management{% endtrans %}</a></li>
     <li><a href="{{ url('counter:product_list') }}">{% trans %}Products management{% endtrans %}</a></li>
@@ -42,7 +42,7 @@
 <hr>
 <h4>{% trans %}Accounting{% endtrans %}</h4>
 <ul>
-    {% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) or user.is_root %}
+    {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) or user.is_root %}
     <li><a href="{{ url('accounting:refound_account') }}">{% trans %}Refound Account{% endtrans %}</a></li>
     <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
     {% endif %}
@@ -62,10 +62,10 @@
 <hr>
 <h4>{% trans %}Communication{% endtrans %}</h4>
 <ul>
-    {% if user.is_in_group(settings.SITH_GROUPS['communication-admin']['id']) %}
+    {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
     <li><a href="{{ url('core:file_moderation') }}">{% trans %}Moderate files{% endtrans %}</a></li>
     {% endif %}
-    {% if user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
+    {% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
     <li><a href="{{ url('sas:moderation') }}">{% trans %}Moderate pictures{% endtrans %}</a></li>
     {% endif %}
 </ul>

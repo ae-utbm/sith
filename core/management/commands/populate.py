@@ -31,8 +31,15 @@ class Command(BaseCommand):
         os.environ['DJANGO_COLORS'] = 'nocolor'
         Site(id=4000, domain=settings.SITH_URL, name=settings.SITH_NAME).save()
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        for g in settings.SITH_GROUPS.values():
-            Group(id=g['id'], name=g['name']).save()
+        Group(name="Root").save()
+        Group(name="Not registered users").save()
+        Group(name="Accounting admin").save()
+        Group(name="Communication admin").save()
+        Group(name="Counter admin").save()
+        Group(name="Banned from buying alcohol").save()
+        Group(name="Banned from counters").save()
+        Group(name="Banned to subscribe").save()
+        Group(name="SAS admin").save()
         self.reset_index("core", "auth")
         root = User(id=0, username='root', last_name="", first_name="Bibou",
                  email="ae.info@utbm.fr",
@@ -46,7 +53,6 @@ class Command(BaseCommand):
         club_root = SithFile(parent=None, name="clubs", is_folder=True, owner=root)
         club_root.save()
         SithFile(parent=None, name="SAS", is_folder=True, owner=root).save()
-        Group(name="SAS admin").save()
         main_club = Club(id=1, name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
                 address=settings.SITH_MAIN_CLUB['address'])
         main_club.save()
@@ -77,7 +83,7 @@ class Command(BaseCommand):
         p = Page(name='Index')
         p.set_lock(root)
         p.save()
-        p.view_groups=[settings.SITH_GROUPS['public']['id']]
+        p.view_groups=[settings.SITH_GROUP_PUBLIC_ID]
         p.set_lock(root)
         p.save()
         PageRev(page=p, title="Wiki index", author=root, content="""
@@ -87,7 +93,7 @@ Welcome to the wiki page!
         p = Page(name="services")
         p.set_lock(root)
         p.save()
-        p.view_groups=[settings.SITH_GROUPS['public']['id']]
+        p.view_groups=[settings.SITH_GROUP_PUBLIC_ID]
         p.set_lock(root)
         PageRev(page=p, title="Services", author=root, content="""
 |   |   |   |
@@ -139,7 +145,7 @@ Welcome to the wiki page!
             counter.set_password("plop")
             counter.save()
             counter.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
-            counter.groups=[Group.objects.filter(name=settings.SITH_GROUPS['counter-admin']['name']).first().id]
+            counter.groups=[Group.objects.filter(id=settings.SITH_GROUP_COUNTER_ADMIN_ID).first().id]
             counter.save()
             # Adding user Comptable
             comptable = User(username='comptable', last_name="Able", first_name="Compte",
@@ -149,7 +155,7 @@ Welcome to the wiki page!
             comptable.set_password("plop")
             comptable.save()
             comptable.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
-            comptable.groups=[Group.objects.filter(name=settings.SITH_GROUPS['accounting-admin']['name']).first().id]
+            comptable.groups=[Group.objects.filter(id=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID).first().id]
             comptable.save()
             # Adding user Guy
             u = User(username='guy', last_name="Carlier", first_name="Guy",
@@ -176,7 +182,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 """).save()
             p = Page(name='Services')
             p.save(force_lock=True)
-            p.view_groups=[settings.SITH_GROUPS['public']['id']]
+            p.view_groups=[settings.SITH_GROUP_PUBLIC_ID]
             p.save(force_lock=True)
             PageRev(page=p, title="Services", author=skia, content="""
 |   |   |   |
@@ -188,7 +194,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             # Adding README
             p = Page(name='README')
             p.save(force_lock=True)
-            p.view_groups=[settings.SITH_GROUPS['public']['id']]
+            p.view_groups=[settings.SITH_GROUP_PUBLIC_ID]
             p.save(force_lock=True)
             with open(os.path.join(root_path)+'/README.md', 'r') as rm:
                 PageRev(page=p, title="README", author=skia, content=rm.read()).save()

@@ -165,7 +165,7 @@ class UserTabsMixin(TabedViewMixin):
                         })
         try:
             if (self.object.customer and (self.object == self.request.user
-                or self.request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
+                or self.request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
                 or self.request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
                 or self.request.user.is_root)):
                 tab_list.append({
@@ -417,7 +417,7 @@ class UserAccountBase(UserTabsMixin, DetailView):
     def dispatch(self, request, *arg, **kwargs): # Manually validates the rights
         res = super(UserAccountBase, self).dispatch(request, *arg, **kwargs)
         if (self.object == request.user
-                or request.user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name'])
+                or request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
                 or request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
                 or request.user.is_root):
             return res

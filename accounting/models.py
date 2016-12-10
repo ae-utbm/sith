@@ -68,7 +68,7 @@ class BankAccount(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         m = self.club.get_membership_for(user)
         if m is not None and m.role >= 7:
@@ -94,7 +94,7 @@ class ClubAccount(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
 
@@ -155,7 +155,7 @@ class GeneralJournal(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         if self.club_account.can_be_edited_by(user):
             return True
@@ -260,7 +260,7 @@ class Operation(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         if self.journal.closed:
             return False
@@ -308,7 +308,7 @@ class AccountingType(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
 

@@ -62,7 +62,7 @@
             {% for r in picture.people.all() %}
             <li>
                 <a href="{{ r.user.get_absolute_url() }}">{{ r.user.get_short_name() }}</a>
-                {% if user == r.user or user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
+                {% if user == r.user or user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
                 <a href="?remove_user={{ r.user.id }}">{% trans %}Delete{% endtrans %}</a>
                 {% endif %}
             </li>

@@ -24,7 +24,7 @@
         {{ a.name }}
     </div>
     </a>
-    {% elif user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
+    {% elif user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
     <div style="display: inline-block; border: solid 1px red; text-align: center">
         <p><a href="{{ url('core:file_moderate', file_id=a.id) }}?next={{ url('sas:moderation') }}">Moderate</a> or <a href="">Delete</a></p>
         <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
@@ -32,7 +32,7 @@
     {% endif %}
     {% endfor %}
 </div>
-{% if user.is_in_group(settings.SITH_SAS_ADMIN_GROUP_ID) %}
+{% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.non_field_errors() }}

@@ -79,7 +79,7 @@ class ProductType(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']):
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
 
@@ -117,7 +117,7 @@ class Product(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) or user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']):
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID):
             return True
         return False
 
@@ -159,7 +159,7 @@ class Counter(models.Model):
         mem = self.club.get_membership_for(user)
         if mem and mem.role >= 7:
             return True
-        return user.is_in_group(settings.SITH_GROUPS['counter-admin']['name'])
+        return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
         if self.type == "BAR" or self.type == "EBOUTIC":
@@ -464,7 +464,7 @@ class CashRegisterSummary(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUPS['counter-admin']['name']):
+        if user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID):
             return True
         return False
 
@@ -516,7 +516,7 @@ class Eticket(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        return user.is_in_group(settings.SITH_GROUPS['counter-admin']['name'])
+        return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def get_hash(self, string):
         import hashlib, hmac
