@@ -195,6 +195,10 @@ class User(AbstractBaseUser):
     def to_dict(self):
         return self.__dict__
 
+    def is_subscribed(self):
+        s = self.subscriptions.last()
+        return s.is_valid_now() if s is not None else False
+
     def is_in_group(self, group_name):
         """If the user is in the group passed in argument (as string or by id)"""
         group_id = 0
@@ -208,15 +212,7 @@ class User(AbstractBaseUser):
         if group_id == settings.SITH_GROUP_PUBLIC_ID:
             return True
         if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked
-            if 'subscription' in settings.INSTALLED_APPS:
-                from subscription.models import Subscriber
-                s = Subscriber.objects.filter(pk=self.pk).first()
-                if s is not None and s.is_subscribed():
-                    return True
-                else:
-                    return False
-            else:
-                return False
+            return self.is_subscribed()
         if group_name[-len(settings.SITH_BOARD_SUFFIX):] == settings.SITH_BOARD_SUFFIX:
             from club.models import Club
             name = group_name[:-len(settings.SITH_BOARD_SUFFIX)]

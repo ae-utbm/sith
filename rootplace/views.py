@@ -8,7 +8,6 @@ from django.core.exceptions import PermissionDenied
 from ajax_select.fields import AutoCompleteSelectField
 
 from core.models import User
-from subscription.models import Subscriber
 from counter.models import Customer
 
 def merge_users(u1, u2):
@@ -40,8 +39,8 @@ def merge_users(u1, u2):
                 f.auto_now = False
         u1.invoices.add(i)
     u1.save()
-    s1 = Subscriber.objects.filter(id=u1.id).first()
-    s2 = Subscriber.objects.filter(id=u2.id).first()
+    s1 = User.objects.filter(id=u1.id).first()
+    s2 = User.objects.filter(id=u2.id).first()
     for s in s2.subscriptions.all():
         s1.subscriptions.add(s)
     s1.save()

@@ -5,8 +5,6 @@ from django.core.urlresolvers import reverse
 
 from counter.models import Counter, Product
 from core.models import User
-from subscription.models import Subscriber
-from subscription.views import get_subscriber
 from club.models import Club
 
 # Create your models here.
@@ -86,7 +84,7 @@ class Token(models.Model):
     launderette = models.ForeignKey(Launderette, related_name='tokens', verbose_name=_('launderette'))
     type = models.CharField(_('type'), max_length=10, choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES)
     borrow_date = models.DateTimeField(_('borrow date'), null=True, blank=True)
-    user = models.ForeignKey(Subscriber, related_name='tokens', verbose_name=_('user'), null=True, blank=True)
+    user = models.ForeignKey(User, related_name='tokens', verbose_name=_('user'), null=True, blank=True)
 
     class Meta:
         verbose_name = _('Token')
@@ -123,7 +121,7 @@ class Slot(models.Model):
     type = models.CharField(_('type'), max_length=10, choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES)
     machine = models.ForeignKey(Machine, related_name='slots', verbose_name=_('machine'))
     token = models.ForeignKey(Token, related_name='slots', verbose_name=_('token'), blank=True, null=True)
-    user = models.ForeignKey(Subscriber, related_name='slots', verbose_name=_('user'))
+    user = models.ForeignKey(User, related_name='slots', verbose_name=_('user'))
 
     class Meta:
         verbose_name = _('Slot')

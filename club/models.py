@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 
 from core.models import User, MetaGroup, Group, SithFile
-from subscription.models import Subscriber
 
 # Create your models here.
 
@@ -120,7 +119,7 @@ class Club(models.Model):
         """
         Method to see if that object can be seen by the given user
         """
-        sub = Subscriber.objects.filter(pk=user.pk).first()
+        sub = User.objects.filter(pk=user.pk).first()
         if sub is None:
             return False
         return sub.is_subscribed()
@@ -151,7 +150,7 @@ class Membership(models.Model):
     description = models.CharField(_('description'), max_length=128, null=False, blank=True)
 
     def clean(self):
-        sub = Subscriber.objects.filter(pk=self.user.pk).first()
+        sub = User.objects.filter(pk=self.user.pk).first()
         if sub is None or not sub.is_subscribed():
             raise ValidationError(_('User must be subscriber to take part to a club'))
         if Membership.objects.filter(user=self.user).filter(club=self.club).filter(end_date=None).exists():

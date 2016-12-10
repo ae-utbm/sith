@@ -16,8 +16,7 @@ import datetime
 from club.models import Club
 from accounting.models import CurrencyField
 from core.models import Group, User, Notification
-from subscription.models import Subscriber, Subscription
-from subscription.views import get_subscriber
+from subscription.models import Subscription
 
 class Customer(models.Model):
     """
@@ -134,7 +133,7 @@ class Counter(models.Model):
     type = models.CharField(_('counter type'),
             max_length=255,
             choices=[('BAR',_('Bar')), ('OFFICE',_('Office')), ('EBOUTIC',_('Eboutic'))])
-    sellers = models.ManyToManyField(Subscriber, verbose_name=_('sellers'), related_name='counters', blank=True)
+    sellers = models.ManyToManyField(User, verbose_name=_('sellers'), related_name='counters', blank=True)
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
     token = models.CharField(_('token'), max_length=30, null=True, blank=True)
@@ -164,7 +163,7 @@ class Counter(models.Model):
     def can_be_viewed_by(self, user):
         if self.type == "BAR" or self.type == "EBOUTIC":
             return True
-        sub = get_subscriber(request.user)
+        sub = request.user
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or sub in self.sellers
 
     def gen_token(self):
@@ -349,7 +348,7 @@ class Selling(models.Model):
             self.customer.save()
             self.is_validated = True
         if self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
-            s = Subscriber.objects.filter(id=self.customer.user.id).first()
+            s = User.objects.filter(id=self.customer.user.id).first()
             sub = Subscription(
                     member=s,
                     subscription_type='un-semestre',
@@ -364,7 +363,7 @@ class Selling(models.Model):
                     start=sub.subscription_start)
             sub.save()
         elif self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS:
-            s = Subscriber.objects.filter(id=self.customer.user.id).first()
+            s = User.objects.filter(id=self.customer.user.id).first()
             sub = Subscription(
                     member=s,
                     subscription_type='deux-semestres',

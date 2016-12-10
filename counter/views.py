@@ -22,8 +22,7 @@ from ajax_select import make_ajax_form, make_ajax_field
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectUser, LoginForm, SelectDate, SelectDateTime
 from core.models import User
-from subscription.models import Subscriber, Subscription
-from subscription.views import get_subscriber
+from subscription.models import Subscription
 from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType, CashRegisterSummary, CashRegisterSummaryItem, Eticket
 from accounting.models import CurrencyField
 
@@ -49,7 +48,7 @@ class GetUserForm(forms.Form):
             cus = Customer.objects.filter(account_id__iexact=cleaned_data['code']).first()
         elif cleaned_data['id'] is not None:
             cus = Customer.objects.filter(user=cleaned_data['id']).first()
-        sub = get_subscriber(cus.user) if cus is not None else None
+        sub = cus.user if cus is not None else None
         if (cus is None or sub is None or not sub.subscriptions.last() or
             (date.today() - sub.subscriptions.last().subscription_end) > timedelta(days=90)):
             raise forms.ValidationError(_("User not found"))

@@ -139,7 +139,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='counter',
             name='sellers',
-            field=models.ManyToManyField(related_name='counters', to='subscription.Subscriber', blank=True, verbose_name='sellers'),
+            field=models.ManyToManyField(related_name='counters', to='core.User', blank=True, verbose_name='sellers'),
         ),
         migrations.AddField(
             model_name='counter',

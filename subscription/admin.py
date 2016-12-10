@@ -1,8 +1,7 @@
 from django.contrib import admin
 
-from subscription.models import Subscriber, Subscription
+from subscription.models import Subscription
 
 
 
-admin.site.register(Subscriber)
 admin.site.register(Subscription)

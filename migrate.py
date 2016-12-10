@@ -22,7 +22,7 @@ from django.core.files import File
 from core.models import User, SithFile
 from club.models import Club, Membership
 from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType, Permanency, Eticket
-from subscription.models import Subscription, Subscriber
+from subscription.models import Subscription
 from eboutic.models import Invoice, InvoiceItem
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
 from sas.models import Album, Picture, PeoplePictureRelation
@@ -298,7 +298,7 @@ def migrate_subscriptions():
     print("Customers deleted")
     for r in cur:
         try:
-            user = Subscriber.objects.filter(id=r['id_utilisateur']).first()
+            user = User.objects.filter(id=r['id_utilisateur']).first()
             if user:
                 new = Subscription(
                         id=r['id_cotisation'],

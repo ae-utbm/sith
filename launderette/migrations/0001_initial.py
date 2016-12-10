@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(choices=[('WASHING', 'Washing'), ('DRYING', 'Drying')], max_length=10, verbose_name='type')),
                 ('borrow_date', models.DateTimeField(null=True, verbose_name='borrow date', blank=True)),
                 ('launderette', models.ForeignKey(verbose_name='launderette', to='launderette.Launderette', related_name='tokens')),
-                ('user', models.ForeignKey(null=True, related_name='tokens', verbose_name='user', to='subscription.Subscriber', blank=True)),
+                ('user', models.ForeignKey(null=True, related_name='tokens', verbose_name='user', to='core.User', blank=True)),
             ],
             options={
                 'verbose_name': 'Token',
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='slot',
             name='user',
-            field=models.ForeignKey(verbose_name='user', to='subscription.Subscriber', related_name='slots'),
+            field=models.ForeignKey(verbose_name='user', to='core.User', related_name='slots'),
         ),
         migrations.AlterUniqueTogether(
             name='token',

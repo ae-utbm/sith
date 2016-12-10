@@ -12,7 +12,7 @@ from django.contrib.sites.models import Site
 from core.models import Group, User, Page, PageRev, SithFile
 from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operation, AccountingType, Company
 from club.models import Club, Membership
-from subscription.models import Subscription, Subscriber
+from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
 
 class Command(BaseCommand):
@@ -201,7 +201,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
 
             # Subscription
             ## Root
-            s = Subscription(member=Subscriber.objects.filter(pk=root.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+            s = Subscription(member=User.objects.filter(pk=root.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -209,7 +209,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     start=s.subscription_start)
             s.save()
             ## Skia
-            s = Subscription(member=Subscriber.objects.filter(pk=skia.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+            s = Subscription(member=User.objects.filter(pk=skia.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -217,7 +217,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     start=s.subscription_start)
             s.save()
             ## Comptable
-            s = Subscription(member=Subscriber.objects.filter(pk=comptable.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+            s = Subscription(member=User.objects.filter(pk=comptable.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -225,15 +225,15 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     start=s.subscription_start)
             s.save()
             ## Richard
-            s = Subscription(member=Subscriber.objects.filter(pk=r.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+            s = Subscription(member=User.objects.filter(pk=r.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
                     duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
                     start=s.subscription_start)
             s.save()
-            ## Subscriber
-            s = Subscription(member=Subscriber.objects.filter(pk=subscriber.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+            ## User
+            s = Subscription(member=User.objects.filter(pk=subscriber.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(

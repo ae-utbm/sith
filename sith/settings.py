@@ -111,7 +111,6 @@ TEMPLATES = [
                 "can_edit_prop": "core.views.can_edit_prop",
                 "can_edit": "core.views.can_edit",
                 "can_view": "core.views.can_view",
-                "get_subscriber": "subscription.views.get_subscriber",
                 "settings": "sith.settings",
                 "Launderette": "launderette.models.Launderette",
                 "Counter": "counter.models.Counter",

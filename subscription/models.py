@@ -19,36 +19,8 @@ def validate_payment(value):
     if value not in settings.SITH_SUBSCRIPTION_PAYMENT_METHOD:
         raise ValidationError(_('Bad payment method'))
 
-class Subscriber(User):
-    class Meta:
-        proxy = True
-
-    def is_subscribed(self):
-        s = self.subscriptions.last()
-        return s.is_valid_now() if s is not None else False
-
-    def save(self):
-        create = False
-        if not self.id:
-            create = True
-        super(Subscriber, self).save()
-        if create and settings.IS_OLD_MYSQL_PRESENT:
-            try: # Create user on the old site: TODO remove me!
-                import MySQLdb
-                db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
-                c = db.cursor()
-                c.execute("""INSERT INTO utilisateurs (id_utilisateur, nom_utl, prenom_utl, email_utl, hash_utl, ae_utl) VALUES
-                (%s, %s, %s, %s, %s, %s)""", (self.id, self.last_name, self.first_name, self.email, "valid", "1"))
-                db.commit()
-            except Exception as e:
-                with open(settings.BASE_DIR+"/user_fail.log", "a") as f:
-                    print("FAIL to add user %s (%s %s - %s) to old site" % (self.id, self.first_name.encode('utf-8'),
-                        self.last_name.encode('utf-8'), self.email), file=f)
-                    print("Reason: %s" % (repr(e)), file=f)
-                db.rollback()
-
 class Subscription(models.Model):
-    member = models.ForeignKey(Subscriber, related_name='subscriptions')
+    member = models.ForeignKey(User, related_name='subscriptions')
     subscription_type = models.CharField(_('subscription type'),
                                          max_length=255,
                                          choices=((k, v['name']) for k,v in sorted(settings.SITH_SUBSCRIPTIONS.items())))

@@ -5,7 +5,7 @@ from django.conf import settings
 from accounting.models import CurrencyField
 from counter.models import Counter, Product, Customer, Selling, Refilling
 from core.models import User
-from subscription.models import Subscription, Subscriber
+from subscription.models import Subscription
 
 class Basket(models.Model):
     """

@@ -11,13 +11,9 @@ from django.conf import settings
 from ajax_select.fields import AutoCompleteSelectField
 import random
 
-from subscription.models import Subscriber, Subscription
+from subscription.models import Subscription
 from core.views import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.models import User
-
-def get_subscriber(user):
-    s = Subscriber.objects.filter(pk=user.pk).first()
-    return s
 
 class SubscriptionForm(forms.ModelForm):
     class Meta:
@@ -38,7 +34,7 @@ class SubscriptionForm(forms.ModelForm):
     def clean_member(self):
         subscriber = self.cleaned_data.get("member")
         if subscriber:
-            subscriber = Subscriber.objects.filter(id=subscriber.id).first()
+            subscriber = User.objects.filter(id=subscriber.id).first()
         return subscriber
 
     def clean(self):
@@ -50,10 +46,10 @@ class SubscriptionForm(forms.ModelForm):
             self.errors.pop("member", None)
             if self.errors:
                 return cleaned_data
-            if Subscriber.objects.filter(email=cleaned_data.get("email")).first() is not None:
+            if User.objects.filter(email=cleaned_data.get("email")).first() is not None:
                 self.add_error("email", ValidationError(_("A user with that email address already exists")))
             else:
-                u = Subscriber(last_name = self.cleaned_data.get("last_name"),
+                u = User(last_name = self.cleaned_data.get("last_name"),
                         first_name = self.cleaned_data.get("first_name"),
                         email = self.cleaned_data.get("email"))
                 u.generate_username()

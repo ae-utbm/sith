@@ -26,21 +26,9 @@ class Migration(migrations.Migration):
                 'ordering': ['subscription_start'],
             },
         ),
-        migrations.CreateModel(
-            name='Subscriber',
-            fields=[
-            ],
-            options={
-                'proxy': True,
-            },
-            bases=('core.user',),
-            managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
-            ],
-        ),
         migrations.AddField(
             model_name='subscription',
             name='member',
-            field=models.ForeignKey(to='subscription.Subscriber', related_name='subscriptions'),
+            field=models.ForeignKey(to='core.User', related_name='subscriptions'),
         ),
     ]

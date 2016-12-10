@@ -54,7 +54,7 @@
 {% if user.memberships.filter(end_date=None).exists() or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user == profile %}
 {# if the user is member of a club, he can view the subscription state #}
 <p>
-{% if get_subscriber(profile).is_subscribed() %}
+{% if profile.is_subscribed() %}
     {% if user == profile or user.is_root or user.is_board_member %}
         {{ user_subscription(profile) }}
     {% endif %}

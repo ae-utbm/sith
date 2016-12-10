@@ -20,8 +20,6 @@ from core.models import Page
 from club.models import Club
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from launderette.models import Launderette, Token, Machine, Slot
-from subscription.views import get_subscriber
-from subscription.models import Subscriber
 from counter.models import Counter, Customer, Selling
 from counter.views import GetUserForm
 
@@ -61,7 +59,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
             if 'slot_type' in request.POST.keys():
                 self.slot_type = request.POST['slot_type']
             if 'slot' in request.POST.keys() and request.user.is_authenticated():
-                self.subscriber = get_subscriber(request.user)
+                self.subscriber = request.user
                 if self.subscriber.is_subscribed():
                     self.date = dateparse.parse_datetime(request.POST['slot']).replace(tzinfo=pytz.UTC)
                     if self.slot_type == "WASHING":
@@ -224,7 +222,7 @@ class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
 class GetLaunderetteUserForm(GetUserForm):
     def clean(self):
         cleaned_data = super(GetLaunderetteUserForm, self).clean()
-        sub = get_subscriber(cleaned_data['user'])
+        sub = cleaned_data['user']
         if sub.slots.all().count() <= 0:
             raise forms.ValidationError(_("User has booked no slot"))
         return cleaned_data
@@ -272,10 +270,10 @@ class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
 class ClickTokenForm(forms.BaseForm):
     def clean(self):
         with transaction.atomic():
-            operator = Subscriber.objects.filter(id=self.operator_id).first()
+            operator = User.objects.filter(id=self.operator_id).first()
             customer = Customer.objects.filter(user__id=self.subscriber_id).first()
             counter = Counter.objects.filter(id=self.counter_id).first()
-            subscriber = get_subscriber(customer.user)
+            subscriber = customer.user
             self.last_basket = {
                     'last_basket': [],
                     'last_customer': customer.user.get_display_name(),
@@ -334,7 +332,7 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
     def get(self, request, *args, **kwargs):
         """Simple get view"""
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
-        self.subscriber = get_subscriber(self.customer.user)
+        self.subscriber = self.customer.user
         self.operator = request.user
         return super(LaunderetteClickView, self).get(request, *args, **kwargs)
 
@@ -342,7 +340,7 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
         """ Handle the many possibilities of the post request """
         self.object = self.get_object()
         self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
-        self.subscriber = get_subscriber(self.customer.user)
+        self.subscriber = self.customer.user
         self.operator = request.user
         return super(LaunderetteClickView, self).post(request, *args, **kwargs)
 

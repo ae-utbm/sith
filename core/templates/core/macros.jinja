@@ -35,15 +35,15 @@
 {%- endmacro %}
 
 {% macro user_subscription(user) %}
-        {% trans subscription_end=get_subscriber(user).subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
+        {% trans subscription_end=user.subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
         {% trans %}Account number: {% endtrans %}{{ user.customer.account_id }}<br/>
 {%- endmacro %}
 
 {% macro show_slots(user) %}
-    {% if get_subscriber(user).slots.filter(start_date__gte=timezone.now()).exists() %}
+    {% if user.slots.filter(start_date__gte=timezone.now()).exists() %}
         <h5>{% trans %}Slot{% endtrans %}</h5>
         <ul>
-        {% for i in get_subscriber(user).slots.filter(start_date__gte=timezone.now().replace(tzinfo=None)).all() %}
+        {% for i in user.slots.filter(start_date__gte=timezone.now().replace(tzinfo=None)).all() %}
             <li>{{ i.get_type_display() }} - {{i.machine.launderette }}, {{ i.start_date|date("l j") }} : {{ i.start_date|time(DATETIME_FORMAT) }}</li>
         {% endfor %}
         </ul>
@@ -51,10 +51,10 @@
 {% endmacro %}
 
 {% macro show_tokens(user) %}
-    {% if get_subscriber(user).tokens.exists() %}
+    {% if user.tokens.exists() %}
         <h5>{% trans %}Tokens{% endtrans %}</h5>
         <ul>
-        {% for i in get_subscriber(user).tokens.all() %}
+        {% for i in user.tokens.all() %}
             <li>{{ i }}</li>
         {% endfor %}
         </ul>
