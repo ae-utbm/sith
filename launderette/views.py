@@ -16,7 +16,7 @@ from django import forms
 from django.template import defaultfilters
 from django.utils import formats
 
-from core.models import Page
+from core.models import Page, User
 from club.models import Club
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from launderette.models import Launderette, Token, Machine, Slot
