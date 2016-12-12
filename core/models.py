@@ -195,6 +195,9 @@ class User(AbstractBaseUser):
     def to_dict(self):
         return self.__dict__
 
+    def was_subscribed(self):
+        return self.subscriptions.exists()
+
     def is_subscribed(self):
         s = self.subscriptions.last()
         return s.is_valid_now() if s is not None else False
