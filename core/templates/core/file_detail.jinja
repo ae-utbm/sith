@@ -19,17 +19,27 @@
     <p><input type="submit" value="{% trans %}Add{% endtrans %}"></p>
 </form>
 {% endif %}
-<ul>
-    {% for f in file.children.order_by('-is_folder', 'name').all() %}
-    <li>
-        {% if f.is_folder %}
-        &#x1f4c1;
-        {% else %}
-        &#128462;
-        {% endif %}
-        <a href="{{ url('core:file_detail', file_id=f.id, popup=popup) }}">{{ f.get_display_name() }}</a></li>
-    {% endfor %}
-</ul>
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p>
+        <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}"> |
+        <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}"> |
+        <input name="cut" type="submit" value="{% trans %}Cut{% endtrans %}"> |
+        <input name="paste" type="submit" value="{% trans %}Paste{% endtrans %}">
+    </p>
+    <ul>
+        {% for f in file.children.order_by('-is_folder', 'name').all() %}
+        <li>
+            <input type="checkbox" name="file_list" value="{{ f.id }}">
+            {% if f.is_folder %}
+            &#x1f4c1;
+            {% else %}
+            &#128462;
+            {% endif %}
+            <a href="{{ url('core:file_detail', file_id=f.id, popup=popup) }}">{{ f.get_display_name() }}</a></li>
+        {% endfor %}
+    </ul>
+</form>
 {% else %}
 <p>{% trans %}Real name: {% endtrans %}{{ file.file.name.split('/')[-1] }}</p>
 <p>{% trans %}Date: {% endtrans %}{{ file.date|localtime|date(DATETIME_FORMAT) }} -

@@ -529,7 +529,7 @@ class SithFile(models.Model):
     size = models.IntegerField(_("size"), default=0)
     date = models.DateTimeField(_('date'), default=timezone.now)
     is_moderated = models.BooleanField(_("is moderated"), default=False)
-    moderator = models.ForeignKey(User, related_name="moderated_files", verbose_name=_("owner"))
+    moderator = models.ForeignKey(User, related_name="moderated_files", verbose_name=_("owner"), null=True, blank=True)
     asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
     is_in_sas = models.BooleanField(_("is in the SAS"), default=False) # Allows to query this flag, updated at each call to save()
 
@@ -617,6 +617,27 @@ class SithFile(models.Model):
             self.view_groups = self.parent.view_groups.all()
             self.save()
 
+    def move_to(self, parent):
+        """Move a file to somewhere else"""
+        if not parent.is_folder:
+            return
+        import shutil
+        import os
+        with transaction.atomic():
+            if self.is_folder:
+                old_file_name = self.get_full_path()
+            else:
+                old_file_name = self.file.name
+            self.parent = parent
+            self.save()
+            if self.is_folder:
+                for c in self.children.all():
+                    c.move_to(self)
+                shutil.rmtree(settings.MEDIA_ROOT + old_file_name)
+            else:
+                self.file.save(name=self.name, content=self.file)
+                os.remove(settings.MEDIA_ROOT + old_file_name)
+
     def __getattribute__(self, attr):
         if attr == "is_file":
             return not self.is_folder
@@ -644,6 +665,9 @@ class SithFile(models.Model):
 
     def get_parent_path(self):
         return '/' + '/'.join([p.name for p in self.get_parent_list()[::-1]])
+
+    def get_full_path(self):
+        return self.get_parent_path() + '/' + self.name
 
     def get_display_name(self):
         return self.name

@@ -58,7 +58,7 @@ class AddFilesForm(forms.Form):
                 notif = True
         except Exception as e:
             self.add_error(None, _("Error creating folder %(folder_name)s: %(msg)s") %
-                    {'folder_name': self.cleaned_data['folder_name'], 'msg': str(e.message)})
+                    {'folder_name': self.cleaned_data['folder_name'], 'msg': repr(e)})
         for f in files:
             new_file = SithFile(parent=parent, name=f.name, file=f, owner=owner, is_folder=False,
                     mime_type=f.content_type, size=f._size)
@@ -69,10 +69,9 @@ class AddFilesForm(forms.Form):
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
         if notif:
-            for u in RealGroup.objects.filter(id=settings.SITH_GROUP_SAS_ADMIN_ID).first().users.all():
+            for u in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
                 if not u.notifications.filter(type="FILE_MODERATION").exists():
                     Notification(user=u, url=reverse("core:file_moderation"), type="FILE_MODERATION").save()
-
 
 class FileListView(ListView):
     template_name = 'core/file_list.jinja'
@@ -148,7 +147,29 @@ class FileView(CanViewMixin, DetailView, FormMixin):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.form = self.get_form()
+        if request.user.can_edit(self.object):
+            if 'delete' in request.POST.keys():
+                for f_id in request.POST.getlist('file_list'):
+                    sf = SithFile.objects.filter(id=f_id).first()
+                    if sf:
+                        sf.delete()
+            if 'clear' in request.POST.keys():
+                request.session['clipboard'] = []
+            if 'cut' in request.POST.keys():
+                request.session['clipboard'] = request.session['clipboard'] or []
+                for f_id in request.POST.getlist('file_list'):
+                    f_id = int(f_id)
+                    if f_id in [c.id for c in self.object.children.all()] and f_id not in request.session['clipboard']:
+                        request.session['clipboard'].append(f_id)
+            if 'paste' in request.POST.keys():
+                for f_id in request.session['clipboard']:
+                    sf = SithFile.objects.filter(id=f_id).first()
+                    print(sf)
+                    if sf:
+                        sf.move_to(self.object)
+                request.session['clipboard'] = []
+            print(request.session['clipboard'])
+        self.form = self.get_form() # The form handle only the file upload
         files = request.FILES.getlist('file_field')
         if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
             self.form.process(parent=self.object, owner=request.user, files=files)
