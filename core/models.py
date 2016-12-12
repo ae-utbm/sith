@@ -439,6 +439,9 @@ class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):
         super(AnonymousUser, self).__init__()
 
+    def was_subscribed(self):
+        return False
+
     @property
     def subscribed(self):
         return False
@@ -526,8 +529,9 @@ class SithFile(models.Model):
     size = models.IntegerField(_("size"), default=0)
     date = models.DateTimeField(_('date'), default=timezone.now)
     is_moderated = models.BooleanField(_("is moderated"), default=False)
+    moderator = models.ForeignKey(User, related_name="moderated_files", verbose_name=_("owner"))
     asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
-    is_in_sas = models.BooleanField(_("is in the SAS"), default=False)
+    is_in_sas = models.BooleanField(_("is in the SAS"), default=False) # Allows to query this flag, updated at each call to save()
 
     class Meta:
         verbose_name = _("file")

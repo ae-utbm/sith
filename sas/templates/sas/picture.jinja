@@ -77,6 +77,8 @@
     <div>
         <h5>{% trans %}Infos{% endtrans %}</h5>
         <p>{% trans %}Date: {% endtrans %}{{ picture.date|date(DATETIME_FORMAT) }}</p>
+        <p>{% trans %}Owner: {% endtrans %}<a href="{{ picture.owner.get_absolute_url() }}">{{ picture.owner.get_short_name() }}</a></p>
+        <p>{% trans %}Moderator: {% endtrans %}<a href="{{ picture.moderator.get_absolute_url() }}">{{ picture.moderator.get_short_name() }}</a></p>
         <p>{{ picture.parent.children.filter(id__lte=picture.id).count() }} / {{ picture.parent.children.count() }}</p>
     </div>
     <div>

@@ -1136,6 +1136,25 @@ def migrate_sas():
     # except:
     #     f = None
 
+def reset_sas_moderators():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+    cur.execute("""
+    SELECT *
+    FROM sas_photos
+    WHERE id_utilisateur_moderateur IS NOT NULL
+    """)
+    for r in cur:
+        try:
+            name = str(r['id_photo']) + '.jpg'
+            pict = SithFile.objects.filter(name__icontains=name, is_in_sas=True).first()
+            user = User.objects.filter(id=r['id_utilisateur_moderateur']).first()
+            if pict and user:
+                pict.moderator = user
+                pict.save()
+            else:
+                print("No pict %s (%s) or user %s (%s)" %(pict, name, user, r['id_utilisateur_moderateur']))
+        except Exception as e:
+            print(repr(e))
 
 def main():
     print("Start at %s" % start)
@@ -1153,8 +1172,9 @@ def main():
     # migrate_godfathers()
     # migrate_etickets()
     # reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
-    migrate_sas()
-    reset_index('core', 'sas')
+    # migrate_sas()
+    # reset_index('core', 'sas')
+    reset_sas_moderators()
     end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end-start))

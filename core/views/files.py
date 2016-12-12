@@ -203,6 +203,7 @@ class FileModerateView(CanEditPropMixin, SingleObjectMixin):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.object.is_moderated = True
+        self.object.moderator = request.user
         self.object.save()
         if 'next' in self.request.GET.keys():
             return redirect(self.request.GET['next'])
