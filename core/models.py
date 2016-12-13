@@ -649,6 +649,11 @@ class SithFile(models.Model):
         from sas.models import Picture
         return Picture.objects.filter(id=self.id).first()
 
+    @property
+    def as_album(self):
+        from sas.models import Album
+        return Album.objects.filter(id=self.id).first()
+
     def __str__(self):
         if self.is_folder:
             return _("Folder: ") + self.name

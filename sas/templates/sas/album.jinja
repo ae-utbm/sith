@@ -18,9 +18,10 @@
 <a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a><br>
 <hr>
 <div>
-    {% for a in album.children.filter(is_folder=True, is_moderated=True).order_by('-id') %}
+    {% for a in album.children.filter(is_folder=True).order_by('-id') %}
+    {% if a.as_album.can_be_viewed_by(user) %}
     <a href="{{ url("sas:album", album_id=a.id) }}" style="display: inline-block">
-    <div class="album">
+        <div class="album{% if not a.is_moderated %} not_moderated{% endif %}">
         <div>
         {% if a.file %}
         <img src="{{ a.as_picture.get_download_url() }}" alt="{% trans %}preview{% endtrans %}">
@@ -33,12 +34,13 @@
         {{ a.name }}
     </div>
     </a>
+    {% endif %}
     {% endfor %}
 </div>
 <div>
-    {% for p in album.children.filter(is_folder=False, is_moderated=True).order_by('id') %}
+    {% for p in album.children.filter(is_folder=False).order_by('id') %}
     {% if p.as_picture.can_be_viewed_by(user) %}
-    <div class="picture">
+    <div class="picture{% if not p.is_moderated %} not_moderated{% endif %}">
         <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
             <img src="{{ p.as_picture.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" />
         </a>

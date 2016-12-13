@@ -27,6 +27,15 @@
         <input name="cut" type="submit" value="{% trans %}Cut{% endtrans %}"> |
         <input name="paste" type="submit" value="{% trans %}Paste{% endtrans %}">
     </p>
+    {% if clipboard %}
+    <p>{% trans %}Clipboard: {% endtrans %}
+        <ul>
+        {% for f in clipboard %}
+            <li>{{ f.get_full_path() }}</li>
+        {% endfor %}
+        </ul>
+    </p>
+    {% endif %}
     <ul>
         {% for f in file.children.order_by('-is_folder', 'name').all() %}
         <li>

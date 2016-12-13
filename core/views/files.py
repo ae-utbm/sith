@@ -143,10 +143,14 @@ class FileView(CanViewMixin, DetailView, FormMixin):
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
+        if 'clipboard' not in request.session.keys():
+            request.session['clipboard'] = []
         return super(FileView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if 'clipboard' not in request.session.keys():
+            request.session['clipboard'] = []
         if request.user.can_edit(self.object):
             if 'delete' in request.POST.keys():
                 for f_id in request.POST.getlist('file_list'):
@@ -156,7 +160,6 @@ class FileView(CanViewMixin, DetailView, FormMixin):
             if 'clear' in request.POST.keys():
                 request.session['clipboard'] = []
             if 'cut' in request.POST.keys():
-                request.session['clipboard'] = request.session['clipboard'] or []
                 for f_id in request.POST.getlist('file_list'):
                     f_id = int(f_id)
                     if f_id in [c.id for c in self.object.children.all()] and f_id not in request.session['clipboard']:
@@ -164,11 +167,10 @@ class FileView(CanViewMixin, DetailView, FormMixin):
             if 'paste' in request.POST.keys():
                 for f_id in request.session['clipboard']:
                     sf = SithFile.objects.filter(id=f_id).first()
-                    print(sf)
                     if sf:
                         sf.move_to(self.object)
                 request.session['clipboard'] = []
-            print(request.session['clipboard'])
+            request.session.modified = True
         self.form = self.get_form() # The form handle only the file upload
         files = request.FILES.getlist('file_field')
         if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
@@ -186,6 +188,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         kwargs['form'] = self.form
         if self.kwargs['popup']:
             kwargs['popup'] = 'popup'
+        kwargs['clipboard'] = SithFile.objects.filter(id__in=self.request.session['clipboard'])
         return kwargs
 
 class FileDeleteView(CanEditPropMixin, DeleteView):
