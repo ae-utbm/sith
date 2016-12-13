@@ -17,7 +17,7 @@ from PIL import Image
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectUser, LoginForm, SelectDate, SelectDateTime
-from core.views.files import send_file
+from core.views.files import send_file, FileView
 from core.models import SithFile, User, Notification, RealGroup
 
 from sas.models import Picture, Album, PeoplePictureRelation
@@ -154,14 +154,20 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
+        if 'clipboard' not in request.session.keys():
+            request.session['clipboard'] = []
         return super(AlbumView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
+        if 'clipboard' not in request.session.keys():
+            request.session['clipboard'] = []
+        if request.user.can_edit(self.object): # Handle the copy-paste functions
+            FileView.handle_clipboard(request, self.object)
         parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist('images')
-        if request.user.is_authenticated() and request.user.is_in_group('ae-membres'):
+        if request.user.is_authenticated() and request.user.is_subscribed():
             if self.form.is_valid():
                 self.form.process(parent=parent, owner=request.user, files=files,
                         automodere=request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID))
@@ -177,6 +183,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
     def get_context_data(self, **kwargs):
         kwargs = super(AlbumView, self).get_context_data(**kwargs)
         kwargs['form'] = self.form
+        kwargs['clipboard'] = SithFile.objects.filter(id__in=self.request.session['clipboard'])
         return kwargs
 
 # Admin views

@@ -17,37 +17,69 @@
 <h3>{{ album.get_display_name() }}</h3>
 <a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a><br>
 <hr>
-<div>
-    {% for a in album.children.filter(is_folder=True).order_by('-id') %}
-    {% if a.as_album.can_be_viewed_by(user) %}
-    <a href="{{ url("sas:album", album_id=a.id) }}" style="display: inline-block">
-        <div class="album{% if not a.is_moderated %} not_moderated{% endif %}">
-        <div>
-        {% if a.file %}
-        <img src="{{ a.as_picture.get_download_url() }}" alt="{% trans %}preview{% endtrans %}">
-        {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
-        <img src="{{ a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() }}" alt="{% trans %}preview{% endtrans %}">
-        {% else %}
-        <img src="{{ static('core/img/sas.jpg') }}" alt="{% trans %}preview{% endtrans %}">
+{% if user.can_edit(album) %}
+<form action="" method="post" enctype="multipart/form-data" style="width: 100%;">
+    {% csrf_token %}
+    <p>
+        <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}"> |
+        <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}"> |
+        <input name="cut" type="submit" value="{% trans %}Cut{% endtrans %}"> |
+        <input name="paste" type="submit" value="{% trans %}Paste{% endtrans %}">
+    </p>
+    {% if clipboard %}
+    <p>{% trans %}Clipboard: {% endtrans %}
+        <ul>
+        {% for f in clipboard %}
+            <li>{{ f.get_full_path() }}</li>
+        {% endfor %}
+        </ul>
+    </p>
+    {% endif %}
+{% endif %}
+    <div>
+        {% for a in album.children.filter(is_folder=True).order_by('-id') %}
+        <div style="display: inline-block;">
+        {% if user.can_edit(album) %}
+        <input type="checkbox" name="file_list" value="{{ a.id }}">
+        {% endif %}
+        {% if a.as_album.can_be_viewed_by(user) %}
+        <a href="{{ url("sas:album", album_id=a.id) }}" style="display: inline-block">
+            <div class="album{% if not a.is_moderated %} not_moderated{% endif %}">
+            <div>
+            {% if a.file %}
+            <img src="{{ a.as_picture.get_download_url() }}" alt="{% trans %}preview{% endtrans %}">
+            {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
+            <img src="{{ a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() }}" alt="{% trans %}preview{% endtrans %}">
+            {% else %}
+            <img src="{{ static('core/img/sas.jpg') }}" alt="{% trans %}preview{% endtrans %}">
+            {% endif %}
+            </div>
+            {{ a.name }}
+        </div>
+        </a>
         {% endif %}
         </div>
-        {{ a.name }}
+        {% endfor %}
     </div>
-    </a>
-    {% endif %}
-    {% endfor %}
-</div>
-<div>
-    {% for p in album.children.filter(is_folder=False).order_by('id') %}
-    {% if p.as_picture.can_be_viewed_by(user) %}
-    <div class="picture{% if not p.is_moderated %} not_moderated{% endif %}">
-        <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
-            <img src="{{ p.as_picture.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" />
-        </a>
+    <div>
+        {% for p in album.children.filter(is_folder=False).order_by('id') %}
+        <div style="display: inline-block;">
+        {% if user.can_edit(album) %}
+        <input type="checkbox" name="file_list" value="{{ p.id }}">
+        {% endif %}
+        {% if p.as_picture.can_be_viewed_by(user) %}
+        <div class="picture{% if not p.is_moderated %} not_moderated{% endif %}">
+            <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
+                <img src="{{ p.as_picture.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" />
+            </a>
+        </div>
+        {% endif %}
+        </div>
+        {% endfor %}
     </div>
-    {% endif %}
-    {% endfor %}
-</div>
+{% if user.can_edit(album) %}
+</form>
+{% endif %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p() }}

@@ -24,7 +24,7 @@ class Picture(SithFile):
         return False
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) or super(Picture, self).can_be_edited_by(user)
+        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
         return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
@@ -87,7 +87,7 @@ class Album(SithFile):
         proxy = True
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) or super(Album, self).can_be_edited_by(user)
+        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
         return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
