@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-13 00:42+0100\n"
+"POT-Creation-Date: 2016-12-13 17:52+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -123,8 +123,8 @@ msgstr "numéro"
 msgid "journal"
 msgstr "classeur"
 
-#: accounting/models.py:194 core/models.py:530 core/models.py:858
-#: core/models.py:898 counter/models.py:243 counter/models.py:291
+#: accounting/models.py:194 core/models.py:530 core/models.py:863
+#: core/models.py:903 counter/models.py:243 counter/models.py:291
 #: counter/models.py:416 eboutic/models.py:15 eboutic/models.py:48
 msgid "date"
 msgstr "date"
@@ -305,7 +305,7 @@ msgstr "Compte en banque : "
 #: accounting/templates/accounting/label_list.jinja:21
 #: club/templates/club/club_sellings.jinja:49
 #: core/templates/core/file_detail.jinja:25
-#: core/templates/core/file_detail.jinja:53
+#: core/templates/core/file_detail.jinja:62
 #: core/templates/core/file_moderation.jinja:24
 #: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:66
 #: core/templates/core/user_account_detail.jinja:38
@@ -313,8 +313,9 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:29
 #: counter/templates/counter/last_ops.jinja:59
 #: launderette/templates/launderette/launderette_admin.jinja:16
-#: launderette/views.py:144 sas/templates/sas/moderation.jinja:36
-#: sas/templates/sas/picture.jinja:66 sas/templates/sas/picture.jinja:111
+#: launderette/views.py:144 sas/templates/sas/album.jinja:24
+#: sas/templates/sas/moderation.jinja:36 sas/templates/sas/picture.jinja:66
+#: sas/templates/sas/picture.jinja:111
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -844,7 +845,7 @@ msgstr "Membres"
 msgid "Old members"
 msgstr "Anciens membres"
 
-#: club/views.py:49 core/templates/core/base.jinja:52 core/views/user.py:146
+#: club/views.py:49 core/templates/core/base.jinja:53 core/views/user.py:146
 #: sas/templates/sas/picture.jinja:85
 msgid "Tools"
 msgstr "Outils"
@@ -859,7 +860,7 @@ msgstr "Propriétés"
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
-#: club/views.py:150 sas/views.py:79 sas/views.py:129 sas/views.py:171
+#: club/views.py:150 sas/views.py:79 sas/views.py:129 sas/views.py:177
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
@@ -1178,7 +1179,7 @@ msgstr "Montrez vos statistiques de compte aux autres"
 msgid "file name"
 msgstr "nom du fichier"
 
-#: core/models.py:520 core/models.py:705
+#: core/models.py:520 core/models.py:710
 msgid "parent"
 msgstr "parent"
 
@@ -1198,11 +1199,11 @@ msgstr "miniature"
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:525 core/models.py:711
+#: core/models.py:525 core/models.py:716
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:526 core/models.py:712
+#: core/models.py:526 core/models.py:717
 msgid "view group"
 msgstr "groupe de vue"
 
@@ -1252,64 +1253,64 @@ msgstr "Un fichier de ce nom existe déjà"
 msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
-#: core/models.py:654
+#: core/models.py:659
 msgid "Folder: "
 msgstr "Dossier : "
 
-#: core/models.py:656
+#: core/models.py:661
 msgid "File: "
 msgstr "Fichier : "
 
-#: core/models.py:704 core/models.py:708
+#: core/models.py:709 core/models.py:713
 msgid "page name"
 msgstr "nom de la page"
 
-#: core/models.py:709
+#: core/models.py:714
 msgid "owner group"
 msgstr "groupe propriétaire"
 
-#: core/models.py:713
+#: core/models.py:718
 msgid "lock user"
 msgstr "utilisateur bloquant"
 
-#: core/models.py:714
+#: core/models.py:719
 msgid "lock_timeout"
 msgstr "décompte du déblocage"
 
-#: core/models.py:741
+#: core/models.py:746
 msgid "Duplicate page"
 msgstr "Une page de ce nom existe déjà"
 
-#: core/models.py:747
+#: core/models.py:752
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:855
+#: core/models.py:860
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:856
+#: core/models.py:861
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:857
+#: core/models.py:862
 msgid "page content"
 msgstr "contenu de la page"
 
-#: core/models.py:895
+#: core/models.py:900
 msgid "url"
 msgstr "url"
 
-#: core/models.py:896
+#: core/models.py:901
 msgid "param"
 msgstr "param"
 
-#: core/models.py:897 launderette/models.py:60 launderette/models.py:85
+#: core/models.py:902 launderette/models.py:60 launderette/models.py:85
 #: launderette/models.py:121
 msgid "type"
 msgstr "type"
 
-#: core/models.py:899
+#: core/models.py:904
 msgid "viewed"
 msgstr "vue"
 
@@ -1342,74 +1343,78 @@ msgstr "S'enregister"
 msgid "View more"
 msgstr "Voir plus"
 
-#: core/templates/core/base.jinja:53
+#: core/templates/core/base.jinja:51
+msgid "Mark all as read"
+msgstr "Marquer tout commme lu"
+
+#: core/templates/core/base.jinja:54
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: core/templates/core/base.jinja:55 core/templates/core/base.jinja.py:56
+#: core/templates/core/base.jinja:56 core/templates/core/base.jinja.py:57
 msgid "Search"
 msgstr "Recherche"
 
-#: core/templates/core/base.jinja:78
+#: core/templates/core/base.jinja:79
 msgid "Main"
 msgstr "Accueil"
 
-#: core/templates/core/base.jinja:79
+#: core/templates/core/base.jinja:80
 msgid "Matmatronch"
 msgstr "Matmatronch"
 
-#: core/templates/core/base.jinja:80
+#: core/templates/core/base.jinja:81
 msgid "Wiki"
 msgstr "Wiki"
 
-#: core/templates/core/base.jinja:81 sas/templates/sas/album.jinja:4
+#: core/templates/core/base.jinja:82 sas/templates/sas/album.jinja:4
 #: sas/templates/sas/main.jinja:4 sas/templates/sas/main.jinja.py:8
 #: sas/templates/sas/picture.jinja:26
 msgid "SAS"
 msgstr "SAS"
 
-#: core/templates/core/base.jinja:82
+#: core/templates/core/base.jinja:83
 msgid "Forum"
 msgstr "Forum"
 
-#: core/templates/core/base.jinja:83
+#: core/templates/core/base.jinja:84
 msgid "Services"
 msgstr "Services"
 
-#: core/templates/core/base.jinja:84 core/templates/core/file.jinja:20
+#: core/templates/core/base.jinja:85 core/templates/core/file.jinja:20
 #: core/views/files.py:48
 msgid "Files"
 msgstr "Fichiers"
 
-#: core/templates/core/base.jinja:85
+#: core/templates/core/base.jinja:86
 msgid "Sponsors"
 msgstr "Partenaires"
 
-#: core/templates/core/base.jinja:86
+#: core/templates/core/base.jinja:87
 msgid "Help"
 msgstr "Aide"
 
-#: core/templates/core/base.jinja:119
+#: core/templates/core/base.jinja:120
 msgid "Contacts"
 msgstr "Contacts"
 
-#: core/templates/core/base.jinja:120
+#: core/templates/core/base.jinja:121
 msgid "Legal notices"
 msgstr "Mentions légales"
 
-#: core/templates/core/base.jinja:121
+#: core/templates/core/base.jinja:122
 msgid "Intellectual property"
 msgstr "Propriété intellectuelle"
 
-#: core/templates/core/base.jinja:122
+#: core/templates/core/base.jinja:123
 msgid "Help & Documentation"
 msgstr "Aide & Documentation"
 
-#: core/templates/core/base.jinja:123
+#: core/templates/core/base.jinja:124
 msgid "R&D"
 msgstr "R&D"
 
-#: core/templates/core/base.jinja:125
+#: core/templates/core/base.jinja:126
 msgid "Site made by good people"
 msgstr "Site réalisé par des gens bons"
 
@@ -1475,45 +1480,51 @@ msgstr "Propriétés"
 msgid "Owner: "
 msgstr "Propriétaire : "
 
-#: core/templates/core/file_detail.jinja:26
+#: core/templates/core/file_detail.jinja:26 sas/templates/sas/album.jinja:25
 msgid "Clear clipboard"
 msgstr "Vider le presse-papier"
 
-#: core/templates/core/file_detail.jinja:27
+#: core/templates/core/file_detail.jinja:27 sas/templates/sas/album.jinja:26
 msgid "Cut"
 msgstr "Couper"
 
-#: core/templates/core/file_detail.jinja:28
+#: core/templates/core/file_detail.jinja:28 sas/templates/sas/album.jinja:27
 msgid "Paste"
 msgstr "Coller"
 
-#: core/templates/core/file_detail.jinja:44
+#: core/templates/core/file_detail.jinja:31 sas/templates/sas/album.jinja:30
+#, fuzzy
+#| msgid "Clear clipboard"
+msgid "Clipboard: "
+msgstr "Vider le presse-papier"
+
+#: core/templates/core/file_detail.jinja:53
 msgid "Real name: "
 msgstr "Nom réel : "
 
-#: core/templates/core/file_detail.jinja:45
+#: core/templates/core/file_detail.jinja:54
 #: core/templates/core/file_moderation.jinja:21
 #: sas/templates/sas/moderation.jinja:25 sas/templates/sas/picture.jinja:79
 msgid "Date: "
 msgstr "Date : "
 
-#: core/templates/core/file_detail.jinja:47
+#: core/templates/core/file_detail.jinja:56
 msgid "Type: "
 msgstr "Type : "
 
-#: core/templates/core/file_detail.jinja:48
+#: core/templates/core/file_detail.jinja:57
 msgid "Size: "
 msgstr "Taille : "
 
-#: core/templates/core/file_detail.jinja:48
+#: core/templates/core/file_detail.jinja:57
 msgid "bytes"
 msgstr "octets"
 
-#: core/templates/core/file_detail.jinja:50
+#: core/templates/core/file_detail.jinja:59
 msgid "Download"
 msgstr "Télécharger"
 
-#: core/templates/core/file_detail.jinja:56
+#: core/templates/core/file_detail.jinja:65
 #: core/templates/core/file_moderation.jinja:23
 #: sas/templates/sas/moderation.jinja:32 sas/templates/sas/picture.jinja:109
 msgid "Moderate"
@@ -2911,13 +2922,13 @@ msgstr "Utilisateur qui sera supprimé"
 msgid "picture"
 msgstr "photo"
 
-#: sas/templates/sas/album.jinja:26 sas/templates/sas/album.jinja.py:28
-#: sas/templates/sas/album.jinja:30 sas/templates/sas/main.jinja:17
+#: sas/templates/sas/album.jinja:50 sas/templates/sas/album.jinja.py:52
+#: sas/templates/sas/album.jinja:54 sas/templates/sas/main.jinja:17
 #: sas/templates/sas/main.jinja.py:19 sas/templates/sas/main.jinja:21
 msgid "preview"
 msgstr "miniature"
 
-#: sas/templates/sas/album.jinja:52
+#: sas/templates/sas/album.jinja:86
 msgid "Upload"
 msgstr "Envoyer"
 

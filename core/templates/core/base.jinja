@@ -47,7 +47,8 @@
                             n.date|time(DATETIME_FORMAT) }}</span><br>
                         {{ n }}</a></li>
                 {% endfor %}
-                <li><a href="{{ url('core:notification_list') }}">{% trans %}View more{% endtrans %}</a></li>
+                <li><a href="{{ url('core:notification_list') }}">{% trans %}View more{% endtrans %}</a>
+                    <a href="{{ url('core:notification_list') }}?see_all">{% trans %}Mark all as read{% endtrans %}</a></li>
             </ul>
             <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
             <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
