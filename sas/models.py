@@ -24,11 +24,13 @@ class Picture(SithFile):
         return False
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
+        file = SithFile.objects.filter(id=self.id).first()
+        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) or user.can_edit(file)
 
     def can_be_viewed_by(self, user):
+        file = SithFile.objects.filter(id=self.id).first()
         return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
-                user.was_subscribed())
+                user.was_subscribed()) or user.can_view(file)
 
     def get_download_url(self):
         return reverse('sas:download', kwargs={'picture_id': self.id})
@@ -87,11 +89,13 @@ class Album(SithFile):
         proxy = True
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
+        file = SithFile.objects.filter(id=self.id).first()
+        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) or user.can_edit(file)
 
     def can_be_viewed_by(self, user):
+        file = SithFile.objects.filter(id=self.id).first()
         return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
-                user.was_subscribed())
+                user.was_subscribed()) or user.can_view(file)
 
     def get_absolute_url(self):
         return reverse('sas:album', kwargs={'album_id': self.id})

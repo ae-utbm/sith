@@ -42,7 +42,7 @@
         {% if user.can_edit(album) %}
         <input type="checkbox" name="file_list" value="{{ a.id }}">
         {% endif %}
-        {% if a.as_album.can_be_viewed_by(user) %}
+        {% if user.can_view(a.as_album) %}
         <a href="{{ url("sas:album", album_id=a.id) }}" style="display: inline-block">
             <div class="album{% if not a.is_moderated %} not_moderated{% endif %}">
             <div>
@@ -67,7 +67,7 @@
         {% if user.can_edit(album) %}
         <input type="checkbox" name="file_list" value="{{ p.id }}">
         {% endif %}
-        {% if p.as_picture.can_be_viewed_by(user) %}
+        {% if user.can_view(p.as_picture) %}
         <div class="picture{% if not p.is_moderated %} not_moderated{% endif %}">
             <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
                 <img src="{{ p.as_picture.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" />
