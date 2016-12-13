@@ -5,8 +5,6 @@ from django.conf import settings
 
 from datetime import timedelta
 from core.models import User
-from subscription.models import Subscriber
-from subscription.views import get_subscriber
 
 
 class Election(models.Model):
@@ -66,7 +64,7 @@ class List(models.Model):
     """
     To allow per list vote
     """
-    title = models.CharField(_('title'))
+    title = models.CharField(_('title'), max_length=255)
 
 
 class Vote(models.Model):

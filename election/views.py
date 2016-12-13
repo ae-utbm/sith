@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
-from election.models import Election, Responsability, Candidate
+from election.models import Election, Role, Candidature
 
 # Display elections
 
