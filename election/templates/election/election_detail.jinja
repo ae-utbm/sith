@@ -11,16 +11,16 @@
 	<h1>{{object.title}}</h1>
 	<p>{{object.description}}</p>
 	<p>{% trans %}End :{% endtrans %} {{object.end_date}}</p>
-	{% for resp in object.responsability.all() %}
-		<h2>{{resp.title}}</h2>
-		{% for candidate in resp.candidate.all() %}
-			<a href="{{url('core:user_profile', user_id=candidate.user.id)}}"><h3>{{candidate.user.first_name}} {{candidate.user.last_name}} ({{candidate.user.nick_name}})</h3></a>
-			{% if candidate.user.profile_pict %}
-				<img src="{{candidate.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}"/>
+	{% for role in object.role.all() %}
+		<h2>{{role.title}}</h2>
+		{% for candidature in role.candidature.all() %}
+			<a href="{{url('core:user_profile', user_id=candidature.user.id)}}"><h3>{{candidature.user.first_name}} {{candidature.user.last_name}} ({{candidature.user.nick_name}})</h3></a>
+			{% if candidature.user.profile_pict %}
+				<p><img src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}"/></p>
 			{% endif %}
-			{% if candidate.program %}
+			{% if candidature.program %}
 				<h4>Programme</h4>
-				<p>{{candidate.program}}</p>
+				<p>{{candidature.program}}</p>
 			{% endif %}
 		{% endfor %}
 	{% endfor %}

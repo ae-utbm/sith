@@ -15,8 +15,7 @@ from club.models import Club, Membership
 from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
 from com.models import Sith
-from election.models import Election, Responsability, Candidate
-
+from election.models import Election, Role, Candidature, List
 
 class Command(BaseCommand):
     help = "Populate a new instance of the Sith AE"
@@ -349,10 +348,12 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                 operation.save()
 
             # Create an election
-            # el = Election(title="Élection 2017", description="La roue tourne", start_proposal='1942-06-12 10:28:45', end_proposal='2042-06-12 10:28:45',start_date='1942-06-12 10:28:45', end_date='7942-06-12 10:28:45')
-            # el.save()
-            # resp = Responsability(election=el, title="Co Respo Info", description="Ghetto++")
-            # resp.save()
-            # cand = Candidate(responsability=resp, user=skia)
-            # cand.save()
+            el = Election(title="Élection 2017", description="La roue tourne", start_candidature='1942-06-12 10:28:45', end_candidature='2042-06-12 10:28:45',start_date='1942-06-12 10:28:45', end_date='7942-06-12 10:28:45')
+            el.save()
+            liste = List(title="Candidature Libre", election=el)
+            liste.save()
+            resp = Role(election=el, title="Co Respo Info", description="Ghetto++")
+            resp.save()
+            cand = Candidature(role=resp, user=skia, liste=liste, program="Refesons le site AE")
+            cand.save()
 

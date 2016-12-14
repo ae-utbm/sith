@@ -32,7 +32,8 @@ class Election(models.Model):
         return bool(now <= self.end_candidature and now >= self.start_candidature)
 
     def has_voted(self, user):
-        return self.has_voted.filter(id=user.id).exists()
+        return False
+        # return self.has_voted.filter(id=user.id).exists()
 
     def get_results(self):
         pass
@@ -50,6 +51,14 @@ class Role(models.Model):
         return ("%s : %s") % (self.election.title, self.title)
 
 
+class List(models.Model):
+    """
+    To allow per list vote
+    """
+    title = models.CharField(_('title'), max_length=255)
+    election = models.ForeignKey(Election, related_name='list', verbose_name=_("election"))
+
+
 class Candidature(models.Model):
     """
     This class is a component of responsability
@@ -58,13 +67,7 @@ class Candidature(models.Model):
     user = models.ForeignKey(User, verbose_name=_('user'), related_name='candidate', blank=True)
     program = models.TextField(_('description'), null=True, blank=True)
     has_voted = models.ManyToManyField(User, verbose_name=_('has_voted'), related_name='has_voted')
-
-
-class List(models.Model):
-    """
-    To allow per list vote
-    """
-    title = models.CharField(_('title'), max_length=255)
+    liste = models.ForeignKey(List, related_name='candidature', verbose_name=_('list'))
 
 
 class Vote(models.Model):
