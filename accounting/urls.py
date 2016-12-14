@@ -26,7 +26,10 @@ urlpatterns = [
     url(r'^journal/create$', JournalCreateView.as_view(), name='journal_new'),
     url(r'^journal/(?P<j_id>[0-9]+)$', JournalDetailView.as_view(), name='journal_details'),
     url(r'^journal/(?P<j_id>[0-9]+)/edit$', JournalEditView.as_view(), name='journal_edit'),
-    url(r'^journal/(?P<j_id>[0-9]+)/bilan$', JournalBilanView.as_view(), name='journal_bilan'),
+    url(r'^journal/(?P<j_id>[0-9]+)/bilan/nature$', JournalBilanNatureView.as_view(), name='journal_bilan_nature'),
+    url(r'^journal/(?P<j_id>[0-9]+)/bilan/person$', JournalBilanPersonView.as_view(), name='journal_bilan_person'),
+    url(r'^journal/(?P<j_id>[0-9]+)/bilan/accounting$', JournalBilanAccountingView.as_view(), name='journal_bilan_accounting'),
+
     # Operations
     url(r'^operation/create/(?P<j_id>[0-9]+)$', OperationCreateView.as_view(), name='op_new'),
     url(r'^operation/(?P<op_id>[0-9]+)$', OperationEditView.as_view(), name='op_edit'),

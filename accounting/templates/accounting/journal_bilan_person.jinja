@@ -1,0 +1,63 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}General journal:{% endtrans %} {{ object.name }}
+{% endblock %}
+
+
+{% block content %}
+	<h2>{% trans %}Person bilan: {% endtrans %} {{ object.name }}</h2>
+
+	<h3>{% trans %}Credit{% endtrans %}</h3>
+
+	<table>
+        <thead>
+        <tr>
+            <td>{% trans %}Target of the operation{% endtrans %}</td>
+            <td>{% trans %}Sum{% endtrans %}</td>
+        </tr>
+        </thead>
+        <tbody>
+            {% for key in bilan_credit.keys() %}
+                <tr>
+                	{% if key.target_type == "OTHER" %}
+                        <td>{{ o.target_label }}</td>
+                    {% else %}
+                        <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
+                    {% endif %}
+                	<td>{{bilan_credit[key]}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    <p>Total : {{total_credit}}</p>
+
+	<h3>{% trans %}Debit{% endtrans %}</h3>
+    
+    <table>
+        <thead>
+        <tr>
+            <td>{% trans %}Target of the operation{% endtrans %}</td>
+            <td>{% trans %}Sum{% endtrans %}</td>
+        </tr>
+        </thead>
+        <tbody>
+            {% for key in bilan_debit.keys() %}
+                <tr>
+                    {% if key.target_type == "OTHER" %}
+                        <td>{{ o.target_label }}</td>
+                    {% else %}
+                        <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
+                    {% endif %}
+                    <td>{{bilan_debit[key]}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    <p>Total : {{total_debit}}</p>
+
+{% endblock %}

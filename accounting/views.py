@@ -444,34 +444,145 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.save()
         return response
 
-class JournalBilanView(CanViewMixin, DetailView):
+class JournalBilanNatureView(CanViewMixin, DetailView):
     """
     Calculate a dictionary with operation code and sum of operations
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
-    template_name='accounting/journal_bilan.jinja'
+    template_name='accounting/journal_bilan_nature.jinja'
 
     def sum_by_code(self, code):
         from decimal import Decimal
+        from django.db.models import Sum, DecimalField
         amount_sum = Decimal(0)
-        for amount in self.get_object().operations.filter(accounting_type__code=code).values('amount'):
-            amount_sum += amount['amount']
-        return amount_sum
+        print(self.object.operations.filter(
+            accounting_type__code=code).values('amount').annotate(
+            sum = Sum('amount')).values('sum').first()['sum'])
+        return(self.object.operations.filter(
+            accounting_type__code=code).values('amount').annotate(
+            sum = Sum('amount')).values('sum').first()['sum'])
 
-    def bilan(self):
+    def bilan_credit(self):
         bilan = {}
-        for el in AccountingType.objects.values('code').distinct():
-            bilan[el['code']] = self.sum_by_code(el['code'])
-        print(bilan)
+        for el in AccountingType.objects.filter(movement_type='CREDIT'):
+            bilan["%s - %s" % (el.code, el.label)] = self.sum_by_code(el.code)
         return bilan
+
+    def bilan_debit(self):
+        bilan = {}
+        for el in AccountingType.objects.filter(movement_type='DEBIT'):
+            bilan["%s - %s" % (el.code, el.label)] = self.sum_by_code(el.code)
+        return bilan
+
+    def total_credit(self):
+        return sum(self.bilan_credit().values())
+
+    def total_debit(self):
+        return sum(self.bilan_debit().values())
 
     def get_context_data(self, **kwargs):
         """ Add journal to the context """
-        kwargs = super(JournalBilanView, self).get_context_data(**kwargs)
-        kwargs['bilan'] = self.bilan()
+        kwargs = super(JournalBilanNatureView, self).get_context_data(**kwargs)
+        kwargs['bilan_credit'] = self.bilan_credit()
+        kwargs['bilan_debit'] = self.bilan_debit()
+        kwargs['total_credit'] = self.total_credit()
+        kwargs['total_debit'] = self.total_debit()
         return kwargs
 
+class JournalBilanPersonView(CanViewMixin, DetailView):
+    """
+    Calculate a dictionary with operation target and sum of operations
+    """
+    model = GeneralJournal
+    pk_url_kwarg = "j_id"
+    template_name='accounting/journal_bilan_person.jinja'
+
+    def sum_by_target(self, target_id):
+        from decimal import Decimal
+        from django.db.models import Sum, DecimalField
+        amount_sum = Decimal(0)
+        print(self.object.operations.filter(
+            target_id=target_id).values('amount').annotate(
+            sum = Sum('amount')).values('sum').first()['sum'])
+        return(self.object.operations.filter(
+            target_id=target_id).values('amount').annotate(
+            sum = Sum('amount')).values('sum').first()['sum'])
+
+    def bilan_credit(self):
+
+        bilan = {}
+        for el in Operation.objects.filter(accounting_type__movement_type='CREDIT'):
+            bilan[el.target] = self.sum_by_target(el.target_id)
+        return bilan
+
+    def bilan_debit(self):
+        bilan = {}
+        for el in Operation.objects.filter(accounting_type__movement_type='DEBIT'):
+            bilan[el.target] = self.sum_by_target(el.target_id)
+        return bilan
+
+    def total_credit(self):
+        return sum(self.bilan_credit().values())
+
+    def total_debit(self):
+        return sum(self.bilan_debit().values())
+
+    def get_context_data(self, **kwargs):
+        """ Add journal to the context """
+        kwargs = super(JournalBilanPersonView, self).get_context_data(**kwargs)
+        kwargs['bilan_credit'] = self.bilan_credit()
+        kwargs['bilan_debit'] = self.bilan_debit()
+        kwargs['total_credit'] = self.total_credit()
+        kwargs['total_debit'] = self.total_debit()
+        return kwargs
+
+class JournalBilanAccountingView(CanViewMixin, DetailView):
+    """
+    Calculate a dictionary with operation type and sum of operations
+    """
+    model = GeneralJournal
+    pk_url_kwarg = "j_id"
+    template_name='accounting/journal_bilan_person.jinja'
+
+    def sum_by_code(self, target_id):
+        from decimal import Decimal
+        from django.db.models import Sum, DecimalField
+        amount_sum = Decimal(0)
+        print(self.object.operations.filter(
+            target_id=target_id).values('amount').annotate(
+            sum = Sum('amount')).values('sum').first()['sum'])
+        return(self.object.operations.filter(
+            target_id=target_id).values('amount').annotate(
+            sum = Sum('amount')).values('sum').first()['sum'])
+
+    def bilan_credit(self):
+
+        bilan = {}
+        for el in Operation.objects.filter(accounting_type__movement_type='CREDIT'):
+            bilan[el.target] = self.sum_by_code(el.target_id)
+        return bilan
+
+    def bilan_debit(self):
+        bilan = {}
+        for el in Operation.objects.filter(accounting_type__movement_type='DEBIT'):
+            bilan[el.target] = self.sum_by_code(el.target_id)
+        return bilan
+
+    def total_credit(self):
+        return sum(self.bilan_credit().values())
+
+    def total_debit(self):
+        return sum(self.bilan_debit().values())
+
+    def get_context_data(self, **kwargs):
+        """ Add journal to the context """
+        kwargs = super(JournalBilanAccountingView, self).get_context_data(**kwargs)
+        kwargs['bilan_credit'] = self.bilan_credit()
+        kwargs['bilan_debit'] = self.bilan_debit()
+        kwargs['total_credit'] = self.total_credit()
+        kwargs['total_debit'] = self.total_debit()
+        return kwargs
 
 # Company views
 
