@@ -2962,7 +2962,7 @@ msgstr "Personne(s)"
 
 #: sas/templates/sas/picture.jinja:81
 msgid "Moderator: "
-msgstr "Modérateur"
+msgstr "Modérateur : "
 
 #: sas/templates/sas/picture.jinja:87
 msgid "HD version"

@@ -70,7 +70,7 @@ class AddFilesForm(forms.Form):
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
         if notif:
             for u in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
-                if not u.notifications.filter(type="FILE_MODERATION").exists():
+                if not u.notifications.filter(type="FILE_MODERATION", viewed=False).exists():
                     Notification(user=u, url=reverse("core:file_moderation"), type="FILE_MODERATION").save()
 
 class FileListView(ListView):

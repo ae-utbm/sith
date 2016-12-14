@@ -50,7 +50,7 @@ class SASForm(forms.Form):
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
         if notif:
             for u in RealGroup.objects.filter(id=settings.SITH_GROUP_SAS_ADMIN_ID).first().users.all():
-                if not u.notifications.filter(type="SAS_MODERATION").exists():
+                if not u.notifications.filter(type="SAS_MODERATION", viewed=False).exists():
                     Notification(user=u, url=reverse("sas:moderation"), type="SAS_MODERATION").save()
 
 class RelationForm(forms.ModelForm):
@@ -122,7 +122,7 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
                     u = User.objects.filter(id=uid).first()
                     PeoplePictureRelation(user=u,
                             picture=self.form.cleaned_data['picture']).save()
-                    if not u.notifications.filter(type="NEW_PICTURES").exists():
+                    if not u.notifications.filter(type="NEW_PICTURES", viewed=False).exists():
                         Notification(user=u, url=reverse("core:user_pictures", kwargs={'user_id': u.id}), type="NEW_PICTURES").save()
                 return super(PictureView, self).form_valid(self.form)
         else:
