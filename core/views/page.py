@@ -87,7 +87,8 @@ class PageCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.set_lock(self.request.user)
-        return super(PageCreateView, self).form_valid(form)
+        ret = super(PageCreateView, self).form_valid(form)
+        return ret
 
 class PagePropView(CanEditPropMixin, UpdateView):
     model = Page

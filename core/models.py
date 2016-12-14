@@ -772,6 +772,8 @@ class Page(models.Model):
         if not locked:
             raise NotLocked("The page is not locked and thus can not be saved")
         self.full_clean()
+        if not self.id:
+            super(Page, self).save(*args, **kwargs) # Save a first time to correctly set _full_name
         # This reset the _full_name just before saving to maintain a coherent field quicker for queries than the
         # recursive method
         # It also update all the children to maintain correct names

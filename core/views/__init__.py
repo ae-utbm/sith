@@ -1,3 +1,4 @@
+import types
 
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound
@@ -57,19 +58,20 @@ class CanEditPropMixin(View):
     object's owner_group
     """
     def dispatch(self, request, *arg, **kwargs):
-        res = super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
-        if res.__class__.status_code == 302:
-            return res
-        if hasattr(self, 'object'):
-            obj = self.object
-        elif hasattr(self, 'object_list'):
-            obj = self.object_list[0] if self.object_list else None
-        if can_edit_prop(obj, self.request.user):
-            return res
-        try: # Always unlock when 403
-            self.object.unset_lock()
+        try:
+            self.object = self.get_object()
+            if can_edit_prop(self.object, request.user):
+                return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
         except: pass
-        raise PermissionDenied
+        # If we get here, it's a ListView
+        l_id = [o.id for o in self.get_queryset() if can_edit_prop(o, request.user)]
+        if not l_id:
+            raise PermissionDenied
+        self._get_queryset = self.get_queryset
+        def get_qs(self2):
+            return self2._get_queryset().filter(id__in=l_id)
+        self.get_queryset = types.MethodType(get_qs, self)
+        return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
 
 class CanEditMixin(View):
     """
@@ -77,19 +79,20 @@ class CanEditMixin(View):
     object
     """
     def dispatch(self, request, *arg, **kwargs):
-        res = super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
-        if res.__class__.status_code == 302:
-            return res
-        if hasattr(self, 'object'):
-            obj = self.object
-        elif hasattr(self, 'object_list'):
-            obj = self.object_list[0] if self.object_list else None
-        if can_edit(obj, self.request.user):
-            return res
-        try: # Always unlock when 403
-            self.object.unset_lock()
+        try:
+            self.object = self.get_object()
+            if can_edit(self.object, request.user):
+                return super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
         except: pass
-        raise PermissionDenied
+        # If we get here, it's a ListView
+        l_id = [o.id for o in self.get_queryset() if can_edit(o, request.user)]
+        if not l_id:
+            raise PermissionDenied
+        self._get_queryset = self.get_queryset
+        def get_qs(self2):
+            return self2._get_queryset().filter(id__in=l_id)
+        self.get_queryset = types.MethodType(get_qs, self)
+        return super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
 
 class CanViewMixin(View):
     """
@@ -97,30 +100,20 @@ class CanViewMixin(View):
     the object
     """
     def dispatch(self, request, *arg, **kwargs):
-        res = super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
-        if res.__class__.status_code == 302:
-            return res
-        if hasattr(self, 'object'):
-            obj = self.object
-        elif hasattr(self, 'object_list'):
-            obj = self.object_list[0] if self.object_list else None
-        if can_view(obj, self.request.user):
-            return res
-        try: # Always unlock when 403
-            self.object.unset_lock()
+        try:
+            self.object = self.get_object()
+            if can_view(self.object, request.user):
+                return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
         except: pass
-        raise PermissionDenied
-
-    def get_context_data(self, **kwargs):
-        context = super(CanViewMixin, self).get_context_data(**kwargs)
-        if hasattr(self, 'object_list'):
-            ba_list = list(self.object_list)
-            l = []
-            for ba in ba_list:
-                if self.request.user.can_view(ba):
-                    l.append(ba)
-            context['object_list'] = l
-        return context
+        # If we get here, it's a ListView
+        l_id = [o.id for o in self.get_queryset() if can_view(o, request.user)]
+        if not l_id:
+            raise PermissionDenied
+        self._get_queryset = self.get_queryset
+        def get_qs(self2):
+            return self2._get_queryset().filter(id__in=l_id)
+        self.get_queryset = types.MethodType(get_qs, self)
+        return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
 
 class TabedViewMixin(View):
     """
