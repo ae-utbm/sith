@@ -14,13 +14,16 @@
         <thead>
         <tr>
             <td>{% trans %}Nature of operation{% endtrans %}</td>
-            <td>{% trans %}Amount{% endtrans %}</td>
+            <td>{% trans %}Sum{% endtrans %}</td>
         </tr>
         </thead>
-        <tbody></tr>
-        	<td>bla</td>
-        	<td>{{self.get_test()}}</td>
-        <tr>
+        <tbody>
+            {% for key in bilan.keys() %}
+                <tr>
+                	<td>{{object.operations.get(accounting_type__code=key).accounting_type.label}}</td>
+                	<td>{{bilan[key]}}</td>
+                </tr>
+            {% endfor %}
         </tbody>
 
     </table>

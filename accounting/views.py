@@ -444,6 +444,35 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.save()
         return response
 
+class JournalBilanView(CanViewMixin, DetailView):
+    """
+    Calculate a dictionary with operation code and sum of operations
+    """
+    model = GeneralJournal
+    pk_url_kwarg = "j_id"
+    template_name='accounting/journal_bilan.jinja'
+
+    def sum_by_code(self, code):
+        from decimal import Decimal
+        amount_sum = Decimal(0)
+        for amount in self.get_object().operations.filter(accounting_type__code=code).values('amount'):
+            amount_sum += amount['amount']
+        return amount_sum
+
+    def bilan(self):
+        bilan = {}
+        for el in AccountingType.objects.values('code').distinct():
+            bilan[el['code']] = self.sum_by_code(el['code'])
+        print(bilan)
+        return bilan
+
+    def get_context_data(self, **kwargs):
+        """ Add journal to the context """
+        kwargs = super(JournalBilanView, self).get_context_data(**kwargs)
+        kwargs['bilan'] = self.bilan()
+        return kwargs
+
+
 # Company views
 
 class CompanyListView(CanViewMixin, ListView):
