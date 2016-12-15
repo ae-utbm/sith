@@ -257,6 +257,11 @@ SITH_GROUP_BANNED_COUNTER_ID = 7
 SITH_GROUP_BANNED_SUBSCRIPTION_ID = 8
 SITH_GROUP_SAS_ADMIN_ID = 9
 
+SITH_CLUB_REFOUND_ID = 89
+SITH_COUNTER_REFOUND_ID = 38
+SITH_PRODUCT_REFOUND_ID = 5
+
+
 # SAS variables
 SITH_SAS_ROOT_DIR_ID = 4
 
@@ -312,10 +317,6 @@ SITH_COUNTER_BANK = [
         ('CREDIT-LYONNAIS', 'Credit Lyonnais'),
         ('LA-POSTE', 'La Poste'),
         ]
-
-SITH_COUNTER_REFOUND = (88, 'Carte AE')
-
-SITH_COUNTER_REFOUND_PRODUCT = (1899, 'REMBOURS', 'Remboursement')
 
 # Defines which product type is the refilling type, and thus increases the account amount
 SITH_COUNTER_PRODUCTTYPE_REFILLING = 11

@@ -74,7 +74,6 @@ class Command(BaseCommand):
         self.reset_index("counter")
         Counter(name="Eboutic", club=main_club, type='EBOUTIC').save()
         Counter(name="AE", club=main_club, type='OFFICE').save()
-        Counter(name=settings.SITH_COUNTER_REFOUND[1], club=main_club, type='OFFICE').save()
 
         home_root.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
         club_root.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
@@ -254,6 +253,9 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             troll = Club(name="Troll Penché", unix_name="troll",
                     address="Terre Du Milieu", parent=main_club)
             troll.save()
+            refound = Club(name="Carte AE", unix_name="carte_ae",
+                    address="Jamais imprimée", parent=main_club)
+            refound.save()
 
             # Counters
             Customer(user=skia, account_id="6568j", amount=0).save()
@@ -274,9 +276,12 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             mde.products.add(barb)
             mde.products.add(cble)
             mde.save()
-            refound = Product(name=settings.SITH_COUNTER_REFOUND_PRODUCT[2], code=settings.SITH_COUNTER_REFOUND_PRODUCT[1], purchase_price="0", selling_price="0",
-                    special_selling_price="0", club=main_club)
-            refound.save()
+
+            refound_counter = Counter(name="Carte AE", club=refound, type='OFFICE')
+            refound_counter.save()
+            refound_product = Product(name="remboursement", code="REMBOURS", purchase_price="0", selling_price="0",
+                    special_selling_price="0", club=refound)
+            refound_product.save()
 
             # Accounting test values:
             BankAccount(name="AE TG", club=main_club).save()
