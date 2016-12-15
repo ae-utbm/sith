@@ -543,7 +543,7 @@ class JournalBilanAccountingView(CanViewMixin, DetailView):
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
-    template_name='accounting/journal_bilan_person.jinja'
+    template_name='accounting/journal_bilan_accounting.jinja'
 
     def sum_by_code(self, target_id):
         from decimal import Decimal
