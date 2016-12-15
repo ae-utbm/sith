@@ -78,7 +78,9 @@
         <h5>{% trans %}Infos{% endtrans %}</h5>
         <p>{% trans %}Date: {% endtrans %}{{ picture.date|date(DATETIME_FORMAT) }}</p>
         <p>{% trans %}Owner: {% endtrans %}<a href="{{ picture.owner.get_absolute_url() }}">{{ picture.owner.get_short_name() }}</a></p>
+        {% if picture.moderator %}
         <p>{% trans %}Moderator: {% endtrans %}<a href="{{ picture.moderator.get_absolute_url() }}">{{ picture.moderator.get_short_name() }}</a></p>
+        {% endif %}
         <p>{{ picture.parent.children.filter(id__lte=picture.id).count() }} / {{ picture.parent.children.count() }}</p>
     </div>
     <div>
@@ -105,6 +107,9 @@
     {% set next = next.get_absolute_url() + "#pict" %}
 {% endif %}
 <div style="background: lightgrey; padding: 2px;">
+    {% if picture.asked_for_removal %}
+    <span class="important">{% trans %}Asked for removal{% endtrans %}</span>
+    {% endif %}
     <a href="{{ url('core:file_moderate', file_id=picture.id) }}?next={{ next }}">
         {% trans %}Moderate{% endtrans %}</a> |
     <a href="{{ url('core:file_delete', file_id=picture.id) }}?next={{ next }}">

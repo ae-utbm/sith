@@ -7,41 +7,28 @@
 {% block content %}
 <h3>{% trans %}SAS moderation{% endtrans %}</h3>
 <div id="moderation">
-    <form action="" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% for p in pictures %}
-    <div style="">
-        {% if p.is_folder %}
-            <strong>{% trans %}Album{% endtrans %}</strong>
-        {% else %}
-            <strong>{% trans %}Picture{% endtrans %}</strong>
-        {% endif %}
-        <p>
-            <a href="{{ url("sas:picture", picture_id=p.id) }}">
-                <img src="{{ p.get_download_compressed_url() }}" alt="{{ p.name }}">
-            </a><br/>
-            {% trans %}Full name: {% endtrans %}{{ p.get_parent_path()+'/'+p.name }}<br/>
-            {% trans %}Owner: {% endtrans %}{{ p.owner.get_display_name() }}<br/>
-            {% trans %}Date: {% endtrans %}{{ p.date|date(DATE_FORMAT) }} {{ p.date|time(TIME_FORMAT) }}<br/>
-        </p>
-        {% if p.asked_for_removal %}
-        <p class="important">{% trans %}Asked for removal{% endtrans %}</p>
-        {% endif %}
-        <p>
-        <input type="radio" name="a_{{ p.id }}" id="m_{{ p.id }}" value="moderate"/>
-        <a href="{{ url('core:file_moderate', file_id=p.id) }}?next={{ url('sas:moderation') }}">{% trans %}Moderate{% endtrans %}</a>
-        </p>
-        <p>
-        <input type="radio" name="a_{{ p.id }}" id="m_{{ p.id }}" value="delete"/>
-        <a href="{{ url('core:file_delete', file_id=p.id) }}?next={{ url('sas:moderation') }}">{% trans %}Delete{% endtrans %}</a>
-        </p>
-        <p>
-        <input type="radio" name="a_{{ p.id }}" id="m_{{ p.id }}" value="nothing" checked/>
-        {% trans %}Do nothing{% endtrans %}
-        </p>
+    <h4>{% trans %}Albums{% endtrans %}</h4>
+    <ul>
+    {% for a in albums_to_moderate %}
+        <li>{{ a }}:
+        <form action="" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="album_id" value="{{ a.id }}" />
+            <input type="submit" name="moderate" value="{% trans %}Moderate{% endtrans %}" />
+            <input type="submit" name="delete" value="{% trans %}Delete{% endtrans %}" />
+        </form>
+    </li>
+    {% endfor %}
+    </ul>
+    {% for a in albums %}
+        <h4>{{ a.get_display_name() }}</h4>
+    {% for p in pictures.filter(parent=a).order_by('id') %}
+    <div class="picture">
+        <a href="{{ url("sas:picture", picture_id=p.id) }}">
+            <img src="{{ p.get_download_thumb_url() }}" alt="{{ p.name }}">
+        </a>
     </div>
     {% endfor %}
-    <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
-    </form>
+    {% endfor %}
 </div>
 {% endblock %}

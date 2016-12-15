@@ -41,6 +41,8 @@ class SASForm(forms.Form):
         for f in files:
             new_file = Picture(parent=parent, name=f.name, file=f, owner=owner, mime_type=f.content_type, size=f._size,
                     is_folder=False, is_moderated=automodere)
+            if automodere:
+                new_file.moderator = owner
             try:
                 new_file.clean()
                 new_file.generate_thumbnails()
@@ -193,26 +195,28 @@ class ModerationView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
-            for k,v in request.GET.items():
-                if k[:2] == "a_":
-                    try:
-                        pict = Picture.objects.filter(id=int(k[2:])).first()
-                        if v == "delete":
-                            pict.delete()
-                        elif v == "moderate":
-                            pict.is_moderated = True
-                            pict.asked_for_removal = False
-                            pict.save()
-                    except: pass
             return super(ModerationView, self).get(request, *args, **kwargs)
         raise PermissionDenied
 
     def post(self, request, *args, **kwargs):
-        return self.get(request, *args, **kwargs)
+        if request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
+            try:
+                a = Album.objects.filter(id=request.POST['album_id']).first()
+                if 'moderate' in request.POST.keys():
+                    a.moderator = request.user
+                    a.is_moderated = True
+                    a.save()
+                elif 'delete' in request.POST.keys():
+                    a.delete()
+            except: pass
+        return super(ModerationView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(ModerationView, self).get_context_data(**kwargs)
-        kwargs['pictures'] = Picture.objects.filter(is_moderated=False, is_in_sas=True).order_by('id')
+        kwargs['albums_to_moderate'] = Album.objects.filter(is_moderated=False, is_in_sas=True,
+                is_folder=True).order_by('id')
+        kwargs['pictures'] = Picture.objects.filter(is_moderated=False, is_in_sas=True, is_folder=False)
+        kwargs['albums'] = Album.objects.filter(id__in=kwargs['pictures'].values('parent').distinct('parent'))
         return kwargs
 
 class PictureEditForm(forms.ModelForm):
@@ -224,8 +228,9 @@ class PictureEditForm(forms.ModelForm):
 class AlbumEditForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields=['name', 'file', 'parent']
+        fields=['name', 'file', 'parent', 'edit_groups']
     parent = make_ajax_field(Album, 'parent', 'files', help_text="")
+    edit_groups = make_ajax_field(Album, 'edit_groups', 'groups', help_text="")
 
 class PictureEditView(CanEditMixin, UpdateView):
     model=Picture
