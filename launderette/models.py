@@ -127,6 +127,9 @@ class Slot(models.Model):
         verbose_name = _('Slot')
         ordering = ['start_date']
 
+    def is_owned_by(self, user):
+        return user == self.user
+
     def __str__(self):
         return "User: %s - Date: %s - Type: %s - Machine: %s - Token: %s" % (self.user, self.start_date, self.get_type_display(),
                 self.machine.name, self.token)

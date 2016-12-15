@@ -5,6 +5,7 @@ from launderette.views import *
 urlpatterns = [
     # views
     url(r'^$', LaunderetteMainView.as_view(), name='launderette_main'),
+    url(r'^slot/(?P<slot_id>[0-9]+)/delete$', SlotDeleteView.as_view(), name='delete_slot'),
     url(r'^book$', LaunderetteBookMainView.as_view(), name='book_main'),
     url(r'^book/(?P<launderette_id>[0-9]+)$', LaunderetteBookView.as_view(), name='book_slot'),
     url(r'^(?P<launderette_id>[0-9]+)/click$', LaunderetteMainClickView.as_view(), name='main_click'),

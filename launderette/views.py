@@ -113,6 +113,16 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                     kwargs['planning'][date].append(None)
         return kwargs
 
+class SlotDeleteView(CanEditPropMixin, DeleteView):
+    """Delete a slot"""
+    model = Slot
+    pk_url_kwarg = "slot_id"
+    template_name = 'core/delete_confirm.jinja'
+
+    def get_success_url(self):
+        return self.request.user.get_absolute_url()
+
+
 # For admins
 
 class LaunderetteListView(CanEditPropMixin, ListView):
