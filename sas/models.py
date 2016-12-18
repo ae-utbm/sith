@@ -111,6 +111,14 @@ class Album(SithFile):
     def get_download_url(self):
         return reverse('sas:download', kwargs={'picture_id': self.id})
 
+    def generate_thumbnail(self):
+        p = self.children_pictures.order_by('?').first() or self.children_albums.exclude(file=None).exclude(file="").order_by('?').first()
+        if p and p.file:
+            im = Image.open(BytesIO(p.file.read()))
+            self.file = resize_image(im, 200, "jpeg")
+            self.file.name = self.name + '/thumb.jpg'
+            self.save()
+
 class PeoplePictureRelation(models.Model):
     """
     The PeoplePictureRelation class makes the connection between User and Picture

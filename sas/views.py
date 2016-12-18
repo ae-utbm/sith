@@ -162,6 +162,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        self.object.generate_thumbnail()
         self.form = self.get_form()
         if 'clipboard' not in request.session.keys():
             request.session['clipboard'] = []
