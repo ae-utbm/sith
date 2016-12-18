@@ -1,5 +1,4 @@
 {% extends "core/base.jinja" %}
-{% from "core/macros.jinja" import user_link_with_pict, delete_godfather %}
 
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s pictures{% endtrans %}
@@ -23,7 +22,7 @@
     {%- endif %}
         <div class="picture">
             <a href="{{ url("sas:picture", picture_id=r.picture.id) }}#pict">
-                <img src="{{ r.picture.as_picture.get_download_thumb_url() }}" alt="{{ r.picture.get_display_name() }}" style="max-width: 100%"/>
+                <img src="{{ r.picture.get_download_thumb_url() }}" alt="{{ r.picture.get_display_name() }}" style="max-width: 100%"/>
             </a>
         </div>
 {%- endfor %}

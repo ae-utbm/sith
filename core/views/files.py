@@ -16,6 +16,8 @@ from django import forms
 
 import os
 
+from ajax_select import make_ajax_form, make_ajax_field
+
 from core.models import SithFile, RealGroup, Notification
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, can_view, not_found
 from counter.models import Counter
@@ -111,12 +113,21 @@ class FileEditView(CanEditMixin, UpdateView):
             kwargs['popup'] = 'popup'
         return kwargs
 
+class FileEditPropForm(forms.ModelForm):
+    class Meta:
+        model = SithFile
+        fields = ['parent', 'owner', 'edit_groups', 'view_groups']
+    parent = make_ajax_field(SithFile, 'parent', 'files', help_text="")
+    edit_groups = make_ajax_field(SithFile, 'edit_groups', 'groups', help_text="")
+    view_groups = make_ajax_field(SithFile, 'view_groups', 'groups', help_text="")
+
+
 class FileEditPropView(CanEditPropMixin, UpdateView):
     model = SithFile
     pk_url_kwarg = "file_id"
     template_name = 'core/file_edit.jinja'
     context_object_name = "file"
-    fields = ['parent', 'owner', 'edit_groups', 'view_groups']
+    form_class = FileEditPropForm
 
     def get_form(self, form_class=None):
         form = super(FileEditPropView, self).get_form(form_class)
