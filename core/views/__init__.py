@@ -62,6 +62,7 @@ class CanEditPropMixin(View):
             self.object = self.get_object()
             if can_edit_prop(self.object, request.user):
                 return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
+            return forbidden(request)
         except: pass
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_edit_prop(o, request.user)]
@@ -83,6 +84,7 @@ class CanEditMixin(View):
             self.object = self.get_object()
             if can_edit(self.object, request.user):
                 return super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
+            return forbidden(request)
         except: pass
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_edit(o, request.user)]
@@ -104,6 +106,7 @@ class CanViewMixin(View):
             self.object = self.get_object()
             if can_view(self.object, request.user):
                 return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
+            return forbidden(request)
         except: pass
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_view(o, request.user)]
