@@ -162,7 +162,8 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.generate_thumbnail()
+        if not self.object.file:
+            self.object.generate_thumbnail()
         self.form = self.get_form()
         if 'clipboard' not in request.session.keys():
             request.session['clipboard'] = []
@@ -232,6 +233,7 @@ class AlbumEditForm(forms.ModelForm):
         fields=['name', 'file', 'parent', 'edit_groups']
     parent = make_ajax_field(Album, 'parent', 'files', help_text="")
     edit_groups = make_ajax_field(Album, 'edit_groups', 'groups', help_text="")
+    recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 
 class PictureEditView(CanEditMixin, UpdateView):
     model=Picture
@@ -245,3 +247,8 @@ class AlbumEditView(CanEditMixin, UpdateView):
     template_name='core/edit.jinja'
     pk_url_kwarg = "album_id"
 
+    def form_valid(self, form):
+        ret = super(AlbumEditView, self).form_valid(form)
+        if form.cleaned_data['recursive']:
+            self.object.apply_rights_recursively(True)
+        return ret
