@@ -16,6 +16,7 @@
 <a href="{{ url('sas:main') }}">SAS</a> > {{ print_path(album.parent) }} {{ album.get_display_name() }}
 <h3>{{ album.get_display_name() }}</h3>
 <a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a><br>
+{{ timezone.now() }}
 <hr>
 {% set edit_mode = user.can_edit(album) %}
 {% if edit_mode %}
@@ -38,19 +39,17 @@
     {% endif %}
 {% endif %}
     <div>
-        {% for a in album.children.filter(is_folder=True).order_by('-id') %}
+        {% for a in album.children_albums.order_by('-id') %}
         <div style="display: inline-block;">
         {% if edit_mode %}
         <input type="checkbox" name="file_list" value="{{ a.id }}">
         {% endif %}
-        {% if user.can_view(a.as_album) %}
+        {% if user.can_view(a) %}
         <a href="{{ url("sas:album", album_id=a.id) }}" style="display: inline-block">
             <div class="album{% if not a.is_moderated %} not_moderated{% endif %}">
             <div>
             {% if a.file %}
-            <img src="{{ a.as_picture.get_download_url() }}" alt="{% trans %}preview{% endtrans %}">
-            {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
-            <img src="{{ a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() }}" alt="{% trans %}preview{% endtrans %}">
+            <img src="{{ a.get_download_url() }}" alt="{% trans %}preview{% endtrans %}">
             {% else %}
             <img src="{{ static('core/img/sas.jpg') }}" alt="{% trans %}preview{% endtrans %}">
             {% endif %}
@@ -63,15 +62,15 @@
         {% endfor %}
     </div>
     <div>
-        {% for p in album.children.filter(is_folder=False).order_by('id') %}
+        {% for p in album.children_pictures.order_by('id') %}
         <div style="display: inline-block;">
         {% if edit_mode %}
         <input type="checkbox" name="file_list" value="{{ p.id }}">
         {% endif %}
-        {% if user.can_view(p.as_picture) %}
+        {% if user.can_view(p) %}
         <div class="picture{% if not p.is_moderated %} not_moderated{% endif %}">
             <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
-                <img src="{{ p.as_picture.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" />
+                <img src="{{ p.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" />
             </a>
         </div>
         {% endif %}
@@ -86,6 +85,7 @@
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Upload{% endtrans %}" /></p>
 </form>
+{{ timezone.now() }}
 {% endblock %}
 
 {% block script %}
