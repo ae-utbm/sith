@@ -1092,6 +1092,13 @@ class EticketPDFView(CanViewMixin, DetailView):
         renderPDF.draw(d, p, 10.5 * cm - 130, 6.1 * cm)
         p.drawCentredString(10.5 * cm, 6 * cm, code)
 
+        partners = ImageReader("core/static/core/img/partners.png")
+        width, height = partners.getSize()
+        size = max(width, height)
+        width = width * 2 / 3
+        height = height * 2 / 3
+        p.drawImage(partners, 0 * cm, 0 * cm, width, height)
+
         p.showPage()
         p.save()
         return response
