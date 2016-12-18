@@ -18,6 +18,7 @@ import os
 
 from core.models import SithFile, RealGroup, Notification
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, can_view, not_found
+from counter.models import Counter
 
 def send_file(request, file_id, file_class=SithFile, file_attr="file"):
     """
@@ -28,7 +29,6 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
     f = file_class.objects.filter(id=file_id).first()
     if f is None or not f.file:
         return not_found(request)
-    from counter.models import Counter
     if not (can_view(f, request.user) or
             ('counter_token' in request.session.keys() and
                 request.session['counter_token'] and # check if not null for counters that have no token set

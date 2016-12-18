@@ -17,7 +17,8 @@
 <h3>{{ album.get_display_name() }}</h3>
 <a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a><br>
 <hr>
-{% if user.can_edit(album) %}
+{% set edit_mode = user.can_edit(album) %}
+{% if edit_mode %}
 <form action="" method="post" enctype="multipart/form-data" style="width: 100%;">
     {% csrf_token %}
     <p>
@@ -39,7 +40,7 @@
     <div>
         {% for a in album.children.filter(is_folder=True).order_by('-id') %}
         <div style="display: inline-block;">
-        {% if user.can_edit(album) %}
+        {% if edit_mode %}
         <input type="checkbox" name="file_list" value="{{ a.id }}">
         {% endif %}
         {% if user.can_view(a.as_album) %}
@@ -64,7 +65,7 @@
     <div>
         {% for p in album.children.filter(is_folder=False).order_by('id') %}
         <div style="display: inline-block;">
-        {% if user.can_edit(album) %}
+        {% if edit_mode %}
         <input type="checkbox" name="file_list" value="{{ p.id }}">
         {% endif %}
         {% if user.can_view(p.as_picture) %}
@@ -77,7 +78,7 @@
         </div>
         {% endfor %}
     </div>
-{% if user.can_edit(album) %}
+{% if edit_mode %}
 </form>
 {% endif %}
 <form action="" method="post" enctype="multipart/form-data">

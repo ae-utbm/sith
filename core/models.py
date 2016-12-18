@@ -385,7 +385,7 @@ class User(AbstractBaseUser):
         """
         Determine if the object can be edited by the user
         """
-        if self.is_owner(obj):
+        if hasattr(obj, "can_be_edited_by") and obj.can_be_edited_by(self):
             return True
         if hasattr(obj, "edit_groups"):
             for g in obj.edit_groups.all():
@@ -393,7 +393,7 @@ class User(AbstractBaseUser):
                     return True
         if isinstance(obj, User) and obj == self:
             return True
-        if hasattr(obj, "can_be_edited_by") and obj.can_be_edited_by(self):
+        if self.is_owner(obj):
             return True
         return False
 
@@ -401,13 +401,13 @@ class User(AbstractBaseUser):
         """
         Determine if the object can be viewed by the user
         """
-        if self.can_edit(obj):
+        if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
             return True
         if hasattr(obj, "view_groups"):
             for g in obj.view_groups.all():
                 if self.is_in_group(g.name):
                     return True
-        if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
+        if self.can_edit(obj):
             return True
         return False
 
