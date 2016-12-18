@@ -382,6 +382,7 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.drawString(90, height - 100, _("Financial proof: ") + "OP%010d" % (id_op)) #Justificatif du libellé
         p.drawString(90, height - 130, _("Club: %(club_name)s") % ({"club_name": club_name}))
         p.drawString(90, height - 160, _("Label: %(op_label)s") % {"op_label": op_label if op_label != None else ""})
+        p.drawString(90, height - 190, _("Date: %(date)s") % {"date": date})
 
         data = []
 
@@ -418,6 +419,17 @@ class OperationPDFView(CanViewMixin, DetailView):
                         ('ALIGN', (-2, -1), (-1, -1), 'LEFT'),
                         ('BOX', (0,0), (-1,-1), 0.25, colors.black),
                         ]))
+
+        signature = []
+        signature += [[_("Signature:")]]
+
+        tSig = Table(signature, colWidths=[(width-90*2)], rowHeights=[80])
+        tSig.setStyle(TableStyle([
+            ('VALIGN',(0,0),(-1,-1),'TOP'),
+            ('BOX', (0,0), (-1,-1), 0.25, colors.black)]))
+
+        w, h = tSig.wrapOn(p, 0, 0)
+        tSig.drawOn(p, 90, 200)
 
         w, h = t.wrapOn(p, 0, 0)
 
