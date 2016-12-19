@@ -163,8 +163,7 @@ class Counter(models.Model):
     def can_be_viewed_by(self, user):
         if self.type == "BAR" or self.type == "EBOUTIC":
             return True
-        sub = request.user
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or sub in self.sellers
+        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user in self.sellers
 
     def gen_token(self):
         """Generate a new token for this counter"""
