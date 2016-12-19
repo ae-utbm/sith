@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from datetime import timedelta
-from core.models import User
+from core.models import User, Group
 
 
 class Election(models.Model):
@@ -17,6 +17,11 @@ class Election(models.Model):
     end_candidature = models.DateTimeField(_('end candidature'), blank=False)
     start_date = models.DateTimeField(_('start date'), blank=False)
     end_date = models.DateTimeField(_('end date'), blank=False)
+
+    edit_groups = models.ManyToManyField(Group, related_name="editable_election", verbose_name=_("edit group"), blank=True)
+    view_groups = models.ManyToManyField(Group, related_name="viewable_election", verbose_name=_("view group"), blank=True)
+    vote_group = models.ManyToManyField(Group, related_name="votable_election", verbose_name=_("vote group"), blank=True)
+    candidature_group = models.ManyToManyField(Group, related_name="candidate_election", verbose_name=_("candidature group"), blank=True)
 
     def __str__(self):
         return self.title
@@ -38,11 +43,7 @@ class Election(models.Model):
     def get_results(self):
         pass
 
-    def can_view(self, obj):
-        return True
-
-    def can_be_viewed_by(self, user):
-        return True
+    # Permissions
 
 
 class Role(models.Model):
@@ -53,6 +54,7 @@ class Role(models.Model):
     title = models.CharField(_('title'), max_length=255)
     description = models.TextField(_('description'), null=True, blank=True)
     has_voted = models.ManyToManyField(User, verbose_name=('has voted'), related_name='has_voted')
+    max_choice = models.IntegerField(_('max choice'), default=1)
 
     def __str__(self):
         return ("%s : %s") % (self.election.title, self.title)

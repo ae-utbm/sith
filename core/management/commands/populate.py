@@ -363,7 +363,15 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                 operation.save()
 
             # Create an election
+            public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
+            subscriber_group = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)
+            ae_board_gorup = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
             el = Election(title="Élection 2017", description="La roue tourne", start_candidature='1942-06-12 10:28:45', end_candidature='2042-06-12 10:28:45',start_date='1942-06-12 10:28:45', end_date='7942-06-12 10:28:45')
+            el.save()
+            el.view_groups.add(public_group)
+            el.edit_groups.add(ae_board_gorup)
+            el.candidature_group.add(subscriber_group)
+            el.vote_group.add(subscriber_group)
             el.save()
             liste = ElectionList(title="Candidature Libre", election=el)
             liste.save()
