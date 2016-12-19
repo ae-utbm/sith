@@ -44,14 +44,18 @@ class Picture(SithFile):
     def get_absolute_url(self):
         return reverse('sas:picture', kwargs={'picture_id': self.id})
 
-    def generate_thumbnails(self):
+    def generate_thumbnails(self, overwrite=False):
         im = Image.open(BytesIO(self.file.read()))
         try:
             im = exif_auto_rotate(im)
         except: pass
         file = resize_image(im, max(im.size), self.mime_type.split('/')[-1])
         thumb = resize_image(im, 200, self.mime_type.split('/')[-1])
-        compressed = resize_image(im, 600, self.mime_type.split('/')[-1])
+        compressed = resize_image(im, 1200, self.mime_type.split('/')[-1])
+        if overwrite:
+            self.file.delete()
+            self.thumbnail.delete()
+            self.compressed.delete()
         self.file = file
         self.file.name = self.name
         self.thumbnail = thumb
