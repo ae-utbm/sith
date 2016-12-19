@@ -253,6 +253,9 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             troll = Club(name="Troll Penché", unix_name="troll",
                     address="Terre Du Milieu", parent=main_club)
             troll.save()
+            refound = Club(name="Carte AE", unix_name="carte_ae",
+                    address="Jamais imprimée", parent=main_club)
+            refound.save()
 
             # Counters
             Customer(user=skia, account_id="6568j", amount=0).save()
@@ -273,6 +276,12 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             mde.products.add(barb)
             mde.products.add(cble)
             mde.save()
+
+            refound_counter = Counter(name="Carte AE", club=refound, type='OFFICE')
+            refound_counter.save()
+            refound_product = Product(name="remboursement", code="REMBOURS", purchase_price="0", selling_price="0",
+                    special_selling_price="0", club=refound)
+            refound_product.save()
 
             # Accounting test values:
             BankAccount(name="AE TG", club=main_club).save()
@@ -295,4 +304,3 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     target_id=bar_club.id).save()
             woenzco = Company(name="Woenzel & co")
             woenzco.save()
-

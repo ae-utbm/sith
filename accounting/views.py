@@ -19,7 +19,7 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from core.views.forms import SelectFile, SelectDate
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
-from counter.models import Counter, Selling
+from counter.models import Counter, Selling, Product
 
 # Main accounting view
 
@@ -367,11 +367,11 @@ class OperationPDFView(CanViewMixin, DetailView):
         im = ImageReader("core/static/core/img/logo.jpg")
         iw, ih = im.getSize()
         p.drawImage(im, 40, height - 50, width=iw/2, height=ih/2)
-
+ 
         labelStr = [["%s %s - %s %s" % (_("Journal"), ti, _("Operation"), num)]]
 
         label = Table(labelStr, colWidths=[150], rowHeights=[20])
-
+        
         label.setStyle(TableStyle([
                                 ('ALIGN',(0,0),(-1,-1),'CENTER'),
                                 ('BOX', (0,0), (-1,-1), 0.25, colors.black),
@@ -385,11 +385,11 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.drawString(90, height - 190, _("Date: %(date)s") % {"date": date})
 
         data = []
-
+        
         data += [["%s" % (_("Credit").upper() if nature == 'CREDIT' else _("Debit").upper())]]
 
         data += [[_("Amount: %(amount).2f €") % {"amount": amount}]]
-
+        
         payment_mode = ""
         for m in settings.SITH_ACCOUNTING_PAYMENT_METHOD:
             if m[0] == mode:
@@ -399,11 +399,11 @@ class OperationPDFView(CanViewMixin, DetailView):
             payment_mode += " %s\n" %(m[1])
 
         data += [[payment_mode]]
-
+        
         data += [["%s : %s" % (_("Debtor") if nature == 'CREDIT' else _("Creditor"), target), ""]]
 
         data += [["%s \n%s" % (_("Comment:"), remark)]]
-
+        
         t = Table(data, colWidths=[(width-90*2)/2]*2, rowHeights=[20, 20, 70, 20, 80])
         t.setStyle(TableStyle([
                         ('ALIGN',(0,0),(-1,-1),'CENTER'),
@@ -536,11 +536,11 @@ class RefoundAccountView(FormView):
     def create_selling(self):
         with transaction.atomic():
             uprice = self.customer.customer.amount
-            main_club_counter = Counter.objects.filter(club__unix_name=settings.SITH_MAIN_CLUB['unix_name'],
-                                                       type='OFFICE').first()
-            main_club = main_club_counter.club
+            refound_club_counter = Counter.objects.get(id=settings.SITH_COUNTER_REFOUND_ID)
+            refound_club = refound_club_counter.club
             s = Selling(label=_('Refound account'), unit_price=uprice,
                         quantity=1, seller=self.operator,
                         customer=self.customer.customer,
-                        club=main_club, counter=main_club_counter)
+                        club=refound_club, counter=refound_club_counter,
+                        product=Product.objects.get(id=settings.SITH_PRODUCT_REFOUND_ID))
             s.save()
