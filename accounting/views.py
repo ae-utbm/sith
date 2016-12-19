@@ -446,6 +446,10 @@ class OperationPDFView(CanViewMixin, DetailView):
 
 # Company views
 
+class CompanyListView(CanViewMixin, ListView):
+    model = Company
+    template_name = 'accounting/co_list.jinja'
+
 class CompanyCreateView(CanCreateMixin, CreateView):
     """
     Create a company
@@ -453,6 +457,8 @@ class CompanyCreateView(CanCreateMixin, CreateView):
     model = Company
     fields = ['name']
     template_name = 'core/create.jinja'
+    success_url = reverse_lazy('accounting:co_list')
+
 
 class CompanyEditView(CanCreateMixin, UpdateView):
     """
@@ -462,6 +468,7 @@ class CompanyEditView(CanCreateMixin, UpdateView):
     pk_url_kwarg = "co_id"
     fields = ['name']
     template_name = 'core/edit.jinja'
+    success_url = reverse_lazy('accounting:co_list')
 
 # Label views
 
