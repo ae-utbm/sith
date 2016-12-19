@@ -15,7 +15,8 @@ from club.models import Club, Membership
 from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
 from com.models import Sith
-from election.models import Election, Role, Candidature, List
+from election.models import Election, Role, Candidature, ElectionList
+
 
 class Command(BaseCommand):
     help = "Populate a new instance of the Sith AE"
@@ -364,20 +365,20 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             # Create an election
             el = Election(title="Élection 2017", description="La roue tourne", start_candidature='1942-06-12 10:28:45', end_candidature='2042-06-12 10:28:45',start_date='1942-06-12 10:28:45', end_date='7942-06-12 10:28:45')
             el.save()
-            liste = List(title="Candidature Libre", election=el)
+            liste = ElectionList(title="Candidature Libre", election=el)
             liste.save()
-            listeT = List(title="Troll", election=el)
+            listeT = ElectionList(title="Troll", election=el)
             listeT.save()
             pres = Role(election=el, title="Président AE", description="Roi de l'AE")
             pres.save()
             resp = Role(election=el, title="Co Respo Info", description="Ghetto++")
             resp.save()
-            cand = Candidature(role=resp, user=skia, liste=liste, program="Refesons le site AE")
+            cand = Candidature(role=resp, user=skia, election_list=liste, program="Refesons le site AE")
             cand.save()
-            cand = Candidature(role=resp, user=sli, liste=liste, program="Vasy je deviens mon propre adjoint")
+            cand = Candidature(role=resp, user=sli, election_list=liste, program="Vasy je deviens mon propre adjoint")
             cand.save()
-            cand = Candidature(role=resp, user=krophil, liste=listeT, program="Le Pôle Troll !")
+            cand = Candidature(role=resp, user=krophil, election_list=listeT, program="Le Pôle Troll !")
             cand.save()
-            cand = Candidature(role=pres, user=sli, liste=listeT, program="En fait j'aime pas l'info, je voulais faire GMC")
+            cand = Candidature(role=pres, user=sli, election_list=listeT, program="En fait j'aime pas l'info, je voulais faire GMC")
             cand.save()
 

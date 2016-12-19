@@ -13,8 +13,8 @@
 	<p>{% trans %}End :{% endtrans %} {{object.end_date}}</p>
 	<table>
 		<tr>
-		{% set nb_list = object.list.all().count() + 1 -%}
-		{% for liste in object.list.all() %}
+		{% set nb_list = object.election_list.all().count() + 1 -%}
+		{% for liste in object.election_list.all() %}
 			<td>{{liste.title}}</td>
 			{% set nb_list = nb_list + 1 -%}
 		{% endfor %}
@@ -23,15 +23,18 @@
 	{% for role in object.role.all() %}
 		<tr><td colspan={{nb_list}}>{{role.title}}</td></tr>
 		<tr>
-			{% for liste in object.list.all() %}
+			{% for liste in object.election_list.all() %}
 			<td>
 				<ul>
-				{% for candidature in role.candidature.filter(liste=liste) %}
+				{% for candidature in role.candidature.filter(election_list=liste) %}
 				<li>
 					{{candidature.user.first_name}} {{candidature.user.last_name}} {{candidature.user.nick_name or ''}}
 					{% if candidature.user.profile_pict %}
+					<br>
 						<img src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
 					{% endif %}
+					<br>
+					{{candidature.program or ''}}
 				</li>
 				{% endfor %}
 				</ul>

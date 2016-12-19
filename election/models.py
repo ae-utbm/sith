@@ -38,6 +38,12 @@ class Election(models.Model):
     def get_results(self):
         pass
 
+    def can_view(self, obj):
+        return True
+
+    def can_be_viewed_by(self, user):
+        return True
+
 
 class Role(models.Model):
     """
@@ -52,12 +58,12 @@ class Role(models.Model):
         return ("%s : %s") % (self.election.title, self.title)
 
 
-class List(models.Model):
+class ElectionList(models.Model):
     """
     To allow per list vote
     """
     title = models.CharField(_('title'), max_length=255)
-    election = models.ForeignKey(Election, related_name='list', verbose_name=_("election"))
+    election = models.ForeignKey(Election, related_name='election_list', verbose_name=_("election"))
 
 
 class Candidature(models.Model):
@@ -67,7 +73,7 @@ class Candidature(models.Model):
     role = models.ForeignKey(Role, related_name='candidature', verbose_name=_("role"))
     user = models.ForeignKey(User, verbose_name=_('user'), related_name='candidate', blank=True)
     program = models.TextField(_('description'), null=True, blank=True)
-    liste = models.ForeignKey(List, related_name='candidature', verbose_name=_('list'))
+    election_list = models.ForeignKey(ElectionList, related_name='candidature', verbose_name=_('election_list'))
 
 
 class Vote(models.Model):
