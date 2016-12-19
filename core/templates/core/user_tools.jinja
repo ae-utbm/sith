@@ -85,6 +85,12 @@
     <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
     {% endfor %}
 </ul>
+<hr>
+<h4>{% trans %}Elections{% endtrans %}</h4>
+<ul>
+    <li><a href="{{ url('election:list') }}">{% trans %}Vote{% endtrans %}</a></li>
+    <li><a href="">{% trans %}Candidate{% endtrans %}</a></li>
+</ul>
 
 {% endblock %}
 

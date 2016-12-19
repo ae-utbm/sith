@@ -46,6 +46,7 @@ class Role(models.Model):
     election = models.ForeignKey(Election, related_name='role', verbose_name=_("election"))
     title = models.CharField(_('title'), max_length=255)
     description = models.TextField(_('description'), null=True, blank=True)
+    has_voted = models.ManyToManyField(User, verbose_name=('has voted'), related_name='has_voted')
 
     def __str__(self):
         return ("%s : %s") % (self.election.title, self.title)
@@ -66,7 +67,6 @@ class Candidature(models.Model):
     role = models.ForeignKey(Role, related_name='candidature', verbose_name=_("role"))
     user = models.ForeignKey(User, verbose_name=_('user'), related_name='candidate', blank=True)
     program = models.TextField(_('description'), null=True, blank=True)
-    has_voted = models.ManyToManyField(User, verbose_name=_('has_voted'), related_name='has_voted')
     liste = models.ForeignKey(List, related_name='candidature', verbose_name=_('list'))
 
 

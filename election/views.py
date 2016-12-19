@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.conf import settings
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
@@ -17,6 +18,12 @@ class ElectionsListView(CanViewMixin, ListView):
     """
     model = Election
     template_name = 'election/election_list.jinja'
+
+    def get_queryset(self):
+        qs = super(ElectionsListView, self).get_queryset()
+        today = timezone.now()
+        qs = qs.filter(end_date__gte=today, start_date__lte=today)
+        return qs
 
 
 class ElectionDetailView(CanViewMixin, DetailView):

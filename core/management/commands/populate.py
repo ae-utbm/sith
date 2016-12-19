@@ -318,8 +318,22 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             sli.save()
             skia.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             sli.save()
+            # Adding user Krophil
+            krophil = User(username='krophil', last_name="Phil'", first_name="Kro",
+                           email="krophil@git.an",
+                           date_of_birth="1942-06-12")
+            krophil.set_password("plop")
+            krophil.save()
             ## Adding subscription for sli
             s = Subscription(member=User.objects.filter(pk=sli.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                    start=s.subscription_start)
+            s.save()
+            ## Adding subscription for Krophil
+            s = Subscription(member=User.objects.filter(pk=krophil.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -352,8 +366,18 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             el.save()
             liste = List(title="Candidature Libre", election=el)
             liste.save()
+            listeT = List(title="Troll", election=el)
+            listeT.save()
+            pres = Role(election=el, title="Président AE", description="Roi de l'AE")
+            pres.save()
             resp = Role(election=el, title="Co Respo Info", description="Ghetto++")
             resp.save()
             cand = Candidature(role=resp, user=skia, liste=liste, program="Refesons le site AE")
+            cand.save()
+            cand = Candidature(role=resp, user=sli, liste=liste, program="Vasy je deviens mon propre adjoint")
+            cand.save()
+            cand = Candidature(role=resp, user=krophil, liste=listeT, program="Le Pôle Troll !")
+            cand.save()
+            cand = Candidature(role=pres, user=sli, liste=listeT, program="En fait j'aime pas l'info, je voulais faire GMC")
             cand.save()
 

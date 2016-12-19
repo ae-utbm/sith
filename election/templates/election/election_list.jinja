@@ -6,8 +6,6 @@
 
 {% block content %}
 	{% for el in object_list %}
-		{% if el.is_active %}
-			<p><a href="{{ url('election:detail', election_id=el.id) }}">{{el}}</a></p>
-		{% endif %}
+		<p><a href="{{ url('election:detail', election_id=el.id) }}">{{el}}</a></p>
 	{% endfor %}
 {% endblock %}

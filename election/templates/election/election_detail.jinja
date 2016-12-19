@@ -11,17 +11,34 @@
 	<h1>{{object.title}}</h1>
 	<p>{{object.description}}</p>
 	<p>{% trans %}End :{% endtrans %} {{object.end_date}}</p>
-	{% for role in object.role.all() %}
-		<h2>{{role.title}}</h2>
-		{% for candidature in role.candidature.all() %}
-			<a href="{{url('core:user_profile', user_id=candidature.user.id)}}"><h3>{{candidature.user.first_name}} {{candidature.user.last_name}} ({{candidature.user.nick_name}})</h3></a>
-			{% if candidature.user.profile_pict %}
-				<p><img src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}"/></p>
-			{% endif %}
-			{% if candidature.program %}
-				<h4>Programme</h4>
-				<p>{{candidature.program}}</p>
-			{% endif %}
+	<table>
+		<tr>
+		{% set nb_list = object.list.all().count() + 1 -%}
+		{% for liste in object.list.all() %}
+			<td>{{liste.title}}</td>
+			{% set nb_list = nb_list + 1 -%}
 		{% endfor %}
+		<td>{% trans %}Blank vote{% endtrans %}</td>
+		</tr>
+	{% for role in object.role.all() %}
+		<tr><td colspan={{nb_list}}>{{role.title}}</td></tr>
+		<tr>
+			{% for liste in object.list.all() %}
+			<td>
+				<ul>
+				{% for candidature in role.candidature.filter(liste=liste) %}
+				<li>
+					{{candidature.user.first_name}} {{candidature.user.last_name}} {{candidature.user.nick_name or ''}}
+					{% if candidature.user.profile_pict %}
+						<img src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
+					{% endif %}
+				</li>
+				{% endfor %}
+				</ul>
+			</td>
+			{% endfor %}
+			<td></td>
+		</tr>
 	{% endfor %}
+	</table>
 {% endblock %}
