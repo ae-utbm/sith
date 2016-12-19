@@ -10,6 +10,8 @@ import os
 import json
 from itertools import chain
 
+from haystack.query import SearchQuerySet
+
 from core.models import User, Notification
 from club.models import Club
 
@@ -34,24 +36,8 @@ def notification(request, notif_id):
     return redirect("/")
 
 def search_user(query, as_json=False):
-    users = []
-    if query:
-        exact_nick = User.objects.filter(nick_name__iexact=query).all()
-        nicks = User.objects.filter(nick_name__icontains=query).exclude(id__in=exact_nick).all()
-        users = User.objects.filter(Q(first_name__icontains=query) |
-                Q(last_name__icontains=query)).exclude(id__in=exact_nick).exclude(id__in=nicks).all()
-        nicks = nicks[:5]
-        users = users[:50]
-        if as_json: # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
-            exact_nick = json.loads(serializers.serialize('json', exact_nick, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
-            nicks = json.loads(serializers.serialize('json', nicks, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
-            users = json.loads(serializers.serialize('json', users, fields=('nick_name', 'last_name', 'first_name', 'profile_pict')))
-        else:
-            exact_nick = list(exact_nick)
-            nicks = list(nicks)
-            users = list(users)
-        users = exact_nick + nicks + users
-    return users
+    res = SearchQuerySet().models(User).filter(text=query).filter_or(text__contains=query)[:20]
+    return [r.object for r in res]
 
 def search_club(query, as_json=False):
     clubs = []

@@ -13,7 +13,3 @@ class UserIndex(indexes.SearchIndex, indexes.Indexable):
         """Used when the entire index for model is updated."""
         return self.get_model().objects.all()
 
-    def prepare(self, obj):
-        ret = super(UserIndex, self).prepare(obj)
-        print(ret)
-        return ret

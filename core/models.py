@@ -613,7 +613,6 @@ class SithFile(models.Model):
             self.copy_rights()
 
     def apply_rights_recursively(self, only_folders=False):
-        print(self)
         children = self.children.all()
         if only_folders:
             children = children.filter(is_folder=True)
