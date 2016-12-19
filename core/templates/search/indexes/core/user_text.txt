@@ -1,0 +1,3 @@
+{{ object.get_display_name|safe }}
+{{ object.get_display_name|safe|slugify }}
+{{ object.get_display_name|safe|slugify|cut:"-" }}

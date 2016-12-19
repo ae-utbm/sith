@@ -190,7 +190,7 @@ class User(AbstractBaseUser):
         return reverse('core:user_profile', kwargs={'user_id': self.pk})
 
     def __str__(self):
-        return self.username
+        return self.get_display_name()
 
     def to_dict(self):
         return self.__dict__

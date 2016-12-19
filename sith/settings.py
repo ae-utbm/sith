@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'django_jinja',
     'rest_framework',
     'ajax_select',
+    'haystack',
     'core',
     'club',
     'subscription',
@@ -141,6 +142,13 @@ TEMPLATES = [
         },
     },
 ]
+
+HAYSTACK_CONNECTIONS = {
+        'default': {
+            'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+            'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
+            },
+        }
 
 WSGI_APPLICATION = 'sith.wsgi.application'
 

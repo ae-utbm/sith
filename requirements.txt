@@ -9,5 +9,7 @@ djangorestframework
 django-phonenumber-field
 django-ajax-selects
 reportlab
+django-haystack
+whoosh
 # mysqlclient
 
