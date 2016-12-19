@@ -1,0 +1,33 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}General journal:{% endtrans %} {{ object.name }}
+{% endblock %}
+
+
+{% block content %}
+	<h2>{% trans %}Accounting bilan: {% endtrans %} {{ object.name }}</h2>
+
+	<h3>{% trans %}Credit{% endtrans %}</h3>
+
+	<table>
+        <thead>
+        <tr>
+            <td>{% trans %}Type of operations{% endtrans %}</td>
+            <td>{% trans %}Sum{% endtrans %}</td>
+        </tr>
+        </thead>
+        <tbody>
+            {% for key in bilan.keys() %}
+                <tr>
+                    <td>{{ key }}</td>
+                	<td>{{bilan[key]}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    <p>Total : {{total_credit}}</p>
+
+{% endblock %}

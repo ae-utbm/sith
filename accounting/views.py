@@ -545,41 +545,38 @@ class JournalBilanAccountingView(CanViewMixin, DetailView):
     pk_url_kwarg = "j_id"
     template_name='accounting/journal_bilan_accounting.jinja'
 
-    def sum_by_code(self, target_id):
-        from decimal import Decimal
-        from django.db.models import Sum, DecimalField
-        amount_sum = Decimal(0)
-        print(self.object.operations.filter(
-            target_id=target_id).values('amount').annotate(
-            sum = Sum('amount')).values('sum').first()['sum'])
-        return(self.object.operations.filter(
-            target_id=target_id).values('amount').annotate(
-            sum = Sum('amount')).values('sum').first()['sum'])
+    def recursive_sum(self, code, bilan):
+        op = Operation.objects.filter(accounting_type__code__startswith=code)
 
-    def bilan_credit(self):
+        if op.exists():
+            for o in op :
+                if o.accounting_type.code in bilan :
+                        bilan[o.accounting_type.code]+=o.amount
+                else:
+                    bilan[o.accounting_type.code]=o.amount
+                
+                if o.number == code :
+                    self.recursive_sum(o.accounting_type.code, bilan)
+        else:
+            return bilan
 
+
+    def bilan(self):
         bilan = {}
-        for el in Operation.objects.filter(accounting_type__movement_type='CREDIT'):
-            bilan[el.target] = self.sum_by_code(el.target_id)
-        return bilan
-
-    def bilan_debit(self):
-        bilan = {}
-        for el in Operation.objects.filter(accounting_type__movement_type='DEBIT'):
-            bilan[el.target] = self.sum_by_code(el.target_id)
+        self.recursive_sum('6', bilan)
+        print(bilan)
         return bilan
 
     def total_credit(self):
-        return sum(self.bilan_credit().values())
+        return sum(self.bilan().values())
 
     def total_debit(self):
-        return sum(self.bilan_debit().values())
+        return sum(self.bilan().values())
 
     def get_context_data(self, **kwargs):
         """ Add journal to the context """
         kwargs = super(JournalBilanAccountingView, self).get_context_data(**kwargs)
-        kwargs['bilan_credit'] = self.bilan_credit()
-        kwargs['bilan_debit'] = self.bilan_debit()
+        kwargs['bilan'] = self.bilan()
         kwargs['total_credit'] = self.total_credit()
         kwargs['total_debit'] = self.total_debit()
         return kwargs
