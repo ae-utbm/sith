@@ -3,11 +3,24 @@ from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.utils.translation import ugettext_lazy as _
+from django.forms.models import modelform_factory
+from django.forms import CheckboxSelectMultiple
 from django.utils import timezone
 from django.conf import settings
+from django import forms
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from core.views.forms import SelectDateTime
+from core.widgets import ChoiceWithOtherField
 from election.models import Election, Role, Candidature
+
+from ajax_select.fields import AutoCompleteSelectField
+
+# Forms
+
+
+class CandidateForm(forms.Form):
+    user = AutoCompleteSelectField('users', label=_('Refound this account'), help_text=None, required=True)
 
 # Display elections
 
@@ -34,4 +47,24 @@ class ElectionDetailView(CanViewMixin, DetailView):
     template_name = 'election/election_detail.jinja'
     pk_url_kwarg = "election_id"
 
-# Forms
+
+class PageCreateView(CanCreateMixin, CreateView):
+    model = Election
+    form_class = modelform_factory(Election,
+        fields=['title', 'description', 'start_candidature', 'end_candidature', 'start_date', 'end_date',
+                'edit_groups', 'view_groups', 'vote_groups', 'candidature_groups'],
+        widgets={
+            'edit_groups': CheckboxSelectMultiple,
+            'view_groups': CheckboxSelectMultiple,
+            'edit_groups': CheckboxSelectMultiple,
+            'vote_groups': CheckboxSelectMultiple,
+            'candidature_groups': CheckboxSelectMultiple,
+            'start_date': SelectDateTime,
+            'end_date': SelectDateTime,
+            'start_candidature': SelectDateTime,
+            'end_candidature': SelectDateTime,
+        })
+    template_name = 'core/page_prop.jinja'
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.id})

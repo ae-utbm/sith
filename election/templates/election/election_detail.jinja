@@ -11,14 +11,21 @@
 	<h1>{{object.title}}</h1>
 	<p>{{object.description}}</p>
 	<p>{% trans %}End :{% endtrans %} {{object.end_date}}</p>
+	{% if object.election_list.exists() %}
 	<table>
 		<tr>
 		{% set nb_list = object.election_list.all().count() + 1 -%}
 		{% for liste in object.election_list.all() %}
 			<td>{{liste.title}}</td>
+			{% if object.is_candidature_active -%}
+			{% set nb_list = nb_list -%}
+			{% else -%}
 			{% set nb_list = nb_list + 1 -%}
+			{% endif -%}
 		{% endfor %}
+		{% if not object.is_candidature_active -%}
 		<td>{% trans %}Blank vote{% endtrans %}</td>
+		{% endif %}
 		</tr>
 	{% for role in object.role.all() %}
 		<tr><td colspan={{nb_list}}>{{role.title}}</td></tr>
@@ -40,8 +47,14 @@
 				</ul>
 			</td>
 			{% endfor %}
+			{% if not object.is_candidature_active -%}
 			<td></td>
+			{% endif %}
 		</tr>
 	{% endfor %}
 	</table>
+	{% endif %}
+	{% if object.is_candidature_active -%}
+		candidature
+	{% endif -%}
 {% endblock %}
