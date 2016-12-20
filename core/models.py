@@ -106,7 +106,7 @@ class User(AbstractBaseUser):
         ),
     )
     date_joined = models.DateField(_('date joined'), auto_now_add=True)
-    last_update = models.DateField(_('last update'), auto_now=True)
+    last_update = models.DateTimeField(_('last update'), auto_now=True)
     is_superuser = models.BooleanField(
         _('superuser'),
         default=False,
