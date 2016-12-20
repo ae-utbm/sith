@@ -54,7 +54,9 @@
 	{% endfor %}
 	</table>
 	{% endif %}
-	<form>{{candidate_form}}</form>
+	<form action="{{url('election:candidate', election_id=object.id)}}" method="post">{{candidate_form}}
+	{% csrf_token %}
+	</form>
 	{% if object.is_candidature_active -%}
 		candidature
 	{% endif -%}

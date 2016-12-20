@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
 from django.core.urlresolvers import reverse_lazy, reverse
@@ -62,7 +62,56 @@ class ElectionDetailView(CanViewMixin, DetailView):
         kwargs['candidate_form'] = CandidateForm(self.get_object().id)
         return kwargs
 
+
+# Form view
+
+class CandidatureCreateView(CanCreateMixin, FormView):
+    """
+    View dedicated to a cundidature creation
+    """
+    form_class = CandidateForm
+    template_name = 'core/page_prop.jinja'
+
+    def dispatch(self, request, *arg, **kwargs):
+        self.election_id = kwargs['election_id']
+        return super(CandidatureCreateView, self).dispatch(request, *arg, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(CandidatureCreateView, self).get_form_kwargs()
+        kwargs['election_id'] = self.election_id
+        return kwargs
+
+    def create_candidature(self, data):
+        cand = Candidature(
+                role=data['role'],
+                user=data['user'],
+                election_list=data['election_list'],
+                program=data['program']
+            )
+        cand.save()
+
+    def form_valid(self, form):
+        """
+            Verify that the selected user is in candidate group
+        """
+        data = form.clean()
+        res = super(FormView, self).form_valid(form)
+        data['election'] = Election.objects.get(id=self.election_id)
+        if data['user'].is_root:
+            self.create_candidature(data)
+            return res
+        for grp in data['election'].candidature_groups.all():
+            if data['user'].is_in_group(grp):
+                self.create_candidature(data)
+                return res
+        return res
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election_id})
+
+
 # Create views
+
 
 class ElectionCreateView(CanCreateMixin, CreateView):
     model = Election
@@ -86,6 +135,30 @@ class ElectionCreateView(CanCreateMixin, CreateView):
         return reverse_lazy('election:detail', kwargs={'election_id': self.object.id})
 
 
+class RoleCreateView(CanCreateMixin, CreateView):
+    model = Role
+    form_class = modelform_factory(Role,
+        fields=['title', 'election', 'title', 'description', 'max_choice'])
+    template_name = 'core/page_prop.jinja'
+
+    def form_valid(self, form):
+        """
+            Verify that the user can edit proprely
+        """
+        obj = form.instance
+        res = super(CreateView, self).form_valid
+        if self.request.user.is_root:
+            return res(form)
+        if obj.election:
+            for grp in obj.election.edit_groups.all():
+                if self.request.user.is_in_group(grp):
+                    return res(form)
+        raise PermissionDenied
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
+
+
 class ElectionListCreateView(CanCreateMixin, CreateView):
     model = ElectionList
     form_class = modelform_factory(ElectionList,
@@ -99,6 +172,8 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         obj = form.instance
         res = super(CreateView, self).form_valid
         if obj.election:
+            if self.request.user.is_root:
+                return res(form)
             for grp in obj.election.candidature_groups.all():
                 if self.request.user.is_in_group(grp):
                     return res(form)
