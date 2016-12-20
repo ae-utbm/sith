@@ -455,13 +455,8 @@ class JournalBilanNatureView(CanViewMixin, DetailView):
     def sum_by_code(self, code):
         from decimal import Decimal
         from django.db.models import Sum, DecimalField
-        amount_sum = Decimal(0)
-        print(self.object.operations.filter(
-            accounting_type__code=code).values('amount').annotate(
-            sum = Sum('amount')).values('sum').first()['sum'])
-        return(self.object.operations.filter(
-            accounting_type__code=code).values('amount').annotate(
-            sum = Sum('amount')).values('sum').first()['sum'])
+        return(list((self.object.operations.filter(
+                accounting_type__code=code).aggregate(Sum('amount'))).values())[0])
 
     def bilan_credit(self):
         bilan = {}
@@ -501,13 +496,8 @@ class JournalBilanPersonView(CanViewMixin, DetailView):
     def sum_by_target(self, target_id):
         from decimal import Decimal
         from django.db.models import Sum, DecimalField
-        amount_sum = Decimal(0)
-        print(self.object.operations.filter(
-            target_id=target_id).values('amount').annotate(
-            sum = Sum('amount')).values('sum').first()['sum'])
-        return(self.object.operations.filter(
-            target_id=target_id).values('amount').annotate(
-            sum = Sum('amount')).values('sum').first()['sum'])
+        return(list((self.object.operations.filter(
+                target_id=target_id).aggregate(Sum('amount'))).values())[0])
 
     def bilan_credit(self):
 
@@ -545,33 +535,31 @@ class JournalBilanAccountingView(CanViewMixin, DetailView):
     pk_url_kwarg = "j_id"
     template_name='accounting/journal_bilan_accounting.jinja'
 
-    def recursive_sum(self, code, bilan):
-        op = Operation.objects.filter(accounting_type__code__startswith=code)
+    def recursive_sum(self, max_length):
+        import collections
+        from decimal import Decimal
+        from django.db.models import Sum, DecimalField
+        bilan = {}
+        bilan = collections.OrderedDict(bilan)
 
-        if op.exists():
-            for o in op :
-                if o.accounting_type.code in bilan :
-                        bilan[o.accounting_type.code]+=o.amount
-                else:
-                    bilan[o.accounting_type.code]=o.amount
-                
-                if o.number == code :
-                    self.recursive_sum(o.accounting_type.code, bilan)
-        else:
-            return bilan
+        for at in AccountingType.objects.order_by('code').all():
+            #bilan[at] = self.object.operations.filter(type__startswith=at.code)
+            sum_by_type = list((self.object.operations.filter(
+                accounting_type__code__startswith=at.code).aggregate(Sum('amount'))).values())[0]
+            if sum_by_type != 0:
+                bilan[at] = sum_by_type
+        return bilan
 
 
     def bilan(self):
-        bilan = {}
-        self.recursive_sum('6', bilan)
-        print(bilan)
+        bilan = self.recursive_sum(3)
         return bilan
 
     def total_credit(self):
-        return sum(self.bilan().values())
+        return self.bilan().get('6')#sum(self.bilan().values())
 
     def total_debit(self):
-        return sum(self.bilan().values())
+        return self.bilan().get('6')#sum(self.bilan().values())
 
     def get_context_data(self, **kwargs):
         """ Add journal to the context """
