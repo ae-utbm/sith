@@ -346,36 +346,37 @@ class Selling(models.Model):
             self.customer.amount -= self.quantity * self.unit_price
             self.customer.save()
             self.is_validated = True
-        if self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
-            s = User.objects.filter(id=self.customer.user.id).first()
-            sub = Subscription(
-                    member=s,
-                    subscription_type='un-semestre',
-                    payment_method="EBOUTIC",
-                    location="EBOUTIC",
-                    )
-            sub.subscription_start = Subscription.compute_start()
-            sub.subscription_start = Subscription.compute_start(
-                duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
-            sub.subscription_end = Subscription.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
-                    start=sub.subscription_start)
-            sub.save()
-        elif self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS:
-            s = User.objects.filter(id=self.customer.user.id).first()
-            sub = Subscription(
-                    member=s,
-                    subscription_type='deux-semestres',
-                    payment_method="EBOUTIC",
-                    location="EBOUTIC",
-                    )
-            sub.subscription_start = Subscription.compute_start()
-            sub.subscription_start = Subscription.compute_start(
-                duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
-            sub.subscription_end = Subscription.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
-                    start=sub.subscription_start)
-            sub.save()
+        u = User.objects.filter(id=self.customer.user.id).first()
+        if u.was_subscribed():
+            if self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
+                sub = Subscription(
+                        member=u,
+                        subscription_type='un-semestre',
+                        payment_method="EBOUTIC",
+                        location="EBOUTIC",
+                        )
+                sub.subscription_start = Subscription.compute_start()
+                sub.subscription_start = Subscription.compute_start(
+                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
+                sub.subscription_end = Subscription.compute_end(
+                        duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
+                        start=sub.subscription_start)
+                sub.save()
+            elif self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS:
+                u = User.objects.filter(id=self.customer.user.id).first()
+                sub = Subscription(
+                        member=u,
+                        subscription_type='deux-semestres',
+                        payment_method="EBOUTIC",
+                        location="EBOUTIC",
+                        )
+                sub.subscription_start = Subscription.compute_start()
+                sub.subscription_start = Subscription.compute_start(
+                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
+                sub.subscription_end = Subscription.compute_end(
+                        duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
+                        start=sub.subscription_start)
+                sub.save()
         try:
             if self.product.eticket:
                 self.send_mail_customer()
