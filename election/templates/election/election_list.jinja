@@ -1,11 +1,27 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Election list{% endtrans %}
-{% endblock %}
+{%- trans %}Election list{% endtrans %}
+{%- endblock %}
+
+{% block head %}
+{{ super() -}}
+<style type="text/css">
+  small {
+    font-size: smaller;
+  }
+</style>
+{%- endblock %}
 
 {% block content %}
-	{% for el in object_list %}
-		<p><a href="{{ url('election:detail', election_id=el.id) }}">{{el}}</a></p>
-	{% endfor %}
-{% endblock %}
+  <h3>{% trans %}Current elections{% endtrans %}</h3>
+  <hr>
+  <ul>
+  {%- for election in object_list %}
+    <p>
+      <a href="{{ url('election:detail', election_id=election.id) }}">{{election}}</a>
+      <small>{% trans %}From{% endtrans %} {{ election.start_date|date("l d F Y") }} {% trans %}to{% endtrans %} {{ election.end_date|date("l d F Y") }}</small>
+    </p>
+  {%- endfor %}
+  </ul>
+{%- endblock %}
