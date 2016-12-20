@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^operation/(?P<op_id>[0-9]+)$', OperationEditView.as_view(), name='op_edit'),
     url(r'^operation/(?P<op_id>[0-9]+)/pdf$', OperationPDFView.as_view(), name='op_pdf'),
     # Companies
+    url(r'^company/list$', CompanyListView.as_view(), name='co_list'),
     url(r'^company/create$', CompanyCreateView.as_view(), name='co_new'),
     url(r'^company/(?P<co_id>[0-9]+)$', CompanyEditView.as_view(), name='co_edit'),
     # Labels
