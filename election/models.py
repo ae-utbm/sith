@@ -67,6 +67,9 @@ class ElectionList(models.Model):
     title = models.CharField(_('title'), max_length=255)
     election = models.ForeignKey(Election, related_name='election_list', verbose_name=_("election"))
 
+    def __str__(self):
+        return self.title
+
 
 class Candidature(models.Model):
     """
