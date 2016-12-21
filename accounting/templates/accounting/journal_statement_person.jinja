@@ -6,58 +6,58 @@
 
 
 {% block content %}
-	<h3>{% trans %}Statement by person: {% endtrans %} {{ object.name }}</h3>
+<h3>{% trans %}Statement by person: {% endtrans %} {{ object.name }}</h3>
 
-	<h4>{% trans %}Credit{% endtrans %}</h4>
+<h4>{% trans %}Credit{% endtrans %}</h4>
 
-	<table>
-        <thead>
+<table>
+    <thead>
         <tr>
             <td>{% trans %}Target of the operation{% endtrans %}</td>
             <td>{% trans %}Sum{% endtrans %}</td>
         </tr>
-        </thead>
-        <tbody>
-            {% for key in credit_statement.keys() %}
-                <tr>
-                	{% if key.target_type == "OTHER" %}
-                        <td>{{ o.target_label }}</td>
-                    {% else %}
-                        <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
-                    {% endif %}
-                	<td>{{credit_statement[key]}}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
+    </thead>
+    <tbody>
+        {% for key in credit_statement.keys() %}
+        <tr>
+            {% if key.target_type == "OTHER" %}
+            <td>{{ o.target_label }}</td>
+            {% else %}
+            <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
+            {% endif %}
+            <td>{{ credit_statement[key] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 
-    </table>
+</table>
 
-    <p>Total : {{total_credit}}</p>
+<p>Total : {{ total_credit }}</p>
 
-	<h4>{% trans %}Debit{% endtrans %}</h4>
+<h4>{% trans %}Debit{% endtrans %}</h4>
 
-    <table>
-        <thead>
+<table>
+    <thead>
         <tr>
             <td>{% trans %}Target of the operation{% endtrans %}</td>
             <td>{% trans %}Sum{% endtrans %}</td>
         </tr>
-        </thead>
-        <tbody>
-            {% for key in debit_statement.keys() %}
-                <tr>
-                    {% if key.target_type == "OTHER" %}
-                        <td>{{ o.target_label }}</td>
-                    {% else %}
-                        <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
-                    {% endif %}
-                    <td>{{debit_statement[key]}}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
+    </thead>
+    <tbody>
+        {% for key in debit_statement.keys() %}
+        <tr>
+            {% if key.target_type == "OTHER" %}
+            <td>{{ o.target_label }}</td>
+            {% else %}
+            <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
+            {% endif %}
+            <td>{{ debit_statement[key] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 
-    </table>
+</table>
 
-    <p>Total : {{total_debit}}</p>
+<p>Total : {{ total_debit }}</p>
 
 {% endblock %}

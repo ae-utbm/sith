@@ -527,37 +527,26 @@ class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
     template_name='accounting/journal_statement_person.jinja'
     current_tab='person_statement'
 
-    def sum_by_target(self, target_id):
-        from decimal import Decimal
-        from django.db.models import Sum, DecimalField
-        return(list((self.object.operations.filter(
-                target_id=target_id).aggregate(Sum('amount'))).values())[0])
+    def sum_by_target(self, target_id, target_type, movement_type):
+        return self.object.operations.filter(accounting_type__movement_type=movement_type,
+                target_id=target_id, target_type=target_type).aggregate(amount_sum=Sum('amount'))['amount_sum']
 
-    def credit_statement(self):
+    def statement(self, movement_type):
         statement = {}
-        for el in Operation.objects.filter(accounting_type__movement_type='CREDIT'):
-            statement[el.target] = self.sum_by_target(el.target_id)
+        for op in Operation.objects.filter(accounting_type__movement_type=movement_type):
+            statement[op.target] = self.sum_by_target(op.target_id, op.target_type, movement_type)
         return statement
 
-    def debit_statement(self):
-        statement = {}
-        for el in Operation.objects.filter(accounting_type__movement_type='DEBIT'):
-            statement[el.target] = self.sum_by_target(el.target_id)
-        return statement
-
-    def total_credit(self):
-        return sum(self.credit_statement().values())
-
-    def total_debit(self):
-        return sum(self.debit_statement().values())
+    def total(self, movement_type):
+        return sum(self.statement(movement_type).values())
 
     def get_context_data(self, **kwargs):
         """ Add journal to the context """
         kwargs = super(JournalPersonStatementView, self).get_context_data(**kwargs)
-        kwargs['credit_statement'] = self.credit_statement()
-        kwargs['debit_statement'] = self.debit_statement()
-        kwargs['total_credit'] = self.total_credit()
-        kwargs['total_debit'] = self.total_debit()
+        kwargs['credit_statement'] = self.statement("CREDIT")
+        kwargs['debit_statement'] = self.statement("DEBIT")
+        kwargs['total_credit'] = self.total("CREDIT")
+        kwargs['total_debit'] = self.total("DEBIT")
         return kwargs
 
 class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView):
