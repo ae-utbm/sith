@@ -57,6 +57,7 @@ INSTALLED_APPS = (
     'api',
     'rootplace',
     'sas',
+    'com',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -117,6 +118,7 @@ TEMPLATES = [
                 "Counter": "counter.models.Counter",
                 "ProductType": "counter.models.ProductType",
                 "timezone": "django.utils.timezone",
+                "get_sith": "com.views.sith",
             },
             "bytecode_cache": {
                 "name": "default",

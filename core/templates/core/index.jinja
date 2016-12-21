@@ -3,9 +3,7 @@
 {% block title %}
 {% trans %}Welcome!{% endtrans %}
 {% endblock %}
+
 {% block content %}
-    <p>{% trans %}Welcome to the new AE's website!{% endtrans %}</p>
-    <p>Ce site supporte pour l'instant toute la gestion de l'argent, c'est à dire les comptes AE, les comptoirs,
-    l'Eboutic, et la comptabilité</p>
-    <p>Pour le reste, merci de retourner voir sur l'<a href="https://ae.utbm.fr">ancien site</a></p>
+    {{ get_sith().index_page|markdown }}
 {% endblock %}

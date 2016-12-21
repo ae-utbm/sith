@@ -14,6 +14,7 @@ from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operatio
 from club.models import Club, Membership
 from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
+from com.models import Sith
 
 class Command(BaseCommand):
     help = "Populate a new instance of the Sith AE"
@@ -79,6 +80,8 @@ class Command(BaseCommand):
         club_root.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
         home_root.save()
         club_root.save()
+
+        Sith().save()
 
         p = Page(name='Index')
         p.set_lock(root)

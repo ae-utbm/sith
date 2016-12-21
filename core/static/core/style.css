@@ -14,6 +14,7 @@ a:active  { color: #007BE6; }
 /*--------------------------------HEADER-------------------------------*/
 #logo {
     margin-left: 5%;
+    display: inline-block;
 }
 header {
     display: block;
@@ -73,6 +74,29 @@ header form {
 }
 #notif li:hover {
     background: #bcc;
+}
+
+#alert_box p, #info_box p {
+    margin: 0px;
+    padding: 0px;
+}
+#alert_box, #info_box {
+    font-size: smaller;
+    display: inline-block;
+    border: solid 1px grey;
+    vertical-align: top;
+    padding: 2px;
+    margin: 4px;
+    margin-top: 60px;
+    min-width: 10%;
+    max-width: 30%;
+    min-height: 20px;
+}
+#info_box {
+    background: cornsilk
+}
+#alert_box {
+    background: gold;
 }
 
 /*---------------------------------NAV---------------------------------*/
