@@ -22,6 +22,7 @@
     <p>{% trans %}Journal is closed, you can not create operation{% endtrans %}</p>
     {% else %}
     <p><a href="{{ url('accounting:op_new', j_id=object.id) }}">{% trans %}New operation{% endtrans %}</a></p>
+    </br>
     {% endif %}
     <table>
         <thead>

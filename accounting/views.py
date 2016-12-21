@@ -7,16 +7,18 @@ from django.forms.models import modelform_factory
 from django.core.exceptions import PermissionDenied
 from django.forms import HiddenInput
 from django.db import transaction
+from django.db.models import Sum
 from django.conf import settings
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
+import collections
 
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectFile, SelectDate
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
 from counter.models import Counter, Selling, Product
@@ -165,6 +167,34 @@ class ClubAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete 
 
 # Journal views
 
+class JournalTabsMixin(TabedViewMixin):
+    def get_tabs_title(self):
+        return _("Journal")
+
+    def get_list_of_tabs(self):
+        tab_list = []
+        tab_list.append({
+                    'url': reverse('accounting:journal_details', kwargs={'j_id': self.object.id}),
+                    'slug': 'journal',
+                    'name': _("Journal"),
+                    })
+        tab_list.append({
+                    'url': reverse('accounting:journal_nature_statement', kwargs={'j_id': self.object.id}),
+                    'slug': 'nature_statement',
+                    'name': _("Statement by nature"),
+                    })
+        tab_list.append({
+                    'url': reverse('accounting:journal_person_statement', kwargs={'j_id': self.object.id}),
+                    'slug': 'person_statement',
+                    'name': _("Statement by person"),
+                    })
+        tab_list.append({
+                    'url': reverse('accounting:journal_accounting_statement', kwargs={'j_id': self.object.id}),
+                    'slug': 'accounting_statement',
+                    'name': _("Accounting statement"),
+                    })
+        return tab_list
+
 class JournalCreateView(CanCreateMixin, CreateView):
     """
     Create a general journal
@@ -182,13 +212,14 @@ class JournalCreateView(CanCreateMixin, CreateView):
                 ret['club_account'] = obj.id
         return ret
 
-class JournalDetailView(CanViewMixin, DetailView):
+class JournalDetailView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     A detail view, listing every operation
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
     template_name = 'accounting/journal_details.jinja'
+    current_tab = 'journal'
 
 class JournalEditView(CanEditMixin, UpdateView):
     """
@@ -334,8 +365,6 @@ class OperationPDFView(CanViewMixin, DetailView):
 
         pdfmetrics.registerFont(TTFont('DejaVu', 'DejaVuSerif.ttf'))
 
-
-
         self.object = self.get_object()
         amount = self.object.amount
         remark = self.object.remark
@@ -355,7 +384,6 @@ class OperationPDFView(CanViewMixin, DetailView):
         else:
             target = self.object.target.get_display_name()
 
-
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="op-%d(%s_on_%s).pdf"'  %(num, ti, club_name)
         p = canvas.Canvas(response)
@@ -367,11 +395,11 @@ class OperationPDFView(CanViewMixin, DetailView):
         im = ImageReader("core/static/core/img/logo.jpg")
         iw, ih = im.getSize()
         p.drawImage(im, 40, height - 50, width=iw/2, height=ih/2)
- 
+
         labelStr = [["%s %s - %s %s" % (_("Journal"), ti, _("Operation"), num)]]
 
         label = Table(labelStr, colWidths=[150], rowHeights=[20])
-        
+
         label.setStyle(TableStyle([
                                 ('ALIGN',(0,0),(-1,-1),'CENTER'),
                                 ('BOX', (0,0), (-1,-1), 0.25, colors.black),
@@ -385,11 +413,11 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.drawString(90, height - 190, _("Date: %(date)s") % {"date": date})
 
         data = []
-        
+
         data += [["%s" % (_("Credit").upper() if nature == 'CREDIT' else _("Debit").upper())]]
 
         data += [[_("Amount: %(amount).2f €") % {"amount": amount}]]
-        
+
         payment_mode = ""
         for m in settings.SITH_ACCOUNTING_PAYMENT_METHOD:
             if m[0] == mode:
@@ -399,11 +427,11 @@ class OperationPDFView(CanViewMixin, DetailView):
             payment_mode += " %s\n" %(m[1])
 
         data += [[payment_mode]]
-        
+
         data += [["%s : %s" % (_("Debtor") if nature == 'CREDIT' else _("Creditor"), target), ""]]
 
         data += [["%s \n%s" % (_("Comment:"), remark)]]
-        
+
         t = Table(data, colWidths=[(width-90*2)/2]*2, rowHeights=[20, 20, 70, 20, 80])
         t.setStyle(TableStyle([
                         ('ALIGN',(0,0),(-1,-1),'CENTER'),
@@ -435,14 +463,118 @@ class OperationPDFView(CanViewMixin, DetailView):
 
         t.drawOn(p, 90, 350)
 
-
-
         p.drawCentredString(10.5 * cm, 2 * cm, club_name)
         p.drawCentredString(10.5 * cm, 1 * cm, club_address)
 
         p.showPage()
         p.save()
         return response
+
+class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
+    """
+    Display a statement sorted by labels
+    """
+    model = GeneralJournal
+    pk_url_kwarg = "j_id"
+    template_name='accounting/journal_statement_nature.jinja'
+    current_tab='nature_statement'
+
+    def statement(self, queryset, movement_type):
+        ret = collections.OrderedDict()
+        statement = collections.OrderedDict()
+        total_sum = 0
+        for sat in [None] + list(SimplifiedAccountingType.objects.order_by('label').all()):
+            sum = queryset.filter(accounting_type__movement_type=movement_type,
+                simpleaccounting_type=sat).aggregate(amount_sum=Sum('amount'))['amount_sum']
+            if sat: sat = sat.label
+            else: sat = ""
+            if sum:
+                total_sum += sum
+                statement[sat] = sum
+        ret[movement_type] = statement
+        ret[movement_type+"_sum"] = total_sum
+        return ret
+
+    def big_statement(self):
+        label_list = self.object.operations.order_by('label').values_list('label').distinct()
+        labels = Label.objects.filter(id__in=label_list).all()
+        statement = collections.OrderedDict()
+        gen_statement = collections.OrderedDict()
+        no_label_statement = collections.OrderedDict()
+        gen_statement.update(self.statement(self.object.operations.all(), "CREDIT"))
+        gen_statement.update(self.statement(self.object.operations.all(), "DEBIT"))
+        statement[_("General statement")] = gen_statement
+        no_label_statement.update(self.statement(self.object.operations.filter(label=None).all(), "CREDIT"))
+        no_label_statement.update(self.statement(self.object.operations.filter(label=None).all(), "DEBIT"))
+        statement[_("No label operations")] = no_label_statement
+        for l in labels:
+            l_stmt = collections.OrderedDict()
+            l_stmt.update(self.statement(self.object.operations.filter(label=l).all(), "CREDIT"))
+            l_stmt.update(self.statement(self.object.operations.filter(label=l).all(), "DEBIT"))
+            statement[l] = l_stmt
+        return statement
+
+    def get_context_data(self, **kwargs):
+        """ Add infos to the context """
+        kwargs = super(JournalNatureStatementView, self).get_context_data(**kwargs)
+        kwargs['statement'] = self.big_statement()
+        return kwargs
+
+class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
+    """
+    Calculate a dictionary with operation target and sum of operations
+    """
+    model = GeneralJournal
+    pk_url_kwarg = "j_id"
+    template_name='accounting/journal_statement_person.jinja'
+    current_tab='person_statement'
+
+    def sum_by_target(self, target_id, target_type, movement_type):
+        return self.object.operations.filter(accounting_type__movement_type=movement_type,
+                target_id=target_id, target_type=target_type).aggregate(amount_sum=Sum('amount'))['amount_sum']
+
+    def statement(self, movement_type):
+        statement = collections.OrderedDict()
+        for op in self.object.operations.filter(accounting_type__movement_type=movement_type).order_by('target_type',
+                'target_id').distinct():
+            statement[op.target] = self.sum_by_target(op.target_id, op.target_type, movement_type)
+        return statement
+
+    def total(self, movement_type):
+        return sum(self.statement(movement_type).values())
+
+    def get_context_data(self, **kwargs):
+        """ Add journal to the context """
+        kwargs = super(JournalPersonStatementView, self).get_context_data(**kwargs)
+        kwargs['credit_statement'] = self.statement("CREDIT")
+        kwargs['debit_statement'] = self.statement("DEBIT")
+        kwargs['total_credit'] = self.total("CREDIT")
+        kwargs['total_debit'] = self.total("DEBIT")
+        return kwargs
+
+class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView):
+    """
+    Calculate a dictionary with operation type and sum of operations
+    """
+    model = GeneralJournal
+    pk_url_kwarg = "j_id"
+    template_name='accounting/journal_statement_accounting.jinja'
+    current_tab = "accounting_statement"
+
+    def statement(self):
+        statement = collections.OrderedDict()
+        for at in AccountingType.objects.order_by('code').all():
+            sum_by_type = self.object.operations.filter(
+                accounting_type__code__startswith=at.code).aggregate(amount_sum=Sum('amount'))['amount_sum']
+            if sum_by_type:
+                statement[at] = sum_by_type
+        return statement
+
+    def get_context_data(self, **kwargs):
+        """ Add journal to the context """
+        kwargs = super(JournalAccountingStatementView, self).get_context_data(**kwargs)
+        kwargs['statement'] = self.statement()
+        return kwargs
 
 # Company views
 
@@ -477,7 +609,7 @@ class LabelListView(CanViewMixin, DetailView):
     pk_url_kwarg = "clubaccount_id"
     template_name = 'accounting/label_list.jinja'
 
-class LabelCreateView(CanEditMixin, CreateView): # FIXME we need to check the rights before creating the object
+class LabelCreateView(CanCreateMixin, CreateView): # FIXME we need to check the rights before creating the object
     model = Label
     form_class = modelform_factory(Label, fields=['name', 'club_account'], widgets={
         'club_account': HiddenInput,

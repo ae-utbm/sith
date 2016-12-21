@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-21 02:37+0100\n"
+"POT-Creation-Date: 2016-12-21 05:22+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -161,7 +161,7 @@ msgstr "type comptable"
 #: accounting/models.py:205 accounting/models.py:299 accounting/models.py:325
 #: accounting/models.py:348 counter/models.py:282
 msgid "label"
-msgstr "intitulé"
+msgstr "étiquette"
 
 #: accounting/models.py:206
 msgid "target type"
@@ -244,11 +244,17 @@ msgstr "Un code comptable ne contient que des numéros"
 msgid "movement type"
 msgstr "type de mouvement"
 
-#: accounting/models.py:300 accounting/views.py:389
+#: accounting/models.py:300
+#: accounting/templates/accounting/journal_statement_nature.jinja:8
+#: accounting/templates/accounting/journal_statement_person.jinja:11
+#: accounting/views.py:417
 msgid "Credit"
 msgstr "Crédit"
 
-#: accounting/models.py:300 accounting/views.py:389
+#: accounting/models.py:300
+#: accounting/templates/accounting/journal_statement_nature.jinja:27
+#: accounting/templates/accounting/journal_statement_person.jinja:37
+#: accounting/views.py:417
 msgid "Debit"
 msgstr "Débit"
 
@@ -340,7 +346,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_details.jinja:26
 #: accounting/templates/accounting/bank_account_list.jinja:21
 #: accounting/templates/accounting/club_account_details.jinja:55
-#: accounting/templates/accounting/journal_details.jinja:72 club/views.py:54
+#: accounting/templates/accounting/journal_details.jinja:73 club/views.py:54
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
 #: core/templates/core/user_tools.jinja:38 core/views/user.py:152
 #: counter/templates/counter/cash_summary_list.jinja:53
@@ -413,7 +419,7 @@ msgid "End"
 msgstr "Fin"
 
 #: accounting/templates/accounting/club_account_details.jinja:31
-#: accounting/templates/accounting/journal_details.jinja:32
+#: accounting/templates/accounting/journal_details.jinja:33
 #: core/templates/core/user_account_detail.jinja:53
 #: core/templates/core/user_account_detail.jinja:80
 #: counter/templates/counter/last_ops.jinja:17
@@ -429,17 +435,17 @@ msgid "Closed"
 msgstr "Fermé"
 
 #: accounting/templates/accounting/club_account_details.jinja:34
-#: accounting/templates/accounting/journal_details.jinja:40
+#: accounting/templates/accounting/journal_details.jinja:41
 msgid "Actions"
 msgstr "Actions"
 
 #: accounting/templates/accounting/club_account_details.jinja:50
-#: accounting/templates/accounting/journal_details.jinja:60
+#: accounting/templates/accounting/journal_details.jinja:61
 msgid "Yes"
 msgstr "Oui"
 
 #: accounting/templates/accounting/club_account_details.jinja:52
-#: accounting/templates/accounting/journal_details.jinja:62
+#: accounting/templates/accounting/journal_details.jinja:63
 msgid "No"
 msgstr "Non"
 
@@ -464,10 +470,14 @@ msgstr "Entreprises"
 
 #: accounting/templates/accounting/journal_details.jinja:4
 #: accounting/templates/accounting/journal_details.jinja:15
+#: accounting/templates/accounting/journal_statement_accounting.jinja:4
+#: accounting/templates/accounting/journal_statement_nature.jinja:4
+#: accounting/templates/accounting/journal_statement_person.jinja:4
 msgid "General journal:"
 msgstr "Classeur : "
 
 #: accounting/templates/accounting/journal_details.jinja:19
+#: accounting/templates/accounting/journal_statement_accounting.jinja:29
 #: core/templates/core/user_account.jinja:38
 #: core/templates/core/user_account_detail.jinja:10
 #: counter/templates/counter/counter_click.jinja:32
@@ -475,6 +485,7 @@ msgid "Amount: "
 msgstr "Montant : "
 
 #: accounting/templates/accounting/journal_details.jinja:20
+#: accounting/templates/accounting/journal_statement_accounting.jinja:30
 msgid "Effective amount: "
 msgstr "Montant effectif: "
 
@@ -486,12 +497,12 @@ msgstr "Le classeur est fermé, vous ne pouvez pas créer d'opération"
 msgid "New operation"
 msgstr "Nouvelle opération"
 
-#: accounting/templates/accounting/journal_details.jinja:29
+#: accounting/templates/accounting/journal_details.jinja:30
 #: counter/templates/counter/stats.jinja:14
 msgid "Nb"
 msgstr "No"
 
-#: accounting/templates/accounting/journal_details.jinja:30
+#: accounting/templates/accounting/journal_details.jinja:31
 #: club/templates/club/club_sellings.jinja:19
 #: core/templates/core/user_account_detail.jinja:17
 #: core/templates/core/user_account_detail.jinja:50
@@ -502,49 +513,93 @@ msgstr "No"
 msgid "Date"
 msgstr "Date"
 
-#: accounting/templates/accounting/journal_details.jinja:31
+#: accounting/templates/accounting/journal_details.jinja:32
 #: club/templates/club/club_sellings.jinja:23
 #: core/templates/core/user_account_detail.jinja:20
 #: counter/templates/counter/last_ops.jinja:42
 msgid "Label"
 msgstr "Étiquette"
 
-#: accounting/templates/accounting/journal_details.jinja:33
+#: accounting/templates/accounting/journal_details.jinja:34
 msgid "Payment mode"
 msgstr "Méthode de paiement"
 
-#: accounting/templates/accounting/journal_details.jinja:34
+#: accounting/templates/accounting/journal_details.jinja:35
 msgid "Target"
 msgstr "Cible"
 
-#: accounting/templates/accounting/journal_details.jinja:35
+#: accounting/templates/accounting/journal_details.jinja:36
 msgid "Code"
 msgstr "Code"
 
-#: accounting/templates/accounting/journal_details.jinja:36
+#: accounting/templates/accounting/journal_details.jinja:37
 msgid "Nature"
 msgstr "Nature"
 
-#: accounting/templates/accounting/journal_details.jinja:37
+#: accounting/templates/accounting/journal_details.jinja:38
 msgid "Done"
 msgstr "Effectué"
 
-#: accounting/templates/accounting/journal_details.jinja:38
+#: accounting/templates/accounting/journal_details.jinja:39
 #: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:710
 msgid "Comment"
 msgstr "Commentaire"
 
-#: accounting/templates/accounting/journal_details.jinja:39
+#: accounting/templates/accounting/journal_details.jinja:40
 msgid "File"
 msgstr "Fichier"
 
-#: accounting/templates/accounting/journal_details.jinja:41
+#: accounting/templates/accounting/journal_details.jinja:42
 msgid "PDF"
 msgstr "PDF"
 
-#: accounting/templates/accounting/journal_details.jinja:75
+#: accounting/templates/accounting/journal_details.jinja:76
 msgid "Generate"
 msgstr "Générer"
+
+#: accounting/templates/accounting/journal_statement_accounting.jinja:9
+msgid "Accounting statement: "
+msgstr "Bilan comptable : "
+
+#: accounting/templates/accounting/journal_statement_accounting.jinja:14
+msgid "Operation type"
+msgstr "Type d'opération"
+
+#: accounting/templates/accounting/journal_statement_accounting.jinja:15
+#: accounting/templates/accounting/journal_statement_nature.jinja:13
+#: accounting/templates/accounting/journal_statement_nature.jinja:32
+#: accounting/templates/accounting/journal_statement_person.jinja:17
+#: accounting/templates/accounting/journal_statement_person.jinja:43
+#: counter/templates/counter/invoices_call.jinja:21
+msgid "Sum"
+msgstr "Somme"
+
+#: accounting/templates/accounting/journal_statement_nature.jinja:12
+#: accounting/templates/accounting/journal_statement_nature.jinja:31
+msgid "Nature of operation"
+msgstr "Nature de l'opération"
+
+#: accounting/templates/accounting/journal_statement_nature.jinja:25
+#: accounting/templates/accounting/journal_statement_nature.jinja:44
+#: club/templates/club/club_sellings.jinja:14
+#: counter/templates/counter/counter_click.jinja:70
+#: counter/templates/counter/counter_main.jinja:28
+#: eboutic/templates/eboutic/eboutic_main.jinja:34
+msgid "Total: "
+msgstr "Total : "
+
+#: accounting/templates/accounting/journal_statement_nature.jinja:48
+msgid "Statement by nature: "
+msgstr "Bilan par nature : "
+
+#: accounting/templates/accounting/journal_statement_person.jinja:9
+msgid "Statement by person: "
+msgstr "Bilan par personne : "
+
+#: accounting/templates/accounting/journal_statement_person.jinja:16
+#: accounting/templates/accounting/journal_statement_person.jinja:42
+msgid "Target of the operation"
+msgstr "Cible de l'opération"
 
 #: accounting/templates/accounting/label_list.jinja:14
 msgid "Back to club account"
@@ -573,7 +628,7 @@ msgstr "Sauver"
 
 #: accounting/templates/accounting/refound_account.jinja:4
 #: accounting/templates/accounting/refound_account.jinja:8
-#: accounting/views.py:548
+#: accounting/views.py:688
 msgid "Refound account"
 msgstr "Remboursement de compte"
 
@@ -594,55 +649,75 @@ msgstr "Types simplifiés"
 msgid "New simplified type"
 msgstr "Nouveau type simplifié"
 
-#: accounting/views.py:365 accounting/views.py:371
-msgid "Operation"
-msgstr "Opération"
-
-#: accounting/views.py:371
+#: accounting/views.py:172 accounting/views.py:179 accounting/views.py:399
 msgid "Journal"
 msgstr "Classeur"
 
-#: accounting/views.py:382
+#: accounting/views.py:184
+msgid "Statement by nature"
+msgstr "Bilan par nature"
+
+#: accounting/views.py:189
+msgid "Statement by person"
+msgstr "Bilan par personne"
+
+#: accounting/views.py:194
+msgid "Accounting statement"
+msgstr "Bilan comptable"
+
+#: accounting/views.py:393 accounting/views.py:399
+msgid "Operation"
+msgstr "Opération"
+
+#: accounting/views.py:410
 msgid "Financial proof: "
 msgstr "Justificatif de libellé : "
 
-#: accounting/views.py:383
+#: accounting/views.py:411
 #, python-format
 msgid "Club: %(club_name)s"
 msgstr "Club : %(club_name)s"
 
-#: accounting/views.py:384
+#: accounting/views.py:412
 #, python-format
 msgid "Label: %(op_label)s"
 msgstr "Libellé : %(op_label)s"
 
-#: accounting/views.py:385
+#: accounting/views.py:413
 #, python-format
 msgid "Date: %(date)s"
 msgstr "Date : %(date)s"
 
-#: accounting/views.py:391
+#: accounting/views.py:419
 #, python-format
 msgid "Amount: %(amount).2f €"
 msgstr "Montant : %(amount).2f €"
 
-#: accounting/views.py:403
+#: accounting/views.py:431
 msgid "Debtor"
 msgstr "Débiteur"
 
-#: accounting/views.py:403
+#: accounting/views.py:431
 msgid "Creditor"
 msgstr "Créditeur"
 
-#: accounting/views.py:405
+#: accounting/views.py:433
 msgid "Comment:"
 msgstr "Commentaire :"
 
-#: accounting/views.py:424
+#: accounting/views.py:452
 msgid "Signature:"
 msgstr "Signature :"
 
-#: accounting/views.py:510
+#: accounting/views.py:504
+msgid "General statement"
+msgstr "Bilan général"
+
+#: accounting/views.py:507
+msgid "No label operations"
+msgstr "Opérations sans étiquette"
+
+#: accounting/views.py:650
 msgid "Refound this account"
 msgstr "Rembourser ce compte"
 
@@ -789,13 +864,6 @@ msgstr "Quantité : "
 #: club/templates/club/club_sellings.jinja:13
 msgid "units"
 msgstr "unités"
-
-#: club/templates/club/club_sellings.jinja:14
-#: counter/templates/counter/counter_click.jinja:70
-#: counter/templates/counter/counter_main.jinja:28
-#: eboutic/templates/eboutic/eboutic_main.jinja:34
-msgid "Total: "
-msgstr "Total : "
 
 #: club/templates/club/club_sellings.jinja:20 club/views.py:167
 #: core/templates/core/user_account_detail.jinja:18
@@ -2601,10 +2669,6 @@ msgstr "Appels à facture pour %(date)s"
 msgid "Choose another month: "
 msgstr "Choisir un autre mois : "
 
-#: counter/templates/counter/invoices_call.jinja:21
-msgid "Sum"
-msgstr "Somme"
-
 #: counter/templates/counter/last_ops.jinja:5
 #: counter/templates/counter/last_ops.jinja:9
 #, python-format
@@ -3228,5 +3292,3 @@ msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, soit en créer un proprement"
 
-#~ msgid "Welcome to the new AE's website!"
-#~ msgstr "Bienvenue sur le nouveau site de l'AE ! "
