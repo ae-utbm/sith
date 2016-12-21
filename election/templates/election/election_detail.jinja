@@ -1,10 +1,65 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Election list{% endtrans %}
+{{object.title}}
 {% endblock %}
 
+{% block head %}
+{{ super() -}}
+<style type="text/css">
+  time {
+    font-weight: bolder;
+  }
+</style>
+{%- endblock %}
+
 {% block content %}
+	<h3>{{ object.title }}</h3>
+	<hr>
+	<section>
+    <p>
+      {% trans %}Polls close {% endtrans %} 
+      <time datetime="{{ election.end_date }}">{{ election.end_date|date("l d F Y") }}</time> at <time>{{ election.end_date|time("G:i") }}</time>
+    </p>
+	</section>
+	<section>
+		<table>
+			{%- set election_lists = object.election_list.all() -%}
+			<caption></caption>
+			<thead>
+				{%- for election_list in election_lists %}
+				<th>{{election_list.title}}</th>
+				{%- endfor %}
+			</thead>
+			{%- for role in object.role.all() %}
+			<tbody>
+				<tr><td colspan="{{election_lists.count()}}">{{role.title}}</td></tr>
+				<tr>
+					{%- for election_list in election_lists %}
+					<td>
+						<ul>
+						{%- for candidature in election_list.candidature.filter(role=role) %}
+							<li>
+								<figure>
+									{%- if candidature.user.profile_pict %}
+										<img src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
+									{%- endif %}
+									<figcaption>
+										<cite>{{ candidature.user.first_name }} <em>{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</cite>
+										<q>{{ candidature.program or '' }}</q>
+									</figcaption>
+								</figure>
+							</li>
+						{%- endfor %}
+						</ul>
+					</td>
+					{%- endfor %}
+				</tr>
+			</tbody>
+			{%- endfor %}
+		</table>
+	</section>
+
 	{% if object.has_voted(request.user) %}
 		A voté
 	{% endif %}
