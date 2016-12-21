@@ -1,6 +1,6 @@
 import os
 from datetime import date, datetime
-from io import StringIO
+from io import StringIO, BytesIO
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management import call_command
@@ -8,9 +8,11 @@ from django.conf import settings
 from django.db import connection
 from django.contrib.sites.models import Site
 
+from PIL import Image
 
 from core.models import Group, User, Page, PageRev, SithFile
 from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operation, AccountingType, SimplifiedAccountingType, Company
+from core.utils import resize_image
 from club.models import Club, Membership
 from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
@@ -50,7 +52,8 @@ class Command(BaseCommand):
                  is_superuser=True, is_staff=True)
         root.set_password("plop")
         root.save()
-        SithFile(parent=None, name="profiles", is_folder=True, owner=root).save()
+        profiles_root = SithFile(parent=None, name="profiles", is_folder=True, owner=root)
+        profiles_root.save()
         home_root = SithFile(parent=None, name="users", is_folder=True, owner=root)
         home_root.save()
         club_root = SithFile(parent=None, name="clubs", is_folder=True, owner=root)
@@ -124,6 +127,17 @@ Welcome to the wiki page!
             skia.save()
             skia.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             skia.save()
+            skia_profile_path = os.path.join(root_path, 'core/fixtures/images/3.jpg')
+            with open(skia_profile_path, 'rb') as f:
+                name = str(skia.id) + "_profile.jpg"
+                skia_profile = SithFile(parent=profiles_root, name=name,
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, 'JPEG'),
+                    owner=skia, is_folder=False, mime_type='image/jpeg', size=os.path.getsize(skia_profile_path))
+                skia_profile.file.name = name
+                skia_profile.save()
+                skia.profile_pict = skia_profile
+                skia.save()
+
             # Adding user public
             public = User(username='public', last_name="Not subscribed", first_name="Public",
                      email="public@git.an",
@@ -319,12 +333,32 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             sli.save()
             skia.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             sli.save()
+            sli_profile_path = os.path.join(root_path, 'core/fixtures/images/5.jpg')
+            with open(sli_profile_path, 'rb') as f:
+                name = str(sli.id) + "_profile.jpg"
+                sli_profile = SithFile(parent=profiles_root, name=name,
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, 'JPEG'),
+                    owner=sli, is_folder=False, mime_type='image/jpeg', size=os.path.getsize(sli_profile_path))
+                sli_profile.file.name = name
+                sli_profile.save()
+                sli.profile_pict = sli_profile
+                sli.save()
             # Adding user Krophil
             krophil = User(username='krophil', last_name="Phil'", first_name="Kro",
                            email="krophil@git.an",
                            date_of_birth="1942-06-12")
             krophil.set_password("plop")
             krophil.save()
+            krophil_profile_path = os.path.join(root_path, 'core/fixtures/images/6.jpg')
+            with open(krophil_profile_path, 'rb') as f:
+                name = str(krophil.id) + "_profile.jpg"
+                krophil_profile = SithFile(parent=profiles_root, name=name,
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, 'JPEG'),
+                    owner=krophil, is_folder=False, mime_type='image/jpeg', size=os.path.getsize(krophil_profile_path))
+                krophil_profile.file.name = name
+                krophil_profile.save()
+                krophil.profile_pict = krophil_profile
+                krophil.save()
             ## Adding subscription for sli
             s = Subscription(member=User.objects.filter(pk=sli.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])

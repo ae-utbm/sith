@@ -7,9 +7,36 @@
 {% block head %}
 {{ super() -}}
 <style type="text/css">
-  time {
-    font-weight: bolder;
-  }
+time {
+  font-weight: bolder;
+}
+
+th {
+  padding: 4px;
+  margin: 5px;
+  border: solid 1px darkgrey;
+  border-collapse: collapse;
+  vertical-align: top;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.role {
+
+}
+
+.list-per-role {
+
+}
+
+.list-per-role__candidates {
+	list-style: none;
+	margin-left: 0;
+}
+
+.candidate {
+
+}
 </style>
 {%- endblock %}
 
@@ -32,17 +59,17 @@
 				{%- endfor %}
 			</thead>
 			{%- for role in object.role.all() %}
-			<tbody>
+			<tbody class="role">
 				<tr><td colspan="{{election_lists.count()}}">{{role.title}}</td></tr>
 				<tr>
 					{%- for election_list in election_lists %}
-					<td>
-						<ul>
+					<td class="list-per-role">
+						<ul class="list-per-role__candidates">
 						{%- for candidature in election_list.candidature.filter(role=role) %}
 							<li>
-								<figure>
+								<figure class="candidate">
 									{%- if candidature.user.profile_pict %}
-										<img src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
+									<img src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
 									{%- endif %}
 									<figcaption>
 										<cite>{{ candidature.user.first_name }} <em>{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</cite>
