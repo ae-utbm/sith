@@ -1,4 +1,4 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
 from django.core.urlresolvers import reverse_lazy, reverse
@@ -18,6 +18,29 @@ from election.models import Election, Role, Candidature, ElectionList
 from ajax_select.fields import AutoCompleteSelectField
 
 
+# Custom form field
+
+class VoteCheckbox(forms.ModelMultipleChoiceField):
+    """
+        Used to replace ModelMultipleChoiceField but with
+        automatic backend verification
+    """
+    def __init__(self, queryset, max_choice, required=True, widget=None, label=None,
+                 initial=None, help_text='', *args, **kwargs):
+        self.max_choice = max_choice
+        widget = forms.CheckboxSelectMultiple
+        super(VoteCheckbox, self).__init__(queryset, None, required, widget, label,
+                                           initial, help_text, *args, **kwargs)
+
+    def clean(self, value):
+        qs = super(VoteCheckbox, self).clean(value)
+        self.validate(qs)
+
+    def validate(self, qs):
+        if qs.count() > self.max_choice:
+            raise forms.ValidationError(_("You have selected too much candidate"))
+
+
 # Forms
 
 
@@ -33,22 +56,17 @@ class CandidateForm(forms.Form):
 
 
 class VoteForm(forms.Form):
-    def __init__(self, role_id, *args, **kwargs):
+    def __init__(self, election, user, *args, **kwargs):
         super(VoteForm, self).__init__(*args, **kwargs)
-        self.max_choice = Role.objects.get(id=role_id).max_choice
-        cand = Candidature.objects.filter(role__id=role_id)
-        if self.max_choice > 1:
-            self.fields['candidature'] = forms.ModelMultipleChoiceField(cand, required=False,
-                                                                        widget=forms.CheckboxSelectMultiple())
-        else:
-            self.fields['candidature'] = forms.ModelChoiceField(cand, required=False,
-                                                                widget=forms.RadioSelect(), empty_label=_("Blank vote"))
+        for role in election.role.all():
+            if role.user_has_voted(user):
+                cand = role.candidature
+                if role.max_choice > 1:
+                    self.fields[role.title] = VoteCheckbox(cand, role.max_choice, required=False)
+                else:
+                    self.fields[role.title] = forms.ModelChoiceField(cand, required=False,
+                                                                        widget=forms.RadioSelect(), empty_label=_("Blank vote"))
 
-    def clean_candidature(self):
-        data = self.cleaned_data['candidature']
-        if self.max_choice > 1 and len(data) > self.max_choice:
-            raise forms.ValidationError(_("You have selected too much candidate"))
-        return data
 
 # Display elections
 
@@ -138,14 +156,16 @@ class VoteFormView(CanCreateMixin, FormView):
 
     def dispatch(self, request, *arg, **kwargs):
         self.election_id = kwargs['election_id']
+        self.election = get_object_or_404(Election, pk=self.election_id)
         return super(VoteFormView, self).dispatch(request, *arg, **kwargs)
 
     def vote(self, data):
-        pass
+        print(data)
 
     def get_form_kwargs(self):
         kwargs = super(VoteFormView, self).get_form_kwargs()
-        kwargs['role_id'] = self.election_id
+        kwargs['election'] = self.election
+        kwargs['user'] = self.request.user
         return kwargs
 
     def form_valid(self, form):

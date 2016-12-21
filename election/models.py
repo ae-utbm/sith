@@ -36,12 +36,11 @@ class Election(models.Model):
         now = timezone.now()
         return bool(now <= self.end_candidature and now >= self.start_candidature)
 
-    def has_voted(self, user):
-        return False
-        # return self.has_voted.filter(id=user.id).exists()
-
     def get_results(self):
         pass
+
+    def has_voted(self, user):
+        return False
 
     # Permissions
 
@@ -55,6 +54,9 @@ class Role(models.Model):
     description = models.TextField(_('description'), null=True, blank=True)
     has_voted = models.ManyToManyField(User, verbose_name=('has voted'), related_name='has_voted')
     max_choice = models.IntegerField(_('max choice'), default=1)
+
+    def user_has_voted(self, user):
+        return not self.has_voted.filter(id=user.id).exists()
 
     def __str__(self):
         return ("%s : %s") % (self.election.title, self.title)
