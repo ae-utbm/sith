@@ -80,6 +80,9 @@ class Candidature(models.Model):
     program = models.TextField(_('description'), null=True, blank=True)
     election_list = models.ForeignKey(ElectionList, related_name='candidature', verbose_name=_('election_list'))
 
+    def __str__(self):
+        return "%s : %s" % (self.role.title, self.user.username)
+
 
 class Vote(models.Model):
     """

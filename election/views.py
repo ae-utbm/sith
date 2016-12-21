@@ -11,8 +11,8 @@ from django.conf import settings
 from django import forms
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from django.views.generic.edit import FormMixin
 from core.views.forms import SelectDateTime
-from core.widgets import ChoiceWithOtherField
 from election.models import Election, Role, Candidature, ElectionList
 
 from ajax_select.fields import AutoCompleteSelectField
@@ -30,6 +30,25 @@ class CandidateForm(forms.Form):
         super(CandidateForm, self).__init__(*args, **kwargs)
         self.fields['role'] = forms.ModelChoiceField(Role.objects.filter(election__id=election_id))
         self.fields['election_list'] = forms.ModelChoiceField(ElectionList.objects.filter(election__id=election_id))
+
+
+class VoteForm(forms.Form):
+    def __init__(self, role_id, *args, **kwargs):
+        super(VoteForm, self).__init__(*args, **kwargs)
+        self.max_choice = Role.objects.get(id=role_id).max_choice
+        cand = Candidature.objects.filter(role__id=role_id)
+        if self.max_choice > 1:
+            self.fields['candidature'] = forms.ModelMultipleChoiceField(cand, required=False,
+                                                                        widget=forms.CheckboxSelectMultiple())
+        else:
+            self.fields['candidature'] = forms.ModelChoiceField(cand, required=False,
+                                                                widget=forms.RadioSelect(), empty_label=_("Blank vote"))
+
+    def clean_candidature(self):
+        data = self.cleaned_data['candidature']
+        if self.max_choice > 1 and len(data) > self.max_choice:
+            raise forms.ValidationError(_("You have selected too much candidate"))
+        return data
 
 # Display elections
 
@@ -109,6 +128,43 @@ class CandidatureCreateView(CanCreateMixin, FormView):
     def get_success_url(self, **kwargs):
         return reverse_lazy('election:detail', kwargs={'election_id': self.election_id})
 
+
+class VoteFormView(CanCreateMixin, FormView):
+    """
+    Alows users to vote
+    """
+    form_class = VoteForm
+    template_name = 'core/page_prop.jinja'
+
+    def dispatch(self, request, *arg, **kwargs):
+        self.election_id = kwargs['election_id']
+        return super(VoteFormView, self).dispatch(request, *arg, **kwargs)
+
+    def vote(self, data):
+        pass
+
+    def get_form_kwargs(self):
+        kwargs = super(VoteFormView, self).get_form_kwargs()
+        kwargs['role_id'] = self.election_id
+        return kwargs
+
+    def form_valid(self, form):
+        """
+            Verify that the user is part in a vote group
+        """
+        data = form.clean()
+        res = super(FormView, self).form_valid(form)
+        if self.request.user.is_root:
+            self.vote(data)
+            return res
+        for grp in data['role'].election.vote_groups.all():
+            if self.request.user.is_in_group(grp):
+                self.vote(data)
+                return res
+        return res
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election_id})
 
 # Create views
 
