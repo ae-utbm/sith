@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% macro display_tables(dict) %}
-<h4>{% trans %}Credit{% endtrans %}</h4>
+<h5>{% trans %}Credit{% endtrans %}</h5>
 <table>
     <thead>
         <tr>
@@ -24,7 +24,7 @@
 </table>
 {% trans %}Total: {% endtrans %}{{ dict['CREDIT_sum'] }}
 
-<h4>{% trans %}Debit{% endtrans %}</h4>
+<h5>{% trans %}Debit{% endtrans %}</h5>
 <table>
     <thead>
         <tr>
@@ -45,10 +45,10 @@
 {% endmacro %}
 
 {% block content %}
-<h2>{% trans %}Statement by nature: {% endtrans %} {{ object.name }}</h2>
+<h3>{% trans %}Statement by nature: {% endtrans %} {{ object.name }}</h3>
 
 {% for k,v in statement.items() %}
-<h3>{{ k }}</h3>
+<h4>{{ k }}</h4>
 {{ display_tables(v) }}
 <hr>
 {% endfor %}

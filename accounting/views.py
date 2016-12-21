@@ -179,19 +179,19 @@ class JournalTabsMixin(TabedViewMixin):
                     'name': _("Journal"),
                     })
         tab_list.append({
-                    'url': reverse('accounting:journal_bilan_nature', kwargs={'j_id': self.object.id}),
-                    'slug': 'bilan_nature',
-                    'name': _("Bilan nature"),
+                    'url': reverse('accounting:journal_nature_statement', kwargs={'j_id': self.object.id}),
+                    'slug': 'nature_statement',
+                    'name': _("Statement by nature"),
                     })
         tab_list.append({
-                    'url': reverse('accounting:journal_bilan_person', kwargs={'j_id': self.object.id}),
-                    'slug': 'bilan_person',
-                    'name': _("Bilan person"),
+                    'url': reverse('accounting:journal_person_statement', kwargs={'j_id': self.object.id}),
+                    'slug': 'person_statement',
+                    'name': _("Statement by person"),
                     })
         tab_list.append({
-                    'url': reverse('accounting:journal_bilan_accounting', kwargs={'j_id': self.object.id}),
-                    'slug': 'bilan_accounting',
-                    'name': _("Bilan accounting"),
+                    'url': reverse('accounting:journal_accounting_statement', kwargs={'j_id': self.object.id}),
+                    'slug': 'accounting_statement',
+                    'name': _("Accounting statement"),
                     })
         return tab_list
 
@@ -470,14 +470,14 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.save()
         return response
 
-class JournalBilanNatureView(JournalTabsMixin, CanViewMixin, DetailView):
+class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     Display a statement sorted by labels
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
-    template_name='accounting/journal_bilan_nature.jinja'
-    current_tab='bilan_nature'
+    template_name='accounting/journal_statement_nature.jinja'
+    current_tab='nature_statement'
 
     def statement(self, queryset, movement_type):
         ret = collections.OrderedDict()
@@ -514,18 +514,18 @@ class JournalBilanNatureView(JournalTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """ Add infos to the context """
-        kwargs = super(JournalBilanNatureView, self).get_context_data(**kwargs)
+        kwargs = super(JournalNatureStatementView, self).get_context_data(**kwargs)
         kwargs['statement'] = self.big_statement()
         return kwargs
 
-class JournalBilanPersonView(JournalTabsMixin, CanViewMixin, DetailView):
+class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     Calculate a dictionary with operation target and sum of operations
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
-    template_name='accounting/journal_bilan_person.jinja'
-    current_tab='bilan_person'
+    template_name='accounting/journal_statement_person.jinja'
+    current_tab='person_statement'
 
     def sum_by_target(self, target_id):
         from decimal import Decimal
@@ -553,21 +553,21 @@ class JournalBilanPersonView(JournalTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """ Add journal to the context """
-        kwargs = super(JournalBilanPersonView, self).get_context_data(**kwargs)
+        kwargs = super(JournalPersonStatementView, self).get_context_data(**kwargs)
         kwargs['credit_statement'] = self.credit_statement()
         kwargs['debit_statement'] = self.debit_statement()
         kwargs['total_credit'] = self.total_credit()
         kwargs['total_debit'] = self.total_debit()
         return kwargs
 
-class JournalBilanAccountingView(JournalTabsMixin, CanViewMixin, DetailView):
+class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     Calculate a dictionary with operation type and sum of operations
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
-    template_name='accounting/journal_bilan_accounting.jinja'
-    current_tab = "bilan_accounting"
+    template_name='accounting/journal_statement_accounting.jinja'
+    current_tab = "accounting_statement"
 
     def statement(self):
         statement = collections.OrderedDict()
@@ -580,7 +580,7 @@ class JournalBilanAccountingView(JournalTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """ Add journal to the context """
-        kwargs = super(JournalBilanAccountingView, self).get_context_data(**kwargs)
+        kwargs = super(JournalAccountingStatementView, self).get_context_data(**kwargs)
         kwargs['statement'] = self.statement()
         return kwargs
 

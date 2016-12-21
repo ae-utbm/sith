@@ -6,9 +6,9 @@
 
 
 {% block content %}
-	<h2>{% trans %}Person bilan: {% endtrans %} {{ object.name }}</h2>
+	<h3>{% trans %}Statement by person: {% endtrans %} {{ object.name }}</h3>
 
-	<h3>{% trans %}Credit{% endtrans %}</h3>
+	<h4>{% trans %}Credit{% endtrans %}</h4>
 
 	<table>
         <thead>
@@ -18,14 +18,14 @@
         </tr>
         </thead>
         <tbody>
-            {% for key in bilan_credit.keys() %}
+            {% for key in credit_statement.keys() %}
                 <tr>
                 	{% if key.target_type == "OTHER" %}
                         <td>{{ o.target_label }}</td>
                     {% else %}
                         <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
                     {% endif %}
-                	<td>{{bilan_credit[key]}}</td>
+                	<td>{{credit_statement[key]}}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -34,8 +34,8 @@
 
     <p>Total : {{total_credit}}</p>
 
-	<h3>{% trans %}Debit{% endtrans %}</h3>
-    
+	<h4>{% trans %}Debit{% endtrans %}</h4>
+
     <table>
         <thead>
         <tr>
@@ -44,14 +44,14 @@
         </tr>
         </thead>
         <tbody>
-            {% for key in bilan_debit.keys() %}
+            {% for key in debit_statement.keys() %}
                 <tr>
                     {% if key.target_type == "OTHER" %}
                         <td>{{ o.target_label }}</td>
                     {% else %}
                         <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
                     {% endif %}
-                    <td>{{bilan_debit[key]}}</td>
+                    <td>{{debit_statement[key]}}</td>
                 </tr>
             {% endfor %}
         </tbody>

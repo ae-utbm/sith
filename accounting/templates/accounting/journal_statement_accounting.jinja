@@ -6,7 +6,7 @@
 
 
 {% block content %}
-<h3>{% trans %}Accounting bilan: {% endtrans %} {{ object.name }}</h3>
+<h3>{% trans %}Accounting statement: {% endtrans %} {{ object.name }}</h3>
 
 <table>
     <thead>
@@ -16,7 +16,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for k,v in bilan.items() %}
+        {% for k,v in statement.items() %}
         <tr>
             <td>{{ k }}</td>
             <td>{{ v }}</td>
