@@ -323,6 +323,21 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             comptes.save()
             simple = SimplifiedAccountingType(label = 'Je fais du simple 6', accounting_type = comptes, movement_type='DEBIT')
             simple.save()
+
+            t = AccountingType(code='602', label="Gros test de malade", movement_type='DEBIT')
+            t.save()
+            Operation(journal=gj, date=date.today(), amount=32.3, remark="...", mode="CASH", done=True, accounting_type=t, target_type="USER", target_id=skia.id).save()
+            t = AccountingType(code='60', label="...", movement_type='DEBIT')
+            t.save()
+            Operation(journal=gj, date=date.today(), amount=32.3, remark="...", mode="CASH", done=True, accounting_type=t, target_type="USER", target_id=skia.id).save()
+            Operation(journal=gj, date=date.today(), amount=46.42, remark="An answer to life...", mode="CASH", done=True, accounting_type=t, target_type="USER", target_id=skia.id).save()
+            Operation(journal=gj, date=date.today(), amount=666.42,
+                    remark="An answer to life...", mode="CASH", done=True, accounting_type=credit, target_type="USER",
+                    target_id=skia.id).save()
+            Operation(journal=gj, date=date.today(), amount=42,
+                    remark="An answer to life...", mode="CASH", done=False, accounting_type=debit, target_type="CLUB",
+                    target_id=bar_club.id).save()
+
             woenzco = Company(name="Woenzel & co")
             woenzco.save()
             # Adding user sli
@@ -400,7 +415,9 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
             subscriber_group = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)
             ae_board_gorup = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
-            el = Election(title="Élection 2017", description="La roue tourne", start_candidature='1942-06-12 10:28:45', end_candidature='2042-06-12 10:28:45',start_date='1942-06-12 10:28:45', end_date='7942-06-12 10:28:45')
+            el = Election(title="Élection 2017", description="La roue tourne", start_candidature='1942-06-12 10:28:45+01',
+                    end_candidature='2042-06-12 10:28:45+01',start_date='1942-06-12 10:28:45+01',
+                    end_date='7942-06-12 10:28:45+01')
             el.save()
             el.view_groups.add(public_group)
             el.edit_groups.add(ae_board_gorup)
