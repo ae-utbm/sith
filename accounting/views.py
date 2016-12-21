@@ -16,7 +16,7 @@ from django.conf import settings
 
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectFile, SelectDate
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
 from counter.models import Counter, Selling, Product
@@ -165,6 +165,34 @@ class ClubAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete 
 
 # Journal views
 
+class JournalTabsMixin(TabedViewMixin):
+    def get_tabs_title(self):
+        return _("Journal")
+
+    def get_list_of_tabs(self):
+        tab_list = []
+        tab_list.append({
+                    'url': reverse('accounting:journal_details', kwargs={'j_id': self.object.id}),
+                    'slug': 'journal',
+                    'name': _("Journal"),
+                    })
+        tab_list.append({
+                    'url': reverse('accounting:journal_bilan_nature', kwargs={'j_id': self.object.id}),
+                    'slug': 'bilan_nature',
+                    'name': _("Bilan nature"),
+                    })
+        tab_list.append({
+                    'url': reverse('accounting:journal_bilan_person', kwargs={'j_id': self.object.id}),
+                    'slug': 'bilan_person',
+                    'name': _("Bilan person"),
+                    })
+        tab_list.append({
+                    'url': reverse('accounting:journal_bilan_accounting', kwargs={'j_id': self.object.id}),
+                    'slug': 'bilan_accounting',
+                    'name': _("Bilan accounting"),
+                    })
+        return tab_list
+
 class JournalCreateView(CanCreateMixin, CreateView):
     """
     Create a general journal
@@ -182,13 +210,14 @@ class JournalCreateView(CanCreateMixin, CreateView):
                 ret['club_account'] = obj.id
         return ret
 
-class JournalDetailView(CanViewMixin, DetailView):
+class JournalDetailView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     A detail view, listing every operation
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
     template_name = 'accounting/journal_details.jinja'
+    current_tab = 'journal'
 
 class JournalEditView(CanEditMixin, UpdateView):
     """
@@ -444,13 +473,14 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.save()
         return response
 
-class JournalBilanNatureView(CanViewMixin, DetailView):
+class JournalBilanNatureView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     Calculate a dictionary with operation code and sum of operations
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
     template_name='accounting/journal_bilan_nature.jinja'
+    current_tab='bilan_nature'
 
     def sum_by_code(self, code):
         from decimal import Decimal
@@ -485,13 +515,14 @@ class JournalBilanNatureView(CanViewMixin, DetailView):
         kwargs['total_debit'] = self.total_debit()
         return kwargs
 
-class JournalBilanPersonView(CanViewMixin, DetailView):
+class JournalBilanPersonView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     Calculate a dictionary with operation target and sum of operations
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
     template_name='accounting/journal_bilan_person.jinja'
+    current_tab='bilan_person'
 
     def sum_by_target(self, target_id):
         from decimal import Decimal
@@ -527,13 +558,14 @@ class JournalBilanPersonView(CanViewMixin, DetailView):
         kwargs['total_debit'] = self.total_debit()
         return kwargs
 
-class JournalBilanAccountingView(CanViewMixin, DetailView):
+class JournalBilanAccountingView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     Calculate a dictionary with operation type and sum of operations
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
     template_name='accounting/journal_bilan_accounting.jinja'
+    current_tab = "bilan_accounting"
 
     def recursive_sum(self, max_length):
         import collections
