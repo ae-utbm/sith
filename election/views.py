@@ -152,7 +152,7 @@ class VoteFormView(CanCreateMixin, FormView):
     Alows users to vote
     """
     form_class = VoteForm
-    template_name = 'core/page_prop.jinja'
+    template_name = 'election/vote_form.jinja'
 
     def dispatch(self, request, *arg, **kwargs):
         self.election_id = kwargs['election_id']
