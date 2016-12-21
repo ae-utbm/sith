@@ -7,12 +7,14 @@ from django.forms.models import modelform_factory
 from django.core.exceptions import PermissionDenied
 from django.forms import HiddenInput
 from django.db import transaction
+from django.db.models import Sum
 from django.conf import settings
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
+import collections
 
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 
@@ -363,8 +365,6 @@ class OperationPDFView(CanViewMixin, DetailView):
 
         pdfmetrics.registerFont(TTFont('DejaVu', 'DejaVuSerif.ttf'))
 
-
-
         self.object = self.get_object()
         amount = self.object.amount
         remark = self.object.remark
@@ -384,7 +384,6 @@ class OperationPDFView(CanViewMixin, DetailView):
         else:
             target = self.object.target.get_display_name()
 
-
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="op-%d(%s_on_%s).pdf"'  %(num, ti, club_name)
         p = canvas.Canvas(response)
@@ -396,11 +395,11 @@ class OperationPDFView(CanViewMixin, DetailView):
         im = ImageReader("core/static/core/img/logo.jpg")
         iw, ih = im.getSize()
         p.drawImage(im, 40, height - 50, width=iw/2, height=ih/2)
- 
+
         labelStr = [["%s %s - %s %s" % (_("Journal"), ti, _("Operation"), num)]]
 
         label = Table(labelStr, colWidths=[150], rowHeights=[20])
-        
+
         label.setStyle(TableStyle([
                                 ('ALIGN',(0,0),(-1,-1),'CENTER'),
                                 ('BOX', (0,0), (-1,-1), 0.25, colors.black),
@@ -414,11 +413,11 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.drawString(90, height - 190, _("Date: %(date)s") % {"date": date})
 
         data = []
-        
+
         data += [["%s" % (_("Credit").upper() if nature == 'CREDIT' else _("Debit").upper())]]
 
         data += [[_("Amount: %(amount).2f €") % {"amount": amount}]]
-        
+
         payment_mode = ""
         for m in settings.SITH_ACCOUNTING_PAYMENT_METHOD:
             if m[0] == mode:
@@ -428,11 +427,11 @@ class OperationPDFView(CanViewMixin, DetailView):
             payment_mode += " %s\n" %(m[1])
 
         data += [[payment_mode]]
-        
+
         data += [["%s : %s" % (_("Debtor") if nature == 'CREDIT' else _("Creditor"), target), ""]]
 
         data += [["%s \n%s" % (_("Comment:"), remark)]]
-        
+
         t = Table(data, colWidths=[(width-90*2)/2]*2, rowHeights=[20, 20, 70, 20, 80])
         t.setStyle(TableStyle([
                         ('ALIGN',(0,0),(-1,-1),'CENTER'),
@@ -464,8 +463,6 @@ class OperationPDFView(CanViewMixin, DetailView):
 
         t.drawOn(p, 90, 350)
 
-
-
         p.drawCentredString(10.5 * cm, 2 * cm, club_name)
         p.drawCentredString(10.5 * cm, 1 * cm, club_address)
 
@@ -475,44 +472,50 @@ class OperationPDFView(CanViewMixin, DetailView):
 
 class JournalBilanNatureView(JournalTabsMixin, CanViewMixin, DetailView):
     """
-    Calculate a dictionary with operation code and sum of operations
+    Display a statement sorted by labels
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
     template_name='accounting/journal_bilan_nature.jinja'
     current_tab='bilan_nature'
 
-    def sum_by_code(self, code):
-        from decimal import Decimal
-        from django.db.models import Sum, DecimalField
-        return(list((self.object.operations.filter(
-                accounting_type__code=code).aggregate(Sum('amount'))).values())[0])
+    def statement(self, queryset, movement_type):
+        ret = collections.OrderedDict()
+        statement = collections.OrderedDict()
+        total_sum = 0
+        for at in AccountingType.objects.order_by('label').all():
+            sum = queryset.filter(accounting_type__movement_type=movement_type,
+                accounting_type__code__startswith=at.code).aggregate(amount_sum=Sum('amount'))['amount_sum']
+            if sum:
+                total_sum += sum
+                statement[at.label] = sum
+        ret[movement_type] = statement
+        ret[movement_type+"_sum"] = total_sum
+        return ret
 
-    def bilan_credit(self):
-        bilan = {}
-        for el in AccountingType.objects.filter(movement_type='CREDIT'):
-            bilan["%s - %s" % (el.code, el.label)] = self.sum_by_code(el.code)
-        return bilan
-
-    def bilan_debit(self):
-        bilan = {}
-        for el in AccountingType.objects.filter(movement_type='DEBIT'):
-            bilan["%s - %s" % (el.code, el.label)] = self.sum_by_code(el.code)
-        return bilan
-
-    def total_credit(self):
-        return sum(self.bilan_credit().values())
-
-    def total_debit(self):
-        return sum(self.bilan_debit().values())
+    def big_statement(self):
+        label_list = self.object.operations.order_by('label').values_list('label').distinct()
+        labels = Label.objects.filter(id__in=label_list).all()
+        statement = collections.OrderedDict()
+        gen_statement = collections.OrderedDict()
+        no_label_statement = collections.OrderedDict()
+        gen_statement.update(self.statement(self.object.operations.all(), "CREDIT"))
+        gen_statement.update(self.statement(self.object.operations.all(), "DEBIT"))
+        statement[_("General statement")] = gen_statement
+        no_label_statement.update(self.statement(self.object.operations.filter(label=None).all(), "CREDIT"))
+        no_label_statement.update(self.statement(self.object.operations.filter(label=None).all(), "DEBIT"))
+        statement[_("No label operations")] = no_label_statement
+        for l in labels:
+            l_stmt = collections.OrderedDict()
+            l_stmt.update(self.statement(self.object.operations.filter(label=l).all(), "CREDIT"))
+            l_stmt.update(self.statement(self.object.operations.filter(label=l).all(), "DEBIT"))
+            statement[l] = l_stmt
+        return statement
 
     def get_context_data(self, **kwargs):
-        """ Add journal to the context """
+        """ Add infos to the context """
         kwargs = super(JournalBilanNatureView, self).get_context_data(**kwargs)
-        kwargs['bilan_credit'] = self.bilan_credit()
-        kwargs['bilan_debit'] = self.bilan_debit()
-        kwargs['total_credit'] = self.total_credit()
-        kwargs['total_debit'] = self.total_debit()
+        kwargs['statement'] = self.big_statement()
         return kwargs
 
 class JournalBilanPersonView(JournalTabsMixin, CanViewMixin, DetailView):
@@ -530,30 +533,29 @@ class JournalBilanPersonView(JournalTabsMixin, CanViewMixin, DetailView):
         return(list((self.object.operations.filter(
                 target_id=target_id).aggregate(Sum('amount'))).values())[0])
 
-    def bilan_credit(self):
-
-        bilan = {}
+    def credit_statement(self):
+        statement = {}
         for el in Operation.objects.filter(accounting_type__movement_type='CREDIT'):
-            bilan[el.target] = self.sum_by_target(el.target_id)
-        return bilan
+            statement[el.target] = self.sum_by_target(el.target_id)
+        return statement
 
-    def bilan_debit(self):
-        bilan = {}
+    def debit_statement(self):
+        statement = {}
         for el in Operation.objects.filter(accounting_type__movement_type='DEBIT'):
-            bilan[el.target] = self.sum_by_target(el.target_id)
-        return bilan
+            statement[el.target] = self.sum_by_target(el.target_id)
+        return statement
 
     def total_credit(self):
-        return sum(self.bilan_credit().values())
+        return sum(self.credit_statement().values())
 
     def total_debit(self):
-        return sum(self.bilan_debit().values())
+        return sum(self.debit_statement().values())
 
     def get_context_data(self, **kwargs):
         """ Add journal to the context """
         kwargs = super(JournalBilanPersonView, self).get_context_data(**kwargs)
-        kwargs['bilan_credit'] = self.bilan_credit()
-        kwargs['bilan_debit'] = self.bilan_debit()
+        kwargs['credit_statement'] = self.credit_statement()
+        kwargs['debit_statement'] = self.debit_statement()
         kwargs['total_credit'] = self.total_credit()
         kwargs['total_debit'] = self.total_debit()
         return kwargs
@@ -567,38 +569,19 @@ class JournalBilanAccountingView(JournalTabsMixin, CanViewMixin, DetailView):
     template_name='accounting/journal_bilan_accounting.jinja'
     current_tab = "bilan_accounting"
 
-    def recursive_sum(self, max_length):
-        import collections
-        from decimal import Decimal
-        from django.db.models import Sum, DecimalField
-        bilan = {}
-        bilan = collections.OrderedDict(bilan)
-
+    def statement(self):
+        statement = collections.OrderedDict()
         for at in AccountingType.objects.order_by('code').all():
-            #bilan[at] = self.object.operations.filter(type__startswith=at.code)
-            sum_by_type = list((self.object.operations.filter(
-                accounting_type__code__startswith=at.code).aggregate(Sum('amount'))).values())[0]
+            sum_by_type = self.object.operations.filter(
+                accounting_type__code__startswith=at.code).aggregate(amount_sum=Sum('amount'))['amount_sum']
             if sum_by_type != 0:
-                bilan[at] = sum_by_type
-        return bilan
-
-
-    def bilan(self):
-        bilan = self.recursive_sum(3)
-        return bilan
-
-    def total_credit(self):
-        return self.bilan().get('6')#sum(self.bilan().values())
-
-    def total_debit(self):
-        return self.bilan().get('6')#sum(self.bilan().values())
+                statement[at] = sum_by_type
+        return statement
 
     def get_context_data(self, **kwargs):
         """ Add journal to the context """
         kwargs = super(JournalBilanAccountingView, self).get_context_data(**kwargs)
-        kwargs['bilan'] = self.bilan()
-        kwargs['total_credit'] = self.total_credit()
-        kwargs['total_debit'] = self.total_debit()
+        kwargs['statement'] = self.statement()
         return kwargs
 
 # Company views
@@ -634,7 +617,7 @@ class LabelListView(CanViewMixin, DetailView):
     pk_url_kwarg = "clubaccount_id"
     template_name = 'accounting/label_list.jinja'
 
-class LabelCreateView(CanEditMixin, CreateView): # FIXME we need to check the rights before creating the object
+class LabelCreateView(CanCreateMixin, CreateView): # FIXME we need to check the rights before creating the object
     model = Label
     form_class = modelform_factory(Label, fields=['name', 'club_account'], widgets={
         'club_account': HiddenInput,

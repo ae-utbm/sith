@@ -161,7 +161,7 @@ msgstr "type comptable"
 #: accounting/models.py:205 accounting/models.py:299 accounting/models.py:325
 #: accounting/models.py:348 counter/models.py:282
 msgid "label"
-msgstr "intitulé"
+msgstr "étiquette"
 
 #: accounting/models.py:206
 msgid "target type"

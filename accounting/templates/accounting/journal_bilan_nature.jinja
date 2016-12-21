@@ -4,52 +4,53 @@
 {% trans %}General journal:{% endtrans %} {{ object.name }}
 {% endblock %}
 
+{% macro display_tables(dict) %}
+<h4>{% trans %}Credit{% endtrans %}</h4>
+<table>
+    <thead>
+        <tr>
+            <td>{% trans %}Nature of operation{% endtrans %}</td>
+            <td>{% trans %}Sum{% endtrans %}</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for k,v in dict['CREDIT'].items() %}
+        <tr>
+            <td>{{ k }}</td>
+            <td>{{ v }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% trans %}Total: {% endtrans %}{{ dict['CREDIT_sum'] }}
+
+<h4>{% trans %}Debit{% endtrans %}</h4>
+<table>
+    <thead>
+        <tr>
+            <td>{% trans %}Nature of operation{% endtrans %}</td>
+            <td>{% trans %}Sum{% endtrans %}</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for k,v in dict['DEBIT'].items() %}
+        <tr>
+            <td>{{ k }}</td>
+            <td>{{ v }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% trans %}Total: {% endtrans %}{{ dict['DEBIT_sum'] }}
+{% endmacro %}
 
 {% block content %}
-	<h2>{% trans %}Nature bilan: {% endtrans %} {{ object.name }}</h2>
+<h2>{% trans %}Statement by nature: {% endtrans %} {{ object.name }}</h2>
 
-	<h3>{% trans %}Credit{% endtrans %}</h3>
-
-	<table>
-        <thead>
-        <tr>
-            <td>{% trans %}Nature of operation{% endtrans %}</td>
-            <td>{% trans %}Sum{% endtrans %}</td>
-        </tr>
-        </thead>
-        <tbody>
-            {% for key in bilan_credit.keys() %}
-                <tr>
-                	<td>{{key}}</td>
-                	<td>{{bilan_credit[key]}}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-
-    </table>
-
-    <p>Total : {{total_credit}}</p>
-
-	<h3>{% trans %}Debit{% endtrans %}</h3>
-    
-    <table>
-        <thead>
-        <tr>
-            <td>{% trans %}Nature of operation{% endtrans %}</td>
-            <td>{% trans %}Sum{% endtrans %}</td>
-        </tr>
-        </thead>
-        <tbody>
-            {% for key in bilan_debit.keys() %}
-                <tr>
-                    <td>{{key}}</td>
-                    <td>{{bilan_debit[key]}}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-
-    </table>
-
-    <p>Total : {{total_debit}}</p>
+{% for k,v in statement.items() %}
+<h3>{{ k }}</h3>
+{{ display_tables(v) }}
+<hr>
+{% endfor %}
 
 {% endblock %}

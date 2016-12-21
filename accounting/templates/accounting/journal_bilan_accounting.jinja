@@ -6,28 +6,27 @@
 
 
 {% block content %}
-	<h2>{% trans %}Accounting bilan: {% endtrans %} {{ object.name }}</h2>
+<h3>{% trans %}Accounting bilan: {% endtrans %} {{ object.name }}</h3>
 
-	<h3>{% trans %}Credit{% endtrans %}</h3>
-
-	<table>
-        <thead>
+<table>
+    <thead>
         <tr>
-            <td>{% trans %}Type of operations{% endtrans %}</td>
+            <td>{% trans %}Operation type{% endtrans %}</td>
             <td>{% trans %}Sum{% endtrans %}</td>
         </tr>
-        </thead>
-        <tbody>
-            {% for key in bilan.keys() %}
-                <tr>
-                    <td>{{ key }}</td>
-                	<td>{{ bilan[key] }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
+    </thead>
+    <tbody>
+        {% for k,v in bilan.items() %}
+        <tr>
+            <td>{{ k }}</td>
+            <td>{{ v }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 
-    </table>
+</table>
 
-    <p>Total : {{ total_credit }}</p>
+<p><strong>{% trans %}Amount: {% endtrans %}</strong>{{ object.amount }} €</p>
+<p><strong>{% trans %}Effective amount: {% endtrans %}</strong>{{ object.effective_amount }} €</p>
 
 {% endblock %}
