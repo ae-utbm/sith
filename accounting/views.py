@@ -483,12 +483,14 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         ret = collections.OrderedDict()
         statement = collections.OrderedDict()
         total_sum = 0
-        for at in AccountingType.objects.order_by('label').all():
+        for sat in [None] + list(SimplifiedAccountingType.objects.order_by('label').all()):
             sum = queryset.filter(accounting_type__movement_type=movement_type,
-                accounting_type__code__startswith=at.code).aggregate(amount_sum=Sum('amount'))['amount_sum']
+                simpleaccounting_type=sat).aggregate(amount_sum=Sum('amount'))['amount_sum']
+            if sat: sat = sat.label
+            else: sat = ""
             if sum:
                 total_sum += sum
-                statement[at.label] = sum
+                statement[sat] = sum
         ret[movement_type] = statement
         ret[movement_type+"_sum"] = total_sum
         return ret
@@ -532,8 +534,9 @@ class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
                 target_id=target_id, target_type=target_type).aggregate(amount_sum=Sum('amount'))['amount_sum']
 
     def statement(self, movement_type):
-        statement = {}
-        for op in Operation.objects.filter(accounting_type__movement_type=movement_type):
+        statement = collections.OrderedDict()
+        for op in self.object.operations.filter(accounting_type__movement_type=movement_type).order_by('target_type',
+                'target_id').distinct():
             statement[op.target] = self.sum_by_target(op.target_id, op.target_type, movement_type)
         return statement
 
@@ -563,7 +566,7 @@ class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView)
         for at in AccountingType.objects.order_by('code').all():
             sum_by_type = self.object.operations.filter(
                 accounting_type__code__startswith=at.code).aggregate(amount_sum=Sum('amount'))['amount_sum']
-            if sum_by_type != 0:
+            if sum_by_type:
                 statement[at] = sum_by_type
         return statement
 

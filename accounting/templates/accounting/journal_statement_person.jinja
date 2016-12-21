@@ -22,8 +22,10 @@
         <tr>
             {% if key.target_type == "OTHER" %}
             <td>{{ o.target_label }}</td>
-            {% else %}
+            {% elif key %}
             <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
+            {% else %}
+            <td></td>
             {% endif %}
             <td>{{ credit_statement[key] }}</td>
         </tr>
@@ -48,8 +50,10 @@
         <tr>
             {% if key.target_type == "OTHER" %}
             <td>{{ o.target_label }}</td>
-            {% else %}
+            {% elif key %}
             <td><a href="{{ key.get_absolute_url() }}">{{ key.get_display_name() }}</a></td>
+            {% else %}
+            <td></td>
             {% endif %}
             <td>{{ debit_statement[key] }}</td>
         </tr>
