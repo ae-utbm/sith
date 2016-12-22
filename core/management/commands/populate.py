@@ -346,7 +346,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                        date_of_birth="1942-06-12")
             sli.set_password("plop")
             sli.save()
-            skia.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            sli.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             sli.save()
             sli_profile_path = os.path.join(root_path, 'core/fixtures/images/5.jpg')
             with open(sli_profile_path, 'rb') as f:

@@ -8,31 +8,31 @@
 {{ super() -}}
 <style type="text/css">
 time {
-	font-weight: bolder;
+    font-weight: bolder;
 }
 
 th {
-	padding: 5px;
-	margin: 5px;
-	border: solid 1px darkgrey;
-	border-collapse: collapse;
-	vertical-align: top;
-	overflow: hidden;
-	text-overflow: ellipsis;
+    padding: 5px;
+    margin: 5px;
+    border: solid 1px darkgrey;
+    border-collapse: collapse;
+    vertical-align: top;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .election__title {
-	margin: 0;
+    margin: 0;
 }
 
 .election__description {
-	margin: 0;
-	margin-top: 5px;
+    margin: 0;
+    margin-top: 5px;
 }
 
 .election__details {
-	margin: 0;
-	margin-bottom: 5px;
+    margin: 0;
+    margin-bottom: 5px;
 }
 
 .role {
@@ -40,214 +40,214 @@ th {
 }
 
 .role .role__title {
-	background: lightgrey;
+    background: lightgrey;
 }
 
 .role__multiple-choices {
-	color: darkgreen;
+    color: darkgreen;
 }
 
 .role .role_candidates {
-	background: white;
+    background: white;
 }
 
 .list-per-role {
-	padding: 5px;
-	max-width: 310px;
+    padding: 5px;
+    max-width: 310px;
 
 }
 
 .list-per-role__candidates {
-	list-style: none;
-	margin: 0;
+    list-style: none;
+    margin: 0;
 }
 
 .list-per-role__candidate:not(:last-child) {
-	margin-bottom: 5px;
+    margin-bottom: 5px;
 }
 
 .candidate {
-	display: flex;
-	flex-flow: row nowrap;
+    display: flex;
+    flex-flow: row nowrap;
 }
 
 .candidate__picture-wrapper {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-	width: 150px;
-	height: 150px;
+    width: 150px;
+    height: 150px;
 
-	background-color: lightgrey;
+    background-color: lightgrey;
 }
 
 .candidate__picture {
-	max-width: 150px;
-	max-height: 150px;
+    max-width: 150px;
+    max-height: 150px;
 }
 
 .candidate__infos {
-	margin-left: 5px;
+    margin-left: 5px;
 }
 
 .candidate__full-name {
-	display: block;
+    display: block;
 
-	font-weight: bolder;
+    font-weight: bolder;
 }
 
 .candidate__nick-name {
-	font-style: italic;
+    font-style: italic;
 }
 
 .candidate__program {
-	display: block;
-	margin-top: 5px;
+    display: block;
+    margin-top: 5px;
 }
 
 .candidate__vote-input {
-	position: absolute;
-	border: 0;
-	height: 1px;
-	width: 1px;
-	padding: 0;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
+    position: absolute;
+    border: 0;
+    height: 1px;
+    width: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
 }
 
 .candidate__vote-choice {
-		margin-top: 5px;
-		padding: 15px;
+        margin-top: 5px;
+        padding: 15px;
 
-		border: solid 1px darkgrey;
+        border: solid 1px darkgrey;
 
-		text-align: center;
-		cursor: pointer;
+        text-align: center;
+        cursor: pointer;
 }
 
 .candidate__vote-choice:hover, .candidate__vote-choice:focus {
-	background: lightgrey;
+    background: lightgrey;
 }
 
 .candidate__vote-input:checked + .candidate__vote-choice {
-	border-width: 2px;
-	border-color: darkgreen;
-	color: darkgreen;
-	font-weight: bolder;
+    border-width: 2px;
+    border-color: darkgreen;
+    color: darkgreen;
+    font-weight: bolder;
 }
 
 .candidate__vote-input:checked + .candidate__vote-choice:hover,
 .candidate__vote-input:checked + .candidate__vote-choice:focus {
-	background: palegreen;
+    background: palegreen;
 }
 
 .election__sumbit-section {
-	margin-top: 5px;
+    margin-top: 5px;
 }
 
 .election__sumbit-button {
-	display: block;
-	width: 100%;
-	padding: 20px;
-	background: white;
-	border: solid 15px orange;
-	text-align: center;
-	font-size: 200%;
-	font-weight: bolder;
-	cursor: pointer;
+    display: block;
+    width: 100%;
+    padding: 20px;
+    background: white;
+    border: solid 15px orange;
+    text-align: center;
+    font-size: 200%;
+    font-weight: bolder;
+    cursor: pointer;
 }
 </style>
 {%- endblock %}
 
 {% block content %}
-	<h3 class="election__title">{{ object.title }}</h3>
-	<p class="election__description">{{ object.description }}</p>
-	<hr>
-	<section>
-		<p class="election__details">
-			{% trans %}Polls close {% endtrans %}
-			<time datetime="{{ election.end_date }}">{{ election.end_date|date("l d F Y") }}</time> at <time>{{ election.end_date|time("G:i") }}</time>
-		</p>
-{# 		{%- if object.has_voted(request.user) %}
-		<p class="election__elector-infos">
-			<span>{% trans %}You already have submitted your vote.{% endtrans %}</span>
-		</p>
-		{%- endif %}
- #}	</section>
-	<section>
-		<table>
-			{%- set election_lists = object.election_list.all() -%}
-			<caption></caption>
-			<thead>
-				{%- for election_list in election_lists %}
-				<th>{{election_list.title}}</th>
-				{%- endfor %}
-				<th>{% trans %}Blank vote{% endtrans %}</th>
-			</thead>
-			{%- for role in object.role.all() %}
-			<tbody class="role">
-				<tr class="role__title">
-					<td colspan="{{election_lists.count() + 1}}">
-						<span>{{role.title}}</span>
-						{%- if role.max_choice > 1 %}
-						<strong class="role__multiple-choices">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
-						{%- endif %}
-					</td>
-				</tr>
-				<tr class="role_candidates">
-					{%- for election_list in election_lists %}
-					<td class="list-per-role">
-						<ul class="list-per-role__candidates">
-						{%- for candidature in election_list.candidature.filter(role=role) %}
-							<li class="list-per-role__candidate">
-								<figure class="candidate">
-									<div class="candidate__picture-wrapper">
-										{%- if candidature.user.profile_pict %}
-										<img class="candidate__picture" src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
-										{%- endif %}
-									</div>
-									<figcaption class="candidate__infos">
-										<cite class="candidate__full-name">{{ candidature.user.first_name }} <em class="candidate__nick-name">{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</cite>
-										<q class="candidate__program">{{ candidature.program or '' }}</q>
-									</figcaption>
-								</figure>
-								{%- if object.is_active %}
-								<input id="id" class="candidate__vote-input" type="radio" name="vote">
-								<label for="id" class="candidate__vote-choice">
-									<span>{% trans %}Choose{% endtrans %} {{ candidature.user.nick_name or candidature.user.first_name }}</span>
-								</label>
-								{% endif %}
-							</li>
-						{%- endfor %}
-						</ul>
-					</td>
-					{%- endfor %}
-					<td class="list-per-role">
-						{%- if object.is_active %}
-						<input id="id" class="candidate__vote-input" type="radio" name="vote">
-						<label for="id" class="candidate__vote-choice">
-							<span>{% trans %}Choose blank vote{% endtrans %}</span>
-						</label>
-						{% endif %}
-					</td>
-				</tr>
-			</tbody>
-			{%- endfor %}
-		</table>
-	</section>
-	<section class="election__sumbit-section">
-		<button class="election__sumbit-button">{% trans %}Submit the vote !{% endtrans %}</button>
-	</section>
-	<a href="{{url('election:create_list')}}">{% trans %}Add a new list{% endtrans %}</a>
-	<a href="{{url('election:create_role')}}">{% trans %}Add a new role{% endtrans %}</a>
-	<form action="{{url('election:candidate', election_id=object.id)}}" method="post">{{candidate_form}}
-	{% csrf_token %}
+    <h3 class="election__title">{{ object.title }}</h3>
+    <p class="election__description">{{ object.description }}</p>
+    <hr>
+    <section>
+        <p class="election__details">
+            {% trans %}Polls close {% endtrans %}
+            <time datetime="{{ election.end_date }}">{{ election.end_date|date("l d F Y") }}</time> at <time>{{ election.end_date|time("G:i") }}</time>
+        </p>
+{#      {%- if object.has_voted(request.user) %}
+        <p class="election__elector-infos">
+            <span>{% trans %}You already have submitted your vote.{% endtrans %}</span>
+        </p>
+        {%- endif %}
+ #} </section>
+    <section>
+        <table>
+            {%- set election_lists = object.election_list.all() -%}
+            <caption></caption>
+            <thead>
+                {%- for election_list in election_lists %}
+                <th>{{election_list.title}}</th>
+                {%- endfor %}
+                <th>{% trans %}Blank vote{% endtrans %}</th>
+            </thead>
+            {%- for role in object.role.all() %}
+            <tbody class="role">
+                <tr class="role__title">
+                    <td colspan="{{election_lists.count() + 1}}">
+                        <span>{{role.title}}</span>
+                        {%- if role.max_choice > 1 %}
+                        <strong class="role__multiple-choices">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
+                        {%- endif %}
+                    </td>
+                </tr>
+                <tr class="role_candidates">
+                    {%- for election_list in election_lists %}
+                    <td class="list-per-role">
+                        <ul class="list-per-role__candidates">
+                        {%- for candidature in election_list.candidature.filter(role=role) %}
+                            <li class="list-per-role__candidate">
+                                <figure class="candidate">
+                                    <div class="candidate__picture-wrapper">
+                                        {%- if candidature.user.profile_pict %}
+                                        <img class="candidate__picture" src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
+                                        {%- endif %}
+                                    </div>
+                                    <figcaption class="candidate__infos">
+                                        <cite class="candidate__full-name">{{ candidature.user.first_name }} <em class="candidate__nick-name">{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</cite>
+                                        <q class="candidate__program">{{ candidature.program or '' }}</q>
+                                    </figcaption>
+                                </figure>
+                                {%- if object.is_active %}
+                                <input id="id" class="candidate__vote-input" type="radio" name="vote">
+                                <label for="id" class="candidate__vote-choice">
+                                    <span>{% trans %}Choose{% endtrans %} {{ candidature.user.nick_name or candidature.user.first_name }}</span>
+                                </label>
+                                {% endif %}
+                            </li>
+                        {%- endfor %}
+                        </ul>
+                    </td>
+                    {%- endfor %}
+                    <td class="list-per-role">
+                        {%- if object.is_active %}
+                        <input id="id" class="candidate__vote-input" type="radio" name="vote">
+                        <label for="id" class="candidate__vote-choice">
+                            <span>{% trans %}Choose blank vote{% endtrans %}</span>
+                        </label>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+            {%- endfor %}
+        </table>
+    </section>
+    <section class="election__sumbit-section">
+        <button class="election__sumbit-button">{% trans %}Submit the vote !{% endtrans %}</button>
+    </section>
+    <a href="{{url('election:create_list')}}">{% trans %}Add a new list{% endtrans %}</a>
+    <a href="{{url('election:create_role')}}">{% trans %}Add a new role{% endtrans %}</a>
+    <form action="{{url('election:candidate', election_id=object.id)}}" method="post">{{candidate_form}}
+    {% csrf_token %}
     <p><input type="submit" value="{% trans %}Candidate{% endtrans %}" /></p>
-	</form>
-	<form action="{{url('election:vote', election_id=object.id)}}" method="post">
-	{{election_form.as_p()}}
+    </form>
+    <form action="{{url('election:vote', election_id=object.id)}}" method="post">
+    {{election_form.as_p()}}
     <p><input type="submit" value="{% trans %}Vote{% endtrans %}" /></p>
-	{% csrf_token %}
-	</form>
+    {% csrf_token %}
+    </form>
 {% endblock %}

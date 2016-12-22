@@ -18,10 +18,10 @@ class Election(models.Model):
     start_date = models.DateTimeField(_('start date'), blank=False)
     end_date = models.DateTimeField(_('end date'), blank=False)
 
-    edit_groups = models.ManyToManyField(Group, related_name="editable_elections", verbose_name=_("edit group"), blank=True)
-    view_groups = models.ManyToManyField(Group, related_name="viewable_elections", verbose_name=_("view group"), blank=True)
-    vote_groups = models.ManyToManyField(Group, related_name="votable_elections", verbose_name=_("vote group"), blank=True)
-    candidature_groups = models.ManyToManyField(Group, related_name="candidate_elections", verbose_name=_("candidature group"), blank=True)
+    edit_groups = models.ManyToManyField(Group, related_name="editable_elections", verbose_name=_("edit groups"), blank=True)
+    view_groups = models.ManyToManyField(Group, related_name="viewable_elections", verbose_name=_("view groups"), blank=True)
+    vote_groups = models.ManyToManyField(Group, related_name="votable_elections", verbose_name=_("vote groups"), blank=True)
+    candidature_groups = models.ManyToManyField(Group, related_name="candidate_elections", verbose_name=_("candidature groups"), blank=True)
 
     def __str__(self):
         return self.title
