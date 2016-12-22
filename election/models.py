@@ -39,6 +39,12 @@ class Election(models.Model):
     def has_voted(self, user):
         return hasattr(user, 'has_voted') and user.has_voted.all() == list(self.role.all())
 
+    def can_candidate(self, user):
+        for group in self.candidature_groups.all():
+            if user.is_in_group(group):
+                return True
+        return False
+
     # Permissions
 
 

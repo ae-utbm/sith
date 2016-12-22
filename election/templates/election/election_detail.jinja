@@ -35,6 +35,17 @@ th {
     margin-bottom: 5px;
 }
 
+.election__elector-infos {
+    margin: 0;
+    margin-bottom: 5px;
+    font-weight: bolder;
+    color: darkgreen;
+}
+
+.election__vote {
+    margin-bottom: 5px;
+}
+
 .election__vote-form {
     width: auto;
 }
@@ -135,10 +146,10 @@ th {
     color: dimgray;
     text-align: center;
     font-weight: bolder;
-    cursor: pointer;
 }
 
-.candidate__vote-choice:hover, .candidate__vote-choice:focus {
+.candidate__vote-input:not(:disabled:checked) + .candidate__vote-choice:hover,
+.candidate__vote-input:not(:disabled:checked) + .candidate__vote-choice:focus {
     background: lightgrey;
 }
 
@@ -149,8 +160,12 @@ th {
     color: darkgreen;
 }
 
-.candidate__vote-input:checked + .candidate__vote-choice:hover,
-.candidate__vote-input:checked + .candidate__vote-choice:focus {
+.candidate__vote-input:not(:disabled) + .candidate__vote-choice {
+    cursor: pointer;
+}
+
+.candidate__vote-input:checked:not(:disabled) + .candidate__vote-choice:hover,
+.candidate__vote-input:checked:not(:disabled) + .candidate__vote-choice:focus {
     background: palegreen;
 }
 
@@ -159,8 +174,8 @@ th {
     color: darkred;
 }
 
-.role_error .candidate__vote-input:checked + .candidate__vote-choice:hover,
-.role_error .candidate__vote-input:checked + .candidate__vote-choice:focus {
+.role_error .candidate__vote-input:checked:not(:disabled) + .candidate__vote-choice:hover,
+.role_error .candidate__vote-input:checked:not(:disabled) + .candidate__vote-choice:focus {
     background: indianred;
 }
 
@@ -184,6 +199,18 @@ th {
 .election__sumbit-button:focus {
     background-color: lightskyblue;
 }
+
+.election__add-elements a {
+    display: inline-block;
+    border: solid 1px darkgrey;
+    height: 20px;
+    line-height: 20px;
+    padding: 10px;
+}
+
+.election__add-candidature {
+    margin-top: 5px;
+}
 </style>
 {%- endblock %}
 
@@ -202,7 +229,7 @@ th {
         </p>
         {%- endif %}
     </section>
-    <section>
+    <section class="election__vote">
         <form action="/election/1/vote" method="post" class="election__vote-form" name="vote-form" id="vote-form">
             {% csrf_token %}
             <table>
@@ -234,7 +261,7 @@ th {
                     <tr class="role_candidates">
                         <td class="list-per-role">
                             {%- if election.is_active and role.max_choice == 1 %}
-                            <input id="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-input" type="radio" name="{{ role.title }}" value {{ '' if role_data in election_form else 'checked' }}>
+                            <input id="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-input" type="radio" name="{{ role.title }}" value {{ '' if role_data in election_form else 'checked' }} {{ 'disabled' if election.has_voted(request.user) else '' }}>
                             <label for="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-choice">
                                 <span>{% trans %}Choose blank vote{% endtrans %}</span>
                             </label>
@@ -258,7 +285,7 @@ th {
                                         </figcaption>
                                     </figure>
                                     {%- if election.is_active %}
-                                    <input id="id_{{ role.title }}_{{ count[0] }}" type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}" {{ 'checked' if candidature.id|string in role_data else '' }} name="{{ role.title }}" value="{{ candidature.id }}" class="candidate__vote-input">
+                                    <input id="id_{{ role.title }}_{{ count[0] }}" type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}" {{ 'checked' if candidature.id|string in role_data else '' }} {{ 'disabled' if election.has_voted(request.user) else '' }} name="{{ role.title }}" value="{{ candidature.id }}" class="candidate__vote-input">
                                     <label for="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-choice">
                                         <span>{% trans %}Choose{% endtrans %} {{ candidature.user.nick_name or candidature.user.first_name }}</span>
                                     </label>
@@ -275,15 +302,23 @@ th {
             </table>
         </form>
     </section>
+    {%- if not election.has_voted(request.user) %}
     <section class="election__sumbit-section">
         <button class="election__sumbit-button" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
     </section>
+    {%- endif %}
+    {%- if request.user.can_edit(election) %}
     <section class="election__add-elements">
         <a href="{{url('election:create_list')}}">{% trans %}Add a new list{% endtrans %}</a>
         <a href="{{url('election:create_role')}}">{% trans %}Add a new role{% endtrans %}</a>
     </section>
-    <form action="{{url('election:candidate', election_id=election.id)}}" method="post">{{candidate_form}}
-    {% csrf_token %}
-    <p><input type="submit" value="{% trans %}Candidate{% endtrans %}" /></p>
-    </form>
+    {%- endif %}
+    {%- if election.can_candidate(request.user) %}
+    <section class="election__add-candidature">
+        <form action="{{url('election:candidate', election_id=election.id)}}" method="post">{{candidate_form}}
+        {% csrf_token %}
+        <p><input type="submit" value="{% trans %}Candidate{% endtrans %}" /></p>
+        </form>
+    </section>
+    {%- endif %}
 {% endblock %}

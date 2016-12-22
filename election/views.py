@@ -137,10 +137,9 @@ class CandidatureCreateView(CanCreateMixin, FormView):
         data = form.clean()
         res = super(FormView, self).form_valid(form)
         data['election'] = Election.objects.get(id=self.election_id)
-        for grp in data['election'].candidature_groups.all():
-            if data['user'].is_in_group(grp):
-                self.create_candidature(data)
-                return res
+        if(data['election'].can_candidate(data['user'])):
+            self.create_candidature(data)
+            return res
         return res
 
     def get_success_url(self, **kwargs):
