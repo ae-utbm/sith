@@ -63,7 +63,7 @@ th {
     background: lightgrey;
 }
 
-.role__multiple-choices {
+.role__multiple-choices-label {
     color: darkgreen;
 }
 
@@ -251,12 +251,12 @@ th {
                 {%- for role in election.role.all() %}
                 {%- set count = [0] %}
                 {%- set role_data = election_form.data.getlist(role.title) if role.title in election_form.data else [] %}
-                <tbody class="role {% if election_form.errors[role.title] is defined %}role_error{% endif %}">
+                <tbody data-max-choice="{{role.max_choice}}" class="role{{ ' role_error' if role.title in election_form.errors else '' }}{{ ' role__multiple-choices' if role.max_choice > 1 else ''}}">
                     <tr class="role__title">
                         <td colspan="{{election_lists.count() + 1}}">
                             <span>{{role.title}}</span>
                             {%- if role.max_choice > 1 and not election.has_voted(request.user) %}
-                            <strong class="role__multiple-choices">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
+                            <strong class="role__multiple-choices-label">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
                             {%- endif %}
                             {%- if election_form.errors[role.title] is defined %}
                             {%- for error in election_form.errors.as_data()[role.title] %}
@@ -330,4 +330,31 @@ th {
         </form>
     </section>
     {%- endif %}
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+<script type="text/javascript">
+document.querySelectorAll('.role__multiple-choices').forEach(setupRestrictions);
+
+function setupRestrictions(role) {
+    var selectedChoices = [];
+    role.querySelectorAll('input').forEach(setupRestriction);
+
+    function setupRestriction(choice) {
+        if (choice.checked)
+            selectedChoices.push(choice);
+        choice.addEventListener('change', onChange);
+
+        function onChange() {
+            if (choice.checked)
+                selectedChoices.push(choice);
+            else
+                selectedChoices.splice(selectedChoices.indexOf(choice), 1);
+            while (selectedChoices.length > role.dataset.maxChoice)
+                selectedChoices.shift().checked = false;
+        }
+    }
+}
+</script>
 {% endblock %}
