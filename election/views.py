@@ -11,9 +11,10 @@ from django.conf import settings
 from django import forms
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from django.db.models.query import QuerySet
 from django.views.generic.edit import FormMixin
 from core.views.forms import SelectDateTime
-from election.models import Election, Role, Candidature, ElectionList
+from election.models import Election, Role, Candidature, ElectionList, Vote
 
 from ajax_select.fields import AutoCompleteSelectField
 
@@ -28,13 +29,14 @@ class VoteCheckbox(forms.ModelMultipleChoiceField):
     def __init__(self, queryset, max_choice, required=True, widget=None, label=None,
                  initial=None, help_text='', *args, **kwargs):
         self.max_choice = max_choice
-        widget = forms.CheckboxSelectMultiple
+        widget = forms.CheckboxSelectMultiple()
         super(VoteCheckbox, self).__init__(queryset, None, required, widget, label,
                                            initial, help_text, *args, **kwargs)
 
     def clean(self, value):
         qs = super(VoteCheckbox, self).clean(value)
         self.validate(qs)
+        return qs
 
     def validate(self, qs):
         if qs.count() > self.max_choice:
@@ -157,7 +159,18 @@ class VoteFormView(CanCreateMixin, FormView):
         return super(VoteFormView, self).dispatch(request, *arg, **kwargs)
 
     def vote(self, data):
-        print(data)
+        for key in data.keys():
+            if isinstance(data[key], QuerySet):
+                if data[key].count() > 0:
+                    vote = Vote(role=data[key].first().role)
+                    vote.save()
+                for el in data[key]:
+                    vote.candidature.add(el)
+            elif data[key] is not None:
+                vote = Vote(role=data[key].role)
+                vote.save()
+                vote.candidature.add(data[key])
+            self.election.role.get(title=key).has_voted.add(self.request.user)
 
     def get_form_kwargs(self):
         kwargs = super(VoteFormView, self).get_form_kwargs()
