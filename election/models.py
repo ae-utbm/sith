@@ -56,7 +56,7 @@ class Role(models.Model):
     max_choice = models.IntegerField(_('max choice'), default=1)
 
     def user_has_voted(self, user):
-        return not self.has_voted.filter(id=user.id).exists()
+        return self.has_voted.filter(id=user.id).exists()
 
     def __str__(self):
         return ("%s : %s") % (self.election.title, self.title)

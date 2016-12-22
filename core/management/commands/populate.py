@@ -430,7 +430,7 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             listeT.save()
             pres = Role(election=el, title="Président AE", description="Roi de l'AE")
             pres.save()
-            resp = Role(election=el, title="Co Respo Info", description="Ghetto++")
+            resp = Role(election=el, title="Co Respo Info", max_choice=2, description="Ghetto++")
             resp.save()
             cand = Candidature(role=resp, user=skia, election_list=liste, program="Refesons le site AE")
             cand.save()

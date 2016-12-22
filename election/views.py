@@ -59,7 +59,7 @@ class VoteForm(forms.Form):
     def __init__(self, election, user, *args, **kwargs):
         super(VoteForm, self).__init__(*args, **kwargs)
         for role in election.role.all():
-            if role.user_has_voted(user):
+            if not role.user_has_voted(user):
                 cand = role.candidature
                 if role.max_choice > 1:
                     self.fields[role.title] = VoteCheckbox(cand, role.max_choice, required=False)
@@ -97,6 +97,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
         """ Add additionnal data to the template """
         kwargs = super(ElectionDetailView, self).get_context_data(**kwargs)
         kwargs['candidate_form'] = CandidateForm(self.get_object().id)
+        kwargs['election_form'] = VoteForm(self.get_object(), self.request.user)
         return kwargs
 
 
@@ -149,11 +150,10 @@ class VoteFormView(CanCreateMixin, FormView):
     Alows users to vote
     """
     form_class = VoteForm
-    template_name = 'election/vote_form.jinja'
+    template_name = 'election/election_detail.jinja'
 
     def dispatch(self, request, *arg, **kwargs):
-        self.election_id = kwargs['election_id']
-        self.election = get_object_or_404(Election, pk=self.election_id)
+        self.election = get_object_or_404(Election, pk=kwargs['election_id'])
         return super(VoteFormView, self).dispatch(request, *arg, **kwargs)
 
     def vote(self, data):
@@ -171,17 +171,24 @@ class VoteFormView(CanCreateMixin, FormView):
         """
         data = form.clean()
         res = super(FormView, self).form_valid(form)
-        if self.request.user.is_root:
-            self.vote(data)
-            return res
-        for grp in data['role'].election.vote_groups.all():
+        for grp in self.election.vote_groups.all():
             if self.request.user.is_in_group(grp):
                 self.vote(data)
                 return res
         return res
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.election_id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
+
+    def get_context_data(self, **kwargs):
+        """ Add additionnal data to the template """
+        kwargs = super(VoteFormView, self).get_context_data(**kwargs)
+        kwargs['candidate_form'] = CandidateForm(self.election.id)
+        kwargs['object'] = self.election
+        kwargs['election'] = self.election
+        kwargs['election_form'] = self.get_form()
+        return kwargs
+
 
 # Create views
 
@@ -220,8 +227,6 @@ class RoleCreateView(CanCreateMixin, CreateView):
         """
         obj = form.instance
         res = super(CreateView, self).form_valid
-        if self.request.user.is_root:
-            return res(form)
         if obj.election:
             for grp in obj.election.edit_groups.all():
                 if self.request.user.is_in_group(grp):
@@ -245,8 +250,6 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         obj = form.instance
         res = super(CreateView, self).form_valid
         if obj.election:
-            if self.request.user.is_root:
-                return res(form)
             for grp in obj.election.candidature_groups.all():
                 if self.request.user.is_in_group(grp):
                     return res(form)

@@ -239,7 +239,15 @@ th {
 	<section class="election__sumbit-section">
 		<button class="election__sumbit-button">{% trans %}Submit the vote !{% endtrans %}</button>
 	</section>
+	<a href="{{url('election:create_list')}}">{% trans %}Add a new list{% endtrans %}</a>
+	<a href="{{url('election:create_role')}}">{% trans %}Add a new role{% endtrans %}</a>
 	<form action="{{url('election:candidate', election_id=object.id)}}" method="post">{{candidate_form}}
+	{% csrf_token %}
+    <p><input type="submit" value="{% trans %}Candidate{% endtrans %}" /></p>
+	</form>
+	<form action="{{url('election:vote', election_id=object.id)}}" method="post">
+	{{election_form.as_p()}}
+    <p><input type="submit" value="{% trans %}Vote{% endtrans %}" /></p>
 	{% csrf_token %}
 	</form>
 {% endblock %}
