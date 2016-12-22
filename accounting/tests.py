@@ -6,6 +6,7 @@ from django.conf import settings
 
 from core.models import User
 from counter.models import Counter
+from accounting.models import GeneralJournal, Operation, AccountingType
 
 
 class RefoundAccountTest(TestCase):
@@ -17,7 +18,7 @@ class RefoundAccountTest(TestCase):
         self.skia.customer.save()
 
     def test_permission_denied(self):
-        self.client.login(useername='guy', password='plop')
+        self.client.login(username='guy', password='plop')
         response_post = self.client.post(reverse("accounting:refound_account"),
                                          {"user": self.skia.id})
         response_get = self.client.get(reverse("accounting:refound_account"))
@@ -45,3 +46,75 @@ class RefoundAccountTest(TestCase):
         self.assertTrue('<form action="" method="post">' in str(response_get.content))
         self.assertFalse(response_post.status_code == 403)
         self.assertTrue(self.skia.customer.amount == 0)
+
+class JournalTest(TestCase):
+    def setUp(self):
+        call_command("populate")
+        self.journal = GeneralJournal.objects.filter(id = 1).first()
+
+    def test_permission_granted(self):
+        self.client.login(username='comptable', password='plop')
+        response_get = self.client.get(reverse("accounting:journal_details", args=[self.journal.id]))
+
+        self.assertTrue(response_get.status_code == 200)
+        self.assertTrue('<td>M\\xc3\\xa9thode de paiement</td>' in str(response_get.content))
+
+    def test_permission_not_granted(self):
+        self.client.login(username='skia', password='plop')
+        response_get = self.client.get(reverse("accounting:journal_details", args=[self.journal.id]))
+
+        self.assertTrue(response_get.status_code == 403)
+        self.assertFalse('<td>M\xc3\xa9thode de paiement</td>' in str(response_get.content))
+
+class OperationTest(TestCase):
+    def setUp(self):
+        call_command("populate")
+        self.journal = GeneralJournal.objects.filter(id = 1).first()
+        self.skia = User.objects.filter(username='skia').first()
+
+    def test_new_operation(self):
+        self.client.login(username='comptable', password='plop')  
+        at = AccountingType.objects.filter(code = '604').first()
+        at.save()
+        response = self.client.post(reverse('accounting:op_new', 
+                                                        args=[self.journal.id]),
+                                                        {'amount': 30,
+                                                        'remark' : "Un gros test",
+                                                        'journal' : self.journal.id,
+                                                        'target_type' : 'OTHER',
+                                                        'target_id' : '',
+                                                        'target_label' : "Le fantome de la nuit",
+                                                        'date' : '04/12/2020',
+                                                        'mode' : 'CASH',
+                                                        'cheque_number' : '', 
+                                                        'invoice' : '', 
+                                                        'simpleaccounting_type' : '',
+                                                        'accounting_type': at.id,
+                                                        'label' : '',
+                                                        'done' : False,
+                                                        })
+        self.assertFalse(response.status_code == 403)
+        self.assertTrue(self.journal.operations.filter(target_label = "Le fantome de la nuit").exists())
+
+    def test_new_operation_not_authorized(self):
+        self.client.login(username='skia', password='plop')
+        at = AccountingType.objects.filter(code = '604').first()
+        at.save()
+        response = self.client.post(reverse('accounting:op_new', 
+                                                        args=[self.journal.id]),
+                                                        {'amount': 30,
+                                                        'remark' : "Un gros test",
+                                                        'journal' : self.journal.id,
+                                                        'target_type' : 'OTHER',
+                                                        'target_id' : '',
+                                                        'target_label' : "Le fantome de la nuit",
+                                                        'date' : '04/12/2020',
+                                                        'mode' : 'CASH',
+                                                        'cheque_number' : '', 
+                                                        'invoice' : '', 
+                                                        'simpleaccounting_type' : '',
+                                                        'accounting_type': at.id,
+                                                        'label' : '',
+                                                        'done' : False,
+                                                        })
+        self.assertTrue(response.status_code == 403)

@@ -295,22 +295,22 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             ca.save()
             gj = GeneralJournal(name="A16", start_date=date.today(), club_account=ca)
             gj.save()
-            credit = AccountingType(code='74', label="Someone gave us money", movement_type='CREDIT')
+            credit = AccountingType(code='74', label="Subventions d'exploitation", movement_type='CREDIT')
             credit.save()
-            debit = AccountingType(code='607', label="Had to pay a beer", movement_type='DEBIT')
+            debit = AccountingType(code='606', label="Achats non stockés de matières et fournitures(*1)", movement_type='DEBIT')
             debit.save()
-            t = AccountingType(code='602', label="Gros test de malade", movement_type='DEBIT')
-            t.save()
-            Operation(journal=gj, date=date.today(), amount=32.3, remark="...", mode="CASH", done=True, accounting_type=t, target_type="USER", target_id=skia.id).save()
-            t = AccountingType(code='60', label="...", movement_type='DEBIT')
-            t.save()
-            Operation(journal=gj, date=date.today(), amount=32.3, remark="...", mode="CASH", done=True, accounting_type=t, target_type="USER", target_id=skia.id).save()           
-            Operation(journal=gj, date=date.today(), amount=46.42, remark="An answer to life...", mode="CASH", done=True, accounting_type=t, target_type="USER", target_id=skia.id).save()
+            debit2 = AccountingType(code='604', label="Achats d'études et prestations de services(*2)", movement_type='DEBIT')
+            debit2.save()
+            Operation(journal=gj, date=date.today(), amount=300, remark="Paiement Guy", mode="CASH", done=True, accounting_type=debit2, target_type="USER", target_id=skia.id).save()
+            buying = AccountingType(code='60', label="Achats (sauf 603)", movement_type='DEBIT')
+            buying.save()
+            Operation(journal=gj, date=date.today(), amount=32.3, remark="Essence", mode="CASH", done=True, accounting_type=buying, target_type="USER", target_id=skia.id).save()           
+            Operation(journal=gj, date=date.today(), amount=46.42, remark="marqueurs + rouleaux", mode="CASH", done=True, accounting_type=debit, target_type="USER", target_id=skia.id).save()
             Operation(journal=gj, date=date.today(), amount=666.42,
-                    remark="An answer to life...", mode="CASH", done=True, accounting_type=credit, target_type="USER",
+                    remark="Subvention territoire de FarfarAway", mode="CASH", done=True, accounting_type=credit, target_type="USER",
                     target_id=skia.id).save()
             Operation(journal=gj, date=date.today(), amount=42,
-                    remark="An answer to life...", mode="CASH", done=False, accounting_type=debit, target_type="CLUB",
+                    remark="La Gargotte du Korrigan", mode="CASH", done=False, accounting_type=debit, target_type="CLUB",
                     target_id=bar_club.id).save()
             woenzco = Company(name="Woenzel & co")
             woenzco.save()
