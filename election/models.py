@@ -36,12 +36,6 @@ class Election(models.Model):
         now = timezone.now()
         return bool(now <= self.end_candidature and now >= self.start_candidature)
 
-    def get_results(self):
-        pass
-
-    def has_voted(self, user):
-        return False
-
     # Permissions
 
 

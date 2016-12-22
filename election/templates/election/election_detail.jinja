@@ -169,12 +169,12 @@ th {
 			{% trans %}Polls close {% endtrans %}
 			<time datetime="{{ election.end_date }}">{{ election.end_date|date("l d F Y") }}</time> at <time>{{ election.end_date|time("G:i") }}</time>
 		</p>
-		{%- if object.has_voted(request.user) %}
+{# 		{%- if object.has_voted(request.user) %}
 		<p class="election__elector-infos">
 			<span>{% trans %}You already have submitted your vote.{% endtrans %}</span>
 		</p>
 		{%- endif %}
-	</section>
+ #}	</section>
 	<section>
 		<table>
 			{%- set election_lists = object.election_list.all() -%}
