@@ -37,7 +37,10 @@ class Election(models.Model):
         return bool(now <= self.end_candidature and now >= self.start_candidature)
 
     def has_voted(self, user):
-        return hasattr(user, 'has_voted') and list(user.has_voted.all()) == list(self.role.all())
+        for role in self.role.all():
+            if role.user_has_voted(user):
+                return True
+        return False
 
     def can_candidate(self, user):
         for group in self.candidature_groups.all():
