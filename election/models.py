@@ -36,6 +36,9 @@ class Election(models.Model):
         now = timezone.now()
         return bool(now <= self.end_candidature and now >= self.start_candidature)
 
+    def has_voted(self, user):
+        return hasattr(user, 'has_voted') and user.has_voted.all() == list(self.role.all())
+
     # Permissions
 
 

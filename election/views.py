@@ -40,7 +40,7 @@ class VoteCheckbox(forms.ModelMultipleChoiceField):
 
     def validate(self, qs):
         if qs.count() > self.max_choice:
-            raise forms.ValidationError(_("You have selected too much candidate"))
+            raise forms.ValidationError(_("You have selected too much candidates."), code='invalid')
 
 
 # Forms
