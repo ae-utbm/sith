@@ -48,6 +48,12 @@ class Election(models.Model):
                 return True
         return False
 
+    def can_vote(self, user):
+        for group in self.vote_groups.all():
+            if user.is_in_group(group):
+                return True
+        return False
+
     # Permissions
 
 
