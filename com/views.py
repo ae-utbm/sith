@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.conf import settings
 from django import forms
 
 from datetime import timedelta
@@ -13,6 +14,7 @@ from datetime import timedelta
 from com.models import Sith, News, NewsDate
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin
 from core.views.forms import SelectDateTime
+from core.models import Notification, RealGroup
 from club.models import Club
 
 
@@ -141,6 +143,9 @@ class NewsEditView(CanEditMixin, UpdateView):
         else:
             self.object.is_moderated = False
             self.object.save()
+            for u in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
+                if not u.notifications.filter(type="NEWS_MODERATION", viewed=False).exists():
+                    Notification(user=u, url=reverse("com:news_detail", kwargs={'news_id': self.object.id}), type="NEWS_MODERATION").save()
         return super(NewsEditView, self).form_valid(form)
 
 class NewsCreateView(CanCreateMixin, CreateView):
@@ -165,12 +170,14 @@ class NewsCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        print(form.cleaned_data)
         if form.cleaned_data['automoderation'] and self.request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID):
-            print("GUY")
             self.object.moderator = self.request.user
             self.object.is_moderated = True
             self.object.save()
+        else:
+            for u in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
+                if not u.notifications.filter(type="NEWS_MODERATION", viewed=False).exists():
+                    Notification(user=u, url=reverse("com:news_detail", kwargs={'news_id': self.object.id}), type="NEWS_MODERATION").save()
         return super(NewsCreateView, self).form_valid(form)
 
 class NewsModerateView(CanEditMixin, SingleObjectMixin):

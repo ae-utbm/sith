@@ -440,6 +440,7 @@ SITH_LAUNDERETTE_PRICES = {
         }
 
 SITH_NOTIFICATIONS = [
+        ('NEWS_MODERATION', _("A fresh new to be moderated")),
         ('FILE_MODERATION', _("New files to be moderated")),
         ('SAS_MODERATION', _("New pictures/album to be moderated in the SAS")),
         ('NEW_PICTURES', _("You've been identified on some pictures")),
