@@ -245,7 +245,7 @@ th {
         {%- endif %}
     </section>
     <section class="election__vote">
-        <form action="/election/1/vote" method="post" class="election__vote-form" name="vote-form" id="vote-form">
+        <form action="{{url('election:vote', election.id)}}" method="post" class="election__vote-form" name="vote-form" id="vote-form">
             {% csrf_token %}
             <table>
                 {%- set election_lists = election.election_list.all() -%}
