@@ -9,8 +9,6 @@
 {% block content %}
 <p><a href="{{ url('com:news_list') }}">{% trans %}Back to news{% endtrans %}</a></p>
     <h3>{% trans %}News{% endtrans %}</h3>
-    {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user.is_root %}
-    {% endif %}
     <section class="news_event">
         <h4>{{ news.title }}</h4>
         <p class="date">

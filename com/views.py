@@ -125,6 +125,13 @@ class NewsEditView(CanEditMixin, UpdateView):
         except: pass
         return init
 
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid() and not 'preview' in request.POST.keys():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
     def form_valid(self, form):
         self.object = form.save()
         if form.cleaned_data['automoderation'] and self.request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID):
@@ -147,6 +154,14 @@ class NewsCreateView(CanCreateMixin, CreateView):
             init['club'] = Club.objects.filter(id=self.request.GET['club']).first()
         except: pass
         return init
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid() and not 'preview' in request.POST.keys():
+            return self.form_valid(form)
+        else:
+            self.object = form.instance
+            return self.form_invalid(form)
 
     def form_valid(self, form):
         self.object = form.save()
