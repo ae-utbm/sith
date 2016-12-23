@@ -224,13 +224,23 @@ th {
     <p class="election__description">{{ election.description }}</p>
     <hr>
     <section class="election__details">
-        <p class="">
+        <p>
+            {%- if election.is_vote_active %}
             {% trans %}Polls close {% endtrans %}
+            {%- else %}
+            {% trans %}Polls will open {% endtrans %}
+            <time datetime="{{ election.start_date }}">{{ election.start_date|date("l d F Y") }}</time> at <time>{{ election.start_date|time("G:i") }}</time>
+            {% trans %}and will close {% endtrans %}
+            {%- endif %}
             <time datetime="{{ election.end_date }}">{{ election.end_date|date("l d F Y") }}</time> at <time>{{ election.end_date|time("G:i") }}</time>
         </p>
-        {%- if election.has_voted(request.user) %}
+        {%- if election.has_voted(user) %}
         <p class="election__elector-infos">
+            {%- if election.is_vote_active %}
             <span>{% trans %}You already have submitted your vote.{% endtrans %}</span>
+            {%- else %}
+            <span>{% trans %}You have voted in this election.{% endtrans %}</span>
+            {%- endif %}
         </p>
         {%- endif %}
     </section>
@@ -241,7 +251,7 @@ th {
                 {%- set election_lists = election.election_list.all() -%}
                 <caption></caption>
                 <thead>
-                    {%- if not election.has_voted(request.user) %}
+                    {%- if not election.has_voted(user) %}
                     <th>{% trans %}Blank vote{% endtrans %}</th>
                     {%- endif %}
                     {%- for election_list in election_lists %}
@@ -255,7 +265,7 @@ th {
                     <tr class="role__title">
                         <td colspan="{{election_lists.count() + 1}}">
                             <span>{{role.title}}</span>
-                            {%- if role.max_choice > 1 and not election.has_voted(request.user) %}
+                            {%- if role.max_choice > 1 and not election.has_voted(user) %}
                             <strong class="role__multiple-choices-label">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
                             {%- endif %}
                             {%- if election_form.errors[role.title] is defined %}
@@ -266,10 +276,10 @@ th {
                         </td>
                     </tr>
                     <tr class="role_candidates">
-                        {%- if not election.has_voted(request.user) %}
+                        {%- if election.can_vote(user) %}
                         <td class="list-per-role">
-                            {%- if election.is_active and role.max_choice == 1 %}
-                            <input id="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-input" type="radio" name="{{ role.title }}" value {{ '' if role_data in election_form else 'checked' }} {{ 'disabled' if election.has_voted(request.user) else '' }}>
+                            {%- if role.max_choice == 1 %}
+                            <input id="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-input" type="radio" name="{{ role.title }}" value {{ '' if role_data in election_form else 'checked' }} {{ 'disabled' if election.has_voted(user) else '' }}>
                             <label for="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-choice">
                                 <span>{% trans %}Choose blank vote{% endtrans %}</span>
                             </label>
@@ -293,8 +303,8 @@ th {
                                             <q class="candidate__program">{{ candidature.program or '' }}</q>
                                         </figcaption>
                                     </figure>
-                                    {%- if election.is_active and not election.has_voted(request.user) %}
-                                    <input id="id_{{ role.title }}_{{ count[0] }}" type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}" {{ 'checked' if candidature.id|string in role_data else '' }} {{ 'disabled' if election.has_voted(request.user) else '' }} name="{{ role.title }}" value="{{ candidature.id }}" class="candidate__vote-input">
+                                    {%- if election.can_vote(user) %}
+                                    <input id="id_{{ role.title }}_{{ count[0] }}" type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}" {{ 'checked' if candidature.id|string in role_data else '' }} {{ 'disabled' if election.has_voted(user) else '' }} name="{{ role.title }}" value="{{ candidature.id }}" class="candidate__vote-input">
                                     <label for="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-choice">
                                         <span>{% trans %}Choose{% endtrans %} {{ candidature.user.nick_name or candidature.user.first_name }}</span>
                                     </label>
@@ -311,18 +321,18 @@ th {
             </table>
         </form>
     </section>
-    {%- if not election.has_voted(request.user) %}
+    {%- if not election.has_voted(user) %}
     <section class="election__sumbit-section">
         <button class="election__sumbit-button" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
     </section>
     {%- endif %}
-    {%- if request.user.can_edit(election) %}
+    {%- if user.can_edit(election) %}
     <section class="election__add-elements">
         <a href="{{url('election:create_list')}}">{% trans %}Add a new list{% endtrans %}</a>
         <a href="{{url('election:create_role')}}">{% trans %}Add a new role{% endtrans %}</a>
     </section>
     {%- endif %}
-    {%- if election.can_candidate(request.user) %}
+    {%- if election.can_candidate(user) or user.can_edit(election) %}
     <section class="election__add-candidature">
         <form action="{{url('election:candidate', election_id=election.id)}}" method="post">{{candidate_form}}
         {% csrf_token %}

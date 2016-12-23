@@ -27,7 +27,7 @@ class Election(models.Model):
         return self.title
 
     @property
-    def is_active(self):
+    def is_vote_active(self):
         now = timezone.now()
         return bool(now <= self.end_date and now >= self.start_date)
 
@@ -49,6 +49,8 @@ class Election(models.Model):
         return False
 
     def can_vote(self, user):
+        if not self.is_vote_active or self.has_voted(user):
+            return False
         for group in self.vote_groups.all():
             if user.is_in_group(group):
                 return True
