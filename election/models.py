@@ -57,10 +57,10 @@ class Election(models.Model):
         return False
 
     @property
-    def get_results(self):
+    def results(self):
         results = {}
         for role in self.role.all():
-            results[role.title] = role.get_results
+            results[role.title] = role.results
         return results
 
     # Permissions
@@ -80,7 +80,7 @@ class Role(models.Model):
         return self.has_voted.filter(id=user.id).exists()
 
     @property
-    def get_results(self):
+    def results(self):
         results = {}
         total_vote = self.has_voted.count() * self.max_choice
         if total_vote == 0:

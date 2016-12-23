@@ -87,12 +87,16 @@ th {
 }
 
 .list-per-role__candidate:not(:last-child) {
-    margin-bottom: 5px;
+    margin-bottom: 15px;
 }
 
-.candidate {
+.candidate__infos {
     display: flex;
     flex-flow: row nowrap;
+}
+
+.candidate__infos:not(:last-child) {
+    margin-bottom: 5px;
 }
 
 .candidate__picture-wrapper {
@@ -113,7 +117,7 @@ th {
     max-height: 150px;
 }
 
-.candidate__infos {
+.candidate__details {
     margin-left: 5px;
 }
 
@@ -184,6 +188,10 @@ th {
     background: indianred;
 }
 
+.election__results {
+    text-align: center;
+}
+
 .election__sumbit-section {
     margin-bottom: 5px;
 }
@@ -251,9 +259,7 @@ th {
                 {%- set election_lists = election.election_list.all() -%}
                 <caption></caption>
                 <thead>
-                    {%- if not election.has_voted(user) and election.can_vote(user) %}
                     <th>{% trans %}Blank vote{% endtrans %}</th>
-                    {%- endif %}
                     {%- for election_list in election_lists %}
                     <th>{{election_list.title}}</th>
                     {%- endfor %}
@@ -276,29 +282,33 @@ th {
                         </td>
                     </tr>
                     <tr class="role_candidates">
-                        {%- if election.can_vote(user) %}
                         <td class="list-per-role">
-                            {%- if role.max_choice == 1 %}
+                            {%- if role.max_choice == 1 and election.can_vote(user) %}
                             <input id="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-input" type="radio" name="{{ role.title }}" value {{ '' if role_data in election_form else 'checked' }} {{ 'disabled' if election.has_voted(user) else '' }}>
                             <label for="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-choice">
                                 <span>{% trans %}Choose blank vote{% endtrans %}</span>
                             </label>
                             {%- set _ = count.append(count.pop() + 1) %}
                             {%- endif %}
+                            {%- if election.has_voted(user) or not election.is_vote_active %}
+                            {%- set results = election_results[role.title]['blank vote'] %}
+                            <div class="election__results">
+                                <strong>{{results.vote}} {% trans %}votes{% endtrans %} ( {{results.percent}} %)</strong>
+                            </div>
+                            {%- endif %}
                         </td>
-                        {%- endif %}
                         {%- for election_list in election_lists %}
                         <td class="list-per-role">
                             <ul class="list-per-role__candidates">
                                 {%- for candidature in election_list.candidature.filter(role=role) %}
-                                <li class="list-per-role__candidate">
-                                    <figure class="candidate">
+                                <li class="list-per-role__candidate candidate">
+                                    <figure class="candidate__infos">
                                         <div class="candidate__picture-wrapper">
                                             {%- if candidature.user.profile_pict and user.is_subscriber_viewable %}
                                             <img class="candidate__picture" src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
                                             {%- endif %}
                                         </div>
-                                        <figcaption class="candidate__infos">
+                                        <figcaption class="candidate__details">
                                             <cite class="candidate__full-name">{{ candidature.user.first_name }} <em class="candidate__nick-name">{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</cite>
                                             <q class="candidate__program">{{ candidature.program or '' }}</q>
                                         </figcaption>
@@ -309,6 +319,11 @@ th {
                                         <span>{% trans %}Choose{% endtrans %} {{ candidature.user.nick_name or candidature.user.first_name }}</span>
                                     </label>
                                     {%- set _ = count.append(count.pop() + 1) %}
+                                    {%- else %}
+                                    {%- set results = election_results[role.title][candidature.user.username] %}
+                                    <div class="election__results">
+                                        <strong>{{results.vote}} {% trans %}votes{% endtrans %} ( {{results.percent}} %)</strong>
+                                    </div>
                                     {%- endif %}
                                 </li>
                                 {%- endfor %}
