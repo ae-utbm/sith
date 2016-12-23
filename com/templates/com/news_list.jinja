@@ -1,0 +1,86 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}News{% endtrans %}
+{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style type="text/css" media="all">
+section {
+    padding: 5px;
+}
+section.news_call {
+    background: lightgrey;
+}
+section.news_event:nth-child(even) {
+    background: lightblue;
+}
+.date {
+    font-size: small;
+    color: grey;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <h3>{% trans %}News{% endtrans %}</h3>
+    <hr>
+    <h4>Notice</h4>
+    {% for news in object_list.filter(type="NOTICE") %}
+    <section class="news_notice">
+        <h4>{{ news.title }}</h4>
+        <p>{{ news.summary }}</p>
+    </section>
+    {% endfor %}
+    <hr>
+    <h4>Calls</h4>
+    {% for news in object_list.filter(dates__start_date__lte=timezone.now(), dates__end_date__gte=timezone.now(), type="CALL") %}
+    <section class="news_call">
+        <h4>{{ news.title }}</h4>
+        <p class="date">
+            <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
+                {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+            <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
+                {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
+        </p>
+        <p>{{ news.summary }}</p>
+    </section>
+    {% endfor %}
+    <hr>
+    <h4>Events</h4>
+    {% for news in object_list.filter(dates__end_date__gte=timezone.now(), type="EVENT") %}
+    <section class="news_event">
+        <h4>{{ news.title }}</h4>
+        <p class="date">
+            <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
+                {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+            <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
+                {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
+        </p>
+        <p><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></p>
+        <p>{{ news.summary|markdown }}</p>
+    </section>
+    {% endfor %}
+    <hr>
+    <h4>Weekly</h4>
+    {% for news in object_list.filter(dates__end_date__gte=timezone.now(), type="WEEKLY").distinct() %}
+    <!-- buggy when more than one news, anyway, we won't use it this way -->
+    {% for d in news.dates.all() %}
+    <section class="news_weekly">
+        <h4>{{ news.title }}</h4>
+        <p class="date">
+            <span>{{ d.start_date|localtime|date(DATETIME_FORMAT) }}
+                {{ d.start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+            <span>{{ d.end_date|localtime|date(DATETIME_FORMAT) }}
+                {{ d.end_date|localtime|time(DATETIME_FORMAT) }}</span>
+        </p>
+        <p><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></p>
+        <p>{{ news.summary|markdown }}</p>
+    </section>
+    {% endfor %}
+    {% endfor %}
+{% endblock %}
+
+
+

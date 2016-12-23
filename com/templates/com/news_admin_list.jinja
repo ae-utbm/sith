@@ -1,0 +1,25 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}News admin{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <h3>{% trans %}News{% endtrans %}</h3>
+    <ul>
+    {% for news in object_list %}
+    <li>
+        <p>{{ news.get_type_display() }} - {{ news.title }}:
+            <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
+                {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+            <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
+                {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span> -
+            <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
+        </p>
+    </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+
+
+
