@@ -100,7 +100,6 @@ class ElectionDetailView(CanViewMixin, DetailView):
         kwargs = super(ElectionDetailView, self).get_context_data(**kwargs)
         kwargs['candidate_form'] = CandidateForm(self.get_object().id)
         kwargs['election_form'] = VoteForm(self.get_object(), self.request.user)
-        kwargs['user'] = self.request.user
         return kwargs
 
 
