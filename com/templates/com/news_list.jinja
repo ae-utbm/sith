@@ -10,10 +10,11 @@
 section {
     padding: 5px;
 }
-section.news_call {
+section.news_call, section.news_notice {
     background: lightgrey;
+    margin: 2px;
 }
-section.news_event:nth-child(even) {
+section.news_event:nth-of-type(even) {
     background: lightblue;
 }
 .date {
@@ -25,50 +26,62 @@ section.news_event:nth-child(even) {
 
 {% block content %}
     <h3>{% trans %}News{% endtrans %}</h3>
-    <hr>
-    <h4>{% trans %}Notice{% endtrans %}</h4>
     {% for news in object_list.filter(type="NOTICE") %}
     <section class="news_notice">
-        <h4>{{ news.title }}</h4>
-        <p>{{ news.summary }}</p>
+        <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
+        <p>{{ news.summary|markdown }}</p>
     </section>
     {% endfor %}
-    <hr>
-    <h4>{% trans %}Calls{% endtrans %}</h4>
     {% for news in object_list.filter(dates__start_date__lte=timezone.now(), dates__end_date__gte=timezone.now(), type="CALL") %}
     <section class="news_call">
-        <h4>{{ news.title }}</h4>
+        <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
         <p class="date">
             <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
                 {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
             <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
                 {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
         </p>
-        <p>{{ news.summary }}</p>
+        <p>{{ news.summary|markdown }}</p>
     </section>
     {% endfor %}
     <hr>
-    <h4>{% trans %}Events{% endtrans %}</h4>
-    {% for news in object_list.filter(dates__end_date__gte=timezone.now(), type="EVENT") %}
+    <h4>{% trans %}Events today and the next few days{% endtrans %}</h4>
+    {% for d in NewsDate.objects.filter(end_date__gte=timezone.now(), start_date__lte=timezone.now()+timedelta(days=5),
+                                        news__type="EVENT", news__is_moderated=True).datetimes('start_date', 'day') %}
+    <h5 class="date">{{ d|localtime|date(DATETIME_FORMAT) }}</h5>
+    {% for news in object_list.filter(dates__start_date__gte=d, dates__start_date__lte=d+timedelta(days=1),
+                                      type="EVENT").exclude(dates__end_date__lt=timezone.now()) %}
     <section class="news_event">
-        <h4>{{ news.title }}</h4>
+        <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
         <p class="date">
-            <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
-                {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-            <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
-                {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
+            <span>{{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+            <span>{{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
         </p>
         <p><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></p>
         <p>{{ news.summary|markdown }}</p>
     </section>
     {% endfor %}
     <hr>
+    <h4>{% trans %}Coming soon... don't miss!{% endtrans %}</h4>
+    {% endfor %}
+    {% for news in object_list.filter(dates__start_date__gte=timezone.now()+timedelta(days=5), type="EVENT") %}
+    <section>
+        <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a>
+            <span class="date">{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
+                {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }} -
+            {{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
+            {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
+        </h4>
+    </section>
+    {% endfor %}
+    <!--
+    <hr>
     <h4>{% trans %}Weekly{% endtrans %}</h4>
     {% for news in object_list.filter(dates__end_date__gte=timezone.now(), type="WEEKLY").distinct() %}
-    <!-- buggy when more than one news, anyway, we won't use it this way -->
+    buggy when more than one news, anyway, we won't use it this way
     {% for d in news.dates.all() %}
     <section class="news_weekly">
-        <h4>{{ news.title }}</h4>
+        <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
         <p class="date">
             <span>{{ d.start_date|localtime|date(DATETIME_FORMAT) }}
                 {{ d.start_date|localtime|time(DATETIME_FORMAT) }}</span> -
@@ -80,6 +93,7 @@ section.news_event:nth-child(even) {
     </section>
     {% endfor %}
     {% endfor %}
+    -->
 {% endblock %}
 
 

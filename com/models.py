@@ -32,9 +32,18 @@ class News(models.Model):
     content = models.TextField(_("content"))
     type = models.CharField(_("type"), max_length=16, choices=NEWS_TYPES, default="EVENT")
     club = models.ForeignKey(Club, related_name="news", verbose_name=_("club"))
-    owner = models.ForeignKey(User, related_name="owned_news", verbose_name=_("owner"))
+    author = models.ForeignKey(User, related_name="owned_news", verbose_name=_("author"))
     is_moderated = models.BooleanField(_("is moderated"), default=False)
-    moderator = models.ForeignKey(User, related_name="moderated_news", verbose_name=_("owner"), null=True)
+    moderator = models.ForeignKey(User, related_name="moderated_news", verbose_name=_("moderator"), null=True)
+
+    def is_owned_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user == self.author
+
+    def can_be_edited_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def can_be_viewed_by(self, user):
+        return self.is_moderated or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def get_absolute_url(self):
         return reverse('com:news_detail', kwargs={'news_id': self.id})

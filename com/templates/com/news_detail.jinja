@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
 
 {% block title %}
 {% trans %}News{% endtrans %} -
@@ -6,9 +7,30 @@
 {% endblock %}
 
 {% block content %}
+<p><a href="{{ url('com:news_list') }}">{% trans %}Back to news{% endtrans %}</a></p>
     <h3>{% trans %}News{% endtrans %}</h3>
-    {{ object }}
-    {{ object.dates.all() }}
+    {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user.is_root %}
+    {% endif %}
+    <section class="news_event">
+        <h4>{{ news.title }}</h4>
+        <p class="date">
+            <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
+                {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+            <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
+                {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
+        </p>
+        <p><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></p>
+        <p>{{ news.summary|markdown }}</p>
+        <p>{% trans %}Author: {% endtrans %}{{ user_profile_link(news.author) }}</p>
+        {% if news.moderator %}
+        <p>{% trans %}Moderator: {% endtrans %}{{ user_profile_link(news.moderator) }}</p>
+        {% elif user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+        <p> <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Moderate{% endtrans %}</a></p>
+        {% endif %}
+        {% if user.can_edit(news) %}
+        <p> <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit (will be remoderated){% endtrans %}</a></p>
+        {% endif %}
+    </section>
 {% endblock %}
 
 

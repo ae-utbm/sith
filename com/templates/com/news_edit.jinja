@@ -17,8 +17,15 @@
 <form action="" method="post">
     {% csrf_token %}
     {{ form.non_field_errors() }}
-    {{ form.owner }}
-    <p>{{ form.type.errors }}<label for="{{ form.type.name }}">{{ form.type.label }}</label> {{ form.type }}</p>
+    {{ form.author }}
+    <p>{{ form.type.errors }}<label for="{{ form.type.name }}">{{ form.type.label }}</label>
+    <ul>
+        <li>Notice: Information, election result - no date</li>
+        <li>Evenement: punctual event, associated with one date</li>
+        <li>Weekly: recurrent event, associated with many dates (specify the first one, and a deadline)</li>
+        <li>Call: long time event, associated with a long date (election appliance, ...)</li>
+    </ul>
+    {{ form.type }}</p>
     <p class="date">{{ form.start_date.errors }}<label for="{{ form.start_date.name }}">{{ form.start_date.label }}</label> {{ form.start_date }}</p>
     <p class="date">{{ form.end_date.errors }}<label for="{{ form.end_date.name }}">{{ form.end_date.label }}</label> {{ form.end_date }}</p>
     <p class="until">{{ form.until.errors }}<label for="{{ form.until.name }}">{{ form.until.label }}</label> {{ form.until }}</p>
@@ -26,6 +33,10 @@
     <p>{{ form.club.errors }}<label for="{{ form.club.name }}">{{ form.club.label }}</label> {{ form.club }}</p>
     <p>{{ form.summary.errors }}<label for="{{ form.summary.name }}">{{ form.summary.label }}</label> {{ form.summary }}</p>
     <p>{{ form.content.errors }}<label for="{{ form.content.name }}">{{ form.content.label }}</label> {{ form.content }}</p>
+    {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+    <p>{{ form.automoderation.errors }}<label for="{{ form.automoderation.name }}">{{ form.automoderation.label }}</label>
+        {{ form.automoderation }}</p>
+    {% endif %}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
 {% endblock %}

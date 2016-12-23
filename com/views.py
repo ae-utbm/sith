@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.core.exceptions import ValidationError
@@ -10,7 +11,7 @@ from django import forms
 from datetime import timedelta
 
 from com.models import Sith, News, NewsDate
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin
 from core.views.forms import SelectDateTime
 from club.models import Club
 
@@ -69,14 +70,15 @@ class IndexEditView(ComEditView):
 class NewsForm(forms.ModelForm):
     class Meta:
         model = News
-        fields = ['type', 'title', 'club', 'summary', 'content', 'owner']
+        fields = ['type', 'title', 'club', 'summary', 'content', 'author']
         widgets = {
-                'owner': forms.HiddenInput,
+                'author': forms.HiddenInput,
                 'type': forms.RadioSelect,
                 }
     start_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start date"), widget=SelectDateTime, required=False)
     end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"), widget=SelectDateTime, required=False)
     until = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Until"), widget=SelectDateTime, required=False)
+    automoderation = forms.BooleanField(label=_("Automoderation"), required=False)
 
     def clean(self):
         self.cleaned_data = super(NewsForm, self).clean()
@@ -107,7 +109,7 @@ class NewsForm(forms.ModelForm):
                 end_date += timedelta(days=7)
         return ret
 
-class NewsEditView(UpdateView):
+class NewsEditView(CanEditMixin, UpdateView):
     model = News
     form_class = NewsForm
     template_name = 'com/news_edit.jinja'
@@ -123,27 +125,70 @@ class NewsEditView(UpdateView):
         except: pass
         return init
 
-class NewsCreateView(CreateView):
+    def form_valid(self, form):
+        self.object = form.save()
+        if form.cleaned_data['automoderation'] and self.request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID):
+            self.object.moderator = self.request.user
+            self.object.is_moderated = True
+            self.object.save()
+        else:
+            self.object.is_moderated = False
+            self.object.save()
+        return super(NewsEditView, self).form_valid(form)
+
+class NewsCreateView(CanCreateMixin, CreateView):
     model = News
     form_class = NewsForm
     template_name = 'com/news_edit.jinja'
 
     def get_initial(self):
-        init = {'owner': self.request.user}
+        init = {'author': self.request.user}
         try:
             init['club'] = Club.objects.filter(id=self.request.GET['club']).first()
         except: pass
         return init
 
-class NewsAdminListView(ListView):
+    def form_valid(self, form):
+        self.object = form.save()
+        print(form.cleaned_data)
+        if form.cleaned_data['automoderation'] and self.request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID):
+            print("GUY")
+            self.object.moderator = self.request.user
+            self.object.is_moderated = True
+            self.object.save()
+        return super(NewsCreateView, self).form_valid(form)
+
+class NewsModerateView(CanEditMixin, SingleObjectMixin):
+    model = News
+    pk_url_kwarg = 'news_id'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.is_moderated = True
+        self.object.moderator = request.user
+        self.object.save()
+        if 'next' in self.request.GET.keys():
+            return redirect(self.request.GET['next'])
+        return redirect('com:news_admin_list')
+
+class NewsAdminListView(CanEditMixin, ListView):
     model = News
     template_name = 'com/news_admin_list.jinja'
+    queryset = News.objects.filter(dates__end_date__gte=timezone.now()).distinct().order_by('id')
 
-class NewsListView(ListView):
+class NewsListView(CanViewMixin, ListView):
     model = News
     template_name = 'com/news_list.jinja'
 
-class NewsDetailView(DetailView):
+    def get_context_data(self, **kwargs):
+        kwargs = super(NewsListView, self).get_context_data(**kwargs)
+        kwargs['NewsDate'] = NewsDate
+        kwargs['timedelta'] = timedelta
+        return kwargs
+
+class NewsDetailView(CanViewMixin, DetailView):
     model = News
     template_name = 'com/news_detail.jinja'
     pk_url_kwarg = 'news_id'
+
+

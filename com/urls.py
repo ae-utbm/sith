@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^news$', NewsListView.as_view(), name='news_list'),
     url(r'^news/admin$', NewsAdminListView.as_view(), name='news_admin_list'),
     url(r'^news/create$', NewsCreateView.as_view(), name='news_new'),
+    url(r'^news/(?P<news_id>[0-9]+)/moderate$', NewsModerateView.as_view(), name='news_moderate'),
     url(r'^news/(?P<news_id>[0-9]+)/edit$', NewsEditView.as_view(), name='news_edit'),
     url(r'^news/(?P<news_id>[0-9]+)$', NewsDetailView.as_view(), name='news_detail'),
 ]

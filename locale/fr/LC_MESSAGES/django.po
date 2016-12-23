@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-23 03:16+0100\n"
+"POT-Creation-Date: 2016-12-23 18:25+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -178,6 +178,8 @@ msgid "User"
 msgstr "Utilisateur"
 
 #: accounting/models.py:207 club/templates/club/club_detail.jinja:5
+#: com/templates/com/news_admin_list.jinja:17
+#: com/templates/com/news_admin_list.jinja:51
 #: counter/templates/counter/invoices_call.jinja:20
 msgid "Club"
 msgstr "Club"
@@ -347,7 +349,8 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_list.jinja:21
 #: accounting/templates/accounting/club_account_details.jinja:55
 #: accounting/templates/accounting/journal_details.jinja:73 club/views.py:54
-#: com/templates/com/news_admin_list.jinja:17 core/templates/core/file.jinja:38
+#: com/templates/com/news_admin_list.jinja:39
+#: com/templates/com/news_admin_list.jinja:71 core/templates/core/file.jinja:38
 #: core/templates/core/page.jinja:31 core/templates/core/user_tools.jinja:38
 #: core/views/user.py:152 counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
@@ -411,10 +414,14 @@ msgid "Name"
 msgstr "Nom"
 
 #: accounting/templates/accounting/club_account_details.jinja:29
+#: com/templates/com/news_admin_list.jinja:20
+#: com/templates/com/news_admin_list.jinja:53
 msgid "Start"
 msgstr "Début"
 
 #: accounting/templates/accounting/club_account_details.jinja:30
+#: com/templates/com/news_admin_list.jinja:21
+#: com/templates/com/news_admin_list.jinja:54
 msgid "End"
 msgstr "Fin"
 
@@ -436,6 +443,8 @@ msgstr "Fermé"
 
 #: accounting/templates/accounting/club_account_details.jinja:34
 #: accounting/templates/accounting/journal_details.jinja:41
+#: com/templates/com/news_admin_list.jinja:22
+#: com/templates/com/news_admin_list.jinja:55
 msgid "Actions"
 msgstr "Actions"
 
@@ -450,7 +459,9 @@ msgid "No"
 msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:54
-#: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
+#: com/templates/com/news_admin_list.jinja:38
+#: com/templates/com/news_admin_list.jinja:70 core/templates/core/file.jinja:36
+#: core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
 
@@ -616,7 +627,7 @@ msgid "Edit operation"
 msgstr "Éditer l'opération"
 
 #: accounting/templates/accounting/operation_edit.jinja:41
-#: com/templates/com/news_edit.jinja:29 core/templates/core/create.jinja:12
+#: com/templates/com/news_edit.jinja:40 core/templates/core/create.jinja:12
 #: core/templates/core/edit.jinja:7 core/templates/core/edit.jinja.py:15
 #: core/templates/core/edit.jinja:20 core/templates/core/file_edit.jinja:8
 #: core/templates/core/page_prop.jinja:8
@@ -913,19 +924,27 @@ msgid "Payment method"
 msgstr "Méthode de paiement"
 
 #: club/templates/club/club_tools.jinja:4
-#: core/templates/core/user_tools.jinja:81
+#: core/templates/core/user_tools.jinja:82
 msgid "Club tools"
 msgstr "Outils club"
 
 #: club/templates/club/club_tools.jinja:6
+msgid "Communication:"
+msgstr "Communication : "
+
+#: club/templates/club/club_tools.jinja:8
+msgid "Create a news"
+msgstr "Créer une nouvelle"
+
+#: club/templates/club/club_tools.jinja:10
 msgid "Counters:"
 msgstr "Comptoirs : "
 
-#: club/templates/club/club_tools.jinja:22
+#: club/templates/club/club_tools.jinja:26
 msgid "Accouting: "
 msgstr "Comptabilité : "
 
-#: club/templates/club/club_tools.jinja:30
+#: club/templates/club/club_tools.jinja:34
 msgid "Manage launderettes"
 msgstr "Gestion des laveries"
 
@@ -960,7 +979,7 @@ msgstr "Vous n'avez pas la permission de faire cela"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:166 com/views.py:78 counter/views.py:909
+#: club/views.py:166 com/views.py:79 counter/views.py:909
 msgid "End date"
 msgstr "Date de fin"
 
@@ -981,7 +1000,7 @@ msgstr "message d'info"
 msgid "index page"
 msgstr "page d'accueil"
 
-#: com/models.py:22 com/templates/com/news_list.jinja:29
+#: com/models.py:22
 msgid "Notice"
 msgstr "Notification"
 
@@ -989,7 +1008,7 @@ msgstr "Notification"
 msgid "Event"
 msgstr "Événement"
 
-#: com/models.py:24 com/templates/com/news_list.jinja:66
+#: com/models.py:24 com/templates/com/news_list.jinja:79
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
@@ -1014,35 +1033,97 @@ msgstr "contenu de la nouvelle"
 msgid "type"
 msgstr "type"
 
-#: com/models.py:35 com/models.py:37 core/models.py:524 core/models.py:532
-msgid "owner"
-msgstr "propriétaire"
+#: com/models.py:35
+msgid "author"
+msgstr "auteur"
 
 #: com/models.py:36 core/models.py:531
 msgid "is moderated"
 msgstr "est modéré"
 
-#: com/models.py:52
+#: com/models.py:37
+msgid "moderator"
+msgstr "modérateur"
+
+#: com/models.py:61
 msgid "news_date"
 msgstr "date de la nouvelle"
 
-#: com/models.py:53
+#: com/models.py:62
 msgid "start_date"
 msgstr "date de début"
 
-#: com/models.py:54
+#: com/models.py:63
 msgid "end_date"
 msgstr "date de fin"
 
-#: com/templates/com/news_admin_list.jinja:4
+#: com/templates/com/news_admin_list.jinja:5
 msgid "News admin"
 msgstr "Administration des nouvelles"
 
-#: com/templates/com/news_admin_list.jinja:8
-#: com/templates/com/news_detail.jinja:4 com/templates/com/news_detail.jinja:9
-#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:27
+#: com/templates/com/news_admin_list.jinja:9
+#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
+#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:28
 msgid "News"
 msgstr "Nouvelles"
+
+#: com/templates/com/news_admin_list.jinja:10
+msgid "Displayed news"
+msgstr "Nouvelles affichées"
+
+#: com/templates/com/news_admin_list.jinja:14
+#: com/templates/com/news_admin_list.jinja:48
+#: launderette/templates/launderette/launderette_admin.jinja:42
+#: launderette/views.py:156
+msgid "Type"
+msgstr "Type"
+
+#: com/templates/com/news_admin_list.jinja:15
+#: com/templates/com/news_admin_list.jinja:49
+msgid "Title"
+msgstr "Titre"
+
+#: com/templates/com/news_admin_list.jinja:16
+#: com/templates/com/news_admin_list.jinja:50
+msgid "Summary"
+msgstr "Résumé"
+
+#: com/templates/com/news_admin_list.jinja:18
+#: com/templates/com/news_admin_list.jinja:52
+msgid "Author"
+msgstr "Auteur"
+
+#: com/templates/com/news_admin_list.jinja:19
+msgid "Moderator"
+msgstr "Modérateur"
+
+#: com/templates/com/news_admin_list.jinja:44
+msgid "News to moderate"
+msgstr "Nouvelles à modérer"
+
+#: com/templates/com/news_admin_list.jinja:72
+#: com/templates/com/news_detail.jinja:28
+#: core/templates/core/file_detail.jinja:65
+#: core/templates/core/file_moderation.jinja:23
+#: sas/templates/sas/moderation.jinja:17 sas/templates/sas/picture.jinja:114
+msgid "Moderate"
+msgstr "Modérer"
+
+#: com/templates/com/news_detail.jinja:10
+msgid "Back to news"
+msgstr "Retour aux nouvelles"
+
+#: com/templates/com/news_detail.jinja:24
+msgid "Author: "
+msgstr "Auteur : "
+
+#: com/templates/com/news_detail.jinja:26 sas/templates/sas/picture.jinja:82
+msgid "Moderator: "
+msgstr "Modérateur : "
+
+#: com/templates/com/news_detail.jinja:31
+msgid "Edit (will be remoderated)"
+msgstr "Éditer (sera resoumise à modération)"
 
 #: com/templates/com/news_edit.jinja:5 com/templates/com/news_edit.jinja:13
 msgid "Edit news"
@@ -1052,39 +1133,43 @@ msgstr "Éditer la nouvelle"
 msgid "Create news"
 msgstr "Créer nouvelle"
 
-#: com/templates/com/news_list.jinja:37
-msgid "Calls"
-msgstr "Appels"
+#: com/templates/com/news_list.jinja:48
+msgid "Events today and the next few days"
+msgstr "Événement aujourd'hui et dans les prochains jours"
 
-#: com/templates/com/news_list.jinja:51
-msgid "Events"
-msgstr "Événements"
+#: com/templates/com/news_list.jinja:65
+msgid "Coming soon... don't miss!"
+msgstr "Prochainement... à ne pas rater!"
 
-#: com/views.py:24
+#: com/views.py:25
 msgid "Communication administration"
 msgstr "Administration de la communication"
 
-#: com/views.py:31
+#: com/views.py:32
 msgid "Index page"
 msgstr "Page d'accueil"
 
-#: com/views.py:36
+#: com/views.py:37
 msgid "Info message"
 msgstr "Message d'info"
 
-#: com/views.py:41
+#: com/views.py:42
 msgid "Alert message"
 msgstr "Message d'alerte"
 
-#: com/views.py:77
+#: com/views.py:78
 msgid "Start date"
 msgstr "Date de début"
 
-#: com/views.py:79
+#: com/views.py:80
 msgid "Until"
 msgstr "Jusqu'à"
 
-#: com/views.py:85 com/views.py:87 com/views.py:89
+#: com/views.py:81
+msgid "Automoderation"
+msgstr "Automodération"
+
+#: com/views.py:87 com/views.py:89 com/views.py:91
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
@@ -1406,6 +1491,10 @@ msgstr "version allégée"
 msgid "thumbnail"
 msgstr "miniature"
 
+#: core/models.py:524 core/models.py:532
+msgid "owner"
+msgstr "propriétaire"
+
 #: core/models.py:525 core/models.py:726
 msgid "edit group"
 msgstr "groupe d'édition"
@@ -1719,12 +1808,6 @@ msgstr "octets"
 #: core/templates/core/file_detail.jinja:59
 msgid "Download"
 msgstr "Télécharger"
-
-#: core/templates/core/file_detail.jinja:65
-#: core/templates/core/file_moderation.jinja:23
-#: sas/templates/sas/moderation.jinja:17 sas/templates/sas/picture.jinja:114
-msgid "Moderate"
-msgstr "Modérer"
 
 #: core/templates/core/file_list.jinja:19
 msgid "There is no file in this website."
@@ -2291,22 +2374,26 @@ msgid "Communication"
 msgstr "Communication"
 
 #: core/templates/core/user_tools.jinja:69
+msgid "Moderate news"
+msgstr "Modérer les nouvelles"
+
+#: core/templates/core/user_tools.jinja:70
 msgid "Edit index page"
 msgstr "Éditer la page d'accueil"
 
-#: core/templates/core/user_tools.jinja:70
+#: core/templates/core/user_tools.jinja:71
 msgid "Edit alert message"
 msgstr "Éditer le message d'alerte"
 
-#: core/templates/core/user_tools.jinja:71
+#: core/templates/core/user_tools.jinja:72
 msgid "Edit information message"
 msgstr "Éditer le message d'informations"
 
-#: core/templates/core/user_tools.jinja:72
+#: core/templates/core/user_tools.jinja:73
 msgid "Moderate files"
 msgstr "Modérer les fichiers"
 
-#: core/templates/core/user_tools.jinja:75
+#: core/templates/core/user_tools.jinja:76
 msgid "Moderate pictures"
 msgstr "Modérer les photos"
 
@@ -3031,11 +3118,6 @@ msgstr "Machines"
 msgid "New machine"
 msgstr "Nouvelle machine"
 
-#: launderette/templates/launderette/launderette_admin.jinja:42
-#: launderette/views.py:156
-msgid "Type"
-msgstr "Type"
-
 #: launderette/templates/launderette/launderette_book.jinja:12
 msgid "Choose"
 msgstr "Choisir"
@@ -3146,10 +3228,6 @@ msgstr "Albums"
 #: sas/templates/sas/picture.jinja:60
 msgid "People"
 msgstr "Personne(s)"
-
-#: sas/templates/sas/picture.jinja:82
-msgid "Moderator: "
-msgstr "Modérateur : "
 
 #: sas/templates/sas/picture.jinja:89
 msgid "HD version"
@@ -3370,3 +3448,4 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, soit en créer un proprement"
+

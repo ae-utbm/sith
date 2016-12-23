@@ -3,6 +3,10 @@
 {% block content %}
 <h3>{% trans %}Club tools{% endtrans %}</h3>
 <div>
+    <h4>{% trans %}Communication:{% endtrans %}</h4>
+    <ul>
+        <li> <a href="{{ url('com:news_new') }}?club={{ object.id }}">{% trans %}Create a news{% endtrans %}</a></li>
+    </ul>
     <h4>{% trans %}Counters:{% endtrans %}</h4>
     <ul>
     {% if object.unix_name == settings.SITH_LAUNDERETTE_MANAGER['unix_name'] %}
