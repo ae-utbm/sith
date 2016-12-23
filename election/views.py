@@ -60,8 +60,8 @@ class CandidateForm(forms.Form):
 class VoteForm(forms.Form):
     def __init__(self, election, user, *args, **kwargs):
         super(VoteForm, self).__init__(*args, **kwargs)
-        for role in election.roles.all():
-            if not role.user_has_voted(user):
+        if not election.has_voted(user):
+            for role in election.roles.all():
                 cand = role.candidatures
                 if role.max_choice > 1:
                     self.fields[role.title] = VoteCheckbox(cand, role.max_choice, required=False)
@@ -112,9 +112,10 @@ class ElectionDetailView(CanViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         """ Add additionnal data to the template """
         kwargs = super(ElectionDetailView, self).get_context_data(**kwargs)
-        kwargs['candidate_form'] = CandidateForm(self.get_object().id)
-        kwargs['election_form'] = VoteForm(self.get_object(), self.request.user)
-        kwargs['election_results'] = self.get_object().results
+        kwargs['candidate_form'] = CandidateForm(self.object.id)
+        kwargs['election_form'] = VoteForm(self.object, self.request.user)
+        kwargs['election_results'] = self.object.results
+        print(self.object.results)
         return kwargs
 
 
@@ -196,7 +197,7 @@ class VoteFormView(CanCreateMixin, FormView):
                 vote = Vote(role=election_data[role_title].role)
                 vote.save()
                 vote.candidature.add(election_data[role_title])
-            self.election.roles.get(title=role_title).has_voted.add(self.request.user)
+        self.election.voters.add(self.request.user)
 
     def get_form_kwargs(self):
         kwargs = super(VoteFormView, self).get_form_kwargs()

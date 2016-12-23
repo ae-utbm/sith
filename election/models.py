@@ -22,6 +22,7 @@ class Election(models.Model):
     view_groups = models.ManyToManyField(Group, related_name="viewable_elections", verbose_name=_("view groups"), blank=True)
     vote_groups = models.ManyToManyField(Group, related_name="votable_elections", verbose_name=_("vote groups"), blank=True)
     candidature_groups = models.ManyToManyField(Group, related_name="candidate_elections", verbose_name=_("candidature groups"), blank=True)
+    voters = models.ManyToManyField(User, verbose_name=('voters'), related_name='voted_elections')
 
     def __str__(self):
         return self.title
@@ -40,12 +41,6 @@ class Election(models.Model):
         now = timezone.now()
         return bool(now <= self.end_candidature and now >= self.start_candidature)
 
-    def has_voted(self, user):
-        for role in self.roles.all():
-            if role.user_has_voted(user):
-                return True
-        return False
-
     def can_candidate(self, user):
         for group in self.candidature_groups.all():
             if user.is_in_group(group):
@@ -60,11 +55,15 @@ class Election(models.Model):
                 return True
         return False
 
+    def has_voted(self, user):
+        return self.voters.filter(id=user.id).exists()
+
     @property
     def results(self):
         results = {}
+        total_vote = self.voters.count()
         for role in self.roles.all():
-            results[role.title] = role.results
+            results[role.title] = role.results(total_vote)
         return results
 
     # Permissions
@@ -77,16 +76,11 @@ class Role(models.Model):
     election = models.ForeignKey(Election, related_name='roles', verbose_name=_("election"))
     title = models.CharField(_('title'), max_length=255)
     description = models.TextField(_('description'), null=True, blank=True)
-    has_voted = models.ManyToManyField(User, verbose_name=('has voted'), related_name='has_voted')
     max_choice = models.IntegerField(_('max choice'), default=1)
 
-    def user_has_voted(self, user):
-        return self.has_voted.filter(id=user.id).exists()
-
-    @property
-    def results(self):
+    def results(self, total_vote):
         results = {}
-        total_vote = self.has_voted.count() * self.max_choice
+        total_vote *= self.max_choice
         if total_vote == 0:
             return None
         non_blank = 0
