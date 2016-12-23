@@ -32,6 +32,10 @@ class Election(models.Model):
         return bool(now <= self.end_date and now >= self.start_date)
 
     @property
+    def is_vote_finished(self):
+        return bool(timezone.now() > self.end_date)
+
+    @property
     def is_candidature_active(self):
         now = timezone.now()
         return bool(now <= self.end_candidature and now >= self.start_candidature)

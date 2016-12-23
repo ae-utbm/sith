@@ -182,19 +182,21 @@ class VoteFormView(CanCreateMixin, FormView):
         self.election = get_object_or_404(Election, pk=kwargs['election_id'])
         return super(VoteFormView, self).dispatch(request, *arg, **kwargs)
 
-    def vote(self, data):
-        for key in data.keys():
-            if isinstance(data[key], QuerySet):
-                if data[key].count() > 0:
-                    vote = Vote(role=data[key].first().role)
+    def vote(self, election_data):
+        for role_title in election_data.keys():
+            # If we have a multiple choice field
+            if isinstance(election_data[role_title], QuerySet):
+                if election_data[role_title].count() > 0:
+                    vote = Vote(role=election_data[role_title].first().role)
                     vote.save()
-                for el in data[key]:
+                for el in election_data[role_title]:
                     vote.candidature.add(el)
-            elif data[key] is not None:
-                vote = Vote(role=data[key].role)
+            # If we have a single choice
+            elif election_data[role_title] is not None:
+                vote = Vote(role=election_data[role_title].role)
                 vote.save()
-                vote.candidature.add(data[key])
-            self.election.role.get(title=key).has_voted.add(self.request.user)
+                vote.candidature.add(election_data[role_title])
+            self.election.role.get(title=role_title).has_voted.add(self.request.user)
 
     def get_form_kwargs(self):
         kwargs = super(VoteFormView, self).get_form_kwargs()

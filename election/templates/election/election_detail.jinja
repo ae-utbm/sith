@@ -235,6 +235,8 @@ th {
         <p>
             {%- if election.is_vote_active %}
             {% trans %}Polls close {% endtrans %}
+            {%- elif election.is_vote_finished %}
+            {% trans %}Polls closed {% endtrans %}
             {%- else %}
             {% trans %}Polls will open {% endtrans %}
             <time datetime="{{ election.start_date }}">{{ election.start_date|date("l d F Y") }}</time> at <time>{{ election.start_date|time("G:i") }}</time>
@@ -290,7 +292,7 @@ th {
                             </label>
                             {%- set _ = count.append(count.pop() + 1) %}
                             {%- endif %}
-                            {%- if election.has_voted(user) or not election.is_vote_active %}
+                            {%- if not election.is_vote_finished %}
                             {%- set results = election_results[role.title]['blank vote'] %}
                             <div class="election__results">
                                 <strong>{{results.vote}} {% trans %}votes{% endtrans %} ( {{results.percent}} %)</strong>
@@ -319,7 +321,8 @@ th {
                                         <span>{% trans %}Choose{% endtrans %} {{ candidature.user.nick_name or candidature.user.first_name }}</span>
                                     </label>
                                     {%- set _ = count.append(count.pop() + 1) %}
-                                    {%- else %}
+                                    {%- endif %}
+                                    {%- if not election.is_vote_finished %}
                                     {%- set results = election_results[role.title][candidature.user.username] %}
                                     <div class="election__results">
                                         <strong>{{results.vote}} {% trans %}votes{% endtrans %} ( {{results.percent}} %)</strong>
