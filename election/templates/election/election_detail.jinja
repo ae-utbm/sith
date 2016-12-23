@@ -292,10 +292,10 @@ th {
                             </label>
                             {%- set _ = count.append(count.pop() + 1) %}
                             {%- endif %}
-                            {%- if not election.is_vote_finished %}
+                            {%- if election.is_vote_finished %}
                             {%- set results = election_results[role.title]['blank vote'] %}
                             <div class="election__results">
-                                <strong>{{results.vote}} {% trans %}votes{% endtrans %} ( {{results.percent}} %)</strong>
+                                <strong>{{results.vote}} {% trans %}votes{% endtrans %} ({{results.percent}} %)</strong>
                             </div>
                             {%- endif %}
                         </td>
@@ -322,10 +322,10 @@ th {
                                     </label>
                                     {%- set _ = count.append(count.pop() + 1) %}
                                     {%- endif %}
-                                    {%- if not election.is_vote_finished %}
+                                    {%- if election.is_vote_finished %}
                                     {%- set results = election_results[role.title][candidature.user.username] %}
                                     <div class="election__results">
-                                        <strong>{{results.vote}} {% trans %}votes{% endtrans %} ( {{results.percent}} %)</strong>
+                                        <strong>{{results.vote}} {% trans %}votes{% endtrans %} ({{results.percent}} %)</strong>
                                     </div>
                                     {%- endif %}
                                 </li>
