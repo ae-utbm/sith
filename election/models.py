@@ -41,7 +41,7 @@ class Election(models.Model):
         return bool(now <= self.end_candidature and now >= self.start_candidature)
 
     def has_voted(self, user):
-        for role in self.role.all():
+        for role in self.roles.all():
             if role.user_has_voted(user):
                 return True
         return False
@@ -63,7 +63,7 @@ class Election(models.Model):
     @property
     def results(self):
         results = {}
-        for role in self.role.all():
+        for role in self.roles.all():
             results[role.title] = role.results
         return results
 
@@ -74,7 +74,7 @@ class Role(models.Model):
     """
     This class allows to create a new role avaliable for a candidature
     """
-    election = models.ForeignKey(Election, related_name='role', verbose_name=_("election"))
+    election = models.ForeignKey(Election, related_name='roles', verbose_name=_("election"))
     title = models.CharField(_('title'), max_length=255)
     description = models.TextField(_('description'), null=True, blank=True)
     has_voted = models.ManyToManyField(User, verbose_name=('has voted'), related_name='has_voted')
@@ -90,9 +90,9 @@ class Role(models.Model):
         if total_vote == 0:
             return None
         non_blank = 0
-        for candidature in self.candidature.all():
+        for candidature in self.candidatures.all():
             cand_results = {}
-            cand_results['vote'] = self.vote.filter(candidature=candidature).count()
+            cand_results['vote'] = self.votes.filter(candidature=candidature).count()
             cand_results['percent'] = cand_results['vote'] * 100 / total_vote
             non_blank += cand_results['vote']
             results[candidature.user.username] = cand_results
@@ -110,7 +110,7 @@ class ElectionList(models.Model):
     To allow per list vote
     """
     title = models.CharField(_('title'), max_length=255)
-    election = models.ForeignKey(Election, related_name='election_list', verbose_name=_("election"))
+    election = models.ForeignKey(Election, related_name='election_lists', verbose_name=_("election"))
 
     def __str__(self):
         return self.title
@@ -120,10 +120,10 @@ class Candidature(models.Model):
     """
     This class is a component of responsability
     """
-    role = models.ForeignKey(Role, related_name='candidature', verbose_name=_("role"))
-    user = models.ForeignKey(User, verbose_name=_('user'), related_name='candidate', blank=True)
+    role = models.ForeignKey(Role, related_name='candidatures', verbose_name=_("role"))
+    user = models.ForeignKey(User, verbose_name=_('user'), related_name='candidates', blank=True)
     program = models.TextField(_('description'), null=True, blank=True)
-    election_list = models.ForeignKey(ElectionList, related_name='candidature', verbose_name=_('election_list'))
+    election_list = models.ForeignKey(ElectionList, related_name='candidatures', verbose_name=_('election_list'))
 
     def __str__(self):
         return "%s : %s" % (self.role.title, self.user.username)
@@ -133,8 +133,8 @@ class Vote(models.Model):
     """
     This class allows to vote for candidates
     """
-    role = models.ForeignKey(Role, related_name='vote', verbose_name=_("role"))
-    candidature = models.ManyToManyField(Candidature, related_name='vote', verbose_name=_("candidature"))
+    role = models.ForeignKey(Role, related_name='votes', verbose_name=_("role"))
+    candidature = models.ManyToManyField(Candidature, related_name='votes', verbose_name=_("candidature"))
 
     def __str__(self):
         return "Vote"

@@ -258,7 +258,7 @@ th {
         <form action="{{url('election:vote', election.id)}}" method="post" class="election__vote-form" name="vote-form" id="vote-form">
             {% csrf_token %}
             <table>
-                {%- set election_lists = election.election_list.all() -%}
+                {%- set election_lists = election.election_lists.all() -%}
                 <caption></caption>
                 <thead>
                     <th>{% trans %}Blank vote{% endtrans %}</th>
@@ -266,7 +266,7 @@ th {
                     <th>{{election_list.title}}</th>
                     {%- endfor %}
                 </thead>
-                {%- for role in election.role.all() %}
+                {%- for role in election.roles.all() %}
                 {%- set count = [0] %}
                 {%- set role_data = election_form.data.getlist(role.title) if role.title in election_form.data else [] %}
                 <tbody data-max-choice="{{role.max_choice}}" class="role{{ ' role_error' if role.title in election_form.errors else '' }}{{ ' role__multiple-choices' if role.max_choice > 1 else ''}}">
@@ -302,7 +302,7 @@ th {
                         {%- for election_list in election_lists %}
                         <td class="list-per-role">
                             <ul class="list-per-role__candidates">
-                                {%- for candidature in election_list.candidature.filter(role=role) %}
+                                {%- for candidature in election_list.candidatures.filter(role=role) %}
                                 <li class="list-per-role__candidate candidate">
                                     <figure class="candidate__infos">
                                         <div class="candidate__picture-wrapper">

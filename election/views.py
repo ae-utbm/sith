@@ -60,9 +60,9 @@ class CandidateForm(forms.Form):
 class VoteForm(forms.Form):
     def __init__(self, election, user, *args, **kwargs):
         super(VoteForm, self).__init__(*args, **kwargs)
-        for role in election.role.all():
+        for role in election.roles.all():
             if not role.user_has_voted(user):
-                cand = role.candidature
+                cand = role.candidatures
                 if role.max_choice > 1:
                     self.fields[role.title] = VoteCheckbox(cand, role.max_choice, required=False)
                 else:
@@ -196,7 +196,7 @@ class VoteFormView(CanCreateMixin, FormView):
                 vote = Vote(role=election_data[role_title].role)
                 vote.save()
                 vote.candidature.add(election_data[role_title])
-            self.election.role.get(title=role_title).has_voted.add(self.request.user)
+            self.election.roles.get(title=role_title).has_voted.add(self.request.user)
 
     def get_form_kwargs(self):
         kwargs = super(VoteFormView, self).get_form_kwargs()
