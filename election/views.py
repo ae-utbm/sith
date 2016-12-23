@@ -67,7 +67,21 @@ class VoteForm(forms.Form):
                     self.fields[role.title] = VoteCheckbox(cand, role.max_choice, required=False)
                 else:
                     self.fields[role.title] = forms.ModelChoiceField(cand, required=False,
-                                                                        widget=forms.RadioSelect(), empty_label=_("Blank vote"))
+                                                                     widget=forms.RadioSelect(), empty_label=_("Blank vote"))
+
+
+class RoleForm(forms.ModelForm):
+    """ Form for creating a role """
+    class Meta:
+        model = Role
+        fields = ['title', 'election', 'description', 'max_choice']
+
+    def clean(self):
+        cleaned_data = super(RoleForm, self).clean()
+        title = cleaned_data.get('title')
+        election = cleaned_data.get('election')
+        if Role.objects.filter(title=title, election=election).exists():
+            raise forms.ValidationError(_("This role already exists for this election"), code='invalid')
 
 
 # Display elections
@@ -110,10 +124,11 @@ class CandidatureCreateView(CanCreateMixin, FormView):
     View dedicated to a cundidature creation
     """
     form_class = CandidateForm
-    template_name = 'core/page_prop.jinja'
+    template_name = 'election/election_detail.jinja'
 
     def dispatch(self, request, *arg, **kwargs):
         self.election_id = kwargs['election_id']
+        self.election = get_object_or_404(Election, pk=self.election_id)
         return super(CandidatureCreateView, self).dispatch(request, *arg, **kwargs)
 
     def get_form_kwargs(self):
@@ -141,6 +156,15 @@ class CandidatureCreateView(CanCreateMixin, FormView):
             self.create_candidature(data)
             return res
         return res
+
+    def get_context_data(self, **kwargs):
+        """ Add additionnal data to the template """
+        kwargs = super(CandidatureCreateView, self).get_context_data(**kwargs)
+        kwargs['candidate_form'] = self.get_form()
+        kwargs['object'] = self.election
+        kwargs['election'] = self.election
+        kwargs['election_form'] = VoteForm(self.election, self.request.user)
+        return kwargs
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('election:detail', kwargs={'election_id': self.election_id})
@@ -229,8 +253,7 @@ class ElectionCreateView(CanCreateMixin, CreateView):
 
 class RoleCreateView(CanCreateMixin, CreateView):
     model = Role
-    form_class = modelform_factory(Role,
-        fields=['title', 'election', 'title', 'description', 'max_choice'])
+    form_class = RoleForm
     template_name = 'core/page_prop.jinja'
 
     def form_valid(self, form):

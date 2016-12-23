@@ -56,6 +56,13 @@ class Election(models.Model):
                 return True
         return False
 
+    @property
+    def get_results(self):
+        results = {}
+        for role in self.role.all():
+            results[role.title] = role.get_results
+        return results
+
     # Permissions
 
 
@@ -71,6 +78,24 @@ class Role(models.Model):
 
     def user_has_voted(self, user):
         return self.has_voted.filter(id=user.id).exists()
+
+    @property
+    def get_results(self):
+        results = {}
+        total_vote = self.has_voted.count() * self.max_choice
+        if total_vote == 0:
+            return None
+        non_blank = 0
+        for candidature in self.candidature.all():
+            cand_results = {}
+            cand_results['vote'] = self.vote.filter(candidature=candidature).count()
+            cand_results['percent'] = cand_results['vote'] * 100 / total_vote
+            non_blank += cand_results['vote']
+            results[candidature.user.username] = cand_results
+        results['total vote'] = total_vote
+        results['blank vote'] = {'vote': total_vote - non_blank,
+                                 'percent': (total_vote - non_blank) * 100 / total_vote}
+        return results
 
     def __str__(self):
         return ("%s : %s") % (self.election.title, self.title)
