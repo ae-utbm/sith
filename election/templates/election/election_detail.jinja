@@ -251,7 +251,7 @@ th {
                 {%- set election_lists = election.election_list.all() -%}
                 <caption></caption>
                 <thead>
-                    {%- if not election.has_voted(user) %}
+                    {%- if not election.has_voted(user) and election.can_vote(user) %}
                     <th>{% trans %}Blank vote{% endtrans %}</th>
                     {%- endif %}
                     {%- for election_list in election_lists %}
@@ -265,7 +265,7 @@ th {
                     <tr class="role__title">
                         <td colspan="{{election_lists.count() + 1}}">
                             <span>{{role.title}}</span>
-                            {%- if role.max_choice > 1 and not election.has_voted(user) %}
+                            {%- if role.max_choice > 1 and not election.has_voted(user) and election.can_vote(user) %}
                             <strong class="role__multiple-choices-label">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
                             {%- endif %}
                             {%- if election_form.errors[role.title] is defined %}
@@ -294,7 +294,7 @@ th {
                                 <li class="list-per-role__candidate">
                                     <figure class="candidate">
                                         <div class="candidate__picture-wrapper">
-                                            {%- if candidature.user.profile_pict %}
+                                            {%- if candidature.user.profile_pict and user.is_subscriber_viewable %}
                                             <img class="candidate__picture" src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
                                             {%- endif %}
                                         </div>
@@ -321,7 +321,7 @@ th {
             </table>
         </form>
     </section>
-    {%- if not election.has_voted(user) %}
+    {%- if not election.has_voted(user) and election.can_vote(user) %}
     <section class="election__sumbit-section">
         <button class="election__sumbit-button" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
     </section>
