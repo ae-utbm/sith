@@ -10,7 +10,7 @@ from django.contrib.sites.models import Site
 
 
 from core.models import Group, User, Page, PageRev, SithFile
-from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operation, AccountingType, Company
+from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operation, AccountingType, SimplifiedAccountingType, Company
 from club.models import Club, Membership
 from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
@@ -301,16 +301,33 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             debit.save()
             debit2 = AccountingType(code='604', label="Achats d'études et prestations de services(*2)", movement_type='DEBIT')
             debit2.save()
-            Operation(journal=gj, date=date.today(), amount=300, remark="Paiement Guy", mode="CASH", done=True, accounting_type=debit2, target_type="USER", target_id=skia.id).save()
             buying = AccountingType(code='60', label="Achats (sauf 603)", movement_type='DEBIT')
             buying.save()
-            Operation(journal=gj, date=date.today(), amount=32.3, remark="Essence", mode="CASH", done=True, accounting_type=buying, target_type="USER", target_id=skia.id).save()           
-            Operation(journal=gj, date=date.today(), amount=46.42, remark="marqueurs + rouleaux", mode="CASH", done=True, accounting_type=debit, target_type="USER", target_id=skia.id).save()
-            Operation(journal=gj, date=date.today(), amount=666.42,
-                    remark="Subvention territoire de FarfarAway", mode="CASH", done=True, accounting_type=credit, target_type="USER",
-                    target_id=skia.id).save()
-            Operation(journal=gj, date=date.today(), amount=42,
-                    remark="La Gargotte du Korrigan", mode="CASH", done=False, accounting_type=debit, target_type="CLUB",
-                    target_id=bar_club.id).save()
+            comptes = AccountingType(code='6', label="Comptes de charge", movement_type='DEBIT')
+            comptes.save()
+            simple = SimplifiedAccountingType(label = 'Je fais du simple 6', accounting_type = comptes, movement_type='DEBIT')
+            simple.save()
             woenzco = Company(name="Woenzel & co")
             woenzco.save()
+
+            operation_list = [
+                            (27, "J'avais trop de bière", 'CASH', None, buying, 'USER', skia.id, "", None), 
+                            (4000, "Ceci n'est pas une opération... en fait si mais non", 'CHECK', None, debit,'COMPANY', woenzco.id, "", 23),
+                            (22, "C'est de l'argent ?", 'CARD', None, credit, 'CLUB', troll.id, "", None),
+                            (37, "Je paye CASH", 'CASH', None, debit2, 'OTHER', None, "tous les étudiants <3", None),
+                            (300, "Paiement Guy", 'CASH', None, buying, 'USER', skia.id, "", None),
+                            (32.3, "Essence", 'CASH', None, buying, 'OTHER', None, "station", None),
+                            (46.42, "Allumette", 'CHECK', None, credit, 'CLUB', main_club.id, "", 57),
+                            (666.42, "Subvention de far far away", 'CASH', None, comptes, 'CLUB', main_club.id, "", None),
+                            (496, "Ça, c'est un 6", 'CARD', simple, None, 'USER', skia.id, "", None),
+                            (17, "La Gargotte du Korrigan", 'CASH', None, debit2, 'CLUB', bar_club.id, "", None),
+                            ]
+            for op in operation_list:
+                operation = Operation(journal=gj, date=date.today(), amount=op[0], 
+                    remark=op[1], mode=op[2], done=True, simpleaccounting_type=op[3], 
+                    accounting_type=op[4], target_type=op[5], target_id=op[6], 
+                    target_label=op[7], cheque_number=op[8])
+                operation.clean()
+                operation.save()
+                   
+
