@@ -41,6 +41,10 @@ class Election(models.Model):
         now = timezone.now()
         return bool(now <= self.end_candidature and now >= self.start_candidature)
 
+    @property
+    def is_vote_editable(self):
+        return bool(timezone.now() <= self.end_candidature)
+
     def can_candidate(self, user):
         for group in self.candidature_groups.all():
             if user.is_in_group(group):
@@ -95,6 +99,10 @@ class Role(models.Model):
                                  'percent': (total_vote - non_blank) * 100 / total_vote}
         return results
 
+    @property
+    def edit_groups(self):
+        return self.election.edit_groups
+
     def __str__(self):
         return ("%s : %s") % (self.election.title, self.title)
 
@@ -118,6 +126,9 @@ class Candidature(models.Model):
     user = models.ForeignKey(User, verbose_name=_('user'), related_name='candidates', blank=True)
     program = models.TextField(_('description'), null=True, blank=True)
     election_list = models.ForeignKey(ElectionList, related_name='candidatures', verbose_name=_('election_list'))
+
+    def can_be_edited_by(self, user):
+        return (user == self.user)
 
     def __str__(self):
         return "%s : %s" % (self.role.title, self.user.username)

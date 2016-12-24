@@ -265,7 +265,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
 class ElectionCreateView(CanCreateMixin, CreateView):
     model = Election
     form_class = ElectionForm
-    template_name = 'core/page_prop.jinja'
+    template_name = 'election/create_template.jinja'
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_subscribed():
@@ -285,11 +285,11 @@ class ElectionCreateView(CanCreateMixin, CreateView):
 class RoleCreateView(CanCreateMixin, CreateView):
     model = Role
     form_class = RoleForm
-    template_name = 'core/page_prop.jinja'
+    template_name = 'election/create_template.jinja'
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs['election_id'])
-        if self.election.is_vote_active or self.election.is_vote_finished:
+        if self.election.is_vote_editable:
             raise PermissionDenied
         return super(RoleCreateView, self).dispatch(request, *arg, **kwargs)
 
@@ -321,11 +321,11 @@ class RoleCreateView(CanCreateMixin, CreateView):
 class ElectionListCreateView(CanCreateMixin, CreateView):
     model = ElectionList
     form_class = ElectionListForm
-    template_name = 'core/page_prop.jinja'
+    template_name = 'election/create_template.jinja'
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs['election_id'])
-        if self.election.is_vote_finished:
+        if not self.election.is_vote_editable:
             raise PermissionDenied
         return super(ElectionListCreateView, self).dispatch(request, *arg, **kwargs)
 
@@ -362,6 +362,116 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
 class ElectionUpdateView(CanEditMixin, UpdateView):
     model = Election
     form_class = ElectionForm
-    template_name = 'core/page_prop.jinja'
+    template_name = 'election/update_template.jinja'
     pk_url_kwarg = 'election_id'
 
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.id})
+
+
+class CandidatureUpdateView(CanEditMixin, UpdateView):
+    model = Candidature
+    form_class = CandidateForm
+    template_name = 'election/update_template.jinja'
+    pk_url_kwarg = 'candidature_id'
+
+    def dispatch(self, request, *arg, **kwargs):
+        self.object = self.get_object()
+        if not self.object.role.election.is_vote_editable:
+            raise PermissionDenied
+        return super(CandidatureUpdateView, self).dispatch(request, *arg, **kwargs)
+
+    def remove_fields(self):
+        self.form.fields.pop('role', None)
+
+    def get(self, request, *args, **kwargs):
+        self.form = self.get_form()
+        self.remove_fields()
+        return self.render_to_response(self.get_context_data(form=self.form))
+
+    def post(self, request, *args, **kwargs):
+        self.form = self.get_form()
+        self.remove_fields()
+        if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
+            return super(CandidatureUpdateView, self).form_valid(self.form)
+        return self.form_invalid(self.form)
+
+    def get_form_kwargs(self):
+        kwargs = super(CandidatureUpdateView, self).get_form_kwargs()
+        kwargs['election_id'] = self.object.role.election.id
+        return kwargs
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.role.election.id})
+
+
+class RoleUpdateView(CanEditMixin, UpdateView):
+    model = Role
+    form_class = RoleForm
+    template_name = 'election/update_template.jinja'
+    pk_url_kwarg = 'role_id'
+
+    def dispatch(self, request, *arg, **kwargs):
+        self.object = self.get_object()
+        if not self.object.election.is_vote_editable:
+            raise PermissionDenied
+        return super(RoleUpdateView, self).dispatch(request, *arg, **kwargs)
+
+    def remove_fields(self):
+        self.form.fields.pop('election', None)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.form = self.get_form()
+        self.remove_fields()
+        return self.render_to_response(self.get_context_data(form=self.form))
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.form = self.get_form()
+        self.remove_fields()
+        if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
+            return super(RoleUpdateView, self).form_valid(self.form)
+        return self.form_invalid(self.form)
+
+    def get_form_kwargs(self):
+        kwargs = super(RoleUpdateView, self).get_form_kwargs()
+        kwargs['election_id'] = self.object.election.id
+        return kwargs
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
+
+# Delete Views
+
+
+class CandidatureDeleteView(CanEditMixin, DeleteView):
+    model = Candidature
+    template_name = 'election/delete_template.jinja'
+    pk_url_kwarg = 'candidature_id'
+
+    def dispatch(self, request, *arg, **kwargs):
+        self.object = self.get_object()
+        self.election = self.object.role.election
+        if not self.election.can_candidate:
+            raise PermissionDenied
+        return super(CandidatureDeleteView, self).dispatch(request, *arg, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
+
+
+class RoleDeleteView(CanEditMixin, DeleteView):
+    model = Role
+    template_name = 'election/delete_template.jinja'
+    pk_url_kwarg = 'role_id'
+
+    def dispatch(self, request, *arg, **kwargs):
+        self.object = self.get_object()
+        self.election = self.object.election
+        if not self.election.is_vote_editable:
+            raise PermissionDenied
+        return super(RoleDeleteView, self).dispatch(request, *arg, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})

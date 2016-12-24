@@ -273,6 +273,10 @@ th {
                     <tr class="role__title">
                         <td colspan="{{election_lists.count() + 1}}">
                             <span>{{role.title}}</span>
+                            {% if user.can_edit(role) and election.is_vote_editable -%}
+                                <a href="{{url('election:update_role', role_id=role.id)}}">{% trans %}Edit{% endtrans %}</a>
+                                <a href="{{url('election:delete_role', role_id=role.id)}}">{% trans %}Delete{% endtrans %}</a>
+                            {%- endif -%}
                             {%- if role.max_choice > 1 and not election.has_voted(user) and election.can_vote(user) %}
                             <strong class="role__multiple-choices-label">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
                             {%- endif %}
@@ -313,6 +317,14 @@ th {
                                         <figcaption class="candidate__details">
                                             <cite class="candidate__full-name">{{ candidature.user.first_name }} <em class="candidate__nick-name">{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</cite>
                                             <q class="candidate__program">{{ candidature.program or '' }}</q>
+                                            {%- if user.can_edit(candidature) -%}
+                                            {% if election.is_vote_editable %}
+                                            <a href="{{url('election:update_candidate', candidature_id=candidature.id)}}">{% trans %}Edit{% endtrans %}</a>
+                                            {% endif %}
+                                            {% if election.can_candidate -%}
+                                            <a href="{{url('election:delete_candidate', candidature_id=candidature.id)}}">{% trans %}Delete{% endtrans %}</a>
+                                            {%- endif -%}
+                                            {%- endif -%}
                                         </figcaption>
                                     </figure>
                                     {%- if election.can_vote(user) %}
