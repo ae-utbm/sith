@@ -101,6 +101,36 @@ class RoleForm(forms.ModelForm):
             raise forms.ValidationError(_("This role already exists for this election"), code='invalid')
 
 
+class ElectionListForm(forms.ModelForm):
+    class Meta:
+        model = ElectionList
+        fields = ('title','election')
+
+    def __init__(self, *args, **kwargs):
+        election_id = kwargs.pop('election_id', None)
+        super(ElectionListForm, self).__init__(*args, **kwargs)
+        if election_id:
+            self.fields['election'].queryset = Election.objects.filter(id=election_id).all()
+
+
+class ElectionForm(forms.ModelForm):
+    class Meta:
+        model = Election
+        fields = ['title', 'description', 'start_candidature', 'end_candidature', 'start_date', 'end_date',
+                'edit_groups', 'view_groups', 'vote_groups', 'candidature_groups']
+        widgets = {
+            'edit_groups': CheckboxSelectMultiple,
+            'view_groups': CheckboxSelectMultiple,
+            'edit_groups': CheckboxSelectMultiple,
+            'vote_groups': CheckboxSelectMultiple,
+            'candidature_groups': CheckboxSelectMultiple,
+            'start_date': SelectDateTime,
+            'end_date': SelectDateTime,
+            'start_candidature': SelectDateTime,
+            'end_candidature': SelectDateTime,
+        }
+
+
 # Display elections
 
 
@@ -110,12 +140,6 @@ class ElectionsListView(CanViewMixin, ListView):
     """
     model = Election
     template_name = 'election/election_list.jinja'
-
-    def get_queryset(self):
-        qs = super(ElectionsListView, self).get_queryset()
-        today = timezone.now()
-        qs = qs.filter(end_date__gte=today, start_date__lte=today)
-        return qs
 
 
 class ElectionDetailView(CanViewMixin, DetailView):
@@ -240,29 +264,19 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
 
 class ElectionCreateView(CanCreateMixin, CreateView):
     model = Election
-    form_class = modelform_factory(Election,
-        fields=['title', 'description', 'start_candidature', 'end_candidature', 'start_date', 'end_date',
-                'edit_groups', 'view_groups', 'vote_groups', 'candidature_groups'],
-        widgets={
-            'edit_groups': CheckboxSelectMultiple,
-            'view_groups': CheckboxSelectMultiple,
-            'edit_groups': CheckboxSelectMultiple,
-            'vote_groups': CheckboxSelectMultiple,
-            'candidature_groups': CheckboxSelectMultiple,
-            'start_date': SelectDateTime,
-            'end_date': SelectDateTime,
-            'start_candidature': SelectDateTime,
-            'end_candidature': SelectDateTime,
-        })
+    form_class = ElectionForm
     template_name = 'core/page_prop.jinja'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_subscribed():
+            raise PermissionDenied
+        return super(ElectionCreateView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         """
-            Verify that the user is suscribed
+            Allow every users that had passed the dispatch to create an election
         """
-        res = super(CreateView, self).form_valid(form)
-        if self.request.user.is_subscribed():
-            return res
+        return super(CreateView, self).form_valid(form)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('election:detail', kwargs={'election_id': self.object.id})
@@ -275,6 +289,8 @@ class RoleCreateView(CanCreateMixin, CreateView):
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs['election_id'])
+        if self.election.is_vote_active or self.election.is_vote_finished:
+            raise PermissionDenied
         return super(RoleCreateView, self).dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
@@ -304,9 +320,24 @@ class RoleCreateView(CanCreateMixin, CreateView):
 
 class ElectionListCreateView(CanCreateMixin, CreateView):
     model = ElectionList
-    form_class = modelform_factory(ElectionList,
-        fields=['title', 'election'])
+    form_class = ElectionListForm
     template_name = 'core/page_prop.jinja'
+
+    def dispatch(self, request, *arg, **kwargs):
+        self.election = get_object_or_404(Election, pk=kwargs['election_id'])
+        if self.election.is_vote_finished:
+            raise PermissionDenied
+        return super(ElectionListCreateView, self).dispatch(request, *arg, **kwargs)
+
+    def get_initial(self):
+        init = {}
+        init['election'] = self.election
+        return init
+
+    def get_form_kwargs(self):
+        kwargs = super(ElectionListCreateView, self).get_form_kwargs()
+        kwargs['election_id'] = self.election.id
+        return kwargs
 
     def form_valid(self, form):
         """
@@ -324,3 +355,13 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
+
+# Update view
+
+
+class ElectionUpdateView(CanEditMixin, UpdateView):
+    model = Election
+    form_class = ElectionForm
+    template_name = 'core/page_prop.jinja'
+    pk_url_kwarg = 'election_id'
+

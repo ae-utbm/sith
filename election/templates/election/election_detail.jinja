@@ -348,9 +348,10 @@ th {
     {%- if election.can_candidate(user) or user.can_edit(election) %}
         <a href="{{url('election:candidate', election_id=object.id)}}">{% trans %}Candidate{% endtrans %}</a>
     {%- endif %}
-        <a href="{{url('election:create_list')}}">{% trans %}Add a new list{% endtrans %}</a>
+        <a href="{{url('election:create_list', election_id=object.id)}}">{% trans %}Add a new list{% endtrans %}</a>
     {%- if user.can_edit(election) %}
         <a href="{{url('election:create_role', election_id=object.id)}}">{% trans %}Add a new role{% endtrans %}</a>
+        <a href="{{url('election:update', election_id=object.id)}}">{% trans %}Edit{% endtrans %}</a>
     {%- endif %}
     </section>
 {% endblock %}
