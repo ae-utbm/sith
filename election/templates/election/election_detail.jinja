@@ -344,20 +344,15 @@ th {
         <button class="election__sumbit-button" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
     </section>
     {%- endif %}
-    {%- if user.can_edit(election) %}
     <section class="election__add-elements">
-        <a href="{{url('election:create_list')}}">{% trans %}Add a new list{% endtrans %}</a>
-        <a href="{{url('election:create_role')}}">{% trans %}Add a new role{% endtrans %}</a>
-    </section>
-    {%- endif %}
     {%- if election.can_candidate(user) or user.can_edit(election) %}
-    <section class="election__add-candidature">
-        <form action="{{url('election:candidate', election_id=election.id)}}" method="post">{{candidate_form}}
-        {% csrf_token %}
-        <p><input type="submit" value="{% trans %}Candidate{% endtrans %}" /></p>
-        </form>
-    </section>
+        <a href="{{url('election:candidate', election_id=object.id)}}">{% trans %}Candidate{% endtrans %}</a>
     {%- endif %}
+        <a href="{{url('election:create_list')}}">{% trans %}Add a new list{% endtrans %}</a>
+    {%- if user.can_edit(election) %}
+        <a href="{{url('election:create_role')}}">{% trans %}Add a new role{% endtrans %}</a>
+    {%- endif %}
+    </section>
 {% endblock %}
 
 {% block script %}
