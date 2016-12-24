@@ -8,30 +8,42 @@ class SithRenderer(Renderer):
         return reverse('core:file_detail', kwargs={'file_id': id}) + suffix
 
 class SithInlineLexer(InlineLexer):
-    def enable_file_link(self):
-        # add file_link rules
-        self.rules.file_link = re.compile(
-            r'dfile://(\d*)/?(\S*)?'                   # dfile://4000/download
-        )
-        # Add file_link parser to default rules
-        # you can insert it some place you like
-        # but place matters, maybe 2 is not good
-        self.default_rules.insert(0, 'file_link')
+    def _process_link(self, m, link, title=None):
+        try:
+            file_link = re.compile(
+                r'^file://(\d*)/?(\S*)?'                   # dfile://4000/download
+            )
+            match = file_link.search(link)
+            id = match.group(1)
+            suffix = match.group(2) or ""
+            link = reverse('core:file_detail', kwargs={'file_id': id}) + suffix
+        except: pass
+        return super(SithInlineLexer, self)._process_link(m, link, title)
 
-    def output_file_link(self, m):
-        id = m.group(1)
-        suffix = m.group(2) or ""
-        # you can create an custom render
-        # you can also return the html if you like
-        # return directly html like this:
-        # return reverse('core:file_detail', kwargs={'file_id': id}) + suffix
-        return self.renderer.file_link(id, suffix)
+    # def enable_file_link(self):
+    #     # add file_link rules
+    #     self.rules.file_link = re.compile(
+    #         r'dfile://(\d*)/?(\S*)?'                   # dfile://4000/download
+    #     )
+    #     # Add file_link parser to default rules
+    #     # you can insert it some place you like
+    #     # but place matters, maybe 2 is not good
+    #     self.default_rules.insert(0, 'file_link')
+
+    # def output_file_link(self, m):
+    #     id = m.group(1)
+    #     suffix = m.group(2) or ""
+    #     # you can create an custom render
+    #     # you can also return the html if you like
+    #     # return directly html like this:
+    #     # return reverse('core:file_detail', kwargs={'file_id': id}) + suffix
+    #     return self.renderer.file_link(id, suffix)
 
 renderer = SithRenderer()
 inline = SithInlineLexer(renderer)
 
 # enable the features
-inline.enable_file_link()
+# inline.enable_file_link()
 markdown = Markdown(renderer, inline=inline)
 
 
