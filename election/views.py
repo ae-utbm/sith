@@ -31,7 +31,7 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
         self.max_choice = max_choice
         widget = forms.CheckboxSelectMultiple()
         super(LimitedCheckboxField, self).__init__(queryset, None, required, widget, label,
-                                           initial, help_text, *args, **kwargs)
+                                                   initial, help_text, *args, **kwargs)
 
     def clean(self, value):
         qs = super(LimitedCheckboxField, self).clean(value)
@@ -86,6 +86,12 @@ class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
         fields = ['title', 'election', 'description', 'max_choice']
+
+    def __init__(self, *args, **kwargs):
+        election_id = kwargs.pop('election_id', None)
+        super(RoleForm, self).__init__(*args, **kwargs)
+        if election_id:
+            self.fields['election'].queryset = Election.objects.filter(id=election_id).all()
 
     def clean(self):
         cleaned_data = super(RoleForm, self).clean()
@@ -267,6 +273,15 @@ class RoleCreateView(CanCreateMixin, CreateView):
     form_class = RoleForm
     template_name = 'core/page_prop.jinja'
 
+    def dispatch(self, request, *arg, **kwargs):
+        self.election = get_object_or_404(Election, pk=kwargs['election_id'])
+        return super(RoleCreateView, self).dispatch(request, *arg, **kwargs)
+
+    def get_initial(self):
+        init = {}
+        init['election'] = self.election
+        return init
+
     def form_valid(self, form):
         """
             Verify that the user can edit proprely
@@ -277,6 +292,11 @@ class RoleCreateView(CanCreateMixin, CreateView):
                 if self.request.user.is_in_group(grp):
                     return super(CreateView, self).form_valid(form)
         raise PermissionDenied
+
+    def get_form_kwargs(self):
+        kwargs = super(RoleCreateView, self).get_form_kwargs()
+        kwargs['election_id'] = self.election.id
+        return kwargs
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
