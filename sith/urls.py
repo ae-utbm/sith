@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^launderette/', include('launderette.urls', namespace="launderette", app_name="launderette")),
     url(r'^sas/', include('sas.urls', namespace="sas", app_name="sas")),
     url(r'^api/v1/', include('api.urls', namespace="api", app_name="api")),
+    url(r'^election/', include('election.urls', namespace="election", app_name="election")),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ajax_select/', include(ajax_select_urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),
