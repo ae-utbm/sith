@@ -10,8 +10,16 @@ class SithRenderer(Renderer):
 class SithInlineLexer(InlineLexer):
     def _process_link(self, m, link, title=None):
         try:
+            page = re.compile(
+                r'^page://(\S*)'                   # page://nom_de_ma_page
+            )
+            match = page.search(link)
+            page = match.group(1) or ""
+            link = reverse('core:page', kwargs={'page_name': page})
+        except: pass
+        try:
             file_link = re.compile(
-                r'^file://(\d*)/?(\S*)?'                   # dfile://4000/download
+                r'^file://(\d*)/?(\S*)?'                   # file://4000/download
             )
             match = file_link.search(link)
             id = match.group(1)
