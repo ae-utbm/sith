@@ -323,23 +323,29 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
             comptes.save()
             simple = SimplifiedAccountingType(label = 'Je fais du simple 6', accounting_type = comptes, movement_type='DEBIT')
             simple.save()
-
-            t = AccountingType(code='602', label="Gros test de malade", movement_type='DEBIT')
-            t.save()
-            Operation(journal=gj, date=date.today(), amount=32.3, remark="...", mode="CASH", done=True, accounting_type=t, target_type="USER", target_id=skia.id).save()
-            t = AccountingType(code='60', label="...", movement_type='DEBIT')
-            t.save()
-            Operation(journal=gj, date=date.today(), amount=32.3, remark="...", mode="CASH", done=True, accounting_type=t, target_type="USER", target_id=skia.id).save()
-            Operation(journal=gj, date=date.today(), amount=46.42, remark="An answer to life...", mode="CASH", done=True, accounting_type=t, target_type="USER", target_id=skia.id).save()
-            Operation(journal=gj, date=date.today(), amount=666.42,
-                    remark="An answer to life...", mode="CASH", done=True, accounting_type=credit, target_type="USER",
-                    target_id=skia.id).save()
-            Operation(journal=gj, date=date.today(), amount=42,
-                    remark="An answer to life...", mode="CASH", done=False, accounting_type=debit, target_type="CLUB",
-                    target_id=bar_club.id).save()
-
             woenzco = Company(name="Woenzel & co")
             woenzco.save()
+
+            operation_list = [
+                            (27, "J'avais trop de bière", 'CASH', None, buying, 'USER', skia.id, "", None), 
+                            (4000, "Ceci n'est pas une opération... en fait si mais non", 'CHECK', None, debit,'COMPANY', woenzco.id, "", 23),
+                            (22, "C'est de l'argent ?", 'CARD', None, credit, 'CLUB', troll.id, "", None),
+                            (37, "Je paye CASH", 'CASH', None, debit2, 'OTHER', None, "tous les étudiants <3", None),
+                            (300, "Paiement Guy", 'CASH', None, buying, 'USER', skia.id, "", None),
+                            (32.3, "Essence", 'CASH', None, buying, 'OTHER', None, "station", None),
+                            (46.42, "Allumette", 'CHECK', None, credit, 'CLUB', main_club.id, "", 57),
+                            (666.42, "Subvention de far far away", 'CASH', None, comptes, 'CLUB', main_club.id, "", None),
+                            (496, "Ça, c'est un 6", 'CARD', simple, None, 'USER', skia.id, "", None),
+                            (17, "La Gargotte du Korrigan", 'CASH', None, debit2, 'CLUB', bar_club.id, "", None),
+                            ]
+            for op in operation_list:
+                operation = Operation(journal=gj, date=date.today(), amount=op[0], 
+                    remark=op[1], mode=op[2], done=True, simpleaccounting_type=op[3], 
+                    accounting_type=op[4], target_type=op[5], target_id=op[6], 
+                    target_label=op[7], cheque_number=op[8])
+                operation.clean()
+                operation.save()
+
             # Adding user sli
             sli = User(username='sli', last_name="Li", first_name="S",
                        email="sli@git.an",
@@ -390,26 +396,6 @@ Cette page vise à documenter la syntaxe *Markdown* utilisée sur le site.
                     duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
                     start=s.subscription_start)
             s.save()
-
-            operation_list = [
-                            (27, "J'avais trop de bière", 'CASH', None, buying, 'USER', skia.id, "", None), 
-                            (4000, "Ceci n'est pas une opération... en fait si mais non", 'CHECK', None, debit,'COMPANY', woenzco.id, "", 23),
-                            (22, "C'est de l'argent ?", 'CARD', None, credit, 'CLUB', troll.id, "", None),
-                            (37, "Je paye CASH", 'CASH', None, debit2, 'OTHER', None, "tous les étudiants <3", None),
-                            (300, "Paiement Guy", 'CASH', None, buying, 'USER', skia.id, "", None),
-                            (32.3, "Essence", 'CASH', None, buying, 'OTHER', None, "station", None),
-                            (46.42, "Allumette", 'CHECK', None, credit, 'CLUB', main_club.id, "", 57),
-                            (666.42, "Subvention de far far away", 'CASH', None, comptes, 'CLUB', main_club.id, "", None),
-                            (496, "Ça, c'est un 6", 'CARD', simple, None, 'USER', skia.id, "", None),
-                            (17, "La Gargotte du Korrigan", 'CASH', None, debit2, 'CLUB', bar_club.id, "", None),
-                            ]
-            for op in operation_list:
-                operation = Operation(journal=gj, date=date.today(), amount=op[0], 
-                    remark=op[1], mode=op[2], done=True, simpleaccounting_type=op[3], 
-                    accounting_type=op[4], target_type=op[5], target_id=op[6], 
-                    target_label=op[7], cheque_number=op[8])
-                operation.clean()
-                operation.save()
 
             # Create an election
             public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
