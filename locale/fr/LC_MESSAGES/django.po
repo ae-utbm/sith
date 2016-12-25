@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-25 23:30+0100\n"
+"POT-Creation-Date: 2016-12-26 00:34+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -322,9 +322,8 @@ msgstr "Compte en banque : "
 #: core/templates/core/user_edit.jinja:19
 #: counter/templates/counter/last_ops.jinja:29
 #: counter/templates/counter/last_ops.jinja:59
-#: election/templates/election/delete_template.jinja:4
-#: election/templates/election/election_detail.jinja:278
-#: election/templates/election/election_detail.jinja:325
+#: election/templates/election/election_detail.jinja:280
+#: election/templates/election/election_detail.jinja:327
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:154 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:66
@@ -360,11 +359,9 @@ msgstr "Nouveau compte club"
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:32
 #: counter/templates/counter/counter_list.jinja:47
-#: election/templates/election/election_detail.jinja:277
-#: election/templates/election/election_detail.jinja:322
-#: election/templates/election/election_detail.jinja:368
-#: election/templates/election/update_template.jinja:4
-#: election/templates/election/update_template.jinja:8
+#: election/templates/election/election_detail.jinja:279
+#: election/templates/election/election_detail.jinja:324
+#: election/templates/election/election_detail.jinja:370
 #: launderette/templates/launderette/launderette_list.jinja:16
 #: sas/templates/sas/album.jinja:18 sas/templates/sas/picture.jinja:92
 msgid "Edit"
@@ -643,8 +640,6 @@ msgstr "Éditer l'opération"
 #: core/templates/core/pagerev_edit.jinja:24
 #: core/templates/core/user_godfathers.jinja:35
 #: counter/templates/counter/cash_register_summary.jinja:22
-#: election/templates/election/create_template.jinja:11
-#: election/templates/election/update_template.jinja:11
 #: subscription/templates/subscription/subscription.jinja:23
 msgid "Save"
 msgstr "Sauver"
@@ -992,7 +987,7 @@ msgstr "Vous n'avez pas la permission de faire cela"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:166 com/views.py:81 counter/views.py:909
+#: club/views.py:166 com/views.py:81 counter/views.py:909 election/views.py:130
 msgid "End date"
 msgstr "Date de fin"
 
@@ -1199,7 +1194,7 @@ msgstr "Message d'info"
 msgid "Alert message"
 msgstr "Message d'alerte"
 
-#: com/views.py:80
+#: com/views.py:80 election/views.py:129
 msgid "Start date"
 msgstr "Date de début"
 
@@ -1498,7 +1493,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/templates/core/user_detail.jinja:14
 #: core/templates/core/user_detail.jinja:16
 #: core/templates/core/user_edit.jinja:17
-#: election/templates/election/election_detail.jinja:314
+#: election/templates/election/election_detail.jinja:316
 msgid "Profile"
 msgstr "Profil"
 
@@ -2441,7 +2436,7 @@ msgid "Elections"
 msgstr "Élections"
 
 #: core/templates/core/user_tools.jinja:91
-msgid "See avaliable elections"
+msgid "See available elections"
 msgstr "Voir les élections disponibles"
 
 #: core/templates/core/user_tools.jinja:93
@@ -3148,7 +3143,7 @@ msgstr "élection"
 
 #: election/models.py:83
 msgid "max choice"
-msgstr "choix maximums"
+msgstr "nombre de choix maxi"
 
 #: election/models.py:128
 msgid "election list"
@@ -3159,24 +3154,14 @@ msgid "candidature"
 msgstr "candidature"
 
 #: election/templates/election/candidate_form.jinja:4
-#: election/templates/election/candidate_form.jinja:11
-#: election/templates/election/election_detail.jinja:361
+#: election/templates/election/candidate_form.jinja:13
+#: election/templates/election/election_detail.jinja:363
 msgid "Candidate"
 msgstr "Candidater"
 
-#: election/templates/election/candidate_form.jinja:16
+#: election/templates/election/candidate_form.jinja:17
 msgid "Candidature are closed for this election"
 msgstr "Les candidatures sont fermées pour cette élection"
-
-#: election/templates/election/create_template.jinja:4
-#: election/templates/election/create_template.jinja:8
-#: sas/templates/sas/main.jinja:41
-msgid "Create"
-msgstr "Créer"
-
-#: election/templates/election/delete_template.jinja:9
-msgid "Are you sure you want to delete "
-msgstr "Êtes-vous sûr de vouloir supprimer \"%(obj)s\" ?"
 
 #: election/templates/election/election_detail.jinja:237
 msgid "Polls close "
@@ -3188,70 +3173,70 @@ msgstr "Votes fermés"
 
 #: election/templates/election/election_detail.jinja:241
 msgid "Polls will open "
-msgstr "Les votes ouvriront"
+msgstr "Les votes ouvriront "
 
-#: election/templates/election/election_detail.jinja:242
-#: election/templates/election/election_detail.jinja:245
-#: election/templates/election/election_list.jinja:30
-#: election/templates/election/election_list.jinja:32
-#: election/templates/election/election_list.jinja:36
-#: election/templates/election/election_list.jinja:38
+#: election/templates/election/election_detail.jinja:243
+#: election/templates/election/election_detail.jinja:247
+#: election/templates/election/election_list.jinja:31
+#: election/templates/election/election_list.jinja:34
+#: election/templates/election/election_list.jinja:39
+#: election/templates/election/election_list.jinja:42
 msgid " at "
 msgstr " à "
 
-#: election/templates/election/election_detail.jinja:243
+#: election/templates/election/election_detail.jinja:244
 msgid "and will close "
 msgstr "et fermeront"
 
-#: election/templates/election/election_detail.jinja:250
+#: election/templates/election/election_detail.jinja:252
 msgid "You already have submitted your vote."
 msgstr "Vous avez déjà soumis votre vote."
 
-#: election/templates/election/election_detail.jinja:252
+#: election/templates/election/election_detail.jinja:254
 msgid "You have voted in this election."
-msgstr "Vous avez voté pour cette élection."
+msgstr "Vous avez déjà voté pour cette élection."
 
-#: election/templates/election/election_detail.jinja:264 election/views.py:81
+#: election/templates/election/election_detail.jinja:266 election/views.py:81
 msgid "Blank vote"
 msgstr "Vote blanc"
 
-#: election/templates/election/election_detail.jinja:281
+#: election/templates/election/election_detail.jinja:283
 msgid "You may choose up to"
 msgstr "Vous pouvez choisir jusqu'à"
 
-#: election/templates/election/election_detail.jinja:281
+#: election/templates/election/election_detail.jinja:283
 msgid "people."
 msgstr "personne(s)"
 
-#: election/templates/election/election_detail.jinja:295
+#: election/templates/election/election_detail.jinja:297
 msgid "Choose blank vote"
 msgstr "Choisir de voter blanc"
 
-#: election/templates/election/election_detail.jinja:302
-#: election/templates/election/election_detail.jinja:340
+#: election/templates/election/election_detail.jinja:304
+#: election/templates/election/election_detail.jinja:342
 msgid "votes"
 msgstr "votes"
 
-#: election/templates/election/election_detail.jinja:333
+#: election/templates/election/election_detail.jinja:335
 #: launderette/templates/launderette/launderette_book.jinja:12
 msgid "Choose"
 msgstr "Choisir"
 
-#: election/templates/election/election_detail.jinja:356
+#: election/templates/election/election_detail.jinja:358
 msgid "Submit the vote !"
 msgstr "Envoyer le vote !"
 
-#: election/templates/election/election_detail.jinja:363
+#: election/templates/election/election_detail.jinja:365
 msgid "Add a new list"
 msgstr "Ajouter une nouvelle liste"
 
-#: election/templates/election/election_detail.jinja:366
+#: election/templates/election/election_detail.jinja:368
 msgid "Add a new role"
 msgstr "Ajouter un nouveau rôle"
 
 #: election/templates/election/election_list.jinja:4
 msgid "Election list"
-msgstr "Liste des électorale"
+msgstr "Liste des élections"
 
 #: election/templates/election/election_list.jinja:21
 msgid "Current elections"
@@ -3259,14 +3244,14 @@ msgstr "Élections actuelles"
 
 #: election/templates/election/election_list.jinja:29
 msgid "Applications open from"
-msgstr "Candidatures ouverts à partir du"
+msgstr "Candidatures ouvertes à partir du"
 
-#: election/templates/election/election_list.jinja:31
-#: election/templates/election/election_list.jinja:37
+#: election/templates/election/election_list.jinja:32
+#: election/templates/election/election_list.jinja:40
 msgid "to"
 msgstr "au"
 
-#: election/templates/election/election_list.jinja:35
+#: election/templates/election/election_list.jinja:37
 msgid "Polls open from"
 msgstr "Votes ouverts du"
 
@@ -3281,6 +3266,14 @@ msgstr "Utilisateur se présentant"
 #: election/views.py:101
 msgid "This role already exists for this election"
 msgstr "Ce rôle existe déjà pour cette élection"
+
+#: election/views.py:131
+msgid "Start candidature"
+msgstr "Début des candidatures"
+
+#: election/views.py:132
+msgid "End candidature"
+msgstr "Fin des candidatures"
 
 #: launderette/models.py:17
 #: launderette/templates/launderette/launderette_book.jinja:5
@@ -3423,6 +3416,10 @@ msgstr "miniature"
 #: sas/templates/sas/album.jinja:86
 msgid "Upload"
 msgstr "Envoyer"
+
+#: sas/templates/sas/main.jinja:41
+msgid "Create"
+msgstr "Créer"
 
 #: sas/templates/sas/moderation.jinja:4 sas/templates/sas/moderation.jinja:8
 msgid "SAS moderation"
