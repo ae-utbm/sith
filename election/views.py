@@ -289,7 +289,7 @@ class RoleCreateView(CanCreateMixin, CreateView):
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs['election_id'])
-        if self.election.is_vote_editable:
+        if not self.election.is_vote_editable:
             raise PermissionDenied
         return super(RoleCreateView, self).dispatch(request, *arg, **kwargs)
 

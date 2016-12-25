@@ -362,7 +362,9 @@ th {
     {%- endif %}
         <a href="{{url('election:create_list', election_id=object.id)}}">{% trans %}Add a new list{% endtrans %}</a>
     {%- if user.can_edit(election) %}
+        {% if election.is_vote_editable %}
         <a href="{{url('election:create_role', election_id=object.id)}}">{% trans %}Add a new role{% endtrans %}</a>
+        {% endif %}
         <a href="{{url('election:update', election_id=object.id)}}">{% trans %}Edit{% endtrans %}</a>
     {%- endif %}
     </section>
