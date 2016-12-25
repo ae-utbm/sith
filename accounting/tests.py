@@ -3,10 +3,11 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.conf import settings
+from datetime import date, datetime
 
 from core.models import User
 from counter.models import Counter
-from accounting.models import GeneralJournal, Operation, AccountingType, SimplifiedAccountingType
+from accounting.models import GeneralJournal, Operation, Label, AccountingType, SimplifiedAccountingType
 
 
 class RefoundAccountTest(TestCase):
@@ -71,6 +72,19 @@ class OperationTest(TestCase):
         call_command("populate")
         self.journal = GeneralJournal.objects.filter(id = 1).first()
         self.skia = User.objects.filter(username='skia').first()
+        at = AccountingType(code='443', label="Ce code n'existe pas", movement_type='CREDIT')
+        at.save()
+        l = Label(club_account= self.journal.club_account, name='bob')
+        l.save()
+        self.client.login(username='comptable', password='plop')
+        self.op1 = Operation(journal=self.journal, date=date.today(), amount=1, 
+            remark="Test bilan", mode='CASH', done=True, label=l,
+            accounting_type=at, target_type='USER', target_id=self.skia.id)
+        self.op1.save()
+        self.op2 = Operation(journal=self.journal, date=date.today(), amount=2, 
+            remark="Test bilan", mode='CASH', done=True, label=l,
+            accounting_type=at, target_type='USER', target_id=self.skia.id)
+        self.op2.save()
 
     def test_new_operation(self):
         self.client.login(username='comptable', password='plop')  
@@ -167,3 +181,19 @@ class OperationTest(TestCase):
         response_get = self.client.get(reverse("accounting:journal_details", args=[self.journal.id]))
         self.assertTrue("<td>Le fantome de l&#39;aurore</td>" in str(response_get.content))
         self.assertTrue(self.journal.operations.filter(amount=23).values('accounting_type').first()['accounting_type'] == AccountingType.objects.filter(code=6).values('id').first()['id'])
+
+    def test_nature_statement(self):
+        self.client.login(username='comptable', password='plop')
+        response_get = self.client.get(reverse("accounting:journal_nature_statement", args=[self.journal.id]))
+        self.assertTrue("bob (Troll Pench\\xc3\\xa9) : 3.00" in str(response_get.content))
+
+    def test_person_statement(self):
+        self.client.login(username='comptable', password='plop')
+        response_get = self.client.get(reverse("accounting:journal_person_statement", args=[self.journal.id]))
+        self.assertTrue("S&#39; Kia</a></td>\\n            \\n            <td>3.00</td>" in str(response_get.content))
+
+
+    def test_accounting_statement(self):
+        self.client.login(username='comptable', password='plop')
+        response_get = self.client.get(reverse("accounting:journal_accounting_statement", args=[self.journal.id]))
+        self.assertTrue("<td>443 - Cr\\xc3\\xa9dit - Ce code n&#39;existe pas</td>\\n            <td>3.00</td>" in str(response_get.content))
