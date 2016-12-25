@@ -12,5 +12,7 @@
         {% csrf_token %}
         </form>
     </section>
+    {%- else -%}
+    {% trans %}Candidature are closed for this election{% endtrans %}
     {%- endif %}
 {% endblock content %}

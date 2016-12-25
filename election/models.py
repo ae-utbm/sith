@@ -125,7 +125,7 @@ class Candidature(models.Model):
     role = models.ForeignKey(Role, related_name='candidatures', verbose_name=_("role"))
     user = models.ForeignKey(User, verbose_name=_('user'), related_name='candidates', blank=True)
     program = models.TextField(_('description'), null=True, blank=True)
-    election_list = models.ForeignKey(ElectionList, related_name='candidatures', verbose_name=_('election_list'))
+    election_list = models.ForeignKey(ElectionList, related_name='candidatures', verbose_name=_('election list'))
 
     def can_be_edited_by(self, user):
         return (user == self.user)

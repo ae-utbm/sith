@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-23 20:10+0100\n"
+"POT-Creation-Date: 2016-12-25 19:56+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -86,11 +86,12 @@ msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
 #: accounting/models.py:142 club/models.py:146 counter/models.py:399
-#: launderette/models.py:120
+#: election/models.py:18 launderette/models.py:120
 msgid "start date"
 msgstr "date de début"
 
 #: accounting/models.py:143 club/models.py:147 counter/models.py:400
+#: election/models.py:19
 msgid "end date"
 msgstr "date de fin"
 
@@ -192,7 +193,7 @@ msgstr "Compte"
 msgid "Company"
 msgstr "Entreprise"
 
-#: accounting/models.py:207 sith/settings.py:296
+#: accounting/models.py:207 sith/settings.py:297
 msgid "Other"
 msgstr "Autre"
 
@@ -321,6 +322,9 @@ msgstr "Compte en banque : "
 #: core/templates/core/user_edit.jinja:19
 #: counter/templates/counter/last_ops.jinja:29
 #: counter/templates/counter/last_ops.jinja:59
+#: election/templates/election/delete_template.jinja:4
+#: election/templates/election/election_detail.jinja:278
+#: election/templates/election/election_detail.jinja:325
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:154 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:66
@@ -356,6 +360,11 @@ msgstr "Nouveau compte club"
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:32
 #: counter/templates/counter/counter_list.jinja:47
+#: election/templates/election/election_detail.jinja:277
+#: election/templates/election/election_detail.jinja:322
+#: election/templates/election/election_detail.jinja:366
+#: election/templates/election/update_template.jinja:4
+#: election/templates/election/update_template.jinja:8
 #: launderette/templates/launderette/launderette_list.jinja:16
 #: sas/templates/sas/album.jinja:18 sas/templates/sas/picture.jinja:92
 msgid "Edit"
@@ -634,6 +643,8 @@ msgstr "Éditer l'opération"
 #: core/templates/core/pagerev_edit.jinja:24
 #: core/templates/core/user_godfathers.jinja:35
 #: counter/templates/counter/cash_register_summary.jinja:22
+#: election/templates/election/create_template.jinja:11
+#: election/templates/election/update_template.jinja:11
 #: subscription/templates/subscription/subscription.jinja:23
 msgid "Save"
 msgstr "Sauver"
@@ -766,17 +777,19 @@ msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
 #: club/models.py:144 counter/models.py:397 counter/models.py:414
-#: eboutic/models.py:14 eboutic/models.py:47 launderette/models.py:87
-#: launderette/models.py:124 sas/models.py:131
+#: eboutic/models.py:14 eboutic/models.py:47 election/models.py:126
+#: launderette/models.py:87 launderette/models.py:124 sas/models.py:131
 msgid "user"
 msgstr "nom d'utilisateur"
 
-#: club/models.py:148 core/models.py:137
+#: club/models.py:148 core/models.py:137 election/models.py:125
+#: election/models.py:141
 msgid "role"
 msgstr "rôle"
 
 #: club/models.py:150 core/models.py:33 counter/models.py:71
-#: counter/models.py:96
+#: counter/models.py:96 election/models.py:15 election/models.py:82
+#: election/models.py:127
 msgid "description"
 msgstr "description"
 
@@ -1016,7 +1029,8 @@ msgstr "Hebdomadaire"
 msgid "Call"
 msgstr "Appel"
 
-#: com/models.py:30
+#: com/models.py:30 election/models.py:14 election/models.py:81
+#: election/models.py:114
 msgid "title"
 msgstr "titre"
 
@@ -1484,6 +1498,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/templates/core/user_detail.jinja:14
 #: core/templates/core/user_detail.jinja:16
 #: core/templates/core/user_edit.jinja:17
+#: election/templates/election/election_detail.jinja:314
 msgid "Profile"
 msgstr "Profil"
 
@@ -2421,6 +2436,18 @@ msgstr "Modérer les fichiers"
 msgid "Moderate pictures"
 msgstr "Modérer les photos"
 
+#: core/templates/core/user_tools.jinja:89
+msgid "Elections"
+msgstr "Élections"
+
+#: core/templates/core/user_tools.jinja:91
+msgid "See avaliable elections"
+msgstr "Voir les élections disponibles"
+
+#: core/templates/core/user_tools.jinja:93
+msgid "Create a new election"
+msgstr "Créer une nouvelle élection"
+
 #: core/views/files.py:49
 msgid "Add a new folder"
 msgstr "Ajouter un nouveau dossier"
@@ -2566,7 +2593,7 @@ msgstr "Bureau"
 #: eboutic/templates/eboutic/eboutic_main.jinja:24
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:8
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:4
-#: sith/settings.py:295 sith/settings.py:303
+#: sith/settings.py:296 sith/settings.py:304
 msgid "Eboutic"
 msgstr "Eboutic"
 
@@ -2607,8 +2634,8 @@ msgstr "quantité"
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: counter/models.py:292 sith/settings.py:288 sith/settings.py:293
-#: sith/settings.py:315
+#: counter/models.py:292 sith/settings.py:289 sith/settings.py:294
+#: sith/settings.py:316
 msgid "Credit card"
 msgstr "Carte bancaire"
 
@@ -3091,6 +3118,161 @@ msgstr "Retourner à l'eboutic"
 msgid "You do not have enough money to buy the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
+#: election/models.py:16
+msgid "start candidature"
+msgstr "début des candidatures"
+
+#: election/models.py:17
+msgid "end candidature"
+msgstr "fin des candidatures"
+
+#: election/models.py:21
+msgid "edit groups"
+msgstr "groupe d'édition"
+
+#: election/models.py:22
+msgid "view groups"
+msgstr "groupe de vue"
+
+#: election/models.py:23
+msgid "vote groups"
+msgstr "groupe de vote"
+
+#: election/models.py:24
+msgid "candidature groups"
+msgstr "groupe de candidature"
+
+#: election/models.py:80 election/models.py:115
+msgid "election"
+msgstr "élection"
+
+#: election/models.py:83
+msgid "max choice"
+msgstr "choix maximums"
+
+#: election/models.py:128
+msgid "election list"
+msgstr "liste électorale"
+
+#: election/models.py:142
+msgid "candidature"
+msgstr "candidature"
+
+#: election/templates/election/candidate_form.jinja:4
+#: election/templates/election/candidate_form.jinja:11
+#: election/templates/election/election_detail.jinja:361
+msgid "Candidate"
+msgstr "Candidater"
+
+#: election/templates/election/candidate_form.jinja:16
+msgid "Candidature are closed for this election"
+msgstr "Les candidatures sont fermées pour cette élection"
+
+#: election/templates/election/create_template.jinja:4
+#: election/templates/election/create_template.jinja:8
+#: sas/templates/sas/main.jinja:41
+msgid "Create"
+msgstr "Créer"
+
+#: election/templates/election/delete_template.jinja:9
+msgid "Are you sure you want to delete "
+msgstr "Êtes-vous sûr de vouloir supprimer \"%(obj)s\" ?"
+
+#: election/templates/election/election_detail.jinja:237
+msgid "Polls close "
+msgstr "Votes fermés"
+
+#: election/templates/election/election_detail.jinja:239
+msgid "Polls closed "
+msgstr "Votes fermés"
+
+#: election/templates/election/election_detail.jinja:241
+msgid "Polls will open "
+msgstr "Les votes ouvriront"
+
+#: election/templates/election/election_detail.jinja:243
+msgid "and will close "
+msgstr "et fermeront"
+
+#: election/templates/election/election_detail.jinja:250
+msgid "You already have submitted your vote."
+msgstr "Vous avez déjà soumis votre vote."
+
+#: election/templates/election/election_detail.jinja:252
+msgid "You have voted in this election."
+msgstr "Vous avez voté pour cette élection."
+
+#: election/templates/election/election_detail.jinja:264 election/views.py:81
+msgid "Blank vote"
+msgstr "Vote blanc"
+
+#: election/templates/election/election_detail.jinja:281
+msgid "You may choose up to"
+msgstr "Vous pouvez choisir jusqu'à"
+
+#: election/templates/election/election_detail.jinja:281
+msgid "people."
+msgstr "personne(s)"
+
+#: election/templates/election/election_detail.jinja:295
+msgid "Choose blank vote"
+msgstr "Choisir de voter blanc"
+
+#: election/templates/election/election_detail.jinja:302
+#: election/templates/election/election_detail.jinja:340
+msgid "votes"
+msgstr "votes"
+
+#: election/templates/election/election_detail.jinja:333
+#: launderette/templates/launderette/launderette_book.jinja:12
+msgid "Choose"
+msgstr "Choisir"
+
+#: election/templates/election/election_detail.jinja:356
+msgid "Submit the vote !"
+msgstr "Envoyer le vote !"
+
+#: election/templates/election/election_detail.jinja:363
+msgid "Add a new list"
+msgstr "Ajouter une nouvelle liste"
+
+#: election/templates/election/election_detail.jinja:365
+msgid "Add a new role"
+msgstr "Ajouter un nouveau rôle"
+
+#: election/templates/election/election_list.jinja:4
+msgid "Election list"
+msgstr "Liste des électorale"
+
+#: election/templates/election/election_list.jinja:21
+msgid "Current elections"
+msgstr "Élections actuelles"
+
+#: election/templates/election/election_list.jinja:29
+msgid "Applications open from"
+msgstr "Candidatures ouverts à partir du"
+
+#: election/templates/election/election_list.jinja:31
+#: election/templates/election/election_list.jinja:37
+msgid "to"
+msgstr "au"
+
+#: election/templates/election/election_list.jinja:35
+msgid "Polls open from"
+msgstr "Votes ouverts du"
+
+#: election/views.py:43
+msgid "You have selected too much candidates."
+msgstr "Vous avez sélectionné trop de candidats."
+
+#: election/views.py:58
+msgid "User to candidate"
+msgstr "Utilisateur se présentant"
+
+#: election/views.py:101
+msgid "This role already exists for this election"
+msgstr "Ce rôle existe déjà pour cette élection"
+
 #: launderette/models.py:17
 #: launderette/templates/launderette/launderette_book.jinja:5
 #: launderette/templates/launderette/launderette_book_choose.jinja:4
@@ -3142,21 +3324,17 @@ msgstr "Machines"
 msgid "New machine"
 msgstr "Nouvelle machine"
 
-#: launderette/templates/launderette/launderette_book.jinja:12
-msgid "Choose"
-msgstr "Choisir"
-
 #: launderette/templates/launderette/launderette_book.jinja:23
 msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:436
+#: sith/settings.py:437
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:436
+#: sith/settings.py:437
 msgid "Drying"
 msgstr "Séchage"
 
@@ -3237,10 +3415,6 @@ msgstr "miniature"
 msgid "Upload"
 msgstr "Envoyer"
 
-#: sas/templates/sas/main.jinja:41
-msgid "Create"
-msgstr "Créer"
-
 #: sas/templates/sas/moderation.jinja:4 sas/templates/sas/moderation.jinja:8
 msgid "SAS moderation"
 msgstr "Modération du SAS"
@@ -3294,145 +3468,145 @@ msgstr "Ajouter une personne"
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
-#: sith/settings.py:175
+#: sith/settings.py:176
 msgid "English"
 msgstr "Anglais"
 
-#: sith/settings.py:176
+#: sith/settings.py:177
 msgid "French"
 msgstr "Français"
 
-#: sith/settings.py:285 sith/settings.py:292 sith/settings.py:313
+#: sith/settings.py:286 sith/settings.py:293 sith/settings.py:314
 msgid "Check"
 msgstr "Chèque"
 
-#: sith/settings.py:286 sith/settings.py:294 sith/settings.py:314
+#: sith/settings.py:287 sith/settings.py:295 sith/settings.py:315
 msgid "Cash"
 msgstr "Espèces"
 
-#: sith/settings.py:287
+#: sith/settings.py:288
 msgid "Transfert"
 msgstr "Virement"
 
-#: sith/settings.py:300
+#: sith/settings.py:301
 msgid "Belfort"
 msgstr "Belfort"
 
-#: sith/settings.py:301
+#: sith/settings.py:302
 msgid "Sevenans"
 msgstr "Sevenans"
 
-#: sith/settings.py:302
+#: sith/settings.py:303
 msgid "Montbéliard"
 msgstr "Montbéliard"
 
-#: sith/settings.py:343
+#: sith/settings.py:344
 msgid "One semester"
 msgstr "Un semestre, 15 €"
 
-#: sith/settings.py:348
+#: sith/settings.py:349
 msgid "Two semesters"
 msgstr "Deux semestres, 28 €"
 
-#: sith/settings.py:353
+#: sith/settings.py:354
 msgid "Common core cursus"
 msgstr "Cursus tronc commun, 45 €"
 
-#: sith/settings.py:358
+#: sith/settings.py:359
 msgid "Branch cursus"
 msgstr "Cursus branche, 45 €"
 
-#: sith/settings.py:363
+#: sith/settings.py:364
 msgid "Alternating cursus"
 msgstr "Cursus alternant, 30 €"
 
-#: sith/settings.py:368
+#: sith/settings.py:369
 msgid "Honorary member"
 msgstr "Membre honoraire, 0 €"
 
-#: sith/settings.py:373
+#: sith/settings.py:374
 msgid "Assidu member"
 msgstr "Membre d'Assidu, 0 €"
 
-#: sith/settings.py:378
+#: sith/settings.py:379
 msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO, 0 €"
 
-#: sith/settings.py:383
+#: sith/settings.py:384
 msgid "UT network member"
 msgstr "Cotisant du réseau UT, 0 €"
 
-#: sith/settings.py:388
+#: sith/settings.py:389
 msgid "CROUS member"
 msgstr "Membres du CROUS, 0 €"
 
-#: sith/settings.py:393
+#: sith/settings.py:394
 msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
 
-#: sith/settings.py:401
+#: sith/settings.py:402
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:402
+#: sith/settings.py:403
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:403
+#: sith/settings.py:404
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:404
+#: sith/settings.py:405
 msgid "Communication supervisor"
 msgstr "Responsable com"
 
-#: sith/settings.py:405
+#: sith/settings.py:406
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:406
+#: sith/settings.py:407
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:407
+#: sith/settings.py:408
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:408
+#: sith/settings.py:409
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:409
+#: sith/settings.py:410
 msgid "Curious"
 msgstr "Curieux"
 
-#: sith/settings.py:443
+#: sith/settings.py:444
 msgid "A fresh new to be moderated"
 msgstr "Une nouvelle toute neuve à modérer"
 
-#: sith/settings.py:444
+#: sith/settings.py:445
 msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
-#: sith/settings.py:445
+#: sith/settings.py:446
 msgid "New pictures/album to be moderated in the SAS"
 msgstr "Nouvelles photos/albums à modérer dans le SAS"
 
-#: sith/settings.py:446
+#: sith/settings.py:447
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:447
+#: sith/settings.py:448
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s €"
 
-#: sith/settings.py:448
+#: sith/settings.py:449
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:449
+#: sith/settings.py:450
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
