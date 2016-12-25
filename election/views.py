@@ -266,7 +266,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
 class ElectionCreateView(CanCreateMixin, CreateView):
     model = Election
     form_class = ElectionForm
-    template_name = 'election/create_template.jinja'
+    template_name = 'core/create.jinja'
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_subscribed():
@@ -286,7 +286,7 @@ class ElectionCreateView(CanCreateMixin, CreateView):
 class RoleCreateView(CanCreateMixin, CreateView):
     model = Role
     form_class = RoleForm
-    template_name = 'election/create_template.jinja'
+    template_name = 'core/create.jinja'
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs['election_id'])
@@ -322,7 +322,7 @@ class RoleCreateView(CanCreateMixin, CreateView):
 class ElectionListCreateView(CanCreateMixin, CreateView):
     model = ElectionList
     form_class = ElectionListForm
-    template_name = 'election/create_template.jinja'
+    template_name = 'core/create.jinja'
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs['election_id'])
@@ -363,7 +363,7 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
 class ElectionUpdateView(CanEditMixin, UpdateView):
     model = Election
     form_class = ElectionForm
-    template_name = 'election/update_template.jinja'
+    template_name = 'core/edit.jinja'
     pk_url_kwarg = 'election_id'
 
     def get_success_url(self, **kwargs):
@@ -373,7 +373,7 @@ class ElectionUpdateView(CanEditMixin, UpdateView):
 class CandidatureUpdateView(CanEditMixin, UpdateView):
     model = Candidature
     form_class = CandidateForm
-    template_name = 'election/update_template.jinja'
+    template_name = 'core/edit.jinja'
     pk_url_kwarg = 'candidature_id'
 
     def dispatch(self, request, *arg, **kwargs):
@@ -409,7 +409,7 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
 class RoleUpdateView(CanEditMixin, UpdateView):
     model = Role
     form_class = RoleForm
-    template_name = 'election/update_template.jinja'
+    template_name = 'core/edit.jinja'
     pk_url_kwarg = 'role_id'
 
     def dispatch(self, request, *arg, **kwargs):
@@ -448,7 +448,7 @@ class RoleUpdateView(CanEditMixin, UpdateView):
 
 class CandidatureDeleteView(CanEditMixin, DeleteView):
     model = Candidature
-    template_name = 'election/delete_template.jinja'
+    template_name = 'core/delete_confirm.jinja'
     pk_url_kwarg = 'candidature_id'
 
     def dispatch(self, request, *arg, **kwargs):
@@ -464,7 +464,7 @@ class CandidatureDeleteView(CanEditMixin, DeleteView):
 
 class RoleDeleteView(CanEditMixin, DeleteView):
     model = Role
-    template_name = 'election/delete_template.jinja'
+    template_name = 'core/delete_confirm.jinja'
     pk_url_kwarg = 'role_id'
 
     def dispatch(self, request, *arg, **kwargs):
