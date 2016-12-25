@@ -26,18 +26,23 @@
       <a href="{{ url('election:detail', election_id=election.id) }}">{{ election }}</a>
     </h4>
     <p>
-      {% trans %}Applications open from{% endtrans %} 
-      <time datetime="{{ election.start_candidature }}">{{ election.start_candidature|localtime|date("l d F Y") }}</time>{% trans %} at {% endtrans %}<time>{{ election.start_candidature|localtime|time("G:i") }}</time>
-       {% trans %}to{% endtrans %} 
-      <time datetime="{{ election.end_candidature }}">{{ election.end_candidature|localtime|date("l d F Y") }}</time>{% trans %} at {% endtrans %}<time>{{ election.end_candidature|time("G:i") }}</time>
+      {% trans %}Applications open from{% endtrans %}
+      <time datetime="{{ election.start_candidature }}">{{ election.start_candidature|localtime|date(DATETIME_FORMAT) }}</time>
+            {% trans %} at {% endtrans %}<time>{{ election.start_candidature|localtime|time(DATETIME_FORMAT) }}</time>
+       {% trans %}to{% endtrans %}
+      <time datetime="{{ election.end_candidature }}">{{ election.end_candidature|localtime|date(DATETIME_FORMAT) }}</time>
+            {% trans %} at {% endtrans %}<time>{{ election.end_candidature|time(DATETIME_FORMAT) }}</time>
     </p>
     <p>
-      {% trans %}Polls open from{% endtrans %} 
-      <time datetime="{{ election.start_date }}">{{ election.start_date|localtime|date("l d F Y") }}</time>{% trans %} at {% endtrans %}<time>{{ election.start_date|localtime|time("G:i") }}</time>
-       {% trans %}to{% endtrans %} 
-      <time datetime="{{ election.end_date }}">{{ election.end_date|localtime|date("l d F Y") }}</time>{% trans %} at {% endtrans %}<time>{{ election.end_date|localtime|time("G:i") }}</time>
+      {% trans %}Polls open from{% endtrans %}
+      <time datetime="{{ election.start_date }}">{{ election.start_date|localtime|date(DATETIME_FORMAT) }}</time>
+            {% trans %} at {% endtrans %}<time>{{ election.start_date|localtime|time(DATETIME_FORMAT) }}</time>
+       {% trans %}to{% endtrans %}
+      <time datetime="{{ election.end_date }}">{{ election.end_date|localtime|date(DATETIME_FORMAT) }}</time>
+            {% trans %} at {% endtrans %}<time>{{ election.end_date|localtime|time(DATETIME_FORMAT) }}</time>
     </p>
     <p>{{ election.description }}</p>
   </section>
   {%- endfor %}
 {%- endblock %}
+

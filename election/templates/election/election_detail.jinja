@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{{object.title}}
+{{ object.title }}
 {% endblock %}
 
 {% block head %}
@@ -239,10 +239,12 @@ th {
             {% trans %}Polls closed {% endtrans %}
             {%- else %}
             {% trans %}Polls will open {% endtrans %}
-            <time datetime="{{ election.start_date }}">{{ election.start_date|localtime|date("l d F Y")}}</time>{% trans %} at {% endtrans %}<time>{{ election.start_date|localtime|time("G:i")}}</time>
+            <time datetime="{{ election.start_date }}">{{ election.start_date|localtime|date(DATETIME_FORMAT)}}</time>
+                        {% trans %} at {% endtrans %}<time>{{ election.start_date|localtime|time(DATETIME_FORMAT)}}</time>
             {% trans %}and will close {% endtrans %}
             {%- endif %}
-            <time datetime="{{ election.end_date }}">{{ election.end_date|localtime|date("l d F Y")}}</time>{% trans %} at {% endtrans %}<time>{{ election.end_date|localtime|time("G:i")}}</time>
+            <time datetime="{{ election.end_date }}">{{ election.end_date|localtime|date(DATETIME_FORMAT)}}</time>
+                        {% trans %} at {% endtrans %}<time>{{ election.end_date|localtime|time(DATETIME_FORMAT)}}</time>
         </p>
         {%- if election.has_voted(user) %}
         <p class="election__elector-infos">
@@ -255,7 +257,7 @@ th {
         {%- endif %}
     </section>
     <section class="election__vote">
-        <form action="{{url('election:vote', election.id)}}" method="post" class="election__vote-form" name="vote-form" id="vote-form">
+        <form action="{{ url('election:vote', election.id) }}" method="post" class="election__vote-form" name="vote-form" id="vote-form">
             {% csrf_token %}
             <table>
                 {%- set election_lists = election.election_lists.all() -%}
@@ -263,7 +265,7 @@ th {
                 <thead>
                     <th>{% trans %}Blank vote{% endtrans %}</th>
                     {%- for election_list in election_lists %}
-                    <th>{{election_list.title}}</th>
+                    <th>{{ election_list.title }}</th>
                     {%- endfor %}
                 </thead>
                 {%- for role in election.roles.all() %}
@@ -271,8 +273,8 @@ th {
                 {%- set role_data = election_form.data.getlist(role.title) if role.title in election_form.data else [] %}
                 <tbody data-max-choice="{{role.max_choice}}" class="role{{ ' role_error' if role.title in election_form.errors else '' }}{{ ' role__multiple-choices' if role.max_choice > 1 else ''}}">
                     <tr class="role__title">
-                        <td colspan="{{election_lists.count() + 1}}">
-                            <span>{{role.title}}</span>
+                        <td colspan="{{ election_lists.count() + 1 }}">
+                            <span>{{ role.title }}</span>
                             {% if user.can_edit(role) and election.is_vote_editable -%}
                                 <a href="{{url('election:update_role', role_id=role.id)}}">{% trans %}Edit{% endtrans %}</a>
                                 <a href="{{url('election:delete_role', role_id=role.id)}}">{% trans %}Delete{% endtrans %}</a>
@@ -299,7 +301,7 @@ th {
                             {%- if election.is_vote_finished %}
                             {%- set results = election_results[role.title]['blank vote'] %}
                             <div class="election__results">
-                                <strong>{{results.vote}} {% trans %}votes{% endtrans %} ({{results.percent}} %)</strong>
+                                <strong>{{ results.vote }} {% trans %}votes{% endtrans %} ({{ results.percent }} %)</strong>
                             </div>
                             {%- endif %}
                         </td>
@@ -311,7 +313,7 @@ th {
                                     <figure class="candidate__infos">
                                         <div class="candidate__picture-wrapper">
                                             {%- if candidature.user.profile_pict and user.is_subscriber_viewable %}
-                                            <img class="candidate__picture" src="{{candidature.user.profile_pict.get_download_url()}}" alt="{% trans %}Profile{% endtrans %}">
+                                            <img class="candidate__picture" src="{{ candidature.user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}">
                                             {%- endif %}
                                         </div>
                                         <figcaption class="candidate__details">
@@ -337,7 +339,7 @@ th {
                                     {%- if election.is_vote_finished %}
                                     {%- set results = election_results[role.title][candidature.user.username] %}
                                     <div class="election__results">
-                                        <strong>{{results.vote}} {% trans %}votes{% endtrans %} ({{results.percent}} %)</strong>
+                                        <strong>{{ results.vote }} {% trans %}votes{% endtrans %} ({{ results.percent }} %)</strong>
                                     </div>
                                     {%- endif %}
                                 </li>
@@ -358,14 +360,14 @@ th {
     {%- endif %}
     <section class="election__add-elements">
     {%- if election.can_candidate(user) or user.can_edit(election) %}
-        <a href="{{url('election:candidate', election_id=object.id)}}">{% trans %}Candidate{% endtrans %}</a>
+        <a href="{{ url('election:candidate', election_id=object.id) }}">{% trans %}Candidate{% endtrans %}</a>
     {%- endif %}
-        <a href="{{url('election:create_list', election_id=object.id)}}">{% trans %}Add a new list{% endtrans %}</a>
+        <a href="{{ url('election:create_list', election_id=object.id) }}">{% trans %}Add a new list{% endtrans %}</a>
     {%- if user.can_edit(election) %}
         {% if election.is_vote_editable %}
-        <a href="{{url('election:create_role', election_id=object.id)}}">{% trans %}Add a new role{% endtrans %}</a>
+        <a href="{{ url('election:create_role', election_id=object.id) }}">{% trans %}Add a new role{% endtrans %}</a>
         {% endif %}
-        <a href="{{url('election:update', election_id=object.id)}}">{% trans %}Edit{% endtrans %}</a>
+        <a href="{{ url('election:update', election_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
     {%- endif %}
     </section>
 {% endblock %}

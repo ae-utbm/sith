@@ -7,9 +7,10 @@
 {% block content %}
     {%- if election.can_candidate(user) or user.can_edit(election) %}
     <section class="election__add-candidature">
-        <form action="{{url('election:candidate', election_id=election.id)}}" method="post">{{form.as_p()}}
-        <p><input type="submit" value="{% trans %}Candidate{% endtrans %}" /></p>
-        {% csrf_token %}
+        <form action="{{ url('election:candidate', election_id=election.id) }}" method="post">
+            {% csrf_token %}
+            {{ form.as_p() }}
+            <p><input type="submit" value="{% trans %}Candidate{% endtrans %}" /></p>
         </form>
     </section>
     {%- else -%}
