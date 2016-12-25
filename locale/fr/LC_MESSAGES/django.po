@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-25 19:56+0100\n"
+"POT-Creation-Date: 2016-12-25 23:30+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -362,7 +362,7 @@ msgstr "Nouveau compte club"
 #: counter/templates/counter/counter_list.jinja:47
 #: election/templates/election/election_detail.jinja:277
 #: election/templates/election/election_detail.jinja:322
-#: election/templates/election/election_detail.jinja:366
+#: election/templates/election/election_detail.jinja:368
 #: election/templates/election/update_template.jinja:4
 #: election/templates/election/update_template.jinja:8
 #: launderette/templates/launderette/launderette_list.jinja:16
@@ -3190,6 +3190,15 @@ msgstr "Votes fermés"
 msgid "Polls will open "
 msgstr "Les votes ouvriront"
 
+#: election/templates/election/election_detail.jinja:242
+#: election/templates/election/election_detail.jinja:245
+#: election/templates/election/election_list.jinja:30
+#: election/templates/election/election_list.jinja:32
+#: election/templates/election/election_list.jinja:36
+#: election/templates/election/election_list.jinja:38
+msgid " at "
+msgstr " à "
+
 #: election/templates/election/election_detail.jinja:243
 msgid "and will close "
 msgstr "et fermeront"
@@ -3236,7 +3245,7 @@ msgstr "Envoyer le vote !"
 msgid "Add a new list"
 msgstr "Ajouter une nouvelle liste"
 
-#: election/templates/election/election_detail.jinja:365
+#: election/templates/election/election_detail.jinja:366
 msgid "Add a new role"
 msgstr "Ajouter un nouveau rôle"
 

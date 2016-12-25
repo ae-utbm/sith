@@ -239,10 +239,10 @@ th {
             {% trans %}Polls closed {% endtrans %}
             {%- else %}
             {% trans %}Polls will open {% endtrans %}
-            <time datetime="{{ election.start_date }}">{{ election.start_date|date("l d F Y") }}</time> at <time>{{ election.start_date|time("G:i") }}</time>
+            <time datetime="{{ election.start_date }}">{{ election.start_date|localtime|date("l d F Y")}}</time>{% trans %} at {% endtrans %}<time>{{ election.start_date|localtime|time("G:i")}}</time>
             {% trans %}and will close {% endtrans %}
             {%- endif %}
-            <time datetime="{{ election.end_date }}">{{ election.end_date|date("l d F Y") }}</time> at <time>{{ election.end_date|time("G:i") }}</time>
+            <time datetime="{{ election.end_date }}">{{ election.end_date|localtime|date("l d F Y")}}</time>{% trans %} at {% endtrans %}<time>{{ election.end_date|localtime|time("G:i")}}</time>
         </p>
         {%- if election.has_voted(user) %}
         <p class="election__elector-infos">

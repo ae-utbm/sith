@@ -117,18 +117,19 @@ class ElectionForm(forms.ModelForm):
     class Meta:
         model = Election
         fields = ['title', 'description', 'start_candidature', 'end_candidature', 'start_date', 'end_date',
-                'edit_groups', 'view_groups', 'vote_groups', 'candidature_groups']
+                  'edit_groups', 'view_groups', 'vote_groups', 'candidature_groups']
         widgets = {
             'edit_groups': CheckboxSelectMultiple,
             'view_groups': CheckboxSelectMultiple,
             'edit_groups': CheckboxSelectMultiple,
             'vote_groups': CheckboxSelectMultiple,
-            'candidature_groups': CheckboxSelectMultiple,
-            'start_date': SelectDateTime,
-            'end_date': SelectDateTime,
-            'start_candidature': SelectDateTime,
-            'end_candidature': SelectDateTime,
+            'candidature_groups': CheckboxSelectMultiple
         }
+
+    start_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start date"), widget=SelectDateTime, required=True)
+    end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"), widget=SelectDateTime, required=True)
+    start_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start candidature"), widget=SelectDateTime, required=True)
+    end_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End candidature"), widget=SelectDateTime, required=True)
 
 
 # Display elections
