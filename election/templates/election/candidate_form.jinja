@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    {%- if election.can_candidate(user) or user.can_edit(election) %}
+    {%- if (election.can_candidate(user) and election.is_candidature_active) or (user.can_edit(election) and election.is_vote_editable) %}
     <section class="election__add-candidature">
         <form action="{{ url('election:candidate', election_id=election.id) }}" method="post">
             {% csrf_token %}

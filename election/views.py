@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import modelform_factory
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ImproperlyConfigured
+from django.db import DataError, transaction
 from django.forms import CheckboxSelectMultiple
 from django.utils import timezone
 from django.conf import settings
@@ -173,20 +174,21 @@ class VoteFormView(CanCreateMixin, FormView):
         return super(VoteFormView, self).dispatch(request, *arg, **kwargs)
 
     def vote(self, election_data):
-        for role_title in election_data.keys():
-            # If we have a multiple choice field
-            if isinstance(election_data[role_title], QuerySet):
-                if election_data[role_title].count() > 0:
-                    vote = Vote(role=election_data[role_title].first().role)
+        with transaction.atomic():
+            for role_title in election_data.keys():
+                # If we have a multiple choice field
+                if isinstance(election_data[role_title], QuerySet):
+                    if election_data[role_title].count() > 0:
+                        vote = Vote(role=election_data[role_title].first().role)
+                        vote.save()
+                    for el in election_data[role_title]:
+                        vote.candidature.add(el)
+                # If we have a single choice
+                elif election_data[role_title] is not None:
+                    vote = Vote(role=election_data[role_title].role)
                     vote.save()
-                for el in election_data[role_title]:
-                    vote.candidature.add(el)
-            # If we have a single choice
-            elif election_data[role_title] is not None:
-                vote = Vote(role=election_data[role_title].role)
-                vote.save()
-                vote.candidature.add(election_data[role_title])
-        self.election.voters.add(self.request.user)
+                    vote.candidature.add(election_data[role_title])
+            self.election.voters.add(self.request.user)
 
     def get_form_kwargs(self):
         kwargs = super(VoteFormView, self).get_form_kwargs()
@@ -365,6 +367,22 @@ class ElectionUpdateView(CanEditMixin, UpdateView):
     form_class = ElectionForm
     template_name = 'core/edit.jinja'
     pk_url_kwarg = 'election_id'
+
+    def get_initial(self):
+        init = {}
+        try:
+            init['start_date'] = self.object.start_date.strftime('%Y-%m-%d %H:%M:%S')
+        except:pass
+        try:
+            init['end_date'] = self.object.end_date.strftime('%Y-%m-%d %H:%M:%S')
+        except:pass
+        try:
+            init['start_candidature'] = self.object.start_candidature.strftime('%Y-%m-%d %H:%M:%S')
+        except:pass
+        try:
+            init['end_candidature'] = self.object.end_candidature.strftime('%Y-%m-%d %H:%M:%S')
+        except:pass
+        return init
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('election:detail', kwargs={'election_id': self.object.id})

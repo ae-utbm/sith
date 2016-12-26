@@ -359,7 +359,7 @@ th {
     </section>
     {%- endif %}
     <section class="election__add-elements">
-    {%- if election.can_candidate(user) or user.can_edit(election) %}
+    {%- if (election.can_candidate(user) and election.is_candidature_active) or (user.can_edit(election) and election.is_vote_editable) %}
         <a href="{{ url('election:candidate', election_id=object.id) }}">{% trans %}Candidate{% endtrans %}</a>
     {%- endif %}
         <a href="{{ url('election:create_list', election_id=object.id) }}">{% trans %}Add a new list{% endtrans %}</a>

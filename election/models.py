@@ -128,7 +128,7 @@ class Candidature(models.Model):
     election_list = models.ForeignKey(ElectionList, related_name='candidatures', verbose_name=_('election list'))
 
     def can_be_edited_by(self, user):
-        return (user == self.user)
+        return (user == self.user) or user.can_edit(self.role.election)
 
     def __str__(self):
         return "%s : %s" % (self.role.title, self.user.username)
