@@ -7,6 +7,6 @@ db.sqlite3
 env/
 doc/html
 data/
-static/
+/static/
 sith/settings_custom.py
 sith/whoosh_index/
