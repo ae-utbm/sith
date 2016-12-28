@@ -143,7 +143,7 @@ class Membership(models.Model):
     """
     user = models.ForeignKey(User, verbose_name=_('user'), related_name="memberships", null=False, blank=False)
     club = models.ForeignKey(Club, verbose_name=_('club'), related_name="members", null=False, blank=False)
-    start_date = models.DateField(_('start date'))
+    start_date = models.DateField(_('start date'), default=timezone.now)
     end_date = models.DateField(_('end date'), null=True, blank=True)
     role = models.IntegerField(_('role'), choices=sorted(settings.SITH_CLUB_ROLES.items()),
             default=sorted(settings.SITH_CLUB_ROLES.items())[0][0])
@@ -155,11 +155,6 @@ class Membership(models.Model):
             raise ValidationError(_('User must be subscriber to take part to a club'))
         if Membership.objects.filter(user=self.user).filter(club=self.club).filter(end_date=None).exists():
             raise ValidationError(_('User is already member of that club'))
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.start_date = timezone.now()
-        return super(Membership, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.club.name+' - '+self.user.username+' - '+str(settings.SITH_CLUB_ROLES[self.role])+str(

@@ -99,7 +99,10 @@ class ClubMemberForm(forms.ModelForm):
     required_css_class = 'required'
     class Meta:
         model = Membership
-        fields = ['user', 'role', 'description']
+        fields = ['user', 'role', 'start_date', 'description']
+        widgets = {
+                'start_date': SelectDate
+                }
     user = AutoCompleteSelectField('users', required=True, label=_("Select user"), help_text=None)
 
     def save(self, *args, **kwargs):
