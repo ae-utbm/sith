@@ -5,6 +5,60 @@ Shopping list for {{ stock }}
 {% endblock %}
 
 {% block content %}
-<h3>Shopping list for {{ stock }}</h3>
+{% if current_tab == "stocks" %}
+	<a href="{{ url('stock:shoppinglist_create', stock_id=stock.id)}}">{% trans %}Do shopping{% endtrans %}</a>
+{% endif %}
+<h3>{% trans s=stock %}Shopping lists history for {{ s }}{% endtrans %}</h3>
 
+	<h4>To do</h4>
+	<table>
+		<thead>
+		    <tr>
+		        <td>{% trans %}Date{% endtrans %}</td>
+		        <td>{% trans %}Name{% endtrans %}</td>
+		        <td>{% trans %}Number of items{% endtrans %}</td>
+		    </tr>
+		</thead>
+		<tbody>
+		{% for s in shoppinglist_list.filter(todo=True).filter(stock_owner=stock).order_by('-date') %}
+			<tr>
+				<td>{{ s.date|localtime|date("Y-m-d H:i") }}</td>
+				<td><a href="{{ url('stock:shoppinglist_items', stock_id=stock.id, shoppinglist_id=s.id)}}">{{ s.name }}</a></td>
+				<td>{{ s.items_to_buy.count() }}</td>
+				<td>
+					<a href="{{ url('stock:shoppinglist_set_done', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Mark as done{% endtrans %}</a>
+				</td>
+				<td>
+					<a href="{{ url('stock:shoppinglist_delete', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Delete{% endtrans %}</a>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+
+	<h4>Done</h4>
+	<table>
+		<thead>
+		    <tr>
+		        <td>{% trans %}Date{% endtrans %}</td>
+		        <td>{% trans %}Name{% endtrans %}</td>
+		        <td>{% trans %}Number of items{% endtrans %}</td>
+		    </tr>
+		</thead>
+		<tbody>
+		{% for s in shoppinglist_list.filter(todo=False).filter(stock_owner=stock).order_by('-date') %}
+			<tr>
+				<td>{{ s.date|localtime|date("Y-m-d H:i") }}</td>
+				<td><a href="{{ url('stock:shoppinglist_items', stock_id=stock.id, shoppinglist_id=s.id)}}">{{ s.name }}</a></td>
+				<td>{{ s.items_to_buy.count() }}</td>
+				<td>
+					<a href="{{ url('stock:shoppinglist_set_todo', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Mark as todo{% endtrans %}</a>
+				</td>
+				<td>
+					<a href="{{ url('stock:shoppinglist_delete', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Delete{% endtrans %}</a>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
 {% endblock %}

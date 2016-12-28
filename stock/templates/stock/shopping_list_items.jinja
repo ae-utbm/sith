@@ -1,0 +1,34 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}{{ shoppinglist }}'s items{% endtrans %}
+{% endblock %}
+
+{% block content %}
+{% if current_tab == "stocks" %}
+	<a href="{{ url('stock:shoppinglist_list', stock_id=shoppinglist.stock_owner.id)}}">{% trans %}Back{% endtrans %}</a>
+{% endif %}
+
+<h3>{{ shoppinglist.name }}</h3>
+{% for t in ProductType.objects.order_by('name') %}
+	{% if shoppinglist.items_to_buy.filter(type=t) %}
+	<h4>{{ t }}</h4>
+	<table>
+		<thead>
+		    <tr>
+		        <td>{% trans %}Name{% endtrans %}</td>
+		        <td>{% trans %}Number{% endtrans %}</td>
+		    </tr>
+		</thead>
+		<tbody>
+    	{% for i in shoppinglist.items_to_buy.filter(type=t).order_by('name') %}
+			<tr>
+				<td>{{ i.name }}</td>
+				<td>{{ i.tobuy_quantity }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+	{% endif %}
+{% endfor %}
+{% endblock %}

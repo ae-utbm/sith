@@ -88,6 +88,11 @@ class CounterTabsMixin(TabedViewMixin):
                 'slug': 'last_ops',
                 'name': _("Last operations"),
                 })
+            tab_list.append({
+                'url': reverse_lazy('stock:items_list', kwargs={'stock_id': self.object.stock.id}),
+                'slug': 'stock_items_list',
+                'name': _("Stock items list"),
+                })
         return tab_list
 
 class CounterMain(CounterTabsMixin, CanViewMixin, DetailView, ProcessFormView, FormMixin):
