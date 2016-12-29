@@ -62,7 +62,16 @@
             {% else %}
             <td>{% trans %}No{% endtrans %}</td>
             {% endif %}
-            <td>{{ o.remark }}</td>
+            <td>{{ o.remark }}
+            {% if not o.linked_operation and o.target_type == "ACCOUNT" and not o.target.has_open_journal() %}
+                <p><strong>
+{% trans %}Warning: this operation has no linked operation because the targeted club account has no opened journal.{% endtrans %}
+            </strong></p>
+            <p><strong>
+{% trans url=o.target.get_absolute_url() %}Open a journal in <a href="{{ url }}">this club account</a>, then save this operation again to make the linked operation.{% endtrans %}
+        </strong></p>
+            {% endif %}
+            </td>
             {% if o.invoice %}
             <td><a href="{{ url('core:download', file_id=o.invoice.id) }}">{{ o.invoice.name }}</a></td>
             {% else %}

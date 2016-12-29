@@ -38,6 +38,16 @@
     form.accounting_type }}</p>
     <p>{{ form.label.errors }}<label for="{{ form.label.name }}">{{ form.label.label }}</label> {{ form.label }}</p>
     <p>{{ form.done.errors }}<label for="{{ form.done.name }}">{{ form.done.label }}</label> {{ form.done }}</p>
+    {% if form.instance.linked_operation %}
+    {% set obj = form.instance.linked_operation %}
+    <p><strong>{% trans %}Linked operation:{% endtrans %}</strong><br>
+    <a href="{{ url('accounting:bank_details', b_account_id=obj.journal.club_account.bank_account.id) }}">
+            {{obj.journal.club_account.bank_account }}</a> >
+    <a href="{{ url('accounting:club_details', c_account_id=obj.journal.club_account.id) }}">{{ obj.journal.club_account }}</a> >
+    <a href="{{ url('accounting:journal_details', j_id=obj.journal.id) }}">{{ obj.journal }}</a> >
+    n°{{ obj.number }}
+    </p>
+    {% endif %}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
 {% endblock %}

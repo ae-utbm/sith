@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import modelform_factory
 from django.core.exceptions import PermissionDenied
-from django.forms import HiddenInput
+from django.forms import HiddenInput, TextInput
 from django.db import transaction
 from django.db.models import Sum
 from django.conf import settings
@@ -237,7 +237,7 @@ class OperationForm(forms.ModelForm):
     class Meta:
         model = Operation
         fields = ['amount', 'remark', 'journal', 'target_type', 'target_id', 'target_label', 'date', 'mode',
-            'cheque_number', 'invoice', 'simpleaccounting_type', 'accounting_type', 'label', 'done']
+            'cheque_number', 'invoice', 'simpleaccounting_type', 'accounting_type', 'label', 'done' ]
         widgets = {
                 'journal': HiddenInput,
                 'target_id': HiddenInput,
@@ -281,7 +281,7 @@ class OperationForm(forms.ModelForm):
             inst = self.instance
             club_account = inst.target
             acc_type = AccountingType.objects.exclude(movement_type="NEUTRAL").exclude(
-                    movement_type=inst.accounting_type.movement_type).first() # Select a random opposite accounting type
+                    movement_type=inst.accounting_type.movement_type).order_by('code').first() # Select a random opposite accounting type
             op = Operation(
                     journal=club_account.get_open_journal(),
                     amount=inst.amount,
