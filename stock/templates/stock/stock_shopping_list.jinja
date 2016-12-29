@@ -6,11 +6,11 @@ Shopping list for {{ stock }}
 
 {% block content %}
 {% if current_tab == "stocks" %}
-	<a href="{{ url('stock:shoppinglist_create', stock_id=stock.id)}}">{% trans %}Do shopping{% endtrans %}</a>
+	<a href="{{ url('stock:shoppinglist_create', stock_id=stock.id)}}">{% trans %}Create shopping list{% endtrans %}</a>
 {% endif %}
 <h3>{% trans s=stock %}Shopping lists history for {{ s }}{% endtrans %}</h3>
 
-	<h4>To do</h4>
+	<h4>{% trans %}To do{% endtrans %}</h4>
 	<table>
 		<thead>
 		    <tr>
@@ -36,7 +36,7 @@ Shopping list for {{ stock }}
 		</tbody>
 	</table>
 
-	<h4>Done</h4>
+	<h4>{% trans %}Done{% endtrans %}</h4>
 	<table>
 		<thead>
 		    <tr>
@@ -52,7 +52,7 @@ Shopping list for {{ stock }}
 				<td><a href="{{ url('stock:shoppinglist_items', stock_id=stock.id, shoppinglist_id=s.id)}}">{{ s.name }}</a></td>
 				<td>{{ s.items_to_buy.count() }}</td>
 				<td>
-					<a href="{{ url('stock:shoppinglist_set_todo', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Mark as todo{% endtrans %}</a>
+					<a href="{{ url('stock:shoppinglist_set_todo', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Mark as to do{% endtrans %}</a>
 				</td>
 				<td>
 					<a href="{{ url('stock:shoppinglist_delete', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Delete{% endtrans %}</a>

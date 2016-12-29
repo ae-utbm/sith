@@ -170,7 +170,7 @@ class StockItemQuantityForm(forms.BaseForm):
 			shopping_list.stock_owner = self.stock
 			shopping_list.save()
 			for k,t in self.cleaned_data.items():
-				if t is not None:
+				if int(t) > 0 :
 					item_id = int(k[5:])
 					item = StockItem.objects.filter(id=item_id).first()
 					item.tobuy_quantity = t
