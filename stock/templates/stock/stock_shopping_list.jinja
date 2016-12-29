@@ -10,6 +10,14 @@ Shopping list for {{ stock }}
 {% endif %}
 <h3>{% trans s=stock %}Shopping lists history for {{ s }}{% endtrans %}</h3>
 
+	<p>
+		{% trans %}Information :{% endtrans %}
+		<br>
+		{% trans %}Use the "update stock" action when you get back from shopping to add the effective quantity bought for each shopping list item.{% endtrans %}
+		<br> 
+		{% trans %}For example, 3 Cheesburger (boxes) are aksing in the list, but there were only 2 so, 2 have to be added in the stock quantity.{% endtrans %}
+	</p>
+
 	<h4>{% trans %}To do{% endtrans %}</h4>
 	<table>
 		<thead>
@@ -25,6 +33,9 @@ Shopping list for {{ stock }}
 				<td>{{ s.date|localtime|date("Y-m-d H:i") }}</td>
 				<td><a href="{{ url('stock:shoppinglist_items', stock_id=stock.id, shoppinglist_id=s.id)}}">{{ s.name }}</a></td>
 				<td>{{ s.items_to_buy.count() }}</td>
+				<td>
+					<a href="{{ url('stock:update_after_shopping', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Update stock{% endtrans %}</a>
+				</td>
 				<td>
 					<a href="{{ url('stock:shoppinglist_set_done', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Mark as done{% endtrans %}</a>
 				</td>

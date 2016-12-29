@@ -24,4 +24,6 @@ urlpatterns = [
     	name='shoppinglist_set_done'),
 	url(r'^(?P<stock_id>[0-9]+)/shoppingList/(?P<shoppinglist_id>[0-9]+)/setTodo$', StockShopppingListSetTodo.as_view(),
     	name='shoppinglist_set_todo'),
+    url(r'^(?P<stock_id>[0-9]+)/shoppingList/(?P<shoppinglist_id>[0-9]+)/updateStock$', StockUpdateAfterShopppingBaseFormView.as_view(),
+        name='update_after_shopping'),
 ]

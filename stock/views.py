@@ -218,15 +218,9 @@ class StockItemQuantityBaseFormView(CounterAdminTabsMixin, CanEditMixin, DetailV
 		return super(StockItemQuantityBaseFormView, self).post(request, *args, **kwargs)
 
 	def form_valid(self, form):
-		"""
-		We handle here the redirection, passing the user id of the asked customer
-		"""
 		return super(StockItemQuantityBaseFormView, self).form_valid(form)
 
 	def get_context_data(self, **kwargs):
-		"""
-    	We handle here the login form for the barman
-    	"""
 		kwargs = super(StockItemQuantityBaseFormView, self).get_context_data(**kwargs)
 		if 'form' not in kwargs.keys():
 			kwargs['form'] = self.get_form()
@@ -297,3 +291,69 @@ class StockShopppingListSetTodo(CanEditMixin, DetailView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         return HttpResponseRedirect(reverse('stock:shoppinglist_list', args=self.args, kwargs={'stock_id':self.object.stock_owner.id}))
+
+
+class StockUpdateAfterShopppingForm(forms.BaseForm):
+	def clean(self):
+		with transaction.atomic():
+			self.shoppinglist = ShoppingList.objects.filter(id=self.shoppinglist_id).first()
+			for k,t in self.cleaned_data.items():
+				item_id = int(k[5:])
+				if int(t) > 0 :
+					item = StockItem.objects.filter(id=item_id).first()
+					item.effective_quantity += int(t)
+					item.save()
+			self.shoppinglist.todo = False
+			self.shoppinglist.save()
+		return self.cleaned_data
+
+class StockUpdateAfterShopppingBaseFormView(CounterAdminTabsMixin, CanEditMixin, DetailView, BaseFormView):
+	"""
+	docstring for StockUpdateAfterShopppingBaseFormView
+	"""
+	model = ShoppingList
+	template_name = "stock/update_after_shopping.jinja"
+	pk_url_kwarg = "shoppinglist_id"
+	current_tab = "stocks"
+
+	def get_form_class(self):
+		fields = OrderedDict()
+		kwargs = {}
+		for t in ProductType.objects.order_by('name').all():
+			for i in self.shoppinglist.items_to_buy.filter(type=t).order_by('name').all():
+				field_name = "item-%s" % (str(i.id))
+				fields[field_name] = forms.CharField(max_length=30, required=True, label=str(i),
+						help_text=str(i.tobuy_quantity) + " asked")
+		kwargs['shoppinglist_id'] = self.shoppinglist.id
+		kwargs['base_fields'] = fields
+		return type('StockUpdateAfterShopppingForm', (StockUpdateAfterShopppingForm,), kwargs)
+
+	def get(self, request, *args, **kwargs):
+		self.shoppinglist = ShoppingList.objects.filter(id=self.kwargs['shoppinglist_id']).first()
+		return super(StockUpdateAfterShopppingBaseFormView, self).get(request, *args, **kwargs)
+	
+	def post(self, request, *args, **kwargs):
+		"""
+		Handle the many possibilities of the post request
+		"""
+		self.object = self.get_object()
+		self.shoppinglist = ShoppingList.objects.filter(id=self.kwargs['shoppinglist_id']).first()
+		return super(StockUpdateAfterShopppingBaseFormView, self).post(request, *args, **kwargs)
+
+	def form_valid(self, form):
+		"""
+		We handle here the redirection
+		"""
+		return super(StockUpdateAfterShopppingBaseFormView, self).form_valid(form)
+
+	def get_context_data(self, **kwargs):
+		kwargs = super(StockUpdateAfterShopppingBaseFormView, self).get_context_data(**kwargs)
+		if 'form' not in kwargs.keys():
+			kwargs['form'] = self.get_form()
+		kwargs['shoppinglist'] = self.shoppinglist
+		kwargs['stock'] = self.shoppinglist.stock_owner
+		return kwargs
+
+	def get_success_url(self):
+		self.kwargs.pop('shoppinglist_id', None)
+		return reverse_lazy('stock:shoppinglist_list', args=self.args, kwargs=self.kwargs)
