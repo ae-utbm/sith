@@ -26,15 +26,15 @@ class SithInlineGrammar(InlineGrammar):
     underline = re.compile(
         r'^_{2}([\s\S]+?)_{2}(?!_)'  # __word__
     )
-    exposant = re.compile(
-        r'^\^([\s\S]+?)\^(?!\^)'  # ^text^
-        r'|'
-        r'^\^(\S*)'  # ^word
+    exposant = re.compile( # FIXME Does not work for now
+        r'^\^([\s\S]+?)\^'  # ^text^
+        # r'|' # FIXME doesn't properly works like this
+        # r'^\^(\S+)'  # ^word
     )
-    indice = re.compile( # XXX FIXME: don't work with inline code
-        r'^_([\s\S]+?)_(?!_)'  # _text_
-        r'|'
-        r'^_(\S*)'  # _word
+    indice = re.compile(
+        r'^_([\s\S]+?)_'  # _text_ (^` hack, because no other solution were found :/ this sadly prevent code in indices)
+        # r'|' # FIXME doesn't properly works like this
+        # r'^_(\S+)'  # _word
     )
 
 class SithInlineLexer(InlineLexer):
@@ -49,11 +49,11 @@ class SithInlineLexer(InlineLexer):
         'link',
         'reflink',
         'nolink',
+        'exposant',
         'double_emphasis',
         'emphasis',
         'underline',
-        # 'indice',
-        'exposant',
+        'indice',
         'code',
         'linebreak',
         'strikethrough',
@@ -66,11 +66,11 @@ class SithInlineLexer(InlineLexer):
         'link',
         'reflink',
         'nolink',
+        'exposant',
         'double_emphasis',
         'emphasis',
         'underline',
-        # 'indice',
-        'exposant',
+        'indice',
         'code',
         'linebreak',
         'strikethrough',
@@ -82,11 +82,11 @@ class SithInlineLexer(InlineLexer):
         return self.renderer.underline(text)
 
     def output_exposant(self, m):
-        text = m.group(1) or m.group(2)
+        text = m.group(1)
         return self.renderer.exposant(text)
 
     def output_indice(self, m):
-        text = m.group(1) or m.group(2)
+        text = m.group(1)
         return self.renderer.indice(text)
 
     # Double emphasis rule changed
@@ -124,11 +124,6 @@ class SithInlineLexer(InlineLexer):
 renderer = SithRenderer()
 inline = SithInlineLexer(renderer)
 
-# enable the features
-# inline.enable_indice()
-# inline.enable_exposant()
-# inline.enable_underline()
-
 markdown = Markdown(renderer, inline=inline)
 
 if __name__ == "__main__":
@@ -145,10 +140,9 @@ if __name__ == "__main__":
 
 * ~~Barrer du texte~~ : `~~texte~~`
 
-* ^Mettre du texte^ en ^exposant : `^mot` ou `^texte^`
-just ^another test
+* Mettre ^du texte^ en ^exposant^ : `^mot` ou `^texte^`
 
-* _Mettre du texte_ en _indice : `_mot` ou `_texte_`
+* _Mettre du texte_ en _indice_ : `_mot` ou `_texte_`
 
 * Pied de page [^en pied de page]
 
@@ -166,6 +160,8 @@ Un bloc de citation se crée ainsi :
  > citation
 
 Il est possible d'intégrer de la syntaxe Markdown-AE dans un tel bloc.
+
+Petit *test* _sur_ ^une^ **seule** ^ligne pour voir^
 
 """
     print(markdown(text))
