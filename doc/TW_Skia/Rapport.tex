@@ -62,18 +62,19 @@
 \chapter{Introduction}
 \par Il y a longtemps, au début des années 2000, l'Association des Étudiants a mis en place un site internet qui n'a eu de
 cesse d'évoluer au fil des ans. Grâce aux différents contributeurs qui s'y sont plongés, et qui ont pu y ajouter leurs
-fonctionnalités plus ou moins utiles, le site possède désormais un ensemble de fonctionnalité impressionnant.
+bouts de code plus ou moins utiles, le site possède désormais un ensemble de fonctionnalités impressionnant.
 \par De la comptabilité à la gestion de la laverie, en passant par le forum ou le Matmatronch', le site de l'AE prend
-actuellement en charge la quasi totalité de la gestion de l'argent, et c'est là un de ces rôles les plus importants.
-\par Mais les vieilles technologies qu'il emploie, et le maintient plus ou moins aléatoire, en font un outil très difficile à
-maintenir à l'heure actuelle, et le besoin d'une refonte s'imposait de plus en plus.
-\par Le choix de technologies récentes, maintenues, et éprouvée a donc été fait, et le développement a pu commencer dès
+actuellement en charge la quasi totalité de la gestion de l'argent, et c'est là un de ses rôles les plus importants.
+\par Mais les vieilles technologies qu'il emploie, et l'entretien plus ou moins aléatoire qu'il a subit, en font un
+outil très difficile à maintenir à l'heure actuelle, et le besoin d'une refonte s'imposait de plus en plus.
+\par Le choix de technologies récentes, maintenues, et éprouvées a donc été fait, et le développement a pu commencer dès
 Novembre 2015, avec l'objectif d'une mise en production dans l'été 2016, au moins dans une version incluant
 l'intégralité des fonctions liées à l'argent, qui sont les plus critiques.
 \par Soutenant les projets libres, j'ai décidé de placer le projet sous licence MIT, assurant ainsi une pérénité aux
-source. Si quelqu'un dans le futur souhaite le relicencier sous GPL ou autre, cela reste possible, mais je n'impose au
-départ que très peu de restrictions \footnote{La seule condition en réalité, est de toujours garder à sa place une copie
-de la licence originale, à savoir le fichier LICENSE à la racine du site.} .
+source. Si quelqu'un dans le futur souhaite le relicencier sous GPL (ou autre licence plus restrictive que la MIT, voire
+contagieuse), cela reste possible, mais je n'impose au départ que très peu de restrictions \footnote{La seule condition
+en réalité, est de toujours garder à sa place une copie de la licence originale, à savoir le fichier LICENSE à la racine
+du site.} .
 
 \chapter{Les technologies}
 \label{cha:les_technologies}
@@ -93,10 +94,10 @@ projet.
 
 \section{Django}
 \label{sec:django}
-\par \emph{Django}  est un framework web pour \emph{Python}, apparu en 2005, et fournissant un grand nombre de fonctionnalités pour
-développer un site rapidement et simplement. Cela inclut entre autre un serveur Web, pour les échanges HTTP, un parseur
-d'URL, pour le routage des différentes URI du site, un ORM\footnote{Object-Relational Mapper} pour la gestion de la base
-de donnée, ou encore un moteur de template, pour les rendus HTML.
+\par \emph{Django}  est un framework web pour \emph{Python}, apparu en 2005, et fournissant un grand nombre de
+fonctionnalités pour développer un site rapidement et simplement. Cela inclut entre autre un serveur Web, pour les
+échanges HTTP, un parseur d'URL, pour le routage des différentes URI du site, un ORM\footnote{Object-Relational Mapper}
+pour la gestion de la base de donnée, ou encore un moteur de templates, pour les rendus HTML.
 \par La version 1.8 de \emph{Django} a été choisie pour le développement de ce projet, car c'est une version LTS (Long Term
 Support), c'est à dire qu'elle restera stable et maintenue plus longtemps que les autres (au moins jusqu'en Avril 2018).
 \par La documentation est disponible à cette addresse: \url{https://docs.djangoproject.com/en/1.8/}. Bien que ce rapport
@@ -116,13 +117,18 @@ mais ne contiennent en général pas de code à proprement parler. Ce n'est pas 
 elles:
 \begin{itemize}
     \item \textbf{startapp} \\
-        Créer une application
+        Créer une application.
     \item \textbf{makemigrations} \\
-        Parser les modèles pour créer les fichiers de migration de la base de donnée
+        Parser les modèles pour créer les fichiers de migration de la base de donnée.
     \item \textbf{migrate} \\
-        Appliquer les migrations sur la base de données
+        Appliquer les migrations sur la base de données.
     \item \textbf{runserver} \\
-        Pour lancer le serveur Web, et donc le site en lui même
+        Pour lancer le serveur Web, et donc le site en lui même, dans une version de développement.
+    \item \textbf{makemessages} \\
+        Pour générer les fichiers de traduction, dans le dossier \verb#locale#.
+    \item \textbf{compilemessages} \\
+        Pour compiler les fichiers de traduction, dans le dossier \verb#locale#, et passer de \verb#django.po# à
+        \verb#django.mo#, sa version binaire, optimisée pour l'utilisation.
 \end{itemize}
 
 \subsubsection{Un premier dossier}
@@ -149,7 +155,7 @@ On trouve dans celui-ci un certain nombre de fichiers:
     \item \textbf{\_\_init\_\_.py} \\
         Permet de définir le dossier comme un package \emph{Python}. Ce fichier est généralement vide.
     \item \textbf{models.py} \\
-        C'est là qu'on définit tous les modèles, c'est à dire toutes les classes qui définissent des tables dans la base
+        C'est là que l'on définit tous les modèles, c'est à dire toutes les classes qui définissent des tables dans la base
         de donnée.
     \item \textbf{views.py} \\
         Les vues y sont définies.
@@ -157,7 +163,8 @@ On trouve dans celui-ci un certain nombre de fichiers:
         C'est là que l'on déclare quels modèles doivent apparaîtrent dans l'interface fournie par le module
         d'administration.
     \item \textbf{tests.py} \\
-        Ce dernier fichier sert à écrire les tests fonctionnels ou unitaires à l'aide de la librairie de test de \emph{Django}.
+        Ce dernier fichier sert à écrire les tests fonctionnels, unitaires, ou d'intégation à l'aide de la librairie de
+        test de \emph{Django}.
     \item \textbf{migrations} \\
         Ce dossier sert à stocker les fichiers de migration de la base de donnée générés par \verb#./manage.py makemigrations#.
 \end{itemize}
@@ -207,9 +214,11 @@ class Club(models.Model): # (1)
     address = models.CharField(_('address'), max_length=254)
     email = models.EmailField(_('email address'), unique=True)
     owner_group = models.ForeignKey(Group, related_name="owned_club",
-                                    default=settings.SITH_GROUPS['root']['id']) # (7)
+                                    default=settings.SITH_GROUP_ROOT_ID) # (7)
     edit_groups = models.ManyToManyField(Group, related_name="editable_club", blank=True) # (8)
     view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
+    home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True,
+            on_delete=models.SET_NULL) # (9)
 \end{minted}
 \end{addmargin}
 \par Explications:
@@ -219,9 +228,9 @@ class Club(models.Model): # (1)
     \item[(2)] Toujours penser à commenter le modèle.
     \item[(3)] Un premier attribut: \verb#name#, de type \verb#CharField#. Il constitue une colonne dans la base de
         donnée une fois que \verb#./manage.py migrate# a été appliqué.
-    \item[(4)] Une \verb#ForeignKey#, l'une des relations les plus utilisée. \verb#related_name# précise le nom qui sert
+    \item[(4)] Une \verb#ForeignKey#, l'une des relations les plus utilisées. \verb#related_name# précise le nom qui sert
         de retour vers cette classe depuis la classe pointée. Ici, elle est même récursive, puisque l'on pointe vers la
-        classe que l'on est en train de définir, ce qui donne au final une structure d'arbre.)r
+        classe que l'on est en train de définir, ce qui donne au final une structure d'arbre.
     \item[(5)] On peut toujours préciser des \verb#validators#, afin que le modèle soit contraint, et que \emph{Django}
         maintienne toujours des informations cohérentes dans la base.
     \item[(6)] Un message d'erreur peut être précisé pour expliciter à l'utilisateur les problèmes rencontrés.
@@ -229,8 +238,8 @@ class Club(models.Model): # (1)
         affecté à une valeur contenue dans les \verb#settings# de \emph{Django}.
     \item[(8)] Les \verb#ManyToManyField# permettent de générer automatiquement une table intermédiaire de manière
         transparente afin d'avoir des relations doubles dans les deux classes mises en jeu.
-    \item[OneToOneField] Il n'est pas présent dans ce modèle, mais est très utilisé pour étendre une table avec des
-        informations supplémentaires sans toucher à la table originale.
+    \item[(9)] Le \verb#OneToOneField# est très utilisé pour étendre une table avec des informations supplémentaires
+        sans toucher à la table originale.
     \item[PRIMARY KEY] Les plus observateurs d'entre vous auront remarqué qu'il n'y a pas ici de \verb#PRIMARY KEY# de précisé. En
         effet, \emph{Django} s'en occupe automatiquement en rajoutant un champ \verb#id# jouant ce rôle. On peut alors y
         accèder en l'appelant par son nom, \verb#id# la plupart du temps, sauf s'il a été personnalisé, ou bien par
@@ -256,7 +265,7 @@ et renvoient des réponses HTTP en fonction du traitement effectué.
 \par Les URLs sont définies par application, et centralisées dans le dossier du projet. Il s'agit à chaque fois d'une
 liste d'appel à la fonction \verb#url()#, qui comprends toujours une expression rationnelle décrivant l'URL, une
 fonction passée en tant que callback qui sera appelé au moment où l'URL est résolue, et enfin un nom, permettant de s'y
-référer dans les fonctiones de résolution inverse, comme dans les templates par exemple. Nous détaillerons cette
+référer dans les fonctions de résolution inverse, comme dans les templates par exemple. Nous détaillerons cette
 utilisation plus tard.
 
 \par Pour garder une organisation claire, les URLs sont classées par espaces de noms (namespace) afin d'avoir à éviter
@@ -275,14 +284,14 @@ variables \verb#GET# et \verb#POST# très facilement en appelant respectivement 
 
 \subsubsection{Des vues basées sur des classes}
 \label{ssub:Des vues basées sur des classes}
-\par Les vues en \emph{Django} peuvent aussi être définies comme des classes. Elles héritent alors à ce moment là toutes de la
-classe \verb#View#, mais ont toutefois souvent beaucoup d'intermédiaire et n'héritent donc pas directement de cette
-dernière.
+\par Les vues avec \emph{Django} peuvent aussi être définies comme des classes. Elles héritent alors à ce moment là
+toutes de la classe \verb#View#, mais ont toutefois souvent beaucoup d'intermédiaires et n'héritent donc pas directement
+de cette dernière.
 \par L'avantage de ces vues sous forme de classe est de pouvoir séparer toute la chaîne de traitement entre les
 différentes méthodes, et ainsi permettre, en jouant avec l'héritage, de fournir alors très peu d'informations à la
 classe, tout en lui permettant d'effectuer un travail correct.
 \par Ainsi, on retrouve de base, dans les filles de \verb#View#, un grand nombre de classes prédéfinies pour la plupart
-des comportement. \verb#DetailView#, \verb#CreateView#, \verb#ListView#, sont quelques exemples de classes affichant
+des comportement. \verb#DetailView#, \verb#CreateView#, \verb#ListView#, sont quelques exemples de classes renvoyant
 respectivement un objet en détails, un formulaire pour créer un nouvel objet, et enfin une liste d'objets. Il existe
 cependant un bon nombre de ces vues fournissant d'autres fonctionnalités, et si malgré tout, aucune ne peut convenir, il
 reste possible de se baser sur l'une d'elle et surcharger l'une de ses fonctions pour l'adapter à ses besoins.
@@ -293,14 +302,14 @@ d'offrir un bon résumé de la situation: \emph{Classy class-based views}, acces
 \section{Jinja2}
 \label{sec:jinja2}
 \par \emph{Jinja2} est un moteur de template écrit en \emph{Python}  qui s'inspire fortement de la syntaxe des templates de
-\emph{Django}, mais qui apporte toutefois sont lot d'améliorations non négligeable. En effet, l'ajout des macros, par
+\emph{Django}, mais qui apporte toutefois son lot d'améliorations non négligeables. En effet, l'ajout des macros, par
 exemple, permet de factoriser une grande partie du code.
 \par Un moteur de template permet de générer du contenu textuel de manière procédural en fonction des données à
 afficher. Cela permet en pratique de pouvoir inclure du code proche de \emph{Python} dans la syntaxe au milieu d'un
-document contenant principalement du HTML. Ainsi, si on a une liste d'objet, on peut facilement executer une boucle
+document contenant principalement du HTML. Ainsi, si on a une liste d'objets, on peut facilement executer une boucle
 \verb#for# afin de faire afficher simplement tous les objets selon le même format.
 \noindent De même, il est facile d'inclure un \verb#if# pour décider à l'execution d'afficher ou non un lien en fonction
-des droits que l'utilisateur possède sur le site.
+des droits que l'utilisateur possède sur le site, par exemple.
 \par En plus des structures conditionnelles classiques, un moteur de templates permet de formater des données plus
 simplement, comme par exemple des dates, en fonction de la langue actuellement utilisée par l'utilisateur.
 \par Enfin, bien utilisés, les templates permettent d'utiliser des fonctions d'inclusion, ce qui permet de hiérarchiser
@@ -316,32 +325,32 @@ tous les autres.
 {% extends "core/base.jinja" %} {# (1) #}
 
 {% block title %} {# (2) #}
-    {{ user.get_display_name() }}'s tools {# (3) #}
+{% trans user_name=user.get_display_name() %}{{ user_name }}'s tools{% endtrans %} {# (3) #}
 {% endblock %}
 
 {% block content %}
-<h3>User Tools</h3>
-<p><a href="{{ url('core:user_profile', user_id=request.user.id) }}{# (4) #}">
-    Back to profile</a>
+    <h3>{% trans %}User Tools{% endtrans %}</h3> {# (4) #}
+<p><a href="{{ url('core:user_profile', user_id=request.user.id) }}{# (5) #}">
+    {% trans %}Back to profile{% endtrans %}</a>
 </p>
 
-<h4>Sith management</h4>
+<h4>{% trans %}Sith management{% endtrans %}</h4>
 <ul>
-{% if user.is_in_group(settings.SITH_GROUPS['root']['name']) %} {# (5) #}
-    <li><a href="{{ url('core:group_list') }}">Groups</a></li>
+{% if user.is_root %} {# (6) #}
+    <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
 {% endif %}
-{% if user.is_in_group(settings.SITH_GROUPS['accounting-admin']['name']) %}
+{% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
     <li><a href="{{ url('accounting:bank_list') }}">Accounting</a></li>
 {% endif %}
-{% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or
-    user.is_in_group(settings.SITH_GROUPS['root']['name']) %}
+{% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root %}
     <li><a href="{{ url('subscription:subscription') }}">Subscriptions</a></li>
     <li><a href="{{ url('counter:admin_list') }}">Counters management</a></li>
 {% endif %}
 </ul>
-<h4>Clubs</h4>
+
+<h4>{% trans %}Club tools{% endtrans %}</h4>
 <ul>
-    {% for m in user.memberships.filter(end_date=None).all() %} {# (6) #}
+    {% for m in user.memberships.filter(end_date=None).all() %} {# (7) #}
     <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
     {% endfor %}
 </ul>
@@ -357,12 +366,14 @@ tous les autres.
         place dans le template parent.
     \item[(3)] La variable \verb#user# faisant ici partie du contexte, nous pouvons donc appeler une de ses méthodes
         pour obtenir un contenu dynamiquement.
-    \item[(4)] L'appel à la fonction \verb#url()# permet de résoudre la route afin d'obtenir l'adresse appropriée en
+    \item[(4)] Les blocs \verb#{% trans %}# et \verb#{% endtrans %}# permettent de définir les chaînes qui vont ensuite
+            être traduites.
+    \item[(5)] L'appel à la fonction \verb#url()# permet de résoudre la route afin d'obtenir l'adresse appropriée en
         fonction des arguments passé. Cette fonction fait généralement partie du contexte global, et est donc accessible
         dans tous les templates.
-    \item[(5)] Les structures conditionnelles permettent d'afficher ou pas un élément en fonction de la valeur d'une
+    \item[(6)] Les structures conditionnelles permettent d'afficher ou pas un élément en fonction de la valeur d'une
         variable ou du retour d'une fonction.
-    \item[(6)] Le \verb#for# permet, comme en Python, d'itérer sur les éléments d'une liste. Ici, on fait même une
+    \item[(7)] Le \verb#for# permet, comme en Python, d'itérer sur les éléments d'une liste. Ici, on fait même une
         requête via l'ORM de \emph{Django} en utilisant un filtre pour obtenir directement des valeurs depuis la base de
         donnée de manière transparente.
 \end{description}
@@ -401,55 +412,21 @@ contenu de \verb#settings#, et enfin des fonction utiles dont voici la liste:
         l'utilisateur donnée peut éditer l'objet.
     \item \textbf{can\_view} permet, en fonction d'une variable \verb#user# et d'un objet, de savoir si
         l'utilisateur donnée peut voir l'objet.
-    \item \textbf{get\_subscriber} permet à partir d'un utilisateur d'obtenir son équivalent en objet \verb#subscriber#,
-        afin de vérifier l'état de sa cotisation.
 \end{itemize}
 
-\subsection{Liste des variables définies dans \textbf{settings.py}}
-\label{sub:liste_des_variables_d_finies_dans_settings.py}
-\begin{itemize}
-    \item \textbf{SITH\_MAIN\_CLUB} \\
-        Définit le club principal, en général propriétaire du site. Les membres du bureau de ce club auront accès à la
-        plupart des outils d'administration, droits que les autres clubs ne confèrent pas. Dans notre cas, c'est bien
-        évidemment l'AE elle même qui est définit ici.
-    \item \textbf{SITH\_START\_DATE} \\
-        Définit la date de début du semestre. Plusieurs fonctions se basent dessus, notamment pour remettre à jour
-        certains compteurs semestriel, ou pour les dates de début de certains types de cotisation comme la cotisation au
-        cursus.
-    \item \textbf{SITH\_GROUPS} \\
-        Définit les groupes nécessaires au fonctionnement du site, comme le groupe \verb#root#, les groupes
-        administrateurs de certains outils spécifiques comme la comptabilité, ou le groupe \verb#public#.
-    \item \textbf{SITH\_BOARD\_SUFFIX} \\
-        Définit le suffixe appliqué à chaque nom de club pour constituer le groupe des membres du bureau de ce club.
-    \item \textbf{SITH\_MEMBER\_SUFFIX} \\
-        Définit le suffixe appliqué à chaque nom de club pour constituer le groupe des membres de ce club.
-    \item \textbf{SITH\_MAIN\_BOARD\_GROUP} \\
-        Définit le nom du groupe constituant le bureau de l'association principale, pour éviter de le recalculer à
-        chaque fois. Il est définit en fonction des précédentes variable et ne devrait jamais être affecté à la main.
-    \item \textbf{SITH\_MAIN\_MEMBERS\_GROUP} \\
-        Définit le nom du groupe constituant les membres de l'association principale, pour éviter de le recalculer à
-        chaque fois. Il est définit en fonction des précédentes variable et ne devrait jamais être affecté à la main.
-    \item \textbf{SITH\_ACCOUNTING\_PAYMENT\_METHOD} \\
-        Définit les méthodes de paiement pour la comptabilité.
-    \item \textbf{SITH\_SUBSCRIPTION\_PAYMENT\_METHOD} \\
-        Définit les méthodes de paiement pour les cotisations.
-    \item \textbf{SITH\_COUNTER\_PAYMENT\_METHOD} \\
-        Définit les méthodes de paiement pour les comptoirs.
-    \item \textbf{SITH\_SUBSCRIPTIONS} \\
-        Définit les différentes cotisations possibles.
-    \item \textbf{SITH\_CLUB\_ROLES} \\
-        Définit les différentes postes possibles dans les clubs, ainsi que leur hiérarchie.
-    \item \textbf{SITH\_MAXIMUM\_FREE\_ROLE} \\
-        Définit jusqu'à quel rôle un utilisateur lambda peut s'ajouter seul dans un club sans requérir de droits
-        particuliers. Cela permet par exemple de s'ajouter à des mailings lists.
-    \item \textbf{SITH\_BARMAN\_TIMEOUT} \\
-        Définit au bout de combien de minutes d'inactivité les barmans sont déconnectés d'un comptoir.
-\end{itemize}
+\subsection{Le fichier \textbf{settings\_custom.py}}
+\label{sub:le_fichier_settings_custom.py}
+\par Afin de faciliter la configuration des différentes instances du projet, un fichier \verb#settings_custom.py# a été
+créé à côté de \verb#settings.py#. Celui-ci est automatiquement inclu à la fin de \verb#settings.py#, pour que tout ce
+qui est défini dans le \verb#_custom# vienne remplacer les valeurs par défaut. Seul \verb#settings.py# est versionné
+dans \emph{Git}, et est exhaustif concernant la configuration et les variables requises. \verb#settings_custom.py# quant
+à lui n'est même pas obligatoire, et s'il existe, ne peut contenir que quelques variables qui diffèrent de la
+configuration par défaut\footnote{Typiquement, ajouter \textbf{DEBUG=True} }.
 
 
 \section{Les commandes ajoutées}
-\label{sec:les_commandes_ajout_es}
-\par Si cela ne suffit, il est possible d'enrichir de nouvelles commandes le script \verb#manage.py#. Cela a été fait
+\label{sec:les_commandes_ajoutees}
+\par Si cela ne suffit pas, il est possible d'enrichir de nouvelles commandes le script \verb#manage.py#. Cela a été fait
 pour \emph{Sith}, afin de pouvoir très rapidement déployer un environnement en ayant déjà les quelques données
 nécéssaires au fonctionnement du projet, comme le groupe \verb#root# par exemple.
 
@@ -462,13 +439,14 @@ propre avant de la peupler.
 
 \subsection{populate}
 \label{sub:populate}
-\par \verb#populate# permet de remplir la base de donnée avec dans un premier temps les données \textbf{nécéssaires} au
-bon fonctionnement du site. Cela comprend un superutilisateur, les groupes définis dans \verb#settings.SITH_GROUPS#,
-dont le groupe \verb#root# fait partie, une première page de Wiki, ainsi qu'un club racine, l'AE dans notre cas.
+\par \verb#populate# permet de remplir la base de donnée avec dans un premier temps les données \textbf{nécessaires} au
+bon fonctionnement du site. Cela comprend notamment un superutilisateur, les groupes définis dans
+\verb#settings.SITH_GROUP_*_ID#, dont le groupe \verb#root# fait partie, une première page de Wiki, ainsi qu'un club
+racine, l'AE dans notre cas.
 \par Cette fonction prend un éventuel argument, \verb#--prod#, qui lui permet de mettre en place le strict minimum
 énoncé précédemment. Sinon, elle continue en ajoutant un certain nombre de données pratiques pour le développement,
 comme un certain nombre d'utilisateurs avec différents droits, de nouvelles pages dans le Wiki, de nouveaux clubs, des
-comptoirs et des produits, ainsi que des données de comptabilité.
+comptoirs et des produits, ou encore des données de comptabilité.
 \par L'argument \verb#--prod# peut, en outre, être passé directement depuis la fonction \verb#setup#.
 
 \chapter{Les applications}
@@ -479,16 +457,16 @@ comptoirs et des produits, ainsi que des données de comptabilité.
 \section{Core}
 \label{sec:core}
 \subsection{Résumé}
-\label{sub:r_sum_}
+\label{sub:resume}
 \par L'application \emph{Core} est de loin la plus importante de toutes. C'est elle qui gère les utilisateurs ainsi que
 leurs droits. Le CMS y est aussi définit pour tout ce qui est pages de Wiki, pages statiques, ou l'ajout du filtre
 \verb#markdown# pour les templates.
 
 \subsection{Liste des modèles}
-\label{sub:liste_des_mod_les}
+\label{sub:liste_des_modeles}
 \begin{itemize}
     \item \textbf{Group} \\
-        Ce modèle se subdivise en deux: RealGroup et MetaGroup, décrivant respectivement un vrai groupe géré à la main
+        Ce modèle se subdivise en deux: RealGroup et MetaGroup, décrivants respectivement un vrai groupe géré à la main
         dans la liste des groupes, et un meta-groupe, géré automatiquement, en général par les clubs, ou bien par les
         cotisations.
     \item \textbf{User} \\
@@ -509,11 +487,11 @@ leurs droits. Le CMS y est aussi définit pour tout ce qui est pages de Wiki, pa
 \subsection{La gestion des droits}
 \label{sub:la_gestion_des_droits}
 \par La gestion des droits est implémentée de manière globale dans l'application Core.
-\par On trouve en effet dans \verb#views/__init__.py# un certain nombre de mixins \footnote{Un mixin est, en
+\par On trouve en effet dans \verb#views/__init__.py# un certain nombre de mixins \footnote{Un mixin est, dans
 \emph{Django}, un terme désignant une classe abstraite qui ne peut pas servir de parente seule. Elle permet de
 surcharger certaines méthodes d'une autre classe abstraite afin de l'adapter à un comportement plus spécifique, mais
 reste totalement inutile quand elle est seule. La gestion des droits est un bon exemple puisqu'elle ne s'occupe pas
-vraiment de traitement des données comme les autres vues le ferait, elle permet simplement d'ajouter une condition à une
+vraiment de traitement des données comme les autres vues le feraient, elle permet simplement d'ajouter une condition à une
 autre classe où cette dernière renverrait un \emph{403 Forbidden} }  s'occupant de cela, en se basant sur
 un modèle général permettant de rendre compatible rapidement n'importe quel modèle que l'on voudrait protéger. Il suffit
 alors de déclarer dans la classe une certain nombre de méthodes et/ou d'attributs, le reste étant simplement déjà pris
@@ -530,7 +508,7 @@ en charge par les mixins suivants:
         droits accordé à un utilisateur. \\
         Attribut correspondant à créer dans les modèles: \\
         \verb#owner_group = models.ForeignKey(Group, # \\
-        \verb#     related_name="owned_user", default=settings.SITH_GROUPS['root']['id'])# \\
+        \verb#     related_name="owned_user", default=settings.SITH_GROUP_ROOT_ID)# \\
         Méthode correspondante à créer dans les modèles: \\
         \verb#def is_owned_by(self, user):# \\
     \item \textbf{CanEditMixin} \\
@@ -541,7 +519,7 @@ en charge par les mixins suivants:
         \verb#     related_name="editable_user", blank=True)# \\
         Méthode correspondante à créer dans les modèles: \\
         \verb#def can_be_edited_by(self, user):# \\
-    \item \textbf{CanEditPropMixin} \\
+    \item \textbf{CanViewMixin} \\
         Cette classe protège l'objet pour la vue. Par exemple: consulter une page, ou voir le profil d'un utilisateur. \\
         Attribut correspondant à créer dans les modèles: \\
         \verb#view_groups = models.ManyToManyField(Group, # \\
@@ -557,9 +535,9 @@ droit, alors la méthode suffira. Mais si on a besoin d'une gestion au niveau de
 recourir aux attributs.
 \par Exemples:
 \begin{itemize}
-    \item Les comptes en banques sont gérés uniquement par les personnes faisant partie du groupe \verb#admin-compta#.
-        Ils ont donc tous les même droits, c'est une gestion au niveau de la classe, donc les méthodes suffisent.
-    \item Les classeurs de comptabilité sont gérés par les trésoriers des clubs, ils n'ont pas tous les même droits,
+    \item Les comptes en banque sont gérés uniquement par les personnes faisant partie du groupe \verb#admin-compta#.
+        Ils ont donc tous les mêmes droits, c'est une gestion au niveau de la classe, donc les méthodes suffisent.
+    \item Les classeurs de comptabilité sont gérés par les trésoriers des clubs, ils n'ont pas tous les mêmes droits,
         mais cela peut tout de même se calculer en fonction des postes dans les clubs correspondants. On a donc besoin
         des méthodes uniquement.
     \item Les pages n'appartiennent pas forcément à un club, ni à une quelconque entité, mais ont tout de même besoin de
@@ -570,16 +548,12 @@ recourir aux attributs.
 \section{Subscription}
 \label{sec:subscription}
 \subsection{Résumé}
-\label{sub:r_sum_}
-\par Cette application étend le modèle \verb#User# pour y ajouter le support des cotisations. Elle fournit également les
-interfaces de cotisation.
+\label{sub:resume}
+\par Cette application ajoute le support des cotisations. Elle fournit également les interfaces de cotisation.
 
 \subsection{Liste des modèles}
-\label{sub:liste_des_mod_les}
+\label{sub:liste_des_modeles}
 \begin{itemize}
-    \item \textbf{Subscriber} \\
-        Un modèle proxy de \verb#User# fournissant les méthodes pour rapidement savoir si l'utilisateur est cotisant ou
-        non.
     \item \textbf{Subscription} \\
         Un modèle cotisation, pour stocker ces dernières. Cette classe fait automatiquement les calculs de début et de
         fin de cotisation en fonction de la date du jour, du type de cotisation, et de la durée en semestre de
@@ -589,8 +563,8 @@ interfaces de cotisation.
 \section{Accounting}
 \label{sec:accounting}
 \subsection{Résumé}
-\label{sub:r_sum_}
-\par Cette application sert à gérer à la comptabilité. Elle est architecturée de façon hiérarchique, avec en haut, les
+\label{sub:resume}
+\par Cette application sert à gérer la comptabilité. Elle est architecturée de façon hiérarchique, avec en haut, les
 comptes bancaires réels, qui contiennent eux des comptes de clubs, permettant de les diviser en plusieurs petits comptes
 en interne, et enfin les classeurs de trésorerie, propres à chaque compte club, permettant de faire les comptes en
 triant par semestre.
@@ -598,7 +572,7 @@ triant par semestre.
 permettant de stocker de valeurs monétaires.
 
 \subsection{Liste des modèles}
-\label{sub:liste_des_mod_les}
+\label{sub:liste_des_modeles}
 \begin{itemize}
     \item \textbf{BankAccount} \\
         Le modèle des comptes bancaires.
@@ -609,20 +583,24 @@ permettant de stocker de valeurs monétaires.
         année pour les activités plus longues comme le Gala.
     \item \textbf{AccountingType} \\
         Le modèle pour stocker les types comptables, servant à remplir les opérations.
+    \item \textbf{SimpleAccountingType} \\
+        Le modèle pour stocker les types comptables simplifiés, servant à remplir les opérations.
+    \item \textbf{Label} \\
+        Le modèle pour stocker les étiquettes, servant à classifer les opérations.
     \item \textbf{Operation} \\
-        Le modèle des opérations, servant à remplir les classeurs comptables. Un opération peut être un débit ou un
+        Le modèle des opérations, servant à remplir les classeurs comptables. Une opération peut être un débit ou un
         crédit, et permet ensuite d'éditer des factures, par exemple.
 \end{itemize}
 
 \section{Counter}
 \label{sec:counter}
 \subsection{Résumé}
-\label{sub:r_sum_}
+\label{sub:resume}
 \par Cette application s'occupe de la gestion des comptoirs. Elle définit ainsi des produits, et ajoute également le
 support du compte AE pour les utilisateurs.
 
 \subsection{Liste des modèles}
-\label{sub:liste_des_mod_les}
+\label{sub:liste_des_modeles}
 \begin{itemize}
     \item \textbf{Customer} \\
         Ce modèle étend l'utilisateur pour lui rajouter un compte AE. Il est lié à la classe \verb#User# par un
@@ -643,11 +621,11 @@ support du compte AE pour les utilisateurs.
 \section{Club}
 \label{sec:club}
 \subsection{Résumé}
-\label{sub:r_sum_}
-\par Cette application permet de générer les clubs et les adhésions des utilisateur à ceux-ci.
+\label{sub:resume}
+\par Cette application permet de générer les clubs et les adhésions des utilisateurs à ceux-ci.
 
 \subsection{Liste des modèles}
-\label{sub:liste_des_mod_les}
+\label{sub:liste_des_modeles}
 \begin{itemize}
     \item \textbf{Club} \\
         Le modèle des clubs.
@@ -663,7 +641,7 @@ support du compte AE pour les utilisateurs.
 \par Concernant \emph{Python}, \emph{Django}, ou \emph{Jinja}, les documentations respectives sont toujours très bien
 faites, et permettront de répondre à toutes les questions techniques concernant les technologies.
 \par Concernant le projet \emph{Sith} en lui-même, ce rapport n'est pas non plus exhaustif. Pour cela, lire le code des
-différentes sections sera le meilleur moyen de comprendre le fonctionnement des différentes fonctions. Pour obtenir plus
+différentes sections sera le meilleur moyen de comprendre le fonctionnement des différentes applications. Pour obtenir plus
 rapidement un résumé à jour des sources, le fichier \verb#Doxyfile# présent à la racine du site permet de regénérer de
 la documentation exhaustive rapidement à l'aide de \emph{Doxygen} (voir la section correspondante dans le README).
 \par J'espère toutefois que même s'il n'est pas complet, ce rapport permettra à tout futur contributeur de rentrer plus
