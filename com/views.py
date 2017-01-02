@@ -11,7 +11,7 @@ from django import forms
 
 from datetime import timedelta
 
-from com.models import Sith, News, NewsDate
+from com.models import Sith, News, NewsDate, Weekmail, WeekmailArticle
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin
 from core.views.forms import SelectDateTime
 from core.models import Notification, RealGroup
@@ -28,6 +28,11 @@ class ComTabsMixin(TabedViewMixin):
 
     def get_list_of_tabs(self):
         tab_list = []
+        tab_list.append({
+                    'url': reverse('com:weekmail'),
+                    'slug': 'weekmail',
+                    'name': _("Weekmail"),
+                    })
         tab_list.append({
                     'url': reverse('com:index_edit'),
                     'slug': 'index',
@@ -212,5 +217,14 @@ class NewsDetailView(CanViewMixin, DetailView):
     model = News
     template_name = 'com/news_detail.jinja'
     pk_url_kwarg = 'news_id'
+
+# Weekmail
+
+class WeekmailEditView(UpdateView):
+    model = Weekmail
+    template_name = 'com/weekmail.jinja'
+
+    def get_object(self, queryset=None):
+        return self.model.objects.order_by('-id').first()
 
 

@@ -11,6 +11,7 @@ class Sith(models.Model):
     alert_msg = models.TextField(_("alert message"), default="", blank=True)
     info_msg = models.TextField(_("info message"), default="", blank=True)
     index_page = models.TextField(_("index page"), default="", blank=True)
+    weekmail_destinations = models.TextField(_("weekmail destinations"), default="")
 
     def is_owned_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
@@ -64,3 +65,35 @@ class NewsDate(models.Model):
 
     def __str__(self):
         return "%s: %s - %s" % (self.news.title, self.start_date, self.end_date)
+
+class Weekmail(models.Model):
+    """
+    The weekmail class
+    """
+    title = models.CharField(_("title"), max_length=64)
+    intro = models.TextField(_("intro"), blank=True)
+    joke = models.TextField(_("joke"), blank=True)
+    protip = models.TextField(_("protip"), blank=True)
+    conclusion = models.TextField(_("conclusion"), blank=True)
+    sent = models.BooleanField(_("sent"), default=False)
+
+    class Meta:
+        ordering = ['-id']
+
+    def send(self):
+        print("Sending weekmail n°" + str(self.id))
+        self.sent = True
+        self.save()
+
+class WeekmailArticle(models.Model):
+    weekmail = models.ForeignKey(Weekmail, related_name="articles", verbose_name=_("weekmail"))
+    title = models.CharField(_("title"), max_length=64)
+    content = models.TextField(_("content"))
+    author = models.ForeignKey(User, related_name="owned_weekmail_articles", verbose_name=_("author"))
+    club = models.ForeignKey(Club, related_name="weekmail_articles", verbose_name=_("club"))
+    rank = models.IntegerField(_('rank'), default=-1)
+
+    def clean(self):
+        super(WeekmailArticle, self).clean()
+        if not self.weekmail:
+            self.weekmail = Weekmail.objects.order_by('-id').first()
