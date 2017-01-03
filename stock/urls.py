@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^(?P<stock_id>[0-9]+)$', StockItemList.as_view(), name='items_list'),
     url(r'^(?P<stock_id>[0-9]+)/stockItem/newItem$', StockItemCreateView.as_view(), name='new_item'),
     url(r'^stockItem/(?P<item_id>[0-9]+)/edit$', StockItemEditView.as_view(), name='edit_item'),
+    url(r'^(?P<stock_id>[0-9]+)/stockItem/takeItems$', StockTakeItemsBaseFormView.as_view(), name='take_items'),
 
 # ShoppingList urls
     url(r'^(?P<stock_id>[0-9]+)/shoppingList/list$', StockShoppingListView.as_view(), name='shoppinglist_list'),

@@ -8,10 +8,9 @@ from django.forms.models import modelform_factory
 from django.core.urlresolvers import reverse_lazy, reverse
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
-from counter.views import CounterAdminTabsMixin
-from counter.models import Counter
-from stock.models import Stock, StockItem
-
+from counter.views import CounterAdminTabsMixin, CounterTabsMixin
+from counter.models import Counter, ProductType
+from stock.models import Stock, StockItem, ShoppingList
 
 
 class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):
@@ -22,6 +21,9 @@ class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):
 	template_name = 'stock/stock_item_list.jinja'
 	pk_url_kwarg = "stock_id"
 	current_tab = "stocks"
+
+	#def can_be_viewed_by(self, user):
+		#return user.is_in_group(settings.SITH_GROUPS['counter-admin'].id)
 
 class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 	"""
@@ -357,3 +359,77 @@ class StockUpdateAfterShopppingBaseFormView(CounterAdminTabsMixin, CanEditMixin,
 	def get_success_url(self):
 		self.kwargs.pop('shoppinglist_id', None)
 		return reverse_lazy('stock:shoppinglist_list', args=self.args, kwargs=self.kwargs)
+
+
+class StockTakeItemsForm(forms.BaseForm):
+	"""
+	docstring for StockTakeItemsFormView
+	"""
+	def clean(self):
+		with transaction.atomic():
+			for k,t in self.cleaned_data.items():
+				item_id = int(k[5:])
+				if int(t) > 0 :
+					item = StockItem.objects.filter(id=item_id).first()
+					item.effective_quantity -= int(t)
+					item.save()
+		return self.cleaned_data			
+
+
+class StockTakeItemsBaseFormView(CounterTabsMixin, CanEditMixin, DetailView, BaseFormView):
+	"""
+	docstring for StockTakeItemsBaseFormView
+	"""
+	model = StockItem
+	template_name = "stock/stock_take_items.jinja"
+	pk_url_kwarg = "stock_id"
+	current_tab = "take_items_from_stock"
+
+	def get_form_class(self):
+		fields = OrderedDict()
+		kwargs = {}
+		for t in ProductType.objects.order_by('name').all():
+			for i in self.stock.items.filter(type=t).order_by('name').all():
+				field_name = "item-%s" % (str(i.id))
+				fields[field_name] = forms.CharField(max_length=30, required=True, label=str(i))
+				kwargs[field_name] = i.effective_quantity
+		kwargs['stock_id'] = self.stock.id
+		kwargs['counter_id'] = self.stock.counter.id
+		kwargs['base_fields'] = fields
+		return type('StockTakeItemsForm', (StockTakeItemsForm,), kwargs)
+
+	def get(self, request, *args, **kwargs):
+		"""
+		Simple get view
+		"""
+		self.stock = Stock.objects.filter(id=self.kwargs['stock_id']).first()
+		return super(StockTakeItemsBaseFormView, self).get(request, *args, **kwargs)
+	
+	def post(self, request, *args, **kwargs):
+		"""
+		Handle the many possibilities of the post request
+		"""
+		self.object = self.get_object()
+		self.stock = Stock.objects.filter(id=self.kwargs['stock_id']).first()
+		if self.stock.counter.type == "BAR" and not ('counter_token' in self.request.session.keys() and
+				self.request.session['counter_token'] == self.stock.counter.token): # Also check the token to avoid the bar to be stolen
+			return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
+				kwargs={'counter_id': self.stock.counter.id})+'?bad_location')
+		return super(StockTakeItemsBaseFormView, self).post(request, *args, **kwargs)
+
+	def form_valid(self, form):
+		return super(StockTakeItemsBaseFormView, self).form_valid(form)
+
+	def get_context_data(self, **kwargs):
+		kwargs = super(StockTakeItemsBaseFormView, self).get_context_data(**kwargs)
+		if 'form' not in kwargs.keys():
+			kwargs['form'] = self.get_form()
+		kwargs['stock'] = self.stock
+		kwargs['counter'] = self.stock.counter
+		return kwargs
+
+	def get_success_url(self):
+		stock = Stock.objects.filter(id=self.kwargs['stock_id']).first()
+		self.kwargs['counter_id'] = stock.counter.id
+		self.kwargs.pop('stock_id', None)
+		return reverse_lazy('counter:details', args=self.args, kwargs=self.kwargs)

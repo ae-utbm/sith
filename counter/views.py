@@ -69,29 +69,36 @@ class RefillForm(forms.ModelForm):
 
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
-        return self.object
+        if hasattr(self.object, 'stock_owner') : 
+            return self.object.stock_owner.counter
+        else:
+            return self.object
     def get_list_of_tabs(self):
         tab_list = []
         tab_list.append({
-            'url': reverse_lazy('counter:details', kwargs={'counter_id': self.object.id}),
+            'url': reverse_lazy('counter:details',
+                kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id }),
             'slug': 'counter',
             'name': _("Counter"),
             })
-        if self.object.type == "BAR":
+        if self.object.stock_owner.counter.type if hasattr(self.object, 'stock_owner') else self.object.type == "BAR":
             tab_list.append({
-                'url': reverse_lazy('counter:cash_summary', kwargs={'counter_id': self.object.id}),
+                'url': reverse_lazy('counter:cash_summary', 
+                    kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id}),
                 'slug': 'cash_summary',
                 'name': _("Cash summary"),
                 })
             tab_list.append({
-                'url': reverse_lazy('counter:last_ops', kwargs={'counter_id': self.object.id}),
+                'url': reverse_lazy('counter:last_ops', 
+                    kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id}),
                 'slug': 'last_ops',
                 'name': _("Last operations"),
                 })
             tab_list.append({
-                'url': reverse_lazy('stock:items_list', kwargs={'stock_id': self.object.stock.id}),
-                'slug': 'stock_items_list',
-                'name': _("Stock items list"),
+                'url': reverse_lazy('stock:take_items', 
+                    kwargs={'stock_id': self.object.stock.id if hasattr(self.object, 'stock') else self.object.stock_owner.id}),
+                'slug': 'take_items_from_stock',
+                'name': _("Take items from stock"),
                 })
         return tab_list
 

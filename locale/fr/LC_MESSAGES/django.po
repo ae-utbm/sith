@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-29 18:13+0100\n"
+"POT-Creation-Date: 2017-01-03 14:35+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -519,10 +519,10 @@ msgstr "Nature"
 #: accounting/templates/accounting/journal_details.jinja:36
 #: stock/templates/stock/stock_shopping_list.jinja:50
 msgid "Done"
-msgstr "Effectué"
+msgstr "Effectuées"
 
 #: accounting/templates/accounting/journal_details.jinja:37
-#: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:721
+#: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:728
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -783,7 +783,7 @@ msgstr "Total : "
 #: club/templates/club/club_sellings.jinja:20 club/views.py:167
 #: core/templates/core/user_account_detail.jinja:18
 #: core/templates/core/user_account_detail.jinja:51
-#: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:78
+#: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:82
 msgid "Counter"
 msgstr "Comptoir"
 
@@ -870,16 +870,16 @@ msgstr "Choisir un utilisateur"
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
-#: club/views.py:165 counter/views.py:919
+#: club/views.py:165 counter/views.py:926
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:166 counter/views.py:920
+#: club/views.py:166 counter/views.py:927
 msgid "End date"
 msgstr "Date de fin"
 
 #: club/views.py:180 core/templates/core/user_stats.jinja:27
-#: counter/views.py:1000
+#: counter/views.py:1007
 msgid "Product"
 msgstr "Produit"
 
@@ -1826,7 +1826,7 @@ msgstr "Rechargements"
 msgid "Eboutic invoices"
 msgstr "Facture eboutic"
 
-#: core/templates/core/user_account.jinja:53 counter/views.py:489
+#: core/templates/core/user_account.jinja:53 counter/views.py:496
 msgid "Etickets"
 msgstr "Etickets"
 
@@ -2003,8 +2003,8 @@ msgstr "Fusionner deux utilisateurs"
 msgid "Subscriptions"
 msgstr "Cotisations"
 
-#: core/templates/core/user_tools.jinja:24 counter/views.py:459
-#: counter/views.py:608
+#: core/templates/core/user_tools.jinja:24 counter/views.py:466
+#: counter/views.py:615
 msgid "Counters"
 msgstr "Comptoirs"
 
@@ -2025,7 +2025,7 @@ msgid "Product types management"
 msgstr "Gestion des types de produit"
 
 #: core/templates/core/user_tools.jinja:31
-#: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:479
+#: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:486
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
 
@@ -2377,7 +2377,7 @@ msgstr "Liste des relevés de caisse"
 msgid "Theoric sums"
 msgstr "Sommes théoriques"
 
-#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:722
+#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:729
 msgid "Emptied"
 msgstr "Coffre vidé"
 
@@ -2501,7 +2501,7 @@ msgstr "Nouveau eticket"
 msgid "There is no eticket in this website."
 msgstr "Il n'y a pas de eticket sur ce site web."
 
-#: counter/templates/counter/invoices_call.jinja:4 counter/views.py:484
+#: counter/templates/counter/invoices_call.jinja:4 counter/views.py:491
 msgid "Invoices call"
 msgstr "Appels à facture"
 
@@ -2577,121 +2577,121 @@ msgstr "Pourcentage"
 msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
-#: counter/views.py:84
+#: counter/views.py:89
 msgid "Cash summary"
 msgstr "Relevé de caisse"
 
-#: counter/views.py:89
+#: counter/views.py:95
 msgid "Last operations"
 msgstr "Dernières opérations"
 
-#: counter/views.py:94
-msgid "Stock items list"
-msgstr "Liste des éléments du stock"
+#: counter/views.py:101
+msgid "Take items from stock"
+msgstr ""
 
-#: counter/views.py:128
+#: counter/views.py:135
 msgid "Bad credentials"
 msgstr "Mauvais identifiants"
 
-#: counter/views.py:130
+#: counter/views.py:137
 msgid "User is not barman"
 msgstr "L'utilisateur n'est pas barman."
 
-#: counter/views.py:134
+#: counter/views.py:141
 msgid "Bad location, someone is already logged in somewhere else"
 msgstr "Mauvais comptoir, quelqu'un est déjà connecté ailleurs"
 
-#: counter/views.py:324
+#: counter/views.py:331
 msgid "END"
 msgstr "FIN"
 
-#: counter/views.py:326
+#: counter/views.py:333
 msgid "CAN"
 msgstr "ANN"
 
-#: counter/views.py:356
+#: counter/views.py:363
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: counter/views.py:449
+#: counter/views.py:456
 msgid "Counter administration"
 msgstr "Administration des comptoirs"
 
-#: counter/views.py:454
+#: counter/views.py:461
 msgid "Stocks"
 msgstr ""
 
-#: counter/views.py:464
+#: counter/views.py:471
 msgid "Products"
 msgstr "Produits"
 
-#: counter/views.py:469
+#: counter/views.py:476
 msgid "Archived products"
 msgstr "Produits archivés"
 
-#: counter/views.py:474
+#: counter/views.py:481
 msgid "Product types"
 msgstr "Types de produit"
 
-#: counter/views.py:605
+#: counter/views.py:612
 msgid "Parent product"
 msgstr "Produit parent"
 
-#: counter/views.py:606
+#: counter/views.py:613
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
-#: counter/views.py:701
+#: counter/views.py:708
 msgid "10 cents"
 msgstr "10 centimes"
 
-#: counter/views.py:702
+#: counter/views.py:709
 msgid "20 cents"
 msgstr "20 centimes"
 
-#: counter/views.py:703
+#: counter/views.py:710
 msgid "50 cents"
 msgstr "50 centimes"
 
-#: counter/views.py:704
+#: counter/views.py:711
 msgid "1 euro"
 msgstr "1 €"
 
-#: counter/views.py:705
+#: counter/views.py:712
 msgid "2 euros"
 msgstr "2 €"
 
-#: counter/views.py:706
+#: counter/views.py:713
 msgid "5 euros"
 msgstr "5 €"
 
-#: counter/views.py:707
+#: counter/views.py:714
 msgid "10 euros"
 msgstr "10 €"
 
-#: counter/views.py:708
+#: counter/views.py:715
 msgid "20 euros"
 msgstr "20 €"
 
-#: counter/views.py:709
+#: counter/views.py:716
 msgid "50 euros"
 msgstr "50 €"
 
-#: counter/views.py:710
+#: counter/views.py:717
 msgid "100 euros"
 msgstr "100 €"
 
-#: counter/views.py:711 counter/views.py:713 counter/views.py:715
-#: counter/views.py:717 counter/views.py:719
+#: counter/views.py:718 counter/views.py:720 counter/views.py:722
+#: counter/views.py:724 counter/views.py:726
 msgid "Check amount"
 msgstr "Montant du chèque"
 
-#: counter/views.py:712 counter/views.py:714 counter/views.py:716
-#: counter/views.py:718 counter/views.py:720
+#: counter/views.py:719 counter/views.py:721 counter/views.py:723
+#: counter/views.py:725 counter/views.py:727
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
-#: counter/views.py:1071
+#: counter/views.py:1078
 msgid "people(s)"
 msgstr "personne(s)"
 
@@ -3196,8 +3196,21 @@ msgstr "Marquer comme effectué(e)"
 msgid "Mark as to do"
 msgstr "Marquer comme à faire"
 
+#: stock/templates/stock/stock_take_items.jinja:5
+#: stock/templates/stock/stock_take_items.jinja:9
+#, python-format
+msgid "Take items form %(s)s"
+msgstr ""
+
+#: stock/templates/stock/stock_take_items.jinja:14
+#, fuzzy
+#| msgid "Take picture"
+msgid "Take items"
+msgstr "Prendre une photo"
+
 #: stock/templates/stock/update_after_shopping.jinja:4
 #: stock/templates/stock/update_after_shopping.jinja:8
+#, python-format
 msgid "Update %(s)s's quantity after shopping"
 msgstr "Mise à jour des stocks selon les quantités achetées pour %(s)s"
 
@@ -3245,3 +3258,6 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, ou en créer un proprement."
+
+#~ msgid "Stock items list"
+#~ msgstr "Liste des éléments du stock"
