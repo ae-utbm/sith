@@ -22,9 +22,9 @@ class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):
 	pk_url_kwarg = "stock_id"
 	current_tab = "stocks"
 
-	#def can_be_viewed_by(self, user):
-		#return user.is_in_group(settings.SITH_GROUPS['counter-admin'].id)
-
+	def can_be_viewed_by(self, user):
+		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+	
 class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 	"""
 	A list view for the admins
@@ -33,6 +33,9 @@ class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 	template_name = 'stock/stock_list.jinja'
 	current_tab = "stocks"
 
+	def can_be_viewed_by(self, user):
+		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+		
 
 class StockEditForm(forms.ModelForm):
 	"""
@@ -64,40 +67,9 @@ class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
 			context['stock'] = Stock.objects.filter(id=self.request.GET['stock']).first()
 		return context
 
-class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
-	"""
-	A list view for the admins
-	"""
-	model = Stock
-	template_name = 'stock/stock_list.jinja'
-	current_tab = "stocks"
-
-
-class StockEditForm(forms.ModelForm):
-	"""
-	A form to change stock's characteristics
-	"""
-	class Meta:
-		model = Stock
-		fields = ['name', 'counter']
-			
-	def __init__(self, *args, **kwargs):
-		super(StockEditForm, self).__init__(*args, **kwargs)
-
-	def save(self, *args, **kwargs):
-		return super(StockEditForm, self).save(*args, **kwargs)
+	def can_be_viewed_by(self, user):
+		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
 		
-
-class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
-	"""
-	An edit view for the stock
-	"""
-	model = Stock
-	form_class = StockEditForm
-	pk_url_kwarg = "stock_id"
-	template_name = 'core/edit.jinja'
-	current_tab = "stocks"
-
 
 class StockItemEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
 	"""
