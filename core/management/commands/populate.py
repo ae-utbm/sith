@@ -16,7 +16,7 @@ from core.utils import resize_image
 from club.models import Club, Membership
 from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
-from com.models import Sith
+from com.models import Sith, Weekmail
 from election.models import Election, Role, Candidature, ElectionList
 
 
@@ -87,6 +87,7 @@ class Command(BaseCommand):
         club_root.save()
 
         Sith().save()
+        Weekmail().save()
 
         p = Page(name='Index')
         p.set_lock(root)

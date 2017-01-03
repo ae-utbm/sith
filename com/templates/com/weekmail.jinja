@@ -5,8 +5,13 @@
 {% endblock %}
 
 {% block content %}
-    <h3>{% trans %}Weekmail{% endtrans %}</h3>
-    {{ object }}
+<h3>{% trans %}Weekmail{% endtrans %}</h3>
+{{ object }}
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+</form>
 {% endblock %}
 
 

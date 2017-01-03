@@ -1,7 +1,8 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.conf import settings
+from django.core.mail import EmailMessage
 
 from core.models import User
 from club.models import Club
@@ -70,7 +71,7 @@ class Weekmail(models.Model):
     """
     The weekmail class
     """
-    title = models.CharField(_("title"), max_length=64)
+    title = models.CharField(_("title"), max_length=64, blank=True)
     intro = models.TextField(_("intro"), blank=True)
     joke = models.TextField(_("joke"), blank=True)
     protip = models.TextField(_("protip"), blank=True)
@@ -81,9 +82,18 @@ class Weekmail(models.Model):
         ordering = ['-id']
 
     def send(self):
-        print("Sending weekmail n°" + str(self.id))
-        self.sent = True
-        self.save()
+        with transaction.atomic():
+            print("Sending weekmail n°" + str(self.id))
+            email = EmailMessage(
+                    subject=self.title,
+                    body="\n\n".join([self.intro, self.joke, self.protip, self.conclusion]),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[],
+                    bcc=Sith.objects.first().weekmail_destinations.split(' '),
+                    )
+            self.sent = True
+            self.save()
+            Weekmail().save()
 
 class WeekmailArticle(models.Model):
     weekmail = models.ForeignKey(Weekmail, related_name="articles", verbose_name=_("weekmail"))

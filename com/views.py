@@ -223,8 +223,14 @@ class NewsDetailView(CanViewMixin, DetailView):
 class WeekmailEditView(UpdateView):
     model = Weekmail
     template_name = 'com/weekmail.jinja'
+    fields = ['title', 'intro', 'joke', 'protip', 'conclusion']
+    success_url = reverse_lazy('com:weekmail')
 
     def get_object(self, queryset=None):
-        return self.model.objects.order_by('-id').first()
+        weekmail = self.model.objects.filter(sent=False).order_by('-id').first()
+        if not weekmail.title:
+            now = timezone.now()
+            weekmail.title = _("Weekmail of the ") + (now + timedelta(days=6 - now.weekday())).strftime('%d/%m/%Y')
+        return weekmail
 
 
