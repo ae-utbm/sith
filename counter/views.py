@@ -412,7 +412,7 @@ class CounterLogin(RedirectView):
             if user in self.counter.sellers.all() and not user in self.counter.get_barmen_list():
                 if len(self.counter.get_barmen_list()) <= 0:
                     self.counter.gen_token()
-                    request.session['counter_token'] = self.counter.token
+                request.session['counter_token'] = self.counter.token
                 self.counter.add_barman(user)
             else:
                 self.errors += ["sellers"]
