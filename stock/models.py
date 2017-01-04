@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+from django.conf import settings
+
 
 from counter.models import Counter, ProductType
 
@@ -16,6 +18,9 @@ class Stock(models.Model):
 
 	def get_absolute_url(self):
 		return reverse('stock:list')
+
+	def can_be_viewed_by(self, user):
+		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
 class StockItem(models.Model):
 	"""
@@ -34,6 +39,9 @@ class StockItem(models.Model):
 	def get_absolute_url(self):
 		return reverse('stock:items_list', kwargs={'stock_id':self.stock_owner.id})
 
+	def can_be_viewed_by(self, user):
+		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+
 class ShoppingList(models.Model):
 	"""
 	The ShoppingList class, used to make an history of the shopping lists
@@ -49,3 +57,6 @@ class ShoppingList(models.Model):
 
 	def get_absolute_url(self):
 		return reverse('stock:shoppinglist_list')
+
+	def can_be_viewed_by(self, user):
+		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)

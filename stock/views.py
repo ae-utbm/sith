@@ -22,8 +22,11 @@ class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):
 	pk_url_kwarg = "stock_id"
 	current_tab = "stocks"
 
-	def can_be_viewed_by(self, user):
-		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+	def get_context_data(self):
+		ret = super(StockItemList, self).get_context_data()
+		if 'stock_id' in self.kwargs.keys():
+			ret['stock'] = Stock.objects.filter(id=self.kwargs['stock_id']).first();
+		return ret
 	
 class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 	"""
@@ -35,7 +38,7 @@ class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 
 	def can_be_viewed_by(self, user):
 		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
-		
+
 
 class StockEditForm(forms.ModelForm):
 	"""
@@ -66,9 +69,6 @@ class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
 		if 'stock' in self.request.GET.keys():
 			context['stock'] = Stock.objects.filter(id=self.request.GET['stock']).first()
 		return context
-
-	def can_be_viewed_by(self, user):
-		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
 		
 
 class StockItemEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
