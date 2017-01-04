@@ -90,7 +90,7 @@ class CounterTabsMixin(TabedViewMixin):
                 })
         return tab_list
 
-class CounterMain(CounterTabsMixin, DetailView, ProcessFormView, FormMixin):
+class CounterMain(CounterTabsMixin, CanViewMixin, DetailView, ProcessFormView, FormMixin):
     """
     The public (barman) view
     """
@@ -148,7 +148,7 @@ class CounterMain(CounterTabsMixin, DetailView, ProcessFormView, FormMixin):
     def get_success_url(self):
         return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
 
-class CounterClick(CounterTabsMixin, DetailView):
+class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     """
     The click view
     This is a detail view not to have to worry about loading the counter

@@ -15,7 +15,7 @@ from django.db import transaction, DataError
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
-from counter.models import Product, Customer, Counter, ProductType, Selling
+from counter.models import Customer, Counter, ProductType, Selling
 from eboutic.models import Basket, Invoice, BasketItem, InvoiceItem
 
 class EbouticMain(TemplateView):
@@ -37,6 +37,7 @@ class EbouticMain(TemplateView):
         if not request.user.is_authenticated():
             return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs) + "?next=" +
                     request.path)
+        self.object = Counter.objects.filter(type="EBOUTIC").first()
         self.make_basket(request)
         return super(EbouticMain, self).get(request, *args, **kwargs)
 
@@ -44,6 +45,7 @@ class EbouticMain(TemplateView):
         if not request.user.is_authenticated():
             return HttpResponseRedirect(reverse_lazy('core:login', args=self.args, kwargs=kwargs) + "?next=" +
                     request.path)
+        self.object = Counter.objects.filter(type="EBOUTIC").first()
         self.make_basket(request)
         if 'add_product' in request.POST['action']:
             self.add_product(request)
@@ -55,7 +57,7 @@ class EbouticMain(TemplateView):
     def add_product(self, request):
         """ Add a product to the basket """
         try:
-            p = Product.objects.filter(id=int(request.POST['product_id'])).first()
+            p = self.object.products.filter(id=int(request.POST['product_id'])).first()
             if not p.buying_groups.exists():
                 self.basket.add_product(p)
             for g in p.buying_groups.all():
@@ -68,7 +70,7 @@ class EbouticMain(TemplateView):
     def del_product(self, request):
         """ Delete a product from the basket """
         try:
-            p = Product.objects.filter(id=int(request.POST['product_id'])).first()
+            p = self.object.products.filter(id=int(request.POST['product_id'])).first()
             self.basket.del_product(p)
         except:
             pass
@@ -144,7 +146,7 @@ class EbouticPayWithSith(TemplateView):
                 else:
                     eboutic = Counter.objects.filter(type="EBOUTIC").first()
                     for it in b.items.all():
-                        product = Product.objects.filter(id=it.product_id).first()
+                        product = eboutic.products.filter(id=it.product_id).first()
                         Selling(
                                 label=it.product_name,
                                 counter=eboutic,

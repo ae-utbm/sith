@@ -161,7 +161,7 @@ class Counter(models.Model):
         return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
-        if self.type == "BAR" or self.type == "EBOUTIC":
+        if self.type == "BAR":
             return True
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user in self.sellers.all()
 
