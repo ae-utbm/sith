@@ -203,6 +203,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
             kwargs['result'] = qs.all().order_by('-id')
             kwargs['total'] = sum([s.quantity * s.unit_price for s in qs.all()])
             kwargs['total_quantity'] = sum([s.quantity for s in qs.all()])
+            kwargs['benefit'] = kwargs['total'] - sum([s.product.purchase_price for s in qs.exclude(product=None)])
         else:
             kwargs['result'] = qs[:0]
         kwargs['form'] = form
@@ -222,8 +223,11 @@ class ClubSellingCSVView(ClubSellingView):
         kwargs = self.get_context_data(**kwargs)
         writer = csv.writer(response, delimiter=";", lineterminator='\n', quoting=csv.QUOTE_ALL)
 
+        writer.writerow([_t('Quantity'), kwargs['total_quantity']])
+        writer.writerow([_t('Total'), kwargs['total']])
+        writer.writerow([_t('Benefit'), kwargs['benefit']])
         writer.writerow([_t('Date'),_t('Counter'),_t('Barman'),_t('Customer'),_t('Label'),
-                         _t('Quantity'), _t('Total'),_t('Payment method')])
+                         _t('Quantity'), _t('Total'),_t('Payment method'), _t('Selling price'), _t('Purchase price'), _t('Benefit')])
         for o in kwargs['result']:
             row = [o.date, o.counter]
             if o.seller:
@@ -234,6 +238,11 @@ class ClubSellingCSVView(ClubSellingView):
             else: row.append('')
             row = row +[o.label, o.quantity, o.quantity * o.unit_price,
                        o.get_payment_method_display()]
+            if o.product:
+                row.append(o.product.selling_price)
+                row.append(o.product.purchase_price)
+                row.append(o.product.selling_price - o.product.purchase_price)
+            else: row = row + ['', '', '']
             writer.writerow(row)
 
         return response
