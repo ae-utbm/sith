@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^$', SASMainView.as_view(), name='main'),
     url(r'^moderation$', ModerationView.as_view(), name='moderation'),
     url(r'^album/(?P<album_id>[0-9]+)$', AlbumView.as_view(), name='album'),
+    url(r'^album/(?P<album_id>[0-9]+)/upload$', AlbumUploadView.as_view(), name='album_upload'),
     url(r'^album/(?P<album_id>[0-9]+)/edit$', AlbumEditView.as_view(), name='album_edit'),
     url(r'^picture/(?P<picture_id>[0-9]+)$', PictureView.as_view(), name='picture'),
     url(r'^picture/(?P<picture_id>[0-9]+)/edit$', PictureEditView.as_view(), name='picture_edit'),

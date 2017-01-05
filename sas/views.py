@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin, FormView
@@ -34,7 +35,7 @@ class SASForm(forms.Form):
                 album = Album(parent=parent, name=self.cleaned_data['album_name'], owner=owner, is_moderated=automodere)
                 album.clean()
                 album.save()
-                notif = True
+                notif = not automodere
         except Exception as e:
             self.add_error(None, _("Error creating album %(album)s: %(msg)s") %
                     {'album': self.cleaned_data['album_name'], 'msg': repr(e)})
@@ -47,7 +48,7 @@ class SASForm(forms.Form):
                 new_file.clean()
                 new_file.generate_thumbnails()
                 new_file.save()
-                notif = True
+                notif = not automodere
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
         if notif:
@@ -147,6 +148,25 @@ def send_compressed(request, picture_id):
 
 def send_thumb(request, picture_id):
     return send_file(request, picture_id, Picture, "thumbnail")
+
+class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
+    model = Album
+    form_class = SASForm
+    pk_url_kwarg = "album_id"
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.form = self.get_form()
+        parent = SithFile.objects.filter(id=self.object.id).first()
+        files = request.FILES.getlist('images')
+        if request.user.is_authenticated() and request.user.is_subscribed():
+            if self.form.is_valid():
+                self.form.process(parent=parent, owner=request.user, files=files,
+                        automodere=request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID))
+                if self.form.is_valid():
+                    return HttpResponse(str(self.form.errors), status=200)
+        return HttpResponse(str(self.form.errors), status=500)
+
 
 class AlbumView(CanViewMixin, DetailView, FormMixin):
     model = Album
