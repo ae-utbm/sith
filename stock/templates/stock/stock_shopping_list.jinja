@@ -28,11 +28,11 @@ Shopping list for {{ stock }}
 		    </tr>
 		</thead>
 		<tbody>
-		{% for s in shoppinglist_list.filter(todo=True).filter(stock_owner=stock).order_by('-date') %}
+		{% for s in stock.shopping_lists.filter(todo=True).filter(stock_owner=stock).order_by('-date').all() %}
 			<tr>
 				<td>{{ s.date|localtime|date("Y-m-d H:i") }}</td>
 				<td><a href="{{ url('stock:shoppinglist_items', stock_id=stock.id, shoppinglist_id=s.id)}}">{{ s.name }}</a></td>
-				<td>{{ s.items_to_buy.count() }}</td>
+				<td>{{ s.shopping_items_to_buy.count() }}</td>
 				<td>
 					<a href="{{ url('stock:update_after_shopping', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Update stock{% endtrans %}</a>
 				</td>
@@ -57,11 +57,11 @@ Shopping list for {{ stock }}
 		    </tr>
 		</thead>
 		<tbody>
-		{% for s in shoppinglist_list.filter(todo=False).filter(stock_owner=stock).order_by('-date') %}
+		{% for s in stock.shopping_lists.filter(todo=False).filter(stock_owner=stock).order_by('-date').all() %}
 			<tr>
 				<td>{{ s.date|localtime|date("Y-m-d H:i") }}</td>
 				<td><a href="{{ url('stock:shoppinglist_items', stock_id=stock.id, shoppinglist_id=s.id)}}">{{ s.name }}</a></td>
-				<td>{{ s.items_to_buy.count() }}</td>
+				<td>{{ s.shopping_items_to_buy.count() }}</td>
 				<td>
 					<a href="{{ url('stock:shoppinglist_set_todo', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Mark as to do{% endtrans %}</a>
 				</td>

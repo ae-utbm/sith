@@ -29,6 +29,8 @@ class StockItem(models.Model):
 	name = models.CharField(_('name'), max_length=64)
 	unit_quantity = models.IntegerField(_('unit quantity'), default=0, help_text='number of element in one box')
 	effective_quantity = models.IntegerField(_('effective quantity'), default=0, help_text='number of box')
+	minimal_quantity = models.IntegerField(_('minimal quantity'), default=1, 
+		help_text='if the effective quantity is less than the minimal, item is added to the shopping list')
 	type = models.ForeignKey(ProductType, related_name="stock_items", verbose_name=_("type"), null=True, blank=True,
 		on_delete=models.SET_NULL)
 	stock_owner = models.ForeignKey(Stock, related_name="items")
@@ -49,14 +51,36 @@ class ShoppingList(models.Model):
 	date = models.DateTimeField(_('date'))
 	name = models.CharField(_('name'), max_length=64)
 	todo = models.BooleanField(_('todo'))
-	items_to_buy = models.ManyToManyField(StockItem, verbose_name=_('items to buy'), related_name="shopping_lists")
+	comment = models.TextField(_('comment'), null=True, blank=True)
 	stock_owner = models.ForeignKey(Stock, null=True, related_name="shopping_lists")
 
 	def __str__(self):
-		return "%s (%s)" % (self.name, self.effective_quantity)
+		return "%s (%s)" % (self.name, self.date)
 
 	def get_absolute_url(self):
 		return reverse('stock:shoppinglist_list')
 
 	def can_be_viewed_by(self, user):
 		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+
+
+class ShoppingListItem(models.Model):
+	"""
+	"""
+	shopping_lists = models.ManyToManyField(ShoppingList, verbose_name=_('shopping lists'), related_name="shopping_items_to_buy")
+	stockitem_owner = models.ForeignKey(StockItem, related_name="shopping_item", null=True)
+	name = models.CharField(_('name'), max_length=64)
+	type = models.ForeignKey(ProductType, related_name="shoppinglist_items", verbose_name=_("type"), null=True, blank=True,
+		on_delete=models.SET_NULL)
+	tobuy_quantity = models.IntegerField(_('quantity to buy'), default=6, help_text="quantity to buy during the next shopping session")
+	bought_quantity = models.IntegerField(_('quantity bought'), default=0, help_text="quantity bought during the last shopping session")
+
+	def __str__(self):
+		return "%s - %s" % (self.name, self.shopping_lists.first())
+
+	def can_be_viewed_by(self, user):
+		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+
+	def get_absolute_url(self):
+		return reverse('stock:shoppinglist_list')
+		

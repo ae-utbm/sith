@@ -1,16 +1,21 @@
+from collections import OrderedDict
+from datetime import datetime, timedelta
+
+from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin
+from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin, BaseFormView
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.forms.models import modelform_factory
 from django.core.urlresolvers import reverse_lazy, reverse
+from django.db import transaction, DataError
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from counter.views import CounterAdminTabsMixin, CounterTabsMixin
 from counter.models import Counter, ProductType
-from stock.models import Stock, StockItem, ShoppingList
+from stock.models import Stock, StockItem, ShoppingList, ShoppingListItem
 
 
 class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):
@@ -76,7 +81,7 @@ class StockItemEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
 	An edit view for a stock item
 	"""
 	model = StockItem
-	form_class = modelform_factory(StockItem, fields=['name', 'unit_quantity', 'effective_quantity', 'type', 'stock_owner'])
+	form_class = modelform_factory(StockItem, fields=['name', 'unit_quantity', 'effective_quantity', 'minimal_quantity', 'type', 'stock_owner'])
 	pk_url_kwarg = "item_id"
 	template_name = 'core/edit.jinja'
 	current_tab = "stocks"
@@ -104,7 +109,7 @@ class StockItemCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
 	A create view for a new StockItem
 	"""	
 	model = StockItem
-	form_class = modelform_factory(StockItem, fields=['name', 'unit_quantity', 'effective_quantity', 'type', 'stock_owner'])
+	form_class = modelform_factory(StockItem, fields=['name', 'unit_quantity', 'effective_quantity', 'minimal_quantity', 'type', 'stock_owner'])
 	template_name = 'core/create.jinja'
 	pk_url_kwarg = "stock_id"
 	current_tab = "stocks"
@@ -144,13 +149,21 @@ class StockItemQuantityForm(forms.BaseForm):
 			shopping_list.stock_owner = self.stock
 			shopping_list.save()
 			for k,t in self.cleaned_data.items():
-				if int(t) > 0 :
-					item_id = int(k[5:])
-					item = StockItem.objects.filter(id=item_id).first()
-					item.tobuy_quantity = t
-					item.shopping_lists.add(shopping_list)
-					item.save()
-
+				if k == 'name':
+					shopping_list.name = t
+					shopping_list.save()
+				elif k == "comment":
+					shopping_list.comment = t
+					shopping_list.save()
+				else:
+					if t > 0 :
+						item_id = int(k[5:])
+						item = StockItem.objects.filter(id=item_id).first()
+						shoppinglist_item = ShoppingListItem(stockitem_owner=item, name=item.name, type=item.type, tobuy_quantity=t)
+						shoppinglist_item.save()
+						shoppinglist_item.shopping_lists.add(shopping_list)
+						shoppinglist_item.save()
+						
 		return self.cleaned_data
 
 class StockItemQuantityBaseFormView(CounterAdminTabsMixin, CanEditMixin, DetailView, BaseFormView):
@@ -165,13 +178,15 @@ class StockItemQuantityBaseFormView(CounterAdminTabsMixin, CanEditMixin, DetailV
 	def get_form_class(self):
 		fields = OrderedDict()
 		kwargs = {}
+		fields['name'] = forms.CharField(max_length=30, required=True, label='Shopping list name')
 		for t in ProductType.objects.order_by('name').all():
 			for i in self.stock.items.filter(type=t).order_by('name').all():
 				if i.effective_quantity <= i.minimal_quantity:	            
 					field_name = "item-%s" % (str(i.id))
-					fields[field_name] = forms.CharField(max_length=30, required=True, label=str(i),
+					fields[field_name] = forms.IntegerField(required=True, label=str(i),
 								help_text=str(i.effective_quantity)+" left")
-					kwargs[field_name] = i.effective_quantity
+		fields['comment'] = forms.CharField(widget=forms.Textarea(), required=False,
+				initial="Add here, items to buy that are not reference as a product (example : sponge, knife, mugs ...)")				
 		kwargs['stock_id'] = self.stock.id
 		kwargs['base_fields'] = fields
 		return type('StockItemQuantityForm', (StockItemQuantityForm,), kwargs)
@@ -272,11 +287,18 @@ class StockUpdateAfterShopppingForm(forms.BaseForm):
 		with transaction.atomic():
 			self.shoppinglist = ShoppingList.objects.filter(id=self.shoppinglist_id).first()
 			for k,t in self.cleaned_data.items():
-				item_id = int(k[5:])
+				shoppinglist_item_id = int(k[5:])
+				#item_id = int(k[5:])
 				if int(t) > 0 :
-					item = StockItem.objects.filter(id=item_id).first()
-					item.effective_quantity += int(t)
-					item.save()
+					shoppinglist_item = ShoppingListItem.objects.filter(id=shoppinglist_item_id).first()
+					shoppinglist_item.bought_quantity = int(t)
+					shoppinglist_item.save()
+					shoppinglist_item.stockitem_owner.effective_quantity += int(t)
+					shoppinglist_item.stockitem_owner.save()
+					#item = StockItem.objects.filter(id=item_id).first()
+					#item.bought_quantity = int(t)
+					#item.effective_quantity += int(t)
+					#item.save()
 			self.shoppinglist.todo = False
 			self.shoppinglist.save()
 		return self.cleaned_data
@@ -294,7 +316,7 @@ class StockUpdateAfterShopppingBaseFormView(CounterAdminTabsMixin, CanEditMixin,
 		fields = OrderedDict()
 		kwargs = {}
 		for t in ProductType.objects.order_by('name').all():
-			for i in self.shoppinglist.items_to_buy.filter(type=t).order_by('name').all():
+			for i in self.shoppinglist.shopping_items_to_buy.filter(type=t).order_by('name').all():
 				field_name = "item-%s" % (str(i.id))
 				fields[field_name] = forms.CharField(max_length=30, required=True, label=str(i),
 						help_text=str(i.tobuy_quantity) + " asked")
@@ -341,9 +363,9 @@ class StockTakeItemsForm(forms.BaseForm):
 		with transaction.atomic():
 			for k,t in self.cleaned_data.items():
 				item_id = int(k[5:])
-				if int(t) > 0 :
+				if t > 0 :
 					item = StockItem.objects.filter(id=item_id).first()
-					item.effective_quantity -= int(t)
+					item.effective_quantity -= t
 					item.save()
 		return self.cleaned_data			
 
@@ -363,7 +385,7 @@ class StockTakeItemsBaseFormView(CounterTabsMixin, CanEditMixin, DetailView, Bas
 		for t in ProductType.objects.order_by('name').all():
 			for i in self.stock.items.filter(type=t).order_by('name').all():
 				field_name = "item-%s" % (str(i.id))
-				fields[field_name] = forms.CharField(max_length=30, required=True, label=str(i))
+				fields[field_name] = forms.IntegerField(required=False, label=str(i), help_text="("+ str(i.effective_quantity) + " left)")
 				kwargs[field_name] = i.effective_quantity
 		kwargs['stock_id'] = self.stock.id
 		kwargs['counter_id'] = self.stock.counter.id

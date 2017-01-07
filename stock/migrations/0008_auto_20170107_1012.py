@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('stock', '0013_auto_20161228_1006'),
+        ('stock', '0007_shoppinglistitem_type'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='shoppinglist',
-            name='stock_owner',
-            field=models.ForeignKey(related_name='shopping_lists', null=True, to='stock.Stock'),
+            model_name='shoppinglistitem',
+            name='stockitem_owner',
+            field=models.ForeignKey(related_name='shopping_item', to='stock.StockItem', null=True),
         ),
     ]
