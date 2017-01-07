@@ -14,9 +14,14 @@ class Command(BaseCommand):
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         try:
             os.mkdir(os.path.join(root_path)+'/data')
+            print("Data dir created")
         except Exception as e:
-            print(e)
-        call_command('flush')
+            repr(e)
+        try:
+            os.remove(os.path.join(root_path, 'db.sqlite3'))
+            print("db.sqlite3 deleted")
+        except Exception as e:
+            repr(e)
         call_command('migrate')
         if options['prod']:
             call_command('populate', '--prod')
