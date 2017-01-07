@@ -147,6 +147,34 @@ class TabedViewMixin(View):
         kwargs['list_of_tabs'] = self.get_list_of_tabs()
         return kwargs
 
+class QuickNotifMixin():
+    quick_notif_list = []
+    def get_success_url(self):
+        ret = super(QuickNotifMixin, self).get_success_url()
+        try:
+            if '?' in ret:
+                ret += '&' + self.quick_notif_url_arg
+            else:
+                ret += '?' + self.quick_notif_url_arg
+        except: pass
+        return ret
+
+    def get_context_data(self, **kwargs):
+        """Add quick notifications to context"""
+        kwargs = super(QuickNotifMixin, self).get_context_data(**kwargs)
+        kwargs['quick_notifs'] = []
+        print(self.quick_notif_list)
+        for n in self.quick_notif_list:
+            kwargs['quick_notifs'].append(settings.SITH_QUICK_NOTIF[n])
+        self.quick_notif_list = [] # In some cases, the class can stay instanciated, so we need to reset the list
+        for k,v in settings.SITH_QUICK_NOTIF.items():
+            for gk in self.request.GET.keys():
+                if k == gk:
+                    kwargs['quick_notifs'].append(v)
+        print(self.quick_notif_list)
+        return kwargs
+
+
 from .user import *
 from .page import *
 from .files import *

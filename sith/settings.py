@@ -466,6 +466,13 @@ SITH_NOTIFICATIONS = [
         ('GENERIC', _("You have a notification")),
         ]
 
+SITH_QUICK_NOTIF = {
+        'qn_success': _("Success!"),
+        'qn_fail': _("Fail!"),
+        'qn_weekmail_new_article': _("You successfully posted an article in the Weekmail"),
+        'qn_weekmail_article_edit': _("You successfully edited an article in the Weekmail"),
+        }
+
 try:
     from .settings_custom import *
     print("Custom settings imported")

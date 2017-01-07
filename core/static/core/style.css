@@ -122,6 +122,15 @@ nav a:hover {
 }
 
 /*--------------------------------CONTENT------------------------------*/
+#quick_notif {
+    width: 90%;
+    margin: 0px auto;
+    list-style-type: none;
+    background: lightblue;
+}
+#quick_notif li {
+    padding: 10px;
+}
 #content {
     width: 88%;
     margin: 0px auto;
