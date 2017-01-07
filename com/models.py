@@ -96,14 +96,10 @@ class Weekmail(models.Model):
             Weekmail().save()
 
 class WeekmailArticle(models.Model):
-    weekmail = models.ForeignKey(Weekmail, related_name="articles", verbose_name=_("weekmail"))
+    weekmail = models.ForeignKey(Weekmail, related_name="articles", verbose_name=_("weekmail"), null=True)
     title = models.CharField(_("title"), max_length=64)
     content = models.TextField(_("content"))
     author = models.ForeignKey(User, related_name="owned_weekmail_articles", verbose_name=_("author"))
     club = models.ForeignKey(Club, related_name="weekmail_articles", verbose_name=_("club"))
     rank = models.IntegerField(_('rank'), default=-1)
 
-    def clean(self):
-        super(WeekmailArticle, self).clean()
-        if not self.weekmail:
-            self.weekmail = Weekmail.objects.order_by('-id').first()
