@@ -27,10 +27,10 @@ class StockItem(models.Model):
 	The StockItem class, element of the stock
 	"""
 	name = models.CharField(_('name'), max_length=64)
-	unit_quantity = models.IntegerField(_('unit quantity'), default=0, help_text='number of element in one box')
-	effective_quantity = models.IntegerField(_('effective quantity'), default=0, help_text='number of box')
+	unit_quantity = models.IntegerField(_('unit quantity'), default=0, help_text=_('number of element in one box'))
+	effective_quantity = models.IntegerField(_('effective quantity'), default=0, help_text=_('number of box'))
 	minimal_quantity = models.IntegerField(_('minimal quantity'), default=1, 
-		help_text='if the effective quantity is less than the minimal, item is added to the shopping list')
+		help_text=_('if the effective quantity is less than the minimal, item is added to the shopping list'))
 	type = models.ForeignKey(ProductType, related_name="stock_items", verbose_name=_("type"), null=True, blank=True,
 		on_delete=models.SET_NULL)
 	stock_owner = models.ForeignKey(Stock, related_name="items")
@@ -67,13 +67,13 @@ class ShoppingList(models.Model):
 class ShoppingListItem(models.Model):
 	"""
 	"""
-	shopping_lists = models.ManyToManyField(ShoppingList, verbose_name=_('shopping lists'), related_name="shopping_items_to_buy")
+	shopping_lists = models.ManyToManyField(ShoppingList, verbose_name=_("shopping lists"), related_name="shopping_items_to_buy")
 	stockitem_owner = models.ForeignKey(StockItem, related_name="shopping_item", null=True)
 	name = models.CharField(_('name'), max_length=64)
 	type = models.ForeignKey(ProductType, related_name="shoppinglist_items", verbose_name=_("type"), null=True, blank=True,
 		on_delete=models.SET_NULL)
-	tobuy_quantity = models.IntegerField(_('quantity to buy'), default=6, help_text="quantity to buy during the next shopping session")
-	bought_quantity = models.IntegerField(_('quantity bought'), default=0, help_text="quantity bought during the last shopping session")
+	tobuy_quantity = models.IntegerField(_('quantity to buy'), default=6, help_text=_("quantity to buy during the next shopping session"))
+	bought_quantity = models.IntegerField(_('quantity bought'), default=0, help_text=_("quantity bought during the last shopping session"))
 
 	def __str__(self):
 		return "%s - %s" % (self.name, self.shopping_lists.first())
