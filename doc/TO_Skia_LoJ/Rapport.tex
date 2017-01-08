@@ -1,0 +1,218 @@
+%%
+%
+% Skia
+% skia@libskia.so
+%
+%%
+
+\documentclass[a4paper]{report}
+
+%packages
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage{graphicx}\graphicspath{{pix/}}
+\usepackage{float}
+\usepackage{scrextend}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage{fancyhdr}
+%Options: Sonny, Lenny, Glenn, Conny, Rejne, Bjarne, Bjornstrup
+\usepackage[Bjornstrup]{fncychap}
+\usepackage{minted}
+\usepackage[colorlinks=true,linkcolor=black]{hyperref}
+\usepackage{pdfpages}
+%\usepackage{titlesec, blindtext, color}
+
+%pdf metadata
+\hypersetup{
+    unicode=true,
+    colorlinks=true,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black,
+    pdfauthor={Skia <skia@libskia.so>},
+    pdftitle={},
+    pdfcreator={pdftex},
+    pdfsubject={},
+    pdfkeywords={},
+}
+
+
+\definecolor{keywords}{RGB}{200,0,90}
+\definecolor{comments}{RGB}{50,50,253}
+\definecolor{red}{RGB}{160,0,0}
+\definecolor{brown}{RGB}{160,100,100}
+\definecolor{green}{RGB}{0,200,0}
+\definecolor{darkgreen}{RGB}{0,130,0}
+\definecolor{gray}{RGB}{100,100,100}
+
+
+%inner meta
+\title{Sith: Détail de quelques applications}
+\author{Skia (Florent JACQUET)\\
+Lo-J (Guillaume Renaud)}
+\date{Dernière version: \today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Introduction}
+
+\chapter{Eboutic}
+\label{sec:eboutic}
+\par Développeur principal: Skia
+
+\section{But}
+\label{sub:but}
+\par Fournir une boutique en ligne, avec paiement sécurisé, compatible avec l'API de paiement du Crédit Agricole.
+\begin{itemize}
+    \item Gérer les cotisations
+    \item Gérer les rechargements de compte AE
+    \item Gérer différents groupes de vente
+\end{itemize}
+
+\section{Principaux problèmes}
+\label{sec:principaux_problemes}
+
+\subsection{Interaction avec l'API}
+\label{sub:interaction_avec_l_api}
+
+\subsection{Accès concurrentiels}
+\label{sub:acces_concurrentiels}
+
+
+
+\chapter{Le SAS}
+\label{sec:le_sas}
+\par Développeur principal: Skia
+
+\section{But}
+\label{sub:but}
+\par Fournir un système de galerie de photo:
+\begin{itemize}
+    \item Upload en ligne via un formulaire pour tous les cotisants.
+    \item Modération pour l'équipe du SAS.
+    \item Système d'identification des membres pour retrouver rapidement ses photos.
+    \item Affichage des photos dans les différents album et sur la page "photo" du profil d'un utilisateur.
+\end{itemize}
+
+\section{Principaux problèmes}
+\label{sec:principaux_problemes}
+
+\subsection{Gestion des fichiers}
+\label{sub:gestion_des_fichiers}
+
+\subsection{Optimisation des pages}
+\label{sub:optimisation_des_pages}
+
+
+\chapter{Les élections}
+\label{sec:les_elections}
+\par Développeur principal: Sli
+
+\section{But}
+\label{sub:but}
+\par Fournir un système d'élections:
+\begin{itemize}
+    \item Gestion des différentes élections comprenants à chaque fois une liste de postes pour lesquels les gens
+        candidatent, ainsi qu'une gestion des listes, pour pouvoir classifier et répartir les candidatures.
+    \item Gestion d'une page de vote, permettant aux gens autorisés de pouvoir voter.
+    \item Affichage des résultats une fois le vote terminé.
+    \item Pas compatible avec la législation française: trop contraignant et pas utile, puisque validation officiel en
+        AG.
+\end{itemize}
+
+\section{Principaux problèmes}
+\label{sec:principaux_problemes}
+
+\subsection{Automatisation d'un widget particulier pour les formulaires}
+\label{sub:automatisation_d_un_widget_particulier_pour_les_formulaires}
+
+\subsection{Revue du code d'un autre développeur}
+\label{sub:revue_du_code_d_un_autre_developpeur}
+
+
+\chapter{Les stocks}
+\label{sub:les_stocks}
+\par Développeur principal: Lo-J
+
+\section{But}
+\label{sec:but}
+
+\section{Principaux problèmes}
+\label{sec:principaux_problemes}
+
+
+\chapter{La laverie}
+\label{sec:la_laverie}
+\par Développeur principal: Skia
+
+\section{But}
+\label{sub:but}
+\par Cette application doit fournir un système de gestion de laverie. Cela comprend:
+\begin{itemize}
+    \item Un système de planning et de réservation de créneaux
+    \item Un système de vente de jetons de laverie, lié aux comptoirs et au compte AE, permettant aux permanenciers de
+        cliquer les jetons en même temps qu'ils vérifient l'état de la cotisation.
+    \item Un système d'inventaire, pour gérer les différentes machines dans les différents lieux, et gérer également le
+        retour des jetons après utilisation.
+\end{itemize}
+
+\section{Principaux problèmes}
+\label{sec:principaux_problemes}
+
+\subsection{Génération de plannings}
+\label{sub:generation_de_plannings}
+
+\subsection{Gestion des timezones}
+\label{sub:gestion_des_timezones}
+
+
+\chapter{La communication}
+\label{sec:la_communication}
+\par Développeur principal: Skia
+
+\section{But}
+\label{sub:but}
+\par Cette application a plusieurs but:
+\begin{itemize}
+    \item Donner la possibilité au responsable communication d'éditer les différents textes, messages, et pages
+        statiques du site.
+    \item Fournir un système de news.
+    \item Fournir un système de newsletter: le Weekmail.
+\end{itemize}
+
+\section{Principaux problèmes}
+\label{sec:principaux_problemes}
+
+\subsection{Envoie de mails}
+\label{sub:envoie_de_mails}
+
+\subsection{Amélioration de l'outil de recherche}
+\label{sub:amelioration_de_l_outil_de_recherche}
+
+
+\chapter{Conclusions personnelles}
+\section{Skia}
+\label{sec:skia}
+\par Développer de nouvelles application m'a permis d'apréhender d'autres problématiques, comme la gestion des fichiers
+dans le SAS, ou bien des contraintes de concurrence et d'atomicité sur l'Eboutic.
+
+\par Mais la plus grosse partie de mon travail ce semestre a surtout été de superviser une équipe de développement
+naissante, de relire les "Merge request", et de m'assurer de la cohérence du code des contributeurs avec le reste du
+projet.
+
+\par J'ai églament pu approfondir mon utilisation de Gitlab à travers ses outils de gestion de projet, de revue de code,
+et de gestion des permissions sur les différentes branches.
+
+\section{Lo-J}
+\label{sec:lo_j}
+
+
+
+\end{document}
+
