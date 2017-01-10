@@ -85,6 +85,7 @@ class SASMainView(FormView):
     def get_context_data(self, **kwargs):
         kwargs = super(SASMainView, self).get_context_data(**kwargs)
         kwargs['root_file'] = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
+        kwargs['latest'] = SithFile.objects.filter(is_in_sas=True, is_folder=True, is_moderated=True).order_by('-id')[:5]
         return kwargs
 
 class PictureView(CanViewMixin, DetailView, FormMixin):

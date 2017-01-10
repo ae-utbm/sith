@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-05 15:45+0100\n"
+"POT-Creation-Date: 2017-01-10 23:29+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -325,11 +325,11 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:29
 #: counter/templates/counter/last_ops.jinja:59
 #: election/templates/election/election_detail.jinja:280
-#: election/templates/election/election_detail.jinja:327
+#: election/templates/election/election_detail.jinja:329
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:154 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:66
-#: sas/templates/sas/picture.jinja.py:116
+#: sas/templates/sas/picture.jinja:116
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -355,15 +355,16 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/club_account_details.jinja:55
 #: accounting/templates/accounting/journal_details.jinja:82 club/views.py:55
 #: com/templates/com/news_admin_list.jinja:39
-#: com/templates/com/news_admin_list.jinja:71 core/templates/core/file.jinja:38
-#: core/templates/core/page.jinja:31 core/templates/core/user_tools.jinja:38
-#: core/views/user.py:152 counter/templates/counter/cash_summary_list.jinja:53
+#: com/templates/com/news_admin_list.jinja:71
+#: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
+#: core/templates/core/user_tools.jinja:38 core/views/user.py:152
+#: counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:32
 #: counter/templates/counter/counter_list.jinja:47
 #: election/templates/election/election_detail.jinja:279
-#: election/templates/election/election_detail.jinja:324
-#: election/templates/election/election_detail.jinja:370
+#: election/templates/election/election_detail.jinja:326
+#: election/templates/election/election_detail.jinja:374
 #: launderette/templates/launderette/launderette_list.jinja:16
 #: sas/templates/sas/album.jinja:18 sas/templates/sas/picture.jinja:92
 msgid "Edit"
@@ -468,8 +469,8 @@ msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:54
 #: com/templates/com/news_admin_list.jinja:38
-#: com/templates/com/news_admin_list.jinja:70 core/templates/core/file.jinja:36
-#: core/templates/core/page.jinja:28
+#: com/templates/com/news_admin_list.jinja:70
+#: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
 
@@ -797,19 +798,19 @@ msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
 #: club/models.py:144 counter/models.py:397 counter/models.py:414
-#: eboutic/models.py:14 eboutic/models.py:47 election/models.py:126
+#: eboutic/models.py:14 eboutic/models.py:47 election/models.py:130
 #: launderette/models.py:87 launderette/models.py:124 sas/models.py:131
 msgid "user"
 msgstr "nom d'utilisateur"
 
-#: club/models.py:148 core/models.py:137 election/models.py:125
-#: election/models.py:141
+#: club/models.py:148 core/models.py:137 election/models.py:129
+#: election/models.py:145
 msgid "role"
 msgstr "rôle"
 
 #: club/models.py:150 core/models.py:33 counter/models.py:71
 #: counter/models.py:96 election/models.py:15 election/models.py:82
-#: election/models.py:127
+#: election/models.py:131
 msgid "description"
 msgstr "description"
 
@@ -825,7 +826,8 @@ msgstr "L'utilisateur est déjà membre de ce club"
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4
+#: club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -887,13 +889,14 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:60 club/views.py:221
-#: counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:60
+#: club/views.py:221 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja:9 club/templates/club/stats.jinja:19
+#: club/templates/club/club_sellings.jinja:9
+#: club/templates/club/stats.jinja:19
 #: counter/templates/counter/cash_summary_list.jinja:15
 msgid "Show"
 msgstr "Montrer"
@@ -1012,7 +1015,7 @@ msgstr "Propriétés"
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
-#: club/views.py:154 sas/views.py:82 sas/views.py:132 sas/views.py:201
+#: club/views.py:154 sas/views.py:82 sas/views.py:133 sas/views.py:202
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
@@ -1020,7 +1023,8 @@ msgstr "Vous n'avez pas la permission de faire cela"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:170 com/views.py:81 counter/views.py:933 election/views.py:131
+#: club/views.py:170 com/views.py:81 counter/views.py:933
+#: election/views.py:131
 msgid "End date"
 msgstr "Date de fin"
 
@@ -1058,7 +1062,7 @@ msgid "Call"
 msgstr "Appel"
 
 #: com/models.py:30 election/models.py:14 election/models.py:81
-#: election/models.py:114
+#: election/models.py:118
 msgid "title"
 msgstr "titre"
 
@@ -1104,8 +1108,9 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
-#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
-#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:28
+#: com/templates/com/news_detail.jinja:5
+#: com/templates/com/news_detail.jinja:11 com/templates/com/news_list.jinja:4
+#: com/templates/com/news_list.jinja:28
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1674,7 +1679,7 @@ msgid "Wiki"
 msgstr "Wiki"
 
 #: core/templates/core/base.jinja:93 sas/templates/sas/album.jinja:4
-#: sas/templates/sas/main.jinja:4 sas/templates/sas/main.jinja.py:8
+#: sas/templates/sas/main.jinja:4 sas/templates/sas/main.jinja.py:32
 #: sas/templates/sas/picture.jinja:26
 msgid "SAS"
 msgstr "SAS"
@@ -1891,11 +1896,13 @@ msgstr "login"
 msgid "Lost password?"
 msgstr "Mot de passe perdu ?"
 
-#: core/templates/core/macros.jinja:27 core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:27
+#: core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:31 core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:31
+#: core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -2512,15 +2519,6 @@ msgstr "type du produit"
 msgid "purchase price"
 msgstr "prix d'achat"
 
-msgid "Purchase price"
-msgstr "Prix d'achat"
-
-msgid "Selling price"
-msgstr "Prix de vente"
-
-msgid "Benefit"
-msgstr "Bénéfice"
-
 #: counter/models.py:101
 msgid "selling price"
 msgstr "prix de vente"
@@ -2927,21 +2925,17 @@ msgid "Percentage"
 msgstr "Pourcentage"
 
 #: counter/templates/counter/stats.jinja:47
-#, fuzzy, python-format
-#| msgid "Top 100 %(counter_name)s"
 msgid "Top 100 barman %(counter_name)s"
-msgstr "Top 100 %(counter_name)s"
+msgstr "Top 100 barman %(counter_name)s"
 
 #: counter/templates/counter/stats.jinja:53
 #: counter/templates/counter/stats.jinja:78
 msgid "Time"
-msgstr ""
+msgstr "Temps"
 
 #: counter/templates/counter/stats.jinja:72
-#, fuzzy, python-format
-#| msgid "Top 100 %(counter_name)s"
 msgid "Top 100 barman %(counter_name)s (all semesters)"
-msgstr "Top 100 %(counter_name)s"
+msgstr "Top 100 barman %(counter_name)s (tous les semestres)"
 
 #: counter/views.py:55
 msgid "User not found"
@@ -3144,7 +3138,7 @@ msgstr "groupe de vote"
 msgid "candidature groups"
 msgstr "groupe de candidature"
 
-#: election/models.py:80 election/models.py:115
+#: election/models.py:80 election/models.py:119
 msgid "election"
 msgstr "élection"
 
@@ -3152,17 +3146,17 @@ msgstr "élection"
 msgid "max choice"
 msgstr "nombre de choix maxi"
 
-#: election/models.py:128
+#: election/models.py:132
 msgid "election list"
 msgstr "liste électorale"
 
-#: election/models.py:142
+#: election/models.py:146
 msgid "candidature"
 msgstr "candidature"
 
 #: election/templates/election/candidate_form.jinja:4
 #: election/templates/election/candidate_form.jinja:13
-#: election/templates/election/election_detail.jinja:363
+#: election/templates/election/election_detail.jinja:365
 msgid "Candidate"
 msgstr "Candidater"
 
@@ -3220,24 +3214,24 @@ msgid "Choose blank vote"
 msgstr "Choisir de voter blanc"
 
 #: election/templates/election/election_detail.jinja:304
-#: election/templates/election/election_detail.jinja:342
+#: election/templates/election/election_detail.jinja:344
 msgid "votes"
 msgstr "votes"
 
-#: election/templates/election/election_detail.jinja:335
+#: election/templates/election/election_detail.jinja:337
 #: launderette/templates/launderette/launderette_book.jinja:12
 msgid "Choose"
 msgstr "Choisir"
 
-#: election/templates/election/election_detail.jinja:358
+#: election/templates/election/election_detail.jinja:360
 msgid "Submit the vote !"
 msgstr "Envoyer le vote !"
 
-#: election/templates/election/election_detail.jinja:365
+#: election/templates/election/election_detail.jinja:368
 msgid "Add a new list"
 msgstr "Ajouter une nouvelle liste"
 
-#: election/templates/election/election_detail.jinja:368
+#: election/templates/election/election_detail.jinja:372
 msgid "Add a new role"
 msgstr "Ajouter un nouveau rôle"
 
@@ -3415,8 +3409,8 @@ msgid "picture"
 msgstr "photo"
 
 #: sas/templates/sas/album.jinja:52 sas/templates/sas/album.jinja.py:54
-#: sas/templates/sas/main.jinja:17 sas/templates/sas/main.jinja.py:19
-#: sas/templates/sas/main.jinja:21
+#: sas/templates/sas/main.jinja:13 sas/templates/sas/main.jinja.py:15
+#: sas/templates/sas/main.jinja:17
 msgid "preview"
 msgstr "miniature"
 
@@ -3424,7 +3418,15 @@ msgstr "miniature"
 msgid "Upload"
 msgstr "Envoyer"
 
+#: sas/templates/sas/main.jinja:34
+msgid "Latest albums"
+msgstr "Derniers albums"
+
 #: sas/templates/sas/main.jinja:41
+msgid "All categories"
+msgstr "Toutes les catégories"
+
+#: sas/templates/sas/main.jinja:53
 msgid "Create"
 msgstr "Créer"
 
@@ -3477,7 +3479,7 @@ msgstr "Erreur de création de l'album %(album)s : %(msg)s"
 msgid "Add user"
 msgstr "Ajouter une personne"
 
-#: sas/views.py:256
+#: sas/views.py:257
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
@@ -3715,3 +3717,4 @@ msgstr "Un utilisateur avec cette adresse email existe déjà"
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, soit en créer un proprement"
+
