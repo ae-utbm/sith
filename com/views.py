@@ -232,12 +232,10 @@ class WeekmailEditView(QuickNotifMixin, UpdateView):
         if not weekmail.title:
             now = timezone.now()
             weekmail.title = _("Weekmail of the ") + (now + timedelta(days=6 - now.weekday())).strftime('%d/%m/%Y')
-        print(self.quick_notif_list)
         return weekmail
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        print(self.quick_notif_list)
         if 'up_article' in request.GET.keys():
             art = get_object_or_404(WeekmailArticle, id=request.GET['up_article'], weekmail=self.object)
             prev_art = self.object.articles.order_by('rank').filter(rank__lt=art.rank).last()
@@ -267,7 +265,6 @@ class WeekmailEditView(QuickNotifMixin, UpdateView):
             art.rank = -1
             art.save()
             self.quick_notif_list += ['qn_success']
-        print(self.quick_notif_list)
         return super(WeekmailEditView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
