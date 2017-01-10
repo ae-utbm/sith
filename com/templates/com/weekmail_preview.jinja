@@ -1,0 +1,13 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+
+{% block title %}
+{{ weekmail.title }}
+{% endblock %}
+
+{% block content %}
+{{ weekmail_rendered|safe }}
+{% endblock %}
+
+
+

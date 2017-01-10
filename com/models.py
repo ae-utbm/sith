@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse_lazy, reverse
@@ -86,14 +87,21 @@ class Weekmail(models.Model):
             print("Sending weekmail n°" + str(self.id))
             email = EmailMessage(
                     subject=self.title,
-                    body="\n\n".join([self.intro, self.joke, self.protip, self.conclusion]),
+                    body=self.render(),
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[],
+                    to=['skia@git.an'],
                     bcc=Sith.objects.first().weekmail_destinations.split(' '),
+                    # TODO: Content-Type: text/html
                     )
+            email.send()
             self.sent = True
             self.save()
             Weekmail().save()
+
+    def render(self):
+        return render(None, "com/weekmail_renderer.jinja", context={
+            'weekmail': self,
+            }).content.decode('utf-8')
 
 class WeekmailArticle(models.Model):
     weekmail = models.ForeignKey(Weekmail, related_name="articles", verbose_name=_("weekmail"), null=True)

@@ -1,0 +1,34 @@
+<h2>{{ weekmail.title }}</h2>
+
+{% if weekmail.intro %}
+<h3>{% trans %}Intro{% endtrans %}</h3>
+{{ weekmail.intro|markdown }}
+{% endif %}
+
+<h3>{% trans %}Table of content{% endtrans %}</h3>
+<ul>
+    {% for a in weekmail.articles.all() %}
+    <li>[{{ a.club }}] {{ a.title }}</li>
+    {% endfor %}
+</ul>
+
+{% for a in weekmail.articles.all() %}
+<h3>[{{ a.club }}] {{ a.title }}</h3>
+{{ a.content|markdown }}
+{% endfor %}
+
+{% if weekmail.joke %}
+<h3>{% trans %}Joke{% endtrans %}</h3>
+{{ weekmail.joke|markdown }}
+{% endif %}
+
+{% if weekmail.protip %}
+<h3>{% trans %}Pro tip{% endtrans %}</h3>
+{{ weekmail.protip|markdown }}
+{% endif %}
+
+{% if weekmail.conclusion %}
+<h3>{% trans %}Final word{% endtrans %}</h3>
+{{ weekmail.conclusion|markdown }}
+{% endif %}
+

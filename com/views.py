@@ -221,6 +221,20 @@ class NewsDetailView(CanViewMixin, DetailView):
 
 # Weekmail
 
+class WeekmailPreviewView(DetailView):
+    model = Weekmail
+    template_name = 'com/weekmail_preview.jinja'
+    success_url = reverse_lazy('com:weekmail')
+
+    def get_object(self, queryset=None):
+        return self.model.objects.filter(sent=False).order_by('-id').first()
+
+    def get_context_data(self, **kwargs):
+        """Add rendered weekmail"""
+        kwargs = super(WeekmailPreviewView, self).get_context_data(**kwargs)
+        kwargs['weekmail_rendered'] = self.object.render()
+        return kwargs
+
 class WeekmailEditView(QuickNotifMixin, UpdateView):
     model = Weekmail
     template_name = 'com/weekmail.jinja'
@@ -232,6 +246,7 @@ class WeekmailEditView(QuickNotifMixin, UpdateView):
         if not weekmail.title:
             now = timezone.now()
             weekmail.title = _("Weekmail of the ") + (now + timedelta(days=6 - now.weekday())).strftime('%d/%m/%Y')
+            weekmail.save()
         return weekmail
 
     def get(self, request, *args, **kwargs):
@@ -264,6 +279,9 @@ class WeekmailEditView(QuickNotifMixin, UpdateView):
             art.weekmail = None
             art.rank = -1
             art.save()
+            self.quick_notif_list += ['qn_success']
+        if 'send' in request.GET.keys():
+            self.object.send()
             self.quick_notif_list += ['qn_success']
         return super(WeekmailEditView, self).get(request, *args, **kwargs)
 
