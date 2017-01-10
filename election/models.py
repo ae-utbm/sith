@@ -85,18 +85,22 @@ class Role(models.Model):
     def results(self, total_vote):
         results = {}
         total_vote *= self.max_choice
-        if total_vote == 0:
-            return None
         non_blank = 0
         for candidature in self.candidatures.all():
             cand_results = {}
             cand_results['vote'] = self.votes.filter(candidature=candidature).count()
-            cand_results['percent'] = cand_results['vote'] * 100 / total_vote
+            if total_vote == 0:
+                cand_results['percent'] = 0
+            else:
+                cand_results['percent'] = cand_results['vote'] * 100 / total_vote
             non_blank += cand_results['vote']
             results[candidature.user.username] = cand_results
         results['total vote'] = total_vote
-        results['blank vote'] = {'vote': total_vote - non_blank,
-                                 'percent': (total_vote - non_blank) * 100 / total_vote}
+        if total_vote == 0:
+            results['blank vote'] = {'vote': 0, 'percent': 0}
+        else:
+            results['blank vote'] = {'vote': total_vote - non_blank,
+                                     'percent': (total_vote - non_blank) * 100 / total_vote}
         return results
 
     @property

@@ -472,7 +472,7 @@ class CandidatureDeleteView(CanEditMixin, DeleteView):
     def dispatch(self, request, *arg, **kwargs):
         self.object = self.get_object()
         self.election = self.object.role.election
-        if not self.election.can_candidate:
+        if not self.election.can_candidate or not self.election.is_vote_editable:
             raise PermissionDenied
         return super(CandidatureDeleteView, self).dispatch(request, *arg, **kwargs)
 
