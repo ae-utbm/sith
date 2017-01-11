@@ -17,7 +17,7 @@ from django.utils import timezone
 from datetime import timedelta, datetime, date
 import logging
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, QuickNotifMixin
 from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm, UserGodfathersForm
 from core.models import User, SithFile, Preferences
 from club.models import Club
@@ -415,7 +415,7 @@ class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     context_object_name = "profile"
     current_tab = "groups"
 
-class UserToolsView(UserTabsMixin, TemplateView):
+class UserToolsView(QuickNotifMixin, UserTabsMixin, TemplateView):
     """
     Displays the logged user's tools
     """

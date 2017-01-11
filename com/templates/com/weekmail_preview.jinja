@@ -6,6 +6,18 @@
 {% endblock %}
 
 {% block content %}
+<a href="{{ url('com:weekmail') }}">{% trans %}Back{% endtrans %}</a>
+{% if request.GET['send'] %}
+<p>{% trans %}Are you sure you want to send this weekmail?{% endtrans %}</p>
+{% if request.LANGUAGE_CODE != settings.LANGUAGE_CODE[:2] %}
+<p><strong>{% trans %}Warning: you are sending the weekmail in another language than the default one!{% endtrans %}</strong></p>
+{% endif %}
+<form method="post" action="">
+    {% csrf_token %}
+    <button type="submit" name="send" value="validate">{% trans %}Send{% endtrans %}</button>
+</form>
+{% endif %}
+<hr>
 {{ weekmail_rendered|safe }}
 {% endblock %}
 

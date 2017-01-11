@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
@@ -231,10 +232,20 @@ class NewsDetailView(CanViewMixin, DetailView):
 
 # Weekmail
 
-class WeekmailPreviewView(DetailView):
+class WeekmailPreviewView(ComTabsMixin, DetailView):
     model = Weekmail
     template_name = 'com/weekmail_preview.jinja'
     success_url = reverse_lazy('com:weekmail')
+    current_tab = "weekmail"
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            if request.POST['send'] == "validate":
+                self.object.send()
+                return HttpResponseRedirect(reverse('com:weekmail') + "?qn_weekmail_send_success")
+        except: pass
+        return super(WeekmailEditView, self).get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         return self.model.objects.filter(sent=False).order_by('-id').first()
@@ -290,9 +301,6 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, UpdateView):
             art.weekmail = None
             art.rank = -1
             art.save()
-            self.quick_notif_list += ['qn_success']
-        if 'send' in request.GET.keys():
-            self.object.send()
             self.quick_notif_list += ['qn_success']
         return super(WeekmailEditView, self).get(request, *args, **kwargs)
 

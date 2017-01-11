@@ -6,9 +6,9 @@
 {% endblock %}
 
 {% block content %}
-<h3>{% trans %}Weekmail{% endtrans %}</h3>
-<p><a href="{{ url('com:weekmail_preview') }}" target="_blank">{% trans %}Preview{% endtrans %}</a></p>
-<p><a href="?send">{% trans %}Send{% endtrans %}</a></p>
+<h3>{% trans %}Weekmail{% endtrans %} {{ object.id }}</h3>
+<p><a href="{{ url('com:weekmail_preview') }}">{% trans %}Preview{% endtrans %}</a></p>
+<p><a href="{{ url('com:weekmail_preview') }}?send=true">{% trans %}Send{% endtrans %}</a></p>
 <h4>{% trans %}Articles in no weekmail yet{% endtrans %}</h4>
 <table>
     <thead>
