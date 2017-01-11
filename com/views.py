@@ -35,6 +35,11 @@ class ComTabsMixin(TabedViewMixin):
                     'name': _("Weekmail"),
                     })
         tab_list.append({
+                    'url': reverse('com:weekmail_destinations'),
+                    'slug': 'weekmail_destinations',
+                    'name': _("Weekmail destinations"),
+                    })
+        tab_list.append({
                     'url': reverse('com:index_edit'),
                     'slug': 'index',
                     'name': _("Index page"),
@@ -72,6 +77,11 @@ class IndexEditView(ComEditView):
     fields = ['index_page']
     current_tab = "index"
     success_url = reverse_lazy('com:index_edit')
+
+class WeekmailDestinationEditView(ComEditView):
+    fields = ['weekmail_destinations']
+    current_tab = "weekmail_destinations"
+    success_url = reverse_lazy('com:weekmail_destinations')
 
 # News
 
@@ -232,14 +242,15 @@ class WeekmailPreviewView(DetailView):
     def get_context_data(self, **kwargs):
         """Add rendered weekmail"""
         kwargs = super(WeekmailPreviewView, self).get_context_data(**kwargs)
-        kwargs['weekmail_rendered'] = self.object.render()
+        kwargs['weekmail_rendered'] = self.object.render_html()
         return kwargs
 
-class WeekmailEditView(QuickNotifMixin, UpdateView):
+class WeekmailEditView(ComTabsMixin, QuickNotifMixin, UpdateView):
     model = Weekmail
     template_name = 'com/weekmail.jinja'
     fields = ['title', 'intro', 'joke', 'protip', 'conclusion']
     success_url = reverse_lazy('com:weekmail')
+    current_tab = "weekmail"
 
     def get_object(self, queryset=None):
         weekmail = self.model.objects.filter(sent=False).order_by('-id').first()
@@ -291,7 +302,7 @@ class WeekmailEditView(QuickNotifMixin, UpdateView):
         kwargs['orphans'] = WeekmailArticle.objects.filter(weekmail=None)
         return kwargs
 
-class WeekmailArticleEditView(QuickNotifMixin, UpdateView):
+class WeekmailArticleEditView(ComTabsMixin, QuickNotifMixin, UpdateView):
     """Edit an article"""
     model = WeekmailArticle
     fields = ['title', 'content']
@@ -299,6 +310,7 @@ class WeekmailArticleEditView(QuickNotifMixin, UpdateView):
     template_name = 'core/edit.jinja'
     success_url = reverse_lazy('com:weekmail')
     quick_notif_url_arg = "qn_weekmail_article_edit"
+    current_tab = "weekmail"
 
 class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
     """Post an article"""

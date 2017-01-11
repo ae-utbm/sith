@@ -487,11 +487,22 @@ class AnonymousUser(AuthAnonymousUser):
 
 class Preferences(models.Model):
     user = models.OneToOneField(User, related_name="preferences")
+    receive_weekmail = models.BooleanField(
+        _('do you want to receive the weekmail'),
+        default=False,
+        # help_text=_('Do you want to receive the weekmail?'),
+    )
     show_my_stats = models.BooleanField(
         _('define if we show a users stats'),
         default=False,
         help_text=_('Show your account statistics to others'),
     )
+
+    def get_display_name(self):
+        return self.user.get_display_name()
+
+    def get_absolute_url(self):
+        return self.user.get_absolute_url()
 
 def get_directory(instance, filename):
     return '.{0}/{1}'.format(instance.get_parent_path(), filename)

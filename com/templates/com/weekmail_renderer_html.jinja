@@ -9,26 +9,26 @@
 <ul>
     {% for a in weekmail.articles.all() %}
     <li>[{{ a.club }}] {{ a.title }}</li>
-    {% endfor %}
+    {%- endfor %}
 </ul>
 
-{% for a in weekmail.articles.all() %}
+{%- for a in weekmail.articles.all() %}
 <h3>[{{ a.club }}] {{ a.title }}</h3>
 {{ a.content|markdown }}
-{% endfor %}
+{%- endfor -%}
 
-{% if weekmail.joke %}
+{%- if weekmail.joke %}
 <h3>{% trans %}Joke{% endtrans %}</h3>
 {{ weekmail.joke|markdown }}
-{% endif %}
+{% endif -%}
 
-{% if weekmail.protip %}
+{%- if weekmail.protip %}
 <h3>{% trans %}Pro tip{% endtrans %}</h3>
 {{ weekmail.protip|markdown }}
-{% endif %}
+{% endif -%}
 
-{% if weekmail.conclusion %}
+{%- if weekmail.conclusion %}
 <h3>{% trans %}Final word{% endtrans %}</h3>
 {{ weekmail.conclusion|markdown }}
-{% endif %}
+{% endif -%}
 

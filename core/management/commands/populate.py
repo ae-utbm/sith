@@ -86,7 +86,7 @@ class Command(BaseCommand):
         home_root.save()
         club_root.save()
 
-        Sith().save()
+        Sith(weekmail_destinations="etudiants@git.an personnel@git.an").save()
         Weekmail().save()
 
         p = Page(name='Index')

@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^sith/edit/alert$', AlertMsgEditView.as_view(), name='alert_edit'),
     url(r'^sith/edit/info$', InfoMsgEditView.as_view(), name='info_edit'),
     url(r'^sith/edit/index$', IndexEditView.as_view(), name='index_edit'),
+    url(r'^sith/edit/weekmail_destinations$', WeekmailDestinationEditView.as_view(), name='weekmail_destinations'),
     url(r'^weekmail$', WeekmailEditView.as_view(), name='weekmail'),
     url(r'^weekmail/preview$', WeekmailPreviewView.as_view(), name='weekmail_preview'),
     url(r'^weekmail/club/(?P<club_id>[0-9]+)/new_article$', WeekmailArticleCreateView.as_view(), name='weekmail_article'),

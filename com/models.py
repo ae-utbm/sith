@@ -3,9 +3,9 @@ from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 
-from core.models import User
+from core.models import User, Preferences
 from club.models import Club
 
 class Sith(models.Model):
@@ -83,25 +83,33 @@ class Weekmail(models.Model):
         ordering = ['-id']
 
     def send(self):
+        dest = [i[0] for i in Preferences.objects.filter(receive_weekmail=True).values_list('user__email')]
         with transaction.atomic():
-            print("Sending weekmail n°" + str(self.id))
-            email = EmailMessage(
+            email = EmailMultiAlternatives(
                     subject=self.title,
-                    body=self.render(),
+                    body=self.render_text(),
                     from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=['skia@git.an'],
-                    bcc=Sith.objects.first().weekmail_destinations.split(' '),
-                    # TODO: Content-Type: text/html
+                    to=Sith.objects.first().weekmail_destinations.split(' '),
+                    bcc=dest,
                     )
+            email.attach_alternative(self.render_html(), "text/html")
             email.send()
             self.sent = True
             self.save()
             Weekmail().save()
 
-    def render(self):
-        return render(None, "com/weekmail_renderer.jinja", context={
+    def render_text(self):
+        return render(None, "com/weekmail_renderer_text.jinja", context={
             'weekmail': self,
             }).content.decode('utf-8')
+
+    def render_html(self):
+        return render(None, "com/weekmail_renderer_html.jinja", context={
+            'weekmail': self,
+            }).content.decode('utf-8')
+
+    def __str__(self):
+        return "Weekmail %s (sent: %s) - %s" % (self.id, self.sent, self.title)
 
 class WeekmailArticle(models.Model):
     weekmail = models.ForeignKey(Weekmail, related_name="articles", verbose_name=_("weekmail"), null=True)

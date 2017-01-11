@@ -19,7 +19,7 @@ import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
 from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm, UserGodfathersForm
-from core.models import User, SithFile
+from core.models import User, SithFile, Preferences
 from club.models import Club
 from subscription.models import Subscription
 
@@ -150,6 +150,11 @@ class UserTabsMixin(TabedViewMixin):
                         'url': reverse('core:user_edit', kwargs={'user_id': self.object.id}),
                         'slug': 'edit',
                         'name': _("Edit"),
+                        })
+            tab_list.append({
+                        'url': reverse('core:user_prefs', kwargs={'user_id': self.object.id}),
+                        'slug': 'prefs',
+                        'name': _("Preferences"),
                         })
         if self.request.user.can_view(self.object):
             tab_list.append({
@@ -377,6 +382,26 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
     pk_url_kwarg = "user_id"
     template_name = "core/user_clubs.jinja"
     current_tab = "clubs"
+
+class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
+    """
+    Edit a user's preferences
+    """
+    model = Preferences
+    pk_url_kwarg = "user_id"
+    template_name = "core/edit.jinja"
+    fields = ['receive_weekmail']
+    context_object_name = "profile"
+    current_tab = "prefs"
+
+    def get_object(self, queryset=None):
+        user = get_object_or_404(User, pk=self.kwargs['user_id'])
+        try:
+            return user.preferences
+        except:
+            pref = Preferences(user=user)
+            pref.save()
+            return pref
 
 class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     """
