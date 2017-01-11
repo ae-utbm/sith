@@ -60,6 +60,13 @@ Lo-J (Guillaume Renaud)}
 
 \tableofcontents
 
+\chapter{Remerciements}
+\section{Lo-J (Guillaume RENAUD)}
+\par Je remercie tout d’abord Monsieur Frédéric Lassabe qui nous a permis d’effectuer cette TO52 lors de notre cursus à l’UTBM, nous permettant ainsi de mêler nôtre travail scolaire à nôtre envie de participer à l’amélioration de la vie associative de l’UTBM.
+
+\par Je tiens aussi à remercier Florent Jacquet qui m’a aidé tout au long de ce travail et à qui j’ai pu poser mes différentes questions pour apprendre et comprendre plus rapidement que si j’avais été seul.
+
+
 \chapter{Introduction}
 
 \chapter{Eboutic}
@@ -139,12 +146,62 @@ Lo-J (Guillaume Renaud)}
 \chapter{Les stocks}
 \label{sub:les_stocks}
 \par Développeur principal: Lo-J
+\par Cette application s’occupe de la gestion des stocks des comptoirs de type « BAR ». Elle permet de suivre les quantités restantes afin de pouvoir déterminer de manière automatisée quels sont les produits qu’il faut acheter et en quelle quantité.
 
-\section{But}
-\label{sec:but}
+\section{Liste des modèles}
+\label{sec:liste_des_modeles}
 
-\section{Principaux problèmes}
-\label{sec:principaux_problemes}
+\subsection{Stock}
+\par Un Stock possède un nom et est lié à la classe Counter. Ainsi, chaque Comptoir peut avoir son propre Stock.
+
+\subsection{StockItem}
+\par Un StockItem possède un nom, une quantité unitaire, une quantité effective, une quantité minimale et est lié à la classe Stock ainsi qu’à la classe ProductType. De cette manière, chaque élément appartient à un Stock et il est catégorisé de la même manière que les Products (qui sont les objets utilisés pour la vente dans les comptoirs). 
+
+\subsection{ShoppingList}
+\par Une ShoppingList possède un nom, une date, un booléen (fait ou à faire), un commentaire et est liée à un Stock. Chaque ShoppingList est donc liée à un Stock ce qui permet d’avoir des listes de courses spécifique à chaque comptoir.
+
+\subsection{ShoppingListItem}
+\par Un ShoppingListItem possède un nom, une quantité demandée, une quantité achetée et est lié à la classe StockItem, à la classe ShoppingList et à la classe ProductType. Cela permet de pouvoir faire plusieurs listes de courses différentes en même temps et d’en garder un historique.
+
+\section{Fonctionnement}
+\label{sec:fonctionnement}
+
+\par Au départ, si le comptoir de type « BAR » n’a pas de stock, la seule chose qu’il est possible de faire est d’en créer un. Ensuite, il va falloir créer les objets StockItem en indiquant pour chacun les quantités qu’il y a dans le stock.
+    
+\par De plus, la personne (généralement le Responsable du lieu de vie) qui aura la responsabilité d’informatiser les stocks devra aussi définir la quantité unitaire, effective et minimale. 
+\par Par exemple, les Cheeseburger vendus aux différents comptoirs sont achetés par boite de 6, la quantité unitaire sera donc 6, la quantité effective correspondra au nombre de boites restantes dans le stock (c’est à dire dans la réserve du lieu de vie, une boite sortie du stock est considérée comme consommée) et enfin, la quantité minimale servira de valeur seuil.
+\par Une fois l’état de la réserve retranscrit dans le site, il reste encore gérer les stocks de manière quotidienne. Pour ce faire, l’application se décompose en 3 parties :
+\begin{itemize}
+    \item Création automatique des listes de courses
+    \item Approvisionnement du stock
+    \item Prise d’éléments dans le stock
+\end{itemize}
+
+\par Lorsque l’on accède à la partie qui s’occupe de la gestion des listes de courses, il y a un bouton permettant de créer une liste de courses en fonction de l’état des stocks à cet instant, puis un premier tableau contenant les listes de courses qu’il faut faire et enfin un second tableau servant d’historique des listes de courses déjà effectuées.
+\par Pour chaque liste de course ainsi créée, qu’elle soit « faite » ou « à faire », il est possible de cliquer sur son nom pour voir le détail de ce qu’elle comprend.
+
+\subsection{Création automatique des listes de courses}
+\par En cliquant sur le bouton permettant de créer une nouvelle liste de courses, il faut remplir un formulaire. Les informations à donner dans ce formulaire sont le nom de la liste de course (par exemple, une liste spéciale pour Leclerc), ensuite, apparaissent tous les StockItem ayant une quantité effective inférieure au seuil fixé par leur quantité minimale. Il faut donc donner pour chacun de ces éléments une quantité à acheter. Enfin, un dernier champ de commentaire peut être compléter, il sert à demander l’achat d’éléments qui n’apparaissent pas dans le Stock, par exemple, des couteaux, fourchettes ou encore tasses … 
+\par Lors de la validation de ce formulaire, la liste de courses est créée et est ajoutée au tableau contenant les listes de courses à faire.
+
+\subsection{Approvisionnement du stock}
+\par Au retour des courses, il faut ranger les produits achetés dans la réserve. À ce moment-là, il faut aussi mettre à jour le stock. Une opération « Mettre à jour le stock » est disponible pour chaque liste de courses du tableau « À faire ». 
+\par En effectuant cette action, il va falloir indiquer les quantités effectivement achetées. En effet, les quantités demandées ne sont pas forcément celles achetées, c’est donc les quantités effectives qu’il faut ajouter au stock. Une fois ce formulaire validé, la liste de couses passera de l’état « à faire » à l’état « faite ».
+
+\subsection{Prise d’éléments dans le stock}
+\par La réserve étant accessible aux barmen afin qu’ils puissent réapprovisionner les réfrigérateurs à tout moment, l’interface permettant de prendre des éléments dans le stock a été ajoutée dans les onglets de l’interface des ventes (là où le barman inscrit le code du compte du client qui souhaite commander quelque chose). Ainsi, en revenant de la réserve, le barman doit indiquer le nombre de chaque produit qu’il a rapporté.
+\par Dans un souci de simplicité pour le gérant du lieu de vie, ce formulaire de prise des éléments dans le stock est aussi accessible depuis son interface de gestion. 
+
+
+\section{Améliorations à apporter}
+\label{sec:amelioration_a_apporter}
+
+\begin{itemize}
+    \item Il n’est pas encore possible de modifier les quantités demandées pour un ou plusieurs des produits d’une liste de course. Il faudrait rendre cela possible car actuellement, il faut supprimer la liste de courses et la refaire en changeant les quantités souhaitées.
+    \item Il faudrait améliorer la manière dont on ajoute les éléments non définis en tant que StockItem dans la liste de course. Un objet ShoppingListItem avec une référence « Null » vers la classe StockItem pourrait être créé à la place de compléter le champ de commentaires.
+    \item Dans les améliorations sur le long terme, il faudrait que la décrémentation des quantités de chaque élément dans le stock soit automatique. En repensant une partie de l’architecture de l’application, on pourrait faire en sorte que chaque vente faite au comptoir face diminuer les quantités restantes (cela remplacerait le formulaire de « Prise d’éléments dans le stock », mais cela ne serait pas applicable à tous les produits mis en vente. Par exemple, pour les cacahuètes que nous vendons au bol et non par paquet)
+    \item Avec le système de notifications qui a été mis en place sur le site, on pourrait faire en sorte que le ou les responsables des lieux de vie reçoivent une notification lorsque la liste de courses contient plus de 5 éléments
+\end{itemize}
 
 
 \chapter{La laverie}
@@ -211,7 +268,19 @@ et de gestion des permissions sur les différentes branches.
 
 \section{Lo-J}
 \label{sec:lo_j}
+\par Je suis très heureux d’avoir pu participer à ce projet de TO52 sur le développement de modules sur le site de l’Association des Étudiants. J’ai pu apprendre à travailler avec un nouvel environnement informatique tout en contribuant au développement d’outils pour l’association dont je suis Président, le Bureau des Festivités.
 
+\subsection{Django}
+\par Ayant déjà travaillé avec le framework Spring et Java durant mon stage ST40, j’ai pu m’appuyer sur des notions générales afin d’apprendre et de comprendre le fonctionnement du Python et de Django que je ne connaissais pas du tout. 
+
+\par Mon apprentissage a été assez long au départ, car il y avait beaucoup d’informations à intégrer. Django est un framework très pratique qui permet d’effectuer de nombreuses tâches assez rébarbatives de manière automatique certes, mais encore faut-il comprendre ce qu’il se passe en arrière-plan. C’est cet apprentissage qui m’a pris le plus de temps.
+
+\par Mon deuxième point de difficulté a été les formulaires. Là encore, Django est très pratique dès lors qu’il s’agit de faire un formulaire avec tous les champs d’un même Model. Cependant, il m’a fallu de l’aide et du temps pour comprendre comment faire pour ajouter d’autres champs en plus de ceux du Model au formulaire et pour comprendre comment récupérer les valeurs associées à chacun d’eux.
+
+\subsection{Git}
+\par J’ai eu aussi à apprendre le fonctionnement de Git que j’avais déjà pu manipuler quelque peu mais il me manquait quand même beaucoup d’éléments. 
+
+\par Aujourd’hui, je pense pouvoir dire que j’ai progressé dans ce domaine mais il me reste encore bien des choses à apprendre pour être capable de l’utiliser de manière efficace.
 
 
 \end{document}
