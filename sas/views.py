@@ -273,3 +273,4 @@ class AlbumEditView(CanEditMixin, UpdateView):
         if form.cleaned_data['recursive']:
             self.object.apply_rights_recursively(True)
         return ret
+

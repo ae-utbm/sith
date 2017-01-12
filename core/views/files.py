@@ -120,7 +120,7 @@ class FileEditPropForm(forms.ModelForm):
     parent = make_ajax_field(SithFile, 'parent', 'files', help_text="")
     edit_groups = make_ajax_field(SithFile, 'edit_groups', 'groups', help_text="")
     view_groups = make_ajax_field(SithFile, 'view_groups', 'groups', help_text="")
-
+    recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 
 class FileEditPropView(CanEditPropMixin, UpdateView):
     model = SithFile
@@ -133,6 +133,12 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
         form = super(FileEditPropView, self).get_form(form_class)
         form.fields['parent'].queryset = SithFile.objects.filter(is_folder=True)
         return form
+
+    def form_valid(self, form):
+        ret = super(FileEditPropView, self).form_valid(form)
+        if form.cleaned_data['recursive']:
+            self.object.apply_rights_recursively()
+        return ret
 
     def get_success_url(self):
         return reverse('core:file_detail', kwargs={'file_id': self.object.id, 'popup': self.kwargs['popup'] or ""})
