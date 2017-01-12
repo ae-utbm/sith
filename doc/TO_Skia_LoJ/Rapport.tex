@@ -60,14 +60,20 @@ Lo-J (Guillaume Renaud)}
 
 \tableofcontents
 
-\chapter{Remerciements}
-\section{Lo-J (Guillaume RENAUD)}
+\chapter*{Remerciements}
+\section*{Lo-J (Guillaume RENAUD)}
 \par Je remercie tout d’abord Monsieur Frédéric Lassabe qui nous a permis d’effectuer cette TO52 lors de notre cursus à l’UTBM, nous permettant ainsi de mêler nôtre travail scolaire à nôtre envie de participer à l’amélioration de la vie associative de l’UTBM.
 
 \par Je tiens aussi à remercier Florent Jacquet qui m’a aidé tout au long de ce travail et à qui j’ai pu poser mes différentes questions pour apprendre et comprendre plus rapidement que si j’avais été seul.
 
 
 \chapter{Introduction}
+\par Après le développement de la base du nouveau site de l'AE, le projet \textsc{Sith}, au Printemps 2016, la mise en
+production a pu avoir lieu avec succès fin Août 2016.
+
+\par Mais le site était encore très incomplet, et il était nécessaire d'y ajouter un grand nombre de fonctionnalités
+moins critiques, celles-ci n'ayant pas de rapport avec l'argent, mais tout de même très utiles pour le fonctionnement
+de l'AE.
 
 \chapter{Eboutic}
 \label{sec:eboutic}
@@ -87,10 +93,39 @@ Lo-J (Guillaume Renaud)}
 
 \subsection{Interaction avec l'API}
 \label{sub:interaction_avec_l_api}
+\par C'est la principale contrainte de cette application. On doit interagir avec les serveurs du Crédit Agricole, et
+pour cela, ces derniers n'aident pas beaucoup.
+
+\par Ils fournissent un PDF peu clair\footnote{disponible dans le dossier \url{doc/Etransaction/} des sources du site}
+expliquant l'implémentation d'un site marchand, en plus des nombreux autres PDF de documentation disponibles à l'adresse
+\url{https://e-transactions.avem-groupe.com/pages/global.php?page=telechargement}.
+
+\par Une implémentation de référence uniquement en PHP, et contenant que peut de fonctionnalités par rapport à ce
+que dit le PDF peut aussi être obtenue, mais n'est guère utile excepté pour la vérification cryptographique de la
+signature de la réponse. Mais encore, il faut arriver à traduire les fonctions propres à PHP, et ce n'est pas toujours
+une mince affaire, mais fort heureusement, les algorithmes sont encore assez standards et l'on trouve vite de l'aide
+quant à ces fonctions.
+
+\par De plus, certaines informations concernants les numéros d'identification de marchand son incohérents
+d'une documentation à l'autre, et le plus simple à ce niveau est encore de contacter le support.
 
 \subsection{Accès concurrentiels}
 \label{sub:acces_concurrentiels}
+\par En production, le projet Sith tourne à l'aide d'uWSGI, qui s'occupe lui de gérer les différents processus du
+logiciel. Cela se traduit par des accès concurrentiels à la base de donnée lors de l'appel de deux pages simultanément
+qui ont besoin d'accèder aux mêmes ressources.
 
+\par Le problème n'en est la plupart du temps pas un, mais il devient très critique lorsque la page appelée permet par
+exemple de recharger un compte AE. Il ne faut alors surtout faire l'opération en double.
+
+\par Pour protéger ces accès en double, on peut alors utiliser des transactions, et \textbf{Django} fournit une
+abstraction très pratique: \verb-with transaction.atomic():-.
+
+\par L'Eboutic, avec sa réponse de la banque, est très sujette à ces accès concurrents, et cela a posé quelques
+problèmes dans les débuts. La plupart ont été résolu, mais il arrive encore dans les comptoirs d'avoir une vente en
+double, sans pour autant avoir le débit du compte qui soit doublé. Cela ne pose pas foncièrement de problèmes, puisque
+le solde du compte est tout de même valide, et c'est un problème très compliqué à debugger, puisqu'il survient très
+rarement, mais il faudrait tout de même arriver à le résoudre un jour.
 
 
 \chapter{Le SAS}
@@ -112,9 +147,28 @@ Lo-J (Guillaume Renaud)}
 
 \subsection{Gestion des fichiers}
 \label{sub:gestion_des_fichiers}
+\par
 
 \subsection{Optimisation des pages}
 \label{sub:optimisation_des_pages}
+\par La génération d'un grand nombre de requêtes SQL est un des principaux problèmes de ralentissement d'un site. Le
+SAS, avec ses très nombreuses photos, qui requierent une validation des droits, a posé un gros problème à ce niveau.
+
+\par Certaines pages ont pu mettre jusqu'à plus de 10 secondes à générer, ce qui est inconcevable pour une galerie de
+photos, mais ce temps à pu être réduit à moins de 3 secondes.
+
+\par L'astuce à été d'utiliser des actions utilisateurs, comme l'upload de nouvelles photos, pour faire plus de
+traitement que nécessaire, afin de mettre en "cache" une grande partie des actions, comme par exemple la génération des
+miniatures des albums.
+
+\par Une autre technique pour gagner du temps est de mettre en cache certaines requêtes en forcant les \textsc{QuerySet}
+à s'évaluer dans une \textsc{list} \textbf{Python} que l'on stocke afin d'obtenir sa longueur, au lieu de lancer d'abord
+un \textsc{count}, puis une itération des résultats, qui en utilisant directement l'ORM, conduit à réaliser deux
+requêtes SQL.
+
+\par Enfin, le passage à \textbf{HTTP/2} permettrait d'améliorer encore les performances côté utilisateur puisqu'il n'y
+aurait plus qu'un seul \textsc{socket} d'ouvert pour transférer toutes les photos d'une page par exemple, sans avoir
+pour autant à toucher au code.
 
 
 \chapter{Les élections}
@@ -155,7 +209,7 @@ Lo-J (Guillaume Renaud)}
 \par Un Stock possède un nom et est lié à la classe Counter. Ainsi, chaque Comptoir peut avoir son propre Stock.
 
 \subsection{StockItem}
-\par Un StockItem possède un nom, une quantité unitaire, une quantité effective, une quantité minimale et est lié à la classe Stock ainsi qu’à la classe ProductType. De cette manière, chaque élément appartient à un Stock et il est catégorisé de la même manière que les Products (qui sont les objets utilisés pour la vente dans les comptoirs). 
+\par Un StockItem possède un nom, une quantité unitaire, une quantité effective, une quantité minimale et est lié à la classe Stock ainsi qu’à la classe ProductType. De cette manière, chaque élément appartient à un Stock et il est catégorisé de la même manière que les Products (qui sont les objets utilisés pour la vente dans les comptoirs).
 
 \subsection{ShoppingList}
 \par Une ShoppingList possède un nom, une date, un booléen (fait ou à faire), un commentaire et est liée à un Stock. Chaque ShoppingList est donc liée à un Stock ce qui permet d’avoir des listes de courses spécifique à chaque comptoir.
@@ -167,8 +221,8 @@ Lo-J (Guillaume Renaud)}
 \label{sec:fonctionnement}
 
 \par Au départ, si le comptoir de type « BAR » n’a pas de stock, la seule chose qu’il est possible de faire est d’en créer un. Ensuite, il va falloir créer les objets StockItem en indiquant pour chacun les quantités qu’il y a dans le stock.
-    
-\par De plus, la personne (généralement le Responsable du lieu de vie) qui aura la responsabilité d’informatiser les stocks devra aussi définir la quantité unitaire, effective et minimale. 
+
+\par De plus, la personne (généralement le Responsable du lieu de vie) qui aura la responsabilité d’informatiser les stocks devra aussi définir la quantité unitaire, effective et minimale.
 \par Par exemple, les Cheeseburger vendus aux différents comptoirs sont achetés par boite de 6, la quantité unitaire sera donc 6, la quantité effective correspondra au nombre de boites restantes dans le stock (c’est à dire dans la réserve du lieu de vie, une boite sortie du stock est considérée comme consommée) et enfin, la quantité minimale servira de valeur seuil.
 \par Une fois l’état de la réserve retranscrit dans le site, il reste encore gérer les stocks de manière quotidienne. Pour ce faire, l’application se décompose en 3 parties :
 \begin{itemize}
@@ -181,16 +235,16 @@ Lo-J (Guillaume Renaud)}
 \par Pour chaque liste de course ainsi créée, qu’elle soit « faite » ou « à faire », il est possible de cliquer sur son nom pour voir le détail de ce qu’elle comprend.
 
 \subsection{Création automatique des listes de courses}
-\par En cliquant sur le bouton permettant de créer une nouvelle liste de courses, il faut remplir un formulaire. Les informations à donner dans ce formulaire sont le nom de la liste de course (par exemple, une liste spéciale pour Leclerc), ensuite, apparaissent tous les StockItem ayant une quantité effective inférieure au seuil fixé par leur quantité minimale. Il faut donc donner pour chacun de ces éléments une quantité à acheter. Enfin, un dernier champ de commentaire peut être compléter, il sert à demander l’achat d’éléments qui n’apparaissent pas dans le Stock, par exemple, des couteaux, fourchettes ou encore tasses … 
+\par En cliquant sur le bouton permettant de créer une nouvelle liste de courses, il faut remplir un formulaire. Les informations à donner dans ce formulaire sont le nom de la liste de course (par exemple, une liste spéciale pour Leclerc), ensuite, apparaissent tous les StockItem ayant une quantité effective inférieure au seuil fixé par leur quantité minimale. Il faut donc donner pour chacun de ces éléments une quantité à acheter. Enfin, un dernier champ de commentaire peut être compléter, il sert à demander l’achat d’éléments qui n’apparaissent pas dans le Stock, par exemple, des couteaux, fourchettes ou encore tasses …
 \par Lors de la validation de ce formulaire, la liste de courses est créée et est ajoutée au tableau contenant les listes de courses à faire.
 
 \subsection{Approvisionnement du stock}
-\par Au retour des courses, il faut ranger les produits achetés dans la réserve. À ce moment-là, il faut aussi mettre à jour le stock. Une opération « Mettre à jour le stock » est disponible pour chaque liste de courses du tableau « À faire ». 
+\par Au retour des courses, il faut ranger les produits achetés dans la réserve. À ce moment-là, il faut aussi mettre à jour le stock. Une opération « Mettre à jour le stock » est disponible pour chaque liste de courses du tableau « À faire ».
 \par En effectuant cette action, il va falloir indiquer les quantités effectivement achetées. En effet, les quantités demandées ne sont pas forcément celles achetées, c’est donc les quantités effectives qu’il faut ajouter au stock. Une fois ce formulaire validé, la liste de couses passera de l’état « à faire » à l’état « faite ».
 
 \subsection{Prise d’éléments dans le stock}
 \par La réserve étant accessible aux barmen afin qu’ils puissent réapprovisionner les réfrigérateurs à tout moment, l’interface permettant de prendre des éléments dans le stock a été ajoutée dans les onglets de l’interface des ventes (là où le barman inscrit le code du compte du client qui souhaite commander quelque chose). Ainsi, en revenant de la réserve, le barman doit indiquer le nombre de chaque produit qu’il a rapporté.
-\par Dans un souci de simplicité pour le gérant du lieu de vie, ce formulaire de prise des éléments dans le stock est aussi accessible depuis son interface de gestion. 
+\par Dans un souci de simplicité pour le gérant du lieu de vie, ce formulaire de prise des éléments dans le stock est aussi accessible depuis son interface de gestion.
 
 
 \section{Améliorations à apporter}
@@ -271,14 +325,14 @@ et de gestion des permissions sur les différentes branches.
 \par Je suis très heureux d’avoir pu participer à ce projet de TO52 sur le développement de modules sur le site de l’Association des Étudiants. J’ai pu apprendre à travailler avec un nouvel environnement informatique tout en contribuant au développement d’outils pour l’association dont je suis Président, le Bureau des Festivités.
 
 \subsection{Django}
-\par Ayant déjà travaillé avec le framework Spring et Java durant mon stage ST40, j’ai pu m’appuyer sur des notions générales afin d’apprendre et de comprendre le fonctionnement du Python et de Django que je ne connaissais pas du tout. 
+\par Ayant déjà travaillé avec le framework Spring et Java durant mon stage ST40, j’ai pu m’appuyer sur des notions générales afin d’apprendre et de comprendre le fonctionnement du Python et de Django que je ne connaissais pas du tout.
 
 \par Mon apprentissage a été assez long au départ, car il y avait beaucoup d’informations à intégrer. Django est un framework très pratique qui permet d’effectuer de nombreuses tâches assez rébarbatives de manière automatique certes, mais encore faut-il comprendre ce qu’il se passe en arrière-plan. C’est cet apprentissage qui m’a pris le plus de temps.
 
 \par Mon deuxième point de difficulté a été les formulaires. Là encore, Django est très pratique dès lors qu’il s’agit de faire un formulaire avec tous les champs d’un même Model. Cependant, il m’a fallu de l’aide et du temps pour comprendre comment faire pour ajouter d’autres champs en plus de ceux du Model au formulaire et pour comprendre comment récupérer les valeurs associées à chacun d’eux.
 
 \subsection{Git}
-\par J’ai eu aussi à apprendre le fonctionnement de Git que j’avais déjà pu manipuler quelque peu mais il me manquait quand même beaucoup d’éléments. 
+\par J’ai eu aussi à apprendre le fonctionnement de Git que j’avais déjà pu manipuler quelque peu mais il me manquait quand même beaucoup d’éléments.
 
 \par Aujourd’hui, je pense pouvoir dire que j’ai progressé dans ce domaine mais il me reste encore bien des choses à apprendre pour être capable de l’utiliser de manière efficace.
 
