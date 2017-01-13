@@ -41,10 +41,7 @@ class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 	template_name = 'stock/stock_list.jinja'
 	current_tab = "stocks"
 
-	def can_be_viewed_by(self, user):
-		return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
-
-
+	
 class StockEditForm(forms.ModelForm):
 	"""
 	A form to change stock's characteristics
@@ -65,15 +62,10 @@ class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
 	An edit view for the stock
 	"""
 	model = Stock
-	form_class = StockEditForm
+	form_class = modelform_factory(Stock, fields=['name', 'counter'])
 	pk_url_kwarg = "stock_id"
+	template_name = 'core/edit.jinja'
 	current_tab = "stocks"
-
-	def get_context_data(self, **kwargs):
-		context = super(StockItemList, self).get_context_data(**kwargs)
-		if 'stock' in self.request.GET.keys():
-			context['stock'] = Stock.objects.filter(id=self.request.GET['stock']).first()
-		return context
 		
 
 class StockItemEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
@@ -183,10 +175,10 @@ class StockItemQuantityBaseFormView(CounterAdminTabsMixin, CanEditMixin, DetailV
 			for i in self.stock.items.filter(type=t).order_by('name').all():
 				if i.effective_quantity <= i.minimal_quantity:	            
 					field_name = "item-%s" % (str(i.id))
-					fields[field_name] = forms.IntegerField(required=True, label=str(i),
+					fields[field_name] = forms.IntegerField(required=True, label=str(i), initial=0,
 								help_text=_(str(i.effective_quantity)+" left"))
-		fields['comment'] = forms.CharField(widget=forms.Textarea(), required=False, label=_("Comments"),
-				initial=_("Add here, items to buy that are not reference as a stock item (example : sponge, knife, mugs ...)"))				
+		fields['comment'] = forms.CharField(widget=forms.Textarea(attrs={"placeholder":_("Add here, items to buy that are not reference as a stock item (example : sponge, knife, mugs ...)")}),
+				required=False, label=_("Comments"))				
 		kwargs['stock_id'] = self.stock.id
 		kwargs['base_fields'] = fields
 		return type('StockItemQuantityForm', (StockItemQuantityForm,), kwargs)
@@ -380,7 +372,8 @@ class StockTakeItemsBaseFormView(CounterTabsMixin, CanEditMixin, DetailView, Bas
 		for t in ProductType.objects.order_by('name').all():
 			for i in self.stock.items.filter(type=t).order_by('name').all():
 				field_name = "item-%s" % (str(i.id))
-				fields[field_name] = forms.IntegerField(required=False, label=str(i), help_text=_("("+ str(i.effective_quantity) + " left)"))
+				fields[field_name] = forms.IntegerField(required=False, label=str(i), initial=0, min_value=0, max_value=i.effective_quantity,
+						help_text=_("("+ str(i.effective_quantity) + " left)"))
 				kwargs[field_name] = i.effective_quantity
 		kwargs['stock_id'] = self.stock.id
 		kwargs['counter_id'] = self.stock.counter.id

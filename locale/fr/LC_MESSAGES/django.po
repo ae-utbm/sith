@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-07 13:15+0100\n"
+"POT-Creation-Date: 2017-01-12 15:49+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -2386,7 +2386,7 @@ msgstr "Stats"
 #: stock/templates/stock/stock_item_list.jinja:11
 #: stock/templates/stock/stock_list.jinja:16
 msgid "Shopping lists"
-msgstr "Liste de course"
+msgstr "Liste de courses"
 
 #: core/templates/core/user_tools.jinja:46
 #: counter/templates/counter/counter_list.jinja:39
@@ -3703,7 +3703,7 @@ msgstr "nombre d'éléments dans une boite"
 
 #: stock/models.py:31
 msgid "effective quantity"
-msgstr "qunatité effective"
+msgstr "quantité effective"
 
 #: stock/models.py:31
 msgid "number of box"
@@ -3758,7 +3758,7 @@ msgstr "Quantité demandée"
 msgid "Quantity bought"
 msgstr "Quantité achetée"
 
-#: stock/templates/stock/shopping_list_items.jinja:42 stock/views.py:188
+#: stock/templates/stock/shopping_list_items.jinja:42 stock/views.py:181
 msgid "Comments"
 msgstr "Commentaires"
 
@@ -3861,27 +3861,27 @@ msgstr "Mettre à jour les quantités de %(s)s après les courses"
 msgid "Update stock quantities"
 msgstr "Mettre à jour les quantités du stock"
 
-#: stock/views.py:181
+#: stock/views.py:173
 msgid "Shopping list name"
-msgstr "Nom de la liste de course"
+msgstr "Nom de la liste de courses"
 
-#: stock/views.py:187
+#: stock/views.py:179
 msgid " left"
 msgstr " restant(s)"
 
-#: stock/views.py:189
+#: stock/views.py:180
 msgid ""
 "Add here, items to buy that are not reference as a stock item (example : "
 "sponge, knife, mugs ...)"
 msgstr ""
 "Ajouter ici les éléments à acheter qui ne sont pas référencés comme un "
-"élément du stock (exemple : éponges, couteaux, tasses ..."
+"élément du stock (exemple : éponges, couteaux, tasses ...)"
 
-#: stock/views.py:317
+#: stock/views.py:309
 msgid " asked"
 msgstr " demandé(s)"
 
-#: stock/views.py:383
+#: stock/views.py:376
 msgid "("
 msgstr "("
 
