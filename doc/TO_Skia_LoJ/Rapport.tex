@@ -68,7 +68,7 @@ Lo-J (Guillaume Renaud)}
 
 
 \chapter{Introduction}
-\par Après le développement de la base du nouveau site de l'AE, le projet \textsc{Sith}, au Printemps 2016, la mise en
+\par Après le développement de la base du nouveau site de l'AE, le projet \emph{Sith}, au Printemps 2016, la mise en
 production a pu avoir lieu avec succès fin Août 2016.
 
 \par Mais le site était encore très incomplet, et il était nécessaire d'y ajouter un grand nombre de fonctionnalités
@@ -147,7 +147,17 @@ rarement, mais il faudrait tout de même arriver à le résoudre un jour.
 
 \subsection{Gestion des fichiers}
 \label{sub:gestion_des_fichiers}
-\par
+\par L'envoie en grande quantité de photos nécéssite une gestion des fichiers solide, en même temps qu'un formulaire
+d'envoie efficace, capable d'envoyer plusieurs dizaines de photos en une seule action de l'utilisateur.
+
+\par L'envoie est donc fait à l'aide de requêtes AJAX pour envoyer les photos une par une et éviter alors le timeout.
+
+\par Concernant les fichiers une fois envoyé, ils sont en réalité traités par la classe \verb#SithFile# qui gère tous
+les fichiers du site. Cela ne fait qu'une seule classe à développer, de même qu'un seul système de fichier avec une
+seule arborescence, ce qui est beaucoup plus robuste.
+
+\par La difficulté a aussi été de permettre le déplacement des fichiers, par couper-coller, tout en faisant de même dans
+le système de fichier réel, afin d'avoir une arborescence cohérente même en cas de perte de la base de données.
 
 \subsection{Optimisation des pages}
 \label{sub:optimisation_des_pages}
@@ -161,13 +171,13 @@ photos, mais ce temps à pu être réduit à moins de 3 secondes.
 traitement que nécessaire, afin de mettre en "cache" une grande partie des actions, comme par exemple la génération des
 miniatures des albums.
 
-\par Une autre technique pour gagner du temps est de mettre en cache certaines requêtes en forcant les \textsc{QuerySet}
-à s'évaluer dans une \textsc{list} \textbf{Python} que l'on stocke afin d'obtenir sa longueur, au lieu de lancer d'abord
-un \textsc{count}, puis une itération des résultats, qui en utilisant directement l'ORM, conduit à réaliser deux
+\par Une autre technique pour gagner du temps est de mettre en cache certaines requêtes en forcant les \emph{QuerySet}
+à s'évaluer dans une \emph{list} \textbf{Python} que l'on stocke afin d'obtenir sa longueur, au lieu de lancer d'abord
+un \emph{count}, puis une itération des résultats, qui en utilisant directement l'ORM, conduit à réaliser deux
 requêtes SQL.
 
 \par Enfin, le passage à \textbf{HTTP/2} permettrait d'améliorer encore les performances côté utilisateur puisqu'il n'y
-aurait plus qu'un seul \textsc{socket} d'ouvert pour transférer toutes les photos d'une page par exemple, sans avoir
+aurait plus qu'un seul \emph{socket} d'ouvert pour transférer toutes les photos d'une page par exemple, sans avoir
 pour autant à toucher au code.
 
 
@@ -192,15 +202,37 @@ pour autant à toucher au code.
 
 \subsection{Automatisation d'un widget particulier pour les formulaires}
 \label{sub:automatisation_d_un_widget_particulier_pour_les_formulaires}
+\par La demande est venue du \textbf{BdF} qui a voulu autoriser pour certains poste un nombre de vote supérieur à 1.
+Cela signifie que l'on passe d'un choix simple, type \verb#radio# à un choix multiple, type \verb#checkbox#, tout cela
+étant paramètrable dans l'élection.
+
+\par Ce genre de choix n'étant pas disponible dans \textbf{Django} de base, il a fallut développer le \emph{widget} à
+utiliser dans le formulaire qui permette cette configuration tout en validant bien les données reçues par rapport au
+modèle, et éviter ainsi de pouvoir "tricher" en envoyant des requêtes erronées.
 
 \subsection{Revue du code d'un autre développeur}
 \label{sub:revue_du_code_d_un_autre_developpeur}
+\par \emph{Sli} étant le principal développeur de cette application, un gros travail de revue de code a dû être
+effectuer afin de garantir une certaine cohérence avec le reste du projet.
 
+\par C'est un travail très long et fastidieux, car il faut bien revérifier chaque ligne, sur chaque fichier, tout en
+faisant des commentaire lorsque quelque chose ne va pas. \textbf{Gitlab} a, à ce niveau, grandement facilité la tâche, à
+l'aide de ses outils de \emph{merge request} assez avancés.
+
+\par En plus du code en lui-même, il a fallut porter une attention particulière aux migrations. Ces fichiers générés
+automatiquement par \textbf{Django} sont responsables du maintient d'une base de donnée cohérente malgré les évolutions
+des modèles. Même si le code parait donc valide, il est impératif de surveiller que la chaîne de dépendance des dites
+migrations ne soit pas cassée, au risque de problèmes potentiels au moment de la mise en production, ce qui entraînent à
+coup sûr un \emph{downtime}.
 
 \chapter{Les stocks}
 \label{sub:les_stocks}
 \par Développeur principal: Lo-J
-\par Cette application s’occupe de la gestion des stocks des comptoirs de type « BAR ». Elle permet de suivre les quantités restantes afin de pouvoir déterminer de manière automatisée quels sont les produits qu’il faut acheter et en quelle quantité.
+\vskip 2em
+
+\par Cette application s’occupe de la gestion des stocks des comptoirs de type « BAR ». Elle permet de suivre les
+quantités restantes afin de pouvoir déterminer de manière automatisée quels sont les produits qu’il faut acheter et en
+quelle quantité.
 
 \section{Liste des modèles}
 \label{sec:liste_des_modeles}
@@ -209,52 +241,90 @@ pour autant à toucher au code.
 \par Un Stock possède un nom et est lié à la classe Counter. Ainsi, chaque Comptoir peut avoir son propre Stock.
 
 \subsection{StockItem}
-\par Un StockItem possède un nom, une quantité unitaire, une quantité effective, une quantité minimale et est lié à la classe Stock ainsi qu’à la classe ProductType. De cette manière, chaque élément appartient à un Stock et il est catégorisé de la même manière que les Products (qui sont les objets utilisés pour la vente dans les comptoirs).
+\par Un StockItem possède un nom, une quantité unitaire, une quantité effective, une quantité minimale et est lié à la
+classe Stock ainsi qu’à la classe ProductType. De cette manière, chaque élément appartient à un Stock et il est
+catégorisé de la même manière que les Products (qui sont les objets utilisés pour la vente dans les comptoirs).
 
 \subsection{ShoppingList}
-\par Une ShoppingList possède un nom, une date, un booléen (fait ou à faire), un commentaire et est liée à un Stock. Chaque ShoppingList est donc liée à un Stock ce qui permet d’avoir des listes de courses spécifique à chaque comptoir.
+\par Une ShoppingList possède un nom, une date, un booléen (fait ou à faire), un commentaire et est liée à un Stock.
+Chaque ShoppingList est donc liée à un Stock ce qui permet d’avoir des listes de courses spécifique à chaque comptoir.
 
 \subsection{ShoppingListItem}
-\par Un ShoppingListItem possède un nom, une quantité demandée, une quantité achetée et est lié à la classe StockItem, à la classe ShoppingList et à la classe ProductType. Cela permet de pouvoir faire plusieurs listes de courses différentes en même temps et d’en garder un historique.
+\par Un ShoppingListItem possède un nom, une quantité demandée, une quantité achetée et est lié à la classe StockItem, à
+la classe ShoppingList et à la classe ProductType. Cela permet de pouvoir faire plusieurs listes de courses différentes
+en même temps et d’en garder un historique.
 
 \section{Fonctionnement}
 \label{sec:fonctionnement}
 
-\par Au départ, si le comptoir de type « BAR » n’a pas de stock, la seule chose qu’il est possible de faire est d’en créer un. Ensuite, il va falloir créer les objets StockItem en indiquant pour chacun les quantités qu’il y a dans le stock.
+\par Au départ, si le comptoir de type « BAR » n’a pas de stock, la seule chose qu’il est possible de faire est d’en
+créer un. Ensuite, il va falloir créer les objets StockItem en indiquant pour chacun les quantités qu’il y a dans le
+stock.
 
-\par De plus, la personne (généralement le Responsable du lieu de vie) qui aura la responsabilité d’informatiser les stocks devra aussi définir la quantité unitaire, effective et minimale.
-\par Par exemple, les Cheeseburger vendus aux différents comptoirs sont achetés par boite de 6, la quantité unitaire sera donc 6, la quantité effective correspondra au nombre de boites restantes dans le stock (c’est à dire dans la réserve du lieu de vie, une boite sortie du stock est considérée comme consommée) et enfin, la quantité minimale servira de valeur seuil.
-\par Une fois l’état de la réserve retranscrit dans le site, il reste encore gérer les stocks de manière quotidienne. Pour ce faire, l’application se décompose en 3 parties :
+\par De plus, la personne (généralement le Responsable du lieu de vie) qui aura la responsabilité d’informatiser les
+stocks devra aussi définir la quantité unitaire, effective et minimale.
+\par Par exemple, les Cheeseburger vendus aux différents comptoirs sont achetés par boite de 6, la quantité unitaire
+sera donc 6, la quantité effective correspondra au nombre de boites restantes dans le stock (c’est à dire dans la
+réserve du lieu de vie, une boite sortie du stock est considérée comme consommée) et enfin, la quantité minimale servira
+de valeur seuil.
+\par Une fois l’état de la réserve retranscrit dans le site, il reste encore gérer les stocks de manière quotidienne.
+Pour ce faire, l’application se décompose en 3 parties :
 \begin{itemize}
     \item Création automatique des listes de courses
     \item Approvisionnement du stock
     \item Prise d’éléments dans le stock
 \end{itemize}
 
-\par Lorsque l’on accède à la partie qui s’occupe de la gestion des listes de courses, il y a un bouton permettant de créer une liste de courses en fonction de l’état des stocks à cet instant, puis un premier tableau contenant les listes de courses qu’il faut faire et enfin un second tableau servant d’historique des listes de courses déjà effectuées.
-\par Pour chaque liste de course ainsi créée, qu’elle soit « faite » ou « à faire », il est possible de cliquer sur son nom pour voir le détail de ce qu’elle comprend.
+\par Lorsque l’on accède à la partie qui s’occupe de la gestion des listes de courses, il y a un bouton permettant de
+créer une liste de courses en fonction de l’état des stocks à cet instant, puis un premier tableau contenant les listes
+de courses qu’il faut faire et enfin un second tableau servant d’historique des listes de courses déjà effectuées.
+\par Pour chaque liste de course ainsi créée, qu’elle soit « faite » ou « à faire », il est possible de cliquer sur son
+nom pour voir le détail de ce qu’elle comprend.
 
 \subsection{Création automatique des listes de courses}
-\par En cliquant sur le bouton permettant de créer une nouvelle liste de courses, il faut remplir un formulaire. Les informations à donner dans ce formulaire sont le nom de la liste de course (par exemple, une liste spéciale pour Leclerc), ensuite, apparaissent tous les StockItem ayant une quantité effective inférieure au seuil fixé par leur quantité minimale. Il faut donc donner pour chacun de ces éléments une quantité à acheter. Enfin, un dernier champ de commentaire peut être compléter, il sert à demander l’achat d’éléments qui n’apparaissent pas dans le Stock, par exemple, des couteaux, fourchettes ou encore tasses …
-\par Lors de la validation de ce formulaire, la liste de courses est créée et est ajoutée au tableau contenant les listes de courses à faire.
+\par En cliquant sur le bouton permettant de créer une nouvelle liste de courses, il faut remplir un formulaire. Les
+informations à donner dans ce formulaire sont le nom de la liste de course (par exemple, une liste spéciale pour
+Leclerc), ensuite, apparaissent tous les StockItem ayant une quantité effective inférieure au seuil fixé par leur
+quantité minimale. Il faut donc donner pour chacun de ces éléments une quantité à acheter. Enfin, un dernier champ de
+commentaire peut être compléter, il sert à demander l’achat d’éléments qui n’apparaissent pas dans le Stock, par
+exemple, des couteaux, fourchettes ou encore tasses...
+\par Lors de la validation de ce formulaire, la liste de courses est créée et est ajoutée au tableau contenant les
+listes de courses à faire.
 
 \subsection{Approvisionnement du stock}
-\par Au retour des courses, il faut ranger les produits achetés dans la réserve. À ce moment-là, il faut aussi mettre à jour le stock. Une opération « Mettre à jour le stock » est disponible pour chaque liste de courses du tableau « À faire ».
-\par En effectuant cette action, il va falloir indiquer les quantités effectivement achetées. En effet, les quantités demandées ne sont pas forcément celles achetées, c’est donc les quantités effectives qu’il faut ajouter au stock. Une fois ce formulaire validé, la liste de couses passera de l’état « à faire » à l’état « faite ».
+\par Au retour des courses, il faut ranger les produits achetés dans la réserve. À ce moment-là, il faut aussi mettre à
+jour le stock. Une opération « Mettre à jour le stock » est disponible pour chaque liste de courses du tableau « À
+faire ».
+\par En effectuant cette action, il va falloir indiquer les quantités effectivement achetées. En effet, les quantités
+demandées ne sont pas forcément celles achetées, c’est donc les quantités effectives qu’il faut ajouter au stock. Une
+fois ce formulaire validé, la liste de couses passera de l’état « à faire » à l’état « faite ».
 
 \subsection{Prise d’éléments dans le stock}
-\par La réserve étant accessible aux barmen afin qu’ils puissent réapprovisionner les réfrigérateurs à tout moment, l’interface permettant de prendre des éléments dans le stock a été ajoutée dans les onglets de l’interface des ventes (là où le barman inscrit le code du compte du client qui souhaite commander quelque chose). Ainsi, en revenant de la réserve, le barman doit indiquer le nombre de chaque produit qu’il a rapporté.
-\par Dans un souci de simplicité pour le gérant du lieu de vie, ce formulaire de prise des éléments dans le stock est aussi accessible depuis son interface de gestion.
+\par La réserve étant accessible aux barmen afin qu’ils puissent réapprovisionner les réfrigérateurs à tout moment,
+l’interface permettant de prendre des éléments dans le stock a été ajoutée dans les onglets de l’interface des ventes
+(là où le barman inscrit le code du compte du client qui souhaite commander quelque chose). Ainsi, en revenant de la
+réserve, le barman doit indiquer le nombre de chaque produit qu’il a rapporté.
+\par Dans un souci de simplicité pour le gérant du lieu de vie, ce formulaire de prise des éléments dans le stock est
+aussi accessible depuis son interface de gestion.
 
 
 \section{Améliorations à apporter}
 \label{sec:amelioration_a_apporter}
 
 \begin{itemize}
-    \item Il n’est pas encore possible de modifier les quantités demandées pour un ou plusieurs des produits d’une liste de course. Il faudrait rendre cela possible car actuellement, il faut supprimer la liste de courses et la refaire en changeant les quantités souhaitées.
-    \item Il faudrait améliorer la manière dont on ajoute les éléments non définis en tant que StockItem dans la liste de course. Un objet ShoppingListItem avec une référence « Null » vers la classe StockItem pourrait être créé à la place de compléter le champ de commentaires.
-    \item Dans les améliorations sur le long terme, il faudrait que la décrémentation des quantités de chaque élément dans le stock soit automatique. En repensant une partie de l’architecture de l’application, on pourrait faire en sorte que chaque vente faite au comptoir face diminuer les quantités restantes (cela remplacerait le formulaire de « Prise d’éléments dans le stock », mais cela ne serait pas applicable à tous les produits mis en vente. Par exemple, pour les cacahuètes que nous vendons au bol et non par paquet)
-    \item Avec le système de notifications qui a été mis en place sur le site, on pourrait faire en sorte que le ou les responsables des lieux de vie reçoivent une notification lorsque la liste de courses contient plus de 5 éléments
+    \item Il n’est pas encore possible de modifier les quantités demandées pour un ou plusieurs des produits d’une liste
+        de course. Il faudrait rendre cela possible car actuellement, il faut supprimer la liste de courses et la
+        refaire en changeant les quantités souhaitées.
+    \item Il faudrait améliorer la manière dont on ajoute les éléments non définis en tant que StockItem dans la liste
+        de course. Un objet ShoppingListItem avec une référence « Null » vers la classe StockItem pourrait être créé à
+        la place de compléter le champ de commentaires.
+    \item Dans les améliorations sur le long terme, il faudrait que la décrémentation des quantités de chaque élément
+        dans le stock soit automatique. En repensant une partie de l’architecture de l’application, on pourrait faire en
+        sorte que chaque vente faite au comptoir face diminuer les quantités restantes (cela remplacerait le formulaire
+        de « Prise d’éléments dans le stock », mais cela ne serait pas applicable à tous les produits mis en vente. Par
+        exemple, pour les cacahuètes que nous vendons au bol et non par paquet)
+    \item Avec le système de notifications qui a été mis en place sur le site, on pourrait faire en sorte que le ou les
+        responsables des lieux de vie reçoivent une notification lorsque la liste de courses contient plus de 5 éléments
 \end{itemize}
 
 
@@ -278,9 +348,27 @@ pour autant à toucher au code.
 
 \subsection{Génération de plannings}
 \label{sub:generation_de_plannings}
+\par Il y a là beaucoup de cas à prendre en compte. Lorsque que quelqu'un veut réserver directement un "Lavage +
+Séchage", un simple "Lavage", ou un simple "Séchage", il faut toujours vérifier la disponibilité des créneaux en
+fonction du nombre de machine de chaque type présent dans la laverie en question \footnote{Belfort ou Sevenans, en
+l'occurrence}, et cela représente vite un grand nombre de combinaisons à vérifier.
+
+\par De plus, la réservation doit rester ergonomique, et s'afficher dans un format le plus lisible possible pour un
+humain. Là dessus, un tableau est le plus approprié, avec chaque jour représenté par une colonne, et chaque créneau par
+une ligne.\\
+Mais cela ne représente malheureusement pas la temporalité, et la génération du tableau devient alors plutôt compliquée,
+et d'autant plus si l'on veut qu'il soit sémantiquement correct en HTML.
 
 \subsection{Gestion des timezones}
 \label{sub:gestion_des_timezones}
+\par La gestion et le stockage des crénaux implique l'utilisation de champs de type \verb#DateTime#. \textbf{Django} les
+gère très bien, particulièrement au niveau des \emph{timezones}, où ce dernier n'hésite pas à lancer un warning lorsque
+l'objet \emph{date} passé ne contient pas d'information de fuseau horaire.
+
+\par Mais avec notre décalage d'une heure par rapport au temps UTC, tous les horaires se retrouvent décalés, et gérer
+cela convenablement sans sortir d'avertissement a été plutôt compliqué. La solution a été de forcer un peu partout la
+\emph{timezone} à UTC, afin de ne pas créer de décalage, mais en conservant tout de même l'information de fuseau
+horaire, et sans tout casser lors du passage à l'heure d'hiver.
 
 
 \chapter{La communication}
@@ -302,9 +390,37 @@ pour autant à toucher au code.
 
 \subsection{Envoie de mails}
 \label{sub:envoie_de_mails}
+\par Un outil de \emph{newsletter} nécessite l'envoie de mail. C'est là quelque chose de relativement compliqué à
+tester, d'autant plus lorsqu'il s'agit de mailing-list contenant l'intégralité des étudiants de l'UTBM.
+
+\par \textbf{Django} fournit toutefois un outil très pratique: il contient plusieurs \emph{backend} d'emails, dont entre
+autre un \emph{SMTP}, et un \emph{console}. Le \emph{SMTP} est bien évidemment utilisé en production pour envoyer
+effectivement les mails, mais il est compliqué à utiliser en développement, car il suppose que le développeur a à sa
+disposition un serveur de ce type. On utilise alors le backend \emph{console}, qui affiche simplement dans le thread
+d'execution de \textbf{Django} une version texte de l'email envoyé, avec d'une part les entêtes, d'autre part le corps
+de message.
+
+\par Mais autant pour tester l'envoie d'un mail unique à une adresse unique, cela fonctionne parfaitement bien, ce n'est
+toutefois pas suffisant pour tester un envoie massif à plusieurs mailings, avec en plus encore d'autres adresses en
+\emph{Bcc} pour les gens ne faisant pas partie des mailings "classiques", mais souhaitant quand même recevoir le
+\textbf{Weekmail}.
 
 \subsection{Amélioration de l'outil de recherche}
 \label{sub:amelioration_de_l_outil_de_recherche}
+\par Pour la gestion de l'AE, il est nécessaire de pouvoir rechercher et trouver efficacement n'importe quel membre, en
+tapant au choix son nom, prénom, ou surnom, voire une combinaison de ces trois champs.
+
+\par Mais une fonction de recherche aussi complexe est très difficile a mettre en place efficacement sans un traitement
+préalable, d'où la nécessité d'indexer les entrées à chercher. Un indexeur étant très complexe, mais également très
+courant, il n'a pas été difficile de trouver une application déjà existante fournissant ces fonctionnalités.
+
+\par Le choix s'est porté sur \textbf{Haystack}, en l'utilisant avec l'indexeur \textbf{Whoosh}, plutôt efficace pour
+des bases raisonnables, et surtout écrit en pure \textbf{Python}, donc ne nécessitant pas d'installation compliqué en
+parallèle du site.
+
+\par Le résultat est plutôt satisfaisant, mais il faudrait encore améliorer les résultats en utilisant les fonctions de
+\emph{boost} pour certains champs. De plus, une certaine lenteur se fait encore sentir avec certaines recherches trop
+communes ou générales.
 
 
 \chapter{Conclusions personnelles}
