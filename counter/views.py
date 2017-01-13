@@ -800,8 +800,8 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
         """Add form to the context """
         kwargs = super(CounterLastOperationsView, self).get_context_data(**kwargs)
         threshold = timezone.now() - timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT)
-        kwargs['last_refillings'] = self.object.refillings.filter(date__gte=threshold).all()
-        kwargs['last_sellings'] = self.object.sellings.filter(date__gte=threshold).all()
+        kwargs['last_refillings'] = self.object.refillings.filter(date__gte=threshold).order_by('-id')[:20]
+        kwargs['last_sellings'] = self.object.sellings.filter(date__gte=threshold).order_by('-id')[:20]
         return kwargs
 
 class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
