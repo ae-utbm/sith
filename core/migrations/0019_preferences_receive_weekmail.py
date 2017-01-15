@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='preferences',
             name='receive_weekmail',
-            field=models.BooleanField(verbose_name='define if we want to receive the weekmail', default=False, help_text='Do you want to receive the weekmail'),
+            field=models.BooleanField(default=False, verbose_name='do you want to receive the weekmail'),
         ),
     ]

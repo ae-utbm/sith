@@ -387,21 +387,26 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
     """
     Edit a user's preferences
     """
-    model = Preferences
+    model = User
     pk_url_kwarg = "user_id"
     template_name = "core/edit.jinja"
-    fields = ['receive_weekmail']
+    form_class = modelform_factory(Preferences, fields=['receive_weekmail'])
     context_object_name = "profile"
     current_tab = "prefs"
 
     def get_object(self, queryset=None):
         user = get_object_or_404(User, pk=self.kwargs['user_id'])
+        return user
+
+    def get_form_kwargs(self):
+        kwargs = super(UserPreferencesView, self).get_form_kwargs()
         try:
-            return user.preferences
+            pref = self.object.preferences
         except:
-            pref = Preferences(user=user)
+            pref = Preferences(user=self.object)
             pref.save()
-            return pref
+        kwargs.update({'instance': pref})
+        return kwargs
 
 class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     """

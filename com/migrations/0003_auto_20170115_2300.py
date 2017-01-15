@@ -8,8 +8,8 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('club', '0006_auto_20161229_0040'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('com', '0002_news_newsdate'),
     ]
 
@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Weekmail',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
-                ('title', models.CharField(verbose_name='title', max_length=64)),
+                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
+                ('title', models.CharField(max_length=64, verbose_name='title', blank=True)),
                 ('intro', models.TextField(verbose_name='intro', blank=True)),
                 ('joke', models.TextField(verbose_name='joke', blank=True)),
                 ('protip', models.TextField(verbose_name='protip', blank=True)),
@@ -32,13 +32,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='WeekmailArticle',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
-                ('title', models.CharField(verbose_name='title', max_length=64)),
+                ('id', models.AutoField(serialize=False, primary_key=True, verbose_name='ID', auto_created=True)),
+                ('title', models.CharField(max_length=64, verbose_name='title')),
                 ('content', models.TextField(verbose_name='content')),
                 ('rank', models.IntegerField(verbose_name='rank', default=-1)),
-                ('author', models.ForeignKey(related_name='owned_weekmail_articles', to=settings.AUTH_USER_MODEL, verbose_name='author')),
-                ('club', models.ForeignKey(related_name='weekmail_articles', to='club.Club', verbose_name='club')),
-                ('weekmail', models.ForeignKey(related_name='articles', to='com.Weekmail', verbose_name='weekmail')),
+                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL, verbose_name='author', related_name='owned_weekmail_articles')),
+                ('club', models.ForeignKey(to='club.Club', verbose_name='club', related_name='weekmail_articles')),
+                ('weekmail', models.ForeignKey(to='com.Weekmail', verbose_name='weekmail', related_name='articles', null=True)),
             ],
         ),
         migrations.AddField(

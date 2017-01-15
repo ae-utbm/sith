@@ -84,6 +84,7 @@ class Weekmail(models.Model):
 
     def send(self):
         dest = [i[0] for i in Preferences.objects.filter(receive_weekmail=True).values_list('user__email')]
+        print(dest)
         with transaction.atomic():
             email = EmailMultiAlternatives(
                     subject=self.title,
