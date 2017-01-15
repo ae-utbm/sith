@@ -84,7 +84,6 @@ class Weekmail(models.Model):
 
     def send(self):
         dest = [i[0] for i in Preferences.objects.filter(receive_weekmail=True).values_list('user__email')]
-        print(dest)
         with transaction.atomic():
             email = EmailMultiAlternatives(
                     subject=self.title,
@@ -112,6 +111,9 @@ class Weekmail(models.Model):
     def __str__(self):
         return "Weekmail %s (sent: %s) - %s" % (self.id, self.sent, self.title)
 
+    def is_owned_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
 class WeekmailArticle(models.Model):
     weekmail = models.ForeignKey(Weekmail, related_name="articles", verbose_name=_("weekmail"), null=True)
     title = models.CharField(_("title"), max_length=64)
@@ -119,4 +121,7 @@ class WeekmailArticle(models.Model):
     author = models.ForeignKey(User, related_name="owned_weekmail_articles", verbose_name=_("author"))
     club = models.ForeignKey(Club, related_name="weekmail_articles", verbose_name=_("club"))
     rank = models.IntegerField(_('rank'), default=-1)
+
+    def is_owned_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 

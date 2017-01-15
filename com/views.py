@@ -165,7 +165,7 @@ class NewsEditView(CanEditMixin, UpdateView):
                     Notification(user=u, url=reverse("com:news_detail", kwargs={'news_id': self.object.id}), type="NEWS_MODERATION").save()
         return super(NewsEditView, self).form_valid(form)
 
-class NewsCreateView(CanCreateMixin, CreateView):
+class NewsCreateView(CanCreateMixin, CreateView): #XXX no can_be_created_by function in News model
     model = News
     form_class = NewsForm
     template_name = 'com/news_edit.jinja'
@@ -232,7 +232,7 @@ class NewsDetailView(CanViewMixin, DetailView):
 
 # Weekmail
 
-class WeekmailPreviewView(ComTabsMixin, DetailView):
+class WeekmailPreviewView(ComTabsMixin, CanEditPropMixin, DetailView):
     model = Weekmail
     template_name = 'com/weekmail_preview.jinja'
     success_url = reverse_lazy('com:weekmail')
@@ -256,7 +256,7 @@ class WeekmailPreviewView(ComTabsMixin, DetailView):
         kwargs['weekmail_rendered'] = self.object.render_html()
         return kwargs
 
-class WeekmailEditView(ComTabsMixin, QuickNotifMixin, UpdateView):
+class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateView):
     model = Weekmail
     template_name = 'com/weekmail.jinja'
     fields = ['title', 'intro', 'joke', 'protip', 'conclusion']
@@ -310,7 +310,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, UpdateView):
         kwargs['orphans'] = WeekmailArticle.objects.filter(weekmail=None)
         return kwargs
 
-class WeekmailArticleEditView(ComTabsMixin, QuickNotifMixin, UpdateView):
+class WeekmailArticleEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateView):
     """Edit an article"""
     model = WeekmailArticle
     fields = ['title', 'content']
@@ -320,7 +320,7 @@ class WeekmailArticleEditView(ComTabsMixin, QuickNotifMixin, UpdateView):
     quick_notif_url_arg = "qn_weekmail_article_edit"
     current_tab = "weekmail"
 
-class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
+class WeekmailArticleCreateView(QuickNotifMixin, CreateView): #XXX need to protect this view
     """Post an article"""
     model = WeekmailArticle
     fields = ['title', 'content']
@@ -334,7 +334,7 @@ class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
         form.instance.author = self.request.user
         return super(WeekmailArticleCreateView, self).form_valid(form)
 
-class WeekmailArticleDeleteView(DeleteView):
+class WeekmailArticleDeleteView(CanEditPropMixin, DeleteView):
     """Delete an article"""
     model = WeekmailArticle
     template_name = 'core/delete_confirm.jinja'
