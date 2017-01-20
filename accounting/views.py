@@ -385,7 +385,7 @@ class OperationPDFView(CanViewMixin, DetailView):
             target = self.object.target.get_display_name()
 
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="op-%d(%s_on_%s).pdf"'  %(num, ti, club_name)
+        response['Content-Disposition'] = 'filename="op-%d(%s_on_%s).pdf"'  %(num, ti, club_name)
         p = canvas.Canvas(response)
 
         p.setFont('DejaVu', 12)
@@ -401,8 +401,7 @@ class OperationPDFView(CanViewMixin, DetailView):
         label = Table(labelStr, colWidths=[150], rowHeights=[20])
 
         label.setStyle(TableStyle([
-                                ('ALIGN',(0,0),(-1,-1),'CENTER'),
-                                ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                ('ALIGN',(0,0),(-1,-1),'RIGHT'),
                                 ]))
         w, h = label.wrapOn(label, 0, 0)
         label.drawOn(p, width-180, height)
