@@ -1,0 +1,38 @@
+{% extends "core/base.jinja" %}
+
+{% block head %}
+{{ super() }}
+<style type="text/css" media="all">
+.topic {
+    border: solid skyblue 1px;
+    padding: 2px;
+    margin: 2px;
+}
+.forum {
+    background: lightblue;
+    padding: 2px;
+    margin: 2px;
+}
+.category {
+    background: skyblue;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <h3>{{ topic.title }}</h3>
+    <p>{{ topic.description }}</p>
+    <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">Reply</a></p>
+    {% for m in topic.messages.all() %}
+    <div>
+        <h5>{{ m.title }}</h5>
+        <p><strong>{{ m.author.get_display_name() }}</strong> - {{ m.date|date(DATETIME_FORMAT) }}
+            {{ m.date|time(DATETIME_FORMAT) }} -
+            <a href="{{ url('forum:new_message', topic_id=topic.id) }}?quote_id={{ m.id }}">Reply as quote</a></p>
+        <p>{{ m.message|markdown }}</p>
+    </div>
+    {% endfor %}
+{% endblock %}
+
+
+

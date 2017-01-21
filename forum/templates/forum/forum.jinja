@@ -1,0 +1,44 @@
+{% extends "core/base.jinja" %}
+{% from 'forum/macros.jinja' import display_forum %}
+
+{% block head %}
+{{ super() }}
+<style type="text/css" media="all">
+.topic {
+    border: solid skyblue 1px;
+    padding: 2px;
+    margin: 2px;
+}
+.forum {
+    background: lightblue;
+    padding: 2px;
+    margin: 2px;
+}
+.category {
+    background: skyblue;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <p>{{ forum.get_parent_list() }}</p>
+    <h3>{{ forum.name }}</h3>
+    <a href="{{ url('forum:new_forum') }}?parent={{ forum.id }}">New forum</a>
+    {% for f in forum.children.all() %}
+    {{ display_forum(f) }}
+    {% endfor %}
+    {% for t in forum.topics.all() %}
+    <div class="topic">
+        <p>
+            <a href="{{ url('forum:view_topic', topic_id=t.id) }}">View</a>
+            <a href="{{ url('forum:edit_topic', topic_id=t.id) }}">Edit</a>
+        </p>
+        <h5>{{ t.title }}</h5>
+        <p>{{ t.description }}</p>
+    </div>
+    {% endfor %}
+    <a href="{{ url('forum:new_topic', forum_id=forum.id) }}">New topic</a>
+{% endblock %}
+
+
+

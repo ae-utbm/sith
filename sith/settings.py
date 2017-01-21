@@ -59,6 +59,7 @@ INSTALLED_APPS = (
     'sas',
     'com',
     'election',
+    'forum',
 )
 
 MIDDLEWARE_CLASSES = (

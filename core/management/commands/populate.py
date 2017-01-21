@@ -18,6 +18,7 @@ from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
 from com.models import Sith, Weekmail
 from election.models import Election, Role, Candidature, ElectionList
+from forum.models import Forum, ForumMessage
 
 
 class Command(BaseCommand):
@@ -428,4 +429,14 @@ Welcome to the wiki page!
             cand.save()
             cand = Candidature(role=pres, user=sli, election_list=listeT, program="En fait j'aime pas l'info, je voulais faire GMC")
             cand.save()
+
+            # Forum
+            room = Forum(name="Salon de discussions", description="Pour causer de tout", is_category=True)
+            room.save()
+            Forum(name="AE", description="Réservé au bureau AE", parent=room).save()
+            Forum(name="BdF", description="Réservé au bureau BdF", parent=room).save()
+            Forum(name="Hall de discussions", description="Pour toutes les discussions", parent=room).save()
+            various = Forum(name="Divers", description="Pour causer de rien", is_category=True)
+            various.save()
+            Forum(name="Promos", description="Réservé aux Promos", parent=various).save()
 

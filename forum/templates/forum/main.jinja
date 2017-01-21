@@ -1,0 +1,33 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'forum/macros.jinja' import display_forum %}
+
+{% block head %}
+{{ super() }}
+<style type="text/css" media="all">
+.forum {
+    background: lightblue;
+    padding: 2px;
+    margin: 2px;
+}
+.category {
+    background: skyblue;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <h3>{% trans %}Forum{% endtrans %}</h3>
+    <a href="{{ url('forum:new_forum') }}">New forum</a>
+    {% for f in forum_list %}
+    <div style="padding: 4px; margin: 4px">
+    {{ display_forum(f) }}
+        {% for c in f.children.all() %}
+        {{ display_forum(c) }}
+        {% endfor %}
+    </div>
+    {% endfor %}
+{% endblock %}
+
+
+
