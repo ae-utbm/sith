@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
 
 {% block head %}
 {{ super() }}
@@ -20,13 +21,22 @@
 {% endblock %}
 
 {% block content %}
+    <p>
+    <a href="{{ url('forum:main') }}">Forum</a>
+    {% for f in topic.forum.get_parent_list() %}
+    > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
+    {% endfor %}
+    > <a href="{{ topic.forum.get_absolute_url() }}">{{ topic.forum }}</a>
+    > <a href="{{ topic.get_absolute_url() }}">{{ topic }}</a>
+    </p>
     <h3>{{ topic.title }}</h3>
     <p>{{ topic.description }}</p>
     <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">Reply</a></p>
     {% for m in topic.messages.all() %}
+    <hr>
     <div>
         <h5>{{ m.title }}</h5>
-        <p><strong>{{ m.author.get_display_name() }}</strong> - {{ m.date|date(DATETIME_FORMAT) }}
+        <p><strong>{{ user_profile_link(m.author) }}</strong> - {{ m.date|date(DATETIME_FORMAT) }}
             {{ m.date|time(DATETIME_FORMAT) }} -
             <a href="{{ url('forum:new_message', topic_id=topic.id) }}?quote_id={{ m.id }}">Reply as quote</a></p>
         <p>{{ m.message|markdown }}</p>

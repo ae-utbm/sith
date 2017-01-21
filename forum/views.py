@@ -38,8 +38,8 @@ class ForumDetailView(DetailView):
     pk_url_kwarg = "forum_id"
 
 class ForumTopicCreateView(CreateView):
-    model = ForumTopic
-    fields = ['title']
+    model = ForumMessage
+    fields = ['title', 'message']
     template_name = "core/create.jinja"
 
     def dispatch(self, request, *args, **kwargs):
@@ -49,13 +49,15 @@ class ForumTopicCreateView(CreateView):
         return super(ForumTopicCreateView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        form.instance.forum = self.forum
+        topic = ForumTopic(title=form.instance.title, author=self.request.user, forum=self.forum)
+        topic.save()
+        form.instance.topic = topic
         form.instance.author = self.request.user
         return super(ForumTopicCreateView, self).form_valid(form)
 
 class ForumTopicEditView(UpdateView):
     model = ForumTopic
-    fields = ['title']
+    fields = ['title', 'forum']
     pk_url_kwarg = "topic_id"
     template_name = "core/edit.jinja"
 

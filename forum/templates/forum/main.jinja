@@ -17,6 +17,9 @@
 {% endblock %}
 
 {% block content %}
+    <p>
+    <a href="{{ url('forum:main') }}">Forum</a> >
+    </p>
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <a href="{{ url('forum:new_forum') }}">New forum</a>
     {% for f in forum_list %}

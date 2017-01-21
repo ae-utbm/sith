@@ -56,7 +56,10 @@ class ForumTopic(models.Model):
     description = models.CharField(_('description'), max_length=256, default="")
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['-id'] # TODO: add date message ordering
+
+    def __str__(self):
+        return "%s" % (self.title)
 
     def get_absolute_url(self):
         return reverse('forum:view_topic', kwargs={'topic_id': self.id})
@@ -72,7 +75,7 @@ class ForumMessage(models.Model):
     date = models.DateTimeField(_('date'), default=timezone.now)
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['id']
 
     def get_absolute_url(self):
         return self.topic.get_absolute_url()
