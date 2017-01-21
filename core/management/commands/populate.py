@@ -38,7 +38,9 @@ class Command(BaseCommand):
         Site(id=4000, domain=settings.SITH_URL, name=settings.SITH_NAME).save()
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         Group(name="Root").save()
-        Group(name="Not registered users").save()
+        Group(name="Public").save()
+        Group(name="Subscribers").save()
+        Group(name="Old subscribers").save()
         Group(name="Accounting admin").save()
         Group(name="Communication admin").save()
         Group(name="Counter admin").save()
@@ -46,6 +48,7 @@ class Command(BaseCommand):
         Group(name="Banned from counters").save()
         Group(name="Banned to subscribe").save()
         Group(name="SAS admin").save()
+        Group(name="Forum admin").save()
         self.reset_index("core", "auth")
         root = User(id=0, username='root', last_name="", first_name="Bibou",
                  email="ae.info@utbm.fr",

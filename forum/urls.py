@@ -11,6 +11,5 @@ urlpatterns = [
     url(r'^topic/(?P<topic_id>[0-9]+)$', ForumTopicDetailView.as_view(), name='view_topic'),
     url(r'^topic/(?P<topic_id>[0-9]+)/edit$', ForumTopicEditView.as_view(), name='edit_topic'),
     url(r'^topic/(?P<topic_id>[0-9]+)/new_message$', ForumMessageCreateView.as_view(), name='new_message'),
-    # url(r'^(?P<club_id>[0-9]+)/tools$', ClubToolsView.as_view(), name='tools'),
 ]
 

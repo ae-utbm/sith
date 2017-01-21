@@ -17,10 +17,13 @@ class Forum(models.Model):
     description = models.CharField(_('description'), max_length=256, default="")
     is_category = models.BooleanField(_('is a category'), default=False)
     parent = models.ForeignKey('Forum', related_name='children', null=True, blank=True)
-    owner_group = models.ForeignKey(Group, related_name="owned_forums",
-                                    default=settings.SITH_GROUP_COM_ADMIN_ID)
-    edit_groups = models.ManyToManyField(Group, related_name="editable_forums", blank=True)
-    view_groups = models.ManyToManyField(Group, related_name="viewable_forums", blank=True)
+    edit_groups = models.ManyToManyField(Group, related_name="editable_forums", blank=True,
+            default=[settings.SITH_GROUP_OLD_SUBSCRIBERS_ID])
+    view_groups = models.ManyToManyField(Group, related_name="viewable_forums", blank=True,
+            default=[settings.SITH_GROUP_PUBLIC_ID])
+
+    def is_owned_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID)
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
@@ -58,6 +61,15 @@ class ForumTopic(models.Model):
     class Meta:
         ordering = ['-id'] # TODO: add date message ordering
 
+    def is_owned_by(self, user):
+        return self.forum.is_owned_by(user) or user.id == self.author.id
+
+    def can_be_edited_by(self, user):
+        return user.can_edit(self.forum)
+
+    def can_be_viewed_by(self, user):
+        return user.can_view(self.forum)
+
     def __str__(self):
         return "%s" % (self.title)
 
@@ -66,7 +78,7 @@ class ForumTopic(models.Model):
 
 class ForumMessage(models.Model):
     """
-    "A ForumMessage object is a message in the forum" Cpt. Obvious
+    "A ForumMessage object represents a message in the forum" -- Cpt. Obvious
     """
     topic = models.ForeignKey(ForumTopic, related_name='messages')
     author = models.ForeignKey(User, related_name='forum_messages')
@@ -76,6 +88,15 @@ class ForumMessage(models.Model):
 
     class Meta:
         ordering = ['id']
+
+    def is_owned_by(self, user):
+        return self.topic.is_owned_by(user) or user.id == self.author.id
+
+    def can_be_edited_by(self, user):
+        return user.can_edit(self.topic)
+
+    def can_be_viewed_by(self, user):
+        return user.can_view(self.topic)
 
     def get_absolute_url(self):
         return self.topic.get_absolute_url()

@@ -8,15 +8,16 @@ from django.conf import settings
 from django import forms
 from django.core.exceptions import PermissionDenied
 
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from forum.models import Forum, ForumMessage, ForumTopic
 
-class ForumMainView(ListView):
+class ForumMainView(CanViewMixin, ListView):
     queryset = Forum.objects.filter(parent=None)
     template_name = "forum/main.jinja"
 
-class ForumCreateView(CreateView):
+class ForumCreateView(CanCreateMixin, CreateView):
     model = Forum
-    fields = ['name', 'parent', 'is_category', 'owner_group', 'edit_groups', 'view_groups']
+    fields = ['name', 'parent', 'is_category', 'edit_groups', 'view_groups']
     template_name = "core/create.jinja"
 
     def get_initial(self):
@@ -25,19 +26,19 @@ class ForumCreateView(CreateView):
         init['parent'] = parent
         return init
 
-class ForumEditView(UpdateView):
+class ForumEditView(CanEditPropMixin, UpdateView):
     model = Forum
     pk_url_kwarg = "forum_id"
-    fields = ['name', 'parent', 'is_category', 'owner_group', 'edit_groups', 'view_groups']
+    fields = ['name', 'parent', 'is_category', 'edit_groups', 'view_groups']
     template_name = "core/edit.jinja"
     success_url = reverse_lazy('forum:main')
 
-class ForumDetailView(DetailView):
+class ForumDetailView(CanViewMixin, DetailView):
     model = Forum
     template_name = "forum/forum.jinja"
     pk_url_kwarg = "forum_id"
 
-class ForumTopicCreateView(CreateView):
+class ForumTopicCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
     fields = ['title', 'message']
     template_name = "core/create.jinja"
@@ -55,19 +56,19 @@ class ForumTopicCreateView(CreateView):
         form.instance.author = self.request.user
         return super(ForumTopicCreateView, self).form_valid(form)
 
-class ForumTopicEditView(UpdateView):
+class ForumTopicEditView(CanEditPropMixin, UpdateView):
     model = ForumTopic
     fields = ['title', 'forum']
     pk_url_kwarg = "topic_id"
     template_name = "core/edit.jinja"
 
-class ForumTopicDetailView(DetailView):
+class ForumTopicDetailView(CanViewMixin, DetailView):
     model = ForumTopic
     pk_url_kwarg = "topic_id"
     template_name = "forum/topic.jinja"
     context_object_name = "topic"
 
-class ForumMessageCreateView(CreateView):
+class ForumMessageCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
     fields = ['title', 'message']
     template_name = "core/create.jinja"
