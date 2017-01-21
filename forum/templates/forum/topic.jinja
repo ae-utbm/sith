@@ -40,21 +40,25 @@
             {% else %}
             <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
             {% endif %}
+            <br/>
             <strong>{{ user_profile_link(m.author) }}</strong>
         </div>
-        <div style="display: inline-block; width: 80%;">
+        <div style="display: inline-block; width: 80%; vertical-align: top;">
             <div style="display: inline-block; width: 74%;">
                 {% if m.title %}
                 <h5>{{ m.title }}</h5>
-                <hr>
                 {% endif %}
             </div>
             <div style="display: inline-block; width: 25%;">
-                <span> <a href="{{ url('forum:edit_message', message_id=m.id) }}">{% trans %}Edit{% endtrans %}</a></span>
                 <span><a href="{{ url('forum:new_message', topic_id=topic.id) }}?quote_id={{ m.id }}">
-                        {% trans %}Reply as quote{% endtrans %}</a></span><br/>
+                        {% trans %}Reply as quote{% endtrans %}</a></span>
+                {% if user.can_edit(m) %}
+                <span> <a href="{{ url('forum:edit_message', message_id=m.id) }}">{% trans %}Edit{% endtrans %}</a></span>
+                {% endif %}
+                <br/>
                 <span>{{ m.date|date(DATETIME_FORMAT) }} {{ m.date|time(DATETIME_FORMAT) }}</span>
             </div>
+            <hr>
             <div>
             {{ m.message|markdown }}
             </div>

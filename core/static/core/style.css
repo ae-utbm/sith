@@ -11,6 +11,20 @@ a {
 }
 a:hover   { color: #7FDBFF; }
 a:active  { color: #007BE6; }
+.ib {
+    display: inline-block;
+    padding: 2px;
+    margin: 2px;
+}
+.w_big {
+    width: 75%;
+}
+.w_medium {
+    width: 45%;
+}
+.w_small {
+    width: 20%;
+}
 /*--------------------------------HEADER-------------------------------*/
 #logo {
     margin-left: 5%;
@@ -377,7 +391,8 @@ textarea {
     color: black;
 }
 .topic a:hover, .forum a:hover, .category a:hover {
-    color: #242424;
+    color: #424242;
+    text-decoration: underline;
 }
 .topic {
     border: solid skyblue 1px;
@@ -403,6 +418,7 @@ textarea {
 .msg_author {
     display: inline-block;
     width: 19%;
+    text-align: center;
 }
 .msg_author img {
     max-width: 80%;

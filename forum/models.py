@@ -52,6 +52,24 @@ class Forum(models.Model):
             p = p.parent
         return l
 
+    def get_topic_number(self):
+        number = self.topics.all().count()
+        for c in self.children.all():
+            number += c.get_topic_number()
+        return number
+
+    def get_last_message(self):
+        last_msg = None
+        for m in ForumMessage.objects.order_by('-id'):
+            forum = m.topic.forum
+            if self in (forum.get_parent_list() + [forum]):
+                return m
+                last_msg = m
+        try:
+            pass
+        except: pass
+        return last_msg
+
 class ForumTopic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics')
     author = models.ForeignKey(User, related_name='forum_topics')
@@ -93,7 +111,7 @@ class ForumMessage(models.Model):
         return self.topic.is_owned_by(user) or user.id == self.author.id
 
     def can_be_edited_by(self, user):
-        return user.can_edit(self.topic)
+        return user.is_owner(self.topic)
 
     def can_be_viewed_by(self, user):
         return user.can_view(self.topic)

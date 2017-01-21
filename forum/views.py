@@ -23,8 +23,10 @@ class ForumCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         init = super(ForumCreateView, self).get_initial()
-        parent = Forum.objects.filter(id=self.request.GET['parent']).first()
-        init['parent'] = parent
+        try:
+            parent = Forum.objects.filter(id=self.request.GET['parent']).first()
+            init['parent'] = parent
+        except: pass
         return init
 
 class ForumEditView(CanEditPropMixin, UpdateView):
@@ -62,7 +64,7 @@ class ForumTopicCreateView(CanCreateMixin, CreateView):
         form.instance.author = self.request.user
         return super(ForumTopicCreateView, self).form_valid(form)
 
-class ForumTopicEditView(CanEditPropMixin, UpdateView):
+class ForumTopicEditView(CanEditMixin, UpdateView):
     model = ForumTopic
     fields = ['title', 'forum']
     pk_url_kwarg = "topic_id"

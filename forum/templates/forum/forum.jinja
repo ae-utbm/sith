@@ -3,13 +3,13 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 
 {% block content %}
-    <p>
+    <div>
     <a href="{{ url('forum:main') }}">Forum</a>
     {% for f in forum.get_parent_list() %}
     > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
     {% endfor %}
     > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
-    </p>
+    </div>
     <h3>{{ forum.name }}</h3>
     <a href="{{ url('forum:new_forum') }}?parent={{ forum.id }}">New forum</a>
     {% for f in forum.children.all() %}
@@ -17,19 +17,31 @@
     {% endfor %}
     {% for t in topics %}
     <div class="topic">
-        <p>
-            <a href="{{ url('forum:edit_topic', topic_id=t.id) }}">Edit</a>
-        </p>
-        <a href="{{ url('forum:view_topic', topic_id=t.id) }}">
-        <div style="display: inline-block; width: 80%">
-            <h5>{{ t.title }}</h5>
-            <p>{{ t.description }}</p>
+        <div class="ib w_medium">
+            <a class="ib w_big" href="{{ url('forum:view_topic', topic_id=t.id) }}">
+                <h5>{{ t.title }}</h5>
+                <p>{{ t.description }}</p>
+            </a>
+            {% if user.can_edit(t) %}
+            <div class="ib" style="text-align: center;">
+                <a href="{{ url('forum:edit_topic', topic_id=t.id) }}">Edit</a>
+            </div>
+            {% endif %}
         </div>
-        </a>
-        <div style="display: inline-block; width: 19%">
-            {% set last_msg = t.messages.order_by('id').last() %}
-            <p>Last message by {{ user_profile_link(last_msg.author) }} at {{ last_msg.date|date(DATETIME_FORMAT) }} {{
-            last_msg.date|time(DATETIME_FORMAT) }}</p>
+        <div class="ib w_medium">
+            <div class="ib w_medium">
+                <div class="ib w_medium" style="text-align: center;">
+                    {{ user_profile_link(t.author) }}
+                </div>
+                <div class="ib w_medium" style="text-align: center;">
+                    {{ t.messages.count() }}
+                </div>
+            </div>
+            <div class="ib w_medium" style="text-align: center;">
+                {% set last_msg = t.messages.order_by('id').last() %}
+                {{ user_profile_link(last_msg.author) }} <br/>
+                {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
+            </div>
         </div>
     </div>
     {% endfor %}

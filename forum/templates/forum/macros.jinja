@@ -1,17 +1,33 @@
 {% macro display_forum(forum) %}
 <div class="forum {% if forum.is_category %}category{% endif %}">
-    <p>
-        <a href="{{ url('forum:edit_forum', forum_id=forum.id) }}">Edit</a>
-    </p>
-    {% if not forum.is_category %}
-    <a href="{{ url('forum:view_forum', forum_id=forum.id) }}">
-    {% endif %}
-    <div>
-        <h5>{{ forum.name }}</h5>
-        <p>{{ forum.description }}</p>
+    <div class="ib w_big">
+        {% if not forum.is_category %}
+        <a class="ib w_big" href="{{ url('forum:view_forum', forum_id=forum.id) }}">
+        {% else %}
+        <div class="ib w_big">
+        {% endif %}
+            <h5>{{ forum.name }}</h5>
+            <p>{{ forum.description }}</p>
+        {% if not forum.is_category %}
+        </a>
+        {% else %}
+        </div>
+        {% endif %}
+        <a class="ib" href="{{ url('forum:edit_forum', forum_id=forum.id) }}">Edit</a>
     </div>
     {% if not forum.is_category %}
-    </a>
+    <div class="ib w_small">
+        <div class="ib w_medium">
+            {{ forum.get_topic_number() }}
+        </div>
+        <div class="ib w_medium">
+            {% set last_msg = forum.get_last_message() %}
+            {% if last_msg %}
+            {{ last_msg.author }} <br/>
+            {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
+            {% endif %}
+        </div>
+    </div>
     {% endif %}
 </div>
 {% endmacro %}
