@@ -1,24 +1,6 @@
 {% extends "core/base.jinja" %}
 {% from 'forum/macros.jinja' import display_forum %}
-
-{% block head %}
-{{ super() }}
-<style type="text/css" media="all">
-.topic {
-    border: solid skyblue 1px;
-    padding: 2px;
-    margin: 2px;
-}
-.forum {
-    background: lightblue;
-    padding: 2px;
-    margin: 2px;
-}
-.category {
-    background: skyblue;
-}
-</style>
-{% endblock %}
+{% from 'core/macros.jinja' import user_profile_link %}
 
 {% block content %}
     <p>
@@ -33,14 +15,22 @@
     {% for f in forum.children.all() %}
     {{ display_forum(f) }}
     {% endfor %}
-    {% for t in forum.topics.all() %}
+    {% for t in topics %}
     <div class="topic">
         <p>
-            <a href="{{ url('forum:view_topic', topic_id=t.id) }}">View</a>
             <a href="{{ url('forum:edit_topic', topic_id=t.id) }}">Edit</a>
         </p>
-        <h5>{{ t.title }}</h5>
-        <p>{{ t.description }}</p>
+        <a href="{{ url('forum:view_topic', topic_id=t.id) }}">
+        <div style="display: inline-block; width: 80%">
+            <h5>{{ t.title }}</h5>
+            <p>{{ t.description }}</p>
+        </div>
+        </a>
+        <div style="display: inline-block; width: 19%">
+            {% set last_msg = t.messages.order_by('id').last() %}
+            <p>Last message by {{ user_profile_link(last_msg.author) }} at {{ last_msg.date|date(DATETIME_FORMAT) }} {{
+            last_msg.date|time(DATETIME_FORMAT) }}</p>
+        </div>
     </div>
     {% endfor %}
     <a href="{{ url('forum:new_topic', forum_id=forum.id) }}">New topic</a>

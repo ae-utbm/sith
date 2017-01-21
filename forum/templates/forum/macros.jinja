@@ -1,13 +1,18 @@
 {% macro display_forum(forum) %}
 <div class="forum {% if forum.is_category %}category{% endif %}">
     <p>
-        {% if not forum.is_category %}
-        <a href="{{ url('forum:view_forum', forum_id=forum.id) }}">View</a>
-        {% endif %}
         <a href="{{ url('forum:edit_forum', forum_id=forum.id) }}">Edit</a>
     </p>
-    <h5>{{ forum.name }}</h5>
-    <p>{{ forum.description }}</p>
+    {% if not forum.is_category %}
+    <a href="{{ url('forum:view_forum', forum_id=forum.id) }}">
+    {% endif %}
+    <div>
+        <h5>{{ forum.name }}</h5>
+        <p>{{ forum.description }}</p>
+    </div>
+    {% if not forum.is_category %}
+    </a>
+    {% endif %}
 </div>
 {% endmacro %}
 

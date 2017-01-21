@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils import timezone
 from django.conf import settings
 from django import forms
+from django.db import models
 from django.core.exceptions import PermissionDenied
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
@@ -38,6 +39,11 @@ class ForumDetailView(CanViewMixin, DetailView):
     template_name = "forum/forum.jinja"
     pk_url_kwarg = "forum_id"
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(ForumDetailView, self).get_context_data(**kwargs)
+        kwargs['topics'] = self.object.topics.annotate(models.Max('messages__date')).order_by('-messages__date__max')
+        return kwargs
+
 class ForumTopicCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
     fields = ['title', 'message']
@@ -67,6 +73,12 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "topic_id"
     template_name = "forum/topic.jinja"
     context_object_name = "topic"
+
+class ForumMessageEditView(CanEditMixin, UpdateView):
+    model = ForumMessage
+    fields = ['title', 'message']
+    template_name = "core/edit.jinja"
+    pk_url_kwarg = "message_id"
 
 class ForumMessageCreateView(CanCreateMixin, CreateView):
     model = ForumMessage

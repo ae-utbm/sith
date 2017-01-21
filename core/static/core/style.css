@@ -372,6 +372,42 @@ textarea {
     display: inline;
 }
 
+/*------------------------------FORUM----------------------------------*/
+.topic a, .forum a, .category a {
+    color: black;
+}
+.topic a:hover, .forum a:hover, .category a:hover {
+    color: #242424;
+}
+.topic {
+    border: solid skyblue 1px;
+    padding: 2px;
+    margin: 2px;
+}
+.forum {
+    background: lightblue;
+    padding: 2px;
+    margin: 2px;
+}
+.category {
+    background: skyblue;
+}
+.message {
+    padding: 2px;
+    margin: 2px;
+    background: skyblue;
+}
+.message h5 {
+    font-size: 100%;
+}
+.msg_author {
+    display: inline-block;
+    width: 19%;
+}
+.msg_author img {
+    max-width: 80%;
+    margin: 0px auto;
+}
 /*------------------------------SAS------------------------------------*/
 .album {
     display: inline-block;
