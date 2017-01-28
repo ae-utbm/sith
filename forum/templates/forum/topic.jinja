@@ -1,6 +1,10 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link %}
 
+{% block title %}
+{{ topic }}
+{% endblock %}
+
 {% block head %}
 {{ super() }}
 <style type="text/css" media="all">
@@ -32,8 +36,16 @@
     <h3>{{ topic.title }}</h3>
     <p>{{ topic.description }}</p>
     <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">Reply</a></p>
+    {% set unread = False %}
     {% for m in topic.messages.all() %}
+    {% if m.id == first_unread_message_id %}
+    <div class="message unread" id="first_unread">
+    {% set unread = True %}
+    {% elif unread %}
+    <div class="message unread">
+    {% else %}
     <div class="message">
+    {% endif %}
         <div class="msg_author">
             {% if m.author.profile_pict %}
             <img src="{{ m.author.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
@@ -64,6 +76,7 @@
             </div>
         </div>
     </div>
+    {# m.mark_as_read(user) or "" #}
     {% endfor %}
 {% endblock %}
 

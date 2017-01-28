@@ -2,16 +2,25 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 {% from 'forum/macros.jinja' import display_forum %}
 
+{% block title %}
+{% trans %}Forum{% endtrans %}
+{% endblock %}
+
 {% block content %}
     <p>
     <a href="{{ url('forum:main') }}">Forum</a> >
     </p>
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <p>
-    {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
-        <a href="{{ url('forum:new_forum') }}">New forum</a>
-    {% endif %}
+        <a class="ib" href="{{ url('forum:last_unread') }}">{% trans %}View last unread messages{% endtrans %}</a>
+        <a class="ib" href="{{ url('forum:mark_all_as_read') }}">{% trans %}Mark all as read{% endtrans %}</a>
+        <a class="ib" href="{{ url('forum:main') }}">{% trans %}Refresh{% endtrans %}</a>
     </p>
+    {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+    <p>
+        <a href="{{ url('forum:new_forum') }}">{% trans %}New forum{% endtrans %}</a>
+    </p>
+    {% endif %}
     {% for f in forum_list %}
     <div style="padding: 4px; margin: 4px">
     {{ display_forum(f, user) }}

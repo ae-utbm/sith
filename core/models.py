@@ -426,6 +426,16 @@ class User(AbstractBaseUser):
     def subscribed(self):
         return self.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
 
+    @property
+    def forum_infos(self):
+        try:
+            return self._forum_infos
+        except:
+            from forum.models import ForumUserInfo
+            infos = ForumUserInfo(user=self)
+            infos.save()
+            return infos
+
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):
         super(AnonymousUser, self).__init__()

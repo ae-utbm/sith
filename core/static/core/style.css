@@ -412,6 +412,9 @@ textarea {
     margin: 2px;
     background: skyblue;
 }
+.unread {
+    background: #e6ddad;
+}
 .message h5 {
     font-size: 100%;
 }

@@ -16,6 +16,29 @@ class ForumMainView(CanViewMixin, ListView):
     queryset = Forum.objects.filter(parent=None)
     template_name = "forum/main.jinja"
 
+class ForumMarkAllAsRead(RedirectView):
+    permanent = False
+    url = reverse_lazy('forum:last_unread')
+
+    def get(self, request, *args, **kwargs):
+        try:
+            fi = request.user.forum_infos
+            fi.last_read_date = timezone.now()
+            fi.save()
+        except: pass
+        return super(ForumMarkAllAsRead, self).get(request, *args, **kwargs)
+
+class ForumLastUnread(ListView):
+    model = ForumTopic
+    template_name = "forum/last_unread.jinja"
+
+    def get_queryset(self):
+        l = ForumMessage.objects.exclude(readers=self.request.user).filter(
+                date__gt=self.request.user.forum_infos.last_read_date).values_list('topic') # TODO try to do better
+        return self.model.objects.filter(id__in=l).annotate(models.Max('messages__date')).order_by('-messages__date__max')
+        # return self.model.objects.exclude(messages__readers=self.request.user).distinct().annotate(
+                # models.Max('messages__date')).order_by('-messages__date__max')
+
 class ForumCreateView(CanCreateMixin, CreateView):
     model = Forum
     fields = ['name', 'parent', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
@@ -94,6 +117,15 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "topic_id"
     template_name = "forum/topic.jinja"
     context_object_name = "topic"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ForumTopicDetailView, self).get_context_data(**kwargs)
+        msg = self.object.messages.exclude(readers=self.request.user).order_by('id').first()
+        try:
+            kwargs['first_unread_message_id'] = msg.id
+        except:
+            kwargs['first_unread_message_id'] = -1
+        return kwargs
 
 class ForumMessageEditView(CanEditMixin, UpdateView):
     model = ForumMessage

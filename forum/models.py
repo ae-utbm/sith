@@ -7,6 +7,9 @@ from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 
+from datetime import datetime
+import pytz
+
 from core.models import User, MetaGroup, Group, SithFile
 from club.models import Club
 
@@ -136,9 +139,13 @@ class ForumMessage(models.Model):
     title = models.CharField(_("title"), default="", max_length=64, blank=True)
     message = models.TextField(_("message"), default="")
     date = models.DateTimeField(_('date'), default=timezone.now)
+    readers = models.ManyToManyField(User, related_name="read_messages", verbose_name=_("readers"))
 
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return "%s" % (self.title)
 
     def is_owned_by(self, user):
         return self.topic.is_owned_by(user) or user.id == self.author.id
@@ -150,5 +157,14 @@ class ForumMessage(models.Model):
         return user.can_view(self.topic)
 
     def get_absolute_url(self):
-        return self.topic.get_absolute_url()
+        return self.topic.get_absolute_url() + "#first_unread"
+
+    def mark_as_read(self, user):
+        self.readers.add(user)
+
+class ForumUserInfo(models.Model):
+    user = models.OneToOneField(User, related_name="_forum_infos")
+    last_read_date = models.DateTimeField(_('last read date'), default=datetime(year=settings.SITH_SCHOOL_START_YEAR,
+        month=1, day=1, tzinfo=pytz.UTC))
+    # read_messages = models.ManyToManyField(ForumMessage, related_name="readers", verbose_name=_("read messages"))
 

@@ -18,7 +18,7 @@ from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
 from com.models import Sith, Weekmail
 from election.models import Election, Role, Candidature, ElectionList
-from forum.models import Forum, ForumMessage
+from forum.models import Forum, ForumMessage, ForumTopic
 
 
 class Command(BaseCommand):
@@ -438,8 +438,10 @@ Welcome to the wiki page!
             room.save()
             Forum(name="AE", description="Réservé au bureau AE", parent=room).save()
             Forum(name="BdF", description="Réservé au bureau BdF", parent=room).save()
-            Forum(name="Hall de discussions", description="Pour toutes les discussions", parent=room).save()
+            hall = Forum(name="Hall de discussions", description="Pour toutes les discussions", parent=room)
+            hall.save()
             various = Forum(name="Divers", description="Pour causer de rien", is_category=True)
             various.save()
             Forum(name="Promos", description="Réservé aux Promos", parent=various).save()
+            ForumTopic(forum=hall)
 

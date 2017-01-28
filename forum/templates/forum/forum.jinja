@@ -1,6 +1,9 @@
 {% extends "core/base.jinja" %}
-{% from 'forum/macros.jinja' import display_forum %}
-{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'forum/macros.jinja' import display_forum, display_topic %}
+
+{% block title %}
+{{ forum }}
+{% endblock %}
 
 {% block content %}
     <div>
@@ -21,34 +24,7 @@
     {{ display_forum(f, user) }}
     {% endfor %}
     {% for t in topics %}
-    <div class="topic">
-        <div class="ib w_medium">
-            <a class="ib w_big" href="{{ url('forum:view_topic', topic_id=t.id) }}">
-                <h5>{{ t.title }}</h5>
-                <p>{{ t.description }}</p>
-            </a>
-            {% if user.is_owner(t) %}
-            <div class="ib" style="text-align: center;">
-                <a href="{{ url('forum:edit_topic', topic_id=t.id) }}">Edit</a>
-            </div>
-            {% endif %}
-        </div>
-        <div class="ib w_medium">
-            <div class="ib w_medium">
-                <div class="ib w_medium" style="text-align: center;">
-                    {{ user_profile_link(t.author) }}
-                </div>
-                <div class="ib w_medium" style="text-align: center;">
-                    {{ t.messages.count() }}
-                </div>
-            </div>
-            <div class="ib w_medium" style="text-align: center;">
-                {% set last_msg = t.messages.order_by('id').last() %}
-                {{ user_profile_link(last_msg.author) }} <br/>
-                {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
-            </div>
-        </div>
-    </div>
+    {{ display_topic(t, user) }}
     {% endfor %}
 {% endblock %}
 
