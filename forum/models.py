@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 
 from core.models import User, MetaGroup, Group, SithFile
+from club.models import Club
 
 class Forum(models.Model):
     """
@@ -17,13 +18,45 @@ class Forum(models.Model):
     description = models.CharField(_('description'), max_length=256, default="")
     is_category = models.BooleanField(_('is a category'), default=False)
     parent = models.ForeignKey('Forum', related_name='children', null=True, blank=True)
+    owner_club = models.ForeignKey(Club, related_name="owned_forums", verbose_name=_("owner club"),
+            default=settings.SITH_MAIN_CLUB_ID)
     edit_groups = models.ManyToManyField(Group, related_name="editable_forums", blank=True,
             default=[settings.SITH_GROUP_OLD_SUBSCRIBERS_ID])
     view_groups = models.ManyToManyField(Group, related_name="viewable_forums", blank=True,
             default=[settings.SITH_GROUP_PUBLIC_ID])
 
+    def clean(self):
+        self.check_loop()
+
+    def save(self, *args, **kwargs):
+        copy_rights = False
+        if self.id is None:
+            copy_rights = True
+        super(Forum, self).save(*args, **kwargs)
+        if copy_rights:
+            self.copy_rights()
+
+    def apply_rights_recursively(self):
+        children = self.children.all()
+        for c in children:
+            c.copy_rights()
+            c.apply_rights_recursively()
+
+    def copy_rights(self):
+        """Copy, if possible, the rights of the parent folder"""
+        if self.parent is not None:
+            self.owner_club = self.parent.owner_club
+            self.edit_groups = self.parent.edit_groups.all()
+            self.view_groups = self.parent.view_groups.all()
+            self.save()
+
     def is_owned_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID)
+        if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID):
+            return True
+        m = self.owner_club.get_membership_for(user)
+        if m:
+            return m.role > settings.SITH_MAXIMUM_FREE_ROLE
+        return False
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
@@ -34,9 +67,6 @@ class Forum(models.Model):
                 raise ValidationError(_('You can not make loops in forums'))
             objs.append(cur)
             cur = cur.parent
-
-    def clean(self):
-        self.check_loop()
 
     def __str__(self):
         return "%s" % (self.name)
@@ -73,7 +103,6 @@ class Forum(models.Model):
 class ForumTopic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics')
     author = models.ForeignKey(User, related_name='forum_topics')
-    title = models.CharField(_("title"), default="", max_length=64)
     description = models.CharField(_('description'), max_length=256, default="")
 
     class Meta:
@@ -93,6 +122,10 @@ class ForumTopic(models.Model):
 
     def get_absolute_url(self):
         return reverse('forum:view_topic', kwargs={'topic_id': self.id})
+
+    @property
+    def title(self):
+        return self.messages.order_by('date').first().title
 
 class ForumMessage(models.Model):
     """

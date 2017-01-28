@@ -11,9 +11,14 @@
     > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
     </div>
     <h3>{{ forum.name }}</h3>
-    <a href="{{ url('forum:new_forum') }}?parent={{ forum.id }}">New forum</a>
+    <p>
+    {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+        <a href="{{ url('forum:new_forum') }}?parent={{ forum.id }}">New forum</a> <br/>
+    {% endif %}
+        <a href="{{ url('forum:new_topic', forum_id=forum.id) }}">New topic</a>
+    </p>
     {% for f in forum.children.all() %}
-    {{ display_forum(f) }}
+    {{ display_forum(f, user) }}
     {% endfor %}
     {% for t in topics %}
     <div class="topic">
@@ -22,7 +27,7 @@
                 <h5>{{ t.title }}</h5>
                 <p>{{ t.description }}</p>
             </a>
-            {% if user.can_edit(t) %}
+            {% if user.is_owner(t) %}
             <div class="ib" style="text-align: center;">
                 <a href="{{ url('forum:edit_topic', topic_id=t.id) }}">Edit</a>
             </div>
@@ -45,7 +50,6 @@
         </div>
     </div>
     {% endfor %}
-    <a href="{{ url('forum:new_topic', forum_id=forum.id) }}">New topic</a>
 {% endblock %}
 
 

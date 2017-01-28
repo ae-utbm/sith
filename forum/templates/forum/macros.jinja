@@ -1,4 +1,4 @@
-{% macro display_forum(forum) %}
+{% macro display_forum(forum, user) %}
 <div class="forum {% if forum.is_category %}category{% endif %}">
     <div class="ib w_big">
         {% if not forum.is_category %}
@@ -13,7 +13,10 @@
         {% else %}
         </div>
         {% endif %}
+        {% if user.is_owner(forum) %}
         <a class="ib" href="{{ url('forum:edit_forum', forum_id=forum.id) }}">Edit</a>
+        <a class="ib" href="{{ url('forum:delete_forum', forum_id=forum.id) }}">Delete</a>
+        {% endif %}
     </div>
     {% if not forum.is_category %}
     <div class="ib w_small">

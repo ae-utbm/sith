@@ -18,7 +18,7 @@ class ForumMainView(CanViewMixin, ListView):
 
 class ForumCreateView(CanCreateMixin, CreateView):
     model = Forum
-    fields = ['name', 'parent', 'is_category', 'edit_groups', 'view_groups']
+    fields = ['name', 'parent', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
     template_name = "core/create.jinja"
 
     def get_initial(self):
@@ -26,14 +26,33 @@ class ForumCreateView(CanCreateMixin, CreateView):
         try:
             parent = Forum.objects.filter(id=self.request.GET['parent']).first()
             init['parent'] = parent
+            init['owner_club'] = parent.owner_club
         except: pass
         return init
+
+class ForumEditForm(forms.ModelForm):
+    class Meta:
+        model = Forum
+        fields = ['name', 'parent', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
+    recursive = forms.BooleanField(label=_("Apply rights and club owner recursively"), required=False)
 
 class ForumEditView(CanEditPropMixin, UpdateView):
     model = Forum
     pk_url_kwarg = "forum_id"
-    fields = ['name', 'parent', 'is_category', 'edit_groups', 'view_groups']
+    form_class = ForumEditForm
     template_name = "core/edit.jinja"
+    success_url = reverse_lazy('forum:main')
+
+    def form_valid(self, form):
+        ret = super(ForumEditView, self).form_valid(form)
+        if form.cleaned_data['recursive']:
+            self.object.apply_rights_recursively()
+        return ret
+
+class ForumDeleteView(CanEditPropMixin, DeleteView):
+    model = Forum
+    pk_url_kwarg = "forum_id"
+    template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy('forum:main')
 
 class ForumDetailView(CanViewMixin, DetailView):
