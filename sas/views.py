@@ -157,6 +157,8 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if not self.object.file:
+            self.object.generate_thumbnail()
         self.form = self.get_form()
         parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist('images')
