@@ -14,7 +14,7 @@ def check_token(request):
 
 class RightManagedLookupChannel(LookupChannel):
     def check_auth(self, request):
-        if not request.user.subscribed and not check_token(request):
+        if not request.user.was_subscribed() and not check_token(request):
             raise PermissionDenied
 
 @register('users')
