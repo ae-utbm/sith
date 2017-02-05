@@ -45,6 +45,32 @@ class Company(models.Model):
     class Meta:
         verbose_name = _("company")
 
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
+            return True
+        return False
+
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        for club in user.memberships.filter(end_date=None).all():
+            if club and club.role == 7:
+                return True
+        return False
+
+    def can_be_viewed_by(self, user):
+        """
+        Method to see if that object can be viewed by the given user
+        """
+        for club in user.memberships.filter(end_date=None).all():
+            if club and club.role >= 7:
+                return True
+        return False
+
     def get_absolute_url(self):
         return reverse('accounting:co_edit', kwargs={'co_id': self.id})
 
