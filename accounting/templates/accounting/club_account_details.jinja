@@ -15,7 +15,9 @@
     {% if user.is_root and not object.journals.exists() %}
     <a href="{{ url('accounting:club_delete', c_account_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
     {% endif %}
+    {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
     <p><a href="{{ url('accounting:label_new') }}?parent={{ object.id }}">{% trans %}New label{% endtrans %}</a></p>
+    {% endif %}
     <p><a href="{{ url('accounting:label_list', clubaccount_id=object.id) }}">{% trans %}Label list{% endtrans %}</a></p>
     {% if not object.has_open_journal() %}
     <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">{% trans %}New journal{% endtrans %}</a></p>
@@ -52,7 +54,11 @@
             <td>{% trans %}No{% endtrans %}</td>
             {% endif %}
             <td> <a href="{{ url('accounting:journal_details', j_id=j.id) }}">{% trans %}View{% endtrans %}</a>
-                <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">{% trans %}Edit{% endtrans %}</a> </td>
+                <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">{% trans %}Edit{% endtrans %}</a>
+                {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
+                    <a href="{{ url('accounting:journal_delete', j_id=j.id) }}">{% trans %}Delete{% endtrans %}</a>
+                {% endif %}
+                </td>
         </tr>
         {% endfor %}
         </tbody>
