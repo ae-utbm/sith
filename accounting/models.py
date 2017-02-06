@@ -58,7 +58,7 @@ class Company(models.Model):
         Method to see if that object can be edited by the given user
         """
         for club in user.memberships.filter(end_date=None).all():
-            if club and club.role == 7:
+            if club and club.role == settings.SITH_CLUB_ROLES_ID['Treasurer']:
                 return True
         return False
 
@@ -67,7 +67,7 @@ class Company(models.Model):
         Method to see if that object can be viewed by the given user
         """
         for club in user.memberships.filter(end_date=None).all():
-            if club and club.role >= 7:
+            if club and club.role >= settings.SITH_CLUB_ROLES_ID['Treasurer']:
                 return True
         return False
 
@@ -97,7 +97,7 @@ class BankAccount(models.Model):
         if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         m = self.club.get_membership_for(user)
-        if m is not None and m.role >= 7:
+        if m is not None and m.role >= settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 
@@ -129,7 +129,7 @@ class ClubAccount(models.Model):
         Method to see if that object can be edited by the given user
         """
         m = self.club.get_membership_for(user)
-        if m and m.role == 7:
+        if m and m.role == settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 
@@ -138,7 +138,7 @@ class ClubAccount(models.Model):
         Method to see if that object can be viewed by the given user
         """
         m = self.club.get_membership_for(user)
-        if m and m.role >= 7:
+        if m and m.role >= settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 
@@ -218,7 +218,7 @@ class Operation(models.Model):
     journal = models.ForeignKey(GeneralJournal, related_name="operations", null=False, verbose_name=_("journal"))
     amount = CurrencyField(_('amount'))
     date = models.DateField(_('date'))
-    remark = models.CharField(_('comment'), max_length=128, default="", null=True, blank=True)
+    remark = models.CharField(_('comment'), max_length=128, null=True, blank=True)
     mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)
     cheque_number = models.CharField(_('cheque number'), max_length=32, default="", null=True, blank=True)
     invoice = models.ForeignKey(SithFile, related_name='operations', verbose_name=_("invoice"), null=True, blank=True)
