@@ -55,7 +55,7 @@
             {% endif %}
             <td> <a href="{{ url('accounting:journal_details', j_id=j.id) }}">{% trans %}View{% endtrans %}</a>
                 <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">{% trans %}Edit{% endtrans %}</a>
-                {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
+                {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) and j.operations.count() == 0 %}
                     <a href="{{ url('accounting:journal_delete', j_id=j.id) }}">{% trans %}Delete{% endtrans %}</a>
                 {% endif %}
                 </td>
