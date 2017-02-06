@@ -155,9 +155,9 @@ Un bloc de citation se crée ainsi :
 > citation
 ```
 
- > Ceci est
- > un bloc de
- > citation
+> Ceci est
+> un bloc de
+> citation
 
 Il est possible d'intégrer de la syntaxe Markdown-AE dans un tel bloc.
 
