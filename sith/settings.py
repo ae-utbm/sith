@@ -153,6 +153,8 @@ HAYSTACK_CONNECTIONS = {
             },
         }
 
+HAYSTACK_SIGNAL_PROCESSOR = 'core.search_indexes.UserOnlySignalProcessor'
+
 WSGI_APPLICATION = 'sith.wsgi.application'
 
 
