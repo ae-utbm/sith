@@ -39,7 +39,7 @@
     {% endif %}
 {% endif %}
     <div>
-        {% for a in album.children_albums.order_by('-id') %}
+        {% for a in album.children_albums.order_by('-date') %}
         <div style="display: inline-block;">
         {% if edit_mode %}
         <input type="checkbox" name="file_list" value="{{ a.id }}">

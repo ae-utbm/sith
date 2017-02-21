@@ -253,7 +253,8 @@ class PictureEditForm(forms.ModelForm):
 class AlbumEditForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields=['name', 'file', 'parent', 'edit_groups']
+        fields = ['name', 'date', 'file', 'parent', 'edit_groups']
+    date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
     parent = make_ajax_field(Album, 'parent', 'files', help_text="")
     edit_groups = make_ajax_field(Album, 'edit_groups', 'groups', help_text="")
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
