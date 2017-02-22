@@ -402,7 +402,7 @@ class User(AbstractBaseUser):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
 
     def can_be_viewed_by(self, user):
-        return (user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP) and self.is_subscriber_viewable) or user.is_root
+        return (user.was_subscribed() and self.is_subscriber_viewable) or user.is_root
 
     def get_mini_item(self):
         return """
