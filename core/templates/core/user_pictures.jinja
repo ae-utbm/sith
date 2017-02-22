@@ -5,27 +5,19 @@
 {% endblock %}
 
 {% block content %}
-{% set album = None %}
-{% set new_album = True %}
-{% for r in profile.pictures.exclude(picture=None).order_by('-picture__parent__id', 'id') -%}
-    {%- if album != r.picture.parent %}
-        {%- if album %}
-    </div>
-        {% endif -%}
-    {% set new_album = True %}
-    {% set album = r.picture.parent %}
+{% set picture_qs = profile.pictures.exclude(picture=None).order_by('-picture__parent__id', 'id').select_related('picture__parent__parent__name') %}
+{% for a in picture_qs.distinct('picture__parent') %}
     <div style="padding: 10px">
-        <h4>{{ album.name }}</h4>
+        <h4>{{ a.picture.parent.name }}</h4>
         <hr>
-    {% else %}
-        {% set new_album = False %}
-    {%- endif %}
+    {% for r in picture_qs.filter(picture__parent=a.picture.parent) -%}
         <div class="picture">
             <a href="{{ url("sas:picture", picture_id=r.picture.id) }}#pict">
                 <img src="{{ r.picture.get_download_thumb_url() }}" alt="{{ r.picture.get_display_name() }}" style="max-width: 100%"/>
             </a>
         </div>
-{%- endfor %}
+    {% endfor %}
     </div>
+{% endfor %}
 {% endblock %}
 

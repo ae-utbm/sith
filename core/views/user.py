@@ -502,8 +502,8 @@ class UserAccountView(UserAccountBase):
                 (lambda q: q.amount)
             )
             kwargs['etickets'] = self.object.customer.buyings.exclude(product__eticket=None).all()
-        except:
-            pass
+        except Exception as e:
+            print(repr(e))
         return kwargs
 
 class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
