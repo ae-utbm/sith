@@ -27,6 +27,7 @@ SECRET_KEY = '(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+INTERNAL_IPS = ['127.0.0.1']
 
 ALLOWED_HOSTS = ['*']
 
@@ -483,6 +484,5 @@ except:
     print("Custom settings failed")
 
 if DEBUG:
-    INTERNAL_IPS = ['127.0.0.1']
     INSTALLED_APPS += ("debug_toolbar",)
     MIDDLEWARE_CLASSES = ('debug_toolbar.middleware.DebugToolbarMiddleware',) + MIDDLEWARE_CLASSES
