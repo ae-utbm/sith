@@ -10,7 +10,7 @@ from django import forms
 from django.db import models
 from django.core.exceptions import PermissionDenied
 
-from math import inf
+import math
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
@@ -126,7 +126,7 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
         try:
             kwargs['first_unread_message_id'] = msg.id
         except:
-            kwargs['first_unread_message_id'] = inf
+            kwargs['first_unread_message_id'] = math.inf
         return kwargs
 
 class ForumMessageEditView(CanEditMixin, UpdateView):
