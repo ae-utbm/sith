@@ -11,5 +11,6 @@ django-ajax-selects
 reportlab
 django-haystack
 whoosh
+django-debug-toolbar
 # mysqlclient
 
