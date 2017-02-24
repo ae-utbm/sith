@@ -8,10 +8,10 @@ class SithRenderer(Renderer):
         return reverse('core:file_detail', kwargs={'file_id': id}) + suffix
 
     def exposant(self, text):
-        return """<span class="exposant">%s</span>""" % text
+        return """<sup>%s</sup>""" % text
 
     def indice(self, text):
-        return """<span class="indice">%s</span>""" % text
+        return """<sub>%s</sub>""" % text
 
     def underline(self, text):
         return """<span class="underline">%s</span>""" % text
