@@ -10,6 +10,8 @@ from django import forms
 from django.db import models
 from django.core.exceptions import PermissionDenied
 
+from math import inf
+
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
 
@@ -36,9 +38,7 @@ class ForumLastUnread(ListView):
     def get_queryset(self):
         l = ForumMessage.objects.exclude(readers=self.request.user).filter(
                 date__gt=self.request.user.forum_infos.last_read_date).values_list('topic') # TODO try to do better
-        return self.model.objects.filter(id__in=l).annotate(models.Max('messages__date')).order_by('-messages__date__max')
-        # return self.model.objects.exclude(messages__readers=self.request.user).distinct().annotate(
-                # models.Max('messages__date')).order_by('-messages__date__max')
+        return self.model.objects.filter(id__in=l).annotate(models.Max('messages__date')).order_by('-messages__date__max').select_related('author')
 
 class ForumCreateView(CanCreateMixin, CreateView):
     model = Forum
@@ -118,14 +118,15 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "topic_id"
     template_name = "forum/topic.jinja"
     context_object_name = "topic"
+    queryset = ForumTopic.objects.select_related('forum__parent')
 
     def get_context_data(self, **kwargs):
         kwargs = super(ForumTopicDetailView, self).get_context_data(**kwargs)
-        msg = self.object.messages.exclude(readers=self.request.user).order_by('id').first()
+        msg = self.object.messages.exclude(readers=self.request.user).filter(date__gte=self.request.user.forum_infos.last_read_date).order_by('id').first()
         try:
             kwargs['first_unread_message_id'] = msg.id
         except:
-            kwargs['first_unread_message_id'] = -1
+            kwargs['first_unread_message_id'] = inf
         return kwargs
 
 class ForumMessageEditView(CanEditMixin, UpdateView):
@@ -144,6 +145,7 @@ class ForumMessageDeleteView(SingleObjectMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
+        self.object = self.get_object()
         if self.object.can_be_moderated_by(self.request.user):
             ForumMessageMeta(message=self.object, user=self.request.user, action="DELETE").save()
         return self.object.get_absolute_url()
@@ -154,6 +156,7 @@ class ForumMessageUndeleteView(SingleObjectMixin, RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
+        self.object = self.get_object()
         if self.object.can_be_moderated_by(self.request.user):
             ForumMessageMeta(message=self.object, user=self.request.user, action="UNDELETE").save()
         return self.object.get_absolute_url()
@@ -172,14 +175,19 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
     def get_initial(self):
         init = super(ForumMessageCreateView, self).get_initial()
         try:
-            init['message'] = "\n".join([
-                "> " + line for line in ForumMessage.objects.filter(id=self.request.GET['quote_id']).first().message.split('\n')
+            message = ForumMessage.objects.select_related('author').filter(id=self.request.GET['quote_id']).first()
+            init['message'] = "> ##### %s\n" % (_("%(author)s said") % {'author': message.author.get_short_name()})
+            init['message'] += "\n".join([
+                "> " + line for line in message.message.split('\n')
                 ])
-        except: pass
+            init['message'] += "\n\n"
+        except Exception as e:
+            print(repr(e))
         return init
 
     def form_valid(self, form):
         form.instance.topic = self.topic
         form.instance.author = self.request.user
         return super(ForumMessageCreateView, self).form_valid(form)
+
 

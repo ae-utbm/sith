@@ -37,16 +37,13 @@
     <p>{{ topic.description }}</p>
     <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">Reply</a></p>
 
-    {% set vars = {'unread': False} %} {# ugly hack to counter Jinja scopes #}
-    {% for m in topic.messages.all() %}
-    {% if m.id == first_unread_message_id and vars.update({'unread': True}) %} {# idem #}
-        <div class="message unread" id="first_unread">
-    {% elif vars.unread %}
-        <div class="message unread">
+    {% for m in topic.messages.select_related('author__profile_pict').all() %}
+    {% if m.id >= first_unread_message_id %}
+    <div id="msg_{{ m.id }}" class="message unread">
     {% else %}
-        <div class="message">
+    <div id="msg_{{ m.id }}" class="message">
     {% endif %}
-            <div class="msg_author">
+        <div class="msg_author">
                 {% if m.author.profile_pict %}
             <img src="{{ m.author.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
             {% else %}
@@ -55,7 +52,7 @@
             <br/>
             <strong>{{ user_profile_link(m.author) }}</strong>
         </div>
-        <div style="display: inline-block; width: 80%; vertical-align: top;">
+        <div {% if m.id == first_unread_message_id %}id="first_unread"{% endif %} style="display: inline-block; width: 80%; vertical-align: top;">
             <div style="display: inline-block; width: 74%;">
                 {% if m.title %}
                 <h5>{{ m.title }}</h5>
@@ -68,7 +65,7 @@
                 <span> <a href="{{ url('forum:edit_message', message_id=m.id) }}">{% trans %}Edit{% endtrans %}</a></span>
                 {% endif %}
                 {% if m.can_be_moderated_by(user) %}
-                {% if m.is_deleted() %}
+                {% if m.deleted %}
                 <span> <a href="{{ url('forum:undelete_message', message_id=m.id) }}">{% trans %}Undelete{% endtrans %}</a></span>
                 {% else %}
                 <span> <a href="{{ url('forum:delete_message', message_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></span>
@@ -81,17 +78,20 @@
             <div>
             {{ m.message|markdown }}
             </div>
+            {% if m.can_be_moderated_by(user) %}
             <ul>
-            {% for meta in m.metas.all() %}
+            {% for meta in m.metas.select_related('user').all() %}
                 <li>{{ meta.get_action_display() }} {{ meta.user.get_display_name() }}
                     {% trans %} at {% endtrans %}{{ meta.date|time(DATETIME_FORMAT) }}
                     {% trans %} the {% endtrans %}{{ meta.date|date(DATETIME_FORMAT)}}</li>
             {% endfor %}
             </ul>
+            {% endif %}
         </div>
     </div>
     {{ m.mark_as_read(user) or "" }}
     {% endfor %}
+    <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">Reply</a></p>
 {% endblock %}
 
 

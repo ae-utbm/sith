@@ -23,13 +23,12 @@
     {% if not forum.is_category %}
     <div class="ib w_small">
         <div class="ib w_medium">
-            {{ forum.get_topic_number() }}
+            {{ forum.topic_number }}
         </div>
         <div class="ib w_medium">
-            {% set last_msg = forum.get_last_message() %}
-            {% if last_msg %}
-            {{ last_msg.author }} <br/>
-            {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
+            {% if forum.last_message %}
+            {{ forum.last_message.author }} <br/>
+            {{ forum.last_message.date|date(DATETIME_FORMAT) }} {{ forum.last_message.date|time(DATETIME_FORMAT) }}
             {% endif %}
         </div>
     </div>
@@ -64,7 +63,7 @@
             </div>
         </div>
         <div class="ib w_medium" style="text-align: center;">
-            {% set last_msg = topic.messages.order_by('id').last() %}
+            {% set last_msg = topic.messages.order_by('id').select_related('author').last() %}
             {{ user_profile_link(last_msg.author) }} <br/>
             {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
         </div>
