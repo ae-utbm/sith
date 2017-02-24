@@ -1,0 +1,73 @@
+{% from 'core/macros.jinja' import user_profile_link %}
+
+{% macro display_forum(forum, user) %}
+<div class="forum {% if forum.is_category %}category{% endif %}">
+    <div class="ib w_big">
+        {% if not forum.is_category %}
+        <a class="ib w_big" href="{{ url('forum:view_forum', forum_id=forum.id) }}">
+        {% else %}
+        <div class="ib w_big">
+        {% endif %}
+            <h5>{{ forum.name }}</h5>
+            <p>{{ forum.description }}</p>
+        {% if not forum.is_category %}
+        </a>
+        {% else %}
+        </div>
+        {% endif %}
+        {% if user.is_owner(forum) %}
+        <a class="ib" href="{{ url('forum:edit_forum', forum_id=forum.id) }}">Edit</a>
+        <a class="ib" href="{{ url('forum:delete_forum', forum_id=forum.id) }}">Delete</a>
+        {% endif %}
+    </div>
+    {% if not forum.is_category %}
+    <div class="ib w_small">
+        <div class="ib w_medium">
+            {{ forum.topic_number }}
+        </div>
+        <div class="ib w_medium">
+            {% if forum.last_message %}
+            {{ forum.last_message.author }} <br/>
+            {{ forum.last_message.date|date(DATETIME_FORMAT) }} {{ forum.last_message.date|time(DATETIME_FORMAT) }}
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro display_topic(topic, user, first_unread=False) %}
+<div class="topic">
+    <div class="ib w_medium">
+        {% if first_unread %}
+        <a class="ib w_big" href="{{ url('forum:view_topic', topic_id=topic.id) }}#first_unread">
+        {% else %}
+        <a class="ib w_big" href="{{ url('forum:view_topic', topic_id=topic.id) }}">
+        {% endif %}
+            <h5>{{ topic.title }}</h5>
+            <p>{{ topic.description }}</p>
+        </a>
+        {% if user.is_owner(topic) %}
+        <div class="ib" style="text-align: center;">
+            <a href="{{ url('forum:edit_topic', topic_id=topic.id) }}">{% trans %}Edit{% endtrans %}</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="ib w_medium">
+        <div class="ib w_medium">
+            <div class="ib w_medium" style="text-align: center;">
+                {{ user_profile_link(topic.author) }}
+            </div>
+            <div class="ib w_medium" style="text-align: center;">
+                {{ topic.messages.count() }}
+            </div>
+        </div>
+        <div class="ib w_medium" style="text-align: center;">
+            {% set last_msg = topic.messages.order_by('id').select_related('author').last() %}
+            {{ user_profile_link(last_msg.author) }} <br/>
+            {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
+        </div>
+    </div>
+</div>
+{% endmacro %}
+

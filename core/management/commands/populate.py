@@ -18,6 +18,7 @@ from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
 from com.models import Sith, Weekmail
 from election.models import Election, Role, Candidature, ElectionList
+from forum.models import Forum, ForumMessage, ForumTopic
 
 
 class Command(BaseCommand):
@@ -37,7 +38,9 @@ class Command(BaseCommand):
         Site(id=4000, domain=settings.SITH_URL, name=settings.SITH_NAME).save()
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         Group(name="Root").save()
-        Group(name="Not registered users").save()
+        Group(name="Public").save()
+        Group(name="Subscribers").save()
+        Group(name="Old subscribers").save()
         Group(name="Accounting admin").save()
         Group(name="Communication admin").save()
         Group(name="Counter admin").save()
@@ -45,6 +48,7 @@ class Command(BaseCommand):
         Group(name="Banned from counters").save()
         Group(name="Banned to subscribe").save()
         Group(name="SAS admin").save()
+        Group(name="Forum admin").save()
         self.reset_index("core", "auth")
         root = User(id=0, username='root', last_name="", first_name="Bibou",
                  email="ae.info@utbm.fr",
@@ -428,4 +432,16 @@ Welcome to the wiki page!
             cand.save()
             cand = Candidature(role=pres, user=sli, election_list=listeT, program="En fait j'aime pas l'info, je voulais faire GMC")
             cand.save()
+
+            # Forum
+            room = Forum(name="Salon de discussions", description="Pour causer de tout", is_category=True)
+            room.save()
+            Forum(name="AE", description="Réservé au bureau AE", parent=room).save()
+            Forum(name="BdF", description="Réservé au bureau BdF", parent=room).save()
+            hall = Forum(name="Hall de discussions", description="Pour toutes les discussions", parent=room)
+            hall.save()
+            various = Forum(name="Divers", description="Pour causer de rien", is_category=True)
+            various.save()
+            Forum(name="Promos", description="Réservé aux Promos", parent=various).save()
+            ForumTopic(forum=hall)
 

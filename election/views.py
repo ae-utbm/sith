@@ -271,7 +271,7 @@ class ElectionCreateView(CanCreateMixin, CreateView):
     template_name = 'core/create.jinja'
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_subscribed():
+        if not request.user.is_subscribed:
             raise PermissionDenied
         return super(ElectionCreateView, self).dispatch(request, *args, **kwargs)
 

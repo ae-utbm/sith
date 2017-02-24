@@ -10,7 +10,7 @@ register = template.Library()
 @register.filter(is_safe=False)
 @stringfilter
 def markdown(text):
-    return mark_safe(md(escape(text)))
+    return mark_safe(md(text))
 
 @register.filter()
 @stringfilter
