@@ -10,6 +10,8 @@ from django.conf import settings
 from django.db import transaction
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.html import escape
+from django.utils.functional import cached_property
+
 from phonenumber_field.modelfields import PhoneNumberField
 
 from datetime import datetime, timedelta, date
@@ -230,25 +232,25 @@ class User(AbstractBaseUser):
             return True
         return self.groups.filter(name=group_name).exists()
 
-    @property
+    @cached_property
     def is_root(self):
         return self.is_superuser or self.groups.filter(id=settings.SITH_GROUP_ROOT_ID).exists()
 
-    @property
+    @cached_property
     def is_board_member(self):
         from club.models import Club
         return Club.objects.filter(unix_name=settings.SITH_MAIN_CLUB['unix_name']).first().get_membership_for(self)
 
-    @property
+    @cached_property
     def is_launderette_manager(self):
         from club.models import Club
         return Club.objects.filter(unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name']).first().get_membership_for(self)
 
-    @property
+    @cached_property
     def is_banned_alcohol(self):
         return self.is_in_group(settings.SITH_GROUP_BANNED_ALCOHOL_ID)
 
-    @property
+    @cached_property
     def is_banned_counter(self):
         return self.is_in_group(settings.SITH_GROUP_BANNED_COUNTER_ID)
 
@@ -422,11 +424,11 @@ class User(AbstractBaseUser):
             escape(self.get_display_name()),
             )
 
-    @property
+    @cached_property
     def subscribed(self):
         return self.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
 
-    @property
+    @cached_property
     def forum_infos(self):
         try:
             return self._forum_infos
@@ -666,12 +668,12 @@ class SithFile(models.Model):
         else:
             return super(SithFile, self).__getattribute__(attr)
 
-    @property
+    @cached_property
     def as_picture(self):
         from sas.models import Picture
         return Picture.objects.filter(id=self.id).first()
 
-    @property
+    @cached_property
     def as_album(self):
         from sas.models import Album
         return Album.objects.filter(id=self.id).first()
