@@ -414,22 +414,42 @@ textarea {
 .message {
     padding: 2px;
     margin: 2px;
-    background: skyblue;
-}
-.unread {
-    background: #e6ddad;
+    background: #eff7ff;
 }
 .message h5 {
     font-size: 100%;
+}
+.unread {
+    background: #d8e7f3;
+}
+.msg_author.deleted {
+    background: #ffcfcf;
+}
+.msg_content.deleted {
+    background: #ffefef;
+}
+.msg_content {
+    display: inline-block;
+    width: 80%;
+    vertical-align: top;
 }
 .msg_author {
     display: inline-block;
     width: 19%;
     text-align: center;
+    background: #d8e7f3;
 }
 .msg_author img {
-    max-width: 80%;
+    max-width: 70%;
     margin: 0px auto;
+}
+.msg_meta {
+    font-size: small;
+    list-style-type: none;
+}
+.msg_meta li {
+    padding: 2px;
+    margin: 2px;
 }
 /*------------------------------SAS------------------------------------*/
 .album {

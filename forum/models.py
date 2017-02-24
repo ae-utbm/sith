@@ -126,7 +126,7 @@ class ForumTopic(models.Model):
         ordering = ['-id'] # TODO: add date message ordering
 
     def is_owned_by(self, user):
-        return self.forum.is_owned_by(user) or user.id == self.author.id
+        return self.forum.is_owned_by(user)
 
     def can_be_edited_by(self, user):
         return user.can_edit(self.forum)
@@ -169,10 +169,10 @@ class ForumMessage(models.Model):
         return user.can_edit(self.topic.forum)
 
     def can_be_viewed_by(self, user):
-        return user.can_view(self.topic)
+        return (not self.deleted and user.can_view(self.topic))
 
     def can_be_moderated_by(self, user):
-        return self.topic.forum.is_owned_by(user)
+        return self.topic.forum.is_owned_by(user) or user.id == self.author.id
 
     def get_absolute_url(self):
         return self.topic.get_absolute_url() + "#msg_" + str(self.id)

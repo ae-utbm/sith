@@ -58,6 +58,8 @@ class ForumCreateView(CanCreateMixin, CreateView):
             parent = Forum.objects.filter(id=self.request.GET['parent']).first()
             init['parent'] = parent
             init['owner_club'] = parent.owner_club
+            init['edit_groups'] = parent.edit_groups.all()
+            init['view_groups'] = parent.view_groups.all()
         except: pass
         return init
 
@@ -93,9 +95,15 @@ class ForumDetailView(CanViewMixin, DetailView):
         kwargs['topics'] = self.object.topics.annotate(models.Max('messages__date')).order_by('-messages__date__max')
         return kwargs
 
+class TopicForm(forms.ModelForm):
+    class Meta:
+        model = ForumMessage
+        fields = ['title', 'message']
+    title = forms.CharField(required=True)
+
 class ForumTopicCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
-    fields = ['title', 'message']
+    form_class = TopicForm
     template_name = "core/create.jinja"
 
     def dispatch(self, request, *args, **kwargs):

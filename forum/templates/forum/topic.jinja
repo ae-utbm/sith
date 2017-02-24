@@ -37,23 +37,23 @@
     <p>{{ topic.description }}</p>
     <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">Reply</a></p>
 
-    {% for m in topic.messages.select_related('author__profile_pict').all() %}
+    {% for m in topic.messages.select_related('author__avatar_pict').all() %}
+    {% if user.can_view(m) %}
     {% if m.id >= first_unread_message_id %}
     <div id="msg_{{ m.id }}" class="message unread">
     {% else %}
     <div id="msg_{{ m.id }}" class="message">
     {% endif %}
-        <div class="msg_author">
-                {% if m.author.profile_pict %}
-            <img src="{{ m.author.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
+        <div class="msg_author {% if m.deleted %}deleted{% endif %}">
+                {% if m.author.avatar_pict %}
+            <img src="{{ m.author.avatar_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
             {% else %}
             <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
             {% endif %}
             <br/>
-            <strong>{{ user_profile_link(m.author) }}</strong>
+            <strong><a href="{{ m.author.get_absolute_url() }}">{{ m.author.get_short_name() }}</a></strong>
         </div>
-        <div {% if m.id == first_unread_message_id %}id="first_unread"{% endif %} style="display: inline-block; width:
-            80%; vertical-align: top; {% if m.deleted %}background: #FFAAAA;{% endif %}">
+        <div class="msg_content  {% if m.deleted %}deleted{% endif %}" {% if m.id == first_unread_message_id %}id="first_unread"{% endif %}>
             <div style="display: inline-block; width: 74%;">
                 {% if m.title %}
                 <h5>{{ m.title }}</h5>
@@ -73,24 +73,26 @@
                 {% endif %}
                 {% endif %}
                 <br/>
-                <span>{{ m.date|date(DATETIME_FORMAT) }} {{ m.date|time(DATETIME_FORMAT) }}</span>
+                <span>{{ m.date|localtime|date(DATETIME_FORMAT) }} {{ m.date|localtime|time(DATETIME_FORMAT) }}</span>
             </div>
             <hr>
             <div>
             {{ m.message|markdown }}
             </div>
             {% if m.can_be_moderated_by(user) %}
-            <ul>
-            {% for meta in m.metas.select_related('user').all() %}
-                <li>{{ meta.get_action_display() }} {{ meta.user.get_display_name() }}
-                    {% trans %} at {% endtrans %}{{ meta.date|time(DATETIME_FORMAT) }}
-                    {% trans %} the {% endtrans %}{{ meta.date|date(DATETIME_FORMAT)}}</li>
+            <ul class="msg_meta">
+            {% for meta in m.metas.select_related('user').order_by('id') %}
+                <li style="background: {% if m.author == meta.user %}#bfffbf{% else %}#ffffbf{% endif %}">
+                    {{ meta.get_action_display() }} {{ meta.user.get_display_name() }}
+                    {% trans %} at {% endtrans %}{{ meta.date|localtime|time(DATETIME_FORMAT) }}
+                    {% trans %} the {% endtrans %}{{ meta.date|localtime|date(DATETIME_FORMAT)}}</li>
             {% endfor %}
             </ul>
             {% endif %}
         </div>
     </div>
     {{ m.mark_as_read(user) or "" }}
+    {% endif %}
     {% endfor %}
     <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">Reply</a></p>
 {% endblock %}

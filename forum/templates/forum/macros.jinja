@@ -47,7 +47,7 @@
             <h5>{{ topic.title }}</h5>
             <p>{{ topic.description }}</p>
         </a>
-        {% if user.is_owner(topic) %}
+        {% if user.can_edit(topic) %}
         <div class="ib" style="text-align: center;">
             <a href="{{ url('forum:edit_topic', topic_id=topic.id) }}">{% trans %}Edit{% endtrans %}</a>
         </div>
