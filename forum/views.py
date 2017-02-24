@@ -148,7 +148,7 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
         init = super(ForumMessageCreateView, self).get_initial()
         try:
             init['message'] = "\n".join([
-                " > " + line for line in ForumMessage.objects.filter(id=self.request.GET['quote_id']).first().message.split('\n')
+                "> " + line for line in ForumMessage.objects.filter(id=self.request.GET['quote_id']).first().message.split('\n')
                 ])
         except: pass
         return init

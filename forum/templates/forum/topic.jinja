@@ -36,18 +36,18 @@
     <h3>{{ topic.title }}</h3>
     <p>{{ topic.description }}</p>
     <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">Reply</a></p>
-    {% set unread = False %}
+
+    {% set vars = {'unread': False} %} {# ugly hack to counter Jinja scopes #}
     {% for m in topic.messages.all() %}
-    {% if m.id == first_unread_message_id %}
-    <div class="message unread" id="first_unread">
-    {% set unread = True %}
-    {% elif unread %}
-    <div class="message unread">
+    {% if m.id == first_unread_message_id and vars.update({'unread': True}) %} {# idem #}
+        <div class="message unread" id="first_unread">
+    {% elif vars.unread %}
+        <div class="message unread">
     {% else %}
-    <div class="message">
+        <div class="message">
     {% endif %}
-        <div class="msg_author">
-            {% if m.author.profile_pict %}
+            <div class="msg_author">
+                {% if m.author.profile_pict %}
             <img src="{{ m.author.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
             {% else %}
             <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
