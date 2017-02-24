@@ -160,7 +160,7 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
         self.form = self.get_form()
         parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist('images')
-        if request.user.is_authenticated() and request.user.is_subscribed():
+        if request.user.is_authenticated() and request.user.is_subscribed:
             if self.form.is_valid():
                 self.form.process(parent=parent, owner=request.user, files=files,
                         automodere=request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID))
@@ -192,7 +192,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
             FileView.handle_clipboard(request, self.object)
         parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist('images')
-        if request.user.is_authenticated() and request.user.is_subscribed():
+        if request.user.is_authenticated() and request.user.is_subscribed:
             if self.form.is_valid():
                 self.form.process(parent=parent, owner=request.user, files=files,
                         automodere=request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID))

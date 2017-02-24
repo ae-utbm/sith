@@ -184,9 +184,11 @@ class User(AbstractBaseUser):
     def to_dict(self):
         return self.__dict__
 
+    @cached_property
     def was_subscribed(self):
         return self.subscriptions.exists()
 
+    @cached_property
     def is_subscribed(self):
         s = self.subscriptions.last()
         return s.is_valid_now() if s is not None else False
@@ -207,11 +209,11 @@ class User(AbstractBaseUser):
         if group_id == settings.SITH_GROUP_PUBLIC_ID:
             return True
         if group_id == settings.SITH_GROUP_SUBSCRIBERS_ID:
-            return self.is_subscribed()
+            return self.is_subscribed
         if group_id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
-            return self.was_subscribed()
+            return self.was_subscribed
         if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked
-            return self.is_subscribed()
+            return self.is_subscribed
         if group_name[-len(settings.SITH_BOARD_SUFFIX):] == settings.SITH_BOARD_SUFFIX:
             from club.models import Club
             name = group_name[:-len(settings.SITH_BOARD_SUFFIX)]

@@ -60,7 +60,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                 self.slot_type = request.POST['slot_type']
             if 'slot' in request.POST.keys() and request.user.is_authenticated():
                 self.subscriber = request.user
-                if self.subscriber.is_subscribed():
+                if self.subscriber.is_subscribed:
                     self.date = dateparse.parse_datetime(request.POST['slot']).replace(tzinfo=pytz.UTC)
                     if self.slot_type == "WASHING":
                         if self.check_slot(self.slot_type):

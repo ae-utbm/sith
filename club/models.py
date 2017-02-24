@@ -122,7 +122,7 @@ class Club(models.Model):
         sub = User.objects.filter(pk=user.pk).first()
         if sub is None:
             return False
-        return sub.is_subscribed()
+        return sub.is_subscribed
 
     def get_membership_for(self, user):
         """
@@ -151,7 +151,7 @@ class Membership(models.Model):
 
     def clean(self):
         sub = User.objects.filter(pk=self.user.pk).first()
-        if sub is None or not sub.is_subscribed():
+        if sub is None or not sub.is_subscribed:
             raise ValidationError(_('User must be subscriber to take part to a club'))
         if Membership.objects.filter(user=self.user).filter(club=self.club).filter(end_date=None).exists():
             raise ValidationError(_('User is already member of that club'))

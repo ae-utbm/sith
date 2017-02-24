@@ -347,7 +347,7 @@ class Selling(models.Model):
             self.customer.save()
             self.is_validated = True
         u = User.objects.filter(id=self.customer.user.id).first()
-        if u.was_subscribed():
+        if u.was_subscribed:
             if self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
                 sub = Subscription(
                         member=u,

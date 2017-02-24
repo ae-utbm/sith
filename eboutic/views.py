@@ -80,7 +80,7 @@ class EbouticMain(TemplateView):
         kwargs['basket'] = self.basket
         kwargs['eboutic'] = Counter.objects.filter(type="EBOUTIC").first()
         kwargs['categories'] = ProductType.objects.all()
-        if not self.request.user.was_subscribed():
+        if not self.request.user.was_subscribed:
             kwargs['categories'] = kwargs['categories'].exclude(id=settings.SITH_PRODUCTTYPE_SUBSCRIPTION)
         return kwargs
 
