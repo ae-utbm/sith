@@ -732,7 +732,15 @@ class Page(models.Model):
     Be careful with the _full_name attribute: this field may not be valid until you call save(). It's made for fast
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
     """
-    name = models.CharField(_('page name'), max_length=30, blank=False)
+    name = models.CharField(_('page unix name'), max_length=30,
+            validators=[
+                validators.RegexValidator(
+                    r'^[\w.+-]+$',
+                    _('Enter a valid page name. This value may contain only '
+                      'letters, numbers ' 'and ./+/-/_ characters.')
+                ),
+            ],
+            blank=False)
     parent = models.ForeignKey('self', related_name="children", verbose_name=_("parent"), null=True, blank=True, on_delete=models.SET_NULL)
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
