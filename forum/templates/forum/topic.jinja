@@ -67,6 +67,13 @@
                 {% if user.can_edit(m) %}
                 <span> <a href="{{ url('forum:edit_message', message_id=m.id) }}">{% trans %}Edit{% endtrans %}</a></span>
                 {% endif %}
+                {% if m.can_be_moderated_by(user) %}
+                {% if m.is_deleted() %}
+                <span> <a href="{{ url('forum:undelete_message', message_id=m.id) }}">{% trans %}Undelete{% endtrans %}</a></span>
+                {% else %}
+                <span> <a href="{{ url('forum:delete_message', message_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></span>
+                {% endif %}
+                {% endif %}
                 <br/>
                 <span>{{ m.date|date(DATETIME_FORMAT) }} {{ m.date|time(DATETIME_FORMAT) }}</span>
             </div>
@@ -74,6 +81,13 @@
             <div>
             {{ m.message|markdown }}
             </div>
+            <ul>
+            {% for meta in m.metas.all() %}
+                <li>{{ meta.get_action_display() }} {{ meta.user.get_display_name() }}
+                    {% trans %} at {% endtrans %}{{ meta.date|time(DATETIME_FORMAT) }}
+                    {% trans %} the {% endtrans %}{{ meta.date|date(DATETIME_FORMAT)}}</li>
+            {% endfor %}
+            </ul>
         </div>
     </div>
     {{ m.mark_as_read(user) or "" }}

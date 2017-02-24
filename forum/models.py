@@ -156,11 +156,32 @@ class ForumMessage(models.Model):
     def can_be_viewed_by(self, user):
         return user.can_view(self.topic)
 
+    def can_be_moderated_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID)
+
     def get_absolute_url(self):
         return self.topic.get_absolute_url() + "#first_unread"
 
     def mark_as_read(self, user):
         self.readers.add(user)
+
+    def is_deleted(self):
+        meta = self.metas.exclude(action="EDIT").order_by('-date').first()
+        if meta:
+            return meta.action == "DELETE"
+        return False
+
+MESSAGE_META_ACTIONS = [
+        ('EDIT', _("Message edited by")),
+        ('DELETE', _("Message deleted by")),
+        ('UNDELETE', _("Message undeleted by")),
+        ]
+
+class ForumMessageMeta(models.Model):
+    user = models.ForeignKey(User, related_name="forum_message_metas")
+    message = models.ForeignKey(ForumMessage, related_name="metas")
+    date = models.DateTimeField(_('date'), default=timezone.now)
+    action = models.CharField(_("action"), choices=MESSAGE_META_ACTIONS, max_length=16)
 
 class ForumUserInfo(models.Model):
     user = models.OneToOneField(User, related_name="_forum_infos")

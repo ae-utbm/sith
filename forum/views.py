@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
+from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils import timezone
@@ -10,7 +11,7 @@ from django.db import models
 from django.core.exceptions import PermissionDenied
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
-from forum.models import Forum, ForumMessage, ForumTopic
+from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
 
 class ForumMainView(ListView):
     queryset = Forum.objects.filter(parent=None)
@@ -132,6 +133,30 @@ class ForumMessageEditView(CanEditMixin, UpdateView):
     fields = ['title', 'message']
     template_name = "core/edit.jinja"
     pk_url_kwarg = "message_id"
+
+    def form_valid(self, form):
+        ForumMessageMeta(message=self.object, user=self.request.user, action="EDIT").save()
+        return super(ForumMessageEditView, self).form_valid(form)
+
+class ForumMessageDeleteView(SingleObjectMixin, RedirectView):
+    model = ForumMessage
+    pk_url_kwarg = "message_id"
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        if self.object.can_be_moderated_by(self.request.user):
+            ForumMessageMeta(message=self.object, user=self.request.user, action="DELETE").save()
+        return self.object.get_absolute_url()
+
+class ForumMessageUndeleteView(SingleObjectMixin, RedirectView):
+    model = ForumMessage
+    pk_url_kwarg = "message_id"
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        if self.object.can_be_moderated_by(self.request.user):
+            ForumMessageMeta(message=self.object, user=self.request.user, action="UNDELETE").save()
+        return self.object.get_absolute_url()
 
 class ForumMessageCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
