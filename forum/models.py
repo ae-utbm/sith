@@ -166,5 +166,4 @@ class ForumUserInfo(models.Model):
     user = models.OneToOneField(User, related_name="_forum_infos")
     last_read_date = models.DateTimeField(_('last read date'), default=datetime(year=settings.SITH_SCHOOL_START_YEAR,
         month=1, day=1, tzinfo=pytz.UTC))
-    # read_messages = models.ManyToManyField(ForumMessage, related_name="readers", verbose_name=_("read messages"))
 

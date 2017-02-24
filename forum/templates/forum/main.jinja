@@ -13,8 +13,6 @@
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <p>
         <a class="ib" href="{{ url('forum:last_unread') }}">{% trans %}View last unread messages{% endtrans %}</a>
-        <a class="ib" href="{{ url('forum:mark_all_as_read') }}">{% trans %}Mark all as read{% endtrans %}</a>
-        <a class="ib" href="{{ url('forum:main') }}">{% trans %}Refresh{% endtrans %}</a>
     </p>
     {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
     <p>

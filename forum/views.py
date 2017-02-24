@@ -12,7 +12,7 @@ from django.core.exceptions import PermissionDenied
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from forum.models import Forum, ForumMessage, ForumTopic
 
-class ForumMainView(CanViewMixin, ListView):
+class ForumMainView(ListView):
     queryset = Forum.objects.filter(parent=None)
     template_name = "forum/main.jinja"
 
@@ -108,7 +108,7 @@ class ForumTopicCreateView(CanCreateMixin, CreateView):
 
 class ForumTopicEditView(CanEditMixin, UpdateView):
     model = ForumTopic
-    fields = ['title', 'forum']
+    fields = ['forum']
     pk_url_kwarg = "topic_id"
     template_name = "core/edit.jinja"
 

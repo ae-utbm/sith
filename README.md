@@ -28,7 +28,7 @@ already.
 You can check all of them with:
 
 ```
-sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev
+sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev
 ```
 
 The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
