@@ -416,10 +416,13 @@ textarea {
     margin: 2px;
     background: #eff7ff;
 }
+.message:nth-child(odd) {
+    background: #fff;
+}
 .message h5 {
     font-size: 100%;
 }
-.unread {
+.message.unread {
     background: #d8e7f3;
 }
 .msg_author.deleted {

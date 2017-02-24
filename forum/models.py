@@ -178,7 +178,9 @@ class ForumMessage(models.Model):
         return self.topic.get_absolute_url() + "#msg_" + str(self.id)
 
     def mark_as_read(self, user):
-        self.readers.add(user)
+        try: # Need the try/except because of AnonymousUser
+            self.readers.add(user)
+        except: pass
 
     def is_read(self, user):
         return (self.date < user.forum_infos.last_read_date) or (user in self.readers.all())

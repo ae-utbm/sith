@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-24 04:33+0100\n"
+"POT-Creation-Date: 2017-02-24 16:30+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -125,10 +125,10 @@ msgstr "numéro"
 msgid "journal"
 msgstr "classeur"
 
-#: accounting/models.py:194 core/models.py:546 core/models.py:902
-#: core/models.py:942 counter/models.py:242 counter/models.py:290
+#: accounting/models.py:194 core/models.py:546 core/models.py:899
+#: core/models.py:939 counter/models.py:242 counter/models.py:290
 #: counter/models.py:416 eboutic/models.py:15 eboutic/models.py:48
-#: forum/models.py:155 forum/models.py:205
+#: forum/models.py:155 forum/models.py:207
 msgid "date"
 msgstr "date"
 
@@ -1089,7 +1089,7 @@ msgstr "résumé"
 msgid "content"
 msgstr "contenu de la nouvelle"
 
-#: com/models.py:36 core/models.py:941 launderette/models.py:60
+#: com/models.py:36 core/models.py:938 launderette/models.py:60
 #: launderette/models.py:85 launderette/models.py:121
 msgid "type"
 msgstr "type"
@@ -1171,6 +1171,7 @@ msgstr "Type"
 #: com/templates/com/news_admin_list.jinja:15
 #: com/templates/com/news_admin_list.jinja:49
 #: com/templates/com/weekmail.jinja:18 com/templates/com/weekmail.jinja:41
+#: forum/templates/forum/forum.jinja:26 forum/templates/forum/forum.jinja:44
 msgid "Title"
 msgstr "Titre"
 
@@ -1182,6 +1183,7 @@ msgstr "Résumé"
 #: com/templates/com/news_admin_list.jinja:18
 #: com/templates/com/news_admin_list.jinja:52
 #: com/templates/com/weekmail.jinja:16 com/templates/com/weekmail.jinja:39
+#: forum/templates/forum/forum.jinja:48
 msgid "Author"
 msgstr "Auteur"
 
@@ -1614,7 +1616,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/templates/core/user_detail.jinja:16
 #: core/templates/core/user_edit.jinja:17
 #: election/templates/election/election_detail.jinja:316
-#: forum/templates/forum/topic.jinja:48 forum/templates/forum/topic.jinja:50
+#: forum/templates/forum/topic.jinja:49 forum/templates/forum/topic.jinja:51
 msgid "Profile"
 msgstr "Profil"
 
@@ -1725,8 +1727,7 @@ msgid ""
 "Enter a valid page name. This value may contain only letters, numbers and ./"
 "+/-/_ characters."
 msgstr ""
-"Entrez un nom de page correct. Uniquement des lettres, numéros, et ./"
-"+/-/_"
+"Entrez un nom de page correct. Uniquement des lettres, numéros, et ./+/-/_"
 
 #: core/models.py:747
 msgid "page name"
@@ -1752,27 +1753,27 @@ msgstr "Une page de ce nom existe déjà"
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:899
+#: core/models.py:896
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:900
+#: core/models.py:897
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:901
+#: core/models.py:898
 msgid "page content"
 msgstr "contenu de la page"
 
-#: core/models.py:939
+#: core/models.py:936
 msgid "url"
 msgstr "url"
 
-#: core/models.py:940
+#: core/models.py:937
 msgid "param"
 msgstr "param"
 
-#: core/models.py:943
+#: core/models.py:940
 msgid "viewed"
 msgstr "vue"
 
@@ -3342,7 +3343,7 @@ msgstr "Les votes ouvriront "
 #: election/templates/election/election_list.jinja:34
 #: election/templates/election/election_list.jinja:39
 #: election/templates/election/election_list.jinja:42
-#: forum/templates/forum/topic.jinja:86
+#: forum/templates/forum/topic.jinja:87
 msgid " at "
 msgstr " à "
 
@@ -3457,23 +3458,23 @@ msgstr "message"
 msgid "readers"
 msgstr "lecteurs"
 
-#: forum/models.py:197
+#: forum/models.py:199
 msgid "Message edited by"
 msgstr "Message édité par"
 
-#: forum/models.py:198
+#: forum/models.py:200
 msgid "Message deleted by"
 msgstr "Message supprimé par"
 
-#: forum/models.py:199
+#: forum/models.py:201
 msgid "Message undeleted by"
 msgstr "Message restauré par"
 
-#: forum/models.py:206
+#: forum/models.py:208
 msgid "action"
 msgstr "action"
 
-#: forum/models.py:215
+#: forum/models.py:217
 msgid "last read date"
 msgstr "dernière date de lecture"
 
@@ -3484,6 +3485,18 @@ msgstr "Nouveau forum"
 #: forum/templates/forum/forum.jinja:21
 msgid "New topic"
 msgstr "Nouveau sujet"
+
+#: forum/templates/forum/forum.jinja:30
+msgid "Topics"
+msgstr "Sujets"
+
+#: forum/templates/forum/forum.jinja:33 forum/templates/forum/forum.jinja:54
+msgid "Last message"
+msgstr "Dernier message"
+
+#: forum/templates/forum/forum.jinja:51
+msgid "Messages"
+msgstr "Messages"
 
 #: forum/templates/forum/last_unread.jinja:5
 #: forum/templates/forum/last_unread.jinja:13
@@ -3498,6 +3511,10 @@ msgstr "Rafraîchir"
 msgid "View last unread messages"
 msgstr "Voir les derniers messages non lus"
 
+#: forum/templates/forum/topic.jinja:38 forum/templates/forum/topic.jinja:97
+msgid "Reply"
+msgstr "Répondre"
+
 #: forum/templates/forum/topic.jinja:64
 msgid "Reply as quote"
 msgstr "Répondre en citant"
@@ -3506,15 +3523,15 @@ msgstr "Répondre en citant"
 msgid "Undelete"
 msgstr "Restaurer"
 
-#: forum/templates/forum/topic.jinja:87
+#: forum/templates/forum/topic.jinja:88
 msgid " the "
 msgstr " le "
 
-#: forum/views.py:65
+#: forum/views.py:67
 msgid "Apply rights and club owner recursively"
 msgstr "Appliquer les droits et le club propriétaire récursivement"
 
-#: forum/views.py:183
+#: forum/views.py:191
 #, python-format
 msgid "%(author)s said"
 msgstr "Citation de %(author)s"

@@ -134,8 +134,8 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(ForumTopicDetailView, self).get_context_data(**kwargs)
-        msg = self.object.messages.exclude(readers=self.request.user).filter(date__gte=self.request.user.forum_infos.last_read_date).order_by('id').first()
         try:
+            msg = self.object.messages.exclude(readers=self.request.user).filter(date__gte=self.request.user.forum_infos.last_read_date).order_by('id').first()
             kwargs['first_unread_message_id'] = msg.id
         except:
             kwargs['first_unread_message_id'] = float("inf")
@@ -176,7 +176,7 @@ class ForumMessageUndeleteView(SingleObjectMixin, RedirectView):
 class ForumMessageCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
     fields = ['title', 'message']
-    template_name = "core/create.jinja"
+    template_name = "forum/reply.jinja"
 
     def dispatch(self, request, *args, **kwargs):
         self.topic = get_object_or_404(ForumTopic, id=self.kwargs['topic_id'])
@@ -202,4 +202,8 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
         form.instance.author = self.request.user
         return super(ForumMessageCreateView, self).form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(ForumMessageCreateView, self).get_context_data(**kwargs)
+        kwargs['topic'] = self.topic
+        return kwargs
 

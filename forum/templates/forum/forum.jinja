@@ -23,14 +23,14 @@
     {% if forum.children.exists() %}
     <div>
         <div class="ib w_big">
-            Title
+            {% trans %}Title{% endtrans %}
         </div>
         <div class="ib w_small">
             <div class="ib w_medium">
-                Topics
+                {% trans %}Topics{% endtrans %}
             </div>
             <div class="ib w_small">
-                Last message
+                {% trans %}Last message{% endtrans %}
             </div>
         </div>
     </div>
@@ -41,17 +41,17 @@
     {% if topics %}
     <div>
         <div class="ib w_medium">
-            Title
+            {% trans %}Title{% endtrans %}
         </div>
         <div class="ib w_medium">
             <div class="ib w_small">
-                Author
+                {% trans %}Author{% endtrans %}
             </div>
             <div class="ib w_medium">
-                Messages
+                {% trans %}Messages{% endtrans %}
             </div>
             <div class="ib w_small">
-                Last message
+                {% trans %}Last message{% endtrans %}
             </div>
         </div>
     </div>
