@@ -121,7 +121,7 @@ class SithInlineLexer(InlineLexer):
         except: pass
         return super(SithInlineLexer, self)._process_link(m, link, title)
 
-renderer = SithRenderer()
+renderer = SithRenderer(escape=True)
 inline = SithInlineLexer(renderer)
 
 markdown = Markdown(renderer, inline=inline)

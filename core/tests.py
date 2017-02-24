@@ -253,8 +253,8 @@ http://git.an
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'guy'}))
         self.assertTrue(response.status_code == 200)
         self.assertTrue('<p>Guy <em>bibou</em></p>\\n<p><a href="http://git.an">http://git.an</a></p>\\n' +
-                '<h1>Swag</h1>\\n<p>&lt;guy&gt;Bibou&lt;/guy&gt;</p>\\n' +
-                '<p>&lt;script&gt;alert(&#39;Guy&#39;);&lt;/script&gt;</p>' in str(response.content))
+                '<h1>Swag</h1>\\n&lt;guy&gt;Bibou&lt;/guy&gt;' +
+                "&lt;script&gt;alert(\\'Guy\\');&lt;/script&gt;" in str(response.content))
 
 #TODO: many tests on the pages:
 #   - renaming a page
