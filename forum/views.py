@@ -10,7 +10,7 @@ from django import forms
 from django.db import models
 from django.core.exceptions import PermissionDenied
 
-import math
+from ajax_select import make_ajax_form, make_ajax_field
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
@@ -40,9 +40,16 @@ class ForumLastUnread(ListView):
                 date__gt=self.request.user.forum_infos.last_read_date).values_list('topic') # TODO try to do better
         return self.model.objects.filter(id__in=l).annotate(models.Max('messages__date')).order_by('-messages__date__max').select_related('author')
 
+class ForumForm(forms.ModelForm):
+    class Meta:
+        model = Forum
+        fields = ['name', 'parent', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
+    edit_groups = make_ajax_field(Forum, 'edit_groups', 'groups', help_text="")
+    view_groups = make_ajax_field(Forum, 'view_groups', 'groups', help_text="")
+
 class ForumCreateView(CanCreateMixin, CreateView):
     model = Forum
-    fields = ['name', 'parent', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
+    form_class = ForumForm
     template_name = "core/create.jinja"
 
     def get_initial(self):
@@ -54,10 +61,7 @@ class ForumCreateView(CanCreateMixin, CreateView):
         except: pass
         return init
 
-class ForumEditForm(forms.ModelForm):
-    class Meta:
-        model = Forum
-        fields = ['name', 'parent', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
+class ForumEditForm(ForumForm):
     recursive = forms.BooleanField(label=_("Apply rights and club owner recursively"), required=False)
 
 class ForumEditView(CanEditPropMixin, UpdateView):
@@ -126,7 +130,7 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
         try:
             kwargs['first_unread_message_id'] = msg.id
         except:
-            kwargs['first_unread_message_id'] = math.inf
+            kwargs['first_unread_message_id'] = float("inf")
         return kwargs
 
 class ForumMessageEditView(CanEditMixin, UpdateView):

@@ -16,8 +16,8 @@
         </div>
         {% endif %}
         {% if user.is_owner(forum) %}
-        <a class="ib" href="{{ url('forum:edit_forum', forum_id=forum.id) }}">Edit</a>
-        <a class="ib" href="{{ url('forum:delete_forum', forum_id=forum.id) }}">Delete</a>
+        <a class="ib" href="{{ url('forum:edit_forum', forum_id=forum.id) }}">{% trans %}Edit{% endtrans %}</a>
+        <a class="ib" href="{{ url('forum:delete_forum', forum_id=forum.id) }}">{% trans %}Delete{% endtrans %}</a>
         {% endif %}
     </div>
     {% if not forum.is_category %}
