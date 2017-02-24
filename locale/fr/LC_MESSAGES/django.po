@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-24 03:23+0100\n"
+"POT-Creation-Date: 2017-02-24 04:33+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -125,8 +125,8 @@ msgstr "numéro"
 msgid "journal"
 msgstr "classeur"
 
-#: accounting/models.py:194 core/models.py:546 core/models.py:891
-#: core/models.py:931 counter/models.py:242 counter/models.py:290
+#: accounting/models.py:194 core/models.py:546 core/models.py:902
+#: core/models.py:942 counter/models.py:242 counter/models.py:290
 #: counter/models.py:416 eboutic/models.py:15 eboutic/models.py:48
 #: forum/models.py:155 forum/models.py:205
 msgid "date"
@@ -329,7 +329,7 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:59
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:329
-#: forum/templates/forum/topic.jinja:71
+#: forum/templates/forum/macros.jinja:20 forum/templates/forum/topic.jinja:72
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:154 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:66
@@ -369,7 +369,8 @@ msgstr "Nouveau compte club"
 #: election/templates/election/election_detail.jinja:279
 #: election/templates/election/election_detail.jinja:326
 #: election/templates/election/election_detail.jinja:374
-#: forum/templates/forum/macros.jinja:52 forum/templates/forum/topic.jinja:65
+#: forum/templates/forum/macros.jinja:19 forum/templates/forum/macros.jinja:52
+#: forum/templates/forum/topic.jinja:66
 #: launderette/templates/launderette/launderette_list.jinja:16
 #: sas/templates/sas/album.jinja:18 sas/templates/sas/picture.jinja:92
 msgid "Edit"
@@ -1088,7 +1089,7 @@ msgstr "résumé"
 msgid "content"
 msgstr "contenu de la nouvelle"
 
-#: com/models.py:36 core/models.py:930 launderette/models.py:60
+#: com/models.py:36 core/models.py:941 launderette/models.py:60
 #: launderette/models.py:85 launderette/models.py:121
 msgid "type"
 msgstr "type"
@@ -1637,7 +1638,7 @@ msgstr "Montrez vos statistiques de compte aux autres"
 msgid "file name"
 msgstr "nom du fichier"
 
-#: core/models.py:536 core/models.py:736
+#: core/models.py:536 core/models.py:744
 msgid "parent"
 msgstr "parent"
 
@@ -1657,11 +1658,11 @@ msgstr "miniature"
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:541 core/models.py:742
+#: core/models.py:541 core/models.py:750
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:542 core/models.py:743
+#: core/models.py:542 core/models.py:751
 msgid "view group"
 msgstr "groupe de vue"
 
@@ -1715,51 +1716,63 @@ msgstr "Dossier : "
 msgid "File: "
 msgstr "Fichier : "
 
-#: core/models.py:735 core/models.py:739
+#: core/models.py:735
+msgid "page unix name"
+msgstr "nom unix de la page"
+
+#: core/models.py:739
+msgid ""
+"Enter a valid page name. This value may contain only letters, numbers and ./"
+"+/-/_ characters."
+msgstr ""
+"Entrez un nom de page correct. Uniquement des lettres, numéros, et ./"
+"+/-/_"
+
+#: core/models.py:747
 msgid "page name"
 msgstr "nom de la page"
 
-#: core/models.py:740
+#: core/models.py:748
 msgid "owner group"
 msgstr "groupe propriétaire"
 
-#: core/models.py:744
+#: core/models.py:752
 msgid "lock user"
 msgstr "utilisateur bloquant"
 
-#: core/models.py:745
+#: core/models.py:753
 msgid "lock_timeout"
 msgstr "décompte du déblocage"
 
-#: core/models.py:772
+#: core/models.py:780
 msgid "Duplicate page"
 msgstr "Une page de ce nom existe déjà"
 
-#: core/models.py:778
+#: core/models.py:786
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:888
+#: core/models.py:899
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:889
+#: core/models.py:900
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:890
+#: core/models.py:901
 msgid "page content"
 msgstr "contenu de la page"
 
-#: core/models.py:928
+#: core/models.py:939
 msgid "url"
 msgstr "url"
 
-#: core/models.py:929
+#: core/models.py:940
 msgid "param"
 msgstr "param"
 
-#: core/models.py:932
+#: core/models.py:943
 msgid "viewed"
 msgstr "vue"
 
@@ -1823,9 +1836,10 @@ msgstr "Wiki"
 msgid "SAS"
 msgstr "SAS"
 
-#: core/templates/core/base.jinja:94
+#: core/templates/core/base.jinja:94 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:12
-#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:13
+#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:11
+#: forum/templates/forum/main.jinja:13 forum/templates/forum/topic.jinja:29
 msgid "Forum"
 msgstr "Forum"
 
@@ -3328,7 +3342,7 @@ msgstr "Les votes ouvriront "
 #: election/templates/election/election_list.jinja:34
 #: election/templates/election/election_list.jinja:39
 #: election/templates/election/election_list.jinja:42
-#: forum/templates/forum/topic.jinja:85
+#: forum/templates/forum/topic.jinja:86
 msgid " at "
 msgstr " à "
 
@@ -3463,6 +3477,14 @@ msgstr "action"
 msgid "last read date"
 msgstr "dernière date de lecture"
 
+#: forum/templates/forum/forum.jinja:19 forum/templates/forum/main.jinja:19
+msgid "New forum"
+msgstr "Nouveau forum"
+
+#: forum/templates/forum/forum.jinja:21
+msgid "New topic"
+msgstr "Nouveau sujet"
+
 #: forum/templates/forum/last_unread.jinja:5
 #: forum/templates/forum/last_unread.jinja:13
 msgid "Last unread messages"
@@ -3476,27 +3498,23 @@ msgstr "Rafraîchir"
 msgid "View last unread messages"
 msgstr "Voir les derniers messages non lus"
 
-#: forum/templates/forum/main.jinja:19
-msgid "New forum"
-msgstr "Nouveau forum"
-
-#: forum/templates/forum/topic.jinja:63
+#: forum/templates/forum/topic.jinja:64
 msgid "Reply as quote"
 msgstr "Répondre en citant"
 
-#: forum/templates/forum/topic.jinja:69
+#: forum/templates/forum/topic.jinja:70
 msgid "Undelete"
 msgstr "Restaurer"
 
-#: forum/templates/forum/topic.jinja:86
+#: forum/templates/forum/topic.jinja:87
 msgid " the "
 msgstr " le "
 
-#: forum/views.py:61
+#: forum/views.py:65
 msgid "Apply rights and club owner recursively"
 msgstr "Appliquer les droits et le club propriétaire récursivement"
 
-#: forum/views.py:179
+#: forum/views.py:183
 #, python-format
 msgid "%(author)s said"
 msgstr "Citation de %(author)s"
