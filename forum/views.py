@@ -144,12 +144,17 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
 class ForumMessageEditView(CanEditMixin, UpdateView):
     model = ForumMessage
     fields = ['title', 'message']
-    template_name = "core/edit.jinja"
+    template_name = "forum/reply.jinja"
     pk_url_kwarg = "message_id"
 
     def form_valid(self, form):
         ForumMessageMeta(message=self.object, user=self.request.user, action="EDIT").save()
         return super(ForumMessageEditView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ForumMessageEditView, self).get_context_data(**kwargs)
+        kwargs['topic'] = self.object.topic
+        return kwargs
 
 class ForumMessageDeleteView(SingleObjectMixin, RedirectView):
     model = ForumMessage

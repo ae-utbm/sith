@@ -247,9 +247,15 @@ tbody>tr:hover {
     background: darkgrey;
     width: 100%;
 }
+em {
+    font-style: italic;
+}
 .highlight {
     background: orange;
     font-weight: bold;
+}
+.underline {
+    text-decoration: underline;
 }
 .tool-bar {
     overflow: auto;
