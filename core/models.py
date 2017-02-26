@@ -444,6 +444,7 @@ class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):
         super(AnonymousUser, self).__init__()
 
+    @property
     def was_subscribed(self):
         return False
 
