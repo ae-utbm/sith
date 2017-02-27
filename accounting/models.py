@@ -187,6 +187,16 @@ class GeneralJournal(models.Model):
             return True
         return False
 
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
+            return True
+        if self.club_account.can_be_edited_by(user):
+            return True
+        return False
+
     def can_be_viewed_by(self, user):
         return self.club_account.can_be_edited_by(user)
 
@@ -291,7 +301,7 @@ class Operation(models.Model):
         if self.journal.closed:
             return False
         m = self.journal.club_account.club.get_membership_for(user)
-        if m is not None and m.role >= 7:
+        if m is not None and m.role >= settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 
@@ -299,7 +309,12 @@ class Operation(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if self.is_owned_by(user):
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
+            return True
+        if self.journal.closed:
+            return False
+        m = self.journal.club_account.club.get_membership_for(user)
+        if m is not None and m.role == settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 
