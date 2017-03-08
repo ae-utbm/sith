@@ -1,7 +1,8 @@
 # This file contains all the views that concern the page model
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 from django.forms.models import modelform_factory
@@ -159,3 +160,11 @@ class PageEditView(CanEditMixin, UpdateView):
         form.instance = new_rev
         return super(PageEditView, self).form_valid(form)
 
+
+class PageDeleteView(CanEditPropMixin, DeleteView):
+    model = Page
+    template_name = 'core/delete_confirm.jinja'
+    pk_url_kwarg = 'page_id'
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('core:page_list')
