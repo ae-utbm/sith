@@ -56,6 +56,12 @@ Finally, when building a class based view, which is highly advised, you just hav
 CanEditMixin, or CanViewMixin, which are located in core.views. Your view will then be protected using either the
 appropriate group fields, or the right method to check user permissions.
 
+#### Counting the number of line of code
+
+```
+# apt install cloc
+$ cloc --exclude-dir=doc,env .
+```
 
 
 

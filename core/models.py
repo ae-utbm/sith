@@ -736,9 +736,9 @@ class Page(models.Model):
     name = models.CharField(_('page unix name'), max_length=30,
             validators=[
                 validators.RegexValidator(
-                    r'^[\w.+-]+$',
+                    r'^[A-z.+-]+$',
                     _('Enter a valid page name. This value may contain only '
-                      'letters, numbers ' 'and ./+/-/_ characters.')
+                      'unaccented letters, numbers ' 'and ./+/-/_ characters.')
                 ),
             ],
             blank=False)
@@ -846,6 +846,14 @@ class Page(models.Model):
             p.set_lock_recursive(user)
         self.set_lock(user)
 
+    def unset_lock_recursive(self):
+        """
+        Unlocks recursively all the child pages
+        """
+        for p in self.children.all():
+            p.unset_lock_recursive()
+        self.unset_lock()
+
     def unset_lock(self):
         """Always try to unlock, even if there is no lock"""
         self.lock_user = None
@@ -885,6 +893,16 @@ class Page(models.Model):
             return self.revisions.last().title
         except:
             return self.name
+
+    def delete(self):
+        self.unset_lock_recursive()
+        self.set_lock_recursive(User.objects.get(id=0))
+        for child in self.children.all():
+            child.parent = self.parent
+            child.save()
+            child.unset_lock_recursive()
+        super(Page, self).delete()
+
 
 class PageRev(models.Model):
     """
