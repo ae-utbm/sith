@@ -239,6 +239,12 @@ class JournalDeleteView(CanEditPropMixin, DeleteView):
     template_name = 'core/delete_confirm.jinja'
     success_url = reverse_lazy('accounting:club_details')
 
+    def dispatch(self, request, *args, **kwargs):
+       self.object = self.get_object()
+       if self.object.operations.count() == 0:
+          return super(JournalDeleteView, self).dispatch(request, *args, **kwargs)
+       else:
+          raise PermissionDenied
 
 # Operation views
 
