@@ -230,6 +230,21 @@ class JournalEditView(CanEditMixin, UpdateView):
     fields = ['name', 'start_date', 'end_date', 'club_account', 'closed']
     template_name = 'core/edit.jinja'
 
+class JournalDeleteView(CanEditPropMixin, DeleteView):
+    """
+    Delete a club account (for the admins)
+    """
+    model = GeneralJournal
+    pk_url_kwarg = "j_id"
+    template_name = 'core/delete_confirm.jinja'
+    success_url = reverse_lazy('accounting:club_details')
+
+    def dispatch(self, request, *args, **kwargs):
+       self.object = self.get_object()
+       if self.object.operations.count() == 0:
+          return super(JournalDeleteView, self).dispatch(request, *args, **kwargs)
+       else:
+          raise PermissionDenied
 
 # Operation views
 

@@ -426,17 +426,22 @@ SITH_SUBSCRIPTIONS = {
 # To be completed....
 }
 
-SITH_CLUB_ROLES = {
-        10: _('President'),
-        9: _('Vice-President'),
-        7: _('Treasurer'),
-        5: _('Communication supervisor'),
-        4: _('Secretary'),
-        3: _('IT supervisor'),
-        2: _('Board member'),
-        1: _('Active member'),
-        0: _('Curious'),
-        }
+SITH_CLUB_ROLES = {}
+
+SITH_CLUB_ROLES_ID = {
+    'President': 10,
+    'Vice-President': 9,
+    'Treasurer': 7,
+    'Communication supervisor': 5,
+    'Secretary': 4,
+    'IT supervisor': 3,
+    'Board member': 2,
+    'Active member': 1,
+    'Curious': 0,
+}
+
+for role in SITH_CLUB_ROLES_ID:
+    SITH_CLUB_ROLES[SITH_CLUB_ROLES_ID[role]] = _(role)
 
 # This corresponds to the maximum role a user can freely subscribe to
 # In this case, SITH_MAXIMUM_FREE_ROLE=1 means that a user can set himself as "Membre actif" or "Curieux", but not higher

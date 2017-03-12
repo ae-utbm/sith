@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ImproperlyConfigured
 from django.views.generic.base import View
+from django.db.models import Count
 
 from core.models import Group
 from core.views.forms import LoginForm
@@ -66,7 +67,7 @@ class CanEditPropMixin(View):
         except: pass
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_edit_prop(o, request.user)]
-        if not l_id:
+        if not l_id and self.get_queryset().count() != 0:
             raise PermissionDenied
         self._get_queryset = self.get_queryset
         def get_qs(self2):
@@ -88,7 +89,7 @@ class CanEditMixin(View):
         except: pass
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_edit(o, request.user)]
-        if not l_id:
+        if not l_id and self.get_queryset().count() != 0:
             raise PermissionDenied
         self._get_queryset = self.get_queryset
         def get_qs(self2):
@@ -110,7 +111,7 @@ class CanViewMixin(View):
         except: pass
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_view(o, request.user)]
-        if not l_id:
+        if not l_id and self.get_queryset().count() != 0:
             raise PermissionDenied
         self._get_queryset = self.get_queryset
         def get_qs(self2):
