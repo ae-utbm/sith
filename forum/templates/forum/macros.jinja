@@ -28,7 +28,9 @@
         <div class="ib w_medium">
             {% if forum.last_message %}
             {{ forum.last_message.author }} <br/>
-            {{ forum.last_message.date|date(DATETIME_FORMAT) }} {{ forum.last_message.date|time(DATETIME_FORMAT) }}
+            <a href="{{ forum.last_message.get_absolute_url() }}">
+                {{ forum.last_message.date|localtime|date(DATETIME_FORMAT) }} {{ forum.last_message.date|localtime|time(DATETIME_FORMAT) }}
+            </a>
             {% endif %}
         </div>
     </div>
