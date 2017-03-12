@@ -24,7 +24,7 @@
 
 <hr>
 
-{% for m in topic.messages.select_related('author__avatar_pict').order_by('-id') %}
+{% for m in topic.messages.select_related('author__avatar_pict').order_by('-id')[:10] %}
     {{ display_message(m, user) }}
 {% endfor %}
 

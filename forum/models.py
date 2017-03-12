@@ -144,6 +144,13 @@ class ForumTopic(models.Model):
     def get_absolute_url(self):
         return reverse('forum:view_topic', kwargs={'topic_id': self.id})
 
+    def get_first_unread_message(self, user):
+        try:
+            msg = self.messages.exclude(readers=user).filter(date__gte=user.forum_infos.last_read_date).order_by('id').first()
+            return msg
+        except:
+            return None
+
     @property
     def title(self):
         return self.messages.order_by('date').first().title
@@ -179,7 +186,10 @@ class ForumMessage(models.Model):
         return self.topic.forum.is_owned_by(user) or user.id == self.author.id
 
     def get_absolute_url(self):
-        return self.topic.get_absolute_url() + "#msg_" + str(self.id)
+        return self.topic.get_absolute_url() + "?page=" + str(self.get_page()) + "#msg_" + str(self.id)
+
+    def get_page(self):
+        return int(self.topic.messages.filter(id__lt=self.id).count() / settings.SITH_FORUM_PAGE_LENGTH) + 1
 
     def mark_as_read(self, user):
         try: # Need the try/except because of AnonymousUser

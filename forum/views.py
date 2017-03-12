@@ -135,10 +135,20 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         kwargs = super(ForumTopicDetailView, self).get_context_data(**kwargs)
         try:
-            msg = self.object.messages.exclude(readers=self.request.user).filter(date__gte=self.request.user.forum_infos.last_read_date).order_by('id').first()
+            msg = self.object.get_first_unread_message(user)
             kwargs['first_unread_message_id'] = msg.id
         except:
             kwargs['first_unread_message_id'] = float("inf")
+        page_length = settings.SITH_FORUM_PAGE_LENGTH
+        try:
+            page = int(self.request.GET['page']) - 1
+            if page < 0:
+                page = 0
+        except:
+            page = 0
+        kwargs["msgs"] = self.object.messages.select_related('author__avatar_pict').all()[page*page_length:page*page_length+page_length]
+        kwargs["page_count"] = int(self.object.messages.count() / page_length) + 1
+        kwargs["current_page"] = page + 1
         return kwargs
 
 class ForumMessageEditView(CanEditMixin, UpdateView):

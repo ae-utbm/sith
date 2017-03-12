@@ -42,7 +42,7 @@
 <div class="topic">
     <div class="ib w_medium">
         {% if first_unread %}
-        <a class="ib w_big" href="{{ url('forum:view_topic', topic_id=topic.id) }}#first_unread">
+        <a class="ib w_big" href="{{ topic.get_first_unread_message(user).get_absolute_url() }}">
         {% else %}
         <a class="ib w_big" href="{{ url('forum:view_topic', topic_id=topic.id) }}">
         {% endif %}
@@ -67,7 +67,9 @@
         <div class="ib w_medium" style="text-align: center;">
             {% set last_msg = topic.messages.order_by('id').select_related('author').last() %}
             {{ user_profile_link(last_msg.author) }} <br/>
-            {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
+            <a href="{{ last_msg.get_absolute_url() }}">
+                {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
+            </a>
         </div>
     </div>
 </div>
