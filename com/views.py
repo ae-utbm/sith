@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.conf import settings
 from django.db.models import Max
+from django.forms.models import modelform_factory
 from django import forms
 
 from datetime import timedelta
@@ -259,7 +260,8 @@ class WeekmailPreviewView(ComTabsMixin, CanEditPropMixin, DetailView):
 class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateView):
     model = Weekmail
     template_name = 'com/weekmail.jinja'
-    fields = ['title', 'intro', 'joke', 'protip', 'conclusion']
+    form_class = modelform_factory(Weekmail, fields=['title', 'intro', 'joke', 'protip', 'conclusion'],
+            help_texts={'title': _("Delete and save to regenerate")})
     success_url = reverse_lazy('com:weekmail')
     current_tab = "weekmail"
 
