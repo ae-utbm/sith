@@ -32,6 +32,10 @@ class Forum(models.Model):
             default=[settings.SITH_GROUP_OLD_SUBSCRIBERS_ID])
     view_groups = models.ManyToManyField(Group, related_name="viewable_forums", blank=True,
             default=[settings.SITH_GROUP_PUBLIC_ID])
+    number = models.IntegerField(_("number to choose a specific forum ordering"), default=1)
+
+    class Meta:
+        ordering = ['number']
 
     def clean(self):
         self.check_loop()

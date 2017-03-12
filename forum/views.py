@@ -43,7 +43,7 @@ class ForumLastUnread(ListView):
 class ForumForm(forms.ModelForm):
     class Meta:
         model = Forum
-        fields = ['name', 'parent', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
+        fields = ['name', 'parent', 'number', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
     edit_groups = make_ajax_field(Forum, 'edit_groups', 'groups', help_text="")
     view_groups = make_ajax_field(Forum, 'view_groups', 'groups', help_text="")
 
