@@ -938,6 +938,8 @@ class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
     template_name = 'counter/cash_summary_list.jinja'
     context_object_name = "cashsummary_list"
     current_tab = "cash_summary"
+    queryset = CashRegisterSummary.objects.all().order_by('-date')
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         """ Add sums to the context """
