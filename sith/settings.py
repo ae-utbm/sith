@@ -357,6 +357,9 @@ SITH_COUNTER_BANK = [
         ('LA-POSTE', 'La Poste'),
         ]
 
+# Defines pagination for cash summary
+SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
+
 # Defines which product type is the refilling type, and thus increases the account amount
 SITH_COUNTER_PRODUCTTYPE_REFILLING = 11
 

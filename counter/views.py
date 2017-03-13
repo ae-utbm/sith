@@ -939,7 +939,7 @@ class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
     context_object_name = "cashsummary_list"
     current_tab = "cash_summary"
     queryset = CashRegisterSummary.objects.all().order_by('-date')
-    paginate_by = 10
+    paginate_by = settings.SITH_COUNTER_CASH_SUMMARY_LENGTH
 
     def get_context_data(self, **kwargs):
         """ Add sums to the context """
