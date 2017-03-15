@@ -9,6 +9,7 @@ from django.conf import settings
 from django import forms
 from django.db import models
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from ajax_select import make_ajax_form, make_ajax_field
 
@@ -139,16 +140,15 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
             kwargs['first_unread_message_id'] = msg.id
         except:
             kwargs['first_unread_message_id'] = float("inf")
-        page_length = settings.SITH_FORUM_PAGE_LENGTH
+        paginator = Paginator(self.object.messages.select_related('author__avatar_pict').all(),
+                settings.SITH_FORUM_PAGE_LENGTH)
+        page = self.request.GET.get('page')
         try:
-            page = int(self.request.GET['page']) - 1
-            if page < 0:
-                page = 0
-        except:
-            page = 0
-        kwargs["msgs"] = self.object.messages.select_related('author__avatar_pict').all()[page*page_length:page*page_length+page_length]
-        kwargs["page_count"] = int(self.object.messages.count() / page_length) + 1
-        kwargs["current_page"] = page + 1
+            kwargs["msgs"] = paginator.page(page)
+        except PageNotAnInteger:
+            kwargs["msgs"] = paginator.page(1)
+        except EmptyPage:
+            kwargs["msgs"] = paginator.page(paginator.num_pages)
         return kwargs
 
 class ForumMessageEditView(CanEditMixin, UpdateView):

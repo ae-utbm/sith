@@ -39,8 +39,8 @@
     <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
 
     <p style="text-align: right; background: #d8e7f3;">
-    {% for p in range(1, page_count + 1) %}
-        <span class="ib" style="background: {% if p == current_page %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
+    {% for p in msgs.paginator.page_range %}
+        <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
     {% endfor %}
     </p>
 
@@ -58,8 +58,8 @@
     <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
 
     <p style="text-align: right; background: #d8e7f3;">
-    {% for p in range(1, page_count + 1) %}
-        <span class="ib" style="background: {% if p == current_page %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
+    {% for p in msgs.paginator.page_range %}
+        <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
     {% endfor %}
     </p>
 {% endblock %}
