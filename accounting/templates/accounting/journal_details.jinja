@@ -78,7 +78,7 @@
             <td>-</td>
             {% endif %}
             <td>
-                {% if o.journal.club_account.bank_account.name != "AE TI" and journal.club_account.bank_account.name != "TI" or user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
+                {% if o.journal.club_account.bank_account.name != "AE TI" and o.journal.club_account.bank_account.name != "TI" or user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
                 {% if not o.journal.closed %}
                 <a href="{{ url('accounting:op_edit', op_id=o.id) }}">{% trans %}Edit{% endtrans %}</a>
                 {% endif %}
