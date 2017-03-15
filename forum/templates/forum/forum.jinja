@@ -8,7 +8,7 @@
 {% block content %}
     <div>
     <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
-    {% for f in forum.get_parent_list() %}
+    {% for f in forum.get_parent_list()|reverse %}
     > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
     {% endfor %}
     > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
