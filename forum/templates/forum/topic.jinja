@@ -28,7 +28,7 @@
 {% block content %}
     <p>
     <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
-    {% for f in topic.forum.get_parent_list() %}
+    {% for f in topic.forum.get_parent_list()|reverse %}
     > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
     {% endfor %}
     > <a href="{{ topic.forum.get_absolute_url() }}">{{ topic.forum }}</a>
