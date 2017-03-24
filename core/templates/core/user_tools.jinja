@@ -66,8 +66,10 @@
 <h4>{% trans %}Communication{% endtrans %}</h4>
 <ul>
     {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user.is_root %}
+    <li><a href="{{ url('com:weekmail_article') }}">{% trans %}Create weekmail article{% endtrans %}</a></li>
     <li><a href="{{ url('com:weekmail') }}">{% trans %}Weekmail{% endtrans %}</a></li>
     <li><a href="{{ url('com:weekmail_destinations') }}">{% trans %}Weekmail destinations{% endtrans %}</a></li>
+    <li><a href="{{ url('com:news_new') }}">{% trans %}Create news{% endtrans %}</a></li>
     <li><a href="{{ url('com:news_admin_list') }}">{% trans %}Moderate news{% endtrans %}</a></li>
     <li><a href="{{ url('com:index_edit') }}">{% trans %}Edit index page{% endtrans %}</a></li>
     <li><a href="{{ url('com:alert_edit') }}">{% trans %}Edit alert message{% endtrans %}</a></li>

@@ -125,3 +125,5 @@ class WeekmailArticle(models.Model):
     def is_owned_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
+    def __str__(self):
+        return "%s - %s (%s)" % (self.title, self.author, self.club)

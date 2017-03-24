@@ -33,6 +33,10 @@ class Group(AuthGroup):
         help_text=_('Whether a group is a meta group or not'),
     )
     description = models.CharField(_('description'), max_length=60)
+
+    class Meta:
+        ordering = ['name']
+
     def get_absolute_url(self):
         """
         This is needed for black magic powered UpdateView's children

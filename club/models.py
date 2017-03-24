@@ -38,6 +38,9 @@ class Club(models.Model):
     home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True,
             on_delete=models.SET_NULL)
 
+    class Meta:
+        ordering = ['name', 'unix_name']
+
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
         objs = []

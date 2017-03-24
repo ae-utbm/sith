@@ -315,7 +315,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
 class WeekmailArticleEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateView):
     """Edit an article"""
     model = WeekmailArticle
-    fields = ['title', 'content']
+    fields = ['title', 'club', 'content']
     pk_url_kwarg = "article_id"
     template_name = 'core/edit.jinja'
     success_url = reverse_lazy('com:weekmail')
@@ -325,14 +325,21 @@ class WeekmailArticleEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, U
 class WeekmailArticleCreateView(QuickNotifMixin, CreateView): #XXX need to protect this view
     """Post an article"""
     model = WeekmailArticle
-    fields = ['title', 'content']
+    fields = ['title', 'club', 'content']
     template_name = 'core/create.jinja'
     success_url = reverse_lazy('core:user_tools')
     quick_notif_url_arg = "qn_weekmail_new_article"
 
+    def get_initial(self):
+        init = {}
+        try:
+            init['club'] = Club.objects.filter(id=self.kwargs['club_id']).first()
+        except: pass
+        return init
+
     def form_valid(self, form):
-        club = get_object_or_404(Club, id=self.kwargs['club_id'])
-        form.instance.club = club
+        # club = get_object_or_404(Club, id=self.kwargs['club_id'])
+        # form.instance.club = club
         form.instance.author = self.request.user
         return super(WeekmailArticleCreateView, self).form_valid(form)
 
@@ -340,6 +347,7 @@ class WeekmailArticleDeleteView(CanEditPropMixin, DeleteView):
     """Delete an article"""
     model = WeekmailArticle
     template_name = 'core/delete_confirm.jinja'
+    pk_url_kwarg = "article_id"
 
 
 

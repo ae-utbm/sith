@@ -9,6 +9,7 @@
 <h3>{% trans %}Weekmail{% endtrans %} {{ object.id }}</h3>
 <p><a href="{{ url('com:weekmail_preview') }}">{% trans %}Preview{% endtrans %}</a></p>
 <p><a href="{{ url('com:weekmail_preview') }}?send=true">{% trans %}Send{% endtrans %}</a></p>
+<p><a href="{{ url('com:weekmail_article') }}">{% trans %}New article{% endtrans %}</a></p>
 <h4>{% trans %}Articles in no weekmail yet{% endtrans %}</h4>
 <table>
     <thead>
@@ -27,7 +28,13 @@
             <td><a href="{{ a.club.get_absolute_url() }}">{{ a.club }}</a></td>
             <td>{{ a.title }}</td>
             <td>{{ a.content|markdown }}</td>
-            <td><a href="?add_article={{ a.id }}">{% trans %}Add to weekmail{% endtrans %}</a></td>
+            <td>
+                <a href="{{ url('com:weekmail_article_edit', article_id=a.id) }}">{% trans %}Edit{% endtrans %}</a> |
+                <a href="{{ url('com:weekmail_article_delete', article_id=a.id) }}">{% trans %}Delete{% endtrans %}</a> |
+                <a href="?add_article={{ a.id }}">{% trans %}Add to weekmail{% endtrans %}</a> |
+                <a href="?up_article={{ a.id }}">{% trans %}Up{% endtrans %}</a> |
+                <a href="?down_article={{ a.id }}">{% trans %}Down{% endtrans %}</a>
+            </td>
         </tr>
     {% endfor %}
     </tbody>
@@ -52,6 +59,7 @@
             <td>{{ a.content|markdown }}</td>
             <td>
                 <a href="{{ url('com:weekmail_article_edit', article_id=a.id) }}">{% trans %}Edit{% endtrans %}</a> |
+                <a href="{{ url('com:weekmail_article_delete', article_id=a.id) }}">{% trans %}Delete{% endtrans %}</a> |
                 <a href="?del_article={{ a.id }}">{% trans %}Delete from weekmail{% endtrans %}</a> |
                 <a href="?up_article={{ a.id }}">{% trans %}Up{% endtrans %}</a> |
                 <a href="?down_article={{ a.id }}">{% trans %}Down{% endtrans %}</a>
