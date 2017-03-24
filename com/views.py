@@ -333,7 +333,7 @@ class WeekmailArticleCreateView(QuickNotifMixin, CreateView): #XXX need to prote
     def get_initial(self):
         init = {}
         try:
-            init['club'] = Club.objects.filter(id=self.kwargs['club_id']).first()
+            init['club'] = Club.objects.filter(id=self.request.GET['club']).first()
         except: pass
         return init
 
