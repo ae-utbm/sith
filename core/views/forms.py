@@ -167,7 +167,8 @@ class UserProfileForm(forms.ModelForm):
                     im = Image.open(BytesIO(f.read()))
                     new_file = SithFile(parent=parent, name=self.generate_name(field, f),
                             file=resize_image(im, 400, f.content_type.split('/')[-1]),
-                            owner=self.instance, is_folder=False, mime_type=f.content_type, size=f._size)
+                            owner=self.instance, is_folder=False, mime_type=f.content_type, size=f._size,
+                            moderator=self.instance, is_moderated=True)
                     new_file.file.name = new_file.name
                     old = SithFile.objects.filter(parent=parent, name=new_file.name).first()
                     if old:
