@@ -4,7 +4,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth import logout, login, authenticate
 from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput, DateTimeInput
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from ajax_select.fields import AutoCompleteSelectField
 

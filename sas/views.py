@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin, FormView
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.forms.models import modelform_factory
