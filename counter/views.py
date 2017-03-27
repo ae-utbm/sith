@@ -59,12 +59,10 @@ class GetUserForm(forms.Form):
 class RefillForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'
+    amount = forms.FloatField(min_value=0, widget=forms.NumberInput(attrs={'class':'focus'}))
     class Meta:
         model = Refilling
         fields = ['amount', 'payment_method', 'bank']
-        widgets = {
-            'amount': forms.NumberInput(attrs={'class':'focus'},)
-        }
 
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
