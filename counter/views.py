@@ -276,7 +276,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             total_qty_mod_6 = self.get_total_quantity_for_pid(request, pid) % 6
             bq = int((total_qty_mod_6 + q) / 6) # Integer division
             q -= bq
-        if self.customer.amount < (total + q*float(price)): # Check for enough money
+        if self.customer.amount < (total + round(q*float(price),2)): # Check for enough money
             request.session['not_enough'] = True
             return False
         if product.limit_age >= 18 and not self.customer.user.date_of_birth:
