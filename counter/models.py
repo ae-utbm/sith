@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.forms import ValidationError
 from django.contrib.sites.shortcuts import get_current_site
 
-from datetime import timedelta
+from datetime import timedelta, date
 import random
 import string
 import os
@@ -34,6 +34,11 @@ class Customer(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.user.username, self.account_id)
+
+    @property
+    def can_buy(self):
+        return (self.user.subscriptions.last() and
+                (date.today() - self.user.subscriptions.last().subscription_end) < timedelta(days=90))
 
     def generate_account_id(number):
         number = str(number)
