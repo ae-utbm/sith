@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-27 14:21+0200\n"
+"POT-Creation-Date: 2017-03-27 15:09+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1676,11 +1676,11 @@ msgstr "miniature"
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:546 core/models.py:755
+#: core/models.py:546 core/models.py:755 core/views/files.py:121
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:547 core/models.py:756
+#: core/models.py:547 core/models.py:756 core/views/files.py:122
 msgid "view group"
 msgstr "groupe de vue"
 

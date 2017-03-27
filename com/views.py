@@ -347,6 +347,7 @@ class WeekmailArticleDeleteView(CanEditPropMixin, DeleteView):
     """Delete an article"""
     model = WeekmailArticle
     template_name = 'core/delete_confirm.jinja'
+    success_url = reverse_lazy('com:weekmail')
     pk_url_kwarg = "article_id"
 
 

@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
@@ -118,8 +118,8 @@ class FileEditPropForm(forms.ModelForm):
         model = SithFile
         fields = ['parent', 'owner', 'edit_groups', 'view_groups']
     parent = make_ajax_field(SithFile, 'parent', 'files', help_text="")
-    edit_groups = make_ajax_field(SithFile, 'edit_groups', 'groups', help_text="")
-    view_groups = make_ajax_field(SithFile, 'view_groups', 'groups', help_text="")
+    edit_groups = make_ajax_field(SithFile, 'edit_groups', 'groups', help_text="", label=_("edit group"))
+    view_groups = make_ajax_field(SithFile, 'view_groups', 'groups', help_text="", label=_("view group"))
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 
 class FileEditPropView(CanEditPropMixin, UpdateView):
