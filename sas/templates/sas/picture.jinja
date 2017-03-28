@@ -20,6 +20,13 @@
     max-width: 100%;
 }
 </style>
+
+<link rel="prefetch" href="{{ url("sas:picture", picture_id=picture.get_previous().id} }}"> <!-- Firefox -->
+<link rel="prerender" href="{{ url("sas:picture", picture_id=picture.get_previous().id }}"> <!-- Chrome -->
+
+<link rel="prefetch" href="{{ url("sas:picture", picture_id=picture.get_next().id} }}"> <!-- Firefox -->
+<link rel="prerender" href="{{ url("sas:picture", picture_id=picture.get_next().id }}"> <!-- Chrome -->
+
 {% endblock %}
 
 {% block title %}
