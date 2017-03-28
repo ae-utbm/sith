@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin
@@ -49,9 +50,7 @@ class GetUserForm(forms.Form):
             cus = Customer.objects.filter(account_id__iexact=cleaned_data['code']).first()
         elif cleaned_data['id'] is not None:
             cus = Customer.objects.filter(user=cleaned_data['id']).first()
-        sub = cus.user if cus is not None else None
-        if (cus is None or sub is None or not sub.subscriptions.last() or
-            (date.today() - sub.subscriptions.last().subscription_end) > timedelta(days=90)):
+        if (cus is None or not cus.can_buy):
             raise forms.ValidationError(_("User not found"))
         cleaned_data['user_id'] = cus.user.id
         cleaned_data['user'] = cus.user
@@ -60,12 +59,10 @@ class GetUserForm(forms.Form):
 class RefillForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'
+    amount = forms.FloatField(min_value=0, widget=forms.NumberInput(attrs={'class':'focus'}))
     class Meta:
         model = Refilling
         fields = ['amount', 'payment_method', 'bank']
-        widgets = {
-            'amount': forms.NumberInput(attrs={'class':'focus'},)
-        }
 
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
@@ -159,9 +156,14 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
 
+    def dispatch(self, request, *args, **kwargs):
+        self.customer = get_object_or_404(Customer, user__id=self.kwargs['user_id'])
+        if not self.customer.can_buy:
+            raise Http404
+        return super(CounterClick, self).dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         """Simple get view"""
-        self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
         if 'basket' not in request.session.keys(): # Init the basket session entry
             request.session['basket'] = {}
             request.session['basket_total'] = 0
@@ -180,7 +182,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     def post(self, request, *args, **kwargs):
         """ Handle the many possibilities of the post request """
         self.object = self.get_object()
-        self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
         self.refill_form = None
         if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
                 (self.object.type == "BAR" and
@@ -275,7 +276,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             total_qty_mod_6 = self.get_total_quantity_for_pid(request, pid) % 6
             bq = int((total_qty_mod_6 + q) / 6) # Integer division
             q -= bq
-        if self.customer.amount < (total + q*float(price)): # Check for enough money
+        if self.customer.amount < (total + round(q*float(price),2)): # Check for enough money
             request.session['not_enough'] = True
             return False
         if product.limit_age >= 18 and not self.customer.user.date_of_birth:

@@ -262,6 +262,14 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     template_name = "core/user_stats.jinja"
     current_tab = 'stats'
 
+    def dispatch(self, request, *arg, **kwargs):
+        profile = self.get_object()
+
+        if (profile != request.user and not request.user.is_root):
+            raise PermissionDenied
+
+        return super(UserStatsView, self).dispatch(request, *arg, **kwargs)
+
     def get_context_data(self, **kwargs):
         kwargs = super(UserStatsView, self).get_context_data(**kwargs)
         from counter.models import Counter, Product, Selling

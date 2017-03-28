@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import logout, login, authenticate
 from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput, DateTimeInput
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from ajax_select.fields import AutoCompleteSelectField
 
@@ -59,7 +60,7 @@ class SelectFile(TextInput):
                 'title': _("Choose file"),
                 'name': name,
                 }
-        output += '<span name="' + name + '" class="choose_file_button">' + _("Choose file") + '</span>'
+        output += '<span name="' + name + '" class="choose_file_button">' + ugettext("Choose file") + '</span>'
         return output
 
 class SelectUser(TextInput):
@@ -73,7 +74,7 @@ class SelectUser(TextInput):
                 'title': _("Choose user"),
                 'name': name,
                 }
-        output += '<span name="' + name + '" class="choose_user_button">' + _("Choose user") + '</span>'
+        output += '<span name="' + name + '" class="choose_user_button">' + ugettext("Choose user") + '</span>'
         return output
 
 # Forms
