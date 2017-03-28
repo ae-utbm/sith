@@ -265,7 +265,13 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     def dispatch(self, request, *arg, **kwargs):
         profile = self.get_object()
 
-        if (profile != request.user and not request.user.is_root):
+        if not hasattr(profile, "customer"):
+            raise Http404
+
+        if not (profile == request.user
+                or request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+                or request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
+                or request.user.is_root):
             raise PermissionDenied
 
         return super(UserStatsView, self).dispatch(request, *arg, **kwargs)
