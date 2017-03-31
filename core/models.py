@@ -12,6 +12,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.html import escape
 from django.utils.functional import cached_property
 
+import os
+
 from phonenumber_field.modelfields import PhoneNumberField
 
 from datetime import datetime, timedelta, date
@@ -664,10 +666,10 @@ class SithFile(models.Model):
             if self.is_folder:
                 for c in self.children.all():
                     c.move_to(self)
-                shutil.rmtree(settings.MEDIA_ROOT + old_file_name)
+                shutil.rmtree(os.path.join(settings.MEDIA_ROOT, old_file_name))
             else:
                 self.file.save(name=self.name, content=self.file)
-                os.remove(settings.MEDIA_ROOT + old_file_name)
+                os.remove(os.path.join(settings.MEDIA_ROOT, old_file_name))
 
     def __getattribute__(self, attr):
         if attr == "is_file":

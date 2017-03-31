@@ -7,6 +7,7 @@ from django.core.files.base import ContentFile
 
 from PIL import Image
 from io import BytesIO
+import os
 
 from core.models import SithFile, User
 from core.utils import resize_image, exif_auto_rotate
@@ -17,7 +18,7 @@ class Picture(SithFile):
 
     @property
     def is_vertical(self):
-        with open((settings.MEDIA_ROOT + self.file.name).encode('utf-8'), 'rb') as f:
+        with open(os.path.join(settings.MEDIA_ROOT, self.file.name).encode('utf-8'), 'rb') as f:
             im = Image.open(BytesIO(f.read()))
             (w, h) = im.size
             return (w / h) < 1
@@ -67,7 +68,7 @@ class Picture(SithFile):
     def rotate(self, degree):
         for attr in ['file', 'compressed', 'thumbnail']:
             name = self.__getattribute__(attr).name
-            with open((settings.MEDIA_ROOT + name).encode('utf-8'), 'r+b') as file:
+            with open(os.path.join(settings.MEDIA_ROOT, name).encode('utf-8'), 'r+b') as file:
                 if file:
                     im = Image.open(BytesIO(file.read()))
                     file.seek(0)
