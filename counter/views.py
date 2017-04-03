@@ -33,9 +33,17 @@ class IsCounterAdminMixin(View):
     """
     This view is made to protect counter admin section
     """
+    group_id_list = [settings.SITH_GROUP_COUNTER_ADMIN_ID]
+    def _test_group(self, user):
+        print(self.group_id_list)
+        for g in self.group_id_list:
+            if user.is_in_group(g):
+                return True
+        return False
+
     def dispatch(self, request, *args, **kwargs):
-        res = super(CanEditCounterMixin, self).dispatch(request, *args, **kwargs)
-        if not (request.user.is_root or request.user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)):
+        res = super(IsCounterAdminMixin, self).dispatch(request, *args, **kwargs)
+        if not (request.user.is_root or self._test_group(request.user)):
             raise PermissionDenied
         return res
 
@@ -503,7 +511,7 @@ class CounterAdminTabsMixin(TabedViewMixin):
                 },
             ]
 
-class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView, IsCounterAdminMixin):
+class CounterListView(CounterAdminTabsMixin, IsCounterAdminMixin, CanViewMixin, ListView):
     """
     A list view for the admins
     """
@@ -518,7 +526,7 @@ class CounterEditForm(forms.ModelForm):
     sellers = make_ajax_field(Counter, 'sellers', 'users', help_text="")
     products = make_ajax_field(Counter, 'products', 'products', help_text="")
 
-class CounterEditView(CounterAdminTabsMixin, CanEditMixin, UpdateView, IsCounterAdminMixin):
+class CounterEditView(CounterAdminTabsMixin, UpdateView, IsCounterAdminMixin):
     """
     Edit a counter's main informations (for the counter's manager)
     """
@@ -528,10 +536,17 @@ class CounterEditView(CounterAdminTabsMixin, CanEditMixin, UpdateView, IsCounter
     template_name = 'core/edit.jinja'
     current_tab = "counters"
 
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        self.group_id_list.append(obj.club.owner_group.id)
+        for g in obj.club.edit_groups.all():
+            self.group_id_list.append(g.id)
+        return super(CounterEditView, self).dispatch(request, *args, **kwargs)
+
     def get_success_url(self):
         return reverse_lazy('counter:admin', kwargs={'counter_id': self.object.id})
 
-class CounterEditPropView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView, IsCounterAdminMixin):
+class CounterEditPropView(CounterAdminTabsMixin, IsCounterAdminMixin, CanEditPropMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's admin)
     """
@@ -541,7 +556,7 @@ class CounterEditPropView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView, I
     template_name = 'core/edit.jinja'
     current_tab = "counters"
 
-class CounterCreateView(CounterAdminTabsMixin, CanEditCounterMixin, CreateView, IsCounterAdminMixin):
+class CounterCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CanEditMixin, CreateView):
     """
     Create a counter (for the admins)
     """
@@ -551,7 +566,7 @@ class CounterCreateView(CounterAdminTabsMixin, CanEditCounterMixin, CreateView, 
     template_name = 'core/create.jinja'
     current_tab = "counters"
 
-class CounterDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteView, IsCounterAdminMixin):
+class CounterDeleteView(CounterAdminTabsMixin, IsCounterAdminMixin, CanEditMixin, DeleteView):
     """
     Delete a counter (for the admins)
     """
@@ -563,7 +578,7 @@ class CounterDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteView, IsCount
 
 # Product management
 
-class ProductTypeListView(CounterAdminTabsMixin, CanEditPropMixin, ListView, IsCounterAdminMixin):
+class ProductTypeListView(CounterAdminTabsMixin, IsCounterAdminMixin, CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
@@ -571,7 +586,7 @@ class ProductTypeListView(CounterAdminTabsMixin, CanEditPropMixin, ListView, IsC
     template_name = 'counter/producttype_list.jinja'
     current_tab = "product_types"
 
-class ProductTypeCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView, IsCounterAdminMixin):
+class ProductTypeCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CanCreateMixin, CreateView):
     """
     A create view for the admins
     """
@@ -580,7 +595,7 @@ class ProductTypeCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView, I
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductTypeEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView, IsCounterAdminMixin):
+class ProductTypeEditView(CounterAdminTabsMixin, IsCounterAdminMixin, CanEditPropMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -590,7 +605,7 @@ class ProductTypeEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView, I
     pk_url_kwarg = "type_id"
     current_tab = "products"
 
-class ProductArchivedListView(CounterAdminTabsMixin, CanEditPropMixin, ListView, IsCounterAdminMixin):
+class ProductArchivedListView(CounterAdminTabsMixin, IsCounterAdminMixin, CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
@@ -600,7 +615,7 @@ class ProductArchivedListView(CounterAdminTabsMixin, CanEditPropMixin, ListView,
     ordering = ['name']
     current_tab = "archive"
 
-class ProductListView(CounterAdminTabsMixin, CanEditPropMixin, ListView, IsCounterAdminMixin):
+class ProductListView(CounterAdminTabsMixin, IsCounterAdminMixin, CanEditPropMixin, ListView):
     """
     A list view for the admins
     """
@@ -638,7 +653,7 @@ class ProductEditForm(forms.ModelForm):
             c.save()
         return ret
 
-class ProductCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView, IsCounterAdminMixin):
+class ProductCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CanCreateMixin, CreateView):
     """
     A create view for the admins
     """
@@ -647,7 +662,7 @@ class ProductCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView, IsCou
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView, IsCounterAdminMixin):
+class ProductEditView(CounterAdminTabsMixin, IsCounterAdminMixin, CanEditPropMixin, UpdateView):
     """
     An edit view for the admins
     """
