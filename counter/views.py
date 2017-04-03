@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
+from django.views.generic.base import View
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
@@ -27,6 +28,16 @@ from subscription.models import Subscription
 from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType, \
         CashRegisterSummary, CashRegisterSummaryItem, Eticket, Permanency
 from accounting.models import CurrencyField
+
+class IsCounterAdminMixin(View):
+    """
+    This view is made to protect counter admin section
+    """
+    def dispatch(self, request, *args, **kwargs):
+        res = super(CanEditCounterMixin, self).dispatch(request, *args, **kwargs)
+        if not (request.user.is_root or request.user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)):
+            raise PermissionDenied
+        return res
 
 class GetUserForm(forms.Form):
     """
@@ -492,7 +503,7 @@ class CounterAdminTabsMixin(TabedViewMixin):
                 },
             ]
 
-class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
+class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView, IsCounterAdminMixin):
     """
     A list view for the admins
     """
@@ -507,7 +518,7 @@ class CounterEditForm(forms.ModelForm):
     sellers = make_ajax_field(Counter, 'sellers', 'users', help_text="")
     products = make_ajax_field(Counter, 'products', 'products', help_text="")
 
-class CounterEditView(CounterAdminTabsMixin, CanEditMixin, UpdateView):
+class CounterEditView(CounterAdminTabsMixin, CanEditMixin, UpdateView, IsCounterAdminMixin):
     """
     Edit a counter's main informations (for the counter's manager)
     """
@@ -520,7 +531,7 @@ class CounterEditView(CounterAdminTabsMixin, CanEditMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('counter:admin', kwargs={'counter_id': self.object.id})
 
-class CounterEditPropView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+class CounterEditPropView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView, IsCounterAdminMixin):
     """
     Edit a counter's main informations (for the counter's admin)
     """
@@ -530,7 +541,7 @@ class CounterEditPropView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
     template_name = 'core/edit.jinja'
     current_tab = "counters"
 
-class CounterCreateView(CounterAdminTabsMixin, CanEditMixin, CreateView):
+class CounterCreateView(CounterAdminTabsMixin, CanEditCounterMixin, CreateView, IsCounterAdminMixin):
     """
     Create a counter (for the admins)
     """
@@ -540,7 +551,7 @@ class CounterCreateView(CounterAdminTabsMixin, CanEditMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "counters"
 
-class CounterDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteView):
+class CounterDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteView, IsCounterAdminMixin):
     """
     Delete a counter (for the admins)
     """
@@ -552,7 +563,7 @@ class CounterDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteView):
 
 # Product management
 
-class ProductTypeListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
+class ProductTypeListView(CounterAdminTabsMixin, CanEditPropMixin, ListView, IsCounterAdminMixin):
     """
     A list view for the admins
     """
@@ -560,7 +571,7 @@ class ProductTypeListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
     template_name = 'counter/producttype_list.jinja'
     current_tab = "product_types"
 
-class ProductTypeCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
+class ProductTypeCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView, IsCounterAdminMixin):
     """
     A create view for the admins
     """
@@ -569,7 +580,7 @@ class ProductTypeCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductTypeEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+class ProductTypeEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView, IsCounterAdminMixin):
     """
     An edit view for the admins
     """
@@ -579,7 +590,7 @@ class ProductTypeEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
     pk_url_kwarg = "type_id"
     current_tab = "products"
 
-class ProductArchivedListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
+class ProductArchivedListView(CounterAdminTabsMixin, CanEditPropMixin, ListView, IsCounterAdminMixin):
     """
     A list view for the admins
     """
@@ -589,7 +600,7 @@ class ProductArchivedListView(CounterAdminTabsMixin, CanEditPropMixin, ListView)
     ordering = ['name']
     current_tab = "archive"
 
-class ProductListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
+class ProductListView(CounterAdminTabsMixin, CanEditPropMixin, ListView, IsCounterAdminMixin):
     """
     A list view for the admins
     """
@@ -627,7 +638,7 @@ class ProductEditForm(forms.ModelForm):
             c.save()
         return ret
 
-class ProductCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
+class ProductCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView, IsCounterAdminMixin):
     """
     A create view for the admins
     """
@@ -636,7 +647,7 @@ class ProductCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+class ProductEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView, IsCounterAdminMixin):
     """
     An edit view for the admins
     """
