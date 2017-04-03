@@ -133,6 +133,8 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
             form.instance = Membership.objects.filter(club=self.object).filter(user=form.data.get('user')).filter(end_date=None).first()
         if form.instance is None: # Instanciate a new membership
             form.instance = Membership(club=self.object, user=self.request.user)
+        if not self.request.user.is_root:
+            form.fields.pop('start_date', None)
         # form.initial = {'user': self.request.user}
         # form._user = self.request.user
         return form
