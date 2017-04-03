@@ -158,8 +158,16 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, user__id=self.kwargs['user_id'])
+        obj = self.get_object()
         if not self.customer.can_buy:
             raise Http404
+        if obj.type == "BAR":
+            if not ('counter_token' in request.session.keys() and
+                request.session['counter_token'] == obj.token) or len(obj.get_barmen_list())<1:
+                raise PermissionDenied
+        else:
+            if not request.user.is_authenticated():
+                raise PermissionDenied
         return super(CounterClick, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -376,14 +384,17 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def refill(self, request):
         """Refill the customer's account"""
-        form = RefillForm(request.POST)
-        if form.is_valid():
-            form.instance.counter = self.object
-            form.instance.operator = self.operator
-            form.instance.customer = self.customer
-            form.instance.save()
+        if self.get_object().type == 'BAR':
+            form = RefillForm(request.POST)
+            if form.is_valid():
+                form.instance.counter = self.object
+                form.instance.operator = self.operator
+                form.instance.customer = self.customer
+                form.instance.save()
+            else:
+                self.refill_form = form
         else:
-            self.refill_form = form
+            raise PermissionDenied
 
     def get_context_data(self, **kwargs):
         """ Add customer to the context """
