@@ -29,7 +29,7 @@ from counter.models import Counter, Customer, Product, Selling, Refilling, Produ
         CashRegisterSummary, CashRegisterSummaryItem, Eticket, Permanency
 from accounting.models import CurrencyField
 
-class IsCounterAdminMixin(View):
+class CounterAdminMixin(View):
     """
     This view is made to protect counter admin section
     """
@@ -50,7 +50,7 @@ class IsCounterAdminMixin(View):
 
 
     def dispatch(self, request, *args, **kwargs):
-        res = super(IsCounterAdminMixin, self).dispatch(request, *args, **kwargs)
+        res = super(CounterAdminMixin, self).dispatch(request, *args, **kwargs)
         if not (request.user.is_root or self._test_group(request.user)
                 or self._test_club(request.user)):
             raise PermissionDenied
@@ -535,7 +535,7 @@ class CounterEditForm(forms.ModelForm):
     sellers = make_ajax_field(Counter, 'sellers', 'users', help_text="")
     products = make_ajax_field(Counter, 'products', 'products', help_text="")
 
-class CounterEditView(CounterAdminTabsMixin, IsCounterAdminMixin, UpdateView):
+class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's manager)
     """
@@ -553,7 +553,7 @@ class CounterEditView(CounterAdminTabsMixin, IsCounterAdminMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('counter:admin', kwargs={'counter_id': self.object.id})
 
-class CounterEditPropView(CounterAdminTabsMixin, IsCounterAdminMixin, UpdateView):
+class CounterEditPropView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's admin)
     """
@@ -563,7 +563,7 @@ class CounterEditPropView(CounterAdminTabsMixin, IsCounterAdminMixin, UpdateView
     template_name = 'core/edit.jinja'
     current_tab = "counters"
 
-class CounterCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CreateView):
+class CounterCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     Create a counter (for the admins)
     """
@@ -573,7 +573,7 @@ class CounterCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "counters"
 
-class CounterDeleteView(CounterAdminTabsMixin, IsCounterAdminMixin, DeleteView):
+class CounterDeleteView(CounterAdminTabsMixin, CounterAdminMixin, DeleteView):
     """
     Delete a counter (for the admins)
     """
@@ -585,7 +585,7 @@ class CounterDeleteView(CounterAdminTabsMixin, IsCounterAdminMixin, DeleteView):
 
 # Product management
 
-class ProductTypeListView(CounterAdminTabsMixin, IsCounterAdminMixin, ListView):
+class ProductTypeListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
     """
@@ -593,7 +593,7 @@ class ProductTypeListView(CounterAdminTabsMixin, IsCounterAdminMixin, ListView):
     template_name = 'counter/producttype_list.jinja'
     current_tab = "product_types"
 
-class ProductTypeCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CreateView):
+class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     A create view for the admins
     """
@@ -602,7 +602,7 @@ class ProductTypeCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CreateVi
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductTypeEditView(CounterAdminTabsMixin, IsCounterAdminMixin, UpdateView):
+class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -612,7 +612,7 @@ class ProductTypeEditView(CounterAdminTabsMixin, IsCounterAdminMixin, UpdateView
     pk_url_kwarg = "type_id"
     current_tab = "products"
 
-class ProductArchivedListView(CounterAdminTabsMixin, IsCounterAdminMixin, ListView):
+class ProductArchivedListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
     """
@@ -622,7 +622,7 @@ class ProductArchivedListView(CounterAdminTabsMixin, IsCounterAdminMixin, ListVi
     ordering = ['name']
     current_tab = "archive"
 
-class ProductListView(CounterAdminTabsMixin, IsCounterAdminMixin, ListView):
+class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
     """
@@ -660,7 +660,7 @@ class ProductEditForm(forms.ModelForm):
             c.save()
         return ret
 
-class ProductCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CreateView):
+class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     A create view for the admins
     """
@@ -669,7 +669,7 @@ class ProductCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductEditView(CounterAdminTabsMixin, IsCounterAdminMixin, UpdateView):
+class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -899,7 +899,7 @@ class CounterActivityView(DetailView):
     pk_url_kwarg = "counter_id"
     template_name = 'counter/activity.jinja'
 
-class CounterStatView(DetailView, IsCounterAdminMixin):
+class CounterStatView(DetailView, CounterAdminMixin):
     """
     Show the bar stats
     """
@@ -961,7 +961,7 @@ class CounterStatView(DetailView, IsCounterAdminMixin):
                 return super(CanEditMixin, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
-class CashSummaryEditView(CounterAdminTabsMixin, IsCounterAdminMixin,  UpdateView):
+class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin,  UpdateView):
     """Edit cash summaries"""
     model = CashRegisterSummary
     template_name = 'counter/cash_register_summary.jinja'
@@ -977,7 +977,7 @@ class CashSummaryFormBase(forms.Form):
     begin_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Begin date"), required=False, widget=SelectDateTime)
     end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"), required=False, widget=SelectDateTime)
 
-class CashSummaryListView(CounterAdminTabsMixin, IsCounterAdminMixin, ListView):
+class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """Display a list of cash summaries"""
     model = CashRegisterSummary
     template_name = 'counter/cash_summary_list.jinja'
@@ -1014,7 +1014,7 @@ class CashSummaryListView(CounterAdminTabsMixin, IsCounterAdminMixin, ListView):
             kwargs['refilling_sums'][c.name] = sum([s.amount for s in refillings.all()])
         return kwargs
 
-class InvoiceCallView(CounterAdminTabsMixin, IsCounterAdminMixin, TemplateView):
+class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
     template_name = 'counter/invoices_call.jinja'
     current_tab = 'invoices_call'
 
@@ -1041,7 +1041,7 @@ class InvoiceCallView(CounterAdminTabsMixin, IsCounterAdminMixin, TemplateView):
             )).exclude(selling_sum=None).order_by('-selling_sum')
         return kwargs
 
-class EticketListView(CounterAdminTabsMixin, IsCounterAdminMixin, ListView):
+class EticketListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
     """
@@ -1059,7 +1059,7 @@ class EticketForm(forms.ModelForm):
                 }
     product = AutoCompleteSelectField('products', show_help_text=False, label=_("Product"), required=True)
 
-class EticketCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CreateView):
+class EticketCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     Create an eticket
     """
@@ -1068,7 +1068,7 @@ class EticketCreateView(CounterAdminTabsMixin, IsCounterAdminMixin, CreateView):
     form_class = EticketForm
     current_tab = "etickets"
 
-class EticketEditView(CounterAdminTabsMixin, IsCounterAdminMixin, UpdateView):
+class EticketEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     Edit an eticket
     """
