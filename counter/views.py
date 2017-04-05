@@ -1031,6 +1031,10 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         start_date = start_date.replace(tzinfo=pytz.UTC)
         end_date = (start_date + timedelta(days=32)).replace(day=1, hour=0, minute=0, microsecond=0)
         from django.db.models import Sum, Case, When, F, DecimalField
+        kwargs['sum_cb'] = sum([r.amount for r in Refilling.objects.filter(payment_method='CARD', is_validated=True,
+                                                                          date__gte=start_date, date__lte=end_date)])
+        kwargs['sum_cb'] += sum([s.quantity*s.unit_price for s in Selling.objects.filter(payment_method='CARD', is_validated=True,
+                                                                                         date__gte=start_date, date__lte=end_date)])
         kwargs['start_date'] = start_date
         kwargs['sums'] = Selling.objects.values('club__name').annotate(selling_sum=Sum(
             Case(When(date__gte=start_date,
