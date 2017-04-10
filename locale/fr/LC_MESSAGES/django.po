@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-05 13:42+0200\n"
+"POT-Creation-Date: 2017-04-10 23:25+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -128,7 +128,7 @@ msgstr "classeur"
 #: accounting/models.py:230 core/models.py:553 core/models.py:924
 #: core/models.py:964 counter/models.py:247 counter/models.py:295
 #: counter/models.py:421 eboutic/models.py:15 eboutic/models.py:48
-#: forum/models.py:166 forum/models.py:221
+#: forum/models.py:170 forum/models.py:225
 msgid "date"
 msgstr "date"
 
@@ -333,11 +333,12 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:59
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:329
-#: forum/templates/forum/macros.jinja:20 forum/templates/forum/macros.jinja:108
+#: forum/templates/forum/macros.jinja:20
+#: forum/templates/forum/macros.jinja:110
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:154 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:74
-#: sas/templates/sas/picture.jinja.py:124
+#: sas/templates/sas/picture.jinja:124
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -375,7 +376,7 @@ msgstr "Nouveau compte club"
 #: election/templates/election/election_detail.jinja:326
 #: election/templates/election/election_detail.jinja:374
 #: forum/templates/forum/macros.jinja:19 forum/templates/forum/macros.jinja:56
-#: forum/templates/forum/macros.jinja:102
+#: forum/templates/forum/macros.jinja:104
 #: launderette/templates/launderette/launderette_list.jinja:16
 #: sas/templates/sas/album.jinja:18 sas/templates/sas/picture.jinja:100
 msgid "Edit"
@@ -481,8 +482,8 @@ msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:56
 #: com/templates/com/news_admin_list.jinja:38
-#: com/templates/com/news_admin_list.jinja:70 core/templates/core/file.jinja:36
-#: core/templates/core/page.jinja:28
+#: com/templates/com/news_admin_list.jinja:70
+#: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
 
@@ -823,7 +824,7 @@ msgstr "rôle"
 
 #: club/models.py:153 core/models.py:37 counter/models.py:76
 #: counter/models.py:101 election/models.py:15 election/models.py:82
-#: election/models.py:131 forum/models.py:26 forum/models.py:127
+#: election/models.py:131 forum/models.py:26 forum/models.py:125
 msgid "description"
 msgstr "description"
 
@@ -839,7 +840,8 @@ msgstr "L'utilisateur est déjà membre de ce club"
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4
+#: club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -901,13 +903,14 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:60 club/views.py:223
-#: counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:60
+#: club/views.py:223 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja:9 club/templates/club/stats.jinja:19
+#: club/templates/club/club_sellings.jinja:9
+#: club/templates/club/stats.jinja:19
 #: counter/templates/counter/cash_summary_list.jinja:15
 msgid "Show"
 msgstr "Montrer"
@@ -1038,12 +1041,13 @@ msgstr "Vous n'avez pas la permission de faire cela"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:172 com/views.py:99 counter/views.py:978 election/views.py:131
+#: club/views.py:172 com/views.py:99 counter/views.py:978
+#: election/views.py:131
 msgid "End date"
 msgstr "Date de fin"
 
 #: club/views.py:186 core/templates/core/user_stats.jinja:27
-#: counter/views.py:1068
+#: counter/views.py:1064
 msgid "Product"
 msgstr "Produit"
 
@@ -1080,7 +1084,7 @@ msgid "Call"
 msgstr "Appel"
 
 #: com/models.py:33 com/models.py:75 com/models.py:119 election/models.py:14
-#: election/models.py:81 election/models.py:118 forum/models.py:164
+#: election/models.py:81 election/models.py:118 forum/models.py:168
 msgid "title"
 msgstr "titre"
 
@@ -1154,8 +1158,9 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
-#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
-#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:28
+#: com/templates/com/news_detail.jinja:5
+#: com/templates/com/news_detail.jinja:11 com/templates/com/news_list.jinja:4
+#: com/templates/com/news_list.jinja:28
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1627,7 +1632,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/templates/core/user_detail.jinja:16
 #: core/templates/core/user_edit.jinja:17
 #: election/templates/election/election_detail.jinja:316
-#: forum/templates/forum/macros.jinja:85 forum/templates/forum/macros.jinja:87
+#: forum/templates/forum/macros.jinja:87 forum/templates/forum/macros.jinja:89
 msgid "Profile"
 msgstr "Profil"
 
@@ -1818,7 +1823,8 @@ msgstr "S'enregister"
 msgid "View more"
 msgstr "Voir plus"
 
-#: core/templates/core/base.jinja:62 forum/templates/forum/last_unread.jinja:15
+#: core/templates/core/base.jinja:62
+#: forum/templates/forum/last_unread.jinja:15
 msgid "Mark all as read"
 msgstr "Marquer tout commme lu"
 
@@ -1850,7 +1856,7 @@ msgstr "SAS"
 
 #: core/templates/core/base.jinja:94 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:12
-#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
+#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:11
 #: forum/templates/forum/main.jinja:13 forum/templates/forum/reply.jinja:10
 #: forum/templates/forum/topic.jinja:30
 msgid "Forum"
@@ -2064,11 +2070,13 @@ msgstr "login"
 msgid "Lost password?"
 msgstr "Mot de passe perdu ?"
 
-#: core/templates/core/macros.jinja:27 core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:27
+#: core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:31 core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:31
+#: core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -3240,7 +3248,7 @@ msgstr "Montant du chèque"
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
-#: counter/views.py:1139
+#: counter/views.py:1135
 msgid "people(s)"
 msgstr "personne(s)"
 
@@ -3375,7 +3383,7 @@ msgstr "Les votes ouvriront "
 #: election/templates/election/election_list.jinja:34
 #: election/templates/election/election_list.jinja:39
 #: election/templates/election/election_list.jinja:42
-#: forum/templates/forum/macros.jinja:123
+#: forum/templates/forum/macros.jinja:125
 msgid " at "
 msgstr " à "
 
@@ -3486,31 +3494,31 @@ msgstr "numéro spécifiant l'ordre d'affichage"
 msgid "You can not make loops in forums"
 msgstr "Vous ne pouvez pas faire de boucles dans les forums"
 
-#: forum/models.py:165
+#: forum/models.py:169
 msgid "message"
 msgstr "message"
 
-#: forum/models.py:167
+#: forum/models.py:171
 msgid "readers"
 msgstr "lecteurs"
 
-#: forum/models.py:213
+#: forum/models.py:217
 msgid "Message edited by"
 msgstr "Message édité par"
 
-#: forum/models.py:214
+#: forum/models.py:218
 msgid "Message deleted by"
 msgstr "Message supprimé par"
 
-#: forum/models.py:215
+#: forum/models.py:219
 msgid "Message undeleted by"
 msgstr "Message restauré par"
 
-#: forum/models.py:222
+#: forum/models.py:226
 msgid "action"
 msgstr "action"
 
-#: forum/models.py:231
+#: forum/models.py:235
 msgid "last read date"
 msgstr "dernière date de lecture"
 
@@ -3543,17 +3551,21 @@ msgstr "Derniers messages non lus"
 msgid "Refresh"
 msgstr "Rafraîchir"
 
-#: forum/templates/forum/macros.jinja:100
+#: forum/templates/forum/macros.jinja:102
 msgid "Reply as quote"
 msgstr "Répondre en citant"
 
-#: forum/templates/forum/macros.jinja:106
+#: forum/templates/forum/macros.jinja:108
 msgid "Undelete"
 msgstr "Restaurer"
 
-#: forum/templates/forum/macros.jinja:124
+#: forum/templates/forum/macros.jinja:126
 msgid " the "
 msgstr " le "
+
+#: forum/templates/forum/macros.jinja:137
+msgid "Deleted or unreadable message."
+msgstr "Message supprimé ou non-visible."
 
 #: forum/templates/forum/main.jinja:15
 msgid "View last unread messages"

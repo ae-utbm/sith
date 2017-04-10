@@ -129,6 +129,15 @@
         {% endif %}
     </div>
 </div>
+{% else %}
+<div id="msg_{{ m.id }}" class="message">
+    <div class="msg_author deleted">
+    </div>
+    <div class="msg_content deleted">
+        <p class="ib w_big">{% trans %}Deleted or unreadable message.{% endtrans %}</p>
+        <p class="ib w_small">{{ m.date|localtime|date(DATETIME_FORMAT) }} {{ m.date|localtime|time(DATETIME_FORMAT) }}</p>
+    </div>
+</div>
 {% endif %}
 {{ m.mark_as_read(user) or "" }}
 {% endmacro %}
