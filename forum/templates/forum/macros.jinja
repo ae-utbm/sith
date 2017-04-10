@@ -67,11 +67,13 @@
             </div>
         </div>
         <div class="ib w_medium" style="text-align: center;">
-            {% set last_msg = topic.messages.order_by('id').select_related('author').last() %}
+            {% set last_msg = topic.last_message %}
+            {% if last_msg %}
             {{ user_profile_link(last_msg.author) }} <br/>
             <a href="{{ last_msg.get_absolute_url() }}">
                 {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
             </a>
+            {% endif %}
         </div>
     </div>
 </div>

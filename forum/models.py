@@ -116,10 +116,8 @@ class Forum(models.Model):
         last_msg = None
         for m in ForumMessage.objects.select_related('topic__forum', 'author').order_by('-id'):
             forum = m.topic.forum
-            if self in (forum.parent_list + [forum]):
+            if self in (forum.parent_list + [forum]) and not m.deleted:
                 return m
-                last_msg = m
-        return last_msg
 
 class ForumTopic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics')
@@ -150,6 +148,12 @@ class ForumTopic(models.Model):
             return msg
         except:
             return None
+
+    @cached_property
+    def last_message(self):
+        for msg in self.messages.order_by('id').select_related('author').order_by('-id').all():
+            if not msg.deleted:
+                return msg
 
     @property
     def title(self):
