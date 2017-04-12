@@ -107,6 +107,8 @@ class NewsForm(forms.ModelForm):
                 self.add_error('start_date', ValidationError(_("This field is required.")))
             if not self.cleaned_data['end_date']:
                 self.add_error('end_date', ValidationError(_("This field is required.")))
+            if self.cleaned_data['start_date'] > self.cleaned_data['end_date']:
+                self.add_error('end_date', ValidationError(_("You crazy? You can not finish an event before starting it.")))
             if self.cleaned_data['type'] == "WEEKLY" and not self.cleaned_data['until']:
                 self.add_error('until', ValidationError(_("This field is required.")))
         return self.cleaned_data

@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.core.exceptions import ValidationError
 
 from core.models import User, Preferences
 from club.models import Club
