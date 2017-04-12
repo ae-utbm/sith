@@ -41,7 +41,9 @@
         <strong><a href="{{ user.get_absolute_url() }}">{{ user.get_short_name() }}</a></strong>
     </div>
     <div class="msg_content">
-        <p id="preview" class="ib w_big"></p>
+        <hr>
+        <div id="preview" class="ib w_big"></div>
+        <div class="forum_signature">{{ user.forum_signature|markdown }}</div>
     </div>
 </div>
 
