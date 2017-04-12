@@ -4,10 +4,12 @@
 {{ super() }}
 <script>
 function make_preview() {
+    text = $("#id_content").val();
+    console.log("Rendering text: " + text);
     $.ajax({
         url: "{{ url('api:api_markdown') }}",
-        method: "GET",
-        data: { text: $("#id_content").val() }
+        method: "POST",
+        data: { text:  text, csrfmiddlewaretoken: "{{ csrf_token }}"}
     }).done(function (msg) {
         $("#preview").html(msg);
     });

@@ -100,12 +100,12 @@ class TopicForm(forms.ModelForm):
     class Meta:
         model = ForumMessage
         fields = ['title', 'message']
-    title = forms.CharField(required=True)
+    title = forms.CharField(required=True, label=_("Title"))
 
 class ForumTopicCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
     form_class = TopicForm
-    template_name = "core/create.jinja"
+    template_name = "forum/reply.jinja"
 
     def dispatch(self, request, *args, **kwargs):
         self.forum = get_object_or_404(Forum, id=self.kwargs['forum_id'], is_category=False)
