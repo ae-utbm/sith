@@ -348,7 +348,7 @@ class WeekmailArticleEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, U
     quick_notif_url_arg = "qn_weekmail_article_edit"
     current_tab = "weekmail"
 
-class WeekmailArticleCreateView(QuickNotifMixin, CreateView): #XXX need to protect this view
+class WeekmailArticleCreateView(QuickNotifMixin, CanViewMixin, CreateView): #XXX need to protect this view
     """Post an article"""
     model = WeekmailArticle
     fields = ['title', 'club', 'content']
