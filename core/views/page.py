@@ -1,7 +1,32 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 # This file contains all the views that concern the page model
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 from django.forms.models import modelform_factory
@@ -159,3 +184,11 @@ class PageEditView(CanEditMixin, UpdateView):
         form.instance = new_rev
         return super(PageEditView, self).form_valid(form)
 
+
+class PageDeleteView(CanEditPropMixin, DeleteView):
+    model = Page
+    template_name = 'core/delete_confirm.jinja'
+    pk_url_kwarg = 'page_id'
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('core:page_list')

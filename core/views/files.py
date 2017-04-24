@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 # This file contains all the views that concern the page model
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, TemplateView
@@ -7,7 +31,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.conf import settings
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 from django.core.servers.basehttp import FileWrapper
 from django.core.urlresolvers import reverse
@@ -38,10 +62,11 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
             ):
         raise PermissionDenied
     name = f.__getattribute__(file_attr).name
-    with open((settings.MEDIA_ROOT + name).encode('utf-8'), 'rb') as filename:
+    filepath = os.path.join(settings.MEDIA_ROOT, name)
+    with open(filepath.encode('utf-8'), 'rb') as filename:
         wrapper = FileWrapper(filename)
         response = HttpResponse(wrapper, content_type=f.mime_type)
-        response['Content-Length'] = os.path.getsize((settings.MEDIA_ROOT + name).encode('utf-8'))
+        response['Content-Length'] = os.path.getsize(filepath.encode('utf-8'))
         response['Content-Disposition'] = ('inline; filename="%s"' % f.name).encode('utf-8')
         return response
 
@@ -118,9 +143,9 @@ class FileEditPropForm(forms.ModelForm):
         model = SithFile
         fields = ['parent', 'owner', 'edit_groups', 'view_groups']
     parent = make_ajax_field(SithFile, 'parent', 'files', help_text="")
-    edit_groups = make_ajax_field(SithFile, 'edit_groups', 'groups', help_text="")
-    view_groups = make_ajax_field(SithFile, 'view_groups', 'groups', help_text="")
-
+    edit_groups = make_ajax_field(SithFile, 'edit_groups', 'groups', help_text="", label=_("edit group"))
+    view_groups = make_ajax_field(SithFile, 'view_groups', 'groups', help_text="", label=_("view group"))
+    recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 
 class FileEditPropView(CanEditPropMixin, UpdateView):
     model = SithFile
@@ -133,6 +158,12 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
         form = super(FileEditPropView, self).get_form(form_class)
         form.fields['parent'].queryset = SithFile.objects.filter(is_folder=True)
         return form
+
+    def form_valid(self, form):
+        ret = super(FileEditPropView, self).form_valid(form)
+        if form.cleaned_data['recursive']:
+            self.object.apply_rights_recursively()
+        return ret
 
     def get_success_url(self):
         return reverse('core:file_detail', kwargs={'file_id': self.object.id, 'popup': self.kwargs['popup'] or ""})

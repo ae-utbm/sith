@@ -20,6 +20,14 @@
     max-width: 100%;
 }
 </style>
+
+{% if picture.get_previous() %}
+<link rel="preload" as="image" href="{{ url("sas:download_compressed", picture_id=picture.get_previous().id) }}">
+{% endif %}
+{% if picture.get_next() %}
+<link rel="preload" as="image" href="{{ url("sas:download_compressed", picture_id=picture.get_next().id) }}">
+{% endif %}
+
 {% endblock %}
 
 {% block title %}

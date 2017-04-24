@@ -1,0 +1,24 @@
+{% extends "core/base.jinja" %}
+{% from 'forum/macros.jinja' import display_topic %}
+
+{% block title %}
+{% trans %}Last unread messages{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <p>
+    <a href="{{ url('forum:main') }}">Forum</a> >
+    </p>
+    <h3>{% trans %}Forum{% endtrans %}</h3>
+    <h4>{% trans %}Last unread messages{% endtrans %}</h4>
+    <p>
+        <a class="ib" href="{{ url('forum:mark_all_as_read') }}">{% trans %}Mark all as read{% endtrans %}</a>
+        <a class="ib" href="{{ url('forum:last_unread') }}">{% trans %}Refresh{% endtrans %}</a>
+    </p>
+    {% for t in forumtopic_list %}
+    {{ display_topic(t, user, True) }}
+    {% endfor %}
+{% endblock %}
+
+
+

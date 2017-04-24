@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.db import models
 from django.core import validators
 from django.conf import settings
@@ -37,6 +61,9 @@ class Club(models.Model):
     view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
     home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True,
             on_delete=models.SET_NULL)
+
+    class Meta:
+        ordering = ['name', 'unix_name']
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
@@ -122,7 +149,7 @@ class Club(models.Model):
         sub = User.objects.filter(pk=user.pk).first()
         if sub is None:
             return False
-        return sub.is_subscribed()
+        return sub.is_subscribed
 
     def get_membership_for(self, user):
         """
@@ -151,7 +178,7 @@ class Membership(models.Model):
 
     def clean(self):
         sub = User.objects.filter(pk=self.user.pk).first()
-        if sub is None or not sub.is_subscribed():
+        if sub is None or not sub.is_subscribed:
             raise ValidationError(_('User must be subscriber to take part to a club'))
         if Membership.objects.filter(user=self.user).filter(club=self.club).filter(end_date=None).exists():
             raise ValidationError(_('User is already member of that club'))

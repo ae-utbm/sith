@@ -54,8 +54,8 @@
             <ul id="notif">
                 {% for n in user.notifications.filter(viewed=False).order_by('-id') %}
                 <li><a href="{{ url("core:notification", notif_id=n.id) }}">
-                        <span style="font-size: small; ">{{ n.date|date(DATE_FORMAT) }} {{
-                            n.date|time(DATETIME_FORMAT) }}</span><br>
+                        <span style="font-size: small; ">{{ n.date|localtime|date(DATE_FORMAT) }} {{
+                            n.date|localtime|time(DATETIME_FORMAT) }}</span><br>
                         {{ n }}</a></li>
                 {% endfor %}
                 <li><a href="{{ url('core:notification_list') }}">{% trans %}View more{% endtrans %}</a>
@@ -91,7 +91,7 @@
             <a href="https://ae.utbm.fr/matmatronch/">{% trans %}Matmatronch{% endtrans %}</a>
             <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
             <a href="{{ url('sas:main') }}">{% trans %}SAS{% endtrans %}</a>
-            <a href="https://ae.utbm.fr/forum2/">{% trans %}Forum{% endtrans %}</a>
+            <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
             <a href="{{ url('core:page', "services") }}">{% trans %}Services{% endtrans %}</a>
             <a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a>
             <a href="https://ae.utbm.fr/article.php?name=liens">{% trans %}Sponsors{% endtrans %}</a>
@@ -99,6 +99,12 @@
         </nav>
         {% endif %}
         {% endblock %}
+
+        <ul id="quick_notif">
+            {% for n in quick_notifs %}
+            <li>{{ n }}</li>
+            {% endfor %}
+        </ul>
 
         <div id="content">
             {% if list_of_tabs %}

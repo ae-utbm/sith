@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
 from django.shortcuts import render
@@ -230,6 +254,21 @@ class JournalEditView(CanEditMixin, UpdateView):
     fields = ['name', 'start_date', 'end_date', 'club_account', 'closed']
     template_name = 'core/edit.jinja'
 
+class JournalDeleteView(CanEditPropMixin, DeleteView):
+    """
+    Delete a club account (for the admins)
+    """
+    model = GeneralJournal
+    pk_url_kwarg = "j_id"
+    template_name = 'core/delete_confirm.jinja'
+    success_url = reverse_lazy('accounting:club_details')
+
+    def dispatch(self, request, *args, **kwargs):
+       self.object = self.get_object()
+       if self.object.operations.count() == 0:
+          return super(JournalDeleteView, self).dispatch(request, *args, **kwargs)
+       else:
+          raise PermissionDenied
 
 # Operation views
 
@@ -385,7 +424,7 @@ class OperationPDFView(CanViewMixin, DetailView):
             target = self.object.target.get_display_name()
 
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="op-%d(%s_on_%s).pdf"'  %(num, ti, club_name)
+        response['Content-Disposition'] = 'filename="op-%d(%s_on_%s).pdf"'  %(num, ti, club_name)
         p = canvas.Canvas(response)
 
         p.setFont('DejaVu', 12)
@@ -401,8 +440,7 @@ class OperationPDFView(CanViewMixin, DetailView):
         label = Table(labelStr, colWidths=[150], rowHeights=[20])
 
         label.setStyle(TableStyle([
-                                ('ALIGN',(0,0),(-1,-1),'CENTER'),
-                                ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                                ('ALIGN',(0,0),(-1,-1),'RIGHT'),
                                 ]))
         w, h = label.wrapOn(label, 0, 0)
         label.drawOn(p, width-180, height)

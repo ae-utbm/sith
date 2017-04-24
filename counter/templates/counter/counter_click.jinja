@@ -51,7 +51,7 @@
         <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
             {% csrf_token %}
             <input type="hidden" name="action" value="code">
-            <input type="input" name="code" value="" autofocus class="focus" id="code_field"/>
+            <input type="input" name="code" value="" class="focus" id="code_field"/>
             <input type="submit" value="{% trans %}Go{% endtrans %}" />
         </form>
         <p>{% trans %}Basket: {% endtrans %}</p>
@@ -179,6 +179,7 @@ $( function() {
         }
         });
     $("#products").tabs();
+    $("#code_field").focus();
 });
 </script>
 {% endblock %}

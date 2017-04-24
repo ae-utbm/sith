@@ -1,9 +1,33 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin, FormView
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.forms.models import modelform_factory
@@ -85,6 +109,7 @@ class SASMainView(FormView):
     def get_context_data(self, **kwargs):
         kwargs = super(SASMainView, self).get_context_data(**kwargs)
         kwargs['root_file'] = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
+        kwargs['latest'] = SithFile.objects.filter(is_in_sas=True, is_folder=True, is_moderated=True).order_by('-id')[:5]
         return kwargs
 
 class PictureView(CanViewMixin, DetailView, FormMixin):
@@ -156,10 +181,12 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if not self.object.file:
+            self.object.generate_thumbnail()
         self.form = self.get_form()
         parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist('images')
-        if request.user.is_authenticated() and request.user.is_subscribed():
+        if request.user.is_authenticated() and request.user.is_subscribed:
             if self.form.is_valid():
                 self.form.process(parent=parent, owner=request.user, files=files,
                         automodere=request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID))
@@ -191,7 +218,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
             FileView.handle_clipboard(request, self.object)
         parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist('images')
-        if request.user.is_authenticated() and request.user.is_subscribed():
+        if request.user.is_authenticated() and request.user.is_subscribed:
             if self.form.is_valid():
                 self.form.process(parent=parent, owner=request.user, files=files,
                         automodere=request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID))
@@ -250,7 +277,8 @@ class PictureEditForm(forms.ModelForm):
 class AlbumEditForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields=['name', 'file', 'parent', 'edit_groups']
+        fields = ['name', 'date', 'file', 'parent', 'edit_groups']
+    date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
     parent = make_ajax_field(Album, 'parent', 'files', help_text="")
     edit_groups = make_ajax_field(Album, 'edit_groups', 'groups', help_text="")
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
@@ -272,3 +300,4 @@ class AlbumEditView(CanEditMixin, UpdateView):
         if form.cleaned_data['recursive']:
             self.object.apply_rights_recursively(True)
         return ret
+

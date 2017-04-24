@@ -301,7 +301,7 @@ th {
                             {%- if election.is_vote_finished %}
                             {%- set results = election_results[role.title]['blank vote'] %}
                             <div class="election__results">
-                                <strong>{{ results.vote }} {% trans %}votes{% endtrans %} ({{ results.percent }} %)</strong>
+                                <strong>{{ results.vote }} {% trans %}votes{% endtrans %} ({{ "%.2f" % results.percent }} %)</strong>
                             </div>
                             {%- endif %}
                         </td>
@@ -318,12 +318,14 @@ th {
                                         </div>
                                         <figcaption class="candidate__details">
                                             <cite class="candidate__full-name">{{ candidature.user.first_name }} <em class="candidate__nick-name">{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</cite>
+                                            {%- if not election.is_vote_finished %}
                                             <q class="candidate__program">{{ candidature.program or '' }}</q>
+                                            {%- endif %}
                                             {%- if user.can_edit(candidature) -%}
                                             {% if election.is_vote_editable %}
                                             <a href="{{url('election:update_candidate', candidature_id=candidature.id)}}">{% trans %}Edit{% endtrans %}</a>
                                             {% endif %}
-                                            {% if election.can_candidate -%}
+                                            {% if election.is_vote_editable -%}
                                             <a href="{{url('election:delete_candidate', candidature_id=candidature.id)}}">{% trans %}Delete{% endtrans %}</a>
                                             {%- endif -%}
                                             {%- endif -%}
@@ -339,7 +341,7 @@ th {
                                     {%- if election.is_vote_finished %}
                                     {%- set results = election_results[role.title][candidature.user.username] %}
                                     <div class="election__results">
-                                        <strong>{{ results.vote }} {% trans %}votes{% endtrans %} ({{ results.percent }} %)</strong>
+                                        <strong>{{ results.vote }} {% trans %}votes{% endtrans %} ({{ "%.2f" % results.percent }} %)</strong>
                                     </div>
                                     {%- endif %}
                                 </li>
@@ -362,7 +364,9 @@ th {
     {%- if (election.can_candidate(user) and election.is_candidature_active) or (user.can_edit(election) and election.is_vote_editable) %}
         <a href="{{ url('election:candidate', election_id=object.id) }}">{% trans %}Candidate{% endtrans %}</a>
     {%- endif %}
+    {%- if election.is_vote_editable %}
         <a href="{{ url('election:create_list', election_id=object.id) }}">{% trans %}Add a new list{% endtrans %}</a>
+    {%- endif %}
     {%- if user.can_edit(election) %}
         {% if election.is_vote_editable %}
         <a href="{{ url('election:create_role', election_id=object.id) }}">{% trans %}Add a new role{% endtrans %}</a>

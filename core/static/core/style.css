@@ -11,6 +11,20 @@ a {
 }
 a:hover   { color: #7FDBFF; }
 a:active  { color: #007BE6; }
+.ib {
+    display: inline-block;
+    padding: 2px;
+    margin: 2px;
+}
+.w_big {
+    width: 75%;
+}
+.w_medium {
+    width: 45%;
+}
+.w_small {
+    width: 20%;
+}
 /*--------------------------------HEADER-------------------------------*/
 #logo {
     margin-left: 5%;
@@ -122,6 +136,15 @@ nav a:hover {
 }
 
 /*--------------------------------CONTENT------------------------------*/
+#quick_notif {
+    width: 90%;
+    margin: 0px auto;
+    list-style-type: none;
+    background: lightblue;
+}
+#quick_notif li {
+    padding: 10px;
+}
 #content {
     width: 88%;
     margin: 0px auto;
@@ -180,7 +203,11 @@ ul, ol {
 code {
     font-family: monospace;
 }
-
+blockquote {
+    margin: 10px;
+    padding: 5px;
+    border: solid 1px black;
+}
 .edit-bar {
     display: block;
     margin: 4px;
@@ -220,9 +247,15 @@ tbody>tr:hover {
     background: darkgrey;
     width: 100%;
 }
+em {
+    font-style: italic;
+}
 .highlight {
     background: orange;
     font-weight: bold;
+}
+.underline {
+    text-decoration: underline;
 }
 .tool-bar {
     overflow: auto;
@@ -363,6 +396,80 @@ textarea {
     display: inline;
 }
 
+/*------------------------------FORUM----------------------------------*/
+.topic a, .forum a, .category a {
+    color: black;
+}
+.topic a:hover, .forum a:hover, .category a:hover {
+    color: #424242;
+    text-decoration: underline;
+}
+.topic {
+    border: solid skyblue 1px;
+    padding: 2px;
+    margin: 2px;
+}
+.forum {
+    background: lightblue;
+    padding: 2px;
+    margin: 2px;
+}
+.category {
+    background: skyblue;
+}
+.message {
+    padding: 2px;
+    margin: 2px;
+    background: #eff7ff;
+}
+.message:nth-child(odd) {
+    background: #fff;
+}
+.message h5 {
+    font-size: 100%;
+}
+.message.unread {
+    background: #d8e7f3;
+}
+.msg_author.deleted {
+    background: #ffcfcf;
+}
+.msg_content.deleted {
+    background: #ffefef;
+}
+.msg_content {
+    display: inline-block;
+    width: 80%;
+    vertical-align: top;
+}
+.msg_author {
+    display: inline-block;
+    width: 19%;
+    text-align: center;
+    background: #d8e7f3;
+}
+.msg_author img {
+    max-width: 70%;
+    margin: 0px auto;
+}
+.msg_meta {
+    font-size: small;
+    list-style-type: none;
+}
+.msg_meta li {
+    padding: 2px;
+    margin: 2px;
+}
+.forum_signature {
+    color: #C0C0C0;
+    border-top: 1px solid #C0C0C0;
+}
+.forum_signature a {
+    color: #C0C0C0;
+}
+.forum_signature a:hover {
+    text-decoration: underline;
+}
 /*------------------------------SAS------------------------------------*/
 .album {
     display: inline-block;

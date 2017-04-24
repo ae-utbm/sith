@@ -1,6 +1,32 @@
-from django.shortcuts import render
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
+from django.views.generic.base import View
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, ProcessFormView, FormMixin
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
@@ -27,6 +53,33 @@ from counter.models import Counter, Customer, Product, Selling, Refilling, Produ
         CashRegisterSummary, CashRegisterSummaryItem, Eticket, Permanency
 from accounting.models import CurrencyField
 
+class CounterAdminMixin(View):
+    """
+    This view is made to protect counter admin section
+    """
+    edit_group = [settings.SITH_GROUP_COUNTER_ADMIN_ID]
+    edit_club = []
+
+    def _test_group(self, user):
+        for g in self.edit_group:
+            if user.is_in_group(g):
+                return True
+        return False
+
+    def _test_club(self, user):
+        for c in self.edit_club:
+            if c.can_be_edited_by(user):
+                return True
+        return False
+
+
+    def dispatch(self, request, *args, **kwargs):
+        res = super(CounterAdminMixin, self).dispatch(request, *args, **kwargs)
+        if not (request.user.is_root or self._test_group(request.user)
+                or self._test_club(request.user)):
+            raise PermissionDenied
+        return res
+
 class GetUserForm(forms.Form):
     """
     The Form class aims at providing a valid user_id field in its cleaned data, in order to pass it to some view,
@@ -49,9 +102,7 @@ class GetUserForm(forms.Form):
             cus = Customer.objects.filter(account_id__iexact=cleaned_data['code']).first()
         elif cleaned_data['id'] is not None:
             cus = Customer.objects.filter(user=cleaned_data['id']).first()
-        sub = cus.user if cus is not None else None
-        if (cus is None or sub is None or not sub.subscriptions.last() or
-            (date.today() - sub.subscriptions.last().subscription_end) > timedelta(days=90)):
+        if (cus is None or not cus.can_buy):
             raise forms.ValidationError(_("User not found"))
         cleaned_data['user_id'] = cus.user.id
         cleaned_data['user'] = cus.user
@@ -60,12 +111,10 @@ class GetUserForm(forms.Form):
 class RefillForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'
+    amount = forms.FloatField(min_value=0, widget=forms.NumberInput(attrs={'class':'focus'}))
     class Meta:
         model = Refilling
         fields = ['amount', 'payment_method', 'bank']
-        widgets = {
-            'amount': forms.NumberInput(attrs={'class':'focus'},)
-        }
 
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
@@ -171,9 +220,22 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
 
+    def dispatch(self, request, *args, **kwargs):
+        self.customer = get_object_or_404(Customer, user__id=self.kwargs['user_id'])
+        obj = self.get_object()
+        if not self.customer.can_buy:
+            raise Http404
+        if obj.type == "BAR":
+            if not ('counter_token' in request.session.keys() and
+                request.session['counter_token'] == obj.token) or len(obj.get_barmen_list())<1:
+                raise PermissionDenied
+        else:
+            if not request.user.is_authenticated():
+                raise PermissionDenied
+        return super(CounterClick, self).dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         """Simple get view"""
-        self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
         if 'basket' not in request.session.keys(): # Init the basket session entry
             request.session['basket'] = {}
             request.session['basket_total'] = 0
@@ -192,7 +254,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     def post(self, request, *args, **kwargs):
         """ Handle the many possibilities of the post request """
         self.object = self.get_object()
-        self.customer = Customer.objects.filter(user__id=self.kwargs['user_id']).first()
         self.refill_form = None
         if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
                 (self.object.type == "BAR" and
@@ -287,7 +348,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             total_qty_mod_6 = self.get_total_quantity_for_pid(request, pid) % 6
             bq = int((total_qty_mod_6 + q) / 6) # Integer division
             q -= bq
-        if self.customer.amount < (total + q*float(price)): # Check for enough money
+        if self.customer.amount < (total + round(q*float(price),2)): # Check for enough money
             request.session['not_enough'] = True
             return False
         if product.limit_age >= 18 and not self.customer.user.date_of_birth:
@@ -387,14 +448,17 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def refill(self, request):
         """Refill the customer's account"""
-        form = RefillForm(request.POST)
-        if form.is_valid():
-            form.instance.counter = self.object
-            form.instance.operator = self.operator
-            form.instance.customer = self.customer
-            form.instance.save()
+        if self.get_object().type == 'BAR':
+            form = RefillForm(request.POST)
+            if form.is_valid():
+                form.instance.counter = self.object
+                form.instance.operator = self.operator
+                form.instance.customer = self.customer
+                form.instance.save()
+            else:
+                self.refill_form = form
         else:
-            self.refill_form = form
+            raise PermissionDenied
 
     def get_context_data(self, **kwargs):
         """ Add customer to the context """
@@ -512,7 +576,7 @@ class CounterEditForm(forms.ModelForm):
     sellers = make_ajax_field(Counter, 'sellers', 'users', help_text="")
     products = make_ajax_field(Counter, 'products', 'products', help_text="")
 
-class CounterEditView(CounterAdminTabsMixin, CanEditMixin, UpdateView):
+class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's manager)
     """
@@ -522,10 +586,15 @@ class CounterEditView(CounterAdminTabsMixin, CanEditMixin, UpdateView):
     template_name = 'core/edit.jinja'
     current_tab = "counters"
 
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        self.edit_club.append(obj.club)
+        return super(CounterEditView, self).dispatch(request, *args, **kwargs)
+
     def get_success_url(self):
         return reverse_lazy('counter:admin', kwargs={'counter_id': self.object.id})
 
-class CounterEditPropView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+class CounterEditPropView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's admin)
     """
@@ -535,7 +604,7 @@ class CounterEditPropView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
     template_name = 'core/edit.jinja'
     current_tab = "counters"
 
-class CounterCreateView(CounterAdminTabsMixin, CanEditMixin, CreateView):
+class CounterCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     Create a counter (for the admins)
     """
@@ -545,7 +614,7 @@ class CounterCreateView(CounterAdminTabsMixin, CanEditMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "counters"
 
-class CounterDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteView):
+class CounterDeleteView(CounterAdminTabsMixin, CounterAdminMixin, DeleteView):
     """
     Delete a counter (for the admins)
     """
@@ -557,7 +626,7 @@ class CounterDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteView):
 
 # Product management
 
-class ProductTypeListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
+class ProductTypeListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
     """
@@ -565,7 +634,7 @@ class ProductTypeListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
     template_name = 'counter/producttype_list.jinja'
     current_tab = "product_types"
 
-class ProductTypeCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
+class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     A create view for the admins
     """
@@ -574,7 +643,7 @@ class ProductTypeCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductTypeEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -584,7 +653,7 @@ class ProductTypeEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
     pk_url_kwarg = "type_id"
     current_tab = "products"
 
-class ProductArchivedListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
+class ProductArchivedListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
     """
@@ -594,7 +663,7 @@ class ProductArchivedListView(CounterAdminTabsMixin, CanEditPropMixin, ListView)
     ordering = ['name']
     current_tab = "archive"
 
-class ProductListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
+class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
     """
@@ -632,7 +701,7 @@ class ProductEditForm(forms.ModelForm):
             c.save()
         return ret
 
-class ProductCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
+class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     A create view for the admins
     """
@@ -641,7 +710,7 @@ class ProductCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
     template_name = 'core/create.jinja'
     current_tab = "products"
 
-class ProductEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     An edit view for the admins
     """
@@ -705,26 +774,26 @@ class CashRegisterSummaryForm(forms.Form):
     """
     Provide the cash summary form
     """
-    ten_cents = forms.IntegerField(label=_("10 cents"), required=False)
-    twenty_cents = forms.IntegerField(label=_("20 cents"), required=False)
-    fifty_cents = forms.IntegerField(label=_("50 cents"), required=False)
-    one_euro = forms.IntegerField(label=_("1 euro"), required=False)
-    two_euros = forms.IntegerField(label=_("2 euros"), required=False)
-    five_euros = forms.IntegerField(label=_("5 euros"), required=False)
-    ten_euros = forms.IntegerField(label=_("10 euros"), required=False)
-    twenty_euros = forms.IntegerField(label=_("20 euros"), required=False)
-    fifty_euros = forms.IntegerField(label=_("50 euros"), required=False)
-    hundred_euros = forms.IntegerField(label=_("100 euros"), required=False)
-    check_1_value = forms.DecimalField(label=_("Check amount"), required=False)
-    check_1_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
-    check_2_value = forms.DecimalField(label=_("Check amount"), required=False)
-    check_2_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
-    check_3_value = forms.DecimalField(label=_("Check amount"), required=False)
-    check_3_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
-    check_4_value = forms.DecimalField(label=_("Check amount"), required=False)
-    check_4_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
-    check_5_value = forms.DecimalField(label=_("Check amount"), required=False)
-    check_5_quantity = forms.IntegerField(label=_("Check quantity"), required=False)
+    ten_cents = forms.IntegerField(label=_("10 cents"), required=False, min_value=0)
+    twenty_cents = forms.IntegerField(label=_("20 cents"), required=False, min_value=0)
+    fifty_cents = forms.IntegerField(label=_("50 cents"), required=False, min_value=0)
+    one_euro = forms.IntegerField(label=_("1 euro"), required=False, min_value=0)
+    two_euros = forms.IntegerField(label=_("2 euros"), required=False, min_value=0)
+    five_euros = forms.IntegerField(label=_("5 euros"), required=False, min_value=0)
+    ten_euros = forms.IntegerField(label=_("10 euros"), required=False, min_value=0)
+    twenty_euros = forms.IntegerField(label=_("20 euros"), required=False, min_value=0)
+    fifty_euros = forms.IntegerField(label=_("50 euros"), required=False, min_value=0)
+    hundred_euros = forms.IntegerField(label=_("100 euros"), required=False, min_value=0)
+    check_1_value = forms.DecimalField(label=_("Check amount"), required=False, min_value=0)
+    check_1_quantity = forms.IntegerField(label=_("Check quantity"), required=False, min_value=0)
+    check_2_value = forms.DecimalField(label=_("Check amount"), required=False, min_value=0)
+    check_2_quantity = forms.IntegerField(label=_("Check quantity"), required=False, min_value=0)
+    check_3_value = forms.DecimalField(label=_("Check amount"), required=False, min_value=0)
+    check_3_quantity = forms.IntegerField(label=_("Check quantity"), required=False, min_value=0)
+    check_4_value = forms.DecimalField(label=_("Check amount"), required=False, min_value=0)
+    check_4_quantity = forms.IntegerField(label=_("Check quantity"), required=False, min_value=0)
+    check_5_value = forms.DecimalField(label=_("Check amount"), required=False, min_value=0)
+    check_5_quantity = forms.IntegerField(label=_("Check quantity"), required=False, min_value=0)
     comment = forms.CharField(label=_("Comment"), required=False)
     emptied = forms.BooleanField(label=_("Emptied"), required=False)
 
@@ -817,8 +886,8 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
         """Add form to the context """
         kwargs = super(CounterLastOperationsView, self).get_context_data(**kwargs)
         threshold = timezone.now() - timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT)
-        kwargs['last_refillings'] = self.object.refillings.filter(date__gte=threshold).all()
-        kwargs['last_sellings'] = self.object.sellings.filter(date__gte=threshold).all()
+        kwargs['last_refillings'] = self.object.refillings.filter(date__gte=threshold).order_by('-id')[:20]
+        kwargs['last_sellings'] = self.object.sellings.filter(date__gte=threshold).order_by('-id')[:20]
         return kwargs
 
 class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
@@ -871,7 +940,7 @@ class CounterActivityView(DetailView):
     pk_url_kwarg = "counter_id"
     template_name = 'counter/activity.jinja'
 
-class CounterStatView(DetailView, CanEditMixin):
+class CounterStatView(DetailView, CounterAdminMixin):
     """
     Show the bar stats
     """
@@ -933,7 +1002,7 @@ class CounterStatView(DetailView, CanEditMixin):
                 return super(CanEditMixin, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
-class CashSummaryEditView(CanEditPropMixin, CounterAdminTabsMixin, UpdateView):
+class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin,  UpdateView):
     """Edit cash summaries"""
     model = CashRegisterSummary
     template_name = 'counter/cash_register_summary.jinja'
@@ -949,12 +1018,14 @@ class CashSummaryFormBase(forms.Form):
     begin_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Begin date"), required=False, widget=SelectDateTime)
     end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"), required=False, widget=SelectDateTime)
 
-class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
+class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """Display a list of cash summaries"""
     model = CashRegisterSummary
     template_name = 'counter/cash_summary_list.jinja'
     context_object_name = "cashsummary_list"
     current_tab = "cash_summary"
+    queryset = CashRegisterSummary.objects.all().order_by('-date')
+    paginate_by = settings.SITH_COUNTER_CASH_SUMMARY_LENGTH
 
     def get_context_data(self, **kwargs):
         """ Add sums to the context """
@@ -984,7 +1055,7 @@ class CashSummaryListView(CanEditPropMixin, CounterAdminTabsMixin, ListView):
             kwargs['refilling_sums'][c.name] = sum([s.amount for s in refillings.all()])
         return kwargs
 
-class InvoiceCallView(CounterAdminTabsMixin, TemplateView):
+class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
     template_name = 'counter/invoices_call.jinja'
     current_tab = 'invoices_call'
 
@@ -1001,6 +1072,10 @@ class InvoiceCallView(CounterAdminTabsMixin, TemplateView):
         start_date = start_date.replace(tzinfo=pytz.UTC)
         end_date = (start_date + timedelta(days=32)).replace(day=1, hour=0, minute=0, microsecond=0)
         from django.db.models import Sum, Case, When, F, DecimalField
+        kwargs['sum_cb'] = sum([r.amount for r in Refilling.objects.filter(payment_method='CARD', is_validated=True,
+                                                                          date__gte=start_date, date__lte=end_date)])
+        kwargs['sum_cb'] += sum([s.quantity*s.unit_price for s in Selling.objects.filter(payment_method='CARD', is_validated=True,
+                                                                                         date__gte=start_date, date__lte=end_date)])
         kwargs['start_date'] = start_date
         kwargs['sums'] = Selling.objects.values('club__name').annotate(selling_sum=Sum(
             Case(When(date__gte=start_date,
@@ -1011,7 +1086,7 @@ class InvoiceCallView(CounterAdminTabsMixin, TemplateView):
             )).exclude(selling_sum=None).order_by('-selling_sum')
         return kwargs
 
-class EticketListView(CounterAdminTabsMixin, CanEditPropMixin, ListView):
+class EticketListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
     """
@@ -1029,7 +1104,7 @@ class EticketForm(forms.ModelForm):
                 }
     product = AutoCompleteSelectField('products', show_help_text=False, label=_("Product"), required=True)
 
-class EticketCreateView(CounterAdminTabsMixin, CanEditPropMixin, CreateView):
+class EticketCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     Create an eticket
     """
@@ -1038,7 +1113,7 @@ class EticketCreateView(CounterAdminTabsMixin, CanEditPropMixin, CreateView):
     form_class = EticketForm
     current_tab = "etickets"
 
-class EticketEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
+class EticketEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     Edit an eticket
     """
@@ -1108,6 +1183,13 @@ class EticketPDFView(CanViewMixin, DetailView):
         d.add(qrcode)
         renderPDF.draw(d, p, 10.5 * cm - 130, 6.1 * cm)
         p.drawCentredString(10.5 * cm, 6 * cm, code)
+
+        partners = ImageReader("core/static/core/img/partners.png")
+        width, height = partners.getSize()
+        size = max(width, height)
+        width = width * 2 / 3
+        height = height * 2 / 3
+        p.drawImage(partners, 0 * cm, 0 * cm, width, height)
 
         p.showPage()
         p.save()

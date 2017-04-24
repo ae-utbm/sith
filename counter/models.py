@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.db import models, DataError
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -6,7 +30,7 @@ from django.core.urlresolvers import reverse
 from django.forms import ValidationError
 from django.contrib.sites.shortcuts import get_current_site
 
-from datetime import timedelta
+from datetime import timedelta, date
 import random
 import string
 import os
@@ -34,6 +58,11 @@ class Customer(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.user.username, self.account_id)
+
+    @property
+    def can_buy(self):
+        return (self.user.subscriptions.last() and
+                (date.today() - self.user.subscriptions.last().subscription_end) < timedelta(days=90))
 
     def generate_account_id(number):
         number = str(number)
@@ -347,7 +376,7 @@ class Selling(models.Model):
             self.customer.save()
             self.is_validated = True
         u = User.objects.filter(id=self.customer.user.id).first()
-        if u.was_subscribed():
+        if u.was_subscribed:
             if self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
                 sub = Subscription(
                         member=u,

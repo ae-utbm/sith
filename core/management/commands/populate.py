@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 import os
 from datetime import date, datetime
 from io import StringIO, BytesIO
@@ -16,8 +40,9 @@ from core.utils import resize_image
 from club.models import Club, Membership
 from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
-from com.models import Sith
+from com.models import Sith, Weekmail
 from election.models import Election, Role, Candidature, ElectionList
+from forum.models import Forum, ForumMessage, ForumTopic
 
 
 class Command(BaseCommand):
@@ -37,7 +62,9 @@ class Command(BaseCommand):
         Site(id=4000, domain=settings.SITH_URL, name=settings.SITH_NAME).save()
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         Group(name="Root").save()
-        Group(name="Not registered users").save()
+        Group(name="Public").save()
+        Group(name="Subscribers").save()
+        Group(name="Old subscribers").save()
         Group(name="Accounting admin").save()
         Group(name="Communication admin").save()
         Group(name="Counter admin").save()
@@ -45,6 +72,7 @@ class Command(BaseCommand):
         Group(name="Banned from counters").save()
         Group(name="Banned to subscribe").save()
         Group(name="SAS admin").save()
+        Group(name="Forum admin").save()
         self.reset_index("core", "auth")
         root = User(id=0, username='root', last_name="", first_name="Bibou",
                  email="ae.info@utbm.fr",
@@ -86,7 +114,8 @@ class Command(BaseCommand):
         home_root.save()
         club_root.save()
 
-        Sith().save()
+        Sith(weekmail_destinations="etudiants@git.an personnel@git.an").save()
+        Weekmail().save()
 
         p = Page(name='Index')
         p.set_lock(root)
@@ -427,4 +456,16 @@ Welcome to the wiki page!
             cand.save()
             cand = Candidature(role=pres, user=sli, election_list=listeT, program="En fait j'aime pas l'info, je voulais faire GMC")
             cand.save()
+
+            # Forum
+            room = Forum(name="Salon de discussions", description="Pour causer de tout", is_category=True)
+            room.save()
+            Forum(name="AE", description="Réservé au bureau AE", parent=room).save()
+            Forum(name="BdF", description="Réservé au bureau BdF", parent=room).save()
+            hall = Forum(name="Hall de discussions", description="Pour toutes les discussions", parent=room)
+            hall.save()
+            various = Forum(name="Divers", description="Pour causer de rien", is_category=True)
+            various.save()
+            Forum(name="Promos", description="Réservé aux Promos", parent=various).save()
+            ForumTopic(forum=hall)
 

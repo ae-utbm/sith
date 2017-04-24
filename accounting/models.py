@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.core import validators
@@ -45,6 +69,32 @@ class Company(models.Model):
     class Meta:
         verbose_name = _("company")
 
+    def is_owned_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
+            return True
+        return False
+
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        for club in user.memberships.filter(end_date=None).all():
+            if club and club.role == settings.SITH_CLUB_ROLES_ID['Treasurer']:
+                return True
+        return False
+
+    def can_be_viewed_by(self, user):
+        """
+        Method to see if that object can be viewed by the given user
+        """
+        for club in user.memberships.filter(end_date=None).all():
+            if club and club.role >= settings.SITH_CLUB_ROLES_ID['Treasurer']:
+                return True
+        return False
+
     def get_absolute_url(self):
         return reverse('accounting:co_edit', kwargs={'co_id': self.id})
 
@@ -71,7 +121,7 @@ class BankAccount(models.Model):
         if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         m = self.club.get_membership_for(user)
-        if m is not None and m.role >= 7:
+        if m is not None and m.role >= settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 
@@ -103,7 +153,7 @@ class ClubAccount(models.Model):
         Method to see if that object can be edited by the given user
         """
         m = self.club.get_membership_for(user)
-        if m and m.role == 7:
+        if m and m.role == settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 
@@ -112,7 +162,7 @@ class ClubAccount(models.Model):
         Method to see if that object can be viewed by the given user
         """
         m = self.club.get_membership_for(user)
-        if m and m.role >= 7:
+        if m and m.role >= settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 
@@ -161,6 +211,16 @@ class GeneralJournal(models.Model):
             return True
         return False
 
+    def can_be_edited_by(self, user):
+        """
+        Method to see if that object can be edited by the given user
+        """
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
+            return True
+        if self.club_account.can_be_edited_by(user):
+            return True
+        return False
+
     def can_be_viewed_by(self, user):
         return self.club_account.can_be_edited_by(user)
 
@@ -192,7 +252,7 @@ class Operation(models.Model):
     journal = models.ForeignKey(GeneralJournal, related_name="operations", null=False, verbose_name=_("journal"))
     amount = CurrencyField(_('amount'))
     date = models.DateField(_('date'))
-    remark = models.CharField(_('comment'), max_length=128)
+    remark = models.CharField(_('comment'), max_length=128, null=True, blank=True)
     mode = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_ACCOUNTING_PAYMENT_METHOD)
     cheque_number = models.CharField(_('cheque number'), max_length=32, default="", null=True, blank=True)
     invoice = models.ForeignKey(SithFile, related_name='operations', verbose_name=_("invoice"), null=True, blank=True)
@@ -265,7 +325,7 @@ class Operation(models.Model):
         if self.journal.closed:
             return False
         m = self.journal.club_account.club.get_membership_for(user)
-        if m is not None and m.role >= 7:
+        if m is not None and m.role >= settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 
@@ -273,7 +333,12 @@ class Operation(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if self.is_owned_by(user):
+        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
+            return True
+        if self.journal.closed:
+            return False
+        m = self.journal.club_account.club.get_membership_for(user)
+        if m is not None and m.role == settings.SITH_CLUB_ROLES_ID['Treasurer']:
             return True
         return False
 

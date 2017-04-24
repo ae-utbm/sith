@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.db import models
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.conf import settings
@@ -7,6 +31,7 @@ from django.core.files.base import ContentFile
 
 from PIL import Image
 from io import BytesIO
+import os
 
 from core.models import SithFile, User
 from core.utils import resize_image, exif_auto_rotate
@@ -17,7 +42,7 @@ class Picture(SithFile):
 
     @property
     def is_vertical(self):
-        with open((settings.MEDIA_ROOT + self.file.name).encode('utf-8'), 'rb') as f:
+        with open(os.path.join(settings.MEDIA_ROOT, self.file.name).encode('utf-8'), 'rb') as f:
             im = Image.open(BytesIO(f.read()))
             (w, h) = im.size
             return (w / h) < 1
@@ -30,7 +55,7 @@ class Picture(SithFile):
     def can_be_viewed_by(self, user):
         # file = SithFile.objects.filter(id=self.id).first()
         return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
-                user.was_subscribed())# or user.can_view(file)
+                user.was_subscribed)# or user.can_view(file)
 
     def get_download_url(self):
         return reverse('sas:download', kwargs={'picture_id': self.id})
@@ -67,7 +92,7 @@ class Picture(SithFile):
     def rotate(self, degree):
         for attr in ['file', 'compressed', 'thumbnail']:
             name = self.__getattribute__(attr).name
-            with open((settings.MEDIA_ROOT + name).encode('utf-8'), 'r+b') as file:
+            with open(os.path.join(settings.MEDIA_ROOT, name).encode('utf-8'), 'r+b') as file:
                 if file:
                     im = Image.open(BytesIO(file.read()))
                     file.seek(0)
@@ -107,7 +132,7 @@ class Album(SithFile):
     def can_be_viewed_by(self, user):
         # file = SithFile.objects.filter(id=self.id).first()
         return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
-                user.was_subscribed())# or user.can_view(file)
+                user.was_subscribed)# or user.can_view(file)
 
     def get_absolute_url(self):
         return reverse('sas:album', kwargs={'album_id': self.id})

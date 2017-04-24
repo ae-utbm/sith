@@ -1,0 +1,33 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'forum/macros.jinja' import display_forum %}
+
+{% block title %}
+{% trans %}Forum{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <p>
+    <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a> >
+    </p>
+    <h3>{% trans %}Forum{% endtrans %}</h3>
+    <p>
+        <a class="ib" href="{{ url('forum:last_unread') }}">{% trans %}View last unread messages{% endtrans %}</a>
+    </p>
+    {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+    <p>
+        <a href="{{ url('forum:new_forum') }}">{% trans %}New forum{% endtrans %}</a>
+    </p>
+    {% endif %}
+    {% for f in forum_list %}
+    <div style="padding: 4px; margin: 4px">
+    {{ display_forum(f, user) }}
+        {% for c in f.children.all() %}
+        {{ display_forum(c, user) }}
+        {% endfor %}
+    </div>
+    {% endfor %}
+{% endblock %}
+
+
+

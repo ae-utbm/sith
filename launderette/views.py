@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from datetime import datetime, timedelta
 from collections import OrderedDict
 import pytz
@@ -60,7 +84,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                 self.slot_type = request.POST['slot_type']
             if 'slot' in request.POST.keys() and request.user.is_authenticated():
                 self.subscriber = request.user
-                if self.subscriber.is_subscribed():
+                if self.subscriber.is_subscribed:
                     self.date = dateparse.parse_datetime(request.POST['slot']).replace(tzinfo=pytz.UTC)
                     if self.slot_type == "WASHING":
                         if self.check_slot(self.slot_type):

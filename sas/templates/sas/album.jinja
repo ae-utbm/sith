@@ -39,7 +39,7 @@
     {% endif %}
 {% endif %}
     <div>
-        {% for a in album.children_albums.order_by('-id') %}
+        {% for a in album.children_albums.order_by('-date') %}
         <div style="display: inline-block;">
         {% if edit_mode %}
         <input type="checkbox" name="file_list" value="{{ a.id }}">
@@ -142,7 +142,7 @@ $("form#upload_form").submit(function (event) {
     var imagesCount = images.length;
     var completeCount = 0;
 
-    var poolSize = 5;
+    var poolSize = 1;
     var imagePool = [];
 
     while(images.length > 0 && imagePool.length < poolSize) {

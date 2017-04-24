@@ -14,8 +14,8 @@
     <li style="background: lightgrey;">
     {% endif %}
         <a href="{{ url("core:notification", notif_id=n.id) }}">
-        <span style="font-size: small; ">{{ n.date|date(DATE_FORMAT) }} {{
-            n.date|time(DATETIME_FORMAT) }}</span><br>
+        <span style="font-size: small; ">{{ n.date|localtime|date(DATE_FORMAT) }} {{
+            n.date|localtime|time(DATETIME_FORMAT) }}</span><br>
         {{ n }}</a>
     </li>
 {% endfor %}

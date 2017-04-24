@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django import forms
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, TemplateView
@@ -133,6 +157,8 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
             form.instance = Membership.objects.filter(club=self.object).filter(user=form.data.get('user')).filter(end_date=None).first()
         if form.instance is None: # Instanciate a new membership
             form.instance = Membership(club=self.object, user=self.request.user)
+        if not self.request.user.is_root:
+            form.fields.pop('start_date', None)
         # form.initial = {'user': self.request.user}
         # form._user = self.request.user
         return form
@@ -203,6 +229,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
             kwargs['result'] = qs.all().order_by('-id')
             kwargs['total'] = sum([s.quantity * s.unit_price for s in qs.all()])
             kwargs['total_quantity'] = sum([s.quantity for s in qs.all()])
+            kwargs['benefit'] = kwargs['total'] - sum([s.product.purchase_price for s in qs.exclude(product=None)])
         else:
             kwargs['result'] = qs[:0]
         kwargs['form'] = form
@@ -222,8 +249,11 @@ class ClubSellingCSVView(ClubSellingView):
         kwargs = self.get_context_data(**kwargs)
         writer = csv.writer(response, delimiter=";", lineterminator='\n', quoting=csv.QUOTE_ALL)
 
+        writer.writerow([_t('Quantity'), kwargs['total_quantity']])
+        writer.writerow([_t('Total'), kwargs['total']])
+        writer.writerow([_t('Benefit'), kwargs['benefit']])
         writer.writerow([_t('Date'),_t('Counter'),_t('Barman'),_t('Customer'),_t('Label'),
-                         _t('Quantity'), _t('Total'),_t('Payment method')])
+                         _t('Quantity'), _t('Total'),_t('Payment method'), _t('Selling price'), _t('Purchase price'), _t('Benefit')])
         for o in kwargs['result']:
             row = [o.date, o.counter]
             if o.seller:
@@ -234,6 +264,11 @@ class ClubSellingCSVView(ClubSellingView):
             else: row.append('')
             row = row +[o.label, o.quantity, o.quantity * o.unit_price,
                        o.get_payment_method_display()]
+            if o.product:
+                row.append(o.product.selling_price)
+                row.append(o.product.purchase_price)
+                row.append(o.product.selling_price - o.product.purchase_price)
+            else: row = row + ['', '', '']
             writer.writerow(row)
 
         return response

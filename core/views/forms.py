@@ -1,10 +1,35 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
 from django import forms
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth import logout, login, authenticate
 from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput, DateTimeInput
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from ajax_select.fields import AutoCompleteSelectField
 
@@ -59,7 +84,7 @@ class SelectFile(TextInput):
                 'title': _("Choose file"),
                 'name': name,
                 }
-        output += '<span name="' + name + '" class="choose_file_button">' + _("Choose file") + '</span>'
+        output += '<span name="' + name + '" class="choose_file_button">' + ugettext("Choose file") + '</span>'
         return output
 
 class SelectUser(TextInput):
@@ -73,7 +98,7 @@ class SelectUser(TextInput):
                 'title': _("Choose user"),
                 'name': name,
                 }
-        output += '<span name="' + name + '" class="choose_user_button">' + _("Choose user") + '</span>'
+        output += '<span name="' + name + '" class="choose_user_button">' + ugettext("Choose user") + '</span>'
         return output
 
 # Forms
@@ -167,7 +192,8 @@ class UserProfileForm(forms.ModelForm):
                     im = Image.open(BytesIO(f.read()))
                     new_file = SithFile(parent=parent, name=self.generate_name(field, f),
                             file=resize_image(im, 400, f.content_type.split('/')[-1]),
-                            owner=self.instance, is_folder=False, mime_type=f.content_type, size=f._size)
+                            owner=self.instance, is_folder=False, mime_type=f.content_type, size=f._size,
+                            moderator=self.instance, is_moderated=True)
                     new_file.file.name = new_file.name
                     old = SithFile.objects.filter(parent=parent, name=new_file.name).first()
                     if old:

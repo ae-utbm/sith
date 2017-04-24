@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.conf.urls import url, include
 
 from core.views import *
@@ -40,6 +64,7 @@ urlpatterns = [
     url(r'^user/(?P<user_id>[0-9]+)/edit$', UserUpdateProfileView.as_view(), name='user_edit'),
     url(r'^user/(?P<user_id>[0-9]+)/profile_upload$', UserUploadProfilePictView.as_view(), name='user_profile_upload'),
     url(r'^user/(?P<user_id>[0-9]+)/clubs$', UserClubView.as_view(), name='user_clubs'),
+    url(r'^user/(?P<user_id>[0-9]+)/prefs$', UserPreferencesView.as_view(), name='user_prefs'),
     url(r'^user/(?P<user_id>[0-9]+)/groups$', UserUpdateGroupView.as_view(), name='user_groups'),
     url(r'^user/tools/$', UserToolsView.as_view(), name='user_tools'),
     url(r'^user/(?P<user_id>[0-9]+)/account$', UserAccountView.as_view(), name='user_account'),
@@ -60,6 +85,7 @@ urlpatterns = [
     # Page views
     url(r'^page/$', PageListView.as_view(), name='page_list'),
     url(r'^page/create$', PageCreateView.as_view(), name='page_new'),
+    url(r'^page/(?P<page_id>[0-9]*)/delete$', PageDeleteView.as_view(), name='page_delete'),
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/edit$', PageEditView.as_view(), name='page_edit'),
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/prop$', PagePropView.as_view(), name='page_prop'),
     url(r'^page/(?P<page_name>[a-z0-9/-_]*)/hist$', PageHistView.as_view(), name='page_hist'),

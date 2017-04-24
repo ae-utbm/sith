@@ -1,0 +1,68 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'forum/macros.jinja' import display_message %}
+
+{% block title %}
+{{ topic }}
+{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style type="text/css" media="all">
+.topic {
+    border: solid skyblue 1px;
+    padding: 2px;
+    margin: 2px;
+}
+.forum {
+    background: lightblue;
+    padding: 2px;
+    margin: 2px;
+}
+.category {
+    background: skyblue;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <p>
+    <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
+    {% for f in topic.forum.get_parent_list()|reverse %}
+    > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
+    {% endfor %}
+    > <a href="{{ topic.forum.get_absolute_url() }}">{{ topic.forum }}</a>
+    > <a href="{{ topic.get_absolute_url() }}">{{ topic }}</a>
+    </p>
+    <h3>{{ topic.title }}</h3>
+    <p>{{ topic.description }}</p>
+    <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
+
+    <p style="text-align: right; background: #d8e7f3;">
+    {% for p in msgs.paginator.page_range %}
+        <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
+    {% endfor %}
+    </p>
+
+    {% for m in msgs %}
+        {% if m.id == first_unread_message_id %}
+        <span id="first_unread"></span>
+        {% endif %}
+        {% if m.id >= first_unread_message_id %}
+        {{ display_message(m, user, True) }}
+        {% else %}
+        {{ display_message(m, user, False) }}
+        {% endif %}
+    {% endfor %}
+
+    <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
+
+    <p style="text-align: right; background: #d8e7f3;">
+    {% for p in msgs.paginator.page_range %}
+        <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
+    {% endfor %}
+    </p>
+{% endblock %}
+
+
+

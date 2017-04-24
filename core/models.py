@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group as AuthGroup, GroupManager as AuthGroupManager, AnonymousUser as AuthAnonymousUser
@@ -10,6 +34,10 @@ from django.conf import settings
 from django.db import transaction
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.html import escape
+from django.utils.functional import cached_property
+
+import os
+
 from phonenumber_field.modelfields import PhoneNumberField
 
 from datetime import datetime, timedelta, date
@@ -31,6 +59,10 @@ class Group(AuthGroup):
         help_text=_('Whether a group is a meta group or not'),
     )
     description = models.CharField(_('description'), max_length=60)
+
+    class Meta:
+        ordering = ['name']
+
     def get_absolute_url(self):
         """
         This is needed for black magic powered UpdateView's children
@@ -182,9 +214,11 @@ class User(AbstractBaseUser):
     def to_dict(self):
         return self.__dict__
 
+    @cached_property
     def was_subscribed(self):
         return self.subscriptions.exists()
 
+    @cached_property
     def is_subscribed(self):
         s = self.subscriptions.last()
         return s.is_valid_now() if s is not None else False
@@ -204,8 +238,12 @@ class User(AbstractBaseUser):
             return False
         if group_id == settings.SITH_GROUP_PUBLIC_ID:
             return True
+        if group_id == settings.SITH_GROUP_SUBSCRIBERS_ID:
+            return self.is_subscribed
+        if group_id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
+            return self.was_subscribed
         if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked
-            return self.is_subscribed()
+            return self.is_subscribed
         if group_name[-len(settings.SITH_BOARD_SUFFIX):] == settings.SITH_BOARD_SUFFIX:
             from club.models import Club
             name = group_name[:-len(settings.SITH_BOARD_SUFFIX)]
@@ -226,25 +264,25 @@ class User(AbstractBaseUser):
             return True
         return self.groups.filter(name=group_name).exists()
 
-    @property
+    @cached_property
     def is_root(self):
         return self.is_superuser or self.groups.filter(id=settings.SITH_GROUP_ROOT_ID).exists()
 
-    @property
+    @cached_property
     def is_board_member(self):
         from club.models import Club
         return Club.objects.filter(unix_name=settings.SITH_MAIN_CLUB['unix_name']).first().get_membership_for(self)
 
-    @property
+    @cached_property
     def is_launderette_manager(self):
         from club.models import Club
         return Club.objects.filter(unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name']).first().get_membership_for(self)
 
-    @property
+    @cached_property
     def is_banned_alcohol(self):
         return self.is_in_group(settings.SITH_GROUP_BANNED_ALCOHOL_ID)
 
-    @property
+    @cached_property
     def is_banned_counter(self):
         return self.is_in_group(settings.SITH_GROUP_BANNED_COUNTER_ID)
 
@@ -402,7 +440,7 @@ class User(AbstractBaseUser):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
 
     def can_be_viewed_by(self, user):
-        return (user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP) and self.is_subscriber_viewable) or user.is_root
+        return (user.was_subscribed and self.is_subscriber_viewable) or user.is_root
 
     def get_mini_item(self):
         return """
@@ -418,14 +456,25 @@ class User(AbstractBaseUser):
             escape(self.get_display_name()),
             )
 
-    @property
+    @cached_property
     def subscribed(self):
         return self.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
+
+    @cached_property
+    def forum_infos(self):
+        try:
+            return self._forum_infos
+        except:
+            from forum.models import ForumUserInfo
+            infos = ForumUserInfo(user=self)
+            infos.save()
+            return infos
 
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):
         super(AnonymousUser, self).__init__()
 
+    @property
     def was_subscribed(self):
         return False
 
@@ -487,11 +536,22 @@ class AnonymousUser(AuthAnonymousUser):
 
 class Preferences(models.Model):
     user = models.OneToOneField(User, related_name="preferences")
+    receive_weekmail = models.BooleanField(
+        _('do you want to receive the weekmail'),
+        default=False,
+        # help_text=_('Do you want to receive the weekmail?'),
+    )
     show_my_stats = models.BooleanField(
         _('define if we show a users stats'),
         default=False,
         help_text=_('Show your account statistics to others'),
     )
+
+    def get_display_name(self):
+        return self.user.get_display_name()
+
+    def get_absolute_url(self):
+        return self.user.get_absolute_url()
 
 def get_directory(instance, filename):
     return '.{0}/{1}'.format(instance.get_parent_path(), filename)
@@ -630,10 +690,10 @@ class SithFile(models.Model):
             if self.is_folder:
                 for c in self.children.all():
                     c.move_to(self)
-                shutil.rmtree(settings.MEDIA_ROOT + old_file_name)
+                shutil.rmtree(os.path.join(settings.MEDIA_ROOT, old_file_name))
             else:
                 self.file.save(name=self.name, content=self.file)
-                os.remove(settings.MEDIA_ROOT + old_file_name)
+                os.remove(os.path.join(settings.MEDIA_ROOT, old_file_name))
 
     def __getattribute__(self, attr):
         if attr == "is_file":
@@ -641,12 +701,12 @@ class SithFile(models.Model):
         else:
             return super(SithFile, self).__getattribute__(attr)
 
-    @property
+    @cached_property
     def as_picture(self):
         from sas.models import Picture
         return Picture.objects.filter(id=self.id).first()
 
-    @property
+    @cached_property
     def as_album(self):
         from sas.models import Album
         return Album.objects.filter(id=self.id).first()
@@ -703,7 +763,15 @@ class Page(models.Model):
     Be careful with the _full_name attribute: this field may not be valid until you call save(). It's made for fast
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
     """
-    name = models.CharField(_('page name'), max_length=30, blank=False)
+    name = models.CharField(_('page unix name'), max_length=30,
+            validators=[
+                validators.RegexValidator(
+                    r'^[A-z.+-]+$',
+                    _('Enter a valid page name. This value may contain only '
+                      'unaccented letters, numbers ' 'and ./+/-/_ characters.')
+                ),
+            ],
+            blank=False)
     parent = models.ForeignKey('self', related_name="children", verbose_name=_("parent"), null=True, blank=True, on_delete=models.SET_NULL)
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
@@ -808,6 +876,14 @@ class Page(models.Model):
             p.set_lock_recursive(user)
         self.set_lock(user)
 
+    def unset_lock_recursive(self):
+        """
+        Unlocks recursively all the child pages
+        """
+        for p in self.children.all():
+            p.unset_lock_recursive()
+        self.unset_lock()
+
     def unset_lock(self):
         """Always try to unlock, even if there is no lock"""
         self.lock_user = None
@@ -847,6 +923,16 @@ class Page(models.Model):
             return self.revisions.last().title
         except:
             return self.name
+
+    def delete(self):
+        self.unset_lock_recursive()
+        self.set_lock_recursive(User.objects.get(id=0))
+        for child in self.children.all():
+            child.parent = self.parent
+            child.save()
+            child.unset_lock_recursive()
+        super(Page, self).delete()
+
 
 class PageRev(models.Model):
     """

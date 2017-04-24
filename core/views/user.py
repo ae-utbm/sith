@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 # This file contains all the views that concern the user model
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout as auth_logout, views
@@ -17,9 +41,9 @@ from django.utils import timezone
 from datetime import timedelta, datetime, date
 import logging
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, QuickNotifMixin
 from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm, UserGodfathersForm
-from core.models import User, SithFile
+from core.models import User, SithFile, Preferences
 from club.models import Club
 from subscription.models import Subscription
 
@@ -151,6 +175,11 @@ class UserTabsMixin(TabedViewMixin):
                         'slug': 'edit',
                         'name': _("Edit"),
                         })
+            tab_list.append({
+                        'url': reverse('core:user_prefs', kwargs={'user_id': self.object.id}),
+                        'slug': 'prefs',
+                        'name': _("Preferences"),
+                        })
         if self.request.user.can_view(self.object):
             tab_list.append({
                         'url': reverse('core:user_clubs', kwargs={'user_id': self.object.id}),
@@ -256,6 +285,20 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_stats.jinja"
     current_tab = 'stats'
+
+    def dispatch(self, request, *arg, **kwargs):
+        profile = self.get_object()
+
+        if not hasattr(profile, "customer"):
+            raise Http404
+
+        if not (profile == request.user
+                or request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+                or request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
+                or request.user.is_root):
+            raise PermissionDenied
+
+        return super(UserStatsView, self).dispatch(request, *arg, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserStatsView, self).get_context_data(**kwargs)
@@ -378,6 +421,31 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
     template_name = "core/user_clubs.jinja"
     current_tab = "clubs"
 
+class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
+    """
+    Edit a user's preferences
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    template_name = "core/edit.jinja"
+    form_class = modelform_factory(Preferences, fields=['receive_weekmail'])
+    context_object_name = "profile"
+    current_tab = "prefs"
+
+    def get_object(self, queryset=None):
+        user = get_object_or_404(User, pk=self.kwargs['user_id'])
+        return user
+
+    def get_form_kwargs(self):
+        kwargs = super(UserPreferencesView, self).get_form_kwargs()
+        try:
+            pref = self.object.preferences
+        except:
+            pref = Preferences(user=self.object)
+            pref.save()
+        kwargs.update({'instance': pref})
+        return kwargs
+
 class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     """
     Edit a user's groups
@@ -390,7 +458,7 @@ class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     context_object_name = "profile"
     current_tab = "groups"
 
-class UserToolsView(UserTabsMixin, TemplateView):
+class UserToolsView(QuickNotifMixin, UserTabsMixin, TemplateView):
     """
     Displays the logged user's tools
     """
@@ -472,8 +540,8 @@ class UserAccountView(UserAccountBase):
                 (lambda q: q.amount)
             )
             kwargs['etickets'] = self.object.customer.buyings.exclude(product__eticket=None).all()
-        except:
-            pass
+        except Exception as e:
+            print(repr(e))
         return kwargs
 
 class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):

@@ -35,6 +35,9 @@ $( function() {
         popup.html('<iframe src="/file/popup" width="100%" height="95%"></iframe><div id="file_id" value="null" />');
         popup.dialog({title: $(this).text()}).dialog( "open" );
     });
+    $("#quick_notif li").click(function () {
+        $(this).hide();
+    })
 } );
 
 function display_notif() {

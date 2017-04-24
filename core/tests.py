@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
@@ -253,8 +277,8 @@ http://git.an
         response = self.client.get(reverse('core:page', kwargs={'page_name': 'guy'}))
         self.assertTrue(response.status_code == 200)
         self.assertTrue('<p>Guy <em>bibou</em></p>\\n<p><a href="http://git.an">http://git.an</a></p>\\n' +
-                '<h1>Swag</h1>\\n<p>&lt;guy&gt;Bibou&lt;/guy&gt;</p>\\n' +
-                '<p>&lt;script&gt;alert(&#39;Guy&#39;);&lt;/script&gt;</p>' in str(response.content))
+                '<h1>Swag</h1>\\n&lt;guy&gt;Bibou&lt;/guy&gt;' +
+                "&lt;script&gt;alert(\\'Guy\\');&lt;/script&gt;" in str(response.content))
 
 #TODO: many tests on the pages:
 #   - renaming a page

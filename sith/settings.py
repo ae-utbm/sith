@@ -1,3 +1,27 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 """
 Django settings for sith project.
 
@@ -27,6 +51,7 @@ SECRET_KEY = '(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+INTERNAL_IPS = ['127.0.0.1']
 
 ALLOWED_HOSTS = ['*']
 
@@ -59,7 +84,7 @@ INSTALLED_APPS = (
     'sas',
     'com',
     'election',
-    'stock',
+    'forum',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -154,6 +179,8 @@ HAYSTACK_CONNECTIONS = {
             },
         }
 
+HAYSTACK_SIGNAL_PROCESSOR = 'core.search_indexes.UserOnlySignalProcessor'
+
 WSGI_APPLICATION = 'sith.wsgi.application'
 
 
@@ -232,6 +259,7 @@ SITH_URL = "my.url.git.an"
 SITH_NAME = "Sith website"
 
 # AE configuration
+SITH_MAIN_CLUB_ID = 1 # TODO: keep only that first setting, with the ID, and do the same for the other clubs
 SITH_MAIN_CLUB = {
         'name': "AE",
         'unix_name': "ae",
@@ -261,18 +289,25 @@ SITH_SCHOOL_START_YEAR = 1999
 
 SITH_GROUP_ROOT_ID = 1
 SITH_GROUP_PUBLIC_ID = 2
-SITH_GROUP_ACCOUNTING_ADMIN_ID = 3
-SITH_GROUP_COM_ADMIN_ID = 4
-SITH_GROUP_COUNTER_ADMIN_ID = 5
-SITH_GROUP_BANNED_ALCOHOL_ID = 6
-SITH_GROUP_BANNED_COUNTER_ID = 7
-SITH_GROUP_BANNED_SUBSCRIPTION_ID = 8
-SITH_GROUP_SAS_ADMIN_ID = 9
+SITH_GROUP_SUBSCRIBERS_ID = 3
+SITH_GROUP_OLD_SUBSCRIBERS_ID = 4
+SITH_GROUP_ACCOUNTING_ADMIN_ID = 5
+SITH_GROUP_COM_ADMIN_ID = 6
+SITH_GROUP_COUNTER_ADMIN_ID = 7
+SITH_GROUP_BANNED_ALCOHOL_ID = 8
+SITH_GROUP_BANNED_COUNTER_ID = 9
+SITH_GROUP_BANNED_SUBSCRIPTION_ID = 10
+SITH_GROUP_SAS_ADMIN_ID = 11
+SITH_GROUP_FORUM_ADMIN_ID = 12
+
 
 SITH_CLUB_REFOUND_ID = 89
 SITH_COUNTER_REFOUND_ID = 38
 SITH_PRODUCT_REFOUND_ID = 5
 
+# Forum
+
+SITH_FORUM_PAGE_LENGTH = 30
 
 # SAS variables
 SITH_SAS_ROOT_DIR_ID = 4
@@ -346,6 +381,9 @@ SITH_COUNTER_BANK = [
         ('LA-POSTE', 'La Poste'),
         ]
 
+# Defines pagination for cash summary
+SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
+
 # Defines which product type is the refilling type, and thus increases the account amount
 SITH_COUNTER_PRODUCTTYPE_REFILLING = 11
 
@@ -415,17 +453,31 @@ SITH_SUBSCRIPTIONS = {
 # To be completed....
 }
 
+SITH_CLUB_ROLES = {}
+
+SITH_CLUB_ROLES_ID = {
+    'President': 10,
+    'Vice-President': 9,
+    'Treasurer': 7,
+    'Communication supervisor': 5,
+    'Secretary': 4,
+    'IT supervisor': 3,
+    'Board member': 2,
+    'Active member': 1,
+    'Curious': 0,
+}
+
 SITH_CLUB_ROLES = {
-        10: _('President'),
-        9: _('Vice-President'),
-        7: _('Treasurer'),
-        5: _('Communication supervisor'),
-        4: _('Secretary'),
-        3: _('IT supervisor'),
-        2: _('Board member'),
-        1: _('Active member'),
-        0: _('Curious'),
-        }
+    10: _('President'),
+    9: _('Vice-President'),
+    7: _('Treasurer'),
+    5: _('Communication supervisor'),
+    4: _('Secretary'),
+    3: _('IT supervisor'),
+    2: _('Board member'),
+    1: _('Active member'),
+    0: _('Curious'),
+}
 
 # This corresponds to the maximum role a user can freely subscribe to
 # In this case, SITH_MAXIMUM_FREE_ROLE=1 means that a user can set himself as "Membre actif" or "Curieux", but not higher
@@ -435,7 +487,7 @@ SITH_MAXIMUM_FREE_ROLE=1
 SITH_BARMAN_TIMEOUT=20
 
 # Minutes to delete the last operations
-SITH_LAST_OPERATIONS_LIMIT=5
+SITH_LAST_OPERATIONS_LIMIT=10
 
 # Minutes for a counter to be inactive
 SITH_COUNTER_MINUTE_INACTIVE=10
@@ -467,8 +519,34 @@ SITH_NOTIFICATIONS = [
         ('GENERIC', _("You have a notification")),
         ]
 
+SITH_QUICK_NOTIF = {
+        'qn_success': _("Success!"),
+        'qn_fail': _("Fail!"),
+        'qn_weekmail_new_article': _("You successfully posted an article in the Weekmail"),
+        'qn_weekmail_article_edit': _("You successfully edited an article in the Weekmail"),
+        'qn_weekmail_send_success': _("You successfully sent the Weekmail"),
+        }
+
 try:
     from .settings_custom import *
     print("Custom settings imported")
 except:
     print("Custom settings failed")
+
+if DEBUG:
+    INSTALLED_APPS += ("debug_toolbar",)
+    MIDDLEWARE_CLASSES = ('debug_toolbar.middleware.DebugToolbarMiddleware',) + MIDDLEWARE_CLASSES
+    DEBUG_TOOLBAR_PANELS = [
+        'debug_toolbar.panels.versions.VersionsPanel',
+        'debug_toolbar.panels.timer.TimerPanel',
+        'debug_toolbar.panels.settings.SettingsPanel',
+        'debug_toolbar.panels.headers.HeadersPanel',
+        'debug_toolbar.panels.request.RequestPanel',
+        'debug_toolbar.panels.sql.SQLPanel',
+        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+        'sith.toolbar_debug.TemplatesPanel',
+        'debug_toolbar.panels.cache.CachePanel',
+        'debug_toolbar.panels.signals.SignalsPanel',
+        'debug_toolbar.panels.logging.LoggingPanel',
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+    ]

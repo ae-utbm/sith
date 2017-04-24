@@ -12,16 +12,6 @@
 {% block content %}
 {% if 'preview' in request.POST.keys() %}
 <section class="news_event">
-    <h4> <a href="#">{{ form.instance.title }}</a></h4>
-    <p class="date">
-        <span>{{ form.instance.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-        <span>{{ form.instance.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
-    </p>
-    <p><a href="#">{{ form.instance.club or "Club" }}</a></p>
-    <p>{{ form.instance.summary|markdown }}</p>
-</section>
-<hr>
-<section class="news_event">
     <h4>{{ form.instance.title }}</h4>
     <p class="date">
         <span>{{ form.instance.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}

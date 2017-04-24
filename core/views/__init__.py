@@ -1,9 +1,34 @@
+# -*- coding:utf-8 -*
+#
+# Copyright 2016,2017
+# - Skia <skia@libskia.so>
+#
+# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
+# http://ae.utbm.fr.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License a published by the Free Software
+# Foundation; either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+#
+
 import types
 
 from django.shortcuts import render
 from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ImproperlyConfigured
 from django.views.generic.base import View
+from django.db.models import Count
 
 from core.models import Group
 from core.views.forms import LoginForm
@@ -66,7 +91,7 @@ class CanEditPropMixin(View):
         except: pass
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_edit_prop(o, request.user)]
-        if not l_id:
+        if not l_id and self.get_queryset().count() != 0:
             raise PermissionDenied
         self._get_queryset = self.get_queryset
         def get_qs(self2):
@@ -88,7 +113,7 @@ class CanEditMixin(View):
         except: pass
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_edit(o, request.user)]
-        if not l_id:
+        if not l_id and self.get_queryset().count() != 0:
             raise PermissionDenied
         self._get_queryset = self.get_queryset
         def get_qs(self2):
@@ -110,7 +135,7 @@ class CanViewMixin(View):
         except: pass
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_view(o, request.user)]
-        if not l_id:
+        if not l_id and self.get_queryset().count() != 0:
             raise PermissionDenied
         self._get_queryset = self.get_queryset
         def get_qs(self2):
@@ -146,6 +171,36 @@ class TabedViewMixin(View):
         kwargs['current_tab'] = self.get_current_tab()
         kwargs['list_of_tabs'] = self.get_list_of_tabs()
         return kwargs
+
+class QuickNotifMixin:
+    quick_notif_list = []
+
+    def dispatch(self, request, *arg, **kwargs):
+        self.quick_notif_list = [] # In some cases, the class can stay instanciated, so we need to reset the list
+        return super(QuickNotifMixin, self).dispatch(request, *arg, **kwargs)
+
+    def get_success_url(self):
+        ret = super(QuickNotifMixin, self).get_success_url()
+        try:
+            if '?' in ret:
+                ret += '&' + self.quick_notif_url_arg
+            else:
+                ret += '?' + self.quick_notif_url_arg
+        except: pass
+        return ret
+
+    def get_context_data(self, **kwargs):
+        """Add quick notifications to context"""
+        kwargs = super(QuickNotifMixin, self).get_context_data(**kwargs)
+        kwargs['quick_notifs'] = []
+        for n in self.quick_notif_list:
+            kwargs['quick_notifs'].append(settings.SITH_QUICK_NOTIF[n])
+        for k,v in settings.SITH_QUICK_NOTIF.items():
+            for gk in self.request.GET.keys():
+                if k == gk:
+                    kwargs['quick_notifs'].append(v)
+        return kwargs
+
 
 from .user import *
 from .page import *

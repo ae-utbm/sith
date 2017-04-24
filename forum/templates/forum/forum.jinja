@@ -1,0 +1,65 @@
+{% extends "core/base.jinja" %}
+{% from 'forum/macros.jinja' import display_forum, display_topic %}
+
+{% block title %}
+{{ forum }}
+{% endblock %}
+
+{% block content %}
+    <div>
+    <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
+    {% for f in forum.get_parent_list()|reverse %}
+    > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
+    {% endfor %}
+    > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
+    </div>
+    <h3>{{ forum.name }}</h3>
+    <p>
+    {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+        <a href="{{ url('forum:new_forum') }}?parent={{ forum.id }}">{% trans %}New forum{% endtrans %}</a> <br/>
+    {% endif %}
+        <a href="{{ url('forum:new_topic', forum_id=forum.id) }}">{% trans %}New topic{% endtrans %}</a>
+    </p>
+    {% if forum.children.exists() %}
+    <div>
+        <div class="ib w_big">
+            {% trans %}Title{% endtrans %}
+        </div>
+        <div class="ib w_small">
+            <div class="ib w_medium">
+                {% trans %}Topics{% endtrans %}
+            </div>
+            <div class="ib w_small">
+                {% trans %}Last message{% endtrans %}
+            </div>
+        </div>
+    </div>
+    {% for f in forum.children.all() %}
+    {{ display_forum(f, user) }}
+    {% endfor %}
+    {% endif %}
+    {% if topics %}
+    <div>
+        <div class="ib w_medium">
+            {% trans %}Title{% endtrans %}
+        </div>
+        <div class="ib w_medium">
+            <div class="ib w_small">
+                {% trans %}Author{% endtrans %}
+            </div>
+            <div class="ib w_medium">
+                {% trans %}Messages{% endtrans %}
+            </div>
+            <div class="ib w_small">
+                {% trans %}Last message{% endtrans %}
+            </div>
+        </div>
+    </div>
+    {% for t in topics %}
+    {{ display_topic(t, user) }}
+    {% endfor %}
+    {% endif %}
+{% endblock %}
+
+
+
