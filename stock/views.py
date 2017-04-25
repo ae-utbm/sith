@@ -373,7 +373,7 @@ class StockTakeItemsBaseFormView(CounterTabsMixin, CanEditMixin, DetailView, Bas
             for i in self.stock.items.filter(type=t).order_by('name').all():
                 field_name = "item-%s" % (str(i.id))
                 fields[field_name] = forms.IntegerField(required=False, label=str(i), initial=0, min_value=0, max_value=i.effective_quantity,
-                                help_text=_("(%(effective_quantity)s left" % {"effective_quantity": str(i.effective_quantity)}))
+                                help_text=_("%(effective_quantity)s left" % {"effective_quantity": str(i.effective_quantity)}))
                 kwargs[field_name] = i.effective_quantity
         kwargs['stock_id'] = self.stock.id
         kwargs['counter_id'] = self.stock.counter.id

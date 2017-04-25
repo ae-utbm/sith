@@ -118,7 +118,7 @@ class RefillForm(forms.ModelForm):
 
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
-        if hasattr(self.object, 'stock_owner') : 
+        if hasattr(self.object, 'stock_owner') :
             return self.object.stock_owner.counter
         else:
             return self.object
@@ -132,19 +132,19 @@ class CounterTabsMixin(TabedViewMixin):
             })
         if self.object.stock_owner.counter.type if hasattr(self.object, 'stock_owner') else self.object.type == "BAR":
             tab_list.append({
-                'url': reverse_lazy('counter:cash_summary', 
+                'url': reverse_lazy('counter:cash_summary',
                     kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id}),
                 'slug': 'cash_summary',
                 'name': _("Cash summary"),
                 })
             tab_list.append({
-                'url': reverse_lazy('counter:last_ops', 
+                'url': reverse_lazy('counter:last_ops',
                     kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id}),
                 'slug': 'last_ops',
                 'name': _("Last operations"),
                 })
             tab_list.append({
-                'url': reverse_lazy('stock:take_items', 
+                'url': reverse_lazy('stock:take_items',
                     kwargs={'stock_id': self.object.stock.id if hasattr(self.object, 'stock') else self.object.stock_owner.id}),
                 'slug': 'take_items_from_stock',
                 'name': _("Take items from stock"),
