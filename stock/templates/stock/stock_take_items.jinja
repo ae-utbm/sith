@@ -1,0 +1,17 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import user_profile_link %}
+
+{% block title %}
+{% trans s = stock %}Take items from {{ s }}{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans s = stock %}Take items from {{ s }}{% endtrans %}</h3>
+    <div>
+    	<form method="post" action="" class="inline" style="display:inline">
+        	{% csrf_token %}
+        	{{ form.as_p() }}
+            <p><input type="submit" value="{% trans %}Take items{% endtrans %}" /></p>
+        </form>
+    </div>
+{% endblock %}

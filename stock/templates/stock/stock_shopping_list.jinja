@@ -1,0 +1,75 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+Shopping list for {{ stock }}
+{% endblock %}
+
+{% block content %}
+{% if current_tab == "stocks" %}
+	<a href="{{ url('stock:shoppinglist_create', stock_id=stock.id)}}">{% trans %}Create shopping list{% endtrans %}</a>
+{% endif %}
+<h3>{% trans s=stock %}Shopping lists history for {{ s }}{% endtrans %}</h3>
+
+	<p>
+		{% trans %}Information :{% endtrans %}
+		<br>
+		{% trans %}Use the "update stock" action when you get back from shopping to add the effective quantity bought for each shopping list item.{% endtrans %}
+		<br> 
+		{% trans %}For example, 3 Cheeseburger (boxes) are aksing in the list, but there were only 2 so, 2 have to be added in the stock quantity.{% endtrans %}
+	</p>
+
+	<h4>{% trans %}To do{% endtrans %}</h4>
+	<table>
+		<thead>
+		    <tr>
+		        <td>{% trans %}Date{% endtrans %}</td>
+		        <td>{% trans %}Name{% endtrans %}</td>
+		        <td>{% trans %}Number of items{% endtrans %}</td>
+		    </tr>
+		</thead>
+		<tbody>
+		{% for s in stock.shopping_lists.filter(todo=True).filter(stock_owner=stock).order_by('-date').all() %}
+			<tr>
+				<td>{{ s.date|localtime|date("Y-m-d H:i") }}</td>
+				<td><a href="{{ url('stock:shoppinglist_items', stock_id=stock.id, shoppinglist_id=s.id)}}">{{ s.name }}</a></td>
+				<td>{{ s.shopping_items_to_buy.count() }}</td>
+				<td>
+					<a href="{{ url('stock:update_after_shopping', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Update stock{% endtrans %}</a>
+				</td>
+				<td>
+					<a href="{{ url('stock:shoppinglist_set_done', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Mark as done{% endtrans %}</a>
+				</td>
+				<td>
+					<a href="{{ url('stock:shoppinglist_delete', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Delete{% endtrans %}</a>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+
+	<h4>{% trans %}Done{% endtrans %}</h4>
+	<table>
+		<thead>
+		    <tr>
+		        <td>{% trans %}Date{% endtrans %}</td>
+		        <td>{% trans %}Name{% endtrans %}</td>
+		        <td>{% trans %}Number of items{% endtrans %}</td>
+		    </tr>
+		</thead>
+		<tbody>
+		{% for s in stock.shopping_lists.filter(todo=False).filter(stock_owner=stock).order_by('-date').all() %}
+			<tr>
+				<td>{{ s.date|localtime|date("Y-m-d H:i") }}</td>
+				<td><a href="{{ url('stock:shoppinglist_items', stock_id=stock.id, shoppinglist_id=s.id)}}">{{ s.name }}</a></td>
+				<td>{{ s.shopping_items_to_buy.count() }}</td>
+				<td>
+					<a href="{{ url('stock:shoppinglist_set_todo', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Mark as to do{% endtrans %}</a>
+				</td>
+				<td>
+					<a href="{{ url('stock:shoppinglist_delete', stock_id=stock.id, shoppinglist_id=s.id)}}">{% trans %}Delete{% endtrans %}</a>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}

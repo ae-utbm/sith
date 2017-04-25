@@ -58,6 +58,7 @@ urlpatterns = [
     url(r'^com/', include('com.urls', namespace="com", app_name="com")),
     url(r'^club/', include('club.urls', namespace="club", app_name="club")),
     url(r'^counter/', include('counter.urls', namespace="counter", app_name="counter")),
+    url(r'^stock/', include('stock.urls', namespace="stock", app_name="stock")),
     url(r'^accounting/', include('accounting.urls', namespace="accounting", app_name="accounting")),
     url(r'^eboutic/', include('eboutic.urls', namespace="eboutic", app_name="eboutic")),
     url(r'^launderette/', include('launderette.urls', namespace="launderette", app_name="launderette")),
