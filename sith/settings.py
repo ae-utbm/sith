@@ -72,6 +72,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'ajax_select',
     'haystack',
+    'sass_processor',
     'core',
     'club',
     'subscription',
@@ -133,6 +134,7 @@ TEMPLATES = [
                 "django_jinja.builtins.extensions.UrlsExtension",
                 "django_jinja.builtins.extensions.StaticFilesExtension",
                 "django_jinja.builtins.extensions.DjangoFiltersExtension",
+                "sass_processor.jinja2.ext.SassSrc",
             ],
             "filters": {
                 "markdown": "core.templatetags.renderer.markdown",
@@ -182,6 +184,12 @@ HAYSTACK_CONNECTIONS = {
 
 HAYSTACK_SIGNAL_PROCESSOR = 'core.search_indexes.UserOnlySignalProcessor'
 
+SASS_PRECISION = 8
+
+SASS_OUTPUT_STYLE = 'compact'
+
+SASS_TEMPLATE_EXTS = ['.html','.jinja']
+
 WSGI_APPLICATION = 'sith.wsgi.application'
 
 
@@ -229,6 +237,13 @@ MEDIA_URL = '/data/'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = './static/'
+
+# Static files finders which allow to see static folder in all apps
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'sass_processor.finders.CssFinder',
+]
 
 # Auth configuration
 AUTH_USER_MODEL = 'core.User'
