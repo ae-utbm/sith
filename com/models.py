@@ -27,11 +27,13 @@ from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.conf import settings
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ValidationError
 
 from core.models import User, Preferences
 from club.models import Club
+import os
 
 class Sith(models.Model):
     """A one instance class storing all the modifiable infos"""
@@ -132,6 +134,9 @@ class Weekmail(models.Model):
         return render(None, "com/weekmail_renderer_html.jinja", context={
             'weekmail': self,
             }).content.decode('utf-8')
+
+    def get_banner(self):
+        return "http://" + settings.SITH_URL + static("com/img/weekmail_banner.png")
 
     def __str__(self):
         return "Weekmail %s (sent: %s) - %s" % (self.id, self.sent, self.title)
