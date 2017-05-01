@@ -386,12 +386,12 @@ SITH_COUNTER_BANK = [
 SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
 
 # Defines which product type is the refilling type, and thus increases the account amount
-SITH_COUNTER_PRODUCTTYPE_REFILLING = 11
+SITH_COUNTER_PRODUCTTYPE_REFILLING = 3
 
 # Defines which product is the one year subscription and which one is the six month subscription
-SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER = 93
-SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS = 94
-SITH_PRODUCTTYPE_SUBSCRIPTION = 23
+SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER = 1
+SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS = 2
+SITH_PRODUCTTYPE_SUBSCRIPTION = 2
 
 # Subscription durations are in semestres
 # Be careful, modifying this parameter will need a migration to be applied

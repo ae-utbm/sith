@@ -185,6 +185,15 @@ Welcome to the wiki page!
             subscriber.save()
             subscriber.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             subscriber.save()
+            # Adding user old Subscriber
+            old_subscriber = User(username='old_subscriber', last_name="Subscriber", first_name="Old",
+                     email="old_subscriber@git.an",
+                     date_of_birth="1942-06-12",
+                     is_superuser=False, is_staff=False)
+            old_subscriber.set_password("plop")
+            old_subscriber.save()
+            old_subscriber.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            old_subscriber.save()
             # Adding user Counter admin
             counter = User(username='counter', last_name="Ter", first_name="Coun",
                      email="counter@git.an",
@@ -265,6 +274,14 @@ Welcome to the wiki page!
                     duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
                     start=s.subscription_start)
             s.save()
+            ## Counter admin
+            s = Subscription(member=User.objects.filter(pk=counter.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                    start=s.subscription_start)
+            s.save()
             ## Comptable
             s = Subscription(member=User.objects.filter(pk=comptable.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
@@ -285,6 +302,14 @@ Welcome to the wiki page!
             s = Subscription(member=User.objects.filter(pk=subscriber.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
                     payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                    start=s.subscription_start)
+            s.save()
+            ## Old subscriber
+            s = Subscription(member=User.objects.filter(pk=old_subscriber.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+            s.subscription_start = s.compute_start(datetime(year=2012, month=9, day=4))
             s.subscription_end = s.compute_end(
                     duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
                     start=s.subscription_start)
@@ -311,6 +336,19 @@ Welcome to the wiki page!
             Customer(user=r, account_id="4000", amount=0).save()
             p = ProductType(name="Bières bouteilles")
             p.save()
+            c = ProductType(name="Cotisations")
+            c.save()
+            r = ProductType(name="Rechargements")
+            r.save()
+            cotis = Product(name="Cotis 1 semestre", code="1SCOTIZ", product_type=c, purchase_price="15", selling_price="15",
+                    special_selling_price="15", club=main_club)
+            cotis.save()
+            cotis2 = Product(name="Cotis 2 semestres", code="2SCOTIZ", product_type=c, purchase_price="28", selling_price="28",
+                    special_selling_price="28", club=main_club)
+            cotis2.save()
+            refill = Product(name="Rechargement 15 €", code="15REFILL", product_type=r, purchase_price="15", selling_price="15",
+                    special_selling_price="15", club=main_club)
+            refill.save()
             barb = Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",
                     special_selling_price="1.6", club=main_club)
             barb.save()
@@ -325,6 +363,13 @@ Welcome to the wiki page!
             mde.products.add(barb)
             mde.products.add(cble)
             mde.save()
+
+            eboutic = Counter.objects.filter(name="Eboutic").first()
+            eboutic.products.add(barb)
+            eboutic.products.add(cotis)
+            eboutic.products.add(cotis2)
+            eboutic.products.add(refill)
+            eboutic.save()
 
             refound_counter = Counter(name="Carte AE", club=refound, type='OFFICE')
             refound_counter.save()
