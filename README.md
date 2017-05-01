@@ -36,8 +36,8 @@ The development is done with sqlite, but it is advised to set a more robust DBMS
 ### Collecting statics for production:
 
 ```
-./manage.py collectstatic --ignore=.scss
-./manage.py compilescss
+./manage.py collectstatic
+./manage.py compilestatic
 ```
 
 ### Misc about development

@@ -188,7 +188,7 @@ SASS_PRECISION = 8
 
 SASS_OUTPUT_STYLE = 'compact'
 
-SASS_TEMPLATE_EXTS = ['.html','.jinja']
+SASS_TEMPLATE_EXTS = ['.jinja']
 
 WSGI_APPLICATION = 'sith.wsgi.application'
 
