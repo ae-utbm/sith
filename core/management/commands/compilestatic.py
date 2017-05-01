@@ -28,45 +28,40 @@ import sass
 from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
-    help = "Comile scss files from static folder"
+    help = "Compile scss files from static folder"
 
-    def compilescss(self, folder):
-        to_compile = []
+    def is_compilable(self, file, ext_list):
+        path, ext = os.path.splitext(file)
+        return ext in ext_list
+
+    def exec_on_folder(self, folder, func):
+        to_exec = []
         for file in os.listdir(folder):
             file = os.path.join(folder, file)
             if os.path.isdir(file):
-                self.compilescss(file)
-            else:
-                path, ext = os.path.splitext(file)
-                if ext == ".scss":
-                    to_compile.append(file)
+                self.exec_on_folder(file, func)
+            elif self.is_compilable(file, ['.scss']):
+                to_exec.append(file)
 
-        for f in to_compile:
-            print("compilling %s" % f)
-            with open(f, "r") as oldfile:
-                with open(f.replace('.scss', '.css'), "w") as newfile:
-                    newfile.write(sass.compile(string=oldfile.read()))
+        for file in to_exec:
+            func(file)
 
-    def removescss(self, folder):
-        to_remove = []
-        for file in os.listdir(folder):
-            file = os.path.join(folder, file)
-            if os.path.isdir(file):
-                self.removescss(file)
-            else:
-                path, ext = os.path.splitext(file)
-                if ext == ".scss":
-                    to_remove.append(file)
-        for f in to_remove:
-            print("removing %s" % f)
-            os.remove(f)
+    def compilescss(self, file):
+        print("compiling %s" % file)
+        with open(file, "r") as oldfile:
+            with open(file.replace('.scss', '.css'), "w") as newfile:
+                newfile.write(sass.compile(string=oldfile.read()))
+
+    def removescss(self, file):
+        print("removing %s" % file)
+        os.remove(file)
 
     def handle(self, *args, **options):
 
         if 'static' in os.listdir():
-            print("---- Compilling scss files ---")
-            self.compilescss('static')
+            print("---- Compiling scss files ---")
+            self.exec_on_folder('static', self.compilescss)
             print("---- Removing scss files ----")
-            self.removescss('static')
+            self.exec_on_folder('static', self.removescss)
         else:
-            print("No static folder avaliable, please use collectstatic before compilling scss")
+            print("No static folder avalaible, please use collectstatic before compiling scss")
