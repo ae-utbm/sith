@@ -33,6 +33,12 @@ sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-de
 
 The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
 
+### Collecting statics for production:
+
+```
+./manage.py collectstatic --ignore=.scss
+./manage.py compilescss
+```
 
 ### Misc about development
 
