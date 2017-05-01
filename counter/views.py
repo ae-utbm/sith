@@ -143,12 +143,14 @@ class CounterTabsMixin(TabedViewMixin):
                 'slug': 'last_ops',
                 'name': _("Last operations"),
                 })
-            tab_list.append({
-                'url': reverse_lazy('stock:take_items',
-                    kwargs={'stock_id': self.object.stock.id if hasattr(self.object, 'stock') else self.object.stock_owner.id}),
-                'slug': 'take_items_from_stock',
-                'name': _("Take items from stock"),
-                })
+            try:
+                tab_list.append({
+                    'url': reverse_lazy('stock:take_items',
+                        kwargs={'stock_id': self.object.stock.id if hasattr(self.object, 'stock') else self.object.stock_owner.id}),
+                    'slug': 'take_items_from_stock',
+                    'name': _("Take items from stock"),
+                    })
+            except: pass # The counter just have no stock
         return tab_list
 
 class CounterMain(CounterTabsMixin, CanViewMixin, DetailView, ProcessFormView, FormMixin):
