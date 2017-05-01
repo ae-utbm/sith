@@ -430,13 +430,13 @@ Welcome to the wiki page!
             # Create an election
             public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
             subscriber_group = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)
-            ae_board_gorup = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
+            ae_board_group = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
             el = Election(title="Élection 2017", description="La roue tourne", start_candidature='1942-06-12 10:28:45+01',
                     end_candidature='2042-06-12 10:28:45+01',start_date='1942-06-12 10:28:45+01',
                     end_date='7942-06-12 10:28:45+01')
             el.save()
             el.view_groups.add(public_group)
-            el.edit_groups.add(ae_board_gorup)
+            el.edit_groups.add(ae_board_group)
             el.candidature_groups.add(subscriber_group)
             el.vote_groups.add(subscriber_group)
             el.save()
