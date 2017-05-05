@@ -10,16 +10,16 @@ img {
 </style>
 <div style="background: #CBD1DD; padding: 0px 5%;">
     <div style="background: #F9FAFB;">
-        <h2 style="background: #304C83; color: hsl(219.6, 20.8%, 98%)">{{ weekmail.title }}</h2>
+        <h2 style="background: #304C83; color: #f9fafb">{{ weekmail.title }}</h2>
         <img src="{{ weekmail.get_banner() }}"
         id="OWATemporaryImageDivContainerBannerForOutlook"
         >
         {% if weekmail.intro %}
-        <h3 style="background: #E3A11C; color: hsl(219.6, 20.8%, 98%)">{% trans %}Intro{% endtrans %}</h3>
+        <h3 style="background: #E3A11C; color: #f9fafb">{% trans %}Intro{% endtrans %}</h3>
         {{ weekmail.intro|markdown }}
         {% endif %}
 
-        <h3 style="background: #E3A11C; color: hsl(219.6, 20.8%, 98%)">{% trans %}Table of content{% endtrans %}</h3>
+        <h3 style="background: #E3A11C; color: #f9fafb">{% trans %}Table of content{% endtrans %}</h3>
         <ul>
             {% for a in weekmail.articles.all() %}
             <li>[{{ a.club }}] {{ a.title }}</li>
@@ -27,22 +27,22 @@ img {
         </ul>
 
         {%- for a in weekmail.articles.all() %}
-        <h3 style="background: #E3A11C; color: hsl(219.6, 20.8%, 98%)">[{{ a.club }}] {{ a.title }}</h3>
+        <h3 style="background: #E3A11C; color: #f9fafb">[{{ a.club }}] {{ a.title }}</h3>
         {{ a.content|markdown }}
         {%- endfor -%}
 
         {%- if weekmail.joke %}
-        <h3 style="background: #E3A11C; color: hsl(219.6, 20.8%, 98%)">{% trans %}Joke{% endtrans %}</h3>
+        <h3 style="background: #E3A11C; color: #f9fafb">{% trans %}Joke{% endtrans %}</h3>
         {{ weekmail.joke|markdown }}
         {% endif -%}
 
         {%- if weekmail.protip %}
-        <h3 style="background: #E3A11C; color: hsl(219.6, 20.8%, 98%)">{% trans %}Pro tip{% endtrans %}</h3>
+        <h3 style="background: #E3A11C; color: #f9fafb">{% trans %}Pro tip{% endtrans %}</h3>
         {{ weekmail.protip|markdown }}
         {% endif -%}
 
         {%- if weekmail.conclusion %}
-        <h3 style="background: #E3A11C; color: hsl(219.6, 20.8%, 98%)">{% trans %}Final word{% endtrans %}</h3>
+        <h3 style="background: #E3A11C; color: #f9fafb">{% trans %}Final word{% endtrans %}</h3>
         {{ weekmail.conclusion|markdown }}
         {% endif -%}
 

@@ -237,6 +237,7 @@ LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
 LOGIN_REDIRECT_URL = '/'
 DEFAULT_FROM_EMAIL="bibou@git.an"
+SITH_COM_EMAIL="bibou_com@git.an"
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
