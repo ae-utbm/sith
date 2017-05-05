@@ -13,6 +13,4 @@ django-haystack
 whoosh
 django-debug-toolbar
 libsass
-django-compressor
-django-sass-processor
 # mysqlclient

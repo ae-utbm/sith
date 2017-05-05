@@ -72,7 +72,6 @@ INSTALLED_APPS = (
     'rest_framework',
     'ajax_select',
     'haystack',
-    'sass_processor',
     'core',
     'club',
     'subscription',
@@ -134,7 +133,6 @@ TEMPLATES = [
                 "django_jinja.builtins.extensions.UrlsExtension",
                 "django_jinja.builtins.extensions.StaticFilesExtension",
                 "django_jinja.builtins.extensions.DjangoFiltersExtension",
-                "sass_processor.jinja2.ext.SassSrc",
             ],
             "filters": {
                 "markdown": "core.templatetags.renderer.markdown",
@@ -149,6 +147,7 @@ TEMPLATES = [
                 "ProductType": "counter.models.ProductType",
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
+                "scss": "core.templatetags.scss.scss",
             },
             "bytecode_cache": {
                 "name": "default",
@@ -185,10 +184,6 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_SIGNAL_PROCESSOR = 'core.search_indexes.UserOnlySignalProcessor'
 
 SASS_PRECISION = 8
-
-SASS_OUTPUT_STYLE = 'compact'
-
-SASS_TEMPLATE_EXTS = ['.jinja']
 
 WSGI_APPLICATION = 'sith.wsgi.application'
 
@@ -242,7 +237,7 @@ STATIC_ROOT = './static/'
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'sass_processor.finders.CssFinder',
+    'core.scss.finder.ScssFinder',
 ]
 
 # Auth configuration
@@ -566,4 +561,7 @@ if DEBUG:
         'debug_toolbar.panels.signals.SignalsPanel',
         'debug_toolbar.panels.logging.LoggingPanel',
         'debug_toolbar.panels.redirects.RedirectsPanel',
+    ]
+    SASS_INCLUDE_FOLDERS = [
+        'core/static/',
     ]

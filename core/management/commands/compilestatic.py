@@ -26,9 +26,21 @@
 import os
 import sass
 from django.core.management.base import BaseCommand
+from django.conf import settings
+
 
 class Command(BaseCommand):
     help = "Compile scss files from static folder"
+
+    def compile(self, filename):
+        args = {
+            "filename": filename,
+            "include_paths": settings.STATIC_ROOT,
+        }
+        if settings.SASS_PRECISION:
+            args['precision'] = settings.SASS_PRECISION
+        return sass.compile(**args)
+
 
     def is_compilable(self, file, ext_list):
         path, ext = os.path.splitext(file)
@@ -48,9 +60,8 @@ class Command(BaseCommand):
 
     def compilescss(self, file):
         print("compiling %s" % file)
-        with open(file, "r") as oldfile:
-            with open(file.replace('.scss', '.css'), "w") as newfile:
-                newfile.write(sass.compile(string=oldfile.read()))
+        with(open(file.replace('.scss', '.css'), "w")) as newfile:
+            newfile.write(self.compile(file))
 
     def removescss(self, file):
         print("removing %s" % file)
@@ -58,10 +69,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        if 'static' in os.listdir():
+        if os.path.isdir(settings.STATIC_ROOT):
             print("---- Compiling scss files ---")
-            self.exec_on_folder('static', self.compilescss)
+            self.exec_on_folder(settings.STATIC_ROOT, self.compilescss)
             print("---- Removing scss files ----")
-            self.exec_on_folder('static', self.removescss)
+            self.exec_on_folder(settings.STATIC_ROOT, self.removescss)
         else:
             print("No static folder avalaible, please use collectstatic before compiling scss")
