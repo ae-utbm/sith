@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
+# Copyright 2017
 # - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
@@ -65,7 +65,6 @@ class ScssProcessor(object):
         if self.storage.exists(css_filename):
             self.storage.delete(css_filename)
         self.storage.save(css_filename, ContentFile(content))
-        print("saved")
 
         return url
 
