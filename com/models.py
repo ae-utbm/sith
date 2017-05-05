@@ -115,7 +115,7 @@ class Weekmail(models.Model):
             email = EmailMultiAlternatives(
                     subject=self.title,
                     body=self.render_text(),
-                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    from_email=settings.SITH_COM_EMAIL,
                     to=Sith.objects.first().weekmail_destinations.split(' '),
                     bcc=dest,
                     )
