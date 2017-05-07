@@ -304,14 +304,15 @@ class OperationForm(forms.ModelForm):
 
     def clean(self):
         self.cleaned_data = super(OperationForm, self).clean()
-        if self.cleaned_data['target_type'] == "USER":
-            self.cleaned_data['target_id'] = self.cleaned_data['user'].id
-        elif self.cleaned_data['target_type'] == "ACCOUNT":
-            self.cleaned_data['target_id'] = self.cleaned_data['club_account'].id
-        elif self.cleaned_data['target_type'] == "CLUB":
-            self.cleaned_data['target_id'] = self.cleaned_data['club'].id
-        elif self.cleaned_data['target_type'] == "COMPANY":
-            self.cleaned_data['target_id'] = self.cleaned_data['company'].id
+        if 'target_type' in self.cleaned_data.keys():
+            if self.cleaned_data['target_type'] == "USER":
+                self.cleaned_data['target_id'] = self.cleaned_data['user'].id
+            elif self.cleaned_data['target_type'] == "ACCOUNT":
+                self.cleaned_data['target_id'] = self.cleaned_data['club_account'].id
+            elif self.cleaned_data['target_type'] == "CLUB":
+                self.cleaned_data['target_id'] = self.cleaned_data['club'].id
+            elif self.cleaned_data['target_type'] == "COMPANY":
+                self.cleaned_data['target_id'] = self.cleaned_data['company'].id
         return self.cleaned_data
 
     def save(self):

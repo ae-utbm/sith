@@ -74,11 +74,10 @@ class CounterAdminMixin(View):
 
 
     def dispatch(self, request, *args, **kwargs):
-        res = super(CounterAdminMixin, self).dispatch(request, *args, **kwargs)
         if not (request.user.is_root or self._test_group(request.user)
                 or self._test_club(request.user)):
             raise PermissionDenied
-        return res
+        return super(CounterAdminMixin, self).dispatch(request, *args, **kwargs)
 
 class GetUserForm(forms.Form):
     """
