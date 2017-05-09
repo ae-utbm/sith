@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -25,6 +26,7 @@
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
+from core.scss.processor import ScssProcessor
 from django.utils.html import escape
 
 from core.markdown import markdown as md
@@ -49,4 +51,7 @@ def datetime_format_python_to_PHP(python_format_string):
         php_format_string = php_format_string.replace(py, php)
     return php_format_string
 
-
+@register.simple_tag()
+def scss(path):
+    processor = ScssProcessor(path)
+    return processor.get_converted_scss()

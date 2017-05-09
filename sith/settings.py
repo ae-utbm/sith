@@ -147,7 +147,7 @@ TEMPLATES = [
                 "ProductType": "counter.models.ProductType",
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
-                "scss": "core.templatetags.scss.scss",
+                "scss": "core.templatetags.renderer.scss",
             },
             "bytecode_cache": {
                 "name": "default",
