@@ -46,6 +46,7 @@ from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, Log
 from core.models import User, SithFile, Preferences
 from club.models import Club
 from subscription.models import Subscription
+from matmat.views import UserMatmatForm
 
 def login(request):
     """
@@ -427,7 +428,7 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
     """
     model = User
     pk_url_kwarg = "user_id"
-    template_name = "core/edit.jinja"
+    template_name = "core/user_preferences.jinja"
     form_class = modelform_factory(Preferences, fields=['receive_weekmail'])
     context_object_name = "profile"
     current_tab = "prefs"
@@ -444,6 +445,12 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
             pref = Preferences(user=self.object)
             pref.save()
         kwargs.update({'instance': pref})
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserPreferencesView, self).get_context_data(**kwargs)
+        if not hasattr(self.object, 'matmat_user'):
+            kwargs['matmat_form'] = UserMatmatForm()
         return kwargs
 
 class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):

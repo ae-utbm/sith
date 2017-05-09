@@ -7,6 +7,11 @@
     <ul>
         <li> <a href="{{ url('com:news_new') }}?club={{ object.id }}">{% trans %}Create a news{% endtrans %}</a></li>
         <li> <a href="{{ url('com:weekmail_article') }}?club={{ object.id }}">{% trans %}Post in the Weekmail{% endtrans %}</a></li>
+        {% if object.matmat %}
+        <li> <a href="{{ url('matmat:detail', matmat_id=object.matmat.id) }}">{% trans %}Edit Matmatronch{% endtrans %}</a></li>
+        {% else %}
+        <li> <a href="{{ url('matmat:create', club_id=object.id) }}">{% trans %}New Matmatronch{% endtrans %}</a></li>
+        {% endif %}
     </ul>
     <h4>{% trans %}Counters:{% endtrans %}</h4>
     <ul>

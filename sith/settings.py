@@ -86,6 +86,7 @@ INSTALLED_APPS = (
     'election',
     'forum',
     'stock',
+    'matmat',
 )
 
 MIDDLEWARE_CLASSES = (
