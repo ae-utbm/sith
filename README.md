@@ -33,6 +33,14 @@ sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-de
 
 The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
 
+### Collecting statics for production:
+
+We use scss in the project. In development environment (DEBUG=True), scss is compiled every time the file is needed. For production, it assumes you have already compiled every files and to do so, you need to use the following commands : 
+
+```
+./manage.py collectstatic # To collect statics
+./manage.py compilestatic # To compile scss in those statics
+```
 
 ### Misc about development
 

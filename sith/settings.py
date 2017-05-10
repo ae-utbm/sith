@@ -147,6 +147,7 @@ TEMPLATES = [
                 "ProductType": "counter.models.ProductType",
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
+                "scss": "core.templatetags.renderer.scss",
             },
             "bytecode_cache": {
                 "name": "default",
@@ -181,6 +182,8 @@ HAYSTACK_CONNECTIONS = {
         }
 
 HAYSTACK_SIGNAL_PROCESSOR = 'core.search_indexes.UserOnlySignalProcessor'
+
+SASS_PRECISION = 8
 
 WSGI_APPLICATION = 'sith.wsgi.application'
 
@@ -229,6 +232,13 @@ MEDIA_URL = '/data/'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = './static/'
+
+# Static files finders which allow to see static folder in all apps
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'core.scss.finder.ScssFinder',
+]
 
 # Auth configuration
 AUTH_USER_MODEL = 'core.User'
@@ -551,4 +561,7 @@ if DEBUG:
         'debug_toolbar.panels.signals.SignalsPanel',
         'debug_toolbar.panels.logging.LoggingPanel',
         'debug_toolbar.panels.redirects.RedirectsPanel',
+    ]
+    SASS_INCLUDE_FOLDERS = [
+        'core/static/',
     ]

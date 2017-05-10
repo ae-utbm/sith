@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
+# Copyright 2017
 # - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
@@ -22,11 +23,22 @@
 #
 #
 
-from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
+from django.conf import settings
+from django.contrib.staticfiles.finders import get_finders
+from django.core.files.storage import FileSystemStorage
 
-class TemplatesPanel(BaseTemplatesPanel):
-    def generate_stats(self, *args):
-        template = self.templates[0]['template']
-        if not hasattr(template, 'engine') and hasattr(template, 'backend'):
-            template.engine = template.backend
-        return super().generate_stats(*args)
+
+class ScssFileStorage(FileSystemStorage):
+    def __init__(self, location=None, base_url=None, *args, **kwargs):
+        if location is None:
+            location = settings.STATIC_ROOT
+        if base_url is None:
+            base_url = settings.STATIC_URL
+        super(ScssFileStorage, self).__init__(location, base_url, *args, **kwargs)
+
+
+def find_file(path):
+    for finder in get_finders():
+        result = finder.find(path)
+        if result:
+            return result
