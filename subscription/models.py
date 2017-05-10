@@ -50,7 +50,10 @@ class Subscription(models.Model):
                                          choices=((k, v['name']) for k,v in sorted(settings.SITH_SUBSCRIPTIONS.items())))
     subscription_start = models.DateField(_('subscription start'))
     subscription_end = models.DateField(_('subscription end'))
-    payment_method = models.CharField(_('payment method'), max_length=255, choices=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD)
+    payment_method = models.CharField(_('payment method'),
+                                        max_length=255,
+                                        help_text=_('Eboutic is reserved to specific users. In doubt, don\'t use it.'),
+                                        choices=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD)
     location = models.CharField(choices=settings.SITH_SUBSCRIPTION_LOCATIONS,
             max_length=20, verbose_name=_('location'))
 

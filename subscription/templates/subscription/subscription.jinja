@@ -19,6 +19,7 @@
     <p>{{ form.subscription_type.errors }}<label for="{{ form.subscription_type.name }}">{{ form.subscription_type.label }}</label> {{ form.subscription_type }}</p>
     <p>{{ form.payment_method.errors }}<label for="{{ form.payment_method.name }}">{{ form.payment_method.label }}</label> {{
     form.payment_method }}</p>
+    <p>{{ form.payment_method.help_text }}</p>
     <p>{{ form.location.errors }}<label for="{{ form.location.name }}">{{ form.location.label }}</label> {{ form.location }}</p>
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
