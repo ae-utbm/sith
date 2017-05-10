@@ -11,14 +11,14 @@
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
-{% if matmat_form %}
-<form action="{{ url('matmat:user_tools') }}" method="post" enctype="multipart/form-data">
+{% if trombi_form %}
+<form action="{{ url('trombi:user_tools') }}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ matmat_form.as_p() }}
+    {{ trombi_form.as_p() }}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
 {% else %}
-<p><a href="{{ url('matmat:user_tools') }}">Matmatronch tools</a></p>
+<p><a href="{{ url('trombi:user_tools') }}">Trombi tools</a></p>
 {% endif %}
 {% endblock %}
 

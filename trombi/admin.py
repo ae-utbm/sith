@@ -24,6 +24,6 @@
 
 from django.contrib import admin
 
-from matmat.models import Matmat
+from trombi.models import Trombi
 
-admin.site.register(Matmat)
+admin.site.register(Trombi)

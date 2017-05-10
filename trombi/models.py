@@ -34,34 +34,34 @@ from datetime import timedelta, date
 from core.models import User
 from club.models import Club
 
-class MatmatManager(models.Manager):
+class TrombiManager(models.Manager):
     def get_queryset(self):
-        return super(MatmatManager, self).get_queryset()
+        return super(TrombiManager, self).get_queryset()
 
-class AvailableMatmatManager(models.Manager):
+class AvailableTrombiManager(models.Manager):
     def get_queryset(self):
-        return super(AvailableMatmatManager,
+        return super(AvailableTrombiManager,
                 self).get_queryset().filter(subscription_deadline__gte=date.today())
 
-class Matmat(models.Model):
+class Trombi(models.Model):
     """
-    This is the main class, the Matmat itself.
+    This is the main class, the Trombi itself.
     It contains the deadlines for the users, and the link to the club that makes
-    its Matmatronch.
+    its Trombi.
     """
     subscription_deadline = models.DateField(_('subscription deadline'),
             default=timezone.now, help_text=_("Before this date, users are "
-                "allowed to subscribe to this Matmatronch. "
+                "allowed to subscribe to this Trombi. "
                 "After this date, users subscribed will be allowed to comment on each other."))
     comments_deadline = models.DateField(_('comments deadline'),
             default=timezone.now, help_text=_("After this date, users won't be "
                 "able to make comments anymore"))
     max_chars = models.IntegerField(_('maximum characters'), default=400,
             help_text=_('maximum number of characters allowed in a comment'))
-    club = models.OneToOneField(Club, related_name='matmat')
+    club = models.OneToOneField(Club, related_name='trombi')
 
-    objects = MatmatManager()
-    availables = AvailableMatmatManager()
+    objects = TrombiManager()
+    availables = AvailableTrombiManager()
 
     def __str__(self):
         return str(self.club.name)
@@ -72,7 +72,7 @@ class Matmat(models.Model):
                 "comments is definitively not a good idea."))
 
     def get_absolute_url(self):
-        return reverse('matmat:detail', kwargs={'matmat_id': self.id})
+        return reverse('trombi:detail', kwargs={'trombi_id': self.id})
 
     def is_owned_by(self, user):
         return user.is_owner(self.club)
@@ -83,25 +83,25 @@ class Matmat(models.Model):
     def can_be_viewed_by(self, user):
         return user.id in [u.user.id for u in self.users.all()]
 
-class MatmatUser(models.Model):
+class TrombiUser(models.Model):
     """
     This class is only here to avoid cross references between the core, club,
-    and matmat modules. It binds a User to a Matmat without needing to import
-    Matmat into the core.
+    and trombi modules. It binds a User to a Trombi without needing to import
+    Trombi into the core.
     """
-    user = models.OneToOneField(User, verbose_name=_("matmat user"), related_name='matmat_user')
-    matmat = models.ForeignKey(Matmat, verbose_name=_("matmat"), related_name='users', blank=True, null=True, on_delete=models.SET_NULL)
+    user = models.OneToOneField(User, verbose_name=_("trombi user"), related_name='trombi_user')
+    trombi = models.ForeignKey(Trombi, verbose_name=_("trombi"), related_name='users', blank=True, null=True, on_delete=models.SET_NULL)
 
-class MatmatComment(models.Model):
+class TrombiComment(models.Model):
     """
-    This represent a comment given by someone to someone else in the same Matmat
+    This represent a comment given by someone to someone else in the same Trombi
     instance.
     """
-    author = models.ForeignKey(MatmatUser, verbose_name=_("author"), related_name='given_comments')
-    target = models.ForeignKey(MatmatUser, verbose_name=_("target"), related_name='received_comments')
+    author = models.ForeignKey(TrombiUser, verbose_name=_("author"), related_name='given_comments')
+    target = models.ForeignKey(TrombiUser, verbose_name=_("target"), related_name='received_comments')
     content = models.TextField(_("content"), default="")
 
     def can_be_viewed_by(self, user):
         if user.id == self.target.user.id:
             return False
-        return user.id == self.author.user.id or user.can_edit(self.author.matmat)
+        return user.id == self.author.user.id or user.can_edit(self.author.trombi)

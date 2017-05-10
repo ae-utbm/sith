@@ -30,27 +30,27 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.forms.models import modelform_factory
 
-from matmat.models import Matmat, MatmatUser, MatmatComment
+from trombi.models import Trombi, TrombiUser, TrombiComment
 from core.views.forms import SelectFile, SelectDate
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin, QuickNotifMixin
 from core.models import User
 from club.models import Club
 
-class MatmatForm(forms.ModelForm):
+class TrombiForm(forms.ModelForm):
     class Meta:
-        model = Matmat
+        model = Trombi
         fields = ['subscription_deadline', 'comments_deadline', 'max_chars']
         widgets = {
                 'subscription_deadline': SelectDate,
                 'comments_deadline': SelectDate,
                 }
 
-class MatmatCreateView(CanEditPropMixin, CreateView):
+class TrombiCreateView(CanEditPropMixin, CreateView):
     """
-    Create a matmat for a club
+    Create a trombi for a club
     """
-    model = Matmat
-    form_class = MatmatForm
+    model = Trombi
+    form_class = TrombiForm
     template_name = 'core/create.jinja'
 
     def post(self, request, *args, **kwargs):
@@ -66,59 +66,59 @@ class MatmatCreateView(CanEditPropMixin, CreateView):
         else:
             return self.form_invalid(form)
 
-class MatmatEditView(CanEditPropMixin, UpdateView):
-    model = Matmat
-    form_class = MatmatForm
+class TrombiEditView(CanEditPropMixin, UpdateView):
+    model = Trombi
+    form_class = TrombiForm
     template_name = 'core/edit.jinja'
-    pk_url_kwarg = 'matmat_id'
+    pk_url_kwarg = 'trombi_id'
 
-class MatmatDetailView(CanEditMixin, DetailView):
-    model = Matmat
-    template_name = 'matmat/detail.jinja'
-    pk_url_kwarg = 'matmat_id'
+class TrombiDetailView(CanEditMixin, DetailView):
+    model = Trombi
+    template_name = 'trombi/detail.jinja'
+    pk_url_kwarg = 'trombi_id'
 
-class MatmatDeleteUserView(CanEditPropMixin, SingleObjectMixin, RedirectView):
-    model = Matmat
-    pk_url_kwarg = 'matmat_id'
+class TrombiDeleteUserView(CanEditPropMixin, SingleObjectMixin, RedirectView):
+    model = Trombi
+    pk_url_kwarg = 'trombi_id'
     permanent = False
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        user = get_object_or_404(MatmatUser, id=self.kwargs['user_id'])
+        user = get_object_or_404(TrombiUser, id=self.kwargs['user_id'])
         user.delete()
 # See if we need to also delete the comments on the user, or if we keep them
         return redirect(self.object.get_absolute_url())
 
 # User side
-class UserMatmatForm(forms.Form):
-    matmat = forms.ModelChoiceField(Matmat.availables.all(), required=False, label=_("Select matmatronch"),
-            help_text=_("This allows you to subscribe to a Matmatronch. "
+class UserTrombiForm(forms.Form):
+    trombi = forms.ModelChoiceField(Trombi.availables.all(), required=False, label=_("Select trombi"),
+            help_text=_("This allows you to subscribe to a Trombi. "
             "Be aware that you can subscribe only once, so don't play with that, "
             "or you will expose yourself to the admins' wrath!"))
 
-class UserMatmatToolsView(QuickNotifMixin, TemplateView):
+class UserTrombiToolsView(QuickNotifMixin, TemplateView):
     """
-    Display a user's matmat tools
+    Display a user's trombi tools
     """
-    template_name = "matmat/user_tools.jinja"
+    template_name = "trombi/user_tools.jinja"
 
     def post(self, request, *args, **kwargs):
-        self.form = UserMatmatForm(request.POST)
+        self.form = UserTrombiForm(request.POST)
         if self.form.is_valid():
-            matmat_user = MatmatUser(user=request.user,
-                    matmat=self.form.cleaned_data['matmat'])
-            matmat_user.save()
+            trombi_user = TrombiUser(user=request.user,
+                    trombi=self.form.cleaned_data['trombi'])
+            trombi_user.save()
             self.quick_notif_list += ['qn_success']
-        return super(UserMatmatToolsView, self).get(request, *args, **kwargs)
+        return super(UserTrombiToolsView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserMatmatToolsView, self).get_context_data(**kwargs)
+        kwargs = super(UserTrombiToolsView, self).get_context_data(**kwargs)
         kwargs['user'] = self.request.user
-        if not hasattr(self.request.user, 'matmat_user'):
-            kwargs['subscribe_form'] = UserMatmatForm()
+        if not hasattr(self.request.user, 'trombi_user'):
+            kwargs['subscribe_form'] = UserTrombiForm()
         return kwargs
 
-class UserMatmatEditProfileView(UpdateView):
+class UserTrombiEditProfileView(UpdateView):
     model = User
     form_class = modelform_factory(User,
             fields=['second_email', 'phone', 'department', 'dpt_option',
@@ -129,41 +129,41 @@ class UserMatmatEditProfileView(UpdateView):
                 'parent_address': _("Native town"),
             })
     template_name = "core/edit.jinja"
-    success_url = reverse_lazy('matmat:user_tools')
+    success_url = reverse_lazy('trombi:user_tools')
 
     def get_object(self):
         return self.request.user
 
-class MatmatCommentFormView():
+class TrombiCommentFormView():
     """
-    Create/edit a matmat comment
+    Create/edit a trombi comment
     """
-    model = MatmatComment
+    model = TrombiComment
     fields = ['content']
 
     def get_form_class(self):
-        self.matmat = self.request.user.matmat_user.matmat
+        self.trombi = self.request.user.trombi_user.trombi
         return modelform_factory(self.model, fields=self.fields,
             widgets={
-                'content': forms.widgets.Textarea(attrs={'maxlength': self.matmat.max_chars})
+                'content': forms.widgets.Textarea(attrs={'maxlength': self.trombi.max_chars})
             },
             help_texts={
-                'content': _("Maximum characters: %(max_length)s") % {'max_length': self.matmat.max_chars}
+                'content': _("Maximum characters: %(max_length)s") % {'max_length': self.trombi.max_chars}
             })
 
     def get_success_url(self):
-        return reverse('matmat:user_tools')
+        return reverse('trombi:user_tools')
 
-class MatmatCommentCreateView(MatmatCommentFormView, CreateView):
+class TrombiCommentCreateView(TrombiCommentFormView, CreateView):
     template_name = 'core/create.jinja'
 
     def form_valid(self, form):
-        target = get_object_or_404(MatmatUser, id=self.kwargs['user_id'])
-        form.instance.author = self.request.user.matmat_user
+        target = get_object_or_404(TrombiUser, id=self.kwargs['user_id'])
+        form.instance.author = self.request.user.trombi_user
         form.instance.target = target
-        return super(MatmatCommentCreateView, self).form_valid(form)
+        return super(TrombiCommentCreateView, self).form_valid(form)
 
-class MatmatCommentEditView(MatmatCommentFormView, CanViewMixin, UpdateView):
+class TrombiCommentEditView(TrombiCommentFormView, CanViewMixin, UpdateView):
     pk_url_kwarg = "comment_id"
     template_name = 'core/edit.jinja'
 

@@ -46,7 +46,7 @@ from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, Log
 from core.models import User, SithFile, Preferences
 from club.models import Club
 from subscription.models import Subscription
-from matmat.views import UserMatmatForm
+from trombi.views import UserTrombiForm
 
 def login(request):
     """
@@ -449,8 +449,8 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserPreferencesView, self).get_context_data(**kwargs)
-        if not hasattr(self.object, 'matmat_user'):
-            kwargs['matmat_form'] = UserMatmatForm()
+        if not hasattr(self.object, 'trombi_user'):
+            kwargs['trombi_form'] = UserTrombiForm()
         return kwargs
 
 class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):

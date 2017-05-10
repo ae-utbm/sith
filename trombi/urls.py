@@ -24,16 +24,16 @@
 
 from django.conf.urls import url, include
 
-from matmat.views import *
+from trombi.views import *
 
 urlpatterns = [
-    url(r'^(?P<club_id>[0-9]+)/new$', MatmatCreateView.as_view(), name='create'),
-    url(r'^(?P<matmat_id>[0-9]+)/edit$', MatmatEditView.as_view(), name='edit'),
-    url(r'^(?P<matmat_id>[0-9]+)/delete/(?P<user_id>[0-9]+)$', MatmatDeleteUserView.as_view(), name='delete_user'),
-    url(r'^(?P<matmat_id>[0-9]+)$', MatmatDetailView.as_view(), name='detail'),
-    url(r'^(?P<user_id>[0-9]+)/new_comment$', MatmatCommentCreateView.as_view(), name='new_comment'),
-    url(r'^comment/(?P<comment_id>[0-9]+)/edit$', MatmatCommentEditView.as_view(), name='edit_comment'),
-    url(r'^tools$', UserMatmatToolsView.as_view(), name='user_tools'),
-    url(r'^profile$', UserMatmatEditProfileView.as_view(), name='profile'),
+    url(r'^(?P<club_id>[0-9]+)/new$', TrombiCreateView.as_view(), name='create'),
+    url(r'^(?P<trombi_id>[0-9]+)/edit$', TrombiEditView.as_view(), name='edit'),
+    url(r'^(?P<trombi_id>[0-9]+)/delete/(?P<user_id>[0-9]+)$', TrombiDeleteUserView.as_view(), name='delete_user'),
+    url(r'^(?P<trombi_id>[0-9]+)$', TrombiDetailView.as_view(), name='detail'),
+    url(r'^(?P<user_id>[0-9]+)/new_comment$', TrombiCommentCreateView.as_view(), name='new_comment'),
+    url(r'^comment/(?P<comment_id>[0-9]+)/edit$', TrombiCommentEditView.as_view(), name='edit_comment'),
+    url(r'^tools$', UserTrombiToolsView.as_view(), name='user_tools'),
+    url(r'^profile$', UserTrombiEditProfileView.as_view(), name='profile'),
 ]
 
