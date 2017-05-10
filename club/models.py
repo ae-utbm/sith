@@ -138,7 +138,7 @@ class Club(models.Model):
         Method to see if that object can be edited by the given user
         """
         ms = self.get_membership_for(user)
-        if ms is not None:
+        if ms is not None and ms.role > settings.SITH_MAXIMUM_FREE_ROLE:
             return True
         return False
 
