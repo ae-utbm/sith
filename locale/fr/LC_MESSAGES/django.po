@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-25 09:38+0200\n"
+"POT-Creation-Date: 2017-05-10 09:40+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: accounting/models.py:194 club/models.py:42 counter/models.py:99
 #: counter/models.py:124 counter/models.py:159 forum/models.py:49
 #: launderette/models.py:37 launderette/models.py:82 launderette/models.py:107
-#: stock/models.py:13 stock/models.py:29 stock/models.py:52 stock/models.py:72
+#: stock/models.py:38 stock/models.py:54 stock/models.py:77 stock/models.py:97
 msgid "name"
 msgstr "nom"
 
@@ -129,11 +129,11 @@ msgstr "classeur"
 #: accounting/models.py:254 core/models.py:577 core/models.py:948
 #: core/models.py:988 counter/models.py:271 counter/models.py:319
 #: counter/models.py:445 eboutic/models.py:39 eboutic/models.py:72
-#: forum/models.py:194 forum/models.py:249 stock/models.py:51
+#: forum/models.py:194 forum/models.py:249 stock/models.py:76
 msgid "date"
 msgstr "date"
 
-#: accounting/models.py:255 counter/models.py:446 stock/models.py:54
+#: accounting/models.py:255 counter/models.py:446 stock/models.py:79
 msgid "comment"
 msgstr "commentaire"
 
@@ -689,7 +689,7 @@ msgstr "Opération liée : "
 #: core/templates/core/user_godfathers.jinja:35
 #: counter/templates/counter/cash_register_summary.jinja:22
 #: forum/templates/forum/reply.jinja:31
-#: subscription/templates/subscription/subscription.jinja:23
+#: subscription/templates/subscription/subscription.jinja:24
 msgid "Save"
 msgstr "Sauver"
 
@@ -1104,8 +1104,8 @@ msgid "content"
 msgstr "contenu de la nouvelle"
 
 #: com/models.py:61 core/models.py:987 launderette/models.py:84
-#: launderette/models.py:109 launderette/models.py:145 stock/models.py:34
-#: stock/models.py:73
+#: launderette/models.py:109 launderette/models.py:145 stock/models.py:59
+#: stock/models.py:98
 msgid "type"
 msgstr "type"
 
@@ -2794,7 +2794,7 @@ msgid "token"
 msgstr "jeton"
 
 #: counter/models.py:171 counter/models.py:427 counter/models.py:444
-#: launderette/models.py:38 stock/models.py:14
+#: launderette/models.py:38 stock/models.py:39
 msgid "counter"
 msgstr "comptoir"
 
@@ -4039,27 +4039,27 @@ msgstr "Article édité avec succès dans le Weekmail"
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
-#: stock/models.py:30
+#: stock/models.py:55
 msgid "unit quantity"
 msgstr "quantité unitaire"
 
-#: stock/models.py:30
+#: stock/models.py:55
 msgid "number of element in one box"
 msgstr "nombre d'éléments par boîte"
 
-#: stock/models.py:31
+#: stock/models.py:56
 msgid "effective quantity"
 msgstr "quantité effective"
 
-#: stock/models.py:31
+#: stock/models.py:56
 msgid "number of box"
 msgstr "nombre de boîtes"
 
-#: stock/models.py:32
+#: stock/models.py:57
 msgid "minimal quantity"
 msgstr "quantité minimale"
 
-#: stock/models.py:33
+#: stock/models.py:58
 msgid ""
 "if the effective quantity is less than the minimal, item is added to the "
 "shopping list"
@@ -4067,27 +4067,27 @@ msgstr ""
 "si la quantité effective est en dessous du minima, l'item est ajouté àla "
 "liste de courses"
 
-#: stock/models.py:53
+#: stock/models.py:78
 msgid "todo"
 msgstr "à faire"
 
-#: stock/models.py:70
+#: stock/models.py:95
 msgid "shopping lists"
 msgstr "listes de courses"
 
-#: stock/models.py:75
+#: stock/models.py:100
 msgid "quantity to buy"
 msgstr "quantité à acheter"
 
-#: stock/models.py:75
+#: stock/models.py:100
 msgid "quantity to buy during the next shopping session"
 msgstr "quantité à acheter pendant les prochaines courses"
 
-#: stock/models.py:76
+#: stock/models.py:101
 msgid "quantity bought"
 msgstr "quantité achetée"
 
-#: stock/models.py:76
+#: stock/models.py:101
 msgid "quantity bought during the last shopping session"
 msgstr "quantité achetée pendant les dernières courses"
 
@@ -4104,7 +4104,7 @@ msgstr "Quantité demandée"
 msgid "Quantity bought"
 msgstr "Quantité achetée"
 
-#: stock/templates/stock/shopping_list_items.jinja:42 stock/views.py:181
+#: stock/templates/stock/shopping_list_items.jinja:42 stock/views.py:206
 msgid "Comments"
 msgstr "Commentaires"
 
@@ -4212,15 +4212,15 @@ msgstr "Mettre à jour les quantités de %(s)s après les courses"
 msgid "Update stock quantities"
 msgstr "Mettre à jour les quantités en stock"
 
-#: stock/views.py:173
+#: stock/views.py:198
 msgid "Shopping list name"
 msgstr "Nom de la liste de courses"
 
-#: stock/views.py:179
+#: stock/views.py:204
 msgid " left"
 msgstr " restant"
 
-#: stock/views.py:180
+#: stock/views.py:205
 msgid ""
 "Add here, items to buy that are not reference as a stock item (example : "
 "sponge, knife, mugs ...)"
@@ -4228,11 +4228,11 @@ msgstr ""
 "Ajouter ici les éléments non référencé comme élément de stock (example : "
 "éponge, couteau, mugs ...)"
 
-#: stock/views.py:309
+#: stock/views.py:334
 msgid " asked"
 msgstr " demandé"
 
-#: stock/views.py:376
+#: stock/views.py:401
 #, python-format
 msgid "%(effective_quantity)s left"
 msgstr "%(effective_quantity)s restant"
@@ -4258,14 +4258,18 @@ msgid "subscription end"
 msgstr "fin de la cotisation"
 
 #: subscription/models.py:55
+msgid "Eboutic is reserved to specific users. In doubt, don't use it."
+msgstr "Eboutic est réservé à des cas particuliers. Dans le doute, ne l'utilisez pas."
+
+#: subscription/models.py:58
 msgid "location"
 msgstr "lieu"
 
-#: subscription/models.py:64
+#: subscription/models.py:67
 msgid "You can not subscribe many time for the same period"
 msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 
-#: subscription/models.py:68
+#: subscription/models.py:71
 msgid "Subscription error"
 msgstr "Erreur de cotisation"
 
