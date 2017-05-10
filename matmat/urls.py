@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^(?P<matmat_id>[0-9]+)/edit$', MatmatEditView.as_view(), name='edit'),
     url(r'^(?P<matmat_id>[0-9]+)/delete/(?P<user_id>[0-9]+)$', MatmatDeleteUserView.as_view(), name='delete_user'),
     url(r'^(?P<matmat_id>[0-9]+)$', MatmatDetailView.as_view(), name='detail'),
-    url(r'^tools$', UserMatmatView.as_view(), name='user_tools'),
+    url(r'^(?P<user_id>[0-9]+)/new_comment$', MatmatCommentCreateView.as_view(), name='new_comment'),
+    url(r'^comment/(?P<comment_id>[0-9]+)/edit$', MatmatCommentEditView.as_view(), name='edit_comment'),
+    url(r'^tools$', UserMatmatToolsView.as_view(), name='user_tools'),
 ]
 

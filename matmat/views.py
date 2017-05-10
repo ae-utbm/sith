@@ -23,12 +23,14 @@
 #
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView, SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
 from django import forms
+from django.forms.models import modelform_factory
 
-from matmat.models import Matmat, MatmatUser
+from matmat.models import Matmat, MatmatUser, MatmatComment
 from core.views.forms import SelectFile, SelectDate
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin, QuickNotifMixin
 from core.models import User
@@ -37,7 +39,7 @@ from club.models import Club
 class MatmatForm(forms.ModelForm):
     class Meta:
         model = Matmat
-        fields = ['subscription_deadline', 'comments_deadline']
+        fields = ['subscription_deadline', 'comments_deadline', 'max_chars']
         widgets = {
                 'subscription_deadline': SelectDate,
                 'comments_deadline': SelectDate,
@@ -70,7 +72,7 @@ class MatmatEditView(CanEditPropMixin, UpdateView):
     template_name = 'core/edit.jinja'
     pk_url_kwarg = 'matmat_id'
 
-class MatmatDetailView(CanViewMixin, DetailView):
+class MatmatDetailView(CanEditMixin, DetailView):
     model = Matmat
     template_name = 'matmat/detail.jinja'
     pk_url_kwarg = 'matmat_id'
@@ -94,11 +96,11 @@ class UserMatmatForm(forms.Form):
             "Be aware that you can subscribe only once, so don't play with that, "
             "or you will expose yourself to the admins' wrath!"))
 
-class UserMatmatView(QuickNotifMixin, TemplateView):
+class UserMatmatToolsView(QuickNotifMixin, TemplateView):
     """
     Display a user's matmat tools
     """
-    template_name = "core/user_matmat.jinja"
+    template_name = "matmat/user_tools.jinja"
 
     def post(self, request, *args, **kwargs):
         self.form = UserMatmatForm(request.POST)
@@ -107,12 +109,46 @@ class UserMatmatView(QuickNotifMixin, TemplateView):
                     matmat=self.form.cleaned_data['matmat'])
             matmat_user.save()
             self.quick_notif_list += ['qn_success']
-        return super(UserMatmatView, self).get(request, *args, **kwargs)
+        return super(UserMatmatToolsView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserMatmatView, self).get_context_data(**kwargs)
+        kwargs = super(UserMatmatToolsView, self).get_context_data(**kwargs)
         kwargs['user'] = self.request.user
         if not hasattr(self.request.user, 'matmat_user'):
             kwargs['subscribe_form'] = UserMatmatForm()
         return kwargs
+
+class MatmatCommentFormView():
+    """
+    Create/edit a matmat comment
+    """
+    model = MatmatComment
+    fields = ['content']
+
+    def get_form_class(self):
+        self.matmat = self.request.user.matmat_user.matmat
+        return modelform_factory(self.model, fields=self.fields,
+            widgets={
+                'content': forms.widgets.Textarea(attrs={'maxlength': self.matmat.max_chars})
+            },
+            help_texts={
+                'content': _("Maximum characters: %(max_length)s") % {'max_length': self.matmat.max_chars}
+            })
+
+    def get_success_url(self):
+        return reverse('matmat:user_tools')
+
+class MatmatCommentCreateView(MatmatCommentFormView, CreateView):
+    template_name = 'core/create.jinja'
+
+    def form_valid(self, form):
+        target = get_object_or_404(MatmatUser, id=self.kwargs['user_id'])
+        form.instance.author = self.request.user.matmat_user
+        form.instance.target = target
+        return super(MatmatCommentCreateView, self).form_valid(form)
+
+class MatmatCommentEditView(MatmatCommentFormView, CanViewMixin, UpdateView):
+    pk_url_kwarg = "comment_id"
+    template_name = 'core/edit.jinja'
+
 

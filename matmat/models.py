@@ -56,6 +56,8 @@ class Matmat(models.Model):
     comments_deadline = models.DateField(_('comments deadline'),
             default=timezone.now, help_text=_("After this date, users won't be "
                 "able to make comments anymore"))
+    max_chars = models.IntegerField(_('maximum characters'), default=400,
+            help_text=_('maximum number of characters allowed in a comment'))
     club = models.OneToOneField(Club, related_name='matmat')
 
     objects = MatmatManager()
@@ -75,8 +77,11 @@ class Matmat(models.Model):
     def is_owned_by(self, user):
         return user.is_owner(self.club)
 
-    def can_be_viewed_by(self, user):
+    def can_be_edited_by(self, user):
         return user.can_edit(self.club)
+
+    def can_be_viewed_by(self, user):
+        return user.id in [u.user.id for u in self.users.all()]
 
 class MatmatUser(models.Model):
     """
@@ -94,6 +99,9 @@ class MatmatComment(models.Model):
     """
     author = models.ForeignKey(MatmatUser, verbose_name=_("author"), related_name='given_comments')
     target = models.ForeignKey(MatmatUser, verbose_name=_("target"), related_name='received_comments')
-    content = models.TextField(_("content"), default="", max_length=400)
-    is_moderated = models.BooleanField(_("is moderated"), default=False)
+    content = models.TextField(_("content"), default="")
 
+    def can_be_viewed_by(self, user):
+        if user.id == self.target.user.id:
+            return False
+        return user.id == self.author.user.id or user.can_edit(self.author.matmat)

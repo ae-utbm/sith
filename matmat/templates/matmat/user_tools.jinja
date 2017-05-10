@@ -14,10 +14,15 @@
 </form>
 {% else %}
 <p>{% trans matmat = user.matmat_user.matmat %}You are subscribed to the Matmatronch {{ matmat }}{% endtrans %}</p>
-{% for u in user.matmat_user.matmat.users.all() %}
+{% for u in user.matmat_user.matmat.users.exclude(id=user.matmat_user.id) %}
     <div class="ib">
         <div>{{ u.user.get_display_name() }}</div>
-        <a>Comment</a>
+        {% set comment = u.received_comments.filter(author__id=user.matmat_user.id).first() %}
+        {% if comment %}
+        <a href="{{ url("matmat:edit_comment", comment_id=comment.id) }}">Edit comment</a>
+        {% else %}
+        <a href="{{ url("matmat:new_comment", user_id=u.id) }}">Comment</a>
+        {% endif %}
     </div>
 {% endfor %}
 {% endif %}
