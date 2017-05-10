@@ -55,9 +55,9 @@ class Trombi(models.Model):
                 "After this date, users subscribed will be allowed to comment on each other."))
     comments_deadline = models.DateField(_('comments deadline'),
             default=timezone.now, help_text=_("After this date, users won't be "
-                "able to make comments anymore"))
+                "able to make comments anymore."))
     max_chars = models.IntegerField(_('maximum characters'), default=400,
-            help_text=_('maximum number of characters allowed in a comment'))
+            help_text=_('Maximum number of characters allowed in a comment.'))
     club = models.OneToOneField(Club, related_name='trombi')
 
     objects = TrombiManager()
@@ -98,6 +98,9 @@ class TrombiUser(models.Model):
     scrub_pict = models.ImageField(upload_to='trombi', verbose_name=_("scrub pict"), null=True, blank=True,
             help_text=_("The scrub picture you want in the trombi (warning: this picture may be published)"))
 
+    def __str__(self):
+        return str(self.user)
+
 class TrombiComment(models.Model):
     """
     This represent a comment given by someone to someone else in the same Trombi
@@ -111,3 +114,4 @@ class TrombiComment(models.Model):
         if user.id == self.target.user.id:
             return False
         return user.id == self.author.user.id or user.can_edit(self.author.trombi)
+

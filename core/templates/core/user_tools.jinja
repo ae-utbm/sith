@@ -34,13 +34,13 @@
     {% endif %}
     {% for b in settings.SITH_COUNTER_BARS %}
     {% if user.is_in_group(b[1]+" admin") %}
-    <li>   
+    <li>
         <a href="{{ url('counter:details', counter_id=b[0]) }}">{{ b[1] }}</a> -
         <a href="{{ url('counter:admin', counter_id=b[0]) }}">{% trans %}Edit{% endtrans %}</a> -
         <a href="{{ url('counter:stats', counter_id=b[0]) }}">{% trans %}Stats{% endtrans %}</a> -
         {% set c = Counter.objects.filter(id=b[0]).first() %}
         {% if c.stock %}
-        <a href="{{ url('stock:items_list', stock_id=c.stock.id)}}">Stock</a> - 
+        <a href="{{ url('stock:items_list', stock_id=c.stock.id)}}">Stock</a> -
         <a href="{{ url('stock:shoppinglist_list', stock_id=c.stock.id)}}">{% trans %}Shopping lists{% endtrans %}</a>
         {% else %}
         <a href="{{url('stock:new', counter_id=c.id)}}">{% trans %}Create new stock{% endtrans%}</a>
@@ -105,6 +105,10 @@
     {%- if user.is_subscribed -%}
     <li><a href="{{ url('election:create') }}">{% trans %}Create a new election{% endtrans %}</a></li>
     {%- endif -%}
+</ul>
+<h4>{% trans %}Other tools{% endtrans %}</h4>
+<ul>
+    <li><a href="{{ url('trombi:user_tools') }}">{% trans %}Trombi tools{% endtrans %}</a></li>
 </ul>
 
 {% endblock %}

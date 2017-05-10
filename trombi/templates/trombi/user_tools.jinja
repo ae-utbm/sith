@@ -14,8 +14,8 @@
 </form>
 {% else %}
 <p>{% trans trombi = user.trombi_user.trombi %}You are subscribed to the Trombi {{ trombi }}{% endtrans %}</p>
-<p><a href="{{ url("trombi:profile") }}">Edit my profile</a></p>
-<p><a href="{{ url("trombi:pictures") }}">Edit my pictures</a></p>
+<p><a href="{{ url("trombi:profile") }}">{% trans %}Edit my profile{% endtrans %}</a></p>
+<p><a href="{{ url("trombi:pictures") }}">{% trans %}Edit my pictures{% endtrans %}</a></p>
 <hr>
 <div>
 {% for u in user.trombi_user.trombi.users.exclude(id=user.trombi_user.id) %}
@@ -32,9 +32,9 @@
         <div>{{ u.user.get_display_name() }}</div>
         {% set comment = u.received_comments.filter(author__id=user.trombi_user.id).first() %}
         {% if comment %}
-        <a href="{{ url("trombi:edit_comment", comment_id=comment.id) }}">Edit comment</a>
+        <a href="{{ url("trombi:edit_comment", comment_id=comment.id) }}">{% trans %}Edit comment{% endtrans %}</a>
         {% else %}
-        <a href="{{ url("trombi:new_comment", user_id=u.id) }}">Comment</a>
+        <a href="{{ url("trombi:new_comment", user_id=u.id) }}">{% trans %}Comment{% endtrans %}</a>
         {% endif %}
     </div>
 {% endfor %}

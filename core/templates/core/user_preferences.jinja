@@ -11,6 +11,7 @@
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
+<h4>{% trans %}Trombi{% endtrans %}</h4>
 {% if trombi_form %}
 <form action="{{ url('trombi:user_tools') }}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -18,7 +19,8 @@
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
 {% else %}
-<p><a href="{{ url('trombi:user_tools') }}">Trombi tools</a></p>
+<p>{% trans trombi=user.trombi_user.trombi %}You already choose to be in that Trombi: {{ trombi }}.{% endtrans %}
+<a href="{{ url('trombi:user_tools') }}">{% trans %}Go to my Trombi tools{% endtrans %}</a></p>
 {% endif %}
 {% endblock %}
 

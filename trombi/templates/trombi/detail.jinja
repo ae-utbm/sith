@@ -6,9 +6,9 @@
 
 {% block content %}
     <h2>{% trans club=object.club %}{{ club }}'s Trombi{% endtrans %}</h2>
-    <a href="{{ url('trombi:edit', trombi_id=object.id) }}">Edit</a>
-    <p>Subscription deadline: {{ object.subscription_deadline|date(DATETIME_FORMAT) }}</p>
-    <p>Comment deadline: {{ object.comments_deadline|date(DATETIME_FORMAT) }}</p>
+    <a href="{{ url('trombi:edit', trombi_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
+    <p>{% trans %}Subscription deadline: {% endtrans %}{{ object.subscription_deadline|date(DATETIME_FORMAT) }}</p>
+    <p>{% trans %}Comment deadline: {% endtrans %}{{ object.comments_deadline|date(DATETIME_FORMAT) }}</p>
     <a href="#">Export</a>
     <hr>
     <div>
@@ -24,7 +24,7 @@
                 <img src="{{ file }}" alt="" style="max-width: 100px">
             </div>
             <div>{{ u.user.get_display_name() }}</div>
-            <div><a href="{{ url('trombi:delete_user', trombi_id=object.id, user_id=u.id) }}">Delete</a></div>
+            <div><a href="{{ url('trombi:delete_user', trombi_id=object.id, user_id=u.id) }}">{% trans %}Delete{% endtrans %}</a></div>
         </div>
     {% endfor %}
     </div>

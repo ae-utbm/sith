@@ -72,7 +72,10 @@ class TrombiEditView(CanEditPropMixin, UpdateView):
     template_name = 'core/edit.jinja'
     pk_url_kwarg = 'trombi_id'
 
-class TrombiDetailView(CanEditMixin, DetailView):
+    def get_success_url(self):
+        return super(TrombiEditView, self).get_success_url()+"?qn_success"
+
+class TrombiDetailView(CanEditMixin, QuickNotifMixin, DetailView):
     model = Trombi
     template_name = 'trombi/detail.jinja'
     pk_url_kwarg = 'trombi_id'
@@ -87,7 +90,7 @@ class TrombiDeleteUserView(CanEditPropMixin, SingleObjectMixin, RedirectView):
         user = get_object_or_404(TrombiUser, id=self.kwargs['user_id'])
         user.delete()
 # See if we need to also delete the comments on the user, or if we keep them
-        return redirect(self.object.get_absolute_url())
+        return redirect(self.object.get_absolute_url()+"?qn_success")
 
 # User side
 class UserTrombiForm(forms.Form):
