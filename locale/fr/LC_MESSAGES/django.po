@@ -1101,7 +1101,7 @@ msgstr "résumé"
 
 #: com/models.py:60 com/models.py:145
 msgid "content"
-msgstr "contenu de la nouvelle"
+msgstr "contenu"
 
 #: com/models.py:61 core/models.py:987 launderette/models.py:84
 #: launderette/models.py:109 launderette/models.py:145 stock/models.py:59
