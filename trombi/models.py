@@ -88,9 +88,15 @@ class TrombiUser(models.Model):
     This class is only here to avoid cross references between the core, club,
     and trombi modules. It binds a User to a Trombi without needing to import
     Trombi into the core.
+    It also adds the pictures to the profile without needing all the security
+    like the other SithFiles.
     """
     user = models.OneToOneField(User, verbose_name=_("trombi user"), related_name='trombi_user')
     trombi = models.ForeignKey(Trombi, verbose_name=_("trombi"), related_name='users', blank=True, null=True, on_delete=models.SET_NULL)
+    profile_pict = models.ImageField(upload_to='trombi', verbose_name=_("profile pict"), null=True, blank=True,
+            help_text=_("The profile picture you want in the trombi (warning: this picture may be published)"))
+    scrub_pict = models.ImageField(upload_to='trombi', verbose_name=_("scrub pict"), null=True, blank=True,
+            help_text=_("The scrub picture you want in the trombi (warning: this picture may be published)"))
 
 class TrombiComment(models.Model):
     """

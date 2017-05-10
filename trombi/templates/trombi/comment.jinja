@@ -1,0 +1,31 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Comment{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h2>{% trans %}Comment{% endtrans %}</h2>
+<div style="width: 400px; margin: auto; border: solid 1px grey; text-align: center">
+    {% set file = None %}
+    {% if target.profile_pict %}
+        {% set file = target.profile_pict.url %}
+    {% else %}
+        {% set file = static('core/img/na.gif') %}
+    {% endif %}
+    <div style="max-width: 300px; margin: auto;">
+        <img src="{{ file }}" alt="" style="max-width: 300px">
+    </div>
+    <div>
+        {{ target.user.get_display_name() }}
+    </div>
+</div>
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+</form>
+{% endblock %}
+
+
+

@@ -10,10 +10,22 @@
     <p>Subscription deadline: {{ object.subscription_deadline|date(DATETIME_FORMAT) }}</p>
     <p>Comment deadline: {{ object.comments_deadline|date(DATETIME_FORMAT) }}</p>
     <a href="#">Export</a>
-    <p>People:</p>
-    <ul>
-        {% for u in object.users.all() %}
-        <li>{{ u.user.get_display_name() }} - <a href="{{ url('trombi:delete_user', trombi_id=object.id, user_id=u.id) }}">Delete</a></li>
-        {% endfor %}
-    </ul>
+    <hr>
+    <div>
+    {% for u in object.users.all() %}
+        <div class="ib" style="border: solid 1px grey; text-align: center">
+            {% set file = None %}
+            {% if u.profile_pict %}
+                {% set file = u.profile_pict.url %}
+            {% else %}
+                {% set file = static('core/img/na.gif') %}
+            {% endif %}
+            <div style="max-width: 100px; margin: auto;">
+                <img src="{{ file }}" alt="" style="max-width: 100px">
+            </div>
+            <div>{{ u.user.get_display_name() }}</div>
+            <div><a href="{{ url('trombi:delete_user', trombi_id=object.id, user_id=u.id) }}">Delete</a></div>
+        </div>
+    {% endfor %}
+    </div>
 {% endblock %}

@@ -193,11 +193,15 @@ nav {
 
 /*--------------------------------CONTENT------------------------------*/
 
+.helptext {
+    display: block;
+}
+
 #quick_notif {
   width: 90%;
   margin: 0px auto;
   list-style-type: none;
-  background: $primary-neutral-light-color;
+  background: $second-color;
   li {
     padding: 10px;
   }

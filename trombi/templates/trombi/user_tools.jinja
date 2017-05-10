@@ -15,10 +15,20 @@
 {% else %}
 <p>{% trans trombi = user.trombi_user.trombi %}You are subscribed to the Trombi {{ trombi }}{% endtrans %}</p>
 <p><a href="{{ url("trombi:profile") }}">Edit my profile</a></p>
+<p><a href="{{ url("trombi:pictures") }}">Edit my pictures</a></p>
 <hr>
 <div>
 {% for u in user.trombi_user.trombi.users.exclude(id=user.trombi_user.id) %}
-    <div class="ib">
+    <div class="ib" style="border: solid 1px grey; text-align: center">
+        {% set file = None %}
+        {% if u.profile_pict %}
+            {% set file = u.profile_pict.url %}
+        {% else %}
+            {% set file = static('core/img/na.gif') %}
+        {% endif %}
+        <div style="max-width: 100px; margin: auto;">
+            <img src="{{ file }}" alt="" style="max-width: 100px">
+        </div>
         <div>{{ u.user.get_display_name() }}</div>
         {% set comment = u.received_comments.filter(author__id=user.trombi_user.id).first() %}
         {% if comment %}

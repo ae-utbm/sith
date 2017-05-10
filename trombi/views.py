@@ -118,6 +118,17 @@ class UserTrombiToolsView(QuickNotifMixin, TemplateView):
             kwargs['subscribe_form'] = UserTrombiForm()
         return kwargs
 
+class UserTrombiEditPicturesView(UpdateView):
+    model = TrombiUser
+    fields = ['profile_pict', 'scrub_pict']
+    template_name = "core/edit.jinja"
+
+    def get_object(self):
+        return self.request.user.trombi_user
+
+    def get_success_url(self):
+        return reverse('trombi:user_tools')+"?qn_success"
+
 class UserTrombiEditProfileView(UpdateView):
     model = User
     form_class = modelform_factory(User,
@@ -129,10 +140,12 @@ class UserTrombiEditProfileView(UpdateView):
                 'parent_address': _("Native town"),
             })
     template_name = "core/edit.jinja"
-    success_url = reverse_lazy('trombi:user_tools')
 
     def get_object(self):
         return self.request.user
+
+    def get_success_url(self):
+        return reverse('trombi:user_tools')+"?qn_success"
 
 class TrombiCommentFormView():
     """
@@ -140,6 +153,7 @@ class TrombiCommentFormView():
     """
     model = TrombiComment
     fields = ['content']
+    template_name = 'trombi/comment.jinja'
 
     def get_form_class(self):
         self.trombi = self.request.user.trombi_user.trombi
@@ -152,11 +166,17 @@ class TrombiCommentFormView():
             })
 
     def get_success_url(self):
-        return reverse('trombi:user_tools')
+        return reverse('trombi:user_tools')+"?qn_success"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TrombiCommentFormView, self).get_context_data(**kwargs)
+        if 'user_id' in self.kwargs.keys():
+            kwargs['target'] = get_object_or_404(TrombiUser, id=self.kwargs['user_id'])
+        else:
+            kwargs['target'] = self.object.target
+        return kwargs
 
 class TrombiCommentCreateView(TrombiCommentFormView, CreateView):
-    template_name = 'core/create.jinja'
-
     def form_valid(self, form):
         target = get_object_or_404(TrombiUser, id=self.kwargs['user_id'])
         form.instance.author = self.request.user.trombi_user
@@ -165,6 +185,5 @@ class TrombiCommentCreateView(TrombiCommentFormView, CreateView):
 
 class TrombiCommentEditView(TrombiCommentFormView, CanViewMixin, UpdateView):
     pk_url_kwarg = "comment_id"
-    template_name = 'core/edit.jinja'
 
 

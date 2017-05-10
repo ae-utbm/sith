@@ -35,5 +35,6 @@ urlpatterns = [
     url(r'^comment/(?P<comment_id>[0-9]+)/edit$', TrombiCommentEditView.as_view(), name='edit_comment'),
     url(r'^tools$', UserTrombiToolsView.as_view(), name='user_tools'),
     url(r'^profile$', UserTrombiEditProfileView.as_view(), name='profile'),
+    url(r'^pictures$', UserTrombiEditPicturesView.as_view(), name='pictures'),
 ]
 
