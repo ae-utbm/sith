@@ -118,6 +118,22 @@ class UserMatmatToolsView(QuickNotifMixin, TemplateView):
             kwargs['subscribe_form'] = UserMatmatForm()
         return kwargs
 
+class UserMatmatEditProfileView(UpdateView):
+    model = User
+    form_class = modelform_factory(User,
+            fields=['second_email', 'phone', 'department', 'dpt_option',
+                'quote', 'parent_address'],
+            labels={
+                'second_email': _("Personal email (not UTBM)"),
+                'phone': _("Phone"),
+                'parent_address': _("Native town"),
+            })
+    template_name = "core/edit.jinja"
+    success_url = reverse_lazy('matmat:user_tools')
+
+    def get_object(self):
+        return self.request.user
+
 class MatmatCommentFormView():
     """
     Create/edit a matmat comment

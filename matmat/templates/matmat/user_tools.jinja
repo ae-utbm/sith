@@ -14,6 +14,9 @@
 </form>
 {% else %}
 <p>{% trans matmat = user.matmat_user.matmat %}You are subscribed to the Matmatronch {{ matmat }}{% endtrans %}</p>
+<p><a href="{{ url("matmat:profile") }}">Edit my profile</a></p>
+<hr>
+<div>
 {% for u in user.matmat_user.matmat.users.exclude(id=user.matmat_user.id) %}
     <div class="ib">
         <div>{{ u.user.get_display_name() }}</div>
@@ -25,6 +28,7 @@
         {% endif %}
     </div>
 {% endfor %}
+</div>
 {% endif %}
 {% endblock %}
 
