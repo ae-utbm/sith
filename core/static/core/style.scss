@@ -500,19 +500,19 @@ textarea {
 }
 
 .topic {
-  border: solid $secondary-color 1px;
+  border: solid $primary-neutral-color 1px;
   padding: 2px;
   margin: 2px;
 }
 
 .forum {
-  background: $secondary-light-color;
+  background: $primary-neutral-light-color;
   padding: 2px;
   margin: 2px;
 }
 
 .category {
-  background: $second-color;
+  background: $secondary-color;
 }
 
 .message {
@@ -520,7 +520,7 @@ textarea {
   margin: 2px;
   background: $white-color;
   &:nth-child(odd) {
-    background: $secondary-neutral-light-color;
+    background: $primary-neutral-light-color;
   }
   h5 {
     font-size: 100%;
@@ -547,7 +547,7 @@ textarea {
   display: inline-block;
   width: 19%;
   text-align: center;
-  background: $secondary-neutral-light-color;
+  background: $primary-light-color;
   img {
     max-width: 70%;
     margin: 0px auto;
