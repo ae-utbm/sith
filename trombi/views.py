@@ -22,6 +22,7 @@
 #
 #
 
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
@@ -29,6 +30,8 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormVi
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.forms.models import modelform_factory
+
+from datetime import date
 
 from trombi.models import Trombi, TrombiUser, TrombiComment
 from core.views.forms import SelectFile, SelectDate
@@ -93,8 +96,12 @@ class TrombiDeleteUserView(CanEditPropMixin, SingleObjectMixin, RedirectView):
         return redirect(self.object.get_absolute_url()+"?qn_success")
 
 # User side
+class TrombiModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return _("%(name)s (deadline: %(date)s)") % {'name': str(obj), 'date': str(obj.subscription_deadline)}
+
 class UserTrombiForm(forms.Form):
-    trombi = forms.ModelChoiceField(Trombi.availables.all(), required=False, label=_("Select trombi"),
+    trombi = TrombiModelChoiceField(Trombi.availables.all(), required=False, label=_("Select trombi"),
             help_text=_("This allows you to subscribe to a Trombi. "
             "Be aware that you can subscribe only once, so don't play with that, "
             "or you will expose yourself to the admins' wrath!"))
@@ -119,6 +126,9 @@ class UserTrombiToolsView(QuickNotifMixin, TemplateView):
         kwargs['user'] = self.request.user
         if not hasattr(self.request.user, 'trombi_user'):
             kwargs['subscribe_form'] = UserTrombiForm()
+        else:
+            kwargs['trombi'] = self.request.user.trombi_user.trombi
+            kwargs['date'] = date
         return kwargs
 
 class UserTrombiEditPicturesView(UpdateView):
@@ -160,6 +170,12 @@ class TrombiCommentFormView():
 
     def get_form_class(self):
         self.trombi = self.request.user.trombi_user.trombi
+        if date.today() <= self.trombi.subscription_deadline:
+            raise Http404(_("You can not yet write comment, you must wait for "
+                "the subscription deadline to be passed."))
+        if self.trombi.comments_deadline < date.today():
+            raise Http404(_("You can not write comment anymore, the deadline is "
+                "already passed."))
         return modelform_factory(self.model, fields=self.fields,
             widgets={
                 'content': forms.widgets.Textarea(attrs={'maxlength': self.trombi.max_chars})

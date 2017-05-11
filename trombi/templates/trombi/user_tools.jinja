@@ -17,6 +17,14 @@
 <p><a href="{{ url("trombi:profile") }}">{% trans %}Edit my profile{% endtrans %}</a></p>
 <p><a href="{{ url("trombi:pictures") }}">{% trans %}Edit my pictures{% endtrans %}</a></p>
 <hr>
+{% set can_comment = trombi.subscription_deadline < date.today() and
+    date.today() <= trombi.comments_deadline %}
+{% if not can_comment %}
+<p>{% trans %}You can not write comments at this date.{% endtrans %}</p>
+<p>
+{% trans start=trombi.subscription_deadline|date(DATE_FORMAT), end=trombi.comments_deadline|date(DATE_FORMAT) %}Comments are only allowed between {{ start }} (excluded) and {{ end }} (included){% endtrans %}</p>
+<hr>
+{% endif %}
 <div>
 {% for u in user.trombi_user.trombi.users.exclude(id=user.trombi_user.id) %}
     <div class="ib" style="border: solid 1px grey; text-align: center">
@@ -30,11 +38,13 @@
             <img src="{{ file }}" alt="" style="max-width: 100px">
         </div>
         <div>{{ u.user.get_display_name() }}</div>
+        {% if can_comment %}
         {% set comment = u.received_comments.filter(author__id=user.trombi_user.id).first() %}
         {% if comment %}
         <a href="{{ url("trombi:edit_comment", comment_id=comment.id) }}">{% trans %}Edit comment{% endtrans %}</a>
         {% else %}
         <a href="{{ url("trombi:new_comment", user_id=u.id) }}">{% trans %}Comment{% endtrans %}</a>
+        {% endif %}
         {% endif %}
     </div>
 {% endfor %}

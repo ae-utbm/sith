@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-10 23:26+0200\n"
+"POT-Creation-Date: 2017-05-11 18:32+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -590,7 +590,7 @@ msgstr "Effectuées"
 #: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:798
 #: trombi/templates/trombi/comment.jinja:4
 #: trombi/templates/trombi/comment.jinja:8
-#: trombi/templates/trombi/user_tools.jinja:37
+#: trombi/templates/trombi/user_tools.jinja:46
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -4430,15 +4430,31 @@ msgstr "Éditer mon profil"
 msgid "Edit my pictures"
 msgstr "Éditer mes photos"
 
-#: trombi/templates/trombi/user_tools.jinja:35
+#: trombi/templates/trombi/user_tools.jinja:23
+msgid "You can not write comments at this date."
+msgstr "Vous ne pouvez pas commenter à cette date."
+
+#: trombi/templates/trombi/user_tools.jinja:25
+msgid ""
+"Comments are only allowed between %(start)s (excluded) and %(end)s (included)"
+msgstr ""
+"Les commentaires sont autorisés entre le %(start)s (exclu) et le %(end)s "
+"(inclu)"
+
+#: trombi/templates/trombi/user_tools.jinja:44
 msgid "Edit comment"
 msgstr "Éditer le commentaire"
 
-#: trombi/views.py:94
+#: trombi/views.py:101
+#, python-format
+msgid "%(name)s (deadline: %(date)s)"
+msgstr "%(name)s (date limite: %(date)s)"
+
+#: trombi/views.py:104
 msgid "Select trombi"
 msgstr "Choisir un trombi"
 
-#: trombi/views.py:95
+#: trombi/views.py:105
 msgid ""
 "This allows you to subscribe to a Trombi. Be aware that you can subscribe "
 "only once, so don't play with that, or you will expose yourself to the "
@@ -4448,19 +4464,31 @@ msgstr ""
 "pouvez vous inscrire qu'à un seul Trombi, donc ne jouez pas avec cet option "
 "ou vous encourerez la colère des admins!"
 
-#: trombi/views.py:138
+#: trombi/views.py:151
 msgid "Personal email (not UTBM)"
 msgstr "Email personnel (pas UTBM)"
 
-#: trombi/views.py:139
+#: trombi/views.py:152
 msgid "Phone"
 msgstr "Téléphone"
 
-#: trombi/views.py:140
+#: trombi/views.py:153
 msgid "Native town"
 msgstr "Ville d'origine"
 
-#: trombi/views.py:165
+#: trombi/views.py:174
+msgid ""
+"You can not yet write comment, you must wait for the subscription deadline "
+"to be passed."
+msgstr ""
+"Vous ne pouvez pas encore écrire de commentaires, vous devez attendre la fin "
+"des inscriptions"
+
+#: trombi/views.py:177
+msgid "You can not write comment anymore, the deadline is already passed."
+msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
+
+#: trombi/views.py:184
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
