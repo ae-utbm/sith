@@ -50,11 +50,11 @@ class Trombi(models.Model):
     its Trombi.
     """
     subscription_deadline = models.DateField(_('subscription deadline'),
-            default=timezone.now, help_text=_("Before this date, users are "
+            default=date.today, help_text=_("Before this date, users are "
                 "allowed to subscribe to this Trombi. "
                 "After this date, users subscribed will be allowed to comment on each other."))
     comments_deadline = models.DateField(_('comments deadline'),
-            default=timezone.now, help_text=_("After this date, users won't be "
+            default=date.today, help_text=_("After this date, users won't be "
                 "able to make comments anymore."))
     max_chars = models.IntegerField(_('maximum characters'), default=400,
             help_text=_('Maximum number of characters allowed in a comment.'))
