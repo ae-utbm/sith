@@ -74,9 +74,6 @@ class Trombi(models.Model):
         return reverse('trombi:detail', kwargs={'trombi_id': self.id})
 
     def is_owned_by(self, user):
-        return user.is_owner(self.club)
-
-    def can_be_edited_by(self, user):
         return user.can_edit(self.club)
 
     def can_be_viewed_by(self, user):
