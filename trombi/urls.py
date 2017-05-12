@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^(?P<trombi_id>[0-9]+)/delete/(?P<user_id>[0-9]+)$', TrombiDeleteUserView.as_view(), name='delete_user'),
     url(r'^(?P<trombi_id>[0-9]+)$', TrombiDetailView.as_view(), name='detail'),
     url(r'^(?P<user_id>[0-9]+)/new_comment$', TrombiCommentCreateView.as_view(), name='new_comment'),
+    url(r'^(?P<user_id>[0-9]+)/profile$', UserTrombiProfileView.as_view(), name='user_profile'),
     url(r'^comment/(?P<comment_id>[0-9]+)/edit$', TrombiCommentEditView.as_view(), name='edit_comment'),
     url(r'^tools$', UserTrombiToolsView.as_view(), name='user_tools'),
     url(r'^profile$', UserTrombiEditProfileView.as_view(), name='profile'),

@@ -1,0 +1,35 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans user_name=trombi_user.user.get_display_name() %}{{ user_name }}'s Trombi profile{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h3>{% trans user_name=trombi_user.user.get_display_name() %}{{ user_name }}'s Trombi profile{% endtrans %}</h3>
+<p> <a href="{{ url('trombi:user_tools') }}">{% trans %}Back to tools{% endtrans %}</a></p>
+<div>
+    {% set profile_file = None %}
+    {% set scrub_file = None %}
+    {% if trombi_user.profile_pict %}
+        {% set profile_file = trombi_user.profile_pict.url %}
+    {% else %}
+        {% set profile_file = static('core/img/na.gif') %}
+    {% endif %}
+    {% if trombi_user.scrub_pict %}
+        {% set scrub_file = trombi_user.scrub_pict.url %}
+    {% else %}
+        {% set scrub_file = static('core/img/na.gif') %}
+    {% endif %}
+    <div style="max-width: 410px; margin: auto;">
+        <img src="{{ profile_file }}" alt="" style="max-width: 200px">
+        <img src="{{ scrub_file }}" alt="" style="max-width: 200px">
+    </div>
+    <dl>
+    {% for c in trombi_user.received_comments.all() %}
+        <dt style="font-weight: bold; font-size: 110%">{{ c.author.user.get_display_name() }}</dt>
+        <dd>{{ c.content}}</dd>
+    {% endfor %}
+    </dl>
+</div>
+{% endblock %}
+

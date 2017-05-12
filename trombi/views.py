@@ -42,7 +42,7 @@ from club.models import Club
 class TrombiForm(forms.ModelForm):
     class Meta:
         model = Trombi
-        fields = ['subscription_deadline', 'comments_deadline', 'max_chars']
+        fields = ['subscription_deadline', 'comments_deadline', 'max_chars', 'show_profiles']
         widgets = {
                 'subscription_deadline': SelectDate,
                 'comments_deadline': SelectDate,
@@ -159,6 +159,20 @@ class UserTrombiEditProfileView(UpdateView):
 
     def get_success_url(self):
         return reverse('trombi:user_tools')+"?qn_success"
+
+class UserTrombiProfileView(DetailView):
+    model = TrombiUser
+    pk_url_kwarg = "user_id"
+    template_name = "trombi/user_profile.jinja"
+    context_object_name = "trombi_user"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if (self.object.trombi.id != request.user.trombi_user.trombi.id or
+                self.object.user.id == request.user.id or
+                not self.object.trombi.show_profiles):
+            raise Http404()
+        return super(UserTrombiProfileView, self).get(request, *args, **kwargs)
 
 class TrombiCommentFormView():
     """

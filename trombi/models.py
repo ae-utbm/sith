@@ -57,6 +57,7 @@ class Trombi(models.Model):
                 "able to make comments anymore."))
     max_chars = models.IntegerField(_('maximum characters'), default=400,
             help_text=_('Maximum number of characters allowed in a comment.'))
+    show_profiles = models.BooleanField(_("show users profiles to each other"), default=True)
     club = models.OneToOneField(Club, related_name='trombi')
 
     objects = TrombiManager()

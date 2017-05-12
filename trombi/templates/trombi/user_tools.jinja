@@ -38,14 +38,21 @@
             <img src="{{ file }}" alt="" style="max-width: 100px">
         </div>
         <div>{{ u.user.get_display_name() }}</div>
-        {% if can_comment %}
-        {% set comment = u.received_comments.filter(author__id=user.trombi_user.id).first() %}
-        {% if comment %}
-        <a href="{{ url("trombi:edit_comment", comment_id=comment.id) }}">{% trans %}Edit comment{% endtrans %}</a>
-        {% else %}
-        <a href="{{ url("trombi:new_comment", user_id=u.id) }}">{% trans %}Comment{% endtrans %}</a>
+        {% if trombi.show_profiles %}
+        <div>
+            <a href="{{ url("trombi:user_profile", user_id=u.id) }}">{% trans %}Profile{% endtrans %}</a>
+        </div>
         {% endif %}
-        {% endif %}
+        <div>
+            {% if can_comment %}
+            {% set comment = u.received_comments.filter(author__id=user.trombi_user.id).first() %}
+            {% if comment %}
+            <a href="{{ url("trombi:edit_comment", comment_id=comment.id) }}">{% trans %}Edit comment{% endtrans %}</a>
+            {% else %}
+            <a href="{{ url("trombi:new_comment", user_id=u.id) }}">{% trans %}Comment{% endtrans %}</a>
+            {% endif %}
+            {% endif %}
+        </div>
     </div>
 {% endfor %}
 </div>
