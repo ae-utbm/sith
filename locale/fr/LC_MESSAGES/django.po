@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-11 18:32+0200\n"
+"POT-Creation-Date: 2017-05-12 16:56+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -335,14 +335,15 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:59
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:329
-#: forum/templates/forum/macros.jinja:20 forum/templates/forum/macros.jinja:110
+#: forum/templates/forum/macros.jinja:20
+#: forum/templates/forum/macros.jinja:110
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:178 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:74
-#: sas/templates/sas/picture.jinja.py:124
+#: sas/templates/sas/picture.jinja:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
 #: stock/templates/stock/stock_shopping_list.jinja:69
-#: trombi/templates/trombi/detail.jinja:27
+#: trombi/templates/trombi/detail.jinja:28
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -490,8 +491,8 @@ msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:56
 #: com/templates/com/news_admin_list.jinja:38
-#: com/templates/com/news_admin_list.jinja:70 core/templates/core/file.jinja:36
-#: core/templates/core/page.jinja:28
+#: com/templates/com/news_admin_list.jinja:70
+#: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
 
@@ -590,7 +591,7 @@ msgstr "Effectuées"
 #: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:798
 #: trombi/templates/trombi/comment.jinja:4
 #: trombi/templates/trombi/comment.jinja:8
-#: trombi/templates/trombi/user_tools.jinja:46
+#: trombi/templates/trombi/user_tools.jinja:52
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -858,7 +859,8 @@ msgstr "L'utilisateur est déjà membre de ce club"
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4
+#: club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -920,13 +922,14 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:84 club/views.py:247
-#: counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:84
+#: club/views.py:247 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja:9 club/templates/club/stats.jinja:19
+#: club/templates/club/club_sellings.jinja:9
+#: club/templates/club/stats.jinja:19
 #: counter/templates/counter/cash_summary_list.jinja:15
 msgid "Show"
 msgstr "Montrer"
@@ -1116,7 +1119,7 @@ msgstr "titre"
 msgid "summary"
 msgstr "résumé"
 
-#: com/models.py:62 com/models.py:150 trombi/models.py:111
+#: com/models.py:62 com/models.py:150 trombi/models.py:108
 msgid "content"
 msgstr "contenu"
 
@@ -1126,7 +1129,7 @@ msgstr "contenu"
 msgid "type"
 msgstr "type"
 
-#: com/models.py:65 com/models.py:151 trombi/models.py:109
+#: com/models.py:65 com/models.py:151 trombi/models.py:106
 msgid "author"
 msgstr "auteur"
 
@@ -1183,8 +1186,9 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
-#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
-#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:28
+#: com/templates/com/news_detail.jinja:5
+#: com/templates/com/news_detail.jinja:11 com/templates/com/news_list.jinja:4
+#: com/templates/com/news_list.jinja:28
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1343,6 +1347,7 @@ msgstr "Supprimer du Weekmail"
 #: core/templates/core/user_account_detail.jinja:11
 #: core/templates/core/user_account_detail.jinja:104 launderette/views.py:178
 #: stock/templates/stock/shopping_list_items.jinja:9
+#: trombi/templates/trombi/comment_moderation.jinja:10
 msgid "Back"
 msgstr "Retour"
 
@@ -1665,6 +1670,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: election/templates/election/election_detail.jinja:316
 #: forum/templates/forum/macros.jinja:87 forum/templates/forum/macros.jinja:89
 #: forum/templates/forum/reply.jinja:36 forum/templates/forum/reply.jinja:38
+#: trombi/templates/trombi/user_tools.jinja:43
 msgid "Profile"
 msgstr "Profil"
 
@@ -1855,7 +1861,8 @@ msgstr "S'enregister"
 msgid "View more"
 msgstr "Voir plus"
 
-#: core/templates/core/base.jinja:62 forum/templates/forum/last_unread.jinja:15
+#: core/templates/core/base.jinja:62
+#: forum/templates/forum/last_unread.jinja:15
 msgid "Mark all as read"
 msgstr "Marquer tout commme lu"
 
@@ -1887,7 +1894,7 @@ msgstr "SAS"
 
 #: core/templates/core/base.jinja:94 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:12
-#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
+#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:11
 #: forum/templates/forum/main.jinja:13 forum/templates/forum/reply.jinja:15
 #: forum/templates/forum/topic.jinja:30
 msgid "Forum"
@@ -2101,11 +2108,13 @@ msgstr "login"
 msgid "Lost password?"
 msgstr "Mot de passe perdu ?"
 
-#: core/templates/core/macros.jinja:27 core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:27
+#: core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:31 core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:31
+#: core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -4322,11 +4331,11 @@ msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, soit en créer un proprement"
 
-#: trombi/models.py:52
+#: trombi/models.py:51
 msgid "subscription deadline"
 msgstr "fin des inscriptions"
 
-#: trombi/models.py:53
+#: trombi/models.py:52
 msgid ""
 "Before this date, users are allowed to subscribe to this Trombi. After this "
 "date, users subscribed will be allowed to comment on each other."
@@ -4335,22 +4344,26 @@ msgstr ""
 "Après cette date, les utilisateurs inscrits peuvent se soumettre des "
 "commentaires entre eux."
 
-#: trombi/models.py:56
+#: trombi/models.py:55
 msgid "comments deadline"
 msgstr "fin des commentaires"
 
-#: trombi/models.py:57
+#: trombi/models.py:56
 msgid "After this date, users won't be able to make comments anymore."
 msgstr ""
 "Après cette date, les utilisateurs ne peuvent plus faire de commentaires."
 
-#: trombi/models.py:59
+#: trombi/models.py:58
 msgid "maximum characters"
 msgstr "nombre de caractères max"
 
-#: trombi/models.py:60
+#: trombi/models.py:59
 msgid "Maximum number of characters allowed in a comment."
 msgstr "Nombre maximum de caractères autorisés dans un commentaire."
+
+#: trombi/models.py:60
+msgid "show users profiles to each other"
+msgstr "montrer les profils aux inscrits"
 
 #: trombi/models.py:71
 msgid ""
@@ -4358,19 +4371,19 @@ msgid ""
 msgstr ""
 "Fermer les inscriptions après les commentaires est vraiment une idée pourrie."
 
-#: trombi/models.py:94
+#: trombi/models.py:91
 msgid "trombi user"
 msgstr "utilisateur trombi"
 
-#: trombi/models.py:95
+#: trombi/models.py:92
 msgid "trombi"
 msgstr "trombi"
 
-#: trombi/models.py:96
+#: trombi/models.py:93
 msgid "profile pict"
 msgstr "photo de profil"
 
-#: trombi/models.py:97
+#: trombi/models.py:94
 msgid ""
 "The profile picture you want in the trombi (warning: this picture may be "
 "published)"
@@ -4378,11 +4391,11 @@ msgstr ""
 "La photo de profil que vous souhaitez voir dans le Trombi (attention: cette "
 "photo risque d'être publiée)"
 
-#: trombi/models.py:98
+#: trombi/models.py:95
 msgid "scrub pict"
 msgstr "photo de blouse"
 
-#: trombi/models.py:99
+#: trombi/models.py:96
 msgid ""
 "The scrub picture you want in the trombi (warning: this picture may be "
 "published)"
@@ -4390,9 +4403,26 @@ msgstr ""
 "La photo de blouse que vous souhaitez voir dans le Trombi (attention: cette "
 "photo risque d'être publiée)"
 
-#: trombi/models.py:110
+#: trombi/models.py:107
 msgid "target"
 msgstr "cible"
+
+#: trombi/models.py:109
+msgid "is the comment moderated"
+msgstr "le commentaire est modéré"
+
+#: trombi/templates/trombi/comment_moderation.jinja:4
+#: trombi/templates/trombi/comment_moderation.jinja:8
+msgid "Moderate Trombi comments"
+msgstr "Modérer les commentaires du Trombi"
+
+#: trombi/templates/trombi/comment_moderation.jinja:23
+msgid "Accept"
+msgstr "Accepter"
+
+#: trombi/templates/trombi/comment_moderation.jinja:28
+msgid "Reject"
+msgstr "Refuser"
 
 #: trombi/templates/trombi/detail.jinja:4
 #: trombi/templates/trombi/detail.jinja:8
@@ -4401,12 +4431,25 @@ msgid "%(club)s's Trombi"
 msgstr "Trombi de %(club)s"
 
 #: trombi/templates/trombi/detail.jinja:10
+msgid "Moderate comments"
+msgstr "Modérer les commentaires"
+
+#: trombi/templates/trombi/detail.jinja:11
 msgid "Subscription deadline: "
 msgstr "Fin des inscriptions : "
 
-#: trombi/templates/trombi/detail.jinja:11
+#: trombi/templates/trombi/detail.jinja:12
 msgid "Comment deadline: "
 msgstr "Fin des commentaires : "
+
+#: trombi/templates/trombi/user_profile.jinja:4
+#: trombi/templates/trombi/user_profile.jinja:8
+msgid "%(user_name)s's Trombi profile"
+msgstr "Profil Trombi de %(user_name)s"
+
+#: trombi/templates/trombi/user_profile.jinja:9
+msgid "Back to tools"
+msgstr "Retour aux outils"
 
 #: trombi/templates/trombi/user_tools.jinja:4
 #, python-format
@@ -4435,26 +4478,52 @@ msgid "You can not write comments at this date."
 msgstr "Vous ne pouvez pas commenter à cette date."
 
 #: trombi/templates/trombi/user_tools.jinja:25
+#, python-format
 msgid ""
 "Comments are only allowed between %(start)s (excluded) and %(end)s (included)"
 msgstr ""
 "Les commentaires sont autorisés entre le %(start)s (exclu) et le %(end)s "
 "(inclu)"
 
-#: trombi/templates/trombi/user_tools.jinja:44
+#: trombi/templates/trombi/user_tools.jinja:50
 msgid "Edit comment"
 msgstr "Éditer le commentaire"
 
-#: trombi/views.py:101
+#: trombi/views.py:110
+msgid "Explain why you rejected the comment"
+msgstr "Expliquez pourquoi vous refusez le commentaire"
+
+#: trombi/views.py:132
+msgid "Rejected comment"
+msgstr "Commentaire rejeté"
+
+#: trombi/views.py:133
+#, python-format
+msgid ""
+"Your comment to %(target)s on the Trombi \"%(trombi)s\" was rejected for the "
+"following reason: %(reason)s\n"
+"\n"
+"Your comment was:\n"
+"\n"
+"%(content)s"
+msgstr ""
+"Votre commentaire pour %(target)s sur le Trombi \"%(trombi)s\" a été rejecté pour le "
+"motif suivant: %(reason)s\n"
+"\n"
+"Votre commentaire était:\n"
+"\n"
+"%(content)s"
+
+#: trombi/views.py:156
 #, python-format
 msgid "%(name)s (deadline: %(date)s)"
 msgstr "%(name)s (date limite: %(date)s)"
 
-#: trombi/views.py:104
+#: trombi/views.py:159
 msgid "Select trombi"
 msgstr "Choisir un trombi"
 
-#: trombi/views.py:105
+#: trombi/views.py:160
 msgid ""
 "This allows you to subscribe to a Trombi. Be aware that you can subscribe "
 "only once, so don't play with that, or you will expose yourself to the "
@@ -4464,19 +4533,19 @@ msgstr ""
 "pouvez vous inscrire qu'à un seul Trombi, donc ne jouez pas avec cet option "
 "ou vous encourerez la colère des admins!"
 
-#: trombi/views.py:151
+#: trombi/views.py:206
 msgid "Personal email (not UTBM)"
 msgstr "Email personnel (pas UTBM)"
 
-#: trombi/views.py:152
+#: trombi/views.py:207
 msgid "Phone"
 msgstr "Téléphone"
 
-#: trombi/views.py:153
+#: trombi/views.py:208
 msgid "Native town"
 msgstr "Ville d'origine"
 
-#: trombi/views.py:174
+#: trombi/views.py:243
 msgid ""
 "You can not yet write comment, you must wait for the subscription deadline "
 "to be passed."
@@ -4484,11 +4553,11 @@ msgstr ""
 "Vous ne pouvez pas encore écrire de commentaires, vous devez attendre la fin "
 "des inscriptions"
 
-#: trombi/views.py:177
+#: trombi/views.py:246
 msgid "You can not write comment anymore, the deadline is already passed."
 msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 
-#: trombi/views.py:184
+#: trombi/views.py:253
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"

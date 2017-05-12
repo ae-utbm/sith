@@ -106,6 +106,7 @@ class TrombiComment(models.Model):
     author = models.ForeignKey(TrombiUser, verbose_name=_("author"), related_name='given_comments')
     target = models.ForeignKey(TrombiUser, verbose_name=_("target"), related_name='received_comments')
     content = models.TextField(_("content"), default="")
+    is_moderated = models.BooleanField(_("is the comment moderated"), default=False)
 
     def can_be_viewed_by(self, user):
         if user.id == self.target.user.id:

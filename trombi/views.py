@@ -29,6 +29,7 @@ from django.views.generic import ListView, DetailView, RedirectView, TemplateVie
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView, SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
 from django import forms
+from django.conf import settings
 from django.forms.models import modelform_factory
 
 from datetime import date
@@ -94,6 +95,63 @@ class TrombiDeleteUserView(CanEditPropMixin, SingleObjectMixin, RedirectView):
         user.delete()
 # See if we need to also delete the comments on the user, or if we keep them
         return redirect(self.object.get_absolute_url()+"?qn_success")
+
+class TrombiModerateCommentsView(CanEditPropMixin, QuickNotifMixin, DetailView):
+    model = Trombi
+    template_name = 'trombi/comment_moderation.jinja'
+    pk_url_kwarg = 'trombi_id'
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TrombiModerateCommentsView, self).get_context_data(**kwargs)
+        kwargs['comments'] = TrombiComment.objects.filter(is_moderated=False,
+                author__trombi__id=self.object.id).exclude(target__user__id=self.request.user.id)
+        return kwargs
+
+class TrombiModerateForm(forms.Form):
+    reason = forms.CharField(help_text=_("Explain why you rejected the comment"))
+    action = forms.CharField(initial="delete", widget=forms.widgets.HiddenInput)
+
+class TrombiModerateCommentView(DetailView):
+    model = TrombiComment
+    template_name = 'core/edit.jinja'
+    pk_url_kwarg = 'comment_id'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not request.user.is_owner(self.object.author.trombi):
+            raise Http404()
+        return super(TrombiModerateCommentView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if "action" in request.POST:
+            if request.POST['action'] == "accept":
+                self.object.is_moderated = True
+                self.object.save()
+                return redirect(reverse('trombi:moderate_comments', kwargs={'trombi_id': self.object.author.trombi.id})+"?qn_success")
+            elif request.POST['action'] == "reject":
+                return super(TrombiModerateCommentView, self).get(request, *args, **kwargs)
+            elif request.POST['action'] == "delete" and "reason" in request.POST.keys():
+                self.object.author.user.email_user(
+                        subject="[%s] %s" % (settings.SITH_NAME, _("Rejected comment")),
+                        message=_("Your comment to %(target)s on the Trombi \"%(trombi)s\" was rejected for the following "
+                            "reason: %(reason)s\n\n"
+                            "Your comment was:\n\n%(content)s"
+                            ) % {
+                                'target': self.object.target.user.get_display_name(),
+                                'trombi': self.object.author.trombi,
+                                'reason': request.POST["reason"],
+                                'content': self.object.content,
+                                },
+                        )
+                self.object.delete()
+                return redirect(reverse('trombi:moderate_comments', kwargs={'trombi_id': self.object.author.trombi.id})+"?qn_success")
+        raise Http404
+
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TrombiModerateCommentView, self).get_context_data(**kwargs)
+        kwargs['form'] = TrombiModerateForm()
+        return kwargs
 
 # User side
 class TrombiModelChoiceField(forms.ModelChoiceField):

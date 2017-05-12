@@ -255,11 +255,15 @@ p, pre {
   margin-left: 0px;
 }
 
-ul, ol {
+ul, ol, dl {
   margin-top: 1em;
   margin-bottom: 1em;
   list-style-type: disc;
   margin-left: 25px;
+}
+
+dt {
+    margin-top: 25px;
 }
 
 code {

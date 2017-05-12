@@ -7,6 +7,7 @@
 {% block content %}
     <h2>{% trans club=object.club %}{{ club }}'s Trombi{% endtrans %}</h2>
     <a href="{{ url('trombi:edit', trombi_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
+    <a href="{{ url('trombi:moderate_comments', trombi_id=object.id) }}">{% trans %}Moderate comments{% endtrans %}</a>
     <p>{% trans %}Subscription deadline: {% endtrans %}{{ object.subscription_deadline|date(DATETIME_FORMAT) }}</p>
     <p>{% trans %}Comment deadline: {% endtrans %}{{ object.comments_deadline|date(DATETIME_FORMAT) }}</p>
     <a href="#">Export</a>

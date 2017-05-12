@@ -29,6 +29,8 @@ from trombi.views import *
 urlpatterns = [
     url(r'^(?P<club_id>[0-9]+)/new$', TrombiCreateView.as_view(), name='create'),
     url(r'^(?P<trombi_id>[0-9]+)/edit$', TrombiEditView.as_view(), name='edit'),
+    url(r'^(?P<trombi_id>[0-9]+)/moderate_comments$', TrombiModerateCommentsView.as_view(), name='moderate_comments'),
+    url(r'^(?P<comment_id>[0-9]+)/moderate$', TrombiModerateCommentView.as_view(), name='moderate_comment'),
     url(r'^(?P<trombi_id>[0-9]+)/delete/(?P<user_id>[0-9]+)$', TrombiDeleteUserView.as_view(), name='delete_user'),
     url(r'^(?P<trombi_id>[0-9]+)$', TrombiDetailView.as_view(), name='detail'),
     url(r'^(?P<user_id>[0-9]+)/new_comment$', TrombiCommentCreateView.as_view(), name='new_comment'),
