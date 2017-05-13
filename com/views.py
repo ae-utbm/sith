@@ -192,7 +192,7 @@ class NewsEditView(CanEditMixin, UpdateView):
                     Notification(user=u, url=reverse("com:news_detail", kwargs={'news_id': self.object.id}), type="NEWS_MODERATION").save()
         return super(NewsEditView, self).form_valid(form)
 
-class NewsCreateView(CanCreateMixin, CreateView): #XXX no can_be_created_by function in News model
+class NewsCreateView(CanCreateMixin, CreateView):
     model = News
     form_class = NewsForm
     template_name = 'com/news_edit.jinja'
@@ -230,7 +230,10 @@ class NewsModerateView(CanEditMixin, SingleObjectMixin):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.is_moderated = True
+        if 'remove' in request.GET.keys():
+            self.object.is_moderated = False
+        else:
+            self.object.is_moderated = True
         self.object.moderator = request.user
         self.object.save()
         if 'next' in self.request.GET.keys():

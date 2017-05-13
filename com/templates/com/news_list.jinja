@@ -26,6 +26,9 @@ section.news_event:nth-of-type(even) {
 
 {% block content %}
     <h3>{% trans %}News{% endtrans %}</h3>
+    {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+    <a href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
+    {% endif  %}
     {% for news in object_list.filter(type="NOTICE") %}
     <section class="news_notice">
         <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>

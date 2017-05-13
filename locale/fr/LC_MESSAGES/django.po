@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-12 16:56+0200\n"
+"POT-Creation-Date: 2017-05-13 18:31+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -185,7 +185,7 @@ msgstr "Utilisateur"
 
 #: accounting/models.py:267 club/templates/club/club_detail.jinja:5
 #: com/templates/com/news_admin_list.jinja:17
-#: com/templates/com/news_admin_list.jinja:51
+#: com/templates/com/news_admin_list.jinja:52
 #: com/templates/com/weekmail.jinja:18 com/templates/com/weekmail.jinja:47
 #: counter/templates/counter/invoices_call.jinja:23
 msgid "Club"
@@ -335,12 +335,11 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:59
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:329
-#: forum/templates/forum/macros.jinja:20
-#: forum/templates/forum/macros.jinja:110
+#: forum/templates/forum/macros.jinja:20 forum/templates/forum/macros.jinja:110
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:178 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:74
-#: sas/templates/sas/picture.jinja:124
+#: sas/templates/sas/picture.jinja.py:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
 #: stock/templates/stock/stock_shopping_list.jinja:69
 #: trombi/templates/trombi/detail.jinja:28
@@ -369,7 +368,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/club_account_details.jinja:57
 #: accounting/templates/accounting/journal_details.jinja:83 club/views.py:79
 #: com/templates/com/news_admin_list.jinja:39
-#: com/templates/com/news_admin_list.jinja:71
+#: com/templates/com/news_admin_list.jinja:72
 #: com/templates/com/weekmail.jinja:32 com/templates/com/weekmail.jinja:61
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
 #: core/templates/core/user_tools.jinja:39 core/views/user.py:177
@@ -445,13 +444,13 @@ msgstr "Nom"
 
 #: accounting/templates/accounting/club_account_details.jinja:31
 #: com/templates/com/news_admin_list.jinja:20
-#: com/templates/com/news_admin_list.jinja:53
+#: com/templates/com/news_admin_list.jinja:54
 msgid "Start"
 msgstr "Début"
 
 #: accounting/templates/accounting/club_account_details.jinja:32
 #: com/templates/com/news_admin_list.jinja:21
-#: com/templates/com/news_admin_list.jinja:54
+#: com/templates/com/news_admin_list.jinja:55
 msgid "End"
 msgstr "Fin"
 
@@ -474,7 +473,7 @@ msgstr "Fermé"
 #: accounting/templates/accounting/club_account_details.jinja:36
 #: accounting/templates/accounting/journal_details.jinja:41
 #: com/templates/com/news_admin_list.jinja:22
-#: com/templates/com/news_admin_list.jinja:55
+#: com/templates/com/news_admin_list.jinja:56
 #: com/templates/com/weekmail.jinja:21 com/templates/com/weekmail.jinja:50
 msgid "Actions"
 msgstr "Actions"
@@ -491,8 +490,8 @@ msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:56
 #: com/templates/com/news_admin_list.jinja:38
-#: com/templates/com/news_admin_list.jinja:70
-#: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
+#: com/templates/com/news_admin_list.jinja:71 core/templates/core/file.jinja:36
+#: core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
 
@@ -859,8 +858,7 @@ msgstr "L'utilisateur est déjà membre de ce club"
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/templates/club/club_list.jinja:4
-#: club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -922,14 +920,13 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:84
-#: club/views.py:247 counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:84 club/views.py:247
+#: counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja:9
-#: club/templates/club/stats.jinja:19
+#: club/templates/club/club_sellings.jinja:9 club/templates/club/stats.jinja:19
 #: counter/templates/counter/cash_summary_list.jinja:15
 msgid "Show"
 msgstr "Montrer"
@@ -1102,7 +1099,7 @@ msgstr "Information"
 msgid "Event"
 msgstr "Événement"
 
-#: com/models.py:54 com/templates/com/news_list.jinja:81
+#: com/models.py:54 com/templates/com/news_list.jinja:84
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
@@ -1186,9 +1183,8 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
-#: com/templates/com/news_detail.jinja:5
-#: com/templates/com/news_detail.jinja:11 com/templates/com/news_list.jinja:4
-#: com/templates/com/news_list.jinja:28
+#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
+#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:28
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1197,14 +1193,14 @@ msgid "Displayed news"
 msgstr "Nouvelles affichées"
 
 #: com/templates/com/news_admin_list.jinja:14
-#: com/templates/com/news_admin_list.jinja:48
+#: com/templates/com/news_admin_list.jinja:49
 #: launderette/templates/launderette/launderette_admin.jinja:42
 #: launderette/views.py:180
 msgid "Type"
 msgstr "Type"
 
 #: com/templates/com/news_admin_list.jinja:15
-#: com/templates/com/news_admin_list.jinja:49
+#: com/templates/com/news_admin_list.jinja:50
 #: com/templates/com/weekmail.jinja:19 com/templates/com/weekmail.jinja:48
 #: forum/templates/forum/forum.jinja:26 forum/templates/forum/forum.jinja:44
 #: forum/views.py:127
@@ -1212,12 +1208,12 @@ msgid "Title"
 msgstr "Titre"
 
 #: com/templates/com/news_admin_list.jinja:16
-#: com/templates/com/news_admin_list.jinja:50
+#: com/templates/com/news_admin_list.jinja:51
 msgid "Summary"
 msgstr "Résumé"
 
 #: com/templates/com/news_admin_list.jinja:18
-#: com/templates/com/news_admin_list.jinja:52
+#: com/templates/com/news_admin_list.jinja:53
 #: com/templates/com/weekmail.jinja:17 com/templates/com/weekmail.jinja:46
 #: forum/templates/forum/forum.jinja:48
 msgid "Author"
@@ -1227,11 +1223,15 @@ msgstr "Auteur"
 msgid "Moderator"
 msgstr "Modérateur"
 
-#: com/templates/com/news_admin_list.jinja:44
+#: com/templates/com/news_admin_list.jinja:40
+msgid "Remove"
+msgstr ""
+
+#: com/templates/com/news_admin_list.jinja:45
 msgid "News to moderate"
 msgstr "Nouvelles à modérer"
 
-#: com/templates/com/news_admin_list.jinja:72
+#: com/templates/com/news_admin_list.jinja:73
 #: com/templates/com/news_detail.jinja:26
 #: core/templates/core/file_detail.jinja:65
 #: core/templates/core/file_moderation.jinja:23
@@ -1293,11 +1293,15 @@ msgstr ""
 msgid "Preview"
 msgstr "Prévisualiser"
 
-#: com/templates/com/news_list.jinja:48
+#: com/templates/com/news_list.jinja:30
+msgid "Administrate news"
+msgstr "Administrer les news"
+
+#: com/templates/com/news_list.jinja:51
 msgid "Events today and the next few days"
 msgstr "Événement aujourd'hui et dans les prochains jours"
 
-#: com/templates/com/news_list.jinja:67
+#: com/templates/com/news_list.jinja:70
 msgid "Coming soon... don't miss!"
 msgstr "Prochainement... à ne pas rater!"
 
@@ -1428,11 +1432,11 @@ msgstr "Ce champ est obligatoire."
 msgid "You crazy? You can not finish an event before starting it."
 msgstr "T'es fou? Un événement ne peut pas finir avant même de commencer."
 
-#: com/views.py:290
+#: com/views.py:293
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour regénérer"
 
-#: com/views.py:298
+#: com/views.py:301
 msgid "Weekmail of the "
 msgstr "Weekmail du "
 
@@ -1861,8 +1865,7 @@ msgstr "S'enregister"
 msgid "View more"
 msgstr "Voir plus"
 
-#: core/templates/core/base.jinja:62
-#: forum/templates/forum/last_unread.jinja:15
+#: core/templates/core/base.jinja:62 forum/templates/forum/last_unread.jinja:15
 msgid "Mark all as read"
 msgstr "Marquer tout commme lu"
 
@@ -1894,7 +1897,7 @@ msgstr "SAS"
 
 #: core/templates/core/base.jinja:94 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:12
-#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:11
+#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
 #: forum/templates/forum/main.jinja:13 forum/templates/forum/reply.jinja:15
 #: forum/templates/forum/topic.jinja:30
 msgid "Forum"
@@ -2108,13 +2111,11 @@ msgstr "login"
 msgid "Lost password?"
 msgstr "Mot de passe perdu ?"
 
-#: core/templates/core/macros.jinja:27
-#: core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:27 core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:31
-#: core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:31 core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -4444,6 +4445,7 @@ msgstr "Fin des commentaires : "
 
 #: trombi/templates/trombi/user_profile.jinja:4
 #: trombi/templates/trombi/user_profile.jinja:8
+#, python-format
 msgid "%(user_name)s's Trombi profile"
 msgstr "Profil Trombi de %(user_name)s"
 
@@ -4489,15 +4491,15 @@ msgstr ""
 msgid "Edit comment"
 msgstr "Éditer le commentaire"
 
-#: trombi/views.py:110
+#: trombi/views.py:111
 msgid "Explain why you rejected the comment"
 msgstr "Expliquez pourquoi vous refusez le commentaire"
 
-#: trombi/views.py:132
+#: trombi/views.py:135
 msgid "Rejected comment"
 msgstr "Commentaire rejeté"
 
-#: trombi/views.py:133
+#: trombi/views.py:136
 #, python-format
 msgid ""
 "Your comment to %(target)s on the Trombi \"%(trombi)s\" was rejected for the "
@@ -4507,23 +4509,23 @@ msgid ""
 "\n"
 "%(content)s"
 msgstr ""
-"Votre commentaire pour %(target)s sur le Trombi \"%(trombi)s\" a été rejecté pour le "
-"motif suivant: %(reason)s\n"
+"Votre commentaire pour %(target)s sur le Trombi \"%(trombi)s\" a été rejecté "
+"pour le motif suivant: %(reason)s\n"
 "\n"
 "Votre commentaire était:\n"
 "\n"
 "%(content)s"
 
-#: trombi/views.py:156
+#: trombi/views.py:159
 #, python-format
 msgid "%(name)s (deadline: %(date)s)"
 msgstr "%(name)s (date limite: %(date)s)"
 
-#: trombi/views.py:159
+#: trombi/views.py:162
 msgid "Select trombi"
 msgstr "Choisir un trombi"
 
-#: trombi/views.py:160
+#: trombi/views.py:163
 msgid ""
 "This allows you to subscribe to a Trombi. Be aware that you can subscribe "
 "only once, so don't play with that, or you will expose yourself to the "
@@ -4533,19 +4535,19 @@ msgstr ""
 "pouvez vous inscrire qu'à un seul Trombi, donc ne jouez pas avec cet option "
 "ou vous encourerez la colère des admins!"
 
-#: trombi/views.py:206
+#: trombi/views.py:209
 msgid "Personal email (not UTBM)"
 msgstr "Email personnel (pas UTBM)"
 
-#: trombi/views.py:207
+#: trombi/views.py:210
 msgid "Phone"
 msgstr "Téléphone"
 
-#: trombi/views.py:208
+#: trombi/views.py:211
 msgid "Native town"
 msgstr "Ville d'origine"
 
-#: trombi/views.py:243
+#: trombi/views.py:246
 msgid ""
 "You can not yet write comment, you must wait for the subscription deadline "
 "to be passed."
@@ -4553,11 +4555,11 @@ msgstr ""
 "Vous ne pouvez pas encore écrire de commentaires, vous devez attendre la fin "
 "des inscriptions"
 
-#: trombi/views.py:246
+#: trombi/views.py:249
 msgid "You can not write comment anymore, the deadline is already passed."
 msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 
-#: trombi/views.py:253
+#: trombi/views.py:256
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"

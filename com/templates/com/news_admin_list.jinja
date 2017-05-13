@@ -36,7 +36,8 @@
                 <td>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
                     {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</td>
                 <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
-                    <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a> </td>
+                    <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
+                    <a href="{{ url('com:news_moderate', news_id=news.id) }}?remove">{% trans %}Remove{% endtrans %}</a></td>
             </tr>
             {% endfor %}
         </tbody>
