@@ -23,7 +23,7 @@
 #
 
 import re
-from mistune import Renderer, InlineGrammar, InlineLexer, Markdown
+from mistune import Renderer, InlineGrammar, InlineLexer, Markdown, escape, escape_link
 from django.core.urlresolvers import reverse_lazy, reverse
 
 
@@ -39,6 +39,43 @@ class SithRenderer(Renderer):
 
     def underline(self, text):
         return """<span class="underline">%s</span>""" % text
+
+    def image(self, original_src, title, text):
+        """Rendering a image with title and text.
+        :param src: source link of the image.
+        :param title: title text of the image.
+        :param text: alt text of the image.
+        """
+        style = None
+        if '?' in original_src:
+            src, params = original_src.rsplit('?', maxsplit=1)
+            m = re.search(r'(\d+%?)(x(\d+%?))?', params)
+            if not m:
+                src = original_src
+            else:
+                width = m.group(1)
+                if not width.endswith('%'): width += "px"
+                style = "width: %s; " % width
+                try:
+                    height = m.group(3)
+                    if not height.endswith('%'): height += "px"
+                    style += "height: %s; " % height
+                except: pass
+        else:
+            params = None
+            src = original_src
+        src = escape_link(src)
+        text = escape(text, quote=True)
+        if title:
+            title = escape(title, quote=True)
+            html = '<img src="%s" alt="%s" title="%s"' % (src, text, title)
+        else:
+            html = '<img src="%s" alt="%s"' % (src, text)
+        if style:
+            html = '%s style="%s"' % (html, style)
+        if self.options.get('use_xhtml'):
+            return '%s />' % html
+        return '%s>' % html
 
 class SithInlineGrammar(InlineGrammar):
     double_emphasis = re.compile(
