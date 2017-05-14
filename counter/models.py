@@ -29,6 +29,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.forms import ValidationError
 from django.contrib.sites.shortcuts import get_current_site
+from django.utils.functional import cached_property
 
 from datetime import timedelta, date
 import random
@@ -215,6 +216,10 @@ class Counter(models.Model):
             p.end = p.activity
             p.save()
 
+    @cached_property
+    def barmen_list(self):
+        return self.get_barmen_list()
+
     def get_barmen_list(self):
         """
         Returns the barman list as list of User
@@ -246,7 +251,7 @@ class Counter(models.Model):
             p.save() # Update activity
 
     def is_open(self):
-        return len(self.get_barmen_list()) > 0
+        return len(self.barmen_list) > 0
 
     def is_inactive(self):
         """

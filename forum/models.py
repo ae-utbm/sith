@@ -136,10 +136,19 @@ class Forum(models.Model):
     def last_message(self):
         return self.get_last_message()
 
+    forum_list = {} # Class variable used for cache purpose
     def get_last_message(self):
         last_msg = None
-        for m in ForumMessage.objects.select_related('topic__forum', 'author').order_by('-id'):
-            forum = m.topic.forum
+        for m in ForumMessage.objects.select_related('topic__forum').order_by('-id'):
+            if m.topic.forum.id in Forum.forum_list.keys(): # The object is already in Python's memory,
+                                                            # so there's no need to query it again
+                forum = Forum.forum_list[m.topic.forum.id]
+            else: # Query the forum object and store it in the class variable for further use.
+                  # Keeping the same object allows the @cached_property to work properly.
+# This trick divided by 4 the number of DB queries in the main forum page, and about the same on many other forum pages.
+# This also divided by 4 the amount of CPU usage for thoses pages, according to Django Debug Toolbar.
+                forum = m.topic.forum
+                Forum.forum_list[forum.id] = forum
             if self in (forum.parent_list + [forum]) and not m.deleted:
                 return m
 
