@@ -22,6 +22,8 @@
 #
 #
 
+import re
+
 # Image utils
 
 from io import BytesIO
@@ -62,3 +64,69 @@ def exif_auto_rotate(image):
         image=image.rotate(90, expand=True)
 
     return image
+
+def doku_to_markdown(text):
+    text = re.sub(r'([^:]|^)\/\/(.*?)\/\/', r'*\2*', text) # Italic (prevents protocol:// conflict)
+    text = re.sub(r'<del>(.*?)<\/del>', r'~~\1~~', text, flags=re.DOTALL) # Strike (may be multiline)
+    text = re.sub(r'<sup>(.*?)<\/sup>', r'^\1^', text) # Superscript (multiline not supported, because almost never used)
+    text = re.sub(r'<sub>(.*?)<\/sub>', r'_\1_', text) # Subscript (idem)
+
+    text = re.sub(r'^======(.*?)======', r'#\1', text, flags=re.MULTILINE) # Titles
+    text = re.sub(r'^=====(.*?)=====', r'##\1', text, flags=re.MULTILINE)
+    text = re.sub(r'^====(.*?)====', r'###\1', text, flags=re.MULTILINE)
+    text = re.sub(r'^===(.*?)===', r'####\1', text, flags=re.MULTILINE)
+    text = re.sub(r'^==(.*?)==', r'#####\1', text, flags=re.MULTILINE)
+    text = re.sub(r'^=(.*?)=', r'######\1', text, flags=re.MULTILINE)
+
+    text = re.sub(r'<nowiki>', r'<nosyntax>', text)
+    text = re.sub(r'</nowiki>', r'</nosyntax>', text)
+    text = re.sub(r'<code>', r'```\n', text)
+    text = re.sub(r'</code>', r'\n```', text)
+    text = re.sub(r'article://', r'page://', text)
+    text = re.sub(r'dfile://', r'file://', text)
+
+    i = 1
+    for fn in re.findall(r'\(\((.*?)\)\)', text): # Footnotes
+        text = re.sub(r'\(\((.*?)\)\)', r'[^%s]' % i, text, count=1)
+        text += "\n[^%s]: %s\n" % (i, fn)
+        i += 1
+
+    text = re.sub(r'\\{2,}[\s]', r'   \n', text) # Carriage return
+
+    text = re.sub(r'\[\[(.*?)(\|(.*?))?\]\]', r'[\3](\1)', text) # Links
+    text = re.sub(r'{{(.*?)(\|(.*?))?}}', r'![\3](\1 "\3")', text) # Images
+    text = re.sub(r'{\[(.*?)(\|(.*?))?\]}', r'[\1](\1)', text) # Video (transform to classic links, since we can't integrate them)
+
+    text = re.sub(r'###(\d*?)###', r'[[[\1]]]', text) # Progress bar
+
+    text = re.sub(r'(\n +[^* -][^\n]*(\n +[^* -][^\n]*)*)', r'```\1\n```', text, flags=re.DOTALL) # Block code without lists
+
+    text = re.sub(r'( +)-(.*)', r'1.\2', text) # Ordered lists
+
+    new_text = []
+    quote_level = 0
+    for line in text.splitlines(): # Tables and quotes
+        enter = re.finditer(r'\[quote(=(.+?))?\]', line)
+        quit = re.finditer(r'\[/quote\]', line)
+        if re.search(r'\A\s*\^(([^\^]*?)\^)*', line): # Table part
+            line = line.replace('^', '|')
+            new_text.append("> " * quote_level + line)
+            new_text.append("> " * quote_level + "|---|") # Don't keep the text alignement in tables it's really too complex for what it's worth
+        elif enter or quit: # Quote part
+            for quote in enter: # Enter quotes (support multiple at a time)
+                quote_level += 1
+                try:
+                    new_text.append("> " * quote_level + "##### " + quote.group(2))
+                    line = line.replace(quote.group(0), '')
+                except:
+                    new_text.append("> " * quote_level)
+            final_quote_level = quote_level # Store quote_level to use at the end, since it will be modified during quit iteration
+            for quote in quit: # Quit quotes (support multiple at a time)
+                line = line.replace(quote.group(0), '')
+                quote_level -= 1
+            new_text.append("> " * final_quote_level + line) # Finally append the line
+        else:
+            new_text.append(line)
+
+    return "\n".join(new_text)
+

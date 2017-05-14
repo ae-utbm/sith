@@ -28,7 +28,7 @@ from django.http import JsonResponse
 from django.core import serializers
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 
 import os
 import json
@@ -37,6 +37,7 @@ from itertools import chain
 from haystack.query import SearchQuerySet
 
 from core.models import User, Notification
+from core.utils import doku_to_markdown
 from club.models import Club
 
 def index(request, context=None):
@@ -96,4 +97,23 @@ def search_json(request):
             'clubs': search_club(request.GET.get('query', ''), True),
             }
     return JsonResponse(result)
+
+class DokuToMarkdownView(TemplateView):
+    template_name = "core/doku_to_markdown.jinja"
+
+    def post(self, request, *args, **kwargs):
+        self.text = request.POST['text']
+        self.text_md = doku_to_markdown(self.text)
+        context = self.get_context_data(**kwargs)
+        return self.render_to_response(context)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(DokuToMarkdownView, self).get_context_data(**kwargs)
+        try:
+            kwargs['text'] = self.text
+            kwargs['text_md'] = self.text_md
+        except:
+            kwargs['text'] = ""
+            kwargs['text_md'] = ""
+        return kwargs
 

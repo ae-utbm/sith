@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-13 18:31+0200\n"
+"POT-Creation-Date: 2017-05-14 03:16+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1973,6 +1973,22 @@ msgstr "Confirmation"
 msgid "Cancel"
 msgstr "Annuler"
 
+#: core/templates/core/doku_to_markdown.jinja:4
+msgid "Doku to Markdown"
+msgstr "Doku vers Markdown"
+
+#: core/templates/core/doku_to_markdown.jinja:13
+msgid "Convert"
+msgstr "Convertir"
+
+#: core/templates/core/doku_to_markdown.jinja:16
+msgid "Markdown"
+msgstr "Markdown"
+
+#: core/templates/core/doku_to_markdown.jinja:20
+msgid "Render"
+msgstr "Rendu"
+
 #: core/templates/core/edit.jinja:5 core/templates/core/edit.jinja.py:13
 #: core/templates/core/file_edit.jinja:4
 #: counter/templates/counter/cash_register_summary.jinja:4
@@ -2678,6 +2694,10 @@ msgid "Other tools"
 msgstr "Autres outils"
 
 #: core/templates/core/user_tools.jinja:111
+msgid "Convert dokuwiki syntax to Markdown"
+msgstr "Convertir de la syntaxe dokuwiki vers Markdown"
+
+#: core/templates/core/user_tools.jinja:112
 msgid "Trombi tools"
 msgstr "Outils Trombi"
 

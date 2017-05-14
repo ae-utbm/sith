@@ -28,6 +28,7 @@ from core.views import *
 
 urlpatterns = [
     url(r'^$', index, name='index'),
+    url(r'^doku_to_markdown$', DokuToMarkdownView.as_view(), name='doku_to_markdown'),
     url(r'^notifications$', NotificationList.as_view(), name='notification_list'),
     url(r'^notification/(?P<notif_id>[0-9]+)$', notification, name='notification'),
 
