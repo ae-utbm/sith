@@ -473,6 +473,11 @@ Welcome to the wiki page!
                     start=s.subscription_start)
             s.save()
 
+            # Add barman to counter
+            c = Counter.objects.get(id=2)
+            c.sellers.add(User.objects.get(pk=krophil.pk))
+            c.save()
+
             # Create an election
             public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
             subscriber_group = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)

@@ -22,6 +22,7 @@
 #
 #
 
+<<<<<<< 52a643878a10b52d9d7a17cd6c2854112c0a65d0
 import re
 from pprint import pprint
 
@@ -74,3 +75,48 @@ class CounterTest(TestCase):
         # TODO finir le test en vérifiant que les produits ont bien été clickés
         # hint: pprint(response.__dict__)
 
+
+class BarmanConnectionTest(TestCase):
+    def setUp(self):
+        call_command("populate")
+        self.krophil = User.objects.get(username="krophil")
+        self.skia = User.objects.get(username="skia")
+        self.skia.customer.account = 800
+        self.krophil.customer.save()
+        self.skia.customer.save()
+
+        self.counter = Counter.objects.filter(id = 2).first()
+
+    def test_barman_granted(self):
+        response_post = self.client.post(reverse('counter:login', args=[self.counter.id]),
+                                        {'username': "krophil",
+                                        'password' : "plop"})
+        response_get = self.client.get(reverse("counter:details",
+                                                args=[self.counter.id]))
+
+        self.assertTrue('<p>Enter client code:</p>' in str(response_get.content))
+
+    def test_counters_list_barmen(self):
+        response_post = self.client.post(reverse('counter:login', args=[self.counter.id]),
+                                        {'username': "krophil",
+                                        'password' : "plop"})
+        response_get = self.client.get(reverse("counter:activity",
+                                                args=[self.counter.id]))
+        
+        self.assertTrue('<li><a href="/user/10/">Kro Phil&#39;</a></li>' in str(response_get.content))
+    
+    def test_barman_denied(self):
+        response_post = self.client.post(reverse('counter:login', args=[self.counter.id]),
+                                        {'username': "skia",
+                                        'password' : "plop"})
+        response_get = self.client.get(reverse("counter:details", args=[self.counter.id]))
+        
+        self.assertTrue('<p>Please, login</p>' in str(response_get.content))
+
+    def test_counters_list_no_barmen(self):
+        response_post = self.client.post(reverse('counter:login', args=[self.counter.id]),
+                                        {'username': "krophil",
+                                        'password' : "plop"})
+        response_get = self.client.get(reverse("counter:activity", args=[self.counter.id]))
+        
+        self.assertFalse('<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response_get.content))
