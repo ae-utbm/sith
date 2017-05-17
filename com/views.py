@@ -351,7 +351,7 @@ class WeekmailArticleEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, U
     quick_notif_url_arg = "qn_weekmail_article_edit"
     current_tab = "weekmail"
 
-class WeekmailArticleCreateView(QuickNotifMixin, CanViewMixin, CreateView): #XXX need to protect this view
+class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
     """Post an article"""
     model = WeekmailArticle
     fields = ['title', 'club', 'content']
@@ -366,9 +366,22 @@ class WeekmailArticleCreateView(QuickNotifMixin, CanViewMixin, CreateView): #XXX
         except: pass
         return init
 
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        self.object = form.instance
+        form.is_valid() # Valid a first time to populate club field
+        try:
+            m = form.instance.club.get_membership_for(request.user)
+            if m.role <= settings.SITH_MAXIMUM_FREE_ROLE:
+                raise
+        except:
+            form.add_error('club', ValidationError(_("You must be a board member of the selected club to post in the Weekmail.")))
+        if form.is_valid() and not 'preview' in request.POST.keys():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
     def form_valid(self, form):
-        # club = get_object_or_404(Club, id=self.kwargs['club_id'])
-        # form.instance.club = club
         form.instance.author = self.request.user
         return super(WeekmailArticleCreateView, self).form_valid(form)
 
