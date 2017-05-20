@@ -45,12 +45,14 @@ from django.core.files import File
 
 
 from core.models import User, SithFile
+from core.utils import doku_to_markdown
 from club.models import Club, Membership
 from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType, Permanency, Eticket
 from subscription.models import Subscription
 from eboutic.models import Invoice, InvoiceItem
 from accounting.models import BankAccount, ClubAccount, GeneralJournal, Operation, AccountingType, Company, SimplifiedAccountingType, Label
 from sas.models import Album, Picture, PeoplePictureRelation
+from forum.models import Forum, ForumTopic, ForumMessage, ForumMessageMeta, ForumUserInfo
 
 db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
 start = datetime.datetime.now()
@@ -1181,6 +1183,152 @@ def reset_sas_moderators():
         except Exception as e:
             print(repr(e))
 
+def migrate_forum():
+    print("Migrating forum")
+    def migrate_forums():
+        cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+        print("  Cleaning up forums")
+        Forum.objects.all().delete()
+        cur.execute("""
+        SELECT *
+        FROM frm_forum
+        WHERE id_forum <> 1
+        """)
+        print("  Migrating forums")
+        for r in cur:
+            try:
+                # parent = Forum.objects.filter(id=r['id_forum_parent']).first()
+                club = Club.objects.filter(id=r['id_asso']).first()
+                ae = Club.objects.filter(id=settings.SITH_MAIN_CLUB_ID).first()
+                forum = Forum(
+                    id=r['id_forum'],
+                    name=to_unicode(r['titre_forum']),
+                    description=to_unicode(r['description_forum'])[:511],
+                    is_category=bool(r['categorie_forum']),
+                    # parent=parent,
+                    owner_club=club or ae,
+                    number=r['ordre_forum'],
+                    )
+                forum.save()
+            except Exception as e:
+                print("  FAIL to migrate forum: %s" % (repr(e)))
+        cur.execute("""
+        SELECT *
+        FROM frm_forum
+        WHERE id_forum_parent <> 1
+        """)
+        for r in cur:
+            parent = Forum.objects.filter(id=r['id_forum_parent']).first()
+            forum = Forum.objects.filter(id=r['id_forum']).first()
+            forum.parent = parent
+            forum.save()
+        cur.close()
+        print("  Forums migrated at %s" % datetime.datetime.now())
+        print("  Running time: %s" % (datetime.datetime.now()-start))
+
+    def migrate_topics():
+        cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+        print("  Cleaning up topics")
+        ForumTopic.objects.all().delete()
+        cur.execute("""
+        SELECT *
+        FROM frm_sujet
+        """)
+        print("  Migrating topics")
+        for r in cur:
+            try:
+                parent = Forum.objects.filter(id=r['id_forum']).first()
+                saloon = Forum.objects.filter(id=3).first()
+                author = User.objects.filter(id=r['id_utilisateur']).first()
+                root = User.objects.filter(id=0).first()
+                topic = ForumTopic(
+                    id=r['id_sujet'],
+                    author=author or root,
+                    forum=parent or saloon,
+                    _title=to_unicode(r['titre_sujet']),
+                    description=to_unicode(r['soustitre_sujet']),
+                    )
+                topic.save()
+            except Exception as e:
+                print("  FAIL to migrate topic: %s" % (repr(e)))
+        cur.close()
+        print("  Topics migrated at %s" % datetime.datetime.now())
+        print("  Running time: %s" % (datetime.datetime.now()-start))
+
+    def migrate_messages():
+        cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+        print("  Cleaning up messages")
+        ForumMessage.objects.all().delete()
+        cur.execute("""
+        SELECT *
+        FROM frm_message
+        """)
+        print("  Migrating messages")
+        for r in cur:
+            try:
+                topic = ForumTopic.objects.filter(id=r['id_sujet']).first()
+                author = User.objects.filter(id=r['id_utilisateur']).first()
+                root = User.objects.filter(id=0).first()
+                msg = ForumMessage(
+                    id=r['id_message'],
+                    topic=topic,
+                    author=author or root,
+                    title=to_unicode(r['titre_message'])[:63],
+                    date=r['date_message'].replace(tzinfo=timezone('Europe/Paris')),
+                    )
+                if r['syntaxengine_message'] == "doku":
+                    msg.message = doku_to_markdown(to_unicode(r['contenu_message']))
+                else:
+                    msg.message = to_unicode(r['contenu_message'])
+                msg.save()
+            except Exception as e:
+                print("  FAIL to migrate message: %s" % (repr(e)))
+        cur.close()
+        print("  Messages migrated at %s" % datetime.datetime.now())
+        print("  Running time: %s" % (datetime.datetime.now()-start))
+
+    def migrate_message_infos():
+        cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+        print("  Cleaning up message meta")
+        ForumMessageMeta.objects.all().delete()
+        cur.execute("""
+        SELECT *
+        FROM frm_modere_info
+        """)
+        print("  Migrating message meta")
+        ACTIONS = {
+                "EDIT": "EDIT",
+                "AUTOEDIT": "EDIT",
+                "UNDELETE": "UNDELETE",
+                "DELETE": "DELETE",
+                "DELETEFIRST": "DELETE",
+                "AUTODELETE": "DELETE",
+                }
+        for r in cur:
+            try:
+                msg = ForumMessage.objects.filter(id=r['id_message']).first()
+                author = User.objects.filter(id=r['id_utilisateur']).first()
+                root = User.objects.filter(id=0).first()
+                meta = ForumMessageMeta(
+                    message=msg,
+                    user=author or root,
+                    date=r['modere_date'].replace(tzinfo=timezone('Europe/Paris')),
+                    action=ACTIONS[r['modere_action']],
+                    )
+                meta.save()
+            except Exception as e:
+                print("  FAIL to migrate message meta: %s" % (repr(e)))
+        cur.close()
+        print("  Messages meta migrated at %s" % datetime.datetime.now())
+        print("  Running time: %s" % (datetime.datetime.now()-start))
+
+    migrate_forums()
+    migrate_topics()
+    migrate_messages()
+    migrate_message_infos()
+    print("Forum migrated at %s" % datetime.datetime.now())
+    print("Running time: %s" % (datetime.datetime.now()-start))
+
 def main():
     print("Start at %s" % start)
     # Core
@@ -1199,7 +1347,9 @@ def main():
     # reset_index('core', 'club', 'subscription', 'accounting', 'eboutic', 'launderette', 'counter')
     # migrate_sas()
     # reset_index('core', 'sas')
-    reset_sas_moderators()
+    # reset_sas_moderators()
+    migrate_forum()
+    reset_index('forum')
     end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end-start))
