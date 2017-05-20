@@ -46,8 +46,9 @@ class Forum(models.Model):
     edit_groups allows to put any group as a forum admin
     view_groups allows some groups to view a forum
     """
+    id = models.AutoField(primary_key=True, db_index=True)
     name = models.CharField(_('name'), max_length=64)
-    description = models.CharField(_('description'), max_length=256, default="")
+    description = models.CharField(_('description'), max_length=512, default="")
     is_category = models.BooleanField(_('is a category'), default=False)
     parent = models.ForeignKey('Forum', related_name='children', null=True, blank=True)
     owner_club = models.ForeignKey(Club, related_name="owned_forums", verbose_name=_("owner club"),
@@ -57,6 +58,8 @@ class Forum(models.Model):
     view_groups = models.ManyToManyField(Group, related_name="viewable_forums", blank=True,
             default=[settings.SITH_GROUP_PUBLIC_ID])
     number = models.IntegerField(_("number to choose a specific forum ordering"), default=1)
+    _last_message = models.ForeignKey('ForumMessage', related_name="forums_where_its_last", verbose_name=_("the last message"), null=True)
+    _topic_number = models.IntegerField(_("number of topics"), default=0)
 
     class Meta:
         ordering = ['number']
@@ -72,6 +75,28 @@ class Forum(models.Model):
         if copy_rights:
             self.copy_rights()
 
+    def set_topic_number(self):
+        self._topic_number = self.get_topic_number()
+        self.save()
+        if self.parent:
+            self.parent.set_topic_number()
+
+    def set_last_message(self):
+        topic = ForumTopic.objects.filter(forum__id=self.id).exclude(_last_message=None).order_by('-_last_message__id').first()
+        forum = Forum.objects.filter(parent__id=self.id).exclude(_last_message=None).order_by('-_last_message__id').first()
+        if topic and forum:
+            if topic._last_message_id < forum._last_message_id:
+                self._last_message_id = forum._last_message_id
+            else:
+                self._last_message_id = topic._last_message_id
+        elif topic:
+            self._last_message_id = topic._last_message_id
+        elif forum:
+            self._last_message_id = forum._last_message_id
+        self.save()
+        if self.parent:
+            self.parent.set_last_message()
+
     def apply_rights_recursively(self):
         children = self.children.all()
         for c in children:
@@ -86,10 +111,19 @@ class Forum(models.Model):
             self.view_groups = self.parent.view_groups.all()
             self.save()
 
+    _club_memberships = {} # This cache is particularly efficient:
+                           # divided by 3 the number of requests on the main forum page
+                           # after the first load
     def is_owned_by(self, user):
         if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID):
             return True
-        m = self.owner_club.get_membership_for(user)
+        try: m = Forum._club_memberships[self.id][user.id]
+        except:
+            m = self.owner_club.get_membership_for(user)
+            try: Forum._club_memberships[self.id][user.id] = m
+            except:
+                Forum._club_memberships[self.id] = {}
+                Forum._club_memberships[self.id][user.id] = m
         if m:
             return m.role > settings.SITH_MAXIMUM_FREE_ROLE
         return False
@@ -122,9 +156,9 @@ class Forum(models.Model):
             p = p.parent
         return l
 
-    @cached_property
+    @property
     def topic_number(self):
-        return self.get_topic_number()
+        return self._topic_number
 
     def get_topic_number(self):
         number = self.topics.all().count()
@@ -134,31 +168,29 @@ class Forum(models.Model):
 
     @cached_property
     def last_message(self):
-        return self.get_last_message()
+        return self._last_message
 
-    forum_list = {} # Class variable used for cache purpose
-    def get_last_message(self):
-        last_msg = None
-        for m in ForumMessage.objects.select_related('topic__forum').order_by('-id'):
-            if m.topic.forum.id in Forum.forum_list.keys(): # The object is already in Python's memory,
-                                                            # so there's no need to query it again
-                forum = Forum.forum_list[m.topic.forum.id]
-            else: # Query the forum object and store it in the class variable for further use.
-                  # Keeping the same object allows the @cached_property to work properly.
-# This trick divided by 4 the number of DB queries in the main forum page, and about the same on many other forum pages.
-# This also divided by 4 the amount of CPU usage for thoses pages, according to Django Debug Toolbar.
-                forum = m.topic.forum
-                Forum.forum_list[forum.id] = forum
-            if self in (forum.parent_list + [forum]) and not m.deleted:
-                return m
+    def get_children_list(self):
+        l = [self.id]
+        for c in self.children.all():
+            l.append(c.id)
+            l += c.get_children_list()
+        return l
 
 class ForumTopic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics')
     author = models.ForeignKey(User, related_name='forum_topics')
     description = models.CharField(_('description'), max_length=256, default="")
+    _last_message = models.ForeignKey('ForumMessage', related_name="+", verbose_name=_("the last message"), null=True)
+    _title = models.CharField(_('title'), max_length=64, blank=True)
 
     class Meta:
-        ordering = ['-id'] # TODO: add date message ordering
+        ordering = ['-_last_message__date']
+
+    def save(self, *args, **kwargs):
+        super(ForumTopic, self).save(*args, **kwargs)
+        self.forum.set_topic_number() # Recompute the cached value
+        self.forum.set_last_message()
 
     def is_owned_by(self, user):
         return self.forum.is_owned_by(user)
@@ -184,13 +216,16 @@ class ForumTopic(models.Model):
 
     @cached_property
     def last_message(self):
-        for msg in self.messages.order_by('id').select_related('author').order_by('-id').all():
-            if not msg.deleted:
-                return msg
+        return self._last_message
 
-    @property
+    @cached_property
     def title(self):
-        return self.messages.order_by('date').first().title
+        if self._title:
+            return self._title
+        else:
+            self._title = self.messages.order_by('id').first().title
+            self.save()
+            return self._title
 
 class ForumMessage(models.Model):
     """
@@ -202,12 +237,29 @@ class ForumMessage(models.Model):
     message = models.TextField(_("message"), default="")
     date = models.DateTimeField(_('date'), default=timezone.now)
     readers = models.ManyToManyField(User, related_name="read_messages", verbose_name=_("readers"))
+    _deleted = models.BooleanField(_('is deleted'), default=False)
 
     class Meta:
-        ordering = ['id']
+        ordering = ['-date']
 
     def __str__(self):
-        return "%s - %s" % (self.id, self.title)
+        return "%s (%s) - %s" % (self.id, self.author, self.title)
+
+    def save(self, *args, **kwargs):
+        self._deleted = self.is_deleted() # Recompute the cached value
+        super(ForumMessage, self).save(*args, **kwargs)
+        if self.is_last_in_topic():
+            self.topic._last_message_id = self.id
+            self.topic.save()
+        if self.is_first_in_topic():
+            self.topic._title = self.title
+            self.topic.save()
+
+    def is_first_in_topic(self):
+        return bool(self.id == self.topic.messages.order_by('date').first().id)
+
+    def is_last_in_topic(self):
+        return bool(self.id == self.topic.messages.order_by('date').last().id)
 
     def is_owned_by(self, user): # Anyone can create a topic: it's better to
                                  # check the rights at the forum level, since it's more controlled
@@ -217,12 +269,15 @@ class ForumMessage(models.Model):
         return user.can_edit(self.topic.forum)
 
     def can_be_viewed_by(self, user):
-        return (not self.deleted and user.can_view(self.topic))
+        return not self._deleted # No need to check the real rights since it's already done by the Topic view
 
     def can_be_moderated_by(self, user):
         return self.topic.forum.is_owned_by(user) or user.id == self.author.id
 
     def get_absolute_url(self):
+        return reverse('forum:view_message', kwargs={'message_id': self.id})
+
+    def get_url(self):
         return self.topic.get_absolute_url() + "?page=" + str(self.get_page()) + "#msg_" + str(self.id)
 
     def get_page(self):
@@ -235,10 +290,6 @@ class ForumMessage(models.Model):
 
     def is_read(self, user):
         return (self.date < user.forum_infos.last_read_date) or (user in self.readers.all())
-
-    @cached_property
-    def deleted(self):
-        return self.is_deleted()
 
     def is_deleted(self):
         meta = self.metas.exclude(action="EDIT").order_by('-date').first()
@@ -258,13 +309,22 @@ class ForumMessageMeta(models.Model):
     date = models.DateTimeField(_('date'), default=timezone.now)
     action = models.CharField(_("action"), choices=MESSAGE_META_ACTIONS, max_length=16)
 
+    def save(self, *args, **kwargs):
+        super(ForumMessageMeta, self).save(*args, **kwargs)
+        self.message._deleted = self.message.is_deleted()
+        self.message.save()
+
+
 class ForumUserInfo(models.Model):
     """
     This currently stores only the last date a user clicked "Mark all as read".
     However, this can be extended with lot of user preferences dedicated to a
     user, such as the favourite topics, the signature, and so on...
     """
-    user = models.OneToOneField(User, related_name="_forum_infos") # TODO: see to move that to the User class in order to reduce the number of db queries
+    user = models.OneToOneField(User, related_name="_forum_infos")
     last_read_date = models.DateTimeField(_('last read date'), default=datetime(year=settings.SITH_SCHOOL_START_YEAR,
         month=1, day=1, tzinfo=pytz.UTC))
+
+    def __str__(self):
+        return str(self.user)
 
