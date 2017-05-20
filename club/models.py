@@ -39,6 +39,7 @@ class Club(models.Model):
     """
     The Club class, made as a tree to allow nice tidy organization
     """
+    id = models.AutoField(primary_key=True, db_index=True)
     name = models.CharField(_('name'), max_length=64)
     parent = models.ForeignKey('Club', related_name='children', null=True, blank=True)
     unix_name = models.CharField(_('unix name'), max_length=30, unique=True,
@@ -151,11 +152,21 @@ class Club(models.Model):
             return False
         return sub.is_subscribed
 
+    _memberships = {}
     def get_membership_for(self, user):
         """
         Returns the current membership the given user
         """
-        return self.members.filter(user=user.id).filter(end_date=None).first()
+        try:
+            return Club._memberships[self.id][user.id]
+        except:
+            m = self.members.filter(user=user.id).filter(end_date=None).first()
+            try:
+                Club._memberships[self.id][user.id] = m
+            except:
+                Club._memberships[self.id] = {}
+                Club._memberships[self.id][user.id] = m
+            return m
 
 class Membership(models.Model):
     """
