@@ -223,14 +223,25 @@ class User(AbstractBaseUser):
         s = self.subscriptions.last()
         return s.is_valid_now() if s is not None else False
 
+    _club_memberships = {}
+    _group_names = {}
+    _group_ids = {}
     def is_in_group(self, group_name):
         """If the user is in the group passed in argument (as string or by id)"""
         group_id = 0
         g = None
         if isinstance(group_name, int): # Handle the case where group_name is an ID
-            g = Group.objects.filter(id=group_name).first()
+            if group_name in User._group_ids.keys():
+                g = User._group_ids[group_name]
+            else:
+                g = Group.objects.filter(id=group_name).first()
+                User._group_ids[group_name] = g
         else:
-            g = Group.objects.filter(name=group_name).first()
+            if group_name in User._group_names.keys():
+                g = User._group_names[group_name]
+            else:
+                g = Group.objects.filter(name=group_name).first()
+                User._group_names[group_name] = g
         if g:
             group_name = g.name
             group_id = g.id
@@ -245,18 +256,26 @@ class User(AbstractBaseUser):
         if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked
             return self.is_subscribed
         if group_name[-len(settings.SITH_BOARD_SUFFIX):] == settings.SITH_BOARD_SUFFIX:
-            from club.models import Club
             name = group_name[:-len(settings.SITH_BOARD_SUFFIX)]
-            c = Club.objects.filter(unix_name=name).first()
-            mem = c.get_membership_for(self)
+            if name in User._club_memberships.keys():
+                mem = User._club_memberships[name]
+            else:
+                from club.models import Club
+                c = Club.objects.filter(unix_name=name).first()
+                mem = c.get_membership_for(self)
+                User._club_memberships[name] = mem
             if mem:
                 return mem.role > settings.SITH_MAXIMUM_FREE_ROLE
             return False
         if group_name[-len(settings.SITH_MEMBER_SUFFIX):] == settings.SITH_MEMBER_SUFFIX:
-            from club.models import Club
             name = group_name[:-len(settings.SITH_MEMBER_SUFFIX)]
-            c = Club.objects.filter(unix_name=name).first()
-            mem = c.get_membership_for(self)
+            if name in User._club_memberships.keys():
+                mem = User._club_memberships[name]
+            else:
+                from club.models import Club
+                c = Club.objects.filter(unix_name=name).first()
+                mem = c.get_membership_for(self)
+                User._club_memberships[name] = mem
             if mem:
                 return True
             return False
