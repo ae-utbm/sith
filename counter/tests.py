@@ -22,6 +22,55 @@
 #
 #
 
-from django.test import TestCase
+import re
+from pprint import pprint
 
-# Create your tests here.
+from django.test import TestCase
+from django.core.urlresolvers import reverse
+from django.core.management import call_command
+
+from core.models import User
+from counter.models import Counter
+
+
+class CounterTest(TestCase):
+    def setUp(self):
+        call_command("populate")
+        self.skia = User.objects.filter(username="skia").first()
+        self.mde = Counter.objects.filter(name="MDE").first()
+
+    def test_full_click(self):
+        response = self.client.post(reverse("counter:login", kwargs={"counter_id":self.mde.id}), {
+            "username": self.skia.username,
+            "password": "plop"
+        })
+        response = self.client.get(reverse("counter:details", kwargs={"counter_id":self.mde.id}))
+        # TODO check that barman is logged:
+        # self.assertTrue(mon barman est bien dans le HTML de response.content)
+        counter_token = re.search(r'name="counter_token" value="([^"]*)"', str(response.content)).group(1)
+
+        response = self.client.post(reverse("counter:details",
+            kwargs={"counter_id":self.mde.id}), {
+                "code": "4000k",
+                "counter_token": counter_token,
+                })
+        location = response.get('location')
+        # TODO check qu'on a bien eu la bonne page, avec le bon client, etc...
+        # response = self.client.get(response.get('location'))
+        response = self.client.post(location, {
+            'action': 'refill',
+            'amount': '10',
+            'payment_method': 'CASH',
+            'bank': 'OTHER',
+            })
+        response = self.client.post(location, {
+            'action': 'code',
+            'code': 'BARB',
+            })
+        response = self.client.post(location, {
+            'action': 'code',
+            'code': 'fin',
+            })
+        # TODO finir le test en vérifiant que les produits ont bien été clickés
+        # hint: pprint(response.__dict__)
+

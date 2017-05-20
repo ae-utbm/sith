@@ -333,7 +333,7 @@ Welcome to the wiki page!
 
             # Counters
             Customer(user=skia, account_id="6568j", amount=0).save()
-            Customer(user=r, account_id="4000", amount=0).save()
+            Customer(user=r, account_id="4000k", amount=0).save()
             p = ProductType(name="Bières bouteilles")
             p.save()
             c = ProductType(name="Cotisations")
@@ -362,6 +362,7 @@ Welcome to the wiki page!
             mde = Counter.objects.filter(name="MDE").first()
             mde.products.add(barb)
             mde.products.add(cble)
+            mde.sellers.add(skia)
             mde.save()
 
             eboutic = Counter.objects.filter(name="Eboutic").first()
