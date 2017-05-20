@@ -35,6 +35,7 @@
     > <a href="{{ topic.get_absolute_url() }}">{{ topic }}</a>
     </p>
     <h3>{{ topic.title }}</h3>
+<div id="forum">
     <p>{{ topic.description }}</p>
     <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
 
@@ -62,6 +63,7 @@
         <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
     {% endfor %}
     </p>
+</div>
 {% endblock %}
 
 

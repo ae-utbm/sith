@@ -15,9 +15,17 @@
         <a class="ib" href="{{ url('forum:mark_all_as_read') }}">{% trans %}Mark all as read{% endtrans %}</a>
         <a class="ib" href="{{ url('forum:last_unread') }}">{% trans %}Refresh{% endtrans %}</a>
     </p>
-    {% for t in forumtopic_list %}
+    {% for t in page_obj.object_list %}
     {{ display_topic(t, user, True) }}
     {% endfor %}
+
+    <p style="text-align: right; background: #d8e7f3;">
+    {% for p in paginator.page_range %}
+        <span class="ib" style="background: {% if p == paginator.number %}white{% endif %}; margin: 0;">
+            <a href="?page={{ p }}">{{ p }}</a>
+        </span>
+    {% endfor %}
+    </p>
 {% endblock %}
 
 

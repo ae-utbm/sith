@@ -7,9 +7,10 @@
 {% endblock %}
 
 {% block content %}
-    <p>
-    <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a> >
-    </p>
+<p>
+<a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a> >
+</p>
+<div id="forum">
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <p>
         <a class="ib" href="{{ url('forum:last_unread') }}">{% trans %}View last unread messages{% endtrans %}</a>
@@ -19,14 +20,28 @@
         <a href="{{ url('forum:new_forum') }}">{% trans %}New forum{% endtrans %}</a>
     </p>
     {% endif %}
+    <div>
+        <div class="ib w_big">
+            {% trans %}Title{% endtrans %}
+        </div>
+        <div class="ib w_small">
+            <div class="ib w_medium">
+                {% trans %}Topics{% endtrans %}
+            </div>
+            <div class="ib w_small">
+                {% trans %}Last message{% endtrans %}
+            </div>
+        </div>
+    </div>
     {% for f in forum_list %}
-    <div style="padding: 4px; margin: 4px">
-    {{ display_forum(f, user) }}
+    <div>
+    {{ display_forum(f, user, True) }}
         {% for c in f.children.all() %}
         {{ display_forum(c, user) }}
         {% endfor %}
     </div>
     {% endfor %}
+</div>
 {% endblock %}
 
 

@@ -6,13 +6,14 @@
 {% endblock %}
 
 {% block content %}
-    <div>
+<div>
     <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
     {% for f in forum.get_parent_list()|reverse %}
     > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
     {% endfor %}
     > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
-    </div>
+</div>
+<div id="forum">
     <h3>{{ forum.name }}</h3>
     <p>
     {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
@@ -34,6 +35,7 @@
             </div>
         </div>
     </div>
+    {{ display_forum(forum, user, True) }}
     {% for f in forum.children.all() %}
     {{ display_forum(f, user) }}
     {% endfor %}
@@ -58,7 +60,13 @@
     {% for t in topics %}
     {{ display_topic(t, user) }}
     {% endfor %}
+    <p style="text-align: right; background: #d8e7f3;">
+    {% for p in topics.paginator.page_range %}
+        <span class="ib" style="background: {% if p == topics.number %}white{% endif %}; margin: 0;"><a href="?topic_page={{ p }}">{{ p }}</a></span>
+    {% endfor %}
+    </p>
     {% endif %}
+</div>
 {% endblock %}
 
 

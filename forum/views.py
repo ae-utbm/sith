@@ -59,6 +59,7 @@ class ForumMarkAllAsRead(RedirectView):
 class ForumLastUnread(ListView):
     model = ForumTopic
     template_name = "forum/last_unread.jinja"
+    paginate_by = settings.SITH_FORUM_PAGE_LENGTH / 2
 
     def get_queryset(self):
         l = ForumMessage.objects.exclude(readers=self.request.user).filter(
@@ -117,7 +118,16 @@ class ForumDetailView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(ForumDetailView, self).get_context_data(**kwargs)
-        kwargs['topics'] = self.object.topics.annotate(models.Max('messages__date')).order_by('-messages__date__max')
+        qs = self.object.topics.order_by('-_last_message__date').select_related('_last_message')
+        paginator = Paginator(qs,
+                settings.SITH_FORUM_PAGE_LENGTH)
+        page = self.request.GET.get('topic_page')
+        try:
+            kwargs["topics"] = paginator.page(page)
+        except PageNotAnInteger:
+            kwargs["topics"] = paginator.page(1)
+        except EmptyPage:
+            kwargs["topics"] = paginator.page(paginator.num_pages)
         return kwargs
 
 class TopicForm(forms.ModelForm):
@@ -164,7 +174,7 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
             kwargs['first_unread_message_id'] = msg.id
         except:
             kwargs['first_unread_message_id'] = float("inf")
-        paginator = Paginator(self.object.messages.select_related('author__avatar_pict').all(),
+        paginator = Paginator(self.object.messages.select_related('author__avatar_pict').order_by('date'),
                 settings.SITH_FORUM_PAGE_LENGTH)
         page = self.request.GET.get('page')
         try:
