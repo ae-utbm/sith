@@ -45,7 +45,7 @@ from django.core.files import File
 
 
 from core.models import User, SithFile
-from core.utils import doku_to_markdown
+from core.utils import doku_to_markdown, bbcode_to_markdown
 from club.models import Club, Membership
 from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType, Permanency, Eticket
 from subscription.models import Subscription
@@ -1279,7 +1279,7 @@ def migrate_forum():
                 if r['syntaxengine_message'] == "doku":
                     msg.message = doku_to_markdown(to_unicode(r['contenu_message']))
                 else:
-                    msg.message = to_unicode(r['contenu_message'])
+                    msg.message = bbcode_to_markdown(to_unicode(r['contenu_message']))
                 msg.save()
             except Exception as e:
                 print("  FAIL to migrate message: %s" % (repr(e)))
