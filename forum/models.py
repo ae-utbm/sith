@@ -246,7 +246,7 @@ class ForumMessage(models.Model):
         super(ForumMessage, self).save(*args, **kwargs)
         if self.is_last_in_topic():
             self.topic._last_message_id = self.id
-        if self.is_first_in_topic():
+        if self.is_first_in_topic() and self.title:
             self.topic._title = self.title
         self.topic._message_number = self.topic.messages.count()
         self.topic.save()

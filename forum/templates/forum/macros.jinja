@@ -54,7 +54,7 @@
         {% else %}
         <a class="ib w_big" href="{{ url('forum:view_topic', topic_id=topic.id) }}">
         {% endif %}
-            <div class="title">{{ topic.title }}</div>
+            <div class="title">{{ topic.title or topic.messages.first().title }}</div>
             <p>{{ topic.description }}</p>
         </a>
         {% if user.can_edit(topic) %}
