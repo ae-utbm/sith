@@ -67,7 +67,8 @@ class ForumLastUnread(ListView):
         topic_list = self.model.objects.filter(_last_message__date__gt=self.request.user.forum_infos.last_read_date)\
                 .exclude(_last_message__readers=self.request.user)\
                 .order_by('-_last_message__date')\
-                .select_related('_last_message__author__avatar_pict')
+                .select_related('_last_message__author', 'author')\
+                .prefetch_related('forum__edit_groups')
         return topic_list
 
 class ForumForm(forms.ModelForm):
@@ -122,7 +123,8 @@ class ForumDetailView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(ForumDetailView, self).get_context_data(**kwargs)
-        qs = self.object.topics.order_by('-_last_message__date').select_related('_last_message__author', 'author')\
+        qs = self.object.topics.order_by('-_last_message__date')\
+                .select_related('_last_message__author', 'author')\
                 .prefetch_related("forum__edit_groups")
         paginator = Paginator(qs,
                 settings.SITH_FORUM_PAGE_LENGTH)

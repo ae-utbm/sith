@@ -6,9 +6,10 @@
 {% endblock %}
 
 {% block content %}
-    <p>
+<p>
     <a href="{{ url('forum:main') }}">Forum</a> >
-    </p>
+</p>
+<div id="forum">
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <h4>{% trans %}Last unread messages{% endtrans %}</h4>
     <p>
@@ -26,6 +27,7 @@
         </span>
     {% endfor %}
     </p>
+</div>
 {% endblock %}
 
 
