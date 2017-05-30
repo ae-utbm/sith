@@ -117,14 +117,17 @@ def doku_to_markdown(text):
                 quote_level += 1
                 try:
                     new_text.append("> " * quote_level + "##### " + quote.group(2))
-                    line = line.replace(quote.group(0), '')
                 except:
                     new_text.append("> " * quote_level)
+                line = line.replace(quote.group(0), '')
             final_quote_level = quote_level # Store quote_level to use at the end, since it will be modified during quit iteration
+            final_newline = False
             for quote in quit: # Quit quotes (support multiple at a time)
                 line = line.replace(quote.group(0), '')
                 quote_level -= 1
+                final_newline = True
             new_text.append("> " * final_quote_level + line) # Finally append the line
+            if final_newline: new_text.append("\n") # Add a new line to ensure the separation between the quote and the following text
         else:
             new_text.append(line)
 
