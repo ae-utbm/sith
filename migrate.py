@@ -1245,7 +1245,7 @@ def migrate_forum():
                     id=r['id_sujet'],
                     author=author or root,
                     forum=parent or saloon,
-                    _title=to_unicode(r['titre_sujet']),
+                    _title=to_unicode(r['titre_sujet'])[:64],
                     description=to_unicode(r['soustitre_sujet']),
                     )
                 topic.save()

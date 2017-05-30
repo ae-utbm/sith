@@ -183,6 +183,7 @@ class ForumTopic(models.Model):
     description = models.CharField(_('description'), max_length=256, default="")
     _last_message = models.ForeignKey('ForumMessage', related_name="+", verbose_name=_("the last message"), null=True)
     _title = models.CharField(_('title'), max_length=64, blank=True)
+    _message_number = models.IntegerField(_("number of messages"), default=0)
 
     class Meta:
         ordering = ['-_last_message__date']
@@ -220,12 +221,7 @@ class ForumTopic(models.Model):
 
     @cached_property
     def title(self):
-        if self._title:
-            return self._title
-        else:
-            self._title = self.messages.order_by('id').first().title
-            self.save()
-            return self._title
+        return self._title
 
 class ForumMessage(models.Model):
     """
@@ -250,10 +246,10 @@ class ForumMessage(models.Model):
         super(ForumMessage, self).save(*args, **kwargs)
         if self.is_last_in_topic():
             self.topic._last_message_id = self.id
-            self.topic.save()
         if self.is_first_in_topic():
             self.topic._title = self.title
-            self.topic.save()
+        self.topic._message_number = self.topic.messages.count()
+        self.topic.save()
 
     def is_first_in_topic(self):
         return bool(self.id == self.topic.messages.order_by('date').first().id)
@@ -285,7 +281,8 @@ class ForumMessage(models.Model):
 
     def mark_as_read(self, user):
         try: # Need the try/except because of AnonymousUser
-            self.readers.add(user)
+            if not self.is_read(user):
+                self.readers.add(user)
         except: pass
 
     def is_read(self, user):

@@ -41,7 +41,7 @@ from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMi
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
 
 class ForumMainView(ListView):
-    queryset = Forum.objects.filter(parent=None).select_related("_last_message__author", "_last_message__topic___title")
+    queryset = Forum.objects.filter(parent=None).prefetch_related("children___last_message__author", "children___last_message__topic")
     template_name = "forum/main.jinja"
 
 class ForumMarkAllAsRead(RedirectView):
@@ -122,7 +122,8 @@ class ForumDetailView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(ForumDetailView, self).get_context_data(**kwargs)
-        qs = self.object.topics.order_by('-_last_message__date').select_related('_last_message')
+        qs = self.object.topics.order_by('-_last_message__date').select_related('_last_message__author', 'author')\
+                .prefetch_related("forum__edit_groups")
         paginator = Paginator(qs,
                 settings.SITH_FORUM_PAGE_LENGTH)
         page = self.request.GET.get('topic_page')
@@ -178,7 +179,8 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
             kwargs['first_unread_message_id'] = msg.id
         except:
             kwargs['first_unread_message_id'] = float("inf")
-        paginator = Paginator(self.object.messages.select_related('author__avatar_pict').order_by('date'),
+        paginator = Paginator(self.object.messages.select_related('author__avatar_pict')\
+                .prefetch_related('topic__forum__edit_groups', 'readers').order_by('date'),
                 settings.SITH_FORUM_PAGE_LENGTH)
         page = self.request.GET.get('page')
         try:

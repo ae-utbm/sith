@@ -22,36 +22,41 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='forum',
             name='_last_message',
-            field=models.ForeignKey(related_name='forums_where_its_last', to='forum.ForumMessage', null=True, verbose_name='the last message'),
+            field=models.ForeignKey(related_name='forums_where_its_last', null=True, to='forum.ForumMessage', verbose_name='the last message'),
         ),
         migrations.AddField(
             model_name='forum',
             name='_topic_number',
-            field=models.IntegerField(default=0, verbose_name='number of topics'),
+            field=models.IntegerField(verbose_name='number of topics', default=0),
         ),
         migrations.AddField(
             model_name='forummessage',
             name='_deleted',
-            field=models.BooleanField(default=False, verbose_name='is deleted'),
+            field=models.BooleanField(verbose_name='is deleted', default=False),
         ),
         migrations.AddField(
             model_name='forumtopic',
             name='_last_message',
-            field=models.ForeignKey(related_name='+', to='forum.ForumMessage', null=True, verbose_name='the last message'),
+            field=models.ForeignKey(related_name='+', null=True, to='forum.ForumMessage', verbose_name='the last message'),
+        ),
+        migrations.AddField(
+            model_name='forumtopic',
+            name='_message_number',
+            field=models.IntegerField(verbose_name='number of messages', default=0),
         ),
         migrations.AddField(
             model_name='forumtopic',
             name='_title',
-            field=models.CharField(max_length=64, blank=True, verbose_name='title'),
+            field=models.CharField(max_length=64, verbose_name='title', blank=True),
         ),
         migrations.AlterField(
             model_name='forum',
             name='description',
-            field=models.CharField(max_length=512, default='', verbose_name='description'),
+            field=models.CharField(max_length=512, verbose_name='description', default=''),
         ),
         migrations.AlterField(
             model_name='forum',
             name='id',
-            field=models.AutoField(primary_key=True, serialize=False, db_index=True),
+            field=models.AutoField(serialize=False, db_index=True, primary_key=True),
         ),
     ]

@@ -36,7 +36,7 @@
         </div>
     </div>
     {{ display_forum(forum, user, True) }}
-    {% for f in forum.children.all() %}
+    {% for f in forum.children.all().select_related("_last_message__author", "_last_message__topic") %}
     {{ display_forum(f, user) }}
     {% endfor %}
     {% endif %}
