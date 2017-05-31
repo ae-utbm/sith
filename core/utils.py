@@ -94,8 +94,10 @@ def doku_to_markdown(text):
 
     text = re.sub(r'\\{2,}[\s]', r'   \n', text) # Carriage return
 
-    text = re.sub(r'\[\[(.*?)(\|(.*?))?\]\]', r'[\3](\1)', text) # Links
-    text = re.sub(r'{{(.*?)(\|(.*?))?}}', r'![\3](\1 "\3")', text) # Images
+    text = re.sub(r'\[\[(.*?)\|(.*?)\]\]', r'[\2](\1)', text) # Links
+    text = re.sub(r'\[\[(.*?)\]\]', r'[\1](\1)', text) # Links 2
+    text = re.sub(r'{{(.*?)\|(.*?)}}', r'![\2](\1 "\2")', text) # Images
+    text = re.sub(r'{{(.*?)(\|(.*?))?}}', r'![\1](\1 "\1")', text) # Images 2
     text = re.sub(r'{\[(.*?)(\|(.*?))?\]}', r'[\1](\1)', text) # Video (transform to classic links, since we can't integrate them)
 
     text = re.sub(r'###(\d*?)###', r'[[[\1]]]', text) # Progress bar

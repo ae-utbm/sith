@@ -1276,10 +1276,13 @@ def migrate_forum():
                     title=to_unicode(r['titre_message'])[:63],
                     date=r['date_message'].replace(tzinfo=timezone('Europe/Paris')),
                     )
-                if r['syntaxengine_message'] == "doku":
-                    msg.message = doku_to_markdown(to_unicode(r['contenu_message']))
-                else:
-                    msg.message = bbcode_to_markdown(to_unicode(r['contenu_message']))
+                try:
+                    if r['syntaxengine_message'] == "doku":
+                        msg.message = doku_to_markdown(to_unicode(r['contenu_message']))
+                    else:
+                        msg.message = bbcode_to_markdown(to_unicode(r['contenu_message']))
+                except:
+                    msg.message = to_unicode(r['contenu_message'])
                 msg.save()
             except Exception as e:
                 print("  FAIL to migrate message: %s" % (repr(e)))
