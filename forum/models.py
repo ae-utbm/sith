@@ -58,7 +58,8 @@ class Forum(models.Model):
     view_groups = models.ManyToManyField(Group, related_name="viewable_forums", blank=True,
             default=[settings.SITH_GROUP_PUBLIC_ID])
     number = models.IntegerField(_("number to choose a specific forum ordering"), default=1)
-    _last_message = models.ForeignKey('ForumMessage', related_name="forums_where_its_last", verbose_name=_("the last message"), null=True)
+    _last_message = models.ForeignKey('ForumMessage', related_name="forums_where_its_last",
+            verbose_name=_("the last message"), null=True, on_delete=models.SET_NULL)
     _topic_number = models.IntegerField(_("number of topics"), default=0)
 
     class Meta:
@@ -181,7 +182,8 @@ class ForumTopic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics')
     author = models.ForeignKey(User, related_name='forum_topics')
     description = models.CharField(_('description'), max_length=256, default="")
-    _last_message = models.ForeignKey('ForumMessage', related_name="+", verbose_name=_("the last message"), null=True)
+    _last_message = models.ForeignKey('ForumMessage', related_name="+", verbose_name=_("the last message"),
+            null=True, on_delete=models.SET_NULL)
     _title = models.CharField(_('title'), max_length=64, blank=True)
     _message_number = models.IntegerField(_("number of messages"), default=0)
 
