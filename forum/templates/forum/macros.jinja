@@ -1,4 +1,4 @@
-{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'core/macros.jinja' import user_profile_link_short_name %}
 
 {% macro display_forum(forum, user, is_root=False) %}
 <div class="forum {% if is_root %}category{% endif %}">
@@ -29,7 +29,7 @@
         </p>
         <div class="ib w_medium last_message" style="font-size: x-small; text-align: center">
             {% if forum.last_message %}
-            {{ forum.last_message.author }} <br/>
+            {{ user_profile_link_short_name(forum.last_message.author) }} <br/>
             <a href="{{ forum.last_message.get_absolute_url() }}">
                 <date>
                 {{ forum.last_message.date|localtime|date(DATETIME_FORMAT) }}
@@ -66,7 +66,7 @@
     <div class="ib w_medium last_message">
         <div class="ib w_medium">
             <p class="ib w_medium" style="text-align: center;">
-                {{ user_profile_link(topic.author) }}
+                {{ user_profile_link_short_name(topic.author) }}
             </p>
             <p class="ib w_medium" style="text-align: center;">
                 {{ topic._message_number }}
@@ -75,7 +75,7 @@
         <p class="ib w_medium" style="text-align: center;">
             {% set last_msg = topic.last_message %}
             {% if last_msg %}
-            {{ user_profile_link(last_msg.author) }} <br/>
+            {{ user_profile_link_short_name(last_msg.author) }} <br/>
             <a href="{{ last_msg.get_absolute_url() }}">
                 <date>{{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}</date>
             </a>
@@ -133,7 +133,7 @@
         <ul class="msg_meta">
         {% for meta in m.metas.select_related('user').order_by('id') %}
             <li style="background: {% if m.author == meta.user %}#bfffbf{% else %}#ffffbf{% endif %}">
-                {{ meta.get_action_display() }} {{ meta.user.get_display_name() }}
+                {{ meta.get_action_display() }} {{ meta.user.get_short_name() }}
                 {% trans %} at {% endtrans %}{{ meta.date|localtime|time(DATETIME_FORMAT) }}
                 {% trans %} the {% endtrans %}{{ meta.date|localtime|date(DATETIME_FORMAT)}}</li>
         {% endfor %}

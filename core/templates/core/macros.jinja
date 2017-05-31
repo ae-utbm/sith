@@ -2,6 +2,10 @@
 <a href="{{ url("core:user_profile", user_id=user.id) }}">{{ user.get_display_name() }}</a>
 {%- endmacro %}
 
+{% macro user_profile_link_short_name(user) -%}
+<a href="{{ url("core:user_profile", user_id=user.id) }}">{{ user.get_short_name() }}</a>
+{%- endmacro %}
+
 {% macro user_link_with_pict(user) -%}
 <a href="{{ url("core:user_profile", user_id=user.id) }}" class="mini_profile_link" >
     {{ user.get_mini_item()|safe }}
