@@ -1,37 +1,43 @@
-{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'core/macros.jinja' import user_profile_link_short_name %}
 
-{% macro display_forum(forum, user) %}
-<div class="forum {% if forum.is_category %}category{% endif %}">
+{% macro display_forum(forum, user, is_root=False) %}
+<div class="forum {% if is_root %}category{% endif %}">
     <div class="ib w_big">
-        {% if not forum.is_category %}
+        {% if not is_root %}
         <a class="ib w_big" href="{{ url('forum:view_forum', forum_id=forum.id) }}">
         {% else %}
         <div class="ib w_big">
         {% endif %}
-            <h5>{{ forum.name }}</h5>
+            <div class="title">{{ forum.name }}</div>
             <p>{{ forum.description }}</p>
-        {% if not forum.is_category %}
+        {% if not is_root %}
         </a>
         {% else %}
         </div>
         {% endif %}
         {% if user.is_owner(forum) %}
+        <div class="tools">
         <a class="ib" href="{{ url('forum:edit_forum', forum_id=forum.id) }}">{% trans %}Edit{% endtrans %}</a>
         <a class="ib" href="{{ url('forum:delete_forum', forum_id=forum.id) }}">{% trans %}Delete{% endtrans %}</a>
+        </div>
         {% endif %}
     </div>
-    {% if not forum.is_category %}
+    {% if not is_root %}
     <div class="ib w_small">
-        <div class="ib w_medium">
+        <p class="ib w_medium">
             {{ forum.topic_number }}
-        </div>
-        <div class="ib w_medium" style="font-size: x-small; text-align: center">
+        </p>
+        <div class="ib w_medium last_message" style="font-size: x-small; text-align: center">
             {% if forum.last_message %}
-            {{ forum.last_message.author }} <br/>
+            {{ user_profile_link_short_name(forum.last_message.author) }} <br/>
             <a href="{{ forum.last_message.get_absolute_url() }}">
+                <date>
                 {{ forum.last_message.date|localtime|date(DATETIME_FORMAT) }}
-                {{ forum.last_message.date|localtime|time(DATETIME_FORMAT) }}<br/>
+                {{ forum.last_message.date|localtime|time(DATETIME_FORMAT) }}
+                </date><br>
+                <span>
                 {{ forum.last_message.topic }}
+                </span>
             </a>
             {% endif %}
         </div>
@@ -48,33 +54,33 @@
         {% else %}
         <a class="ib w_big" href="{{ url('forum:view_topic', topic_id=topic.id) }}">
         {% endif %}
-            <h5>{{ topic.title }}</h5>
+            <div class="title">{{ topic.title or topic.messages.first().title }}</div>
             <p>{{ topic.description }}</p>
         </a>
         {% if user.can_edit(topic) %}
-        <div class="ib" style="text-align: center;">
+        <div class="ib tools" style="text-align: center;">
             <a href="{{ url('forum:edit_topic', topic_id=topic.id) }}">{% trans %}Edit{% endtrans %}</a>
         </div>
         {% endif %}
     </div>
-    <div class="ib w_medium">
+    <div class="ib w_medium last_message">
         <div class="ib w_medium">
-            <div class="ib w_medium" style="text-align: center;">
-                {{ user_profile_link(topic.author) }}
-            </div>
-            <div class="ib w_medium" style="text-align: center;">
-                {{ topic.messages.count() }}
-            </div>
+            <p class="ib w_medium" style="text-align: center;">
+                {{ user_profile_link_short_name(topic.author) }}
+            </p>
+            <p class="ib w_medium" style="text-align: center;">
+                {{ topic._message_number }}
+            </p>
         </div>
-        <div class="ib w_medium" style="text-align: center;">
+        <p class="ib w_medium" style="text-align: center;">
             {% set last_msg = topic.last_message %}
             {% if last_msg %}
-            {{ user_profile_link(last_msg.author) }} <br/>
+            {{ user_profile_link_short_name(last_msg.author) }} <br/>
             <a href="{{ last_msg.get_absolute_url() }}">
-                {{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}
+                <date>{{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}</date>
             </a>
             {% endif %}
-        </div>
+        </p>
     </div>
 </div>
 {% endmacro %}
@@ -92,26 +98,32 @@
         <strong><a href="{{ m.author.get_absolute_url() }}">{{ m.author.get_short_name() }}</a></strong>
     </div>
     <div class="msg_content  {% if m.deleted %}deleted{% endif %}" {% if m.id == first_unread_message_id %}id="first_unread"{% endif %}>
-        <div style="display: inline-block; width: 74%;">
-            {% if m.title %}
-            <h5>{{ m.title }}</h5>
-            {% endif %}
-        </div>
-        <div style="display: inline-block; width: 25%;">
-            <span><a href="{{ url('forum:new_message', topic_id=m.topic.id) }}?quote_id={{ m.id }}">
-                    {% trans %}Reply as quote{% endtrans %}</a></span>
-            {% if user.can_edit(m) %}
-            <span> <a href="{{ url('forum:edit_message', message_id=m.id) }}">{% trans %}Edit{% endtrans %}</a></span>
-            {% endif %}
-            {% if m.can_be_moderated_by(user) %}
-            {% if m.deleted %}
-            <span> <a href="{{ url('forum:undelete_message', message_id=m.id) }}">{% trans %}Undelete{% endtrans %}</a></span>
-            {% else %}
-            <span> <a href="{{ url('forum:delete_message', message_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></span>
-            {% endif %}
-            {% endif %}
-            <br/>
-            <span>{{ m.date|localtime|date(DATETIME_FORMAT) }} {{ m.date|localtime|time(DATETIME_FORMAT) }}</span>
+        <div class="msg_header">
+            <div class="ib w_big title">
+                <a href="{{ m.get_absolute_url() }}">
+                {{ m.date|localtime|date(DATETIME_FORMAT) }}
+                {{ m.date|localtime|time(DATETIME_FORMAT) }}
+                {%- if m.title -%}
+                    - {{ m.title }}
+                {%- endif -%}
+                </a>
+            </div>
+            <div class="ib w_small">
+                <span><a href="{{ m.get_absolute_url() }}">#{{ m.id }}</a></span>
+                <br/>
+                <span><a href="{{ url('forum:new_message', topic_id=m.topic.id) }}?quote_id={{ m.id }}">
+                        {% trans %}Reply as quote{% endtrans %}</a></span>
+                {% if user.can_edit(m) %}
+                <span> <a href="{{ url('forum:edit_message', message_id=m.id) }}">{% trans %}Edit{% endtrans %}</a></span>
+                {% endif %}
+                {% if m.can_be_moderated_by(user) %}
+                {% if m.deleted %}
+                <span> <a href="{{ url('forum:undelete_message', message_id=m.id) }}">{% trans %}Undelete{% endtrans %}</a></span>
+                {% else %}
+                <span> <a href="{{ url('forum:delete_message', message_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></span>
+                {% endif %}
+                {% endif %}
+            </div>
         </div>
         <hr>
         <div>
@@ -121,7 +133,7 @@
         <ul class="msg_meta">
         {% for meta in m.metas.select_related('user').order_by('id') %}
             <li style="background: {% if m.author == meta.user %}#bfffbf{% else %}#ffffbf{% endif %}">
-                {{ meta.get_action_display() }} {{ meta.user.get_display_name() }}
+                {{ meta.get_action_display() }} {{ meta.user.get_short_name() }}
                 {% trans %} at {% endtrans %}{{ meta.date|localtime|time(DATETIME_FORMAT) }}
                 {% trans %} the {% endtrans %}{{ meta.date|localtime|date(DATETIME_FORMAT)}}</li>
         {% endfor %}

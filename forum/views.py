@@ -41,7 +41,7 @@ from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMi
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
 
 class ForumMainView(ListView):
-    queryset = Forum.objects.filter(parent=None)
+    queryset = Forum.objects.filter(parent=None).prefetch_related("children___last_message__author", "children___last_message__topic")
     template_name = "forum/main.jinja"
 
 class ForumMarkAllAsRead(RedirectView):
@@ -53,17 +53,23 @@ class ForumMarkAllAsRead(RedirectView):
             fi = request.user.forum_infos
             fi.last_read_date = timezone.now()
             fi.save()
+            for m in request.user.read_messages.filter(date__lt=fi.last_read_date):
+                m.readers.remove(request.user) # Clean up to keep table low in data
         except: pass
         return super(ForumMarkAllAsRead, self).get(request, *args, **kwargs)
 
 class ForumLastUnread(ListView):
     model = ForumTopic
     template_name = "forum/last_unread.jinja"
+    paginate_by = settings.SITH_FORUM_PAGE_LENGTH / 2
 
     def get_queryset(self):
-        l = ForumMessage.objects.exclude(readers=self.request.user).filter(
-                date__gt=self.request.user.forum_infos.last_read_date).values_list('topic') # TODO try to do better
-        return self.model.objects.filter(id__in=l).annotate(models.Max('messages__date')).order_by('-messages__date__max').select_related('author')
+        topic_list = self.model.objects.filter(_last_message__date__gt=self.request.user.forum_infos.last_read_date)\
+                .exclude(_last_message__readers=self.request.user)\
+                .order_by('-_last_message__date')\
+                .select_related('_last_message__author', 'author')\
+                .prefetch_related('forum__edit_groups')
+        return topic_list
 
 class ForumForm(forms.ModelForm):
     class Meta:
@@ -117,7 +123,18 @@ class ForumDetailView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(ForumDetailView, self).get_context_data(**kwargs)
-        kwargs['topics'] = self.object.topics.annotate(models.Max('messages__date')).order_by('-messages__date__max')
+        qs = self.object.topics.order_by('-_last_message__date')\
+                .select_related('_last_message__author', 'author')\
+                .prefetch_related("forum__edit_groups")
+        paginator = Paginator(qs,
+                settings.SITH_FORUM_PAGE_LENGTH)
+        page = self.request.GET.get('topic_page')
+        try:
+            kwargs["topics"] = paginator.page(page)
+        except PageNotAnInteger:
+            kwargs["topics"] = paginator.page(1)
+        except EmptyPage:
+            kwargs["topics"] = paginator.page(paginator.num_pages)
         return kwargs
 
 class TopicForm(forms.ModelForm):
@@ -164,7 +181,8 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
             kwargs['first_unread_message_id'] = msg.id
         except:
             kwargs['first_unread_message_id'] = float("inf")
-        paginator = Paginator(self.object.messages.select_related('author__avatar_pict').all(),
+        paginator = Paginator(self.object.messages.select_related('author__avatar_pict')\
+                .prefetch_related('topic__forum__edit_groups', 'readers').order_by('date'),
                 settings.SITH_FORUM_PAGE_LENGTH)
         page = self.request.GET.get('page')
         try:
@@ -174,6 +192,15 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
         except EmptyPage:
             kwargs["msgs"] = paginator.page(paginator.num_pages)
         return kwargs
+
+class ForumMessageView(SingleObjectMixin, RedirectView):
+    model = ForumMessage
+    pk_url_kwarg = "message_id"
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.object = self.get_object()
+        return self.object.get_url()
 
 class ForumMessageEditView(CanEditMixin, UpdateView):
     model = ForumMessage

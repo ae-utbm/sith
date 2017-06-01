@@ -66,6 +66,7 @@ def exif_auto_rotate(image):
     return image
 
 def doku_to_markdown(text):
+    """This is a quite correct doku translator"""
     text = re.sub(r'([^:]|^)\/\/(.*?)\/\/', r'*\2*', text) # Italic (prevents protocol:// conflict)
     text = re.sub(r'<del>(.*?)<\/del>', r'~~\1~~', text, flags=re.DOTALL) # Strike (may be multiline)
     text = re.sub(r'<sup>(.*?)<\/sup>', r'^\1^', text) # Superscript (multiline not supported, because almost never used)
@@ -93,8 +94,10 @@ def doku_to_markdown(text):
 
     text = re.sub(r'\\{2,}[\s]', r'   \n', text) # Carriage return
 
-    text = re.sub(r'\[\[(.*?)(\|(.*?))?\]\]', r'[\3](\1)', text) # Links
-    text = re.sub(r'{{(.*?)(\|(.*?))?}}', r'![\3](\1 "\3")', text) # Images
+    text = re.sub(r'\[\[(.*?)\|(.*?)\]\]', r'[\2](\1)', text) # Links
+    text = re.sub(r'\[\[(.*?)\]\]', r'[\1](\1)', text) # Links 2
+    text = re.sub(r'{{(.*?)\|(.*?)}}', r'![\2](\1 "\2")', text) # Images
+    text = re.sub(r'{{(.*?)(\|(.*?))?}}', r'![\1](\1 "\1")', text) # Images 2
     text = re.sub(r'{\[(.*?)(\|(.*?))?\]}', r'[\1](\1)', text) # Video (transform to classic links, since we can't integrate them)
 
     text = re.sub(r'###(\d*?)###', r'[[[\1]]]', text) # Progress bar
@@ -117,14 +120,58 @@ def doku_to_markdown(text):
                 quote_level += 1
                 try:
                     new_text.append("> " * quote_level + "##### " + quote.group(2))
-                    line = line.replace(quote.group(0), '')
                 except:
                     new_text.append("> " * quote_level)
+                line = line.replace(quote.group(0), '')
             final_quote_level = quote_level # Store quote_level to use at the end, since it will be modified during quit iteration
+            final_newline = False
             for quote in quit: # Quit quotes (support multiple at a time)
                 line = line.replace(quote.group(0), '')
                 quote_level -= 1
+                final_newline = True
             new_text.append("> " * final_quote_level + line) # Finally append the line
+            if final_newline: new_text.append("\n") # Add a new line to ensure the separation between the quote and the following text
+        else:
+            new_text.append(line)
+
+    return "\n".join(new_text)
+
+def bbcode_to_markdown(text):
+    """This is a very basic BBcode translator"""
+    text = re.sub(r'\[b\](.*?)\[\/b\]', r'**\1**', text, flags=re.DOTALL) # Bold
+    text = re.sub(r'\[i\](.*?)\[\/i\]', r'*\1*', text, flags=re.DOTALL) # Italic
+    text = re.sub(r'\[u\](.*?)\[\/u\]', r'__\1__', text, flags=re.DOTALL) # Underline
+    text = re.sub(r'\[s\](.*?)\[\/s\]', r'~~\1~~', text, flags=re.DOTALL) # Strike (may be multiline)
+    text = re.sub(r'\[strike\](.*?)\[\/strike\]', r'~~\1~~', text, flags=re.DOTALL) # Strike 2
+
+    text = re.sub(r'article://', r'page://', text)
+    text = re.sub(r'dfile://', r'file://', text)
+
+    text = re.sub(r'\[url=(.*?)\](.*)\[\/url\]', r'[\2](\1)', text) # Links
+    text = re.sub(r'\[url\](.*)\[\/url\]', r'\1', text) # Links 2
+    text = re.sub(r'\[img\](.*)\[\/img\]', r'![\1](\1 "\1")', text) # Images
+
+    new_text = []
+    quote_level = 0
+    for line in text.splitlines(): # Tables and quotes
+        enter = re.finditer(r'\[quote(=(.+?))?\]', line)
+        quit = re.finditer(r'\[/quote\]', line)
+        if enter or quit: # Quote part
+            for quote in enter: # Enter quotes (support multiple at a time)
+                quote_level += 1
+                try:
+                    new_text.append("> " * quote_level + "##### " + quote.group(2))
+                except:
+                    new_text.append("> " * quote_level)
+                line = line.replace(quote.group(0), '')
+            final_quote_level = quote_level # Store quote_level to use at the end, since it will be modified during quit iteration
+            final_newline = False
+            for quote in quit: # Quit quotes (support multiple at a time)
+                line = line.replace(quote.group(0), '')
+                quote_level -= 1
+                final_newline = True
+            new_text.append("> " * final_quote_level + line) # Finally append the line
+            if final_newline: new_text.append("\n") # Add a new line to ensure the separation between the quote and the following text
         else:
             new_text.append(line)
 

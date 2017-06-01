@@ -37,7 +37,7 @@ from itertools import chain
 from haystack.query import SearchQuerySet
 
 from core.models import User, Notification
-from core.utils import doku_to_markdown
+from core.utils import doku_to_markdown, bbcode_to_markdown
 from club.models import Club
 
 def index(request, context=None):
@@ -98,17 +98,20 @@ def search_json(request):
             }
     return JsonResponse(result)
 
-class DokuToMarkdownView(TemplateView):
-    template_name = "core/doku_to_markdown.jinja"
+class ToMarkdownView(TemplateView):
+    template_name = "core/to_markdown.jinja"
 
     def post(self, request, *args, **kwargs):
         self.text = request.POST['text']
-        self.text_md = doku_to_markdown(self.text)
+        if request.POST['syntax'] == "doku":
+            self.text_md = doku_to_markdown(self.text)
+        else:
+            self.text_md = bbcode_to_markdown(self.text)
         context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(DokuToMarkdownView, self).get_context_data(**kwargs)
+        kwargs = super(ToMarkdownView, self).get_context_data(**kwargs)
         try:
             kwargs['text'] = self.text
             kwargs['text_md'] = self.text_md

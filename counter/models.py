@@ -431,7 +431,7 @@ class Permanency(models.Model):
     user = models.ForeignKey(User, related_name="permanencies", verbose_name=_("user"))
     counter = models.ForeignKey(Counter, related_name="permanencies", verbose_name=_("counter"))
     start = models.DateTimeField(_('start date'))
-    end = models.DateTimeField(_('end date'), null=True)
+    end = models.DateTimeField(_('end date'), null=True, db_index=True)
     activity = models.DateTimeField(_('last activity date'), auto_now=True)
 
     class Meta:
