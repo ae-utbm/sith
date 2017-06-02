@@ -22,10 +22,9 @@
 #
 #
 
-<<<<<<< 52a643878a10b52d9d7a17cd6c2854112c0a65d0
 import re
-from pprint import pprint
 
+from pprint import pprint
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
@@ -41,39 +40,46 @@ class CounterTest(TestCase):
         self.mde = Counter.objects.filter(name="MDE").first()
 
     def test_full_click(self):
-        response = self.client.post(reverse("counter:login", kwargs={"counter_id":self.mde.id}), {
+        response = self.client.post(reverse("counter:login", kwargs={"counter_id": self.mde.id}), {
             "username": self.skia.username,
             "password": "plop"
         })
-        response = self.client.get(reverse("counter:details", kwargs={"counter_id":self.mde.id}))
-        # TODO check that barman is logged:
-        # self.assertTrue(mon barman est bien dans le HTML de response.content)
-        counter_token = re.search(r'name="counter_token" value="([^"]*)"', str(response.content)).group(1)
+        response = self.client.get(
+            reverse("counter:details", kwargs={"counter_id": self.mde.id}))
+
+        self.assertTrue(
+            'class="link-button">S&#39; Kia</button>' in str(response.content))
+
+        counter_token = re.search(
+            r'name="counter_token" value="([^"]*)"', str(response.content)).group(1)
 
         response = self.client.post(reverse("counter:details",
-            kwargs={"counter_id":self.mde.id}), {
-                "code": "4000k",
-                "counter_token": counter_token,
-                })
+                                            kwargs={"counter_id": self.mde.id}), {
+            "code": "4000k",
+            "counter_token": counter_token,
+        })
         location = response.get('location')
-        # TODO check qu'on a bien eu la bonne page, avec le bon client, etc...
-        # response = self.client.get(response.get('location'))
+
+        response = self.client.get(response.get('location'))
+        self.assertTrue('<p>Richard Batsbak</p>' in str(response.content))
+
         response = self.client.post(location, {
             'action': 'refill',
             'amount': '10',
             'payment_method': 'CASH',
             'bank': 'OTHER',
-            })
+        })
         response = self.client.post(location, {
             'action': 'code',
             'code': 'BARB',
-            })
+        })
         response = self.client.post(location, {
             'action': 'code',
             'code': 'fin',
-            })
-        # TODO finir le test en vérifiant que les produits ont bien été clickés
-        # hint: pprint(response.__dict__)
+        })
+
+        response_get = self.client.get(response.get('location'))
+        self.assertTrue('<p>Client : Richard Batsbak - Nouveau montant : 8.30' in str(response_get.content))
 
 
 class BarmanConnectionTest(TestCase):
@@ -85,38 +91,43 @@ class BarmanConnectionTest(TestCase):
         self.krophil.customer.save()
         self.skia.customer.save()
 
-        self.counter = Counter.objects.filter(id = 2).first()
+        self.counter = Counter.objects.filter(id=2).first()
 
     def test_barman_granted(self):
-        response_post = self.client.post(reverse('counter:login', args=[self.counter.id]),
-                                        {'username': "krophil",
-                                        'password' : "plop"})
+        self.client.post(reverse('counter:login', args=[self.counter.id]),
+                         {'username': "krophil",
+                          'password': "plop"})
         response_get = self.client.get(reverse("counter:details",
-                                                args=[self.counter.id]))
+                                               args=[self.counter.id]))
 
-        self.assertTrue('<p>Enter client code:</p>' in str(response_get.content))
+        self.assertTrue(
+            '<p>Entrez un code client : </p>' in str(response_get.content))
 
     def test_counters_list_barmen(self):
-        response_post = self.client.post(reverse('counter:login', args=[self.counter.id]),
-                                        {'username': "krophil",
-                                        'password' : "plop"})
+        self.client.post(reverse('counter:login', args=[self.counter.id]),
+                         {'username': "krophil",
+                          'password': "plop"})
         response_get = self.client.get(reverse("counter:activity",
-                                                args=[self.counter.id]))
-        
-        self.assertTrue('<li><a href="/user/10/">Kro Phil&#39;</a></li>' in str(response_get.content))
-    
+                                               args=[self.counter.id]))
+
+        self.assertTrue(
+            '<li><a href="/user/10/">Kro Phil&#39;</a></li>' in str(response_get.content))
+
     def test_barman_denied(self):
-        response_post = self.client.post(reverse('counter:login', args=[self.counter.id]),
-                                        {'username': "skia",
-                                        'password' : "plop"})
-        response_get = self.client.get(reverse("counter:details", args=[self.counter.id]))
-        
-        self.assertTrue('<p>Please, login</p>' in str(response_get.content))
+        self.client.post(reverse('counter:login', args=[self.counter.id]),
+                         {'username': "skia",
+                          'password': "plop"})
+        response_get = self.client.get(
+            reverse("counter:details", args=[self.counter.id]))
+
+        self.assertTrue('<p>Merci de vous identifier</p>' in str(response_get.content))
 
     def test_counters_list_no_barmen(self):
-        response_post = self.client.post(reverse('counter:login', args=[self.counter.id]),
-                                        {'username': "krophil",
-                                        'password' : "plop"})
-        response_get = self.client.get(reverse("counter:activity", args=[self.counter.id]))
-        
-        self.assertFalse('<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response_get.content))
+        self.client.post(reverse('counter:login', args=[self.counter.id]),
+                         {'username': "krophil",
+                          'password': "plop"})
+        response_get = self.client.get(
+            reverse("counter:activity", args=[self.counter.id]))
+
+        self.assertFalse(
+            '<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response_get.content))
