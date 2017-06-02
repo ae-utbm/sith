@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-31 23:42+0200\n"
+"POT-Creation-Date: 2017-06-02 14:55+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -326,8 +326,8 @@ msgstr "Compte en banque : "
 #: core/templates/core/file_detail.jinja:25
 #: core/templates/core/file_detail.jinja:62
 #: core/templates/core/file_moderation.jinja:24
-#: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:49
-#: core/templates/core/macros.jinja:68
+#: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:53
+#: core/templates/core/macros.jinja:72
 #: core/templates/core/pagerev_edit.jinja:28
 #: core/templates/core/user_account_detail.jinja:38
 #: core/templates/core/user_edit.jinja:19
@@ -335,12 +335,11 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:59
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:329
-#: forum/templates/forum/macros.jinja:21
-#: forum/templates/forum/macros.jinja:123
+#: forum/templates/forum/macros.jinja:21 forum/templates/forum/macros.jinja:123
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:178 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:74
-#: sas/templates/sas/picture.jinja:124
+#: sas/templates/sas/picture.jinja.py:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
 #: stock/templates/stock/stock_shopping_list.jinja:69
 #: trombi/templates/trombi/detail.jinja:28
@@ -491,8 +490,8 @@ msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:56
 #: com/templates/com/news_admin_list.jinja:38
-#: com/templates/com/news_admin_list.jinja:71
-#: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
+#: com/templates/com/news_admin_list.jinja:71 core/templates/core/file.jinja:36
+#: core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
 
@@ -696,7 +695,7 @@ msgstr "Opération liée : "
 #: core/templates/core/user_preferences.jinja:12
 #: core/templates/core/user_preferences.jinja:19
 #: counter/templates/counter/cash_register_summary.jinja:22
-#: forum/templates/forum/reply.jinja:31
+#: forum/templates/forum/reply.jinja:32
 #: subscription/templates/subscription/subscription.jinja:24
 #: trombi/templates/trombi/comment.jinja:26
 #: trombi/templates/trombi/user_tools.jinja:13
@@ -859,8 +858,7 @@ msgstr "L'utilisateur est déjà membre de ce club"
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/templates/club/club_list.jinja:4
-#: club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -922,14 +920,13 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:84
-#: club/views.py:247 counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:84 club/views.py:247
+#: counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja:9
-#: club/templates/club/stats.jinja:19
+#: club/templates/club/club_sellings.jinja:9 club/templates/club/stats.jinja:19
 #: counter/templates/counter/cash_summary_list.jinja:15
 msgid "Show"
 msgstr "Montrer"
@@ -985,6 +982,7 @@ msgstr "Quantité"
 #: counter/templates/counter/cash_summary_list.jinja:35
 #: counter/templates/counter/last_ops.jinja:44
 #: counter/templates/counter/stats.jinja:18
+#: subscription/templates/subscription/stats.jinja:28
 msgid "Total"
 msgstr "Total"
 
@@ -1187,9 +1185,8 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
-#: com/templates/com/news_detail.jinja:5
-#: com/templates/com/news_detail.jinja:11 com/templates/com/news_list.jinja:4
-#: com/templates/com/news_list.jinja:28
+#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
+#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:28
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1294,7 +1291,7 @@ msgstr ""
 
 #: com/templates/com/news_edit.jinja:55 com/templates/com/weekmail.jinja:10
 #: core/templates/core/pagerev_edit.jinja:25
-#: forum/templates/forum/reply.jinja:30
+#: forum/templates/forum/reply.jinja:31
 msgid "Preview"
 msgstr "Prévisualiser"
 
@@ -1677,13 +1674,13 @@ msgstr "profil visible par les cotisants"
 msgid "A user with that username already exists"
 msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 
-#: core/models.py:474 core/templates/core/macros.jinja:17
+#: core/models.py:474 core/templates/core/macros.jinja:21
 #: core/templates/core/user_detail.jinja:14
 #: core/templates/core/user_detail.jinja:16
 #: core/templates/core/user_edit.jinja:17
 #: election/templates/election/election_detail.jinja:316
 #: forum/templates/forum/macros.jinja:93 forum/templates/forum/macros.jinja:95
-#: forum/templates/forum/reply.jinja:36 forum/templates/forum/reply.jinja:38
+#: forum/templates/forum/reply.jinja:37 forum/templates/forum/reply.jinja:39
 #: trombi/templates/trombi/user_tools.jinja:43
 msgid "Profile"
 msgstr "Profil"
@@ -1875,8 +1872,7 @@ msgstr "S'enregister"
 msgid "View more"
 msgstr "Voir plus"
 
-#: core/templates/core/base.jinja:62
-#: forum/templates/forum/last_unread.jinja:16
+#: core/templates/core/base.jinja:62 forum/templates/forum/last_unread.jinja:16
 msgid "Mark all as read"
 msgstr "Marquer tout commme lu"
 
@@ -1908,7 +1904,7 @@ msgstr "SAS"
 
 #: core/templates/core/base.jinja:94 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:13
-#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:11
+#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
 #: forum/templates/forum/main.jinja:14 forum/templates/forum/reply.jinja:15
 #: forum/templates/forum/topic.jinja:30
 msgid "Forum"
@@ -2122,30 +2118,28 @@ msgstr "login"
 msgid "Lost password?"
 msgstr "Mot de passe perdu ?"
 
-#: core/templates/core/macros.jinja:27
-#: core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:31 core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:31
-#: core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:35 core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
-#: core/templates/core/macros.jinja:38
+#: core/templates/core/macros.jinja:42
 #, python-format
 msgid "Subscribed until %(subscription_end)s"
 msgstr "Cotisant jusqu'au %(subscription_end)s"
 
-#: core/templates/core/macros.jinja:39 core/templates/core/user_edit.jinja:40
+#: core/templates/core/macros.jinja:43 core/templates/core/user_edit.jinja:40
 msgid "Account number: "
 msgstr "Numero de compte : "
 
-#: core/templates/core/macros.jinja:44 launderette/models.py:151
+#: core/templates/core/macros.jinja:48 launderette/models.py:151
 msgid "Slot"
 msgstr "Créneau"
 
-#: core/templates/core/macros.jinja:57
+#: core/templates/core/macros.jinja:61
 #: launderette/templates/launderette/launderette_admin.jinja:20
 msgid "Tokens"
 msgstr "Jetons"
@@ -3661,7 +3655,7 @@ msgid "New forum"
 msgstr "Nouveau forum"
 
 #: forum/templates/forum/forum.jinja:22 forum/templates/forum/reply.jinja:8
-#: forum/templates/forum/reply.jinja:25
+#: forum/templates/forum/reply.jinja:26
 msgid "New topic"
 msgstr "Nouveau sujet"
 
@@ -3707,7 +3701,7 @@ msgstr "Message supprimé ou non-visible."
 msgid "View last unread messages"
 msgstr "Voir les derniers messages non lus"
 
-#: forum/templates/forum/reply.jinja:6 forum/templates/forum/reply.jinja:23
+#: forum/templates/forum/reply.jinja:6 forum/templates/forum/reply.jinja:24
 #: forum/templates/forum/topic.jinja:40 forum/templates/forum/topic.jinja:59
 msgid "Reply"
 msgstr "Répondre"
@@ -3841,11 +3835,11 @@ msgstr "Fusionner deux utilisateurs"
 msgid "Merge"
 msgstr "Fusion"
 
-#: rootplace/views.py:89
+#: rootplace/views.py:90
 msgid "User that will be kept"
 msgstr "Utilisateur qui sera conservé"
 
-#: rootplace/views.py:90
+#: rootplace/views.py:91
 msgid "User that will be deleted"
 msgstr "Utilisateur qui sera supprimé"
 
@@ -4368,16 +4362,32 @@ msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 msgid "Subscription error"
 msgstr "Erreur de cotisation"
 
+#: subscription/templates/subscription/stats.jinja:4
+msgid "Subscription stats"
+msgstr "Statistiques de cotisation"
+
+#: subscription/templates/subscription/stats.jinja:9
+msgid "Total subscriptions"
+msgstr "Cotisations totales"
+
+#: subscription/templates/subscription/stats.jinja:10
+msgid "Subscriptions by type"
+msgstr "Cotisations par type"
+
+#: subscription/templates/subscription/stats.jinja:19
+msgid "Subscripton type"
+msgstr "Type de cotisation"
+
 #: subscription/templates/subscription/subscription.jinja:22
 msgid "Eboutic is reserved to specific users. In doubt, don't use it."
 msgstr ""
 "Eboutic est réservé à des cas particuliers. Dans le doute, ne l'utilisez pas."
 
-#: subscription/views.py:74
+#: subscription/views.py:75
 msgid "A user with that email address already exists"
 msgstr "Un utilisateur avec cette adresse email existe déjà"
 
-#: subscription/views.py:90
+#: subscription/views.py:91
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, soit en créer un proprement"
@@ -4613,4 +4623,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
-

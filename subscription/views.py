@@ -25,6 +25,7 @@
 from django.shortcuts import render
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.base import View
+from django.views.generic import TemplateView
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError
@@ -114,3 +115,22 @@ class NewSubscription(CreateView):
                 )
         return super(NewSubscription, self).form_valid(form)
 
+
+class SubscriptionsStatsView(TemplateView):
+    template_name = "subscription/stats.jinja"
+
+    def dispatch(self, request, *arg, **kwargs):
+        res = super(SubscriptionsStatsView, self).dispatch(request, *arg, **kwargs)
+        if request.user.is_root or request.user.is_board_member:
+            return res
+        raise PermissionDenied
+
+    def get_context_data(self, **kwargs):
+        from subscription.models import Subscription
+        import datetime
+        kwargs = super(SubscriptionsStatsView, self).get_context_data(**kwargs)
+        kwargs['subscriptions_total'] = Subscription.objects.filter(subscription_end__gte=datetime.datetime.today())
+        kwargs['subscriptions_types'] = settings.SITH_SUBSCRIPTIONS
+        kwargs['payment_types'] = settings.SITH_COUNTER_PAYMENT_METHOD
+        kwargs['locations'] = settings.SITH_SUBSCRIPTION_LOCATIONS
+        return kwargs

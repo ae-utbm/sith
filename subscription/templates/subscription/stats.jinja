@@ -1,0 +1,38 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+    {% trans %}Subscription stats{% endtrans %}
+{% endblock %}
+
+{% block content %}
+
+{% trans %}Total subscriptions{% endtrans %} : {{ subscriptions_total.count() }}<br><br>
+{% trans %}Subscriptions by type{% endtrans %}<br><br>
+{% for location in locations %}
+    {{ location[1] }} {{ subscriptions_total.filter(location=location[0]).count() }}<br>
+{% endfor %}
+
+<br>
+
+<table>
+    <tr>
+        <th>{% trans %}Subscripton type{% endtrans %}</th>
+        {% for location in locations %}
+            <th>{{ location[1] }}</th>
+        {% endfor %}
+        {% for type in subscriptions_types %}
+        <tr>
+            <td>{{ subscriptions_types[type]['name'] }}</td>
+            {% for location in locations %}
+                <td>
+                {% trans %}Total{% endtrans %} : {{ subscriptions_total.filter(location=location[0]).count()}}<br>
+                {% for p_type in payment_types %}
+                {{ p_type[1] }} : {{ subscriptions_total.filter(location=location[0], payment_method=p_type[0]).count()}}<br>
+                {% endfor %}
+                </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+</table>
+
+{% endblock %}
