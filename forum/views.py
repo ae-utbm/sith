@@ -155,7 +155,7 @@ class ForumTopicCreateView(CanCreateMixin, CreateView):
         return super(ForumTopicCreateView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        topic = ForumTopic(title=form.instance.title, author=self.request.user, forum=self.forum)
+        topic = ForumTopic(_title=form.instance.title, author=self.request.user, forum=self.forum)
         topic.save()
         form.instance.topic = topic
         form.instance.author = self.request.user
