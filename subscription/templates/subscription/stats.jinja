@@ -20,17 +20,19 @@
         {% for location in locations %}
             <th>{{ location[1] }}</th>
         {% endfor %}
+        <th>{% trans %}Total{% endtrans %}</th>
         {% for type in subscriptions_types %}
         <tr>
             <td>{{ subscriptions_types[type]['name'] }}</td>
             {% for location in locations %}
                 <td>
-                {% trans %}Total{% endtrans %} : {{ subscriptions_total.filter(location=location[0]).count()}}<br>
+                {% trans %}Total{% endtrans %} : {{ subscriptions_total.filter(subscription_type=type, location=location[0]).count()}}<br>
                 {% for p_type in payment_types %}
-                {{ p_type[1] }} : {{ subscriptions_total.filter(location=location[0], payment_method=p_type[0]).count()}}<br>
+                {{ p_type[1] }} : {{ subscriptions_total.filter(subscription_type=type, location=location[0], payment_method=p_type[0]).count()}}<br>
                 {% endfor %}
                 </td>
             {% endfor %}
+            <td>{{subscriptions_total.filter(subscription_type=type).count()}}
         </tr>
         {% endfor %}
 </table>
