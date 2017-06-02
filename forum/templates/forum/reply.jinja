@@ -19,41 +19,45 @@
 > <a href="{{ topic.forum.get_absolute_url() }}">{{ topic.forum }}</a>
 > <a href="{{ topic.get_absolute_url() }}">{{ topic }}</a>
 </p>
-<h3>{{ topic.title }}</h3>
-<h4>{% trans %}Reply{% endtrans %}</h4>
-{% else %}
-<h4>{% trans %}New topic{% endtrans %}</h4>
-{% endif %}
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p() }}
-    <p><input type="button" value="{% trans %}Preview{% endtrans %}" onclick="javascript:make_preview();" /></p>
-    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
-</form>
-<div id="preview_message" class="message" style="display: none;">
-    <div class="msg_author">
-        {% if user.avatar_pict %}
-        <img src="{{ user.avatar_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
-        {% else %}
-        <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
-        {% endif %}
-        <br/>
-        <strong><a href="{{ user.get_absolute_url() }}">{{ user.get_short_name() }}</a></strong>
+<div id="forum">
+    <h3>{{ topic.title }}</h3>
+    <h4>{% trans %}Reply{% endtrans %}</h4>
+    {% else %}
+    <h4>{% trans %}New topic{% endtrans %}</h4>
+    {% endif %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p() }}
+        <p><input type="button" value="{% trans %}Preview{% endtrans %}" onclick="javascript:make_preview();" /></p>
+        <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+    </form>
+    <div id="preview_message" class="message" style="display: none;">
+        <div class="msg_author">
+            {% if user.avatar_pict %}
+            <img src="{{ user.avatar_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
+            {% else %}
+            <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
+            {% endif %}
+            <br/>
+            <strong><a href="{{ user.get_absolute_url() }}">{{ user.get_short_name() }}</a></strong>
+        </div>
+        <div class="msg_content">
+            <hr>
+            <div id="preview" class="ib w_big"></div>
+            <div class="forum_signature">{{ user.forum_signature|markdown }}</div>
+        </div>
     </div>
-    <div class="msg_content">
-        <hr>
-        <div id="preview" class="ib w_big"></div>
-        <div class="forum_signature">{{ user.forum_signature|markdown }}</div>
-    </div>
+
+    <hr>
+
+    {% if topic %}
+    {% for m in topic.messages.select_related('author__avatar_pict').order_by('-id')[:10] %}
+        {{ display_message(m, user) }}
+    {% endfor %}
+    {% endif %}
+
+
 </div>
-
-<hr>
-
-{% if topic %}
-{% for m in topic.messages.select_related('author__avatar_pict').order_by('-id')[:10] %}
-    {{ display_message(m, user) }}
-{% endfor %}
-{% endif %}
 
 {% endblock %}
 
