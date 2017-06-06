@@ -6,17 +6,27 @@
 
 {% block content %}
 
-{% trans %}Total subscriptions{% endtrans %} : {{ subscriptions_total.count() }}<br><br>
-{% trans %}Subscriptions by type{% endtrans %}<br><br>
-{% for location in locations %}
-    {{ location[1] }} {{ subscriptions_total.filter(location=location[0]).count() }}<br>
-{% endfor %}
+<p>
+    {{ form.start_date.label }}<br>
+    {{ form.start_date }}<br><br>
+    {{ form.end_date.label }}<br>
+    {{ form.end_date }}<br>
+    <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
+</p>
+
+<p>
+    {% trans %}Total subscriptions{% endtrans %} : {{ subscriptions_total.count() }}<br><br>
+    {% trans %}Subscriptions by type{% endtrans %}<br><br>
+    {% for location in locations %}
+        {{ location[1] }} : {{ subscriptions_total.filter(location=location[0]).count() }}<br>
+    {% endfor %}
+<p>
 
 <br>
 
 <table>
     <tr>
-        <th>{% trans %}Subscripton type{% endtrans %}</th>
+        <th>{% trans %}Subscription type{% endtrans %}</th>
         {% for location in locations %}
             <th>{{ location[1] }}</th>
         {% endfor %}
@@ -24,15 +34,17 @@
         {% for type in subscriptions_types %}
         <tr>
             <td>{{ subscriptions_types[type]['name'] }}</td>
+            {% set subscriptions_total_type = subscriptions_total.filter(subscription_type=type) %}
             {% for location in locations %}
                 <td>
-                {% trans %}Total{% endtrans %} : {{ subscriptions_total.filter(subscription_type=type, location=location[0]).count()}}<br>
+                {% set subscriptions_total_type_location = subscriptions_total_type.filter(location=location[0]) %}
+                {% trans %}Total{% endtrans %} : {{ subscriptions_total_type_location.count()}}<br>
                 {% for p_type in payment_types %}
-                {{ p_type[1] }} : {{ subscriptions_total.filter(subscription_type=type, location=location[0], payment_method=p_type[0]).count()}}<br>
+                {{ p_type[1] }} : {{ subscriptions_total_type_location.filter(payment_method=p_type[0]).count()}}<br>
                 {% endfor %}
                 </td>
             {% endfor %}
-            <td>{{subscriptions_total.filter(subscription_type=type).count()}}
+            <td>{{subscriptions_total_type.count()}}
         </tr>
         {% endfor %}
 </table>
