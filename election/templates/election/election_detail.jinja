@@ -373,6 +373,9 @@ th {
         {% endif %}
         <a href="{{ url('election:update', election_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
     {%- endif %}
+    {%- if user.is_root %}
+        <a href="{{ url('election:delete', election_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
+    {%- endif %}
     </section>
 {% endblock %}
 

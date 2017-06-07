@@ -129,7 +129,7 @@ class ElectionListForm(forms.ModelForm):
 class ElectionForm(forms.ModelForm):
     class Meta:
         model = Election
-        fields = ['title', 'description',
+        fields = ['title', 'description', 'archived',
                   'start_candidature', 'end_candidature',
                   'start_date', 'end_date',
                   'edit_groups', 'view_groups',
@@ -161,12 +161,30 @@ class ElectionForm(forms.ModelForm):
 
 class ElectionsListView(CanViewMixin, ListView):
     """
-    A list with all responsabilities and their candidates
+    A list of all non archived elections visible
     """
     model = Election
     ordering = ["-id"]
     paginate_by = 10
     template_name = 'election/election_list.jinja'
+
+    def get_queryset(self):
+        return super(ElectionsListView,
+                     self).get_queryset().filter(archived=False).all()
+
+
+class ElectionListArchivedView(CanViewMixin, ListView):
+    """
+    A list of all archived elections visible
+    """
+    model = Election
+    ordering = ["-id"]
+    paginate_by = 10
+    template_name = 'election/election_list.jinja'
+
+    def get_queryset(self):
+        return super(ElectionListArchivedView,
+                     self).get_queryset().filter(archived=True).all()
 
 
 class ElectionDetailView(CanViewMixin, DetailView):
@@ -513,6 +531,21 @@ class RoleUpdateView(CanEditMixin, UpdateView):
                             kwargs={'election_id': self.object.election.id})
 
 # Delete Views
+
+
+class ElectionDeleteView(DeleteView):
+    model = Election
+    template_name = 'core/delete_confirm.jinja'
+    pk_url_kwarg = 'election_id'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_root:
+            return super(ElectionDeleteView,
+                         self).dispatch(request, *args, **kwargs)
+        raise PermissionDenied
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:list')
 
 
 class CandidatureDeleteView(CanEditMixin, DeleteView):

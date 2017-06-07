@@ -31,6 +31,7 @@ class Election(models.Model):
         verbose_name=_("candidature groups"), blank=True)
     voters = models.ManyToManyField(User, verbose_name=(
         'voters'), related_name='voted_elections')
+    archived = models.BooleanField(_("archived"), default=False)
 
     def __str__(self):
         return self.title

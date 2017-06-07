@@ -4,9 +4,13 @@ from election.views import *
 
 urlpatterns = [
     url(r'^$', ElectionsListView.as_view(), name='list'),
+    url(r'^archived$',
+        ElectionListArchivedView.as_view(), name='list_archived'),
     url(r'^add$', ElectionCreateView.as_view(), name='create'),
     url(r'^(?P<election_id>[0-9]+)/edit$',
         ElectionUpdateView.as_view(), name='update'),
+    url(r'^(?P<election_id>[0-9]+)/delete$',
+        ElectionDeleteView.as_view(), name='delete'),
     url(r'^(?P<election_id>[0-9]+)/list/add$',
         ElectionListCreateView.as_view(), name='create_list'),
     url(r'^(?P<election_id>[0-9]+)/role/create$',
