@@ -24,34 +24,28 @@
 
 from django.apps import AppConfig
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, post_save, m2m_changed
+from django.core.signals import request_started
 
 class SithConfig(AppConfig):
     name = 'core'
     verbose_name = "Core app of the Sith"
 
     def ready(self):
-        from core.models import User, Group
-        from club.models import Club, Membership
+        from core.models import User
+        from club.models import Club
         from forum.models import Forum
 
-        def clear_cached_groups(sender, **kwargs):
-            if kwargs['model'] == Group:
-                User._group_ids = {}
-                User._group_name = {}
+        def clear_cached_groups(**kwargs):
+            User._group_ids = {}
+            User._group_name = {}
 
-        def clear_cached_memberships(sender, **kwargs):
+        def clear_cached_memberships(**kwargs):
             User._club_memberships = {}
             Club._memberships = {}
             Forum._club_memberships = {}
 
         print("Connecting signals!")
-        m2m_changed.connect(clear_cached_groups, weak=False, dispatch_uid="clear_cached_groups")
-        post_save.connect(clear_cached_memberships, weak=False, sender=Membership, # Membership is cached
-                dispatch_uid="clear_cached_memberships_membership")
-        post_save.connect(clear_cached_memberships, weak=False, sender=Club, # Club has a cache of Membership
-                dispatch_uid="clear_cached_memberships_club")
-        post_save.connect(clear_cached_memberships, weak=False, sender=Forum, # Forum has a cache of Membership
-                dispatch_uid="clear_cached_memberships_forum")
+        request_started.connect(clear_cached_groups, weak=False, dispatch_uid="clear_cached_groups")
+        request_started.connect(clear_cached_memberships, weak=False, dispatch_uid="clear_cached_memberships")
         # TODO: there may be a need to add more cache clearing
 
