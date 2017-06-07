@@ -29,8 +29,7 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
                  label=None, initial=None, help_text='', *args, **kwargs):
         self.max_choice = max_choice
         widget = forms.CheckboxSelectMultiple()
-        super(LimitedCheckboxField, self).__init__(queryset,
-                                                   None, required,
+        super(LimitedCheckboxField, self).__init__(queryset, None, required,
                                                    widget, label,
                                                    initial, help_text,
                                                    *args, **kwargs)
@@ -42,8 +41,7 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
 
     def validate(self, qs):
         if qs.count() > self.max_choice:
-            raise forms.ValidationError(
-                _("You have selected too much candidates."), code='invalid')
+            raise forms.ValidationError(_("You have selected too much candidates."), code='invalid')
 
 
 # Forms
@@ -66,10 +64,8 @@ class CandidateForm(forms.ModelForm):
         can_edit = kwargs.pop('can_edit', False)
         super(CandidateForm, self).__init__(*args, **kwargs)
         if election_id:
-            self.fields['role'].queryset = Role.objects.filter(
-                election__id=election_id).all()
-            self.fields['election_list'].queryset \
-                = ElectionList.objects.filter(election__id=election_id).all()
+            self.fields['role'].queryset = Role.objects.filter(election__id=election_id).all()
+            self.fields['election_list'].queryset = ElectionList.objects.filter(election__id=election_id).all()
         if not can_edit:
             self.fields['user'].widget = forms.HiddenInput()
 
@@ -81,13 +77,11 @@ class VoteForm(forms.Form):
             for role in election.roles.all():
                 cand = role.candidatures
                 if role.max_choice > 1:
-                    self.fields[role.title] = LimitedCheckboxField(
-                        cand, role.max_choice, required=False)
+                    self.fields[role.title] = LimitedCheckboxField(cand, role.max_choice, required=False)
                 else:
-                    self.fields[role.title] \
-                        = forms.ModelChoiceField(cand, required=False,
-                                                 widget=forms.RadioSelect(),
-                                                 empty_label=_("Blank vote"))
+                    self.fields[role.title] = forms.ModelChoiceField(cand, required=False,
+                                                                     widget=forms.RadioSelect(),
+                                                                     empty_label=_("Blank vote"))
 
 
 class RoleForm(forms.ModelForm):
@@ -109,8 +103,7 @@ class RoleForm(forms.ModelForm):
         election = cleaned_data.get('election')
         if Role.objects.filter(title=title, election=election).exists():
             raise forms.ValidationError(
-                _("This role already exists for this election"),
-                code='invalid')
+                _("This role already exists for this election"), code='invalid')
 
 
 class ElectionListForm(forms.ModelForm):
@@ -122,8 +115,7 @@ class ElectionListForm(forms.ModelForm):
         election_id = kwargs.pop('election_id', None)
         super(ElectionListForm, self).__init__(*args, **kwargs)
         if election_id:
-            self.fields['election'].queryset = Election.objects.filter(
-                id=election_id).all()
+            self.fields['election'].queryset = Election.objects.filter(id=election_id).all()
 
 
 class ElectionForm(forms.ModelForm):
@@ -142,18 +134,14 @@ class ElectionForm(forms.ModelForm):
             'candidature_groups': CheckboxSelectMultiple
         }
 
-    start_date = forms.DateTimeField(
-        ['%Y-%m-%d %H:%M:%S'], label=_("Start date"),
-        widget=SelectDateTime, required=True)
-    end_date = forms.DateTimeField(
-        ['%Y-%m-%d %H:%M:%S'], label=_("End date"),
-        widget=SelectDateTime, required=True)
-    start_candidature = forms.DateTimeField(
-        ['%Y-%m-%d %H:%M:%S'], label=_("Start candidature"),
-        widget=SelectDateTime, required=True)
-    end_candidature = forms.DateTimeField(
-        ['%Y-%m-%d %H:%M:%S'], label=_("End candidature"),
-        widget=SelectDateTime, required=True)
+    start_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start date"),
+                                     widget=SelectDateTime, required=True)
+    end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"),
+                                   widget=SelectDateTime, required=True)
+    start_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start candidature"),
+                                            widget=SelectDateTime, required=True)
+    end_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End candidature"),
+                                          widget=SelectDateTime, required=True)
 
 
 # Display elections
@@ -169,8 +157,7 @@ class ElectionsListView(CanViewMixin, ListView):
     template_name = 'election/election_list.jinja'
 
     def get_queryset(self):
-        return super(ElectionsListView,
-                     self).get_queryset().filter(archived=False).all()
+        return super(ElectionsListView, self).get_queryset().filter(archived=False).all()
 
 
 class ElectionListArchivedView(CanViewMixin, ListView):
@@ -183,8 +170,7 @@ class ElectionListArchivedView(CanViewMixin, ListView):
     template_name = 'election/election_list.jinja'
 
     def get_queryset(self):
-        return super(ElectionListArchivedView,
-                     self).get_queryset().filter(archived=True).all()
+        return super(ElectionListArchivedView, self).get_queryset().filter(archived=True).all()
 
 
 class ElectionDetailView(CanViewMixin, DetailView):
@@ -222,8 +208,7 @@ class VoteFormView(CanCreateMixin, FormView):
                 # If we have a multiple choice field
                 if isinstance(election_data[role_title], QuerySet):
                     if election_data[role_title].count() > 0:
-                        vote = Vote(role=election_data[
-                                    role_title].first().role)
+                        vote = Vote(role=election_data[role_title].first().role)
                         vote.save()
                     for el in election_data[role_title]:
                         vote.candidature.add(el)
@@ -277,8 +262,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs['election_id'])
-        return super(CandidatureCreateView,
-                     self).dispatch(request, *arg, **kwargs)
+        return super(CandidatureCreateView, self).dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
         init = {}
@@ -298,8 +282,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
         """
         obj = form.instance
         obj.election = Election.objects.get(id=self.election.id)
-        if(obj.election.can_candidate(obj.user)) and \
-                (obj.user == self.request.user or self.can_edit):
+        if(obj.election.can_candidate(obj.user)) and (obj.user == self.request.user or self.can_edit):
             return super(CreateView, self).form_valid(form)
         raise PermissionDenied
 
@@ -309,8 +292,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id': self.election.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
 
 
 class ElectionCreateView(CanCreateMixin, CreateView):
@@ -321,8 +303,7 @@ class ElectionCreateView(CanCreateMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_subscribed:
             raise PermissionDenied
-        return super(ElectionCreateView,
-                     self).dispatch(request, *args, **kwargs)
+        return super(ElectionCreateView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         """
@@ -332,8 +313,7 @@ class ElectionCreateView(CanCreateMixin, CreateView):
         return super(CreateView, self).form_valid(form)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id': self.object.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.id})
 
 
 class RoleCreateView(CanCreateMixin, CreateView):
@@ -369,8 +349,7 @@ class RoleCreateView(CanCreateMixin, CreateView):
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id': self.object.election.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
 
 
 class ElectionListCreateView(CanCreateMixin, CreateView):
@@ -382,8 +361,7 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         self.election = get_object_or_404(Election, pk=kwargs['election_id'])
         if not self.election.is_vote_editable:
             raise PermissionDenied
-        return super(ElectionListCreateView,
-                     self).dispatch(request, *arg, **kwargs)
+        return super(ElectionListCreateView, self).dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
         init = {}
@@ -410,8 +388,7 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         raise PermissionDenied
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id': self.object.election.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
 
 # Update view
 
@@ -425,30 +402,25 @@ class ElectionUpdateView(CanEditMixin, UpdateView):
     def get_initial(self):
         init = {}
         try:
-            init['start_date'] = self.object.start_date.strftime(
-                '%Y-%m-%d %H:%M:%S')
+            init['start_date'] = self.object.start_date.strftime('%Y-%m-%d %H:%M:%S')
         except Exception:
             pass
         try:
-            init['end_date'] = self.object.end_date.strftime(
-                '%Y-%m-%d %H:%M:%S')
+            init['end_date'] = self.object.end_date.strftime('%Y-%m-%d %H:%M:%S')
         except Exception:
             pass
         try:
-            init['start_candidature'] = self.object.start_candidature.strftime(
-                '%Y-%m-%d %H:%M:%S')
+            init['start_candidature'] = self.object.start_candidature.strftime('%Y-%m-%d %H:%M:%S')
         except Exception:
             pass
         try:
-            init['end_candidature'] = self.object.end_candidature.strftime(
-                '%Y-%m-%d %H:%M:%S')
+            init['end_candidature'] = self.object.end_candidature.strftime('%Y-%m-%d %H:%M:%S')
         except Exception:
             pass
         return init
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id': self.object.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.id})
 
 
 class CandidatureUpdateView(CanEditMixin, UpdateView):
@@ -475,8 +447,7 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         self.form = self.get_form()
         self.remove_fields()
-        if request.user.is_authenticated() and \
-                request.user.can_edit(self.object) and self.form.is_valid():
+        if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
             return super(CandidatureUpdateView, self).form_valid(self.form)
         return self.form_invalid(self.form)
 
@@ -486,9 +457,7 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id':
-                                    self.object.role.election.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.role.election.id})
 
 
 class RoleUpdateView(CanEditMixin, UpdateView):
@@ -516,8 +485,7 @@ class RoleUpdateView(CanEditMixin, UpdateView):
         self.object = self.get_object()
         self.form = self.get_form()
         self.remove_fields()
-        if request.user.is_authenticated() and \
-                request.user.can_edit(self.object) and self.form.is_valid():
+        if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
             return super(RoleUpdateView, self).form_valid(self.form)
         return self.form_invalid(self.form)
 
@@ -527,8 +495,7 @@ class RoleUpdateView(CanEditMixin, UpdateView):
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id': self.object.election.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
 
 # Delete Views
 
@@ -540,8 +507,7 @@ class ElectionDeleteView(DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_root:
-            return super(ElectionDeleteView,
-                         self).dispatch(request, *args, **kwargs)
+            return super(ElectionDeleteView, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
     def get_success_url(self, **kwargs):
@@ -556,15 +522,12 @@ class CandidatureDeleteView(CanEditMixin, DeleteView):
     def dispatch(self, request, *arg, **kwargs):
         self.object = self.get_object()
         self.election = self.object.role.election
-        if not self.election.can_candidate \
-                or not self.election.is_vote_editable:
+        if not self.election.can_candidate or not self.election.is_vote_editable:
             raise PermissionDenied
-        return super(CandidatureDeleteView,
-                     self).dispatch(request, *arg, **kwargs)
+        return super(CandidatureDeleteView, self).dispatch(request, *arg, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id': self.election.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
 
 
 class RoleDeleteView(CanEditMixin, DeleteView):
@@ -580,5 +543,4 @@ class RoleDeleteView(CanEditMixin, DeleteView):
         return super(RoleDeleteView, self).dispatch(request, *arg, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id': self.election.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
