@@ -29,10 +29,9 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
                  label=None, initial=None, help_text='', *args, **kwargs):
         self.max_choice = max_choice
         widget = forms.CheckboxSelectMultiple()
-        super(LimitedCheckboxField, self).__init__(queryset, None, required,
-                                                   widget, label,
-                                                   initial, help_text,
-                                                   *args, **kwargs)
+        super(LimitedCheckboxField,
+              self).__init__(queryset, None, required, widget,
+                             label, initial, help_text, *args, **kwargs)
 
     def clean(self, value):
         qs = super(LimitedCheckboxField, self).clean(value)
@@ -56,8 +55,7 @@ class CandidateForm(forms.ModelForm):
             'program': forms.Textarea
         }
 
-    user = AutoCompleteSelectField('users', label=_(
-        'User to candidate'), help_text=None, required=True)
+    user = AutoCompleteSelectField('users', label=_('User to candidate'), help_text=None, required=True)
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop('election_id', None)
@@ -94,16 +92,14 @@ class RoleForm(forms.ModelForm):
         election_id = kwargs.pop('election_id', None)
         super(RoleForm, self).__init__(*args, **kwargs)
         if election_id:
-            self.fields['election'].queryset = Election.objects.filter(
-                id=election_id).all()
+            self.fields['election'].queryset = Election.objects.filter(id=election_id).all()
 
     def clean(self):
         cleaned_data = super(RoleForm, self).clean()
         title = cleaned_data.get('title')
         election = cleaned_data.get('election')
         if Role.objects.filter(title=title, election=election).exists():
-            raise forms.ValidationError(
-                _("This role already exists for this election"), code='invalid')
+            raise forms.ValidationError(_("This role already exists for this election"), code='invalid')
 
 
 class ElectionListForm(forms.ModelForm):
@@ -238,8 +234,7 @@ class VoteFormView(CanCreateMixin, FormView):
         return res
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail',
-                            kwargs={'election_id': self.election.id})
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
 
     def get_context_data(self, **kwargs):
         """ Add additionnal data to the template """
@@ -433,8 +428,7 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
         self.object = self.get_object()
         if not self.object.role.election.is_vote_editable:
             raise PermissionDenied
-        return super(CandidatureUpdateView,
-                     self).dispatch(request, *arg, **kwargs)
+        return super(CandidatureUpdateView, self).dispatch(request, *arg, **kwargs)
 
     def remove_fields(self):
         self.form.fields.pop('role', None)
