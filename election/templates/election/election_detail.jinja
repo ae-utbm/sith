@@ -279,6 +279,7 @@ th {
                                 <a href="{{url('election:update_role', role_id=role.id)}}">{% trans %}Edit{% endtrans %}</a>
                                 <a href="{{url('election:delete_role', role_id=role.id)}}">{% trans %}Delete{% endtrans %}</a>
                             {%- endif -%}
+                            <br><span>{{ role.description }}</span>
                             {%- if role.max_choice > 1 and not election.has_voted(user) and election.can_vote(user) %}
                             <strong class="role__multiple-choices-label">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
                             {%- endif %}
@@ -372,6 +373,9 @@ th {
         <a href="{{ url('election:create_role', election_id=object.id) }}">{% trans %}Add a new role{% endtrans %}</a>
         {% endif %}
         <a href="{{ url('election:update', election_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
+    {%- endif %}
+    {%- if user.is_root %}
+        <a href="{{ url('election:delete', election_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
     {%- endif %}
     </section>
 {% endblock %}

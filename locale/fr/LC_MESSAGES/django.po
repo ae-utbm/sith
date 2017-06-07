@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-06 23:25+0200\n"
+"POT-Creation-Date: 2017-06-07 17:32+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -88,12 +88,12 @@ msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
 #: accounting/models.py:192 club/models.py:184 counter/models.py:433
-#: election/models.py:18 launderette/models.py:144
+#: election/models.py:17 launderette/models.py:144
 msgid "start date"
 msgstr "date de début"
 
 #: accounting/models.py:193 club/models.py:185 counter/models.py:434
-#: election/models.py:19
+#: election/models.py:18
 msgid "end date"
 msgstr "date de fin"
 
@@ -335,6 +335,7 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:59
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:329
+#: election/templates/election/election_detail.jinja:377
 #: forum/templates/forum/macros.jinja:21 forum/templates/forum/macros.jinja:123
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:178 sas/templates/sas/album.jinja:26
@@ -830,19 +831,19 @@ msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
 #: club/models.py:182 counter/models.py:431 counter/models.py:448
-#: eboutic/models.py:38 eboutic/models.py:71 election/models.py:130
+#: eboutic/models.py:38 eboutic/models.py:71 election/models.py:147
 #: launderette/models.py:111 launderette/models.py:148 sas/models.py:156
 msgid "user"
 msgstr "nom d'utilisateur"
 
-#: club/models.py:186 core/models.py:169 election/models.py:129
-#: election/models.py:145
+#: club/models.py:186 core/models.py:169 election/models.py:145
+#: election/models.py:165
 msgid "role"
 msgstr "rôle"
 
 #: club/models.py:188 core/models.py:61 counter/models.py:101
-#: counter/models.py:126 election/models.py:15 election/models.py:82
-#: election/models.py:131 forum/models.py:51 forum/models.py:184
+#: counter/models.py:126 election/models.py:13 election/models.py:93
+#: election/models.py:148 forum/models.py:51 forum/models.py:184
 msgid "description"
 msgstr "description"
 
@@ -1069,6 +1070,7 @@ msgstr "Date de début"
 
 #: club/views.py:196 com/views.py:123 counter/views.py:1020
 #: election/views.py:131 subscription/views.py:50
+#: election/views.py:149
 msgid "End date"
 msgstr "Date de fin"
 
@@ -1109,8 +1111,8 @@ msgstr "Hebdomadaire"
 msgid "Call"
 msgstr "Appel"
 
-#: com/models.py:60 com/models.py:102 com/models.py:149 election/models.py:14
-#: election/models.py:81 election/models.py:118 forum/models.py:187
+#: com/models.py:60 com/models.py:102 com/models.py:149 election/models.py:12
+#: election/models.py:92 election/models.py:132 forum/models.py:187
 #: forum/models.py:234
 msgid "title"
 msgstr "titre"
@@ -1416,6 +1418,7 @@ msgid "Alert message"
 msgstr "Message d'alerte"
 
 #: com/views.py:122 election/views.py:130 subscription/views.py:47
+#: com/views.py:122 election/views.py:146
 msgid "Start date"
 msgstr "Date de début"
 
@@ -2145,6 +2148,18 @@ msgstr "Créneau"
 msgid "Tokens"
 msgstr "Jetons"
 
+#: core/templates/core/macros.jinja:78 core/templates/core/macros.jinja:80
+msgid "Previous"
+msgstr "Précédent"
+
+#: core/templates/core/macros.jinja:84
+msgid "current"
+msgstr "actuel"
+
+#: core/templates/core/macros.jinja:90 core/templates/core/macros.jinja:92
+msgid "Next"
+msgstr "Suivant"
+
 #: core/templates/core/new_user_email.jinja:2
 msgid ""
 "You're receiving this email because you subscribed to the UTBM student "
@@ -2698,6 +2713,10 @@ msgstr "Élections"
 msgid "See available elections"
 msgstr "Voir les élections disponibles"
 
+#: core/templates/core/user_tools.jinja:105
+msgid "See archived elections"
+msgstr "Voir les élections archivées"
+
 #: core/templates/core/user_tools.jinja:107
 msgid "Create a new election"
 msgstr "Créer une nouvelle élection"
@@ -2834,7 +2853,7 @@ msgstr "produit parent"
 msgid "buying groups"
 msgstr "groupe d'achat"
 
-#: counter/models.py:140
+#: counter/models.py:140 election/models.py:34
 msgid "archived"
 msgstr "archivé"
 
@@ -3035,21 +3054,7 @@ msgstr "Coffre vidé"
 msgid "yes"
 msgstr "oui"
 
-#: counter/templates/counter/cash_summary_list.jinja:61
 #: counter/templates/counter/cash_summary_list.jinja:63
-msgid "Previous"
-msgstr "Précédent"
-
-#: counter/templates/counter/cash_summary_list.jinja:67
-msgid "current"
-msgstr "actuel"
-
-#: counter/templates/counter/cash_summary_list.jinja:73
-#: counter/templates/counter/cash_summary_list.jinja:75
-msgid "Next"
-msgstr "Suivant"
-
-#: counter/templates/counter/cash_summary_list.jinja:79
 msgid "There is no cash register summary in this website."
 msgstr "Il n'y a pas de relevé de caisse dans ce site web."
 
@@ -3434,43 +3439,43 @@ msgstr "Retourner à l'eboutic"
 msgid "You do not have enough money to buy the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: election/models.py:16
+#: election/models.py:15
 msgid "start candidature"
 msgstr "début des candidatures"
 
-#: election/models.py:17
+#: election/models.py:16
 msgid "end candidature"
 msgstr "fin des candidatures"
 
-#: election/models.py:21
+#: election/models.py:22
 msgid "edit groups"
 msgstr "groupe d'édition"
 
-#: election/models.py:22
+#: election/models.py:25
 msgid "view groups"
 msgstr "groupe de vue"
 
-#: election/models.py:23
+#: election/models.py:28
 msgid "vote groups"
 msgstr "groupe de vote"
 
-#: election/models.py:24
+#: election/models.py:31
 msgid "candidature groups"
 msgstr "groupe de candidature"
 
-#: election/models.py:80 election/models.py:119
+#: election/models.py:91 election/models.py:134
 msgid "election"
 msgstr "élection"
 
-#: election/models.py:83
+#: election/models.py:94
 msgid "max choice"
 msgstr "nombre de choix maxi"
 
-#: election/models.py:132
+#: election/models.py:151
 msgid "election list"
 msgstr "liste électorale"
 
-#: election/models.py:146
+#: election/models.py:167
 msgid "candidature"
 msgstr "candidature"
 
@@ -3498,10 +3503,10 @@ msgstr "Les votes ouvriront "
 
 #: election/templates/election/election_detail.jinja:243
 #: election/templates/election/election_detail.jinja:247
-#: election/templates/election/election_list.jinja:31
-#: election/templates/election/election_list.jinja:34
-#: election/templates/election/election_list.jinja:39
-#: election/templates/election/election_list.jinja:42
+#: election/templates/election/election_list.jinja:32
+#: election/templates/election/election_list.jinja:35
+#: election/templates/election/election_list.jinja:40
+#: election/templates/election/election_list.jinja:43
 #: forum/templates/forum/macros.jinja:137
 msgid " at "
 msgstr " à "
@@ -3518,7 +3523,7 @@ msgstr "Vous avez déjà soumis votre vote."
 msgid "You have voted in this election."
 msgstr "Vous avez déjà voté pour cette élection."
 
-#: election/templates/election/election_detail.jinja:266 election/views.py:82
+#: election/templates/election/election_detail.jinja:266 election/views.py:90
 msgid "Blank vote"
 msgstr "Vote blanc"
 
@@ -3556,44 +3561,44 @@ msgstr "Ajouter une nouvelle liste"
 msgid "Add a new role"
 msgstr "Ajouter un nouveau rôle"
 
-#: election/templates/election/election_list.jinja:4
+#: election/templates/election/election_list.jinja:5
 msgid "Election list"
 msgstr "Liste des élections"
 
-#: election/templates/election/election_list.jinja:21
+#: election/templates/election/election_list.jinja:22
 msgid "Current elections"
 msgstr "Élections actuelles"
 
-#: election/templates/election/election_list.jinja:29
+#: election/templates/election/election_list.jinja:30
 msgid "Applications open from"
 msgstr "Candidatures ouvertes à partir du"
 
-#: election/templates/election/election_list.jinja:32
-#: election/templates/election/election_list.jinja:40
+#: election/templates/election/election_list.jinja:33
+#: election/templates/election/election_list.jinja:41
 msgid "to"
 msgstr "au"
 
-#: election/templates/election/election_list.jinja:37
+#: election/templates/election/election_list.jinja:38
 msgid "Polls open from"
 msgstr "Votes ouverts du"
 
-#: election/views.py:44
+#: election/views.py:46
 msgid "You have selected too much candidates."
 msgstr "Vous avez sélectionné trop de candidats."
 
-#: election/views.py:59
+#: election/views.py:62
 msgid "User to candidate"
 msgstr "Utilisateur se présentant"
 
-#: election/views.py:102
+#: election/views.py:112
 msgid "This role already exists for this election"
 msgstr "Ce rôle existe déjà pour cette élection"
 
-#: election/views.py:132
+#: election/views.py:152
 msgid "Start candidature"
 msgstr "Début des candidatures"
 
-#: election/views.py:133
+#: election/views.py:155
 msgid "End candidature"
 msgstr "Fin des candidatures"
 

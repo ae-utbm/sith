@@ -1,19 +1,16 @@
-from django.shortcuts import redirect, get_object_or_404
-from django.views.generic import ListView, DetailView, RedirectView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.shortcuts import get_object_or_404
+from django.views.generic import ListView, DetailView
+from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic.edit import DeleteView, FormView
+from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-from django.forms.models import modelform_factory
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ImproperlyConfigured
-from django.db import DataError, transaction
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.forms import CheckboxSelectMultiple
-from django.utils import timezone
-from django.conf import settings
 from django import forms
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from core.views import CanViewMixin, CanEditMixin, CanCreateMixin
 from django.db.models.query import QuerySet
-from django.views.generic.edit import FormMixin
 from core.views.forms import SelectDateTime
 from election.models import Election, Role, Candidature, ElectionList, Vote
 
@@ -27,12 +24,14 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
         Used to replace ModelMultipleChoiceField but with
         automatic backend verification
     """
-    def __init__(self, queryset, max_choice, required=True, widget=None, label=None,
-                 initial=None, help_text='', *args, **kwargs):
+
+    def __init__(self, queryset, max_choice, required=True, widget=None,
+                 label=None, initial=None, help_text='', *args, **kwargs):
         self.max_choice = max_choice
         widget = forms.CheckboxSelectMultiple()
-        super(LimitedCheckboxField, self).__init__(queryset, None, required, widget, label,
-                                                   initial, help_text, *args, **kwargs)
+        super(LimitedCheckboxField,
+              self).__init__(queryset, None, required, widget,
+                             label, initial, help_text, *args, **kwargs)
 
     def clean(self, value):
         qs = super(LimitedCheckboxField, self).clean(value)
@@ -79,7 +78,8 @@ class VoteForm(forms.Form):
                     self.fields[role.title] = LimitedCheckboxField(cand, role.max_choice, required=False)
                 else:
                     self.fields[role.title] = forms.ModelChoiceField(cand, required=False,
-                                                                     widget=forms.RadioSelect(), empty_label=_("Blank vote"))
+                                                                     widget=forms.RadioSelect(),
+                                                                     empty_label=_("Blank vote"))
 
 
 class RoleForm(forms.ModelForm):
@@ -105,7 +105,7 @@ class RoleForm(forms.ModelForm):
 class ElectionListForm(forms.ModelForm):
     class Meta:
         model = ElectionList
-        fields = ('title','election')
+        fields = ('title', 'election')
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop('election_id', None)
@@ -117,8 +117,11 @@ class ElectionListForm(forms.ModelForm):
 class ElectionForm(forms.ModelForm):
     class Meta:
         model = Election
-        fields = ['title', 'description', 'start_candidature', 'end_candidature', 'start_date', 'end_date',
-                  'edit_groups', 'view_groups', 'vote_groups', 'candidature_groups']
+        fields = ['title', 'description', 'archived',
+                  'start_candidature', 'end_candidature',
+                  'start_date', 'end_date',
+                  'edit_groups', 'view_groups',
+                  'vote_groups', 'candidature_groups']
         widgets = {
             'edit_groups': CheckboxSelectMultiple,
             'view_groups': CheckboxSelectMultiple,
@@ -127,10 +130,14 @@ class ElectionForm(forms.ModelForm):
             'candidature_groups': CheckboxSelectMultiple
         }
 
-    start_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start date"), widget=SelectDateTime, required=True)
-    end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"), widget=SelectDateTime, required=True)
-    start_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start candidature"), widget=SelectDateTime, required=True)
-    end_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End candidature"), widget=SelectDateTime, required=True)
+    start_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start date"),
+                                     widget=SelectDateTime, required=True)
+    end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"),
+                                   widget=SelectDateTime, required=True)
+    start_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start candidature"),
+                                            widget=SelectDateTime, required=True)
+    end_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End candidature"),
+                                          widget=SelectDateTime, required=True)
 
 
 # Display elections
@@ -138,10 +145,28 @@ class ElectionForm(forms.ModelForm):
 
 class ElectionsListView(CanViewMixin, ListView):
     """
-    A list with all responsabilities and their candidates
+    A list of all non archived elections visible
     """
     model = Election
+    ordering = ["-id"]
+    paginate_by = 10
     template_name = 'election/election_list.jinja'
+
+    def get_queryset(self):
+        return super(ElectionsListView, self).get_queryset().filter(archived=False).all()
+
+
+class ElectionListArchivedView(CanViewMixin, ListView):
+    """
+    A list of all archived elections visible
+    """
+    model = Election
+    ordering = ["-id"]
+    paginate_by = 10
+    template_name = 'election/election_list.jinja'
+
+    def get_queryset(self):
+        return super(ElectionListArchivedView, self).get_queryset().filter(archived=True).all()
 
 
 class ElectionDetailView(CanViewMixin, DetailView):
@@ -277,7 +302,8 @@ class ElectionCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-            Allow every users that had passed the dispatch to create an election
+            Allow every users that had passed the dispatch
+            to create an election
         """
         return super(CreateView, self).form_valid(form)
 
@@ -372,16 +398,20 @@ class ElectionUpdateView(CanEditMixin, UpdateView):
         init = {}
         try:
             init['start_date'] = self.object.start_date.strftime('%Y-%m-%d %H:%M:%S')
-        except:pass
+        except Exception:
+            pass
         try:
             init['end_date'] = self.object.end_date.strftime('%Y-%m-%d %H:%M:%S')
-        except:pass
+        except Exception:
+            pass
         try:
             init['start_candidature'] = self.object.start_candidature.strftime('%Y-%m-%d %H:%M:%S')
-        except:pass
+        except Exception:
+            pass
         try:
             init['end_candidature'] = self.object.end_candidature.strftime('%Y-%m-%d %H:%M:%S')
-        except:pass
+        except Exception:
+            pass
         return init
 
     def get_success_url(self, **kwargs):
@@ -462,6 +492,20 @@ class RoleUpdateView(CanEditMixin, UpdateView):
         return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
 
 # Delete Views
+
+
+class ElectionDeleteView(DeleteView):
+    model = Election
+    template_name = 'core/delete_confirm.jinja'
+    pk_url_kwarg = 'election_id'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_root:
+            return super(ElectionDeleteView, self).dispatch(request, *args, **kwargs)
+        raise PermissionDenied
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:list')
 
 
 class CandidatureDeleteView(CanEditMixin, DeleteView):

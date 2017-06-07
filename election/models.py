@@ -1,9 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.conf import settings
 
-from datetime import timedelta
 from core.models import User, Group
 
 
@@ -18,11 +16,24 @@ class Election(models.Model):
     start_date = models.DateTimeField(_('start date'), blank=False)
     end_date = models.DateTimeField(_('end date'), blank=False)
 
-    edit_groups = models.ManyToManyField(Group, related_name="editable_elections", verbose_name=_("edit groups"), blank=True)
-    view_groups = models.ManyToManyField(Group, related_name="viewable_elections", verbose_name=_("view groups"), blank=True)
-    vote_groups = models.ManyToManyField(Group, related_name="votable_elections", verbose_name=_("vote groups"), blank=True)
-    candidature_groups = models.ManyToManyField(Group, related_name="candidate_elections", verbose_name=_("candidature groups"), blank=True)
+    edit_groups = models.ManyToManyField(
+        Group, related_name="editable_elections",
+        verbose_name=_("edit groups"), blank=True)
+
+    view_groups = models.ManyToManyField(
+        Group, related_name="viewable_elections",
+        verbose_name=_("view groups"), blank=True)
+
+    vote_groups = models.ManyToManyField(
+        Group, related_name="votable_elections",
+        verbose_name=_("vote groups"), blank=True)
+
+    candidature_groups = models.ManyToManyField(
+        Group, related_name="candidate_elections",
+        verbose_name=_("candidature groups"), blank=True)
+
     voters = models.ManyToManyField(User, verbose_name=('voters'), related_name='voted_elections')
+    archived = models.BooleanField(_("archived"), default=False)
 
     def __str__(self):
         return self.title
@@ -99,8 +110,7 @@ class Role(models.Model):
         if total_vote == 0:
             results['blank vote'] = {'vote': 0, 'percent': 0}
         else:
-            results['blank vote'] = {'vote': total_vote - non_blank,
-                                     'percent': (total_vote - non_blank) * 100 / total_vote}
+            results['blank vote'] = {'vote': total_vote - non_blank, 'percent': (total_vote - non_blank) * 100 / total_vote}
         return results
 
     @property
