@@ -22,13 +22,14 @@
 #
 #
 
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from subscription.views import *
 
 urlpatterns = [
     # Subscription views
     url(r'^$', NewSubscription.as_view(), name='subscription'),
+    url(r'stats', SubscriptionsStatsView.as_view(), name='stats'),
 ]
 
 

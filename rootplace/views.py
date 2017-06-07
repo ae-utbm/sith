@@ -31,6 +31,7 @@ from django.core.exceptions import PermissionDenied
 
 from ajax_select.fields import AutoCompleteSelectField
 
+from core.views import CanViewMixin
 from core.models import User
 from counter.models import Customer
 

@@ -16,6 +16,7 @@
     {% endif %}
     {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root %}
     <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
+    <li><a href="{{ url('subscription:stats') }}">{% trans %}Subscription stats{% endtrans %}</a></li>
     <li><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></li>
     {% endif %}
 </ul>
