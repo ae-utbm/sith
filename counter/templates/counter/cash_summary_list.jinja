@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'core/macros.jinja' import user_profile_link, paginate %}
 
 {% block title %}
 {% trans %}Cash register summary list{% endtrans %}
@@ -57,23 +57,7 @@
 </table>
 <br>
 {% if is_paginated %}
-        {% if page_obj.has_previous() %}
-            <a href="?page={{ page_obj.previous_page_number() }}">{% trans %}Previous{% endtrans %}</a>
-        {% else %}
-            <span class="disabled">{% trans %}Previous{% endtrans %}</span>
-        {% endif %}
-    {% for i in paginator.page_range %}
-        {% if page_obj.number == i %}
-            <span class="active">{{ i }} <span class="sr-only">({% trans %}current{% endtrans %})</span></span>
-        {% else %}
-            <a href="?page={{ i }}">{{ i }}</a>
-        {% endif %}
-    {% endfor %}
-    {% if page_obj.has_next() %}
-        <a href="?page={{ page_obj.next_page_number() }}">{% trans %}Next{% endtrans %}</a>
-    {% else %}
-        <span class="disabled">{% trans %}Next{% endtrans %}</span>
-    {% endif %}
+    {{ paginate(page_obj, paginator) }}
 {% endif %}
 {% else %}
 {% trans %}There is no cash register summary in this website.{% endtrans %}

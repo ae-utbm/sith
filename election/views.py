@@ -164,6 +164,8 @@ class ElectionsListView(CanViewMixin, ListView):
     A list with all responsabilities and their candidates
     """
     model = Election
+    ordering = ["-id"]
+    paginate_by = 10
     template_name = 'election/election_list.jinja'
 
 

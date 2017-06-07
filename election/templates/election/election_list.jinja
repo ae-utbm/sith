@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import paginate %}
 
 {% block title %}
 {%- trans %}Election list{% endtrans %}
@@ -44,5 +45,8 @@
     <p>{{ election.description }}</p>
   </section>
   {%- endfor %}
+{% if is_paginated %}
+    {{ paginate(page_obj, paginator) }}
+{% endif %}
 {%- endblock %}
 
