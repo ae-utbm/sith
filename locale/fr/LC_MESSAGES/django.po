@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-07 17:32+0200\n"
+"POT-Creation-Date: 2017-06-09 16:30+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -88,12 +88,12 @@ msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
 #: accounting/models.py:192 club/models.py:184 counter/models.py:433
-#: election/models.py:17 launderette/models.py:144
+#: election/models.py:16 launderette/models.py:144
 msgid "start date"
 msgstr "date de début"
 
 #: accounting/models.py:193 club/models.py:185 counter/models.py:434
-#: election/models.py:18
+#: election/models.py:17
 msgid "end date"
 msgstr "date de fin"
 
@@ -101,7 +101,7 @@ msgstr "date de fin"
 msgid "is closed"
 msgstr "est fermé"
 
-#: accounting/models.py:196 accounting/models.py:414
+#: accounting/models.py:196 accounting/models.py:416
 msgid "club account"
 msgstr "compte club"
 
@@ -158,12 +158,12 @@ msgstr "est fait"
 msgid "simple type"
 msgstr "type simplifié"
 
-#: accounting/models.py:263 accounting/models.py:369
+#: accounting/models.py:263 accounting/models.py:371
 msgid "accounting type"
 msgstr "type comptable"
 
-#: accounting/models.py:265 accounting/models.py:364 accounting/models.py:390
-#: accounting/models.py:413 counter/models.py:316
+#: accounting/models.py:265 accounting/models.py:366 accounting/models.py:392
+#: accounting/models.py:415 counter/models.py:316
 msgid "label"
 msgstr "étiquette"
 
@@ -217,6 +217,10 @@ msgid "linked operation"
 msgstr "opération liée"
 
 #: accounting/models.py:286
+msgid "The date must be set."
+msgstr "La date doit être indiquée."
+
+#: accounting/models.py:288
 #, python-format
 msgid ""
 "The date can not be before the start date of the journal, which is\n"
@@ -225,16 +229,16 @@ msgstr ""
 "La date ne peut pas être avant la date de début du journal, qui est\n"
 "%(start_date)s."
 
-#: accounting/models.py:289
+#: accounting/models.py:291
 msgid "Target does not exists"
 msgstr "La cible n'existe pas."
 
-#: accounting/models.py:291
+#: accounting/models.py:293
 msgid "Please add a target label if you set no existing target"
 msgstr ""
 "Merci d'ajouter un nom de cible si vous ne spécifiez pas de cible existante"
 
-#: accounting/models.py:293
+#: accounting/models.py:295
 msgid ""
 "You need to provide ether a simplified accounting type or a standard "
 "accounting type"
@@ -242,41 +246,41 @@ msgstr ""
 "Vous devez fournir soit un type comptable simplifié ou un type comptable "
 "standard"
 
-#: accounting/models.py:359 counter/models.py:129
+#: accounting/models.py:361 counter/models.py:129
 msgid "code"
 msgstr "code"
 
-#: accounting/models.py:361
+#: accounting/models.py:363
 msgid "An accounting type code contains only numbers"
 msgstr "Un code comptable ne contient que des numéros"
 
-#: accounting/models.py:365
+#: accounting/models.py:367
 msgid "movement type"
 msgstr "type de mouvement"
 
-#: accounting/models.py:365
+#: accounting/models.py:367
 #: accounting/templates/accounting/journal_statement_nature.jinja:8
 #: accounting/templates/accounting/journal_statement_person.jinja:11
-#: accounting/views.py:456
+#: accounting/views.py:463
 msgid "Credit"
 msgstr "Crédit"
 
-#: accounting/models.py:365
+#: accounting/models.py:367
 #: accounting/templates/accounting/journal_statement_nature.jinja:27
 #: accounting/templates/accounting/journal_statement_person.jinja:39
-#: accounting/views.py:456
+#: accounting/views.py:463
 msgid "Debit"
 msgstr "Débit"
 
-#: accounting/models.py:366
+#: accounting/models.py:368
 msgid "Neutral"
 msgstr "Neutre"
 
-#: accounting/models.py:392
+#: accounting/models.py:394
 msgid "simplified accounting types"
 msgstr "type simplifié"
 
-#: accounting/models.py:395
+#: accounting/models.py:397
 msgid "simplified type"
 msgstr "type simplifié"
 
@@ -334,8 +338,8 @@ msgstr "Compte en banque : "
 #: counter/templates/counter/last_ops.jinja:29
 #: counter/templates/counter/last_ops.jinja:59
 #: election/templates/election/election_detail.jinja:280
-#: election/templates/election/election_detail.jinja:329
-#: election/templates/election/election_detail.jinja:377
+#: election/templates/election/election_detail.jinja:330
+#: election/templates/election/election_detail.jinja:378
 #: forum/templates/forum/macros.jinja:21 forum/templates/forum/macros.jinja:123
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:178 sas/templates/sas/album.jinja:26
@@ -378,8 +382,8 @@ msgstr "Nouveau compte club"
 #: counter/templates/counter/counter_list.jinja:32
 #: counter/templates/counter/counter_list.jinja:53
 #: election/templates/election/election_detail.jinja:279
-#: election/templates/election/election_detail.jinja:326
-#: election/templates/election/election_detail.jinja:374
+#: election/templates/election/election_detail.jinja:327
+#: election/templates/election/election_detail.jinja:375
 #: forum/templates/forum/macros.jinja:20 forum/templates/forum/macros.jinja:62
 #: forum/templates/forum/macros.jinja:117
 #: launderette/templates/launderette/launderette_list.jinja:16
@@ -705,7 +709,7 @@ msgstr "Sauver"
 
 #: accounting/templates/accounting/refound_account.jinja:4
 #: accounting/templates/accounting/refound_account.jinja:8
-#: accounting/views.py:719
+#: accounting/views.py:726
 msgid "Refound account"
 msgstr "Remboursement de compte"
 
@@ -726,7 +730,7 @@ msgstr "Types simplifiés"
 msgid "New simplified type"
 msgstr "Nouveau type simplifié"
 
-#: accounting/views.py:196 accounting/views.py:203 accounting/views.py:439
+#: accounting/views.py:196 accounting/views.py:203 accounting/views.py:446
 msgid "Journal"
 msgstr "Classeur"
 
@@ -742,59 +746,67 @@ msgstr "Bilan par personne"
 msgid "Accounting statement"
 msgstr "Bilan comptable"
 
-#: accounting/views.py:433 accounting/views.py:439
+#: accounting/views.py:309
+msgid "The target must be set."
+msgstr "La cible doit être indiquée."
+
+#: accounting/views.py:321
+msgid "The amount must be set."
+msgstr "Le montant doit être indiqué."
+
+#: accounting/views.py:440 accounting/views.py:446
 msgid "Operation"
 msgstr "Opération"
 
-#: accounting/views.py:449
+#: accounting/views.py:456
 msgid "Financial proof: "
 msgstr "Justificatif de libellé : "
 
-#: accounting/views.py:450
+#: accounting/views.py:457
 #, python-format
 msgid "Club: %(club_name)s"
 msgstr "Club : %(club_name)s"
 
-#: accounting/views.py:451
+#: accounting/views.py:458
 #, python-format
 msgid "Label: %(op_label)s"
 msgstr "Libellé : %(op_label)s"
 
-#: accounting/views.py:452
+#: accounting/views.py:459
 #, python-format
 msgid "Date: %(date)s"
 msgstr "Date : %(date)s"
 
-#: accounting/views.py:458
+#: accounting/views.py:465
 #, python-format
 msgid "Amount: %(amount).2f €"
 msgstr "Montant : %(amount).2f €"
 
-#: accounting/views.py:470
+#: accounting/views.py:477
 msgid "Debtor"
 msgstr "Débiteur"
 
-#: accounting/views.py:470
+#: accounting/views.py:477
 msgid "Creditor"
 msgstr "Créditeur"
 
-#: accounting/views.py:472
+#: accounting/views.py:479
 msgid "Comment:"
 msgstr "Commentaire :"
 
-#: accounting/views.py:491
+#: accounting/views.py:498
 msgid "Signature:"
 msgstr "Signature :"
 
-#: accounting/views.py:545
+#: accounting/views.py:552
 msgid "General statement"
 msgstr "Bilan général"
 
-#: accounting/views.py:548
+#: accounting/views.py:555
 msgid "No label operations"
 msgstr "Opérations sans étiquette"
 
-#: accounting/views.py:681
+#: accounting/views.py:688
 msgid "Refound this account"
 msgstr "Rembourser ce compte"
 
@@ -831,19 +843,19 @@ msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
 #: club/models.py:182 counter/models.py:431 counter/models.py:448
-#: eboutic/models.py:38 eboutic/models.py:71 election/models.py:147
+#: eboutic/models.py:38 eboutic/models.py:71 election/models.py:140
 #: launderette/models.py:111 launderette/models.py:148 sas/models.py:156
 msgid "user"
 msgstr "nom d'utilisateur"
 
-#: club/models.py:186 core/models.py:169 election/models.py:145
-#: election/models.py:165
+#: club/models.py:186 core/models.py:169 election/models.py:139
+#: election/models.py:155
 msgid "role"
 msgstr "rôle"
 
 #: club/models.py:188 core/models.py:61 counter/models.py:101
 #: counter/models.py:126 election/models.py:13 election/models.py:93
-#: election/models.py:148 forum/models.py:51 forum/models.py:184
+#: election/models.py:141 forum/models.py:51 forum/models.py:184
 msgid "description"
 msgstr "description"
 
@@ -983,8 +995,8 @@ msgstr "Quantité"
 #: counter/templates/counter/cash_summary_list.jinja:35
 #: counter/templates/counter/last_ops.jinja:44
 #: counter/templates/counter/stats.jinja:18
-#: subscription/templates/subscription/stats.jinja:33
-#: subscription/templates/subscription/stats.jinja:41
+#: subscription/templates/subscription/stats.jinja:40
+#: subscription/templates/subscription/stats.jinja:48
 msgid "Total"
 msgstr "Total"
 
@@ -1069,8 +1081,7 @@ msgid "Begin date"
 msgstr "Date de début"
 
 #: club/views.py:196 com/views.py:123 counter/views.py:1020
-#: election/views.py:131 subscription/views.py:50
-#: election/views.py:149
+#: election/views.py:135 subscription/views.py:50
 msgid "End date"
 msgstr "Date de fin"
 
@@ -1112,7 +1123,7 @@ msgid "Call"
 msgstr "Appel"
 
 #: com/models.py:60 com/models.py:102 com/models.py:149 election/models.py:12
-#: election/models.py:92 election/models.py:132 forum/models.py:187
+#: election/models.py:92 election/models.py:128 forum/models.py:187
 #: forum/models.py:234
 msgid "title"
 msgstr "titre"
@@ -1121,7 +1132,8 @@ msgstr "titre"
 msgid "summary"
 msgstr "résumé"
 
-#: com/models.py:62 com/models.py:150 trombi/models.py:108
+#: com/models.py:62 com/models.py:150 pedagogy/models.py:82
+#: trombi/models.py:108
 msgid "content"
 msgstr "contenu"
 
@@ -1417,8 +1429,7 @@ msgstr "Message d'info"
 msgid "Alert message"
 msgstr "Message d'alerte"
 
-#: com/views.py:122 election/views.py:130 subscription/views.py:47
-#: com/views.py:122 election/views.py:146
+#: com/views.py:122 election/views.py:133 subscription/views.py:47
 msgid "Start date"
 msgstr "Date de début"
 
@@ -1682,7 +1693,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/templates/core/user_detail.jinja:14
 #: core/templates/core/user_detail.jinja:16
 #: core/templates/core/user_edit.jinja:17
-#: election/templates/election/election_detail.jinja:316
+#: election/templates/election/election_detail.jinja:317
 #: forum/templates/forum/macros.jinja:93 forum/templates/forum/macros.jinja:95
 #: forum/templates/forum/reply.jinja:37 forum/templates/forum/reply.jinja:39
 #: trombi/templates/trombi/user_tools.jinja:43
@@ -2713,23 +2724,23 @@ msgstr "Élections"
 msgid "See available elections"
 msgstr "Voir les élections disponibles"
 
-#: core/templates/core/user_tools.jinja:105
+#: core/templates/core/user_tools.jinja:106
 msgid "See archived elections"
 msgstr "Voir les élections archivées"
 
-#: core/templates/core/user_tools.jinja:107
+#: core/templates/core/user_tools.jinja:108
 msgid "Create a new election"
 msgstr "Créer une nouvelle élection"
 
-#: core/templates/core/user_tools.jinja:110
+#: core/templates/core/user_tools.jinja:111
 msgid "Other tools"
 msgstr "Autres outils"
 
-#: core/templates/core/user_tools.jinja:112
+#: core/templates/core/user_tools.jinja:113
 msgid "Convert dokuwiki/BBcode syntax to Markdown"
 msgstr "Convertir de la syntaxe dokuwiki/BBcode vers Markdown"
 
-#: core/templates/core/user_tools.jinja:113
+#: core/templates/core/user_tools.jinja:114
 msgid "Trombi tools"
 msgstr "Outils Trombi"
 
@@ -2853,7 +2864,7 @@ msgstr "produit parent"
 msgid "buying groups"
 msgstr "groupe d'achat"
 
-#: counter/models.py:140 election/models.py:34
+#: counter/models.py:140 election/models.py:36
 msgid "archived"
 msgstr "archivé"
 
@@ -3084,7 +3095,7 @@ msgstr "Pas de date de naissance renseignée"
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
 #: sas/templates/sas/picture.jinja:82
-#: subscription/templates/subscription/stats.jinja:14
+#: subscription/templates/subscription/stats.jinja:19
 msgid "Go"
 msgstr "Valider"
 
@@ -3439,15 +3450,15 @@ msgstr "Retourner à l'eboutic"
 msgid "You do not have enough money to buy the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: election/models.py:15
+#: election/models.py:14
 msgid "start candidature"
 msgstr "début des candidatures"
 
-#: election/models.py:16
+#: election/models.py:15
 msgid "end candidature"
 msgstr "fin des candidatures"
 
-#: election/models.py:22
+#: election/models.py:21
 msgid "edit groups"
 msgstr "groupe d'édition"
 
@@ -3455,15 +3466,15 @@ msgstr "groupe d'édition"
 msgid "view groups"
 msgstr "groupe de vue"
 
-#: election/models.py:28
+#: election/models.py:29
 msgid "vote groups"
 msgstr "groupe de vote"
 
-#: election/models.py:31
+#: election/models.py:33
 msgid "candidature groups"
 msgstr "groupe de candidature"
 
-#: election/models.py:91 election/models.py:134
+#: election/models.py:91 election/models.py:129
 msgid "election"
 msgstr "élection"
 
@@ -3471,17 +3482,17 @@ msgstr "élection"
 msgid "max choice"
 msgstr "nombre de choix maxi"
 
-#: election/models.py:151
+#: election/models.py:142
 msgid "election list"
 msgstr "liste électorale"
 
-#: election/models.py:167
+#: election/models.py:156
 msgid "candidature"
 msgstr "candidature"
 
 #: election/templates/election/candidate_form.jinja:4
 #: election/templates/election/candidate_form.jinja:13
-#: election/templates/election/election_detail.jinja:365
+#: election/templates/election/election_detail.jinja:366
 msgid "Candidate"
 msgstr "Candidater"
 
@@ -3523,41 +3534,41 @@ msgstr "Vous avez déjà soumis votre vote."
 msgid "You have voted in this election."
 msgstr "Vous avez déjà voté pour cette élection."
 
-#: election/templates/election/election_detail.jinja:266 election/views.py:90
+#: election/templates/election/election_detail.jinja:266 election/views.py:82
 msgid "Blank vote"
 msgstr "Vote blanc"
 
-#: election/templates/election/election_detail.jinja:283
+#: election/templates/election/election_detail.jinja:284
 msgid "You may choose up to"
 msgstr "Vous pouvez choisir jusqu'à"
 
-#: election/templates/election/election_detail.jinja:283
+#: election/templates/election/election_detail.jinja:284
 msgid "people."
 msgstr "personne(s)"
 
-#: election/templates/election/election_detail.jinja:297
+#: election/templates/election/election_detail.jinja:298
 msgid "Choose blank vote"
 msgstr "Choisir de voter blanc"
 
-#: election/templates/election/election_detail.jinja:304
-#: election/templates/election/election_detail.jinja:344
+#: election/templates/election/election_detail.jinja:305
+#: election/templates/election/election_detail.jinja:345
 msgid "votes"
 msgstr "votes"
 
-#: election/templates/election/election_detail.jinja:337
+#: election/templates/election/election_detail.jinja:338
 #: launderette/templates/launderette/launderette_book.jinja:12
 msgid "Choose"
 msgstr "Choisir"
 
-#: election/templates/election/election_detail.jinja:360
+#: election/templates/election/election_detail.jinja:361
 msgid "Submit the vote !"
 msgstr "Envoyer le vote !"
 
-#: election/templates/election/election_detail.jinja:368
+#: election/templates/election/election_detail.jinja:369
 msgid "Add a new list"
 msgstr "Ajouter une nouvelle liste"
 
-#: election/templates/election/election_detail.jinja:372
+#: election/templates/election/election_detail.jinja:373
 msgid "Add a new role"
 msgstr "Ajouter un nouveau rôle"
 
@@ -3582,23 +3593,23 @@ msgstr "au"
 msgid "Polls open from"
 msgstr "Votes ouverts du"
 
-#: election/views.py:46
+#: election/views.py:43
 msgid "You have selected too much candidates."
 msgstr "Vous avez sélectionné trop de candidats."
 
-#: election/views.py:62
+#: election/views.py:58
 msgid "User to candidate"
 msgstr "Utilisateur se présentant"
 
-#: election/views.py:112
+#: election/views.py:102
 msgid "This role already exists for this election"
 msgstr "Ce rôle existe déjà pour cette élection"
 
-#: election/views.py:152
+#: election/views.py:137
 msgid "Start candidature"
 msgstr "Début des candidatures"
 
-#: election/views.py:155
+#: election/views.py:139
 msgid "End candidature"
 msgstr "Fin des candidatures"
 
@@ -3838,6 +3849,10 @@ msgstr "L'utilisateur n'a pas réservé de créneau"
 #: launderette/views.py:351
 msgid "Token not found"
 msgstr "Jeton non trouvé"
+
+#: trombi/models.py:109
+msgid "is the comment moderated"
+msgstr "le commentaire est modéré"
 
 #: rootplace/templates/rootplace/merge.jinja:8
 msgid "Merge two users"
@@ -4374,15 +4389,15 @@ msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 msgid "Subscription error"
 msgstr "Erreur de cotisation"
 
-#: subscription/templates/subscription/stats.jinja:18
+#: subscription/templates/subscription/stats.jinja:25
 msgid "Total subscriptions"
 msgstr "Cotisations totales"
 
-#: subscription/templates/subscription/stats.jinja:19
+#: subscription/templates/subscription/stats.jinja:26
 msgid "Subscriptions by type"
 msgstr "Cotisations par type"
 
-#: subscription/templates/subscription/stats.jinja:29
+#: subscription/templates/subscription/stats.jinja:36
 msgid "Subscription type"
 msgstr "Type de cotisation"
 
@@ -4475,10 +4490,6 @@ msgstr ""
 #: trombi/models.py:107
 msgid "target"
 msgstr "cible"
-
-#: trombi/models.py:109
-msgid "is the comment moderated"
-msgstr "le commentaire est modéré"
 
 #: trombi/templates/trombi/comment_moderation.jinja:4
 #: trombi/templates/trombi/comment_moderation.jinja:8
