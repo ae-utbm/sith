@@ -282,7 +282,9 @@ class Operation(models.Model):
 
     def clean(self):
         super(Operation, self).clean()
-        if self.date < self.journal.start_date:
+        if self.date is None:
+            raise ValidationError(_("The date must be set."))
+        elif self.date < self.journal.start_date:
             raise ValidationError(_("""The date can not be before the start date of the journal, which is
 %(start_date)s.""") % {'start_date': defaultfilters.date(self.journal.start_date, settings.DATE_FORMAT)})
         if self.target_type != "OTHER" and self.get_target() is None:

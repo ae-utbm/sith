@@ -28,7 +28,7 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import modelform_factory
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.forms import HiddenInput, TextInput
 from django.db import transaction
 from django.db.models import Sum
@@ -305,14 +305,21 @@ class OperationForm(forms.ModelForm):
     def clean(self):
         self.cleaned_data = super(OperationForm, self).clean()
         if 'target_type' in self.cleaned_data.keys():
-            if self.cleaned_data['target_type'] == "USER":
-                self.cleaned_data['target_id'] = self.cleaned_data['user'].id
-            elif self.cleaned_data['target_type'] == "ACCOUNT":
-                self.cleaned_data['target_id'] = self.cleaned_data['club_account'].id
-            elif self.cleaned_data['target_type'] == "CLUB":
-                self.cleaned_data['target_id'] = self.cleaned_data['club'].id
-            elif self.cleaned_data['target_type'] == "COMPANY":
-                self.cleaned_data['target_id'] = self.cleaned_data['company'].id
+            if self.cleaned_data.get("user") is None or self.cleaned_data.get("club") or self.cleaned_data.get("club_account") is None or self.cleaned_data.get("company") is None or self.cleaned_data.get("other"):
+                self.add_error('target_id', ValidationError(_("The target must be set.")))
+            else:
+                if self.cleaned_data['target_type'] == "USER":
+                    self.cleaned_data['target_id'] = self.cleaned_data['user'].id
+                elif self.cleaned_data['target_type'] == "ACCOUNT":
+                    self.cleaned_data['target_id'] = self.cleaned_data['club_account'].id
+                elif self.cleaned_data['target_type'] == "CLUB":
+                    self.cleaned_data['target_id'] = self.cleaned_data['club'].id
+                elif self.cleaned_data['target_type'] == "COMPANY":
+                    self.cleaned_data['target_id'] = self.cleaned_data['company'].id
+
+        if self.cleaned_data.get("amount") is None:
+            self.add_error('amount', ValidationError(_("The amount must be set.")))
+
         return self.cleaned_data
 
     def save(self):
