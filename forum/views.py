@@ -182,7 +182,7 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         kwargs = super(ForumTopicDetailView, self).get_context_data(**kwargs)
         try:
-            msg = self.object.get_first_unread_message(user)
+            msg = self.object.get_first_unread_message(self.request.user)
             kwargs['first_unread_message_id'] = msg.id
         except:
             kwargs['first_unread_message_id'] = float("inf")
