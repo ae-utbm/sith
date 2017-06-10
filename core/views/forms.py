@@ -24,6 +24,7 @@
 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
 from django import forms
+from django.conf import settings
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth import logout, login, authenticate
@@ -75,7 +76,10 @@ class SelectDate(DateInput):
 
 class MarkdownInput(Textarea):
     def render(self, name, value, attrs=None):
-        output = '<div class="markdown_editor">%(content)s</div>' % {
+        output = '<p><a href="%(syntax_url)s">%(help_text)s</a></p>'\
+                 '<div class="markdown_editor">%(content)s</div>' % {
+                'syntax_url': Page.get_page_by_full_name(settings.SITH_CORE_PAGE_SYNTAX),
+                'help_text': _("Help on the syntax"),
                 'content': super(MarkdownInput, self).render(name, value, attrs),
                 }
         return output

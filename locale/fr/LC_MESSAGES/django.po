@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-10 19:05+0200\n"
+"POT-Creation-Date: 2017-06-10 19:56+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -698,7 +698,7 @@ msgstr "Opération liée : "
 #: core/templates/core/user_preferences.jinja:12
 #: core/templates/core/user_preferences.jinja:19
 #: counter/templates/counter/cash_register_summary.jinja:22
-#: forum/templates/forum/reply.jinja:38
+#: forum/templates/forum/reply.jinja:33
 #: subscription/templates/subscription/subscription.jinja:24
 #: trombi/templates/trombi/comment.jinja:26
 #: trombi/templates/trombi/user_tools.jinja:13
@@ -905,7 +905,7 @@ msgid "Mark as old"
 msgstr "Marquer comme ancien"
 
 #: club/templates/club/club_members.jinja:30
-#: core/templates/core/file_detail.jinja:19 core/views/forms.py:229
+#: core/templates/core/file_detail.jinja:19 core/views/forms.py:240
 #: launderette/views.py:178
 msgid "Add"
 msgstr "Ajouter"
@@ -1060,7 +1060,7 @@ msgstr "Outils"
 msgid "Props"
 msgstr "Propriétés"
 
-#: club/views.py:131 core/views/forms.py:230 counter/views.py:91
+#: club/views.py:131 core/views/forms.py:241 counter/views.py:91
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
@@ -1213,7 +1213,7 @@ msgstr "Type"
 #: com/templates/com/weekmail.jinja:19 com/templates/com/weekmail.jinja:48
 #: core/templates/core/base.jinja:243 forum/templates/forum/forum.jinja:27
 #: forum/templates/forum/forum.jinja:46 forum/templates/forum/main.jinja:25
-#: forum/views.py:145
+#: forum/views.py:149
 msgid "Title"
 msgstr "Titre"
 
@@ -1299,7 +1299,7 @@ msgstr ""
 
 #: com/templates/com/news_edit.jinja:55 com/templates/com/weekmail.jinja:10
 #: core/templates/core/pagerev_edit.jinja:25
-#: forum/templates/forum/reply.jinja:37
+#: forum/templates/forum/reply.jinja:32
 msgid "Preview"
 msgstr "Prévisualiser"
 
@@ -1582,7 +1582,7 @@ msgstr "-"
 msgid "XS"
 msgstr "XS"
 
-#: core/models.py:162 core/templates/core/base.jinja:257
+#: core/models.py:162 core/templates/core/base.jinja:256
 msgid "S"
 msgstr "S"
 
@@ -1688,7 +1688,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/templates/core/user_edit.jinja:17
 #: election/templates/election/election_detail.jinja:317
 #: forum/templates/forum/macros.jinja:93 forum/templates/forum/macros.jinja:95
-#: forum/templates/forum/reply.jinja:43 forum/templates/forum/reply.jinja:45
+#: forum/templates/forum/reply.jinja:38 forum/templates/forum/reply.jinja:40
 #: trombi/templates/trombi/user_tools.jinja:43
 msgid "Profile"
 msgstr "Profil"
@@ -1968,31 +1968,31 @@ msgstr "https://chemin/vers/image.gif"
 msgid "alternative text"
 msgstr "texte alternatif"
 
-#: core/templates/core/base.jinja:253
+#: core/templates/core/base.jinja:252
 msgid "Image"
 msgstr "Image"
 
-#: core/templates/core/base.jinja:254
+#: core/templates/core/base.jinja:253
 msgid "Link"
 msgstr "Lien"
 
-#: core/templates/core/base.jinja:255
+#: core/templates/core/base.jinja:254
 msgid "sup"
 msgstr "exp"
 
-#: core/templates/core/base.jinja:256
+#: core/templates/core/base.jinja:255
 msgid "sub"
 msgstr "ind"
 
-#: core/templates/core/base.jinja:258
+#: core/templates/core/base.jinja:257
 msgid "U"
 msgstr "S"
 
-#: core/templates/core/base.jinja:259
+#: core/templates/core/base.jinja:258
 msgid "I"
 msgstr "I"
 
-#: core/templates/core/base.jinja:260
+#: core/templates/core/base.jinja:259
 msgid "B"
 msgstr "G"
 
@@ -2785,7 +2785,7 @@ msgstr "Ajouter un nouveau dossier"
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py:97 core/views/forms.py:207 core/views/forms.py:211
+#: core/views/files.py:97 core/views/forms.py:218 core/views/forms.py:222
 #: sas/views.py:77
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
@@ -2795,19 +2795,23 @@ msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
-#: core/views/forms.py:84 core/views/forms.py:87
+#: core/views/forms.py:82
+msgid "Help on the syntax"
+msgstr "Aide sur la syntaxe"
+
+#: core/views/forms.py:95 core/views/forms.py:98
 msgid "Choose file"
 msgstr "Choisir un fichier"
 
-#: core/views/forms.py:98 core/views/forms.py:101
+#: core/views/forms.py:109 core/views/forms.py:112
 msgid "Choose user"
 msgstr "Choisir un utilisateur"
 
-#: core/views/forms.py:123
+#: core/views/forms.py:134
 msgid "Username, email, or account number"
 msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
-#: core/views/forms.py:165
+#: core/views/forms.py:176
 msgid ""
 "Profile: you need to be visible on the picture, in order to be recognized (e."
 "g. by the barmen)"
@@ -2815,23 +2819,23 @@ msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
 
-#: core/views/forms.py:166
+#: core/views/forms.py:177
 msgid "Avatar: used on the forum"
 msgstr "Avatar : utilisé sur le forum"
 
-#: core/views/forms.py:167
+#: core/views/forms.py:178
 msgid "Scrub: let other know how your scrub looks like!"
 msgstr "Blouse : montrez aux autres à quoi ressemble votre blouse !"
 
-#: core/views/forms.py:212
+#: core/views/forms.py:223
 msgid "Bad image format, only jpeg, png, and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, et gif sont acceptés"
 
-#: core/views/forms.py:229
+#: core/views/forms.py:240
 msgid "Godfather"
 msgstr "Parrain"
 
-#: core/views/forms.py:229
+#: core/views/forms.py:240
 msgid "Godchild"
 msgstr "Fillot"
 
@@ -3710,7 +3714,7 @@ msgid "New forum"
 msgstr "Nouveau forum"
 
 #: forum/templates/forum/forum.jinja:22 forum/templates/forum/reply.jinja:8
-#: forum/templates/forum/reply.jinja:26
+#: forum/templates/forum/reply.jinja:27
 msgid "New topic"
 msgstr "Nouveau sujet"
 
@@ -3761,15 +3765,11 @@ msgstr "Voir les derniers messages non lus"
 msgid "Reply"
 msgstr "Répondre"
 
-#: forum/templates/forum/reply.jinja:32
-msgid "Help on the syntax"
-msgstr "Aide sur la syntaxe"
-
-#: forum/views.py:99
+#: forum/views.py:100
 msgid "Apply rights and club owner recursively"
 msgstr "Appliquer les droits et le club propriétaire récursivement"
 
-#: forum/views.py:259
+#: forum/views.py:262
 #, python-format
 msgid "%(author)s said"
 msgstr "Citation de %(author)s"
