@@ -248,8 +248,7 @@ function add_syntax(e, choice) {
 }
 
 $(document).ready(function() {
-    textarea = $('.markdown_editor textarea');
-    editor = textarea.parent();
+    editor = $('.markdown_editor');
     editor.prepend('<a onclick="javascript:add_syntax(this, \'image\')">{% trans %}Image{% endtrans %}</a>');
     editor.prepend('<a onclick="javascript:add_syntax(this, \'link\')">{% trans %}Link{% endtrans %}</a>');
     editor.prepend('<a onclick="javascript:add_syntax(this, \'sup\')"><sup>{% trans %}sup{% endtrans %}</sup></a>');
@@ -258,7 +257,6 @@ $(document).ready(function() {
     editor.prepend('<a onclick="javascript:add_syntax(this, \'underline\')"><u>{% trans %}U{% endtrans %}</u></a>');
     editor.prepend('<a onclick="javascript:add_syntax(this, \'italic\')"><i>{% trans %}I{% endtrans %}</i></a>');
     editor.prepend('<a onclick="javascript:add_syntax(this, \'bold\')"><b>{% trans %}B{% endtrans %}</b></a>');
-    console.log(textarea.parent());
 });
         </script>
         {% endblock %}

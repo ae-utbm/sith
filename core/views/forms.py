@@ -27,7 +27,7 @@ from django import forms
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth import logout, login, authenticate
-from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput, DateTimeInput
+from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput, DateTimeInput, Textarea
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
@@ -72,6 +72,13 @@ class SelectDate(DateInput):
         else:
             attrs = {'class': "select_date"}
         return super(SelectDate, self).render(name, value, attrs)
+
+class MarkdownInput(Textarea):
+    def render(self, name, value, attrs=None):
+        output = '<div class="markdown_editor">%(content)s</div>' % {
+                'content': super(MarkdownInput, self).render(name, value, attrs),
+                }
+        return output
 
 class SelectFile(TextInput):
     def render(self, name, value, attrs=None):

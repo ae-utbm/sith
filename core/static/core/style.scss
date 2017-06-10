@@ -515,6 +515,12 @@ textarea {
       margin: 1px;
       font-size: smaller;
     }
+    a {
+      color: $black-color;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
   }
 
   .tools {
@@ -550,6 +556,12 @@ textarea {
     p {
       margin: 1px;
       font-size: smaller;
+    }
+    a {
+      color: $black-color;
+    }
+    a:hover {
+      text-decoration: underline;
     }
   }
 

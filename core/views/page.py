@@ -30,10 +30,10 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 from django.forms.models import modelform_factory
-from django.forms import CheckboxSelectMultiple
+from django.forms import CheckboxSelectMultiple, modelform_factory
 
 from core.models import Page, PageRev, LockError
-from core.views.forms import PagePropForm
+from core.views.forms import PagePropForm, MarkdownInput
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 
 class PageListView(CanViewMixin, ListView):
@@ -147,7 +147,7 @@ class PagePropView(CanEditPropMixin, UpdateView):
 
 class PageEditView(CanEditMixin, UpdateView):
     model = PageRev
-    fields = ['title', 'content',]
+    form_class = modelform_factory(model=PageRev, fields=['title', 'content',], widgets={'content': MarkdownInput})
     template_name = 'core/pagerev_edit.jinja'
 
     def get_object(self):

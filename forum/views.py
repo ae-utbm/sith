@@ -38,6 +38,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from ajax_select import make_ajax_form, make_ajax_field
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
+from core.views.forms import MarkdownInput
 from core.models import Page
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
 
@@ -142,6 +143,9 @@ class TopicForm(forms.ModelForm):
     class Meta:
         model = ForumMessage
         fields = ['title', 'message']
+        widgets = {
+            'message': MarkdownInput,
+            }
     title = forms.CharField(required=True, label=_("Title"))
 
 class ForumTopicCreateView(CanCreateMixin, CreateView):
@@ -161,6 +165,11 @@ class ForumTopicCreateView(CanCreateMixin, CreateView):
         form.instance.topic = topic
         form.instance.author = self.request.user
         return super(ForumTopicCreateView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ForumTopicCreateView, self).get_context_data(**kwargs)
+        kwargs['syntax_help_page'] = Page.get_page_by_full_name(settings.SITH_CORE_PAGE_SYNTAX)
+        return kwargs
 
 class ForumTopicEditView(CanEditMixin, UpdateView):
     model = ForumTopic
@@ -205,7 +214,7 @@ class ForumMessageView(SingleObjectMixin, RedirectView):
 
 class ForumMessageEditView(CanEditMixin, UpdateView):
     model = ForumMessage
-    fields = ['title', 'message']
+    form_class = forms.modelform_factory(model=ForumMessage, fields=['title', 'message',], widgets={'message': MarkdownInput})
     template_name = "forum/reply.jinja"
     pk_url_kwarg = "message_id"
 
@@ -243,7 +252,7 @@ class ForumMessageUndeleteView(SingleObjectMixin, RedirectView):
 
 class ForumMessageCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
-    fields = ['title', 'message']
+    form_class = forms.modelform_factory(model=ForumMessage, fields=['title', 'message',], widgets={'message': MarkdownInput})
     template_name = "forum/reply.jinja"
 
     def dispatch(self, request, *args, **kwargs):
