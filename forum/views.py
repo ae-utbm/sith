@@ -38,6 +38,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from ajax_select import make_ajax_form, make_ajax_field
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
+from core.models import Page
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
 
 class ForumMainView(ListView):
@@ -215,6 +216,7 @@ class ForumMessageEditView(CanEditMixin, UpdateView):
     def get_context_data(self, **kwargs):
         kwargs = super(ForumMessageEditView, self).get_context_data(**kwargs)
         kwargs['topic'] = self.object.topic
+        kwargs['syntax_help_page'] = Page.get_page_by_full_name(settings.SITH_CORE_PAGE_SYNTAX)
         return kwargs
 
 class ForumMessageDeleteView(SingleObjectMixin, RedirectView):
@@ -271,5 +273,6 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
     def get_context_data(self, **kwargs):
         kwargs = super(ForumMessageCreateView, self).get_context_data(**kwargs)
         kwargs['topic'] = self.topic
+        kwargs['syntax_help_page'] = Page.get_page_by_full_name(settings.SITH_CORE_PAGE_SYNTAX)
         return kwargs
 

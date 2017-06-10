@@ -27,7 +27,11 @@
     {% endif %}
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p() }}
+        <p>{{ form.title.errors }}<label for="{{ form.title.name }}">{{ form.title.label }}</label> {{ form.title }}</p>
+        <p>{{ form.message.errors }}<label for="{{ form.message.name }}">{{ form.message.label }}</label> </p>
+        <p class="markdown_editor"><a href="{{ syntax_help_page.get_absolute_url() }}">{% trans %}Help on the syntax{% endtrans %}</a>
+        {{ form.message }}
+        </p>
         <p><input type="button" value="{% trans %}Preview{% endtrans %}" onclick="javascript:make_preview();" /></p>
         <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
     </form>
@@ -43,7 +47,7 @@
         </div>
         <div class="msg_content">
             <hr>
-            <div id="preview" class="ib w_big"></div>
+            <div id="preview" class="ib"></div>
             <div class="forum_signature">{{ user.forum_signature|markdown }}</div>
         </div>
     </div>

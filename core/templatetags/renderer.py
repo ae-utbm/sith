@@ -36,7 +36,7 @@ register = template.Library()
 @register.filter(is_safe=False)
 @stringfilter
 def markdown(text):
-    return mark_safe(md(text))
+    return mark_safe("<div class=\"markdown\">%s</div>" % md(text))
 
 @register.filter()
 @stringfilter

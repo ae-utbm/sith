@@ -470,13 +470,11 @@ em {
   border: solid #333 2px;
 }
 
-/*---------------------------------PAGE--------------------------------*/
+/*-------------------------------MARKDOWN------------------------------*/
 
-.page_content {
-  display: block;
-  margin: 10px;
-  padding: 10px;
-  background: $white-color;
+.markdown {
+  margin: 0px;
+  padding: 0px;
   code {
     font-family: monospace;
     color: $white-color;
@@ -487,8 +485,16 @@ em {
   }
 }
 
+/*---------------------------------PAGE--------------------------------*/
+
+.page_content {
+  display: block;
+  margin: 10px;
+  padding: 10px;
+  background: $white-color;
+}
+
 textarea {
-  white-space: pre;
   width: 98%;
   margin-top: 10px;
 }
