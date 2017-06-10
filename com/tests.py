@@ -47,7 +47,7 @@ class ComTest(TestCase):
 """})
         r = self.client.get(reverse("core:index"))
         self.assertTrue(r.status_code == 200)
-        self.assertTrue("""<div id="alert_box">\\n            <h3>ALERTE!</h3>\\n<p><strong>Caaaataaaapuuuulte!!!!</strong></p>""" in str(r.content))
+        self.assertTrue("""<div id="alert_box">\\n            <div class="markdown"><h3>ALERTE!</h3>\\n<p><strong>Caaaataaaapuuuulte!!!!</strong></p>""" in str(r.content))
 
     def test_info_msg(self):
         response = self.client.post(reverse("com:info_edit"), {"info_msg": """
@@ -55,5 +55,5 @@ class ComTest(TestCase):
 """})
         r = self.client.get(reverse("core:index"))
         self.assertTrue(r.status_code == 200)
-        self.assertTrue("""<div id="info_box">\\n            <h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>""" in str(r.content))
+        self.assertTrue("""<div id="info_box">\\n            <div class="markdown"><h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>""" in str(r.content))
 
