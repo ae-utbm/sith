@@ -219,12 +219,12 @@ function add_syntax(e, choice) {
             ta.selectionEnd = end + 2;
             break;
         case "sub":
-            ta.value = before + "_" + between + "_" + after;
-            ta.selectionEnd = end + 1;
+            ta.value = before + "<sub>" + between + "</sub>" + after;
+            ta.selectionEnd = end + 5;
             break;
         case "sup":
-            ta.value = before + "^" + between + "^" + after;
-            ta.selectionEnd = end + 1;
+            ta.value = before + "<sup>" + between + "</sup>" + after;
+            ta.selectionEnd = end + 5;
             break;
         case "link":
             if (between === "") {

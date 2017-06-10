@@ -38,7 +38,7 @@ class SithRenderer(Renderer):
         return """<sub>%s</sub>""" % text
 
     def underline(self, text):
-        return """<span class="underline">%s</span>""" % text
+        return """<u>%s</u>""" % text
 
     def image(self, original_src, title, text):
         """Rendering a image with title and text.
@@ -87,15 +87,11 @@ class SithInlineGrammar(InlineGrammar):
     underline = re.compile(
         r'^_{2}([\s\S]+?)_{2}(?!_)'  # __word__
     )
-    exposant = re.compile( # FIXME Does not work for now
-        r'^\^([\s\S]+?)\^'  # ^text^
-        # r'|' # FIXME doesn't properly works like this
-        # r'^\^(\S+)'  # ^word
+    exposant = re.compile(
+        r'^<sup>([\s\S]+?)</sup>'  # <sup>text</sup>
     )
     indice = re.compile(
-        r'^_([\s\S]+?)_'  # _text_ (^` hack, because no other solution were found :/ this sadly prevent code in indices)
-        # r'|' # FIXME doesn't properly works like this
-        # r'^_(\S+)'  # _word
+        r'^<sub>([\s\S]+?)</sub>'  # <sub>text</sub>
     )
 
 class SithInlineLexer(InlineLexer):
@@ -103,7 +99,7 @@ class SithInlineLexer(InlineLexer):
 
     default_rules = [
         'escape',
-        'inline_html',
+        # 'inline_html',
         'autolink',
         'url',
         'footnote',
