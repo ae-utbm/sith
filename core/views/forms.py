@@ -78,7 +78,7 @@ class MarkdownInput(Textarea):
     def render(self, name, value, attrs=None):
         output = '<p><a href="%(syntax_url)s">%(help_text)s</a></p>'\
                  '<div class="markdown_editor">%(content)s</div>' % {
-                'syntax_url': Page.get_page_by_full_name(settings.SITH_CORE_PAGE_SYNTAX),
+                'syntax_url': Page.get_page_by_full_name(settings.SITH_CORE_PAGE_SYNTAX).get_absolute_url(),
                 'help_text': _("Help on the syntax"),
                 'content': super(MarkdownInput, self).render(name, value, attrs),
                 }
