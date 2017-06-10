@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-10 16:53+0200\n"
+"POT-Creation-Date: 2017-06-10 19:05+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -17,7 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: accounting/models.py:60 accounting/models.py:108 accounting/models.py:135
-#: accounting/models.py:194 club/models.py:43 counter/models.py:100
+#: accounting/models.py:194 club/models.py:43
+#: core/templates/core/base.jinja:233 counter/models.py:100
 #: counter/models.py:125 counter/models.py:160 forum/models.py:50
 #: launderette/models.py:37 launderette/models.py:82 launderette/models.py:107
 #: stock/models.py:38 stock/models.py:54 stock/models.py:77 stock/models.py:97
@@ -697,7 +698,7 @@ msgstr "Opération liée : "
 #: core/templates/core/user_preferences.jinja:12
 #: core/templates/core/user_preferences.jinja:19
 #: counter/templates/counter/cash_register_summary.jinja:22
-#: forum/templates/forum/reply.jinja:36
+#: forum/templates/forum/reply.jinja:38
 #: subscription/templates/subscription/subscription.jinja:24
 #: trombi/templates/trombi/comment.jinja:26
 #: trombi/templates/trombi/user_tools.jinja:13
@@ -1210,8 +1211,9 @@ msgstr "Type"
 #: com/templates/com/news_admin_list.jinja:15
 #: com/templates/com/news_admin_list.jinja:50
 #: com/templates/com/weekmail.jinja:19 com/templates/com/weekmail.jinja:48
-#: forum/templates/forum/forum.jinja:27 forum/templates/forum/forum.jinja:46
-#: forum/templates/forum/main.jinja:25 forum/views.py:145
+#: core/templates/core/base.jinja:243 forum/templates/forum/forum.jinja:27
+#: forum/templates/forum/forum.jinja:46 forum/templates/forum/main.jinja:25
+#: forum/views.py:145
 msgid "Title"
 msgstr "Titre"
 
@@ -1297,7 +1299,7 @@ msgstr ""
 
 #: com/templates/com/news_edit.jinja:55 com/templates/com/weekmail.jinja:10
 #: core/templates/core/pagerev_edit.jinja:25
-#: forum/templates/forum/reply.jinja:35
+#: forum/templates/forum/reply.jinja:37
 msgid "Preview"
 msgstr "Prévisualiser"
 
@@ -1580,7 +1582,7 @@ msgstr "-"
 msgid "XS"
 msgstr "XS"
 
-#: core/models.py:162
+#: core/models.py:162 core/templates/core/base.jinja:257
 msgid "S"
 msgstr "S"
 
@@ -1686,7 +1688,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/templates/core/user_edit.jinja:17
 #: election/templates/election/election_detail.jinja:317
 #: forum/templates/forum/macros.jinja:93 forum/templates/forum/macros.jinja:95
-#: forum/templates/forum/reply.jinja:41 forum/templates/forum/reply.jinja:43
+#: forum/templates/forum/reply.jinja:43 forum/templates/forum/reply.jinja:45
 #: trombi/templates/trombi/user_tools.jinja:43
 msgid "Profile"
 msgstr "Profil"
@@ -1957,6 +1959,42 @@ msgstr "R&D"
 #: core/templates/core/base.jinja:143
 msgid "Site made by good people"
 msgstr "Site réalisé par des gens bons"
+
+#: core/templates/core/base.jinja:240
+msgid "https://path/to/image.gif"
+msgstr "https://chemin/vers/image.gif"
+
+#: core/templates/core/base.jinja:242
+msgid "alternative text"
+msgstr "texte alternatif"
+
+#: core/templates/core/base.jinja:253
+msgid "Image"
+msgstr "Image"
+
+#: core/templates/core/base.jinja:254
+msgid "Link"
+msgstr "Lien"
+
+#: core/templates/core/base.jinja:255
+msgid "sup"
+msgstr "exp"
+
+#: core/templates/core/base.jinja:256
+msgid "sub"
+msgstr "ind"
+
+#: core/templates/core/base.jinja:258
+msgid "U"
+msgstr "S"
+
+#: core/templates/core/base.jinja:259
+msgid "I"
+msgstr "I"
+
+#: core/templates/core/base.jinja:260
+msgid "B"
+msgstr "G"
 
 #: core/templates/core/create.jinja:4 core/templates/core/create.jinja.py:8
 #, python-format

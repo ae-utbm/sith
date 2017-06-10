@@ -326,7 +326,21 @@ tbody > tr {
   }
 }
 
-em {
+sup {
+  vertical-align: super;
+  font-size: smaller;
+}
+
+sub {
+  vertical-align: sub;
+  font-size: smaller;
+}
+
+b, strong {
+  font-weight: bold;
+}
+
+i, em {
   font-style: italic;
 }
 
@@ -335,7 +349,7 @@ em {
   font-weight: bold;
 }
 
-.underline {
+u, .underline {
   text-decoration: underline;
 }
 
@@ -470,21 +484,6 @@ em {
   border: solid #333 2px;
 }
 
-/*-------------------------------MARKDOWN------------------------------*/
-
-.markdown {
-  margin: 0px;
-  padding: 0px;
-  code {
-    font-family: monospace;
-    color: $white-color;
-    background: $black-color;
-    display: inline-block;
-    padding: 4px;
-    line-height: 120%;
-  }
-}
-
 /*---------------------------------PAGE--------------------------------*/
 
 .page_content {
@@ -508,15 +507,6 @@ textarea {
 /*------------------------------FORUM----------------------------------*/
 
 #forum {
-  a {
-    color: $black-color;
-  }
-
-  a:hover {
-    color: #424242;
-    text-decoration: underline;
-  }
-
   .topic {
     border: solid $primary-neutral-color 1px;
     padding: 1px;
@@ -750,3 +740,45 @@ label {
     vertical-align: middle;
   }
 }
+
+/*-------------------------------MARKDOWN------------------------------*/
+
+.markdown {
+  margin: 0px;
+  padding: 0px;
+  code {
+    font-family: monospace;
+    color: $white-color;
+    background: $black-color;
+    display: inline-block;
+    padding: 4px;
+    line-height: 120%;
+  }
+  a {
+    color: $primary-light-color;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}
+
+.markdown_editor {
+  margin-top: 5px;
+}
+
+.markdown_editor a {
+  border: solid 1px $black-color;
+  padding: 2px;
+  min-width: 1em;
+  display: inline-block;
+  text-align: center;
+  margin: 0px 1px;
+}
+
+.markdown_editor a:hover {
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0px 0px 1px 1px $secondary-light-color;
+  transition: all 0.1s linear;
+}
+
