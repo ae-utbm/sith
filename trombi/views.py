@@ -277,4 +277,8 @@ class TrombiCommentCreateView(TrombiCommentFormView, CreateView):
 class TrombiCommentEditView(TrombiCommentFormView, CanViewMixin, UpdateView):
     pk_url_kwarg = "comment_id"
 
+    def form_valid(self, form):
+        form.instance.is_moderated = False
+        return super(TrombiCommentEditView, self).form_valid(form)
+
 
