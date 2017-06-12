@@ -28,7 +28,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserM
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import transaction
@@ -495,35 +495,31 @@ class AnonymousUser(AuthAnonymousUser):
 
     @property
     def was_subscribed(self):
-        raise PermissionDenied
+        return False
 
     @property
     def subscribed(self):
-        raise PermissionDenied
+        return False
 
     @property
     def is_root(self):
-        raise PermissionDenied
+        return False
 
     @property
     def is_board_member(self):
-        raise PermissionDenied
+        return False
 
     @property
     def is_launderette_manager(self):
-        raise PermissionDenied
+        return False
 
     @property
     def is_banned_alcohol(self):
-        raise PermissionDenied
+        return False
 
     @property
-    def is_banned_counter(self):
-        raise PermissionDenied
-
-    @property
-    def forum_infos(self):
-        raise PermissionDenied
+    def is_banned_conuter(self):
+        return False
 
     def is_in_group(self, group_name):
         """
