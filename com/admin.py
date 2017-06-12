@@ -30,5 +30,3 @@ admin.site.register(Sith)
 admin.site.register(News)
 admin.site.register(Weekmail)
 
-
-

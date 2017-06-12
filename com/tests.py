@@ -28,7 +28,7 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 
 from core.models import User, RealGroup
-from com.models import Sith
+
 
 class ComTest(TestCase):
     def setUp(self):
@@ -56,4 +56,3 @@ class ComTest(TestCase):
         r = self.client.get(reverse("core:index"))
         self.assertTrue(r.status_code == 200)
         self.assertTrue("""<div id="info_box">\\n            <div class="markdown"><h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>""" in str(r.content))
-
