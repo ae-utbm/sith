@@ -14,8 +14,6 @@
 </form>
 {% else %}
 <p>{% trans trombi = user.trombi_user.trombi %}You are subscribed to the Trombi {{ trombi }}{% endtrans %}</p>
-<p><a href="{{ url("trombi:profile") }}">{% trans %}Edit my profile{% endtrans %}</a></p>
-<p><a href="{{ url("trombi:pictures") }}">{% trans %}Edit my pictures{% endtrans %}</a></p>
 <hr>
 {% set can_comment = trombi.subscription_deadline < date.today() and
     date.today() <= trombi.comments_deadline %}

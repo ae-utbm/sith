@@ -40,6 +40,38 @@ from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMi
 from core.models import User
 from club.models import Club
 
+class TrombiTabsMixin(TabedViewMixin):
+    def get_tabs_title(self):
+        return _("Trombi")
+
+    def get_list_of_tabs(self):
+        tab_list = []
+        tab_list.append({
+                    'url': reverse('trombi:user_tools'),
+                    'slug': 'tools',
+                    'name': _("Tools"),
+                    })
+        tab_list.append({
+                    'url': reverse('trombi:profile'),
+                    'slug': 'profile',
+                    'name': _("My profile"),
+                    })
+        tab_list.append({
+                    'url': reverse('trombi:pictures'),
+                    'slug': 'pictures',
+                    'name': _("My pictures"),
+                    })
+        try:
+            trombi = self.request.user.trombi_user.trombi
+            if self.request.user.is_owner(trombi):
+                tab_list.append({
+                        'url': reverse('trombi:detail', kwargs={'trombi_id': trombi.id}),
+                        'slug': 'admin_tools',
+                        'name': _("Admin tools"),
+                        })
+        except: pass
+        return tab_list
+
 class TrombiForm(forms.ModelForm):
     class Meta:
         model = Trombi
@@ -70,19 +102,21 @@ class TrombiCreateView(CanEditPropMixin, CreateView):
         else:
             return self.form_invalid(form)
 
-class TrombiEditView(CanEditPropMixin, UpdateView):
+class TrombiEditView(CanEditPropMixin, TrombiTabsMixin, UpdateView):
     model = Trombi
     form_class = TrombiForm
     template_name = 'core/edit.jinja'
     pk_url_kwarg = 'trombi_id'
+    current_tab = "admin_tools"
 
     def get_success_url(self):
         return super(TrombiEditView, self).get_success_url()+"?qn_success"
 
-class TrombiDetailView(CanEditMixin, QuickNotifMixin, DetailView):
+class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailView):
     model = Trombi
     template_name = 'trombi/detail.jinja'
     pk_url_kwarg = 'trombi_id'
+    current_tab = "admin_tools"
 
 class TrombiDeleteUserView(CanEditPropMixin, SingleObjectMixin, RedirectView):
     model = Trombi
@@ -96,10 +130,11 @@ class TrombiDeleteUserView(CanEditPropMixin, SingleObjectMixin, RedirectView):
 # See if we need to also delete the comments on the user, or if we keep them
         return redirect(self.object.get_absolute_url()+"?qn_success")
 
-class TrombiModerateCommentsView(CanEditPropMixin, QuickNotifMixin, DetailView):
+class TrombiModerateCommentsView(CanEditPropMixin, QuickNotifMixin, TrombiTabsMixin, DetailView):
     model = Trombi
     template_name = 'trombi/comment_moderation.jinja'
     pk_url_kwarg = 'trombi_id'
+    current_tab = "admin_tools"
 
     def get_context_data(self, **kwargs):
         kwargs = super(TrombiModerateCommentsView, self).get_context_data(**kwargs)
@@ -164,11 +199,12 @@ class UserTrombiForm(forms.Form):
             "Be aware that you can subscribe only once, so don't play with that, "
             "or you will expose yourself to the admins' wrath!"))
 
-class UserTrombiToolsView(QuickNotifMixin, TemplateView):
+class UserTrombiToolsView(QuickNotifMixin, TrombiTabsMixin, TemplateView):
     """
     Display a user's trombi tools
     """
     template_name = "trombi/user_tools.jinja"
+    current_tab = "tools"
 
     def post(self, request, *args, **kwargs):
         self.form = UserTrombiForm(request.POST)
@@ -189,10 +225,11 @@ class UserTrombiToolsView(QuickNotifMixin, TemplateView):
             kwargs['date'] = date
         return kwargs
 
-class UserTrombiEditPicturesView(UpdateView):
+class UserTrombiEditPicturesView(TrombiTabsMixin, UpdateView):
     model = TrombiUser
     fields = ['profile_pict', 'scrub_pict']
     template_name = "core/edit.jinja"
+    current_tab = "pictures"
 
     def get_object(self):
         return self.request.user.trombi_user
@@ -200,7 +237,7 @@ class UserTrombiEditPicturesView(UpdateView):
     def get_success_url(self):
         return reverse('trombi:user_tools')+"?qn_success"
 
-class UserTrombiEditProfileView(UpdateView):
+class UserTrombiEditProfileView(QuickNotifMixin, TrombiTabsMixin, UpdateView):
     model = User
     form_class = modelform_factory(User,
             fields=['second_email', 'phone', 'department', 'dpt_option',
@@ -211,6 +248,7 @@ class UserTrombiEditProfileView(UpdateView):
                 'parent_address': _("Native town"),
             })
     template_name = "trombi/edit_profile.jinja"
+    current_tab = "profile"
 
     def get_object(self):
         return self.request.user
@@ -227,25 +265,35 @@ class UserTrombiResetClubMembershipsView(RedirectView):
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('trombi:user_tools')+"?qn_success"
+        return reverse('trombi:profile')+"?qn_success"
 
-class UserTrombiDeleteMembershipView(DeleteView, CanEditMixin):
+class UserTrombiDeleteMembershipView(TrombiTabsMixin, CanEditMixin, DeleteView):
     model = TrombiClubMembership
     pk_url_kwarg = "membership_id"
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy('trombi:profile')
+    current_tab = "profile"
 
-class UserTrombiEditMembershipView(UpdateView, CanEditMixin):
+    def get_success_url(self):
+        return super(UserTrombiDeleteMembershipView, self).get_success_url() + "?qn_success"
+
+class UserTrombiEditMembershipView(CanEditMixin, TrombiTabsMixin, UpdateView):
     model = TrombiClubMembership
     pk_url_kwarg = "membership_id"
     fields = ['role', 'start', 'end']
     template_name = "core/edit.jinja"
+    current_tab = "profile"
 
-class UserTrombiProfileView(DetailView):
+    def get_success_url(self):
+        return super(UserTrombiEditMembershipView, self).get_success_url() + "?qn_success"
+
+
+class UserTrombiProfileView(TrombiTabsMixin, DetailView):
     model = TrombiUser
     pk_url_kwarg = "user_id"
     template_name = "trombi/user_profile.jinja"
     context_object_name = "trombi_user"
+    current_tab = "tools"
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()

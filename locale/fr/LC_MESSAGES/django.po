@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-12 23:48+0200\n"
+"POT-Creation-Date: 2017-06-13 00:20+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -604,7 +604,7 @@ msgstr "Effectuées"
 #: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:798
 #: trombi/templates/trombi/comment.jinja:4
 #: trombi/templates/trombi/comment.jinja:8
-#: trombi/templates/trombi/user_tools.jinja:52
+#: trombi/templates/trombi/user_tools.jinja:50
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -1073,7 +1073,7 @@ msgid "Old members"
 msgstr "Anciens membres"
 
 #: club/views.py:74 core/templates/core/base.jinja:64 core/views/user.py:171
-#: sas/templates/sas/picture.jinja:95
+#: sas/templates/sas/picture.jinja:95 trombi/views.py:52
 msgid "Tools"
 msgstr "Outils"
 
@@ -1712,7 +1712,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: election/templates/election/election_detail.jinja:317
 #: forum/templates/forum/macros.jinja:93 forum/templates/forum/macros.jinja:95
 #: forum/templates/forum/reply.jinja:38 forum/templates/forum/reply.jinja:40
-#: trombi/templates/trombi/user_tools.jinja:43
+#: trombi/templates/trombi/user_tools.jinja:41
 msgid "Profile"
 msgstr "Profil"
 
@@ -2616,7 +2616,7 @@ msgstr "Photos de %(user_name)s"
 msgid "Preferences"
 msgstr "Préférences"
 
-#: core/templates/core/user_preferences.jinja:14
+#: core/templates/core/user_preferences.jinja:14 trombi/views.py:45
 msgid "Trombi"
 msgstr "Trombi"
 
@@ -4604,8 +4604,8 @@ msgid ""
 "Reset club memberships in Trombi (delete exising ones, does not impact real "
 "club memberships)"
 msgstr ""
-"Réinitialiser les participations aux clubs dans le Trombi (supprime les existantes, n'impacte "
-"pas les vraies appartenances du site)"
+"Réinitialiser les participations aux clubs dans le Trombi (supprime les "
+"existantes, n'impacte pas les vraies appartenances du site)"
 
 #: trombi/templates/trombi/edit_profile.jinja:24
 msgid "Dates"
@@ -4631,19 +4631,11 @@ msgstr "Trombi'"
 msgid "You are subscribed to the Trombi %(trombi)s"
 msgstr "Vous êtes inscrit au Trombi %(trombi)s"
 
-#: trombi/templates/trombi/user_tools.jinja:17
-msgid "Edit my profile"
-msgstr "Éditer mon profil"
-
-#: trombi/templates/trombi/user_tools.jinja:18
-msgid "Edit my pictures"
-msgstr "Éditer mes photos"
-
-#: trombi/templates/trombi/user_tools.jinja:23
+#: trombi/templates/trombi/user_tools.jinja:21
 msgid "You can not write comments at this date."
 msgstr "Vous ne pouvez pas commenter à cette date."
 
-#: trombi/templates/trombi/user_tools.jinja:25
+#: trombi/templates/trombi/user_tools.jinja:23
 #, python-format
 msgid ""
 "Comments are only allowed between %(start)s (excluded) and %(end)s (included)"
@@ -4651,19 +4643,31 @@ msgstr ""
 "Les commentaires sont autorisés entre le %(start)s (exclu) et le %(end)s "
 "(inclu)"
 
-#: trombi/templates/trombi/user_tools.jinja:50
+#: trombi/templates/trombi/user_tools.jinja:48
 msgid "Edit comment"
 msgstr "Éditer le commentaire"
 
-#: trombi/views.py:111
+#: trombi/views.py:57
+msgid "My profile"
+msgstr "Mon profil"
+
+#: trombi/views.py:62
+msgid "My pictures"
+msgstr "Mes photos"
+
+#: trombi/views.py:70
+msgid "Admin tools"
+msgstr "Admin Trombi"
+
+#: trombi/views.py:146
 msgid "Explain why you rejected the comment"
 msgstr "Expliquez pourquoi vous refusez le commentaire"
 
-#: trombi/views.py:135
+#: trombi/views.py:170
 msgid "Rejected comment"
 msgstr "Commentaire rejeté"
 
-#: trombi/views.py:136
+#: trombi/views.py:171
 #, python-format
 msgid ""
 "Your comment to %(target)s on the Trombi \"%(trombi)s\" was rejected for the "
@@ -4680,16 +4684,16 @@ msgstr ""
 "\n"
 "%(content)s"
 
-#: trombi/views.py:159
+#: trombi/views.py:194
 #, python-format
 msgid "%(name)s (deadline: %(date)s)"
 msgstr "%(name)s (date limite: %(date)s)"
 
-#: trombi/views.py:162
+#: trombi/views.py:197
 msgid "Select trombi"
 msgstr "Choisir un trombi"
 
-#: trombi/views.py:163
+#: trombi/views.py:198
 msgid ""
 "This allows you to subscribe to a Trombi. Be aware that you can subscribe "
 "only once, so don't play with that, or you will expose yourself to the "
@@ -4699,19 +4703,19 @@ msgstr ""
 "pouvez vous inscrire qu'à un seul Trombi, donc ne jouez pas avec cet option "
 "ou vous encourerez la colère des admins!"
 
-#: trombi/views.py:209
+#: trombi/views.py:246
 msgid "Personal email (not UTBM)"
 msgstr "Email personnel (pas UTBM)"
 
-#: trombi/views.py:210
+#: trombi/views.py:247
 msgid "Phone"
 msgstr "Téléphone"
 
-#: trombi/views.py:211
+#: trombi/views.py:248
 msgid "Native town"
 msgstr "Ville d'origine"
 
-#: trombi/views.py:269
+#: trombi/views.py:317
 msgid ""
 "You can not yet write comment, you must wait for the subscription deadline "
 "to be passed."
@@ -4719,11 +4723,17 @@ msgstr ""
 "Vous ne pouvez pas encore écrire de commentaires, vous devez attendre la fin "
 "des inscriptions"
 
-#: trombi/views.py:272
+#: trombi/views.py:320
 msgid "You can not write comment anymore, the deadline is already passed."
 msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 
-#: trombi/views.py:279
+#: trombi/views.py:327
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#~ msgid "Edit my profile"
+#~ msgstr "Éditer mon profil"
+
+#~ msgid "Edit my pictures"
+#~ msgstr "Éditer mes photos"
