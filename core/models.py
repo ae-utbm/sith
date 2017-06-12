@@ -28,7 +28,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserM
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import transaction
@@ -518,8 +518,12 @@ class AnonymousUser(AuthAnonymousUser):
         return False
 
     @property
-    def is_banned_conuter(self):
+    def is_banned_counter(self):
         return False
+
+    @property
+    def forum_infos(self):
+        raise PermissionDenied
 
     def is_in_group(self, group_name):
         """
