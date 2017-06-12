@@ -22,7 +22,7 @@
 #
 #
 
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from sas.views import *
 
@@ -40,4 +40,3 @@ urlpatterns = [
     # url(r'^album/new$', AlbumCreateView.as_view(), name='album_new'),
     # url(r'^(?P<club_id>[0-9]+)/$', ClubView.as_view(), name='club_view'),
 ]
-
