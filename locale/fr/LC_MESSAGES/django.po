@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-10 19:56+0200\n"
+"POT-Creation-Date: 2017-06-12 08:12+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -102,7 +102,7 @@ msgstr "date de fin"
 msgid "is closed"
 msgstr "est fermé"
 
-#: accounting/models.py:196 accounting/models.py:414
+#: accounting/models.py:196 accounting/models.py:416
 msgid "club account"
 msgstr "compte club"
 
@@ -159,12 +159,12 @@ msgstr "est fait"
 msgid "simple type"
 msgstr "type simplifié"
 
-#: accounting/models.py:263 accounting/models.py:369
+#: accounting/models.py:263 accounting/models.py:371
 msgid "accounting type"
 msgstr "type comptable"
 
-#: accounting/models.py:265 accounting/models.py:364 accounting/models.py:390
-#: accounting/models.py:413 counter/models.py:316
+#: accounting/models.py:265 accounting/models.py:366 accounting/models.py:392
+#: accounting/models.py:415 counter/models.py:316
 msgid "label"
 msgstr "étiquette"
 
@@ -218,6 +218,10 @@ msgid "linked operation"
 msgstr "opération liée"
 
 #: accounting/models.py:286
+msgid "The date must be set."
+msgstr "La date doit être indiquée."
+
+#: accounting/models.py:288
 #, python-format
 msgid ""
 "The date can not be before the start date of the journal, which is\n"
@@ -226,16 +230,16 @@ msgstr ""
 "La date ne peut pas être avant la date de début du journal, qui est\n"
 "%(start_date)s."
 
-#: accounting/models.py:289
+#: accounting/models.py:291
 msgid "Target does not exists"
 msgstr "La cible n'existe pas."
 
-#: accounting/models.py:291
+#: accounting/models.py:293
 msgid "Please add a target label if you set no existing target"
 msgstr ""
 "Merci d'ajouter un nom de cible si vous ne spécifiez pas de cible existante"
 
-#: accounting/models.py:293
+#: accounting/models.py:295
 msgid ""
 "You need to provide ether a simplified accounting type or a standard "
 "accounting type"
@@ -243,41 +247,41 @@ msgstr ""
 "Vous devez fournir soit un type comptable simplifié ou un type comptable "
 "standard"
 
-#: accounting/models.py:359 counter/models.py:129
+#: accounting/models.py:361 counter/models.py:129
 msgid "code"
 msgstr "code"
 
-#: accounting/models.py:361
+#: accounting/models.py:363
 msgid "An accounting type code contains only numbers"
 msgstr "Un code comptable ne contient que des numéros"
 
-#: accounting/models.py:365
+#: accounting/models.py:367
 msgid "movement type"
 msgstr "type de mouvement"
 
-#: accounting/models.py:365
+#: accounting/models.py:367
 #: accounting/templates/accounting/journal_statement_nature.jinja:8
 #: accounting/templates/accounting/journal_statement_person.jinja:11
-#: accounting/views.py:456
+#: accounting/views.py:463
 msgid "Credit"
 msgstr "Crédit"
 
-#: accounting/models.py:365
+#: accounting/models.py:367
 #: accounting/templates/accounting/journal_statement_nature.jinja:27
 #: accounting/templates/accounting/journal_statement_person.jinja:39
-#: accounting/views.py:456
+#: accounting/views.py:463
 msgid "Debit"
 msgstr "Débit"
 
-#: accounting/models.py:366
+#: accounting/models.py:368
 msgid "Neutral"
 msgstr "Neutre"
 
-#: accounting/models.py:392
+#: accounting/models.py:394
 msgid "simplified accounting types"
 msgstr "type simplifié"
 
-#: accounting/models.py:395
+#: accounting/models.py:397
 msgid "simplified type"
 msgstr "type simplifié"
 
@@ -337,12 +341,11 @@ msgstr "Compte en banque : "
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:330
 #: election/templates/election/election_detail.jinja:378
-#: forum/templates/forum/macros.jinja:21
-#: forum/templates/forum/macros.jinja:123
+#: forum/templates/forum/macros.jinja:21 forum/templates/forum/macros.jinja:123
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:178 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:74
-#: sas/templates/sas/picture.jinja:124
+#: sas/templates/sas/picture.jinja.py:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
 #: stock/templates/stock/stock_shopping_list.jinja:69
 #: trombi/templates/trombi/detail.jinja:28
@@ -493,8 +496,8 @@ msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:56
 #: com/templates/com/news_admin_list.jinja:38
-#: com/templates/com/news_admin_list.jinja:71
-#: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
+#: com/templates/com/news_admin_list.jinja:71 core/templates/core/file.jinja:36
+#: core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
 
@@ -707,7 +710,7 @@ msgstr "Sauver"
 
 #: accounting/templates/accounting/refound_account.jinja:4
 #: accounting/templates/accounting/refound_account.jinja:8
-#: accounting/views.py:719
+#: accounting/views.py:726
 msgid "Refound account"
 msgstr "Remboursement de compte"
 
@@ -728,7 +731,7 @@ msgstr "Types simplifiés"
 msgid "New simplified type"
 msgstr "Nouveau type simplifié"
 
-#: accounting/views.py:196 accounting/views.py:203 accounting/views.py:439
+#: accounting/views.py:196 accounting/views.py:203 accounting/views.py:446
 msgid "Journal"
 msgstr "Classeur"
 
@@ -744,59 +747,67 @@ msgstr "Bilan par personne"
 msgid "Accounting statement"
 msgstr "Bilan comptable"
 
-#: accounting/views.py:433 accounting/views.py:439
+#: accounting/views.py:309
+msgid "The target must be set."
+msgstr "La cible doit être indiquée."
+
+#: accounting/views.py:321
+msgid "The amount must be set."
+msgstr "Le montant doit être indiqué."
+
+#: accounting/views.py:440 accounting/views.py:446
 msgid "Operation"
 msgstr "Opération"
 
-#: accounting/views.py:449
+#: accounting/views.py:456
 msgid "Financial proof: "
 msgstr "Justificatif de libellé : "
 
-#: accounting/views.py:450
+#: accounting/views.py:457
 #, python-format
 msgid "Club: %(club_name)s"
 msgstr "Club : %(club_name)s"
 
-#: accounting/views.py:451
+#: accounting/views.py:458
 #, python-format
 msgid "Label: %(op_label)s"
 msgstr "Libellé : %(op_label)s"
 
-#: accounting/views.py:452
+#: accounting/views.py:459
 #, python-format
 msgid "Date: %(date)s"
 msgstr "Date : %(date)s"
 
-#: accounting/views.py:458
+#: accounting/views.py:465
 #, python-format
 msgid "Amount: %(amount).2f €"
 msgstr "Montant : %(amount).2f €"
 
-#: accounting/views.py:470
+#: accounting/views.py:477
 msgid "Debtor"
 msgstr "Débiteur"
 
-#: accounting/views.py:470
+#: accounting/views.py:477
 msgid "Creditor"
 msgstr "Créditeur"
 
-#: accounting/views.py:472
+#: accounting/views.py:479
 msgid "Comment:"
 msgstr "Commentaire :"
 
-#: accounting/views.py:491
+#: accounting/views.py:498
 msgid "Signature:"
 msgstr "Signature :"
 
-#: accounting/views.py:545
+#: accounting/views.py:552
 msgid "General statement"
 msgstr "Bilan général"
 
-#: accounting/views.py:548
+#: accounting/views.py:555
 msgid "No label operations"
 msgstr "Opérations sans étiquette"
 
-#: accounting/views.py:681
+#: accounting/views.py:688
 msgid "Refound this account"
 msgstr "Rembourser ce compte"
 
@@ -861,8 +872,7 @@ msgstr "L'utilisateur est déjà membre de ce club"
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/templates/club/club_list.jinja:4
-#: club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -924,14 +934,13 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:84
-#: club/views.py:247 counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:84 club/views.py:247
+#: counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja:9
-#: club/templates/club/stats.jinja:19
+#: club/templates/club/club_sellings.jinja:9 club/templates/club/stats.jinja:19
 #: counter/templates/counter/cash_summary_list.jinja:15
 msgid "Show"
 msgstr "Montrer"
@@ -1191,9 +1200,8 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
-#: com/templates/com/news_detail.jinja:5
-#: com/templates/com/news_detail.jinja:11 com/templates/com/news_list.jinja:4
-#: com/templates/com/news_list.jinja:28
+#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
+#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:28
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1880,8 +1888,7 @@ msgstr "S'enregister"
 msgid "View more"
 msgstr "Voir plus"
 
-#: core/templates/core/base.jinja:62
-#: forum/templates/forum/last_unread.jinja:16
+#: core/templates/core/base.jinja:62 forum/templates/forum/last_unread.jinja:16
 msgid "Mark all as read"
 msgstr "Marquer tout commme lu"
 
@@ -1913,7 +1920,7 @@ msgstr "SAS"
 
 #: core/templates/core/base.jinja:94 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:13
-#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:11
+#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
 #: forum/templates/forum/main.jinja:14 forum/templates/forum/reply.jinja:15
 #: forum/templates/forum/topic.jinja:30
 msgid "Forum"
@@ -2163,13 +2170,11 @@ msgstr "login"
 msgid "Lost password?"
 msgstr "Mot de passe perdu ?"
 
-#: core/templates/core/macros.jinja:31
-#: core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:31 core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:35
-#: core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:35 core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
