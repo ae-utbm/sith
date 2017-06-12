@@ -22,29 +22,29 @@
 #
 #
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse_lazy
 from django.utils import timezone
 from django.conf import settings
 from django import forms
-from django.db import models
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from ajax_select import make_ajax_form, make_ajax_field
+from ajax_select import make_ajax_field
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from core.views.forms import MarkdownInput
-from core.models import Page
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
+
 
 class ForumMainView(ListView):
     queryset = Forum.objects.filter(parent=None).prefetch_related("children___last_message__author", "children___last_message__topic")
     template_name = "forum/main.jinja"
+
 
 class ForumMarkAllAsRead(RedirectView):
     permanent = False
@@ -56,9 +56,11 @@ class ForumMarkAllAsRead(RedirectView):
             fi.last_read_date = timezone.now()
             fi.save()
             for m in request.user.read_messages.filter(date__lt=fi.last_read_date):
-                m.readers.remove(request.user) # Clean up to keep table low in data
-        except: pass
+                m.readers.remove(request.user)  # Clean up to keep table low in data
+        except:
+            pass
         return super(ForumMarkAllAsRead, self).get(request, *args, **kwargs)
+
 
 class ForumLastUnread(ListView):
     model = ForumTopic
@@ -67,11 +69,12 @@ class ForumLastUnread(ListView):
 
     def get_queryset(self):
         topic_list = self.model.objects.filter(_last_message__date__gt=self.request.user.forum_infos.last_read_date)\
-                .exclude(_last_message__readers=self.request.user)\
-                .order_by('-_last_message__date')\
-                .select_related('_last_message__author', 'author')\
-                .prefetch_related('forum__edit_groups')
+            .exclude(_last_message__readers=self.request.user)\
+            .order_by('-_last_message__date')\
+            .select_related('_last_message__author', 'author')\
+            .prefetch_related('forum__edit_groups')
         return topic_list
+
 
 class ForumForm(forms.ModelForm):
     class Meta:
@@ -79,6 +82,7 @@ class ForumForm(forms.ModelForm):
         fields = ['name', 'parent', 'number', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
     edit_groups = make_ajax_field(Forum, 'edit_groups', 'groups', help_text="")
     view_groups = make_ajax_field(Forum, 'view_groups', 'groups', help_text="")
+
 
 class ForumCreateView(CanCreateMixin, CreateView):
     model = Forum
@@ -93,11 +97,14 @@ class ForumCreateView(CanCreateMixin, CreateView):
             init['owner_club'] = parent.owner_club
             init['edit_groups'] = parent.edit_groups.all()
             init['view_groups'] = parent.view_groups.all()
-        except: pass
+        except:
+            pass
         return init
+
 
 class ForumEditForm(ForumForm):
     recursive = forms.BooleanField(label=_("Apply rights and club owner recursively"), required=False)
+
 
 class ForumEditView(CanEditPropMixin, UpdateView):
     model = Forum
@@ -112,11 +119,13 @@ class ForumEditView(CanEditPropMixin, UpdateView):
             self.object.apply_rights_recursively()
         return ret
 
+
 class ForumDeleteView(CanEditPropMixin, DeleteView):
     model = Forum
     pk_url_kwarg = "forum_id"
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy('forum:main')
+
 
 class ForumDetailView(CanViewMixin, DetailView):
     model = Forum
@@ -126,10 +135,10 @@ class ForumDetailView(CanViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         kwargs = super(ForumDetailView, self).get_context_data(**kwargs)
         qs = self.object.topics.order_by('-_last_message__date')\
-                .select_related('_last_message__author', 'author')\
-                .prefetch_related("forum__edit_groups")
+            .select_related('_last_message__author', 'author')\
+            .prefetch_related("forum__edit_groups")
         paginator = Paginator(qs,
-                settings.SITH_FORUM_PAGE_LENGTH)
+                              settings.SITH_FORUM_PAGE_LENGTH)
         page = self.request.GET.get('topic_page')
         try:
             kwargs["topics"] = paginator.page(page)
@@ -139,14 +148,16 @@ class ForumDetailView(CanViewMixin, DetailView):
             kwargs["topics"] = paginator.page(paginator.num_pages)
         return kwargs
 
+
 class TopicForm(forms.ModelForm):
     class Meta:
         model = ForumMessage
         fields = ['title', 'message']
         widgets = {
             'message': MarkdownInput,
-            }
+        }
     title = forms.CharField(required=True, label=_("Title"))
+
 
 class ForumTopicCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
@@ -166,11 +177,13 @@ class ForumTopicCreateView(CanCreateMixin, CreateView):
         form.instance.author = self.request.user
         return super(ForumTopicCreateView, self).form_valid(form)
 
+
 class ForumTopicEditView(CanEditMixin, UpdateView):
     model = ForumTopic
     fields = ['forum']
     pk_url_kwarg = "topic_id"
     template_name = "core/edit.jinja"
+
 
 class ForumTopicDetailView(CanViewMixin, DetailView):
     model = ForumTopic
@@ -186,9 +199,9 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
             kwargs['first_unread_message_id'] = msg.id
         except:
             kwargs['first_unread_message_id'] = float("inf")
-        paginator = Paginator(self.object.messages.select_related('author__avatar_pict')\
-                .prefetch_related('topic__forum__edit_groups', 'readers').order_by('date'),
-                settings.SITH_FORUM_PAGE_LENGTH)
+        paginator = Paginator(self.object.messages.select_related('author__avatar_pict')
+                              .prefetch_related('topic__forum__edit_groups', 'readers').order_by('date'),
+                              settings.SITH_FORUM_PAGE_LENGTH)
         page = self.request.GET.get('page')
         try:
             kwargs["msgs"] = paginator.page(page)
@@ -197,6 +210,7 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
         except EmptyPage:
             kwargs["msgs"] = paginator.page(paginator.num_pages)
         return kwargs
+
 
 class ForumMessageView(SingleObjectMixin, RedirectView):
     model = ForumMessage
@@ -207,9 +221,10 @@ class ForumMessageView(SingleObjectMixin, RedirectView):
         self.object = self.get_object()
         return self.object.get_url()
 
+
 class ForumMessageEditView(CanEditMixin, UpdateView):
     model = ForumMessage
-    form_class = forms.modelform_factory(model=ForumMessage, fields=['title', 'message',], widgets={'message': MarkdownInput})
+    form_class = forms.modelform_factory(model=ForumMessage, fields=['title', 'message', ], widgets={'message': MarkdownInput})
     template_name = "forum/reply.jinja"
     pk_url_kwarg = "message_id"
 
@@ -222,6 +237,7 @@ class ForumMessageEditView(CanEditMixin, UpdateView):
         kwargs['topic'] = self.object.topic
         return kwargs
 
+
 class ForumMessageDeleteView(SingleObjectMixin, RedirectView):
     model = ForumMessage
     pk_url_kwarg = "message_id"
@@ -232,6 +248,7 @@ class ForumMessageDeleteView(SingleObjectMixin, RedirectView):
         if self.object.can_be_moderated_by(self.request.user):
             ForumMessageMeta(message=self.object, user=self.request.user, action="DELETE").save()
         return self.object.get_absolute_url()
+
 
 class ForumMessageUndeleteView(SingleObjectMixin, RedirectView):
     model = ForumMessage
@@ -244,9 +261,10 @@ class ForumMessageUndeleteView(SingleObjectMixin, RedirectView):
             ForumMessageMeta(message=self.object, user=self.request.user, action="UNDELETE").save()
         return self.object.get_absolute_url()
 
+
 class ForumMessageCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
-    form_class = forms.modelform_factory(model=ForumMessage, fields=['title', 'message',], widgets={'message': MarkdownInput})
+    form_class = forms.modelform_factory(model=ForumMessage, fields=['title', 'message', ], widgets={'message': MarkdownInput})
     template_name = "forum/reply.jinja"
 
     def dispatch(self, request, *args, **kwargs):
@@ -262,7 +280,7 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
             init['message'] = "> ##### %s\n" % (_("%(author)s said") % {'author': message.author.get_short_name()})
             init['message'] += "\n".join([
                 "> " + line for line in message.message.split('\n')
-                ])
+            ])
             init['message'] += "\n\n"
         except Exception as e:
             print(repr(e))
@@ -277,4 +295,3 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
         kwargs = super(ForumMessageCreateView, self).get_context_data(**kwargs)
         kwargs['topic'] = self.topic
         return kwargs
-
