@@ -27,11 +27,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from counter.models import Counter, Product
+from counter.models import Counter
 from core.models import User
 from club.models import Club
 
 # Create your models here.
+
 
 class Launderette(models.Model):
     name = models.CharField(_('name'), max_length=30)
@@ -78,6 +79,7 @@ class Launderette(models.Model):
     def token_list(self):
         return [t.id for t in self.get_token_list()]
 
+
 class Machine(models.Model):
     name = models.CharField(_('name'), max_length=30)
     launderette = models.ForeignKey(Launderette, related_name='machines', verbose_name=_('launderette'))
@@ -102,6 +104,7 @@ class Machine(models.Model):
 
     def get_absolute_url(self):
         return reverse('launderette:launderette_admin', kwargs={"launderette_id": self.launderette.id})
+
 
 class Token(models.Model):
     name = models.CharField(_('name'), max_length=5)
@@ -140,6 +143,7 @@ class Token(models.Model):
         else:
             return False
 
+
 class Slot(models.Model):
     start_date = models.DateTimeField(_('start date'))
     type = models.CharField(_('type'), max_length=10, choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES)
@@ -156,6 +160,4 @@ class Slot(models.Model):
 
     def __str__(self):
         return "User: %s - Date: %s - Type: %s - Machine: %s - Token: %s" % (self.user, self.start_date, self.get_type_display(),
-                self.machine.name, self.token)
-
-
+                                                                             self.machine.name, self.token)
