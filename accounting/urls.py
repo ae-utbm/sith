@@ -22,7 +22,7 @@
 #
 #
 
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from accounting.views import *
 
@@ -71,5 +71,3 @@ urlpatterns = [
     # User account
     url(r'^refound/account$', RefoundAccountView.as_view(), name='refound_account'),
 ]
-
-
