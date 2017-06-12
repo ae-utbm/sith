@@ -26,16 +26,13 @@ from django.views.generic.edit import CreateView, FormView
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.urlresolvers import reverse_lazy
-from django.db import IntegrityError
 from django import forms
-from django.forms import Select
 from django.conf import settings
 
 from ajax_select.fields import AutoCompleteSelectField
 import random
 
 from subscription.models import Subscription
-from core.views import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.views.forms import SelectDateTime
 from core.models import User
 
@@ -85,9 +82,9 @@ class SubscriptionForm(forms.ModelForm):
             if User.objects.filter(email=cleaned_data.get("email")).first() is not None:
                 self.add_error("email", ValidationError(_("A user with that email address already exists")))
             else:
-                u = User(last_name = self.cleaned_data.get("last_name"),
-                        first_name = self.cleaned_data.get("first_name"),
-                        email = self.cleaned_data.get("email"))
+                u = User(last_name=self.cleaned_data.get("last_name"),
+                         first_name=self.cleaned_data.get("first_name"),
+                         email=self.cleaned_data.get("email"))
                 u.generate_username()
                 u.set_password(str(random.randrange(1000000, 10000000)))
                 u.save()
@@ -101,6 +98,7 @@ class SubscriptionForm(forms.ModelForm):
             # TODO investigate why!
             raise ValidationError(_("You must either choose an existing user or create a new one properly"))
         return cleaned_data
+
 
 class NewSubscription(CreateView):
     template_name = 'subscription/subscription.jinja'
@@ -119,11 +117,11 @@ class NewSubscription(CreateView):
 
     def form_valid(self, form):
         form.instance.subscription_start = Subscription.compute_start(
-                duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'])
+            duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'])
         form.instance.subscription_end = Subscription.compute_end(
-                duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'],
-                start=form.instance.subscription_start
-                )
+            duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'],
+            start=form.instance.subscription_start
+        )
         return super(NewSubscription, self).form_valid(form)
 
 
