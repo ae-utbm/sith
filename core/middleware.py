@@ -52,4 +52,3 @@ class AuthenticationMiddleware(DjangoAuthenticationMiddleware):
             "'account.middleware.AuthenticationMiddleware'."
         )
         request.user = SimpleLazyObject(lambda: get_cached_user(request))
-

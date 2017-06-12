@@ -22,22 +22,24 @@
 #
 #
 
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.conf import settings
 from django.db import transaction
 from django.core.exceptions import ValidationError
-from django.contrib.auth import logout, login, authenticate
 from django.forms import CheckboxSelectMultiple, Select, DateInput, TextInput, DateTimeInput, Textarea
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from ajax_select.fields import AutoCompleteSelectField
 
-import logging
 import re
 
-from core.models import User, Page, RealGroup, SithFile
+from core.models import User, Page, SithFile
+
+from core.utils import resize_image
+from io import BytesIO
+from PIL import Image
 
 
 # Widgets
@@ -50,6 +52,7 @@ class SelectSingle(Select):
             attrs = {'class': "select_single"}
         return super(SelectSingle, self).render(name, value, attrs)
 
+
 class SelectMultiple(Select):
     def render(self, name, value, attrs=None):
         if attrs:
@@ -57,6 +60,7 @@ class SelectMultiple(Select):
         else:
             attrs = {'class': "select_multiple"}
         return super(SelectMultiple, self).render(name, value, attrs)
+
 
 class SelectDateTime(DateTimeInput):
     def render(self, name, value, attrs=None):
@@ -66,6 +70,7 @@ class SelectDateTime(DateTimeInput):
             attrs = {'class': "select_datetime"}
         return super(SelectDateTime, self).render(name, value, attrs)
 
+
 class SelectDate(DateInput):
     def render(self, name, value, attrs=None):
         if attrs:
@@ -74,15 +79,17 @@ class SelectDate(DateInput):
             attrs = {'class': "select_date"}
         return super(SelectDate, self).render(name, value, attrs)
 
+
 class MarkdownInput(Textarea):
     def render(self, name, value, attrs=None):
         output = '<p><a href="%(syntax_url)s">%(help_text)s</a></p>'\
                  '<div class="markdown_editor">%(content)s</div>' % {
-                'syntax_url': Page.get_page_by_full_name(settings.SITH_CORE_PAGE_SYNTAX).get_absolute_url(),
-                'help_text': _("Help on the syntax"),
-                'content': super(MarkdownInput, self).render(name, value, attrs),
-                }
+                     'syntax_url': Page.get_page_by_full_name(settings.SITH_CORE_PAGE_SYNTAX).get_absolute_url(),
+                     'help_text': _("Help on the syntax"),
+                     'content': super(MarkdownInput, self).render(name, value, attrs),
+                 }
         return output
+
 
 class SelectFile(TextInput):
     def render(self, name, value, attrs=None):
@@ -91,12 +98,13 @@ class SelectFile(TextInput):
         else:
             attrs = {'class': "select_file"}
         output = '%(content)s<div name="%(name)s" class="choose_file_widget" title="%(title)s"></div>' % {
-                'content': super(SelectFile, self).render(name, value, attrs),
-                'title': _("Choose file"),
-                'name': name,
-                }
+            'content': super(SelectFile, self).render(name, value, attrs),
+            'title': _("Choose file"),
+            'name': name,
+        }
         output += '<span name="' + name + '" class="choose_file_button">' + ugettext("Choose file") + '</span>'
         return output
+
 
 class SelectUser(TextInput):
     def render(self, name, value, attrs=None):
@@ -105,14 +113,15 @@ class SelectUser(TextInput):
         else:
             attrs = {'class': "select_user"}
         output = '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>' % {
-                'content': super(SelectUser, self).render(name, value, attrs),
-                'title': _("Choose user"),
-                'name': name,
-                }
+            'content': super(SelectUser, self).render(name, value, attrs),
+            'title': _("Choose user"),
+            'name': name,
+        }
         output += '<span name="' + name + '" class="choose_user_button">' + ugettext("Choose user") + '</span>'
         return output
 
 # Forms
+
 
 class LoginForm(AuthenticationForm):
     def __init__(self, *arg, **kwargs):
@@ -128,14 +137,17 @@ class LoginForm(AuthenticationForm):
                 else:
                     user = User.objects.filter(username=data['username']).first()
                 data['username'] = user.username
-            except: pass
+            except:
+                pass
             kwargs['data'] = data
         super(LoginForm, self).__init__(*arg, **kwargs)
         self.fields['username'].label = _("Username, email, or account number")
 
+
 class RegisteringForm(UserCreationForm):
     error_css_class = 'error'
     required_css_class = 'required'
+
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'email')
@@ -148,9 +160,6 @@ class RegisteringForm(UserCreationForm):
             user.save()
         return user
 
-from core.utils import resize_image
-from io import BytesIO
-from PIL import Image
 
 class UserProfileForm(forms.ModelForm):
     """
@@ -161,22 +170,22 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'nick_name', 'email', 'date_of_birth', 'profile_pict', 'avatar_pict',
-                'scrub_pict', 'sex', 'second_email', 'address', 'parent_address', 'phone', 'parent_phone',
-                'tshirt_size', 'role', 'department', 'dpt_option', 'semester', 'quote', 'school', 'promo',
-                'forum_signature', 'is_subscriber_viewable']
+                  'scrub_pict', 'sex', 'second_email', 'address', 'parent_address', 'phone', 'parent_phone',
+                  'tshirt_size', 'role', 'department', 'dpt_option', 'semester', 'quote', 'school', 'promo',
+                  'forum_signature', 'is_subscriber_viewable']
         widgets = {
-                'date_of_birth': SelectDate,
-                'profile_pict': forms.ClearableFileInput,
-                'avatar_pict': forms.ClearableFileInput,
-                'scrub_pict': forms.ClearableFileInput,
-                'phone': PhoneNumberInternationalFallbackWidget,
-                'parent_phone': PhoneNumberInternationalFallbackWidget,
-                }
+            'date_of_birth': SelectDate,
+            'profile_pict': forms.ClearableFileInput,
+            'avatar_pict': forms.ClearableFileInput,
+            'scrub_pict': forms.ClearableFileInput,
+            'phone': PhoneNumberInternationalFallbackWidget,
+            'parent_phone': PhoneNumberInternationalFallbackWidget,
+        }
         labels = {
-                'profile_pict': _("Profile: you need to be visible on the picture, in order to be recognized (e.g. by the barmen)"),
-                'avatar_pict': _("Avatar: used on the forum"),
-                'scrub_pict': _("Scrub: let other know how your scrub looks like!"),
-                }
+            'profile_pict': _("Profile: you need to be visible on the picture, in order to be recognized (e.g. by the barmen)"),
+            'avatar_pict': _("Avatar: used on the forum"),
+            'scrub_pict': _("Scrub: let other know how your scrub looks like!"),
+        }
 
     def __init__(self, *arg, **kwargs):
         super(UserProfileForm, self).__init__(*arg, **kwargs)
@@ -197,14 +206,14 @@ class UserProfileForm(forms.ModelForm):
         self.cleaned_data['profile_pict'] = profile
         self.cleaned_data['scrub_pict'] = scrub
         parent = SithFile.objects.filter(parent=None, name="profiles").first()
-        for field,f in files:
+        for field, f in files:
             with transaction.atomic():
                 try:
                     im = Image.open(BytesIO(f.read()))
                     new_file = SithFile(parent=parent, name=self.generate_name(field, f),
-                            file=resize_image(im, 400, f.content_type.split('/')[-1]),
-                            owner=self.instance, is_folder=False, mime_type=f.content_type, size=f._size,
-                            moderator=self.instance, is_moderated=True)
+                                        file=resize_image(im, 400, f.content_type.split('/')[-1]),
+                                        owner=self.instance, is_folder=False, mime_type=f.content_type, size=f._size,
+                                        moderator=self.instance, is_moderated=True)
                     new_file.file.name = new_file.name
                     old = SithFile.objects.filter(parent=parent, name=new_file.name).first()
                     if old:
@@ -216,16 +225,18 @@ class UserProfileForm(forms.ModelForm):
                 except ValidationError as e:
                     self._errors.pop(field, None)
                     self.add_error(field, _("Error uploading file %(file_name)s: %(msg)s") %
-                            {'file_name': f, 'msg': str(e.message)})
+                                   {'file_name': f, 'msg': str(e.message)})
                 except IOError:
                     self._errors.pop(field, None)
                     self.add_error(field, _("Error uploading file %(file_name)s: %(msg)s") %
-                            {'file_name': f, 'msg': _("Bad image format, only jpeg, png, and gif are accepted")})
+                                   {'file_name': f, 'msg': _("Bad image format, only jpeg, png, and gif are accepted")})
         self._post_clean()
+
 
 class UserPropForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'
+
     class Meta:
         model = User
         fields = ['groups']
@@ -236,13 +247,16 @@ class UserPropForm(forms.ModelForm):
             'groups': CheckboxSelectMultiple,
         }
 
+
 class UserGodfathersForm(forms.Form):
     type = forms.ChoiceField(choices=[('godfather', _("Godfather")), ('godchild', _("Godchild"))], label=_("Add"))
     user = AutoCompleteSelectField('users', required=True, label=_("Select user"), help_text=None)
 
+
 class PagePropForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'
+
     class Meta:
         model = Page
         fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ]
@@ -255,4 +269,3 @@ class PagePropForm(forms.ModelForm):
         super(PagePropForm, self).__init__(*arg, **kwargs)
         self.fields['edit_groups'].required = False
         self.fields['view_groups'].required = False
-
