@@ -27,10 +27,37 @@ import re
 # Image utils
 
 from io import BytesIO
+from datetime import datetime, timezone, date
+
 from PIL import Image, ExifTags
-# from exceptions import IOError
 import PIL
+
+from django.conf import settings
 from django.core.files.base import ContentFile
+
+
+def get_start_of_semester(d=date.today()):
+    """
+    This function computes the start date of the semester with respect to the given date (default is today),
+    and the start date given in settings.SITH_START_DATE.
+    It takes the nearest past start date.
+    Exemples: with SITH_START_DATE = (8, 15)
+        Today      -> Start date
+        2015-03-17 -> 2015-02-15
+        2015-01-11 -> 2014-08-15
+    """
+    today = d
+    year = today.year
+    start = date(year, settings.SITH_START_DATE[0], settings.SITH_START_DATE[1])
+    start2 = start.replace(month=(start.month+6)%12)
+    if start > start2:
+        start, start2 = start2, start
+    if today < start:
+        return start2.replace(year=year-1)
+    elif today < start2:
+        return start
+    else:
+        return start2
 
 def scale_dimension(width, height, long_edge):
     if width > height:

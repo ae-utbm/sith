@@ -32,6 +32,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.forms import PasswordResetForm
 
 from core.models import User
+from core.utils import get_start_of_semester
 
 
 
@@ -147,18 +148,7 @@ class Subscription(models.Model):
         """
         if duration <= 2: # Sliding subscriptions for 1 or 2 semesters
             return d
-        today = d
-        year = today.year
-        start = date(year, settings.SITH_START_DATE[0], settings.SITH_START_DATE[1])
-        start2 = start.replace(month=(start.month+6)%12)
-        if start > start2:
-            start, start2 = start2, start
-        if today < start:
-            return start2.replace(year=year-1)
-        elif today < start2:
-            return start
-        else:
-            return start2
+        return get_start_of_semester(d)
 
     @staticmethod
     def compute_end(duration, start=None):
