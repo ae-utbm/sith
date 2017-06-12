@@ -305,8 +305,8 @@ class OperationForm(forms.ModelForm):
     def clean(self):
         self.cleaned_data = super(OperationForm, self).clean()
         if 'target_type' in self.cleaned_data.keys():
-            if self.cleaned_data.get("user") is None or self.cleaned_data.get("club") or self.cleaned_data.get("club_account") is None or self.cleaned_data.get("company") is None or self.cleaned_data.get("other"):
-                self.add_error('target_id', ValidationError(_("The target must be set.")))
+            if self.cleaned_data.get("user") is None and self.cleaned_data.get("club") is None and self.cleaned_data.get("club_account") is None and self.cleaned_data.get("company") is None and self.cleaned_data.get("target_label") is None:
+                self.add_error('target_type', ValidationError(_("The target must be set.")))
             else:
                 if self.cleaned_data['target_type'] == "USER":
                     self.cleaned_data['target_id'] = self.cleaned_data['user'].id
