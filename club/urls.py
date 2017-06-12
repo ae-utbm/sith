@@ -22,7 +22,7 @@
 #
 #
 
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from club.views import *
 
@@ -40,4 +40,3 @@ urlpatterns = [
     url(r'^(?P<club_id>[0-9]+)/tools$', ClubToolsView.as_view(), name='tools'),
     url(r'^membership/(?P<membership_id>[0-9]+)/set_old$', MembershipSetOldView.as_view(), name='membership_set_old'),
 ]
-
