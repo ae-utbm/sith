@@ -59,6 +59,13 @@ def get_start_of_semester(d=date.today()):
     else:
         return start2
 
+def get_semester(d=date.today()):
+    start = get_start_of_semester(d)
+    if start.month <= 6:
+        return "P" + str(start.year)[-2:]
+    else:
+        return "A" + str(start.year)[-2:]
+
 def scale_dimension(width, height, long_edge):
     if width > height:
         ratio = long_edge * 1. / width

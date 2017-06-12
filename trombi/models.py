@@ -31,6 +31,7 @@ from django.core.exceptions import ValidationError
 from datetime import timedelta, date
 
 from core.models import User
+from core.utils import get_start_of_semester, get_semester
 from club.models import Club
 
 class TrombiManager(models.Manager):
@@ -98,6 +99,24 @@ class TrombiUser(models.Model):
     def __str__(self):
         return str(self.user)
 
+    def make_memberships(self):
+        self.memberships.all().delete()
+        for m in self.user.memberships.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE).order_by('end_date'):
+            role = str(settings.SITH_CLUB_ROLES[m.role])
+            if m.description:
+                role += " (%s)" % m.description
+            if m.end_date:
+                end_date = get_semester(m.end_date)
+            else:
+                end_date = ""
+            TrombiClubMembership(
+                    user=self,
+                    club=str(m.club),
+                    role=role[:64],
+                    start=get_semester(m.start_date),
+                    end=end_date,
+                    ).save()
+
 class TrombiComment(models.Model):
     """
     This represent a comment given by someone to someone else in the same Trombi
@@ -112,4 +131,26 @@ class TrombiComment(models.Model):
         if user.id == self.target.user.id:
             return False
         return user.id == self.author.user.id or user.can_edit(self.author.trombi)
+
+class TrombiClubMembership(models.Model):
+    """
+    This represent a membership to a club
+    """
+    user = models.ForeignKey(TrombiUser, verbose_name=_("user"), related_name='memberships')
+    club = models.CharField(_("club"), max_length=32, default="")
+    role = models.CharField(_("role"), max_length=64, default="")
+    start = models.CharField(_("start"), max_length=16, default="")
+    end = models.CharField(_("end"), max_length=16, default="")
+
+    class Meta:
+        ordering = ['id']
+
+    def __str__(self):
+        return "%s - %s - %s (%s)" % (self.user, self.club, self.role, self.start)
+
+    def can_be_edited_by(self, user):
+        return user.id == self.user.user.id or user.can_edit(self.user.trombi)
+
+    def get_absolute_url(self):
+        return reverse('trombi:profile')
 

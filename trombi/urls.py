@@ -39,5 +39,8 @@ urlpatterns = [
     url(r'^tools$', UserTrombiToolsView.as_view(), name='user_tools'),
     url(r'^profile$', UserTrombiEditProfileView.as_view(), name='profile'),
     url(r'^pictures$', UserTrombiEditPicturesView.as_view(), name='pictures'),
+    url(r'^reset_memberships$', UserTrombiResetClubMembershipsView.as_view(), name='reset_memberships'),
+    url(r'^membership/(?P<membership_id>[0-9]+)/edit$', UserTrombiEditMembershipView.as_view(), name='edit_membership'),
+    url(r'^membership/(?P<membership_id>[0-9]+)/delete$', UserTrombiDeleteMembershipView.as_view(), name='delete_membership'),
 ]
 

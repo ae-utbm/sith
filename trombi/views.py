@@ -34,7 +34,7 @@ from django.forms.models import modelform_factory
 
 from datetime import date
 
-from trombi.models import Trombi, TrombiUser, TrombiComment
+from trombi.models import Trombi, TrombiUser, TrombiComment, TrombiClubMembership
 from core.views.forms import SelectFile, SelectDate
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin, QuickNotifMixin
 from core.models import User
@@ -210,13 +210,36 @@ class UserTrombiEditProfileView(UpdateView):
                 'phone': _("Phone"),
                 'parent_address': _("Native town"),
             })
-    template_name = "core/edit.jinja"
+    template_name = "trombi/edit_profile.jinja"
 
     def get_object(self):
         return self.request.user
 
     def get_success_url(self):
         return reverse('trombi:user_tools')+"?qn_success"
+
+class UserTrombiResetClubMembershipsView(RedirectView):
+    permanent = False
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user.trombi_user
+        user.make_memberships()
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('trombi:user_tools')+"?qn_success"
+
+class UserTrombiDeleteMembershipView(DeleteView, CanEditMixin):
+    model = TrombiClubMembership
+    pk_url_kwarg = "membership_id"
+    template_name = "core/delete_confirm.jinja"
+    success_url = reverse_lazy('trombi:profile')
+
+class UserTrombiEditMembershipView(UpdateView, CanEditMixin):
+    model = TrombiClubMembership
+    pk_url_kwarg = "membership_id"
+    fields = ['role', 'start', 'end']
+    template_name = "core/edit.jinja"
 
 class UserTrombiProfileView(DetailView):
     model = TrombiUser

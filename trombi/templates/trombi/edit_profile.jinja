@@ -1,0 +1,44 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Edit profile{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h2>{% trans %}Edit profile{% endtrans %}</h2>
+<p> <a href="{{ url('trombi:user_tools') }}">{% trans %}Back to tools{% endtrans %}</a></p>
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+</form>
+<h4>{% trans %}Club{% endtrans %}</h4>
+<a href="{{ url('trombi:reset_memberships') }}">
+    {% trans %}Reset club memberships in Trombi (delete exising ones, does not impact real club memberships){% endtrans %}
+</a>
+<table style="max-width: 80%; margin: auto;">
+    <thead>
+        <tr>
+            <td>{% trans %}Club{% endtrans %}</td>
+            <td>{% trans %}Role{% endtrans %}</td>
+            <td>{% trans %}Dates{% endtrans %}</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in user.trombi_user.memberships.all() %}
+        <tr>
+            <td>{{ m.club }}</td>
+            <td>{{ m.role }}</td>
+            <td>{{ m.start }} - {{ m.end }}</td>
+            <td>
+                <a href="{{ url('trombi:edit_membership', membership_id=m.id) }}">{% trans %}Edit{% endtrans %}</a>
+                <a href="{{ url('trombi:delete_membership', membership_id=m.id) }}">{% trans %}Delete{% endtrans %}</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+
+
