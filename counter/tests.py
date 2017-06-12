@@ -24,7 +24,6 @@
 
 import re
 
-from pprint import pprint
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command

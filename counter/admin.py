@@ -36,4 +36,3 @@ admin.site.register(Selling)
 admin.site.register(Permanency)
 admin.site.register(CashRegisterSummary)
 admin.site.register(Eticket)
-
