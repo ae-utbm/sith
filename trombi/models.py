@@ -99,6 +99,9 @@ class TrombiUser(models.Model):
     def __str__(self):
         return str(self.user)
 
+    def is_owned_by(self, user):
+        return user.is_owner(self.trombi)
+
     def make_memberships(self):
         self.memberships.all().delete()
         for m in self.user.memberships.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE).order_by('end_date'):

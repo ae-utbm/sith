@@ -118,17 +118,14 @@ class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailVie
     pk_url_kwarg = 'trombi_id'
     current_tab = "admin_tools"
 
-class TrombiDeleteUserView(CanEditPropMixin, SingleObjectMixin, RedirectView):
-    model = Trombi
-    pk_url_kwarg = 'trombi_id'
-    permanent = False
+class TrombiDeleteUserView(CanEditPropMixin, TrombiTabsMixin, DeleteView):
+    model = TrombiUser
+    pk_url_kwarg = 'user_id'
+    template_name = 'core/delete_confirm.jinja'
+    current_tab = "admin_tools"
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        user = get_object_or_404(TrombiUser, id=self.kwargs['user_id'])
-        user.delete()
-# See if we need to also delete the comments on the user, or if we keep them
-        return redirect(self.object.get_absolute_url()+"?qn_success")
+    def get_success_url(self):
+        return reverse('trombi:detail', kwargs={'trombi_id': self.object.trombi.id}) + "?qn_success"
 
 class TrombiModerateCommentsView(CanEditPropMixin, QuickNotifMixin, TrombiTabsMixin, DetailView):
     model = Trombi
