@@ -23,10 +23,10 @@
 #
 
 from django.http import Http404
-from django.shortcuts import render, get_object_or_404, redirect
-from django.core.urlresolvers import reverse_lazy, reverse
-from django.views.generic import ListView, DetailView, RedirectView, TemplateView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView, SingleObjectMixin
+from django.shortcuts import get_object_or_404, redirect
+from django.core.urlresolvers import reverse
+from django.views.generic import DetailView, RedirectView, TemplateView
+from django.views.generic.edit import UpdateView, CreateView
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.conf import settings
@@ -35,10 +35,11 @@ from django.forms.models import modelform_factory
 from datetime import date
 
 from trombi.models import Trombi, TrombiUser, TrombiComment, TrombiClubMembership
-from core.views.forms import SelectFile, SelectDate
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin, QuickNotifMixin
+from core.views.forms import SelectDate
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, QuickNotifMixin
 from core.models import User
 from club.models import Club
+
 
 class TrombiTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
@@ -47,39 +48,42 @@ class TrombiTabsMixin(TabedViewMixin):
     def get_list_of_tabs(self):
         tab_list = []
         tab_list.append({
-                    'url': reverse('trombi:user_tools'),
-                    'slug': 'tools',
-                    'name': _("Tools"),
-                    })
+            'url': reverse('trombi:user_tools'),
+            'slug': 'tools',
+            'name': _("Tools"),
+        })
         tab_list.append({
-                    'url': reverse('trombi:profile'),
-                    'slug': 'profile',
-                    'name': _("My profile"),
-                    })
+            'url': reverse('trombi:profile'),
+            'slug': 'profile',
+            'name': _("My profile"),
+        })
         tab_list.append({
-                    'url': reverse('trombi:pictures'),
-                    'slug': 'pictures',
-                    'name': _("My pictures"),
-                    })
+            'url': reverse('trombi:pictures'),
+            'slug': 'pictures',
+            'name': _("My pictures"),
+        })
         try:
             trombi = self.request.user.trombi_user.trombi
             if self.request.user.is_owner(trombi):
                 tab_list.append({
-                        'url': reverse('trombi:detail', kwargs={'trombi_id': trombi.id}),
-                        'slug': 'admin_tools',
-                        'name': _("Admin tools"),
-                        })
-        except: pass
+                    'url': reverse('trombi:detail', kwargs={'trombi_id': trombi.id}),
+                    'slug': 'admin_tools',
+                    'name': _("Admin tools"),
+                })
+        except:
+            pass
         return tab_list
+
 
 class TrombiForm(forms.ModelForm):
     class Meta:
         model = Trombi
         fields = ['subscription_deadline', 'comments_deadline', 'max_chars', 'show_profiles']
         widgets = {
-                'subscription_deadline': SelectDate,
-                'comments_deadline': SelectDate,
-                }
+            'subscription_deadline': SelectDate,
+            'comments_deadline': SelectDate,
+        }
+
 
 class TrombiCreateView(CanEditPropMixin, CreateView):
     """
@@ -102,6 +106,7 @@ class TrombiCreateView(CanEditPropMixin, CreateView):
         else:
             return self.form_invalid(form)
 
+
 class TrombiEditView(CanEditPropMixin, TrombiTabsMixin, UpdateView):
     model = Trombi
     form_class = TrombiForm
@@ -110,13 +115,15 @@ class TrombiEditView(CanEditPropMixin, TrombiTabsMixin, UpdateView):
     current_tab = "admin_tools"
 
     def get_success_url(self):
-        return super(TrombiEditView, self).get_success_url()+"?qn_success"
+        return super(TrombiEditView, self).get_success_url() + "?qn_success"
+
 
 class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailView):
     model = Trombi
     template_name = 'trombi/detail.jinja'
     pk_url_kwarg = 'trombi_id'
     current_tab = "admin_tools"
+
 
 class TrombiDeleteUserView(CanEditPropMixin, TrombiTabsMixin, DeleteView):
     model = TrombiUser
@@ -127,6 +134,7 @@ class TrombiDeleteUserView(CanEditPropMixin, TrombiTabsMixin, DeleteView):
     def get_success_url(self):
         return reverse('trombi:detail', kwargs={'trombi_id': self.object.trombi.id}) + "?qn_success"
 
+
 class TrombiModerateCommentsView(CanEditPropMixin, QuickNotifMixin, TrombiTabsMixin, DetailView):
     model = Trombi
     template_name = 'trombi/comment_moderation.jinja'
@@ -136,12 +144,14 @@ class TrombiModerateCommentsView(CanEditPropMixin, QuickNotifMixin, TrombiTabsMi
     def get_context_data(self, **kwargs):
         kwargs = super(TrombiModerateCommentsView, self).get_context_data(**kwargs)
         kwargs['comments'] = TrombiComment.objects.filter(is_moderated=False,
-                author__trombi__id=self.object.id).exclude(target__user__id=self.request.user.id)
+                                                          author__trombi__id=self.object.id).exclude(target__user__id=self.request.user.id)
         return kwargs
+
 
 class TrombiModerateForm(forms.Form):
     reason = forms.CharField(help_text=_("Explain why you rejected the comment"))
     action = forms.CharField(initial="delete", widget=forms.widgets.HiddenInput)
+
 
 class TrombiModerateCommentView(DetailView):
     model = TrombiComment
@@ -159,26 +169,25 @@ class TrombiModerateCommentView(DetailView):
             if request.POST['action'] == "accept":
                 self.object.is_moderated = True
                 self.object.save()
-                return redirect(reverse('trombi:moderate_comments', kwargs={'trombi_id': self.object.author.trombi.id})+"?qn_success")
+                return redirect(reverse('trombi:moderate_comments', kwargs={'trombi_id': self.object.author.trombi.id}) + "?qn_success")
             elif request.POST['action'] == "reject":
                 return super(TrombiModerateCommentView, self).get(request, *args, **kwargs)
             elif request.POST['action'] == "delete" and "reason" in request.POST.keys():
                 self.object.author.user.email_user(
-                        subject="[%s] %s" % (settings.SITH_NAME, _("Rejected comment")),
-                        message=_("Your comment to %(target)s on the Trombi \"%(trombi)s\" was rejected for the following "
-                            "reason: %(reason)s\n\n"
-                            "Your comment was:\n\n%(content)s"
-                            ) % {
-                                'target': self.object.target.user.get_display_name(),
-                                'trombi': self.object.author.trombi,
-                                'reason': request.POST["reason"],
-                                'content': self.object.content,
-                                },
-                        )
+                    subject="[%s] %s" % (settings.SITH_NAME, _("Rejected comment")),
+                    message=_("Your comment to %(target)s on the Trombi \"%(trombi)s\" was rejected for the following "
+                              "reason: %(reason)s\n\n"
+                              "Your comment was:\n\n%(content)s"
+                              ) % {
+                        'target': self.object.target.user.get_display_name(),
+                        'trombi': self.object.author.trombi,
+                        'reason': request.POST["reason"],
+                        'content': self.object.content,
+                    },
+                )
                 self.object.delete()
-                return redirect(reverse('trombi:moderate_comments', kwargs={'trombi_id': self.object.author.trombi.id})+"?qn_success")
+                return redirect(reverse('trombi:moderate_comments', kwargs={'trombi_id': self.object.author.trombi.id}) + "?qn_success")
         raise Http404
-
 
     def get_context_data(self, **kwargs):
         kwargs = super(TrombiModerateCommentView, self).get_context_data(**kwargs)
@@ -186,15 +195,19 @@ class TrombiModerateCommentView(DetailView):
         return kwargs
 
 # User side
+
+
 class TrombiModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return _("%(name)s (deadline: %(date)s)") % {'name': str(obj), 'date': str(obj.subscription_deadline)}
 
+
 class UserTrombiForm(forms.Form):
     trombi = TrombiModelChoiceField(Trombi.availables.all(), required=False, label=_("Select trombi"),
-            help_text=_("This allows you to subscribe to a Trombi. "
-            "Be aware that you can subscribe only once, so don't play with that, "
-            "or you will expose yourself to the admins' wrath!"))
+                                    help_text=_("This allows you to subscribe to a Trombi. "
+                                                "Be aware that you can subscribe only once, so don't play with that, "
+                                                "or you will expose yourself to the admins' wrath!"))
+
 
 class UserTrombiToolsView(QuickNotifMixin, TrombiTabsMixin, TemplateView):
     """
@@ -207,7 +220,7 @@ class UserTrombiToolsView(QuickNotifMixin, TrombiTabsMixin, TemplateView):
         self.form = UserTrombiForm(request.POST)
         if self.form.is_valid():
             trombi_user = TrombiUser(user=request.user,
-                    trombi=self.form.cleaned_data['trombi'])
+                                     trombi=self.form.cleaned_data['trombi'])
             trombi_user.save()
             self.quick_notif_list += ['qn_success']
         return super(UserTrombiToolsView, self).get(request, *args, **kwargs)
@@ -222,6 +235,7 @@ class UserTrombiToolsView(QuickNotifMixin, TrombiTabsMixin, TemplateView):
             kwargs['date'] = date
         return kwargs
 
+
 class UserTrombiEditPicturesView(TrombiTabsMixin, UpdateView):
     model = TrombiUser
     fields = ['profile_pict', 'scrub_pict']
@@ -232,18 +246,18 @@ class UserTrombiEditPicturesView(TrombiTabsMixin, UpdateView):
         return self.request.user.trombi_user
 
     def get_success_url(self):
-        return reverse('trombi:user_tools')+"?qn_success"
+        return reverse('trombi:user_tools') + "?qn_success"
+
 
 class UserTrombiEditProfileView(QuickNotifMixin, TrombiTabsMixin, UpdateView):
     model = User
     form_class = modelform_factory(User,
-            fields=['second_email', 'phone', 'department', 'dpt_option',
-                'quote', 'parent_address'],
-            labels={
-                'second_email': _("Personal email (not UTBM)"),
-                'phone': _("Phone"),
-                'parent_address': _("Native town"),
-            })
+                                   fields=['second_email', 'phone', 'department', 'dpt_option',
+                                           'quote', 'parent_address'],
+                                   labels={'second_email': _("Personal email (not UTBM)"),
+                                           'phone': _("Phone"),
+                                           'parent_address': _("Native town"),
+                                           })
     template_name = "trombi/edit_profile.jinja"
     current_tab = "profile"
 
@@ -251,7 +265,8 @@ class UserTrombiEditProfileView(QuickNotifMixin, TrombiTabsMixin, UpdateView):
         return self.request.user
 
     def get_success_url(self):
-        return reverse('trombi:user_tools')+"?qn_success"
+        return reverse('trombi:user_tools') + "?qn_success"
+
 
 class UserTrombiResetClubMembershipsView(RedirectView):
     permanent = False
@@ -262,7 +277,8 @@ class UserTrombiResetClubMembershipsView(RedirectView):
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('trombi:profile')+"?qn_success"
+        return reverse('trombi:profile') + "?qn_success"
+
 
 class UserTrombiDeleteMembershipView(TrombiTabsMixin, CanEditMixin, DeleteView):
     model = TrombiClubMembership
@@ -273,6 +289,7 @@ class UserTrombiDeleteMembershipView(TrombiTabsMixin, CanEditMixin, DeleteView):
 
     def get_success_url(self):
         return super(UserTrombiDeleteMembershipView, self).get_success_url() + "?qn_success"
+
 
 class UserTrombiEditMembershipView(CanEditMixin, TrombiTabsMixin, UpdateView):
     model = TrombiClubMembership
@@ -300,6 +317,7 @@ class UserTrombiProfileView(TrombiTabsMixin, DetailView):
             raise Http404()
         return super(UserTrombiProfileView, self).get(request, *args, **kwargs)
 
+
 class TrombiCommentFormView():
     """
     Create/edit a trombi comment
@@ -312,20 +330,20 @@ class TrombiCommentFormView():
         self.trombi = self.request.user.trombi_user.trombi
         if date.today() <= self.trombi.subscription_deadline:
             raise Http404(_("You can not yet write comment, you must wait for "
-                "the subscription deadline to be passed."))
+                            "the subscription deadline to be passed."))
         if self.trombi.comments_deadline < date.today():
             raise Http404(_("You can not write comment anymore, the deadline is "
-                "already passed."))
+                            "already passed."))
         return modelform_factory(self.model, fields=self.fields,
-            widgets={
-                'content': forms.widgets.Textarea(attrs={'maxlength': self.trombi.max_chars})
-            },
-            help_texts={
-                'content': _("Maximum characters: %(max_length)s") % {'max_length': self.trombi.max_chars}
-            })
+                                 widgets={
+                                     'content': forms.widgets.Textarea(attrs={'maxlength': self.trombi.max_chars})
+                                 },
+                                 help_texts={
+                                     'content': _("Maximum characters: %(max_length)s") % {'max_length': self.trombi.max_chars}
+                                 })
 
     def get_success_url(self):
-        return reverse('trombi:user_tools')+"?qn_success"
+        return reverse('trombi:user_tools') + "?qn_success"
 
     def get_context_data(self, **kwargs):
         kwargs = super(TrombiCommentFormView, self).get_context_data(**kwargs)
@@ -335,6 +353,7 @@ class TrombiCommentFormView():
             kwargs['target'] = self.object.target
         return kwargs
 
+
 class TrombiCommentCreateView(TrombiCommentFormView, CreateView):
     def form_valid(self, form):
         target = get_object_or_404(TrombiUser, id=self.kwargs['user_id'])
@@ -342,11 +361,10 @@ class TrombiCommentCreateView(TrombiCommentFormView, CreateView):
         form.instance.target = target
         return super(TrombiCommentCreateView, self).form_valid(form)
 
+
 class TrombiCommentEditView(TrombiCommentFormView, CanViewMixin, UpdateView):
     pk_url_kwarg = "comment_id"
 
     def form_valid(self, form):
         form.instance.is_moderated = False
         return super(TrombiCommentEditView, self).form_valid(form)
-
-
