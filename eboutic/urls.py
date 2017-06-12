@@ -22,7 +22,7 @@
 #
 #
 
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from eboutic.views import *
 
@@ -33,6 +33,3 @@ urlpatterns = [
     url(r'^pay$', EbouticPayWithSith.as_view(), name='pay_with_sith'),
     url(r'^et_autoanswer$', EtransactionAutoAnswer.as_view(), name='etransation_autoanswer'),
 ]
-
-
-
