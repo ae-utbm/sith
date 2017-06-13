@@ -25,7 +25,6 @@
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.core import validators
-from django.db.models import Count
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -36,6 +35,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from decimal import Decimal
 from core.models import User, SithFile
 from club.models import Club
+
 
 class CurrencyField(models.DecimalField):
     """
@@ -50,11 +50,12 @@ class CurrencyField(models.DecimalField):
 
     def to_python(self, value):
         try:
-           return super(CurrencyField, self).to_python(value).quantize(Decimal("0.01"))
+            return super(CurrencyField, self).to_python(value).quantize(Decimal("0.01"))
         except AttributeError:
-           return None
+            return None
 
 # Accounting classes
+
 
 class Company(models.Model):
     name = models.CharField(_('name'), max_length=60)
@@ -104,6 +105,7 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
+
 class BankAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
     iban = models.CharField(_('iban'), max_length=255, blank=True)
@@ -130,6 +132,7 @@ class BankAccount(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class ClubAccount(models.Model):
     name = models.CharField(_('name'), max_length=30)
@@ -244,6 +247,7 @@ class GeneralJournal(models.Model):
                 self.amount -= o.amount
         self.save()
 
+
 class Operation(models.Model):
     """
     An operation is a line in the journal, a debit or a credit
@@ -258,17 +262,17 @@ class Operation(models.Model):
     invoice = models.ForeignKey(SithFile, related_name='operations', verbose_name=_("invoice"), null=True, blank=True)
     done = models.BooleanField(_('is done'), default=False)
     simpleaccounting_type = models.ForeignKey('SimplifiedAccountingType', related_name="operations",
-            verbose_name=_("simple type"), null=True, blank=True)
+                                              verbose_name=_("simple type"), null=True, blank=True)
     accounting_type = models.ForeignKey('AccountingType', related_name="operations",
-            verbose_name=_("accounting type"), null=True, blank=True)
+                                        verbose_name=_("accounting type"), null=True, blank=True)
     label = models.ForeignKey('Label', related_name="operations",
-            verbose_name=_("label"), null=True, blank=True, on_delete=models.SET_NULL)
+                              verbose_name=_("label"), null=True, blank=True, on_delete=models.SET_NULL)
     target_type = models.CharField(_('target type'), max_length=10,
-            choices=[('USER', _('User')), ('CLUB', _('Club')), ('ACCOUNT', _('Account')), ('COMPANY', _('Company')), ('OTHER', _('Other'))])
+                                   choices=[('USER', _('User')), ('CLUB', _('Club')), ('ACCOUNT', _('Account')), ('COMPANY', _('Company')), ('OTHER', _('Other'))])
     target_id = models.IntegerField(_('target id'), null=True, blank=True)
     target_label = models.CharField(_('target label'), max_length=32, default="", blank=True)
     linked_operation = models.OneToOneField('self', related_name='operation_linked_to', verbose_name=_("linked operation"),
-            null=True, blank=True, default=None)
+                                            null=True, blank=True, default=None)
 
     class Meta:
         unique_together = ('number', 'journal')
@@ -349,8 +353,9 @@ class Operation(models.Model):
 
     def __str__(self):
         return "%d € | %s | %s | %s" % (
-                self.amount, self.date, self.accounting_type, self.done,
-                )
+            self.amount, self.date, self.accounting_type, self.done,
+        )
+
 
 class AccountingType(models.Model):
     """
@@ -359,13 +364,13 @@ class AccountingType(models.Model):
     Thoses are numbers used in accounting to classify operations
     """
     code = models.CharField(_('code'), max_length=16,
-            validators=[
-                validators.RegexValidator(r'^[0-9]*$', _('An accounting type code contains only numbers')),
-                ],
-            )
+                            validators=[
+        validators.RegexValidator(r'^[0-9]*$', _('An accounting type code contains only numbers')),
+    ],
+    )
     label = models.CharField(_('label'), max_length=128)
     movement_type = models.CharField(_('movement type'), choices=[('CREDIT', _('Credit')), ('DEBIT', _('Debit')),
-            ('NEUTRAL', _('Neutral'))], max_length=12)
+                                                                  ('NEUTRAL', _('Neutral'))], max_length=12)
 
     class Meta:
         verbose_name = _("accounting type")
@@ -383,7 +388,8 @@ class AccountingType(models.Model):
         return reverse('accounting:type_list')
 
     def __str__(self):
-        return self.code+" - "+self.get_movement_type_display()+" - "+self.label
+        return self.code + " - " + self.get_movement_type_display() + " - " + self.label
+
 
 class SimplifiedAccountingType(models.Model):
     """
@@ -391,7 +397,7 @@ class SimplifiedAccountingType(models.Model):
     """
     label = models.CharField(_('label'), max_length=128)
     accounting_type = models.ForeignKey(AccountingType, related_name="simplified_types",
-            verbose_name=_("simplified accounting types"))
+                                        verbose_name=_("simplified accounting types"))
 
     class Meta:
         verbose_name = _("simplified type")
@@ -408,7 +414,8 @@ class SimplifiedAccountingType(models.Model):
         return reverse('accounting:simple_type_list')
 
     def __str__(self):
-        return self.get_movement_type_display()+" - "+self.accounting_type.code+" - "+self.label
+        return self.get_movement_type_display() + " - " + self.accounting_type.code + " - " + self.label
+
 
 class Label(models.Model):
     """Label allow a club to sort its operations"""
@@ -432,4 +439,3 @@ class Label(models.Model):
 
     def can_be_viewed_by(self, user):
         return self.club_account.can_be_viewed_by(user)
-

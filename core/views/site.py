@@ -22,17 +22,13 @@
 #
 #
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.db import models
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.core import serializers
-from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, TemplateView
 
-import os
 import json
-from itertools import chain
 
 from haystack.query import SearchQuerySet
 
@@ -40,8 +36,10 @@ from core.models import User, Notification
 from core.utils import doku_to_markdown, bbcode_to_markdown
 from club.models import Club
 
+
 def index(request, context=None):
     return render(request, "core/index.jinja")
+
 
 class NotificationList(ListView):
     model = Notification
@@ -52,6 +50,7 @@ class NotificationList(ListView):
             self.request.user.notifications.update(viewed=True)
         return self.request.user.notifications.order_by('-id')[:20]
 
+
 def notification(request, notif_id):
     notif = Notification.objects.filter(id=notif_id).first()
     if notif:
@@ -60,43 +59,49 @@ def notification(request, notif_id):
         return redirect(notif.url)
     return redirect("/")
 
+
 def search_user(query, as_json=False):
     res = SearchQuerySet().models(User).filter(text=query).filter_or(text__contains=query)[:20]
     return [r.object for r in res]
+
 
 def search_club(query, as_json=False):
     clubs = []
     if query:
         clubs = Club.objects.filter(name__icontains=query).all()
         clubs = clubs[:5]
-        if as_json: # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
+        if as_json:  # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
             clubs = json.loads(serializers.serialize('json', clubs, fields=('name')))
         else:
             clubs = list(clubs)
     return clubs
 
+
 @login_required
 def search_view(request):
     result = {
-            'users': search_user(request.GET.get('query', '')),
-            'clubs': search_club(request.GET.get('query', '')),
-            }
+        'users': search_user(request.GET.get('query', '')),
+        'clubs': search_club(request.GET.get('query', '')),
+    }
     return render(request, "core/search.jinja", context={'result': result})
+
 
 @login_required
 def search_user_json(request):
     result = {
-            'users': search_user(request.GET.get('query', ''), True),
-            }
+        'users': search_user(request.GET.get('query', ''), True),
+    }
     return JsonResponse(result)
+
 
 @login_required
 def search_json(request):
     result = {
-            'users': search_user(request.GET.get('query', ''), True),
-            'clubs': search_club(request.GET.get('query', ''), True),
-            }
+        'users': search_user(request.GET.get('query', ''), True),
+        'clubs': search_club(request.GET.get('query', ''), True),
+    }
     return JsonResponse(result)
+
 
 class ToMarkdownView(TemplateView):
     template_name = "core/to_markdown.jinja"
@@ -119,4 +124,3 @@ class ToMarkdownView(TemplateView):
             kwargs['text'] = ""
             kwargs['text_md'] = ""
         return kwargs
-

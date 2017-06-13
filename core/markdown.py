@@ -24,7 +24,7 @@
 
 import re
 from mistune import Renderer, InlineGrammar, InlineLexer, Markdown, escape, escape_link
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.urlresolvers import reverse
 
 
 class SithRenderer(Renderer):
@@ -54,13 +54,16 @@ class SithRenderer(Renderer):
                 src = original_src
             else:
                 width = m.group(1)
-                if not width.endswith('%'): width += "px"
+                if not width.endswith('%'):
+                    width += "px"
                 style = "width: %s; " % width
                 try:
                     height = m.group(3)
-                    if not height.endswith('%'): height += "px"
+                    if not height.endswith('%'):
+                        height += "px"
                     style += "height: %s; " % height
-                except: pass
+                except:
+                    pass
         else:
             params = None
             src = original_src
@@ -76,6 +79,7 @@ class SithRenderer(Renderer):
         if self.options.get('use_xhtml'):
             return '%s />' % html
         return '%s>' % html
+
 
 class SithInlineGrammar(InlineGrammar):
     double_emphasis = re.compile(
@@ -93,6 +97,7 @@ class SithInlineGrammar(InlineGrammar):
     indice = re.compile(
         r'^<sub>([\s\S]+?)</sub>'  # <sub>text</sub>
     )
+
 
 class SithInlineLexer(InlineLexer):
     grammar_class = SithInlineGrammar
@@ -159,15 +164,16 @@ class SithInlineLexer(InlineLexer):
         return self.renderer.emphasis(text)
 
     def _process_link(self, m, link, title=None):
-        try: # Add page:// support for links
+        try:  # Add page:// support for links
             page = re.compile(
                 r'^page://(\S*)'                   # page://nom_de_ma_page
             )
             match = page.search(link)
             page = match.group(1) or ""
             link = reverse('core:page', kwargs={'page_name': page})
-        except: pass
-        try: # Add file:// support for links
+        except:
+            pass
+        try:  # Add file:// support for links
             file_link = re.compile(
                 r'^file://(\d*)/?(\S*)?'                   # file://4000/download
             )
@@ -175,8 +181,10 @@ class SithInlineLexer(InlineLexer):
             id = match.group(1)
             suffix = match.group(2) or ""
             link = reverse('core:file_detail', kwargs={'file_id': id}) + suffix
-        except: pass
+        except:
+            pass
         return super(SithInlineLexer, self)._process_link(m, link, title)
+
 
 renderer = SithRenderer(escape=True)
 inline = SithInlineLexer(renderer)
@@ -222,4 +230,3 @@ Petit *test* _sur_ ^une^ **seule** ^ligne pour voir^
 
 """
     print(markdown(text))
-

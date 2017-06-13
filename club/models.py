@@ -27,11 +27,12 @@ from django.core import validators
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 
 from core.models import User, MetaGroup, Group, SithFile
+
 
 # Create your models here.
 
@@ -43,17 +44,17 @@ class Club(models.Model):
     name = models.CharField(_('name'), max_length=64)
     parent = models.ForeignKey('Club', related_name='children', null=True, blank=True)
     unix_name = models.CharField(_('unix name'), max_length=30, unique=True,
-            validators=[
-                validators.RegexValidator(
-                    r'^[a-z0-9][a-z0-9._-]*[a-z0-9]$',
-                    _('Enter a valid unix name. This value may contain only '
-                        'letters, numbers ./-/_ characters.')
-                    ),
-                ],
-            error_messages={
-                'unique': _("A club with that unix name already exists."),
-                },
-            )
+                                 validators=[
+        validators.RegexValidator(
+            r'^[a-z0-9][a-z0-9._-]*[a-z0-9]$',
+            _('Enter a valid unix name. This value may contain only '
+              'letters, numbers ./-/_ characters.')
+        ),
+    ],
+        error_messages={
+        'unique': _("A club with that unix name already exists."),
+    },
+    )
     address = models.CharField(_('address'), max_length=254)
     # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
     owner_group = models.ForeignKey(Group, related_name="owned_club",
@@ -61,7 +62,7 @@ class Club(models.Model):
     edit_groups = models.ManyToManyField(Group, related_name="editable_club", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
     home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True,
-            on_delete=models.SET_NULL)
+                                on_delete=models.SET_NULL)
 
     class Meta:
         ordering = ['name', 'unix_name']
@@ -109,9 +110,9 @@ class Club(models.Model):
                     self._change_unixname(self.unix_name)
             super(Club, self).save(*args, **kwargs)
             if creation:
-                board = MetaGroup(name=self.unix_name+settings.SITH_BOARD_SUFFIX)
+                board = MetaGroup(name=self.unix_name + settings.SITH_BOARD_SUFFIX)
                 board.save()
-                member = MetaGroup(name=self.unix_name+settings.SITH_MEMBER_SUFFIX)
+                member = MetaGroup(name=self.unix_name + settings.SITH_MEMBER_SUFFIX)
                 member.save()
                 subscribers = Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()
                 self.make_home()
@@ -153,6 +154,7 @@ class Club(models.Model):
         return sub.is_subscribed
 
     _memberships = {}
+
     def get_membership_for(self, user):
         """
         Returns the current membership the given user
@@ -167,6 +169,7 @@ class Club(models.Model):
                 Club._memberships[self.id] = {}
                 Club._memberships[self.id][user.id] = m
             return m
+
 
 class Membership(models.Model):
     """
@@ -184,7 +187,7 @@ class Membership(models.Model):
     start_date = models.DateField(_('start date'), default=timezone.now)
     end_date = models.DateField(_('end date'), null=True, blank=True)
     role = models.IntegerField(_('role'), choices=sorted(settings.SITH_CLUB_ROLES.items()),
-            default=sorted(settings.SITH_CLUB_ROLES.items())[0][0])
+                               default=sorted(settings.SITH_CLUB_ROLES.items())[0][0])
     description = models.CharField(_('description'), max_length=128, null=False, blank=True)
 
     def clean(self):
@@ -195,9 +198,9 @@ class Membership(models.Model):
             raise ValidationError(_('User is already member of that club'))
 
     def __str__(self):
-        return self.club.name+' - '+self.user.username+' - '+str(settings.SITH_CLUB_ROLES[self.role])+str(
-                " - "+str(_('past member')) if self.end_date is not None else ""
-                )
+        return self.club.name + ' - ' + self.user.username + ' - ' + str(settings.SITH_CLUB_ROLES[self.role]) + str(
+            " - " + str(_('past member')) if self.end_date is not None else ""
+        )
 
     def is_owned_by(self, user):
         """
@@ -216,4 +219,3 @@ class Membership(models.Model):
 
     def get_absolute_url(self):
         return reverse('club:club_members', kwargs={'club_id': self.club.id})
-

@@ -31,15 +31,18 @@ from club.models import Club
 from counter.models import Product, Counter
 from accounting.models import ClubAccount, Company
 
+
 def check_token(request):
     return ('counter_token' in request.session.keys() and
-        request.session['counter_token'] and
-        Counter.objects.filter(token=request.session['counter_token']).exists())
+            request.session['counter_token'] and
+            Counter.objects.filter(token=request.session['counter_token']).exists())
+
 
 class RightManagedLookupChannel(LookupChannel):
     def check_auth(self, request):
         if not request.user.was_subscribed and not check_token(request):
             raise PermissionDenied
+
 
 @register('users')
 class UsersLookup(RightManagedLookupChannel):
@@ -54,6 +57,7 @@ class UsersLookup(RightManagedLookupChannel):
     def format_item_display(self, item):
         return item.get_display_name()
 
+
 @register('groups')
 class GroupsLookup(RightManagedLookupChannel):
     model = Group
@@ -66,6 +70,7 @@ class GroupsLookup(RightManagedLookupChannel):
 
     def format_item_display(self, item):
         return item.name
+
 
 @register('clubs')
 class ClubLookup(RightManagedLookupChannel):
@@ -80,6 +85,7 @@ class ClubLookup(RightManagedLookupChannel):
     def format_item_display(self, item):
         return item.name
 
+
 @register('counters')
 class CountersLookup(RightManagedLookupChannel):
     model = Counter
@@ -89,6 +95,7 @@ class CountersLookup(RightManagedLookupChannel):
 
     def format_item_display(self, item):
         return item.name
+
 
 @register('products')
 class ProductsLookup(RightManagedLookupChannel):
@@ -101,12 +108,14 @@ class ProductsLookup(RightManagedLookupChannel):
     def format_item_display(self, item):
         return "%s (%s)" % (item.name, item.code)
 
+
 @register('files')
 class SithFileLookup(RightManagedLookupChannel):
     model = SithFile
 
     def get_query(self, q, request):
         return self.model.objects.filter(name__icontains=q)[:50]
+
 
 @register('club_accounts')
 class ClubAccountLookup(RightManagedLookupChannel):
@@ -117,6 +126,7 @@ class ClubAccountLookup(RightManagedLookupChannel):
 
     def format_item_display(self, item):
         return item.name
+
 
 @register('companies')
 class CompaniesLookup(RightManagedLookupChannel):

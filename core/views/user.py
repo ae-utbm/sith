@@ -24,29 +24,28 @@
 
 # This file contains all the views that concern the user model
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import logout as auth_logout, views
+from django.contrib.auth import views
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404
 from django.views.generic.edit import UpdateView
-from django.views.generic import ListView, DetailView, TemplateView, DeleteView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.template.response import TemplateResponse
 from django.conf import settings
 from django.views.generic.dates import YearMixin, MonthMixin
 
-from django.utils import timezone
-from datetime import timedelta, datetime, date
+from datetime import timedelta, date
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, QuickNotifMixin
-from core.views.forms import RegisteringForm, UserPropForm, UserProfileForm, LoginForm, UserGodfathersForm
+from core.views.forms import RegisteringForm, UserProfileForm, LoginForm, UserGodfathersForm
 from core.models import User, SithFile, Preferences
-from club.models import Club
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
+
 
 def login(request):
     """
@@ -56,11 +55,13 @@ def login(request):
     """
     return views.login(request, template_name="core/login.jinja", authentication_form=LoginForm)
 
+
 def logout(request):
     """
     The logout view
     """
     return views.logout_then_login(request)
+
 
 def password_change(request):
     """
@@ -68,11 +69,13 @@ def password_change(request):
     """
     return views.password_change(request, template_name="core/password_change.jinja", post_change_redirect=reverse("core:password_change_done"))
 
+
 def password_change_done(request):
     """
     Allows a user to change its password
     """
     return views.password_change_done(request, template_name="core/password_change_done.jinja")
+
 
 def password_root_change(request, user_id):
     """
@@ -92,6 +95,7 @@ def password_root_change(request, user_id):
         form = views.SetPasswordForm(user=user)
     return TemplateResponse(request, "core/password_change.jinja", {'form': form, 'target': user})
 
+
 def password_reset(request):
     """
     Allows someone to enter an email adresse for resetting password
@@ -100,13 +104,15 @@ def password_reset(request):
                                 template_name="core/password_reset.jinja",
                                 email_template_name="core/password_reset_email.jinja",
                                 post_reset_redirect="core:password_reset_done",
-                               )
+                                )
+
 
 def password_reset_done(request):
     """
     Confirm that the reset email has been sent
     """
     return views.password_reset_done(request, template_name="core/password_reset_done.jinja")
+
 
 def password_reset_confirm(request, uidb64=None, token=None):
     """
@@ -115,7 +121,8 @@ def password_reset_confirm(request, uidb64=None, token=None):
     return views.password_reset_confirm(request, uidb64=uidb64, token=token,
                                         post_reset_redirect="core:password_reset_complete",
                                         template_name="core/password_reset_confirm.jinja",
-                                       )
+                                        )
+
 
 def password_reset_complete(request):
     """
@@ -123,14 +130,15 @@ def password_reset_complete(request):
     """
     return views.password_reset_complete(request,
                                          template_name="core/password_reset_complete.jinja",
-                                        )
+                                         )
+
 
 def register(request):
     context = {}
     if request.method == 'POST':
         form = RegisteringForm(request.POST)
         if form.is_valid():
-            logging.debug("Registering "+form.cleaned_data['first_name']+form.cleaned_data['last_name'])
+            logging.debug("Registering " + form.cleaned_data['first_name'] + form.cleaned_data['last_name'])
             u = form.save()
             context['user_registered'] = u
             context['tests'] = 'TEST_REGISTER_USER_FORM_OK'
@@ -143,6 +151,7 @@ def register(request):
     context['form'] = form.as_p()
     return render(request, "core/register.jinja", context)
 
+
 class UserTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
         return self.object.get_display_name()
@@ -150,66 +159,68 @@ class UserTabsMixin(TabedViewMixin):
     def get_list_of_tabs(self):
         tab_list = []
         tab_list.append({
-                    'url': reverse('core:user_profile', kwargs={'user_id': self.object.id}),
-                    'slug': 'infos',
+            'url': reverse('core:user_profile', kwargs={'user_id': self.object.id}),
+            'slug': 'infos',
                     'name': _("Infos"),
-                    })
+        })
         tab_list.append({
-                    'url': reverse('core:user_godfathers', kwargs={'user_id': self.object.id}),
-                    'slug': 'godfathers',
+            'url': reverse('core:user_godfathers', kwargs={'user_id': self.object.id}),
+            'slug': 'godfathers',
                     'name': _("Godfathers"),
-                    })
+        })
         tab_list.append({
-                    'url': reverse('core:user_pictures', kwargs={'user_id': self.object.id}),
-                    'slug': 'pictures',
+            'url': reverse('core:user_pictures', kwargs={'user_id': self.object.id}),
+            'slug': 'pictures',
                     'name': _("Pictures"),
-                    })
+        })
         if self.request.user == self.object:
             tab_list.append({
-                        'url': reverse('core:user_tools'),
-                        'slug': 'tools',
+                'url': reverse('core:user_tools'),
+                'slug': 'tools',
                         'name': _("Tools"),
-                        })
+            })
         if self.request.user.can_edit(self.object):
             tab_list.append({
-                        'url': reverse('core:user_edit', kwargs={'user_id': self.object.id}),
-                        'slug': 'edit',
+                'url': reverse('core:user_edit', kwargs={'user_id': self.object.id}),
+                'slug': 'edit',
                         'name': _("Edit"),
-                        })
+            })
             tab_list.append({
-                        'url': reverse('core:user_prefs', kwargs={'user_id': self.object.id}),
-                        'slug': 'prefs',
+                'url': reverse('core:user_prefs', kwargs={'user_id': self.object.id}),
+                'slug': 'prefs',
                         'name': _("Preferences"),
-                        })
+            })
         if self.request.user.can_view(self.object):
             tab_list.append({
-                        'url': reverse('core:user_clubs', kwargs={'user_id': self.object.id}),
-                        'slug': 'clubs',
+                'url': reverse('core:user_clubs', kwargs={'user_id': self.object.id}),
+                'slug': 'clubs',
                         'name': _("Clubs"),
-                        })
+            })
         if self.request.user.is_owner(self.object):
             tab_list.append({
-                        'url': reverse('core:user_groups', kwargs={'user_id': self.object.id}),
-                        'slug': 'groups',
+                'url': reverse('core:user_groups', kwargs={'user_id': self.object.id}),
+                'slug': 'groups',
                         'name': _("Groups"),
-                        })
+            })
         try:
             if (self.object.customer and (self.object == self.request.user
-                or self.request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-                or self.request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
-                or self.request.user.is_root)):
+                                          or self.request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+                                          or self.request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name'] + settings.SITH_BOARD_SUFFIX)
+                                          or self.request.user.is_root)):
                 tab_list.append({
-                            'url': reverse('core:user_stats', kwargs={'user_id': self.object.id}),
-                            'slug': 'stats',
+                    'url': reverse('core:user_stats', kwargs={'user_id': self.object.id}),
+                    'slug': 'stats',
                             'name': _("Stats"),
-                            })
+                })
                 tab_list.append({
-                            'url': reverse('core:user_account', kwargs={'user_id': self.object.id}),
-                            'slug': 'account',
-                            'name': _("Account")+" (%s €)" % self.object.customer.amount,
-                            })
-        except: pass
+                    'url': reverse('core:user_account', kwargs={'user_id': self.object.id}),
+                    'slug': 'account',
+                            'name': _("Account") + " (%s €)" % self.object.customer.amount,
+                })
+        except:
+            pass
         return tab_list
+
 
 class UserView(UserTabsMixin, CanViewMixin, DetailView):
     """
@@ -225,8 +236,8 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
 def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
     user = User.objects.get(id=user_id)
     if ((user == request.user) or
-         request.user.is_root or
-         request.user.is_board_member):
+        request.user.is_root or
+            request.user.is_board_member):
         ud = get_object_or_404(User, id=godfather_id)
         if is_father == "True":
             user.godfathers.remove(ud)
@@ -235,6 +246,7 @@ def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
     else:
         raise PermissionDenied
     return redirect('core:user_godfathers', user_id=user_id)
+
 
 class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
     """
@@ -245,6 +257,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_pictures.jinja"
     current_tab = 'pictures'
+
 
 class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
     """
@@ -277,6 +290,7 @@ class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
             kwargs['form'] = UserGodfathersForm()
         return kwargs
 
+
 class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     """
     Display a user's stats
@@ -295,7 +309,7 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
 
         if not (profile == request.user
                 or request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-                or request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
+                or request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name'] + settings.SITH_BOARD_SUFFIX)
                 or request.user.is_root):
             raise PermissionDenied
 
@@ -303,25 +317,26 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserStatsView, self).get_context_data(**kwargs)
-        from counter.models import Counter, Product, Selling
+        from counter.models import Counter
         from django.db.models import Sum
         foyer = Counter.objects.filter(name="Foyer").first()
         mde = Counter.objects.filter(name="MDE").first()
         gommette = Counter.objects.filter(name="La Gommette").first()
-        semester_start=Subscription.compute_start(d=date.today(), duration=3)
-        kwargs['total_perm_time'] = sum([p.end-p.start for p in self.object.permanencies.exclude(end=None)], timedelta())
-        kwargs['total_foyer_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=foyer).exclude(end=None)], timedelta())
-        kwargs['total_mde_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=mde).exclude(end=None)], timedelta())
-        kwargs['total_gommette_time'] = sum([p.end-p.start for p in self.object.permanencies.filter(counter=gommette).exclude(end=None)], timedelta())
-        kwargs['total_foyer_buyings'] = sum([b.unit_price*b.quantity for b in
-            self.object.customer.buyings.filter(counter=foyer, date__gte=semester_start)])
-        kwargs['total_mde_buyings'] = sum([b.unit_price*b.quantity for b in self.object.customer.buyings.filter(counter=mde,
-            date__gte=semester_start)])
-        kwargs['total_gommette_buyings'] = sum([b.unit_price*b.quantity for b in
-            self.object.customer.buyings.filter(counter=gommette, date__gte=semester_start)])
+        semester_start = Subscription.compute_start(d=date.today(), duration=3)
+        kwargs['total_perm_time'] = sum([p.end - p.start for p in self.object.permanencies.exclude(end=None)], timedelta())
+        kwargs['total_foyer_time'] = sum([p.end - p.start for p in self.object.permanencies.filter(counter=foyer).exclude(end=None)], timedelta())
+        kwargs['total_mde_time'] = sum([p.end - p.start for p in self.object.permanencies.filter(counter=mde).exclude(end=None)], timedelta())
+        kwargs['total_gommette_time'] = sum([p.end - p.start for p in self.object.permanencies.filter(counter=gommette).exclude(end=None)], timedelta())
+        kwargs['total_foyer_buyings'] = sum([b.unit_price * b.quantity for b in
+                                             self.object.customer.buyings.filter(counter=foyer, date__gte=semester_start)])
+        kwargs['total_mde_buyings'] = sum([b.unit_price * b.quantity for b in self.object.customer.buyings.filter(counter=mde,
+                                                                                                                  date__gte=semester_start)])
+        kwargs['total_gommette_buyings'] = sum([b.unit_price * b.quantity for b in
+                                                self.object.customer.buyings.filter(counter=gommette, date__gte=semester_start)])
         kwargs['top_product'] = self.object.customer.buyings.values('product__name').annotate(
-                product_sum=Sum('quantity')).exclude(product_sum=None).order_by('-product_sum').all()[:10]
+            product_sum=Sum('quantity')).exclude(product_sum=None).order_by('-product_sum').all()[:10]
         return kwargs
+
 
 class UserMiniView(CanViewMixin, DetailView):
     """
@@ -332,12 +347,14 @@ class UserMiniView(CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_mini.jinja"
 
+
 class UserListView(ListView, CanEditPropMixin):
     """
     Displays the user list
     """
     model = User
     template_name = "core/user_list.jinja"
+
 
 class UserUploadProfilePictView(CanEditMixin, DetailView):
     """
@@ -356,16 +373,17 @@ class UserUploadProfilePictView(CanEditMixin, DetailView):
             raise ValidationError(_("User already has a profile picture"))
         f = request.FILES['new_profile_pict']
         parent = SithFile.objects.filter(parent=None, name="profiles").first()
-        name = str(self.object.id) + "_profile.jpg" # Webcamejs uploads JPGs
+        name = str(self.object.id) + "_profile.jpg"  # Webcamejs uploads JPGs
         im = Image.open(BytesIO(f.read()))
         new_file = SithFile(parent=parent, name=name,
-                file=resize_image(im, 400, f.content_type.split('/')[-1]),
-                owner=self.object, is_folder=False, mime_type=f.content_type, size=f._size)
+                            file=resize_image(im, 400, f.content_type.split('/')[-1]),
+                            owner=self.object, is_folder=False, mime_type=f.content_type, size=f._size)
         new_file.file.name = name
         new_file.save()
         self.object.profile_pict = new_file
         self.object.save()
         return redirect("core:user_edit", user_id=self.object.id)
+
 
 class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     """
@@ -412,6 +430,7 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
         kwargs['form'] = self.form
         return kwargs
 
+
 class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
     """
     Display the user's club(s)
@@ -421,6 +440,7 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
     pk_url_kwarg = "user_id"
     template_name = "core/user_clubs.jinja"
     current_tab = "clubs"
+
 
 class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
     """
@@ -453,6 +473,7 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
             kwargs['trombi_form'] = UserTrombiForm()
         return kwargs
 
+
 class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     """
     Edit a user's groups
@@ -461,9 +482,10 @@ class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     pk_url_kwarg = "user_id"
     template_name = "core/user_group.jinja"
     form_class = modelform_factory(User, fields=['groups'],
-            widgets={'groups':CheckboxSelectMultiple})
+                                   widgets={'groups': CheckboxSelectMultiple})
     context_object_name = "profile"
     current_tab = "groups"
+
 
 class UserToolsView(QuickNotifMixin, UserTabsMixin, TemplateView):
     """
@@ -481,6 +503,7 @@ class UserToolsView(QuickNotifMixin, UserTabsMixin, TemplateView):
         kwargs['object'] = self.request.user
         return kwargs
 
+
 class UserAccountBase(UserTabsMixin, DetailView):
     """
     Base class for UserAccount
@@ -489,14 +512,15 @@ class UserAccountBase(UserTabsMixin, DetailView):
     pk_url_kwarg = "user_id"
     current_tab = "account"
 
-    def dispatch(self, request, *arg, **kwargs): # Manually validates the rights
+    def dispatch(self, request, *arg, **kwargs):  # Manually validates the rights
         res = super(UserAccountBase, self).dispatch(request, *arg, **kwargs)
         if (self.object == request.user
                 or request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-                or request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name']+settings.SITH_BOARD_SUFFIX)
+                or request.user.is_in_group(settings.SITH_BAR_MANAGER['unix_name'] + settings.SITH_BOARD_SUFFIX)
                 or request.user.is_root):
             return res
         raise PermissionDenied
+
 
 class UserAccountView(UserAccountBase):
     """
@@ -511,14 +535,14 @@ class UserAccountView(UserAccountBase):
             stats.append([])
             i = 0
             for month in obj.filter(date__year=year.year).datetimes(
-                'date', 'month', order='DESC'):
+                    'date', 'month', order='DESC'):
                 q = obj.filter(
                     date__year=month.year,
                     date__month=month.month
                 )
                 stats[i].append({
-                    'sum':sum([calc(p) for p in q]),
-                    'date':month
+                    'sum': sum([calc(p) for p in q]),
+                    'date': month
                 })
             i += 1
         return stats
@@ -551,6 +575,7 @@ class UserAccountView(UserAccountBase):
             print(repr(e))
         return kwargs
 
+
 class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
     """
     Display a user's account for month
@@ -568,4 +593,3 @@ class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
             pass
         kwargs['tab'] = "account"
         return kwargs
-

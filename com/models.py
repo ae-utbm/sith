@@ -25,15 +25,14 @@
 from django.shortcuts import render
 from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.mail import EmailMultiAlternatives
-from django.core.exceptions import ValidationError
 
 from core.models import User, Preferences
 from club.models import Club
-import os
+
 
 class Sith(models.Model):
     """A one instance class storing all the modifiable infos"""
@@ -48,12 +47,14 @@ class Sith(models.Model):
     def __str__(self):
         return "⛩ Sith ⛩"
 
+
 NEWS_TYPES = [
-        ('NOTICE', _('Notice')),
-        ('EVENT', _('Event')),
-        ('WEEKLY', _('Weekly')),
-        ('CALL', _('Call')),
-        ]
+    ('NOTICE', _('Notice')),
+    ('EVENT', _('Event')),
+    ('WEEKLY', _('Weekly')),
+    ('CALL', _('Call')),
+]
+
 
 class News(models.Model):
     """The news class"""
@@ -81,6 +82,7 @@ class News(models.Model):
     def __str__(self):
         return "%s: %s" % (self.type, self.title)
 
+
 class NewsDate(models.Model):
     """
     A date class, useful for weekly events, or for events that just have no date
@@ -94,6 +96,7 @@ class NewsDate(models.Model):
 
     def __str__(self):
         return "%s: %s - %s" % (self.news.title, self.start_date, self.end_date)
+
 
 class Weekmail(models.Model):
     """
@@ -113,12 +116,12 @@ class Weekmail(models.Model):
         dest = [i[0] for i in Preferences.objects.filter(receive_weekmail=True).values_list('user__email')]
         with transaction.atomic():
             email = EmailMultiAlternatives(
-                    subject=self.title,
-                    body=self.render_text(),
-                    from_email=settings.SITH_COM_EMAIL,
-                    to=Sith.objects.first().weekmail_destinations.split(' '),
-                    bcc=dest,
-                    )
+                subject=self.title,
+                body=self.render_text(),
+                from_email=settings.SITH_COM_EMAIL,
+                to=Sith.objects.first().weekmail_destinations.split(' '),
+                bcc=dest,
+            )
             email.attach_alternative(self.render_html(), "text/html")
             email.send()
             self.sent = True
@@ -128,12 +131,12 @@ class Weekmail(models.Model):
     def render_text(self):
         return render(None, "com/weekmail_renderer_text.jinja", context={
             'weekmail': self,
-            }).content.decode('utf-8')
+        }).content.decode('utf-8')
 
     def render_html(self):
         return render(None, "com/weekmail_renderer_html.jinja", context={
             'weekmail': self,
-            }).content.decode('utf-8')
+        }).content.decode('utf-8')
 
     def get_banner(self):
         return "http://" + settings.SITH_URL + static("com/img/weekmail_banner.png")
@@ -143,6 +146,7 @@ class Weekmail(models.Model):
 
     def is_owned_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
 
 class WeekmailArticle(models.Model):
     weekmail = models.ForeignKey(Weekmail, related_name="articles", verbose_name=_("weekmail"), null=True)

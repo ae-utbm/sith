@@ -26,11 +26,8 @@ from datetime import datetime, timedelta
 from collections import OrderedDict
 import pytz
 
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView, RedirectView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, BaseFormView
-from django.forms.models import modelform_factory
-from django.forms import CheckboxSelectMultiple
 from django.utils.translation import ugettext as _
 from django.utils import dateparse, timezone
 from django.core.urlresolvers import reverse_lazy
@@ -38,7 +35,6 @@ from django.conf import settings
 from django.db import transaction, DataError
 from django import forms
 from django.template import defaultfilters
-from django.utils import formats
 
 from core.models import Page, User
 from club.models import Club
@@ -48,6 +44,7 @@ from counter.models import Counter, Customer, Selling
 from counter.views import GetUserForm
 
 # For users
+
 
 class LaunderetteMainView(TemplateView):
     """Main presentation view"""
@@ -59,10 +56,12 @@ class LaunderetteMainView(TemplateView):
         kwargs['page'] = Page.objects.filter(name='launderette').first()
         return kwargs
 
+
 class LaunderetteBookMainView(CanViewMixin, ListView):
     """Choose which launderette to book"""
     model = Launderette
     template_name = 'launderette/launderette_book_choose.jinja'
+
 
 class LaunderetteBookView(CanViewMixin, DetailView):
     """Display the launderette schedule"""
@@ -96,11 +95,12 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                         if self.check_slot("WASHING") and self.check_slot("DRYING", self.date + timedelta(hours=1)):
                             Slot(user=self.subscriber, start_date=self.date, machine=self.machines["WASHING"], type="WASHING").save()
                             Slot(user=self.subscriber, start_date=self.date + timedelta(hours=1),
-                                    machine=self.machines["DRYING"], type="DRYING").save()
+                                 machine=self.machines["DRYING"], type="DRYING").save()
         return super(LaunderetteBookView, self).get(request, *args, **kwargs)
 
     def check_slot(self, type, date=None):
-        if date is None: date = self.date
+        if date is None:
+            date = self.date
         for m in self.object.machines.filter(is_working=True, type=type).all():
             slot = Slot.objects.filter(start_date=date, machine=m).first()
             if slot is None:
@@ -121,9 +121,9 @@ class LaunderetteBookView(CanViewMixin, DetailView):
         kwargs['planning'] = OrderedDict()
         kwargs['slot_type'] = self.slot_type
         start_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
-        for date in LaunderetteBookView.date_iterator(start_date, start_date+timedelta(days=6), timedelta(days=1)):
+        for date in LaunderetteBookView.date_iterator(start_date, start_date + timedelta(days=6), timedelta(days=1)):
             kwargs['planning'][date] = []
-            for h in LaunderetteBookView.date_iterator(date, date+timedelta(days=1), timedelta(hours=1)):
+            for h in LaunderetteBookView.date_iterator(date, date + timedelta(days=1), timedelta(hours=1)):
                 free = False
                 if self.slot_type == "BOTH" and self.check_slot("WASHING", h) and self.check_slot("DRYING", h + timedelta(hours=1)):
                     free = True
@@ -136,6 +136,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                 else:
                     kwargs['planning'][date].append(None)
         return kwargs
+
 
 class SlotDeleteView(CanEditPropMixin, DeleteView):
     """Delete a slot"""
@@ -154,12 +155,14 @@ class LaunderetteListView(CanEditPropMixin, ListView):
     model = Launderette
     template_name = 'launderette/launderette_list.jinja'
 
+
 class LaunderetteEditView(CanEditPropMixin, UpdateView):
     """Edit a launderette"""
     model = Launderette
     pk_url_kwarg = "launderette_id"
     fields = ['name']
     template_name = 'core/edit.jinja'
+
 
 class LaunderetteCreateView(CanCreateMixin, CreateView):
     """Create a new launderette"""
@@ -174,11 +177,12 @@ class LaunderetteCreateView(CanCreateMixin, CreateView):
         form.instance.counter = c
         return super(LaunderetteCreateView, self).form_valid(form)
 
+
 class ManageTokenForm(forms.Form):
     action = forms.ChoiceField(choices=[("BACK", _("Back")), ("ADD", _("Add")), ("DEL", _("Delete"))], initial="BACK",
-            label=_("Action"), widget=forms.RadioSelect)
+                               label=_("Action"), widget=forms.RadioSelect)
     token_type = forms.ChoiceField(choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES, label=_("Type"), initial="WASHING",
-            widget=forms.RadioSelect)
+                                   widget=forms.RadioSelect)
     tokens = forms.CharField(max_length=512, widget=forms.widgets.Textarea, label=_("Tokens, separated by spaces"))
 
     def process(self, launderette):
@@ -209,6 +213,7 @@ class ManageTokenForm(forms.Form):
                     Token.objects.filter(launderette=launderette, type=token_type, name=t).delete()
                 except:
                     self.add_error(None, _("Token %(token_name)s does not exists") % {'token_name': t})
+
 
 class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
     """The admin page of the launderette"""
@@ -253,6 +258,7 @@ class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
     def get_success_url(self):
         return reverse_lazy('launderette:launderette_admin', args=self.args, kwargs=self.kwargs)
 
+
 class GetLaunderetteUserForm(GetUserForm):
     def clean(self):
         cleaned_data = super(GetLaunderetteUserForm, self).clean()
@@ -261,12 +267,13 @@ class GetLaunderetteUserForm(GetUserForm):
             raise forms.ValidationError(_("User has booked no slot"))
         return cleaned_data
 
+
 class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
     """The click page of the launderette"""
     model = Launderette
     pk_url_kwarg = "launderette_id"
     template_name = 'counter/counter_main.jinja'
-    form_class = GetLaunderetteUserForm # Form to enter a client code and get the corresponding user id
+    form_class = GetLaunderetteUserForm  # Form to enter a client code and get the corresponding user id
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -301,6 +308,7 @@ class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
     def get_success_url(self):
         return reverse_lazy('launderette:click', args=self.args, kwargs=self.kwargs)
 
+
 class ClickTokenForm(forms.BaseForm):
     def clean(self):
         with transaction.atomic():
@@ -309,11 +317,11 @@ class ClickTokenForm(forms.BaseForm):
             counter = Counter.objects.filter(id=self.counter_id).first()
             subscriber = customer.user
             self.last_basket = {
-                    'last_basket': [],
-                    'last_customer': customer.user.get_display_name(),
-                    }
+                'last_basket': [],
+                'last_customer': customer.user.get_display_name(),
+            }
             total = 0
-            for k,t in self.cleaned_data.items():
+            for k, t in self.cleaned_data.items():
                 if t is not None:
                     slot_id = int(k[5:])
                     slot = Slot.objects.filter(id=slot_id).first()
@@ -323,14 +331,15 @@ class ClickTokenForm(forms.BaseForm):
                     t.borrow_date = datetime.now().replace(tzinfo=pytz.UTC)
                     t.save()
                     price = settings.SITH_LAUNDERETTE_PRICES[t.type]
-                    s = Selling(label="Jeton "+t.get_type_display()+" N°"+t.name, club=counter.club, product=None, counter=counter, unit_price=price,
-                            quantity=1, seller=operator, customer=customer)
+                    s = Selling(label="Jeton " + t.get_type_display() + " N°" + t.name, club=counter.club, product=None, counter=counter, unit_price=price,
+                                quantity=1, seller=operator, customer=customer)
                     s.save()
                     total += price
-                    self.last_basket['last_basket'].append("Jeton "+t.get_type_display()+" N°"+t.name)
+                    self.last_basket['last_basket'].append("Jeton " + t.get_type_display() + " N°" + t.name)
             self.last_basket['new_customer_amount'] = str(customer.amount)
             self.last_basket['last_total'] = str(total)
         return self.cleaned_data
+
 
 class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
     """The click page of the launderette"""
@@ -346,7 +355,7 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
                 t_name = str(self2.data[field_name])
                 if t_name != "":
                     t = Token.objects.filter(name=str(self2.data[field_name]), type=slot.type, launderette=self.object,
-                            user=None).first()
+                                             user=None).first()
                     if t is None:
                         raise forms.ValidationError(_("Token not found"))
                     return t
@@ -354,9 +363,9 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
         for s in self.subscriber.slots.filter(token=None, start_date__gte=timezone.now().replace(tzinfo=None)).all():
             field_name = "slot-%s" % (str(s.id))
             fields[field_name] = forms.CharField(max_length=5, required=False,
-                    label="%s - %s" % (s.get_type_display(), defaultfilters.date(s.start_date, "j N Y H:i")))
+                                                 label="%s - %s" % (s.get_type_display(), defaultfilters.date(s.start_date, "j N Y H:i")))
             # XXX l10n settings.DATETIME_FORMAT didn't work here :/
-            kwargs["clean_"+field_name] = clean_field_factory(field_name, s)
+            kwargs["clean_" + field_name] = clean_field_factory(field_name, s)
         kwargs['subscriber_id'] = self.subscriber.id
         kwargs['counter_id'] = self.object.counter.id
         kwargs['operator_id'] = self.operator.id
@@ -401,7 +410,6 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
         return reverse_lazy('launderette:main_click', args=self.args, kwargs=self.kwargs)
 
 
-
 class MachineEditView(CanEditPropMixin, UpdateView):
     """Edit a machine"""
     model = Machine
@@ -409,12 +417,14 @@ class MachineEditView(CanEditPropMixin, UpdateView):
     fields = ['name', 'launderette', 'type', 'is_working']
     template_name = 'core/edit.jinja'
 
+
 class MachineDeleteView(CanEditPropMixin, DeleteView):
     """Edit a machine"""
     model = Machine
     pk_url_kwarg = "machine_id"
     template_name = 'core/delete_confirm.jinja'
     success_url = reverse_lazy('launderette:launderette_list')
+
 
 class MachineCreateView(CanCreateMixin, CreateView):
     """Create a new machine"""
@@ -429,6 +439,3 @@ class MachineCreateView(CanCreateMixin, CreateView):
             if obj is not None:
                 ret['launderette'] = obj.id
         return ret
-
-
-

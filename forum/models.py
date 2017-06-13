@@ -23,11 +23,9 @@
 #
 
 from django.db import models
-from django.core import validators
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -35,8 +33,9 @@ from django.utils.functional import cached_property
 from datetime import datetime
 import pytz
 
-from core.models import User, MetaGroup, Group, SithFile
+from core.models import User, Group
 from club.models import Club
+
 
 class Forum(models.Model):
     """
@@ -52,14 +51,14 @@ class Forum(models.Model):
     is_category = models.BooleanField(_('is a category'), default=False)
     parent = models.ForeignKey('Forum', related_name='children', null=True, blank=True)
     owner_club = models.ForeignKey(Club, related_name="owned_forums", verbose_name=_("owner club"),
-            default=settings.SITH_MAIN_CLUB_ID)
+                                   default=settings.SITH_MAIN_CLUB_ID)
     edit_groups = models.ManyToManyField(Group, related_name="editable_forums", blank=True,
-            default=[settings.SITH_GROUP_OLD_SUBSCRIBERS_ID])
+                                         default=[settings.SITH_GROUP_OLD_SUBSCRIBERS_ID])
     view_groups = models.ManyToManyField(Group, related_name="viewable_forums", blank=True,
-            default=[settings.SITH_GROUP_PUBLIC_ID])
+                                         default=[settings.SITH_GROUP_PUBLIC_ID])
     number = models.IntegerField(_("number to choose a specific forum ordering"), default=1)
     _last_message = models.ForeignKey('ForumMessage', related_name="forums_where_its_last",
-            verbose_name=_("the last message"), null=True, on_delete=models.SET_NULL)
+                                      verbose_name=_("the last message"), null=True, on_delete=models.SET_NULL)
     _topic_number = models.IntegerField(_("number of topics"), default=0)
 
     class Meta:
@@ -112,16 +111,18 @@ class Forum(models.Model):
             self.view_groups = self.parent.view_groups.all()
             self.save()
 
-    _club_memberships = {} # This cache is particularly efficient:
-                           # divided by 3 the number of requests on the main forum page
-                           # after the first load
+    _club_memberships = {}  # This cache is particularly efficient:
+                            # divided by 3 the number of requests on the main forum page
+                            # after the first load
     def is_owned_by(self, user):
         if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID):
             return True
-        try: m = Forum._club_memberships[self.id][user.id]
+        try:
+            m = Forum._club_memberships[self.id][user.id]
         except:
             m = self.owner_club.get_membership_for(user)
-            try: Forum._club_memberships[self.id][user.id] = m
+            try:
+                Forum._club_memberships[self.id][user.id] = m
             except:
                 Forum._club_memberships[self.id] = {}
                 Forum._club_memberships[self.id][user.id] = m
@@ -178,12 +179,13 @@ class Forum(models.Model):
             l += c.get_children_list()
         return l
 
+
 class ForumTopic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics')
     author = models.ForeignKey(User, related_name='forum_topics')
     description = models.CharField(_('description'), max_length=256, default="")
     _last_message = models.ForeignKey('ForumMessage', related_name="+", verbose_name=_("the last message"),
-            null=True, on_delete=models.SET_NULL)
+                                      null=True, on_delete=models.SET_NULL)
     _title = models.CharField(_('title'), max_length=64, blank=True)
     _message_number = models.IntegerField(_("number of messages"), default=0)
 
@@ -192,7 +194,7 @@ class ForumTopic(models.Model):
 
     def save(self, *args, **kwargs):
         super(ForumTopic, self).save(*args, **kwargs)
-        self.forum.set_topic_number() # Recompute the cached value
+        self.forum.set_topic_number()  # Recompute the cached value
         self.forum.set_last_message()
 
     def is_owned_by(self, user):
@@ -225,6 +227,7 @@ class ForumTopic(models.Model):
     def title(self):
         return self._title
 
+
 class ForumMessage(models.Model):
     """
     "A ForumMessage object represents a message in the forum" -- Cpt. Obvious
@@ -244,7 +247,7 @@ class ForumMessage(models.Model):
         return "%s (%s) - %s" % (self.id, self.author, self.title)
 
     def save(self, *args, **kwargs):
-        self._deleted = self.is_deleted() # Recompute the cached value
+        self._deleted = self.is_deleted()  # Recompute the cached value
         super(ForumMessage, self).save(*args, **kwargs)
         if self.is_last_in_topic():
             self.topic._last_message_id = self.id
@@ -259,15 +262,15 @@ class ForumMessage(models.Model):
     def is_last_in_topic(self):
         return bool(self.id == self.topic.messages.order_by('date').last().id)
 
-    def is_owned_by(self, user): # Anyone can create a topic: it's better to
-                                 # check the rights at the forum level, since it's more controlled
+    def is_owned_by(self, user):  # Anyone can create a topic: it's better to
+                                  # check the rights at the forum level, since it's more controlled
         return self.topic.forum.is_owned_by(user) or user.id == self.author.id
 
     def can_be_edited_by(self, user):
         return user.can_edit(self.topic.forum)
 
     def can_be_viewed_by(self, user):
-        return not self._deleted # No need to check the real rights since it's already done by the Topic view
+        return not self._deleted  # No need to check the real rights since it's already done by the Topic view
 
     def can_be_moderated_by(self, user):
         return self.topic.forum.is_owned_by(user) or user.id == self.author.id
@@ -282,10 +285,11 @@ class ForumMessage(models.Model):
         return int(self.topic.messages.filter(id__lt=self.id).count() / settings.SITH_FORUM_PAGE_LENGTH) + 1
 
     def mark_as_read(self, user):
-        try: # Need the try/except because of AnonymousUser
+        try:  # Need the try/except because of AnonymousUser
             if not self.is_read(user):
                 self.readers.add(user)
-        except: pass
+        except:
+            pass
 
     def is_read(self, user):
         return (self.date < user.forum_infos.last_read_date) or (user in self.readers.all())
@@ -296,11 +300,13 @@ class ForumMessage(models.Model):
             return meta.action == "DELETE"
         return False
 
+
 MESSAGE_META_ACTIONS = [
-        ('EDIT', _("Message edited by")),
-        ('DELETE', _("Message deleted by")),
-        ('UNDELETE', _("Message undeleted by")),
-        ]
+    ('EDIT', _("Message edited by")),
+    ('DELETE', _("Message deleted by")),
+    ('UNDELETE', _("Message undeleted by")),
+]
+
 
 class ForumMessageMeta(models.Model):
     user = models.ForeignKey(User, related_name="forum_message_metas")
@@ -322,8 +328,7 @@ class ForumUserInfo(models.Model):
     """
     user = models.OneToOneField(User, related_name="_forum_infos")
     last_read_date = models.DateTimeField(_('last read date'), default=datetime(year=settings.SITH_SCHOOL_START_YEAR,
-        month=1, day=1, tzinfo=pytz.UTC))
+                                          month=1, day=1, tzinfo=pytz.UTC))
 
     def __str__(self):
         return str(self.user)
-

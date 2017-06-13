@@ -22,7 +22,7 @@
 #
 #
 
-from django.conf.urls import url, include
+from django.conf.urls import url
 
 from trombi.views import *
 
@@ -43,4 +43,3 @@ urlpatterns = [
     url(r'^membership/(?P<membership_id>[0-9]+)/edit$', UserTrombiEditMembershipView.as_view(), name='edit_membership'),
     url(r'^membership/(?P<membership_id>[0-9]+)/delete$', UserTrombiDeleteMembershipView.as_view(), name='delete_membership'),
 ]
-

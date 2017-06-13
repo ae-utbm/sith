@@ -44,7 +44,6 @@ class Command(BaseCommand):
             args['precision'] = settings.SASS_PRECISION
         return sass.compile(**args)
 
-
     def is_compilable(self, file, ext_list):
         path, ext = os.path.splitext(file)
         return ext in ext_list

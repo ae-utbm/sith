@@ -23,22 +23,21 @@
 #
 
 # This file contains all the views that concern the page model
-from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.contrib.auth.decorators import login_required, permission_required
-from django.utils.decorators import method_decorator
 from django.forms.models import modelform_factory
-from django.forms import CheckboxSelectMultiple, modelform_factory
+from django.forms import CheckboxSelectMultiple
 
 from core.models import Page, PageRev, LockError
-from core.views.forms import PagePropForm, MarkdownInput
+from core.views.forms import MarkdownInput
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+
 
 class PageListView(CanViewMixin, ListView):
     model = Page
     template_name = 'core/page_list.jinja'
+
 
 class PageView(CanViewMixin, DetailView):
     model = Page
@@ -54,6 +53,7 @@ class PageView(CanViewMixin, DetailView):
             context['new_page'] = self.kwargs['page_name']
         return context
 
+
 class PageHistView(CanViewMixin, DetailView):
     model = Page
     template_name = 'core/page_hist.jinja'
@@ -61,6 +61,7 @@ class PageHistView(CanViewMixin, DetailView):
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
         return self.page
+
 
 class PageRevView(CanViewMixin, DetailView):
     model = Page
@@ -78,20 +79,21 @@ class PageRevView(CanViewMixin, DetailView):
                 rev = self.page.revisions.get(id=self.kwargs['rev'])
                 context['rev'] = rev
             except:
-            # By passing, the template will just display the normal page without taking revision into account
+                # By passing, the template will just display the normal page without taking revision into account
                 pass
         else:
             context['new_page'] = self.kwargs['page_name']
         return context
 
+
 class PageCreateView(CanCreateMixin, CreateView):
     model = Page
     form_class = modelform_factory(Page,
-            fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
-            widgets={
-                'edit_groups':CheckboxSelectMultiple,
-                'view_groups':CheckboxSelectMultiple,
-                })
+                                   fields=['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
+                                   widgets={
+                                       'edit_groups': CheckboxSelectMultiple,
+                                       'view_groups': CheckboxSelectMultiple,
+                                   })
     template_name = 'core/page_prop.jinja'
 
     def get_initial(self):
@@ -115,14 +117,15 @@ class PageCreateView(CanCreateMixin, CreateView):
         ret = super(PageCreateView, self).form_valid(form)
         return ret
 
+
 class PagePropView(CanEditPropMixin, UpdateView):
     model = Page
     form_class = modelform_factory(Page,
-            fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
-            widgets={
-                'edit_groups':CheckboxSelectMultiple,
-                'view_groups':CheckboxSelectMultiple,
-                })
+                                   fields=['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
+                                   widgets={
+                                       'edit_groups': CheckboxSelectMultiple,
+                                       'view_groups': CheckboxSelectMultiple,
+                                   })
     template_name = 'core/page_prop.jinja'
     slug_field = '_full_name'
     slug_url_kwarg = 'page_name'
@@ -130,7 +133,7 @@ class PagePropView(CanEditPropMixin, UpdateView):
     def get_object(self):
         o = super(PagePropView, self).get_object()
         # Create the page if it does not exists
-        #if p == None:
+        # if p == None:
         #    parent_name = '/'.join(page_name.split('/')[:-1])
         #    name = page_name.split('/')[-1]
         #    if parent_name == "":
@@ -145,9 +148,10 @@ class PagePropView(CanEditPropMixin, UpdateView):
             raise e
         return self.page
 
+
 class PageEditView(CanEditMixin, UpdateView):
     model = PageRev
-    form_class = modelform_factory(model=PageRev, fields=['title', 'content',], widgets={'content': MarkdownInput})
+    form_class = modelform_factory(model=PageRev, fields=['title', 'content', ], widgets={'content': MarkdownInput})
     template_name = 'core/pagerev_edit.jinja'
 
     def get_object(self):

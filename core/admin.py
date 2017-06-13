@@ -33,8 +33,9 @@ admin.site.unregister(AuthGroup)
 admin.site.register(RealGroup)
 admin.site.register(Page)
 
+
 @admin.register(SithFile)
 class SithFileAdmin(admin.ModelAdmin):
     form = make_ajax_form(SithFile, {
         'parent': 'files',  # ManyToManyField
-        })
+    })

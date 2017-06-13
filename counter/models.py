@@ -22,13 +22,12 @@
 #
 #
 
-from django.db import models, DataError
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.forms import ValidationError
-from django.contrib.sites.shortcuts import get_current_site
 from django.utils.functional import cached_property
 
 from datetime import timedelta, date
@@ -43,6 +42,7 @@ from accounting.models import CurrencyField
 from core.models import Group, User, Notification
 from subscription.models import Subscription
 
+
 class Customer(models.Model):
     """
     This class extends a user to make a customer. It adds some basic customers informations, such as the accound ID, and
@@ -55,7 +55,7 @@ class Customer(models.Model):
     class Meta:
         verbose_name = _('customer')
         verbose_name_plural = _('customers')
-        ordering = ['account_id',]
+        ordering = ['account_id', ]
 
     def __str__(self):
         return "%s - %s" % (self.user.username, self.account_id)
@@ -68,9 +68,9 @@ class Customer(models.Model):
     def generate_account_id(number):
         number = str(number)
         letter = random.choice(string.ascii_lowercase)
-        while Customer.objects.filter(account_id=number+letter).exists():
+        while Customer.objects.filter(account_id=number + letter).exists():
             letter = random.choice(string.ascii_lowercase)
-        return number+letter
+        return number + letter
 
     def save(self, *args, **kwargs):
         if self.amount < 0:
@@ -118,6 +118,7 @@ class ProductType(models.Model):
     def get_absolute_url(self):
         return reverse('counter:producttype_list')
 
+
 class Product(models.Model):
     """
     This describes a product, with all its related informations
@@ -125,7 +126,7 @@ class Product(models.Model):
     name = models.CharField(_('name'), max_length=64)
     description = models.TextField(_('description'), blank=True)
     product_type = models.ForeignKey(ProductType, related_name='products', verbose_name=_("product type"), null=True, blank=True,
-            on_delete=models.SET_NULL)
+                                     on_delete=models.SET_NULL)
     code = models.CharField(_('code'), max_length=16, blank=True)
     purchase_price = CurrencyField(_('purchase price'))
     selling_price = CurrencyField(_('selling price'))
@@ -135,7 +136,7 @@ class Product(models.Model):
     limit_age = models.IntegerField(_('limit age'), default=0)
     tray = models.BooleanField(_('tray price'), default=False)
     parent_product = models.ForeignKey('self', related_name='children_products', verbose_name=_("parent product"), null=True,
-            blank=True, on_delete=models.SET_NULL)
+                                       blank=True, on_delete=models.SET_NULL)
     buying_groups = models.ManyToManyField(Group, related_name='products', verbose_name=_("buying groups"), blank=True)
     archived = models.BooleanField(_("archived"), default=False)
 
@@ -156,13 +157,14 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse('counter:product_list')
 
+
 class Counter(models.Model):
     name = models.CharField(_('name'), max_length=30)
     club = models.ForeignKey(Club, related_name="counters", verbose_name=_("club"))
     products = models.ManyToManyField(Product, related_name="counters", verbose_name=_("products"), blank=True)
     type = models.CharField(_('counter type'),
-            max_length=255,
-            choices=[('BAR',_('Bar')), ('OFFICE',_('Office')), ('EBOUTIC',_('Eboutic'))])
+                            max_length=255,
+                            choices=[('BAR', _('Bar')), ('OFFICE', _('Office')), ('EBOUTIC', _('Eboutic'))])
     sellers = models.ManyToManyField(User, verbose_name=_('sellers'), related_name='counters', blank=True)
     edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
@@ -173,7 +175,7 @@ class Counter(models.Model):
 
     def __getattribute__(self, name):
         if name == "edit_groups":
-            return Group.objects.filter(name=self.club.unix_name+settings.SITH_BOARD_SUFFIX).all()
+            return Group.objects.filter(name=self.club.unix_name + settings.SITH_BOARD_SUFFIX).all()
         return object.__getattribute__(self, name)
 
     def __str__(self):
@@ -248,7 +250,7 @@ class Counter(models.Model):
         Update the barman activity to prevent timeout
         """
         for p in Permanency.objects.filter(counter=self, end=None).all():
-            p.save() # Update activity
+            p.save()  # Update activity
 
     def is_open(self):
         return len(self.barmen_list) > 0
@@ -265,6 +267,7 @@ class Counter(models.Model):
         """
         return [b.id for b in self.get_barmen_list()]
 
+
 class Refilling(models.Model):
     """
     Handle the refilling
@@ -275,9 +278,9 @@ class Refilling(models.Model):
     customer = models.ForeignKey(Customer, related_name="refillings", blank=False)
     date = models.DateTimeField(_('date'))
     payment_method = models.CharField(_('payment method'), max_length=255,
-            choices=settings.SITH_COUNTER_PAYMENT_METHOD, default='CASH')
+                                      choices=settings.SITH_COUNTER_PAYMENT_METHOD, default='CASH')
     bank = models.CharField(_('bank'), max_length=255,
-            choices=settings.SITH_COUNTER_BANK, default='OTHER')
+                            choices=settings.SITH_COUNTER_BANK, default='OTHER')
     is_validated = models.BooleanField(_('is validated'), default=False)
 
     class Meta:
@@ -303,11 +306,12 @@ class Refilling(models.Model):
             self.customer.save()
             self.is_validated = True
         Notification(user=self.customer.user, url=reverse('core:user_account_detail',
-                    kwargs={'user_id': self.customer.user.id, 'year': self.date.year, 'month': self.date.month}),
-                param=str(self.amount),
-                type="REFILLING",
-                ).save()
+                                                          kwargs={'user_id': self.customer.user.id, 'year': self.date.year, 'month': self.date.month}),
+                     param=str(self.amount),
+                     type="REFILLING",
+                     ).save()
         super(Refilling, self).save(*args, **kwargs)
+
 
 class Selling(models.Model):
     """
@@ -323,7 +327,7 @@ class Selling(models.Model):
     customer = models.ForeignKey(Customer, related_name="buyings", null=True, blank=False, on_delete=models.SET_NULL)
     date = models.DateTimeField(_('date'))
     payment_method = models.CharField(_('payment method'), max_length=255,
-            choices=[('SITH_ACCOUNT', _('Sith account')), ('CARD', _('Credit card'))], default='SITH_ACCOUNT')
+                                      choices=[('SITH_ACCOUNT', _('Sith account')), ('CARD', _('Credit card'))], default='SITH_ACCOUNT')
     is_validated = models.BooleanField(_('is validated'), default=False)
 
     class Meta:
@@ -331,7 +335,7 @@ class Selling(models.Model):
 
     def __str__(self):
         return "Selling: %d x %s (%f) for %s" % (self.quantity, self.label,
-                self.quantity*self.unit_price, self.customer.user.get_display_name())
+                                                 self.quantity * self.unit_price, self.customer.user.get_display_name())
 
     def is_owned_by(self, user):
         return user.is_owner(self.counter) and self.payment_method != "CARD"
@@ -352,13 +356,13 @@ class Selling(models.Model):
             "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
         ) % {
             'event': event,
-            'url':''.join((
-                    '<a href="',
-                    self.customer.get_full_url(),
-                    '">',
-                    self.customer.get_full_url(),
-                    '</a>'
-                ))
+            'url': ''.join((
+                '<a href="',
+                self.customer.get_full_url(),
+                '">',
+                self.customer.get_full_url(),
+                '</a>'
+            ))
         }
         message_txt = _(
             "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
@@ -384,45 +388,47 @@ class Selling(models.Model):
         if u.was_subscribed:
             if self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
                 sub = Subscription(
-                        member=u,
-                        subscription_type='un-semestre',
-                        payment_method="EBOUTIC",
-                        location="EBOUTIC",
-                        )
+                    member=u,
+                    subscription_type='un-semestre',
+                    payment_method="EBOUTIC",
+                    location="EBOUTIC",
+                )
                 sub.subscription_start = Subscription.compute_start()
                 sub.subscription_start = Subscription.compute_start(
                     duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
                 sub.subscription_end = Subscription.compute_end(
-                        duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
-                        start=sub.subscription_start)
+                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
+                    start=sub.subscription_start)
                 sub.save()
             elif self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS:
                 u = User.objects.filter(id=self.customer.user.id).first()
                 sub = Subscription(
-                        member=u,
-                        subscription_type='deux-semestres',
-                        payment_method="EBOUTIC",
-                        location="EBOUTIC",
-                        )
+                    member=u,
+                    subscription_type='deux-semestres',
+                    payment_method="EBOUTIC",
+                    location="EBOUTIC",
+                )
                 sub.subscription_start = Subscription.compute_start()
                 sub.subscription_start = Subscription.compute_start(
                     duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
                 sub.subscription_end = Subscription.compute_end(
-                        duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
-                        start=sub.subscription_start)
+                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
+                    start=sub.subscription_start)
                 sub.save()
         try:
             if self.product.eticket:
                 self.send_mail_customer()
-        except: pass
+        except:
+            pass
         Notification(
-                user=self.customer.user,
-                url=reverse('core:user_account_detail',
-                    kwargs={'user_id': self.customer.user.id, 'year': self.date.year, 'month': self.date.month}),
-                param="%d x %s" % (self.quantity, self.label),
-                type="SELLING",
-                ).save()
+            user=self.customer.user,
+            url=reverse('core:user_account_detail',
+                        kwargs={'user_id': self.customer.user.id, 'year': self.date.year, 'month': self.date.month}),
+            param="%d x %s" % (self.quantity, self.label),
+            type="SELLING",
+        ).save()
         super(Selling, self).save(*args, **kwargs)
+
 
 class Permanency(models.Model):
     """
@@ -439,10 +445,11 @@ class Permanency(models.Model):
 
     def __str__(self):
         return "%s in %s from %s (last activity: %s) to %s" % (self.user, self.counter,
-                self.start.strftime("%Y-%m-%d %H:%M:%S"),
-                self.activity.strftime("%Y-%m-%d %H:%M:%S"),
-                self.end.strftime("%Y-%m-%d %H:%M:%S") if self.end else "",
-                )
+                                                               self.start.strftime("%Y-%m-%d %H:%M:%S"),
+                                                               self.activity.strftime("%Y-%m-%d %H:%M:%S"),
+                                                               self.end.strftime("%Y-%m-%d %H:%M:%S") if self.end else "",
+                                                               )
+
 
 class CashRegisterSummary(models.Model):
     user = models.ForeignKey(User, related_name="cash_summaries", verbose_name=_("user"))
@@ -515,6 +522,7 @@ class CashRegisterSummary(models.Model):
     def get_absolute_url(self):
         return reverse('counter:cash_summary_list')
 
+
 class CashRegisterSummaryItem(models.Model):
     cash_summary = models.ForeignKey(CashRegisterSummary, related_name="items", verbose_name=_("cash summary"))
     value = CurrencyField(_("value"))
@@ -523,6 +531,7 @@ class CashRegisterSummaryItem(models.Model):
 
     class Meta:
         verbose_name = _("cash register summary item")
+
 
 class Eticket(models.Model):
     """
@@ -552,6 +561,6 @@ class Eticket(models.Model):
         return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def get_hash(self, string):
-        import hashlib, hmac
+        import hashlib
+        import hmac
         return hmac.new(bytes(self.secret, 'utf-8'), bytes(string, 'utf-8'), hashlib.sha1).hexdigest()
-

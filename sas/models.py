@@ -23,11 +23,9 @@
 #
 
 from django.db import models
-from django.core.urlresolvers import reverse_lazy, reverse
-from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from django.core.files.base import ContentFile
 
 from PIL import Image
 from io import BytesIO
@@ -35,6 +33,7 @@ import os
 
 from core.models import SithFile, User
 from core.utils import resize_image, exif_auto_rotate
+
 
 class Picture(SithFile):
     class Meta:
@@ -50,12 +49,12 @@ class Picture(SithFile):
 
     def can_be_edited_by(self, user):
         # file = SithFile.objects.filter(id=self.id).first()
-        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)# or user.can_edit(file)
+        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)  # or user.can_edit(file)
 
     def can_be_viewed_by(self, user):
         # file = SithFile.objects.filter(id=self.id).first()
         return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
-                user.was_subscribed)# or user.can_view(file)
+                                               user.was_subscribed)  # or user.can_view(file)
 
     def get_download_url(self):
         return reverse('sas:download', kwargs={'picture_id': self.id})
@@ -73,7 +72,8 @@ class Picture(SithFile):
         im = Image.open(BytesIO(self.file.read()))
         try:
             im = exif_auto_rotate(im)
-        except: pass
+        except:
+            pass
         file = resize_image(im, max(im.size), self.mime_type.split('/')[-1])
         thumb = resize_image(im, 200, self.mime_type.split('/')[-1])
         compressed = resize_image(im, 1200, self.mime_type.split('/')[-1])
@@ -102,16 +102,17 @@ class Picture(SithFile):
     def get_next(self):
         if self.is_moderated:
             return self.parent.children.filter(is_moderated=True, asked_for_removal=False, is_folder=False,
-                    id__gt=self.id).order_by('id').first()
+                                               id__gt=self.id).order_by('id').first()
         else:
             return Picture.objects.filter(id__gt=self.id, is_moderated=False, is_in_sas=True).order_by('id').first()
 
     def get_previous(self):
         if self.is_moderated:
             return self.parent.children.filter(is_moderated=True, asked_for_removal=False, is_folder=False,
-                    id__lt=self.id).order_by('id').last()
+                                               id__lt=self.id).order_by('id').last()
         else:
             return Picture.objects.filter(id__lt=self.id, is_moderated=False, is_in_sas=True).order_by('-id').first()
+
 
 class Album(SithFile):
     class Meta:
@@ -127,12 +128,12 @@ class Album(SithFile):
 
     def can_be_edited_by(self, user):
         # file = SithFile.objects.filter(id=self.id).first()
-        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)# or user.can_edit(file)
+        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)  # or user.can_edit(file)
 
     def can_be_viewed_by(self, user):
         # file = SithFile.objects.filter(id=self.id).first()
         return self.can_be_edited_by(user) or (self.is_in_sas and self.is_moderated and
-                user.was_subscribed)# or user.can_view(file)
+                                               user.was_subscribed)  # or user.can_view(file)
 
     def get_absolute_url(self):
         return reverse('sas:album', kwargs={'album_id': self.id})
@@ -147,6 +148,7 @@ class Album(SithFile):
             self.file = resize_image(im, 200, "jpeg")
             self.file.name = self.name + '/thumb.jpg'
             self.save()
+
 
 class PeoplePictureRelation(models.Model):
     """

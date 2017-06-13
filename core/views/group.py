@@ -29,6 +29,7 @@ from django.core.urlresolvers import reverse_lazy
 from core.models import RealGroup
 from core.views import CanEditMixin
 
+
 class GroupListView(CanEditMixin, ListView):
     """
     Displays the group list
@@ -36,16 +37,19 @@ class GroupListView(CanEditMixin, ListView):
     model = RealGroup
     template_name = "core/group_list.jinja"
 
+
 class GroupEditView(CanEditMixin, UpdateView):
     model = RealGroup
     pk_url_kwarg = "group_id"
     template_name = "core/group_edit.jinja"
     fields = ['name', 'description']
 
+
 class GroupCreateView(CanEditMixin, CreateView):
     model = RealGroup
     template_name = "core/group_edit.jinja"
     fields = ['name', 'description']
+
 
 class GroupDeleteView(CanEditMixin, DeleteView):
     model = RealGroup

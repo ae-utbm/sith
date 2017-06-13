@@ -22,7 +22,7 @@
 #
 #
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
@@ -31,7 +31,6 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView, Proces
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.core.urlresolvers import reverse_lazy, reverse
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django import forms
@@ -43,15 +42,16 @@ import re
 import pytz
 from datetime import date, timedelta, datetime
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
-from ajax_select import make_ajax_form, make_ajax_field
+from ajax_select import make_ajax_field
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
-from core.views.forms import SelectUser, LoginForm, SelectDate, SelectDateTime
+from core.views import CanViewMixin, TabedViewMixin
+from core.views.forms import LoginForm, SelectDate, SelectDateTime
 from core.models import User
 from subscription.models import Subscription
 from counter.models import Counter, Customer, Product, Selling, Refilling, ProductType, \
-        CashRegisterSummary, CashRegisterSummaryItem, Eticket, Permanency
+    CashRegisterSummary, CashRegisterSummaryItem, Eticket, Permanency
 from accounting.models import CurrencyField
+
 
 class CounterAdminMixin(View):
     """
@@ -72,12 +72,12 @@ class CounterAdminMixin(View):
                 return True
         return False
 
-
     def dispatch(self, request, *args, **kwargs):
         if not (request.user.is_root or self._test_group(request.user)
                 or self._test_club(request.user)):
             raise PermissionDenied
         return super(CounterAdminMixin, self).dispatch(request, *args, **kwargs)
+
 
 class GetUserForm(forms.Form):
     """
@@ -107,50 +107,56 @@ class GetUserForm(forms.Form):
         cleaned_data['user'] = cus.user
         return cleaned_data
 
+
 class RefillForm(forms.ModelForm):
     error_css_class = 'error'
     required_css_class = 'required'
-    amount = forms.FloatField(min_value=0, widget=forms.NumberInput(attrs={'class':'focus'}))
+    amount = forms.FloatField(min_value=0, widget=forms.NumberInput(attrs={'class': 'focus'}))
+
     class Meta:
         model = Refilling
         fields = ['amount', 'payment_method', 'bank']
 
+
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
-        if hasattr(self.object, 'stock_owner') :
+        if hasattr(self.object, 'stock_owner'):
             return self.object.stock_owner.counter
         else:
             return self.object
+
     def get_list_of_tabs(self):
         tab_list = []
         tab_list.append({
             'url': reverse_lazy('counter:details',
-                kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id }),
+                                kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id}),
             'slug': 'counter',
             'name': _("Counter"),
-            })
+        })
         if self.object.stock_owner.counter.type if hasattr(self.object, 'stock_owner') else self.object.type == "BAR":
             tab_list.append({
                 'url': reverse_lazy('counter:cash_summary',
-                    kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id}),
+                                    kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id}),
                 'slug': 'cash_summary',
                 'name': _("Cash summary"),
-                })
+            })
             tab_list.append({
                 'url': reverse_lazy('counter:last_ops',
-                    kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id}),
+                                    kwargs={'counter_id': self.object.stock_owner.counter.id if hasattr(self.object, 'stock_owner') else self.object.id}),
                 'slug': 'last_ops',
                 'name': _("Last operations"),
-                })
+            })
             try:
                 tab_list.append({
                     'url': reverse_lazy('stock:take_items',
-                        kwargs={'stock_id': self.object.stock.id if hasattr(self.object, 'stock') else self.object.stock_owner.id}),
+                                        kwargs={'stock_id': self.object.stock.id if hasattr(self.object, 'stock') else self.object.stock_owner.id}),
                     'slug': 'take_items_from_stock',
                     'name': _("Take items from stock"),
-                    })
-            except: pass # The counter just have no stock
+                })
+            except:
+                pass  # The counter just have no stock
         return tab_list
+
 
 class CounterMain(CounterTabsMixin, CanViewMixin, DetailView, ProcessFormView, FormMixin):
     """
@@ -159,15 +165,15 @@ class CounterMain(CounterTabsMixin, CanViewMixin, DetailView, ProcessFormView, F
     model = Counter
     template_name = 'counter/counter_main.jinja'
     pk_url_kwarg = "counter_id"
-    form_class = GetUserForm # Form to enter a client code and get the corresponding user id
+    form_class = GetUserForm  # Form to enter a client code and get the corresponding user id
     current_tab = "counter"
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         if self.object.type == "BAR" and not ('counter_token' in self.request.session.keys() and
-                self.request.session['counter_token'] == self.object.token): # Check the token to avoid the bar to be stolen
+                                              self.request.session['counter_token'] == self.object.token):  # Check the token to avoid the bar to be stolen
             return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
-                kwargs={'counter_id': self.object.id})+'?bad_location')
+                                                     kwargs={'counter_id': self.object.id}) + '?bad_location')
         return super(CounterMain, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -180,13 +186,13 @@ class CounterMain(CounterTabsMixin, CanViewMixin, DetailView, ProcessFormView, F
         kwargs = super(CounterMain, self).get_context_data(**kwargs)
         kwargs['login_form'] = LoginForm()
         kwargs['login_form'].fields['username'].widget.attrs['autofocus'] = True
-        kwargs['login_form'].cleaned_data = {} # add_error fails if there are no cleaned_data
+        kwargs['login_form'].cleaned_data = {}  # add_error fails if there are no cleaned_data
         if "credentials" in self.request.GET:
             kwargs['login_form'].add_error(None, _("Bad credentials"))
         if "sellers" in self.request.GET:
             kwargs['login_form'].add_error(None, _("User is not barman"))
         kwargs['form'] = self.get_form()
-        kwargs['form'].cleaned_data = {} # same as above
+        kwargs['form'].cleaned_data = {}  # same as above
         if "bad_location" in self.request.GET:
             kwargs['form'].add_error(None, _("Bad location, someone is already logged in somewhere else"))
         if self.object.type == 'BAR':
@@ -210,6 +216,7 @@ class CounterMain(CounterTabsMixin, CanViewMixin, DetailView, ProcessFormView, F
     def get_success_url(self):
         return reverse_lazy('counter:click', args=self.args, kwargs=self.kwargs)
 
+
 class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     """
     The click view
@@ -228,7 +235,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             raise Http404
         if obj.type == "BAR":
             if not ('counter_token' in request.session.keys() and
-                request.session['counter_token'] == obj.token) or len(obj.get_barmen_list())<1:
+                    request.session['counter_token'] == obj.token) or len(obj.get_barmen_list()) < 1:
                 raise PermissionDenied
         else:
             if not request.user.is_authenticated():
@@ -237,10 +244,10 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         """Simple get view"""
-        if 'basket' not in request.session.keys(): # Init the basket session entry
+        if 'basket' not in request.session.keys():  # Init the basket session entry
             request.session['basket'] = {}
             request.session['basket_total'] = 0
-        request.session['not_enough'] = False # Reset every variable
+        request.session['not_enough'] = False  # Reset every variable
         request.session['too_young'] = False
         request.session['not_allowed'] = False
         request.session['no_age'] = False
@@ -248,8 +255,8 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         ret = super(CounterClick, self).get(request, *args, **kwargs)
         if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
                 (self.object.type == "BAR" and
-                len(self.object.get_barmen_list()) < 1)): # Check that at least one barman is logged in
-            ret = self.cancel(request) # Otherwise, go to main view
+                 len(self.object.get_barmen_list()) < 1)):  # Check that at least one barman is logged in
+            ret = self.cancel(request)  # Otherwise, go to main view
         return ret
 
     def post(self, request, *args, **kwargs):
@@ -258,16 +265,16 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         self.refill_form = None
         if ((self.object.type != "BAR" and not request.user.is_authenticated()) or
                 (self.object.type == "BAR" and
-                len(self.object.get_barmen_list()) < 1)): # Check that at least one barman is logged in
+                 len(self.object.get_barmen_list()) < 1)):  # Check that at least one barman is logged in
             return self.cancel(request)
         if self.object.type == "BAR" and not ('counter_token' in self.request.session.keys() and
-                self.request.session['counter_token'] == self.object.token): # Also check the token to avoid the bar to be stolen
+                                              self.request.session['counter_token'] == self.object.token):  # Also check the token to avoid the bar to be stolen
             return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args,
-                kwargs={'counter_id': self.object.id})+'?bad_location')
+                                                     kwargs={'counter_id': self.object.id}) + '?bad_location')
         if 'basket' not in request.session.keys():
             request.session['basket'] = {}
             request.session['basket_total'] = 0
-        request.session['not_enough'] = False # Reset every variable
+        request.session['not_enough'] = False  # Reset every variable
         request.session['too_young'] = False
         request.session['not_allowed'] = False
         request.session['no_age'] = False
@@ -312,7 +319,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def sum_basket(self, request):
         total = 0
-        for pid,infos in request.session['basket'].items():
+        for pid, infos in request.session['basket'].items():
             total += infos['price'] * infos['qty']
         return total / 100
 
@@ -323,7 +330,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         except:
             return 0
 
-    def add_product(self, request, q = 1, p=None):
+    def add_product(self, request, q=1, p=None):
         """
         Add a product to the basket
         q is the quantity passed as integer
@@ -344,12 +351,12 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         if not can_buy:
             request.session['not_allowed'] = True
             return False
-        bq = 0 # Bonus quantity, for trays
-        if product.tray: # Handle the tray to adjust the quantity q to add and the bonus quantity bq
+        bq = 0  # Bonus quantity, for trays
+        if product.tray:  # Handle the tray to adjust the quantity q to add and the bonus quantity bq
             total_qty_mod_6 = self.get_total_quantity_for_pid(request, pid) % 6
-            bq = int((total_qty_mod_6 + q) / 6) # Integer division
+            bq = int((total_qty_mod_6 + q) / 6)  # Integer division
             q -= bq
-        if self.customer.amount < (total + round(q*float(price),2)): # Check for enough money
+        if self.customer.amount < (total + round(q * float(price), 2)):  # Check for enough money
             request.session['not_enough'] = True
             return False
         if product.limit_age >= 18 and not self.customer.user.date_of_birth:
@@ -361,14 +368,14 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         if self.customer.user.is_banned_counter:
             request.session['not_allowed'] = True
             return False
-        if self.customer.user.date_of_birth and self.customer.user.get_age() < product.limit_age: # Check if affordable
+        if self.customer.user.date_of_birth and self.customer.user.get_age() < product.limit_age:  # Check if affordable
             request.session['too_young'] = True
             return False
-        if pid in request.session['basket']: # Add if already in basket
+        if pid in request.session['basket']:  # Add if already in basket
             request.session['basket'][pid]['qty'] += q
             request.session['basket'][pid]['bonus_qty'] += bq
-        else: # or create if not
-            request.session['basket'][pid] = {'qty': q, 'price': int(price*100), 'bonus_qty': bq}
+        else:  # or create if not
+            request.session['basket'][pid] = {'qty': q, 'price': int(price * 100), 'bonus_qty': bq}
         request.session.modified = True
         return True
 
@@ -414,7 +421,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         """ Finish the click session, and validate the basket """
         with transaction.atomic():
             request.session['last_basket'] = []
-            for pid,infos in request.session['basket'].items():
+            for pid, infos in request.session['basket'].items():
                 # This duplicates code for DB optimization (prevent to load many times the same object)
                 p = Product.objects.filter(pk=pid).first()
                 if self.is_barman_price():
@@ -423,13 +430,13 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                     uprice = p.selling_price
                 if uprice * infos['qty'] > self.customer.amount:
                     raise DataError(_("You have not enough money to buy all the basket"))
-                request.session['last_basket'].append("%d x %s" % (infos['qty']+infos['bonus_qty'], p.name))
+                request.session['last_basket'].append("%d x %s" % (infos['qty'] + infos['bonus_qty'], p.name))
                 s = Selling(label=p.name, product=p, club=p.club, counter=self.object, unit_price=uprice,
-                       quantity=infos['qty'], seller=self.operator, customer=self.customer)
+                            quantity=infos['qty'], seller=self.operator, customer=self.customer)
                 s.save()
                 if infos['bonus_qty']:
                     s = Selling(label=p.name + " (Plateau)", product=p, club=p.club, counter=self.object, unit_price=0,
-                           quantity=infos['bonus_qty'], seller=self.operator, customer=self.customer)
+                                quantity=infos['bonus_qty'], seller=self.operator, customer=self.customer)
                     s.save()
             request.session['last_customer'] = self.customer.user.get_display_name()
             request.session['last_total'] = "%0.2f" % self.sum_basket(request)
@@ -437,8 +444,8 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             del request.session['basket']
             request.session.modified = True
             kwargs = {
-                    'counter_id': self.object.id,
-                    }
+                'counter_id': self.object.id,
+            }
             return HttpResponseRedirect(reverse_lazy('counter:details', args=self.args, kwargs=kwargs))
 
     def cancel(self, request):
@@ -470,6 +477,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         kwargs['categories'] = ProductType.objects.all()
         return kwargs
 
+
 class CounterLogin(RedirectView):
     """
     Handle the login of a barman
@@ -477,6 +485,7 @@ class CounterLogin(RedirectView):
     Logged barmen are stored in the Permanency model
     """
     permanent = False
+
     def post(self, request, *args, **kwargs):
         """
         Register the logged user as barman for this counter
@@ -499,10 +508,12 @@ class CounterLogin(RedirectView):
         return super(CounterLogin, self).post(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        return reverse_lazy('counter:details', args=args, kwargs=kwargs)+"?"+'&'.join(self.errors)
+        return reverse_lazy('counter:details', args=args, kwargs=kwargs) + "?" + '&'.join(self.errors)
+
 
 class CounterLogout(RedirectView):
     permanent = False
+
     def post(self, request, *args, **kwargs):
         """
         Unregister the user from the barman
@@ -515,52 +526,54 @@ class CounterLogout(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         return reverse_lazy('counter:details', args=args, kwargs=kwargs)
 
-## Counter admin views
+# Counter admin views
+
 
 class CounterAdminTabsMixin(TabedViewMixin):
     tabs_title = _("Counter administration")
     list_of_tabs = [
-            {
-                'url': reverse_lazy('stock:list'),
-                'slug': 'stocks',
-                'name': _("Stocks"),
-                },
-            {
-                'url': reverse_lazy('counter:admin_list'),
-                'slug': 'counters',
-                'name': _("Counters"),
-                },
-            {
-                'url': reverse_lazy('counter:product_list'),
-                'slug': 'products',
-                'name': _("Products"),
-                },
-            {
-                'url': reverse_lazy('counter:product_list_archived'),
-                'slug': 'archive',
-                'name': _("Archived products"),
-                },
-            {
-                'url': reverse_lazy('counter:producttype_list'),
-                'slug': 'product_types',
-                'name': _("Product types"),
-                },
-            {
-                'url': reverse_lazy('counter:cash_summary_list'),
-                'slug': 'cash_summary',
-                'name': _("Cash register summaries"),
-                },
-            {
-                'url': reverse_lazy('counter:invoices_call'),
-                'slug': 'invoices_call',
-                'name': _("Invoices call"),
-                },
-            {
-                'url': reverse_lazy('counter:eticket_list'),
-                'slug': 'etickets',
-                'name': _("Etickets"),
-                },
-            ]
+        {
+            'url': reverse_lazy('stock:list'),
+            'slug': 'stocks',
+            'name': _("Stocks"),
+        },
+        {
+            'url': reverse_lazy('counter:admin_list'),
+            'slug': 'counters',
+            'name': _("Counters"),
+        },
+        {
+            'url': reverse_lazy('counter:product_list'),
+            'slug': 'products',
+            'name': _("Products"),
+        },
+        {
+            'url': reverse_lazy('counter:product_list_archived'),
+            'slug': 'archive',
+            'name': _("Archived products"),
+        },
+        {
+            'url': reverse_lazy('counter:producttype_list'),
+            'slug': 'product_types',
+            'name': _("Product types"),
+        },
+        {
+            'url': reverse_lazy('counter:cash_summary_list'),
+            'slug': 'cash_summary',
+            'name': _("Cash register summaries"),
+        },
+        {
+            'url': reverse_lazy('counter:invoices_call'),
+            'slug': 'invoices_call',
+            'name': _("Invoices call"),
+        },
+        {
+            'url': reverse_lazy('counter:eticket_list'),
+            'slug': 'etickets',
+            'name': _("Etickets"),
+        },
+    ]
+
 
 class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
     """
@@ -570,12 +583,14 @@ class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
     template_name = 'counter/counter_list.jinja'
     current_tab = "counters"
 
+
 class CounterEditForm(forms.ModelForm):
     class Meta:
         model = Counter
         fields = ['sellers', 'products']
     sellers = make_ajax_field(Counter, 'sellers', 'users', help_text="")
     products = make_ajax_field(Counter, 'products', 'products', help_text="")
+
 
 class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
@@ -595,6 +610,7 @@ class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('counter:admin', kwargs={'counter_id': self.object.id})
 
+
 class CounterEditPropView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's admin)
@@ -605,15 +621,17 @@ class CounterEditPropView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     template_name = 'core/edit.jinja'
     current_tab = "counters"
 
+
 class CounterCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     Create a counter (for the admins)
     """
     model = Counter
     form_class = modelform_factory(Counter, fields=['name', 'club', 'type', 'products'],
-            widgets={'products':CheckboxSelectMultiple})
+                                   widgets={'products': CheckboxSelectMultiple})
     template_name = 'core/create.jinja'
     current_tab = "counters"
+
 
 class CounterDeleteView(CounterAdminTabsMixin, CounterAdminMixin, DeleteView):
     """
@@ -627,6 +645,7 @@ class CounterDeleteView(CounterAdminTabsMixin, CounterAdminMixin, DeleteView):
 
 # Product management
 
+
 class ProductTypeListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
@@ -634,6 +653,7 @@ class ProductTypeListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     model = ProductType
     template_name = 'counter/producttype_list.jinja'
     current_tab = "product_types"
+
 
 class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
@@ -643,6 +663,7 @@ class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView
     fields = ['name', 'description', 'icon']
     template_name = 'core/create.jinja'
     current_tab = "products"
+
 
 class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
@@ -654,6 +675,7 @@ class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     pk_url_kwarg = "type_id"
     current_tab = "products"
 
+
 class ProductArchivedListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
     A list view for the admins
@@ -663,6 +685,7 @@ class ProductArchivedListView(CounterAdminTabsMixin, CounterAdminMixin, ListView
     queryset = Product.objects.filter(archived=True)
     ordering = ['name']
     current_tab = "archive"
+
 
 class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
@@ -674,11 +697,12 @@ class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     ordering = ['name']
     current_tab = "products"
 
+
 class ProductEditForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['name', 'description', 'product_type', 'code', 'parent_product', 'buying_groups', 'purchase_price',
-                'selling_price', 'special_selling_price', 'icon', 'club', 'limit_age', 'tray', 'archived']
+                  'selling_price', 'special_selling_price', 'icon', 'club', 'limit_age', 'tray', 'archived']
     parent_product = AutoCompleteSelectField('products', show_help_text=False, label=_("Parent product"), required=False)
     buying_groups = AutoCompleteSelectMultipleField('groups', show_help_text=False, help_text="", label=_("Buying groups"), required=False)
     club = AutoCompleteSelectField('clubs', show_help_text=False)
@@ -702,6 +726,7 @@ class ProductEditForm(forms.ModelForm):
             c.save()
         return ret
 
+
 class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
     A create view for the admins
@@ -710,6 +735,7 @@ class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     form_class = ProductEditForm
     template_name = 'core/create.jinja'
     current_tab = "products"
+
 
 class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
@@ -720,6 +746,7 @@ class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     pk_url_kwarg = "product_id"
     template_name = 'core/edit.jinja'
     current_tab = "products"
+
 
 class RefillingDeleteView(DeleteView):
     """
@@ -736,7 +763,7 @@ class RefillingDeleteView(DeleteView):
         self.object = self.get_object()
         if (timezone.now() - self.object.date <= timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT) and
                 'counter_token' in request.session.keys() and
-                request.session['counter_token'] and # check if not null for counters that have no token set
+                request.session['counter_token'] and  # check if not null for counters that have no token set
                 Counter.objects.filter(token=request.session['counter_token']).exists()):
             self.success_url = reverse('counter:details', kwargs={'counter_id': self.object.counter.id})
             return super(RefillingDeleteView, self).dispatch(request, *args, **kwargs)
@@ -744,6 +771,7 @@ class RefillingDeleteView(DeleteView):
             self.success_url = reverse('core:user_account', kwargs={'user_id': self.object.customer.user.id})
             return super(RefillingDeleteView, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied
+
 
 class SellingDeleteView(DeleteView):
     """
@@ -760,7 +788,7 @@ class SellingDeleteView(DeleteView):
         self.object = self.get_object()
         if (timezone.now() - self.object.date <= timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT) and
                 'counter_token' in request.session.keys() and
-                request.session['counter_token'] and # check if not null for counters that have no token set
+                request.session['counter_token'] and  # check if not null for counters that have no token set
                 Counter.objects.filter(token=request.session['counter_token']).exists()):
             self.success_url = reverse('counter:details', kwargs={'counter_id': self.object.counter.id})
             return super(SellingDeleteView, self).dispatch(request, *args, **kwargs)
@@ -770,6 +798,7 @@ class SellingDeleteView(DeleteView):
         raise PermissionDenied
 
 # Cash register summaries
+
 
 class CashRegisterSummaryForm(forms.Form):
     """
@@ -831,37 +860,53 @@ class CashRegisterSummaryForm(forms.Form):
     def save(self, counter=None):
         cd = self.cleaned_data
         summary = self.instance or CashRegisterSummary(
-                counter=counter,
-                user=counter.get_random_barman(),
-                )
+            counter=counter,
+            user=counter.get_random_barman(),
+        )
         summary.comment = cd['comment']
         summary.emptied = cd['emptied']
         summary.save()
         summary.items.all().delete()
         # Cash
-        if cd['ten_cents']: CashRegisterSummaryItem(cash_summary=summary, value=0.1, quantity=cd['ten_cents']).save()
-        if cd['twenty_cents']: CashRegisterSummaryItem(cash_summary=summary, value=0.2, quantity=cd['twenty_cents']).save()
-        if cd['fifty_cents']: CashRegisterSummaryItem(cash_summary=summary, value=0.5, quantity=cd['fifty_cents']).save()
-        if cd['one_euro']: CashRegisterSummaryItem(cash_summary=summary, value=1, quantity=cd['one_euro']).save()
-        if cd['two_euros']: CashRegisterSummaryItem(cash_summary=summary, value=2, quantity=cd['two_euros']).save()
-        if cd['five_euros']: CashRegisterSummaryItem(cash_summary=summary, value=5, quantity=cd['five_euros']).save()
-        if cd['ten_euros']: CashRegisterSummaryItem(cash_summary=summary, value=10, quantity=cd['ten_euros']).save()
-        if cd['twenty_euros']: CashRegisterSummaryItem(cash_summary=summary, value=20, quantity=cd['twenty_euros']).save()
-        if cd['fifty_euros']: CashRegisterSummaryItem(cash_summary=summary, value=50, quantity=cd['fifty_euros']).save()
-        if cd['hundred_euros']: CashRegisterSummaryItem(cash_summary=summary, value=100, quantity=cd['hundred_euros']).save()
+        if cd['ten_cents']:
+            CashRegisterSummaryItem(cash_summary=summary, value=0.1, quantity=cd['ten_cents']).save()
+        if cd['twenty_cents']:
+            CashRegisterSummaryItem(cash_summary=summary, value=0.2, quantity=cd['twenty_cents']).save()
+        if cd['fifty_cents']:
+            CashRegisterSummaryItem(cash_summary=summary, value=0.5, quantity=cd['fifty_cents']).save()
+        if cd['one_euro']:
+            CashRegisterSummaryItem(cash_summary=summary, value=1, quantity=cd['one_euro']).save()
+        if cd['two_euros']:
+            CashRegisterSummaryItem(cash_summary=summary, value=2, quantity=cd['two_euros']).save()
+        if cd['five_euros']:
+            CashRegisterSummaryItem(cash_summary=summary, value=5, quantity=cd['five_euros']).save()
+        if cd['ten_euros']:
+            CashRegisterSummaryItem(cash_summary=summary, value=10, quantity=cd['ten_euros']).save()
+        if cd['twenty_euros']:
+            CashRegisterSummaryItem(cash_summary=summary, value=20, quantity=cd['twenty_euros']).save()
+        if cd['fifty_euros']:
+            CashRegisterSummaryItem(cash_summary=summary, value=50, quantity=cd['fifty_euros']).save()
+        if cd['hundred_euros']:
+            CashRegisterSummaryItem(cash_summary=summary, value=100, quantity=cd['hundred_euros']).save()
         # Checks
-        if cd['check_1_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_1_value'],
-                quantity=cd['check_1_quantity'], check=True).save()
-        if cd['check_2_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_2_value'],
-                quantity=cd['check_2_quantity'], check=True).save()
-        if cd['check_3_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_3_value'],
-                quantity=cd['check_3_quantity'], check=True).save()
-        if cd['check_4_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_4_value'],
-                quantity=cd['check_4_quantity'], check=True).save()
-        if cd['check_5_quantity']: CashRegisterSummaryItem(cash_summary=summary, value=cd['check_5_value'],
-                quantity=cd['check_5_quantity'], check=True).save()
+        if cd['check_1_quantity']:
+            CashRegisterSummaryItem(cash_summary=summary, value=cd['check_1_value'],
+                                    quantity=cd['check_1_quantity'], check=True).save()
+        if cd['check_2_quantity']:
+            CashRegisterSummaryItem(cash_summary=summary, value=cd['check_2_value'],
+                                    quantity=cd['check_2_quantity'], check=True).save()
+        if cd['check_3_quantity']:
+            CashRegisterSummaryItem(cash_summary=summary, value=cd['check_3_value'],
+                                    quantity=cd['check_3_quantity'], check=True).save()
+        if cd['check_4_quantity']:
+            CashRegisterSummaryItem(cash_summary=summary, value=cd['check_4_value'],
+                                    quantity=cd['check_4_quantity'], check=True).save()
+        if cd['check_5_quantity']:
+            CashRegisterSummaryItem(cash_summary=summary, value=cd['check_5_value'],
+                                    quantity=cd['check_5_quantity'], check=True).save()
         if summary.items.count() < 1:
             summary.delete()
+
 
 class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
     """
@@ -878,10 +923,10 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
         """
         self.object = self.get_object()
         if (self.object.get_barmen_list() and 'counter_token' in request.session.keys() and
-            request.session['counter_token'] and # check if not null for counters that have no token set
-            Counter.objects.filter(token=request.session['counter_token']).exists()):
+            request.session['counter_token'] and  # check if not null for counters that have no token set
+                Counter.objects.filter(token=request.session['counter_token']).exists()):
             return super(CounterLastOperationsView, self).dispatch(request, *args, **kwargs)
-        return HttpResponseRedirect(reverse('counter:details', kwargs={'counter_id': self.object.id})+'?bad_location')
+        return HttpResponseRedirect(reverse('counter:details', kwargs={'counter_id': self.object.id}) + '?bad_location')
 
     def get_context_data(self, **kwargs):
         """Add form to the context """
@@ -890,6 +935,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
         kwargs['last_refillings'] = self.object.refillings.filter(date__gte=threshold).order_by('-id')[:20]
         kwargs['last_sellings'] = self.object.sellings.filter(date__gte=threshold).order_by('-id')[:20]
         return kwargs
+
 
 class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
     """
@@ -906,10 +952,10 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
         """
         self.object = self.get_object()
         if (self.object.get_barmen_list() and 'counter_token' in request.session.keys() and
-            request.session['counter_token'] and # check if not null for counters that have no token set
-            Counter.objects.filter(token=request.session['counter_token']).exists()):
+            request.session['counter_token'] and  # check if not null for counters that have no token set
+                Counter.objects.filter(token=request.session['counter_token']).exists()):
             return super(CounterCashSummaryView, self).dispatch(request, *args, **kwargs)
-        return HttpResponseRedirect(reverse('counter:details', kwargs={'counter_id': self.object.id})+'?bad_location')
+        return HttpResponseRedirect(reverse('counter:details', kwargs={'counter_id': self.object.id}) + '?bad_location')
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -933,6 +979,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
         kwargs['form'] = self.form
         return kwargs
 
+
 class CounterActivityView(DetailView):
     """
     Show the bar activity
@@ -940,6 +987,7 @@ class CounterActivityView(DetailView):
     model = Counter
     pk_url_kwarg = "counter_id"
     template_name = 'counter/activity.jinja'
+
 
 class CounterStatView(DetailView, CounterAdminMixin):
     """
@@ -957,40 +1005,40 @@ class CounterStatView(DetailView, CounterAdminMixin):
         kwargs['User'] = User
         semester_start = Subscription.compute_start(d=date.today(), duration=3)
         kwargs['total_sellings'] = Selling.objects.filter(date__gte=semester_start,
-                counter=self.object).aggregate(total_sellings=Sum(F('quantity')*F('unit_price'),
-                    output_field=CurrencyField()))['total_sellings']
+                                                          counter=self.object).aggregate(total_sellings=Sum(F('quantity') * F('unit_price'),
+                                                                                                            output_field=CurrencyField()))['total_sellings']
         kwargs['top'] = Selling.objects.values('customer__user').annotate(
-                selling_sum=Sum(
-                    Case(When(counter=self.object,
-                            date__gte=semester_start,
-                            unit_price__gt=0,
-                        then=F('unit_price')*F('quantity')),
-                        output_field=CurrencyField()
-                        )
-                    )
-                ).exclude(selling_sum=None).order_by('-selling_sum').all()[:100]
+            selling_sum=Sum(
+                Case(When(counter=self.object,
+                          date__gte=semester_start,
+                          unit_price__gt=0,
+                          then=F('unit_price') * F('quantity')),
+                     output_field=CurrencyField()
+                     )
+            )
+        ).exclude(selling_sum=None).order_by('-selling_sum').all()[:100]
         kwargs['top_barman'] = Permanency.objects.values('user').annotate(
-                perm_sum=Sum(
-                    Case(When(counter=self.object,
-                            end__gt=datetime(year=1999, month=1, day=1),
-                        then=F('end')-F('start')),
-                        output_field=models.DateTimeField()
-                        )
-                    )
-                ).exclude(perm_sum=None).order_by('-perm_sum').all()[:100]
+            perm_sum=Sum(
+                Case(When(counter=self.object,
+                          end__gt=datetime(year=1999, month=1, day=1),
+                          then=F('end') - F('start')),
+                     output_field=models.DateTimeField()
+                     )
+            )
+        ).exclude(perm_sum=None).order_by('-perm_sum').all()[:100]
         kwargs['top_barman_semester'] = Permanency.objects.values('user').annotate(
-                perm_sum=Sum(
-                    Case(When(counter=self.object,
-                            start__gt=semester_start,
-                            end__gt=datetime(year=1999, month=1, day=1),
-                        then=F('end')-F('start')),
-                        output_field=models.DateTimeField()
-                        )
-                    )
-                ).exclude(perm_sum=None).order_by('-perm_sum').all()[:100]
+            perm_sum=Sum(
+                Case(When(counter=self.object,
+                          start__gt=semester_start,
+                          end__gt=datetime(year=1999, month=1, day=1),
+                          then=F('end') - F('start')),
+                     output_field=models.DateTimeField()
+                     )
+            )
+        ).exclude(perm_sum=None).order_by('-perm_sum').all()[:100]
 
-        kwargs['sith_date']=settings.SITH_START_DATE[0]
-        kwargs['semester_start']=semester_start
+        kwargs['sith_date'] = settings.SITH_START_DATE[0]
+        kwargs['semester_start'] = semester_start
         return kwargs
 
     def dispatch(self, request, *args, **kwargs):
@@ -999,11 +1047,12 @@ class CounterStatView(DetailView, CounterAdminMixin):
         except:
             if (request.user.is_root
                 or request.user.is_board_member
-                or self.object.is_owned_by(request.user)):
+                    or self.object.is_owned_by(request.user)):
                 return super(CanEditMixin, self).dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
-class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin,  UpdateView):
+
+class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """Edit cash summaries"""
     model = CashRegisterSummary
     template_name = 'counter/cash_register_summary.jinja'
@@ -1015,9 +1064,11 @@ class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin,  UpdateView)
     def get_success_url(self):
         return reverse('counter:cash_summary_list')
 
+
 class CashSummaryFormBase(forms.Form):
     begin_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Begin date"), required=False, widget=SelectDateTime)
     end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"), required=False, widget=SelectDateTime)
+
 
 class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """Display a list of cash summaries"""
@@ -1047,7 +1098,7 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
                     refillings = refillings.filter(date__gt=last_summary.date)
                     cashredistersummaries = cashredistersummaries.filter(date__gt=last_summary.date)
                 else:
-                    refillings = refillings.filter(date__gte=datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC)) # My birth date should be old enough
+                    refillings = refillings.filter(date__gte=datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC))  # My birth date should be old enough
                     cashredistersummaries = cashredistersummaries.filter(date__gte=datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC))
             if form.is_valid() and form.cleaned_data['end_date']:
                 refillings = refillings.filter(date__lte=form.cleaned_data['end_date'])
@@ -1055,6 +1106,7 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
             kwargs['summaries_sums'][c.name] = sum([s.get_total() for s in cashredistersummaries.all()])
             kwargs['refilling_sums'][c.name] = sum([s.amount for s in refillings.all()])
         return kwargs
+
 
 class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
     template_name = 'counter/invoices_call.jinja'
@@ -1069,23 +1121,24 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         try:
             start_date = datetime.strptime(self.request.GET['month'], '%Y-%m')
         except:
-            start_date = datetime(year=timezone.now().year, month=(timezone.now().month+10)%12+1, day=1)
+            start_date = datetime(year=timezone.now().year, month=(timezone.now().month + 10) % 12 + 1, day=1)
         start_date = start_date.replace(tzinfo=pytz.UTC)
         end_date = (start_date + timedelta(days=32)).replace(day=1, hour=0, minute=0, microsecond=0)
         from django.db.models import Sum, Case, When, F, DecimalField
         kwargs['sum_cb'] = sum([r.amount for r in Refilling.objects.filter(payment_method='CARD', is_validated=True,
-                                                                          date__gte=start_date, date__lte=end_date)])
-        kwargs['sum_cb'] += sum([s.quantity*s.unit_price for s in Selling.objects.filter(payment_method='CARD', is_validated=True,
-                                                                                         date__gte=start_date, date__lte=end_date)])
+                                                                           date__gte=start_date, date__lte=end_date)])
+        kwargs['sum_cb'] += sum([s.quantity * s.unit_price for s in Selling.objects.filter(payment_method='CARD', is_validated=True,
+                                                                                           date__gte=start_date, date__lte=end_date)])
         kwargs['start_date'] = start_date
         kwargs['sums'] = Selling.objects.values('club__name').annotate(selling_sum=Sum(
             Case(When(date__gte=start_date,
-                date__lt=end_date,
-                then=F('unit_price')*F('quantity')),
-                output_field=CurrencyField()
-                )
-            )).exclude(selling_sum=None).order_by('-selling_sum')
+                      date__lt=end_date,
+                      then=F('unit_price') * F('quantity')),
+                 output_field=CurrencyField()
+                 )
+        )).exclude(selling_sum=None).order_by('-selling_sum')
         return kwargs
+
 
 class EticketListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """
@@ -1096,14 +1149,16 @@ class EticketListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     ordering = ['id']
     current_tab = "etickets"
 
+
 class EticketForm(forms.ModelForm):
     class Meta:
         model = Eticket
         fields = ['product', 'banner', 'event_title', 'event_date']
         widgets = {
-                'event_date': SelectDate,
-                }
+            'event_date': SelectDate,
+        }
     product = AutoCompleteSelectField('products', show_help_text=False, label=_("Product"), required=True)
+
 
 class EticketCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """
@@ -1114,6 +1169,7 @@ class EticketCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     form_class = EticketForm
     current_tab = "etickets"
 
+
 class EticketEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     Edit an eticket
@@ -1123,6 +1179,7 @@ class EticketEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     form_class = EticketForm
     pk_url_kwarg = "eticket_id"
     current_tab = "etickets"
+
 
 class EticketPDFView(CanViewMixin, DetailView):
     """
@@ -1172,7 +1229,7 @@ class EticketPDFView(CanViewMixin, DetailView):
             p.drawCentredString(10.5 * cm, 23.6 * cm, eticket.event_title)
         if eticket.event_date:
             p.setFont("Helvetica-Bold", 16)
-            p.drawCentredString(10.5 * cm, 22.6 * cm, eticket.event_date.strftime("%d %b %Y")) # FIXME with a locale
+            p.drawCentredString(10.5 * cm, 22.6 * cm, eticket.event_date.strftime("%d %b %Y"))  # FIXME with a locale
         p.setFont("Helvetica-Bold", 14)
         p.drawCentredString(10.5 * cm, 15 * cm, "%s : %d %s" % (user.get_display_name(), self.object.quantity, str(_("people(s)"))))
         p.setFont("Courier-Bold", 14)
@@ -1180,7 +1237,7 @@ class EticketPDFView(CanViewMixin, DetailView):
         bounds = qrcode.getBounds()
         width = bounds[2] - bounds[0]
         height = bounds[3] - bounds[1]
-        d = Drawing(260, 260, transform=[260./width, 0, 0, 260./height, 0, 0])
+        d = Drawing(260, 260, transform=[260. / width, 0, 0, 260. / height, 0, 0])
         d.add(qrcode)
         renderPDF.draw(d, p, 10.5 * cm - 130, 6.1 * cm)
         p.drawCentredString(10.5 * cm, 6 * cm, code)
@@ -1195,4 +1252,3 @@ class EticketPDFView(CanViewMixin, DetailView):
         p.showPage()
         p.save()
         return response
-

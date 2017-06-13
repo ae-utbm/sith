@@ -44,13 +44,16 @@ from datetime import datetime, timedelta, date
 
 import unicodedata
 
+
 class RealGroupManager(AuthGroupManager):
     def get_queryset(self):
         return super(RealGroupManager, self).get_queryset().filter(is_meta=False)
 
+
 class MetaGroupManager(AuthGroupManager):
     def get_queryset(self):
         return super(MetaGroupManager, self).get_queryset().filter(is_meta=True)
+
 
 class Group(AuthGroup):
     is_meta = models.BooleanField(
@@ -69,8 +72,10 @@ class Group(AuthGroup):
         """
         return reverse('core:group_list')
 
+
 class MetaGroup(Group):
     objects = MetaGroupManager()
+
     class Meta:
         proxy = True
 
@@ -78,19 +83,23 @@ class MetaGroup(Group):
         super(MetaGroup, self).__init__(*args, **kwargs)
         self.is_meta = True
 
+
 class RealGroup(Group):
     objects = RealGroupManager()
+
     class Meta:
         proxy = True
 
+
 def validate_promo(value):
     start_year = settings.SITH_SCHOOL_START_YEAR
-    delta = (date.today()+timedelta(days=180)).year - start_year
+    delta = (date.today() + timedelta(days=180)).year - start_year
     if value < 0 or delta < value:
         raise ValidationError(
             _('%(value)s is not a valid promo (between 0 and %(end)s)'),
             params={'value': value, 'end': delta},
         )
+
 
 class User(AbstractBaseUser):
     """
@@ -148,13 +157,13 @@ class User(AbstractBaseUser):
     )
     groups = models.ManyToManyField(RealGroup, related_name='users', blank=True)
     home = models.OneToOneField('SithFile', related_name='home_of', verbose_name=_("home"), null=True, blank=True,
-            on_delete=models.SET_NULL)
+                                on_delete=models.SET_NULL)
     profile_pict = models.OneToOneField('SithFile', related_name='profile_of', verbose_name=_("profile"), null=True,
-            blank=True, on_delete=models.SET_NULL)
+                                        blank=True, on_delete=models.SET_NULL)
     avatar_pict = models.OneToOneField('SithFile', related_name='avatar_of', verbose_name=_("avatar"), null=True,
-            blank=True, on_delete=models.SET_NULL)
+                                       blank=True, on_delete=models.SET_NULL)
     scrub_pict = models.OneToOneField('SithFile', related_name='scrub_of', verbose_name=_("scrub"), null=True,
-            blank=True, on_delete=models.SET_NULL)
+                                      blank=True, on_delete=models.SET_NULL)
     sex = models.CharField(_("sex"), max_length=10, choices=[("MAN", _("Man")), ("WOMAN", _("Woman"))], default="MAN")
     tshirt_size = models.CharField(_("tshirt size"), max_length=5, choices=[
         ("-", _("-")),
@@ -165,7 +174,7 @@ class User(AbstractBaseUser):
         ("XL", _("XL")),
         ("XXL", _("XXL")),
         ("XXXL", _("XXXL")),
-        ], default="-")
+    ], default="-")
     role = models.CharField(_("role"), max_length=15, choices=[
         ("STUDENT", _("Student")),
         ("ADMINISTRATIVE", _("Administrative agent")),
@@ -174,9 +183,9 @@ class User(AbstractBaseUser):
         ("DOCTOR", _("Doctor")),
         ("FORMER STUDENT", _("Former student")),
         ("SERVICE", _("Service")),
-        ], blank=True, default="")
+    ], blank=True, default="")
     department = models.CharField(_("department"), max_length=15, choices=settings.SITH_PROFILE_DEPARTMENTS,
-            default="NA", blank=True)
+                                  default="NA", blank=True)
     dpt_option = models.CharField(_("dpt option"), max_length=32, blank=True, default="")
     semester = models.CharField(_("semester"), max_length=5, blank=True, default="")
     quote = models.CharField(_("quote"), max_length=256, blank=True, default="")
@@ -226,11 +235,12 @@ class User(AbstractBaseUser):
     _club_memberships = {}
     _group_names = {}
     _group_ids = {}
+
     def is_in_group(self, group_name):
         """If the user is in the group passed in argument (as string or by id)"""
         group_id = 0
         g = None
-        if isinstance(group_name, int): # Handle the case where group_name is an ID
+        if isinstance(group_name, int):  # Handle the case where group_name is an ID
             if group_name in User._group_ids.keys():
                 g = User._group_ids[group_name]
             else:
@@ -253,7 +263,7 @@ class User(AbstractBaseUser):
             return self.is_subscribed
         if group_id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
             return self.was_subscribed
-        if group_name == settings.SITH_MAIN_MEMBERS_GROUP: # We check the subscription if asked
+        if group_name == settings.SITH_MAIN_MEMBERS_GROUP:  # We check the subscription if asked
             return self.is_subscribed
         if group_name[-len(settings.SITH_BOARD_SUFFIX):] == settings.SITH_BOARD_SUFFIX:
             name = group_name[:-len(settings.SITH_BOARD_SUFFIX)]
@@ -315,7 +325,7 @@ class User(AbstractBaseUser):
             else:
                 create = True
             super(User, self).save(*args, **kwargs)
-            if create and settings.IS_OLD_MYSQL_PRESENT: # Create user on the old site: TODO remove me!
+            if create and settings.IS_OLD_MYSQL_PRESENT:  # Create user on the old site: TODO remove me!
                 import MySQLdb
                 try:
                     db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
@@ -324,9 +334,9 @@ class User(AbstractBaseUser):
                     (%s, %s, %s, %s, %s, %s)""", (self.id, self.last_name, self.first_name, self.email, "valid", "0"))
                     db.commit()
                 except Exception as e:
-                    with open(settings.BASE_DIR+"/user_fail.log", "a") as f:
+                    with open(settings.BASE_DIR + "/user_fail.log", "a") as f:
                         print("FAIL to add user %s (%s %s - %s) to old site" % (self.id, self.first_name, self.last_name,
-                            self.email), file=f)
+                                                                                self.email), file=f)
                         print("Reason: %s" % (repr(e)), file=f)
                     db.rollback()
 
@@ -401,13 +411,13 @@ class User(AbstractBaseUser):
         Returns the generated username
         """
         def remove_accents(data):
-            return ''.join(x for x in unicodedata.normalize('NFKD', data) if \
-            unicodedata.category(x)[0] == 'L').lower()
-        user_name = remove_accents(self.first_name[0]+self.last_name).encode('ascii', 'ignore').decode('utf-8')
+            return ''.join(x for x in unicodedata.normalize('NFKD', data) if
+                           unicodedata.category(x)[0] == 'L').lower()
+        user_name = remove_accents(self.first_name[0] + self.last_name).encode('ascii', 'ignore').decode('utf-8')
         un_set = [u.username for u in User.objects.all()]
         if user_name in un_set:
             i = 1
-            while user_name+str(i) in un_set:
+            while user_name + str(i) in un_set:
                 i += 1
             user_name += str(i)
         self.username = user_name
@@ -473,7 +483,7 @@ class User(AbstractBaseUser):
             self.profile_pict.get_download_url() if self.profile_pict else staticfiles_storage.url("core/img/unknown.jpg"),
             _("Profile"),
             escape(self.get_display_name()),
-            )
+        )
 
     @cached_property
     def subscribed(self):
@@ -488,6 +498,7 @@ class User(AbstractBaseUser):
             infos = ForumUserInfo(user=self)
             infos.save()
             return infos
+
 
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):
@@ -530,7 +541,7 @@ class AnonymousUser(AuthAnonymousUser):
         The anonymous user is only the public group
         """
         group_id = 0
-        if isinstance(group_name, int): # Handle the case where group_name is an ID
+        if isinstance(group_name, int):  # Handle the case where group_name is an ID
             g = Group.objects.filter(id=group_name).first()
             if g:
                 group_name = g.name
@@ -557,6 +568,7 @@ class AnonymousUser(AuthAnonymousUser):
     def get_display_name(self):
         return _("Visitor")
 
+
 class Preferences(models.Model):
     user = models.OneToOneField(User, related_name="preferences")
     receive_weekmail = models.BooleanField(
@@ -576,14 +588,18 @@ class Preferences(models.Model):
     def get_absolute_url(self):
         return self.user.get_absolute_url()
 
+
 def get_directory(instance, filename):
     return '.{0}/{1}'.format(instance.get_parent_path(), filename)
+
 
 def get_compressed_directory(instance, filename):
     return '.{0}/compressed/{1}'.format(instance.get_parent_path(), filename)
 
+
 def get_thumbnail_directory(instance, filename):
     return '.{0}/thumbnail/{1}'.format(instance.get_parent_path(), filename)
+
 
 class SithFile(models.Model):
     name = models.CharField(_('file name'), max_length=256, blank=False)
@@ -601,7 +617,7 @@ class SithFile(models.Model):
     is_moderated = models.BooleanField(_("is moderated"), default=False)
     moderator = models.ForeignKey(User, related_name="moderated_files", verbose_name=_("owner"), null=True, blank=True)
     asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
-    is_in_sas = models.BooleanField(_("is in the SAS"), default=False) # Allows to query this flag, updated at each call to save()
+    is_in_sas = models.BooleanField(_("is in the SAS"), default=False)  # Allows to query this flag, updated at each call to save()
 
     class Meta:
         verbose_name = _("file")
@@ -763,17 +779,21 @@ class SithFile(models.Model):
     def __str__(self):
         return self.get_parent_path() + "/" + self.name
 
+
 class LockError(Exception):
     """There was a lock error on the object"""
     pass
+
 
 class AlreadyLocked(LockError):
     """The object is already locked"""
     pass
 
+
 class NotLocked(LockError):
     """The object is not locked"""
     pass
+
 
 class Page(models.Model):
     """
@@ -787,14 +807,13 @@ class Page(models.Model):
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
     """
     name = models.CharField(_('page unix name'), max_length=30,
-            validators=[
-                validators.RegexValidator(
-                    r'^[A-z.+-]+$',
-                    _('Enter a valid page name. This value may contain only '
-                      'unaccented letters, numbers ' 'and ./+/-/_ characters.')
-                ),
-            ],
-            blank=False)
+                            validators=[
+                            validators.RegexValidator(
+                                r'^[A-z.+-]+$',
+                                _('Enter a valid page name. This value may contain only '
+                                  'unaccented letters, numbers ' 'and ./+/-/_ characters.')
+                            ), ],
+                            blank=False)
     parent = models.ForeignKey('self', related_name="children", verbose_name=_("parent"), null=True, blank=True, on_delete=models.SET_NULL)
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
@@ -854,12 +873,13 @@ class Page(models.Model):
         Performs some needed actions before and after saving a page in database
         """
         locked = kwargs.pop('force_lock', False)
-        if not locked: locked = self.is_locked()
+        if not locked:
+            locked = self.is_locked()
         if not locked:
             raise NotLocked("The page is not locked and thus can not be saved")
         self.full_clean()
         if not self.id:
-            super(Page, self).save(*args, **kwargs) # Save a first time to correctly set _full_name
+            super(Page, self).save(*args, **kwargs)  # Save a first time to correctly set _full_name
         # This reset the _full_name just before saving to maintain a coherent field quicker for queries than the
         # recursive method
         # It also update all the children to maintain correct names
@@ -973,7 +993,7 @@ class PageRev(models.Model):
     page = models.ForeignKey(Page, related_name='revisions')
 
     class Meta:
-        ordering = ['date',]
+        ordering = ['date', ]
 
     def get_absolute_url(self):
         """
@@ -1003,6 +1023,7 @@ class PageRev(models.Model):
         # Don't forget to unlock, otherwise, people will have to wait for the page's timeout
         self.page.unset_lock()
 
+
 class Notification(models.Model):
     user = models.ForeignKey(User, related_name='notifications')
     url = models.CharField(_("url"), max_length=255)
@@ -1015,4 +1036,3 @@ class Notification(models.Model):
         if self.param:
             return self.get_type_display() % self.param
         return self.get_type_display()
-

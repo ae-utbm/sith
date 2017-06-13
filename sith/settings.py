@@ -114,14 +114,14 @@ TEMPLATES = [
             "app_dirname": "templates",
             "newstyle_gettext": True,
             "context_processors": [
-                    "django.contrib.auth.context_processors.auth",
-                    "django.template.context_processors.debug",
-                    "django.template.context_processors.i18n",
-                    "django.template.context_processors.media",
-                    "django.template.context_processors.static",
-                    "django.template.context_processors.tz",
-                    "django.contrib.messages.context_processors.messages",
-                ],
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+            ],
             "extensions": [
                 "jinja2.ext.do",
                 "jinja2.ext.loopcontrols",
@@ -176,11 +176,11 @@ TEMPLATES = [
 ]
 
 HAYSTACK_CONNECTIONS = {
-        'default': {
-            'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-            'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
-            },
-        }
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
+    },
+}
 
 HAYSTACK_SIGNAL_PROCESSOR = 'core.search_indexes.UserOnlySignalProcessor'
 
@@ -206,9 +206,9 @@ DATABASES = {
 LANGUAGE_CODE = 'fr-FR'
 
 LANGUAGES = [
-        ('en', _('English')),
-        ('fr', _('French')),
-        ]
+    ('en', _('English')),
+    ('fr', _('French')),
+]
 
 TIME_ZONE = 'Europe/Paris'
 
@@ -247,55 +247,55 @@ AUTH_ANONYMOUS_MODEL = 'core.models.AnonymousUser'
 LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
 LOGIN_REDIRECT_URL = '/'
-DEFAULT_FROM_EMAIL="bibou@git.an"
-SITH_COM_EMAIL="bibou_com@git.an"
+DEFAULT_FROM_EMAIL = "bibou@git.an"
+SITH_COM_EMAIL = "bibou_com@git.an"
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_HOST="localhost"
-EMAIL_PORT=25
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 25
 
 # Below this line, only Sith-specific variables are defined
 
 IS_OLD_MYSQL_PRESENT = False
 OLD_MYSQL_INFOS = {
-        'host': 'ae-db',
-        'user': "my_user",
-        'passwd': "password",
-        'db': "ae2-db",
-        'charset': 'utf8',
-        'use_unicode': True,
-        }
+    'host': 'ae-db',
+    'user': "my_user",
+    'passwd': "password",
+    'db': "ae2-db",
+    'charset': 'utf8',
+    'use_unicode': True,
+}
 
 
 SITH_URL = "my.url.git.an"
 SITH_NAME = "Sith website"
 
 # AE configuration
-SITH_MAIN_CLUB_ID = 1 # TODO: keep only that first setting, with the ID, and do the same for the other clubs
+SITH_MAIN_CLUB_ID = 1  # TODO: keep only that first setting, with the ID, and do the same for the other clubs
 SITH_MAIN_CLUB = {
-        'name': "AE",
-        'unix_name': "ae",
-        'address': "6 Boulevard Anatole France, 90000 Belfort"
-        }
+    'name': "AE",
+    'unix_name': "ae",
+    'address': "6 Boulevard Anatole France, 90000 Belfort"
+}
 
 # Bar managers
 SITH_BAR_MANAGER = {
-        'name': "BdF",
-        'unix_name': "bdf",
-        'address': "6 Boulevard Anatole France, 90000 Belfort"
-        }
+    'name': "BdF",
+    'unix_name': "bdf",
+    'address': "6 Boulevard Anatole France, 90000 Belfort"
+}
 
 # Launderette managers
 SITH_LAUNDERETTE_MANAGER = {
-        'name': "Laverie",
-        'unix_name': "laverie",
-        'address': "6 Boulevard Anatole France, 90000 Belfort"
-        }
+    'name': "Laverie",
+    'unix_name': "laverie",
+    'address': "6 Boulevard Anatole France, 90000 Belfort"
+}
 
 # Define the date in the year serving as reference for the subscriptions calendar
 # (month, day)
-SITH_START_DATE = (8, 15) # 15th August
+SITH_START_DATE = (8, 15)  # 15th August
 
 # Used to determine the valid promos
 SITH_SCHOOL_START_YEAR = 1999
@@ -328,74 +328,74 @@ SITH_FORUM_PAGE_LENGTH = 30
 # SAS variables
 SITH_SAS_ROOT_DIR_ID = 4
 
-SITH_BOARD_SUFFIX="-bureau"
-SITH_MEMBER_SUFFIX="-membres"
+SITH_BOARD_SUFFIX = "-bureau"
+SITH_MEMBER_SUFFIX = "-membres"
 
-SITH_MAIN_BOARD_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_BOARD_SUFFIX
-SITH_MAIN_MEMBERS_GROUP=SITH_MAIN_CLUB['unix_name']+SITH_MEMBER_SUFFIX
+SITH_MAIN_BOARD_GROUP = SITH_MAIN_CLUB['unix_name'] + SITH_BOARD_SUFFIX
+SITH_MAIN_MEMBERS_GROUP = SITH_MAIN_CLUB['unix_name'] + SITH_MEMBER_SUFFIX
 
 SITH_PROFILE_DEPARTMENTS = [
-        ("TC", _("TC")),
-        ("IMSI", _("IMSI")),
-        ("IMAP", _("IMAP")),
-        ("INFO", _("INFO")),
-        ("GI", _("GI")),
-        ("E", _("E")),
-        ("EE", _("EE")),
-        ("GESC", _("GESC")),
-        ("GMC", _("GMC")),
-        ("MC", _("MC")),
-        ("EDIM", _("EDIM")),
-        ("HUMA", _("Humanities")),
-        ("NA", _("N/A")),
-        ]
+    ("TC", _("TC")),
+    ("IMSI", _("IMSI")),
+    ("IMAP", _("IMAP")),
+    ("INFO", _("INFO")),
+    ("GI", _("GI")),
+    ("E", _("E")),
+    ("EE", _("EE")),
+    ("GESC", _("GESC")),
+    ("GMC", _("GMC")),
+    ("MC", _("MC")),
+    ("EDIM", _("EDIM")),
+    ("HUMA", _("Humanities")),
+    ("NA", _("N/A")),
+]
 
 SITH_ACCOUNTING_PAYMENT_METHOD = [
-        ('CHECK', _('Check')),
-        ('CASH', _('Cash')),
-        ('TRANSFERT', _('Transfert')),
-        ('CARD', _('Credit card')),
-        ]
+    ('CHECK', _('Check')),
+    ('CASH', _('Cash')),
+    ('TRANSFERT', _('Transfert')),
+    ('CARD', _('Credit card')),
+]
 
 SITH_SUBSCRIPTION_PAYMENT_METHOD = [
-        ('CHECK', _('Check')),
-        ('CARD', _('Credit card')),
-        ('CASH', _('Cash')),
-        ('EBOUTIC', _('Eboutic')),
-        ('OTHER', _('Other')),
-        ]
+    ('CHECK', _('Check')),
+    ('CARD', _('Credit card')),
+    ('CASH', _('Cash')),
+    ('EBOUTIC', _('Eboutic')),
+    ('OTHER', _('Other')),
+]
 
 SITH_SUBSCRIPTION_LOCATIONS = [
-        ('BELFORT', _('Belfort')),
-        ('SEVENANS', _('Sevenans')),
-        ('MONTBELIARD', _('Montbéliard')),
-        ('EBOUTIC', _('Eboutic')),
-        ]
+    ('BELFORT', _('Belfort')),
+    ('SEVENANS', _('Sevenans')),
+    ('MONTBELIARD', _('Montbéliard')),
+    ('EBOUTIC', _('Eboutic')),
+]
 
 SITH_COUNTER_BARS = [
-        (1, "MDE"),
-        (2, "Foyer"),
-        (35, "La Gommette"),
-        ]
+    (1, "MDE"),
+    (2, "Foyer"),
+    (35, "La Gommette"),
+]
 
 SITH_COUNTER_PAYMENT_METHOD = [
-        ('CHECK', _('Check')),
-        ('CASH', _('Cash')),
-        ('CARD', _('Credit card')),
-        ]
+    ('CHECK', _('Check')),
+    ('CASH', _('Cash')),
+    ('CARD', _('Credit card')),
+]
 
 SITH_COUNTER_BANK = [
-        ('OTHER', 'Autre'),
-        ('SOCIETE-GENERALE', 'Société générale'),
-        ('BANQUE-POPULAIRE', 'Banque populaire'),
-        ('BNP', 'BNP'),
-        ('CAISSE-EPARGNE', 'Caisse d\'épargne'),
-        ('CIC', 'CIC'),
-        ('CREDIT-AGRICOLE', 'Crédit Agricole'),
-        ('CREDIT-MUTUEL', 'Credit Mutuel'),
-        ('CREDIT-LYONNAIS', 'Credit Lyonnais'),
-        ('LA-POSTE', 'La Poste'),
-        ]
+    ('OTHER', 'Autre'),
+    ('SOCIETE-GENERALE', 'Société générale'),
+    ('BANQUE-POPULAIRE', 'Banque populaire'),
+    ('BNP', 'BNP'),
+    ('CAISSE-EPARGNE', 'Caisse d\'épargne'),
+    ('CIC', 'CIC'),
+    ('CREDIT-AGRICOLE', 'Crédit Agricole'),
+    ('CREDIT-MUTUEL', 'Credit Mutuel'),
+    ('CREDIT-LYONNAIS', 'Credit Lyonnais'),
+    ('LA-POSTE', 'La Poste'),
+]
 
 # Defines pagination for cash summary
 SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
@@ -466,7 +466,7 @@ SITH_SUBSCRIPTIONS = {
         'price': 15,
         'duration': 2,
     },
-# To be completed....
+    # To be completed....
 }
 
 SITH_CLUB_ROLES = {}
@@ -497,16 +497,16 @@ SITH_CLUB_ROLES = {
 
 # This corresponds to the maximum role a user can freely subscribe to
 # In this case, SITH_MAXIMUM_FREE_ROLE=1 means that a user can set himself as "Membre actif" or "Curieux", but not higher
-SITH_MAXIMUM_FREE_ROLE=1
+SITH_MAXIMUM_FREE_ROLE = 1
 
 # Minutes to timeout the logged barmen
-SITH_BARMAN_TIMEOUT=20
+SITH_BARMAN_TIMEOUT = 20
 
 # Minutes to delete the last operations
-SITH_LAST_OPERATIONS_LIMIT=10
+SITH_LAST_OPERATIONS_LIMIT = 10
 
 # Minutes for a counter to be inactive
-SITH_COUNTER_MINUTE_INACTIVE=10
+SITH_COUNTER_MINUTE_INACTIVE = 10
 
 # ET variables
 SITH_EBOUTIC_ET_URL = "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
@@ -521,27 +521,27 @@ with open('./sith/et_keys/pubkey.pem') as f:
 # Launderette variables
 SITH_LAUNDERETTE_MACHINE_TYPES = [('WASHING', _('Washing')), ('DRYING', _('Drying'))]
 SITH_LAUNDERETTE_PRICES = {
-        'WASHING': 1.0,
-        'DRYING': 0.75,
-        }
+    'WASHING': 1.0,
+    'DRYING': 0.75,
+}
 
 SITH_NOTIFICATIONS = [
-        ('NEWS_MODERATION', _("A fresh new to be moderated")),
-        ('FILE_MODERATION', _("New files to be moderated")),
-        ('SAS_MODERATION', _("New pictures/album to be moderated in the SAS")),
-        ('NEW_PICTURES', _("You've been identified on some pictures")),
-        ('REFILLING', _("You just refilled of %s €")),
-        ('SELLING', _("You just bought %s")),
-        ('GENERIC', _("You have a notification")),
-        ]
+    ('NEWS_MODERATION', _("A fresh new to be moderated")),
+    ('FILE_MODERATION', _("New files to be moderated")),
+    ('SAS_MODERATION', _("New pictures/album to be moderated in the SAS")),
+    ('NEW_PICTURES', _("You've been identified on some pictures")),
+    ('REFILLING', _("You just refilled of %s €")),
+    ('SELLING', _("You just bought %s")),
+    ('GENERIC', _("You have a notification")),
+]
 
 SITH_QUICK_NOTIF = {
-        'qn_success': _("Success!"),
-        'qn_fail': _("Fail!"),
-        'qn_weekmail_new_article': _("You successfully posted an article in the Weekmail"),
-        'qn_weekmail_article_edit': _("You successfully edited an article in the Weekmail"),
-        'qn_weekmail_send_success': _("You successfully sent the Weekmail"),
-        }
+    'qn_success': _("Success!"),
+    'qn_fail': _("Fail!"),
+    'qn_weekmail_new_article': _("You successfully posted an article in the Weekmail"),
+    'qn_weekmail_article_edit': _("You successfully edited an article in the Weekmail"),
+    'qn_weekmail_send_success': _("You successfully sent the Weekmail"),
+}
 
 try:
     from .settings_custom import *

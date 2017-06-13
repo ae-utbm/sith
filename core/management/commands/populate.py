@@ -26,7 +26,7 @@ import os
 from datetime import date, datetime
 from io import StringIO, BytesIO
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.conf import settings
 from django.db import connection
@@ -42,7 +42,7 @@ from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter
 from com.models import Sith, Weekmail
 from election.models import Election, Role, Candidature, ElectionList
-from forum.models import Forum, ForumMessage, ForumTopic
+from forum.models import Forum, ForumTopic
 
 
 class Command(BaseCommand):
@@ -75,9 +75,9 @@ class Command(BaseCommand):
         Group(name="Forum admin").save()
         self.reset_index("core", "auth")
         root = User(id=0, username='root', last_name="", first_name="Bibou",
-                 email="ae.info@utbm.fr",
-                 date_of_birth="1942-06-12",
-                 is_superuser=True, is_staff=True)
+                    email="ae.info@utbm.fr",
+                    date_of_birth="1942-06-12",
+                    is_superuser=True, is_staff=True)
         root.set_password("plop")
         root.save()
         profiles_root = SithFile(parent=None, name="profiles", is_folder=True, owner=root)
@@ -88,18 +88,18 @@ class Command(BaseCommand):
         club_root.save()
         SithFile(parent=None, name="SAS", is_folder=True, owner=root).save()
         main_club = Club(id=1, name=settings.SITH_MAIN_CLUB['name'], unix_name=settings.SITH_MAIN_CLUB['unix_name'],
-                address=settings.SITH_MAIN_CLUB['address'])
+                         address=settings.SITH_MAIN_CLUB['address'])
         main_club.save()
         bar_club = Club(id=2, name=settings.SITH_BAR_MANAGER['name'], unix_name=settings.SITH_BAR_MANAGER['unix_name'],
-                address=settings.SITH_BAR_MANAGER['address'])
+                        address=settings.SITH_BAR_MANAGER['address'])
         bar_club.save()
         launderette_club = Club(id=84, name=settings.SITH_LAUNDERETTE_MANAGER['name'],
-                unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name'],
-                address=settings.SITH_LAUNDERETTE_MANAGER['address'])
+                                unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name'],
+                                address=settings.SITH_LAUNDERETTE_MANAGER['address'])
         launderette_club.save()
         self.reset_index("club")
         for b in settings.SITH_COUNTER_BARS:
-            g = Group(name=b[1]+" admin")
+            g = Group(name=b[1] + " admin")
             g.save()
             c = Counter(id=b[0], name=b[1], club=bar_club, type='BAR')
             c.save()
@@ -120,7 +120,7 @@ class Command(BaseCommand):
         p = Page(name='Index')
         p.set_lock(root)
         p.save()
-        p.view_groups=[settings.SITH_GROUP_PUBLIC_ID]
+        p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
         p.set_lock(root)
         p.save()
         PageRev(page=p, title="Wiki index", author=root, content="""
@@ -130,7 +130,7 @@ Welcome to the wiki page!
         p = Page(name="services")
         p.set_lock(root)
         p.save()
-        p.view_groups=[settings.SITH_GROUP_PUBLIC_ID]
+        p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
         p.set_lock(root)
         PageRev(page=p, title="Services", author=root, content="""
 |   |   |   |
@@ -150,18 +150,18 @@ Welcome to the wiki page!
         if not options['prod']:
             # Adding user Skia
             skia = User(username='skia', last_name="Kia", first_name="S'",
-                     email="skia@git.an",
-                     date_of_birth="1942-06-12")
+                        email="skia@git.an",
+                        date_of_birth="1942-06-12")
             skia.set_password("plop")
             skia.save()
-            skia.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            skia.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             skia.save()
             skia_profile_path = os.path.join(root_path, 'core/fixtures/images/3.jpg')
             with open(skia_profile_path, 'rb') as f:
                 name = str(skia.id) + "_profile.jpg"
                 skia_profile = SithFile(parent=profiles_root, name=name,
-                    file=resize_image(Image.open(BytesIO(f.read())), 400, 'JPEG'),
-                    owner=skia, is_folder=False, mime_type='image/jpeg', size=os.path.getsize(skia_profile_path))
+                                        file=resize_image(Image.open(BytesIO(f.read())), 400, 'JPEG'),
+                                        owner=skia, is_folder=False, mime_type='image/jpeg', size=os.path.getsize(skia_profile_path))
                 skia_profile.file.name = name
                 skia_profile.save()
                 skia.profile_pict = skia_profile
@@ -169,50 +169,50 @@ Welcome to the wiki page!
 
             # Adding user public
             public = User(username='public', last_name="Not subscribed", first_name="Public",
-                     email="public@git.an",
-                     date_of_birth="1942-06-12",
-                     is_superuser=False, is_staff=False)
+                          email="public@git.an",
+                          date_of_birth="1942-06-12",
+                          is_superuser=False, is_staff=False)
             public.set_password("plop")
             public.save()
-            public.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            public.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             public.save()
             # Adding user Subscriber
             subscriber = User(username='subscriber', last_name="User", first_name="Subscribed",
-                     email="Subscribed@git.an",
-                     date_of_birth="1942-06-12",
-                     is_superuser=False, is_staff=False)
+                              email="Subscribed@git.an",
+                              date_of_birth="1942-06-12",
+                              is_superuser=False, is_staff=False)
             subscriber.set_password("plop")
             subscriber.save()
-            subscriber.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            subscriber.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             subscriber.save()
             # Adding user old Subscriber
             old_subscriber = User(username='old_subscriber', last_name="Subscriber", first_name="Old",
-                     email="old_subscriber@git.an",
-                     date_of_birth="1942-06-12",
-                     is_superuser=False, is_staff=False)
+                                  email="old_subscriber@git.an",
+                                  date_of_birth="1942-06-12",
+                                  is_superuser=False, is_staff=False)
             old_subscriber.set_password("plop")
             old_subscriber.save()
-            old_subscriber.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            old_subscriber.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             old_subscriber.save()
             # Adding user Counter admin
             counter = User(username='counter', last_name="Ter", first_name="Coun",
-                     email="counter@git.an",
-                     date_of_birth="1942-06-12",
-                     is_superuser=False, is_staff=False)
+                           email="counter@git.an",
+                           date_of_birth="1942-06-12",
+                           is_superuser=False, is_staff=False)
             counter.set_password("plop")
             counter.save()
-            counter.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
-            counter.groups=[Group.objects.filter(id=settings.SITH_GROUP_COUNTER_ADMIN_ID).first().id]
+            counter.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            counter.groups = [Group.objects.filter(id=settings.SITH_GROUP_COUNTER_ADMIN_ID).first().id]
             counter.save()
             # Adding user Comptable
             comptable = User(username='comptable', last_name="Able", first_name="Compte",
-                     email="compta@git.an",
-                     date_of_birth="1942-06-12",
-                     is_superuser=False, is_staff=False)
+                             email="compta@git.an",
+                             date_of_birth="1942-06-12",
+                             is_superuser=False, is_staff=False)
             comptable.set_password("plop")
             comptable.save()
-            comptable.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
-            comptable.groups=[Group.objects.filter(id=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID).first().id]
+            comptable.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            comptable.groups = [Group.objects.filter(id=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID).first().id]
             comptable.save()
             # Adding user Guy
             u = User(username='guy', last_name="Carlier", first_name="Guy",
@@ -221,7 +221,7 @@ Welcome to the wiki page!
                      is_superuser=False, is_staff=False)
             u.set_password("plop")
             u.save()
-            u.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            u.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             u.save()
             # Adding user Richard Batsbak
             r = User(username='rbatsbak', last_name="Batsbak", first_name="Richard",
@@ -229,18 +229,18 @@ Welcome to the wiki page!
                      date_of_birth="1982-06-12")
             r.set_password("plop")
             r.save()
-            r.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            r.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             r.save()
             # Adding syntax help page
             p = Page(name='Aide_sur_la_syntaxe')
             p.save(force_lock=True)
-            with open(os.path.join(root_path)+'/doc/SYNTAX.md', 'r') as rm:
+            with open(os.path.join(root_path) + '/doc/SYNTAX.md', 'r') as rm:
                 PageRev(page=p, title="Aide sur la syntaxe", author=skia, content=rm.read()).save()
-            p.view_groups=[settings.SITH_GROUP_PUBLIC_ID]
+            p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
             p.save(force_lock=True)
             p = Page(name='Services')
             p.save(force_lock=True)
-            p.view_groups=[settings.SITH_GROUP_PUBLIC_ID]
+            p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
             p.save(force_lock=True)
             PageRev(page=p, title="Services", author=skia, content="""
 |   |   |   |
@@ -252,83 +252,83 @@ Welcome to the wiki page!
             # Adding README
             p = Page(name='README')
             p.save(force_lock=True)
-            p.view_groups=[settings.SITH_GROUP_PUBLIC_ID]
+            p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
             p.save(force_lock=True)
-            with open(os.path.join(root_path)+'/README.md', 'r') as rm:
+            with open(os.path.join(root_path) + '/README.md', 'r') as rm:
                 PageRev(page=p, title="README", author=skia, content=rm.read()).save()
 
             # Subscription
-            ## Root
+            # Root
             s = Subscription(member=User.objects.filter(pk=root.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+                             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
-                    start=s.subscription_start)
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                start=s.subscription_start)
             s.save()
-            ## Skia
+            # Skia
             s = Subscription(member=User.objects.filter(pk=skia.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+                             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
-                    start=s.subscription_start)
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                start=s.subscription_start)
             s.save()
-            ## Counter admin
+            # Counter admin
             s = Subscription(member=User.objects.filter(pk=counter.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+                             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
-                    start=s.subscription_start)
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                start=s.subscription_start)
             s.save()
-            ## Comptable
+            # Comptable
             s = Subscription(member=User.objects.filter(pk=comptable.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+                             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
-                    start=s.subscription_start)
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                start=s.subscription_start)
             s.save()
-            ## Richard
+            # Richard
             s = Subscription(member=User.objects.filter(pk=r.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+                             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
-                    start=s.subscription_start)
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                start=s.subscription_start)
             s.save()
-            ## User
+            # User
             s = Subscription(member=User.objects.filter(pk=subscriber.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+                             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
-                    start=s.subscription_start)
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                start=s.subscription_start)
             s.save()
-            ## Old subscriber
+            # Old subscriber
             s = Subscription(member=User.objects.filter(pk=old_subscriber.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+                             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start(datetime(year=2012, month=9, day=4))
             s.subscription_end = s.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
-                    start=s.subscription_start)
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                start=s.subscription_start)
             s.save()
 
             # Clubs
             Club(name="Bibo'UT", unix_name="bibout",
-                    address="46 de la Boustifaille", parent=main_club).save()
+                 address="46 de la Boustifaille", parent=main_club).save()
             guyut = Club(name="Guy'UT", unix_name="guyut",
-                    address="42 de la Boustifaille", parent=main_club)
+                         address="42 de la Boustifaille", parent=main_club)
             guyut.save()
             Club(name="Woenzel'UT", unix_name="woenzel",
-                    address="Woenzel", parent=guyut).save()
+                 address="Woenzel", parent=guyut).save()
             Membership(user=skia, club=main_club, role=3, description="").save()
             troll = Club(name="Troll Penché", unix_name="troll",
-                    address="Terre Du Milieu", parent=main_club)
+                         address="Terre Du Milieu", parent=main_club)
             troll.save()
             refound = Club(name="Carte AE", unix_name="carte_ae",
-                    address="Jamais imprimée", parent=main_club)
+                           address="Jamais imprimée", parent=main_club)
             refound.save()
 
             # Counters
@@ -341,19 +341,19 @@ Welcome to the wiki page!
             r = ProductType(name="Rechargements")
             r.save()
             cotis = Product(name="Cotis 1 semestre", code="1SCOTIZ", product_type=c, purchase_price="15", selling_price="15",
-                    special_selling_price="15", club=main_club)
+                            special_selling_price="15", club=main_club)
             cotis.save()
             cotis2 = Product(name="Cotis 2 semestres", code="2SCOTIZ", product_type=c, purchase_price="28", selling_price="28",
-                    special_selling_price="28", club=main_club)
+                             special_selling_price="28", club=main_club)
             cotis2.save()
             refill = Product(name="Rechargement 15 €", code="15REFILL", product_type=r, purchase_price="15", selling_price="15",
-                    special_selling_price="15", club=main_club)
+                             special_selling_price="15", club=main_club)
             refill.save()
             barb = Product(name="Barbar", code="BARB", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6", club=main_club)
+                           special_selling_price="1.6", club=main_club)
             barb.save()
             cble = Product(name="Chimay Bleue", code="CBLE", product_type=p, purchase_price="1.50", selling_price="1.7",
-                    special_selling_price="1.6", club=main_club)
+                           special_selling_price="1.6", club=main_club)
             cble.save()
             Product(name="Corsendonk", code="CORS", product_type=p, purchase_price="1.50", selling_price="1.7",
                     special_selling_price="1.6", club=main_club).save()
@@ -375,7 +375,7 @@ Welcome to the wiki page!
             refound_counter = Counter(name="Carte AE", club=refound, type='OFFICE')
             refound_counter.save()
             refound_product = Product(name="remboursement", code="REMBOURS", purchase_price="0", selling_price="0",
-                    special_selling_price="0", club=refound)
+                                      special_selling_price="0", club=refound)
             refound_product.save()
 
             # Accounting test values:
@@ -397,28 +397,28 @@ Welcome to the wiki page!
             buying.save()
             comptes = AccountingType(code='6', label="Comptes de charge", movement_type='DEBIT')
             comptes.save()
-            simple = SimplifiedAccountingType(label = 'Je fais du simple 6', accounting_type = comptes, movement_type='DEBIT')
+            simple = SimplifiedAccountingType(label='Je fais du simple 6', accounting_type=comptes, movement_type='DEBIT')
             simple.save()
             woenzco = Company(name="Woenzel & co")
             woenzco.save()
 
             operation_list = [
-                            (27, "J'avais trop de bière", 'CASH', None, buying, 'USER', skia.id, "", None),
-                            (4000, "Ceci n'est pas une opération... en fait si mais non", 'CHECK', None, debit,'COMPANY', woenzco.id, "", 23),
-                            (22, "C'est de l'argent ?", 'CARD', None, credit, 'CLUB', troll.id, "", None),
-                            (37, "Je paye CASH", 'CASH', None, debit2, 'OTHER', None, "tous les étudiants <3", None),
-                            (300, "Paiement Guy", 'CASH', None, buying, 'USER', skia.id, "", None),
-                            (32.3, "Essence", 'CASH', None, buying, 'OTHER', None, "station", None),
-                            (46.42, "Allumette", 'CHECK', None, credit, 'CLUB', main_club.id, "", 57),
-                            (666.42, "Subvention de far far away", 'CASH', None, comptes, 'CLUB', main_club.id, "", None),
-                            (496, "Ça, c'est un 6", 'CARD', simple, None, 'USER', skia.id, "", None),
-                            (17, "La Gargotte du Korrigan", 'CASH', None, debit2, 'CLUB', bar_club.id, "", None),
-                            ]
+                (27, "J'avais trop de bière", 'CASH', None, buying, 'USER', skia.id, "", None),
+                (4000, "Ceci n'est pas une opération... en fait si mais non", 'CHECK', None, debit, 'COMPANY', woenzco.id, "", 23),
+                (22, "C'est de l'argent ?", 'CARD', None, credit, 'CLUB', troll.id, "", None),
+                (37, "Je paye CASH", 'CASH', None, debit2, 'OTHER', None, "tous les étudiants <3", None),
+                (300, "Paiement Guy", 'CASH', None, buying, 'USER', skia.id, "", None),
+                (32.3, "Essence", 'CASH', None, buying, 'OTHER', None, "station", None),
+                (46.42, "Allumette", 'CHECK', None, credit, 'CLUB', main_club.id, "", 57),
+                (666.42, "Subvention de far far away", 'CASH', None, comptes, 'CLUB', main_club.id, "", None),
+                (496, "Ça, c'est un 6", 'CARD', simple, None, 'USER', skia.id, "", None),
+                (17, "La Gargotte du Korrigan", 'CASH', None, debit2, 'CLUB', bar_club.id, "", None),
+            ]
             for op in operation_list:
                 operation = Operation(journal=gj, date=date.today(), amount=op[0],
-                    remark=op[1], mode=op[2], done=True, simpleaccounting_type=op[3],
-                    accounting_type=op[4], target_type=op[5], target_id=op[6],
-                    target_label=op[7], cheque_number=op[8])
+                                      remark=op[1], mode=op[2], done=True, simpleaccounting_type=op[3],
+                                      accounting_type=op[4], target_type=op[5], target_id=op[6],
+                                      target_label=op[7], cheque_number=op[8])
                 operation.clean()
                 operation.save()
 
@@ -428,14 +428,14 @@ Welcome to the wiki page!
                        date_of_birth="1942-06-12")
             sli.set_password("plop")
             sli.save()
-            sli.view_groups=[Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
+            sli.view_groups = [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id]
             sli.save()
             sli_profile_path = os.path.join(root_path, 'core/fixtures/images/5.jpg')
             with open(sli_profile_path, 'rb') as f:
                 name = str(sli.id) + "_profile.jpg"
                 sli_profile = SithFile(parent=profiles_root, name=name,
-                    file=resize_image(Image.open(BytesIO(f.read())), 400, 'JPEG'),
-                    owner=sli, is_folder=False, mime_type='image/jpeg', size=os.path.getsize(sli_profile_path))
+                                       file=resize_image(Image.open(BytesIO(f.read())), 400, 'JPEG'),
+                                       owner=sli, is_folder=False, mime_type='image/jpeg', size=os.path.getsize(sli_profile_path))
                 sli_profile.file.name = name
                 sli_profile.save()
                 sli.profile_pict = sli_profile
@@ -450,27 +450,27 @@ Welcome to the wiki page!
             with open(krophil_profile_path, 'rb') as f:
                 name = str(krophil.id) + "_profile.jpg"
                 krophil_profile = SithFile(parent=profiles_root, name=name,
-                    file=resize_image(Image.open(BytesIO(f.read())), 400, 'JPEG'),
-                    owner=krophil, is_folder=False, mime_type='image/jpeg', size=os.path.getsize(krophil_profile_path))
+                                           file=resize_image(Image.open(BytesIO(f.read())), 400, 'JPEG'),
+                                           owner=krophil, is_folder=False, mime_type='image/jpeg', size=os.path.getsize(krophil_profile_path))
                 krophil_profile.file.name = name
                 krophil_profile.save()
                 krophil.profile_pict = krophil_profile
                 krophil.save()
-            ## Adding subscription for sli
+            # Adding subscription for sli
             s = Subscription(member=User.objects.filter(pk=sli.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+                             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
-                    start=s.subscription_start)
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                start=s.subscription_start)
             s.save()
-            ## Adding subscription for Krophil
+            # Adding subscription for Krophil
             s = Subscription(member=User.objects.filter(pk=krophil.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                    payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+                             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
-                    start=s.subscription_start)
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                start=s.subscription_start)
             s.save()
 
             # Add barman to counter
@@ -483,8 +483,8 @@ Welcome to the wiki page!
             subscriber_group = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)
             ae_board_group = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
             el = Election(title="Élection 2017", description="La roue tourne", start_candidature='1942-06-12 10:28:45+01',
-                    end_candidature='2042-06-12 10:28:45+01',start_date='1942-06-12 10:28:45+01',
-                    end_date='7942-06-12 10:28:45+01')
+                          end_candidature='2042-06-12 10:28:45+01', start_date='1942-06-12 10:28:45+01',
+                          end_date='7942-06-12 10:28:45+01')
             el.save()
             el.view_groups.add(public_group)
             el.edit_groups.add(ae_board_group)
@@ -519,4 +519,3 @@ Welcome to the wiki page!
             various.save()
             Forum(name="Promos", description="Réservé aux Promos", parent=various).save()
             ForumTopic(forum=hall)
-

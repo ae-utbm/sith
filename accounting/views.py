@@ -22,25 +22,21 @@
 #
 #
 
-from django.views.generic import ListView, DetailView, RedirectView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
-from django.shortcuts import render
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import modelform_factory
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.forms import HiddenInput, TextInput
+from django.forms import HiddenInput
 from django.db import transaction
 from django.db.models import Sum
 from django.conf import settings
 from django import forms
-from django.http import HttpResponseRedirect, HttpResponse
-from django.utils.translation import ugettext as _
-from django.conf import settings
-
+from django.http import HttpResponse
 import collections
 
-from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
+from ajax_select.fields import AutoCompleteSelectField
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin, TabedViewMixin
 from core.views.forms import SelectFile, SelectDate
@@ -49,6 +45,7 @@ from counter.models import Counter, Selling, Product
 
 # Main accounting view
 
+
 class BankAccountListView(CanViewMixin, ListView):
     """
     A list view for the admins
@@ -56,6 +53,7 @@ class BankAccountListView(CanViewMixin, ListView):
     model = BankAccount
     template_name = 'accounting/bank_account_list.jinja'
     ordering = ['name']
+
 
 # Simplified accounting types
 
@@ -66,6 +64,7 @@ class SimplifiedAccountingTypeListView(CanViewMixin, ListView):
     model = SimplifiedAccountingType
     template_name = 'accounting/simplifiedaccountingtype_list.jinja'
 
+
 class SimplifiedAccountingTypeEditView(CanViewMixin, UpdateView):
     """
     An edit view for the admins
@@ -75,6 +74,7 @@ class SimplifiedAccountingTypeEditView(CanViewMixin, UpdateView):
     fields = ['label', 'accounting_type']
     template_name = 'core/edit.jinja'
 
+
 class SimplifiedAccountingTypeCreateView(CanCreateMixin, CreateView):
     """
     Create an accounting type (for the admins)
@@ -82,6 +82,7 @@ class SimplifiedAccountingTypeCreateView(CanCreateMixin, CreateView):
     model = SimplifiedAccountingType
     fields = ['label', 'accounting_type']
     template_name = 'core/create.jinja'
+
 
 # Accounting types
 
@@ -92,6 +93,7 @@ class AccountingTypeListView(CanViewMixin, ListView):
     model = AccountingType
     template_name = 'accounting/accountingtype_list.jinja'
 
+
 class AccountingTypeEditView(CanViewMixin, UpdateView):
     """
     An edit view for the admins
@@ -101,6 +103,7 @@ class AccountingTypeEditView(CanViewMixin, UpdateView):
     fields = ['code', 'label', 'movement_type']
     template_name = 'core/edit.jinja'
 
+
 class AccountingTypeCreateView(CanCreateMixin, CreateView):
     """
     Create an accounting type (for the admins)
@@ -108,6 +111,7 @@ class AccountingTypeCreateView(CanCreateMixin, CreateView):
     model = AccountingType
     fields = ['code', 'label', 'movement_type']
     template_name = 'core/create.jinja'
+
 
 # BankAccount views
 
@@ -120,6 +124,7 @@ class BankAccountEditView(CanViewMixin, UpdateView):
     fields = ['name', 'iban', 'number', 'club']
     template_name = 'core/edit.jinja'
 
+
 class BankAccountDetailView(CanViewMixin, DetailView):
     """
     A detail view, listing every club account
@@ -127,6 +132,7 @@ class BankAccountDetailView(CanViewMixin, DetailView):
     model = BankAccount
     pk_url_kwarg = "b_account_id"
     template_name = 'accounting/bank_account_details.jinja'
+
 
 class BankAccountCreateView(CanCreateMixin, CreateView):
     """
@@ -136,7 +142,8 @@ class BankAccountCreateView(CanCreateMixin, CreateView):
     fields = ['name', 'club', 'iban', 'number']
     template_name = 'core/create.jinja'
 
-class BankAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete to Close
+
+class BankAccountDeleteView(CanEditPropMixin, DeleteView):  # TODO change Delete to Close
     """
     Delete a bank account (for the admins)
     """
@@ -144,6 +151,7 @@ class BankAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete 
     pk_url_kwarg = "b_account_id"
     template_name = 'core/delete_confirm.jinja'
     success_url = reverse_lazy('accounting:bank_list')
+
 
 # ClubAccount views
 
@@ -156,6 +164,7 @@ class ClubAccountEditView(CanViewMixin, UpdateView):
     fields = ['name', 'club', 'bank_account']
     template_name = 'core/edit.jinja'
 
+
 class ClubAccountDetailView(CanViewMixin, DetailView):
     """
     A detail view, listing every journal
@@ -163,6 +172,7 @@ class ClubAccountDetailView(CanViewMixin, DetailView):
     model = ClubAccount
     pk_url_kwarg = "c_account_id"
     template_name = 'accounting/club_account_details.jinja'
+
 
 class ClubAccountCreateView(CanCreateMixin, CreateView):
     """
@@ -180,7 +190,8 @@ class ClubAccountCreateView(CanCreateMixin, CreateView):
                 ret['bank_account'] = obj.id
         return ret
 
-class ClubAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete to Close
+
+class ClubAccountDeleteView(CanEditPropMixin, DeleteView):  # TODO change Delete to Close
     """
     Delete a club account (for the admins)
     """
@@ -188,6 +199,7 @@ class ClubAccountDeleteView(CanEditPropMixin, DeleteView): # TODO change Delete 
     pk_url_kwarg = "c_account_id"
     template_name = 'core/delete_confirm.jinja'
     success_url = reverse_lazy('accounting:bank_list')
+
 
 # Journal views
 
@@ -198,26 +210,27 @@ class JournalTabsMixin(TabedViewMixin):
     def get_list_of_tabs(self):
         tab_list = []
         tab_list.append({
-                    'url': reverse('accounting:journal_details', kwargs={'j_id': self.object.id}),
-                    'slug': 'journal',
+            'url': reverse('accounting:journal_details', kwargs={'j_id': self.object.id}),
+            'slug': 'journal',
                     'name': _("Journal"),
-                    })
+        })
         tab_list.append({
-                    'url': reverse('accounting:journal_nature_statement', kwargs={'j_id': self.object.id}),
-                    'slug': 'nature_statement',
+            'url': reverse('accounting:journal_nature_statement', kwargs={'j_id': self.object.id}),
+            'slug': 'nature_statement',
                     'name': _("Statement by nature"),
-                    })
+        })
         tab_list.append({
-                    'url': reverse('accounting:journal_person_statement', kwargs={'j_id': self.object.id}),
-                    'slug': 'person_statement',
+            'url': reverse('accounting:journal_person_statement', kwargs={'j_id': self.object.id}),
+            'slug': 'person_statement',
                     'name': _("Statement by person"),
-                    })
+        })
         tab_list.append({
-                    'url': reverse('accounting:journal_accounting_statement', kwargs={'j_id': self.object.id}),
-                    'slug': 'accounting_statement',
+            'url': reverse('accounting:journal_accounting_statement', kwargs={'j_id': self.object.id}),
+            'slug': 'accounting_statement',
                     'name': _("Accounting statement"),
-                    })
+        })
         return tab_list
+
 
 class JournalCreateView(CanCreateMixin, CreateView):
     """
@@ -225,7 +238,7 @@ class JournalCreateView(CanCreateMixin, CreateView):
     """
     model = GeneralJournal
     form_class = modelform_factory(GeneralJournal, fields=['name', 'start_date', 'club_account'],
-            widgets={ 'start_date': SelectDate, })
+                                   widgets={'start_date': SelectDate, })
     template_name = 'core/create.jinja'
 
     def get_initial(self):
@@ -236,6 +249,7 @@ class JournalCreateView(CanCreateMixin, CreateView):
                 ret['club_account'] = obj.id
         return ret
 
+
 class JournalDetailView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     A detail view, listing every operation
@@ -245,6 +259,7 @@ class JournalDetailView(JournalTabsMixin, CanViewMixin, DetailView):
     template_name = 'accounting/journal_details.jinja'
     current_tab = 'journal'
 
+
 class JournalEditView(CanEditMixin, UpdateView):
     """
     Update a general journal
@@ -253,6 +268,7 @@ class JournalEditView(CanEditMixin, UpdateView):
     pk_url_kwarg = "j_id"
     fields = ['name', 'start_date', 'end_date', 'club_account', 'closed']
     template_name = 'core/edit.jinja'
+
 
 class JournalDeleteView(CanEditPropMixin, DeleteView):
     """
@@ -264,11 +280,12 @@ class JournalDeleteView(CanEditPropMixin, DeleteView):
     success_url = reverse_lazy('accounting:club_details')
 
     def dispatch(self, request, *args, **kwargs):
-       self.object = self.get_object()
-       if self.object.operations.count() == 0:
-          return super(JournalDeleteView, self).dispatch(request, *args, **kwargs)
-       else:
-          raise PermissionDenied
+        self.object = self.get_object()
+        if self.object.operations.count() == 0:
+            return super(JournalDeleteView, self).dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+
 
 # Operation views
 
@@ -276,13 +293,13 @@ class OperationForm(forms.ModelForm):
     class Meta:
         model = Operation
         fields = ['amount', 'remark', 'journal', 'target_type', 'target_id', 'target_label', 'date', 'mode',
-            'cheque_number', 'invoice', 'simpleaccounting_type', 'accounting_type', 'label', 'done' ]
+                  'cheque_number', 'invoice', 'simpleaccounting_type', 'accounting_type', 'label', 'done']
         widgets = {
-                'journal': HiddenInput,
-                'target_id': HiddenInput,
-                'date': SelectDate,
-                'invoice': SelectFile,
-                }
+            'journal': HiddenInput,
+            'target_id': HiddenInput,
+            'date': SelectDate,
+            'invoice': SelectFile,
+        }
     user = AutoCompleteSelectField('users', help_text=None, required=False)
     club_account = AutoCompleteSelectField('club_accounts', help_text=None, required=False)
     club = AutoCompleteSelectField('clubs', help_text=None, required=False)
@@ -328,27 +345,28 @@ class OperationForm(forms.ModelForm):
             inst = self.instance
             club_account = inst.target
             acc_type = AccountingType.objects.exclude(movement_type="NEUTRAL").exclude(
-                    movement_type=inst.accounting_type.movement_type).order_by('code').first() # Select a random opposite accounting type
+                movement_type=inst.accounting_type.movement_type).order_by('code').first()  # Select a random opposite accounting type
             op = Operation(
-                    journal=club_account.get_open_journal(),
-                    amount=inst.amount,
-                    date=inst.date,
-                    remark=inst.remark,
-                    mode=inst.mode,
-                    cheque_number=inst.cheque_number,
-                    invoice=inst.invoice,
-                    done=False, # Has to be checked by hand
-                    simpleaccounting_type=None,
-                    accounting_type=acc_type,
-                    target_type="ACCOUNT",
-                    target_id=inst.journal.club_account.id,
-                    target_label="",
-                    linked_operation=inst,
-                    )
+                journal=club_account.get_open_journal(),
+                amount=inst.amount,
+                date=inst.date,
+                remark=inst.remark,
+                mode=inst.mode,
+                cheque_number=inst.cheque_number,
+                invoice=inst.invoice,
+                done=False,  # Has to be checked by hand
+                simpleaccounting_type=None,
+                accounting_type=acc_type,
+                target_type="ACCOUNT",
+                target_id=inst.journal.club_account.id,
+                target_label="",
+                linked_operation=inst,
+            )
             op.save()
             self.instance.linked_operation = op
             self.save()
         return ret
+
 
 class OperationCreateView(CanCreateMixin, CreateView):
     """
@@ -376,6 +394,7 @@ class OperationCreateView(CanCreateMixin, CreateView):
             kwargs['object'] = self.journal
         return kwargs
 
+
 class OperationEditView(CanEditMixin, UpdateView):
     """
     An edit view, working as detail for the moment
@@ -391,6 +410,7 @@ class OperationEditView(CanEditMixin, UpdateView):
         kwargs['object'] = self.object.journal
         return kwargs
 
+
 class OperationPDFView(CanViewMixin, DetailView):
     """
     Display the PDF of a given operation
@@ -402,11 +422,10 @@ class OperationPDFView(CanViewMixin, DetailView):
     def get(self, request, *args, **kwargs):
         from reportlab.pdfgen import canvas
         from reportlab.lib.units import cm
-        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+        from reportlab.platypus import Table, TableStyle
         from reportlab.lib import colors
         from reportlab.lib.pagesizes import letter
         from reportlab.lib.utils import ImageReader
-        from reportlab.graphics.shapes import Drawing
         from reportlab.pdfbase.ttfonts import TTFont
         from reportlab.pdfbase import pdfmetrics
 
@@ -419,7 +438,6 @@ class OperationPDFView(CanViewMixin, DetailView):
         num = self.object.number
         date = self.object.date
         mode = self.object.mode
-        cheque_number = self.object.cheque_number
         club_name = self.object.journal.club_account.name
         ti = self.object.journal.name
         op_label = self.object.label
@@ -432,7 +450,7 @@ class OperationPDFView(CanViewMixin, DetailView):
             target = self.object.target.get_display_name()
 
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'filename="op-%d(%s_on_%s).pdf"'  %(num, ti, club_name)
+        response['Content-Disposition'] = 'filename="op-%d(%s_on_%s).pdf"' % (num, ti, club_name)
         p = canvas.Canvas(response)
 
         p.setFont('DejaVu', 12)
@@ -441,21 +459,21 @@ class OperationPDFView(CanViewMixin, DetailView):
         width, height = letter
         im = ImageReader("core/static/core/img/logo.jpg")
         iw, ih = im.getSize()
-        p.drawImage(im, 40, height - 50, width=iw/2, height=ih/2)
+        p.drawImage(im, 40, height - 50, width=iw / 2, height=ih / 2)
 
         labelStr = [["%s %s - %s %s" % (_("Journal"), ti, _("Operation"), num)]]
 
         label = Table(labelStr, colWidths=[150], rowHeights=[20])
 
         label.setStyle(TableStyle([
-                                ('ALIGN',(0,0),(-1,-1),'RIGHT'),
-                                ]))
+            ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ]))
         w, h = label.wrapOn(label, 0, 0)
-        label.drawOn(p, width-180, height)
+        label.drawOn(p, width - 180, height)
 
-        p.drawString(90, height - 100, _("Financial proof: ") + "OP%010d" % (id_op)) #Justificatif du libellé
+        p.drawString(90, height - 100, _("Financial proof: ") + "OP%010d" % (id_op))  # Justificatif du libellé
         p.drawString(90, height - 130, _("Club: %(club_name)s") % ({"club_name": club_name}))
-        p.drawString(90, height - 160, _("Label: %(op_label)s") % {"op_label": op_label if op_label != None else ""})
+        p.drawString(90, height - 160, _("Label: %(op_label)s") % {"op_label": op_label if op_label is not None else ""})
         p.drawString(90, height - 190, _("Date: %(date)s") % {"date": date})
 
         data = []
@@ -470,7 +488,7 @@ class OperationPDFView(CanViewMixin, DetailView):
                 payment_mode += "[\u00D7]"
             else:
                 payment_mode += "[  ]"
-            payment_mode += " %s\n" %(m[1])
+            payment_mode += " %s\n" % (m[1])
 
         data += [[payment_mode]]
 
@@ -478,29 +496,29 @@ class OperationPDFView(CanViewMixin, DetailView):
 
         data += [["%s \n%s" % (_("Comment:"), remark)]]
 
-        t = Table(data, colWidths=[(width-90*2)/2]*2, rowHeights=[20, 20, 70, 20, 80])
+        t = Table(data, colWidths=[(width - 90 * 2) / 2] * 2, rowHeights=[20, 20, 70, 20, 80])
         t.setStyle(TableStyle([
-                        ('ALIGN',(0,0),(-1,-1),'CENTER'),
-                        ('VALIGN',(-2,-1),(-1,-1),'TOP'),
-                        ('VALIGN',(0,0),(-1,-2),'MIDDLE'),
-                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('SPAN', (0, 0), (1, 0)), # line DEBIT/CREDIT
-                        ('SPAN', (0, 1), (1, 1)), # line amount
-                        ('SPAN',(-2, -1), (-1,-1)), # line comment
-                        ('SPAN', (0, -2), (-1, -2)), # line creditor/debtor
-                        ('SPAN', (0, 2), (1, 2)), # line payment_mode
-                        ('ALIGN',(0, 2), (1, 2),'LEFT'), # line payment_mode
-                        ('ALIGN', (-2, -1), (-1, -1), 'LEFT'),
-                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-                        ]))
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (-2, -1), (-1, -1), 'TOP'),
+            ('VALIGN', (0, 0), (-1, -2), 'MIDDLE'),
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('SPAN', (0, 0), (1, 0)),  # line DEBIT/CREDIT
+            ('SPAN', (0, 1), (1, 1)),  # line amount
+            ('SPAN', (-2, -1), (-1, -1)),  # line comment
+            ('SPAN', (0, -2), (-1, -2)),  # line creditor/debtor
+            ('SPAN', (0, 2), (1, 2)),  # line payment_mode
+            ('ALIGN', (0, 2), (1, 2), 'LEFT'),  # line payment_mode
+            ('ALIGN', (-2, -1), (-1, -1), 'LEFT'),
+            ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ]))
 
         signature = []
         signature += [[_("Signature:")]]
 
-        tSig = Table(signature, colWidths=[(width-90*2)], rowHeights=[80])
+        tSig = Table(signature, colWidths=[(width - 90 * 2)], rowHeights=[80])
         tSig.setStyle(TableStyle([
-            ('VALIGN',(0,0),(-1,-1),'TOP'),
-            ('BOX', (0,0), (-1,-1), 0.25, colors.black)]))
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('BOX', (0, 0), (-1, -1), 0.25, colors.black)]))
 
         w, h = tSig.wrapOn(p, 0, 0)
         tSig.drawOn(p, 90, 200)
@@ -516,14 +534,15 @@ class OperationPDFView(CanViewMixin, DetailView):
         p.save()
         return response
 
+
 class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     Display a statement sorted by labels
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
-    template_name='accounting/journal_statement_nature.jinja'
-    current_tab='nature_statement'
+    template_name = 'accounting/journal_statement_nature.jinja'
+    current_tab = 'nature_statement'
 
     def statement(self, queryset, movement_type):
         ret = collections.OrderedDict()
@@ -531,14 +550,16 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         total_sum = 0
         for sat in [None] + list(SimplifiedAccountingType.objects.order_by('label').all()):
             sum = queryset.filter(accounting_type__movement_type=movement_type,
-                simpleaccounting_type=sat).aggregate(amount_sum=Sum('amount'))['amount_sum']
-            if sat: sat = sat.label
-            else: sat = ""
+                                  simpleaccounting_type=sat).aggregate(amount_sum=Sum('amount'))['amount_sum']
+            if sat:
+                sat = sat.label
+            else:
+                sat = ""
             if sum:
                 total_sum += sum
                 statement[sat] = sum
         ret[movement_type] = statement
-        ret[movement_type+"_sum"] = total_sum
+        ret[movement_type + "_sum"] = total_sum
         return ret
 
     def big_statement(self):
@@ -566,23 +587,24 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         kwargs['statement'] = self.big_statement()
         return kwargs
 
+
 class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     Calculate a dictionary with operation target and sum of operations
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
-    template_name='accounting/journal_statement_person.jinja'
-    current_tab='person_statement'
+    template_name = 'accounting/journal_statement_person.jinja'
+    current_tab = 'person_statement'
 
     def sum_by_target(self, target_id, target_type, movement_type):
         return self.object.operations.filter(accounting_type__movement_type=movement_type,
-                target_id=target_id, target_type=target_type).aggregate(amount_sum=Sum('amount'))['amount_sum']
+                                             target_id=target_id, target_type=target_type).aggregate(amount_sum=Sum('amount'))['amount_sum']
 
     def statement(self, movement_type):
         statement = collections.OrderedDict()
         for op in self.object.operations.filter(accounting_type__movement_type=movement_type).order_by('target_type',
-                'target_id').distinct():
+                                                                                                       'target_id').distinct():
             statement[op.target] = self.sum_by_target(op.target_id, op.target_type, movement_type)
         return statement
 
@@ -598,13 +620,14 @@ class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         kwargs['total_debit'] = self.total("DEBIT")
         return kwargs
 
+
 class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView):
     """
     Calculate a dictionary with operation type and sum of operations
     """
     model = GeneralJournal
     pk_url_kwarg = "j_id"
-    template_name='accounting/journal_statement_accounting.jinja'
+    template_name = 'accounting/journal_statement_accounting.jinja'
     current_tab = "accounting_statement"
 
     def statement(self):
@@ -624,9 +647,11 @@ class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView)
 
 # Company views
 
+
 class CompanyListView(CanViewMixin, ListView):
     model = Company
     template_name = 'accounting/co_list.jinja'
+
 
 class CompanyCreateView(CanCreateMixin, CreateView):
     """
@@ -648,6 +673,7 @@ class CompanyEditView(CanCreateMixin, UpdateView):
     template_name = 'core/edit.jinja'
     success_url = reverse_lazy('accounting:co_list')
 
+
 # Label views
 
 class LabelListView(CanViewMixin, DetailView):
@@ -655,11 +681,12 @@ class LabelListView(CanViewMixin, DetailView):
     pk_url_kwarg = "clubaccount_id"
     template_name = 'accounting/label_list.jinja'
 
-class LabelCreateView(CanCreateMixin, CreateView): # FIXME we need to check the rights before creating the object
+
+class LabelCreateView(CanCreateMixin, CreateView):  # FIXME we need to check the rights before creating the object
     model = Label
     form_class = modelform_factory(Label, fields=['name', 'club_account'], widgets={
         'club_account': HiddenInput,
-        })
+    })
     template_name = 'core/create.jinja'
 
     def get_initial(self):
@@ -670,11 +697,13 @@ class LabelCreateView(CanCreateMixin, CreateView): # FIXME we need to check the 
                 ret['club_account'] = obj.id
         return ret
 
+
 class LabelEditView(CanEditMixin, UpdateView):
     model = Label
     pk_url_kwarg = "label_id"
     fields = ['name']
     template_name = 'core/edit.jinja'
+
 
 class LabelDeleteView(CanEditMixin, DeleteView):
     model = Label
@@ -684,8 +713,10 @@ class LabelDeleteView(CanEditMixin, DeleteView):
     def get_success_url(self):
         return self.object.get_absolute_url()
 
+
 class CloseCustomerAccountForm(forms.Form):
     user = AutoCompleteSelectField('users', label=_('Refound this account'), help_text=None, required=True)
+
 
 class RefoundAccountView(FormView):
     """

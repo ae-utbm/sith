@@ -34,14 +34,17 @@ from core.models import User
 from core.utils import get_start_of_semester, get_semester
 from club.models import Club
 
+
 class TrombiManager(models.Manager):
     def get_queryset(self):
         return super(TrombiManager, self).get_queryset()
 
+
 class AvailableTrombiManager(models.Manager):
     def get_queryset(self):
         return super(AvailableTrombiManager,
-                self).get_queryset().filter(subscription_deadline__gte=date.today())
+                     self).get_queryset().filter(subscription_deadline__gte=date.today())
+
 
 class Trombi(models.Model):
     """
@@ -50,14 +53,14 @@ class Trombi(models.Model):
     its Trombi.
     """
     subscription_deadline = models.DateField(_('subscription deadline'),
-            default=date.today, help_text=_("Before this date, users are "
-                "allowed to subscribe to this Trombi. "
-                "After this date, users subscribed will be allowed to comment on each other."))
+                                             default=date.today, help_text=_("Before this date, users are "
+                                                                             "allowed to subscribe to this Trombi. "
+                                                                             "After this date, users subscribed will be allowed to comment on each other."))
     comments_deadline = models.DateField(_('comments deadline'),
-            default=date.today, help_text=_("After this date, users won't be "
-                "able to make comments anymore."))
+                                         default=date.today, help_text=_("After this date, users won't be "
+                                                                         "able to make comments anymore."))
     max_chars = models.IntegerField(_('maximum characters'), default=400,
-            help_text=_('Maximum number of characters allowed in a comment.'))
+                                    help_text=_('Maximum number of characters allowed in a comment.'))
     show_profiles = models.BooleanField(_("show users profiles to each other"), default=True)
     club = models.OneToOneField(Club, related_name='trombi')
 
@@ -70,7 +73,7 @@ class Trombi(models.Model):
     def clean(self):
         if self.subscription_deadline > self.comments_deadline:
             raise ValidationError(_("Closing the subscriptions after the "
-                "comments is definitively not a good idea."))
+                                    "comments is definitively not a good idea."))
 
     def get_absolute_url(self):
         return reverse('trombi:detail', kwargs={'trombi_id': self.id})
@@ -80,6 +83,7 @@ class Trombi(models.Model):
 
     def can_be_viewed_by(self, user):
         return user.id in [u.user.id for u in self.users.all()]
+
 
 class TrombiUser(models.Model):
     """
@@ -92,9 +96,9 @@ class TrombiUser(models.Model):
     user = models.OneToOneField(User, verbose_name=_("trombi user"), related_name='trombi_user')
     trombi = models.ForeignKey(Trombi, verbose_name=_("trombi"), related_name='users', blank=True, null=True, on_delete=models.SET_NULL)
     profile_pict = models.ImageField(upload_to='trombi', verbose_name=_("profile pict"), null=True, blank=True,
-            help_text=_("The profile picture you want in the trombi (warning: this picture may be published)"))
+                                     help_text=_("The profile picture you want in the trombi (warning: this picture may be published)"))
     scrub_pict = models.ImageField(upload_to='trombi', verbose_name=_("scrub pict"), null=True, blank=True,
-            help_text=_("The scrub picture you want in the trombi (warning: this picture may be published)"))
+                                   help_text=_("The scrub picture you want in the trombi (warning: this picture may be published)"))
 
     def __str__(self):
         return str(self.user)
@@ -113,12 +117,13 @@ class TrombiUser(models.Model):
             else:
                 end_date = ""
             TrombiClubMembership(
-                    user=self,
-                    club=str(m.club),
-                    role=role[:64],
-                    start=get_semester(m.start_date),
-                    end=end_date,
-                    ).save()
+                user=self,
+                club=str(m.club),
+                role=role[:64],
+                start=get_semester(m.start_date),
+                end=end_date,
+            ).save()
+
 
 class TrombiComment(models.Model):
     """
@@ -134,6 +139,7 @@ class TrombiComment(models.Model):
         if user.id == self.target.user.id:
             return False
         return user.id == self.author.user.id or user.can_edit(self.author.trombi)
+
 
 class TrombiClubMembership(models.Model):
     """
@@ -156,4 +162,3 @@ class TrombiClubMembership(models.Model):
 
     def get_absolute_url(self):
         return reverse('trombi:profile')
-

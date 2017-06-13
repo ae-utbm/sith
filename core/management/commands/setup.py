@@ -23,9 +23,8 @@
 #
 
 import os
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.core.management import call_command
-from django.conf import settings
 
 
 class Command(BaseCommand):
@@ -37,7 +36,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         try:
-            os.mkdir(os.path.join(root_path)+'/data')
+            os.mkdir(os.path.join(root_path) + '/data')
             print("Data dir created")
         except Exception as e:
             repr(e)
