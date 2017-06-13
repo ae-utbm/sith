@@ -25,6 +25,7 @@
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse_lazy, reverse
+from core.views.forms import SelectDate
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import UpdateView, FormMixin, FormView
 from django.utils.translation import ugettext_lazy as _
@@ -130,7 +131,7 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
             try:
                 user = User.objects.filter(id=int(request.GET['remove_user'])).first()
                 if user.id == request.user.id or request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
-                    r = PeoplePictureRelation.objects.filter(user=user, picture=self.object).delete()
+                    PeoplePictureRelation.objects.filter(user=user, picture=self.object).delete()
             except:
                 pass
         if 'ask_removal' in request.GET.keys():

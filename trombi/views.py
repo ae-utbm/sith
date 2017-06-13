@@ -24,9 +24,9 @@
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.generic import DetailView, RedirectView, TemplateView
-from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.conf import settings
@@ -50,17 +50,17 @@ class TrombiTabsMixin(TabedViewMixin):
         tab_list.append({
             'url': reverse('trombi:user_tools'),
             'slug': 'tools',
-            'name': _("Tools"),
+                    'name': _("Tools"),
         })
         tab_list.append({
             'url': reverse('trombi:profile'),
             'slug': 'profile',
-            'name': _("My profile"),
+                    'name': _("My profile"),
         })
         tab_list.append({
             'url': reverse('trombi:pictures'),
             'slug': 'pictures',
-            'name': _("My pictures"),
+                    'name': _("My pictures"),
         })
         try:
             trombi = self.request.user.trombi_user.trombi
@@ -254,10 +254,11 @@ class UserTrombiEditProfileView(QuickNotifMixin, TrombiTabsMixin, UpdateView):
     form_class = modelform_factory(User,
                                    fields=['second_email', 'phone', 'department', 'dpt_option',
                                            'quote', 'parent_address'],
-                                   labels={'second_email': _("Personal email (not UTBM)"),
-                                           'phone': _("Phone"),
-                                           'parent_address': _("Native town"),
-                                           })
+                                   labels={
+                                       'second_email': _("Personal email (not UTBM)"),
+                                       'phone': _("Phone"),
+                                       'parent_address': _("Native town"),
+                                   })
     template_name = "trombi/edit_profile.jinja"
     current_tab = "profile"
 

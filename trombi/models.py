@@ -117,12 +117,12 @@ class TrombiUser(models.Model):
             else:
                 end_date = ""
             TrombiClubMembership(
-                    user=self,
-                    club=str(m.club),
-                    role=role[:64],
-                    start=get_semester(m.start_date),
-                    end=end_date,
-                    ).save()
+                user=self,
+                club=str(m.club),
+                role=role[:64],
+                start=get_semester(m.start_date),
+                end=end_date,
+            ).save()
 
 
 class TrombiComment(models.Model):
@@ -139,6 +139,7 @@ class TrombiComment(models.Model):
         if user.id == self.target.user.id:
             return False
         return user.id == self.author.user.id or user.can_edit(self.author.trombi)
+
 
 class TrombiClubMembership(models.Model):
     """
