@@ -36,7 +36,7 @@ from datetime import date
 
 from trombi.models import Trombi, TrombiUser, TrombiComment, TrombiClubMembership
 from core.views.forms import SelectDate
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, QuickNotifMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin, QuickNotifMixin
 from core.models import User
 from club.models import Club
 
