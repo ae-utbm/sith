@@ -81,7 +81,7 @@ class TrombiForm(forms.ModelForm):
                 'comments_deadline': SelectDate,
                 }
 
-class TrombiCreateView(CanEditPropMixin, CreateView):
+class TrombiCreateView(CanCreateMixin, CreateView):
     """
     Create a trombi for a club
     """
