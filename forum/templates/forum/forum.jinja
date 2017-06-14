@@ -19,7 +19,9 @@
     {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
         <a href="{{ url('forum:new_forum') }}?parent={{ forum.id }}">{% trans %}New forum{% endtrans %}</a> <br/>
     {% endif %}
+    {% if not forum.is_category %}
         <a href="{{ url('forum:new_topic', forum_id=forum.id) }}">{% trans %}New topic{% endtrans %}</a>
+    {% endif %}
     </p>
     {% if forum.children.exists() %}
     <div>
