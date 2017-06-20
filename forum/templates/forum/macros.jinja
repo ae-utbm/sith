@@ -77,7 +77,7 @@
             {% if last_msg %}
             {{ user_profile_link_short_name(last_msg.author) }} <br/>
             <a href="{{ last_msg.get_absolute_url() }}">
-                <date>{{ last_msg.date|date(DATETIME_FORMAT) }} {{ last_msg.date|time(DATETIME_FORMAT) }}</date>
+                <date>{{ last_msg.date|localtime|date(DATETIME_FORMAT) }} {{ last_msg.date|localtime|time(DATETIME_FORMAT) }}</date>
             </a>
             {% endif %}
         </p>
