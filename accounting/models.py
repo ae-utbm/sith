@@ -225,7 +225,7 @@ class GeneralJournal(models.Model):
         return False
 
     def can_be_viewed_by(self, user):
-        return self.club_account.can_be_edited_by(user)
+        return self.club_account.can_be_viewed_by(user)
 
     def get_absolute_url(self):
         return reverse('accounting:journal_details', kwargs={'j_id': self.id})
