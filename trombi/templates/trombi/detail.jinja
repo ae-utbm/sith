@@ -12,6 +12,13 @@
     <p>{% trans %}Comment deadline: {% endtrans %}{{ object.comments_deadline|date(DATETIME_FORMAT) }}</p>
     <a href="#">Export</a>
     <hr>
+    <h4>{% trans %}Add user{% endtrans %}</h4>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p() }}
+        <input type="submit" value="{% trans %}Add{% endtrans %}" />
+    </form>
+    <hr>
     <div>
     {% for u in object.users.order_by('user__nick_name') %}
         <div class="ib" style="border: solid 1px grey; text-align: center">

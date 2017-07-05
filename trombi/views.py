@@ -32,6 +32,8 @@ from django import forms
 from django.conf import settings
 from django.forms.models import modelform_factory
 
+from ajax_select.fields import AutoCompleteSelectField
+
 from datetime import date
 
 from trombi.models import Trombi, TrombiUser, TrombiComment, TrombiClubMembership
@@ -118,11 +120,28 @@ class TrombiEditView(CanEditPropMixin, TrombiTabsMixin, UpdateView):
         return super(TrombiEditView, self).get_success_url() + "?qn_success"
 
 
+class AddUserForm(forms.Form):
+    user = AutoCompleteSelectField('users', required=True, label=_("Select user"), help_text=None)
+
 class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailView):
     model = Trombi
     template_name = 'trombi/detail.jinja'
     pk_url_kwarg = 'trombi_id'
     current_tab = "admin_tools"
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = AddUserForm(request.POST)
+        if form.is_valid():
+            try:
+                TrombiUser(user=form.cleaned_data['user'], trombi=self.object).save()
+            except: pass # We don't care about duplicate keys
+        return super(TrombiDetailView, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(TrombiDetailView, self).get_context_data(**kwargs)
+        kwargs['form'] = AddUserForm()
+        return kwargs
 
 
 class TrombiDeleteUserView(CanEditPropMixin, TrombiTabsMixin, DeleteView):
