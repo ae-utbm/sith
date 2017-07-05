@@ -24,7 +24,7 @@
 <hr>
 {% endif %}
 <div>
-{% for u in user.trombi_user.trombi.users.exclude(id=user.trombi_user.id) %}
+{% for u in user.trombi_user.trombi.users.exclude(id=user.trombi_user.id).order_by('user__nick_name') %}
     <div class="ib" style="border: solid 1px grey; text-align: center">
         {% set file = None %}
         {% if u.profile_pict %}

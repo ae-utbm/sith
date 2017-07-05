@@ -13,7 +13,7 @@
     <a href="#">Export</a>
     <hr>
     <div>
-    {% for u in object.users.all() %}
+    {% for u in object.users.order_by('user__nick_name') %}
         <div class="ib" style="border: solid 1px grey; text-align: center">
             {% set file = None %}
             {% if u.profile_pict %}
