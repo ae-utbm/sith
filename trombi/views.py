@@ -135,7 +135,9 @@ class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailVie
         if form.is_valid():
             try:
                 TrombiUser(user=form.cleaned_data['user'], trombi=self.object).save()
-            except: pass # We don't care about duplicate keys
+                self.quick_notif_list.append("qn_success")
+            except: # We don't care about duplicate keys
+                self.quick_notif_list.append("qn_fail")
         return super(TrombiDetailView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
