@@ -24,6 +24,7 @@
 
 from django.contrib import admin
 
-from trombi.models import Trombi
+from trombi.models import Trombi, TrombiUser
 
 admin.site.register(Trombi)
+admin.site.register(TrombiUser)
