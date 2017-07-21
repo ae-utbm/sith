@@ -14,8 +14,10 @@
     <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
     <li><a href="{{ url('rootplace:merge') }}">{% trans %}Merge users{% endtrans %}</a></li>
     {% endif %}
-    {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root %}
+    {% if user.can_create_subscription or user.is_root %}
     <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
+    {% endif %}
+    {% if user.is_board_member or user.is_root %}
     <li><a href="{{ url('subscription:stats') }}">{% trans %}Subscription stats{% endtrans %}</a></li>
     <li><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></li>
     {% endif %}

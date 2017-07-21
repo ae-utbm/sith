@@ -139,10 +139,7 @@ class Club(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        ms = self.get_membership_for(user)
-        if ms is not None and ms.role > settings.SITH_MAXIMUM_FREE_ROLE:
-            return True
-        return False
+        return self.has_rights_in_club(user)
 
     def can_be_viewed_by(self, user):
         """
@@ -169,6 +166,10 @@ class Club(models.Model):
                 Club._memberships[self.id] = {}
                 Club._memberships[self.id][user.id] = m
             return m
+
+    def has_rights_in_club(self, user):
+        m = self.get_membership_for(user)
+        return m is not None and m.role > settings.SITH_MAXIMUM_FREE_ROLE
 
 
 class Membership(models.Model):
