@@ -340,6 +340,8 @@ Welcome to the wiki page!
             c.save()
             r = ProductType(name="Rechargements")
             r.save()
+            verre = ProductType(name="Verre")
+            verre.save()
             cotis = Product(name="Cotis 1 semestre", code="1SCOTIZ", product_type=c, purchase_price="15", selling_price="15",
                             special_selling_price="15", club=main_club)
             cotis.save()
@@ -355,6 +357,14 @@ Welcome to the wiki page!
             cble = Product(name="Chimay Bleue", code="CBLE", product_type=p, purchase_price="1.50", selling_price="1.7",
                            special_selling_price="1.6", club=main_club)
             cble.save()
+            cons = Product(name="Consigne Eco-cup", code="CONS", product_type=verre, purchase_price="1", selling_price="1",
+                           special_selling_price="1", club=main_club)
+            cons.id = 1152
+            cons.save()
+            dcons = Product(name="Déconsigne Eco-cup", code="DECO", product_type=verre, purchase_price="-1", selling_price="-1",
+                            special_selling_price="-1", club=main_club)
+            dcons.id = 1151
+            dcons.save()
             Product(name="Corsendonk", code="CORS", product_type=p, purchase_price="1.50", selling_price="1.7",
                     special_selling_price="1.6", club=main_club).save()
             Product(name="Carolus", code="CARO", product_type=p, purchase_price="1.50", selling_price="1.7",
@@ -362,6 +372,8 @@ Welcome to the wiki page!
             mde = Counter.objects.filter(name="MDE").first()
             mde.products.add(barb)
             mde.products.add(cble)
+            mde.products.add(cons)
+            mde.products.add(dcons)
             mde.sellers.add(skia)
             mde.save()
 

@@ -397,6 +397,16 @@ SITH_COUNTER_BANK = [
     ('LA-POSTE', 'La Poste'),
 ]
 
+SITH_RECORD_PRODUCT = [
+    1152,
+]
+
+SITH_UNRECORD_PRODUCT = [
+    1151,
+]
+
+SITH_RECORD_LIMIT = 3
+
 # Defines pagination for cash summary
 SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
 

@@ -51,6 +51,7 @@ class Customer(models.Model):
     user = models.OneToOneField(User, primary_key=True)
     account_id = models.CharField(_('account id'), max_length=10, unique=True)
     amount = CurrencyField(_('amount'))
+    recorded_products = models.IntegerField(_('recorded product'), default=0)
 
     class Meta:
         verbose_name = _('customer')
@@ -59,6 +60,13 @@ class Customer(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.user.username, self.account_id)
+
+    @property
+    def can_record(self):
+        return self.recorded_products > -settings.SITH_RECORD_LIMIT
+
+    def can_record_more(self, number):
+        return self.recorded_products - number >= -settings.SITH_RECORD_LIMIT
 
     @property
     def can_buy(self):
@@ -142,6 +150,20 @@ class Product(models.Model):
 
     class Meta:
         verbose_name = _('product')
+
+    @property
+    def is_record_product(self):
+        for product in settings.SITH_RECORD_PRODUCT:
+            if product == self.id:
+                return True
+        return False
+
+    @property
+    def is_unrecord_product(self):
+        for product in settings.SITH_UNRECORD_PRODUCT:
+            if product == self.id:
+                return True
+        return False
 
     def is_owned_by(self, user):
         """
