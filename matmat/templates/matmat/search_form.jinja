@@ -1,0 +1,50 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Search user{% endtrans %}
+{% endblock %}
+
+{% block content %}
+{% if object_list.exists() %}
+<h2>{% trans %}User found{% endtrans %}</h2>
+{% for user in object_list %}
+	{{ user }}
+{% endfor %}
+{% endif %}
+<h2>{% trans %}Search user{% endtrans %}</h2>
+<h3>{% trans %}Search by profile{% endtrans %}</h3>
+<form action="{{ url('matmat:search') }}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+    {% if field.name != 'phone' %}
+    <p>
+	    {{ field.errors }}
+	    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    	{{ field }}
+    </p>
+    {% endif %}
+    {% endfor %}
+    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+</form>
+<h3>{% trans %}Inverted search{% endtrans %}</h3>
+<form action="{{ url('matmat:search_reverse') }}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+	<p>
+	    {{ form.phone.errors }}
+	    <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+	    {{ form.phone }}
+	    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+	</p>
+</form>
+<h3>{% trans %}Simple search{% endtrans %}</h3>
+    {% csrf_token %}
+    <form action="{{ url('core:search') }}" method="GET">
+        <label for="search">{% trans %}Last/First name or nickname{% endtrans %}</label>
+        <input type="text" name="query" id="search" />
+	    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+    </form>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+{% endblock %}

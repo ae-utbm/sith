@@ -143,6 +143,17 @@ class CanViewMixin(View):
         self.get_queryset = types.MethodType(get_qs, self)
         return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
 
+
+class WasSuscribed(View):
+    """
+    This view check if the user was at least an old subscriber
+    """
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.was_subscribed:
+            raise PermissionDenied
+        return super(WasSuscribed, self).dispatch(request, *args, **kwargs)
+
+
 class TabedViewMixin(View):
     """
     This view provide the basic functions for displaying tabs in the template
