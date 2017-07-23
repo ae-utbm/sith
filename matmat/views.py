@@ -134,8 +134,11 @@ class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
             if self.search_type == SearchType.REVERSE:
                 q = q.filter(phone=self.valid_form['phone']).all()
             elif self.search_type == SearchType.QUICK:
-                q = search_user(self.valid_form['quick'])
-                if not self.can_see_hidden:
+                if self.valid_form['quick'].strip():
+                    q = search_user(self.valid_form['quick'])
+                else:
+                    q = []
+                if not self.can_see_hidden and len(q) > 0:
                     q = [user for user in q if user.is_subscriber_viewable]
             else:
                 search_dict = {}
@@ -182,7 +185,10 @@ class SearchFormView(WasSuscribed, FormView):
         return view(request, *args, **kwargs)
 
     def get_initial(self):
-        return self.session.get('matmat_search_form', {})
+        init = self.session.get('matmat_search_form', {})
+        if not init:
+            init['department'] = ''
+        return init
 
 
 class SearchNormalFormView(SearchFormView):
