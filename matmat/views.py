@@ -21,6 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from ast import literal_eval
 
 from django.views.generic import ListView, View
 from django.views.generic.edit import FormView
@@ -87,6 +88,10 @@ class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
     def dispatch(self, request, *args, **kwargs):
         self.form_class = kwargs['form']
         self.reverse = kwargs['reverse']
+        self.session = request.session
+        self.last_search = self.session.get('matmat_search_result', str([]))
+        self.last_search = literal_eval(self.last_search)
+        print(self.last_search)
         if 'valid_form' in kwargs.keys():
             self.valid_form = kwargs['valid_form']
         else:
@@ -105,18 +110,24 @@ class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
         self.object = None
         kwargs = super(SearchFormListView, self).get_context_data(**kwargs)
         kwargs['form'] = self.form_class
+        kwargs['result_exists'] = self.result_exists
         return kwargs
 
     def get_queryset(self):
+        q = self.init_query
         if self.valid_form is not None:
             if self.reverse:
-                return self.init_query.filter(phone=self.valid_form['phone']).all()
+                q = q.filter(phone=self.valid_form['phone']).all()
             else:
-                q = self.init_query
-                # f = self.valid_form
-                return q.all()
+                q = q.all()
         else:
-            return self.model.objects.none()
+            q = q.filter(pk__in=self.last_search).all()
+        self.result_exists = q.exists()
+        self.last_search = []
+        for user in q:
+            self.last_search.append(user.id)
+        self.session['matmat_search_result'] = str(self.last_search)
+        return q
 
 
 class SearchFormView(WasSuscribed, FormView):
@@ -142,11 +153,11 @@ class SearchFormView(WasSuscribed, FormView):
         view = SearchFormListView.as_view()
         if form.is_valid():
             kwargs['valid_form'] = form.clean()
-            request.session['matmat_search'] = form.cleaned_data_json
+            request.session['matmat_search_form'] = form.cleaned_data_json
         return view(request, *args, **kwargs)
 
     def get_initial(self):
-        return self.session.get('matmat_search', {})
+        return self.session.get('matmat_search_form', {})
 
 
 class SearchReverseFormView(SearchFormView):
@@ -160,5 +171,8 @@ class SearchClearFormView(WasSuscribed, View):
 
     def dispatch(self, request, *args, **kwargs):
         super(SearchClearFormView, self).dispatch(request, *args, **kwargs)
-        request.session.pop('matmat_search')
+        if 'matmat_search_form' in request.session.keys():
+            request.session.pop('matmat_search_form')
+        if 'matmat_search_result' in request.session.keys():
+            request.session.pop('matmat_search_result')
         return HttpResponseRedirect(reverse('matmat:search'))

@@ -20,7 +20,7 @@
     border-color: black;
 }
 </style>
-{% if object_list.exists() %}
+{% if result_exists %}
 <h2>{% trans %}User found{% endtrans %}</h2>
 {% for user in object_list %}
 
