@@ -28,5 +28,6 @@ from matmat.views import *
 
 urlpatterns = [
     url(r'^$', SearchFormView.as_view(), name="search"),
-    url(r'^search_reverse$', SearchReverseFormView.as_view(), name="search_reverse"),
+    url(r'^reverse$', SearchReverseFormView.as_view(), name="search_reverse"),
+    url(r'^clear$', SearchClearFormView.as_view(), name="search_clear"),
 ]

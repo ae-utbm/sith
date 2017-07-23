@@ -22,19 +22,12 @@
 #
 #
 
-from django.shortcuts import render
-
-# Create your views here.
-
-from django.shortcuts import get_object_or_404
-from django.views.generic import ListView
+from django.views.generic import ListView, View
 from django.views.generic.edit import FormView
-from django.core.urlresolvers import reverse_lazy, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import SingleObjectMixin
-from django.core.exceptions import PermissionDenied
-from django.db import transaction
-from django.forms import CheckboxSelectMultiple
+from django.http.response import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 from django import forms
 
 from core.models import User
@@ -52,7 +45,6 @@ class SearchForm(forms.ModelForm):
             'first_name',
             'last_name',
             'nick_name',
-            'sex',
             'role',
             'department',
             'semester',
@@ -63,21 +55,34 @@ class SearchForm(forms.ModelForm):
         widgets = {
             'date_of_birth': SelectDate,
             'phone': PhoneNumberInternationalFallbackWidget,
-            # 'sex': CheckboxSelectMultiple,
         }
+
+    sex = forms.ChoiceField([
+        ("MAN", _("Man")),
+        ("WOMAN", _("Woman")),
+        ("INDIFFERENT", _("Indifferent"))
+    ], widget=forms.RadioSelect, initial="INDIFFERENT")
 
     def __init__(self, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
         for key in self.fields.keys():
             self.fields[key].required = False
-        self.fields['sex'].choices.append(("INDIFFERENT", _("Indifferent")))
 
+    @property
+    def cleaned_data_json(self):
+        data = self.cleaned_data
+        for key in data.keys():
+            if key in ('date_of_birth', 'phone') and data[key] is not None:
+                data[key] = str(data[key])
+        return data
 
 # Views
+
 
 class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
     model = User
     template_name = 'matmat/search_form.jinja'
+    paginate_by = 3
 
     def dispatch(self, request, *args, **kwargs):
         self.form_class = kwargs['form']
@@ -99,7 +104,7 @@ class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
     def get_context_data(self, **kwargs):
         self.object = None
         kwargs = super(SearchFormListView, self).get_context_data(**kwargs)
-        kwargs['form'] = self.form_class()
+        kwargs['form'] = self.form_class
         return kwargs
 
     def get_queryset(self):
@@ -122,8 +127,9 @@ class SearchFormView(WasSuscribed, FormView):
     reverse = False
 
     def dispatch(self, request, *args, **kwargs):
+        self.session = request.session
         self.init_query = User.objects
-        kwargs['form'] = self.get_form_class()
+        kwargs['form'] = self.get_form()
         kwargs['reverse'] = self.reverse
         return super(SearchFormView, self).dispatch(request, *args, **kwargs)
 
@@ -136,11 +142,23 @@ class SearchFormView(WasSuscribed, FormView):
         view = SearchFormListView.as_view()
         if form.is_valid():
             kwargs['valid_form'] = form.clean()
+            request.session['matmat_search'] = form.cleaned_data_json
         return view(request, *args, **kwargs)
 
     def get_initial(self):
-        return super(SearchFormView, self).get_initial()
+        return self.session.get('matmat_search', {})
 
 
 class SearchReverseFormView(SearchFormView):
     reverse = True
+
+
+class SearchClearFormView(WasSuscribed, View):
+    """
+    Clear SearchFormView and redirect to it
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        super(SearchClearFormView, self).dispatch(request, *args, **kwargs)
+        request.session.pop('matmat_search')
+        return HttpResponseRedirect(reverse('matmat:search'))

@@ -88,7 +88,7 @@
         {% if not popup %}
         <nav>
             <a href="https://ae.utbm.fr/">{% trans %}Main{% endtrans %}</a>
-            <a href="https://ae.utbm.fr/matmatronch/">{% trans %}Matmatronch{% endtrans %}</a>
+            <a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a>
             <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
             <a href="{{ url('sas:main') }}">{% trans %}SAS{% endtrans %}</a>
             <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
