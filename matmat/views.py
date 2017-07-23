@@ -22,6 +22,7 @@
 #
 #
 from ast import literal_eval
+from enum import Enum
 
 from django.views.generic import ListView, View
 from django.views.generic.edit import FormView
@@ -34,7 +35,17 @@ from django import forms
 from core.models import User
 from core.views import WasSuscribed
 from core.views.forms import SelectDate
+from core.views import search_user
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
+
+# Enum to select search type
+
+
+class SearchType(Enum):
+    NORMAL = 1
+    REVERSE = 2
+    QUICK = 3
+
 
 # Custom form
 
@@ -64,6 +75,8 @@ class SearchForm(forms.ModelForm):
         ("INDIFFERENT", _("Indifferent"))
     ], widget=forms.RadioSelect, initial="INDIFFERENT")
 
+    quick = forms.CharField(label=_('Last/First name or nickname'), max_length=255)
+
     def __init__(self, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
         for key in self.fields.keys():
@@ -82,12 +95,13 @@ class SearchForm(forms.ModelForm):
 
 class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
     model = User
+    ordering = ["-id"]
+    paginate_by = 12
     template_name = 'matmat/search_form.jinja'
-    paginate_by = 3
 
     def dispatch(self, request, *args, **kwargs):
         self.form_class = kwargs['form']
-        self.reverse = kwargs['reverse']
+        self.search_type = kwargs['search_type']
         self.session = request.session
         self.last_search = self.session.get('matmat_search_result', str([]))
         self.last_search = literal_eval(self.last_search)
@@ -97,7 +111,9 @@ class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
             self.valid_form = None
 
         self.init_query = self.model.objects
+        self.can_see_hidden = True
         if not (request.user.is_board_member or request.user.is_root):
+            self.can_see_hidden = False
             self.init_query = self.init_query.exclude(is_subscriber_viewable=False)
 
         return super(SearchFormListView, self).dispatch(request, *args, **kwargs)
@@ -115,17 +131,24 @@ class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
     def get_queryset(self):
         q = self.init_query
         if self.valid_form is not None:
-            if self.reverse:
+            if self.search_type == SearchType.REVERSE:
                 q = q.filter(phone=self.valid_form['phone']).all()
+            elif self.search_type == SearchType.QUICK:
+                q = search_user(self.valid_form['quick'])
+                if not self.can_see_hidden:
+                    q = [user for user in q if user.is_subscriber_viewable]
             else:
                 search_dict = {}
                 for key, value in self.valid_form.items():
-                    if key != 'phone' and not (value == '' or value is None or value == 'INDIFFERENT'):
+                    if key not in ('phone', 'quick') and not (value == '' or value is None or value == 'INDIFFERENT'):
                         search_dict[key + "__icontains"] = value
                 q = q.filter(**search_dict).all()
         else:
             q = q.filter(pk__in=self.last_search).all()
-        self.result_exists = q.exists()
+        if isinstance(q, list):
+            self.result_exists = len(q) > 0
+        else:
+            self.result_exists = q.exists()
         self.last_search = []
         for user in q:
             self.last_search.append(user.id)
@@ -138,13 +161,12 @@ class SearchFormView(WasSuscribed, FormView):
     Allows users to search inside the user list
     """
     form_class = SearchForm
-    reverse = False
 
     def dispatch(self, request, *args, **kwargs):
         self.session = request.session
         self.init_query = User.objects
         kwargs['form'] = self.get_form()
-        kwargs['reverse'] = self.reverse
+        kwargs['search_type'] = self.search_type
         return super(SearchFormView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -163,8 +185,16 @@ class SearchFormView(WasSuscribed, FormView):
         return self.session.get('matmat_search_form', {})
 
 
+class SearchNormalFormView(SearchFormView):
+    search_type = SearchType.NORMAL
+
+
 class SearchReverseFormView(SearchFormView):
-    reverse = True
+    search_type = SearchType.REVERSE
+
+
+class SearchQuickFormView(SearchFormView):
+    search_type = SearchType.QUICK
 
 
 class SearchClearFormView(WasSuscribed, View):

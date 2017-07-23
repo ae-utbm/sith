@@ -39,7 +39,7 @@
 <form action="{{ url('matmat:search') }}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {% for field in form %}
-    {% if field.name != 'phone' %}
+    {% if field.name not in ('phone', 'quick') %}
     <p>
 	    {{ field.errors }}
 	    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -59,13 +59,16 @@
 	    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
 	</p>
 </form>
-<h3>{% trans %}Simple search{% endtrans %}</h3>
+<h3>{% trans %}Quick search{% endtrans %}</h3>
+<form action="{{ url('matmat:search_quick') }}" method="post">
     {% csrf_token %}
-    <form action="{{ url('core:search') }}" method="GET">
-        <label for="search">{% trans %}Last/First name or nickname{% endtrans %}</label>
-        <input type="text" name="query" id="search" />
-	    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
-    </form>
+    <p>
+        {{ form.quick.errors }}
+        <label for="{{ form.quick.id_for_label }}">{{ form.quick.label }}</label>
+        {{ form.quick }}
+        <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+    </p>
+</form>
 {% endblock %}
 
 {% block script %}
