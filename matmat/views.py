@@ -91,7 +91,6 @@ class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
         self.session = request.session
         self.last_search = self.session.get('matmat_search_result', str([]))
         self.last_search = literal_eval(self.last_search)
-        print(self.last_search)
         if 'valid_form' in kwargs.keys():
             self.valid_form = kwargs['valid_form']
         else:
@@ -119,7 +118,11 @@ class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
             if self.reverse:
                 q = q.filter(phone=self.valid_form['phone']).all()
             else:
-                q = q.all()
+                search_dict = {}
+                for key, value in self.valid_form.items():
+                    if key != 'phone' and not (value == '' or value is None or value == 'INDIFFERENT'):
+                        search_dict[key + "__icontains"] = value
+                q = q.filter(**search_dict).all()
         else:
             q = q.filter(pk__in=self.last_search).all()
         self.result_exists = q.exists()
