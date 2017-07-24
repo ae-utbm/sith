@@ -144,14 +144,14 @@ class CanViewMixin(View):
         return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
 
 
-class WasSuscribed(View):
+class FormerSubscriberMixin(View):
     """
     This view check if the user was at least an old subscriber
     """
     def dispatch(self, request, *args, **kwargs):
         if not request.user.was_subscribed:
             raise PermissionDenied
-        return super(WasSuscribed, self).dispatch(request, *args, **kwargs)
+        return super(FormerSubscriberMixin, self).dispatch(request, *args, **kwargs)
 
 
 class TabedViewMixin(View):

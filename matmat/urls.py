@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*
 #
 # Copyright 2017
-# - Sli <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.

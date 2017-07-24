@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*
 #
 # Copyright 2017
-# - Sli <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -33,7 +33,7 @@ from django.core.urlresolvers import reverse
 from django import forms
 
 from core.models import User
-from core.views import WasSuscribed
+from core.views import FormerSubscriberMixin
 from core.views.forms import SelectDate
 from core.views import search_user
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
@@ -93,7 +93,7 @@ class SearchForm(forms.ModelForm):
 # Views
 
 
-class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
+class SearchFormListView(FormerSubscriberMixin, SingleObjectMixin, ListView):
     model = User
     ordering = ["-id"]
     paginate_by = 12
@@ -159,7 +159,7 @@ class SearchFormListView(WasSuscribed, SingleObjectMixin, ListView):
         return q
 
 
-class SearchFormView(WasSuscribed, FormView):
+class SearchFormView(FormerSubscriberMixin, FormView):
     """
     Allows users to search inside the user list
     """
@@ -203,7 +203,7 @@ class SearchQuickFormView(SearchFormView):
     search_type = SearchType.QUICK
 
 
-class SearchClearFormView(WasSuscribed, View):
+class SearchClearFormView(FormerSubscriberMixin, View):
     """
     Clear SearchFormView and redirect to it
     """
