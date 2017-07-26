@@ -300,7 +300,15 @@ class User(AbstractBaseUser):
     @cached_property
     def is_board_member(self):
         from club.models import Club
-        return Club.objects.filter(unix_name=settings.SITH_MAIN_CLUB['unix_name']).first().get_membership_for(self)
+        return Club.objects.filter(unix_name=settings.SITH_MAIN_CLUB['unix_name']).first().has_rights_in_club(self)
+
+    @cached_property
+    def can_create_subscription(self):
+        from club.models import Club
+        for club in Club.objects.filter(id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS).all():
+            if club.has_rights_in_club(self):
+                return True
+        return False
 
     @cached_property
     def is_launderette_manager(self):
@@ -503,6 +511,10 @@ class User(AbstractBaseUser):
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):
         super(AnonymousUser, self).__init__()
+
+    @property
+    def can_create_subscription(self):
+        return False
 
     @property
     def was_subscribed(self):

@@ -408,6 +408,10 @@ SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER = 1
 SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS = 2
 SITH_PRODUCTTYPE_SUBSCRIPTION = 2
 
+SITH_CAN_CREATE_SUBSCRIPTIONS = [
+    1,
+]
+
 # Subscription durations are in semestres
 # Be careful, modifying this parameter will need a migration to be applied
 SITH_SUBSCRIPTIONS = {

@@ -106,7 +106,7 @@ class NewSubscription(CreateView):
 
     def dispatch(self, request, *arg, **kwargs):
         res = super(NewSubscription, self).dispatch(request, *arg, **kwargs)
-        if request.user.is_in_group(settings.SITH_MAIN_BOARD_GROUP):
+        if request.user.can_create_subscription:
             return res
         raise PermissionDenied
 
