@@ -54,7 +54,7 @@
     <dl>
     {% for c in trombi_user.received_comments.filter(is_moderated=True) %}
         <dt style="font-weight: bold; font-size: 110%">{{ c.author.user.get_display_name() }}</dt>
-        <dd>{{ c.content }}</dd>
+        <dd><pre>{{ c.content }}</pre></dd>
     {% endfor %}
     </dl>
 </div>

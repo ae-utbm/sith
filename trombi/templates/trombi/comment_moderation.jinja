@@ -14,9 +14,9 @@
     <dt>{% trans author=c.author.user.get_display_name(),
             target=c.target.user.get_display_name() %}Author: {{ author }} - Target: {{ target }}{% endtrans %}</dt>
     <dd>
-        <p>
+        <pre>
         {{ c.content }}
-        </p>
+        </pre>
         <form action="{{ url('trombi:moderate_comment', comment_id=c.id )}}" method="post">
             {% csrf_token %}
             <input type="hidden" name="action" id="action" value="accept" />
