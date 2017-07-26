@@ -144,7 +144,7 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
-        if request.user.is_authenticated() and request.user.is_in_group('ae-membres'):
+        if request.user.is_authenticated() and request.user.was_subscribed:
             if self.form.is_valid():
                 for uid in self.form.cleaned_data['users']:
                     u = User.objects.filter(id=uid).first()
