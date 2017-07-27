@@ -381,7 +381,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         if self.customer.amount < (total + round(q * float(price), 2)):  # Check for enough money
             request.session['not_enough'] = True
             return False
-        if not self.is_record_product_ok(request, product):
+        if product.is_unrecord_product and not self.is_record_product_ok(request, product):
             request.session['not_allowed'] = True
             return False
         if product.limit_age >= 18 and not self.customer.user.date_of_birth:
@@ -446,6 +446,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         """ Finish the click session, and validate the basket """
         with transaction.atomic():
             request.session['last_basket'] = []
+            if self.sum_basket(request) > self.customer.amount:
+                raise DataError(_("You have not enough money to buy all the basket"))
+
             for pid, infos in request.session['basket'].items():
                 # This duplicates code for DB optimization (prevent to load many times the same object)
                 p = Product.objects.filter(pk=pid).first()
@@ -453,8 +456,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                     uprice = p.special_selling_price
                 else:
                     uprice = p.selling_price
-                if uprice * infos['qty'] > self.customer.amount:
-                    raise DataError(_("You have not enough money to buy all the basket"))
                 request.session['last_basket'].append("%d x %s" % (infos['qty'] + infos['bonus_qty'], p.name))
                 s = Selling(label=p.name, product=p, club=p.club, counter=self.object, unit_price=uprice,
                             quantity=infos['qty'], seller=self.operator, customer=self.customer)

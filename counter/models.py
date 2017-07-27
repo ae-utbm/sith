@@ -153,17 +153,11 @@ class Product(models.Model):
 
     @property
     def is_record_product(self):
-        for product in settings.SITH_RECORD_PRODUCT:
-            if product == self.id:
-                return True
-        return False
+        return settings.SITH_RECORD_PRODUCT == self.id
 
     @property
     def is_unrecord_product(self):
-        for product in settings.SITH_UNRECORD_PRODUCT:
-            if product == self.id:
-                return True
-        return False
+        return settings.SITH_UNRECORD_PRODUCT == self.id
 
     def is_owned_by(self, user):
         """
