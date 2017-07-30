@@ -22,7 +22,7 @@
 #
 #
 
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.views.generic import DetailView, RedirectView, TemplateView
@@ -379,8 +379,15 @@ class TrombiCommentFormView():
 class TrombiCommentCreateView(TrombiCommentFormView, CreateView):
     def form_valid(self, form):
         target = get_object_or_404(TrombiUser, id=self.kwargs['user_id'])
-        form.instance.author = self.request.user.trombi_user
+        author = self.request.user.trombi_user
+        form.instance.author = author
         form.instance.target = target
+        # Check that this combination does not already have a comment
+        old = TrombiComment.objects.filter(author=author, target=target).first()
+        if old:
+            old.content = form.instance.content
+            old.save()
+            return HttpResponseRedirect(self.get_success_url())
         return super(TrombiCommentCreateView, self).form_valid(form)
 
 
