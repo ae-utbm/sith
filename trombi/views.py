@@ -145,6 +145,11 @@ class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailVie
         kwargs['form'] = AddUserForm()
         return kwargs
 
+class TrombiExportView(CanEditMixin, TrombiTabsMixin, DetailView):
+    model = Trombi
+    template_name = 'trombi/export.jinja'
+    pk_url_kwarg = 'trombi_id'
+    current_tab = "admin_tools"
 
 class TrombiDeleteUserView(CanEditPropMixin, TrombiTabsMixin, DeleteView):
     model = TrombiUser

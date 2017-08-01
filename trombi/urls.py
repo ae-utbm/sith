@@ -28,6 +28,7 @@ from trombi.views import *
 
 urlpatterns = [
     url(r'^(?P<club_id>[0-9]+)/new$', TrombiCreateView.as_view(), name='create'),
+    url(r'^(?P<trombi_id>[0-9]+)/export$', TrombiExportView.as_view(), name='export'),
     url(r'^(?P<trombi_id>[0-9]+)/edit$', TrombiEditView.as_view(), name='edit'),
     url(r'^(?P<trombi_id>[0-9]+)/moderate_comments$', TrombiModerateCommentsView.as_view(), name='moderate_comments'),
     url(r'^(?P<comment_id>[0-9]+)/moderate$', TrombiModerateCommentView.as_view(), name='moderate_comment'),

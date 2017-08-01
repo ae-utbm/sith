@@ -1,0 +1,113 @@
+{% extends 'core/base.jinja' %}
+
+{% block title %}
+{% trans club=object.club %}{{ club }}'s Trombi{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <h2>{% trans club=object.club %}{{ club }}'s Trombi{% endtrans %}</h2>
+    <a href="{{ url('trombi:detail', trombi_id=object.id) }}">{% trans %}Back{% endtrans %}</a>
+    <hr>
+    <div>
+    {% for trombi_user in object.users.order_by('user__nick_name') %}
+        <div style="border: solid 1px grey; text-align: center; margin: 5px;">
+            <div id="user_{{ trombi_user.id }}_infos">
+                {{ trombi_user.user.get_display_name() }}<br>
+                {% trans %}Date of birth: {% endtrans %}{{ trombi_user.user.date_of_birth|date("d/m/Y") }}<br>
+                {% trans %}Email: {% endtrans %}{{ trombi_user.user.second_email }}<br>
+                {% trans %}Phone: {% endtrans %}{{ trombi_user.user.phone }}<br>
+                {% trans %}City: {% endtrans %}{{ trombi_user.user.parent_address }}<br>
+                {% trans %}Quote: {% endtrans %}{{ trombi_user.user.quote }}<br>
+            </div>
+            <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_infos'))">{% trans %}Copy{% endtrans %}</button>
+
+            <h4>{% trans %}Pictures{% endtrans %}</h4>
+            {% set profile_file = None %}
+            {% set scrub_file = None %}
+            {% if trombi_user.profile_pict %}
+                {% set profile_file = trombi_user.profile_pict.url %}
+            {% else %}
+                {% set profile_file = static('core/img/na.gif') %}
+            {% endif %}
+            {% if trombi_user.scrub_pict %}
+                {% set scrub_file = trombi_user.scrub_pict.url %}
+            {% else %}
+                {% set scrub_file = static('core/img/na.gif') %}
+            {% endif %}
+            <div style="max-width: 410px; margin: auto; text-align: center;">
+                <div>
+                    <div class="ib w_medium">
+                        <div id="user_{{ trombi_user.id }}_profile"><img src="{{ profile_file }}" alt="" style="max-width: 200px"></div>
+                        <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_profile'))">{% trans %}Copy profile picture{% endtrans %}</button>
+                    </div>
+                    <div class="ib w_medium">
+                        <div id="user_{{ trombi_user.id }}_scrub"><img src="{{ scrub_file }}" alt="" style="max-width: 200px"></div>
+                        <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_scrub'))">{% trans %}Copy scrub picture{% endtrans %}</button>
+                    </div>
+                </div>
+            </div>
+            {% if trombi_user.memberships.exists() %}
+            <h4>{% trans %}Club{% endtrans %}</h4>
+            <table id="user_{{ trombi_user.id }}_clubs" style="max-width: 70%; margin: auto;">
+                <thead>
+                    <tr>
+                        <td>{% trans %}Club{% endtrans %}</td>
+                        <td>{% trans %}Role{% endtrans %}</td>
+                        <td>{% trans %}Date{% endtrans %}</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in trombi_user.memberships.all() %}
+                    <tr>
+                        <td>{{ m.club }}</td>
+                        <td>{{ m.role }}</td>
+                        <td>{{ m.start }} - {{ m.end }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_clubs'))">{% trans %}Copy clubs{% endtrans %}</button>
+            {% endif %}
+            <h4>{% trans %}Comments{% endtrans %}</h4>
+            <div id="user_{{ trombi_user.id }}_coms" style="text-align: left">
+            {% for c in trombi_user.received_comments.filter(is_moderated=True) %}
+                <strong>{{ c.author.user.get_display_name() }}</strong><br>
+                {% for line in c.content.splitlines() %}
+                    {{ line }}<br>
+                {% endfor %}
+                <br>
+            {% endfor %}
+            </div>
+            <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_coms'))">{% trans %}Copy comments{% endtrans %}</button>
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}
+
+{% block script %}
+{{ super () }}
+<script>
+function copyToClipboard(el) {
+    var body = document.body, range, sel;
+    if (document.createRange && window.getSelection) {
+        range = document.createRange();
+        sel = window.getSelection();
+        sel.removeAllRanges();
+        try {
+            range.selectNodeContents(el);
+            sel.addRange(range);
+        } catch (e) {
+            range.selectNode(el);
+            sel.addRange(range);
+        }
+        document.execCommand("copy");
+
+    } else if (body.createTextRange) {
+        range = body.createTextRange();
+        range.moveToElementText(el);
+        range.select();
+        range.execCommand("Copy");
+    }
+}
+</script>
+{% endblock %}

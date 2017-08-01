@@ -10,7 +10,7 @@
     <a href="{{ url('trombi:moderate_comments', trombi_id=object.id) }}">{% trans %}Moderate comments{% endtrans %}</a>
     <p>{% trans %}Subscription deadline: {% endtrans %}{{ object.subscription_deadline|date(DATETIME_FORMAT) }}</p>
     <p>{% trans %}Comment deadline: {% endtrans %}{{ object.comments_deadline|date(DATETIME_FORMAT) }}</p>
-    <a href="#">Export</a>
+    <a href="{{ url('trombi:export', trombi_id=object.id) }}">{% trans %}Export{% endtrans %}</a>
     <hr>
     <h4>{% trans %}Add user{% endtrans %}</h4>
     <form action="" method="post">
