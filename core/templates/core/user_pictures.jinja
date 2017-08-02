@@ -5,15 +5,14 @@
 {% endblock %}
 
 {% block content %}
-{% set picture_qs = profile.pictures.exclude(picture=None).order_by('-picture__parent__id', 'id').select_related('picture__parent__parent__name') %}
-{% for a in picture_qs.distinct('picture__parent') %}
+{% for a in albums %}
     <div style="padding: 10px">
-        <h4>{{ a.picture.parent.name }}</h4>
+        <h4>{{ a.name }}</h4>
         <hr>
-    {% for r in picture_qs.filter(picture__parent=a.picture.parent) -%}
+    {% for picture in pictures[a.id] %}
         <div class="picture">
-            <a href="{{ url("sas:picture", picture_id=r.picture.id) }}#pict">
-                <img src="{{ r.picture.get_download_thumb_url() }}" alt="{{ r.picture.get_display_name() }}" style="max-width: 100%"/>
+            <a href="{{ url("sas:picture", picture_id=picture.id) }}#pict">
+                <img src="{{ picture.get_download_thumb_url() }}" alt="{{ picture.get_display_name() }}" style="max-width: 100%"/>
             </a>
         </div>
     {% endfor %}

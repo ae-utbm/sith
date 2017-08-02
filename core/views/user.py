@@ -258,6 +258,21 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
     template_name = "core/user_pictures.jinja"
     current_tab = 'pictures'
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserPicturesView, self).get_context_data(**kwargs)
+        kwargs['albums'] = []
+        kwargs['pictures'] = {}
+        picture_qs = self.object.pictures.exclude(picture=None).order_by('-picture__parent__date', 'id').select_related('picture__parent__name')
+        last_album = None
+        for pict_relation in picture_qs:
+            album = pict_relation.picture.parent
+            if album.id != last_album:
+                kwargs['albums'].append(album)
+                kwargs['pictures'][album.id] = []
+                last_album = album.id
+                print(album, album.date)
+            kwargs['pictures'][album.id].append(pict_relation.picture)
+        return kwargs
 
 class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
     """
