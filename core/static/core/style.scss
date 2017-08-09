@@ -255,7 +255,6 @@ h6 {
 p, pre {
   margin-top: 1em;
   margin-left: 0px;
-  overflow: auto;
 }
 
 ul, ol, dl {
@@ -270,6 +269,8 @@ dt {
 
 code {
   font-family: monospace;
+  overflow: auto;
+  max-width: 100%;
 }
 
 blockquote {
