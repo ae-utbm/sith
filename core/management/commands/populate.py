@@ -39,7 +39,7 @@ from accounting.models import GeneralJournal, BankAccount, ClubAccount, Operatio
 from core.utils import resize_image
 from club.models import Club, Membership
 from subscription.models import Subscription
-from counter.models import Customer, ProductType, Product, Counter
+from counter.models import Customer, ProductType, Product, Counter, Selling
 from com.models import Sith, Weekmail
 from election.models import Election, Role, Candidature, ElectionList
 from forum.models import Forum, ForumTopic
@@ -484,6 +484,9 @@ Welcome to the wiki page!
                 duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
                 start=s.subscription_start)
             s.save()
+
+            Selling(label=dcons.name, product=dcons, counter=mde, unit_price=dcons.selling_price, club=main_club,
+                                       quantity=settings.SITH_RECORD_LIMIT + 3, seller=skia, customer=krophil.customer).save()
 
             # Add barman to counter
             c = Counter.objects.get(id=2)

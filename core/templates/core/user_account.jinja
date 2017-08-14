@@ -37,14 +37,18 @@
 <h3>{% trans %}User account{% endtrans %}</h3>
 <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 <div id="drop">
-{% if customer.refillings.exists() %}
-    {% if customer.buyings.exists() %}
+{% set bought = customer.buyings.exists() %}
+{% set refilled = customer.refillings.exists() %}
+{% if bought or refilled %}
+    {% if bought %}
     <h5>{% trans %}Account buyings{% endtrans %}</h5>
         {{ monthly(buyings_month) }}
     {% endif %}
+    {% if refilled %}
     <h5>{% trans %}Refillings{% endtrans %}</h5>
         {{ monthly(refilling_month) }}
     {% endif %}
+{% endif %}
     {% if customer.user.invoices.exists() %}
     <h5>{% trans %}Eboutic invoices{% endtrans %}</h5>
         {{ monthly(invoices_month) }}
