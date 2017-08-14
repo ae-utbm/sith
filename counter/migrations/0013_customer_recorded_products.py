@@ -11,6 +11,7 @@ from counter.models import Customer, Product, Selling, Counter
 
 def balance_ecocups(apps, schema_editor):
     for customer in Customer.objects.all():
+        customer.recorded_products = 0
         for selling in customer.buyings.filter(product__id__in=[settings.SITH_RECORD_PRODUCT, settings.SITH_UNRECORD_PRODUCT]).all():
             if selling.product.id == settings.SITH_RECORD_PRODUCT:
                 customer.recorded_products -= selling.quantity
@@ -21,7 +22,7 @@ def balance_ecocups(apps, schema_editor):
             cons = Product.objects.get(id=settings.SITH_RECORD_PRODUCT)
             Selling(label=_("Record regularization"), product=cons, unit_price=cons.selling_price,
                     club=cons.club, counter=Counter.objects.filter(name='Foyer').first(),
-                    quantity=qt, seller=User.objects.get(id=0), customer=customer).save()
+                    quantity=qt, seller=User.objects.get(id=0), customer=customer).save(allow_negative=True)
             customer.recorded_products -= qt
             customer.save()
 

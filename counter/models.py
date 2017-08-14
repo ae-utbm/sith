@@ -80,8 +80,8 @@ class Customer(models.Model):
             letter = random.choice(string.ascii_lowercase)
         return number + letter
 
-    def save(self, *args, **kwargs):
-        if self.amount < 0:
+    def save(self, allow_negative=False, is_purchase=False, *args, **kwargs):
+        if self.amount < 0 and (is_purchase and not allow_negative):
             raise ValidationError(_("Not enough money"))
         super(Customer, self).save(*args, **kwargs)
 
@@ -392,13 +392,13 @@ class Selling(models.Model):
             html_message=message_html
         )
 
-    def save(self, *args, **kwargs):
+    def save(self, allow_negative=False, *args, **kwargs):
         if not self.date:
             self.date = timezone.now()
         self.full_clean()
         if not self.is_validated:
             self.customer.amount -= self.quantity * self.unit_price
-            self.customer.save()
+            self.customer.save(allow_negative=allow_negative, is_purchase=True)
             self.is_validated = True
         u = User.objects.filter(id=self.customer.user.id).first()
         if u.was_subscribed:
