@@ -486,7 +486,7 @@ Welcome to the wiki page!
             s.save()
 
             Selling(label=dcons.name, product=dcons, counter=mde, unit_price=dcons.selling_price, club=main_club,
-                                       quantity=settings.SITH_RECORD_LIMIT + 3, seller=skia, customer=krophil.customer).save()
+                                       quantity=settings.SITH_ECOCUP_LIMIT + 3, seller=skia, customer=krophil.customer).save()
 
             # Add barman to counter
             c = Counter.objects.get(id=2)

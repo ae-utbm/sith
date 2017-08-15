@@ -63,10 +63,10 @@ class Customer(models.Model):
 
     @property
     def can_record(self):
-        return self.recorded_products > -settings.SITH_RECORD_LIMIT
+        return self.recorded_products > -settings.SITH_ECOCUP_LIMIT
 
     def can_record_more(self, number):
-        return self.recorded_products - number >= -settings.SITH_RECORD_LIMIT
+        return self.recorded_products - number >= -settings.SITH_ECOCUP_LIMIT
 
     @property
     def can_buy(self):
@@ -80,8 +80,8 @@ class Customer(models.Model):
             letter = random.choice(string.ascii_lowercase)
         return number + letter
 
-    def save(self, allow_negative=False, is_purchase=False, *args, **kwargs):
-        if self.amount < 0 and (is_purchase and not allow_negative):
+    def save(self, allow_negative=False, is_selling=False, *args, **kwargs):
+        if self.amount < 0 and (is_selling and not allow_negative):
             raise ValidationError(_("Not enough money"))
         super(Customer, self).save(*args, **kwargs)
 
@@ -153,11 +153,11 @@ class Product(models.Model):
 
     @property
     def is_record_product(self):
-        return settings.SITH_RECORD_PRODUCT == self.id
+        return settings.SITH_ECOCUP_CONS == self.id
 
     @property
     def is_unrecord_product(self):
-        return settings.SITH_UNRECORD_PRODUCT == self.id
+        return settings.SITH_ECOCUP_DECO == self.id
 
     def is_owned_by(self, user):
         """
@@ -398,7 +398,7 @@ class Selling(models.Model):
         self.full_clean()
         if not self.is_validated:
             self.customer.amount -= self.quantity * self.unit_price
-            self.customer.save(allow_negative=allow_negative, is_purchase=True)
+            self.customer.save(allow_negative=allow_negative, is_selling=True)
             self.is_validated = True
         u = User.objects.filter(id=self.customer.user.id).first()
         if u.was_subscribed:

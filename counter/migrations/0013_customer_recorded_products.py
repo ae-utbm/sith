@@ -12,18 +12,18 @@ from counter.models import Customer, Product, Selling, Counter
 def balance_ecocups(apps, schema_editor):
     for customer in Customer.objects.all():
         customer.recorded_products = 0
-        for selling in customer.buyings.filter(product__id__in=[settings.SITH_RECORD_PRODUCT, settings.SITH_UNRECORD_PRODUCT]).all():
-            if selling.product.id == settings.SITH_RECORD_PRODUCT:
-                customer.recorded_products -= selling.quantity
-            elif selling.product.id == settings.SITH_UNRECORD_PRODUCT:
+        for selling in customer.buyings.filter(product__id__in=[settings.SITH_ECOCUP_CONS, settings.SITH_ECOCUP_DECO]).all():
+            if selling.product.is_record_product:
                 customer.recorded_products += selling.quantity
-        if customer.recorded_products > settings.SITH_RECORD_LIMIT:
-            qt = customer.recorded_products - settings.SITH_RECORD_LIMIT
-            cons = Product.objects.get(id=settings.SITH_RECORD_PRODUCT)
-            Selling(label=_("Record regularization"), product=cons, unit_price=cons.selling_price,
+            elif selling.product.is_unrecord_product:
+                customer.recorded_products -= selling.quantity
+        if customer.recorded_products < -settings.SITH_ECOCUP_LIMIT:
+            qt = -(customer.recorded_products + settings.SITH_ECOCUP_LIMIT)
+            cons = Product.objects.get(id=settings.SITH_ECOCUP_CONS)
+            Selling(label=_("Ecocup regularization"), product=cons, unit_price=cons.selling_price,
                     club=cons.club, counter=Counter.objects.filter(name='Foyer').first(),
                     quantity=qt, seller=User.objects.get(id=0), customer=customer).save(allow_negative=True)
-            customer.recorded_products -= qt
+            customer.recorded_products += qt
             customer.save()
 
 
