@@ -1,0 +1,78 @@
+{% from "core/macros.jinja" import user_mini_profile, paginate %}
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Search user{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<style type="text/css">
+.matmat_user {
+	/*position: absolute;*/
+	display: inline-block;
+    width: 240px;
+    height: 191px;
+    top: 6px;
+    left: 6px;
+    overflow: hidden;
+    border-width: 3px;
+    border-style: solid;
+    border-color: black;
+}
+</style>
+{% if result_exists %}
+<h2>{% trans %}User found{% endtrans %}</h2>
+{% for user in object_list %}
+
+    <div class="matmat_user">
+    	<a href="{{ url("core:user_profile", user_id=user.id) }}">
+		{{ user_mini_profile(user) }}
+		</a>
+	</div>
+
+{% endfor %}
+<br><br>
+{{ paginate(page_obj, paginator) }}
+{% endif %}
+<h2>{% trans %}Search user{% endtrans %}</h2>
+<h3>{% trans %}Search by profile{% endtrans %}</h3>
+<form action="{{ url('matmat:search') }}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+    {% if field.name not in ('phone', 'quick') %}
+    <p>
+	    {{ field.errors }}
+	    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    	{{ field }}
+    </p>
+    {% endif %}
+    {% endfor %}
+    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+</form>
+<h3>{% trans %}Inverted search{% endtrans %}</h3>
+<form action="{{ url('matmat:search_reverse') }}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+	<p>
+	    {{ form.phone.errors }}
+	    <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+	    {{ form.phone }}
+        {{ form.sex.as_hidden() }}
+	    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+	</p>
+</form>
+<h3>{% trans %}Quick search{% endtrans %}</h3>
+<form action="{{ url('matmat:search_quick') }}" method="post">
+    {% csrf_token %}
+    <p>
+        {{ form.quick.errors }}
+        <label for="{{ form.quick.id_for_label }}">{{ form.quick.label }}</label>
+        {{ form.sex.as_hidden() }}
+        {{ form.quick }}
+        <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+    </p>
+</form>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+{% endblock %}

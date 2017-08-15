@@ -67,6 +67,7 @@ urlpatterns = [
     url(r'^election/', include('election.urls', namespace="election", app_name="election")),
     url(r'^forum/', include('forum.urls', namespace="forum", app_name="forum")),
     url(r'^trombi/', include('trombi.urls', namespace="trombi", app_name="trombi")),
+    url(r'^matmatronch/', include('matmat.urls', namespace="matmat", app_name="matmat")),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^ajax_select/', include(ajax_select_urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),
