@@ -73,7 +73,7 @@ class SearchForm(forms.ModelForm):
         ("MAN", _("Man")),
         ("WOMAN", _("Woman")),
         ("INDIFFERENT", _("Indifferent"))
-    ], widget=forms.RadioSelect, initial="INDIFFERENT")
+    ], widget=forms.RadioSelect, initial="INDIFFERENT", label=_('Sex'))
 
     quick = forms.CharField(label=_('Last/First name or nickname'), max_length=255)
 

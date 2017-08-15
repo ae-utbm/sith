@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-15 18:05+0200\n"
+"POT-Creation-Date: 2017-08-15 18:57+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3927,7 +3927,7 @@ msgstr "Utilisateur trouvé"
 
 #: matmat/templates/matmat/search_form.jinja:38
 msgid "Search by profile"
-msgstr "Recherche par profile"
+msgstr "Recherche par profil"
 
 #: matmat/templates/matmat/search_form.jinja:52
 msgid "Inverted search"
@@ -3940,6 +3940,10 @@ msgstr "Recherche rapide"
 #: matmat/views.py:75
 msgid "Indifferent"
 msgstr "Indifferent"
+
+#: matmat/views.py:76
+msgid "Sex"
+msgstr "Sexe"
 
 #: matmat/views.py:78
 msgid "Last/First name or nickname"
