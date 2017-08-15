@@ -401,6 +401,7 @@ SITH_ECOCUP_CONS = 1152
 
 SITH_ECOCUP_DECO = 1151
 
+# The limit is the maximum difference between cons and deco possible for a customer
 SITH_ECOCUP_LIMIT = 3
 
 # Defines pagination for cash summary
