@@ -397,6 +397,13 @@ SITH_COUNTER_BANK = [
     ('LA-POSTE', 'La Poste'),
 ]
 
+SITH_ECOCUP_CONS = 1152
+
+SITH_ECOCUP_DECO = 1151
+
+# The limit is the maximum difference between cons and deco possible for a customer
+SITH_ECOCUP_LIMIT = 3
+
 # Defines pagination for cash summary
 SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
 

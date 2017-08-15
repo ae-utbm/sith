@@ -51,6 +51,7 @@ class Customer(models.Model):
     user = models.OneToOneField(User, primary_key=True)
     account_id = models.CharField(_('account id'), max_length=10, unique=True)
     amount = CurrencyField(_('amount'))
+    recorded_products = models.IntegerField(_('recorded product'), default=0)
 
     class Meta:
         verbose_name = _('customer')
@@ -59,6 +60,13 @@ class Customer(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.user.username, self.account_id)
+
+    @property
+    def can_record(self):
+        return self.recorded_products > -settings.SITH_ECOCUP_LIMIT
+
+    def can_record_more(self, number):
+        return self.recorded_products - number >= -settings.SITH_ECOCUP_LIMIT
 
     @property
     def can_buy(self):
@@ -72,8 +80,13 @@ class Customer(models.Model):
             letter = random.choice(string.ascii_lowercase)
         return number + letter
 
-    def save(self, *args, **kwargs):
-        if self.amount < 0:
+    def save(self, allow_negative=False, is_selling=False, *args, **kwargs):
+        """
+            is_selling : tell if the current action is a selling
+            allow_negative : ignored if not a selling. Allow a selling to put the account in negative
+            Those two parameters avoid blocking the save method of a customer if his account is negative
+        """
+        if self.amount < 0 and (is_selling and not allow_negative):
             raise ValidationError(_("Not enough money"))
         super(Customer, self).save(*args, **kwargs)
 
@@ -142,6 +155,14 @@ class Product(models.Model):
 
     class Meta:
         verbose_name = _('product')
+
+    @property
+    def is_record_product(self):
+        return settings.SITH_ECOCUP_CONS == self.id
+
+    @property
+    def is_unrecord_product(self):
+        return settings.SITH_ECOCUP_DECO == self.id
 
     def is_owned_by(self, user):
         """
@@ -376,13 +397,16 @@ class Selling(models.Model):
             html_message=message_html
         )
 
-    def save(self, *args, **kwargs):
+    def save(self, allow_negative=False, *args, **kwargs):
+        """
+            allow_negative : Allow this selling to use more money than available for this user
+        """
         if not self.date:
             self.date = timezone.now()
         self.full_clean()
         if not self.is_validated:
             self.customer.amount -= self.quantity * self.unit_price
-            self.customer.save()
+            self.customer.save(allow_negative=allow_negative, is_selling=True)
             self.is_validated = True
         u = User.objects.filter(id=self.customer.user.id).first()
         if u.was_subscribed:

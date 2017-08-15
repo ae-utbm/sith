@@ -330,6 +330,28 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         except:
             return 0
 
+    def compute_record_product(self, request, product=None):
+        recorded = 0
+        basket = request.session['basket']
+
+        if product:
+            if product.is_record_product:
+                recorded -= 1
+            elif product.is_unrecord_product:
+                recorded += 1
+
+        for p in basket:
+            bproduct = self.get_product(str(p))
+            if bproduct.is_record_product:
+                recorded -= basket[p]['qty']
+            elif bproduct.is_unrecord_product:
+                recorded += basket[p]['qty']
+        return recorded
+
+    def is_record_product_ok(self, request, product):
+        return self.customer.can_record_more(
+            self.compute_record_product(request, product))
+
     def add_product(self, request, q=1, p=None):
         """
         Add a product to the basket
@@ -358,6 +380,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             q -= bq
         if self.customer.amount < (total + round(q * float(price), 2)):  # Check for enough money
             request.session['not_enough'] = True
+            return False
+        if product.is_unrecord_product and not self.is_record_product_ok(request, product):
+            request.session['not_allowed'] = True
             return False
         if product.limit_age >= 18 and not self.customer.user.date_of_birth:
             request.session['no_age'] = True
@@ -421,6 +446,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         """ Finish the click session, and validate the basket """
         with transaction.atomic():
             request.session['last_basket'] = []
+            if self.sum_basket(request) > self.customer.amount:
+                raise DataError(_("You have not enough money to buy all the basket"))
+
             for pid, infos in request.session['basket'].items():
                 # This duplicates code for DB optimization (prevent to load many times the same object)
                 p = Product.objects.filter(pk=pid).first()
@@ -428,8 +456,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                     uprice = p.special_selling_price
                 else:
                     uprice = p.selling_price
-                if uprice * infos['qty'] > self.customer.amount:
-                    raise DataError(_("You have not enough money to buy all the basket"))
                 request.session['last_basket'].append("%d x %s" % (infos['qty'] + infos['bonus_qty'], p.name))
                 s = Selling(label=p.name, product=p, club=p.club, counter=self.object, unit_price=uprice,
                             quantity=infos['qty'], seller=self.operator, customer=self.customer)
@@ -438,6 +464,8 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                     s = Selling(label=p.name + " (Plateau)", product=p, club=p.club, counter=self.object, unit_price=0,
                                 quantity=infos['bonus_qty'], seller=self.operator, customer=self.customer)
                     s.save()
+                self.customer.recorded_products -= self.compute_record_product(request)
+                self.customer.save()
             request.session['last_customer'] = self.customer.user.get_display_name()
             request.session['last_total'] = "%0.2f" % self.sum_basket(request)
             request.session['new_customer_amount'] = str(self.customer.amount)
