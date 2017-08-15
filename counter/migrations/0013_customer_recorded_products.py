@@ -24,7 +24,7 @@ def balance_ecocups(apps, schema_editor):
                     club=cons.club, counter=Counter.objects.filter(name='Foyer').first(),
                     quantity=qt, seller=User.objects.get(id=0), customer=customer).save(allow_negative=True)
             customer.recorded_products += qt
-            customer.save()
+        customer.save()
 
 
 class Migration(migrations.Migration):
