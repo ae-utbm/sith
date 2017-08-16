@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -220,3 +221,36 @@ class Membership(models.Model):
 
     def get_absolute_url(self):
         return reverse('club:club_members', kwargs={'club_id': self.club.id})
+
+
+class Mailing(models.Model):
+    """
+    This class correspond to a mailing list
+
+    """
+    club = models.ForeignKey(Club, verbose_name=_('Club'), related_name="mailings", null=False, blank=False)
+    email = models.EmailField(_('Email address'), unique=True)
+
+    def is_owned_by(self, user):
+        return self.club.has_rights_in_club(user) or user.is_root
+
+    def can_be_edited_by(self, user):
+        return self.is_owned_by(user)
+
+    def __str__(self):
+        return "%s - %s" % (self.club, self.email)
+
+
+class MailingSubscription(models.Model):
+    """
+    This class make the link between user and mailing list
+    """
+    mailing = models.ForeignKey(Mailing, verbose_name=_('Mailing'), related_name="subscriptions", null=False, blank=False)
+    user = models.ForeignKey(User, verbose_name=_('User'), related_name="mailing_subscriptions", null=True, blank=True)
+    email = models.EmailField(_('Email address'), unique=True)
+
+    def is_owned_by(self, user):
+        return self.mailing.club.has_rights_in_club(user) or user.is_root
+
+    def can_be_edited_by(self, user):
+        return self.is_owned_by(user) or (user is not None and user.id == self.user.id)

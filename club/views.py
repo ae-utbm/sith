@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -23,20 +24,52 @@
 #
 
 from django import forms
+from enum import Enum
 from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic.edit import DeleteView, FormView
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView, CreateView
 from django.http import HttpResponseRedirect, HttpResponse
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _t
 from ajax_select.fields import AutoCompleteSelectField
+from django.shortcuts import get_object_or_404
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin
 from core.views.forms import SelectDate, SelectDateTime
-from club.models import Club, Membership
+from club.models import Club, Membership, Mailing, MailingSubscription
 from sith.settings import SITH_MAXIMUM_FREE_ROLE
 from counter.models import Selling, Counter
+
+# Custom forms
+
+
+class MailingForm(forms.ModelForm):
+    class Meta:
+        model = Mailing
+        fields = ('email', 'club')
+
+    def __init__(self, *args, **kwargs):
+        club_id = kwargs.pop('club_id', None)
+        super(MailingForm, self).__init__(*args, **kwargs)
+        if club_id:
+            self.fields['club'].queryset = Club.objects.filter(id=club_id)
+
+
+class MailingSubscriptionForm(forms.ModelForm):
+    class Meta:
+        model = MailingSubscription
+        fields = ('mailing', 'user', 'email')
+
+    def __init__(self, *args, **kwargs):
+        club_id = kwargs.pop('club_id', None)
+        super(MailingSubscriptionForm, self).__init__(*args, **kwargs)
+        if club_id:
+            self.fields['mailing'].queryset = Mailing.objects.filter(club__id=club_id)
+
+    user = AutoCompleteSelectField('users', label=_('User'), help_text=None, required=False)
 
 
 class ClubTabsMixin(TabedViewMixin):
@@ -60,6 +93,11 @@ class ClubTabsMixin(TabedViewMixin):
                 'url': reverse('club:club_old_members', kwargs={'club_id': self.object.id}),
                 'slug': 'elderlies',
                         'name': _("Old members"),
+            })
+            tab_list.append({
+                'url': reverse('club:mailing', kwargs={'club_id': self.object.id}),
+                'slug': 'mailing',
+                        'name': _("Mailing list"),
             })
         if self.request.user.can_edit(self.object):
             tab_list.append({
@@ -338,3 +376,78 @@ class ClubStatView(TemplateView):
         kwargs = super(ClubStatView, self).get_context_data(**kwargs)
         kwargs['club_list'] = Club.objects.all()
         return kwargs
+
+
+class MailingFormType(Enum):
+    DISPLAY = 0
+    MEMBER = 1
+    MAILING = 2
+
+
+class ClubMailingView(CanViewMixin, ListView):
+    """
+    A list of mailing for a given club
+    """
+    action = None
+    model = Mailing
+    template_name = "club/mailing.jinja"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.club = get_object_or_404(Club, pk=kwargs['club_id'])
+        self.user = request.user
+        self.member_form = MailingSubscriptionForm(club_id=self.club.id)
+        self.mailing_form = MailingForm(club_id=self.club.id)
+        return super(ClubMailingView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        res = super(ClubMailingView, self).get(request, *args, **kwargs)
+        if self.action != MailingFormType.DISPLAY:
+            if self.action == MailingFormType.MAILING:
+                form = MailingForm
+                string = 'new_mailing'
+            elif self.action == MailingFormType.MEMBER:
+                form = MailingSubscriptionForm
+                string = 'new_member'
+            return MailingGenericCreateView.as_view(list_view=self, form_class=form, form_kwarg_string=string)(request, *args, **kwargs)
+        return res
+
+    def get_queryset(self):
+        return Mailing.objects.filter(club_id=self.club.id).all()
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubMailingView, self).get_context_data(**kwargs)
+        kwargs['new_member'] = self.member_form
+        kwargs['new_mailing'] = self.mailing_form
+        kwargs['club'] = self.club
+        kwargs['user'] = self.user
+        kwargs['has_objects'] = len(kwargs['object_list']) > 0
+        return kwargs
+
+
+class MailingGenericCreateView(CanCreateMixin, CreateView, SingleObjectMixin):
+    """
+    Create a new mailing list
+    """
+    model = Mailing
+    list_view = None
+    form_class = None
+    form_kwarg_string = None
+
+    def get_context_data(self, **kwargs):
+        view_kwargs = self.list_view.get_context_data(**kwargs)
+        for key, data in super(MailingGenericCreateView, self).get_context_data(**kwargs).items():
+            view_kwargs[key] = data
+        view_kwargs[self.form_kwarg_string] = view_kwargs['form']
+        return view_kwargs
+
+    def get_form_kwargs(self):
+        kwargs = super(MailingGenericCreateView, self).get_form_kwargs()
+        kwargs['club_id'] = self.list_view.club.id
+        return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        self.template_name = self.list_view.template_name
+        return super(MailingGenericCreateView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('club:mailing', kwargs={'club_id': self.list_view.club.id})

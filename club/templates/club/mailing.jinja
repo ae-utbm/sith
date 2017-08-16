@@ -1,0 +1,56 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Mailing lists{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if has_objects %}
+
+    {% for mailing in object_list %}
+    <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email }}</h2>
+    <table>
+        <tr>
+            <th>{% trans %}User{% endtrans %}</th>
+            <th>{% trans %}Mail{%endtrans%}</th>
+        </tr>
+        {% for subscriber in mailing.subscriptions.all() %}
+        <tr>
+            {% if subscriber.user %}
+            <td>{{ subscriber.user }}</td>
+            {% else %}
+            <td>{% trans %}Unregistered user{% endtrans %}</td>
+            {% endif %}
+            <td>{{ subscriber.email }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+
+    {% else %}
+    <p>{% trans %}No mailing list existing for this club{% endtrans %}</p>
+    {% endif %}
+
+    {% if club.has_rights_in_club(user) %}
+
+    {% if has_objects %}
+        <h2>{% trans %}New member{% endtrans %}</h2>
+        <form action="{{ url('club:mailing_subscription_create', club_id=club.id) }}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ new_member.as_p() }}
+            <p><input type="submit" value="{% trans %}Add to mailing list{% endtrans %}" /></p>
+        </form>
+    {% endif %}
+
+    <h2>{% trans %}New mailing{% endtrans %}</h2>
+    <form action="{{ url('club:mailing_create', club_id=club.id) }}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ new_mailing.as_p() }}
+        <p><input type="submit" value="{% trans %}Create mailing list{% endtrans %}" /></p>
+    </form>
+    {% endif %}
+
+{% endblock %}
+
+
+

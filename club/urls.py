@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -38,5 +39,8 @@ urlpatterns = [
     url(r'^(?P<club_id>[0-9]+)/sellings/csv$', ClubSellingCSVView.as_view(), name='sellings_csv'),
     url(r'^(?P<club_id>[0-9]+)/prop$', ClubEditPropView.as_view(), name='club_prop'),
     url(r'^(?P<club_id>[0-9]+)/tools$', ClubToolsView.as_view(), name='tools'),
+    url(r'^(?P<club_id>[0-9]+)/mailing$', ClubMailingView.as_view(action=MailingFormType.DISPLAY), name='mailing'),
+    url(r'^(?P<club_id>[0-9]+)/mailing/new/mailing$', ClubMailingView.as_view(action=MailingFormType.MAILING), name='mailing_create'),
+    url(r'^(?P<club_id>[0-9]+)/mailing/new/subscription$', ClubMailingView.as_view(action=MailingFormType.MEMBER), name='mailing_subscription_create'),
     url(r'^membership/(?P<membership_id>[0-9]+)/set_old$', MembershipSetOldView.as_view(), name='membership_set_old'),
 ]
