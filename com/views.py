@@ -257,7 +257,7 @@ class NewsModerateView(CanEditMixin, SingleObjectMixin):
 class NewsAdminListView(CanEditMixin, ListView):
     model = News
     template_name = 'com/news_admin_list.jinja'
-    queryset = News.objects.filter(dates__end_date__gte=timezone.now()).distinct().order_by('id')
+    queryset = News.objects.all()
 
 
 class NewsListView(CanViewMixin, ListView):
