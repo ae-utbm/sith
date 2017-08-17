@@ -8,11 +8,16 @@
     {% if has_objects %}
 
     {% for mailing in object_list %}
-    <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email }}</h2>
+    <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email }} 
+        {%- if user.is_owner(mailing) -%}
+        <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}">{% trans %}Delete{% endtrans %}</a>
+        {%- endif -%}
+    </h2>
+    <hr>
     <table>
         <tr>
             <th>{% trans %}User{% endtrans %}</th>
-            <th>{% trans %}Mail{%endtrans%}</th>
+            <th colspan="2">{% trans %}Email{%endtrans%}</th>
         </tr>
         {% for subscriber in mailing.subscriptions.all() %}
         <tr>
@@ -22,6 +27,7 @@
             <td>{% trans %}Unregistered user{% endtrans %}</td>
             {% endif %}
             <td>{{ subscriber.email }}</td>
+            <td><a href="{{ url('club:mailing_subscription_delete', mailing_subscription_id=subscriber.id) }}">{% trans %}Delete{% endtrans %}</a></td>
         </tr>
         {% endfor %}
     </table>
@@ -30,8 +36,6 @@
     {% else %}
     <p>{% trans %}No mailing list existing for this club{% endtrans %}</p>
     {% endif %}
-
-    {% if club.has_rights_in_club(user) %}
 
     {% if has_objects %}
         <h2>{% trans %}New member{% endtrans %}</h2>
@@ -48,9 +52,5 @@
         {{ new_mailing.as_p() }}
         <p><input type="submit" value="{% trans %}Create mailing list{% endtrans %}" /></p>
     </form>
-    {% endif %}
 
 {% endblock %}
-
-
-

@@ -58,5 +58,12 @@
     	{% endfor %}
     </tbody>
 </table>
+
+{% if user.mailing_subscriptions.exists() %}
+    <h4>{% trans %}Subscribed mailing lists{% endtrans %}</h4>
+    {% for sub in user.mailing_subscriptions.all() %}
+        <p>{{ sub }} <a href="{{ url('club:mailing_subscription_delete', mailing_subscription_id=sub.id) }}">{% trans %}Unsuscribe{% endtrans %}</a></p>
+    {% endfor %}
+{% endif %}
 {% endblock %}
 

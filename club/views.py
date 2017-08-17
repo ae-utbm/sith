@@ -35,6 +35,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _t
 from ajax_select.fields import AutoCompleteSelectField
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin
@@ -56,6 +57,8 @@ class MailingForm(forms.ModelForm):
         super(MailingForm, self).__init__(*args, **kwargs)
         if club_id:
             self.fields['club'].queryset = Club.objects.filter(id=club_id)
+            self.fields['club'].initial = club_id
+            self.fields['club'].widget = forms.HiddenInput()
 
 
 class MailingSubscriptionForm(forms.ModelForm):
@@ -66,8 +69,21 @@ class MailingSubscriptionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         club_id = kwargs.pop('club_id', None)
         super(MailingSubscriptionForm, self).__init__(*args, **kwargs)
+        self.fields['email'].required = False
         if club_id:
             self.fields['mailing'].queryset = Mailing.objects.filter(club__id=club_id)
+
+    def clean(self):
+        cleaned_data = super(MailingSubscriptionForm, self).clean()
+        user = cleaned_data.get('user', None)
+        email = cleaned_data.get('email', None)
+        mailing = cleaned_data.get('mailing')
+        if not user and not email:
+            raise forms.ValidationError(_("At least user or email should be filled"))
+        if user and not email:
+            email = user.email
+        if user and MailingSubscription.objects.filter(mailing=mailing, email=email).exists():
+            raise forms.ValidationError(_("This email is already suscribed in this mailing"))
 
     user = AutoCompleteSelectField('users', label=_('User'), help_text=None, required=False)
 
@@ -94,11 +110,6 @@ class ClubTabsMixin(TabedViewMixin):
                 'slug': 'elderlies',
                         'name': _("Old members"),
             })
-            tab_list.append({
-                'url': reverse('club:mailing', kwargs={'club_id': self.object.id}),
-                'slug': 'mailing',
-                        'name': _("Mailing list"),
-            })
         if self.request.user.can_edit(self.object):
             tab_list.append({
                 'url': reverse('club:tools', kwargs={'club_id': self.object.id}),
@@ -114,6 +125,11 @@ class ClubTabsMixin(TabedViewMixin):
                 'url': reverse('club:club_sellings', kwargs={'club_id': self.object.id}),
                 'slug': 'sellings',
                         'name': _("Sellings"),
+            })
+            tab_list.append({
+                'url': reverse('club:mailing', kwargs={'club_id': self.object.id}),
+                'slug': 'mailing',
+                        'name': _("Mailing list"),
             })
         if self.request.user.is_owner(self.object):
             tab_list.append({
@@ -384,17 +400,24 @@ class MailingFormType(Enum):
     MAILING = 2
 
 
-class ClubMailingView(CanViewMixin, ListView):
+class ClubMailingView(ClubTabsMixin, ListView):
     """
     A list of mailing for a given club
     """
     action = None
     model = Mailing
     template_name = "club/mailing.jinja"
+    current_tab = 'mailing'
+
+    def authorized(self):
+        return self.club.has_rights_in_club(self.user) or self.user.is_root or self.user.is_board_member
 
     def dispatch(self, request, *args, **kwargs):
         self.club = get_object_or_404(Club, pk=kwargs['club_id'])
         self.user = request.user
+        self.object = self.club
+        if not self.authorized():
+            raise PermissionDenied
         self.member_form = MailingSubscriptionForm(club_id=self.club.id)
         self.mailing_form = MailingForm(club_id=self.club.id)
         return super(ClubMailingView, self).dispatch(request, *args, **kwargs)
@@ -405,10 +428,12 @@ class ClubMailingView(CanViewMixin, ListView):
             if self.action == MailingFormType.MAILING:
                 form = MailingForm
                 string = 'new_mailing'
+                model = Mailing
             elif self.action == MailingFormType.MEMBER:
                 form = MailingSubscriptionForm
                 string = 'new_member'
-            return MailingGenericCreateView.as_view(list_view=self, form_class=form, form_kwarg_string=string)(request, *args, **kwargs)
+                model = MailingSubscription
+            return MailingGenericCreateView.as_view(model=model, list_view=self, form_class=form, form_kwarg_string=string)(request, *args, **kwargs)
         return res
 
     def get_queryset(self):
@@ -424,11 +449,10 @@ class ClubMailingView(CanViewMixin, ListView):
         return kwargs
 
 
-class MailingGenericCreateView(CanCreateMixin, CreateView, SingleObjectMixin):
+class MailingGenericCreateView(CreateView, SingleObjectMixin):
     """
     Create a new mailing list
     """
-    model = Mailing
     list_view = None
     form_class = None
     form_kwarg_string = None
@@ -446,8 +470,38 @@ class MailingGenericCreateView(CanCreateMixin, CreateView, SingleObjectMixin):
         return kwargs
 
     def dispatch(self, request, *args, **kwargs):
+        if not self.list_view.authorized():
+            raise PermissionDenied
         self.template_name = self.list_view.template_name
         return super(MailingGenericCreateView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('club:mailing', kwargs={'club_id': self.list_view.club.id})
+
+
+class MailingDeleteView(CanEditMixin, DeleteView):
+
+    model = Mailing
+    template_name = 'core/delete_confirm.jinja'
+    pk_url_kwarg = "mailing_id"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.club_id = self.get_object().club.id
+        return super(MailingDeleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('club:mailing', kwargs={'club_id': self.club_id})
+
+
+class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):
+
+    model = MailingSubscription
+    template_name = 'core/delete_confirm.jinja'
+    pk_url_kwarg = "mailing_subscription_id"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.club_id = self.get_object().mailing.club.id
+        return super(MailingSubscriptionDeleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('club:mailing', kwargs={'club_id': self.club_id})

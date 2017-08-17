@@ -1,0 +1,30 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Mailing lists administration{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <h1>{% trans %}This page list all existing mailing lists{% endtrans %}</h1>
+    {% if has_objects %}
+    <table>
+        <tr>
+            <th>{% trans %}Email{% endtrans %}</th>
+            <th>{% trans %}Club{%endtrans%}</th>
+        </tr>
+        {% for mailing in object_list %}
+        <tr>
+            <td>{{ mailing.email }}</td>
+            <td>{{ mailing.club }} <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% else %}
+    <p>{% trans %}No mailing existing{% endtrans %}</p>
+    {% endif %}
+
+{% endblock %}
+
+
+

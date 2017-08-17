@@ -226,16 +226,21 @@ class Membership(models.Model):
 class Mailing(models.Model):
     """
     This class correspond to a mailing list
-
+    Remember that mailing lists should be validated by UTBM
     """
     club = models.ForeignKey(Club, verbose_name=_('Club'), related_name="mailings", null=False, blank=False)
     email = models.EmailField(_('Email address'), unique=True)
 
     def is_owned_by(self, user):
-        return self.club.has_rights_in_club(user) or user.is_root
+        return user.is_in_group(self) or user.is_root or user.is_board_member
 
-    def can_be_edited_by(self, user):
-        return self.is_owned_by(user)
+    def can_view(self, user):
+        return self.club.has_rights_in_club(user)
+
+    def delete(self):
+        for sub in self.subscriptions.all():
+            sub.delete()
+        super(Mailing, self).delete()
 
     def __str__(self):
         return "%s - %s" % (self.club, self.email)
@@ -243,14 +248,31 @@ class Mailing(models.Model):
 
 class MailingSubscription(models.Model):
     """
-    This class make the link between user and mailing list
+    This class makes the link between user and mailing list
     """
     mailing = models.ForeignKey(Mailing, verbose_name=_('Mailing'), related_name="subscriptions", null=False, blank=False)
     user = models.ForeignKey(User, verbose_name=_('User'), related_name="mailing_subscriptions", null=True, blank=True)
-    email = models.EmailField(_('Email address'), unique=True)
+    email = models.EmailField(_('Email address'), blank=False, null=False)
+
+    class Meta:
+        unique_together = (('user', 'email', 'mailing'),)
+
+    def clean(self):
+        if not self.user and not self.email:
+            raise ValidationError(_("At least user or email is required"))
+        if self.user and not self.email:
+            self.email = self.user.email
+        super(MailingSubscription, self).clean()
 
     def is_owned_by(self, user):
         return self.mailing.club.has_rights_in_club(user) or user.is_root
 
     def can_be_edited_by(self, user):
         return self.is_owned_by(user) or (user is not None and user.id == self.user.id)
+
+    def __str__(self):
+        if self.user:
+            user = str(self.user)
+        else:
+            user = _("Unregistered user")
+        return "(%s) - %s : %s" % (self.mailing, user, self.email)

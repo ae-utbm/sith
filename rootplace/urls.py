@@ -28,4 +28,5 @@ from rootplace.views import *
 
 urlpatterns = [
     url(r'^merge$', MergeUsersView.as_view(), name='merge'),
+    url(r'^mailings$', MailingListAdminView.as_view(), name='mailings')
 ]
