@@ -44,5 +44,6 @@ urlpatterns = [
     url(r'^(?P<club_id>[0-9]+)/mailing/new/subscription$', ClubMailingView.as_view(action=MailingFormType.MEMBER), name='mailing_subscription_create'),
     url(r'^(?P<mailing_id>[0-9]+)/mailing/delete$', MailingDeleteView.as_view(), name='mailing_delete'),
     url(r'^(?P<mailing_subscription_id>[0-9]+)/mailing/delete/subscription$', MailingSubscriptionDeleteView.as_view(), name='mailing_subscription_delete'),
+    url(r'^mailing/fetch$', MailingFetchView.as_view(), name='mailing_fetch'),
     url(r'^membership/(?P<membership_id>[0-9]+)/set_old$', MembershipSetOldView.as_view(), name='membership_set_old'),
 ]

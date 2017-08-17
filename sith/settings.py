@@ -586,3 +586,8 @@ if DEBUG:
     SASS_INCLUDE_FOLDERS = [
         'core/static/',
     ]
+
+# Mailing related settings
+
+SITH_MAILING_ALLOWED_DOMAIN = 'utbm.fr'
+SITH_MAILING_FETCH_KEY = 'IloveMails'

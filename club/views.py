@@ -44,6 +44,8 @@ from club.models import Club, Membership, Mailing, MailingSubscription
 from sith.settings import SITH_MAXIMUM_FREE_ROLE
 from counter.models import Selling, Counter
 
+from django.conf import settings
+
 # Custom forms
 
 
@@ -505,3 +507,15 @@ class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('club:mailing', kwargs={'club_id': self.club_id})
+
+
+class MailingFetchView(ListView):
+
+    model = Mailing
+    template_name = 'club/mailing_output.jinja'
+
+    def dispatch(self, request, *args, **kwargs):
+        key = request.GET.get('key', '')
+        if key != settings.SITH_MAILING_FETCH_KEY:
+            raise PermissionDenied
+        return super(MailingFetchView, self).dispatch(request, *args, **kwargs)

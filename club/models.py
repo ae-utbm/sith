@@ -231,6 +231,11 @@ class Mailing(models.Model):
     club = models.ForeignKey(Club, verbose_name=_('Club'), related_name="mailings", null=False, blank=False)
     email = models.EmailField(_('Email address'), unique=True)
 
+    def clean(self):
+        if '@' + settings.SITH_MAILING_ALLOWED_DOMAIN not in self.email:
+            raise ValidationError(_('Unothorized mailing domain'))
+            super(Mailing, self).clean()
+
     def is_owned_by(self, user):
         return user.is_in_group(self) or user.is_root or user.is_board_member
 
@@ -241,6 +246,15 @@ class Mailing(models.Model):
         for sub in self.subscriptions.all():
             sub.delete()
         super(Mailing, self).delete()
+
+    def base_mail(self):
+        return self.email.split('@')[0]
+
+    def fetch_format(self):
+        resp = self.base_mail() + ': '
+        for sub in self.subscriptions.all():
+            resp += sub.fetch_format()
+        return resp
 
     def __str__(self):
         return "%s - %s" % (self.club, self.email)
@@ -269,6 +283,9 @@ class MailingSubscription(models.Model):
 
     def can_be_edited_by(self, user):
         return self.is_owned_by(user) or (user is not None and user.id == self.user.id)
+
+    def fetch_format(self):
+        return self.email + ' '
 
     def __str__(self):
         if self.user:
