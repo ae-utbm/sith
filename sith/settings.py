@@ -560,6 +560,11 @@ SITH_QUICK_NOTIF = {
     'qn_weekmail_send_success': _("You successfully sent the Weekmail"),
 }
 
+# Mailing related settings
+
+SITH_MAILING_ALLOWED_DOMAIN = 'utbm.fr'
+SITH_MAILING_FETCH_KEY = 'IloveMails'
+
 try:
     from .settings_custom import *
     print("Custom settings imported")
@@ -586,8 +591,3 @@ if DEBUG:
     SASS_INCLUDE_FOLDERS = [
         'core/static/',
     ]
-
-# Mailing related settings
-
-SITH_MAILING_ALLOWED_DOMAIN = 'utbm.fr'
-SITH_MAILING_FETCH_KEY = 'IloveMails'
