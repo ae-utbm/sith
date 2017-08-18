@@ -276,6 +276,8 @@ class MailingSubscription(models.Model):
             raise ValidationError(_("At least user or email is required"))
         if self.user and not self.email:
             self.email = self.user.email
+        if MailingSubscription.objects.filter(mailing=self.mailing, email=self.email).exists():
+            raise ValidationError(_("This email is already suscribed in this mailing"))
         super(MailingSubscription, self).clean()
 
     def is_owned_by(self, user):

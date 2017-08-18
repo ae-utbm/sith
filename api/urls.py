@@ -48,5 +48,6 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^login/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^markdown$', RenderMarkdown, name='api_markdown'),
+    url(r'^mailings$', FetchMailingLists, name='mailings_fetch')
 
 ]

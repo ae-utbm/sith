@@ -41,7 +41,7 @@
         <h2>{% trans %}New member{% endtrans %}</h2>
         <form action="{{ url('club:mailing_subscription_create', club_id=club.id) }}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ new_member.as_p() }}
+            {{ add_member.as_p() }}
             <p><input type="submit" value="{% trans %}Add to mailing list{% endtrans %}" /></p>
         </form>
     {% endif %}
@@ -49,7 +49,7 @@
     <h2>{% trans %}New mailing{% endtrans %}</h2>
     <form action="{{ url('club:mailing_create', club_id=club.id) }}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ new_mailing.as_p() }}
+        {{ add_mailing.as_p() }}
         <p><input type="submit" value="{% trans %}Create mailing list{% endtrans %}" /></p>
     </form>
 

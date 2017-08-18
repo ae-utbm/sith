@@ -43,7 +43,6 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.views.i18n import javascript_catalog
 from ajax_select import urls as ajax_select_urls
-from club.views import MailingFetchView
 
 js_info_dict = {
     'packages': ('sith',),
@@ -73,8 +72,6 @@ urlpatterns = [
     url(r'^ajax_select/', include(ajax_select_urls)),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
-    # This url is for legacy use
-    url(r'^mailing.php$', MailingFetchView.as_view(), name='mailing_fetch_legacy'),
 ]
 
 if settings.DEBUG:

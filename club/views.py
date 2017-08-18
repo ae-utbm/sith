@@ -75,18 +75,6 @@ class MailingSubscriptionForm(forms.ModelForm):
         if club_id:
             self.fields['mailing'].queryset = Mailing.objects.filter(club__id=club_id)
 
-    def clean(self):
-        cleaned_data = super(MailingSubscriptionForm, self).clean()
-        user = cleaned_data.get('user', None)
-        email = cleaned_data.get('email', None)
-        mailing = cleaned_data.get('mailing')
-        if not user and not email:
-            raise forms.ValidationError(_("At least user or email should be filled"))
-        if user and not email:
-            email = user.email
-        if user and MailingSubscription.objects.filter(mailing=mailing, email=email).exists():
-            raise forms.ValidationError(_("This email is already suscribed in this mailing"))
-
     user = AutoCompleteSelectField('users', label=_('User'), help_text=None, required=False)
 
 
@@ -396,12 +384,6 @@ class ClubStatView(TemplateView):
         return kwargs
 
 
-class MailingFormType(Enum):
-    DISPLAY = 0
-    MEMBER = 1
-    MAILING = 2
-
-
 class ClubMailingView(ClubTabsMixin, ListView):
     """
     A list of mailing for a given club
@@ -426,16 +408,14 @@ class ClubMailingView(ClubTabsMixin, ListView):
 
     def post(self, request, *args, **kwargs):
         res = super(ClubMailingView, self).get(request, *args, **kwargs)
-        if self.action != MailingFormType.DISPLAY:
-            if self.action == MailingFormType.MAILING:
+        if self.action != "display":
+            if self.action == "add_mailing":
                 form = MailingForm
-                string = 'new_mailing'
                 model = Mailing
-            elif self.action == MailingFormType.MEMBER:
+            elif self.action == "add_member":
                 form = MailingSubscriptionForm
-                string = 'new_member'
                 model = MailingSubscription
-            return MailingGenericCreateView.as_view(model=model, list_view=self, form_class=form, form_kwarg_string=string)(request, *args, **kwargs)
+            return MailingGenericCreateView.as_view(model=model, list_view=self, form_class=form)(request, *args, **kwargs)
         return res
 
     def get_queryset(self):
@@ -443,8 +423,8 @@ class ClubMailingView(ClubTabsMixin, ListView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(ClubMailingView, self).get_context_data(**kwargs)
-        kwargs['new_member'] = self.member_form
-        kwargs['new_mailing'] = self.mailing_form
+        kwargs['add_member'] = self.member_form
+        kwargs['add_mailing'] = self.mailing_form
         kwargs['club'] = self.club
         kwargs['user'] = self.user
         kwargs['has_objects'] = len(kwargs['object_list']) > 0
@@ -457,13 +437,12 @@ class MailingGenericCreateView(CreateView, SingleObjectMixin):
     """
     list_view = None
     form_class = None
-    form_kwarg_string = None
 
     def get_context_data(self, **kwargs):
         view_kwargs = self.list_view.get_context_data(**kwargs)
         for key, data in super(MailingGenericCreateView, self).get_context_data(**kwargs).items():
             view_kwargs[key] = data
-        view_kwargs[self.form_kwarg_string] = view_kwargs['form']
+        view_kwargs[self.list_view.action] = view_kwargs['form']
         return view_kwargs
 
     def get_form_kwargs(self):
@@ -507,15 +486,3 @@ class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('club:mailing', kwargs={'club_id': self.club_id})
-
-
-class MailingFetchView(ListView):
-
-    model = Mailing
-    template_name = 'club/mailing_output.jinja'
-
-    def dispatch(self, request, *args, **kwargs):
-        key = request.GET.get('key', '')
-        if key != settings.SITH_MAILING_FETCH_KEY:
-            raise PermissionDenied
-        return super(MailingFetchView, self).dispatch(request, *args, **kwargs)
