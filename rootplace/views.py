@@ -23,20 +23,16 @@
 #
 #
 
-from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
 from django.core.urlresolvers import reverse
 from django import forms
-from django.views.generic import ListView
 from django.core.exceptions import PermissionDenied
 
 from ajax_select.fields import AutoCompleteSelectField
 
-from core.views import CanViewMixin
 from core.models import User
 from counter.models import Customer
-from club.models import Mailing
 
 
 def merge_users(u1, u2):
@@ -112,18 +108,3 @@ class MergeUsersView(FormView):
 
     def get_success_url(self):
         return reverse('core:user_profile', kwargs={'user_id': self.final_user.id})
-
-
-class MailingListAdminView(ListView):
-    template_name = "rootplace/mailing_lists.jinja"
-    model = Mailing
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_root:
-            raise PermissionDenied
-        return super(MailingListAdminView, self).dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        kwargs = super(MailingListAdminView, self).get_context_data(**kwargs)
-        kwargs['has_objects'] = len(kwargs['object_list']) > 0
-        return kwargs

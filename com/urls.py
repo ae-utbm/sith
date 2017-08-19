@@ -42,5 +42,6 @@ urlpatterns = [
     url(r'^news/(?P<news_id>[0-9]+)/moderate$', NewsModerateView.as_view(), name='news_moderate'),
     url(r'^news/(?P<news_id>[0-9]+)/edit$', NewsEditView.as_view(), name='news_edit'),
     url(r'^news/(?P<news_id>[0-9]+)$', NewsDetailView.as_view(), name='news_detail'),
+    url(r'^mailings$', MailingListAdminView.as_view(), name='mailing_admin'),
 ]
 

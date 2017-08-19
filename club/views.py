@@ -24,9 +24,8 @@
 #
 
 from django import forms
-from enum import Enum
 from django.views.generic import ListView, DetailView, TemplateView
-from django.views.generic.edit import DeleteView, FormView
+from django.views.generic.edit import DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView, CreateView
 from django.http import HttpResponseRedirect, HttpResponse
@@ -38,7 +37,7 @@ from ajax_select.fields import AutoCompleteSelectField
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
 from core.views.forms import SelectDate, SelectDateTime
 from club.models import Club, Membership, Mailing, MailingSubscription
 from sith.settings import SITH_MAXIMUM_FREE_ROLE
@@ -394,7 +393,7 @@ class ClubMailingView(ClubTabsMixin, ListView):
     current_tab = 'mailing'
 
     def authorized(self):
-        return self.club.has_rights_in_club(self.user) or self.user.is_root or self.user.is_board_member
+        return self.club.has_rights_in_club(self.user) or self.user.is_root or self.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def dispatch(self, request, *args, **kwargs):
         self.club = get_object_or_404(Club, pk=kwargs['club_id'])

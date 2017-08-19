@@ -7,6 +7,8 @@
 {% block content %}
     {% if has_objects %}
 
+    {% trans %}Remember : mailing lists need to be validated by the school to work, please inform us about any new mailing list created{% endtrans %}
+
     {% for mailing in object_list %}
     <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email }} 
         {%- if user.is_owner(mailing) -%}

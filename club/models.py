@@ -237,7 +237,7 @@ class Mailing(models.Model):
             super(Mailing, self).clean()
 
     def is_owned_by(self, user):
-        return user.is_in_group(self) or user.is_root or user.is_board_member
+        return user.is_in_group(self) or user.is_root or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def can_view(self, user):
         return self.club.has_rights_in_club(user)
@@ -281,10 +281,10 @@ class MailingSubscription(models.Model):
         super(MailingSubscription, self).clean()
 
     def is_owned_by(self, user):
-        return self.mailing.club.has_rights_in_club(user) or user.is_root
+        return self.mailing.club.has_rights_in_club(user) or user.is_root or self.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def can_be_edited_by(self, user):
-        return self.is_owned_by(user) or (user is not None and user.id == self.user.id)
+        return (user is not None and user.id == self.user.id)
 
     def fetch_format(self):
         return self.email + ' '

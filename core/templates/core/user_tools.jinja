@@ -13,7 +13,6 @@
     {% if user.is_root %}
     <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
     <li><a href="{{ url('rootplace:merge') }}">{% trans %}Merge users{% endtrans %}</a></li>
-    <li><a href="{{ url('rootplace:mailings') }}">{% trans %}Mailing lists administration{% endtrans %}</a></li>
     {% endif %}
     {% if user.can_create_subscription or user.is_root %}
     <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
@@ -88,6 +87,7 @@
     <li><a href="{{ url('com:alert_edit') }}">{% trans %}Edit alert message{% endtrans %}</a></li>
     <li><a href="{{ url('com:info_edit') }}">{% trans %}Edit information message{% endtrans %}</a></li>
     <li><a href="{{ url('core:file_moderation') }}">{% trans %}Moderate files{% endtrans %}</a></li>
+    <li><a href="{{ url('com:mailing_admin') }}">{% trans %}Mailing lists administration{% endtrans %}</a></li>
     {% endif %}
     {% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
     <li><a href="{{ url('sas:moderation') }}">{% trans %}Moderate pictures{% endtrans %}</a></li>
