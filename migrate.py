@@ -1335,6 +1335,13 @@ def migrate_forum():
 
 def migrate_mailings():
     cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+
+    print("Delete all mailings")
+
+    Mailing.objects.all().delete()
+
+    print("Migrating old database")
+
     mailing_db = cur.execute("""
         SELECT * FROM mailing
     """)
@@ -1384,6 +1391,7 @@ def main():
     # reset_sas_moderators()
     # migrate_forum()
     # reset_index('forum')
+    migrate_mailings()
     end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end - start))
