@@ -1342,14 +1342,11 @@ def migrate_mailings():
 
     print("Migrating old database")
 
-    mailing_db = cur.execute("""
+    cur.execute("""
         SELECT * FROM mailing
     """)
-    mailing_sub_db = cur.execute("""
-        SELECT * FROM mailing_membres
-    """)
 
-    for mailing in mailing_db:
+    for mailing in cur:
         club = Club.objects.filter(id=mailing['id_asso_parent'])
         if club.exists():
             print(mailing)
@@ -1358,7 +1355,12 @@ def migrate_mailings():
                 mailing['nom'] = '.' + mailing['nom']
             Mailing(id=mailing['id_mailing'], club=club, email=str(club.unix_name + mailing['nom'] + '@utbm.fr')).save()
     print("-------------------")
-    for mailing_sub in mailing_sub_db:
+
+    cur.execute("""
+        SELECT * FROM mailing_membres
+    """)
+
+    for mailing_sub in cur:
         mailing = Mailing.objects.filter(id=mailing_sub['id_mailing'])
         if mailing.exists():
             print(mailing_sub)
