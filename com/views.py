@@ -429,7 +429,7 @@ class MailingListAdminView(ComTabsMixin, ListView):
     current_tab = "mailings"
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID):
+        if not request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or request.user.is_root:
             raise PermissionDenied
         return super(MailingListAdminView, self).dispatch(request, *args, **kwargs)
 
