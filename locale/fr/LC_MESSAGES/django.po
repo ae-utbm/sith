@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-15 18:57+0200\n"
+"POT-Creation-Date: 2017-08-21 21:00+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -183,8 +183,14 @@ msgid "User"
 msgstr "Utilisateur"
 
 #: accounting/models.py:271 club/templates/club/club_detail.jinja:5
-#: com/templates/com/news_admin_list.jinja:17
-#: com/templates/com/news_admin_list.jinja:52
+#: com/templates/com/news_admin_list.jinja:21
+#: com/templates/com/news_admin_list.jinja:50
+#: com/templates/com/news_admin_list.jinja:81
+#: com/templates/com/news_admin_list.jinja:122
+#: com/templates/com/news_admin_list.jinja:165
+#: com/templates/com/news_admin_list.jinja:200
+#: com/templates/com/news_admin_list.jinja:237
+#: com/templates/com/news_admin_list.jinja:272
 #: com/templates/com/weekmail.jinja:18 com/templates/com/weekmail.jinja:47
 #: core/templates/core/user_clubs.jinja:15
 #: core/templates/core/user_clubs.jinja:41
@@ -380,8 +386,14 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_list.jinja:21
 #: accounting/templates/accounting/club_account_details.jinja:57
 #: accounting/templates/accounting/journal_details.jinja:83 club/views.py:73
-#: com/templates/com/news_admin_list.jinja:39
-#: com/templates/com/news_admin_list.jinja:72
+#: com/templates/com/news_admin_list.jinja:37
+#: com/templates/com/news_admin_list.jinja:64
+#: com/templates/com/news_admin_list.jinja:109
+#: com/templates/com/news_admin_list.jinja:148
+#: com/templates/com/news_admin_list.jinja:187
+#: com/templates/com/news_admin_list.jinja:220
+#: com/templates/com/news_admin_list.jinja:259
+#: com/templates/com/news_admin_list.jinja:292
 #: com/templates/com/weekmail.jinja:32 com/templates/com/weekmail.jinja:61
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
 #: core/templates/core/user_tools.jinja:42 core/views/user.py:186
@@ -457,14 +469,18 @@ msgid "Name"
 msgstr "Nom"
 
 #: accounting/templates/accounting/club_account_details.jinja:31
-#: com/templates/com/news_admin_list.jinja:20
-#: com/templates/com/news_admin_list.jinja:54
+#: com/templates/com/news_admin_list.jinja:168
+#: com/templates/com/news_admin_list.jinja:202
+#: com/templates/com/news_admin_list.jinja:240
+#: com/templates/com/news_admin_list.jinja:274
 msgid "Start"
 msgstr "Début"
 
 #: accounting/templates/accounting/club_account_details.jinja:32
-#: com/templates/com/news_admin_list.jinja:21
-#: com/templates/com/news_admin_list.jinja:55
+#: com/templates/com/news_admin_list.jinja:169
+#: com/templates/com/news_admin_list.jinja:203
+#: com/templates/com/news_admin_list.jinja:241
+#: com/templates/com/news_admin_list.jinja:275
 msgid "End"
 msgstr "Fin"
 
@@ -486,8 +502,14 @@ msgstr "Fermé"
 
 #: accounting/templates/accounting/club_account_details.jinja:36
 #: accounting/templates/accounting/journal_details.jinja:41
-#: com/templates/com/news_admin_list.jinja:22
-#: com/templates/com/news_admin_list.jinja:56
+#: com/templates/com/news_admin_list.jinja:24
+#: com/templates/com/news_admin_list.jinja:52
+#: com/templates/com/news_admin_list.jinja:85
+#: com/templates/com/news_admin_list.jinja:125
+#: com/templates/com/news_admin_list.jinja:170
+#: com/templates/com/news_admin_list.jinja:204
+#: com/templates/com/news_admin_list.jinja:242
+#: com/templates/com/news_admin_list.jinja:276
 #: com/templates/com/weekmail.jinja:21 com/templates/com/weekmail.jinja:50
 msgid "Actions"
 msgstr "Actions"
@@ -503,9 +525,15 @@ msgid "No"
 msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:56
-#: com/templates/com/news_admin_list.jinja:38
-#: com/templates/com/news_admin_list.jinja:71 core/templates/core/file.jinja:36
-#: core/templates/core/page.jinja:28
+#: com/templates/com/news_admin_list.jinja:36
+#: com/templates/com/news_admin_list.jinja:63
+#: com/templates/com/news_admin_list.jinja:108
+#: com/templates/com/news_admin_list.jinja:147
+#: com/templates/com/news_admin_list.jinja:186
+#: com/templates/com/news_admin_list.jinja:219
+#: com/templates/com/news_admin_list.jinja:258
+#: com/templates/com/news_admin_list.jinja:291
+#: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
 
@@ -1221,19 +1249,39 @@ msgstr "Administration des nouvelles"
 msgid "News"
 msgstr "Nouvelles"
 
-#: com/templates/com/news_admin_list.jinja:10
-msgid "Displayed news"
-msgstr "Nouvelles affichées"
+#: com/templates/com/news_admin_list.jinja:12
+#, fuzzy
+#| msgid "Notice"
+msgid "Notices"
+msgstr "Information"
 
 #: com/templates/com/news_admin_list.jinja:14
-#: com/templates/com/news_admin_list.jinja:49
+#, fuzzy
+#| msgid "Displayed news"
+msgid "Displayed notices"
+msgstr "Nouvelles affichées"
+
+#: com/templates/com/news_admin_list.jinja:18
+#: com/templates/com/news_admin_list.jinja:47
+#: com/templates/com/news_admin_list.jinja:78
+#: com/templates/com/news_admin_list.jinja:119
+#: com/templates/com/news_admin_list.jinja:162
+#: com/templates/com/news_admin_list.jinja:197
+#: com/templates/com/news_admin_list.jinja:234
+#: com/templates/com/news_admin_list.jinja:269
 #: launderette/templates/launderette/launderette_admin.jinja:42
 #: launderette/views.py:184
 msgid "Type"
 msgstr "Type"
 
-#: com/templates/com/news_admin_list.jinja:15
-#: com/templates/com/news_admin_list.jinja:50
+#: com/templates/com/news_admin_list.jinja:19
+#: com/templates/com/news_admin_list.jinja:48
+#: com/templates/com/news_admin_list.jinja:79
+#: com/templates/com/news_admin_list.jinja:120
+#: com/templates/com/news_admin_list.jinja:163
+#: com/templates/com/news_admin_list.jinja:198
+#: com/templates/com/news_admin_list.jinja:235
+#: com/templates/com/news_admin_list.jinja:270
 #: com/templates/com/weekmail.jinja:19 com/templates/com/weekmail.jinja:48
 #: core/templates/core/base.jinja:243 forum/templates/forum/forum.jinja:29
 #: forum/templates/forum/forum.jinja:48 forum/templates/forum/main.jinja:25
@@ -1241,37 +1289,120 @@ msgstr "Type"
 msgid "Title"
 msgstr "Titre"
 
-#: com/templates/com/news_admin_list.jinja:16
-#: com/templates/com/news_admin_list.jinja:51
+#: com/templates/com/news_admin_list.jinja:20
+#: com/templates/com/news_admin_list.jinja:49
+#: com/templates/com/news_admin_list.jinja:80
+#: com/templates/com/news_admin_list.jinja:121
+#: com/templates/com/news_admin_list.jinja:164
+#: com/templates/com/news_admin_list.jinja:199
+#: com/templates/com/news_admin_list.jinja:236
+#: com/templates/com/news_admin_list.jinja:271
 msgid "Summary"
 msgstr "Résumé"
 
-#: com/templates/com/news_admin_list.jinja:18
-#: com/templates/com/news_admin_list.jinja:53
+#: com/templates/com/news_admin_list.jinja:22
+#: com/templates/com/news_admin_list.jinja:51
+#: com/templates/com/news_admin_list.jinja:82
+#: com/templates/com/news_admin_list.jinja:123
+#: com/templates/com/news_admin_list.jinja:166
+#: com/templates/com/news_admin_list.jinja:201
+#: com/templates/com/news_admin_list.jinja:238
+#: com/templates/com/news_admin_list.jinja:273
 #: com/templates/com/weekmail.jinja:17 com/templates/com/weekmail.jinja:46
 #: forum/templates/forum/forum.jinja:52
 msgid "Author"
 msgstr "Auteur"
 
-#: com/templates/com/news_admin_list.jinja:19
+#: com/templates/com/news_admin_list.jinja:23
+#: com/templates/com/news_admin_list.jinja:83
+#: com/templates/com/news_admin_list.jinja:167
+#: com/templates/com/news_admin_list.jinja:239
 msgid "Moderator"
 msgstr "Modérateur"
 
-#: com/templates/com/news_admin_list.jinja:40
+#: com/templates/com/news_admin_list.jinja:38
+#: com/templates/com/news_admin_list.jinja:110
+#: com/templates/com/news_admin_list.jinja:188
+#: com/templates/com/news_admin_list.jinja:260
 msgid "Remove"
 msgstr ""
 
-#: com/templates/com/news_admin_list.jinja:45
-msgid "News to moderate"
+#: com/templates/com/news_admin_list.jinja:43
+#, fuzzy
+#| msgid "News to moderate"
+msgid "Notices to moderate"
 msgstr "Nouvelles à modérer"
 
-#: com/templates/com/news_admin_list.jinja:73
+#: com/templates/com/news_admin_list.jinja:65
+#: com/templates/com/news_admin_list.jinja:149
+#: com/templates/com/news_admin_list.jinja:221
+#: com/templates/com/news_admin_list.jinja:293
 #: com/templates/com/news_detail.jinja:26
 #: core/templates/core/file_detail.jinja:65
 #: core/templates/core/file_moderation.jinja:23
 #: sas/templates/sas/moderation.jinja:17 sas/templates/sas/picture.jinja:122
 msgid "Moderate"
 msgstr "Modérer"
+
+#: com/templates/com/news_admin_list.jinja:72
+#, fuzzy
+#| msgid "Weekly"
+msgid "Weeklies"
+msgstr "Hebdomadaire"
+
+#: com/templates/com/news_admin_list.jinja:74
+#, fuzzy
+#| msgid "Displayed news"
+msgid "Displayed weeklies"
+msgstr "Nouvelles affichées"
+
+#: com/templates/com/news_admin_list.jinja:84
+#: com/templates/com/news_admin_list.jinja:124
+#: trombi/templates/trombi/edit_profile.jinja:24
+msgid "Dates"
+msgstr "Dates"
+
+#: com/templates/com/news_admin_list.jinja:115
+#, fuzzy
+#| msgid "News to moderate"
+msgid "Weeklies to moderate"
+msgstr "Nouvelles à modérer"
+
+#: com/templates/com/news_admin_list.jinja:156
+#, fuzzy
+#| msgid "Call"
+msgid "Calls"
+msgstr "Appel"
+
+#: com/templates/com/news_admin_list.jinja:158
+#, fuzzy
+#| msgid "Displayed news"
+msgid "Displayed calls"
+msgstr "Nouvelles affichées"
+
+#: com/templates/com/news_admin_list.jinja:193
+#, fuzzy
+#| msgid "News to moderate"
+msgid "Calls to moderate"
+msgstr "Nouvelles à modérer"
+
+#: com/templates/com/news_admin_list.jinja:228
+#, fuzzy
+#| msgid "Event"
+msgid "Events"
+msgstr "Événement"
+
+#: com/templates/com/news_admin_list.jinja:230
+#, fuzzy
+#| msgid "Displayed news"
+msgid "Displayed events"
+msgstr "Nouvelles affichées"
+
+#: com/templates/com/news_admin_list.jinja:265
+#, fuzzy
+#| msgid "News to moderate"
+msgid "Events to moderate"
+msgstr "Nouvelles à modérer"
 
 #: com/templates/com/news_detail.jinja:10
 msgid "Back to news"
@@ -3860,12 +3991,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:534
+#: sith/settings.py:539
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:534
+#: sith/settings.py:539
 msgid "Drying"
 msgstr "Séchage"
 
@@ -4168,89 +4299,95 @@ msgstr "Membres du CROUS, 0 €"
 msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
 
-#: sith/settings.py:499
+#: sith/settings.py:482
+#, fuzzy
+#| msgid "One semester"
+msgid "One semester Welcome Week"
+msgstr "Un semestre - Welcome Week"
+
+#: sith/settings.py:504
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:500
+#: sith/settings.py:505
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:501
+#: sith/settings.py:506
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:502
+#: sith/settings.py:507
 msgid "Communication supervisor"
 msgstr "Responsable communication"
 
-#: sith/settings.py:503
+#: sith/settings.py:508
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:504
+#: sith/settings.py:509
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:505
+#: sith/settings.py:510
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:506
+#: sith/settings.py:511
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:507
+#: sith/settings.py:512
 msgid "Curious"
 msgstr "Curieux"
 
-#: sith/settings.py:541
+#: sith/settings.py:546
 msgid "A fresh new to be moderated"
 msgstr "Une nouvelle toute neuve à modérer"
 
-#: sith/settings.py:542
+#: sith/settings.py:547
 msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
-#: sith/settings.py:543
+#: sith/settings.py:548
 msgid "New pictures/album to be moderated in the SAS"
 msgstr "Nouvelles photos/albums à modérer dans le SAS"
 
-#: sith/settings.py:544
+#: sith/settings.py:549
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:545
+#: sith/settings.py:550
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s €"
 
-#: sith/settings.py:546
+#: sith/settings.py:551
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:547
+#: sith/settings.py:552
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:551
+#: sith/settings.py:556
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:552
+#: sith/settings.py:557
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:553
+#: sith/settings.py:558
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:554
+#: sith/settings.py:559
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:555
+#: sith/settings.py:560
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
@@ -4653,10 +4790,6 @@ msgid ""
 msgstr ""
 "Réinitialiser les participations aux clubs dans le Trombi (supprime les "
 "existantes, n'impacte pas les vraies appartenances du site)"
-
-#: trombi/templates/trombi/edit_profile.jinja:24
-msgid "Dates"
-msgstr "Dates"
 
 #: trombi/templates/trombi/export.jinja:16
 msgid "Date of birth: "

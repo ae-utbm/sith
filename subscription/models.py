@@ -103,6 +103,7 @@ class Subscription(models.Model):
                     'crous': 8,
                     'sbarro/esta': 9,
                     'cursus-alternant': 10,
+                    'welcome-semestre': 11,
                 }
                 PAYMENT = {
                     "CHECK": 1,

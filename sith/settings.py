@@ -478,6 +478,11 @@ SITH_SUBSCRIPTIONS = {
         'price': 15,
         'duration': 2,
     },
+    'un-semestre-welcome': {
+        'name': _('One semester Welcome Week'),
+        'price': 0,
+        'duration': 1,
+    },
     # To be completed....
 }
 
