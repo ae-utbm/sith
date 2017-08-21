@@ -1353,7 +1353,7 @@ def migrate_mailings():
             club = club.first()
             if mailing['nom']:
                 mailing['nom'] = '.' + mailing['nom']
-            Mailing(id=mailing['id_mailing'], club=club, email=str(club.unix_name + mailing['nom'] + '@utbm.fr')).save()
+            Mailing(id=mailing['id_mailing'], club=club, email=to_unicode(club.unix_name + mailing['nom'] + '@utbm.fr')).save()
     print("-------------------")
 
     cur.execute("""
@@ -1369,7 +1369,7 @@ def migrate_mailings():
                 user = User.objects.get(id=mailing_sub['id_user'])
                 MailingSubscription(mailing=mailing, user=user, email=user.email).save()
             elif mailing_sub['email']:
-                MailingSubscription(mailing=mailing, email=mailing_sub['email']).save()
+                MailingSubscription(mailing=mailing, email=to_unicode(mailing_sub['email'])).save()
 
 
 def main():

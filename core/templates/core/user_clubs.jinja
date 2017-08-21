@@ -62,7 +62,7 @@
 {% if profile.mailing_subscriptions.exists() and (profile.id == user.id or user.is_root or self.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)) %}
     <h4>{% trans %}Subscribed mailing lists{% endtrans %}</h4>
     {% for sub in profile.mailing_subscriptions.all() %}
-        <p>{{ sub.mailing.email }} <a href="{{ url('club:mailing_subscription_delete', mailing_subscription_id=sub.id) }}">{% trans %}Unsuscribe{% endtrans %}</a></p>
+        <p>{{ sub.mailing.email }} <a href="{{ url('club:mailing_subscription_delete', mailing_subscription_id=sub.id) }}">{% trans %}Unsubscribe{% endtrans %}</a></p>
     {% endfor %}
 {% endif %}
 {% endblock %}
