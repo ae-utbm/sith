@@ -25,7 +25,7 @@
 
 from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, View
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
@@ -429,11 +429,27 @@ class MailingListAdminView(ComTabsMixin, ListView):
     current_tab = "mailings"
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or request.user.is_root:
+        if not (request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or request.user.is_root):
             raise PermissionDenied
         return super(MailingListAdminView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(MailingListAdminView, self).get_context_data(**kwargs)
-        kwargs['has_objects'] = len(kwargs['object_list']) > 0
+        kwargs['moderated'] = self.get_queryset().filter(is_moderated=True).all()
+        kwargs['unmoderated'] = self.get_queryset().filter(is_moderated=False).all()
+        kwargs['has_moderated'] = len(kwargs['moderated']) > 0
+        kwargs['has_unmoderated'] = len(kwargs['unmoderated']) > 0
         return kwargs
+
+
+class MailingModerateView(View):
+
+    def get(self, request, *args, **kwargs):
+        mailing = get_object_or_404(Mailing, pk=kwargs['mailing_id'])
+        if mailing.can_moderate(request.user):
+            mailing.is_moderated = True
+            mailing.moderator = request.user
+            mailing.save()
+            return redirect('com:mailing_admin')
+
+        raise PermissionDenied

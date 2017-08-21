@@ -7,9 +7,10 @@
 {% block content %}
     {% if has_objects %}
 
-    {% trans %}Remember : mailing lists need to be validated by the school to work, please inform us about any new mailing list created{% endtrans %}
+    <b>{% trans %}Remember : mailing lists need to be moderated, if your new created list is not shown wait until moderation takes action{% endtrans %}</b>
 
     {% for mailing in object_list %}
+    {% if mailing.is_moderated %}
     <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email }} 
         {%- if user.is_owner(mailing) -%}
         <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a>
@@ -33,6 +34,7 @@
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
     {% endfor %}
 
     {% else %}

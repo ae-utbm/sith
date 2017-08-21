@@ -1346,6 +1346,8 @@ def migrate_mailings():
         SELECT * FROM mailing
     """)
 
+    moderator = User.objects.get(id=0)
+
     for mailing in cur:
         club = Club.objects.filter(id=mailing['id_asso_parent'])
         if club.exists():
@@ -1353,7 +1355,8 @@ def migrate_mailings():
             club = club.first()
             if mailing['nom']:
                 mailing['nom'] = '.' + mailing['nom']
-            Mailing(id=mailing['id_mailing'], club=club, email=to_unicode(club.unix_name + mailing['nom'] + '@utbm.fr')).save()
+            Mailing(id=mailing['id_mailing'], club=club, email=to_unicode(club.unix_name + mailing['nom'] + '@utbm.fr'),
+                    moderator=moderator, is_moderated=(mailing['is_valid'] > 0)).save()
     print("-------------------")
 
     cur.execute("""

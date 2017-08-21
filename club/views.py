@@ -43,6 +43,7 @@ from core.views.forms import SelectDate, SelectDateTime
 from club.models import Club, Membership, Mailing, MailingSubscription
 from sith.settings import SITH_MAXIMUM_FREE_ROLE
 from counter.models import Selling, Counter
+from core.models import User
 
 from django.conf import settings
 
@@ -52,7 +53,7 @@ from django.conf import settings
 class MailingForm(forms.ModelForm):
     class Meta:
         model = Mailing
-        fields = ('email', 'club')
+        fields = ('email', 'club', 'moderator')
 
     email = forms.CharField(
         label=_('Email address'),
@@ -66,11 +67,16 @@ class MailingForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         club_id = kwargs.pop('club_id', None)
+        user_id = kwargs.pop('user_id', -1)  # Remember 0 is treated as None
         super(MailingForm, self).__init__(*args, **kwargs)
         if club_id:
             self.fields['club'].queryset = Club.objects.filter(id=club_id)
             self.fields['club'].initial = club_id
             self.fields['club'].widget = forms.HiddenInput()
+        if user_id >= 0:
+            self.fields['moderator'].queryset = User.objects.filter(id=user_id)
+            self.fields['moderator'].initial = user_id
+            self.fields['moderator'].widget = forms.HiddenInput()
 
     def clean(self):
         cleaned_data = super(MailingForm, self).clean()
@@ -85,11 +91,12 @@ class MailingSubscriptionForm(forms.ModelForm):
         fields = ('mailing', 'user', 'email')
 
     def __init__(self, *args, **kwargs):
+        kwargs.pop('user_id', None)  # For standart interface
         club_id = kwargs.pop('club_id', None)
         super(MailingSubscriptionForm, self).__init__(*args, **kwargs)
         self.fields['email'].required = False
         if club_id:
-            self.fields['mailing'].queryset = Mailing.objects.filter(club__id=club_id)
+            self.fields['mailing'].queryset = Mailing.objects.filter(club__id=club_id, is_moderated=True)
 
     user = AutoCompleteSelectField('users', label=_('User'), help_text=None, required=False)
 
@@ -419,7 +426,7 @@ class ClubMailingView(ClubTabsMixin, ListView):
         if not self.authorized():
             raise PermissionDenied
         self.member_form = MailingSubscriptionForm(club_id=self.club.id)
-        self.mailing_form = MailingForm(club_id=self.club.id)
+        self.mailing_form = MailingForm(club_id=self.club.id, user_id=self.user.id)
         return super(ClubMailingView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -464,6 +471,7 @@ class MailingGenericCreateView(CreateView, SingleObjectMixin):
     def get_form_kwargs(self):
         kwargs = super(MailingGenericCreateView, self).get_form_kwargs()
         kwargs['club_id'] = self.list_view.club.id
+        kwargs['user_id'] = self.list_view.user.id
         return kwargs
 
     def dispatch(self, request, *args, **kwargs):
@@ -481,13 +489,17 @@ class MailingDeleteView(CanEditMixin, DeleteView):
     model = Mailing
     template_name = 'core/delete_confirm.jinja'
     pk_url_kwarg = "mailing_id"
+    redirect_page = None
 
     def dispatch(self, request, *args, **kwargs):
         self.club_id = self.get_object().club.id
         return super(MailingDeleteView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('club:mailing', kwargs={'club_id': self.club_id})
+        if self.redirect_page:
+            return reverse_lazy(self.redirect_page)
+        else:
+            return reverse_lazy('club:mailing', kwargs={'club_id': self.club_id})
 
 
 class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):

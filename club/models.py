@@ -27,12 +27,12 @@ from django.db import models
 from django.core import validators
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 
-from core.models import User, MetaGroup, Group, SithFile
+from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification
 
 
 # Create your models here.
@@ -230,11 +230,18 @@ class Mailing(models.Model):
     """
     club = models.ForeignKey(Club, verbose_name=_('Club'), related_name="mailings", null=False, blank=False)
     email = models.EmailField(_('Email address'), unique=True)
+    is_moderated = models.BooleanField(_('is moderated'), default=False)
+    moderator = models.ForeignKey(User, related_name="moderated_mailings", verbose_name=_("moderator"), null=True)
 
     def clean(self):
-        if '@' + settings.SITH_MAILING_DOMAIN not in self.email:
-            raise ValidationError(_('Unothorized mailing domain'))
-            super(Mailing, self).clean()
+        if self.can_moderate(self.moderator):
+            self.is_moderated = True
+        else:
+            self.moderator = None
+        super(Mailing, self).clean()
+
+    def can_moderate(self, user):
+        return user.is_root or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def is_owned_by(self, user):
         return user.is_in_group(self) or user.is_root or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
@@ -256,6 +263,13 @@ class Mailing(models.Model):
             resp += sub.fetch_format()
         return resp
 
+    def save(self):
+        if not self.is_moderated:
+            for user in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
+                if not user.notifications.filter(type="MAILING_MODERATION", viewed=False).exists():
+                    Notification(user=user, url=reverse('com:mailing_admin'), type="MAILING_MODERATION").save()
+        super(Mailing, self).save()
+
     def __str__(self):
         return "%s - %s" % (self.club, self.email)
 
@@ -274,10 +288,13 @@ class MailingSubscription(models.Model):
     def clean(self):
         if not self.user and not self.email:
             raise ValidationError(_("At least user or email is required"))
-        if self.user and not self.email:
-            self.email = self.user.email
-        if MailingSubscription.objects.filter(mailing=self.mailing, email=self.email).exists():
-            raise ValidationError(_("This email is already suscribed in this mailing"))
+        try:
+            if self.user and not self.email:
+                self.email = self.user.email
+                if MailingSubscription.objects.filter(mailing=self.mailing, email=self.email).exists():
+                    raise ValidationError(_("This email is already suscribed in this mailing"))
+        except ObjectDoesNotExist:
+            pass
         super(MailingSubscription, self).clean()
 
     def is_owned_by(self, user):

@@ -4,22 +4,37 @@
 {% trans %}Mailing lists administration{% endtrans %}
 {% endblock %}
 
-{% block content %}
-    <h1>{% trans %}This page lists all existing mailing lists{% endtrans %}</h1>
-    {% if has_objects %}
+{% macro display_mailings(list) %}
     <table>
         <tr>
             <th>{% trans %}Email{% endtrans %}</th>
             <th>{% trans %}Club{%endtrans%}</th>
+            <th>{% trans %}Actions{% endtrans %}</th>
         </tr>
-        {% for mailing in object_list %}
+        {% for mailing in list %}
         <tr>
             <td>{{ mailing.email }}</td>
-            <td><a href="{{ url('club:mailing', club_id=mailing.club.id) }}">{{ mailing.club }}</a> <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+            <td><a href="{{ url('club:mailing', club_id=mailing.club.id) }}">{{ mailing.club }}</a></td>
+            <td>
+                <a href="{{ url('com:mailing_delete', mailing_id=mailing.id) }}">{% trans %}Delete{% endtrans %}</a> - {% if not mailing.is_moderated %}<a href="{{ url('com:mailing_moderate', mailing_id=mailing.id) }}">{% trans %}Moderate{% endtrans %}</a>{% else %}{% trans user=mailing.moderator %}Moderated by {{ user }}{% endtrans %}{% endif %}
+            </td>
         </tr>
         {% endfor %}
     </table>
+    
+{% endmacro %}
 
+{% block content %}
+    <h1>{% trans %}This page lists all mailing lists{% endtrans %}</h1>
+
+    {% if has_unmoderated %}
+    <h2>{% trans %}Not moderated mailing lists{% endtrans %}</h2>
+    {{ display_mailings(unmoderated) }}
+    {% endif %}
+
+    <h2>{% trans %}Moderated mailing lists{% endtrans %}</h2>
+    {% if has_moderated %}
+        {{ display_mailings(moderated) }}
     {% else %}
     <p>{% trans %}No mailing list existing{% endtrans %}</p>
     {% endif %}
