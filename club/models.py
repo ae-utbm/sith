@@ -232,7 +232,7 @@ class Mailing(models.Model):
     email = models.EmailField(_('Email address'), unique=True)
 
     def clean(self):
-        if '@' + settings.SITH_MAILING_ALLOWED_DOMAIN not in self.email:
+        if '@' + settings.SITH_MAILING_DOMAIN not in self.email:
             raise ValidationError(_('Unothorized mailing domain'))
             super(Mailing, self).clean()
 

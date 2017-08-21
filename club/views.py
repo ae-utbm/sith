@@ -36,6 +36,7 @@ from django.utils.translation import ugettext as _t
 from ajax_select.fields import AutoCompleteSelectField
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from django.core.validators import RegexValidator, validate_email
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
 from core.views.forms import SelectDate, SelectDateTime
@@ -53,6 +54,16 @@ class MailingForm(forms.ModelForm):
         model = Mailing
         fields = ('email', 'club')
 
+    email = forms.CharField(
+        label=_('Email address'),
+        validators=[
+            RegexValidator(
+                validate_email.user_regex,
+                _('Enter a valid address. Only the root of the address is needed.')
+            )
+        ],
+        required=True)
+
     def __init__(self, *args, **kwargs):
         club_id = kwargs.pop('club_id', None)
         super(MailingForm, self).__init__(*args, **kwargs)
@@ -60,6 +71,12 @@ class MailingForm(forms.ModelForm):
             self.fields['club'].queryset = Club.objects.filter(id=club_id)
             self.fields['club'].initial = club_id
             self.fields['club'].widget = forms.HiddenInput()
+
+    def clean(self):
+        cleaned_data = super(MailingForm, self).clean()
+        if self.is_valid():
+            cleaned_data['email'] += '@' + settings.SITH_MAILING_DOMAIN
+        return cleaned_data
 
 
 class MailingSubscriptionForm(forms.ModelForm):
