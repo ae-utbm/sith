@@ -25,6 +25,7 @@
 from django.conf.urls import url
 
 from com.views import *
+from club.views import MailingDeleteView
 
 urlpatterns = [
     url(r'^sith/edit/alert$', AlertMsgEditView.as_view(), name='alert_edit'),
@@ -42,5 +43,8 @@ urlpatterns = [
     url(r'^news/(?P<news_id>[0-9]+)/moderate$', NewsModerateView.as_view(), name='news_moderate'),
     url(r'^news/(?P<news_id>[0-9]+)/edit$', NewsEditView.as_view(), name='news_edit'),
     url(r'^news/(?P<news_id>[0-9]+)$', NewsDetailView.as_view(), name='news_detail'),
+    url(r'^mailings$', MailingListAdminView.as_view(), name='mailing_admin'),
+    url(r'^mailings/(?P<mailing_id>[0-9]+)/moderate$', MailingModerateView.as_view(), name='mailing_moderate'),
+    url(r'^mailings/(?P<mailing_id>[0-9]+)/delete$', MailingDeleteView.as_view(redirect_page='com:mailing_admin'), name='mailing_delete'),
 ]
 

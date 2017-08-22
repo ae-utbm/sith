@@ -22,9 +22,15 @@
 #
 #
 
+from rest_framework.response import Response
 from rest_framework import serializers
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import StaticHTMLRenderer
 
-from club.models import Club
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+
+from club.models import Club, Mailing
 
 from api.views import RightModelViewSet
 
@@ -43,3 +49,15 @@ class ClubViewSet(RightModelViewSet):
 
     serializer_class = ClubSerializer
     queryset = Club.objects.all()
+
+
+@api_view(['GET'])
+@renderer_classes((StaticHTMLRenderer,))
+def FetchMailingLists(request):
+    key = request.GET.get('key', '')
+    if key != settings.SITH_MAILING_FETCH_KEY:
+        raise PermissionDenied
+    data = ''
+    for mailing in Mailing.objects.filter(is_moderated=True).all():
+        data += mailing.fetch_format()
+    return Response(data)

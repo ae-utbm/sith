@@ -46,7 +46,7 @@ from django.core.files import File
 
 from core.models import User, SithFile
 from core.utils import doku_to_markdown, bbcode_to_markdown
-from club.models import Club, Membership
+from club.models import Club, Membership, Mailing, MailingSubscription
 from counter.models import Customer, Counter, Selling, Refilling, Product, ProductType, Permanency, Eticket
 from subscription.models import Subscription
 from eboutic.models import Invoice, InvoiceItem
@@ -1332,6 +1332,49 @@ def migrate_forum():
     print("Forum migrated at %s" % datetime.datetime.now())
     print("Running time: %s" % (datetime.datetime.now()-start))
 
+
+def migrate_mailings():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+
+    print("Delete all mailings")
+
+    Mailing.objects.all().delete()
+
+    print("Migrating old mailing database")
+
+    cur.execute("""
+        SELECT * FROM mailing
+    """)
+
+    moderator = User.objects.get(id=0)
+
+    for mailing in cur:
+        club = Club.objects.filter(id=mailing['id_asso_parent'])
+        if club.exists():
+            print(mailing)
+            club = club.first()
+            if mailing['nom']:
+                mailing['nom'] = '.' + mailing['nom']
+            Mailing(id=mailing['id_mailing'], club=club, email=to_unicode(club.unix_name + mailing['nom']),
+                    moderator=moderator, is_moderated=(mailing['is_valid'] > 0)).save()
+    print("-------------------")
+
+    cur.execute("""
+        SELECT * FROM mailing_membres
+    """)
+
+    for mailing_sub in cur:
+        mailing = Mailing.objects.filter(id=mailing_sub['id_mailing'])
+        if mailing.exists():
+            print(mailing_sub)
+            mailing = mailing.first()
+            if mailing_sub['id_user'] and User.objects.filter(id=mailing_sub['id_user']).exists():
+                user = User.objects.get(id=mailing_sub['id_user'])
+                MailingSubscription(mailing=mailing, user=user, email=user.email).save()
+            elif mailing_sub['email']:
+                MailingSubscription(mailing=mailing, email=to_unicode(mailing_sub['email'])).save()
+
+
 def main():
     print("Start at %s" % start)
     # Core
@@ -1351,11 +1394,13 @@ def main():
     # migrate_sas()
     # reset_index('core', 'sas')
     # reset_sas_moderators()
-    migrate_forum()
-    reset_index('forum')
+    # migrate_forum()
+    # reset_index('forum')
+    migrate_mailings()
     end = datetime.datetime.now()
     print("End at %s" % end)
-    print("Running time: %s" % (end-start))
+    print("Running time: %s" % (end - start))
+
 
 if __name__ == "__main__":
     main()

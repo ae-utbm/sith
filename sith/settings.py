@@ -543,6 +543,7 @@ SITH_LAUNDERETTE_PRICES = {
 }
 
 SITH_NOTIFICATIONS = [
+    ('MAILING_MODERATION', _("A new mailing list needs to be moderated")),
     ('NEWS_MODERATION', _("A fresh new to be moderated")),
     ('FILE_MODERATION', _("New files to be moderated")),
     ('SAS_MODERATION', _("New pictures/album to be moderated in the SAS")),
@@ -559,6 +560,11 @@ SITH_QUICK_NOTIF = {
     'qn_weekmail_article_edit': _("You successfully edited an article in the Weekmail"),
     'qn_weekmail_send_success': _("You successfully sent the Weekmail"),
 }
+
+# Mailing related settings
+
+SITH_MAILING_DOMAIN = 'utbm.fr'
+SITH_MAILING_FETCH_KEY = 'IloveMails'
 
 try:
     from .settings_custom import *

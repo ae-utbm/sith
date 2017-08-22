@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -24,7 +25,7 @@
 
 from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, View
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
@@ -34,6 +35,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.db.models import Max
 from django.forms.models import modelform_factory
+from django.core.exceptions import PermissionDenied
 from django import forms
 
 from datetime import timedelta
@@ -42,7 +44,7 @@ from com.models import Sith, News, NewsDate, Weekmail, WeekmailArticle
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin, QuickNotifMixin
 from core.views.forms import SelectDateTime
 from core.models import Notification, RealGroup
-from club.models import Club
+from club.models import Club, Mailing
 
 
 # Sith object
@@ -80,6 +82,11 @@ class ComTabsMixin(TabedViewMixin):
             'url': reverse('com:alert_edit'),
             'slug': 'alert',
                     'name': _("Alert message"),
+        })
+        tab_list.append({
+            'url': reverse('com:mailing_admin'),
+            'slug': 'mailings',
+                    'name': _("Mailing lists administration"),
         })
         return tab_list
 
@@ -414,3 +421,35 @@ class WeekmailArticleDeleteView(CanEditPropMixin, DeleteView):
     template_name = 'core/delete_confirm.jinja'
     success_url = reverse_lazy('com:weekmail')
     pk_url_kwarg = "article_id"
+
+
+class MailingListAdminView(ComTabsMixin, ListView):
+    template_name = "com/mailing_admin.jinja"
+    model = Mailing
+    current_tab = "mailings"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not (request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or request.user.is_root):
+            raise PermissionDenied
+        return super(MailingListAdminView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(MailingListAdminView, self).get_context_data(**kwargs)
+        kwargs['moderated'] = self.get_queryset().filter(is_moderated=True).all()
+        kwargs['unmoderated'] = self.get_queryset().filter(is_moderated=False).all()
+        kwargs['has_moderated'] = len(kwargs['moderated']) > 0
+        kwargs['has_unmoderated'] = len(kwargs['unmoderated']) > 0
+        return kwargs
+
+
+class MailingModerateView(View):
+
+    def get(self, request, *args, **kwargs):
+        mailing = get_object_or_404(Mailing, pk=kwargs['mailing_id'])
+        if mailing.can_moderate(request.user):
+            mailing.is_moderated = True
+            mailing.moderator = request.user
+            mailing.save()
+            return redirect('com:mailing_admin')
+
+        raise PermissionDenied

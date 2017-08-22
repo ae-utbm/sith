@@ -1,0 +1,60 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Mailing lists{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if has_objects %}
+
+    <b>{% trans %}Remember : mailing lists need to be moderated, if your new created list is not shown wait until moderation takes action{% endtrans %}</b>
+
+    {% for mailing in object_list %}
+    {% if mailing.is_moderated %}
+    <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email_full }} 
+        {%- if user.is_owner(mailing) -%}
+        <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a>
+        {%- endif -%}
+    </h2>
+    <hr>
+    <table>
+        <tr>
+            <th>{% trans %}User{% endtrans %}</th>
+            <th colspan="2">{% trans %}Email{%endtrans%}</th>
+        </tr>
+        {% for subscriber in mailing.subscriptions.all() %}
+        <tr>
+            {% if subscriber.user %}
+            <td>{{ subscriber.user }}</td>
+            {% else %}
+            <td>{% trans %}Unregistered user{% endtrans %}</td>
+            {% endif %}
+            <td>{{ subscriber.email }}</td>
+            <td><a href="{{ url('club:mailing_subscription_delete', mailing_subscription_id=subscriber.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    {% endfor %}
+
+    {% else %}
+    <p>{% trans %}No mailing list existing for this club{% endtrans %}</p>
+    {% endif %}
+
+    {% if has_objects %}
+        <h2>{% trans %}New member{% endtrans %}</h2>
+        <form action="{{ url('club:mailing_subscription_create', club_id=club.id) }}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ add_member.as_p() }}
+            <p><input type="submit" value="{% trans %}Add to mailing list{% endtrans %}" /></p>
+        </form>
+    {% endif %}
+
+    <h2>{% trans %}New mailing{% endtrans %}</h2>
+    <form action="{{ url('club:mailing_create', club_id=club.id) }}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ add_mailing.as_p() }}
+        <p><input type="submit" value="{% trans %}Create mailing list{% endtrans %}" /></p>
+    </form>
+
+{% endblock %}

@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -22,7 +23,6 @@
 #
 #
 
-from django.shortcuts import render
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
 from django.core.urlresolvers import reverse
@@ -31,9 +31,9 @@ from django.core.exceptions import PermissionDenied
 
 from ajax_select.fields import AutoCompleteSelectField
 
-from core.views import CanViewMixin
 from core.models import User
 from counter.models import Customer
+
 
 def merge_users(u1, u2):
     u1.nick_name = u1.nick_name or u2.nick_name
@@ -86,9 +86,11 @@ def merge_users(u1, u2):
     u2.delete()
     return u1
 
+
 class MergeForm(forms.Form):
     user1 = AutoCompleteSelectField('users', label=_("User that will be kept"), help_text=None, required=True)
     user2 = AutoCompleteSelectField('users', label=_("User that will be deleted"), help_text=None, required=True)
+
 
 class MergeUsersView(FormView):
     template_name = "rootplace/merge.jinja"
@@ -106,4 +108,3 @@ class MergeUsersView(FormView):
 
     def get_success_url(self):
         return reverse('core:user_profile', kwargs={'user_id': self.final_user.id})
-

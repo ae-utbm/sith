@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -26,12 +27,13 @@ from django.db import models
 from django.core import validators
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.core.validators import RegexValidator, validate_email
 
-from core.models import User, MetaGroup, Group, SithFile
+from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification
 
 
 # Create your models here.
@@ -220,3 +222,99 @@ class Membership(models.Model):
 
     def get_absolute_url(self):
         return reverse('club:club_members', kwargs={'club_id': self.club.id})
+
+
+class Mailing(models.Model):
+    """
+    This class correspond to a mailing list
+    Remember that mailing lists should be validated by UTBM
+    """
+    club = models.ForeignKey(Club, verbose_name=_('Club'), related_name="mailings", null=False, blank=False)
+    email = models.CharField(_('Email address'), unique=True, null=False, blank=False, max_length=256,
+                             validators=[
+                                 RegexValidator(validate_email.user_regex,
+                                                _('Enter a valid address. Only the root of the address is needed.'))
+    ])
+    is_moderated = models.BooleanField(_('is moderated'), default=False)
+    moderator = models.ForeignKey(User, related_name="moderated_mailings", verbose_name=_("moderator"), null=True)
+
+    def clean(self):
+        if self.can_moderate(self.moderator):
+            self.is_moderated = True
+        else:
+            self.moderator = None
+        super(Mailing, self).clean()
+
+    @property
+    def email_full(self):
+        return self.email + '@' + settings.SITH_MAILING_DOMAIN
+
+    def can_moderate(self, user):
+        return user.is_root or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def is_owned_by(self, user):
+        return user.is_in_group(self) or user.is_root or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def can_view(self, user):
+        return self.club.has_rights_in_club(user)
+
+    def delete(self):
+        for sub in self.subscriptions.all():
+            sub.delete()
+        super(Mailing, self).delete()
+
+    def fetch_format(self):
+        resp = self.email + ': '
+        for sub in self.subscriptions.all():
+            resp += sub.fetch_format()
+        return resp
+
+    def save(self):
+        if not self.is_moderated:
+            for user in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
+                if not user.notifications.filter(type="MAILING_MODERATION", viewed=False).exists():
+                    Notification(user=user, url=reverse('com:mailing_admin'), type="MAILING_MODERATION").save()
+        super(Mailing, self).save()
+
+    def __str__(self):
+        return "%s - %s" % (self.club, self.email_full)
+
+
+class MailingSubscription(models.Model):
+    """
+    This class makes the link between user and mailing list
+    """
+    mailing = models.ForeignKey(Mailing, verbose_name=_('Mailing'), related_name="subscriptions", null=False, blank=False)
+    user = models.ForeignKey(User, verbose_name=_('User'), related_name="mailing_subscriptions", null=True, blank=True)
+    email = models.EmailField(_('Email address'), blank=False, null=False)
+
+    class Meta:
+        unique_together = (('user', 'email', 'mailing'),)
+
+    def clean(self):
+        if not self.user and not self.email:
+            raise ValidationError(_("At least user or email is required"))
+        try:
+            if self.user and not self.email:
+                self.email = self.user.email
+                if MailingSubscription.objects.filter(mailing=self.mailing, email=self.email).exists():
+                    raise ValidationError(_("This email is already suscribed in this mailing"))
+        except ObjectDoesNotExist:
+            pass
+        super(MailingSubscription, self).clean()
+
+    def is_owned_by(self, user):
+        return self.mailing.club.has_rights_in_club(user) or user.is_root or self.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def can_be_edited_by(self, user):
+        return (user is not None and user.id == self.user.id)
+
+    def fetch_format(self):
+        return self.email + ' '
+
+    def __str__(self):
+        if self.user:
+            user = str(self.user)
+        else:
+            user = _("Unregistered user")
+        return "(%s) - %s : %s" % (self.mailing, user, self.email)
