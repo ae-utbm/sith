@@ -13,7 +13,7 @@
         </tr>
         {% for mailing in list %}
         <tr>
-            <td>{{ mailing.email }}</td>
+            <td>{{ mailing.email_full }}</td>
             <td><a href="{{ url('club:mailing', club_id=mailing.club.id) }}">{{ mailing.club }}</a></td>
             <td>
                 <a href="{{ url('com:mailing_delete', mailing_id=mailing.id) }}">{% trans %}Delete{% endtrans %}</a> - {% if not mailing.is_moderated %}<a href="{{ url('com:mailing_moderate', mailing_id=mailing.id) }}">{% trans %}Moderate{% endtrans %}</a>{% else %}{% trans user=mailing.moderator %}Moderated by {{ user }}{% endtrans %}{% endif %}

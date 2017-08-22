@@ -11,7 +11,7 @@
 
     {% for mailing in object_list %}
     {% if mailing.is_moderated %}
-    <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email }} 
+    <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email_full }} 
         {%- if user.is_owner(mailing) -%}
         <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a>
         {%- endif -%}

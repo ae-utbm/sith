@@ -1340,7 +1340,7 @@ def migrate_mailings():
 
     Mailing.objects.all().delete()
 
-    print("Migrating old database")
+    print("Migrating old mailing database")
 
     cur.execute("""
         SELECT * FROM mailing
@@ -1355,7 +1355,7 @@ def migrate_mailings():
             club = club.first()
             if mailing['nom']:
                 mailing['nom'] = '.' + mailing['nom']
-            Mailing(id=mailing['id_mailing'], club=club, email=to_unicode(club.unix_name + mailing['nom'] + '@utbm.fr'),
+            Mailing(id=mailing['id_mailing'], club=club, email=to_unicode(club.unix_name + mailing['nom']),
                     moderator=moderator, is_moderated=(mailing['is_valid'] > 0)).save()
     print("-------------------")
 

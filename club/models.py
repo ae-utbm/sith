@@ -31,6 +31,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.core.validators import RegexValidator, validate_email
 
 from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification
 
@@ -229,7 +230,11 @@ class Mailing(models.Model):
     Remember that mailing lists should be validated by UTBM
     """
     club = models.ForeignKey(Club, verbose_name=_('Club'), related_name="mailings", null=False, blank=False)
-    email = models.EmailField(_('Email address'), unique=True)
+    email = models.CharField(_('Email address'), unique=True, null=False, blank=False, max_length=256,
+                             validators=[
+                                 RegexValidator(validate_email.user_regex,
+                                                _('Enter a valid address. Only the root of the address is needed.'))
+    ])
     is_moderated = models.BooleanField(_('is moderated'), default=False)
     moderator = models.ForeignKey(User, related_name="moderated_mailings", verbose_name=_("moderator"), null=True)
 
@@ -239,6 +244,10 @@ class Mailing(models.Model):
         else:
             self.moderator = None
         super(Mailing, self).clean()
+
+    @property
+    def email_full(self):
+        return self.email + '@' + settings.SITH_MAILING_DOMAIN
 
     def can_moderate(self, user):
         return user.is_root or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
@@ -254,11 +263,8 @@ class Mailing(models.Model):
             sub.delete()
         super(Mailing, self).delete()
 
-    def base_mail(self):
-        return self.email.split('@')[0]
-
     def fetch_format(self):
-        resp = self.base_mail() + ': '
+        resp = self.email + ': '
         for sub in self.subscriptions.all():
             resp += sub.fetch_format()
         return resp
@@ -271,7 +277,7 @@ class Mailing(models.Model):
         super(Mailing, self).save()
 
     def __str__(self):
-        return "%s - %s" % (self.club, self.email)
+        return "%s - %s" % (self.club, self.email_full)
 
 
 class MailingSubscription(models.Model):

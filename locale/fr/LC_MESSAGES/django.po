@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-22 15:42+0200\n"
+"POT-Creation-Date: 2017-08-22 22:36+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: accounting/models.py:61 accounting/models.py:110 accounting/models.py:138
-#: accounting/models.py:197 club/models.py:45
+#: accounting/models.py:197 club/models.py:46
 #: core/templates/core/base.jinja:233 counter/models.py:113
 #: counter/models.py:139 counter/models.py:183 forum/models.py:49
 #: launderette/models.py:38 launderette/models.py:84 launderette/models.py:110
@@ -65,7 +65,7 @@ msgstr "IBAN"
 msgid "account number"
 msgstr "numero de compte"
 
-#: accounting/models.py:113 accounting/models.py:139 club/models.py:188
+#: accounting/models.py:113 accounting/models.py:139 club/models.py:189
 #: com/models.py:65 com/models.py:156 counter/models.py:148
 #: counter/models.py:184 trombi/models.py:149
 msgid "club"
@@ -88,12 +88,12 @@ msgstr "Compte club"
 msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
-#: accounting/models.py:195 club/models.py:189 counter/models.py:463
+#: accounting/models.py:195 club/models.py:190 counter/models.py:463
 #: election/models.py:16 launderette/models.py:148
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:196 club/models.py:190 counter/models.py:464
+#: accounting/models.py:196 club/models.py:191 counter/models.py:464
 #: election/models.py:17
 msgid "end date"
 msgstr "date de fin"
@@ -172,10 +172,10 @@ msgstr "étiquette"
 msgid "target type"
 msgstr "type de cible"
 
-#: accounting/models.py:271 club/models.py:282
+#: accounting/models.py:271 club/models.py:288
 #: club/templates/club/club_members.jinja:8
 #: club/templates/club/club_old_members.jinja:8
-#: club/templates/club/mailing.jinja:22 club/views.py:101
+#: club/templates/club/mailing.jinja:22 club/views.py:84
 #: counter/templates/counter/cash_summary_list.jinja:32
 #: counter/templates/counter/stats.jinja:15
 #: counter/templates/counter/stats.jinja:52
@@ -184,7 +184,7 @@ msgstr "type de cible"
 msgid "User"
 msgstr "Utilisateur"
 
-#: accounting/models.py:271 club/models.py:231
+#: accounting/models.py:271 club/models.py:232
 #: club/templates/club/club_detail.jinja:5
 #: com/templates/com/mailing_admin.jinja:11
 #: com/templates/com/news_admin_list.jinja:21
@@ -371,7 +371,7 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: accounting/templates/accounting/bank_account_details.jinja:17
-#: club/views.py:113 core/views/user.py:164 sas/templates/sas/picture.jinja:86
+#: club/views.py:96 core/views/user.py:164 sas/templates/sas/picture.jinja:86
 msgid "Infos"
 msgstr "Infos"
 
@@ -390,7 +390,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_details.jinja:26
 #: accounting/templates/accounting/bank_account_list.jinja:21
 #: accounting/templates/accounting/club_account_details.jinja:57
-#: accounting/templates/accounting/journal_details.jinja:83 club/views.py:135
+#: accounting/templates/accounting/journal_details.jinja:83 club/views.py:118
 #: com/templates/com/news_admin_list.jinja:37
 #: com/templates/com/news_admin_list.jinja:64
 #: com/templates/com/news_admin_list.jinja:109
@@ -856,11 +856,11 @@ msgstr "Opérations sans étiquette"
 msgid "Refound this account"
 msgstr "Rembourser ce compte"
 
-#: club/models.py:47
+#: club/models.py:48
 msgid "unix name"
 msgstr "nom unix"
 
-#: club/models.py:51
+#: club/models.py:52
 msgid ""
 "Enter a valid unix name. This value may contain only letters, numbers ./-/_ "
 "characters."
@@ -868,81 +868,85 @@ msgstr ""
 "Entrez un nom UNIX valide. Cette valeur peut contenir uniquement des "
 "lettres, des nombres, et les caractères ./-/_"
 
-#: club/models.py:56
+#: club/models.py:57
 msgid "A club with that unix name already exists."
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:59 core/models.py:198
+#: club/models.py:60 core/models.py:198
 msgid "address"
 msgstr "Adresse"
 
-#: club/models.py:65 core/models.py:159
+#: club/models.py:66 core/models.py:159
 msgid "home"
 msgstr "home"
 
-#: club/models.py:77
+#: club/models.py:78
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
-#: club/models.py:91
+#: club/models.py:92
 msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:187 counter/models.py:461 counter/models.py:479
+#: club/models.py:188 counter/models.py:461 counter/models.py:479
 #: eboutic/models.py:38 eboutic/models.py:72 election/models.py:140
 #: launderette/models.py:114 launderette/models.py:152 sas/models.py:158
 #: trombi/models.py:148
 msgid "user"
 msgstr "nom d'utilisateur"
 
-#: club/models.py:191 core/models.py:178 election/models.py:139
+#: club/models.py:192 core/models.py:178 election/models.py:139
 #: election/models.py:155 trombi/models.py:150
 msgid "role"
 msgstr "rôle"
 
-#: club/models.py:193 core/models.py:64 counter/models.py:114
+#: club/models.py:194 core/models.py:64 counter/models.py:114
 #: counter/models.py:140 election/models.py:13 election/models.py:93
 #: election/models.py:141 forum/models.py:50 forum/models.py:186
 msgid "description"
 msgstr "description"
 
-#: club/models.py:198
+#: club/models.py:199
 msgid "User must be subscriber to take part to a club"
 msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
 
-#: club/models.py:200
+#: club/models.py:201
 msgid "User is already member of that club"
 msgstr "L'utilisateur est déjà membre de ce club"
 
-#: club/models.py:204
+#: club/models.py:205
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/models.py:232 club/models.py:283 club/views.py:59
+#: club/models.py:233 club/models.py:289
 msgid "Email address"
 msgstr "Adresse email"
 
-#: club/models.py:233 com/models.py:67 core/models.py:629
+#: club/models.py:236
+msgid "Enter a valid address. Only the root of the address is needed."
+msgstr "Entrez une adresse valide. Seule la racine de l'adresse est nécessaire."
+
+#: club/models.py:238 com/models.py:67 core/models.py:629
 msgid "is moderated"
 msgstr "est modéré"
 
-#: club/models.py:234 com/models.py:68
+#: club/models.py:239 com/models.py:68
 msgid "moderator"
 msgstr "modérateur"
 
-#: club/models.py:281 club/templates/club/mailing.jinja:14
+#: club/models.py:287 club/templates/club/mailing.jinja:14
 msgid "Mailing"
 msgstr "Mailing"
 
-#: club/models.py:290
+#: club/models.py:296
 msgid "At least user or email is required"
 msgstr "Au moins un utilisateur ou un email est nécessaire"
 
-#: club/models.py:295
+#: club/models.py:301
 msgid "This email is already suscribed in this mailing"
 msgstr "Cet email est déjà abonné à cette mailing"
 
-#: club/models.py:313 club/templates/club/mailing.jinja:30
+#: club/models.py:319 club/templates/club/mailing.jinja:30
 msgid "Unregistered user"
 msgstr "Désabonner un utilisateur"
 
@@ -1011,8 +1015,8 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:140
-#: club/views.py:318 counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:123
+#: club/views.py:301 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
@@ -1038,7 +1042,7 @@ msgstr "unités"
 msgid "Benefit: "
 msgstr "Bénéfice : "
 
-#: club/templates/club/club_sellings.jinja:21 club/views.py:266
+#: club/templates/club/club_sellings.jinja:21 club/views.py:249
 #: core/templates/core/user_account_detail.jinja:18
 #: core/templates/core/user_account_detail.jinja:51
 #: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:134
@@ -1132,8 +1136,9 @@ msgid ""
 "Remember : mailing lists need to be moderated, if your new created list is "
 "not shown wait until moderation takes action"
 msgstr ""
-"Rappelez vous : les mailing listes doivent être modérées, si votre liste nouvellement créee "
-"n'est pas affichée, attendez jusqu'à qu'un modérateur entre en action"
+"Rappelez vous : les mailing listes doivent être modérées, si votre liste "
+"nouvellement créee n'est pas affichée, attendez jusqu'à qu'un modérateur "
+"entre en action"
 
 #: club/templates/club/mailing.jinja:23
 #: com/templates/com/mailing_admin.jinja:10
@@ -1164,54 +1169,50 @@ msgstr "Créer une mailing liste"
 msgid "Club stats"
 msgstr "Statistiques du club"
 
-#: club/views.py:63
-msgid "Enter a valid address. Only the root of the address is needed."
-msgstr ""
-
-#: club/views.py:119
+#: club/views.py:102
 msgid "Members"
 msgstr "Membres"
 
-#: club/views.py:124
+#: club/views.py:107
 msgid "Old members"
 msgstr "Anciens membres"
 
-#: club/views.py:130 core/templates/core/base.jinja:64 core/views/user.py:180
+#: club/views.py:113 core/templates/core/base.jinja:64 core/views/user.py:180
 #: sas/templates/sas/picture.jinja:95 trombi/views.py:55
 msgid "Tools"
 msgstr "Outils"
 
-#: club/views.py:145
+#: club/views.py:128
 #, fuzzy
 #| msgid "File list"
 msgid "Mailing list"
 msgstr "Liste des fichiers"
 
-#: club/views.py:151 counter/templates/counter/counter_list.jinja:21
+#: club/views.py:134 counter/templates/counter/counter_list.jinja:21
 #: counter/templates/counter/counter_list.jinja:42
 #: counter/templates/counter/counter_list.jinja:57
 msgid "Props"
 msgstr "Propriétés"
 
-#: club/views.py:197 core/views/forms.py:253 counter/views.py:91
+#: club/views.py:180 core/views/forms.py:253 counter/views.py:91
 #: trombi/views.py:124
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
-#: club/views.py:247 sas/views.py:104 sas/views.py:157 sas/views.py:232
+#: club/views.py:230 sas/views.py:104 sas/views.py:157 sas/views.py:232
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
-#: club/views.py:264 counter/views.py:1097
+#: club/views.py:247 counter/views.py:1097
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:265 com/views.py:137 counter/views.py:1098
+#: club/views.py:248 com/views.py:137 counter/views.py:1098
 #: election/views.py:135 subscription/views.py:47
 msgid "End date"
 msgstr "Date de fin"
 
-#: club/views.py:280 core/templates/core/user_stats.jinja:27
+#: club/views.py:263 core/templates/core/user_stats.jinja:27
 #: counter/views.py:1188
 msgid "Product"
 msgstr "Produit"
@@ -1330,6 +1331,7 @@ msgid "Moderate"
 msgstr "Modérer"
 
 #: com/templates/com/mailing_admin.jinja:19
+#, python-format
 msgid "Moderated by %(user)s"
 msgstr "Modéré par %(user)s"
 
