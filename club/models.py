@@ -307,7 +307,7 @@ class MailingSubscription(models.Model):
         return self.mailing.club.has_rights_in_club(user) or user.is_root or self.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def can_be_edited_by(self, user):
-        return (user is not None and user.id == self.user.id)
+        return (self.user is not None and user.id == self.user.id)
 
     def fetch_format(self):
         return self.email + ' '
