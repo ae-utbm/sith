@@ -526,6 +526,7 @@ SITH_LAST_OPERATIONS_LIMIT = 10
 SITH_COUNTER_MINUTE_INACTIVE = 10
 
 # ET variables
+SITH_EBOUTIC_CB_ENABLED = True
 SITH_EBOUTIC_ET_URL = "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
 SITH_EBOUTIC_PBX_SITE = "4000666"
 SITH_EBOUTIC_PBX_RANG = "42"
