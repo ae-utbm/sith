@@ -22,6 +22,7 @@
 #
 #
 
+import os
 import re
 from mistune import Renderer, InlineGrammar, InlineLexer, Markdown, escape, escape_link
 from django.core.urlresolvers import reverse
@@ -192,41 +193,7 @@ inline = SithInlineLexer(renderer)
 markdown = Markdown(renderer, inline=inline)
 
 if __name__ == "__main__":
-    print(markdown.inline.default_rules)
-    print(markdown.inline.inline_html_rules)
-    text = """
-## Basique
-
-* Mettre le texte en **gras** : `**texte**`
-
-* Mettre le texte en *italique* : `*texte*`
-
-* __Souligner__ le texte : `__texte__`
-
-* ~~Barrer du texte~~ : `~~texte~~`
-
-* Mettre ^du texte^ en ^exposant^ : `^mot` ou `^texte^`
-
-* _Mettre du texte_ en _indice_ : `_mot` ou `_texte_`
-
-* Pied de page [^en pied de page]
-
-## Blocs de citations
-
-Un bloc de citation se crée ainsi :
-```
-> Ceci est
-> un bloc de
-> citation
-```
-
-> Ceci est
-> un bloc de
-> citation
-
-Il est possible d'intégrer de la syntaxe Markdown-AE dans un tel bloc.
-
-Petit *test* _sur_ ^une^ **seule** ^ligne pour voir^
-
-"""
-    print(markdown(text))
+    root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(root_path) + '/doc/SYNTAX.md', 'r') as md:
+        result = markdown(md.read())
+    print(result, end='')

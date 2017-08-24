@@ -22,11 +22,14 @@
 #
 #
 
+import os
+
 from django.test import Client, TestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 
 from core.models import User, Group, Page
+from core.markdown import markdown
 
 """
 to run these tests :
@@ -185,6 +188,15 @@ class UserRegistrationTest(TestCase):
         self.assertTrue(response.status_code == 200)
         self.assertTrue("""<p>Votre nom d\\'utilisateur et votre mot de passe ne correspondent pas. Merci de r\\xc3\\xa9essayer.</p>""" in str(response.content))
 
+class MarkdownTest(TestCase):
+    def test_full_markdown_syntax(self):
+        root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root_path) + '/doc/SYNTAX.md', 'r') as md_file:
+            md = md_file.read()
+        with open(os.path.join(root_path) + '/doc/SYNTAX.html', 'r') as html_file:
+            html = html_file.read()
+        result = markdown(md)
+        self.assertTrue(result == html)
 
 class PageHandlingTest(TestCase):
     def setUp(self):

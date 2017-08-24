@@ -36,6 +36,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 import binascii
 from django.utils.translation import ugettext_lazy as _
 
@@ -569,9 +570,9 @@ SITH_MAILING_FETCH_KEY = 'IloveMails'
 
 try:
     from .settings_custom import *
-    print("Custom settings imported")
+    print("Custom settings imported", file=sys.stderr)
 except:
-    print("Custom settings failed")
+    print("Custom settings failed", file=sys.stderr)
 
 if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)

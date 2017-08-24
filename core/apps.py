@@ -22,6 +22,8 @@
 #
 #
 
+import sys
+
 from django.apps import AppConfig
 from django.core.signals import request_started
 
@@ -44,7 +46,7 @@ class SithConfig(AppConfig):
             Club._memberships = {}
             Forum._club_memberships = {}
 
-        print("Connecting signals!")
+        print("Connecting signals!", file=sys.stderr)
         request_started.connect(clear_cached_groups, weak=False, dispatch_uid="clear_cached_groups")
         request_started.connect(clear_cached_memberships, weak=False, dispatch_uid="clear_cached_memberships")
         # TODO: there may be a need to add more cache clearing

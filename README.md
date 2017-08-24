@@ -71,5 +71,13 @@ appropriate group fields, or the right method to check user permissions.
 $ cloc --exclude-dir=doc,env .
 ```
 
+#### Updating doc/SYNTAX.md
+
+If you make an update in the Markdown syntax parser, it's good to document
+update the syntax reference page in `doc/SYNTAX.md`. But updating this file will
+break the tests if you don't update the corresponding `doc/SYNTAX.html` file at
+the same time.  
+To do that, simply run `./manage.py markdown > doc/SYNTAX.html`,
+and the tests should pass again.
 
 
