@@ -28,11 +28,27 @@ from core.models import User, Page, RealGroup, SithFile
 from django.contrib.auth.models import Group as AuthGroup
 
 
-admin.site.register(User)
 admin.site.unregister(AuthGroup)
 admin.site.register(RealGroup)
-admin.site.register(Page)
 
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    form = make_ajax_form(User, {
+        'godfathers': 'users',
+        'home': 'files',  # ManyToManyField
+        'profile_pict': 'files',  # ManyToManyField
+        'avatar_pict': 'files',  # ManyToManyField
+        'scrub_pict': 'files',  # ManyToManyField
+    })
+
+@admin.register(Page)
+class PageAdmin(admin.ModelAdmin):
+    form = make_ajax_form(Page, {
+        'lock_user': 'users',
+        'owner_group': 'groups',
+        'edit_groups': 'groups',
+        'view_groups': 'groups',
+    })
 
 @admin.register(SithFile)
 class SithFileAdmin(admin.ModelAdmin):
