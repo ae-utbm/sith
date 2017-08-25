@@ -59,5 +59,5 @@ def FetchMailingLists(request):
         raise PermissionDenied
     data = ''
     for mailing in Mailing.objects.filter(is_moderated=True).all():
-        data += mailing.fetch_format()
+        data += mailing.fetch_format() + "\n"
     return Response(data)
