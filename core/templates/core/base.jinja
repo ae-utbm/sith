@@ -16,7 +16,9 @@
     <body>
         {% block header %}
         {% if not popup %}
-        <div id="logo" style="background-image: url('{{ static('core/img/logo.png') }}');"><a href="{{ url('core:index') }}"></a></div>
+        <div id="logo" style="background-image: url('{{ static('core/img/logo.png') }}');">
+            <a style="display: inline-block; width: 100%; height: 100%;" href="{{ url('core:index') }}"></a>
+        </div>
         {% set sith = get_sith() %}
         {% if sith.alert_msg %}
         <div id="alert_box">
