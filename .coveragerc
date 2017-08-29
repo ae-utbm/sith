@@ -1,0 +1,14 @@
+[run]
+source = .
+branch = False
+omit =
+    *test*
+    */migrations/*
+    doc/*
+    env/*
+[report]
+show_missing = False
+include = *.py
+[html]
+title = Sith Code Coverage
+directory = coverage_report

@@ -3,5 +3,11 @@ test:
   - apt-get update
   - apt-get install -y gettext
   - pip install -r requirements.txt
-  - python manage.py compilemessages
-  - python manage.py test
+  - pip install coverage
+  - ./manage.py compilemessages
+  - coverage run ./manage.py test
+  - coverage html
+  - coverage report
+  artifacts:
+    paths:
+      - coverage_report/

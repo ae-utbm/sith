@@ -1,3 +1,6 @@
+[![pipeline status](https://ae-dev.utbm.fr/ae/Sith/badges/master/pipeline.svg)](https://ae-dev.utbm.fr/ae/Sith/commits/master)
+[![coverage report](https://ae-dev.utbm.fr/ae/Sith/badges/master/coverage.svg)](https://ae-dev.utbm.fr/ae/Sith/commits/master)
+
 ## Sith AE
 
 ### Get started
