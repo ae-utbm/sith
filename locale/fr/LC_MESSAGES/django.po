@@ -1365,15 +1365,8 @@ msgid "Notices"
 msgstr "Information"
 
 #: com/templates/com/news_admin_list.jinja:14
-<<<<<<< 02b317eeb9274ad44a74856c412b3a2a0e8eda
 msgid "Displayed notices"
 msgstr "Informations affichées"
-=======
-#, fuzzy
-#| msgid "Legal notices"
-msgid "Displayed notices"
-msgstr "Mentions légales"
->>>>>>> Free subscription for jewels
 
 #: com/templates/com/news_admin_list.jinja:18
 #: com/templates/com/news_admin_list.jinja:47
@@ -1442,15 +1435,8 @@ msgid "Remove"
 msgstr "Retirer"
 
 #: com/templates/com/news_admin_list.jinja:43
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
 msgid "Notices to moderate"
 msgstr "Informations à modérer"
-=======
-#, fuzzy
-#| msgid "New files to be moderated"
-msgid "Notices to moderate"
-msgstr "Nouveaux fichiers à modérer"
->>>>>>> Free subscription for jewels
 
 #: com/templates/com/news_admin_list.jinja:72
 msgid "Weeklies"
@@ -1458,11 +1444,7 @@ msgstr "Nouvelles hebdomadaires"
 
 #: com/templates/com/news_admin_list.jinja:74
 msgid "Displayed weeklies"
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
 msgstr "Nouvelles hebdomadaires affichées"
-=======
-msgstr ""
->>>>>>> Free subscription for jewels
 
 #: com/templates/com/news_admin_list.jinja:84
 #: com/templates/com/news_admin_list.jinja:124
@@ -1471,15 +1453,8 @@ msgid "Dates"
 msgstr "Dates"
 
 #: com/templates/com/news_admin_list.jinja:115
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
 msgid "Weeklies to moderate"
 msgstr "Nouvelles hebdomadaires à modérer"
-=======
-#, fuzzy
-#| msgid "New files to be moderated"
-msgid "Weeklies to moderate"
-msgstr "Nouveaux fichiers à modérer"
->>>>>>> Free subscription for jewels
 
 #: com/templates/com/news_admin_list.jinja:156
 msgid "Calls"
@@ -1487,21 +1462,11 @@ msgstr "Appels"
 
 #: com/templates/com/news_admin_list.jinja:158
 msgid "Displayed calls"
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
 msgstr "Appels affichés"
 
 #: com/templates/com/news_admin_list.jinja:193
 msgid "Calls to moderate"
 msgstr "Appels à modérer"
-=======
-msgstr ""
-
-#: com/templates/com/news_admin_list.jinja:193
-#, fuzzy
-#| msgid "is moderated"
-msgid "Calls to moderate"
-msgstr "est modéré"
->>>>>>> Free subscription for jewels
 
 #: com/templates/com/news_admin_list.jinja:228
 msgid "Events"
@@ -1509,21 +1474,11 @@ msgstr "Événements"
 
 #: com/templates/com/news_admin_list.jinja:230
 msgid "Displayed events"
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
 msgstr "Événements affichés"
 
 #: com/templates/com/news_admin_list.jinja:265
 msgid "Events to moderate"
 msgstr "Événements à modérer"
-=======
-msgstr ""
-
-#: com/templates/com/news_admin_list.jinja:265
-#, fuzzy
-#| msgid "is moderated"
-msgid "Events to moderate"
-msgstr "est modéré"
->>>>>>> Free subscription for jewels
 
 #: com/templates/com/news_detail.jinja:10
 msgid "Back to news"
@@ -4122,20 +4077,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
 #: sith/settings.py:541
-=======
-#: sith/settings.py:544
->>>>>>> Free subscription for jewels
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
 #: sith/settings.py:541
-=======
-#: sith/settings.py:544
->>>>>>> Free subscription for jewels
 msgid "Drying"
 msgstr "Séchage"
 
@@ -4442,79 +4389,43 @@ msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
 msgid "One semester Welcome Week"
 msgstr "Un semestre Welcome Week"
 
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
-#: sith/settings.py:505
-msgid "President"
-msgstr "Président"
-
-#: sith/settings.py:506
-msgid "Vice-President"
-msgstr "Vice-Président"
-
-#: sith/settings.py:507
-msgid "Treasurer"
-msgstr "Trésorier"
-
-#: sith/settings.py:508
-msgid "Communication supervisor"
-msgstr "Responsable communication"
-
-#: sith/settings.py:509
-msgid "Secretary"
-msgstr "Secrétaire"
-
-#: sith/settings.py:510
-msgid "IT supervisor"
-msgstr "Responsable info"
-
-#: sith/settings.py:511
-msgid "Board member"
-msgstr "Membre du bureau"
-
-#: sith/settings.py:512
-msgid "Active member"
-msgstr "Membre actif"
-
 #: sith/settings.py:513
-=======
-#: sith/settings.py:487
 msgid "Two month for free"
 msgstr "Deux mois gratuits"
 
-#: sith/settings.py:509
+#: sith/settings.py:510
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:510
+#: sith/settings.py:511
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:511
+#: sith/settings.py:512
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:512
+#: sith/settings.py:513
 msgid "Communication supervisor"
 msgstr "Responsable communication"
 
-#: sith/settings.py:513
+#: sith/settings.py:514
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:514
+#: sith/settings.py:515
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:515
+#: sith/settings.py:516
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:516
+#: sith/settings.py:517
 msgid "Active member"
 msgstr "Membre actif"
 
 #: sith/settings.py:517
->>>>>>> Free subscription for jewels
 msgid "Curious"
 msgstr "Curieux"
 
@@ -4538,47 +4449,38 @@ msgstr "Nouvelles photos/albums à modérer dans le SAS"
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
-#: sith/settings.py:553
-=======
-#: sith/settings.py:551
-
->>>>>>> Free subscription for jewels
+#: sith/settings.py:558
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s €"
 
-<<<<<<< 02b317eee8b9274ad44a74856c412b3a2a0e8eda
 #: sith/settings.py:554
-=======
-#: sith/settings.py:552
-#: sith/settings.py:556
->>>>>>> Free subscription for jewels
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:555
+#: sith/settings.py:563
+#: sith/settings.py:560
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:559
+#: sith/settings.py:564
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:560
+#: sith/settings.py:565
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:561
+#: sith/settings.py:566
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:562
+#: sith/settings.py:567
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:563
+#: sith/settings.py:568
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 

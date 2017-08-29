@@ -104,7 +104,7 @@ class Subscription(models.Model):
                     'sbarro/esta': 9,
                     'cursus-alternant': 10,
                     'welcome-semestre': 11,
-                    'un-mois': 12,
+                    'deux-mois-essai': 12,
                 }
                 PAYMENT = {
                     "CHECK": 1,
@@ -169,11 +169,11 @@ class Subscription(models.Model):
             start = Subscription.compute_start(duration=duration)
         # This can certainly be simplified, but it works like this
         try:
-            return start.replace(month=int((start.month - 1 + 6 * duration) % 12 + 1),
-                                 year=int(start.year + int(duration / 2) + (1 if start.month > 6 and duration % 2 == 1 else 0)))
+            return start.replace(month=int(round((start.month - 1 + 6 * duration) % 12 + 1, 0)),
+                                 year=int(round(start.year + int(duration / 2) + (1 if int(start.month + 6 * duration) > 12 and (duration % 2 == 1 or duration < 1) else 0), 0)))
         except ValueError as e:
-            return start.replace(day=1, month=int((start.month + 6 * duration) % 12 + 1),
-                                 year=int(start.year + int(duration / 2) + (1 if start.month > 6 and duration % 2 == 1 else 0)))
+            return start.replace(day=1, month=int(round((start.month + 6 * duration) % 12 + 1, 0)),
+                                 year=int(round(start.year + int(duration / 2) + (1 if int(start.month + 6 * duration) > 12 and (duration % 2 == 1 or duration < 1) else 0), 0)))
 
     def can_be_edited_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
