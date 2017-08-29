@@ -10,3 +10,5 @@ data/
 /static/
 sith/settings_custom.py
 sith/whoosh_index/
+.coverage
+coverage_report/
