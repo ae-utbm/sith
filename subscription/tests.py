@@ -21,7 +21,69 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from datetime import date
+from unittest import mock
 
 from django.test import TestCase
+from subscription.models import Subscription
 
-# Create your tests here.
+class FakeDate(date):
+    """A fake replacement for date that can be mocked for testing."""
+    def __new__(cls, *args, **kwargs):
+        return date.__new__(date, *args, **kwargs)
+
+def date_mock_today(year, month, day):
+    FakeDate.today = classmethod(lambda cls: date(year, month, day))
+
+class SubscribtionTest(TestCase):
+
+    @mock.patch('subscription.models.date', FakeDate)
+    def test_start_dates_sliding_without_start(self):
+        date_mock_today(2015, 9, 18)
+        d = Subscription.compute_start(duration=1)
+        self.assertTrue(d == date(2015, 9, 18))
+        self.assertTrue(Subscription.compute_start(duration=2) == date(2015, 9, 18))
+
+    def test_start_dates_sliding_with_start(self):
+        self.assertTrue(Subscription.compute_start(date(2015, 5, 17), 1) ==
+            date(2015, 5, 17))
+        self.assertTrue(Subscription.compute_start(date(2015, 5, 17), 2) ==
+            date(2015, 5, 17))
+
+    @mock.patch('subscription.models.date', FakeDate)
+    def test_start_dates_not_sliding_without_start(self):
+        date_mock_today(2015, 5, 17)
+        self.assertTrue(Subscription.compute_start(duration=3) == date(2015, 2, 15))
+        date_mock_today(2016, 1, 18)
+        self.assertTrue(Subscription.compute_start(duration=4) == date(2015, 8, 15))
+        date_mock_today(2015, 9, 18)
+        self.assertTrue(Subscription.compute_start(duration=4) == date(2015, 8, 15))
+
+    def test_start_dates_not_sliding_with_start(self):
+        self.assertTrue(Subscription.compute_start(date(2015, 5, 17), 3) ==
+            date(2015, 2, 15))
+        self.assertTrue(Subscription.compute_start(date(2015, 1, 11), 3) ==
+            date(2014, 8, 15))
+
+    @mock.patch('subscription.models.date', FakeDate)
+    def test_end_dates_sliding(self):
+        date_mock_today(2015, 9, 18)
+        d = Subscription.compute_end(2)
+        self.assertTrue(d == date(2016, 9, 18))
+        d = Subscription.compute_end(1)
+        self.assertTrue(d == date(2016, 3, 18))
+
+    @mock.patch('subscription.models.date', FakeDate)
+    def test_end_dates_not_sliding_without_start(self):
+        date_mock_today(2015, 9, 18)
+        d = Subscription.compute_end(duration=3)
+        self.assertTrue(d == date(2017, 2, 15))
+        d = Subscription.compute_end(duration=4)
+        self.assertTrue(d == date(2017, 8, 15))
+
+    def test_end_dates_not_sliding_with_start(self):
+        d = Subscription.compute_end(duration=3, start=date(2015, 9, 18))
+        self.assertTrue(d == date(2017, 3, 18))
+        d = Subscription.compute_end(duration=4, start=date(2015, 9, 18))
+        self.assertTrue(d == date(2017, 9, 18))
+

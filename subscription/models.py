@@ -137,7 +137,7 @@ class Subscription(models.Model):
             return 'No user - ' + str(self.pk)
 
     @staticmethod
-    def compute_start(d=date.today(), duration=1):
+    def compute_start(d=None, duration=1):
         """
         This function computes the start date of the subscription with respect to the given date (default is today),
         and the start date given in settings.SITH_START_DATE.
@@ -147,6 +147,8 @@ class Subscription(models.Model):
             2015-03-17 -> 2015-02-15
             2015-01-11 -> 2014-08-15
         """
+        if not d:
+            d = date.today()
         if duration <= 2:  # Sliding subscriptions for 1 or 2 semesters
             return d
         return get_start_of_semester(d)
