@@ -4387,41 +4387,45 @@ msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
 
 #: sith/settings.py:483
 msgid "One semester Welcome Week"
-msgstr "Un semestre - Welcome Week 0 €"
+msgstr "Un semestre Welcome Week"
 
-#: sith/settings.py:505
+#: sith/settings.py:513
+msgid "Two month for free"
+msgstr "Deux mois gratuits"
+
+#: sith/settings.py:510
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:506
+#: sith/settings.py:511
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:507
+#: sith/settings.py:512
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:508
+#: sith/settings.py:513
 msgid "Communication supervisor"
 msgstr "Responsable communication"
 
-#: sith/settings.py:509
+#: sith/settings.py:514
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:510
+#: sith/settings.py:515
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:511
+#: sith/settings.py:516
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:512
+#: sith/settings.py:517
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:513
+#: sith/settings.py:517
 msgid "Curious"
 msgstr "Curieux"
 
@@ -4445,7 +4449,7 @@ msgstr "Nouvelles photos/albums à modérer dans le SAS"
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:553
+#: sith/settings.py:558
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s €"
@@ -4455,27 +4459,28 @@ msgstr "Vous avez rechargé votre compte de %s €"
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:555
+#: sith/settings.py:563
+#: sith/settings.py:560
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:559
+#: sith/settings.py:564
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:560
+#: sith/settings.py:565
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:561
+#: sith/settings.py:566
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:562
+#: sith/settings.py:567
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:563
+#: sith/settings.py:568
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 

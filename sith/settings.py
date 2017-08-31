@@ -484,6 +484,11 @@ SITH_SUBSCRIPTIONS = {
         'price': 0,
         'duration': 1,
     },
+    'deux-mois-essai': {
+        'name': _('Two month for free'),
+        'price': 0,
+        'duration': 0.33,
+    }
     # To be completed....
 }
 
