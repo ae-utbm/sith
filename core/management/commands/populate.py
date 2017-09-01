@@ -23,7 +23,7 @@
 #
 
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from io import StringIO, BytesIO
 
 from django.core.management.base import BaseCommand
@@ -31,6 +31,7 @@ from django.core.management import call_command
 from django.conf import settings
 from django.db import connection
 from django.contrib.sites.models import Site
+from django.utils import timezone
 
 from PIL import Image
 
@@ -40,7 +41,7 @@ from core.utils import resize_image
 from club.models import Club, Membership
 from subscription.models import Subscription
 from counter.models import Customer, ProductType, Product, Counter, Selling
-from com.models import Sith, Weekmail
+from com.models import Sith, Weekmail, News, NewsDate
 from election.models import Election, Role, Candidature, ElectionList
 from forum.models import Forum, ForumTopic
 
@@ -534,3 +535,33 @@ Welcome to the wiki page!
             various.save()
             Forum(name="Promos", description="Réservé aux Promos", parent=various).save()
             ForumTopic(forum=hall)
+
+            # News
+            friday = timezone.now()
+            while friday.weekday() != 4:
+                friday += timedelta(hours=6)
+            friday.replace(hour=20, minute=0, second=0)
+            # Event
+            n = News(title="Repas barman", summary="Enjoy la fin du semestre!",
+                    content="Viens donc t'enjailler avec les autres barmans aux "
+                    "frais du BdF! \o/", type="EVENT", club=bar_club,
+                    author=subscriber, is_moderated=True, moderator=skia)
+            n.save()
+            NewsDate(news=n, start_date=timezone.now()+timedelta(hours=72),
+                    end_date=timezone.now()+timedelta(hours=84)).save()
+            n = News(title="SdF", summary="Enjoy la fin des finaux!",
+                    content="Viens faire la fête avec tout plein de gens!",
+                    type="EVENT", club=bar_club, author=subscriber,
+                    is_moderated=True, moderator=skia)
+            n.save()
+            NewsDate(news=n, start_date=friday+timedelta(hours=24*7+1),
+                    end_date=timezone.now()+timedelta(hours=24*7+9)).save()
+            # Weekly
+            n = News(title="Jeux sans faim", summary="Viens jouer!",
+                    content="Rejoins la fine équipe du Troll Penché et viens "
+                    "d'amuser le Vendredi soir!", type="WEEKLY", club=troll,
+                    author=subscriber, is_moderated=True, moderator=skia)
+            n.save()
+            for i in range(10):
+                NewsDate(news=n, start_date=friday+timedelta(hours=24*7*i),
+                        end_date=friday+timedelta(hours=24*7*i+8)).save()

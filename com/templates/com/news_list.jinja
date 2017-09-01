@@ -17,6 +17,23 @@ section.news_call, section.news_notice {
 section.news_event:nth-of-type(even) {
     background: lightblue;
 }
+div#agenda {
+    display: block;
+    width: 20%;
+    float: right;
+    background: white;
+    font-size: 70%;
+    border: solid 1px darkgrey;
+    padding: 0.5em;
+}
+div#agenda_content {
+    overflow: auto;
+    width: 100%;
+    height: 20em;
+}
+.news_weekly p {
+    margin: 0.2em;
+}
 .date {
     font-size: small;
     color: grey;
@@ -29,6 +46,28 @@ section.news_event:nth-of-type(even) {
     {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
     <a href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
     {% endif  %}
+
+    <div id="agenda">
+        <h4>{% trans %}Agenda{% endtrans %}</h4>
+        <hr>
+        <div id="agenda_content">
+        {% for d in NewsDate.objects.filter(end_date__gte=timezone.now(),
+                news__is_moderated=True, news__type__in=["WEEKLY",
+                "EVENT"]).order_by('start_date', 'end_date') %}
+        <section class="news_weekly">
+            <p><strong>{{ d.start_date|localtime|date('D d M Y') }}</strong></p>
+            <p class="date">
+                <span>{{ d.start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+                <span>{{ d.end_date|localtime|time(DATETIME_FORMAT) }}</span>
+            </p>
+            <p><strong><a href="{{ url('com:news_detail', news_id=d.news.id) }}">{{ d.news.title }}</a></strong>
+                <a href="{{ d.news.club.get_absolute_url() }}">{{ d.news.club }}</a></p>
+            <p>{{ d.news.summary|markdown }}</p>
+        </section>
+        {% endfor %}
+        </div>
+    </div>
+
     {% for news in object_list.filter(type="NOTICE") %}
     <section class="news_notice">
         <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
@@ -67,9 +106,9 @@ section.news_event:nth-of-type(even) {
     </section>
     {% endfor %}
     <hr>
-    <h4>{% trans %}Coming soon... don't miss!{% endtrans %}</h4>
     {% endfor %}
-    {% for news in object_list.filter(dates__start_date__gte=timezone.now()+timedelta(days=5), type="EVENT") %}
+    <h4>{% trans %}Coming soon... don't miss!{% endtrans %}</h4>
+    {% for news in object_list.filter(dates__start_date__gte=timezone.now()+timedelta(days=5), type="EVENT", is_moderated=True) %}
     <section>
         <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a>
             <span class="date">{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
@@ -79,26 +118,6 @@ section.news_event:nth-of-type(even) {
         </h4>
     </section>
     {% endfor %}
-    <!--
-    <hr>
-    <h4>{% trans %}Weekly{% endtrans %}</h4>
-    {% for news in object_list.filter(dates__end_date__gte=timezone.now(), type="WEEKLY").distinct() %}
-    buggy when more than one news, anyway, we won't use it this way
-    {% for d in news.dates.all() %}
-    <section class="news_weekly">
-        <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
-        <p class="date">
-            <span>{{ d.start_date|localtime|date(DATETIME_FORMAT) }}
-                {{ d.start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-            <span>{{ d.end_date|localtime|date(DATETIME_FORMAT) }}
-                {{ d.end_date|localtime|time(DATETIME_FORMAT) }}</span>
-        </p>
-        <p><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></p>
-        <p>{{ news.summary|markdown }}</p>
-    </section>
-    {% endfor %}
-    {% endfor %}
-    -->
 {% endblock %}
 
 
