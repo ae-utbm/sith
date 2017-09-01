@@ -171,7 +171,7 @@ header {
 #info_boxes {
   display: flex;
   width: 90%;
-  margin: 0 auto;
+  margin: 1em auto;
   p {
     margin: 0px;
     padding: 0px;
@@ -180,20 +180,30 @@ header {
     font-size: smaller;
     display: inline-block;
     flex: auto;
-    vertical-align: top;
     padding: 2px;
     margin: 0.2em 1.5%;
     min-width: 10%;
     max-width: 46%;
     min-height: 20px;
+    &:before {
+      float: left;
+      margin: 0.2em;
+      margin-right: 0.5em;
+    }
   }
   #info_box {
     border: solid 1px $primary-neutral-light-color;
     background: $white-color;
+    &:before {
+      content: url('img/info.png');
+    }
   }
   #alert_box {
     border: solid 1px grey;
     background: gold;
+    &:before {
+      content: url('img/warning.png');
+    }
   }
 }
 
@@ -203,7 +213,7 @@ header {
 nav {
   display: block;
   width: 90%;
-  margin: 0px auto;
+  margin: 1em auto 0em auto;
   background: $primary-color;
   color: $white-color;
   a {
