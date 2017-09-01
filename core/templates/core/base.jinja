@@ -14,69 +14,11 @@
     </head>
 
     <body>
+
+        <!-- BEGIN HEADER -->
         {% block header %}
         {% if not popup %}
-        <div id="logo" style="background-image: url('{{ static('core/img/logo.png') }}');">
-            <a style="display: inline-block; width: 100%; height: 100%;" href="{{ url('core:index') }}"></a>
-        </div>
-        {% set sith = get_sith() %}
-        {% if sith.alert_msg %}
-        <div id="alert_box">
-            {{ sith.alert_msg|markdown }}
-        </div>
-        {% endif %}
-        {% if sith.info_msg %}
-        <div id="info_box">
-            {{ sith.info_msg|markdown }}
-        </div>
-        {% endif %}
-        <header>
-            {% if not user.is_authenticated() %}
-            <a href="{{ url('core:login') }}">{% trans %}Login{% endtrans %}</a>
-            <a href="{{ url('core:register') }}">{% trans %}Register{% endtrans %}</a>
-            {% else %}
-            <ul>
-            {% for bar in Counter.objects.filter(type="BAR").all() %}
-                <li>
-                <a href="{{ url('counter:activity', counter_id=bar.id) }}" style="padding: 0px">
-                {% if bar.is_inactive(): %}
-                    <span style="color: orange">&#x3f;</span>
-                {% elif bar.is_open(): %}
-                    <span style="color: green">&#x2713;</span>
-                {% else %}
-                    <span style="color: red">&#10007;</span>
-                {% endif %}
-                    {{ bar }}
-                </a>
-                </li>
-            {% endfor %}
-            </ul>
-            <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
-            <a href="#" onclick="display_notif()">&#x1f514; ({{ user.notifications.filter(viewed=False).count() }})</a>
-            <ul id="notif">
-                {% for n in user.notifications.filter(viewed=False).order_by('-id') %}
-                <li><a href="{{ url("core:notification", notif_id=n.id) }}">
-                        <span style="font-size: small; ">{{ n.date|localtime|date(DATE_FORMAT) }} {{
-                            n.date|localtime|time(DATETIME_FORMAT) }}</span><br>
-                        {{ n }}</a></li>
-                {% endfor %}
-                <li><a href="{{ url('core:notification_list') }}">{% trans %}View more{% endtrans %}</a>
-                    <a href="{{ url('core:notification_list') }}?see_all">{% trans %}Mark all as read{% endtrans %}</a></li>
-            </ul>
-            <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
-            <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
-            <form action="{{ url('core:search') }}" method="GET">
-                <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" id="search" />
-                <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />
-            </form>
-            {% endif %}
-        </header>
-        {% else %}
-        <div id="popupheader">{{ user.get_display_name() }}</div>
-        {% endif %}
-        {% endblock %}
-
-        <div id="language_chooser">
+        <div id="header_language_chooser">
             {% for language in LANGUAGES %}
             <form action="{{ url('set_language') }}" method="post">{% csrf_token %}
                 <input name="next" value="{{ request.path }}" type="hidden" />
@@ -85,6 +27,91 @@
             </form>
             {% endfor %}
         </div>
+
+        <header>
+            {% if not user.is_authenticated() %}
+            <div id="header_logo" style="background-image: url('{{
+                static('core/img/logo.png') }}'); width: 185px; height: 100px;">
+                <a href="{{ url('core:index') }}"></a>
+            </div>
+            <div id="header_connect_links">
+                <form method="post" action="{{ url('core:login') }}">
+                {% csrf_token %}
+                <label for="id_username">{% trans %}Username{% endtrans %}</label>
+                    <input id="id_username" maxlength="254" name="username" type="text">
+                <label for="id_password">{% trans %}Password{% endtrans %}</label>
+                    <input type="password" name="password" id="id_password">
+                <input type="submit" value="{% trans %}Login{% endtrans %}">
+                </form>
+                <a href="{{ url('core:register') }}"><button type="button">{% trans %}Register{% endtrans %}</button></a>
+            </div>
+            {% else %}
+            <div id="header_logo" style="background-image: url('{{
+                static('core/img/logo.png') }}'); width: 92px; height: 50px;">
+                <a href="{{ url('core:index') }}"></a>
+            </div>
+            <div id="header_bar">
+                <ul id="header_bars_infos">
+                {% for bar in Counter.objects.filter(type="BAR").all() %}
+                    <li>
+                    <a href="{{ url('counter:activity', counter_id=bar.id) }}" style="padding: 0px">
+                    {% if bar.is_inactive(): %}
+                        <span style="color: orange">&#x3f;</span>
+                    {% elif bar.is_open(): %}
+                        <span style="color: green">&#x2713;</span>
+                    {% else %}
+                        <span style="color: red">&#10007;</span>
+                    {% endif %}
+                        {{ bar }}
+                    </a>
+                    </li>
+                {% endfor %}
+                </ul>
+                <form action="{{ url('core:search') }}" method="GET" id="header_search">
+                    <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" id="search" />
+                    <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />
+                </form>
+                <div id="header_user_links">
+                    <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
+                    <a href="#" onclick="display_notif()">&#x1f514; ({{ user.notifications.filter(viewed=False).count() }})</a>
+                    <ul id="notif">
+                        {% for n in user.notifications.filter(viewed=False).order_by('-id') %}
+                        <li><a href="{{ url("core:notification", notif_id=n.id) }}">
+                                <span style="font-size: small; ">{{ n.date|localtime|date(DATE_FORMAT) }} {{
+                                    n.date|localtime|time(DATETIME_FORMAT) }}</span><br>
+                                {{ n }}</a></li>
+                        {% endfor %}
+                        <li><a href="{{ url('core:notification_list') }}">{% trans %}View more{% endtrans %}</a>
+                            <a href="{{ url('core:notification_list') }}?see_all">{% trans %}Mark all as read{% endtrans %}</a></li>
+                    </ul>
+                    <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
+                    <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
+                </div>
+            </div>
+            {% endif %}
+        </header>
+
+        <div id="info_boxes">
+            {% set sith = get_sith() %}
+            {% if sith.alert_msg %}
+            <div id="alert_box">
+                {{ sith.alert_msg|markdown }}
+            </div>
+            {% endif %}
+            {% if sith.info_msg %}
+            <div id="info_box">
+                {{ sith.info_msg|markdown }}
+            </div>
+            {% endif %}
+        </div>
+
+        {% else %}{# if not popup #}
+        <div id="popupheader">{{ user.get_display_name() }}</div>
+        {% endif %}
+
+
+        {% endblock %}
+        <!-- END HEADER -->
 
         {% block nav %}
         {% if not popup %}
