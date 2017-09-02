@@ -138,50 +138,52 @@
         {% endblock %}
         <!-- END HEADER -->
 
-        {% block nav %}
-        {% if not popup %}
-        <nav>
-            <a href="https://ae2.utbm.fr/">{% trans %}Main{% endtrans %}</a>
-            <a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a>
-            <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
-            <a href="{{ url('sas:main') }}">{% trans %}SAS{% endtrans %}</a>
-            <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
-            <a href="{{ url('core:page', "services") }}">{% trans %}Services{% endtrans %}</a>
-            <a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a>
-            <a href="{{ url('core:page', page_name="partenaires")}}">{% trans %}Sponsors{% endtrans %}</a>
-            <a href="https://ae2.utbm.fr/article.php?name=docs:index">{% trans %}Help{% endtrans %}</a>
-        </nav>
-        {% endif %}
-        {% endblock %}
+        <div id="page">
+          {% block nav %}
+          {% if not popup %}
+          <nav>
+              <a href="https://ae2.utbm.fr/">{% trans %}Main{% endtrans %}</a>
+              <a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a>
+              <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
+              <a href="{{ url('sas:main') }}">{% trans %}SAS{% endtrans %}</a>
+              <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
+              <a href="{{ url('core:page', "services") }}">{% trans %}Services{% endtrans %}</a>
+              <a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a>
+              <a href="{{ url('core:page', page_name="partenaires")}}">{% trans %}Sponsors{% endtrans %}</a>
+              <a href="https://ae2.utbm.fr/article.php?name=docs:index">{% trans %}Help{% endtrans %}</a>
+          </nav>
+          {% endif %}
+          {% endblock %}
 
-        <ul id="quick_notif">
-            {% for n in quick_notifs %}
-            <li>{{ n }}</li>
-            {% endfor %}
-        </ul>
+          <ul id="quick_notif">
+              {% for n in quick_notifs %}
+              <li>{{ n }}</li>
+              {% endfor %}
+          </ul>
 
-        <div id="content">
-            {% if list_of_tabs %}
-            <div class="tool-bar">
-                <div>{{ tabs_title }}</div>
-                <div class="tools">
-                    {% for t in list_of_tabs %}
-                    <a href="{{ t.url }}"
-                        {%- if current_tab == t.slug %}
-                            class="selected_tab"
-                        {%- endif -%}
-                    >{{ t.name }}</a>
-                    {% endfor %}
-                </div>
-                <hr>
-            </div>
-            {% endif %}
+          <div id="content">
+              {% if list_of_tabs %}
+              <div class="tool-bar">
+                  <div>{{ tabs_title }}</div>
+                  <div class="tools">
+                      {% for t in list_of_tabs %}
+                      <a href="{{ t.url }}"
+                          {%- if current_tab == t.slug %}
+                              class="selected_tab"
+                          {%- endif -%}
+                      >{{ t.name }}</a>
+                      {% endfor %}
+                  </div>
+                  <hr>
+              </div>
+              {% endif %}
 
-            {% if error %}
-            {{ error }}
-            {% endif %}
-            {% block content %}
-            {% endblock %}
+              {% if error %}
+              {{ error }}
+              {% endif %}
+              {% block content %}
+              {% endblock %}
+          </div>
         </div>
 
         {% if not popup %}

@@ -68,8 +68,9 @@ a {
 
 #header_language_chooser {
   position: absolute;
-  top: 1em;
-  width: 5%;
+  top: 0.2em;
+  right: 0.5em;
+  width: 3%;
   text-align: center;
   input {
     display: block;
@@ -79,18 +80,25 @@ a {
   }
   form {
     display: block;
+    margin: 0.2em 0em;
+    width: 100%;
   }
 }
 
 header {
   width: 90%;
-  margin: 0 auto;
+  margin: 0px auto;
   display: flex;
+  box-shadow: black 1px 1px 5px;
+  border: solid 1px $black-color;
+  border-top: none;
+  background-color: $primary-neutral-dark-color;
 
   #header_logo {
     display: inline-block;
     flex: none;
     background-size: 100% 100%;
+    background-color: $white-color;
     padding: 0.2em;
     a {
       display: inline-block;
@@ -102,6 +110,7 @@ header {
 
   #header_connect_links {
     margin: 0.6em 0.6em 0em auto;
+    color: $white-color;
     form {
       display: inline;
       width: 100%;
@@ -115,10 +124,18 @@ header {
   }
 
   #header_bar {
-    background-color: $secondary-light-color;
     display: flex;
     flex: auto;
     width: 80%;
+
+    a {
+      text-decoration: none;
+      margin: 0em 1em;
+      color: $white-color;
+      &:hover {
+        color: $secondary-color;
+      }
+    }
 
     #header_bars_infos {
       width: 35ch;
@@ -144,14 +161,6 @@ header {
         padding: 1.2em 0em;
         &:first-child {
           flex: auto;
-        }
-      }
-      a {
-        text-decoration: none;
-        margin: 0em 1em;
-        color: $black-color;
-        &:hover {
-          color: $secondary-color;
         }
       }
       .white {
@@ -224,22 +233,26 @@ header {
     min-width: 10%;
     max-width: 46%;
     min-height: 20px;
+    box-shadow: black 1px 1px 5px;
     &:before {
       float: left;
       margin: 0.2em;
       margin-right: 0.5em;
     }
+    .markdown {
+      margin-top: 0.5em;
+    }
   }
   #info_box {
-    border: solid 1px $primary-neutral-light-color;
+    border: solid 1px $black-color;
     background: $white-color;
     &:before {
       content: url('img/info.png');
     }
   }
   #alert_box {
-    border: solid 1px grey;
-    background: gold;
+    border: solid 1px $black-color;
+    background: $second-color;
     &:before {
       content: url('img/warning.png');
     }
@@ -247,50 +260,55 @@ header {
 }
 
 
-/*---------------------------------NAV---------------------------------*/
-
-nav {
-  display: block;
+#page {
+  box-shadow: black 1px 1px 5px;
   width: 90%;
-  margin: 1em auto 0em auto;
-  background: $primary-color;
-  color: $white-color;
-  a {
+  margin: 0em auto;
+  border: solid 1px $black-color;
+
+/*---------------------------------NAV---------------------------------*/
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: $primary-dark-color;
     color: $white-color;
-    font-style: normal;
-    font-weight: bolder;
-    text-decoration: none;
-    display: inline-block;
-    padding: 20px;
-    &:hover {
-      background: $primary-dark-color;
+    a {
+      flex: auto;
+      text-align: center;
+      padding: 20px;
       color: $white-color;
+      font-style: normal;
+      font-weight: bolder;
+      text-decoration: none;
+      &:hover {
+        background: $secondary-neutral-color;
+        color: $white-color;
+      }
     }
   }
-}
 
 /*--------------------------------CONTENT------------------------------*/
+  #quick_notif {
+    width: 90%;
+    margin: 0px auto;
+    list-style-type: none;
+    background: $second-color;
+    li {
+      padding: 10px;
+    }
+  }
+
+
+  #content {
+    padding: 1em 1%;
+    background: $white-color;
+    overflow: auto;
+  }
+
+}
 
 .helptext {
     display: block;
-}
-
-#quick_notif {
-  width: 90%;
-  margin: 0px auto;
-  list-style-type: none;
-  background: $second-color;
-  li {
-    padding: 10px;
-  }
-}
-
-#content {
-  width: 88%;
-  margin: 0px auto;
-  padding: 1em 1%;
-  background: $white-color;
-  overflow: auto;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -763,13 +781,27 @@ textarea {
 /*--------------------------------FOOTER-------------------------------*/
 
 footer {
+  width: 90%;
+  margin: 2em auto;
+
+  font-size: 80%;
   text-align: center;
+  vertical-align: middle;
   div {
-    margin-top: 25px;
-    margin-bottom: 15px;
-  }
-  a {
-    margin: 1px 20px;
+    margin: 0.6em 0em;
+    color: $white-color;
+    display: flex;
+    background-color: $primary-neutral-dark-color;
+    box-shadow: black 1px 1px 5px;
+    border: solid 1px $black-color;
+    a {
+      padding: 0.8em;
+      flex: 1;
+      color: $white-color;
+      &:hover {
+        color: $secondary-color;
+      }
+    }
   }
 }
 
@@ -847,7 +879,7 @@ label {
     line-height: 120%;
   }
   a {
-    color: $primary-light-color;
+    color: $primary-dark-color;
   }
   a:hover {
     text-decoration: underline;
