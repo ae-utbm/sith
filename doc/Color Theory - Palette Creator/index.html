@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>Color Theory Palette creator</title>
+  
+  
+  
+      <style>
+      /* NOTE: The styles were added inline because Prefixfree needs access to your styles and they must be inlined if they are on local disk! */
+      html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #424242;
+  font-size: 16px;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: .875rem;
+}
+
+.form {
+  margin: 5rem 0;
+  width: 30rem;
+  background: #FAFAFA;
+  padding: 2rem;
+  border-radius: .25rem;
+  box-shadow: 0 4px 5px  hsla(0, 0%, 0%, .5);
+}
+
+.form-group {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.form-group:not(:first-child) {
+  margin-top: 1rem;
+}
+
+.color-display {
+  display: flex;
+  align-items: center;
+}
+
+.color-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.color-group > .color-code {
+  flex: 1 0 auto;
+  margin-left: 1rem;
+}
+
+.color-hue {
+  height: 2rem;
+  align-self: stretch;
+  background-image: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red)
+}
+
+.form-input {
+  width: 100%;
+  margin: 0;
+}
+
+.color-preview {
+  height: 5rem;
+  width: 5rem;
+  background-color: lightgrey;
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.color-text {
+  font-size: 3rem;
+}
+    </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
+
+</head>
+
+<body>
+  <form name="color-theory" class="form">
+  <div class="form-group">
+    <div class="color-hue"></div>
+    <input type="range" name="first-color" class="form-input" min="0" max="359" value="220">
+  </div>
+  <div class="form-group">
+    <fieldset class="first-color">
+      <legend>First color</legend>
+      <div class="color-group">
+        <div class="color-preview"></div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="second-color">
+      <legend>Second color</legend>
+      <div class="color-group">
+        <div class="color-preview"></div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+  </div>
+  <div class="form-group">
+    <fieldset class="primary-color">
+      <legend>Primary color</legend>
+      <div class="color-group">
+        <div class="color-preview"></div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="complementary-color">
+      <legend>Secondary color</legend>
+      <div class="color-group">
+        <div class="color-preview"></div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+  </div>
+  <div class="form-group">
+    <fieldset class="text-on-primary">
+      <legend>Text on primary color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="text-on-complementary">
+      <legend>Text on complementary color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+  </div>
+  <div class="form-group">
+    <fieldset class="complementary-neutral-light">
+      <legend>Complementary neutral light color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="complementary-neutral">
+      <legend>Complementary neutral color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="complementary-neutral-dark">
+      <legend>Complementary neutral dark color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="primary-neutral-light">
+      <legend>Primary neutral light color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="primary-neutral">
+      <legend>Primary neutral color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="primary-neutral-dark">
+      <legend>Primary neutral dark color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+  </div>
+  <div class="form-group">
+    <fieldset class="white">
+      <legend>"White" color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="black">
+      <legend>"Black" color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+  </div>
+  <div class="form-group">
+    <fieldset class="primary-light">
+      <legend>Primary light color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="primary-color">
+      <legend>Primary color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+    <fieldset class="primary-dark">
+      <legend>Primary dark color</legend>
+      <div class="color-group">
+        <div class="color-preview">
+          <span class="color-text">Ab</span>
+        </div>
+        <input type="text" class="color-code" readonly>
+      </div>
+    </fieldset>
+  </div>
+</form>
+<template id="scss-template">
+  <style type="text/scss">
+//From https://github.com/tallys/color-theory
+  
+//Pick a color
+
+// THIS IS SET IN THE THEME FILE AT THE TOP LEVEL
+// $first-color: hsl(17, 100%, 50%);
+
+// Find the complement
+
+$second-color: complement($first-color);
+
+//Check if you have a cool color on your hands. Cool colors will overpower warm colors when mixing.
+
+@function is-cool-color($color) {
+	@return hue($color) < 310 and hue($color) > 140;
+}
+
+@function is-high-key-value($color) {
+	@return hue($color) > 20 and hue($color) < 190;
+}
+
+@function is-highest-key-value($color) {
+	@return hue($color) > 30 and hue($color) <90;
+}
+
+//Establish a relationship (similar lighting conditions) between colors.
+
+@function harmonious-mix($mix, $base) {
+	@if (is-cool-color($mix)){
+		@if is-high-key-value($base) {
+			@return mix($mix, $base, 11%);
+		}
+		@else {
+			@return mix($mix, $base, 16%);
+		}
+	}
+	@else {
+		@if is-high-key-value($base) {
+			@return mix($mix, $base, 13%);
+		}
+		@else {
+			@return mix($mix, $base, 23%);
+		}
+	}
+}
+
+@function mix-neutral($color) {
+	@if (is-highest-key-value($color)) {
+		@if is-high-key-value(complement($color)) {
+			@return mix(complement($color), $color, 19%);
+		}
+		@else {
+			@return mix(complement($color), $color, 13%);
+		}
+	}
+	@else if (is-high-key-value($color)) {
+		@if is-high-key-value(complement($color)) {
+			@return mix(complement($color), $color, 31%);
+		}
+		@else {
+			@return mix(complement($color), $color, 23%);
+		}
+	}
+	@else {
+		@if is-highest-key-value(complement($color)) {
+			@return mix(complement($color), $color, 31%);
+		}
+		@if is-high-key-value(complement($color)) {
+			@return mix(complement($color), $color, 26%);
+		}
+		@else {
+			@return mix(complement($color), $color, 23%);
+		}
+	}
+}
+
+@function pick-contrast-of($color) {
+	@if is-high-key-value($color){
+		@if lightness($color) < 30% {
+			@return lighten(complement($color), 86);
+		}
+		@else if lightness($color) > 70% {
+			@return darken(complement($color), 68);
+		}
+		@else {
+			@return darken(complement($color), 53);
+		}
+} @else {
+	@if lightness($color) < 30% {
+			@return lighten(complement($color), 86);
+		}
+		@else if lightness($color) > 70% {
+			@return darken(complement($color), 68);
+		}
+		@else {
+			@return lighten(complement($color), 53);
+		}
+	}
+}
+
+$primary-color: harmonious-mix($second-color, $first-color);
+$complementary-color: harmonious-mix($first-color, $second-color);
+
+// Complementary Neutrals, highlight, midtone, shadow
+
+$complementary-neutral: mix-neutral($complementary-color);
+$complementary-neutral-light: lighten($complementary-neutral, 33);
+$complementary-neutral-dark: darken($complementary-neutral, 33);
+
+// Primary neutrals, highlight, midtone, shadow`
+
+$primary-neutral: mix-neutral($primary-color);
+$primary-neutral-light: lighten($primary-neutral, 33);
+$primary-neutral-dark: darken($primary-neutral, 33);
+
+// Primary tint and shade
+
+$primary-light: mix($primary-neutral-light, $primary-color, 45%);
+$primary-dark: mix($primary-neutral-dark, $primary-color, 45%);
+
+$complementary-light: mix($complementary-neutral-light, $complementary-color, 45%);
+
+// Pure neutrals, highlight, midtone, shadow
+
+$white: lighten($primary-neutral-light, 15);
+$neutral-gray: grayscale($primary-neutral);
+$primary-gray: mix($primary-color, $complementary-color, 30);
+$complementary-gray: mix($complementary-color, $primary-color, 63);
+$black: grayscale($complementary-neutral-dark);
+
+// Analogous Colors
+
+$analogous-color: adjust-hue($complementary-color, -40);
+$complementary-analogous: mix($analogous-color, $complementary-color, 66);
+
+.first-color {color: unquote( 'hsl(') hue($first-color), saturation($first-color), lightness($first-color) unquote(')')}
+.second-color {color: unquote( 'hsl(') hue($second-color), saturation($second-color), lightness($second-color) unquote(')')}
+
+.primary-color {color: unquote( 'hsl(') hue($primary-color), saturation($primary-color), lightness($primary-color) unquote(')')}
+.complementary-color {color: unquote( 'hsl(') hue($complementary-color), saturation($complementary-color), lightness($complementary-color) unquote(')')}
+
+.primary-neutral-light {color: unquote( 'hsl(') hue($primary-neutral-light), saturation($primary-neutral-light), lightness($primary-neutral-light) unquote(')')}
+.primary-neutral {color: unquote( 'hsl(') hue($primary-neutral), saturation($primary-neutral), lightness($primary-neutral) unquote(')')}
+.primary-neutral-dark {color: unquote( 'hsl(') hue($primary-neutral-dark), saturation($primary-neutral-dark), lightness($primary-neutral-dark) unquote(')')}
+.complementary-neutral-light {color: unquote( 'hsl(') hue($complementary-neutral-light), saturation($complementary-neutral-light), lightness($complementary-neutral-light) unquote(')')}
+.complementary-neutral {color: unquote( 'hsl(') hue($complementary-neutral), saturation($complementary-neutral), lightness($complementary-neutral) unquote(')')}
+.complementary-neutral-dark {color: unquote( 'hsl(') hue($complementary-neutral-dark), saturation($complementary-neutral-dark), lightness($complementary-neutral-dark) unquote(')')}
+
+.white {color: unquote( 'hsl(') hue($white), saturation($white), lightness($white) unquote(')')}
+.black {color: unquote( 'hsl(') hue($black), saturation($black), lightness($black) unquote(')')}
+
+.primary-light {color: unquote( 'hsl(') hue($primary-light), saturation($primary-light), lightness($primary-light) unquote(')')}
+.primary-dark {color: unquote( 'hsl(') hue($primary-dark), saturation($primary-dark), lightness($primary-dark) unquote(')')}
+
+.complementary-light {color: unquote( 'hsl(') hue($complementary-light), saturation($complementary-light), lightness($complementary-light) unquote(')')}
+.primary-gray {color: unquote( 'hsl(') hue($primary-gray), saturation($primary-gray), lightness($primary-gray) unquote(')')}
+.neutral-gray {color: unquote( 'hsl(') hue($neutral-gray), saturation($neutral-gray), lightness($neutral-gray) unquote(')')}
+.complementary-gray {color: unquote( 'hsl(') hue($complementary-gray), saturation($complementary-gray), lightness($complementary-gray) unquote(')')}
+  </style>
+</template>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.10.3/sass.sync.js'></script>
+
+    <script src="js/index.js"></script>
+
+</body>
+</html>

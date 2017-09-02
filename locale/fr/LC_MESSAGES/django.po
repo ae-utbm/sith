@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-02 12:33+0200\n"
+"POT-Creation-Date: 2017-09-02 15:17+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -404,8 +404,8 @@ msgstr "Nouveau compte club"
 #: core/templates/core/user_tools.jinja:41 core/views/user.py:186
 #: counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
-#: counter/templates/counter/counter_list.jinja:32
-#: counter/templates/counter/counter_list.jinja:53
+#: counter/templates/counter/counter_list.jinja:33
+#: counter/templates/counter/counter_list.jinja:55
 #: election/templates/election/election_detail.jinja:279
 #: election/templates/election/election_detail.jinja:327
 #: election/templates/election/election_detail.jinja:375
@@ -494,6 +494,7 @@ msgstr "Fin"
 #: core/templates/core/user_account_detail.jinja:53
 #: core/templates/core/user_account_detail.jinja:80
 #: counter/templates/counter/last_ops.jinja:17
+#: counter/templates/counter/refilling_list.jinja:13
 msgid "Amount"
 msgstr "Montant"
 
@@ -517,6 +518,7 @@ msgstr "Fermé"
 #: com/templates/com/news_admin_list.jinja:242
 #: com/templates/com/news_admin_list.jinja:276
 #: com/templates/com/weekmail.jinja:21 com/templates/com/weekmail.jinja:50
+#: counter/templates/counter/refilling_list.jinja:16
 msgid "Actions"
 msgstr "Actions"
 
@@ -1062,6 +1064,7 @@ msgstr "Barman"
 #: counter/templates/counter/counter_click.jinja:29
 #: counter/templates/counter/last_ops.jinja:16
 #: counter/templates/counter/last_ops.jinja:41
+#: counter/templates/counter/refilling_list.jinja:12
 msgid "Customer"
 msgstr "Client"
 
@@ -1088,6 +1091,7 @@ msgstr "Total"
 #: core/templates/core/user_account_detail.jinja:54
 #: counter/templates/counter/last_ops.jinja:18
 #: counter/templates/counter/last_ops.jinja:45
+#: counter/templates/counter/refilling_list.jinja:14
 msgid "Payment method"
 msgstr "Méthode de paiement"
 
@@ -1188,8 +1192,8 @@ msgid "Mailing list"
 msgstr "Listes de diffusion"
 
 #: club/views.py:134 counter/templates/counter/counter_list.jinja:21
-#: counter/templates/counter/counter_list.jinja:42
-#: counter/templates/counter/counter_list.jinja:57
+#: counter/templates/counter/counter_list.jinja:43
+#: counter/templates/counter/counter_list.jinja:59
 msgid "Props"
 msgstr "Propriétés"
 
@@ -2938,20 +2942,20 @@ msgstr "Appels à facture"
 
 #: core/templates/core/user_tools.jinja:42 core/views/user.py:213
 #: counter/templates/counter/counter_list.jinja:18
-#: counter/templates/counter/counter_list.jinja:33
-#: counter/templates/counter/counter_list.jinja:54
+#: counter/templates/counter/counter_list.jinja:34
+#: counter/templates/counter/counter_list.jinja:56
 msgid "Stats"
 msgstr "Stats"
 
 #: core/templates/core/user_tools.jinja:46
-#: counter/templates/counter/counter_list.jinja:37
+#: counter/templates/counter/counter_list.jinja:38
 #: stock/templates/stock/stock_item_list.jinja:11
 #: stock/templates/stock/stock_list.jinja:16
 msgid "Shopping lists"
 msgstr "Liste de courses"
 
 #: core/templates/core/user_tools.jinja:48
-#: counter/templates/counter/counter_list.jinja:39
+#: counter/templates/counter/counter_list.jinja:40
 msgid "Create new stock"
 msgstr "Créer nouveau stock"
 
@@ -3406,6 +3410,7 @@ msgid "Finish"
 msgstr "Terminer"
 
 #: counter/templates/counter/counter_click.jinja:97
+#: counter/templates/counter/refilling_list.jinja:9
 msgid "Refilling"
 msgstr "Rechargement"
 
@@ -3418,15 +3423,21 @@ msgstr "Liste des comptoirs"
 msgid "New counter"
 msgstr "Nouveau comptoir"
 
-#: counter/templates/counter/counter_list.jinja:26
+#: counter/templates/counter/counter_list.jinja:22
+#: counter/templates/counter/counter_list.jinja:44
+#: counter/templates/counter/refilling_list.jinja:5
+msgid "Refillings list"
+msgstr "Liste de rechargements"
+
+#: counter/templates/counter/counter_list.jinja:27
 msgid "Bars"
 msgstr "Bars"
 
-#: counter/templates/counter/counter_list.jinja:47
+#: counter/templates/counter/counter_list.jinja:49
 msgid "Offices"
 msgstr "Bureaux"
 
-#: counter/templates/counter/counter_list.jinja:63
+#: counter/templates/counter/counter_list.jinja:65
 msgid "There is no counters in this website."
 msgstr "Il n'y a pas de comptoirs dans ce site web."
 
@@ -3526,6 +3537,10 @@ msgstr "Nouveau type de produit"
 #: counter/templates/counter/producttype_list.jinja:17
 msgid "There is no product types in this website."
 msgstr "Il n'y a pas de types de produit dans ce site web."
+
+#: counter/templates/counter/refilling_list.jinja:15
+msgid "Seller"
+msgstr "Vendeur"
 
 #: counter/templates/counter/stats.jinja:5
 #: counter/templates/counter/stats.jinja:9

@@ -1280,3 +1280,23 @@ class EticketPDFView(CanViewMixin, DetailView):
         p.showPage()
         p.save()
         return response
+
+
+class CounterRefillingListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+    """
+    List of refillings on a counter
+    """
+    model = Refilling
+    template_name = 'counter/refilling_list.jinja'
+    current_tab = "counters"
+    paginate_by = 30
+
+    def dispatch(self, request, *args, **kwargs):
+        self.counter = get_object_or_404(Counter, pk=kwargs['counter_id'])
+        self.queryset = Refilling.objects.filter(counter__id=self.counter.id)
+        return super(CounterRefillingListView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(CounterRefillingListView, self).get_context_data(**kwargs)
+        kwargs['counter'] = self.counter
+        return kwargs

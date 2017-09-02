@@ -56,6 +56,8 @@ urlpatterns = [
     url(r'^admin/eticket/(?P<eticket_id>[0-9]+)$', EticketEditView.as_view(), name='edit_eticket'),
     url(r'^admin/selling/(?P<selling_id>[0-9]+)/delete$', SellingDeleteView.as_view(), name='selling_delete'),
     url(r'^admin/refilling/(?P<refilling_id>[0-9]+)/delete$', RefillingDeleteView.as_view(), name='refilling_delete'),
+    url(r'^admin/(?P<counter_id>[0-9]+)/refillings$', CounterRefillingListView.as_view(), name='refilling_list'),
+
 ]
 
 
