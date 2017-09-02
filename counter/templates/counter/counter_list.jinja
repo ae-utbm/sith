@@ -18,7 +18,8 @@
     <a href="{{ url('counter:stats', counter_id=c.id) }}">{% trans %}Stats{% endtrans %}</a> -
     {% endif %}
     {% if user.is_owner(c) %}
-    <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a>
+    <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a> -
+    <a href="{{ url('counter:refilling_list', counter_id=c.id) }}">{% trans %}Refillings list{% endtrans %}</a>
     {% endif %}
     </li>
     {% endfor %}
@@ -39,7 +40,8 @@
     <a href="{{url('stock:new', counter_id=c.id)}}">{% trans %}Create new stock{% endtrans%}</a> -
     {% endif %}
     {% if user.is_owner(c) %}
-    <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a>
+    <a href="{{ url('counter:prop_admin', counter_id=c.id) }}">{% trans %}Props{% endtrans %}</a> -
+    <a href="{{ url('counter:refilling_list', counter_id=c.id) }}">{% trans %}Refillings list{% endtrans %}</a>
     {% endif %}
     </li>
     {% endfor %}
