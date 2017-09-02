@@ -22,10 +22,9 @@
     <td>{{ refilling.payment_method }}</td>
     <td>{{ refilling.operator }}</td>
     <td><a href="{{ url('counter:refilling_delete', refilling_id=refilling.id)}}">Delete</a></td>
-  </tr>
-  </table>
-  
+  </tr>  
   {%- endfor %}
+  </table>
 {% if is_paginated %}
     {{ paginate(page_obj, paginator) }}
 {% endif %}
