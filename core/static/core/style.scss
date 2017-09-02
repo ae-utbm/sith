@@ -134,16 +134,67 @@ header {
     }
 
     #header_user_links {
+      display: flex;
       width: 120ch;
       flex: initial;
       text-align: right;
-      margin: 1.2em 0em;
+      margin: 0em;
+      div {
+        display: inline;
+        padding: 1.2em 0em;
+        &:first-child {
+          flex: auto;
+        }
+      }
       a {
         text-decoration: none;
         margin: 0em 1em;
         color: $black-color;
         &:hover {
           color: $secondary-color;
+        }
+      }
+      .white {
+        background: $white-color;
+      }
+      #header_notif {
+        display: none;
+        position: absolute;
+        max-height: 20em;
+        width: 22em;
+        overflow: auto;
+        list-style-type: none;
+        box-shadow: black 1px 1px 5px;
+        background: white;
+        text-align: left;
+        font-size: 80%;
+        margin: 1.5em 0em 0em -14em;
+        .header_notif_date {
+          font-weight: bold;
+        }
+        .header_notif_time {
+          color: grey;
+        }
+        li {
+          padding: 0.2em;
+          &:hover {
+            background: #bcc;
+          }
+        }
+        li:last-child {
+          text-align: center;
+          a {
+            color: $primary-dark-color;
+            &:hover {
+              color: $primary-light-color;
+            }
+          }
+        }
+        a {
+          margin: 0em;
+          &:hover {
+            color: $primary-dark-color;
+          }
         }
       }
     }
@@ -154,18 +205,6 @@ header {
   width: 88%;
   margin: 0px auto;
   padding: 0.3em 1%;
-}
-
-#notif {
-  display: none;
-  position: absolute;
-  background: lightgrey;
-  text-align: center;
-  overflow: scroll;
-  max-height: 400px;
-  li:hover {
-    background: #bcc;
-  }
 }
 
 #info_boxes {
@@ -261,32 +300,32 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: 160%;
-  margin-left: 50px;
+  margin-left: 0px;
 }
 
 h2 {
   font-size: 150%;
-  margin-left: 40px;
+  margin-left: 10px;
 }
 
 h3 {
   font-size: 140%;
-  margin-left: 30px;
+  margin-left: 20px;
 }
 
 h4 {
   font-size: 130%;
-  margin-left: 20px;
+  margin-left: 30px;
 }
 
 h5 {
   font-size: 120%;
-  margin-left: 10px;
+  margin-left: 40px;
 }
 
 h6 {
   font-size: 110%;
-  margin-left: 0px;
+  margin-left: 50px;
 }
 
 p, pre {

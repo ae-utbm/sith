@@ -41,5 +41,5 @@ $( function() {
 } );
 
 function display_notif() {
-    $('#notif').toggle();
+    $('#header_notif').toggle().parent().toggleClass("white");
 }

@@ -72,20 +72,45 @@
                     <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />
                 </form>
                 <div id="header_user_links">
-                    <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
-                    <a href="#" onclick="display_notif()">&#x1f514; ({{ user.notifications.filter(viewed=False).count() }})</a>
-                    <ul id="notif">
-                        {% for n in user.notifications.filter(viewed=False).order_by('-id') %}
-                        <li><a href="{{ url("core:notification", notif_id=n.id) }}">
-                                <span style="font-size: small; ">{{ n.date|localtime|date(DATE_FORMAT) }} {{
-                                    n.date|localtime|time(DATETIME_FORMAT) }}</span><br>
-                                {{ n }}</a></li>
-                        {% endfor %}
-                        <li><a href="{{ url('core:notification_list') }}">{% trans %}View more{% endtrans %}</a>
-                            <a href="{{ url('core:notification_list') }}?see_all">{% trans %}Mark all as read{% endtrans %}</a></li>
-                    </ul>
-                    <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
-                    <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
+                    <div>
+                      <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
+                    </div>
+                    <div>
+                      <a href="#" onclick="display_notif()">&#x1f514; ({{ user.notifications.filter(viewed=False).count() }})</a>
+                      <ul id="header_notif">
+                          {% for n in user.notifications.filter(viewed=False).order_by('-id') %}
+                          <li>
+                              <a href="{{ url("core:notification", notif_id=n.id) }}">
+                                  <span class="header_notif_date">
+                                      {{ n.date|localtime|date(DATE_FORMAT) }}
+                                  </span>
+                                  <span class="header_notif_time">
+                                      {{ n.date|localtime|time(DATETIME_FORMAT) }}
+                                  </span>
+                                  <br>
+                                  {{ n }}
+                              </a>
+                          </li>
+                          {% endfor %}
+                          <li>
+                              <strong>
+                              <a href="{{ url('core:notification_list') }}">
+                                  {% trans %}View more{% endtrans %}
+                              </a>
+                              <br />
+                              <a href="{{ url('core:notification_list') }}?see_all">
+                                  {% trans %}Mark all as read{% endtrans %}
+                              </a>
+                              </strong>
+                          </li>
+                      </ul>
+                    </div>
+                    <div>
+                      <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
+                    </div>
+                    <div>
+                      <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
+                    </div>
                 </div>
             </div>
             {% endif %}

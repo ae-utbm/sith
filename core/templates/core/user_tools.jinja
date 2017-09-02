@@ -27,7 +27,6 @@
 <h4>{% trans %}Counters{% endtrans %}</h4>
 <ul>
     {% if user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID) or user.is_root %}
-    <h5>{% trans %}General management{% endtrans %}</h5>
     <li><a href="{{ url('counter:admin_list') }}">{% trans %}General counters management{% endtrans %}</a></li>
     <li><a href="{{ url('counter:product_list') }}">{% trans %}Products management{% endtrans %}</a></li>
     <li><a href="{{ url('counter:producttype_list') }}">{% trans %}Product types management{% endtrans %}</a></li>
