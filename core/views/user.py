@@ -464,7 +464,8 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
     model = User
     pk_url_kwarg = "user_id"
     template_name = "core/user_preferences.jinja"
-    form_class = modelform_factory(Preferences, fields=['receive_weekmail'])
+    form_class = modelform_factory(Preferences, fields=['receive_weekmail',
+        'notify_on_click', 'notify_on_refill'])
     context_object_name = "profile"
     current_tab = "prefs"
 
@@ -474,11 +475,7 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super(UserPreferencesView, self).get_form_kwargs()
-        try:
-            pref = self.object.preferences
-        except:
-            pref = Preferences(user=self.object)
-            pref.save()
+        pref = self.object.preferences
         kwargs.update({'instance': pref})
         return kwargs
 

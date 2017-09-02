@@ -498,6 +498,15 @@ class User(AbstractBaseUser):
         return self.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
 
     @cached_property
+    def preferences(self):
+        try:
+            return self._preferences
+        except:
+            prefs = Preferences(user=self)
+            prefs.save()
+            return prefs
+
+    @cached_property
     def forum_infos(self):
         try:
             return self._forum_infos
@@ -582,16 +591,22 @@ class AnonymousUser(AuthAnonymousUser):
 
 
 class Preferences(models.Model):
-    user = models.OneToOneField(User, related_name="preferences")
+    user = models.OneToOneField(User, related_name="_preferences")
     receive_weekmail = models.BooleanField(
         _('do you want to receive the weekmail'),
         default=False,
-        # help_text=_('Do you want to receive the weekmail?'),
     )
     show_my_stats = models.BooleanField(
-        _('define if we show a users stats'),
+        _('show your stats to others'),
         default=False,
-        help_text=_('Show your account statistics to others'),
+    )
+    notify_on_click = models.BooleanField(
+        _('get a notification for every click'),
+        default=False,
+    )
+    notify_on_refill = models.BooleanField(
+        _('get a notification for every refilling'),
+        default=False,
     )
 
     def get_display_name(self):
