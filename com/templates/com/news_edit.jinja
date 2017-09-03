@@ -20,7 +20,8 @@
             {{ form.instance.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
     </p>
     <p><a href="#">{{ form.instance.club or "Club" }}</a></p>
-    <p>{{ form.instance.summary|markdown }}</p>
+    <div>{{ form.instance.summary|markdown }}</div>
+    <div>{{ form.instance.content|markdown }}</div>
     <p>{% trans %}Author: {% endtrans %} {{ user_profile_link(form.instance.author) }}</p>
 </section>
 {% endif %}
