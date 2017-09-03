@@ -18,7 +18,8 @@
                 {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
         </p>
         <p><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></p>
-        <p>{{ news.summary|markdown }}</p>
+        <div>{{ news.summary|markdown }}</div>
+        <div>{{ news.content|markdown }}</div>
         <p>{% trans %}Author: {% endtrans %}{{ user_profile_link(news.author) }}</p>
         {% if news.moderator %}
         <p>{% trans %}Moderator: {% endtrans %}{{ user_profile_link(news.moderator) }}</p>
