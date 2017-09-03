@@ -22,7 +22,7 @@
 {% block content %}
 {{ print_page_name(page) }}
 
-<div class="tool-bar">
+<div class="tool_bar">
     <div class="tools">
         {% if page %}
         <a href="{{ url('core:page', page.get_full_name()) }}">{% trans %}View{% endtrans %}</a>

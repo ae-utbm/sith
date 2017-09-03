@@ -4,66 +4,33 @@
 {% trans %}News{% endtrans %}
 {% endblock %}
 
-{% block head %}
-{{ super() }}
-<style type="text/css" media="all">
-section {
-    padding: 5px;
-}
-section.news_call, section.news_notice {
-    background: lightgrey;
-    margin: 2px;
-}
-section.news_event:nth-of-type(even) {
-    background: lightblue;
-}
-div#agenda {
-    display: block;
-    width: 20%;
-    float: right;
-    background: white;
-    font-size: 70%;
-    border: solid 1px darkgrey;
-    padding: 0.5em;
-}
-div#agenda_content {
-    overflow: auto;
-    width: 100%;
-    height: 20em;
-}
-.news_weekly p {
-    margin: 0.2em;
-}
-.date {
-    font-size: small;
-    color: grey;
-}
-</style>
-{% endblock %}
-
 {% block content %}
+<div id="news">
     <h3>{% trans %}News{% endtrans %}</h3>
     {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
     <a href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
     {% endif  %}
 
     <div id="agenda">
-        <h4>{% trans %}Agenda{% endtrans %}</h4>
-        <hr>
+        <div id="agenda_title">{% trans %}Agenda{% endtrans %}</div>
         <div id="agenda_content">
         {% for d in NewsDate.objects.filter(end_date__gte=timezone.now(),
                 news__is_moderated=True, news__type__in=["WEEKLY",
                 "EVENT"]).order_by('start_date', 'end_date') %}
-        <section class="news_weekly">
-            <p><strong>{{ d.start_date|localtime|date('D d M Y') }}</strong></p>
-            <p class="date">
-                <span>{{ d.start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-                <span>{{ d.end_date|localtime|time(DATETIME_FORMAT) }}</span>
-            </p>
-            <p><strong><a href="{{ url('com:news_detail', news_id=d.news.id) }}">{{ d.news.title }}</a></strong>
-                <a href="{{ d.news.club.get_absolute_url() }}">{{ d.news.club }}</a></p>
-            <p>{{ d.news.summary|markdown }}</p>
-        </section>
+            <div class="agenda_item">
+                <div class="agenda_date">
+                    <strong>{{ d.start_date|localtime|date('D d M Y') }}</strong>
+                </div>
+                <div class="agenda_time">
+                    <span>{{ d.start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+                    <span>{{ d.end_date|localtime|time(DATETIME_FORMAT) }}</span>
+                </div>
+                <div>
+                    <strong><a href="{{ url('com:news_detail', news_id=d.news.id) }}">{{ d.news.title }}</a></strong>
+                    <a href="{{ d.news.club.get_absolute_url() }}">{{ d.news.club }}</a>
+                </div>
+                <div class="agenda_item_content">{{ d.news.summary|markdown }}</div>
+            </div>
         {% endfor %}
         </div>
     </div>
@@ -77,7 +44,7 @@ div#agenda_content {
     {% for news in object_list.filter(dates__start_date__lte=timezone.now(), dates__end_date__gte=timezone.now(), type="CALL") %}
     <section class="news_call">
         <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
-        <p class="date">
+        <p class="news_date">
             <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
                 {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
             <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
@@ -90,12 +57,12 @@ div#agenda_content {
     <h4>{% trans %}Events today and the next few days{% endtrans %}</h4>
     {% for d in NewsDate.objects.filter(end_date__gte=timezone.now(), start_date__lte=timezone.now()+timedelta(days=5),
                                         news__type="EVENT", news__is_moderated=True).datetimes('start_date', 'day') %}
-    <h5 class="date">{{ d|localtime|date(DATETIME_FORMAT) }}</h5>
+    <h5 class="news_date">{{ d|localtime|date(DATETIME_FORMAT) }}</h5>
     {% for news in object_list.filter(dates__start_date__gte=d, dates__start_date__lte=d+timedelta(days=1),
                                       type="EVENT").exclude(dates__end_date__lt=timezone.now()) %}
     <section class="news_event">
         <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
-        <p class="date">
+        <p class="news_date">
         <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
         {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
         <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
@@ -111,13 +78,14 @@ div#agenda_content {
     {% for news in object_list.filter(dates__start_date__gte=timezone.now()+timedelta(days=5), type="EVENT", is_moderated=True) %}
     <section>
         <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a>
-            <span class="date">{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
+            <span class="news_date">{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
                 {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }} -
             {{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
             {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
         </h4>
     </section>
     {% endfor %}
+</div>
 {% endblock %}
 
 

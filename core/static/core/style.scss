@@ -293,7 +293,7 @@ header {
 
 /*--------------------------------CONTENT------------------------------*/
   #quick_notif {
-    width: 90%;
+    width: 100%;
     margin: 0px auto;
     list-style-type: none;
     background: $second-color;
@@ -309,6 +309,94 @@ header {
     overflow: auto;
   }
 
+  .tool_bar {
+    overflow: auto;
+    padding: 4px;
+    .tools {
+      display: flex;
+      flex-wrap: wrap;
+      float: right;
+      background: $white-color;
+      border: 1px solid $black-color;
+      text-align: center;
+      a {
+        padding: 10px;
+        display: inline-block;
+        color: $black-color;
+        flex: 1;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        &.selected_tab {
+          background: $second-color;
+          color: $black-color;
+        }
+        &:hover {
+          background: $primary-color;
+          color: $white-color;
+        }
+      }
+    }
+  }
+/*---------------------------------NEWS--------------------------------*/
+  #news {
+    section {
+      padding: 5px;
+    }
+    section.news_call, section.news_notice {
+      background: lightgrey;
+      margin: 2px;
+    }
+    section.news_event:nth-of-type(even) {
+      background: lightblue;
+    }
+    #agenda {
+      box-shadow: $black-color 2px 2px 2px;
+      display: block;
+      width: 20%;
+      float: right;
+      background: white;
+      font-size: 70%;
+      border: solid 1px $black-color;
+      #agenda_title {
+        margin: 0em;
+        padding: 0.5em;
+        font-weight: bold;
+        font-size: 150%;
+        text-align: center;
+        text-transform: uppercase;
+        border-bottom: solid 1px $black-color;
+        background: $second-color;
+
+      }
+      #agenda_content {
+        overflow: auto;
+        height: 20em;
+        .agenda_item {
+          padding: 0.5em;
+          margin-bottom: 0.5em;
+          &:nth-of-type(even) {
+            background: $secondary-neutral-light-color;
+          }
+          .agenda_time {
+            font-size: 90%;
+            color: grey;
+          }
+          .agenda_item_content {
+            p {
+              margin-top: 0.2em;
+            }
+          }
+        }
+      }
+    }
+    .news_weekly p {
+      margin: 0.2em;
+    }
+    .news_date {
+      font-size: small;
+      color: grey;
+    }
+  }
 }
 
 .helptext {
@@ -453,24 +541,6 @@ i, em {
 
 u, .underline {
   text-decoration: underline;
-}
-
-.tool-bar {
-  overflow: auto;
-  padding: 4px;
-}
-
-.tools {
-  float: right;
-  border: 1px solid $primary-neutral-light-color;
-  a {
-    padding: 10px;
-    display: inline-block;
-  }
-}
-
-.selected_tab {
-  background: $primary-neutral-light-color;
 }
 
 #basket {
@@ -917,4 +987,8 @@ label {
 .ui-button.ui-state-active:hover {
   background: $primary-color;
   border-color: $primary-color;
+}
+.ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-top,
+.ui-corner-left {
+  border-radius: 0px;
 }

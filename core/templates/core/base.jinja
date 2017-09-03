@@ -142,7 +142,7 @@
           {% block nav %}
           {% if not popup %}
           <nav>
-              <a href="https://ae.utbm.fr/">{% trans %}Main{% endtrans %}</a>
+              <a href="{{ url('core:index') }}">{% trans %}Main{% endtrans %}</a>
               <a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a>
               <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
               <a href="{{ url('sas:main') }}">{% trans %}SAS{% endtrans %}</a>
@@ -163,16 +163,16 @@
 
           <div id="content">
               {% if list_of_tabs %}
-              <div class="tool-bar">
+              <div class="tool_bar">
                   <div>{{ tabs_title }}</div>
                   <div class="tools">
-                      {% for t in list_of_tabs %}
+                      {% for t in list_of_tabs -%}
                       <a href="{{ t.url }}"
                           {%- if current_tab == t.slug %}
                               class="selected_tab"
                           {%- endif -%}
                       >{{ t.name }}</a>
-                      {% endfor %}
+                      {%- endfor %}
                   </div>
                   <hr>
               </div>
