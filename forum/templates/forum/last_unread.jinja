@@ -17,7 +17,9 @@
         <a class="ib" href="{{ url('forum:last_unread') }}">{% trans %}Refresh{% endtrans %}</a>
     </p>
     {% for t in page_obj.object_list %}
+    {% if user.can_view(t) %}
     {{ display_topic(t, user, True) }}
+    {% endif %}
     {% endfor %}
 
     <p style="text-align: right; background: #d8e7f3;">
