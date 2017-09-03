@@ -2,7 +2,7 @@
 <html lang="fr">
     <head>
         {% block head %}
-        <title>{% block title %}{% trans %}Welcome!{% endtrans %}{% endblock %}</title>
+        <title>{% block title %}{% trans %}Welcome!{% endtrans %}{% endblock %} - Association des Étudiants UTBM</title>
         <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
         <link rel="stylesheet" href="{{ static('core/base.css') }}">
         <link rel="stylesheet" href="{{ static('core/multiple-select.css') }}">
@@ -142,7 +142,7 @@
           {% block nav %}
           {% if not popup %}
           <nav>
-              <a href="https://ae2.utbm.fr/">{% trans %}Main{% endtrans %}</a>
+              <a href="https://ae.utbm.fr/">{% trans %}Main{% endtrans %}</a>
               <a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a>
               <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
               <a href="{{ url('sas:main') }}">{% trans %}SAS{% endtrans %}</a>
@@ -195,6 +195,7 @@
                 <a href="https://ae2.utbm.fr/copyright_agent.php">{% trans %}Intellectual property{% endtrans %}</a>
                 <a href="{{ url('core:page', 'docs') }}">{% trans %}Help & Documentation{% endtrans %}</a>
                 <a href="{{ url('core:page', 'rd') }}">{% trans %}R&D{% endtrans %}</a>
+                <a href="https://ae2.utbm.fr/">{% trans %}Former website{% endtrans %}</a>
             </div>
             {% trans %}Site made by good people{% endtrans %}
             {% endblock %}

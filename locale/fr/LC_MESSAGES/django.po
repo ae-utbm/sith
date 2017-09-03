@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-02 15:17+0200\n"
+"POT-Creation-Date: 2017-09-03 12:28+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: accounting/models.py:61 accounting/models.py:110 accounting/models.py:138
 #: accounting/models.py:197 club/models.py:46
-#: core/templates/core/base.jinja:287 counter/models.py:113
+#: core/templates/core/base.jinja:290 counter/models.py:113
 #: counter/models.py:139 counter/models.py:183 forum/models.py:49
 #: launderette/models.py:38 launderette/models.py:84 launderette/models.py:110
 #: stock/models.py:38 stock/models.py:54 stock/models.py:77 stock/models.py:97
@@ -1360,7 +1360,7 @@ msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
 #: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
-#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:45
+#: com/templates/com/news_list.jinja:41
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1394,7 +1394,7 @@ msgstr "Type"
 #: com/templates/com/news_admin_list.jinja:235
 #: com/templates/com/news_admin_list.jinja:270
 #: com/templates/com/weekmail.jinja:19 com/templates/com/weekmail.jinja:48
-#: core/templates/core/base.jinja:297 forum/templates/forum/forum.jinja:29
+#: core/templates/core/base.jinja:300 forum/templates/forum/forum.jinja:29
 #: forum/templates/forum/forum.jinja:48 forum/templates/forum/main.jinja:25
 #: forum/views.py:159
 msgid "Title"
@@ -1538,19 +1538,19 @@ msgstr ""
 msgid "Preview"
 msgstr "Prévisualiser"
 
-#: com/templates/com/news_list.jinja:47
+#: com/templates/com/news_list.jinja:43
 msgid "Administrate news"
 msgstr "Administrer les news"
 
-#: com/templates/com/news_list.jinja:51
+#: com/templates/com/news_list.jinja:47
 msgid "Agenda"
 msgstr "Agenda"
 
-#: com/templates/com/news_list.jinja:90
+#: com/templates/com/news_list.jinja:86
 msgid "Events today and the next few days"
 msgstr "Événement aujourd'hui et dans les prochains jours"
 
-#: com/templates/com/news_list.jinja:110
+#: com/templates/com/news_list.jinja:106
 msgid "Coming soon... don't miss!"
 msgstr "Prochainement... à ne pas rater!"
 
@@ -1824,7 +1824,7 @@ msgstr "-"
 msgid "XS"
 msgstr "XS"
 
-#: core/models.py:171 core/templates/core/base.jinja:310
+#: core/models.py:171 core/templates/core/base.jinja:313
 msgid "S"
 msgstr "S"
 
@@ -2146,25 +2146,25 @@ msgstr "Marquer tout commme lu"
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: core/templates/core/base.jinja:144
+#: core/templates/core/base.jinja:145
 msgid "Main"
 msgstr "Accueil"
 
-#: core/templates/core/base.jinja:145
+#: core/templates/core/base.jinja:146
 msgid "Matmatronch"
 msgstr "Matmatronch"
 
-#: core/templates/core/base.jinja:146
+#: core/templates/core/base.jinja:147
 msgid "Wiki"
 msgstr "Wiki"
 
-#: core/templates/core/base.jinja:147 sas/templates/sas/album.jinja:4
+#: core/templates/core/base.jinja:148 sas/templates/sas/album.jinja:4
 #: sas/templates/sas/main.jinja:4 sas/templates/sas/main.jinja.py:32
 #: sas/templates/sas/picture.jinja:34
 msgid "SAS"
 msgstr "SAS"
 
-#: core/templates/core/base.jinja:148 forum/templates/forum/forum.jinja:10
+#: core/templates/core/base.jinja:149 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:13
 #: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
 #: forum/templates/forum/main.jinja:14 forum/templates/forum/reply.jinja:15
@@ -2172,80 +2172,84 @@ msgstr "SAS"
 msgid "Forum"
 msgstr "Forum"
 
-#: core/templates/core/base.jinja:149
+#: core/templates/core/base.jinja:150
 msgid "Services"
 msgstr "Services"
 
-#: core/templates/core/base.jinja:150 core/templates/core/file.jinja:20
+#: core/templates/core/base.jinja:151 core/templates/core/file.jinja:20
 #: core/views/files.py:75
 msgid "Files"
 msgstr "Fichiers"
 
-#: core/templates/core/base.jinja:151
+#: core/templates/core/base.jinja:152
 msgid "Sponsors"
 msgstr "Partenaires"
 
-#: core/templates/core/base.jinja:152
+#: core/templates/core/base.jinja:153
 msgid "Help"
 msgstr "Aide"
 
-#: core/templates/core/base.jinja:191
+#: core/templates/core/base.jinja:193
 msgid "Contacts"
 msgstr "Contacts"
 
-#: core/templates/core/base.jinja:192
+#: core/templates/core/base.jinja:194
 msgid "Legal notices"
 msgstr "Mentions légales"
 
-#: core/templates/core/base.jinja:193
+#: core/templates/core/base.jinja:195
 msgid "Intellectual property"
 msgstr "Propriété intellectuelle"
 
-#: core/templates/core/base.jinja:194
+#: core/templates/core/base.jinja:196
 msgid "Help & Documentation"
 msgstr "Aide & Documentation"
 
-#: core/templates/core/base.jinja:195
+#: core/templates/core/base.jinja:197
 msgid "R&D"
 msgstr "R&D"
 
-#: core/templates/core/base.jinja:197
+#: core/templates/core/base.jinja:198
+msgid "Former website"
+msgstr "Ancien site"
+
+#: core/templates/core/base.jinja:200
 msgid "Site made by good people"
 msgstr "Site réalisé par des gens bons"
 
-#: core/templates/core/base.jinja:294
+#: core/templates/core/base.jinja:297
 msgid "https://path/to/image.gif"
 msgstr "https://chemin/vers/image.gif"
 
-#: core/templates/core/base.jinja:296
+#: core/templates/core/base.jinja:299
 msgid "alternative text"
 msgstr "texte alternatif"
 
-#: core/templates/core/base.jinja:306
+#: core/templates/core/base.jinja:309
 msgid "Image"
 msgstr "Image"
 
-#: core/templates/core/base.jinja:307
+#: core/templates/core/base.jinja:310
 msgid "Link"
 msgstr "Lien"
 
-#: core/templates/core/base.jinja:308
+#: core/templates/core/base.jinja:311
 msgid "sup"
 msgstr "exp"
 
-#: core/templates/core/base.jinja:309
+#: core/templates/core/base.jinja:312
 msgid "sub"
 msgstr "ind"
 
-#: core/templates/core/base.jinja:311
+#: core/templates/core/base.jinja:314
 msgid "U"
 msgstr "S"
 
-#: core/templates/core/base.jinja:312
+#: core/templates/core/base.jinja:315
 msgid "I"
 msgstr "I"
 
-#: core/templates/core/base.jinja:313
+#: core/templates/core/base.jinja:316
 msgid "B"
 msgstr "G"
 
