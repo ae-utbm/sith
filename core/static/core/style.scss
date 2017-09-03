@@ -165,6 +165,9 @@ header {
       }
       .white {
         background: $white-color;
+        a {
+          color: $black-color;
+        }
       }
       #header_notif {
         display: none;
@@ -184,6 +187,13 @@ header {
         .header_notif_time {
           color: grey;
         }
+        a {
+          margin: 0em;
+          color: $black-color;
+          &:hover {
+            color: $primary-dark-color;
+          }
+        }
         li {
           padding: 0.2em;
           &:hover {
@@ -197,12 +207,6 @@ header {
             &:hover {
               color: $primary-light-color;
             }
-          }
-        }
-        a {
-          margin: 0em;
-          &:hover {
-            color: $primary-dark-color;
           }
         }
       }

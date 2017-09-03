@@ -4480,7 +4480,7 @@ msgstr "Vous avez été identifié sur des photos"
 #: sith/settings.py:558
 #, python-format
 msgid "You just refilled of %s €"
-msgstr "Vous avez rechargé votre compte de %s €"
+msgstr "Vous avez rechargé votre compte de %s€"
 
 #: sith/settings.py:559
 #, python-format
