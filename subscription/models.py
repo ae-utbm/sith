@@ -64,7 +64,7 @@ class Subscription(models.Model):
     def clean(self):
         try:
             for s in Subscription.objects.filter(member=self.member).exclude(pk=self.pk).all():
-                if s.is_valid_now():
+                if s.is_valid_now() and s.subscription_end - timedelta(weeks=settings.SITH_SUBSCRIPTION_END) > date.today():
                     raise ValidationError(_("You can not subscribe many time for the same period"))
         except:  # This should not happen, because the form should have handled the data before, but sadly, it still
                 # calls the model validation :'(
@@ -138,7 +138,7 @@ class Subscription(models.Model):
             return 'No user - ' + str(self.pk)
 
     @staticmethod
-    def compute_start(d=None, duration=1):
+    def compute_start(d=None, duration=1, user=None):
         """
         This function computes the start date of the subscription with respect to the given date (default is today),
         and the start date given in settings.SITH_START_DATE.
@@ -150,12 +150,14 @@ class Subscription(models.Model):
         """
         if not d:
             d = date.today()
+        if user is not None and user.subscriptions.exists():
+            d = user.subscriptions.last().subscription_end
         if duration <= 2:  # Sliding subscriptions for 1 or 2 semesters
             return d
         return get_start_of_semester(d)
 
     @staticmethod
-    def compute_end(duration, start=None):
+    def compute_end(duration, start=None, user=None):
         """
         This function compute the end date of the subscription given a start date and a duration in number of semestre
         Exemple:
@@ -166,7 +168,8 @@ class Subscription(models.Model):
             2015-09-18 - 4 -> 2017-09-18
         """
         if start is None:
-            start = Subscription.compute_start(duration=duration)
+            start = Subscription.compute_start(duration=duration, user=user)
+
         # This can certainly be simplified, but it works like this
         try:
             return start.replace(month=int(round((start.month - 1 + 6 * duration) % 12 + 1, 0)),

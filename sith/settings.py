@@ -421,6 +421,9 @@ SITH_CAN_CREATE_SUBSCRIPTIONS = [
     1,
 ]
 
+# Number of weeks before the end of a subscription when the subscriber can resubscribe
+SITH_SUBSCRIPTION_END = 10
+
 # Subscription durations are in semestres
 # Be careful, modifying this parameter will need a migration to be applied
 SITH_SUBSCRIPTIONS = {

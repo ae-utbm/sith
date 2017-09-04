@@ -137,3 +137,24 @@ class DecimalDurationTest(TestCase):
                                            start=s.subscription_start)
         s.save()
         self.assertTrue(s.subscription_end == date(2017, 12, 29))
+
+
+class SpecialCasesOfSubscription(TestCase):
+    def setUp(self):
+        call_command("populate")
+        self.user = User.objects.filter(username="public").first()
+
+    @mock.patch('subscription.models.date', FakeDate)
+    def test_subscription_before_end_of_actual_one(self):
+        user = User.objects.filter(pk=self.user.pk).first()
+        s = Subscription(member=user, subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
+                         payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+        s.subscription_start = date(2015, 8, 29)
+        s.subscription_end = s.compute_end(duration=2,
+                                           start=s.subscription_start)
+        s.save()
+        self.assertTrue(s.subscription_end == date(2016, 8, 29))
+        date_mock_today(2016, 8, 25)
+        d = Subscription.compute_end(duration=2,
+                                     user=user)
+        self.assertTrue(d == date(2017, 8, 29))

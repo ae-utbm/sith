@@ -117,10 +117,12 @@ class NewSubscription(CreateView):
 
     def form_valid(self, form):
         form.instance.subscription_start = Subscription.compute_start(
-            duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'])
+            duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'],
+            user=form.instance.member)
         form.instance.subscription_end = Subscription.compute_end(
             duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type]['duration'],
-            start=form.instance.subscription_start
+            start=form.instance.subscription_start,
+            user=form.instance.member
         )
         return super(NewSubscription, self).form_valid(form)
 
