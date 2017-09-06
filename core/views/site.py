@@ -27,6 +27,7 @@ from django.http import JsonResponse
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, TemplateView
+from django.conf import settings
 
 import json
 
@@ -50,15 +51,18 @@ class NotificationList(ListView):
 
     def get_queryset(self):
         if 'see_all' in self.request.GET.keys():
-            self.request.user.notifications.update(viewed=True)
+            for n in self.request.user.notifications.all():
+                n.viewed = True
+                n.save()
         return self.request.user.notifications.order_by('-date')[:20]
 
 
 def notification(request, notif_id):
     notif = Notification.objects.filter(id=notif_id).first()
     if notif:
-        notif.viewed = True
-        notif.save()
+        if notif.type not in settings.SITH_PERMANENT_NOTIFICATIONS:
+            notif.viewed = True
+            notif.save()
         return redirect(notif.url)
     return redirect("/")
 

@@ -24,13 +24,15 @@
 
 from django.shortcuts import render
 from django.db import models, transaction
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.mail import EmailMultiAlternatives
 
-from core.models import User, Preferences
+from core.models import User, Preferences, RealGroup, Notification
 from club.models import Club
 
 
@@ -82,6 +84,23 @@ class News(models.Model):
     def __str__(self):
         return "%s: %s" % (self.type, self.title)
 
+    def save(self, *args, **kwargs):
+        super(News, self).save(*args, **kwargs)
+        for u in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
+            Notification(user=u, url=reverse("com:news_admin_list"),
+                    type="NEWS_MODERATION", param="1").save()
+
+def news_notification_callback(notif):
+    count = News.objects.filter(
+            Q(dates__start_date__gt=timezone.now(), is_moderated=False) |
+            Q(type="NOTICE", is_moderated=False)
+            ).distinct().count()
+    if count:
+        notif.viewed = False
+        notif.param = "%s" % count
+        notif.date = timezone.now()
+    else:
+        notif.viewed = True
 
 class NewsDate(models.Model):
     """

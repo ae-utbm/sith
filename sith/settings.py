@@ -551,7 +551,7 @@ SITH_LAUNDERETTE_PRICES = {
 
 SITH_NOTIFICATIONS = [
     ('MAILING_MODERATION', _("A new mailing list needs to be moderated")),
-    ('NEWS_MODERATION', _("A fresh new to be moderated")),
+    ('NEWS_MODERATION', _("There are %s fresh news to be moderated")),
     ('FILE_MODERATION', _("New files to be moderated")),
     ('SAS_MODERATION', _("New pictures/album to be moderated in the SAS")),
     ('NEW_PICTURES', _("You've been identified on some pictures")),
@@ -559,6 +559,13 @@ SITH_NOTIFICATIONS = [
     ('SELLING', _("You just bought %s")),
     ('GENERIC', _("You have a notification")),
 ]
+
+# The keys are the notification names as found in SITH_NOTIFICATIONS, and the
+# values are the callback function to update the notifs.
+# The callback must take the notif object as first and single argument.
+SITH_PERMANENT_NOTIFICATIONS = {
+    'NEWS_MODERATION': 'com.models.news_notification_callback',
+}
 
 SITH_QUICK_NOTIF = {
     'qn_success': _("Success!"),

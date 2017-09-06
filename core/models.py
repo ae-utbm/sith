@@ -21,6 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import importlib
 
 from django.db import models
 from django.core.mail import send_mail
@@ -1063,3 +1064,14 @@ class Notification(models.Model):
         if self.param:
             return self.get_type_display() % self.param
         return self.get_type_display()
+
+    def save(self, *args, **kwargs):
+        if not self.id and self.type in settings.SITH_PERMANENT_NOTIFICATIONS:
+            old_notif = self.user.notifications.filter(type=self.type).last()
+            if old_notif:
+                mod_name, func_name = settings.SITH_PERMANENT_NOTIFICATIONS[self.type].rsplit('.',1)
+                mod = importlib.import_module(mod_name)
+                getattr(mod, func_name)(old_notif)
+                old_notif.save()
+                return
+        super(Notification, self).save(*args, **kwargs)
