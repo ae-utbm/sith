@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-03 12:28+0200\n"
+"POT-Creation-Date: 2017-09-06 13:18+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -41,7 +41,7 @@ msgstr "code postal"
 msgid "country"
 msgstr "pays"
 
-#: accounting/models.py:66 core/models.py:196
+#: accounting/models.py:66 core/models.py:197
 msgid "phone"
 msgstr "téléphone"
 
@@ -66,7 +66,7 @@ msgid "account number"
 msgstr "numero de compte"
 
 #: accounting/models.py:113 accounting/models.py:139 club/models.py:189
-#: com/models.py:65 com/models.py:156 counter/models.py:148
+#: com/models.py:67 com/models.py:175 counter/models.py:148
 #: counter/models.py:184 trombi/models.py:149
 msgid "club"
 msgstr "club"
@@ -127,8 +127,8 @@ msgstr "numéro"
 msgid "journal"
 msgstr "classeur"
 
-#: accounting/models.py:258 core/models.py:643 core/models.py:1018
-#: core/models.py:1059 counter/models.py:300 counter/models.py:350
+#: accounting/models.py:258 core/models.py:644 core/models.py:1019
+#: core/models.py:1060 counter/models.py:300 counter/models.py:350
 #: counter/models.py:483 eboutic/models.py:39 eboutic/models.py:73
 #: forum/models.py:239 forum/models.py:314 stock/models.py:76
 msgid "date"
@@ -187,14 +187,14 @@ msgstr "Utilisateur"
 #: accounting/models.py:271 club/models.py:232
 #: club/templates/club/club_detail.jinja:5
 #: com/templates/com/mailing_admin.jinja:11
-#: com/templates/com/news_admin_list.jinja:21
-#: com/templates/com/news_admin_list.jinja:50
-#: com/templates/com/news_admin_list.jinja:81
-#: com/templates/com/news_admin_list.jinja:122
-#: com/templates/com/news_admin_list.jinja:165
-#: com/templates/com/news_admin_list.jinja:200
-#: com/templates/com/news_admin_list.jinja:237
-#: com/templates/com/news_admin_list.jinja:272
+#: com/templates/com/news_admin_list.jinja:23
+#: com/templates/com/news_admin_list.jinja:54
+#: com/templates/com/news_admin_list.jinja:87
+#: com/templates/com/news_admin_list.jinja:130
+#: com/templates/com/news_admin_list.jinja:175
+#: com/templates/com/news_admin_list.jinja:212
+#: com/templates/com/news_admin_list.jinja:251
+#: com/templates/com/news_admin_list.jinja:288
 #: com/templates/com/weekmail.jinja:18 com/templates/com/weekmail.jinja:47
 #: core/templates/core/user_clubs.jinja:15
 #: core/templates/core/user_clubs.jinja:41
@@ -344,8 +344,17 @@ msgstr "Compte en banque : "
 #: accounting/templates/accounting/label_list.jinja:25
 #: club/templates/club/club_sellings.jinja:50
 #: club/templates/club/mailing.jinja:16 club/templates/club/mailing.jinja:33
-#: com/templates/com/mailing_admin.jinja:19 com/templates/com/weekmail.jinja:33
-#: com/templates/com/weekmail.jinja:62 core/templates/core/file_detail.jinja:25
+#: com/templates/com/mailing_admin.jinja:19
+#: com/templates/com/news_admin_list.jinja:41
+#: com/templates/com/news_admin_list.jinja:70
+#: com/templates/com/news_admin_list.jinja:117
+#: com/templates/com/news_admin_list.jinja:158
+#: com/templates/com/news_admin_list.jinja:199
+#: com/templates/com/news_admin_list.jinja:234
+#: com/templates/com/news_admin_list.jinja:275
+#: com/templates/com/news_admin_list.jinja:310
+#: com/templates/com/weekmail.jinja:33 com/templates/com/weekmail.jinja:62
+#: core/templates/core/file_detail.jinja:25
 #: core/templates/core/file_detail.jinja:62
 #: core/templates/core/file_moderation.jinja:24
 #: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:53
@@ -391,14 +400,14 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_list.jinja:21
 #: accounting/templates/accounting/club_account_details.jinja:57
 #: accounting/templates/accounting/journal_details.jinja:83 club/views.py:118
-#: com/templates/com/news_admin_list.jinja:37
-#: com/templates/com/news_admin_list.jinja:64
-#: com/templates/com/news_admin_list.jinja:109
-#: com/templates/com/news_admin_list.jinja:148
-#: com/templates/com/news_admin_list.jinja:187
-#: com/templates/com/news_admin_list.jinja:220
-#: com/templates/com/news_admin_list.jinja:259
-#: com/templates/com/news_admin_list.jinja:292
+#: com/templates/com/news_admin_list.jinja:39
+#: com/templates/com/news_admin_list.jinja:68
+#: com/templates/com/news_admin_list.jinja:115
+#: com/templates/com/news_admin_list.jinja:156
+#: com/templates/com/news_admin_list.jinja:197
+#: com/templates/com/news_admin_list.jinja:232
+#: com/templates/com/news_admin_list.jinja:273
+#: com/templates/com/news_admin_list.jinja:308
 #: com/templates/com/weekmail.jinja:32 com/templates/com/weekmail.jinja:61
 #: core/templates/core/file.jinja:38 core/templates/core/page.jinja:31
 #: core/templates/core/user_tools.jinja:41 core/views/user.py:186
@@ -474,18 +483,18 @@ msgid "Name"
 msgstr "Nom"
 
 #: accounting/templates/accounting/club_account_details.jinja:31
-#: com/templates/com/news_admin_list.jinja:168
-#: com/templates/com/news_admin_list.jinja:202
-#: com/templates/com/news_admin_list.jinja:240
-#: com/templates/com/news_admin_list.jinja:274
+#: com/templates/com/news_admin_list.jinja:178
+#: com/templates/com/news_admin_list.jinja:214
+#: com/templates/com/news_admin_list.jinja:254
+#: com/templates/com/news_admin_list.jinja:290
 msgid "Start"
 msgstr "Début"
 
 #: accounting/templates/accounting/club_account_details.jinja:32
-#: com/templates/com/news_admin_list.jinja:169
-#: com/templates/com/news_admin_list.jinja:203
-#: com/templates/com/news_admin_list.jinja:241
-#: com/templates/com/news_admin_list.jinja:275
+#: com/templates/com/news_admin_list.jinja:179
+#: com/templates/com/news_admin_list.jinja:215
+#: com/templates/com/news_admin_list.jinja:255
+#: com/templates/com/news_admin_list.jinja:291
 msgid "End"
 msgstr "Fin"
 
@@ -509,14 +518,14 @@ msgstr "Fermé"
 #: accounting/templates/accounting/club_account_details.jinja:36
 #: accounting/templates/accounting/journal_details.jinja:41
 #: com/templates/com/mailing_admin.jinja:12
-#: com/templates/com/news_admin_list.jinja:24
-#: com/templates/com/news_admin_list.jinja:52
-#: com/templates/com/news_admin_list.jinja:85
-#: com/templates/com/news_admin_list.jinja:125
-#: com/templates/com/news_admin_list.jinja:170
-#: com/templates/com/news_admin_list.jinja:204
-#: com/templates/com/news_admin_list.jinja:242
-#: com/templates/com/news_admin_list.jinja:276
+#: com/templates/com/news_admin_list.jinja:26
+#: com/templates/com/news_admin_list.jinja:56
+#: com/templates/com/news_admin_list.jinja:91
+#: com/templates/com/news_admin_list.jinja:133
+#: com/templates/com/news_admin_list.jinja:180
+#: com/templates/com/news_admin_list.jinja:216
+#: com/templates/com/news_admin_list.jinja:256
+#: com/templates/com/news_admin_list.jinja:292
 #: com/templates/com/weekmail.jinja:21 com/templates/com/weekmail.jinja:50
 #: counter/templates/counter/refilling_list.jinja:16
 msgid "Actions"
@@ -533,14 +542,14 @@ msgid "No"
 msgstr "Non"
 
 #: accounting/templates/accounting/club_account_details.jinja:56
-#: com/templates/com/news_admin_list.jinja:36
-#: com/templates/com/news_admin_list.jinja:63
-#: com/templates/com/news_admin_list.jinja:108
-#: com/templates/com/news_admin_list.jinja:147
-#: com/templates/com/news_admin_list.jinja:186
-#: com/templates/com/news_admin_list.jinja:219
-#: com/templates/com/news_admin_list.jinja:258
-#: com/templates/com/news_admin_list.jinja:291
+#: com/templates/com/news_admin_list.jinja:38
+#: com/templates/com/news_admin_list.jinja:67
+#: com/templates/com/news_admin_list.jinja:114
+#: com/templates/com/news_admin_list.jinja:155
+#: com/templates/com/news_admin_list.jinja:196
+#: com/templates/com/news_admin_list.jinja:231
+#: com/templates/com/news_admin_list.jinja:272
+#: com/templates/com/news_admin_list.jinja:307
 #: core/templates/core/file.jinja:36 core/templates/core/page.jinja:28
 msgid "View"
 msgstr "Voir"
@@ -738,7 +747,7 @@ msgid "Linked operation:"
 msgstr "Opération liée : "
 
 #: accounting/templates/accounting/operation_edit.jinja:51
-#: com/templates/com/news_edit.jinja:56 com/templates/com/weekmail.jinja:74
+#: com/templates/com/news_edit.jinja:57 com/templates/com/weekmail.jinja:74
 #: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:7
 #: core/templates/core/edit.jinja.py:15 core/templates/core/edit.jinja:20
 #: core/templates/core/file_edit.jinja:8 core/templates/core/page_prop.jinja:8
@@ -874,11 +883,11 @@ msgstr ""
 msgid "A club with that unix name already exists."
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:60 core/models.py:198
+#: club/models.py:60 core/models.py:199
 msgid "address"
 msgstr "Adresse"
 
-#: club/models.py:66 core/models.py:159
+#: club/models.py:66 core/models.py:160
 msgid "home"
 msgstr "home"
 
@@ -897,12 +906,12 @@ msgstr "Un club avec ce nom UNIX existe déjà."
 msgid "user"
 msgstr "nom d'utilisateur"
 
-#: club/models.py:192 core/models.py:178 election/models.py:139
+#: club/models.py:192 core/models.py:179 election/models.py:139
 #: election/models.py:155 trombi/models.py:150
 msgid "role"
 msgstr "rôle"
 
-#: club/models.py:194 core/models.py:64 counter/models.py:114
+#: club/models.py:194 core/models.py:65 counter/models.py:114
 #: counter/models.py:140 election/models.py:13 election/models.py:93
 #: election/models.py:141 forum/models.py:50 forum/models.py:186
 msgid "description"
@@ -929,11 +938,11 @@ msgid "Enter a valid address. Only the root of the address is needed."
 msgstr ""
 "Entrez une adresse valide. Seule la racine de l'adresse est nécessaire."
 
-#: club/models.py:238 com/models.py:67 core/models.py:644
+#: club/models.py:238 com/models.py:69 core/models.py:645
 msgid "is moderated"
 msgstr "est modéré"
 
-#: club/models.py:239 com/models.py:68
+#: club/models.py:239 com/models.py:70
 msgid "moderator"
 msgstr "modérateur"
 
@@ -1220,99 +1229,99 @@ msgstr "Date de fin"
 msgid "Product"
 msgstr "Produit"
 
-#: com/models.py:39
+#: com/models.py:41
 msgid "alert message"
 msgstr "message d'alerte"
 
-#: com/models.py:40
+#: com/models.py:42
 msgid "info message"
 msgstr "message d'info"
 
-#: com/models.py:41
+#: com/models.py:43
 msgid "index page"
 msgstr "page d'accueil"
 
-#: com/models.py:42
+#: com/models.py:44
 msgid "weekmail destinations"
 msgstr "destinataires du weekmail"
 
-#: com/models.py:52
+#: com/models.py:54
 msgid "Notice"
 msgstr "Information"
 
-#: com/models.py:53
+#: com/models.py:55
 msgid "Event"
 msgstr "Événement"
 
-#: com/models.py:54
+#: com/models.py:56
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: com/models.py:55
+#: com/models.py:57
 msgid "Call"
 msgstr "Appel"
 
-#: com/models.py:61 com/models.py:105 com/models.py:153 election/models.py:12
+#: com/models.py:63 com/models.py:124 com/models.py:172 election/models.py:12
 #: election/models.py:92 election/models.py:128 forum/models.py:189
 #: forum/models.py:237
 msgid "title"
 msgstr "titre"
 
-#: com/models.py:62
+#: com/models.py:64
 msgid "summary"
 msgstr "résumé"
 
-#: com/models.py:63 com/models.py:154 trombi/models.py:135
+#: com/models.py:65 com/models.py:173 trombi/models.py:135
 msgid "content"
 msgstr "contenu"
 
-#: com/models.py:64 core/models.py:1058 launderette/models.py:86
+#: com/models.py:66 core/models.py:1059 launderette/models.py:86
 #: launderette/models.py:112 launderette/models.py:149 stock/models.py:59
 #: stock/models.py:98
 msgid "type"
 msgstr "type"
 
-#: com/models.py:66 com/models.py:155 trombi/models.py:133
+#: com/models.py:68 com/models.py:174 trombi/models.py:133
 msgid "author"
 msgstr "auteur"
 
-#: com/models.py:93
+#: com/models.py:112
 msgid "news_date"
 msgstr "date de la nouvelle"
 
-#: com/models.py:94
+#: com/models.py:113
 msgid "start_date"
 msgstr "date de début"
 
-#: com/models.py:95
+#: com/models.py:114
 msgid "end_date"
 msgstr "date de fin"
 
-#: com/models.py:106
+#: com/models.py:125
 msgid "intro"
 msgstr "intro"
 
-#: com/models.py:107
+#: com/models.py:126
 msgid "joke"
 msgstr "blague"
 
-#: com/models.py:108
+#: com/models.py:127
 msgid "protip"
 msgstr "astuce"
 
-#: com/models.py:109
+#: com/models.py:128
 msgid "conclusion"
 msgstr "conclusion"
 
-#: com/models.py:110
+#: com/models.py:129
 msgid "sent"
 msgstr "envoyé"
 
-#: com/models.py:152
+#: com/models.py:171
 msgid "weekmail"
 msgstr "weekmail"
 
-#: com/models.py:157
+#: com/models.py:176
 msgid "rank"
 msgstr "rang"
 
@@ -1322,11 +1331,11 @@ msgid "Mailing lists administration"
 msgstr "Administration des mailing listes"
 
 #: com/templates/com/mailing_admin.jinja:19
-#: com/templates/com/news_admin_list.jinja:65
-#: com/templates/com/news_admin_list.jinja:149
-#: com/templates/com/news_admin_list.jinja:221
-#: com/templates/com/news_admin_list.jinja:293
-#: com/templates/com/news_detail.jinja:26
+#: com/templates/com/news_admin_list.jinja:69
+#: com/templates/com/news_admin_list.jinja:157
+#: com/templates/com/news_admin_list.jinja:233
+#: com/templates/com/news_admin_list.jinja:309
+#: com/templates/com/news_detail.jinja:27
 #: core/templates/core/file_detail.jinja:65
 #: core/templates/core/file_moderation.jinja:23
 #: sas/templates/sas/moderation.jinja:17 sas/templates/sas/picture.jinja:122
@@ -1360,39 +1369,45 @@ msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
 #: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
-#: com/templates/com/news_list.jinja:41
+#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:9
 msgid "News"
 msgstr "Nouvelles"
 
-#: com/templates/com/news_admin_list.jinja:12
+#: com/templates/com/news_admin_list.jinja:11
+#: com/templates/com/news_edit.jinja:8 com/templates/com/news_edit.jinja:31
+#: core/templates/core/user_tools.jinja:83
+msgid "Create news"
+msgstr "Créer nouvelle"
+
+#: com/templates/com/news_admin_list.jinja:14
 msgid "Notices"
 msgstr "Information"
 
-#: com/templates/com/news_admin_list.jinja:14
+#: com/templates/com/news_admin_list.jinja:16
 msgid "Displayed notices"
 msgstr "Informations affichées"
 
-#: com/templates/com/news_admin_list.jinja:18
-#: com/templates/com/news_admin_list.jinja:47
-#: com/templates/com/news_admin_list.jinja:78
-#: com/templates/com/news_admin_list.jinja:119
-#: com/templates/com/news_admin_list.jinja:162
-#: com/templates/com/news_admin_list.jinja:197
-#: com/templates/com/news_admin_list.jinja:234
-#: com/templates/com/news_admin_list.jinja:269
+#: com/templates/com/news_admin_list.jinja:20
+#: com/templates/com/news_admin_list.jinja:51
+#: com/templates/com/news_admin_list.jinja:84
+#: com/templates/com/news_admin_list.jinja:127
+#: com/templates/com/news_admin_list.jinja:172
+#: com/templates/com/news_admin_list.jinja:209
+#: com/templates/com/news_admin_list.jinja:248
+#: com/templates/com/news_admin_list.jinja:285
 #: launderette/templates/launderette/launderette_admin.jinja:42
 #: launderette/views.py:184
 msgid "Type"
 msgstr "Type"
 
-#: com/templates/com/news_admin_list.jinja:19
-#: com/templates/com/news_admin_list.jinja:48
-#: com/templates/com/news_admin_list.jinja:79
-#: com/templates/com/news_admin_list.jinja:120
-#: com/templates/com/news_admin_list.jinja:163
-#: com/templates/com/news_admin_list.jinja:198
-#: com/templates/com/news_admin_list.jinja:235
-#: com/templates/com/news_admin_list.jinja:270
+#: com/templates/com/news_admin_list.jinja:21
+#: com/templates/com/news_admin_list.jinja:52
+#: com/templates/com/news_admin_list.jinja:85
+#: com/templates/com/news_admin_list.jinja:128
+#: com/templates/com/news_admin_list.jinja:173
+#: com/templates/com/news_admin_list.jinja:210
+#: com/templates/com/news_admin_list.jinja:249
+#: com/templates/com/news_admin_list.jinja:286
 #: com/templates/com/weekmail.jinja:19 com/templates/com/weekmail.jinja:48
 #: core/templates/core/base.jinja:300 forum/templates/forum/forum.jinja:29
 #: forum/templates/forum/forum.jinja:48 forum/templates/forum/main.jinja:25
@@ -1400,87 +1415,87 @@ msgstr "Type"
 msgid "Title"
 msgstr "Titre"
 
-#: com/templates/com/news_admin_list.jinja:20
-#: com/templates/com/news_admin_list.jinja:49
-#: com/templates/com/news_admin_list.jinja:80
-#: com/templates/com/news_admin_list.jinja:121
-#: com/templates/com/news_admin_list.jinja:164
-#: com/templates/com/news_admin_list.jinja:199
-#: com/templates/com/news_admin_list.jinja:236
-#: com/templates/com/news_admin_list.jinja:271
+#: com/templates/com/news_admin_list.jinja:22
+#: com/templates/com/news_admin_list.jinja:53
+#: com/templates/com/news_admin_list.jinja:86
+#: com/templates/com/news_admin_list.jinja:129
+#: com/templates/com/news_admin_list.jinja:174
+#: com/templates/com/news_admin_list.jinja:211
+#: com/templates/com/news_admin_list.jinja:250
+#: com/templates/com/news_admin_list.jinja:287
 msgid "Summary"
 msgstr "Résumé"
 
-#: com/templates/com/news_admin_list.jinja:22
-#: com/templates/com/news_admin_list.jinja:51
-#: com/templates/com/news_admin_list.jinja:82
-#: com/templates/com/news_admin_list.jinja:123
-#: com/templates/com/news_admin_list.jinja:166
-#: com/templates/com/news_admin_list.jinja:201
-#: com/templates/com/news_admin_list.jinja:238
-#: com/templates/com/news_admin_list.jinja:273
+#: com/templates/com/news_admin_list.jinja:24
+#: com/templates/com/news_admin_list.jinja:55
+#: com/templates/com/news_admin_list.jinja:88
+#: com/templates/com/news_admin_list.jinja:131
+#: com/templates/com/news_admin_list.jinja:176
+#: com/templates/com/news_admin_list.jinja:213
+#: com/templates/com/news_admin_list.jinja:252
+#: com/templates/com/news_admin_list.jinja:289
 #: com/templates/com/weekmail.jinja:17 com/templates/com/weekmail.jinja:46
 #: forum/templates/forum/forum.jinja:52
 msgid "Author"
 msgstr "Auteur"
 
-#: com/templates/com/news_admin_list.jinja:23
-#: com/templates/com/news_admin_list.jinja:83
-#: com/templates/com/news_admin_list.jinja:167
-#: com/templates/com/news_admin_list.jinja:239
+#: com/templates/com/news_admin_list.jinja:25
+#: com/templates/com/news_admin_list.jinja:89
+#: com/templates/com/news_admin_list.jinja:177
+#: com/templates/com/news_admin_list.jinja:253
 msgid "Moderator"
 msgstr "Modérateur"
 
-#: com/templates/com/news_admin_list.jinja:38
-#: com/templates/com/news_admin_list.jinja:110
-#: com/templates/com/news_admin_list.jinja:188
-#: com/templates/com/news_admin_list.jinja:260
+#: com/templates/com/news_admin_list.jinja:40
+#: com/templates/com/news_admin_list.jinja:116
+#: com/templates/com/news_admin_list.jinja:198
+#: com/templates/com/news_admin_list.jinja:274
 msgid "Remove"
 msgstr "Retirer"
 
-#: com/templates/com/news_admin_list.jinja:43
+#: com/templates/com/news_admin_list.jinja:47
 msgid "Notices to moderate"
 msgstr "Informations à modérer"
 
-#: com/templates/com/news_admin_list.jinja:72
+#: com/templates/com/news_admin_list.jinja:78
 msgid "Weeklies"
 msgstr "Nouvelles hebdomadaires"
 
-#: com/templates/com/news_admin_list.jinja:74
+#: com/templates/com/news_admin_list.jinja:80
 msgid "Displayed weeklies"
 msgstr "Nouvelles hebdomadaires affichées"
 
-#: com/templates/com/news_admin_list.jinja:84
-#: com/templates/com/news_admin_list.jinja:124
+#: com/templates/com/news_admin_list.jinja:90
+#: com/templates/com/news_admin_list.jinja:132
 #: trombi/templates/trombi/edit_profile.jinja:24
 msgid "Dates"
 msgstr "Dates"
 
-#: com/templates/com/news_admin_list.jinja:115
+#: com/templates/com/news_admin_list.jinja:123
 msgid "Weeklies to moderate"
 msgstr "Nouvelles hebdomadaires à modérer"
 
-#: com/templates/com/news_admin_list.jinja:156
+#: com/templates/com/news_admin_list.jinja:166
 msgid "Calls"
 msgstr "Appels"
 
-#: com/templates/com/news_admin_list.jinja:158
+#: com/templates/com/news_admin_list.jinja:168
 msgid "Displayed calls"
 msgstr "Appels affichés"
 
-#: com/templates/com/news_admin_list.jinja:193
+#: com/templates/com/news_admin_list.jinja:205
 msgid "Calls to moderate"
 msgstr "Appels à modérer"
 
-#: com/templates/com/news_admin_list.jinja:228
+#: com/templates/com/news_admin_list.jinja:242
 msgid "Events"
 msgstr "Événements"
 
-#: com/templates/com/news_admin_list.jinja:230
+#: com/templates/com/news_admin_list.jinja:244
 msgid "Displayed events"
 msgstr "Événements affichés"
 
-#: com/templates/com/news_admin_list.jinja:265
+#: com/templates/com/news_admin_list.jinja:281
 msgid "Events to moderate"
 msgstr "Événements à modérer"
 
@@ -1488,36 +1503,31 @@ msgstr "Événements à modérer"
 msgid "Back to news"
 msgstr "Retour aux nouvelles"
 
-#: com/templates/com/news_detail.jinja:22 com/templates/com/news_edit.jinja:24
+#: com/templates/com/news_detail.jinja:23 com/templates/com/news_edit.jinja:25
 msgid "Author: "
 msgstr "Auteur : "
 
-#: com/templates/com/news_detail.jinja:24 sas/templates/sas/picture.jinja:90
+#: com/templates/com/news_detail.jinja:25 sas/templates/sas/picture.jinja:90
 msgid "Moderator: "
 msgstr "Modérateur : "
 
-#: com/templates/com/news_detail.jinja:29
+#: com/templates/com/news_detail.jinja:30
 msgid "Edit (will be remoderated)"
 msgstr "Éditer (sera resoumise à modération)"
 
-#: com/templates/com/news_edit.jinja:6 com/templates/com/news_edit.jinja:28
+#: com/templates/com/news_edit.jinja:6 com/templates/com/news_edit.jinja:29
 msgid "Edit news"
 msgstr "Éditer la nouvelle"
 
-#: com/templates/com/news_edit.jinja:8 com/templates/com/news_edit.jinja:30
-#: core/templates/core/user_tools.jinja:83
-msgid "Create news"
-msgstr "Créer nouvelle"
-
-#: com/templates/com/news_edit.jinja:38
+#: com/templates/com/news_edit.jinja:39
 msgid "Notice: Information, election result - no date"
 msgstr "Information, resultat d'élection - sans date"
 
-#: com/templates/com/news_edit.jinja:39
+#: com/templates/com/news_edit.jinja:40
 msgid "Event: punctual event, associated with one date"
 msgstr "Événement : événement ponctuel associé à une date"
 
-#: com/templates/com/news_edit.jinja:40
+#: com/templates/com/news_edit.jinja:41
 msgid ""
 "Weekly: recurrent event, associated with many dates (specify the first one, "
 "and a deadline)"
@@ -1525,32 +1535,32 @@ msgstr ""
 "Hebdomadaire : événement récurrent, associé à plusieurs dates (spécifier la "
 "première, ainsi que la date de fin)"
 
-#: com/templates/com/news_edit.jinja:41
+#: com/templates/com/news_edit.jinja:42
 msgid ""
 "Call: long time event, associated with a long date (election appliance, ...)"
 msgstr ""
 "Appel : événement de longue durée, associé à une longue date (candidature, "
 "concours, ...)"
 
-#: com/templates/com/news_edit.jinja:55 com/templates/com/weekmail.jinja:10
+#: com/templates/com/news_edit.jinja:56 com/templates/com/weekmail.jinja:10
 #: core/templates/core/pagerev_edit.jinja:25
 #: forum/templates/forum/reply.jinja:32
 msgid "Preview"
 msgstr "Prévisualiser"
 
-#: com/templates/com/news_list.jinja:43
+#: com/templates/com/news_list.jinja:11
 msgid "Administrate news"
 msgstr "Administrer les news"
 
-#: com/templates/com/news_list.jinja:47
+#: com/templates/com/news_list.jinja:15
 msgid "Agenda"
 msgstr "Agenda"
 
-#: com/templates/com/news_list.jinja:86
+#: com/templates/com/news_list.jinja:57
 msgid "Events today and the next few days"
 msgstr "Événement aujourd'hui et dans les prochains jours"
 
-#: com/templates/com/news_list.jinja:106
+#: com/templates/com/news_list.jinja:77
 msgid "Coming soon... don't miss!"
 msgstr "Prochainement... à ne pas rater!"
 
@@ -1682,45 +1692,45 @@ msgstr "Ce champ est obligatoire."
 msgid "You crazy? You can not finish an event before starting it."
 msgstr "T'es fou? Un événement ne peut pas finir avant même de commencer."
 
-#: com/views.py:319
+#: com/views.py:324
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour regénérer"
 
-#: com/views.py:327
+#: com/views.py:332
 msgid "Weekmail of the "
 msgstr "Weekmail du "
 
-#: com/views.py:407
+#: com/views.py:412
 msgid ""
 "You must be a board member of the selected club to post in the Weekmail."
 msgstr ""
 "Vous devez êtres un membre du bureau du club sélectionné pour poster dans le "
 "Weekmail."
 
-#: core/models.py:60
+#: core/models.py:61
 msgid "meta group status"
 msgstr "status du meta-groupe"
 
-#: core/models.py:62
+#: core/models.py:63
 msgid "Whether a group is a meta group or not"
 msgstr "Si un groupe est un meta-groupe ou pas"
 
-#: core/models.py:99
+#: core/models.py:100
 #, python-format
 msgid "%(value)s is not a valid promo (between 0 and %(end)s)"
 msgstr "%(value)s n'est pas une promo valide (doit être entre 0 et %(end)s)"
 
-#: core/models.py:116
+#: core/models.py:117
 msgid "username"
 msgstr "nom d'utilisateur"
 
-#: core/models.py:119
+#: core/models.py:120
 msgid "Required. 254 characters or fewer. Letters, digits and ./+/-/_ only."
 msgstr ""
 "Requis. Pas plus de 254 caractères. Uniquement des lettres, numéros, et ./"
 "+/-/_"
 
-#: core/models.py:123
+#: core/models.py:124
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers and ./"
 "+/-/_ characters."
@@ -1728,43 +1738,43 @@ msgstr ""
 "Entrez un nom d'utilisateur correct. Uniquement des lettres, numéros, et ./"
 "+/-/_"
 
-#: core/models.py:128
+#: core/models.py:129
 msgid "A user with that username already exists."
 msgstr "Un utilisateur de ce nom existe déjà"
 
-#: core/models.py:131
+#: core/models.py:132
 msgid "first name"
 msgstr "Prénom"
 
-#: core/models.py:132
+#: core/models.py:133
 msgid "last name"
 msgstr "Nom"
 
-#: core/models.py:133
+#: core/models.py:134
 msgid "email address"
 msgstr "adresse email"
 
-#: core/models.py:134
+#: core/models.py:135
 msgid "date of birth"
 msgstr "date de naissance"
 
-#: core/models.py:135
+#: core/models.py:136
 msgid "nick name"
 msgstr "surnom"
 
-#: core/models.py:137
+#: core/models.py:138
 msgid "staff status"
 msgstr "status \"staff\""
 
-#: core/models.py:139
+#: core/models.py:140
 msgid "Designates whether the user can log into this admin site."
 msgstr "Est-ce que l'utilisateur peut se logger à la partie admin du site."
 
-#: core/models.py:142
+#: core/models.py:143
 msgid "active"
 msgstr "actif"
 
-#: core/models.py:145
+#: core/models.py:146
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -1772,159 +1782,159 @@ msgstr ""
 "Est-ce que l'utilisateur doit être traité comme actif. Déselectionnez au "
 "lieu de supprimer les comptes."
 
-#: core/models.py:149
+#: core/models.py:150
 msgid "date joined"
 msgstr "date d'inscription"
 
-#: core/models.py:150
+#: core/models.py:151
 msgid "last update"
 msgstr "dernière mise à jour"
 
-#: core/models.py:152
+#: core/models.py:153
 msgid "superuser"
 msgstr "super-utilisateur"
 
-#: core/models.py:155
+#: core/models.py:156
 msgid "Designates whether this user is a superuser. "
 msgstr "Est-ce que l'utilisateur est super-utilisateur."
 
-#: core/models.py:161
+#: core/models.py:162
 msgid "profile"
 msgstr "profil"
 
-#: core/models.py:163
+#: core/models.py:164
 msgid "avatar"
 msgstr "avatar"
 
-#: core/models.py:165
+#: core/models.py:166
 msgid "scrub"
 msgstr "blouse"
 
-#: core/models.py:167
+#: core/models.py:168
 msgid "sex"
 msgstr "sexe"
 
-#: core/models.py:167 matmat/views.py:73
+#: core/models.py:168 matmat/views.py:73
 msgid "Man"
 msgstr "Homme"
 
-#: core/models.py:167 matmat/views.py:74
+#: core/models.py:168 matmat/views.py:74
 msgid "Woman"
 msgstr "Femme"
 
-#: core/models.py:168
+#: core/models.py:169
 msgid "tshirt size"
 msgstr "taille de tshirt"
 
-#: core/models.py:169
+#: core/models.py:170
 msgid "-"
 msgstr "-"
 
-#: core/models.py:170
+#: core/models.py:171
 msgid "XS"
 msgstr "XS"
 
-#: core/models.py:171 core/templates/core/base.jinja:313
+#: core/models.py:172 core/templates/core/base.jinja:313
 msgid "S"
 msgstr "S"
 
-#: core/models.py:172
+#: core/models.py:173
 msgid "M"
 msgstr "M"
 
-#: core/models.py:173
+#: core/models.py:174
 msgid "L"
 msgstr "L"
 
-#: core/models.py:174
+#: core/models.py:175
 msgid "XL"
 msgstr "XL"
 
-#: core/models.py:175
+#: core/models.py:176
 msgid "XXL"
 msgstr "XXL"
 
-#: core/models.py:176
+#: core/models.py:177
 msgid "XXXL"
 msgstr "XXXL"
 
-#: core/models.py:179
+#: core/models.py:180
 msgid "Student"
 msgstr "Étudiant"
 
-#: core/models.py:180
+#: core/models.py:181
 msgid "Administrative agent"
 msgstr "Personnel administratif"
 
-#: core/models.py:181
+#: core/models.py:182
 msgid "Teacher"
 msgstr "Enseignant"
 
-#: core/models.py:182
+#: core/models.py:183
 msgid "Agent"
 msgstr "Personnel"
 
-#: core/models.py:183
+#: core/models.py:184
 msgid "Doctor"
 msgstr "Doctorant"
 
-#: core/models.py:184
+#: core/models.py:185
 msgid "Former student"
 msgstr "Ancien étudiant"
 
-#: core/models.py:185
+#: core/models.py:186
 msgid "Service"
 msgstr "Service"
 
-#: core/models.py:187
+#: core/models.py:188
 msgid "department"
 msgstr "département"
 
-#: core/models.py:189
+#: core/models.py:190
 msgid "dpt option"
 msgstr "Filière"
 
-#: core/models.py:190
+#: core/models.py:191
 msgid "semester"
 msgstr "semestre"
 
-#: core/models.py:191
+#: core/models.py:192
 msgid "quote"
 msgstr "citation"
 
-#: core/models.py:192
+#: core/models.py:193
 msgid "school"
 msgstr "école"
 
-#: core/models.py:193
+#: core/models.py:194
 msgid "promo"
 msgstr "promo"
 
-#: core/models.py:194
+#: core/models.py:195
 msgid "forum signature"
 msgstr "signature du forum"
 
-#: core/models.py:195
+#: core/models.py:196
 msgid "second email address"
 msgstr "adresse email secondaire"
 
-#: core/models.py:197
+#: core/models.py:198
 msgid "parent phone"
 msgstr "téléphone des parents"
 
-#: core/models.py:199
+#: core/models.py:200
 msgid "parent address"
 msgstr "adresse des parents"
 
-#: core/models.py:200
+#: core/models.py:201
 msgid "is subscriber viewable"
 msgstr "profil visible par les cotisants"
 
-#: core/models.py:367
+#: core/models.py:368
 msgid "A user with that username already exists"
 msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 
-#: core/models.py:492 core/templates/core/macros.jinja:21
+#: core/models.py:493 core/templates/core/macros.jinja:21
 #: core/templates/core/user_detail.jinja:14
 #: core/templates/core/user_detail.jinja:16
 #: core/templates/core/user_edit.jinja:17
@@ -1935,113 +1945,113 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 msgid "Profile"
 msgstr "Profil"
 
-#: core/models.py:590
+#: core/models.py:591
 msgid "Visitor"
 msgstr "Visiteur"
 
-#: core/models.py:596
+#: core/models.py:597
 msgid "do you want to receive the weekmail"
 msgstr "voulez-vous recevoir le Weekmail"
 
-#: core/models.py:600
+#: core/models.py:601
 msgid "show your stats to others"
 msgstr "montrez vos statistiques aux autres"
 
-#: core/models.py:604
+#: core/models.py:605
 msgid "get a notification for every click"
 msgstr "recevez une notification pour chaque click"
 
-#: core/models.py:608
+#: core/models.py:609
 msgid "get a notification for every refilling"
 msgstr "recevez une notification pour chaque rechargement"
 
-#: core/models.py:632
+#: core/models.py:633
 msgid "file name"
 msgstr "nom du fichier"
 
-#: core/models.py:633 core/models.py:844
+#: core/models.py:634 core/models.py:845
 msgid "parent"
 msgstr "parent"
 
-#: core/models.py:634 core/models.py:650
+#: core/models.py:635 core/models.py:651
 msgid "file"
 msgstr "fichier"
 
-#: core/models.py:635
+#: core/models.py:636
 msgid "compressed file"
 msgstr "version allégée"
 
-#: core/models.py:636
+#: core/models.py:637
 msgid "thumbnail"
 msgstr "miniature"
 
-#: core/models.py:637 core/models.py:645
+#: core/models.py:638 core/models.py:646
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:638 core/models.py:850 core/views/files.py:149
+#: core/models.py:639 core/models.py:851 core/views/files.py:149
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:639 core/models.py:851 core/views/files.py:150
+#: core/models.py:640 core/models.py:852 core/views/files.py:150
 msgid "view group"
 msgstr "groupe de vue"
 
-#: core/models.py:640
+#: core/models.py:641
 msgid "is folder"
 msgstr "est un dossier"
 
-#: core/models.py:641
+#: core/models.py:642
 msgid "mime type"
 msgstr "type mime"
 
-#: core/models.py:642
+#: core/models.py:643
 msgid "size"
 msgstr "taille"
 
-#: core/models.py:646
+#: core/models.py:647
 msgid "asked for removal"
 msgstr "retrait demandé"
 
-#: core/models.py:647
+#: core/models.py:648
 msgid "is in the SAS"
 msgstr "est dans le SAS"
 
-#: core/models.py:686
+#: core/models.py:687
 msgid "Character '/' not authorized in name"
 msgstr "Le caractère '/' n'est pas autorisé dans les noms de fichier"
 
-#: core/models.py:689 core/models.py:694
+#: core/models.py:690 core/models.py:695
 msgid "Loop in folder tree"
 msgstr "Boucle dans l'arborescence des dossiers"
 
-#: core/models.py:698
+#: core/models.py:699
 msgid "You can not make a file be a children of a non folder file"
 msgstr ""
 "Vous ne pouvez pas mettre un fichier enfant de quelque chose qui n'est pas "
 "un dossier"
 
-#: core/models.py:702
+#: core/models.py:703
 msgid "Duplicate file"
 msgstr "Un fichier de ce nom existe déjà"
 
-#: core/models.py:716
+#: core/models.py:717
 msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
-#: core/models.py:782
+#: core/models.py:783
 msgid "Folder: "
 msgstr "Dossier : "
 
-#: core/models.py:784
+#: core/models.py:785
 msgid "File: "
 msgstr "Fichier : "
 
-#: core/models.py:836
+#: core/models.py:837
 msgid "page unix name"
 msgstr "nom unix de la page"
 
-#: core/models.py:840
+#: core/models.py:841
 msgid ""
 "Enter a valid page name. This value may contain only unaccented letters, "
 "numbers and ./+/-/_ characters."
@@ -2049,51 +2059,51 @@ msgstr ""
 "Entrez un nom de page correct. Uniquement des lettres non accentuées, "
 "numéros, et ./+/-/_"
 
-#: core/models.py:847
+#: core/models.py:848
 msgid "page name"
 msgstr "nom de la page"
 
-#: core/models.py:848
+#: core/models.py:849
 msgid "owner group"
 msgstr "groupe propriétaire"
 
-#: core/models.py:852
+#: core/models.py:853
 msgid "lock user"
 msgstr "utilisateur bloquant"
 
-#: core/models.py:853
+#: core/models.py:854
 msgid "lock_timeout"
 msgstr "décompte du déblocage"
 
-#: core/models.py:880
+#: core/models.py:881
 msgid "Duplicate page"
 msgstr "Une page de ce nom existe déjà"
 
-#: core/models.py:886
+#: core/models.py:887
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:1015
+#: core/models.py:1016
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:1016
+#: core/models.py:1017
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:1017
+#: core/models.py:1018
 msgid "page content"
 msgstr "contenu de la page"
 
-#: core/models.py:1056
+#: core/models.py:1057
 msgid "url"
 msgstr "url"
 
-#: core/models.py:1057
+#: core/models.py:1058
 msgid "param"
 msgstr "param"
 
-#: core/models.py:1060
+#: core/models.py:1061
 msgid "viewed"
 msgstr "vue"
 
@@ -4466,8 +4476,8 @@ msgid "A new mailing list needs to be moderated"
 msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
 #: sith/settings.py:554
-msgid "A fresh new to be moderated"
-msgstr "Une nouvelle toute neuve à modérer"
+msgid "There are %s fresh news to be moderated"
+msgstr "Il y a %s nouvelles toutes fraîches à modérer"
 
 #: sith/settings.py:555
 msgid "New files to be moderated"
@@ -4495,23 +4505,23 @@ msgstr "Vous avez acheté %s"
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:564
+#: sith/settings.py:571
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:565
+#: sith/settings.py:572
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:566
+#: sith/settings.py:573
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:567
+#: sith/settings.py:574
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:568
+#: sith/settings.py:575
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
