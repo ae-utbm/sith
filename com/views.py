@@ -244,6 +244,11 @@ class NewsCreateView(CanCreateMixin, CreateView):
         return super(NewsCreateView, self).form_valid(form)
 
 
+class NewsDeleteView(CanEditMixin, DeleteView):
+    model = News
+    pk_url_kwarg = 'news_id'
+    template_name = 'core/delete_confirm.jinja'
+
 class NewsModerateView(CanEditMixin, SingleObjectMixin):
     model = News
     pk_url_kwarg = 'news_id'
