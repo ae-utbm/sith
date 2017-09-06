@@ -78,7 +78,7 @@
                     <div>
                       <a href="#" onclick="display_notif()">&#x1f514; ({{ user.notifications.filter(viewed=False).count() }})</a>
                       <ul id="header_notif">
-                          {% for n in user.notifications.filter(viewed=False).order_by('-id') %}
+                          {% for n in user.notifications.filter(viewed=False).order_by('-date') %}
                           <li>
                               <a href="{{ url("core:notification", notif_id=n.id) }}">
                                   <span class="header_notif_date">

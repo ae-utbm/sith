@@ -51,7 +51,7 @@ class NotificationList(ListView):
     def get_queryset(self):
         if 'see_all' in self.request.GET.keys():
             self.request.user.notifications.update(viewed=True)
-        return self.request.user.notifications.order_by('-id')[:20]
+        return self.request.user.notifications.order_by('-date')[:20]
 
 
 def notification(request, notif_id):
