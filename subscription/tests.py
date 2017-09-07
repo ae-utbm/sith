@@ -42,7 +42,7 @@ def date_mock_today(year, month, day):
     FakeDate.today = classmethod(lambda cls: date(year, month, day))
 
 
-class SubscriptionTest(TestCase):
+class SubscriptionUnitTest(TestCase):
 
     @mock.patch('subscription.models.date', FakeDate)
     def test_start_dates_sliding_without_start(self):
@@ -102,23 +102,7 @@ class SubscriptionTest(TestCase):
         d = Subscription.compute_end(duration=4, start=date(2015, 9, 18))
         self.assertTrue(d == date(2017, 9, 18))
 
-    @mock.patch('subscription.models.date', FakeDate)
-    def test_dates_sliding_with_subscribed_user(self):
-        user = User.objects.filter(pk=self.user.pk).first()
-        s = Subscription(member=user, subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
-                         payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
-        s.subscription_start = date(2015, 8, 29)
-        s.subscription_end = s.compute_end(duration=2,
-                                           start=s.subscription_start)
-        s.save()
-        self.assertTrue(s.subscription_end == date(2016, 8, 29))
-        date_mock_today(2016, 8, 25)
-        d = Subscription.compute_end(duration=2,
-                                     user=user)
-        self.assertTrue(d == date(2017, 8, 29))
-
-
-class DecimalDurationTest(TestCase):
+class SubscriptionIntegrationTest(TestCase):
     def setUp(self):
         call_command("populate")
         self.user = User.objects.filter(username="public").first()
@@ -152,4 +136,19 @@ class DecimalDurationTest(TestCase):
                                            start=s.subscription_start)
         s.save()
         self.assertTrue(s.subscription_end == date(2017, 12, 29))
+
+    @mock.patch('subscription.models.date', FakeDate)
+    def test_dates_sliding_with_subscribed_user(self):
+        user = User.objects.filter(pk=self.user.pk).first()
+        s = Subscription(member=user, subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
+                         payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+        s.subscription_start = date(2015, 8, 29)
+        s.subscription_end = s.compute_end(duration=2,
+                                           start=s.subscription_start)
+        s.save()
+        self.assertTrue(s.subscription_end == date(2016, 8, 29))
+        date_mock_today(2016, 8, 25)
+        d = Subscription.compute_end(duration=2,
+                                     user=user)
+        self.assertTrue(d == date(2017, 8, 29))
 
