@@ -6,6 +6,9 @@ omit =
     */migrations/*
     doc/*
     env/*
+    sith/toolbar_debug.py
+    sith/wsgi.py
+    migrate.py
 [report]
 show_missing = False
 include = *.py
