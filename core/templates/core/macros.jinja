@@ -12,6 +12,10 @@
 </a>
 {%- endmacro %}
 
+{% macro facebook_share(news) -%}
+<a class="fb-share-button" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}">{% trans %}Share on Facebook{% endtrans %}</a>
+{%- endmacro %}
+
 {% macro user_mini_profile(user) %}
 <div id="user_profile">
 
