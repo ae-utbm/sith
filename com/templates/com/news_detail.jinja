@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import user_profile_link, facebook_share %}
+{% from 'core/macros.jinja' import user_profile_link, facebook_share, tweet %}
 
 {% block title %}
 {% trans %}News{% endtrans %} -
@@ -31,6 +31,7 @@
         {% endif %}
         </br>
         {{ facebook_share(news) }}
+        {{ tweet(news) }}
     </section>
 {% endblock %}
 
