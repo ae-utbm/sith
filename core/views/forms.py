@@ -269,3 +269,17 @@ class PagePropForm(forms.ModelForm):
         super(PagePropForm, self).__init__(*arg, **kwargs)
         self.fields['edit_groups'].required = False
         self.fields['view_groups'].required = False
+
+
+class PageForm(forms.ModelForm):
+    class Meta:
+        model = Page
+        fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups']
+        widgets = {
+            'edit_groups': CheckboxSelectMultiple,
+            'view_groups': CheckboxSelectMultiple,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(PageForm, self).__init__(*args, **kwargs)
+        self.fields['parent'].queryset = self.fields['parent'].queryset.exclude(name=settings.SITH_CLUB_ROOT_PAGE).filter(club=None)

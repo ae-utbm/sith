@@ -147,6 +147,10 @@ Welcome to the wiki page!
         p.set_lock(root)
         PageRev(page=p, title="Laverie", author=root, content="Fonctionnement de la laverie").save()
 
+        p = Page(name=settings.SITH_CLUB_ROOT_PAGE)
+        p.set_lock(root)
+        p.save()
+
         # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
         if not options['prod']:
             # Adding user Skia

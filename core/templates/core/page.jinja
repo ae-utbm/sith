@@ -25,12 +25,16 @@
 <div class="tool_bar">
     <div class="tools">
         {% if page %}
+        {% if page.club %}
+        <a href="{{ url('club:club_view', club_id=page.club.id) }}">{% trans %}View{% endtrans %}</a>
+        {% else %}
         <a href="{{ url('core:page', page.get_full_name()) }}">{% trans %}View{% endtrans %}</a>
+        {% endif %}
         <a href="{{ url('core:page_hist', page_name=page.get_full_name()) }}">{% trans %}History{% endtrans %}</a>
         {% if can_edit(page, user) %}
         <a href="{{ url('core:page_edit', page_name=page.get_full_name()) }}">{% trans %}Edit{% endtrans %}</a>
         {% endif %}
-        {% if can_edit_prop(page, user) %}
+        {% if can_edit_prop(page, user) and not page.is_club_page %}
         <a href="{{ url('core:page_prop', page_name=page.get_full_name()) }}">{% trans %}Prop{% endtrans %}</a>
         {% endif %}
         {% endif %}

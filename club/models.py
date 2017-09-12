@@ -33,10 +33,10 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.core.validators import RegexValidator, validate_email
 
-from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification
-
+from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification, Page
 
 # Create your models here.
+
 
 class Club(models.Model):
     """
@@ -58,6 +58,7 @@ class Club(models.Model):
     },
     )
     logo = models.ImageField(upload_to='club_logos', verbose_name=_('logo'), null=True, blank=True)
+    is_active = models.BooleanField(_('is active'), default=True)
     address = models.CharField(_('address'), max_length=254)
     # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
     owner_group = models.ForeignKey(Group, related_name="owned_club",
@@ -66,6 +67,7 @@ class Club(models.Model):
     view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
     home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True,
                                 on_delete=models.SET_NULL)
+    page = models.OneToOneField(Page, related_name="club", blank=True, null=True)
 
     class Meta:
         ordering = ['name', 'unix_name']
@@ -102,6 +104,24 @@ class Club(models.Model):
                 self.home = home
                 self.save()
 
+    def make_page(self):
+        if not self.page:
+            root = User.objects.filter(username="root").first()
+            club_root = Page.objects.filter(name=settings.SITH_CLUB_ROOT_PAGE).first()
+            if root and club_root:
+                public = Group.objects.filter(id=settings.SITH_GROUP_PUBLIC_ID).first()
+                office = Group.objects.filter(name=self.unix_name + settings.SITH_BOARD_SUFFIX).first()
+                p = Page(name=self.unix_name)
+                p.parent = club_root
+                p.set_lock(root)
+                if public:
+                    p.view_groups.add(public)
+                if office:
+                    p.edit_groups.add(office)
+                p.save()
+                self.page = p
+                self.save()
+
     def save(self, *args, **kwargs):
         with transaction.atomic():
             creation = False
@@ -122,6 +142,7 @@ class Club(models.Model):
                 self.home.edit_groups = [board]
                 self.home.view_groups = [member, subscribers]
                 self.home.save()
+                self.make_page()
 
     def __str__(self):
         return self.name

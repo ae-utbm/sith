@@ -2,7 +2,11 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 
 {% block content %}
+    {% if club.page and club.page.revisions.exists() %}
+        {{ club.page.revisions.last().content|markdown }}
+    {% else %}
     <h3>{% trans %}Club{% endtrans %}</h3>
+    {% endif %}
 {% endblock %}
 
 

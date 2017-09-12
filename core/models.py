@@ -999,6 +999,11 @@ class Page(models.Model):
         except:
             return self.name
 
+    @property
+    def is_club_page(self):
+        unauthorized_parent = Page.objects.filter(name=settings.SITH_CLUB_ROOT_PAGE).first()
+        return unauthorized_parent is not None and (self == unauthorized_parent or unauthorized_parent in self.get_parent_list())
+
     def delete(self):
         self.unset_lock_recursive()
         self.set_lock_recursive(User.objects.get(id=0))

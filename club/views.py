@@ -117,6 +117,12 @@ class ClubTabsMixin(TabedViewMixin):
                 'slug': 'edit',
                         'name': _("Edit"),
             })
+            if self.object.page:
+                tab_list.append({
+                    'url': reverse('core:page_edit', kwargs={'page_name': self.object.page.get_full_name()}),
+                    'slug': 'page_edit',
+                            'name': _('Edit club page')
+                })
             tab_list.append({
                 'url': reverse('club:club_sellings', kwargs={'club_id': self.object.id}),
                 'slug': 'sellings',
@@ -348,7 +354,7 @@ class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
     """
     model = Club
     pk_url_kwarg = "club_id"
-    fields = ['name', 'unix_name', 'parent']
+    fields = ['name', 'unix_name', 'parent', 'is_active']
     template_name = 'core/edit.jinja'
     current_tab = "props"
 

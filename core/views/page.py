@@ -27,11 +27,20 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.forms.models import modelform_factory
-from django.forms import CheckboxSelectMultiple
+from django.http import Http404
 
 from core.models import Page, PageRev, LockError
-from core.views.forms import MarkdownInput
+from core.views.forms import MarkdownInput, PageForm, PagePropForm
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+
+
+class CanEditPagePropMixin(CanEditPropMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+        res = super(CanEditPagePropMixin, self).dispatch(request, *args, **kwargs)
+        if self.object.is_club_page:
+            raise Http404
+        return res
 
 
 class PageListView(CanViewMixin, ListView):
@@ -88,12 +97,7 @@ class PageRevView(CanViewMixin, DetailView):
 
 class PageCreateView(CanCreateMixin, CreateView):
     model = Page
-    form_class = modelform_factory(Page,
-                                   fields=['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
-                                   widgets={
-                                       'edit_groups': CheckboxSelectMultiple,
-                                       'view_groups': CheckboxSelectMultiple,
-                                   })
+    form_class = PageForm
     template_name = 'core/page_prop.jinja'
 
     def get_initial(self):
@@ -118,14 +122,9 @@ class PageCreateView(CanCreateMixin, CreateView):
         return ret
 
 
-class PagePropView(CanEditPropMixin, UpdateView):
+class PagePropView(CanEditPagePropMixin, UpdateView):
     model = Page
-    form_class = modelform_factory(Page,
-                                   fields=['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
-                                   widgets={
-                                       'edit_groups': CheckboxSelectMultiple,
-                                       'view_groups': CheckboxSelectMultiple,
-                                   })
+    form_class = PagePropForm
     template_name = 'core/page_prop.jinja'
     slug_field = '_full_name'
     slug_url_kwarg = 'page_name'
@@ -189,7 +188,7 @@ class PageEditView(CanEditMixin, UpdateView):
         return super(PageEditView, self).form_valid(form)
 
 
-class PageDeleteView(CanEditPropMixin, DeleteView):
+class PageDeleteView(CanEditPagePropMixin, DeleteView):
     model = Page
     template_name = 'core/delete_confirm.jinja'
     pk_url_kwarg = 'page_id'

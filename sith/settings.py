@@ -296,6 +296,9 @@ SITH_LAUNDERETTE_MANAGER = {
     'address': "6 Boulevard Anatole France, 90000 Belfort"
 }
 
+# Main root for club pages
+SITH_CLUB_ROOT_PAGE = "clubs"
+
 # Define the date in the year serving as reference for the subscriptions calendar
 # (month, day)
 SITH_START_DATE = (8, 15)  # 15th August
