@@ -116,12 +116,19 @@ class Club(models.Model):
                 if public:
                     p.view_groups.add(public)
                 p.save()
+                if self.parent and self.parent.page:
+                    p.parent = self.parent.page
                 self.page = p
                 self.save()
         elif self.page and self.page.name != self.unix_name:
             self.page.unset_lock()
             self.page.set_lock(root)
             self.page.name = self.unix_name
+            self.page.save()
+        elif self.page and self.parent and self.parent.page and self.page.parent != self.parent.page:
+            self.page.unset_lock()
+            self.page.set_lock(root)
+            self.page.parent = self.parent.page
             self.page.save()
 
     def save(self, *args, **kwargs):
