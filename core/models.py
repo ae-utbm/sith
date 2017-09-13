@@ -892,6 +892,12 @@ class Page(models.Model):
                 code='loop',
             )
 
+    def can_be_edited_by(self, user):
+        if self.is_club_page and self.club.can_be_edited_by(user):
+            # Override normal behavior for clubs
+            return True
+        return False
+
     def get_parent_list(self):
         l = []
         p = self.parent

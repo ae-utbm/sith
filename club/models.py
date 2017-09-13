@@ -105,22 +105,24 @@ class Club(models.Model):
                 self.save()
 
     def make_page(self):
+        root = User.objects.filter(username="root").first()
         if not self.page:
-            root = User.objects.filter(username="root").first()
             club_root = Page.objects.filter(name=settings.SITH_CLUB_ROOT_PAGE).first()
             if root and club_root:
                 public = Group.objects.filter(id=settings.SITH_GROUP_PUBLIC_ID).first()
-                office = Group.objects.filter(name=self.unix_name + settings.SITH_BOARD_SUFFIX).first()
                 p = Page(name=self.unix_name)
                 p.parent = club_root
                 p.set_lock(root)
                 if public:
                     p.view_groups.add(public)
-                if office:
-                    p.edit_groups.add(office)
                 p.save()
                 self.page = p
                 self.save()
+        elif self.page and self.page.name != self.unix_name:
+            self.page.unset_lock()
+            self.page.set_lock(root)
+            self.page.name = self.unix_name
+            self.page.save()
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
@@ -142,7 +144,7 @@ class Club(models.Model):
                 self.home.edit_groups = [board]
                 self.home.view_groups = [member, subscribers]
                 self.home.save()
-                self.make_page()
+            self.make_page()
 
     def __str__(self):
         return self.name
