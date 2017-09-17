@@ -2,7 +2,9 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+
 from club.models import Club
+from core.operations import PsqlRunOnly
 
 
 def generate_club_pages(apps, schema_editor):
@@ -32,7 +34,7 @@ class Migration(migrations.Migration):
             name='page',
             field=models.OneToOneField(related_name='club', blank=True, null=True, to='core.Page'),
         ),
-        migrations.RunSQL('SET CONSTRAINTS ALL IMMEDIATE', reverse_sql=migrations.RunSQL.noop),
+        PsqlRunOnly('SET CONSTRAINTS ALL IMMEDIATE', reverse_sql=migrations.RunSQL.noop),
         migrations.RunPython(generate_club_pages),
-        migrations.RunSQL(migrations.RunSQL.noop, reverse_sql='SET CONSTRAINTS ALL IMMEDIATE'),
+        PsqlRunOnly(migrations.RunSQL.noop, reverse_sql='SET CONSTRAINTS ALL IMMEDIATE'),
     ]

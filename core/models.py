@@ -893,7 +893,7 @@ class Page(models.Model):
             )
 
     def can_be_edited_by(self, user):
-        if self.is_club_page and self.club.can_be_edited_by(user):
+        if hasattr(self, 'club') and self.club.can_be_edited_by(user):
             # Override normal behavior for clubs
             return True
         return False
