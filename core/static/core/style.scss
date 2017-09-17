@@ -23,6 +23,8 @@ $secondary-neutral-dark-color: hsl(40, 57.6%, 17%);
 $white-color: hsl(219.6, 20.8%, 98%);
 $black-color: hsl(40.0, 0%, 17%);
 
+$faceblue: #3B5998;
+$twitblue: #55acee;
 
 
 
@@ -397,6 +399,38 @@ header {
       color: grey;
     }
   }
+}
+
+.fb-share-button {
+  background: $faceblue;
+  border: none;
+  color: white;
+  padding: 0.5em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 2px;
+}
+
+.fb-share-button:hover {
+  color: lightgrey;
+}
+
+.twitter-share-button {
+  background: $twitblue;
+  border: none;
+  color: white;
+  padding: 0.5em 1em;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 2px;
+}
+
+.twitter-share-button:hover {
+  color: lightgrey;
 }
 
 .helptext {

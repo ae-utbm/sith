@@ -12,6 +12,14 @@
 </a>
 {%- endmacro %}
 
+{% macro facebook_share(news) -%}
+<a rel="nofollow" target="#" class="fb-share-button" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}">{% trans %}Share on Facebook{% endtrans %}</a>
+{%- endmacro %}
+
+{% macro tweet(news) -%}
+<a rel="nofollow" target="#" class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}">{% trans %}Tweet{% endtrans %}</a>
+{%- endmacro %}
+
 {% macro user_mini_profile(user) %}
 <div id="user_profile">
 

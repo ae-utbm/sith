@@ -81,6 +81,9 @@ class News(models.Model):
     def get_absolute_url(self):
         return reverse('com:news_detail', kwargs={'news_id': self.id})
 
+    def get_full_url(self):
+        return "https://%s%s" % (settings.SITH_URL, self.get_absolute_url())
+
     def __str__(self):
         return "%s: %s" % (self.type, self.title)
 
