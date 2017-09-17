@@ -1379,10 +1379,13 @@ def migrate_club_again():
         cur = db.cursor(MySQLdb.cursors.SSDictCursor)
         cur.execute("SELECT * FROM asso")
 
+        print("Migrating club is_active")
+
         for club in cur:
             try:
-                c = Club.objects.get(id=club['id_asso'])
-                c.is_disabled = club['hidden'] == 1
+                c = Club.objects.get(unix_name=club['nom_unix_asso'])
+                c.is_active = club['hidden'] == 0
+                c.save()
             except: pass
 
 
