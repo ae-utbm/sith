@@ -6,8 +6,12 @@ from club.models import Club
 
 
 def generate_club_pages(apps, schema_editor):
-    for club in Club.objects.all():
+    def recursive_generate_club_page(club):
         club.make_page()
+        for child in Club.objects.filter(parent=club).all():
+            recursive_generate_club_page(child)
+    for club in Club.objects.filter(parent=None).all():
+        recursive_generate_club_page(club)
 
 
 class Migration(migrations.Migration):
@@ -28,5 +32,7 @@ class Migration(migrations.Migration):
             name='page',
             field=models.OneToOneField(related_name='club', blank=True, null=True, to='core.Page'),
         ),
+        migrations.RunSQL('SET CONSTRAINTS ALL IMMEDIATE', reverse_sql=migrations.RunSQL.noop),
         migrations.RunPython(generate_club_pages),
+        migrations.RunSQL(migrations.RunSQL.noop, reverse_sql='SET CONSTRAINTS ALL IMMEDIATE'),
     ]

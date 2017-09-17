@@ -841,7 +841,7 @@ class Page(models.Model):
     name = models.CharField(_('page unix name'), max_length=30,
                             validators=[
                             validators.RegexValidator(
-                                r'^[A-z.+-]+$',
+                                r'^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]$',
                                 _('Enter a valid page name. This value may contain only '
                                   'unaccented letters, numbers ' 'and ./+/-/_ characters.')
                             ), ],
