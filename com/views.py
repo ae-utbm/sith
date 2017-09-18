@@ -240,7 +240,7 @@ class NewsCreateView(CanCreateMixin, CreateView):
         else:
             for u in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
                 if not u.notifications.filter(type="NEWS_MODERATION", viewed=False).exists():
-                    Notification(user=u, url=reverse("com:news_detail", kwargs={'news_id': self.object.id}), type="NEWS_MODERATION").save()
+                    Notification(user=u, url=reverse("com:news_admin_list"), type="NEWS_MODERATION").save()
         return super(NewsCreateView, self).form_valid(form)
 
 
@@ -248,6 +248,8 @@ class NewsDeleteView(CanEditMixin, DeleteView):
     model = News
     pk_url_kwarg = 'news_id'
     template_name = 'core/delete_confirm.jinja'
+    success_url = reverse_lazy('com:news_admin_list')
+
 
 class NewsModerateView(CanEditMixin, SingleObjectMixin):
     model = News
