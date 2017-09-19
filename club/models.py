@@ -112,24 +112,24 @@ class Club(models.Model):
                 public = Group.objects.filter(id=settings.SITH_GROUP_PUBLIC_ID).first()
                 p = Page(name=self.unix_name)
                 p.parent = club_root
-                p.set_lock(root)
+                p.save(force_lock=True)
                 if public:
                     p.view_groups.add(public)
-                p.save()
+                p.save(force_lock=True)
                 if self.parent and self.parent.page:
                     p.parent = self.parent.page
                 self.page = p
                 self.save()
         elif self.page and self.page.name != self.unix_name:
             self.page.unset_lock()
-            self.page.set_lock(root)
+            # self.page.set_lock(root)
             self.page.name = self.unix_name
-            self.page.save()
+            self.page.save(force_lock=True)
         elif self.page and self.parent and self.parent.page and self.page.parent != self.parent.page:
             self.page.unset_lock()
-            self.page.set_lock(root)
+            # self.page.set_lock(root)
             self.page.parent = self.parent.page
-            self.page.save()
+            self.page.save(force_lock=True)
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
