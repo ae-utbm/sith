@@ -150,6 +150,7 @@
           {% if not popup %}
           <nav>
               <a href="{{ url('core:index') }}">{% trans %}Main{% endtrans %}</a>
+              <a href="{{ url('core:page', page_name='clubs') }}">{% trans %}Clubs{% endtrans %}</a>
               <a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a>
               <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
               <a href="{{ url('sas:main') }}">{% trans %}SAS{% endtrans %}</a>

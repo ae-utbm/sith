@@ -343,7 +343,7 @@ class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
     """
     model = Club
     pk_url_kwarg = "club_id"
-    fields = ['address', 'logo']
+    fields = ['address', 'logo', 'short_description']
     template_name = 'core/edit.jinja'
     current_tab = "edit"
 

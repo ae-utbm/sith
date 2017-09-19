@@ -6,7 +6,9 @@
 
 {% macro display_club(club) -%}
     <li><a href="{{ url('club:club_view', club_id=club.id) }}">{{ club.name }}</a>
-        {%- if club.children.all()|length != 0 %}
+        {% if club.president %} - <a href="{{ url('core:user_profile', user_id=club.president.user.id) }}">{{ club.president.user }}</a>{% endif %}
+        {% if club.short_description %}<p>{{ club.short_description|markdown }}</p>{% endif %}
+        {%- if club.children.exclude(is_active=False).all()|length != 0 %}
         <ul>
             {%- for c in club.children.order_by('name') %}
                 {{ display_club(c) }}
@@ -23,7 +25,7 @@
     {% if club_list %}
     <h3>{% trans %}Club list{% endtrans %}</h3>
     <ul>
-        {%- for c in club_list.order_by('name') if c.parent is none %}
+        {%- for c in club_list.exclude(is_active=False).order_by('name') if c.parent is none %}
         {{ display_club(c) }}
         {%- endfor %}
     </ul>

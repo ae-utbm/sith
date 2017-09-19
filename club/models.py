@@ -32,6 +32,7 @@ from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.core.validators import RegexValidator, validate_email
+from django.utils.functional import cached_property
 
 from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification, Page
 
@@ -59,6 +60,7 @@ class Club(models.Model):
     )
     logo = models.ImageField(upload_to='club_logos', verbose_name=_('logo'), null=True, blank=True)
     is_active = models.BooleanField(_('is active'), default=True)
+    short_description = models.CharField(_('short description'), max_length=1000, blank=True)
     address = models.CharField(_('address'), max_length=254)
     # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
     owner_group = models.ForeignKey(Group, related_name="owned_club",
@@ -71,6 +73,10 @@ class Club(models.Model):
 
     class Meta:
         ordering = ['name', 'unix_name']
+
+    @cached_property
+    def president(self):
+        return self.members.filter(role=settings.SITH_CLUB_ROLES_ID['President'], start_date__lte=timezone.now()).first()
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
