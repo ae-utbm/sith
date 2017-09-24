@@ -13,11 +13,12 @@
         <div style="border: solid 1px grey; text-align: center; margin: 5px;">
             <div id="user_{{ trombi_user.id }}_infos">
                 {{ trombi_user.user.get_display_name() }}<br>
+                {{ trombi_user.user.department }}/{{ trombi_user.user.dpt_option }}<br>
+                {% trans %}Quote: {% endtrans %}{{ trombi_user.user.quote }}<br>
                 {% trans %}Date of birth: {% endtrans %}{{ trombi_user.user.date_of_birth|date("d/m/Y") }}<br>
                 {% trans %}Email: {% endtrans %}{{ trombi_user.user.second_email }}<br>
                 {% trans %}Phone: {% endtrans %}{{ trombi_user.user.phone }}<br>
                 {% trans %}City: {% endtrans %}{{ trombi_user.user.parent_address }}<br>
-                {% trans %}Quote: {% endtrans %}{{ trombi_user.user.quote }}<br>
             </div>
             <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_infos'))">{% trans %}Copy{% endtrans %}</button>
 
@@ -69,7 +70,7 @@
             <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_clubs'))">{% trans %}Copy clubs{% endtrans %}</button>
             {% endif %}
             <h4>{% trans %}Comments{% endtrans %}</h4>
-            <div id="user_{{ trombi_user.id }}_coms" style="text-align: left">
+            <div id="user_{{ trombi_user.id }}_coms" style="text-align: left; word-wrap: break-word;">
             {% for c in trombi_user.received_comments.filter(is_moderated=True) %}
                 <strong>{{ c.author.user.get_display_name() }}</strong><br>
                 {% for line in c.content.splitlines() %}
