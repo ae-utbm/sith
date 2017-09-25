@@ -49,13 +49,11 @@ class SASForm(forms.Form):
                               required=False)
 
     def process(self, parent, owner, files, automodere=False):
-        notif = False
         try:
             if self.cleaned_data['album_name'] != "":
                 album = Album(parent=parent, name=self.cleaned_data['album_name'], owner=owner, is_moderated=automodere)
                 album.clean()
                 album.save()
-                notif = not automodere
         except Exception as e:
             self.add_error(None, _("Error creating album %(album)s: %(msg)s") %
                            {'album': self.cleaned_data['album_name'], 'msg': repr(e)})
@@ -68,13 +66,8 @@ class SASForm(forms.Form):
                 new_file.clean()
                 new_file.generate_thumbnails()
                 new_file.save()
-                notif = not automodere
             except Exception as e:
                 self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
-        if notif:
-            for u in RealGroup.objects.filter(id=settings.SITH_GROUP_SAS_ADMIN_ID).first().users.all():
-                if not u.notifications.filter(type="SAS_MODERATION", viewed=False).exists():
-                    Notification(user=u, url=reverse("sas:moderation"), type="SAS_MODERATION").save()
 
 
 class RelationForm(forms.ModelForm):
