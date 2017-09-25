@@ -57,6 +57,7 @@ class Club(models.Model):
         'unique': _("A club with that unix name already exists."),
     },
     )
+    logo = models.ImageField(upload_to='club_logos', verbose_name=_('logo'), null=True, blank=True)
     address = models.CharField(_('address'), max_length=254)
     # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
     owner_group = models.ForeignKey(Group, related_name="owned_club",
