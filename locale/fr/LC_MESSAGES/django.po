@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-25 12:39+0200\n"
+"POT-Creation-Date: 2017-09-25 18:37+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -65,7 +65,7 @@ msgstr "IBAN"
 msgid "account number"
 msgstr "numero de compte"
 
-#: accounting/models.py:113 accounting/models.py:139 club/models.py:189
+#: accounting/models.py:113 accounting/models.py:139 club/models.py:190
 #: com/models.py:67 com/models.py:178 counter/models.py:148
 #: counter/models.py:184 trombi/models.py:149
 msgid "club"
@@ -88,12 +88,12 @@ msgstr "Compte club"
 msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
-#: accounting/models.py:195 club/models.py:190 counter/models.py:465
+#: accounting/models.py:195 club/models.py:191 counter/models.py:465
 #: election/models.py:16 launderette/models.py:148
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:196 club/models.py:191 counter/models.py:466
+#: accounting/models.py:196 club/models.py:192 counter/models.py:466
 #: election/models.py:17
 msgid "end date"
 msgstr "date de fin"
@@ -172,7 +172,7 @@ msgstr "étiquette"
 msgid "target type"
 msgstr "type de cible"
 
-#: accounting/models.py:271 club/models.py:288
+#: accounting/models.py:271 club/models.py:289
 #: club/templates/club/club_members.jinja:8
 #: club/templates/club/club_old_members.jinja:8
 #: club/templates/club/mailing.jinja:22 club/views.py:84
@@ -184,7 +184,7 @@ msgstr "type de cible"
 msgid "User"
 msgstr "Utilisateur"
 
-#: accounting/models.py:271 club/models.py:232
+#: accounting/models.py:271 club/models.py:233
 #: club/templates/club/club_detail.jinja:5
 #: com/templates/com/mailing_admin.jinja:11
 #: com/templates/com/news_admin_list.jinja:23
@@ -367,12 +367,11 @@ msgstr "Compte en banque : "
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:330
 #: election/templates/election/election_detail.jinja:378
-#: forum/templates/forum/macros.jinja:21
-#: forum/templates/forum/macros.jinja:123
+#: forum/templates/forum/macros.jinja:21 forum/templates/forum/macros.jinja:123
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:182 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:74
-#: sas/templates/sas/picture.jinja:124
+#: sas/templates/sas/picture.jinja.py:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
 #: stock/templates/stock/stock_shopping_list.jinja:69
 #: trombi/templates/trombi/detail.jinja:35
@@ -612,7 +611,7 @@ msgstr "No"
 #: core/templates/core/user_account_detail.jinja:78
 #: counter/templates/counter/cash_summary_list.jinja:34
 #: counter/templates/counter/last_ops.jinja:14
-#: counter/templates/counter/last_ops.jinja:39 sas/views.py:289
+#: counter/templates/counter/last_ops.jinja:39 sas/views.py:282
 #: stock/templates/stock/stock_shopping_list.jinja:25
 #: stock/templates/stock/stock_shopping_list.jinja:54
 #: trombi/templates/trombi/export.jinja:57
@@ -884,87 +883,90 @@ msgstr ""
 msgid "A club with that unix name already exists."
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:60 core/models.py:199
+#: club/models.py:60
+msgid "logo"
+msgstr "logo"
+
+#: club/models.py:61 core/models.py:199
 msgid "address"
 msgstr "Adresse"
 
-#: club/models.py:66 core/models.py:160
+#: club/models.py:67 core/models.py:160
 msgid "home"
 msgstr "home"
 
-#: club/models.py:78
+#: club/models.py:79
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
-#: club/models.py:92
+#: club/models.py:93
 msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:188 counter/models.py:463 counter/models.py:481
+#: club/models.py:189 counter/models.py:463 counter/models.py:481
 #: eboutic/models.py:38 eboutic/models.py:72 election/models.py:140
 #: launderette/models.py:114 launderette/models.py:152 sas/models.py:180
 #: trombi/models.py:148
 msgid "user"
 msgstr "nom d'utilisateur"
 
-#: club/models.py:192 core/models.py:179 election/models.py:139
+#: club/models.py:193 core/models.py:179 election/models.py:139
 #: election/models.py:155 trombi/models.py:150
 msgid "role"
 msgstr "rôle"
 
-#: club/models.py:194 core/models.py:65 counter/models.py:114
+#: club/models.py:195 core/models.py:65 counter/models.py:114
 #: counter/models.py:140 election/models.py:13 election/models.py:93
 #: election/models.py:141 forum/models.py:50 forum/models.py:186
 msgid "description"
 msgstr "description"
 
-#: club/models.py:199
+#: club/models.py:200
 msgid "User must be subscriber to take part to a club"
 msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
 
-#: club/models.py:201
+#: club/models.py:202
 msgid "User is already member of that club"
 msgstr "L'utilisateur est déjà membre de ce club"
 
-#: club/models.py:205
+#: club/models.py:206
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/models.py:233 club/models.py:289
+#: club/models.py:234 club/models.py:290
 msgid "Email address"
 msgstr "Adresse email"
 
-#: club/models.py:236
+#: club/models.py:237
 msgid "Enter a valid address. Only the root of the address is needed."
 msgstr ""
 "Entrez une adresse valide. Seule la racine de l'adresse est nécessaire."
 
-#: club/models.py:238 com/models.py:69 core/models.py:645
+#: club/models.py:239 com/models.py:69 core/models.py:645
 msgid "is moderated"
 msgstr "est modéré"
 
-#: club/models.py:239 com/models.py:70
+#: club/models.py:240 com/models.py:70
 msgid "moderator"
 msgstr "modérateur"
 
-#: club/models.py:287 club/templates/club/mailing.jinja:14
+#: club/models.py:288 club/templates/club/mailing.jinja:14
 msgid "Mailing"
 msgstr "Mailing"
 
-#: club/models.py:296
+#: club/models.py:297
 msgid "At least user or email is required"
 msgstr "Au moins un utilisateur ou un email est nécessaire"
 
-#: club/models.py:301
+#: club/models.py:302
 msgid "This email is already suscribed in this mailing"
 msgstr "Cet email est déjà abonné à cette mailing"
 
-#: club/models.py:319 club/templates/club/mailing.jinja:30
+#: club/models.py:320 club/templates/club/mailing.jinja:30
 msgid "Unregistered user"
 msgstr "Désabonner un utilisateur"
 
-#: club/templates/club/club_list.jinja:4
-#: club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -1035,8 +1037,7 @@ msgstr "Au"
 msgid "Sellings"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja:9
-#: club/templates/club/stats.jinja:19
+#: club/templates/club/club_sellings.jinja:9 club/templates/club/stats.jinja:19
 #: counter/templates/counter/cash_summary_list.jinja:15
 msgid "Show"
 msgstr "Montrer"
@@ -1214,7 +1215,7 @@ msgstr "Propriétés"
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
-#: club/views.py:230 sas/views.py:104 sas/views.py:157 sas/views.py:232
+#: club/views.py:230 sas/views.py:97 sas/views.py:150 sas/views.py:225
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
@@ -1371,9 +1372,8 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
-#: com/templates/com/news_detail.jinja:5
-#: com/templates/com/news_detail.jinja:11 com/templates/com/news_list.jinja:4
-#: com/templates/com/news_list.jinja:9
+#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
+#: com/templates/com/news_list.jinja:4
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1556,15 +1556,19 @@ msgstr "Prévisualiser"
 msgid "Administrate news"
 msgstr "Administrer les news"
 
-#: com/templates/com/news_list.jinja:15
+#: com/templates/com/news_list.jinja:17
 msgid "Agenda"
 msgstr "Agenda"
 
-#: com/templates/com/news_list.jinja:57
+#: com/templates/com/news_list.jinja:63
 msgid "Events today and the next few days"
-msgstr "Événement aujourd'hui et dans les prochains jours"
+msgstr "Événements aujourd'hui et dans les prochains jours"
 
-#: com/templates/com/news_list.jinja:77
+#: com/templates/com/news_list.jinja:96
+msgid "Nothing to come..."
+msgstr "Rien à venir..."
+
+#: com/templates/com/news_list.jinja:102
 msgid "Coming soon... don't miss!"
 msgstr "Prochainement... à ne pas rater!"
 
@@ -2180,7 +2184,7 @@ msgstr "SAS"
 
 #: core/templates/core/base.jinja:149 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:13
-#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:11
+#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
 #: forum/templates/forum/main.jinja:14 forum/templates/forum/reply.jinja:15
 #: forum/templates/forum/topic.jinja:30
 msgid "Forum"
@@ -2442,13 +2446,11 @@ msgstr "Partager sur Facebook"
 msgid "Tweet"
 msgstr "Tweeter"
 
-#: core/templates/core/macros.jinja:39
-#: core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:39 core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:43
-#: core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:43 core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -3069,12 +3071,12 @@ msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
 #: core/views/files.py:97 core/views/forms.py:227 core/views/forms.py:231
-#: sas/views.py:73
+#: sas/views.py:70
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 
-#: core/views/files.py:151 sas/views.py:292
+#: core/views/files.py:151 sas/views.py:285
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
@@ -4304,12 +4306,12 @@ msgstr "Ajouter un nouvel album"
 msgid "Upload images"
 msgstr "Envoyer les images"
 
-#: sas/views.py:60
+#: sas/views.py:58
 #, python-format
 msgid "Error creating album %(album)s: %(msg)s"
 msgstr "Erreur de création de l'album %(album)s : %(msg)s"
 
-#: sas/views.py:85 trombi/templates/trombi/detail.jinja:15
+#: sas/views.py:78 trombi/templates/trombi/detail.jinja:15
 msgid "Add user"
 msgstr "Ajouter une personne"
 
@@ -4499,6 +4501,7 @@ msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
 #: sith/settings.py:559
+#, python-format
 msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
