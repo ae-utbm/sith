@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-17 15:00+0200\n"
+"POT-Creation-Date: 2017-09-25 12:39+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -127,8 +127,8 @@ msgstr "numéro"
 msgid "journal"
 msgstr "classeur"
 
-#: accounting/models.py:258 core/models.py:644 core/models.py:1019
-#: core/models.py:1060 counter/models.py:300 counter/models.py:350
+#: accounting/models.py:258 core/models.py:644 core/models.py:1023
+#: core/models.py:1064 counter/models.py:300 counter/models.py:350
 #: counter/models.py:483 eboutic/models.py:39 eboutic/models.py:73
 #: forum/models.py:239 forum/models.py:314 stock/models.py:76
 msgid "date"
@@ -201,8 +201,8 @@ msgstr "Utilisateur"
 #: counter/templates/counter/invoices_call.jinja:23
 #: trombi/templates/trombi/edit_profile.jinja:15
 #: trombi/templates/trombi/edit_profile.jinja:22
-#: trombi/templates/trombi/export.jinja:50
-#: trombi/templates/trombi/export.jinja:54
+#: trombi/templates/trombi/export.jinja:51
+#: trombi/templates/trombi/export.jinja:55
 #: trombi/templates/trombi/user_profile.jinja:34
 #: trombi/templates/trombi/user_profile.jinja:38
 msgid "Club"
@@ -367,11 +367,12 @@ msgstr "Compte en banque : "
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:330
 #: election/templates/election/election_detail.jinja:378
-#: forum/templates/forum/macros.jinja:21 forum/templates/forum/macros.jinja:123
+#: forum/templates/forum/macros.jinja:21
+#: forum/templates/forum/macros.jinja:123
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:182 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:74
-#: sas/templates/sas/picture.jinja.py:124
+#: sas/templates/sas/picture.jinja:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
 #: stock/templates/stock/stock_shopping_list.jinja:69
 #: trombi/templates/trombi/detail.jinja:35
@@ -614,7 +615,7 @@ msgstr "No"
 #: counter/templates/counter/last_ops.jinja:39 sas/views.py:289
 #: stock/templates/stock/stock_shopping_list.jinja:25
 #: stock/templates/stock/stock_shopping_list.jinja:54
-#: trombi/templates/trombi/export.jinja:56
+#: trombi/templates/trombi/export.jinja:57
 #: trombi/templates/trombi/user_profile.jinja:40
 msgid "Date"
 msgstr "Date"
@@ -901,7 +902,7 @@ msgstr "Un club avec ce nom UNIX existe déjà."
 
 #: club/models.py:188 counter/models.py:463 counter/models.py:481
 #: eboutic/models.py:38 eboutic/models.py:72 election/models.py:140
-#: launderette/models.py:114 launderette/models.py:152 sas/models.py:158
+#: launderette/models.py:114 launderette/models.py:152 sas/models.py:180
 #: trombi/models.py:148
 msgid "user"
 msgstr "nom d'utilisateur"
@@ -962,7 +963,8 @@ msgstr "Cet email est déjà abonné à cette mailing"
 msgid "Unregistered user"
 msgstr "Désabonner un utilisateur"
 
-#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4
+#: club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -984,7 +986,7 @@ msgstr "Membres du club"
 #: core/templates/core/user_clubs.jinja:16
 #: core/templates/core/user_clubs.jinja:42
 #: trombi/templates/trombi/edit_profile.jinja:23
-#: trombi/templates/trombi/export.jinja:55
+#: trombi/templates/trombi/export.jinja:56
 #: trombi/templates/trombi/user_profile.jinja:39
 msgid "Role"
 msgstr "Rôle"
@@ -1033,7 +1035,8 @@ msgstr "Au"
 msgid "Sellings"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja:9 club/templates/club/stats.jinja:19
+#: club/templates/club/club_sellings.jinja:9
+#: club/templates/club/stats.jinja:19
 #: counter/templates/counter/cash_summary_list.jinja:15
 msgid "Show"
 msgstr "Montrer"
@@ -1275,7 +1278,7 @@ msgstr "résumé"
 msgid "content"
 msgstr "contenu"
 
-#: com/models.py:66 core/models.py:1059 launderette/models.py:86
+#: com/models.py:66 core/models.py:1063 launderette/models.py:86
 #: launderette/models.py:112 launderette/models.py:149 stock/models.py:59
 #: stock/models.py:98
 msgid "type"
@@ -1368,8 +1371,9 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
-#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
-#: com/templates/com/news_list.jinja:4 com/templates/com/news_list.jinja:9
+#: com/templates/com/news_detail.jinja:5
+#: com/templates/com/news_detail.jinja:11 com/templates/com/news_list.jinja:4
+#: com/templates/com/news_list.jinja:9
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1692,15 +1696,15 @@ msgstr "Ce champ est obligatoire."
 msgid "You crazy? You can not finish an event before starting it."
 msgstr "T'es fou? Un événement ne peut pas finir avant même de commencer."
 
-#: com/views.py:324
+#: com/views.py:326
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour regénérer"
 
-#: com/views.py:332
+#: com/views.py:334
 msgid "Weekmail of the "
 msgstr "Weekmail du "
 
-#: com/views.py:412
+#: com/views.py:414
 msgid ""
 "You must be a board member of the selected club to post in the Weekmail."
 msgstr ""
@@ -1969,7 +1973,7 @@ msgstr "recevez une notification pour chaque rechargement"
 msgid "file name"
 msgstr "nom du fichier"
 
-#: core/models.py:634 core/models.py:845
+#: core/models.py:634 core/models.py:849
 msgid "parent"
 msgstr "parent"
 
@@ -1989,11 +1993,11 @@ msgstr "miniature"
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:639 core/models.py:851 core/views/files.py:149
+#: core/models.py:639 core/models.py:855 core/views/files.py:149
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:640 core/models.py:852 core/views/files.py:150
+#: core/models.py:640 core/models.py:856 core/views/files.py:150
 msgid "view group"
 msgstr "groupe de vue"
 
@@ -2039,19 +2043,19 @@ msgstr "Un fichier de ce nom existe déjà"
 msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
-#: core/models.py:783
+#: core/models.py:787
 msgid "Folder: "
 msgstr "Dossier : "
 
-#: core/models.py:785
+#: core/models.py:789
 msgid "File: "
 msgstr "Fichier : "
 
-#: core/models.py:837
+#: core/models.py:841
 msgid "page unix name"
 msgstr "nom unix de la page"
 
-#: core/models.py:841
+#: core/models.py:845
 msgid ""
 "Enter a valid page name. This value may contain only unaccented letters, "
 "numbers and ./+/-/_ characters."
@@ -2059,51 +2063,51 @@ msgstr ""
 "Entrez un nom de page correct. Uniquement des lettres non accentuées, "
 "numéros, et ./+/-/_"
 
-#: core/models.py:848
+#: core/models.py:852
 msgid "page name"
 msgstr "nom de la page"
 
-#: core/models.py:849
+#: core/models.py:853
 msgid "owner group"
 msgstr "groupe propriétaire"
 
-#: core/models.py:853
+#: core/models.py:857
 msgid "lock user"
 msgstr "utilisateur bloquant"
 
-#: core/models.py:854
+#: core/models.py:858
 msgid "lock_timeout"
 msgstr "décompte du déblocage"
 
-#: core/models.py:881
+#: core/models.py:885
 msgid "Duplicate page"
 msgstr "Une page de ce nom existe déjà"
 
-#: core/models.py:887
+#: core/models.py:891
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:1016
+#: core/models.py:1020
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:1017
+#: core/models.py:1021
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:1018
+#: core/models.py:1022
 msgid "page content"
 msgstr "contenu de la page"
 
-#: core/models.py:1057
+#: core/models.py:1061
 msgid "url"
 msgstr "url"
 
-#: core/models.py:1058
+#: core/models.py:1062
 msgid "param"
 msgstr "param"
 
-#: core/models.py:1061
+#: core/models.py:1065
 msgid "viewed"
 msgstr "vue"
 
@@ -2176,7 +2180,7 @@ msgstr "SAS"
 
 #: core/templates/core/base.jinja:149 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:13
-#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
+#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:11
 #: forum/templates/forum/main.jinja:14 forum/templates/forum/reply.jinja:15
 #: forum/templates/forum/topic.jinja:30
 msgid "Forum"
@@ -2438,11 +2442,13 @@ msgstr "Partager sur Facebook"
 msgid "Tweet"
 msgstr "Tweeter"
 
-#: core/templates/core/macros.jinja:39 core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:39
+#: core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:43 core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:43
+#: core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 
@@ -3116,7 +3122,7 @@ msgstr "Parrain"
 msgid "Godchild"
 msgstr "Fillot"
 
-#: core/views/user.py:174 trombi/templates/trombi/export.jinja:24
+#: core/views/user.py:174 trombi/templates/trombi/export.jinja:25
 #: trombi/templates/trombi/user_profile.jinja:11
 msgid "Pictures"
 msgstr "Photos"
@@ -4232,7 +4238,7 @@ msgstr "Utilisateur qui sera conservé"
 msgid "User that will be deleted"
 msgstr "Utilisateur qui sera supprimé"
 
-#: sas/models.py:159
+#: sas/models.py:181
 msgid "picture"
 msgstr "photo"
 
@@ -4493,8 +4499,8 @@ msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
 #: sith/settings.py:559
-msgid "New pictures/album to be moderated in the SAS"
-msgstr "Nouvelles photos/albums à modérer dans le SAS"
+msgid "There are %s pictures to be moderated in the SAS"
+msgstr "Il y a %s photos à modérer dans le SAS"
 
 #: sith/settings.py:560
 msgid "You've been identified on some pictures"
@@ -4514,23 +4520,23 @@ msgstr "Vous avez acheté %s"
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:574
+#: sith/settings.py:575
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:575
+#: sith/settings.py:576
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:576
+#: sith/settings.py:577
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:577
+#: sith/settings.py:578
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:578
+#: sith/settings.py:579
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
@@ -4600,7 +4606,7 @@ msgid "Quantity bought"
 msgstr "Quantité achetée"
 
 #: stock/templates/stock/shopping_list_items.jinja:42 stock/views.py:206
-#: trombi/templates/trombi/export.jinja:71
+#: trombi/templates/trombi/export.jinja:72
 msgid "Comments"
 msgstr "Commentaires"
 
@@ -4934,43 +4940,43 @@ msgstr ""
 "Réinitialiser les participations aux clubs dans le Trombi (supprime les "
 "existantes, n'impacte pas les vraies appartenances du site)"
 
-#: trombi/templates/trombi/export.jinja:16
-msgid "Date of birth: "
-msgstr "Date de naissance : "
-
 #: trombi/templates/trombi/export.jinja:17
-msgid "Email: "
-msgstr "Email : "
-
-#: trombi/templates/trombi/export.jinja:18
-msgid "Phone: "
-msgstr "Téléphone : "
-
-#: trombi/templates/trombi/export.jinja:19
-msgid "City: "
-msgstr "Ville : "
-
-#: trombi/templates/trombi/export.jinja:20
 msgid "Quote: "
 msgstr "Citation : "
 
-#: trombi/templates/trombi/export.jinja:22
+#: trombi/templates/trombi/export.jinja:18
+msgid "Date of birth: "
+msgstr "Date de naissance : "
+
+#: trombi/templates/trombi/export.jinja:19
+msgid "Email: "
+msgstr "Email : "
+
+#: trombi/templates/trombi/export.jinja:20
+msgid "Phone: "
+msgstr "Téléphone : "
+
+#: trombi/templates/trombi/export.jinja:21
+msgid "City: "
+msgstr "Ville : "
+
+#: trombi/templates/trombi/export.jinja:23
 msgid "Copy"
 msgstr "Copier"
 
-#: trombi/templates/trombi/export.jinja:41
+#: trombi/templates/trombi/export.jinja:42
 msgid "Copy profile picture"
 msgstr "Copier la photo de profil"
 
-#: trombi/templates/trombi/export.jinja:45
+#: trombi/templates/trombi/export.jinja:46
 msgid "Copy scrub picture"
 msgstr "Copier la photo de blouse"
 
-#: trombi/templates/trombi/export.jinja:69
+#: trombi/templates/trombi/export.jinja:70
 msgid "Copy clubs"
 msgstr "Copier les clubs"
 
-#: trombi/templates/trombi/export.jinja:81
+#: trombi/templates/trombi/export.jinja:87
 msgid "Copy comments"
 msgstr "Copier les commentaires"
 
