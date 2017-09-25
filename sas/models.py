@@ -34,10 +34,21 @@ import os
 from core.models import SithFile, User
 from core.utils import resize_image, exif_auto_rotate
 
+class SASPictureManager(models.Manager):
+    def get_queryset(self):
+        return super(SASPictureManager, self).get_queryset().filter(is_in_sas=True,
+                is_folder=False)
+
+class SASAlbumManager(models.Manager):
+    def get_queryset(self):
+        return super(SASAlbumManager, self).get_queryset().filter(is_in_sas=True,
+                is_folder=True)
 
 class Picture(SithFile):
     class Meta:
         proxy = True
+
+    objects = SASPictureManager()
 
     @property
     def is_vertical(self):
@@ -104,27 +115,29 @@ class Picture(SithFile):
             return self.parent.children.filter(is_moderated=True, asked_for_removal=False, is_folder=False,
                                                id__gt=self.id).order_by('id').first()
         else:
-            return Picture.objects.filter(id__gt=self.id, is_moderated=False, is_in_sas=True).order_by('id').first()
+            return Picture.objects.filter(id__gt=self.id, is_moderated=False).order_by('id').first()
 
     def get_previous(self):
         if self.is_moderated:
             return self.parent.children.filter(is_moderated=True, asked_for_removal=False, is_folder=False,
                                                id__lt=self.id).order_by('id').last()
         else:
-            return Picture.objects.filter(id__lt=self.id, is_moderated=False, is_in_sas=True).order_by('-id').first()
+            return Picture.objects.filter(id__lt=self.id, is_moderated=False).order_by('-id').first()
 
 
 class Album(SithFile):
     class Meta:
         proxy = True
 
+    objects = SASAlbumManager()
+
     @property
     def children_pictures(self):
-        return Picture.objects.filter(parent=self, is_folder=False)
+        return Picture.objects.filter(parent=self)
 
     @property
     def children_albums(self):
-        return Album.objects.filter(parent=self, is_folder=True)
+        return Album.objects.filter(parent=self)
 
     def can_be_edited_by(self, user):
         # file = SithFile.objects.filter(id=self.id).first()

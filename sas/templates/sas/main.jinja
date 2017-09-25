@@ -10,7 +10,7 @@
 <div class="album">
     <div>
     {% if a.file %}
-    <img src="{{ a.as_picture.get_download_url() }}" alt="{% trans %}preview{% endtrans %}">
+    <img src="{{ a.get_download_url() }}" alt="{% trans %}preview{% endtrans %}">
     {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
     <img src="{{ a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() }}" alt="{% trans %}preview{% endtrans %}">
     {% else %}
