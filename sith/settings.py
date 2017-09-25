@@ -556,7 +556,7 @@ SITH_NOTIFICATIONS = [
     ('MAILING_MODERATION', _("A new mailing list needs to be moderated")),
     ('NEWS_MODERATION', _("There are %s fresh news to be moderated")),
     ('FILE_MODERATION', _("New files to be moderated")),
-    ('SAS_MODERATION', _("New pictures/album to be moderated in the SAS")),
+    ('SAS_MODERATION', _("There are %s pictures to be moderated in the SAS")),
     ('NEW_PICTURES', _("You've been identified on some pictures")),
     ('REFILLING', _("You just refilled of %s €")),
     ('SELLING', _("You just bought %s")),
@@ -568,6 +568,7 @@ SITH_NOTIFICATIONS = [
 # The callback must take the notif object as first and single argument.
 SITH_PERMANENT_NOTIFICATIONS = {
     'NEWS_MODERATION': 'com.models.news_notification_callback',
+    'SAS_MODERATION': 'sas.models.sas_notification_callback',
 }
 
 SITH_QUICK_NOTIF = {

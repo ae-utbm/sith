@@ -725,6 +725,10 @@ class SithFile(models.Model):
         super(SithFile, self).save(*args, **kwargs)
         if copy_rights:
             self.copy_rights()
+        if self.is_in_sas:
+            for u in RealGroup.objects.filter(id=settings.SITH_GROUP_SAS_ADMIN_ID).first().users.all():
+                Notification(user=u, url=reverse("sas:moderation"),
+                        type="SAS_MODERATION", param="1").save()
 
     def apply_rights_recursively(self, only_folders=False):
         children = self.children.all()

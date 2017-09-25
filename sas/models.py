@@ -26,6 +26,7 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from PIL import Image
 from io import BytesIO
@@ -162,6 +163,14 @@ class Album(SithFile):
             self.file.name = self.name + '/thumb.jpg'
             self.save()
 
+def sas_notification_callback(notif):
+    count = Picture.objects.filter(is_moderated=False).count()
+    if count:
+        notif.viewed = False
+        notif.param = "%s" % count
+        notif.date = timezone.now()
+    else:
+        notif.viewed = True
 
 class PeoplePictureRelation(models.Model):
     """
