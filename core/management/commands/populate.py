@@ -542,6 +542,12 @@ Welcome to the wiki page!
                 friday += timedelta(hours=6)
             friday.replace(hour=20, minute=0, second=0)
             # Event
+            n = News(title="Apero barman", summary="Viens boire un coup avec les barmans",
+                    content="Glou glou glou glou glou glou glou" , type="EVENT",
+                    club=bar_club, author=subscriber, is_moderated=True, moderator=skia)
+            n.save()
+            NewsDate(news=n, start_date=timezone.now()+timedelta(hours=70),
+                    end_date=timezone.now()+timedelta(hours=72)).save()
             n = News(title="Repas barman", summary="Enjoy la fin du semestre!",
                     content="Viens donc t'enjailler avec les autres barmans aux "
                     "frais du BdF! \o/", type="EVENT", club=bar_club,
@@ -549,6 +555,13 @@ Welcome to the wiki page!
             n.save()
             NewsDate(news=n, start_date=timezone.now()+timedelta(hours=72),
                     end_date=timezone.now()+timedelta(hours=84)).save()
+            n = News(title="Repas fromager", summary="Wien manger du l'bon fromeug'",
+                    content="Fô viendre mangey d'la bonne fondue!",
+                    type="EVENT", club=bar_club, author=subscriber,
+                    is_moderated=True, moderator=skia)
+            n.save()
+            NewsDate(news=n, start_date=timezone.now()+timedelta(hours=96),
+                    end_date=timezone.now()+timedelta(hours=100)).save()
             n = News(title="SdF", summary="Enjoy la fin des finaux!",
                     content="Viens faire la fête avec tout plein de gens!",
                     type="EVENT", club=bar_club, author=subscriber,

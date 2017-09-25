@@ -339,23 +339,42 @@ header {
       }
     }
   }
+
 /*---------------------------------NEWS--------------------------------*/
   #news {
-    section {
-      padding: 5px;
+    .news_column {
+      display: inline-block;
+      margin: 0px;
+      vertical-align: top;
     }
-    section.news_call, section.news_notice {
-      background: lightgrey;
-      margin: 2px;
+    #news_admin {
+      margin-bottom: 1em;
     }
-    section.news_event:nth-of-type(even) {
-      background: lightblue;
-    }
-    #agenda {
-      box-shadow: $black-color 2px 2px 2px;
-      display: block;
+    #right_column {
       width: 20%;
       float: right;
+    }
+    #left_column {
+      width: 79%;
+      h3 {
+        background: $second-color;
+        box-shadow: grey 2px 2px 2px;
+        padding: 0.4em;
+        margin: 0em 0em 0.5em 0em;
+        text-transform: uppercase;
+        font-size: 1.1em;
+        border: solid 1px black;
+        &:last-of-type {
+          margin: 2em 0em 1em 0em;
+        }
+      }
+    }
+
+/* AGENDA */
+    #agenda {
+      box-shadow: grey 2px 2px 2px;
+      display: block;
+      width: 100%;
       background: white;
       font-size: 70%;
       border: solid 1px $black-color;
@@ -368,7 +387,6 @@ header {
         text-transform: uppercase;
         border-bottom: solid 1px $black-color;
         background: $second-color;
-
       }
       #agenda_content {
         overflow: auto;
@@ -391,11 +409,136 @@ header {
         }
       }
     }
-    .news_weekly p {
-      margin: 0.2em;
+/* END AGENDA */
+
+/* EVENTS TODAY AND NEXT FEW DAYS */
+    .news_events_group {
+      border: solid 1px black;
+      box-shadow: grey 2px 2px 2px;
+      margin-left: 1em;
+      margin-bottom: 0.5em;
+      .news_events_group_date {
+        display: table-cell;
+        padding: 0.6em;
+        vertical-align: middle;
+        background: $primary-dark-color;
+        color: $white-color;
+        text-transform: uppercase;
+        text-align: center;
+        font-weight: bold;
+        font-family: monospace;
+        font-size: 1.4em;
+        div {
+          margin: 0px auto;
+          .day {
+            font-size: 1.5em;
+          }
+        }
+      }
+      .news_events_group_items {
+        display: table-cell;
+        width: 100%;
+        border-left: solid 1px black;
+        .news_event:nth-of-type(odd) {
+          background: white;
+        }
+        .news_event:nth-of-type(even) {
+          background: $primary-neutral-light-color;
+        }
+        .news_event {
+          display: block;
+          padding: 0.4em;
+          &:not(:last-child) {
+            border-bottom: 1px solid grey;
+          }
+          div {
+            margin: 0.2em;
+          }
+          h4 {
+            margin-top: 1em;
+            text-transform: uppercase;
+          }
+          .club_logo {
+            float: left;
+            width: 7em;
+            margin: 0em;
+            margin-right: 1em;
+            margin-bottom: 0.8em;
+            img {
+              max-height: 6em;
+              display: block;
+              margin: 0em auto;
+            }
+          }
+          .news_date {
+            font-size: 100%;
+          }
+          .news_content {
+            clear: left;
+          }
+        }
+      }
+    }
+/* END EVENTS TODAY AND NEXT FEW DAYS */
+
+/* COMING SOON */
+    .news_coming_soon {
+      display: list-item;
+      list-style-type: square;
+      list-style-position: inside;
+      margin-left: 1em;
+      padding-left: 0em;
+      a {
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+      .news_date {
+        font-size: 0.9em;
+      }
+    }
+/* END COMING SOON */
+
+/* NOTICES */
+    .news_notice {
+      margin: 0em 0em 1em 1em;
+      padding: 0.4em;
+      padding-left: 1em;
+      background: lightgrey;
+      border: 1px solid grey;
+      box-shadow: grey 2px 2px 2px;
+      h4 {
+        margin: 0em;
+      }
+      .news_content {
+        margin-left: 1em;
+      }
+    }
+/* END NOTICES */
+
+/* CALLS */
+    .news_call {
+      margin: 0em 0em 1em 1em;
+      padding: 0.4em;
+      padding-left: 1em;
+      background: $secondary-neutral-light-color;
+      border: 1px solid grey;
+      box-shadow: grey 2px 2px 2px;
+      h4 {
+        margin: 0em;
+      }
+      .news_date {
+        font-size: 0.9em;
+      }
+      .news_content {
+        margin-left: 1em;
+      }
+    }
+/* END CALLS */
+
+    .news_empty {
+      margin-left: 1em;
     }
     .news_date {
-      font-size: small;
       color: grey;
     }
   }
@@ -473,7 +616,7 @@ h6 {
 }
 
 p, pre {
-  margin-top: 1em;
+  margin-top: 0.8em;
   margin-left: 0px;
 }
 
