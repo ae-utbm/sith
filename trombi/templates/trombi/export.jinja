@@ -70,15 +70,20 @@
             <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_clubs'))">{% trans %}Copy clubs{% endtrans %}</button>
             {% endif %}
             <h4>{% trans %}Comments{% endtrans %}</h4>
-            <div id="user_{{ trombi_user.id }}_coms" style="text-align: left; word-wrap: break-word;">
-            {% for c in trombi_user.received_comments.filter(is_moderated=True) %}
-                <strong>{{ c.author.user.get_display_name() }}</strong><br>
-                {% for line in c.content.splitlines() %}
-                    {{ line }}<br>
+            <table id="user_{{ trombi_user.id }}_coms" style="text-align: left; word-wrap: break-word;">
+                <tbody>
+                {% for c in trombi_user.received_comments.filter(is_moderated=True) %}
+                    <tr>
+                        <td>{{ c.author.user.get_display_name() }}</td>
+                        <td>
+                        {% for line in c.content.splitlines() %}
+                            {{ line }}<br>
+                        {% endfor %}
+                        </td>
+                    </tr>
                 {% endfor %}
-                <br>
-            {% endfor %}
-            </div>
+                </tbody>
+            </table>
             <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_coms'))">{% trans %}Copy comments{% endtrans %}</button>
         </div>
     {% endfor %}
