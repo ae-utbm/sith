@@ -60,7 +60,7 @@ class Club(models.Model):
     )
     logo = models.ImageField(upload_to='club_logos', verbose_name=_('logo'), null=True, blank=True)
     is_active = models.BooleanField(_('is active'), default=True)
-    short_description = models.CharField(_('short description'), max_length=1000, blank=True)
+    short_description = models.CharField(_('short description'), max_length=1000, default='', blank=True, null=True)
     address = models.CharField(_('address'), max_length=254)
     # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
     owner_group = models.ForeignKey(Group, related_name="owned_club",
