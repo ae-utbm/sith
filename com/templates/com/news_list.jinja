@@ -36,6 +36,24 @@
           {% endfor %}
           </div>
       </div>
+
+      <div id="birthdays">
+        <div id="birthdays_title">{% trans %}Birthdays{% endtrans %}</div>
+        <div id="birthdays_content">
+          <ul class="birthdays_year">
+          {% for d in birthdays.dates('date_of_birth', 'year', 'DESC') %}
+          <li>
+              {% trans age=timezone.now().year - d.year %}{{ age }} year old{% endtrans %}
+              <ul>
+              {% for u in birthdays.filter(date_of_birth__year=d.year) %}
+                  <li><a href="{{ u.get_absolute_url() }}">{{ u.get_short_name() }}</a></li>
+              {% endfor %}
+              </ul>
+          </li>
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
     </div>
 
 

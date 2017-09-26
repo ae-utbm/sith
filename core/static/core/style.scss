@@ -364,21 +364,22 @@ header {
         text-transform: uppercase;
         font-size: 1.1em;
         border: solid 1px black;
-        &:last-of-type {
+        &:not(:first-of-type) {
           margin: 2em 0em 1em 0em;
         }
       }
     }
 
-/* AGENDA */
-    #agenda {
-      box-shadow: grey 2px 2px 2px;
+/* AGENDA/BIRTHDAYS */
+    #agenda,#birthdays {
       display: block;
       width: 100%;
       background: white;
+      box-shadow: grey 2px 2px 2px;
       font-size: 70%;
       border: solid 1px $black-color;
-      #agenda_title {
+      margin-bottom: 1em;
+      #agenda_title,#birthdays_title {
         margin: 0em;
         padding: 0.5em;
         font-weight: bold;
@@ -391,6 +392,8 @@ header {
       #agenda_content {
         overflow: auto;
         height: 20em;
+      }
+      #agenda_content,#birthdays_content {
         .agenda_item {
           padding: 0.5em;
           margin-bottom: 0.5em;
@@ -407,9 +410,27 @@ header {
             }
           }
         }
+        ul.birthdays_year {
+          margin: 0em;
+          list-style-type: none;
+          font-weight: bold;
+          >li {
+            padding: 0.5em;
+            &:nth-child(even) {
+              background: $secondary-neutral-light-color;
+            }
+          }
+          ul {
+            margin: 0em;
+            margin-left: 1em;
+            list-style-type: square;
+            list-style-position: inside;
+            font-weight: normal;
+          }
+        }
       }
     }
-/* END AGENDA */
+/* END AGENDA/BIRTHDAYS */
 
 /* EVENTS TODAY AND NEXT FEW DAYS */
     .news_events_group {

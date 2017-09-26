@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-25 18:37+0200\n"
+"POT-Creation-Date: 2017-09-26 13:32+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -367,11 +367,12 @@ msgstr "Compte en banque : "
 #: election/templates/election/election_detail.jinja:280
 #: election/templates/election/election_detail.jinja:330
 #: election/templates/election/election_detail.jinja:378
-#: forum/templates/forum/macros.jinja:21 forum/templates/forum/macros.jinja:123
+#: forum/templates/forum/macros.jinja:21
+#: forum/templates/forum/macros.jinja:123
 #: launderette/templates/launderette/launderette_admin.jinja:16
 #: launderette/views.py:182 sas/templates/sas/album.jinja:26
 #: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:74
-#: sas/templates/sas/picture.jinja.py:124
+#: sas/templates/sas/picture.jinja:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
 #: stock/templates/stock/stock_shopping_list.jinja:69
 #: trombi/templates/trombi/detail.jinja:35
@@ -966,7 +967,8 @@ msgstr "Cet email est déjà abonné à cette mailing"
 msgid "Unregistered user"
 msgstr "Désabonner un utilisateur"
 
-#: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:24
+#: club/templates/club/club_list.jinja:4
+#: club/templates/club/club_list.jinja:24
 msgid "Club list"
 msgstr "Liste des clubs"
 
@@ -1037,7 +1039,8 @@ msgstr "Au"
 msgid "Sellings"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja:9 club/templates/club/stats.jinja:19
+#: club/templates/club/club_sellings.jinja:9
+#: club/templates/club/stats.jinja:19
 #: counter/templates/counter/cash_summary_list.jinja:15
 msgid "Show"
 msgstr "Montrer"
@@ -1372,8 +1375,8 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:9
-#: com/templates/com/news_detail.jinja:5 com/templates/com/news_detail.jinja:11
-#: com/templates/com/news_list.jinja:4
+#: com/templates/com/news_detail.jinja:5
+#: com/templates/com/news_detail.jinja:11 com/templates/com/news_list.jinja:4
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1560,15 +1563,24 @@ msgstr "Administrer les news"
 msgid "Agenda"
 msgstr "Agenda"
 
-#: com/templates/com/news_list.jinja:63
+#: com/templates/com/news_list.jinja:41
+msgid "Birthdays"
+msgstr "Anniversaires"
+
+#: com/templates/com/news_list.jinja:46
+#, python-format
+msgid "%(age)s year old"
+msgstr "%(age)s ans"
+
+#: com/templates/com/news_list.jinja:85
 msgid "Events today and the next few days"
 msgstr "Événements aujourd'hui et dans les prochains jours"
 
-#: com/templates/com/news_list.jinja:96
+#: com/templates/com/news_list.jinja:123
 msgid "Nothing to come..."
 msgstr "Rien à venir..."
 
-#: com/templates/com/news_list.jinja:102
+#: com/templates/com/news_list.jinja:130
 msgid "Coming soon... don't miss!"
 msgstr "Prochainement... à ne pas rater!"
 
@@ -1700,15 +1712,15 @@ msgstr "Ce champ est obligatoire."
 msgid "You crazy? You can not finish an event before starting it."
 msgstr "T'es fou? Un événement ne peut pas finir avant même de commencer."
 
-#: com/views.py:326
+#: com/views.py:329
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour regénérer"
 
-#: com/views.py:334
+#: com/views.py:337
 msgid "Weekmail of the "
 msgstr "Weekmail du "
 
-#: com/views.py:414
+#: com/views.py:417
 msgid ""
 "You must be a board member of the selected club to post in the Weekmail."
 msgstr ""
@@ -2184,7 +2196,7 @@ msgstr "SAS"
 
 #: core/templates/core/base.jinja:149 forum/templates/forum/forum.jinja:10
 #: forum/templates/forum/last_unread.jinja:13
-#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
+#: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja:11
 #: forum/templates/forum/main.jinja:14 forum/templates/forum/reply.jinja:15
 #: forum/templates/forum/topic.jinja:30
 msgid "Forum"
@@ -2446,11 +2458,13 @@ msgstr "Partager sur Facebook"
 msgid "Tweet"
 msgstr "Tweeter"
 
-#: core/templates/core/macros.jinja:39 core/templates/core/user_detail.jinja:27
+#: core/templates/core/macros.jinja:39
+#: core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
 
-#: core/templates/core/macros.jinja:43 core/templates/core/user_detail.jinja:48
+#: core/templates/core/macros.jinja:43
+#: core/templates/core/user_detail.jinja:48
 msgid "Promo: "
 msgstr "Promo : "
 

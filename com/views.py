@@ -283,6 +283,10 @@ class NewsListView(CanViewMixin, ListView):
         kwargs = super(NewsListView, self).get_context_data(**kwargs)
         kwargs['NewsDate'] = NewsDate
         kwargs['timedelta'] = timedelta
+        kwargs['birthdays'] = User.objects\
+                .filter(date_of_birth__month=timezone.now().month, date_of_birth__day=timezone.now().day)\
+                .filter(role__in=['STUDENT', 'FORMER_STUDENT'])\
+                .order_by('-date_of_birth')
         return kwargs
 
 
