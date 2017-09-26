@@ -481,12 +481,13 @@ header {
           }
           .club_logo {
             float: left;
-            width: 7em;
+            min-width: 7em;
             margin: 0em;
             margin-right: 1em;
-            margin-bottom: 0.8em;
+            margin-top: 0.8em;
             img {
               max-height: 6em;
+              max-width: 8em;
               display: block;
               margin: 0em auto;
             }
