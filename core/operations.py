@@ -26,6 +26,10 @@ from django.db import connection, migrations
 
 
 class PsqlRunOnly(migrations.RunSQL):
+    """
+        Usefull for migrations with specific postgresql commands
+        Avoid breaking tests and local dev environnment
+    """
 
     def _run_sql(self, schema_editor, sqls):
         if connection.vendor == 'postgresql':

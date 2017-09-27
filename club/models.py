@@ -76,7 +76,7 @@ class Club(models.Model):
 
     @cached_property
     def president(self):
-        return self.members.filter(role=settings.SITH_CLUB_ROLES_ID['President'], start_date__lte=timezone.now()).first()
+        return self.members.filter(role=settings.SITH_CLUB_ROLES_ID['President'], end_date=None).first()
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
@@ -128,12 +128,10 @@ class Club(models.Model):
                 self.save()
         elif self.page and self.page.name != self.unix_name:
             self.page.unset_lock()
-            # self.page.set_lock(root)
             self.page.name = self.unix_name
             self.page.save(force_lock=True)
         elif self.page and self.parent and self.parent.page and self.page.parent != self.parent.page:
             self.page.unset_lock()
-            # self.page.set_lock(root)
             self.page.parent = self.parent.page
             self.page.save(force_lock=True)
 
