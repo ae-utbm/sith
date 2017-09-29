@@ -138,6 +138,9 @@ class Club(models.Model):
         """
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
 
+    def get_full_logo_url(self):
+        return "https://%s%s" % (settings.SITH_URL, self.logo.url)
+
     def can_be_edited_by(self, user):
         """
         Method to see if that object can be edited by the given user

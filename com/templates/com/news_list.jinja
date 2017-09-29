@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import tweet_quick, fb_quick %}
 
 {% block title %}
 {% trans %}News{% endtrans %}
@@ -112,7 +113,12 @@
                       <span>{{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
                       <span>{{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
                   </div>
-                  <div class="news_content">{{ news.summary|markdown }}</div>
+                  <div class="news_content">{{ news.summary|markdown }}
+                  <div class="button_bar">
+                    {{ fb_quick(news) }}
+                    {{ tweet_quick(news) }}
+                  </div>
+                  </div>
               </section>
               {% endfor %}
           </div>

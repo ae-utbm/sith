@@ -272,6 +272,7 @@ OLD_MYSQL_INFOS = {
 
 SITH_URL = "my.url.git.an"
 SITH_NAME = "Sith website"
+SITH_TWITTER = "@ae_utbm"
 
 # AE configuration
 SITH_MAIN_CLUB_ID = 1  # TODO: keep only that first setting, with the ID, and do the same for the other clubs

@@ -497,6 +497,15 @@ header {
           }
           .news_content {
             clear: left;
+            .button_bar {
+                text-align: right;
+              .fb {
+                  color: $faceblue;
+                }
+              .twitter {
+                color: $twitblue;
+              }
+            }
           }
         }
       }
@@ -566,36 +575,60 @@ header {
   }
 }
 
-.fb-share-button {
-  background: $faceblue;
-  border: none;
-  color: white;
-  padding: 0.5em 1em;
-  text-align: center;
-  text-decoration: none;
+#news_details {
   display: inline-block;
-  font-size: 16px;
-  border-radius: 2px;
-}
+  padding: 0.4em;
+  width: 80%;
+  background: $white-color;
+  h4 {
+    margin-top: 1em;
+    text-transform: uppercase;
+  }
+  .club_logo {
+    display: inline-block;
+    text-align: center;
+    width: 19%;
+    float: left;
+    min-width: 10em;
+    margin: 0em;
+    margin-right: 0.5em;
+    margin-top: 0.5em;
+    img {
+      max-height: 15em;
+      max-width: 12em;
+      display: block;
+      margin: 0em auto;
+    }
+  }
+  .share_button {
+    border: none;
+    color: white;
+    padding: 0.5em 1em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 2px;
+    float: right;
+    display: block;
+    margin-left: 0.3em;
+    &:hover {
+      color: lightgrey;
+    }
+  }
 
-.fb-share-button:hover {
-  color: lightgrey;
-}
+  .facebook {
+    background: $faceblue;
+  }
 
-.twitter-share-button {
-  background: $twitblue;
-  border: none;
-  color: white;
-  padding: 0.5em 1em;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  border-radius: 2px;
-}
+  .twitter {
+    background: $twitblue;
+  }
 
-.twitter-share-button:hover {
-  color: lightgrey;
+  .news_meta {
+    margin-top: 10em;
+    font-size: small;
+  }
 }
 
 .helptext {
