@@ -9,7 +9,14 @@
         <link rel="stylesheet" href="{{ static('core/jquery.datetimepicker.min.css') }}">
         <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
         <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
-        <link href="{{ scss('core/style.scss') }}" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="{{ scss('core/style.scss') }}">
+        {% if settings.DEBUG %}
+          <link rel="stylesheet" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}">
+        {% else %}
+          <noscript><link rel="stylesheet" href="https://use.fontawesome.com/775817bb35.css"></noscript>
+          <script src="https://use.fontawesome.com/c06c9c6980.js"></script>
+
+        {% endif %}
         {% endblock %}
     </head>
 
@@ -56,11 +63,11 @@
                     <li>
                     <a href="{{ url('counter:activity', counter_id=bar.id) }}" style="padding: 0px">
                     {% if bar.is_inactive(): %}
-                        <span style="color: orange">&#x3f;</span>
+                        <i class="fa fa-question" style="color: orange"></i>
                     {% elif bar.is_open(): %}
-                        <span style="color: green">&#x2713;</span>
+                        <i class="fa fa-check" style="color: green"></i>
                     {% else %}
-                        <span style="color: red">&#10007;</span>
+                        <i class="fa fa-times" style="color: red"></i>
                     {% endif %}
                         {{ bar }}
                     </a>
@@ -76,7 +83,7 @@
                       <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
                     </div>
                     <div>
-                      <a href="#" onclick="display_notif()">&#x1f514; ({{ user.notifications.filter(viewed=False).count() }})</a>
+                      <a href="#" onclick="display_notif()"><i class="fa fa-bell-o"></i> ({{ user.notifications.filter(viewed=False).count() }})</a>
                       <ul id="header_notif">
                           {% for n in user.notifications.filter(viewed=False).order_by('-date') %}
                           <li>

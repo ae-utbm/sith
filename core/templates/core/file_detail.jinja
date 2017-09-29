@@ -4,9 +4,9 @@
 {% block file %}
 <h3>
 {% if file.is_folder %}
-&#x1f4c1;
+<i class="fa fa-folder fa-3x" aria-hidden="true"></i>
 {% else %}
-&#128462;
+<i class="fa fa-file fa-3x" aria-hidden="true"></i>
 {% endif %}
 {{ file.get_display_name() }}
 </h3>
@@ -38,12 +38,12 @@
     {% endif %}
     <ul>
         {% for f in file.children.order_by('-is_folder', 'name').all() %}
-        <li>
+        <li style="list-style-type: none;">
             <input type="checkbox" name="file_list" value="{{ f.id }}">
             {% if f.is_folder %}
-            &#x1f4c1;
+                <i class="fa fa-folder" aria-hidden="true"></i>
             {% else %}
-            &#128462;
+                <i class="fa fa-file" aria-hidden="true"></i>
             {% endif %}
             <a href="{{ url('core:file_detail', file_id=f.id, popup=popup) }}">{{ f.get_display_name() }}</a></li>
         {% endfor %}
