@@ -6,10 +6,10 @@
 		{% if club.logo %}
 			<div class="club_logo"><img src="{{ club.logo.url }}" alt="{{ club.unix_name }}"></div>
 		{% endif %}
-	    {% if club.page and club.page.revisions.exists() %}
-	        {{ club.page.revisions.last().content|markdown }}
-	    {% else %}
-	    <h3>{% trans %}Club{% endtrans %}</h3>
+		{% if page_revision %}
+			{{ page_revision|markdown }}
+ 		{% else %}
+ 		<h3>{% trans %}Club{% endtrans %}</h3>
 	    {% endif %}
     </div>
 {% endblock %}

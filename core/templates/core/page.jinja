@@ -26,7 +26,7 @@
     <div class="tools">
         {% if page %}
         {% if page.club %}
-        <a href="{{ url('club:club_view', club_id=page.club.id) }}">{% trans %}Infos{% endtrans %}</a>
+        <a href="{{ url('club:club_view', club_id=page.club.id) }}">{% trans %}Return to club management{% endtrans %}</a>
         {% else %}
         <a href="{{ url('core:page', page.get_full_name()) }}">{% trans %}View{% endtrans %}</a>
         {% endif %}

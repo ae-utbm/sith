@@ -103,6 +103,7 @@ class Command(BaseCommand):
         launderette_club = Club(id=84, name=settings.SITH_LAUNDERETTE_MANAGER['name'],
                                 unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name'],
                                 address=settings.SITH_LAUNDERETTE_MANAGER['address'])
+
         launderette_club.save()
         self.reset_index("club")
         for b in settings.SITH_COUNTER_BARS:

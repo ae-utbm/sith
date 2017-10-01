@@ -28,7 +28,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView, CreateView
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -37,12 +37,12 @@ from ajax_select.fields import AutoCompleteSelectField
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, PageEditViewBase
 from core.views.forms import SelectDate, SelectDateTime
 from club.models import Club, Membership, Mailing, MailingSubscription
 from sith.settings import SITH_MAXIMUM_FREE_ROLE
 from counter.models import Selling, Counter
-from core.models import User
+from core.models import User, PageRev
 
 from django.conf import settings
 
@@ -86,6 +86,8 @@ class MailingSubscriptionForm(forms.ModelForm):
 
 class ClubTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
+        if isinstance(self.object, PageRev):
+            self.object = self.object.page.club
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
@@ -106,6 +108,12 @@ class ClubTabsMixin(TabedViewMixin):
                 'slug': 'elderlies',
                         'name': _("Old members"),
             })
+        if self.object.page:
+            tab_list.append({
+                'url': reverse('club:club_hist', kwargs={'club_id': self.object.id}),
+                'slug': 'history',
+                        'name': _("History"),
+            })
         if self.request.user.can_edit(self.object):
             tab_list.append({
                 'url': reverse('club:tools', kwargs={'club_id': self.object.id}),
@@ -117,7 +125,7 @@ class ClubTabsMixin(TabedViewMixin):
                 'slug': 'edit',
                         'name': _("Edit"),
             })
-            if self.object.page:
+            if self.object.page and self.request.user.can_edit(self.object.page):
                 tab_list.append({
                     'url': reverse('core:page_edit', kwargs={'page_name': self.object.page.get_full_name()}),
                     'slug': 'page_edit',
@@ -158,6 +166,55 @@ class ClubView(ClubTabsMixin, DetailView):
     pk_url_kwarg = "club_id"
     template_name = 'club/club_detail.jinja'
     current_tab = "infos"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubView, self).get_context_data(**kwargs)
+        if self.object.page and self.object.page.revisions.exists():
+            kwargs['page_revision'] = self.object.page.revisions.last().content
+        return kwargs
+
+
+class ClubRevView(ClubView):
+    """
+    Display a specific page revision
+    """
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        self.revision = get_object_or_404(PageRev, pk=kwargs['rev_id'], page__club=obj)
+        return super(ClubRevView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubRevView, self).get_context_data(**kwargs)
+        kwargs['page_revision'] = self.revision.content
+        return kwargs
+
+
+class ClubPageEditView(ClubTabsMixin, PageEditViewBase):
+    template_name = 'club/pagerev_edit.jinja'
+    current_tab = "page_edit"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.club = get_object_or_404(Club, pk=kwargs['club_id'])
+        if not self.club.page:
+            raise Http404
+        return super(ClubPageEditView, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        self.page = self.club.page
+        return self._get_revision()
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('club:club_view', kwargs={'club_id': self.club.id})
+
+
+class ClubPageHistView(ClubTabsMixin, CanViewMixin, DetailView):
+    """
+    Modification hostory of the page
+    """
+    model = Club
+    pk_url_kwarg = "club_id"
+    template_name = 'club/page_history.jinja'
+    current_tab = "history"
 
 
 class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
