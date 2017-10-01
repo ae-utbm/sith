@@ -24,7 +24,7 @@
 #
 
 from django import forms
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, View
 from django.views.generic.edit import DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView, CreateView
@@ -35,7 +35,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _t
 from ajax_select.fields import AutoCompleteSelectField
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, PageEditViewBase
 from core.views.forms import SelectDate, SelectDateTime
@@ -562,3 +562,33 @@ class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('club:mailing', kwargs={'club_id': self.club_id})
+
+class MailingAutoGenerationView(View):
+
+    def dispatch(self, request, *args, **kwargs):
+        self.mailing = get_object_or_404(Mailing, pk=kwargs['mailing_id'])
+        if not request.user.can_edit(self.mailing):
+            raise PermissionDenied
+        return super(MailingAutoGenerationView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        club = self.mailing.club
+        already_subscribed = [sub.user for sub in self.mailing.subscriptions.all()]
+        members = club.members.filter(role__gte=settings.SITH_CLUB_ROLES_ID['Board member'])
+        members = members.exclude(user__in=already_subscribed)
+        for member in members.all():
+            MailingSubscription(user=member.user, mailing=self.mailing).save()
+        return redirect('club:mailing', club_id=club.id)
+
+class MailingAutoCleanView(View):
+
+    def dispatch(self, request, *args, **kwargs):
+        self.mailing = get_object_or_404(Mailing, pk=kwargs['mailing_id'])
+        if not request.user.can_edit(self.mailing):
+            raise PermissionDenied
+        return super(MailingAutoCleanView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        for sub in self.mailing.subscriptions.all():
+            sub.delete()
+        return redirect('club:mailing', club_id=self.mailing.club.id)

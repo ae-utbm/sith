@@ -16,6 +16,12 @@
         <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a>
         {%- endif -%}
     </h2>
+    <form method="GET" action="{{ url('club:mailing_generate', mailing_id=mailing.id) }}" style="display:inline-block;">
+        <input type="submit" name="generateMalingList" value="{% trans %}Generate mailing list{% endtrans %}">
+    </form>
+    <form method="GET" action="{{ url('club:mailing_clean', mailing_id=mailing.id) }}" style="display:inline-block;">
+        <input type="submit" name="cleanMailingList" value="{% trans %}Clean mailing list{% endtrans %}">
+    </form>
     <hr>
     <table>
         <tr>
