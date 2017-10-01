@@ -272,28 +272,30 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
             form.instance = Membership(club=self.object, user=self.request.user)
         if not self.request.user.is_root:
             form.fields.pop('start_date', None)
-        # form.initial = {'user': self.request.user}
-        # form._user = self.request.user
         return form
 
-    def post(self, request, *args, **kwargs):
+    def form_valid(self, form):
         """
             Check user rights
         """
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            ms = self.object.get_membership_for(request.user)
-            if (form.cleaned_data['role'] <= SITH_MAXIMUM_FREE_ROLE or
-                (ms is not None and ms.role >= form.cleaned_data['role']) or
-                request.user.is_board_member or
-                    request.user.is_root):
-                return self.form_valid(form)
-            else:
-                form.add_error(None, _("You do not have the permission to do that"))
-                return self.form_invalid(form)
+        user = self.request.user
+        ms = self.object.get_membership_for(user)
+        if (form.cleaned_data['role'] <= SITH_MAXIMUM_FREE_ROLE or
+            (ms is not None and ms.role >= form.cleaned_data['role']) or
+            user.is_board_member or user.is_root):
+            form.save()
+            form = self.form_class()
+            return super(ModelFormMixin, self).form_valid(form)
         else:
+            form.add_error(None, _("You do not have the permission to do that"))
             return self.form_invalid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.request = request
+        return super(ClubMembersView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('club:club_members', kwargs={'club_id': self.club.id})
 
 
 class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
