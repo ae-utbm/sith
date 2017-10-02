@@ -563,6 +563,7 @@ class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):
     def get_success_url(self, **kwargs):
         return reverse_lazy('club:mailing', kwargs={'club_id': self.club_id})
 
+
 class MailingAutoGenerationView(View):
 
     def dispatch(self, request, *args, **kwargs):
@@ -573,12 +574,12 @@ class MailingAutoGenerationView(View):
 
     def get(self, request, *args, **kwargs):
         club = self.mailing.club
-        already_subscribed = [sub.user for sub in self.mailing.subscriptions.all()]
-        members = club.members.filter(role__gte=settings.SITH_CLUB_ROLES_ID['Board member'])
-        members = members.exclude(user__in=already_subscribed)
+        self.mailing.subscriptions.all().delete()
+        members = club.members.filter(role__gte=settings.SITH_CLUB_ROLES_ID['Board member']).exclude(end_date__lte=timezone.now())
         for member in members.all():
             MailingSubscription(user=member.user, mailing=self.mailing).save()
         return redirect('club:mailing', club_id=club.id)
+
 
 class MailingAutoCleanView(View):
 
@@ -589,6 +590,5 @@ class MailingAutoCleanView(View):
         return super(MailingAutoCleanView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        for sub in self.mailing.subscriptions.all():
-            sub.delete()
+        self.mailing.subscriptions.all().delete()
         return redirect('club:mailing', club_id=self.mailing.club.id)

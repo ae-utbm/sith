@@ -347,8 +347,14 @@ class MailingSubscription(models.Model):
     def can_be_edited_by(self, user):
         return (self.user is not None and user.id == self.user.id)
 
+    @property
+    def get_email(self):
+        if self.user and not self.email:
+            return self.user.email
+        return self.email
+
     def fetch_format(self):
-        return self.email + ' '
+        return self.get_email + ' '
 
     def __str__(self):
         if self.user:

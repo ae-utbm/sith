@@ -35,7 +35,7 @@
             {% else %}
             <td>{% trans %}Unregistered user{% endtrans %}</td>
             {% endif %}
-            <td>{{ subscriber.email }}</td>
+            <td>{{ subscriber.get_email }}</td>
             <td><a href="{{ url('club:mailing_subscription_delete', mailing_subscription_id=subscriber.id) }}">{% trans %}Delete{% endtrans %}</a></td>
         </tr>
         {% endfor %}
