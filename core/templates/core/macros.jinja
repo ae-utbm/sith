@@ -12,17 +12,43 @@
 </a>
 {%- endmacro %}
 
+{% macro link_news_logo(news) -%}
+    {% if news.club.logo -%}
+        {{ news.club.logo.url }}
+    {% else -%}
+        {{ static("com/img/news.png") }}
+    {% endif %}
+{%- endmacro %}
+
+{% macro gen_news_metatags(news) -%}
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="{{ settings.SITH_TWITTER }}" />
+<meta name="twitter:creator" content= "{{ settings.SITH_TWITTER }}" />
+<meta property="og:url"                content="{{ news.get_full_url() }}" />
+<meta property="og:type"               content="article" />
+<meta property="og:title"              content="{{ news.title }}" />
+<meta property="og:description"        content="{{ news.summary }}" />
+<meta property="og:image"              content="{{ "https://%s%s" % (settings.SITH_URL, link_news_logo(news)) }}" />
+{%- endmacro %}
+
 {% macro facebook_share(news) -%}
-<a rel="nofollow" target="#" class="fb-share-button" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}">{% trans %}Share on Facebook{% endtrans %}</a>
+<a rel="nofollow" target="#" class="share_button facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}">{% trans %}Share on Facebook{% endtrans %}</a>
 {%- endmacro %}
 
 {% macro tweet(news) -%}
-<a rel="nofollow" target="#" class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}">{% trans %}Tweet{% endtrans %}</a>
+<a rel="nofollow" target="#" class="share_button twitter" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}">{% trans %}Tweet{% endtrans %}</a>
+{%- endmacro %}
+
+{% macro fb_quick(news) -%}
+<a rel="nofollow" target="#" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}" class="fb fa fa-facebook-square fa-2x"></a>
+{%- endmacro %}
+
+{% macro tweet_quick(news) -%}
+<a rel="nofollow" target="#" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}" class="twitter fa fa-twitter-square fa-2x"></a>
 {%- endmacro %}
 
 {% macro user_mini_profile(user) %}
 <div id="user_profile">
-
     <div id="right_column">
         <div id="pictures">
             {% if user.profile_pict %}
