@@ -91,8 +91,8 @@ header {
   width: 90%;
   margin: 0px auto;
   display: flex;
-  box-shadow: black 1px 1px 5px;
-  border: solid 1px $black-color;
+  box-shadow: grey 1px 1px 5px;
+  border: solid 1px grey;
   border-top: none;
   background-color: $primary-neutral-dark-color;
 
@@ -178,7 +178,7 @@ header {
         width: 22em;
         overflow: auto;
         list-style-type: none;
-        box-shadow: black 1px 1px 5px;
+        box-shadow: grey 1px 1px 5px;
         background: white;
         text-align: left;
         font-size: 80%;
@@ -239,7 +239,7 @@ header {
     min-width: 10%;
     max-width: 46%;
     min-height: 20px;
-    box-shadow: black 1px 1px 5px;
+    box-shadow: grey 1px 1px 5px;
     &:before {
       float: left;
       margin: 0.2em;
@@ -250,27 +250,33 @@ header {
     }
   }
   #info_box {
-    border: solid 1px $black-color;
+    border: solid 1px grey;
     background: $white-color;
     &:before {
-      content: url('img/info.png');
+      font-family: FontAwesome;
+      font-size: 4em;
+      content: "\f05a";
+      color: darkblue;
     }
   }
   #alert_box {
-    border: solid 1px $black-color;
+    border: solid 1px grey;
     background: $second-color;
     &:before {
-      content: url('img/warning.png');
+      font-family: FontAwesome;
+      font-size: 4em;
+      content: "\f06a";
+      color: $white-color;
     }
   }
 }
 
 
 #page {
-  box-shadow: black 1px 1px 5px;
+  box-shadow: grey 1px 1px 5px;
   width: 90%;
   margin: 0em auto;
-  border: solid 1px $black-color;
+  border: solid 1px grey;
 
 /*---------------------------------NAV---------------------------------*/
   nav {
@@ -363,7 +369,7 @@ header {
         margin: 0em 0em 0.5em 0em;
         text-transform: uppercase;
         font-size: 1.1em;
-        border: solid 1px black;
+        border: solid 1px grey;
         &:not(:first-of-type) {
           margin: 2em 0em 1em 0em;
         }
@@ -377,7 +383,7 @@ header {
       background: white;
       box-shadow: grey 2px 2px 2px;
       font-size: 70%;
-      border: solid 1px $black-color;
+      border: solid 1px grey;
       margin-bottom: 1em;
       #agenda_title,#birthdays_title {
         margin: 0em;
@@ -386,7 +392,7 @@ header {
         font-size: 150%;
         text-align: center;
         text-transform: uppercase;
-        border-bottom: solid 1px $black-color;
+        border-bottom: solid 1px grey;
         background: $second-color;
       }
       #agenda_content {
@@ -434,7 +440,7 @@ header {
 
 /* EVENTS TODAY AND NEXT FEW DAYS */
     .news_events_group {
-      border: solid 1px black;
+      border: solid 1px grey;
       box-shadow: grey 2px 2px 2px;
       margin-left: 1em;
       margin-bottom: 0.5em;
@@ -459,7 +465,7 @@ header {
       .news_events_group_items {
         display: table-cell;
         width: 100%;
-        border-left: solid 1px black;
+        border-left: solid 1px grey;
         .news_event:nth-of-type(odd) {
           background: white;
         }
@@ -1099,8 +1105,8 @@ footer {
     color: $white-color;
     display: flex;
     background-color: $primary-neutral-dark-color;
-    box-shadow: black 1px 1px 5px;
-    border: solid 1px $black-color;
+    box-shadow: grey 1px 1px 5px;
+    border: solid 1px grey;
     a {
       padding: 0.8em;
       flex: 1;
