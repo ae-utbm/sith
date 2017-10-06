@@ -214,7 +214,7 @@ class PageEditView(PageEditViewBase):
 
     def dispatch(self, request, *args, **kwargs):
         res = super(PageEditView, self).dispatch(request, *args, **kwargs)
-        if self.object.page.need_club_redirection:
+        if self.object and self.object.page.need_club_redirection:
             return redirect('club:club_edit_page', club_id=self.object.page.club.id)
         return res
 
