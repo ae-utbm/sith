@@ -40,7 +40,7 @@
 <hr>
 <h4>{% trans %}All categories{% endtrans %}</h4>
 <div>
-    {% for a in root_file.children.filter(is_folder=True).order_by('date') %}
+    {% for a in categories %}
         {{ display_album(a) }}
     {% endfor %}
 </div>

@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^album/(?P<album_id>[0-9]+)$', AlbumView.as_view(), name='album'),
     url(r'^album/(?P<album_id>[0-9]+)/upload$', AlbumUploadView.as_view(), name='album_upload'),
     url(r'^album/(?P<album_id>[0-9]+)/edit$', AlbumEditView.as_view(), name='album_edit'),
+    url(r'^album/(?P<album_id>[0-9]+)/preview$', send_album, name='album_preview'),
     url(r'^picture/(?P<picture_id>[0-9]+)$', PictureView.as_view(), name='picture'),
     url(r'^picture/(?P<picture_id>[0-9]+)/edit$', PictureEditView.as_view(), name='picture_edit'),
     url(r'^picture/(?P<picture_id>[0-9]+)/download$', send_pict, name='download'),

@@ -99,8 +99,8 @@ class SASMainView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(SASMainView, self).get_context_data(**kwargs)
-        kwargs['root_file'] = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
-        kwargs['latest'] = SithFile.objects.filter(is_in_sas=True, is_folder=True, is_moderated=True).order_by('-id')[:5]
+        kwargs['categories'] = Album.objects.filter(parent__id=settings.SITH_SAS_ROOT_DIR_ID).order_by('date')
+        kwargs['latest'] = Album.objects.filter(is_moderated=True).order_by('-id')[:5]
         return kwargs
 
 
@@ -158,6 +158,9 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
     def get_success_url(self):
         return reverse('sas:picture', kwargs={'picture_id': self.object.id})
 
+
+def send_album(request, album_id):
+    return send_file(request, album_id, Album)
 
 def send_pict(request, picture_id):
     return send_file(request, picture_id, Picture)

@@ -153,7 +153,7 @@ class Album(SithFile):
         return reverse('sas:album', kwargs={'album_id': self.id})
 
     def get_download_url(self):
-        return reverse('sas:download', kwargs={'picture_id': self.id})
+        return reverse('sas:album_preview', kwargs={'album_id': self.id})
 
     def generate_thumbnail(self):
         p = self.children_pictures.order_by('?').first() or self.children_albums.exclude(file=None).exclude(file="").order_by('?').first()
