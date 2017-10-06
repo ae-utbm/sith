@@ -23,6 +23,8 @@
 #
 #
 
+import phonenumbers
+
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
@@ -38,6 +40,18 @@ register = template.Library()
 def markdown(text):
     return mark_safe("<div class=\"markdown\">%s</div>" % md(text))
 
+@register.filter(name='phonenumber')
+def phonenumber(value, country='FR',
+        format=phonenumbers.PhoneNumberFormat.NATIONAL):
+    """
+    This filter is kindly borrowed from https://github.com/foundertherapy/django-phonenumber-filter
+    """
+    value = str(value)
+    try:
+        parsed = phonenumbers.parse(value, country)
+        return phonenumbers.format_number(parsed, format)
+    except phonenumbers.NumberParseException as e:
+        return value
 
 @register.filter()
 @stringfilter

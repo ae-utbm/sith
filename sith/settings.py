@@ -139,6 +139,7 @@ TEMPLATES = [
             ],
             "filters": {
                 "markdown": "core.templatetags.renderer.markdown",
+                "phonenumber": "core.templatetags.renderer.phonenumber",
             },
             "globals": {
                 "can_edit_prop": "core.views.can_edit_prop",
