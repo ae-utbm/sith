@@ -15,9 +15,9 @@
                 {{ trombi_user.user.get_display_name() }}<br>
                 {{ trombi_user.user.department }}/{{ trombi_user.user.dpt_option }}<br>
                 {% trans %}Quote: {% endtrans %}{{ trombi_user.user.quote }}<br>
-                {% trans %}Date of birth: {% endtrans %}{{ trombi_user.user.date_of_birth|date("d/m/Y") }}<br>
+                {% trans %}Date of birth: {% endtrans %}{{ trombi_user.user.date_of_birth|date("d F Y") }}<br>
                 {% trans %}Email: {% endtrans %}{{ trombi_user.user.second_email }}<br>
-                {% trans %}Phone: {% endtrans %}{{ trombi_user.user.phone }}<br>
+                {% trans %}Phone: {% endtrans %}{{ trombi_user.user.phone|phonenumber }}<br>
                 {% trans %}City: {% endtrans %}{{ trombi_user.user.parent_address }}<br>
             </div>
             <button onclick="copyToClipboard(document.getElementById('user_{{ trombi_user.id }}_infos'))">{% trans %}Copy{% endtrans %}</button>
@@ -54,15 +54,13 @@
                     <tr>
                         <td>{% trans %}Club{% endtrans %}</td>
                         <td>{% trans %}Role{% endtrans %}</td>
-                        <td>{% trans %}Date{% endtrans %}</td>
                     </tr>
                 </thead>
                 <tbody>
                     {% for m in trombi_user.memberships.all() %}
                     <tr>
                         <td>{{ m.club }}</td>
-                        <td>{{ m.role }}</td>
-                        <td>{{ m.start }} - {{ m.end }}</td>
+                        <td>{{ m.start }} - {{ m.end }} ({{ m.role }})</td>
                     </tr>
                     {% endfor %}
                 </tbody>
