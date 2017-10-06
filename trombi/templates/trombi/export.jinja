@@ -74,7 +74,7 @@
                 <tbody>
                 {% for c in trombi_user.received_comments.filter(is_moderated=True) %}
                     <tr>
-                        <td>{{ c.author.user.get_display_name() }}</td>
+                        <td>{{ c.author.user.get_short_name() }}</td>
                         <td>
                         {% for line in c.content.splitlines() %}
                             {{ line }}<br>
