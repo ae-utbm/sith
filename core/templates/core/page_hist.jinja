@@ -1,23 +1,10 @@
 {% extends "core/page.jinja" %}
 
-{% from "core/macros.jinja" import user_profile_link %}
+{% from "core/macros_pages.jinja" import page_history %}
 
 {% block page %}
     <h3>{% trans %}Page history{% endtrans %}</h3>
-<p>{% trans page_name=page.name %}You're seeing the history of page "{{ page_name }}"{% endtrans %}</p>
-<ul>
-{% for r in (page.revisions.all()|sort(attribute='date', reverse=True)) %}
-    {% if loop.index < 2 %}
-    <li><a href="{{ url('core:page', page_name=page.get_full_name()) }}">{% trans %}last{% endtrans %}</a> -
-    {{ user_profile_link(page.revisions.last().author) }} -
-    {{ page.revisions.last().date|localtime|date(DATETIME_FORMAT) }} {{ page.revisions.last().date|localtime|time(DATETIME_FORMAT) }}</a></li>
-    {% else %}
-    <li><a href="{{ url('core:page_rev', page_name=page.get_full_name(), rev=r['id']) }}">{{ r.revision }}</a> -
-    {{ user_profile_link(r.author) }} -
-    {{ r.date|localtime|date(DATETIME_FORMAT) }} {{ r.date|localtime|time(DATETIME_FORMAT) }}</a></li>
-    {% endif %}
-{% endfor %}
-</ul>
+{{ page_history(page) }}
 {% endblock %}
 
 

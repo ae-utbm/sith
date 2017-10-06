@@ -1,4 +1,4 @@
-{% extends "core/page.jinja" %}
+{% extends "core/base.jinja" %}
 {% from 'core/macros_pages.jinja' import markdown_preview_script, page_edit_form %}
 
 {% block head %}
@@ -6,8 +6,8 @@
 {{ markdown_preview_script(csrf_token) }}
 {% endblock %}
 
-{% block page %}
-{{ page_edit_form(page, form, url('core:page_edit', page_name=page.get_full_name()), csrf_token) }}
+{% block content %}
+{{ page_edit_form(page, form, url('club:club_edit_page', club_id=page.club.id), csrf_token) }}
 {% endblock %}
 
 

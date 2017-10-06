@@ -27,11 +27,21 @@ from django.core.urlresolvers import reverse_lazy
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.forms.models import modelform_factory
-from django.forms import CheckboxSelectMultiple
+from django.http import Http404
+from django.shortcuts import redirect
 
 from core.models import Page, PageRev, LockError
-from core.views.forms import MarkdownInput
+from core.views.forms import MarkdownInput, PageForm, PagePropForm
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+
+
+class CanEditPagePropMixin(CanEditPropMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+        res = super(CanEditPagePropMixin, self).dispatch(request, *args, **kwargs)
+        if self.object.is_club_page:
+            raise Http404
+        return res
 
 
 class PageListView(CanViewMixin, ListView):
@@ -42,6 +52,12 @@ class PageListView(CanViewMixin, ListView):
 class PageView(CanViewMixin, DetailView):
     model = Page
     template_name = 'core/page_detail.jinja'
+
+    def dispatch(self, request, *args, **kwargs):
+        res = super(PageView, self).dispatch(request, *args, **kwargs)
+        if self.object and self.object.need_club_redirection:
+            return redirect('club:club_view', club_id=self.object.club.id)
+        return res
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
@@ -58,6 +74,12 @@ class PageHistView(CanViewMixin, DetailView):
     model = Page
     template_name = 'core/page_hist.jinja'
 
+    def dispatch(self, request, *args, **kwargs):
+        res = super(PageHistView, self).dispatch(request, *args, **kwargs)
+        if self.object.need_club_redirection:
+            return redirect('club:club_hist', club_id=self.object.club.id)
+        return res
+
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
         return self.page
@@ -66,6 +88,12 @@ class PageHistView(CanViewMixin, DetailView):
 class PageRevView(CanViewMixin, DetailView):
     model = Page
     template_name = 'core/page_detail.jinja'
+
+    def dispatch(self, request, *args, **kwargs):
+        res = super(PageRevView, self).dispatch(request, *args, **kwargs)
+        if self.object.need_club_redirection:
+            return redirect('club:club_view_rev', club_id=self.object.club.id, rev_id=kwargs['rev'])
+        return res
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
@@ -88,12 +116,7 @@ class PageRevView(CanViewMixin, DetailView):
 
 class PageCreateView(CanCreateMixin, CreateView):
     model = Page
-    form_class = modelform_factory(Page,
-                                   fields=['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
-                                   widgets={
-                                       'edit_groups': CheckboxSelectMultiple,
-                                       'view_groups': CheckboxSelectMultiple,
-                                   })
+    form_class = PageForm
     template_name = 'core/page_prop.jinja'
 
     def get_initial(self):
@@ -118,14 +141,9 @@ class PageCreateView(CanCreateMixin, CreateView):
         return ret
 
 
-class PagePropView(CanEditPropMixin, UpdateView):
+class PagePropView(CanEditPagePropMixin, UpdateView):
     model = Page
-    form_class = modelform_factory(Page,
-                                   fields=['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ],
-                                   widgets={
-                                       'edit_groups': CheckboxSelectMultiple,
-                                       'view_groups': CheckboxSelectMultiple,
-                                   })
+    form_class = PagePropForm
     template_name = 'core/page_prop.jinja'
     slug_field = '_full_name'
     slug_url_kwarg = 'page_name'
@@ -149,17 +167,20 @@ class PagePropView(CanEditPropMixin, UpdateView):
         return self.page
 
 
-class PageEditView(CanEditMixin, UpdateView):
+class PageEditViewBase(CanEditMixin, UpdateView):
     model = PageRev
     form_class = modelform_factory(model=PageRev, fields=['title', 'content', ], widgets={'content': MarkdownInput})
     template_name = 'core/pagerev_edit.jinja'
 
     def get_object(self):
         self.page = Page.get_page_by_full_name(self.kwargs['page_name'])
+        return self._get_revision()
+
+    def _get_revision(self):
         if self.page is not None:
             # First edit
             if self.page.revisions.all() is None:
-                rev = PageRev(author=request.user)
+                rev = PageRev(author=self.request.user)
                 rev.save()
                 self.page.revisions.add(rev)
             try:
@@ -170,7 +191,7 @@ class PageEditView(CanEditMixin, UpdateView):
         return None
 
     def get_context_data(self, **kwargs):
-        context = super(PageEditView, self).get_context_data(**kwargs)
+        context = super(PageEditViewBase, self).get_context_data(**kwargs)
         if self.page is not None:
             context['page'] = self.page
         else:
@@ -186,10 +207,19 @@ class PageEditView(CanEditMixin, UpdateView):
         new_rev.author = self.request.user
         new_rev.page = self.page
         form.instance = new_rev
-        return super(PageEditView, self).form_valid(form)
+        return super(PageEditViewBase, self).form_valid(form)
 
 
-class PageDeleteView(CanEditPropMixin, DeleteView):
+class PageEditView(PageEditViewBase):
+
+    def dispatch(self, request, *args, **kwargs):
+        res = super(PageEditView, self).dispatch(request, *args, **kwargs)
+        if self.object.page.need_club_redirection:
+            return redirect('club:club_edit_page', club_id=self.object.page.club.id)
+        return res
+
+
+class PageDeleteView(CanEditPagePropMixin, DeleteView):
     model = Page
     template_name = 'core/delete_confirm.jinja'
     pk_url_kwarg = 'page_id'

@@ -32,11 +32,12 @@ from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.core.validators import RegexValidator, validate_email
+from django.utils.functional import cached_property
 
-from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification
-
+from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification, Page
 
 # Create your models here.
+
 
 class Club(models.Model):
     """
@@ -58,6 +59,8 @@ class Club(models.Model):
     },
     )
     logo = models.ImageField(upload_to='club_logos', verbose_name=_('logo'), null=True, blank=True)
+    is_active = models.BooleanField(_('is active'), default=True)
+    short_description = models.CharField(_('short description'), max_length=1000, default='', blank=True, null=True)
     address = models.CharField(_('address'), max_length=254)
     # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
     owner_group = models.ForeignKey(Group, related_name="owned_club",
@@ -66,9 +69,14 @@ class Club(models.Model):
     view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
     home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True,
                                 on_delete=models.SET_NULL)
+    page = models.OneToOneField(Page, related_name="club", blank=True, null=True)
 
     class Meta:
         ordering = ['name', 'unix_name']
+
+    @cached_property
+    def president(self):
+        return self.members.filter(role=settings.SITH_CLUB_ROLES_ID['President'], end_date=None).first()
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list"""
@@ -102,6 +110,31 @@ class Club(models.Model):
                 self.home = home
                 self.save()
 
+    def make_page(self):
+        root = User.objects.filter(username="root").first()
+        if not self.page:
+            club_root = Page.objects.filter(name=settings.SITH_CLUB_ROOT_PAGE).first()
+            if root and club_root:
+                public = Group.objects.filter(id=settings.SITH_GROUP_PUBLIC_ID).first()
+                p = Page(name=self.unix_name)
+                p.parent = club_root
+                p.save(force_lock=True)
+                if public:
+                    p.view_groups.add(public)
+                p.save(force_lock=True)
+                if self.parent and self.parent.page:
+                    p.parent = self.parent.page
+                self.page = p
+                self.save()
+        elif self.page and self.page.name != self.unix_name:
+            self.page.unset_lock()
+            self.page.name = self.unix_name
+            self.page.save(force_lock=True)
+        elif self.page and self.parent and self.parent.page and self.page.parent != self.parent.page:
+            self.page.unset_lock()
+            self.page.parent = self.parent.page
+            self.page.save(force_lock=True)
+
     def save(self, *args, **kwargs):
         with transaction.atomic():
             creation = False
@@ -122,6 +155,7 @@ class Club(models.Model):
                 self.home.edit_groups = [board]
                 self.home.view_groups = [member, subscribers]
                 self.home.save()
+            self.make_page()
 
     def __str__(self):
         return self.name
@@ -313,8 +347,14 @@ class MailingSubscription(models.Model):
     def can_be_edited_by(self, user):
         return (self.user is not None and user.id == self.user.id)
 
+    @property
+    def get_email(self):
+        if self.user and not self.email:
+            return self.user.email
+        return self.email
+
     def fetch_format(self):
-        return self.email + ' '
+        return self.get_email + ' '
 
     def __str__(self):
         if self.user:

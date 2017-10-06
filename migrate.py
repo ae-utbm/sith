@@ -1375,6 +1375,20 @@ def migrate_mailings():
                 MailingSubscription(mailing=mailing, email=to_unicode(mailing_sub['email'])).save()
 
 
+def migrate_club_again():
+        cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+        cur.execute("SELECT * FROM asso")
+
+        print("Migrating club is_active")
+
+        for club in cur:
+            try:
+                c = Club.objects.get(unix_name=club['nom_unix_asso'])
+                c.is_active = club['hidden'] == 0
+                c.save()
+            except: pass
+
+
 def main():
     print("Start at %s" % start)
     # Core
@@ -1396,7 +1410,8 @@ def main():
     # reset_sas_moderators()
     # migrate_forum()
     # reset_index('forum')
-    migrate_mailings()
+    # migrate_mailings()
+    migrate_club_again()
     end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end - start))

@@ -58,6 +58,6 @@ def FetchMailingLists(request):
     if key != settings.SITH_MAILING_FETCH_KEY:
         raise PermissionDenied
     data = ''
-    for mailing in Mailing.objects.filter(is_moderated=True).all():
+    for mailing in Mailing.objects.filter(is_moderated=True, club__is_active=True).all():
         data += mailing.fetch_format() + "\n"
     return Response(data)

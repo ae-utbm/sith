@@ -2,7 +2,16 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 
 {% block content %}
-    <h3>{% trans %}Club{% endtrans %}</h3>
+	<div id="club_detail">
+		{% if club.logo %}
+			<div class="club_logo"><img src="{{ club.logo.url }}" alt="{{ club.unix_name }}"></div>
+		{% endif %}
+		{% if page_revision %}
+			{{ page_revision|markdown }}
+ 		{% else %}
+ 		<h3>{% trans %}Club{% endtrans %}</h3>
+	    {% endif %}
+    </div>
 {% endblock %}
 
 

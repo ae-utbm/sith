@@ -1224,3 +1224,15 @@ label {
 .ui-corner-left {
   border-radius: 0px;
 }
+
+#club_detail {
+  .club_logo {
+    float: right;
+    img {
+      display: block;
+      max-height: 10em;
+      max-width: 10em;
+    }
+  }
+
+}

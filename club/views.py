@@ -24,25 +24,25 @@
 #
 
 from django import forms
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, View
 from django.views.generic.edit import DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView, CreateView
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _t
 from ajax_select.fields import AutoCompleteSelectField
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin
+from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, PageEditViewBase
 from core.views.forms import SelectDate, SelectDateTime
 from club.models import Club, Membership, Mailing, MailingSubscription
 from sith.settings import SITH_MAXIMUM_FREE_ROLE
 from counter.models import Selling, Counter
-from core.models import User
+from core.models import User, PageRev
 
 from django.conf import settings
 
@@ -86,6 +86,8 @@ class MailingSubscriptionForm(forms.ModelForm):
 
 class ClubTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
+        if isinstance(self.object, PageRev):
+            self.object = self.object.page.club
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
@@ -106,6 +108,12 @@ class ClubTabsMixin(TabedViewMixin):
                 'slug': 'elderlies',
                         'name': _("Old members"),
             })
+        if self.object.page:
+            tab_list.append({
+                'url': reverse('club:club_hist', kwargs={'club_id': self.object.id}),
+                'slug': 'history',
+                        'name': _("History"),
+            })
         if self.request.user.can_edit(self.object):
             tab_list.append({
                 'url': reverse('club:tools', kwargs={'club_id': self.object.id}),
@@ -117,6 +125,12 @@ class ClubTabsMixin(TabedViewMixin):
                 'slug': 'edit',
                         'name': _("Edit"),
             })
+            if self.object.page and self.request.user.can_edit(self.object.page):
+                tab_list.append({
+                    'url': reverse('core:page_edit', kwargs={'page_name': self.object.page.get_full_name()}),
+                    'slug': 'page_edit',
+                            'name': _('Edit club page')
+                })
             tab_list.append({
                 'url': reverse('club:club_sellings', kwargs={'club_id': self.object.id}),
                 'slug': 'sellings',
@@ -152,6 +166,55 @@ class ClubView(ClubTabsMixin, DetailView):
     pk_url_kwarg = "club_id"
     template_name = 'club/club_detail.jinja'
     current_tab = "infos"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubView, self).get_context_data(**kwargs)
+        if self.object.page and self.object.page.revisions.exists():
+            kwargs['page_revision'] = self.object.page.revisions.last().content
+        return kwargs
+
+
+class ClubRevView(ClubView):
+    """
+    Display a specific page revision
+    """
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        self.revision = get_object_or_404(PageRev, pk=kwargs['rev_id'], page__club=obj)
+        return super(ClubRevView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ClubRevView, self).get_context_data(**kwargs)
+        kwargs['page_revision'] = self.revision.content
+        return kwargs
+
+
+class ClubPageEditView(ClubTabsMixin, PageEditViewBase):
+    template_name = 'club/pagerev_edit.jinja'
+    current_tab = "page_edit"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.club = get_object_or_404(Club, pk=kwargs['club_id'])
+        if not self.club.page:
+            raise Http404
+        return super(ClubPageEditView, self).dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        self.page = self.club.page
+        return self._get_revision()
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('club:club_view', kwargs={'club_id': self.club.id})
+
+
+class ClubPageHistView(ClubTabsMixin, CanViewMixin, DetailView):
+    """
+    Modification hostory of the page
+    """
+    model = Club
+    pk_url_kwarg = "club_id"
+    template_name = 'club/page_history.jinja'
+    current_tab = "history"
 
 
 class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
@@ -209,28 +272,30 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
             form.instance = Membership(club=self.object, user=self.request.user)
         if not self.request.user.is_root:
             form.fields.pop('start_date', None)
-        # form.initial = {'user': self.request.user}
-        # form._user = self.request.user
         return form
 
-    def post(self, request, *args, **kwargs):
+    def form_valid(self, form):
         """
             Check user rights
         """
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            ms = self.object.get_membership_for(request.user)
-            if (form.cleaned_data['role'] <= SITH_MAXIMUM_FREE_ROLE or
-                (ms is not None and ms.role >= form.cleaned_data['role']) or
-                request.user.is_board_member or
-                    request.user.is_root):
-                return self.form_valid(form)
-            else:
-                form.add_error(None, _("You do not have the permission to do that"))
-                return self.form_invalid(form)
+        user = self.request.user
+        ms = self.object.get_membership_for(user)
+        if (form.cleaned_data['role'] <= SITH_MAXIMUM_FREE_ROLE or
+            (ms is not None and ms.role >= form.cleaned_data['role']) or
+            user.is_board_member or user.is_root):
+            form.save()
+            form = self.form_class()
+            return super(ModelFormMixin, self).form_valid(form)
         else:
+            form.add_error(None, _("You do not have the permission to do that"))
             return self.form_invalid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.request = request
+        return super(ClubMembersView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('club:club_members', kwargs={'club_id': self.club.id})
 
 
 class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
@@ -337,7 +402,7 @@ class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
     """
     model = Club
     pk_url_kwarg = "club_id"
-    fields = ['address', 'logo']
+    fields = ['address', 'logo', 'short_description']
     template_name = 'core/edit.jinja'
     current_tab = "edit"
 
@@ -348,7 +413,7 @@ class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
     """
     model = Club
     pk_url_kwarg = "club_id"
-    fields = ['name', 'unix_name', 'parent']
+    fields = ['name', 'unix_name', 'parent', 'is_active']
     template_name = 'core/edit.jinja'
     current_tab = "props"
 
@@ -497,3 +562,33 @@ class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('club:mailing', kwargs={'club_id': self.club_id})
+
+
+class MailingAutoGenerationView(View):
+
+    def dispatch(self, request, *args, **kwargs):
+        self.mailing = get_object_or_404(Mailing, pk=kwargs['mailing_id'])
+        if not request.user.can_edit(self.mailing):
+            raise PermissionDenied
+        return super(MailingAutoGenerationView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        club = self.mailing.club
+        self.mailing.subscriptions.all().delete()
+        members = club.members.filter(role__gte=settings.SITH_CLUB_ROLES_ID['Board member']).exclude(end_date__lte=timezone.now())
+        for member in members.all():
+            MailingSubscription(user=member.user, mailing=self.mailing).save()
+        return redirect('club:mailing', club_id=club.id)
+
+
+class MailingAutoCleanView(View):
+
+    def dispatch(self, request, *args, **kwargs):
+        self.mailing = get_object_or_404(Mailing, pk=kwargs['mailing_id'])
+        if not request.user.can_edit(self.mailing):
+            raise PermissionDenied
+        return super(MailingAutoCleanView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.mailing.subscriptions.all().delete()
+        return redirect('club:mailing', club_id=self.mailing.club.id)

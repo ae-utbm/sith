@@ -841,7 +841,7 @@ class Page(models.Model):
     name = models.CharField(_('page unix name'), max_length=30,
                             validators=[
                             validators.RegexValidator(
-                                r'^[A-z.+-]+$',
+                                r'^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]$',
                                 _('Enter a valid page name. This value may contain only '
                                   'unaccented letters, numbers ' 'and ./+/-/_ characters.')
                             ), ],
@@ -891,6 +891,19 @@ class Page(models.Model):
                 _('Loop in page tree'),
                 code='loop',
             )
+
+    def can_be_edited_by(self, user):
+        if hasattr(self, 'club') and self.club.can_be_edited_by(user):
+            # Override normal behavior for clubs
+            return True
+        if self.name == settings.SITH_CLUB_ROOT_PAGE and user.is_board_member:
+            return True
+        return False
+
+    def can_be_viewed_by(self, user):
+        if self.is_club_page:
+            return True
+        return False
 
     def get_parent_list(self):
         l = []
@@ -999,6 +1012,15 @@ class Page(models.Model):
         except:
             return self.name
 
+    @cached_property
+    def is_club_page(self):
+        club_root_page = Page.objects.filter(name=settings.SITH_CLUB_ROOT_PAGE).first()
+        return club_root_page is not None and (self == club_root_page or club_root_page in self.get_parent_list())
+
+    @cached_property
+    def need_club_redirection(self):
+        return self.is_club_page and self.name != settings.SITH_CLUB_ROOT_PAGE
+
     def delete(self):
         self.unset_lock_recursive()
         self.set_lock_recursive(User.objects.get(id=0))
@@ -1047,6 +1069,9 @@ class PageRev(models.Model):
             return self.page.unset_lock
         else:
             return object.__getattribute__(self, attr)
+
+    def can_be_edited_by(self, user):
+        return self.page.can_be_edited_by(user)
 
     def save(self, *args, **kwargs):
         if self.revision is None:

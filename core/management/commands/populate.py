@@ -85,6 +85,12 @@ class Command(BaseCommand):
         profiles_root.save()
         home_root = SithFile(parent=None, name="users", is_folder=True, owner=root)
         home_root.save()
+
+        # Page needed for club creation
+        p = Page(name=settings.SITH_CLUB_ROOT_PAGE)
+        p.set_lock(root)
+        p.save()
+
         club_root = SithFile(parent=None, name="clubs", is_folder=True, owner=root)
         club_root.save()
         SithFile(parent=None, name="SAS", is_folder=True, owner=root).save()
@@ -97,6 +103,7 @@ class Command(BaseCommand):
         launderette_club = Club(id=84, name=settings.SITH_LAUNDERETTE_MANAGER['name'],
                                 unix_name=settings.SITH_LAUNDERETTE_MANAGER['unix_name'],
                                 address=settings.SITH_LAUNDERETTE_MANAGER['address'])
+
         launderette_club.save()
         self.reset_index("club")
         for b in settings.SITH_COUNTER_BARS:
