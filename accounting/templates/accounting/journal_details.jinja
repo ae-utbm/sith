@@ -5,88 +5,96 @@
 {% endblock %}
 
 {% block content %}
-    <p>
-    <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
-    <a href="{{ url('accounting:bank_details', b_account_id=object.club_account.bank_account.id) }}">{{object.club_account.bank_account }}</a> >
-    <a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object.club_account }}</a> >
-    {{ object.name }}
-    </p>
-    <hr>
-    <h2>{% trans %}General journal:{% endtrans %} {{ object.name }}</h2>
-    <p><a href="{{ url('accounting:label_new') }}?parent={{ object.club_account.id }}">{% trans %}New label{% endtrans %}</a></p>
-    <p><a href="{{ url('accounting:label_list', clubaccount_id=object.club_account.id) }}">{% trans %}Label list{% endtrans %}</a></p>
-    <p><a href="{{ url('accounting:co_list') }}">{% trans %}Company list{% endtrans %}</a></p>
-    <p><strong>{% trans %}Amount: {% endtrans %}</strong>{{ object.amount }} € -
-    <strong>{% trans %}Effective amount: {% endtrans %}</strong>{{ object.effective_amount }} €</p>
-    {% if object.closed %}
-    <p>{% trans %}Journal is closed, you can not create operation{% endtrans %}</p>
-    {% else %}
-    <p><a href="{{ url('accounting:op_new', j_id=object.id) }}">{% trans %}New operation{% endtrans %}</a></p>
-    </br>
-    {% endif %}
-    <table>
-        <thead>
-        <tr>
-            <td>{% trans %}Nb{% endtrans %}</td>
-            <td>{% trans %}Date{% endtrans %}</td>
-            <td>{% trans %}Label{% endtrans %}</td>
-            <td>{% trans %}Amount{% endtrans %}</td>
-            <td>{% trans %}Payment mode{% endtrans %}</td>
-            <td>{% trans %}Target{% endtrans %}</td>
-            <td>{% trans %}Code{% endtrans %}</td>
-            <td>{% trans %}Nature{% endtrans %}</td>
-            <td>{% trans %}Done{% endtrans %}</td>
-            <td>{% trans %}Comment{% endtrans %}</td>
-            <td>{% trans %}File{% endtrans %}</td>
-            <td>{% trans %}Actions{% endtrans %}</td>
-            <td>{% trans %}PDF{% endtrans %}</td>
-        </tr>
-        </thead>
-        <tbody>
-        {% for o in object.operations.all() %}
-        <tr>
-            <td>{{ o.number }}</td>
-            <td>{{ o.date }}</td>
-            <td>{{ o.label or "" }}</td>
-            <td>{{ o.amount }} €</td>
-            <td>{{ o.get_mode_display() }}</td>
-            {% if o.target_type == "OTHER" %}
-            <td>{{ o.target_label }}</td>
-            {% else %}
-            <td><a href="{{ o.target.get_absolute_url() }}">{{ o.target.get_display_name() }}</a></td>
-            {% endif %}
-            <td>{{ o.accounting_type.code }}</td>
-            <td>{{ o.accounting_type.label }}</td>
-            {% if o.done %}
-            <td>{% trans %}Yes{% endtrans %}</td>
-            {% else %}
-            <td>{% trans %}No{% endtrans %}</td>
-            {% endif %}
-            <td>{{ o.remark }}
-            {% if not o.linked_operation and o.target_type == "ACCOUNT" and not o.target.has_open_journal() %}
+    <div id="accounting">
+        <p>
+        <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
+        <a href="{{ url('accounting:bank_details', b_account_id=object.club_account.bank_account.id) }}">{{object.club_account.bank_account }}</a> >
+        <a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object.club_account }}</a> >
+        {{ object.name }}
+        </p>
+        <hr>
+        <h2>{% trans %}General journal:{% endtrans %} {{ object.name }}</h2>
+        <p><a href="{{ url('accounting:label_new') }}?parent={{ object.club_account.id }}">{% trans %}New label{% endtrans %}</a></p>
+        <p><a href="{{ url('accounting:label_list', clubaccount_id=object.club_account.id) }}">{% trans %}Label list{% endtrans %}</a></p>
+        <p><a href="{{ url('accounting:co_list') }}">{% trans %}Company list{% endtrans %}</a></p>
+        <p><strong>{% trans %}Amount: {% endtrans %}</strong>{{ object.amount }} € -
+        <strong>{% trans %}Effective amount: {% endtrans %}</strong>{{ object.effective_amount }} €</p>
+        {% if object.closed %}
+        <p>{% trans %}Journal is closed, you can not create operation{% endtrans %}</p>
+        {% else %}
+        <p><a href="{{ url('accounting:op_new', j_id=object.id) }}">{% trans %}New operation{% endtrans %}</a></p>
+        </br>
+        {% endif %}
+        <div class="journal-table">
+        <table>
+            <thead>
+            <tr>
+                <td>{% trans %}Nb{% endtrans %}</td>
+                <td>{% trans %}Date{% endtrans %}</td>
+                <td>{% trans %}Label{% endtrans %}</td>
+                <td>{% trans %}Amount{% endtrans %}</td>
+                <td>{% trans %}Payment mode{% endtrans %}</td>
+                <td>{% trans %}Target{% endtrans %}</td>
+                <td>{% trans %}Code{% endtrans %}</td>
+                <td>{% trans %}Nature{% endtrans %}</td>
+                <td>{% trans %}Done{% endtrans %}</td>
+                <td>{% trans %}Comment{% endtrans %}</td>
+                <td>{% trans %}File{% endtrans %}</td>
+                <td>{% trans %}Actions{% endtrans %}</td>
+                <td>{% trans %}PDF{% endtrans %}</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for o in object.operations.all() %}
+            <tr>
+                <td>{{ o.number }}</td>
+                <td>{{ o.date }}</td>
+                <td>{{ o.label or "" }}</td>
+                {% if o.accounting_type.movement_type == "DEBIT" %}
+                    <td class="neg-amount">&nbsp;{{ o.amount }}&nbsp;€</td>
+                {% else %}
+                    <td class="pos-amount">&nbsp;{{ o.amount }}&nbsp;€</td>
+                {% endif %}
+                <td>{{ o.get_mode_display() }}</td>
+                {% if o.target_type == "OTHER" %}
+                <td>{{ o.target_label }}</td>
+                {% else %}
+                <td><a href="{{ o.target.get_absolute_url() }}">{{ o.target.get_display_name() }}</a></td>
+                {% endif %}
+                <td>{{ o.accounting_type.code }}</td>
+                <td>{{ o.accounting_type.label }}</td>
+                {% if o.done %}
+                <td>{% trans %}Yes{% endtrans %}</td>
+                {% else %}
+                <td>{% trans %}No{% endtrans %}</td>
+                {% endif %}
+                <td>{{ o.remark }}
+                {% if not o.linked_operation and o.target_type == "ACCOUNT" and not o.target.has_open_journal() %}
+                    <p><strong>
+    {% trans %}Warning: this operation has no linked operation because the targeted club account has no opened journal.{% endtrans %}
+                </strong></p>
                 <p><strong>
-{% trans %}Warning: this operation has no linked operation because the targeted club account has no opened journal.{% endtrans %}
+    {% trans url=o.target.get_absolute_url() %}Open a journal in <a href="{{ url }}">this club account</a>, then save this operation again to make the linked operation.{% endtrans %}
             </strong></p>
-            <p><strong>
-{% trans url=o.target.get_absolute_url() %}Open a journal in <a href="{{ url }}">this club account</a>, then save this operation again to make the linked operation.{% endtrans %}
-        </strong></p>
-            {% endif %}
-            </td>
-            {% if o.invoice %}
-            <td><a href="{{ url('core:download', file_id=o.invoice.id) }}">{{ o.invoice.name }}</a></td>
-            {% else %}
-            <td>-</td>
-            {% endif %}
-            <td>
-                {% if o.journal.club_account.bank_account.name != "AE TI" and o.journal.club_account.bank_account.name != "TI" or user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
-                {% if not o.journal.closed %}
-                <a href="{{ url('accounting:op_edit', op_id=o.id) }}">{% trans %}Edit{% endtrans %}</a>
                 {% endif %}
+                </td>
+                {% if o.invoice %}
+                <td><a href="{{ url('core:download', file_id=o.invoice.id) }}">{{ o.invoice.name }}</a></td>
+                {% else %}
+                <td>-</td>
                 {% endif %}
-            </td>
-            <td><a href="{{ url('accounting:op_pdf', op_id=o.id) }}">{% trans %}Generate{% endtrans %}</a></td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                <td>
+                    {% if o.journal.club_account.bank_account.name != "AE TI" and o.journal.club_account.bank_account.name != "TI" or user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
+                    {% if not o.journal.closed %}
+                    <a href="{{ url('accounting:op_edit', op_id=o.id) }}">{% trans %}Edit{% endtrans %}</a>
+                    {% endif %}
+                    {% endif %}
+                </td>
+                <td><a href="{{ url('accounting:op_pdf', op_id=o.id) }}">{% trans %}Generate{% endtrans %}</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
 {% endblock %}
