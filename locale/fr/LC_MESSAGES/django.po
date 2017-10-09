@@ -746,7 +746,7 @@ msgid ""
 "created in the target account. If you don't want that, select <em>Club</em> "
 "instead of <em>Account</em>."
 msgstr "Attention : si vous sélectionnez <em>Compte</em>, l'opération inverse sera "
-"sera créé dans le compte cible. Si vous ne le voulez pas, sélectionnez <em>Club</em> "
+"créée dans le compte cible. Si vous ne le voulez pas, sélectionnez <em>Club</em> "
 "à la place de <em>Compte</em>."
 
 #: accounting/templates/accounting/operation_edit.jinja:46
