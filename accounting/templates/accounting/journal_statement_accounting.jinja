@@ -6,27 +6,28 @@
 
 
 {% block content %}
-<h3>{% trans %}Accounting statement: {% endtrans %} {{ object.name }}</h3>
+<div id="accounting">
+    <h3>{% trans %}Accounting statement: {% endtrans %} {{ object.name }}</h3>
 
-<table>
-    <thead>
-        <tr>
-            <td>{% trans %}Operation type{% endtrans %}</td>
-            <td>{% trans %}Sum{% endtrans %}</td>
-        </tr>
-    </thead>
-    <tbody>
-        {% for k,v in statement.items() %}
-        <tr>
-            <td>{{ k }}</td>
-            <td>{{ v }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+    <table>
+        <thead>
+            <tr>
+                <td>{% trans %}Operation type{% endtrans %}</td>
+                <td>{% trans %}Sum{% endtrans %}</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for k,v in statement.items() %}
+            <tr>
+                <td>{{ k }}</td>
+                <td>{{ v }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
 
-</table>
+    </table>
 
-<p><strong>{% trans %}Amount: {% endtrans %}</strong>{{ object.amount }} €</p>
-<p><strong>{% trans %}Effective amount: {% endtrans %}</strong>{{ object.effective_amount }} €</p>
-
+    <p><strong>{% trans %}Amount: {% endtrans %}</strong>{{ object.amount }} €</p>
+    <p><strong>{% trans %}Effective amount: {% endtrans %}</strong>{{ object.effective_amount }} €</p>
+</div>
 {% endblock %}

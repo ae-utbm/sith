@@ -213,9 +213,9 @@ class OperationTest(TestCase):
     def test_person_statement(self):
         self.client.login(username='comptable', password='plop')
         response_get = self.client.get(reverse("accounting:journal_person_statement", args=[self.journal.id]))
-        self.assertTrue("S&#39; Kia</a></td>\\n            \\n            <td>3.00</td>" in str(response_get.content))
+        self.assertTrue("<td>3.00</td>" in str(response_get.content) and '<td><a href="/user/1/">S&#39; Kia</a></td>' in str(response_get.content))
 
     def test_accounting_statement(self):
         self.client.login(username='comptable', password='plop')
         response_get = self.client.get(reverse("accounting:journal_accounting_statement", args=[self.journal.id]))
-        self.assertTrue("<td>443 - Cr\\xc3\\xa9dit - Ce code n&#39;existe pas</td>\\n            <td>3.00</td>" in str(response_get.content))
+        self.assertTrue("<td>443 - Cr\\xc3\\xa9dit - Ce code n&#39;existe pas</td>" in str(response_get.content))

@@ -5,52 +5,53 @@
 {% endblock %}
 
 {% macro display_tables(dict) %}
-<h6>{% trans %}Credit{% endtrans %}</h6>
-<table>
-    <thead>
-        <tr>
-            <td>{% trans %}Nature of operation{% endtrans %}</td>
-            <td>{% trans %}Sum{% endtrans %}</td>
-        </tr>
-    </thead>
-    <tbody>
-        {% for k,v in dict['CREDIT'].items() %}
-        <tr>
-            <td>{{ k }}</td>
-            <td>{{ v }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% trans %}Total: {% endtrans %}{{ dict['CREDIT_sum'] }}
+<div id="accounting">
+    <h6>{% trans %}Credit{% endtrans %}</h6>
+    <table>
+        <thead>
+            <tr>
+                <td>{% trans %}Nature of operation{% endtrans %}</td>
+                <td>{% trans %}Sum{% endtrans %}</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for k,v in dict['CREDIT'].items() %}
+            <tr>
+                <td>{{ k }}</td>
+                <td>{{ v }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% trans %}Total: {% endtrans %}{{ dict['CREDIT_sum'] }}
 
-<h6>{% trans %}Debit{% endtrans %}</h6>
-<table>
-    <thead>
-        <tr>
-            <td>{% trans %}Nature of operation{% endtrans %}</td>
-            <td>{% trans %}Sum{% endtrans %}</td>
-        </tr>
-    </thead>
-    <tbody>
-        {% for k,v in dict['DEBIT'].items() %}
-        <tr>
-            <td>{{ k }}</td>
-            <td>{{ v }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% trans %}Total: {% endtrans %}{{ dict['DEBIT_sum'] }}
-{% endmacro %}
+    <h6>{% trans %}Debit{% endtrans %}</h6>
+    <table>
+        <thead>
+            <tr>
+                <td>{% trans %}Nature of operation{% endtrans %}</td>
+                <td>{% trans %}Sum{% endtrans %}</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for k,v in dict['DEBIT'].items() %}
+            <tr>
+                <td>{{ k }}</td>
+                <td>{{ v }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% trans %}Total: {% endtrans %}{{ dict['DEBIT_sum'] }}
+    {% endmacro %}
 
-{% block content %}
-<h3>{% trans %}Statement by nature: {% endtrans %} {{ object.name }}</h3>
+    {% block content %}
+    <h3>{% trans %}Statement by nature: {% endtrans %} {{ object.name }}</h3>
 
-{% for k,v in statement.items() %}
-    <h4 style="background: lightblue; padding: 4px;">{{ k }} : {{ v['CREDIT_sum'] - v['DEBIT_sum'] }}</h4>
-{{ display_tables(v) }}
-<hr>
-{% endfor %}
-
+    {% for k,v in statement.items() %}
+        <h4 style="background: lightblue; padding: 4px;">{{ k }} : {{ v['CREDIT_sum'] - v['DEBIT_sum'] }}</h4>
+    {{ display_tables(v) }}
+    <hr>
+    {% endfor %}
+</div>
 {% endblock %}

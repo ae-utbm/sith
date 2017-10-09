@@ -5,62 +5,64 @@
 {% endblock %}
 
 {% block content %}
-    <p>
-    <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
-    <a href="{{ url('accounting:bank_details', b_account_id=object.bank_account.id) }}">{{object.bank_account }}</a> >
-    {{ object }}
-    </p>
-    <hr>
-    <h2>{% trans %}Club account:{% endtrans %} {{ object.name }}</h2>
-    {% if user.is_root and not object.journals.exists() %}
-    <a href="{{ url('accounting:club_delete', c_account_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
-    {% endif %}
-    {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
-    <p><a href="{{ url('accounting:label_new') }}?parent={{ object.id }}">{% trans %}New label{% endtrans %}</a></p>
-    {% endif %}
-    <p><a href="{{ url('accounting:label_list', clubaccount_id=object.id) }}">{% trans %}Label list{% endtrans %}</a></p>
-    {% if not object.has_open_journal() %}
-    <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">{% trans %}New journal{% endtrans %}</a></p>
-    {% else %}
-    <p>{% trans %}You can not create new journal while you still have one opened{% endtrans %}</p>
-    {% endif %}
-    <table>
-        <thead>
-        <tr>
-            <td>{% trans %}Name{% endtrans %}</td>
-            <td>{% trans %}Start{% endtrans %}</td>
-            <td>{% trans %}End{% endtrans %}</td>
-            <td>{% trans %}Amount{% endtrans %}</td>
-            <td>{% trans %}Effective amount{% endtrans %}</td>
-            <td>{% trans %}Closed{% endtrans %}</td>
-            <td>{% trans %}Actions{% endtrans %}</td>
-        </tr>
-        </thead>
-        <tbody>
-        {% for j in object.journals.all() %}
-        <tr>
-            <td>{{ j.name }}</td>
-            <td>{{ j.start_date }}</td>
-            {% if j.end_date %}
-            <td>{{ j.end_date }}</td>
-            {% else %}
-            <td> - </td>
-            {% endif %}
-            <td>{{ j.amount }} €</td>
-            <td>{{ j.effective_amount }} €</td>
-            {% if j.closed %}
-            <td>{% trans %}Yes{% endtrans %}</td>
-            {% else %}
-            <td>{% trans %}No{% endtrans %}</td>
-            {% endif %}
-            <td> <a href="{{ url('accounting:journal_details', j_id=j.id) }}">{% trans %}View{% endtrans %}</a>
-                <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">{% trans %}Edit{% endtrans %}</a>
-                {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) and j.operations.count() == 0 %}
-                    <a href="{{ url('accounting:journal_delete', j_id=j.id) }}">{% trans %}Delete{% endtrans %}</a>
+    <div id="accounting">
+        <p>
+        <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
+        <a href="{{ url('accounting:bank_details', b_account_id=object.bank_account.id) }}">{{object.bank_account }}</a> >
+        {{ object }}
+        </p>
+        <hr>
+        <h2>{% trans %}Club account:{% endtrans %} {{ object.name }}</h2>
+        {% if user.is_root and not object.journals.exists() %}
+        <a href="{{ url('accounting:club_delete', c_account_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
+        {% endif %}
+        {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
+        <p><a href="{{ url('accounting:label_new') }}?parent={{ object.id }}">{% trans %}New label{% endtrans %}</a></p>
+        {% endif %}
+        <p><a href="{{ url('accounting:label_list', clubaccount_id=object.id) }}">{% trans %}Label list{% endtrans %}</a></p>
+        {% if not object.has_open_journal() %}
+        <p><a href="{{ url('accounting:journal_new') }}?parent={{ object.id }}">{% trans %}New journal{% endtrans %}</a></p>
+        {% else %}
+        <p>{% trans %}You can not create new journal while you still have one opened{% endtrans %}</p>
+        {% endif %}
+        <table>
+            <thead>
+            <tr>
+                <td>{% trans %}Name{% endtrans %}</td>
+                <td>{% trans %}Start{% endtrans %}</td>
+                <td>{% trans %}End{% endtrans %}</td>
+                <td>{% trans %}Amount{% endtrans %}</td>
+                <td>{% trans %}Effective amount{% endtrans %}</td>
+                <td>{% trans %}Closed{% endtrans %}</td>
+                <td>{% trans %}Actions{% endtrans %}</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for j in object.journals.all() %}
+            <tr>
+                <td>{{ j.name }}</td>
+                <td>{{ j.start_date }}</td>
+                {% if j.end_date %}
+                <td>{{ j.end_date }}</td>
+                {% else %}
+                <td> - </td>
                 {% endif %}
-                </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                <td>{{ j.amount }} €</td>
+                <td>{{ j.effective_amount }} €</td>
+                {% if j.closed %}
+                <td>{% trans %}Yes{% endtrans %}</td>
+                {% else %}
+                <td>{% trans %}No{% endtrans %}</td>
+                {% endif %}
+                <td> <a href="{{ url('accounting:journal_details', j_id=j.id) }}">{% trans %}View{% endtrans %}</a>
+                    <a href="{{ url('accounting:journal_edit', j_id=j.id) }}">{% trans %}Edit{% endtrans %}</a>
+                    {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) and j.operations.count() == 0 %}
+                        <a href="{{ url('accounting:journal_delete', j_id=j.id) }}">{% trans %}Delete{% endtrans %}</a>
+                    {% endif %}
+                    </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
