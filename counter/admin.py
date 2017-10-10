@@ -23,13 +23,22 @@
 #
 
 from django.contrib import admin
+from haystack.admin import SearchModelAdmin
 
 from counter.models import *
 
-# Register your models here.
-admin.site.register(Customer)
+
+class ProductAdmin(SearchModelAdmin):
+    search_fields = ["name", "code"]
+
+
+class CustomerAdmin(SearchModelAdmin):
+    search_fields = ["account_id"]
+
+
+admin.site.register(Customer, CustomerAdmin)
+admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductType)
-admin.site.register(Product)
 admin.site.register(Counter)
 admin.site.register(Refilling)
 admin.site.register(Selling)

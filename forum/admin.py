@@ -23,10 +23,26 @@
 #
 
 from django.contrib import admin
+from haystack.admin import SearchModelAdmin
+
 
 from forum.models import *
 
-admin.site.register(Forum)
-admin.site.register(ForumTopic)
-admin.site.register(ForumMessage)
+
+class ForumAdmin(SearchModelAdmin):
+    search_fields = ["name", "description"]
+
+
+class ForumTopicAdmin(SearchModelAdmin):
+    search_fields = ["_title", "description"]
+
+
+class ForumMessageAdmin(SearchModelAdmin):
+    search_fields = ["title", "message"]
+
+
+admin.site.register(Forum, ForumAdmin)
+admin.site.register(ForumTopic, ForumTopicAdmin)
+admin.site.register(ForumMessage, ForumMessageAdmin)
 admin.site.register(ForumUserInfo)
+
