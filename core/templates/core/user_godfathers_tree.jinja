@@ -1,0 +1,54 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% if param == "godchildren" %}
+{% trans user_name=profile.get_display_name() %}{{ user_name }}'s godchildren{% endtrans %}
+{% else %}
+{% trans user_name=profile.get_display_name() %}{{ user_name }}'s godfathers{% endtrans %}
+{% endif %}
+{% endblock %}
+
+{% macro display_members_list(user) %}
+{% if user.__getattribute__(param).exists() %}
+<ul>
+    {% for u in user.__getattribute__(param).all() %}
+    <li>
+        <a href="{{ url("core:user_godfathers", user_id=u.id) }}">
+            {{ u.get_short_name() }}
+        </a>
+        {% if u in members_set %}
+            {% trans %}Already seen (check above){% endtrans %}
+        {% else %}
+            {{ members_set.add(u) or "" }}
+            {{ display_members_list(u) }}
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}
+
+{% block content %}
+    <p><a href="{{ url("core:user_godfathers", user_id=profile.id) }}">
+        {% trans %}Back to family{% endtrans %}</a></p>
+    {% if profile.__getattribute__(param).exists() %}
+        {% if param == "godchildren" %}
+        <p><a href="{{ url("core:user_godfathers_tree_pict", user_id=profile.id) }}?descent">
+            {% trans %}Show a picture of the tree{% endtrans %}</a></p>
+        <h4>{% trans u=profile.get_short_name() %}Descent tree of {{ u }}{% endtrans %}</h4>
+        {% else %}
+        <p><a href="{{ url("core:user_godfathers_tree_pict", user_id=profile.id) }}?ancestors">
+            {% trans %}Show a picture of the tree{% endtrans %}</a></p>
+        <h4>{% trans u=profile.get_short_name() %}Ancestors tree of {{ u }}{% endtrans %}</h4>
+        {% endif %}
+        {{ members_set.add(profile) or "" }}
+        {{ display_members_list(profile) }}
+    {% else %}
+        {% if param == "godchildren" %}
+        <p>{% trans %}No godchildren{% endtrans %}
+        {% else %}
+        <p>{% trans %}No godfathers{% endtrans %}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+

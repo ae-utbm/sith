@@ -28,7 +28,7 @@ from django.contrib.auth import views
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.views.generic.edit import UpdateView
 from django.views.generic import ListView, DetailView, TemplateView
 from django.forms.models import modelform_factory
@@ -233,20 +233,6 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
     current_tab = 'infos'
 
 
-def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
-    user = User.objects.get(id=user_id)
-    if ((user == request.user) or
-        request.user.is_root or
-            request.user.is_board_member):
-        ud = get_object_or_404(User, id=godfather_id)
-        if is_father == "True":
-            user.godfathers.remove(ud)
-        else:
-            user.godchildren.remove(ud)
-    else:
-        raise PermissionDenied
-    return redirect('core:user_godfathers', user_id=user_id)
-
 
 class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
     """
@@ -273,6 +259,20 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
                 print(album, album.date)
             kwargs['pictures'][album.id].append(pict_relation.picture)
         return kwargs
+
+def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
+    user = User.objects.get(id=user_id)
+    if ((user == request.user) or
+        request.user.is_root or
+            request.user.is_board_member):
+        ud = get_object_or_404(User, id=godfather_id)
+        if is_father == "True":
+            user.godfathers.remove(ud)
+        else:
+            user.godchildren.remove(ud)
+    else:
+        raise PermissionDenied
+    return redirect('core:user_godfathers', user_id=user_id)
 
 class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
     """
@@ -305,6 +305,91 @@ class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
             kwargs['form'] = UserGodfathersForm()
         return kwargs
 
+class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
+    """
+    Display a user's family tree
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+    context_object_name = "profile"
+    template_name = "core/user_godfathers_tree.jinja"
+    current_tab = 'godfathers'
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserGodfathersTreeView, self).get_context_data(**kwargs)
+        if "descent" in self.request.GET:
+            kwargs['param'] = "godchildren"
+        else:
+            kwargs['param'] = "godfathers"
+        kwargs['members_set'] = set()
+        return kwargs
+
+class UserGodfathersTreePictureView(CanViewMixin, DetailView):
+    """
+    Display a user's tree as a picture
+    """
+    model = User
+    pk_url_kwarg = "user_id"
+
+    def build_complex_graph(self):
+        import pygraphviz as pgv
+        self.depth = int(self.request.GET.get("depth", 4))
+        if self.param == "godfathers":
+            self.graph = pgv.AGraph(strict=False, directed=True, rankdir="BT")
+        else:
+            self.graph = pgv.AGraph(strict=False, directed=True)
+        family = set()
+        self.level = 1
+        # Since the tree isn't very deep, we can build it recursively
+        def crawl_family(user):
+            if self.level > self.depth: return
+            self.level += 1
+            for u in user.__getattribute__(self.param).all():
+                self.graph.add_edge(user.get_short_name(), u.get_short_name())
+                if u not in family:
+                    family.add(u)
+                    crawl_family(u)
+            self.level -= 1
+        self.graph.add_node(self.object.get_short_name())
+        family.add(self.object)
+        crawl_family(self.object)
+
+    def build_family_graph(self):
+        import pygraphviz as pgv
+        self.graph = pgv.AGraph(strict=False, directed=True)
+        self.graph.add_node(self.object.get_short_name())
+        for u in self.object.godfathers.all():
+            self.graph.add_edge(u.get_short_name(), self.object.get_short_name())
+        for u in self.object.godchildren.all():
+            self.graph.add_edge(self.object.get_short_name(), u.get_short_name())
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if "descent" in self.request.GET:
+            self.param = "godchildren"
+        elif "ancestors" in self.request.GET:
+            self.param = "godfathers"
+        else:
+            self.param = "family"
+
+        if self.param == "family":
+            self.build_family_graph()
+        else:
+            self.build_complex_graph()
+        # Pimp the graph before display
+        self.graph.node_attr['color'] = "lightblue"
+        self.graph.node_attr['style'] = "filled"
+        main_node = self.graph.get_node(self.object.get_short_name())
+        main_node.attr['color'] = "sandybrown"
+        main_node.attr['shape'] = "rect"
+        if self.param == "godchildren":
+            self.graph.graph_attr['label'] = _("Godchildren")
+        elif self.param == "godfathers":
+            self.graph.graph_attr['label'] = _("Godfathers")
+        else:
+            self.graph.graph_attr['label'] = _("Family")
+        img = self.graph.draw(format="png", prog="dot")
+        return HttpResponse(img, content_type="image/png")
 
 class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     """

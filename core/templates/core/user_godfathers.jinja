@@ -6,6 +6,8 @@
 {% endblock %}
 
 {% block content %}
+    <p><a href="{{ url("core:user_godfathers_tree_pict", user_id=profile.id) }}?family">
+        {% trans %}Show family picture{% endtrans %}</a></p>
     {% if profile.godfathers.exists() %}
         <h4>{% trans %}Godfathers{% endtrans %}</h4>
         <ul>
@@ -14,6 +16,8 @@
                     {{ u.get_mini_item()|safe }} </a>{{ delete_godfather(user, profile, u, True) }}</li>
             {% endfor %}
         </ul>
+        <p><a href="{{ url("core:user_godfathers_tree", user_id=profile.id) }}">
+            {% trans %}Show ancestors tree{% endtrans %}</a></p>
     {% else %}
         <p>{% trans %}No godfathers{% endtrans %}
     {% endif %}
@@ -25,6 +29,8 @@
                     {{ u.get_mini_item()|safe }} </a>{{ delete_godfather(user, profile, u, False) }}</li>
             {% endfor %}
         </ul>
+        <p><a href="{{ url("core:user_godfathers_tree", user_id=profile.id) }}?descent">
+            {% trans %}Show descent tree{% endtrans %}</a></p>
     {% else %}
         <p>{% trans %}No godchildren{% endtrans %}
     {% endif %}

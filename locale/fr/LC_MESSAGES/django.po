@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-09 16:19+0200\n"
+"POT-Creation-Date: 2017-10-11 12:22+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -745,9 +745,10 @@ msgid ""
 "Warning: if you select <em>Account</em>, the opposite operation will be "
 "created in the target account. If you don't want that, select <em>Club</em> "
 "instead of <em>Account</em>."
-msgstr "Attention : si vous sélectionnez <em>Compte</em>, l'opération inverse sera "
-"créée dans le compte cible. Si vous ne le voulez pas, sélectionnez <em>Club</em> "
-"à la place de <em>Compte</em>."
+msgstr ""
+"Attention : si vous sélectionnez <em>Compte</em>, l'opération inverse sera "
+"créée dans le compte cible. Si vous ne le voulez pas, sélectionnez <em>Club</"
+"em> à la place de <em>Compte</em>."
 
 #: accounting/templates/accounting/operation_edit.jinja:46
 msgid "Linked operation:"
@@ -760,7 +761,7 @@ msgstr "Opération liée : "
 #: core/templates/core/file_edit.jinja:8
 #: core/templates/core/macros_pages.jinja:26
 #: core/templates/core/page_prop.jinja:11
-#: core/templates/core/user_godfathers.jinja:35
+#: core/templates/core/user_godfathers.jinja:41
 #: core/templates/core/user_preferences.jinja:12
 #: core/templates/core/user_preferences.jinja:19
 #: counter/templates/counter/cash_register_summary.jinja:22
@@ -896,16 +897,12 @@ msgid "logo"
 msgstr "logo"
 
 #: club/models.py:62
-#, fuzzy
-#| msgid "active"
 msgid "is active"
 msgstr "actif"
 
 #: club/models.py:63
-#, fuzzy
-#| msgid "description"
 msgid "short description"
-msgstr "description"
+msgstr "description courte"
 
 #: club/models.py:64 core/models.py:199
 msgid "address"
@@ -2895,25 +2892,68 @@ msgid "Change user password"
 msgstr "Changer le mot de passe"
 
 #: core/templates/core/user_godfathers.jinja:5
+#: core/templates/core/user_godfathers_tree.jinja:7
 #, python-format
 msgid "%(user_name)s's godfathers"
 msgstr "Parrains de %(user_name)s"
 
-#: core/templates/core/user_godfathers.jinja:10 core/views/user.py:169
+#: core/templates/core/user_godfathers.jinja:10
+msgid "Show family picture"
+msgstr "Voir une image de la famille"
+
+#: core/templates/core/user_godfathers.jinja:12 core/views/user.py:169
+#: core/views/user.py:388
 msgid "Godfathers"
 msgstr "Parrains"
 
-#: core/templates/core/user_godfathers.jinja:18
+#: core/templates/core/user_godfathers.jinja:20
+msgid "Show ancestors tree"
+msgstr "Voir l'arbre des ancêtres"
+
+#: core/templates/core/user_godfathers.jinja:22
+#: core/templates/core/user_godfathers_tree.jinja:50
 msgid "No godfathers"
 msgstr "Pas de parrains"
 
-#: core/templates/core/user_godfathers.jinja:21
+#: core/templates/core/user_godfathers.jinja:25 core/views/user.py:386
 msgid "Godchildren"
 msgstr "Fillots"
 
-#: core/templates/core/user_godfathers.jinja:29
+#: core/templates/core/user_godfathers.jinja:33
+msgid "Show descent tree"
+msgstr "Voir l'arbre de la descendance"
+
+#: core/templates/core/user_godfathers.jinja:35
+#: core/templates/core/user_godfathers_tree.jinja:48
 msgid "No godchildren"
 msgstr "Pas de fillots"
+
+#: core/templates/core/user_godfathers_tree.jinja:5
+msgid "%(user_name)s's godchildren"
+msgstr "Fillots de %(user_name)s"
+
+#: core/templates/core/user_godfathers_tree.jinja:20
+msgid "Already seen (check above)"
+msgstr "Déjà vu (voir plus haut)"
+
+#: core/templates/core/user_godfathers_tree.jinja:33
+msgid "Back to family"
+msgstr "Retour à la famille"
+
+#: core/templates/core/user_godfathers_tree.jinja:37
+#: core/templates/core/user_godfathers_tree.jinja:41
+msgid "Show a picture of the tree"
+msgstr "Voir une image de l'arbre"
+
+#: core/templates/core/user_godfathers_tree.jinja:38
+#, python-format
+msgid "Descent tree of %(u)s"
+msgstr "Descendants de %(u)s"
+
+#: core/templates/core/user_godfathers_tree.jinja:42
+#, python-format
+msgid "Ancestors tree of %(u)s"
+msgstr "Ancêtres de %(u)s"
 
 #: core/templates/core/user_group.jinja:4
 #, python-format
@@ -3181,7 +3221,11 @@ msgstr "Fillot"
 msgid "Pictures"
 msgstr "Photos"
 
-#: core/views/user.py:388
+#: core/views/user.py:390
+msgid "Family"
+msgstr "Famille"
+
+#: core/views/user.py:473
 msgid "User already has a profile picture"
 msgstr "L'utilisateur a déjà une photo de profil"
 
