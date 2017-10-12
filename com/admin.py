@@ -23,10 +23,20 @@
 #
 
 from django.contrib import admin
+from haystack.admin import SearchModelAdmin
 
 from com.models import *
 
+
+class NewsAdmin(SearchModelAdmin):
+    search_fields = ["title", "summary", "content"]
+
+
+class WeekmailAdmin(SearchModelAdmin):
+    search_fields = ["title"]
+
+
 admin.site.register(Sith)
-admin.site.register(News)
-admin.site.register(Weekmail)
+admin.site.register(News, NewsAdmin)
+admin.site.register(Weekmail, WeekmailAdmin)
 

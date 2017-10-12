@@ -26,13 +26,14 @@ from django.contrib import admin
 from ajax_select import make_ajax_form
 from core.models import User, Page, RealGroup, SithFile
 from django.contrib.auth.models import Group as AuthGroup
+from haystack.admin import SearchModelAdmin
 
 
 admin.site.unregister(AuthGroup)
 admin.site.register(RealGroup)
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(SearchModelAdmin):
+    list_display = ["first_name", "last_name", "username", "email", "nick_name"]
     form = make_ajax_form(User, {
         'godfathers': 'users',
         'home': 'files',  # ManyToManyField
@@ -40,6 +41,9 @@ class UserAdmin(admin.ModelAdmin):
         'avatar_pict': 'files',  # ManyToManyField
         'scrub_pict': 'files',  # ManyToManyField
     })
+    search_fields = ["first_name", "last_name", "username"]
+
+admin.site.register(User, UserAdmin)
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
