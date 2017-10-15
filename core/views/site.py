@@ -62,7 +62,9 @@ def notification(request, notif_id):
     if notif:
         if notif.type not in settings.SITH_PERMANENT_NOTIFICATIONS:
             notif.viewed = True
-            notif.save()
+        else:
+            notif.callback()
+        notif.save()
         return redirect(notif.url)
     return redirect("/")
 
