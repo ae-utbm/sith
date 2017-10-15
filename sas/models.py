@@ -167,10 +167,10 @@ def sas_notification_callback(notif):
     count = Picture.objects.filter(is_moderated=False).count()
     if count:
         notif.viewed = False
-        notif.param = "%s" % count
-        notif.date = timezone.now()
     else:
         notif.viewed = True
+    notif.param = "%s" % count
+    notif.date = timezone.now()
 
 class PeoplePictureRelation(models.Model):
     """
