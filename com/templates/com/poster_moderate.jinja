@@ -1,0 +1,39 @@
+{% extends "core/base.jinja" %}
+
+{% block script %}
+{{ super() }}
+<script src="{{ static('com/js/poster_list.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div id="poster_list">
+
+    <div id="title">
+        <div id="links" class="left">
+            <a id="list" class="link" href="{{ url("com:poster_list") }}">{% trans %}List{% endtrans %}</a>
+        </div>
+        <h3>{% trans %}Posters - moderation{% endtrans %}</h3>
+    </div>
+
+    <div id="posters">
+
+        {% if object_list.count == 0 %}
+            <div id="no-posters">{% trans %}No objects{% endtrans %}</div>
+        {% else %}
+
+            {% for poster in object_list %}
+                <div class="poster">
+                    <div class="name"> {{ poster.name }} </div>
+                    <div class="image"> <img src="{{ static(poster.file.url) }}"></img> </div>
+                    <a class="moderate" href="{{ url(moderation_url, object_id=poster.id) }}">Moderate</a>
+                </div>
+            {% endfor %}
+
+        {% endif %}
+
+    </div>
+
+    <div id="view"><div id="placeholder"></div></div>
+
+</div>
+{% endblock %}

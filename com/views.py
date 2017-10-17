@@ -40,7 +40,7 @@ from django import forms
 
 from datetime import timedelta
 
-from com.models import Sith, News, NewsDate, Weekmail, WeekmailArticle
+from com.models import Sith, News, NewsDate, Weekmail, WeekmailArticle, Screen, Poster
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, CanCreateMixin, QuickNotifMixin
 from core.views.forms import SelectDateTime
 from core.models import Notification, RealGroup, User
@@ -88,7 +88,25 @@ class ComTabsMixin(TabedViewMixin):
             'slug': 'mailings',
                     'name': _("Mailing lists administration"),
         })
+        tab_list.append({
+            'url': reverse('com:poster_list'),
+            'slug': 'posters',
+                    'name': _("Posters list"),
+        })
+        tab_list.append({
+            'url': reverse('com:screen_list'),
+            'slug': 'screens',
+                    'name': _("Screens list"),
+        })
         return tab_list
+
+
+class IsComAdminMixin(View):
+
+    def dispatch(self, request, *args, **kwargs):
+        if not (request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or request.user.is_root):
+            raise PermissionDenied
+        return super(IsComAdminMixin, self).dispatch(request, *args, **kwargs)
 
 
 class ComEditView(ComTabsMixin, CanEditPropMixin, UpdateView):
@@ -115,6 +133,14 @@ class IndexEditView(ComEditView):
     fields = ['index_page']
     current_tab = "index"
     success_url = reverse_lazy('com:index_edit')
+
+
+class ModerateListView(ListView):
+    """Generic view for moderation pages"""
+
+
+class ModerateView(View):
+    """Generic view for moderation pages"""
 
 
 class WeekmailDestinationEditView(ComEditView):
@@ -465,3 +491,114 @@ class MailingModerateView(View):
             return redirect('com:mailing_admin')
 
         raise PermissionDenied
+
+
+class PosterListView(IsComAdminMixin, ComTabsMixin, ListView):
+    """List communication posters"""
+    current_tab = "posters"
+    model = Poster
+    template_name = 'com/poster_list.jinja'
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(PosterListView, self).get_context_data(**kwargs)
+        kwargs['posters'] = Poster.objects.all().order_by('-date_begin')
+        return kwargs
+
+
+class PosterCreateView(IsComAdminMixin, ComTabsMixin, CreateView):
+    """Create communication poster"""
+    current_tab = "posters"
+    model = Poster
+    fields = ['name', 'file', 'screens', 'date_begin', 'date_end']
+    template_name = 'core/create.jinja'
+    success_url = reverse_lazy('com:poster_list')
+
+
+class PosterEditView(IsComAdminMixin, ComTabsMixin, UpdateView):
+    """Edit communication poster"""
+    pk_url_kwarg = "poster_id"
+    current_tab = "posters"
+    model = Poster
+    fields = ['name', 'file', 'screens', 'date_begin', 'date_end']
+    template_name = 'com/poster_edit.jinja'
+    success_url = reverse_lazy('com:poster_list')
+
+
+class PosterDeleteView(IsComAdminMixin, ComTabsMixin, DeleteView):
+    """Delete communication poster"""
+    pk_url_kwarg = "poster_id"
+    current_tab = "posters"
+    model = Poster
+    template_name = 'core/delete_confirm.jinja'
+    success_url = reverse_lazy('com:poster_list')
+
+
+class PosterModerateListView(IsComAdminMixin, ComTabsMixin, ListView):
+    """Moderate list communication poster"""
+    current_tab = "posters"
+    model = Poster
+    template_name = 'com/poster_moderate.jinja'
+    def get_context_data(self, **kwargs):
+        kwargs = super(PosterModerateListView, self).get_context_data(**kwargs)
+        kwargs['moderation_url'] = 'com:poster_moderate'
+        kwargs['object_list'] = Poster.objects.filter(is_moderated=False).all()
+        return kwargs
+
+
+class PosterModerateView(IsComAdminMixin, ComTabsMixin, ModerateView):
+    """Moderate communication poster"""
+    def get(self, request, *args, **kwargs):
+        obj = get_object_or_404(Poster, pk=kwargs['object_id'])
+        if obj.can_moderate(request.user):
+            obj.is_moderated = True
+            obj.moderator = request.user
+            obj.save()
+            return redirect('com:poster_moderate_list')
+        raise PermissionDenied
+
+
+class ScreenListView(IsComAdminMixin, ComTabsMixin, ListView):
+    """List communication screens"""
+    current_tab = "screens"
+    model = Screen
+    template_name = 'com/screen_list.jinja'
+
+
+class ScreenSlideshowView(DetailView):
+    """Slideshow of actives posters"""
+    pk_url_kwarg = "screen_id"
+    model = Screen
+    template_name = 'com/screen_slideshow.jinja'
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(ScreenSlideshowView, self).get_context_data(**kwargs)
+        kwargs['posters'] = self.object.active_posters()
+        return kwargs
+
+
+class ScreenCreateView(IsComAdminMixin, ComTabsMixin, CreateView):
+    """Create communication screen"""
+    current_tab = "screens"
+    model = Screen
+    fields = ['name', 'club']
+    template_name = 'core/create.jinja'
+    success_url = reverse_lazy('com:screen_list')
+
+
+class ScreenEditView(IsComAdminMixin, ComTabsMixin, UpdateView):
+    """Edit communication screen"""
+    pk_url_kwarg = "screen_id"
+    current_tab = "screens"
+    model = Screen
+    fields = ['name', 'club']
+    template_name = 'com/screen_edit.jinja'
+    success_url = reverse_lazy('com:screen_list')
+
+
+class ScreenDeleteView(IsComAdminMixin, ComTabsMixin, DeleteView):
+    """Delete communication screen"""
+    pk_url_kwarg = "screen_id"
+    current_tab = "screens"
+    model = Screen
+    template_name = 'core/delete_confirm.jinja'
+    success_url = reverse_lazy('com:screen_list')

@@ -47,5 +47,16 @@ urlpatterns = [
     url(r'^mailings$', MailingListAdminView.as_view(), name='mailing_admin'),
     url(r'^mailings/(?P<mailing_id>[0-9]+)/moderate$', MailingModerateView.as_view(), name='mailing_moderate'),
     url(r'^mailings/(?P<mailing_id>[0-9]+)/delete$', MailingDeleteView.as_view(redirect_page='com:mailing_admin'), name='mailing_delete'),
+    url(r'^poster$', PosterListView.as_view(), name='poster_list'),
+    url(r'^poster/create$', PosterCreateView.as_view(), name='poster_create'),
+    url(r'^poster/(?P<poster_id>[0-9]+)/edit$', PosterEditView.as_view(), name='poster_edit'),
+    url(r'^poster/(?P<poster_id>[0-9]+)/delete$', PosterDeleteView.as_view(), name='poster_delete'),
+    url(r'^poster/moderate$', PosterModerateListView.as_view(), name='poster_moderate_list'),
+    url(r'^poster/(?P<object_id>[0-9]+)/moderate$', PosterModerateView.as_view(), name='poster_moderate'),
+    url(r'^screen$', ScreenListView.as_view(), name='screen_list'),
+    url(r'^screen/create$', ScreenCreateView.as_view(), name='screen_create'),
+    url(r'^screen/(?P<screen_id>[0-9]+)/slideshow$', ScreenSlideshowView.as_view(), name='screen_slideshow'),
+    url(r'^screen/(?P<screen_id>[0-9]+)/edit$', ScreenEditView.as_view(), name='screen_edit'),
+    url(r'^screen/(?P<screen_id>[0-9]+)/delete$', ScreenDeleteView.as_view(), name='screen_delete'),
 ]
 

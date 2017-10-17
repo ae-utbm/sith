@@ -32,8 +32,12 @@ from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.mail import EmailMultiAlternatives
 
-from core.models import User, Preferences, RealGroup, Notification
+from django.utils import timezone
+
+from core.models import User, Preferences, RealGroup, Notification, SithFile
 from club.models import Club
+
+
 
 
 class Sith(models.Model):
@@ -183,3 +187,41 @@ class WeekmailArticle(models.Model):
 
     def __str__(self):
         return "%s - %s (%s)" % (self.title, self.author, self.club)
+
+
+class Screen(models.Model):
+    name = models.CharField(_("name"), max_length=128)
+    club = models.ForeignKey(Club, related_name="screens", verbose_name=_("club"), null=False)
+
+    def active_posters(self):
+        now = timezone.now()
+        return self.posters.filter(is_moderated=True, date_begin__lte=now).filter(Q(date_end__isnull=True)|Q(date_end__gte=now))
+
+    def is_owned_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def __str__(self):
+        return "%s: %s" % (self.club, self.name)
+
+class Poster(models.Model):
+    name = models.CharField(_("name"), blank=False, null=False, max_length=128, default="")
+    file = models.ImageField(_("file"), null=False, upload_to="com/posters")
+    screens = models.ManyToManyField(Screen, related_name="posters")
+    date_begin = models.DateTimeField(blank=False, null=False, default=timezone.now)
+    date_end = models.DateTimeField(blank=True, null=True)
+    is_moderated = models.BooleanField(_("is moderated"), default=False)
+    moderator = models.ForeignKey(User, related_name="moderated_posters", verbose_name=_("moderator"), null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.date_end and self.date_begin > self.date_end:
+            raise ValidationError
+        return super(Poster, self).save(*args, **kwargs)
+
+    def is_owned_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def can_moderate(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def __str__(self):
+        return self.name
