@@ -304,6 +304,7 @@ class OperationForm(forms.ModelForm):
     club_account = AutoCompleteSelectField('club_accounts', help_text=None, required=False)
     club = AutoCompleteSelectField('clubs', help_text=None, required=False)
     company = AutoCompleteSelectField('companies', help_text=None, required=False)
+    need_link = forms.BooleanField(label=_("Link this operation to the target account"), required=False, initial=False)
 
     def __init__(self, *args, **kwargs):
         club_account = kwargs.pop('club_account', None)
@@ -341,7 +342,7 @@ class OperationForm(forms.ModelForm):
 
     def save(self):
         ret = super(OperationForm, self).save()
-        if self.instance.target_type == "ACCOUNT" and not self.instance.linked_operation and self.instance.target.has_open_journal():
+        if self.instance.target_type == "ACCOUNT" and not self.instance.linked_operation and self.instance.target.has_open_journal() and self.cleaned_data['need_link']:
             inst = self.instance
             club_account = inst.target
             acc_type = AccountingType.objects.exclude(movement_type="NEUTRAL").exclude(
