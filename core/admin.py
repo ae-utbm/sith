@@ -2,7 +2,6 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
-# - Nabos <gnikwo@hotmail.com>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -29,12 +28,9 @@ from core.models import User, Page, RealGroup, SithFile
 from django.contrib.auth.models import Group as AuthGroup
 from haystack.admin import SearchModelAdmin
 
-@admin.register(SithFile)
-class SithFileAdmin(admin.ModelAdmin):
-    form = make_ajax_form(SithFile, {
-        'parent': 'files',  # ManyToManyField
-    })
 
+admin.site.unregister(AuthGroup)
+admin.site.register(RealGroup)
 
 class UserAdmin(SearchModelAdmin):
     list_display = ["first_name", "last_name", "username", "email", "nick_name"]
@@ -49,11 +45,6 @@ class UserAdmin(SearchModelAdmin):
 
 admin.site.register(User, UserAdmin)
 
-    search_fields = ['username', 'first_name', 'last_name']
-    list_display = ('username', 'first_name', 'last_name')
-    list_filter = ['department', 'promo', 'groups']
-    list_per_page = 20
-
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
     form = make_ajax_form(Page, {
@@ -63,6 +54,8 @@ class PageAdmin(admin.ModelAdmin):
         'view_groups': 'groups',
     })
 
-admin.site.register(User, UserAdmin)
-admin.site.unregister(AuthGroup)
-admin.site.register(RealGroup)
+@admin.register(SithFile)
+class SithFileAdmin(admin.ModelAdmin):
+    form = make_ajax_form(SithFile, {
+        'parent': 'files',  # ManyToManyField
+    })
