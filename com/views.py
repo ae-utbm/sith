@@ -549,7 +549,7 @@ class PosterModerateView(IsComAdminMixin, ComTabsMixin, ModerateView):
     """Moderate communication poster"""
     def get(self, request, *args, **kwargs):
         obj = get_object_or_404(Poster, pk=kwargs['object_id'])
-        if obj.can_moderate(request.user):
+        if obj.can_be_moderated_by(request.user):
             obj.is_moderated = True
             obj.moderator = request.user
             obj.save()

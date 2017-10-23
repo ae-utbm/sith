@@ -191,7 +191,6 @@ class WeekmailArticle(models.Model):
 
 class Screen(models.Model):
     name = models.CharField(_("name"), max_length=128)
-    club = models.ForeignKey(Club, related_name="screens", verbose_name=_("club"), null=False)
 
     def active_posters(self):
         now = timezone.now()
@@ -206,6 +205,7 @@ class Screen(models.Model):
 class Poster(models.Model):
     name = models.CharField(_("name"), blank=False, null=False, max_length=128, default="")
     file = models.ImageField(_("file"), null=False, upload_to="com/posters")
+    club = models.ForeignKey(Club, related_name="posters", verbose_name=_("club"), null=False)
     screens = models.ManyToManyField(Screen, related_name="posters")
     date_begin = models.DateTimeField(blank=False, null=False, default=timezone.now)
     date_end = models.DateTimeField(blank=True, null=True)
@@ -220,7 +220,7 @@ class Poster(models.Model):
     def is_owned_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
-    def can_moderate(self, user):
+    def can_be_moderated_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def __str__(self):
