@@ -73,7 +73,7 @@
 {%- endmacro %}
 
 {% macro user_subscription(user) %}
-        {% trans subscription_end=user.subscriptions.last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
+        {% trans subscription_end=user.subscriptions.order_by('subscription_end').last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
         {% trans %}Account number: {% endtrans %}{{ user.customer.account_id }}<br/>
 {%- endmacro %}
 
