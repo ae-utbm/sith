@@ -30,6 +30,7 @@
             {{ form.club_account }}
             {{ form.company }}
             {{ form.target_label }}
+            <span id="id_need_link_full"><label>{{ form.need_link.label }}</label> {{ form.need_link }}</span>
         <p>{{ form.date.errors }}<label for="{{ form.date.name }}">{{ form.date.label }}</label> {{ form.date }}</p>
         <p>{{ form.mode.errors }}<label for="{{ form.mode.name }}">{{ form.mode.label }}</label> {{ form.mode }}</p>
         <p>{{ form.cheque_number.errors }}<label for="{{ form.cheque_number.name }}">{{ form.cheque_number.label }}</label> {{
@@ -65,6 +66,7 @@
             var club_account = $('#id_club_account_wrapper');
             var company = $('#id_company_wrapper');
             var other = $('#id_target_label');
+            var need_link = $('#id_need_link_full');
             function update_targets () {
                 if (target_type.val() == "USER") {
                     console.log(user);
@@ -73,8 +75,10 @@
                     club_account.hide();
                     company.hide();
                     other.hide();
+                    need_link.hide();
                 } else if (target_type.val() == "ACCOUNT") {
                     club_account.show();
+                    need_link.show();
                     user.hide();
                     club.hide();
                     company.hide();
@@ -85,24 +89,28 @@
                     club_account.hide();
                     company.hide();
                     other.hide();
+                    need_link.hide();
                 } else if (target_type.val() == "COMPANY") {
                     company.show();
                     user.hide();
                     club_account.hide();
                     club.hide();
                     other.hide();
+                    need_link.hide();
                 } else if (target_type.val() == "OTHER") {
                     other.show();
                     user.hide();
                     club.hide();
                     club_account.hide();
                     company.hide();
+                    need_link.hide();
                 } else {
                     company.hide();
                     user.hide();
                     club_account.hide();
                     club.hide();
                     other.hide();
+                    need_link.hide();
                 }
             }
             update_targets();
