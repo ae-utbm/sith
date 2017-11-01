@@ -188,7 +188,7 @@ class Club(models.Model):
         sub = User.objects.filter(pk=user.pk).first()
         if sub is None:
             return False
-        return sub.is_subscribed
+        return sub.was_subscribed
 
     _memberships = {}
 
