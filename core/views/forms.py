@@ -37,11 +37,11 @@ from ajax_select.fields import AutoCompleteSelectField
 import re
 
 from core.models import User, Page, SithFile, Gift
+from com.models import Poster, Screen
 
 from core.utils import resize_image
 from io import BytesIO
 from PIL import Image
-
 
 # Widgets
 

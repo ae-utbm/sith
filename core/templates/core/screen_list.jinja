@@ -10,7 +10,7 @@
     <div id="title">
         <h3>{% trans %}Screens{% endtrans %}</h3>
         <div id="links" class="right">
-            <a id="create" class="link" href="{{ url("com:screen_create") }}">{% trans %}Create{% endtrans %}</a>
+            <a id="create" class="link" href="{{ url(screen_create_url_name) }}">{% trans %}Create{% endtrans %}</a>
         </div>
     </div>
 
@@ -23,8 +23,7 @@
             {% for screen in screen_list %}
                 <div class="screen">
                     <div class="name">{{ screen.name }}</div>
-                    <div class="club">Club: {{ screen.club }}</div>
-                    <a class="edit" href="{{ url("com:screen_edit", screen.id) }}">{% trans %}Edit{% endtrans %}</a>
+                    <a class="edit" href="{{ url(screen_edit_url_name, screen.id) }}">{% trans %}Edit{% endtrans %}</a>
                     <a class="slideshow" href="{{ url("com:screen_slideshow", screen.id) }}" target="_blank">{% trans %}Slideshow{% endtrans %}</a>
                 </div>
             {% endfor %}

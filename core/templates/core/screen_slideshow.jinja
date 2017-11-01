@@ -10,7 +10,7 @@
         <div id="slides">
         {% for poster in posters %}
             <div class="slide {% if loop.first %}center{% else %}right{% endif %}">
-                <img src="{{ static(poster.file.url) }}"></img>
+                <img src="{{ poster.file.url }}"></img>
             </div>
         {% endfor %}
         </div>

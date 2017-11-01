@@ -37,12 +37,13 @@ from ajax_select.fields import AutoCompleteSelectField
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, PageEditViewBase
-from core.views.forms import SelectDate, SelectDateTime
+from core.views import CanCreateMixin, CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, PageEditViewBase
+from core.views.forms import SelectDate, SelectDateTime, PosterForm
 from club.models import Club, Membership, Mailing, MailingSubscription
 from sith.settings import SITH_MAXIMUM_FREE_ROLE
 from counter.models import Selling, Counter
 from core.models import User, PageRev
+from com.models import Poster
 
 from django.conf import settings
 
@@ -140,6 +141,11 @@ class ClubTabsMixin(TabedViewMixin):
                 'url': reverse('club:mailing', kwargs={'club_id': self.object.id}),
                 'slug': 'mailing',
                         'name': _("Mailing list"),
+            })
+            tab_list.append({
+                'url': reverse('club:poster_list', kwargs={'club_id': self.object.id}),
+                'slug': 'posters',
+                        'name': _("Posters list"),
             })
         if self.request.user.is_owner(self.object):
             tab_list.append({
@@ -592,3 +598,75 @@ class MailingAutoCleanView(View):
     def get(self, request, *args, **kwargs):
         self.mailing.subscriptions.all().delete()
         return redirect('club:mailing', club_id=self.mailing.club.id)
+
+
+class PosterListView(CanViewMixin, ListView):
+    """List communication posters"""
+    current_tab = "posters"
+    model = Poster
+    template_name = 'core/poster_list.jinja'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.club = get_object_or_404(Club, pk=kwargs['club_id'])
+        return super(PosterListView, self).dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Poster.objects.filter(club=self.club.id)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(PosterListView, self).get_context_data(**kwargs)
+        kwargs['club'] = self.club
+        kwargs['app'] = "club"
+        kwargs['poster_create_url_name'] = "club:poster_create"
+        kwargs['poster_edit_url_name'] = "club:poster_edit"
+        kwargs['poster_list_url_name'] = "club:poster_list"
+        return kwargs
+
+
+class PosterCreateView(CanCreateMixin, CreateView):
+    """Create communication poster"""
+    current_tab = "posters"
+    form_class = PosterForm
+    template_name = 'core/create.jinja'
+    success_url = reverse_lazy('club:poster_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        self.club = get_object_or_404(Club, pk=kwargs['club_id'])
+        self.request = request
+        return super(PosterCreateView, self).dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        initials = super(PosterCreateView, self).get_initial()
+        initials['user'] = self.request.user
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(PosterCreateView, self).get_context_data(**kwargs)
+        kwargs['club'] = self.club
+        kwargs['app'] = "club"
+        kwargs['poster_create_url_name'] = "club:poster_create"
+        kwargs['poster_edit_url_name'] = "club:poster_edit"
+        kwargs['poster_list_url_name'] = "club:poster_list"
+        return kwargs
+
+class PosterEditView(CanEditMixin, UpdateView):
+    """Edit communication poster"""
+    pk_url_kwarg = "poster_id"
+    current_tab = "posters"
+    form_class = PosterForm
+    template_name = 'core/poster_edit.jinja'
+    success_url = reverse_lazy('club:poster_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        self.club = get_object_or_404(Club, pk=kwargs['club_id'])
+        self.request = request
+        return super(PosterCreateView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super(PosterEditView, self).get_context_data(**kwargs)
+        kwargs['club'] = self.club
+        kwargs['app'] = "club"
+        kwargs['poster_create_url_name'] = "club:poster_create"
+        kwargs['poster_edit_url_name'] = "club:poster_edit"
+        kwargs['poster_list_url_name'] = "club:poster_list"
+        return kwargs
+

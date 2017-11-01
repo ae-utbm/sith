@@ -518,6 +518,9 @@ class User(AbstractBaseUser):
             infos.save()
             return infos
 
+    def get_clubs_with_rights(self):
+        return [m.club.id for m in self.memberships.filter(end_date__gte=timezone.now()).all() if m.club.has_rights_in_club(self)]
+
 
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self, request):

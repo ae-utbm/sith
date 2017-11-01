@@ -24,7 +24,7 @@
             {% for poster in object_list %}
                 <div class="poster">
                     <div class="name"> {{ poster.name }} </div>
-                    <div class="image"> <img src="{{ static(poster.file.url) }}"></img> </div>
+                    <div class="image"> <img src="{{ poster.file.url }}"></img> </div>
                     <a class="moderate" href="{{ url(moderation_url, object_id=poster.id) }}">Moderate</a>
                 </div>
             {% endfor %}
