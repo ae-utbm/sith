@@ -9,16 +9,12 @@
         <link rel="stylesheet" href="{{ static('core/jquery.datetimepicker.min.css') }}">
         <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
         <link rel="stylesheet" href="{{ scss('core/style.scss') }}">
+        <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
         {% if settings.EXTERNAL_RES %}
           <noscript><link rel="stylesheet" href="https://use.fontawesome.com/775817bb35.css"></noscript>
           <script src="https://use.fontawesome.com/c06c9c6980.js"></script>
-
-          <noscript><link rel="stylesheet" type="text/css" href="static('core/js/ui/jquery-ui.min.css')"></noscript>
-          <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-
         {% else %}
           <link rel="stylesheet" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}">
-          <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
         {% endif %}
         {% endblock %}
     </head>
