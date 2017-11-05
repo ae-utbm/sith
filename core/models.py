@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -1109,3 +1110,15 @@ class Notification(models.Model):
                 old_notif.save()
                 return
         super(Notification, self).save(*args, **kwargs)
+
+
+class Gift(models.Model):
+    label = models.CharField(_('label'), max_length=255)
+    date = models.DateTimeField(_('date'), default=timezone.now)
+    user = models.ForeignKey(User, related_name='gifts')
+
+    def __str__(self):
+        return "%s - %s" % (self.label, self.date.strftime('%d %b %Y'))
+
+    def is_owned_by(self, user):
+        return user.is_board_member or user.is_root
