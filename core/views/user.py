@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -30,9 +31,10 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpResponse
 from django.views.generic.edit import UpdateView
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, CreateView, DeleteView
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
+from django.core.urlresolvers import reverse_lazy
 from django.template.response import TemplateResponse
 from django.conf import settings
 from django.views.generic.dates import YearMixin, MonthMixin
@@ -41,8 +43,8 @@ from datetime import timedelta, date
 import logging
 
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, TabedViewMixin, QuickNotifMixin
-from core.views.forms import RegisteringForm, UserProfileForm, LoginForm, UserGodfathersForm
-from core.models import User, SithFile, Preferences
+from core.views.forms import RegisteringForm, UserProfileForm, LoginForm, UserGodfathersForm, GiftForm
+from core.models import User, SithFile, Preferences, Gift
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
@@ -232,6 +234,10 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
     template_name = "core/user_detail.jinja"
     current_tab = 'infos'
 
+    def get_context_data(self, **kwargs):
+        kwargs = super(UserView, self).get_context_data(**kwargs)
+        kwargs['gift_form'] = GiftForm(user_id=self.object.id, initial={'user': self.object})
+        return kwargs
 
 
 class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
@@ -690,3 +696,38 @@ class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
             pass
         kwargs['tab'] = "account"
         return kwargs
+
+
+class GiftCreateView(CreateView):
+    form_class = GiftForm
+    template_name = 'core/create.jinja'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not (request.user.is_board_member or request.user.is_root):
+            raise PermissionDenied
+        self.user = get_object_or_404(User, pk=kwargs['user_id'])
+        return super(GiftCreateView, self).dispatch(request, *args, **kwargs)
+
+    def get_initial(self):
+        return {'user': self.user}
+
+    def get_form_kwargs(self):
+        kwargs = super(GiftCreateView, self).get_form_kwargs()
+        kwargs['user_id'] = self.user.id
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy('core:user_profile', kwargs={'user_id': self.user.id})
+
+
+class GiftDeleteView(CanEditPropMixin, DeleteView):
+    model = Gift
+    pk_url_kwarg = "gift_id"
+    template_name = 'core/delete_confirm.jinja'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.user = get_object_or_404(User, pk=kwargs['user_id'])
+        return super(GiftDeleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('core:user_profile', kwargs={'user_id': self.user.id})

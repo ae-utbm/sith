@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -73,6 +74,8 @@ urlpatterns = [
     url(r'^user/(?P<user_id>[0-9]+)/account$', UserAccountView.as_view(), name='user_account'),
     url(r'^user/(?P<user_id>[0-9]+)/account/(?P<year>[0-9]+)/(?P<month>[0-9]+)$', UserAccountDetailView.as_view(), name='user_account_detail'),
     url(r'^user/(?P<user_id>[0-9]+)/stats$', UserStatsView.as_view(), name='user_stats'),
+    url(r'^user/(?P<user_id>[0-9]+)/gift/create$', GiftCreateView.as_view(), name='user_gift_create'),
+    url(r'^user/(?P<user_id>[0-9]+)/gift/delete/(?P<gift_id>[0-9]+)/$', GiftDeleteView.as_view(), name='user_gift_delete'),
 
     # File views
     # url(r'^file/add/(?P<popup>popup)?$', FileCreateView.as_view(), name='file_new'),

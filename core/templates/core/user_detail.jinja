@@ -66,12 +66,38 @@
     {% endif %}
 {% else %}
     {% trans %}Not subscribed{% endtrans %}
-    {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
+    {% if user.is_board_member %}
         <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>
         {% endif %}
     {% endif %}
     </p>
 {% endif %}
+
+{% if user.is_root or user.is_board_member %}
+    <hr>
+    <form style="margin-left: 0px;" action="{{ url('core:user_gift_create', user_id=profile.id) }}" method="post">
+        {% csrf_token %}
+        {{ gift_form.label }}
+        {{ gift_form.user }}
+        <input type="submit" value="{% trans %}Give gift{% endtrans %}">
+    </form>
+    {% if profile.gifts.exists() %}
+    <br>
+        <div id="drop_gifts">
+            <h5>{% trans %}Last given gift :{% endtrans %} {{ profile.gifts.order_by('-date').first() }}</h5>
+            <div>
+                <ul>
+                {% for gift in profile.gifts.all().order_by('-date') %}
+                    <li>{{ gift }} <a href="{{ url('core:user_gift_delete', user_id=profile.id, gift_id=gift.id) }}">{% trans %}Delete{% endtrans %}</a></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% else %}
+        {% trans %}No gift given yet{% endtrans %}
+    {% endif %}
+{% endif %}
+
 
 {% endblock %}
 
@@ -92,6 +118,13 @@ $( function() {
         }
     });
 } );
+$(function(){
+    $("#drop_gifts").accordion({
+        heightStyle: "content",
+        collapsible: true,
+        active: false
+    });
+});
 </script>
 {% endblock %}
 

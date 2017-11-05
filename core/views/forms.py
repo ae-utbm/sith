@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -35,7 +36,7 @@ from ajax_select.fields import AutoCompleteSelectField
 
 import re
 
-from core.models import User, Page, SithFile
+from core.models import User, Page, SithFile, Gift
 
 from core.utils import resize_image
 from io import BytesIO
@@ -283,3 +284,18 @@ class PageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(PageForm, self).__init__(*args, **kwargs)
         self.fields['parent'].queryset = self.fields['parent'].queryset.exclude(name=settings.SITH_CLUB_ROOT_PAGE).filter(club=None)
+
+
+class GiftForm(forms.ModelForm):
+    class Meta:
+        model = Gift
+        fields = ['label', 'user']
+
+    label = forms.ChoiceField(choices=settings.SITH_GIFT_LIST)
+
+    def __init__(self, *args, **kwargs):
+        user_id = kwargs.pop('user_id', None)
+        super(GiftForm, self).__init__(*args, **kwargs)
+        if user_id:
+            self.fields['user'].queryset = self.fields['user'].queryset.filter(id=user_id)
+            self.fields['user'].widget = forms.HiddenInput()

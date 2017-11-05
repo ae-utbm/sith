@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -591,6 +592,10 @@ SITH_QUICK_NOTIF = {
 
 SITH_MAILING_DOMAIN = 'utbm.fr'
 SITH_MAILING_FETCH_KEY = 'IloveMails'
+
+SITH_GIFT_LIST = [
+    ('AE Tee-shirt', _("AE tee-shirt"))
+]
 
 try:
     from .settings_custom import *
