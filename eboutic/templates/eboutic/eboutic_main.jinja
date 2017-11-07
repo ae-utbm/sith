@@ -41,6 +41,10 @@
     {% for t in categories %}
     {% if eboutic.products.filter(product_type=t).exists() %}
         <h5>{{ t }}</h5>
+        {% if t.comment %}
+        <p>{{ t.comment }}</p>
+        {% endif %}
+        <br />
         {% for p in eboutic.products.filter(product_type=t).all() %}
             {% set file = None %}
             {% if p.icon %}

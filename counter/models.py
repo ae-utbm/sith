@@ -112,6 +112,7 @@ class ProductType(models.Model):
     """
     name = models.CharField(_('name'), max_length=30)
     description = models.TextField(_('description'), null=True, blank=True)
+    comment = models.TextField(_('comment'), null=True, blank=True)
     icon = models.ImageField(upload_to='products', null=True, blank=True)
 
     class Meta:
