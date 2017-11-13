@@ -1118,7 +1118,14 @@ class Gift(models.Model):
     user = models.ForeignKey(User, related_name='gifts')
 
     def __str__(self):
-        return "%s - %s" % (self.label, self.date.strftime('%d %b %Y'))
+        return "%s - %s" % (self.translated_label, self.date.strftime('%d %b %Y'))
+
+    @property
+    def translated_label(self):
+        translations = [label[1] for label in settings.SITH_GIFT_LIST if label[0] == self.label]
+        if len(translations) > 0:
+            return translations[0]
+        return self.label
 
     def is_owned_by(self, user):
         return user.is_board_member or user.is_root
