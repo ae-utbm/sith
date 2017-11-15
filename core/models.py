@@ -231,8 +231,8 @@ class User(AbstractBaseUser):
 
     @cached_property
     def is_subscribed(self):
-        s = self.subscriptions.filter(subscription_start__lte=timezone.now()).order_by('subscription_end').last()
-        return s.is_valid_now() if s is not None else False
+        s = self.subscriptions.filter(subscription_start__lte=timezone.now(), subscription_end__gte=timezone.now())
+        return s.exists()
 
     _club_memberships = {}
     _group_names = {}
