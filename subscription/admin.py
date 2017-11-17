@@ -25,5 +25,11 @@
 from django.contrib import admin
 
 from subscription.models import Subscription
+from haystack.admin import SearchModelAdmin
 
-admin.site.register(Subscription)
+
+class SubscriptionAdmin(SearchModelAdmin):
+    search_fields = ["member__username", "subscription_start", "subscription_end", "subscription_type"]
+
+
+admin.site.register(Subscription, SubscriptionAdmin)
