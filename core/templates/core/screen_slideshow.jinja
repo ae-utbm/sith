@@ -9,7 +9,7 @@
 
         <div id="slides">
         {% for poster in posters %}
-            <div class="slide {% if loop.first %}center{% else %}right{% endif %}">
+            <div class="slide {% if loop.first %}center{% else %}right{% endif %}" display_time="{{ poster.display_time }}">
                 <img src="{{ poster.file.url }}"></img>
             </div>
         {% endfor %}

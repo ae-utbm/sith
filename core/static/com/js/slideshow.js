@@ -1,6 +1,5 @@
 $(document).ready(function(){
 
-    wait_time = 40 * 1000;
     transition_time = 1000;
 
     i = 0;
@@ -39,16 +38,18 @@ $(document).ready(function(){
     function init_progress_bar()
     {
 
+        $("#slideshow #progress_bar").css("transition", "none");
         $("#slideshow #progress_bar").removeClass("progress");
         $("#slideshow #progress_bar").addClass("init");
 
     }
 
-    function start_progress_bar()
+    function start_progress_bar(display_time)
     {
 
         $("#slideshow #progress_bar").removeClass("init");
         $("#slideshow #progress_bar").addClass("progress");
+        $("#slideshow #progress_bar").css("transition", "width " + display_time + "s linear")
 
     }
 
@@ -63,6 +64,7 @@ $(document).ready(function(){
         next_slide = $($("#slideshow .slide").get((i + 1) % max));
         next_slide.removeClass("right");
         next_slide.addClass("center");
+        display_time = next_slide.attr("display_time") || 2;
 
         $("#slideshow .bullet").removeClass("active");
         bullet = $("#slideshow .bullet")[(i + 1) % max];
@@ -76,19 +78,20 @@ $(document).ready(function(){
             others_left.removeClass("left");
             others_left.addClass("right");
 
-            start_progress_bar();
-            next_trigger = setTimeout(next, wait_time);
+            start_progress_bar(display_time);
+            next_trigger = setTimeout(next, display_time * 1000);
 
         }, transition_time);
 
     }
 
 
+    display_time = $("#slideshow .center").attr("display_time");
     init_progress_bar();
     setTimeout(function(){
         if(max > 1){
-            start_progress_bar();
-            setTimeout(next, wait_time);
+            start_progress_bar(display_time);
+            setTimeout(next, display_time * 1000);
         }
     }, 10);
 

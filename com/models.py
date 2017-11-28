@@ -209,6 +209,7 @@ class Poster(models.Model):
     screens = models.ManyToManyField(Screen, related_name="posters")
     date_begin = models.DateTimeField(blank=False, null=False, default=timezone.now)
     date_end = models.DateTimeField(blank=True, null=True)
+    display_time = models.IntegerField(_("display time"), blank=False, null=False, default=30)
     is_moderated = models.BooleanField(_("is moderated"), default=False)
     moderator = models.ForeignKey(User, related_name="moderated_posters", verbose_name=_("moderator"), null=True, blank=True)
 

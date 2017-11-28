@@ -16,7 +16,7 @@
     <div id="title">
         <h3>{% trans %}Posters{% endtrans %}</h3>
         <div id="links" class="right">
-            <a id="create" class="link" href="{{ url(poster_create_url_name) }}">{% trans %}Create{% endtrans %}</a>
+            <a id="create" class="link" href="{{ url(app + ":poster_list") }}">{% trans %}Create{% endtrans %}</a>
             {% if app == "com" %}
                 <a id="moderation" class="link" href="{{ url("com:poster_moderate_list") }}">{% trans %}Moderation{% endtrans %}</a>
             {% endif %}
