@@ -1,0 +1,39 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Poster{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<div id="poster_edit">
+
+    <div id="title">
+        <div id="links" class="left">
+            {% if app == "com" %}
+                <a id="list" class="link" href="{{ url(app + ":poster_list") }}">{% trans %}List{% endtrans %}</a>
+            {% elif app == "club" %}
+                <a id="list" class="link" href="{{ url(app + ":poster_list", club.id) }}">{% trans %}List{% endtrans %}</a>
+            {% endif %}
+        </div>
+        <h3>{% trans %}Posters - edit{% endtrans %}</h3>
+        <div id="links" class="right">
+            <a class="link delete" href="{{ url("com:poster_delete", poster.id) }}">{% trans %}Delete{% endtrans %}</a>
+        </div>
+    </div>
+
+    <div id="poster">
+
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p() }}
+            <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+        </form>
+
+
+    </div>
+
+</div>
+{% endblock %}
+
+
+
