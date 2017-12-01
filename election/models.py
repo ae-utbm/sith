@@ -128,6 +128,14 @@ class ElectionList(models.Model):
     title = models.CharField(_('title'), max_length=255)
     election = models.ForeignKey(Election, related_name='election_lists', verbose_name=_("election"))
 
+    def can_be_edited_by(self, user):
+        return user.can_edit(self.election)
+
+    def delete(self):
+        for candidature in self.candidatures.all():
+            candidature.delete()
+        super(ElectionList, self).delete()
+
     def __str__(self):
         return self.title
 

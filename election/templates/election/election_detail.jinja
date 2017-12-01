@@ -265,7 +265,12 @@ th {
                 <thead>
                     <th>{% trans %}Blank vote{% endtrans %}</th>
                     {%- for election_list in election_lists %}
-                    <th>{{ election_list.title }}</th>
+                    <th>
+                        {{ election_list.title }}
+                        {% if user.can_edit(election_list) and election.is_vote_editable -%}
+                            - <a href="{{ url('election:delete_list', list_id=election_list.id) }}">{% trans %}Delete{% endtrans %}</a>
+                        {% endif %}
+                    </th>
                     {%- endfor %}
                 </thead>
                 {%- for role in election.roles.all() %}
@@ -279,8 +284,9 @@ th {
                                 <a href="{{url('election:update_role', role_id=role.id)}}">{% trans %}Edit{% endtrans %}</a>
                                 <a href="{{url('election:delete_role', role_id=role.id)}}">{% trans %}Delete{% endtrans %}</a>
                             {%- endif -%}
-                            <br><span>{{ role.description }}</span>
+                            <br><span class='role__description'><p>{{ role.description }}</p></span>
                             {%- if role.max_choice > 1 and not election.has_voted(user) and election.can_vote(user) %}
+                            <br>
                             <strong class="role__multiple-choices-label">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
                             {%- endif %}
                             {%- if election_form.errors[role.title] is defined %}
@@ -319,9 +325,6 @@ th {
                                         </div>
                                         <figcaption class="candidate__details">
                                             <cite class="candidate__full-name">{{ candidature.user.first_name }} <em class="candidate__nick-name">{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</cite>
-                                            {%- if not election.is_vote_finished %}
-                                            <q class="candidate__program">{{ candidature.program or '' }}</q>
-                                            {%- endif %}
                                             {%- if user.can_edit(candidature) -%}
                                             {% if election.is_vote_editable %}
                                             <a href="{{url('election:update_candidate', candidature_id=candidature.id)}}">{% trans %}Edit{% endtrans %}</a>
@@ -330,6 +333,9 @@ th {
                                             <a href="{{url('election:delete_candidate', candidature_id=candidature.id)}}">{% trans %}Delete{% endtrans %}</a>
                                             {%- endif -%}
                                             {%- endif -%}
+                                            {%- if not election.is_vote_finished %}
+                                            <q class="candidate__program">{{ candidature.program | markdown or '' }}</q>
+                                            {%- endif %}
                                         </figcaption>
                                     </figure>
                                     {%- if election.can_vote(user) %}
@@ -382,6 +388,18 @@ th {
 
 {% block script %}
 {{ super() }}
+<script src="{{ static('core/js/shorten.min.js') }}"></script>
+<script type="text/javascript">
+$('.role__description').shorten({
+    moreText: "{% trans %}Show more{% endtrans %}",
+    lessText: "{% trans %}Show less{% endtrans %}"
+});
+$('.candidate__program').shorten({
+    moreText: "{% trans %}Show more{% endtrans %}",
+    lessText: "{% trans %}Show less{% endtrans %}",
+    showChars: 200
+});
+</script>
 <script type="text/javascript">
 document.querySelectorAll('.role__multiple-choices').forEach(setupRestrictions);
 

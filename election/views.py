@@ -538,3 +538,19 @@ class RoleDeleteView(CanEditMixin, DeleteView):
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
+
+
+class ElectionListDeleteView(CanEditMixin, DeleteView):
+    model = ElectionList
+    template_name = 'core/delete_confirm.jinja'
+    pk_url_kwarg = 'list_id'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.election = self.object.election
+        if not self.election.is_vote_editable:
+            raise PermissionDenied
+        return super(ElectionListDeleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
