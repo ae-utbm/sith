@@ -71,7 +71,7 @@ class Customer(models.Model):
     @property
     def can_buy(self):
         return (self.user.subscriptions.last() and
-                (date.today() - self.user.subscriptions.last().subscription_end) < timedelta(days=90))
+                (date.today() - self.user.subscriptions.order_by('subscription_end').last().subscription_end) < timedelta(days=90))
 
     def generate_account_id(number):
         number = str(number)
