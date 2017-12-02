@@ -13,5 +13,6 @@ django-haystack
 whoosh
 django-debug-toolbar
 libsass
+django-ordered-model
 pygraphviz
 # mysqlclient

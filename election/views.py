@@ -177,6 +177,23 @@ class ElectionDetailView(CanViewMixin, DetailView):
     template_name = 'election/election_detail.jinja'
     pk_url_kwarg = "election_id"
 
+    def get(self, request, *arg, **kwargs):
+        r = super(ElectionDetailView, self).get(request, *arg, **kwargs)
+        election = self.get_object()
+        if request.user.can_edit(election) and election.is_vote_editable:
+            action = request.GET.get('action', None)
+            role = request.GET.get('role', None)
+            if action and role and Role.objects.filter(id=role).exists():
+                if action == "up":
+                    Role.objects.get(id=role).up()
+                elif action == "down":
+                    Role.objects.get(id=role).down()
+                elif action == "bottom":
+                    Role.objects.get(id=role).bottom()
+                elif action == "top":
+                    Role.objects.get(id=role).top()
+        return r
+
     def get_context_data(self, **kwargs):
         """ Add additionnal data to the template """
         kwargs = super(ElectionDetailView, self).get_context_data(**kwargs)

@@ -273,7 +273,8 @@ th {
                     </th>
                     {%- endfor %}
                 </thead>
-                {%- for role in election.roles.all() %}
+                {%- set role_list = election.roles.order_by('order').all() %}
+                {%- for role in role_list %}
                 {%- set count = [0] %}
                 {%- set role_data = election_form.data.getlist(role.title) if role.title in election_form.data else [] %}
                 <tbody data-max-choice="{{role.max_choice}}" class="role{{ ' role_error' if role.title in election_form.errors else '' }}{{ ' role__multiple-choices' if role.max_choice > 1 else ''}}">
@@ -283,6 +284,22 @@ th {
                             {% if user.can_edit(role) and election.is_vote_editable -%}
                                 <a href="{{url('election:update_role', role_id=role.id)}}">{% trans %}Edit{% endtrans %}</a>
                                 <a href="{{url('election:delete_role', role_id=role.id)}}">{% trans %}Delete{% endtrans %}</a>
+                                <span style="float:right">
+                                    {%- if role == role_list.last() %}
+                                    <button disabled><i class="fa fa-arrow-down"></i></button>
+                                    <button disabled><i class="fa fa-caret-down"></i></button>
+                                    {%- else %}
+                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=bottom');"><i class="fa fa-arrow-down"></i></button>
+                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=down');"><i class="fa fa-caret-down"></i></button>
+                                    {%- endif %}
+                                    {% if role == role_list.first() %}
+                                    <button disabled><i class="fa fa-caret-up"></i></button>
+                                    <button disabled><i class="fa fa-arrow-up"></i></button>
+                                    {% else %}
+                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=up');"><i class="fa fa-caret-up"></i></button>
+                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=top');"><i class="fa fa-arrow-up"></i></button>
+                                    {% endif %}
+                                </span>
                             {%- endif -%}
                             <br><span class='role__description'><p>{{ role.description }}</p></span>
                             {%- if role.max_choice > 1 and not election.has_voted(user) and election.can_vote(user) %}
