@@ -177,6 +177,23 @@ class ElectionDetailView(CanViewMixin, DetailView):
     template_name = 'election/election_detail.jinja'
     pk_url_kwarg = "election_id"
 
+    def get(self, request, *arg, **kwargs):
+        r = super(ElectionDetailView, self).get(request, *arg, **kwargs)
+        election = self.get_object()
+        if request.user.can_edit(election) and election.is_vote_editable:
+            action = request.GET.get('action', None)
+            role = request.GET.get('role', None)
+            if action and role and Role.objects.filter(id=role).exists():
+                if action == "up":
+                    Role.objects.get(id=role).up()
+                elif action == "down":
+                    Role.objects.get(id=role).down()
+                elif action == "bottom":
+                    Role.objects.get(id=role).bottom()
+                elif action == "top":
+                    Role.objects.get(id=role).top()
+        return r
+
     def get_context_data(self, **kwargs):
         """ Add additionnal data to the template """
         kwargs = super(ElectionDetailView, self).get_context_data(**kwargs)
@@ -535,6 +552,22 @@ class RoleDeleteView(CanEditMixin, DeleteView):
         if not self.election.is_vote_editable:
             raise PermissionDenied
         return super(RoleDeleteView, self).dispatch(request, *arg, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
+
+
+class ElectionListDeleteView(CanEditMixin, DeleteView):
+    model = ElectionList
+    template_name = 'core/delete_confirm.jinja'
+    pk_url_kwarg = 'list_id'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.election = self.object.election
+        if not self.election.is_vote_editable:
+            raise PermissionDenied
+        return super(ElectionListDeleteView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})

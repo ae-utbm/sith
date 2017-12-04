@@ -1,4 +1,5 @@
 from django.db import models
+from ordered_model.models import OrderedModel
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
@@ -81,10 +82,15 @@ class Election(models.Model):
             results[role.title] = role.results(total_vote)
         return results
 
+    def delete(self):
+        for election_list in self.election_lists.all():
+            election_list.delete()
+        super(Election, self).delete()
+
     # Permissions
 
 
-class Role(models.Model):
+class Role(OrderedModel):
     """
     This class allows to create a new role avaliable for a candidature
     """
@@ -128,6 +134,14 @@ class ElectionList(models.Model):
     title = models.CharField(_('title'), max_length=255)
     election = models.ForeignKey(Election, related_name='election_lists', verbose_name=_("election"))
 
+    def can_be_edited_by(self, user):
+        return user.can_edit(self.election)
+
+    def delete(self):
+        for candidature in self.candidatures.all():
+            candidature.delete()
+        super(ElectionList, self).delete()
+
     def __str__(self):
         return self.title
 
@@ -140,6 +154,10 @@ class Candidature(models.Model):
     user = models.ForeignKey(User, verbose_name=_('user'), related_name='candidates', blank=True)
     program = models.TextField(_('description'), null=True, blank=True)
     election_list = models.ForeignKey(ElectionList, related_name='candidatures', verbose_name=_('election list'))
+
+    def delete(self):
+        for vote in self.votes.all():
+            vote.delete()
 
     def can_be_edited_by(self, user):
         return (user == self.user) or user.can_edit(self.role.election)

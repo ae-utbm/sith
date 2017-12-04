@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^(?P<election_id>[0-9]+)/edit$', ElectionUpdateView.as_view(), name='update'),
     url(r'^(?P<election_id>[0-9]+)/delete$', ElectionDeleteView.as_view(), name='delete'),
     url(r'^(?P<election_id>[0-9]+)/list/add$', ElectionListCreateView.as_view(), name='create_list'),
+    url(r'^(?P<list_id>[0-9]+)/list/delete$', ElectionListDeleteView.as_view(), name='delete_list'),
     url(r'^(?P<election_id>[0-9]+)/role/create$', RoleCreateView.as_view(), name='create_role'),
     url(r'^(?P<role_id>[0-9]+)/role/edit$', RoleUpdateView.as_view(), name='update_role'),
     url(r'^(?P<role_id>[0-9]+)/role/delete$', RoleDeleteView.as_view(), name='delete_role'),
