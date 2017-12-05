@@ -510,6 +510,7 @@ class PosterListBaseView(ListView):
 
     def dispatch(self, request, *args, **kwargs):
         club_id = kwargs.pop('club_id', None)
+        self.club = None
         if club_id:
             self.club = get_object_or_404(Club, pk=club_id)
         return super(PosterListBaseView, self).dispatch(request, *args, **kwargs)

@@ -90,8 +90,6 @@ class ClubTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
         if isinstance(self.object, PageRev):
             self.object = self.object.page.club
-        if isinstance(self.object, Poster):
-            self.object = self.club
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
@@ -603,15 +601,17 @@ class MailingAutoCleanView(View):
         return redirect('club:mailing', club_id=self.mailing.club.id)
 
 
-class PosterListView(PosterListBaseView, CanViewMixin, ClubTabsMixin):
+class PosterListView(PosterListBaseView, ClubTabsMixin, CanViewMixin):
     """List communication posters"""
 
-    def dispatch(self, request, *args, **kwargs):
-        return super(PosterListView, self).dispatch(request, *args, **kwargs)
+    def get_object(self):
+        return self.club
 
     def get_context_data(self, **kwargs):
         kwargs = super(PosterListView, self).get_context_data(**kwargs)
         kwargs['app'] = "club"
+        kwargs['tabs_title'] = self.get_tabs_title()
+        kwargs['list_of_tabs'] = self.get_list_of_tabs()
         return kwargs
 
 
