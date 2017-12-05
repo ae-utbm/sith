@@ -518,8 +518,13 @@ class User(AbstractBaseUser):
             infos.save()
             return infos
 
-    def get_clubs_with_rights(self):
+    @cached_property
+    def clubs_with_rights(self):
         return [m.club.id for m in self.memberships.filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=timezone.now())).all() if m.club.has_rights_in_club(self)]
+
+    @cached_property
+    def is_com_admin(self):
+        return self.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
 
 class AnonymousUser(AuthAnonymousUser):

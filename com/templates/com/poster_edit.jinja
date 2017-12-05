@@ -17,7 +17,11 @@
         </div>
         <h3>{% trans %}Posters - edit{% endtrans %}</h3>
         <div id="links" class="right">
-            <a class="link delete" href="{{ url("com:poster_delete", poster.id) }}">{% trans %}Delete{% endtrans %}</a>
+            {% if app == "com" %}
+                <a class="link delete" href="{{ url(app + ":poster_delete", poster.id) }}">{% trans %}Delete{% endtrans %}</a>
+            {% elif app == "club" %}
+                <a class="link delete" href="{{ url(app + ":poster_delete", club.id, poster.id) }}">{% trans %}Delete{% endtrans %}</a>
+            {% endif %}
         </div>
     </div>
 

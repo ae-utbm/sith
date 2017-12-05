@@ -219,7 +219,7 @@ class Poster(models.Model):
         return super(Poster, self).save(*args, **kwargs)
 
     def is_owned_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or Club.objects.filter(id__in=user.get_clubs_with_rights())
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or Club.objects.filter(id__in=user.clubs_with_rights)
 
     def can_be_moderated_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)

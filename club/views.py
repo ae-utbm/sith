@@ -43,7 +43,7 @@ from club.models import Club, Membership, Mailing, MailingSubscription
 from sith.settings import SITH_MAXIMUM_FREE_ROLE
 from counter.models import Selling, Counter
 from core.models import User, PageRev
-from com.views import PosterListBaseView, PosterCreateBaseView, PosterEditBaseView
+from com.views import PosterListBaseView, PosterCreateBaseView, PosterEditBaseView, PosterDeleteBaseView
 from com.models import Poster
 
 from django.conf import settings
@@ -90,6 +90,8 @@ class ClubTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
         if isinstance(self.object, PageRev):
             self.object = self.object.page.club
+        if isinstance(self.object, Poster):
+            self.object = self.club
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
@@ -601,8 +603,11 @@ class MailingAutoCleanView(View):
         return redirect('club:mailing', club_id=self.mailing.club.id)
 
 
-class PosterListView(CanViewMixin, PosterListBaseView):
+class PosterListView(PosterListBaseView, CanViewMixin, ClubTabsMixin):
     """List communication posters"""
+
+    def dispatch(self, request, *args, **kwargs):
+        return super(PosterListView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(PosterListView, self).get_context_data(**kwargs)
@@ -610,19 +615,19 @@ class PosterListView(CanViewMixin, PosterListBaseView):
         return kwargs
 
 
-class PosterCreateView(CanCreateMixin, PosterCreateBaseView):
+class PosterCreateView(PosterCreateBaseView, CanCreateMixin):
     """Create communication poster"""
 
     def get_success_url(self, **kwargs):
         return reverse_lazy('club:poster_list', kwargs={'club_id': self.club.id});
-
 
     def get_context_data(self, **kwargs):
         kwargs = super(PosterCreateView, self).get_context_data(**kwargs)
         kwargs['app'] = "club"
         return kwargs
 
-class PosterEditView(CanEditMixin, PosterEditBaseView):
+
+class PosterEditView(ClubTabsMixin, PosterEditBaseView, CanEditMixin):
     """Edit communication poster"""
 
     def get_success_url(self):
@@ -632,4 +637,11 @@ class PosterEditView(CanEditMixin, PosterEditBaseView):
         kwargs = super(PosterEditView, self).get_context_data(**kwargs)
         kwargs['app'] = "club"
         return kwargs
+
+
+class PosterDeleteView(PosterDeleteBaseView, ClubTabsMixin, CanEditMixin):
+    """Delete communication poster"""
+
+    def get_success_url(self):
+        return reverse_lazy('club:poster_list', kwargs={'club_id': self.club.id});
 

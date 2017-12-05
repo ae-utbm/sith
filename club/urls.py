@@ -53,4 +53,5 @@ urlpatterns = [
     url(r'^(?P<club_id>[0-9]+)/poster$', PosterListView.as_view(), name='poster_list'),
     url(r'^(?P<club_id>[0-9]+)/poster/create$', PosterCreateView.as_view(), name='poster_create'),
     url(r'^(?P<club_id>[0-9]+)/poster/(?P<poster_id>[0-9]+)/edit$', PosterEditView.as_view(), name='poster_edit'),
+    url(r'^(?P<club_id>[0-9]+)/poster/(?P<poster_id>[0-9]+)/delete$', PosterDeleteView.as_view(), name='poster_delete'),
 ]

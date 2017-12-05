@@ -62,13 +62,11 @@ class PosterForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
+        self.user = kwargs.pop('user', None)
         super(PosterForm, self).__init__(*args, **kwargs)
-        if user:
-            if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID):
-                self.fields['club'].queryset = Club.objects.all()
-            else:
-                self.fields['club'].queryset = Club.objects.filter(id__in=user.get_clubs_with_rights()).all()
+        if self.user:
+            if not self.user.is_com_admin:
+                self.fields['club'].queryset = Club.objects.filter(id__in=self.user.clubs_with_rights)
 
 
 class ComTabsMixin(TabedViewMixin):
@@ -511,23 +509,21 @@ class PosterListBaseView(ListView):
     template_name = 'com/poster_list.jinja'
 
     def dispatch(self, request, *args, **kwargs):
-        self.club = None
-        if 'club_id' in kwargs and kwargs['club_id']:
-            try:
-                self.club = Club.objects.get(pk=kwargs['club_id'])
-            except Club.DoesNotExist:
-                pass
+        club_id = kwargs.pop('club_id', None)
+        if club_id:
+            self.club = get_object_or_404(Club, pk=club_id)
         return super(PosterListBaseView, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        if 'club' in self.__dict__ and self.club:
-            return Poster.objects.filter(club=self.club.id)
-        else:
+        if self.request.user.is_com_admin:
             return Poster.objects.all().order_by('-date_begin')
+        else:
+            return Poster.objects.filter(club=self.club.id)
 
     def get_context_data(self, **kwargs):
         kwargs = super(PosterListBaseView, self).get_context_data(**kwargs)
-        kwargs['club'] = self.club
+        if not self.request.user.is_com_admin:
+            kwargs['club'] = self.club
         return kwargs
 
 
@@ -541,21 +537,26 @@ class PosterCreateBaseView(CreateView):
         return Poster.objects.all()
 
     def dispatch(self, request, *args, **kwargs):
-        self.club = None
         if 'club_id' in kwargs and kwargs['club_id']:
             try:
                 self.club = Club.objects.get(pk=kwargs['club_id'])
             except Club.DoesNotExist:
-                pass
+                raise PermissionDenied
         return super(PosterCreateBaseView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(PosterCreateBaseView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
 
     def get_context_data(self, **kwargs):
         kwargs = super(PosterCreateBaseView, self).get_context_data(**kwargs)
-        kwargs['club'] = self.club
+        if not self.request.user.is_com_admin:
+            kwargs['club'] = self.club
         return kwargs
 
     def form_valid(self, form):
-        if not('club' in self.__dict__ and self.club):
+        if self.request.user.is_com_admin:
             form.instance.is_moderated = True
         return super(PosterCreateBaseView, self).form_valid(form)
 
@@ -568,20 +569,25 @@ class PosterEditBaseView(UpdateView):
     template_name = 'com/poster_edit.jinja'
 
     def dispatch(self, request, *args, **kwargs):
-        self.club = None
         if 'club_id' in kwargs and kwargs['club_id']:
             try:
                 self.club = Club.objects.get(pk=kwargs['club_id'])
             except Club.DoesNotExist:
-                pass
+                raise PermissionDenied
         return super(PosterEditBaseView, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return Poster.objects.all()
 
+    def get_form_kwargs(self):
+        kwargs = super(PosterEditBaseView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
     def get_context_data(self, **kwargs):
         kwargs = super(PosterEditBaseView, self).get_context_data(**kwargs)
-        kwargs['club'] = self.club
+        if not self.request.user.is_com_admin:
+            kwargs['club'] = self.club
         return kwargs
 
     def form_valid(self, form):
@@ -590,11 +596,24 @@ class PosterEditBaseView(UpdateView):
         return super(PosterEditBaseView, self).form_valid(form)
 
 
-class PosterListView(IsComAdminMixin, ComTabsMixin, PosterListBaseView):
-    """List communication posters"""
+class PosterDeleteBaseView(DeleteView):
+    """Edit communication poster"""
+    pk_url_kwarg = "poster_id"
     current_tab = "posters"
     model = Poster
-    template_name = 'com/poster_list.jinja'
+    template_name = 'core/delete_confirm.jinja'
+
+    def dispatch(self, request, *args, **kwargs):
+        if 'club_id' in kwargs and kwargs['club_id']:
+            try:
+                self.club = Club.objects.get(pk=kwargs['club_id'])
+            except Club.DoesNotExist:
+                raise PermissionDenied
+        return super(PosterDeleteBaseView, self).dispatch(request, *args, **kwargs)
+
+
+class PosterListView(IsComAdminMixin, ComTabsMixin, PosterListBaseView):
+    """List communication posters"""
 
     def get_context_data(self, **kwargs):
         kwargs = super(PosterListView, self).get_context_data(**kwargs)
@@ -622,12 +641,8 @@ class PosterEditView(IsComAdminMixin, ComTabsMixin, PosterEditBaseView):
         return kwargs
 
 
-class PosterDeleteView(IsComAdminMixin, ComTabsMixin, DeleteView):
+class PosterDeleteView(IsComAdminMixin, ComTabsMixin, PosterDeleteBaseView):
     """Delete communication poster"""
-    pk_url_kwarg = "poster_id"
-    current_tab = "posters"
-    model = Poster
-    template_name = 'core/delete_confirm.jinja'
     success_url = reverse_lazy('com:poster_list')
 
 
