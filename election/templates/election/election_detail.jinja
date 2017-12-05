@@ -280,7 +280,7 @@ th {
                 <tbody data-max-choice="{{role.max_choice}}" class="role{{ ' role_error' if role.title in election_form.errors else '' }}{{ ' role__multiple-choices' if role.max_choice > 1 else ''}}">
                     <tr class="role__title">
                         <td colspan="{{ election_lists.count() + 1 }}">
-                            <span>{{ role.title }}</span>
+                            <span><b>{{ role.title }}</b></span>
                             {% if user.can_edit(role) and election.is_vote_editable -%}
                                 <a href="{{url('election:update_role', role_id=role.id)}}">{% trans %}Edit{% endtrans %}</a>
                                 <a href="{{url('election:delete_role', role_id=role.id)}}">{% trans %}Delete{% endtrans %}</a>

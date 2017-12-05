@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.forms import CheckboxSelectMultiple
+from django.shortcuts import redirect
 from django import forms
 
 from core.views import CanViewMixin, CanEditMixin, CanCreateMixin
@@ -192,6 +193,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
                     Role.objects.get(id=role).bottom()
                 elif action == "top":
                     Role.objects.get(id=role).top()
+                return redirect(reverse_lazy('election:detail', kwargs={'election_id': election.id}))
         return r
 
     def get_context_data(self, **kwargs):
