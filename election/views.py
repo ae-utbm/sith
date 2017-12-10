@@ -16,6 +16,7 @@ from core.views.forms import SelectDateTime
 from election.models import Election, Role, Candidature, ElectionList, Vote
 
 from ajax_select.fields import AutoCompleteSelectField
+from ajax_select import make_ajax_field
 
 
 # Custom form field
@@ -123,13 +124,11 @@ class ElectionForm(forms.ModelForm):
                   'start_date', 'end_date',
                   'edit_groups', 'view_groups',
                   'vote_groups', 'candidature_groups']
-        widgets = {
-            'edit_groups': CheckboxSelectMultiple,
-            'view_groups': CheckboxSelectMultiple,
-            'edit_groups': CheckboxSelectMultiple,
-            'vote_groups': CheckboxSelectMultiple,
-            'candidature_groups': CheckboxSelectMultiple
-        }
+
+    edit_groups = make_ajax_field(Election, 'edit_groups', 'groups', help_text="", label=_("edit groups"))
+    view_groups = make_ajax_field(Election, 'view_groups', 'groups', help_text="", label=_("view groups"))
+    vote_groups = make_ajax_field(Election, 'vote_groups', 'groups', help_text="", label=_("vote groups"))
+    candidature_groups = make_ajax_field(Election, 'candidature_groups', 'groups', help_text="", label=_("candidature groups"))
 
     start_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start date"),
                                      widget=SelectDateTime, required=True)
