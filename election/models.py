@@ -158,6 +158,7 @@ class Candidature(models.Model):
     def delete(self):
         for vote in self.votes.all():
             vote.delete()
+        super(Candidature, self).delete()
 
     def can_be_edited_by(self, user):
         return (user == self.user) or user.can_edit(self.role.election)
