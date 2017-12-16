@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -31,6 +32,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.mail import EmailMultiAlternatives
+from django.core.exceptions import ValidationError
 
 from django.utils import timezone
 
@@ -194,13 +196,14 @@ class Screen(models.Model):
 
     def active_posters(self):
         now = timezone.now()
-        return self.posters.filter(is_moderated=True, date_begin__lte=now).filter(Q(date_end__isnull=True)|Q(date_end__gte=now))
+        return self.posters.filter(is_moderated=True, date_begin__lte=now).filter(Q(date_end__isnull=True) | Q(date_end__gte=now))
 
     def is_owned_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def __str__(self):
         return "%s" % (self.name)
+
 
 class Poster(models.Model):
     name = models.CharField(_("name"), blank=False, null=False, max_length=128, default="")
@@ -215,7 +218,11 @@ class Poster(models.Model):
 
     def save(self, *args, **kwargs):
         if self.date_end and self.date_begin > self.date_end:
-            raise ValidationError
+            raise ValidationError(_("Begin date should be before end date"))
+        if not self.is_moderated:
+            for u in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
+                Notification(user=u, url=reverse("com:poster_moderate_list"),
+                             type="POSTER_MODERATION").save()
         return super(Poster, self).save(*args, **kwargs)
 
     def is_owned_by(self, user):
@@ -223,6 +230,13 @@ class Poster(models.Model):
 
     def can_be_moderated_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def get_display_name(self):
+        return self.club.get_display_name()
+
+    @property
+    def page(self):
+        return self.club.page
 
     def __str__(self):
         return self.name

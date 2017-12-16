@@ -538,11 +538,9 @@ class PosterCreateBaseView(CreateView):
         return Poster.objects.all()
 
     def dispatch(self, request, *args, **kwargs):
-        if 'club_id' in kwargs and kwargs['club_id']:
-            try:
-                self.club = Club.objects.get(pk=kwargs['club_id'])
-            except Club.DoesNotExist:
-                raise PermissionDenied
+        if 'club_id' in kwargs:
+            self.club = get_object_or_404(Club, pk=kwargs['club_id'])
+            print(self.club)
         return super(PosterCreateBaseView, self).dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
