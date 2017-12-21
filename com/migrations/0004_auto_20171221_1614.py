@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
                 ('file', models.ImageField(verbose_name='file', upload_to='com/posters')),
                 ('date_begin', models.DateTimeField(default=django.utils.timezone.now)),
                 ('date_end', models.DateTimeField(blank=True, null=True)),
+                ('display_time', models.IntegerField(verbose_name='display time', default=30)),
                 ('is_moderated', models.BooleanField(verbose_name='is moderated', default=False)),
                 ('club', models.ForeignKey(verbose_name='club', related_name='posters', to='club.Club')),
                 ('moderator', models.ForeignKey(verbose_name='moderator', blank=True, null=True, related_name='moderated_posters', to=settings.AUTH_USER_MODEL)),
