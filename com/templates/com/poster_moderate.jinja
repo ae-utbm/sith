@@ -22,7 +22,7 @@
         {% else %}
 
             {% for poster in object_list %}
-                <div class="poster">
+                <div class="poster{% if not poster.is_moderated %} not_moderated{% endif %}">
                     <div class="name"> {{ poster.name }} </div>
                     <div class="image"> <img src="{{ poster.file.url }}"></img> </div>
                     <a class="moderate" href="{{ url("com:poster_moderate", object_id=poster.id) }}">Moderate</a>

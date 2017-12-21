@@ -2,8 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
-# - Sli <antoine@bartuccio.fr>
-#
+# - Sli <antoine@bartuccio.fr> #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
 #
@@ -33,15 +32,16 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from ajax_select.fields import AutoCompleteSelectField
+from ajax_select import make_ajax_field
 
 import re
 
 from core.models import User, Page, SithFile, Gift
-from com.models import Poster, Screen
 
 from core.utils import resize_image
 from io import BytesIO
 from PIL import Image
+
 
 # Widgets
 
@@ -261,10 +261,8 @@ class PagePropForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups', ]
-        widgets = {
-            'edit_groups': CheckboxSelectMultiple,
-            'view_groups': CheckboxSelectMultiple,
-        }
+    edit_groups = make_ajax_field(Page, 'edit_groups', 'groups', help_text="", label=_("edit groups"))
+    view_groups = make_ajax_field(Page, 'view_groups', 'groups', help_text="", label=_("view groups"))
 
     def __init__(self, *arg, **kwargs):
         super(PagePropForm, self).__init__(*arg, **kwargs)
@@ -276,10 +274,8 @@ class PageForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = ['parent', 'name', 'owner_group', 'edit_groups', 'view_groups']
-        widgets = {
-            'edit_groups': CheckboxSelectMultiple,
-            'view_groups': CheckboxSelectMultiple,
-        }
+    edit_groups = make_ajax_field(Page, 'edit_groups', 'groups', help_text="", label=_("edit groups"))
+    view_groups = make_ajax_field(Page, 'view_groups', 'groups', help_text="", label=_("view groups"))
 
     def __init__(self, *args, **kwargs):
         super(PageForm, self).__init__(*args, **kwargs)

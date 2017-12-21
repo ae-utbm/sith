@@ -623,7 +623,6 @@ class PosterCreateView(PosterCreateBaseView, CanCreateMixin):
     pk_url_kwarg = "club_id"
 
     def get_object(self):
-        print(self.club)
         obj = super(PosterCreateView, self).get_object()
         if not obj:
             return self.club

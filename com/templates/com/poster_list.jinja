@@ -32,7 +32,7 @@
         {% else %}
 
             {% for poster in poster_list %}
-                <div class="poster">
+                <div class="poster{% if not poster.is_moderated %} not_moderated{% endif %}">
                     <div class="name">{{ poster.name }}</div>
                     <div class="image"><img src="{{ poster.file.url }}"></img></div>
                     <div class="dates">
@@ -44,6 +44,13 @@
                     {% elif app == "club" %}
                         <a class="edit" href="{{ url(app + ":poster_edit", club.id, poster.id) }}">{% trans %}Edit{% endtrans %}</a>
                     {% endif %}
+                    <div class="tooltip">
+                        <ul>
+                        {% for screen in poster.screens.all() %}
+                            <li>{{ screen }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             {% endfor %}
 

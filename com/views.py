@@ -540,7 +540,6 @@ class PosterCreateBaseView(CreateView):
     def dispatch(self, request, *args, **kwargs):
         if 'club_id' in kwargs:
             self.club = get_object_or_404(Club, pk=kwargs['club_id'])
-            print(self.club)
         return super(PosterCreateBaseView, self).dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
@@ -590,7 +589,7 @@ class PosterEditBaseView(UpdateView):
         return kwargs
 
     def form_valid(self, form):
-        if 'club' in self.__dict__ and self.club:
+        if self.request.user.is_com_admin:
             form.instance.is_moderated = False
         return super(PosterEditBaseView, self).form_valid(form)
 
