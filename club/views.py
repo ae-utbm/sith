@@ -602,7 +602,7 @@ class MailingAutoCleanView(View):
         return redirect('club:mailing', club_id=self.mailing.club.id)
 
 
-class PosterListView(PosterListBaseView, CanViewMixin, ClubTabsMixin):
+class PosterListView(ClubTabsMixin, PosterListBaseView, CanViewMixin):
     """List communication posters"""
 
     def get_object(self):
@@ -611,9 +611,7 @@ class PosterListView(PosterListBaseView, CanViewMixin, ClubTabsMixin):
     def get_context_data(self, **kwargs):
         kwargs = super(PosterListView, self).get_context_data(**kwargs)
         kwargs['app'] = "club"
-        kwargs['current_tab'] = self.current_tab
-        kwargs['tabs_title'] = self.get_tabs_title()
-        kwargs['list_of_tabs'] = self.get_list_of_tabs()
+        kwargs['club'] = self.club
         return kwargs
 
 
