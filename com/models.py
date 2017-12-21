@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -31,9 +32,14 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.mail import EmailMultiAlternatives
+from django.core.exceptions import ValidationError
 
-from core.models import User, Preferences, RealGroup, Notification
+from django.utils import timezone
+
+from core.models import User, Preferences, RealGroup, Notification, SithFile
 from club.models import Club
+
+
 
 
 class Sith(models.Model):
@@ -183,3 +189,54 @@ class WeekmailArticle(models.Model):
 
     def __str__(self):
         return "%s - %s (%s)" % (self.title, self.author, self.club)
+
+
+class Screen(models.Model):
+    name = models.CharField(_("name"), max_length=128)
+
+    def active_posters(self):
+        now = timezone.now()
+        return self.posters.filter(is_moderated=True, date_begin__lte=now).filter(Q(date_end__isnull=True) | Q(date_end__gte=now))
+
+    def is_owned_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def __str__(self):
+        return "%s" % (self.name)
+
+
+class Poster(models.Model):
+    name = models.CharField(_("name"), blank=False, null=False, max_length=128, default="")
+    file = models.ImageField(_("file"), null=False, upload_to="com/posters")
+    club = models.ForeignKey(Club, related_name="posters", verbose_name=_("club"), null=False)
+    screens = models.ManyToManyField(Screen, related_name="posters")
+    date_begin = models.DateTimeField(blank=False, null=False, default=timezone.now)
+    date_end = models.DateTimeField(blank=True, null=True)
+    display_time = models.IntegerField(_("display time"), blank=False, null=False, default=30)
+    is_moderated = models.BooleanField(_("is moderated"), default=False)
+    moderator = models.ForeignKey(User, related_name="moderated_posters", verbose_name=_("moderator"), null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.date_end and self.date_begin > self.date_end:
+            raise ValidationError(_("Begin date should be before end date"))
+        if not self.is_moderated:
+            for u in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
+                Notification(user=u, url=reverse("com:poster_moderate_list"),
+                             type="POSTER_MODERATION").save()
+        return super(Poster, self).save(*args, **kwargs)
+
+    def is_owned_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or Club.objects.filter(id__in=user.clubs_with_rights)
+
+    def can_be_moderated_by(self, user):
+        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+
+    def get_display_name(self):
+        return self.club.get_display_name()
+
+    @property
+    def page(self):
+        return self.club.page
+
+    def __str__(self):
+        return self.name

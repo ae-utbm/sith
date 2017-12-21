@@ -11,6 +11,7 @@
         <li> <a href="{{ url('trombi:detail', trombi_id=object.trombi.id) }}">{% trans %}Edit Trombi{% endtrans %}</a></li>
         {% else %}
         <li> <a href="{{ url('trombi:create', club_id=object.id) }}">{% trans %}New Trombi{% endtrans %}</a></li>
+        <li> <a href="{{ url('club:poster_list', club_id=object.id) }}">{% trans %}Posters{% endtrans %}</a></li>
         {% endif %}
     </ul>
     <h4>{% trans %}Counters:{% endtrans %}</h4>

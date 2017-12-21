@@ -562,6 +562,7 @@ SITH_LAUNDERETTE_PRICES = {
 }
 
 SITH_NOTIFICATIONS = [
+    ('POSTER_MODERATION', _("A new poster needs to be moderated")),
     ('MAILING_MODERATION', _("A new mailing list needs to be moderated")),
     ('NEWS_MODERATION', _("There are %s fresh news to be moderated")),
     ('FILE_MODERATION', _("New files to be moderated")),
