@@ -61,6 +61,11 @@ class PosterForm(forms.ModelForm):
             'is_moderated': forms.HiddenInput()
         }
 
+    date_begin = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start date"),
+                                     widget=SelectDateTime, required=True, initial=timezone.now().strftime("%Y-%m-%d %H:%M:%S"))
+    date_end = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"),
+                                   widget=SelectDateTime, required=False)
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super(PosterForm, self).__init__(*args, **kwargs)

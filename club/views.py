@@ -509,6 +509,9 @@ class ClubMailingView(ClubTabsMixin, ListView):
         kwargs['has_objects'] = len(kwargs['object_list']) > 0
         return kwargs
 
+    def get_object(self):
+        return self.club
+
 
 class MailingGenericCreateView(CreateView, SingleObjectMixin):
     """
