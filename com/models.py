@@ -217,13 +217,15 @@ class Poster(models.Model):
     moderator = models.ForeignKey(User, related_name="moderated_posters", verbose_name=_("moderator"), null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        if self.date_end and self.date_begin > self.date_end:
-            raise ValidationError(_("Begin date should be before end date"))
         if not self.is_moderated:
             for u in RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID).first().users.all():
                 Notification(user=u, url=reverse("com:poster_moderate_list"),
                              type="POSTER_MODERATION").save()
         return super(Poster, self).save(*args, **kwargs)
+
+    def clean(self, *args, **kwargs):
+        if self.date_end and self.date_begin > self.date_end:
+            raise ValidationError(_("Begin date should be before end date"))
 
     def is_owned_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or Club.objects.filter(id__in=user.clubs_with_rights)
