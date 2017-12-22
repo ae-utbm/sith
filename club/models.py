@@ -296,6 +296,9 @@ class Mailing(models.Model):
     def can_view(self, user):
         return self.club.has_rights_in_club(user)
 
+    def can_be_edited_by(self, user):
+        return self.club.has_rights_in_club(user)
+
     def delete(self):
         for sub in self.subscriptions.all():
             sub.delete()
