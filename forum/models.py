@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
+# Copyright 2016,2017,2018
 # - Skia <skia@libskia.so>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
@@ -184,6 +184,7 @@ class ForumTopic(models.Model):
     forum = models.ForeignKey(Forum, related_name='topics')
     author = models.ForeignKey(User, related_name='forum_topics')
     description = models.CharField(_('description'), max_length=256, default="")
+    subscribed_users = models.ManyToManyField(User, related_name='favorite_topics', verbose_name=_("subscribed users"))
     _last_message = models.ForeignKey('ForumMessage', related_name="+", verbose_name=_("the last message"),
                                       null=True, on_delete=models.SET_NULL)
     _title = models.CharField(_('title'), max_length=64, blank=True)

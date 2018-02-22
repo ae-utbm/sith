@@ -37,7 +37,14 @@
     <h3>{{ topic.title }}</h3>
 <div id="forum">
     <p>{{ topic.description }}</p>
-    <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
+    <p>
+    <a class="ib button" href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a>
+    {% if user in topic.subscribed_users.all() %}
+    <a class="ib button" href="{{ url('forum:toggle_subscribe_topic', topic_id=topic.id) }}">{% trans %}Unmark as favorite{% endtrans %}</a>
+    {% else %}
+    <a class="ib button" href="{{ url('forum:toggle_subscribe_topic', topic_id=topic.id) }}">{% trans %}Mark as favorite{% endtrans %}</a>
+    {% endif %}
+    </p>
 
     <p style="text-align: right; background: #d8e7f3;">
     {% for p in msgs.paginator.page_range %}
@@ -56,7 +63,7 @@
         {% endif %}
     {% endfor %}
 
-    <p><a href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
+    <p><a class="ib button" href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
 
     <p style="text-align: right; background: #d8e7f3;">
     {% for p in msgs.paginator.page_range %}

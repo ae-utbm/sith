@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-22 12:14+0100\n"
+"POT-Creation-Date: 2018-02-22 22:25+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -127,10 +127,10 @@ msgstr "numéro"
 msgid "journal"
 msgstr "classeur"
 
-#: accounting/models.py:258 core/models.py:653 core/models.py:1054
-#: core/models.py:1098 core/models.py:1125 counter/models.py:301
+#: accounting/models.py:258 core/models.py:657 core/models.py:1058
+#: core/models.py:1102 core/models.py:1129 counter/models.py:301
 #: counter/models.py:351 counter/models.py:484 eboutic/models.py:39
-#: eboutic/models.py:73 forum/models.py:239 forum/models.py:314
+#: eboutic/models.py:73 forum/models.py:240 forum/models.py:315
 #: stock/models.py:76
 msgid "date"
 msgstr "date"
@@ -166,7 +166,7 @@ msgid "accounting type"
 msgstr "type comptable"
 
 #: accounting/models.py:269 accounting/models.py:371 accounting/models.py:398
-#: accounting/models.py:422 core/models.py:1124 counter/models.py:343
+#: accounting/models.py:422 core/models.py:1128 counter/models.py:343
 msgid "label"
 msgstr "étiquette"
 
@@ -973,7 +973,7 @@ msgid "Enter a valid address. Only the root of the address is needed."
 msgstr ""
 "Entrez une adresse valide. Seule la racine de l'adresse est nécessaire."
 
-#: club/models.py:276 com/models.py:75 com/models.py:216 core/models.py:654
+#: club/models.py:276 com/models.py:75 com/models.py:216 core/models.py:658
 msgid "is moderated"
 msgstr "est modéré"
 
@@ -1266,7 +1266,7 @@ msgstr "Éditer la page de club"
 msgid "Mailing list"
 msgstr "Listes de diffusion"
 
-#: club/views.py:150 com/views.py:111
+#: club/views.py:150 com/views.py:116
 msgid "Posters list"
 msgstr "Liste d'affiches"
 
@@ -1289,7 +1289,7 @@ msgstr "Vous n'avez pas la permission de faire cela"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:321 com/views.py:172 counter/views.py:1098
+#: club/views.py:321 com/views.py:66 com/views.py:177 counter/views.py:1098
 #: election/views.py:135 subscription/views.py:47
 msgid "End date"
 msgstr "Date de fin"
@@ -1332,8 +1332,8 @@ msgid "Call"
 msgstr "Appel"
 
 #: com/models.py:69 com/models.py:133 com/models.py:181 election/models.py:13
-#: election/models.py:98 election/models.py:134 forum/models.py:189
-#: forum/models.py:237
+#: election/models.py:98 election/models.py:134 forum/models.py:190
+#: forum/models.py:238
 msgid "title"
 msgstr "titre"
 
@@ -1345,7 +1345,7 @@ msgstr "résumé"
 msgid "content"
 msgstr "contenu"
 
-#: com/models.py:72 core/models.py:1097 launderette/models.py:86
+#: com/models.py:72 core/models.py:1101 launderette/models.py:86
 #: launderette/models.py:112 launderette/models.py:149 stock/models.py:59
 #: stock/models.py:98
 msgid "type"
@@ -1395,7 +1395,7 @@ msgstr "weekmail"
 msgid "rank"
 msgstr "rang"
 
-#: com/models.py:210 core/models.py:644 core/models.py:660
+#: com/models.py:210 core/models.py:648 core/models.py:664
 msgid "file"
 msgstr "fichier"
 
@@ -1403,11 +1403,11 @@ msgstr "fichier"
 msgid "display time"
 msgstr "temps d'affichage"
 
-#: com/models.py:221
+#: com/models.py:228
 msgid "Begin date should be before end date"
 msgstr "La date de début doit être avant celle de fin"
 
-#: com/templates/com/mailing_admin.jinja:4 com/views.py:106
+#: com/templates/com/mailing_admin.jinja:4 com/views.py:111
 #: core/templates/core/user_tools.jinja:89
 msgid "Mailing lists administration"
 msgstr "Administration des mailing listes"
@@ -1491,8 +1491,8 @@ msgstr "Type"
 #: com/templates/com/news_admin_list.jinja:286
 #: com/templates/com/weekmail.jinja:19 com/templates/com/weekmail.jinja:48
 #: core/templates/core/base.jinja:307 forum/templates/forum/forum.jinja:29
-#: forum/templates/forum/forum.jinja:48 forum/templates/forum/main.jinja:25
-#: forum/views.py:159
+#: forum/templates/forum/forum.jinja:48 forum/templates/forum/main.jinja:26
+#: forum/views.py:168
 msgid "Title"
 msgstr "Titre"
 
@@ -1723,7 +1723,7 @@ msgid "Slideshow"
 msgstr "Diaporama"
 
 #: com/templates/com/weekmail.jinja:5 com/templates/com/weekmail.jinja.py:9
-#: com/views.py:81 core/templates/core/user_tools.jinja:81
+#: com/views.py:86 core/templates/core/user_tools.jinja:81
 msgid "Weekmail"
 msgstr "Weekmail"
 
@@ -1810,59 +1810,60 @@ msgstr "Astuce"
 msgid "Final word"
 msgstr "Le mot de la fin"
 
-#: com/views.py:74
-msgid "Communication administration"
-msgstr "Administration de la communication"
-
-#: com/views.py:86 core/templates/core/user_tools.jinja:82
-msgid "Weekmail destinations"
-msgstr "Destinataires du Weekmail"
-
-#: com/views.py:91
-msgid "Index page"
-msgstr "Page d'accueil"
-
-#: com/views.py:96
-msgid "Info message"
-msgstr "Message d'info"
-
-#: com/views.py:101
-msgid "Alert message"
-msgstr "Message d'alerte"
-
-#: com/views.py:116
-msgid "Screens list"
-msgstr "Liste d'écrans"
-
-#: com/views.py:171 election/views.py:133 subscription/views.py:44
+#: com/views.py:64 com/views.py:176 election/views.py:133
+#: subscription/views.py:44
 msgid "Start date"
 msgstr "Date de début"
 
-#: com/views.py:173
+#: com/views.py:79
+msgid "Communication administration"
+msgstr "Administration de la communication"
+
+#: com/views.py:91 core/templates/core/user_tools.jinja:82
+msgid "Weekmail destinations"
+msgstr "Destinataires du Weekmail"
+
+#: com/views.py:96
+msgid "Index page"
+msgstr "Page d'accueil"
+
+#: com/views.py:101
+msgid "Info message"
+msgstr "Message d'info"
+
+#: com/views.py:106
+msgid "Alert message"
+msgstr "Message d'alerte"
+
+#: com/views.py:121
+msgid "Screens list"
+msgstr "Liste d'écrans"
+
+#: com/views.py:178
 msgid "Until"
 msgstr "Jusqu'à"
 
-#: com/views.py:174
+#: com/views.py:179
 msgid "Automoderation"
 msgstr "Automodération"
 
-#: com/views.py:180 com/views.py:182 com/views.py:186
+#: com/views.py:185 com/views.py:187 com/views.py:191
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-#: com/views.py:184
+#: com/views.py:189
 msgid "You crazy? You can not finish an event before starting it."
 msgstr "T'es fou? Un événement ne peut pas finir avant même de commencer."
 
-#: com/views.py:366
+#: com/views.py:371
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour regénérer"
 
-#: com/views.py:374
+#: com/views.py:379
 msgid "Weekmail of the "
 msgstr "Weekmail du "
 
-#: com/views.py:454
+#: com/views.py:459
 msgid ""
 "You must be a board member of the selected club to post in the Weekmail."
 msgstr ""
@@ -2107,109 +2108,109 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 msgid "Profile"
 msgstr "Profil"
 
-#: core/models.py:600
+#: core/models.py:604
 msgid "Visitor"
 msgstr "Visiteur"
 
-#: core/models.py:606
+#: core/models.py:610
 msgid "do you want to receive the weekmail"
 msgstr "voulez-vous recevoir le Weekmail"
 
-#: core/models.py:610
+#: core/models.py:614
 msgid "show your stats to others"
 msgstr "montrez vos statistiques aux autres"
 
-#: core/models.py:614
+#: core/models.py:618
 msgid "get a notification for every click"
 msgstr "recevez une notification pour chaque click"
 
-#: core/models.py:618
+#: core/models.py:622
 msgid "get a notification for every refilling"
 msgstr "recevez une notification pour chaque rechargement"
 
-#: core/models.py:642
+#: core/models.py:646
 msgid "file name"
 msgstr "nom du fichier"
 
-#: core/models.py:643 core/models.py:858
+#: core/models.py:647 core/models.py:862
 msgid "parent"
 msgstr "parent"
 
-#: core/models.py:645
+#: core/models.py:649
 msgid "compressed file"
 msgstr "version allégée"
 
-#: core/models.py:646
+#: core/models.py:650
 msgid "thumbnail"
 msgstr "miniature"
 
-#: core/models.py:647 core/models.py:655
+#: core/models.py:651 core/models.py:659
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:648 core/models.py:864 core/views/files.py:149
+#: core/models.py:652 core/models.py:868 core/views/files.py:149
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:649 core/models.py:865 core/views/files.py:150
+#: core/models.py:653 core/models.py:869 core/views/files.py:150
 msgid "view group"
 msgstr "groupe de vue"
 
-#: core/models.py:650
+#: core/models.py:654
 msgid "is folder"
 msgstr "est un dossier"
 
-#: core/models.py:651
+#: core/models.py:655
 msgid "mime type"
 msgstr "type mime"
 
-#: core/models.py:652
+#: core/models.py:656
 msgid "size"
 msgstr "taille"
 
-#: core/models.py:656
+#: core/models.py:660
 msgid "asked for removal"
 msgstr "retrait demandé"
 
-#: core/models.py:657
+#: core/models.py:661
 msgid "is in the SAS"
 msgstr "est dans le SAS"
 
-#: core/models.py:696
+#: core/models.py:700
 msgid "Character '/' not authorized in name"
 msgstr "Le caractère '/' n'est pas autorisé dans les noms de fichier"
 
-#: core/models.py:699 core/models.py:704
+#: core/models.py:703 core/models.py:708
 msgid "Loop in folder tree"
 msgstr "Boucle dans l'arborescence des dossiers"
 
-#: core/models.py:708
+#: core/models.py:712
 msgid "You can not make a file be a children of a non folder file"
 msgstr ""
 "Vous ne pouvez pas mettre un fichier enfant de quelque chose qui n'est pas "
 "un dossier"
 
-#: core/models.py:712
+#: core/models.py:716
 msgid "Duplicate file"
 msgstr "Un fichier de ce nom existe déjà"
 
-#: core/models.py:726
+#: core/models.py:730
 msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
-#: core/models.py:796
+#: core/models.py:800
 msgid "Folder: "
 msgstr "Dossier : "
 
-#: core/models.py:798
+#: core/models.py:802
 msgid "File: "
 msgstr "Fichier : "
 
-#: core/models.py:850
+#: core/models.py:854
 msgid "page unix name"
 msgstr "nom unix de la page"
 
-#: core/models.py:854
+#: core/models.py:858
 msgid ""
 "Enter a valid page name. This value may contain only unaccented letters, "
 "numbers and ./+/-/_ characters."
@@ -2217,51 +2218,51 @@ msgstr ""
 "Entrez un nom de page correct. Uniquement des lettres non accentuées, "
 "numéros, et ./+/-/_"
 
-#: core/models.py:861
+#: core/models.py:865
 msgid "page name"
 msgstr "nom de la page"
 
-#: core/models.py:862
+#: core/models.py:866
 msgid "owner group"
 msgstr "groupe propriétaire"
 
-#: core/models.py:866
+#: core/models.py:870
 msgid "lock user"
 msgstr "utilisateur bloquant"
 
-#: core/models.py:867
+#: core/models.py:871
 msgid "lock_timeout"
 msgstr "décompte du déblocage"
 
-#: core/models.py:894
+#: core/models.py:898
 msgid "Duplicate page"
 msgstr "Une page de ce nom existe déjà"
 
-#: core/models.py:900
+#: core/models.py:904
 msgid "Loop in page tree"
 msgstr "Boucle dans l'arborescence des pages"
 
-#: core/models.py:1051
+#: core/models.py:1055
 msgid "revision"
 msgstr "révision"
 
-#: core/models.py:1052
+#: core/models.py:1056
 msgid "page title"
 msgstr "titre de la page"
 
-#: core/models.py:1053
+#: core/models.py:1057
 msgid "page content"
 msgstr "contenu de la page"
 
-#: core/models.py:1095
+#: core/models.py:1099
 msgid "url"
 msgstr "url"
 
-#: core/models.py:1096
+#: core/models.py:1100
 msgid "param"
 msgstr "param"
 
-#: core/models.py:1099
+#: core/models.py:1103
 msgid "viewed"
 msgstr "vue"
 
@@ -2306,7 +2307,7 @@ msgid "View more"
 msgstr "Voir plus"
 
 #: core/templates/core/base.jinja:108
-#: forum/templates/forum/last_unread.jinja:16
+#: forum/templates/forum/last_unread.jinja:17
 msgid "Mark all as read"
 msgstr "Marquer tout commme lu"
 
@@ -2337,8 +2338,10 @@ msgstr "Wiki"
 msgid "SAS"
 msgstr "SAS"
 
-#: core/templates/core/base.jinja:156 forum/templates/forum/forum.jinja:10
-#: forum/templates/forum/last_unread.jinja:13
+#: core/templates/core/base.jinja:156
+#: forum/templates/forum/favorite_topics.jinja:14
+#: forum/templates/forum/forum.jinja:10
+#: forum/templates/forum/last_unread.jinja:14
 #: forum/templates/forum/main.jinja:6 forum/templates/forum/main.jinja.py:11
 #: forum/templates/forum/main.jinja:14 forum/templates/forum/reply.jinja:15
 #: forum/templates/forum/topic.jinja:30
@@ -4188,7 +4191,7 @@ msgstr "club propriétaire"
 msgid "number to choose a specific forum ordering"
 msgstr "numéro spécifiant l'ordre d'affichage"
 
-#: forum/models.py:61 forum/models.py:187
+#: forum/models.py:61 forum/models.py:188
 msgid "the last message"
 msgstr "le dernier message"
 
@@ -4200,43 +4203,54 @@ msgstr "nombre de sujets"
 msgid "You can not make loops in forums"
 msgstr "Vous ne pouvez pas faire de boucles dans les forums"
 
-#: forum/models.py:190
+#: forum/models.py:187
+msgid "subscribed users"
+msgstr "utilisateurs abonnés"
+
+#: forum/models.py:191
 msgid "number of messages"
 msgstr "nombre de messages"
 
-#: forum/models.py:238
+#: forum/models.py:239
 msgid "message"
 msgstr "message"
 
-#: forum/models.py:240
+#: forum/models.py:241
 msgid "readers"
 msgstr "lecteurs"
 
-#: forum/models.py:241
+#: forum/models.py:242
 msgid "is deleted"
 msgstr "est supprimé"
 
-#: forum/models.py:305
+#: forum/models.py:306
 msgid "Message edited by"
 msgstr "Message édité par"
 
-#: forum/models.py:306
+#: forum/models.py:307
 msgid "Message deleted by"
 msgstr "Message supprimé par"
 
-#: forum/models.py:307
+#: forum/models.py:308
 msgid "Message undeleted by"
 msgstr "Message restauré par"
 
-#: forum/models.py:315
+#: forum/models.py:316
 msgid "action"
 msgstr "action"
 
-#: forum/models.py:330
+#: forum/models.py:331
 msgid "last read date"
 msgstr "dernière date de lecture"
 
-#: forum/templates/forum/forum.jinja:20 forum/templates/forum/main.jinja:20
+#: forum/templates/forum/favorite_topics.jinja:5
+#: forum/templates/forum/favorite_topics.jinja:11
+#: forum/templates/forum/favorite_topics.jinja:15
+#: forum/templates/forum/main.jinja:17
+msgid "Favorite topics"
+msgstr "Topics favoris"
+
+#: forum/templates/forum/forum.jinja:20 forum/templates/forum/main.jinja:21
 msgid "New forum"
 msgstr "Nouveau forum"
 
@@ -4245,12 +4259,12 @@ msgstr "Nouveau forum"
 msgid "New topic"
 msgstr "Nouveau sujet"
 
-#: forum/templates/forum/forum.jinja:33 forum/templates/forum/main.jinja:29
+#: forum/templates/forum/forum.jinja:33 forum/templates/forum/main.jinja:30
 msgid "Topics"
 msgstr "Sujets"
 
 #: forum/templates/forum/forum.jinja:36 forum/templates/forum/forum.jinja:58
-#: forum/templates/forum/main.jinja:32
+#: forum/templates/forum/main.jinja:33
 msgid "Last message"
 msgstr "Dernier message"
 
@@ -4259,11 +4273,12 @@ msgid "Messages"
 msgstr "Messages"
 
 #: forum/templates/forum/last_unread.jinja:5
-#: forum/templates/forum/last_unread.jinja:14
+#: forum/templates/forum/last_unread.jinja:11
+#: forum/templates/forum/last_unread.jinja:15
 msgid "Last unread messages"
 msgstr "Derniers messages non lus"
 
-#: forum/templates/forum/last_unread.jinja:17
+#: forum/templates/forum/last_unread.jinja:18
 msgid "Refresh"
 msgstr "Rafraîchir"
 
@@ -4288,15 +4303,23 @@ msgid "View last unread messages"
 msgstr "Voir les derniers messages non lus"
 
 #: forum/templates/forum/reply.jinja:6 forum/templates/forum/reply.jinja:24
-#: forum/templates/forum/topic.jinja:40 forum/templates/forum/topic.jinja:59
+#: forum/templates/forum/topic.jinja:41 forum/templates/forum/topic.jinja:66
 msgid "Reply"
 msgstr "Répondre"
 
-#: forum/views.py:106
+#: forum/templates/forum/topic.jinja:43
+msgid "Unmark as favorite"
+msgstr "Enlever des favoris"
+
+#: forum/templates/forum/topic.jinja:45
+msgid "Mark as favorite"
+msgstr "Ajouter aux favoris"
+
+#: forum/views.py:115
 msgid "Apply rights and club owner recursively"
 msgstr "Appliquer les droits et le club propriétaire récursivement"
 
-#: forum/views.py:280
+#: forum/views.py:305
 #, python-format
 msgid "%(author)s said"
 msgstr "Citation de %(author)s"

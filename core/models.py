@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
+# Copyright 2016,2017,2018
 # - Skia <skia@libskia.so>
 # - Sli <antoine@bartuccio.fr>
 #
@@ -565,6 +565,10 @@ class AnonymousUser(AuthAnonymousUser):
 
     @property
     def forum_infos(self):
+        raise PermissionDenied
+
+    @property
+    def favorite_topics(self):
         raise PermissionDenied
 
     def is_in_group(self, group_name):

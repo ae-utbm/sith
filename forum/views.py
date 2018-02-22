@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
+# Copyright 2016,2017,2018
 # - Skia <skia@libskia.so>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
@@ -61,6 +61,15 @@ class ForumMarkAllAsRead(RedirectView):
             pass
         return super(ForumMarkAllAsRead, self).get(request, *args, **kwargs)
 
+
+class ForumFavoriteTopics(ListView):
+    model = ForumTopic
+    template_name = "forum/favorite_topics.jinja"
+    paginate_by = settings.SITH_FORUM_PAGE_LENGTH / 2
+
+    def get_queryset(self):
+        topic_list = self.request.user.favorite_topics.all()
+        return topic_list
 
 class ForumLastUnread(ListView):
     model = ForumTopic
@@ -183,6 +192,22 @@ class ForumTopicEditView(CanEditMixin, UpdateView):
     fields = ['forum']
     pk_url_kwarg = "topic_id"
     template_name = "core/edit.jinja"
+
+class ForumTopicSubscribeView(CanViewMixin, SingleObjectMixin, RedirectView):
+    model = ForumTopic
+    pk_url_kwarg = "topic_id"
+    permanent = False
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if request.user in self.object.subscribed_users.all():
+            self.object.subscribed_users.remove(request.user)
+        else:
+            self.object.subscribed_users.add(request.user)
+        return super().get(request, *args, **kwargs)
+
+    def get_redirect_url(self, *args, **kwargs):
+        return self.object.get_absolute_url()
 
 
 class ForumTopicDetailView(CanViewMixin, DetailView):
