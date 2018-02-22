@@ -13,7 +13,7 @@
 <div id="forum">
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <p>
-        <a class="ib" href="{{ url('forum:last_unread') }}">{% trans %}View last unread messages{% endtrans %}</a>
+        <a class="ib button" href="{{ url('forum:last_unread') }}">{% trans %}View last unread messages{% endtrans %}</a>
     </p>
     {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
     <p>

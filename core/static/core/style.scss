@@ -1137,6 +1137,14 @@ textarea {
 /*------------------------------FORUM----------------------------------*/
 
 #forum {
+  .button {
+    background-color: $primary-neutral-light-color;
+    border: outset $primary-neutral-dark-color 2px;
+    padding: 4px;
+    &:hover {
+      border: inset $primary-neutral-dark-color 2px;
+    }
+  }
   .topic {
     border: solid $primary-neutral-color 1px;
     padding: 1px;

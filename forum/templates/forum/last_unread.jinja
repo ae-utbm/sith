@@ -8,13 +8,14 @@
 {% block content %}
 <p>
     <a href="{{ url('forum:main') }}">Forum</a> >
+    <a href="{{ url('forum:last_unread') }}">{% trans %}Last unread messages{% endtrans %}</a>
 </p>
 <div id="forum">
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <h4>{% trans %}Last unread messages{% endtrans %}</h4>
     <p>
-        <a class="ib" href="{{ url('forum:mark_all_as_read') }}">{% trans %}Mark all as read{% endtrans %}</a>
-        <a class="ib" href="{{ url('forum:last_unread') }}">{% trans %}Refresh{% endtrans %}</a>
+        <a class="ib button" href="{{ url('forum:mark_all_as_read') }}">{% trans %}Mark all as read{% endtrans %}</a>
+        <a class="ib button" href="{{ url('forum:last_unread') }}">{% trans %}Refresh{% endtrans %}</a>
     </p>
     {% for t in page_obj.object_list %}
     {% if user.can_view(t) %}
