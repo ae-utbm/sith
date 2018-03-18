@@ -72,6 +72,7 @@ class PosterForm(forms.ModelForm):
         if self.user:
             if not self.user.is_com_admin:
                 self.fields['club'].queryset = Club.objects.filter(id__in=self.user.clubs_with_rights)
+                self.fields['display_time'].widget = forms.HiddenInput()
 
 
 class ComTabsMixin(TabedViewMixin):
