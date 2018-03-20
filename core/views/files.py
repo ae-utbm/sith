@@ -189,6 +189,18 @@ class FileView(CanViewMixin, DetailView, FormMixin):
     form_class = AddFilesForm
 
     def handle_clipboard(request, object):
+        """
+        This method handles the clipboard in the view.
+        This method can fail, since it does not catch the exceptions coming from
+        below, allowing proper handling in the calling view.
+        Use this method like this:
+
+            FileView.handle_clipboard(request, self.object)
+
+        `request` is usually the self.request object in your view
+        `object` is the SithFile object you want to put in the clipboard, or
+                 where you want to paste the clipboard
+        """
         if 'delete' in request.POST.keys():
             for f_id in request.POST.getlist('file_list'):
                 sf = SithFile.objects.filter(id=f_id).first()
@@ -200,7 +212,6 @@ class FileView(CanViewMixin, DetailView, FormMixin):
             for f_id in request.POST.getlist('file_list'):
                 f_id = int(f_id)
                 if f_id in [c.id for c in object.children.all()] and f_id not in request.session['clipboard']:
-                    print(f_id)
                     request.session['clipboard'].append(f_id)
         if 'paste' in request.POST.keys():
             for f_id in request.session['clipboard']:
@@ -221,6 +232,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         if 'clipboard' not in request.session.keys():
             request.session['clipboard'] = []
         if request.user.can_edit(self.object):
+            # XXX this call can fail!
             FileView.handle_clipboard(request, self.object)
         self.form = self.get_form()  # The form handle only the file upload
         files = request.FILES.getlist('file_field')
