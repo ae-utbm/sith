@@ -635,11 +635,11 @@ def get_directory(instance, filename):
 
 
 def get_compressed_directory(instance, filename):
-    return '.{0}/compressed/{1}'.format(instance.get_parent_path(), filename)
+    return './.compressed/{0}/{1}'.format(instance.get_parent_path(), filename)
 
 
 def get_thumbnail_directory(instance, filename):
-    return '.{0}/thumbnail/{1}'.format(instance.get_parent_path(), filename)
+    return './.thumbnails/{0}/{1}'.format(instance.get_parent_path(), filename)
 
 
 class SithFile(models.Model):
