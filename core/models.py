@@ -782,7 +782,6 @@ class SithFile(models.Model):
                 c._repair_fs()
             return
         else:
-            import os
             # First get future parent path and the old file name
             # Prepend "." so that we match all relative handling of Django's
             # file storage
@@ -794,22 +793,32 @@ class SithFile(models.Model):
             new_path = "." + self.get_full_path()
             print("Old path: %s " % old_path)
             print("New path: %s " % new_path)
-            # Make this atomic, so that a FS problem rolls back the DB change
-            with transaction.atomic():
-                # Set the new filesystem path
-                self.file.name = new_path
-                self.save()
-                print("New file path: %s " % self.file.path)
-                # Really move at the FS level
-                if os.path.exists(parent_full_path):
-                    os.rename(settings.MEDIA_ROOT + old_path, settings.MEDIA_ROOT + new_path)
-                    # Empty directories may remain, but that's not really a
-                    # problem, and that can be solved with a simple shell
-                    # command: `find . -type d -empty -delete`
+            try:
+                # Make this atomic, so that a FS problem rolls back the DB change
+                with transaction.atomic():
+                    # Set the new filesystem path
+                    self.file.name = new_path
+                    self.save()
+                    print("New file path: %s " % self.file.path)
+                    # Really move at the FS level
+                    if os.path.exists(parent_full_path):
+                        os.rename(settings.MEDIA_ROOT + old_path, settings.MEDIA_ROOT + new_path)
+                        # Empty directories may remain, but that's not really a
+                        # problem, and that can be solved with a simple shell
+                        # command: `find . -type d -empty -delete`
+            except Exception as e:
+                print("This file likely had a problem. Here is the exception:")
+                print(repr(e))
 
     def _check_path_consistence(self):
         file_path = str(self.file)
+        file_full_path = settings.MEDIA_ROOT + file_path
         db_path = ".%s" % self.get_full_path()
+        if not os.path.exists(file_full_path):
+            print("%s: WARNING: real file does not exists!" % self.id)
+            print("file path: %s" % file_path, end='')
+            print("  db path: %s" % db_path)
+            return False
         if file_path != db_path:
             print("%s: " % self.id, end='')
             print("file path: %s" % file_path, end='')
