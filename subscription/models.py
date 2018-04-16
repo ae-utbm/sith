@@ -151,7 +151,9 @@ class Subscription(models.Model):
         if not d:
             d = date.today()
         if user is not None and user.subscriptions.exists():
-            d = user.subscriptions.last().subscription_end
+            last = user.subscriptions.last()
+            if last.is_valid_now():
+                d = last.subscription_end
         if duration <= 2:  # Sliding subscriptions for 1 or 2 semesters
             return d
         return get_start_of_semester(d)
@@ -174,7 +176,7 @@ class Subscription(models.Model):
         try:
             return start.replace(month=int(round((start.month - 1 + 6 * duration) % 12 + 1, 0)),
                                  year=int(round(start.year + int(duration / 2) + (1 if int(start.month + 6 * duration) > 12 and (duration % 2 == 1 or duration < 1) else 0), 0)))
-        except ValueError as e:
+        except ValueError as e: # This catches 29th of February errors
             return start.replace(day=1, month=int(round((start.month + 6 * duration) % 12 + 1, 0)),
                                  year=int(round(start.year + int(duration / 2) + (1 if int(start.month + 6 * duration) > 12 and (duration % 2 == 1 or duration < 1) else 0), 0)))
 

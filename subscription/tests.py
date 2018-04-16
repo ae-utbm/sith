@@ -140,15 +140,46 @@ class SubscriptionIntegrationTest(TestCase):
     @mock.patch('subscription.models.date', FakeDate)
     def test_dates_sliding_with_subscribed_user(self):
         user = User.objects.filter(pk=self.user.pk).first()
-        s = Subscription(member=user, subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
+        s = Subscription(member=user, subscription_type='deux-semestres',
                          payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
         s.subscription_start = date(2015, 8, 29)
-        s.subscription_end = s.compute_end(duration=2,
+        s.subscription_end = s.compute_end(duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
                                            start=s.subscription_start)
         s.save()
         self.assertTrue(s.subscription_end == date(2016, 8, 29))
         date_mock_today(2016, 8, 25)
-        d = Subscription.compute_end(duration=2,
+        d = Subscription.compute_end(duration=settings.SITH_SUBSCRIPTIONS['deux-semestres']['duration'],
                                      user=user)
         self.assertTrue(d == date(2017, 8, 29))
+
+    @mock.patch('subscription.models.date', FakeDate)
+    def test_dates_renewal_sliding_during_two_free_monthes(self):
+        user = User.objects.filter(pk=self.user.pk).first()
+        s = Subscription(member=user, subscription_type='deux-mois-essai',
+                         payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+        s.subscription_start = date(2015, 8, 29)
+        s.subscription_end = s.compute_end(duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                                           start=s.subscription_start)
+        s.save()
+        self.assertTrue(s.subscription_end == date(2015, 10, 29))
+        date_mock_today(2015, 9, 25)
+        d = Subscription.compute_end(duration=settings.SITH_SUBSCRIPTIONS['deux-semestres']['duration'],
+                                     user=user)
+        self.assertTrue(d == date(2016, 10, 29))
+
+    @mock.patch('subscription.models.date', FakeDate)
+    def test_dates_renewal_sliding_after_two_free_monthes(self):
+        user = User.objects.filter(pk=self.user.pk).first()
+        s = Subscription(member=user, subscription_type='deux-mois-essai',
+                         payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+        s.subscription_start = date(2015, 8, 29)
+        s.subscription_end = s.compute_end(duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]['duration'],
+                                           start=s.subscription_start)
+        s.save()
+        self.assertTrue(s.subscription_end == date(2015, 10, 29))
+        date_mock_today(2015, 11, 5)
+        d = Subscription.compute_end(duration=settings.SITH_SUBSCRIPTIONS['deux-semestres']['duration'],
+                                     user=user)
+        print(d)
+        self.assertTrue(d == date(2016, 11, 5))
 
