@@ -41,8 +41,6 @@ class CurrencyField(models.DecimalField):
     """
     This is a custom database field used for currency
     """
-    __metaclass__ = models.SubfieldBase
-
     def __init__(self, *args, **kwargs):
         kwargs['max_digits'] = 12
         kwargs['decimal_places'] = 2

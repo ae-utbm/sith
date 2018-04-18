@@ -31,7 +31,7 @@ from django.forms.models import modelform_factory
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
-from django.core.servers.basehttp import FileWrapper
+from wsgiref.util import FileWrapper
 from django.core.urlresolvers import reverse
 from django.core.exceptions import PermissionDenied
 from django import forms
