@@ -809,6 +809,7 @@ class SithFile(models.Model):
             except Exception as e:
                 print("This file likely had a problem. Here is the exception:")
                 print(repr(e))
+            print('-'*80)
 
     def _check_path_consistence(self):
         file_path = str(self.file)
