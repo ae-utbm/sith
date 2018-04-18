@@ -99,7 +99,7 @@ class SASMainView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(SASMainView, self).get_context_data(**kwargs)
-        kwargs['categories'] = Album.objects.filter(parent__id=settings.SITH_SAS_ROOT_DIR_ID).order_by('date')
+        kwargs['categories'] = Album.objects.filter(parent__id=settings.SITH_SAS_ROOT_DIR_ID).order_by('id')
         kwargs['latest'] = Album.objects.filter(is_moderated=True).order_by('-id')[:5]
         return kwargs
 
