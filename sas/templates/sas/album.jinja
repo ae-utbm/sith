@@ -16,7 +16,7 @@
 <a href="{{ url('sas:main') }}">SAS</a> > {{ print_path(album.parent) }} {{ album.get_display_name() }}
 <h3>{{ album.get_display_name() }}</h3>
 <a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a><br>
-{{ timezone.now() }}
+{% set start = timezone.now() %}
 <hr>
 {% set edit_mode = user.can_edit(album) %}
 {% if edit_mode %}
@@ -85,7 +85,9 @@
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Upload{% endtrans %}" /></p>
 </form>
-{{ timezone.now() }}
+<p style="font-size: small; color: #444;">{% trans %}Template generation time: {% endtrans %}
+{{ timezone.now() - start }}
+</p>
 {% endblock %}
 
 {% block script %}
