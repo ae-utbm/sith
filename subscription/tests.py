@@ -180,6 +180,5 @@ class SubscriptionIntegrationTest(TestCase):
         date_mock_today(2015, 11, 5)
         d = Subscription.compute_end(duration=settings.SITH_SUBSCRIPTIONS['deux-semestres']['duration'],
                                      user=user)
-        print(d)
         self.assertTrue(d == date(2016, 11, 5))
 
