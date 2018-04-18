@@ -635,11 +635,11 @@ def get_directory(instance, filename):
 
 
 def get_compressed_directory(instance, filename):
-    return '.{0}/compressed/{1}'.format(instance.get_parent_path(), filename)
+    return './.compressed/{0}/{1}'.format(instance.get_parent_path(), filename)
 
 
 def get_thumbnail_directory(instance, filename):
-    return '.{0}/thumbnail/{1}'.format(instance.get_parent_path(), filename)
+    return './.thumbnails/{0}/{1}'.format(instance.get_parent_path(), filename)
 
 
 class SithFile(models.Model):
@@ -759,25 +759,81 @@ class SithFile(models.Model):
             self.save()
 
     def move_to(self, parent):
-        """Move a file to somewhere else"""
+        """
+        Move a file to a new parent.
+        `parent` must be a SithFile with the `is_folder=True` property. Otherwise, this function doesn't change
+        anything.
+        This is done only at the DB level, so that it's very fast for the user. Indeed, this function doesn't modify
+        SithFiles recursively, so it stays efficient even with top-level folders.
+        """
         if not parent.is_folder:
             return
-        import shutil
-        import os
-        with transaction.atomic():
-            if self.is_folder:
-                old_file_name = self.get_full_path()
-            else:
-                old_file_name = self.file.name
-            self.parent = parent
-            self.save()
-            if self.is_folder:
-                for c in self.children.all():
-                    c.move_to(self)
-                shutil.rmtree(os.path.join(settings.MEDIA_ROOT, old_file_name))
-            else:
-                self.file.save(name=self.name, content=self.file)
-                os.remove(os.path.join(settings.MEDIA_ROOT, old_file_name))
+        self.parent = parent
+        self.clean()
+        self.save()
+
+    def _repair_fs(self):
+        """
+        This function rebuilds recursively the filesystem as it should be
+        regarding the DB tree.
+        """
+        if self.is_folder:
+            for c in self.children.all():
+                c._repair_fs()
+            return
+        else:
+            # First get future parent path and the old file name
+            # Prepend "." so that we match all relative handling of Django's
+            # file storage
+            parent_path = "." + self.parent.get_full_path()
+            parent_full_path = settings.MEDIA_ROOT + parent_path
+            print("Parent full path: %s" % parent_full_path)
+            os.makedirs(parent_full_path, exist_ok=True)
+            old_path = self.file.name # Should be relative: "./users/skia/bleh.jpg"
+            new_path = "." + self.get_full_path()
+            print("Old path: %s " % old_path)
+            print("New path: %s " % new_path)
+            try:
+                # Make this atomic, so that a FS problem rolls back the DB change
+                with transaction.atomic():
+                    # Set the new filesystem path
+                    self.file.name = new_path
+                    self.save()
+                    print("New file path: %s " % self.file.path)
+                    # Really move at the FS level
+                    if os.path.exists(parent_full_path):
+                        os.rename(settings.MEDIA_ROOT + old_path, settings.MEDIA_ROOT + new_path)
+                        # Empty directories may remain, but that's not really a
+                        # problem, and that can be solved with a simple shell
+                        # command: `find . -type d -empty -delete`
+            except Exception as e:
+                print("This file likely had a problem. Here is the exception:")
+                print(repr(e))
+
+    def _check_path_consistence(self):
+        file_path = str(self.file)
+        file_full_path = settings.MEDIA_ROOT + file_path
+        db_path = ".%s" % self.get_full_path()
+        if not os.path.exists(file_full_path):
+            print("%s: WARNING: real file does not exists!" % self.id)
+            print("file path: %s" % file_path, end='')
+            print("  db path: %s" % db_path)
+            return False
+        if file_path != db_path:
+            print("%s: " % self.id, end='')
+            print("file path: %s" % file_path, end='')
+            print("  db path: %s" % db_path)
+            return False
+        else:
+            return True
+
+    def _check_fs(self):
+        if self.is_folder:
+            for c in self.children.all():
+                c._check_fs()
+            return
+        else:
+            self._check_path_consistence()
 
     def __getattribute__(self, attr):
         if attr == "is_file":
