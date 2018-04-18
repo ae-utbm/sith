@@ -781,7 +781,7 @@ class SithFile(models.Model):
             for c in self.children.all():
                 c._repair_fs()
             return
-        else:
+        elif not self._check_path_consistence():
             # First get future parent path and the old file name
             # Prepend "." so that we match all relative handling of Django's
             # file storage
@@ -824,8 +824,8 @@ class SithFile(models.Model):
             print("file path: %s" % file_path, end='')
             print("  db path: %s" % db_path)
             return False
-        else:
-            return True
+        print("%s OK (%s)" % (self.id, file_path))
+        return True
 
     def _check_fs(self):
         if self.is_folder:
