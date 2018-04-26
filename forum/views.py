@@ -71,6 +71,7 @@ class ForumFavoriteTopics(ListView):
         topic_list = self.request.user.favorite_topics.all()
         return topic_list
 
+
 class ForumLastUnread(ListView):
     model = ForumTopic
     template_name = "forum/last_unread.jinja"
@@ -85,12 +86,18 @@ class ForumLastUnread(ListView):
         return topic_list
 
 
+class ForumNameField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.get_full_name()
+
+
 class ForumForm(forms.ModelForm):
     class Meta:
         model = Forum
         fields = ['name', 'parent', 'number', 'owner_club', 'is_category', 'edit_groups', 'view_groups']
     edit_groups = make_ajax_field(Forum, 'edit_groups', 'groups', help_text="")
     view_groups = make_ajax_field(Forum, 'view_groups', 'groups', help_text="")
+    parent = ForumNameField(Forum.objects.all())
 
 
 class ForumCreateView(CanCreateMixin, CreateView):

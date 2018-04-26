@@ -143,6 +143,12 @@ class Forum(models.Model):
     def __str__(self):
         return "%s" % (self.name)
 
+    def get_full_name(self):
+        name = ''
+        for parent in self.get_parent_list():
+            name += parent.name + '/'
+        return name + self.name
+
     def get_absolute_url(self):
         return reverse('forum:view_forum', kwargs={'forum_id': self.id})
 
