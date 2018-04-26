@@ -31,6 +31,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from datetime import datetime
+from itertools import chain
 import pytz
 
 from core.models import User, Group
@@ -142,6 +143,9 @@ class Forum(models.Model):
 
     def __str__(self):
         return "%s" % (self.name)
+
+    def get_full_name(self):
+        return '/'.join(chain.from_iterable([[parent.name for parent in self.get_parent_list()], [self.name]]))
 
     def get_absolute_url(self):
         return reverse('forum:view_forum', kwargs={'forum_id': self.id})
