@@ -23,7 +23,7 @@
 #
 
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.core.urlresolvers import reverse_lazy
 
 from core.models import RealGroup
@@ -36,6 +36,7 @@ class GroupListView(CanEditMixin, ListView):
     """
 
     model = RealGroup
+    ordering = ["name"]
     template_name = "core/group_list.jinja"
 
 
@@ -50,6 +51,12 @@ class GroupCreateView(CanEditMixin, CreateView):
     model = RealGroup
     template_name = "core/group_edit.jinja"
     fields = ["name", "description"]
+
+
+class GroupDetailView(CanEditMixin, DetailView):
+    model = RealGroup
+    pk_url_kwarg = "group_id"
+    template_name = "core/group_detail.jinja"
 
 
 class GroupDeleteView(CanEditMixin, DeleteView):

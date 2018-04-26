@@ -64,6 +64,11 @@ urlpatterns = [
         GroupDeleteView.as_view(),
         name="group_delete",
     ),
+    url(
+        r"^group/(?P<group_id>[0-9]+)/detail$",
+        GroupDetailView.as_view(),
+        name="group_detail",
+    ),
     # User views
     url(r"^user/$", UserListView.as_view(), name="user_list"),
     url(
