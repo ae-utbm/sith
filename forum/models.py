@@ -38,6 +38,7 @@ from core.models import User, Group
 from club.models import Club
 
 
+
 class Forum(models.Model):
     """
     The Forum class, made as a tree to allow nice tidy organization
@@ -46,6 +47,9 @@ class Forum(models.Model):
     edit_groups allows to put any group as a forum admin
     view_groups allows some groups to view a forum
     """
+    # Those functions prevent generating migration upon settings changes
+    def get_default_edit_group(): return [settings.SITH_GROUP_OLD_SUBSCRIBERS_ID]
+    def get_default_view_group(): return [settings.SITH_GROUP_PUBLIC_ID]
     id = models.AutoField(primary_key=True, db_index=True)
     name = models.CharField(_('name'), max_length=64)
     description = models.CharField(_('description'), max_length=512, default="")
@@ -54,9 +58,9 @@ class Forum(models.Model):
     owner_club = models.ForeignKey(Club, related_name="owned_forums", verbose_name=_("owner club"),
                                    default=settings.SITH_MAIN_CLUB_ID)
     edit_groups = models.ManyToManyField(Group, related_name="editable_forums", blank=True,
-                                         default=[settings.SITH_GROUP_OLD_SUBSCRIBERS_ID])
+                                         default=get_default_edit_group)
     view_groups = models.ManyToManyField(Group, related_name="viewable_forums", blank=True,
-                                         default=[settings.SITH_GROUP_PUBLIC_ID])
+                                         default=get_default_view_group)
     number = models.IntegerField(_("number to choose a specific forum ordering"), default=1)
     _last_message = models.ForeignKey('ForumMessage', related_name="forums_where_its_last",
                                       verbose_name=_("the last message"), null=True, on_delete=models.SET_NULL)

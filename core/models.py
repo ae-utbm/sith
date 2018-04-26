@@ -920,8 +920,10 @@ class Page(models.Model):
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
     _full_name = models.CharField(_('page name'), max_length=255, blank=True)
+    # This function prevents generating migration upon settings change
+    def get_default_owner_group(): return settings.SITH_GROUP_ROOT_ID
     owner_group = models.ForeignKey(Group, related_name="owned_page", verbose_name=_("owner group"),
-                                    default=settings.SITH_GROUP_ROOT_ID)
+                                    default=get_default_owner_group)
     edit_groups = models.ManyToManyField(Group, related_name="editable_page", verbose_name=_("edit group"), blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_page", verbose_name=_("view group"), blank=True)
     lock_user = models.ForeignKey(User, related_name="locked_pages", verbose_name=_("lock user"), blank=True, null=True, default=None)

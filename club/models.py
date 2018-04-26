@@ -62,9 +62,9 @@ class Club(models.Model):
     is_active = models.BooleanField(_('is active'), default=True)
     short_description = models.CharField(_('short description'), max_length=1000, default='', blank=True, null=True)
     address = models.CharField(_('address'), max_length=254)
-    # email = models.EmailField(_('email address'), unique=True) # This should, and will be generated automatically
-    owner_group = models.ForeignKey(Group, related_name="owned_club",
-                                    default=settings.SITH_GROUP_ROOT_ID)
+    # This function prevents generating migration upon settings change
+    def get_default_owner_group(): return settings.SITH_GROUP_ROOT_ID
+    owner_group = models.ForeignKey(Group, related_name="owned_club", default=get_default_owner_group)
     edit_groups = models.ManyToManyField(Group, related_name="editable_club", blank=True)
     view_groups = models.ManyToManyField(Group, related_name="viewable_club", blank=True)
     home = models.OneToOneField(SithFile, related_name='home_of_club', verbose_name=_("home"), null=True, blank=True,
