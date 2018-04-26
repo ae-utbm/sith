@@ -58,7 +58,6 @@ class PosterForm(forms.ModelForm):
         fields = ['name', 'file', 'club', 'screens', 'date_begin', 'date_end', 'display_time']
         widgets = {
             'screens': forms.CheckboxSelectMultiple,
-            'is_moderated': forms.HiddenInput()
         }
 
     date_begin = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start date"),
@@ -72,7 +71,7 @@ class PosterForm(forms.ModelForm):
         if self.user:
             if not self.user.is_com_admin:
                 self.fields['club'].queryset = Club.objects.filter(id__in=self.user.clubs_with_rights)
-                self.fields['display_time'].widget = forms.HiddenInput()
+                self.fields.pop('display_time')
 
 
 class ComTabsMixin(TabedViewMixin):
@@ -571,6 +570,18 @@ class PosterEditBaseView(UpdateView):
     current_tab = "posters"
     form_class = PosterForm
     template_name = 'com/poster_edit.jinja'
+
+    def get_initial(self):
+        init = {}
+        try:
+            init['date_begin'] = self.object.date_begin.strftime('%Y-%m-%d %H:%M:%S')
+        except Exception:
+            pass
+        try:
+            init['date_end'] = self.object.date_end.strftime('%Y-%m-%d %H:%M:%S')
+        except Exception:
+            pass
+        return init
 
     def dispatch(self, request, *args, **kwargs):
         if 'club_id' in kwargs and kwargs['club_id']:
