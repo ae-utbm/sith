@@ -1031,43 +1031,77 @@ u, .underline {
 
 /*-----------------------------USER PROFILE----------------------------*/
 
-#user_profile_container {
-  width: 80%;
-  margin: 0px auto;
-}
-
-#user_profile {
-  width: 100%;
-  margin: 0px auto;
-  padding: 10px;
-  overflow: auto;
-  h4 {
-    border-bottom: 1px solid $primary-light-color;
-    max-width: 60%;
-  }
-  #left_column {
-    width: 59%;
-  }
-  #right_column {
-    width: 40%;
-    float: right;
-    font-style: italic;
-  }
-  #pictures {
-    max-width: 250px;
-    max-height: 300px;
-    margin: 0px auto;
-  }
-  #nickname {
-    font-style: italic;
-  }
-  #pictures img {
-    max-width: 96%;
-    max-height: 96%;
-  }
-  .promo_pict {
-    height: 45px;
-  }
+#user_profile_page {
+    #user_profile {
+        display: flex;
+        justify-content: center;
+        margin-top: 2em;
+        margin-bottom: 4em;
+        #user_profile_infos {
+            flex-basis: 30%;
+            border-right: solid 1px grey;
+            div {
+                margin: 0.5em;
+            }
+            #user_profile_infos_items {
+                margin-top: 3em;
+            }
+            .user_profile_infos_item, .user_profile_infos_item_value {
+                vertical-align: top;
+                display: inline-block;
+                width: 49%;
+            }
+            .user_profile_infos_item {
+                color: grey;
+            }
+            #user_profile_infos_promo {
+                display: flex;
+                align-items: center;
+                img {
+                    margin: 0.5em;
+                }
+            }
+            #user_profile_infos_quote {
+                text-align: right;
+                color: grey;
+                font-style: italic;
+                &:after, &:before {
+                    content: "\201C";
+                    vertical-align: middle;
+                }
+            }
+        }
+        #user_profile_pictures {
+            height: 20em;
+            flex-basis: 30%;
+            display: flex;
+            justify-content: flex-end;
+            #user_profile_pictures_bigone {
+                flex-grow: 9;
+                flex-basis: 20em;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    object-fit: contain;
+                }
+            }
+            #user_profile_pictures_thumbnails {
+                flex-grow: 1;
+                flex-basis: 50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                img {
+                    margin: 0.1em;
+                    width: 50px;
+                }
+            }
+        }
+    }
 }
 
 .mini_profile_link {
@@ -1107,6 +1141,7 @@ u, .underline {
   }
 }
 
+/* XXX This seems to be used in the SAS */
 #pict {
   display: inline-block;
   width: 80%;
