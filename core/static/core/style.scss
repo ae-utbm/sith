@@ -1104,6 +1104,38 @@ u, .underline {
     }
 }
 
+.user_mini_profile {
+    height: 100%;
+    width: 100%;
+    img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    .user_mini_profile_infos {
+        padding: 0.2em;
+        height: 20%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        font-size: 0.9em;
+        div {
+            max-height: 100%;
+        }
+        .user_mini_profile_infos_text {
+            text-align: center;
+            .user_mini_profile_nick {
+                font-style: italic;
+            }
+        }
+    }
+    .user_mini_profile_picture {
+        height: 80%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
 .mini_profile_link {
   display: block;
   text-decoration: none;
@@ -1148,6 +1180,32 @@ u, .underline {
   background: #333;
   border: solid #333 2px;
 }
+/*--------------------------------MATMAT-------------------------------*/
+.matmat_results {
+    display: flex;
+    flex-wrap: wrap;
+    .matmat_user {
+        flex-basis: 14em;
+        align-self: flex-start;
+        margin: 0.5em;
+        height: 18em;
+        overflow: hidden;
+        border: 1px solid black;
+        box-shadow: 2px 2px 5px grey;
+        &:hover {
+            box-shadow: 1px 1px 5px $second-color;
+        }
+    }
+    .matmat_user a {
+        color: $primary-neutral-dark-color;
+        height: 100%;
+        width: 100%;
+        margin: 0em;
+        padding: 0em;
+        display: block;
+    }
+}
+
 
 /*---------------------------------PAGE--------------------------------*/
 

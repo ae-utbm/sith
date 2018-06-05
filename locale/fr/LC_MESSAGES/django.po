@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-05 00:14+0200\n"
+"POT-Creation-Date: 2018-06-06 00:23+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -361,8 +361,8 @@ msgstr "Compte en banque : "
 #: com/templates/com/weekmail.jinja:62 core/templates/core/file_detail.jinja:25
 #: core/templates/core/file_detail.jinja:62
 #: core/templates/core/file_moderation.jinja:24
-#: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:87
-#: core/templates/core/macros.jinja:106 core/templates/core/page_prop.jinja:14
+#: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:93
+#: core/templates/core/macros.jinja:112 core/templates/core/page_prop.jinja:14
 #: core/templates/core/user_account_detail.jinja:38
 #: core/templates/core/user_detail.jinja:157
 #: core/templates/core/user_edit.jinja:19
@@ -2097,7 +2097,8 @@ msgstr "profil visible par les cotisants"
 msgid "A user with that username already exists"
 msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 
-#: core/models.py:494 core/templates/core/macros.jinja:55
+#: core/models.py:494 core/templates/core/macros.jinja:72
+#: core/templates/core/macros.jinja:74 core/templates/core/macros.jinja:75
 #: core/templates/core/user_detail.jinja:79
 #: core/templates/core/user_detail.jinja:80
 #: core/templates/core/user_detail.jinja:82
@@ -2302,9 +2303,9 @@ msgid "Register"
 msgstr "S'enregister"
 
 #: core/templates/core/base.jinja:77 core/templates/core/base.jinja.py:78
-#: matmat/templates/matmat/search_form.jinja:50
-#: matmat/templates/matmat/search_form.jinja:60
-#: matmat/templates/matmat/search_form.jinja:71
+#: matmat/templates/matmat/search_form.jinja:37
+#: matmat/templates/matmat/search_form.jinja:47
+#: matmat/templates/matmat/search_form.jinja:58
 msgid "Search"
 msgstr "Recherche"
 
@@ -2610,41 +2611,33 @@ msgstr "Partager sur Facebook"
 msgid "Tweet"
 msgstr "Tweeter"
 
-#: core/templates/core/macros.jinja:65 core/templates/core/user_detail.jinja:27
-msgid "Born: "
-msgstr "Né le : "
-
-#: core/templates/core/macros.jinja:69 core/templates/core/user_detail.jinja:71
-msgid "Promo: "
-msgstr "Promo : "
-
-#: core/templates/core/macros.jinja:76
+#: core/templates/core/macros.jinja:82
 #, python-format
 msgid "Subscribed until %(subscription_end)s"
 msgstr "Cotisant jusqu'au %(subscription_end)s"
 
-#: core/templates/core/macros.jinja:77 core/templates/core/user_edit.jinja:40
+#: core/templates/core/macros.jinja:83 core/templates/core/user_edit.jinja:40
 msgid "Account number: "
 msgstr "Numero de compte : "
 
-#: core/templates/core/macros.jinja:82 launderette/models.py:155
+#: core/templates/core/macros.jinja:88 launderette/models.py:155
 msgid "Slot"
 msgstr "Créneau"
 
-#: core/templates/core/macros.jinja:95
+#: core/templates/core/macros.jinja:101
 #: launderette/templates/launderette/launderette_admin.jinja:20
 msgid "Tokens"
 msgstr "Jetons"
 
-#: core/templates/core/macros.jinja:112 core/templates/core/macros.jinja:114
+#: core/templates/core/macros.jinja:118 core/templates/core/macros.jinja:120
 msgid "Previous"
 msgstr "Précédent"
 
-#: core/templates/core/macros.jinja:118
+#: core/templates/core/macros.jinja:124
 msgid "current"
 msgstr "actuel"
 
-#: core/templates/core/macros.jinja:124 core/templates/core/macros.jinja:126
+#: core/templates/core/macros.jinja:130 core/templates/core/macros.jinja:132
 msgid "Next"
 msgstr "Suivant"
 
@@ -2943,6 +2936,10 @@ msgstr "Se désabonner"
 msgid "%(user_name)s's profile"
 msgstr "Profil de %(user_name)s"
 
+#: core/templates/core/user_detail.jinja:27
+msgid "Born: "
+msgstr "Né le : "
+
 #: core/templates/core/user_detail.jinja:34
 msgid "Department: "
 msgstr "Département : "
@@ -2963,6 +2960,10 @@ msgstr "Adresse : "
 #: core/templates/core/user_detail.jinja:62
 msgid "Parents address: "
 msgstr "Adresse des parents : "
+
+#: core/templates/core/user_detail.jinja:71
+msgid "Promo: "
+msgstr "Promo : "
 
 #: core/templates/core/user_detail.jinja:96
 #: core/templates/core/user_detail.jinja:97
@@ -4468,23 +4469,23 @@ msgid "Token not found"
 msgstr "Jeton non trouvé"
 
 #: matmat/templates/matmat/search_form.jinja:5
-#: matmat/templates/matmat/search_form.jinja:37
+#: matmat/templates/matmat/search_form.jinja:24
 msgid "Search user"
 msgstr "Rechercher un utilisateur"
 
-#: matmat/templates/matmat/search_form.jinja:24
-msgid "User found"
-msgstr "Utilisateur trouvé"
+#: matmat/templates/matmat/search_form.jinja:10
+msgid "Results"
+msgstr "Résultats"
 
-#: matmat/templates/matmat/search_form.jinja:38
+#: matmat/templates/matmat/search_form.jinja:25
 msgid "Search by profile"
 msgstr "Recherche par profil"
 
-#: matmat/templates/matmat/search_form.jinja:52
+#: matmat/templates/matmat/search_form.jinja:39
 msgid "Inverted search"
 msgstr "Recherche inversée"
 
-#: matmat/templates/matmat/search_form.jinja:63
+#: matmat/templates/matmat/search_form.jinja:50
 msgid "Quick search"
 msgstr "Recherche rapide"
 
@@ -5384,11 +5385,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
 
-#~ msgid "define if we show a users stats"
-#~ msgstr "Definit si l'on montre les statistiques de l'utilisateur"
-
-#~ msgid "Record regularization"
-#~ msgstr "Régularization des consignes"
-
-#~ msgid "Logo"
-#~ msgstr "Logo"
