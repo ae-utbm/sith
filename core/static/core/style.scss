@@ -1115,7 +1115,7 @@ u, .underline {
         padding: 0.2em;
         height: 20%;
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         justify-content: space-around;
         font-size: 0.9em;
         div {
