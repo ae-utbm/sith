@@ -60,7 +60,7 @@ class CounterTest(TestCase):
         location = response.get('location')
 
         response = self.client.get(response.get('location'))
-        self.assertTrue('<p>Richard Batsbak</p>' in str(response.content))
+        self.assertTrue('>Richard Batsbak</' in str(response.content))
 
         response = self.client.post(location, {
             'action': 'refill',
