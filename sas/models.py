@@ -35,15 +35,18 @@ import os
 from core.models import SithFile, User
 from core.utils import resize_image, exif_auto_rotate
 
+
 class SASPictureManager(models.Manager):
     def get_queryset(self):
         return super(SASPictureManager, self).get_queryset().filter(is_in_sas=True,
-                is_folder=False)
+                                                                    is_folder=False)
+
 
 class SASAlbumManager(models.Manager):
     def get_queryset(self):
         return super(SASAlbumManager, self).get_queryset().filter(is_in_sas=True,
-                is_folder=True)
+                                                                  is_folder=True)
+
 
 class Picture(SithFile):
     class Meta:
@@ -163,6 +166,7 @@ class Album(SithFile):
             self.file.name = self.name + '/thumb.jpg'
             self.save()
 
+
 def sas_notification_callback(notif):
     count = Picture.objects.filter(is_moderated=False).count()
     if count:
@@ -171,6 +175,7 @@ def sas_notification_callback(notif):
         notif.viewed = True
     notif.param = "%s" % count
     notif.date = timezone.now()
+
 
 class PeoplePictureRelation(models.Model):
     """
