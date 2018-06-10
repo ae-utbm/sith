@@ -1,11 +1,11 @@
 # Django 1.8 LTS is required, version 1.9 is not supported
-Django >=1.8,<1.9
+Django >=1.11, <2.0
 Pillow
 mistune
 django-jinja
 pyopenssl
 pytz
-djangorestframework <3.7
+djangorestframework
 django-phonenumber-field
 django-ajax-selects
 reportlab

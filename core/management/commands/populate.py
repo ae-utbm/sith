@@ -418,7 +418,7 @@ Welcome to the wiki page!
             buying.save()
             comptes = AccountingType(code='6', label="Comptes de charge", movement_type='DEBIT')
             comptes.save()
-            simple = SimplifiedAccountingType(label='Je fais du simple 6', accounting_type=comptes, movement_type='DEBIT')
+            simple = SimplifiedAccountingType(label='Je fais du simple 6', accounting_type=comptes)
             simple.save()
             woenzco = Company(name="Woenzel & co")
             woenzco.save()
