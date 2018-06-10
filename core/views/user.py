@@ -254,7 +254,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
         kwargs = super(UserPicturesView, self).get_context_data(**kwargs)
         kwargs['albums'] = []
         kwargs['pictures'] = {}
-        picture_qs = self.object.pictures.exclude(picture=None).order_by('-picture__parent__date', 'id').select_related('picture__parent__name')
+        picture_qs = self.object.pictures.exclude(picture=None).order_by('-picture__parent__date', 'id').select_related('picture__parent')
         last_album = None
         for pict_relation in picture_qs:
             album = pict_relation.picture.parent
@@ -262,9 +262,9 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
                 kwargs['albums'].append(album)
                 kwargs['pictures'][album.id] = []
                 last_album = album.id
-                print(album, album.date)
             kwargs['pictures'][album.id].append(pict_relation.picture)
         return kwargs
+
 
 def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
     user = User.objects.get(id=user_id)
@@ -279,6 +279,7 @@ def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
     else:
         raise PermissionDenied
     return redirect('core:user_godfathers', user_id=user_id)
+
 
 class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
     """
