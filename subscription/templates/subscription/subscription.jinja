@@ -35,10 +35,21 @@ $( function() {
     function display_new_member() {
         if (select.val()) {
             member_block.hide();
+            member_block.children().each(function() {
+                $(this).children().each(function() {
+                    $(this).removeAttr('required');
+                });
+            });
             user_info.load("/user/"+select.val()+"/mini");
             user_info.show();
         } else {
             member_block.show();
+            member_block.children().each(function() {
+                $(this).children().each(function() {
+                    $(this).prop('required', true);
+                });
+            });
+
             user_info.empty();
             user_info.hide();
         }
