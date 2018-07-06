@@ -502,6 +502,11 @@ SITH_SUBSCRIPTIONS = {
         'name': _('Two month for free'),
         'price': 0,
         'duration': 0.33,
+    },
+    'benevoles-euroks': {
+        'name': _('Eurok\'s volunteer'),
+        'price': 5,
+        'duration': 0.1
     }
     # To be completed....
 }
