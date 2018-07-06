@@ -14,5 +14,6 @@ whoosh
 django-debug-toolbar
 libsass
 django-ordered-model
+django-simple-captcha
 pygraphviz
 # mysqlclient

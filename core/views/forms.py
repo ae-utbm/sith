@@ -21,7 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
+from captcha.fields import CaptchaField
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.conf import settings
@@ -148,6 +148,7 @@ class LoginForm(AuthenticationForm):
 class RegisteringForm(UserCreationForm):
     error_css_class = 'error'
     required_css_class = 'required'
+    captcha = CaptchaField()
 
     class Meta:
         model = User

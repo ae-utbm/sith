@@ -55,6 +55,8 @@ class UserRegistrationTest(TestCase):
                                                      'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
+                                                     'captcha_0': 'dummy-value',
+                                                     'captcha_1': 'PASSED'
                                                      })
         self.assertTrue(response.status_code == 200)
         self.assertTrue('TEST_REGISTER_USER_FORM_OK' in str(response.content))
@@ -70,6 +72,8 @@ class UserRegistrationTest(TestCase):
                                                      'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop2',
+                                                     'captcha_0': 'dummy-value',
+                                                     'captcha_1': 'PASSED'
                                                      })
         self.assertTrue(response.status_code == 200)
         self.assertTrue('TEST_REGISTER_USER_FORM_FAIL' in str(response.content))
@@ -85,6 +89,8 @@ class UserRegistrationTest(TestCase):
                                                      'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
+                                                     'captcha_0': 'dummy-value',
+                                                     'captcha_1': 'PASSED'
                                                      })
         self.assertTrue(response.status_code == 200)
         self.assertTrue('TEST_REGISTER_USER_FORM_FAIL' in str(response.content))
@@ -100,6 +106,8 @@ class UserRegistrationTest(TestCase):
                                                      'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
+                                                     'captcha_0': 'dummy-value',
+                                                     'captcha_1': 'PASSED'
                                                      })
         self.assertTrue(response.status_code == 200)
         self.assertTrue('TEST_REGISTER_USER_FORM_FAIL' in str(response.content))
@@ -115,6 +123,8 @@ class UserRegistrationTest(TestCase):
                                                      'date_of_birth': '',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
+                                                     'captcha_0': 'dummy-value',
+                                                     'captcha_1': 'PASSED'
                                                      })
         self.assertTrue(response.status_code == 200)
         self.assertTrue('TEST_REGISTER_USER_FORM_FAIL' in str(response.content))
@@ -130,6 +140,25 @@ class UserRegistrationTest(TestCase):
                                                      'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
+                                                     'captcha_0': 'dummy-value',
+                                                     'captcha_1': 'PASSED'
+                                                     })
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue('TEST_REGISTER_USER_FORM_FAIL' in str(response.content))
+
+    def test_register_user_form_fail_wrong_captcha(self):
+        """
+        Should not register a user correctly
+        """
+        c = Client()
+        response = c.post(reverse('core:register'), {'first_name': 'Bibou',
+                                                     'last_name': 'Carlier',
+                                                     'email': 'bibou@git.an',
+                                                     'date_of_birth': '12/6/1942',
+                                                     'password1': 'plop',
+                                                     'password2': 'plop',
+                                                     'captcha_0': 'dummy-value',
+                                                     'captcha_1': 'WRONG_CAPTCHA'
                                                      })
         self.assertTrue(response.status_code == 200)
         self.assertTrue('TEST_REGISTER_USER_FORM_FAIL' in str(response.content))
@@ -145,6 +174,8 @@ class UserRegistrationTest(TestCase):
                                           'date_of_birth': '12/6/1942',
                                           'password1': 'plop',
                                           'password2': 'plop',
+                                          'captcha_0': 'dummy-value',
+                                          'captcha_1': 'PASSED'
                                           })
         response = c.post(reverse('core:register'), {'first_name': 'Bibou',
                                                      'last_name': 'Carlier',
@@ -152,6 +183,8 @@ class UserRegistrationTest(TestCase):
                                                      'date_of_birth': '12/6/1942',
                                                      'password1': 'plop',
                                                      'password2': 'plop',
+                                                     'captcha_0': 'dummy-value',
+                                                     'captcha_1': 'PASSED'
                                                      })
         self.assertTrue(response.status_code == 200)
         self.assertTrue('TEST_REGISTER_USER_FORM_FAIL' in str(response.content))
@@ -167,6 +200,8 @@ class UserRegistrationTest(TestCase):
                                           'date_of_birth': '12/6/1942',
                                           'password1': 'plop',
                                           'password2': 'plop',
+                                          'captcha_0': 'dummy-value',
+                                          'captcha_1': 'PASSED'
                                           })
         response = c.post(reverse('core:login'), {'username': 'gcarlier', 'password': 'plop'})
         self.assertTrue(response.status_code == 302)
@@ -183,6 +218,8 @@ class UserRegistrationTest(TestCase):
                                           'date_of_birth': '12/6/1942',
                                           'password1': 'plop',
                                           'password2': 'plop',
+                                          'captcha_0': 'dummy-value',
+                                          'captcha_1': 'PASSED'
                                           })
         response = c.post(reverse('core:login'), {'username': 'gcarlier', 'password': 'guy'})
         self.assertTrue(response.status_code == 200)
