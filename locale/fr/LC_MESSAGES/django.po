@@ -4725,8 +4725,8 @@ msgid "One semester Welcome Week"
 msgstr "Un semestre Welcome Week"
 
 #: sith/settings.py:501
-msgid "Two month for free"
-msgstr "Deux mois gratuits"
+msgid "Six weeks for free"
+msgstr "6 semaines gratuits"
 
 #: sith/settings.py:506
 msgid "Eurok's volunteer"
