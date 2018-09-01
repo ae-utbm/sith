@@ -15,5 +15,6 @@ django-debug-toolbar
 libsass
 django-ordered-model
 django-simple-captcha
+python-dateutil
 pygraphviz
 # mysqlclient
