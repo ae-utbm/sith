@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-06 11:42+0200\n"
+"POT-Creation-Date: 2018-09-01 17:42+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -141,7 +141,7 @@ msgid "comment"
 msgstr "commentaire"
 
 #: accounting/models.py:258 counter/models.py:302 counter/models.py:352
-#: subscription/models.py:55
+#: subscription/models.py:59
 msgid "payment method"
 msgstr "méthode de paiement"
 
@@ -218,7 +218,7 @@ msgstr "Compte"
 msgid "Company"
 msgstr "Entreprise"
 
-#: accounting/models.py:269 sith/settings.py:377
+#: accounting/models.py:269 sith/settings.py:378
 #: stock/templates/stock/shopping_list_items.jinja:37
 msgid "Other"
 msgstr "Autre"
@@ -1047,7 +1047,7 @@ msgid "Mark as old"
 msgstr "Marquer comme ancien"
 
 #: club/templates/club/club_members.jinja:30
-#: core/templates/core/file_detail.jinja:19 core/views/forms.py:253
+#: core/templates/core/file_detail.jinja:19 core/views/forms.py:254
 #: launderette/views.py:182 trombi/templates/trombi/detail.jinja:19
 msgid "Add"
 msgstr "Ajouter"
@@ -1276,7 +1276,7 @@ msgstr "Liste d'affiches"
 msgid "Props"
 msgstr "Propriétés"
 
-#: club/views.py:251 core/views/forms.py:254 counter/views.py:91
+#: club/views.py:251 core/views/forms.py:255 counter/views.py:91
 #: trombi/views.py:124
 msgid "Select user"
 msgstr "Choisir un utilisateur"
@@ -3311,7 +3311,7 @@ msgstr "Ajouter un nouveau dossier"
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py:97 core/views/forms.py:228 core/views/forms.py:232
+#: core/views/files.py:97 core/views/forms.py:229 core/views/forms.py:233
 #: sas/views.py:70
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
@@ -3337,7 +3337,7 @@ msgstr "Choisir un utilisateur"
 msgid "Username, email, or account number"
 msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
-#: core/views/forms.py:186
+#: core/views/forms.py:187
 msgid ""
 "Profile: you need to be visible on the picture, in order to be recognized (e."
 "g. by the barmen)"
@@ -3345,32 +3345,32 @@ msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
 
-#: core/views/forms.py:187
+#: core/views/forms.py:188
 msgid "Avatar: used on the forum"
 msgstr "Avatar : utilisé sur le forum"
 
-#: core/views/forms.py:188
+#: core/views/forms.py:189
 msgid "Scrub: let other know how your scrub looks like!"
 msgstr "Blouse : montrez aux autres à quoi ressemble votre blouse !"
 
-#: core/views/forms.py:233
+#: core/views/forms.py:234
 msgid "Bad image format, only jpeg, png, and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, et gif sont acceptés"
 
-#: core/views/forms.py:253
+#: core/views/forms.py:254
 msgid "Godfather"
 msgstr "Parrain"
 
-#: core/views/forms.py:253
+#: core/views/forms.py:254
 msgid "Godchild"
 msgstr "Fillot"
 
-#: core/views/forms.py:264 core/views/forms.py:277 election/models.py:22
+#: core/views/forms.py:265 core/views/forms.py:278 election/models.py:22
 #: election/views.py:128
 msgid "edit groups"
 msgstr "groupe d'édition"
 
-#: core/views/forms.py:265 core/views/forms.py:278 election/models.py:26
+#: core/views/forms.py:266 core/views/forms.py:279 election/models.py:26
 #: election/views.py:129
 msgid "view groups"
 msgstr "groupe de vue"
@@ -3478,7 +3478,7 @@ msgstr "Bureau"
 #: eboutic/templates/eboutic/eboutic_main.jinja:24
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:8
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:4
-#: sith/settings.py:376 sith/settings.py:384
+#: sith/settings.py:377 sith/settings.py:385
 msgid "Eboutic"
 msgstr "Eboutic"
 
@@ -3519,8 +3519,8 @@ msgstr "quantité"
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: counter/models.py:353 sith/settings.py:369 sith/settings.py:374
-#: sith/settings.py:396
+#: counter/models.py:353 sith/settings.py:370 sith/settings.py:375
+#: sith/settings.py:397
 msgid "Credit card"
 msgstr "Carte bancaire"
 
@@ -4412,12 +4412,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:564
+#: sith/settings.py:570
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:564
+#: sith/settings.py:570
 msgid "Drying"
 msgstr "Séchage"
 
@@ -4592,243 +4592,247 @@ msgstr "Erreur de création de l'album %(album)s : %(msg)s"
 msgid "Add user"
 msgstr "Ajouter une personne"
 
-#: sith/settings.py:213
+#: sith/settings.py:214
 msgid "English"
 msgstr "Anglais"
 
-#: sith/settings.py:214
+#: sith/settings.py:215
 msgid "French"
 msgstr "Français"
 
-#: sith/settings.py:350
+#: sith/settings.py:351
 msgid "TC"
 msgstr "TC"
 
-#: sith/settings.py:351
+#: sith/settings.py:352
 msgid "IMSI"
 msgstr "IMSI"
 
-#: sith/settings.py:352
+#: sith/settings.py:353
 msgid "IMAP"
 msgstr "IMAP"
 
-#: sith/settings.py:353
+#: sith/settings.py:354
 msgid "INFO"
 msgstr "INFO"
 
-#: sith/settings.py:354
+#: sith/settings.py:355
 msgid "GI"
 msgstr "GI"
 
-#: sith/settings.py:355
+#: sith/settings.py:356
 msgid "E"
 msgstr "E"
 
-#: sith/settings.py:356
+#: sith/settings.py:357
 msgid "EE"
 msgstr "EE"
 
-#: sith/settings.py:357
+#: sith/settings.py:358
 msgid "GESC"
 msgstr "GESC"
 
-#: sith/settings.py:358
+#: sith/settings.py:359
 msgid "GMC"
 msgstr "GMC"
 
-#: sith/settings.py:359
+#: sith/settings.py:360
 msgid "MC"
 msgstr "MC"
 
-#: sith/settings.py:360
+#: sith/settings.py:361
 msgid "EDIM"
 msgstr "EDIM"
 
-#: sith/settings.py:361
+#: sith/settings.py:362
 msgid "Humanities"
 msgstr "Humanités"
 
-#: sith/settings.py:362
+#: sith/settings.py:363
 msgid "N/A"
 msgstr "N/A"
 
-#: sith/settings.py:366 sith/settings.py:373 sith/settings.py:394
+#: sith/settings.py:367 sith/settings.py:374 sith/settings.py:395
 msgid "Check"
 msgstr "Chèque"
 
-#: sith/settings.py:367 sith/settings.py:375 sith/settings.py:395
+#: sith/settings.py:368 sith/settings.py:376 sith/settings.py:396
 msgid "Cash"
 msgstr "Espèces"
 
-#: sith/settings.py:368
+#: sith/settings.py:369
 msgid "Transfert"
 msgstr "Virement"
 
-#: sith/settings.py:381
+#: sith/settings.py:382
 msgid "Belfort"
 msgstr "Belfort"
 
-#: sith/settings.py:382
+#: sith/settings.py:383
 msgid "Sevenans"
 msgstr "Sevenans"
 
-#: sith/settings.py:383
+#: sith/settings.py:384
 msgid "Montbéliard"
 msgstr "Montbéliard"
 
-#: sith/settings.py:441
+#: sith/settings.py:442
 msgid "One semester"
 msgstr "Un semestre, 15 €"
 
-#: sith/settings.py:446
+#: sith/settings.py:447
 msgid "Two semesters"
 msgstr "Deux semestres, 28 €"
 
-#: sith/settings.py:451
+#: sith/settings.py:452
 msgid "Common core cursus"
 msgstr "Cursus tronc commun, 45 €"
 
-#: sith/settings.py:456
+#: sith/settings.py:457
 msgid "Branch cursus"
 msgstr "Cursus branche, 45 €"
 
-#: sith/settings.py:461
+#: sith/settings.py:462
 msgid "Alternating cursus"
 msgstr "Cursus alternant, 30 €"
 
-#: sith/settings.py:466
+#: sith/settings.py:467
 msgid "Honorary member"
 msgstr "Membre honoraire, 0 €"
 
-#: sith/settings.py:471
+#: sith/settings.py:472
 msgid "Assidu member"
 msgstr "Membre d'Assidu, 0 €"
 
-#: sith/settings.py:476
+#: sith/settings.py:477
 msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO, 0 €"
 
-#: sith/settings.py:481
+#: sith/settings.py:482
 msgid "UT network member"
 msgstr "Cotisant du réseau UT, 0 €"
 
-#: sith/settings.py:486
+#: sith/settings.py:487
 msgid "CROUS member"
 msgstr "Membres du CROUS, 0 €"
 
-#: sith/settings.py:491
+#: sith/settings.py:492
 msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
 
-#: sith/settings.py:496
+#: sith/settings.py:497
 msgid "One semester Welcome Week"
 msgstr "Un semestre Welcome Week"
 
-#: sith/settings.py:501
-msgid "Two month for free"
+#: sith/settings.py:502
+msgid "Two months for free"
 msgstr "Deux mois gratuits"
 
-#: sith/settings.py:506
+#: sith/settings.py:507
 msgid "Eurok's volunteer"
 msgstr "Bénévole Eurockéennes"
 
-#: sith/settings.py:528
+#: sith/settings.py:512
+msgid "Six weeks for free"
+msgstr "6 semaines gratuites"
+
+#: sith/settings.py:534
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:529
+#: sith/settings.py:535
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:530
+#: sith/settings.py:536
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:531
+#: sith/settings.py:537
 msgid "Communication supervisor"
 msgstr "Responsable communication"
 
-#: sith/settings.py:532
+#: sith/settings.py:538
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:533
+#: sith/settings.py:539
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:534
+#: sith/settings.py:540
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:535
+#: sith/settings.py:541
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:536
+#: sith/settings.py:542
 msgid "Curious"
 msgstr "Curieux"
 
-#: sith/settings.py:571
+#: sith/settings.py:577
 msgid "A new poster needs to be moderated"
 msgstr "Une nouvelle affiche a besoin d'être modérée"
 
-#: sith/settings.py:572
+#: sith/settings.py:578
 msgid "A new mailing list needs to be moderated"
 msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
-#: sith/settings.py:573
+#: sith/settings.py:579
 #, python-format
 msgid "There are %s fresh news to be moderated"
 msgstr "Il y a %s nouvelles toutes fraîches à modérer"
 
-#: sith/settings.py:574
+#: sith/settings.py:580
 msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
-#: sith/settings.py:575
+#: sith/settings.py:581
 #, python-format
 msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
-#: sith/settings.py:576
+#: sith/settings.py:582
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:577
+#: sith/settings.py:583
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s€"
 
-#: sith/settings.py:578
+#: sith/settings.py:584
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:579
+#: sith/settings.py:585
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:591
+#: sith/settings.py:597
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:592
+#: sith/settings.py:598
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:593
+#: sith/settings.py:599
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:594
+#: sith/settings.py:600
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:595
+#: sith/settings.py:601
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
-#: sith/settings.py:604
+#: sith/settings.py:610
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 
@@ -5031,35 +5035,35 @@ msgstr " demandé"
 msgid "%(effective_quantity)s left"
 msgstr "%(effective_quantity)s restant"
 
-#: subscription/models.py:40
+#: subscription/models.py:44
 msgid "Bad subscription type"
 msgstr "Mauvais type de cotisation"
 
-#: subscription/models.py:45
+#: subscription/models.py:49
 msgid "Bad payment method"
 msgstr "Mauvais type de paiement"
 
-#: subscription/models.py:50
+#: subscription/models.py:54
 msgid "subscription type"
 msgstr "type d'inscription"
 
-#: subscription/models.py:53
+#: subscription/models.py:57
 msgid "subscription start"
 msgstr "début de la cotisation"
 
-#: subscription/models.py:54
+#: subscription/models.py:58
 msgid "subscription end"
 msgstr "fin de la cotisation"
 
-#: subscription/models.py:59
+#: subscription/models.py:63
 msgid "location"
 msgstr "lieu"
 
-#: subscription/models.py:68
+#: subscription/models.py:72
 msgid "You can not subscribe many time for the same period"
 msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 
-#: subscription/models.py:72
+#: subscription/models.py:76
 msgid "Subscription error"
 msgstr "Erreur de cotisation"
 

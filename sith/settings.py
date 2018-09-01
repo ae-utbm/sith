@@ -499,7 +499,7 @@ SITH_SUBSCRIPTIONS = {
         'duration': 1,
     },
     'deux-mois-essai': {
-        'name': _('Two month for free'),
+        'name': _('Two months for free'),
         'price': 0,
         'duration': 0.33,
     },
@@ -507,6 +507,11 @@ SITH_SUBSCRIPTIONS = {
         'name': _('Eurok\'s volunteer'),
         'price': 5,
         'duration': 0.1
+    },
+    'six-semaines-essai': {
+        'name': _('Six weeks for free'),
+        'price': 0,
+        'duration': 0.23,
     }
     # To be completed....
 }

@@ -31,6 +31,10 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib.auth.forms import PasswordResetForm
 
+from dateutil.relativedelta import relativedelta
+
+import math
+
 from core.models import User
 from core.utils import get_start_of_semester
 
@@ -172,14 +176,8 @@ class Subscription(models.Model):
         if start is None:
             start = Subscription.compute_start(duration=duration, user=user)
 
-        # This can certainly be simplified, but it works like this
-        try:
-            return start.replace(month=int(round((start.month - 1 + 6 * duration) % 12 + 1, 0)),
-                                 year=int(round(start.year + int(duration / 2) + (1 if int(start.month + 6 * duration) > 12 and (duration % 2 == 1 or duration < 1) else 0), 0)))
-        except ValueError as e: # This catches 29th of February errors
-            return start.replace(day=1, month=int(round((start.month + 6 * duration) % 12 + 1, 0)),
-                                 year=int(round(start.year + int(duration / 2) + (1 if int(start.month + 6 * duration) > 12 and (duration % 2 == 1 or duration < 1) else 0), 0)))
-
+        return start + relativedelta(months=round(6*duration),days=math.ceil((6*duration - round(6*duration)) * 30))
+        
     def can_be_edited_by(self, user):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
 
