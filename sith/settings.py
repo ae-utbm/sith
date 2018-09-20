@@ -512,6 +512,11 @@ SITH_SUBSCRIPTIONS = {
         'name': _('Six weeks for free'),
         'price': 0,
         'duration': 0.23,
+    },
+    'un-jour': {
+        'name': _('Un jour'),
+        'price': 0,
+        'duration': 0.00555333,
     }
     # To be completed....
 }

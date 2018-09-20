@@ -117,6 +117,16 @@ class SubscriptionIntegrationTest(TestCase):
         s.save()
         self.assertTrue(s.subscription_end == date(2017, 10, 29))
 
+    def test_duration_two_months(self):
+
+        s = Subscription(member=User.objects.filter(pk=self.user.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
+                         payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0])
+        s.subscription_start = date(2017, 8, 29)
+        s.subscription_end = s.compute_end(duration=settings.SITH_SUBSCRIPTIONS['un-jour']['duration'],
+                                           start=s.subscription_start)
+        s.save()
+        self.assertTrue(s.subscription_end == date(2017, 8, 30))
+
     def test_duration_three_months(self):
 
         s = Subscription(member=User.objects.filter(pk=self.user.pk).first(), subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
