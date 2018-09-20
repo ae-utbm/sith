@@ -514,7 +514,7 @@ SITH_SUBSCRIPTIONS = {
         'duration': 0.23,
     },
     'un-jour': {
-        'name': _('Un jour'),
+        'name': _('One day'),
         'price': 0,
         'duration': 0.00555333,
     }
