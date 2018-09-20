@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-01 17:42+0200\n"
+"POT-Creation-Date: 2018-09-20 14:41+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4412,12 +4412,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:570
+#: sith/settings.py:575
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:570
+#: sith/settings.py:575
 msgid "Drying"
 msgstr "Séchage"
 
@@ -4736,103 +4736,107 @@ msgstr "Bénévole Eurockéennes"
 msgid "Six weeks for free"
 msgstr "6 semaines gratuites"
 
-#: sith/settings.py:534
+#: sith/settings.py:517
+msgid "One day"
+msgstr "Un jour"
+
+#: sith/settings.py:539
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:535
+#: sith/settings.py:540
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:536
+#: sith/settings.py:541
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:537
+#: sith/settings.py:542
 msgid "Communication supervisor"
 msgstr "Responsable communication"
 
-#: sith/settings.py:538
+#: sith/settings.py:543
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:539
+#: sith/settings.py:544
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:540
+#: sith/settings.py:545
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:541
+#: sith/settings.py:546
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:542
+#: sith/settings.py:547
 msgid "Curious"
 msgstr "Curieux"
 
-#: sith/settings.py:577
+#: sith/settings.py:582
 msgid "A new poster needs to be moderated"
 msgstr "Une nouvelle affiche a besoin d'être modérée"
 
-#: sith/settings.py:578
+#: sith/settings.py:583
 msgid "A new mailing list needs to be moderated"
 msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
-#: sith/settings.py:579
+#: sith/settings.py:584
 #, python-format
 msgid "There are %s fresh news to be moderated"
 msgstr "Il y a %s nouvelles toutes fraîches à modérer"
 
-#: sith/settings.py:580
+#: sith/settings.py:585
 msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
-#: sith/settings.py:581
+#: sith/settings.py:586
 #, python-format
 msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
-#: sith/settings.py:582
+#: sith/settings.py:587
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:583
+#: sith/settings.py:588
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s€"
 
-#: sith/settings.py:584
+#: sith/settings.py:589
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:585
+#: sith/settings.py:590
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:597
+#: sith/settings.py:602
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:598
+#: sith/settings.py:603
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:599
+#: sith/settings.py:604
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:600
+#: sith/settings.py:605
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:601
+#: sith/settings.py:606
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
-#: sith/settings.py:610
+#: sith/settings.py:615
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 
