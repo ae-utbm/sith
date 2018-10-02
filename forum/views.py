@@ -39,6 +39,16 @@ from ajax_select import make_ajax_field
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from core.views.forms import MarkdownInput
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
+from haystack.query import SearchQuerySet
+
+
+class ForumSearchView(ListView):
+    template_name = "forum/search.jinja"
+
+    def get_queryset(self):
+        query = self.request.GET.get("query", "")
+        q = SearchQuerySet().models(ForumMessage).filter(text=query)
+        return [r.object for r in q]
 
 
 class ForumMainView(ListView):

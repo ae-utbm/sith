@@ -27,6 +27,7 @@ from django.db import models
 from haystack import indexes, signals
 
 from core.models import User
+from forum.models import ForumMessage
 
 
 class UserIndex(indexes.SearchIndex, indexes.Indexable):
@@ -54,3 +55,10 @@ class UserOnlySignalProcessor(signals.BaseSignalProcessor):
         # Disconnect only for the ``User`` model.
         models.signals.post_save.disconnect(self.handle_save, sender=User)
         models.signals.post_delete.disconnect(self.handle_delete, sender=User)
+
+
+class ForumMessageIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+
+    def get_model(self):
+        return ForumMessage

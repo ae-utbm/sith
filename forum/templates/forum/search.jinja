@@ -1,0 +1,22 @@
+{% extends "core/base.jinja" %}
+
+{% from 'forum/macros.jinja' import display_message %}
+
+{% block content %}
+    <div id="forum">
+        <div class="search-results">
+            {% for m in object_list %}
+                {% if user.can_view(m) %}
+                    <div class="result-box">
+                        <div class="result-topic">
+                            {{ m }}
+                        </div>
+                        <div class="result-message">
+                            {{ m.message }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

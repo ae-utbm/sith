@@ -21,6 +21,10 @@
         <a href="{{ url('forum:new_forum') }}">{% trans %}New forum{% endtrans %}</a>
     </p>
     {% endif %}
+                <form action="{{ url('forum:search') }}" method="GET" id="header_search">
+                    <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" id="search" />
+                    <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />
+                </form>
     <div>
         <div class="ib w_big">
             {% trans %}Title{% endtrans %}
@@ -34,6 +38,7 @@
             </div>
         </div>
     </div>
+
     {% for f in forum_list %}
     <div>
     {{ display_forum(f, user, True) }}
