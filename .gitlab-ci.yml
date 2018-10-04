@@ -8,11 +8,12 @@ setup:
   - apt-get update
   - apt-get install -y gettext
   - pip install -r requirements.txt
+  - pip install coverage
+  - pip install black
 
 test:
   stage: test
   script:
-  - pip install coverage
   - ./manage.py compilemessages
   - coverage run ./manage.py test
   - coverage html
@@ -24,5 +25,4 @@ test:
 black:
   stage: test
   script:
-    - pip install black
     - black --check .

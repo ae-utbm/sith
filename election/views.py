@@ -21,19 +21,30 @@ from ajax_select import make_ajax_field
 
 # Custom form field
 
+
 class LimitedCheckboxField(forms.ModelMultipleChoiceField):
     """
         Used to replace ModelMultipleChoiceField but with
         automatic backend verification
     """
 
-    def __init__(self, queryset, max_choice, required=True, widget=None,
-                 label=None, initial=None, help_text='', *args, **kwargs):
+    def __init__(
+        self,
+        queryset,
+        max_choice,
+        required=True,
+        widget=None,
+        label=None,
+        initial=None,
+        help_text="",
+        *args,
+        **kwargs
+    ):
         self.max_choice = max_choice
         widget = forms.CheckboxSelectMultiple()
-        super(LimitedCheckboxField,
-              self).__init__(queryset, None, required, widget,
-                             label, initial, help_text, *args, **kwargs)
+        super(LimitedCheckboxField, self).__init__(
+            queryset, None, required, widget, label, initial, help_text, *args, **kwargs
+        )
 
     def clean(self, value):
         qs = super(LimitedCheckboxField, self).clean(value)
@@ -42,7 +53,9 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
 
     def validate(self, qs):
         if qs.count() > self.max_choice:
-            raise forms.ValidationError(_("You have selected too much candidates."), code='invalid')
+            raise forms.ValidationError(
+                _("You have selected too much candidates."), code="invalid"
+            )
 
 
 # Forms
@@ -50,24 +63,29 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
 
 class CandidateForm(forms.ModelForm):
     """ Form to candidate """
+
     class Meta:
         model = Candidature
-        fields = ['user', 'role', 'program', 'election_list']
-        widgets = {
-            'program': forms.Textarea
-        }
+        fields = ["user", "role", "program", "election_list"]
+        widgets = {"program": forms.Textarea}
 
-    user = AutoCompleteSelectField('users', label=_('User to candidate'), help_text=None, required=True)
+    user = AutoCompleteSelectField(
+        "users", label=_("User to candidate"), help_text=None, required=True
+    )
 
     def __init__(self, *args, **kwargs):
-        election_id = kwargs.pop('election_id', None)
-        can_edit = kwargs.pop('can_edit', False)
+        election_id = kwargs.pop("election_id", None)
+        can_edit = kwargs.pop("can_edit", False)
         super(CandidateForm, self).__init__(*args, **kwargs)
         if election_id:
-            self.fields['role'].queryset = Role.objects.filter(election__id=election_id).all()
-            self.fields['election_list'].queryset = ElectionList.objects.filter(election__id=election_id).all()
+            self.fields["role"].queryset = Role.objects.filter(
+                election__id=election_id
+            ).all()
+            self.fields["election_list"].queryset = ElectionList.objects.filter(
+                election__id=election_id
+            ).all()
         if not can_edit:
-            self.fields['user'].widget = forms.HiddenInput()
+            self.fields["user"].widget = forms.HiddenInput()
 
 
 class VoteForm(forms.Form):
@@ -77,67 +95,112 @@ class VoteForm(forms.Form):
             for role in election.roles.all():
                 cand = role.candidatures
                 if role.max_choice > 1:
-                    self.fields[role.title] = LimitedCheckboxField(cand, role.max_choice, required=False)
+                    self.fields[role.title] = LimitedCheckboxField(
+                        cand, role.max_choice, required=False
+                    )
                 else:
-                    self.fields[role.title] = forms.ModelChoiceField(cand, required=False,
-                                                                     widget=forms.RadioSelect(),
-                                                                     empty_label=_("Blank vote"))
+                    self.fields[role.title] = forms.ModelChoiceField(
+                        cand,
+                        required=False,
+                        widget=forms.RadioSelect(),
+                        empty_label=_("Blank vote"),
+                    )
 
 
 class RoleForm(forms.ModelForm):
     """ Form for creating a role """
+
     class Meta:
         model = Role
-        fields = ['title', 'election', 'description', 'max_choice']
+        fields = ["title", "election", "description", "max_choice"]
 
     def __init__(self, *args, **kwargs):
-        election_id = kwargs.pop('election_id', None)
+        election_id = kwargs.pop("election_id", None)
         super(RoleForm, self).__init__(*args, **kwargs)
         if election_id:
-            self.fields['election'].queryset = Election.objects.filter(id=election_id).all()
+            self.fields["election"].queryset = Election.objects.filter(
+                id=election_id
+            ).all()
 
     def clean(self):
         cleaned_data = super(RoleForm, self).clean()
-        title = cleaned_data.get('title')
-        election = cleaned_data.get('election')
+        title = cleaned_data.get("title")
+        election = cleaned_data.get("election")
         if Role.objects.filter(title=title, election=election).exists():
-            raise forms.ValidationError(_("This role already exists for this election"), code='invalid')
+            raise forms.ValidationError(
+                _("This role already exists for this election"), code="invalid"
+            )
 
 
 class ElectionListForm(forms.ModelForm):
     class Meta:
         model = ElectionList
-        fields = ('title', 'election')
+        fields = ("title", "election")
 
     def __init__(self, *args, **kwargs):
-        election_id = kwargs.pop('election_id', None)
+        election_id = kwargs.pop("election_id", None)
         super(ElectionListForm, self).__init__(*args, **kwargs)
         if election_id:
-            self.fields['election'].queryset = Election.objects.filter(id=election_id).all()
+            self.fields["election"].queryset = Election.objects.filter(
+                id=election_id
+            ).all()
 
 
 class ElectionForm(forms.ModelForm):
     class Meta:
         model = Election
-        fields = ['title', 'description', 'archived',
-                  'start_candidature', 'end_candidature',
-                  'start_date', 'end_date',
-                  'edit_groups', 'view_groups',
-                  'vote_groups', 'candidature_groups']
+        fields = [
+            "title",
+            "description",
+            "archived",
+            "start_candidature",
+            "end_candidature",
+            "start_date",
+            "end_date",
+            "edit_groups",
+            "view_groups",
+            "vote_groups",
+            "candidature_groups",
+        ]
 
-    edit_groups = make_ajax_field(Election, 'edit_groups', 'groups', help_text="", label=_("edit groups"))
-    view_groups = make_ajax_field(Election, 'view_groups', 'groups', help_text="", label=_("view groups"))
-    vote_groups = make_ajax_field(Election, 'vote_groups', 'groups', help_text="", label=_("vote groups"))
-    candidature_groups = make_ajax_field(Election, 'candidature_groups', 'groups', help_text="", label=_("candidature groups"))
+    edit_groups = make_ajax_field(
+        Election, "edit_groups", "groups", help_text="", label=_("edit groups")
+    )
+    view_groups = make_ajax_field(
+        Election, "view_groups", "groups", help_text="", label=_("view groups")
+    )
+    vote_groups = make_ajax_field(
+        Election, "vote_groups", "groups", help_text="", label=_("vote groups")
+    )
+    candidature_groups = make_ajax_field(
+        Election,
+        "candidature_groups",
+        "groups",
+        help_text="",
+        label=_("candidature groups"),
+    )
 
-    start_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start date"),
-                                     widget=SelectDateTime, required=True)
-    end_date = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End date"),
-                                   widget=SelectDateTime, required=True)
-    start_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("Start candidature"),
-                                            widget=SelectDateTime, required=True)
-    end_candidature = forms.DateTimeField(['%Y-%m-%d %H:%M:%S'], label=_("End candidature"),
-                                          widget=SelectDateTime, required=True)
+    start_date = forms.DateTimeField(
+        ["%Y-%m-%d %H:%M:%S"],
+        label=_("Start date"),
+        widget=SelectDateTime,
+        required=True,
+    )
+    end_date = forms.DateTimeField(
+        ["%Y-%m-%d %H:%M:%S"], label=_("End date"), widget=SelectDateTime, required=True
+    )
+    start_candidature = forms.DateTimeField(
+        ["%Y-%m-%d %H:%M:%S"],
+        label=_("Start candidature"),
+        widget=SelectDateTime,
+        required=True,
+    )
+    end_candidature = forms.DateTimeField(
+        ["%Y-%m-%d %H:%M:%S"],
+        label=_("End candidature"),
+        widget=SelectDateTime,
+        required=True,
+    )
 
 
 # Display elections
@@ -147,42 +210,52 @@ class ElectionsListView(CanViewMixin, ListView):
     """
     A list of all non archived elections visible
     """
+
     model = Election
     ordering = ["-id"]
     paginate_by = 10
-    template_name = 'election/election_list.jinja'
+    template_name = "election/election_list.jinja"
 
     def get_queryset(self):
-        return super(ElectionsListView, self).get_queryset().filter(archived=False).all()
+        return (
+            super(ElectionsListView, self).get_queryset().filter(archived=False).all()
+        )
 
 
 class ElectionListArchivedView(CanViewMixin, ListView):
     """
     A list of all archived elections visible
     """
+
     model = Election
     ordering = ["-id"]
     paginate_by = 10
-    template_name = 'election/election_list.jinja'
+    template_name = "election/election_list.jinja"
 
     def get_queryset(self):
-        return super(ElectionListArchivedView, self).get_queryset().filter(archived=True).all()
+        return (
+            super(ElectionListArchivedView, self)
+            .get_queryset()
+            .filter(archived=True)
+            .all()
+        )
 
 
 class ElectionDetailView(CanViewMixin, DetailView):
     """
     Details an election responsability by responsability
     """
+
     model = Election
-    template_name = 'election/election_detail.jinja'
+    template_name = "election/election_detail.jinja"
     pk_url_kwarg = "election_id"
 
     def get(self, request, *arg, **kwargs):
         r = super(ElectionDetailView, self).get(request, *arg, **kwargs)
         election = self.get_object()
         if request.user.can_edit(election) and election.is_vote_editable:
-            action = request.GET.get('action', None)
-            role = request.GET.get('role', None)
+            action = request.GET.get("action", None)
+            role = request.GET.get("role", None)
             if action and role and Role.objects.filter(id=role).exists():
                 if action == "up":
                     Role.objects.get(id=role).up()
@@ -192,28 +265,32 @@ class ElectionDetailView(CanViewMixin, DetailView):
                     Role.objects.get(id=role).bottom()
                 elif action == "top":
                     Role.objects.get(id=role).top()
-                return redirect(reverse_lazy('election:detail', kwargs={'election_id': election.id}))
+                return redirect(
+                    reverse_lazy("election:detail", kwargs={"election_id": election.id})
+                )
         return r
 
     def get_context_data(self, **kwargs):
         """ Add additionnal data to the template """
         kwargs = super(ElectionDetailView, self).get_context_data(**kwargs)
-        kwargs['election_form'] = VoteForm(self.object, self.request.user)
-        kwargs['election_results'] = self.object.results
+        kwargs["election_form"] = VoteForm(self.object, self.request.user)
+        kwargs["election_results"] = self.object.results
         return kwargs
 
 
 # Form view
 
+
 class VoteFormView(CanCreateMixin, FormView):
     """
     Alows users to vote
     """
+
     form_class = VoteForm
-    template_name = 'election/election_detail.jinja'
+    template_name = "election/election_detail.jinja"
 
     def dispatch(self, request, *arg, **kwargs):
-        self.election = get_object_or_404(Election, pk=kwargs['election_id'])
+        self.election = get_object_or_404(Election, pk=kwargs["election_id"])
         return super(VoteFormView, self).dispatch(request, *arg, **kwargs)
 
     def vote(self, election_data):
@@ -235,8 +312,8 @@ class VoteFormView(CanCreateMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super(VoteFormView, self).get_form_kwargs()
-        kwargs['election'] = self.election
-        kwargs['user'] = self.request.user
+        kwargs["election"] = self.election
+        kwargs["user"] = self.request.user
         return kwargs
 
     def form_valid(self, form):
@@ -252,41 +329,43 @@ class VoteFormView(CanCreateMixin, FormView):
         return res
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
+        return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
 
     def get_context_data(self, **kwargs):
         """ Add additionnal data to the template """
         kwargs = super(VoteFormView, self).get_context_data(**kwargs)
-        kwargs['object'] = self.election
-        kwargs['election'] = self.election
-        kwargs['election_form'] = self.get_form()
+        kwargs["object"] = self.election
+        kwargs["election"] = self.election
+        kwargs["election_form"] = self.get_form()
         return kwargs
 
 
 # Create views
 
+
 class CandidatureCreateView(CanCreateMixin, CreateView):
     """
     View dedicated to a cundidature creation
     """
+
     form_class = CandidateForm
     model = Candidature
-    template_name = 'election/candidate_form.jinja'
+    template_name = "election/candidate_form.jinja"
 
     def dispatch(self, request, *arg, **kwargs):
-        self.election = get_object_or_404(Election, pk=kwargs['election_id'])
+        self.election = get_object_or_404(Election, pk=kwargs["election_id"])
         return super(CandidatureCreateView, self).dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
         init = {}
         self.can_edit = self.request.user.can_edit(self.election)
-        init['user'] = self.request.user.id
+        init["user"] = self.request.user.id
         return init
 
     def get_form_kwargs(self):
         kwargs = super(CandidatureCreateView, self).get_form_kwargs()
-        kwargs['election_id'] = self.election.id
-        kwargs['can_edit'] = self.can_edit
+        kwargs["election_id"] = self.election.id
+        kwargs["can_edit"] = self.can_edit
         return kwargs
 
     def form_valid(self, form):
@@ -295,23 +374,25 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
         """
         obj = form.instance
         obj.election = Election.objects.get(id=self.election.id)
-        if(obj.election.can_candidate(obj.user)) and (obj.user == self.request.user or self.can_edit):
+        if (obj.election.can_candidate(obj.user)) and (
+            obj.user == self.request.user or self.can_edit
+        ):
             return super(CreateView, self).form_valid(form)
         raise PermissionDenied
 
     def get_context_data(self, **kwargs):
         kwargs = super(CandidatureCreateView, self).get_context_data(**kwargs)
-        kwargs['election'] = self.election
+        kwargs["election"] = self.election
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
+        return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
 
 
 class ElectionCreateView(CanCreateMixin, CreateView):
     model = Election
     form_class = ElectionForm
-    template_name = 'core/create.jinja'
+    template_name = "core/create.jinja"
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_subscribed:
@@ -326,23 +407,23 @@ class ElectionCreateView(CanCreateMixin, CreateView):
         return super(CreateView, self).form_valid(form)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.object.id})
+        return reverse_lazy("election:detail", kwargs={"election_id": self.object.id})
 
 
 class RoleCreateView(CanCreateMixin, CreateView):
     model = Role
     form_class = RoleForm
-    template_name = 'core/create.jinja'
+    template_name = "core/create.jinja"
 
     def dispatch(self, request, *arg, **kwargs):
-        self.election = get_object_or_404(Election, pk=kwargs['election_id'])
+        self.election = get_object_or_404(Election, pk=kwargs["election_id"])
         if not self.election.is_vote_editable:
             raise PermissionDenied
         return super(RoleCreateView, self).dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
         init = {}
-        init['election'] = self.election
+        init["election"] = self.election
         return init
 
     def form_valid(self, form):
@@ -358,32 +439,34 @@ class RoleCreateView(CanCreateMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super(RoleCreateView, self).get_form_kwargs()
-        kwargs['election_id'] = self.election.id
+        kwargs["election_id"] = self.election.id
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
+        return reverse_lazy(
+            "election:detail", kwargs={"election_id": self.object.election.id}
+        )
 
 
 class ElectionListCreateView(CanCreateMixin, CreateView):
     model = ElectionList
     form_class = ElectionListForm
-    template_name = 'core/create.jinja'
+    template_name = "core/create.jinja"
 
     def dispatch(self, request, *arg, **kwargs):
-        self.election = get_object_or_404(Election, pk=kwargs['election_id'])
+        self.election = get_object_or_404(Election, pk=kwargs["election_id"])
         if not self.election.is_vote_editable:
             raise PermissionDenied
         return super(ElectionListCreateView, self).dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
         init = {}
-        init['election'] = self.election
+        init["election"] = self.election
         return init
 
     def get_form_kwargs(self):
         kwargs = super(ElectionListCreateView, self).get_form_kwargs()
-        kwargs['election_id'] = self.election.id
+        kwargs["election_id"] = self.election.id
         return kwargs
 
     def form_valid(self, form):
@@ -401,7 +484,10 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         raise PermissionDenied
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
+        return reverse_lazy(
+            "election:detail", kwargs={"election_id": self.object.election.id}
+        )
+
 
 # Update view
 
@@ -409,38 +495,42 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
 class ElectionUpdateView(CanEditMixin, UpdateView):
     model = Election
     form_class = ElectionForm
-    template_name = 'core/edit.jinja'
-    pk_url_kwarg = 'election_id'
+    template_name = "core/edit.jinja"
+    pk_url_kwarg = "election_id"
 
     def get_initial(self):
         init = {}
         try:
-            init['start_date'] = self.object.start_date.strftime('%Y-%m-%d %H:%M:%S')
+            init["start_date"] = self.object.start_date.strftime("%Y-%m-%d %H:%M:%S")
         except Exception:
             pass
         try:
-            init['end_date'] = self.object.end_date.strftime('%Y-%m-%d %H:%M:%S')
+            init["end_date"] = self.object.end_date.strftime("%Y-%m-%d %H:%M:%S")
         except Exception:
             pass
         try:
-            init['start_candidature'] = self.object.start_candidature.strftime('%Y-%m-%d %H:%M:%S')
+            init["start_candidature"] = self.object.start_candidature.strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
         except Exception:
             pass
         try:
-            init['end_candidature'] = self.object.end_candidature.strftime('%Y-%m-%d %H:%M:%S')
+            init["end_candidature"] = self.object.end_candidature.strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
         except Exception:
             pass
         return init
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.object.id})
+        return reverse_lazy("election:detail", kwargs={"election_id": self.object.id})
 
 
 class CandidatureUpdateView(CanEditMixin, UpdateView):
     model = Candidature
     form_class = CandidateForm
-    template_name = 'core/edit.jinja'
-    pk_url_kwarg = 'candidature_id'
+    template_name = "core/edit.jinja"
+    pk_url_kwarg = "candidature_id"
 
     def dispatch(self, request, *arg, **kwargs):
         self.object = self.get_object()
@@ -449,7 +539,7 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
         return super(CandidatureUpdateView, self).dispatch(request, *arg, **kwargs)
 
     def remove_fields(self):
-        self.form.fields.pop('role', None)
+        self.form.fields.pop("role", None)
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
@@ -459,24 +549,30 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         self.form = self.get_form()
         self.remove_fields()
-        if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
+        if (
+            request.user.is_authenticated()
+            and request.user.can_edit(self.object)
+            and self.form.is_valid()
+        ):
             return super(CandidatureUpdateView, self).form_valid(self.form)
         return self.form_invalid(self.form)
 
     def get_form_kwargs(self):
         kwargs = super(CandidatureUpdateView, self).get_form_kwargs()
-        kwargs['election_id'] = self.object.role.election.id
+        kwargs["election_id"] = self.object.role.election.id
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.object.role.election.id})
+        return reverse_lazy(
+            "election:detail", kwargs={"election_id": self.object.role.election.id}
+        )
 
 
 class RoleUpdateView(CanEditMixin, UpdateView):
     model = Role
     form_class = RoleForm
-    template_name = 'core/edit.jinja'
-    pk_url_kwarg = 'role_id'
+    template_name = "core/edit.jinja"
+    pk_url_kwarg = "role_id"
 
     def dispatch(self, request, *arg, **kwargs):
         self.object = self.get_object()
@@ -485,7 +581,7 @@ class RoleUpdateView(CanEditMixin, UpdateView):
         return super(RoleUpdateView, self).dispatch(request, *arg, **kwargs)
 
     def remove_fields(self):
-        self.form.fields.pop('election', None)
+        self.form.fields.pop("election", None)
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -497,25 +593,32 @@ class RoleUpdateView(CanEditMixin, UpdateView):
         self.object = self.get_object()
         self.form = self.get_form()
         self.remove_fields()
-        if request.user.is_authenticated() and request.user.can_edit(self.object) and self.form.is_valid():
+        if (
+            request.user.is_authenticated()
+            and request.user.can_edit(self.object)
+            and self.form.is_valid()
+        ):
             return super(RoleUpdateView, self).form_valid(self.form)
         return self.form_invalid(self.form)
 
     def get_form_kwargs(self):
         kwargs = super(RoleUpdateView, self).get_form_kwargs()
-        kwargs['election_id'] = self.object.election.id
+        kwargs["election_id"] = self.object.election.id
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.object.election.id})
+        return reverse_lazy(
+            "election:detail", kwargs={"election_id": self.object.election.id}
+        )
+
 
 # Delete Views
 
 
 class ElectionDeleteView(DeleteView):
     model = Election
-    template_name = 'core/delete_confirm.jinja'
-    pk_url_kwarg = 'election_id'
+    template_name = "core/delete_confirm.jinja"
+    pk_url_kwarg = "election_id"
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_root:
@@ -523,13 +626,13 @@ class ElectionDeleteView(DeleteView):
         raise PermissionDenied
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:list')
+        return reverse_lazy("election:list")
 
 
 class CandidatureDeleteView(CanEditMixin, DeleteView):
     model = Candidature
-    template_name = 'core/delete_confirm.jinja'
-    pk_url_kwarg = 'candidature_id'
+    template_name = "core/delete_confirm.jinja"
+    pk_url_kwarg = "candidature_id"
 
     def dispatch(self, request, *arg, **kwargs):
         self.object = self.get_object()
@@ -539,13 +642,13 @@ class CandidatureDeleteView(CanEditMixin, DeleteView):
         return super(CandidatureDeleteView, self).dispatch(request, *arg, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
+        return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
 
 
 class RoleDeleteView(CanEditMixin, DeleteView):
     model = Role
-    template_name = 'core/delete_confirm.jinja'
-    pk_url_kwarg = 'role_id'
+    template_name = "core/delete_confirm.jinja"
+    pk_url_kwarg = "role_id"
 
     def dispatch(self, request, *arg, **kwargs):
         self.object = self.get_object()
@@ -555,13 +658,13 @@ class RoleDeleteView(CanEditMixin, DeleteView):
         return super(RoleDeleteView, self).dispatch(request, *arg, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
+        return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
 
 
 class ElectionListDeleteView(CanEditMixin, DeleteView):
     model = ElectionList
-    template_name = 'core/delete_confirm.jinja'
-    pk_url_kwarg = 'list_id'
+    template_name = "core/delete_confirm.jinja"
+    pk_url_kwarg = "list_id"
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -571,4 +674,4 @@ class ElectionListDeleteView(CanEditMixin, DeleteView):
         return super(ElectionListDeleteView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy('election:detail', kwargs={'election_id': self.election.id})
+        return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})

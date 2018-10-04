@@ -39,7 +39,8 @@ class ScssProcessor(object):
         Else : give the path of the corresponding css supposed to already be compiled
         Don't forget to use compilestatics to compile scss for production
     """
-    prefix = iri_to_uri(getattr(settings, 'STATIC_URL', '/static/'))
+
+    prefix = iri_to_uri(getattr(settings, "STATIC_URL", "/static/"))
     storage = ScssFileStorage()
     scss_extensions = [".scss"]
 
@@ -63,7 +64,7 @@ class ScssProcessor(object):
             "include_paths": settings.SASS_INCLUDE_FOLDERS,
         }
         if settings.SASS_PRECISION:
-            compile_args['precision'] = settings.SASS_PRECISION
+            compile_args["precision"] = settings.SASS_PRECISION
         content = sass.compile(**compile_args)
         content = force_bytes(content)
 

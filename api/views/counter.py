@@ -35,14 +35,12 @@ class CounterSerializer(serializers.ModelSerializer):
 
     is_open = serializers.BooleanField(read_only=True)
     barman_list = serializers.ListField(
-        child=serializers.IntegerField(),
-        read_only=True
+        child=serializers.IntegerField(), read_only=True
     )
 
     class Meta:
         model = Counter
-        fields = ('id', 'name', 'type', 'club',
-                  'products', 'is_open', 'barman_list')
+        fields = ("id", "name", "type", "club", "products", "is_open", "barman_list")
 
 
 class CounterViewSet(RightModelViewSet):

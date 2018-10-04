@@ -30,7 +30,7 @@ from django.core.urlresolvers import reverse
 
 class SithRenderer(Renderer):
     def file_link(self, id, suffix):
-        return reverse('core:file_detail', kwargs={'file_id': id}) + suffix
+        return reverse("core:file_detail", kwargs={"file_id": id}) + suffix
 
     def exposant(self, text):
         return """<sup>%s</sup>""" % text
@@ -48,19 +48,19 @@ class SithRenderer(Renderer):
         :param text: alt text of the image.
         """
         style = None
-        if '?' in original_src:
-            src, params = original_src.rsplit('?', maxsplit=1)
-            m = re.search(r'(\d+%?)(x(\d+%?))?', params)
+        if "?" in original_src:
+            src, params = original_src.rsplit("?", maxsplit=1)
+            m = re.search(r"(\d+%?)(x(\d+%?))?", params)
             if not m:
                 src = original_src
             else:
                 width = m.group(1)
-                if not width.endswith('%'):
+                if not width.endswith("%"):
                     width += "px"
                 style = "width: %s; " % width
                 try:
                     height = m.group(3)
-                    if not height.endswith('%'):
+                    if not height.endswith("%"):
                         height += "px"
                     style += "height: %s; " % height
                 except:
@@ -77,67 +77,57 @@ class SithRenderer(Renderer):
             html = '<img src="%s" alt="%s"' % (src, text)
         if style:
             html = '%s style="%s"' % (html, style)
-        if self.options.get('use_xhtml'):
-            return '%s />' % html
-        return '%s>' % html
+        if self.options.get("use_xhtml"):
+            return "%s />" % html
+        return "%s>" % html
 
 
 class SithInlineGrammar(InlineGrammar):
-    double_emphasis = re.compile(
-        r'^\*{2}([\s\S]+?)\*{2}(?!\*)'  # **word**
-    )
-    emphasis = re.compile(
-        r'^\*((?:\*\*|[^\*])+?)\*(?!\*)'  # *word*
-    )
-    underline = re.compile(
-        r'^_{2}([\s\S]+?)_{2}(?!_)'  # __word__
-    )
-    exposant = re.compile(
-        r'^<sup>([\s\S]+?)</sup>'  # <sup>text</sup>
-    )
-    indice = re.compile(
-        r'^<sub>([\s\S]+?)</sub>'  # <sub>text</sub>
-    )
+    double_emphasis = re.compile(r"^\*{2}([\s\S]+?)\*{2}(?!\*)")  # **word**
+    emphasis = re.compile(r"^\*((?:\*\*|[^\*])+?)\*(?!\*)")  # *word*
+    underline = re.compile(r"^_{2}([\s\S]+?)_{2}(?!_)")  # __word__
+    exposant = re.compile(r"^<sup>([\s\S]+?)</sup>")  # <sup>text</sup>
+    indice = re.compile(r"^<sub>([\s\S]+?)</sub>")  # <sub>text</sub>
 
 
 class SithInlineLexer(InlineLexer):
     grammar_class = SithInlineGrammar
 
     default_rules = [
-        'escape',
+        "escape",
         # 'inline_html',
-        'autolink',
-        'url',
-        'footnote',
-        'link',
-        'reflink',
-        'nolink',
-        'exposant',
-        'double_emphasis',
-        'emphasis',
-        'underline',
-        'indice',
-        'code',
-        'linebreak',
-        'strikethrough',
-        'text',
+        "autolink",
+        "url",
+        "footnote",
+        "link",
+        "reflink",
+        "nolink",
+        "exposant",
+        "double_emphasis",
+        "emphasis",
+        "underline",
+        "indice",
+        "code",
+        "linebreak",
+        "strikethrough",
+        "text",
     ]
     inline_html_rules = [
-        'escape',
-        'autolink',
-        'url',
-        'link',
-        'reflink',
-        'nolink',
-        'exposant',
-        'double_emphasis',
-        'emphasis',
-        'underline',
-        'indice',
-        'code',
-        'linebreak',
-        'strikethrough',
-        'text',
+        "escape",
+        "autolink",
+        "url",
+        "link",
+        "reflink",
+        "nolink",
+        "exposant",
+        "double_emphasis",
+        "emphasis",
+        "underline",
+        "indice",
+        "code",
+        "linebreak",
+        "strikethrough",
+        "text",
     ]
 
     def output_underline(self, m):
@@ -166,22 +156,18 @@ class SithInlineLexer(InlineLexer):
 
     def _process_link(self, m, link, title=None):
         try:  # Add page:// support for links
-            page = re.compile(
-                r'^page://(\S*)'                   # page://nom_de_ma_page
-            )
+            page = re.compile(r"^page://(\S*)")  # page://nom_de_ma_page
             match = page.search(link)
             page = match.group(1) or ""
-            link = reverse('core:page', kwargs={'page_name': page})
+            link = reverse("core:page", kwargs={"page_name": page})
         except:
             pass
         try:  # Add file:// support for links
-            file_link = re.compile(
-                r'^file://(\d*)/?(\S*)?'                   # file://4000/download
-            )
+            file_link = re.compile(r"^file://(\d*)/?(\S*)?")  # file://4000/download
             match = file_link.search(link)
             id = match.group(1)
             suffix = match.group(2) or ""
-            link = reverse('core:file_detail', kwargs={'file_id': id}) + suffix
+            link = reverse("core:file_detail", kwargs={"file_id": id}) + suffix
         except:
             pass
         return super(SithInlineLexer, self)._process_link(m, link, title)
@@ -194,6 +180,6 @@ markdown = Markdown(renderer, inline=inline)
 
 if __name__ == "__main__":
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    with open(os.path.join(root_path) + '/doc/SYNTAX.md', 'r') as md:
+    with open(os.path.join(root_path) + "/doc/SYNTAX.md", "r") as md:
         result = markdown(md.read())
-    print(result, end='')
+    print(result, end="")

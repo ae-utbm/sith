@@ -34,6 +34,7 @@ class GroupListView(CanEditMixin, ListView):
     """
     Displays the group list
     """
+
     model = RealGroup
     template_name = "core/group_list.jinja"
 
@@ -42,17 +43,17 @@ class GroupEditView(CanEditMixin, UpdateView):
     model = RealGroup
     pk_url_kwarg = "group_id"
     template_name = "core/group_edit.jinja"
-    fields = ['name', 'description']
+    fields = ["name", "description"]
 
 
 class GroupCreateView(CanEditMixin, CreateView):
     model = RealGroup
     template_name = "core/group_edit.jinja"
-    fields = ['name', 'description']
+    fields = ["name", "description"]
 
 
 class GroupDeleteView(CanEditMixin, DeleteView):
     model = RealGroup
     pk_url_kwarg = "group_id"
     template_name = "core/delete_confirm.jinja"
-    success_url = reverse_lazy('core:group_list')
+    success_url = reverse_lazy("core:group_list")

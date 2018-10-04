@@ -30,34 +30,45 @@ from launderette.models import Launderette, Machine, Token
 
 from api.views import RightModelViewSet
 
+
 class LaunderettePlaceSerializer(serializers.ModelSerializer):
 
     machine_list = serializers.ListField(
-        child=serializers.IntegerField(),
-        read_only=True
+        child=serializers.IntegerField(), read_only=True
     )
-    token_list = serializers.ListField(
-        child=serializers.IntegerField(),
-        read_only=True
-    )
+    token_list = serializers.ListField(child=serializers.IntegerField(), read_only=True)
 
     class Meta:
         model = Launderette
-        fields = ('id', 'name', 'counter', 'machine_list',
-                  'token_list', 'get_absolute_url')
+        fields = (
+            "id",
+            "name",
+            "counter",
+            "machine_list",
+            "token_list",
+            "get_absolute_url",
+        )
+
 
 class LaunderetteMachineSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Machine
-        fields = ('id', 'name', 'type', 'is_working', 'launderette')
+        fields = ("id", "name", "type", "is_working", "launderette")
+
 
 class LaunderetteTokenSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Token
-        fields = ('id', 'name', 'type', 'launderette', 'borrow_date',
-                  'user', 'is_avaliable')
+        fields = (
+            "id",
+            "name",
+            "type",
+            "launderette",
+            "borrow_date",
+            "user",
+            "is_avaliable",
+        )
+
 
 class LaunderettePlaceViewSet(RightModelViewSet):
     """
@@ -66,6 +77,7 @@ class LaunderettePlaceViewSet(RightModelViewSet):
 
     serializer_class = LaunderettePlaceSerializer
     queryset = Launderette.objects.all()
+
 
 class LaunderetteMachineViewSet(RightModelViewSet):
     """
@@ -89,7 +101,7 @@ class LaunderetteTokenViewSet(RightModelViewSet):
         """
             Return all washing tokens (api/v1/launderette/token/washing)
         """
-        self.queryset = self.queryset.filter(type='WASHING')
+        self.queryset = self.queryset.filter(type="WASHING")
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
 
@@ -98,7 +110,7 @@ class LaunderetteTokenViewSet(RightModelViewSet):
         """
             Return all drying tokens (api/v1/launderette/token/drying)
         """
-        self.queryset = self.queryset.filter(type='DRYING')
+        self.queryset = self.queryset.filter(type="DRYING")
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
 
@@ -107,7 +119,9 @@ class LaunderetteTokenViewSet(RightModelViewSet):
         """
             Return all avaliable tokens (api/v1/launderette/token/avaliable)
         """
-        self.queryset = self.queryset.filter(borrow_date__isnull=True, user__isnull=True)
+        self.queryset = self.queryset.filter(
+            borrow_date__isnull=True, user__isnull=True
+        )
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
 
@@ -116,6 +130,8 @@ class LaunderetteTokenViewSet(RightModelViewSet):
         """
             Return all unavaliable tokens (api/v1/launderette/token/unavaliable)
         """
-        self.queryset = self.queryset.filter(borrow_date__isnull=False, user__isnull=False)
+        self.queryset = self.queryset.filter(
+            borrow_date__isnull=False, user__isnull=False
+        )
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)

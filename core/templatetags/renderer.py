@@ -38,11 +38,11 @@ register = template.Library()
 @register.filter(is_safe=False)
 @stringfilter
 def markdown(text):
-    return mark_safe("<div class=\"markdown\">%s</div>" % md(text))
+    return mark_safe('<div class="markdown">%s</div>' % md(text))
 
-@register.filter(name='phonenumber')
-def phonenumber(value, country='FR',
-        format=phonenumbers.PhoneNumberFormat.NATIONAL):
+
+@register.filter(name="phonenumber")
+def phonenumber(value, country="FR", format=phonenumbers.PhoneNumberFormat.NATIONAL):
     """
     This filter is kindly borrowed from https://github.com/foundertherapy/django-phonenumber-filter
     """
@@ -53,13 +53,37 @@ def phonenumber(value, country='FR',
     except phonenumbers.NumberParseException as e:
         return value
 
+
 @register.filter()
 @stringfilter
 def datetime_format_python_to_PHP(python_format_string):
     """
     Given a python datetime format string, attempts to convert it to the nearest PHP datetime format string possible.
     """
-    python2PHP = {"%a": "D", "%a": "D", "%A": "l", "%b": "M", "%B": "F", "%c": "", "%d": "d", "%H": "H", "%I": "h", "%j": "z", "%m": "m", "%M": "i", "%p": "A", "%S": "s", "%U": "", "%w": "w", "%W": "W", "%x": "", "%X": "", "%y": "y", "%Y": "Y", "%Z": "e"}
+    python2PHP = {
+        "%a": "D",
+        "%a": "D",
+        "%A": "l",
+        "%b": "M",
+        "%B": "F",
+        "%c": "",
+        "%d": "d",
+        "%H": "H",
+        "%I": "h",
+        "%j": "z",
+        "%m": "m",
+        "%M": "i",
+        "%p": "A",
+        "%S": "s",
+        "%U": "",
+        "%w": "w",
+        "%W": "W",
+        "%x": "",
+        "%X": "",
+        "%y": "y",
+        "%Y": "Y",
+        "%Z": "e",
+    }
 
     php_format_string = python_format_string
     for py, php in python2PHP.items():

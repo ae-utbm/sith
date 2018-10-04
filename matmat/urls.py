@@ -27,8 +27,8 @@ from django.conf.urls import url
 from matmat.views import *
 
 urlpatterns = [
-    url(r'^$', SearchNormalFormView.as_view(), name="search"),
-    url(r'^reverse$', SearchReverseFormView.as_view(), name="search_reverse"),
-    url(r'^quick$', SearchQuickFormView.as_view(), name="search_quick"),
-    url(r'^clear$', SearchClearFormView.as_view(), name="search_clear"),
+    url(r"^$", SearchNormalFormView.as_view(), name="search"),
+    url(r"^reverse$", SearchReverseFormView.as_view(), name="search_reverse"),
+    url(r"^quick$", SearchQuickFormView.as_view(), name="search_quick"),
+    url(r"^clear$", SearchClearFormView.as_view(), name="search_clear"),
 ]

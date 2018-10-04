@@ -48,15 +48,16 @@ class Customer(models.Model):
     This class extends a user to make a customer. It adds some basic customers informations, such as the accound ID, and
     is used by other accounting classes as reference to the customer, rather than using User
     """
+
     user = models.OneToOneField(User, primary_key=True)
-    account_id = models.CharField(_('account id'), max_length=10, unique=True)
-    amount = CurrencyField(_('amount'))
-    recorded_products = models.IntegerField(_('recorded product'), default=0)
+    account_id = models.CharField(_("account id"), max_length=10, unique=True)
+    amount = CurrencyField(_("amount"))
+    recorded_products = models.IntegerField(_("recorded product"), default=0)
 
     class Meta:
-        verbose_name = _('customer')
-        verbose_name_plural = _('customers')
-        ordering = ['account_id', ]
+        verbose_name = _("customer")
+        verbose_name_plural = _("customers")
+        ordering = ["account_id"]
 
     def __str__(self):
         return "%s - %s" % (self.user.username, self.account_id)
@@ -70,8 +71,12 @@ class Customer(models.Model):
 
     @property
     def can_buy(self):
-        return (self.user.subscriptions.last() and
-                (date.today() - self.user.subscriptions.order_by('subscription_end').last().subscription_end) < timedelta(days=90))
+        return self.user.subscriptions.last() and (
+            date.today()
+            - self.user.subscriptions.order_by("subscription_end")
+            .last()
+            .subscription_end
+        ) < timedelta(days=90)
 
     def generate_account_id(number):
         number = str(number)
@@ -99,10 +104,10 @@ class Customer(models.Model):
             self.save()
 
     def get_absolute_url(self):
-        return reverse('core:user_account', kwargs={'user_id': self.user.pk})
+        return reverse("core:user_account", kwargs={"user_id": self.user.pk})
 
     def get_full_url(self):
-        return ''.join(['https://', settings.SITH_URL, self.get_absolute_url()])
+        return "".join(["https://", settings.SITH_URL, self.get_absolute_url()])
 
 
 class ProductType(models.Model):
@@ -110,13 +115,14 @@ class ProductType(models.Model):
     This describes a product type
     Useful only for categorizing, changes are made at the product level for now
     """
-    name = models.CharField(_('name'), max_length=30)
-    description = models.TextField(_('description'), null=True, blank=True)
-    comment = models.TextField(_('comment'), null=True, blank=True)
-    icon = models.ImageField(upload_to='products', null=True, blank=True)
+
+    name = models.CharField(_("name"), max_length=30)
+    description = models.TextField(_("description"), null=True, blank=True)
+    comment = models.TextField(_("comment"), null=True, blank=True)
+    icon = models.ImageField(upload_to="products", null=True, blank=True)
 
     class Meta:
-        verbose_name = _('product type')
+        verbose_name = _("product type")
 
     def is_owned_by(self, user):
         """
@@ -130,32 +136,49 @@ class ProductType(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('counter:producttype_list')
+        return reverse("counter:producttype_list")
 
 
 class Product(models.Model):
     """
     This describes a product, with all its related informations
     """
-    name = models.CharField(_('name'), max_length=64)
-    description = models.TextField(_('description'), blank=True)
-    product_type = models.ForeignKey(ProductType, related_name='products', verbose_name=_("product type"), null=True, blank=True,
-                                     on_delete=models.SET_NULL)
-    code = models.CharField(_('code'), max_length=16, blank=True)
-    purchase_price = CurrencyField(_('purchase price'))
-    selling_price = CurrencyField(_('selling price'))
-    special_selling_price = CurrencyField(_('special selling price'))
-    icon = models.ImageField(upload_to='products', null=True, blank=True, verbose_name=_("icon"))
+
+    name = models.CharField(_("name"), max_length=64)
+    description = models.TextField(_("description"), blank=True)
+    product_type = models.ForeignKey(
+        ProductType,
+        related_name="products",
+        verbose_name=_("product type"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    code = models.CharField(_("code"), max_length=16, blank=True)
+    purchase_price = CurrencyField(_("purchase price"))
+    selling_price = CurrencyField(_("selling price"))
+    special_selling_price = CurrencyField(_("special selling price"))
+    icon = models.ImageField(
+        upload_to="products", null=True, blank=True, verbose_name=_("icon")
+    )
     club = models.ForeignKey(Club, related_name="products", verbose_name=_("club"))
-    limit_age = models.IntegerField(_('limit age'), default=0)
-    tray = models.BooleanField(_('tray price'), default=False)
-    parent_product = models.ForeignKey('self', related_name='children_products', verbose_name=_("parent product"), null=True,
-                                       blank=True, on_delete=models.SET_NULL)
-    buying_groups = models.ManyToManyField(Group, related_name='products', verbose_name=_("buying groups"), blank=True)
+    limit_age = models.IntegerField(_("limit age"), default=0)
+    tray = models.BooleanField(_("tray price"), default=False)
+    parent_product = models.ForeignKey(
+        "self",
+        related_name="children_products",
+        verbose_name=_("parent product"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    buying_groups = models.ManyToManyField(
+        Group, related_name="products", verbose_name=_("buying groups"), blank=True
+    )
     archived = models.BooleanField(_("archived"), default=False)
 
     class Meta:
-        verbose_name = _('product')
+        verbose_name = _("product")
 
     @property
     def is_record_product(self):
@@ -169,7 +192,9 @@ class Product(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
-        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID):
+        if user.is_in_group(
+            settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
+        ) or user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID):
             return True
         return False
 
@@ -177,27 +202,39 @@ class Product(models.Model):
         return "%s (%s)" % (self.name, self.code)
 
     def get_absolute_url(self):
-        return reverse('counter:product_list')
+        return reverse("counter:product_list")
 
 
 class Counter(models.Model):
-    name = models.CharField(_('name'), max_length=30)
+    name = models.CharField(_("name"), max_length=30)
     club = models.ForeignKey(Club, related_name="counters", verbose_name=_("club"))
-    products = models.ManyToManyField(Product, related_name="counters", verbose_name=_("products"), blank=True)
-    type = models.CharField(_('counter type'),
-                            max_length=255,
-                            choices=[('BAR', _('Bar')), ('OFFICE', _('Office')), ('EBOUTIC', _('Eboutic'))])
-    sellers = models.ManyToManyField(User, verbose_name=_('sellers'), related_name='counters', blank=True)
-    edit_groups = models.ManyToManyField(Group, related_name="editable_counters", blank=True)
-    view_groups = models.ManyToManyField(Group, related_name="viewable_counters", blank=True)
-    token = models.CharField(_('token'), max_length=30, null=True, blank=True)
+    products = models.ManyToManyField(
+        Product, related_name="counters", verbose_name=_("products"), blank=True
+    )
+    type = models.CharField(
+        _("counter type"),
+        max_length=255,
+        choices=[("BAR", _("Bar")), ("OFFICE", _("Office")), ("EBOUTIC", _("Eboutic"))],
+    )
+    sellers = models.ManyToManyField(
+        User, verbose_name=_("sellers"), related_name="counters", blank=True
+    )
+    edit_groups = models.ManyToManyField(
+        Group, related_name="editable_counters", blank=True
+    )
+    view_groups = models.ManyToManyField(
+        Group, related_name="viewable_counters", blank=True
+    )
+    token = models.CharField(_("token"), max_length=30, null=True, blank=True)
 
     class Meta:
-        verbose_name = _('counter')
+        verbose_name = _("counter")
 
     def __getattribute__(self, name):
         if name == "edit_groups":
-            return Group.objects.filter(name=self.club.unix_name + settings.SITH_BOARD_SUFFIX).all()
+            return Group.objects.filter(
+                name=self.club.unix_name + settings.SITH_BOARD_SUFFIX
+            ).all()
         return object.__getattribute__(self, name)
 
     def __str__(self):
@@ -205,8 +242,8 @@ class Counter(models.Model):
 
     def get_absolute_url(self):
         if self.type == "EBOUTIC":
-            return reverse('eboutic:main')
-        return reverse('counter:details', kwargs={'counter_id': self.id})
+            return reverse("eboutic:main")
+        return reverse("counter:details", kwargs={"counter_id": self.id})
 
     def is_owned_by(self, user):
         mem = self.club.get_membership_for(user)
@@ -217,11 +254,16 @@ class Counter(models.Model):
     def can_be_viewed_by(self, user):
         if self.type == "BAR":
             return True
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user in self.sellers.all()
+        return (
+            user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
+            or user in self.sellers.all()
+        )
 
     def gen_token(self):
         """Generate a new token for this counter"""
-        self.token = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(30))
+        self.token = "".join(
+            random.choice(string.ascii_letters + string.digits) for x in range(30)
+        )
         self.save()
 
     def add_barman(self, user):
@@ -253,7 +295,9 @@ class Counter(models.Model):
         pl = Permanency.objects.filter(counter=self, end=None).all()
         bl = []
         for p in pl:
-            if timezone.now() - p.activity < timedelta(minutes=settings.SITH_BARMAN_TIMEOUT):
+            if timezone.now() - p.activity < timedelta(
+                minutes=settings.SITH_BARMAN_TIMEOUT
+            ):
                 bl.append(p.user)
             else:
                 p.end = p.activity
@@ -281,7 +325,10 @@ class Counter(models.Model):
         """
         Returns True if the counter self is inactive from SITH_COUNTER_MINUTE_INACTIVE's value minutes, else False
         """
-        return self.is_open() and ((timezone.now() - self.permanencies.order_by('-activity').first().activity) > datetime.timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE))
+        return self.is_open() and (
+            (timezone.now() - self.permanencies.order_by("-activity").first().activity)
+            > datetime.timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE)
+        )
 
     def barman_list(self):
         """
@@ -294,22 +341,33 @@ class Refilling(models.Model):
     """
     Handle the refilling
     """
+
     counter = models.ForeignKey(Counter, related_name="refillings", blank=False)
-    amount = CurrencyField(_('amount'))
-    operator = models.ForeignKey(User, related_name="refillings_as_operator", blank=False)
+    amount = CurrencyField(_("amount"))
+    operator = models.ForeignKey(
+        User, related_name="refillings_as_operator", blank=False
+    )
     customer = models.ForeignKey(Customer, related_name="refillings", blank=False)
-    date = models.DateTimeField(_('date'))
-    payment_method = models.CharField(_('payment method'), max_length=255,
-                                      choices=settings.SITH_COUNTER_PAYMENT_METHOD, default='CASH')
-    bank = models.CharField(_('bank'), max_length=255,
-                            choices=settings.SITH_COUNTER_BANK, default='OTHER')
-    is_validated = models.BooleanField(_('is validated'), default=False)
+    date = models.DateTimeField(_("date"))
+    payment_method = models.CharField(
+        _("payment method"),
+        max_length=255,
+        choices=settings.SITH_COUNTER_PAYMENT_METHOD,
+        default="CASH",
+    )
+    bank = models.CharField(
+        _("bank"), max_length=255, choices=settings.SITH_COUNTER_BANK, default="OTHER"
+    )
+    is_validated = models.BooleanField(_("is validated"), default=False)
 
     class Meta:
         verbose_name = _("refilling")
 
     def __str__(self):
-        return "Refilling: %.2f for %s" % (self.amount, self.customer.user.get_display_name())
+        return "Refilling: %.2f for %s" % (
+            self.amount,
+            self.customer.user.get_display_name(),
+        )
 
     def is_owned_by(self, user):
         return user.is_owner(self.counter) and self.payment_method != "CARD"
@@ -328,11 +386,19 @@ class Refilling(models.Model):
             self.customer.save()
             self.is_validated = True
         if self.customer.user.preferences.notify_on_refill:
-            Notification(user=self.customer.user, url=reverse('core:user_account_detail',
-                                                              kwargs={'user_id': self.customer.user.id, 'year': self.date.year, 'month': self.date.month}),
-                         param=str(self.amount),
-                         type="REFILLING",
-                         ).save()
+            Notification(
+                user=self.customer.user,
+                url=reverse(
+                    "core:user_account_detail",
+                    kwargs={
+                        "user_id": self.customer.user.id,
+                        "year": self.date.year,
+                        "month": self.date.month,
+                    },
+                ),
+                param=str(self.amount),
+                type="REFILLING",
+            ).save()
         super(Refilling, self).save(*args, **kwargs)
 
 
@@ -340,25 +406,60 @@ class Selling(models.Model):
     """
     Handle the sellings
     """
+
     label = models.CharField(_("label"), max_length=64)
-    product = models.ForeignKey(Product, related_name="sellings", null=True, blank=True, on_delete=models.SET_NULL)
-    counter = models.ForeignKey(Counter, related_name="sellings", null=True, blank=False, on_delete=models.SET_NULL)
-    club = models.ForeignKey(Club, related_name="sellings", null=True, blank=False, on_delete=models.SET_NULL)
-    unit_price = CurrencyField(_('unit price'))
-    quantity = models.IntegerField(_('quantity'))
-    seller = models.ForeignKey(User, related_name="sellings_as_operator", null=True, blank=False, on_delete=models.SET_NULL)
-    customer = models.ForeignKey(Customer, related_name="buyings", null=True, blank=False, on_delete=models.SET_NULL)
-    date = models.DateTimeField(_('date'))
-    payment_method = models.CharField(_('payment method'), max_length=255,
-                                      choices=[('SITH_ACCOUNT', _('Sith account')), ('CARD', _('Credit card'))], default='SITH_ACCOUNT')
-    is_validated = models.BooleanField(_('is validated'), default=False)
+    product = models.ForeignKey(
+        Product,
+        related_name="sellings",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    counter = models.ForeignKey(
+        Counter,
+        related_name="sellings",
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+    )
+    club = models.ForeignKey(
+        Club, related_name="sellings", null=True, blank=False, on_delete=models.SET_NULL
+    )
+    unit_price = CurrencyField(_("unit price"))
+    quantity = models.IntegerField(_("quantity"))
+    seller = models.ForeignKey(
+        User,
+        related_name="sellings_as_operator",
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+    )
+    customer = models.ForeignKey(
+        Customer,
+        related_name="buyings",
+        null=True,
+        blank=False,
+        on_delete=models.SET_NULL,
+    )
+    date = models.DateTimeField(_("date"))
+    payment_method = models.CharField(
+        _("payment method"),
+        max_length=255,
+        choices=[("SITH_ACCOUNT", _("Sith account")), ("CARD", _("Credit card"))],
+        default="SITH_ACCOUNT",
+    )
+    is_validated = models.BooleanField(_("is validated"), default=False)
 
     class Meta:
         verbose_name = _("selling")
 
     def __str__(self):
-        return "Selling: %d x %s (%f) for %s" % (self.quantity, self.label,
-                                                 self.quantity * self.unit_price, self.customer.user.get_display_name())
+        return "Selling: %d x %s (%f) for %s" % (
+            self.quantity,
+            self.label,
+            self.quantity * self.unit_price,
+            self.customer.user.get_display_name(),
+        )
 
     def is_owned_by(self, user):
         return user.is_owner(self.counter) and self.payment_method != "CARD"
@@ -374,30 +475,25 @@ class Selling(models.Model):
 
     def send_mail_customer(self):
         event = self.product.eticket.event_title or _("Unknown event")
-        subject = _('Eticket bought for the event %(event)s') % {'event': event}
+        subject = _("Eticket bought for the event %(event)s") % {"event": event}
         message_html = _(
             "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
         ) % {
-            'event': event,
-            'url': ''.join((
-                '<a href="',
-                self.customer.get_full_url(),
-                '">',
-                self.customer.get_full_url(),
-                '</a>'
-            ))
+            "event": event,
+            "url": "".join(
+                (
+                    '<a href="',
+                    self.customer.get_full_url(),
+                    '">',
+                    self.customer.get_full_url(),
+                    "</a>",
+                )
+            ),
         }
         message_txt = _(
             "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
-        ) % {
-            'event': event,
-            'url': self.customer.get_full_url(),
-        }
-        self.customer.user.email_user(
-            subject,
-            message_txt,
-            html_message=message_html
-        )
+        ) % {"event": event, "url": self.customer.get_full_url()}
+        self.customer.user.email_user(subject, message_txt, html_message=message_html)
 
     def save(self, allow_negative=False, *args, **kwargs):
         """
@@ -412,34 +508,52 @@ class Selling(models.Model):
             self.is_validated = True
         u = User.objects.filter(id=self.customer.user.id).first()
         if u.was_subscribed:
-            if self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER:
+            if (
+                self.product
+                and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER
+            ):
                 sub = Subscription(
                     member=u,
-                    subscription_type='un-semestre',
+                    subscription_type="un-semestre",
                     payment_method="EBOUTIC",
                     location="EBOUTIC",
                 )
                 sub.subscription_start = Subscription.compute_start()
                 sub.subscription_start = Subscription.compute_start(
-                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
+                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type][
+                        "duration"
+                    ]
+                )
                 sub.subscription_end = Subscription.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
-                    start=sub.subscription_start)
+                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type][
+                        "duration"
+                    ],
+                    start=sub.subscription_start,
+                )
                 sub.save()
-            elif self.product and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS:
+            elif (
+                self.product
+                and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS
+            ):
                 u = User.objects.filter(id=self.customer.user.id).first()
                 sub = Subscription(
                     member=u,
-                    subscription_type='deux-semestres',
+                    subscription_type="deux-semestres",
                     payment_method="EBOUTIC",
                     location="EBOUTIC",
                 )
                 sub.subscription_start = Subscription.compute_start()
                 sub.subscription_start = Subscription.compute_start(
-                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'])
+                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type][
+                        "duration"
+                    ]
+                )
                 sub.subscription_end = Subscription.compute_end(
-                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type]['duration'],
-                    start=sub.subscription_start)
+                    duration=settings.SITH_SUBSCRIPTIONS[sub.subscription_type][
+                        "duration"
+                    ],
+                    start=sub.subscription_start,
+                )
                 sub.save()
         try:
             if self.product.eticket:
@@ -449,8 +563,14 @@ class Selling(models.Model):
         if self.customer.user.preferences.notify_on_click:
             Notification(
                 user=self.customer.user,
-                url=reverse('core:user_account_detail',
-                            kwargs={'user_id': self.customer.user.id, 'year': self.date.year, 'month': self.date.month}),
+                url=reverse(
+                    "core:user_account_detail",
+                    kwargs={
+                        "user_id": self.customer.user.id,
+                        "year": self.date.year,
+                        "month": self.date.month,
+                    },
+                ),
                 param="%d x %s" % (self.quantity, self.label),
                 type="SELLING",
             ).save()
@@ -461,29 +581,38 @@ class Permanency(models.Model):
     """
     This class aims at storing a traceability of who was barman where and when
     """
+
     user = models.ForeignKey(User, related_name="permanencies", verbose_name=_("user"))
-    counter = models.ForeignKey(Counter, related_name="permanencies", verbose_name=_("counter"))
-    start = models.DateTimeField(_('start date'))
-    end = models.DateTimeField(_('end date'), null=True, db_index=True)
-    activity = models.DateTimeField(_('last activity date'), auto_now=True)
+    counter = models.ForeignKey(
+        Counter, related_name="permanencies", verbose_name=_("counter")
+    )
+    start = models.DateTimeField(_("start date"))
+    end = models.DateTimeField(_("end date"), null=True, db_index=True)
+    activity = models.DateTimeField(_("last activity date"), auto_now=True)
 
     class Meta:
         verbose_name = _("permanency")
 
     def __str__(self):
-        return "%s in %s from %s (last activity: %s) to %s" % (self.user, self.counter,
-                                                               self.start.strftime("%Y-%m-%d %H:%M:%S"),
-                                                               self.activity.strftime("%Y-%m-%d %H:%M:%S"),
-                                                               self.end.strftime("%Y-%m-%d %H:%M:%S") if self.end else "",
-                                                               )
+        return "%s in %s from %s (last activity: %s) to %s" % (
+            self.user,
+            self.counter,
+            self.start.strftime("%Y-%m-%d %H:%M:%S"),
+            self.activity.strftime("%Y-%m-%d %H:%M:%S"),
+            self.end.strftime("%Y-%m-%d %H:%M:%S") if self.end else "",
+        )
 
 
 class CashRegisterSummary(models.Model):
-    user = models.ForeignKey(User, related_name="cash_summaries", verbose_name=_("user"))
-    counter = models.ForeignKey(Counter, related_name="cash_summaries", verbose_name=_("counter"))
-    date = models.DateTimeField(_('date'))
-    comment = models.TextField(_('comment'), null=True, blank=True)
-    emptied = models.BooleanField(_('emptied'), default=False)
+    user = models.ForeignKey(
+        User, related_name="cash_summaries", verbose_name=_("user")
+    )
+    counter = models.ForeignKey(
+        Counter, related_name="cash_summaries", verbose_name=_("counter")
+    )
+    date = models.DateTimeField(_("date"))
+    comment = models.TextField(_("comment"), null=True, blank=True)
+    emptied = models.BooleanField(_("emptied"), default=False)
 
     class Meta:
         verbose_name = _("cash register summary")
@@ -492,37 +621,37 @@ class CashRegisterSummary(models.Model):
         return "At %s by %s - Total: %s €" % (self.counter, self.user, self.get_total())
 
     def __getattribute__(self, name):
-        if name[:5] == 'check':
-            checks = self.items.filter(check=True).order_by('value').all()
-        if name == 'ten_cents':
+        if name[:5] == "check":
+            checks = self.items.filter(check=True).order_by("value").all()
+        if name == "ten_cents":
             return self.items.filter(value=0.1, check=False).first()
-        elif name == 'twenty_cents':
+        elif name == "twenty_cents":
             return self.items.filter(value=0.2, check=False).first()
-        elif name == 'fifty_cents':
+        elif name == "fifty_cents":
             return self.items.filter(value=0.5, check=False).first()
-        elif name == 'one_euro':
+        elif name == "one_euro":
             return self.items.filter(value=1, check=False).first()
-        elif name == 'two_euros':
+        elif name == "two_euros":
             return self.items.filter(value=2, check=False).first()
-        elif name == 'five_euros':
+        elif name == "five_euros":
             return self.items.filter(value=5, check=False).first()
-        elif name == 'ten_euros':
+        elif name == "ten_euros":
             return self.items.filter(value=10, check=False).first()
-        elif name == 'twenty_euros':
+        elif name == "twenty_euros":
             return self.items.filter(value=20, check=False).first()
-        elif name == 'fifty_euros':
+        elif name == "fifty_euros":
             return self.items.filter(value=50, check=False).first()
-        elif name == 'hundred_euros':
+        elif name == "hundred_euros":
             return self.items.filter(value=100, check=False).first()
-        elif name == 'check_1':
+        elif name == "check_1":
             return checks[0] if 0 < len(checks) else None
-        elif name == 'check_2':
+        elif name == "check_2":
             return checks[1] if 1 < len(checks) else None
-        elif name == 'check_3':
+        elif name == "check_3":
             return checks[2] if 2 < len(checks) else None
-        elif name == 'check_4':
+        elif name == "check_4":
             return checks[3] if 3 < len(checks) else None
-        elif name == 'check_5':
+        elif name == "check_5":
             return checks[4] if 4 < len(checks) else None
         else:
             return object.__getattribute__(self, name)
@@ -547,14 +676,16 @@ class CashRegisterSummary(models.Model):
         return super(CashRegisterSummary, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('counter:cash_summary_list')
+        return reverse("counter:cash_summary_list")
 
 
 class CashRegisterSummaryItem(models.Model):
-    cash_summary = models.ForeignKey(CashRegisterSummary, related_name="items", verbose_name=_("cash summary"))
+    cash_summary = models.ForeignKey(
+        CashRegisterSummary, related_name="items", verbose_name=_("cash summary")
+    )
     value = CurrencyField(_("value"))
-    quantity = models.IntegerField(_('quantity'), default=0)
-    check = models.BooleanField(_('check'), default=False)
+    quantity = models.IntegerField(_("quantity"), default=0)
+    check = models.BooleanField(_("check"), default=False)
 
     class Meta:
         verbose_name = _("cash register summary item")
@@ -564,17 +695,24 @@ class Eticket(models.Model):
     """
     Eticket can be linked to a product an allows PDF generation
     """
-    product = models.OneToOneField(Product, related_name='eticket', verbose_name=_("product"))
-    banner = models.ImageField(upload_to='etickets', null=True, blank=True, verbose_name=_("banner"))
-    event_date = models.DateField(_('event date'), null=True, blank=True)
-    event_title = models.CharField(_('event title'), max_length=64, null=True, blank=True)
-    secret = models.CharField(_('secret'), max_length=64, unique=True)
+
+    product = models.OneToOneField(
+        Product, related_name="eticket", verbose_name=_("product")
+    )
+    banner = models.ImageField(
+        upload_to="etickets", null=True, blank=True, verbose_name=_("banner")
+    )
+    event_date = models.DateField(_("event date"), null=True, blank=True)
+    event_title = models.CharField(
+        _("event title"), max_length=64, null=True, blank=True
+    )
+    secret = models.CharField(_("secret"), max_length=64, unique=True)
 
     def __str__(self):
         return "%s" % (self.product.name)
 
     def get_absolute_url(self):
-        return reverse('counter:eticket_list')
+        return reverse("counter:eticket_list")
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -590,4 +728,7 @@ class Eticket(models.Model):
     def get_hash(self, string):
         import hashlib
         import hmac
-        return hmac.new(bytes(self.secret, 'utf-8'), bytes(string, 'utf-8'), hashlib.sha1).hexdigest()
+
+        return hmac.new(
+            bytes(self.secret, "utf-8"), bytes(string, "utf-8"), hashlib.sha1
+        ).hexdigest()

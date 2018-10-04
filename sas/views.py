@@ -44,22 +44,43 @@ from sas.models import Picture, Album, PeoplePictureRelation
 
 
 class SASForm(forms.Form):
-    album_name = forms.CharField(label=_("Add a new album"), max_length=30, required=False)
-    images = forms.ImageField(widget=forms.ClearableFileInput(attrs={'multiple': True}), label=_("Upload images"),
-                              required=False)
+    album_name = forms.CharField(
+        label=_("Add a new album"), max_length=30, required=False
+    )
+    images = forms.ImageField(
+        widget=forms.ClearableFileInput(attrs={"multiple": True}),
+        label=_("Upload images"),
+        required=False,
+    )
 
     def process(self, parent, owner, files, automodere=False):
         try:
-            if self.cleaned_data['album_name'] != "":
-                album = Album(parent=parent, name=self.cleaned_data['album_name'], owner=owner, is_moderated=automodere)
+            if self.cleaned_data["album_name"] != "":
+                album = Album(
+                    parent=parent,
+                    name=self.cleaned_data["album_name"],
+                    owner=owner,
+                    is_moderated=automodere,
+                )
                 album.clean()
                 album.save()
         except Exception as e:
-            self.add_error(None, _("Error creating album %(album)s: %(msg)s") %
-                           {'album': self.cleaned_data['album_name'], 'msg': repr(e)})
+            self.add_error(
+                None,
+                _("Error creating album %(album)s: %(msg)s")
+                % {"album": self.cleaned_data["album_name"], "msg": repr(e)},
+            )
         for f in files:
-            new_file = Picture(parent=parent, name=f.name, file=f, owner=owner, mime_type=f.content_type, size=f._size,
-                               is_folder=False, is_moderated=automodere)
+            new_file = Picture(
+                parent=parent,
+                name=f.name,
+                file=f,
+                owner=owner,
+                mime_type=f.content_type,
+                size=f._size,
+                is_folder=False,
+                is_moderated=automodere,
+            )
             if automodere:
                 new_file.moderator = owner
             try:
@@ -67,30 +88,41 @@ class SASForm(forms.Form):
                 new_file.generate_thumbnails()
                 new_file.save()
             except Exception as e:
-                self.add_error(None, _("Error uploading file %(file_name)s: %(msg)s") % {'file_name': f, 'msg': repr(e)})
+                self.add_error(
+                    None,
+                    _("Error uploading file %(file_name)s: %(msg)s")
+                    % {"file_name": f, "msg": repr(e)},
+                )
 
 
 class RelationForm(forms.ModelForm):
     class Meta:
         model = PeoplePictureRelation
-        fields = ['picture']
-        widgets = {'picture': forms.HiddenInput}
-    users = AutoCompleteSelectMultipleField('users', show_help_text=False, help_text="", label=_("Add user"), required=False)
+        fields = ["picture"]
+        widgets = {"picture": forms.HiddenInput}
+
+    users = AutoCompleteSelectMultipleField(
+        "users", show_help_text=False, help_text="", label=_("Add user"), required=False
+    )
 
 
 class SASMainView(FormView):
     form_class = SASForm
     template_name = "sas/main.jinja"
-    success_url = reverse_lazy('sas:main')
+    success_url = reverse_lazy("sas:main")
 
     def post(self, request, *args, **kwargs):
         self.form = self.get_form()
         parent = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
-        files = request.FILES.getlist('images')
+        files = request.FILES.getlist("images")
         root = User.objects.filter(username="root").first()
-        if request.user.is_authenticated() and request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
+        if request.user.is_authenticated() and request.user.is_in_group(
+            settings.SITH_GROUP_SAS_ADMIN_ID
+        ):
             if self.form.is_valid():
-                self.form.process(parent=parent, owner=root, files=files, automodere=True)
+                self.form.process(
+                    parent=parent, owner=root, files=files, automodere=True
+                )
                 if self.form.is_valid():
                     return super(SASMainView, self).form_valid(self.form)
         else:
@@ -99,8 +131,10 @@ class SASMainView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(SASMainView, self).get_context_data(**kwargs)
-        kwargs['categories'] = Album.objects.filter(parent__id=settings.SITH_SAS_ROOT_DIR_ID).order_by('id')
-        kwargs['latest'] = Album.objects.filter(is_moderated=True).order_by('-id')[:5]
+        kwargs["categories"] = Album.objects.filter(
+            parent__id=settings.SITH_SAS_ROOT_DIR_ID
+        ).order_by("id")
+        kwargs["latest"] = Album.objects.filter(is_moderated=True).order_by("-id")[:5]
         return kwargs
 
 
@@ -111,23 +145,27 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
     template_name = "sas/picture.jinja"
 
     def get_initial(self):
-        return {'picture': self.object}
+        return {"picture": self.object}
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
-        if 'rotate_right' in request.GET.keys():
+        if "rotate_right" in request.GET.keys():
             self.object.rotate(270)
-        if 'rotate_left' in request.GET.keys():
+        if "rotate_left" in request.GET.keys():
             self.object.rotate(90)
-        if 'remove_user' in request.GET.keys():
+        if "remove_user" in request.GET.keys():
             try:
-                user = User.objects.filter(id=int(request.GET['remove_user'])).first()
-                if user.id == request.user.id or request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
-                    PeoplePictureRelation.objects.filter(user=user, picture=self.object).delete()
+                user = User.objects.filter(id=int(request.GET["remove_user"])).first()
+                if user.id == request.user.id or request.user.is_in_group(
+                    settings.SITH_GROUP_SAS_ADMIN_ID
+                ):
+                    PeoplePictureRelation.objects.filter(
+                        user=user, picture=self.object
+                    ).delete()
             except:
                 pass
-        if 'ask_removal' in request.GET.keys():
+        if "ask_removal" in request.GET.keys():
             self.object.is_moderated = False
             self.object.asked_for_removal = True
             self.object.save()
@@ -139,12 +177,19 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
         self.form = self.get_form()
         if request.user.is_authenticated() and request.user.was_subscribed:
             if self.form.is_valid():
-                for uid in self.form.cleaned_data['users']:
+                for uid in self.form.cleaned_data["users"]:
                     u = User.objects.filter(id=uid).first()
-                    PeoplePictureRelation(user=u,
-                                          picture=self.form.cleaned_data['picture']).save()
-                    if not u.notifications.filter(type="NEW_PICTURES", viewed=False).exists():
-                        Notification(user=u, url=reverse("core:user_pictures", kwargs={'user_id': u.id}), type="NEW_PICTURES").save()
+                    PeoplePictureRelation(
+                        user=u, picture=self.form.cleaned_data["picture"]
+                    ).save()
+                    if not u.notifications.filter(
+                        type="NEW_PICTURES", viewed=False
+                    ).exists():
+                        Notification(
+                            user=u,
+                            url=reverse("core:user_pictures", kwargs={"user_id": u.id}),
+                            type="NEW_PICTURES",
+                        ).save()
                 return super(PictureView, self).form_valid(self.form)
         else:
             self.form.add_error(None, _("You do not have the permission to do that"))
@@ -152,15 +197,16 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         kwargs = super(PictureView, self).get_context_data(**kwargs)
-        kwargs['form'] = self.form
+        kwargs["form"] = self.form
         return kwargs
 
     def get_success_url(self):
-        return reverse('sas:picture', kwargs={'picture_id': self.object.id})
+        return reverse("sas:picture", kwargs={"picture_id": self.object.id})
 
 
 def send_album(request, album_id):
     return send_file(request, album_id, Album)
+
 
 def send_pict(request, picture_id):
     return send_file(request, picture_id, Picture)
@@ -185,11 +231,17 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
             self.object.generate_thumbnail()
         self.form = self.get_form()
         parent = SithFile.objects.filter(id=self.object.id).first()
-        files = request.FILES.getlist('images')
+        files = request.FILES.getlist("images")
         if request.user.is_authenticated() and request.user.is_subscribed:
             if self.form.is_valid():
-                self.form.process(parent=parent, owner=request.user, files=files,
-                                  automodere=request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID))
+                self.form.process(
+                    parent=parent,
+                    owner=request.user,
+                    files=files,
+                    automodere=request.user.is_in_group(
+                        settings.SITH_GROUP_SAS_ADMIN_ID
+                    ),
+                )
                 if self.form.is_valid():
                     return HttpResponse(str(self.form.errors), status=200)
         return HttpResponse(str(self.form.errors), status=500)
@@ -203,8 +255,8 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
-        if 'clipboard' not in request.session.keys():
-            request.session['clipboard'] = []
+        if "clipboard" not in request.session.keys():
+            request.session["clipboard"] = []
         return super(AlbumView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -212,16 +264,22 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         if not self.object.file:
             self.object.generate_thumbnail()
         self.form = self.get_form()
-        if 'clipboard' not in request.session.keys():
-            request.session['clipboard'] = []
+        if "clipboard" not in request.session.keys():
+            request.session["clipboard"] = []
         if request.user.can_edit(self.object):  # Handle the copy-paste functions
             FileView.handle_clipboard(request, self.object)
         parent = SithFile.objects.filter(id=self.object.id).first()
-        files = request.FILES.getlist('images')
+        files = request.FILES.getlist("images")
         if request.user.is_authenticated() and request.user.is_subscribed:
             if self.form.is_valid():
-                self.form.process(parent=parent, owner=request.user, files=files,
-                                  automodere=request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID))
+                self.form.process(
+                    parent=parent,
+                    owner=request.user,
+                    files=files,
+                    automodere=request.user.is_in_group(
+                        settings.SITH_GROUP_SAS_ADMIN_ID
+                    ),
+                )
                 if self.form.is_valid():
                     return super(AlbumView, self).form_valid(self.form)
         else:
@@ -229,13 +287,16 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         return self.form_invalid(self.form)
 
     def get_success_url(self):
-        return reverse('sas:album', kwargs={'album_id': self.object.id})
+        return reverse("sas:album", kwargs={"album_id": self.object.id})
 
     def get_context_data(self, **kwargs):
         kwargs = super(AlbumView, self).get_context_data(**kwargs)
-        kwargs['form'] = self.form
-        kwargs['clipboard'] = SithFile.objects.filter(id__in=self.request.session['clipboard'])
+        kwargs["form"] = self.form
+        kwargs["clipboard"] = SithFile.objects.filter(
+            id__in=self.request.session["clipboard"]
+        )
         return kwargs
+
 
 # Admin views
 
@@ -251,12 +312,12 @@ class ModerationView(TemplateView):
     def post(self, request, *args, **kwargs):
         if request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
             try:
-                a = Album.objects.filter(id=request.POST['album_id']).first()
-                if 'moderate' in request.POST.keys():
+                a = Album.objects.filter(id=request.POST["album_id"]).first()
+                if "moderate" in request.POST.keys():
                     a.moderator = request.user
                     a.is_moderated = True
                     a.save()
-                elif 'delete' in request.POST.keys():
+                elif "delete" in request.POST.keys():
                     a.delete()
             except:
                 pass
@@ -264,45 +325,52 @@ class ModerationView(TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(ModerationView, self).get_context_data(**kwargs)
-        kwargs['albums_to_moderate'] = Album.objects.filter(is_moderated=False, is_in_sas=True,
-                                                            is_folder=True).order_by('id')
-        kwargs['pictures'] = Picture.objects.filter(is_moderated=False, is_in_sas=True, is_folder=False)
-        kwargs['albums'] = Album.objects.filter(id__in=kwargs['pictures'].values('parent').distinct('parent'))
+        kwargs["albums_to_moderate"] = Album.objects.filter(
+            is_moderated=False, is_in_sas=True, is_folder=True
+        ).order_by("id")
+        kwargs["pictures"] = Picture.objects.filter(
+            is_moderated=False, is_in_sas=True, is_folder=False
+        )
+        kwargs["albums"] = Album.objects.filter(
+            id__in=kwargs["pictures"].values("parent").distinct("parent")
+        )
         return kwargs
 
 
 class PictureEditForm(forms.ModelForm):
     class Meta:
         model = Picture
-        fields = ['name', 'parent']
-    parent = make_ajax_field(Picture, 'parent', 'files', help_text="")
+        fields = ["name", "parent"]
+
+    parent = make_ajax_field(Picture, "parent", "files", help_text="")
 
 
 class AlbumEditForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields = ['name', 'date', 'file', 'parent', 'edit_groups']
+        fields = ["name", "date", "file", "parent", "edit_groups"]
+
     date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
-    parent = make_ajax_field(Album, 'parent', 'files', help_text="")
-    edit_groups = make_ajax_field(Album, 'edit_groups', 'groups', help_text="")
+    parent = make_ajax_field(Album, "parent", "files", help_text="")
+    edit_groups = make_ajax_field(Album, "edit_groups", "groups", help_text="")
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 
 
 class PictureEditView(CanEditMixin, UpdateView):
     model = Picture
     form_class = PictureEditForm
-    template_name = 'core/edit.jinja'
+    template_name = "core/edit.jinja"
     pk_url_kwarg = "picture_id"
 
 
 class AlbumEditView(CanEditMixin, UpdateView):
     model = Album
     form_class = AlbumEditForm
-    template_name = 'core/edit.jinja'
+    template_name = "core/edit.jinja"
     pk_url_kwarg = "album_id"
 
     def form_valid(self, form):
         ret = super(AlbumEditView, self).form_valid(form)
-        if form.cleaned_data['recursive']:
+        if form.cleaned_data["recursive"]:
             self.object.apply_rights_recursively(True)
         return ret

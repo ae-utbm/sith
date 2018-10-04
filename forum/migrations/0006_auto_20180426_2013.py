@@ -7,19 +7,27 @@ import forum.models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('forum', '0005_forumtopic_subscribed_users'),
-    ]
+    dependencies = [("forum", "0005_forumtopic_subscribed_users")]
 
     operations = [
         migrations.AlterField(
-            model_name='forum',
-            name='edit_groups',
-            field=models.ManyToManyField(blank=True, default=forum.models.Forum.get_default_edit_group, related_name='editable_forums', to='core.Group'),
+            model_name="forum",
+            name="edit_groups",
+            field=models.ManyToManyField(
+                blank=True,
+                default=forum.models.Forum.get_default_edit_group,
+                related_name="editable_forums",
+                to="core.Group",
+            ),
         ),
         migrations.AlterField(
-            model_name='forum',
-            name='view_groups',
-            field=models.ManyToManyField(blank=True, default=forum.models.Forum.get_default_view_group, related_name='viewable_forums', to='core.Group'),
+            model_name="forum",
+            name="view_groups",
+            field=models.ManyToManyField(
+                blank=True,
+                default=forum.models.Forum.get_default_view_group,
+                related_name="viewable_forums",
+                to="core.Group",
+            ),
         ),
     ]

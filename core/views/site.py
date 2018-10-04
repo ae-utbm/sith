@@ -41,6 +41,7 @@ from club.models import Club
 def index(request, context=None):
     if request.user.is_authenticated():
         from com.views import NewsListView
+
         return NewsListView.as_view()(request)
     return render(request, "core/index.jinja")
 
@@ -50,11 +51,11 @@ class NotificationList(ListView):
     template_name = "core/notification_list.jinja"
 
     def get_queryset(self):
-        if 'see_all' in self.request.GET.keys():
+        if "see_all" in self.request.GET.keys():
             for n in self.request.user.notifications.all():
                 n.viewed = True
                 n.save()
-        return self.request.user.notifications.order_by('-date')[:20]
+        return self.request.user.notifications.order_by("-date")[:20]
 
 
 def notification(request, notif_id):
@@ -70,7 +71,12 @@ def notification(request, notif_id):
 
 
 def search_user(query, as_json=False):
-    res = SearchQuerySet().models(User).filter(text=query).filter_or(text__contains=query)[:20]
+    res = (
+        SearchQuerySet()
+        .models(User)
+        .filter(text=query)
+        .filter_or(text__contains=query)[:20]
+    )
     return [r.object for r in res]
 
 
@@ -79,8 +85,10 @@ def search_club(query, as_json=False):
     if query:
         clubs = Club.objects.filter(name__icontains=query).all()
         clubs = clubs[:5]
-        if as_json:  # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
-            clubs = json.loads(serializers.serialize('json', clubs, fields=('name')))
+        if (
+            as_json
+        ):  # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
+            clubs = json.loads(serializers.serialize("json", clubs, fields=("name")))
         else:
             clubs = list(clubs)
     return clubs
@@ -89,25 +97,23 @@ def search_club(query, as_json=False):
 @login_required
 def search_view(request):
     result = {
-        'users': search_user(request.GET.get('query', '')),
-        'clubs': search_club(request.GET.get('query', '')),
+        "users": search_user(request.GET.get("query", "")),
+        "clubs": search_club(request.GET.get("query", "")),
     }
-    return render(request, "core/search.jinja", context={'result': result})
+    return render(request, "core/search.jinja", context={"result": result})
 
 
 @login_required
 def search_user_json(request):
-    result = {
-        'users': search_user(request.GET.get('query', ''), True),
-    }
+    result = {"users": search_user(request.GET.get("query", ""), True)}
     return JsonResponse(result)
 
 
 @login_required
 def search_json(request):
     result = {
-        'users': search_user(request.GET.get('query', ''), True),
-        'clubs': search_club(request.GET.get('query', ''), True),
+        "users": search_user(request.GET.get("query", ""), True),
+        "clubs": search_club(request.GET.get("query", ""), True),
     }
     return JsonResponse(result)
 
@@ -116,8 +122,8 @@ class ToMarkdownView(TemplateView):
     template_name = "core/to_markdown.jinja"
 
     def post(self, request, *args, **kwargs):
-        self.text = request.POST['text']
-        if request.POST['syntax'] == "doku":
+        self.text = request.POST["text"]
+        if request.POST["syntax"] == "doku":
             self.text_md = doku_to_markdown(self.text)
         else:
             self.text_md = bbcode_to_markdown(self.text)
@@ -127,9 +133,9 @@ class ToMarkdownView(TemplateView):
     def get_context_data(self, **kwargs):
         kwargs = super(ToMarkdownView, self).get_context_data(**kwargs)
         try:
-            kwargs['text'] = self.text
-            kwargs['text_md'] = self.text_md
+            kwargs["text"] = self.text
+            kwargs["text_md"] = self.text_md
         except:
-            kwargs['text'] = ""
-            kwargs['text_md'] = ""
+            kwargs["text"] = ""
+            kwargs["text_md"] = ""
         return kwargs

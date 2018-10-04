@@ -27,20 +27,56 @@ from django.conf.urls import url
 from trombi.views import *
 
 urlpatterns = [
-    url(r'^(?P<club_id>[0-9]+)/new$', TrombiCreateView.as_view(), name='create'),
-    url(r'^(?P<trombi_id>[0-9]+)/export$', TrombiExportView.as_view(), name='export'),
-    url(r'^(?P<trombi_id>[0-9]+)/edit$', TrombiEditView.as_view(), name='edit'),
-    url(r'^(?P<trombi_id>[0-9]+)/moderate_comments$', TrombiModerateCommentsView.as_view(), name='moderate_comments'),
-    url(r'^(?P<comment_id>[0-9]+)/moderate$', TrombiModerateCommentView.as_view(), name='moderate_comment'),
-    url(r'^user/(?P<user_id>[0-9]+)/delete$', TrombiDeleteUserView.as_view(), name='delete_user'),
-    url(r'^(?P<trombi_id>[0-9]+)$', TrombiDetailView.as_view(), name='detail'),
-    url(r'^(?P<user_id>[0-9]+)/new_comment$', TrombiCommentCreateView.as_view(), name='new_comment'),
-    url(r'^(?P<user_id>[0-9]+)/profile$', UserTrombiProfileView.as_view(), name='user_profile'),
-    url(r'^comment/(?P<comment_id>[0-9]+)/edit$', TrombiCommentEditView.as_view(), name='edit_comment'),
-    url(r'^tools$', UserTrombiToolsView.as_view(), name='user_tools'),
-    url(r'^profile$', UserTrombiEditProfileView.as_view(), name='profile'),
-    url(r'^pictures$', UserTrombiEditPicturesView.as_view(), name='pictures'),
-    url(r'^reset_memberships$', UserTrombiResetClubMembershipsView.as_view(), name='reset_memberships'),
-    url(r'^membership/(?P<membership_id>[0-9]+)/edit$', UserTrombiEditMembershipView.as_view(), name='edit_membership'),
-    url(r'^membership/(?P<membership_id>[0-9]+)/delete$', UserTrombiDeleteMembershipView.as_view(), name='delete_membership'),
+    url(r"^(?P<club_id>[0-9]+)/new$", TrombiCreateView.as_view(), name="create"),
+    url(r"^(?P<trombi_id>[0-9]+)/export$", TrombiExportView.as_view(), name="export"),
+    url(r"^(?P<trombi_id>[0-9]+)/edit$", TrombiEditView.as_view(), name="edit"),
+    url(
+        r"^(?P<trombi_id>[0-9]+)/moderate_comments$",
+        TrombiModerateCommentsView.as_view(),
+        name="moderate_comments",
+    ),
+    url(
+        r"^(?P<comment_id>[0-9]+)/moderate$",
+        TrombiModerateCommentView.as_view(),
+        name="moderate_comment",
+    ),
+    url(
+        r"^user/(?P<user_id>[0-9]+)/delete$",
+        TrombiDeleteUserView.as_view(),
+        name="delete_user",
+    ),
+    url(r"^(?P<trombi_id>[0-9]+)$", TrombiDetailView.as_view(), name="detail"),
+    url(
+        r"^(?P<user_id>[0-9]+)/new_comment$",
+        TrombiCommentCreateView.as_view(),
+        name="new_comment",
+    ),
+    url(
+        r"^(?P<user_id>[0-9]+)/profile$",
+        UserTrombiProfileView.as_view(),
+        name="user_profile",
+    ),
+    url(
+        r"^comment/(?P<comment_id>[0-9]+)/edit$",
+        TrombiCommentEditView.as_view(),
+        name="edit_comment",
+    ),
+    url(r"^tools$", UserTrombiToolsView.as_view(), name="user_tools"),
+    url(r"^profile$", UserTrombiEditProfileView.as_view(), name="profile"),
+    url(r"^pictures$", UserTrombiEditPicturesView.as_view(), name="pictures"),
+    url(
+        r"^reset_memberships$",
+        UserTrombiResetClubMembershipsView.as_view(),
+        name="reset_memberships",
+    ),
+    url(
+        r"^membership/(?P<membership_id>[0-9]+)/edit$",
+        UserTrombiEditMembershipView.as_view(),
+        name="edit_membership",
+    ),
+    url(
+        r"^membership/(?P<membership_id>[0-9]+)/delete$",
+        UserTrombiDeleteMembershipView.as_view(),
+        name="delete_membership",
+    ),
 ]

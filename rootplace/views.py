@@ -59,7 +59,7 @@ def merge_users(u1, u2):
         u1.godfathers.add(u)
     u1.save()
     for i in u2.invoices.all():
-        for f in i._meta.local_fields: # I have sadly not found anything better :/
+        for f in i._meta.local_fields:  # I have sadly not found anything better :/
             if f.name == "date":
                 f.auto_now = False
         u1.invoices.add(i)
@@ -88,8 +88,12 @@ def merge_users(u1, u2):
 
 
 class MergeForm(forms.Form):
-    user1 = AutoCompleteSelectField('users', label=_("User that will be kept"), help_text=None, required=True)
-    user2 = AutoCompleteSelectField('users', label=_("User that will be deleted"), help_text=None, required=True)
+    user1 = AutoCompleteSelectField(
+        "users", label=_("User that will be kept"), help_text=None, required=True
+    )
+    user2 = AutoCompleteSelectField(
+        "users", label=_("User that will be deleted"), help_text=None, required=True
+    )
 
 
 class MergeUsersView(FormView):
@@ -103,8 +107,10 @@ class MergeUsersView(FormView):
         raise PermissionDenied
 
     def form_valid(self, form):
-        self.final_user = merge_users(form.cleaned_data['user1'], form.cleaned_data['user2'])
+        self.final_user = merge_users(
+            form.cleaned_data["user1"], form.cleaned_data["user2"]
+        )
         return super(MergeUsersView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse('core:user_profile', kwargs={'user_id': self.final_user.id})
+        return reverse("core:user_profile", kwargs={"user_id": self.final_user.id})

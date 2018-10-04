@@ -26,6 +26,4 @@ from django.conf.urls import url
 
 from rootplace.views import *
 
-urlpatterns = [
-    url(r'^merge$', MergeUsersView.as_view(), name='merge'),
-]
+urlpatterns = [url(r"^merge$", MergeUsersView.as_view(), name="merge")]

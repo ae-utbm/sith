@@ -41,4 +41,3 @@ admin.site.register(News, NewsAdmin)
 admin.site.register(Weekmail, WeekmailAdmin)
 admin.site.register(Screen)
 admin.site.register(Poster)
-

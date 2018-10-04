@@ -62,112 +62,193 @@ class EbouticTest(TestCase):
         sig = crypto.sign(privkey, query, "sha1")
         b64sig = base64.b64encode(sig).decode("ascii")
 
-        url = reverse("eboutic:etransation_autoanswer") + "?%s&Sig=%s" % (query, urllib.parse.quote_plus(b64sig))
+        url = reverse("eboutic:etransation_autoanswer") + "?%s&Sig=%s" % (
+            query,
+            urllib.parse.quote_plus(b64sig),
+        )
         response = self.client.get(url)
         self.assertTrue(response.status_code == 200)
         self.assertTrue(response.content.decode("utf-8") == "")
         return response
 
     def test_buy_simple_product_with_sith_account(self):
-        self.client.login(username='subscriber', password='plop')
-        Refilling(amount=10, counter=self.eboutic, operator=self.skia, customer=self.subscriber.customer).save()
-        response = self.client.post(reverse("eboutic:main"), {
-            "action": "add_product",
-            "product_id": self.barbar.id})
-        self.assertTrue("<input type=\"hidden\" name=\"action\" value=\"add_product\">\\n"
-                        "    <button type=\"submit\" name=\"product_id\" value=\"4\"> + </button>\\n"
-                        "</form>\\n Barbar: 1.70 \\xe2\\x82\\xac</li>" in str(response.content))
+        self.client.login(username="subscriber", password="plop")
+        Refilling(
+            amount=10,
+            counter=self.eboutic,
+            operator=self.skia,
+            customer=self.subscriber.customer,
+        ).save()
+        response = self.client.post(
+            reverse("eboutic:main"),
+            {"action": "add_product", "product_id": self.barbar.id},
+        )
+        self.assertTrue(
+            '<input type="hidden" name="action" value="add_product">\\n'
+            '    <button type="submit" name="product_id" value="4"> + </button>\\n'
+            "</form>\\n Barbar: 1.70 \\xe2\\x82\\xac</li>" in str(response.content)
+        )
         response = self.client.post(reverse("eboutic:command"))
-        self.assertTrue("<tr>\\n                <td>Barbar</td>\\n                <td>1</td>\\n"
-                        "                <td>1.70 \\xe2\\x82\\xac</td>\\n            </tr>" in str(response.content))
-        response = self.client.post(reverse("eboutic:pay_with_sith"), {
-            "action": "pay_with_sith_account"
-        })
-        self.assertTrue("Le paiement a \\xc3\\xa9t\\xc3\\xa9 effectu\\xc3\\xa9\\n" in str(response.content))
-        response = self.client.get(reverse("core:user_account_detail", kwargs={
-            "user_id": self.subscriber.id,
-            "year": datetime.now().year,
-            "month": datetime.now().month,
-        }))
-        self.assertTrue("class=\"selected_tab\">Compte (8.30 \\xe2\\x82\\xac)</a>" in str(response.content))
-        self.assertTrue("<td>Eboutic</td>\\n        <td><a href=\"/user/3/\">Subscribed User</a></td>\\n"
-                        "        <td>Barbar</td>\\n        <td>1</td>\\n        <td>1.70 \\xe2\\x82\\xac</td>\\n"
-                        "        <td>Compte utilisateur</td>" in str(response.content))
+        self.assertTrue(
+            "<tr>\\n                <td>Barbar</td>\\n                <td>1</td>\\n"
+            "                <td>1.70 \\xe2\\x82\\xac</td>\\n            </tr>"
+            in str(response.content)
+        )
+        response = self.client.post(
+            reverse("eboutic:pay_with_sith"), {"action": "pay_with_sith_account"}
+        )
+        self.assertTrue(
+            "Le paiement a \\xc3\\xa9t\\xc3\\xa9 effectu\\xc3\\xa9\\n"
+            in str(response.content)
+        )
+        response = self.client.get(
+            reverse(
+                "core:user_account_detail",
+                kwargs={
+                    "user_id": self.subscriber.id,
+                    "year": datetime.now().year,
+                    "month": datetime.now().month,
+                },
+            )
+        )
+        self.assertTrue(
+            'class="selected_tab">Compte (8.30 \\xe2\\x82\\xac)</a>'
+            in str(response.content)
+        )
+        self.assertTrue(
+            '<td>Eboutic</td>\\n        <td><a href="/user/3/">Subscribed User</a></td>\\n'
+            "        <td>Barbar</td>\\n        <td>1</td>\\n        <td>1.70 \\xe2\\x82\\xac</td>\\n"
+            "        <td>Compte utilisateur</td>" in str(response.content)
+        )
 
     def test_buy_simple_product_with_credit_card(self):
-        self.client.login(username='subscriber', password='plop')
-        response = self.client.post(reverse("eboutic:main"), {
-            "action": "add_product",
-            "product_id": self.barbar.id})
-        self.assertTrue("<input type=\"hidden\" name=\"action\" value=\"add_product\">\\n"
-                        "    <button type=\"submit\" name=\"product_id\" value=\"4\"> + </button>\\n"
-                        "</form>\\n Barbar: 1.70 \\xe2\\x82\\xac</li>" in str(response.content))
+        self.client.login(username="subscriber", password="plop")
+        response = self.client.post(
+            reverse("eboutic:main"),
+            {"action": "add_product", "product_id": self.barbar.id},
+        )
+        self.assertTrue(
+            '<input type="hidden" name="action" value="add_product">\\n'
+            '    <button type="submit" name="product_id" value="4"> + </button>\\n'
+            "</form>\\n Barbar: 1.70 \\xe2\\x82\\xac</li>" in str(response.content)
+        )
         response = self.client.post(reverse("eboutic:command"))
-        self.assertTrue("<tr>\\n                <td>Barbar</td>\\n                <td>1</td>\\n"
-                        "                <td>1.70 \\xe2\\x82\\xac</td>\\n            </tr>" in str(response.content))
+        self.assertTrue(
+            "<tr>\\n                <td>Barbar</td>\\n                <td>1</td>\\n"
+            "                <td>1.70 \\xe2\\x82\\xac</td>\\n            </tr>"
+            in str(response.content)
+        )
 
         response = self.generate_bank_valid_answer_from_page_content(response.content)
 
-        response = self.client.get(reverse("core:user_account_detail", kwargs={
-            "user_id": self.subscriber.id,
-            "year": datetime.now().year,
-            "month": datetime.now().month,
-        }))
-        self.assertTrue("class=\"selected_tab\">Compte (0.00 \\xe2\\x82\\xac)</a>" in str(response.content))
-        self.assertTrue("<td>Eboutic</td>\\n        <td><a href=\"/user/3/\">Subscribed User</a></td>\\n"
-                        "        <td>Barbar</td>\\n        <td>1</td>\\n        <td>1.70 \\xe2\\x82\\xac</td>\\n"
-                        "        <td>Carte bancaire</td>" in str(response.content))
+        response = self.client.get(
+            reverse(
+                "core:user_account_detail",
+                kwargs={
+                    "user_id": self.subscriber.id,
+                    "year": datetime.now().year,
+                    "month": datetime.now().month,
+                },
+            )
+        )
+        self.assertTrue(
+            'class="selected_tab">Compte (0.00 \\xe2\\x82\\xac)</a>'
+            in str(response.content)
+        )
+        self.assertTrue(
+            '<td>Eboutic</td>\\n        <td><a href="/user/3/">Subscribed User</a></td>\\n'
+            "        <td>Barbar</td>\\n        <td>1</td>\\n        <td>1.70 \\xe2\\x82\\xac</td>\\n"
+            "        <td>Carte bancaire</td>" in str(response.content)
+        )
 
     def test_buy_refill_product_with_credit_card(self):
-        self.client.login(username='subscriber', password='plop')
-        response = self.client.post(reverse("eboutic:main"), {
-            "action": "add_product",
-            "product_id": self.refill.id})
-        self.assertTrue("<input type=\"hidden\" name=\"action\" value=\"add_product\">\\n"
-                        "    <button type=\"submit\" name=\"product_id\" value=\"3\"> + </button>\\n"
-                        "</form>\\n Rechargement 15 \\xe2\\x82\\xac: 15.00 \\xe2\\x82\\xac</li>" in str(response.content))
+        self.client.login(username="subscriber", password="plop")
+        response = self.client.post(
+            reverse("eboutic:main"),
+            {"action": "add_product", "product_id": self.refill.id},
+        )
+        self.assertTrue(
+            '<input type="hidden" name="action" value="add_product">\\n'
+            '    <button type="submit" name="product_id" value="3"> + </button>\\n'
+            "</form>\\n Rechargement 15 \\xe2\\x82\\xac: 15.00 \\xe2\\x82\\xac</li>"
+            in str(response.content)
+        )
         response = self.client.post(reverse("eboutic:command"))
-        self.assertTrue("<tr>\\n                <td>Rechargement 15 \\xe2\\x82\\xac</td>\\n                <td>1</td>\\n"
-                        "                <td>15.00 \\xe2\\x82\\xac</td>\\n            </tr>" in str(response.content))
+        self.assertTrue(
+            "<tr>\\n                <td>Rechargement 15 \\xe2\\x82\\xac</td>\\n                <td>1</td>\\n"
+            "                <td>15.00 \\xe2\\x82\\xac</td>\\n            </tr>"
+            in str(response.content)
+        )
 
         response = self.generate_bank_valid_answer_from_page_content(response.content)
 
-        response = self.client.get(reverse("core:user_account_detail", kwargs={
-            "user_id": self.subscriber.id,
-            "year": datetime.now().year,
-            "month": datetime.now().month,
-        }))
-        self.assertTrue("class=\"selected_tab\">Compte (15.00 \\xe2\\x82\\xac)</a>" in str(response.content))
-        self.assertTrue("<td>\\n            <ul>\\n                \\n                "
-                        "<li>1 x Rechargement 15 \\xe2\\x82\\xac - 15.00 \\xe2\\x82\\xac</li>\\n"
-                        "                \\n            </ul>\\n        </td>\\n"
-                        "        <td>15.00 \\xe2\\x82\\xac</td>" in str(response.content))
+        response = self.client.get(
+            reverse(
+                "core:user_account_detail",
+                kwargs={
+                    "user_id": self.subscriber.id,
+                    "year": datetime.now().year,
+                    "month": datetime.now().month,
+                },
+            )
+        )
+        self.assertTrue(
+            'class="selected_tab">Compte (15.00 \\xe2\\x82\\xac)</a>'
+            in str(response.content)
+        )
+        self.assertTrue(
+            "<td>\\n            <ul>\\n                \\n                "
+            "<li>1 x Rechargement 15 \\xe2\\x82\\xac - 15.00 \\xe2\\x82\\xac</li>\\n"
+            "                \\n            </ul>\\n        </td>\\n"
+            "        <td>15.00 \\xe2\\x82\\xac</td>" in str(response.content)
+        )
 
     def test_buy_subscribe_product_with_credit_card(self):
-        self.client.login(username='old_subscriber', password='plop')
-        response = self.client.get(reverse("core:user_profile", kwargs={"user_id": self.old_subscriber.id}))
+        self.client.login(username="old_subscriber", password="plop")
+        response = self.client.get(
+            reverse("core:user_profile", kwargs={"user_id": self.old_subscriber.id})
+        )
         self.assertTrue("Non cotisant" in str(response.content))
-        response = self.client.post(reverse("eboutic:main"), {
-            "action": "add_product",
-            "product_id": self.cotis.id})
-        self.assertTrue("<input type=\"hidden\" name=\"action\" value=\"add_product\">\\n"
-                        "    <button type=\"submit\" name=\"product_id\" value=\"1\"> + </button>\\n"
-                        "</form>\\n Cotis 1 semestre: 15.00 \\xe2\\x82\\xac</li>" in str(response.content))
+        response = self.client.post(
+            reverse("eboutic:main"),
+            {"action": "add_product", "product_id": self.cotis.id},
+        )
+        self.assertTrue(
+            '<input type="hidden" name="action" value="add_product">\\n'
+            '    <button type="submit" name="product_id" value="1"> + </button>\\n'
+            "</form>\\n Cotis 1 semestre: 15.00 \\xe2\\x82\\xac</li>"
+            in str(response.content)
+        )
         response = self.client.post(reverse("eboutic:command"))
-        self.assertTrue("<tr>\\n                <td>Cotis 1 semestre</td>\\n                <td>1</td>\\n"
-                        "                <td>15.00 \\xe2\\x82\\xac</td>\\n            </tr>" in str(response.content))
+        self.assertTrue(
+            "<tr>\\n                <td>Cotis 1 semestre</td>\\n                <td>1</td>\\n"
+            "                <td>15.00 \\xe2\\x82\\xac</td>\\n            </tr>"
+            in str(response.content)
+        )
 
         response = self.generate_bank_valid_answer_from_page_content(response.content)
 
-        response = self.client.get(reverse("core:user_account_detail", kwargs={
-            "user_id": self.old_subscriber.id,
-            "year": datetime.now().year,
-            "month": datetime.now().month,
-        }))
-        self.assertTrue("class=\"selected_tab\">Compte (0.00 \\xe2\\x82\\xac)</a>" in str(response.content))
-        self.assertTrue("<td>\\n            <ul>\\n                \\n                "
-                        "<li>1 x Cotis 1 semestre - 15.00 \\xe2\\x82\\xac</li>\\n"
-                        "                \\n            </ul>\\n        </td>\\n"
-                        "        <td>15.00 \\xe2\\x82\\xac</td>" in str(response.content))
-        response = self.client.get(reverse("core:user_profile", kwargs={"user_id": self.old_subscriber.id}))
+        response = self.client.get(
+            reverse(
+                "core:user_account_detail",
+                kwargs={
+                    "user_id": self.old_subscriber.id,
+                    "year": datetime.now().year,
+                    "month": datetime.now().month,
+                },
+            )
+        )
+        self.assertTrue(
+            'class="selected_tab">Compte (0.00 \\xe2\\x82\\xac)</a>'
+            in str(response.content)
+        )
+        self.assertTrue(
+            "<td>\\n            <ul>\\n                \\n                "
+            "<li>1 x Cotis 1 semestre - 15.00 \\xe2\\x82\\xac</li>\\n"
+            "                \\n            </ul>\\n        </td>\\n"
+            "        <td>15.00 \\xe2\\x82\\xac</td>" in str(response.content)
+        )
+        response = self.client.get(
+            reverse("core:user_profile", kwargs={"user_id": self.old_subscriber.id})
+        )
         self.assertTrue("Cotisant jusqu\\'au" in str(response.content))

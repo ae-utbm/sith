@@ -43,19 +43,19 @@ from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-os.environ['HTTPS'] = "off"
+os.environ["HTTPS"] = "off"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2'
+SECRET_KEY = "(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-INTERNAL_IPS = ['127.0.0.1']
+INTERNAL_IPS = ["127.0.0.1"]
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -63,50 +63,50 @@ ALLOWED_HOSTS = ['*']
 SITE_ID = 4000
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
-    'django_jinja',
-    'rest_framework',
-    'ajax_select',
-    'haystack',
-    'captcha',
-    'core',
-    'club',
-    'subscription',
-    'accounting',
-    'counter',
-    'eboutic',
-    'launderette',
-    'api',
-    'rootplace',
-    'sas',
-    'com',
-    'election',
-    'forum',
-    'stock',
-    'trombi',
-    'matmat',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "django_jinja",
+    "rest_framework",
+    "ajax_select",
+    "haystack",
+    "captcha",
+    "core",
+    "club",
+    "subscription",
+    "accounting",
+    "counter",
+    "eboutic",
+    "launderette",
+    "api",
+    "rootplace",
+    "sas",
+    "com",
+    "election",
+    "forum",
+    "stock",
+    "trombi",
+    "matmat",
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'core.middleware.AuthenticationMiddleware',
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.auth.middleware.SessionAuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "core.middleware.AuthenticationMiddleware",
 )
 
-ROOT_URLCONF = 'sith.urls'
+ROOT_URLCONF = "sith.urls"
 
 TEMPLATES = [
     {
@@ -163,44 +163,44 @@ TEMPLATES = [
             "autoescape": True,
             "auto_reload": True,
             "translation_engine": "django.utils.translation",
-        }
+        },
     },
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ]
         },
     },
 ]
 
 HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
-    },
+    "default": {
+        "ENGINE": "haystack.backends.whoosh_backend.WhooshEngine",
+        "PATH": os.path.join(os.path.dirname(__file__), "whoosh_index"),
+    }
 }
 
-HAYSTACK_SIGNAL_PROCESSOR = 'core.search_indexes.UserOnlySignalProcessor'
+HAYSTACK_SIGNAL_PROCESSOR = "core.search_indexes.UserOnlySignalProcessor"
 
 SASS_PRECISION = 8
 
-WSGI_APPLICATION = 'sith.wsgi.application'
+WSGI_APPLICATION = "sith.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 
@@ -208,14 +208,11 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = 'fr-FR'
+LANGUAGE_CODE = "fr-FR"
 
-LANGUAGES = [
-    ('en', _('English')),
-    ('fr', _('French')),
-]
+LANGUAGES = [("en", _("English")), ("fr", _("French"))]
 
-TIME_ZONE = 'Europe/Paris'
+TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True
 
@@ -223,9 +220,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-LOCALE_PATHS = (
-    os.path.join(BASE_DIR, "locale"),
-)
+LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 
 PHONENUMBER_DEFAULT_REGION = "FR"
 
@@ -233,33 +228,33 @@ PHONENUMBER_DEFAULT_REGION = "FR"
 EXTERNAL_RES = True
 
 # Medias
-MEDIA_ROOT = './data/'
-MEDIA_URL = '/data/'
+MEDIA_ROOT = "./data/"
+MEDIA_URL = "/data/"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = './static/'
+STATIC_URL = "/static/"
+STATIC_ROOT = "./static/"
 
 # Static files finders which allow to see static folder in all apps
 STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'core.scss.finder.ScssFinder',
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "core.scss.finder.ScssFinder",
 ]
 
 # Auth configuration
-AUTH_USER_MODEL = 'core.User'
-AUTH_ANONYMOUS_MODEL = 'core.models.AnonymousUser'
-LOGIN_URL = '/login'
-LOGOUT_URL = '/logout'
-LOGIN_REDIRECT_URL = '/'
+AUTH_USER_MODEL = "core.User"
+AUTH_ANONYMOUS_MODEL = "core.models.AnonymousUser"
+LOGIN_URL = "/login"
+LOGOUT_URL = "/logout"
+LOGIN_REDIRECT_URL = "/"
 DEFAULT_FROM_EMAIL = "bibou@git.an"
 SITH_COM_EMAIL = "bibou_com@git.an"
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = "localhost"
 EMAIL_PORT = 25
 
@@ -267,12 +262,12 @@ EMAIL_PORT = 25
 
 IS_OLD_MYSQL_PRESENT = False
 OLD_MYSQL_INFOS = {
-    'host': 'ae-db',
-    'user': "my_user",
-    'passwd': "password",
-    'db': "ae2-db",
-    'charset': 'utf8',
-    'use_unicode': True,
+    "host": "ae-db",
+    "user": "my_user",
+    "passwd": "password",
+    "db": "ae2-db",
+    "charset": "utf8",
+    "use_unicode": True,
 }
 
 
@@ -281,25 +276,27 @@ SITH_NAME = "Sith website"
 SITH_TWITTER = "@ae_utbm"
 
 # AE configuration
-SITH_MAIN_CLUB_ID = 1  # TODO: keep only that first setting, with the ID, and do the same for the other clubs
+SITH_MAIN_CLUB_ID = (
+    1
+)  # TODO: keep only that first setting, with the ID, and do the same for the other clubs
 SITH_MAIN_CLUB = {
-    'name': "AE",
-    'unix_name': "ae",
-    'address': "6 Boulevard Anatole France, 90000 Belfort"
+    "name": "AE",
+    "unix_name": "ae",
+    "address": "6 Boulevard Anatole France, 90000 Belfort",
 }
 
 # Bar managers
 SITH_BAR_MANAGER = {
-    'name': "BdF",
-    'unix_name': "bdf",
-    'address': "6 Boulevard Anatole France, 90000 Belfort"
+    "name": "BdF",
+    "unix_name": "bdf",
+    "address": "6 Boulevard Anatole France, 90000 Belfort",
 }
 
 # Launderette managers
 SITH_LAUNDERETTE_MANAGER = {
-    'name': "Laverie",
-    'unix_name': "laverie",
-    'address': "6 Boulevard Anatole France, 90000 Belfort"
+    "name": "Laverie",
+    "unix_name": "laverie",
+    "address": "6 Boulevard Anatole France, 90000 Belfort",
 }
 
 # Main root for club pages
@@ -343,9 +340,9 @@ SITH_SAS_ROOT_DIR_ID = 4
 SITH_BOARD_SUFFIX = "-bureau"
 SITH_MEMBER_SUFFIX = "-membres"
 
-SITH_MAIN_BOARD_GROUP = SITH_MAIN_CLUB['unix_name'] + SITH_BOARD_SUFFIX
-SITH_MAIN_MEMBERS_GROUP = SITH_MAIN_CLUB['unix_name'] + SITH_MEMBER_SUFFIX
-SITH_BAR_MANAGER_BOARD_GROUP = SITH_BAR_MANAGER['unix_name'] + SITH_BOARD_SUFFIX
+SITH_MAIN_BOARD_GROUP = SITH_MAIN_CLUB["unix_name"] + SITH_BOARD_SUFFIX
+SITH_MAIN_MEMBERS_GROUP = SITH_MAIN_CLUB["unix_name"] + SITH_MEMBER_SUFFIX
+SITH_BAR_MANAGER_BOARD_GROUP = SITH_BAR_MANAGER["unix_name"] + SITH_BOARD_SUFFIX
 
 SITH_PROFILE_DEPARTMENTS = [
     ("TC", _("TC")),
@@ -364,50 +361,46 @@ SITH_PROFILE_DEPARTMENTS = [
 ]
 
 SITH_ACCOUNTING_PAYMENT_METHOD = [
-    ('CHECK', _('Check')),
-    ('CASH', _('Cash')),
-    ('TRANSFERT', _('Transfert')),
-    ('CARD', _('Credit card')),
+    ("CHECK", _("Check")),
+    ("CASH", _("Cash")),
+    ("TRANSFERT", _("Transfert")),
+    ("CARD", _("Credit card")),
 ]
 
 SITH_SUBSCRIPTION_PAYMENT_METHOD = [
-    ('CHECK', _('Check')),
-    ('CARD', _('Credit card')),
-    ('CASH', _('Cash')),
-    ('EBOUTIC', _('Eboutic')),
-    ('OTHER', _('Other')),
+    ("CHECK", _("Check")),
+    ("CARD", _("Credit card")),
+    ("CASH", _("Cash")),
+    ("EBOUTIC", _("Eboutic")),
+    ("OTHER", _("Other")),
 ]
 
 SITH_SUBSCRIPTION_LOCATIONS = [
-    ('BELFORT', _('Belfort')),
-    ('SEVENANS', _('Sevenans')),
-    ('MONTBELIARD', _('Montbéliard')),
-    ('EBOUTIC', _('Eboutic')),
+    ("BELFORT", _("Belfort")),
+    ("SEVENANS", _("Sevenans")),
+    ("MONTBELIARD", _("Montbéliard")),
+    ("EBOUTIC", _("Eboutic")),
 ]
 
-SITH_COUNTER_BARS = [
-    (1, "MDE"),
-    (2, "Foyer"),
-    (35, "La Gommette"),
-]
+SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]
 
 SITH_COUNTER_PAYMENT_METHOD = [
-    ('CHECK', _('Check')),
-    ('CASH', _('Cash')),
-    ('CARD', _('Credit card')),
+    ("CHECK", _("Check")),
+    ("CASH", _("Cash")),
+    ("CARD", _("Credit card")),
 ]
 
 SITH_COUNTER_BANK = [
-    ('OTHER', 'Autre'),
-    ('SOCIETE-GENERALE', 'Société générale'),
-    ('BANQUE-POPULAIRE', 'Banque populaire'),
-    ('BNP', 'BNP'),
-    ('CAISSE-EPARGNE', 'Caisse d\'épargne'),
-    ('CIC', 'CIC'),
-    ('CREDIT-AGRICOLE', 'Crédit Agricole'),
-    ('CREDIT-MUTUEL', 'Credit Mutuel'),
-    ('CREDIT-LYONNAIS', 'Credit Lyonnais'),
-    ('LA-POSTE', 'La Poste'),
+    ("OTHER", "Autre"),
+    ("SOCIETE-GENERALE", "Société générale"),
+    ("BANQUE-POPULAIRE", "Banque populaire"),
+    ("BNP", "BNP"),
+    ("CAISSE-EPARGNE", "Caisse d'épargne"),
+    ("CIC", "CIC"),
+    ("CREDIT-AGRICOLE", "Crédit Agricole"),
+    ("CREDIT-MUTUEL", "Credit Mutuel"),
+    ("CREDIT-LYONNAIS", "Credit Lyonnais"),
+    ("LA-POSTE", "La Poste"),
 ]
 
 SITH_ECOCUP_CONS = 1152
@@ -428,9 +421,7 @@ SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER = 1
 SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS = 2
 SITH_PRODUCTTYPE_SUBSCRIPTION = 2
 
-SITH_CAN_CREATE_SUBSCRIPTIONS = [
-    1,
-]
+SITH_CAN_CREATE_SUBSCRIPTIONS = [1]
 
 # Number of weeks before the end of a subscription when the subscriber can resubscribe
 SITH_SUBSCRIPTION_END = 10
@@ -438,113 +429,61 @@ SITH_SUBSCRIPTION_END = 10
 # Subscription durations are in semestres
 # Be careful, modifying this parameter will need a migration to be applied
 SITH_SUBSCRIPTIONS = {
-    'un-semestre': {
-        'name': _('One semester'),
-        'price': 15,
-        'duration': 1,
+    "un-semestre": {"name": _("One semester"), "price": 15, "duration": 1},
+    "deux-semestres": {"name": _("Two semesters"), "price": 28, "duration": 2},
+    "cursus-tronc-commun": {
+        "name": _("Common core cursus"),
+        "price": 45,
+        "duration": 4,
     },
-    'deux-semestres': {
-        'name': _('Two semesters'),
-        'price': 28,
-        'duration': 2,
+    "cursus-branche": {"name": _("Branch cursus"), "price": 45, "duration": 6},
+    "cursus-alternant": {"name": _("Alternating cursus"), "price": 30, "duration": 6},
+    "membre-honoraire": {"name": _("Honorary member"), "price": 0, "duration": 666},
+    "assidu": {"name": _("Assidu member"), "price": 0, "duration": 2},
+    "amicale/doceo": {"name": _("Amicale/DOCEO member"), "price": 0, "duration": 2},
+    "reseau-ut": {"name": _("UT network member"), "price": 0, "duration": 1},
+    "crous": {"name": _("CROUS member"), "price": 0, "duration": 2},
+    "sbarro/esta": {"name": _("Sbarro/ESTA member"), "price": 15, "duration": 2},
+    "un-semestre-welcome": {
+        "name": _("One semester Welcome Week"),
+        "price": 0,
+        "duration": 1,
     },
-    'cursus-tronc-commun': {
-        'name': _('Common core cursus'),
-        'price': 45,
-        'duration': 4,
+    "deux-mois-essai": {"name": _("Two months for free"), "price": 0, "duration": 0.33},
+    "benevoles-euroks": {"name": _("Eurok's volunteer"), "price": 5, "duration": 0.1},
+    "six-semaines-essai": {
+        "name": _("Six weeks for free"),
+        "price": 0,
+        "duration": 0.23,
     },
-    'cursus-branche': {
-        'name': _('Branch cursus'),
-        'price': 45,
-        'duration': 6,
-    },
-    'cursus-alternant': {
-        'name': _('Alternating cursus'),
-        'price': 30,
-        'duration': 6,
-    },
-    'membre-honoraire': {
-        'name': _('Honorary member'),
-        'price': 0,
-        'duration': 666,
-    },
-    'assidu': {
-        'name': _('Assidu member'),
-        'price': 0,
-        'duration': 2,
-    },
-    'amicale/doceo': {
-        'name': _('Amicale/DOCEO member'),
-        'price': 0,
-        'duration': 2,
-    },
-    'reseau-ut': {
-        'name': _('UT network member'),
-        'price': 0,
-        'duration': 1,
-    },
-    'crous': {
-        'name': _('CROUS member'),
-        'price': 0,
-        'duration': 2,
-    },
-    'sbarro/esta': {
-        'name': _('Sbarro/ESTA member'),
-        'price': 15,
-        'duration': 2,
-    },
-    'un-semestre-welcome': {
-        'name': _('One semester Welcome Week'),
-        'price': 0,
-        'duration': 1,
-    },
-    'deux-mois-essai': {
-        'name': _('Two months for free'),
-        'price': 0,
-        'duration': 0.33,
-    },
-    'benevoles-euroks': {
-        'name': _('Eurok\'s volunteer'),
-        'price': 5,
-        'duration': 0.1
-    },
-    'six-semaines-essai': {
-        'name': _('Six weeks for free'),
-        'price': 0,
-        'duration': 0.23,
-    },
-    'un-jour': {
-        'name': _('One day'),
-        'price': 0,
-        'duration': 0.00555333,
-    }
+    "un-jour": {"name": _("One day"), "price": 0, "duration": 0.00555333}
     # To be completed....
 }
 
 SITH_CLUB_ROLES = {}
 
 SITH_CLUB_ROLES_ID = {
-    'President': 10,
-    'Vice-President': 9,
-    'Treasurer': 7,
-    'Communication supervisor': 5,
-    'Secretary': 4,
-    'IT supervisor': 3,
-    'Board member': 2,
-    'Active member': 1,
-    'Curious': 0,
+    "President": 10,
+    "Vice-President": 9,
+    "Treasurer": 7,
+    "Communication supervisor": 5,
+    "Secretary": 4,
+    "IT supervisor": 3,
+    "Board member": 2,
+    "Active member": 1,
+    "Curious": 0,
 }
 
 SITH_CLUB_ROLES = {
-    10: _('President'),
-    9: _('Vice-President'),
-    7: _('Treasurer'),
-    5: _('Communication supervisor'),
-    4: _('Secretary'),
-    3: _('IT supervisor'),
-    2: _('Board member'),
-    1: _('Active member'),
-    0: _('Curious'),
+    10: _("President"),
+    9: _("Vice-President"),
+    7: _("Treasurer"),
+    5: _("Communication supervisor"),
+    4: _("Secretary"),
+    3: _("IT supervisor"),
+    2: _("Board member"),
+    1: _("Active member"),
+    0: _("Curious"),
 }
 
 # This corresponds to the maximum role a user can freely subscribe to
@@ -562,85 +501,85 @@ SITH_COUNTER_MINUTE_INACTIVE = 10
 
 # ET variables
 SITH_EBOUTIC_CB_ENABLED = True
-SITH_EBOUTIC_ET_URL = "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
+SITH_EBOUTIC_ET_URL = (
+    "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
+)
 SITH_EBOUTIC_PBX_SITE = "4000666"
 SITH_EBOUTIC_PBX_RANG = "42"
 SITH_EBOUTIC_PBX_IDENTIFIANT = "123456789"
-SITH_EBOUTIC_HMAC_KEY = binascii.unhexlify("0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF")
+SITH_EBOUTIC_HMAC_KEY = binascii.unhexlify(
+    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
+)
 SITH_EBOUTIC_PUB_KEY = ""
-with open('./sith/et_keys/pubkey.pem') as f:
+with open("./sith/et_keys/pubkey.pem") as f:
     SITH_EBOUTIC_PUB_KEY = f.read()
 
 # Launderette variables
-SITH_LAUNDERETTE_MACHINE_TYPES = [('WASHING', _('Washing')), ('DRYING', _('Drying'))]
-SITH_LAUNDERETTE_PRICES = {
-    'WASHING': 1.0,
-    'DRYING': 0.75,
-}
+SITH_LAUNDERETTE_MACHINE_TYPES = [("WASHING", _("Washing")), ("DRYING", _("Drying"))]
+SITH_LAUNDERETTE_PRICES = {"WASHING": 1.0, "DRYING": 0.75}
 
 SITH_NOTIFICATIONS = [
-    ('POSTER_MODERATION', _("A new poster needs to be moderated")),
-    ('MAILING_MODERATION', _("A new mailing list needs to be moderated")),
-    ('NEWS_MODERATION', _("There are %s fresh news to be moderated")),
-    ('FILE_MODERATION', _("New files to be moderated")),
-    ('SAS_MODERATION', _("There are %s pictures to be moderated in the SAS")),
-    ('NEW_PICTURES', _("You've been identified on some pictures")),
-    ('REFILLING', _("You just refilled of %s €")),
-    ('SELLING', _("You just bought %s")),
-    ('GENERIC', _("You have a notification")),
+    ("POSTER_MODERATION", _("A new poster needs to be moderated")),
+    ("MAILING_MODERATION", _("A new mailing list needs to be moderated")),
+    ("NEWS_MODERATION", _("There are %s fresh news to be moderated")),
+    ("FILE_MODERATION", _("New files to be moderated")),
+    ("SAS_MODERATION", _("There are %s pictures to be moderated in the SAS")),
+    ("NEW_PICTURES", _("You've been identified on some pictures")),
+    ("REFILLING", _("You just refilled of %s €")),
+    ("SELLING", _("You just bought %s")),
+    ("GENERIC", _("You have a notification")),
 ]
 
 # The keys are the notification names as found in SITH_NOTIFICATIONS, and the
 # values are the callback function to update the notifs.
 # The callback must take the notif object as first and single argument.
 SITH_PERMANENT_NOTIFICATIONS = {
-    'NEWS_MODERATION': 'com.models.news_notification_callback',
-    'SAS_MODERATION': 'sas.models.sas_notification_callback',
+    "NEWS_MODERATION": "com.models.news_notification_callback",
+    "SAS_MODERATION": "sas.models.sas_notification_callback",
 }
 
 SITH_QUICK_NOTIF = {
-    'qn_success': _("Success!"),
-    'qn_fail': _("Fail!"),
-    'qn_weekmail_new_article': _("You successfully posted an article in the Weekmail"),
-    'qn_weekmail_article_edit': _("You successfully edited an article in the Weekmail"),
-    'qn_weekmail_send_success': _("You successfully sent the Weekmail"),
+    "qn_success": _("Success!"),
+    "qn_fail": _("Fail!"),
+    "qn_weekmail_new_article": _("You successfully posted an article in the Weekmail"),
+    "qn_weekmail_article_edit": _("You successfully edited an article in the Weekmail"),
+    "qn_weekmail_send_success": _("You successfully sent the Weekmail"),
 }
 
 # Mailing related settings
 
-SITH_MAILING_DOMAIN = 'utbm.fr'
-SITH_MAILING_FETCH_KEY = 'IloveMails'
+SITH_MAILING_DOMAIN = "utbm.fr"
+SITH_MAILING_FETCH_KEY = "IloveMails"
 
-SITH_GIFT_LIST = [
-    ('AE Tee-shirt', _("AE tee-shirt"))
-]
+SITH_GIFT_LIST = [("AE Tee-shirt", _("AE tee-shirt"))]
 
 try:
     from .settings_custom import *
+
     print("Custom settings imported", file=sys.stderr)
 except:
     print("Custom settings failed", file=sys.stderr)
 
 if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)
-    MIDDLEWARE_CLASSES = ('debug_toolbar.middleware.DebugToolbarMiddleware',) + MIDDLEWARE_CLASSES
+    MIDDLEWARE_CLASSES = (
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ) + MIDDLEWARE_CLASSES
     DEBUG_TOOLBAR_PANELS = [
-        'debug_toolbar.panels.versions.VersionsPanel',
-        'debug_toolbar.panels.timer.TimerPanel',
-        'debug_toolbar.panels.settings.SettingsPanel',
-        'debug_toolbar.panels.headers.HeadersPanel',
-        'debug_toolbar.panels.request.RequestPanel',
-        'debug_toolbar.panels.sql.SQLPanel',
-        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
-        'sith.toolbar_debug.TemplatesPanel',
-        'debug_toolbar.panels.cache.CachePanel',
-        'debug_toolbar.panels.signals.SignalsPanel',
-        'debug_toolbar.panels.logging.LoggingPanel',
-        'debug_toolbar.panels.redirects.RedirectsPanel',
+        "debug_toolbar.panels.versions.VersionsPanel",
+        "debug_toolbar.panels.timer.TimerPanel",
+        "debug_toolbar.panels.settings.SettingsPanel",
+        "debug_toolbar.panels.headers.HeadersPanel",
+        "debug_toolbar.panels.request.RequestPanel",
+        "debug_toolbar.panels.sql.SQLPanel",
+        "debug_toolbar.panels.staticfiles.StaticFilesPanel",
+        "sith.toolbar_debug.TemplatesPanel",
+        "debug_toolbar.panels.cache.CachePanel",
+        "debug_toolbar.panels.signals.SignalsPanel",
+        "debug_toolbar.panels.logging.LoggingPanel",
+        "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
-    SASS_INCLUDE_FOLDERS = [
-        'core/static/',
-    ]
+    SASS_INCLUDE_FOLDERS = ["core/static/"]
 
-if 'test' in sys.argv:
+if "test" in sys.argv:
     CAPTCHA_TEST_MODE = True
