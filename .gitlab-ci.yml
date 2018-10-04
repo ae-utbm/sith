@@ -1,8 +1,17 @@
-test:
+stages:
+  - setup
+  - test
+
+setup:
+  stage: setup
   script:
   - apt-get update
   - apt-get install -y gettext
   - pip install -r requirements.txt
+
+test:
+  stage: test
+  script:
   - pip install coverage
   - ./manage.py compilemessages
   - coverage run ./manage.py test
@@ -11,3 +20,9 @@ test:
   artifacts:
     paths:
       - coverage_report/
+
+black:
+  stage: test
+  script:
+    - pip install black
+    - black --check .
