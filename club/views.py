@@ -51,6 +51,16 @@ from django.conf import settings
 # Custom forms
 
 
+class ClubEditForm(forms.ModelForm):
+    class Meta:
+        model = Club
+        fields = ['address', 'logo', 'short_description']
+
+    def __init__(self, *args, **kwargs):
+        super(ClubEditForm, self).__init__(*args, **kwargs)
+        self.fields["short_description"].widget = forms.Textarea()
+
+
 class MailingForm(forms.ModelForm):
     class Meta:
         model = Mailing
@@ -410,7 +420,7 @@ class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
     """
     model = Club
     pk_url_kwarg = "club_id"
-    fields = ['address', 'logo', 'short_description']
+    form_class = ClubEditForm
     template_name = 'core/edit.jinja'
     current_tab = "edit"
 
