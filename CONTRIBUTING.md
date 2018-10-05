@@ -4,7 +4,7 @@
 Hey ! Tu veux devenir un mec bien et en plus devenir bon en python si tu l'es pas déjà ?
 Il se trouve que le sith AE prévu pour l'été 2016 a besoin de toi !
 
-Pour faire le sith, on utilise le framework Web [Django](https://docs.djangoproject.com/fr/1.8/intro/)  
+Pour faire le sith, on utilise le framework Web [Django](https://docs.djangoproject.com/fr/1.11/intro/)  
 N'hésite pas à lire les tutos et à nous demander (ae.info@utbm.fr).
 
 Bon, passons aux choses sérieuses, pour bidouiller le sith sans le casser :  
@@ -31,7 +31,6 @@ Maintenant, faut passer le sith en mode debug dans le fichier de settings person
 Enfin, il s'agit de créer la base de donnée de test lors de la première utilisation
 
 	./manage.py setup
-	répondre no
 
 Et pour lancer le sith, tu fais `python3 manage.py runserver`
 
@@ -41,7 +40,7 @@ Va, et que l'AE soit avec toi.
 Sites et doc cools
 ------------------
 
-[Classy Class-Based Views](http://ccbv.co.uk/projects/Django/1.8/)
+[Classy Class-Based Views](http://ccbv.co.uk/projects/Django/1.11/)
 
 Helpers:
 
