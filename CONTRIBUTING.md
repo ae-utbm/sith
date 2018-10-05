@@ -37,6 +37,24 @@ Et pour lancer le sith, tu fais `python3 manage.py runserver`
 Voilà, c'est le sith AE. Il y a des issues dans le gitlab qui sont à régler. Si tu as un domaine qui t'intéresse, une appli que tu voudrais développer, n'hésites pas et contacte-nous.
 Va, et que l'AE soit avec toi.
 
+Black
+------------------
+Pour uniformiser le formattage du code nous utilisons [Black](https://github.com/ambv/black). Cela permet d'avoir le même codestyle et donc le codereview prend moins de temps. Tout etant dans le même format, il est plus facile pour chacun de comprendre le code de chacun ! Cela permet aussi d'éviter des erreurs (y parait 🤷‍♀️).
+
+Installation de black:
+
+    cd Sith
+    virtualenv --clear --python=python3 env_sith
+    source env_sith/bin/activate
+    pip install black
+    
+Sous VsCode:
+Ajouter ces deux lignes dans les settings de VsCode
+
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true,
+
+
 Sites et doc cools
 ------------------
 

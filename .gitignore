@@ -4,6 +4,7 @@ db.sqlite3
 *.mo
 *__pycache__*
 .DS_Store
+.vscode/
 env/
 doc/html
 data/
