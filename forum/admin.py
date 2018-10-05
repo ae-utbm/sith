@@ -45,4 +45,3 @@ admin.site.register(Forum, ForumAdmin)
 admin.site.register(ForumTopic, ForumTopicAdmin)
 admin.site.register(ForumMessage, ForumMessageAdmin)
 admin.site.register(ForumUserInfo)
-

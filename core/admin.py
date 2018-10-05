@@ -32,30 +32,38 @@ from haystack.admin import SearchModelAdmin
 admin.site.unregister(AuthGroup)
 admin.site.register(RealGroup)
 
+
 class UserAdmin(SearchModelAdmin):
     list_display = ["first_name", "last_name", "username", "email", "nick_name"]
-    form = make_ajax_form(User, {
-        'godfathers': 'users',
-        'home': 'files',  # ManyToManyField
-        'profile_pict': 'files',  # ManyToManyField
-        'avatar_pict': 'files',  # ManyToManyField
-        'scrub_pict': 'files',  # ManyToManyField
-    })
+    form = make_ajax_form(
+        User,
+        {
+            "godfathers": "users",
+            "home": "files",  # ManyToManyField
+            "profile_pict": "files",  # ManyToManyField
+            "avatar_pict": "files",  # ManyToManyField
+            "scrub_pict": "files",  # ManyToManyField
+        },
+    )
     search_fields = ["first_name", "last_name", "username"]
+
 
 admin.site.register(User, UserAdmin)
 
+
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
-    form = make_ajax_form(Page, {
-        'lock_user': 'users',
-        'owner_group': 'groups',
-        'edit_groups': 'groups',
-        'view_groups': 'groups',
-    })
+    form = make_ajax_form(
+        Page,
+        {
+            "lock_user": "users",
+            "owner_group": "groups",
+            "edit_groups": "groups",
+            "view_groups": "groups",
+        },
+    )
+
 
 @admin.register(SithFile)
 class SithFileAdmin(admin.ModelAdmin):
-    form = make_ajax_form(SithFile, {
-        'parent': 'files',  # ManyToManyField
-    })
+    form = make_ajax_form(SithFile, {"parent": "files"})  # ManyToManyField

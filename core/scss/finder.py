@@ -34,21 +34,20 @@ class ScssFinder(FileSystemFinder):
     """
     Find static *.css files compiled on the fly
     """
+
     locations = []
 
     def __init__(self, apps=None, *args, **kwargs):
         location = settings.STATIC_ROOT
         if not os.path.isdir(location):
             return
-        self.locations = [
-            ('', location),
-        ]
+        self.locations = [("", location)]
         self.storages = OrderedDict()
         filesystem_storage = FileSystemStorage(location=location)
         filesystem_storage.prefix = self.locations[0][0]
         self.storages[location] = filesystem_storage
 
     def find(self, path, all=False):
-        if path.endswith('.css'):
+        if path.endswith(".css"):
             return super(ScssFinder, self).find(path, all)
         return []

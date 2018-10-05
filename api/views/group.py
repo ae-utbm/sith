@@ -30,7 +30,6 @@ from api.views import RightModelViewSet
 
 
 class GroupSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = RealGroup
 

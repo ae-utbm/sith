@@ -46,5 +46,5 @@ class PsqlRunOnly(migrations.RunSQL):
     """
 
     def _run_sql(self, schema_editor, sqls):
-        if connection.vendor == 'postgresql':
+        if connection.vendor == "postgresql":
             super(PsqlRunOnly, self)._run_sql(schema_editor, sqls)

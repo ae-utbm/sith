@@ -33,9 +33,11 @@ from accounting.models import ClubAccount, Company
 
 
 def check_token(request):
-    return ('counter_token' in request.session.keys() and
-            request.session['counter_token'] and
-            Counter.objects.filter(token=request.session['counter_token']).exists())
+    return (
+        "counter_token" in request.session.keys()
+        and request.session["counter_token"]
+        and Counter.objects.filter(token=request.session["counter_token"]).exists()
+    )
 
 
 class RightManagedLookupChannel(LookupChannel):
@@ -44,7 +46,7 @@ class RightManagedLookupChannel(LookupChannel):
             raise PermissionDenied
 
 
-@register('users')
+@register("users")
 class UsersLookup(RightManagedLookupChannel):
     model = User
 
@@ -58,7 +60,7 @@ class UsersLookup(RightManagedLookupChannel):
         return item.get_display_name()
 
 
-@register('groups')
+@register("groups")
 class GroupsLookup(RightManagedLookupChannel):
     model = Group
 
@@ -72,7 +74,7 @@ class GroupsLookup(RightManagedLookupChannel):
         return item.name
 
 
-@register('clubs')
+@register("clubs")
 class ClubLookup(RightManagedLookupChannel):
     model = Club
 
@@ -86,7 +88,7 @@ class ClubLookup(RightManagedLookupChannel):
         return item.name
 
 
-@register('counters')
+@register("counters")
 class CountersLookup(RightManagedLookupChannel):
     model = Counter
 
@@ -97,19 +99,21 @@ class CountersLookup(RightManagedLookupChannel):
         return item.name
 
 
-@register('products')
+@register("products")
 class ProductsLookup(RightManagedLookupChannel):
     model = Product
 
     def get_query(self, q, request):
-        return (self.model.objects.filter(name__icontains=q) |
-                self.model.objects.filter(code__icontains=q)).filter(archived=False)[:50]
+        return (
+            self.model.objects.filter(name__icontains=q)
+            | self.model.objects.filter(code__icontains=q)
+        ).filter(archived=False)[:50]
 
     def format_item_display(self, item):
         return "%s (%s)" % (item.name, item.code)
 
 
-@register('files')
+@register("files")
 class SithFileLookup(RightManagedLookupChannel):
     model = SithFile
 
@@ -117,7 +121,7 @@ class SithFileLookup(RightManagedLookupChannel):
         return self.model.objects.filter(name__icontains=q)[:50]
 
 
-@register('club_accounts')
+@register("club_accounts")
 class ClubAccountLookup(RightManagedLookupChannel):
     model = ClubAccount
 
@@ -128,7 +132,7 @@ class ClubAccountLookup(RightManagedLookupChannel):
         return item.name
 
 
-@register('companies')
+@register("companies")
 class CompaniesLookup(RightManagedLookupChannel):
     model = Company
 

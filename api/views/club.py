@@ -36,10 +36,9 @@ from api.views import RightModelViewSet
 
 
 class ClubSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Club
-        fields = ('id', 'name', 'unix_name', 'address', 'members')
+        fields = ("id", "name", "unix_name", "address", "members")
 
 
 class ClubViewSet(RightModelViewSet):
@@ -51,13 +50,15 @@ class ClubViewSet(RightModelViewSet):
     queryset = Club.objects.all()
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @renderer_classes((StaticHTMLRenderer,))
 def FetchMailingLists(request):
-    key = request.GET.get('key', '')
+    key = request.GET.get("key", "")
     if key != settings.SITH_MAILING_FETCH_KEY:
         raise PermissionDenied
-    data = ''
-    for mailing in Mailing.objects.filter(is_moderated=True, club__is_active=True).all():
+    data = ""
+    for mailing in Mailing.objects.filter(
+        is_moderated=True, club__is_active=True
+    ).all():
         data += mailing.fetch_format() + "\n"
     return Response(data)

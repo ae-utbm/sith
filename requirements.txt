@@ -1,4 +1,4 @@
-# Django 1.8 LTS is required, version 1.9 is not supported
+# Django 1.11 LTS is required
 Django >=1.11, <2.0
 Pillow
 mistune

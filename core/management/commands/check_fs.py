@@ -33,10 +33,14 @@ class Command(BaseCommand):
     help = "Recursively check the file system with respect to the DB"
 
     def add_arguments(self, parser):
-        parser.add_argument('ids', metavar='ID', type=int, nargs='+', help="The file IDs to process")
+        parser.add_argument(
+            "ids", metavar="ID", type=int, nargs="+", help="The file IDs to process"
+        )
 
     def handle(self, *args, **options):
-        root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        files = SithFile.objects.filter(id__in=options['ids']).all()
+        root_path = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        )
+        files = SithFile.objects.filter(id__in=options["ids"]).all()
         for f in files:
             f._check_fs()

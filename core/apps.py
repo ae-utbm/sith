@@ -29,7 +29,7 @@ from django.core.signals import request_started
 
 
 class SithConfig(AppConfig):
-    name = 'core'
+    name = "core"
     verbose_name = "Core app of the Sith"
 
     def ready(self):
@@ -47,6 +47,12 @@ class SithConfig(AppConfig):
             Forum._club_memberships = {}
 
         print("Connecting signals!", file=sys.stderr)
-        request_started.connect(clear_cached_groups, weak=False, dispatch_uid="clear_cached_groups")
-        request_started.connect(clear_cached_memberships, weak=False, dispatch_uid="clear_cached_memberships")
+        request_started.connect(
+            clear_cached_groups, weak=False, dispatch_uid="clear_cached_groups"
+        )
+        request_started.connect(
+            clear_cached_memberships,
+            weak=False,
+            dispatch_uid="clear_cached_memberships",
+        )
         # TODO: there may be a need to add more cache clearing

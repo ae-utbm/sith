@@ -32,7 +32,3 @@ try:
     print("Verify OK")
 except:
     print("Verify failed")
-
-
-
-

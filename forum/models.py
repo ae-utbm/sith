@@ -38,7 +38,6 @@ from core.models import User, Group
 from club.models import Club
 
 
-
 class Forum(models.Model):
     """
     The Forum class, made as a tree to allow nice tidy organization
@@ -47,27 +46,51 @@ class Forum(models.Model):
     edit_groups allows to put any group as a forum admin
     view_groups allows some groups to view a forum
     """
+
     # Those functions prevent generating migration upon settings changes
-    def get_default_edit_group(): return [settings.SITH_GROUP_OLD_SUBSCRIBERS_ID]
-    def get_default_view_group(): return [settings.SITH_GROUP_PUBLIC_ID]
+    def get_default_edit_group():
+        return [settings.SITH_GROUP_OLD_SUBSCRIBERS_ID]
+
+    def get_default_view_group():
+        return [settings.SITH_GROUP_PUBLIC_ID]
+
     id = models.AutoField(primary_key=True, db_index=True)
-    name = models.CharField(_('name'), max_length=64)
-    description = models.CharField(_('description'), max_length=512, default="")
-    is_category = models.BooleanField(_('is a category'), default=False)
-    parent = models.ForeignKey('Forum', related_name='children', null=True, blank=True)
-    owner_club = models.ForeignKey(Club, related_name="owned_forums", verbose_name=_("owner club"),
-                                   default=settings.SITH_MAIN_CLUB_ID)
-    edit_groups = models.ManyToManyField(Group, related_name="editable_forums", blank=True,
-                                         default=get_default_edit_group)
-    view_groups = models.ManyToManyField(Group, related_name="viewable_forums", blank=True,
-                                         default=get_default_view_group)
-    number = models.IntegerField(_("number to choose a specific forum ordering"), default=1)
-    _last_message = models.ForeignKey('ForumMessage', related_name="forums_where_its_last",
-                                      verbose_name=_("the last message"), null=True, on_delete=models.SET_NULL)
+    name = models.CharField(_("name"), max_length=64)
+    description = models.CharField(_("description"), max_length=512, default="")
+    is_category = models.BooleanField(_("is a category"), default=False)
+    parent = models.ForeignKey("Forum", related_name="children", null=True, blank=True)
+    owner_club = models.ForeignKey(
+        Club,
+        related_name="owned_forums",
+        verbose_name=_("owner club"),
+        default=settings.SITH_MAIN_CLUB_ID,
+    )
+    edit_groups = models.ManyToManyField(
+        Group,
+        related_name="editable_forums",
+        blank=True,
+        default=get_default_edit_group,
+    )
+    view_groups = models.ManyToManyField(
+        Group,
+        related_name="viewable_forums",
+        blank=True,
+        default=get_default_view_group,
+    )
+    number = models.IntegerField(
+        _("number to choose a specific forum ordering"), default=1
+    )
+    _last_message = models.ForeignKey(
+        "ForumMessage",
+        related_name="forums_where_its_last",
+        verbose_name=_("the last message"),
+        null=True,
+        on_delete=models.SET_NULL,
+    )
     _topic_number = models.IntegerField(_("number of topics"), default=0)
 
     class Meta:
-        ordering = ['number']
+        ordering = ["number"]
 
     def clean(self):
         self.check_loop()
@@ -87,8 +110,18 @@ class Forum(models.Model):
             self.parent.set_topic_number()
 
     def set_last_message(self):
-        topic = ForumTopic.objects.filter(forum__id=self.id).exclude(_last_message=None).order_by('-_last_message__id').first()
-        forum = Forum.objects.filter(parent__id=self.id).exclude(_last_message=None).order_by('-_last_message__id').first()
+        topic = (
+            ForumTopic.objects.filter(forum__id=self.id)
+            .exclude(_last_message=None)
+            .order_by("-_last_message__id")
+            .first()
+        )
+        forum = (
+            Forum.objects.filter(parent__id=self.id)
+            .exclude(_last_message=None)
+            .order_by("-_last_message__id")
+            .first()
+        )
         if topic and forum:
             if topic._last_message_id < forum._last_message_id:
                 self._last_message_id = forum._last_message_id
@@ -117,8 +150,8 @@ class Forum(models.Model):
             self.save()
 
     _club_memberships = {}  # This cache is particularly efficient:
-                            # divided by 3 the number of requests on the main forum page
-                            # after the first load
+    # divided by 3 the number of requests on the main forum page
+    # after the first load
     def is_owned_by(self, user):
         if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID):
             return True
@@ -141,7 +174,7 @@ class Forum(models.Model):
         cur = self
         while cur.parent is not None:
             if cur in objs:
-                raise ValidationError(_('You can not make loops in forums'))
+                raise ValidationError(_("You can not make loops in forums"))
             objs.append(cur)
             cur = cur.parent
 
@@ -149,10 +182,14 @@ class Forum(models.Model):
         return "%s" % (self.name)
 
     def get_full_name(self):
-        return '/'.join(chain.from_iterable([[parent.name for parent in self.get_parent_list()], [self.name]]))
+        return "/".join(
+            chain.from_iterable(
+                [[parent.name for parent in self.get_parent_list()], [self.name]]
+            )
+        )
 
     def get_absolute_url(self):
-        return reverse('forum:view_forum', kwargs={'forum_id': self.id})
+        return reverse("forum:view_forum", kwargs={"forum_id": self.id})
 
     @cached_property
     def parent_list(self):
@@ -189,17 +226,24 @@ class Forum(models.Model):
 
 
 class ForumTopic(models.Model):
-    forum = models.ForeignKey(Forum, related_name='topics')
-    author = models.ForeignKey(User, related_name='forum_topics')
-    description = models.CharField(_('description'), max_length=256, default="")
-    subscribed_users = models.ManyToManyField(User, related_name='favorite_topics', verbose_name=_("subscribed users"))
-    _last_message = models.ForeignKey('ForumMessage', related_name="+", verbose_name=_("the last message"),
-                                      null=True, on_delete=models.SET_NULL)
-    _title = models.CharField(_('title'), max_length=64, blank=True)
+    forum = models.ForeignKey(Forum, related_name="topics")
+    author = models.ForeignKey(User, related_name="forum_topics")
+    description = models.CharField(_("description"), max_length=256, default="")
+    subscribed_users = models.ManyToManyField(
+        User, related_name="favorite_topics", verbose_name=_("subscribed users")
+    )
+    _last_message = models.ForeignKey(
+        "ForumMessage",
+        related_name="+",
+        verbose_name=_("the last message"),
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+    _title = models.CharField(_("title"), max_length=64, blank=True)
     _message_number = models.IntegerField(_("number of messages"), default=0)
 
     class Meta:
-        ordering = ['-_last_message__date']
+        ordering = ["-_last_message__date"]
 
     def save(self, *args, **kwargs):
         super(ForumTopic, self).save(*args, **kwargs)
@@ -219,11 +263,16 @@ class ForumTopic(models.Model):
         return "%s" % (self.title)
 
     def get_absolute_url(self):
-        return reverse('forum:view_topic', kwargs={'topic_id': self.id})
+        return reverse("forum:view_topic", kwargs={"topic_id": self.id})
 
     def get_first_unread_message(self, user):
         try:
-            msg = self.messages.exclude(readers=user).filter(date__gte=user.forum_infos.last_read_date).order_by('id').first()
+            msg = (
+                self.messages.exclude(readers=user)
+                .filter(date__gte=user.forum_infos.last_read_date)
+                .order_by("id")
+                .first()
+            )
             return msg
         except:
             return None
@@ -241,16 +290,19 @@ class ForumMessage(models.Model):
     """
     "A ForumMessage object represents a message in the forum" -- Cpt. Obvious
     """
-    topic = models.ForeignKey(ForumTopic, related_name='messages')
-    author = models.ForeignKey(User, related_name='forum_messages')
+
+    topic = models.ForeignKey(ForumTopic, related_name="messages")
+    author = models.ForeignKey(User, related_name="forum_messages")
     title = models.CharField(_("title"), default="", max_length=64, blank=True)
     message = models.TextField(_("message"), default="")
-    date = models.DateTimeField(_('date'), default=timezone.now)
-    readers = models.ManyToManyField(User, related_name="read_messages", verbose_name=_("readers"))
-    _deleted = models.BooleanField(_('is deleted'), default=False)
+    date = models.DateTimeField(_("date"), default=timezone.now)
+    readers = models.ManyToManyField(
+        User, related_name="read_messages", verbose_name=_("readers")
+    )
+    _deleted = models.BooleanField(_("is deleted"), default=False)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ["-date"]
 
     def __str__(self):
         return "%s (%s) - %s" % (self.id, self.author, self.title)
@@ -266,32 +318,46 @@ class ForumMessage(models.Model):
         self.topic.save()
 
     def is_first_in_topic(self):
-        return bool(self.id == self.topic.messages.order_by('date').first().id)
+        return bool(self.id == self.topic.messages.order_by("date").first().id)
 
     def is_last_in_topic(self):
-        return bool(self.id == self.topic.messages.order_by('date').last().id)
+        return bool(self.id == self.topic.messages.order_by("date").last().id)
 
     def is_owned_by(self, user):  # Anyone can create a topic: it's better to
-                                  # check the rights at the forum level, since it's more controlled
+        # check the rights at the forum level, since it's more controlled
         return self.topic.forum.is_owned_by(user) or user.id == self.author.id
 
     def can_be_edited_by(self, user):
         return user.can_edit(self.topic.forum)
 
     def can_be_viewed_by(self, user):
-        return not self._deleted  # No need to check the real rights since it's already done by the Topic view
+        return (
+            not self._deleted
+        )  # No need to check the real rights since it's already done by the Topic view
 
     def can_be_moderated_by(self, user):
         return self.topic.forum.is_owned_by(user) or user.id == self.author.id
 
     def get_absolute_url(self):
-        return reverse('forum:view_message', kwargs={'message_id': self.id})
+        return reverse("forum:view_message", kwargs={"message_id": self.id})
 
     def get_url(self):
-        return self.topic.get_absolute_url() + "?page=" + str(self.get_page()) + "#msg_" + str(self.id)
+        return (
+            self.topic.get_absolute_url()
+            + "?page="
+            + str(self.get_page())
+            + "#msg_"
+            + str(self.id)
+        )
 
     def get_page(self):
-        return int(self.topic.messages.filter(id__lt=self.id).count() / settings.SITH_FORUM_PAGE_LENGTH) + 1
+        return (
+            int(
+                self.topic.messages.filter(id__lt=self.id).count()
+                / settings.SITH_FORUM_PAGE_LENGTH
+            )
+            + 1
+        )
 
     def mark_as_read(self, user):
         try:  # Need the try/except because of AnonymousUser
@@ -301,26 +367,28 @@ class ForumMessage(models.Model):
             pass
 
     def is_read(self, user):
-        return (self.date < user.forum_infos.last_read_date) or (user in self.readers.all())
+        return (self.date < user.forum_infos.last_read_date) or (
+            user in self.readers.all()
+        )
 
     def is_deleted(self):
-        meta = self.metas.exclude(action="EDIT").order_by('-date').first()
+        meta = self.metas.exclude(action="EDIT").order_by("-date").first()
         if meta:
             return meta.action == "DELETE"
         return False
 
 
 MESSAGE_META_ACTIONS = [
-    ('EDIT', _("Message edited by")),
-    ('DELETE', _("Message deleted by")),
-    ('UNDELETE', _("Message undeleted by")),
+    ("EDIT", _("Message edited by")),
+    ("DELETE", _("Message deleted by")),
+    ("UNDELETE", _("Message undeleted by")),
 ]
 
 
 class ForumMessageMeta(models.Model):
     user = models.ForeignKey(User, related_name="forum_message_metas")
     message = models.ForeignKey(ForumMessage, related_name="metas")
-    date = models.DateTimeField(_('date'), default=timezone.now)
+    date = models.DateTimeField(_("date"), default=timezone.now)
     action = models.CharField(_("action"), choices=MESSAGE_META_ACTIONS, max_length=16)
 
     def save(self, *args, **kwargs):
@@ -335,9 +403,14 @@ class ForumUserInfo(models.Model):
     However, this can be extended with lot of user preferences dedicated to a
     user, such as the favourite topics, the signature, and so on...
     """
+
     user = models.OneToOneField(User, related_name="_forum_infos")
-    last_read_date = models.DateTimeField(_('last read date'), default=datetime(year=settings.SITH_SCHOOL_START_YEAR,
-                                          month=1, day=1, tzinfo=pytz.UTC))
+    last_read_date = models.DateTimeField(
+        _("last read date"),
+        default=datetime(
+            year=settings.SITH_SCHOOL_START_YEAR, month=1, day=1, tzinfo=pytz.UTC
+        ),
+    )
 
     def __str__(self):
         return str(self.user)

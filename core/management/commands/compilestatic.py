@@ -33,15 +33,13 @@ class Command(BaseCommand):
     """
         Compiles scss in static folder for production
     """
+
     help = "Compile scss files from static folder"
 
     def compile(self, filename):
-        args = {
-            "filename": filename,
-            "include_paths": settings.STATIC_ROOT,
-        }
+        args = {"filename": filename, "include_paths": settings.STATIC_ROOT}
         if settings.SASS_PRECISION:
-            args['precision'] = settings.SASS_PRECISION
+            args["precision"] = settings.SASS_PRECISION
         return sass.compile(**args)
 
     def is_compilable(self, file, ext_list):
@@ -54,7 +52,7 @@ class Command(BaseCommand):
             file = os.path.join(folder, file)
             if os.path.isdir(file):
                 self.exec_on_folder(file, func)
-            elif self.is_compilable(file, ['.scss']):
+            elif self.is_compilable(file, [".scss"]):
                 to_exec.append(file)
 
         for file in to_exec:
@@ -62,7 +60,7 @@ class Command(BaseCommand):
 
     def compilescss(self, file):
         print("compiling %s" % file)
-        with(open(file.replace('.scss', '.css'), "w")) as newfile:
+        with (open(file.replace(".scss", ".css"), "w")) as newfile:
             newfile.write(self.compile(file))
 
     def removescss(self, file):
@@ -77,4 +75,6 @@ class Command(BaseCommand):
             print("---- Removing scss files ----")
             self.exec_on_folder(settings.STATIC_ROOT, self.removescss)
         else:
-            print("No static folder avalaible, please use collectstatic before compiling scss")
+            print(
+                "No static folder avalaible, please use collectstatic before compiling scss"
+            )

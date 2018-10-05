@@ -6,14 +6,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('trombi', '0002_trombi_show_profiles'),
-    ]
+    dependencies = [("trombi", "0002_trombi_show_profiles")]
 
     operations = [
         migrations.AddField(
-            model_name='trombicomment',
-            name='is_moderated',
-            field=models.BooleanField(default=False, verbose_name='is the comment moderated'),
-        ),
+            model_name="trombicomment",
+            name="is_moderated",
+            field=models.BooleanField(
+                default=False, verbose_name="is the comment moderated"
+            ),
+        )
     ]

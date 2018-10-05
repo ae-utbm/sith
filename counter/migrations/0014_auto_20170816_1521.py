@@ -6,14 +6,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('counter', '0013_customer_recorded_products'),
-    ]
+    dependencies = [("counter", "0013_customer_recorded_products")]
 
     operations = [
         migrations.AlterField(
-            model_name='customer',
-            name='recorded_products',
-            field=models.IntegerField(default=0, verbose_name='recorded product'),
-        ),
+            model_name="customer",
+            name="recorded_products",
+            field=models.IntegerField(default=0, verbose_name="recorded product"),
+        )
     ]

@@ -7,14 +7,17 @@ import core.models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('core', '0028_auto_20171216_2044'),
-    ]
+    dependencies = [("core", "0028_auto_20171216_2044")]
 
     operations = [
         migrations.AlterField(
-            model_name='page',
-            name='owner_group',
-            field=models.ForeignKey(verbose_name='owner group', default=core.models.Page.get_default_owner_group, related_name='owned_page', to='core.Group'),
-        ),
+            model_name="page",
+            name="owner_group",
+            field=models.ForeignKey(
+                verbose_name="owner group",
+                default=core.models.Page.get_default_owner_group,
+                related_name="owned_page",
+                to="core.Group",
+            ),
+        )
     ]

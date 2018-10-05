@@ -29,7 +29,12 @@ from haystack.admin import SearchModelAdmin
 
 
 class SubscriptionAdmin(SearchModelAdmin):
-    search_fields = ["member__username", "subscription_start", "subscription_end", "subscription_type"]
+    search_fields = [
+        "member__username",
+        "subscription_start",
+        "subscription_end",
+        "subscription_type",
+    ]
 
 
 admin.site.register(Subscription, SubscriptionAdmin)

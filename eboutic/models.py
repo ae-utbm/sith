@@ -35,14 +35,23 @@ class Basket(models.Model):
     """
     Basket is built when the user connects to an eboutic page
     """
-    user = models.ForeignKey(User, related_name='baskets', verbose_name=_('user'), blank=False)
-    date = models.DateTimeField(_('date'), auto_now=True)
+
+    user = models.ForeignKey(
+        User, related_name="baskets", verbose_name=_("user"), blank=False
+    )
+    date = models.DateTimeField(_("date"), auto_now=True)
 
     def add_product(self, p, q=1):
         item = self.items.filter(product_id=p.id).first()
         if item is None:
-            BasketItem(basket=self, product_id=p.id, product_name=p.name, type_id=p.product_type.id,
-                       quantity=q, product_unit_price=p.selling_price).save()
+            BasketItem(
+                basket=self,
+                product_id=p.id,
+                product_name=p.name,
+                type_id=p.product_type.id,
+                quantity=q,
+                product_unit_price=p.selling_price,
+            ).save()
         else:
             item.quantity += q
             item.save()
@@ -69,8 +78,11 @@ class Invoice(models.Model):
     """
     Invoices are generated once the payment has been validated
     """
-    user = models.ForeignKey(User, related_name='invoices', verbose_name=_('user'), blank=False)
-    date = models.DateTimeField(_('date'), auto_now=True)
+
+    user = models.ForeignKey(
+        User, related_name="invoices", verbose_name=_("user"), blank=False
+    )
+    date = models.DateTimeField(_("date"), auto_now=True)
     validated = models.BooleanField(_("validated"), default=False)
 
     def __str__(self):
@@ -86,9 +98,14 @@ class Invoice(models.Model):
         if self.validated:
             raise DataError(_("Invoice already validated"))
         from counter.models import Customer
+
         if not Customer.objects.filter(user=self.user).exists():
             number = Customer.objects.count() + 1
-            Customer(user=self.user, account_id=Customer.generate_account_id(number), amount=0).save()
+            Customer(
+                user=self.user,
+                account_id=Customer.generate_account_id(number),
+                amount=0,
+            ).save()
         eboutic = Counter.objects.filter(type="EBOUTIC").first()
         for i in self.items.all():
             if i.type_id == settings.SITH_COUNTER_PRODUCTTYPE_REFILLING:
@@ -123,22 +140,28 @@ class Invoice(models.Model):
 
 
 class AbstractBaseItem(models.Model):
-    product_id = models.IntegerField(_('product id'))
-    product_name = models.CharField(_('product name'), max_length=255)
-    type_id = models.IntegerField(_('product type id'))
-    product_unit_price = CurrencyField(_('unit price'))
-    quantity = models.IntegerField(_('quantity'))
+    product_id = models.IntegerField(_("product id"))
+    product_name = models.CharField(_("product name"), max_length=255)
+    type_id = models.IntegerField(_("product type id"))
+    product_unit_price = CurrencyField(_("unit price"))
+    quantity = models.IntegerField(_("quantity"))
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return "Item: %s (%s) x%d" % (self.product_name, self.product_unit_price, self.quantity)
+        return "Item: %s (%s) x%d" % (
+            self.product_name,
+            self.product_unit_price,
+            self.quantity,
+        )
 
 
 class BasketItem(AbstractBaseItem):
-    basket = models.ForeignKey(Basket, related_name='items', verbose_name=_('basket'))
+    basket = models.ForeignKey(Basket, related_name="items", verbose_name=_("basket"))
 
 
 class InvoiceItem(AbstractBaseItem):
-    invoice = models.ForeignKey(Invoice, related_name='items', verbose_name=_('invoice'))
+    invoice = models.ForeignKey(
+        Invoice, related_name="items", verbose_name=_("invoice")
+    )

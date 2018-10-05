@@ -1,4 +1,8 @@
+stages:
+  - test
+
 test:
+  stage: test
   script:
   - apt-get update
   - apt-get install -y gettext
@@ -11,3 +15,9 @@ test:
   artifacts:
     paths:
       - coverage_report/
+
+black:
+  stage: test
+  script:
+    - pip install black
+    - black --check .

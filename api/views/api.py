@@ -30,15 +30,14 @@ from rest_framework.views import APIView
 from core.templatetags.renderer import markdown
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @renderer_classes((StaticHTMLRenderer,))
 def RenderMarkdown(request):
     """
         Render Markdown
     """
     try:
-        data = markdown(request.POST['text'])
+        data = markdown(request.POST["text"])
     except:
-        data = 'Error'
+        data = "Error"
     return Response(data)
-

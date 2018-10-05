@@ -1,5 +1,6 @@
 [![pipeline status](https://ae-dev.utbm.fr/ae/Sith/badges/master/pipeline.svg)](https://ae-dev.utbm.fr/ae/Sith/commits/master)
 [![coverage report](https://ae-dev.utbm.fr/ae/Sith/badges/master/coverage.svg)](https://ae-dev.utbm.fr/ae/Sith/commits/master)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 ## Sith AE
 
