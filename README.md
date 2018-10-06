@@ -17,6 +17,10 @@ To start working on the project, just run the following commands:
 
 To start the simple development server, just run `python3 manage.py runserver`
 
+### Logging errors with sentry
+
+To connect the app to sentry.io, you must set the variable SENTRY_DSN in your settings custom. It's composed of the full link given on your sentry project
+
 ### Generating documentation
 
 There is a Doxyfile at the root of the project, meaning that if you have Doxygen, you can run `doxygen Doxyfile` to

@@ -17,4 +17,5 @@ django-ordered-model
 django-simple-captcha
 python-dateutil
 pygraphviz
+sentry_sdk
 # mysqlclient
