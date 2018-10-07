@@ -6,7 +6,7 @@ $primary-color-text: hsl(0, 0%, 100%);
 $secondary-color-text: hsla(0, 0%, 0%, 0.87);
 
 $primary-light-color: hsl(219.8, 46.4%, 64.9%);
-$primary-dark-color: hsl(203, 70%, 52%);
+$primary-dark-color: hsl(203, 75%, 40%);
 
 $secondary-light-color: hsl(40, 68%, 65%);
 $secondary-dark-color: hsl(40, 68%, 35%);
@@ -365,7 +365,7 @@ header {
 
   #content {
     padding: 1em 1%;
-    box-shadow: $shadow-color 0px 0px 15px;
+    box-shadow: #dfdfdf 0px 5px 10px;
     background: $white-color;
     overflow: auto;
   }
