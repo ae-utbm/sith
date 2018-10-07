@@ -53,7 +53,7 @@
             </div>
             {% else %}
             <div id="header_logo" style="background-image: url('{{
-                static('core/img/logo.png') }}'); width: 92px; height: 50px;">
+                static('core/img/logo.png') }}'); width: 92px; height: 52px;">
                 <a href="{{ url('core:index') }}"></a>
             </div>
             <div id="header_bar">
@@ -62,11 +62,11 @@
                     <li>
                     <a href="{{ url('counter:activity', counter_id=bar.id) }}" style="padding: 0px">
                     {% if bar.is_inactive(): %}
-                        <i class="fa fa-question" style="color: orange"></i>
+                        <i class="fa fa-question" style="color: #f39c12"></i>
                     {% elif bar.is_open(): %}
-                        <i class="fa fa-check" style="color: green"></i>
+                        <i class="fa fa-check" style="color: #2ecc71"></i>
                     {% else %}
-                        <i class="fa fa-times" style="color: red"></i>
+                        <i class="fa fa-times" style="color: #eb2f06"></i>
                     {% endif %}
                         {{ bar }}
                     </a>
@@ -181,7 +181,6 @@
                       >{{ t.name }}</a>
                       {%- endfor %}
                   </div>
-                  <hr>
               </div>
               {% endif %}
 
