@@ -1,42 +1,96 @@
 $first-color: hsl(220, 100%, 50%);
-$second-color: hsl(40, 100%, 50%);
+$second-color: hsl(48, 100%, 67%);
 $primary-color: hsl(219.9, 53.7%, 50%);
-$secondary-color: hsl(40.1, 78.0%, 50%);
+$secondary-color: hsl(204, 64%, 44%);
 $primary-color-text: hsl(0, 0%, 100%);
 $secondary-color-text: hsla(0, 0%, 0%, 0.87);
 
 $primary-light-color: hsl(219.8, 46.4%, 64.9%);
-$primary-dark-color: hsl(219.8, 46.4%, 35.1%);
+$primary-dark-color: hsl(203, 70%, 52%);
 
 $secondary-light-color: hsl(40, 68%, 65%);
 $secondary-dark-color: hsl(40, 68%, 35%);
 
 
 $primary-neutral-color: hsl(219.6, 20.8%, 50%);
-$primary-neutral-light-color: hsl(219.6, 20.8%, 83%);
-$primary-neutral-dark-color: hsl(219.6, 20.8%, 17%);
+$primary-neutral-light-color: hsl(0, 0%, 94%);
+$primary-neutral-dark-color: hsl(210, 29%, 29%);
 
-$secondary-neutral-color: hsl(40, 57.6%, 50%);
-$secondary-neutral-light-color: hsl(40, 57.6%, 83%);
+$secondary-neutral-color: hsl(204, 64%, 44%);
+$secondary-neutral-light-color: hsl(0, 0%, 91%);
 $secondary-neutral-dark-color: hsl(40, 57.6%, 17%);
 
 $white-color: hsl(219.6, 20.8%, 98%);
 $black-color: hsl(40.0, 0%, 17%);
 
-$faceblue: #3B5998;
-$twitblue: #55acee;
+$faceblue: hsl(221, 44%, 41%);
+$twitblue: hsl(206, 82%, 63%);
 
+$shadow-color: rgb(223, 223, 223);
 
+$background-bouton-color: hsl(0, 0%, 90%);
 
 /*--------------------------------GENERAL------------------------------*/
 
 body {
-  background-color: $primary-neutral-light-color;
   position: relative;
   width: 100%;
   font-family: sans-serif;
 }
 
+input[type=button], input[type=submit], input[type=reset],input[type=file] {
+  border: none;
+  text-decoration: none;
+  background-color: $background-bouton-color;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: $shadow-color 0px 0px 1px;
+
+  &:hover {
+    background: hsl(0, 0%, 83%);
+  }
+}
+button{
+  border: none;
+  text-decoration: none;
+  background-color: $background-bouton-color;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  box-shadow: $shadow-color 0px 0px 1px;
+  cursor: pointer;
+  &:hover {
+    background: hsl(0, 0%, 83%);
+  }
+}
+input,textarea[type=text],[type=number]{
+  border: none;
+  text-decoration: none;
+  background-color: $background-bouton-color;
+  padding: 7px;
+  font-size: 16px;
+  border-radius: 5px;
+}
+textarea{
+  border: none;
+  text-decoration: none;
+  background-color: $background-bouton-color;
+  padding: 7px;
+  font-size: 16px;
+  border-radius: 5px;
+}
+select{
+  border: none;
+  text-decoration: none;
+  font-size: 15px;
+  background-color: $background-bouton-color;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
 a {
   text-decoration: none;
   color: $primary-dark-color;
@@ -77,7 +131,7 @@ a {
   input {
     display: block;
     width: 100%;
-    padding: 0px;
+    padding: 4px;
     margin: 0px;
   }
   form {
@@ -91,10 +145,10 @@ header {
   width: 90%;
   margin: 0px auto;
   display: flex;
-  box-shadow: grey 1px 1px 5px;
-  border: solid 1px grey;
+  box-shadow: $shadow-color 0px 0px 15px;
   border-top: none;
   background-color: $primary-neutral-dark-color;
+  border-radius: 0px 0px 10px 10px;
 
   #header_logo {
     display: inline-block;
@@ -102,6 +156,8 @@ header {
     background-size: 100% 100%;
     background-color: $white-color;
     padding: 0.2em;
+    border-radius: 0px 0px 0px 9px;
+
     a {
       display: inline-block;
       margin: 0px;
@@ -129,10 +185,11 @@ header {
     display: flex;
     flex: auto;
     width: 80%;
-
+    
     a {
       text-decoration: none;
       margin: 0em 1em;
+      font-weight: bold;
       color: $white-color;
       &:hover {
         color: $secondary-color;
@@ -199,7 +256,7 @@ header {
         li {
           padding: 0.2em;
           &:hover {
-            background: #bcc;
+            background: hsl(180, 14%, 77%);
           }
         }
         li:last-child {
@@ -228,10 +285,10 @@ header {
   margin: 1em auto;
   p {
     margin: 0px;
-    padding: 0px;
+    padding: 7px;
   }
   #alert_box, #info_box {
-    font-size: smaller;
+    font-size: 14px;
     display: inline-block;
     flex: auto;
     padding: 2px;
@@ -239,28 +296,23 @@ header {
     min-width: 10%;
     max-width: 46%;
     min-height: 20px;
-    box-shadow: grey 1px 1px 5px;
     &:before {
       float: left;
       margin: 0.2em;
-      margin-right: 0.5em;
-    }
-    .markdown {
-      margin-top: 0.5em;
     }
   }
   #info_box {
-    border: solid 1px grey;
-    background: $white-color;
+    border-radius: 10px;
+    background: $primary-neutral-light-color;
     &:before {
       font-family: FontAwesome;
       font-size: 4em;
       content: "\f05a";
-      color: darkblue;
+      color: hsl(210, 100%, 56%);
     }
   }
   #alert_box {
-    border: solid 1px grey;
+    border-radius: 10px;
     background: $second-color;
     &:before {
       font-family: FontAwesome;
@@ -273,17 +325,17 @@ header {
 
 
 #page {
-  box-shadow: grey 1px 1px 5px;
   width: 90%;
   margin: 0em auto;
-  border: solid 1px grey;
-
 /*---------------------------------NAV---------------------------------*/
   nav {
     display: flex;
     flex-wrap: wrap;
     background-color: $primary-dark-color;
     color: $white-color;
+    border-radius: 10px 10px 0px 0px;
+    box-shadow: $shadow-color 0px 0px 15px;
+
     a {
       flex: auto;
       text-align: center;
@@ -313,6 +365,7 @@ header {
 
   #content {
     padding: 1em 1%;
+    box-shadow: $shadow-color 0px 0px 15px;
     background: $white-color;
     overflow: auto;
   }
@@ -324,23 +377,27 @@ header {
       display: flex;
       flex-wrap: wrap;
       float: right;
-      background: $white-color;
-      border: 1px solid $black-color;
+      background: $primary-neutral-light-color;
+      padding: 5px;
+      border-radius: 10px;
       text-align: center;
       a {
         padding: 10px;
         display: inline-block;
         color: $black-color;
+        font-weight: bold;
         flex: 1;
         flex-wrap: nowrap;
         white-space: nowrap;
         &.selected_tab {
-          background: $second-color;
-          color: $black-color;
+          background: $primary-color;
+          color: $white-color;
+          border-radius: 10px;
         }
         &:hover {
           background: $primary-color;
           color: $white-color;
+          border-radius: 10px;
         }
       }
     }
@@ -364,12 +421,11 @@ header {
       width: 79%;
       h3 {
         background: $second-color;
-        box-shadow: grey 2px 2px 2px;
+        box-shadow: $shadow-color 1px 1px 1px;
         padding: 0.4em;
         margin: 0em 0em 0.5em 0em;
         text-transform: uppercase;
         font-size: 1.1em;
-        border: solid 1px grey;
         &:not(:first-of-type) {
           margin: 2em 0em 1em 0em;
         }
@@ -381,22 +437,22 @@ header {
       display: block;
       width: 100%;
       background: white;
-      box-shadow: grey 2px 2px 2px;
       font-size: 70%;
-      border: solid 1px grey;
       margin-bottom: 1em;
       #agenda_title,#birthdays_title {
         margin: 0em;
+        border-radius: 10px 10px 0px 0px;
+        box-shadow: $shadow-color 1px 1px 1px;
         padding: 0.5em;
         font-weight: bold;
         font-size: 150%;
         text-align: center;
         text-transform: uppercase;
-        border-bottom: solid 1px grey;
         background: $second-color;
       }
       #agenda_content {
         overflow: auto;
+        box-shadow: $shadow-color 1px 1px 1px;
         height: 20em;
       }
       #agenda_content,#birthdays_content {
@@ -440,21 +496,22 @@ header {
 
 /* EVENTS TODAY AND NEXT FEW DAYS */
     .news_events_group {
-      border: solid 1px grey;
-      box-shadow: grey 2px 2px 2px;
+      box-shadow: $shadow-color 1px 1px 1px;
       margin-left: 1em;
       margin-bottom: 0.5em;
       .news_events_group_date {
         display: table-cell;
         padding: 0.6em;
         vertical-align: middle;
-        background: $primary-dark-color;
+        background: $primary-neutral-dark-color;
         color: $white-color;
         text-transform: uppercase;
         text-align: center;
         font-weight: bold;
         font-family: monospace;
         font-size: 1.4em;
+        border-radius: 10px 0px 0px 10px;
+
         div {
           margin: 0px auto;
           .day {
@@ -465,7 +522,6 @@ header {
       .news_events_group_items {
         display: table-cell;
         width: 100%;
-        border-left: solid 1px grey;
         .news_event:nth-of-type(odd) {
           background: white;
         }
@@ -541,9 +597,9 @@ header {
       margin: 0em 0em 1em 1em;
       padding: 0.4em;
       padding-left: 1em;
-      background: lightgrey;
-      border: 1px solid grey;
-      box-shadow: grey 2px 2px 2px;
+      background: $secondary-neutral-light-color;
+      box-shadow: $shadow-color 0px 0px 2px;
+      border-radius: 18px 5px 18px 5px;
       h4 {
         margin: 0em;
       }
@@ -560,7 +616,7 @@ header {
       padding-left: 1em;
       background: $secondary-neutral-light-color;
       border: 1px solid grey;
-      box-shadow: grey 2px 2px 2px;
+      box-shadow: $shadow-color 1px 1px 1px;
       h4 {
         margin: 0em;
       }
@@ -584,6 +640,7 @@ header {
 
 #news_details {
   display: inline-block;
+  margin-top: 20px;
   padding: 0.4em;
   width: 80%;
   background: $white-color;
@@ -596,15 +653,14 @@ header {
     text-align: center;
     width: 19%;
     float: left;
-    min-width: 10em;
+    min-width: 15em;
     margin: 0em;
-    margin-right: 0.5em;
-    margin-top: 0.5em;
     img {
       max-height: 15em;
       max-width: 12em;
       display: block;
       margin: 0em auto;
+      margin-bottom: 10px;
     }
   }
   .share_button {
@@ -639,6 +695,7 @@ header {
 }
 
 .helptext {
+    margin-top: 10px;
     display: block;
 }
 
@@ -672,14 +729,14 @@ header {
                 padding-right: 20px;
                 margin-left: 5px;
                 border-radius: 20px;
-                background-color: #ffaa00;
+                background-color: hsl(40, 100%, 50%);
                 color: black;
                 &:hover{
                     color: black;
-                    background-color: #c99836;
+                    background-color: hsl(40, 58%, 50%);
                 }
                 &.delete{
-                    background-color: #cb0000;
+                    background-color: hsl(0, 100%, 40%);
                 }
             }
         }
@@ -764,11 +821,11 @@ header {
             .edit, .moderate, .slideshow{
                 padding: 5px;
                 border-radius: 20px;
-                background-color: #ffaa00;
+                background-color: hsl(40, 100%, 50%);
                 color: black;
                 &:hover{
                     color: black;
-                    background-color: #c99836;
+                    background-color: hsl(40, 58%, 50%);
                 }
                 &:nth-child(2n){
                     margin-top: 5px;
@@ -778,8 +835,8 @@ header {
             .tooltip{
                 visibility: hidden;
                 width: 120px;
-                background-color: #f9fafb;
-                color: #000;
+                background-color: hsl(210, 20%, 98%);
+                color: hsl(0, 0%, 0%);
                 text-align: center;
                 padding: 5px 0;
                 border-radius: 6px;
@@ -1006,6 +1063,7 @@ u, .underline {
   background: $primary-neutral-light-color;
   float: right;
   padding: 10px;
+  border-radius: 10px;
 }
 
 #products {
@@ -1177,8 +1235,8 @@ u, .underline {
 #pict {
   display: inline-block;
   width: 80%;
-  background: #333;
-  border: solid #333 2px;
+  background: hsl(0, 0%, 20%);
+  border: solid hsl(0, 0%, 20%) 2px;
 }
 /*--------------------------------MATMAT-------------------------------*/
 .matmat_results {
@@ -1191,7 +1249,7 @@ u, .underline {
         height: 18em;
         overflow: hidden;
         border: 1px solid black;
-        box-shadow: 2px 2px 5px grey;
+        box-shadow: $shadow-color 1px 1px 1px;
         &:hover {
             box-shadow: 1px 1px 5px $second-color;
         }
@@ -1231,11 +1289,12 @@ textarea {
 
 #forum {
   .button {
-    background-color: $primary-neutral-light-color;
-    border: outset $primary-neutral-dark-color 2px;
-    padding: 4px;
+    background-color: rgb(230, 230, 230);
+    padding: 10px;
+    font-weight: bold;
+    border-radius: 5px;
     &:hover {
-      border: inset $primary-neutral-dark-color 2px;
+      background-color: rgb(211, 211, 211);
     }
   }
   .topic {
@@ -1257,6 +1316,7 @@ textarea {
   .tools {
     font-size: x-small;
     border: none;
+    font-weight: bold;
     a {
       padding: 1px;
     }
@@ -1299,6 +1359,8 @@ textarea {
   .category {
     margin-top: 5px;
     background: $secondary-color;
+    color: white;
+    border-radius: 10px 10px 0px 0px;
     .title {
       text-transform: uppercase;
     }
@@ -1307,7 +1369,7 @@ textarea {
   .message {
     padding: 1px;
     margin: 1px;
-    background: $white-color;
+    background: $secondary-neutral-light-color;
     &:nth-child(odd) {
       background: $primary-neutral-light-color;
     }
@@ -1336,7 +1398,6 @@ textarea {
     display: inline-block;
     width: 19%;
     text-align: center;
-    background: $primary-light-color;
     img {
       max-width: 70%;
       margin: 0px auto;
@@ -1359,10 +1420,10 @@ textarea {
   }
 
   .forum_signature {
-    color: #C0C0C0;
-    border-top: 1px solid #C0C0C0;
+    color: hsl(0, 0%, 75%);
+    border-top: 1px solid hsl(0, 0%, 75%);
     a {
-      color: #C0C0C0;
+      color: hsl(0, 0%, 75%);
       &:hover {
         text-decoration: underline;
       }
@@ -1379,7 +1440,7 @@ textarea {
   padding: 5px;
   width: 200px;
   height: 140px;
-  background: #eee;
+  background: hsl(0, 0%, 93%);
   box-shadow: black 2px 2px 10px;
   margin: 10px;
   vertical-align: top;
@@ -1394,7 +1455,7 @@ textarea {
   width: 150px;
   height: 100px;
   margin: 5px;
-  background: #eee;
+  background: #eeeeee;
   box-shadow: grey 2px 2px 5px;
   padding: 2px;
   vertical-align: middle;
@@ -1417,22 +1478,23 @@ footer {
   width: 90%;
   margin: 2em auto;
 
-  font-size: 80%;
+  font-size: 90%;
   text-align: center;
   vertical-align: middle;
   div {
     margin: 0.6em 0em;
     color: $white-color;
+    border-radius: 5px;
     display: flex;
     background-color: $primary-neutral-dark-color;
-    box-shadow: grey 1px 1px 5px;
-    border: solid 1px grey;
+    box-shadow: $shadow-color 0px 0px 15px;
     a {
       padding: 0.8em;
       flex: 1;
+      font-weight: bold;
       color: $white-color;
       &:hover {
-        color: $secondary-color;
+        color: $primary-dark-color;
       }
     }
   }
@@ -1442,11 +1504,13 @@ footer {
 
 form {
   margin: 0px auto;
+  margin-bottom: 10px;
   width: 60%;
 }
 
 label {
   display: block;
+  margin-bottom: 8px;
 }
 
 .choose_file_widget {
@@ -1492,8 +1556,6 @@ label {
     font-size: 1.2em;
   }
   button {
-    width: 100%;
-    height: 100%;
     vertical-align: middle;
   }
 }
