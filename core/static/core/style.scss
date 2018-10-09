@@ -21,7 +21,7 @@ $secondary-neutral-light-color: hsl(0, 0%, 91%);
 $secondary-neutral-dark-color: hsl(40, 57.6%, 17%);
 
 $white-color: hsl(219.6, 20.8%, 98%);
-$black-color: hsl(40.0, 0%, 17%);
+$black-color: hsl(0, 0%, 17%);
 
 $faceblue: hsl(221, 44%, 41%);
 $twitblue: hsl(206, 82%, 63%);
@@ -372,7 +372,7 @@ header {
 
   #content {
     padding: 1em 1%;
-    box-shadow: #dfdfdf 0px 5px 10px;
+    box-shadow: $shadow-color 0px 5px 10px;
     background: $white-color;
     overflow: auto;
   }
@@ -391,7 +391,7 @@ header {
       a {
         padding: 7px;
         display: inline-block;
-        color: #2b2b2b;
+        color: $black-color;
         font-weight: bold;
         margin: 2px;
         flex: 1;
