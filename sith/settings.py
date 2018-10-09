@@ -39,6 +39,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 import sys
 import binascii
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -553,6 +555,8 @@ SITH_MAILING_FETCH_KEY = "IloveMails"
 
 SITH_GIFT_LIST = [("AE Tee-shirt", _("AE tee-shirt"))]
 
+SENTRY_DSN = ""
+
 try:
     from .settings_custom import *
 
@@ -583,3 +587,7 @@ if DEBUG:
 
 if "test" in sys.argv:
     CAPTCHA_TEST_MODE = True
+
+if SENTRY_DSN:
+    # Connection to sentry
+    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()])
