@@ -48,6 +48,7 @@ js_info_dict = {"packages": ("sith",)}
 
 handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
+handler500 = "core.views.internal_servor_error"
 
 urlpatterns = [
     url(r"^", include("core.urls", namespace="core", app_name="core")),
