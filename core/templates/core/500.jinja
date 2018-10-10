@@ -1,12 +1,16 @@
 {% extends "core/base.jinja" %}
 {% block head %}
 {{ super() }}
-	<script src="https://browser.sentry-cdn.com/4.0.6/bundle.min.js" crossorigin="anonymous"></script>
+	{% if settings.EXTERNAL_RES %}
+		<script src="https://browser.sentry-cdn.com/4.0.6/bundle.min.js" crossorigin="anonymous"></script>
+	{% else %}
+		<script src="{{ static('core/js/sentry/bundle.min.js') }}" crossorigin="anonymous"></script>
+	{% endif %}
 {% endblock head %}
 
 {% block content %}
 	<h3>{% trans %}500, Server Error{% endtrans %}</h3>
-	{% if request.sentry_dsn %}
+	{% if settings.SENTRY_DSN %}
 	<script>
 		Sentry.init({ dsn: '{{ request.sentry_dsn }}' });
 		Sentry.showReportDialog({ eventId: '{{ request.sentry_last_event_id() }}' })

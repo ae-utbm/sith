@@ -72,7 +72,6 @@ def not_found(request):
 
 
 def internal_servor_error(request):
-    request.sentry_dsn = settings.SENTRY_DSN
     request.sentry_last_event_id = last_event_id
     return HttpResponseServerError(render(request, "core/500.jinja"))
 
