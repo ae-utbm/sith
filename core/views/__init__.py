@@ -24,8 +24,14 @@
 
 import types
 
+from sentry_sdk import last_event_id
 from django.shortcuts import render
-from django.http import HttpResponseForbidden, HttpResponseNotFound
+from django.http import (
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseServerError,
+)
+from django.template import RequestContext
 from django.core.exceptions import (
     PermissionDenied,
     ObjectDoesNotExist,
@@ -63,6 +69,12 @@ def forbidden(request):
 
 def not_found(request):
     return HttpResponseNotFound(render(request, "core/404.jinja"))
+
+
+def internal_servor_error(request):
+    request.sentry_dsn = settings.SENTRY_DSN
+    request.sentry_last_event_id = last_event_id
+    return HttpResponseServerError(render(request, "core/500.jinja"))
 
 
 def can_edit_prop(obj, user):
