@@ -6,7 +6,7 @@ $primary-color-text: hsl(0, 0%, 100%);
 $secondary-color-text: hsla(0, 0%, 0%, 0.87);
 
 $primary-light-color: hsl(219.8, 46.4%, 64.9%);
-$primary-dark-color: hsl(203, 70%, 52%);
+$primary-dark-color: hsl(203, 75%, 40%);
 
 $secondary-light-color: hsl(40, 68%, 65%);
 $secondary-dark-color: hsl(40, 68%, 35%);
@@ -21,7 +21,7 @@ $secondary-neutral-light-color: hsl(0, 0%, 91%);
 $secondary-neutral-dark-color: hsl(40, 57.6%, 17%);
 
 $white-color: hsl(219.6, 20.8%, 98%);
-$black-color: hsl(40.0, 0%, 17%);
+$black-color: hsl(0, 0%, 17%);
 
 $faceblue: hsl(221, 44%, 41%);
 $twitblue: hsl(206, 82%, 63%);
@@ -333,7 +333,7 @@ header {
     flex-wrap: wrap;
     background-color: $primary-dark-color;
     color: $white-color;
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 6px 6px 0px 0px;
     box-shadow: $shadow-color 0px 0px 15px;
 
     a {
@@ -344,9 +344,16 @@ header {
       font-style: normal;
       font-weight: bolder;
       text-decoration: none;
+      
       &:hover {
         background: $secondary-neutral-color;
         color: $white-color;
+        &:first-of-type {
+          border-radius: 6px 0px 0px 0px;
+        }
+        &:last-of-type {
+          border-radius: 0px 6px 0px 0px;
+        }
       }
     }
   }
@@ -365,7 +372,7 @@ header {
 
   #content {
     padding: 1em 1%;
-    box-shadow: $shadow-color 0px 0px 15px;
+    box-shadow: $shadow-color 0px 5px 10px;
     background: $white-color;
     overflow: auto;
   }
@@ -379,25 +386,26 @@ header {
       float: right;
       background: $primary-neutral-light-color;
       padding: 5px;
-      border-radius: 10px;
+      border-radius: 6px;
       text-align: center;
       a {
-        padding: 10px;
+        padding: 7px;
         display: inline-block;
         color: $black-color;
         font-weight: bold;
+        margin: 2px;
         flex: 1;
         flex-wrap: nowrap;
         white-space: nowrap;
         &.selected_tab {
           background: $primary-color;
           color: $white-color;
-          border-radius: 10px;
+          border-radius: 6px;
         }
         &:hover {
           background: $primary-color;
           color: $white-color;
-          border-radius: 10px;
+          border-radius: 6px;
         }
       }
     }
@@ -441,7 +449,7 @@ header {
       margin-bottom: 1em;
       #agenda_title,#birthdays_title {
         margin: 0em;
-        border-radius: 10px 10px 0px 0px;
+        border-radius: 5px 5px 0px 0px;
         box-shadow: $shadow-color 1px 1px 1px;
         padding: 0.5em;
         font-weight: bold;
@@ -510,7 +518,7 @@ header {
         font-weight: bold;
         font-family: monospace;
         font-size: 1.4em;
-        border-radius: 10px 0px 0px 10px;
+        border-radius: 7px 0px 0px 7px;
 
         div {
           margin: 0px auto;
