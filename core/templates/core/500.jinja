@@ -12,7 +12,7 @@
 	<h3>{% trans %}500, Server Error{% endtrans %}</h3>
 	{% if settings.SENTRY_DSN %}
 	<script>
-		Sentry.init({ dsn: '{{ request.sentry_dsn }}' });
+		Sentry.init({ dsn: '{{ settings.SENTRY_DSN }}' });
 		Sentry.showReportDialog({ eventId: '{{ request.sentry_last_event_id() }}' })
 	</script>
 {% endif %}
