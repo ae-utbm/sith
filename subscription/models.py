@@ -25,6 +25,7 @@
 from datetime import date, timedelta
 from django.db import models
 from django.utils import timezone
+from ast import literal_eval as make_tuple
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -70,6 +71,10 @@ class Subscription(models.Model):
         max_length=20,
         verbose_name=_("location"),
     )
+
+    def get_payment_method_display(self):
+
+        return _(make_tuple(self.payment_method)[1])
 
     class Meta:
         ordering = ["subscription_start"]

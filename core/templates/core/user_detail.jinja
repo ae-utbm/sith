@@ -119,6 +119,26 @@
         <div>
             {{ user_subscription(profile) }}
         </div>
+        <br>
+        <div id="drop_subscriptions">
+            <h5>{% trans %}Subscription history{% endtrans %}</h5>
+            <table>
+                <tr>
+                    <th>{% trans %}Subscription start{% endtrans %}</th>
+                    <th>{% trans %}Subscription end{% endtrans %}</th>
+                    <th>{% trans %}Subscription type{% endtrans %}</th>
+                    <th>{% trans %}Payment method{% endtrans %}</th>
+                </tr>
+            {% for sub in profile.subscriptions.all() %}
+                <tr>
+                    <td>{{ sub.subscription_start }}</td>
+                    <td>{{ sub.subscription_end }}</td>
+                    <td>{{ sub.subscription_type }}</td>
+                    <td>{{ sub.get_payment_method_display() }}</td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
         {% endif %}
         {% if user == profile or user.is_root or user.is_board_member or user.is_launderette_manager %}
         <div>
@@ -195,6 +215,13 @@ $(function(){
 });
 $(function(){
     $("#drop_gifts").accordion({
+        heightStyle: "content",
+        collapsible: true,
+        active: false
+    });
+});
+$(function(){
+    $("#drop_subscriptions").accordion({
         heightStyle: "content",
         collapsible: true,
         active: false

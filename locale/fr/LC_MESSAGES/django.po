@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-10 02:17+0200\n"
+"POT-Creation-Date: 2018-10-16 00:13+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -142,7 +142,7 @@ msgid "comment"
 msgstr "commentaire"
 
 #: accounting/models.py:272 counter/models.py:353 counter/models.py:446
-#: subscription/models.py:64
+#: subscription/models.py:65
 msgid "payment method"
 msgstr "méthode de paiement"
 
@@ -365,7 +365,7 @@ msgstr "Compte en banque : "
 #: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:93
 #: core/templates/core/macros.jinja:112 core/templates/core/page_prop.jinja:14
 #: core/templates/core/user_account_detail.jinja:38
-#: core/templates/core/user_detail.jinja:157
+#: core/templates/core/user_detail.jinja:177
 #: core/templates/core/user_edit.jinja:19
 #: counter/templates/counter/last_ops.jinja:29
 #: counter/templates/counter/last_ops.jinja:59
@@ -1138,6 +1138,7 @@ msgstr "Total"
 #: club/templates/club/club_sellings.jinja:27
 #: core/templates/core/user_account_detail.jinja:23
 #: core/templates/core/user_account_detail.jinja:54
+#: core/templates/core/user_detail.jinja:130
 #: counter/templates/counter/last_ops.jinja:18
 #: counter/templates/counter/last_ops.jinja:45
 #: counter/templates/counter/refilling_list.jinja:14
@@ -2282,7 +2283,7 @@ msgstr "403, Non autorisé"
 msgid "404, Not Found"
 msgstr "404. Non trouvé"
 
-#: core/templates/core/500.jinja:8
+#: core/templates/core/500.jinja:12
 msgid "500, Server Error"
 msgstr "500, Erreur Serveur"
 
@@ -2986,25 +2987,42 @@ msgstr "Avatar"
 msgid "Scrub"
 msgstr "Blouse"
 
-#: core/templates/core/user_detail.jinja:133
+#: core/templates/core/user_detail.jinja:124
+msgid "Subscription history"
+msgstr "Historique de cotisation"
+
+#: core/templates/core/user_detail.jinja:127
+msgid "Subscription start"
+msgstr "Début de la cotisation"
+
+#: core/templates/core/user_detail.jinja:128
+msgid "Subscription end"
+msgstr "Fin de la cotisation"
+
+#: core/templates/core/user_detail.jinja:129
+#: subscription/templates/subscription/stats.jinja:36
+msgid "Subscription type"
+msgstr "Type de cotisation"
+
+#: core/templates/core/user_detail.jinja:153
 msgid "Not subscribed"
 msgstr "Non cotisant"
 
-#: core/templates/core/user_detail.jinja:135
+#: core/templates/core/user_detail.jinja:155
 #: subscription/templates/subscription/subscription.jinja:4
 #: subscription/templates/subscription/subscription.jinja:8
 msgid "New subscription"
 msgstr "Nouvelle cotisation"
 
-#: core/templates/core/user_detail.jinja:148
+#: core/templates/core/user_detail.jinja:168
 msgid "Give gift"
 msgstr "Donner cadeau"
 
-#: core/templates/core/user_detail.jinja:153
+#: core/templates/core/user_detail.jinja:173
 msgid "Last given gift :"
 msgstr "Dernier cadeau donné :"
 
-#: core/templates/core/user_detail.jinja:163
+#: core/templates/core/user_detail.jinja:183
 msgid "No gift given yet"
 msgstr "Aucun cadeau donné pour l'instant"
 
@@ -5044,35 +5062,35 @@ msgstr " demandé"
 msgid "%(effective_quantity)s left"
 msgstr "%(effective_quantity)s restant"
 
-#: subscription/models.py:44
+#: subscription/models.py:45
 msgid "Bad subscription type"
 msgstr "Mauvais type de cotisation"
 
-#: subscription/models.py:49
+#: subscription/models.py:50
 msgid "Bad payment method"
 msgstr "Mauvais type de paiement"
 
-#: subscription/models.py:55
+#: subscription/models.py:56
 msgid "subscription type"
 msgstr "type d'inscription"
 
-#: subscription/models.py:61
+#: subscription/models.py:62
 msgid "subscription start"
 msgstr "début de la cotisation"
 
-#: subscription/models.py:62
+#: subscription/models.py:63
 msgid "subscription end"
 msgstr "fin de la cotisation"
 
-#: subscription/models.py:71
+#: subscription/models.py:72
 msgid "location"
 msgstr "lieu"
 
-#: subscription/models.py:91
+#: subscription/models.py:96
 msgid "You can not subscribe many time for the same period"
 msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 
-#: subscription/models.py:96
+#: subscription/models.py:101
 msgid "Subscription error"
 msgstr "Erreur de cotisation"
 
@@ -5083,10 +5101,6 @@ msgstr "Cotisations totales"
 #: subscription/templates/subscription/stats.jinja:26
 msgid "Subscriptions by type"
 msgstr "Cotisations par type"
-
-#: subscription/templates/subscription/stats.jinja:36
-msgid "Subscription type"
-msgstr "Type de cotisation"
 
 #: subscription/templates/subscription/subscription.jinja:22
 msgid "Eboutic is reserved to specific users. In doubt, don't use it."
