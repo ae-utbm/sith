@@ -35,6 +35,7 @@ import random
 from subscription.models import Subscription
 from core.views.forms import SelectDateTime
 from core.models import User
+from core.views.forms import SelectDate
 
 
 class SelectionDateForm(forms.Form):
@@ -71,6 +72,7 @@ class SubscriptionForm(forms.ModelForm):
             max_length=User._meta.get_field("first_name").max_length
         )
         self.fields["email"] = forms.EmailField()
+        self.fields["date_of_birth"] = forms.DateTimeField(widget=SelectDate)
         self.fields.move_to_end("subscription_type")
         self.fields.move_to_end("payment_method")
         self.fields.move_to_end("location")
@@ -88,6 +90,7 @@ class SubscriptionForm(forms.ModelForm):
             and "last_name" not in self.errors.as_data()
             and "first_name" not in self.errors.as_data()
             and "email" not in self.errors.as_data()
+            and "date_of_birth" not in self.errors.as_data()
         ):
             self.errors.pop("member", None)
             if self.errors:
@@ -102,6 +105,7 @@ class SubscriptionForm(forms.ModelForm):
                     last_name=self.cleaned_data.get("last_name"),
                     first_name=self.cleaned_data.get("first_name"),
                     email=self.cleaned_data.get("email"),
+                    date_of_birth=self.cleaned_data.get("date_of_birth"),
                 )
                 u.generate_username()
                 u.set_password(str(random.randrange(1000000, 10000000)))
@@ -111,6 +115,7 @@ class SubscriptionForm(forms.ModelForm):
             self.errors.pop("last_name", None)
             self.errors.pop("first_name", None)
             self.errors.pop("email", None)
+            self.errors.pop("date_of_birth", None)
         if cleaned_data.get("member") is None:
             # This should be handled here, but it is done in the Subscription model's clean method
             # TODO investigate why!
