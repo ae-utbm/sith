@@ -119,7 +119,25 @@
         <div>
             {{ user_subscription(profile) }}
         </div>
-        <br>
+        {% endif %}
+        {% if user == profile or user.is_root or user.is_board_member or user.is_launderette_manager %}
+        <div>
+            {# Shows tokens bought by the user #}
+            {{ show_tokens(profile) }}
+            {# Shows slots took by the user #}
+            {{ show_slots(profile) }}
+        </div>
+        {% endif %}
+    {% else %}
+        <div>
+        {% trans %}Not subscribed{% endtrans %}
+        {% if user.is_board_member %}
+            <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>
+            {% endif %}
+        {% endif %}
+        </div>
+    {% endif %}
+    {% if profile.was_subscribed and (user == profile or user.is_root or user.is_board_member)%}
         <div id="drop_subscriptions">
             <h5>{% trans %}Subscription history{% endtrans %}</h5>
             <table>
@@ -138,23 +156,6 @@
                 </tr>
             {% endfor %}
             </table>
-        </div>
-        {% endif %}
-        {% if user == profile or user.is_root or user.is_board_member or user.is_launderette_manager %}
-        <div>
-            {# Shows tokens bought by the user #}
-            {{ show_tokens(profile) }}
-            {# Shows slots took by the user #}
-            {{ show_slots(profile) }}
-        </div>
-        {% endif %}
-    {% else %}
-        <div>
-        {% trans %}Not subscribed{% endtrans %}
-        {% if user.is_board_member %}
-            <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>
-            {% endif %}
-        {% endif %}
         </div>
     {% endif %}
 
