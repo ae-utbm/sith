@@ -389,7 +389,7 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=root.pk).first(),
                 subscription_type=default_subscription,
-                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -401,7 +401,7 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=skia.pk).first(),
                 subscription_type=default_subscription,
-                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -413,7 +413,7 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=counter.pk).first(),
                 subscription_type=default_subscription,
-                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -425,7 +425,7 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=comptable.pk).first(),
                 subscription_type=default_subscription,
-                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -437,7 +437,7 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=r.pk).first(),
                 subscription_type=default_subscription,
-                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -449,7 +449,7 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=subscriber.pk).first(),
                 subscription_type=default_subscription,
-                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -461,7 +461,7 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=old_subscriber.pk).first(),
                 subscription_type=default_subscription,
-                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start(datetime(year=2012, month=9, day=4))
             s.subscription_end = s.compute_end(
@@ -841,7 +841,7 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=sli.pk).first(),
                 subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
@@ -853,7 +853,7 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=krophil.pk).first(),
                 subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
-                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
             s.subscription_end = s.compute_end(
