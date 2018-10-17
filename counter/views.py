@@ -57,6 +57,7 @@ from subscription.models import Subscription
 from counter.models import (
     Counter,
     Customer,
+    StudentCard,
     Product,
     Selling,
     Refilling,
@@ -121,9 +122,14 @@ class GetUserForm(forms.Form):
         cleaned_data = super(GetUserForm, self).clean()
         cus = None
         if cleaned_data["code"] != "":
-            cus = Customer.objects.filter(
-                account_id__iexact=cleaned_data["code"]
-            ).first()
+            if len(cleaned_data["code"]) == StudentCard.UID_SIZE:
+                card = StudentCard.objects.filter(uid=cleaned_data["code"])
+                if card.exists():
+                    cus = card.first().customer
+            if cus is None:
+                cus = Customer.objects.filter(
+                    account_id__iexact=cleaned_data["code"]
+                ).first()
         elif cleaned_data["id"] is not None:
             cus = Customer.objects.filter(user=cleaned_data["id"]).first()
         if cus is None or not cus.can_buy:

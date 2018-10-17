@@ -732,3 +732,23 @@ class Eticket(models.Model):
         return hmac.new(
             bytes(self.secret, "utf-8"), bytes(string, "utf-8"), hashlib.sha1
         ).hexdigest()
+
+
+class StudentCard(models.Model):
+    """
+    Alternative way to connect a customer into a counter
+    We are using Mifare DESFire EV1 specs since it's used for izly cards
+    https://www.nxp.com/docs/en/application-note/AN10927.pdf
+    UID is 7 byte long that means 14 hexa characters
+    """
+
+    UID_SIZE = 14
+
+    uid = models.CharField(_("uid"), max_length=14, unique=True)
+    customer = models.ForeignKey(
+        Customer,
+        related_name="student_cards",
+        verbose_name=_("student cards"),
+        null=False,
+        blank=False,
+    )
