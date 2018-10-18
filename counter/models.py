@@ -27,8 +27,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.core.validators import MinLengthValidator
 from django.forms import ValidationError
 from django.utils.functional import cached_property
+from django.core.exceptions import PermissionDenied
 
 from datetime import timedelta, date
 import random
@@ -84,6 +86,29 @@ class Customer(models.Model):
         while Customer.objects.filter(account_id=number + letter).exists():
             letter = random.choice(string.ascii_lowercase)
         return number + letter
+
+    def add_student_card(self, uid, request, counter=None):
+        """
+        Add a new student card on the customer account
+        """
+        # If you are comming from a counter, only your connection to the counter is checked, not your right on the user to avoid wierd conflicts
+        if counter != None and (
+            counter.type != "BAR"
+            or not (
+                "counter_token" in request.session.keys()
+                and request.session["counter_token"] == counter.token
+            )
+            or len(counter.get_barmen_list()) < 1
+        ):
+            raise PermissionDenied
+        # If you are not comming from a counter, your permissions are checked
+        if not (
+            request.user.id == self.user.id
+            or request.user.is_board_member
+            or request.user.is_root
+        ):
+            raise PermissionDenied
+        StudentCard(customer=self, uid=uid).save()
 
     def save(self, allow_negative=False, is_selling=False, *args, **kwargs):
         """
@@ -744,7 +769,9 @@ class StudentCard(models.Model):
 
     UID_SIZE = 14
 
-    uid = models.CharField(_("uid"), max_length=14, unique=True)
+    uid = models.CharField(
+        _("uid"), max_length=14, unique=True, validators=[MinLengthValidator(4)]
+    )
     customer = models.ForeignKey(
         Customer,
         related_name="student_cards",

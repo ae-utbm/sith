@@ -380,6 +380,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session["too_young"] = False
         request.session["not_allowed"] = False
         request.session["no_age"] = False
+        request.session["not_valid_student_card_uid"] = False
         if self.object.type != "BAR":
             self.operator = request.user
         elif self.is_barman_price():
@@ -389,6 +390,8 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
         if "add_product" in request.POST["action"]:
             self.add_product(request)
+        elif "add_student_card" in request.POST["action"]:
+            self.add_student_card(request)
         elif "del_product" in request.POST["action"]:
             self.del_product(request)
         elif "refill" in request.POST["action"]:
@@ -525,6 +528,19 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session.modified = True
         return True
 
+    def add_student_card(self, request):
+        """
+        Add a new student card on the customer account
+        """
+        uid = request.POST["student_card_uid"]
+        uid = str(uid)
+        if len(uid) != StudentCard.UID_SIZE:
+            request.session["not_valid_student_card_uid"] = True
+            return False
+
+        self.customer.add_student_card(uid, request, self.object)
+        return True
+
     def del_product(self, request):
         """ Delete a product from the basket """
         pid = str(request.POST["product_id"])
@@ -648,6 +664,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         kwargs["basket_total"] = self.sum_basket(self.request)
         kwargs["refill_form"] = self.refill_form or RefillForm()
         kwargs["categories"] = ProductType.objects.all()
+        kwargs["student_card_max_uid_size"] = StudentCard.UID_SIZE
         return kwargs
 
 
