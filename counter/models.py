@@ -91,22 +91,7 @@ class Customer(models.Model):
         """
         Add a new student card on the customer account
         """
-        # If you are comming from a counter, only your connection to the counter is checked, not your right on the user to avoid wierd conflicts
-        if counter != None and (
-            counter.type != "BAR"
-            or not (
-                "counter_token" in request.session.keys()
-                and request.session["counter_token"] == counter.token
-            )
-            or len(counter.get_barmen_list()) < 1
-        ):
-            raise PermissionDenied
-        # If you are not comming from a counter, your permissions are checked
-        if not (
-            request.user.id == self.user.id
-            or request.user.is_board_member
-            or request.user.is_root
-        ):
+        if not StudentCard.check_creation_permission(request, self, counter):
             raise PermissionDenied
         StudentCard(customer=self, uid=uid).save()
 
@@ -768,6 +753,38 @@ class StudentCard(models.Model):
     """
 
     UID_SIZE = 14
+
+    @staticmethod
+    def is_valid(uid):
+        return len(uid) == StudentCard.UID_SIZE
+
+    @staticmethod
+    def __comming_from_right_counter(request, counter):
+        return (
+            counter.type == "BAR"
+            and "counter_token" in request.session.keys()
+            and request.session["counter_token"] == counter.token
+            and len(counter.get_barmen_list()) > 0
+        )
+
+    @staticmethod
+    def __user_has_rights(customer, user):
+        return user.pk == customer.user.pk or user.is_board_member or user.is_root
+
+    @staticmethod
+    def check_creation_permission(request, customer, counter=None):
+        """
+        If you are comming from a counter, only your connection to the counter is checked, not your right on the user to avoid wierd conflicts
+        If you are not comming from a counter, your permissions are checked
+        """
+        if counter:
+            return StudentCard.__comming_from_right_counter(request, counter)
+        return StudentCard.__user_has_rights(customer, request.user)
+
+    def can_edit(self, obj):
+        if isinstance(obj, User):
+            return StudentCard.__user_has_rights(self.customer, obj)
+        return False
 
     uid = models.CharField(
         _("uid"), max_length=14, unique=True, validators=[MinLengthValidator(4)]

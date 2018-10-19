@@ -64,6 +64,7 @@ from core.views.forms import (
 )
 from core.models import User, SithFile, Preferences, Gift
 from subscription.models import Subscription
+from counter.views import StudentCardForm
 from trombi.views import UserTrombiForm
 
 
@@ -741,6 +742,8 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
         kwargs = super(UserPreferencesView, self).get_context_data(**kwargs)
         if not hasattr(self.object, "trombi_user"):
             kwargs["trombi_form"] = UserTrombiForm()
+        if self.object.customer:
+            kwargs["student_card_form"] = StudentCardForm()
         return kwargs
 
 

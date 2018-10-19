@@ -56,6 +56,16 @@ urlpatterns = [
         EticketPDFView.as_view(),
         name="eticket_pdf",
     ),
+    url(
+        r"^customer/(?P<customer_id>[0-9]+)/card/add$",
+        StudentCardFormView.as_view(),
+        name="add_student_card",
+    ),
+    url(
+        r"^customer/(?P<customer_id>[0-9]+)/card/delete/(?P<card_id>[0-9]+)/$",
+        StudentCardDeleteView.as_view(),
+        name="delete_student_card",
+    ),
     url(r"^admin/(?P<counter_id>[0-9]+)$", CounterEditView.as_view(), name="admin"),
     url(
         r"^admin/(?P<counter_id>[0-9]+)/prop$",

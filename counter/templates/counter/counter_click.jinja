@@ -40,6 +40,16 @@
         {% endif %}
         <input type="submit" value="{% trans %}Go{% endtrans %}" />
     </form>
+    <h6>{% trans %}Registered cards{% endtrans %}</h6>
+    {% if customer.student_cards.exists() %}
+        <ul>
+            {% for card in customer.student_cards.all() %}
+                <li>{{ card.uid }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        {% trans %}No card registered{% endtrans %}
+    {% endif %}
 </div>
 <div id="bar_ui">
     <h5>{% trans %}Selling{% endtrans %}</h5>

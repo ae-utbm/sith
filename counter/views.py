@@ -33,6 +33,7 @@ from django.views.generic.edit import (
     DeleteView,
     ProcessFormView,
     FormMixin,
+    FormView,
 )
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
@@ -50,7 +51,7 @@ from datetime import date, timedelta, datetime
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from ajax_select import make_ajax_field
 
-from core.views import CanViewMixin, TabedViewMixin
+from core.views import CanViewMixin, TabedViewMixin, CanEditMixin
 from core.views.forms import LoginForm, SelectDate, SelectDateTime
 from core.models import User
 from subscription.models import Subscription
@@ -100,6 +101,45 @@ class CounterAdminMixin(View):
         return super(CounterAdminMixin, self).dispatch(request, *args, **kwargs)
 
 
+class StudentCardForm(forms.ModelForm):
+    """
+    Form for adding student cards
+    Only used for user profile since CounterClick is to complicated
+    """
+
+    class Meta:
+        model = StudentCard
+        fields = ["uid"]
+
+    def clean(self):
+        cleaned_data = super(StudentCardForm, self).clean()
+        uid = cleaned_data.get("uid")
+        if not StudentCard.is_valid(uid):
+            raise forms.ValidationError(_("This uid is invalid"), code="invalid")
+        return cleaned_data
+
+
+class StudentCardDeleteView(DeleteView):
+    """
+    View used to delete a card from a user
+    """
+
+    model = StudentCard
+    template_name = "core/delete_confirm.jinja"
+    pk_url_kwarg = "card_id"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
+        if not self.get_object().can_edit(self.customer.user):
+            raise PermissionDenied
+        return super(StudentCardDeleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy(
+            "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
+        )
+
+
 class GetUserForm(forms.Form):
     """
     The Form class aims at providing a valid user_id field in its cleaned data, in order to pass it to some view,
@@ -109,7 +149,9 @@ class GetUserForm(forms.Form):
     some nickname, first name, or last name (TODO)
     """
 
-    code = forms.CharField(label="Code", max_length=10, required=False)
+    code = forms.CharField(
+        label="Code", max_length=StudentCard.UID_SIZE, required=False
+    )
     id = AutoCompleteSelectField(
         "users", required=False, label=_("Select user"), help_text=None
     )
@@ -534,7 +576,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         """
         uid = request.POST["student_card_uid"]
         uid = str(uid)
-        if len(uid) != StudentCard.UID_SIZE:
+        if not StudentCard.is_valid(uid):
             request.session["not_valid_student_card_uid"] = True
             return False
 
@@ -1788,3 +1830,27 @@ class CounterRefillingListView(CounterAdminTabsMixin, CounterAdminMixin, ListVie
         kwargs = super(CounterRefillingListView, self).get_context_data(**kwargs)
         kwargs["counter"] = self.counter
         return kwargs
+
+
+class StudentCardFormView(FormView):
+    """
+    Add a new student card
+    """
+
+    form_class = StudentCardForm
+    template_name = "core/create.jinja"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
+        return super(StudentCardFormView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        data = form.clean()
+        res = super(FormView, self).form_valid(form)
+        self.customer.add_student_card(data["uid"], self.request)
+        return res
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy(
+            "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
+        )
