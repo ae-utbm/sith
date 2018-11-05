@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-06 00:25+0100\n"
+"POT-Creation-Date: 2018-11-06 00:55+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -2334,8 +2334,8 @@ msgid "Main"
 msgstr "Accueil"
 
 #: core/templates/core/base.jinja:153
-msgid "Assocations & Clubs"
-msgstr ""
+msgid "Associations & Clubs"
+msgstr "Associations & Clubs"
 
 #: core/templates/core/base.jinja:157
 msgid "The AE"
@@ -2411,7 +2411,7 @@ msgstr "Fichiers"
 
 #: core/templates/core/base.jinja:184
 msgid "Pedagogy"
-msgstr ""
+msgstr "Pédagogie"
 
 #: core/templates/core/base.jinja:187
 msgid "Sponsors"
