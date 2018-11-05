@@ -154,13 +154,22 @@
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="/club/1/">{% trans %}The AE{% endtrans %}</a>
-                    <a href="{{ url('core:page', page_name='clubs') }}">{% trans %}The Clubs of The AE{% endtrans %}</a>
-                    <a href="/club/2/">{% trans %}The BDF{% endtrans %}</a>
-                    <a href="/club/3/">{% trans %}The BDS{% endtrans %}</a>
+                    <a href="/page/ae/">{% trans %}The AE{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='clubs') }}">{% trans %}The AE's clubs{% endtrans %}</a>
+                    <a href="/page/bdf/">{% trans %}The BDF{% endtrans %}</a>
+                    <a href="/page/bds/">{% trans %}The BDS{% endtrans %}</a>
+                    <a href="/page/cetu/">{% trans %}The CETU{% endtrans %}</a>
                 </div>
               </div> 
-              <a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a>
+              <div class="dropdown">
+                <button class="dropbtn">{% trans %}Events{% endtrans %} 
+                <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="/page/Index/calendrier_evenements/">{% trans %}Calender{% endtrans %}</a>
+                    <a href="/page/GA">{% trans %}Big event{% endtrans %}</a>
+                </div>
+              </div> 
               <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
               <a href="{{ url('sas:main') }}">{% trans %}Gallery{% endtrans %}</a>
               <a href="{{ url('eboutic:main') }}">{% trans %}Eboutic{% endtrans %}</a>
@@ -169,11 +178,10 @@
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
+                    <a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a>
                     <a href="/launderette">{% trans %}Launderette{% endtrans %}</a>
-                    <a href="{{ url('eboutic:main') }}">{% trans %}E-Boutic{% endtrans %}</a>
                     <a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a>
                     <a href="https://ae2.utbm.fr/uvs/">{% trans %}Pedagogy{% endtrans %}</a>
-                    <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
                 </div>
               </div> 
               <a href="{{ url('core:page', page_name="partenaires")}}">{% trans %}Sponsors{% endtrans %}</a>
@@ -182,8 +190,9 @@
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
+                    <a href="/page/FAQ/">{% trans %}FAQ{% endtrans %}</a>
                     <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
-                    <a href="https://ae2.utbm.fr/article.php?name=docs:index">{% trans %}Help{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
                 </div>
               </div> 
           </nav>
