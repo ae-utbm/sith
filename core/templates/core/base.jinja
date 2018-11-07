@@ -36,8 +36,7 @@
 
         <header>
             {% if not user.is_authenticated() %}
-            <div id="header_logo" style="background-image: url('{{
-                static('core/img/logo.png') }}'); width: 185px; height: 100px;">
+            <div id="header_logo" style="background-image: url('{{ static('core/img/logo.png') }}'); width: 185px; height: 100px;">
                 <a href="{{ url('core:index') }}"></a>
             </div>
             <div id="header_connect_links">
@@ -52,8 +51,7 @@
                 <a href="{{ url('core:register') }}"><button type="button">{% trans %}Register{% endtrans %}</button></a>
             </div>
             {% else %}
-            <div id="header_logo" style="background-image: url('{{
-                static('core/img/logo.png') }}'); width: 92px; height: 52px;">
+            <div id="header_logo" style="background-image: url('{{ static('core/img/logo.png') }}'); width: 92px; height: 52px;">
                 <a href="{{ url('core:index') }}"></a>
             </div>
             <div id="header_bar">
@@ -154,11 +152,11 @@
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="/page/ae/">{% trans %}The AE{% endtrans %}</a>
-                    <a href="{{ url('core:page', page_name='clubs') }}">{% trans %}The AE's clubs{% endtrans %}</a>
-                    <a href="/page/bdf/">{% trans %}The BDF{% endtrans %}</a>
-                    <a href="/page/bds/">{% trans %}The BDS{% endtrans %}</a>
-                    <a href="/page/cetu/">{% trans %}The CETU{% endtrans %}</a>
+                    <a href="/page/ae/">{% trans %}AE{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='clubs') }}">{% trans %}AE's clubs{% endtrans %}</a>
+                    <a href="/page/bdf/">{% trans %}BdF{% endtrans %}</a>
+                    <a href="/page/bds/">{% trans %}BDS{% endtrans %}</a>
+                    <a href="/page/cetu/">{% trans %}CETU{% endtrans %}</a>
                 </div>
               </div> 
               <div class="dropdown">
