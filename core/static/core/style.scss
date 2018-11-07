@@ -356,6 +356,45 @@ header {
         }
       }
     }
+
+    .dropdown {
+      flex: auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .dropbtn {
+      all: unset;
+      padding: 20px;
+      font-weight: bolder;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      overflow: auto;
+      width: 100%;
+      background-color: #f9f9f9;
+      box-shadow: 3px 3px 3px 0px $shadow-color;
+      z-index: 1;
+    }
+
+    .dropdown-content a {
+      float: none;
+      color: black;
+      padding: 12px 16px;
+      display: block;
+      text-align: center;
+      &:hover {
+        border-radius: unset;
+        color: white;
+        background: $secondary-neutral-color;
+      }
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
   }
 
 /*--------------------------------CONTENT------------------------------*/
