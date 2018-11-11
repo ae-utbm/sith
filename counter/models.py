@@ -87,14 +87,6 @@ class Customer(models.Model):
             letter = random.choice(string.ascii_lowercase)
         return number + letter
 
-    def add_student_card(self, uid, request, counter=None):
-        """
-        Add a new student card on the customer account
-        """
-        if not StudentCard.check_creation_permission(request, self, counter):
-            raise PermissionDenied
-        StudentCard(customer=self, uid=uid).save()
-
     def save(self, allow_negative=False, is_selling=False, *args, **kwargs):
         """
             is_selling : tell if the current action is a selling
@@ -756,34 +748,18 @@ class StudentCard(models.Model):
 
     @staticmethod
     def is_valid(uid):
-        return len(uid) == StudentCard.UID_SIZE
-
-    @staticmethod
-    def __comming_from_right_counter(request, counter):
         return (
-            counter.type == "BAR"
-            and "counter_token" in request.session.keys()
-            and request.session["counter_token"] == counter.token
-            and len(counter.get_barmen_list()) > 0
+            len(uid) == StudentCard.UID_SIZE
+            and not StudentCard.objects.filter(uid=uid).exists()
         )
 
     @staticmethod
-    def __user_has_rights(customer, user):
+    def can_create(customer, user):
         return user.pk == customer.user.pk or user.is_board_member or user.is_root
-
-    @staticmethod
-    def check_creation_permission(request, customer, counter=None):
-        """
-        If you are comming from a counter, only your connection to the counter is checked, not your right on the user to avoid wierd conflicts
-        If you are not comming from a counter, your permissions are checked
-        """
-        if counter:
-            return StudentCard.__comming_from_right_counter(request, counter)
-        return StudentCard.__user_has_rights(customer, request.user)
 
     def can_edit(self, obj):
         if isinstance(obj, User):
-            return StudentCard.__user_has_rights(self.customer, obj)
+            return StudentCard.can_create(self.customer, obj)
         return False
 
     uid = models.CharField(

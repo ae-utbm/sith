@@ -119,7 +119,7 @@ class StudentCardForm(forms.ModelForm):
         return cleaned_data
 
 
-class StudentCardDeleteView(DeleteView):
+class StudentCardDeleteView(DeleteView, CanEditMixin):
     """
     View used to delete a card from a user
     """
@@ -130,8 +130,6 @@ class StudentCardDeleteView(DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
-        if not self.get_object().can_edit(self.customer.user):
-            raise PermissionDenied
         return super(StudentCardDeleteView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
@@ -580,7 +578,15 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             request.session["not_valid_student_card_uid"] = True
             return False
 
-        self.customer.add_student_card(uid, request, self.object)
+        if not (
+            self.object.type == "BAR"
+            and "counter_token" in request.session.keys()
+            and request.session["counter_token"] == self.object.token
+            and len(self.object.get_barmen_list()) > 0
+        ):
+            raise PermissionDenied
+
+        StudentCard(customer=self.customer, uid=uid).save()
         return True
 
     def del_product(self, request):
@@ -1842,12 +1848,14 @@ class StudentCardFormView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
+        if not StudentCard.can_create(self.customer, request.user):
+            raise PermissionDenied
         return super(StudentCardFormView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         data = form.clean()
         res = super(FormView, self).form_valid(form)
-        self.customer.add_student_card(data["uid"], self.request)
+        StudentCard(customer=self.customer, uid=data["uid"]).save()
         return res
 
     def get_success_url(self, **kwargs):
