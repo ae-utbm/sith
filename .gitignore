@@ -10,6 +10,6 @@ doc/html
 data/
 /static/
 sith/settings_custom.py
-sith/whoosh_index/
+sith/search_indexes/
 .coverage
 coverage_report/

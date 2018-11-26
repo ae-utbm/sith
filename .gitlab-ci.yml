@@ -5,7 +5,10 @@ test:
   stage: test
   script:
   - apt-get update
-  - apt-get install -y gettext
+  - apt-get install -y gettext python3-xapian
+  - pushd /usr/lib/python3/dist-packages/xapian && ln -s _xapian* _xapian.so && popd
+  - export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
+  - python -c 'import xapian' # Fail immediately if there is a problem with xapian
   - pip install -r requirements.txt
   - pip install coverage
   - ./manage.py compilemessages

@@ -30,14 +30,14 @@ generate a complete HTML documentation that will be available in the *./doc/html
 ### Dependencies:
 See requirements.txt
 
-You may need to install some dev libraries like `libmysqlclient-dev`, `libssl-dev`, `libjpeg-dev`, or `zlib1g-dev` to install all the
+You may need to install some dev libraries like `libmysqlclient-dev`, `libssl-dev`, `libjpeg-dev`, `python3-xapian`, or `zlib1g-dev` to install all the
 requiered dependancies with pip. You may also need `mysql-client`. Don't also forget `python3-dev` if you don't have it
 already.
 
 You can check all of them with:
 
 ```
-sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config
+sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian
 ```
 
 The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)

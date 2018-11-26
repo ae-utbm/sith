@@ -11,7 +11,7 @@ phonenumbers
 django-ajax-selects
 reportlab
 django-haystack
-whoosh
+xapian-haystack
 django-debug-toolbar
 libsass
 django-ordered-model
