@@ -71,7 +71,7 @@ def notification(request, notif_id):
 
 
 def search_user(query, as_json=False):
-    res = SearchQuerySet().models(User).filter_or(text__contains=query)[:20]
+    res = SearchQuerySet().models(User).autocomplete(auto=query)[:20]
     return [r.object for r in res]
 
 
