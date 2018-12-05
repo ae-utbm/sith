@@ -59,6 +59,7 @@ class UserOnlySignalProcessor(signals.BaseSignalProcessor):
 
 class ForumMessageIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
+    auto = indexes.EdgeNgramField(use_template=True)
 
     def get_model(self):
         return ForumMessage

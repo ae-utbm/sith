@@ -1,0 +1,4 @@
+{{ object.topic }}
+{{ object.title }}
+{{ object.message }}
+{{ object.author }}
