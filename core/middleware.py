@@ -27,7 +27,7 @@ from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 from django.contrib.auth import get_user
 from django.contrib.auth.middleware import (
-    AuthenticationMiddleware as DjangoAuthenticationMiddleware
+    AuthenticationMiddleware as DjangoAuthenticationMiddleware,
 )
 
 module, klass = settings.AUTH_ANONYMOUS_MODEL.rsplit(".", 1)

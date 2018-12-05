@@ -47,7 +47,7 @@ class ForumSearchView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("query", "")
-        q = SearchQuerySet().models(ForumMessage).filter(text=query)
+        q = SearchQuerySet().models(ForumMessage).filter_or(text__contains=query)
         return [r.object for r in q]
 
 
