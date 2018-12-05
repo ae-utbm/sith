@@ -9,12 +9,14 @@
 
 To start working on the project, just run the following commands:
 
-    git clone https://ae-dev.utbm.fr/ae/Sith.git
-    cd Sith
-    virtualenv --clear --python=python3 env
-    source env/bin/activate
-    pip install -r requirements.txt
-    ./manage.py setup
+```bash
+git clone https://ae-dev.utbm.fr/ae/Sith.git
+cd Sith
+virtualenv --system-site-packages --python=python3 env
+source env/bin/activate
+pip install -r requirements.txt
+./manage.py setup
+```
 
 To start the simple development server, just run `python3 manage.py runserver`
 
@@ -36,9 +38,17 @@ already.
 
 You can check all of them with:
 
-```
+```bash
 sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian
 ```
+
+On macos, you will need homebrew
+
+```bash
+brew install --build-from-source xapian --with-python
+```
+
+If it doesn't work it's because it need [this pull request](https://github.com/Homebrew/homebrew-core/pull/34835) to be validated.
 
 The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
 
@@ -46,7 +56,7 @@ The development is done with sqlite, but it is advised to set a more robust DBMS
 
 We use scss in the project. In development environment (DEBUG=True), scss is compiled every time the file is needed. For production, it assumes you have already compiled every files and to do so, you need to use the following commands : 
 
-```
+```bash
 ./manage.py collectstatic # To collect statics
 ./manage.py compilestatic # To compile scss in those statics
 ```
@@ -75,9 +85,9 @@ appropriate group fields, or the right method to check user permissions.
 
 #### Counting the number of line of code
 
-```
-# apt install cloc
-$ cloc --exclude-dir=doc,env .
+```bash
+sudo apt install cloc
+cloc --exclude-dir=doc,env .
 ```
 
 #### Updating doc/SYNTAX.md

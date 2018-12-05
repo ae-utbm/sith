@@ -18,24 +18,26 @@ Ensuite, tu fais :
 Avec cette commande, tu clones le sith AE dans le dossier courant.
 
 ```bash
-    cd Sith
-    virtualenv --clear --python=python3 env_sith
-    source env_sith/bin/activate
-    pip install -r requirements.txt
+cd Sith
+virtualenv --system-site-packages --python=python3 env_sith
+source env_sith/bin/activate
+pip install -r requirements.txt
 ```
+
+Attention aux dépendances système, à voir dans le README.md
 
 Maintenant, faut passer le sith en mode debug dans le fichier de settings personnalisé.
 
 ```bash
-    echo "DEBUG=True" > sith/settings_custom.py
-    echo 'EXTERNAL_RES = "False"' >> sith/settings_custom.py
-    echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
+echo "DEBUG=True" > sith/settings_custom.py
+echo 'EXTERNAL_RES = "False"' >> sith/settings_custom.py
+echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
 ```
 
 Enfin, il s'agit de créer la base de donnée de test lors de la première utilisation
 
 ```bash
-	./manage.py setup
+./manage.py setup
 ```
 
 Et pour lancer le sith, tu fais `python3 manage.py runserver`
@@ -50,7 +52,7 @@ Pour uniformiser le formattage du code nous utilisons [Black](https://github.com
 Installation de black:
 
 ```bash
-    pip install black
+pip install black
 ```
 
 ## Sous VsCode:
