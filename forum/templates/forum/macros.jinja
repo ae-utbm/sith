@@ -155,3 +155,9 @@
 {{ m.mark_as_read(user) or "" }}
 {% endmacro %}
 
+{% macro display_search_bar() %}
+<form action="{{ url('forum:search') }}" method="GET" style="text-align: right;">
+    <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query"/>
+    <input type="submit" value="{% trans %}Search{% endtrans %}"/>
+</form>
+{% endmacro %}

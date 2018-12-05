@@ -1,6 +1,6 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link %}
-{% from 'forum/macros.jinja' import display_forum %}
+{% from 'forum/macros.jinja' import display_forum, display_search_bar %}
 
 {% block title %}
 {% trans %}Forum{% endtrans %}
@@ -12,6 +12,7 @@
 </p>
 <div id="forum">
     <h3>{% trans %}Forum{% endtrans %}</h3>
+    {{ display_search_bar() }}
     <p>
         <a class="ib button" href="{{ url('forum:last_unread') }}">{% trans %}View last unread messages{% endtrans %}</a>
         <a class="ib button" href="{{ url('forum:favorite_topics') }}">{% trans %}Favorite topics{% endtrans %}</a>
@@ -21,10 +22,6 @@
         <a href="{{ url('forum:new_forum') }}">{% trans %}New forum{% endtrans %}</a>
     </p>
     {% endif %}
-                <form action="{{ url('forum:search') }}" method="GET" id="header_search">
-                    <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" id="search" />
-                    <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />
-                </form>
     <div>
         <div class="ib w_big">
             {% trans %}Title{% endtrans %}

@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from 'forum/macros.jinja' import display_message %}
+{% from 'forum/macros.jinja' import display_message, display_search_bar %}
 
 {% block title %}
 {% if topic %}
@@ -11,6 +11,7 @@
 
 {% block content %}
 {% if topic %}
+{{ display_search_bar() }}
 <p>
 <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
 {% for f in topic.forum.get_parent_list() %}

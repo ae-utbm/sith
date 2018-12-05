@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from 'forum/macros.jinja' import display_forum, display_topic %}
+{% from 'forum/macros.jinja' import display_forum, display_topic, display_search_bar %}
 
 {% block title %}
 {{ forum }}
@@ -12,6 +12,7 @@
     > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
     {% endfor %}
     > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
+    {{ display_search_bar() }}
 </div>
 <div id="forum">
     <h3>{{ forum.name }}</h3>
