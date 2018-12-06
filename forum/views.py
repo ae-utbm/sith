@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017,2018
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -42,13 +43,13 @@ from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
 from haystack.query import SearchQuerySet
 
 
-class ForumSearchView(ListView):
+class ForumSearchView(CanViewMixin, ListView):
     template_name = "forum/search.jinja"
 
     def get_queryset(self):
         query = self.request.GET.get("query", "")
-        q = SearchQuerySet().models(ForumMessage).autocomplete(auto=query)
-        return [r.object for r in q]
+        return SearchQuerySet().models(ForumMessage).autocomplete(auto=query)
+        # return [r.object for r in q]
 
 
 class ForumMainView(ListView):

@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -42,6 +43,7 @@ from django.db.models import Count
 
 from core.models import Group
 from core.views.forms import LoginForm
+from haystack.query import SearchQuerySet
 
 
 def forbidden(request):
@@ -176,6 +178,7 @@ class CanViewMixin(View):
     """
 
     def dispatch(self, request, *arg, **kwargs):
+
         try:
             self.object = self.get_object()
             if can_view(self.object, request.user):
@@ -184,13 +187,24 @@ class CanViewMixin(View):
         except:
             pass
         # If we get here, it's a ListView
-        l_id = [o.id for o in self.get_queryset() if can_view(o, request.user)]
-        if not l_id and self.get_queryset().count() != 0:
+        queryset = self.get_queryset()
+
+        # Test if comes from a haystack query
+        if isinstance(queryset, SearchQuerySet):
+            l_id = [o.object.id for o in queryset if can_view(o.object, request.user)]
+        else:
+            l_id = [o.id for o in queryset if can_view(o, request.user)]
+        if not l_id and queryset.count() != 0:
             raise PermissionDenied
         self._get_queryset = self.get_queryset
 
         def get_qs(self2):
-            return self2._get_queryset().filter(id__in=l_id)
+            q = self2._get_queryset()
+            # Test if comes from a haystack query
+            if isinstance(q, SearchQuerySet):
+                resp = [r.object for r in q if r.object.id in l_id]
+                return resp
+            return q.filter(id__in=l_id)
 
         self.get_queryset = types.MethodType(get_qs, self)
         return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
