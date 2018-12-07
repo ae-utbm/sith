@@ -57,8 +57,18 @@ class UserOnlySignalProcessor(signals.BaseSignalProcessor):
         models.signals.post_delete.disconnect(self.handle_delete, sender=User)
 
 
+class BigCharFieldIndex(indexes.CharField):
+    """
+    Workaround to avoid xapian.InvalidArgument: Term too long (> 245)
+    See https://groups.google.com/forum/#!topic/django-haystack/hRJKcPNPXqw/discussion
+    """
+
+    def prepare(self, term):
+        return super(BigCharFieldIndex, self).prepare(term)[:245]
+
+
 class ForumMessageIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True)
+    text = BigCharFieldIndex(document=True, use_template=True)
     auto = indexes.EdgeNgramField(use_template=True)
 
     def get_model(self):
