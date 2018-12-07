@@ -195,7 +195,7 @@ class CanViewMixin(View):
         self._get_queryset = self.get_queryset
 
         def get_qs(self2):
-            return self._get_queryset().filter(id__in=l_id)
+            return self2._get_queryset().filter(id__in=l_id)
 
         self.get_queryset = types.MethodType(get_qs, self)
         return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
