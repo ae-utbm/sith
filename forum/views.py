@@ -54,14 +54,10 @@ class ForumSearchView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("query", "")
-        queryset = SearchQuerySet().models(ForumMessage).autocomplete(auto=query)
-        excluded = [
-            o.object.id
-            for o in queryset
-            if not can_view(o.object.topic, self.request.user)
-        ]
-        queryset.exclude(id__in=excluded)
-        return [r.object for r in queryset]
+        queryset = SearchQuerySet().models(ForumMessage).autocomplete(auto=query)[:100]
+        return [
+            r.object for r in queryset if can_view(r.object.topic, self.request.user)
+        ][:30]
 
 
 class ForumMainView(ListView):
