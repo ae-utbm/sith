@@ -42,19 +42,26 @@ from core.views import (
     CanEditMixin,
     CanEditPropMixin,
     CanCreateMixin,
-    CanViewSearchMixin,
+    can_view,
 )
 from core.views.forms import MarkdownInput
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
 from haystack.query import SearchQuerySet
 
 
-class ForumSearchView(CanViewSearchMixin, ListView):
+class ForumSearchView(ListView):
     template_name = "forum/search.jinja"
 
     def get_queryset(self):
         query = self.request.GET.get("query", "")
-        return SearchQuerySet().models(ForumMessage).autocomplete(auto=query)
+        queryset = SearchQuerySet().models(ForumMessage).autocomplete(auto=query)
+        excluded = [
+            o.object.id
+            for o in queryset
+            if not can_view(o.object.topic, self.request.user)
+        ]
+        queryset.exclude(id__in=excluded)
+        return [r.object for r in queryset]
 
 
 class ForumMainView(ListView):

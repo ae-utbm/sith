@@ -201,29 +201,6 @@ class CanViewMixin(View):
         return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
 
 
-class CanViewSearchMixin(View):
-    """
-    This view removes all forbidden content from a SearchQuerySet
-    """
-
-    def dispatch(self, request, *arg, **kwargs):
-
-        queryset = self.get_queryset()
-        excluded = [
-            o.object.id for o in queryset if not can_view(o.object, request.user)
-        ]
-
-        self._queryset = queryset
-
-        def get_qs(self2):
-            q = self2._queryset.exclude(id__in=excluded)
-            resp = [r.object for r in q]
-            return resp
-
-        self.get_queryset = types.MethodType(get_qs, self)
-        return super(CanViewSearchMixin, self).dispatch(request, *arg, **kwargs)
-
-
 class FormerSubscriberMixin(View):
     """
     This view check if the user was at least an old subscriber
