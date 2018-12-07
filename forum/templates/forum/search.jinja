@@ -1,22 +1,20 @@
 {% extends "core/base.jinja" %}
 
-{% from 'forum/macros.jinja' import display_message %}
+{% from 'forum/macros.jinja' import display_message, display_search_bar %}
 
 {% block content %}
     <div id="forum">
+    {% if object_list|length != 0 %}
+        <br>
+        {{ display_search_bar() }}
         <div class="search-results">
             {% for m in object_list %}
-                {% if user.can_view(m) %}
-                    <div class="result-box">
-                        <div class="result-topic">
-                            {{ m }}
-                        </div>
-                        <div class="result-message">
-                            {{ m.message }}
-                        </div>
-                    </div>
-                {% endif %}
+                {{ display_message(m, user) }}
             {% endfor %}
         </div>
+    {% else %}
+        {% trans %}No result found{% endtrans %}
+    {% endif %}
     </div>
+
 {% endblock %}
