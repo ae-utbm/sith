@@ -189,25 +189,39 @@ class CanViewMixin(View):
         # If we get here, it's a ListView
         queryset = self.get_queryset()
 
-        # Test if comes from a haystack query
-        if isinstance(queryset, SearchQuerySet):
-            l_id = [o.object.id for o in queryset if can_view(o.object, request.user)]
-        else:
-            l_id = [o.id for o in queryset if can_view(o, request.user)]
+        l_id = [o.id for o in queryset if can_view(o, request.user)]
         if not l_id and queryset.count() != 0:
             raise PermissionDenied
         self._get_queryset = self.get_queryset
 
         def get_qs(self2):
-            q = self2._get_queryset()
-            # Test if comes from a haystack query
-            if isinstance(q, SearchQuerySet):
-                resp = [r.object for r in q if r.object.id in l_id]
-                return resp
-            return q.filter(id__in=l_id)
+            return self._get_queryset().filter(id__in=l_id)
 
         self.get_queryset = types.MethodType(get_qs, self)
         return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
+
+
+class CanViewSearchMixin(View):
+    """
+    This view removes all forbidden content from a SearchQuerySet
+    """
+
+    def dispatch(self, request, *arg, **kwargs):
+
+        queryset = self.get_queryset()
+        excluded = [
+            o.object.id for o in queryset if not can_view(o.object, request.user)
+        ]
+
+        self._queryset = queryset
+
+        def get_qs(self2):
+            q = self2._queryset.exclude(id__in=excluded)
+            resp = [r.object for r in q]
+            return resp
+
+        self.get_queryset = types.MethodType(get_qs, self)
+        return super(CanViewSearchMixin, self).dispatch(request, *arg, **kwargs)
 
 
 class FormerSubscriberMixin(View):

@@ -37,19 +37,24 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from ajax_select import make_ajax_field
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from core.views import (
+    CanViewMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    CanCreateMixin,
+    CanViewSearchMixin,
+)
 from core.views.forms import MarkdownInput
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
 from haystack.query import SearchQuerySet
 
 
-class ForumSearchView(CanViewMixin, ListView):
+class ForumSearchView(CanViewSearchMixin, ListView):
     template_name = "forum/search.jinja"
 
     def get_queryset(self):
         query = self.request.GET.get("query", "")
         return SearchQuerySet().models(ForumMessage).autocomplete(auto=query)
-        # return [r.object for r in q]
 
 
 class ForumMainView(ListView):
