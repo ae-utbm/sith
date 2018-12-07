@@ -4,9 +4,9 @@
 
 {% block content %}
     <div id="forum">
+    {{ display_search_bar() }}
     {% if object_list|length != 0 %}
         <br>
-        {{ display_search_bar() }}
         <div class="search-results">
             {% for m in object_list %}
                 {{ display_message(m, user) }}

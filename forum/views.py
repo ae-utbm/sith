@@ -54,6 +54,8 @@ class ForumSearchView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("query", "")
+        if query == "":
+            return []
         queryset = SearchQuerySet().models(ForumMessage).autocomplete(auto=query)[:100]
         return [
             r.object for r in queryset if can_view(r.object.topic, self.request.user)
