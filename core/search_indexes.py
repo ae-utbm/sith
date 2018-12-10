@@ -29,8 +29,6 @@ from haystack import indexes, signals
 from core.models import User
 from forum.models import ForumMessage
 
-from unicodedata import normalize
-
 
 class UserIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
@@ -66,7 +64,7 @@ class BigCharFieldIndex(indexes.CharField):
     """
 
     def prepare(self, term):
-        return normalize("NFKC", super(BigCharFieldIndex, self).prepare(term))[:245]
+        return super(BigCharFieldIndex, self).prepare(term)[:240]
 
 
 class ForumMessageIndex(indexes.SearchIndex, indexes.Indexable):
