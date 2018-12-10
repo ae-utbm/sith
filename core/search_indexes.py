@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -27,7 +28,7 @@ from django.db import models
 from haystack import indexes, signals
 
 from core.models import User
-from forum.models import ForumMessage
+from forum.models import ForumMessage, ForumMessageMeta
 
 
 class UserIndex(indexes.SearchIndex, indexes.Indexable):
@@ -45,16 +46,50 @@ class UserIndex(indexes.SearchIndex, indexes.Indexable):
         return "last_update"
 
 
-class UserOnlySignalProcessor(signals.BaseSignalProcessor):
+class IndexSignalProcessor(signals.BaseSignalProcessor):
     def setup(self):
         # Listen only to the ``User`` model.
         models.signals.post_save.connect(self.handle_save, sender=User)
         models.signals.post_delete.connect(self.handle_delete, sender=User)
 
+        # Listen only to the ``ForumMessage`` model.
+        models.signals.post_save.connect(self.handle_save, sender=ForumMessageMeta)
+        models.signals.post_delete.connect(self.handle_delete, sender=ForumMessage)
+
+        # Listen to the ``ForumMessageMeta`` model pretending it's a ``ForumMessage``.
+        models.signals.post_save.connect(
+            self.handle_forum_message_meta_save, sender=ForumMessageMeta
+        )
+        models.signals.post_delete.connect(
+            self.handle_forum_message_meta_delete, sender=ForumMessageMeta
+        )
+
     def teardown(self):
         # Disconnect only for the ``User`` model.
         models.signals.post_save.disconnect(self.handle_save, sender=User)
         models.signals.post_delete.disconnect(self.handle_delete, sender=User)
+
+        # Disconnect only to the ``ForumMessage`` model.
+        models.signals.post_save.disconnect(self.handle_save, sender=ForumMessage)
+        models.signals.post_delete.disconnect(self.handle_delete, sender=ForumMessage)
+
+        # Disconnect to the ``ForumMessageMeta`` model pretending it's a ``ForumMessage``.
+        models.signals.post_save.disconnect(
+            self.handle_forum_message_meta_save, sender=ForumMessageMeta
+        )
+        models.signals.post_delete.disconnect(
+            self.handle_forum_message_meta_delete, sender=ForumMessageMeta
+        )
+
+    def handle_forum_message_meta_save(self, sender, instance, **kwargs):
+        super(IndexSignalProcessor, self).handle_save(
+            ForumMessage, instance.message, **kwargs
+        )
+
+    def handle_forum_message_meta_delete(self, sender, instance, **kwargs):
+        super(IndexSignalProcessor, self).handle_delete(
+            ForumMessage, instance.message, **kwargs
+        )
 
 
 class BigCharFieldIndex(indexes.CharField):

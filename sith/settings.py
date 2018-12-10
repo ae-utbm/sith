@@ -190,7 +190,7 @@ HAYSTACK_CONNECTIONS = {
     }
 }
 
-HAYSTACK_SIGNAL_PROCESSOR = "core.search_indexes.UserOnlySignalProcessor"
+HAYSTACK_SIGNAL_PROCESSOR = "core.search_indexes.IndexSignalProcessor"
 
 SASS_PRECISION = 8
 
