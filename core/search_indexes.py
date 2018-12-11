@@ -99,7 +99,9 @@ class BigCharFieldIndex(indexes.CharField):
     """
 
     def prepare(self, term):
-        return super(BigCharFieldIndex, self).prepare(term)[:240]
+        return bytes(super(BigCharFieldIndex, self).prepare(term), "utf-8")[
+            :245
+        ].decode("utf-8", errors="ignore")
 
 
 class ForumMessageIndex(indexes.SearchIndex, indexes.Indexable):
