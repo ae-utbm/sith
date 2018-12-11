@@ -12,7 +12,6 @@
     > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
     {% endfor %}
     > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
-    {{ display_search_bar() }}
 </div>
 <div id="forum">
     <h3>{{ forum.name }}</h3>
@@ -23,6 +22,7 @@
     {% if not forum.is_category %}
         <a class="ib button" href="{{ url('forum:new_topic', forum_id=forum.id) }}">{% trans %}New topic{% endtrans %}</a>
     {% endif %}
+    {{ display_search_bar() }}
     </p>
     {% if forum.children.exists() %}
     <div>

@@ -156,8 +156,10 @@
 {% endmacro %}
 
 {% macro display_search_bar() %}
-<form action="{{ url('forum:search') }}" method="GET" style="text-align: right;">
+<form class="search_bar" action="{{ url('forum:search') }}" method="GET">
     <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query"/>
-    <input type="submit" value="{% trans %}Search{% endtrans %}"/>
+    <input type="checkbox" class="sreach_check" name="order" value="date" checked> {% trans %}Order by date{% endtrans %}<br>
+    <input type="submit" class="search_bouton" value="{% trans %}Search{% endtrans %}"/>
+
 </form>
 {% endmacro %}
