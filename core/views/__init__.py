@@ -43,7 +43,6 @@ from django.db.models import Count
 
 from core.models import Group
 from core.views.forms import LoginForm
-from haystack.query import SearchQuerySet
 
 
 def forbidden(request):

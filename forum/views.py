@@ -56,10 +56,24 @@ class ForumSearchView(ListView):
         query = self.request.GET.get("query", "")
         if query == "":
             return []
-        queryset = SearchQuerySet().models(ForumMessage).autocomplete(auto=query)[:100]
-        return [
-            r.object for r in queryset if can_view(r.object.topic, self.request.user)
-        ][:30]
+        queryset = (
+            SearchQuerySet().models(ForumMessage).autocomplete(auto=query).load_all()
+        )
+
+        # Filter unauthorized responses
+        resp = []
+        count = 0
+        max_count = 30
+        for r in queryset:
+            if count >= max_count:
+                return resp
+            if can_view(r.object, self.request.user) and can_view(
+                r.object.topic, self.request.user
+            ):
+                resp.append(r.object)
+                count += 1
+
+        return resp
 
 
 class ForumMainView(ListView):
