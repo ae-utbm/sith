@@ -155,33 +155,12 @@
 {{ m.mark_as_read(user) or "" }}
 {% endmacro %}
 
-{% macro display_search_bar() %}
+{% macro display_search_bar(request) %}
 <form class="search_bar" action="{{ url('forum:search') }}" method="GET">
-    <input type="text" id="forum_search_input" placeholder="{% trans %}Search{% endtrans %}" name="query"/>
-    <input type="checkbox" id="forum_search_order_date" class="sreach_check" name="order" value="date" checked> {% trans %}Order by date{% endtrans %}<br>
+    <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" value="{{ request.GET.query|default('') }}"/>
+    <input type="checkbox" class="sreach_check" name="order" value="date" {% if request.GET.order|default("") == "date" or (request.GET.order|default("") == "" and request.GET.query|default("") == "") -%}
+        checked
+    {%- endif -%}> {% trans %}Order by date{% endtrans %}<br>
     <input type="submit" class="search_bouton" value="{% trans %}Search{% endtrans %}"/>
-    <script type="text/javascript">
-        // Uncheck the order by date checkbox if previously unchecked
-        const searchParams = new URLSearchParams(window.location.search);
-        var waitForJQuery = setInterval(function () {
-            if (typeof $ != 'undefined'){
-                fillSearchBar();
-                clearInterval(waitForJQuery);
-            }
-        }, 10);
-        function fillSearchBar() {
-            if (searchParams.has('query')){
-                $('#forum_search_input').val(searchParams.get('query'));
-            }
-            if (
-                   (!searchParams.has('order') && searchParams.has('query') )||
-                   (searchParams.has('order') && searchParams.get('order') != 'date')
-            ) {
-                $('#forum_search_order_date').removeAttr('checked');
-                clearInterval(waitForJQuery);
-            }
-        }
-    </script>
-
 </form>
 {% endmacro %}

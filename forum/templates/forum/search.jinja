@@ -4,7 +4,7 @@
 
 {% block content %}
     <div id="forum">
-    {{ display_search_bar() }}
+    {{ display_search_bar(request) }}
     {% if object_list|length != 0 %}
         <br>
         <div class="search-results">

@@ -11,7 +11,7 @@
 
 {% block content %}
 {% if topic %}
-{{ display_search_bar() }}
+{{ display_search_bar(request) }}
 <p>
 <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
 {% for f in topic.forum.get_parent_list() %}
