@@ -107,6 +107,7 @@ class BigCharFieldIndex(indexes.CharField):
 class ForumMessageIndex(indexes.SearchIndex, indexes.Indexable):
     text = BigCharFieldIndex(document=True, use_template=True)
     auto = indexes.EdgeNgramField(use_template=True)
+    date = indexes.DateTimeField(model_attr="date")
 
     def get_model(self):
         return ForumMessage

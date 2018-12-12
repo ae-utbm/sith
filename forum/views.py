@@ -54,11 +54,17 @@ class ForumSearchView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get("query", "")
+        order_by = self.request.GET.get("order", "")
+
         if query == "":
             return []
-        queryset = (
-            SearchQuerySet().models(ForumMessage).autocomplete(auto=query).load_all()
-        )
+
+        queryset = SearchQuerySet().models(ForumMessage).autocomplete(auto=query)
+
+        if order_by == "date":
+            queryset.order_by("date")
+
+        queryset = queryset.load_all()
 
         # Filter unauthorized responses
         resp = []
