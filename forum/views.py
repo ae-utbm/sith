@@ -62,7 +62,7 @@ class ForumSearchView(ListView):
         queryset = SearchQuerySet().models(ForumMessage).autocomplete(auto=query)
 
         if order_by == "date":
-            queryset.order_by("date")
+            queryset = queryset.order_by("-date")
 
         queryset = queryset.load_all()
 
