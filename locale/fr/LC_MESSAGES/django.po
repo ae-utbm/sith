@@ -4416,10 +4416,8 @@ msgid "Reply"
 msgstr "Répondre"
 
 #: forum/templates/forum/search.jinja:16
-#, fuzzy
-#| msgid "Not found"
 msgid "No result found"
-msgstr "Non trouvé"
+msgstr "Pas de résultats"
 
 #: forum/templates/forum/topic.jinja:44
 msgid "Unmark as favorite"
