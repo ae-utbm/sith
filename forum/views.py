@@ -46,7 +46,7 @@ from core.views import (
 )
 from core.views.forms import MarkdownInput
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
-from haystack.query import SearchQuerySet
+from haystack.query import RelatedSearchQuerySet
 
 
 class ForumSearchView(ListView):
@@ -59,12 +59,19 @@ class ForumSearchView(ListView):
         if query == "":
             return []
 
-        queryset = SearchQuerySet().models(ForumMessage).autocomplete(auto=query)
+        queryset = RelatedSearchQuerySet().models(ForumMessage).autocomplete(auto=query)
 
         if order_by == "date":
             queryset = queryset.order_by("-date")
 
         queryset = queryset.load_all()
+        queryset = queryset.load_all_queryset(
+            ForumMessage,
+            ForumMessage.objects.all()
+            .prefetch_related("topic__forum__edit_groups")
+            .prefetch_related("topic__forum__view_groups")
+            .prefetch_related("topic__forum__owner_club"),
+        )
 
         # Filter unauthorized responses
         resp = []
