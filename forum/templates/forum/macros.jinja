@@ -158,7 +158,7 @@
 {% macro display_search_bar(request) %}
 <form class="search_bar" action="{{ url('forum:search') }}" method="GET">
     <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" value="{{ request.GET.query|default('') }}"/>
-    <input type="checkbox" class="sreach_check" name="order" value="date" {% if request.GET.order|default("") == "date" or (request.GET.order|default("") == "" and request.GET.query|default("") == "") -%}
+    <input type="checkbox" class="search_check" name="order" value="date" {% if request.GET.order|default("") == "date" or (request.GET.order|default("") == "" and request.GET.query|default("") == "") -%}
         checked
     {%- endif -%}> {% trans %}Order by date{% endtrans %}<br>
     <input type="submit" class="search_bouton" value="{% trans %}Search{% endtrans %}"/>
