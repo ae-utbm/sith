@@ -1,18 +1,12 @@
 {% extends "core/base.jinja" %}
-{% from 'forum/macros.jinja' import display_forum, display_topic, display_search_bar %}
+{% from 'forum/macros.jinja' import display_forum, display_breadcrumb, display_topic, display_search_bar %}
 
 {% block title %}
 {{ forum }}
 {% endblock %}
 
 {% block content %}
-<div>
-    <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
-    {% for f in forum.get_parent_list()|reverse %}
-    > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
-    {% endfor %}
-    > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
-</div>
+{{ display_breadcrumb(forum) }}
 <div id="forum">
     <h3>{{ forum.name }}</h3>
     <p>

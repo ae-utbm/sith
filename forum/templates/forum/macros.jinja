@@ -85,9 +85,20 @@
 </div>
 {% endmacro %}
 
+{% macro display_breadcrumb(forum, topic="") %}
+<p>
+    <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
+    {% for f in forum.get_parent_list()|reverse %}
+    > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
+    {% endfor %}
+    > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
+    {% if topic != "" %} > <a href="{{ topic.get_absolute_url() }}">{{ topic }}</a>{%- endif -%}
+</p>
+{% endmacro %}
+
 {% macro display_message(m, user, unread=False) %}
 {% if user.can_view(m) %}
-<div id="msg_{{ m.id }}" class="message {% if unread %}unread{% endif %}">
+<div id="msg_{{ m.id }}" class="message {% if unread %}unread{% endif %}">
     <div class="msg_author {% if m.deleted %}deleted{% endif %}">
             {% if m.author.avatar_pict %}
         <img src="{{ m.author.avatar_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
@@ -143,7 +154,7 @@
     </div>
 </div>
 {% else %}
-<div id="msg_{{ m.id }}" class="message">
+<div id="msg_{{ m.id }}" class="message">
     <div class="msg_author deleted">
     </div>
     <div class="msg_content deleted">

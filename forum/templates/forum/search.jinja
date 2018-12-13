@@ -1,6 +1,6 @@
 {% extends "core/base.jinja" %}
 
-{% from 'forum/macros.jinja' import display_message, display_search_bar %}
+{% from 'forum/macros.jinja' import display_message, display_breadcrumb, display_search_bar %}
 
 {% block content %}
     <div id="forum">
@@ -9,6 +9,7 @@
         <br>
         <div class="search-results">
             {% for m in object_list %}
+                {{ display_breadcrumb(m.topic.forum, m.topic) }}
                 {{ display_message(m, user) }}
             {% endfor %}
         </div>
