@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -176,6 +177,7 @@ class CanViewMixin(View):
     """
 
     def dispatch(self, request, *arg, **kwargs):
+
         try:
             self.object = self.get_object()
             if can_view(self.object, request.user):
@@ -184,8 +186,10 @@ class CanViewMixin(View):
         except:
             pass
         # If we get here, it's a ListView
-        l_id = [o.id for o in self.get_queryset() if can_view(o, request.user)]
-        if not l_id and self.get_queryset().count() != 0:
+        queryset = self.get_queryset()
+
+        l_id = [o.id for o in queryset if can_view(o, request.user)]
+        if not l_id and queryset.count() != 0:
             raise PermissionDenied
         self._get_queryset = self.get_queryset
 

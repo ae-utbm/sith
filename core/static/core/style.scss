@@ -1403,6 +1403,18 @@ textarea {
     }
   }
 
+  .search_bar {
+    margin: 10px 0px;
+    display: flex;
+    height: 20p;
+    align-items: center;
+  }
+  .search_check {
+    margin-left: 10px;
+  }
+  .search_bouton {
+    margin-left: 10px;
+  }
   .category {
     margin-top: 5px;
     background: $secondary-color;

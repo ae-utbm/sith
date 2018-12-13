@@ -366,7 +366,11 @@ class User(AbstractBaseUser):
             return False
         if group_id == settings.SITH_GROUP_ROOT_ID and self.is_superuser:
             return True
-        return self.groups.filter(name=group_name).exists()
+        return group_name in self.cached_groups_names
+
+    @cached_property
+    def cached_groups_names(self):
+        return [g.name for g in self.groups.all()]
 
     @cached_property
     def is_root(self):

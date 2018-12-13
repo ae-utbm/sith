@@ -331,9 +331,9 @@ class ForumMessage(models.Model):
         return user.can_edit(self.topic.forum)
 
     def can_be_viewed_by(self, user):
-        return (
-            not self._deleted
-        )  # No need to check the real rights since it's already done by the Topic view
+        # No need to check the real rights since it's already done by the Topic view
+        # and it impacts performances too much
+        return not self._deleted
 
     def can_be_moderated_by(self, user):
         return self.topic.forum.is_owned_by(user) or user.id == self.author.id

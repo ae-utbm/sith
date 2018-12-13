@@ -26,8 +26,10 @@ from django.conf.urls import url
 
 from forum.views import *
 
+
 urlpatterns = [
     url(r"^$", ForumMainView.as_view(), name="main"),
+    url(r"^search/$", ForumSearchView.as_view(), name="search"),
     url(r"^new_forum$", ForumCreateView.as_view(), name="new_forum"),
     url(r"^mark_all_as_read$", ForumMarkAllAsRead.as_view(), name="mark_all_as_read"),
     url(r"^last_unread$", ForumLastUnread.as_view(), name="last_unread"),

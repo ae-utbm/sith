@@ -1,6 +1,6 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link %}
-{% from 'forum/macros.jinja' import display_message %}
+{% from 'forum/macros.jinja' import display_message, display_breadcrumb, display_search_bar %}
 
 {% block title %}
 {{ topic }}
@@ -26,15 +26,8 @@
 {% endblock %}
 
 {% block content %}
-    <p>
-    <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
-    {% for f in topic.forum.get_parent_list()|reverse %}
-    > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
-    {% endfor %}
-    > <a href="{{ topic.forum.get_absolute_url() }}">{{ topic.forum }}</a>
-    > <a href="{{ topic.get_absolute_url() }}">{{ topic }}</a>
-    </p>
-    <h3>{{ topic.title }}</h3>
+{{ display_breadcrumb(topic.forum, topic) }}
+<h3>{{ topic.title }}</h3>
 <div id="forum">
     <p>{{ topic.description }}</p>
     <p>
@@ -46,6 +39,7 @@
     {% endif %}
     </p>
 
+    {{ display_search_bar(request) }}
     <p style="text-align: right; background: #d8e7f3;">
     {% for p in msgs.paginator.page_range %}
         <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>

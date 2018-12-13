@@ -2,6 +2,7 @@
 #
 # Copyright 2016,2017,2018
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -36,9 +37,56 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from ajax_select import make_ajax_field
 
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
+from core.views import (
+    CanViewMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    CanCreateMixin,
+    can_view,
+)
 from core.views.forms import MarkdownInput
 from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
+from haystack.query import RelatedSearchQuerySet
+
+
+class ForumSearchView(ListView):
+    template_name = "forum/search.jinja"
+
+    def get_queryset(self):
+        query = self.request.GET.get("query", "")
+        order_by = self.request.GET.get("order", "")
+
+        if query == "":
+            return []
+
+        queryset = RelatedSearchQuerySet().models(ForumMessage).autocomplete(auto=query)
+
+        if order_by == "date":
+            queryset = queryset.order_by("-date")
+
+        queryset = queryset.load_all()
+        queryset = queryset.load_all_queryset(
+            ForumMessage,
+            ForumMessage.objects.all()
+            .prefetch_related("topic__forum__edit_groups")
+            .prefetch_related("topic__forum__view_groups")
+            .prefetch_related("topic__forum__owner_club"),
+        )
+
+        # Filter unauthorized responses
+        resp = []
+        count = 0
+        max_count = 30
+        for r in queryset:
+            if count >= max_count:
+                return resp
+            if can_view(r.object, self.request.user) and can_view(
+                r.object.topic, self.request.user
+            ):
+                resp.append(r.object)
+                count += 1
+
+        return resp
 
 
 class ForumMainView(ListView):

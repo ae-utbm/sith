@@ -1,18 +1,12 @@
 {% extends "core/base.jinja" %}
-{% from 'forum/macros.jinja' import display_forum, display_topic %}
+{% from 'forum/macros.jinja' import display_forum, display_breadcrumb, display_topic, display_search_bar %}
 
 {% block title %}
 {{ forum }}
 {% endblock %}
 
 {% block content %}
-<div>
-    <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
-    {% for f in forum.get_parent_list()|reverse %}
-    > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
-    {% endfor %}
-    > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
-</div>
+{{ display_breadcrumb(forum) }}
 <div id="forum">
     <h3>{{ forum.name }}</h3>
     <p>
@@ -22,6 +16,7 @@
     {% if not forum.is_category %}
         <a class="ib button" href="{{ url('forum:new_topic', forum_id=forum.id) }}">{% trans %}New topic{% endtrans %}</a>
     {% endif %}
+    {{ display_search_bar(request) }}
     </p>
     {% if forum.children.exists() %}
     <div>
