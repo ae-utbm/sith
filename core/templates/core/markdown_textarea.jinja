@@ -54,6 +54,7 @@
 			spellChecker: false,
 			previewRender: function(plainText, preview){ // Async method
 				customMarkdownParser(plainText, preview);
+				return preview.innerHTML;
 			}
 		});
 
