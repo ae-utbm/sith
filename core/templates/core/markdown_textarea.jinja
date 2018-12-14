@@ -1,0 +1,62 @@
+<div>
+	<textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+	{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
+
+	{# The simplemde script can be included twice, it's safe in the code #}
+	<script src="{{ statics.js }}"> </script>
+	<script type="text/javascript">
+		var css = "{{ statics.css }}";
+
+		// Only import the css once
+		if (!document.head.innerHTML.includes(css)){
+			document.head.innerHTML += '<link rel="stylesheet" href="' + css + '">';
+		}
+
+		// You can't get the csrf token from the template in a widget
+		// We get it from a cookie as a workaround, see this link
+		// https://docs.djangoproject.com/en/2.0/ref/csrf/#ajax
+		function getCookie(name) {
+			var cookieValue = null;
+			if (document.cookie && document.cookie !== '') {
+				var cookies = document.cookie.split(';');
+				for (var i = 0; i < cookies.length; i++) {
+					var cookie = jQuery.trim(cookies[i]);
+					// Does this cookie string begin with the name we want?
+					if (cookie.substring(0, name.length + 1) === (name + '=')) {
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+						break;
+					}
+				}
+			}
+			return cookieValue;
+		}
+
+
+		// Custom markdown parser
+		function customMarkdownParser(plainText, preview) {
+			// Wait for jquery to load
+			var waitForJquery = setInterval(function () {
+				if (typeof $ != 'undefined'){
+					clearInterval(waitForJquery)
+					$.ajax({
+						url: "{{ markdown_api_url }}",
+						method: "POST",
+						data: { text: plainText, csrfmiddlewaretoken: getCookie('csrftoken') },
+					}).done(function (msg) {
+						preview.innerHTML = msg;
+					});
+				}
+			}, 10);
+		}
+
+		// Pretty markdown input
+		var simplemde = new SimpleMDE({
+			element: document.getElementById("{{ widget.attrs.id }}"),
+			spellChecker: false,
+			previewRender: function(plainText, preview){ // Async method
+				customMarkdownParser(plainText, preview);
+			}
+		});
+
+	</script>
+</div>
