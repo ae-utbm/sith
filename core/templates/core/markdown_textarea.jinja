@@ -33,19 +33,13 @@
 
 		// Custom markdown parser
 		function customMarkdownParser(plainText, preview) {
-			// Wait for jquery to load
-			var waitForJquery = setInterval(function () {
-				if (typeof $ != 'undefined'){
-					clearInterval(waitForJquery)
-					$.ajax({
-						url: "{{ markdown_api_url }}",
-						method: "POST",
-						data: { text: plainText, csrfmiddlewaretoken: getCookie('csrftoken') },
-					}).done(function (msg) {
-						preview.innerHTML = msg;
-					});
-				}
-			}, 10);
+			$.ajax({
+				url: "{{ markdown_api_url }}",
+				method: "POST",
+				data: { text: plainText, csrfmiddlewaretoken: getCookie('csrftoken') },
+			}).done(function (msg) {
+				preview.innerHTML = msg;
+			});
 		}
 
 		// Pretty markdown input
