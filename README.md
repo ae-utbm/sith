@@ -45,7 +45,7 @@ sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-de
 On macos, you will need homebrew
 
 ```bash
-brew install --build-from-source xapian --with-python
+brew install xapian
 ```
 
 If it doesn't work it's because it need [this pull request](https://github.com/Homebrew/homebrew-core/pull/34835) to be validated.
