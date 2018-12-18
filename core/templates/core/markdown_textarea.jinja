@@ -1,6 +1,5 @@
 <div>
-	<textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
-	{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
+	<textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
 
 	{# The simplemde script can be included twice, it's safe in the code #}
 	<script src="{{ statics.js }}"> </script>
