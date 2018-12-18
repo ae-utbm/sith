@@ -39,6 +39,7 @@
 			}).done(function (msg) {
 				preview.innerHTML = msg;
 			});
+			return preview.innerHTML;
 		}
 
 		// Pretty markdown input
@@ -46,10 +47,14 @@
 			element: document.getElementById("{{ widget.attrs.id }}"),
 			spellChecker: false,
 			previewRender: function(plainText, preview){ // Async method
-				customMarkdownParser(plainText, preview);
-				return preview.innerHTML;
-			}
+				return customMarkdownParser(plainText, preview);
+			},
+			showIcons: ["code", "table", "clean-block"]
 		});
 
+		// Change the behavior of the markdown guide button to use our page
+		$("[title='Markdown Guide']").each(function() {
+			$(this).prop("href", "/page/Aide_sur_la_syntaxe/");
+		});
 	</script>
 </div>
