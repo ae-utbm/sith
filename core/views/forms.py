@@ -102,7 +102,7 @@ class MarkdownInput(Textarea):
             "css": static("core/simplemde/simplemde.min.css"),
         }
         context["translations"] = {
-            "heading": _("Heading"),
+            "heading_smaller": _("Heading"),
             "italic": _("Italic"),
             "bold": _("Bold"),
             "strikethrough": _("Strikethrough"),
