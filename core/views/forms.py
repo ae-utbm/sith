@@ -101,6 +101,27 @@ class MarkdownInput(Textarea):
             "js": static("core/simplemde/simplemde.min.js"),
             "css": static("core/simplemde/simplemde.min.css"),
         }
+        context["translations"] = {
+            "heading": _("Heading"),
+            "italic": _("Italic"),
+            "bold": _("Bold"),
+            "strikethrough": _("Strikethrough"),
+            "underline": _("Underline"),
+            "superscript": _("Superscript"),
+            "subscript": _("Subscript"),
+            "code": _("Code"),
+            "quote": _("Quote"),
+            "unordered_list": _("Unordered list"),
+            "ordered_list": _("Ordered list"),
+            "image": _("Insert image"),
+            "link": _("Insert link"),
+            "table": _("Insert table"),
+            "clean_block": _("Clean block"),
+            "preview": _("Toggle preview"),
+            "side_by_side": _("Toggle side by side"),
+            "fullscreen": _("Toggle fullscreen"),
+            "guide": _("Markdown guide"),
+        }
         context["markdown_api_url"] = reverse("api:api_markdown")
         return context
 
