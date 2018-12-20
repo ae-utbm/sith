@@ -19,6 +19,8 @@
 
         <!-- Jquery declared here to be accessible in every django widgets -->
         <script src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>
+        <!-- Put here to always have acces to those functions on django widgets -->
+        <script src="{{ static('core/js/script.js') }}"></script>
         {% endblock %}
     </head>
 
@@ -257,7 +259,6 @@
         <script src="{{ static('core/js/multiple-select.js') }}"></script>
         <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
         <script src="{{ url('javascript-catalog') }}"></script>
-        <script src="{{ static('core/js/script.js') }}"></script>
         <script>
 $('.select_single').multipleSelect({
     single: true,

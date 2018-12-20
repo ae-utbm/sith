@@ -43,3 +43,22 @@ $( function() {
 function display_notif() {
     $('#header_notif').toggle().parent().toggleClass("white");
 }
+
+// You can't get the csrf token from the template in a widget
+// We get it from a cookie as a workaround, see this link
+// https://docs.djangoproject.com/en/2.0/ref/csrf/#ajax
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
