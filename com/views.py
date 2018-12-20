@@ -197,7 +197,12 @@ class NewsForm(forms.ModelForm):
     class Meta:
         model = News
         fields = ["type", "title", "club", "summary", "content", "author"]
-        widgets = {"author": forms.HiddenInput, "type": forms.RadioSelect}
+        widgets = {
+            "author": forms.HiddenInput,
+            "type": forms.RadioSelect,
+            "summary": MarkdownInput,
+            "content": MarkdownInput,
+        }
 
     start_date = forms.DateTimeField(
         ["%Y-%m-%d %H:%M:%S"],
