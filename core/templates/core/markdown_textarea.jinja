@@ -35,7 +35,7 @@
 				}, 300, plainText, preview);
 				return preview.innerHTML;
 			},
-			// showIcons: ["code", "table", "clean-block"],
+			forceSync: true, // Avoid validation error on generic create view
 			toolbar: [
 				{
 					name: "heading-smaller",
