@@ -12,7 +12,7 @@ from django import forms
 
 from core.views import CanViewMixin, CanEditMixin, CanCreateMixin
 from django.db.models.query import QuerySet
-from core.views.forms import SelectDateTime
+from core.views.forms import SelectDateTime, MarkdownInput
 from election.models import Election, Role, Candidature, ElectionList, Vote
 
 from ajax_select.fields import AutoCompleteSelectField
@@ -67,7 +67,7 @@ class CandidateForm(forms.ModelForm):
     class Meta:
         model = Candidature
         fields = ["user", "role", "program", "election_list"]
-        widgets = {"program": forms.Textarea}
+        widgets = {"program": MarkdownInput}
 
     user = AutoCompleteSelectField(
         "users", label=_("User to candidate"), help_text=None, required=True
