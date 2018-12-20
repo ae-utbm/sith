@@ -1644,26 +1644,6 @@ label {
   }
 }
 
-.markdown_editor {
-  margin-top: 5px;
-}
-
-.markdown_editor a {
-  border: solid 1px $black-color;
-  padding: 2px;
-  min-width: 1em;
-  display: inline-block;
-  text-align: center;
-  margin: 0px 1px;
-}
-
-.markdown_editor a:hover {
-  text-decoration: none;
-  cursor: pointer;
-  box-shadow: 0px 0px 1px 1px $secondary-light-color;
-  transition: all 0.1s linear;
-}
-
 /*--------------------------------JQuery-------------------------------*/
 
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header
