@@ -6,6 +6,7 @@
 	<script src="{{ statics.js }}"> </script>
 	<script type="text/javascript">
 		var css = "{{ statics.css }}";
+		var lastAPICall;
 
 		// Only import the css once
 		if (!document.head.innerHTML.includes(css)){
@@ -40,7 +41,6 @@
 			}).done(function (msg) {
 				preview.innerHTML = msg;
 			});
-			return preview.innerHTML;
 		}
 
 		// Pretty markdown input
@@ -48,7 +48,11 @@
 			element: document.getElementById("{{ widget.attrs.id }}"),
 			spellChecker: false,
 			previewRender: function(plainText, preview){ // Async method
-				return customMarkdownParser(plainText, preview);
+				clearTimeout(lastAPICall);
+				lastAPICall = setTimeout(function (plainText, preview){
+					customMarkdownParser(plainText, preview);
+				}, 300, plainText, preview);
+				return preview.innerHTML;
 			},
 			// showIcons: ["code", "table", "clean-block"],
 			toolbar: [
