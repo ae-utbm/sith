@@ -18,7 +18,7 @@
 			$.ajax({
 				url: "{{ markdown_api_url }}",
 				method: "POST",
-				data: { text: plainText, csrfmiddlewaretoken: getCookie('csrftoken') },
+				data: { text: plainText, csrfmiddlewaretoken: getCSRFToken() },
 			}).done(function (msg) {
 				preview.innerHTML = msg;
 			});

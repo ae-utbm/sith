@@ -26,6 +26,9 @@
 
     <body>
 
+        <!-- The token is always passed here to be accessible from the dom -->
+        <!-- See this workaround https://docs.djangoproject.com/en/2.0/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-is-true -->
+        {% csrf_token %}
         <!-- BEGIN HEADER -->
         {% block header %}
         {% if not popup %}

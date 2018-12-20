@@ -47,18 +47,9 @@ function display_notif() {
 // You can't get the csrf token from the template in a widget
 // We get it from a cookie as a workaround, see this link
 // https://docs.djangoproject.com/en/2.0/ref/csrf/#ajax
-function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
+// Sadly, getting the cookie is not possible with CSRF_COOKIE_HTTPONLY or CSRF_USE_SESSIONS is True
+// So, the true workaround is to get the token from the dom
+// https://docs.djangoproject.com/en/2.0/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-is-true
+function getCSRFToken() {
+    return $("[name=csrfmiddlewaretoken]").val();
 }
