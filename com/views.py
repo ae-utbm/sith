@@ -167,19 +167,25 @@ class ComEditView(ComTabsMixin, CanEditPropMixin, UpdateView):
 
 
 class AlertMsgEditView(ComEditView):
-    fields = ["alert_msg"]
+    form_class = modelform_factory(
+        Sith, fields=["alert_msg"], widgets={"alert_msg": MarkdownInput}
+    )
     current_tab = "alert"
     success_url = reverse_lazy("com:alert_edit")
 
 
 class InfoMsgEditView(ComEditView):
-    fields = ["info_msg"]
+    form_class = modelform_factory(
+        Sith, fields=["info_msg"], widgets={"info_msg": MarkdownInput}
+    )
     current_tab = "info"
     success_url = reverse_lazy("com:info_edit")
 
 
 class IndexEditView(ComEditView):
-    fields = ["index_page"]
+    form_class = modelform_factory(
+        Sith, fields=["index_page"], widgets={"index_page": MarkdownInput}
+    )
     current_tab = "index"
     success_url = reverse_lazy("com:index_edit")
 
