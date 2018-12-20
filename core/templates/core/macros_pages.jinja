@@ -22,29 +22,6 @@
 <form action="{{ url }}" method="post">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ token }}">
     {{ form.as_p() }}
-    {{ markdown_preview_button() }}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
 </form>
-<div id="preview" class="page_content">
-</div>
-{% endmacro %}
-
-{% macro markdown_preview_script(token) %}
-<script>
-function make_preview() {
-    text = $("#id_content").val();
-    console.log("Rendering text: " + text);
-    $.ajax({
-        url: "{{ url('api:api_markdown') }}",
-        method: "POST",
-        data: { text:  text, csrfmiddlewaretoken: "{{ token }}"}
-    }).done(function (msg) {
-        $("#preview").html(msg);
-    });
-}
-</script>
-{% endmacro %}
-
-{% macro markdown_preview_button() %}
-    <p><input type="button" value="{% trans %}Preview{% endtrans %}" onclick="javascript:make_preview();" /></p>
 {% endmacro %}
