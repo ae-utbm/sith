@@ -1,0 +1,171 @@
+<div>
+	{# Depends on this package https://github.com/sparksuite/simplemde-markdown-editor #}
+	<textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
+
+	{# The simplemde script can be included twice, it's safe in the code #}
+	<script src="{{ statics.js }}"> </script>
+	<script type="text/javascript">
+		var css = "{{ statics.css }}";
+		var lastAPICall;
+
+		// Only import the css once
+		if (!document.head.innerHTML.includes(css)){
+			document.head.innerHTML += '<link rel="stylesheet" href="' + css + '">';
+		}
+
+		// Custom markdown parser
+		function customMarkdownParser(plainText, preview) {
+			$.ajax({
+				url: "{{ markdown_api_url }}",
+				method: "POST",
+				data: { text: plainText, csrfmiddlewaretoken: getCookie('csrftoken') },
+			}).done(function (msg) {
+				preview.innerHTML = msg;
+			});
+		}
+
+		// Pretty markdown input
+		var simplemde = new SimpleMDE({
+			element: document.getElementById("{{ widget.attrs.id }}"),
+			spellChecker: false,
+			previewRender: function(plainText, preview){ // Async method
+				clearTimeout(lastAPICall);
+				lastAPICall = setTimeout(function (plainText, preview){
+					customMarkdownParser(plainText, preview);
+				}, 300, plainText, preview);
+				return preview.innerHTML;
+			},
+			forceSync: true, // Avoid validation error on generic create view
+			toolbar: [
+				{
+					name: "heading-smaller",
+					action: SimpleMDE.toggleHeadingSmaller,
+					className: "fa fa-header",
+					title: "{{ translations.heading_smaller }}"
+				},
+				{
+					name: "italic",
+					action: SimpleMDE.toggleItalic,
+					className: "fa fa-italic",
+					title: "{{ translations.italic }}"
+				},
+				{
+					name: "bold",
+					action: SimpleMDE.toggleBold,
+					className: "fa fa-bold",
+					title: "{{ translations.bold }}"
+				},
+				{
+					name: "strikethrough",
+					action: SimpleMDE.toggleStrikethrough,
+					className: "fa fa-strikethrough",
+					title: "{{ translations.strikethrough }}"
+				},
+				{
+					name: "underline",
+					action: function customFunction(editor){
+						var cm = editor.codemirror;
+						cm.replaceSelection('__' + cm.getSelection() + '__');
+					},
+					className: "fa fa-underline",
+					title: "{{ translations.underline }}"
+				},
+				{
+					name: "superscript",
+					action: function customFunction(editor){
+						var cm = editor.codemirror;
+						cm.replaceSelection('<sup>' + cm.getSelection() + '</sup>');
+					},
+					className: "fa fa-superscript",
+					title: "{{ translations.superscript }}"
+				},
+				{
+					name: "subscript",
+					action: function customFunction(editor){
+						var cm = editor.codemirror;
+						cm.replaceSelection('<sub>' + cm.getSelection() + '</sub>');
+					},
+					className: "fa fa-subscript",
+					title: "{{ translations.subscript }}"
+				},
+				{
+					name: "code",
+					action: SimpleMDE.toggleCodeBlock,
+					className: "fa fa-code",
+					title: "{{ translations.code }}"
+				},
+				"|",
+				{
+					name: "quote",
+					action: SimpleMDE.toggleBlockquote,
+					className: "fa fa-quote-left",
+					title: "{{ translations.quote }}"
+				},
+				{
+					name: "unordered-list",
+					action: SimpleMDE.toggleUnorderedList,
+					className: "fa fa-list-ul",
+					title: "{{ translations.unordered_list }}"
+				},
+				{
+					name: "ordered-list",
+					action: SimpleMDE.toggleOrderedList,
+					className: "fa fa-list-ol",
+					title: "{{ translations.ordered_list }}"
+				},
+				"|",
+				{
+					name: "link",
+					action: SimpleMDE.drawLink,
+					className: "fa fa-link",
+					title: "{{ translations.link }}"
+				},
+				{
+					name: "image",
+					action: SimpleMDE.drawImage,
+					className: "fa fa-picture-o",
+					title: "{{ translations.image }}"
+				},
+				{
+					name: "table",
+					action: SimpleMDE.drawTable,
+					className: "fa fa-table",
+					title: "{{ translations.table }}"
+				},
+				"|",
+				{
+					name: "clean-block",
+					action: SimpleMDE.cleanBlock,
+					className: "fa fa-eraser fa-clean-block",
+					title: "{{ translations.clean_block }}"
+				},
+				"|",
+				{
+					name: "preview",
+					action: SimpleMDE.togglePreview,
+					className: "fa fa-eye no-disable",
+					title: "{{ translations.preview }}"
+				},
+				{
+					name: "side-by-side",
+					action: SimpleMDE.toggleSideBySide,
+					className: "fa fa-columns no-disable no-mobile",
+					title: "{{ translations.side_by_side }}"
+				},
+				{
+					name: "fullscreen",
+					action: SimpleMDE.toggleFullScreen,
+					className: "fa fa-arrows-alt no-disable no-mobile",
+					title: "{{ translations.fullscreen }}"
+				},
+				"|",
+				{
+					name: "guide",
+					action: "/page/Aide_sur_la_syntaxe",
+					className: "fa fa-question-circle",
+					title: "{{ translations.guide }}"
+				},
+			]
+		});
+	</script>
+</div>

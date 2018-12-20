@@ -16,6 +16,11 @@
         {% else %}
           <link rel="stylesheet" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}">
         {% endif %}
+
+        <!-- Jquery declared here to be accessible in every django widgets -->
+        <script src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>
+        <!-- Put here to always have acces to those functions on django widgets -->
+        <script src="{{ static('core/js/script.js') }}"></script>
         {% endblock %}
     </head>
 
@@ -248,14 +253,12 @@
             {% endblock %}
         -->
         {% block script %}
-        <script src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>
         <script src="{{ static('core/js/ui/jquery-ui.min.js') }}"></script>
         <script src="{{ static('core/js/ui/i18n/datepicker-fr.js') }}"></script>
         <script src="{{ static('core/js/jquery.datetimepicker.full.min.js') }}"></script>
         <script src="{{ static('core/js/multiple-select.js') }}"></script>
         <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
         <script src="{{ url('javascript-catalog') }}"></script>
-        <script src="{{ static('core/js/script.js') }}"></script>
         <script>
 $('.select_single').multipleSelect({
     single: true,
@@ -289,73 +292,8 @@ $(document).keydown(function (e) {
 jQuery.datetimepicker.setLocale('{{ request.LANGUAGE_CODE|lower }}');
 $('.select_datetime').datetimepicker({
         format: 'Y-m-d H:i:s',
-        });
-
-function add_syntax(e, choice) {
-    ta = $(e).parent().children('textarea')[0];
-    ta.focus();
-    var start = ta.selectionStart;
-    var end = ta.selectionEnd;
-    var before = ta.value.substring(0, start);
-    var after = ta.value.substring(end);
-    var between = ta.value.substring(start, end);
-    switch (choice) {
-        case "bold":
-            ta.value = before + "**" + between + "**" + after;
-            ta.selectionEnd = end + 2;
-            break;
-        case "italic":
-            ta.value = before + "*" + between + "*" + after;
-            ta.selectionEnd = end + 1;
-            break;
-        case "underline":
-            ta.value = before + "__" + between + "__" + after;
-            ta.selectionEnd = end + 2;
-            break;
-        case "strike":
-            ta.value = before + "~~" + between + "~~" + after;
-            ta.selectionEnd = end + 2;
-            break;
-        case "sub":
-            ta.value = before + "<sub>" + between + "</sub>" + after;
-            ta.selectionEnd = end + 5;
-            break;
-        case "sup":
-            ta.value = before + "<sup>" + between + "</sup>" + after;
-            ta.selectionEnd = end + 5;
-            break;
-        case "link":
-            if (between === "") {
-                between = "https://";
-            }
-            name = "{% trans %}name{% endtrans %}";
-            ta.value = before + "[" + name + "](" + between + ")" + after;
-            ta.selectionStart = start + 1;
-            ta.selectionEnd = start + 1 + name.length;
-            break;
-        case "image":
-            if (between === "") {
-                between = "{% trans %}https://path/to/image.gif{% endtrans %}";
-            }
-            alt = "{% trans %}alternative text{% endtrans %}";
-            ta.value = before + "![" + alt + "](" + between + "?42% \"{% trans %}Title{% endtrans %}\")" + after;
-            ta.selectionStart = start + 2;
-            ta.selectionEnd = start + 2 + alt.length;
-            break;
-    }
-}
-
-$(document).ready(function() {
-    editor = $('.markdown_editor');
-    editor.prepend('<a onclick="javascript:add_syntax(this, \'image\')">{% trans %}Image{% endtrans %}</a>');
-    editor.prepend('<a onclick="javascript:add_syntax(this, \'link\')">{% trans %}Link{% endtrans %}</a>');
-    editor.prepend('<a onclick="javascript:add_syntax(this, \'sup\')"><sup>{% trans %}sup{% endtrans %}</sup></a>');
-    editor.prepend('<a onclick="javascript:add_syntax(this, \'sub\')"><sub>{% trans %}sub{% endtrans %}</sub></a>');
-    editor.prepend('<a onclick="javascript:add_syntax(this, \'strike\')"><del>{% trans %}S{% endtrans %}</del></a>');
-    editor.prepend('<a onclick="javascript:add_syntax(this, \'underline\')"><u>{% trans %}U{% endtrans %}</u></a>');
-    editor.prepend('<a onclick="javascript:add_syntax(this, \'italic\')"><i>{% trans %}I{% endtrans %}</i></a>');
-    editor.prepend('<a onclick="javascript:add_syntax(this, \'bold\')"><b>{% trans %}B{% endtrans %}</b></a>');
 });
+
         </script>
         {% endblock %}
     </body>

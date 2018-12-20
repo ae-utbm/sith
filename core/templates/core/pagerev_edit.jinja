@@ -1,10 +1,5 @@
 {% extends "core/page.jinja" %}
-{% from 'core/macros_pages.jinja' import markdown_preview_script, page_edit_form %}
-
-{% block head %}
-{{ super() }}
-{{ markdown_preview_script(csrf_token) }}
-{% endblock %}
+{% from 'core/macros_pages.jinja' import page_edit_form %}
 
 {% block page %}
 {{ page_edit_form(page, form, url('core:page_edit', page_name=page.get_full_name()), csrf_token) }}

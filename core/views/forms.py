@@ -26,6 +26,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.conf import settings
 from django.db import transaction
+from django.templatetags.static import static
+from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.forms import (
     CheckboxSelectMultiple,
@@ -90,19 +92,38 @@ class SelectDate(DateInput):
 
 
 class MarkdownInput(Textarea):
-    def render(self, name, value, attrs=None):
-        output = (
-            '<p><a href="%(syntax_url)s">%(help_text)s</a></p>'
-            '<div class="markdown_editor">%(content)s</div>'
-            % {
-                "syntax_url": Page.get_page_by_full_name(
-                    settings.SITH_CORE_PAGE_SYNTAX
-                ).get_absolute_url(),
-                "help_text": _("Help on the syntax"),
-                "content": super(MarkdownInput, self).render(name, value, attrs),
-            }
-        )
-        return output
+    template_name = "core/markdown_textarea.jinja"
+
+    def get_context(self, name, value, attrs):
+        context = super(MarkdownInput, self).get_context(name, value, attrs)
+
+        context["statics"] = {
+            "js": static("core/simplemde/simplemde.min.js"),
+            "css": static("core/simplemde/simplemde.min.css"),
+        }
+        context["translations"] = {
+            "heading_smaller": _("Heading"),
+            "italic": _("Italic"),
+            "bold": _("Bold"),
+            "strikethrough": _("Strikethrough"),
+            "underline": _("Underline"),
+            "superscript": _("Superscript"),
+            "subscript": _("Subscript"),
+            "code": _("Code"),
+            "quote": _("Quote"),
+            "unordered_list": _("Unordered list"),
+            "ordered_list": _("Ordered list"),
+            "image": _("Insert image"),
+            "link": _("Insert link"),
+            "table": _("Insert table"),
+            "clean_block": _("Clean block"),
+            "preview": _("Toggle preview"),
+            "side_by_side": _("Toggle side by side"),
+            "fullscreen": _("Toggle fullscreen"),
+            "guide": _("Markdown guide"),
+        }
+        context["markdown_api_url"] = reverse("api:api_markdown")
+        return context
 
 
 class SelectFile(TextInput):

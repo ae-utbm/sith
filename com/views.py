@@ -49,7 +49,7 @@ from core.views import (
     CanCreateMixin,
     QuickNotifMixin,
 )
-from core.views.forms import SelectDateTime
+from core.views.forms import SelectDateTime, MarkdownInput
 from core.models import Notification, RealGroup, User
 from club.models import Club, Mailing
 
@@ -167,19 +167,25 @@ class ComEditView(ComTabsMixin, CanEditPropMixin, UpdateView):
 
 
 class AlertMsgEditView(ComEditView):
-    fields = ["alert_msg"]
+    form_class = modelform_factory(
+        Sith, fields=["alert_msg"], widgets={"alert_msg": MarkdownInput}
+    )
     current_tab = "alert"
     success_url = reverse_lazy("com:alert_edit")
 
 
 class InfoMsgEditView(ComEditView):
-    fields = ["info_msg"]
+    form_class = modelform_factory(
+        Sith, fields=["info_msg"], widgets={"info_msg": MarkdownInput}
+    )
     current_tab = "info"
     success_url = reverse_lazy("com:info_edit")
 
 
 class IndexEditView(ComEditView):
-    fields = ["index_page"]
+    form_class = modelform_factory(
+        Sith, fields=["index_page"], widgets={"index_page": MarkdownInput}
+    )
     current_tab = "index"
     success_url = reverse_lazy("com:index_edit")
 
@@ -197,7 +203,12 @@ class NewsForm(forms.ModelForm):
     class Meta:
         model = News
         fields = ["type", "title", "club", "summary", "content", "author"]
-        widgets = {"author": forms.HiddenInput, "type": forms.RadioSelect}
+        widgets = {
+            "author": forms.HiddenInput,
+            "type": forms.RadioSelect,
+            "summary": MarkdownInput,
+            "content": MarkdownInput,
+        }
 
     start_date = forms.DateTimeField(
         ["%Y-%m-%d %H:%M:%S"],
@@ -461,6 +472,12 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
         Weekmail,
         fields=["title", "intro", "joke", "protip", "conclusion"],
         help_texts={"title": _("Delete and save to regenerate")},
+        widgets={
+            "intro": MarkdownInput,
+            "joke": MarkdownInput,
+            "protip": MarkdownInput,
+            "conclusion": MarkdownInput,
+        },
     )
     success_url = reverse_lazy("com:weekmail")
     current_tab = "weekmail"
@@ -533,7 +550,11 @@ class WeekmailArticleEditView(
     """Edit an article"""
 
     model = WeekmailArticle
-    fields = ["title", "club", "content"]
+    form_class = modelform_factory(
+        WeekmailArticle,
+        fields=["title", "club", "content"],
+        widgets={"content": MarkdownInput},
+    )
     pk_url_kwarg = "article_id"
     template_name = "core/edit.jinja"
     success_url = reverse_lazy("com:weekmail")
@@ -545,7 +566,11 @@ class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
     """Post an article"""
 
     model = WeekmailArticle
-    fields = ["title", "club", "content"]
+    form_class = modelform_factory(
+        WeekmailArticle,
+        fields=["title", "club", "content"],
+        widgets={"content": MarkdownInput},
+    )
     template_name = "core/create.jinja"
     success_url = reverse_lazy("core:user_tools")
     quick_notif_url_arg = "qn_weekmail_new_article"

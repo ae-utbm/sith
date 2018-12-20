@@ -30,26 +30,8 @@
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p() }}
-        <p><input type="button" value="{% trans %}Preview{% endtrans %}" onclick="javascript:make_preview();" /></p>
         <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
     </form>
-    <div id="preview_message" class="message" style="display: none;">
-        <div class="msg_author">
-            {% if user.avatar_pict %}
-            <img src="{{ user.avatar_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
-            {% else %}
-            <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
-            {% endif %}
-            <br/>
-            <strong><a href="{{ user.get_absolute_url() }}">{{ user.get_short_name() }}</a></strong>
-        </div>
-        <div class="msg_content">
-            <hr>
-            <div id="preview" class="ib"></div>
-            <div class="forum_signature">{{ user.forum_signature|markdown }}</div>
-        </div>
-    </div>
-
     <hr>
 
     {% if topic %}
@@ -62,26 +44,3 @@
 </div>
 
 {% endblock %}
-
-
-{% block script %}
-{{ super() }}
-<script>
-function make_preview() {
-    $("#preview_message").hide(300);
-    text = $("#id_message").val();
-    console.log("Rendering text: " + text);
-    $.ajax({
-        url: "{{ url('api:api_markdown') }}",
-        method: "POST",
-        data: { text:  text, csrfmiddlewaretoken: "{{ csrf_token }}"}
-    }).done(function (msg) {
-        $("#preview").html(msg);
-        $("#preview_message").show(300);
-    });
-}
-</script>
-{% endblock %}
-
-
-
