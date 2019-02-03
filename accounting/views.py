@@ -415,7 +415,7 @@ class OperationForm(forms.ModelForm):
                 and self.cleaned_data.get("club") is None
                 and self.cleaned_data.get("club_account") is None
                 and self.cleaned_data.get("company") is None
-                and self.cleaned_data.get("target_label") is ""
+                and self.cleaned_data.get("target_label") == ""
             ):
                 self.add_error(
                     "target_type", ValidationError(_("The target must be set."))
