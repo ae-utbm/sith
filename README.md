@@ -20,6 +20,8 @@ pip install -r requirements.txt
 
 To start the simple development server, just run `python3 manage.py runserver`
 
+For more informations, check out the CONTRIBUTING.md file.
+
 ### Logging errors with sentry
 
 To connect the app to sentry.io, you must set the variable SENTRY_DSN in your settings custom. It's composed of the full link given on your sentry project
@@ -39,7 +41,7 @@ already.
 You can check all of them with:
 
 ```bash
-sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian
+sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian gettext
 ```
 
 On macos, you will need homebrew
