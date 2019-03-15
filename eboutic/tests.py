@@ -67,8 +67,6 @@ class EbouticTest(TestCase):
             urllib.parse.quote_plus(b64sig),
         )
         response = self.client.get(url)
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue(response.content.decode("utf-8") == "")
         return response
 
     def test_buy_simple_product_with_sith_account(self):
@@ -140,6 +138,8 @@ class EbouticTest(TestCase):
         )
 
         response = self.generate_bank_valid_answer_from_page_content(response.content)
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.content.decode("utf-8") == "")
 
         response = self.client.get(
             reverse(
@@ -159,6 +159,42 @@ class EbouticTest(TestCase):
             '<td>Eboutic</td>\\n        <td><a href="/user/3/">Subscribed User</a></td>\\n'
             "        <td>Barbar</td>\\n        <td>1</td>\\n        <td>1.70 \\xe2\\x82\\xac</td>\\n"
             "        <td>Carte bancaire</td>" in str(response.content)
+        )
+
+    def test_alter_basket_with_credit_card(self):
+        self.client.login(username="subscriber", password="plop")
+        response = self.client.post(
+            reverse("eboutic:main"),
+            {"action": "add_product", "product_id": self.barbar.id},
+        )
+        self.assertTrue(
+            '<input type="hidden" name="action" value="add_product">\\n'
+            '    <button type="submit" name="product_id" value="4"> + </button>\\n'
+            "</form>\\n Barbar: 1.70 \\xe2\\x82\\xac</li>" in str(response.content)
+        )
+        response = self.client.post(reverse("eboutic:command"))
+        self.assertTrue(
+            "<tr>\\n                <td>Barbar</td>\\n                <td>1</td>\\n"
+            "                <td>1.70 \\xe2\\x82\\xac</td>\\n            </tr>"
+            in str(response.content)
+        )
+
+        response_altered = self.client.post(
+            reverse("eboutic:main"),
+            {"action": "add_product", "product_id": self.barbar.id},
+        )
+        self.assertTrue(
+            '<input type="hidden" name="action" value="add_product">\\n'
+            '    <button type="submit" name="product_id" value="4"> + </button>\\n'
+            "</form>\\n Barbar: 3.40 \\xe2\\x82\\xac</li>"
+            in str(response_altered.content)
+        )
+
+        response = self.generate_bank_valid_answer_from_page_content(response.content)
+        self.assertTrue(response.status_code == 400)
+        self.assertTrue(
+            "Payment failed with error: SuspiciousOperation('Basket total and amount do not match'"
+            in response.content.decode("utf-8")
         )
 
     def test_buy_refill_product_with_credit_card(self):
@@ -181,6 +217,8 @@ class EbouticTest(TestCase):
         )
 
         response = self.generate_bank_valid_answer_from_page_content(response.content)
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.content.decode("utf-8") == "")
 
         response = self.client.get(
             reverse(
@@ -227,6 +265,8 @@ class EbouticTest(TestCase):
         )
 
         response = self.generate_bank_valid_answer_from_page_content(response.content)
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(response.content.decode("utf-8") == "")
 
         response = self.client.get(
             reverse(

@@ -271,6 +271,10 @@ class EtransactionAutoAnswer(View):
                     )
                     if b is None:
                         raise SuspiciousOperation("Basket does not exists")
+                    if int(b.get_total() * 100) != int(request.GET["Amount"]):
+                        raise SuspiciousOperation(
+                            "Basket total and amount do not match"
+                        )
                     i = Invoice()
                     i.user = b.user
                     i.payment_method = "CARD"
