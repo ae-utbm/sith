@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-19 14:00+0100\n"
+"POT-Creation-Date: 2019-03-17 17:55+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -18,11 +18,10 @@ msgstr ""
 
 #: accounting/models.py:61 accounting/models.py:110 accounting/models.py:138
 #: accounting/models.py:203 club/models.py:48 com/models.py:231
-#: com/models.py:248 core/templates/core/base.jinja:333 counter/models.py:119
-#: counter/models.py:147 counter/models.py:209 forum/models.py:58
-#: launderette/models.py:38 launderette/models.py:90 launderette/models.py:125
-#: stock/models.py:40 stock/models.py:60 stock/models.py:100
-#: stock/models.py:127
+#: com/models.py:248 counter/models.py:119 counter/models.py:147
+#: counter/models.py:209 forum/models.py:58 launderette/models.py:38
+#: launderette/models.py:90 launderette/models.py:125 stock/models.py:40
+#: stock/models.py:60 stock/models.py:100 stock/models.py:127
 msgid "name"
 msgstr "nom"
 
@@ -317,7 +316,7 @@ msgstr "Liste des types comptable"
 #: accounting/templates/accounting/label_list.jinja:10
 #: accounting/templates/accounting/operation_edit.jinja:10
 #: accounting/templates/accounting/simplifiedaccountingtype_list.jinja:10
-#: core/templates/core/user_tools.jinja:56
+#: core/templates/core/user_tools.jinja:57
 msgid "Accounting"
 msgstr "Comptabilité"
 
@@ -336,7 +335,7 @@ msgstr "Il n'y a pas de types comptable dans ce site web."
 
 #: accounting/templates/accounting/bank_account_details.jinja:4
 #: accounting/templates/accounting/bank_account_details.jinja:14
-#: core/templates/core/user_tools.jinja:65
+#: core/templates/core/user_tools.jinja:66
 msgid "Bank account: "
 msgstr "Compte en banque : "
 
@@ -419,7 +418,7 @@ msgstr "Nouveau compte club"
 #: com/templates/com/screen_list.jinja:26 com/templates/com/weekmail.jinja:32
 #: com/templates/com/weekmail.jinja:61 core/templates/core/file.jinja:38
 #: core/templates/core/page.jinja:35 core/templates/core/poster_list.jinja:40
-#: core/templates/core/user_tools.jinja:41 core/views/user.py:237
+#: core/templates/core/user_tools.jinja:42 core/views/user.py:237
 #: counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:33
@@ -565,7 +564,7 @@ msgstr "Voir"
 
 #: accounting/templates/accounting/co_list.jinja:4
 #: accounting/templates/accounting/journal_details.jinja:19
-#: core/templates/core/user_tools.jinja:61
+#: core/templates/core/user_tools.jinja:62
 msgid "Company list"
 msgstr "Liste des entreprises"
 
@@ -771,13 +770,13 @@ msgstr "Opération liée : "
 #: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:7
 #: core/templates/core/edit.jinja:15 core/templates/core/edit.jinja:20
 #: core/templates/core/file_edit.jinja:8
-#: core/templates/core/macros_pages.jinja:26
+#: core/templates/core/macros_pages.jinja:25
 #: core/templates/core/page_prop.jinja:11
 #: core/templates/core/user_godfathers.jinja:41
 #: core/templates/core/user_preferences.jinja:12
 #: core/templates/core/user_preferences.jinja:19
 #: counter/templates/counter/cash_register_summary.jinja:22
-#: forum/templates/forum/reply.jinja:34
+#: forum/templates/forum/reply.jinja:33
 #: subscription/templates/subscription/subscription.jinja:25
 #: trombi/templates/trombi/comment.jinja:26
 #: trombi/templates/trombi/edit_profile.jinja:13
@@ -1008,7 +1007,7 @@ msgid "inactive"
 msgstr "inactif"
 
 #: club/templates/club/club_list.jinja:34
-#: core/templates/core/user_tools.jinja:22
+#: core/templates/core/user_tools.jinja:23
 msgid "New club"
 msgstr "Nouveau club"
 
@@ -1147,7 +1146,7 @@ msgid "Payment method"
 msgstr "Méthode de paiement"
 
 #: club/templates/club/club_tools.jinja:4
-#: core/templates/core/user_tools.jinja:100
+#: core/templates/core/user_tools.jinja:101
 msgid "Club tools"
 msgstr "Outils club"
 
@@ -1174,7 +1173,7 @@ msgstr "Nouveau Trombi"
 #: club/templates/club/club_tools.jinja:14
 #: com/templates/com/poster_list.jinja:17
 #: core/templates/core/poster_list.jinja:17
-#: core/templates/core/user_tools.jinja:90
+#: core/templates/core/user_tools.jinja:91
 msgid "Posters"
 msgstr "Affiches"
 
@@ -1256,7 +1255,7 @@ msgstr "Anciens membres"
 msgid "History"
 msgstr "Historique"
 
-#: club/views.py:165 core/templates/core/base.jinja:116 core/views/user.py:228
+#: club/views.py:165 core/templates/core/base.jinja:121 core/views/user.py:228
 #: sas/templates/sas/picture.jinja:95 trombi/views.py:60
 msgid "Tools"
 msgstr "Outils"
@@ -1292,7 +1291,7 @@ msgstr "Vous n'avez pas la permission de faire cela"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:412 com/views.py:85 com/views.py:210 counter/views.py:1487
+#: club/views.py:412 com/views.py:85 com/views.py:221 counter/views.py:1487
 #: election/views.py:190 subscription/views.py:52
 msgid "End date"
 msgstr "Date de fin"
@@ -1411,7 +1410,7 @@ msgid "Begin date should be before end date"
 msgstr "La date de début doit être avant celle de fin"
 
 #: com/templates/com/mailing_admin.jinja:4 com/views.py:134
-#: core/templates/core/user_tools.jinja:89
+#: core/templates/core/user_tools.jinja:90
 msgid "Mailing lists administration"
 msgstr "Administration des mailing listes"
 
@@ -1459,7 +1458,7 @@ msgstr "Nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:11
 #: com/templates/com/news_edit.jinja:8 com/templates/com/news_edit.jinja:31
-#: core/templates/core/user_tools.jinja:83
+#: core/templates/core/user_tools.jinja:84
 msgid "Create news"
 msgstr "Créer nouvelle"
 
@@ -1493,9 +1492,8 @@ msgstr "Type"
 #: com/templates/com/news_admin_list.jinja:249
 #: com/templates/com/news_admin_list.jinja:286
 #: com/templates/com/weekmail.jinja:19 com/templates/com/weekmail.jinja:48
-#: core/templates/core/base.jinja:343 forum/templates/forum/forum.jinja:24
-#: forum/templates/forum/forum.jinja:43 forum/templates/forum/main.jinja:27
-#: forum/views.py:240
+#: forum/templates/forum/forum.jinja:24 forum/templates/forum/forum.jinja:43
+#: forum/templates/forum/main.jinja:27 forum/views.py:240
 msgid "Title"
 msgstr "Titre"
 
@@ -1572,7 +1570,7 @@ msgid "Calls to moderate"
 msgstr "Appels à modérer"
 
 #: com/templates/com/news_admin_list.jinja:242
-#: core/templates/core/base.jinja:166
+#: core/templates/core/base.jinja:171
 msgid "Events"
 msgstr "Événements"
 
@@ -1628,8 +1626,6 @@ msgstr ""
 "concours, ...)"
 
 #: com/templates/com/news_edit.jinja:56 com/templates/com/weekmail.jinja:10
-#: core/templates/core/macros_pages.jinja:49
-#: forum/templates/forum/reply.jinja:33
 msgid "Preview"
 msgstr "Prévisualiser"
 
@@ -1712,7 +1708,7 @@ msgid "Screen - edit"
 msgstr "Écran - modifier"
 
 #: com/templates/com/screen_list.jinja:4 com/templates/com/screen_list.jinja:11
-#: core/templates/core/user_tools.jinja:91
+#: core/templates/core/user_tools.jinja:92
 msgid "Screens"
 msgstr "Écrans"
 
@@ -1727,7 +1723,7 @@ msgid "Slideshow"
 msgstr "Diaporama"
 
 #: com/templates/com/weekmail.jinja:5 com/templates/com/weekmail.jinja:9
-#: com/views.py:108 core/templates/core/user_tools.jinja:81
+#: com/views.py:108 core/templates/core/user_tools.jinja:82
 msgid "Weekmail"
 msgstr "Weekmail"
 
@@ -1814,7 +1810,7 @@ msgstr "Astuce"
 msgid "Final word"
 msgstr "Le mot de la fin"
 
-#: com/views.py:78 com/views.py:204 election/views.py:185
+#: com/views.py:78 com/views.py:215 election/views.py:185
 #: subscription/views.py:46
 msgid "Start date"
 msgstr "Date de début"
@@ -1823,7 +1819,7 @@ msgstr "Date de début"
 msgid "Communication administration"
 msgstr "Administration de la communication"
 
-#: com/views.py:114 core/templates/core/user_tools.jinja:82
+#: com/views.py:114 core/templates/core/user_tools.jinja:83
 msgid "Weekmail destinations"
 msgstr "Destinataires du Weekmail"
 
@@ -1843,31 +1839,31 @@ msgstr "Message d'alerte"
 msgid "Screens list"
 msgstr "Liste d'écrans"
 
-#: com/views.py:215
+#: com/views.py:226
 msgid "Until"
 msgstr "Jusqu'à"
 
-#: com/views.py:217
+#: com/views.py:228
 msgid "Automoderation"
 msgstr "Automodération"
 
-#: com/views.py:224 com/views.py:228 com/views.py:238
+#: com/views.py:235 com/views.py:239 com/views.py:249
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-#: com/views.py:234
+#: com/views.py:245
 msgid "You crazy? You can not finish an event before starting it."
 msgstr "T'es fou? Un événement ne peut pas finir avant même de commencer."
 
-#: com/views.py:463
+#: com/views.py:474
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour regénérer"
 
-#: com/views.py:472
+#: com/views.py:489
 msgid "Weekmail of the "
 msgstr "Weekmail du "
 
-#: com/views.py:574
+#: com/views.py:599
 msgid ""
 "You must be a board member of the selected club to post in the Weekmail."
 msgstr ""
@@ -2001,7 +1997,7 @@ msgstr "-"
 msgid "XS"
 msgstr "XS"
 
-#: core/models.py:214 core/templates/core/base.jinja:356
+#: core/models.py:214
 msgid "S"
 msgstr "S"
 
@@ -2114,8 +2110,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/templates/core/user_edit.jinja:17
 #: election/templates/election/election_detail.jinja:340
 #: forum/templates/forum/macros.jinja:104
-#: forum/templates/forum/macros.jinja:106 forum/templates/forum/reply.jinja:39
-#: forum/templates/forum/reply.jinja:41
+#: forum/templates/forum/macros.jinja:106
 #: trombi/templates/trombi/user_tools.jinja:41
 msgid "Profile"
 msgstr "Profil"
@@ -2294,24 +2289,24 @@ msgstr "500, Erreur Serveur"
 msgid "Welcome!"
 msgstr "Bienvenue!"
 
-#: core/templates/core/base.jinja:48
+#: core/templates/core/base.jinja:53
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: core/templates/core/base.jinja:50
+#: core/templates/core/base.jinja:55
 msgid "Password"
 msgstr "Mot de passe"
 
-#: core/templates/core/base.jinja:52 core/templates/core/login.jinja:4
+#: core/templates/core/base.jinja:57 core/templates/core/login.jinja:4
 #: core/templates/core/password_reset_complete.jinja:5
 msgid "Login"
 msgstr "Connexion"
 
-#: core/templates/core/base.jinja:54 core/templates/core/register.jinja:18
+#: core/templates/core/base.jinja:59 core/templates/core/register.jinja:18
 msgid "Register"
 msgstr "S'enregister"
 
-#: core/templates/core/base.jinja:78 core/templates/core/base.jinja:79
+#: core/templates/core/base.jinja:83 core/templates/core/base.jinja:84
 #: forum/templates/forum/macros.jinja:171
 #: forum/templates/forum/macros.jinja:175
 #: matmat/templates/matmat/search_form.jinja:37
@@ -2320,56 +2315,56 @@ msgstr "S'enregister"
 msgid "Search"
 msgstr "Recherche"
 
-#: core/templates/core/base.jinja:105
+#: core/templates/core/base.jinja:110
 msgid "View more"
 msgstr "Voir plus"
 
-#: core/templates/core/base.jinja:109
+#: core/templates/core/base.jinja:114
 #: forum/templates/forum/last_unread.jinja:17
 msgid "Mark all as read"
 msgstr "Marquer tout commme lu"
 
-#: core/templates/core/base.jinja:119
+#: core/templates/core/base.jinja:124
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: core/templates/core/base.jinja:152
+#: core/templates/core/base.jinja:157
 msgid "Main"
 msgstr "Accueil"
 
-#: core/templates/core/base.jinja:154
+#: core/templates/core/base.jinja:159
 msgid "Associations & Clubs"
 msgstr "Associations & Clubs"
 
-#: core/templates/core/base.jinja:158
+#: core/templates/core/base.jinja:163
 msgid "AE"
 msgstr "L'AE"
 
-#: core/templates/core/base.jinja:159
+#: core/templates/core/base.jinja:164
 msgid "AE's clubs"
 msgstr "Les clubs de L'AE"
 
-#: core/templates/core/base.jinja:160
+#: core/templates/core/base.jinja:165
 msgid "BdF"
 msgstr "Le BdF"
 
-#: core/templates/core/base.jinja:161
+#: core/templates/core/base.jinja:166
 msgid "BDS"
 msgstr "Le BDS"
 
-#: core/templates/core/base.jinja:162
+#: core/templates/core/base.jinja:167
 msgid "CETU"
 msgstr "Le CETU"
 
-#: core/templates/core/base.jinja:170
+#: core/templates/core/base.jinja:175
 msgid "Calendar"
 msgstr "Calendrier"
 
-#: core/templates/core/base.jinja:171
+#: core/templates/core/base.jinja:176
 msgid "Big event"
 msgstr "GA"
 
-#: core/templates/core/base.jinja:174
+#: core/templates/core/base.jinja:179
 #: forum/templates/forum/favorite_topics.jinja:14
 #: forum/templates/forum/last_unread.jinja:14
 #: forum/templates/forum/macros.jinja:90 forum/templates/forum/main.jinja:6
@@ -2378,11 +2373,11 @@ msgstr "GA"
 msgid "Forum"
 msgstr "Forum"
 
-#: core/templates/core/base.jinja:175
+#: core/templates/core/base.jinja:180
 msgid "Gallery"
 msgstr "Photos"
 
-#: core/templates/core/base.jinja:176 counter/models.py:217
+#: core/templates/core/base.jinja:181 counter/models.py:217
 #: counter/templates/counter/counter_list.jinja:11
 #: eboutic/templates/eboutic/eboutic_main.jinja:4
 #: eboutic/templates/eboutic/eboutic_main.jinja:24
@@ -2392,109 +2387,73 @@ msgstr "Photos"
 msgid "Eboutic"
 msgstr "Eboutic"
 
-#: core/templates/core/base.jinja:178
+#: core/templates/core/base.jinja:183
 msgid "Services"
 msgstr "Services"
 
-#: core/templates/core/base.jinja:182
+#: core/templates/core/base.jinja:187
 msgid "Matmatronch"
 msgstr "Matmatronch"
 
-#: core/templates/core/base.jinja:183 launderette/models.py:44
+#: core/templates/core/base.jinja:188 launderette/models.py:44
 #: launderette/templates/launderette/launderette_book.jinja:5
 #: launderette/templates/launderette/launderette_book_choose.jinja:4
 #: launderette/templates/launderette/launderette_main.jinja:4
 msgid "Launderette"
 msgstr "Laverie"
 
-#: core/templates/core/base.jinja:184 core/templates/core/file.jinja:20
+#: core/templates/core/base.jinja:189 core/templates/core/file.jinja:20
 #: core/views/files.py:86
 msgid "Files"
 msgstr "Fichiers"
 
-#: core/templates/core/base.jinja:185
+#: core/templates/core/base.jinja:190
 msgid "Pedagogy"
 msgstr "Pédagogie"
 
-#: core/templates/core/base.jinja:188
+#: core/templates/core/base.jinja:193
 msgid "Sponsors"
 msgstr "Partenaires"
 
-#: core/templates/core/base.jinja:190
+#: core/templates/core/base.jinja:195
 msgid "Help"
 msgstr "Aide"
 
-#: core/templates/core/base.jinja:194
+#: core/templates/core/base.jinja:199
 msgid "FAQ"
 msgstr "FAQ"
 
-#: core/templates/core/base.jinja:195 core/templates/core/base.jinja:237
+#: core/templates/core/base.jinja:200 core/templates/core/base.jinja:242
 msgid "Contacts"
 msgstr "Contacts"
 
-#: core/templates/core/base.jinja:196
+#: core/templates/core/base.jinja:201
 msgid "Wiki"
 msgstr "Wiki"
 
-#: core/templates/core/base.jinja:238
+#: core/templates/core/base.jinja:243
 msgid "Legal notices"
 msgstr "Mentions légales"
 
-#: core/templates/core/base.jinja:239
+#: core/templates/core/base.jinja:244
 msgid "Intellectual property"
 msgstr "Propriété intellectuelle"
 
-#: core/templates/core/base.jinja:240
+#: core/templates/core/base.jinja:245
 msgid "Help & Documentation"
 msgstr "Aide & Documentation"
 
-#: core/templates/core/base.jinja:241
+#: core/templates/core/base.jinja:246
 msgid "R&D"
 msgstr "R&D"
 
-#: core/templates/core/base.jinja:242
+#: core/templates/core/base.jinja:247
 msgid "Former website"
 msgstr "Ancien site"
 
-#: core/templates/core/base.jinja:244
+#: core/templates/core/base.jinja:249
 msgid "Site made by good people"
 msgstr "Site réalisé par des gens bons"
-
-#: core/templates/core/base.jinja:340
-msgid "https://path/to/image.gif"
-msgstr "https://chemin/vers/image.gif"
-
-#: core/templates/core/base.jinja:342
-msgid "alternative text"
-msgstr "texte alternatif"
-
-#: core/templates/core/base.jinja:352
-msgid "Image"
-msgstr "Image"
-
-#: core/templates/core/base.jinja:353
-msgid "Link"
-msgstr "Lien"
-
-#: core/templates/core/base.jinja:354
-msgid "sup"
-msgstr "exp"
-
-#: core/templates/core/base.jinja:355
-msgid "sub"
-msgstr "ind"
-
-#: core/templates/core/base.jinja:357
-msgid "U"
-msgstr "S"
-
-#: core/templates/core/base.jinja:358
-msgid "I"
-msgstr "I"
-
-#: core/templates/core/base.jinja:359
-msgid "B"
-msgstr "G"
 
 #: core/templates/core/create.jinja:4 core/templates/core/create.jinja:8
 #, python-format
@@ -2958,7 +2917,7 @@ msgid "Eboutic invoices"
 msgstr "Facture eboutic"
 
 #: core/templates/core/user_account.jinja:57
-#: core/templates/core/user_tools.jinja:35 counter/views.py:745
+#: core/templates/core/user_tools.jinja:36 counter/views.py:745
 msgid "Etickets"
 msgstr "Etickets"
 
@@ -3257,130 +3216,135 @@ msgstr "Groupes"
 msgid "Merge users"
 msgstr "Fusionner deux utilisateurs"
 
-#: core/templates/core/user_tools.jinja:18
+#: core/templates/core/user_tools.jinja:16
+#: rootplace/templates/rootplace/delete_user_messages.jinja:4
+msgid "Delete user's forum messages"
+msgstr "Supprimer les messages forum d'un utilisateur"
+
+#: core/templates/core/user_tools.jinja:19
 msgid "Subscriptions"
 msgstr "Cotisations"
 
-#: core/templates/core/user_tools.jinja:21
+#: core/templates/core/user_tools.jinja:22
 #: subscription/templates/subscription/stats.jinja:4
 msgid "Subscription stats"
 msgstr "Statistiques de cotisation"
 
-#: core/templates/core/user_tools.jinja:27 counter/views.py:715
+#: core/templates/core/user_tools.jinja:28 counter/views.py:715
 #: counter/views.py:923
 msgid "Counters"
 msgstr "Comptoirs"
 
-#: core/templates/core/user_tools.jinja:30
+#: core/templates/core/user_tools.jinja:31
 msgid "General counters management"
 msgstr "Gestion générale des comptoirs"
 
-#: core/templates/core/user_tools.jinja:31
+#: core/templates/core/user_tools.jinja:32
 msgid "Products management"
 msgstr "Gestion des produits"
 
-#: core/templates/core/user_tools.jinja:32
+#: core/templates/core/user_tools.jinja:33
 msgid "Product types management"
 msgstr "Gestion des types de produit"
 
-#: core/templates/core/user_tools.jinja:33
+#: core/templates/core/user_tools.jinja:34
 #: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:735
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
 
-#: core/templates/core/user_tools.jinja:34
+#: core/templates/core/user_tools.jinja:35
 #: counter/templates/counter/invoices_call.jinja:4 counter/views.py:740
 msgid "Invoices call"
 msgstr "Appels à facture"
 
-#: core/templates/core/user_tools.jinja:42 core/views/user.py:286
+#: core/templates/core/user_tools.jinja:43 core/views/user.py:286
 #: counter/templates/counter/counter_list.jinja:18
 #: counter/templates/counter/counter_list.jinja:34
 #: counter/templates/counter/counter_list.jinja:56
 msgid "Stats"
 msgstr "Stats"
 
-#: core/templates/core/user_tools.jinja:46
+#: core/templates/core/user_tools.jinja:47
 #: counter/templates/counter/counter_list.jinja:38
 #: stock/templates/stock/stock_item_list.jinja:11
 #: stock/templates/stock/stock_list.jinja:16
 msgid "Shopping lists"
 msgstr "Liste de courses"
 
-#: core/templates/core/user_tools.jinja:48
+#: core/templates/core/user_tools.jinja:49
 #: counter/templates/counter/counter_list.jinja:40
 msgid "Create new stock"
 msgstr "Créer nouveau stock"
 
-#: core/templates/core/user_tools.jinja:59
+#: core/templates/core/user_tools.jinja:60
 msgid "Refound Account"
 msgstr "Rembourser un compte"
 
-#: core/templates/core/user_tools.jinja:60
+#: core/templates/core/user_tools.jinja:61
 msgid "General accounting"
 msgstr "Comptabilité générale"
 
-#: core/templates/core/user_tools.jinja:70
+#: core/templates/core/user_tools.jinja:71
 msgid "Club account: "
 msgstr "Compte club : "
 
-#: core/templates/core/user_tools.jinja:77
+#: core/templates/core/user_tools.jinja:78
 msgid "Communication"
 msgstr "Communication"
 
-#: core/templates/core/user_tools.jinja:80
+#: core/templates/core/user_tools.jinja:81
 msgid "Create weekmail article"
 msgstr "Rédiger un nouvel article dans le Weekmail"
 
-#: core/templates/core/user_tools.jinja:84
+#: core/templates/core/user_tools.jinja:85
 msgid "Moderate news"
 msgstr "Modérer les nouvelles"
 
-#: core/templates/core/user_tools.jinja:85
+#: core/templates/core/user_tools.jinja:86
 msgid "Edit index page"
 msgstr "Éditer la page d'accueil"
 
-#: core/templates/core/user_tools.jinja:86
+#: core/templates/core/user_tools.jinja:87
 msgid "Edit alert message"
 msgstr "Éditer le message d'alerte"
 
-#: core/templates/core/user_tools.jinja:87
+#: core/templates/core/user_tools.jinja:88
 msgid "Edit information message"
 msgstr "Éditer le message d'informations"
 
-#: core/templates/core/user_tools.jinja:88
+#: core/templates/core/user_tools.jinja:89
 msgid "Moderate files"
 msgstr "Modérer les fichiers"
 
-#: core/templates/core/user_tools.jinja:94
+#: core/templates/core/user_tools.jinja:95
 msgid "Moderate pictures"
 msgstr "Modérer les photos"
 
-#: core/templates/core/user_tools.jinja:107
+#: core/templates/core/user_tools.jinja:108
 msgid "Elections"
 msgstr "Élections"
 
-#: core/templates/core/user_tools.jinja:109
+#: core/templates/core/user_tools.jinja:110
 msgid "See available elections"
 msgstr "Voir les élections disponibles"
 
-#: core/templates/core/user_tools.jinja:110
+#: core/templates/core/user_tools.jinja:111
 msgid "See archived elections"
 msgstr "Voir les élections archivées"
 
-#: core/templates/core/user_tools.jinja:112
+#: core/templates/core/user_tools.jinja:113
 msgid "Create a new election"
 msgstr "Créer une nouvelle élection"
 
-#: core/templates/core/user_tools.jinja:115
+#: core/templates/core/user_tools.jinja:116
 msgid "Other tools"
 msgstr "Autres outils"
 
-#: core/templates/core/user_tools.jinja:117
+#: core/templates/core/user_tools.jinja:118
 msgid "Convert dokuwiki/BBcode syntax to Markdown"
 msgstr "Convertir de la syntaxe dokuwiki/BBcode vers Markdown"
 
-#: core/templates/core/user_tools.jinja:118
+#: core/templates/core/user_tools.jinja:119
 msgid "Trombi tools"
 msgstr "Outils Trombi"
 
@@ -4643,6 +4607,14 @@ msgstr "Sexe"
 msgid "Last/First name or nickname"
 msgstr "Nom de famille, prénom ou surnom"
 
+#: rootplace/templates/rootplace/delete_user_messages.jinja:8
+msgid "Delete all forum messages from an user"
+msgstr "Supprimer tous les messages forum d'un utilisateur"
+
+#: rootplace/templates/rootplace/delete_user_messages.jinja:12
+msgid "Delete messages"
+msgstr "Supprimer les messages"
+
 #: rootplace/templates/rootplace/merge.jinja:8
 msgid "Merge two users"
 msgstr "Fusionner deux utilisateurs"
@@ -4651,13 +4623,17 @@ msgstr "Fusionner deux utilisateurs"
 msgid "Merge"
 msgstr "Fusion"
 
-#: rootplace/views.py:92
+#: rootplace/views.py:93
 msgid "User that will be kept"
 msgstr "Utilisateur qui sera conservé"
 
-#: rootplace/views.py:95
+#: rootplace/views.py:96
 msgid "User that will be deleted"
 msgstr "Utilisateur qui sera supprimé"
+
+#: rootplace/views.py:102
+msgid "User to be selected"
+msgstr "Utilisateur à sélectionner"
 
 #: sas/models.py:243
 msgid "picture"
