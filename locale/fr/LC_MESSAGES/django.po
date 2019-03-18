@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-17 17:55+0100\n"
+"POT-Creation-Date: 2019-03-18 20:48+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4615,6 +4615,13 @@ msgstr "Supprimer tous les messages forum d'un utilisateur"
 msgid "Delete messages"
 msgstr "Supprimer les messages"
 
+#: rootplace/templates/rootplace/delete_user_messages.jinja:14
+msgid ""
+"If you have trouble using this utility (timeout error, 500 error), try using "
+"the command line utility"
+msgstr "Si vous avez des soucis en utilisant cet utilitaire (connection expirée, erreur 500), "
+"essayez en utilisant l'utilitaire en ligne de commande"
+
 #: rootplace/templates/rootplace/merge.jinja:8
 msgid "Merge two users"
 msgstr "Fusionner deux utilisateurs"
@@ -4623,15 +4630,15 @@ msgstr "Fusionner deux utilisateurs"
 msgid "Merge"
 msgstr "Fusion"
 
-#: rootplace/views.py:93
+#: rootplace/views.py:110
 msgid "User that will be kept"
 msgstr "Utilisateur qui sera conservé"
 
-#: rootplace/views.py:96
+#: rootplace/views.py:113
 msgid "User that will be deleted"
 msgstr "Utilisateur qui sera supprimé"
 
-#: rootplace/views.py:102
+#: rootplace/views.py:119
 msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
