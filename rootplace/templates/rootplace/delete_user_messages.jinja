@@ -1,0 +1,14 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Delete user's forum messages{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <h3>{% trans %}Delete all forum messages from an user{% endtrans %}</h3>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p() }}
+        <p><input type="submit" value="{% trans %}Delete messages{% endtrans %}" /></p>
+    </form>
+{% endblock %}

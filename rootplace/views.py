@@ -25,7 +25,7 @@
 
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django import forms
 from django.core.exceptions import PermissionDenied
 
@@ -33,6 +33,7 @@ from ajax_select.fields import AutoCompleteSelectField
 
 from core.models import User
 from counter.models import Customer
+from forum.models import ForumMessageMeta
 
 
 def merge_users(u1, u2):
@@ -96,6 +97,12 @@ class MergeForm(forms.Form):
     )
 
 
+class SelectUserForm(forms.Form):
+    user = AutoCompleteSelectField(
+        "users", label=_("User to be selected"), help_text=None, required=True
+    )
+
+
 class MergeUsersView(FormView):
     template_name = "rootplace/merge.jinja"
     form_class = MergeForm
@@ -114,3 +121,32 @@ class MergeUsersView(FormView):
 
     def get_success_url(self):
         return reverse("core:user_profile", kwargs={"user_id": self.final_user.id})
+
+
+class DeleteAllForumUserMessagesView(FormView):
+    """
+        Delete all forum messages from an user
+        Messages are soft deleted and are still visible from admins
+    """
+
+    template_name = "rootplace/delete_user_messages.jinja"
+    form_class = SelectUserForm
+
+    def dispatch(self, request, *args, **kwargs):
+        res = super(DeleteAllForumUserMessagesView, self).dispatch(
+            request, *args, **kwargs
+        )
+        if request.user.is_root:
+            return res
+        raise PermissionDenied
+
+    def form_valid(self, form):
+        self.user = form.cleaned_data["user"]
+        for message in self.user.forum_messages.all():
+            ForumMessageMeta(
+                message=message, user=self.request.user, action="DELETE"
+            ).save()
+        return super(DeleteAllForumUserMessagesView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse("core:user_profile", kwargs={"user_id": self.user.id})
