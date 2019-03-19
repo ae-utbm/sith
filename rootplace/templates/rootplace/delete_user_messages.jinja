@@ -11,5 +11,5 @@
         {{ form.as_p() }}
         <p><input type="submit" value="{% trans %}Delete messages{% endtrans %}" /></p>
     </form>
-    <p><strong>{% trans %}If you have trouble using this utility (timeout error, 500 error), try using the command line utility{% endtrans %}</strong></p>
+    <p><strong>{% trans %}If you have trouble using this utility (timeout error, 500 error), try using the command line utility. Use ./manage.py delete_all_forum_user_messages ID.{% endtrans %}</strong></p>
 {% endblock %}

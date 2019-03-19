@@ -31,8 +31,7 @@ from rootplace.views import delete_all_forum_user_messages
 
 class Command(BaseCommand):
     """
-        Delete all forum messages from an user
-        Messages are soft deleted and are still visible from admins
+        Delete all forum messages from a user
     """
 
     help = "Delete all user's forum message"
@@ -46,15 +45,15 @@ class Command(BaseCommand):
 
         if user is None:
             print("User with ID %s not found" % (options["user_id"],))
-            return
+            exit(1)
 
         confirm = input(
-            "User selected %s\nDo you really want to delete all user's messages ? [y/N] "
+            "User selected: %s\nDo you really want to delete all message from this user ? [y/N] "
             % (user,)
         )
 
-        if confirm != "y" and confirm != "Y":
+        if not confirm.lower().startswith("y"):
             print("Operation aborted")
-            return
+            exit(1)
 
         delete_all_forum_user_messages(user, User.objects.get(id=0), True)
