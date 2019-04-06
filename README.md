@@ -5,6 +5,29 @@
 
 ## Sith AE
 
+### Dependencies:
+See requirements.txt
+
+You may need to install some dev libraries like `libmysqlclient-dev`, `libssl-dev`, `libjpeg-dev`, `python3-xapian`, or `zlib1g-dev` to install all the
+requiered dependancies with pip. You may also need `mysql-client`. Don't also forget `python3-dev` if you don't have it
+already.
+
+You can check all of them with:
+
+```bash
+sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian gettext
+```
+
+On macos, you will need homebrew
+
+```bash
+brew install xapian
+```
+
+If it doesn't work it's because it need [this pull request](https://github.com/Homebrew/homebrew-core/pull/34835) to be validated.
+
+The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
+
 ### Get started
 
 To start working on the project, just run the following commands:
@@ -30,29 +53,6 @@ To connect the app to sentry.io, you must set the variable SENTRY_DSN in your se
 
 There is a Doxyfile at the root of the project, meaning that if you have Doxygen, you can run `doxygen Doxyfile` to
 generate a complete HTML documentation that will be available in the *./doc/html/* folder.
-
-### Dependencies:
-See requirements.txt
-
-You may need to install some dev libraries like `libmysqlclient-dev`, `libssl-dev`, `libjpeg-dev`, `python3-xapian`, or `zlib1g-dev` to install all the
-requiered dependancies with pip. You may also need `mysql-client`. Don't also forget `python3-dev` if you don't have it
-already.
-
-You can check all of them with:
-
-```bash
-sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian gettext
-```
-
-On macos, you will need homebrew
-
-```bash
-brew install xapian
-```
-
-If it doesn't work it's because it need [this pull request](https://github.com/Homebrew/homebrew-core/pull/34835) to be validated.
-
-The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
 
 ### Collecting statics for production:
 
