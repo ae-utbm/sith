@@ -66,7 +66,7 @@ urlpatterns = [
     ),
     url(
         r"^group/(?P<group_id>[0-9]+)/detail$",
-        GroupDetailView.as_view(),
+        GroupTemplateView.as_view(),
         name="group_detail",
     ),
     # User views

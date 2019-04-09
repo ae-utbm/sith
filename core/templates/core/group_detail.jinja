@@ -15,4 +15,14 @@
         {% endfor %}
     	</ul>
     {% endif %}
+    <form action="{{ url('core:group_detail', object.id) }}" method="post" id="add_users">
+        {% csrf_token %}
+        <p>
+            {{ form.users_added.errors }}
+            <label for="{{ form.users_added.id_for_label }}">{{ form.users_added.label }} :</label>
+            {{ form.users_added }}
+            <span class="helptext">{{ form.users_added.help_text }}</span>
+        </p>
+        <input type="submit" name="submit">
+    </form>
 {% endblock content %}
