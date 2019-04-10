@@ -52,7 +52,7 @@ class EditMembersForm(forms.Form):
         super(EditMembersForm, self).__init__(*args, **kwargs)
         self.fields["users_removed"] = forms.ModelMultipleChoiceField(
             User.objects.filter(id__in=self.current_users).all(),
-            label=None,
+            label=_("Users to delete"),
             required=False,
             widget=forms.CheckboxSelectMultiple,
         )
@@ -65,6 +65,9 @@ class EditMembersForm(forms.Form):
     )
 
     def clean_users_added(self):
+        """
+            Check that the user is not trying to add an user already in the group
+        """
         cleaned_data = super(EditMembersForm, self).clean()
         users_added = cleaned_data.get("users_added", None)
         if not users_added:

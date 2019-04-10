@@ -12,6 +12,7 @@
     {% else %}
         <form action="{{ url('core:group_detail', object.id) }}" method="post" id="add_users">
             {% csrf_token %}
+            <label for="{{ form.users_removed.id_for_label }}">{{ form.users_removed.label }} :</label>
             {{ form.users_removed.errors }}
             {% for user in form.users_removed %}
                 <label for="{{ user.id_for_label }}">
