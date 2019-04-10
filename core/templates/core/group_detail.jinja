@@ -19,7 +19,7 @@
                     {{ user.tag() }}
                 </label>
             {% endfor %}
-            <input type="submit" name="submit">
+            <input type="submit" name="submit" value="{% trans %}Delete{% endtrans %}">
         </form>
     {% endif %}
     <form action="{{ url('core:group_detail', object.id) }}" method="post" id="add_users">

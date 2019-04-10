@@ -39,6 +39,9 @@ from django.core.exceptions import (
     ImproperlyConfigured,
 )
 from django.views.generic.base import View
+from django.views.generic.edit import FormView
+from django.views.generic.detail import SingleObjectMixin
+from django.utils.functional import cached_property
 from django.db.models import Count
 
 from core.models import Group
@@ -272,6 +275,30 @@ class QuickNotifMixin:
             for gk in self.request.GET.keys():
                 if k == gk:
                     kwargs["quick_notifs"].append(v)
+        return kwargs
+
+
+class DetailFormView(SingleObjectMixin, FormView):
+    """
+        Class that allow both a detail view and a form view
+    """
+
+    def get_object(self):
+        """
+            Get current group from id in url
+        """
+        return self.cached_object
+
+    @cached_property
+    def cached_object(self):
+        """
+            Optimisation on group retrieval
+        """
+        return super(DetailFormView, self).get_object()
+
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(DetailFormView, self).get_context_data()
+        kwargs["object"] = self.get_object()
         return kwargs
 
 

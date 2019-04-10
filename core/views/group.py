@@ -31,14 +31,13 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormView
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import get_object_or_404
-from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 
 from ajax_select.fields import AutoCompleteSelectMultipleField
 
 from core.models import RealGroup, User
-from core.views import CanEditMixin
+from core.views import CanEditMixin, DetailFormView
 
 # Forms
 
@@ -117,7 +116,7 @@ class GroupCreateView(CanEditMixin, CreateView):
     fields = ["name", "description"]
 
 
-class GroupTemplateView(CanEditMixin, FormView):
+class GroupTemplateView(CanEditMixin, DetailFormView):
     """
         Display all users in a given Group
         Allow adding and removing users from it
@@ -128,24 +127,11 @@ class GroupTemplateView(CanEditMixin, FormView):
     pk_url_kwarg = "group_id"
     template_name = "core/group_detail.jinja"
 
-    def get_object(self):
-        """
-            Get current group from id in url
-        """
-        return self.cached_object
-
-    @cached_property
-    def cached_object(self):
-        """
-            Optimisation on group retrieval
-        """
-        return get_object_or_404(self.model, pk=self.group_id)
-
     def dispatch(self, request, *args, **kwargs):
 
-        self.group_id = kwargs[self.pk_url_kwarg]
         self.users = self.get_object().users.all()
-        return super(GroupTemplateView, self).dispatch(request, *args, **kwargs)
+        resp = super(GroupTemplateView, self).dispatch(request, *args, **kwargs)
+        return resp
 
     def form_valid(self, form):
         resp = super(GroupTemplateView, self).form_valid(form)
@@ -161,16 +147,13 @@ class GroupTemplateView(CanEditMixin, FormView):
         return resp
 
     def get_success_url(self):
-        return reverse_lazy("core:group_detail", kwargs={"group_id": self.group_id})
+        return reverse_lazy(
+            "core:group_detail", kwargs={"group_id": self.get_object().id}
+        )
 
     def get_form_kwargs(self):
         kwargs = super(GroupTemplateView, self).get_form_kwargs()
         kwargs["users"] = self.users
-        return kwargs
-
-    def get_context_data(self, *args, **kwargs):
-        kwargs = super(GroupTemplateView, self).get_context_data()
-        kwargs["object"] = self.get_object()
         return kwargs
 
 
