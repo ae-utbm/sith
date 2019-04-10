@@ -52,14 +52,14 @@ class EditMembersForm(forms.Form):
         super(EditMembersForm, self).__init__(*args, **kwargs)
         self.fields["users_removed"] = forms.ModelMultipleChoiceField(
             User.objects.filter(id__in=self.current_users).all(),
-            label=_("Users to delete"),
+            label=_("Users to remove from group"),
             required=False,
             widget=forms.CheckboxSelectMultiple,
         )
 
     users_added = AutoCompleteSelectMultipleField(
         "users",
-        label=_("Users to add"),
+        label=_("Users to add to group"),
         help_text=_("Search users to add (one or more)."),
         required=False,
     )

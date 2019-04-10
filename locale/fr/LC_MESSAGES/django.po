@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-19 17:16+0100\n"
+"POT-Creation-Date: 2019-04-11 01:41+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -361,7 +361,8 @@ msgstr "Compte en banque : "
 #: com/templates/com/weekmail.jinja:62 core/templates/core/file_detail.jinja:25
 #: core/templates/core/file_detail.jinja:62
 #: core/templates/core/file_moderation.jinja:24
-#: core/templates/core/group_list.jinja:13 core/templates/core/macros.jinja:93
+#: core/templates/core/group_detail.jinja:23
+#: core/templates/core/group_list.jinja:22 core/templates/core/macros.jinja:93
 #: core/templates/core/macros.jinja:112 core/templates/core/page_prop.jinja:14
 #: core/templates/core/user_account_detail.jinja:38
 #: core/templates/core/user_detail.jinja:178
@@ -417,7 +418,8 @@ msgstr "Nouveau compte club"
 #: com/templates/com/poster_list.jinja:45
 #: com/templates/com/screen_list.jinja:26 com/templates/com/weekmail.jinja:32
 #: com/templates/com/weekmail.jinja:61 core/templates/core/file.jinja:38
-#: core/templates/core/page.jinja:35 core/templates/core/poster_list.jinja:40
+#: core/templates/core/group_list.jinja:21 core/templates/core/page.jinja:35
+#: core/templates/core/poster_list.jinja:40
 #: core/templates/core/user_tools.jinja:42 core/views/user.py:237
 #: counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
@@ -1031,6 +1033,7 @@ msgstr "Rôle"
 
 #: club/templates/club/club_members.jinja:10
 #: club/templates/club/club_old_members.jinja:10
+#: core/templates/core/group_list.jinja:14
 #: core/templates/core/user_clubs.jinja:17
 #: core/templates/core/user_clubs.jinja:43
 msgid "Description"
@@ -2572,9 +2575,18 @@ msgstr "Modération des fichiers"
 msgid "Full name: "
 msgstr "Nom complet : "
 
+#: core/templates/core/group_detail.jinja:4
+msgid "Group detail"
+msgstr "Détail du groupe"
+
+#: core/templates/core/group_detail.jinja:9
 #: core/templates/core/group_edit.jinja:4
 msgid "Back to list"
 msgstr "Retour à la liste"
+
+#: core/templates/core/group_detail.jinja:11
+msgid "No user in this group"
+msgstr "Aucun utilisateur dans ce groupe"
 
 #: core/templates/core/group_edit.jinja:5
 msgid "Edit group"
@@ -2594,6 +2606,14 @@ msgstr "Liste des groupes"
 #: core/templates/core/group_list.jinja:9
 msgid "New group"
 msgstr "Nouveau groupe"
+
+#: core/templates/core/group_list.jinja:12
+msgid "ID"
+msgstr "ID"
+
+#: core/templates/core/group_list.jinja:13
+msgid "Group"
+msgstr "Groupe"
 
 #: core/templates/core/login.jinja:10
 msgid "Your username and password didn't match. Please try again."
@@ -3488,6 +3508,22 @@ msgstr "groupe d'édition"
 #: election/views.py:170
 msgid "view groups"
 msgstr "groupe de vue"
+
+#: core/views/group.py:55
+msgid "Users to remove from group"
+msgstr "Utilisateurs à retirer du groupe"
+
+#: core/views/group.py:62
+msgid "Users to add to group"
+msgstr "Utilisateur à ajouter au groupe"
+
+#: core/views/group.py:63
+msgid "Search users to add (one or more)."
+msgstr "Rechere les utilisateurs à ajouter (un ou plus)."
+
+#: core/views/group.py:82
+msgid "You can not add the same user twice"
+msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
 #: core/views/user.py:223 trombi/templates/trombi/export.jinja:25
 #: trombi/templates/trombi/user_profile.jinja:11
