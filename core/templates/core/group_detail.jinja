@@ -5,15 +5,22 @@
 {% endblock title %}
 
 {% block content %}
+    <h1>{{ object }}</h1>
 	<p><a href="{{ url('core:group_list') }}">{% trans %}Back to list{% endtrans %}</a></p>
-    {% if not object.users.exists() %}
+    {% if form.users_removed | length <= 0 %}
         <p>{% trans %}No user in this group{% endtrans %}</p>
     {% else %}
-    	<ul>
-        {% for user in object.users.all() %}
-        	<li><a href="{{ url('core:user_profile', user.id) }}">{{ user }}</a></li>
-        {% endfor %}
-    	</ul>
+        <form action="{{ url('core:group_detail', object.id) }}" method="post" id="add_users">
+            {% csrf_token %}
+            {{ form.users_removed.errors }}
+            {% for user in form.users_removed %}
+                <label for="{{ user.id_for_label }}">
+                    <a href="{{ url('core:user_profile', user.data.value) }}">{{ user.choice_label }}</a>
+                    {{ user.tag() }}
+                </label>
+            {% endfor %}
+            <input type="submit" name="submit">
+        </form>
     {% endif %}
     <form action="{{ url('core:group_detail', object.id) }}" method="post" id="add_users">
         {% csrf_token %}
