@@ -3519,7 +3519,7 @@ msgstr "Utilisateur à ajouter au groupe"
 
 #: core/views/group.py:63
 msgid "Search users to add (one or more)."
-msgstr "Rechere les utilisateurs à ajouter (un ou plus)."
+msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
 
 #: core/views/group.py:82
 msgid "You can not add the same user twice"
