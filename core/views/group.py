@@ -130,12 +130,6 @@ class GroupTemplateView(CanEditMixin, DetailFormView):
     pk_url_kwarg = "group_id"
     template_name = "core/group_detail.jinja"
 
-    def dispatch(self, request, *args, **kwargs):
-
-        self.users = self.get_object().users.all()
-        resp = super(GroupTemplateView, self).dispatch(request, *args, **kwargs)
-        return resp
-
     def form_valid(self, form):
         resp = super(GroupTemplateView, self).form_valid(form)
 
@@ -156,7 +150,7 @@ class GroupTemplateView(CanEditMixin, DetailFormView):
 
     def get_form_kwargs(self):
         kwargs = super(GroupTemplateView, self).get_form_kwargs()
-        kwargs["users"] = self.users
+        kwargs["users"] = self.get_object().users.all()
         return kwargs
 
 

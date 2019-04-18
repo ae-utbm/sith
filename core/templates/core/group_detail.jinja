@@ -16,8 +16,8 @@
             {{ form.users_removed.errors }}
             {% for user in form.users_removed %}
                 <label for="{{ user.id_for_label }}">
-                    <a href="{{ url('core:user_profile', user.data.value) }}">{{ user.choice_label }}</a>
                     {{ user.tag() }}
+                    <a href="{{ url('core:user_profile', user.data.value) }}">{{ user.choice_label }}</a>
                 </label>
             {% endfor %}
             <input type="submit" name="submit" value="{% trans %}Delete{% endtrans %}">
