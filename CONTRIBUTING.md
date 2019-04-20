@@ -20,8 +20,9 @@ Avec cette commande, tu clones le sith AE dans le dossier courant.
 ```bash
 cd Sith
 virtualenv --system-site-packages --python=python3 env
-source env_sith/bin/activate
+source env/bin/activate
 pip install -r requirements.txt
+./manage runserver
 ```
 
 Attention aux dépendances système, à voir dans le README.md
