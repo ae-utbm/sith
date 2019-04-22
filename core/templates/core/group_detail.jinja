@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import select_all_checkbox %}
 
 {% block title %}
     {% trans %}Group detail{% endtrans %}
@@ -11,6 +12,8 @@
         <p>{% trans %}No user in this group{% endtrans %}</p>
     {% else %}
         <form action="{{ url('core:group_detail', object.id) }}" method="post" id="add_users">
+            {{ select_all_checkbox("add_users") }}
+            <hr>
             {% csrf_token %}
             <label for="{{ form.users_removed.id_for_label }}">{{ form.users_removed.label }} :</label>
             {{ form.users_removed.errors }}
