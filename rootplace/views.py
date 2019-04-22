@@ -25,7 +25,7 @@
 
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.urlresolvers import reverse
 from django import forms
 from django.core.exceptions import PermissionDenied
 
@@ -33,6 +33,7 @@ from ajax_select.fields import AutoCompleteSelectField
 
 from core.models import User
 from counter.models import Customer
+
 from forum.models import ForumMessageMeta
 
 
@@ -88,6 +89,22 @@ def merge_users(u1, u2):
     return u1
 
 
+def delete_all_forum_user_messages(user, moderator, verbose=False):
+    """
+        Create a ForumMessageMeta that says a forum
+            message is deleted on every forum message of an user
+        user: the user to delete messages from
+        moderator: the one marked as the moderator
+    """
+    for message in user.forum_messages.all():
+        if message.is_deleted():
+            continue
+
+        if verbose:
+            print(message)
+        ForumMessageMeta(message=message, user=moderator, action="DELETE").save()
+
+
 class MergeForm(forms.Form):
     user1 = AutoCompleteSelectField(
         "users", label=_("User that will be kept"), help_text=None, required=True
@@ -127,6 +144,7 @@ class DeleteAllForumUserMessagesView(FormView):
     """
         Delete all forum messages from an user
         Messages are soft deleted and are still visible from admins
+        GUI frontend to the dedicated command
     """
 
     template_name = "rootplace/delete_user_messages.jinja"
@@ -142,10 +160,7 @@ class DeleteAllForumUserMessagesView(FormView):
 
     def form_valid(self, form):
         self.user = form.cleaned_data["user"]
-        for message in self.user.forum_messages.all():
-            ForumMessageMeta(
-                message=message, user=self.request.user, action="DELETE"
-            ).save()
+        delete_all_forum_user_messages(self.user, self.request.user)
         return super(DeleteAllForumUserMessagesView, self).form_valid(form)
 
     def get_success_url(self):
