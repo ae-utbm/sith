@@ -132,3 +132,18 @@
         <span class="disabled">{% trans %}Next{% endtrans %}</span>
     {% endif %}
 {% endmacro %}
+
+{% macro select_all_checkbox(form_id) %}
+    <script type="text/javascript">
+        function checkbox_{{form_id}}(value) {
+            list = document.getElementById("{{ form_id }}").getElementsByTagName("input");
+            for (let element of list){
+              if (element.type == "checkbox"){
+                element.checked = value;
+              }
+            }
+        }
+    </script>
+    <button type="button" onclick="checkbox_{{form_id}}(true);">{% trans %}Select All{% endtrans %}</button>
+    <button type="button" onclick="checkbox_{{form_id}}(false);">{% trans %}Unselect All{% endtrans %}</button>
+{% endmacro %}
