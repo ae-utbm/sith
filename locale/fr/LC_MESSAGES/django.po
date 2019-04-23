@@ -3523,7 +3523,7 @@ msgstr "Utilisateurs à retirer du groupe"
 
 #: core/views/group.py:62
 msgid "Users to add to group"
-msgstr "Utilisateur à ajouter au groupe"
+msgstr "Utilisateurs à ajouter au groupe"
 
 #: core/views/group.py:63
 msgid "Search users to add (one or more)."
