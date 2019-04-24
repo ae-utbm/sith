@@ -11,7 +11,7 @@
             <td>{% trans %}Since{% endtrans %}</td>
         </thead>
         <tbody>
-        {% for m in club.members.filter(end_date=None).order_by('-role').all() %}
+        {% for m in members %}
             <tr>
                 <td>{{ user_profile_link(m.user) }}</td>
                 <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
@@ -30,6 +30,3 @@
         <p><input type="submit" value="{% trans %}Add{% endtrans %}" /></p>
     </form>
 {% endblock %}
-
-
-

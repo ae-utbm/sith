@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-22 14:57+0200\n"
+"POT-Creation-Date: 2019-04-24 03:06+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -177,7 +177,7 @@ msgstr "type de cible"
 #: accounting/models.py:313 club/models.py:422
 #: club/templates/club/club_members.jinja:8
 #: club/templates/club/club_old_members.jinja:8
-#: club/templates/club/mailing.jinja:28 club/views.py:111
+#: club/templates/club/mailing.jinja:28 club/views.py:112
 #: counter/templates/counter/cash_summary_list.jinja:32
 #: counter/templates/counter/stats.jinja:15
 #: counter/templates/counter/stats.jinja:52
@@ -386,7 +386,7 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: accounting/templates/accounting/bank_account_details.jinja:18
-#: club/views.py:128 core/views/user.py:205 sas/templates/sas/picture.jinja:86
+#: club/views.py:129 core/views/user.py:205 sas/templates/sas/picture.jinja:86
 msgid "Infos"
 msgstr "Infos"
 
@@ -405,7 +405,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_details.jinja:27
 #: accounting/templates/accounting/bank_account_list.jinja:22
 #: accounting/templates/accounting/club_account_details.jinja:58
-#: accounting/templates/accounting/journal_details.jinja:89 club/views.py:174
+#: accounting/templates/accounting/journal_details.jinja:89 club/views.py:175
 #: com/templates/com/news_admin_list.jinja:39
 #: com/templates/com/news_admin_list.jinja:68
 #: com/templates/com/news_admin_list.jinja:115
@@ -1070,8 +1070,8 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:194
-#: club/views.py:478 counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:195
+#: club/views.py:507 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
@@ -1097,7 +1097,7 @@ msgstr "unités"
 msgid "Benefit: "
 msgstr "Bénéfice : "
 
-#: club/templates/club/club_sellings.jinja:21 club/views.py:417
+#: club/templates/club/club_sellings.jinja:21 club/views.py:446
 #: core/templates/core/user_account_detail.jinja:18
 #: core/templates/core/user_account_detail.jinja:51
 #: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:168
@@ -1246,60 +1246,71 @@ msgstr "Aucune page n'existe pour ce club"
 msgid "Club stats"
 msgstr "Statistiques du club"
 
-#: club/views.py:138
+#: club/views.py:139
 msgid "Members"
 msgstr "Membres"
 
-#: club/views.py:147
+#: club/views.py:148
 msgid "Old members"
 msgstr "Anciens membres"
 
-#: club/views.py:157 core/templates/core/page.jinja:33
+#: club/views.py:158 core/templates/core/page.jinja:33
 msgid "History"
 msgstr "Historique"
 
-#: club/views.py:165 core/templates/core/base.jinja:121 core/views/user.py:228
+#: club/views.py:166 core/templates/core/base.jinja:121 core/views/user.py:228
 #: sas/templates/sas/picture.jinja:95 trombi/views.py:60
 msgid "Tools"
 msgstr "Outils"
 
-#: club/views.py:185
+#: club/views.py:186
 msgid "Edit club page"
 msgstr "Éditer la page de club"
 
-#: club/views.py:201
+#: club/views.py:202
 msgid "Mailing list"
 msgstr "Listes de diffusion"
 
-#: club/views.py:210 com/views.py:141
+#: club/views.py:211 com/views.py:141
 msgid "Posters list"
 msgstr "Liste d'affiches"
 
-#: club/views.py:220 counter/templates/counter/counter_list.jinja:21
+#: club/views.py:221 counter/templates/counter/counter_list.jinja:21
 #: counter/templates/counter/counter_list.jinja:43
 #: counter/templates/counter/counter_list.jinja:59
 msgid "Props"
 msgstr "Propriétés"
 
-#: club/views.py:322 core/views/forms.py:358 counter/views.py:113
-#: trombi/views.py:141
-msgid "Select user"
-msgstr "Choisir un utilisateur"
+#: club/views.py:319
+msgid "Users to add"
+msgstr "Utilisateurs à ajouter"
 
-#: club/views.py:381 sas/views.py:129 sas/views.py:195 sas/views.py:286
+#: club/views.py:320 core/views/group.py:63
+msgid "Search users to add (one or more)."
+msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
+
+#: club/views.py:348
+msgid "One of the selected users doesn't exist"
+msgstr "Un des utilisateurs sélectionné n'existe pas"
+
+#: club/views.py:353 core/views/group.py:82
+msgid "You can not add the same user twice"
+msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
+
+#: club/views.py:371 sas/views.py:129 sas/views.py:195 sas/views.py:286
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
-#: club/views.py:406 counter/views.py:1481
+#: club/views.py:435 counter/views.py:1481
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:412 com/views.py:85 com/views.py:221 counter/views.py:1487
+#: club/views.py:441 com/views.py:85 com/views.py:221 counter/views.py:1487
 #: election/views.py:190 subscription/views.py:52
 msgid "End date"
 msgstr "Date de fin"
 
-#: club/views.py:435 core/templates/core/user_stats.jinja:27
+#: club/views.py:464 core/templates/core/user_stats.jinja:27
 #: counter/views.py:1635
 msgid "Product"
 msgstr "Produit"
@@ -3507,6 +3518,10 @@ msgstr "Parrain"
 msgid "Godchild"
 msgstr "Fillot"
 
+#: core/views/forms.py:358 counter/views.py:113 trombi/views.py:141
+msgid "Select user"
+msgstr "Choisir un utilisateur"
+
 #: core/views/forms.py:371 core/views/forms.py:389 election/models.py:24
 #: election/views.py:167
 msgid "edit groups"
@@ -3524,14 +3539,6 @@ msgstr "Utilisateurs à retirer du groupe"
 #: core/views/group.py:62
 msgid "Users to add to group"
 msgstr "Utilisateurs à ajouter au groupe"
-
-#: core/views/group.py:63
-msgid "Search users to add (one or more)."
-msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
-
-#: core/views/group.py:82
-msgid "You can not add the same user twice"
-msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
 #: core/views/user.py:223 trombi/templates/trombi/export.jinja:25
 #: trombi/templates/trombi/user_profile.jinja:11
