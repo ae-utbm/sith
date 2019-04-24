@@ -292,12 +292,15 @@ class Membership(models.Model):
         """
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
 
-    def can_be_edited_by(self, user):
+    def can_be_edited_by(self, user, membership=None):
         """
         Method to see if that object can be edited by the given user
         """
         if user.memberships:
-            ms = user.memberships.filter(club=self.club, end_date=None).first()
+            if membership:  # This is for optimisation purpose
+                ms = membership
+            else:
+                ms = user.memberships.filter(club=self.club, end_date=None).first()
             return (ms and ms.role >= self.role) or user.is_in_group(
                 settings.SITH_MAIN_BOARD_GROUP
             )

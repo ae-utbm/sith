@@ -318,12 +318,18 @@ class ClubMemberForm(forms.Form):
         "users",
         label=_("Users to add"),
         help_text=_("Search users to add (one or more)."),
-        required=True,
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
         self.club = kwargs.pop("club")
         self.request_user = kwargs.pop("request_user")
+        self.club_members = kwargs.pop("club_members", None)
+        if not self.club_members:
+            self.club_members = (
+                self.club.members.filter(end_date=None).order_by("-role").all()
+            )
+        self.request_user_membership = self.club.get_membership_for(self.request_user)
         super(ClubMemberForm, self).__init__(*args, **kwargs)
 
         # Using a ModelForm binds too much the form with the model and we don't want that
@@ -335,6 +341,20 @@ class ClubMemberForm(forms.Form):
                 fields=("role", "start_date", "description"),
                 widgets={"start_date": SelectDate},
             )
+        )
+        self.fields["users_old"] = forms.ModelMultipleChoiceField(
+            User.objects.filter(
+                id__in=[
+                    ms.user.id
+                    for ms in self.club_members
+                    if ms.can_be_edited_by(
+                        self.request_user, self.request_user_membership
+                    )
+                ]
+            ).all(),
+            label=_("Mark as old"),
+            required=False,
+            widget=forms.CheckboxSelectMultiple,
         )
         if not self.request_user.is_root:
             self.fields.pop("start_date")
@@ -369,7 +389,7 @@ class ClubMemberForm(forms.Form):
         """
         cleaned_data = super(ClubMemberForm, self).clean()
         request_user = self.request_user
-        membership = self.club.get_membership_for(request_user)
+        membership = self.request_user_membership
         if not (
             cleaned_data["role"] <= SITH_MAXIMUM_FREE_ROLE
             or (membership is not None and membership.role >= cleaned_data["role"])
@@ -395,13 +415,12 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
         kwargs = super(ClubMembersView, self).get_form_kwargs()
         kwargs["request_user"] = self.request_user
         kwargs["club"] = self.get_object()
+        kwargs["club_members"] = self.members
         return kwargs
 
     def get_context_data(self, *args, **kwargs):
         kwargs = super(ClubMembersView, self).get_context_data(*args, **kwargs)
-        kwargs["members"] = (
-            self.get_object().members.filter(end_date=None).order_by("-role").all()
-        )
+        kwargs["members"] = self.members
         return kwargs
 
     def form_valid(self, form):
@@ -412,12 +431,20 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
 
         data = form.clean()
         users = data.pop("users", [])
+        users_old = data.pop("users_old", [])
         for user in users:
             Membership(club=self.get_object(), user=user, **data).save()
+        for user in users_old:
+            membership = self.get_object().get_membership_for(user)
+            membership.end_date = timezone.now()
+            membership.save()
         return resp
 
     def dispatch(self, request, *args, **kwargs):
         self.request_user = request.user
+        self.members = (
+            self.get_object().members.filter(end_date=None).order_by("-role").all()
+        )
         return super(ClubMembersView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
