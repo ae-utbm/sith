@@ -276,18 +276,6 @@ class Membership(models.Model):
         _("description"), max_length=128, null=False, blank=True
     )
 
-    def clean(self):
-        sub = User.objects.filter(pk=self.user.pk).first()
-        if sub is None or not sub.is_subscribed:
-            raise ValidationError(_("User must be subscriber to take part to a club"))
-        if (
-            Membership.objects.filter(user=self.user)
-            .filter(club=self.club)
-            .filter(end_date=None)
-            .exists()
-        ):
-            raise ValidationError(_("User is already member of that club"))
-
     def __str__(self):
         return (
             self.club.name

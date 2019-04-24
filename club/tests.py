@@ -44,7 +44,7 @@ class ClubTest(TestCase):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 3},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 3},
         )
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
@@ -55,14 +55,37 @@ class ClubTest(TestCase):
             in str(response.content)
         )
 
+    def test_create_add_multiple_user_to_club_from_root_ok(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {
+                "users": "|%d|%d|" % (self.skia.id, self.rbatsbak.id),
+                "start_date": "12/06/2016",
+                "role": 3,
+            },
+        )
+        response = self.client.get(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertTrue(
+            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>" in content
+        )
+        self.assertTrue(
+            "Richard Batsbak</a></td>\\n                <td>Responsable info</td>"
+            in content
+        )
+
     def test_create_add_user_to_club_from_root_fail_not_subscriber(self):
         self.client.login(username="root", password="plop")
         response = self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.guy.id, "start_date": "12/06/2016", "role": 3},
+            {"users": self.guy.id, "start_date": "12/06/2016", "role": 3},
         )
         self.assertTrue(response.status_code == 200)
-        self.assertTrue('<ul class="errorlist nonfield"><li>' in str(response.content))
+        self.assertTrue('<ul class="errorlist"><li>' in str(response.content))
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
         )
@@ -75,7 +98,7 @@ class ClubTest(TestCase):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 3},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 3},
         )
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
@@ -86,7 +109,7 @@ class ClubTest(TestCase):
         )
         response = self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 4},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 4},
         )
         self.assertTrue(response.status_code == 200)
         self.assertFalse(
@@ -94,16 +117,40 @@ class ClubTest(TestCase):
             in str(response.content)
         )
 
+    def test_create_add_user_non_existent_to_club_from_root_fail(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users": [9999], "start_date": "12/06/2016", "role": 3},
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertTrue('<ul class="errorlist"><li>' in content)
+        self.assertFalse("<td>Responsable info</td>" in content)
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {
+                "users": "|%d|%d|" % (self.skia.id, 9999),
+                "start_date": "12/06/2016",
+                "role": 3,
+            },
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertTrue('<ul class="errorlist"><li>' in content)
+        self.assertFalse("<td>Responsable info</td>" in content)
+
     def test_create_add_user_to_club_from_skia_ok(self):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 10},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 10},
         )
         self.client.login(username="skia", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.rbatsbak.id, "start_date": "12/06/2016", "role": 9},
+            {"users": self.rbatsbak.id, "start_date": "12/06/2016", "role": 9},
         )
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
@@ -118,12 +165,12 @@ class ClubTest(TestCase):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.rbatsbak.id, "start_date": "12/06/2016", "role": 3},
+            {"users": self.rbatsbak.id, "start_date": "12/06/2016", "role": 3},
         )
         self.client.login(username="rbatsbak", password="plop")
         response = self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 10},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 10},
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(

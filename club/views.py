@@ -326,8 +326,9 @@ class ClubMemberForm(forms.Form):
         self.request_user = kwargs.pop("request_user")
         super(ClubMemberForm, self).__init__(*args, **kwargs)
 
-        # Using a ModelForm forces a save and we don't want that
+        # Using a ModelForm binds too much the form with the model and we don't want that
         # We want the view to process the model creation since they are multiple users
+        # We also want the form to handle bulk deletion
         self.fields.update(
             forms.fields_for_model(
                 Membership,
@@ -341,6 +342,7 @@ class ClubMemberForm(forms.Form):
     def clean_users(self):
         """
             Check that the user is not trying to add an user already in the club
+            Also check that the user is valid and has a valid subscription
         """
         cleaned_data = super(ClubMemberForm, self).clean()
         users = []
@@ -348,13 +350,17 @@ class ClubMemberForm(forms.Form):
             user = User.objects.filter(id=user_id).first()
             if not user:
                 raise forms.ValidationError(
-                    _("One of the selected users doesn't exist", code="invalid")
+                    _("One of the selected users doesn't exist"), code="invalid"
                 )
-            users.append(user)
+            if not user.is_subscribed:
+                raise forms.ValidationError(
+                    _("User must be subscriber to take part to a club"), code="invalid"
+                )
             if self.club.get_membership_for(user):
                 raise forms.ValidationError(
                     _("You can not add the same user twice"), code="invalid"
                 )
+            users.append(user)
         return users
 
     def clean(self):
@@ -364,7 +370,6 @@ class ClubMemberForm(forms.Form):
         cleaned_data = super(ClubMemberForm, self).clean()
         request_user = self.request_user
         membership = self.club.get_membership_for(request_user)
-        print(request_user.is_root)
         if not (
             cleaned_data["role"] <= SITH_MAXIMUM_FREE_ROLE
             or (membership is not None and membership.role >= cleaned_data["role"])
