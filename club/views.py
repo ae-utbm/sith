@@ -397,6 +397,10 @@ class ClubMemberForm(forms.Form):
         """
         cleaned_data = super(ClubMemberForm, self).clean()
 
+        if "start_date" in cleaned_data and not cleaned_data["start_date"]:
+            # Drop start_date if allowed to edition but not specified
+            cleaned_data.pop("start_date")
+
         if not cleaned_data.get("users"):
             # No user to add equals no check needed
             return cleaned_data

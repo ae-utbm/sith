@@ -51,7 +51,7 @@ class ClubTest(TestCase):
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>"
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
             in str(response.content)
         )
 
@@ -71,10 +71,11 @@ class ClubTest(TestCase):
         self.assertTrue(response.status_code == 200)
         content = str(response.content)
         self.assertTrue(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>" in content
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
         )
         self.assertTrue(
-            "Richard Batsbak</a></td>\\n                <td>Responsable info</td>"
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
             in content
         )
 
@@ -90,7 +91,7 @@ class ClubTest(TestCase):
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
         )
         self.assertFalse(
-            "Guy Carlier</a></td>\\n                <td>Responsable info</td>"
+            "Guy Carlier</a></td>\\n                    <td>Responsable info</td>"
             in str(response.content)
         )
 
@@ -104,7 +105,7 @@ class ClubTest(TestCase):
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
         )
         self.assertTrue(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>"
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
             in str(response.content)
         )
         response = self.client.post(
@@ -157,7 +158,7 @@ class ClubTest(TestCase):
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(
-            """Richard Batsbak</a></td>\\n                <td>Vice-Pr\\xc3\\xa9sident</td>"""
+            """Richard Batsbak</a></td>\\n                    <td>Vice-Pr\\xc3\\xa9sident</td>"""
             in str(response.content)
         )
 
@@ -211,11 +212,12 @@ class ClubTest(TestCase):
         self.assertTrue(response.status_code == 200)
         content = str(response.content)
         self.assertFalse(
-            "Richard Batsbak</a></td>\\n                <td>Responsable info</td>"
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
             in content
         )
         self.assertTrue(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>" in content
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
         )
 
         # Skia is board member so he should be able to mark as old even without being in the club
@@ -234,7 +236,7 @@ class ClubTest(TestCase):
             {"users_old": self.rbatsbak.id},
         )
         self.assertFalse(
-            "Richard Batsbak</a></td>\\n                <td>Responsable info</td>"
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
             in str(response.content)
         )
 
@@ -261,11 +263,12 @@ class ClubTest(TestCase):
         self.assertTrue(response.status_code == 200)
         content = str(response.content)
         self.assertFalse(
-            "Richard Batsbak</a></td>\\n                <td>Responsable info</td>"
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
             in content
         )
         self.assertFalse(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>" in content
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
         )
 
     def test_mark_old_user_to_club_from_richard_ok(self):
@@ -293,11 +296,12 @@ class ClubTest(TestCase):
         self.assertTrue(response.status_code == 200)
         content = str(response.content)
         self.assertTrue(
-            "Richard Batsbak</a></td>\\n                <td>Responsable info</td>"
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
             in content
         )
         self.assertFalse(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>" in content
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
         )
 
         # Test with lower rights
@@ -316,11 +320,11 @@ class ClubTest(TestCase):
         self.assertTrue(response.status_code == 200)
         content = str(response.content)
         self.assertTrue(
-            "Richard Batsbak</a></td>\\n                <td>Responsable info</td>"
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
             in content
         )
         self.assertFalse(
-            "S&#39; Kia</a></td>\\n                <td>Curieux</td>" in content
+            "S&#39; Kia</a></td>\\n                    <td>Curieux</td>" in content
         )
 
     def test_mark_old_user_to_club_from_richard_fail(self):
@@ -343,7 +347,7 @@ class ClubTest(TestCase):
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>"
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
             in str(response.content)
         )
 
@@ -363,8 +367,9 @@ class ClubTest(TestCase):
         self.assertTrue(response.status_code == 200)
         content = str(response.content)
         self.assertTrue(
-            "Richard Batsbak</a></td>\\n                <td>Curieux</td>" in content
+            "Richard Batsbak</a></td>\\n                    <td>Curieux</td>" in content
         )
         self.assertTrue(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>" in content
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
         )
