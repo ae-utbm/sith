@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-24 03:06+0200\n"
+"POT-Creation-Date: 2019-04-25 14:45+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -174,7 +174,7 @@ msgstr "étiquette"
 msgid "target type"
 msgstr "type de cible"
 
-#: accounting/models.py:313 club/models.py:422
+#: accounting/models.py:313 club/models.py:413
 #: club/templates/club/club_members.jinja:8
 #: club/templates/club/club_old_members.jinja:8
 #: club/templates/club/mailing.jinja:28 club/views.py:112
@@ -186,7 +186,7 @@ msgstr "type de cible"
 msgid "User"
 msgstr "Utilisateur"
 
-#: accounting/models.py:314 club/models.py:329
+#: accounting/models.py:314 club/models.py:320
 #: club/templates/club/club_detail.jinja:12
 #: com/templates/com/mailing_admin.jinja:11
 #: com/templates/com/news_admin_list.jinja:23
@@ -955,48 +955,40 @@ msgstr "rôle"
 msgid "description"
 msgstr "description"
 
-#: club/models.py:282
-msgid "User must be subscriber to take part to a club"
-msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
-
-#: club/models.py:289
-msgid "User is already member of that club"
-msgstr "L'utilisateur est déjà membre de ce club"
-
-#: club/models.py:298
+#: club/models.py:286
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/models.py:332 club/models.py:427
+#: club/models.py:323 club/models.py:418
 msgid "Email address"
 msgstr "Adresse email"
 
-#: club/models.py:340
+#: club/models.py:331
 msgid "Enter a valid address. Only the root of the address is needed."
 msgstr ""
 "Entrez une adresse valide. Seule la racine de l'adresse est nécessaire."
 
-#: club/models.py:344 com/models.py:79 com/models.py:260 core/models.py:810
+#: club/models.py:335 com/models.py:79 com/models.py:260 core/models.py:810
 msgid "is moderated"
 msgstr "est modéré"
 
-#: club/models.py:346 com/models.py:81 com/models.py:264
+#: club/models.py:337 com/models.py:81 com/models.py:264
 msgid "moderator"
 msgstr "modérateur"
 
-#: club/models.py:415 club/templates/club/mailing.jinja:14
+#: club/models.py:406 club/templates/club/mailing.jinja:14
 msgid "Mailing"
 msgstr "Liste de diffusion"
 
-#: club/models.py:434
+#: club/models.py:425
 msgid "At least user or email is required"
 msgstr "Au moins un utilisateur ou un email est nécessaire"
 
-#: club/models.py:442
+#: club/models.py:433
 msgid "This email is already suscribed in this mailing"
 msgstr "Cet email est déjà abonné à cette mailing"
 
-#: club/models.py:471 club/templates/club/mailing.jinja:36
+#: club/models.py:462 club/templates/club/mailing.jinja:36
 msgid "Unregistered user"
 msgstr "Désabonner un utilisateur"
 
@@ -1045,7 +1037,7 @@ msgstr "Description"
 msgid "Since"
 msgstr "Depuis"
 
-#: club/templates/club/club_members.jinja:21
+#: club/templates/club/club_members.jinja:21 club/views.py:363
 #: core/templates/core/user_clubs.jinja:29
 msgid "Mark as old"
 msgstr "Marquer comme ancien"
@@ -1071,7 +1063,7 @@ msgid "To"
 msgstr "Au"
 
 #: club/templates/club/club_sellings.jinja:5 club/views.py:195
-#: club/views.py:507 counter/templates/counter/counter_main.jinja:19
+#: club/views.py:560 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
@@ -1097,7 +1089,7 @@ msgstr "unités"
 msgid "Benefit: "
 msgstr "Bénéfice : "
 
-#: club/templates/club/club_sellings.jinja:21 club/views.py:446
+#: club/templates/club/club_sellings.jinja:21 club/views.py:499
 #: core/templates/core/user_account_detail.jinja:18
 #: core/templates/core/user_account_detail.jinja:51
 #: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:168
@@ -1289,28 +1281,36 @@ msgstr "Utilisateurs à ajouter"
 msgid "Search users to add (one or more)."
 msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
 
-#: club/views.py:348
+#: club/views.py:381
 msgid "One of the selected users doesn't exist"
 msgstr "Un des utilisateurs sélectionné n'existe pas"
 
-#: club/views.py:353 core/views/group.py:82
+#: club/views.py:385
+msgid "User must be subscriber to take part to a club"
+msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
+
+#: club/views.py:389 core/views/group.py:82
 msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
-#: club/views.py:371 sas/views.py:129 sas/views.py:195 sas/views.py:286
+#: club/views.py:406
+msgid "You should specify a role"
+msgstr "Vous devez choisir un rôle"
+
+#: club/views.py:417 sas/views.py:129 sas/views.py:195 sas/views.py:286
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
-#: club/views.py:435 counter/views.py:1481
+#: club/views.py:488 counter/views.py:1481
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:441 com/views.py:85 com/views.py:221 counter/views.py:1487
+#: club/views.py:494 com/views.py:85 com/views.py:221 counter/views.py:1487
 #: election/views.py:190 subscription/views.py:52
 msgid "End date"
 msgstr "Date de fin"
 
-#: club/views.py:464 core/templates/core/user_stats.jinja:27
+#: club/views.py:517 core/templates/core/user_stats.jinja:27
 #: counter/views.py:1635
 msgid "Product"
 msgstr "Produit"

@@ -342,6 +342,14 @@ class ClubMemberForm(forms.Form):
                 widgets={"start_date": SelectDate},
             )
         )
+
+        # Role is required only if users is specified
+        self.fields["role"].required = False
+
+        # Start date and description are never really required
+        self.fields["start_date"].required = False
+        self.fields["description"].required = False
+
         self.fields["users_old"] = forms.ModelMultipleChoiceField(
             User.objects.filter(
                 id__in=[
@@ -385,9 +393,19 @@ class ClubMemberForm(forms.Form):
 
     def clean(self):
         """
-            Check user rights
+            Check user rights for adding an user
         """
         cleaned_data = super(ClubMemberForm, self).clean()
+
+        if not cleaned_data.get("users"):
+            # No user to add equals no check needed
+            return cleaned_data
+
+        if cleaned_data.get("role", "") == "":
+            # Role is required if users exists
+            self.add_error("role", _("You should specify a role"))
+            return cleaned_data
+
         request_user = self.request_user
         membership = self.request_user_membership
         if not (
