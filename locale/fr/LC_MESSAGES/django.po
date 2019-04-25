@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-25 14:45+0200\n"
+"POT-Creation-Date: 2019-04-25 17:35+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -175,7 +175,7 @@ msgid "target type"
 msgstr "type de cible"
 
 #: accounting/models.py:313 club/models.py:413
-#: club/templates/club/club_members.jinja:8
+#: club/templates/club/club_members.jinja:16
 #: club/templates/club/club_old_members.jinja:8
 #: club/templates/club/mailing.jinja:28 club/views.py:112
 #: counter/templates/counter/cash_summary_list.jinja:32
@@ -1013,7 +1013,7 @@ msgstr "Il n'y a pas de club dans ce site web."
 msgid "Club members"
 msgstr "Membres du club"
 
-#: club/templates/club/club_members.jinja:9
+#: club/templates/club/club_members.jinja:17
 #: club/templates/club/club_old_members.jinja:9
 #: core/templates/core/user_clubs.jinja:16
 #: core/templates/core/user_clubs.jinja:42
@@ -1023,7 +1023,7 @@ msgstr "Membres du club"
 msgid "Role"
 msgstr "Rôle"
 
-#: club/templates/club/club_members.jinja:10
+#: club/templates/club/club_members.jinja:18
 #: club/templates/club/club_old_members.jinja:10
 #: core/templates/core/group_list.jinja:15
 #: core/templates/core/user_clubs.jinja:17
@@ -1031,18 +1031,23 @@ msgstr "Rôle"
 msgid "Description"
 msgstr "Description"
 
-#: club/templates/club/club_members.jinja:11
+#: club/templates/club/club_members.jinja:19
 #: core/templates/core/user_clubs.jinja:18
 #: launderette/templates/launderette/launderette_admin.jinja:45
 msgid "Since"
 msgstr "Depuis"
 
-#: club/templates/club/club_members.jinja:21 club/views.py:363
+#: club/templates/club/club_members.jinja:21
+#: club/templates/club/club_members.jinja:46 club/views.py:363
 #: core/templates/core/user_clubs.jinja:29
 msgid "Mark as old"
 msgstr "Marquer comme ancien"
 
-#: club/templates/club/club_members.jinja:30
+#: club/templates/club/club_members.jinja:50
+msgid "There are no members in this club."
+msgstr "Il n'y a pas de membres dans ce club."
+
+#: club/templates/club/club_members.jinja:78
 #: core/templates/core/file_detail.jinja:19 core/views/forms.py:355
 #: launderette/views.py:226 trombi/templates/trombi/detail.jinja:19
 msgid "Add"
@@ -1063,7 +1068,7 @@ msgid "To"
 msgstr "Au"
 
 #: club/templates/club/club_sellings.jinja:5 club/views.py:195
-#: club/views.py:560 counter/templates/counter/counter_main.jinja:19
+#: club/views.py:564 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
@@ -1089,7 +1094,7 @@ msgstr "unités"
 msgid "Benefit: "
 msgstr "Bénéfice : "
 
-#: club/templates/club/club_sellings.jinja:21 club/views.py:499
+#: club/templates/club/club_sellings.jinja:21 club/views.py:503
 #: core/templates/core/user_account_detail.jinja:18
 #: core/templates/core/user_account_detail.jinja:51
 #: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:168
@@ -1293,24 +1298,24 @@ msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
 msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
-#: club/views.py:406
+#: club/views.py:410
 msgid "You should specify a role"
 msgstr "Vous devez choisir un rôle"
 
-#: club/views.py:417 sas/views.py:129 sas/views.py:195 sas/views.py:286
+#: club/views.py:421 sas/views.py:129 sas/views.py:195 sas/views.py:286
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
-#: club/views.py:488 counter/views.py:1481
+#: club/views.py:492 counter/views.py:1481
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:494 com/views.py:85 com/views.py:221 counter/views.py:1487
+#: club/views.py:498 com/views.py:85 com/views.py:221 counter/views.py:1487
 #: election/views.py:190 subscription/views.py:52
 msgid "End date"
 msgstr "Date de fin"
 
-#: club/views.py:517 core/templates/core/user_stats.jinja:27
+#: club/views.py:521 core/templates/core/user_stats.jinja:27
 #: counter/views.py:1635
 msgid "Product"
 msgstr "Produit"

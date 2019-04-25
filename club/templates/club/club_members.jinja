@@ -3,6 +3,7 @@
 
 {% block content %}
     <h2>{% trans %}Club members{% endtrans %}</h2>
+    {% if members %}
     <form action="{{ url('club:club_members', club_id=club.id) }}" id="users_old" method="post">
         {% csrf_token %}
         {% set users_old = dict(form.users_old | groupby("choice_label")) %}
@@ -45,6 +46,9 @@
             <input type="submit" name="submit" value="{% trans %}Mark as old{% endtrans %}">
         {% endif %}
     </form>
+    {% else %}
+    <p>{% trans %}There are no members in this club.{% endtrans %}</p>
+    {% endif %}
     <form action="{{ url('club:club_members', club_id=club.id) }}" id="add_users" method="post">
         {% csrf_token %}
         {{ form.non_field_errors() }}
