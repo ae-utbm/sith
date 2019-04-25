@@ -435,7 +435,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
 
     def get_form_kwargs(self):
         kwargs = super(ClubMembersView, self).get_form_kwargs()
-        kwargs["request_user"] = self.request_user
+        kwargs["request_user"] = self.request.user
         kwargs["club"] = self.get_object()
         kwargs["club_members"] = self.members
         return kwargs
@@ -463,7 +463,6 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
         return resp
 
     def dispatch(self, request, *args, **kwargs):
-        self.request_user = request.user
         self.members = (
             self.get_object().members.filter(end_date=None).order_by("-role").all()
         )
