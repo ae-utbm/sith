@@ -1,32 +1,68 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'core/macros.jinja' import user_profile_link, select_all_checkbox %}
 
 {% block content %}
     <h2>{% trans %}Club members{% endtrans %}</h2>
-    <table>
-        <thead>
-            <td>{% trans %}User{% endtrans %}</td>
-            <td>{% trans %}Role{% endtrans %}</td>
-            <td>{% trans %}Description{% endtrans %}</td>
-            <td>{% trans %}Since{% endtrans %}</td>
-        </thead>
-        <tbody>
-        {% for m in members %}
-            <tr>
-                <td>{{ user_profile_link(m.user) }}</td>
-                <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
-                <td>{{ m.description }}</td>
-                <td>{{ m.start_date }}</td>
-                {% if m.can_be_edited_by(user) %}
-                <td><a href="{{ url('club:membership_set_old', membership_id=m.id) }}">{% trans %}Mark as old{% endtrans %}</a></td>
-                {% endif %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <form action="{{ url('club:club_members', club_id=club.id) }}" method="post">
+    <form action="{{ url('club:club_members', club_id=club.id) }}" id="users_old" method="post">
         {% csrf_token %}
-        {{ form.as_p() }}
+        {% set users_old = dict(form.users_old | groupby("choice_label")) %}
+        {% if users_old %}
+            {{ select_all_checkbox("users_old") }}
+            <p></p>
+        {% endif %}
+        <table>
+            <thead>
+                <td>{% trans %}User{% endtrans %}</td>
+                <td>{% trans %}Role{% endtrans %}</td>
+                <td>{% trans %}Description{% endtrans %}</td>
+                <td>{% trans %}Since{% endtrans %}</td>
+                {% if users_old %}
+                    <td>{% trans %}Mark as old{% endtrans %}</td>
+                {% endif %}
+            </thead>
+            <tbody>
+            {% for m in members %}
+                <tr>
+                    <td>{{ user_profile_link(m.user) }}</td>
+                    <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+                    <td>{{ m.description }}</td>
+                    <td>{{ m.start_date }}</td>
+                    {% if users_old %}
+                        <td>
+                        {% set user_old = users_old[m.user.get_display_name()] %}
+                        {% if user_old %}
+                            {{ user_old[0].tag() }}
+                        {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {{ form.users_old.errors }}
+        {% if users_old %}
+            <p></p>
+            <input type="submit" name="submit" value="{% trans %}Mark as old{% endtrans %}">
+        {% endif %}
+    </form>
+    <form action="{{ url('club:club_members', club_id=club.id) }}" id="add_users" method="post">
+        {% csrf_token %}
+        <p>
+            {{ form.users.errors }}
+            <label for="{{ form.users.id_for_label }}">{{ form.users.label }} :</label>
+            {{ form.users }}
+            <span class="helptext">{{ form.users.help_text }}</span>
+        </p>
+        <p>
+            {{ form.role.errors }}
+            <label for="{{ form.role.id_for_label }}">{{ form.role.label }} :</label>
+            {{ form.role }}
+        </p>
+        <p>
+            {{ form.description.errors }}
+            <label for="{{ form.description.id_for_label }}">{{ form.description.label }} :</label>
+            {{ form.description }}
+        </p>
         <p><input type="submit" value="{% trans %}Add{% endtrans %}" /></p>
     </form>
 {% endblock %}
