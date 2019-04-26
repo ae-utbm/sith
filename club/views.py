@@ -33,7 +33,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _t
-from ajax_select.fields import AutoCompleteSelectField
+from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect
 
@@ -44,6 +44,7 @@ from core.views import (
     CanEditPropMixin,
     TabedViewMixin,
     PageEditViewBase,
+    DetailFormView,
 )
 from core.views.forms import SelectDate, SelectDateTime
 from club.models import Club, Membership, Mailing, MailingSubscription
@@ -305,7 +306,7 @@ class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
     current_tab = "tools"
 
 
-class ClubMemberForm(forms.ModelForm):
+class ClubMemberForm(forms.Form):
     """
     Form handling the members of a club
     """
@@ -313,24 +314,115 @@ class ClubMemberForm(forms.ModelForm):
     error_css_class = "error"
     required_css_class = "required"
 
-    class Meta:
-        model = Membership
-        fields = ["user", "role", "start_date", "description"]
-        widgets = {"start_date": SelectDate}
-
-    user = AutoCompleteSelectField(
-        "users", required=True, label=_("Select user"), help_text=None
+    users = AutoCompleteSelectMultipleField(
+        "users",
+        label=_("Users to add"),
+        help_text=_("Search users to add (one or more)."),
+        required=False,
     )
 
-    def save(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.club = kwargs.pop("club")
+        self.request_user = kwargs.pop("request_user")
+        self.club_members = kwargs.pop("club_members", None)
+        if not self.club_members:
+            self.club_members = (
+                self.club.members.filter(end_date=None).order_by("-role").all()
+            )
+        self.request_user_membership = self.club.get_membership_for(self.request_user)
+        super(ClubMemberForm, self).__init__(*args, **kwargs)
+
+        # Using a ModelForm binds too much the form with the model and we don't want that
+        # We want the view to process the model creation since they are multiple users
+        # We also want the form to handle bulk deletion
+        self.fields.update(
+            forms.fields_for_model(
+                Membership,
+                fields=("role", "start_date", "description"),
+                widgets={"start_date": SelectDate},
+            )
+        )
+
+        # Role is required only if users is specified
+        self.fields["role"].required = False
+
+        # Start date and description are never really required
+        self.fields["start_date"].required = False
+        self.fields["description"].required = False
+
+        self.fields["users_old"] = forms.ModelMultipleChoiceField(
+            User.objects.filter(
+                id__in=[
+                    ms.user.id
+                    for ms in self.club_members
+                    if ms.can_be_edited_by(
+                        self.request_user, self.request_user_membership
+                    )
+                ]
+            ).all(),
+            label=_("Mark as old"),
+            required=False,
+            widget=forms.CheckboxSelectMultiple,
+        )
+        if not self.request_user.is_root:
+            self.fields.pop("start_date")
+
+    def clean_users(self):
         """
-        Overloaded to return the club, and not to a Membership object that has no view
+            Check that the user is not trying to add an user already in the club
+            Also check that the user is valid and has a valid subscription
         """
-        super(ClubMemberForm, self).save(*args, **kwargs)
-        return self.instance.club
+        cleaned_data = super(ClubMemberForm, self).clean()
+        users = []
+        for user_id in cleaned_data["users"]:
+            user = User.objects.filter(id=user_id).first()
+            if not user:
+                raise forms.ValidationError(
+                    _("One of the selected users doesn't exist"), code="invalid"
+                )
+            if not user.is_subscribed:
+                raise forms.ValidationError(
+                    _("User must be subscriber to take part to a club"), code="invalid"
+                )
+            if self.club.get_membership_for(user):
+                raise forms.ValidationError(
+                    _("You can not add the same user twice"), code="invalid"
+                )
+            users.append(user)
+        return users
+
+    def clean(self):
+        """
+            Check user rights for adding an user
+        """
+        cleaned_data = super(ClubMemberForm, self).clean()
+
+        if "start_date" in cleaned_data and not cleaned_data["start_date"]:
+            # Drop start_date if allowed to edition but not specified
+            cleaned_data.pop("start_date")
+
+        if not cleaned_data.get("users"):
+            # No user to add equals no check needed
+            return cleaned_data
+
+        if cleaned_data.get("role", "") == "":
+            # Role is required if users exists
+            self.add_error("role", _("You should specify a role"))
+            return cleaned_data
+
+        request_user = self.request_user
+        membership = self.request_user_membership
+        if not (
+            cleaned_data["role"] <= SITH_MAXIMUM_FREE_ROLE
+            or (membership is not None and membership.role >= cleaned_data["role"])
+            or request_user.is_board_member
+            or request_user.is_root
+        ):
+            raise forms.ValidationError(_("You do not have the permission to do that"))
+        return cleaned_data
 
 
-class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
+class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
     """
     View of a club's members
     """
@@ -341,52 +433,45 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, UpdateView):
     template_name = "club/club_members.jinja"
     current_tab = "members"
 
-    def get_form(self):
-        """
-        Here we get a Membership object, but the view handles Club object.
-        That's why the save method of ClubMemberForm is overridden.
-        """
-        form = super(ClubMembersView, self).get_form()
-        if (
-            "user" in form.data and form.data.get("user") != ""
-        ):  # Load an existing membership if possible
-            form.instance = (
-                Membership.objects.filter(club=self.object)
-                .filter(user=form.data.get("user"))
-                .filter(end_date=None)
-                .first()
-            )
-        if form.instance is None:  # Instanciate a new membership
-            form.instance = Membership(club=self.object, user=self.request.user)
-        if not self.request.user.is_root:
-            form.fields.pop("start_date", None)
-        return form
+    def get_form_kwargs(self):
+        kwargs = super(ClubMembersView, self).get_form_kwargs()
+        kwargs["request_user"] = self.request.user
+        kwargs["club"] = self.get_object()
+        kwargs["club_members"] = self.members
+        return kwargs
+
+    def get_context_data(self, *args, **kwargs):
+        kwargs = super(ClubMembersView, self).get_context_data(*args, **kwargs)
+        kwargs["members"] = self.members
+        return kwargs
 
     def form_valid(self, form):
         """
             Check user rights
         """
-        user = self.request.user
-        ms = self.object.get_membership_for(user)
-        if (
-            form.cleaned_data["role"] <= SITH_MAXIMUM_FREE_ROLE
-            or (ms is not None and ms.role >= form.cleaned_data["role"])
-            or user.is_board_member
-            or user.is_root
-        ):
-            form.save()
-            form = self.form_class()
-            return super(ModelFormMixin, self).form_valid(form)
-        else:
-            form.add_error(None, _("You do not have the permission to do that"))
-            return self.form_invalid(form)
+        resp = super(ClubMembersView, self).form_valid(form)
+
+        data = form.clean()
+        users = data.pop("users", [])
+        users_old = data.pop("users_old", [])
+        for user in users:
+            Membership(club=self.get_object(), user=user, **data).save()
+        for user in users_old:
+            membership = self.get_object().get_membership_for(user)
+            membership.end_date = timezone.now()
+            membership.save()
+        return resp
 
     def dispatch(self, request, *args, **kwargs):
-        self.request = request
+        self.members = (
+            self.get_object().members.filter(end_date=None).order_by("-role").all()
+        )
         return super(ClubMembersView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy("club:club_members", kwargs={"club_id": self.club.id})
+        return reverse_lazy(
+            "club:club_members", kwargs={"club_id": self.get_object().id}
+        )
 
 
 class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):

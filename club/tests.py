@@ -44,30 +44,54 @@ class ClubTest(TestCase):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 3},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 3},
         )
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>"
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
             in str(response.content)
+        )
+
+    def test_create_add_multiple_user_to_club_from_root_ok(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {
+                "users": "|%d|%d|" % (self.skia.id, self.rbatsbak.id),
+                "start_date": "12/06/2016",
+                "role": 3,
+            },
+        )
+        response = self.client.get(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertTrue(
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
+        )
+        self.assertTrue(
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
+            in content
         )
 
     def test_create_add_user_to_club_from_root_fail_not_subscriber(self):
         self.client.login(username="root", password="plop")
         response = self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.guy.id, "start_date": "12/06/2016", "role": 3},
+            {"users": self.guy.id, "start_date": "12/06/2016", "role": 3},
         )
         self.assertTrue(response.status_code == 200)
-        self.assertTrue('<ul class="errorlist nonfield"><li>' in str(response.content))
+        self.assertTrue('<ul class="errorlist"><li>' in str(response.content))
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
         )
         self.assertFalse(
-            "Guy Carlier</a></td>\\n                <td>Responsable info</td>"
+            "Guy Carlier</a></td>\\n                    <td>Responsable info</td>"
             in str(response.content)
         )
 
@@ -75,18 +99,18 @@ class ClubTest(TestCase):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 3},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 3},
         )
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
         )
         self.assertTrue(
-            "S&#39; Kia</a></td>\\n                <td>Responsable info</td>"
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
             in str(response.content)
         )
         response = self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 4},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 4},
         )
         self.assertTrue(response.status_code == 200)
         self.assertFalse(
@@ -94,23 +118,47 @@ class ClubTest(TestCase):
             in str(response.content)
         )
 
+    def test_create_add_user_non_existent_to_club_from_root_fail(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users": [9999], "start_date": "12/06/2016", "role": 3},
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertTrue('<ul class="errorlist"><li>' in content)
+        self.assertFalse("<td>Responsable info</td>" in content)
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {
+                "users": "|%d|%d|" % (self.skia.id, 9999),
+                "start_date": "12/06/2016",
+                "role": 3,
+            },
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertTrue('<ul class="errorlist"><li>' in content)
+        self.assertFalse("<td>Responsable info</td>" in content)
+
     def test_create_add_user_to_club_from_skia_ok(self):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 10},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 10},
         )
         self.client.login(username="skia", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.rbatsbak.id, "start_date": "12/06/2016", "role": 9},
+            {"users": self.rbatsbak.id, "start_date": "12/06/2016", "role": 9},
         )
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(
-            """Richard Batsbak</a></td>\\n                <td>Vice-Pr\\xc3\\xa9sident</td>"""
+            """Richard Batsbak</a></td>\\n                    <td>Vice-Pr\\xc3\\xa9sident</td>"""
             in str(response.content)
         )
 
@@ -118,15 +166,210 @@ class ClubTest(TestCase):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.rbatsbak.id, "start_date": "12/06/2016", "role": 3},
+            {"users": self.rbatsbak.id, "start_date": "12/06/2016", "role": 3},
         )
         self.client.login(username="rbatsbak", password="plop")
         response = self.client.post(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
-            {"user": self.skia.id, "start_date": "12/06/2016", "role": 10},
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 10},
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(
             "<li>Vous n&#39;avez pas la permission de faire cela</li>"
             in str(response.content)
+        )
+
+    def test_role_required_if_users_specified(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users": self.rbatsbak.id, "start_date": "12/06/2016"},
+        )
+        self.assertTrue(
+            '<ul class="errorlist"><li>Vous devez choisir un r' in str(response.content)
+        )
+
+    def test_mark_old_user_to_club_from_skia_ok(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {
+                "users": "|%d|%d|" % (self.skia.id, self.rbatsbak.id),
+                "start_date": "12/06/2016",
+                "role": 3,
+            },
+        )
+        self.client.login(username="skia", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users_old": self.rbatsbak.id},
+        )
+        self.assertTrue(response.status_code == 302)
+
+        response = self.client.get(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertFalse(
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
+            in content
+        )
+        self.assertTrue(
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
+        )
+
+        # Skia is board member so he should be able to mark as old even without being in the club
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users_old": self.skia.id},
+        )
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users": self.rbatsbak.id, "start_date": "12/06/2016", "role": 3},
+        )
+        self.client.login(username="skia", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users_old": self.rbatsbak.id},
+        )
+        self.assertFalse(
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
+            in str(response.content)
+        )
+
+    def test_mark_old_multiple_users_from_skia_ok(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {
+                "users": "|%d|%d|" % (self.skia.id, self.rbatsbak.id),
+                "start_date": "12/06/2016",
+                "role": 3,
+            },
+        )
+        self.client.login(username="skia", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users_old": [self.rbatsbak.id, self.skia.id]},
+        )
+        self.assertTrue(response.status_code == 302)
+
+        response = self.client.get(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertFalse(
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
+            in content
+        )
+        self.assertFalse(
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
+        )
+
+    def test_mark_old_user_to_club_from_richard_ok(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {
+                "users": "|%d|%d|" % (self.skia.id, self.rbatsbak.id),
+                "start_date": "12/06/2016",
+                "role": 3,
+            },
+        )
+
+        # Test with equal rights
+        self.client.login(username="rbatsbak", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users_old": self.skia.id},
+        )
+        self.assertTrue(response.status_code == 302)
+
+        response = self.client.get(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertTrue(
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
+            in content
+        )
+        self.assertFalse(
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
+        )
+
+        # Test with lower rights
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 0},
+        )
+
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users_old": self.skia.id},
+        )
+        response = self.client.get(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertTrue(
+            "Richard Batsbak</a></td>\\n                    <td>Responsable info</td>"
+            in content
+        )
+        self.assertFalse(
+            "S&#39; Kia</a></td>\\n                    <td>Curieux</td>" in content
+        )
+
+    def test_mark_old_user_to_club_from_richard_fail(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users": self.skia.id, "start_date": "12/06/2016", "role": 3},
+        )
+
+        # Test with richard outside of the club
+        self.client.login(username="rbatsbak", password="plop")
+        response = self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users_old": self.skia.id},
+        )
+        self.assertTrue(response.status_code == 200)
+
+        response = self.client.get(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertTrue(response.status_code == 200)
+        self.assertTrue(
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in str(response.content)
+        )
+
+        # Test with lower rights
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users": self.rbatsbak.id, "start_date": "12/06/2016", "role": 0},
+        )
+
+        self.client.post(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id}),
+            {"users_old": self.skia.id},
+        )
+        response = self.client.get(
+            reverse("club:club_members", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertTrue(response.status_code == 200)
+        content = str(response.content)
+        self.assertTrue(
+            "Richard Batsbak</a></td>\\n                    <td>Curieux</td>" in content
+        )
+        self.assertTrue(
+            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
+            in content
         )

@@ -276,18 +276,6 @@ class Membership(models.Model):
         _("description"), max_length=128, null=False, blank=True
     )
 
-    def clean(self):
-        sub = User.objects.filter(pk=self.user.pk).first()
-        if sub is None or not sub.is_subscribed:
-            raise ValidationError(_("User must be subscriber to take part to a club"))
-        if (
-            Membership.objects.filter(user=self.user)
-            .filter(club=self.club)
-            .filter(end_date=None)
-            .exists()
-        ):
-            raise ValidationError(_("User is already member of that club"))
-
     def __str__(self):
         return (
             self.club.name
@@ -304,12 +292,15 @@ class Membership(models.Model):
         """
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
 
-    def can_be_edited_by(self, user):
+    def can_be_edited_by(self, user, membership=None):
         """
         Method to see if that object can be edited by the given user
         """
         if user.memberships:
-            ms = user.memberships.filter(club=self.club, end_date=None).first()
+            if membership:  # This is for optimisation purpose
+                ms = membership
+            else:
+                ms = user.memberships.filter(club=self.club, end_date=None).first()
             return (ms and ms.role >= self.role) or user.is_in_group(
                 settings.SITH_MAIN_BOARD_GROUP
             )
