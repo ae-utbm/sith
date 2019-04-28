@@ -160,11 +160,13 @@
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="/page/ae/">{% trans %}AE{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='ae') }}">{% trans %}AE{% endtrans %}</a>
                     <a href="{{ url('core:page', page_name='clubs') }}">{% trans %}AE's clubs{% endtrans %}</a>
-                    <a href="/page/bdf/">{% trans %}BdF{% endtrans %}</a>
-                    <a href="/page/bds/">{% trans %}BDS{% endtrans %}</a>
-                    <a href="/page/cetu/">{% trans %}CETU{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='bdf') }}">{% trans %}BdF{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='bds') }}">{% trans %}BDS{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='cetu') }}">{% trans %}CETU{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='clubs/doceo') }}">{% trans %}Doceo{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='positions') }}">{% trans %}Positions{% endtrans %}</a>
                 </div>
               </div> 
               <div class="dropdown">
@@ -172,8 +174,8 @@
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="/page/Index/calendrier_evenements/">{% trans %}Calendar{% endtrans %}</a>
-                    <a href="/page/GA">{% trans %}Big event{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='Index/calendrier_evenements') }}">{% trans %}Calendar{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='ga') }}">{% trans %}Big event{% endtrans %}</a>
                 </div>
               </div> 
               <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
@@ -187,16 +189,24 @@
                     <a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a>
                     <a href="/launderette">{% trans %}Launderette{% endtrans %}</a>
                     <a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a>
-                    <a href="https://ae2.utbm.fr/uvs/">{% trans %}Pedagogy{% endtrans %}</a>
+                    {# <a href="https://ae2.utbm.fr/uvs/">{% trans %}Pedagogy{% endtrans %}</a> #}
                 </div>
               </div> 
-              <a href="{{ url('core:page', page_name="partenaires")}}">{% trans %}Sponsors{% endtrans %}</a>
+              <div class="dropdown">
+                <button class="dropbtn">{% trans %}My Benefits{% endtrans %}
+                <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                  <a href="{{ url('core:page', page_name='partenaires')}}">{% trans %}Sponsors{% endtrans %}</a>
+                  <a href="{{ url('core:page', page_name='avantages') }}">{% trans %}Subscriber benefits{% endtrans %}</a>
+                </div>
+              </div>
               <div class="dropdown">
                 <button class="dropbtn">{% trans %}Help{% endtrans %} 
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
-                    <a href="/page/FAQ/">{% trans %}FAQ{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='FAQ') }}">{% trans %}FAQ{% endtrans %}</a>
                     <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
                     <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
                 </div>
@@ -237,14 +247,13 @@
 
         {% if not popup %}
         <footer>
-            {% block footer %}
+            {% block foooer %}
             <div>
                 <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
                 <a href="{{ url('core:page', 'legals') }}">{% trans %}Legal notices{% endtrans %}</a>
-                <a href="https://ae2.utbm.fr/copyright_agent.php">{% trans %}Intellectual property{% endtrans %}</a>
+                <a href="{{ url('core:page', 'copyright_agent') }}">{% trans %}Intellectual property{% endtrans %}</a>
                 <a href="{{ url('core:page', 'docs') }}">{% trans %}Help & Documentation{% endtrans %}</a>
                 <a href="{{ url('core:page', 'rd') }}">{% trans %}R&D{% endtrans %}</a>
-                <a href="https://ae2.utbm.fr/">{% trans %}Former website{% endtrans %}</a>
             </div>
             {% trans %}Site made by good people{% endtrans %}
             {% endblock %}
