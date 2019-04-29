@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-25 17:35+0200\n"
+"POT-Creation-Date: 2019-04-28 15:00+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1068,7 +1068,7 @@ msgid "To"
 msgstr "Au"
 
 #: club/templates/club/club_sellings.jinja:5 club/views.py:195
-#: club/views.py:564 counter/templates/counter/counter_main.jinja:19
+#: club/views.py:563 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
@@ -1094,7 +1094,7 @@ msgstr "unités"
 msgid "Benefit: "
 msgstr "Bénéfice : "
 
-#: club/templates/club/club_sellings.jinja:21 club/views.py:503
+#: club/templates/club/club_sellings.jinja:21 club/views.py:502
 #: core/templates/core/user_account_detail.jinja:18
 #: core/templates/core/user_account_detail.jinja:51
 #: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:168
@@ -1306,16 +1306,16 @@ msgstr "Vous devez choisir un rôle"
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
-#: club/views.py:492 counter/views.py:1481
+#: club/views.py:491 counter/views.py:1481
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/views.py:498 com/views.py:85 com/views.py:221 counter/views.py:1487
+#: club/views.py:497 com/views.py:85 com/views.py:221 counter/views.py:1487
 #: election/views.py:190 subscription/views.py:52
 msgid "End date"
 msgstr "Date de fin"
 
-#: club/views.py:521 core/templates/core/user_stats.jinja:27
+#: club/views.py:520 core/templates/core/user_stats.jinja:27
 #: counter/views.py:1635
 msgid "Product"
 msgstr "Produit"
@@ -1589,7 +1589,7 @@ msgid "Calls to moderate"
 msgstr "Appels à modérer"
 
 #: com/templates/com/news_admin_list.jinja:242
-#: core/templates/core/base.jinja:171
+#: core/templates/core/base.jinja:173
 msgid "Events"
 msgstr "Événements"
 
@@ -2375,15 +2375,23 @@ msgstr "Le BDS"
 msgid "CETU"
 msgstr "Le CETU"
 
-#: core/templates/core/base.jinja:175
+#: core/templates/core/base.jinja:168
+msgid "Doceo"
+msgstr "Doceo"
+
+#: core/templates/core/base.jinja:169
+msgid "Positions"
+msgstr "Postes à pourvoir"
+
+#: core/templates/core/base.jinja:177
 msgid "Calendar"
 msgstr "Calendrier"
 
-#: core/templates/core/base.jinja:176
+#: core/templates/core/base.jinja:178
 msgid "Big event"
-msgstr "GA"
+msgstr "Grandes Activités"
 
-#: core/templates/core/base.jinja:179
+#: core/templates/core/base.jinja:181
 #: forum/templates/forum/favorite_topics.jinja:14
 #: forum/templates/forum/last_unread.jinja:14
 #: forum/templates/forum/macros.jinja:90 forum/templates/forum/main.jinja:6
@@ -2392,11 +2400,11 @@ msgstr "GA"
 msgid "Forum"
 msgstr "Forum"
 
-#: core/templates/core/base.jinja:180
+#: core/templates/core/base.jinja:182
 msgid "Gallery"
 msgstr "Photos"
 
-#: core/templates/core/base.jinja:181 counter/models.py:217
+#: core/templates/core/base.jinja:183 counter/models.py:217
 #: counter/templates/counter/counter_list.jinja:11
 #: eboutic/templates/eboutic/eboutic_main.jinja:4
 #: eboutic/templates/eboutic/eboutic_main.jinja:24
@@ -2406,71 +2414,71 @@ msgstr "Photos"
 msgid "Eboutic"
 msgstr "Eboutic"
 
-#: core/templates/core/base.jinja:183
+#: core/templates/core/base.jinja:185
 msgid "Services"
 msgstr "Services"
 
-#: core/templates/core/base.jinja:187
+#: core/templates/core/base.jinja:189
 msgid "Matmatronch"
 msgstr "Matmatronch"
 
-#: core/templates/core/base.jinja:188 launderette/models.py:44
+#: core/templates/core/base.jinja:190 launderette/models.py:44
 #: launderette/templates/launderette/launderette_book.jinja:5
 #: launderette/templates/launderette/launderette_book_choose.jinja:4
 #: launderette/templates/launderette/launderette_main.jinja:4
 msgid "Launderette"
 msgstr "Laverie"
 
-#: core/templates/core/base.jinja:189 core/templates/core/file.jinja:20
+#: core/templates/core/base.jinja:191 core/templates/core/file.jinja:20
 #: core/views/files.py:86
 msgid "Files"
 msgstr "Fichiers"
 
-#: core/templates/core/base.jinja:190
-msgid "Pedagogy"
-msgstr "Pédagogie"
+#: core/templates/core/base.jinja:196
+msgid "My Benefits"
+msgstr "Mes Avantages"
 
-#: core/templates/core/base.jinja:193
+#: core/templates/core/base.jinja:200
 msgid "Sponsors"
 msgstr "Partenaires"
 
-#: core/templates/core/base.jinja:195
+#: core/templates/core/base.jinja:201
+msgid "Subscriber benefits"
+msgstr "Les avantages cotisants"
+
+#: core/templates/core/base.jinja:205
 msgid "Help"
 msgstr "Aide"
 
-#: core/templates/core/base.jinja:199
+#: core/templates/core/base.jinja:209
 msgid "FAQ"
 msgstr "FAQ"
 
-#: core/templates/core/base.jinja:200 core/templates/core/base.jinja:242
+#: core/templates/core/base.jinja:210 core/templates/core/base.jinja:252
 msgid "Contacts"
 msgstr "Contacts"
 
-#: core/templates/core/base.jinja:201
+#: core/templates/core/base.jinja:211
 msgid "Wiki"
 msgstr "Wiki"
 
-#: core/templates/core/base.jinja:243
+#: core/templates/core/base.jinja:253
 msgid "Legal notices"
 msgstr "Mentions légales"
 
-#: core/templates/core/base.jinja:244
+#: core/templates/core/base.jinja:254
 msgid "Intellectual property"
 msgstr "Propriété intellectuelle"
 
-#: core/templates/core/base.jinja:245
+#: core/templates/core/base.jinja:255
 msgid "Help & Documentation"
 msgstr "Aide & Documentation"
 
-#: core/templates/core/base.jinja:246
+#: core/templates/core/base.jinja:256
 msgid "R&D"
 msgstr "R&D"
 
-#: core/templates/core/base.jinja:247
-msgid "Former website"
-msgstr "Ancien site"
-
-#: core/templates/core/base.jinja:249
+#: core/templates/core/base.jinja:258
 msgid "Site made by good people"
 msgstr "Site réalisé par des gens bons"
 
@@ -5580,6 +5588,12 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#~ msgid "Pedagogy"
+#~ msgstr "Pédagogie"
+
+#~ msgid "Former website"
+#~ msgstr "Ancien site"
 
 #~ msgid "Help on the syntax"
 #~ msgstr "Aide sur la syntaxe"
