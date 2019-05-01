@@ -61,9 +61,7 @@ class MailingForm(forms.Form):
         required=False,
     )
 
-    def __init__(self, *args, **kwargs):
-        club_id = kwargs.pop("club_id", None)
-        user_id = kwargs.pop("user_id", -1)  # Remember 0 is treated as None
+    def __init__(self, club_id, user_id, *args, **kwargs):
         super(MailingForm, self).__init__(*args, **kwargs)
 
         self.fields["action"] = forms.TypedChoiceField(
@@ -94,17 +92,16 @@ class MailingForm(forms.Form):
             self.fields["subscription_" + field] = self.fields.pop(field)
             self.fields["subscription_" + field].required = False
 
-        if club_id:
-            self.fields["mailing_club"].queryset = Club.objects.filter(id=club_id)
-            self.fields["mailing_club"].initial = club_id
-            self.fields["mailing_club"].widget = forms.HiddenInput()
-            self.fields["subscription_mailing"].queryset = Mailing.objects.filter(
-                club__id=club_id, is_moderated=True
-            )
-        if user_id >= 0:
-            self.fields["mailing_moderator"].queryset = User.objects.filter(id=user_id)
-            self.fields["mailing_moderator"].initial = user_id
-            self.fields["mailing_moderator"].widget = forms.HiddenInput()
+        self.fields["mailing_club"].queryset = Club.objects.filter(id=club_id)
+        self.fields["mailing_club"].initial = club_id
+        self.fields["mailing_club"].widget = forms.HiddenInput()
+        self.fields["subscription_mailing"].queryset = Mailing.objects.filter(
+            club__id=club_id, is_moderated=True
+        )
+
+        self.fields["mailing_moderator"].queryset = User.objects.filter(id=user_id)
+        self.fields["mailing_moderator"].initial = user_id
+        self.fields["mailing_moderator"].widget = forms.HiddenInput()
 
     def check_required(self, cleaned_data, field):
         """
