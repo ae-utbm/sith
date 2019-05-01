@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import select_all_checkbox %}
 
 {% block title %}
 {% trans %}Mailing lists{% endtrans %}
@@ -10,8 +11,7 @@
     <b>{% trans %}Remember : mailing lists need to be moderated, if your new created list is not shown wait until moderation takes action{% endtrans %}</b>
 
     {% for mailing in mailings %}
-    {% if mailing.is_moderated %}
-    <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email_full }} 
+    <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email_full }}
         {%- if user.is_owner(mailing) -%}
         <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a>
         {%- endif -%}
@@ -19,27 +19,38 @@
     <form method="GET" action="{{ url('club:mailing_generate', mailing_id=mailing.id) }}" style="display:inline-block;">
         <input type="submit" name="generateMalingList" value="{% trans %}Generate mailing list{% endtrans %}">
     </form>
-    <form method="GET" action="{{ url('club:mailing_clean', mailing_id=mailing.id) }}" style="display:inline-block;">
-        <input type="submit" name="cleanMailingList" value="{% trans %}Clean mailing list{% endtrans %}">
+    {% set form_mailing_removal = form["removal_" + mailing.id|string] %}
+    {% if form_mailing_removal.field.choices %}
+    {% set ms = dict(mailing.subscriptions.all() | groupby('id')) %}
+    <form action="{{ url('club:mailing', club_id=club.id) }}" id="{{ form_mailing_removal.auto_id }}" method="post" enctype="multipart/form-data">
+        <p style="margin-bottom: 1em;">{{ select_all_checkbox(form_mailing_removal.auto_id) }}</p>
+        {% csrf_token %}
+        <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.REMOVE_SUBSCRIPTION }}" />
+        <table>
+            <thead>
+                <tr>
+                    <td>{% trans %}User{% endtrans %}</td>
+                    <td>{% trans %}Email{% endtrans %}</td>
+                    <td>{% trans %}Delete{% endtrans %}</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for widget in form_mailing_removal.subwidgets %}
+                {% set user = ms[widget.data.value][0] %}
+                <tr>
+                    <td>{{ user.get_username }}</td>
+                    <td>{{ user.get_email }}</td>
+                    <td>{{ widget.tag() }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{ form_mailing_removal.errors }}
+        <p><input type="submit" value="{% trans %}Remove from mailing list{% endtrans %}" /></p>
     </form>
-    <hr>
-    <table>
-        <tr>
-            <th>{% trans %}User{% endtrans %}</th>
-            <th colspan="2">{% trans %}Email{%endtrans%}</th>
-        </tr>
-        {% for subscriber in mailing.subscriptions.all() %}
-        <tr>
-            {% if subscriber.user %}
-            <td>{{ subscriber.user }}</td>
-            {% else %}
-            <td>{% trans %}Unregistered user{% endtrans %}</td>
-            {% endif %}
-            <td>{{ subscriber.get_email }}</td>
-            <td><a href="{{ url('club:mailing_subscription_delete', mailing_subscription_id=subscriber.id) }}">{% trans %}Delete{% endtrans %}</a></td>
-        </tr>
-        {% endfor %}
-    </table>
+
+    {% else %}
+        <p><b>{% trans %}There is no subscriber for this mailing list{% endtrans %}</b></p>
     {% endif %}
     {% endfor %}
 

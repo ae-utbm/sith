@@ -513,23 +513,29 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     template_name = "club/mailing.jinja"
     current_tab = "mailing"
 
-    def get_form_kwargs(self, *args, **kwargs):
-        kwargs = super(ClubMailingView, self).get_form_kwargs(*args, **kwargs)
+    def get_form_kwargs(self):
+        kwargs = super(ClubMailingView, self).get_form_kwargs()
         kwargs["club_id"] = self.get_object().id
         kwargs["user_id"] = self.request.user.id
+        kwargs["mailings"] = self.mailings
         return kwargs
+
+    def dispatch(self, request, *args, **kwargs):
+        self.mailings = Mailing.objects.filter(club_id=self.get_object().id).all()
+        return super(ClubMailingView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(ClubMailingView, self).get_context_data(**kwargs)
         kwargs["club"] = self.get_object()
         kwargs["user"] = self.request.user
-        kwargs["mailings"] = Mailing.objects.filter(club_id=self.get_object().id).all()
+        kwargs["mailings"] = self.mailings
         kwargs["mailings_moderated"] = (
             kwargs["mailings"].exclude(is_moderated=False).all()
         )
         kwargs["form_actions"] = {
             "NEW_MALING": self.form_class.ACTION_NEW_MAILING,
             "NEW_SUBSCRIPTION": self.form_class.ACTION_NEW_SUBSCRIPTION,
+            "REMOVE_SUBSCRIPTION": self.form_class.ACTION_REMOVE_SUBSCRIPTION,
         }
         return kwargs
 
@@ -565,6 +571,19 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
             sub.clean()
             sub.save()
 
+    def remove_subscription(self, cleaned_data):
+        """
+        Remove specified users from a mailing list
+        """
+        fields = [
+            cleaned_data[key]
+            for key in cleaned_data.keys()
+            if key.startswith("removal_")
+        ]
+        for field in fields:
+            for sub in field:
+                sub.delete()
+
     def form_valid(self, form):
         resp = super(ClubMailingView, self).form_valid(form)
 
@@ -575,6 +594,9 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
         if cleaned_data["action"] == self.form_class.ACTION_NEW_SUBSCRIPTION:
             self.add_new_subscription(cleaned_data)
+
+        if cleaned_data["action"] == self.form_class.ACTION_REMOVE_SUBSCRIPTION:
+            self.remove_subscription(cleaned_data)
 
         return resp
 
@@ -632,18 +654,6 @@ class MailingAutoGenerationView(View):
         for member in members.all():
             MailingSubscription(user=member.user, mailing=self.mailing).save()
         return redirect("club:mailing", club_id=club.id)
-
-
-class MailingAutoCleanView(View):
-    def dispatch(self, request, *args, **kwargs):
-        self.mailing = get_object_or_404(Mailing, pk=kwargs["mailing_id"])
-        if not request.user.can_edit(self.mailing):
-            raise PermissionDenied
-        return super(MailingAutoCleanView, self).dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        self.mailing.subscriptions.all().delete()
-        return redirect("club:mailing", club_id=self.mailing.club.id)
 
 
 class PosterListView(ClubTabsMixin, PosterListBaseView, CanViewMixin):

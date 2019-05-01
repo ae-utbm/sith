@@ -53,6 +53,7 @@ class MailingForm(forms.Form):
 
     ACTION_NEW_MAILING = 1
     ACTION_NEW_SUBSCRIPTION = 2
+    ACTION_REMOVE_SUBSCRIPTION = 3
 
     subscription_users = AutoCompleteSelectMultipleField(
         "users",
@@ -61,13 +62,14 @@ class MailingForm(forms.Form):
         required=False,
     )
 
-    def __init__(self, club_id, user_id, *args, **kwargs):
+    def __init__(self, club_id, user_id, mailings, *args, **kwargs):
         super(MailingForm, self).__init__(*args, **kwargs)
 
         self.fields["action"] = forms.TypedChoiceField(
             (
                 (self.ACTION_NEW_MAILING, _("New Mailing")),
                 (self.ACTION_NEW_SUBSCRIPTION, _("Subscribe")),
+                (self.ACTION_REMOVE_SUBSCRIPTION, _("Remove")),
             ),
             coerce=int,
             label=_("Action"),
@@ -75,6 +77,15 @@ class MailingForm(forms.Form):
             required=True,
             widget=forms.HiddenInput(),
         )
+
+        # Generate bulk removal forms, they are never required
+        for mailing in mailings:
+            self.fields["removal_" + str(mailing.id)] = forms.ModelMultipleChoiceField(
+                mailing.subscriptions.all(),
+                label=_("Remove"),
+                required=False,
+                widget=forms.CheckboxSelectMultiple,
+            )
 
         # Include fields for handling mailing creation
         mailing_fields = ("email", "club", "moderator")
@@ -132,8 +143,6 @@ class MailingForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(MailingForm, self).clean()
-
-        print(cleaned_data)
 
         if not "action" in cleaned_data:
             # If there is no action provided, we can stop here

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-28 15:00+0200\n"
+"POT-Creation-Date: 2019-05-01 22:45+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -177,7 +177,7 @@ msgstr "type de cible"
 #: accounting/models.py:313 club/models.py:413
 #: club/templates/club/club_members.jinja:16
 #: club/templates/club/club_old_members.jinja:8
-#: club/templates/club/mailing.jinja:28 club/views.py:112
+#: club/templates/club/mailing.jinja:32
 #: counter/templates/counter/cash_summary_list.jinja:32
 #: counter/templates/counter/stats.jinja:15
 #: counter/templates/counter/stats.jinja:52
@@ -345,7 +345,7 @@ msgstr "Compte en banque : "
 #: accounting/templates/accounting/club_account_details.jinja:60
 #: accounting/templates/accounting/label_list.jinja:26
 #: club/templates/club/club_sellings.jinja:50
-#: club/templates/club/mailing.jinja:16 club/templates/club/mailing.jinja:39
+#: club/templates/club/mailing.jinja:16 club/templates/club/mailing.jinja:34
 #: com/templates/com/mailing_admin.jinja:19
 #: com/templates/com/news_admin_list.jinja:41
 #: com/templates/com/news_admin_list.jinja:70
@@ -386,7 +386,7 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: accounting/templates/accounting/bank_account_details.jinja:18
-#: club/views.py:129 core/views/user.py:205 sas/templates/sas/picture.jinja:86
+#: club/views.py:78 core/views/user.py:205 sas/templates/sas/picture.jinja:86
 msgid "Infos"
 msgstr "Infos"
 
@@ -405,7 +405,7 @@ msgstr "Nouveau compte club"
 #: accounting/templates/accounting/bank_account_details.jinja:27
 #: accounting/templates/accounting/bank_account_list.jinja:22
 #: accounting/templates/accounting/club_account_details.jinja:58
-#: accounting/templates/accounting/journal_details.jinja:89 club/views.py:175
+#: accounting/templates/accounting/journal_details.jinja:89 club/views.py:124
 #: com/templates/com/news_admin_list.jinja:39
 #: com/templates/com/news_admin_list.jinja:68
 #: com/templates/com/news_admin_list.jinja:115
@@ -893,6 +893,101 @@ msgstr "Opérations sans étiquette"
 msgid "Refound this account"
 msgstr "Rembourser ce compte"
 
+#: club/forms.py:60 club/forms.py:197
+msgid "Users to add"
+msgstr "Utilisateurs à ajouter"
+
+#: club/forms.py:61 club/forms.py:198 core/views/group.py:63
+msgid "Search users to add (one or more)."
+msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
+
+#: club/forms.py:70
+#, fuzzy
+#| msgid "New mailing"
+msgid "New Mailing"
+msgstr "Nouvelle mailing liste"
+
+#: club/forms.py:71
+#, fuzzy
+#| msgid "Unsubscribe"
+msgid "Subscribe"
+msgstr "Se désabonner"
+
+#: club/forms.py:72 club/forms.py:85 com/templates/com/news_admin_list.jinja:40
+#: com/templates/com/news_admin_list.jinja:116
+#: com/templates/com/news_admin_list.jinja:198
+#: com/templates/com/news_admin_list.jinja:274
+msgid "Remove"
+msgstr "Retirer"
+
+#: club/forms.py:75 launderette/views.py:228
+msgid "Action"
+msgstr "Action"
+
+#: club/forms.py:122
+#, fuzzy
+#| msgid "This field is required."
+msgid "This field is required"
+msgstr "Ce champ est obligatoire."
+
+#: club/forms.py:134 club/forms.py:259
+msgid "One of the selected users doesn't exist"
+msgstr "Un des utilisateurs sélectionné n'existe pas"
+
+#: club/forms.py:138
+#, fuzzy
+#| msgid "One of the selected users doesn't exist"
+msgid "One of the selected users doesn't have an email address"
+msgstr "Un des utilisateurs sélectionné n'existe pas"
+
+#: club/forms.py:149
+#, fuzzy
+#| msgid "This field is required."
+msgid "An action is required"
+msgstr "Ce champ est obligatoire."
+
+#: club/forms.py:162
+msgid "You must specify at least an user or an email address"
+msgstr ""
+
+#: club/forms.py:172 counter/views.py:1481
+msgid "Begin date"
+msgstr "Date de début"
+
+#: club/forms.py:178 com/views.py:85 com/views.py:221 counter/views.py:1487
+#: election/views.py:190 subscription/views.py:52
+msgid "End date"
+msgstr "Date de fin"
+
+#: club/forms.py:183 club/templates/club/club_sellings.jinja:21
+#: core/templates/core/user_account_detail.jinja:18
+#: core/templates/core/user_account_detail.jinja:51
+#: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:168
+msgid "Counter"
+msgstr "Comptoir"
+
+#: club/forms.py:241 club/templates/club/club_members.jinja:21
+#: club/templates/club/club_members.jinja:46
+#: core/templates/core/user_clubs.jinja:29
+msgid "Mark as old"
+msgstr "Marquer comme ancien"
+
+#: club/forms.py:263
+msgid "User must be subscriber to take part to a club"
+msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
+
+#: club/forms.py:267 core/views/group.py:82
+msgid "You can not add the same user twice"
+msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
+
+#: club/forms.py:288
+msgid "You should specify a role"
+msgstr "Vous devez choisir un rôle"
+
+#: club/forms.py:299 sas/views.py:129 sas/views.py:195 sas/views.py:286
+msgid "You do not have the permission to do that"
+msgstr "Vous n'avez pas la permission de faire cela"
+
 #: club/models.py:51
 msgid "unix name"
 msgstr "nom unix"
@@ -988,9 +1083,9 @@ msgstr "Au moins un utilisateur ou un email est nécessaire"
 msgid "This email is already suscribed in this mailing"
 msgstr "Cet email est déjà abonné à cette mailing"
 
-#: club/models.py:462 club/templates/club/mailing.jinja:36
+#: club/models.py:459
 msgid "Unregistered user"
-msgstr "Désabonner un utilisateur"
+msgstr "Utilisateur non enregistré"
 
 #: club/templates/club/club_list.jinja:4 club/templates/club/club_list.jinja:37
 msgid "Club list"
@@ -1037,12 +1132,6 @@ msgstr "Description"
 msgid "Since"
 msgstr "Depuis"
 
-#: club/templates/club/club_members.jinja:21
-#: club/templates/club/club_members.jinja:46 club/views.py:363
-#: core/templates/core/user_clubs.jinja:29
-msgid "Mark as old"
-msgstr "Marquer comme ancien"
-
 #: club/templates/club/club_members.jinja:50
 msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
@@ -1067,8 +1156,8 @@ msgstr "Du"
 msgid "To"
 msgstr "Au"
 
-#: club/templates/club/club_sellings.jinja:5 club/views.py:195
-#: club/views.py:563 counter/templates/counter/counter_main.jinja:19
+#: club/templates/club/club_sellings.jinja:5 club/views.py:144
+#: club/views.py:378 counter/templates/counter/counter_main.jinja:19
 #: counter/templates/counter/last_ops.jinja:35
 msgid "Sellings"
 msgstr "Ventes"
@@ -1093,13 +1182,6 @@ msgstr "unités"
 #: club/templates/club/club_sellings.jinja:15
 msgid "Benefit: "
 msgstr "Bénéfice : "
-
-#: club/templates/club/club_sellings.jinja:21 club/views.py:502
-#: core/templates/core/user_account_detail.jinja:18
-#: core/templates/core/user_account_detail.jinja:51
-#: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:168
-msgid "Counter"
-msgstr "Comptoir"
 
 #: club/templates/club/club_sellings.jinja:22
 #: core/templates/core/user_account_detail.jinja:19
@@ -1189,11 +1271,11 @@ msgstr "Comptabilité : "
 msgid "Manage launderettes"
 msgstr "Gestion des laveries"
 
-#: club/templates/club/mailing.jinja:4
+#: club/templates/club/mailing.jinja:5
 msgid "Mailing lists"
 msgstr "Mailing listes"
 
-#: club/templates/club/mailing.jinja:10
+#: club/templates/club/mailing.jinja:11
 msgid ""
 "Remember : mailing lists need to be moderated, if your new created list is "
 "not shown wait until moderation takes action"
@@ -1206,34 +1288,38 @@ msgstr ""
 msgid "Generate mailing list"
 msgstr "Générer la liste de diffusion"
 
-#: club/templates/club/mailing.jinja:23
-msgid "Clean mailing list"
-msgstr "Néttoyer la liste de diffusion"
-
-#: club/templates/club/mailing.jinja:29
+#: club/templates/club/mailing.jinja:33
 #: com/templates/com/mailing_admin.jinja:10
 msgid "Email"
 msgstr "Email"
 
-#: club/templates/club/mailing.jinja:47
+#: club/templates/club/mailing.jinja:49
+msgid "Remove from mailing list"
+msgstr "Supprimer de la liste de diffusion"
+
+#: club/templates/club/mailing.jinja:53
+msgid "There is no subscriber for this mailing list"
+msgstr "Il n'y a pas d'abonnés dans cette liste de diffusion"
+
+#: club/templates/club/mailing.jinja:58
 msgid "No mailing list existing for this club"
 msgstr "Aucune mailing liste n'existe pour ce club"
 
-#: club/templates/club/mailing.jinja:51
+#: club/templates/club/mailing.jinja:63
 msgid "New member"
 msgstr "Nouveau membre"
 
-#: club/templates/club/mailing.jinja:55
+#: club/templates/club/mailing.jinja:83
 msgid "Add to mailing list"
 msgstr "Ajouter à la mailing liste"
 
-#: club/templates/club/mailing.jinja:59
+#: club/templates/club/mailing.jinja:87
 msgid "New mailing"
-msgstr "Nouvelle mailing liste"
+msgstr "Nouvelle liste de diffusion"
 
-#: club/templates/club/mailing.jinja:63
+#: club/templates/club/mailing.jinja:100
 msgid "Create mailing list"
-msgstr "Créer une mailing liste"
+msgstr "Créer une liste de diffusion"
 
 #: club/templates/club/page_history.jinja:8
 msgid "No page existing for this club"
@@ -1243,79 +1329,42 @@ msgstr "Aucune page n'existe pour ce club"
 msgid "Club stats"
 msgstr "Statistiques du club"
 
-#: club/views.py:139
+#: club/views.py:88
 msgid "Members"
 msgstr "Membres"
 
-#: club/views.py:148
+#: club/views.py:97
 msgid "Old members"
 msgstr "Anciens membres"
 
-#: club/views.py:158 core/templates/core/page.jinja:33
+#: club/views.py:107 core/templates/core/page.jinja:33
 msgid "History"
 msgstr "Historique"
 
-#: club/views.py:166 core/templates/core/base.jinja:121 core/views/user.py:228
+#: club/views.py:115 core/templates/core/base.jinja:121 core/views/user.py:228
 #: sas/templates/sas/picture.jinja:95 trombi/views.py:60
 msgid "Tools"
 msgstr "Outils"
 
-#: club/views.py:186
+#: club/views.py:135
 msgid "Edit club page"
 msgstr "Éditer la page de club"
 
-#: club/views.py:202
+#: club/views.py:151
 msgid "Mailing list"
 msgstr "Listes de diffusion"
 
-#: club/views.py:211 com/views.py:141
+#: club/views.py:160 com/views.py:141
 msgid "Posters list"
 msgstr "Liste d'affiches"
 
-#: club/views.py:221 counter/templates/counter/counter_list.jinja:21
+#: club/views.py:170 counter/templates/counter/counter_list.jinja:21
 #: counter/templates/counter/counter_list.jinja:43
 #: counter/templates/counter/counter_list.jinja:59
 msgid "Props"
 msgstr "Propriétés"
 
-#: club/views.py:319
-msgid "Users to add"
-msgstr "Utilisateurs à ajouter"
-
-#: club/views.py:320 core/views/group.py:63
-msgid "Search users to add (one or more)."
-msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
-
-#: club/views.py:381
-msgid "One of the selected users doesn't exist"
-msgstr "Un des utilisateurs sélectionné n'existe pas"
-
-#: club/views.py:385
-msgid "User must be subscriber to take part to a club"
-msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
-
-#: club/views.py:389 core/views/group.py:82
-msgid "You can not add the same user twice"
-msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
-
-#: club/views.py:410
-msgid "You should specify a role"
-msgstr "Vous devez choisir un rôle"
-
-#: club/views.py:421 sas/views.py:129 sas/views.py:195 sas/views.py:286
-msgid "You do not have the permission to do that"
-msgstr "Vous n'avez pas la permission de faire cela"
-
-#: club/views.py:491 counter/views.py:1481
-msgid "Begin date"
-msgstr "Date de début"
-
-#: club/views.py:497 com/views.py:85 com/views.py:221 counter/views.py:1487
-#: election/views.py:190 subscription/views.py:52
-msgid "End date"
-msgstr "Date de fin"
-
-#: club/views.py:520 core/templates/core/user_stats.jinja:27
+#: club/views.py:335 core/templates/core/user_stats.jinja:27
 #: counter/views.py:1635
 msgid "Product"
 msgstr "Produit"
@@ -1546,13 +1595,6 @@ msgstr "Auteur"
 #: com/templates/com/news_admin_list.jinja:253
 msgid "Moderator"
 msgstr "Modérateur"
-
-#: com/templates/com/news_admin_list.jinja:40
-#: com/templates/com/news_admin_list.jinja:116
-#: com/templates/com/news_admin_list.jinja:198
-#: com/templates/com/news_admin_list.jinja:274
-msgid "Remove"
-msgstr "Retirer"
 
 #: com/templates/com/news_admin_list.jinja:47
 msgid "Notices to moderate"
@@ -4611,10 +4653,6 @@ msgstr "Éditer la page de présentation"
 #: launderette/templates/launderette/launderette_main.jinja:12
 msgid "Book launderette slot"
 msgstr "Réserver un créneau de laverie"
-
-#: launderette/views.py:228
-msgid "Action"
-msgstr "Action"
 
 #: launderette/views.py:240
 msgid "Tokens, separated by spaces"

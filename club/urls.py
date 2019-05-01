@@ -71,11 +71,6 @@ urlpatterns = [
         name="mailing_generate",
     ),
     url(
-        r"^(?P<mailing_id>[0-9]+)/mailing/clean$",
-        MailingAutoCleanView.as_view(),
-        name="mailing_clean",
-    ),
-    url(
         r"^(?P<mailing_id>[0-9]+)/mailing/delete$",
         MailingDeleteView.as_view(),
         name="mailing_delete",
