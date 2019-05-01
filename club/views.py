@@ -502,7 +502,7 @@ class ClubStatView(TemplateView):
         return kwargs
 
 
-class ClubMailingView(ClubTabsMixin, DetailFormView):
+class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     """
     A list of mailing for a given club
     """
@@ -513,27 +513,13 @@ class ClubMailingView(ClubTabsMixin, DetailFormView):
     template_name = "club/mailing.jinja"
     current_tab = "mailing"
 
-    def authorized(self):
-        return (
-            self.get_object().has_rights_in_club(self.request.user)
-            or self.request.user.is_root
-            or self.request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
-        )
-
     def get_form_kwargs(self, *args, **kwargs):
         kwargs = super(ClubMailingView, self).get_form_kwargs(*args, **kwargs)
         kwargs["club_id"] = self.get_object().id
         kwargs["user_id"] = self.request.user.id
         return kwargs
 
-    def dispatch(self, request, *args, **kwargs):
-        res = super(ClubMailingView, self).dispatch(request, *args, **kwargs)
-        if not self.authorized():
-            raise PermissionDenied
-        return res
-
     def get_context_data(self, **kwargs):
-        self.object = self.get_object()
         kwargs = super(ClubMailingView, self).get_context_data(**kwargs)
         kwargs["club"] = self.get_object()
         kwargs["user"] = self.request.user
