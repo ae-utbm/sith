@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block content %}
-    {% if has_objects %}
+    {% if mailings %}
 
     <b>{% trans %}Remember : mailing lists need to be moderated, if your new created list is not shown wait until moderation takes action{% endtrans %}</b>
 
-    {% for mailing in object_list %}
+    {% for mailing in mailings %}
     {% if mailing.is_moderated %}
     <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email_full }} 
         {%- if user.is_owner(mailing) -%}
@@ -47,19 +47,45 @@
     <p>{% trans %}No mailing list existing for this club{% endtrans %}</p>
     {% endif %}
 
-    {% if has_objects %}
+    <p>{{ form.non_field_errors() }}</p>
+    {% if mailings_moderated %}
         <h2>{% trans %}New member{% endtrans %}</h2>
-        <form action="{{ url('club:mailing_subscription_create', club_id=club.id) }}" method="post" enctype="multipart/form-data">
+        <form action="{{ url('club:mailing', club_id=club.id) }}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ add_member.as_p() }}
+            <p>
+                {{ form.subscription_mailing.errors }}
+                <label for="{{ form.subscription_mailing.id_for_label }}">{{ form.subscription_mailing.label }}</label>
+                {{ form.subscription_mailing }}
+            </p>
+            <p>
+                {{ form.subscription_users.errors }}
+                <label for="{{ form.subscription_users.id_for_label }}">{{ form.subscription_users.label }}</label>
+                {{ form.subscription_users }}
+                <span class="helptext">{{ form.subscription_users.help_text }}</span>
+            </p>
+            <p>
+                {{ form.subscription_email.errors }}
+                <label for="{{ form.subscription_email.id_for_label }}">{{ form.subscription_email.label }}</label>
+                {{ form.subscription_email }}
+            </p>
+            <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.NEW_SUBSCRIPTION }}" />
             <p><input type="submit" value="{% trans %}Add to mailing list{% endtrans %}" /></p>
         </form>
     {% endif %}
 
     <h2>{% trans %}New mailing{% endtrans %}</h2>
-    <form action="{{ url('club:mailing_create', club_id=club.id) }}" method="post" enctype="multipart/form-data">
+    <form action="{{ url('club:mailing', club_id=club.id) }}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ add_mailing.as_p() }}
+        {{ form.mailing_club.errors }}
+        {{ form.mailing_moderator.errors }}
+        <p>
+            {{ form.mailing_email.errors }}
+            <label for="{{ form.mailing_email.id_for_label }}">{{ form.mailing_email.label }}</label>
+            {{ form.mailing_email }}
+        </p>
+        {{ form.mailing_club }}
+        {{ form.mailing_moderator }}
+        <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.NEW_MALING }}" />
         <p><input type="submit" value="{% trans %}Create mailing list{% endtrans %}" /></p>
     </form>
 

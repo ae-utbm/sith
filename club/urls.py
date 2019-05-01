@@ -64,21 +64,7 @@ urlpatterns = [
     ),
     url(r"^(?P<club_id>[0-9]+)/prop$", ClubEditPropView.as_view(), name="club_prop"),
     url(r"^(?P<club_id>[0-9]+)/tools$", ClubToolsView.as_view(), name="tools"),
-    url(
-        r"^(?P<club_id>[0-9]+)/mailing$",
-        ClubMailingView.as_view(action="display"),
-        name="mailing",
-    ),
-    url(
-        r"^(?P<club_id>[0-9]+)/mailing/new/mailing$",
-        ClubMailingView.as_view(action="add_mailing"),
-        name="mailing_create",
-    ),
-    url(
-        r"^(?P<club_id>[0-9]+)/mailing/new/subscription$",
-        ClubMailingView.as_view(action="add_member"),
-        name="mailing_subscription_create",
-    ),
+    url(r"^(?P<club_id>[0-9]+)/mailing$", ClubMailingView.as_view(), name="mailing"),
     url(
         r"^(?P<mailing_id>[0-9]+)/mailing/generate$",
         MailingAutoGenerationView.as_view(),

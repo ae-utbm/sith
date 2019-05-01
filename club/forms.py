@@ -46,43 +46,118 @@ class ClubEditForm(forms.ModelForm):
         self.fields["short_description"].widget = forms.Textarea()
 
 
-class MailingForm(forms.ModelForm):
-    class Meta:
-        model = Mailing
-        fields = ("email", "club", "moderator")
+class MailingForm(forms.Form):
+    """
+    Form handling mailing lists right
+    """
+
+    ACTION_NEW_MAILING = 1
+    ACTION_NEW_SUBSCRIPTION = 2
+
+    subscription_users = AutoCompleteSelectMultipleField(
+        "users",
+        label=_("Users to add"),
+        help_text=_("Search users to add (one or more)."),
+        required=False,
+    )
 
     def __init__(self, *args, **kwargs):
         club_id = kwargs.pop("club_id", None)
         user_id = kwargs.pop("user_id", -1)  # Remember 0 is treated as None
         super(MailingForm, self).__init__(*args, **kwargs)
+
+        self.fields["action"] = forms.TypedChoiceField(
+            (
+                (self.ACTION_NEW_MAILING, _("New Mailing")),
+                (self.ACTION_NEW_SUBSCRIPTION, _("Subscribe")),
+            ),
+            coerce=int,
+            label=_("Action"),
+            initial=1,
+            required=True,
+            widget=forms.HiddenInput(),
+        )
+
+        # Include fields for handling mailing creation
+        mailing_fields = ("email", "club", "moderator")
+        self.fields.update(forms.fields_for_model(Mailing, fields=mailing_fields))
+        for field in mailing_fields:
+            self.fields["mailing_" + field] = self.fields.pop(field)
+            self.fields["mailing_" + field].required = False
+
+        # Include fields for handling subscription creation
+        subscription_fields = ("mailing", "email")
+        self.fields.update(
+            forms.fields_for_model(MailingSubscription, fields=subscription_fields)
+        )
+        for field in subscription_fields:
+            self.fields["subscription_" + field] = self.fields.pop(field)
+            self.fields["subscription_" + field].required = False
+
         if club_id:
-            self.fields["club"].queryset = Club.objects.filter(id=club_id)
-            self.fields["club"].initial = club_id
-            self.fields["club"].widget = forms.HiddenInput()
-        if user_id >= 0:
-            self.fields["moderator"].queryset = User.objects.filter(id=user_id)
-            self.fields["moderator"].initial = user_id
-            self.fields["moderator"].widget = forms.HiddenInput()
-
-
-class MailingSubscriptionForm(forms.ModelForm):
-    class Meta:
-        model = MailingSubscription
-        fields = ("mailing", "user", "email")
-
-    def __init__(self, *args, **kwargs):
-        kwargs.pop("user_id", None)  # For standart interface
-        club_id = kwargs.pop("club_id", None)
-        super(MailingSubscriptionForm, self).__init__(*args, **kwargs)
-        self.fields["email"].required = False
-        if club_id:
-            self.fields["mailing"].queryset = Mailing.objects.filter(
+            self.fields["mailing_club"].queryset = Club.objects.filter(id=club_id)
+            self.fields["mailing_club"].initial = club_id
+            self.fields["mailing_club"].widget = forms.HiddenInput()
+            self.fields["subscription_mailing"].queryset = Mailing.objects.filter(
                 club__id=club_id, is_moderated=True
             )
+        if user_id >= 0:
+            self.fields["mailing_moderator"].queryset = User.objects.filter(id=user_id)
+            self.fields["mailing_moderator"].initial = user_id
+            self.fields["mailing_moderator"].widget = forms.HiddenInput()
 
-    user = AutoCompleteSelectField(
-        "users", label=_("User"), help_text=None, required=False
-    )
+    def check_required(self, cleaned_data, field):
+        """
+        If the given field doesn't exist or has no value, add a required error on it
+        """
+        if not cleaned_data.get(field, None):
+            self.add_error(field, _("This field is required"))
+
+    def clean_subscription_users(self):
+        """
+        Convert given users into real users and check their validity
+        """
+        cleaned_data = super(MailingForm, self).clean()
+        users = []
+        for user in cleaned_data["subscription_users"]:
+            user = User.objects.filter(id=user).first()
+            if not user:
+                raise forms.ValidationError(
+                    _("One of the selected users doesn't exist"), code="invalid"
+                )
+            if not user.email:
+                raise forms.ValidationError(
+                    _("One of the selected users doesn't have an email address"),
+                    code="invalid",
+                )
+            users.append(user)
+        return users
+
+    def clean(self):
+        cleaned_data = super(MailingForm, self).clean()
+
+        print(cleaned_data)
+
+        if not "action" in cleaned_data:
+            # If there is no action provided, we can stop here
+            raise forms.ValidationError(_("An action is required"), code="invalid")
+
+        if cleaned_data["action"] == self.ACTION_NEW_MAILING:
+            self.check_required(cleaned_data, "mailing_email")
+            self.check_required(cleaned_data, "mailing_club")
+            self.check_required(cleaned_data, "mailing_moderator")
+
+        if cleaned_data["action"] == self.ACTION_NEW_SUBSCRIPTION:
+            self.check_required(cleaned_data, "subscription_mailing")
+            if not cleaned_data.get(
+                "subscription_users", None
+            ) and not cleaned_data.get("subscription_email", None):
+                raise forms.ValidationError(
+                    _("You must specify at least an user or an email address"),
+                    code="invalid",
+                )
+
+        return cleaned_data
 
 
 class SellingsFormBase(forms.Form):
