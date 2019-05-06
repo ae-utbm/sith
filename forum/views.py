@@ -56,7 +56,7 @@ class ForumSearchView(ListView):
         query = self.request.GET.get("query", "")
         order_by = self.request.GET.get("order", "")
 
-        if query == "":
+        if query == "" or query.isspace():
             return []
 
         queryset = RelatedSearchQuerySet().models(ForumMessage).autocomplete(auto=query)
