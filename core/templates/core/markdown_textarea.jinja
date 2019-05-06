@@ -1,8 +1,8 @@
 <div>
-	{# Depends on this package https://github.com/sparksuite/simplemde-markdown-editor #}
+	{# Depends on this package https://github.com/lonaru/easy-markdown-editor #}
 	<textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
 
-	{# The simplemde script can be included twice, it's safe in the code #}
+	{# The easymde script can be included twice, it's safe in the code #}
 	<script src="{{ statics.js }}"> </script>
 	<script type="text/javascript">
 		var css = "{{ statics.css }}";
@@ -25,7 +25,7 @@
 		}
 
 		// Pretty markdown input
-		var simplemde = new SimpleMDE({
+		var easymde = new EasyMDE({
 			element: document.getElementById("{{ widget.attrs.id }}"),
 			spellChecker: false,
 			previewRender: function(plainText, preview){ // Async method
@@ -39,25 +39,25 @@
 			toolbar: [
 				{
 					name: "heading-smaller",
-					action: SimpleMDE.toggleHeadingSmaller,
+					action: EasyMDE.toggleHeadingSmaller,
 					className: "fa fa-header",
 					title: "{{ translations.heading_smaller }}"
 				},
 				{
 					name: "italic",
-					action: SimpleMDE.toggleItalic,
+					action: EasyMDE.toggleItalic,
 					className: "fa fa-italic",
 					title: "{{ translations.italic }}"
 				},
 				{
 					name: "bold",
-					action: SimpleMDE.toggleBold,
+					action: EasyMDE.toggleBold,
 					className: "fa fa-bold",
 					title: "{{ translations.bold }}"
 				},
 				{
 					name: "strikethrough",
-					action: SimpleMDE.toggleStrikethrough,
+					action: EasyMDE.toggleStrikethrough,
 					className: "fa fa-strikethrough",
 					title: "{{ translations.strikethrough }}"
 				},
@@ -90,71 +90,71 @@
 				},
 				{
 					name: "code",
-					action: SimpleMDE.toggleCodeBlock,
+					action: EasyMDE.toggleCodeBlock,
 					className: "fa fa-code",
 					title: "{{ translations.code }}"
 				},
 				"|",
 				{
 					name: "quote",
-					action: SimpleMDE.toggleBlockquote,
+					action: EasyMDE.toggleBlockquote,
 					className: "fa fa-quote-left",
 					title: "{{ translations.quote }}"
 				},
 				{
 					name: "unordered-list",
-					action: SimpleMDE.toggleUnorderedList,
+					action: EasyMDE.toggleUnorderedList,
 					className: "fa fa-list-ul",
 					title: "{{ translations.unordered_list }}"
 				},
 				{
 					name: "ordered-list",
-					action: SimpleMDE.toggleOrderedList,
+					action: EasyMDE.toggleOrderedList,
 					className: "fa fa-list-ol",
 					title: "{{ translations.ordered_list }}"
 				},
 				"|",
 				{
 					name: "link",
-					action: SimpleMDE.drawLink,
+					action: EasyMDE.drawLink,
 					className: "fa fa-link",
 					title: "{{ translations.link }}"
 				},
 				{
 					name: "image",
-					action: SimpleMDE.drawImage,
+					action: EasyMDE.drawImage,
 					className: "fa fa-picture-o",
 					title: "{{ translations.image }}"
 				},
 				{
 					name: "table",
-					action: SimpleMDE.drawTable,
+					action: EasyMDE.drawTable,
 					className: "fa fa-table",
 					title: "{{ translations.table }}"
 				},
 				"|",
 				{
 					name: "clean-block",
-					action: SimpleMDE.cleanBlock,
+					action: EasyMDE.cleanBlock,
 					className: "fa fa-eraser fa-clean-block",
 					title: "{{ translations.clean_block }}"
 				},
 				"|",
 				{
 					name: "preview",
-					action: SimpleMDE.togglePreview,
+					action: EasyMDE.togglePreview,
 					className: "fa fa-eye no-disable",
 					title: "{{ translations.preview }}"
 				},
 				{
 					name: "side-by-side",
-					action: SimpleMDE.toggleSideBySide,
+					action: EasyMDE.toggleSideBySide,
 					className: "fa fa-columns no-disable no-mobile",
 					title: "{{ translations.side_by_side }}"
 				},
 				{
 					name: "fullscreen",
-					action: SimpleMDE.toggleFullScreen,
+					action: EasyMDE.toggleFullScreen,
 					className: "fa fa-arrows-alt no-disable no-mobile",
 					title: "{{ translations.fullscreen }}"
 				},
