@@ -26,6 +26,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.core import serializers
 from django.contrib.auth.decorators import login_required
+from django.utils import html
 from django.views.generic import ListView, TemplateView
 from django.conf import settings
 
@@ -71,10 +72,11 @@ def notification(request, notif_id):
 
 
 def search_user(query, as_json=False):
-    if query == "" or query.isspace():
+    try:
+        res = SearchQuerySet().models(User).autocomplete(auto=html.escape(query))[:20]
+        return [r.object for r in res]
+    except TypeError:
         return []
-    res = SearchQuerySet().models(User).autocomplete(auto=query)[:20]
-    return [r.object for r in res]
 
 
 def search_club(query, as_json=False):
