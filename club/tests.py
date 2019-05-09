@@ -24,12 +24,14 @@
 
 from django.conf import settings
 from django.test import TestCase
-from django.utils import timezone
+from django.utils import timezone, html
+from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 
 from core.models import User
-from club.models import Club, Membership
+from club.models import Club, Membership, Mailing
 from club.forms import MailingForm
 
 # Create your tests here.
@@ -385,7 +387,7 @@ class MailingFormTest(TestCase):
         call_command("populate")
         self.skia = User.objects.filter(username="skia").first()
         self.rbatsbak = User.objects.filter(username="rbatsbak").first()
-        self.guy = User.objects.filter(username="krophil").first()
+        self.krophil = User.objects.filter(username="krophil").first()
         self.comunity = User.objects.filter(username="comunity").first()
         self.bdf = Club.objects.filter(unix_name="bdf").first()
         Membership(
@@ -446,3 +448,246 @@ class MailingFormTest(TestCase):
             reverse("club:mailing", kwargs={"club_id": self.bdf.id})
         )
         self.assertContains(response, "", status_code=403)
+
+    def test_add_new_subscription_fail_not_moderated(self):
+        self.client.login(username="rbatsbak", password="plop")
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {"action": MailingForm.ACTION_NEW_MAILING, "mailing_email": "mde"},
+        )
+
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_users": self.skia.id,
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertNotContains(response, "skia@git.an")
+
+    def test_add_new_subscription_success(self):
+        # Prepare mailing list
+        self.client.login(username="comunity", password="plop")
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {"action": MailingForm.ACTION_NEW_MAILING, "mailing_email": "mde"},
+        )
+
+        # Add single user
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_users": self.skia.id,
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertContains(response, "skia@git.an")
+
+        # Add multiple users
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_users": "|%s|%s|" % (self.comunity.id, self.rbatsbak.id),
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertContains(response, "richard@git.an")
+        self.assertContains(response, "comunity@git.an")
+        self.assertContains(response, "skia@git.an")
+
+        # Add arbitrary email
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_email": "arbitrary@git.an",
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertContains(response, "richard@git.an")
+        self.assertContains(response, "comunity@git.an")
+        self.assertContains(response, "skia@git.an")
+        self.assertContains(response, "arbitrary@git.an")
+
+        # Add user and arbitrary email
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_email": "more.arbitrary@git.an",
+                "subscription_users": self.krophil.id,
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertContains(response, "richard@git.an")
+        self.assertContains(response, "comunity@git.an")
+        self.assertContains(response, "skia@git.an")
+        self.assertContains(response, "arbitrary@git.an")
+        self.assertContains(response, "more.arbitrary@git.an")
+        self.assertContains(response, "krophil@git.an")
+
+    def test_add_new_subscription_fail_form_errors(self):
+        # Prepare mailing list
+        self.client.login(username="comunity", password="plop")
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {"action": MailingForm.ACTION_NEW_MAILING, "mailing_email": "mde"},
+        )
+
+        # Neither email or email is specified
+        response = self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+        self.assertContains(
+            response, text=_("You must specify at least an user or an email address")
+        )
+
+        # No mailing specified
+        response = self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_users": self.krophil.id,
+            },
+        )
+        self.assertContains(response, text=_("This field is required"))
+
+        # One of the selected users doesn't exist
+        response = self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_users": "|789|",
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+        self.assertContains(
+            response, text=html.escape(_("One of the selected users doesn't exist"))
+        )
+
+        # An user has no email adress
+        self.krophil.email = ""
+        self.krophil.save()
+
+        response = self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_users": self.krophil.id,
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+        self.assertContains(
+            response,
+            text=html.escape(
+                _("One of the selected users doesn't have an email address")
+            ),
+        )
+
+        self.krophil.email = "krophil@git.an"
+        self.krophil.save()
+
+        # An user is added twice
+
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_users": self.krophil.id,
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+
+        response = self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_users": self.krophil.id,
+                "subscription_mailing": Mailing.objects.get(email="mde").id,
+            },
+        )
+        self.assertContains(
+            response,
+            text=html.escape(_("This email is already suscribed in this mailing")),
+        )
+
+    def test_remove_subscription_success(self):
+        # Prepare mailing list
+        self.client.login(username="comunity", password="plop")
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {"action": MailingForm.ACTION_NEW_MAILING, "mailing_email": "mde"},
+        )
+        mde = Mailing.objects.get(email="mde")
+        response = self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
+                "subscription_users": "|%s|%s|%s|"
+                % (self.comunity.id, self.rbatsbak.id, self.krophil.id),
+                "subscription_mailing": mde.id,
+            },
+        )
+        self.assertContains(response, "comunity@git.an")
+        self.assertContains(response, "richard@git.an")
+        self.assertContains(response, "krophil@git.an")
+
+        # Delete one user
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_REMOVE_SUBSCRIPTION,
+                "removal_%d" % mde.id: mde.subscriptions.get(user=self.krophil).id,
+            },
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+
+        self.assertContains(response, "comunity@git.an")
+        self.assertContains(response, "richard@git.an")
+        self.assertNotContains(response, "krophil@git.an")
+
+        # Delete multiple users
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {
+                "action": MailingForm.ACTION_REMOVE_SUBSCRIPTION,
+                "removal_%d"
+                % mde.id: [
+                    user.id
+                    for user in mde.subscriptions.filter(
+                        user__in=[self.rbatsbak, self.comunity]
+                    ).all()
+                ],
+            },
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+
+        self.assertNotContains(response, "comunity@git.an")
+        self.assertNotContains(response, "richard@git.an")
+        self.assertNotContains(response, "krophil@git.an")
