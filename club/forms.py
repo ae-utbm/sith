@@ -88,7 +88,7 @@ class MailingForm(forms.Form):
             )
 
         # Include fields for handling mailing creation
-        mailing_fields = ("email", "club", "moderator")
+        mailing_fields = ("email",)
         self.fields.update(forms.fields_for_model(Mailing, fields=mailing_fields))
         for field in mailing_fields:
             self.fields["mailing_" + field] = self.fields.pop(field)
@@ -103,16 +103,9 @@ class MailingForm(forms.Form):
             self.fields["subscription_" + field] = self.fields.pop(field)
             self.fields["subscription_" + field].required = False
 
-        self.fields["mailing_club"].queryset = Club.objects.filter(id=club_id)
-        self.fields["mailing_club"].initial = club_id
-        self.fields["mailing_club"].widget = forms.HiddenInput()
         self.fields["subscription_mailing"].queryset = Mailing.objects.filter(
             club__id=club_id, is_moderated=True
         )
-
-        self.fields["mailing_moderator"].queryset = User.objects.filter(id=user_id)
-        self.fields["mailing_moderator"].initial = user_id
-        self.fields["mailing_moderator"].widget = forms.HiddenInput()
 
     def check_required(self, cleaned_data, field):
         """
@@ -150,8 +143,8 @@ class MailingForm(forms.Form):
 
         if cleaned_data["action"] == self.ACTION_NEW_MAILING:
             self.check_required(cleaned_data, "mailing_email")
-            self.check_required(cleaned_data, "mailing_club")
-            self.check_required(cleaned_data, "mailing_moderator")
+            # self.check_required(cleaned_data, "mailing_club")
+            # self.check_required(cleaned_data, "mailing_moderator")
 
         if cleaned_data["action"] == self.ACTION_NEW_SUBSCRIPTION:
             self.check_required(cleaned_data, "subscription_mailing")

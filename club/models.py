@@ -338,6 +338,8 @@ class Mailing(models.Model):
     )
 
     def clean(self):
+        if Mailing.objects.filter(email=self.email).exists():
+            raise ValidationError(_("This mailing list already exists."))
         if self.can_moderate(self.moderator):
             self.is_moderated = True
         else:

@@ -6,11 +6,20 @@
 {% endblock %}
 
 {% block content %}
-    {% if mailings %}
 
     <b>{% trans %}Remember : mailing lists need to be moderated, if your new created list is not shown wait until moderation takes action{% endtrans %}</b>
 
-    {% for mailing in mailings %}
+    {% if mailings_not_moderated %}
+        <p>{% trans %}Mailing lists waiting for moderation{% endtrans %}</p>
+        <ul>
+            {% for mailing in mailings_not_moderated %}
+                <li>{{ mailing.email_full }}<a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if mailings_moderated %}
+    {% for mailing in mailings_moderated %}
     <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email_full }}
         {%- if user.is_owner(mailing) -%}
         <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a>
@@ -87,15 +96,11 @@
     <h2>{% trans %}New mailing{% endtrans %}</h2>
     <form action="{{ url('club:mailing', club_id=club.id) }}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.mailing_club.errors }}
-        {{ form.mailing_moderator.errors }}
         <p>
             {{ form.mailing_email.errors }}
             <label for="{{ form.mailing_email.id_for_label }}">{{ form.mailing_email.label }}</label>
             {{ form.mailing_email }}
         </p>
-        {{ form.mailing_club }}
-        {{ form.mailing_moderator }}
         <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.NEW_MALING }}" />
         <p><input type="submit" value="{% trans %}Create mailing list{% endtrans %}" /></p>
     </form>

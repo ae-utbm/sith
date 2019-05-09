@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-01 22:45+0200\n"
+"POT-Creation-Date: 2019-05-09 11:33+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -174,10 +174,10 @@ msgstr "étiquette"
 msgid "target type"
 msgstr "type de cible"
 
-#: accounting/models.py:313 club/models.py:413
+#: accounting/models.py:313 club/models.py:415
 #: club/templates/club/club_members.jinja:16
 #: club/templates/club/club_old_members.jinja:8
-#: club/templates/club/mailing.jinja:32
+#: club/templates/club/mailing.jinja:41
 #: counter/templates/counter/cash_summary_list.jinja:32
 #: counter/templates/counter/stats.jinja:15
 #: counter/templates/counter/stats.jinja:52
@@ -345,7 +345,7 @@ msgstr "Compte en banque : "
 #: accounting/templates/accounting/club_account_details.jinja:60
 #: accounting/templates/accounting/label_list.jinja:26
 #: club/templates/club/club_sellings.jinja:50
-#: club/templates/club/mailing.jinja:16 club/templates/club/mailing.jinja:34
+#: club/templates/club/mailing.jinja:25 club/templates/club/mailing.jinja:43
 #: com/templates/com/mailing_admin.jinja:19
 #: com/templates/com/news_admin_list.jinja:41
 #: com/templates/com/news_admin_list.jinja:70
@@ -1054,7 +1054,7 @@ msgstr "description"
 msgid "past member"
 msgstr "Anciens membres"
 
-#: club/models.py:323 club/models.py:418
+#: club/models.py:323 club/models.py:420
 msgid "Email address"
 msgstr "Adresse email"
 
@@ -1071,19 +1071,23 @@ msgstr "est modéré"
 msgid "moderator"
 msgstr "modérateur"
 
-#: club/models.py:406 club/templates/club/mailing.jinja:14
+#: club/models.py:342
+msgid "This mailing list already exists."
+msgstr "Cette liste de diffusion existe déjà."
+
+#: club/models.py:408 club/templates/club/mailing.jinja:23
 msgid "Mailing"
 msgstr "Liste de diffusion"
 
-#: club/models.py:425
+#: club/models.py:427
 msgid "At least user or email is required"
 msgstr "Au moins un utilisateur ou un email est nécessaire"
 
-#: club/models.py:433
+#: club/models.py:435
 msgid "This email is already suscribed in this mailing"
 msgstr "Cet email est déjà abonné à cette mailing"
 
-#: club/models.py:459
+#: club/models.py:461
 msgid "Unregistered user"
 msgstr "Utilisateur non enregistré"
 
@@ -1275,7 +1279,7 @@ msgstr "Gestion des laveries"
 msgid "Mailing lists"
 msgstr "Mailing listes"
 
-#: club/templates/club/mailing.jinja:11
+#: club/templates/club/mailing.jinja:10
 msgid ""
 "Remember : mailing lists need to be moderated, if your new created list is "
 "not shown wait until moderation takes action"
@@ -1284,40 +1288,44 @@ msgstr ""
 "nouvellement créee n'est pas affichée, attendez jusqu'à qu'un modérateur "
 "entre en action"
 
-#: club/templates/club/mailing.jinja:20
+#: club/templates/club/mailing.jinja:13
+msgid "Mailing lists waiting for moderation"
+msgstr "Listes de diffusions en attente de modération"
+
+#: club/templates/club/mailing.jinja:29
 msgid "Generate mailing list"
 msgstr "Générer la liste de diffusion"
 
-#: club/templates/club/mailing.jinja:33
+#: club/templates/club/mailing.jinja:42
 #: com/templates/com/mailing_admin.jinja:10
 msgid "Email"
 msgstr "Email"
 
-#: club/templates/club/mailing.jinja:49
+#: club/templates/club/mailing.jinja:58
 msgid "Remove from mailing list"
 msgstr "Supprimer de la liste de diffusion"
 
-#: club/templates/club/mailing.jinja:53
+#: club/templates/club/mailing.jinja:62
 msgid "There is no subscriber for this mailing list"
 msgstr "Il n'y a pas d'abonnés dans cette liste de diffusion"
 
-#: club/templates/club/mailing.jinja:58
+#: club/templates/club/mailing.jinja:67
 msgid "No mailing list existing for this club"
 msgstr "Aucune mailing liste n'existe pour ce club"
 
-#: club/templates/club/mailing.jinja:63
+#: club/templates/club/mailing.jinja:72
 msgid "New member"
 msgstr "Nouveau membre"
 
-#: club/templates/club/mailing.jinja:83
+#: club/templates/club/mailing.jinja:92
 msgid "Add to mailing list"
 msgstr "Ajouter à la mailing liste"
 
-#: club/templates/club/mailing.jinja:87
+#: club/templates/club/mailing.jinja:96
 msgid "New mailing"
 msgstr "Nouvelle liste de diffusion"
 
-#: club/templates/club/mailing.jinja:100
+#: club/templates/club/mailing.jinja:109
 msgid "Create mailing list"
 msgstr "Créer une liste de diffusion"
 

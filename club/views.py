@@ -35,7 +35,7 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _t
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError, NON_FIELD_ERRORS
 from django.shortcuts import get_object_or_404, redirect
 
 from core.views import (
@@ -532,6 +532,9 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         kwargs["mailings_moderated"] = (
             kwargs["mailings"].exclude(is_moderated=False).all()
         )
+        kwargs["mailings_not_moderated"] = (
+            kwargs["mailings"].exclude(is_moderated=True).all()
+        )
         kwargs["form_actions"] = {
             "NEW_MALING": self.form_class.ACTION_NEW_MAILING,
             "NEW_SUBSCRIPTION": self.form_class.ACTION_NEW_SUBSCRIPTION,
@@ -539,20 +542,24 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         }
         return kwargs
 
-    def add_new_mailing(self, cleaned_data):
+    def add_new_mailing(self, cleaned_data) -> ValidationError:
         """
         Create a new mailing list from the form
         """
         mailing = Mailing(
-            club=cleaned_data["mailing_club"],
+            club=self.get_object(),
             email=cleaned_data["mailing_email"],
-            moderator=cleaned_data["mailing_moderator"],
+            moderator=self.request.user,
             is_moderated=False,
         )
-        mailing.clean()
+        try:
+            mailing.clean()
+        except ValidationError as validation_error:
+            return validation_error
         mailing.save()
+        return None
 
-    def add_new_subscription(self, cleaned_data):
+    def add_new_subscription(self, cleaned_data) -> ValidationError:
         """
         Add mailing subscriptions for each user given and/or for the specified email in form
         """
@@ -568,8 +575,14 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
                 mailing=cleaned_data["subscription_mailing"],
                 email=cleaned_data["subscription_email"],
             )
+
+        try:
             sub.clean()
-            sub.save()
+        except ValidationError as validation_error:
+            return validation_error
+        sub.save()
+
+        return None
 
     def remove_subscription(self, cleaned_data):
         """
@@ -588,15 +601,20 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         resp = super(ClubMailingView, self).form_valid(form)
 
         cleaned_data = form.clean()
+        error = None
 
         if cleaned_data["action"] == self.form_class.ACTION_NEW_MAILING:
-            self.add_new_mailing(cleaned_data)
+            error = self.add_new_mailing(cleaned_data)
 
         if cleaned_data["action"] == self.form_class.ACTION_NEW_SUBSCRIPTION:
-            self.add_new_subscription(cleaned_data)
+            error = self.add_new_subscription(cleaned_data)
 
         if cleaned_data["action"] == self.form_class.ACTION_REMOVE_SUBSCRIPTION:
             self.remove_subscription(cleaned_data)
+
+        if error:
+            form.add_error(NON_FIELD_ERRORS, error)
+            return self.form_invalid(form)
 
         return resp
 
