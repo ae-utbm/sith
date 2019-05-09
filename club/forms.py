@@ -143,8 +143,6 @@ class MailingForm(forms.Form):
 
         if cleaned_data["action"] == self.ACTION_NEW_MAILING:
             self.check_required(cleaned_data, "mailing_email")
-            # self.check_required(cleaned_data, "mailing_club")
-            # self.check_required(cleaned_data, "mailing_moderator")
 
         if cleaned_data["action"] == self.ACTION_NEW_SUBSCRIPTION:
             self.check_required(cleaned_data, "subscription_mailing")

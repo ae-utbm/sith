@@ -22,12 +22,15 @@
 #
 #
 
+from django.conf import settings
 from django.test import TestCase
+from django.utils import timezone
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 
 from core.models import User
-from club.models import Club
+from club.models import Club, Membership
+from club.forms import MailingForm
 
 # Create your tests here.
 
@@ -373,3 +376,73 @@ class ClubTest(TestCase):
             "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
             in content
         )
+
+
+class MailingFormTest(TestCase):
+    """Perform validation tests for MailingForm"""
+
+    def setUp(self):
+        call_command("populate")
+        self.skia = User.objects.filter(username="skia").first()
+        self.rbatsbak = User.objects.filter(username="rbatsbak").first()
+        self.guy = User.objects.filter(username="krophil").first()
+        self.comunity = User.objects.filter(username="comunity").first()
+        self.bdf = Club.objects.filter(unix_name="bdf").first()
+        Membership(
+            user=self.rbatsbak,
+            club=self.bdf,
+            start_date=timezone.now(),
+            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+        ).save()
+
+    def test_mailing_list_add_no_moderation(self):
+        # Test with Communication admin
+        self.client.login(username="comunity", password="plop")
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {"action": MailingForm.ACTION_NEW_MAILING, "mailing_email": "foyer"},
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertContains(response, text="Liste de diffusion foyer@utbm.fr")
+
+        # Test with Root
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {"action": MailingForm.ACTION_NEW_MAILING, "mailing_email": "mde"},
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertContains(response, text="Liste de diffusion mde@utbm.fr")
+
+    def test_mailing_list_add_moderation(self):
+        self.client.login(username="rbatsbak", password="plop")
+        self.client.post(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
+            {"action": MailingForm.ACTION_NEW_MAILING, "mailing_email": "mde"},
+        )
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertNotContains(response, text="Liste de diffusion mde@utbm.fr")
+        self.assertContains(
+            response, text="<p>Listes de diffusions en attente de modération</p>"
+        )
+        self.assertContains(response, "<li>mde@utbm.fr")
+
+    def test_mailing_list_forbidden(self):
+        # With anonymous user
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertContains(response, "", status_code=403)
+
+        # With user not in club
+        self.client.login(username="krophil", password="plop")
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+        self.assertContains(response, "", status_code=403)

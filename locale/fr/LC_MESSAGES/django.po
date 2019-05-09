@@ -948,7 +948,7 @@ msgstr "Ce champ est obligatoire."
 
 #: club/forms.py:162
 msgid "You must specify at least an user or an email address"
-msgstr ""
+msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 
 #: club/forms.py:172 counter/views.py:1481
 msgid "Begin date"

@@ -563,12 +563,18 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         """
         Add mailing subscriptions for each user given and/or for the specified email in form
         """
+        users_to_save = []
+
         for user in cleaned_data["subscription_users"]:
             sub = MailingSubscription(
                 mailing=cleaned_data["subscription_mailing"], user=user
             )
-            sub.clean()
-            sub.save()
+            try:
+                sub.clean()
+            except ValidationError as validation_error:
+                return validation_error
+
+            users_to_save.append(sub.save())
 
         if cleaned_data["subscription_email"]:
             sub = MailingSubscription(
@@ -581,6 +587,10 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         except ValidationError as validation_error:
             return validation_error
         sub.save()
+
+        # Save users after we are sure there is no error
+        for user in users_to_save:
+            user.save()
 
         return None
 

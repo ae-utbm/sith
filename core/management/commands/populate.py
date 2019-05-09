@@ -837,6 +837,27 @@ Welcome to the wiki page!
                 krophil_profile.save()
                 krophil.profile_pict = krophil_profile
                 krophil.save()
+            # Adding user Com Unity
+            comunity = User(
+                username="comunity",
+                last_name="Unity",
+                first_name="Com",
+                email="comunity@git.an",
+                date_of_birth="1942-06-12",
+            )
+            comunity.set_password("plop")
+            comunity.save()
+            comunity.groups = [
+                Group.objects.filter(name="Communication admin").first().id
+            ]
+            comunity.save()
+            Membership(
+                user=comunity,
+                club=bar_club,
+                start_date=timezone.now(),
+                role=settings.SITH_CLUB_ROLES_ID["Board member"],
+            ).save()
+
             # Adding subscription for sli
             s = Subscription(
                 member=User.objects.filter(pk=sli.pk).first(),
@@ -853,6 +874,18 @@ Welcome to the wiki page!
             s = Subscription(
                 member=User.objects.filter(pk=krophil.pk).first(),
                 subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+            )
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]["duration"],
+                start=s.subscription_start,
+            )
+            s.save()
+            # Com Unity
+            s = Subscription(
+                member=comunity,
+                subscription_type=default_subscription,
                 payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
