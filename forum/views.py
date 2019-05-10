@@ -29,7 +29,7 @@ from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse_lazy
-from django.utils import timezone
+from django.utils import timezone, html
 from django.conf import settings
 from django import forms
 from django.core.exceptions import PermissionDenied
@@ -56,10 +56,14 @@ class ForumSearchView(ListView):
         query = self.request.GET.get("query", "")
         order_by = self.request.GET.get("order", "")
 
-        if query == "":
+        try:
+            queryset = (
+                RelatedSearchQuerySet()
+                .models(ForumMessage)
+                .autocomplete(auto=html.escape(query))
+            )
+        except TypeError:
             return []
-
-        queryset = RelatedSearchQuerySet().models(ForumMessage).autocomplete(auto=query)
 
         if order_by == "date":
             queryset = queryset.order_by("-date")
@@ -85,7 +89,6 @@ class ForumSearchView(ListView):
             ):
                 resp.append(r.object)
                 count += 1
-
         return resp
 
 
