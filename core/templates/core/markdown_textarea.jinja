@@ -28,6 +28,7 @@
 		var easymde = new EasyMDE({
 			element: document.getElementById("{{ widget.attrs.id }}"),
 			spellChecker: false,
+			autoDownloadFontAwesome: false,
 			previewRender: function(plainText, preview){ // Async method
 				clearTimeout(lastAPICall);
 				lastAPICall = setTimeout(function (plainText, preview){
