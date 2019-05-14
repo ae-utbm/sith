@@ -757,7 +757,7 @@ class StudentCard(models.Model):
     def can_create(customer, user):
         return user.pk == customer.user.pk or user.is_board_member or user.is_root
 
-    def can_edit(self, obj):
+    def can_be_edited_by(self, obj):
         if isinstance(obj, User):
             return StudentCard.can_create(self.customer, obj)
         return False

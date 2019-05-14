@@ -113,8 +113,8 @@ class StudentCardForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(StudentCardForm, self).clean()
-        uid = cleaned_data.get("uid")
-        if not StudentCard.is_valid(uid):
+        uid = cleaned_data.get("uid", None)
+        if not uid or not StudentCard.is_valid(uid):
             raise forms.ValidationError(_("This uid is invalid"), code="invalid")
         return cleaned_data
 
