@@ -188,6 +188,7 @@ class StudentCardTest(TestCase):
         self.assertContains(response, text="8B90734A802A8F")
 
     def test_add_student_card_from_counter_fail(self):
+        # UID too short
         response = self.client.post(
             reverse(
                 "counter:click",
@@ -199,12 +200,37 @@ class StudentCardTest(TestCase):
             response, text="Ce n'est pas un UID de carte étudiante valide"
         )
 
+        # UID too long
         response = self.client.post(
             reverse(
                 "counter:click",
                 kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
             ),
             {"student_card_uid": "8B90734A802A8FA", "action": "add_student_card"},
+        )
+        self.assertContains(
+            response, text="Ce n'est pas un UID de carte étudiante valide"
+        )
+
+        # Test with already existing card
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "9A89B82018B0A0", "action": "add_student_card"},
+        )
+        self.assertContains(
+            response, text="Ce n'est pas un UID de carte étudiante valide"
+        )
+
+        # Test with lowercase
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "8b90734a802a9f", "action": "add_student_card"},
         )
         self.assertContains(
             response, text="Ce n'est pas un UID de carte étudiante valide"
@@ -308,6 +334,7 @@ class StudentCardTest(TestCase):
 
     def test_add_student_card_from_user_preferences_fail(self):
         self.client.login(username="sli", password="plop")
+        # UID too short
         response = self.client.post(
             reverse(
                 "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
@@ -317,11 +344,32 @@ class StudentCardTest(TestCase):
 
         self.assertContains(response, text="Cet UID est invalide")
 
+        # UID too long
         response = self.client.post(
             reverse(
                 "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
             ),
             {"uid": "8B90734A802A8FA"},
+        )
+        self.assertContains(response, text="Cet UID est invalide")
+
+        # Test with already existing card
+        response = self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "9A89B82018B0A0"},
+        )
+        self.assertContains(
+            response, text="Un objet Student card avec ce champ Uid existe déjà."
+        )
+
+        # Test with lowercase
+        response = self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "8b90734a802a9f"},
         )
         self.assertContains(response, text="Cet UID est invalide")
 

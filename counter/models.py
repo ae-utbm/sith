@@ -749,7 +749,8 @@ class StudentCard(models.Model):
     @staticmethod
     def is_valid(uid):
         return (
-            len(uid) == StudentCard.UID_SIZE
+            uid.isupper()
+            and len(uid) == StudentCard.UID_SIZE
             and not StudentCard.objects.filter(uid=uid).exists()
         )
 
