@@ -93,6 +93,7 @@ INSTALLED_APPS = (
     "stock",
     "trombi",
     "matmat",
+    "pedagogy",
 )
 
 MIDDLEWARE_CLASSES = (
