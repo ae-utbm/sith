@@ -10,12 +10,8 @@
         <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
         <link rel="stylesheet" href="{{ scss('core/style.scss') }}">
         <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
-        {% if settings.EXTERNAL_RES %}
-          <noscript><link rel="stylesheet" href="https://use.fontawesome.com/775817bb35.css"></noscript>
-          <script src="https://use.fontawesome.com/c06c9c6980.js"></script>
-        {% else %}
-          <link rel="stylesheet" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}">
-        {% endif %}
+        <link rel="stylesheet" href="/static/core/font-awesome/css/font-awesome.min.css">
+        <script href="/core/static/core/font-awesome/js/fontawesone.min.js"></script>
 
         <!-- Jquery declared here to be accessible in every django widgets -->
         <script src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>

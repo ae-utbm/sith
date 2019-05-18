@@ -98,8 +98,8 @@ class MarkdownInput(Textarea):
         context = super(MarkdownInput, self).get_context(name, value, attrs)
 
         context["statics"] = {
-            "js": static("core/simplemde/simplemde.min.js"),
-            "css": static("core/simplemde/simplemde.min.css"),
+            "js": static("core/easymde/easymde.min.js"),
+            "css": static("core/easymde/easymde.min.css"),
         }
         context["translations"] = {
             "heading_smaller": _("Heading"),
