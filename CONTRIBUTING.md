@@ -31,7 +31,6 @@ Maintenant, faut passer le sith en mode debug dans le fichier de settings person
 
 ```bash
 echo "DEBUG=True" > sith/settings_custom.py
-echo 'EXTERNAL_RES = "False"' >> sith/settings_custom.py
 echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
 ```
 
