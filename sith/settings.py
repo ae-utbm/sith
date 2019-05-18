@@ -227,9 +227,6 @@ LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 
 PHONENUMBER_DEFAULT_REGION = "FR"
 
-# Whether to use CDNs (True) or local ressources (False) for JS and CSS
-EXTERNAL_RES = True
-
 # Medias
 MEDIA_ROOT = "./data/"
 MEDIA_URL = "/data/"
