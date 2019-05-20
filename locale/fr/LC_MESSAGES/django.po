@@ -4128,7 +4128,7 @@ msgid "Top 100 barman %(counter_name)s (all semesters)"
 msgstr "Top 100 barman %(counter_name)s (tous les semestres)"
 
 #: counter/views.py:118
-msgid "This uid is invalid"
+msgid "This UID is invalid"
 msgstr "Cet UID est invalide"
 
 #: counter/views.py:176
