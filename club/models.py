@@ -338,6 +338,8 @@ class Mailing(models.Model):
     )
 
     def clean(self):
+        if Mailing.objects.filter(email=self.email).exists():
+            raise ValidationError(_("This mailing list already exists."))
         if self.can_moderate(self.moderator):
             self.is_moderated = True
         else:
@@ -446,18 +448,20 @@ class MailingSubscription(models.Model):
     def can_be_edited_by(self, user):
         return self.user is not None and user.id == self.user.id
 
-    @property
+    @cached_property
     def get_email(self):
         if self.user and not self.email:
             return self.user.email
         return self.email
 
+    @cached_property
+    def get_username(self):
+        if self.user:
+            return str(self.user)
+        return _("Unregistered user")
+
     def fetch_format(self):
         return self.get_email + " "
 
     def __str__(self):
-        if self.user:
-            user = str(self.user)
-        else:
-            user = _("Unregistered user")
-        return "(%s) - %s : %s" % (self.mailing, user, self.email)
+        return "(%s) - %s : %s" % (self.mailing, self.get_username, self.email)

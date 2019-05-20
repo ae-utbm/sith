@@ -296,11 +296,6 @@ class DetailFormView(SingleObjectMixin, FormView):
         """
         return super(DetailFormView, self).get_object()
 
-    def get_context_data(self, *args, **kwargs):
-        kwargs = super(DetailFormView, self).get_context_data()
-        kwargs["object"] = self.get_object()
-        return kwargs
-
 
 from .user import *
 from .page import *
