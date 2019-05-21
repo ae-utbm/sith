@@ -59,7 +59,7 @@ from com.views import (
 )
 
 from club.models import Club, Membership, Mailing, MailingSubscription
-from club.forms import MailingForm, ClubEditForm, ClubMemberForm
+from club.forms import MailingForm, ClubEditForm, ClubMemberForm, SellingsFormBase
 
 
 class ClubTabsMixin(TabedViewMixin):
