@@ -691,3 +691,23 @@ class MailingFormTest(TestCase):
         self.assertNotContains(response, "comunity@git.an")
         self.assertNotContains(response, "richard@git.an")
         self.assertNotContains(response, "krophil@git.an")
+
+
+class ClubSellingViewTest(TestCase):
+    """
+    Perform basics tests to ensure that the page is available
+    """
+
+    def setUp(self):
+        call_command("populate")
+        self.ae = Club.objects.filter(unix_name="ae").first()
+
+    def test_page_not_internal_error(self):
+        """
+        Test that the page does not return and internal error
+        """
+        self.client.login(username="skia", password="plop")
+        response = self.client.get(
+            reverse("club:club_sellings", kwargs={"club_id": self.ae.id})
+        )
+        self.assertFalse(response.status_code == 500)
