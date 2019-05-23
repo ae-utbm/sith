@@ -142,3 +142,243 @@ class BarmanConnectionTest(TestCase):
         self.assertFalse(
             '<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response_get.content)
         )
+
+
+class StudentCardTest(TestCase):
+    """
+    Tests for adding and deleting Stundent Cards
+    Test that an user can be found with it's student card
+    """
+
+    def setUp(self):
+        call_command("populate")
+        self.krophil = User.objects.get(username="krophil")
+        self.sli = User.objects.get(username="sli")
+
+        self.counter = Counter.objects.filter(id=2).first()
+
+        # Auto login on counter
+        self.client.post(
+            reverse("counter:login", args=[self.counter.id]),
+            {"username": "krophil", "password": "plop"},
+        )
+
+    def test_search_user_with_student_card(self):
+        response = self.client.post(
+            reverse("counter:details", args=[self.counter.id]),
+            {"code": "9A89B82018B0A0"},
+        )
+
+        self.assertEqual(
+            response.url,
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+        )
+
+    def test_add_student_card_from_counter(self):
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "8B90734A802A8F", "action": "add_student_card"},
+        )
+        self.assertContains(response, text="8B90734A802A8F")
+
+    def test_add_student_card_from_counter_fail(self):
+        # UID too short
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "8B90734A802A8", "action": "add_student_card"},
+        )
+        self.assertContains(
+            response, text="Ce n'est pas un UID de carte étudiante valide"
+        )
+
+        # UID too long
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "8B90734A802A8FA", "action": "add_student_card"},
+        )
+        self.assertContains(
+            response, text="Ce n'est pas un UID de carte étudiante valide"
+        )
+
+        # Test with already existing card
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "9A89B82018B0A0", "action": "add_student_card"},
+        )
+        self.assertContains(
+            response, text="Ce n'est pas un UID de carte étudiante valide"
+        )
+
+        # Test with lowercase
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "8b90734a802a9f", "action": "add_student_card"},
+        )
+        self.assertContains(
+            response, text="Ce n'est pas un UID de carte étudiante valide"
+        )
+
+    def test_delete_student_card_with_owner(self):
+        self.client.login(username="sli", password="plop")
+        self.client.post(
+            reverse(
+                "counter:delete_student_card",
+                kwargs={
+                    "customer_id": self.sli.customer.pk,
+                    "card_id": self.sli.customer.student_cards.first().id,
+                },
+            )
+        )
+        self.assertFalse(self.sli.customer.student_cards.exists())
+
+    def test_delete_student_card_with_board_member(self):
+        self.client.login(username="skia", password="plop")
+        self.client.post(
+            reverse(
+                "counter:delete_student_card",
+                kwargs={
+                    "customer_id": self.sli.customer.pk,
+                    "card_id": self.sli.customer.student_cards.first().id,
+                },
+            )
+        )
+        self.assertFalse(self.sli.customer.student_cards.exists())
+
+    def test_delete_student_card_with_root(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse(
+                "counter:delete_student_card",
+                kwargs={
+                    "customer_id": self.sli.customer.pk,
+                    "card_id": self.sli.customer.student_cards.first().id,
+                },
+            )
+        )
+        self.assertFalse(self.sli.customer.student_cards.exists())
+
+    def test_delete_student_card_fail(self):
+        self.client.login(username="krophil", password="plop")
+        response = self.client.post(
+            reverse(
+                "counter:delete_student_card",
+                kwargs={
+                    "customer_id": self.sli.customer.pk,
+                    "card_id": self.sli.customer.student_cards.first().id,
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(self.sli.customer.student_cards.exists())
+
+    def test_add_student_card_from_user_preferences(self):
+        # Test with owner of the card
+        self.client.login(username="sli", password="plop")
+        self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "8B90734A802A8F"},
+        )
+
+        response = self.client.get(
+            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
+        )
+        self.assertContains(response, text="8B90734A802A8F")
+
+        # Test with board member
+        self.client.login(username="skia", password="plop")
+        self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "8B90734A802A8A"},
+        )
+
+        response = self.client.get(
+            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
+        )
+        self.assertContains(response, text="8B90734A802A8A")
+
+        # Test with root
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "8B90734A802A8B"},
+        )
+
+        response = self.client.get(
+            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
+        )
+        self.assertContains(response, text="8B90734A802A8B")
+
+    def test_add_student_card_from_user_preferences_fail(self):
+        self.client.login(username="sli", password="plop")
+        # UID too short
+        response = self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "8B90734A802A8"},
+        )
+
+        self.assertContains(response, text="Cet UID est invalide")
+
+        # UID too long
+        response = self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "8B90734A802A8FA"},
+        )
+        self.assertContains(response, text="Cet UID est invalide")
+
+        # Test with already existing card
+        response = self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "9A89B82018B0A0"},
+        )
+        self.assertContains(
+            response, text="Un objet Student card avec ce champ Uid existe déjà."
+        )
+
+        # Test with lowercase
+        response = self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "8b90734a802a9f"},
+        )
+        self.assertContains(response, text="Cet UID est invalide")
+
+        # Test with unauthorized user
+        self.client.login(username="krophil", password="plop")
+        response = self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "8B90734A802A8F"},
+        )
+        self.assertEqual(response.status_code, 403)

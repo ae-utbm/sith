@@ -27,8 +27,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.core.validators import MinLengthValidator
 from django.forms import ValidationError
 from django.utils.functional import cached_property
+from django.core.exceptions import PermissionDenied
 
 from datetime import timedelta, date
 import random
@@ -732,3 +734,42 @@ class Eticket(models.Model):
         return hmac.new(
             bytes(self.secret, "utf-8"), bytes(string, "utf-8"), hashlib.sha1
         ).hexdigest()
+
+
+class StudentCard(models.Model):
+    """
+    Alternative way to connect a customer into a counter
+    We are using Mifare DESFire EV1 specs since it's used for izly cards
+    https://www.nxp.com/docs/en/application-note/AN10927.pdf
+    UID is 7 byte long that means 14 hexa characters
+    """
+
+    UID_SIZE = 14
+
+    @staticmethod
+    def is_valid(uid):
+        return (
+            uid.isupper()
+            and len(uid) == StudentCard.UID_SIZE
+            and not StudentCard.objects.filter(uid=uid).exists()
+        )
+
+    @staticmethod
+    def can_create(customer, user):
+        return user.pk == customer.user.pk or user.is_board_member or user.is_root
+
+    def can_be_edited_by(self, obj):
+        if isinstance(obj, User):
+            return StudentCard.can_create(self.customer, obj)
+        return False
+
+    uid = models.CharField(
+        _("uid"), max_length=14, unique=True, validators=[MinLengthValidator(4)]
+    )
+    customer = models.ForeignKey(
+        Customer,
+        related_name="student_cards",
+        verbose_name=_("student cards"),
+        null=False,
+        blank=False,
+    )

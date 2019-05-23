@@ -22,6 +22,24 @@
 <p>{% trans trombi=user.trombi_user.trombi %}You already choose to be in that Trombi: {{ trombi }}.{% endtrans %}
 <a href="{{ url('trombi:user_tools') }}">{% trans %}Go to my Trombi tools{% endtrans %}</a></p>
 {% endif %}
+{% if profile.customer %}
+<h4>{% trans %}Student cards{% endtrans %}</h4>
+<p>{% trans %}You can add a card by asking at a counter or add it yourself here. If you want to manually add a student card yourself, you'll need a NFC reader. We store the UID of the card which is 14 characters long.{% endtrans %}</p>
+<form action="{{ url('counter:add_student_card', customer_id=profile.customer.pk) }}" method="post">
+	{% csrf_token %}
+	{{ student_card_form.as_p() }}
+    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+</form>
+{% if profile.customer.student_cards.exists() %}
+	<ul>
+    {% for card in profile.customer.student_cards.all() %}
+    	<li>{{ card.uid }} - <a href="{{ url('counter:delete_student_card', customer_id=profile.customer.pk, card_id=card.id) }}">{% trans %}Delete{% endtrans %}</a></li>
+    {% endfor %}
+	</ul>
+{% else %}
+<p>{% trans %}No student cards registered.{% endtrans %}</p>
+{% endif %}
+{% endif %}
 {% endblock %}
 
 

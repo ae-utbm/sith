@@ -48,7 +48,7 @@ from accounting.models import (
 from core.utils import resize_image
 from club.models import Club, Membership
 from subscription.models import Subscription
-from counter.models import Customer, ProductType, Product, Counter, Selling
+from counter.models import Customer, ProductType, Product, Counter, Selling, StudentCard
 from com.models import Sith, Weekmail, News, NewsDate
 from election.models import Election, Role, Candidature, ElectionList
 from forum.models import Forum, ForumTopic
@@ -870,6 +870,7 @@ Welcome to the wiki page!
                 start=s.subscription_start,
             )
             s.save()
+            StudentCard(uid="9A89B82018B0A0", customer=sli.customer).save()
             # Adding subscription for Krophil
             s = Subscription(
                 member=User.objects.filter(pk=krophil.pk).first(),

@@ -33,6 +33,7 @@ from django.views.generic.edit import (
     DeleteView,
     ProcessFormView,
     FormMixin,
+    FormView,
 )
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
@@ -50,13 +51,14 @@ from datetime import date, timedelta, datetime
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from ajax_select import make_ajax_field
 
-from core.views import CanViewMixin, TabedViewMixin
+from core.views import CanViewMixin, TabedViewMixin, CanEditMixin
 from core.views.forms import LoginForm, SelectDate, SelectDateTime
 from core.models import User
 from subscription.models import Subscription
 from counter.models import (
     Counter,
     Customer,
+    StudentCard,
     Product,
     Selling,
     Refilling,
@@ -99,6 +101,43 @@ class CounterAdminMixin(View):
         return super(CounterAdminMixin, self).dispatch(request, *args, **kwargs)
 
 
+class StudentCardForm(forms.ModelForm):
+    """
+    Form for adding student cards
+    Only used for user profile since CounterClick is to complicated
+    """
+
+    class Meta:
+        model = StudentCard
+        fields = ["uid"]
+
+    def clean(self):
+        cleaned_data = super(StudentCardForm, self).clean()
+        uid = cleaned_data.get("uid", None)
+        if not uid or not StudentCard.is_valid(uid):
+            raise forms.ValidationError(_("This UID is invalid"), code="invalid")
+        return cleaned_data
+
+
+class StudentCardDeleteView(DeleteView, CanEditMixin):
+    """
+    View used to delete a card from a user
+    """
+
+    model = StudentCard
+    template_name = "core/delete_confirm.jinja"
+    pk_url_kwarg = "card_id"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
+        return super(StudentCardDeleteView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy(
+            "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
+        )
+
+
 class GetUserForm(forms.Form):
     """
     The Form class aims at providing a valid user_id field in its cleaned data, in order to pass it to some view,
@@ -108,7 +147,9 @@ class GetUserForm(forms.Form):
     some nickname, first name, or last name (TODO)
     """
 
-    code = forms.CharField(label="Code", max_length=10, required=False)
+    code = forms.CharField(
+        label="Code", max_length=StudentCard.UID_SIZE, required=False
+    )
     id = AutoCompleteSelectField(
         "users", required=False, label=_("Select user"), help_text=None
     )
@@ -121,9 +162,14 @@ class GetUserForm(forms.Form):
         cleaned_data = super(GetUserForm, self).clean()
         cus = None
         if cleaned_data["code"] != "":
-            cus = Customer.objects.filter(
-                account_id__iexact=cleaned_data["code"]
-            ).first()
+            if len(cleaned_data["code"]) == StudentCard.UID_SIZE:
+                card = StudentCard.objects.filter(uid=cleaned_data["code"])
+                if card.exists():
+                    cus = card.first().customer
+            if cus is None:
+                cus = Customer.objects.filter(
+                    account_id__iexact=cleaned_data["code"]
+                ).first()
         elif cleaned_data["id"] is not None:
             cus = Customer.objects.filter(user=cleaned_data["id"]).first()
         if cus is None or not cus.can_buy:
@@ -374,6 +420,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session["too_young"] = False
         request.session["not_allowed"] = False
         request.session["no_age"] = False
+        request.session["not_valid_student_card_uid"] = False
         if self.object.type != "BAR":
             self.operator = request.user
         elif self.is_barman_price():
@@ -383,6 +430,8 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
         if "add_product" in request.POST["action"]:
             self.add_product(request)
+        elif "add_student_card" in request.POST["action"]:
+            self.add_student_card(request)
         elif "del_product" in request.POST["action"]:
             self.del_product(request)
         elif "refill" in request.POST["action"]:
@@ -519,6 +568,27 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session.modified = True
         return True
 
+    def add_student_card(self, request):
+        """
+        Add a new student card on the customer account
+        """
+        uid = request.POST["student_card_uid"]
+        uid = str(uid)
+        if not StudentCard.is_valid(uid):
+            request.session["not_valid_student_card_uid"] = True
+            return False
+
+        if not (
+            self.object.type == "BAR"
+            and "counter_token" in request.session.keys()
+            and request.session["counter_token"] == self.object.token
+            and len(self.object.get_barmen_list()) > 0
+        ):
+            raise PermissionDenied
+
+        StudentCard(customer=self.customer, uid=uid).save()
+        return True
+
     def del_product(self, request):
         """ Delete a product from the basket """
         pid = str(request.POST["product_id"])
@@ -642,6 +712,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         kwargs["basket_total"] = self.sum_basket(self.request)
         kwargs["refill_form"] = self.refill_form or RefillForm()
         kwargs["categories"] = ProductType.objects.all()
+        kwargs["student_card_max_uid_size"] = StudentCard.UID_SIZE
         return kwargs
 
 
@@ -1765,3 +1836,29 @@ class CounterRefillingListView(CounterAdminTabsMixin, CounterAdminMixin, ListVie
         kwargs = super(CounterRefillingListView, self).get_context_data(**kwargs)
         kwargs["counter"] = self.counter
         return kwargs
+
+
+class StudentCardFormView(FormView):
+    """
+    Add a new student card
+    """
+
+    form_class = StudentCardForm
+    template_name = "core/create.jinja"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
+        if not StudentCard.can_create(self.customer, request.user):
+            raise PermissionDenied
+        return super(StudentCardFormView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        data = form.clean()
+        res = super(FormView, self).form_valid(form)
+        StudentCard(customer=self.customer, uid=data["uid"]).save()
+        return res
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy(
+            "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
+        )
