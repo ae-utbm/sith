@@ -178,6 +178,7 @@ class StudentCardTest(TestCase):
         )
 
     def test_add_student_card_from_counter(self):
+        # Test card with mixed letters and numbers
         response = self.client.post(
             reverse(
                 "counter:click",
@@ -186,6 +187,26 @@ class StudentCardTest(TestCase):
             {"student_card_uid": "8B90734A802A8F", "action": "add_student_card"},
         )
         self.assertContains(response, text="8B90734A802A8F")
+
+        # Test card with only numbers
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "04786547890123", "action": "add_student_card"},
+        )
+        self.assertContains(response, text="04786547890123")
+
+        # Test card with only letters
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "ABCAAAFAAFAAAB", "action": "add_student_card"},
+        )
+        self.assertContains(response, text="ABCAAAFAAFAAAB")
 
     def test_add_student_card_from_counter_fail(self):
         # UID too short
@@ -231,6 +252,18 @@ class StudentCardTest(TestCase):
                 kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
             ),
             {"student_card_uid": "8b90734a802a9f", "action": "add_student_card"},
+        )
+        self.assertContains(
+            response, text="Ce n'est pas un UID de carte étudiante valide"
+        )
+
+        # Test with white spaces
+        response = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            ),
+            {"student_card_uid": "              ", "action": "add_student_card"},
         )
         self.assertContains(
             response, text="Ce n'est pas un UID de carte étudiante valide"
@@ -318,6 +351,30 @@ class StudentCardTest(TestCase):
         )
         self.assertContains(response, text="8B90734A802A8A")
 
+        # Test card with only numbers
+        self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "04786547890123"},
+        )
+        response = self.client.get(
+            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
+        )
+        self.assertContains(response, text="04786547890123")
+
+        # Test card with only letters
+        self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "ABCAAAFAAFAAAB"},
+        )
+        response = self.client.get(
+            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
+        )
+        self.assertContains(response, text="ABCAAAFAAFAAAB")
+
         # Test with root
         self.client.login(username="root", password="plop")
         self.client.post(
@@ -370,6 +427,15 @@ class StudentCardTest(TestCase):
                 "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
             ),
             {"uid": "8b90734a802a9f"},
+        )
+        self.assertContains(response, text="Cet UID est invalide")
+
+        # Test with white spaces
+        response = self.client.post(
+            reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
+            ),
+            {"uid": "              "},
         )
         self.assertContains(response, text="Cet UID est invalide")
 
