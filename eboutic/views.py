@@ -239,11 +239,13 @@ class EbouticPayWithSith(TemplateView):
 
 
 class EtransactionAutoAnswer(View):
+    # Response documentation http://www1.paybox.com/espace-integrateur-documentation/la-solution-paybox-system/gestion-de-la-reponse/
     def get(self, request, *args, **kwargs):
         if (
             not "Amount" in request.GET.keys()
             or not "BasketID" in request.GET.keys()
-            or not "Auto" in request.GET.keys()
+            or not "Auto"
+            in request.GET.keys()  # If not in the request it means the payment has been refused
             or not "Error" in request.GET.keys()
             or not "Sig" in request.GET.keys()
         ):
