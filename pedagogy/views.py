@@ -108,17 +108,17 @@ class EducationDepartmentDeleteView(DeleteView):
     pass
 
 
-class StudyCreateView(CreateView):
+class StudyFieldCreateView(CreateView):
     """
-    Add a new Study (Privileged)
+    Add a new Study Field (Privileged)
     """
 
     pass
 
 
-class StudyDeleteView(DeleteView):
+class StudyFieldDeleteView(DeleteView):
     """
-    Allow to delete an Study (Privileged)
+    Allow to delete an Study Field (Privileged)
     """
 
     pass

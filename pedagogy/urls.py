@@ -53,10 +53,10 @@ urlpatterns = [
         EducationDepartmentDeleteView.as_view(),
         name="department_delete",
     ),
-    url(r"^study/create$", StudyCreateView.as_view(), name="study_create"),
+    url(r"^study/create$", StudyFieldCreateView.as_view(), name="study_create"),
     url(
         r"^study/(?P<study_id>[0-9]+)/delete$",
-        StudyDeleteView.as_view(),
+        StudyFieldDeleteView.as_view(),
         name="study_delete",
     ),
 ]

@@ -59,7 +59,7 @@ class EducationDepartment(models.Model):
     pass
 
 
-class Study(models.Model):
+class StudyField(models.Model):
     """
     Speciality inside an Education Department
     """
