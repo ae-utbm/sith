@@ -51,9 +51,9 @@ class UVCommentReport(models.Model):
     pass
 
 
-class TeachingDepartment(models.Model):
+class EducationDepartment(models.Model):
     """
-    Teaching department of the school
+    Education department of the school
     """
 
     pass
@@ -61,7 +61,7 @@ class TeachingDepartment(models.Model):
 
 class Study(models.Model):
     """
-    Speciality inside a Teaching Department
+    Speciality inside an Education Department
     """
 
     pass

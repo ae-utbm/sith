@@ -45,12 +45,12 @@ urlpatterns = [
     url(r"^uv/(?P<uv_id>[0-9]+)/delete$", UVDeleteView.as_view(), name="uv_delete"),
     url(
         r"^department/create$",
-        TeachingDepartmentCreateView.as_view(),
+        EducationDepartmentCreateView.as_view(),
         name="department_create",
     ),
     url(
         r"^department/(?P<department_id>[0-9]+)/delete$",
-        TeachingDepartmentDeleteView.as_view(),
+        EducationDepartmentDeleteView.as_view(),
         name="department_delete",
     ),
     url(r"^study/create$", StudyCreateView.as_view(), name="study_create"),

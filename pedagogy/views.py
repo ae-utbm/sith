@@ -92,17 +92,17 @@ class UVDeleteView(DeleteView):
     pass
 
 
-class TeachingDepartmentCreateView(CreateView):
+class EducationDepartmentCreateView(CreateView):
     """
-    Add a new TeachingDepartment (Privileged)
+    Add a new Education Department (Privileged)
     """
 
     pass
 
 
-class TeachingDepartmentDeleteView(DeleteView):
+class EducationDepartmentDeleteView(DeleteView):
     """
-    Allow to delete an TeachingDepartment (Privileged)
+    Allow to delete an Education Department (Privileged)
     """
 
     pass
