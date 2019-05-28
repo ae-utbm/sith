@@ -27,6 +27,7 @@ from django.conf.urls import url
 from pedagogy.views import *
 
 urlpatterns = [
+    # Urls displaying the actual application for visitors
     url(r"^$", UVListView.as_view(), name="guide"),
     url(r"^uv/(?P<uv_id>[0-9]+)$", UVDetailFormView.as_view(), name="uv_detail"),
     url(
@@ -39,8 +40,10 @@ urlpatterns = [
         UVCommentReportCreateView.as_view(),
         name="comment_report",
     ),
+    # Moderation
     url(r"^reported$", UVCommentReportListView.as_view(), name="comment_report_list"),
     url(r"^moderation$", UVModerationFormView.as_view(), name="moderation"),
+    # Administration : Create Update Delete Edit
     url(r"^uv/create$", UVCreateView.as_view(), name="uv_create"),
     url(r"^uv/(?P<uv_id>[0-9]+)/delete$", UVDeleteView.as_view(), name="uv_delete"),
     url(
