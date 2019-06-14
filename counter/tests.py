@@ -83,6 +83,17 @@ class CounterTest(TestCase):
         )
 
 
+class CounterStatsTest(TestCase):
+    def setUp(self):
+        call_command("populate")
+        self.counter = Counter.objects.filter(id=2).first()
+
+    def test_unothorized_user_fail(self):
+        # Test with not login user
+        response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
+        self.assertTrue(response.status_code == 403)
+
+
 class BarmanConnectionTest(TestCase):
     def setUp(self):
         call_command("populate")
