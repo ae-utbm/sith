@@ -44,7 +44,13 @@ class UV(models.Model):
         return user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
+        """
+        Only visible by subscribers
+        """
         return user.is_subscribed
+
+    def __str__(self):
+        return self.code
 
     code = models.CharField(
         _("code"),

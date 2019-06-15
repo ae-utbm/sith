@@ -22,7 +22,15 @@
 #
 #
 
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, FormView
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    UpdateView,
+    ListView,
+    FormView,
+    View,
+)
 from django.core.urlresolvers import reverse_lazy
 
 from core.views import (
@@ -35,6 +43,32 @@ from core.views import (
 
 from pedagogy.forms import UVForm
 from pedagogy.models import UV
+
+# Some mixins
+
+
+class CanCreateUVFunctionMixin(View):
+    """
+    Add the function can_create_uv(user) into the template
+    """
+
+    @staticmethod
+    def can_create_uv(user):
+        """
+        Creates a dummy instance of UV and test is_owner
+        """
+        return user.is_owner(UV())
+
+    def get_context_data(self, **kwargs):
+        """
+        Pass the function to the template
+        """
+        kwargs = super(CanCreateUVFunctionMixin, self).get_context_data(**kwargs)
+        kwargs["can_create_uv"] = self.can_create_uv
+        return kwargs
+
+
+# Acutal views
 
 
 class UVDetailFormView(DetailFormView):
@@ -54,7 +88,7 @@ class UVCommentDetailView(DetailView):
     pass
 
 
-class UVListView(CanViewMixin, ListView):
+class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
     """
     UV guide main page
     """
@@ -108,12 +142,36 @@ class UVCreateView(CanCreateMixin, CreateView):
         return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.id})
 
 
-class UVDeleteView(DeleteView):
+class UVDeleteView(CanEditPropMixin, DeleteView):
     """
     Allow to delete an UV (Privileged)
     """
 
-    pass
+    model = UV
+    pk_url_kwarg = "uv_id"
+    template_name = "core/delete_confirm.jinja"
+
+    def get_success_url(self):
+        return reverse_lazy("pedagogy:guide")
+
+
+class UVUpdateView(CanEditPropMixin, UpdateView):
+    """
+    Allow to edit an UV (Privilegied)
+    """
+
+    model = UV
+    form_class = UVForm
+    pk_url_kwarg = "uv_id"
+    template_name = "core/edit.jinja"
+
+    def get_form_kwargs(self):
+        kwargs = super(UVUpdateView, self).get_form_kwargs()
+        kwargs["author_id"] = self.request.user.id
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.id})
 
 
 class EducationDepartmentCreateView(CreateView):

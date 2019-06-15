@@ -46,6 +46,7 @@ urlpatterns = [
     # Administration : Create Update Delete Edit
     url(r"^uv/create$", UVCreateView.as_view(), name="uv_create"),
     url(r"^uv/(?P<uv_id>[0-9]+)/delete$", UVDeleteView.as_view(), name="uv_delete"),
+    url(r"^uv/(?P<uv_id>[0-9]+)/edit$", UVUpdateView.as_view(), name="uv_update"),
     url(
         r"^department/create$",
         EducationDepartmentCreateView.as_view(),
