@@ -54,12 +54,16 @@ class UVCommentDetailView(DetailView):
     pass
 
 
-class UVListView(ListView):
+class UVListView(CanViewMixin, ListView):
     """
     UV guide main page
     """
 
-    pass
+    # This is very basic and is prone to changment
+
+    model = UV
+    ordering = ["code"]
+    template_name = "pedagogy/guide.jinja"
 
 
 class UVCommentReportCreateView(CreateView):

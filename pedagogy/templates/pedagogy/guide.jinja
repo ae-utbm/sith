@@ -1,0 +1,12 @@
+
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}UV Guide{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% for uv in object_list %}
+    	{{ uv.code }}
+    {% endfor %}
+{% endblock content %}

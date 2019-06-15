@@ -671,6 +671,10 @@ class AnonymousUser(AuthAnonymousUser):
         return False
 
     @property
+    def is_subscribed(self):
+        return False
+
+    @property
     def subscribed(self):
         return False
 
