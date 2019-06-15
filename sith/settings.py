@@ -404,6 +404,30 @@ SITH_COUNTER_BANK = [
     ("LA-POSTE", "La Poste"),
 ]
 
+SITH_PEDAGOGY_UV_TYPE = [
+    ("FREE", _("Free")),
+    ("CS", _("CS")),
+    ("TM", _("TM")),
+    ("EC", _("EC")),
+    ("CG", _("CG")),
+    ("RN", _("RN")),
+    ("EXT", _("EXT")),
+]
+
+SITH_PEDAGOGY_UV_SEMESTER = [
+    ("CLOSED", _("Closed")),
+    ("AUTUMN", _("Autumn")),
+    ("SPRING", _("Spring")),
+    ("AUTOMN_AND_SPRING", _("Autumn and spring")),
+]
+
+SITH_PEDAGOGY_UV_LANGUAGE = [
+    ("FR", _("French")),
+    ("EN", _("English")),
+    ("DE", _("German")),
+    ("SP", _("Spanich")),
+]
+
 SITH_ECOCUP_CONS = 1152
 
 SITH_ECOCUP_DECO = 1151

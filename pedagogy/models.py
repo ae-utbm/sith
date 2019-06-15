@@ -23,6 +23,11 @@
 #
 
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+from django.core import validators
+from django.conf import settings
+
+from core.models import User
 
 # Create your models here.
 
@@ -32,7 +37,101 @@ class UV(models.Model):
     Contains infos about an UV (course)
     """
 
-    pass
+    code = models.CharField(
+        _("code"),
+        max_length=10,
+        unique=True,
+        validators=[
+            validators.RegexValidator(
+                regex="([A-Z0-9]+)",
+                message=_(
+                    "The code of an UV must only contains uppercase characters without accent and numbers"
+                ),
+            )
+        ],
+    )
+    moderator = models.ForeignKey(
+        User,
+        related_name="moderated_UVs",
+        verbose_name=_("moderated UVs"),
+        null=True,
+        blank=True,
+    )
+    author = models.ForeignKey(
+        User,
+        related_name="created_UVs",
+        verbose_name=_("created UVs"),
+        null=False,
+        blank=False,
+    )
+    credit_type = models.CharField(
+        _("credit type"),
+        max_length=10,
+        choices=settings.SITH_PEDAGOGY_UV_TYPE,
+        default=settings.SITH_PEDAGOGY_UV_TYPE[0][0],
+    )
+    manager = models.CharField(_("uv manager"), max_length=300)
+    semester = models.CharField(
+        _("semester"),
+        max_length=10,
+        choices=settings.SITH_PEDAGOGY_UV_SEMESTER,
+        default=settings.SITH_PEDAGOGY_UV_SEMESTER[0][0],
+    )
+    language = models.CharField(
+        _("language"),
+        max_length=10,
+        choices=settings.SITH_PEDAGOGY_UV_LANGUAGE,
+        default=settings.SITH_PEDAGOGY_UV_LANGUAGE[0][0],
+    )
+    credits = models.IntegerField(
+        _("credits"),
+        validators=[validators.MinValueValidator(0)],
+        blank=False,
+        null=False,
+    )
+    # Double star type not implemented yet
+    # Departments not implemented yet
+
+    # All texts about the UV
+    title = models.CharField(_("title"), max_length=300)
+    manager = models.CharField(_("uv manager"), max_length=300)
+    objectives = models.TextField(_("objectives"))
+    program = models.TextField(_("program"))
+    skills = models.TextField(_("skills"))
+    key_concepts = models.TextField(_("key_concepts"))
+
+    # Hours types CM, TD, TP, THE and TE
+    # Kind of dirty but I have nothing else in mind for now
+    hours_CM = models.IntegerField(
+        _("hours CM"),
+        validators=[validators.MinValueValidator(0)],
+        blank=False,
+        null=False,
+    )
+    hours_TD = models.IntegerField(
+        _("hours TD"),
+        validators=[validators.MinValueValidator(0)],
+        blank=False,
+        null=False,
+    )
+    hours_TP = models.IntegerField(
+        _("hours TP"),
+        validators=[validators.MinValueValidator(0)],
+        blank=False,
+        null=False,
+    )
+    hours_THE = models.IntegerField(
+        _("hours THE"),
+        validators=[validators.MinValueValidator(0)],
+        blank=False,
+        null=False,
+    )
+    hours_TE = models.IntegerField(
+        _("hours TE"),
+        validators=[validators.MinValueValidator(0)],
+        blank=False,
+        null=False,
+    )
 
 
 class UVComment(models.Model):
