@@ -23,8 +23,18 @@
 #
 
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, FormView
+from django.core.urlresolvers import reverse_lazy
 
-from core.views import DetailFormView
+from core.views import (
+    DetailFormView,
+    CanCreateMixin,
+    CanEditMixin,
+    CanViewMixin,
+    CanEditPropMixin,
+)
+
+from pedagogy.forms import UVForm
+from pedagogy.models import UV
 
 
 class UVDetailFormView(DetailFormView):
@@ -76,12 +86,22 @@ class UVModerationFormView(FormView):
     pass
 
 
-class UVCreateView(CreateView):
+class UVCreateView(CanCreateMixin, CreateView):
     """
     Add a new UV (Privileged)
     """
 
-    pass
+    model = UV
+    form_class = UVForm
+    template_name = "core/edit.jinja"
+
+    def get_form_kwargs(self):
+        kwargs = super(UVCreateView, self).get_form_kwargs()
+        kwargs["author_id"] = self.request.user.id
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.id})
 
 
 class UVDeleteView(DeleteView):

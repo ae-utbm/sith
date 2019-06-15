@@ -37,6 +37,12 @@ class UV(models.Model):
     Contains infos about an UV (course)
     """
 
+    def is_owned_by(self, user):
+        """
+        Can be created by superuser, root or pedagogy admin user
+        """
+        return user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+
     code = models.CharField(
         _("code"),
         max_length=10,
@@ -50,17 +56,10 @@ class UV(models.Model):
             )
         ],
     )
-    moderator = models.ForeignKey(
-        User,
-        related_name="moderated_UVs",
-        verbose_name=_("moderated UVs"),
-        null=True,
-        blank=True,
-    )
     author = models.ForeignKey(
         User,
         related_name="created_UVs",
-        verbose_name=_("created UVs"),
+        verbose_name=_("author"),
         null=False,
         blank=False,
     )
@@ -73,7 +72,7 @@ class UV(models.Model):
     manager = models.CharField(_("uv manager"), max_length=300)
     semester = models.CharField(
         _("semester"),
-        max_length=10,
+        max_length=20,
         choices=settings.SITH_PEDAGOGY_UV_SEMESTER,
         default=settings.SITH_PEDAGOGY_UV_SEMESTER[0][0],
     )
@@ -98,7 +97,7 @@ class UV(models.Model):
     objectives = models.TextField(_("objectives"))
     program = models.TextField(_("program"))
     skills = models.TextField(_("skills"))
-    key_concepts = models.TextField(_("key_concepts"))
+    key_concepts = models.TextField(_("key concepts"))
 
     # Hours types CM, TD, TP, THE and TE
     # Kind of dirty but I have nothing else in mind for now
@@ -107,30 +106,35 @@ class UV(models.Model):
         validators=[validators.MinValueValidator(0)],
         blank=False,
         null=False,
+        default=0,
     )
     hours_TD = models.IntegerField(
         _("hours TD"),
         validators=[validators.MinValueValidator(0)],
         blank=False,
         null=False,
+        default=0,
     )
     hours_TP = models.IntegerField(
         _("hours TP"),
         validators=[validators.MinValueValidator(0)],
         blank=False,
         null=False,
+        default=0,
     )
     hours_THE = models.IntegerField(
         _("hours THE"),
         validators=[validators.MinValueValidator(0)],
         blank=False,
         null=False,
+        default=0,
     )
     hours_TE = models.IntegerField(
         _("hours TE"),
         validators=[validators.MinValueValidator(0)],
         blank=False,
         null=False,
+        default=0,
     )
 
 

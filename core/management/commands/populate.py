@@ -84,6 +84,7 @@ class Command(BaseCommand):
         Group(name="Banned to subscribe").save()
         Group(name="SAS admin").save()
         Group(name="Forum admin").save()
+        Group(name="Pedagogy admin").save()
         self.reset_index("core", "auth")
         root = User(
             id=0,

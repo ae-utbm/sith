@@ -322,6 +322,7 @@ SITH_GROUP_BANNED_COUNTER_ID = 9
 SITH_GROUP_BANNED_SUBSCRIPTION_ID = 10
 SITH_GROUP_SAS_ADMIN_ID = 11
 SITH_GROUP_FORUM_ADMIN_ID = 12
+SITH_GROUP_PEDAGOGY_ADMIN_ID = 13
 
 
 SITH_CLUB_REFOUND_ID = 89
@@ -408,9 +409,11 @@ SITH_PEDAGOGY_UV_TYPE = [
     ("FREE", _("Free")),
     ("CS", _("CS")),
     ("TM", _("TM")),
+    ("OM", _("OM")),
+    ("QC", _("QC")),
     ("EC", _("EC")),
-    ("CG", _("CG")),
     ("RN", _("RN")),
+    ("ST", _("ST")),
     ("EXT", _("EXT")),
 ]
 
