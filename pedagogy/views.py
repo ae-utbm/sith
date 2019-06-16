@@ -42,7 +42,7 @@ from core.views import (
 )
 
 from pedagogy.forms import UVForm, UVCommentForm
-from pedagogy.models import UV
+from pedagogy.models import UV, UVComment
 
 # Some mixins
 
@@ -82,13 +82,54 @@ class UVDetailFormView(CanViewMixin, CanCreateUVFunctionMixin, DetailFormView):
     template_name = "pedagogy/uv_detail.jinja"
     form_class = UVCommentForm
 
+    def get_form_kwargs(self):
+        kwargs = super(UVDetailFormView, self).get_form_kwargs()
+        kwargs["author_id"] = self.request.user.id
+        kwargs["uv_id"] = self.get_object().id
+        return kwargs
 
-class UVCommentDetailView(DetailView):
+    def form_valid(self, form):
+        form.save()
+        return super(UVDetailFormView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "pedagogy:uv_detail", kwargs={"uv_id": self.get_object().id}
+        )
+
+
+class UVCommentUpdateView(CanEditPropMixin, UpdateView):
     """
-    Display a specified UVComment (for easy sharing of the comment)
+    Allow edit of a given comment
     """
 
-    pass
+    model = UVComment
+    form_class = UVCommentForm
+    pk_url_kwarg = "comment_id"
+    template_name = "core/edit.jinja"
+
+    def get_form_kwargs(self):
+        kwargs = super(UVCommentUpdateView, self).get_form_kwargs()
+        kwargs["author_id"] = self.request.user.id
+        kwargs["uv_id"] = self.get_object().uv.id
+
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.uv.id})
+
+
+class UVCommentDeleteView(CanEditPropMixin, DeleteView):
+    """
+    Allow delete of a given comment
+    """
+
+    model = UVComment
+    pk_url_kwarg = "comment_id"
+    template_name = "core/delete_confirm.jinja"
+
+    def get_success_url(self):
+        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.uv.id})
 
 
 class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):

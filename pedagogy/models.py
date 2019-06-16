@@ -152,6 +152,12 @@ class UVComment(models.Model):
     A comment about an UV
     """
 
+    def is_owned_by(self, user):
+        """
+        Is owned by a pedagogy admin, a superuser or the author himself
+        """
+        return self.author == user or user.is_owner(self.uv)
+
     author = models.ForeignKey(
         User,
         related_name="uv_comments",
@@ -159,6 +165,7 @@ class UVComment(models.Model):
         null=False,
         blank=False,
     )
+    uv = models.ForeignKey(UV, related_name="comments", verbose_name=_("uv"))
     comment = models.TextField(_("comment"))
     grade_global = models.IntegerField(
         _("global grade"),

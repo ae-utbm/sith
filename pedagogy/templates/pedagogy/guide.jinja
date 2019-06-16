@@ -13,7 +13,7 @@
 	{% endif %}
     {% for uv in object_list %}
     	<p>
-	    	{{ uv.code }}
+	    	<a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}">{{ uv.code }}</a>
 	    	{% if user.is_owner(uv) -%}
 	    	  	<a href="{{ url('pedagogy:uv_update', uv_id=uv.id) }}">{% trans %}Edit{% endtrans %}</a>
 	    	  	<a href="{{ url('pedagogy:uv_delete', uv_id=uv.id) }}">{% trans %}Delete{% endtrans %}</a>

@@ -31,9 +31,14 @@ urlpatterns = [
     url(r"^$", UVListView.as_view(), name="guide"),
     url(r"^uv/(?P<uv_id>[0-9]+)$", UVDetailFormView.as_view(), name="uv_detail"),
     url(
-        r"^comment/(?P<comment_id>[0-9]+)$",
-        UVCommentDetailView.as_view(),
-        name="comment_detail",
+        r"^comment/(?P<comment_id>[0-9]+)/edit$",
+        UVCommentUpdateView.as_view(),
+        name="comment_edit",
+    ),
+    url(
+        r"^comment/(?P<comment_id>[0-9]+)/delete$",
+        UVCommentDeleteView.as_view(),
+        name="comment_delete",
     ),
     url(
         r"^comment/(?P<comment_id>[0-9]+)/report$",

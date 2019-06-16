@@ -77,4 +77,25 @@ class UVCommentForm(forms.ModelForm):
 
     class Meta:
         model = UVComment
-        fields = ()
+        fields = (
+            "author",
+            "uv",
+            "grade_global",
+            "grade_utility",
+            "grade_interest",
+            "grade_teaching",
+            "grade_work_load",
+            "comment",
+        )
+        widgets = {
+            "comment": MarkdownInput,
+            "author": forms.HiddenInput,
+            "uv": forms.HiddenInput,
+        }
+
+    def __init__(self, author_id, uv_id, *args, **kwargs):
+        super(UVCommentForm, self).__init__(*args, **kwargs)
+        self.fields["author"].queryset = User.objects.filter(id=author_id).all()
+        self.fields["author"].initial = author_id
+        self.fields["uv"].queryset = UV.objects.filter(id=uv_id).all()
+        self.fields["uv"].initial = uv_id
