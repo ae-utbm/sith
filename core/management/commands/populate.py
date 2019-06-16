@@ -859,6 +859,18 @@ Welcome to the wiki page!
                 start_date=timezone.now(),
                 role=settings.SITH_CLUB_ROLES_ID["Board member"],
             ).save()
+            # Adding user tutu
+            tutu = User(
+                username="tutu",
+                last_name="Tu",
+                first_name="Tu",
+                email="tutu@git.an",
+                date_of_birth="1942-06-12",
+            )
+            tutu.set_password("plop")
+            tutu.save()
+            tutu.groups = [settings.SITH_GROUP_PEDAGOGY_ADMIN_ID]
+            tutu.save()
 
             # Adding subscription for sli
             s = Subscription(
@@ -888,6 +900,18 @@ Welcome to the wiki page!
             # Com Unity
             s = Subscription(
                 member=comunity,
+                subscription_type=default_subscription,
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+            )
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]["duration"],
+                start=s.subscription_start,
+            )
+            s.save()
+            # Tutu
+            s = Subscription(
+                member=tutu,
                 subscription_type=default_subscription,
                 payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
