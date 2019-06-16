@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+	<p><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
 	<h1>{{ object.code }} - {{ object.title }}</h1>
 	<p>{{ object.objectives|markdown }}</p>
 	<p>{{ object.program|markdown }}</p>
@@ -23,7 +24,7 @@
 			<p>{% trans %}Published: {% endtrans %}{{ comment.publish_date }}</p>
 			<p>{% trans %}Author: {% endtrans %}{{ comment.author }}</p>
 			{% if user.is_owner(comment) %}
-				<p><a href="{{ url('pedagogy:comment_edit', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a></p>
+				<p><a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a></p>
 				<p><a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a></p>
 			{% endif %}
 		{% endfor %}

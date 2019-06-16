@@ -33,7 +33,7 @@ urlpatterns = [
     url(
         r"^comment/(?P<comment_id>[0-9]+)/edit$",
         UVCommentUpdateView.as_view(),
-        name="comment_edit",
+        name="comment_update",
     ),
     url(
         r"^comment/(?P<comment_id>[0-9]+)/delete$",

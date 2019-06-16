@@ -476,3 +476,92 @@ class UVCommentDeleteTest(TestCase):
 
         # Check that the comment still exists
         self.assertTrue(UVComment.objects.filter(id=self.comment.id).exists())
+
+
+class UVCommentUpdateTest(TestCase):
+    """
+    Test UVComment update rights
+    """
+
+    def setUp(self):
+        call_command("populate")
+
+        self.krophil = User.objects.get(username="krophil")
+
+        # Prepare a comment
+        comment_kwargs = create_uv_comment_template(self.krophil.id)
+        comment_kwargs["author"] = self.krophil
+        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
+        self.comment = UVComment(**comment_kwargs)
+        self.comment.save()
+
+        # Prepare edit of this comment for post requests
+        self.comment_edit = create_uv_comment_template(self.krophil.id)
+        self.comment_edit["comment"] = "Edited"
+
+    def test_uv_comment_update_root_success(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
+            self.comment_edit,
+        )
+        self.assertEquals(response.status_code, 302)
+        self.comment.refresh_from_db()
+        self.assertEquals(self.comment.comment, self.comment_edit["comment"])
+
+    def test_uv_comment_update_pedagogy_admin_success(self):
+        self.client.login(username="tutu", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
+            self.comment_edit,
+        )
+        self.assertEquals(response.status_code, 302)
+        self.comment.refresh_from_db()
+        self.assertEquals(self.comment.comment, self.comment_edit["comment"])
+
+    def test_uv_comment_update_author_success(self):
+        self.client.login(username="krophil", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
+            self.comment_edit,
+        )
+        self.assertEquals(response.status_code, 302)
+        self.comment.refresh_from_db()
+        self.assertEquals(self.comment.comment, self.comment_edit["comment"])
+
+    def test_uv_comment_update_unauthorized_fail(self):
+        # Anonymous user
+        response = self.client.post(
+            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
+            self.comment_edit,
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Unsbscribed user
+        response = self.client.post(
+            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
+            self.comment_edit,
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Subscribed user (not author of the comment)
+        response = self.client.post(
+            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
+            self.comment_edit,
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Check that the comment hasn't change
+        self.comment.refresh_from_db()
+        self.assertNotEquals(self.comment.comment, self.comment_edit["comment"])
+
+    def test_uv_comment_update_original_author_does_not_change(self):
+        self.client.login(username="root", password="plop")
+        self.comment_edit["author"] = User.objects.get(username="root").id
+
+        response = self.client.post(
+            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
+            self.comment_edit,
+        )
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(self.comment.author, self.krophil)
