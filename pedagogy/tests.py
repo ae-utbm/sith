@@ -31,6 +31,47 @@ from core.models import User
 from pedagogy.models import UV
 
 
+def create_uv_template(user_id, code="IFC1", exclude_list=[]):
+    """
+    Factory to help UV creation/update in post requests
+    """
+    uv = {
+        "code": code,
+        "author": user_id,
+        "credit_type": "TM",
+        "semester": "SPRING",
+        "language": "FR",
+        "credits": 3,
+        "hours_CM": 10,
+        "hours_TD": 28,
+        "hours_TP": 0,
+        "hours_THE": 37,
+        "hours_TE": 0,
+        "manager": "Gilles BERTRAND",
+        "title": "Algorithmique et programmation : niveau I, initiés - partie I",
+        "objectives": """* Introduction à l'algorithmique et à la programmation pour initiés.
+* Pratiques et développement en langage C.""",
+        "program": """* Découverte des outils élémentaires utilisés pour écrire, compiler et exécuter un programme écrit en langage C
+* Règles de programmation : normes en cours, règles de présentation du code, commentaires
+* Initiation à l'algorithmique et découverte des bases du langage C :
+    * les conditions
+    * les boucles
+    * les types de données
+    * les tableaux à une dimension
+    * manipulations des chaînes de caractères
+    * les fonctions et procédures""",
+        "skills": "* D'écrire un algorithme et de l'implémenter en C",
+        "key_concepts": """* Algorithme
+* Variables scalaires et vectorielles
+* Structures alternatives, répétitives
+* Fonctions, procédures
+* Chaînes de caractères""",
+    }
+    for excluded in exclude_list:
+        uv.pop(excluded)
+    return uv
+
+
 class UVCreation(TestCase):
     """
     Test uv creation
@@ -43,51 +84,10 @@ class UVCreation(TestCase):
         self.sli = User.objects.filter(username="sli").first()
         self.guy = User.objects.filter(username="guy").first()
 
-    @staticmethod
-    def create_uv_template(user_id, code="IFC1", exclude_list=[]):
-        """
-        Factory to help UV creation in post requests
-        """
-        uv = {
-            "code": code,
-            "author": user_id,
-            "credit_type": "TM",
-            "semester": "SPRING",
-            "language": "FR",
-            "credits": 3,
-            "hours_CM": 10,
-            "hours_TD": 28,
-            "hours_TP": 0,
-            "hours_THE": 37,
-            "hours_TE": 0,
-            "manager": "Gilles BERTRAND",
-            "title": "Algorithmique et programmation : niveau I, initiés - partie I",
-            "objectives": """* Introduction à l'algorithmique et à la programmation pour initiés.
-* Pratiques et développement en langage C.""",
-            "program": """* Découverte des outils élémentaires utilisés pour écrire, compiler et exécuter un programme écrit en langage C
-* Règles de programmation : normes en cours, règles de présentation du code, commentaires
-* Initiation à l'algorithmique et découverte des bases du langage C :
-    * les conditions
-    * les boucles
-    * les types de données
-    * les tableaux à une dimension
-    * manipulations des chaînes de caractères
-    * les fonctions et procédures""",
-            "skills": "* D'écrire un algorithme et de l'implémenter en C",
-            "key_concepts": """* Algorithme
-* Variables scalaires et vectorielles
-* Structures alternatives, répétitives
-* Fonctions, procédures
-* Chaînes de caractères""",
-        }
-        for excluded in exclude_list:
-            uv.pop(excluded)
-        return uv
-
     def test_create_uv_admin_success(self):
         self.client.login(username="root", password="plop")
         response = self.client.post(
-            reverse("pedagogy:uv_create"), self.create_uv_template(self.bibou.id)
+            reverse("pedagogy:uv_create"), create_uv_template(self.bibou.id)
         )
         self.assertEquals(response.status_code, 302)
         self.assertTrue(UV.objects.filter(code="IFC1").exists())
@@ -95,7 +95,7 @@ class UVCreation(TestCase):
     def test_create_uv_pedagogy_admin_success(self):
         self.client.login(username="tutu", password="plop")
         response = self.client.post(
-            reverse("pedagogy:uv_create"), self.create_uv_template(self.tutu.id)
+            reverse("pedagogy:uv_create"), create_uv_template(self.tutu.id)
         )
         self.assertEquals(response.status_code, 302)
         self.assertTrue(UV.objects.filter(code="IFC1").exists())
@@ -103,21 +103,21 @@ class UVCreation(TestCase):
     def test_create_uv_unauthorized_fail(self):
         # Test with anonymous user
         response = self.client.post(
-            reverse("pedagogy:uv_create"), self.create_uv_template(0)
+            reverse("pedagogy:uv_create"), create_uv_template(0)
         )
         self.assertEquals(response.status_code, 403)
 
         # Test with subscribed user
         self.client.login(username="sli", password="plop")
         response = self.client.post(
-            reverse("pedagogy:uv_create"), self.create_uv_template(self.sli.id)
+            reverse("pedagogy:uv_create"), create_uv_template(self.sli.id)
         )
         self.assertEquals(response.status_code, 403)
 
         # Test with non subscribed user
         self.client.login(username="guy", password="plop")
         response = self.client.post(
-            reverse("pedagogy:uv_create"), self.create_uv_template(self.guy.id)
+            reverse("pedagogy:uv_create"), create_uv_template(self.guy.id)
         )
         self.assertEquals(response.status_code, 403)
 
@@ -129,7 +129,7 @@ class UVCreation(TestCase):
 
         # Test with wrong user id (if someone cheats on the hidden input)
         response = self.client.post(
-            reverse("pedagogy:uv_create"), self.create_uv_template(self.bibou.id)
+            reverse("pedagogy:uv_create"), create_uv_template(self.bibou.id)
         )
         self.assertNotEquals(response.status_code, 302)
         self.assertEquals(response.status_code, 200)
@@ -137,7 +137,7 @@ class UVCreation(TestCase):
         # Remove a required field
         response = self.client.post(
             reverse("pedagogy:uv_create"),
-            self.create_uv_template(self.tutu.id, exclude_list=["title"]),
+            create_uv_template(self.tutu.id, exclude_list=["title"]),
         )
         self.assertNotEquals(response.status_code, 302)
         self.assertEquals(response.status_code, 200)
@@ -179,3 +179,130 @@ class UVListTest(TestCase):
         self.client.login(username="guy", password="plop")
         response = self.client.get(reverse("pedagogy:guide"))
         self.assertEquals(response.status_code, 403)
+
+
+class UVDeleteTest(TestCase):
+    """
+    Test UV deletion rights
+    """
+
+    def setUp(self):
+        call_command("populate")
+
+    def uv_delete_root_success(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse(
+                "pedagogy:uv_delete", kwargs={"uv_id": UV.objects.get(code="PA00").id}
+            )
+        )
+        self.assertFalse(UV.objects.filter(code="PA00").exists())
+
+    def uv_delete_pedagogy_admin_success(self):
+        self.client.login(username="tutu", password="plop")
+        self.client.post(
+            reverse(
+                "pedagogy:uv_delete", kwargs={"uv_id": UV.objects.get(code="PA00").id}
+            )
+        )
+        self.assertFalse(UV.objects.filter(code="PA00").exists())
+
+    def uv_delete_pedagogy_unauthorized_fail(self):
+        # Anonymous user
+        response = self.client.post(
+            reverse(
+                "pedagogy:uv_delete", kwargs={"uv_id": UV.objects.get(code="PA00").id}
+            )
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Not subscribed user
+        self.client.login(username="guy", password="plop")
+        response = self.client.post(
+            reverse(
+                "pedagogy:uv_delete", kwargs={"uv_id": UV.objects.get(code="PA00").id}
+            )
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Simply subscribed user
+        self.client.login(username="sli", password="plop")
+        response = self.client.post(
+            reverse(
+                "pedagogy:uv_delete", kwargs={"uv_id": UV.objects.get(code="PA00").id}
+            )
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Check that the UV still exists
+        self.assertTrue(UV.objects.filter(code="PA00").exists())
+
+
+class UVUpdateTest(TestCase):
+    """
+    Test UV update rights
+    """
+
+    def setUp(self):
+        call_command("populate")
+        self.bibou = User.objects.filter(username="root").first()
+        self.tutu = User.objects.filter(username="tutu").first()
+        self.sli = User.objects.filter(username="sli").first()
+        self.guy = User.objects.filter(username="guy").first()
+
+    def uv_update_root_success(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse(
+                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
+            ),
+            create_uv_template(bibou.id, code="PA00"),
+        )
+        self.assertEquals(UV.objects.get(code="PA00").credit_type, "TM")
+
+    def uv_update_pedagogy_admin_success(self):
+        self.client.login(username="tutu", password="plop")
+        self.client.post(
+            reverse(
+                "pedagogy:uv_udpate",
+                kwargs={"uv_id": UV.objects.get(tutu.id, code="PA00").id},
+            ),
+            create_uv_template(code="PA00"),
+        )
+        self.assertEquals(UV.objects.get(code="PA00").credit_type, "TM")
+
+    def uv_update_pedagogy_unauthorized_fail(self):
+        # Anonymous user
+        self.client.post(
+            reverse(
+                "pedagogy:uv_udpate",
+                kwargs={"uv_id": UV.objects.get(0, code="PA00").id},
+            ),
+            create_uv_template(code="PA00"),
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Not subscribed user
+        self.client.login(username="guy", password="plop")
+        self.client.post(
+            reverse(
+                "pedagogy:uv_udpate",
+                kwargs={"uv_id": UV.objects.get(guy.id, code="PA00").id},
+            ),
+            create_uv_template(code="PA00"),
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Simply subscribed user
+        self.client.login(username="sli", password="plop")
+        self.client.post(
+            reverse(
+                "pedagogy:uv_udpate",
+                kwargs={"uv_id": UV.objects.get(sli.id, code="PA00").id},
+            ),
+            create_uv_template(code="PA00"),
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Check that the UV has not changed
+        self.assertEquals(UV.objects.get(code="PA00").credit_type, "OM")
