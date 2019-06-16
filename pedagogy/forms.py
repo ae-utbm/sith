@@ -27,7 +27,7 @@ from django import forms
 from core.views.forms import MarkdownInput
 from core.models import User
 
-from pedagogy.models import UV
+from pedagogy.models import UV, UVComment
 
 
 class UVForm(forms.ModelForm):
@@ -68,3 +68,13 @@ class UVForm(forms.ModelForm):
         super(UVForm, self).__init__(*args, **kwargs)
         self.fields["author"].queryset = User.objects.filter(id=author_id).all()
         self.fields["author"].initial = author_id
+
+
+class UVCommentForm(forms.ModelForm):
+    """
+    Form handeling creation and edit of an UVComment
+    """
+
+    class Meta:
+        model = UVComment
+        fields = ()

@@ -1,0 +1,13 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}UV Details{% endtrans %}
+{% endblock %}
+
+{% block content %}
+	<h1>{{ object.code }} - {{ object.title }}</h1>
+	<p>{{ object.objectives|markdown }}</p>
+	<p>{{ object.program|markdown }}</p>
+	<p>{{ object.skills|markdown }}</p>
+	<p>{{ object.key_concepts|markdown }}</p>
+{% endblock %}

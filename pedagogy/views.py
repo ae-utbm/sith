@@ -41,7 +41,7 @@ from core.views import (
     CanEditPropMixin,
 )
 
-from pedagogy.forms import UVForm
+from pedagogy.forms import UVForm, UVCommentForm
 from pedagogy.models import UV
 
 # Some mixins
@@ -71,13 +71,16 @@ class CanCreateUVFunctionMixin(View):
 # Acutal views
 
 
-class UVDetailFormView(DetailFormView):
+class UVDetailFormView(CanViewMixin, CanCreateUVFunctionMixin, DetailFormView):
     """
     Dispaly every comment of an UV and detailed infos about it
     Allow to comment the UV
     """
 
-    pass
+    model = UV
+    pk_url_kwarg = "uv_id"
+    template_name = "pedagogy/uv_detail.jinja"
+    form_class = UVCommentForm
 
 
 class UVCommentDetailView(DetailView):
