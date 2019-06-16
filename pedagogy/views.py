@@ -110,8 +110,9 @@ class UVCommentUpdateView(CanEditPropMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super(UVCommentUpdateView, self).get_form_kwargs()
-        kwargs["author_id"] = self.request.user.id
-        kwargs["uv_id"] = self.get_object().uv.id
+        obj = self.get_object()
+        kwargs["author_id"] = obj.author.id
+        kwargs["uv_id"] = obj.uv.id
 
         return kwargs
 

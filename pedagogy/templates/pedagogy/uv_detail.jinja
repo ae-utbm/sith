@@ -21,6 +21,7 @@
 			<p>{{ comment.grade_work_load }}</p>
 			<p>{{ comment.comment }}</p>
 			<p>{% trans %}Published: {% endtrans %}{{ comment.publish_date }}</p>
+			<p>{% trans %}Author: {% endtrans %}{{ comment.author }}</p>
 			{% if user.is_owner(comment) %}
 				<p><a href="{{ url('pedagogy:comment_edit', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a></p>
 				<p><a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a></p>
