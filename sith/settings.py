@@ -431,6 +431,17 @@ SITH_PEDAGOGY_UV_LANGUAGE = [
     ("SP", _("Spanich")),
 ]
 
+SITH_PEDAGOGY_UV_RESULT_GRADE = [
+    ("A", _("A")),
+    ("B", _("B")),
+    ("C", _("C")),
+    ("D", _("D")),
+    ("E", _("E")),
+    ("FX", _("FX")),
+    ("F", _("F")),
+    ("ABS", _("Abs")),
+]
+
 SITH_ECOCUP_CONS = 1152
 
 SITH_ECOCUP_DECO = 1151

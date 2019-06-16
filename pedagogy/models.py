@@ -67,7 +67,7 @@ class UV(models.Model):
     )
     author = models.ForeignKey(
         User,
-        related_name="created_UVs",
+        related_name="uv_created",
         verbose_name=_("author"),
         null=False,
         blank=False,
@@ -152,7 +152,76 @@ class UVComment(models.Model):
     A comment about an UV
     """
 
-    pass
+    author = models.ForeignKey(
+        User,
+        related_name="uv_comments",
+        verbose_name=_("author"),
+        null=False,
+        blank=False,
+    )
+    comment = models.TextField(_("comment"))
+    grade_global = models.IntegerField(
+        _("global grade"),
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        blank=False,
+        null=False,
+        default=-1,
+    )
+    grade_utility = models.IntegerField(
+        _("utility grade"),
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        blank=False,
+        null=False,
+        default=-1,
+    )
+    grade_interest = models.IntegerField(
+        _("interest grade"),
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        blank=False,
+        null=False,
+        default=-1,
+    )
+    grade_teaching = models.IntegerField(
+        _("teaching grade"),
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        blank=False,
+        null=False,
+        default=-1,
+    )
+    grade_work_load = models.IntegerField(
+        _("work load grade"),
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        blank=False,
+        null=False,
+        default=-1,
+    )
+    publish_date = models.DateField(_("publish date"), auto_now=True)
+
+
+class UVResult(models.Model):
+    """
+    Results got to an UV
+    Views will be implemented after the first release
+    Will list every UV done by an user
+    Linked to user
+              uv
+    Contains a grade settings.SITH_PEDAGOGY_UV_RESULT_GRADE
+             a semester (P/A)20xx
+    """
+
+    uv = models.ForeignKey(UV, related_name="results", verbose_name=_("uv"))
+    user = models.ForeignKey(User, related_name="uv_results", verbose_name=("user"))
+    grade = models.CharField(
+        _("grade"),
+        max_length=10,
+        choices=settings.SITH_PEDAGOGY_UV_RESULT_GRADE,
+        default=settings.SITH_PEDAGOGY_UV_RESULT_GRADE[0][0],
+    )
+    semester = models.CharField(
+        _("semester"),
+        max_length=5,
+        validators=[validators.RegexValidator("[AP][0-9]{3}")],
+    )
 
 
 class UVCommentReport(models.Model):
