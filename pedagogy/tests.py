@@ -28,7 +28,7 @@ from django.core.management import call_command
 
 from core.models import User
 
-from pedagogy.models import UV
+from pedagogy.models import UV, UVComment
 
 
 def create_uv_template(user_id, code="IFC1", exclude_list=[]):
@@ -70,6 +70,9 @@ def create_uv_template(user_id, code="IFC1", exclude_list=[]):
     for excluded in exclude_list:
         uv.pop(excluded)
     return uv
+
+
+# UV class tests
 
 
 class UVCreation(TestCase):
@@ -154,7 +157,7 @@ class UVListTest(TestCase):
     def setUp(self):
         call_command("populate")
 
-    def uv_list_display_success(self):
+    def test_uv_list_display_success(self):
         # Display for root
         self.client.login(username="root", password="plop")
         response = self.client.get(reverse("pedagogy:guide"))
@@ -170,7 +173,7 @@ class UVListTest(TestCase):
         response = self.client.get(reverse("pedagogy:guide"))
         self.assertContains(response, text="PA00")
 
-    def uv_list_display_fail(self):
+    def test_uv_list_display_fail(self):
         # Don't display for anonymous user
         response = self.client.get(reverse("pedagogy:guide"))
         self.assertEquals(response.status_code, 403)
@@ -189,7 +192,7 @@ class UVDeleteTest(TestCase):
     def setUp(self):
         call_command("populate")
 
-    def uv_delete_root_success(self):
+    def test_uv_delete_root_success(self):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse(
@@ -198,7 +201,7 @@ class UVDeleteTest(TestCase):
         )
         self.assertFalse(UV.objects.filter(code="PA00").exists())
 
-    def uv_delete_pedagogy_admin_success(self):
+    def test_uv_delete_pedagogy_admin_success(self):
         self.client.login(username="tutu", password="plop")
         self.client.post(
             reverse(
@@ -207,7 +210,7 @@ class UVDeleteTest(TestCase):
         )
         self.assertFalse(UV.objects.filter(code="PA00").exists())
 
-    def uv_delete_pedagogy_unauthorized_fail(self):
+    def test_uv_delete_pedagogy_unauthorized_fail(self):
         # Anonymous user
         response = self.client.post(
             reverse(
@@ -250,59 +253,226 @@ class UVUpdateTest(TestCase):
         self.sli = User.objects.filter(username="sli").first()
         self.guy = User.objects.filter(username="guy").first()
 
-    def uv_update_root_success(self):
+    def test_uv_update_root_success(self):
         self.client.login(username="root", password="plop")
         self.client.post(
             reverse(
                 "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
             ),
-            create_uv_template(bibou.id, code="PA00"),
+            create_uv_template(self.bibou.id, code="PA00"),
         )
         self.assertEquals(UV.objects.get(code="PA00").credit_type, "TM")
 
-    def uv_update_pedagogy_admin_success(self):
+    def test_uv_update_pedagogy_admin_success(self):
         self.client.login(username="tutu", password="plop")
         self.client.post(
             reverse(
-                "pedagogy:uv_udpate",
-                kwargs={"uv_id": UV.objects.get(tutu.id, code="PA00").id},
+                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
             ),
-            create_uv_template(code="PA00"),
+            create_uv_template(self.tutu.id, code="PA00"),
         )
         self.assertEquals(UV.objects.get(code="PA00").credit_type, "TM")
 
-    def uv_update_pedagogy_unauthorized_fail(self):
+    def test_uv_update_pedagogy_unauthorized_fail(self):
         # Anonymous user
-        self.client.post(
+        response = self.client.post(
             reverse(
-                "pedagogy:uv_udpate",
-                kwargs={"uv_id": UV.objects.get(0, code="PA00").id},
+                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
             ),
-            create_uv_template(code="PA00"),
+            create_uv_template(0, code="PA00"),
         )
         self.assertEquals(response.status_code, 403)
 
         # Not subscribed user
         self.client.login(username="guy", password="plop")
-        self.client.post(
+        response = self.client.post(
             reverse(
-                "pedagogy:uv_udpate",
-                kwargs={"uv_id": UV.objects.get(guy.id, code="PA00").id},
+                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
             ),
-            create_uv_template(code="PA00"),
+            create_uv_template(self.guy.id, code="PA00"),
         )
         self.assertEquals(response.status_code, 403)
 
         # Simply subscribed user
         self.client.login(username="sli", password="plop")
-        self.client.post(
+        response = self.client.post(
             reverse(
-                "pedagogy:uv_udpate",
-                kwargs={"uv_id": UV.objects.get(sli.id, code="PA00").id},
+                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
             ),
-            create_uv_template(code="PA00"),
+            create_uv_template(self.sli.id, code="PA00"),
         )
         self.assertEquals(response.status_code, 403)
 
         # Check that the UV has not changed
         self.assertEquals(UV.objects.get(code="PA00").credit_type, "OM")
+
+
+# UVComment class tests
+
+
+def create_uv_comment_template(user_id, uv_code="PA00", exclude_list=[]):
+    """
+    Factory to help UVComment creation/update in post requests
+    """
+    comment = {
+        "author": user_id,
+        "uv": UV.objects.get(code=uv_code).id,
+        "grade_global": 5,
+        "grade_utility": 5,
+        "grade_interest": 5,
+        "grade_teaching": -1,
+        "grade_work_load": 3,
+        "comment": "Superbe UV qui fait vivre la vie associative de l'école",
+    }
+    for excluded in exclude_list:
+        comment.pop(excluded)
+    return comment
+
+
+class UVCommentCreationAndDisplay(TestCase):
+    """
+    Test UVComment creation and it's display
+    Display and creation are the same view
+    """
+
+    def setUp(self):
+        call_command("populate")
+        self.bibou = User.objects.filter(username="root").first()
+        self.tutu = User.objects.filter(username="tutu").first()
+        self.sli = User.objects.filter(username="sli").first()
+        self.guy = User.objects.filter(username="guy").first()
+        self.uv = UV.objects.get(code="PA00")
+
+    def test_create_uv_comment_admin_success(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
+            create_uv_comment_template(self.bibou.id),
+        )
+        self.assertEquals(response.status_code, 302)
+        response = self.client.get(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
+        )
+        self.assertContains(response, text="Superbe UV")
+
+    def test_create_uv_comment_pedagogy_admin_success(self):
+        self.client.login(username="tutu", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
+            create_uv_comment_template(self.tutu.id),
+        )
+        self.assertEquals(response.status_code, 302)
+        response = self.client.get(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
+        )
+        self.assertContains(response, text="Superbe UV")
+
+    def test_create_uv_comment_subscriber_success(self):
+        self.client.login(username="sli", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
+            create_uv_comment_template(self.sli.id),
+        )
+        self.assertEquals(response.status_code, 302)
+        response = self.client.get(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
+        )
+        self.assertContains(response, text="Superbe UV")
+
+    def test_create_uv_comment_unauthorized_fail(self):
+        # Test with anonymous user
+        response = self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
+            create_uv_comment_template(0),
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Test with non subscribed user
+        self.client.login(username="guy", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
+            create_uv_comment_template(self.guy.id),
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Check that the comment has never been created
+        self.client.login(username="root", password="plop")
+        response = self.client.get(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
+        )
+        self.assertNotContains(response, text="Superbe UV")
+
+    def test_create_uv_comment_bad_form_fail(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
+            create_uv_comment_template(self.bibou.id, exclude_list=["grade_global"]),
+        )
+
+        self.assertEquals(response.status_code, 200)
+
+        response = self.client.get(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
+        )
+        self.assertNotContains(response, text="Superbe UV")
+
+
+class UVCommentDeleteTest(TestCase):
+    """
+    Test UVComment deletion rights
+    """
+
+    def setUp(self):
+        call_command("populate")
+        comment_kwargs = create_uv_comment_template(
+            User.objects.get(username="krophil").id
+        )
+        comment_kwargs["author"] = User.objects.get(id=comment_kwargs["author"])
+        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
+        self.comment = UVComment(**comment_kwargs)
+        self.comment.save()
+
+    def test_uv_comment_delete_root_success(self):
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
+        )
+        self.assertFalse(UVComment.objects.filter(id=self.comment.id).exists())
+
+    def test_uv_comment_delete_pedagogy_admin_success(self):
+        self.client.login(username="tutu", password="plop")
+        self.client.post(
+            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
+        )
+        self.assertFalse(UVComment.objects.filter(id=self.comment.id).exists())
+
+    def test_uv_comment_delete_author_success(self):
+        self.client.login(username="krophil", password="plop")
+        self.client.post(
+            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
+        )
+        self.assertFalse(UVComment.objects.filter(id=self.comment.id).exists())
+
+    def test_uv_comment_delete_unauthorized_fail(self):
+        # Anonymous user
+        response = self.client.post(
+            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Unsbscribed user
+        self.client.login(username="guy", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Subscribed user (not author of the comment)
+        self.client.login(username="sli", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
+        )
+        self.assertEquals(response.status_code, 403)
+
+        # Check that the comment still exists
+        self.assertTrue(UVComment.objects.filter(id=self.comment.id).exists())

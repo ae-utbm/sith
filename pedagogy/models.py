@@ -158,6 +158,9 @@ class UVComment(models.Model):
         """
         return self.author == user or user.is_owner(self.uv)
 
+    def __str__(self):
+        return "%s - %s" % (self.uv, self.author)
+
     author = models.ForeignKey(
         User,
         related_name="uv_comments",
