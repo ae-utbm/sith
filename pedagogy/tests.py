@@ -45,6 +45,9 @@ class UVCreation(TestCase):
 
     @staticmethod
     def create_uv_template(user_id, code="IFC1", exclude_list=[]):
+        """
+        Factory to help UV creation in post requests
+        """
         uv = {
             "code": code,
             "author": user_id,
@@ -141,3 +144,38 @@ class UVCreation(TestCase):
 
         # Check that the UV hase never been created
         self.assertFalse(UV.objects.filter(code="IFC1").exists())
+
+
+class UVListTest(TestCase):
+    """
+    Test guide display rights
+    """
+
+    def setUp(self):
+        call_command("populate")
+
+    def uv_list_display_success(self):
+        # Display for root
+        self.client.login(username="root", password="plop")
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertContains(response, text="PA00")
+
+        # Display for pedagogy admin
+        self.client.login(username="tutu", password="plop")
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertContains(response, text="PA00")
+
+        # Display for simple subscriber
+        self.client.login(username="sli", password="plop")
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertContains(response, text="PA00")
+
+    def uv_list_display_fail(self):
+        # Don't display for anonymous user
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertEquals(response.status_code, 403)
+
+        # Don't display for none subscribed users
+        self.client.login(username="guy", password="plop")
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertEquals(response.status_code, 403)
