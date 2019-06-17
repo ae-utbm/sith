@@ -317,11 +317,11 @@ def create_uv_comment_template(user_id, uv_code="PA00", exclude_list=[]):
     comment = {
         "author": user_id,
         "uv": UV.objects.get(code=uv_code).id,
-        "grade_global": 5,
-        "grade_utility": 5,
-        "grade_interest": 5,
+        "grade_global": 4,
+        "grade_utility": 4,
+        "grade_interest": 4,
         "grade_teaching": -1,
-        "grade_work_load": 3,
+        "grade_work_load": 2,
         "comment": "Superbe UV qui fait vivre la vie associative de l'école",
     }
     for excluded in exclude_list:

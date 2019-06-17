@@ -172,35 +172,35 @@ class UVComment(models.Model):
     comment = models.TextField(_("comment"))
     grade_global = models.IntegerField(
         _("global grade"),
-        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
         blank=False,
         null=False,
         default=-1,
     )
     grade_utility = models.IntegerField(
         _("utility grade"),
-        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
         blank=False,
         null=False,
         default=-1,
     )
     grade_interest = models.IntegerField(
         _("interest grade"),
-        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
         blank=False,
         null=False,
         default=-1,
     )
     grade_teaching = models.IntegerField(
         _("teaching grade"),
-        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
         blank=False,
         null=False,
         default=-1,
     )
     grade_work_load = models.IntegerField(
         _("work load grade"),
-        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(5)],
+        validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
         blank=False,
         null=False,
         default=-1,
