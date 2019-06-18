@@ -162,7 +162,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
         )
 
     def get_queryset(self):
-        query = self.request.GET.get("query", None)
+        search = self.request.GET.get("search", None)
 
         additional_filters = {}
 
@@ -178,14 +178,14 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
             else:
                 additional_filters["semester"] = semester
 
-        if not query:
+        if not search:
             return super(UVListView, self).get_queryset().filter(**additional_filters)
 
         try:
             queryset = (
                 SearchQuerySet()
                 .models(self.model)
-                .autocomplete(auto=html.escape(query))
+                .autocomplete(auto=html.escape(search))
             )
         except TypeError:
             return self.model.objects.none()
