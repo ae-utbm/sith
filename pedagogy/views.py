@@ -31,8 +31,10 @@ from django.views.generic import (
     FormView,
     View,
 )
-from django.core.urlresolvers import reverse_lazy
+from django.core import serializers
 from django.utils import html
+from django.http import HttpResponse
+from django.core.urlresolvers import reverse_lazy
 
 from core.views import (
     DetailFormView,
@@ -146,6 +148,17 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
     model = UV
     ordering = ["code"]
     template_name = "pedagogy/guide.jinja"
+
+    def get(self, *args, **kwargs):
+        if not self.request.GET.get("json", None):
+            # Return normal full template response
+            return super(UVListView, self).get(*args, **kwargs)
+
+        # Return serialized response
+        return HttpResponse(
+            serializers.serialize("json", self.get_queryset()),
+            content_type="application/json",
+        )
 
     def get_queryset(self):
         query = self.request.GET.get("query", None)
