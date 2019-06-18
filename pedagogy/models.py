@@ -211,7 +211,7 @@ class UVComment(models.Model):
         null=False,
         default=-1,
     )
-    publish_date = models.DateField(_("publish date"), auto_now=True)
+    publish_date = models.DateTimeField(_("publish date"), auto_now=True)
 
 
 class UVResult(models.Model):
