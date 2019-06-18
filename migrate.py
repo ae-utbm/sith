@@ -77,7 +77,7 @@ from forum.models import (
     ForumMessageMeta,
     ForumUserInfo,
 )
-from pedagogy.models import UV, UVComment
+from pedagogy.models import UV, UVComment, UVResult
 
 db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
 start = datetime.datetime.now()
@@ -1641,6 +1641,22 @@ def migrate_pedagogy():
             grade_teaching=convert_number(comment["note_enseignement"], -1),
             grade_work_load=convert_number(comment["note_travail"], -1),
             publish_date=comment["date"],
+        ).save()
+
+    print("Migrating UV Results")
+    cur.execute("SELECT * FROM pedag_resultat")
+
+    for result in cur:
+        author = User.objects.filter(id=comment["id_utilisateur"]).first()
+        uv = UV.objects.filter(id=comment["id_uv"]).first()
+        if not author or not uv:
+            continue
+        UVResult(
+            id=result["id_resultat"],
+            uv=uv,
+            user=author,
+            grade=result["note"],
+            semester=result["semestre"],
         ).save()
 
 
