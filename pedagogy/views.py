@@ -32,6 +32,7 @@ from django.views.generic import (
     View,
 )
 from django.core.urlresolvers import reverse_lazy
+from django.utils import html
 
 from core.views import (
     DetailFormView,
@@ -40,6 +41,8 @@ from core.views import (
     CanViewMixin,
     CanEditPropMixin,
 )
+
+from haystack.query import SearchQuerySet
 
 from pedagogy.forms import UVForm, UVCommentForm
 from pedagogy.models import UV, UVComment
@@ -143,6 +146,27 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
     model = UV
     ordering = ["code"]
     template_name = "pedagogy/guide.jinja"
+
+    def get_queryset(self):
+        query = self.request.GET.get("query", None)
+
+        if not query:
+            return super(UVListView, self).get_queryset()
+
+        try:
+            queryset = (
+                SearchQuerySet()
+                .models(self.model)
+                .autocomplete(auto=html.escape(query))
+            )
+        except TypeError:
+            return self.model.objects.none()
+
+        return (
+            super(UVListView, self)
+            .get_queryset()
+            .filter(id__in=([o.object.id for o in queryset]))
+        )
 
 
 class UVCommentReportCreateView(CreateView):
