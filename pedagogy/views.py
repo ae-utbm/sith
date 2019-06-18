@@ -150,9 +150,10 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
     template_name = "pedagogy/guide.jinja"
 
     def get(self, *args, **kwargs):
+        resp = super(UVListView, self).get(*args, **kwargs)
         if not self.request.GET.get("json", None):
             # Return normal full template response
-            return super(UVListView, self).get(*args, **kwargs)
+            return resp
 
         # Return serialized response
         return HttpResponse(
@@ -163,8 +164,22 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
     def get_queryset(self):
         query = self.request.GET.get("query", None)
 
+        additional_filters = {}
+
+        for filter_type in ["credit_type", "language", "department"]:
+            arg = self.request.GET.get(filter_type, None)
+            if arg:
+                additional_filters[filter_type] = arg
+
+        semester = self.request.GET.get("semester", None)
+        if semester:
+            if semester in ["AUTUMN", "SPRING"]:
+                additional_filters["semester__in"] = [semester, "AUTOMN_AND_SPRING"]
+            else:
+                additional_filters["semester"] = semester
+
         if not query:
-            return super(UVListView, self).get_queryset()
+            return super(UVListView, self).get_queryset().filter(**additional_filters)
 
         try:
             queryset = (
@@ -179,6 +194,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
             super(UVListView, self)
             .get_queryset()
             .filter(id__in=([o.object.id for o in queryset]))
+            .filter(**additional_filters)
         )
 
 
