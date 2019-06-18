@@ -98,7 +98,13 @@ class UV(models.Model):
         null=False,
     )
     # Double star type not implemented yet
-    # Departments not implemented yet
+
+    department = models.CharField(
+        _("departmenmt"),
+        max_length=10,
+        choices=settings.SITH_PROFILE_DEPARTMENTS,
+        default=settings.SITH_PROFILE_DEPARTMENTS[-1][0],
+    )
 
     # All texts about the UV
     title = models.CharField(_("title"), max_length=300)
@@ -237,22 +243,6 @@ class UVResult(models.Model):
 class UVCommentReport(models.Model):
     """
     Report an inapropriate comment
-    """
-
-    pass
-
-
-class EducationDepartment(models.Model):
-    """
-    Education department of the school
-    """
-
-    pass
-
-
-class StudyField(models.Model):
-    """
-    Speciality inside an Education Department
     """
 
     pass

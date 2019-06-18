@@ -43,6 +43,7 @@ class UVForm(forms.ModelForm):
             "credit_type",
             "semester",
             "language",
+            "department",
             "credits",
             "hours_CM",
             "hours_TD",

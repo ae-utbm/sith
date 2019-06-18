@@ -217,35 +217,3 @@ class UVUpdateView(CanEditPropMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.id})
-
-
-class EducationDepartmentCreateView(CreateView):
-    """
-    Add a new Education Department (Privileged)
-    """
-
-    pass
-
-
-class EducationDepartmentDeleteView(DeleteView):
-    """
-    Allow to delete an Education Department (Privileged)
-    """
-
-    pass
-
-
-class StudyFieldCreateView(CreateView):
-    """
-    Add a new Study Field (Privileged)
-    """
-
-    pass
-
-
-class StudyFieldDeleteView(DeleteView):
-    """
-    Allow to delete an Study Field (Privileged)
-    """
-
-    pass

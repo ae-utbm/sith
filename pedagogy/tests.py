@@ -41,6 +41,7 @@ def create_uv_template(user_id, code="IFC1", exclude_list=[]):
         "credit_type": "TM",
         "semester": "SPRING",
         "language": "FR",
+        "department": "TC",
         "credits": 3,
         "hours_CM": 10,
         "hours_TD": 28,

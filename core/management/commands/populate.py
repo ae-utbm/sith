@@ -1113,6 +1113,7 @@ Welcome to the wiki page!
                 manager="Laurent HEYBERGER",
                 semester=settings.SITH_PEDAGOGY_UV_SEMESTER[3][0],
                 language=settings.SITH_PEDAGOGY_UV_LANGUAGE[0][0],
+                department=settings.SITH_PROFILE_DEPARTMENTS[-2][0],
                 credits=5,
                 title="Participation dans une association étudiante",
                 objectives="* Permettre aux étudiants de réaliser, pendant un semestre, un projet culturel ou associatif et de le valoriser.",

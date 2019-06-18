@@ -7,6 +7,7 @@
 {% block content %}
 	<p><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
 	<h1>{{ object.code }} - {{ object.title }}</h1>
+	<p>{% trans %}Department: {% endtrans %}{{ object.department }}</p>
 	<p>{{ object.objectives|markdown }}</p>
 	<p>{{ object.program|markdown }}</p>
 	<p>{{ object.skills|markdown }}</p>
