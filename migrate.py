@@ -1581,6 +1581,12 @@ def migrate_pedagogy():
         "AP": "AUTOMN_AND_SPRING",
     }
 
+    def department_conversion(department):
+        # Default of this enum is HUMA
+        if not department or department == "Humas":
+            return "HUMA"
+        return department
+
     def convert_number(num, default=0):
         if not num:
             return default
@@ -1607,7 +1613,7 @@ def migrate_pedagogy():
             semester=semester_conversion[uv["semestre"]],
             language="FR",  # No infos in previous guide about that
             credits=convert_number(uv["guide_credits"]),
-            department=convert_text(uv["departement"]),
+            department=department_conversion(uv["departement"]),
             title=convert_text(uv["intitule"]),
             manager=convert_text(uv["responsable"]),
             objectives=convert_text(uv["guide_objectifs"]),
