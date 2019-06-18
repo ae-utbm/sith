@@ -24,6 +24,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from django.core import validators
 from django.conf import settings
 
@@ -211,7 +212,12 @@ class UVComment(models.Model):
         null=False,
         default=-1,
     )
-    publish_date = models.DateTimeField(_("publish date"), auto_now=True)
+    publish_date = models.DateTimeField(_("publish date"), blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.publish_date is None:
+            self.publish_date = timezone.now()
+        super(UVComment, self).save(*args, **kwargs)
 
 
 class UVResult(models.Model):

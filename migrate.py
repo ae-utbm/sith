@@ -1640,7 +1640,7 @@ def migrate_pedagogy():
             grade_interest=convert_number(comment["note_interet"], -1),
             grade_teaching=convert_number(comment["note_enseignement"], -1),
             grade_work_load=convert_number(comment["note_travail"], -1),
-            publish_date=comment["date"],
+            publish_date=comment["date"].replace(tzinfo=timezone("Europe/Paris")),
         ).save()
 
     print("Migrating UV Results")
