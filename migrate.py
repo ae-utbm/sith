@@ -77,6 +77,7 @@ from forum.models import (
     ForumMessageMeta,
     ForumUserInfo,
 )
+from pedagogy.models import UV, UVComment, UVResult
 
 db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
 start = datetime.datetime.now()
@@ -1568,6 +1569,103 @@ def migrate_club_again():
             pass
 
 
+def migrate_pedagogy():
+    cur = db.cursor(MySQLdb.cursors.SSDictCursor)
+
+    print("Migrating UVs")
+    root = User.objects.get(id=0)
+    semester_conversion = {
+        "closed": "CLOSED",
+        "A": "AUTUMN",
+        "P": "SPRING",
+        "AP": "AUTOMN_AND_SPRING",
+    }
+
+    def department_conversion(department):
+        # Default of this enum is HUMA
+        if not department or department == "Humas":
+            return "HUMA"
+        return department
+
+    def convert_number(num, default=0):
+        if not num:
+            return default
+        return num
+
+    def convert_text(text):
+        if not text:
+            return ""
+        return doku_to_markdown(to_unicode(text))
+
+    cur.execute(
+        """
+    SELECT * FROM pedag_uv
+    LEFT JOIN pedag_uv_dept dept
+    ON dept.id_uv = pedag_uv.id_uv
+    """
+    )
+    for uv in cur:
+        UV(
+            id=uv["id_uv"],
+            code=uv["code"],
+            author=root,
+            credit_type=uv["type"],
+            semester=semester_conversion[uv["semestre"]],
+            language="FR",  # No infos in previous guide about that
+            credits=convert_number(uv["guide_credits"]),
+            department=department_conversion(uv["departement"]),
+            title=convert_text(uv["intitule"]),
+            manager=convert_text(uv["responsable"]),
+            objectives=convert_text(uv["guide_objectifs"]),
+            program=convert_text(uv["guide_programme"]),
+            skills="",  # No info in previous guide about that
+            key_concepts="",  # No info either
+            hours_CM=convert_number(uv["guide_c"]),
+            hours_TD=convert_number(uv["guide_td"]),
+            hours_TP=convert_number(uv["guide_tp"]),
+            hours_THE=convert_number(uv["guide_the"]),
+            hours_TE=0,  # No info either
+        ).save()
+
+    print("Migrating UV Comments")
+
+    cur.execute("SELECT * FROM pedag_uv_commentaire")
+
+    for comment in cur:
+        author = User.objects.filter(id=comment["id_utilisateur"]).first()
+        uv = UV.objects.filter(id=comment["id_uv"]).first()
+        if not author or not uv:
+            continue
+        UVComment(
+            id=comment["id_commentaire"],
+            author=author,
+            uv=uv,
+            comment=convert_text(comment["content"]),
+            grade_global=convert_number(comment["note_generale"], -1),
+            grade_utility=convert_number(comment["note_utilite"], -1),
+            grade_interest=convert_number(comment["note_interet"], -1),
+            grade_teaching=convert_number(comment["note_enseignement"], -1),
+            grade_work_load=convert_number(comment["note_travail"], -1),
+            publish_date=comment["date"].replace(tzinfo=timezone("Europe/Paris")),
+        ).save()
+
+    print("Migrating UV Results")
+    cur.execute("SELECT * FROM pedag_resultat")
+
+    for result in cur:
+        author = User.objects.filter(id=comment["id_utilisateur"]).first()
+        uv = UV.objects.filter(id=comment["id_uv"]).first()
+        if not author or not uv:
+            continue
+        UVResult(
+            id=result["id_resultat"],
+            uv=uv,
+            user=author,
+            grade=result["note"],
+            semester=result["semestre"],
+        ).save()
+
+
 def main():
     print("Start at %s" % start)
     # Core
@@ -1590,7 +1688,8 @@ def main():
     # migrate_forum()
     # reset_index('forum')
     # migrate_mailings()
-    migrate_club_again()
+    # migrate_club_again()
+    migrate_pedagogy()
     end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end - start))
