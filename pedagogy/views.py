@@ -35,6 +35,7 @@ from django.core import serializers
 from django.utils import html
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse_lazy
+from django.shortcuts import get_object_or_404
 
 from core.views import (
     DetailFormView,
@@ -46,8 +47,8 @@ from core.views import (
 
 from haystack.query import SearchQuerySet
 
-from pedagogy.forms import UVForm, UVCommentForm
-from pedagogy.models import UV, UVComment
+from pedagogy.forms import UVForm, UVCommentForm, UVCommentReportForm
+from pedagogy.models import UV, UVComment, UVCommentReport
 
 # Some mixins
 
@@ -200,25 +201,34 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
         return queryset.filter(id__in=([o.object.id for o in qs]))
 
 
-class UVCommentReportCreateView(CreateView):
+class UVCommentReportCreateView(CanCreateMixin, CreateView):
     """
     Create a new report for an inapropriate comment
     """
 
-    pass
+    model = UVCommentReport
+    form_class = UVCommentReportForm
+    template_name = "core/edit.jinja"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.uv_comment = get_object_or_404(UVComment, pk=kwargs["comment_id"])
+        return super(UVCommentReportCreateView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(UVCommentReportCreateView, self).get_form_kwargs()
+        kwargs["reporter_id"] = self.request.user.id
+        kwargs["comment_id"] = self.uv_comment.id
+        return kwargs
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "pedagogy:uv_detail", kwargs={"uv_id": self.uv_comment.uv.id}
+        )
 
 
-class UVCommentReportListView(ListView):
+class UVModerationFormView(CanEditPropMixin, FormView):
     """
-    List all UV reports for moderation (Privileged)
-    """
-
-    pass
-
-
-class UVModerationFormView(FormView):
-    """
-    List all UVs to moderate and allow to moderate them (Privileged)
+    Moderation interface (Privileged)
     """
 
     pass

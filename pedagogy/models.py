@@ -176,7 +176,7 @@ class UVComment(models.Model):
         blank=False,
     )
     uv = models.ForeignKey(UV, related_name="comments", verbose_name=_("uv"))
-    comment = models.TextField(_("comment"))
+    comment = models.TextField(_("comment"), blank=True)
     grade_global = models.IntegerField(
         _("global grade"),
         validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
@@ -251,4 +251,19 @@ class UVCommentReport(models.Model):
     Report an inapropriate comment
     """
 
-    pass
+    def is_owned_by(self, user):
+        """
+        Is owned by a pedagogy admin, a superuser or the author himself
+        """
+        return self.reporter == user or user.is_owner(self.comment.uv)
+
+    comment = models.ForeignKey(
+        UVComment,
+        related_name="reports",
+        verbose_name=_("report"),
+        on_delete=models.CASCADE,
+    )
+    reporter = models.ForeignKey(
+        User, related_name="reported_uv_comment", verbose_name=_("reporter")
+    )
+    reason = models.TextField(_("reason"))
