@@ -12,6 +12,7 @@
 	<p>{{ object.program|markdown }}</p>
 	<p>{{ object.skills|markdown }}</p>
 	<p>{{ object.key_concepts|markdown }}</p>
+	<p>{% trans %}UV manager: {% endtrans %}{{ object.manager }}</p>
 
 	{% if object.comments.exists() %}
 		<h2>{% trans %}Comments{% endtrans %}</h2>
@@ -21,7 +22,7 @@
 			<p>{{ comment.grade_interest }}</p>
 			<p>{{ comment.grade_teaching }}</p>
 			<p>{{ comment.grade_work_load }}</p>
-			<p>{{ comment.comment }}</p>
+			<p>{{ comment.comment|markdown }}</p>
 			<p>{% trans %}Published: {% endtrans %}{{ comment.publish_date }}</p>
 			<p>{% trans %}Author: {% endtrans %}{{ comment.author }}</p>
 			{% if user.is_owner(comment) %}

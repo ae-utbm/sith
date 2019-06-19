@@ -31,6 +31,9 @@ from django.views.generic import (
     FormView,
     View,
 )
+from django.core import serializers
+from django.utils import html
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse_lazy
 
 from core.views import (
@@ -40,6 +43,8 @@ from core.views import (
     CanViewMixin,
     CanEditPropMixin,
 )
+
+from haystack.query import SearchQuerySet
 
 from pedagogy.forms import UVForm, UVCommentForm
 from pedagogy.models import UV, UVComment
@@ -143,6 +148,56 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
     model = UV
     ordering = ["code"]
     template_name = "pedagogy/guide.jinja"
+
+    def get(self, *args, **kwargs):
+        resp = super(UVListView, self).get(*args, **kwargs)
+        if not self.request.GET.get("json", None):
+            # Return normal full template response
+            return resp
+
+        # Return serialized response
+        return HttpResponse(
+            serializers.serialize("json", self.get_queryset()),
+            content_type="application/json",
+        )
+
+    def get_queryset(self):
+        queryset = super(UVListView, self).get_queryset()
+        search = self.request.GET.get("search", None)
+
+        additional_filters = {}
+
+        for filter_type in ["credit_type", "language", "department"]:
+            arg = self.request.GET.get(filter_type, None)
+            if arg:
+                additional_filters[filter_type] = arg
+
+        semester = self.request.GET.get("semester", None)
+        if semester:
+            if semester in ["AUTUMN", "SPRING"]:
+                additional_filters["semester__in"] = [semester, "AUTOMN_AND_SPRING"]
+            else:
+                additional_filters["semester"] = semester
+
+        queryset = queryset.filter(**additional_filters)
+        if not search:
+            return queryset
+
+        if len(search) == 1:
+            # It's a search with only one letter
+            # Hastack doesn't work well with only one letter
+            return queryset.filter(code__startswith=search)
+
+        try:
+            qs = (
+                SearchQuerySet()
+                .models(self.model)
+                .autocomplete(auto=html.escape(search))
+            )
+        except TypeError:
+            return self.model.objects.none()
+
+        return queryset.filter(id__in=([o.object.id for o in qs]))
 
 
 class UVCommentReportCreateView(CreateView):
