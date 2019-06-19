@@ -162,6 +162,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
         )
 
     def get_queryset(self):
+        queryset = super(UVListView, self).get_queryset()
         search = self.request.GET.get("search", None)
 
         additional_filters = {}
@@ -178,11 +179,17 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
             else:
                 additional_filters["semester"] = semester
 
+        queryset = queryset.filter(**additional_filters)
         if not search:
-            return super(UVListView, self).get_queryset().filter(**additional_filters)
+            return queryset
+
+        if len(search) == 1:
+            # It's a search with only one letter
+            # Hastack doesn't work well with only one letter
+            return queryset.filter(code__startswith=search)
 
         try:
-            queryset = (
+            qs = (
                 SearchQuerySet()
                 .models(self.model)
                 .autocomplete(auto=html.escape(search))
@@ -190,12 +197,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
         except TypeError:
             return self.model.objects.none()
 
-        return (
-            super(UVListView, self)
-            .get_queryset()
-            .filter(id__in=([o.object.id for o in queryset]))
-            .filter(**additional_filters)
-        )
+        return queryset.filter(id__in=([o.object.id for o in qs]))
 
 
 class UVCommentReportCreateView(CreateView):
