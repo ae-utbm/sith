@@ -566,3 +566,164 @@ class UVCommentUpdateTest(TestCase):
         )
         self.assertEquals(response.status_code, 200)
         self.assertEquals(self.comment.author, self.krophil)
+
+
+class UVSearchTest(TestCase):
+    """
+    Test UV guide rights for view and API
+    Test that the API is working well
+    """
+
+    def setUp(self):
+        call_command("populate")
+        call_command("update_index", "pedagogy")
+
+    def test_get_page_authorized_success(self):
+        # Test with root user
+        self.client.login(username="root", password="plop")
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertEquals(response.status_code, 200)
+
+        # Test with pedagogy admin
+        self.client.login(username="tutu", password="plop")
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertEquals(response.status_code, 200)
+
+        # Test with subscribed user
+        self.client.login(username="sli", password="plop")
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertEquals(response.status_code, 200)
+
+    def test_get_page_unauthorized_fail(self):
+        # Test with anonymous user
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertEquals(response.status_code, 403)
+
+        # Test with not subscribed user
+        self.client.login(username="guy", password="plop")
+        response = self.client.get(reverse("pedagogy:guide"))
+        self.assertEquals(response.status_code, 403)
+
+    def test_search_pa00_success(self):
+        self.client.login(username="sli", password="plop")
+
+        # Search with UV code
+        response = self.client.get(reverse("pedagogy:guide"), {"search": "PA00"})
+        self.assertContains(response, text="PA00")
+
+        # Search with first letter of UV code
+        response = self.client.get(reverse("pedagogy:guide"), {"search": "P"})
+        self.assertContains(response, text="PA00")
+
+        # Search with UV manager
+        response = self.client.get(reverse("pedagogy:guide"), {"search": "HEYBERGER"})
+        self.assertContains(response, text="PA00")
+
+        # Search with department
+        response = self.client.get(reverse("pedagogy:guide"), {"department": "HUMA"})
+        self.assertContains(response, text="PA00")
+
+        # Search with semester
+        response = self.client.get(reverse("pedagogy:guide"), {"semester": "AUTUMN"})
+        self.assertContains(response, text="PA00")
+
+        response = self.client.get(reverse("pedagogy:guide"), {"semester": "SPRING"})
+        self.assertContains(response, text="PA00")
+
+        response = self.client.get(
+            reverse("pedagogy:guide"), {"semester": "AUTOMN_AND_SPRING"}
+        )
+        self.assertContains(response, text="PA00")
+
+        # Search with language
+        response = self.client.get(reverse("pedagogy:guide"), {"language": "FR"})
+        self.assertContains(response, text="PA00")
+
+        # Search with credit type
+        response = self.client.get(reverse("pedagogy:guide"), {"credit_type": "OM"})
+        self.assertContains(response, text="PA00")
+
+        # Search with combinaison of all
+        response = self.client.get(
+            reverse("pedagogy:guide"),
+            {
+                "search": "P",
+                "department": "HUMA",
+                "semester": "AUTUMN",
+                "language": "FR",
+                "credit_type": "OM",
+            },
+        )
+        self.assertContains(response, text="PA00")
+
+        # Test json briefly
+        response = self.client.get(
+            reverse("pedagogy:guide"),
+            {
+                "json": "t",
+                "search": "P",
+                "department": "HUMA",
+                "semester": "AUTUMN",
+                "language": "FR",
+                "credit_type": "OM",
+            },
+        )
+        self.assertJSONEqual(
+            response.content,
+            [
+                {
+                    "model": "pedagogy.uv",
+                    "pk": 1,
+                    "fields": {
+                        "code": "PA00",
+                        "author": 0,
+                        "credit_type": "OM",
+                        "semester": "AUTOMN_AND_SPRING",
+                        "language": "FR",
+                        "credits": 5,
+                        "department": "HUMA",
+                        "title": "Participation dans une association \u00e9tudiante",
+                        "manager": "Laurent HEYBERGER",
+                        "objectives": "* Permettre aux \u00e9tudiants de r\u00e9aliser, pendant un semestre, un projet culturel ou associatif et de le valoriser.",
+                        "program": "* Semestre pr\u00e9c\u00e9dent proposition d'un projet et d'un cahier des charges\n* Evaluation par un jury de six membres\n* Si accord r\u00e9alisation dans le cadre de l'UV\n* Compte-rendu de l'exp\u00e9rience\n* Pr\u00e9sentation",
+                        "skills": "* G\u00e9rer un projet associatif ou une action \u00e9ducative en autonomie:\n* en produisant un cahier des charges qui -d\u00e9finit clairement le contexte du projet personnel -pose les jalons de ce projet -estime de mani\u00e8re r\u00e9aliste les moyens et objectifs du projet -d\u00e9finit exactement les livrables attendus\n    * en \u00e9tant capable de respecter ce cahier des charges ou, le cas \u00e9ch\u00e9ant, de r\u00e9viser le cahier des charges de mani\u00e8re argument\u00e9e.\n* Relater son exp\u00e9rience dans un rapport:\n* qui permettra \u00e0 d'autres \u00e9tudiants de poursuivre les actions engag\u00e9es\n* qui montre la capacit\u00e9 \u00e0 s'auto-\u00e9valuer et \u00e0 adopter une distance critique sur son action.",
+                        "key_concepts": "* Autonomie\n* Responsabilit\u00e9\n* Cahier des charges\n* Gestion de projet",
+                        "hours_CM": 0,
+                        "hours_TD": 0,
+                        "hours_TP": 0,
+                        "hours_THE": 121,
+                        "hours_TE": 4,
+                    },
+                }
+            ],
+        )
+
+    def test_search_pa00_fail(self):
+
+        # Search with UV code
+        response = self.client.get(reverse("pedagogy:guide"), {"search": "IFC"})
+        self.assertNotContains(response, text="PA00")
+
+        # Search with first letter of UV code
+        response = self.client.get(reverse("pedagogy:guide"), {"search": "I"})
+        self.assertNotContains(response, text="PA00")
+
+        # Search with UV manager
+        response = self.client.get(reverse("pedagogy:guide"), {"search": "GILLES"})
+        self.assertNotContains(response, text="PA00")
+
+        # Search with department
+        response = self.client.get(reverse("pedagogy:guide"), {"department": "TC"})
+        self.assertNotContains(response, text="PA00")
+
+        # Search with semester
+        response = self.client.get(reverse("pedagogy:guide"), {"semester": "CLOSED"})
+        self.assertNotContains(response, text="PA00")
+
+        # Search with language
+        response = self.client.get(reverse("pedagogy:guide"), {"language": "EN"})
+        self.assertNotContains(response, text="PA00")
+
+        # Search with credit type
+        response = self.client.get(reverse("pedagogy:guide"), {"credit_type": "TM"})
+        self.assertNotContains(response, text="PA00")

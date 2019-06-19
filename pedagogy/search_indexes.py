@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2017
+# Copyright 2019
 # - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
