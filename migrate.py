@@ -1690,6 +1690,7 @@ def main():
     # migrate_mailings()
     # migrate_club_again()
     migrate_pedagogy()
+    reset_index("pedagogy")
     end = datetime.datetime.now()
     print("End at %s" % end)
     print("Running time: %s" % (end - start))
