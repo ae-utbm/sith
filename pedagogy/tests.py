@@ -956,3 +956,58 @@ class UVModerationFormTest(TestCase):
         # Test that report and comment 2 still exists
         self.assertTrue(UVCommentReport.objects.filter(id=self.report_2.id).exists())
         self.assertTrue(UVComment.objects.filter(id=self.comment_2.id).exists())
+
+
+class UVCommentReportCreateTest(TestCase):
+    """
+    Test report creation view view
+    Assert access rights and if you can create with it
+    """
+
+    def setUp(self):
+        call_command("populate")
+
+        self.krophil = User.objects.get(username="krophil")
+
+        # Prepare a comment
+        comment_kwargs = create_uv_comment_template(self.krophil.id)
+        comment_kwargs["author"] = self.krophil
+        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
+        self.comment = UVComment(**comment_kwargs)
+        self.comment.save()
+
+    def create_report_test(self, username, success):
+        self.client.login(username=username, password="plop")
+        response = self.client.post(
+            reverse("pedagogy:comment_report", kwargs={"comment_id": self.comment.id}),
+            {
+                "comment": self.comment.id,
+                "reporter": User.objects.get(username=username).id,
+                "reason": "C'est moche",
+            },
+        )
+        if success:
+            self.assertEquals(response.status_code, 302)
+        else:
+            self.assertEquals(response.status_code, 403)
+        self.assertEquals(UVCommentReport.objects.all().exists(), success)
+
+    def test_create_report_root_success(self):
+        self.create_report_test("root", True)
+
+    def test_create_report_pedagogy_admin_success(self):
+        self.create_report_test("tutu", True)
+
+    def test_create_report_subscriber_success(self):
+        self.create_report_test("sli", True)
+
+    def test_create_report_unsubscribed_fail(self):
+        self.create_report_test("guy", False)
+
+    def test_create_report_anonymous_fail(self):
+        response = self.client.post(
+            reverse("pedagogy:comment_report", kwargs={"comment_id": self.comment.id}),
+            {"comment": self.comment.id, "reporter": 0, "reason": "C'est moche"},
+        )
+        self.assertEquals(response.status_code, 403)
+        self.assertFalse(UVCommentReport.objects.all().exists())

@@ -253,9 +253,9 @@ class UVCommentReport(models.Model):
 
     def is_owned_by(self, user):
         """
-        Is owned by a pedagogy admin, a superuser or the author himself
+        Can be created by a pedagogy admin, a superuser or a subscriber
         """
-        return self.reporter == user or user.is_owner(self.comment.uv)
+        return user.is_subscribed or user.is_owner(self.comment.uv)
 
     comment = models.ForeignKey(
         UVComment,
