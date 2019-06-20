@@ -34,6 +34,7 @@ from django.views.generic import (
 from django.core import serializers
 from django.utils import html
 from django.http import HttpResponse
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import get_object_or_404
 
@@ -47,7 +48,12 @@ from core.views import (
 
 from haystack.query import SearchQuerySet
 
-from pedagogy.forms import UVForm, UVCommentForm, UVCommentReportForm
+from pedagogy.forms import (
+    UVForm,
+    UVCommentForm,
+    UVCommentReportForm,
+    UVCommentModerationForm,
+)
 from pedagogy.models import UV, UVComment, UVCommentReport
 
 # Some mixins
@@ -226,12 +232,27 @@ class UVCommentReportCreateView(CanCreateMixin, CreateView):
         )
 
 
-class UVModerationFormView(CanEditPropMixin, FormView):
+class UVModerationFormView(FormView):
     """
     Moderation interface (Privileged)
     """
 
-    pass
+    form_class = UVCommentModerationForm
+    template_name = "pedagogy/moderation.jinja"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_owner(UV()):
+            raise PermissionDenied
+        return super(UVModerationFormView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form_clean = form.clean()
+        for report in form_clean.get("reports", []):
+            report.comment.delete()
+        return super(UVModerationFormView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("pedagogy:moderation")
 
 
 class UVCreateView(CanCreateMixin, CreateView):

@@ -23,6 +23,7 @@
 #
 
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from core.views.forms import MarkdownInput
 from core.models import User
@@ -122,3 +123,15 @@ class UVCommentReportForm(forms.ModelForm):
         self.fields["reporter"].initial = reporter_id
         self.fields["comment"].queryset = UVComment.objects.filter(id=comment_id).all()
         self.fields["comment"].initial = comment_id
+
+
+class UVCommentModerationForm(forms.Form):
+    """
+    Form handeling bulk comment deletion
+    """
+
+    reports = forms.ModelMultipleChoiceField(
+        UVCommentReport.objects.all(),
+        label=_("Reported comments"),
+        widget=forms.CheckboxSelectMultiple,
+    )
