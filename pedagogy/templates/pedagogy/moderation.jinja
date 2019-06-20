@@ -6,9 +6,9 @@
 {% endblock title %}
 
 {% block content %}
-<form action="{{ url('pedagogy:moderation') }}", id="moderation_form" method="post" enctype="multipart/form-data">
+<form action="{{ url('pedagogy:moderation') }}", id="moderation_delete_form" method="post" enctype="multipart/form-data">
 	{% csrf_token %}
-	<p style="margin-bottom: 1em;">{{ select_all_checkbox("moderation_form") }}</p>
+	<p style="margin-bottom: 1em;">{{ select_all_checkbox("moderation_delete_form") }}</p>
 	<table>
 		<thead>
 			<tr>
@@ -19,8 +19,8 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% set queryset = form.reports.field.queryset %}
-			{% for widget in form.reports.subwidgets %}
+			{% set queryset = form.accepted_reports.field.queryset %}
+			{% for widget in form.accepted_reports.subwidgets %}
 			{% set report = queryset.get(id=widget.data.value) %}
 			<tr>
 				<td>{{ report.comment.uv }}</td>
@@ -32,5 +32,32 @@
 		</tbody>
 	</table>
 	<p><input type="submit" value="{% trans %}Delete comments{% endtrans %}"></p>
+</form>
+<form action="{{ url('pedagogy:moderation') }}", id="moderation_keep_form" method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	<p style="margin-bottom: 1em;">{{ select_all_checkbox("moderation_keep_form") }}</p>
+	<table>
+		<thead>
+			<tr>
+				<td>{% trans %}UV{% endtrans %}</td>
+				<td>{% trans %}Comment{% endtrans %}</td>
+				<td>{% trans %}Reason{% endtrans %}</td>
+				<td>{% trans %}Delete{% endtrans %}</td>
+			</tr>
+		</thead>
+		<tbody>
+			{% set queryset = form.denied_reports.field.queryset %}
+			{% for widget in form.denied_reports.subwidgets %}
+			{% set report = queryset.get(id=widget.data.value) %}
+			<tr>
+				<td>{{ report.comment.uv }}</td>
+				<td>{{ report.comment.comment|markdown }}</td>
+				<td>{{ report.reason|markdown }}</td>
+				<td>{{ widget.tag() }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<p><input type="submit" value="{% trans %}Delete report{% endtrans %}"></p>
 </form>
 {% endblock content %}

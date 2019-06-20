@@ -247,8 +247,10 @@ class UVModerationFormView(FormView):
 
     def form_valid(self, form):
         form_clean = form.clean()
-        for report in form_clean.get("reports", []):
-            report.comment.delete()
+        for report in form_clean.get("accepted_reports", []):
+            report.comment.delete()  # Delete the related comment
+        for report in form_clean.get("denied_reports", []):
+            report.delete()  # Delete the report itself
         return super(UVModerationFormView, self).form_valid(form)
 
     def get_success_url(self):

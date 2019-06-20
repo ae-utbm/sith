@@ -130,8 +130,16 @@ class UVCommentModerationForm(forms.Form):
     Form handeling bulk comment deletion
     """
 
-    reports = forms.ModelMultipleChoiceField(
+    accepted_reports = forms.ModelMultipleChoiceField(
         UVCommentReport.objects.all(),
-        label=_("Reported comments"),
+        label=_("Accepted reports"),
         widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    denied_reports = forms.ModelMultipleChoiceField(
+        UVCommentReport.objects.all(),
+        label=_("Denied reports"),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
     )
