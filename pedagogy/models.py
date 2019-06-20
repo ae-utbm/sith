@@ -27,6 +27,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
 from django.conf import settings
+from django.utils.functional import cached_property
 
 from core.models import User
 
@@ -164,6 +165,13 @@ class UVComment(models.Model):
         Is owned by a pedagogy admin, a superuser or the author himself
         """
         return self.author == user or user.is_owner(self.uv)
+
+    @cached_property
+    def is_reported(self):
+        """
+        Return True if someone reported this UV
+        """
+        return self.reports.exists()
 
     def __str__(self):
         return "%s - %s" % (self.uv, self.author)
