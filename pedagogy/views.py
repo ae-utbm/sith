@@ -34,7 +34,7 @@ from django.views.generic import (
 from django.core import serializers
 from django.utils import html
 from django.http import HttpResponse
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import get_object_or_404
 
@@ -248,9 +248,17 @@ class UVModerationFormView(FormView):
     def form_valid(self, form):
         form_clean = form.clean()
         for report in form_clean.get("accepted_reports", []):
-            report.comment.delete()  # Delete the related comment
+            try:
+                report.comment.delete()  # Delete the related comment
+            except ObjectDoesNotExist:
+                # To avoid errors when two reports points the same comment
+                pass
         for report in form_clean.get("denied_reports", []):
-            report.delete()  # Delete the report itself
+            try:
+                report.delete()  # Delete the report itself
+            except ObjectDoesNotExist:
+                # To avoid errors when two reports points the same comment
+                pass
         return super(UVModerationFormView, self).form_valid(form)
 
     def get_success_url(self):
