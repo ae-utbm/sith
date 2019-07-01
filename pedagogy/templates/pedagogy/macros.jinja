@@ -1,0 +1,15 @@
+{% macro display_star(grade) -%}
+
+    {% if grade >= 0 %}
+        {% for i in range(5) %}
+            {% if i <= grade %}
+                <span class="fa fa-star pedagogy star_checked"></span>
+            {% else %}
+                <span class="fa fa-star pedagogy star_not_checked"></span>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p> {% trans %} not rated {% endtrans %} </p>
+    {% endif %}
+
+{%- endmacro %}

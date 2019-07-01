@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% import "pedagogy/macros.jinja" as macros%}
 
 {% block title %}
 {% trans %}UV Details{% endtrans %}
@@ -23,11 +24,11 @@
 	{% if object.comments.exists() %}
 		<h2>{% trans %}Comments{% endtrans %}</h2>
 		{% for comment in object.comments.all() %}
-			<p>{{ comment.grade_global }}</p>
-			<p>{{ comment.grade_utility }}</p>
-			<p>{{ comment.grade_interest }}</p>
-			<p>{{ comment.grade_teaching }}</p>
-			<p>{{ comment.grade_work_load }}</p>
+			<p>{{ macros.display_star(comment.grade_global) }}</p>
+			<p>{{ macros.display_star(comment.grade_utility) }}</p>
+			<p>{{ macros.display_star(comment.grade_interest) }}</p>
+			<p>{{ macros.display_star(comment.grade_teaching) }}</p>
+			<p>{{ macros.display_star(comment.grade_work_load) }}</p>
 			<p>{{ comment.comment|markdown }}</p>
 			<p>{% trans %}Published: {% endtrans %}{{ comment.publish_date }}</p>
 			<p>{% trans %}Author: {% endtrans %}{{ comment.author }}</p>

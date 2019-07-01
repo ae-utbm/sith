@@ -24,6 +24,8 @@
 
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.forms.widgets import Widget
+from django.templatetags.static import static
 
 from core.views.forms import MarkdownInput
 from core.models import User
@@ -72,6 +74,10 @@ class UVForm(forms.ModelForm):
         self.fields["author"].initial = author_id
 
 
+class StarList(forms.NumberInput):
+    template_name = "pedagogy/starlist.jinja"
+
+
 class UVCommentForm(forms.ModelForm):
     """
     Form handeling creation and edit of an UVComment
@@ -93,6 +99,11 @@ class UVCommentForm(forms.ModelForm):
             "comment": MarkdownInput,
             "author": forms.HiddenInput,
             "uv": forms.HiddenInput,
+            "grade_global": StarList,
+            "grade_utility": StarList,
+            "grade_interest": StarList,
+            "grade_teaching": StarList,
+            "grade_work_load": StarList,
         }
 
     def __init__(self, author_id, uv_id, *args, **kwargs):

@@ -1668,3 +1668,14 @@ label {
   }
 
 }
+
+/* --------------------------------------pedagogy-----------------------------------*/
+
+.pedagogy {
+  &.star_not_checked {
+    color : gray;
+  }
+  &.star_checked {
+    color : orange;
+  }
+}
