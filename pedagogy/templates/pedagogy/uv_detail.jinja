@@ -6,47 +6,65 @@
 {% endblock %}
 
 {% block content %}
-	<p><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
-	<h1>{{ object.code }} - {{ object.title }}</h1>
-	<p>{% trans %}Department: {% endtrans %}{{ object.department }}</p>
-	<p>{{ object.objectives|markdown }}</p>
-	<p>{{ object.program|markdown }}</p>
-	<p>{{ object.skills|markdown }}</p>
-	<p>{{ object.key_concepts|markdown }}</p>
-	<p>{% trans %}UV manager: {% endtrans %}{{ object.manager }}</p>
+	<div id="pedagogy">
+		<p><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
+		<h1>{{ object.code }} - {{ object.title }}</h1>
+		<p>{{ object.department }}</p>
+		<p>{{ object.credit_type }}</p>
+		<p>{{ object.semester }}</p>
+		<p>{{ object.objectives|markdown }}</p>
+		<p>{{ object.program|markdown }}</p>
+		<p>{{ object.skills|markdown }}</p>
+		<p>{{ object.key_concepts }}</p>
+		<p>{% trans %}UV manager: {% endtrans %}{{ object.manager }}</p>
 
-	<p>{{ display_star(object.grade_global_average) }}</p>
-	<p>{{ display_star(object.grade_utility_average) }}</p>
-	<p>{{ display_star(object.grade_interest_average) }}</p>
-	<p>{{ display_star(object.grade_teaching_average) }}</p>
-	<p>{{ display_star(object.grade_work_load_average) }}</p>
+		<p>{{ display_star(object.grade_global_average) }}</p>
+		<p>{{ display_star(object.grade_utility_average) }}</p>
+		<p>{{ display_star(object.grade_interest_average) }}</p>
+		<p>{{ display_star(object.grade_teaching_average) }}</p>
+		<p>{{ display_star(object.grade_work_load_average) }}</p>
 
-	{% if object.comments.exists() %}
-		<h2>{% trans %}Comments{% endtrans %}</h2>
-		{% for comment in object.comments.all() %}
-			<p>{{ display_star(comment.grade_global) }}</p>
-			<p>{{ display_star(comment.grade_utility) }}</p>
-			<p>{{ display_star(comment.grade_interest) }}</p>
-			<p>{{ display_star(comment.grade_teaching) }}</p>
-			<p>{{ display_star(comment.grade_work_load) }}</p>
-			<p>{{ comment.comment|markdown }}</p>
-			<p>{% trans %}Published: {% endtrans %}{{ comment.publish_date }}</p>
-			<p>{% trans %}Author: {% endtrans %}{{ comment.author }}</p>
-			{% if user.is_owner(comment) %}
-				<p><a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a></p>
-				<p><a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a></p>
-			{% endif %}
-			<p><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report{% endtrans %}</a></p>
-			{% if comment.is_reported %}
-				<p>{% trans %}This comment has been reported{% endtrans %}</p>
-			{% endif %}
-		{% endfor %}
-	{% endif %}
+		{% if object.comments.exists() %}
+			<h2>{% trans %}Comments{% endtrans %}</h2>
+			{% for comment in object.comments.all() %}
+				<div class="comment">
+					<div class="dif_grade">
+						<p>{% trans %}global grade{% endtrans %}</p>
+						<p>{% trans %}utility grade{% endtrans %}</p>
+						<p>{% trans %}interest grade{% endtrans %}</p>
+						<p>{% trans %}teaching grade{% endtrans %}</p>
+						<p>{% trans %}work_load grade{% endtrans %}</p>
+					</div>
+					<div class="grade">
+						<p>{{ display_star(comment.grade_global) }}</p>
+						<p>{{ display_star(comment.grade_utility) }}</p>
+						<p>{{ display_star(comment.grade_interest) }}</p>
+						<p>{{ display_star(comment.grade_teaching) }}</p>
+						<p>{{ display_star(comment.grade_work_load) }}</p>
+					</div>
+					<p class="text">{{ comment.comment }}</p>
+					<p class="date_info">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
+					<p class="author_info">{{ comment.author }}</p>
 
-	<h2>{% trans %}Leave comment{% endtrans %}</h2>
-	<form action="{{ url('pedagogy:uv_detail', uv_id=object.id) }}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-		{{ form.as_p() }}
-        <p><input type="submit" value="{% trans %}Comment{% endtrans %}" /></p>
-	</form>
+					{# Warning, it's not displayed yet #}
+					<p><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report{% endtrans %}</a></p>
+					{% if comment.is_reported %}
+						<p>{% trans %}This comment has been reported{% endtrans %}</p>
+					{% endif %}
+
+					{% if user.is_owner(comment) %}
+						<p><a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a></p>
+						<p><a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a></p>
+					{% endif %}
+				</div>
+			{% endfor %}
+		{% endif %}
+
+		<h2>{% trans %}Leave comment{% endtrans %}</h2>
+		<form action="{{ url('pedagogy:uv_detail', uv_id=object.id) }}" method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+			{{ form.as_p() }}
+			<p><input type="submit" value="{% trans %}Comment{% endtrans %}" /></p>
+		</form>
+	</div>
 {% endblock %}
