@@ -14,6 +14,12 @@
 	<p>{{ object.key_concepts|markdown }}</p>
 	<p>{% trans %}UV manager: {% endtrans %}{{ object.manager }}</p>
 
+	<p>{{ object.grade_global_average }}</p>
+	<p>{{ object.grade_utility_average }}</p>
+	<p>{{ object.grade_interest_average }}</p>
+	<p>{{ object.grade_teaching_average }}</p>
+	<p>{{ object.grade_work_load_average }}</p>
+
 	{% if object.comments.exists() %}
 		<h2>{% trans %}Comments{% endtrans %}</h2>
 		{% for comment in object.comments.all() %}

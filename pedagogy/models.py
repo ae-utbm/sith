@@ -51,6 +51,33 @@ class UV(models.Model):
         """
         return user.is_subscribed
 
+    def __grade_average_generic(self, field):
+        comments = self.comments.filter(**{field + "__gte": 0})
+        if not comments.exists():
+            return -1
+
+        return int(sum(comments.values_list(field, flat=True)) / comments.count())
+
+    @cached_property
+    def grade_global_average(self):
+        return self.__grade_average_generic("grade_global")
+
+    @cached_property
+    def grade_utility_average(self):
+        return self.__grade_average_generic("grade_utility")
+
+    @cached_property
+    def grade_interest_average(self):
+        return self.__grade_average_generic("grade_interest")
+
+    @cached_property
+    def grade_teaching_average(self):
+        return self.__grade_average_generic("grade_teaching")
+
+    @cached_property
+    def grade_work_load_average(self):
+        return self.__grade_average_generic("grade_work_load")
+
     def __str__(self):
         return self.code
 
