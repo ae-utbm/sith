@@ -27,6 +27,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
 from django.conf import settings
+from django.utils.functional import cached_property
 
 from core.models import User
 
@@ -165,6 +166,13 @@ class UVComment(models.Model):
         """
         return self.author == user or user.is_owner(self.uv)
 
+    @cached_property
+    def is_reported(self):
+        """
+        Return True if someone reported this UV
+        """
+        return self.reports.exists()
+
     def __str__(self):
         return "%s - %s" % (self.uv, self.author)
 
@@ -176,7 +184,7 @@ class UVComment(models.Model):
         blank=False,
     )
     uv = models.ForeignKey(UV, related_name="comments", verbose_name=_("uv"))
-    comment = models.TextField(_("comment"))
+    comment = models.TextField(_("comment"), blank=True)
     grade_global = models.IntegerField(
         _("global grade"),
         validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
@@ -251,4 +259,19 @@ class UVCommentReport(models.Model):
     Report an inapropriate comment
     """
 
-    pass
+    def is_owned_by(self, user):
+        """
+        Can be created by a pedagogy admin, a superuser or a subscriber
+        """
+        return user.is_subscribed or user.is_owner(self.comment.uv)
+
+    comment = models.ForeignKey(
+        UVComment,
+        related_name="reports",
+        verbose_name=_("report"),
+        on_delete=models.CASCADE,
+    )
+    reporter = models.ForeignKey(
+        User, related_name="reported_uv_comment", verbose_name=_("reporter")
+    )
+    reason = models.TextField(_("reason"))

@@ -29,6 +29,10 @@
 				<p><a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a></p>
 				<p><a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a></p>
 			{% endif %}
+			<p><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report{% endtrans %}</a></p>
+			{% if comment.is_reported %}
+				<p>{% trans %}This comment has been reported{% endtrans %}</p>
+			{% endif %}
 		{% endfor %}
 	{% endif %}
 

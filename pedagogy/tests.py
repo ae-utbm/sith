@@ -22,13 +22,14 @@
 #
 #
 
+from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 
-from core.models import User
+from core.models import User, Notification
 
-from pedagogy.models import UV, UVComment
+from pedagogy.models import UV, UVComment, UVCommentReport
 
 
 def create_uv_template(user_id, code="IFC1", exclude_list=[]):
@@ -727,3 +728,323 @@ class UVSearchTest(TestCase):
         # Search with credit type
         response = self.client.get(reverse("pedagogy:guide"), {"credit_type": "TM"})
         self.assertNotContains(response, text="PA00")
+
+
+class UVModerationFormTest(TestCase):
+    """
+    Test moderation view
+    Assert access rights and if the form works well
+    """
+
+    def setUp(self):
+        call_command("populate")
+
+        self.krophil = User.objects.get(username="krophil")
+
+        # Prepare a comment
+        comment_kwargs = create_uv_comment_template(self.krophil.id)
+        comment_kwargs["author"] = self.krophil
+        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
+        self.comment_1 = UVComment(**comment_kwargs)
+        self.comment_1.save()
+
+        # Prepare another comment
+        comment_kwargs = create_uv_comment_template(self.krophil.id)
+        comment_kwargs["author"] = self.krophil
+        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
+        self.comment_2 = UVComment(**comment_kwargs)
+        self.comment_2.save()
+
+        # Prepare a comment report for comment 1
+        self.report_1 = UVCommentReport(
+            comment=self.comment_1, reporter=self.krophil, reason="C'est moche"
+        )
+        self.report_1.save()
+        self.report_1_bis = UVCommentReport(
+            comment=self.comment_1, reporter=self.krophil, reason="C'est moche 2"
+        )
+        self.report_1_bis.save()
+
+        # Prepare a comment report for comment 2
+        self.report_2 = UVCommentReport(
+            comment=self.comment_2, reporter=self.krophil, reason="C'est moche"
+        )
+        self.report_2.save()
+
+    def test_access_authorized_success(self):
+        # Test with root
+        self.client.login(username="root", password="plop")
+        response = self.client.get(reverse("pedagogy:moderation"))
+        self.assertEquals(response.status_code, 200)
+
+        # Test with pedagogy admin
+        self.client.login(username="tutu", password="plop")
+        response = self.client.get(reverse("pedagogy:moderation"))
+        self.assertEquals(response.status_code, 200)
+
+    def test_access_unauthorized_fail(self):
+        # Test with anonymous user
+        response = self.client.get(reverse("pedagogy:moderation"))
+        self.assertEquals(response.status_code, 403)
+
+        # Test with unsubscribed user
+        self.client.login(username="guy", password="plop")
+        response = self.client.get(reverse("pedagogy:moderation"))
+        self.assertEquals(response.status_code, 403)
+
+        # Test with subscribed user
+        self.client.login(username="sli", password="plop")
+        response = self.client.get(reverse("pedagogy:moderation"))
+        self.assertEquals(response.status_code, 403)
+
+    def test_do_nothing(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(reverse("pedagogy:moderation"))
+        self.assertEquals(response.status_code, 302)
+
+        # Test that nothing has changed
+        self.assertTrue(UVCommentReport.objects.filter(id=self.report_1.id).exists())
+        self.assertTrue(UVComment.objects.filter(id=self.comment_1.id).exists())
+        self.assertTrue(
+            UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        )
+        self.assertTrue(UVCommentReport.objects.filter(id=self.report_2.id).exists())
+        self.assertTrue(UVComment.objects.filter(id=self.comment_2.id).exists())
+
+    def test_delete_comment(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:moderation"), {"accepted_reports": [self.report_1.id]}
+        )
+        self.assertEquals(response.status_code, 302)
+
+        # Test that the comment and it's associated report has been deleted
+        self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
+        self.assertFalse(UVComment.objects.filter(id=self.comment_1.id).exists())
+        # Test that the bis report has been deleted
+        self.assertFalse(
+            UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        )
+
+        # Test that the other comment and report still exists
+        self.assertTrue(UVCommentReport.objects.filter(id=self.report_2.id).exists())
+        self.assertTrue(UVComment.objects.filter(id=self.comment_2.id).exists())
+
+    def test_delete_comment_bulk(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:moderation"),
+            {"accepted_reports": [self.report_1.id, self.report_2.id]},
+        )
+        self.assertEquals(response.status_code, 302)
+
+        # Test that comments and their associated reports has been deleted
+        self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
+        self.assertFalse(UVComment.objects.filter(id=self.comment_1.id).exists())
+        self.assertFalse(UVCommentReport.objects.filter(id=self.report_2.id).exists())
+        self.assertFalse(UVComment.objects.filter(id=self.comment_2.id).exists())
+        # Test that the bis report has been deleted
+        self.assertFalse(
+            UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        )
+
+    def test_delete_comment_with_bis(self):
+        # Test case if two reports targets the same comment and are both deleted
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:moderation"),
+            {"accepted_reports": [self.report_1.id, self.report_1_bis.id]},
+        )
+        self.assertEquals(response.status_code, 302)
+
+        # Test that the comment and it's associated report has been deleted
+        self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
+        self.assertFalse(UVComment.objects.filter(id=self.comment_1.id).exists())
+        # Test that the bis report has been deleted
+        self.assertFalse(
+            UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        )
+
+    def test_delete_report(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:moderation"), {"denied_reports": [self.report_1.id]}
+        )
+        self.assertEquals(response.status_code, 302)
+
+        # Test that the report has been deleted and that the comment still exists
+        self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
+        self.assertTrue(UVComment.objects.filter(id=self.comment_1.id).exists())
+        # Test that the bis report is still there
+        self.assertTrue(
+            UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        )
+
+        # Test that the other comment and report still exists
+        self.assertTrue(UVCommentReport.objects.filter(id=self.report_2.id).exists())
+        self.assertTrue(UVComment.objects.filter(id=self.comment_2.id).exists())
+
+    def test_delete_report_bulk(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:moderation"),
+            {
+                "denied_reports": [
+                    self.report_1.id,
+                    self.report_1_bis.id,
+                    self.report_2.id,
+                ]
+            },
+        )
+        self.assertEquals(response.status_code, 302)
+
+        # Test that every reports has been deleted
+        self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
+        self.assertFalse(
+            UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        )
+        self.assertFalse(UVCommentReport.objects.filter(id=self.report_2.id).exists())
+
+        # Test that comments still exists
+        self.assertTrue(UVComment.objects.filter(id=self.comment_1.id).exists())
+        self.assertTrue(UVComment.objects.filter(id=self.comment_2.id).exists())
+
+    def test_delete_mixed(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:moderation"),
+            {
+                "accepted_reports": [self.report_2.id],
+                "denied_reports": [self.report_1.id],
+            },
+        )
+        self.assertEquals(response.status_code, 302)
+
+        # Test that report 2 and his comment has been deleted
+        self.assertFalse(UVCommentReport.objects.filter(id=self.report_2.id).exists())
+        self.assertFalse(UVComment.objects.filter(id=self.comment_2.id).exists())
+
+        # Test that report 1 has been deleted and it's comment still exists
+        self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
+        self.assertTrue(UVComment.objects.filter(id=self.comment_1.id).exists())
+
+        # Test that report 1 bis is still there
+        self.assertTrue(
+            UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        )
+
+    def test_delete_mixed_with_bis(self):
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:moderation"),
+            {
+                "accepted_reports": [self.report_1.id],
+                "denied_reports": [self.report_1_bis.id],
+            },
+        )
+        self.assertEquals(response.status_code, 302)
+
+        # Test that report 1 and 1 bis has been deleted
+        self.assertFalse(
+            UVCommentReport.objects.filter(
+                id__in=[self.report_1.id, self.report_1_bis.id]
+            ).exists()
+        )
+
+        # Test that comment 1 has been deleted
+        self.assertFalse(UVComment.objects.filter(id=self.comment_1.id).exists())
+
+        # Test that report and comment 2 still exists
+        self.assertTrue(UVCommentReport.objects.filter(id=self.report_2.id).exists())
+        self.assertTrue(UVComment.objects.filter(id=self.comment_2.id).exists())
+
+
+class UVCommentReportCreateTest(TestCase):
+    """
+    Test report creation view view
+    Assert access rights and if you can create with it
+    """
+
+    def setUp(self):
+        call_command("populate")
+
+        self.krophil = User.objects.get(username="krophil")
+        self.tutu = User.objects.get(username="tutu")
+
+        # Prepare a comment
+        comment_kwargs = create_uv_comment_template(self.krophil.id)
+        comment_kwargs["author"] = self.krophil
+        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
+        self.comment = UVComment(**comment_kwargs)
+        self.comment.save()
+
+    def create_report_test(self, username, success):
+        self.client.login(username=username, password="plop")
+        response = self.client.post(
+            reverse("pedagogy:comment_report", kwargs={"comment_id": self.comment.id}),
+            {
+                "comment": self.comment.id,
+                "reporter": User.objects.get(username=username).id,
+                "reason": "C'est moche",
+            },
+        )
+        if success:
+            self.assertEquals(response.status_code, 302)
+        else:
+            self.assertEquals(response.status_code, 403)
+        self.assertEquals(UVCommentReport.objects.all().exists(), success)
+
+    def test_create_report_root_success(self):
+        self.create_report_test("root", True)
+
+    def test_create_report_pedagogy_admin_success(self):
+        self.create_report_test("tutu", True)
+
+    def test_create_report_subscriber_success(self):
+        self.create_report_test("sli", True)
+
+    def test_create_report_unsubscribed_fail(self):
+        self.create_report_test("guy", False)
+
+    def test_create_report_anonymous_fail(self):
+        response = self.client.post(
+            reverse("pedagogy:comment_report", kwargs={"comment_id": self.comment.id}),
+            {"comment": self.comment.id, "reporter": 0, "reason": "C'est moche"},
+        )
+        self.assertEquals(response.status_code, 403)
+        self.assertFalse(UVCommentReport.objects.all().exists())
+
+    def test_notifications(self):
+        self.assertFalse(
+            self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").exists()
+        )
+        # Create a comment report
+        self.create_report_test("tutu", True)
+
+        # Check that a notification has been created for pedagogy admins
+        self.assertTrue(
+            self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").exists()
+        )
+
+        # Check that only pedagogy admins recieves this notification
+        for notif in Notification.objects.filter(type="PEDAGOGY_MODERATION").all():
+            self.assertTrue(
+                notif.user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+            )
+
+        # Check that notifications are not duplicated if not viewed
+        self.create_report_test("tutu", True)
+        self.assertEquals(
+            self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").count(), 1
+        )
+
+        # Check that a new notification is created when the old one has been viewed
+        notif = self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").first()
+        notif.viewed = True
+        notif.save()
+
+        self.create_report_test("tutu", True)
+
+        self.assertEquals(
+            self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").count(), 2
+        )

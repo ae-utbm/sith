@@ -34,7 +34,10 @@ from django.views.generic import (
 from django.core import serializers
 from django.utils import html
 from django.http import HttpResponse
-from django.core.urlresolvers import reverse_lazy
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.urlresolvers import reverse_lazy, reverse
+from django.shortcuts import get_object_or_404
+from django.conf import settings
 
 from core.views import (
     DetailFormView,
@@ -43,11 +46,17 @@ from core.views import (
     CanViewMixin,
     CanEditPropMixin,
 )
+from core.models import RealGroup, Notification
 
 from haystack.query import SearchQuerySet
 
-from pedagogy.forms import UVForm, UVCommentForm
-from pedagogy.models import UV, UVComment
+from pedagogy.forms import (
+    UVForm,
+    UVCommentForm,
+    UVCommentReportForm,
+    UVCommentModerationForm,
+)
+from pedagogy.models import UV, UVComment, UVCommentReport
 
 # Some mixins
 
@@ -200,28 +209,82 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
         return queryset.filter(id__in=([o.object.id for o in qs]))
 
 
-class UVCommentReportCreateView(CreateView):
+class UVCommentReportCreateView(CanCreateMixin, CreateView):
     """
     Create a new report for an inapropriate comment
     """
 
-    pass
+    model = UVCommentReport
+    form_class = UVCommentReportForm
+    template_name = "core/edit.jinja"
 
+    def dispatch(self, request, *args, **kwargs):
+        self.uv_comment = get_object_or_404(UVComment, pk=kwargs["comment_id"])
+        return super(UVCommentReportCreateView, self).dispatch(request, *args, **kwargs)
 
-class UVCommentReportListView(ListView):
-    """
-    List all UV reports for moderation (Privileged)
-    """
+    def get_form_kwargs(self):
+        kwargs = super(UVCommentReportCreateView, self).get_form_kwargs()
+        kwargs["reporter_id"] = self.request.user.id
+        kwargs["comment_id"] = self.uv_comment.id
+        return kwargs
 
-    pass
+    def form_valid(self, form):
+        resp = super(UVCommentReportCreateView, self).form_valid(form)
+
+        # Send a message to moderation admins
+        for user in (
+            RealGroup.objects.filter(id=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+            .first()
+            .users.all()
+        ):
+            if not user.notifications.filter(
+                type="PEDAGOGY_MODERATION", viewed=False
+            ).exists():
+                Notification(
+                    user=user,
+                    url=reverse("pedagogy:moderation"),
+                    type="PEDAGOGY_MODERATION",
+                ).save()
+
+        return resp
+
+    def get_success_url(self):
+        return reverse_lazy(
+            "pedagogy:uv_detail", kwargs={"uv_id": self.uv_comment.uv.id}
+        )
 
 
 class UVModerationFormView(FormView):
     """
-    List all UVs to moderate and allow to moderate them (Privileged)
+    Moderation interface (Privileged)
     """
 
-    pass
+    form_class = UVCommentModerationForm
+    template_name = "pedagogy/moderation.jinja"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_owner(UV()):
+            raise PermissionDenied
+        return super(UVModerationFormView, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form_clean = form.clean()
+        for report in form_clean.get("accepted_reports", []):
+            try:
+                report.comment.delete()  # Delete the related comment
+            except ObjectDoesNotExist:
+                # To avoid errors when two reports points the same comment
+                pass
+        for report in form_clean.get("denied_reports", []):
+            try:
+                report.delete()  # Delete the report itself
+            except ObjectDoesNotExist:
+                # To avoid errors when two reports points the same comment
+                pass
+        return super(UVModerationFormView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("pedagogy:moderation")
 
 
 class UVCreateView(CanCreateMixin, CreateView):

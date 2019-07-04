@@ -23,11 +23,12 @@
 #
 
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from core.views.forms import MarkdownInput
 from core.models import User
 
-from pedagogy.models import UV, UVComment
+from pedagogy.models import UV, UVComment, UVCommentReport
 
 
 class UVForm(forms.ModelForm):
@@ -100,3 +101,45 @@ class UVCommentForm(forms.ModelForm):
         self.fields["author"].initial = author_id
         self.fields["uv"].queryset = UV.objects.filter(id=uv_id).all()
         self.fields["uv"].initial = uv_id
+
+
+class UVCommentReportForm(forms.ModelForm):
+    """
+    Form handeling creation and edit of an UVReport
+    """
+
+    class Meta:
+        model = UVCommentReport
+        fields = ("comment", "reporter", "reason")
+        widgets = {
+            "comment": forms.HiddenInput,
+            "reporter": forms.HiddenInput,
+            "reason": MarkdownInput,
+        }
+
+    def __init__(self, reporter_id, comment_id, *args, **kwargs):
+        super(UVCommentReportForm, self).__init__(*args, **kwargs)
+        self.fields["reporter"].queryset = User.objects.filter(id=reporter_id).all()
+        self.fields["reporter"].initial = reporter_id
+        self.fields["comment"].queryset = UVComment.objects.filter(id=comment_id).all()
+        self.fields["comment"].initial = comment_id
+
+
+class UVCommentModerationForm(forms.Form):
+    """
+    Form handeling bulk comment deletion
+    """
+
+    accepted_reports = forms.ModelMultipleChoiceField(
+        UVCommentReport.objects.all(),
+        label=_("Accepted reports"),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    denied_reports = forms.ModelMultipleChoiceField(
+        UVCommentReport.objects.all(),
+        label=_("Denied reports"),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )

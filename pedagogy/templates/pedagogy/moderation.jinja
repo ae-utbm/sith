@@ -1,0 +1,63 @@
+{% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import select_all_checkbox %}
+
+{% block title %}
+{% trans %}UV comment moderation{% endtrans %}
+{% endblock title %}
+
+{% block content %}
+<form action="{{ url('pedagogy:moderation') }}", id="moderation_delete_form" method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	<p style="margin-bottom: 1em;">{{ select_all_checkbox("moderation_delete_form") }}</p>
+	<table>
+		<thead>
+			<tr>
+				<td>{% trans %}UV{% endtrans %}</td>
+				<td>{% trans %}Comment{% endtrans %}</td>
+				<td>{% trans %}Reason{% endtrans %}</td>
+				<td>{% trans %}Delete{% endtrans %}</td>
+			</tr>
+		</thead>
+		<tbody>
+			{% set queryset = form.accepted_reports.field.queryset %}
+			{% for widget in form.accepted_reports.subwidgets %}
+			{% set report = queryset.get(id=widget.data.value) %}
+			<tr>
+				<td><a href="{{ url('pedagogy:uv_detail', uv_id=report.comment.uv.id) }}">{{ report.comment.uv }}</a></td>
+				<td>{{ report.comment.comment|markdown }}</td>
+				<td>{{ report.reason|markdown }}</td>
+				<td>{{ widget.tag() }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<p><input type="submit" value="{% trans %}Delete comments{% endtrans %}"></p>
+</form>
+<form action="{{ url('pedagogy:moderation') }}", id="moderation_keep_form" method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	<p style="margin-bottom: 1em;">{{ select_all_checkbox("moderation_keep_form") }}</p>
+	<table>
+		<thead>
+			<tr>
+				<td>{% trans %}UV{% endtrans %}</td>
+				<td>{% trans %}Comment{% endtrans %}</td>
+				<td>{% trans %}Reason{% endtrans %}</td>
+				<td>{% trans %}Delete{% endtrans %}</td>
+			</tr>
+		</thead>
+		<tbody>
+			{% set queryset = form.denied_reports.field.queryset %}
+			{% for widget in form.denied_reports.subwidgets %}
+			{% set report = queryset.get(id=widget.data.value) %}
+			<tr>
+				<td><a href="{{ url('pedagogy:uv_detail', uv_id=report.comment.uv.id) }}">{{ report.comment.uv }}</a></td>
+				<td>{{ report.comment.comment|markdown }}</td>
+				<td>{{ report.reason|markdown }}</td>
+				<td>{{ widget.tag() }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<p><input type="submit" value="{% trans %}Delete report{% endtrans %}"></p>
+</form>
+{% endblock content %}

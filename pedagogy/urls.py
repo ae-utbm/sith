@@ -46,7 +46,6 @@ urlpatterns = [
         name="comment_report",
     ),
     # Moderation
-    url(r"^reported$", UVCommentReportListView.as_view(), name="comment_report_list"),
     url(r"^moderation$", UVModerationFormView.as_view(), name="moderation"),
     # Administration : Create Update Delete Edit
     url(r"^uv/create$", UVCreateView.as_view(), name="uv_create"),
