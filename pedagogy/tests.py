@@ -22,11 +22,12 @@
 #
 #
 
+from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 
-from core.models import User
+from core.models import User, Notification
 
 from pedagogy.models import UV, UVComment, UVCommentReport
 
@@ -968,6 +969,7 @@ class UVCommentReportCreateTest(TestCase):
         call_command("populate")
 
         self.krophil = User.objects.get(username="krophil")
+        self.tutu = User.objects.get(username="tutu")
 
         # Prepare a comment
         comment_kwargs = create_uv_comment_template(self.krophil.id)
@@ -1011,3 +1013,38 @@ class UVCommentReportCreateTest(TestCase):
         )
         self.assertEquals(response.status_code, 403)
         self.assertFalse(UVCommentReport.objects.all().exists())
+
+    def test_notifications(self):
+        self.assertFalse(
+            self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").exists()
+        )
+        # Create a comment report
+        self.create_report_test("tutu", True)
+
+        # Check that a notification has been created for pedagogy admins
+        self.assertTrue(
+            self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").exists()
+        )
+
+        # Check that only pedagogy admins recieves this notification
+        for notif in Notification.objects.filter(type="PEDAGOGY_MODERATION").all():
+            self.assertTrue(
+                notif.user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+            )
+
+        # Check that notifications are not duplicated if not viewed
+        self.create_report_test("tutu", True)
+        self.assertEquals(
+            self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").count(), 1
+        )
+
+        # Check that a new notification is created when the old one has been viewed
+        notif = self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").first()
+        notif.viewed = True
+        notif.save()
+
+        self.create_report_test("tutu", True)
+
+        self.assertEquals(
+            self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").count(), 2
+        )

@@ -560,6 +560,10 @@ SITH_LAUNDERETTE_PRICES = {"WASHING": 1.0, "DRYING": 0.75}
 SITH_NOTIFICATIONS = [
     ("POSTER_MODERATION", _("A new poster needs to be moderated")),
     ("MAILING_MODERATION", _("A new mailing list needs to be moderated")),
+    (
+        "PEDAGOGY_MODERATION",
+        _("A new pedagogy comment has been signaled for moderation"),
+    ),
     ("NEWS_MODERATION", _("There are %s fresh news to be moderated")),
     ("FILE_MODERATION", _("New files to be moderated")),
     ("SAS_MODERATION", _("There are %s pictures to be moderated in the SAS")),

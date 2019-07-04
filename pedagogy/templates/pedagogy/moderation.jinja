@@ -23,7 +23,7 @@
 			{% for widget in form.accepted_reports.subwidgets %}
 			{% set report = queryset.get(id=widget.data.value) %}
 			<tr>
-				<td>{{ report.comment.uv }}</td>
+				<td><a href="{{ url('pedagogy:uv_detail', uv_id=report.comment.uv.id) }}">{{ report.comment.uv }}</a></td>
 				<td>{{ report.comment.comment|markdown }}</td>
 				<td>{{ report.reason|markdown }}</td>
 				<td>{{ widget.tag() }}</td>
@@ -50,7 +50,7 @@
 			{% for widget in form.denied_reports.subwidgets %}
 			{% set report = queryset.get(id=widget.data.value) %}
 			<tr>
-				<td>{{ report.comment.uv }}</td>
+				<td><a href="{{ url('pedagogy:uv_detail', uv_id=report.comment.uv.id) }}">{{ report.comment.uv }}</a></td>
 				<td>{{ report.comment.comment|markdown }}</td>
 				<td>{{ report.reason|markdown }}</td>
 				<td>{{ widget.tag() }}</td>

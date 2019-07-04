@@ -35,8 +35,9 @@ from django.core import serializers
 from django.utils import html
 from django.http import HttpResponse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 
 from core.views import (
     DetailFormView,
@@ -45,6 +46,7 @@ from core.views import (
     CanViewMixin,
     CanEditPropMixin,
 )
+from core.models import RealGroup, Notification
 
 from haystack.query import SearchQuerySet
 
@@ -225,6 +227,26 @@ class UVCommentReportCreateView(CanCreateMixin, CreateView):
         kwargs["reporter_id"] = self.request.user.id
         kwargs["comment_id"] = self.uv_comment.id
         return kwargs
+
+    def form_valid(self, form):
+        resp = super(UVCommentReportCreateView, self).form_valid(form)
+
+        # Send a message to moderation admins
+        for user in (
+            RealGroup.objects.filter(id=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+            .first()
+            .users.all()
+        ):
+            if not user.notifications.filter(
+                type="PEDAGOGY_MODERATION", viewed=False
+            ).exists():
+                Notification(
+                    user=user,
+                    url=reverse("pedagogy:moderation"),
+                    type="PEDAGOGY_MODERATION",
+                ).save()
+
+        return resp
 
     def get_success_url(self):
         return reverse_lazy(
