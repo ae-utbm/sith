@@ -6,6 +6,31 @@
 {% endblock %}
 
 {% block content %}
+	<form action="{{ url('pedagogy:guide') }}" method="get">
+		<p>
+			<input type="text" name="search">
+			<button>{% trans %}Details{% endtrans %}</button>
+		</p>
+		<p>
+			<input type="radio" name="department" value="EDIM">{% trans %}EDIM{% endtrans %}
+			<input type="radio" name="department" value="EE">{% trans %}ENERGIE{% endtrans %}
+			<input type="radio" name="department" value="IMSI">{% trans %}IMSI{% endtrans %}
+			<input type="radio" name="department" value="GI">{% trans %}INFO{% endtrans %}
+			<input type="radio" name="department" value="MC">{% trans %}GMC{% endtrans %}
+			<input type="radio" name="department" value="HUMA">{% trans %}HUMA{% endtrans %}
+			<input type="radio" name="department" value="TC">{% trans %}TC{% endtrans %}
+		</p>
+		<p>
+			<input type="radio" name="credit_type" value="CS">{% trans %}CS{% endtrans %}
+			<input type="radio" name="credit_type" value="TM">{% trans %}TM{% endtrans %}
+			<input type="radio" name="credit_type" value="EC">{% trans %}EC{% endtrans %}
+			<input type="radio" name="credit_type" value="QC">{% trans %}QC{% endtrans %}
+			<input type="radio" name="credit_type" value="TM">{% trans %}TM{% endtrans %}
+
+			<input type="checkbox" name="semester" value="AUTUMN">A
+			<input type="checkbox" name="semester" value="SPRING">P
+		</p>
+	</form>
 	{% if can_create_uv(user) %}
 		<p>
 			<a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
@@ -20,4 +45,26 @@
 	    	{%- endif -%}
 	    </p>
     {% endfor %}
+
+<script>
+	// Allow unchecking a radio button when we click on it
+	// Keep a state of what is checked
+	var formStates = {};
+	function radioCheckToggle(e){
+		if (formStates[this.name] == this.value){
+			this.checked = false;
+			formStates[this.name] = "";
+			return;
+		}
+		formStates[this.name] = this.value;
+	}
+
+    $("input[type='radio']").each(function() {
+    	$(this).on("click", radioCheckToggle);
+    	// Get current state
+    	if ($(this).prop("checked")){
+    		formStates[$(this).attr("name")] = $(this).attr("value");
+    	}
+    });
+</script>
 {% endblock content %}
