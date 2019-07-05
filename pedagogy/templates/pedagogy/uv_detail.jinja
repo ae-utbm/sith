@@ -8,8 +8,10 @@
 {% block content %}
 	<div id="pedagogy">
 		<p><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
+		{# <button onclick="window.history.back();">{% trans %}Back{% endtrans %}</button> #}
+
 		<h1>{{ object.code }} - {{ object.title }}</h1>
-		<p style = "word-spacing: 20px;">{{ object.department }} {{ object.credit_type }} {{ object.semester }}</p>
+		<p style = "word-spacing: 20px;">{{ object.department }} {{ object.credit_type }} {{ object.semester_translated }}</p>
 		<p>{{ object.objectives|markdown }}</p>
 		<p>{{ object.program|markdown }}</p>
 		<p>{{ object.skills|markdown }}</p>
@@ -25,7 +27,7 @@
 		{% if object.comments.exists() %}
 			<h2>{% trans %}Comments{% endtrans %}</h2>
 			{% for comment in object.comments.all() %}
-				<div class="comment">
+				<div id="{{ comment.id }}" class="comment">
 					<div class="dif_grade">
 						<p>{% trans %}global grade{% endtrans %}</p>
 						<p>{% trans %}utility grade{% endtrans %}</p>
@@ -40,12 +42,13 @@
 						<p>{{ display_star(comment.grade_teaching) }}</p>
 						<p>{{ display_star(comment.grade_work_load) }}</p>
 					</div>
-					<p class="text">{{ comment.comment }}</p>
+					{{ comment.comment|markdown }}
 					<p class="date_info">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
 					<p class="author_info">{{ comment.author }}</p>
 
 					{# Warning, it's not displayed yet #}
 					<p class="action">
+						<a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}#{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
 						<a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report{% endtrans %}</a>
 						{% if user.is_owner(comment) %}
 							<a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a>
