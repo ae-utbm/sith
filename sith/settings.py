@@ -421,7 +421,7 @@ SITH_PEDAGOGY_UV_SEMESTER = [
     ("CLOSED", _("Closed")),
     ("AUTUMN", _("Autumn")),
     ("SPRING", _("Spring")),
-    ("AUTOMN_AND_SPRING", _("Autumn and spring")),
+    ("AUTUMN_AND_SPRING", _("Autumn and spring")),
 ]
 
 SITH_PEDAGOGY_UV_LANGUAGE = [

@@ -632,7 +632,7 @@ class UVSearchTest(TestCase):
         self.assertContains(response, text="PA00")
 
         response = self.client.get(
-            reverse("pedagogy:guide"), {"semester": "AUTOMN_AND_SPRING"}
+            reverse("pedagogy:guide"), {"semester": "AUTUMN_AND_SPRING"}
         )
         self.assertContains(response, text="PA00")
 
@@ -679,7 +679,7 @@ class UVSearchTest(TestCase):
                         "code": "PA00",
                         "author": 0,
                         "credit_type": "OM",
-                        "semester": "AUTOMN_AND_SPRING",
+                        "semester": "AUTUMN_AND_SPRING",
                         "language": "FR",
                         "credits": 5,
                         "department": "HUMA",

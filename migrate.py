@@ -1578,7 +1578,7 @@ def migrate_pedagogy():
         "closed": "CLOSED",
         "A": "AUTUMN",
         "P": "SPRING",
-        "AP": "AUTOMN_AND_SPRING",
+        "AP": "AUTUMN_AND_SPRING",
     }
 
     def department_conversion(department):

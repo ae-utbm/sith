@@ -184,7 +184,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
         semester = self.request.GET.get("semester", None)
         if semester:
             if semester in ["AUTUMN", "SPRING"]:
-                additional_filters["semester__in"] = [semester, "AUTOMN_AND_SPRING"]
+                additional_filters["semester__in"] = [semester, "AUTUMN_AND_SPRING"]
             else:
                 additional_filters["semester"] = semester
 
