@@ -31,6 +31,7 @@
 		<input type="checkbox" name="semester" value="SPRING">P
 		<input type="checkbox" name="semester" value="AUTUMN_AND_SPRING">
 	</p>
+	<input type="text" name="json" hidden>
 </form>
 {% if can_create_uv(user) %}
 <p>
@@ -38,7 +39,7 @@
 </p>
 <br>
 {% endif %}
-<table>
+<table id="dynamic_view">
 	<thead>
 		<tr>
 			<td>{% trans %}UV{% endtrans %}</td>
@@ -51,7 +52,7 @@
 			{% endif %}
 		</tr>
 	</thead>
-	<tbody>
+	<tbody id="dynamic_view_content">
 		{% for uv in object_list %}
 		<tr>
 			<td><a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}">{{ uv.code }}</a></td>
@@ -68,21 +69,38 @@
 </table>
 
 <script>
+	function autofillCheckboxRadio(name){
+			if (urlParams.has(name)){ $("input[name='" + name + "']").each(function(){
+				if ($(this).attr("value") == urlParams.get(name))
+					$(this).prop("checked", true);
+			});
+		}
+	}
+
+	function uvJSONToHTML(uv){
+		var html = `
+			<tr>
+				<td><a href="${uv.absolute_url}">${uv.code}</a></td>
+				<td>${uv.title}</td>
+				<td>${uv.department}</td>
+				<td>${uv.credit_type}</td>
+		`;
+		{% if can_create_uv(user) %}
+		html += `
+			<td><a href="${uv.update_url}">{% trans %}Edit{% endtrans %}</a></td>
+			<td><a href="${uv.delete_url}">{% trans %}Delete{% endtrans %}</a></td>
+		`;
+		{% endif %}
+		return html + "</td>";
+	}
 
 	// Auto fill from get arguments
 	var urlParams = new URLSearchParams(window.location.search);
-	function autofillCheckboxRadio(name){
-		if (urlParams.has(name)){ $("input[name='" + name + "']").each(function(){
-			if ($(this).attr("value") == urlParams.get(name))
-				$(this).prop("checked", true);
-		});
-	}
-}
-if (urlParams.has("search"))
-	$("input[name='search']").first().prop("value", urlParams.get("search"));
-autofillCheckboxRadio("department");
-autofillCheckboxRadio("credit_type");
-autofillCheckboxRadio("semester");
+	if (urlParams.has("search"))
+		$("input[name='search']").first().prop("value", urlParams.get("search"));
+	autofillCheckboxRadio("department");
+	autofillCheckboxRadio("credit_type");
+	autofillCheckboxRadio("semester");
 
 	// Allow unchecking a radio button when we click on it
 	// Keep a state of what is checked
@@ -91,6 +109,8 @@ autofillCheckboxRadio("semester");
 		if (formStates[this.name] == this.value){
 			this.checked = false;
 			formStates[this.name] = "";
+			// Fire an update since the browser does not do it in this situation
+			$("#search_form").submit();
 			return;
 		}
 		formStates[this.name] = this.value;
@@ -111,6 +131,9 @@ autofillCheckboxRadio("semester");
     // Make autumn and spring hidden if js is enabled
     autumn_and_spring.hide();
 
+    // Fill json field if js is enabled
+    $("input[name='json']").first().prop("value", "true");
+
     // Set correctly state of what is checked
     if (autumn_and_spring.prop("checked")){
     	autumn.prop("checked", true);
@@ -119,14 +142,45 @@ autofillCheckboxRadio("semester");
     }
 
     // Handle submit here and modify autumn and spring here
-    $("#search_form").submit(function(e) {
-    	e.preventDefault();
-    	if (autumn.prop("checked") && spring.prop("checked")){
-    		autumn_and_spring.prop("checked", true);
-    		autumn.prop("checked", false);
-    		spring.prop("checked", false);
-    	}
-    	this.submit();
+	$("#search_form").submit(function(e) {
+		e.preventDefault();
+		if (autumn.prop("checked") && spring.prop("checked")){
+			autumn_and_spring.prop("checked", true);
+			autumn.prop("checked", false);
+			spring.prop("checked", false);
+		}
+
+		// Do query
+		var xhr = new XMLHttpRequest();
+		$.ajax({
+			type: "GET",
+			url: "{{ url('pedagogy:guide') }}",
+			data: $(this).serialize(),
+			xhr: function(){
+				 return xhr;
+			},
+			success: function(data){
+				// Update URL
+				history.pushState({}, null, xhr.responseURL.replace("&json=true", ""));
+				// Update content
+				$("#dynamic_view_content").html("");
+				for (key in data){
+					$("#dynamic_view_content").append(uvJSONToHTML(data[key]));
+				}
+			},
+		});
+
+		// Restore autumn and spring for perfect illusion
+		if (autumn_and_spring.prop("checked")){
+			autumn_and_spring.prop("checked", false);
+			autumn.prop("checked", true);
+			spring.prop("checked", true);
+		}
+    });
+
+    // Auto send on change
+    $("#search_form").on("change", function(e){
+    	$(this).submit();
     });
 </script>
 {% endblock content %}

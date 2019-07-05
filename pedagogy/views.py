@@ -25,19 +25,20 @@
 from django.views.generic import (
     CreateView,
     DeleteView,
-    DetailView,
     UpdateView,
     ListView,
     FormView,
     View,
 )
-from django.core import serializers
 from django.utils import html
 from django.http import HttpResponse
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+
+from haystack.query import SearchQuerySet
+from rest_framework.renderers import JSONRenderer
 
 from core.views import (
     DetailFormView,
@@ -48,15 +49,13 @@ from core.views import (
 )
 from core.models import RealGroup, Notification
 
-from haystack.query import SearchQuerySet
-
 from pedagogy.forms import (
     UVForm,
     UVCommentForm,
     UVCommentReportForm,
     UVCommentModerationForm,
 )
-from pedagogy.models import UV, UVComment, UVCommentReport
+from pedagogy.models import UV, UVComment, UVCommentReport, UVSerializer
 
 # Some mixins
 
@@ -166,7 +165,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
 
         # Return serialized response
         return HttpResponse(
-            serializers.serialize("json", self.get_queryset()),
+            JSONRenderer().render(UVSerializer(self.get_queryset(), many=True).data),
             content_type="application/json",
         )
 
