@@ -95,7 +95,7 @@ INSTALLED_APPS = (
     "matmat",
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -564,9 +564,7 @@ except:
 
 if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)
-    MIDDLEWARE_CLASSES = (
-        "debug_toolbar.middleware.DebugToolbarMiddleware",
-    ) + MIDDLEWARE_CLASSES
+    MIDDLEWARE = ("debug_toolbar.middleware.DebugToolbarMiddleware",) + MIDDLEWARE
     DEBUG_TOOLBAR_PANELS = [
         "debug_toolbar.panels.versions.VersionsPanel",
         "debug_toolbar.panels.timer.TimerPanel",
