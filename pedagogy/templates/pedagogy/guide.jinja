@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-	<form action="{{ url('pedagogy:guide') }}" method="get">
+	<form id="search_form" action="{{ url('pedagogy:guide') }}" method="get">
 		<p>
 			<input type="text" name="search">
 			<button>{% trans %}Details{% endtrans %}</button>
@@ -29,6 +29,7 @@
 
 			<input type="checkbox" name="semester" value="AUTUMN">A
 			<input type="checkbox" name="semester" value="SPRING">P
+			<input type="checkbox" name="semester" value="AUTUMN_AND_SPRING">
 		</p>
 	</form>
 	{% if can_create_uv(user) %}
@@ -65,6 +66,31 @@
     	if ($(this).prop("checked")){
     		formStates[$(this).attr("name")] = $(this).attr("value");
     	}
+    });
+
+    var autumn_and_spring = $("input[value='AUTUMN_AND_SPRING']").first();
+    var autumn = $("input[value='AUTUMN']").first();
+    var spring = $("input[value='SPRING']").first();
+
+    // Make autumn and spring hidden if js is enabled
+    autumn_and_spring.hide();
+
+    // Set correctly state of what is checked
+    if (autumn_and_spring.prop("checked")){
+    	autumn.prop("checked", true);
+    	spring.prop("checked", true);
+    	autumn_and_spring.prop("checked", false);
+    }
+
+    // Handle submit here and modify autumn and spring here
+    $("#search_form").submit(function(e) {
+    	e.preventDefault();
+    	if (autumn.prop("checked") && spring.prop("checked")){
+    		autumn_and_spring.prop("checked", true);
+    		autumn.prop("checked", false);
+    		spring.prop("checked", false);
+    	}
+		this.submit();
     });
 </script>
 {% endblock content %}
