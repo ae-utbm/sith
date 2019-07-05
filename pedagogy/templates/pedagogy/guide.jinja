@@ -29,7 +29,7 @@
 
 		<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN">A</label>
 		<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING">P</label>
-		<input type="checkbox" name="semester" id="radioAP" value="AUTUMN_AND_SPRING"><label for="radioAP">AP</label>
+		<span><input type="checkbox" name="semester" id="radioAP" value="AUTUMN_AND_SPRING"><label for="radioAP">AP</label></span>
 	</div>
 	<input type="text" name="json" hidden>
 </form>
@@ -129,7 +129,7 @@
 	var spring = $("input[value='SPRING']").first();
 
     // Make autumn and spring hidden if js is enabled
-    autumn_and_spring.hide();
+    autumn_and_spring.parent().hide();
 
     // Fill json field if js is enabled
     $("input[name='json']").first().prop("value", "true");
