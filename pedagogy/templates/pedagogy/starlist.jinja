@@ -1,29 +1,38 @@
 <div>
-    {# <input name="{{ widget.name }}" id="{{ widget.name }}" hidden type="number" {% include "django/forms/widgets/attrs.html" %}></input> #}
     <style>
-        .checked{
+        .checked {
             color : orange;
         }
-        .unchecked{
+        .unchecked {
             color : gray;
         }
-        .star input[type="radio"]{
+        .star input[type="radio"] {
             display : none;
         }
-        .star{
+        .star {
             display: inline;
         }
-        
+
     </style>
 
-    {% for i in i|rjust:5 %}
+    <label class="star">
+        <input type="radio" name="{{ widget.name }}" value="-1" onclick='
+            var stars = document.getElementsByClassName("{{ widget.name }}");
+            for (var i = 0; i < stars.length; i++){
+                var attrs = stars[i].getAttribute("class");
+                attrs = attrs.replace("unchecked", "");
+                attrs = attrs.replace("checked", "");
+                stars[i].setAttribute("class", attrs + " unchecked");
+            }
+        ' checked>
+        <span class="fa fa-times-circle"> {{ translations.do_not_vote }}</span>
+    </label>
+    {% for i in number_of_stars %}
     <label class="star">
         <input type="radio" name="{{ widget.name }}" value="{{ forloop.counter0 }}" onclick='
             var stars = document.getElementsByClassName("{{ widget.name }}");
-            // console.log(Array.from(this.parentNode.parentNode.children).filter(el => el.className == "star"));
 
-            for (var i = 0; i < 5; i++){
-                console.log(i);
+            for (var i = 0; i < stars.length; i++){
                 var attrs = stars[i].getAttribute("class");
                 attrs = attrs.replace("unchecked", "");
                 attrs = attrs.replace("checked", "");

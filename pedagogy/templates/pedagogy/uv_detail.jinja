@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% import "pedagogy/macros.jinja" as macros%}
+{% from "pedagogy/macros.jinja" import display_star %}
 
 {% block title %}
 {% trans %}UV Details{% endtrans %}
@@ -15,20 +15,20 @@
 	<p>{{ object.key_concepts|markdown }}</p>
 	<p>{% trans %}UV manager: {% endtrans %}{{ object.manager }}</p>
 
-	<p>{{ object.grade_global_average }}</p>
-	<p>{{ object.grade_utility_average }}</p>
-	<p>{{ object.grade_interest_average }}</p>
-	<p>{{ object.grade_teaching_average }}</p>
-	<p>{{ object.grade_work_load_average }}</p>
+	<p>{{ display_star(object.grade_global_average) }}</p>
+	<p>{{ display_star(object.grade_utility_average) }}</p>
+	<p>{{ display_star(object.grade_interest_average) }}</p>
+	<p>{{ display_star(object.grade_teaching_average) }}</p>
+	<p>{{ display_star(object.grade_work_load_average) }}</p>
 
 	{% if object.comments.exists() %}
 		<h2>{% trans %}Comments{% endtrans %}</h2>
 		{% for comment in object.comments.all() %}
-			<p>{{ macros.display_star(comment.grade_global) }}</p>
-			<p>{{ macros.display_star(comment.grade_utility) }}</p>
-			<p>{{ macros.display_star(comment.grade_interest) }}</p>
-			<p>{{ macros.display_star(comment.grade_teaching) }}</p>
-			<p>{{ macros.display_star(comment.grade_work_load) }}</p>
+			<p>{{ display_star(comment.grade_global) }}</p>
+			<p>{{ display_star(comment.grade_utility) }}</p>
+			<p>{{ display_star(comment.grade_interest) }}</p>
+			<p>{{ display_star(comment.grade_teaching) }}</p>
+			<p>{{ display_star(comment.grade_work_load) }}</p>
 			<p>{{ comment.comment|markdown }}</p>
 			<p>{% trans %}Published: {% endtrans %}{{ comment.publish_date }}</p>
 			<p>{% trans %}Author: {% endtrans %}{{ comment.author }}</p>

@@ -77,6 +77,16 @@ class UVForm(forms.ModelForm):
 class StarList(forms.NumberInput):
     template_name = "pedagogy/starlist.jinja"
 
+    def __init__(self, nubmer_of_stars=0):
+        super(StarList, self).__init__(None)
+        self.number_of_stars = nubmer_of_stars
+
+    def get_context(self, name, value, attrs):
+        context = super(StarList, self).get_context(name, value, attrs)
+        context["number_of_stars"] = range(0, self.number_of_stars)
+        context["translations"] = {"do_not_vote": _("Do not vote")}
+        return context
+
 
 class UVCommentForm(forms.ModelForm):
     """
@@ -99,11 +109,11 @@ class UVCommentForm(forms.ModelForm):
             "comment": MarkdownInput,
             "author": forms.HiddenInput,
             "uv": forms.HiddenInput,
-            "grade_global": StarList,
-            "grade_utility": StarList,
-            "grade_interest": StarList,
-            "grade_teaching": StarList,
-            "grade_work_load": StarList,
+            "grade_global": StarList(5),
+            "grade_utility": StarList(5),
+            "grade_interest": StarList(5),
+            "grade_teaching": StarList(5),
+            "grade_work_load": StarList(5),
         }
 
     def __init__(self, author_id, uv_id, *args, **kwargs):
