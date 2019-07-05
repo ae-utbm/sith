@@ -6,46 +6,66 @@
 {% endblock %}
 
 {% block content %}
-	<form id="search_form" action="{{ url('pedagogy:guide') }}" method="get">
-		<p>
-			<input type="text" name="search">
-			<button>{% trans %}Details{% endtrans %}</button>
-		</p>
-		<p>
-			<input type="radio" name="department" value="EDIM">{% trans %}EDIM{% endtrans %}
-			<input type="radio" name="department" value="EE">{% trans %}ENERGIE{% endtrans %}
-			<input type="radio" name="department" value="IMSI">{% trans %}IMSI{% endtrans %}
-			<input type="radio" name="department" value="GI">{% trans %}INFO{% endtrans %}
-			<input type="radio" name="department" value="MC">{% trans %}GMC{% endtrans %}
-			<input type="radio" name="department" value="HUMA">{% trans %}HUMA{% endtrans %}
-			<input type="radio" name="department" value="TC">{% trans %}TC{% endtrans %}
-		</p>
-		<p>
-			<input type="radio" name="credit_type" value="CS">{% trans %}CS{% endtrans %}
-			<input type="radio" name="credit_type" value="TM">{% trans %}TM{% endtrans %}
-			<input type="radio" name="credit_type" value="EC">{% trans %}EC{% endtrans %}
-			<input type="radio" name="credit_type" value="QC">{% trans %}QC{% endtrans %}
-			<input type="radio" name="credit_type" value="TM">{% trans %}TM{% endtrans %}
+<form id="search_form" action="{{ url('pedagogy:guide') }}" method="get">
+	<p>
+		<input type="text" name="search">
+		<button>{% trans %}Details{% endtrans %}</button>
+	</p>
+	<p>
+		<input type="radio" name="department" value="EDIM">{% trans %}EDIM{% endtrans %}
+		<input type="radio" name="department" value="EE">{% trans %}ENERGIE{% endtrans %}
+		<input type="radio" name="department" value="IMSI">{% trans %}IMSI{% endtrans %}
+		<input type="radio" name="department" value="GI">{% trans %}INFO{% endtrans %}
+		<input type="radio" name="department" value="MC">{% trans %}GMC{% endtrans %}
+		<input type="radio" name="department" value="HUMA">{% trans %}HUMA{% endtrans %}
+		<input type="radio" name="department" value="TC">{% trans %}TC{% endtrans %}
+	</p>
+	<p>
+		<input type="radio" name="credit_type" value="CS">{% trans %}CS{% endtrans %}
+		<input type="radio" name="credit_type" value="TM">{% trans %}TM{% endtrans %}
+		<input type="radio" name="credit_type" value="EC">{% trans %}EC{% endtrans %}
+		<input type="radio" name="credit_type" value="QC">{% trans %}QC{% endtrans %}
+		<input type="radio" name="credit_type" value="TM">{% trans %}TM{% endtrans %}
 
-			<input type="checkbox" name="semester" value="AUTUMN">A
-			<input type="checkbox" name="semester" value="SPRING">P
-			<input type="checkbox" name="semester" value="AUTUMN_AND_SPRING">
-		</p>
-	</form>
-	{% if can_create_uv(user) %}
-		<p>
-			<a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
-		</p>
-	{% endif %}
-    {% for uv in object_list %}
-    	<p>
-	    	<a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}">{{ uv.code }}</a>
-	    	{% if user.is_owner(uv) -%}
-	    	  	<a href="{{ url('pedagogy:uv_update', uv_id=uv.id) }}">{% trans %}Edit{% endtrans %}</a>
-	    	  	<a href="{{ url('pedagogy:uv_delete', uv_id=uv.id) }}">{% trans %}Delete{% endtrans %}</a>
-	    	{%- endif -%}
-	    </p>
-    {% endfor %}
+		<input type="checkbox" name="semester" value="AUTUMN">A
+		<input type="checkbox" name="semester" value="SPRING">P
+		<input type="checkbox" name="semester" value="AUTUMN_AND_SPRING">
+	</p>
+</form>
+{% if can_create_uv(user) %}
+<p>
+	<a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
+</p>
+<br>
+{% endif %}
+<table>
+	<thead>
+		<tr>
+			<td>{% trans %}UV{% endtrans %}</td>
+			<td>{% trans %}Title{% endtrans %}</td>
+			<td>{% trans %}Department{% endtrans %}</td>
+			<td>{% trans %}Credit type{% endtrans %}</td>
+			{% if can_create_uv(user) %}
+			<td>{% trans %}Edit{% endtrans %}</td>
+			<td>{% trans %}Delete{% endtrans %}</td>
+			{% endif %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for uv in object_list %}
+		<tr>
+			<td><a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}">{{ uv.code }}</a></td>
+			<td>{{ uv.title }}</td>
+			<td>{{ uv.department }}</td>
+			<td>{{ uv.credit_type }}</td>
+			{% if user.is_owner(uv) -%}
+			<td><a href="{{ url('pedagogy:uv_update', uv_id=uv.id) }}">{% trans %}Edit{% endtrans %}</a></td>
+			<td><a href="{{ url('pedagogy:uv_delete', uv_id=uv.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+			{%- endif -%}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
 
 <script>
 
@@ -53,16 +73,16 @@
 	var urlParams = new URLSearchParams(window.location.search);
 	function autofillCheckboxRadio(name){
 		if (urlParams.has(name)){ $("input[name='" + name + "']").each(function(){
-				if ($(this).attr("value") == urlParams.get(name))
-					$(this).prop("checked", true);
-			});
-		}
+			if ($(this).attr("value") == urlParams.get(name))
+				$(this).prop("checked", true);
+		});
 	}
-	if (urlParams.has("search"))
-		$("input[name='search']").first().prop("value", urlParams.get("search"));
-	autofillCheckboxRadio("department");
-	autofillCheckboxRadio("credit_type");
-	autofillCheckboxRadio("semester");
+}
+if (urlParams.has("search"))
+	$("input[name='search']").first().prop("value", urlParams.get("search"));
+autofillCheckboxRadio("department");
+autofillCheckboxRadio("credit_type");
+autofillCheckboxRadio("semester");
 
 	// Allow unchecking a radio button when we click on it
 	// Keep a state of what is checked
@@ -76,17 +96,17 @@
 		formStates[this.name] = this.value;
 	}
 
-    $("input[type='radio']").each(function() {
-    	$(this).on("click", radioCheckToggle);
+	$("input[type='radio']").each(function() {
+		$(this).on("click", radioCheckToggle);
     	// Get current state
     	if ($(this).prop("checked")){
     		formStates[$(this).attr("name")] = $(this).attr("value");
     	}
     });
 
-    var autumn_and_spring = $("input[value='AUTUMN_AND_SPRING']").first();
-    var autumn = $("input[value='AUTUMN']").first();
-    var spring = $("input[value='SPRING']").first();
+	var autumn_and_spring = $("input[value='AUTUMN_AND_SPRING']").first();
+	var autumn = $("input[value='AUTUMN']").first();
+	var spring = $("input[value='SPRING']").first();
 
     // Make autumn and spring hidden if js is enabled
     autumn_and_spring.hide();
@@ -106,7 +126,7 @@
     		autumn.prop("checked", false);
     		spring.prop("checked", false);
     	}
-		this.submit();
+    	this.submit();
     });
 </script>
 {% endblock content %}
