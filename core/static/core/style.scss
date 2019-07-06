@@ -1730,48 +1730,74 @@ label {
     margin-bottom: 30px;
     margin-top: 10px;
 
-    .grade {
-      height: 156px;
-      float: left;
-      text-align: left;
-      padding: 15px;
-      padding-right: 40px;
-      padding-top: 0px;
-      clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 20%, 75% 0);
-      background-color: #1bb9ea;
+    .grade_block {
+
+      .grade {
+        width: 8%;
+        height: 156px;
+        float: left;
+        text-align: left;
+        padding: 15px;
+        padding-right: 40px;
+        padding-top: 0px;
+        clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 20%, 75% 0);
+        background-color: #1bb9ea;
+      }
+
+      .dif_grade {
+        width: 8%;
+        background-color: #1bb9ea;
+        color: #f0f0f0;
+        height: 156px;
+        float: left;
+        font-weight: bold;
+        text-align: right;
+        padding: 15px;
+        padding-top: 0px;
+      }
     }
 
-    .dif_grade {
+    .info {
       background-color: #1bb9ea;
-      color: #f0f0f0;
-      height: 156px;
+      width: 100%;
       float: left;
-      font-weight: bold;
-      text-align: right;
-      padding: 15px;
-      padding-top: 0px;
-    }
 
-    .author_info {
-      background-color: #1bb9ea;
-      color: #f0f0f0;
-      text-align: center;
-      width: 50px;
-      padding: 5px;
-      font-weight: bold;
-      margin: 0px;
-      float: left;
-      padding-right: 50px;
-      clip-path: polygon(0 0, 0 100%, 100% 100%, 75% 0);
-    }
-    .date_info {
-      background-color: #1bb9ea;
-      color: #f0f0f0;
-      float: left;
-      text-align: center;
-      width : 34%;
-      padding: 5px;
-      margin: 0px;
+      .date_info {
+        color: #f0f0f0;
+        text-align: center;
+        width : 34%;
+
+        padding: 5px;
+        margin: 0px;
+        float: left;
+      }
+
+      .author_info {
+        color: #f0f0f0;
+        text-align: center;
+        font-weight: bold;
+        padding-right: 33%;
+
+        padding: 5px;
+        margin: 0px;
+        float: right;
+        padding-right: 10%;
+      }
+
+      .report {
+        background-color: #ea7900;
+        clip-path: polygon(0 0%, 0 100%, 40% 100%, 30% 0);
+        width : 33%;
+
+        & a {
+          color: #f0f0f0;
+          font-weight: bold;
+        }
+
+        padding: 5px;
+        margin: 0px;
+        float: left;
+      }
     }
 
     .action {

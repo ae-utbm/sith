@@ -28,28 +28,32 @@
 			<h2>{% trans %}Comments{% endtrans %}</h2>
 			{% for comment in object.comments.all() %}
 				<div id="{{ comment.id }}" class="comment">
-					<div class="dif_grade">
-						<p>{% trans %}global grade{% endtrans %}</p>
-						<p>{% trans %}utility grade{% endtrans %}</p>
-						<p>{% trans %}interest grade{% endtrans %}</p>
-						<p>{% trans %}teaching grade{% endtrans %}</p>
-						<p>{% trans %}work_load grade{% endtrans %}</p>
-					</div>
-					<div class="grade">
-						<p>{{ display_star(comment.grade_global) }}</p>
-						<p>{{ display_star(comment.grade_utility) }}</p>
-						<p>{{ display_star(comment.grade_interest) }}</p>
-						<p>{{ display_star(comment.grade_teaching) }}</p>
-						<p>{{ display_star(comment.grade_work_load) }}</p>
+					<div class="grade_block">
+						<div class="dif_grade">
+							<p>{% trans %}global grade{% endtrans %}</p>
+							<p>{% trans %}utility grade{% endtrans %}</p>
+							<p>{% trans %}interest grade{% endtrans %}</p>
+							<p>{% trans %}teaching grade{% endtrans %}</p>
+							<p>{% trans %}work_load grade{% endtrans %}</p>
+						</div>
+						<div class="grade">
+							<p>{{ display_star(comment.grade_global) }}</p>
+							<p>{{ display_star(comment.grade_utility) }}</p>
+							<p>{{ display_star(comment.grade_interest) }}</p>
+							<p>{{ display_star(comment.grade_teaching) }}</p>
+							<p>{{ display_star(comment.grade_work_load) }}</p>
+						</div>
 					</div>
 					{{ comment.comment|markdown }}
-					<p class="date_info">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
-					<p class="author_info">{{ comment.author }}</p>
 
+					<div class="info">
+						<p class="report"><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report this comment{% endtrans %}</a></p>
+						<p class="date_info">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
+						<p class="author_info">{{ comment.author }}</p>
+					</div>
 					{# Warning, it's not displayed yet #}
 					<p class="action">
 						<a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}#{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
-						<a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report{% endtrans %}</a>
 						{% if user.is_owner(comment) %}
 							<a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a>
 							<a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a>
