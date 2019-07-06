@@ -12,7 +12,7 @@
 		<button class="button_search">{% trans %}Search{% endtrans %}</button>
 	</p>
 	<div class="radio_guide">
-		<input type="radio" name="department" id="radioEDIM" value="EDIM" checked><label for="radioEDIM">{% trans %}EDIM{% endtrans %}</label>
+		<input type="radio" name="department" id="radioEDIM" value="EDIM"><label for="radioEDIM">{% trans %}EDIM{% endtrans %}</label>
 		<input type="radio" name="department" id="radioEE" value="EE"><label for="radioEE">{% trans %}ENERGIE{% endtrans %}</label>
 		<input type="radio" name="department" id="radioIMSI" value="IMSI"><label for="radioIMSI">{% trans %}IMSI{% endtrans %}</label>
 		<input type="radio" name="department" id="radioGI" value="GI"><label for="radioGI">{% trans %}INFO{% endtrans %}</label>
@@ -46,6 +46,8 @@
 			<td>{% trans %}Title{% endtrans %}</td>
 			<td>{% trans %}Department{% endtrans %}</td>
 			<td>{% trans %}Credit type{% endtrans %}</td>
+			<td><i class="fa fa-leaf"></i></td>
+			<td><i class="fa fa-sun-o"></i></td>
 			{% if can_create_uv(user) %}
 			<td>{% trans %}Edit{% endtrans %}</td>
 			<td>{% trans %}Delete{% endtrans %}</td>
@@ -59,6 +61,16 @@
 			<td>{{ uv.title }}</td>
 			<td>{{ uv.department }}</td>
 			<td>{{ uv.credit_type }}</td>
+			<td>
+				{% if uv.semester in ["AUTUMN", "AUTUMN_AND_SPRING"] %}
+					<i class="fa fa-leaf"></i>
+				{% endif %}
+			</td>
+			<td>
+				{% if uv.semester in ["SPRING", "AUTUMN_AND_SPRING"] %}
+					<i class="fa fa-sun-o"></i>
+				{% endif %}
+			</td>
 			{% if user.is_owner(uv) -%}
 			<td><a href="{{ url('pedagogy:uv_update', uv_id=uv.id) }}">{% trans %}Edit{% endtrans %}</a></td>
 			<td><a href="{{ url('pedagogy:uv_delete', uv_id=uv.id) }}">{% trans %}Delete{% endtrans %}</a></td>
@@ -78,12 +90,21 @@
 	}
 
 	function uvJSONToHTML(uv){
+		var autumn = "";
+		var spring = "";
+		if (uv.semester == "AUTUMN" || uv.semester == "AUTUMN_AND_SPRING")
+			autumn = "<i class='fa fa-leaf'></i>";
+		if (uv.semester == "SPRING" || uv.semester == "AUTUMN_AND_SPRING")
+			spring = "<i class='fa fa-sun-o'></i>";
+
 		var html = `
 			<tr>
 				<td><a href="${uv.absolute_url}">${uv.code}</a></td>
 				<td>${uv.title}</td>
 				<td>${uv.department}</td>
 				<td>${uv.credit_type}</td>
+				<td>${autumn}</td>
+				<td>${spring}</td>
 		`;
 		{% if can_create_uv(user) %}
 		html += `
