@@ -8,8 +8,9 @@
                 <span class="fa fa-star pedagogy star_not_checked"></span>
             {% endif %}
         {% endfor %}
+        <span class="pedagogy stars_grade not_rated">{{ grade + 1 }}/5</span>
     {% else %}
-        <p class="not_rated"> {% trans %} not rated {% endtrans %} </p>
+        <span class="not_rated"> {% trans %} not rated {% endtrans %} </span>
     {% endif %}
 
 {%- endmacro %}

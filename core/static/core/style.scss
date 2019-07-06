@@ -1677,6 +1677,20 @@ label {
   &.star_checked {
     color: #ea7900;
   }
+  &.stars_grade {
+    display: none;
+  }
+  @media screen and (max-width: 992px) {
+    &.stars_grade {
+      display: block;
+    }
+    &.star_checked {
+      display: none;
+    }
+    &.star_not_checked {
+      display: none;
+    }
+  }
 }
 
 #search_form {
@@ -1736,19 +1750,8 @@ label {
 
     .grade_block {
 
-      .grade {
-        width: 8%;
-        height: 156px;
-        float: left;
-        text-align: left;
-        padding: 15px;
-        padding-right: 40px;
-        padding-top: 0px;
-        clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 20%, 75% 0);
-        background-color: #1bb9ea;
-      }
-
       .dif_grade {
+        height: 156px;
         width: 8%;
         background-color: #1bb9ea;
         color: #f0f0f0;
@@ -1759,10 +1762,33 @@ label {
         padding: 15px;
         padding-top: 0px;
       }
+
+      .grade {
+        height: 156px;
+        width: 8%;
+        float: left;
+        text-align: left;
+        padding: 15px;
+        padding-right: 40px;
+        padding-top: 0px;
+        clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 20%, 75% 0);
+        background-color: #1bb9ea;
+      }
+
+    @media screen and (max-width: 992px) {
+        .dif_grade {
+          width: 11%;
+        }
+
+        .grade {
+          width: 8%;
+        }
+      }
     }
 
     .not_rated {
       color: #f0f0f0;
+      text-align: center;
     }
 
     .info {
