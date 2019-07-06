@@ -26,7 +26,7 @@
 
 		{% if object.comments.exists() %}
 			<h2>{% trans %}Comments{% endtrans %}</h2>
-			{% for comment in object.comments.all() %}
+			{% for comment in object.comments.order_by("-publish_date").all() %}
 				<div id="{{ comment.id }}" class="comment">
 					<div class="grade_block">
 						<div class="dif_grade">
