@@ -8,29 +8,29 @@
 {% block content %}
 <form id="search_form" action="{{ url('pedagogy:guide') }}" method="get">
 	<p>
-		<input type="text" name="search">
-		<button>{% trans %}Details{% endtrans %}</button>
+		<input class="input_search" type="text" name="search">
+		<button class="button_search">{% trans %}Search{% endtrans %}</button>
 	</p>
-	<p>
-		<input type="radio" name="department" value="EDIM">{% trans %}EDIM{% endtrans %}
-		<input type="radio" name="department" value="EE">{% trans %}ENERGIE{% endtrans %}
-		<input type="radio" name="department" value="IMSI">{% trans %}IMSI{% endtrans %}
-		<input type="radio" name="department" value="GI">{% trans %}INFO{% endtrans %}
-		<input type="radio" name="department" value="MC">{% trans %}GMC{% endtrans %}
-		<input type="radio" name="department" value="HUMA">{% trans %}HUMA{% endtrans %}
-		<input type="radio" name="department" value="TC">{% trans %}TC{% endtrans %}
-	</p>
-	<p>
-		<input type="radio" name="credit_type" value="CS">{% trans %}CS{% endtrans %}
-		<input type="radio" name="credit_type" value="TM">{% trans %}TM{% endtrans %}
-		<input type="radio" name="credit_type" value="EC">{% trans %}EC{% endtrans %}
-		<input type="radio" name="credit_type" value="QC">{% trans %}QC{% endtrans %}
-		<input type="radio" name="credit_type" value="TM">{% trans %}TM{% endtrans %}
+	<div class="radio_guide">
+		<input type="radio" name="department" id="radioEDIM" value="EDIM" checked><label for="radioEDIM">{% trans %}EDIM{% endtrans %}</label>
+		<input type="radio" name="department" id="radioEE" value="EE"><label for="radioEE">{% trans %}ENERGIE{% endtrans %}</label>
+		<input type="radio" name="department" id="radioIMSI" value="IMSI"><label for="radioIMSI">{% trans %}IMSI{% endtrans %}</label>
+		<input type="radio" name="department" id="radioGI" value="GI"><label for="radioGI">{% trans %}INFO{% endtrans %}</label>
+		<input type="radio" name="department" id="radioMC" value="MC"><label for="radioMC">{% trans %}GMC{% endtrans %}</label>
+		<input type="radio" name="department" id="radioHUMA" value="HUMA"><label for="radioHUMA">{% trans %}HUMA{% endtrans %}</label>
+		<input type="radio" name="department" id="radioTC" value="TC"><label for="radioTC">{% trans %}TC{% endtrans %}</label>
+	</div>
+	<div class="radio_guide">
+		<input type="radio" name="credit_type" id="radioCS" value="CS"><label for="radioCS">{% trans %}CS{% endtrans %}</label>
+		<input type="radio" name="credit_type" id="radioTM" value="TM"><label for="radioTM">{% trans %}TM{% endtrans %}</label>
+		<input type="radio" name="credit_type" id="radioEC" value="EC"><label for="radioEC">{% trans %}EC{% endtrans %}</label>
+		<input type="radio" name="credit_type" id="radioQC" value="QC"><label for="radioQC">{% trans %}QC{% endtrans %}</label>
+		<input type="radio" name="credit_type" id="radioOM" value="OM"><label for="radioOM">{% trans %}OM{% endtrans %}</label>
 
-		<input type="checkbox" name="semester" value="AUTUMN">A
-		<input type="checkbox" name="semester" value="SPRING">P
-		<input type="checkbox" name="semester" value="AUTUMN_AND_SPRING">
-	</p>
+		<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN">A</label>
+		<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING">P</label>
+		<input type="checkbox" name="semester" id="radioAP" value="AUTUMN_AND_SPRING"><label for="radioAP">AP</label>
+	</div>
 	<input type="text" name="json" hidden>
 </form>
 {% if can_create_uv(user) %}

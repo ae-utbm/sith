@@ -1564,7 +1564,6 @@ footer {
 form {
   margin: 0px auto;
   margin-bottom: 10px;
-  width: 60%;
 }
 
 label {
@@ -1677,6 +1676,47 @@ label {
   }
   &.star_checked {
     color: #ea7900;
+  }
+}
+
+#search_form {
+  margin: 0px;
+  width: 100%;
+
+  .input_search {
+    background: #caf0ff;
+    width: 300px;
+    height: 21px;
+  }
+  .button_search {
+    background: #ea7900;
+    color: white;
+    font-weight: bold;
+    margin-left: 20px;
+  }
+  .radio_guide input[type="radio"],input[type="checkbox"] {
+    display:none; 
+  }
+  .radio_guide {
+    margin-top: 10px;
+    color: white;
+  }
+  .radio_guide label {
+    display:inline-block;
+    background-color:#1bb9ea;
+    padding: 10px 20px;
+    font-family:Arial;
+    font-size:16px;
+    border-radius: 4px;    
+  }
+  .radio_guide input[type="radio"]:checked + label { 
+    background-color:#ea7900;
+  }
+  .radio_guide input[type="checkbox"]:checked + label { 
+    background-color:#ea7900;
+  }
+  .radio_guide  label:hover {
+    background-color:  #0e97ce;
   }
 }
 
