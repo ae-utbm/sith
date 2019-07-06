@@ -1730,6 +1730,10 @@ label {
     margin-bottom: 30px;
     margin-top: 10px;
 
+    .anchor {
+      float: right;
+    }
+
     .grade_block {
 
       .grade {
@@ -1755,6 +1759,10 @@ label {
         padding: 15px;
         padding-top: 0px;
       }
+    }
+
+    .not_rated {
+      color: #f0f0f0;
     }
 
     .info {
@@ -1801,8 +1809,15 @@ label {
     }
 
     .action {
-      float: left;
+      float: right;
       text-align: center;
+      padding: 5px;
+      margin: 0px;
+    }
+
+    .status_reported {
+      color: red;
+      float: left;
       padding: 5px;
       margin: 0px;
     }

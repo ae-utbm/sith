@@ -31,10 +31,10 @@
 					<div class="grade_block">
 						<div class="dif_grade">
 							<p>{% trans %}global grade{% endtrans %}</p>
-							<p>{% trans %}utility grade{% endtrans %}</p>
-							<p>{% trans %}interest grade{% endtrans %}</p>
-							<p>{% trans %}teaching grade{% endtrans %}</p>
-							<p>{% trans %}work_load grade{% endtrans %}</p>
+							<p>{% trans %}utility{% endtrans %}</p>
+							<p>{% trans %}interest{% endtrans %}</p>
+							<p>{% trans %}teaching{% endtrans %}</p>
+							<p>{% trans %}work load{% endtrans %}</p>
 						</div>
 						<div class="grade">
 							<p>{{ display_star(comment.grade_global) }}</p>
@@ -44,24 +44,29 @@
 							<p>{{ display_star(comment.grade_work_load) }}</p>
 						</div>
 					</div>
+					<div class="anchor">
+						<a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}#{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
+					</div>
 					{{ comment.comment|markdown }}
+
+					{% if comment.is_reported %}
+						<p class="status_reported">
+							{% trans %}This comment has been reported{% endtrans %}
+						</p>
+					{% endif %}
+
+					{% if user.is_owner(comment) %}
+						<p class="action">
+								<a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a>
+								<a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a>
+						</p>
+					{% endif %}
 
 					<div class="info">
 						<p class="report"><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report this comment{% endtrans %}</a></p>
 						<p class="date_info">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
 						<p class="author_info">{{ comment.author }}</p>
 					</div>
-					{# Warning, it's not displayed yet #}
-					<p class="action">
-						<a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}#{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
-						{% if user.is_owner(comment) %}
-							<a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a>
-							<a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a>
-						{% endif %}
-					</p>
-					{% if comment.is_reported %}
-						<p>{% trans %}This comment has been reported{% endtrans %}</p>
-					{% endif %}
 
 				</div>
 			{% endfor %}
