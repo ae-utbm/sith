@@ -1683,16 +1683,15 @@ label {
 #pedagogy {
   font-family: "Fira Sans";
   color: #062f38;
-  background-color: #caf0ff;
-  .comment{
-    background-color: #caf0ff;
+  .comment {
     max-width: 100%;
     max-height: 200px;
     overflow: hidden;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
+    margin-top: 10px;
 
-    .grade{
-      height: 200px;
+    .grade {
+      height: 156px;
       float: left;
       text-align: left;
       padding: 15px;
@@ -1702,28 +1701,30 @@ label {
       background-color: #1bb9ea;
     }
 
-    .dif_grade{
+    .dif_grade {
       background-color: #1bb9ea;
       color: #f0f0f0;
-      height: 200px;
+      height: 156px;
       float: left;
+      font-weight: bold;
       text-align: right;
       padding: 15px;
       padding-top: 0px;
     }
 
-    .author_info{
+    .author_info {
       background-color: #1bb9ea;
       color: #f0f0f0;
       text-align: center;
       width: 50px;
       padding: 5px;
+      font-weight: bold;
       margin: 0px;
       float: left;
       padding-right: 50px;
       clip-path: polygon(0 0, 0 100%, 100% 100%, 75% 0);
     }
-    .date_info{
+    .date_info {
       background-color: #1bb9ea;
       color: #f0f0f0;
       float: left;
@@ -1733,16 +1734,21 @@ label {
       margin: 0px;
     }
 
-    .text{
+    .action {
+      float: left;
+      text-align: center;
+      padding: 5px;
+      margin: 0px;
+    }
+
+    .text {
       height: 125px;
       margin-top: 0px;
       margin-right: 0px;
       padding: 10px;
       padding-left: 40px;
-      margin-bottom: 29px;
       overflow: auto;
       text-align: justify;
-      background-color: #caf0ff;
     }
   }  
 }

@@ -9,9 +9,7 @@
 	<div id="pedagogy">
 		<p><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
 		<h1>{{ object.code }} - {{ object.title }}</h1>
-		<p>{{ object.department }}</p>
-		<p>{{ object.credit_type }}</p>
-		<p>{{ object.semester }}</p>
+		<p style = "word-spacing: 20px;">{{ object.department }} {{ object.credit_type }} {{ object.semester }}</p>
 		<p>{{ object.objectives|markdown }}</p>
 		<p>{{ object.program|markdown }}</p>
 		<p>{{ object.skills|markdown }}</p>
@@ -47,15 +45,17 @@
 					<p class="author_info">{{ comment.author }}</p>
 
 					{# Warning, it's not displayed yet #}
-					<p><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report{% endtrans %}</a></p>
+					<p class="action">
+						<a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report{% endtrans %}</a>
+						{% if user.is_owner(comment) %}
+							<a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a>
+							<a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a>
+						{% endif %}
+					</p>
 					{% if comment.is_reported %}
 						<p>{% trans %}This comment has been reported{% endtrans %}</p>
 					{% endif %}
 
-					{% if user.is_owner(comment) %}
-						<p><a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a></p>
-						<p><a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a></p>
-					{% endif %}
 				</div>
 			{% endfor %}
 		{% endif %}
