@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-07 23:44+0200\n"
+"POT-Creation-Date: 2019-07-07 23:59+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -2505,7 +2505,7 @@ msgstr "Laverie"
 msgid "Files"
 msgstr "Fichiers"
 
-#: core/templates/core/base.jinja:188
+#: core/templates/core/base.jinja:188 core/templates/core/user_tools.jinja:109
 msgid "Pedagogy"
 msgstr "Pédagogie"
 
@@ -3466,31 +3466,42 @@ msgstr "Modérer les fichiers"
 msgid "Moderate pictures"
 msgstr "Modérer les photos"
 
-#: core/templates/core/user_tools.jinja:108
+#: core/templates/core/user_tools.jinja:112
+#: pedagogy/templates/pedagogy/guide.jinja:12
+msgid "Create UV"
+msgstr "Créer UV"
+
+#: core/templates/core/user_tools.jinja:113
+#: pedagogy/templates/pedagogy/guide.jinja:15
+#: trombi/templates/trombi/detail.jinja:10
+msgid "Moderate comments"
+msgstr "Modérer les commentaires"
+
+#: core/templates/core/user_tools.jinja:118
 msgid "Elections"
 msgstr "Élections"
 
-#: core/templates/core/user_tools.jinja:110
+#: core/templates/core/user_tools.jinja:120
 msgid "See available elections"
 msgstr "Voir les élections disponibles"
 
-#: core/templates/core/user_tools.jinja:111
+#: core/templates/core/user_tools.jinja:121
 msgid "See archived elections"
 msgstr "Voir les élections archivées"
 
-#: core/templates/core/user_tools.jinja:113
+#: core/templates/core/user_tools.jinja:123
 msgid "Create a new election"
 msgstr "Créer une nouvelle élection"
 
-#: core/templates/core/user_tools.jinja:116
+#: core/templates/core/user_tools.jinja:128
 msgid "Other tools"
 msgstr "Autres outils"
 
-#: core/templates/core/user_tools.jinja:118
+#: core/templates/core/user_tools.jinja:130
 msgid "Convert dokuwiki/BBcode syntax to Markdown"
 msgstr "Convertir de la syntaxe dokuwiki/BBcode vers Markdown"
 
-#: core/templates/core/user_tools.jinja:119
+#: core/templates/core/user_tools.jinja:131
 msgid "Trombi tools"
 msgstr "Outils Trombi"
 
@@ -4914,15 +4925,6 @@ msgstr "raison"
 #: pedagogy/templates/pedagogy/guide.jinja:5
 msgid "UV Guide"
 msgstr "Guide des UVs"
-
-#: pedagogy/templates/pedagogy/guide.jinja:12
-msgid "Create UV"
-msgstr "Créer UV"
-
-#: pedagogy/templates/pedagogy/guide.jinja:15
-#: trombi/templates/trombi/detail.jinja:10
-msgid "Moderate comments"
-msgstr "Modérer les commentaires"
 
 #: pedagogy/templates/pedagogy/guide.jinja:23 sith/settings.py:360
 msgid "EDIM"
