@@ -616,6 +616,10 @@ class UVSearchTest(TestCase):
         response = self.client.get(reverse("pedagogy:guide"), {"search": "P"})
         self.assertContains(response, text="PA00")
 
+        # Search with first letter of UV code in lowercase
+        response = self.client.get(reverse("pedagogy:guide"), {"search": "p"})
+        self.assertContains(response, text="PA00")
+
         # Search with UV manager
         response = self.client.get(reverse("pedagogy:guide"), {"search": "HEYBERGER"})
         self.assertContains(response, text="PA00")
