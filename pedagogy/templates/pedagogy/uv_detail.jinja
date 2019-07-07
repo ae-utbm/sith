@@ -22,15 +22,6 @@
 		<h1>{{ object.code }} - {{ object.title }}</h1>
 		<br>
 		<div class="uv-quick-info-container">
-			<div class="department">
-				{{ object.department }}
-			</div>
-			<div class="credit-type">
-				{{ object.credit_type }}
-			</div>
-			<div class="semester">
-				{{ object.semester_translated }}
-			</div>
 			<div class="hours-cm">
 				<b>{% trans %}CM: {% endtrans %}</b>{{ object.hours_CM }}
 			</div>
@@ -45,6 +36,16 @@
 			</div>
 			<div class="hours-the">
 				<b>{% trans %}THE: {% endtrans %}</b>{{ object.hours_THE }}
+			</div>
+
+			<div class="department">
+				{{ object.department }}
+			</div>
+			<div class="credit-type">
+				{{ object.credit_type }}
+			</div>
+			<div class="semester">
+				{{ object.semester_translated }}
 			</div>
 		</div>
 

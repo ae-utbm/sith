@@ -5071,7 +5071,7 @@ msgstr "Concepts clefs"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:77
 msgid "UV manager: "
-msgstr "Gestionnaire d'UV :"
+msgstr "Gestionnaire d'UV : "
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:83
 msgid "Leave comment"
