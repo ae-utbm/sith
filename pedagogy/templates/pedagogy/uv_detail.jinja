@@ -21,7 +21,7 @@
 
 		<h1>{{ object.code }} - {{ object.title }}</h1>
 		<br>
-		<div class="department-credit-type-semester-container">
+		<div class="uv-quick-info-container">
 			<div class="department">
 				{{ object.department }}
 			</div>
@@ -31,11 +31,26 @@
 			<div class="semester">
 				{{ object.semester_translated }}
 			</div>
+			<div class="hours-cm">
+				<b>{% trans %}CM: {% endtrans %}</b>{{ object.hours_CM }}
+			</div>
+			<div class="hours-td">
+				<b>{% trans %}TD: {% endtrans %}</b>{{ object.hours_TD }}
+			</div>
+			<div class="hours-tp">
+				<b>{% trans %}TP: {% endtrans %}</b>{{ object.hours_TP }}
+			</div>
+			<div class="hours-te">
+				<b>{% trans %}TE: {% endtrans %}</b>{{ object.hours_TE }}
+			</div>
+			<div class="hours-the">
+				<b>{% trans %}THE: {% endtrans %}</b>{{ object.hours_THE }}
+			</div>
 		</div>
 
 		<br>
 
-		<div class="grid-container">
+		<div class="uv-details-container">
 			<div class="grade">
 				<p>{% trans %}global grade{% endtrans %}</p>
 				<p>{% trans %}utility{% endtrans %}</p>

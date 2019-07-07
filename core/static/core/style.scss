@@ -1769,11 +1769,11 @@ $pedagogy-white-text: #f0f0f0;
   font-family: "Fira Sans";
   color: #062f38;
 
-  .department-credit-type-semester-container {
+  .uv-quick-info-container {
     display: grid;
-    grid-template-columns: 10% 10% auto;
-    grid-template-rows: 100%;
-    grid-template-areas: "department credit-type semester";
+    grid-template-columns: 10% 10% 10% 10% auto;
+    grid-template-rows: 100% 100%;
+    grid-template-areas: "hours-cm hours-td hours-tp hours-te hours-the" "department credit-type semester . ." ;
   }
 
   .department {
@@ -1786,6 +1786,26 @@ $pedagogy-white-text: #f0f0f0;
 
   .semester {
     grid-area: semester;
+  }
+
+  .hours-cm {
+    grid-area: hours-cm;
+  }
+
+  .hours-td {
+    grid-area: hours-td;
+  }
+
+  .hours-tp {
+    grid-area: hours-tp;
+  }
+
+  .hours-te {
+    grid-area: hours-te;
+  }
+
+  .hours-the {
+    grid-area: hours-the;
   }
 
   #leave_comment {
@@ -1840,7 +1860,7 @@ $pedagogy-white-text: #f0f0f0;
     }
   }
 
-  .grid-container {
+  .uv-details-container {
     display: grid;
     grid-template-columns: 150px 100px auto;
     grid-template-rows: 156px 1fr;

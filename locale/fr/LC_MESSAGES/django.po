@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-07 19:22+0200\n"
+"POT-Creation-Date: 2019-07-07 21:37+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -382,7 +382,7 @@ msgstr "Compte en banque : "
 #: pedagogy/templates/pedagogy/guide.jinja:115
 #: pedagogy/templates/pedagogy/moderation.jinja:18
 #: pedagogy/templates/pedagogy/moderation.jinja:45
-#: pedagogy/templates/pedagogy/uv_detail.jinja:156
+#: pedagogy/templates/pedagogy/uv_detail.jinja:171
 #: sas/templates/sas/album.jinja:26 sas/templates/sas/moderation.jinja:18
 #: sas/templates/sas/picture.jinja:74 sas/templates/sas/picture.jinja:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
@@ -441,7 +441,7 @@ msgstr "Nouveau compte club"
 #: pedagogy/templates/pedagogy/guide.jinja:55
 #: pedagogy/templates/pedagogy/guide.jinja:78
 #: pedagogy/templates/pedagogy/guide.jinja:114
-#: pedagogy/templates/pedagogy/uv_detail.jinja:155
+#: pedagogy/templates/pedagogy/uv_detail.jinja:170
 #: sas/templates/sas/album.jinja:18 sas/templates/sas/picture.jinja:100
 #: trombi/templates/trombi/detail.jinja:9
 #: trombi/templates/trombi/edit_profile.jinja:34
@@ -673,7 +673,7 @@ msgstr "Effectuées"
 #: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:1162
 #: pedagogy/templates/pedagogy/moderation.jinja:16
 #: pedagogy/templates/pedagogy/moderation.jinja:43
-#: pedagogy/templates/pedagogy/uv_detail.jinja:116
+#: pedagogy/templates/pedagogy/uv_detail.jinja:131
 #: trombi/templates/trombi/comment.jinja:4
 #: trombi/templates/trombi/comment.jinja:8
 #: trombi/templates/trombi/user_tools.jinja:50
@@ -4807,7 +4807,8 @@ msgid ""
 "The code of an UV must only contains uppercase characters without accent and "
 "numbers"
 msgstr ""
-"Le code d'une UV doit seulement contenire des caractères majuscule sans accents et nombres"
+"Le code d'une UV doit seulement contenire des caractères majuscule sans "
+"accents et nombres"
 
 #: pedagogy/models.py:118
 msgid "credit type"
@@ -4869,8 +4870,8 @@ msgstr "heures TE"
 msgid "uv"
 msgstr "uv"
 
-#: pedagogy/models.py:229 pedagogy/templates/pedagogy/uv_detail.jinja:40
-#: pedagogy/templates/pedagogy/uv_detail.jinja:128
+#: pedagogy/models.py:229 pedagogy/templates/pedagogy/uv_detail.jinja:55
+#: pedagogy/templates/pedagogy/uv_detail.jinja:143
 msgid "global grade"
 msgstr "note globale"
 
@@ -5010,63 +5011,83 @@ msgstr "Supprimer signalement"
 msgid "UV Details"
 msgstr "Détails d'UV"
 
+#: pedagogy/templates/pedagogy/uv_detail.jinja:35
+msgid "CM: "
+msgstr "CM : "
+
+#: pedagogy/templates/pedagogy/uv_detail.jinja:38
+msgid "TD: "
+msgstr "TD : "
+
 #: pedagogy/templates/pedagogy/uv_detail.jinja:41
-#: pedagogy/templates/pedagogy/uv_detail.jinja:129
+msgid "TP: "
+msgstr "TP : "
+
+#: pedagogy/templates/pedagogy/uv_detail.jinja:44
+msgid "TE: "
+msgstr "TE : "
+
+#: pedagogy/templates/pedagogy/uv_detail.jinja:47
+msgid "THE: "
+msgstr "THE : "
+
+#: pedagogy/templates/pedagogy/uv_detail.jinja:56
+#: pedagogy/templates/pedagogy/uv_detail.jinja:144
 msgid "utility"
 msgstr "utilité"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:42
-#: pedagogy/templates/pedagogy/uv_detail.jinja:130
+#: pedagogy/templates/pedagogy/uv_detail.jinja:57
+#: pedagogy/templates/pedagogy/uv_detail.jinja:145
 #, fuzzy
 #| msgid "Counters"
 msgid "interest"
 msgstr "intérêt"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:43
-#: pedagogy/templates/pedagogy/uv_detail.jinja:131
+#: pedagogy/templates/pedagogy/uv_detail.jinja:58
+#: pedagogy/templates/pedagogy/uv_detail.jinja:146
 msgid "teaching"
 msgstr "enseignement"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:44
-#: pedagogy/templates/pedagogy/uv_detail.jinja:132
+#: pedagogy/templates/pedagogy/uv_detail.jinja:59
+#: pedagogy/templates/pedagogy/uv_detail.jinja:147
 msgid "work load"
 msgstr "charge de travail"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:54
+#: pedagogy/templates/pedagogy/uv_detail.jinja:69
 msgid "Objectives"
 msgstr "Objectifs"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:56
+#: pedagogy/templates/pedagogy/uv_detail.jinja:71
 msgid "Program"
 msgstr "Programme"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:58
+#: pedagogy/templates/pedagogy/uv_detail.jinja:73
 msgid "Earned skills"
 msgstr "Compétences acquises"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:60
+#: pedagogy/templates/pedagogy/uv_detail.jinja:75
 msgid "Key concepts"
 msgstr "Concepts clefs"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:62
+#: pedagogy/templates/pedagogy/uv_detail.jinja:77
 msgid "UV manager: "
 msgstr "Gestionnaire d'UV :"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:68
+#: pedagogy/templates/pedagogy/uv_detail.jinja:83
 msgid "Leave comment"
 msgstr "Laisser un commentaire"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:123
+#: pedagogy/templates/pedagogy/uv_detail.jinja:138
 #: stock/templates/stock/shopping_list_items.jinja:42 stock/views.py:278
 #: trombi/templates/trombi/export.jinja:70
 msgid "Comments"
 msgstr "Commentaires"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:149
+#: pedagogy/templates/pedagogy/uv_detail.jinja:164
 msgid "This comment has been reported"
 msgstr "Ce commentaire a été signalé"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:161
+#: pedagogy/templates/pedagogy/uv_detail.jinja:176
 msgid "Report this comment"
 msgstr "Signaler ce commentaire"
 
@@ -5425,7 +5446,8 @@ msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
 #: sith/settings.py:565
 msgid "A new pedagogy comment has been signaled for moderation"
-msgstr "Un nouveau commentaire de la pédagogie a été signalé pour la modération"
+msgstr ""
+"Un nouveau commentaire de la pédagogie a été signalé pour la modération"
 
 #: sith/settings.py:567
 #, python-format
