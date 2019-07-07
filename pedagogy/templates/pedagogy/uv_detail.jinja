@@ -7,8 +7,16 @@
 
 {% block content %}
 	<div id="pedagogy">
-		<p><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
-		{# <button onclick="window.history.back();">{% trans %}Back{% endtrans %}</button> #}
+		<p id="return_noscript"><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
+		<button id="return_js" onclick='(function(){
+			// If comes from the guide page, go back with history
+			if (document.referrer.replace(/\?(.+)/gm,"").endsWith(`{{ url("pedagogy:guide") }}`)){
+				window.history.back();
+				return;
+			}
+			// Simply goes to the guide page
+			window.location.href = `{{ url("pedagogy:guide") }}`;
+		})()' hidden>{% trans %}Back{% endtrans %}</button>
 
 		<h1>{{ object.code }} - {{ object.title }}</h1>
 		<p style = "word-spacing: 20px;">{{ object.department }} {{ object.credit_type }} {{ object.semester_translated }}</p>
@@ -79,4 +87,9 @@
 			<p><input type="submit" value="{% trans %}Comment{% endtrans %}" /></p>
 		</form>
 	</div>
+
+	<script type="text/javascript">
+		$("#return_noscript").hide();
+		$("#return_js").show();
+	</script>
 {% endblock %}
