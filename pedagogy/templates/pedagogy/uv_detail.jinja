@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import user_profile_link %}
 {% from "pedagogy/macros.jinja" import display_star %}
 
 {% block title %}
@@ -159,7 +160,7 @@
 					<div class="info">
 						<p class="report"><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report this comment{% endtrans %}</a></p>
 						<p class="date-info">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
-						<p class="author-info">{{ comment.author }}</p>
+						<p class="author-info">{{ user_profile_link(comment.author) }}</p>
 					</div>
 
 				</div>

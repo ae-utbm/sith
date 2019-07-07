@@ -1936,9 +1936,16 @@ $pedagogy-white-text: #f0f0f0;
       }
 
       .author-info {
-        color: $pedagogy-white-text;
-        text-align: center;
-        font-weight: bold;
+
+        a {
+          color: $pedagogy-white-text;
+          text-align: center;
+          font-weight: bold;
+        }
+
+        a:hover {
+          color: $pedagogy-light-blue;
+        }
         padding-right: 33%;
 
         padding: 5px;
@@ -1949,7 +1956,7 @@ $pedagogy-white-text: #f0f0f0;
 
       .report {
         background-color: $pedagogy-orange;
-        clip-path: polygon(0 0%, 0 100%, 40% 100%, 30% 0);
+        clip-path: polygon(0 0%, 0 100%, 300px 100%, 250px 0);
         width : 33%;
 
         & a {
