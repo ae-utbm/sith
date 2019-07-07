@@ -3,12 +3,12 @@
     {% if grade >= 0 %}
         {% for i in range(5) %}
             {% if i <= grade %}
-                <span class="fa fa-star pedagogy star_checked"></span>
+                <span class="fa fa-star pedagogy star-checked"></span>
             {% else %}
-                <span class="fa fa-star pedagogy star_not_checked"></span>
+                <span class="fa fa-star pedagogy star-not-checked"></span>
             {% endif %}
         {% endfor %}
-        <span class="pedagogy stars_grade grade-text">{{ grade + 1 }}/5</span>
+        <span class="pedagogy stars-grade grade-text">{{ grade + 1 }}/5</span>
     {% else %}
         <span class="grade-text"> {% trans %} not rated {% endtrans %} </span>
     {% endif %}

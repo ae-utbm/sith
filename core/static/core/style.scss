@@ -1683,23 +1683,23 @@ $pedagogy-light-blue: #caf0ff;
 $pedagogy-white-text: #f0f0f0;
 
 .pedagogy {
-  &.star_not_checked {
+  &.star-not-checked {
     color : #f7f7f7;
   }
-  &.star_checked {
+  &.star-checked {
     color: $pedagogy-orange;
   }
-  &.stars_grade {
+  &.stars-grade {
     display: none;
   }
   @media screen and (max-width: $large-devices) {
-    &.stars_grade {
+    &.stars-grade {
       display: block;
     }
-    &.star_checked {
+    &.star-checked {
       display: none;
     }
-    &.star_not_checked {
+    &.star-not-checked {
       display: none;
     }
   }
@@ -1724,25 +1724,25 @@ $pedagogy-white-text: #f0f0f0;
   margin: 0px;
   width: 100%;
 
-  .input_search {
+  .input-search {
     background: $pedagogy-light-blue;
     width: 300px;
     height: 21px;
   }
-  .button_search {
+  .button-search {
     background: $pedagogy-orange;
     color: white;
     font-weight: bold;
     margin-left: 20px;
   }
-  .radio_guide input[type="radio"],input[type="checkbox"] {
+  .radio-guide input[type="radio"],input[type="checkbox"] {
     display:none;
   }
-  .radio_guide {
+  .radio-guide {
     margin-top: 10px;
     color: white;
   }
-  .radio_guide label {
+  .radio-guide label {
     display:inline-block;
     background-color: $pedagogy-blue;
     padding: 10px 20px;
@@ -1750,13 +1750,13 @@ $pedagogy-white-text: #f0f0f0;
     font-size:16px;
     border-radius: 4px;
   }
-  .radio_guide input[type="radio"]:checked + label {
+  .radio-guide input[type="radio"]:checked + label {
     background-color:$pedagogy-orange;
   }
-  .radio_guide input[type="checkbox"]:checked + label {
+  .radio-guide input[type="checkbox"]:checked + label {
     background-color:$pedagogy-orange;
   }
-  .radio_guide  label:hover {
+  .radio-guide  label:hover {
     background-color:  $pedagogy-hover-blue;
   }
 
