@@ -1795,7 +1795,7 @@ $pedagogy-white-text: #f0f0f0;
       grid-template-rows: 100%;
       grid-template-areas: "stars comment";
 
-      @media screen and (max-width: $small-devices){
+      @media screen and (max-width: $medium-devices){
         grid-template-columns: 100%;
         grid-template-rows: 100% 100%;
         grid-template-areas: "stars" "comment";
@@ -1821,7 +1821,7 @@ $pedagogy-white-text: #f0f0f0;
       color: $pedagogy-white-text;
       clip-path: polygon(0 0%, 0 100%, 30% 100%, 33% 0);
 
-      @media screen and (max-width: $small-devices){
+      @media screen and (max-width: $medium-devices){
         clip-path: none;
       }
     }
@@ -1846,7 +1846,7 @@ $pedagogy-white-text: #f0f0f0;
     grid-template-rows: 156px 1fr;
     grid-template-areas: "grade grade-stars uv-infos" ". . uv-infos";
 
-    @media screen and (max-width: $small-devices){
+    @media screen and (max-width: $medium-devices){
       grid-template-columns: 150px 100px;
       grid-template-rows: 100% 100%;
       grid-template-areas: "grade grade-stars" "uv-infos uv-infos";
