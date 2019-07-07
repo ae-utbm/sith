@@ -1794,6 +1794,12 @@ $pedagogy-white-text: #f0f0f0;
       grid-template-columns: 270px auto;
       grid-template-rows: 100%;
       grid-template-areas: "stars comment";
+
+      @media screen and (max-width: $small-devices){
+        grid-template-columns: 100%;
+        grid-template-rows: 100% 100%;
+        grid-template-areas: "stars" "comment";
+      }
     }
 
     .ui-accordion-content {
@@ -1813,7 +1819,10 @@ $pedagogy-white-text: #f0f0f0;
     .ui-accordion-header {
       background-color: $pedagogy-orange;
       color: $pedagogy-white-text;
-      clip-path: polygon(0 0%, 0 100%, 30% 100%, 33% 0);
+
+      @media screen and (max-width: $small-devices){
+        clip-path: none;
+      }
     }
 
     .ui-accordion-header-icon {
@@ -1835,6 +1844,12 @@ $pedagogy-white-text: #f0f0f0;
     grid-template-columns: 150px 100px auto;
     grid-template-rows: 156px 1fr;
     grid-template-areas: "grade grade-stars uv-infos" ". . uv-infos";
+
+    @media screen and (max-width: $small-devices){
+      grid-template-columns: 150px 100px;
+      grid-template-rows: 100% 100%;
+      grid-template-areas: "grade grade-stars" "uv-infos uv-infos";
+    }
   }
 
   .grade {
