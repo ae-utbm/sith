@@ -14,6 +14,7 @@
 	<p>
 		<a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a>
 	</p>
+	{% endif %}
 	<p>
 		<input class="input-search" type="text" name="search">
 		<button class="button-search">{% trans %}Search{% endtrans %}</button>
@@ -41,7 +42,6 @@
 	<input type="text" name="json" hidden>
 </form>
 <br>
-{% endif %}
 <table id="dynamic_view">
 	<thead>
 		<tr>
