@@ -1819,6 +1819,7 @@ $pedagogy-white-text: #f0f0f0;
     .ui-accordion-header {
       background-color: $pedagogy-orange;
       color: $pedagogy-white-text;
+      clip-path: polygon(0 0%, 0 100%, 30% 100%, 33% 0);
 
       @media screen and (max-width: $small-devices){
         clip-path: none;
