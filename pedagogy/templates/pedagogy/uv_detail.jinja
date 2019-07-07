@@ -19,7 +19,18 @@
 		})()' hidden>{% trans %}Back{% endtrans %}</button>
 
 		<h1>{{ object.code }} - {{ object.title }}</h1>
-		<p style = "word-spacing: 20px;">{{ object.department }} {{ object.credit_type }} {{ object.semester_translated }}</p>
+		<br>
+		<div class="department-credit-type-semester-container">
+			<div class="department">
+				{{ object.department }}
+			</div>
+			<div class="credit-type">
+				{{ object.credit_type }}
+			</div>
+			<div class="semester">
+				{{ object.semester_translated }}
+			</div>
+		</div>
 
 		<br>
 
@@ -51,12 +62,68 @@
 			</div>
 		</div>
 
+		<br>
+		<div id="leave_comment">
+			<h2>{% trans %}Leave comment{% endtrans %}</h2>
+			<div>
+				<form action="{{ url('pedagogy:uv_detail', uv_id=object.id) }}" method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+					<div class="leave-comment-grid-container">
+						<div class="form-stars">
+							{{ form.author.errors }}
+							{{ form.uv.errors }}
+
+							{{ form.author }}
+							{{ form.uv }}
+
+							<div class="input-stars">
+								<label for="{{ form.grade_global.id_for_label }}">{{ form.grade_global.label }} :</label>
+								{{ form.grade_global.errors }}
+								{{ form.grade_global }}
+							</div>
+
+							<div class="input-stars">
+								<label for="{{ form.grade_utility.id_for_label }}">{{ form.grade_utility.label }} :</label>
+								{{ form.grade_utility.errors }}
+								{{ form.grade_utility }}
+							</div>
+
+							<div class="input-stars">
+								<label for="{{ form.grade_interest.id_for_label }}">{{ form.grade_interest.label }} :</label>
+								{{ form.grade_interest.errors }}
+								{{ form.grade_interest }}
+							</div>
+
+							<div class="input-stars">
+								<label for="{{ form.grade_teaching.id_for_label }}">{{ form.grade_teaching.label }} :</label>
+								{{ form.grade_teaching.errors }}
+								{{ form.grade_teaching }}
+							</div>
+
+							<div class="input-stars">
+								<label for="{{ form.grade_work_load.id_for_label }}">{{ form.grade_work_load.label }} :</label>
+								{{ form.grade_work_load.errors }}
+								{{ form.grade_work_load }}
+							</div>
+						</div>
+						<div class="form-comment">
+							<label for="{{ form.comment.id_for_label }}">{{ form.comment.label }} :</label>
+							{{ form.comment.errors }}
+							{{ form.comment }}
+						</div>
+					</div>
+					<p><input type="submit" value="{% trans %}Comment{% endtrans %}" /></p>
+				</form>
+			</div>
+		</div>
+		<br>
+
 		{% if object.comments.exists() %}
 			<h2>{% trans %}Comments{% endtrans %}</h2>
 			{% for comment in object.comments.order_by("-publish_date").all() %}
 				<div id="{{ comment.id }}" class="comment">
-					<div class="grade_block">
-						<div class="dif_grade">
+					<div class="grade-block">
+						<div class="dif-grade">
 							<p>{% trans %}global grade{% endtrans %}</p>
 							<p>{% trans %}utility{% endtrans %}</p>
 							<p>{% trans %}interest{% endtrans %}</p>
@@ -77,7 +144,7 @@
 					{{ comment.comment|markdown }}
 
 					{% if comment.is_reported %}
-						<p class="status_reported">
+						<p class="status-reported">
 							{% trans %}This comment has been reported{% endtrans %}
 						</p>
 					{% endif %}
@@ -91,24 +158,34 @@
 
 					<div class="info">
 						<p class="report"><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report this comment{% endtrans %}</a></p>
-						<p class="date_info">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
-						<p class="author_info">{{ comment.author }}</p>
+						<p class="date-info">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
+						<p class="author-info">{{ comment.author }}</p>
 					</div>
 
 				</div>
 			{% endfor %}
 		{% endif %}
 
-		<h2>{% trans %}Leave comment{% endtrans %}</h2>
-		<form action="{{ url('pedagogy:uv_detail', uv_id=object.id) }}" method="post" enctype="multipart/form-data">
-			{% csrf_token %}
-			{{ form.as_p() }}
-			<p><input type="submit" value="{% trans %}Comment{% endtrans %}" /></p>
-		</form>
 	</div>
 
 	<script type="text/javascript">
 		$("#return_noscript").hide();
 		$("#return_js").show();
+		var icons = {
+			header: "fa fa-toggle-right",
+			activeHeader: "fa fa-toggle-down"
+		};
+		$(function(){
+			$("#leave_comment").accordion({
+				icons: icons,
+			    heightStyle: "content",
+			    active: false,
+			    collapsible: true
+			});
+		});
+		// Remove jquery-ui icons to make fontawesome work
+		$(document).ready(function(){
+			$(".ui-accordion-header-icon").first().removeClass("ui-icon");
+		});
 	</script>
 {% endblock %}

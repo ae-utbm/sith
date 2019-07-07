@@ -1677,6 +1677,8 @@ label {
 /* --------------------------------------pedagogy-----------------------------------*/
 
 $pedagogy-blue: #1bb9ea;
+$pedagogy-orange: #ea7900;
+$pedagogy-hover-blue: #0e97ce;
 $pedagogy-light-blue: #caf0ff;
 $pedagogy-white-text: #f0f0f0;
 
@@ -1685,7 +1687,7 @@ $pedagogy-white-text: #f0f0f0;
     color : #f7f7f7;
   }
   &.star_checked {
-    color: #ea7900;
+    color: $pedagogy-orange;
   }
   &.stars_grade {
     display: none;
@@ -1728,7 +1730,7 @@ $pedagogy-white-text: #f0f0f0;
     height: 21px;
   }
   .button_search {
-    background: #ea7900;
+    background: $pedagogy-orange;
     color: white;
     font-weight: bold;
     margin-left: 20px;
@@ -1749,13 +1751,13 @@ $pedagogy-white-text: #f0f0f0;
     border-radius: 4px;
   }
   .radio_guide input[type="radio"]:checked + label {
-    background-color:#ea7900;
+    background-color:$pedagogy-orange;
   }
   .radio_guide input[type="checkbox"]:checked + label {
-    background-color:#ea7900;
+    background-color:$pedagogy-orange;
   }
   .radio_guide  label:hover {
-    background-color:  #0e97ce;
+    background-color:  $pedagogy-hover-blue;
   }
 
   #radioAUTUMN + label {
@@ -1767,10 +1769,70 @@ $pedagogy-white-text: #f0f0f0;
   font-family: "Fira Sans";
   color: #062f38;
 
+  .department-credit-type-semester-container {
+    display: grid;
+    grid-template-columns: 10% 10% auto;
+    grid-template-rows: 100%;
+    grid-template-areas: "department credit-type semester";
+  }
+
+  .department {
+    grid-area: department;
+  }
+
+  .credit-type {
+    grid-area: credit-type;
+  }
+
+  .semester {
+    grid-area: semester;
+  }
+
+  #leave_comment {
+    .leave-comment-grid-container {
+      display: grid;
+      grid-template-columns: 270px auto;
+      grid-template-rows: 100%;
+      grid-template-areas: "stars comment";
+    }
+
+    .ui-accordion-content {
+      background-color: $white-color;
+      border-color: $pedagogy-orange;
+      border-right: none;
+    }
+
+    .form-stars {
+      grid-area: stars;
+    }
+
+    .form-comment {
+      grid-area: comment;
+    }
+
+    .ui-accordion-header {
+      background-color: $pedagogy-orange;
+      color: $pedagogy-white-text;
+      clip-path: polygon(0 0%, 0 100%, 30% 100%, 33% 0);
+    }
+
+    .ui-accordion-header-icon {
+      color: $pedagogy-white-text;
+      margin-right: 10px;
+    }
+
+    .input-stars {
+      margin-top: 20px;
+    }
+
+    input[type="submit"] {
+      float: right;
+    }
+  }
 
   .grid-container {
     display: grid;
-    grid-template-columns: 10% 9% 1fr;
+    grid-template-columns: 150px 100px auto;
     grid-template-rows: 156px 1fr;
     grid-template-areas: "grade grade-stars uv-infos" ". . uv-infos";
   }
@@ -1810,9 +1872,9 @@ $pedagogy-white-text: #f0f0f0;
       float: right;
     }
 
-    .grade_block {
+    .grade-block {
 
-      .dif_grade {
+      .dif-grade {
         height: 156px;
         width: 8%;
         background-color: $pedagogy-blue;
@@ -1838,7 +1900,7 @@ $pedagogy-white-text: #f0f0f0;
       }
 
     @media screen and (max-width: $large-devices) {
-        .dif_grade {
+        .dif-grade {
           width: 11%;
         }
 
@@ -1848,7 +1910,7 @@ $pedagogy-white-text: #f0f0f0;
       }
     }
 
-    .not_rated {
+    .grade-text {
       color: $pedagogy-white-text;
       text-align: center;
     }
@@ -1858,7 +1920,7 @@ $pedagogy-white-text: #f0f0f0;
       width: 100%;
       float: left;
 
-      .date_info {
+      .date-info {
         color: $pedagogy-white-text;
         text-align: center;
         width : 34%;
@@ -1873,7 +1935,7 @@ $pedagogy-white-text: #f0f0f0;
 
       }
 
-      .author_info {
+      .author-info {
         color: $pedagogy-white-text;
         text-align: center;
         font-weight: bold;
@@ -1886,7 +1948,7 @@ $pedagogy-white-text: #f0f0f0;
       }
 
       .report {
-        background-color: #ea7900;
+        background-color: $pedagogy-orange;
         clip-path: polygon(0 0%, 0 100%, 40% 100%, 30% 0);
         width : 33%;
 
@@ -1913,7 +1975,7 @@ $pedagogy-white-text: #f0f0f0;
       margin: 0px;
     }
 
-    .status_reported {
+    .status-reported {
       color: red;
       float: left;
       padding: 5px;
