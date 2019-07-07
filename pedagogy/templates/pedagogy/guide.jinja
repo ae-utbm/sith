@@ -7,6 +7,13 @@
 
 {% block content %}
 <form id="search_form" action="{{ url('pedagogy:guide') }}" method="get">
+	{% if can_create_uv(user) %}
+	<p>
+		<a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
+	</p>
+	<p>
+		<a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a>
+	</p>
 	<p>
 		<input class="input_search" type="text" name="search">
 		<button class="button_search">{% trans %}Search{% endtrans %}</button>
@@ -27,16 +34,12 @@
 		<input type="radio" name="credit_type" id="radioQC" value="QC"><label for="radioQC">{% trans %}QC{% endtrans %}</label>
 		<input type="radio" name="credit_type" id="radioOM" value="OM"><label for="radioOM">{% trans %}OM{% endtrans %}</label>
 
-		<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN">A</label>
-		<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING">P</label>
+		<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN"><i class="fa fa-leaf"></i></label>
+		<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING"><i class="fa fa-sun-o"></i></label>
 		<span><input type="checkbox" name="semester" id="radioAP" value="AUTUMN_AND_SPRING"><label for="radioAP">AP</label></span>
 	</div>
 	<input type="text" name="json" hidden>
 </form>
-{% if can_create_uv(user) %}
-<p>
-	<a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
-</p>
 <br>
 {% endif %}
 <table id="dynamic_view">

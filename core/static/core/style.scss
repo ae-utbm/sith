@@ -1703,7 +1703,22 @@ $pedagogy-white-text: #f0f0f0;
   }
 }
 
+#dynamic_view {
+  font-family: "Fira Sans";
+  font-size: 1.1em;
+
+  table {
+  }
+
+  td {
+    text-align: center;
+    border: none;
+  }
+
+}
+
 #search_form {
+  font-family: "Fira Sans";
   margin: 0px;
   width: 100%;
 
@@ -1742,6 +1757,10 @@ $pedagogy-white-text: #f0f0f0;
   .radio_guide  label:hover {
     background-color:  #0e97ce;
   }
+
+  #radioAUTUMN + label {
+    margin-left: 50px;
+  }
 }
 
 #pedagogy {
@@ -1764,6 +1783,7 @@ $pedagogy-white-text: #f0f0f0;
 
     > p {
       text-align: right;
+        font-weight: bold;
     }
   }
 
@@ -1771,6 +1791,7 @@ $pedagogy-white-text: #f0f0f0;
     grid-area: grade-stars;
     color: $pedagogy-white-text;
     background-color: $pedagogy-blue;
+    font-weight: bold;
   }
 
   .uv-infos {
