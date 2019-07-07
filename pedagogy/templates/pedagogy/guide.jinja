@@ -59,7 +59,7 @@
 	</thead>
 	<tbody id="dynamic_view_content">
 		{% for uv in object_list %}
-		<tr>
+		<tr onclick="window.location.href = `{{ url('pedagogy:uv_detail', uv_id=uv.id) }}`">
 			<td><a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}">{{ uv.code }}</a></td>
 			<td>{{ uv.title }}</td>
 			<td>{{ uv.department }}</td>
@@ -101,7 +101,7 @@
 			spring = "<i class='fa fa-sun-o'></i>";
 
 		var html = `
-			<tr>
+			<tr onclick="window.location.href = '${uv.absolute_url}';">
 				<td><a href="${uv.absolute_url}">${uv.code}</a></td>
 				<td>${uv.title}</td>
 				<td>${uv.department}</td>
@@ -180,6 +180,8 @@
 			type: "GET",
 			url: "{{ url('pedagogy:guide') }}",
 			data: $(this).serialize(),
+			tryCount: 0,
+			retryLimit: 10,
 			xhr: function(){
 				 return xhr;
 			},
@@ -192,6 +194,15 @@
 					$("#dynamic_view_content").append(uvJSONToHTML(data[key]));
 				}
 			},
+			error: function(){
+				console.log(`try ${this.tryCount}`);
+				if (this.tryCount++ <= this.retryLimit){
+					$("dynamic_view_content").html("");
+					$.ajax(this);
+					return;
+				}
+				$("#dynamic_view_content").html("<tr><td></td><td>{% trans %}Error connecting to the server{% endtrans %}</td></tr>");
+			}
 		});
 
 		// Restore autumn and spring for perfect illusion
