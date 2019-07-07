@@ -20,17 +20,36 @@
 
 		<h1>{{ object.code }} - {{ object.title }}</h1>
 		<p style = "word-spacing: 20px;">{{ object.department }} {{ object.credit_type }} {{ object.semester_translated }}</p>
-		<p>{{ object.objectives|markdown }}</p>
-		<p>{{ object.program|markdown }}</p>
-		<p>{{ object.skills|markdown }}</p>
-		<p>{{ object.key_concepts }}</p>
-		<p>{% trans %}UV manager: {% endtrans %}{{ object.manager }}</p>
 
-		<p>{{ display_star(object.grade_global_average) }}</p>
-		<p>{{ display_star(object.grade_utility_average) }}</p>
-		<p>{{ display_star(object.grade_interest_average) }}</p>
-		<p>{{ display_star(object.grade_teaching_average) }}</p>
-		<p>{{ display_star(object.grade_work_load_average) }}</p>
+		<br>
+
+		<div class="grid-container">
+			<div class="grade">
+				<p>{% trans %}global grade{% endtrans %}</p>
+				<p>{% trans %}utility{% endtrans %}</p>
+				<p>{% trans %}interest{% endtrans %}</p>
+				<p>{% trans %}teaching{% endtrans %}</p>
+				<p>{% trans %}work load{% endtrans %}</p>
+			</div>
+			<div class="grade-stars">
+				<p>{{ display_star(object.grade_global_average) }}</p>
+				<p>{{ display_star(object.grade_utility_average) }}</p>
+				<p>{{ display_star(object.grade_interest_average) }}</p>
+				<p>{{ display_star(object.grade_teaching_average) }}</p>
+				<p>{{ display_star(object.grade_work_load_average) }}</p>
+			</div>
+			<div class="uv-infos">
+				<p><b>{% trans %}Objectives{% endtrans %}</b></p>
+				<p>{{ object.objectives|markdown }}</p>
+				<p><b>{% trans %}Program{% endtrans %}</b></p>
+				<p>{{ object.program|markdown }}</p>
+				<p><b>{% trans %}Earned skills{% endtrans %}</b></p>
+				<p>{{ object.skills|markdown }}</p>
+				<p><b>{% trans %}Key concepts{% endtrans %}</b></p>
+				<p>{{ object.key_concepts }}</p>
+				<p><b>{% trans %}UV manager: {% endtrans %}</b>{{ object.manager }}</p>
+			</div>
+		</div>
 
 		{% if object.comments.exists() %}
 			<h2>{% trans %}Comments{% endtrans %}</h2>

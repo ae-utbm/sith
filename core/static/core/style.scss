@@ -30,6 +30,12 @@ $shadow-color: rgb(223, 223, 223);
 
 $background-bouton-color: hsl(0, 0%, 90%);
 
+/*--------------------------MEDIA QUERY HELPERS------------------------*/
+$small-devices: 576px;
+$medium-devices: 768px;
+$large-devices: 992px;
+$extra-large-devices: 1200px;
+
 /*--------------------------------GENERAL------------------------------*/
 
 body {
@@ -1670,6 +1676,10 @@ label {
 
 /* --------------------------------------pedagogy-----------------------------------*/
 
+$pedagogy-blue: #1bb9ea;
+$pedagogy-light-blue: #caf0ff;
+$pedagogy-white-text: #f0f0f0;
+
 .pedagogy {
   &.star_not_checked {
     color : #f7f7f7;
@@ -1680,7 +1690,7 @@ label {
   &.stars_grade {
     display: none;
   }
-  @media screen and (max-width: 992px) {
+  @media screen and (max-width: $large-devices) {
     &.stars_grade {
       display: block;
     }
@@ -1698,7 +1708,7 @@ label {
   width: 100%;
 
   .input_search {
-    background: #caf0ff;
+    background: $pedagogy-light-blue;
     width: 300px;
     height: 21px;
   }
@@ -1709,7 +1719,7 @@ label {
     margin-left: 20px;
   }
   .radio_guide input[type="radio"],input[type="checkbox"] {
-    display:none; 
+    display:none;
   }
   .radio_guide {
     margin-top: 10px;
@@ -1717,16 +1727,16 @@ label {
   }
   .radio_guide label {
     display:inline-block;
-    background-color:#1bb9ea;
+    background-color: $pedagogy-blue;
     padding: 10px 20px;
     font-family:Arial;
     font-size:16px;
-    border-radius: 4px;    
+    border-radius: 4px;
   }
-  .radio_guide input[type="radio"]:checked + label { 
+  .radio_guide input[type="radio"]:checked + label {
     background-color:#ea7900;
   }
-  .radio_guide input[type="checkbox"]:checked + label { 
+  .radio_guide input[type="checkbox"]:checked + label {
     background-color:#ea7900;
   }
   .radio_guide  label:hover {
@@ -1737,6 +1747,37 @@ label {
 #pedagogy {
   font-family: "Fira Sans";
   color: #062f38;
+
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: 10% 9% 1fr;
+    grid-template-rows: 156px 1fr;
+    grid-template-areas: "grade grade-stars uv-infos" ". . uv-infos";
+  }
+
+  .grade {
+    grid-area: grade;
+    color: $pedagogy-white-text;
+    background-color: $pedagogy-blue;
+    padding-right: 10px;
+
+    > p {
+      text-align: right;
+    }
+  }
+
+  .grade-stars {
+    grid-area: grade-stars;
+    color: $pedagogy-white-text;
+    background-color: $pedagogy-blue;
+  }
+
+  .uv-infos {
+    grid-area: uv-infos;
+    padding-left: 10px;
+  }
+
   .comment {
     max-width: 100%;
     max-height: 200px;
@@ -1753,8 +1794,8 @@ label {
       .dif_grade {
         height: 156px;
         width: 8%;
-        background-color: #1bb9ea;
-        color: #f0f0f0;
+        background-color: $pedagogy-blue;
+        color: $pedagogy-white-text;
         height: 156px;
         float: left;
         font-weight: bold;
@@ -1772,10 +1813,10 @@ label {
         padding-right: 40px;
         padding-top: 0px;
         clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 20%, 75% 0);
-        background-color: #1bb9ea;
+        background-color: $pedagogy-blue;
       }
 
-    @media screen and (max-width: 992px) {
+    @media screen and (max-width: $large-devices) {
         .dif_grade {
           width: 11%;
         }
@@ -1787,27 +1828,32 @@ label {
     }
 
     .not_rated {
-      color: #f0f0f0;
+      color: $pedagogy-white-text;
       text-align: center;
     }
 
     .info {
-      background-color: #1bb9ea;
+      background-color: $pedagogy-blue;
       width: 100%;
       float: left;
 
       .date_info {
-        color: #f0f0f0;
+        color: $pedagogy-white-text;
         text-align: center;
         width : 34%;
 
         padding: 5px;
         margin: 0px;
         float: left;
+
+        @media screen and (max-width: $large-devices) {
+          width: 0%;
+        }
+
       }
 
       .author_info {
-        color: #f0f0f0;
+        color: $pedagogy-white-text;
         text-align: center;
         font-weight: bold;
         padding-right: 33%;
@@ -1824,13 +1870,18 @@ label {
         width : 33%;
 
         & a {
-          color: #f0f0f0;
+          color: $pedagogy-white-text;
           font-weight: bold;
         }
 
         padding: 5px;
         margin: 0px;
         float: left;
+
+        @media screen and (max-width: $large-devices) {
+          clip-path: none;
+          width : 32%;
+        }
       }
     }
 
