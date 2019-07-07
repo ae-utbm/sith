@@ -16,7 +16,7 @@
 	</p>
 	{% endif %}
 	<p>
-		<input class="input-search" type="text" name="search">
+		<input id="search_input" class="input-search" type="text" name="search">
 		<button class="button-search">{% trans %}Search{% endtrans %}</button>
 	</p>
 	<div class="radio-guide">
@@ -117,6 +117,20 @@
 		{% endif %}
 		return html + "</td>";
 	}
+
+	var lastTypedLetter;
+	$("#search_input").on("keyup", function(){
+		// Auto submit when user pauses it's typing
+		clearTimeout(lastTypedLetter);
+		lastTypedLetter = setTimeout(function (){
+			$("#search_form").submit();
+		}, 300);
+	});
+	$("#search_input").on("change", function(e){
+		// Don't send request when leaving the text area
+		// It has already been send by the keypress event
+		e.preventDefault();
+	});
 
 	// Auto fill from get arguments
 	var urlParams = new URLSearchParams(window.location.search);
