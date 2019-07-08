@@ -74,7 +74,7 @@
 				<p><b>{% trans %}Earned skills{% endtrans %}</b></p>
 				<p>{{ object.skills|markdown }}</p>
 				<p><b>{% trans %}Key concepts{% endtrans %}</b></p>
-				<p>{{ object.key_concepts }}</p>
+				<p>{{ object.key_concepts|markdown }}</p>
 				<p><b>{% trans %}UV manager: {% endtrans %}</b>{{ object.manager }}</p>
 			</div>
 		</div>
