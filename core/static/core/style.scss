@@ -1685,9 +1685,24 @@ $pedagogy-white-text: #f0f0f0;
 .pedagogy {
   &.star-not-checked {
     color : #f7f7f7;
+    margin-bottom: 0px;
+    margin-top: 0px;
   }
   &.star-checked {
     color: $pedagogy-orange;
+    margin-bottom: 0px;
+    margin-top: 0px;
+  }
+
+  @media screen and (max-width: $large-devices){
+    &.star-not-checked {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+    &.star-checked {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
   }
 }
 
@@ -2044,8 +2059,8 @@ $pedagogy-white-text: #f0f0f0;
         }
 
         @media screen and (max-width: $large-devices){
-          // text-align: center;
-          justify-self: center;
+          text-align: center;
+          justify-self: inherit;
           padding-right: 0px;
         }
       }
