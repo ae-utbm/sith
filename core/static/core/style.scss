@@ -1893,7 +1893,7 @@ $pedagogy-white-text: #f0f0f0;
 
     @media screen and (max-width: $large-devices){
       grid-template-columns: auto;
-      grid-template-rows: 156px auto auto auto;
+      grid-template-rows: auto auto auto auto;
       grid-template-areas: "grade-block" "comment" "info" "comment-end-bar"
     }
 
@@ -1913,8 +1913,10 @@ $pedagogy-white-text: #f0f0f0;
       background-color: $pedagogy-blue;
 
       @media screen and (max-width: $large-devices){
-        grid-template-columns: 50% 50%;
-        width: 100%;
+        grid-template-columns: auto auto;
+        grid-template-rows: auto;
+        grid-template-areas: "grade-type grade-stars";
+        width: auto;
         clip-path: none;
       }
 
@@ -1930,7 +1932,6 @@ $pedagogy-white-text: #f0f0f0;
 
       .grade-stars {
         grid-area: grade-stars;
-        justify-self: start;
       }
     }
 
