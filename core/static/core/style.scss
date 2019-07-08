@@ -1952,7 +1952,11 @@ $pedagogy-white-text: #f0f0f0;
 
     .comment {
       grid-area: comment;
-      overflow: scroll;
+
+      display: grid;
+      grid-template-columns: auto;
+      grid-template-rows: auto auto;
+      grid-template-areas: "anchor" "markdown";
 
       @media screen and (max-width: $large-devices){
         border-left: solid;
@@ -1961,15 +1965,18 @@ $pedagogy-white-text: #f0f0f0;
       }
 
       .anchor {
-        float: right;
+        grid-area: anchor;
+        text-align: right;
+        margin-right: 15px;
       }
 
       .markdown {
+        grid-area: markdown;
+        overflow: scroll;
         margin-top: 0px;
         margin-right: 0px;
         padding: 10px;
         padding-left: 40px;
-        overflow: auto;
         text-align: justify;
       }
     }
