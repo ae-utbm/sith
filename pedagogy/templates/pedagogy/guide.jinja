@@ -20,20 +20,15 @@
 		<button class="button-search">{% trans %}Search{% endtrans %}</button>
 	</p>
 	<div class="radio-guide">
-		<input type="radio" name="department" id="radioEDIM" value="EDIM"><label for="radioEDIM">{% trans %}EDIM{% endtrans %}</label>
-		<input type="radio" name="department" id="radioEE" value="EE"><label for="radioEE">{% trans %}ENERGIE{% endtrans %}</label>
-		<input type="radio" name="department" id="radioIMSI" value="IMSI"><label for="radioIMSI">{% trans %}IMSI{% endtrans %}</label>
-		<input type="radio" name="department" id="radioGI" value="GI"><label for="radioGI">{% trans %}INFO{% endtrans %}</label>
-		<input type="radio" name="department" id="radioMC" value="MC"><label for="radioMC">{% trans %}GMC{% endtrans %}</label>
-		<input type="radio" name="department" id="radioHUMA" value="HUMA"><label for="radioHUMA">{% trans %}HUMA{% endtrans %}</label>
-		<input type="radio" name="department" id="radioTC" value="TC"><label for="radioTC">{% trans %}TC{% endtrans %}</label>
+		{% for department in [("EDIM", "EDIM"), ("ENERGIE", "EE"), ("IMSI", "IMSI"), ("INFO", "GI"), ("GMC", "MC"), ("HUMA", "HUMA"), ("TC", "TC")] %}
+			{% set display_name, real_name = department %}
+			<input type="radio" name="department" id="radio{{ real_name }}" value="{{ real_name }}"><label for="radio{{ real_name }}">{% trans %}{{ display_name }}{% endtrans %}</label>
+		{% endfor %}
 	</div>
 	<div class="radio-guide">
-		<input type="radio" name="credit_type" id="radioCS" value="CS"><label for="radioCS">{% trans %}CS{% endtrans %}</label>
-		<input type="radio" name="credit_type" id="radioTM" value="TM"><label for="radioTM">{% trans %}TM{% endtrans %}</label>
-		<input type="radio" name="credit_type" id="radioEC" value="EC"><label for="radioEC">{% trans %}EC{% endtrans %}</label>
-		<input type="radio" name="credit_type" id="radioQC" value="QC"><label for="radioQC">{% trans %}QC{% endtrans %}</label>
-		<input type="radio" name="credit_type" id="radioOM" value="OM"><label for="radioOM">{% trans %}OM{% endtrans %}</label>
+		{% for credit_type in ["CS", "TM", "EC", "QC", "OM"] %}
+			<input type="radio" name="credit_type" id="radio{{ credit_type }}" value="{{ credit_type }}"><label for="radio{{ credit_type }}">{% trans %}{{ credit_type }}{% endtrans %}</label>
+		{% endfor %}
 
 		<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN"><i class="fa fa-leaf"></i></label>
 		<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING"><i class="fa fa-sun-o"></i></label>

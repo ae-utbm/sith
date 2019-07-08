@@ -84,13 +84,6 @@ class UV(models.Model):
     def grade_work_load_average(self):
         return self.__grade_average_generic("grade_work_load")
 
-    @cached_property
-    def semester_translated(self):
-        for semester in settings.SITH_PEDAGOGY_UV_SEMESTER:
-            if semester[0] == self.semester:
-                return semester[1]
-        return ""
-
     def __str__(self):
         return self.code
 
