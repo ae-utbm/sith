@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-08 17:32+0200\n"
+"POT-Creation-Date: 2019-07-08 22:46+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4879,8 +4879,7 @@ msgstr "heures TE"
 msgid "uv"
 msgstr "uv"
 
-#: pedagogy/models.py:222 pedagogy/templates/pedagogy/uv_detail.jinja:57
-#: pedagogy/templates/pedagogy/uv_detail.jinja:146
+#: pedagogy/models.py:222
 msgid "global grade"
 msgstr "note globale"
 
@@ -4997,25 +4996,30 @@ msgstr "TE : "
 msgid "THE: "
 msgstr "THE : "
 
+#: pedagogy/templates/pedagogy/uv_detail.jinja:57
+#: pedagogy/templates/pedagogy/uv_detail.jinja:146
+msgid "Global grade"
+msgstr "Note globale"
+
 #: pedagogy/templates/pedagogy/uv_detail.jinja:58
 #: pedagogy/templates/pedagogy/uv_detail.jinja:147
-msgid "utility"
-msgstr "utilité"
+msgid "Utility"
+msgstr "Utilité"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:59
 #: pedagogy/templates/pedagogy/uv_detail.jinja:148
-msgid "interest"
-msgstr "intérêt"
+msgid "Interest"
+msgstr "Intérêt"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:60
 #: pedagogy/templates/pedagogy/uv_detail.jinja:149
-msgid "teaching"
-msgstr "enseignement"
+msgid "Teaching"
+msgstr "Enseignement"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:61
 #: pedagogy/templates/pedagogy/uv_detail.jinja:150
-msgid "work load"
-msgstr "charge de travail"
+msgid "Work load"
+msgstr "Charge de travail"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:71
 msgid "Objectives"

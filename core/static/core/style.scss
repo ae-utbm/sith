@@ -1896,7 +1896,7 @@ $pedagogy-white-text: #f0f0f0;
 
     .comment-container {
       display: grid;
-      grid-template-columns: auto auto;
+      grid-template-columns: 300px auto;
       grid-template-rows: 156px auto auto;
       grid-template-areas: "grade-block comment" "grade-block info" "comment-end-bar comment-end-bar";
       margin-bottom: 30px;
@@ -1968,6 +1968,7 @@ $pedagogy-white-text: #f0f0f0;
 
         .markdown {
           grid-area: markdown;
+
           overflow: scroll;
           margin-top: 0px;
           margin-right: 0px;
@@ -2018,9 +2019,9 @@ $pedagogy-white-text: #f0f0f0;
 
         .report {
           grid-area: report;
-          padding-top: 6px;
+          padding-top: 8px;
           padding-left: 20px;
-          background-color: $pedagogy-orange;
+          background-color: $white-color;
           clip-path: polygon(0 0%, 0 200%, 300px 200%, 250px 0);
 
           @media screen and (max-width: $large-devices){
@@ -2032,8 +2033,7 @@ $pedagogy-white-text: #f0f0f0;
           }
 
           & a {
-            color: $pedagogy-white-text;
-            font-weight: bold;
+            color: $black-color;
           }
 
         }
@@ -2051,20 +2051,33 @@ $pedagogy-white-text: #f0f0f0;
           grid-area: author;
           justify-self: right;
           padding-right: 30px;
+          padding-left: 30px;
+          background-color: $pedagogy-light-blue;
 
           a {
-            color: $pedagogy-white-text;
+            color: $pedagogy-orange;
             font-weight: bold;
           }
 
           a:hover {
-            color: $pedagogy-light-blue;
+            color: $black-color;
           }
 
           @media screen and (max-width: $large-devices){
             text-align: center;
             justify-self: inherit;
             padding-right: 0px;
+            padding-bottom: 10px;
+            background-color: $pedagogy-blue;
+
+            a {
+              color: $pedagogy-white-text;
+              font-weight: bold;
+            }
+
+            a:hover {
+              color: $pedagogy-light-blue;
+            }
           }
         }
       }

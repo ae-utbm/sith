@@ -54,11 +54,11 @@
 
 		<div class="uv-details-container">
 			<div class="grade">
-				<p>{% trans %}global grade{% endtrans %}</p>
-				<p>{% trans %}utility{% endtrans %}</p>
-				<p>{% trans %}interest{% endtrans %}</p>
-				<p>{% trans %}teaching{% endtrans %}</p>
-				<p>{% trans %}work load{% endtrans %}</p>
+				<p>{% trans %}Global grade{% endtrans %}</p>
+				<p>{% trans %}Utility{% endtrans %}</p>
+				<p>{% trans %}Interest{% endtrans %}</p>
+				<p>{% trans %}Teaching{% endtrans %}</p>
+				<p>{% trans %}Work load{% endtrans %}</p>
 			</div>
 			<div class="grade-stars">
 				<p>{{ display_star(object.grade_global_average) }}</p>
@@ -143,11 +143,11 @@
 
 					<div class="grade-block">
 						<div class="grade-type">
-							<p>{% trans %}global grade{% endtrans %}</p>
-							<p>{% trans %}utility{% endtrans %}</p>
-							<p>{% trans %}interest{% endtrans %}</p>
-							<p>{% trans %}teaching{% endtrans %}</p>
-							<p>{% trans %}work load{% endtrans %}</p>
+							<p>{% trans %}Global grade{% endtrans %}</p>
+							<p>{% trans %}Utility{% endtrans %}</p>
+							<p>{% trans %}Interest{% endtrans %}</p>
+							<p>{% trans %}Teaching{% endtrans %}</p>
+							<p>{% trans %}Work load{% endtrans %}</p>
 						</div>
 						<div class="grade-stars">
 							<p>{{ display_star(comment.grade_global) }}</p>
@@ -185,7 +185,7 @@
 
 						<p class="date">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
 
-						<p class="author">{{ user_profile_link(comment.author) }}</p>
+						<div class="author"><p>{{ user_profile_link(comment.author) }}</p></div>
 					</div>
 
 				</div>
