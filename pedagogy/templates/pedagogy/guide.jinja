@@ -6,78 +6,79 @@
 {% endblock %}
 
 {% block content %}
-<form id="search_form" action="{{ url('pedagogy:guide') }}" method="get">
-	{% if can_create_uv(user) %}
-	<p>
-		<a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
-	</p>
-	<p>
-		<a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a>
-	</p>
-	{% endif %}
-	<p>
-		<input id="search_input" class="input-search" type="text" name="search">
-		<button class="button-search">{% trans %}Search{% endtrans %}</button>
-	</p>
-	<div class="radio-guide">
-		{% for department in [("EDIM", "EDIM"), ("ENERGIE", "EE"), ("IMSI", "IMSI"), ("INFO", "GI"), ("GMC", "MC"), ("HUMA", "HUMA"), ("TC", "TC")] %}
-			{% set display_name, real_name = department %}
-			<input type="radio" name="department" id="radio{{ real_name }}" value="{{ real_name }}"><label for="radio{{ real_name }}">{% trans %}{{ display_name }}{% endtrans %}</label>
-		{% endfor %}
-	</div>
-	<div class="radio-guide">
-		{% for credit_type in ["CS", "TM", "EC", "QC", "OM"] %}
-			<input type="radio" name="credit_type" id="radio{{ credit_type }}" value="{{ credit_type }}"><label for="radio{{ credit_type }}">{% trans %}{{ credit_type }}{% endtrans %}</label>
-		{% endfor %}
+<div class="pedagogy">
+	<form id="search_form" action="{{ url('pedagogy:guide') }}" method="get">
+		{% if can_create_uv(user) %}
+		<p>
+			<a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
+		</p>
+		<p>
+			<a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a>
+		</p>
+		{% endif %}
+		<p>
+			<input id="search_input" class="input-search" type="text" name="search">
+			<button class="button-search">{% trans %}Search{% endtrans %}</button>
+		</p>
+		<div class="radio-guide">
+			{% for department in [("EDIM", "EDIM"), ("ENERGIE", "EE"), ("IMSI", "IMSI"), ("INFO", "GI"), ("GMC", "MC"), ("HUMA", "HUMA"), ("TC", "TC")] %}
+				{% set display_name, real_name = department %}
+				<input type="radio" name="department" id="radio{{ real_name }}" value="{{ real_name }}"><label for="radio{{ real_name }}">{% trans %}{{ display_name }}{% endtrans %}</label>
+			{% endfor %}
+		</div>
+		<div class="radio-guide">
+			{% for credit_type in ["CS", "TM", "EC", "QC", "OM"] %}
+				<input type="radio" name="credit_type" id="radio{{ credit_type }}" value="{{ credit_type }}"><label for="radio{{ credit_type }}">{% trans %}{{ credit_type }}{% endtrans %}</label>
+			{% endfor %}
 
-		<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN"><i class="fa fa-leaf"></i></label>
-		<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING"><i class="fa fa-sun-o"></i></label>
-		<span><input type="checkbox" name="semester" id="radioAP" value="AUTUMN_AND_SPRING"><label for="radioAP">AP</label></span>
-	</div>
-	<input type="text" name="json" hidden>
-</form>
-<br>
-<table id="dynamic_view">
-	<thead>
-		<tr>
-			<td>{% trans %}UV{% endtrans %}</td>
-			<td>{% trans %}Title{% endtrans %}</td>
-			<td>{% trans %}Department{% endtrans %}</td>
-			<td>{% trans %}Credit type{% endtrans %}</td>
-			<td><i class="fa fa-leaf"></i></td>
-			<td><i class="fa fa-sun-o"></i></td>
-			{% if can_create_uv(user) %}
-			<td>{% trans %}Edit{% endtrans %}</td>
-			<td>{% trans %}Delete{% endtrans %}</td>
-			{% endif %}
-		</tr>
-	</thead>
-	<tbody id="dynamic_view_content">
-		{% for uv in object_list %}
-		<tr onclick="window.location.href = `{{ url('pedagogy:uv_detail', uv_id=uv.id) }}`">
-			<td><a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}">{{ uv.code }}</a></td>
-			<td>{{ uv.title }}</td>
-			<td>{{ uv.department }}</td>
-			<td>{{ uv.credit_type }}</td>
-			<td>
-				{% if uv.semester in ["AUTUMN", "AUTUMN_AND_SPRING"] %}
-					<i class="fa fa-leaf"></i>
+			<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN"><i class="fa fa-leaf"></i></label>
+			<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING"><i class="fa fa-sun-o"></i></label>
+			<span><input type="checkbox" name="semester" id="radioAP" value="AUTUMN_AND_SPRING"><label for="radioAP">AP</label></span>
+		</div>
+		<input type="text" name="json" hidden>
+	</form>
+	<br>
+	<table id="dynamic_view">
+		<thead>
+			<tr>
+				<td>{% trans %}UV{% endtrans %}</td>
+				<td>{% trans %}Title{% endtrans %}</td>
+				<td>{% trans %}Department{% endtrans %}</td>
+				<td>{% trans %}Credit type{% endtrans %}</td>
+				<td><i class="fa fa-leaf"></i></td>
+				<td><i class="fa fa-sun-o"></i></td>
+				{% if can_create_uv(user) %}
+				<td>{% trans %}Edit{% endtrans %}</td>
+				<td>{% trans %}Delete{% endtrans %}</td>
 				{% endif %}
-			</td>
-			<td>
-				{% if uv.semester in ["SPRING", "AUTUMN_AND_SPRING"] %}
-					<i class="fa fa-sun-o"></i>
-				{% endif %}
-			</td>
-			{% if user.is_owner(uv) -%}
-			<td><a href="{{ url('pedagogy:uv_update', uv_id=uv.id) }}">{% trans %}Edit{% endtrans %}</a></td>
-			<td><a href="{{ url('pedagogy:uv_delete', uv_id=uv.id) }}">{% trans %}Delete{% endtrans %}</a></td>
-			{%- endif -%}
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
-
+			</tr>
+		</thead>
+		<tbody id="dynamic_view_content">
+			{% for uv in object_list %}
+			<tr onclick="window.location.href = `{{ url('pedagogy:uv_detail', uv_id=uv.id) }}`">
+				<td><a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}">{{ uv.code }}</a></td>
+				<td>{{ uv.title }}</td>
+				<td>{{ uv.department }}</td>
+				<td>{{ uv.credit_type }}</td>
+				<td>
+					{% if uv.semester in ["AUTUMN", "AUTUMN_AND_SPRING"] %}
+						<i class="fa fa-leaf"></i>
+					{% endif %}
+				</td>
+				<td>
+					{% if uv.semester in ["SPRING", "AUTUMN_AND_SPRING"] %}
+						<i class="fa fa-sun-o"></i>
+					{% endif %}
+				</td>
+				{% if user.is_owner(uv) -%}
+				<td><a href="{{ url('pedagogy:uv_update', uv_id=uv.id) }}">{% trans %}Edit{% endtrans %}</a></td>
+				<td><a href="{{ url('pedagogy:uv_delete', uv_id=uv.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+				{%- endif -%}
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
 <script>
 	function autofillCheckboxRadio(name){
 			if (urlParams.has(name)){ $("input[name='" + name + "']").each(function(){

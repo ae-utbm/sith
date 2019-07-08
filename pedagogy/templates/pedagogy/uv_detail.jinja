@@ -7,7 +7,8 @@
 {% endblock %}
 
 {% block content %}
-	<div id="pedagogy">
+<div class="pedagogy">
+	<div id="uv_detail">
 		<p id="return_noscript"><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
 		<button id="return_js" onclick='(function(){
 			// If comes from the guide page, go back with history
@@ -192,25 +193,26 @@
 		{% endif %}
 
 	</div>
+</div>
 
-	<script type="text/javascript">
-		$("#return_noscript").hide();
-		$("#return_js").show();
-		var icons = {
-			header: "fa fa-toggle-right",
-			activeHeader: "fa fa-toggle-down"
-		};
-		$(function(){
-			$("#leave_comment").accordion({
-				icons: icons,
-			    heightStyle: "content",
-			    active: false,
-			    collapsible: true
-			});
+<script type="text/javascript">
+	$("#return_noscript").hide();
+	$("#return_js").show();
+	var icons = {
+		header: "fa fa-toggle-right",
+		activeHeader: "fa fa-toggle-down"
+	};
+	$(function(){
+		$("#leave_comment").accordion({
+			icons: icons,
+		    heightStyle: "content",
+		    active: false,
+		    collapsible: true
 		});
-		// Remove jquery-ui icons to make fontawesome work
-		$(document).ready(function(){
-			$(".ui-accordion-header-icon").first().removeClass("ui-icon");
-		});
-	</script>
+	});
+	// Remove jquery-ui icons to make fontawesome work
+	$(document).ready(function(){
+		$(".ui-accordion-header-icon").first().removeClass("ui-icon");
+	});
+</script>
 {% endblock %}

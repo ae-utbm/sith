@@ -1683,392 +1683,391 @@ $pedagogy-light-blue: #caf0ff;
 $pedagogy-white-text: #f0f0f0;
 
 .pedagogy {
-  &.star-not-checked {
-    color : #f7f7f7;
-    margin-bottom: 0px;
-    margin-top: 0px;
-  }
-  &.star-checked {
-    color: $pedagogy-orange;
-    margin-bottom: 0px;
-    margin-top: 0px;
-  }
+    font-family: "Fira Sans";
 
-  @media screen and (max-width: $large-devices){
     &.star-not-checked {
-      margin-left: 5px;
-      margin-right: 5px;
+      color : #f7f7f7;
+      margin-bottom: 0px;
+      margin-top: 0px;
     }
     &.star-checked {
-      margin-left: 5px;
-      margin-right: 5px;
+      color: $pedagogy-orange;
+      margin-bottom: 0px;
+      margin-top: 0px;
     }
-  }
-}
 
-#dynamic_view {
-  font-family: "Fira Sans";
-  font-size: 1.1em;
-
-  table {
-  }
-
-  td {
-    text-align: center;
-    border: none;
-  }
-
-}
-
-#search_form {
-  font-family: "Fira Sans";
-  margin: 0px;
-  width: 100%;
-
-  .input-search {
-    background: $pedagogy-light-blue;
-    width: 300px;
-    height: 21px;
-  }
-  .button-search {
-    background: $pedagogy-orange;
-    color: white;
-    font-weight: bold;
-    margin-left: 20px;
-  }
-  .radio-guide input[type="radio"],input[type="checkbox"] {
-    display:none;
-  }
-  .radio-guide {
-    margin-top: 10px;
-    color: white;
-  }
-  .radio-guide label {
-    display:inline-block;
-    background-color: $pedagogy-blue;
-    padding: 10px 20px;
-    font-family:Arial;
-    font-size:16px;
-    border-radius: 4px;
-  }
-  .radio-guide input[type="radio"]:checked + label {
-    background-color:$pedagogy-orange;
-  }
-  .radio-guide input[type="checkbox"]:checked + label {
-    background-color:$pedagogy-orange;
-  }
-  .radio-guide  label:hover {
-    background-color:  $pedagogy-hover-blue;
-  }
-
-  #radioAUTUMN + label {
-    margin-left: 50px;
-  }
-}
-
-#pedagogy {
-  font-family: "Fira Sans";
-  color: #062f38;
-
-  .uv-quick-info-container {
-    display: grid;
-    grid-template-columns: 20% 20% 20% 20% auto;
-    grid-template-rows: auto auto;
-    grid-template-areas: "hours-cm hours-td hours-tp hours-te hours-the" "department credit-type semester . ." ;
-  }
-
-  .department {
-    grid-area: department;
-  }
-
-  .credit-type {
-    grid-area: credit-type;
-  }
-
-  .semester {
-    grid-area: semester;
-  }
-
-  .hours-cm {
-    grid-area: hours-cm;
-  }
-
-  .hours-td {
-    grid-area: hours-td;
-  }
-
-  .hours-tp {
-    grid-area: hours-tp;
-  }
-
-  .hours-te {
-    grid-area: hours-te;
-  }
-
-  .hours-the {
-    grid-area: hours-the;
-  }
-
-  #leave_comment {
-    .leave-comment-grid-container {
-      display: grid;
-      grid-template-columns: 270px auto;
-      grid-template-rows: 100%;
-      grid-template-areas: "stars comment";
-
-      @media screen and (max-width: $large-devices){
-        grid-template-columns: 100%;
-        grid-template-rows: auto auto;
-        grid-template-areas: "stars" "comment";
+    @media screen and (max-width: $large-devices){
+      &.star-not-checked {
+        margin-left: 5px;
+        margin-right: 5px;
+      }
+      &.star-checked {
+        margin-left: 5px;
+        margin-right: 5px;
       }
     }
 
-    .ui-accordion-content {
-      background-color: $white-color;
-      border-color: $pedagogy-orange;
-      border-right: none;
+  #dynamic_view {
+    font-size: 1.1em;
+
+    table {
     }
 
-    .form-stars {
-      grid-area: stars;
+    td {
+      text-align: center;
+      border: none;
     }
 
-    .form-comment {
-      grid-area: comment;
-    }
-
-    .ui-accordion-header {
-      background-color: $pedagogy-orange;
-      color: $pedagogy-white-text;
-      clip-path: polygon(0 0%, 0 100%, 30% 100%, 33% 0);
-
-      @media screen and (max-width: $large-devices){
-        clip-path: none;
-      }
-    }
-
-    .ui-accordion-header-icon {
-      color: $pedagogy-white-text;
-      margin-right: 10px;
-    }
-
-    .input-stars {
-      margin-top: 20px;
-    }
-
-    input[type="submit"] {
-      float: right;
-    }
   }
 
-  .uv-details-container {
-    display: grid;
-    grid-template-columns: 150px 100px auto;
-    grid-template-rows: 156px 1fr;
-    grid-template-areas: "grade grade-stars uv-infos" ". . uv-infos";
+  #search_form {
+    margin: 0px;
+    width: 100%;
 
-    @media screen and (max-width: $large-devices){
-      grid-template-columns: 50% 50%;
-      grid-template-rows: auto auto;
-      grid-template-areas: "grade grade-stars" "uv-infos uv-infos";
-    }
-  }
-
-  .grade {
-    grid-area: grade;
-    color: $pedagogy-white-text;
-    background-color: $pedagogy-blue;
-    padding-right: 10px;
-
-    > p {
-      text-align: right;
-        font-weight: bold;
-    }
-  }
-
-  .grade-stars {
-    grid-area: grade-stars;
-    color: $pedagogy-white-text;
-    background-color: $pedagogy-blue;
-    font-weight: bold;
-  }
-
-  .uv-infos {
-    grid-area: uv-infos;
-    padding-left: 10px;
-  }
-
-  .comment-container {
-    display: grid;
-    grid-template-columns: auto auto;
-    grid-template-rows: 156px auto auto;
-    grid-template-areas: "grade-block comment" "grade-block info" "comment-end-bar comment-end-bar";
-    margin-bottom: 30px;
-    margin-top: 10px;
-
-    @media screen and (max-width: $large-devices){
-      grid-template-columns: auto;
-      grid-template-rows: auto auto auto auto;
-      grid-template-areas: "grade-block" "comment" "info" "comment-end-bar"
-    }
-
-    .grade-block {
-      grid-area: grade-block;
+    .input-search {
+      background: $pedagogy-light-blue;
       width: 300px;
-
-      display: grid;
-      grid-template-columns: 150px 150px;
-      grid-template-rows: auto;
-      grid-template-areas: "grade-type grade-stars";
-      grid-gap: 15px;
-
-      clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 20%, 80% 0);
-      align-content: space-evenly;
-
+      height: 21px;
+    }
+    .button-search {
+      background: $pedagogy-orange;
+      color: white;
+      font-weight: bold;
+      margin-left: 20px;
+    }
+    .radio-guide input[type="radio"],input[type="checkbox"] {
+      display:none;
+    }
+    .radio-guide {
+      margin-top: 10px;
+      color: white;
+    }
+    .radio-guide label {
+      display:inline-block;
       background-color: $pedagogy-blue;
+      padding: 10px 20px;
+      font-family:Arial;
+      font-size:16px;
+      border-radius: 4px;
+    }
+    .radio-guide input[type="radio"]:checked + label {
+      background-color:$pedagogy-orange;
+    }
+    .radio-guide input[type="checkbox"]:checked + label {
+      background-color:$pedagogy-orange;
+    }
+    .radio-guide  label:hover {
+      background-color:  $pedagogy-hover-blue;
+    }
 
-      @media screen and (max-width: $large-devices){
-        grid-template-columns: auto auto;
-        grid-template-rows: auto;
-        grid-template-areas: "grade-type grade-stars";
-        width: auto;
-        clip-path: none;
-      }
+    #radioAUTUMN + label {
+      margin-left: 50px;
+    }
+  }
 
-      .grade-type {
-        grid-area: grade-type;
+  #uv_detail {
+    color: #062f38;
 
-        > p {
-          color: $pedagogy-white-text;
-          font-weight: bold;
-          text-align: right;
+    .uv-quick-info-container {
+      display: grid;
+      grid-template-columns: 20% 20% 20% 20% auto;
+      grid-template-rows: auto auto;
+      grid-template-areas: "hours-cm hours-td hours-tp hours-te hours-the" "department credit-type semester . ." ;
+    }
+
+    .department {
+      grid-area: department;
+    }
+
+    .credit-type {
+      grid-area: credit-type;
+    }
+
+    .semester {
+      grid-area: semester;
+    }
+
+    .hours-cm {
+      grid-area: hours-cm;
+    }
+
+    .hours-td {
+      grid-area: hours-td;
+    }
+
+    .hours-tp {
+      grid-area: hours-tp;
+    }
+
+    .hours-te {
+      grid-area: hours-te;
+    }
+
+    .hours-the {
+      grid-area: hours-the;
+    }
+
+    #leave_comment {
+      .leave-comment-grid-container {
+        display: grid;
+        grid-template-columns: 270px auto;
+        grid-template-rows: 100%;
+        grid-template-areas: "stars comment";
+
+        @media screen and (max-width: $large-devices){
+          grid-template-columns: 100%;
+          grid-template-rows: auto auto;
+          grid-template-areas: "stars" "comment";
         }
       }
 
-      .grade-stars {
-        grid-area: grade-stars;
-      }
-    }
-
-    .comment {
-      grid-area: comment;
-
-      display: grid;
-      grid-template-columns: auto;
-      grid-template-rows: auto auto;
-      grid-template-areas: "anchor" "markdown";
-
-      @media screen and (max-width: $large-devices){
-        border-left: solid;
-        border-right: solid;
-        border-color: $pedagogy-blue;
+      .ui-accordion-content {
+        background-color: $white-color;
+        border-color: $pedagogy-orange;
+        border-right: none;
       }
 
-      .anchor {
-        grid-area: anchor;
-        text-align: right;
-        margin-right: 15px;
+      .form-stars {
+        grid-area: stars;
       }
 
-      .markdown {
-        grid-area: markdown;
-        overflow: scroll;
-        margin-top: 0px;
-        margin-right: 0px;
-        padding: 10px;
-        padding-left: 40px;
-        text-align: justify;
-      }
-    }
-
-    .info {
-      grid-area: info;
-      margin-bottom: 0px;
-
-      @media screen and (max-width: $large-devices){
-        border-left: solid;
-        border-right: solid;
-        border-color: $pedagogy-blue;
+      .form-comment {
+        grid-area: comment;
       }
 
-      .status-reported {
-        color: red;
-        float: left;
-        padding-left: 10px;
-        padding-bottom: 10px;
+      .ui-accordion-header {
+        background-color: $pedagogy-orange;
+        color: $pedagogy-white-text;
+        clip-path: polygon(0 0%, 0 100%, 30% 100%, 33% 0);
+
+        @media screen and (max-width: $large-devices){
+          clip-path: none;
+        }
       }
 
-      .actions {
+      .ui-accordion-header-icon {
+        color: $pedagogy-white-text;
+        margin-right: 10px;
+      }
+
+      .input-stars {
+        margin-top: 20px;
+      }
+
+      input[type="submit"] {
         float: right;
       }
     }
 
-    .comment-end-bar {
-      grid-area: comment-end-bar;
-
+    .uv-details-container {
       display: grid;
-      grid-template-columns: auto auto auto;
-      grid-template-rows: 2.5em;
-      grid-template-areas: "report date author";
+      grid-template-columns: 150px 100px auto;
+      grid-template-rows: 156px 1fr;
+      grid-template-areas: "grade grade-stars uv-infos" ". . uv-infos";
 
+      @media screen and (max-width: $large-devices){
+        grid-template-columns: 50% 50%;
+        grid-template-rows: auto auto;
+        grid-template-areas: "grade grade-stars" "uv-infos uv-infos";
+      }
+    }
+
+    .grade {
+      grid-area: grade;
+      color: $pedagogy-white-text;
       background-color: $pedagogy-blue;
-      margin-top: 0px;
+      padding-right: 10px;
+
+      > p {
+        text-align: right;
+          font-weight: bold;
+      }
+    }
+
+    .grade-stars {
+      grid-area: grade-stars;
+      color: $pedagogy-white-text;
+      background-color: $pedagogy-blue;
+      font-weight: bold;
+    }
+
+    .uv-infos {
+      grid-area: uv-infos;
+      padding-left: 10px;
+    }
+
+    .comment-container {
+      display: grid;
+      grid-template-columns: auto auto;
+      grid-template-rows: 156px auto auto;
+      grid-template-areas: "grade-block comment" "grade-block info" "comment-end-bar comment-end-bar";
+      margin-bottom: 30px;
+      margin-top: 10px;
 
       @media screen and (max-width: $large-devices){
         grid-template-columns: auto;
+        grid-template-rows: auto auto auto auto;
+        grid-template-areas: "grade-block" "comment" "info" "comment-end-bar"
+      }
+
+      .grade-block {
+        grid-area: grade-block;
+        width: 300px;
+
+        display: grid;
+        grid-template-columns: 150px 150px;
         grid-template-rows: auto;
-        grid-template-areas: "author" "date" "report"
-      }
+        grid-template-areas: "grade-type grade-stars";
+        grid-gap: 15px;
 
-      .report {
-        grid-area: report;
-        padding-top: 6px;
-        padding-left: 20px;
-        background-color: $pedagogy-orange;
-        clip-path: polygon(0 0%, 0 200%, 300px 200%, 250px 0);
+        clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 20%, 80% 0);
+        align-content: space-evenly;
+
+        background-color: $pedagogy-blue;
 
         @media screen and (max-width: $large-devices){
+          grid-template-columns: auto auto;
+          grid-template-rows: auto;
+          grid-template-areas: "grade-type grade-stars";
+          width: auto;
           clip-path: none;
-          text-align: center;
+        }
+
+        .grade-type {
+          grid-area: grade-type;
+
+          > p {
+            color: $pedagogy-white-text;
+            font-weight: bold;
+            text-align: right;
+          }
+        }
+
+        .grade-stars {
+          grid-area: grade-stars;
+        }
+      }
+
+      .comment {
+        grid-area: comment;
+
+        display: grid;
+        grid-template-columns: auto;
+        grid-template-rows: auto auto;
+        grid-template-areas: "anchor" "markdown";
+
+        @media screen and (max-width: $large-devices){
+          border-left: solid;
+          border-right: solid;
+          border-color: $pedagogy-blue;
+        }
+
+        .anchor {
+          grid-area: anchor;
+          text-align: right;
+          margin-right: 15px;
+        }
+
+        .markdown {
+          grid-area: markdown;
+          overflow: scroll;
+          margin-top: 0px;
+          margin-right: 0px;
+          padding: 10px;
+          padding-left: 40px;
+          text-align: justify;
+        }
+      }
+
+      .info {
+        grid-area: info;
+        margin-bottom: 0px;
+
+        @media screen and (max-width: $large-devices){
+          border-left: solid;
+          border-right: solid;
+          border-color: $pedagogy-blue;
+        }
+
+        .status-reported {
+          color: red;
+          float: left;
+          padding-left: 10px;
+          padding-bottom: 10px;
+        }
+
+        .actions {
+          float: right;
+        }
+      }
+
+      .comment-end-bar {
+        grid-area: comment-end-bar;
+
+        display: grid;
+        grid-template-columns: auto auto auto;
+        grid-template-rows: 2.5em;
+        grid-template-areas: "report date author";
+
+        background-color: $pedagogy-blue;
+        margin-top: 0px;
+
+        @media screen and (max-width: $large-devices){
+          grid-template-columns: auto;
+          grid-template-rows: auto;
+          grid-template-areas: "author" "date" "report"
+        }
+
+        .report {
+          grid-area: report;
           padding-top: 6px;
-          padding-bottom: 6px;
-          padding-left: 0px;
+          padding-left: 20px;
+          background-color: $pedagogy-orange;
+          clip-path: polygon(0 0%, 0 200%, 300px 200%, 250px 0);
+
+          @media screen and (max-width: $large-devices){
+            clip-path: none;
+            text-align: center;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            padding-left: 0px;
+          }
+
+          & a {
+            color: $pedagogy-white-text;
+            font-weight: bold;
+          }
+
         }
 
-        & a {
+        .date {
+          grid-area: date;
           color: $pedagogy-white-text;
-          font-weight: bold;
+
+          @media screen and (max-width: $large-devices){
+            text-align: center;
+          }
         }
 
-      }
+        .author {
+          grid-area: author;
+          justify-self: right;
+          padding-right: 30px;
 
-      .date {
-        grid-area: date;
-        color: $pedagogy-white-text;
+          a {
+            color: $pedagogy-white-text;
+            font-weight: bold;
+          }
 
-        @media screen and (max-width: $large-devices){
-          text-align: center;
-        }
-      }
+          a:hover {
+            color: $pedagogy-light-blue;
+          }
 
-      .author {
-        grid-area: author;
-        justify-self: right;
-        padding-right: 30px;
-
-        a {
-          color: $pedagogy-white-text;
-          font-weight: bold;
-        }
-
-        a:hover {
-          color: $pedagogy-light-blue;
-        }
-
-        @media screen and (max-width: $large-devices){
-          text-align: center;
-          justify-self: inherit;
-          padding-right: 0px;
+          @media screen and (max-width: $large-devices){
+            text-align: center;
+            justify-self: inherit;
+            padding-right: 0px;
+          }
         }
       }
     }
