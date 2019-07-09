@@ -2054,7 +2054,7 @@ $pedagogy-white-text: #f0f0f0;
           padding-left: 20px;
 
           background-color: $pedagogy-orange;
-          clip-path: polygon(0 10px, 0 100%, 300px 200%, 250px 10px);
+          clip-path: polygon(0 10px, 0 100%, 350px 200%, 300px 10px);
 
           @media screen and (max-width: $large-devices){
             clip-path: none;
