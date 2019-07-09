@@ -42,51 +42,6 @@ class UV(models.Model):
     Contains infos about an UV (course)
     """
 
-    def is_owned_by(self, user):
-        """
-        Can be created by superuser, root or pedagogy admin user
-        """
-        return user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
-
-    def can_be_viewed_by(self, user):
-        """
-        Only visible by subscribers
-        """
-        return user.is_subscribed
-
-    def __grade_average_generic(self, field):
-        comments = self.comments.filter(**{field + "__gte": 0})
-        if not comments.exists():
-            return -1
-
-        return int(sum(comments.values_list(field, flat=True)) / comments.count())
-
-    def get_absolute_url(self):
-        return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
-
-    @cached_property
-    def grade_global_average(self):
-        return self.__grade_average_generic("grade_global")
-
-    @cached_property
-    def grade_utility_average(self):
-        return self.__grade_average_generic("grade_utility")
-
-    @cached_property
-    def grade_interest_average(self):
-        return self.__grade_average_generic("grade_interest")
-
-    @cached_property
-    def grade_teaching_average(self):
-        return self.__grade_average_generic("grade_teaching")
-
-    @cached_property
-    def grade_work_load_average(self):
-        return self.__grade_average_generic("grade_work_load")
-
-    def __str__(self):
-        return self.code
-
     code = models.CharField(
         _("code"),
         max_length=10,
@@ -187,27 +142,56 @@ class UV(models.Model):
         default=0,
     )
 
+    def is_owned_by(self, user):
+        """
+        Can be created by superuser, root or pedagogy admin user
+        """
+        return user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+
+    def can_be_viewed_by(self, user):
+        """
+        Only visible by subscribers
+        """
+        return user.is_subscribed
+
+    def __grade_average_generic(self, field):
+        comments = self.comments.filter(**{field + "__gte": 0})
+        if not comments.exists():
+            return -1
+
+        return int(sum(comments.values_list(field, flat=True)) / comments.count())
+
+    def get_absolute_url(self):
+        return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
+
+    @cached_property
+    def grade_global_average(self):
+        return self.__grade_average_generic("grade_global")
+
+    @cached_property
+    def grade_utility_average(self):
+        return self.__grade_average_generic("grade_utility")
+
+    @cached_property
+    def grade_interest_average(self):
+        return self.__grade_average_generic("grade_interest")
+
+    @cached_property
+    def grade_teaching_average(self):
+        return self.__grade_average_generic("grade_teaching")
+
+    @cached_property
+    def grade_work_load_average(self):
+        return self.__grade_average_generic("grade_work_load")
+
+    def __str__(self):
+        return self.code
+
 
 class UVComment(models.Model):
     """
     A comment about an UV
     """
-
-    def is_owned_by(self, user):
-        """
-        Is owned by a pedagogy admin, a superuser or the author himself
-        """
-        return self.author == user or user.is_owner(self.uv)
-
-    @cached_property
-    def is_reported(self):
-        """
-        Return True if someone reported this UV
-        """
-        return self.reports.exists()
-
-    def __str__(self):
-        return "%s - %s" % (self.uv, self.author)
 
     author = models.ForeignKey(
         User,
@@ -255,6 +239,22 @@ class UVComment(models.Model):
     )
     publish_date = models.DateTimeField(_("publish date"), blank=True)
 
+    def is_owned_by(self, user):
+        """
+        Is owned by a pedagogy admin, a superuser or the author himself
+        """
+        return self.author == user or user.is_owner(self.uv)
+
+    @cached_property
+    def is_reported(self):
+        """
+        Return True if someone reported this UV
+        """
+        return self.reports.exists()
+
+    def __str__(self):
+        return "%s - %s" % (self.uv, self.author)
+
     def save(self, *args, **kwargs):
         if self.publish_date is None:
             self.publish_date = timezone.now()
@@ -292,12 +292,6 @@ class UVCommentReport(models.Model):
     Report an inapropriate comment
     """
 
-    def is_owned_by(self, user):
-        """
-        Can be created by a pedagogy admin, a superuser or a subscriber
-        """
-        return user.is_subscribed or user.is_owner(self.comment.uv)
-
     comment = models.ForeignKey(
         UVComment,
         related_name="reports",
@@ -308,6 +302,12 @@ class UVCommentReport(models.Model):
         User, related_name="reported_uv_comment", verbose_name=_("reporter")
     )
     reason = models.TextField(_("reason"))
+
+    def is_owned_by(self, user):
+        """
+        Can be created by a pedagogy admin, a superuser or a subscriber
+        """
+        return user.is_subscribed or user.is_owner(self.comment.uv)
 
 
 # Custom serializers
