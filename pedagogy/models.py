@@ -28,6 +28,9 @@ from django.utils import timezone
 from django.core import validators
 from django.conf import settings
 from django.utils.functional import cached_property
+from django.core.urlresolvers import reverse
+
+from rest_framework import serializers
 
 from core.models import User
 
@@ -57,6 +60,9 @@ class UV(models.Model):
             return -1
 
         return int(sum(comments.values_list(field, flat=True)) / comments.count())
+
+    def get_absolute_url(self):
+        return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
 
     @cached_property
     def grade_global_average(self):
@@ -302,3 +308,30 @@ class UVCommentReport(models.Model):
         User, related_name="reported_uv_comment", verbose_name=_("reporter")
     )
     reason = models.TextField(_("reason"))
+
+
+# Custom serializers
+
+
+class UVSerializer(serializers.ModelSerializer):
+    """
+    Custom seralizer for UVs
+    Allow adding more informations like absolute_url
+    """
+
+    class Meta:
+        model = UV
+        fields = "__all__"
+
+    absolute_url = serializers.SerializerMethodField()
+    update_url = serializers.SerializerMethodField()
+    delete_url = serializers.SerializerMethodField()
+
+    def get_absolute_url(self, obj):
+        return obj.get_absolute_url()
+
+    def get_update_url(self, obj):
+        return reverse("pedagogy:uv_update", kwargs={"uv_id": obj.id})
+
+    def get_delete_url(self, obj):
+        return reverse("pedagogy:uv_delete", kwargs={"uv_id": obj.id})

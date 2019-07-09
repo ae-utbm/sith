@@ -104,6 +104,16 @@
     <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
     {% endfor %}
 </ul>
+
+<hr>
+<h4>{% trans %}Pedagogy{% endtrans %}</h4>
+<ul>
+    {% if user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID) or user.is_root %}
+    <li><a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a></li>
+    <li><a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a></li>
+    {% endif %}
+</ul>
+
 <hr>
 <h4>{% trans %}Elections{% endtrans %}</h4>
 <ul>
@@ -113,6 +123,8 @@
     <li><a href="{{ url('election:create') }}">{% trans %}Create a new election{% endtrans %}</a></li>
     {%- endif -%}
 </ul>
+
+<hr>
 <h4>{% trans %}Other tools{% endtrans %}</h4>
 <ul>
     <li><a href="{{ url('core:to_markdown') }}">{% trans %}Convert dokuwiki/BBcode syntax to Markdown{% endtrans %}</a></li>
