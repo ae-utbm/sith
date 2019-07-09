@@ -1770,7 +1770,9 @@ $pedagogy-white-text: #f0f0f0;
       display: grid;
       grid-template-columns: 20% 20% 20% 20% auto;
       grid-template-rows: auto auto;
-      grid-template-areas: "hours-cm hours-td hours-tp hours-te hours-the" "department credit-type semester . ." ;
+      grid-template-areas:
+        "hours-cm hours-td hours-tp hours-te hours-the"
+        "department credit-type semester . ." ;
     }
 
     .department {
@@ -1815,7 +1817,9 @@ $pedagogy-white-text: #f0f0f0;
         @media screen and (max-width: $large-devices){
           grid-template-columns: 100%;
           grid-template-rows: auto auto;
-          grid-template-areas: "stars" "comment";
+          grid-template-areas:
+            "stars"
+            "comment";
         }
       }
 
@@ -1861,12 +1865,16 @@ $pedagogy-white-text: #f0f0f0;
       display: grid;
       grid-template-columns: 150px 100px auto;
       grid-template-rows: 156px 1fr;
-      grid-template-areas: "grade grade-stars uv-infos" ". . uv-infos";
+      grid-template-areas:
+        "grade grade-stars uv-infos"
+        ". . uv-infos";
 
       @media screen and (max-width: $large-devices){
         grid-template-columns: 50% 50%;
         grid-template-rows: auto auto;
-        grid-template-areas: "grade grade-stars" "uv-infos uv-infos";
+        grid-template-areas:
+          "grade grade-stars"
+          "uv-infos uv-infos";
       }
     }
 
@@ -1897,15 +1905,22 @@ $pedagogy-white-text: #f0f0f0;
     .comment-container {
       display: grid;
       grid-template-columns: 300px auto;
-      grid-template-rows: 156px auto auto;
-      grid-template-areas: "grade-block comment" "grade-block info" "comment-end-bar comment-end-bar";
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        "grade-block comment"
+        "grade-block info"
+        "comment-end-bar comment-end-bar";
       margin-bottom: 30px;
       margin-top: 10px;
 
       @media screen and (max-width: $large-devices){
         grid-template-columns: auto;
         grid-template-rows: auto auto auto auto;
-        grid-template-areas: "grade-block" "comment" "info" "comment-end-bar"
+        grid-template-areas:
+          "grade-block"
+          "comment"
+          "info"
+          "comment-end-bar"
       }
 
       .grade-block {
@@ -1914,21 +1929,30 @@ $pedagogy-white-text: #f0f0f0;
 
         display: grid;
         grid-template-columns: 150px 150px;
-        grid-template-rows: auto;
-        grid-template-areas: "grade-type grade-stars";
+        grid-template-rows: 156px auto;
+        grid-template-areas:
+          "grade-type grade-stars"
+          "grade-extension grade-extension";
         grid-gap: 15px;
 
-        clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 20%, 80% 0);
-        align-content: space-evenly;
+        clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 30px, 270px 0);
+        align-items: start;
 
         background-color: $pedagogy-blue;
 
         @media screen and (max-width: $large-devices){
-          grid-template-columns: auto auto;
+          grid-template-columns: 50% auto;
           grid-template-rows: auto;
-          grid-template-areas: "grade-type grade-stars";
+          grid-template-areas:"grade-type grade-stars";
           width: auto;
           clip-path: none;
+          align-content: space-evenly;
+          align-items: end;
+        }
+
+        .grade-extension {
+          grid-area: grade-extension;
+          background-color: $pedagogy-blue;
         }
 
         .grade-type {
@@ -1952,7 +1976,9 @@ $pedagogy-white-text: #f0f0f0;
         display: grid;
         grid-template-columns: auto;
         grid-template-rows: auto auto;
-        grid-template-areas: "anchor" "markdown";
+        grid-template-areas:
+          "anchor"
+          "markdown";
 
         @media screen and (max-width: $large-devices){
           border-left: solid;
@@ -1969,19 +1995,20 @@ $pedagogy-white-text: #f0f0f0;
         .markdown {
           grid-area: markdown;
 
-          overflow: scroll;
-          overflow-x: hidden;
+          min-height: 139px;
           margin-top: 0px;
           margin-right: 0px;
           padding: 10px;
-          padding-left: 40px;
           text-align: justify;
+          overflow: auto;
         }
       }
 
       .info {
         grid-area: info;
         margin-bottom: 0px;
+
+        min-height: 38px;
 
         @media screen and (max-width: $large-devices){
           border-left: solid;
@@ -2015,7 +2042,10 @@ $pedagogy-white-text: #f0f0f0;
         @media screen and (max-width: $large-devices){
           grid-template-columns: auto;
           grid-template-rows: auto;
-          grid-template-areas: "author" "date" "report"
+          grid-template-areas:
+            "author"
+            "date"
+            "report"
         }
 
         .report {
