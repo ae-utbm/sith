@@ -182,9 +182,9 @@
 					</div>
 
 					<div class="comment-end-bar">
-						<p class="report"><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report this comment{% endtrans %}</a></p>
+						<div class="report"><p><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report this comment{% endtrans %}</a></p></div>
 
-						<p class="date">{{ comment.publish_date.strftime('%d/%m/%Y') }}</p>
+						<div class="date"><p>{{ comment.publish_date.strftime('%d/%m/%Y') }}</p></div>
 
 						<div class="author"><p>{{ user_profile_link(comment.author) }}</p></div>
 					</div>

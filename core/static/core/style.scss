@@ -2029,40 +2029,46 @@ $pedagogy-white-text: #f0f0f0;
         grid-area: comment-end-bar;
 
         display: grid;
-        grid-template-columns: auto auto auto;
+        grid-template-columns: 33% auto auto;
         grid-template-rows: 2.5em;
-        grid-template-areas: "report date author";
+        grid-template-areas: "author date report";
 
         background-color: $pedagogy-blue;
         margin-top: -1px;
 
         @media screen and (max-width: $large-devices){
           grid-template-columns: auto;
-          grid-template-rows: auto;
+          grid-template-rows: auto auto auto;
           grid-template-areas:
-            "author"
+            "report"
             "date"
-            "report";
+            "author";
           margin-top: 0px;
+          text-align: center;
         }
 
-        .report {
-          grid-area: report;
-          padding-top: 8px;
+        .author {
+          grid-area: author;
+
+          padding-top: 6px;
           padding-left: 20px;
-          background-color: $white-color;
-          clip-path: polygon(0 0%, 0 200%, 300px 200%, 250px 0);
+
+          background-color: $pedagogy-orange;
+          clip-path: polygon(0 10px, 0 100%, 300px 200%, 250px 10px);
 
           @media screen and (max-width: $large-devices){
             clip-path: none;
-            text-align: center;
-            padding-top: 6px;
-            padding-bottom: 6px;
-            padding-left: 0px;
+            padding: 0px;
+            padding-bottom: 7px;
           }
 
-          & a {
-            color: $black-color;
+          a {
+            color: $pedagogy-white-text;
+            font-weight: bold;
+          }
+
+          a:hover {
+            color: $pedagogy-hover-blue;
           }
 
         }
@@ -2072,40 +2078,36 @@ $pedagogy-white-text: #f0f0f0;
           color: $pedagogy-white-text;
 
           @media screen and (max-width: $large-devices){
-            text-align: center;
+            padding-bottom: 7px;
           }
         }
 
-        .author {
-          grid-area: author;
+        .report {
+          grid-area: report;
           justify-self: right;
           padding-right: 30px;
           padding-left: 30px;
-          background-color: $pedagogy-light-blue;
 
           a {
-            color: $pedagogy-orange;
-            font-weight: bold;
+            color: $pedagogy-white-text;
           }
 
           a:hover {
-            color: $black-color;
+            color: $pedagogy-hover-blue;
           }
 
           @media screen and (max-width: $large-devices){
             text-align: center;
             justify-self: inherit;
-            padding-right: 0px;
-            padding-bottom: 10px;
-            background-color: $pedagogy-blue;
+            padding-bottom: 7px;
+            background-color: $white-color;
+
+            border-left: solid;
+            border-right: solid;
+            border-color: $pedagogy-blue;
 
             a {
-              color: $pedagogy-white-text;
-              font-weight: bold;
-            }
-
-            a:hover {
-              color: $pedagogy-light-blue;
+              color: $black-color;
             }
           }
         }
