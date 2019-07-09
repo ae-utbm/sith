@@ -2006,9 +2006,7 @@ $pedagogy-white-text: #f0f0f0;
 
       .info {
         grid-area: info;
-        margin-bottom: 0px;
-
-        min-height: 38px;
+        padding-bottom: 10px;
 
         @media screen and (max-width: $large-devices){
           border-left: solid;
@@ -2020,7 +2018,6 @@ $pedagogy-white-text: #f0f0f0;
           color: red;
           float: left;
           padding-left: 10px;
-          padding-bottom: 10px;
         }
 
         .actions {
@@ -2037,7 +2034,7 @@ $pedagogy-white-text: #f0f0f0;
         grid-template-areas: "report date author";
 
         background-color: $pedagogy-blue;
-        margin-top: 0px;
+        margin-top: -1px;
 
         @media screen and (max-width: $large-devices){
           grid-template-columns: auto;
@@ -2045,7 +2042,8 @@ $pedagogy-white-text: #f0f0f0;
           grid-template-areas:
             "author"
             "date"
-            "report"
+            "report";
+          margin-top: 0px;
         }
 
         .report {
