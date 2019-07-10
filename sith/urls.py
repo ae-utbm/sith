@@ -84,6 +84,10 @@ urlpatterns = [
     url(
         r"^matmatronch/", include("matmat.urls", namespace="matmat", app_name="matmat")
     ),
+    url(
+        r"^pedagogy/",
+        include("pedagogy.urls", namespace="pedagogy", app_name="pedagogy"),
+    ),
     url(r"^admin/", include(admin.site.urls)),
     url(r"^ajax_select/", include(ajax_select_urls)),
     url(r"^i18n/", include("django.conf.urls.i18n")),

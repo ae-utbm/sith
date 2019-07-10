@@ -93,6 +93,7 @@ INSTALLED_APPS = (
     "stock",
     "trombi",
     "matmat",
+    "pedagogy",
 )
 
 MIDDLEWARE = (
@@ -321,6 +322,7 @@ SITH_GROUP_BANNED_COUNTER_ID = 9
 SITH_GROUP_BANNED_SUBSCRIPTION_ID = 10
 SITH_GROUP_SAS_ADMIN_ID = 11
 SITH_GROUP_FORUM_ADMIN_ID = 12
+SITH_GROUP_PEDAGOGY_ADMIN_ID = 13
 
 
 SITH_CLUB_REFOUND_ID = 89
@@ -401,6 +403,43 @@ SITH_COUNTER_BANK = [
     ("CREDIT-MUTUEL", "Credit Mutuel"),
     ("CREDIT-LYONNAIS", "Credit Lyonnais"),
     ("LA-POSTE", "La Poste"),
+]
+
+SITH_PEDAGOGY_UV_TYPE = [
+    ("FREE", _("Free")),
+    ("CS", _("CS")),
+    ("TM", _("TM")),
+    ("OM", _("OM")),
+    ("QC", _("QC")),
+    ("EC", _("EC")),
+    ("RN", _("RN")),
+    ("ST", _("ST")),
+    ("EXT", _("EXT")),
+]
+
+SITH_PEDAGOGY_UV_SEMESTER = [
+    ("CLOSED", _("Closed")),
+    ("AUTUMN", _("Autumn")),
+    ("SPRING", _("Spring")),
+    ("AUTUMN_AND_SPRING", _("Autumn and spring")),
+]
+
+SITH_PEDAGOGY_UV_LANGUAGE = [
+    ("FR", _("French")),
+    ("EN", _("English")),
+    ("DE", _("German")),
+    ("SP", _("Spanich")),
+]
+
+SITH_PEDAGOGY_UV_RESULT_GRADE = [
+    ("A", _("A")),
+    ("B", _("B")),
+    ("C", _("C")),
+    ("D", _("D")),
+    ("E", _("E")),
+    ("FX", _("FX")),
+    ("F", _("F")),
+    ("ABS", _("Abs")),
 ]
 
 SITH_ECOCUP_CONS = 1152
@@ -521,6 +560,10 @@ SITH_LAUNDERETTE_PRICES = {"WASHING": 1.0, "DRYING": 0.75}
 SITH_NOTIFICATIONS = [
     ("POSTER_MODERATION", _("A new poster needs to be moderated")),
     ("MAILING_MODERATION", _("A new mailing list needs to be moderated")),
+    (
+        "PEDAGOGY_MODERATION",
+        _("A new pedagogy comment has been signaled for moderation"),
+    ),
     ("NEWS_MODERATION", _("There are %s fresh news to be moderated")),
     ("FILE_MODERATION", _("New files to be moderated")),
     ("SAS_MODERATION", _("There are %s pictures to be moderated in the SAS")),

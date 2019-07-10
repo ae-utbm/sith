@@ -52,6 +52,7 @@ from counter.models import Customer, ProductType, Product, Counter, Selling, Stu
 from com.models import Sith, Weekmail, News, NewsDate
 from election.models import Election, Role, Candidature, ElectionList
 from forum.models import Forum, ForumTopic
+from pedagogy.models import UV
 
 
 class Command(BaseCommand):
@@ -84,6 +85,7 @@ class Command(BaseCommand):
         Group(name="Banned to subscribe").save()
         Group(name="SAS admin").save()
         Group(name="Forum admin").save()
+        Group(name="Pedagogy admin").save()
         self.reset_index("core", "auth")
         root = User(
             id=0,
@@ -857,6 +859,18 @@ Welcome to the wiki page!
                 start_date=timezone.now(),
                 role=settings.SITH_CLUB_ROLES_ID["Board member"],
             ).save()
+            # Adding user tutu
+            tutu = User(
+                username="tutu",
+                last_name="Tu",
+                first_name="Tu",
+                email="tutu@git.an",
+                date_of_birth="1942-06-12",
+            )
+            tutu.set_password("plop")
+            tutu.save()
+            tutu.groups = [settings.SITH_GROUP_PEDAGOGY_ADMIN_ID]
+            tutu.save()
 
             # Adding subscription for sli
             s = Subscription(
@@ -886,6 +900,18 @@ Welcome to the wiki page!
             # Com Unity
             s = Subscription(
                 member=comunity,
+                subscription_type=default_subscription,
+                payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+            )
+            s.subscription_start = s.compute_start()
+            s.subscription_end = s.compute_end(
+                duration=settings.SITH_SUBSCRIPTIONS[s.subscription_type]["duration"],
+                start=s.subscription_start,
+            )
+            s.save()
+            # Tutu
+            s = Subscription(
+                member=tutu,
                 subscription_type=default_subscription,
                 payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
@@ -1077,3 +1103,35 @@ Welcome to the wiki page!
                     start_date=friday + timedelta(hours=24 * 7 * i),
                     end_date=friday + timedelta(hours=24 * 7 * i + 8),
                 ).save()
+
+            # Create som data for pedagogy
+
+            UV(
+                code="PA00",
+                author=User.objects.get(id=0),
+                credit_type=settings.SITH_PEDAGOGY_UV_TYPE[3][0],
+                manager="Laurent HEYBERGER",
+                semester=settings.SITH_PEDAGOGY_UV_SEMESTER[3][0],
+                language=settings.SITH_PEDAGOGY_UV_LANGUAGE[0][0],
+                department=settings.SITH_PROFILE_DEPARTMENTS[-2][0],
+                credits=5,
+                title="Participation dans une association étudiante",
+                objectives="* Permettre aux étudiants de réaliser, pendant un semestre, un projet culturel ou associatif et de le valoriser.",
+                program="""* Semestre précédent proposition d'un projet et d'un cahier des charges
+* Evaluation par un jury de six membres
+* Si accord réalisation dans le cadre de l'UV
+* Compte-rendu de l'expérience
+* Présentation""",
+                skills="""* Gérer un projet associatif ou une action éducative en autonomie:
+* en produisant un cahier des charges qui -définit clairement le contexte du projet personnel -pose les jalons de ce projet -estime de manière réaliste les moyens et objectifs du projet -définit exactement les livrables attendus
+    * en étant capable de respecter ce cahier des charges ou, le cas échéant, de réviser le cahier des charges de manière argumentée.
+* Relater son expérience dans un rapport:
+* qui permettra à d'autres étudiants de poursuivre les actions engagées
+* qui montre la capacité à s'auto-évaluer et à adopter une distance critique sur son action.""",
+                key_concepts="""* Autonomie
+* Responsabilité
+* Cahier des charges
+* Gestion de projet""",
+                hours_THE=121,
+                hours_TE=4,
+            ).save()
