@@ -193,7 +193,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
 
         if len(search) == 1:
             # It's a search with only one letter
-            # Hastack doesn't work well with only one letter
+            # Haystack doesn't work well with only one letter
             return queryset.filter(code__istartswith=search)
 
         try:
