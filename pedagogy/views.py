@@ -158,10 +158,9 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
     template_name = "pedagogy/guide.jinja"
 
     def get(self, *args, **kwargs):
-        resp = super(UVListView, self).get(*args, **kwargs)
         if not self.request.GET.get("json", None):
             # Return normal full template response
-            return resp
+            return super(UVListView, self).get(*args, **kwargs)
 
         # Return serialized response
         return HttpResponse(
