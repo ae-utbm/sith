@@ -770,6 +770,11 @@ class UserToolsView(QuickNotifMixin, UserTabsMixin, TemplateView):
     template_name = "core/user_tools.jinja"
     current_tab = "tools"
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            raise PermissionDenied
+        return super(UserToolsView, self).dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         self.object = self.request.user
         from launderette.models import Launderette
