@@ -5,7 +5,7 @@ test:
   stage: test
   script:
   - apt-get update
-  - apt-get install -y gettext python3-xapian
+  - apt-get install -y gettext python3-xapian libgraphviz-dev
   - pushd /usr/lib/python3/dist-packages/xapian && ln -s _xapian* _xapian.so && popd
   - export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
   - python -c 'import xapian' # Fail immediately if there is a problem with xapian
