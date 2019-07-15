@@ -5,7 +5,7 @@ mistune
 django-jinja
 pyopenssl
 pytz
-djangorestframework
+djangorestframework <3.10
 django-phonenumber-field
 phonenumbers
 django-ajax-selects
