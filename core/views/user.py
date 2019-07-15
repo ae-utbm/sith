@@ -52,6 +52,7 @@ from core.views import (
     CanViewMixin,
     CanEditMixin,
     CanEditPropMixin,
+    UserIsLoggedMixin,
     TabedViewMixin,
     QuickNotifMixin,
 )
@@ -762,7 +763,7 @@ class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     current_tab = "groups"
 
 
-class UserToolsView(QuickNotifMixin, UserTabsMixin, TemplateView):
+class UserToolsView(QuickNotifMixin, UserTabsMixin, UserIsLoggedMixin, TemplateView):
     """
     Displays the logged user's tools
     """

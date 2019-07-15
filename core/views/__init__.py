@@ -214,6 +214,17 @@ class FormerSubscriberMixin(View):
         return super(FormerSubscriberMixin, self).dispatch(request, *args, **kwargs)
 
 
+class UserIsLoggedMixin(View):
+    """
+    This view check if the user is logged
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_anonymous:
+            raise PermissionDenied
+        return super(UserIsLoggedMixin, self).dispatch(request, *args, **kwargs)
+
+
 class TabedViewMixin(View):
     """
     This view provide the basic functions for displaying tabs in the template
