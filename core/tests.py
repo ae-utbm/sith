@@ -396,6 +396,21 @@ http://git.an
         )
 
 
+class UserToolsTest(TestCase):
+    def setUp(self):
+        call_command("populate")
+
+    def test_anonymous_user_unauthorized(self):
+        response = self.client.get(reverse("core:user_tools"))
+        self.assertEquals(response.status_code, 403)
+
+    def test_page_is_working(self):
+        self.client.login(username="guy", password="plop")
+        response = self.client.get(reverse("core:user_tools"))
+        self.assertNotEquals(response.status_code, 500)
+        self.assertEquals(response.status_code, 200)
+
+
 # TODO: many tests on the pages:
 #   - renaming a page
 #   - changing a page's parent --> check that page's children's full_name
