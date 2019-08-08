@@ -1694,6 +1694,10 @@ $pedagogy-white-text: #f0f0f0;
       margin-top: 0px;
     }
 
+    &.grade-without-star {
+      display: none
+    }
+
     @media screen and (max-width: $large-devices){
       &.star-not-checked {
         margin-left: 5px;
@@ -1702,6 +1706,15 @@ $pedagogy-white-text: #f0f0f0;
       &.star-checked {
         margin-left: 5px;
         margin-right: 5px;
+      }
+    }
+
+    @media screen and (max-width: $small-devices){
+      &.grade-without-star {
+        display: block;
+      }
+      &.grade-with-star {
+        display: none;
       }
     }
 
