@@ -15,6 +15,7 @@
 
     </style>
 
+    {# Do not vote button #}
     <label class="star">
         <input type="radio" name="{{ widget.name }}" value="-1" onclick='
             var stars = document.getElementsByClassName("{{ widget.name }}");
@@ -27,6 +28,8 @@
         ' checked>
         <span class="fa fa-times-circle"> {{ translations.do_not_vote }}</span>
     </label>
+
+    {# Star widget #}
     {% for i in number_of_stars %}
     <label class="star">
         <input type="radio" name="{{ widget.name }}" value="{{ forloop.counter0 }}" onclick='
@@ -46,5 +49,10 @@
         <i class="{{ widget.name }} fa fa-star unchecked"></i>
     </label>
     {% endfor %}
+
+    {# Restaure previous (-1 is default) #}
+    <script type="text/javascript">
+        document.querySelector("input[name='{{ widget.name }}'][value='{{ widget.value }}']").click()
+    </script>
 
 </div>
