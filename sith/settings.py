@@ -577,7 +577,7 @@ SITH_EBOUTIC_HMAC_KEY = binascii.unhexlify(
     "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
 )
 SITH_EBOUTIC_PUB_KEY = ""
-with open("./sith/et_keys/pubkey.pem") as f:
+with open(os.path.join(os.path.dirname(__file__), "et_keys/pubkey.pem")) as f:
     SITH_EBOUTIC_PUB_KEY = f.read()
 
 # Launderette variables

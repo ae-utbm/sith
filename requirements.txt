@@ -20,3 +20,7 @@ python-dateutil
 pygraphviz
 sentry_sdk
 # mysqlclient
+
+# For documentation
+Sphinx < 2.0 # To ensure compatibility with reathedocs
+sphinx_rtd_theme
