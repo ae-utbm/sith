@@ -1,21 +1,29 @@
-Introduction au projet
-======================
+Introduction
+============
+
+Le but de ce projet est de fournir à l'Association des Étudiants de l'UTBM une plate-forme pratique et centralisée de ses services. Le Sith de l'AE tiens à jour le registre des cotisations à l'association, prend en charge la trésorerie, les ventes de produits et services, la diffusion d’événements, la gestion de la laverie et bien plus encore.
+
+C'est un projet bénévole qui tire ses origines des années 2000. Il s'agit de la troisième version du site de l'association initiée en 2015. C'est une réécriture complète en rupture totale des deux versions qui l'ont précédé.
+
+Pourquoi réécrire le site
+-------------------------
+
+L'ancienne version du site, sobrement baptisée `ae2 <https://ae-dev.utbm.fr/ae/ae2>`_ présentait un nombre impressionnant de fonctionnalités. Il avait été écrit en PHP et se basait sur son propre framework maison.
+
+Malheureusement, son entretiens était plus ou moins hasardeux et son framework reposait sur des principes assez différents de ce qui se fait aujourd'hui, rendant la maintenance difficile. De plus, la version de PHP qu'il utilisait était plus que déprécié et à l'heure de l'arrivée de PHP 7 et de sa non rétrocompatibilité il était vital de faire quelque chose. Il a donc été décidé de le réécrire.
+
+La philosophie du projet
+------------------------
+
+Pour éviter les erreurs du passé, ce projet met l'accent sur la maintenabilité. Le choix des technologies ne s'est donc pas fait uniquement sur le fait qu'elle soit récentes, mais également sur leur robustesse, leur fiabilité et leur potentiel à être maintenu loin dans le futur.
+
+La maintenabilité passe également par le choix minutieux des dépendances qui doivent eux aussi passer l'épreuve du temps pour éviter qu'elles ne mettent le projet en danger.
+
+Cela passe également par la minimisation des frameworks employés de manière à réduire un maximum les connaissances nécessaires pour contribuer au projet et donc simplifier la prise en main. La simplicité est à privilégier si elle est possible.
+
+Le projet doit être simple à installer et à déployer.
+
+Le projet étant à destination d'étudiants, il est préférable de minimiser les ressources utilisées par l'utilisateur final. Il faut qu'il soit au maximum économe en bande passante et calcul côté client.
 
 
-Il y a longtemps, au début des années 2000, l'Association des Étudiants a mis en place un site internet qui n'a eu de
-cesse d'évoluer au fil des ans. Grâce aux différents contributeurs qui s'y sont plongés, et qui ont pu y ajouter leurs
-bouts de code plus ou moins utiles, le site possède désormais un ensemble de fonctionnalités impressionnant.
-
-De la comptabilité à la gestion de la laverie, en passant par le forum ou le Matmatronch', le site de l'AE prend
-actuellement en charge la quasi totalité de la gestion de l'argent, et c'est là un de ses rôles les plus importants.
-
-Mais les vieilles technologies qu'il emploie, et l'entretien plus ou moins aléatoire qu'il a subit, en font un
-outil très difficile à maintenir à l'heure actuelle, et le besoin d'une refonte s'imposait de plus en plus.
-
-Le choix de technologies récentes, maintenues, et éprouvées a donc été fait, et le développement a pu commencer dès
-Novembre 2015, avec l'objectif d'une mise en production dans l'été 2016, au moins dans une version incluant
-l'intégralité des fonctions liées à l'argent, qui sont les plus critiques.
-
-Soutenant les projets libres, j'ai décidé de placer le projet sous licence MIT, assurant ainsi une pérénité aux
-source. Si quelqu'un dans le futur souhaite le relicencier sous GPL (ou autre licence plus restrictive que la MIT, voire
-contagieuse), cela reste possible, mais je n'impose au départ que très peu de restrictions.
+Le projet est un logiciel libre et est sous licence GPL. Aucune dépendance propriétaire ne sera acceptée.
