@@ -11,6 +11,7 @@ Bienvenue sur la documentation du Sith de l'AE
    :caption: À propos du projet:
 
    about/introduction
+   about/tech
 
 .. toctree::
 	:maxdepth: 3
