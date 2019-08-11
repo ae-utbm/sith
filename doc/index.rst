@@ -6,6 +6,9 @@
 Bienvenue sur la documentation du Sith de l'AE
 ==============================================
 
+.. include:: ../README.rst
+	:end-before: body
+
 .. toctree::
    :maxdepth: 2
    :caption: À propos du projet:
@@ -24,3 +27,6 @@ Bienvenue sur la documentation du Sith de l'AE
 	:caption: Documentation des apps:
 
 	apps/core
+
+.. include:: ../README.rst
+	:start-after: body

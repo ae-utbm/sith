@@ -13,15 +13,18 @@ Certaines dépendances sont nécessaires niveau système :
 * python3-xapian
 * zlib1g-dev
 * python3
+* mysql-client (pour migrer de l'ancien site)
 
-Sur ubuntu :
+Sur Ubuntu
+~~~~~~~~~~
 
 .. sourcecode:: bash
 
 	sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian gettext git
 	sudo pip3 install virtualenv
 
-Sur macos :
+Sur MacOS
+~~~~~~~~~
 
 Pour installer les dépendances, il est fortement recommandé d'installer le gestionnaire de paquets `homebrew <https://brew.sh/index_fr>`__.
 
@@ -66,3 +69,16 @@ Il faut toujours avoir préalablement activé l'environnement virtuel comme fait
 .. sourcecode:: bash
 
 	./manage.py runserver
+
+Le serveur est alors accessible à l'adresse `http://localhost:8000 <http://localhost:8000`__.
+
+Générer la documentation
+------------------------
+
+La documentation est automatiquement mise en ligne sur readthedocs à chaque envoi de code sur GitLab.
+
+Pour l'utiliser en local ou globalement pour la modifier, il existe une commande du site qui génère la documentation et lance un serveur la rendant accessible à l'adresse `http://localhost:8080 <http://localhost:8080>`__.
+
+.. sourcecode:: bash
+
+	./manage.py documentation
