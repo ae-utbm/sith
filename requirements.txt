@@ -24,3 +24,4 @@ sentry_sdk
 # For documentation
 Sphinx > 2.0
 sphinx_rtd_theme
+sphinx-copybutton

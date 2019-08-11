@@ -2,6 +2,7 @@
 [![coverage report](https://ae-dev.utbm.fr/ae/Sith/badges/master/coverage.svg)](https://ae-dev.utbm.fr/ae/Sith/commits/master)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![project chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://ae-dev.zulipchat.com)
+[![Documentation Status](https://readthedocs.org/projects/sith-ae/badge/?version=latest)](https://sith-ae.readthedocs.io/?badge=latest)
 
 ## Sith AE
 
@@ -23,8 +24,6 @@ On macos, you will need homebrew
 ```bash
 brew install xapian
 ```
-
-If it doesn't work it's because it need [this pull request](https://github.com/Homebrew/homebrew-core/pull/34835) to be validated.
 
 The development is done with sqlite, but it is advised to set a more robust DBMS for production (Postgresql for example)
 

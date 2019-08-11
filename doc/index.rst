@@ -14,6 +14,12 @@ Bienvenue sur la documentation du Sith de l'AE
    about/tech
 
 .. toctree::
+	:maxdepth: 2
+	:caption: Bien démarrer
+
+	start/install
+
+.. toctree::
 	:maxdepth: 3
 	:caption: Documentation des apps:
 
