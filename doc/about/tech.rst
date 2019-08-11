@@ -137,7 +137,7 @@ Sentry
 ~~~~~~
 
 | `Site officiel <https://sentry.io>`__
-| `Instance de l'AE <https://ae2.utbm.fr`__
+| `Instance de l'AE <https://ae2.utbm.fr>`__
 
 Sentry est une plate-forme libre qui permet de se tenir informer des bugs qui ont lieu sur le site. À chaque crash du logiciel (erreur 500), une erreur est envoyée sur la plate-forme et est indiqué précisément à quelle ligne de code celle-ci a eu lieu, à quelle heure, combien de fois, avec quel navigateur la page a été visitée et même éventuellement un commentaire de l'utilisateur qui a rencontré le bug.
 

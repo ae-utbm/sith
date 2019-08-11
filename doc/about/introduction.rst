@@ -1,7 +1,7 @@
 Introduction
 ============
 
-Le but de ce projet est de fournir à l'Association des Étudiants de l'UTBM une plate-forme pratique et centralisée de ses services. Le Sith de l'AE tiens à jour le registre des cotisations à l'association, prend en charge la trésorerie, les ventes de produits et services, la diffusion d’événements, la gestion de la laverie et bien plus encore.
+Le but de ce projet est de fournir à l'Association des Étudiants de l'UTBM une plate-forme pratique et centralisée de ses services. Le Sith de l'AE tiens à jour le registre des cotisations à l'association, prend en charge la trésorerie, les ventes de produits et services, la diffusion d’événements, la gestion de la laverie et bien plus encore. Il est conçu de manière suffisamment générique pour être facilement adaptable à une autre association.
 
 C'est un projet bénévole qui tire ses origines des années 2000. Il s'agit de la troisième version du site de l'association initiée en 2015. C'est une réécriture complète en rupture totale des deux versions qui l'ont précédé.
 

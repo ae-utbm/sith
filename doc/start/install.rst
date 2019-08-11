@@ -26,7 +26,7 @@ Sur Ubuntu
 Sur MacOS
 ~~~~~~~~~
 
-Pour installer les dépendances, il est fortement recommandé d'installer le gestionnaire de paquets `homebrew <https://brew.sh/index_fr>`__.
+Pour installer les dépendances, il est fortement recommandé d'installer le gestionnaire de paquets `homebrew <https://brew.sh/index_fr>`_.
 
 .. sourcecode:: bash
 
@@ -70,14 +70,16 @@ Il faut toujours avoir préalablement activé l'environnement virtuel comme fait
 
 	./manage.py runserver
 
-Le serveur est alors accessible à l'adresse `http://localhost:8000 <http://localhost:8000`__.
+.. note::
+
+	Le serveur est alors accessible à l'adresse http://localhost:8000.
 
 Générer la documentation
 ------------------------
 
 La documentation est automatiquement mise en ligne sur readthedocs à chaque envoi de code sur GitLab.
 
-Pour l'utiliser en local ou globalement pour la modifier, il existe une commande du site qui génère la documentation et lance un serveur la rendant accessible à l'adresse `http://localhost:8080 <http://localhost:8080>`__.
+Pour l'utiliser en local ou globalement pour la modifier, il existe une commande du site qui génère la documentation et lance un serveur la rendant accessible à l'adresse http://localhost:8080.
 
 .. sourcecode:: bash
 

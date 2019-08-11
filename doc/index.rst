@@ -28,5 +28,13 @@ Bienvenue sur la documentation du Sith de l'AE
 
 	apps/core
 
+Documents téléchargeables
+-------------------------
+
+* :download:`Rapport de la TW de Skia sur la création du site <TW_Skia/Rapport.pdf>`
+* :download:`Rapport sur la TO de Skia et LoJ <TO_Skia_LoJ/Rapport.pdf>`
+* :download:`Manuel du service E-transactions <Etransaction/Manuel_Integration_E-transactions_Internet_V6.6_FR.pdf>`
+* :download:`Guide de trésorerie <Guide de Tresorerie.pdf>`
+
 .. include:: ../README.rst
 	:start-after: body

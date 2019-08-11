@@ -8,7 +8,7 @@
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
   :target: https://github.com/ambv/black
-  :alt: Code style: black
+  :alt: code style: black
 
 .. image:: https://img.shields.io/badge/zulip-join_chat-brightgreen.svg
   :target: https://ae-dev.zulipchat.com
@@ -16,12 +16,23 @@
 
 .. image:: https://readthedocs.org/projects/sith-ae/badge/?version=latest
   :target: https://sith-ae.readthedocs.io/?badge=latest
-  :alt: Documentation Status
+  :alt: documentation Status
 
 .. body
 
+.. role:: bash(code)
+   :language: bash
+
 Sith AE
 =======
+
+| **Website** is available here https://ae.utbm.fr/.
+| **Documentation** is available here https://sith-ae.readthedocs.io/.
+
+| Please contact us at mailto:ae.info@utbm.fr if you have issues while using our website.
+| If you want to join us, you can join our Zulip chat at https://ae-dev.zulipchat.com.
+
+This project is licenced under GNU GPL, see the LICENSE file at the top of the repository for more details.
 
 Logging errors with sentry
 --------------------------
@@ -31,7 +42,7 @@ To connect the app to sentry.io, you must set the variable SENTRY_DSN in your se
 Collecting statics for production:
 ----------------------------------
 
-We use scss in the project. In development environment (DEBUG=True), scss is compiled every time the file is needed. For production, it assumes you have already compiled every files and to do so, you need to use the following commands : 
+We use scss in the project. In development environment (DEBUG=True), scss is compiled every time the file is needed. For production, it assumes you have already compiled every files and to do so, you need to use the following commands :
 
 .. sourcecode:: bash
 
@@ -44,7 +55,6 @@ Misc about development
 Controlling the rights
 ~~~~~~~~~~~~~~~~~~~~~~
 
-
 When you need to protect an object, there are three levels:
 
   * Editing the object properties
@@ -53,12 +63,15 @@ When you need to protect an object, there are three levels:
 
 Now you have many solutions in your model:
 
-  * You can define a `is_owned_by(self, user)`, a `can_be_edited_by(self, user)`, and/or a `can_be_viewed_by(self, user)` method, each returning True is the user passed can edit/view the object, False otherwise.
+  * You can define a :bash:`is_owned_by(self, user)`, a :bash:`can_be_edited_by(self, user)`, and/or a :bash:`can_be_viewed_by(self, user)` method, each returning True is the user passed can edit/view the object, False otherwise.
 
     * This allows you to make complex request when the group solution is not powerful enough.
     * It's useful too when you want to define class-wide permissions, e.g. the club members, that are viewable only for Subscribers.
 
-  * You can add an `owner_group` field, as a ForeignKey to Group.  Second is an `edit_groups` field, as a ManyToMany to Group, and third is a `view_groups`, same as for edit.
+  * You can add an :bash:`owner_group` field, as a ForeignKey to Group.  Second is an :bash:`edit_groups` field, as a ManyToMany to Group, and third is a :bash:`view_groups`, same as for edit.
+
+
+
 
 Finally, when building a class based view, which is highly advised, you just have to inherit it from CanEditPropMixin,
 CanEditMixin, or CanViewMixin, which are located in core.views. Your view will then be protected using either the
@@ -75,8 +88,6 @@ Counting the number of line of code
 Updating doc/SYNTAX.md
 ~~~~~~~~~~~~~~~~~~~~~~
 
-| If you make an update in the Markdown syntax parser, it's good to document update the syntax reference page in `doc/SYNTAX.md`. But updating this file will break the tests if you don't update the corresponding `doc/SYNTAX.html` file at the same time.
-| To do that, simply run `./manage.py markdown > doc/SYNTAX.html`,
+| If you make an update in the Markdown syntax parser, it's good to document update the syntax reference page in :bash:`doc/SYNTAX.md`. But updating this file will break the tests if you don't update the corresponding :bash:`doc/SYNTAX.html` file at the same time.
+| To do that, simply run :bash:`./manage.py markdown > doc/SYNTAX.html`,
 and the tests should pass again.
-
-
