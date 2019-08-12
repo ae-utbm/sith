@@ -25,6 +25,10 @@ Python 3
 
 Le python est un langage de programmation interprété multi paradigme sorti en 1991. Il est très populaire pour sa simplicité d'utilisation, sa puissance, sa stabilité, sécurité ainsi que sa grande communauté de développeur. Sa version 3, non rétro compatible avec sa version 2, a été publiée en 2008.
 
+.. note::
+
+	Puisque toutes les dépendances du backend sont des packages Python, elles sont toutes ajoutées directement dans le fichier **requirements.txt** à la racine du projet.
+
 Django
 ~~~~~~
 
@@ -88,6 +92,21 @@ Sass
 Sass (Syntactically Awesome Stylesheets) est un langage dynamique de génération de feuilles CSS apparu en 2006. C'est un langage de CSS "amélioré" qui permet l'ajout de variables (à une époque où le CSS ne les supportait pas), de fonctions, mixins ainsi qu'une syntaxe pour imbriquer plus facilement et proprement les règles sur certains éléments. Le Sass est traduit en CSS directement côté serveur et le client ne reçoit que du CSS.
 
 C'est une technologie stable, mature et pratique qui ne nécessite pas énormément d'apprentissage.
+
+Fontawesome
+~~~~~~~~~~~
+
+`Site officiel <https://fontawesome.com>`__
+
+Fontawesome regroupe tout un ensemble d'icônes libres de droits utilisables facilement sur n'importe quelle page web. Ils sont simple à modifier puisque modifiables via le CSS et présentent l'avantage de fonctionner sur tous les navigateurs contrairement à un simple icône unicode qui s'affiche lui différemment selon la plate-forme.
+
+.. note::
+
+	C'est une dépendance capricieuse qu'il évolue très vite et qu'il faut très souvent mettre à jour.
+
+.. warning::
+
+	Il a été décidé de **ne pas utiliser** de CDN puisque le site ralentissait régulièrement. Il est préférable de fournir cette dépendance avec le site.
 
 Documentation
 -------------

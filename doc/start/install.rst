@@ -84,3 +84,22 @@ Pour l'utiliser en local ou globalement pour la modifier, il existe une commande
 .. sourcecode:: bash
 
 	./manage.py documentation
+
+Lancer les tests
+----------------
+
+Pour lancer les tests il suffit d'utiliser la commande intégrée à django.
+
+.. code-block:: bash
+
+    # Lancer tous les tests
+    ./manage.py test
+
+    # Lancer les tests de l'application core
+    ./manage.py test core
+
+    # Lancer les tests de la classe UserRegistrationTest de core
+    ./manage.py test core.tests.UserRegistrationTest
+
+    # Lancer une méthode en particulier de cette même classe
+    ./manage.py test core.tests.UserRegistrationTest.test_register_user_form_ok
