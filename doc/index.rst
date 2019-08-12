@@ -22,11 +22,30 @@ Bienvenue sur la documentation du Sith de l'AE
 
 	start/install
 
+	start/translations
+
+	start/devtools
+
 .. toctree::
 	:maxdepth: 3
-	:caption: Documentation des apps:
+	:caption: Documentation des apps
 
 	apps/core
+
+.. toctree::
+	:maxdepth: 2
+	:caption: Divers
+
+	misc/helpers
+
+Documentations complémentaires
+------------------------------
+
+* `Apprendre Python <https://openclassrooms.com/fr/courses/235344-apprenez-a-programmer-en-python>`__
+* `Documentation de Django <https://docs.djangoproject.com/fr/1.11/>`__
+* `Classy Class-Based Views <http://ccbv.co.uk/projects/Django/1.11/>`__
+* `Cours sur Git <https://openclassrooms.com/fr/courses/2342361-gerez-votre-code-avec-git-et-github>`__
+* `Livre sur Git <http://www.git-scm.com/book/fr/v2>`__
 
 Documents téléchargeables
 -------------------------
