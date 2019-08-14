@@ -81,18 +81,60 @@ def internal_servor_error(request):
 
 
 def can_edit_prop(obj, user):
+    """
+    :param obj: Object to test for permission
+    :param user: core.models.User to test permissions against
+    :return: if user is authorized to edit object properties
+    :rtype: bool
+
+    :Example:
+
+    .. code-block:: python
+
+        if not can_edit_prop(self.object ,request.user):
+            raise PermissionDenied
+
+    """
     if obj is None or user.is_owner(obj):
         return True
     return False
 
 
 def can_edit(obj, user):
+    """
+    :param obj: Object to test for permission
+    :param user: core.models.User to test permissions against
+    :return: if user is authorized to edit object
+    :rtype: bool
+
+    :Example:
+
+    .. code-block:: python
+
+        if not can_edit(self.object ,request.user):
+            raise PermissionDenied
+
+    """
     if obj is None or user.can_edit(obj):
         return True
     return can_edit_prop(obj, user)
 
 
 def can_view(obj, user):
+    """
+    :param obj: Object to test for permission
+    :param user: core.models.User to test permissions against
+    :return: if user is authorized to see object
+    :rtype: bool
+
+    :Example:
+
+    .. code-block:: python
+
+        if not can_view(self.object ,request.user):
+            raise PermissionDenied
+
+    """
     if obj is None or user.can_view(obj):
         return True
     return can_edit(obj, user)
@@ -102,6 +144,8 @@ class CanCreateMixin(View):
     """
     This view is made to protect any child view that would create an object, and thus, that can not be protected by any
     of the following mixin
+
+    :raises: PermissionDenied
     """
 
     def dispatch(self, request, *arg, **kwargs):
@@ -123,6 +167,8 @@ class CanEditPropMixin(View):
     to only the owner group of the given object.
     In other word, you can make a view with this view as parent, and it would be retricted to the users that are in the
     object's owner_group
+
+    :raises: PermissionDenied
     """
 
     def dispatch(self, request, *arg, **kwargs):
@@ -150,6 +196,8 @@ class CanEditMixin(View):
     """
     This view makes exactly the same thing as its direct parent, but checks the group on the edit_groups field of the
     object
+
+    :raises: PermissionDenied
     """
 
     def dispatch(self, request, *arg, **kwargs):
@@ -177,6 +225,8 @@ class CanViewMixin(View):
     """
     This view still makes exactly the same thing as its direct parent, but checks the group on the view_groups field of
     the object
+
+    :raises: PermissionDenied
     """
 
     def dispatch(self, request, *arg, **kwargs):
@@ -206,6 +256,8 @@ class CanViewMixin(View):
 class FormerSubscriberMixin(View):
     """
     This view check if the user was at least an old subscriber
+
+    :raises: PermissionDenied
     """
 
     def dispatch(self, request, *args, **kwargs):
@@ -217,6 +269,8 @@ class FormerSubscriberMixin(View):
 class UserIsLoggedMixin(View):
     """
     This view check if the user is logged
+
+    :raises: PermissionDenied
     """
 
     def dispatch(self, request, *args, **kwargs):

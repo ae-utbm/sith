@@ -7,7 +7,6 @@ Bienvenue sur la documentation du Sith de l'AE
 ==============================================
 
 .. include:: ../README.rst
-	:end-before: body
 
 .. toctree::
    :maxdepth: 2
@@ -27,6 +26,12 @@ Bienvenue sur la documentation du Sith de l'AE
 	start/translations
 
 	start/devtools
+
+.. toctree::
+	:maxdepth: 2
+	:caption: La surcouche "Site AE"
+
+	overlay/rights
 
 .. toctree::
 	:maxdepth: 3
@@ -77,6 +82,3 @@ Documents téléchargeables
 * :download:`Rapport sur la TO de Skia et LoJ <TO_Skia_LoJ/Rapport.pdf>`
 * :download:`Manuel du service E-transactions <Etransaction/Manuel_Integration_E-transactions_Internet_V6.6_FR.pdf>`
 * :download:`Guide de trésorerie <Guide de Tresorerie.pdf>`
-
-.. include:: ../README.rst
-	:start-after: body
