@@ -2,6 +2,10 @@
   :target: https://ae-dev.utbm.fr/ae/Sith/commits/master
   :alt: pipeline status
 
+.. image:: https://readthedocs.org/projects/sith-ae/badge/?version=latest
+  :target: https://sith-ae.readthedocs.io/?badge=latest
+  :alt: documentation Status
+
 .. image:: https://ae-dev.utbm.fr/ae/Sith/badges/master/coverage.svg
   :target: https://ae-dev.utbm.fr/ae/Sith/commits/master
   :alt: coverage report
@@ -13,10 +17,6 @@
 .. image:: https://img.shields.io/badge/zulip-join_chat-brightgreen.svg
   :target: https://ae-dev.zulipchat.com
   :alt: project chat
-
-.. image:: https://readthedocs.org/projects/sith-ae/badge/?version=latest
-  :target: https://sith-ae.readthedocs.io/?badge=latest
-  :alt: documentation Status
 
 | **Website** is available here https://ae.utbm.fr/.
 | **Documentation** is available here https://sith-ae.readthedocs.io/.

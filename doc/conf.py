@@ -16,10 +16,6 @@ import django
 
 sys.path.insert(0, os.path.abspath(".."))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sith.settings")
-
-# from django.conf import settings
-
-# settings.configure()
 django.setup()
 
 
