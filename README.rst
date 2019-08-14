@@ -34,24 +34,6 @@ Sith AE
 
 This project is licenced under GNU GPL, see the LICENSE file at the top of the repository for more details.
 
-Logging errors with sentry
---------------------------
-
-To connect the app to sentry.io, you must set the variable SENTRY_DSN in your settings custom. It's composed of the full link given on your sentry project
-
-Collecting statics for production:
-----------------------------------
-
-We use scss in the project. In development environment (DEBUG=True), scss is compiled every time the file is needed. For production, it assumes you have already compiled every files and to do so, you need to use the following commands :
-
-.. sourcecode:: bash
-
-  ./manage.py collectstatic # To collect statics
-  ./manage.py compilestatic # To compile scss in those statics
-
-Misc about development
-----------------------
-
 Controlling the rights
 ~~~~~~~~~~~~~~~~~~~~~~
 

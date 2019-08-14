@@ -40,6 +40,7 @@ Bienvenue sur la documentation du Sith de l'AE
 
 	misc/md_syntax
 	misc/helpers
+	misc/prod
 
 Documentations complémentaires
 ------------------------------
