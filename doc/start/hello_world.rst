@@ -1,7 +1,7 @@
 Créer une nouvelle application Hello World
 ==========================================
 
-L'objectif de ce petit tutoriel est de manier les vues et les urls de Django simplement. On créera une application nommée *hello* qui fournira une page affichant "Hello World" ainsi qu'une autre page qui affichera en plus un numéro qui sera récupéré depuis l'URL, le tout au milieu d'une page typique du Sith AE.
+L'objectif de ce petit tutoriel est de prendre rapidement en main les vues, les urls et les modèles de Django. On créera une application nommée *hello* qui fournira une page affichant "Hello World", une autre page qui affichera en plus un numéro qui sera récupéré depuis l'URL ainsi qu'une page affichant un élément récupéré de la base de données, le tout au milieu d'une page typique du Sith AE.
 
 Créer l'application
 -------------------
@@ -49,13 +49,13 @@ Dans un premier temps, nous allons créer une vue qui vas charger un template en
     # Toute la logique pour servir la vue et parser le template
     # est directement héritée de TemplateView
     class HelloView(TemplateView):
-        template_name = "hello.jinja" # On indique quel template utiliser
+        template_name = "hello/hello.jinja" # On indique quel template utiliser
 
 On vas ensuite créer le template.
 
 .. code-block:: html+jinja
 
-    {# hello/templates/hello.jinja #}
+    {# hello/templates/hello/hello.jinja #}
 
     {# On étend le template de base du Sith #}
     {% extends "core/base.jinja" %}
@@ -112,7 +112,7 @@ Cette deuxième URL vas donc appeler la classe crée tout à l'heure en lui pass
     from django.views.generic import TemplateView
 
     class HelloView(TemplateView):
-        template_name = "hello.jinja"
+        template_name = "hello/hello.jinja"
 
         # C'est la méthode appelée juste avant de définir le type de requête effectué
         def dispatch(self, request, *args, **kwargs):
@@ -139,7 +139,7 @@ Enfin, on modifie le template en rajoutant une petite condition sur la présence
 
 .. code-block:: html+jinja
 
-    {# hello/templates/hello.jinja #}
+    {# hello/templates/hello/hello.jinja #}
     {% extends "core/base.jinja" %}
 
     {% block title %}
@@ -154,3 +154,122 @@ Enfin, on modifie le template en rajoutant une petite condition sur la présence
         {%- endif -%}
     </p>
     {% endblock content %}
+
+.. note::
+
+    Il est tout à fait possible d'utiliser les arguments GET passés dans l'URL. Dans ce cas, il n'est pas obligatoire de modifier l'URL et il est possible de récupérer l'argument dans le dictionnaire `request.GET`.
+
+À l'assaut des modèles
+----------------------
+
+Pour cette dernière partie, nous allons ajouter une entrée dans la base de donnée et l'afficher dans un template. Nous allons ainsi créer un modèle nommé *Article* qui contiendra une entrée de texte pour le titre et une autre pour le contenu.
+
+Commençons par le modèle en lui même.
+
+.. code-block:: python
+
+    # hello/models.py
+    from django.db import models
+
+
+    class Article(models.Model):
+
+        title = models.CharField("titre", max_length=100)
+        content = models.TextField("contenu")
+
+Continuons avec une vue qui sera en charge d'afficher l'ensemble des articles présent dans la base.
+
+.. code-block:: python
+
+    # hello/views.py
+
+    from django.views.generic import ListView
+
+    from hello.models import Article
+
+    ...
+
+    # On hérite de ListView pour avoir plusieurs objets
+    class ArticlesListView(ListView):
+
+        model = Article # On base la vue sur le modèle Article
+        template_name = "hello/articles.jinja"
+
+On n'oublie pas l'URL.
+
+.. code-block:: python
+
+    from hello.views import HelloView, ArticlesListView
+
+    urlpatterns = [
+        ...
+        url(r"^articles$", ArticlesListView.as_view(), name="articles_list")
+    ]
+
+Et enfin le template.
+
+.. code-block:: html+jinja
+
+    {# hello/templates/hello/articles.jinja #}
+    {% extends "core/base.jinja" %}
+
+    {% block title %}
+        Hello World Articles
+    {% endblock title %}
+
+    {% block content %}
+        {# Par défaut une liste d'objets venant de ListView s'appelle object_list #}
+        {% for article in object_list %}
+            <h2>{{ article.title }}</h2>
+            <p>{{ article.content }}</p>
+        {% endfor %}
+    {% endblock content %}
+
+Maintenant que toute la logique de récupération et d'affichage est terminée, la page est accessible à l'adresse https://localhost:8000/hello/articles.
+
+Mais, j'ai une erreur ! Il se passe quoi ?! Et bien c'est simple, nous avons crée le modèle mais il n'existe pas dans la base de données. Il est dans un premier temps important de créer un fichier de migrations qui contiens des instructions pour la génération de celle-ci. Ce sont les fichiers qui sont enregistrés dans le dossier migration. Pour les générer à partir des classes de modèles qu'on viens de manipuler il suffit d'une seule commande.
+
+.. code-block:: bash
+
+    ./manage.py makemigrations
+
+Un fichier *hello/migrations/0001_initial.py* se crée automatiquement, vous pouvez même aller le voir.
+
+.. note::
+
+    Il est tout à fait possible de modifier à la main les fichiers de migrations. C'est très intéressant si par exemple il faut appliquer des modifications sur les données d'un modèle existant après cette migration mais c'est bien au delà du sujet de ce tutoriel. Référez vous à la documentation pour ce genre de choses.
+
+J'ai toujours une erreur ! Mais oui, c'est pas fini, faut pas aller trop vite. Maintenant il faut appliquer les modifications à la base de données.
+
+.. code-block:: bash
+
+    ./manage.py migrate
+
+Et voilà, là il n'y a plus d'erreur. Tout fonctionne et on a une superbe page vide puisque aucun contenu pour cette table n'est dans la base. Nous allons en rajouter. Pour cela nous allons utiliser le fichier *core/management/commands/populate.py* qui contiens la commande qui initialise les données de la base de données de test. C'est un fichier très important qu'on viendra à modifier assez souvent. Nous allons y ajouter quelques articles.
+
+.. code-block:: python
+
+    # core/management/commands/populate.py
+    from hello.models import Article
+
+    ...
+
+    class Command(BaseCommand):
+
+        ...
+
+        def handle(self, *args, **options):
+
+            ...
+
+            Article(title="First hello", content="Bonjour tout le monde").save()
+            Article(title="Tutorial", content="C'était un super tutoriel").save()
+
+
+On regénère enfin les données de test en lançant la commande que l'on viens de modifier.
+
+.. code-block:: bash
+
+    ./manage.py setup
+
+On reviens sur https://localhost:8000/hello/articles et cette fois-ci nos deux articles apparaissent correctement.
