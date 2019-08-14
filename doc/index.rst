@@ -38,6 +38,7 @@ Bienvenue sur la documentation du Sith de l'AE
 	:maxdepth: 2
 	:caption: Divers
 
+	misc/md_syntax
 	misc/helpers
 
 Documentations complémentaires
@@ -66,8 +67,6 @@ Git
 
 * `Cours sur Git <https://openclassrooms.com/fr/courses/2342361-gerez-votre-code-avec-git-et-github>`__
 * `Livre sur Git <http://www.git-scm.com/book/fr/v2>`__
-
-
 
 
 Documents téléchargeables

@@ -76,18 +76,3 @@ Now you have many solutions in your model:
 Finally, when building a class based view, which is highly advised, you just have to inherit it from CanEditPropMixin,
 CanEditMixin, or CanViewMixin, which are located in core.views. Your view will then be protected using either the
 appropriate group fields, or the right method to check user permissions.
-
-Counting the number of line of code
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. sourcecode:: bash
-
-  sudo apt install cloc
-  cloc --exclude-dir=doc,env .
-
-Updating doc/SYNTAX.md
-~~~~~~~~~~~~~~~~~~~~~~
-
-| If you make an update in the Markdown syntax parser, it's good to document update the syntax reference page in :bash:`doc/SYNTAX.md`. But updating this file will break the tests if you don't update the corresponding :bash:`doc/SYNTAX.html` file at the same time.
-| To do that, simply run :bash:`./manage.py markdown > doc/SYNTAX.html`,
-and the tests should pass again.
