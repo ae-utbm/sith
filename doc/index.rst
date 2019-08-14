@@ -21,6 +21,7 @@ Bienvenue sur la documentation du Sith de l'AE
 	:caption: Bien démarrer
 
 	start/install
+	start/structure
 	start/hello_world
 
 	start/translations
