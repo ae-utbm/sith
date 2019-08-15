@@ -18,12 +18,20 @@
   :target: https://ae-dev.zulipchat.com
   :alt: project chat
 
-| **Website** is available here https://ae.utbm.fr/.
-| **Documentation** is available here https://sith-ae.readthedocs.io/.
+This is the source code of the UTBM's student association available at https://ae.utbm.fr/.
 
-| Please contact us at mailto:ae.info@utbm.fr if you have issues while using our website.
-| If you want to join us, you can join our Zulip chat at https://ae-dev.zulipchat.com.
+All documentation is in the ``docs`` directory and online at https://sith-ae.readthedocs.io/. This documentation is written in French because it targets a French audience and it's too much work to maintain two versions. The code and code comments are strictly written in English.
+
+If you want to contribute, here's how we recommend to read the docs:
+
+* First, it's advised to read the about part of the project to understand the goals and the mindset of the current and previous maintainers and know what to expect to learn.
+* If in the first part you find you need more background about what we use, we provide some links to tutorials and documentation at the end of our documentation. Feel free to use it and complete it with what you found helpful.
+* Keep in mind that this documentation is thought to be read in order.
+
+To join our team :
+
+* Send a mail at mailto:ae.utbm.fr
+* Join our group chat at https://ae-dev.zulipchat.com
+* See and join our Trello at https://trello.com/b/YQOaF33m/site-ae.
 
 This project is licenced under GNU GPL, see the LICENSE file at the top of the repository for more details.
-
-The code is written only in english but the documentation is written in french for comprehension reasons. It will not be written in english because it's too much work.
