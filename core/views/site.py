@@ -40,11 +40,9 @@ from club.models import Club
 
 
 def index(request, context=None):
-    if request.user.is_authenticated():
-        from com.views import NewsListView
+    from com.views import NewsListView
 
-        return NewsListView.as_view()(request)
-    return render(request, "core/index.jinja")
+    return NewsListView.as_view()(request)
 
 
 class NotificationList(ListView):

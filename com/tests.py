@@ -26,6 +26,9 @@ from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
+from django.utils import html
+from django.utils.translation import ugettext as _
+
 
 from core.models import User, RealGroup
 
@@ -73,4 +76,24 @@ class ComTest(TestCase):
         self.assertTrue(
             """<div id="info_box">\\n                <div class="markdown"><h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>"""
             in str(r.content)
+        )
+
+    def test_birthday_non_subscribed_user(self):
+        self.client.login(username="guy", password="plop")
+        response = self.client.get(reverse("core:index"))
+        self.assertContains(
+            response,
+            text=html.escape(
+                _("You need an up to date subscription to access this content")
+            ),
+        )
+
+    def test_birthday_subscibed_user(self):
+        response = self.client.get(reverse("core:index"))
+
+        self.assertNotContains(
+            response,
+            text=html.escape(
+                _("You need an up to date subscription to access this content")
+            ),
         )

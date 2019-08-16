@@ -182,14 +182,6 @@ class InfoMsgEditView(ComEditView):
     success_url = reverse_lazy("com:info_edit")
 
 
-class IndexEditView(ComEditView):
-    form_class = modelform_factory(
-        Sith, fields=["index_page"], widgets={"index_page": MarkdownInput}
-    )
-    current_tab = "index"
-    success_url = reverse_lazy("com:index_edit")
-
-
 class WeekmailDestinationEditView(ComEditView):
     fields = ["weekmail_destinations"]
     current_tab = "weekmail_destinations"
