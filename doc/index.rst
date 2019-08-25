@@ -16,36 +16,42 @@ Bienvenue sur la documentation du Sith de l'AE
    about/tech
 
 .. toctree::
-	:maxdepth: 2
-	:caption: Bien démarrer
+    :maxdepth: 2
+    :caption: Bien démarrer
 
-	start/install
-	start/structure
-	start/hello_world
+    start/install
+    start/structure
+    start/hello_world
 
-	start/translations
+    start/translations
 
-	start/devtools
-
-.. toctree::
-	:maxdepth: 2
-	:caption: La surcouche "Site AE"
-
-	overlay/rights
+    start/devtools
 
 .. toctree::
-	:maxdepth: 3
-	:caption: Documentation des apps
+    :maxdepth: 2
+    :caption: La surcouche "Site AE"
 
-	apps/core
+    overlay/rights
 
 .. toctree::
-	:maxdepth: 2
-	:caption: Divers
+    :maxdepth: 1
+    :caption: Modifications fréquentes
 
-	misc/md_syntax
-	misc/helpers
-	misc/prod
+    frequent/subscriptions
+
+.. toctree::
+    :maxdepth: 3
+    :caption: Documentation des apps
+
+    apps/core
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Divers
+
+    misc/md_syntax
+    misc/helpers
+    misc/prod
 
 Documentations complémentaires
 ------------------------------

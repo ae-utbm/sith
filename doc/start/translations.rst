@@ -1,3 +1,5 @@
+.. _translations:
+
 Ajouter une traduction
 ======================
 
