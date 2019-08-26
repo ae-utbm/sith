@@ -38,6 +38,7 @@ Bienvenue sur la documentation du Sith de l'AE
     :caption: Modifications fréquentes
 
     frequent/subscriptions
+    frequent/weekmail
 
 .. toctree::
     :maxdepth: 3
