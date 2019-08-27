@@ -328,7 +328,8 @@ class UVUpdateView(CanEditPropMixin, UpdateView):
 
     def get_form_kwargs(self):
         kwargs = super(UVUpdateView, self).get_form_kwargs()
-        kwargs["author_id"] = self.request.user.id
+        obj = self.get_object()
+        kwargs["author_id"] = obj.author.id
         return kwargs
 
     def get_success_url(self):
