@@ -194,10 +194,10 @@ class Weekmail(models.Model):
         ).content.decode("utf-8")
 
     def get_banner(self):
-        return "http://" + settings.SITH_URL + static("com/img/weekmail_bannerA18.jpg")
+        return "http://" + settings.SITH_URL + static("com/img/weekmail_bannerA19.jpg")
 
     def get_footer(self):
-        return "http://" + settings.SITH_URL + static("com/img/weekmail_footerA18.jpg")
+        return "http://" + settings.SITH_URL + static("com/img/weekmail_footerA19.jpg")
 
     def __str__(self):
         return "Weekmail %s (sent: %s) - %s" % (self.id, self.sent, self.title)
