@@ -252,61 +252,64 @@ class UVUpdateTest(TestCase):
         call_command("populate")
         self.bibou = User.objects.filter(username="root").first()
         self.tutu = User.objects.filter(username="tutu").first()
-        self.sli = User.objects.filter(username="sli").first()
-        self.guy = User.objects.filter(username="guy").first()
+        self.uv = UV.objects.get(code="PA00")
 
     def test_uv_update_root_success(self):
         self.client.login(username="root", password="plop")
         self.client.post(
-            reverse(
-                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
-            ),
+            reverse("pedagogy:uv_update", kwargs={"uv_id": self.uv.id}),
             create_uv_template(self.bibou.id, code="PA00"),
         )
-        self.assertEquals(UV.objects.get(code="PA00").credit_type, "TM")
+        self.uv.refresh_from_db()
+        self.assertEquals(self.uv.credit_type, "TM")
 
     def test_uv_update_pedagogy_admin_success(self):
         self.client.login(username="tutu", password="plop")
         self.client.post(
-            reverse(
-                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
-            ),
+            reverse("pedagogy:uv_update", kwargs={"uv_id": self.uv.id}),
+            create_uv_template(self.bibou.id, code="PA00"),
+        )
+        self.uv.refresh_from_db()
+        self.assertEquals(self.uv.credit_type, "TM")
+
+    def test_uv_update_original_author_does_not_change(self):
+        self.client.login(username="tutu", password="plop")
+        response = self.client.post(
+            reverse("pedagogy:uv_update", kwargs={"uv_id": self.uv.id}),
             create_uv_template(self.tutu.id, code="PA00"),
         )
-        self.assertEquals(UV.objects.get(code="PA00").credit_type, "TM")
+
+        self.uv.refresh_from_db()
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(self.uv.author, self.bibou)
 
     def test_uv_update_pedagogy_unauthorized_fail(self):
         # Anonymous user
         response = self.client.post(
-            reverse(
-                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
-            ),
-            create_uv_template(0, code="PA00"),
+            reverse("pedagogy:uv_update", kwargs={"uv_id": self.uv.id}),
+            create_uv_template(self.bibou.id, code="PA00"),
         )
         self.assertEquals(response.status_code, 403)
 
         # Not subscribed user
         self.client.login(username="guy", password="plop")
         response = self.client.post(
-            reverse(
-                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
-            ),
-            create_uv_template(self.guy.id, code="PA00"),
+            reverse("pedagogy:uv_update", kwargs={"uv_id": self.uv.id}),
+            create_uv_template(self.bibou.id, code="PA00"),
         )
         self.assertEquals(response.status_code, 403)
 
         # Simply subscribed user
         self.client.login(username="sli", password="plop")
         response = self.client.post(
-            reverse(
-                "pedagogy:uv_update", kwargs={"uv_id": UV.objects.get(code="PA00").id}
-            ),
-            create_uv_template(self.sli.id, code="PA00"),
+            reverse("pedagogy:uv_update", kwargs={"uv_id": self.uv.id}),
+            create_uv_template(self.bibou.id, code="PA00"),
         )
         self.assertEquals(response.status_code, 403)
 
         # Check that the UV has not changed
-        self.assertEquals(UV.objects.get(code="PA00").credit_type, "OM")
+        self.uv.refresh_from_db()
+        self.assertEquals(self.uv.credit_type, "OM")
 
 
 # UVComment class tests
