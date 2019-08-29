@@ -33,6 +33,28 @@ from django.utils.translation import ugettext as _
 from core.models import User, RealGroup
 
 
+class ComAlertTest(TestCase):
+    def setUp(self):
+        call_command("populate")
+
+    def test_page_is_working(self):
+        self.client.login(username="comunity", password="plop")
+        response = self.client.get(reverse("com:alert_edit"))
+        self.assertNotEquals(response.status_code, 500)
+        self.assertEquals(response.status_code, 200)
+
+
+class ComInfoTest(TestCase):
+    def setUp(self):
+        call_command("populate")
+
+    def test_page_is_working(self):
+        self.client.login(username="comunity", password="plop")
+        response = self.client.get(reverse("com:info_edit"))
+        self.assertNotEquals(response.status_code, 500)
+        self.assertEquals(response.status_code, 200)
+
+
 class ComTest(TestCase):
     def setUp(self):
         call_command("populate")
