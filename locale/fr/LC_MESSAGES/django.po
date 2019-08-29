@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-08 22:46+0200\n"
+"POT-Creation-Date: 2019-08-17 18:22+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -136,7 +136,7 @@ msgid "date"
 msgstr "date"
 
 #: accounting/models.py:270 counter/models.py:123 counter/models.py:616
-#: pedagogy/models.py:220 stock/models.py:102
+#: pedagogy/models.py:204 stock/models.py:102
 msgid "comment"
 msgstr "commentaire"
 
@@ -210,7 +210,7 @@ msgstr "Utilisateur"
 msgid "Club"
 msgstr "Club"
 
-#: accounting/models.py:315 core/views/user.py:296
+#: accounting/models.py:315 core/views/user.py:297
 msgid "Account"
 msgstr "Compte"
 
@@ -265,7 +265,7 @@ msgstr ""
 "Vous devez fournir soit un type comptable simplifié ou un type comptable "
 "standard"
 
-#: accounting/models.py:442 counter/models.py:159 pedagogy/models.py:91
+#: accounting/models.py:442 counter/models.py:159 pedagogy/models.py:46
 msgid "code"
 msgstr "code"
 
@@ -380,7 +380,7 @@ msgstr "Compte en banque : "
 #: launderette/views.py:226 pedagogy/templates/pedagogy/guide.jinja:51
 #: pedagogy/templates/pedagogy/guide.jinja:74
 #: pedagogy/templates/pedagogy/guide.jinja:110
-#: pedagogy/templates/pedagogy/uv_detail.jinja:178
+#: pedagogy/templates/pedagogy/uv_detail.jinja:179
 #: sas/templates/sas/album.jinja:26 sas/templates/sas/moderation.jinja:18
 #: sas/templates/sas/picture.jinja:74 sas/templates/sas/picture.jinja:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
@@ -391,7 +391,7 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: accounting/templates/accounting/bank_account_details.jinja:18
-#: club/views.py:78 core/views/user.py:206 sas/templates/sas/picture.jinja:86
+#: club/views.py:78 core/views/user.py:207 sas/templates/sas/picture.jinja:86
 msgid "Infos"
 msgstr "Infos"
 
@@ -425,7 +425,7 @@ msgstr "Nouveau compte club"
 #: com/templates/com/weekmail.jinja:61 core/templates/core/file.jinja:38
 #: core/templates/core/group_list.jinja:24 core/templates/core/page.jinja:35
 #: core/templates/core/poster_list.jinja:40
-#: core/templates/core/user_tools.jinja:42 core/views/user.py:238
+#: core/templates/core/user_tools.jinja:42 core/views/user.py:239
 #: counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:33
@@ -439,7 +439,7 @@ msgstr "Nouveau compte club"
 #: pedagogy/templates/pedagogy/guide.jinja:50
 #: pedagogy/templates/pedagogy/guide.jinja:73
 #: pedagogy/templates/pedagogy/guide.jinja:109
-#: pedagogy/templates/pedagogy/uv_detail.jinja:177
+#: pedagogy/templates/pedagogy/uv_detail.jinja:178
 #: sas/templates/sas/album.jinja:18 sas/templates/sas/picture.jinja:100
 #: trombi/templates/trombi/detail.jinja:9
 #: trombi/templates/trombi/edit_profile.jinja:34
@@ -1363,7 +1363,7 @@ msgstr "Anciens membres"
 msgid "History"
 msgstr "Historique"
 
-#: club/views.py:115 core/templates/core/base.jinja:117 core/views/user.py:229
+#: club/views.py:115 core/templates/core/base.jinja:117 core/views/user.py:230
 #: sas/templates/sas/picture.jinja:95 trombi/views.py:60
 msgid "Tools"
 msgstr "Outils"
@@ -1425,7 +1425,7 @@ msgstr "Appel"
 
 #: com/models.py:69 com/models.py:155 com/models.py:213 election/models.py:14
 #: election/models.py:116 election/models.py:156 forum/models.py:242
-#: forum/models.py:296 pedagogy/models.py:145
+#: forum/models.py:296 pedagogy/models.py:100
 msgid "title"
 msgstr "titre"
 
@@ -1443,8 +1443,8 @@ msgstr "contenu"
 msgid "type"
 msgstr "type"
 
-#: com/models.py:77 com/models.py:216 pedagogy/models.py:106
-#: pedagogy/models.py:215 trombi/models.py:183
+#: com/models.py:77 com/models.py:216 pedagogy/models.py:61
+#: pedagogy/models.py:199 trombi/models.py:183
 msgid "author"
 msgstr "auteur"
 
@@ -1726,20 +1726,24 @@ msgstr "Agenda"
 msgid "Birthdays"
 msgstr "Anniversaires"
 
-#: com/templates/com/news_list.jinja:47
+#: com/templates/com/news_list.jinja:49
 #, python-format
 msgid "%(age)s year old"
 msgstr "%(age)s ans"
 
-#: com/templates/com/news_list.jinja:86
+#: com/templates/com/news_list.jinja:59 com/tests.py:92 com/tests.py:102
+msgid "You need an up to date subscription to access this content"
+msgstr "Votre cotisation doit être à jour pour accéder à cette section"
+
+#: com/templates/com/news_list.jinja:92
 msgid "Events today and the next few days"
 msgstr "Événements aujourd'hui et dans les prochains jours"
 
-#: com/templates/com/news_list.jinja:129
+#: com/templates/com/news_list.jinja:135
 msgid "Nothing to come..."
 msgstr "Rien à venir..."
 
-#: com/templates/com/news_list.jinja:136
+#: com/templates/com/news_list.jinja:142
 msgid "Coming soon... don't miss!"
 msgstr "Prochainement... à ne pas rater!"
 
@@ -2144,7 +2148,7 @@ msgstr "département"
 msgid "dpt option"
 msgstr "Filière"
 
-#: core/models.py:248 pedagogy/models.py:118 pedagogy/models.py:284
+#: core/models.py:248 pedagogy/models.py:73 pedagogy/models.py:284
 msgid "semester"
 msgstr "semestre"
 
@@ -2371,10 +2375,6 @@ msgstr "404. Non trouvé"
 #: core/templates/core/500.jinja:8
 msgid "500, Server Error"
 msgstr "500, Erreur Serveur"
-
-#: core/templates/core/base.jinja:5 core/templates/core/index.jinja:4
-msgid "Welcome!"
-msgstr "Bienvenue!"
 
 #: core/templates/core/base.jinja:49
 msgid "Username"
@@ -2984,7 +2984,7 @@ msgstr "Résultat de la recherche"
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: core/templates/core/search.jinja:18 core/views/user.py:257
+#: core/templates/core/search.jinja:18 core/views/user.py:258
 #: counter/templates/counter/stats.jinja:17
 msgid "Clubs"
 msgstr "Clubs"
@@ -3215,8 +3215,8 @@ msgstr "Parrains de %(user_name)s"
 msgid "Show family picture"
 msgstr "Voir une image de la famille"
 
-#: core/templates/core/user_godfathers.jinja:12 core/views/user.py:215
-#: core/views/user.py:487
+#: core/templates/core/user_godfathers.jinja:12 core/views/user.py:216
+#: core/views/user.py:488
 msgid "Godfathers"
 msgstr "Parrains"
 
@@ -3229,7 +3229,7 @@ msgstr "Voir l'arbre des ancêtres"
 msgid "No godfathers"
 msgstr "Pas de parrains"
 
-#: core/templates/core/user_godfathers.jinja:25 core/views/user.py:485
+#: core/templates/core/user_godfathers.jinja:25 core/views/user.py:486
 msgid "Godchildren"
 msgstr "Fillots"
 
@@ -3285,7 +3285,7 @@ msgid "%(user_name)s's pictures"
 msgstr "Photos de %(user_name)s"
 
 #: core/templates/core/user_preferences.jinja:4
-#: core/templates/core/user_preferences.jinja:8 core/views/user.py:247
+#: core/templates/core/user_preferences.jinja:8 core/views/user.py:248
 msgid "Preferences"
 msgstr "Préférences"
 
@@ -3351,7 +3351,7 @@ msgstr "Outils utilisateurs"
 msgid "Sith management"
 msgstr "Gestion de Sith"
 
-#: core/templates/core/user_tools.jinja:14 core/views/user.py:267
+#: core/templates/core/user_tools.jinja:14 core/views/user.py:268
 msgid "Groups"
 msgstr "Groupes"
 
@@ -3401,7 +3401,7 @@ msgstr "Relevés de caisse"
 msgid "Invoices call"
 msgstr "Appels à facture"
 
-#: core/templates/core/user_tools.jinja:43 core/views/user.py:287
+#: core/templates/core/user_tools.jinja:43 core/views/user.py:288
 #: counter/templates/counter/counter_list.jinja:18
 #: counter/templates/counter/counter_list.jinja:34
 #: counter/templates/counter/counter_list.jinja:56
@@ -3656,16 +3656,16 @@ msgstr "Utilisateurs à retirer du groupe"
 msgid "Users to add to group"
 msgstr "Utilisateurs à ajouter au groupe"
 
-#: core/views/user.py:224 trombi/templates/trombi/export.jinja:25
+#: core/views/user.py:225 trombi/templates/trombi/export.jinja:25
 #: trombi/templates/trombi/user_profile.jinja:11
 msgid "Pictures"
 msgstr "Photos"
 
-#: core/views/user.py:489
+#: core/views/user.py:490
 msgid "Family"
 msgstr "Famille"
 
-#: core/views/user.py:631
+#: core/views/user.py:632
 msgid "User already has a profile picture"
 msgstr "L'utilisateur a déjà une photo de profil"
 
@@ -4811,7 +4811,7 @@ msgstr "Signalements acceptés"
 msgid "Denied reports"
 msgstr "Signalements refusés"
 
-#: pedagogy/models.py:98
+#: pedagogy/models.py:53
 msgid ""
 "The code of an UV must only contains uppercase characters without accent and "
 "numbers"
@@ -4819,87 +4819,87 @@ msgstr ""
 "Le code d'une UV doit seulement contenire des caractères majuscule sans "
 "accents et nombres"
 
-#: pedagogy/models.py:111
+#: pedagogy/models.py:66
 msgid "credit type"
 msgstr "type de crédit"
 
-#: pedagogy/models.py:116 pedagogy/models.py:146
+#: pedagogy/models.py:71 pedagogy/models.py:101
 msgid "uv manager"
 msgstr "gestionnaire d'uv"
 
-#: pedagogy/models.py:124
+#: pedagogy/models.py:79
 msgid "language"
 msgstr "langue"
 
-#: pedagogy/models.py:130
+#: pedagogy/models.py:85
 msgid "credits"
 msgstr "crédits"
 
-#: pedagogy/models.py:138
+#: pedagogy/models.py:93
 msgid "departmenmt"
 msgstr "département"
 
-#: pedagogy/models.py:147
+#: pedagogy/models.py:102
 msgid "objectives"
 msgstr "objecifs"
 
-#: pedagogy/models.py:148
+#: pedagogy/models.py:103
 msgid "program"
 msgstr "programme"
 
-#: pedagogy/models.py:149
+#: pedagogy/models.py:104
 msgid "skills"
 msgstr "compétences"
 
-#: pedagogy/models.py:150
+#: pedagogy/models.py:105
 msgid "key concepts"
 msgstr "concepts clefs"
 
-#: pedagogy/models.py:155
+#: pedagogy/models.py:110
 msgid "hours CM"
 msgstr "heures CM"
 
-#: pedagogy/models.py:162
+#: pedagogy/models.py:117
 msgid "hours TD"
 msgstr "heures TD"
 
-#: pedagogy/models.py:169
+#: pedagogy/models.py:124
 msgid "hours TP"
 msgstr "heures TP"
 
-#: pedagogy/models.py:176
+#: pedagogy/models.py:131
 msgid "hours THE"
 msgstr "heures THE"
 
-#: pedagogy/models.py:183
+#: pedagogy/models.py:138
 msgid "hours TE"
 msgstr "heures TE"
 
-#: pedagogy/models.py:219 pedagogy/models.py:275
+#: pedagogy/models.py:203 pedagogy/models.py:275
 msgid "uv"
 msgstr "uv"
 
-#: pedagogy/models.py:222
+#: pedagogy/models.py:206
 msgid "global grade"
 msgstr "note globale"
 
-#: pedagogy/models.py:229
+#: pedagogy/models.py:213
 msgid "utility grade"
 msgstr "note d'utilité"
 
-#: pedagogy/models.py:236
+#: pedagogy/models.py:220
 msgid "interest grade"
 msgstr "note d'intérêt"
 
-#: pedagogy/models.py:243
+#: pedagogy/models.py:227
 msgid "teaching grade"
 msgstr "note d'enseignement"
 
-#: pedagogy/models.py:250
+#: pedagogy/models.py:234
 msgid "work load grade"
 msgstr "note de charge de travail"
 
-#: pedagogy/models.py:256
+#: pedagogy/models.py:240
 msgid "publish date"
 msgstr "date de publication"
 
@@ -4907,15 +4907,15 @@ msgstr "date de publication"
 msgid "grade"
 msgstr "note"
 
-#: pedagogy/models.py:304
+#: pedagogy/models.py:298
 msgid "report"
 msgstr "signaler"
 
-#: pedagogy/models.py:308
+#: pedagogy/models.py:302
 msgid "reporter"
 msgstr "signalant"
 
-#: pedagogy/models.py:310
+#: pedagogy/models.py:304
 msgid "reason"
 msgstr "raison"
 
@@ -5051,11 +5051,11 @@ msgstr "Laisser un commentaire"
 msgid "Comments"
 msgstr "Commentaires"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:171
+#: pedagogy/templates/pedagogy/uv_detail.jinja:172
 msgid "This comment has been reported"
 msgstr "Ce commentaire a été signalé"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:184
+#: pedagogy/templates/pedagogy/uv_detail.jinja:185
 msgid "Report this comment"
 msgstr "Signaler ce commentaire"
 

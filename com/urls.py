@@ -30,7 +30,6 @@ from club.views import MailingDeleteView
 urlpatterns = [
     url(r"^sith/edit/alert$", AlertMsgEditView.as_view(), name="alert_edit"),
     url(r"^sith/edit/info$", InfoMsgEditView.as_view(), name="info_edit"),
-    url(r"^sith/edit/index$", IndexEditView.as_view(), name="index_edit"),
     url(
         r"^sith/edit/weekmail_destinations$",
         WeekmailDestinationEditView.as_view(),
