@@ -115,9 +115,6 @@ class ComTabsMixin(TabedViewMixin):
             }
         )
         tab_list.append(
-            {"url": reverse("com:index_edit"), "slug": "index", "name": _("Index page")}
-        )
-        tab_list.append(
             {"url": reverse("com:info_edit"), "slug": "info", "name": _("Info message")}
         )
         tab_list.append(
