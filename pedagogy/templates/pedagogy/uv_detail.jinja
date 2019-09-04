@@ -81,6 +81,11 @@
 		</div>
 
 		<br>
+		{% if object.has_user_already_commented(user) %}
+		<div id="leave_comment_not_allowed">
+		<p>{% trans %}You already posted a comment on this UV. If you want to comment again, please modify or delete your previous comment.{% endtrans %}</p>
+		</div>
+		{% else %}
 		<div id="leave_comment">
 			<h2>{% trans %}Leave comment{% endtrans %}</h2>
 			<div>
@@ -134,6 +139,7 @@
 				</form>
 			</div>
 		</div>
+		{% endif %}
 		<br>
 
 		{% if object.comments.exists() %}

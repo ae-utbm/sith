@@ -25,6 +25,7 @@
 from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
 from django.core.management import call_command
 
 from core.models import User, Notification
@@ -420,6 +421,50 @@ class UVCommentCreationAndDisplay(TestCase):
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
         )
         self.assertNotContains(response, text="Superbe UV")
+
+    def test_create_uv_comment_twice_fail(self):
+        # Checks that the has_user_already_commented method works proprely
+        self.assertFalse(self.uv.has_user_already_commented(self.bibou))
+
+        # Create a first comment
+        self.client.login(username="root", password="plop")
+        self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
+            create_uv_comment_template(self.bibou.id),
+        )
+
+        # Checks that the has_user_already_commented method works proprely
+        self.assertTrue(self.uv.has_user_already_commented(self.bibou))
+
+        # Create the second comment
+        comment = create_uv_comment_template(self.bibou.id)
+        comment["comment"] = "Twice"
+        response = self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}), comment
+        )
+        self.assertEquals(response.status_code, 200)
+        self.assertTrue(
+            UVComment.objects.filter(comment__contains="Superbe UV").exists()
+        )
+        self.assertFalse(UVComment.objects.filter(comment__contains="Twice").exists())
+        self.assertContains(
+            response,
+            _(
+                "You already posted a comment on this UV. If you want to comment again, please modify or delete your previous comment."
+            ),
+        )
+
+        # Ensure that there is no crash when no uv or no author is given
+        self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
+            create_uv_comment_template(self.bibou.id, exclude_list=["uv"]),
+        )
+        self.assertEquals(response.status_code, 200)
+        self.client.post(
+            reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
+            create_uv_comment_template(self.bibou.id, exclude_list=["author"]),
+        )
+        self.assertEquals(response.status_code, 200)
 
 
 class UVCommentDeleteTest(TestCase):

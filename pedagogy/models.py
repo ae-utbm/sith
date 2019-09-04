@@ -164,6 +164,17 @@ class UV(models.Model):
     def get_absolute_url(self):
         return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
 
+    def has_user_already_commented(self, user):
+        """
+        Help prevent multiples comments from the same user
+        This function checks that no other comment has been posted by a specified user
+
+        :param user: core.models.User
+        :return: if the user has already posted a comment on this UV
+        :rtype: bool
+        """
+        return self.comments.filter(author=user).exists()
+
     @cached_property
     def grade_global_average(self):
         return self.__grade_average_generic("grade_global")

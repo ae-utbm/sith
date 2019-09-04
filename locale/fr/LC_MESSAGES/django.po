@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-17 18:22+0200\n"
+"POT-Creation-Date: 2019-09-04 20:43+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: accounting/models.py:61 accounting/models.py:110 accounting/models.py:138
-#: accounting/models.py:203 club/models.py:48 com/models.py:231
-#: com/models.py:248 counter/models.py:121 counter/models.py:149
+#: accounting/models.py:203 club/models.py:48 com/models.py:230
+#: com/models.py:247 counter/models.py:121 counter/models.py:149
 #: counter/models.py:211 forum/models.py:58 launderette/models.py:38
 #: launderette/models.py:90 launderette/models.py:125 stock/models.py:40
 #: stock/models.py:60 stock/models.py:100 stock/models.py:127
@@ -66,7 +66,7 @@ msgid "account number"
 msgstr "numero de compte"
 
 #: accounting/models.py:113 accounting/models.py:139 club/models.py:266
-#: com/models.py:75 com/models.py:219 com/models.py:252 counter/models.py:166
+#: com/models.py:74 com/models.py:218 com/models.py:251 counter/models.py:166
 #: counter/models.py:212 trombi/models.py:205
 msgid "club"
 msgstr "club"
@@ -136,7 +136,7 @@ msgid "date"
 msgstr "date"
 
 #: accounting/models.py:270 counter/models.py:123 counter/models.py:616
-#: pedagogy/models.py:204 stock/models.py:102
+#: pedagogy/models.py:215 stock/models.py:102
 msgid "comment"
 msgstr "commentaire"
 
@@ -377,10 +377,10 @@ msgstr "Compte en banque : "
 #: election/templates/election/election_detail.jinja:401
 #: forum/templates/forum/macros.jinja:21 forum/templates/forum/macros.jinja:134
 #: launderette/templates/launderette/launderette_admin.jinja:16
-#: launderette/views.py:226 pedagogy/templates/pedagogy/guide.jinja:51
-#: pedagogy/templates/pedagogy/guide.jinja:74
-#: pedagogy/templates/pedagogy/guide.jinja:110
-#: pedagogy/templates/pedagogy/uv_detail.jinja:179
+#: launderette/views.py:226 pedagogy/templates/pedagogy/guide.jinja:67
+#: pedagogy/templates/pedagogy/guide.jinja:90
+#: pedagogy/templates/pedagogy/guide.jinja:126
+#: pedagogy/templates/pedagogy/uv_detail.jinja:185
 #: sas/templates/sas/album.jinja:26 sas/templates/sas/moderation.jinja:18
 #: sas/templates/sas/picture.jinja:74 sas/templates/sas/picture.jinja:124
 #: stock/templates/stock/stock_shopping_list.jinja:43
@@ -436,10 +436,10 @@ msgstr "Nouveau compte club"
 #: forum/templates/forum/macros.jinja:20 forum/templates/forum/macros.jinja:62
 #: forum/templates/forum/macros.jinja:128
 #: launderette/templates/launderette/launderette_list.jinja:16
-#: pedagogy/templates/pedagogy/guide.jinja:50
-#: pedagogy/templates/pedagogy/guide.jinja:73
-#: pedagogy/templates/pedagogy/guide.jinja:109
-#: pedagogy/templates/pedagogy/uv_detail.jinja:178
+#: pedagogy/templates/pedagogy/guide.jinja:66
+#: pedagogy/templates/pedagogy/guide.jinja:89
+#: pedagogy/templates/pedagogy/guide.jinja:125
+#: pedagogy/templates/pedagogy/uv_detail.jinja:184
 #: sas/templates/sas/album.jinja:18 sas/templates/sas/picture.jinja:100
 #: trombi/templates/trombi/detail.jinja:9
 #: trombi/templates/trombi/edit_profile.jinja:34
@@ -670,7 +670,7 @@ msgstr "Effectuées"
 #: accounting/templates/accounting/journal_details.jinja:41
 #: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:1162
 #: pedagogy/templates/pedagogy/moderation.jinja:13
-#: pedagogy/templates/pedagogy/uv_detail.jinja:133
+#: pedagogy/templates/pedagogy/uv_detail.jinja:138
 #: trombi/templates/trombi/comment.jinja:4
 #: trombi/templates/trombi/comment.jinja:8
 #: trombi/templates/trombi/user_tools.jinja:50
@@ -968,7 +968,7 @@ msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py:169 com/views.py:85 com/views.py:221 counter/views.py:1558
+#: club/forms.py:169 com/views.py:85 com/views.py:210 counter/views.py:1558
 #: election/views.py:190 subscription/views.py:52
 msgid "End date"
 msgstr "Date de fin"
@@ -1077,11 +1077,11 @@ msgid "Enter a valid address. Only the root of the address is needed."
 msgstr ""
 "Entrez une adresse valide. Seule la racine de l'adresse est nécessaire."
 
-#: club/models.py:335 com/models.py:79 com/models.py:260 core/models.py:814
+#: club/models.py:335 com/models.py:78 com/models.py:259 core/models.py:814
 msgid "is moderated"
 msgstr "est modéré"
 
-#: club/models.py:337 com/models.py:81 com/models.py:264
+#: club/models.py:337 com/models.py:80 com/models.py:263
 msgid "moderator"
 msgstr "modérateur"
 
@@ -1246,7 +1246,7 @@ msgid "Payment method"
 msgstr "Méthode de paiement"
 
 #: club/templates/club/club_tools.jinja:4
-#: core/templates/core/user_tools.jinja:101
+#: core/templates/core/user_tools.jinja:100
 msgid "Club tools"
 msgstr "Outils club"
 
@@ -1273,7 +1273,7 @@ msgstr "Nouveau Trombi"
 #: club/templates/club/club_tools.jinja:14
 #: com/templates/com/poster_list.jinja:17
 #: core/templates/core/poster_list.jinja:17
-#: core/templates/core/user_tools.jinja:91
+#: core/templates/core/user_tools.jinja:90
 msgid "Posters"
 msgstr "Affiches"
 
@@ -1376,7 +1376,7 @@ msgstr "Éditer la page de club"
 msgid "Mailing list"
 msgstr "Listes de diffusion"
 
-#: club/views.py:160 com/views.py:141
+#: club/views.py:160 com/views.py:138
 msgid "Posters list"
 msgstr "Liste d'affiches"
 
@@ -1400,108 +1400,104 @@ msgid "info message"
 msgstr "message d'info"
 
 #: com/models.py:48
-msgid "index page"
-msgstr "page d'accueil"
-
-#: com/models.py:49
 msgid "weekmail destinations"
 msgstr "destinataires du weekmail"
 
-#: com/models.py:59
+#: com/models.py:58
 msgid "Notice"
 msgstr "Information"
 
-#: com/models.py:60
+#: com/models.py:59
 msgid "Event"
 msgstr "Événement"
 
-#: com/models.py:61
+#: com/models.py:60
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: com/models.py:62
+#: com/models.py:61
 msgid "Call"
 msgstr "Appel"
 
-#: com/models.py:69 com/models.py:155 com/models.py:213 election/models.py:14
+#: com/models.py:68 com/models.py:154 com/models.py:212 election/models.py:14
 #: election/models.py:116 election/models.py:156 forum/models.py:242
 #: forum/models.py:296 pedagogy/models.py:100
 msgid "title"
 msgstr "titre"
 
-#: com/models.py:70
+#: com/models.py:69
 msgid "summary"
 msgstr "résumé"
 
-#: com/models.py:71 com/models.py:214 trombi/models.py:188
+#: com/models.py:70 com/models.py:213 trombi/models.py:188
 msgid "content"
 msgstr "contenu"
 
-#: com/models.py:73 core/models.py:1393 launderette/models.py:95
+#: com/models.py:72 core/models.py:1393 launderette/models.py:95
 #: launderette/models.py:130 launderette/models.py:182 stock/models.py:77
 #: stock/models.py:131
 msgid "type"
 msgstr "type"
 
-#: com/models.py:77 com/models.py:216 pedagogy/models.py:61
-#: pedagogy/models.py:199 trombi/models.py:183
+#: com/models.py:76 com/models.py:215 pedagogy/models.py:61
+#: pedagogy/models.py:210 trombi/models.py:183
 msgid "author"
 msgstr "auteur"
 
-#: com/models.py:142
+#: com/models.py:141
 msgid "news_date"
 msgstr "date de la nouvelle"
 
-#: com/models.py:143
+#: com/models.py:142
 msgid "start_date"
 msgstr "date de début"
 
-#: com/models.py:144
+#: com/models.py:143
 msgid "end_date"
 msgstr "date de fin"
 
-#: com/models.py:156
+#: com/models.py:155
 msgid "intro"
 msgstr "intro"
 
-#: com/models.py:157
+#: com/models.py:156
 msgid "joke"
 msgstr "blague"
 
-#: com/models.py:158
+#: com/models.py:157
 msgid "protip"
 msgstr "astuce"
 
-#: com/models.py:159
+#: com/models.py:158
 msgid "conclusion"
 msgstr "conclusion"
 
-#: com/models.py:160
+#: com/models.py:159
 msgid "sent"
 msgstr "envoyé"
 
-#: com/models.py:211
+#: com/models.py:210
 msgid "weekmail"
 msgstr "weekmail"
 
-#: com/models.py:221
+#: com/models.py:220
 msgid "rank"
 msgstr "rang"
 
-#: com/models.py:250 core/models.py:784 core/models.py:828
+#: com/models.py:249 core/models.py:784 core/models.py:828
 msgid "file"
 msgstr "fichier"
 
-#: com/models.py:258
+#: com/models.py:257
 msgid "display time"
 msgstr "temps d'affichage"
 
-#: com/models.py:285
+#: com/models.py:284
 msgid "Begin date should be before end date"
 msgstr "La date de début doit être avant celle de fin"
 
-#: com/templates/com/mailing_admin.jinja:4 com/views.py:134
-#: core/templates/core/user_tools.jinja:90
+#: com/templates/com/mailing_admin.jinja:4 com/views.py:131
+#: core/templates/core/user_tools.jinja:89
 msgid "Mailing lists administration"
 msgstr "Administration des mailing listes"
 
@@ -1585,7 +1581,7 @@ msgstr "Type"
 #: com/templates/com/weekmail.jinja:19 com/templates/com/weekmail.jinja:48
 #: forum/templates/forum/forum.jinja:24 forum/templates/forum/forum.jinja:43
 #: forum/templates/forum/main.jinja:27 forum/views.py:243
-#: pedagogy/templates/pedagogy/guide.jinja:44
+#: pedagogy/templates/pedagogy/guide.jinja:60
 msgid "Title"
 msgstr "Titre"
 
@@ -1726,24 +1722,24 @@ msgstr "Agenda"
 msgid "Birthdays"
 msgstr "Anniversaires"
 
-#: com/templates/com/news_list.jinja:49
+#: com/templates/com/news_list.jinja:48
 #, python-format
 msgid "%(age)s year old"
 msgstr "%(age)s ans"
 
-#: com/templates/com/news_list.jinja:59 com/tests.py:92 com/tests.py:102
+#: com/templates/com/news_list.jinja:58 com/tests.py:109 com/tests.py:119
 msgid "You need an up to date subscription to access this content"
 msgstr "Votre cotisation doit être à jour pour accéder à cette section"
 
-#: com/templates/com/news_list.jinja:92
+#: com/templates/com/news_list.jinja:90
 msgid "Events today and the next few days"
 msgstr "Événements aujourd'hui et dans les prochains jours"
 
-#: com/templates/com/news_list.jinja:135
+#: com/templates/com/news_list.jinja:133
 msgid "Nothing to come..."
 msgstr "Rien à venir..."
 
-#: com/templates/com/news_list.jinja:142
+#: com/templates/com/news_list.jinja:140
 msgid "Coming soon... don't miss!"
 msgstr "Prochainement... à ne pas rater!"
 
@@ -1797,7 +1793,7 @@ msgid "Screen - edit"
 msgstr "Écran - modifier"
 
 #: com/templates/com/screen_list.jinja:4 com/templates/com/screen_list.jinja:11
-#: core/templates/core/user_tools.jinja:92
+#: core/templates/core/user_tools.jinja:91
 msgid "Screens"
 msgstr "Écrans"
 
@@ -1901,7 +1897,7 @@ msgstr "Astuce"
 msgid "Final word"
 msgstr "Le mot de la fin"
 
-#: com/views.py:78 com/views.py:215 election/views.py:185
+#: com/views.py:78 com/views.py:204 election/views.py:185
 #: subscription/views.py:46
 msgid "Start date"
 msgstr "Date de début"
@@ -1915,46 +1911,42 @@ msgid "Weekmail destinations"
 msgstr "Destinataires du Weekmail"
 
 #: com/views.py:118
-msgid "Index page"
-msgstr "Page d'accueil"
-
-#: com/views.py:121
 msgid "Info message"
 msgstr "Message d'info"
 
-#: com/views.py:127
+#: com/views.py:124
 msgid "Alert message"
 msgstr "Message d'alerte"
 
-#: com/views.py:148
+#: com/views.py:145
 msgid "Screens list"
 msgstr "Liste d'écrans"
 
-#: com/views.py:226
+#: com/views.py:215
 msgid "Until"
 msgstr "Jusqu'à"
 
-#: com/views.py:228
+#: com/views.py:217
 msgid "Automoderation"
 msgstr "Automodération"
 
-#: com/views.py:235 com/views.py:239 com/views.py:249
+#: com/views.py:224 com/views.py:228 com/views.py:238
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-#: com/views.py:245
+#: com/views.py:234
 msgid "You crazy? You can not finish an event before starting it."
 msgstr "T'es fou? Un événement ne peut pas finir avant même de commencer."
 
-#: com/views.py:474
+#: com/views.py:463
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour regénérer"
 
-#: com/views.py:489
+#: com/views.py:478
 msgid "Weekmail of the "
 msgstr "Weekmail du "
 
-#: com/views.py:599
+#: com/views.py:588
 msgid ""
 "You must be a board member of the selected club to post in the Weekmail."
 msgstr ""
@@ -2148,7 +2140,7 @@ msgstr "département"
 msgid "dpt option"
 msgstr "Filière"
 
-#: core/models.py:248 pedagogy/models.py:73 pedagogy/models.py:284
+#: core/models.py:248 pedagogy/models.py:73 pedagogy/models.py:295
 msgid "semester"
 msgstr "semestre"
 
@@ -2376,6 +2368,10 @@ msgstr "404. Non trouvé"
 msgid "500, Server Error"
 msgstr "500, Erreur Serveur"
 
+#: core/templates/core/base.jinja:5
+msgid "Welcome!"
+msgstr "Bienvenue !"
+
 #: core/templates/core/base.jinja:49
 msgid "Username"
 msgstr "Nom d'utilisateur"
@@ -2399,7 +2395,7 @@ msgstr "S'enregister"
 #: matmat/templates/matmat/search_form.jinja:37
 #: matmat/templates/matmat/search_form.jinja:47
 #: matmat/templates/matmat/search_form.jinja:58
-#: pedagogy/templates/pedagogy/guide.jinja:21
+#: pedagogy/templates/pedagogy/guide.jinja:29
 msgid "Search"
 msgstr "Recherche"
 
@@ -2503,7 +2499,7 @@ msgstr "Laverie"
 msgid "Files"
 msgstr "Fichiers"
 
-#: core/templates/core/base.jinja:188 core/templates/core/user_tools.jinja:109
+#: core/templates/core/base.jinja:188 core/templates/core/user_tools.jinja:108
 msgid "Pedagogy"
 msgstr "Pédagogie"
 
@@ -3445,61 +3441,57 @@ msgid "Moderate news"
 msgstr "Modérer les nouvelles"
 
 #: core/templates/core/user_tools.jinja:86
-msgid "Edit index page"
-msgstr "Éditer la page d'accueil"
-
-#: core/templates/core/user_tools.jinja:87
 msgid "Edit alert message"
 msgstr "Éditer le message d'alerte"
 
-#: core/templates/core/user_tools.jinja:88
+#: core/templates/core/user_tools.jinja:87
 msgid "Edit information message"
 msgstr "Éditer le message d'informations"
 
-#: core/templates/core/user_tools.jinja:89
+#: core/templates/core/user_tools.jinja:88
 msgid "Moderate files"
 msgstr "Modérer les fichiers"
 
-#: core/templates/core/user_tools.jinja:95
+#: core/templates/core/user_tools.jinja:94
 msgid "Moderate pictures"
 msgstr "Modérer les photos"
 
-#: core/templates/core/user_tools.jinja:112
-#: pedagogy/templates/pedagogy/guide.jinja:13
+#: core/templates/core/user_tools.jinja:111
+#: pedagogy/templates/pedagogy/guide.jinja:20
 msgid "Create UV"
 msgstr "Créer UV"
 
-#: core/templates/core/user_tools.jinja:113
-#: pedagogy/templates/pedagogy/guide.jinja:16
+#: core/templates/core/user_tools.jinja:112
+#: pedagogy/templates/pedagogy/guide.jinja:23
 #: trombi/templates/trombi/detail.jinja:10
 msgid "Moderate comments"
 msgstr "Modérer les commentaires"
 
-#: core/templates/core/user_tools.jinja:118
+#: core/templates/core/user_tools.jinja:117
 msgid "Elections"
 msgstr "Élections"
 
-#: core/templates/core/user_tools.jinja:120
+#: core/templates/core/user_tools.jinja:119
 msgid "See available elections"
 msgstr "Voir les élections disponibles"
 
-#: core/templates/core/user_tools.jinja:121
+#: core/templates/core/user_tools.jinja:120
 msgid "See archived elections"
 msgstr "Voir les élections archivées"
 
-#: core/templates/core/user_tools.jinja:123
+#: core/templates/core/user_tools.jinja:122
 msgid "Create a new election"
 msgstr "Créer une nouvelle élection"
 
-#: core/templates/core/user_tools.jinja:128
+#: core/templates/core/user_tools.jinja:127
 msgid "Other tools"
 msgstr "Autres outils"
 
-#: core/templates/core/user_tools.jinja:130
+#: core/templates/core/user_tools.jinja:129
 msgid "Convert dokuwiki/BBcode syntax to Markdown"
 msgstr "Convertir de la syntaxe dokuwiki/BBcode vers Markdown"
 
-#: core/templates/core/user_tools.jinja:131
+#: core/templates/core/user_tools.jinja:130
 msgid "Trombi tools"
 msgstr "Outils Trombi"
 
@@ -4803,11 +4795,15 @@ msgstr "Nom de famille, prénom ou surnom"
 msgid "Do not vote"
 msgstr "Ne pas voter"
 
-#: pedagogy/forms.py:156
+#: pedagogy/forms.py:136
+msgid "This user has already commented on this UV"
+msgstr "Cet utilisateur a déjà commenté cette UV"
+
+#: pedagogy/forms.py:172
 msgid "Accepted reports"
 msgstr "Signalements acceptés"
 
-#: pedagogy/forms.py:163
+#: pedagogy/forms.py:179
 msgid "Denied reports"
 msgstr "Signalements refusés"
 
@@ -4875,47 +4871,47 @@ msgstr "heures THE"
 msgid "hours TE"
 msgstr "heures TE"
 
-#: pedagogy/models.py:203 pedagogy/models.py:275
+#: pedagogy/models.py:214 pedagogy/models.py:286
 msgid "uv"
 msgstr "uv"
 
-#: pedagogy/models.py:206
+#: pedagogy/models.py:217
 msgid "global grade"
 msgstr "note globale"
 
-#: pedagogy/models.py:213
+#: pedagogy/models.py:224
 msgid "utility grade"
 msgstr "note d'utilité"
 
-#: pedagogy/models.py:220
+#: pedagogy/models.py:231
 msgid "interest grade"
 msgstr "note d'intérêt"
 
-#: pedagogy/models.py:227
+#: pedagogy/models.py:238
 msgid "teaching grade"
 msgstr "note d'enseignement"
 
-#: pedagogy/models.py:234
+#: pedagogy/models.py:245
 msgid "work load grade"
 msgstr "note de charge de travail"
 
-#: pedagogy/models.py:240
+#: pedagogy/models.py:251
 msgid "publish date"
 msgstr "date de publication"
 
-#: pedagogy/models.py:278
+#: pedagogy/models.py:289
 msgid "grade"
 msgstr "note"
 
-#: pedagogy/models.py:298
+#: pedagogy/models.py:309
 msgid "report"
 msgstr "signaler"
 
-#: pedagogy/models.py:302
+#: pedagogy/models.py:313
 msgid "reporter"
 msgstr "signalant"
 
-#: pedagogy/models.py:304
+#: pedagogy/models.py:315
 msgid "reason"
 msgstr "raison"
 
@@ -4923,36 +4919,36 @@ msgstr "raison"
 msgid "UV Guide"
 msgstr "Guide des UVs"
 
-#: pedagogy/templates/pedagogy/guide.jinja:25
+#: pedagogy/templates/pedagogy/guide.jinja:34
 #, fuzzy, python-format
 #| msgid "display time"
 msgid "%(display_name)s"
 msgstr "temps d'affichage"
 
-#: pedagogy/templates/pedagogy/guide.jinja:30
+#: pedagogy/templates/pedagogy/guide.jinja:41
 #, fuzzy, python-format
 #| msgid "credit type"
 msgid "%(credit_type)s"
 msgstr "type de crédit"
 
-#: pedagogy/templates/pedagogy/guide.jinja:43
+#: pedagogy/templates/pedagogy/guide.jinja:59
 #: pedagogy/templates/pedagogy/moderation.jinja:12
 msgid "UV"
 msgstr "UV"
 
-#: pedagogy/templates/pedagogy/guide.jinja:45
+#: pedagogy/templates/pedagogy/guide.jinja:61
 msgid "Department"
 msgstr "Département"
 
-#: pedagogy/templates/pedagogy/guide.jinja:46
+#: pedagogy/templates/pedagogy/guide.jinja:62
 msgid "Credit type"
 msgstr "Type de crédit"
 
-#: pedagogy/templates/pedagogy/guide.jinja:213
+#: pedagogy/templates/pedagogy/guide.jinja:229
 msgid "Error connecting to the server"
 msgstr "Erreur lors de la connection au serveur"
 
-#: pedagogy/templates/pedagogy/macros.jinja:12
+#: pedagogy/templates/pedagogy/macros.jinja:13
 msgid " not rated "
 msgstr "non noté"
 
@@ -4997,27 +4993,27 @@ msgid "THE: "
 msgstr "THE : "
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:57
-#: pedagogy/templates/pedagogy/uv_detail.jinja:146
+#: pedagogy/templates/pedagogy/uv_detail.jinja:152
 msgid "Global grade"
 msgstr "Note globale"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:58
-#: pedagogy/templates/pedagogy/uv_detail.jinja:147
+#: pedagogy/templates/pedagogy/uv_detail.jinja:153
 msgid "Utility"
 msgstr "Utilité"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:59
-#: pedagogy/templates/pedagogy/uv_detail.jinja:148
+#: pedagogy/templates/pedagogy/uv_detail.jinja:154
 msgid "Interest"
 msgstr "Intérêt"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:60
-#: pedagogy/templates/pedagogy/uv_detail.jinja:149
+#: pedagogy/templates/pedagogy/uv_detail.jinja:155
 msgid "Teaching"
 msgstr "Enseignement"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:61
-#: pedagogy/templates/pedagogy/uv_detail.jinja:150
+#: pedagogy/templates/pedagogy/uv_detail.jinja:156
 msgid "Work load"
 msgstr "Charge de travail"
 
@@ -5041,21 +5037,29 @@ msgstr "Concepts clefs"
 msgid "UV manager: "
 msgstr "Gestionnaire d'UV : "
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:85
+#: pedagogy/templates/pedagogy/uv_detail.jinja:86 pedagogy/tests.py:453
+msgid ""
+"You already posted a comment on this UV. If you want to comment again, "
+"please modify or delete your previous comment."
+msgstr ""
+"Vous avez déjà commenté cette UV. Si vous voulez de nouveau commenter, "
+"veuillez modifier ou supprimer votre commentaire précédent."
+
+#: pedagogy/templates/pedagogy/uv_detail.jinja:90
 msgid "Leave comment"
 msgstr "Laisser un commentaire"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:140
+#: pedagogy/templates/pedagogy/uv_detail.jinja:146
 #: stock/templates/stock/shopping_list_items.jinja:42 stock/views.py:278
 #: trombi/templates/trombi/export.jinja:70
 msgid "Comments"
 msgstr "Commentaires"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:172
+#: pedagogy/templates/pedagogy/uv_detail.jinja:178
 msgid "This comment has been reported"
 msgstr "Ce commentaire a été signalé"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja:185
+#: pedagogy/templates/pedagogy/uv_detail.jinja:191
 msgid "Report this comment"
 msgstr "Signaler ce commentaire"
 
