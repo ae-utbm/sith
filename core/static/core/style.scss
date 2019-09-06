@@ -1867,6 +1867,13 @@ $pedagogy-white-text: #f0f0f0;
       grid-area: hours-the;
     }
 
+    #leave_comment_not_allowed {
+      p {
+        text-align: center;
+        color: red;
+      }
+    }
+
     #leave_comment {
       .leave-comment-grid-container {
         display: grid;

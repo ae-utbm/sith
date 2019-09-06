@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2017
+# Copyright 2019
 # - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
@@ -99,6 +99,7 @@ class UVDetailFormView(CanViewMixin, CanCreateUVFunctionMixin, DetailFormView):
         kwargs = super(UVDetailFormView, self).get_form_kwargs()
         kwargs["author_id"] = self.request.user.id
         kwargs["uv_id"] = self.get_object().id
+        kwargs["is_creation"] = True
         return kwargs
 
     def form_valid(self, form):
@@ -126,6 +127,7 @@ class UVCommentUpdateView(CanEditPropMixin, UpdateView):
         obj = self.get_object()
         kwargs["author_id"] = obj.author.id
         kwargs["uv_id"] = obj.uv.id
+        kwargs["is_creation"] = False
 
         return kwargs
 

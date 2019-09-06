@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
-# - Skia <skia@libskia.so>
+# Copyright 2019
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -116,12 +116,28 @@ class UVCommentForm(forms.ModelForm):
             "grade_work_load": StarList(5),
         }
 
-    def __init__(self, author_id, uv_id, *args, **kwargs):
+    def __init__(self, author_id, uv_id, is_creation, *args, **kwargs):
         super(UVCommentForm, self).__init__(*args, **kwargs)
         self.fields["author"].queryset = User.objects.filter(id=author_id).all()
         self.fields["author"].initial = author_id
         self.fields["uv"].queryset = UV.objects.filter(id=uv_id).all()
         self.fields["uv"].initial = uv_id
+        self.is_creation = is_creation
+
+    def clean(self):
+        self.cleaned_data = super(UVCommentForm, self).clean()
+        uv = self.cleaned_data.get("uv")
+        author = self.cleaned_data.get("author")
+
+        if self.is_creation and uv and author and uv.has_user_already_commented(author):
+            self.add_error(
+                None,
+                forms.ValidationError(
+                    _("This user has already commented on this UV"), code="invalid"
+                ),
+            )
+
+        return self.cleaned_data
 
 
 class UVCommentReportForm(forms.ModelForm):
