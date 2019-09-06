@@ -807,7 +807,7 @@ class SithFile(models.Model):
     view_groups = models.ManyToManyField(
         Group, related_name="viewable_files", verbose_name=_("view group"), blank=True
     )
-    is_folder = models.BooleanField(_("is folder"), default=True)
+    is_folder = models.BooleanField(_("is folder"), default=True, db_index=True)
     mime_type = models.CharField(_("mime type"), max_length=30)
     size = models.IntegerField(_("size"), default=0)
     date = models.DateTimeField(_("date"), default=timezone.now)
@@ -821,7 +821,7 @@ class SithFile(models.Model):
     )
     asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
     is_in_sas = models.BooleanField(
-        _("is in the SAS"), default=False
+        _("is in the SAS"), default=False, db_index=True
     )  # Allows to query this flag, updated at each call to save()
 
     class Meta:
