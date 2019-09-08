@@ -1393,7 +1393,7 @@ class Notification(models.Model):
         _("type"), max_length=32, choices=settings.SITH_NOTIFICATIONS, default="GENERIC"
     )
     date = models.DateTimeField(_("date"), default=timezone.now)
-    viewed = models.BooleanField(_("viewed"), default=False)
+    viewed = models.BooleanField(_("viewed"), default=False, db_index=True)
 
     def __str__(self):
         if self.param:
