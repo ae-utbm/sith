@@ -60,21 +60,23 @@
             </div>
             <div id="header_bar">
                 <ul id="header_bars_infos">
-                {% for bar in Counter.objects.filter(type="BAR").all() %}
-                    <li>
-                    <a href="{{ url('counter:activity', counter_id=bar.id) }}" style="padding: 0px">
-                    {% if bar.is_inactive(): %}
-                        <i class="fa fa-question" style="color: #f39c12"></i>
-                    {% elif bar.is_open(): %}
-                        <i class="fa fa-check" style="color: #2ecc71"></i>
-                    {% else %}
-                        <i class="fa fa-times" style="color: #eb2f06"></i>
-                    {% endif %}
-                        {{ bar }}
-                    </a>
-                    </li>
-                {% endfor %}
-                </ul>
+                {% cache 100 counters_activity %}
+                  {% for bar in Counter.objects.filter(type="BAR").all() %}
+                      <li>
+                      <a href="{{ url('counter:activity', counter_id=bar.id) }}" style="padding: 0px">
+                      {% if bar.is_inactive(): %}
+                          <i class="fa fa-question" style="color: #f39c12"></i>
+                      {% elif bar.is_open(): %}
+                          <i class="fa fa-check" style="color: #2ecc71"></i>
+                      {% else %}
+                          <i class="fa fa-times" style="color: #eb2f06"></i>
+                      {% endif %}
+                          {{ bar }}
+                      </a>
+                      </li>
+                  {% endfor %}
+                  </ul>
+                {% endcache %}
                 <form action="{{ url('core:search') }}" method="GET" id="header_search">
                     <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" id="search" />
                     <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />

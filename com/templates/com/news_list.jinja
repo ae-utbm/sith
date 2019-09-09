@@ -42,6 +42,8 @@
         <div id="birthdays_title">{% trans %}Birthdays{% endtrans %}</div>
           <div id="birthdays_content">
             {% if user.is_subscribed %}
+              {# Cache request for 1 hour #}
+              {% cache 3600 birthdays %}
               <ul class="birthdays_year">
                 {% for d in birthdays.dates('date_of_birth', 'year', 'DESC') %}
                   <li>
@@ -54,6 +56,7 @@
                   </li>
                 {% endfor %}
               </ul>
+              {% endcache %}
             {% else %}
               <p>{% trans %}You need an up to date subscription to access this content{% endtrans %}</p>
             {% endif %}
