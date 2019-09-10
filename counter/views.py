@@ -708,10 +708,16 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         """ Add customer to the context """
         kwargs = super(CounterClick, self).get_context_data(**kwargs)
+        kwargs["products"] = self.object.products.select_related("product_type")
+        kwargs["categories"] = {}
+        for product in kwargs["products"]:
+            if product.product_type:
+                kwargs["categories"].setdefault(product.product_type, []).append(
+                    product
+                )
         kwargs["customer"] = self.customer
         kwargs["basket_total"] = self.sum_basket(self.request)
         kwargs["refill_form"] = self.refill_form or RefillForm()
-        kwargs["categories"] = ProductType.objects.all()
         kwargs["student_card_max_uid_size"] = StudentCard.UID_SIZE
         return kwargs
 

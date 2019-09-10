@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block content %}
-<h4>{{ counter }}</h4>
+<h4 id="click_interface">{{ counter }}</h4>
 
 <div id="user_info">
     <h5>{% trans %}Customer{% endtrans %}</h5>
@@ -127,17 +127,14 @@
 </div>
 <div id="products">
     <ul>
-        {% for t in categories -%}
-        {%- if counter.products.filter(product_type=t).exists() -%}
-        <li><a href="#cat_{{ t|slugify }}">{{ t }}</a></li>
-        {%- endif -%}
+        {% for category in categories.keys() -%}
+        <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
         {%- endfor %}
     </ul>
-    {% for t in categories -%}
-    {%- if counter.products.filter(product_type=t).exists() -%}
-    <div id="cat_{{ t|slugify }}">
-        <h5>{{ t }}</h5>
-        {% for p in counter.products.filter(product_type=t).all() -%}
+    {% for category in categories.keys() -%}
+    <div id="cat_{{ category|slugify }}">
+        <h5>{{ category }}</h5>
+        {% for p in categories[category] -%}
             {% set file = None %}
             {% if p.icon %}
                 {% set file = p.icon.url %}
@@ -148,18 +145,20 @@
                 {{ add_product(p.id, prod, "form_button") }}
         {%- endfor %}
     </div>
-    {%- endif -%}
     {%- endfor %}
 </div>
 
 {% endblock %}
 
 {% block script %}
+<script>
+document.getElementById("click_interface").scrollIntoView();
+</script>
 {{ super() }}
 <script>
 $( function() {
     var products = [
-    {% for p in counter.products.all() -%}
+    {% for p in products -%}
         {
             value: "{{ p.code }}",
             label: "{{ p.name }}",
@@ -203,6 +202,3 @@ $( function() {
 });
 </script>
 {% endblock %}
-
-
-
