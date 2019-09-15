@@ -743,7 +743,7 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
         kwargs = super(UserPreferencesView, self).get_context_data(**kwargs)
         if not hasattr(self.object, "trombi_user"):
             kwargs["trombi_form"] = UserTrombiForm()
-        if self.object.customer:
+        if hasattr(self.object, "customer"):
             kwargs["student_card_form"] = StudentCardForm()
         return kwargs
 
