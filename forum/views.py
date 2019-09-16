@@ -280,7 +280,7 @@ class ForumTopicSubscribeView(CanViewMixin, SingleObjectMixin, RedirectView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if request.user in self.object.subscribed_users.all():
+        if self.object.subscribed_users.filter(id=request.user.id).exists():
             self.object.subscribed_users.remove(request.user)
         else:
             self.object.subscribed_users.add(request.user)

@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import paginate %}
 
 {% block title %}
 {% trans %}SAS{% endtrans %}
@@ -62,7 +63,7 @@
         {% endfor %}
     </div>
     <div>
-        {% for p in album.children_pictures.order_by('id') %}
+        {% for p in pictures %}
         <div style="display: inline-block;">
         {% if edit_mode %}
         <input type="checkbox" name="file_list" value="{{ p.id }}">
@@ -77,6 +78,8 @@
         </div>
         {% endfor %}
     </div>
+    <br>
+    {{ paginate(pictures, paginator) }}
 {% if edit_mode %}
 </form>
 {% endif %}

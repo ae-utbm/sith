@@ -23,7 +23,7 @@
 #
 
 # This file contains all the views that concern the page model
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import UpdateView, FormMixin, DeleteView
 from django.views.generic.detail import SingleObjectMixin
@@ -51,9 +51,7 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
     memory at once. The FileWrapper will turn the file object into an
     iterator for chunks of 8KB.
     """
-    f = file_class.objects.filter(id=file_id).first()
-    if f is None or not f.file:
-        return not_found(request)
+    f = get_object_or_404(file_class, id=file_id)
     if not (
         can_view(f, request.user)
         or (

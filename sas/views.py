@@ -23,7 +23,7 @@
 #
 
 from django.shortcuts import redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.core.urlresolvers import reverse_lazy, reverse
 from core.views.forms import SelectDate
 from django.views.generic import DetailView, TemplateView
@@ -32,6 +32,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django import forms
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator, InvalidPage
 
 from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectMultipleField
@@ -252,6 +253,14 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
     form_class = SASForm
     pk_url_kwarg = "album_id"
     template_name = "sas/album.jinja"
+    paginate_by = settings.SITH_SAS_IMAGES_PER_PAGE
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.asked_page = int(request.GET.get("page", 1))
+        except ValueError:
+            raise Http404
+        return super(AlbumView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
@@ -291,6 +300,13 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         kwargs = super(AlbumView, self).get_context_data(**kwargs)
+        kwargs["paginator"] = Paginator(
+            self.object.children_pictures.order_by("id"), self.paginate_by
+        )
+        try:
+            kwargs["pictures"] = kwargs["paginator"].page(self.asked_page)
+        except InvalidPage:
+            raise Http404
         kwargs["form"] = self.form
         kwargs["clipboard"] = SithFile.objects.filter(
             id__in=self.request.session["clipboard"]

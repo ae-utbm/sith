@@ -24,6 +24,7 @@
 
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -71,16 +72,19 @@ class Picture(SithFile):
         return False
 
     def can_be_edited_by(self, user):
-        # file = SithFile.objects.filter(id=self.id).first()
-        return user.is_in_group(
-            settings.SITH_GROUP_SAS_ADMIN_ID
-        )  # or user.can_edit(file)
+        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
-        # file = SithFile.objects.filter(id=self.id).first()
-        return self.can_be_edited_by(user) or (
-            self.is_in_sas and self.is_moderated and user.was_subscribed
-        )  # or user.can_view(file)
+        # SAS pictures are visible to old subscribers
+        # Result is cached 4s for this user
+        if user.is_anonymous:
+            return False
+        perm = cache.get("%d_can_view_pictures" % (user.id), False)
+        if perm:
+            return perm
+        perm = self.is_in_sas and self.is_moderated and user.was_subscribed
+        cache.set("%d_can_view_pictures" % (user.id), perm, timeout=4)
+        return perm
 
     def get_download_url(self):
         return reverse("sas:download", kwargs={"picture_id": self.id})
