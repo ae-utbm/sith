@@ -24,6 +24,7 @@
 
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -75,7 +76,15 @@ class Picture(SithFile):
 
     def can_be_viewed_by(self, user):
         # SAS pictures are visible to old subscribers
-        return self.is_in_sas and self.is_moderated and user.was_subscribed
+        # Result is cached 4s for this user
+        if user.is_anonymous:
+            return False
+        perm = cache.get("%d_can_view_pictures" % (user.id), False)
+        if perm:
+            return perm
+        perm = self.is_in_sas and self.is_moderated and user.was_subscribed
+        cache.set("%d_can_view_pictures" % (user.id), perm, timeout=4)
+        return perm
 
     def get_download_url(self):
         return reverse("sas:download", kwargs={"picture_id": self.id})
