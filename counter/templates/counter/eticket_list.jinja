@@ -10,7 +10,7 @@
 <h3>{% trans %}Eticket list{% endtrans %}</h3>
 <ul>
     {% for t in eticket_list  %}
-    <li><a href="{{ url('counter:edit_eticket', eticket_id=t.id) }}">{{ t }}</a> (Hash: <code>{{ t.secret }}</code>)</li>
+    <li><a href="{{ url('counter:edit_eticket', eticket_id=t.id) }}">{{ t }}</a> (ID: {{ t.id }} | Hash: <code>{{ t.secret }}</code>)</li>
     {% endfor %}
 </ul>
 {% else %}
