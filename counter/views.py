@@ -990,7 +990,7 @@ class ProductEditForm(forms.ModelForm):
         show_help_text=False,
         help_text="",
         label=_("Buying groups"),
-        required=False,
+        required=True,
     )
     club = AutoCompleteSelectField("clubs", show_help_text=False)
     counters = AutoCompleteSelectMultipleField(
