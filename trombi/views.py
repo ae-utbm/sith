@@ -313,9 +313,13 @@ class UserTrombiToolsView(QuickNotifMixin, TrombiTabsMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         self.form = UserTrombiForm(request.POST)
         if self.form.is_valid():
-            trombi_user = TrombiUser(
-                user=request.user, trombi=self.form.cleaned_data["trombi"]
-            )
+            if hasattr(request.user, "trombi_user"):
+                trombi_user = request.user.trombi_user
+                trombi_user.trombi = self.form.cleaned_data["trombi"]
+            else:
+                trombi_user = TrombiUser(
+                    user=request.user, trombi=self.form.cleaned_data["trombi"]
+                )
             trombi_user.save()
             self.quick_notif_list += ["qn_success"]
         return super(UserTrombiToolsView, self).get(request, *args, **kwargs)
@@ -323,7 +327,10 @@ class UserTrombiToolsView(QuickNotifMixin, TrombiTabsMixin, TemplateView):
     def get_context_data(self, **kwargs):
         kwargs = super(UserTrombiToolsView, self).get_context_data(**kwargs)
         kwargs["user"] = self.request.user
-        if not hasattr(self.request.user, "trombi_user"):
+        if not (
+            hasattr(self.request.user, "trombi_user")
+            and self.request.user.trombi_user.trombi
+        ):
             kwargs["subscribe_form"] = UserTrombiForm()
         else:
             kwargs["trombi"] = self.request.user.trombi_user.trombi
