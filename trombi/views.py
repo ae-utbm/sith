@@ -25,7 +25,7 @@
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.core.urlresolvers import reverse_lazy, reverse
-from django.views.generic import DetailView, RedirectView, TemplateView
+from django.views.generic import DetailView, RedirectView, TemplateView, View
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.utils.translation import ugettext_lazy as _
 from django import forms
@@ -59,20 +59,21 @@ class TrombiTabsMixin(TabedViewMixin):
         tab_list.append(
             {"url": reverse("trombi:user_tools"), "slug": "tools", "name": _("Tools")}
         )
-        tab_list.append(
-            {
-                "url": reverse("trombi:profile"),
-                "slug": "profile",
-                "name": _("My profile"),
-            }
-        )
-        tab_list.append(
-            {
-                "url": reverse("trombi:pictures"),
-                "slug": "pictures",
-                "name": _("My pictures"),
-            }
-        )
+        if hasattr(self.request.user, "trombi_user"):
+            tab_list.append(
+                {
+                    "url": reverse("trombi:profile"),
+                    "slug": "profile",
+                    "name": _("My profile"),
+                }
+            )
+            tab_list.append(
+                {
+                    "url": reverse("trombi:pictures"),
+                    "slug": "pictures",
+                    "name": _("My pictures"),
+                }
+            )
         try:
             trombi = self.request.user.trombi_user.trombi
             if self.request.user.is_owner(trombi):
@@ -88,6 +89,19 @@ class TrombiTabsMixin(TabedViewMixin):
         except:
             pass
         return tab_list
+
+
+class UserIsInATrombiMixin(View):
+    """
+    This view check if the requested user has a trombi_user attribute
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if not hasattr(self.request.user, "trombi_user"):
+            raise Http404()
+
+        return super(UserIsInATrombiMixin, self).dispatch(request, *args, **kwargs)
 
 
 class TrombiForm(forms.ModelForm):
@@ -317,7 +331,7 @@ class UserTrombiToolsView(QuickNotifMixin, TrombiTabsMixin, TemplateView):
         return kwargs
 
 
-class UserTrombiEditPicturesView(TrombiTabsMixin, UpdateView):
+class UserTrombiEditPicturesView(TrombiTabsMixin, UserIsInATrombiMixin, UpdateView):
     model = TrombiUser
     fields = ["profile_pict", "scrub_pict"]
     template_name = "core/edit.jinja"
@@ -330,7 +344,9 @@ class UserTrombiEditPicturesView(TrombiTabsMixin, UpdateView):
         return reverse("trombi:user_tools") + "?qn_success"
 
 
-class UserTrombiEditProfileView(QuickNotifMixin, TrombiTabsMixin, UpdateView):
+class UserTrombiEditProfileView(
+    QuickNotifMixin, TrombiTabsMixin, UserIsInATrombiMixin, UpdateView
+):
     model = User
     form_class = modelform_factory(
         User,
@@ -358,7 +374,7 @@ class UserTrombiEditProfileView(QuickNotifMixin, TrombiTabsMixin, UpdateView):
         return reverse("trombi:user_tools") + "?qn_success"
 
 
-class UserTrombiResetClubMembershipsView(RedirectView):
+class UserTrombiResetClubMembershipsView(UserIsInATrombiMixin, RedirectView):
     permanent = False
 
     def get(self, request, *args, **kwargs):
