@@ -45,6 +45,7 @@ from core.views import (
     TabedViewMixin,
     CanCreateMixin,
     QuickNotifMixin,
+    UserIsLoggedMixin,
 )
 from core.models import User
 from club.models import Club
@@ -302,7 +303,9 @@ class UserTrombiForm(forms.Form):
     )
 
 
-class UserTrombiToolsView(QuickNotifMixin, TrombiTabsMixin, TemplateView):
+class UserTrombiToolsView(
+    QuickNotifMixin, TrombiTabsMixin, UserIsLoggedMixin, TemplateView
+):
     """
     Display a user's trombi tools
     """
@@ -438,7 +441,7 @@ class UserTrombiProfileView(TrombiTabsMixin, DetailView):
         return super(UserTrombiProfileView, self).get(request, *args, **kwargs)
 
 
-class TrombiCommentFormView:
+class TrombiCommentFormView(UserIsLoggedMixin):
     """
     Create/edit a trombi comment
     """
