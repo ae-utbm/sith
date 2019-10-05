@@ -37,7 +37,10 @@ from club.models import Club
 class Launderette(models.Model):
     name = models.CharField(_("name"), max_length=30)
     counter = models.OneToOneField(
-        Counter, verbose_name=_("counter"), related_name="launderette"
+        Counter,
+        verbose_name=_("counter"),
+        related_name="launderette",
+        on_delete=models.CASCADE,
     )
 
     class Meta:

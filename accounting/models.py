@@ -352,6 +352,7 @@ class Operation(models.Model):
         null=True,
         blank=True,
         default=None,
+        on_delete=models.CASCADE,
     )
 
     class Meta:

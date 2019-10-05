@@ -80,7 +80,7 @@ class Trombi(models.Model):
     show_profiles = models.BooleanField(
         _("show users profiles to each other"), default=True
     )
-    club = models.OneToOneField(Club, related_name="trombi")
+    club = models.OneToOneField(Club, related_name="trombi", on_delete=models.CASCADE)
 
     objects = TrombiManager()
     availables = AvailableTrombiManager()
@@ -117,7 +117,10 @@ class TrombiUser(models.Model):
     """
 
     user = models.OneToOneField(
-        User, verbose_name=_("trombi user"), related_name="trombi_user"
+        User,
+        verbose_name=_("trombi user"),
+        related_name="trombi_user",
+        on_delete=models.CASCADE,
     )
     trombi = models.ForeignKey(
         Trombi,

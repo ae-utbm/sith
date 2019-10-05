@@ -96,7 +96,9 @@ class Club(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    page = models.OneToOneField(Page, related_name="club", blank=True, null=True)
+    page = models.OneToOneField(
+        Page, related_name="club", blank=True, null=True, on_delete=models.CASCADE
+    )
 
     class Meta:
         ordering = ["name", "unix_name"]

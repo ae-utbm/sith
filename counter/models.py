@@ -51,7 +51,7 @@ class Customer(models.Model):
     is used by other accounting classes as reference to the customer, rather than using User
     """
 
-    user = models.OneToOneField(User, primary_key=True)
+    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     account_id = models.CharField(_("account id"), max_length=10, unique=True)
     amount = CurrencyField(_("amount"))
     recorded_products = models.IntegerField(_("recorded product"), default=0)
@@ -727,7 +727,10 @@ class Eticket(models.Model):
     """
 
     product = models.OneToOneField(
-        Product, related_name="eticket", verbose_name=_("product")
+        Product,
+        related_name="eticket",
+        verbose_name=_("product"),
+        on_delete=models.CASCADE,
     )
     banner = models.ImageField(
         upload_to="etickets", null=True, blank=True, verbose_name=_("banner")

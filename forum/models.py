@@ -421,7 +421,9 @@ class ForumUserInfo(models.Model):
     user, such as the favourite topics, the signature, and so on...
     """
 
-    user = models.OneToOneField(User, related_name="_forum_infos")
+    user = models.OneToOneField(
+        User, related_name="_forum_infos", on_delete=models.CASCADE
+    )
     last_read_date = models.DateTimeField(
         _("last read date"),
         default=datetime(

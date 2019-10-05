@@ -39,7 +39,10 @@ class Stock(models.Model):
 
     name = models.CharField(_("name"), max_length=64)
     counter = models.OneToOneField(
-        Counter, verbose_name=_("counter"), related_name="stock"
+        Counter,
+        verbose_name=_("counter"),
+        related_name="stock",
+        on_delete=models.CASCADE,
     )
 
     def __str__(self):
