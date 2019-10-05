@@ -48,7 +48,7 @@ from core.models import Group
 from core.views.forms import LoginForm
 
 
-def forbidden(request):
+def forbidden(request, exception):
     try:
         return HttpResponseForbidden(
             render(
@@ -71,7 +71,7 @@ def forbidden(request):
         )
 
 
-def not_found(request):
+def not_found(request, exception):
     return HttpResponseNotFound(render(request, "core/404.jinja"))
 
 
