@@ -70,7 +70,11 @@ class SearchForm(forms.ModelForm):
         }
 
     sex = forms.ChoiceField(
-        [("MAN", _("Man")), ("WOMAN", _("Woman")), ("INDIFFERENT", _("Indifferent"))],
+        choices=[
+            ("MAN", _("Man")),
+            ("WOMAN", _("Woman")),
+            ("INDIFFERENT", _("Indifferent")),
+        ],
         widget=forms.RadioSelect,
         initial="INDIFFERENT",
         label=_("Sex"),
