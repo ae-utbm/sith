@@ -1554,13 +1554,13 @@ class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 class CashSummaryFormBase(forms.Form):
     begin_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Begin date"),
         required=False,
         widget=SelectDateTime,
     )
     end_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("End date"),
         required=False,
         widget=SelectDateTime,

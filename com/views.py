@@ -74,14 +74,14 @@ class PosterForm(forms.ModelForm):
         widgets = {"screens": forms.CheckboxSelectMultiple}
 
     date_begin = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Start date"),
         widget=SelectDateTime,
         required=True,
         initial=timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
     date_end = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("End date"),
         widget=SelectDateTime,
         required=False,
@@ -200,19 +200,22 @@ class NewsForm(forms.ModelForm):
         }
 
     start_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Start date"),
         widget=SelectDateTime,
         required=False,
     )
     end_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("End date"),
         widget=SelectDateTime,
         required=False,
     )
     until = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"], label=_("Until"), widget=SelectDateTime, required=False
+        input_formats=["%Y-%m-%d %H:%M:%S"],
+        label=_("Until"),
+        widget=SelectDateTime,
+        required=False,
     )
     automoderation = forms.BooleanField(label=_("Automoderation"), required=False)
 

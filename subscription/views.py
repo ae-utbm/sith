@@ -42,13 +42,13 @@ class SelectionDateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(SelectionDateForm, self).__init__(*args, **kwargs)
         self.fields["start_date"] = forms.DateTimeField(
-            ["%Y-%m-%d %H:%M:%S"],
+            input_formats=["%Y-%m-%d %H:%M:%S"],
             label=_("Start date"),
             widget=SelectDateTime,
             required=True,
         )
         self.fields["end_date"] = forms.DateTimeField(
-            ["%Y-%m-%d %H:%M:%S"],
+            input_formats=["%Y-%m-%d %H:%M:%S"],
             label=_("End date"),
             widget=SelectDateTime,
             required=True,

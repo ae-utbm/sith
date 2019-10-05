@@ -181,22 +181,25 @@ class ElectionForm(forms.ModelForm):
     )
 
     start_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Start date"),
         widget=SelectDateTime,
         required=True,
     )
     end_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"], label=_("End date"), widget=SelectDateTime, required=True
+        input_formats=["%Y-%m-%d %H:%M:%S"],
+        label=_("End date"),
+        widget=SelectDateTime,
+        required=True,
     )
     start_candidature = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Start candidature"),
         widget=SelectDateTime,
         required=True,
     )
     end_candidature = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("End candidature"),
         widget=SelectDateTime,
         required=True,
