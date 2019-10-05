@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import django.contrib.auth.models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -79,6 +80,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="subscription",
             name="member",
-            field=models.ForeignKey(to="core.User", related_name="subscriptions"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="core.User",
+                related_name="subscriptions",
+            ),
         ),
     ]

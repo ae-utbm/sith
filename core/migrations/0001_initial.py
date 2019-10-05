@@ -8,6 +8,7 @@ import django.core.validators
 import core.models
 import phonenumber_field.modelfields
 from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -329,6 +330,7 @@ class Migration(migrations.Migration):
                 (
                     "owner_group",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         default=1,
                         related_name="owned_page",
                         verbose_name="owner group",
@@ -390,10 +392,19 @@ class Migration(migrations.Migration):
                 (
                     "author",
                     models.ForeignKey(
-                        to=settings.AUTH_USER_MODEL, related_name="page_rev"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        related_name="page_rev",
                     ),
                 ),
-                ("page", models.ForeignKey(to="core.Page", related_name="revisions")),
+                (
+                    "page",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="core.Page",
+                        related_name="revisions",
+                    ),
+                ),
             ],
             options={"ordering": ["date"]},
         ),
@@ -469,6 +480,7 @@ class Migration(migrations.Migration):
                 (
                     "owner",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="owner",
                         to=settings.AUTH_USER_MODEL,
                         related_name="owned_files",
@@ -477,6 +489,7 @@ class Migration(migrations.Migration):
                 (
                     "parent",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         null=True,
                         related_name="children",
                         verbose_name="parent",

@@ -126,6 +126,7 @@ class Migration(migrations.Migration):
             model_name="trombicomment",
             name="author",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 to="trombi.TrombiUser",
                 verbose_name="author",
                 related_name="given_comments",
@@ -135,6 +136,7 @@ class Migration(migrations.Migration):
             model_name="trombicomment",
             name="target",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 to="trombi.TrombiUser",
                 verbose_name="target",
                 related_name="received_comments",

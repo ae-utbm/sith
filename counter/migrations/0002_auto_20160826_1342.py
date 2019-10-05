@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 from django.conf import settings
 import accounting.models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -35,6 +36,7 @@ class Migration(migrations.Migration):
                 (
                     "counter",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         to="counter.Counter",
                         related_name="cash_summaries",
                         verbose_name="counter",
@@ -43,6 +45,7 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         to=settings.AUTH_USER_MODEL,
                         related_name="cash_summaries",
                         verbose_name="user",
@@ -74,6 +77,7 @@ class Migration(migrations.Migration):
                 (
                     "cash_summary",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         to="counter.CashRegisterSummary",
                         related_name="items",
                         verbose_name="cash summary",
@@ -86,6 +90,7 @@ class Migration(migrations.Migration):
             model_name="permanency",
             name="counter",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 to="counter.Counter",
                 related_name="permanencies",
                 verbose_name="counter",
@@ -95,6 +100,7 @@ class Migration(migrations.Migration):
             model_name="permanency",
             name="user",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 to=settings.AUTH_USER_MODEL,
                 related_name="permanencies",
                 verbose_name="user",

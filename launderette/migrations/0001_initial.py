@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -61,6 +62,7 @@ class Migration(migrations.Migration):
                 (
                     "launderette",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="launderette",
                         to="launderette.Launderette",
                         related_name="machines",
@@ -93,6 +95,7 @@ class Migration(migrations.Migration):
                 (
                     "machine",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="machine",
                         to="launderette.Machine",
                         related_name="slots",
@@ -131,6 +134,7 @@ class Migration(migrations.Migration):
                 (
                     "launderette",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="launderette",
                         to="launderette.Launderette",
                         related_name="tokens",
@@ -139,6 +143,7 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         null=True,
                         related_name="tokens",
                         verbose_name="user",
@@ -153,6 +158,7 @@ class Migration(migrations.Migration):
             model_name="slot",
             name="token",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 null=True,
                 related_name="slots",
                 verbose_name="token",
@@ -164,7 +170,10 @@ class Migration(migrations.Migration):
             model_name="slot",
             name="user",
             field=models.ForeignKey(
-                verbose_name="user", to="core.User", related_name="slots"
+                on_delete=django.db.models.deletion.CASCADE,
+                verbose_name="user",
+                to="core.User",
+                related_name="slots",
             ),
         ),
         migrations.AlterUniqueTogether(

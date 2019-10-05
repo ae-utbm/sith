@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -120,6 +121,7 @@ class Migration(migrations.Migration):
                 (
                     "election",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="election",
                         to="election.Election",
                         related_name="election_lists",
@@ -151,6 +153,7 @@ class Migration(migrations.Migration):
                 (
                     "election",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="election",
                         to="election.Election",
                         related_name="roles",
@@ -181,7 +184,10 @@ class Migration(migrations.Migration):
                 (
                     "role",
                     models.ForeignKey(
-                        verbose_name="role", to="election.Role", related_name="votes"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        verbose_name="role",
+                        to="election.Role",
+                        related_name="votes",
                     ),
                 ),
             ],
@@ -190,6 +196,7 @@ class Migration(migrations.Migration):
             model_name="candidature",
             name="election_list",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 verbose_name="election list",
                 to="election.ElectionList",
                 related_name="candidatures",
@@ -199,13 +206,17 @@ class Migration(migrations.Migration):
             model_name="candidature",
             name="role",
             field=models.ForeignKey(
-                verbose_name="role", to="election.Role", related_name="candidatures"
+                on_delete=django.db.models.deletion.CASCADE,
+                verbose_name="role",
+                to="election.Role",
+                related_name="candidatures",
             ),
         ),
         migrations.AddField(
             model_name="candidature",
             name="user",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 verbose_name="user",
                 to=settings.AUTH_USER_MODEL,
                 related_name="candidates",

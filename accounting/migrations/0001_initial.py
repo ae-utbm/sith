@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.core.validators
 import accounting.models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -243,6 +244,7 @@ class Migration(migrations.Migration):
                         verbose_name="accounting type",
                         to="accounting.AccountingType",
                         blank=True,
+                        on_delete=django.db.models.deletion.CASCADE,
                     ),
                 ),
             ],
@@ -267,6 +269,7 @@ class Migration(migrations.Migration):
                         verbose_name="simplified accounting types",
                         to="accounting.AccountingType",
                         related_name="simplified_types",
+                        on_delete=django.db.models.deletion.CASCADE,
                     ),
                 ),
             ],

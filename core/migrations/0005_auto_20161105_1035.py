@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -21,6 +22,7 @@ class Migration(migrations.Migration):
             model_name="page",
             name="lock_user",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 verbose_name="lock user",
                 default=None,
                 blank=True,

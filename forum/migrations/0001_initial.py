@@ -6,6 +6,7 @@ from django.utils.timezone import utc
 from django.conf import settings
 import django.utils.timezone
 import datetime
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -52,6 +53,7 @@ class Migration(migrations.Migration):
                 (
                     "owner_club",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         to="club.Club",
                         verbose_name="owner club",
                         related_name="owned_forums",
@@ -61,7 +63,11 @@ class Migration(migrations.Migration):
                 (
                     "parent",
                     models.ForeignKey(
-                        to="forum.Forum", null=True, related_name="children", blank=True
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="forum.Forum",
+                        null=True,
+                        related_name="children",
+                        blank=True,
                     ),
                 ),
                 (
@@ -103,7 +109,9 @@ class Migration(migrations.Migration):
                 (
                     "author",
                     models.ForeignKey(
-                        related_name="forum_messages", to=settings.AUTH_USER_MODEL
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="forum_messages",
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
                 (
@@ -149,12 +157,18 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "message",
-                    models.ForeignKey(related_name="metas", to="forum.ForumMessage"),
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="metas",
+                        to="forum.ForumMessage",
+                    ),
                 ),
                 (
                     "user",
                     models.ForeignKey(
-                        related_name="forum_message_metas", to=settings.AUTH_USER_MODEL
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="forum_message_metas",
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
             ],
@@ -180,10 +194,19 @@ class Migration(migrations.Migration):
                 (
                     "author",
                     models.ForeignKey(
-                        related_name="forum_topics", to=settings.AUTH_USER_MODEL
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="forum_topics",
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
-                ("forum", models.ForeignKey(related_name="topics", to="forum.Forum")),
+                (
+                    "forum",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="topics",
+                        to="forum.Forum",
+                    ),
+                ),
             ],
             options={"ordering": ["-id"]},
         ),
@@ -217,6 +240,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="forummessage",
             name="topic",
-            field=models.ForeignKey(related_name="messages", to="forum.ForumTopic"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="messages",
+                to="forum.ForumTopic",
+            ),
         ),
     ]
