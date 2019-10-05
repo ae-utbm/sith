@@ -323,7 +323,7 @@ class CounterMain(
             )
         if self.object.type == "BAR":
             kwargs["barmen"] = self.object.get_barmen_list()
-        elif self.request.user.is_authenticated():
+        elif self.request.user.is_authenticated:
             kwargs["barmen"] = [self.request.user]
         if "last_basket" in self.request.session.keys():
             kwargs["last_basket"] = self.request.session.pop("last_basket")
@@ -372,7 +372,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             ):
                 raise PermissionDenied
         else:
-            if not request.user.is_authenticated():
+            if not request.user.is_authenticated:
                 raise PermissionDenied
         return super(CounterClick, self).dispatch(request, *args, **kwargs)
 
@@ -387,7 +387,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session["no_age"] = False
         self.refill_form = None
         ret = super(CounterClick, self).get(request, *args, **kwargs)
-        if (self.object.type != "BAR" and not request.user.is_authenticated()) or (
+        if (self.object.type != "BAR" and not request.user.is_authenticated) or (
             self.object.type == "BAR" and len(self.object.get_barmen_list()) < 1
         ):  # Check that at least one barman is logged in
             ret = self.cancel(request)  # Otherwise, go to main view
@@ -397,7 +397,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         """ Handle the many possibilities of the post request """
         self.object = self.get_object()
         self.refill_form = None
-        if (self.object.type != "BAR" and not request.user.is_authenticated()) or (
+        if (self.object.type != "BAR" and not request.user.is_authenticated) or (
             self.object.type == "BAR" and len(self.object.get_barmen_list()) < 1
         ):  # Check that at least one barman is logged in
             return self.cancel(request)

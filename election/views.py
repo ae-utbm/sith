@@ -553,7 +553,7 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
         self.form = self.get_form()
         self.remove_fields()
         if (
-            request.user.is_authenticated()
+            request.user.is_authenticated
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):
@@ -597,7 +597,7 @@ class RoleUpdateView(CanEditMixin, UpdateView):
         self.form = self.get_form()
         self.remove_fields()
         if (
-            request.user.is_authenticated()
+            request.user.is_authenticated
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):

@@ -289,7 +289,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         self.form = self.get_form()  # The form handle only the file upload
         files = request.FILES.getlist("file_field")
         if (
-            request.user.is_authenticated()
+            request.user.is_authenticated
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):

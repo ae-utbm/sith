@@ -56,7 +56,7 @@ class EbouticMain(TemplateView):
         request.session.modified = True
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect(
                 reverse_lazy("core:login", args=self.args, kwargs=kwargs)
                 + "?next="
@@ -67,7 +67,7 @@ class EbouticMain(TemplateView):
         return super(EbouticMain, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect(
                 reverse_lazy("core:login", args=self.args, kwargs=kwargs)
                 + "?next="
@@ -118,7 +118,7 @@ class EbouticCommand(TemplateView):
     template_name = "eboutic/eboutic_makecommand.jinja"
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect(
                 reverse_lazy("core:login", args=self.args, kwargs=kwargs)
                 + "?next="
@@ -129,7 +129,7 @@ class EbouticCommand(TemplateView):
         )
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponseRedirect(
                 reverse_lazy("core:login", args=self.args, kwargs=kwargs)
                 + "?next="
@@ -192,7 +192,7 @@ class EbouticPayWithSith(TemplateView):
             with transaction.atomic():
                 if (
                     "basket_id" not in request.session.keys()
-                    or not request.user.is_authenticated()
+                    or not request.user.is_authenticated
                 ):
                     return HttpResponseRedirect(
                         reverse_lazy("eboutic:main", args=self.args, kwargs=kwargs)

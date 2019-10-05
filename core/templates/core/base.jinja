@@ -39,7 +39,7 @@
         </div>
 
         <header>
-            {% if not user.is_authenticated() %}
+            {% if not user.is_authenticated %}
             <div id="header_logo" style="background-image: url('{{ static('core/img/logo.png') }}'); width: 185px; height: 100px;">
                 <a href="{{ url('core:index') }}"></a>
             </div>

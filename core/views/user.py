@@ -689,7 +689,7 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
         files = request.FILES.items()
         self.form.process(files)
         if (
-            request.user.is_authenticated()
+            request.user.is_authenticated
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):

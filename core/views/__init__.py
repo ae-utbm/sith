@@ -150,7 +150,7 @@ class CanCreateMixin(View):
 
     def dispatch(self, request, *arg, **kwargs):
         res = super(CanCreateMixin, self).dispatch(request, *arg, **kwargs)
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             raise PermissionDenied
         return res
 
