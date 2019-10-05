@@ -46,7 +46,9 @@ class Club(models.Model):
 
     id = models.AutoField(primary_key=True, db_index=True)
     name = models.CharField(_("name"), max_length=64)
-    parent = models.ForeignKey("Club", related_name="children", null=True, blank=True)
+    parent = models.ForeignKey(
+        "Club", related_name="children", null=True, blank=True, on_delete=models.CASCADE
+    )
     unix_name = models.CharField(
         _("unix name"),
         max_length=30,
@@ -75,7 +77,10 @@ class Club(models.Model):
         return settings.SITH_GROUP_ROOT_ID
 
     owner_group = models.ForeignKey(
-        Group, related_name="owned_club", default=get_default_owner_group
+        Group,
+        related_name="owned_club",
+        default=get_default_owner_group,
+        on_delete=models.CASCADE,
     )
     edit_groups = models.ManyToManyField(
         Group, related_name="editable_club", blank=True
@@ -261,9 +266,15 @@ class Membership(models.Model):
         related_name="memberships",
         null=False,
         blank=False,
+        on_delete=models.CASCADE,
     )
     club = models.ForeignKey(
-        Club, verbose_name=_("club"), related_name="members", null=False, blank=False
+        Club,
+        verbose_name=_("club"),
+        related_name="members",
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
     )
     start_date = models.DateField(_("start date"), default=timezone.now)
     end_date = models.DateField(_("end date"), null=True, blank=True)
@@ -317,7 +328,12 @@ class Mailing(models.Model):
     """
 
     club = models.ForeignKey(
-        Club, verbose_name=_("Club"), related_name="mailings", null=False, blank=False
+        Club,
+        verbose_name=_("Club"),
+        related_name="mailings",
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
     )
     email = models.CharField(
         _("Email address"),
@@ -334,7 +350,11 @@ class Mailing(models.Model):
     )
     is_moderated = models.BooleanField(_("is moderated"), default=False)
     moderator = models.ForeignKey(
-        User, related_name="moderated_mailings", verbose_name=_("moderator"), null=True
+        User,
+        related_name="moderated_mailings",
+        verbose_name=_("moderator"),
+        null=True,
+        on_delete=models.CASCADE,
     )
 
     def clean(self):
@@ -409,6 +429,7 @@ class MailingSubscription(models.Model):
         related_name="subscriptions",
         null=False,
         blank=False,
+        on_delete=models.CASCADE,
     )
     user = models.ForeignKey(
         User,
@@ -416,6 +437,7 @@ class MailingSubscription(models.Model):
         related_name="mailing_subscriptions",
         null=True,
         blank=True,
+        on_delete=models.CASCADE,
     )
     email = models.EmailField(_("Email address"), blank=False, null=False)
 

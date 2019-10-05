@@ -50,7 +50,9 @@ def validate_payment(value):
 
 
 class Subscription(models.Model):
-    member = models.ForeignKey(User, related_name="subscriptions")
+    member = models.ForeignKey(
+        User, related_name="subscriptions", on_delete=models.CASCADE
+    )
     subscription_type = models.CharField(
         _("subscription type"),
         max_length=255,

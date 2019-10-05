@@ -79,7 +79,9 @@ class StockItem(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    stock_owner = models.ForeignKey(Stock, related_name="items")
+    stock_owner = models.ForeignKey(
+        Stock, related_name="items", on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return "%s" % (self.name)
@@ -100,7 +102,9 @@ class ShoppingList(models.Model):
     name = models.CharField(_("name"), max_length=64)
     todo = models.BooleanField(_("todo"))
     comment = models.TextField(_("comment"), null=True, blank=True)
-    stock_owner = models.ForeignKey(Stock, null=True, related_name="shopping_lists")
+    stock_owner = models.ForeignKey(
+        Stock, null=True, related_name="shopping_lists", on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.date)
@@ -122,7 +126,7 @@ class ShoppingListItem(models.Model):
         related_name="shopping_items_to_buy",
     )
     stockitem_owner = models.ForeignKey(
-        StockItem, related_name="shopping_item", null=True
+        StockItem, related_name="shopping_item", null=True, on_delete=models.CASCADE
     )
     name = models.CharField(_("name"), max_length=64)
     type = models.ForeignKey(

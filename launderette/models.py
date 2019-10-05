@@ -89,7 +89,10 @@ class Launderette(models.Model):
 class Machine(models.Model):
     name = models.CharField(_("name"), max_length=30)
     launderette = models.ForeignKey(
-        Launderette, related_name="machines", verbose_name=_("launderette")
+        Launderette,
+        related_name="machines",
+        verbose_name=_("launderette"),
+        on_delete=models.CASCADE,
     )
     type = models.CharField(
         _("type"), max_length=10, choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES
@@ -124,14 +127,22 @@ class Machine(models.Model):
 class Token(models.Model):
     name = models.CharField(_("name"), max_length=5)
     launderette = models.ForeignKey(
-        Launderette, related_name="tokens", verbose_name=_("launderette")
+        Launderette,
+        related_name="tokens",
+        verbose_name=_("launderette"),
+        on_delete=models.CASCADE,
     )
     type = models.CharField(
         _("type"), max_length=10, choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES
     )
     borrow_date = models.DateTimeField(_("borrow date"), null=True, blank=True)
     user = models.ForeignKey(
-        User, related_name="tokens", verbose_name=_("user"), null=True, blank=True
+        User,
+        related_name="tokens",
+        verbose_name=_("user"),
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
 
     class Meta:
@@ -182,12 +193,22 @@ class Slot(models.Model):
         _("type"), max_length=10, choices=settings.SITH_LAUNDERETTE_MACHINE_TYPES
     )
     machine = models.ForeignKey(
-        Machine, related_name="slots", verbose_name=_("machine")
+        Machine,
+        related_name="slots",
+        verbose_name=_("machine"),
+        on_delete=models.CASCADE,
     )
     token = models.ForeignKey(
-        Token, related_name="slots", verbose_name=_("token"), blank=True, null=True
+        Token,
+        related_name="slots",
+        verbose_name=_("token"),
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
     )
-    user = models.ForeignKey(User, related_name="slots", verbose_name=_("user"))
+    user = models.ForeignKey(
+        User, related_name="slots", verbose_name=_("user"), on_delete=models.CASCADE
+    )
 
     class Meta:
         verbose_name = _("Slot")

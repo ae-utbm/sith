@@ -163,7 +163,9 @@ class Product(models.Model):
     icon = models.ImageField(
         upload_to="products", null=True, blank=True, verbose_name=_("icon")
     )
-    club = models.ForeignKey(Club, related_name="products", verbose_name=_("club"))
+    club = models.ForeignKey(
+        Club, related_name="products", verbose_name=_("club"), on_delete=models.CASCADE
+    )
     limit_age = models.IntegerField(_("limit age"), default=0)
     tray = models.BooleanField(_("tray price"), default=False)
     parent_product = models.ForeignKey(
@@ -209,7 +211,9 @@ class Product(models.Model):
 
 class Counter(models.Model):
     name = models.CharField(_("name"), max_length=30)
-    club = models.ForeignKey(Club, related_name="counters", verbose_name=_("club"))
+    club = models.ForeignKey(
+        Club, related_name="counters", verbose_name=_("club"), on_delete=models.CASCADE
+    )
     products = models.ManyToManyField(
         Product, related_name="counters", verbose_name=_("products"), blank=True
     )
@@ -344,12 +348,19 @@ class Refilling(models.Model):
     Handle the refilling
     """
 
-    counter = models.ForeignKey(Counter, related_name="refillings", blank=False)
+    counter = models.ForeignKey(
+        Counter, related_name="refillings", blank=False, on_delete=models.CASCADE
+    )
     amount = CurrencyField(_("amount"))
     operator = models.ForeignKey(
-        User, related_name="refillings_as_operator", blank=False
+        User,
+        related_name="refillings_as_operator",
+        blank=False,
+        on_delete=models.CASCADE,
     )
-    customer = models.ForeignKey(Customer, related_name="refillings", blank=False)
+    customer = models.ForeignKey(
+        Customer, related_name="refillings", blank=False, on_delete=models.CASCADE
+    )
     date = models.DateTimeField(_("date"))
     payment_method = models.CharField(
         _("payment method"),
@@ -584,9 +595,17 @@ class Permanency(models.Model):
     This class aims at storing a traceability of who was barman where and when
     """
 
-    user = models.ForeignKey(User, related_name="permanencies", verbose_name=_("user"))
+    user = models.ForeignKey(
+        User,
+        related_name="permanencies",
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
+    )
     counter = models.ForeignKey(
-        Counter, related_name="permanencies", verbose_name=_("counter")
+        Counter,
+        related_name="permanencies",
+        verbose_name=_("counter"),
+        on_delete=models.CASCADE,
     )
     start = models.DateTimeField(_("start date"))
     end = models.DateTimeField(_("end date"), null=True, db_index=True)
@@ -607,10 +626,16 @@ class Permanency(models.Model):
 
 class CashRegisterSummary(models.Model):
     user = models.ForeignKey(
-        User, related_name="cash_summaries", verbose_name=_("user")
+        User,
+        related_name="cash_summaries",
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
     )
     counter = models.ForeignKey(
-        Counter, related_name="cash_summaries", verbose_name=_("counter")
+        Counter,
+        related_name="cash_summaries",
+        verbose_name=_("counter"),
+        on_delete=models.CASCADE,
     )
     date = models.DateTimeField(_("date"))
     comment = models.TextField(_("comment"), null=True, blank=True)
@@ -683,7 +708,10 @@ class CashRegisterSummary(models.Model):
 
 class CashRegisterSummaryItem(models.Model):
     cash_summary = models.ForeignKey(
-        CashRegisterSummary, related_name="items", verbose_name=_("cash summary")
+        CashRegisterSummary,
+        related_name="items",
+        verbose_name=_("cash summary"),
+        on_delete=models.CASCADE,
     )
     value = CurrencyField(_("value"))
     quantity = models.IntegerField(_("quantity"), default=0)
@@ -772,4 +800,5 @@ class StudentCard(models.Model):
         verbose_name=_("student cards"),
         null=False,
         blank=False,
+        on_delete=models.CASCADE,
     )

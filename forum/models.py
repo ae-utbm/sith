@@ -58,12 +58,19 @@ class Forum(models.Model):
     name = models.CharField(_("name"), max_length=64)
     description = models.CharField(_("description"), max_length=512, default="")
     is_category = models.BooleanField(_("is a category"), default=False)
-    parent = models.ForeignKey("Forum", related_name="children", null=True, blank=True)
+    parent = models.ForeignKey(
+        "Forum",
+        related_name="children",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
     owner_club = models.ForeignKey(
         Club,
         related_name="owned_forums",
         verbose_name=_("owner club"),
         default=settings.SITH_MAIN_CLUB_ID,
+        on_delete=models.CASCADE,
     )
     edit_groups = models.ManyToManyField(
         Group,
@@ -226,8 +233,10 @@ class Forum(models.Model):
 
 
 class ForumTopic(models.Model):
-    forum = models.ForeignKey(Forum, related_name="topics")
-    author = models.ForeignKey(User, related_name="forum_topics")
+    forum = models.ForeignKey(Forum, related_name="topics", on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        User, related_name="forum_topics", on_delete=models.CASCADE
+    )
     description = models.CharField(_("description"), max_length=256, default="")
     subscribed_users = models.ManyToManyField(
         User, related_name="favorite_topics", verbose_name=_("subscribed users")
@@ -291,8 +300,12 @@ class ForumMessage(models.Model):
     "A ForumMessage object represents a message in the forum" -- Cpt. Obvious
     """
 
-    topic = models.ForeignKey(ForumTopic, related_name="messages")
-    author = models.ForeignKey(User, related_name="forum_messages")
+    topic = models.ForeignKey(
+        ForumTopic, related_name="messages", on_delete=models.CASCADE
+    )
+    author = models.ForeignKey(
+        User, related_name="forum_messages", on_delete=models.CASCADE
+    )
     title = models.CharField(_("title"), default="", max_length=64, blank=True)
     message = models.TextField(_("message"), default="")
     date = models.DateTimeField(_("date"), default=timezone.now)
@@ -386,8 +399,12 @@ MESSAGE_META_ACTIONS = [
 
 
 class ForumMessageMeta(models.Model):
-    user = models.ForeignKey(User, related_name="forum_message_metas")
-    message = models.ForeignKey(ForumMessage, related_name="metas")
+    user = models.ForeignKey(
+        User, related_name="forum_message_metas", on_delete=models.CASCADE
+    )
+    message = models.ForeignKey(
+        ForumMessage, related_name="metas", on_delete=models.CASCADE
+    )
     date = models.DateTimeField(_("date"), default=timezone.now)
     action = models.CharField(_("action"), choices=MESSAGE_META_ACTIONS, max_length=16)
 

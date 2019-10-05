@@ -110,7 +110,12 @@ class BankAccount(models.Model):
     name = models.CharField(_("name"), max_length=30)
     iban = models.CharField(_("iban"), max_length=255, blank=True)
     number = models.CharField(_("account number"), max_length=255, blank=True)
-    club = models.ForeignKey(Club, related_name="bank_accounts", verbose_name=_("club"))
+    club = models.ForeignKey(
+        Club,
+        related_name="bank_accounts",
+        verbose_name=_("club"),
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         verbose_name = _("Bank account")
@@ -136,9 +141,17 @@ class BankAccount(models.Model):
 
 class ClubAccount(models.Model):
     name = models.CharField(_("name"), max_length=30)
-    club = models.ForeignKey(Club, related_name="club_account", verbose_name=_("club"))
+    club = models.ForeignKey(
+        Club,
+        related_name="club_account",
+        verbose_name=_("club"),
+        on_delete=models.CASCADE,
+    )
     bank_account = models.ForeignKey(
-        BankAccount, related_name="club_accounts", verbose_name=_("bank account")
+        BankAccount,
+        related_name="club_accounts",
+        verbose_name=_("bank account"),
+        on_delete=models.CASCADE,
     )
 
     class Meta:
@@ -203,7 +216,11 @@ class GeneralJournal(models.Model):
     name = models.CharField(_("name"), max_length=40)
     closed = models.BooleanField(_("is closed"), default=False)
     club_account = models.ForeignKey(
-        ClubAccount, related_name="journals", null=False, verbose_name=_("club account")
+        ClubAccount,
+        related_name="journals",
+        null=False,
+        verbose_name=_("club account"),
+        on_delete=models.CASCADE,
     )
     amount = CurrencyField(_("amount"), default=0)
     effective_amount = CurrencyField(_("effective_amount"), default=0)
@@ -263,7 +280,11 @@ class Operation(models.Model):
 
     number = models.IntegerField(_("number"))
     journal = models.ForeignKey(
-        GeneralJournal, related_name="operations", null=False, verbose_name=_("journal")
+        GeneralJournal,
+        related_name="operations",
+        null=False,
+        verbose_name=_("journal"),
+        on_delete=models.CASCADE,
     )
     amount = CurrencyField(_("amount"))
     date = models.DateField(_("date"))
@@ -282,6 +303,7 @@ class Operation(models.Model):
         verbose_name=_("invoice"),
         null=True,
         blank=True,
+        on_delete=models.CASCADE,
     )
     done = models.BooleanField(_("is done"), default=False)
     simpleaccounting_type = models.ForeignKey(
@@ -290,6 +312,7 @@ class Operation(models.Model):
         verbose_name=_("simple type"),
         null=True,
         blank=True,
+        on_delete=models.CASCADE,
     )
     accounting_type = models.ForeignKey(
         "AccountingType",
@@ -297,6 +320,7 @@ class Operation(models.Model):
         verbose_name=_("accounting type"),
         null=True,
         blank=True,
+        on_delete=models.CASCADE,
     )
     label = models.ForeignKey(
         "Label",
@@ -487,6 +511,7 @@ class SimplifiedAccountingType(models.Model):
         AccountingType,
         related_name="simplified_types",
         verbose_name=_("simplified accounting types"),
+        on_delete=models.CASCADE,
     )
 
     class Meta:
@@ -518,7 +543,10 @@ class Label(models.Model):
 
     name = models.CharField(_("label"), max_length=64)
     club_account = models.ForeignKey(
-        ClubAccount, related_name="labels", verbose_name=_("club account")
+        ClubAccount,
+        related_name="labels",
+        verbose_name=_("club account"),
+        on_delete=models.CASCADE,
     )
 
     class Meta:

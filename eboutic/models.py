@@ -37,7 +37,11 @@ class Basket(models.Model):
     """
 
     user = models.ForeignKey(
-        User, related_name="baskets", verbose_name=_("user"), blank=False
+        User,
+        related_name="baskets",
+        verbose_name=_("user"),
+        blank=False,
+        on_delete=models.CASCADE,
     )
     date = models.DateTimeField(_("date"), auto_now=True)
 
@@ -80,7 +84,11 @@ class Invoice(models.Model):
     """
 
     user = models.ForeignKey(
-        User, related_name="invoices", verbose_name=_("user"), blank=False
+        User,
+        related_name="invoices",
+        verbose_name=_("user"),
+        blank=False,
+        on_delete=models.CASCADE,
     )
     date = models.DateTimeField(_("date"), auto_now=True)
     validated = models.BooleanField(_("validated"), default=False)
@@ -158,10 +166,15 @@ class AbstractBaseItem(models.Model):
 
 
 class BasketItem(AbstractBaseItem):
-    basket = models.ForeignKey(Basket, related_name="items", verbose_name=_("basket"))
+    basket = models.ForeignKey(
+        Basket, related_name="items", verbose_name=_("basket"), on_delete=models.CASCADE
+    )
 
 
 class InvoiceItem(AbstractBaseItem):
     invoice = models.ForeignKey(
-        Invoice, related_name="items", verbose_name=_("invoice")
+        Invoice,
+        related_name="items",
+        verbose_name=_("invoice"),
+        on_delete=models.CASCADE,
     )
