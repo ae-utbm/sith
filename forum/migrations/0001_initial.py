@@ -232,7 +232,9 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.OneToOneField(
-                        to=settings.AUTH_USER_MODEL, related_name="_forum_infos"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        related_name="_forum_infos",
                     ),
                 ),
             ],

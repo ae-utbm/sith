@@ -86,6 +86,7 @@ class Migration(migrations.Migration):
                 (
                     "counter",
                     models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="counter",
                         related_name="stock",
                         to="counter.Counter",

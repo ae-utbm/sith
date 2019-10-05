@@ -66,7 +66,10 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.OneToOneField(
-                        primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        serialize=False,
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
                 (

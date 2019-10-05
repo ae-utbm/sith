@@ -40,6 +40,7 @@ class Migration(migrations.Migration):
             model_name="operation",
             name="linked_operation",
             field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
                 blank=True,
                 to="accounting.Operation",
                 null=True,

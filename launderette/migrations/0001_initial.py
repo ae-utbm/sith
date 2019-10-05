@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
                 (
                     "counter",
                     models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
                         related_name="launderette",
                         verbose_name="counter",
                         to="counter.Counter",

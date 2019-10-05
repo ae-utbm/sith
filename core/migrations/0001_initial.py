@@ -277,6 +277,7 @@ class Migration(migrations.Migration):
                 (
                     "group_ptr",
                     models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
                         primary_key=True,
                         parent_link=True,
                         serialize=False,
@@ -431,7 +432,9 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.OneToOneField(
-                        to=settings.AUTH_USER_MODEL, related_name="preferences"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        related_name="preferences",
                     ),
                 ),
             ],
@@ -525,6 +528,7 @@ class Migration(migrations.Migration):
             model_name="user",
             name="home",
             field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
                 blank=True,
                 null=True,
                 related_name="home_of",

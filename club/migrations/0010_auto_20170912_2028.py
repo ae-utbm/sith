@@ -5,6 +5,7 @@ from django.db import migrations, models
 
 from club.models import Club
 from core.operations import PsqlRunOnly
+import django.db.models.deletion
 
 
 def generate_club_pages(apps, schema_editor):
@@ -31,7 +32,11 @@ class Migration(migrations.Migration):
             model_name="club",
             name="page",
             field=models.OneToOneField(
-                related_name="club", blank=True, null=True, to="core.Page"
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="club",
+                blank=True,
+                null=True,
+                to="core.Page",
             ),
         ),
         migrations.AddField(
