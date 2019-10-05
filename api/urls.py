@@ -22,7 +22,7 @@
 #
 #
 
-from django.conf.urls import url, include
+from django.urls import re_path, include
 
 from api.views import *
 from rest_framework import routers
@@ -49,8 +49,8 @@ router.register(
 
 urlpatterns = [
     # API
-    url(r"^", include(router.urls)),
-    url(r"^login/", include("rest_framework.urls", namespace="rest_framework")),
-    url(r"^markdown$", RenderMarkdown, name="api_markdown"),
-    url(r"^mailings$", FetchMailingLists, name="mailings_fetch"),
+    re_path(r"^", include(router.urls)),
+    re_path(r"^login/", include("rest_framework.re_paths", namespace="rest_framework")),
+    re_path(r"^markdown$", RenderMarkdown, name="api_markdown"),
+    re_path(r"^mailings$", FetchMailingLists, name="mailings_fetch"),
 ]

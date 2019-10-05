@@ -22,33 +22,33 @@
 #
 #
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from pedagogy.views import *
 
 urlpatterns = [
     # Urls displaying the actual application for visitors
-    url(r"^$", UVListView.as_view(), name="guide"),
-    url(r"^uv/(?P<uv_id>[0-9]+)$", UVDetailFormView.as_view(), name="uv_detail"),
-    url(
+    re_path(r"^$", UVListView.as_view(), name="guide"),
+    re_path(r"^uv/(?P<uv_id>[0-9]+)$", UVDetailFormView.as_view(), name="uv_detail"),
+    re_path(
         r"^comment/(?P<comment_id>[0-9]+)/edit$",
         UVCommentUpdateView.as_view(),
         name="comment_update",
     ),
-    url(
+    re_path(
         r"^comment/(?P<comment_id>[0-9]+)/delete$",
         UVCommentDeleteView.as_view(),
         name="comment_delete",
     ),
-    url(
+    re_path(
         r"^comment/(?P<comment_id>[0-9]+)/report$",
         UVCommentReportCreateView.as_view(),
         name="comment_report",
     ),
     # Moderation
-    url(r"^moderation$", UVModerationFormView.as_view(), name="moderation"),
+    re_path(r"^moderation$", UVModerationFormView.as_view(), name="moderation"),
     # Administration : Create Update Delete Edit
-    url(r"^uv/create$", UVCreateView.as_view(), name="uv_create"),
-    url(r"^uv/(?P<uv_id>[0-9]+)/delete$", UVDeleteView.as_view(), name="uv_delete"),
-    url(r"^uv/(?P<uv_id>[0-9]+)/edit$", UVUpdateView.as_view(), name="uv_update"),
+    re_path(r"^uv/create$", UVCreateView.as_view(), name="uv_create"),
+    re_path(r"^uv/(?P<uv_id>[0-9]+)/delete$", UVDeleteView.as_view(), name="uv_delete"),
+    re_path(r"^uv/(?P<uv_id>[0-9]+)/edit$", UVUpdateView.as_view(), name="uv_update"),
 ]

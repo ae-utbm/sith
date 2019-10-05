@@ -22,12 +22,12 @@
 #
 #
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from subscription.views import *
 
 urlpatterns = [
     # Subscription views
-    url(r"^$", NewSubscription.as_view(), name="subscription"),
-    url(r"stats", SubscriptionsStatsView.as_view(), name="stats"),
+    re_path(r"^$", NewSubscription.as_view(), name="subscription"),
+    re_path(r"stats", SubscriptionsStatsView.as_view(), name="stats"),
 ]

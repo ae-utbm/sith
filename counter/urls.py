@@ -22,119 +22,119 @@
 #
 #
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from counter.views import *
 
 urlpatterns = [
-    url(r"^(?P<counter_id>[0-9]+)$", CounterMain.as_view(), name="details"),
-    url(
+    re_path(r"^(?P<counter_id>[0-9]+)$", CounterMain.as_view(), name="details"),
+    re_path(
         r"^(?P<counter_id>[0-9]+)/click/(?P<user_id>[0-9]+)$",
         CounterClick.as_view(),
         name="click",
     ),
-    url(
+    re_path(
         r"^(?P<counter_id>[0-9]+)/last_ops$",
         CounterLastOperationsView.as_view(),
         name="last_ops",
     ),
-    url(
+    re_path(
         r"^(?P<counter_id>[0-9]+)/cash_summary$",
         CounterCashSummaryView.as_view(),
         name="cash_summary",
     ),
-    url(
+    re_path(
         r"^(?P<counter_id>[0-9]+)/activity$",
         CounterActivityView.as_view(),
         name="activity",
     ),
-    url(r"^(?P<counter_id>[0-9]+)/stats$", CounterStatView.as_view(), name="stats"),
-    url(r"^(?P<counter_id>[0-9]+)/login$", CounterLogin.as_view(), name="login"),
-    url(r"^(?P<counter_id>[0-9]+)/logout$", CounterLogout.as_view(), name="logout"),
-    url(
+    re_path(r"^(?P<counter_id>[0-9]+)/stats$", CounterStatView.as_view(), name="stats"),
+    re_path(r"^(?P<counter_id>[0-9]+)/login$", CounterLogin.as_view(), name="login"),
+    re_path(r"^(?P<counter_id>[0-9]+)/logout$", CounterLogout.as_view(), name="logout"),
+    re_path(
         r"^eticket/(?P<selling_id>[0-9]+)/pdf$",
         EticketPDFView.as_view(),
         name="eticket_pdf",
     ),
-    url(
+    re_path(
         r"^customer/(?P<customer_id>[0-9]+)/card/add$",
         StudentCardFormView.as_view(),
         name="add_student_card",
     ),
-    url(
+    re_path(
         r"^customer/(?P<customer_id>[0-9]+)/card/delete/(?P<card_id>[0-9]+)/$",
         StudentCardDeleteView.as_view(),
         name="delete_student_card",
     ),
-    url(r"^admin/(?P<counter_id>[0-9]+)$", CounterEditView.as_view(), name="admin"),
-    url(
+    re_path(r"^admin/(?P<counter_id>[0-9]+)$", CounterEditView.as_view(), name="admin"),
+    re_path(
         r"^admin/(?P<counter_id>[0-9]+)/prop$",
         CounterEditPropView.as_view(),
         name="prop_admin",
     ),
-    url(r"^admin$", CounterListView.as_view(), name="admin_list"),
-    url(r"^admin/new$", CounterCreateView.as_view(), name="new"),
-    url(
+    re_path(r"^admin$", CounterListView.as_view(), name="admin_list"),
+    re_path(r"^admin/new$", CounterCreateView.as_view(), name="new"),
+    re_path(
         r"^admin/delete/(?P<counter_id>[0-9]+)$",
         CounterDeleteView.as_view(),
         name="delete",
     ),
-    url(r"^admin/invoices_call$", InvoiceCallView.as_view(), name="invoices_call"),
-    url(
+    re_path(r"^admin/invoices_call$", InvoiceCallView.as_view(), name="invoices_call"),
+    re_path(
         r"^admin/cash_summary/list$",
         CashSummaryListView.as_view(),
         name="cash_summary_list",
     ),
-    url(
+    re_path(
         r"^admin/cash_summary/(?P<cashsummary_id>[0-9]+)$",
         CashSummaryEditView.as_view(),
         name="cash_summary_edit",
     ),
-    url(r"^admin/product/list$", ProductListView.as_view(), name="product_list"),
-    url(
+    re_path(r"^admin/product/list$", ProductListView.as_view(), name="product_list"),
+    re_path(
         r"^admin/product/list_archived$",
         ProductArchivedListView.as_view(),
         name="product_list_archived",
     ),
-    url(r"^admin/product/create$", ProductCreateView.as_view(), name="new_product"),
-    url(
+    re_path(r"^admin/product/create$", ProductCreateView.as_view(), name="new_product"),
+    re_path(
         r"^admin/product/(?P<product_id>[0-9]+)$",
         ProductEditView.as_view(),
         name="product_edit",
     ),
-    url(
+    re_path(
         r"^admin/producttype/list$",
         ProductTypeListView.as_view(),
         name="producttype_list",
     ),
-    url(
+    re_path(
         r"^admin/producttype/create$",
         ProductTypeCreateView.as_view(),
         name="new_producttype",
     ),
-    url(
+    re_path(
         r"^admin/producttype/(?P<type_id>[0-9]+)$",
         ProductTypeEditView.as_view(),
         name="producttype_edit",
     ),
-    url(r"^admin/eticket/list$", EticketListView.as_view(), name="eticket_list"),
-    url(r"^admin/eticket/new$", EticketCreateView.as_view(), name="new_eticket"),
-    url(
+    re_path(r"^admin/eticket/list$", EticketListView.as_view(), name="eticket_list"),
+    re_path(r"^admin/eticket/new$", EticketCreateView.as_view(), name="new_eticket"),
+    re_path(
         r"^admin/eticket/(?P<eticket_id>[0-9]+)$",
         EticketEditView.as_view(),
         name="edit_eticket",
     ),
-    url(
+    re_path(
         r"^admin/selling/(?P<selling_id>[0-9]+)/delete$",
         SellingDeleteView.as_view(),
         name="selling_delete",
     ),
-    url(
+    re_path(
         r"^admin/refilling/(?P<refilling_id>[0-9]+)/delete$",
         RefillingDeleteView.as_view(),
         name="refilling_delete",
     ),
-    url(
+    re_path(
         r"^admin/(?P<counter_id>[0-9]+)/refillings$",
         CounterRefillingListView.as_view(),
         name="refilling_list",

@@ -22,64 +22,68 @@
 #
 #
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from forum.views import *
 
 
 urlpatterns = [
-    url(r"^$", ForumMainView.as_view(), name="main"),
-    url(r"^search/$", ForumSearchView.as_view(), name="search"),
-    url(r"^new_forum$", ForumCreateView.as_view(), name="new_forum"),
-    url(r"^mark_all_as_read$", ForumMarkAllAsRead.as_view(), name="mark_all_as_read"),
-    url(r"^last_unread$", ForumLastUnread.as_view(), name="last_unread"),
-    url(r"^favorite_topics$", ForumFavoriteTopics.as_view(), name="favorite_topics"),
-    url(r"^(?P<forum_id>[0-9]+)$", ForumDetailView.as_view(), name="view_forum"),
-    url(r"^(?P<forum_id>[0-9]+)/edit$", ForumEditView.as_view(), name="edit_forum"),
-    url(
+    re_path(r"^$", ForumMainView.as_view(), name="main"),
+    re_path(r"^search/$", ForumSearchView.as_view(), name="search"),
+    re_path(r"^new_forum$", ForumCreateView.as_view(), name="new_forum"),
+    re_path(
+        r"^mark_all_as_read$", ForumMarkAllAsRead.as_view(), name="mark_all_as_read"
+    ),
+    re_path(r"^last_unread$", ForumLastUnread.as_view(), name="last_unread"),
+    re_path(
+        r"^favorite_topics$", ForumFavoriteTopics.as_view(), name="favorite_topics"
+    ),
+    re_path(r"^(?P<forum_id>[0-9]+)$", ForumDetailView.as_view(), name="view_forum"),
+    re_path(r"^(?P<forum_id>[0-9]+)/edit$", ForumEditView.as_view(), name="edit_forum"),
+    re_path(
         r"^(?P<forum_id>[0-9]+)/delete$", ForumDeleteView.as_view(), name="delete_forum"
     ),
-    url(
+    re_path(
         r"^(?P<forum_id>[0-9]+)/new_topic$",
         ForumTopicCreateView.as_view(),
         name="new_topic",
     ),
-    url(
+    re_path(
         r"^topic/(?P<topic_id>[0-9]+)$",
         ForumTopicDetailView.as_view(),
         name="view_topic",
     ),
-    url(
+    re_path(
         r"^topic/(?P<topic_id>[0-9]+)/edit$",
         ForumTopicEditView.as_view(),
         name="edit_topic",
     ),
-    url(
+    re_path(
         r"^topic/(?P<topic_id>[0-9]+)/new_message$",
         ForumMessageCreateView.as_view(),
         name="new_message",
     ),
-    url(
+    re_path(
         r"^topic/(?P<topic_id>[0-9]+)/toggle_subscribe$",
         ForumTopicSubscribeView.as_view(),
         name="toggle_subscribe_topic",
     ),
-    url(
+    re_path(
         r"^message/(?P<message_id>[0-9]+)$",
         ForumMessageView.as_view(),
         name="view_message",
     ),
-    url(
+    re_path(
         r"^message/(?P<message_id>[0-9]+)/edit$",
         ForumMessageEditView.as_view(),
         name="edit_message",
     ),
-    url(
+    re_path(
         r"^message/(?P<message_id>[0-9]+)/delete$",
         ForumMessageDeleteView.as_view(),
         name="delete_message",
     ),
-    url(
+    re_path(
         r"^message/(?P<message_id>[0-9]+)/undelete$",
         ForumMessageUndeleteView.as_view(),
         name="undelete_message",

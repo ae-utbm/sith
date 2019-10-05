@@ -23,80 +23,88 @@
 #
 #
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from club.views import *
 
 urlpatterns = [
-    url(r"^$", ClubListView.as_view(), name="club_list"),
-    url(r"^new$", ClubCreateView.as_view(), name="club_new"),
-    url(r"^stats$", ClubStatView.as_view(), name="club_stats"),
-    url(r"^(?P<club_id>[0-9]+)/$", ClubView.as_view(), name="club_view"),
-    url(
+    re_path(r"^$", ClubListView.as_view(), name="club_list"),
+    re_path(r"^new$", ClubCreateView.as_view(), name="club_new"),
+    re_path(r"^stats$", ClubStatView.as_view(), name="club_stats"),
+    re_path(r"^(?P<club_id>[0-9]+)/$", ClubView.as_view(), name="club_view"),
+    re_path(
         r"^(?P<club_id>[0-9]+)/rev/(?P<rev_id>[0-9]+)/$",
         ClubRevView.as_view(),
         name="club_view_rev",
     ),
-    url(r"^(?P<club_id>[0-9]+)/hist$", ClubPageHistView.as_view(), name="club_hist"),
-    url(r"^(?P<club_id>[0-9]+)/edit$", ClubEditView.as_view(), name="club_edit"),
-    url(
+    re_path(
+        r"^(?P<club_id>[0-9]+)/hist$", ClubPageHistView.as_view(), name="club_hist"
+    ),
+    re_path(r"^(?P<club_id>[0-9]+)/edit$", ClubEditView.as_view(), name="club_edit"),
+    re_path(
         r"^(?P<club_id>[0-9]+)/edit/page$",
         ClubPageEditView.as_view(),
         name="club_edit_page",
     ),
-    url(
+    re_path(
         r"^(?P<club_id>[0-9]+)/members$", ClubMembersView.as_view(), name="club_members"
     ),
-    url(
+    re_path(
         r"^(?P<club_id>[0-9]+)/elderlies$",
         ClubOldMembersView.as_view(),
         name="club_old_members",
     ),
-    url(
+    re_path(
         r"^(?P<club_id>[0-9]+)/sellings$",
         ClubSellingView.as_view(),
         name="club_sellings",
     ),
-    url(
+    re_path(
         r"^(?P<club_id>[0-9]+)/sellings/csv$",
         ClubSellingCSVView.as_view(),
         name="sellings_csv",
     ),
-    url(r"^(?P<club_id>[0-9]+)/prop$", ClubEditPropView.as_view(), name="club_prop"),
-    url(r"^(?P<club_id>[0-9]+)/tools$", ClubToolsView.as_view(), name="tools"),
-    url(r"^(?P<club_id>[0-9]+)/mailing$", ClubMailingView.as_view(), name="mailing"),
-    url(
+    re_path(
+        r"^(?P<club_id>[0-9]+)/prop$", ClubEditPropView.as_view(), name="club_prop"
+    ),
+    re_path(r"^(?P<club_id>[0-9]+)/tools$", ClubToolsView.as_view(), name="tools"),
+    re_path(
+        r"^(?P<club_id>[0-9]+)/mailing$", ClubMailingView.as_view(), name="mailing"
+    ),
+    re_path(
         r"^(?P<mailing_id>[0-9]+)/mailing/generate$",
         MailingAutoGenerationView.as_view(),
         name="mailing_generate",
     ),
-    url(
+    re_path(
         r"^(?P<mailing_id>[0-9]+)/mailing/delete$",
         MailingDeleteView.as_view(),
         name="mailing_delete",
     ),
-    url(
+    re_path(
         r"^(?P<mailing_subscription_id>[0-9]+)/mailing/delete/subscription$",
         MailingSubscriptionDeleteView.as_view(),
         name="mailing_subscription_delete",
     ),
-    url(
+    re_path(
         r"^membership/(?P<membership_id>[0-9]+)/set_old$",
         MembershipSetOldView.as_view(),
         name="membership_set_old",
     ),
-    url(r"^(?P<club_id>[0-9]+)/poster$", PosterListView.as_view(), name="poster_list"),
-    url(
+    re_path(
+        r"^(?P<club_id>[0-9]+)/poster$", PosterListView.as_view(), name="poster_list"
+    ),
+    re_path(
         r"^(?P<club_id>[0-9]+)/poster/create$",
         PosterCreateView.as_view(),
         name="poster_create",
     ),
-    url(
+    re_path(
         r"^(?P<club_id>[0-9]+)/poster/(?P<poster_id>[0-9]+)/edit$",
         PosterEditView.as_view(),
         name="poster_edit",
     ),
-    url(
+    re_path(
         r"^(?P<club_id>[0-9]+)/poster/(?P<poster_id>[0-9]+)/delete$",
         PosterDeleteView.as_view(),
         name="poster_delete",
