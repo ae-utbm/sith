@@ -39,9 +39,9 @@ Including another URLconf
 """
 from django.urls import include, re_path
 from django.contrib import admin
-from django.urls.static import static
 from django.conf import settings
-from django.views.i18n import javascript_catalog
+from django.conf.urls.static import static
+from django.views.i18n import JavaScriptCatalog
 from ajax_select import urls as ajax_select_urls
 
 js_info_dict = {"packages": ("sith",)}
@@ -51,61 +51,43 @@ handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
 
 urlpatterns = [
-    re_path(r"^", include("core.re_paths", namespace="core", app_name="core")),
+    re_path(r"^", include(("core.urls", "core"), namespace="core")),
     re_path(
-        r"^rootplace/",
-        include("rootplace.re_paths", namespace="rootplace", app_name="rootplace"),
+        r"^rootplace/", include(("rootplace.urls", "rootplace"), namespace="rootplace")
     ),
     re_path(
         r"^subscription/",
-        include(
-            "subscription.re_paths", namespace="subscription", app_name="subscription"
-        ),
+        include(("subscription.urls", "subscription"), namespace="subscription"),
     ),
-    re_path(r"^com/", include("com.re_paths", namespace="com", app_name="com")),
-    re_path(r"^club/", include("club.re_paths", namespace="club", app_name="club")),
-    re_path(
-        r"^counter/",
-        include("counter.re_paths", namespace="counter", app_name="counter"),
-    ),
-    re_path(r"^stock/", include("stock.re_paths", namespace="stock", app_name="stock")),
+    re_path(r"^com/", include(("com.urls", "com"), namespace="com")),
+    re_path(r"^club/", include(("club.urls", "club"), namespace="club")),
+    re_path(r"^counter/", include(("counter.urls", "counter"), namespace="counter")),
+    re_path(r"^stock/", include(("stock.urls", "stock"), namespace="stock")),
     re_path(
         r"^accounting/",
-        include("accounting.re_paths", namespace="accounting", app_name="accounting"),
+        include(("accounting.urls", "accounting"), namespace="accounting"),
     ),
-    re_path(
-        r"^eboutic/",
-        include("eboutic.re_paths", namespace="eboutic", app_name="eboutic"),
-    ),
+    re_path(r"^eboutic/", include(("eboutic.urls", "eboutic"), namespace="eboutic")),
     re_path(
         r"^launderette/",
-        include(
-            "launderette.re_paths", namespace="launderette", app_name="launderette"
-        ),
+        include(("launderette.urls", "launderette"), namespace="launderette"),
     ),
-    re_path(r"^sas/", include("sas.re_paths", namespace="sas", app_name="sas")),
-    re_path(r"^api/v1/", include("api.re_paths", namespace="api", app_name="api")),
+    re_path(r"^sas/", include(("sas.urls", "sas"), namespace="sas")),
+    re_path(r"^api/v1/", include(("api.urls", "api"), namespace="api")),
     re_path(
-        r"^election/",
-        include("election.re_paths", namespace="election", app_name="election"),
+        r"^election/", include(("election.urls", "election"), namespace="election")
     ),
-    re_path(r"^forum/", include("forum.re_paths", namespace="forum", app_name="forum")),
+    re_path(r"^forum/", include(("forum.urls", "forum"), namespace="forum")),
+    re_path(r"^trombi/", include(("trombi.urls", "trombi"), namespace="trombi")),
+    re_path(r"^matmatronch/", include(("matmat.urls", "matmat"), namespace="matmat")),
     re_path(
-        r"^trombi/", include("trombi.re_paths", namespace="trombi", app_name="trombi")
+        r"^pedagogy/", include(("pedagogy.urls", "pedagogy"), namespace="pedagogy")
     ),
-    re_path(
-        r"^matmatronch/",
-        include("matmat.re_paths", namespace="matmat", app_name="matmat"),
-    ),
-    re_path(
-        r"^pedagogy/",
-        include("pedagogy.re_paths", namespace="pedagogy", app_name="pedagogy"),
-    ),
-    re_path(r"^admin/", include(admin.site.re_paths)),
-    re_path(r"^ajax_select/", include(ajax_select_re_paths)),
-    re_path(r"^i18n/", include("django.urls.i18n")),
-    re_path(r"^jsi18n/$", javascript_catalog, js_info_dict, name="javascript-catalog"),
-    re_path(r"^captcha/", include("captcha.re_paths")),
+    re_path(r"^admin/", admin.site.urls),
+    re_path(r"^ajax_select/", include(ajax_select_urls)),
+    re_path(r"^i18n/", include("django.conf.urls.i18n")),
+    re_path(r"^jsi18n/$", JavaScriptCatalog.as_view(), name="javascript-catalog"),
+    re_path(r"^captcha/", include("captcha.urls")),
 ]
 
 if settings.DEBUG:

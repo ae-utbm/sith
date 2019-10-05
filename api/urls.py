@@ -50,7 +50,7 @@ router.register(
 urlpatterns = [
     # API
     re_path(r"^", include(router.urls)),
-    re_path(r"^login/", include("rest_framework.re_paths", namespace="rest_framework")),
+    re_path(r"^login/", include("rest_framework.urls", namespace="rest_framework")),
     re_path(r"^markdown$", RenderMarkdown, name="api_markdown"),
     re_path(r"^mailings$", FetchMailingLists, name="mailings_fetch"),
 ]
