@@ -1171,7 +1171,6 @@ class Page(models.Model):
         unique_together = ("name", "parent")
         permissions = (
             ("change_prop_page", "Can change the page's properties (groups, ...)"),
-            ("view_page", "Can view the page"),
         )
 
     @staticmethod
