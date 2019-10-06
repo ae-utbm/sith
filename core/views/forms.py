@@ -302,7 +302,7 @@ class UserProfileForm(forms.ModelForm):
                         owner=self.instance,
                         is_folder=False,
                         mime_type=f.content_type,
-                        size=f._size,
+                        size=f.size,
                         moderator=self.instance,
                         is_moderated=True,
                     )

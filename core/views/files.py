@@ -109,7 +109,7 @@ class AddFilesForm(forms.Form):
                 owner=owner,
                 is_folder=False,
                 mime_type=f.content_type,
-                size=f._size,
+                size=f.size,
             )
             try:
                 new_file.clean()

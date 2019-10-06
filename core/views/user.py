@@ -630,7 +630,7 @@ class UserUploadProfilePictView(CanEditMixin, DetailView):
             owner=self.object,
             is_folder=False,
             mime_type=f.content_type,
-            size=f._size,
+            size=f.size,
         )
         new_file.file.name = name
         new_file.save()

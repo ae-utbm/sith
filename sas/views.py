@@ -78,7 +78,7 @@ class SASForm(forms.Form):
                 file=f,
                 owner=owner,
                 mime_type=f.content_type,
-                size=f._size,
+                size=f.size,
                 is_folder=False,
                 is_moderated=automodere,
             )
