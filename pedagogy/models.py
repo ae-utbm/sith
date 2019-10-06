@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.core import validators
 from django.conf import settings
 from django.utils.functional import cached_property
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from rest_framework import serializers
 

@@ -25,7 +25,7 @@
 import os
 
 from django.test import Client, TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.management import call_command
 
 from core.models import User, Group, Page

@@ -24,7 +24,7 @@
 
 from django.shortcuts import redirect
 from django.http import HttpResponse, Http404
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse
 from core.views.forms import SelectDate
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import UpdateView, FormMixin, FormView

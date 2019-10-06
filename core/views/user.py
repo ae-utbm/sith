@@ -27,7 +27,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import views
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpResponse
 from django.views.generic.edit import UpdateView
@@ -40,7 +40,7 @@ from django.views.generic import (
 )
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.template.response import TemplateResponse
 from django.conf import settings
 from django.views.generic.dates import YearMixin, MonthMixin

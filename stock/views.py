@@ -41,7 +41,7 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.forms.models import modelform_factory
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse
 from django.db import transaction, DataError
 
 from core.views import (

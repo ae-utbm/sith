@@ -37,7 +37,7 @@ from django.views.generic.edit import (
 )
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django import forms

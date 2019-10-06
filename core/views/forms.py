@@ -27,7 +27,7 @@ from django import forms
 from django.conf import settings
 from django.db import transaction
 from django.templatetags.static import static
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.forms import (
     CheckboxSelectMultiple,

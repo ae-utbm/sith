@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.forms import PasswordResetForm
 
 from dateutil.relativedelta import relativedelta
