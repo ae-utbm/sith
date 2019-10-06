@@ -66,7 +66,7 @@ class MailingForm(forms.Form):
         super(MailingForm, self).__init__(*args, **kwargs)
 
         self.fields["action"] = forms.TypedChoiceField(
-            (
+            choices=(
                 (self.ACTION_NEW_MAILING, _("New Mailing")),
                 (self.ACTION_NEW_SUBSCRIPTION, _("Subscribe")),
                 (self.ACTION_REMOVE_SUBSCRIPTION, _("Remove")),

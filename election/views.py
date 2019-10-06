@@ -28,23 +28,10 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
         automatic backend verification
     """
 
-    def __init__(
-        self,
-        queryset,
-        max_choice,
-        required=True,
-        widget=None,
-        label=None,
-        initial=None,
-        help_text="",
-        *args,
-        **kwargs
-    ):
+    def __init__(self, queryset, max_choice, **kwargs):
         self.max_choice = max_choice
         widget = forms.CheckboxSelectMultiple()
-        super(LimitedCheckboxField, self).__init__(
-            queryset, None, required, widget, label, initial, help_text, *args, **kwargs
-        )
+        super(LimitedCheckboxField, self).__init__(queryset, **kwargs)
 
     def clean(self, value):
         qs = super(LimitedCheckboxField, self).clean(value)
