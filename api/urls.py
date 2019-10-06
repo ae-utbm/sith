@@ -29,22 +29,22 @@ from rest_framework import routers
 
 # Router config
 router = routers.DefaultRouter()
-router.register(r"counter", CounterViewSet, base_name="api_counter")
-router.register(r"user", UserViewSet, base_name="api_user")
-router.register(r"club", ClubViewSet, base_name="api_club")
-router.register(r"group", GroupViewSet, base_name="api_group")
+router.register(r"counter", CounterViewSet, basename="api_counter")
+router.register(r"user", UserViewSet, basename="api_user")
+router.register(r"club", ClubViewSet, basename="api_club")
+router.register(r"group", GroupViewSet, basename="api_group")
 
 # Launderette
 router.register(
-    r"launderette/place", LaunderettePlaceViewSet, base_name="api_launderette_place"
+    r"launderette/place", LaunderettePlaceViewSet, basename="api_launderette_place"
 )
 router.register(
     r"launderette/machine",
     LaunderetteMachineViewSet,
-    base_name="api_launderette_machine",
+    basename="api_launderette_machine",
 )
 router.register(
-    r"launderette/token", LaunderetteTokenViewSet, base_name="api_launderette_token"
+    r"launderette/token", LaunderetteTokenViewSet, basename="api_launderette_token"
 )
 
 urlpatterns = [
