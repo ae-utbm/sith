@@ -69,15 +69,13 @@ from counter.views import StudentCardForm
 from trombi.views import UserTrombiForm
 
 
-def login(request):
+class SithLoginView(views.LoginView):
     """
-    The login view
+    The login View
+    """
 
-    Needs to be improve with correct handling of form exceptions
-    """
-    return views.login(
-        request, template_name="core/login.jinja", authentication_form=LoginForm
-    )
+    template_name = "core/login.jinja"
+    authentication_form = LoginForm
 
 
 def logout(request):

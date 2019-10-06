@@ -37,7 +37,7 @@ urlpatterns = [
     re_path(r"^search_json/$", search_json, name="search_json"),
     re_path(r"^search_user/$", search_user_json, name="search_user"),
     # Login and co
-    re_path(r"^login/$", login, name="login"),
+    re_path(r"^login/$", SithLoginView.as_view(), name="login"),
     re_path(r"^logout/$", logout, name="logout"),
     re_path(r"^password_change/$", password_change, name="password_change"),
     re_path(
