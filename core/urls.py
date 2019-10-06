@@ -39,23 +39,37 @@ urlpatterns = [
     # Login and co
     re_path(r"^login/$", SithLoginView.as_view(), name="login"),
     re_path(r"^logout/$", logout, name="logout"),
-    re_path(r"^password_change/$", password_change, name="password_change"),
+    re_path(
+        r"^password_change/$", SithPasswordChangeView.as_view(), name="password_change"
+    ),
     re_path(
         r"^password_change/(?P<user_id>[0-9]+)$",
         password_root_change,
         name="password_root_change",
     ),
     re_path(
-        r"^password_change/done$", password_change_done, name="password_change_done"
+        r"^password_change/done$",
+        SithPasswordChangeDoneView.as_view(),
+        name="password_change_done",
     ),
-    re_path(r"^password_reset/$", password_reset, name="password_reset"),
-    re_path(r"^password_reset/done$", password_reset_done, name="password_reset_done"),
+    re_path(
+        r"^password_reset/$", SithPasswordResetView.as_view(), name="password_reset"
+    ),
+    re_path(
+        r"^password_reset/done$",
+        SithPasswordResetDoneView.as_view(),
+        name="password_reset_done",
+    ),
     re_path(
         r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
-        password_reset_confirm,
+        SithPasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
-    re_path(r"^reset/done/$", password_reset_complete, name="password_reset_complete"),
+    re_path(
+        r"^reset/done/$",
+        SithPasswordResetCompleteView.as_view(),
+        name="password_reset_complete",
+    ),
     re_path(r"^register$", register, name="register"),
     # Group handling
     re_path(r"^group/$", GroupListView.as_view(), name="group_list"),
