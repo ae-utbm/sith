@@ -190,8 +190,8 @@ class Club(models.Model):
                     name=settings.SITH_MAIN_MEMBERS_GROUP
                 ).first()
                 self.make_home()
-                self.home.edit_groups = [board]
-                self.home.view_groups = [member, subscribers]
+                self.home.edit_groups.set([board])
+                self.home.view_groups.set([member, subscribers])
                 self.home.save()
             self.make_page()
 

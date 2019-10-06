@@ -142,18 +142,18 @@ class Command(BaseCommand):
             g.save()
             c = Counter(id=b[0], name=b[1], club=bar_club, type="BAR")
             c.save()
-            c.edit_groups = [g]
-            c.save()
+            g.editable_counters.add(c)
+            g.save()
         self.reset_index("counter")
         Counter(name="Eboutic", club=main_club, type="EBOUTIC").save()
         Counter(name="AE", club=main_club, type="OFFICE").save()
 
-        home_root.view_groups = [
-            Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()
-        ]
-        club_root.view_groups = [
-            Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()
-        ]
+        home_root.view_groups.set(
+            [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
+        )
+        club_root.view_groups.set(
+            [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
+        )
         home_root.save()
         club_root.save()
 
@@ -163,7 +163,7 @@ class Command(BaseCommand):
         p = Page(name="Index")
         p.set_lock(root)
         p.save()
-        p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
+        p.view_groups.set([settings.SITH_GROUP_PUBLIC_ID])
         p.set_lock(root)
         p.save()
         PageRev(
@@ -178,7 +178,7 @@ Welcome to the wiki page!
         p = Page(name="services")
         p.set_lock(root)
         p.save()
-        p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
+        p.view_groups.set([settings.SITH_GROUP_PUBLIC_ID])
         p.set_lock(root)
         PageRev(
             page=p,
@@ -297,9 +297,13 @@ Welcome to the wiki page!
             counter.view_groups = [
                 Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
             ]
-            counter.groups = [
-                Group.objects.filter(id=settings.SITH_GROUP_COUNTER_ADMIN_ID).first().id
-            ]
+            counter.groups.set(
+                [
+                    Group.objects.filter(id=settings.SITH_GROUP_COUNTER_ADMIN_ID)
+                    .first()
+                    .id
+                ]
+            )
             counter.save()
             # Adding user Comptable
             comptable = User(
@@ -316,11 +320,13 @@ Welcome to the wiki page!
             comptable.view_groups = [
                 Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
             ]
-            comptable.groups = [
-                Group.objects.filter(id=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-                .first()
-                .id
-            ]
+            comptable.groups.set(
+                [
+                    Group.objects.filter(id=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+                    .first()
+                    .id
+                ]
+            )
             comptable.save()
             # Adding user Guy
             u = User(
@@ -359,11 +365,11 @@ Welcome to the wiki page!
                 PageRev(
                     page=p, title="Aide sur la syntaxe", author=skia, content=rm.read()
                 ).save()
-            p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
+            p.view_groups.set([settings.SITH_GROUP_PUBLIC_ID])
             p.save(force_lock=True)
             p = Page(name="Services")
             p.save(force_lock=True)
-            p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
+            p.view_groups.set([settings.SITH_GROUP_PUBLIC_ID])
             p.save(force_lock=True)
             PageRev(
                 page=p,
@@ -842,9 +848,9 @@ Welcome to the wiki page!
             )
             comunity.set_password("plop")
             comunity.save()
-            comunity.groups = [
-                Group.objects.filter(name="Communication admin").first().id
-            ]
+            comunity.groups.set(
+                [Group.objects.filter(name="Communication admin").first().id]
+            )
             comunity.save()
             Membership(
                 user=comunity,
@@ -862,7 +868,7 @@ Welcome to the wiki page!
             )
             tutu.set_password("plop")
             tutu.save()
-            tutu.groups = [settings.SITH_GROUP_PEDAGOGY_ADMIN_ID]
+            tutu.groups.set([settings.SITH_GROUP_PEDAGOGY_ADMIN_ID])
             tutu.save()
 
             # Adding subscription for sli

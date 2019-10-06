@@ -62,7 +62,7 @@ class ComTest(TestCase):
         self.com_group = RealGroup.objects.filter(
             id=settings.SITH_GROUP_COM_ADMIN_ID
         ).first()
-        self.skia.groups = [self.com_group]
+        self.skia.groups.set([self.com_group])
         self.skia.save()
         self.client.login(username=self.skia.username, password="plop")
 

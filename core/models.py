@@ -948,8 +948,8 @@ class SithFile(models.Model):
     def copy_rights(self):
         """Copy, if possible, the rights of the parent folder"""
         if self.parent is not None:
-            self.edit_groups = self.parent.edit_groups.all()
-            self.view_groups = self.parent.view_groups.all()
+            self.edit_groups.set(self.parent.edit_groups.all())
+            self.view_groups.set(self.parent.view_groups.all())
             self.save()
 
     def move_to(self, parent):
