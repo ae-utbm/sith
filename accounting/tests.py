@@ -272,30 +272,50 @@ class OperationTest(TestCase):
 
     def test_nature_statement(self):
         self.client.login(username="comptable", password="plop")
-        response_get = self.client.get(
+        response = self.client.get(
             reverse("accounting:journal_nature_statement", args=[self.journal.id])
         )
-        self.assertTrue(
-            "bob (Troll Pench\\xc3\\xa9) : 3.00" in str(response_get.content)
-        )
+        self.assertContains(response, "bob (Troll Penché) : 3.00", status_code=200)
 
     def test_person_statement(self):
         self.client.login(username="comptable", password="plop")
-        response_get = self.client.get(
+        response = self.client.get(
             reverse("accounting:journal_person_statement", args=[self.journal.id])
         )
-        self.assertTrue(
-            "<td>3.00</td>" in str(response_get.content)
-            and '<td><a href="/user/1/">S&#39; Kia</a></td>'
-            in str(response_get.content)
+        self.assertContains(response, "Total : 5575.72", status_code=200)
+        self.assertContains(response, "Total : 71.42")
+        self.assertContains(
+            response,
+            """
+                <td><a href="/user/1/">S&#39; Kia</a></td>
+                
+                <td>3.00</td>""",
+        )
+        self.assertContains(
+            response,
+            """
+                <td><a href="/user/1/">S&#39; Kia</a></td>
+                
+                <td>823.00</td>""",
         )
 
     def test_accounting_statement(self):
         self.client.login(username="comptable", password="plop")
-        response_get = self.client.get(
+        response = self.client.get(
             reverse("accounting:journal_accounting_statement", args=[self.journal.id])
         )
-        self.assertTrue(
-            "<td>443 - Cr\\xc3\\xa9dit - Ce code n&#39;existe pas</td>"
-            in str(response_get.content)
+        self.assertContains(
+            response,
+            """
+            <tr>
+                <td>443 - Crédit - Ce code n&#39;existe pas</td>
+                <td>3.00</td>
+            </tr>""",
+            status_code=200,
+        )
+        self.assertContains(
+            response,
+            """
+    <p><strong>Montant : </strong>-5504.30 €</p>
+    <p><strong>Montant effectif: </strong>-5504.30 €</p>""",
         )

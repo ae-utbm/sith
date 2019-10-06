@@ -28,14 +28,14 @@
                 {% else %}
                 <td></td>
                 {% endif %}
-                <td>{{ credit_statement[key] }}</td>
+                <td>{{ "%.2f" % credit_statement[key] }}</td>
             </tr>
             {% endfor %}
         </tbody>
 
     </table>
 
-    <p>Total : {{ total_credit }}</p>
+    <p>Total : {{ "%.2f" % total_credit }}</p>
 
     <h4>{% trans %}Debit{% endtrans %}</h4>
 
@@ -56,13 +56,13 @@
                 {% else %}
                 <td></td>
                 {% endif %}
-                <td>{{ debit_statement[key] }}</td>
+                <td>{{ "%.2f" % debit_statement[key] }}</td>
             </tr>
             {% endfor %}
         </tbody>
 
     </table>
 
-    <p>Total : {{ total_debit }}</p>
+    <p>Total : {{ "%.2f" % total_debit }}</p>
 </div>
 {% endblock %}
