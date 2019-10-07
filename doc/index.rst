@@ -52,6 +52,7 @@ Bienvenue sur la documentation du Sith de l'AE
 
     misc/md_syntax
     misc/helpers
+    misc/direnv
     misc/prod
 
 Documentations complémentaires

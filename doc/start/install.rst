@@ -51,6 +51,10 @@ Installer le projet
 	# Prépare la base de donnée
 	./manage.py setup
 
+.. note::
+
+    Pour éviter d'avoir à utiliser la commande source sur le virtualenv systématiquement, il est possible de consulter :ref:`direnv`.
+
 Configuration pour le développement
 -----------------------------------
 
