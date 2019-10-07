@@ -29,7 +29,9 @@ import sys
 from http.server import test, CGIHTTPRequestHandler
 
 from django.core.management.base import BaseCommand
-from django.conf import settings
+
+# TODO Django 2.2 : implement autoreload following
+# https://stackoverflow.com/questions/42907285/django-autoreload-add-watched-file
 
 
 class Command(BaseCommand):
