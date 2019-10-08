@@ -14,6 +14,7 @@ Bienvenue sur la documentation du Sith de l'AE
 
    about/introduction
    about/tech
+   about/versioning
 
 .. toctree::
     :maxdepth: 2
