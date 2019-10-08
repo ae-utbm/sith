@@ -149,6 +149,13 @@ class NewsDate(models.Model):
 class Weekmail(models.Model):
     """
     The weekmail class
+
+    :ivar title: Title of the weekmail
+    :ivar intro: Introduction of the weekmail
+    :ivar joke: Joke of the week
+    :ivar protip: Tip of the week
+    :ivar conclusion: Conclusion of the weekmail
+    :ivar sent: Track if the weekmail has been sent
     """
 
     title = models.CharField(_("title"), max_length=64, blank=True)
@@ -162,6 +169,10 @@ class Weekmail(models.Model):
         ordering = ["-id"]
 
     def send(self):
+        """
+        Send the weekmail to all users with the receive weekmail option opt-in.
+        Also send the weekmail to the mailing list in settings.SITH_COM_EMAIL.
+        """
         dest = [
             i[0]
             for i in Preferences.objects.filter(receive_weekmail=True).values_list(
@@ -183,19 +194,31 @@ class Weekmail(models.Model):
             Weekmail().save()
 
     def render_text(self):
+        """
+        Renders a pure text version of the mail for readers without HTML support.
+        """
         return render(
             None, "com/weekmail_renderer_text.jinja", context={"weekmail": self}
         ).content.decode("utf-8")
 
     def render_html(self):
+        """
+        Renders an HTML version of the mail with images and fancy CSS.
+        """
         return render(
             None, "com/weekmail_renderer_html.jinja", context={"weekmail": self}
         ).content.decode("utf-8")
 
     def get_banner(self):
+        """
+        Return an absolute link to the banner.
+        """
         return "http://" + settings.SITH_URL + static("com/img/weekmail_bannerA19.jpg")
 
     def get_footer(self):
+        """
+        Return an absolute link to the footer.
+        """
         return "http://" + settings.SITH_URL + static("com/img/weekmail_footerA19.jpg")
 
     def __str__(self):

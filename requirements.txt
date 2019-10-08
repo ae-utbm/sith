@@ -20,3 +20,8 @@ python-dateutil
 pygraphviz
 sentry_sdk
 # mysqlclient
+
+# For documentation
+Sphinx > 2.0
+sphinx_rtd_theme
+sphinx-copybutton
