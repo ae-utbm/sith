@@ -91,7 +91,7 @@ Voici maintenant comment faire en définissant des fonctions personnalisées. Ce
 
 .. note::
 
-    Si un utilisateur est autorisé à un niveau plus élevé que celui auquel il est testé, le système le détectera automatiquement et les droits lui seront accordé. Par défaut, les seuls utilisateur ayant des droits quelconques sont les *superuser* de Django et les membres du bureau AE qui sont définis comme *owner*.
+    Si un utilisateur est autorisé à un niveau plus élevé que celui auquel il est testé, le système le détectera automatiquement et les droits lui seront accordé. Par défaut, les seuls utilisateurs ayant des droits quelconques sont les *superuser* de Django et les membres du bureau AE qui sont définis comme *owner*.
 
 Appliquer les permissions
 -------------------------
