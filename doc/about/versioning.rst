@@ -1,4 +1,3 @@
-=============
 Le versioning
 =============
 
@@ -12,9 +11,8 @@ Pour palier à ce problème, le programmeur a créé un principe révolutionnair
 
 D'après projet-isika (c'est pas wikipedia ouais, ils étaient pas clairs eux), le versioning (ou versionnage en français mais c'est quand même vachement dégueu comme mot) consiste à travailler directement sur le code source d'un projet, en gardant toutes les versions précédentes. Les outils du versioning aident les développeurs à travailler parallèlement sur différentes parties du projet et à revenir facilement aux étapes précédentes de leur travail en cas de besoin. L’utilisation d’un logiciel de versioning est devenue quasi-indispensable pour tout développeur, même s’il travaille seul.
 
-*********************************
 Un versioning pour les gouverner tous
-*********************************
+-------------------------------------
 
 On va vite fait passer sur les différents logiciels de contrôle de version avant de revenir à l'essentiel, le vrai, le beau, l'unique et l'ultime : Git.
 
@@ -31,8 +29,8 @@ Ce logiciel représente à l'époque une alternative libre au système SCCS, et 
 
 C'est pas forcément utile de comprendre le fonctionnement interne de Git pour développer (la preuve, je n'ai pas franchement chercher au tréfond du bousin) mais c'est en revanche indispensable de comprendre comment l'utiliser avant de faire n'importe quoi. Du coup, on va voir ci-dessous comment utiliser Git et comment on l'utilise sur le site AE.
 
-============
 TLDR
-============
+----
+
 Un système de versioning permet de faire de la merde dans votre code et de pouvoir revenir en arrière malgré tout. Ça permet aussi de coder à plusieurs.
 Git est le meilleur système de gestion de version (ou système de versioning) que vous pourrez trouver à l'heure actuelle. Utilisez-le.
