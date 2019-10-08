@@ -377,13 +377,6 @@ Welcome to the wiki page!
 
 """,
             ).save()
-            # Adding README (discuss if really necessary)
-            p = Page(name="README")
-            p.save(force_lock=True)
-            p.view_groups = [settings.SITH_GROUP_PUBLIC_ID]
-            p.save(force_lock=True)
-            with open(os.path.join(root_path) + "/README.rst", "r") as rm:
-                PageRev(page=p, title="README", author=skia, content=rm.read()).save()
 
             # Subscription
             default_subscription = "un-semestre"
