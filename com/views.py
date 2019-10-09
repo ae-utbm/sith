@@ -739,7 +739,8 @@ class PosterEditBaseView(UpdateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(PosterEditBaseView, self).get_context_data(**kwargs)
-        kwargs["club"] = kwargs.get("club", self.club)
+        if hasattr(self, "club"):
+            kwargs["club"] = self.club
         return kwargs
 
     def form_valid(self, form):
