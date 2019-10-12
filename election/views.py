@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.edit import DeleteView, FormView
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -28,23 +28,10 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
         automatic backend verification
     """
 
-    def __init__(
-        self,
-        queryset,
-        max_choice,
-        required=True,
-        widget=None,
-        label=None,
-        initial=None,
-        help_text="",
-        *args,
-        **kwargs
-    ):
+    def __init__(self, queryset, max_choice, **kwargs):
         self.max_choice = max_choice
         widget = forms.CheckboxSelectMultiple()
-        super(LimitedCheckboxField, self).__init__(
-            queryset, None, required, widget, label, initial, help_text, *args, **kwargs
-        )
+        super(LimitedCheckboxField, self).__init__(queryset, **kwargs)
 
     def clean(self, value):
         qs = super(LimitedCheckboxField, self).clean(value)
@@ -181,22 +168,25 @@ class ElectionForm(forms.ModelForm):
     )
 
     start_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Start date"),
         widget=SelectDateTime,
         required=True,
     )
     end_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"], label=_("End date"), widget=SelectDateTime, required=True
+        input_formats=["%Y-%m-%d %H:%M:%S"],
+        label=_("End date"),
+        widget=SelectDateTime,
+        required=True,
     )
     start_candidature = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Start candidature"),
         widget=SelectDateTime,
         required=True,
     )
     end_candidature = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("End candidature"),
         widget=SelectDateTime,
         required=True,
@@ -550,7 +540,7 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
         self.form = self.get_form()
         self.remove_fields()
         if (
-            request.user.is_authenticated()
+            request.user.is_authenticated
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):
@@ -594,7 +584,7 @@ class RoleUpdateView(CanEditMixin, UpdateView):
         self.form = self.get_form()
         self.remove_fields()
         if (
-            request.user.is_authenticated()
+            request.user.is_authenticated
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):

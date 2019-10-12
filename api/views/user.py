@@ -26,7 +26,7 @@ import datetime
 
 from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 
 from core.models import User
 
@@ -57,7 +57,7 @@ class UserViewSet(RightModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.filter(is_active=True)
 
-    @list_route()
+    @action(detail=False)
     def birthday(self, request):
         """
             Return all users born today (api/v1/user/birstdays)

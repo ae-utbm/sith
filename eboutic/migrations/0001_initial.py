@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import accounting.models
 from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -27,6 +28,7 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="user",
                         to=settings.AUTH_USER_MODEL,
                         related_name="baskets",
@@ -62,7 +64,10 @@ class Migration(migrations.Migration):
                 (
                     "basket",
                     models.ForeignKey(
-                        verbose_name="basket", to="eboutic.Basket", related_name="items"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        verbose_name="basket",
+                        to="eboutic.Basket",
+                        related_name="items",
                     ),
                 ),
             ],
@@ -88,6 +93,7 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="user",
                         to=settings.AUTH_USER_MODEL,
                         related_name="invoices",
@@ -123,6 +129,7 @@ class Migration(migrations.Migration):
                 (
                     "invoice",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="invoice",
                         to="eboutic.Invoice",
                         related_name="items",

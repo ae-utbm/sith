@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -32,6 +33,7 @@ class Migration(migrations.Migration):
                 (
                     "product",
                     models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="product",
                         related_name="eticket",
                         to="counter.Product",

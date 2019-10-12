@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import club.models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -14,6 +15,7 @@ class Migration(migrations.Migration):
             model_name="club",
             name="owner_group",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 default=club.models.Club.get_default_owner_group,
                 related_name="owned_club",
                 to="core.Group",

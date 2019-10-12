@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -56,6 +57,7 @@ class Migration(migrations.Migration):
                 (
                     "author",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         to=settings.AUTH_USER_MODEL,
                         verbose_name="author",
                         related_name="owned_weekmail_articles",
@@ -64,6 +66,7 @@ class Migration(migrations.Migration):
                 (
                     "club",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         to="club.Club",
                         verbose_name="club",
                         related_name="weekmail_articles",
@@ -72,6 +75,7 @@ class Migration(migrations.Migration):
                 (
                     "weekmail",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         to="com.Weekmail",
                         verbose_name="weekmail",
                         related_name="articles",

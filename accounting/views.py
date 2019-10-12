@@ -24,7 +24,7 @@
 
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import modelform_factory
 from django.core.exceptions import PermissionDenied, ValidationError

@@ -24,7 +24,7 @@
 
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, RedirectView, TemplateView, View
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.utils.translation import ugettext_lazy as _

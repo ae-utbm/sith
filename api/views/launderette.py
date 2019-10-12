@@ -24,7 +24,7 @@
 
 from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 
 from launderette.models import Launderette, Machine, Token
 
@@ -96,7 +96,7 @@ class LaunderetteTokenViewSet(RightModelViewSet):
     serializer_class = LaunderetteTokenSerializer
     queryset = Token.objects.all()
 
-    @list_route()
+    @action(detail=False)
     def washing(self, request):
         """
             Return all washing tokens (api/v1/launderette/token/washing)
@@ -105,7 +105,7 @@ class LaunderetteTokenViewSet(RightModelViewSet):
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
 
-    @list_route()
+    @action(detail=False)
     def drying(self, request):
         """
             Return all drying tokens (api/v1/launderette/token/drying)
@@ -114,7 +114,7 @@ class LaunderetteTokenViewSet(RightModelViewSet):
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
 
-    @list_route()
+    @action(detail=False)
     def avaliable(self, request):
         """
             Return all avaliable tokens (api/v1/launderette/token/avaliable)
@@ -125,7 +125,7 @@ class LaunderetteTokenViewSet(RightModelViewSet):
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
 
-    @list_route()
+    @action(detail=False)
     def unavaliable(self, request):
         """
             Return all unavaliable tokens (api/v1/launderette/token/unavaliable)

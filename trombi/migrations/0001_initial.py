@@ -51,7 +51,14 @@ class Migration(migrations.Migration):
                         verbose_name="maximum characters",
                     ),
                 ),
-                ("club", models.OneToOneField(to="club.Club", related_name="trombi")),
+                (
+                    "club",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="club.Club",
+                        related_name="trombi",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -115,6 +122,7 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="trombi user",
                         to=settings.AUTH_USER_MODEL,
                         related_name="trombi_user",
@@ -126,6 +134,7 @@ class Migration(migrations.Migration):
             model_name="trombicomment",
             name="author",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 to="trombi.TrombiUser",
                 verbose_name="author",
                 related_name="given_comments",
@@ -135,6 +144,7 @@ class Migration(migrations.Migration):
             model_name="trombicomment",
             name="target",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 to="trombi.TrombiUser",
                 verbose_name="target",
                 related_name="received_comments",

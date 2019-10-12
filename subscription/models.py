@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.forms import PasswordResetForm
 
 from dateutil.relativedelta import relativedelta
@@ -50,7 +50,9 @@ def validate_payment(value):
 
 
 class Subscription(models.Model):
-    member = models.ForeignKey(User, related_name="subscriptions")
+    member = models.ForeignKey(
+        User, related_name="subscriptions", on_delete=models.CASCADE
+    )
     subscription_type = models.CharField(
         _("subscription type"),
         max_length=255,

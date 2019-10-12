@@ -29,6 +29,7 @@ class Migration(migrations.Migration):
                         related_name="labels",
                         verbose_name="club account",
                         to="accounting.ClubAccount",
+                        on_delete=django.db.models.deletion.CASCADE,
                     ),
                 ),
             ],

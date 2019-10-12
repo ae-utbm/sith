@@ -28,7 +28,7 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.core.mail import EmailMultiAlternatives
@@ -71,13 +71,22 @@ class News(models.Model):
     type = models.CharField(
         _("type"), max_length=16, choices=NEWS_TYPES, default="EVENT"
     )
-    club = models.ForeignKey(Club, related_name="news", verbose_name=_("club"))
+    club = models.ForeignKey(
+        Club, related_name="news", verbose_name=_("club"), on_delete=models.CASCADE
+    )
     author = models.ForeignKey(
-        User, related_name="owned_news", verbose_name=_("author")
+        User,
+        related_name="owned_news",
+        verbose_name=_("author"),
+        on_delete=models.CASCADE,
     )
     is_moderated = models.BooleanField(_("is moderated"), default=False)
     moderator = models.ForeignKey(
-        User, related_name="moderated_news", verbose_name=_("moderator"), null=True
+        User,
+        related_name="moderated_news",
+        verbose_name=_("moderator"),
+        null=True,
+        on_delete=models.CASCADE,
     )
 
     def is_owned_by(self, user):
@@ -138,7 +147,12 @@ class NewsDate(models.Model):
     we don't have to make copies
     """
 
-    news = models.ForeignKey(News, related_name="dates", verbose_name=_("news_date"))
+    news = models.ForeignKey(
+        News,
+        related_name="dates",
+        verbose_name=_("news_date"),
+        on_delete=models.CASCADE,
+    )
     start_date = models.DateTimeField(_("start_date"), null=True, blank=True)
     end_date = models.DateTimeField(_("end_date"), null=True, blank=True)
 
@@ -230,15 +244,25 @@ class Weekmail(models.Model):
 
 class WeekmailArticle(models.Model):
     weekmail = models.ForeignKey(
-        Weekmail, related_name="articles", verbose_name=_("weekmail"), null=True
+        Weekmail,
+        related_name="articles",
+        verbose_name=_("weekmail"),
+        null=True,
+        on_delete=models.CASCADE,
     )
     title = models.CharField(_("title"), max_length=64)
     content = models.TextField(_("content"))
     author = models.ForeignKey(
-        User, related_name="owned_weekmail_articles", verbose_name=_("author")
+        User,
+        related_name="owned_weekmail_articles",
+        verbose_name=_("author"),
+        on_delete=models.CASCADE,
     )
     club = models.ForeignKey(
-        Club, related_name="weekmail_articles", verbose_name=_("club")
+        Club,
+        related_name="weekmail_articles",
+        verbose_name=_("club"),
+        on_delete=models.CASCADE,
     )
     rank = models.IntegerField(_("rank"), default=-1)
 
@@ -271,7 +295,11 @@ class Poster(models.Model):
     )
     file = models.ImageField(_("file"), null=False, upload_to="com/posters")
     club = models.ForeignKey(
-        Club, related_name="posters", verbose_name=_("club"), null=False
+        Club,
+        related_name="posters",
+        verbose_name=_("club"),
+        null=False,
+        on_delete=models.CASCADE,
     )
     screens = models.ManyToManyField(Screen, related_name="posters")
     date_begin = models.DateTimeField(blank=False, null=False, default=timezone.now)
@@ -286,6 +314,7 @@ class Poster(models.Model):
         verbose_name=_("moderator"),
         null=True,
         blank=True,
+        on_delete=models.CASCADE,
     )
 
     def save(self, *args, **kwargs):

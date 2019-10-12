@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -18,6 +19,7 @@ class Migration(migrations.Migration):
             model_name="membership",
             name="user",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 verbose_name="user",
                 to=settings.AUTH_USER_MODEL,
                 related_name="membership",
@@ -34,6 +36,7 @@ class Migration(migrations.Migration):
             model_name="club",
             name="home",
             field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
                 blank=True,
                 null=True,
                 related_name="home_of_club",
@@ -45,14 +48,21 @@ class Migration(migrations.Migration):
             model_name="club",
             name="owner_group",
             field=models.ForeignKey(
-                default=1, to="core.Group", related_name="owned_club"
+                on_delete=django.db.models.deletion.CASCADE,
+                default=1,
+                to="core.Group",
+                related_name="owned_club",
             ),
         ),
         migrations.AddField(
             model_name="club",
             name="parent",
             field=models.ForeignKey(
-                null=True, to="club.Club", related_name="children", blank=True
+                on_delete=django.db.models.deletion.CASCADE,
+                null=True,
+                to="club.Club",
+                related_name="children",
+                blank=True,
             ),
         ),
         migrations.AddField(

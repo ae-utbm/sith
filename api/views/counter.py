@@ -24,7 +24,7 @@
 
 from rest_framework import serializers
 from rest_framework.response import Response
-from rest_framework.decorators import list_route
+from rest_framework.decorators import action
 
 from counter.models import Counter
 
@@ -51,7 +51,7 @@ class CounterViewSet(RightModelViewSet):
     serializer_class = CounterSerializer
     queryset = Counter.objects.all()
 
-    @list_route()
+    @action(detail=False)
     def bar(self, request):
         """
             Return all bars (api/v1/counter/bar/)

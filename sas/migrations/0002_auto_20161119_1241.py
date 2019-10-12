@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -28,12 +29,16 @@ class Migration(migrations.Migration):
                 (
                     "picture",
                     models.ForeignKey(
-                        related_name="people", to="sas.Picture", verbose_name="picture"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="people",
+                        to="sas.Picture",
+                        verbose_name="picture",
                     ),
                 ),
                 (
                     "user",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         related_name="pictures",
                         to=settings.AUTH_USER_MODEL,
                         verbose_name="user",

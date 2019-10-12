@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import core.models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -14,6 +15,7 @@ class Migration(migrations.Migration):
             model_name="page",
             name="owner_group",
             field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
                 verbose_name="owner group",
                 default=core.models.Page.get_default_owner_group,
                 related_name="owned_page",

@@ -29,7 +29,7 @@ from django.views.generic.edit import FormView
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.detail import SingleObjectMixin
 from django.http.response import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django import forms
 
 from core.models import User
@@ -70,7 +70,11 @@ class SearchForm(forms.ModelForm):
         }
 
     sex = forms.ChoiceField(
-        [("MAN", _("Man")), ("WOMAN", _("Woman")), ("INDIFFERENT", _("Indifferent"))],
+        choices=[
+            ("MAN", _("Man")),
+            ("WOMAN", _("Woman")),
+            ("INDIFFERENT", _("Indifferent")),
+        ],
         widget=forms.RadioSelect,
         initial="INDIFFERENT",
         label=_("Sex"),

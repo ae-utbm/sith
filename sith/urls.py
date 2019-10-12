@@ -37,11 +37,11 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from django.contrib import admin
-from django.conf.urls.static import static
 from django.conf import settings
-from django.views.i18n import javascript_catalog
+from django.conf.urls.static import static
+from django.views.i18n import JavaScriptCatalog
 from ajax_select import urls as ajax_select_urls
 
 js_info_dict = {"packages": ("sith",)}
@@ -51,48 +51,43 @@ handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
 
 urlpatterns = [
-    url(r"^", include("core.urls", namespace="core", app_name="core")),
-    url(
-        r"^rootplace/",
-        include("rootplace.urls", namespace="rootplace", app_name="rootplace"),
+    re_path(r"^", include(("core.urls", "core"), namespace="core")),
+    re_path(
+        r"^rootplace/", include(("rootplace.urls", "rootplace"), namespace="rootplace")
     ),
-    url(
+    re_path(
         r"^subscription/",
-        include("subscription.urls", namespace="subscription", app_name="subscription"),
+        include(("subscription.urls", "subscription"), namespace="subscription"),
     ),
-    url(r"^com/", include("com.urls", namespace="com", app_name="com")),
-    url(r"^club/", include("club.urls", namespace="club", app_name="club")),
-    url(r"^counter/", include("counter.urls", namespace="counter", app_name="counter")),
-    url(r"^stock/", include("stock.urls", namespace="stock", app_name="stock")),
-    url(
+    re_path(r"^com/", include(("com.urls", "com"), namespace="com")),
+    re_path(r"^club/", include(("club.urls", "club"), namespace="club")),
+    re_path(r"^counter/", include(("counter.urls", "counter"), namespace="counter")),
+    re_path(r"^stock/", include(("stock.urls", "stock"), namespace="stock")),
+    re_path(
         r"^accounting/",
-        include("accounting.urls", namespace="accounting", app_name="accounting"),
+        include(("accounting.urls", "accounting"), namespace="accounting"),
     ),
-    url(r"^eboutic/", include("eboutic.urls", namespace="eboutic", app_name="eboutic")),
-    url(
+    re_path(r"^eboutic/", include(("eboutic.urls", "eboutic"), namespace="eboutic")),
+    re_path(
         r"^launderette/",
-        include("launderette.urls", namespace="launderette", app_name="launderette"),
+        include(("launderette.urls", "launderette"), namespace="launderette"),
     ),
-    url(r"^sas/", include("sas.urls", namespace="sas", app_name="sas")),
-    url(r"^api/v1/", include("api.urls", namespace="api", app_name="api")),
-    url(
-        r"^election/",
-        include("election.urls", namespace="election", app_name="election"),
+    re_path(r"^sas/", include(("sas.urls", "sas"), namespace="sas")),
+    re_path(r"^api/v1/", include(("api.urls", "api"), namespace="api")),
+    re_path(
+        r"^election/", include(("election.urls", "election"), namespace="election")
     ),
-    url(r"^forum/", include("forum.urls", namespace="forum", app_name="forum")),
-    url(r"^trombi/", include("trombi.urls", namespace="trombi", app_name="trombi")),
-    url(
-        r"^matmatronch/", include("matmat.urls", namespace="matmat", app_name="matmat")
+    re_path(r"^forum/", include(("forum.urls", "forum"), namespace="forum")),
+    re_path(r"^trombi/", include(("trombi.urls", "trombi"), namespace="trombi")),
+    re_path(r"^matmatronch/", include(("matmat.urls", "matmat"), namespace="matmat")),
+    re_path(
+        r"^pedagogy/", include(("pedagogy.urls", "pedagogy"), namespace="pedagogy")
     ),
-    url(
-        r"^pedagogy/",
-        include("pedagogy.urls", namespace="pedagogy", app_name="pedagogy"),
-    ),
-    url(r"^admin/", include(admin.site.urls)),
-    url(r"^ajax_select/", include(ajax_select_urls)),
-    url(r"^i18n/", include("django.conf.urls.i18n")),
-    url(r"^jsi18n/$", javascript_catalog, js_info_dict, name="javascript-catalog"),
-    url(r"^captcha/", include("captcha.urls")),
+    re_path(r"^admin/", admin.site.urls),
+    re_path(r"^ajax_select/", include(ajax_select_urls)),
+    re_path(r"^i18n/", include("django.conf.urls.i18n")),
+    re_path(r"^jsi18n/$", JavaScriptCatalog.as_view(), name="javascript-catalog"),
+    re_path(r"^captcha/", include("captcha.urls")),
 ]
 
 if settings.DEBUG:
@@ -100,4 +95,4 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     import debug_toolbar
 
-    urlpatterns += [url(r"^__debug__/", include(debug_toolbar.urls))]
+    urlpatterns += [re_path(r"^__debug__/", include(debug_toolbar.urls))]

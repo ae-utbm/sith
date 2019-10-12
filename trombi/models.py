@@ -24,7 +24,7 @@
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
@@ -80,7 +80,7 @@ class Trombi(models.Model):
     show_profiles = models.BooleanField(
         _("show users profiles to each other"), default=True
     )
-    club = models.OneToOneField(Club, related_name="trombi")
+    club = models.OneToOneField(Club, related_name="trombi", on_delete=models.CASCADE)
 
     objects = TrombiManager()
     availables = AvailableTrombiManager()
@@ -117,7 +117,10 @@ class TrombiUser(models.Model):
     """
 
     user = models.OneToOneField(
-        User, verbose_name=_("trombi user"), related_name="trombi_user"
+        User,
+        verbose_name=_("trombi user"),
+        related_name="trombi_user",
+        on_delete=models.CASCADE,
     )
     trombi = models.ForeignKey(
         Trombi,
@@ -180,10 +183,16 @@ class TrombiComment(models.Model):
     """
 
     author = models.ForeignKey(
-        TrombiUser, verbose_name=_("author"), related_name="given_comments"
+        TrombiUser,
+        verbose_name=_("author"),
+        related_name="given_comments",
+        on_delete=models.CASCADE,
     )
     target = models.ForeignKey(
-        TrombiUser, verbose_name=_("target"), related_name="received_comments"
+        TrombiUser,
+        verbose_name=_("target"),
+        related_name="received_comments",
+        on_delete=models.CASCADE,
     )
     content = models.TextField(_("content"), default="")
     is_moderated = models.BooleanField(_("is the comment moderated"), default=False)
@@ -200,7 +209,10 @@ class TrombiClubMembership(models.Model):
     """
 
     user = models.ForeignKey(
-        TrombiUser, verbose_name=_("user"), related_name="memberships"
+        TrombiUser,
+        verbose_name=_("user"),
+        related_name="memberships",
+        on_delete=models.CASCADE,
     )
     club = models.CharField(_("club"), max_length=32, default="")
     role = models.CharField(_("role"), max_length=64, default="")

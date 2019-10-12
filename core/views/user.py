@@ -26,8 +26,9 @@
 # This file contains all the views that concern the user model
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import views
+from django.contrib.auth.forms import PasswordChangeForm
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpResponse
 from django.views.generic.edit import UpdateView
@@ -40,7 +41,7 @@ from django.views.generic import (
 )
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.template.response import TemplateResponse
 from django.conf import settings
 from django.views.generic.dates import YearMixin, MonthMixin
@@ -69,15 +70,31 @@ from counter.views import StudentCardForm
 from trombi.views import UserTrombiForm
 
 
-def login(request):
+class SithLoginView(views.LoginView):
     """
-    The login view
+    The login View
+    """
 
-    Needs to be improve with correct handling of form exceptions
+    template_name = "core/login.jinja"
+    authentication_form = LoginForm
+    form_class = PasswordChangeForm
+
+
+class SithPasswordChangeView(views.PasswordChangeView):
     """
-    return views.login(
-        request, template_name="core/login.jinja", authentication_form=LoginForm
-    )
+    Allows a user to change its password
+    """
+
+    template_name = "core/password_change.jinja"
+    success_url = reverse_lazy("core:password_change_done")
+
+
+class SithPasswordChangeDoneView(views.PasswordChangeDoneView):
+    """
+    Allows a user to change its password
+    """
+
+    template_name = "core/password_change_done.jinja"
 
 
 def logout(request):
@@ -85,26 +102,6 @@ def logout(request):
     The logout view
     """
     return views.logout_then_login(request)
-
-
-def password_change(request):
-    """
-    Allows a user to change its password
-    """
-    return views.password_change(
-        request,
-        template_name="core/password_change.jinja",
-        post_change_redirect=reverse("core:password_change_done"),
-    )
-
-
-def password_change_done(request):
-    """
-    Allows a user to change its password
-    """
-    return views.password_change_done(
-        request, template_name="core/password_change_done.jinja"
-    )
 
 
 def password_root_change(request, user_id):
@@ -128,47 +125,39 @@ def password_root_change(request, user_id):
     )
 
 
-def password_reset(request):
+class SithPasswordResetView(views.PasswordResetView):
     """
     Allows someone to enter an email adresse for resetting password
     """
-    return views.password_reset(
-        request,
-        template_name="core/password_reset.jinja",
-        email_template_name="core/password_reset_email.jinja",
-        post_reset_redirect="core:password_reset_done",
-    )
+
+    template_name = "core/password_reset.jinja"
+    email_template_name = "core/password_reset_email.jinja"
+    success_url = reverse_lazy("core:password_reset_done")
 
 
-def password_reset_done(request):
+class SithPasswordResetDoneView(views.PasswordResetDoneView):
     """
     Confirm that the reset email has been sent
     """
-    return views.password_reset_done(
-        request, template_name="core/password_reset_done.jinja"
-    )
+
+    template_name = "core/password_reset_done.jinja"
 
 
-def password_reset_confirm(request, uidb64=None, token=None):
+class SithPasswordResetConfirmView(views.PasswordResetConfirmView):
     """
-    Provide a reset password formular
+    Provide a reset password form
     """
-    return views.password_reset_confirm(
-        request,
-        uidb64=uidb64,
-        token=token,
-        post_reset_redirect="core:password_reset_complete",
-        template_name="core/password_reset_confirm.jinja",
-    )
+
+    template_name = "core/password_reset_confirm.jinja"
+    success_url = reverse_lazy("core:password_reset_complete")
 
 
-def password_reset_complete(request):
+class SithPasswordResetCompleteView(views.PasswordResetCompleteView):
     """
     Confirm the password has sucessfully been reset
     """
-    return views.password_reset_complete(
-        request, template_name="core/password_reset_complete.jinja"
-    )
+
+    template_name = "core/password_reset_complete.jinja"
 
 
 def register(request):
@@ -641,7 +630,7 @@ class UserUploadProfilePictView(CanEditMixin, DetailView):
             owner=self.object,
             is_folder=False,
             mime_type=f.content_type,
-            size=f._size,
+            size=f.size,
         )
         new_file.file.name = name
         new_file.save()
@@ -689,7 +678,7 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
         files = request.FILES.items()
         self.form.process(files)
         if (
-            request.user.is_authenticated()
+            request.user.is_authenticated
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):

@@ -20,14 +20,14 @@
             {% for k,v in statement.items() %}
             <tr>
                 <td>{{ k }}</td>
-                <td>{{ v }}</td>
+                <td>{{ "%.2f" % v }}</td>
             </tr>
             {% endfor %}
         </tbody>
 
     </table>
 
-    <p><strong>{% trans %}Amount: {% endtrans %}</strong>{{ object.amount }} €</p>
-    <p><strong>{% trans %}Effective amount: {% endtrans %}</strong>{{ object.effective_amount }} €</p>
+    <p><strong>{% trans %}Amount: {% endtrans %}</strong>{{ "%.2f" % object.amount }} €</p>
+    <p><strong>{% trans %}Effective amount: {% endtrans %}</strong>{{ "%.2f" %object.effective_amount }} €</p>
 </div>
 {% endblock %}

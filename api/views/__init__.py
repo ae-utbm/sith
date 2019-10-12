@@ -25,7 +25,7 @@
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.core.exceptions import PermissionDenied
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import action
 from django.db.models.query import QuerySet
 
 from core.views import can_view, can_edit
@@ -46,7 +46,7 @@ def check_if(obj, user, test):
 
 
 class ManageModelMixin:
-    @detail_route()
+    @action(detail=True)
     def id(self, request, pk=None):
         """
             Get by id (api/v1/router/{pk}/id/)

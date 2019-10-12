@@ -32,7 +32,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django import forms
 
@@ -109,7 +109,7 @@ class AddFilesForm(forms.Form):
                 owner=owner,
                 is_folder=False,
                 mime_type=f.content_type,
-                size=f._size,
+                size=f.size,
             )
             try:
                 new_file.clean()
@@ -289,7 +289,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         self.form = self.get_form()  # The form handle only the file upload
         files = request.FILES.getlist("file_field")
         if (
-            request.user.is_authenticated()
+            request.user.is_authenticated
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):

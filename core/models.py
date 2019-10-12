@@ -38,7 +38,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core import validators
 from django.core.exceptions import ValidationError, PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.db import transaction
 from django.contrib.staticfiles.storage import staticfiles_storage
@@ -743,7 +743,9 @@ class AnonymousUser(AuthAnonymousUser):
 
 
 class Preferences(models.Model):
-    user = models.OneToOneField(User, related_name="_preferences")
+    user = models.OneToOneField(
+        User, related_name="_preferences", on_delete=models.CASCADE
+    )
     receive_weekmail = models.BooleanField(
         _("do you want to receive the weekmail"), default=False
     )
@@ -777,7 +779,12 @@ def get_thumbnail_directory(instance, filename):
 class SithFile(models.Model):
     name = models.CharField(_("file name"), max_length=256, blank=False)
     parent = models.ForeignKey(
-        "self", related_name="children", verbose_name=_("parent"), null=True, blank=True
+        "self",
+        related_name="children",
+        verbose_name=_("parent"),
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
     file = models.FileField(
         upload_to=get_directory,
@@ -800,7 +807,12 @@ class SithFile(models.Model):
         null=True,
         blank=True,
     )
-    owner = models.ForeignKey(User, related_name="owned_files", verbose_name=_("owner"))
+    owner = models.ForeignKey(
+        User,
+        related_name="owned_files",
+        verbose_name=_("owner"),
+        on_delete=models.CASCADE,
+    )
     edit_groups = models.ManyToManyField(
         Group, related_name="editable_files", verbose_name=_("edit group"), blank=True
     )
@@ -818,6 +830,7 @@ class SithFile(models.Model):
         verbose_name=_("owner"),
         null=True,
         blank=True,
+        on_delete=models.CASCADE,
     )
     asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
     is_in_sas = models.BooleanField(
@@ -935,8 +948,8 @@ class SithFile(models.Model):
     def copy_rights(self):
         """Copy, if possible, the rights of the parent folder"""
         if self.parent is not None:
-            self.edit_groups = self.parent.edit_groups.all()
-            self.view_groups = self.parent.view_groups.all()
+            self.edit_groups.set(self.parent.edit_groups.all())
+            self.view_groups.set(self.parent.view_groups.all())
             self.save()
 
     def move_to(self, parent):
@@ -1133,6 +1146,7 @@ class Page(models.Model):
         related_name="owned_page",
         verbose_name=_("owner group"),
         default=get_default_owner_group,
+        on_delete=models.CASCADE,
     )
     edit_groups = models.ManyToManyField(
         Group, related_name="editable_page", verbose_name=_("edit group"), blank=True
@@ -1147,6 +1161,7 @@ class Page(models.Model):
         blank=True,
         null=True,
         default=None,
+        on_delete=models.CASCADE,
     )
     lock_timeout = models.DateTimeField(
         _("lock_timeout"), null=True, blank=True, default=None
@@ -1156,7 +1171,6 @@ class Page(models.Model):
         unique_together = ("name", "parent")
         permissions = (
             ("change_prop_page", "Can change the page's properties (groups, ...)"),
-            ("view_page", "Can view the page"),
         )
 
     @staticmethod
@@ -1347,8 +1361,8 @@ class PageRev(models.Model):
     title = models.CharField(_("page title"), max_length=255, blank=True)
     content = models.TextField(_("page content"), blank=True)
     date = models.DateTimeField(_("date"), auto_now=True)
-    author = models.ForeignKey(User, related_name="page_rev")
-    page = models.ForeignKey(Page, related_name="revisions")
+    author = models.ForeignKey(User, related_name="page_rev", on_delete=models.CASCADE)
+    page = models.ForeignKey(Page, related_name="revisions", on_delete=models.CASCADE)
 
     class Meta:
         ordering = ["date"]
@@ -1386,7 +1400,9 @@ class PageRev(models.Model):
 
 
 class Notification(models.Model):
-    user = models.ForeignKey(User, related_name="notifications")
+    user = models.ForeignKey(
+        User, related_name="notifications", on_delete=models.CASCADE
+    )
     url = models.CharField(_("url"), max_length=255)
     param = models.CharField(_("param"), max_length=128, default="")
     type = models.CharField(
@@ -1422,7 +1438,7 @@ class Notification(models.Model):
 class Gift(models.Model):
     label = models.CharField(_("label"), max_length=255)
     date = models.DateTimeField(_("date"), default=timezone.now)
-    user = models.ForeignKey(User, related_name="gifts")
+    user = models.ForeignKey(User, related_name="gifts", on_delete=models.CASCADE)
 
     def __str__(self):
         return "%s - %s" % (self.translated_label, self.date.strftime("%d %b %Y"))

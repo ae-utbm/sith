@@ -23,7 +23,7 @@
 #
 
 # This file contains all the views that concern the page model
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.forms.models import modelform_factory

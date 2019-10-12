@@ -28,7 +28,7 @@ from django.utils import timezone
 from django.core import validators
 from django.conf import settings
 from django.utils.functional import cached_property
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from rest_framework import serializers
 
@@ -61,6 +61,7 @@ class UV(models.Model):
         verbose_name=_("author"),
         null=False,
         blank=False,
+        on_delete=models.CASCADE,
     )
     credit_type = models.CharField(
         _("credit type"),
@@ -210,8 +211,11 @@ class UVComment(models.Model):
         verbose_name=_("author"),
         null=False,
         blank=False,
+        on_delete=models.CASCADE,
     )
-    uv = models.ForeignKey(UV, related_name="comments", verbose_name=_("uv"))
+    uv = models.ForeignKey(
+        UV, related_name="comments", verbose_name=_("uv"), on_delete=models.CASCADE
+    )
     comment = models.TextField(_("comment"), blank=True)
     grade_global = models.IntegerField(
         _("global grade"),
@@ -283,8 +287,12 @@ class UVResult(models.Model):
              a semester (P/A)20xx
     """
 
-    uv = models.ForeignKey(UV, related_name="results", verbose_name=_("uv"))
-    user = models.ForeignKey(User, related_name="uv_results", verbose_name=("user"))
+    uv = models.ForeignKey(
+        UV, related_name="results", verbose_name=_("uv"), on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        User, related_name="uv_results", verbose_name=("user"), on_delete=models.CASCADE
+    )
     grade = models.CharField(
         _("grade"),
         max_length=10,
@@ -310,7 +318,10 @@ class UVCommentReport(models.Model):
         on_delete=models.CASCADE,
     )
     reporter = models.ForeignKey(
-        User, related_name="reported_uv_comment", verbose_name=_("reporter")
+        User,
+        related_name="reported_uv_comment",
+        verbose_name=_("reporter"),
+        on_delete=models.CASCADE,
     )
     reason = models.TextField(_("reason"))
 

@@ -5,6 +5,7 @@ from django.db import migrations, models
 from django.conf import settings
 import re
 import django.core.validators
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -51,12 +52,16 @@ class Migration(migrations.Migration):
                 (
                     "club",
                     models.ForeignKey(
-                        verbose_name="Club", related_name="mailings", to="club.Club"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        verbose_name="Club",
+                        related_name="mailings",
+                        to="club.Club",
                     ),
                 ),
                 (
                     "moderator",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         null=True,
                         verbose_name="moderator",
                         related_name="moderated_mailings",
@@ -84,6 +89,7 @@ class Migration(migrations.Migration):
                 (
                     "mailing",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="Mailing",
                         related_name="subscriptions",
                         to="club.Mailing",
@@ -92,6 +98,7 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         null=True,
                         verbose_name="User",
                         related_name="mailing_subscriptions",

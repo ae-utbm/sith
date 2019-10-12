@@ -30,7 +30,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, BaseFormView
 from django.utils.translation import ugettext as _
 from django.utils import dateparse, timezone
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.conf import settings
 from django.db import transaction, DataError
 from django import forms
@@ -84,7 +84,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
             self.object = self.get_object()
             if "slot_type" in request.POST.keys():
                 self.slot_type = request.POST["slot_type"]
-            if "slot" in request.POST.keys() and request.user.is_authenticated():
+            if "slot" in request.POST.keys() and request.user.is_authenticated:
                 self.subscriber = request.user
                 if self.subscriber.is_subscribed:
                     self.date = dateparse.parse_datetime(request.POST["slot"]).replace(

@@ -25,7 +25,7 @@
 import os
 import re
 from mistune import Renderer, InlineGrammar, InlineLexer, Markdown, escape, escape_link
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 
 class SithRenderer(Renderer):

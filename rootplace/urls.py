@@ -22,13 +22,13 @@
 #
 #
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from rootplace.views import *
 
 urlpatterns = [
-    url(r"^merge$", MergeUsersView.as_view(), name="merge"),
-    url(
+    re_path(r"^merge$", MergeUsersView.as_view(), name="merge"),
+    re_path(
         r"^forum/messages/delete$",
         DeleteAllForumUserMessagesView.as_view(),
         name="delete_forum_messages",

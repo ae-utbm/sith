@@ -86,6 +86,7 @@ class Migration(migrations.Migration):
                 (
                     "counter",
                     models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="counter",
                         related_name="stock",
                         to="counter.Counter",
@@ -132,7 +133,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "stock_owner",
-                    models.ForeignKey(related_name="items", to="stock.Stock"),
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="items",
+                        to="stock.Stock",
+                    ),
                 ),
                 (
                     "type",
@@ -151,7 +156,10 @@ class Migration(migrations.Migration):
             model_name="shoppinglistitem",
             name="stockitem_owner",
             field=models.ForeignKey(
-                null=True, related_name="shopping_item", to="stock.StockItem"
+                on_delete=django.db.models.deletion.CASCADE,
+                null=True,
+                related_name="shopping_item",
+                to="stock.StockItem",
             ),
         ),
         migrations.AddField(
@@ -170,7 +178,10 @@ class Migration(migrations.Migration):
             model_name="shoppinglist",
             name="stock_owner",
             field=models.ForeignKey(
-                null=True, related_name="shopping_lists", to="stock.Stock"
+                on_delete=django.db.models.deletion.CASCADE,
+                null=True,
+                related_name="shopping_lists",
+                to="stock.Stock",
             ),
         ),
     ]

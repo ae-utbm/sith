@@ -24,7 +24,7 @@
 
 from django.shortcuts import redirect
 from django.http import HttpResponse, Http404
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse
 from core.views.forms import SelectDate
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import UpdateView, FormMixin, FormView
@@ -78,7 +78,7 @@ class SASForm(forms.Form):
                 file=f,
                 owner=owner,
                 mime_type=f.content_type,
-                size=f._size,
+                size=f.size,
                 is_folder=False,
                 is_moderated=automodere,
             )
@@ -117,7 +117,7 @@ class SASMainView(FormView):
         parent = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
         files = request.FILES.getlist("images")
         root = User.objects.filter(username="root").first()
-        if request.user.is_authenticated() and request.user.is_in_group(
+        if request.user.is_authenticated and request.user.is_in_group(
             settings.SITH_GROUP_SAS_ADMIN_ID
         ):
             if self.form.is_valid():
@@ -176,7 +176,7 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
-        if request.user.is_authenticated() and request.user.was_subscribed:
+        if request.user.is_authenticated and request.user.was_subscribed:
             if self.form.is_valid():
                 for uid in self.form.cleaned_data["users"]:
                     u = User.objects.filter(id=uid).first()
@@ -233,7 +233,7 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
         self.form = self.get_form()
         parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist("images")
-        if request.user.is_authenticated() and request.user.is_subscribed:
+        if request.user.is_authenticated and request.user.is_subscribed:
             if self.form.is_valid():
                 self.form.process(
                     parent=parent,
@@ -279,7 +279,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
             FileView.handle_clipboard(request, self.object)
         parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist("images")
-        if request.user.is_authenticated() and request.user.is_subscribed:
+        if request.user.is_authenticated and request.user.is_subscribed:
             if self.form.is_valid():
                 self.form.process(
                     parent=parent,

@@ -66,7 +66,7 @@ class MailingForm(forms.Form):
         super(MailingForm, self).__init__(*args, **kwargs)
 
         self.fields["action"] = forms.TypedChoiceField(
-            (
+            choices=(
                 (self.ACTION_NEW_MAILING, _("New Mailing")),
                 (self.ACTION_NEW_SUBSCRIPTION, _("Subscribe")),
                 (self.ACTION_REMOVE_SUBSCRIPTION, _("Remove")),
@@ -159,13 +159,13 @@ class MailingForm(forms.Form):
 
 class SellingsFormBase(forms.Form):
     begin_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Begin date"),
         required=False,
         widget=SelectDateTime,
     )
     end_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("End date"),
         required=False,
         widget=SelectDateTime,

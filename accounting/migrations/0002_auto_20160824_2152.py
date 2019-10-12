@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -22,6 +23,7 @@ class Migration(migrations.Migration):
                 verbose_name="invoice",
                 to="core.SithFile",
                 blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
             ),
         ),
         migrations.AddField(
@@ -31,12 +33,14 @@ class Migration(migrations.Migration):
                 verbose_name="journal",
                 to="accounting.GeneralJournal",
                 related_name="operations",
+                on_delete=django.db.models.deletion.CASCADE,
             ),
         ),
         migrations.AddField(
             model_name="operation",
             name="linked_operation",
             field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
                 blank=True,
                 to="accounting.Operation",
                 null=True,
@@ -54,6 +58,7 @@ class Migration(migrations.Migration):
                 verbose_name="simple type",
                 to="accounting.SimplifiedAccountingType",
                 blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
             ),
         ),
         migrations.AddField(
@@ -63,6 +68,7 @@ class Migration(migrations.Migration):
                 verbose_name="club account",
                 to="accounting.ClubAccount",
                 related_name="journals",
+                on_delete=django.db.models.deletion.CASCADE,
             ),
         ),
         migrations.AddField(
@@ -72,20 +78,27 @@ class Migration(migrations.Migration):
                 verbose_name="bank account",
                 to="accounting.BankAccount",
                 related_name="club_accounts",
+                on_delete=django.db.models.deletion.CASCADE,
             ),
         ),
         migrations.AddField(
             model_name="clubaccount",
             name="club",
             field=models.ForeignKey(
-                verbose_name="club", to="club.Club", related_name="club_account"
+                verbose_name="club",
+                to="club.Club",
+                related_name="club_account",
+                on_delete=django.db.models.deletion.CASCADE,
             ),
         ),
         migrations.AddField(
             model_name="bankaccount",
             name="club",
             field=models.ForeignKey(
-                verbose_name="club", to="club.Club", related_name="bank_accounts"
+                verbose_name="club",
+                to="club.Club",
+                related_name="bank_accounts",
+                on_delete=django.db.models.deletion.CASCADE,
             ),
         ),
         migrations.AlterUniqueTogether(

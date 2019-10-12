@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.utils.timezone
 from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -48,12 +49,16 @@ class Migration(migrations.Migration):
                 (
                     "club",
                     models.ForeignKey(
-                        verbose_name="club", related_name="posters", to="club.Club"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        verbose_name="club",
+                        related_name="posters",
+                        to="club.Club",
                     ),
                 ),
                 (
                     "moderator",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         verbose_name="moderator",
                         blank=True,
                         null=True,

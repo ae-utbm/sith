@@ -23,7 +23,7 @@
 #
 
 from django.db import models
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -240,7 +240,12 @@ class PeoplePictureRelation(models.Model):
     """
 
     user = models.ForeignKey(
-        User, verbose_name=_("user"), related_name="pictures", null=False, blank=False
+        User,
+        verbose_name=_("user"),
+        related_name="pictures",
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
     )
     picture = models.ForeignKey(
         Picture,
@@ -248,6 +253,7 @@ class PeoplePictureRelation(models.Model):
         related_name="people",
         null=False,
         blank=False,
+        on_delete=models.CASCADE,
     )
 
     class Meta:

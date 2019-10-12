@@ -5,6 +5,7 @@ from django.db import migrations, models
 import accounting.models
 import django.db.models.deletion
 from django.conf import settings
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -42,7 +43,14 @@ class Migration(migrations.Migration):
                         verbose_name="counter type",
                     ),
                 ),
-                ("club", models.ForeignKey(to="club.Club", related_name="counters")),
+                (
+                    "club",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="club.Club",
+                        related_name="counters",
+                    ),
+                ),
                 (
                     "edit_groups",
                     models.ManyToManyField(
@@ -58,7 +66,10 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.OneToOneField(
-                        primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        serialize=False,
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
                 (
@@ -97,13 +108,17 @@ class Migration(migrations.Migration):
                 (
                     "counter",
                     models.ForeignKey(
-                        to="counter.Counter", related_name="permanencies"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="counter.Counter",
+                        related_name="permanencies",
                     ),
                 ),
                 (
                     "user",
                     models.ForeignKey(
-                        to=settings.AUTH_USER_MODEL, related_name="permanencies"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        related_name="permanencies",
                     ),
                 ),
             ],
@@ -169,7 +184,10 @@ class Migration(migrations.Migration):
                 (
                     "club",
                     models.ForeignKey(
-                        verbose_name="club", to="club.Club", related_name="products"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        verbose_name="club",
+                        to="club.Club",
+                        related_name="products",
                     ),
                 ),
                 (
@@ -268,15 +286,24 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "counter",
-                    models.ForeignKey(to="counter.Counter", related_name="refillings"),
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="counter.Counter",
+                        related_name="refillings",
+                    ),
                 ),
                 (
                     "customer",
-                    models.ForeignKey(to="counter.Customer", related_name="refillings"),
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="counter.Customer",
+                        related_name="refillings",
+                    ),
                 ),
                 (
                     "operator",
                     models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
                         to=settings.AUTH_USER_MODEL,
                         related_name="refillings_as_operator",
                     ),

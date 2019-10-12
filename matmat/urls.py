@@ -22,13 +22,13 @@
 #
 #
 
-from django.conf.urls import url
+from django.urls import re_path
 
 from matmat.views import *
 
 urlpatterns = [
-    url(r"^$", SearchNormalFormView.as_view(), name="search"),
-    url(r"^reverse$", SearchReverseFormView.as_view(), name="search_reverse"),
-    url(r"^quick$", SearchQuickFormView.as_view(), name="search_quick"),
-    url(r"^clear$", SearchClearFormView.as_view(), name="search_clear"),
+    re_path(r"^$", SearchNormalFormView.as_view(), name="search"),
+    re_path(r"^reverse$", SearchReverseFormView.as_view(), name="search_reverse"),
+    re_path(r"^quick$", SearchQuickFormView.as_view(), name="search_quick"),
+    re_path(r"^clear$", SearchClearFormView.as_view(), name="search_clear"),
 ]

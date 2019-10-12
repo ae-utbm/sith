@@ -111,7 +111,10 @@ class Role(OrderedModel):
     """
 
     election = models.ForeignKey(
-        Election, related_name="roles", verbose_name=_("election")
+        Election,
+        related_name="roles",
+        verbose_name=_("election"),
+        on_delete=models.CASCADE,
     )
     title = models.CharField(_("title"), max_length=255)
     description = models.TextField(_("description"), null=True, blank=True)
@@ -155,7 +158,10 @@ class ElectionList(models.Model):
 
     title = models.CharField(_("title"), max_length=255)
     election = models.ForeignKey(
-        Election, related_name="election_lists", verbose_name=_("election")
+        Election,
+        related_name="election_lists",
+        verbose_name=_("election"),
+        on_delete=models.CASCADE,
     )
 
     def can_be_edited_by(self, user):
@@ -175,13 +181,25 @@ class Candidature(models.Model):
     This class is a component of responsability
     """
 
-    role = models.ForeignKey(Role, related_name="candidatures", verbose_name=_("role"))
+    role = models.ForeignKey(
+        Role,
+        related_name="candidatures",
+        verbose_name=_("role"),
+        on_delete=models.CASCADE,
+    )
     user = models.ForeignKey(
-        User, verbose_name=_("user"), related_name="candidates", blank=True
+        User,
+        verbose_name=_("user"),
+        related_name="candidates",
+        blank=True,
+        on_delete=models.CASCADE,
     )
     program = models.TextField(_("description"), null=True, blank=True)
     election_list = models.ForeignKey(
-        ElectionList, related_name="candidatures", verbose_name=_("election list")
+        ElectionList,
+        related_name="candidatures",
+        verbose_name=_("election list"),
+        on_delete=models.CASCADE,
     )
 
     def delete(self):
@@ -201,7 +219,9 @@ class Vote(models.Model):
     This class allows to vote for candidates
     """
 
-    role = models.ForeignKey(Role, related_name="votes", verbose_name=_("role"))
+    role = models.ForeignKey(
+        Role, related_name="votes", verbose_name=_("role"), on_delete=models.CASCADE
+    )
     candidature = models.ManyToManyField(
         Candidature, related_name="votes", verbose_name=_("candidature")
     )

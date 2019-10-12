@@ -29,7 +29,7 @@ from django.views.generic import ListView, DetailView, View
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.conf import settings
@@ -74,14 +74,14 @@ class PosterForm(forms.ModelForm):
         widgets = {"screens": forms.CheckboxSelectMultiple}
 
     date_begin = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Start date"),
         widget=SelectDateTime,
         required=True,
         initial=timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
     date_end = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("End date"),
         widget=SelectDateTime,
         required=False,
@@ -200,19 +200,22 @@ class NewsForm(forms.ModelForm):
         }
 
     start_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Start date"),
         widget=SelectDateTime,
         required=False,
     )
     end_date = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"],
+        input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("End date"),
         widget=SelectDateTime,
         required=False,
     )
     until = forms.DateTimeField(
-        ["%Y-%m-%d %H:%M:%S"], label=_("Until"), widget=SelectDateTime, required=False
+        input_formats=["%Y-%m-%d %H:%M:%S"],
+        label=_("Until"),
+        widget=SelectDateTime,
+        required=False,
     )
     automoderation = forms.BooleanField(label=_("Automoderation"), required=False)
 

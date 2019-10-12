@@ -24,7 +24,7 @@
 
 from django.test import TestCase
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.management import call_command
 from django.utils import html
 from django.utils.translation import ugettext as _
@@ -62,7 +62,7 @@ class ComTest(TestCase):
         self.com_group = RealGroup.objects.filter(
             id=settings.SITH_GROUP_COM_ADMIN_ID
         ).first()
-        self.skia.groups = [self.com_group]
+        self.skia.groups.set([self.com_group])
         self.skia.save()
         self.client.login(username=self.skia.username, password="plop")
 

@@ -29,7 +29,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from django.core.validators import RegexValidator, validate_email
 from django.utils.functional import cached_property
@@ -46,7 +46,9 @@ class Club(models.Model):
 
     id = models.AutoField(primary_key=True, db_index=True)
     name = models.CharField(_("name"), max_length=64)
-    parent = models.ForeignKey("Club", related_name="children", null=True, blank=True)
+    parent = models.ForeignKey(
+        "Club", related_name="children", null=True, blank=True, on_delete=models.CASCADE
+    )
     unix_name = models.CharField(
         _("unix name"),
         max_length=30,
@@ -75,7 +77,10 @@ class Club(models.Model):
         return settings.SITH_GROUP_ROOT_ID
 
     owner_group = models.ForeignKey(
-        Group, related_name="owned_club", default=get_default_owner_group
+        Group,
+        related_name="owned_club",
+        default=get_default_owner_group,
+        on_delete=models.CASCADE,
     )
     edit_groups = models.ManyToManyField(
         Group, related_name="editable_club", blank=True
@@ -91,7 +96,9 @@ class Club(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    page = models.OneToOneField(Page, related_name="club", blank=True, null=True)
+    page = models.OneToOneField(
+        Page, related_name="club", blank=True, null=True, on_delete=models.CASCADE
+    )
 
     class Meta:
         ordering = ["name", "unix_name"]
@@ -183,8 +190,8 @@ class Club(models.Model):
                     name=settings.SITH_MAIN_MEMBERS_GROUP
                 ).first()
                 self.make_home()
-                self.home.edit_groups = [board]
-                self.home.view_groups = [member, subscribers]
+                self.home.edit_groups.set([board])
+                self.home.view_groups.set([member, subscribers])
                 self.home.save()
             self.make_page()
 
@@ -261,9 +268,15 @@ class Membership(models.Model):
         related_name="memberships",
         null=False,
         blank=False,
+        on_delete=models.CASCADE,
     )
     club = models.ForeignKey(
-        Club, verbose_name=_("club"), related_name="members", null=False, blank=False
+        Club,
+        verbose_name=_("club"),
+        related_name="members",
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
     )
     start_date = models.DateField(_("start date"), default=timezone.now)
     end_date = models.DateField(_("end date"), null=True, blank=True)
@@ -317,7 +330,12 @@ class Mailing(models.Model):
     """
 
     club = models.ForeignKey(
-        Club, verbose_name=_("Club"), related_name="mailings", null=False, blank=False
+        Club,
+        verbose_name=_("Club"),
+        related_name="mailings",
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
     )
     email = models.CharField(
         _("Email address"),
@@ -334,7 +352,11 @@ class Mailing(models.Model):
     )
     is_moderated = models.BooleanField(_("is moderated"), default=False)
     moderator = models.ForeignKey(
-        User, related_name="moderated_mailings", verbose_name=_("moderator"), null=True
+        User,
+        related_name="moderated_mailings",
+        verbose_name=_("moderator"),
+        null=True,
+        on_delete=models.CASCADE,
     )
 
     def clean(self):
@@ -409,6 +431,7 @@ class MailingSubscription(models.Model):
         related_name="subscriptions",
         null=False,
         blank=False,
+        on_delete=models.CASCADE,
     )
     user = models.ForeignKey(
         User,
@@ -416,6 +439,7 @@ class MailingSubscription(models.Model):
         related_name="mailing_subscriptions",
         null=True,
         blank=True,
+        on_delete=models.CASCADE,
     )
     email = models.EmailField(_("Email address"), blank=False, null=False)
 

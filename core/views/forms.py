@@ -27,7 +27,7 @@ from django import forms
 from django.conf import settings
 from django.db import transaction
 from django.templatetags.static import static
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.forms import (
     CheckboxSelectMultiple,
@@ -56,39 +56,39 @@ from PIL import Image
 
 
 class SelectSingle(Select):
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if attrs:
             attrs["class"] = "select_single"
         else:
             attrs = {"class": "select_single"}
-        return super(SelectSingle, self).render(name, value, attrs)
+        return super(SelectSingle, self).render(name, value, attrs, renderer)
 
 
 class SelectMultiple(Select):
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if attrs:
             attrs["class"] = "select_multiple"
         else:
             attrs = {"class": "select_multiple"}
-        return super(SelectMultiple, self).render(name, value, attrs)
+        return super(SelectMultiple, self).render(name, value, attrs, renderer)
 
 
 class SelectDateTime(DateTimeInput):
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if attrs:
             attrs["class"] = "select_datetime"
         else:
             attrs = {"class": "select_datetime"}
-        return super(SelectDateTime, self).render(name, value, attrs)
+        return super(SelectDateTime, self).render(name, value, attrs, renderer)
 
 
 class SelectDate(DateInput):
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if attrs:
             attrs["class"] = "select_date"
         else:
             attrs = {"class": "select_date"}
-        return super(SelectDate, self).render(name, value, attrs)
+        return super(SelectDate, self).render(name, value, attrs, renderer)
 
 
 class MarkdownInput(Textarea):
@@ -127,7 +127,7 @@ class MarkdownInput(Textarea):
 
 
 class SelectFile(TextInput):
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if attrs:
             attrs["class"] = "select_file"
         else:
@@ -135,7 +135,7 @@ class SelectFile(TextInput):
         output = (
             '%(content)s<div name="%(name)s" class="choose_file_widget" title="%(title)s"></div>'
             % {
-                "content": super(SelectFile, self).render(name, value, attrs),
+                "content": super(SelectFile, self).render(name, value, attrs, renderer),
                 "title": _("Choose file"),
                 "name": name,
             }
@@ -151,7 +151,7 @@ class SelectFile(TextInput):
 
 
 class SelectUser(TextInput):
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if attrs:
             attrs["class"] = "select_user"
         else:
@@ -159,7 +159,7 @@ class SelectUser(TextInput):
         output = (
             '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>'
             % {
-                "content": super(SelectUser, self).render(name, value, attrs),
+                "content": super(SelectUser, self).render(name, value, attrs, renderer),
                 "title": _("Choose user"),
                 "name": name,
             }
@@ -302,7 +302,7 @@ class UserProfileForm(forms.ModelForm):
                         owner=self.instance,
                         is_folder=False,
                         mime_type=f.content_type,
-                        size=f._size,
+                        size=f.size,
                         moderator=self.instance,
                         is_moderated=True,
                     )

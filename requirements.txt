@@ -1,11 +1,11 @@
 # Django 1.11 LTS is required
-Django >=1.11, <2.0
+Django >=2.2, <3.0
 Pillow
 mistune
 django-jinja
 pyopenssl
 pytz
-djangorestframework <3.10
+djangorestframework
 django-phonenumber-field
 phonenumbers
 django-ajax-selects
