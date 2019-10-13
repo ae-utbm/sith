@@ -25,7 +25,7 @@ All documentation is in the ``docs`` directory and online at https://sith-ae.rea
 If you want to contribute, here's how we recommend to read the docs:
 
 * First, it's advised to read the about part of the project to understand the goals and the mindset of the current and previous maintainers and know what to expect to learn.
-* If in the first part you find you need more background about what we use, we provide some links to tutorials and documentation at the end of our documentation. Feel free to use it and complete it with what you found helpful.
+* If in the first part you realize that you need more background about what we use, we provide some links to tutorials and documentation at the end of our documentation. Feel free to use it and complete it with what you found helpful.
 * Keep in mind that this documentation is thought to be read in order.
 
 To join our team :

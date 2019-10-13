@@ -63,6 +63,7 @@ Python et Django
 ~~~~~~~~~~~~~~~~
 
 * `Apprendre Python <https://openclassrooms.com/fr/courses/235344-apprenez-a-programmer-en-python>`__
+* `Apprendre Django <https://openclassrooms.com/fr/courses/1871271-developpez-votre-site-web-avec-le-framework-django>`__
 * `Documentation de Django <https://docs.djangoproject.com/fr/1.11/>`__
 * `Classy Class-Based Views <http://ccbv.co.uk/projects/Django/1.11/>`__
 

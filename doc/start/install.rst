@@ -7,12 +7,14 @@ Dépendances du système
 Certaines dépendances sont nécessaires niveau système :
 
 * virtualenv
-* limysqlclient
+* libmysqlclient
 * libssl
 * libjpeg
 * python3-xapian
 * zlib1g-dev
 * python3
+* gettext
+* graphviz
 * mysql-client (pour migrer de l'ancien site)
 
 Sur Ubuntu
@@ -20,8 +22,8 @@ Sur Ubuntu
 
 .. sourcecode:: bash
 
-	sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian gettext git
-	sudo pip3 install virtualenv
+    sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian gettext git
+    sudo pip3 install virtualenv
 
 Sur MacOS
 ~~~~~~~~~
@@ -30,26 +32,45 @@ Pour installer les dépendances, il est fortement recommandé d'installer le ges
 
 .. sourcecode:: bash
 
-	brew install git python xapian
-	pip install virtualenv
+    brew install git python xapian graphviz
+
+    # Si vous aviez une version de python ne venant pas de homebrew
+    brew link --overwrite python
+
+
+    # Pour bien configurer gettext
+    brew link gettext # (suivez bien les instructions supplémentaires affichées)
+
+    # Pour installer virtualenv
+    pip3 install virtualenv
+
+.. note::
+
+    Si vous rencontrez des erreurs lors de votre configuration, n'hésitez pas à vérifier l'état de votre installation homebrew avec :code:`brew doctor`
 
 Installer le projet
 -------------------
 
 .. sourcecode:: bash
 
-	git clone https://ae-dev.utbm.fr/ae/Sith.git
-	cd Sith
+    git clone https://ae-dev.utbm.fr/ae/Sith.git
+    cd Sith
 
-	# Prépare et active l'environnement du projet
-	virtualenv --system-site-packages --python=python3 env
-	source env/bin/activate
+    # Prépare et active l'environnement du projet
+    virtualenv --system-site-packages --python=python3 env
+    source env/bin/activate
 
-	# Installe les dépendances du projet
-	pip install -r requirements.txt
+    # Installe les dépendances du projet
+    pip install -r requirements.txt
 
-	# Prépare la base de donnée
-	./manage.py setup
+    # Si vous avez des problèmes avec graphiviz
+    pip install pygraphviz --install-option="--include-path=/usr/include/graphviz" --install-option="--library-path=/usr/lib/graphviz/"
+
+    # Prépare la base de donnée
+    ./manage.py setup
+
+    # Installe les traductions
+    ./manage compilemessages
 
 .. note::
 
@@ -62,8 +83,8 @@ Lorsqu'on souhaite développer pour le site, il est nécessaire de passer le log
 
 .. sourcecode:: bash
 
-	echo "DEBUG=True" > sith/settings_custom.py
-	echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
+    echo "DEBUG=True" > sith/settings_custom.py
+    echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
 
 Démarrer le serveur de développement
 ------------------------------------
@@ -72,11 +93,11 @@ Il faut toujours avoir préalablement activé l'environnement virtuel comme fait
 
 .. sourcecode:: bash
 
-	./manage.py runserver
+    ./manage.py runserver
 
 .. note::
 
-	Le serveur est alors accessible à l'adresse http://localhost:8000.
+    Le serveur est alors accessible à l'adresse http://localhost:8000.
 
 Générer la documentation
 ------------------------
@@ -87,7 +108,7 @@ Pour l'utiliser en local ou globalement pour la modifier, il existe une commande
 
 .. sourcecode:: bash
 
-	./manage.py documentation
+    ./manage.py documentation
 
 Lancer les tests
 ----------------
