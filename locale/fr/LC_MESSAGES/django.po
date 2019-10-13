@@ -2724,7 +2724,7 @@ msgstr ""
 
 #: core/templates/core/login.jinja:18
 msgid "Please login or create an account to see this page."
-msgstr "Merci de vous identifier ou vous créer un compte pour voir cette page."
+msgstr "Merci de vous identifier ou de créer un compte pour voir cette page."
 
 #: core/templates/core/login.jinja:28
 #: counter/templates/counter/counter_main.jinja:51
@@ -3822,7 +3822,7 @@ msgstr "Eticket acheté pour l'événement %(event)s"
 msgid ""
 "You bought an eticket for the event %(event)s.\n"
 "You can download it directly from this link %(eticket)s.\n"
-"You can also retreive all your e-tickets on your account page %(url)s."
+"You can also retrieve all your e-tickets on your account page %(url)s."
 msgstr ""
 "Vous avez acheté un e-ticket pour l'événement %(event)s.\n"
 "Vous pouvez le télécharger directement depuis ce lien: %(eticket)s.\n"
