@@ -106,9 +106,14 @@ La documentation est automatiquement mise en ligne sur readthedocs à chaque env
 
 Pour l'utiliser en local ou globalement pour la modifier, il existe une commande du site qui génère la documentation et lance un serveur la rendant accessible à l'adresse http://localhost:8080.
 
+Cette commande génère la documentation à chacune de ses modifications, inutile de relancer le serveur à chaque fois.
+
 .. sourcecode:: bash
 
     ./manage.py documentation
+
+    # Il est possible de spécifier un port et une adresse d'écoute différente
+    ./manage.py documentation adresse:port
 
 Lancer les tests
 ----------------
