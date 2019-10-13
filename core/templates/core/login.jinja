@@ -15,7 +15,7 @@
     <p>{% trans %}Your account doesn't have access to this page. To proceed,
     please login with an account that has access.{% endtrans %}</p>
     {% else %}
-    <p>{% trans %}Please login to see this page.{% endtrans %}</p>
+    <p>{% trans %}Please login or create an account to see this page.{% endtrans %}</p>
     {% endif %}
 {% endif %}
 
@@ -30,5 +30,6 @@
 
 {# Assumes you setup the password_reset view in your URLconf #}
 <p><a href="{{ url('core:password_reset') }}">{% trans %}Lost password?{% endtrans %}</a></p>
+<p><a href="{{ url('core:register') }}">{% trans %}Create account{% endtrans %}</a></p>
 
 {% endblock %}
