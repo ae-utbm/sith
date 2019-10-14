@@ -200,7 +200,7 @@ $( function() {
         keys.push(e.keyCode);
         if (keys.toString()==pattern) {
                 keys = [];
-                $("#right_column img").attr("src", "{{ static('core/img/yug.jpg') }}");
+                $("#user_profile_pictures_bigone img").attr("src", "{{ static('core/img/yug.jpg') }}");
         }
         if (keys.length==6) {
             keys.shift();
