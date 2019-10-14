@@ -490,7 +490,7 @@ class Selling(models.Model):
         event = self.product.eticket.event_title or _("Unknown event")
         subject = _("Eticket bought for the event %(event)s") % {"event": event}
         message_html = _(
-            "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
+            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
         ) % {
             "event": event,
             "url": "".join(
@@ -502,10 +502,23 @@ class Selling(models.Model):
                     "</a>",
                 )
             ),
+            "eticket": "".join(
+                (
+                    '<a href="',
+                    self.get_eticket_full_url(),
+                    '">',
+                    self.get_eticket_full_url(),
+                    "</a>",
+                )
+            ),
         }
         message_txt = _(
-            "You bought an eticket for the event %(event)s.\nYou can download it on this page %(url)s."
-        ) % {"event": event, "url": self.customer.get_full_url()}
+            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
+        ) % {
+            "event": event,
+            "url": self.customer.get_full_url(),
+            "eticket": self.get_eticket_full_url(),
+        }
         self.customer.user.email_user(subject, message_txt, html_message=message_html)
 
     def save(self, allow_negative=False, *args, **kwargs):
@@ -568,11 +581,6 @@ class Selling(models.Model):
                     start=sub.subscription_start,
                 )
                 sub.save()
-        try:
-            if self.product.eticket:
-                self.send_mail_customer()
-        except:
-            pass
         if self.customer.user.preferences.notify_on_click:
             Notification(
                 user=self.customer.user,
@@ -588,6 +596,16 @@ class Selling(models.Model):
                 type="SELLING",
             ).save()
         super(Selling, self).save(*args, **kwargs)
+        try:
+            # The product has no id until it's saved
+            if self.product.eticket:
+                self.send_mail_customer()
+        except:
+            pass
+
+    def get_eticket_full_url(self):
+        eticket_url = reverse("counter:eticket_pdf", kwargs={"selling_id": self.id})
+        return "".join(["https://", settings.SITH_URL, eticket_url])
 
 
 class Permanency(models.Model):
