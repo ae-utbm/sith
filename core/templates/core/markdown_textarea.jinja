@@ -188,13 +188,11 @@
 			}
 
 			submit.addEventListener('click', () => {
+				if (!submitPressed) {
+					easymde.codemirror.on('change', checkMarkdownInput)
+				}
 				submitPressed = true
 				checkMarkdownInput()
-			})
-			easymde.codemirror.on('change', () => {
-				if (submitPressed) {
-					checkMarkdownInput()
-				}
 			})
 		})
 	</script>
