@@ -14,14 +14,12 @@
 		}
 
 		// Custom markdown parser
-		function customMarkdownParser(plainText, preview) {
+		function customMarkdownParser(plainText, cb) {
 			$.ajax({
 				url: "{{ markdown_api_url }}",
 				method: "POST",
 				data: { text: plainText, csrfmiddlewaretoken: getCSRFToken() },
-			}).done(function (msg) {
-				preview.innerHTML = msg;
-			});
+			}).done(cb);
 		}
 
 		// Pretty markdown input
@@ -31,9 +29,9 @@
 			autoDownloadFontAwesome: false,
 			previewRender: function(plainText, preview){ // Async method
 				clearTimeout(lastAPICall);
-				lastAPICall = setTimeout(function (plainText, preview){
-					customMarkdownParser(plainText, preview);
-				}, 300, plainText, preview);
+				lastAPICall = setTimeout(() => {
+					customMarkdownParser(plainText, (msg) => preview.innerHTML = msg);
+				}, 300);
 				return preview.innerHTML;
 			},
 			forceSync: true, // Avoid validation error on generic create view
