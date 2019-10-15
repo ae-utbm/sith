@@ -166,5 +166,36 @@
 				},
 			]
 		});
+
+		$(function() {
+			let textarea = document.getElementById('{{ widget.attrs.id }}')
+			let submit = textarea
+				.closest('form')
+				.querySelector('input[type="submit"]')
+			let parentDiv = textarea.parentElement
+			let submitPressed = false
+
+			function checkMarkdownInput() {
+				// an attribute is null if it does not exist, else a string
+				let required = textarea.getAttribute('required') != null
+				let length = textarea.value.trim().length
+
+				if (required && length == 0) {
+					parentDiv.style.boxShadow = 'red 0px 0px 1.5px 1px'
+				} else {
+					parentDiv.style.boxShadow = ''
+				}
+			}
+
+			submit.addEventListener('click', () => {
+				submitPressed = true
+				checkMarkdownInput()
+			})
+			easymde.codemirror.on('change', () => {
+				if (submitPressed) {
+					checkMarkdownInput()
+				}
+			})
+		})
 	</script>
 </div>
