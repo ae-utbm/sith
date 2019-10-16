@@ -478,6 +478,8 @@ class Selling(models.Model):
         return user.is_owner(self.counter) and self.payment_method != "CARD"
 
     def can_be_viewed_by(self, user):
+        if not hasattr(self, "customer"):  # Customer can be set to Null
+            return False
         return user == self.customer.user
 
     def delete(self, *args, **kwargs):
