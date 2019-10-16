@@ -641,7 +641,7 @@ class MailingFormTest(TestCase):
             {"action": MailingForm.ACTION_NEW_MAILING, "mailing_email": "mde"},
         )
         mde = Mailing.objects.get(email="mde")
-        response = self.client.post(
+        self.client.post(
             reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
             {
                 "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
@@ -650,6 +650,11 @@ class MailingFormTest(TestCase):
                 "subscription_mailing": mde.id,
             },
         )
+
+        response = self.client.get(
+            reverse("club:mailing", kwargs={"club_id": self.bdf.id})
+        )
+
         self.assertContains(response, "comunity@git.an")
         self.assertContains(response, "richard@git.an")
         self.assertContains(response, "krophil@git.an")
