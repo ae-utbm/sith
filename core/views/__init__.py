@@ -172,13 +172,13 @@ class CanEditPropMixin(View):
     """
 
     def dispatch(self, request, *arg, **kwargs):
-        try:
+
+        if hasattr(self, "get_object"):
             self.object = self.get_object()
-            if can_edit_prop(self.object, request.user):
-                return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
-            return forbidden(request)
-        except:
-            pass
+            if not can_edit_prop(self.object, request.user):
+                raise PermissionDenied
+            return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
+
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_edit_prop(o, request.user)]
         if not l_id and self.get_queryset().count() != 0:
@@ -201,13 +201,13 @@ class CanEditMixin(View):
     """
 
     def dispatch(self, request, *arg, **kwargs):
-        try:
+
+        if hasattr(self, "get_object"):
             self.object = self.get_object()
-            if can_edit(self.object, request.user):
-                return super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
-            return forbidden(request)
-        except:
-            pass
+            if not can_edit(self.object, request.user):
+                raise PermissionDenied
+            return super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
+
         # If we get here, it's a ListView
         l_id = [o.id for o in self.get_queryset() if can_edit(o, request.user)]
         if not l_id and self.get_queryset().count() != 0:
@@ -231,13 +231,12 @@ class CanViewMixin(View):
 
     def dispatch(self, request, *arg, **kwargs):
 
-        try:
+        if hasattr(self, "get_object"):
             self.object = self.get_object()
-            if can_view(self.object, request.user):
-                return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
-            return forbidden(request)
-        except:
-            pass
+            if not can_view(self.object, request.user):
+                raise PermissionDenied
+            return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
+
         # If we get here, it's a ListView
         queryset = self.get_queryset()
 
