@@ -5,7 +5,6 @@
         <title>{% block title %}{% trans %}Welcome!{% endtrans %}{% endblock %} - Association des Étudiants UTBM</title>
         <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
         <link rel="stylesheet" href="{{ static('core/base.css') }}">
-        <link rel="stylesheet" href="{{ static('core/multiple-select.css') }}">
         <link rel="stylesheet" href="{{ static('core/jquery.datetimepicker.min.css') }}">
         <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
         <link rel="stylesheet" href="{{ scss('core/style.scss') }}">
@@ -154,7 +153,7 @@
           <nav>
               <a href="{{ url('core:index') }}">{% trans %}Main{% endtrans %}</a>
               <div class="dropdown">
-                <button class="dropbtn">{% trans %}Associations & Clubs{% endtrans %} 
+                <button class="dropbtn">{% trans %}Associations & Clubs{% endtrans %}
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
@@ -166,21 +165,21 @@
                     <a href="{{ url('core:page', page_name='clubs/doceo') }}">{% trans %}Doceo{% endtrans %}</a>
                     <a href="{{ url('core:page', page_name='positions') }}">{% trans %}Positions{% endtrans %}</a>
                 </div>
-              </div> 
+              </div>
               <div class="dropdown">
-                <button class="dropbtn">{% trans %}Events{% endtrans %} 
+                <button class="dropbtn">{% trans %}Events{% endtrans %}
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
                     <a href="{{ url('core:page', page_name='Index/calendrier_evenements') }}">{% trans %}Calendar{% endtrans %}</a>
                     <a href="{{ url('core:page', page_name='ga') }}">{% trans %}Big event{% endtrans %}</a>
                 </div>
-              </div> 
+              </div>
               <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
               <a href="{{ url('sas:main') }}">{% trans %}Gallery{% endtrans %}</a>
               <a href="{{ url('eboutic:main') }}">{% trans %}Eboutic{% endtrans %}</a>
               <div class="dropdown">
-                <button class="dropbtn">{% trans %}Services{% endtrans %} 
+                <button class="dropbtn">{% trans %}Services{% endtrans %}
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
@@ -189,7 +188,7 @@
                     <a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a>
                     <a href="{{ url('pedagogy:guide') }}">{% trans %}Pedagogy{% endtrans %}</a>
                 </div>
-              </div> 
+              </div>
               <div class="dropdown">
                 <button class="dropbtn">{% trans %}My Benefits{% endtrans %}
                 <i class="fa fa-caret-down"></i>
@@ -200,7 +199,7 @@
                 </div>
               </div>
               <div class="dropdown">
-                <button class="dropbtn">{% trans %}Help{% endtrans %} 
+                <button class="dropbtn">{% trans %}Help{% endtrans %}
                 <i class="fa fa-caret-down"></i>
                 </button>
                 <div class="dropdown-content">
@@ -208,7 +207,7 @@
                     <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
                     <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
                 </div>
-              </div> 
+              </div>
           </nav>
           {% endif %}
           {% endblock %}
@@ -266,22 +265,9 @@
         <script src="{{ static('core/js/ui/jquery-ui.min.js') }}"></script>
         <script src="{{ static('core/js/ui/i18n/datepicker-fr.js') }}"></script>
         <script src="{{ static('core/js/jquery.datetimepicker.full.min.js') }}"></script>
-        <script src="{{ static('core/js/multiple-select.js') }}"></script>
         <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
         <script src="{{ url('javascript-catalog') }}"></script>
         <script>
-$('.select_single').multipleSelect({
-    single: true,
-    {% if not popup %}
-    position: 'top',
-    {% endif %}
-});
-$('.select_multiple').multipleSelect({
-    filter: true,
-    {% if not popup %}
-    position: 'top',
-    {% endif %}
-});
 $('.select_date').datepicker({
     changeMonth: true,
     changeYear: true,

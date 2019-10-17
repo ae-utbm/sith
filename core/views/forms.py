@@ -55,24 +55,6 @@ from PIL import Image
 # Widgets
 
 
-class SelectSingle(Select):
-    def render(self, name, value, attrs=None, renderer=None):
-        if attrs:
-            attrs["class"] = "select_single"
-        else:
-            attrs = {"class": "select_single"}
-        return super(SelectSingle, self).render(name, value, attrs, renderer)
-
-
-class SelectMultiple(Select):
-    def render(self, name, value, attrs=None, renderer=None):
-        if attrs:
-            attrs["class"] = "select_multiple"
-        else:
-            attrs = {"class": "select_multiple"}
-        return super(SelectMultiple, self).render(name, value, attrs, renderer)
-
-
 class SelectDateTime(DateTimeInput):
     def render(self, name, value, attrs=None, renderer=None):
         if attrs:
