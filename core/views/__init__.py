@@ -140,7 +140,7 @@ def can_view(obj, user):
     return can_edit(obj, user)
 
 
-class GenericContentPermission(View):
+class GenericContentPermissionMixinBuilder(View):
     """
     Used to build permission mixins
     This view protect any child view that would be showing an object that is restricted based
@@ -165,7 +165,7 @@ class GenericContentPermission(View):
             self.object = self.get_object()
             if not self.get_permission_function(self.object, request.user):
                 raise self.raised_error
-            return super(GenericContentPermission, self).dispatch(
+            return super(GenericContentPermissionMixinBuilder, self).dispatch(
                 request, *arg, **kwargs
             )
 
@@ -181,7 +181,9 @@ class GenericContentPermission(View):
             return self2._get_queryset().filter(id__in=l_id)
 
         self.get_queryset = types.MethodType(get_qs, self)
-        return super(GenericContentPermission, self).dispatch(request, *arg, **kwargs)
+        return super(GenericContentPermissionMixinBuilder, self).dispatch(
+            request, *arg, **kwargs
+        )
 
 
 class CanCreateMixin(View):
@@ -205,7 +207,7 @@ class CanCreateMixin(View):
         raise PermissionDenied
 
 
-class CanEditPropMixin(GenericContentPermission):
+class CanEditPropMixin(GenericContentPermissionMixinBuilder):
     """
     This view is made to protect any child view that would be showing some properties of an object that are restricted
     to only the owner group of the given object.
@@ -218,7 +220,7 @@ class CanEditPropMixin(GenericContentPermission):
     permission_function = can_edit_prop
 
 
-class CanEditMixin(GenericContentPermission):
+class CanEditMixin(GenericContentPermissionMixinBuilder):
     """
     This view makes exactly the same thing as its direct parent, but checks the group on the edit_groups field of the
     object
@@ -229,7 +231,7 @@ class CanEditMixin(GenericContentPermission):
     permission_function = can_edit
 
 
-class CanViewMixin(GenericContentPermission):
+class CanViewMixin(GenericContentPermissionMixinBuilder):
     """
     This view still makes exactly the same thing as its direct parent, but checks the group on the view_groups field of
     the object
