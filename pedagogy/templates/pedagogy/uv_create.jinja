@@ -12,7 +12,11 @@
 
     {% for field in form %}
 
-    {% if not field.is_hidden %}
+    {% if field.is_hidden %}
+
+        {{ field }}
+
+    {% else %}
     <p>
         {{ field.errors }}
         <label for="{{ field.name }}">{{ field.label }}</label>

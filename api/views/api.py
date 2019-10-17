@@ -125,7 +125,7 @@ def uv_endpoint(request):
         res["hours_{}".format(activity)] = 0
     for activity in uv["activites"]:
         if activity["code"] in activities:
-            res["hours_{}".format(activity["code"])] += activity["nbh"]
+            res["hours_{}".format(activity["code"])] += activity["nbh"] // 60
 
     res["manager"] = uv["automne"]["responsable"]
 
