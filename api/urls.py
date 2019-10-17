@@ -53,4 +53,5 @@ urlpatterns = [
     re_path(r"^login/", include("rest_framework.urls", namespace="rest_framework")),
     re_path(r"^markdown$", RenderMarkdown, name="api_markdown"),
     re_path(r"^mailings$", FetchMailingLists, name="mailings_fetch"),
+    re_path(r"^uv$", uv_endpoint, name="uv_endpoint"),
 ]

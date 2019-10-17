@@ -294,7 +294,7 @@ class UVCreateView(CanCreateMixin, CreateView):
 
     model = UV
     form_class = UVForm
-    template_name = "core/edit.jinja"
+    template_name = "pedagogy/uv_create.jinja"
 
     def get_form_kwargs(self):
         kwargs = super(UVCreateView, self).get_form_kwargs()

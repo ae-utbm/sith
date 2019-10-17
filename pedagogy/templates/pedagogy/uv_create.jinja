@@ -1,0 +1,68 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Edit UV{% endtrans %}
+{% endblock %}
+
+{% block content %}
+<h2>{% trans %}Edit UV{% endtrans %}</h2>
+<form action="" method="post" enctype="multipart/form-data" id="uv_edit">
+    {% csrf_token %}
+    {{ form.non_field_errors() }}
+
+    {% for field in form %}
+
+    {% if not field.is_hidden %}
+    <p>
+        {{ field.errors }}
+        <label for="{{ field.name }}">{{ field.label }}</label>
+        {{ field }}
+
+
+        {% if field.name == 'code' %}
+        <a href="javascript:void(0)" id="autofill">Fill</a>
+        {% endif %}
+    </p>
+    {% endif %}
+
+
+    {% endfor %}
+
+
+    <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>
+</form>
+{% endblock %}
+
+{% block script %}
+{{ super() }}
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const autofillBtn = document.getElementById('autofill')
+        const codeInput = document.querySelector('input[name="code"]')
+
+        autofillBtn.addEventListener('click', () => {
+            const today = new Date()
+            let year = today.getFullYear()
+            if (today.getMonth() < 7) {  // student year, starts in september
+                year--
+            }
+            const url = "{{ url('api:uv_endpoint') }}?year=" + year + "&code=" + codeInput.value
+            $.getJSON(url, function(data) {
+                for (let key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        const el = document.querySelector('[name="' + key + '"]')
+                        if (el.tagName == 'TEXTAREA') {
+                            el.parentNode.querySelector('.CodeMirror').CodeMirror.setValue(data[key])
+                        } else {
+                            el.value = data[key]
+                        }
+
+                    }
+                }
+            })
+        })
+
+    })
+</script>
+{% endblock %}
