@@ -140,6 +140,50 @@ def can_view(obj, user):
     return can_edit(obj, user)
 
 
+class GenericContentPermission(View):
+    """
+    Used to build permission mixins
+    This view protect any child view that would be showing an object that is restricted based
+      on two properties
+
+    :prop permission_function: function to test permission with, takes an object and an user an return a bool
+    :prop raised_error: permission to be raised
+
+    :raises: raised_error
+    """
+
+    permission_function = lambda obj, user: False
+    raised_error = PermissionDenied
+
+    @classmethod
+    def get_permission_function(cls, obj, user):
+        return cls.permission_function(obj, user)
+
+    def dispatch(self, request, *arg, **kwargs):
+
+        if hasattr(self, "get_object") and callable(self.get_object):
+            self.object = self.get_object()
+            if not self.get_permission_function(self.object, request.user):
+                raise self.raised_error
+            return super(GenericContentPermission, self).dispatch(
+                request, *arg, **kwargs
+            )
+
+        # If we get here, it's a ListView
+
+        queryset = self.get_queryset()
+        l_id = [o.id for o in queryset if self.get_permission_function(o, request.user)]
+        if not l_id and queryset.count() != 0:
+            raise self.raised_error
+        self._get_queryset = self.get_queryset
+
+        def get_qs(self2):
+            return self2._get_queryset().filter(id__in=l_id)
+
+        self.get_queryset = types.MethodType(get_qs, self)
+        return super(GenericContentPermission, self).dispatch(request, *arg, **kwargs)
+
+
 class CanCreateMixin(View):
     """
     This view is made to protect any child view that would create an object, and thus, that can not be protected by any
@@ -161,7 +205,7 @@ class CanCreateMixin(View):
         raise PermissionDenied
 
 
-class CanEditPropMixin(View):
+class CanEditPropMixin(GenericContentPermission):
     """
     This view is made to protect any child view that would be showing some properties of an object that are restricted
     to only the owner group of the given object.
@@ -171,28 +215,10 @@ class CanEditPropMixin(View):
     :raises: PermissionDenied
     """
 
-    def dispatch(self, request, *arg, **kwargs):
-
-        if hasattr(self, "get_object"):
-            self.object = self.get_object()
-            if not can_edit_prop(self.object, request.user):
-                raise PermissionDenied
-            return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
-
-        # If we get here, it's a ListView
-        l_id = [o.id for o in self.get_queryset() if can_edit_prop(o, request.user)]
-        if not l_id and self.get_queryset().count() != 0:
-            raise PermissionDenied
-        self._get_queryset = self.get_queryset
-
-        def get_qs(self2):
-            return self2._get_queryset().filter(id__in=l_id)
-
-        self.get_queryset = types.MethodType(get_qs, self)
-        return super(CanEditPropMixin, self).dispatch(request, *arg, **kwargs)
+    permission_function = can_edit_prop
 
 
-class CanEditMixin(View):
+class CanEditMixin(GenericContentPermission):
     """
     This view makes exactly the same thing as its direct parent, but checks the group on the edit_groups field of the
     object
@@ -200,28 +226,10 @@ class CanEditMixin(View):
     :raises: PermissionDenied
     """
 
-    def dispatch(self, request, *arg, **kwargs):
-
-        if hasattr(self, "get_object"):
-            self.object = self.get_object()
-            if not can_edit(self.object, request.user):
-                raise PermissionDenied
-            return super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
-
-        # If we get here, it's a ListView
-        l_id = [o.id for o in self.get_queryset() if can_edit(o, request.user)]
-        if not l_id and self.get_queryset().count() != 0:
-            raise PermissionDenied
-        self._get_queryset = self.get_queryset
-
-        def get_qs(self2):
-            return self2._get_queryset().filter(id__in=l_id)
-
-        self.get_queryset = types.MethodType(get_qs, self)
-        return super(CanEditMixin, self).dispatch(request, *arg, **kwargs)
+    permission_function = can_edit
 
 
-class CanViewMixin(View):
+class CanViewMixin(GenericContentPermission):
     """
     This view still makes exactly the same thing as its direct parent, but checks the group on the view_groups field of
     the object
@@ -229,27 +237,7 @@ class CanViewMixin(View):
     :raises: PermissionDenied
     """
 
-    def dispatch(self, request, *arg, **kwargs):
-
-        if hasattr(self, "get_object"):
-            self.object = self.get_object()
-            if not can_view(self.object, request.user):
-                raise PermissionDenied
-            return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
-
-        # If we get here, it's a ListView
-        queryset = self.get_queryset()
-
-        l_id = [o.id for o in queryset if can_view(o, request.user)]
-        if not l_id and queryset.count() != 0:
-            raise PermissionDenied
-        self._get_queryset = self.get_queryset
-
-        def get_qs(self2):
-            return self2._get_queryset().filter(id__in=l_id)
-
-        self.get_queryset = types.MethodType(get_qs, self)
-        return super(CanViewMixin, self).dispatch(request, *arg, **kwargs)
+    permission_function = can_view
 
 
 class FormerSubscriberMixin(View):
