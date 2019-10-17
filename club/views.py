@@ -574,7 +574,8 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
             except ValidationError as validation_error:
                 return validation_error
 
-            users_to_save.append(sub.save())
+            sub.save()
+            users_to_save.append(sub)
 
         if cleaned_data["subscription_email"]:
             sub = MailingSubscription(

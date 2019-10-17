@@ -1752,7 +1752,11 @@ class EticketPDFView(CanViewMixin, DetailView):
         from reportlab.graphics.barcode.qr import QrCodeWidget
         from reportlab.graphics import renderPDF
 
-        self.object = self.get_object()
+        if not (
+            hasattr(self.object, "product") and hasattr(self.object.product, "eticket")
+        ):
+            raise Http404
+
         eticket = self.object.product.eticket
         user = self.object.customer.user
         code = "%s %s %s %s" % (
