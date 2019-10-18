@@ -31,10 +31,19 @@
         {{ add_product(i.product_id, '+') }} {{ i.product_name }}: {{ "%0.2f"|format(i.product_unit_price*i.quantity) }} €</li>
         {% endfor %}
     </ul>
-    <p><strong>{% trans %}Total: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong></p>
+    <p>
+        <strong>{% trans %}Basket amount: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong>
+        <br>
+        {% trans %}Current account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
+        <br>
+        {% trans %}Remaining account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount - basket.get_total()) }} €</strong>
+    </p>
+
     <form method="post" action="{{ url('eboutic:command') }}">
         {% csrf_token %}
+        <p>
         <input type="submit" value="{% trans %}Proceed to command{% endtrans %}" />
+        </p>
     </form>
 </div>
 <div>
