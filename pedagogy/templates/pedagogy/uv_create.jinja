@@ -52,7 +52,11 @@
                 year--
             }
             const url = "{{ url('api:uv_endpoint') }}?year=" + year + "&code=" + codeInput.value
-            $.getJSON(url, function(data) {
+            $.getJSON(url, function(data, _, xhr) {
+                if (xhr.status != 200) {
+                    alert('{% trans %}Unknown UV code{% endtrans %}')
+                    return
+                }
                 for (let key in data) {
                     if (data.hasOwnProperty(key)) {
                         const el = document.querySelector('[name="' + key + '"]')

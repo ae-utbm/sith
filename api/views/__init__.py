@@ -77,3 +77,4 @@ from .user import *
 from .club import *
 from .group import *
 from .launderette import *
+from .uv import *
