@@ -196,6 +196,8 @@ SASS_PRECISION = 8
 
 WSGI_APPLICATION = "sith.wsgi.application"
 
+REST_FRAMEWORK = {}
+
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -252,6 +254,7 @@ LOGOUT_URL = "/logout"
 LOGIN_REDIRECT_URL = "/"
 DEFAULT_FROM_EMAIL = "bibou@git.an"
 SITH_COM_EMAIL = "bibou_com@git.an"
+REST_FRAMEWORK["UNAUTHENTICATED_USER"] = "core.models.AnonymousUser"
 
 # Email
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

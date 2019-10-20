@@ -12,10 +12,7 @@ from pedagogy.views import CanCreateUVFunctionMixin
 @api_view(["GET"])
 @renderer_classes((JSONRenderer,))
 def uv_endpoint(request):
-    # is authenticated and has the right to create an UV
-    if not request.user.is_authenticated or not CanCreateUVFunctionMixin.can_create_uv(
-        request.user
-    ):
+    if not CanCreateUVFunctionMixin.can_create_uv(request.user):
         raise PermissionDenied
 
     params = request.query_params
