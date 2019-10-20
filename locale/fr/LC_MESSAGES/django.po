@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-18 18:04+0200\n"
+"POT-Creation-Date: 2019-10-20 16:50+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4990,16 +4990,20 @@ msgstr "Supprimer signalement"
 
 #: pedagogy/templates/pedagogy/uv_create.jinja:4
 #: pedagogy/templates/pedagogy/uv_create.jinja:8
-#, fuzzy
-#| msgid "Edit"
 msgid "Edit UV"
 msgstr "Éditer"
 
+#: pedagogy/templates/pedagogy/uv_create.jinja:27
+msgid "Import from UTBM"
+msgstr "Importer depuis l'UTBM"
+
 #: pedagogy/templates/pedagogy/uv_create.jinja:57
-#, fuzzy
-#| msgid "Unknown event"
 msgid "Unknown UV code"
 msgstr "Code d'UV inconnu"
+
+#: pedagogy/templates/pedagogy/uv_create.jinja:72
+msgid "Successful autocomplete"
+msgstr "Autocomplétion réussite"
 
 #: pedagogy/templates/pedagogy/uv_detail.jinja:6
 msgid "UV Details"
