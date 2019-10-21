@@ -36,10 +36,12 @@
     </p>
     {% if settings.SITH_EBOUTIC_CB_ENABLED %}
     <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}">
+        <p>
         {% for (field_name,field_value) in et_request.items() -%}
         <input type="hidden" name="{{ field_name }}" value="{{ field_value }}">
         {% endfor %}
         <input type="submit" value="{% trans %}Pay with credit card{% endtrans %}" />
+        </p>
     </form>
     {% endif %}
     {% if basket.items.filter(type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING).exists() %}
