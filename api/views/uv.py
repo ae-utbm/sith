@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from django.core.exceptions import PermissionDenied
+from django.conf import settings
 from rest_framework import serializers
 import urllib.request
 import json
@@ -34,7 +35,7 @@ def find_uv(lang, year, code):
         full_uv is the detailed representation of an UV.
     """
     # query the UV list
-    uvs_url = "https://extranet1.utbm.fr/gpedago/api/guide/uvs/{lang}/{year}"
+    uvs_url = settings.SITH_PEDAGOGY_UTBM_API_UVS_URL
     response = urllib.request.urlopen(uvs_url.format(lang=lang, year=year))
     uvs = json.loads(response.read().decode("utf-8"))
 
@@ -45,9 +46,8 @@ def find_uv(lang, year, code):
         return (None, None)
 
     # get detailed information about the UV
-    uv_url = "https://extranet1.utbm.fr/gpedago/api/guide/uv/{lang}/{year}/{code}/{formation}"
     response = urllib.request.urlopen(
-        uv_url.format(
+        settings.SITH_PEDAGOGY_UTBM_API_UV_URL.format(
             lang=lang, year=year, code=code, formation=short_uv["codeFormation"]
         )
     )

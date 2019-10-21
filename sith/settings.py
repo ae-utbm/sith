@@ -445,6 +445,9 @@ SITH_PEDAGOGY_UV_RESULT_GRADE = [
     ("ABS", _("Abs")),
 ]
 
+SITH_PEDAGOGY_UTBM_API_UVS_URL = "https://extranet1.utbm.fr/gpedago/api/guide/uvs/{lang}/{year}"
+SITH_PEDAGOGY_UTBM_API_UV_URL = "https://extranet1.utbm.fr/gpedago/api/guide/uv/{lang}/{year}/{code}/{formation}"
+
 SITH_ECOCUP_CONS = 1152
 
 SITH_ECOCUP_DECO = 1151
