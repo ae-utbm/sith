@@ -294,7 +294,7 @@ class UVCreateView(CanCreateMixin, CreateView):
 
     model = UV
     form_class = UVForm
-    template_name = "pedagogy/uv_create.jinja"
+    template_name = "pedagogy/uv_edit.jinja"
 
     def get_form_kwargs(self):
         kwargs = super(UVCreateView, self).get_form_kwargs()
@@ -326,7 +326,7 @@ class UVUpdateView(CanEditPropMixin, UpdateView):
     model = UV
     form_class = UVForm
     pk_url_kwarg = "uv_id"
-    template_name = "core/edit.jinja"
+    template_name = "pedagogy/uv_edit.jinja"
 
     def get_form_kwargs(self):
         kwargs = super(UVUpdateView, self).get_form_kwargs()
