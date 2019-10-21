@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-18 21:35+0200\n"
+"POT-Creation-Date: 2019-10-21 22:04+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4320,22 +4320,16 @@ msgstr "panier"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja:35
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:31
-#, fuzzy
-#| msgid "Bank account: "
 msgid "Basket amount: "
 msgstr "Valeur du panier : "
 
 #: eboutic/templates/eboutic/eboutic_main.jinja:37
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:33
-#, fuzzy
-#| msgid "Current avatar: "
 msgid "Current account amount: "
 msgstr "Solde actuel : "
 
 #: eboutic/templates/eboutic/eboutic_main.jinja:39
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:35
-#, fuzzy
-#| msgid "Current avatar: "
 msgid "Remaining account amount: "
 msgstr "Solde restant : "
 
