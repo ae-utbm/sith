@@ -58,7 +58,7 @@
                 url: url,
                 success: function(data, _, xhr) {
                     if (xhr.status != 200) {
-                        alert("{% trans %}Unknown UV code{% endtrans %}")
+                        createQuickNotif("{% trans %}Unknown UV code{% endtrans %}")
                         return
                     }
                     for (let key in data) {
@@ -73,10 +73,10 @@
                         }
                     }
 
-                    alert('{% trans %}Successful autocomplete{% endtrans %}')
+                    createQuickNotif('{% trans %}Successful autocomplete{% endtrans %}')
                 },
                 error: function(_, _, statusMessage) {
-                    alert('{% trans %}An error occured: {% endtrans %}' + statusMessage)
+                    createQuickNotif('{% trans %}An error occured: {% endtrans %}' + statusMessage)
                 },
             })
         })

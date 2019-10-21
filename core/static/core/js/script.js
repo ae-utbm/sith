@@ -38,7 +38,14 @@ $( function() {
     $("#quick_notif li").click(function () {
         $(this).hide();
     })
-} );
+});
+
+function createQuickNotif(msg) {
+    const el = document.createElement('li')
+    el.textContent = msg
+    el.addEventListener('click', () => el.parentNode.removeChild(el))
+    document.getElementById('quick_notif').appendChild(el)
+}
 
 function display_notif() {
     $('#header_notif').toggle().parent().toggleClass("white");
