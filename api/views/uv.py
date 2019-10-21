@@ -105,7 +105,10 @@ def make_clean_uv(short_uv, full_uv):
             res["hours_{}".format(activity["code"])] += activity["nbh"] // 60
 
     # wrong if the manager changes depending on the semester
-    res["manager"] = full_uv["automne"]["responsable"]
+    semester = full_uv.get("automne", None)
+    if not semester:
+        semester = full_uv.get("printemps", {})
+    res["manager"] = semester.get("responsable", "")
 
     res["title"] = full_uv["libelle"]
 
