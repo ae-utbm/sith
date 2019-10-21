@@ -28,7 +28,7 @@ def uv_endpoint(request):
 
 def find_uv(lang, year, code):
     """
-        Uses the UTBM API to find a UV.
+        Uses the UTBM API to find an UV.
         short_uv is the UV entry in the UV list. It is returned as it contains
         information which are not in full_uv.
         full_uv is the detailed representation of an UV.
