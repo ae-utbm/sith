@@ -445,8 +445,10 @@ SITH_PEDAGOGY_UV_RESULT_GRADE = [
     ("ABS", _("Abs")),
 ]
 
-SITH_PEDAGOGY_UTBM_API_UVS_URL = "https://extranet1.utbm.fr/gpedago/api/guide/uvs/{lang}/{year}"
-SITH_PEDAGOGY_UTBM_API_UV_URL = "https://extranet1.utbm.fr/gpedago/api/guide/uv/{lang}/{year}/{code}/{formation}"
+base_url = "https://extranet1.utbm.fr/gpedago/api/guide"
+SITH_PEDAGOGY_UTBM_API_UVS_URL = base_url + "/uvs/{lang}/{year}"
+SITH_PEDAGOGY_UTBM_API_UV_URL = base_url + "/uv/{lang}/{year}/{code}/{formation}"
+del base_url
 
 SITH_ECOCUP_CONS = 1152
 
