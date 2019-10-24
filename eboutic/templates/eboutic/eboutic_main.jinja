@@ -33,10 +33,13 @@
     </ul>
     <p>
         <strong>{% trans %}Basket amount: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong>
+
+        {% if customer_amount != None %}
         <br>
         {% trans %}Current account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
         <br>
         {% trans %}Remaining account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount - basket.get_total()) }} €</strong>
+        {% endif %}
     </p>
 
     <form method="post" action="{{ url('eboutic:command') }}">
