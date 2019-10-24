@@ -47,6 +47,13 @@ function createQuickNotif(msg) {
     document.getElementById('quick_notif').appendChild(el)
 }
 
+function deleteQuickNotifs() {
+    const el = document.getElementById('quick_notif')
+    while (el.firstChild) {
+        el.removeChild(el.firstChild)
+    }
+}
+
 function display_notif() {
     $('#header_notif').toggle().parent().toggleClass("white");
 }

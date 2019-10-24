@@ -52,6 +52,7 @@
                 year--
             }
             const url = "{{ url('api:uv_endpoint') }}?year=" + year + "&code=" + codeInput.value
+            deleteQuickNotifs()
 
             $.ajax({
                 dataType: "json",

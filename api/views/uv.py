@@ -35,8 +35,8 @@ def find_uv(lang, year, code):
         full_uv is the detailed representation of an UV.
     """
     # query the UV list
-    uvs_url = settings.SITH_PEDAGOGY_UTBM_API_UVS_URL
-    response = urllib.request.urlopen(uvs_url.format(lang=lang, year=year))
+    uvs_url = settings.SITH_PEDAGOGY_UTBM_API + "/uvs/{}/{}".format(lang, year)
+    response = urllib.request.urlopen(uvs_url)
     uvs = json.loads(response.read().decode("utf-8"))
 
     try:
@@ -46,11 +46,10 @@ def find_uv(lang, year, code):
         return (None, None)
 
     # get detailed information about the UV
-    response = urllib.request.urlopen(
-        settings.SITH_PEDAGOGY_UTBM_API_UV_URL.format(
-            lang=lang, year=year, code=code, formation=short_uv["codeFormation"]
-        )
+    uv_url = settings.SITH_PEDAGOGY_UTBM_API + "/uv/{}/{}/{}/{}".format(
+        lang, year, code, short_uv["codeFormation"]
     )
+    response = urllib.request.urlopen(uv_url)
     full_uv = json.loads(response.read().decode("utf-8"))
 
     return (short_uv, full_uv)
@@ -112,9 +111,17 @@ def make_clean_uv(short_uv, full_uv):
 
     res["title"] = full_uv["libelle"]
 
-    res["objectives"] = full_uv["objectifs"]
-    res["program"] = full_uv["programme"]
-    res["skills"] = full_uv["acquisitionCompetences"]
-    res["key_concepts"] = full_uv["acquisitionNotions"]
+    descriptions = {
+        "objectives": "objectifs",
+        "program": "programme",
+        "skills": "acquisitionCompetences",
+        "key_concepts": "acquisitionNotions",
+    }
+
+    for res_key, full_uv_key in descriptions.items():
+        res[res_key] = full_uv[full_uv_key]
+        # if not found or the API did not return a string
+        if type(res[res_key]) != str:
+            res[res_key] = ""
 
     return res
