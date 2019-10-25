@@ -38,7 +38,7 @@ def get_cached_user(request):
     if not hasattr(request, "_cached_user"):
         user = get_user(request)
         if user.is_anonymous:
-            user = AnonymousUser(request)
+            user = AnonymousUser()
 
         request._cached_user = user
 

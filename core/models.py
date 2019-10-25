@@ -659,7 +659,7 @@ class User(AbstractBaseUser):
 
 
 class AnonymousUser(AuthAnonymousUser):
-    def __init__(self, request):
+    def __init__(self):
         super(AnonymousUser, self).__init__()
 
     @property
