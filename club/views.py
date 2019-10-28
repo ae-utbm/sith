@@ -451,7 +451,7 @@ class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
     current_tab = "props"
 
 
-class ClubCreateView(CanEditPropMixin, CreateView):
+class ClubCreateView(CanCreateMixin, CreateView):
     """
     Create a club (for the Sith admin)
     """

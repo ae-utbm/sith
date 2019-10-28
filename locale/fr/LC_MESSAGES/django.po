@@ -218,7 +218,7 @@ msgstr "Compte"
 msgid "Company"
 msgstr "Entreprise"
 
-#: accounting/models.py:341 sith/settings.py:377
+#: accounting/models.py:341 sith/settings.py:380
 #: stock/templates/stock/shopping_list_items.jinja:37
 msgid "Other"
 msgstr "Autre"
@@ -531,7 +531,7 @@ msgid "Effective amount"
 msgstr "Montant effectif"
 
 #: accounting/templates/accounting/club_account_details.jinja:36
-#: sith/settings.py:421
+#: sith/settings.py:424
 msgid "Closed"
 msgstr "Fermé"
 
@@ -2474,7 +2474,7 @@ msgstr "Photos"
 #: eboutic/templates/eboutic/eboutic_main.jinja:24
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:8
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:4
-#: sith/settings.py:376 sith/settings.py:384
+#: sith/settings.py:379 sith/settings.py:387
 msgid "Eboutic"
 msgstr "Eboutic"
 
@@ -2687,6 +2687,7 @@ msgstr "Éditer le groupe"
 #: core/templates/core/group_edit.jinja:9
 #: core/templates/core/user_edit.jinja:37
 #: core/templates/core/user_group.jinja:8
+#: pedagogy/templates/pedagogy/uv_create.jinja:36
 msgid "Update"
 msgstr "Mettre à jour"
 
@@ -3798,8 +3799,8 @@ msgstr "quantité"
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: counter/models.py:461 sith/settings.py:369 sith/settings.py:374
-#: sith/settings.py:392
+#: counter/models.py:461 sith/settings.py:372 sith/settings.py:377
+#: sith/settings.py:395
 msgid "Credit card"
 msgstr "Carte bancaire"
 
@@ -4739,12 +4740,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:583
+#: sith/settings.py:586
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:583
+#: sith/settings.py:586
 msgid "Drying"
 msgstr "Séchage"
 
@@ -5001,6 +5002,29 @@ msgstr "Supprimer commentaire"
 msgid "Delete report"
 msgstr "Supprimer signalement"
 
+#: pedagogy/templates/pedagogy/uv_create.jinja:4
+#: pedagogy/templates/pedagogy/uv_create.jinja:8
+msgid "Edit UV"
+msgstr "Éditer"
+
+#: pedagogy/templates/pedagogy/uv_create.jinja:27
+msgid "Import from UTBM"
+msgstr "Importer depuis l'UTBM"
+
+#: pedagogy/templates/pedagogy/uv_create.jinja:61
+#: pedagogy/templates/pedagogy/uv_create.jinja:84
+msgid "Unknown UV code"
+msgstr "Code d'UV inconnu"
+
+#: pedagogy/templates/pedagogy/uv_create.jinja:76
+#: pedagogy/templates/pedagogy/uv_create.jinja:99
+msgid "Successful autocomplete"
+msgstr "Autocomplétion réussite"
+
+#: pedagogy/templates/pedagogy/uv_create.jinja:79
+msgid "An error occured: "
+msgstr "Une erreur est survenue : "
+
 #: pedagogy/templates/pedagogy/uv_detail.jinja:6
 msgid "UV Details"
 msgstr "Détails d'UV"
@@ -5213,360 +5237,360 @@ msgstr "Erreur de création de l'album %(album)s : %(msg)s"
 msgid "Add user"
 msgstr "Ajouter une personne"
 
-#: sith/settings.py:216 sith/settings.py:429
+#: sith/settings.py:218 sith/settings.py:432
 msgid "English"
 msgstr "Anglais"
 
-#: sith/settings.py:216 sith/settings.py:428
+#: sith/settings.py:218 sith/settings.py:431
 msgid "French"
 msgstr "Français"
 
-#: sith/settings.py:350
+#: sith/settings.py:353
 msgid "TC"
 msgstr "TC"
 
-#: sith/settings.py:351
+#: sith/settings.py:354
 msgid "IMSI"
 msgstr "IMSI"
 
-#: sith/settings.py:352
+#: sith/settings.py:355
 msgid "IMAP"
 msgstr "IMAP"
 
-#: sith/settings.py:353
+#: sith/settings.py:356
 msgid "INFO"
 msgstr "INFO"
 
-#: sith/settings.py:354
+#: sith/settings.py:357
 msgid "GI"
 msgstr "GI"
 
-#: sith/settings.py:355 sith/settings.py:439
+#: sith/settings.py:358 sith/settings.py:442
 msgid "E"
 msgstr "E"
 
-#: sith/settings.py:356
+#: sith/settings.py:359
 msgid "EE"
 msgstr "EE"
 
-#: sith/settings.py:357
+#: sith/settings.py:360
 msgid "GESC"
 msgstr "GESC"
 
-#: sith/settings.py:358
+#: sith/settings.py:361
 msgid "GMC"
 msgstr "GMC"
 
-#: sith/settings.py:359
+#: sith/settings.py:362
 msgid "MC"
 msgstr "MC"
 
-#: sith/settings.py:360
+#: sith/settings.py:363
 msgid "EDIM"
 msgstr "EDIM"
 
-#: sith/settings.py:361
+#: sith/settings.py:364
 msgid "Humanities"
 msgstr "Humanités"
 
-#: sith/settings.py:362
+#: sith/settings.py:365
 msgid "N/A"
 msgstr "N/A"
 
-#: sith/settings.py:366 sith/settings.py:373 sith/settings.py:390
+#: sith/settings.py:369 sith/settings.py:376 sith/settings.py:393
 msgid "Check"
 msgstr "Chèque"
 
-#: sith/settings.py:367 sith/settings.py:375 sith/settings.py:391
+#: sith/settings.py:370 sith/settings.py:378 sith/settings.py:394
 msgid "Cash"
 msgstr "Espèces"
 
-#: sith/settings.py:368
+#: sith/settings.py:371
 msgid "Transfert"
 msgstr "Virement"
 
-#: sith/settings.py:381
+#: sith/settings.py:384
 msgid "Belfort"
 msgstr "Belfort"
 
-#: sith/settings.py:382
+#: sith/settings.py:385
 msgid "Sevenans"
 msgstr "Sevenans"
 
-#: sith/settings.py:383
+#: sith/settings.py:386
 msgid "Montbéliard"
 msgstr "Montbéliard"
 
-#: sith/settings.py:409
+#: sith/settings.py:412
 msgid "Free"
 msgstr "Libre"
 
-#: sith/settings.py:410
+#: sith/settings.py:413
 msgid "CS"
 msgstr "CS"
 
-#: sith/settings.py:411
+#: sith/settings.py:414
 msgid "TM"
 msgstr "TM"
 
-#: sith/settings.py:412
+#: sith/settings.py:415
 msgid "OM"
 msgstr "OM"
 
-#: sith/settings.py:413
+#: sith/settings.py:416
 msgid "QC"
 msgstr "QC"
 
-#: sith/settings.py:414
+#: sith/settings.py:417
 msgid "EC"
 msgstr "EC"
 
-#: sith/settings.py:415
+#: sith/settings.py:418
 msgid "RN"
 msgstr "RN"
 
-#: sith/settings.py:416
+#: sith/settings.py:419
 msgid "ST"
 msgstr "ST"
 
-#: sith/settings.py:417
+#: sith/settings.py:420
 msgid "EXT"
 msgstr "EXT"
 
-#: sith/settings.py:422
+#: sith/settings.py:425
 msgid "Autumn"
 msgstr "Automne"
 
-#: sith/settings.py:423
+#: sith/settings.py:426
 msgid "Spring"
 msgstr "Printemps"
 
-#: sith/settings.py:424
+#: sith/settings.py:427
 msgid "Autumn and spring"
 msgstr "Automne et printemps"
 
-#: sith/settings.py:430
+#: sith/settings.py:433
 msgid "German"
 msgstr "Allemant"
 
-#: sith/settings.py:431
+#: sith/settings.py:434
 msgid "Spanich"
 msgstr "Espagnol"
 
-#: sith/settings.py:435
+#: sith/settings.py:438
 msgid "A"
 msgstr "A"
 
-#: sith/settings.py:436
+#: sith/settings.py:439
 msgid "B"
 msgstr "B"
 
-#: sith/settings.py:437
+#: sith/settings.py:440
 msgid "C"
 msgstr "C"
 
-#: sith/settings.py:438
+#: sith/settings.py:441
 msgid "D"
 msgstr "D"
 
-#: sith/settings.py:440
+#: sith/settings.py:443
 msgid "FX"
 msgstr "FX"
 
-#: sith/settings.py:441
+#: sith/settings.py:444
 msgid "F"
 msgstr "F"
 
-#: sith/settings.py:442
+#: sith/settings.py:445
 msgid "Abs"
 msgstr "Abs"
 
-#: sith/settings.py:471
+#: sith/settings.py:474
 msgid "One semester"
 msgstr "Un semestre, 15 €"
 
-#: sith/settings.py:472
+#: sith/settings.py:475
 msgid "Two semesters"
 msgstr "Deux semestres, 28 €"
 
-#: sith/settings.py:474
+#: sith/settings.py:477
 msgid "Common core cursus"
 msgstr "Cursus tronc commun, 45 €"
 
-#: sith/settings.py:478
+#: sith/settings.py:481
 msgid "Branch cursus"
 msgstr "Cursus branche, 45 €"
 
-#: sith/settings.py:479
+#: sith/settings.py:482
 msgid "Alternating cursus"
 msgstr "Cursus alternant, 30 €"
 
-#: sith/settings.py:480
+#: sith/settings.py:483
 msgid "Honorary member"
 msgstr "Membre honoraire, 0 €"
 
-#: sith/settings.py:481
+#: sith/settings.py:484
 msgid "Assidu member"
 msgstr "Membre d'Assidu, 0 €"
 
-#: sith/settings.py:482
+#: sith/settings.py:485
 msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO, 0 €"
 
-#: sith/settings.py:483
+#: sith/settings.py:486
 msgid "UT network member"
 msgstr "Cotisant du réseau UT, 0 €"
 
-#: sith/settings.py:484
+#: sith/settings.py:487
 msgid "CROUS member"
 msgstr "Membres du CROUS, 0 €"
 
-#: sith/settings.py:485
+#: sith/settings.py:488
 msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
 
-#: sith/settings.py:487
+#: sith/settings.py:490
 msgid "One semester Welcome Week"
 msgstr "Un semestre Welcome Week"
 
-#: sith/settings.py:491
+#: sith/settings.py:494
 msgid "Two months for free"
 msgstr "Deux mois gratuits"
 
-#: sith/settings.py:492
+#: sith/settings.py:495
 msgid "Eurok's volunteer"
 msgstr "Bénévole Eurockéennes"
 
-#: sith/settings.py:494
+#: sith/settings.py:497
 msgid "Six weeks for free"
 msgstr "6 semaines gratuites"
 
-#: sith/settings.py:498
+#: sith/settings.py:501
 msgid "One day"
 msgstr "Un jour"
 
-#: sith/settings.py:501
+#: sith/settings.py:504
 msgid "One semester (-20%)"
 msgstr "Un semestre (-20%), 12 €"
 
-#: sith/settings.py:506
+#: sith/settings.py:509
 msgid "Two semesters (-20%)"
 msgstr "Deux semestres (-20%), 22 €"
 
-#: sith/settings.py:511
+#: sith/settings.py:514
 msgid "Common core cursus (-20%)"
 msgstr "Cursus tronc commun (-20%), 36 €"
 
-#: sith/settings.py:516
+#: sith/settings.py:519
 msgid "Branch cursus (-20%)"
 msgstr "Cursus branche (-20%), 36 €"
 
-#: sith/settings.py:521
+#: sith/settings.py:524
 msgid "Alternating cursus (-20%)"
 msgstr "Cursus alternant (-20%), 24 €"
 
-#: sith/settings.py:543
+#: sith/settings.py:546
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:544
+#: sith/settings.py:547
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:545
+#: sith/settings.py:548
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:546
+#: sith/settings.py:549
 msgid "Communication supervisor"
 msgstr "Responsable communication"
 
-#: sith/settings.py:547
+#: sith/settings.py:550
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:548
+#: sith/settings.py:551
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:549
+#: sith/settings.py:552
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:550
+#: sith/settings.py:553
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:551
+#: sith/settings.py:554
 msgid "Curious"
 msgstr "Curieux"
 
-#: sith/settings.py:587
+#: sith/settings.py:590
 msgid "A new poster needs to be moderated"
 msgstr "Une nouvelle affiche a besoin d'être modérée"
 
-#: sith/settings.py:588
+#: sith/settings.py:591
 msgid "A new mailing list needs to be moderated"
 msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
-#: sith/settings.py:591
+#: sith/settings.py:594
 msgid "A new pedagogy comment has been signaled for moderation"
 msgstr ""
 "Un nouveau commentaire de la pédagogie a été signalé pour la modération"
 
-#: sith/settings.py:593
+#: sith/settings.py:596
 #, python-format
 msgid "There are %s fresh news to be moderated"
 msgstr "Il y a %s nouvelles toutes fraîches à modérer"
 
-#: sith/settings.py:594
+#: sith/settings.py:597
 msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
-#: sith/settings.py:595
+#: sith/settings.py:598
 #, python-format
 msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
-#: sith/settings.py:596
+#: sith/settings.py:599
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:597
+#: sith/settings.py:600
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s€"
 
-#: sith/settings.py:598
+#: sith/settings.py:601
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:599
+#: sith/settings.py:602
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:611
+#: sith/settings.py:614
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:612
+#: sith/settings.py:615
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:613
+#: sith/settings.py:616
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:614
+#: sith/settings.py:617
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:615
+#: sith/settings.py:618
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
-#: sith/settings.py:623
+#: sith/settings.py:626
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 
