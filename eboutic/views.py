@@ -107,6 +107,10 @@ class EbouticMain(TemplateView):
         kwargs["basket"] = self.basket
         kwargs["eboutic"] = Counter.objects.filter(type="EBOUTIC").first()
         kwargs["categories"] = ProductType.objects.all()
+        if hasattr(self.request.user, "customer"):
+            kwargs["customer_amount"] = self.request.user.customer.amount
+        else:
+            kwargs["customer_amount"] = None
         if not self.request.user.was_subscribed:
             kwargs["categories"] = kwargs["categories"].exclude(
                 id=settings.SITH_PRODUCTTYPE_SUBSCRIPTION
@@ -150,6 +154,10 @@ class EbouticCommand(TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(EbouticCommand, self).get_context_data(**kwargs)
+        if hasattr(self.request.user, "customer"):
+            kwargs["customer_amount"] = self.request.user.customer.amount
+        else:
+            kwargs["customer_amount"] = None
         kwargs["et_request"] = OrderedDict()
         kwargs["et_request"]["PBX_SITE"] = settings.SITH_EBOUTIC_PBX_SITE
         kwargs["et_request"]["PBX_RANG"] = settings.SITH_EBOUTIC_PBX_RANG

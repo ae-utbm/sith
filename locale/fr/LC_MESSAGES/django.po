@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-21 10:28+0200\n"
+"POT-Creation-Date: 2019-10-21 22:04+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -733,7 +733,6 @@ msgstr "Nature de l'opération"
 #: club/templates/club/club_sellings.jinja:14
 #: counter/templates/counter/counter_click.jinja:90
 #: counter/templates/counter/counter_main.jinja:28
-#: eboutic/templates/eboutic/eboutic_main.jinja:34
 msgid "Total: "
 msgstr "Total : "
 
@@ -4320,7 +4319,22 @@ msgstr "id du type du produit"
 msgid "basket"
 msgstr "panier"
 
+#: eboutic/templates/eboutic/eboutic_main.jinja:35
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:31
+msgid "Basket amount: "
+msgstr "Valeur du panier : "
+
 #: eboutic/templates/eboutic/eboutic_main.jinja:37
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:33
+msgid "Current account amount: "
+msgstr "Solde actuel : "
+
+#: eboutic/templates/eboutic/eboutic_main.jinja:39
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:35
+msgid "Remaining account amount: "
+msgstr "Solde restant : "
+
+#: eboutic/templates/eboutic/eboutic_main.jinja:45
 msgid "Proceed to command"
 msgstr "Procéder à la commande"
 
@@ -4328,18 +4342,18 @@ msgstr "Procéder à la commande"
 msgid "Basket state"
 msgstr "État du panier"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:36
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:42
 msgid "Pay with credit card"
 msgstr "Payer avec une carte bancaire"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:40
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:46
 msgid ""
 "AE account payment disabled because your basket contains refilling items."
 msgstr ""
 "Paiement par compte AE désactivé parce que votre panier contient des bons de "
 "rechargement."
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:45
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:51
 msgid "Pay with Sith account"
 msgstr "Payer avec un compte AE"
 
@@ -4355,7 +4369,7 @@ msgstr "Le paiement a été effectué"
 msgid "Return to eboutic"
 msgstr "Retourner à l'eboutic"
 
-#: eboutic/views.py:217
+#: eboutic/views.py:219
 msgid "You do not have enough money to buy the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
