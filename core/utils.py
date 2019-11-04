@@ -189,9 +189,7 @@ def doku_to_markdown(text):
                 except:
                     new_text.append("> " * quote_level)
                 line = line.replace(quote.group(0), "")
-            final_quote_level = (
-                quote_level
-            )  # Store quote_level to use at the end, since it will be modified during quit iteration
+            final_quote_level = quote_level  # Store quote_level to use at the end, since it will be modified during quit iteration
             final_newline = False
             for quote in quit:  # Quit quotes (support multiple at a time)
                 line = line.replace(quote.group(0), "")
@@ -240,9 +238,7 @@ def bbcode_to_markdown(text):
                 except:
                     new_text.append("> " * quote_level)
                 line = line.replace(quote.group(0), "")
-            final_quote_level = (
-                quote_level
-            )  # Store quote_level to use at the end, since it will be modified during quit iteration
+            final_quote_level = quote_level  # Store quote_level to use at the end, since it will be modified during quit iteration
             final_newline = False
             for quote in quit:  # Quit quotes (support multiple at a time)
                 line = line.replace(quote.group(0), "")

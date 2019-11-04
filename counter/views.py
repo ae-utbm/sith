@@ -278,8 +278,8 @@ class CounterMain(
     template_name = "counter/counter_main.jinja"
     pk_url_kwarg = "counter_id"
     form_class = (
-        GetUserForm
-    )  # Form to enter a client code and get the corresponding user id
+        GetUserForm  # Form to enter a client code and get the corresponding user id
+    )
     current_tab = "counter"
 
     def post(self, request, *args, **kwargs):
