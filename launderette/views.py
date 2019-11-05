@@ -345,9 +345,7 @@ class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
     model = Launderette
     pk_url_kwarg = "launderette_id"
     template_name = "counter/counter_main.jinja"
-    form_class = (
-        GetLaunderetteUserForm
-    )  # Form to enter a client code and get the corresponding user id
+    form_class = GetLaunderetteUserForm  # Form to enter a client code and get the corresponding user id
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
