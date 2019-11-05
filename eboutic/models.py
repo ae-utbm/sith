@@ -24,6 +24,7 @@
 
 from django.db import models, DataError
 from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
 from django.conf import settings
 
 from accounting.models import CurrencyField
@@ -67,6 +68,12 @@ class Basket(models.Model):
             item.save()
         if item.quantity <= 0:
             item.delete()
+
+    @cached_property
+    def contains_refilling_item(self):
+        return self.items.filter(
+            type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
+        ).exists()
 
     def get_total(self):
         total = 0

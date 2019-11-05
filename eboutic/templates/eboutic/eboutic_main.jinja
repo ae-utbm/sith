@@ -35,10 +35,13 @@
         <strong>{% trans %}Basket amount: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong>
 
         {% if customer_amount != None %}
-        <br>
-        {% trans %}Current account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
-        <br>
-        {% trans %}Remaining account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount - basket.get_total()) }} €</strong>
+            <br>
+            {% trans %}Current account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
+
+            {% if not basket.contains_refilling_item %}
+            <br>
+            {% trans %}Remaining account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount - basket.get_total()) }} €</strong>
+            {% endif %}
         {% endif %}
     </p>
 
