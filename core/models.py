@@ -1454,3 +1454,27 @@ class Gift(models.Model):
 
     def is_owned_by(self, user):
         return user.is_board_member or user.is_root
+
+
+class OperationLog(models.Model):
+    """
+    General purpose log object to register operations
+    """
+
+    date = models.DateTimeField(_("date"), auto_now_add=True)
+    label = models.CharField(_("label"), max_length=255)
+    operator = models.ForeignKey(
+        User, related_name="logs", on_delete=models.SET_NULL, null=True
+    )
+    operation_type = models.CharField(
+        _("operation type"),
+        max_length=40,
+        choices=settings.SITH_LOG_OPERATION_TYPE,
+        default=settings.SITH_LOG_OPERATION_TYPE[0][0],
+    )
+
+    def is_owned_by(self, user):
+        return user.is_root
+
+    def __str__(self):
+        return "%s - %s - %s" % (self.operation_type, self.label, self.operator)

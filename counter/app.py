@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
-# - Skia <skia@libskia.so>
+# Copyright 2019
 # - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
@@ -23,16 +22,13 @@
 #
 #
 
-from django.urls import re_path
+from django.apps import AppConfig
+from django.utils.translation import ugettext_lazy as _
 
-from rootplace.views import *
 
-urlpatterns = [
-    re_path(r"^merge$", MergeUsersView.as_view(), name="merge"),
-    re_path(
-        r"^forum/messages/delete$",
-        DeleteAllForumUserMessagesView.as_view(),
-        name="delete_forum_messages",
-    ),
-    re_path(r"^logs$", OperationLogListView.as_view(), name="operation_logs"),
-]
+class CounterConfig(AppConfig):
+    name = "counter"
+    verbose_name = _("counter")
+
+    def ready(self):
+        import counter.signals

@@ -23,6 +23,7 @@
 #
 
 import importlib
+import threading
 from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 from django.contrib.auth import get_user
@@ -54,3 +55,22 @@ class AuthenticationMiddleware(DjangoAuthenticationMiddleware):
             "'account.middleware.AuthenticationMiddleware'."
         )
         request.user = SimpleLazyObject(lambda: get_cached_user(request))
+
+
+class RequestMiddleware:
+    """
+    Allow to access current request in signals
+    This is a hack that looks into the thread
+    !!! Do not use if your operation is asynchronus !!!
+    Mainly used for log purpose
+    """
+
+    def __init__(self, get_response, thread_local=threading.local()):
+        self.get_response = get_response
+        self.thread_local = thread_local
+
+    def __call__(self, request):
+        self.thread_local.current_request = request
+
+        response = self.get_response(request)
+        return response

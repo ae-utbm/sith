@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-21 22:04+0200\n"
+"POT-Creation-Date: 2019-11-13 23:14+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -128,10 +128,10 @@ msgid "journal"
 msgstr "classeur"
 
 #: accounting/models.py:290 core/models.py:825 core/models.py:1363
-#: core/models.py:1411 core/models.py:1440 counter/models.py:364
-#: counter/models.py:457 counter/models.py:662 eboutic/models.py:46
-#: eboutic/models.py:93 forum/models.py:311 forum/models.py:408
-#: stock/models.py:104
+#: core/models.py:1411 core/models.py:1440 core/models.py:1464
+#: counter/models.py:364 counter/models.py:457 counter/models.py:662
+#: eboutic/models.py:46 eboutic/models.py:93 forum/models.py:311
+#: forum/models.py:408 stock/models.py:104
 msgid "date"
 msgstr "date"
 
@@ -166,7 +166,8 @@ msgid "accounting type"
 msgstr "type comptable"
 
 #: accounting/models.py:328 accounting/models.py:475 accounting/models.py:510
-#: accounting/models.py:545 core/models.py:1439 counter/models.py:423
+#: accounting/models.py:545 core/models.py:1439 core/models.py:1465
+#: counter/models.py:423
 msgid "label"
 msgstr "étiquette"
 
@@ -218,7 +219,7 @@ msgstr "Compte"
 msgid "Company"
 msgstr "Entreprise"
 
-#: accounting/models.py:341 sith/settings.py:380
+#: accounting/models.py:341 sith/settings.py:379
 #: stock/templates/stock/shopping_list_items.jinja:37
 msgid "Other"
 msgstr "Autre"
@@ -316,7 +317,7 @@ msgstr "Liste des types comptable"
 #: accounting/templates/accounting/label_list.jinja:10
 #: accounting/templates/accounting/operation_edit.jinja:10
 #: accounting/templates/accounting/simplifiedaccountingtype_list.jinja:10
-#: core/templates/core/user_tools.jinja:57
+#: core/templates/core/user_tools.jinja:58
 msgid "Accounting"
 msgstr "Comptabilité"
 
@@ -335,7 +336,7 @@ msgstr "Il n'y a pas de types comptable dans ce site web."
 
 #: accounting/templates/accounting/bank_account_details.jinja:4
 #: accounting/templates/accounting/bank_account_details.jinja:14
-#: core/templates/core/user_tools.jinja:66
+#: core/templates/core/user_tools.jinja:67
 msgid "Bank account: "
 msgstr "Compte en banque : "
 
@@ -425,7 +426,7 @@ msgstr "Nouveau compte club"
 #: com/templates/com/weekmail.jinja:61 core/templates/core/file.jinja:38
 #: core/templates/core/group_list.jinja:24 core/templates/core/page.jinja:35
 #: core/templates/core/poster_list.jinja:40
-#: core/templates/core/user_tools.jinja:42 core/views/user.py:228
+#: core/templates/core/user_tools.jinja:43 core/views/user.py:228
 #: counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:33
@@ -531,7 +532,7 @@ msgid "Effective amount"
 msgstr "Montant effectif"
 
 #: accounting/templates/accounting/club_account_details.jinja:36
-#: sith/settings.py:424
+#: sith/settings.py:423
 msgid "Closed"
 msgstr "Fermé"
 
@@ -576,7 +577,7 @@ msgstr "Voir"
 
 #: accounting/templates/accounting/co_list.jinja:4
 #: accounting/templates/accounting/journal_details.jinja:19
-#: core/templates/core/user_tools.jinja:62
+#: core/templates/core/user_tools.jinja:63
 msgid "Company list"
 msgstr "Liste des entreprises"
 
@@ -631,7 +632,8 @@ msgstr "No"
 #: core/templates/core/user_account_detail.jinja:78
 #: counter/templates/counter/cash_summary_list.jinja:34
 #: counter/templates/counter/last_ops.jinja:14
-#: counter/templates/counter/last_ops.jinja:39 sas/views.py:369
+#: counter/templates/counter/last_ops.jinja:39
+#: rootplace/templates/rootplace/logs.jinja:12 sas/views.py:369
 #: stock/templates/stock/stock_shopping_list.jinja:25
 #: stock/templates/stock/stock_shopping_list.jinja:54
 #: trombi/templates/trombi/user_profile.jinja:40
@@ -642,6 +644,7 @@ msgstr "Date"
 #: club/templates/club/club_sellings.jinja:24
 #: core/templates/core/user_account_detail.jinja:20
 #: counter/templates/counter/last_ops.jinja:42
+#: rootplace/templates/rootplace/logs.jinja:14
 msgid "Label"
 msgstr "Étiquette"
 
@@ -711,6 +714,7 @@ msgid "Accounting statement: "
 msgstr "Bilan comptable : "
 
 #: accounting/templates/accounting/journal_statement_accounting.jinja:15
+#: rootplace/templates/rootplace/logs.jinja:13
 msgid "Operation type"
 msgstr "Type d'opération"
 
@@ -1113,7 +1117,7 @@ msgid "inactive"
 msgstr "inactif"
 
 #: club/templates/club/club_list.jinja:34
-#: core/templates/core/user_tools.jinja:23
+#: core/templates/core/user_tools.jinja:24
 msgid "New club"
 msgstr "Nouveau club"
 
@@ -1245,7 +1249,7 @@ msgid "Payment method"
 msgstr "Méthode de paiement"
 
 #: club/templates/club/club_tools.jinja:4
-#: core/templates/core/user_tools.jinja:100
+#: core/templates/core/user_tools.jinja:101
 msgid "Club tools"
 msgstr "Outils club"
 
@@ -1272,7 +1276,7 @@ msgstr "Nouveau Trombi"
 #: club/templates/club/club_tools.jinja:14
 #: com/templates/com/poster_list.jinja:17
 #: core/templates/core/poster_list.jinja:17
-#: core/templates/core/user_tools.jinja:90
+#: core/templates/core/user_tools.jinja:91
 msgid "Posters"
 msgstr "Affiches"
 
@@ -1496,7 +1500,7 @@ msgid "Begin date should be before end date"
 msgstr "La date de début doit être avant celle de fin"
 
 #: com/templates/com/mailing_admin.jinja:4 com/views.py:131
-#: core/templates/core/user_tools.jinja:89
+#: core/templates/core/user_tools.jinja:90
 msgid "Mailing lists administration"
 msgstr "Administration des mailing listes"
 
@@ -1544,7 +1548,7 @@ msgstr "Nouvelles"
 
 #: com/templates/com/news_admin_list.jinja:11
 #: com/templates/com/news_edit.jinja:8 com/templates/com/news_edit.jinja:31
-#: core/templates/core/user_tools.jinja:84
+#: core/templates/core/user_tools.jinja:85
 msgid "Create news"
 msgstr "Créer nouvelle"
 
@@ -1792,7 +1796,7 @@ msgid "Screen - edit"
 msgstr "Écran - modifier"
 
 #: com/templates/com/screen_list.jinja:4 com/templates/com/screen_list.jinja:11
-#: core/templates/core/user_tools.jinja:91
+#: core/templates/core/user_tools.jinja:92
 msgid "Screens"
 msgstr "Écrans"
 
@@ -1807,7 +1811,7 @@ msgid "Slideshow"
 msgstr "Diaporama"
 
 #: com/templates/com/weekmail.jinja:5 com/templates/com/weekmail.jinja:9
-#: com/views.py:108 core/templates/core/user_tools.jinja:82
+#: com/views.py:108 core/templates/core/user_tools.jinja:83
 msgid "Weekmail"
 msgstr "Weekmail"
 
@@ -1905,7 +1909,7 @@ msgstr "Date de début"
 msgid "Communication administration"
 msgstr "Administration de la communication"
 
-#: com/views.py:114 core/templates/core/user_tools.jinja:83
+#: com/views.py:114 core/templates/core/user_tools.jinja:84
 msgid "Weekmail destinations"
 msgstr "Destinataires du Weekmail"
 
@@ -2355,6 +2359,10 @@ msgstr "param"
 msgid "viewed"
 msgstr "vue"
 
+#: core/models.py:1470
+msgid "operation type"
+msgstr "type d'opération"
+
 #: core/templates/core/403.jinja:5
 msgid "403, Forbidden"
 msgstr "403, Non autorisé"
@@ -2474,7 +2482,7 @@ msgstr "Photos"
 #: eboutic/templates/eboutic/eboutic_main.jinja:24
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:8
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:4
-#: sith/settings.py:379 sith/settings.py:387
+#: sith/settings.py:378 sith/settings.py:386
 msgid "Eboutic"
 msgstr "Eboutic"
 
@@ -2498,7 +2506,7 @@ msgstr "Laverie"
 msgid "Files"
 msgstr "Fichiers"
 
-#: core/templates/core/base.jinja:189 core/templates/core/user_tools.jinja:108
+#: core/templates/core/base.jinja:189 core/templates/core/user_tools.jinja:109
 msgid "Pedagogy"
 msgstr "Pédagogie"
 
@@ -2687,7 +2695,7 @@ msgstr "Éditer le groupe"
 #: core/templates/core/group_edit.jinja:9
 #: core/templates/core/user_edit.jinja:37
 #: core/templates/core/user_group.jinja:8
-#: pedagogy/templates/pedagogy/uv_create.jinja:36
+#: pedagogy/templates/pedagogy/uv_edit.jinja:36
 msgid "Update"
 msgstr "Mettre à jour"
 
@@ -3054,7 +3062,7 @@ msgid "Eboutic invoices"
 msgstr "Facture eboutic"
 
 #: core/templates/core/user_account.jinja:57
-#: core/templates/core/user_tools.jinja:36 counter/views.py:822
+#: core/templates/core/user_tools.jinja:37 counter/views.py:822
 msgid "Etickets"
 msgstr "Etickets"
 
@@ -3373,141 +3381,146 @@ msgid "Merge users"
 msgstr "Fusionner deux utilisateurs"
 
 #: core/templates/core/user_tools.jinja:16
+#: rootplace/templates/rootplace/logs.jinja:5
+msgid "Operation logs"
+msgstr "Journal d'opérations"
+
+#: core/templates/core/user_tools.jinja:17
 #: rootplace/templates/rootplace/delete_user_messages.jinja:4
 msgid "Delete user's forum messages"
 msgstr "Supprimer les messages forum d'un utilisateur"
 
-#: core/templates/core/user_tools.jinja:19
+#: core/templates/core/user_tools.jinja:20
 msgid "Subscriptions"
 msgstr "Cotisations"
 
-#: core/templates/core/user_tools.jinja:22
+#: core/templates/core/user_tools.jinja:23
 #: subscription/templates/subscription/stats.jinja:4
 msgid "Subscription stats"
 msgstr "Statistiques de cotisation"
 
-#: core/templates/core/user_tools.jinja:28 counter/views.py:792
+#: core/templates/core/user_tools.jinja:29 counter/views.py:792
 #: counter/views.py:1000
 msgid "Counters"
 msgstr "Comptoirs"
 
-#: core/templates/core/user_tools.jinja:31
+#: core/templates/core/user_tools.jinja:32
 msgid "General counters management"
 msgstr "Gestion générale des comptoirs"
 
-#: core/templates/core/user_tools.jinja:32
+#: core/templates/core/user_tools.jinja:33
 msgid "Products management"
 msgstr "Gestion des produits"
 
-#: core/templates/core/user_tools.jinja:33
+#: core/templates/core/user_tools.jinja:34
 msgid "Product types management"
 msgstr "Gestion des types de produit"
 
-#: core/templates/core/user_tools.jinja:34
+#: core/templates/core/user_tools.jinja:35
 #: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:812
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
 
-#: core/templates/core/user_tools.jinja:35
+#: core/templates/core/user_tools.jinja:36
 #: counter/templates/counter/invoices_call.jinja:4 counter/views.py:817
 msgid "Invoices call"
 msgstr "Appels à facture"
 
-#: core/templates/core/user_tools.jinja:43 core/views/user.py:277
+#: core/templates/core/user_tools.jinja:44 core/views/user.py:277
 #: counter/templates/counter/counter_list.jinja:18
 #: counter/templates/counter/counter_list.jinja:34
 #: counter/templates/counter/counter_list.jinja:56
 msgid "Stats"
 msgstr "Stats"
 
-#: core/templates/core/user_tools.jinja:47
+#: core/templates/core/user_tools.jinja:48
 #: counter/templates/counter/counter_list.jinja:38
 #: stock/templates/stock/stock_item_list.jinja:11
 #: stock/templates/stock/stock_list.jinja:16
 msgid "Shopping lists"
 msgstr "Liste de courses"
 
-#: core/templates/core/user_tools.jinja:49
+#: core/templates/core/user_tools.jinja:50
 #: counter/templates/counter/counter_list.jinja:40
 msgid "Create new stock"
 msgstr "Créer nouveau stock"
 
-#: core/templates/core/user_tools.jinja:60
+#: core/templates/core/user_tools.jinja:61
 msgid "Refound Account"
 msgstr "Rembourser un compte"
 
-#: core/templates/core/user_tools.jinja:61
+#: core/templates/core/user_tools.jinja:62
 msgid "General accounting"
 msgstr "Comptabilité générale"
 
-#: core/templates/core/user_tools.jinja:71
+#: core/templates/core/user_tools.jinja:72
 msgid "Club account: "
 msgstr "Compte club : "
 
-#: core/templates/core/user_tools.jinja:78
+#: core/templates/core/user_tools.jinja:79
 msgid "Communication"
 msgstr "Communication"
 
-#: core/templates/core/user_tools.jinja:81
+#: core/templates/core/user_tools.jinja:82
 msgid "Create weekmail article"
 msgstr "Rédiger un nouvel article dans le Weekmail"
 
-#: core/templates/core/user_tools.jinja:85
+#: core/templates/core/user_tools.jinja:86
 msgid "Moderate news"
 msgstr "Modérer les nouvelles"
 
-#: core/templates/core/user_tools.jinja:86
+#: core/templates/core/user_tools.jinja:87
 msgid "Edit alert message"
 msgstr "Éditer le message d'alerte"
 
-#: core/templates/core/user_tools.jinja:87
+#: core/templates/core/user_tools.jinja:88
 msgid "Edit information message"
 msgstr "Éditer le message d'informations"
 
-#: core/templates/core/user_tools.jinja:88
+#: core/templates/core/user_tools.jinja:89
 msgid "Moderate files"
 msgstr "Modérer les fichiers"
 
-#: core/templates/core/user_tools.jinja:94
+#: core/templates/core/user_tools.jinja:95
 msgid "Moderate pictures"
 msgstr "Modérer les photos"
 
-#: core/templates/core/user_tools.jinja:111
+#: core/templates/core/user_tools.jinja:112
 #: pedagogy/templates/pedagogy/guide.jinja:20
 msgid "Create UV"
 msgstr "Créer UV"
 
-#: core/templates/core/user_tools.jinja:112
+#: core/templates/core/user_tools.jinja:113
 #: pedagogy/templates/pedagogy/guide.jinja:23
 #: trombi/templates/trombi/detail.jinja:10
 msgid "Moderate comments"
 msgstr "Modérer les commentaires"
 
-#: core/templates/core/user_tools.jinja:117
+#: core/templates/core/user_tools.jinja:118
 msgid "Elections"
 msgstr "Élections"
 
-#: core/templates/core/user_tools.jinja:119
+#: core/templates/core/user_tools.jinja:120
 msgid "See available elections"
 msgstr "Voir les élections disponibles"
 
-#: core/templates/core/user_tools.jinja:120
+#: core/templates/core/user_tools.jinja:121
 msgid "See archived elections"
 msgstr "Voir les élections archivées"
 
-#: core/templates/core/user_tools.jinja:122
+#: core/templates/core/user_tools.jinja:123
 msgid "Create a new election"
 msgstr "Créer une nouvelle élection"
 
-#: core/templates/core/user_tools.jinja:127
+#: core/templates/core/user_tools.jinja:128
 msgid "Other tools"
 msgstr "Autres outils"
 
-#: core/templates/core/user_tools.jinja:129
+#: core/templates/core/user_tools.jinja:130
 msgid "Convert dokuwiki/BBcode syntax to Markdown"
 msgstr "Convertir de la syntaxe dokuwiki/BBcode vers Markdown"
 
-#: core/templates/core/user_tools.jinja:130
+#: core/templates/core/user_tools.jinja:131
 msgid "Trombi tools"
 msgstr "Outils Trombi"
 
@@ -3677,6 +3690,11 @@ msgstr "Famille"
 msgid "User already has a profile picture"
 msgstr "L'utilisateur a déjà une photo de profil"
 
+#: counter/app.py:31 counter/models.py:237 counter/models.py:629
+#: counter/models.py:659 launderette/models.py:41 stock/models.py:43
+msgid "counter"
+msgstr "comptoir"
+
 #: counter/migrations/0013_customer_recorded_products.py:26
 msgid "Ecocup regularization"
 msgstr "Régularization des ecocups"
@@ -3770,11 +3788,6 @@ msgstr "vendeurs"
 msgid "token"
 msgstr "jeton"
 
-#: counter/models.py:237 counter/models.py:629 counter/models.py:659
-#: launderette/models.py:41 stock/models.py:43
-msgid "counter"
-msgstr "comptoir"
-
 #: counter/models.py:372
 msgid "bank"
 msgstr "banque"
@@ -3799,8 +3812,8 @@ msgstr "quantité"
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: counter/models.py:461 sith/settings.py:372 sith/settings.py:377
-#: sith/settings.py:395
+#: counter/models.py:461 sith/settings.py:371 sith/settings.py:376
+#: sith/settings.py:394
 msgid "Credit card"
 msgstr "Carte bancaire"
 
@@ -4320,21 +4333,21 @@ msgid "basket"
 msgstr "panier"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja:35
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:31
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:32
 msgid "Basket amount: "
 msgstr "Valeur du panier : "
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:37
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:33
+#: eboutic/templates/eboutic/eboutic_main.jinja:39
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:36
 msgid "Current account amount: "
 msgstr "Solde actuel : "
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:39
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:35
+#: eboutic/templates/eboutic/eboutic_main.jinja:41
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:38
 msgid "Remaining account amount: "
 msgstr "Solde restant : "
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:45
+#: eboutic/templates/eboutic/eboutic_main.jinja:48
 msgid "Proceed to command"
 msgstr "Procéder à la commande"
 
@@ -4342,18 +4355,18 @@ msgstr "Procéder à la commande"
 msgid "Basket state"
 msgstr "État du panier"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:42
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:47
 msgid "Pay with credit card"
 msgstr "Payer avec une carte bancaire"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:46
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:52
 msgid ""
 "AE account payment disabled because your basket contains refilling items."
 msgstr ""
 "Paiement par compte AE désactivé parce que votre panier contient des bons de "
 "rechargement."
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:51
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:57
 msgid "Pay with Sith account"
 msgstr "Payer avec un compte AE"
 
@@ -4369,7 +4382,7 @@ msgstr "Le paiement a été effectué"
 msgid "Return to eboutic"
 msgstr "Retourner à l'eboutic"
 
-#: eboutic/views.py:219
+#: eboutic/views.py:225
 msgid "You do not have enough money to buy the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
@@ -4740,12 +4753,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:586
+#: sith/settings.py:592
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:586
+#: sith/settings.py:592
 msgid "Drying"
 msgstr "Séchage"
 
@@ -4788,7 +4801,7 @@ msgstr "Un jeton %(token_name)s existe déjà"
 msgid "User has booked no slot"
 msgstr "L'utilisateur n'a pas réservé de créneau"
 
-#: launderette/views.py:452
+#: launderette/views.py:450
 msgid "Token not found"
 msgstr "Jeton non trouvé"
 
@@ -5002,29 +5015,6 @@ msgstr "Supprimer commentaire"
 msgid "Delete report"
 msgstr "Supprimer signalement"
 
-#: pedagogy/templates/pedagogy/uv_create.jinja:4
-#: pedagogy/templates/pedagogy/uv_create.jinja:8
-msgid "Edit UV"
-msgstr "Éditer"
-
-#: pedagogy/templates/pedagogy/uv_create.jinja:27
-msgid "Import from UTBM"
-msgstr "Importer depuis l'UTBM"
-
-#: pedagogy/templates/pedagogy/uv_create.jinja:61
-#: pedagogy/templates/pedagogy/uv_create.jinja:84
-msgid "Unknown UV code"
-msgstr "Code d'UV inconnu"
-
-#: pedagogy/templates/pedagogy/uv_create.jinja:76
-#: pedagogy/templates/pedagogy/uv_create.jinja:99
-msgid "Successful autocomplete"
-msgstr "Autocomplétion réussite"
-
-#: pedagogy/templates/pedagogy/uv_create.jinja:79
-msgid "An error occured: "
-msgstr "Une erreur est survenue : "
-
 #: pedagogy/templates/pedagogy/uv_detail.jinja:6
 msgid "UV Details"
 msgstr "Détails d'UV"
@@ -5120,6 +5110,27 @@ msgstr "Ce commentaire a été signalé"
 msgid "Report this comment"
 msgstr "Signaler ce commentaire"
 
+#: pedagogy/templates/pedagogy/uv_edit.jinja:4
+#: pedagogy/templates/pedagogy/uv_edit.jinja:8
+msgid "Edit UV"
+msgstr "Éditer"
+
+#: pedagogy/templates/pedagogy/uv_edit.jinja:27
+msgid "Import from UTBM"
+msgstr "Importer depuis l'UTBM"
+
+#: pedagogy/templates/pedagogy/uv_edit.jinja:62
+msgid "Unknown UV code"
+msgstr "Code d'UV inconnu"
+
+#: pedagogy/templates/pedagogy/uv_edit.jinja:77
+msgid "Successful autocomplete"
+msgstr "Autocomplétion réussite"
+
+#: pedagogy/templates/pedagogy/uv_edit.jinja:80
+msgid "An error occured: "
+msgstr "Une erreur est survenue : "
+
 #: rootplace/templates/rootplace/delete_user_messages.jinja:8
 msgid "Delete all forum messages from an user"
 msgstr "Supprimer tous les messages forum d'un utilisateur"
@@ -5137,6 +5148,10 @@ msgstr ""
 "erreur 500), essayez en utilisant l'utilitaire en ligne de commande. "
 "Utilisez ./manage.py delete_user_messages ID."
 
+#: rootplace/templates/rootplace/logs.jinja:15
+msgid "Operator"
+msgstr "Opérateur"
+
 #: rootplace/templates/rootplace/merge.jinja:8
 msgid "Merge two users"
 msgstr "Fusionner deux utilisateurs"
@@ -5145,15 +5160,15 @@ msgstr "Fusionner deux utilisateurs"
 msgid "Merge"
 msgstr "Fusion"
 
-#: rootplace/views.py:110
+#: rootplace/views.py:112
 msgid "User that will be kept"
 msgstr "Utilisateur qui sera conservé"
 
-#: rootplace/views.py:113
+#: rootplace/views.py:115
 msgid "User that will be deleted"
 msgstr "Utilisateur qui sera supprimé"
 
-#: rootplace/views.py:119
+#: rootplace/views.py:121
 msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
@@ -5237,360 +5252,368 @@ msgstr "Erreur de création de l'album %(album)s : %(msg)s"
 msgid "Add user"
 msgstr "Ajouter une personne"
 
-#: sith/settings.py:218 sith/settings.py:432
+#: sith/settings.py:219 sith/settings.py:431
 msgid "English"
 msgstr "Anglais"
 
-#: sith/settings.py:218 sith/settings.py:431
+#: sith/settings.py:219 sith/settings.py:430
 msgid "French"
 msgstr "Français"
 
-#: sith/settings.py:353
+#: sith/settings.py:352
 msgid "TC"
 msgstr "TC"
 
-#: sith/settings.py:354
+#: sith/settings.py:353
 msgid "IMSI"
 msgstr "IMSI"
 
-#: sith/settings.py:355
+#: sith/settings.py:354
 msgid "IMAP"
 msgstr "IMAP"
 
-#: sith/settings.py:356
+#: sith/settings.py:355
 msgid "INFO"
 msgstr "INFO"
 
-#: sith/settings.py:357
+#: sith/settings.py:356
 msgid "GI"
 msgstr "GI"
 
-#: sith/settings.py:358 sith/settings.py:442
+#: sith/settings.py:357 sith/settings.py:441
 msgid "E"
 msgstr "E"
 
-#: sith/settings.py:359
+#: sith/settings.py:358
 msgid "EE"
 msgstr "EE"
 
-#: sith/settings.py:360
+#: sith/settings.py:359
 msgid "GESC"
 msgstr "GESC"
 
-#: sith/settings.py:361
+#: sith/settings.py:360
 msgid "GMC"
 msgstr "GMC"
 
-#: sith/settings.py:362
+#: sith/settings.py:361
 msgid "MC"
 msgstr "MC"
 
-#: sith/settings.py:363
+#: sith/settings.py:362
 msgid "EDIM"
 msgstr "EDIM"
 
-#: sith/settings.py:364
+#: sith/settings.py:363
 msgid "Humanities"
 msgstr "Humanités"
 
-#: sith/settings.py:365
+#: sith/settings.py:364
 msgid "N/A"
 msgstr "N/A"
 
-#: sith/settings.py:369 sith/settings.py:376 sith/settings.py:393
+#: sith/settings.py:368 sith/settings.py:375 sith/settings.py:392
 msgid "Check"
 msgstr "Chèque"
 
-#: sith/settings.py:370 sith/settings.py:378 sith/settings.py:394
+#: sith/settings.py:369 sith/settings.py:377 sith/settings.py:393
 msgid "Cash"
 msgstr "Espèces"
 
-#: sith/settings.py:371
+#: sith/settings.py:370
 msgid "Transfert"
 msgstr "Virement"
 
-#: sith/settings.py:384
+#: sith/settings.py:383
 msgid "Belfort"
 msgstr "Belfort"
 
-#: sith/settings.py:385
+#: sith/settings.py:384
 msgid "Sevenans"
 msgstr "Sevenans"
 
-#: sith/settings.py:386
+#: sith/settings.py:385
 msgid "Montbéliard"
 msgstr "Montbéliard"
 
-#: sith/settings.py:412
+#: sith/settings.py:411
 msgid "Free"
 msgstr "Libre"
 
-#: sith/settings.py:413
+#: sith/settings.py:412
 msgid "CS"
 msgstr "CS"
 
-#: sith/settings.py:414
+#: sith/settings.py:413
 msgid "TM"
 msgstr "TM"
 
-#: sith/settings.py:415
+#: sith/settings.py:414
 msgid "OM"
 msgstr "OM"
 
-#: sith/settings.py:416
+#: sith/settings.py:415
 msgid "QC"
 msgstr "QC"
 
-#: sith/settings.py:417
+#: sith/settings.py:416
 msgid "EC"
 msgstr "EC"
 
-#: sith/settings.py:418
+#: sith/settings.py:417
 msgid "RN"
 msgstr "RN"
 
-#: sith/settings.py:419
+#: sith/settings.py:418
 msgid "ST"
 msgstr "ST"
 
-#: sith/settings.py:420
+#: sith/settings.py:419
 msgid "EXT"
 msgstr "EXT"
 
-#: sith/settings.py:425
+#: sith/settings.py:424
 msgid "Autumn"
 msgstr "Automne"
 
-#: sith/settings.py:426
+#: sith/settings.py:425
 msgid "Spring"
 msgstr "Printemps"
 
-#: sith/settings.py:427
+#: sith/settings.py:426
 msgid "Autumn and spring"
 msgstr "Automne et printemps"
 
-#: sith/settings.py:433
+#: sith/settings.py:432
 msgid "German"
 msgstr "Allemant"
 
-#: sith/settings.py:434
+#: sith/settings.py:433
 msgid "Spanich"
 msgstr "Espagnol"
 
-#: sith/settings.py:438
+#: sith/settings.py:437
 msgid "A"
 msgstr "A"
 
-#: sith/settings.py:439
+#: sith/settings.py:438
 msgid "B"
 msgstr "B"
 
-#: sith/settings.py:440
+#: sith/settings.py:439
 msgid "C"
 msgstr "C"
 
-#: sith/settings.py:441
+#: sith/settings.py:440
 msgid "D"
 msgstr "D"
 
-#: sith/settings.py:443
+#: sith/settings.py:442
 msgid "FX"
 msgstr "FX"
 
-#: sith/settings.py:444
+#: sith/settings.py:443
 msgid "F"
 msgstr "F"
 
-#: sith/settings.py:445
+#: sith/settings.py:444
 msgid "Abs"
 msgstr "Abs"
 
-#: sith/settings.py:474
+#: sith/settings.py:448
+msgid "Selling deletion"
+msgstr "Suppression de vente"
+
+#: sith/settings.py:449
+msgid "Refilling deletion"
+msgstr "Suppression de rechargement"
+
+#: sith/settings.py:480
 msgid "One semester"
 msgstr "Un semestre, 15 €"
 
-#: sith/settings.py:475
+#: sith/settings.py:481
 msgid "Two semesters"
 msgstr "Deux semestres, 28 €"
 
-#: sith/settings.py:477
+#: sith/settings.py:483
 msgid "Common core cursus"
 msgstr "Cursus tronc commun, 45 €"
 
-#: sith/settings.py:481
+#: sith/settings.py:487
 msgid "Branch cursus"
 msgstr "Cursus branche, 45 €"
 
-#: sith/settings.py:482
+#: sith/settings.py:488
 msgid "Alternating cursus"
 msgstr "Cursus alternant, 30 €"
 
-#: sith/settings.py:483
+#: sith/settings.py:489
 msgid "Honorary member"
 msgstr "Membre honoraire, 0 €"
 
-#: sith/settings.py:484
+#: sith/settings.py:490
 msgid "Assidu member"
 msgstr "Membre d'Assidu, 0 €"
 
-#: sith/settings.py:485
+#: sith/settings.py:491
 msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO, 0 €"
 
-#: sith/settings.py:486
+#: sith/settings.py:492
 msgid "UT network member"
 msgstr "Cotisant du réseau UT, 0 €"
 
-#: sith/settings.py:487
+#: sith/settings.py:493
 msgid "CROUS member"
 msgstr "Membres du CROUS, 0 €"
 
-#: sith/settings.py:488
+#: sith/settings.py:494
 msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
 
-#: sith/settings.py:490
+#: sith/settings.py:496
 msgid "One semester Welcome Week"
 msgstr "Un semestre Welcome Week"
 
-#: sith/settings.py:494
+#: sith/settings.py:500
 msgid "Two months for free"
 msgstr "Deux mois gratuits"
 
-#: sith/settings.py:495
+#: sith/settings.py:501
 msgid "Eurok's volunteer"
 msgstr "Bénévole Eurockéennes"
 
-#: sith/settings.py:497
+#: sith/settings.py:503
 msgid "Six weeks for free"
 msgstr "6 semaines gratuites"
 
-#: sith/settings.py:501
+#: sith/settings.py:507
 msgid "One day"
 msgstr "Un jour"
 
-#: sith/settings.py:504
+#: sith/settings.py:510
 msgid "One semester (-20%)"
 msgstr "Un semestre (-20%), 12 €"
 
-#: sith/settings.py:509
+#: sith/settings.py:515
 msgid "Two semesters (-20%)"
 msgstr "Deux semestres (-20%), 22 €"
 
-#: sith/settings.py:514
+#: sith/settings.py:520
 msgid "Common core cursus (-20%)"
 msgstr "Cursus tronc commun (-20%), 36 €"
 
-#: sith/settings.py:519
+#: sith/settings.py:525
 msgid "Branch cursus (-20%)"
 msgstr "Cursus branche (-20%), 36 €"
 
-#: sith/settings.py:524
+#: sith/settings.py:530
 msgid "Alternating cursus (-20%)"
 msgstr "Cursus alternant (-20%), 24 €"
 
-#: sith/settings.py:546
+#: sith/settings.py:552
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:547
+#: sith/settings.py:553
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:548
+#: sith/settings.py:554
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:549
+#: sith/settings.py:555
 msgid "Communication supervisor"
 msgstr "Responsable communication"
 
-#: sith/settings.py:550
+#: sith/settings.py:556
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:551
+#: sith/settings.py:557
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:552
+#: sith/settings.py:558
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:553
+#: sith/settings.py:559
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:554
+#: sith/settings.py:560
 msgid "Curious"
 msgstr "Curieux"
 
-#: sith/settings.py:590
+#: sith/settings.py:596
 msgid "A new poster needs to be moderated"
 msgstr "Une nouvelle affiche a besoin d'être modérée"
 
-#: sith/settings.py:591
+#: sith/settings.py:597
 msgid "A new mailing list needs to be moderated"
 msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
-#: sith/settings.py:594
+#: sith/settings.py:600
 msgid "A new pedagogy comment has been signaled for moderation"
 msgstr ""
 "Un nouveau commentaire de la pédagogie a été signalé pour la modération"
 
-#: sith/settings.py:596
+#: sith/settings.py:602
 #, python-format
 msgid "There are %s fresh news to be moderated"
 msgstr "Il y a %s nouvelles toutes fraîches à modérer"
 
-#: sith/settings.py:597
+#: sith/settings.py:603
 msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
-#: sith/settings.py:598
+#: sith/settings.py:604
 #, python-format
 msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
-#: sith/settings.py:599
+#: sith/settings.py:605
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:600
+#: sith/settings.py:606
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s€"
 
-#: sith/settings.py:601
+#: sith/settings.py:607
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:602
+#: sith/settings.py:608
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:614
+#: sith/settings.py:620
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:615
+#: sith/settings.py:621
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:616
+#: sith/settings.py:622
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:617
+#: sith/settings.py:623
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:618
+#: sith/settings.py:624
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
-#: sith/settings.py:626
+#: sith/settings.py:632
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 

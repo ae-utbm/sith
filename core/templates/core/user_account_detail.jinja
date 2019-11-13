@@ -63,7 +63,7 @@
         <td>{{ i.amount }} €</td>
         <td>{{ i.get_payment_method_display() }}</td>
         {% if i.is_owned_by(user) %}
-            <td><a href="{{ url('counter:refilling_delete', refilling_id=i.id) }}">Delete</a></td>
+            <td><a href="{{ url('counter:refilling_delete', refilling_id=i.id) }}">{% trans %}Delete{% endtrans %}</a></td>
         {% endif %}
     </tr>
 {% endfor %}

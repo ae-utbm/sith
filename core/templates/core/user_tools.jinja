@@ -13,6 +13,7 @@
     {% if user.is_root %}
     <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
     <li><a href="{{ url('rootplace:merge') }}">{% trans %}Merge users{% endtrans %}</a></li>
+    <li><a href="{{ url('rootplace:operation_logs') }}">{% trans %}Operation logs{% endtrans %}</a></li>
     <li><a href="{{ url('rootplace:delete_forum_messages') }}">{% trans %}Delete user's forum messages{% endtrans %}</a></li>
     {% endif %}
     {% if user.can_create_subscription or user.is_root %}

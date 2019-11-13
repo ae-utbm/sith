@@ -25,13 +25,15 @@
 
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
+from django.views.generic import ListView
 from django.urls import reverse
 from django import forms
 from django.core.exceptions import PermissionDenied
 
 from ajax_select.fields import AutoCompleteSelectField
 
-from core.models import User
+from core.views import CanEditPropMixin
+from core.models import User, OperationLog
 from counter.models import Customer
 
 from forum.models import ForumMessageMeta
@@ -165,3 +167,14 @@ class DeleteAllForumUserMessagesView(FormView):
 
     def get_success_url(self):
         return reverse("core:user_profile", kwargs={"user_id": self.user.id})
+
+
+class OperationLogListView(ListView, CanEditPropMixin):
+    """
+    List all logs
+    """
+
+    model = OperationLog
+    template_name = "rootplace/logs.jinja"
+    ordering = ["-date"]
+    paginate_by = 100
