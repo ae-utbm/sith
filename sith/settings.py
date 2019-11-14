@@ -106,6 +106,7 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "core.middleware.AuthenticationMiddleware",
+    "core.middleware.SignalRequestMiddleware",
 )
 
 ROOT_URLCONF = "sith.urls"
@@ -441,6 +442,11 @@ SITH_PEDAGOGY_UV_RESULT_GRADE = [
     ("FX", _("FX")),
     ("F", _("F")),
     ("ABS", _("Abs")),
+]
+
+SITH_LOG_OPERATION_TYPE = [
+    (("SELLING_DELETION"), _("Selling deletion")),
+    (("REFILLING_DELETION"), _("Refilling deletion")),
 ]
 
 SITH_PEDAGOGY_UTBM_API = "https://extranet1.utbm.fr/gpedago/api/guide"
