@@ -106,7 +106,7 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "core.middleware.AuthenticationMiddleware",
-    "core.middleware.RequestMiddleware",
+    "core.middleware.SignalRequestMiddleware",
 )
 
 ROOT_URLCONF = "sith.urls"

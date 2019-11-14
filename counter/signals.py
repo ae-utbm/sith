@@ -26,7 +26,7 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.conf import settings
 
-from core.middleware import RequestMiddleware
+from core.middleware import get_signal_request
 from core.models import OperationLog
 
 from counter.models import Selling, Refilling, Counter
@@ -34,13 +34,17 @@ from counter.models import Selling, Refilling, Counter
 
 def write_log(instance, operation_type):
     def get_user():
-        request = RequestMiddleware(get_response=None).thread_local.current_request
+        request = get_signal_request()
+
+        if not request:
+            return None
 
         # Get a random barmen if deletion is from a counter
-        session_token = request.session.get("counter_token", None)
+        session = getattr(request, "session", {})
+        session_token = session.get("counter_token", None)
         if session_token:
             counter = Counter.objects.filter(token=session_token).first()
-            if counter:
+            if counter and len(counter.get_barmen_list()) > 0:
                 return counter.get_random_barman()
 
         # Get the current logged user if not from a counter
