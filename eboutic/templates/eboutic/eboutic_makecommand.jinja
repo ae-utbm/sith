@@ -32,10 +32,13 @@
         <strong>{% trans %}Basket amount: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong>
 
         {% if customer_amount != None %}
-        <br>
-        {% trans %}Current account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
-        <br>
-        {% trans %}Remaining account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount - basket.get_total()) }} €</strong>
+            <br>
+            {% trans %}Current account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
+
+            {% if not basket.contains_refilling_item %}
+            <br>
+            {% trans %}Remaining account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount - basket.get_total()) }} €</strong>
+            {% endif %}
         {% endif %}
     </p>
     {% if settings.SITH_EBOUTIC_CB_ENABLED %}
@@ -48,7 +51,7 @@
         </p>
     </form>
     {% endif %}
-    {% if basket.items.filter(type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING).exists() %}
+    {% if basket.contains_refilling_item %}
     <p>{% trans %}AE account payment disabled because your basket contains refilling items.{% endtrans %}</p>
     {% else %}
     <form method="post" action="{{ url('eboutic:pay_with_sith') }}">
