@@ -33,8 +33,13 @@ Bienvenue sur la documentation du Sith de l'AE
     :caption: La surcouche "Site AE"
 
     overlay/rights
-    .. Les clubs
     overlay/groups
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Contenu de l'environnement de développement
+
+    devenv/populate
 
 .. toctree::
     :maxdepth: 1

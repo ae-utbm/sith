@@ -37,6 +37,8 @@ Les méta groupes, comme expliqués précédemment, sont utilisés dans les cont
     :members:
 
 
+.. _groups-list:
+
 La liste des groupes réels
 --------------------------
 
