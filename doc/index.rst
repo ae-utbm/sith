@@ -33,6 +33,8 @@ Bienvenue sur la documentation du Sith de l'AE
     :caption: La surcouche "Site AE"
 
     overlay/rights
+    .. Les clubs
+    overlay/groups
 
 .. toctree::
     :maxdepth: 1

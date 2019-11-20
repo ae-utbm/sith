@@ -65,11 +65,19 @@ class MetaGroupManager(AuthGroupManager):
 
 
 class Group(AuthGroup):
+    """
+    Implement both RealGroups and Meta groups
+
+    Groups are sorted by their is_meta property
+    """
+
+    #: If False, this is a RealGroup
     is_meta = models.BooleanField(
         _("meta group status"),
         default=False,
         help_text=_("Whether a group is a meta group or not"),
     )
+    #: Description of the group
     description = models.CharField(_("description"), max_length=60)
 
     class Meta:
@@ -83,6 +91,15 @@ class Group(AuthGroup):
 
 
 class MetaGroup(Group):
+    """
+    MetaGroups are dynamically created groups.
+    Generaly used with clubs where creating a club creates two groups:
+
+        * club-SITH_BOARD_SUFFIX
+        * club-SITH_MEMBER_SUFFIX
+    """
+
+    #: Assign a manager in a way that MetaGroup.objects only return groups with is_meta=False
     objects = MetaGroupManager()
 
     class Meta:
@@ -94,6 +111,12 @@ class MetaGroup(Group):
 
 
 class RealGroup(Group):
+    """
+    RealGroups are created by the developer.
+    Most of the time they match a number in settings to be easily used for permissions.
+    """
+
+    #: Assign a manager in a way that MetaGroup.objects only return groups with is_meta=True
     objects = RealGroupManager()
 
     class Meta:
