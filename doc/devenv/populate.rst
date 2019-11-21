@@ -10,7 +10,7 @@ Utilisations :
 .. code-block:: shell
 
     ./manage.py setup # Génère la base de test
-    ./manage.py setup --prod # Ne génère que le schémas de base
+    ./manage.py setup --prod # Ne génère que le schéma de base et les données strictement nécessaires au fonctionnement
 
 Les groupes du site de dev
 ==========================
@@ -28,7 +28,7 @@ Voici la liste des groupes avec leur arborescence d'appartenance.
     - Carte AE
     - Guy'UT
 
-        + Woenzei'UT
+        + Woenzel'UT
 
     - Troll Penché
 
