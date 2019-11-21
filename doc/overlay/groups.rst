@@ -1,7 +1,7 @@
 Le système de groupes
 =====================
 
-Il existe deux systèmes de groupes sur le site AE. L'un se base sur l'utilisation de groupes enregistrés en base de données pendant le développement, c'est le système de groupes réels. L'autre est plus dynamique et comprend tous les groupes générés pendant l'exécution et l'utilisation du programme. Cela correspond généralement aux groupes liés aux clubs. Ce sont les méta groupes.
+Il existe deux types de groupes sur le site AE. L'un se base sur des groupes enregistrés en base de données pendant le développement, c'est le système de groupes réels. L'autre est plus dynamique et comprend tous les groupes générés pendant l'exécution et l'utilisation du programme. Cela correspond généralement aux groupes liés aux clubs. Ce sont les méta groupes.
 
 La définition d'un groupe
 --------------------------
@@ -28,7 +28,7 @@ Pour simplifier l'utilisation de ces deux types de groupe, il a été crée une 
 Les méta groupes
 ----------------
 
-Les méta groupes, comme expliqués précédemment, sont utilisés dans les contextes où il est nécessaire de créer un groupe *on runtime*. C'est principalement utilisé au travers des clubs qui créent automatiquement à leur création deux groupes :  et .
+Les méta groupes, comme expliqué précédemment, sont utilisés dans les contextes où il est nécessaire de créer un groupe *on runtime*. Les objets `MetaGroup`, bien que dynamiques, doivent tout de même s'enregistrer en base de donnée comme des vrais groupes afin de pouvoir être affectés dans les permissions d'autres objets, comme un forum ou une page de wiki par exemple. C'est principalement utilisé au travers des clubs qui génèrent automatiquement deux groupes à leur création :
 
 * club-bureau : contient tous les membres d'un club **au dessus** du grade défini dans settings.SITH_MAXIMUM_FREE_ROLE.
 * club-membres : contient tous les membres d'un club **en dessous** du grade défini dans settings.SITH_MAXIMUM_FREE_ROLE.
