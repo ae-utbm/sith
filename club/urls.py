@@ -92,6 +92,11 @@ urlpatterns = [
         name="membership_set_old",
     ),
     re_path(
+        r"^membership/(?P<membership_id>[0-9]+)/delete$",
+        MembershipDeleteView.as_view(),
+        name="membership_delete",
+    ),
+    re_path(
         r"^(?P<club_id>[0-9]+)/poster$", PosterListView.as_view(), name="poster_list"
     ),
     re_path(

@@ -242,6 +242,16 @@ class CanViewMixin(GenericContentPermissionMixinBuilder):
     permission_function = can_view
 
 
+class UserIsRootMixin(GenericContentPermissionMixinBuilder):
+    """
+    This view check if the user is root
+
+    :raises: PermissionDenied
+    """
+
+    permission_function = lambda obj, user: user.is_root
+
+
 class FormerSubscriberMixin(View):
     """
     This view check if the user was at least an old subscriber
