@@ -43,6 +43,7 @@ from core.views import (
     CanViewMixin,
     CanEditMixin,
     CanEditPropMixin,
+    UserIsRootMixin,
     TabedViewMixin,
     PageEditViewBase,
     DetailFormView,
@@ -491,6 +492,19 @@ class MembershipSetOldView(CanEditMixin, DetailView):
                 kwargs={"club_id": self.object.club.id},
             )
         )
+
+
+class MembershipDeleteView(UserIsRootMixin, DeleteView):
+    """
+    Delete a membership (for admins only)
+    """
+
+    model = Membership
+    pk_url_kwarg = "membership_id"
+    template_name = "core/delete_confirm.jinja"
+
+    def get_success_url(self):
+        return reverse_lazy("core:user_clubs", kwargs={"user_id": self.object.user.id})
 
 
 class ClubStatView(TemplateView):

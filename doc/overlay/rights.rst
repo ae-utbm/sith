@@ -87,7 +87,7 @@ Voici maintenant comment faire en définissant des fonctions personnalisées. Ce
         # Donne ou non les droits de vue de l'objet
         # Ici, l'objet n'est visible que par un utilisateur connecté
         def can_be_viewed_by(self, user):
-            return not user.user.is_anonymous
+            return not user.is_anonymous
 
 .. note::
 
@@ -154,5 +154,6 @@ Le système de permissions de propose plusieurs mixins différents, les voici da
 .. autoclass:: core.views.CanEditPropMixin
 .. autoclass:: core.views.CanEditMixin
 .. autoclass:: core.views.CanViewMixin
+.. autoclass:: core.views.UserIsRootMixin
 .. autoclass:: core.views.FormerSubscriberMixin
 .. autoclass:: core.views.UserIsLoggedMixin
