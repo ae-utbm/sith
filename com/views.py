@@ -449,7 +449,7 @@ class WeekmailPreviewView(ComTabsMixin, CanEditPropMixin, DetailView):
                 )
         except:
             pass
-        return super(WeekmailEditView, self).get(request, *args, **kwargs)
+        return super(WeekmailPreviewView, self).get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         return self.model.objects.filter(sent=False).order_by("-id").first()
