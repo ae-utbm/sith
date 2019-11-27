@@ -1,9 +1,9 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'core/macros.jinja' import user_profile_link, paginate %}
 
 {% block content %}
 <h3>{% trans %}Sellings{% endtrans %}</h3>
-<form action="" method="post">
+<form action="?page=1" method="post">
     {% csrf_token %}
     {{ form }}
     <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>
@@ -53,6 +53,7 @@
     {% endfor %}
     </tbody>
 </table>
+{{ paginate(result, paginator) }}
 {% endblock %}
 
 

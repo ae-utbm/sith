@@ -36,6 +36,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _t
 from django.core.exceptions import PermissionDenied, ValidationError, NON_FIELD_ERRORS
+from django.core.paginator import Paginator, InvalidPage
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Sum
 
@@ -331,6 +332,14 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     template_name = "club/club_sellings.jinja"
     current_tab = "sellings"
     form_class = SellingsForm
+    paginate_by = 70
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.asked_page = int(request.GET.get("page", 1))
+        except ValueError:
+            raise Http404
+        return super(ClubSellingView, self).dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super(ClubSellingView, self).get_form_kwargs()
@@ -380,6 +389,12 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
             )
             if benefit["product__purchase_price__sum"]:
                 kwargs["benefit"] = benefit["product__purchase_price__sum"]
+
+        kwargs["paginator"] = Paginator(kwargs["result"], self.paginate_by)
+        try:
+            kwargs["result"] = kwargs["paginator"].page(self.asked_page)
+        except InvalidPage:
+            raise Http404
 
         return kwargs
 
