@@ -3,7 +3,7 @@
 
 {% block content %}
 <h3>{% trans %}Sellings{% endtrans %}</h3>
-<form action="" method="get">
+<form action="" method="post">
     {% csrf_token %}
     {{ form }}
     <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>

@@ -60,7 +60,7 @@ from com.views import (
 )
 
 from club.models import Club, Membership, Mailing, MailingSubscription
-from club.forms import MailingForm, ClubEditForm, ClubMemberForm, SellingsFormBase
+from club.forms import MailingForm, ClubEditForm, ClubMemberForm, SellingsForm
 
 
 class ClubTabsMixin(TabedViewMixin):
@@ -319,7 +319,7 @@ class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
     current_tab = "elderlies"
 
 
-class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
+class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     """
     Sellings of a club
     """
@@ -328,21 +328,26 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
     pk_url_kwarg = "club_id"
     template_name = "club/club_sellings.jinja"
     current_tab = "sellings"
+    form_class = SellingsForm
 
-    def get_form_class(self):
-        kwargs = {
-            "product": forms.ModelChoiceField(
-                self.object.products.order_by("name").all(),
-                label=_("Product"),
-                required=False,
-            )
-        }
-        return type("SellingsForm", (SellingsFormBase,), kwargs)
+    def get_form_kwargs(self):
+        kwargs = super(ClubSellingView, self).get_form_kwargs()
+        kwargs["club"] = self.object
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(ClubSellingView, self).get_context_data(**kwargs)
-        form = self.get_form_class()(self.request.GET)
         qs = Selling.objects.filter(club=self.object)
+
+        kwargs["result"] = qs[:0]
+        kwargs["total"] = 0
+        kwargs["total_quantity"] = 0
+        kwargs["benefit"] = 0
+
+        form = self.get_form()
         if form.is_valid():
             if not len([v for v in form.cleaned_data.values() if v is not None]):
                 qs = Selling.objects.filter(id=-1)
@@ -352,17 +357,19 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
                 qs = qs.filter(date__lte=form.cleaned_data["end_date"])
             if form.cleaned_data["counter"]:
                 qs = qs.filter(counter=form.cleaned_data["counter"])
+            selected_products = []
             if form.cleaned_data["product"]:
-                qs = qs.filter(product__id=form.cleaned_data["product"].id)
+                selected_products.append(form.cleaned_data["product"].id)
+            if form.cleaned_data["archived_product"]:
+                selected_products.append(form.cleaned_data["selected_products"].id)
+            if len(selected_products) > 0:
+                qs = qs.filter(product__id__in=selected_products)
             kwargs["result"] = qs.all().order_by("-id")
             kwargs["total"] = sum([s.quantity * s.unit_price for s in qs.all()])
             kwargs["total_quantity"] = sum([s.quantity for s in qs.all()])
             kwargs["benefit"] = kwargs["total"] - sum(
                 [s.product.purchase_price for s in qs.exclude(product=None)]
             )
-        else:
-            kwargs["result"] = qs[:0]
-        kwargs["form"] = form
         return kwargs
 
 
