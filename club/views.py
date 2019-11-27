@@ -37,6 +37,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _t
 from django.core.exceptions import PermissionDenied, ValidationError, NON_FIELD_ERRORS
 from django.shortcuts import get_object_or_404, redirect
+from django.db.models import Sum
+
 
 from core.views import (
     CanCreateMixin,
@@ -365,19 +367,20 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
             if form.cleaned_data["archived_products"]:
                 selected_products.extend(form.cleaned_data["selected_products"])
 
-            print(selected_products)
-
             if len(selected_products) > 0:
                 qs = qs.filter(product__in=selected_products)
 
             kwargs["result"] = qs.all().order_by("-id")
-            for selling in kwargs["result"]:
-                kwargs["total"] += selling.quantity * selling.unit_price
-                kwargs["total_quantity"] += selling.quantity
-                if hasattr(selling, "product"):
-                    kwargs["benefit"] += selling.product.purchase_price
+            kwargs["total"] = sum([s.quantity * s.unit_price for s in kwargs["result"]])
+            total_quantity = qs.all().aggregate(Sum("quantity"))
+            if total_quantity["quantity__sum"]:
+                kwargs["total_quantity"] = total_quantity["quantity__sum"]
+            benefit = (
+                qs.exclude(product=None).all().aggregate(Sum("product__purchase_price"))
+            )
+            if benefit["product__purchase_price__sum"]:
+                kwargs["benefit"] = benefit["product__purchase_price__sum"]
 
-            kwargs["benefit"] = kwargs["total"] - kwargs["benefit"]
         return kwargs
 
 
