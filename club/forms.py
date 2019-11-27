@@ -170,21 +170,21 @@ class SellingsForm(forms.Form):
         required=False,
         widget=SelectDateTime,
     )
-    counter = forms.ModelChoiceField(
+    counters = forms.ModelMultipleChoiceField(
         Counter.objects.order_by("name").all(), label=_("Counter"), required=False
     )
 
     def __init__(self, club, *args, **kwargs):
 
         super(SellingsForm, self).__init__(*args, **kwargs)
-        self.fields["product"] = forms.ModelChoiceField(
+        self.fields["products"] = forms.ModelMultipleChoiceField(
             club.products.order_by("name").filter(archived=False).all(),
-            label=_("Product"),
+            label=_("Products"),
             required=False,
         )
-        self.fields["archived_product"] = forms.ModelChoiceField(
+        self.fields["archived_products"] = forms.ModelMultipleChoiceField(
             club.products.order_by("name").filter(archived=True).all(),
-            label=_("Archived product"),
+            label=_("Archived products"),
             required=False,
         )
 

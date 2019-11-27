@@ -355,21 +355,29 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
                 qs = qs.filter(date__gte=form.cleaned_data["begin_date"])
             if form.cleaned_data["end_date"]:
                 qs = qs.filter(date__lte=form.cleaned_data["end_date"])
-            if form.cleaned_data["counter"]:
-                qs = qs.filter(counter=form.cleaned_data["counter"])
+
+            if form.cleaned_data["counters"]:
+                qs = qs.filter(counter__in=form.cleaned_data["counters"])
+
             selected_products = []
-            if form.cleaned_data["product"]:
-                selected_products.append(form.cleaned_data["product"].id)
-            if form.cleaned_data["archived_product"]:
-                selected_products.append(form.cleaned_data["selected_products"].id)
+            if form.cleaned_data["products"]:
+                selected_products.extend(form.cleaned_data["products"])
+            if form.cleaned_data["archived_products"]:
+                selected_products.extend(form.cleaned_data["selected_products"])
+
+            print(selected_products)
+
             if len(selected_products) > 0:
-                qs = qs.filter(product__id__in=selected_products)
+                qs = qs.filter(product__in=selected_products)
+
             kwargs["result"] = qs.all().order_by("-id")
-            kwargs["total"] = sum([s.quantity * s.unit_price for s in qs.all()])
-            kwargs["total_quantity"] = sum([s.quantity for s in qs.all()])
-            kwargs["benefit"] = kwargs["total"] - sum(
-                [s.product.purchase_price for s in qs.exclude(product=None)]
-            )
+            for selling in kwargs["result"]:
+                kwargs["total"] += selling.quantity * selling.unit_price
+                kwargs["total_quantity"] += selling.quantity
+                if hasattr(selling, "product"):
+                    kwargs["benefit"] += selling.product.purchase_price
+
+            kwargs["benefit"] = kwargs["total"] - kwargs["benefit"]
         return kwargs
 
 
