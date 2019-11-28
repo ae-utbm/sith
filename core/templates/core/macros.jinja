@@ -113,10 +113,11 @@
     {% endif %}
 {% endmacro %}
 
-{% macro paginate(page_obj, paginator) %}
+{% macro paginate(page_obj, paginator, js_action) %}
+    {% set js = js_action|default('') %}
     {% if page_obj.has_previous() or page_obj.has_next() %}
         {% if page_obj.has_previous() %}
-            <a href="?page={{ page_obj.previous_page_number() }}">{% trans %}Previous{% endtrans %}</a>
+            <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.previous_page_number() }}">{% trans %}Previous{% endtrans %}</a>
         {% else %}
             <span class="disabled">{% trans %}Previous{% endtrans %}</span>
         {% endif %}
@@ -124,11 +125,11 @@
             {% if page_obj.number == i %}
                 <span class="active">{{ i }} <span class="sr-only">({% trans %}current{% endtrans %})</span></span>
             {% else %}
-                <a href="?page={{ i }}">{{ i }}</a>
+                <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ i }}">{{ i }}</a>
             {% endif %}
         {% endfor %}
         {% if page_obj.has_next() %}
-            <a href="?page={{ page_obj.next_page_number() }}">{% trans %}Next{% endtrans %}</a>
+            <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.next_page_number() }}">{% trans %}Next{% endtrans %}</a>
         {% else %}
             <span class="disabled">{% trans %}Next{% endtrans %}</span>
         {% endif %}

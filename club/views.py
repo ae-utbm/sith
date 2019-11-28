@@ -354,6 +354,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         qs = Selling.objects.filter(club=self.object)
 
         kwargs["result"] = qs[:0]
+        kwargs["paginated_result"] = kwargs["result"]
         kwargs["total"] = 0
         kwargs["total_quantity"] = 0
         kwargs["benefit"] = 0
@@ -392,7 +393,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
         kwargs["paginator"] = Paginator(kwargs["result"], self.paginate_by)
         try:
-            kwargs["result"] = kwargs["paginator"].page(self.asked_page)
+            kwargs["paginated_result"] = kwargs["paginator"].page(self.asked_page)
         except InvalidPage:
             raise Http404
 
