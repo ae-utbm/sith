@@ -23,6 +23,7 @@
 #
 #
 
+import csv
 
 from django.conf import settings
 from django import forms
@@ -30,7 +31,12 @@ from django.views.generic import ListView, DetailView, TemplateView, View
 from django.views.generic.edit import DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView, CreateView
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import (
+    HttpResponseRedirect,
+    HttpResponse,
+    Http404,
+    StreamingHttpResponse,
+)
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -405,16 +411,46 @@ class ClubSellingCSVView(ClubSellingView):
     Generate sellings in csv for a given period
     """
 
-    def get(self, request, *args, **kwargs):
-        import csv
+    class StreamWriter:
+        """Implements a file-like interface for streaming the CSV"""
 
-        response = HttpResponse(content_type="text/csv")
+        def write(self, value):
+            """Write the value by returning it, instead of storing in a buffer."""
+            return value
+
+    def write_selling(self, selling):
+        row = [selling.date, selling.counter]
+        if selling.seller:
+            row.append(selling.seller.get_display_name())
+        else:
+            row.append("")
+        if selling.customer:
+            row.append(selling.customer.user.get_display_name())
+        else:
+            row.append("")
+        row = row + [
+            selling.label,
+            selling.quantity,
+            selling.quantity * selling.unit_price,
+            selling.get_payment_method_display(),
+        ]
+        if selling.product:
+            row.append(selling.product.selling_price)
+            row.append(selling.product.purchase_price)
+            row.append(selling.product.selling_price - selling.product.purchase_price)
+        else:
+            row = row + ["", "", ""]
+        return row
+
+    def get(self, request, *args, **kwargs):
+
         self.object = self.get_object()
-        name = _("Sellings") + "_" + self.object.name + ".csv"
-        response["Content-Disposition"] = "filename=" + name
         kwargs = self.get_context_data(**kwargs)
+
+        # Use the StreamWriter class instead of request for streaming
+        pseudo_buffer = self.StreamWriter()
         writer = csv.writer(
-            response, delimiter=";", lineterminator="\n", quoting=csv.QUOTE_ALL
+            pseudo_buffer, delimiter=";", lineterminator="\n", quoting=csv.QUOTE_ALL
         )
 
         writer.writerow([_t("Quantity"), kwargs["total_quantity"]])
@@ -435,29 +471,17 @@ class ClubSellingCSVView(ClubSellingView):
                 _t("Benefit"),
             ]
         )
-        for o in kwargs["result"]:
-            row = [o.date, o.counter]
-            if o.seller:
-                row.append(o.seller.get_display_name())
-            else:
-                row.append("")
-            if o.customer:
-                row.append(o.customer.user.get_display_name())
-            else:
-                row.append("")
-            row = row + [
-                o.label,
-                o.quantity,
-                o.quantity * o.unit_price,
-                o.get_payment_method_display(),
-            ]
-            if o.product:
-                row.append(o.product.selling_price)
-                row.append(o.product.purchase_price)
-                row.append(o.product.selling_price - o.product.purchase_price)
-            else:
-                row = row + ["", "", ""]
-            writer.writerow(row)
+
+        # Stream response
+        response = StreamingHttpResponse(
+            (
+                writer.writerow(self.write_selling(selling))
+                for selling in kwargs["result"]
+            ),
+            content_type="text/csv",
+        )
+        name = _("Sellings") + "_" + self.object.name + ".csv"
+        response["Content-Disposition"] = "filename=" + name
 
         return response
 
