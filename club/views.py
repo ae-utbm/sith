@@ -381,7 +381,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
             if form.cleaned_data["products"]:
                 selected_products.extend(form.cleaned_data["products"])
             if form.cleaned_data["archived_products"]:
-                selected_products.extend(form.cleaned_data["selected_products"])
+                selected_products.extend(form.cleaned_data["archived_products"])
 
             if len(selected_products) > 0:
                 qs = qs.filter(product__in=selected_products)
