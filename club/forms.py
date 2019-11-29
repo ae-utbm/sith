@@ -157,7 +157,7 @@ class MailingForm(forms.Form):
         return cleaned_data
 
 
-class SellingsFormBase(forms.Form):
+class SellingsForm(forms.Form):
     begin_date = forms.DateTimeField(
         input_formats=["%Y-%m-%d %H:%M:%S"],
         label=_("Begin date"),
@@ -170,9 +170,23 @@ class SellingsFormBase(forms.Form):
         required=False,
         widget=SelectDateTime,
     )
-    counter = forms.ModelChoiceField(
+    counters = forms.ModelMultipleChoiceField(
         Counter.objects.order_by("name").all(), label=_("Counter"), required=False
     )
+
+    def __init__(self, club, *args, **kwargs):
+
+        super(SellingsForm, self).__init__(*args, **kwargs)
+        self.fields["products"] = forms.ModelMultipleChoiceField(
+            club.products.order_by("name").filter(archived=False).all(),
+            label=_("Products"),
+            required=False,
+        )
+        self.fields["archived_products"] = forms.ModelMultipleChoiceField(
+            club.products.order_by("name").filter(archived=True).all(),
+            label=_("Archived products"),
+            required=False,
+        )
 
 
 class ClubMemberForm(forms.Form):

@@ -23,6 +23,7 @@
 #
 #
 
+import csv
 
 from django.conf import settings
 from django import forms
@@ -30,13 +31,21 @@ from django.views.generic import ListView, DetailView, TemplateView, View
 from django.views.generic.edit import DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView, CreateView
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import (
+    HttpResponseRedirect,
+    HttpResponse,
+    Http404,
+    StreamingHttpResponse,
+)
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext as _t
 from django.core.exceptions import PermissionDenied, ValidationError, NON_FIELD_ERRORS
+from django.core.paginator import Paginator, InvalidPage
 from django.shortcuts import get_object_or_404, redirect
+from django.db.models import Sum
+
 
 from core.views import (
     CanCreateMixin,
@@ -60,7 +69,7 @@ from com.views import (
 )
 
 from club.models import Club, Membership, Mailing, MailingSubscription
-from club.forms import MailingForm, ClubEditForm, ClubMemberForm, SellingsFormBase
+from club.forms import MailingForm, ClubEditForm, ClubMemberForm, SellingsForm
 
 
 class ClubTabsMixin(TabedViewMixin):
@@ -319,7 +328,7 @@ class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
     current_tab = "elderlies"
 
 
-class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
+class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     """
     Sellings of a club
     """
@@ -328,21 +337,35 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
     pk_url_kwarg = "club_id"
     template_name = "club/club_sellings.jinja"
     current_tab = "sellings"
+    form_class = SellingsForm
+    paginate_by = 70
 
-    def get_form_class(self):
-        kwargs = {
-            "product": forms.ModelChoiceField(
-                self.object.products.order_by("name").all(),
-                label=_("Product"),
-                required=False,
-            )
-        }
-        return type("SellingsForm", (SellingsFormBase,), kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.asked_page = int(request.GET.get("page", 1))
+        except ValueError:
+            raise Http404
+        return super(ClubSellingView, self).dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(ClubSellingView, self).get_form_kwargs()
+        kwargs["club"] = self.object
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super(ClubSellingView, self).get_context_data(**kwargs)
-        form = self.get_form_class()(self.request.GET)
         qs = Selling.objects.filter(club=self.object)
+
+        kwargs["result"] = qs[:0]
+        kwargs["paginated_result"] = kwargs["result"]
+        kwargs["total"] = 0
+        kwargs["total_quantity"] = 0
+        kwargs["benefit"] = 0
+
+        form = self.get_form()
         if form.is_valid():
             if not len([v for v in form.cleaned_data.values() if v is not None]):
                 qs = Selling.objects.filter(id=-1)
@@ -350,19 +373,36 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailView):
                 qs = qs.filter(date__gte=form.cleaned_data["begin_date"])
             if form.cleaned_data["end_date"]:
                 qs = qs.filter(date__lte=form.cleaned_data["end_date"])
-            if form.cleaned_data["counter"]:
-                qs = qs.filter(counter=form.cleaned_data["counter"])
-            if form.cleaned_data["product"]:
-                qs = qs.filter(product__id=form.cleaned_data["product"].id)
+
+            if form.cleaned_data["counters"]:
+                qs = qs.filter(counter__in=form.cleaned_data["counters"])
+
+            selected_products = []
+            if form.cleaned_data["products"]:
+                selected_products.extend(form.cleaned_data["products"])
+            if form.cleaned_data["archived_products"]:
+                selected_products.extend(form.cleaned_data["archived_products"])
+
+            if len(selected_products) > 0:
+                qs = qs.filter(product__in=selected_products)
+
             kwargs["result"] = qs.all().order_by("-id")
-            kwargs["total"] = sum([s.quantity * s.unit_price for s in qs.all()])
-            kwargs["total_quantity"] = sum([s.quantity for s in qs.all()])
-            kwargs["benefit"] = kwargs["total"] - sum(
-                [s.product.purchase_price for s in qs.exclude(product=None)]
+            kwargs["total"] = sum([s.quantity * s.unit_price for s in kwargs["result"]])
+            total_quantity = qs.all().aggregate(Sum("quantity"))
+            if total_quantity["quantity__sum"]:
+                kwargs["total_quantity"] = total_quantity["quantity__sum"]
+            benefit = (
+                qs.exclude(product=None).all().aggregate(Sum("product__purchase_price"))
             )
-        else:
-            kwargs["result"] = qs[:0]
-        kwargs["form"] = form
+            if benefit["product__purchase_price__sum"]:
+                kwargs["benefit"] = benefit["product__purchase_price__sum"]
+
+        kwargs["paginator"] = Paginator(kwargs["result"], self.paginate_by)
+        try:
+            kwargs["paginated_result"] = kwargs["paginator"].page(self.asked_page)
+        except InvalidPage:
+            raise Http404
+
         return kwargs
 
 
@@ -371,16 +411,46 @@ class ClubSellingCSVView(ClubSellingView):
     Generate sellings in csv for a given period
     """
 
-    def get(self, request, *args, **kwargs):
-        import csv
+    class StreamWriter:
+        """Implements a file-like interface for streaming the CSV"""
 
-        response = HttpResponse(content_type="text/csv")
+        def write(self, value):
+            """Write the value by returning it, instead of storing in a buffer."""
+            return value
+
+    def write_selling(self, selling):
+        row = [selling.date, selling.counter]
+        if selling.seller:
+            row.append(selling.seller.get_display_name())
+        else:
+            row.append("")
+        if selling.customer:
+            row.append(selling.customer.user.get_display_name())
+        else:
+            row.append("")
+        row = row + [
+            selling.label,
+            selling.quantity,
+            selling.quantity * selling.unit_price,
+            selling.get_payment_method_display(),
+        ]
+        if selling.product:
+            row.append(selling.product.selling_price)
+            row.append(selling.product.purchase_price)
+            row.append(selling.product.selling_price - selling.product.purchase_price)
+        else:
+            row = row + ["", "", ""]
+        return row
+
+    def get(self, request, *args, **kwargs):
+
         self.object = self.get_object()
-        name = _("Sellings") + "_" + self.object.name + ".csv"
-        response["Content-Disposition"] = "filename=" + name
         kwargs = self.get_context_data(**kwargs)
+
+        # Use the StreamWriter class instead of request for streaming
+        pseudo_buffer = self.StreamWriter()
         writer = csv.writer(
-            response, delimiter=";", lineterminator="\n", quoting=csv.QUOTE_ALL
+            pseudo_buffer, delimiter=";", lineterminator="\n", quoting=csv.QUOTE_ALL
         )
 
         writer.writerow([_t("Quantity"), kwargs["total_quantity"]])
@@ -401,29 +471,17 @@ class ClubSellingCSVView(ClubSellingView):
                 _t("Benefit"),
             ]
         )
-        for o in kwargs["result"]:
-            row = [o.date, o.counter]
-            if o.seller:
-                row.append(o.seller.get_display_name())
-            else:
-                row.append("")
-            if o.customer:
-                row.append(o.customer.user.get_display_name())
-            else:
-                row.append("")
-            row = row + [
-                o.label,
-                o.quantity,
-                o.quantity * o.unit_price,
-                o.get_payment_method_display(),
-            ]
-            if o.product:
-                row.append(o.product.selling_price)
-                row.append(o.product.purchase_price)
-                row.append(o.product.selling_price - o.product.purchase_price)
-            else:
-                row = row + ["", "", ""]
-            writer.writerow(row)
+
+        # Stream response
+        response = StreamingHttpResponse(
+            (
+                writer.writerow(self.write_selling(selling))
+                for selling in kwargs["result"]
+            ),
+            content_type="text/csv",
+        )
+        name = _("Sellings") + "_" + self.object.name + ".csv"
+        response["Content-Disposition"] = "filename=" + name
 
         return response
 

@@ -1,9 +1,9 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'core/macros.jinja' import user_profile_link, paginate %}
 
 {% block content %}
 <h3>{% trans %}Sellings{% endtrans %}</h3>
-<form action="" method="get">
+<form id="form" action="?page=1" method="post">
     {% csrf_token %}
     {{ form }}
     <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>
@@ -28,7 +28,7 @@
         </tr>
     </thead>
     <tbody>
-    {% for s in result %}
+    {% for s in paginated_result %}
         <tr>
             <td>{{ s.date|localtime|date(DATETIME_FORMAT) }} {{ s.date|localtime|time(DATETIME_FORMAT) }}</td>
             <td>{{ s.counter }}</td>
@@ -53,6 +53,14 @@
     {% endfor %}
     </tbody>
 </table>
+<script type="text/javascript">
+    function formPagination(link){
+        $("form").attr("action", link.href);
+        link.href = "javascript:void(0)"; // block link action
+        $("form").submit();
+    }
+</script>
+{{ paginate(paginated_result, paginator, "formPagination(this)") }}
 {% endblock %}
 
 
