@@ -42,7 +42,6 @@ body {
   position: relative;
   width: 100%;
   font-family: sans-serif;
-  background: url("img/p200.png") bottom center fixed no-repeat, url("img/background.png") repeat 100px / 100px;
 }
 
 input[type=button], input[type=submit], input[type=reset],input[type=file] {
@@ -419,7 +418,7 @@ header {
   #content {
     padding: 1em 1%;
     box-shadow: $shadow-color 0px 5px 10px;
-    background-color: rgba(255, 255, 255, 0.8);
+    background: $white-color;
     overflow: auto;
   }
 
