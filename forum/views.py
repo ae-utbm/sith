@@ -42,6 +42,7 @@ from core.views import (
     CanEditMixin,
     CanEditPropMixin,
     CanCreateMixin,
+    UserIsLoggedMixin,
     can_view,
 )
 from core.views.forms import MarkdownInput
@@ -273,7 +274,9 @@ class ForumTopicEditView(CanEditMixin, UpdateView):
     template_name = "core/edit.jinja"
 
 
-class ForumTopicSubscribeView(CanViewMixin, SingleObjectMixin, RedirectView):
+class ForumTopicSubscribeView(
+    CanViewMixin, UserIsLoggedMixin, SingleObjectMixin, RedirectView
+):
     model = ForumTopic
     pk_url_kwarg = "topic_id"
     permanent = False

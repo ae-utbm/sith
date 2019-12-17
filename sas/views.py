@@ -180,6 +180,12 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
             if self.form.is_valid():
                 for uid in self.form.cleaned_data["users"]:
                     u = User.objects.filter(id=uid).first()
+                    if not u:  # Don't use a non existing user
+                        continue
+                    if PeoplePictureRelation.objects.filter(
+                        user=u, picture=self.form.cleaned_data["picture"]
+                    ).exists():  # Avoid existing relation
+                        continue
                     PeoplePictureRelation(
                         user=u, picture=self.form.cleaned_data["picture"]
                     ).save()
