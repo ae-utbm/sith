@@ -69,17 +69,6 @@ class SearchForm(forms.ModelForm):
             "phone": PhoneNumberInternationalFallbackWidget,
         }
 
-    sex = forms.ChoiceField(
-        choices=[
-            ("MAN", _("Man")),
-            ("WOMAN", _("Woman")),
-            ("INDIFFERENT", _("Indifferent")),
-        ],
-        widget=forms.RadioSelect,
-        initial="INDIFFERENT",
-        label=_("Sex"),
-    )
-
     quick = forms.CharField(label=_("Last/First name or nickname"), max_length=255)
 
     def __init__(self, *args, **kwargs):
@@ -150,7 +139,7 @@ class SearchFormListView(FormerSubscriberMixin, SingleObjectMixin, ListView):
                 search_dict = {}
                 for key, value in self.valid_form.items():
                     if key not in ("phone", "quick") and not (
-                        value == "" or value is None or value == "INDIFFERENT"
+                        value == "" or value is None
                     ):
                         search_dict[key + "__icontains"] = value
                 q = q.filter(**search_dict).all()
