@@ -43,7 +43,6 @@
     {{ form.phone.errors }}
     <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
     {{ form.phone }}
-    {{ form.sex.as_hidden() }}
     <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
     </p>
 </form>
@@ -53,7 +52,6 @@
     <p>
         {{ form.quick.errors }}
         <label for="{{ form.quick.id_for_label }}">{{ form.quick.label }}</label>
-        {{ form.sex.as_hidden() }}
         {{ form.quick }}
         <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
     </p>
