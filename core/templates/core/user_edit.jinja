@@ -52,6 +52,7 @@
     {% if not form.instance.profile_pict %}
     <script src="{{ static('core/js/webcam.js') }}"></script>
     <script language="JavaScript">
+        Webcam.hooks.error = function(msg) { console.log("Webcam.js error: " + msg) }
         Webcam.set({
                 width: 320,
                 height: 240,
