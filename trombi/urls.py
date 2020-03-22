@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2017
+# Copyright 2017,2020
 # - Skia <skia@libskia.so>
+# - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -80,5 +81,10 @@ urlpatterns = [
         r"^membership/(?P<membership_id>[0-9]+)/delete$",
         UserTrombiDeleteMembershipView.as_view(),
         name="delete_membership",
+    ),
+    re_path(
+        r"^membership/(?P<user_id>[0-9]+)/create$",
+        UserTrombiAddMembershipView.as_view(),
+        name="create_membership",
     ),
 ]

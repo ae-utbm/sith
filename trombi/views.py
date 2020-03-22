@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2017
+# Copyright 2017,2020
 # - Skia <skia@libskia.so>
+# - Sli <antoine.bartuccio@gmail.com>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -31,6 +32,7 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.conf import settings
 from django.forms.models import modelform_factory
+from django.core.exceptions import PermissionDenied
 
 from ajax_select.fields import AutoCompleteSelectField
 
@@ -407,6 +409,35 @@ class UserTrombiDeleteMembershipView(TrombiTabsMixin, CanEditMixin, DeleteView):
         return (
             super(UserTrombiDeleteMembershipView, self).get_success_url()
             + "?qn_success"
+        )
+
+
+# Used by admins when someone does not have every club in his list
+class UserTrombiAddMembershipView(TrombiTabsMixin, CreateView):
+    model = TrombiClubMembership
+    template_name = "core/edit.jinja"
+    fields = ["club", "role", "start", "end"]
+    pk_url_kwarg = "user_id"
+    current_tab = "profile"
+
+    def dispatch(self, request, *arg, **kwargs):
+        self.trombi_user = get_object_or_404(TrombiUser, pk=kwargs["user_id"])
+        if not self.trombi_user.trombi.is_owned_by(request.user):
+            raise PermissionDenied()
+
+        return super(UserTrombiAddMembershipView, self).dispatch(
+            request, *arg, **kwargs
+        )
+
+    def form_valid(self, form):
+        membership = form.save(commit=False)
+        membership.user = self.trombi_user
+        membership.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse(
+            "trombi:detail", kwargs={"trombi_id": self.trombi_user.trombi.id}
         )
 
 
