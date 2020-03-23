@@ -33,6 +33,7 @@
             </div>
             <div>{{ u.user.get_display_name() }}</div>
             <div><a href="{{ url('trombi:delete_user', user_id=u.id) }}">{% trans %}Delete{% endtrans %}</a></div>
+            <div><a href="{{ url('trombi:create_membership', user_id=u.id) }}">{% trans %}Add club membership{% endtrans %}</a></div>
         </div>
     {% endfor %}
     </div>
