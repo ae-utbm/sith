@@ -47,7 +47,7 @@ class UserIndex(indexes.SearchIndex, indexes.Indexable):
         return "last_update"
 
     def prepare_auto(self, obj):
-        return self.prepared_data["auto"].strip()
+        return self.prepared_data["auto"].strip()[:245]
 
 
 class IndexSignalProcessor(signals.BaseSignalProcessor):
