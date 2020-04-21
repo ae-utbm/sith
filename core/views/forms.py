@@ -42,6 +42,10 @@ from django.utils.translation import ugettext
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from ajax_select.fields import AutoCompleteSelectField
 from ajax_select import make_ajax_field
+from django.utils.dateparse import parse_datetime
+from django.utils import timezone
+import datetime
+from django.forms.utils import to_current_timezone
 
 import re
 
@@ -392,3 +396,26 @@ class GiftForm(forms.ModelForm):
                 id=user_id
             )
             self.fields["user"].widget = forms.HiddenInput()
+
+
+class TzAwareDateTimeField(forms.DateTimeField):
+    def __init__(
+        self, input_formats=["%Y-%m-%d %H:%M:%S"], widget=SelectDateTime, **kwargs
+    ):
+        super().__init__(input_formats=input_formats, widget=widget, **kwargs)
+
+    def prepare_value(self, value):
+        # the db value is a datetime as a string in UTC
+        if isinstance(value, str):
+            # convert it into a naive datetime (no timezone attached)
+            value = parse_datetime(value)
+            # attach it to the UTC timezone (so that to_current_timezone()
+            # converts it to the local timezone)
+            value = timezone.make_aware(value, timezone.utc)
+
+        if isinstance(value, datetime.datetime):
+            value = to_current_timezone(value)
+            # otherwise it is formatted according to locale (in french)
+            value = str(value)
+
+        return value

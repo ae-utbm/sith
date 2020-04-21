@@ -52,6 +52,7 @@ from core.views import (
 from core.views.forms import SelectDateTime, MarkdownInput
 from core.models import Notification, RealGroup, User
 from club.models import Club, Mailing
+from core.views.forms import TzAwareDateTimeField
 
 
 # Sith object
@@ -73,19 +74,12 @@ class PosterForm(forms.ModelForm):
         ]
         widgets = {"screens": forms.CheckboxSelectMultiple}
 
-    date_begin = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
+    date_begin = TzAwareDateTimeField(
         label=_("Start date"),
-        widget=SelectDateTime,
         required=True,
         initial=timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
-    date_end = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End date"),
-        widget=SelectDateTime,
-        required=False,
-    )
+    date_end = TzAwareDateTimeField(label=_("End date"), required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
@@ -199,24 +193,10 @@ class NewsForm(forms.ModelForm):
             "content": MarkdownInput,
         }
 
-    start_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Start date"),
-        widget=SelectDateTime,
-        required=False,
-    )
-    end_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End date"),
-        widget=SelectDateTime,
-        required=False,
-    )
-    until = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Until"),
-        widget=SelectDateTime,
-        required=False,
-    )
+    start_date = TzAwareDateTimeField(label=_("Start date"), required=False)
+    end_date = TzAwareDateTimeField(label=_("End date"), required=False)
+    until = TzAwareDateTimeField(label=_("Until"), required=False)
+
     automoderation = forms.BooleanField(label=_("Automoderation"), required=False)
 
     def clean(self):

@@ -70,6 +70,7 @@ from counter.models import (
     Permanency,
 )
 from accounting.models import CurrencyField
+from core.views.forms import TzAwareDateTimeField
 
 
 class CounterAdminMixin(View):
@@ -1584,18 +1585,8 @@ class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 
 class CashSummaryFormBase(forms.Form):
-    begin_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Begin date"),
-        required=False,
-        widget=SelectDateTime,
-    )
-    end_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End date"),
-        required=False,
-        widget=SelectDateTime,
-    )
+    begin_date = TzAwareDateTimeField(label=_("Begin date"), required=False)
+    end_date = TzAwareDateTimeField(label=_("End date"), required=False)
 
 
 class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):

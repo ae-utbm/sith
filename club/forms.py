@@ -34,6 +34,7 @@ from club.models import Mailing, MailingSubscription, Club, Membership
 from core.models import User
 from core.views.forms import SelectDate, SelectDateTime
 from counter.models import Counter
+from core.views.forms import TzAwareDateTimeField
 
 
 class ClubEditForm(forms.ModelForm):
@@ -158,18 +159,9 @@ class MailingForm(forms.Form):
 
 
 class SellingsForm(forms.Form):
-    begin_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Begin date"),
-        required=False,
-        widget=SelectDateTime,
-    )
-    end_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End date"),
-        required=False,
-        widget=SelectDateTime,
-    )
+    begin_date = TzAwareDateTimeField(label=_("Begin date"), required=False)
+    end_date = TzAwareDateTimeField(label=_("End date"), required=False)
+
     counters = forms.ModelMultipleChoiceField(
         Counter.objects.order_by("name").all(), label=_("Counter"), required=False
     )

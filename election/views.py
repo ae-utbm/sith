@@ -14,6 +14,7 @@ from core.views import CanViewMixin, CanEditMixin, CanCreateMixin
 from django.db.models.query import QuerySet
 from core.views.forms import SelectDateTime, MarkdownInput
 from election.models import Election, Role, Candidature, ElectionList, Vote
+from core.views.forms import TzAwareDateTimeField
 
 from ajax_select.fields import AutoCompleteSelectField
 from ajax_select import make_ajax_field
@@ -167,30 +168,12 @@ class ElectionForm(forms.ModelForm):
         label=_("candidature groups"),
     )
 
-    start_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Start date"),
-        widget=SelectDateTime,
-        required=True,
+    start_date = TzAwareDateTimeField(label=_("Start date"), required=True)
+    end_date = TzAwareDateTimeField(label=_("End date"), required=True)
+    start_candidature = TzAwareDateTimeField(
+        label=_("Start candidature"), required=True
     )
-    end_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End date"),
-        widget=SelectDateTime,
-        required=True,
-    )
-    start_candidature = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Start candidature"),
-        widget=SelectDateTime,
-        required=True,
-    )
-    end_candidature = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End candidature"),
-        widget=SelectDateTime,
-        required=True,
-    )
+    end_candidature = TzAwareDateTimeField(label=_("End candidature"), required=True)
 
 
 # Display elections
