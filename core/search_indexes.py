@@ -45,6 +45,9 @@ class UserIndex(indexes.SearchIndex, indexes.Indexable):
     def get_updated_field(self):
         return "last_update"
 
+    def prepare_auto(self, obj):
+        return self.prepared_data["auto"].strip()
+
 
 class IndexSignalProcessor(signals.BaseSignalProcessor):
     def setup(self):

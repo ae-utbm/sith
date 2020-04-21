@@ -30,6 +30,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import html
 from django.views.generic import ListView, TemplateView
 from django.conf import settings
+from django.utils.text import slugify
 
 import json
 
@@ -73,7 +74,13 @@ def notification(request, notif_id):
 
 def search_user(query, as_json=False):
     try:
-        res = SearchQuerySet().models(User).autocomplete(auto=html.escape(query))[:20]
+        # slugify turns everything into ascii and every whitespace into -
+        # it ends by removing duplicate - (so '- - ' will turn into '-')
+        # replace('-', ' ') because search is whitespace based
+        query = slugify(query).replace("-", " ")
+        # is this necessary? it's not done when indexing users
+        query = html.escape(query)
+        res = SearchQuerySet().models(User).autocomplete(auto=query)[:20]
         return [r.object for r in res]
     except TypeError:
         return []

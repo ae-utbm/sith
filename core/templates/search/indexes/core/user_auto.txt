@@ -1,3 +1,13 @@
-{{ object.first_name }}
-{{ object.last_name }}
-{{ object.nick_name }}
+{% load replace %}
+
+{% with first=object.first_name|safe|slugify last=object.last_name|safe|slugify nick=object.nick_name|default_if_none:""|safe|slugify %}
+
+{{ first|replace:"|-| " }}
+{{ last|replace:"|-| " }}
+{{ nick|replace:"|-| " }}
+{{ first|cut:"-" }}
+{{ last|cut:"-" }}
+{{ nick|cut:"-" }}
+{{ first|cut:"-" }}{{ last|cut:"-" }}
+
+{% endwith %}
