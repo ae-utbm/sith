@@ -34,6 +34,7 @@ from forum.models import ForumMessage, ForumMessageMeta
 class UserIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     auto = indexes.EdgeNgramField(use_template=True)
+    last_update = indexes.DateTimeField(model_attr="last_update")
 
     def get_model(self):
         return User

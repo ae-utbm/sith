@@ -75,12 +75,17 @@ def notification(request, notif_id):
 def search_user(query, as_json=False):
     try:
         # slugify turns everything into ascii and every whitespace into -
-        # it ends by removing duplicate - (so '- - ' will turn into '-')
+        # it ends by removing duplicate - (so ' - ' will turn into '-')
         # replace('-', ' ') because search is whitespace based
         query = slugify(query).replace("-", " ")
-        # is this necessary? it's not done when indexing users
+        # TODO: is this necessary?
         query = html.escape(query)
-        res = SearchQuerySet().models(User).autocomplete(auto=query)[:20]
+        res = (
+            SearchQuerySet()
+            .models(User)
+            .autocomplete(auto=query)
+            .order_by("-last_update")[:20]
+        )
         return [r.object for r in res]
     except TypeError:
         return []
