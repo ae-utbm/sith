@@ -20,3 +20,8 @@ def replace(value, arg):
         raise TemplateSyntaxError("badly formatted argument")
 
     return value.replace(arg[1], arg[2])
+
+
+@register.filter
+def count(value, arg):
+    return value.count(arg)
