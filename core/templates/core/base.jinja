@@ -59,7 +59,7 @@
             </div>
             <div id="header_bar">
                 <ul id="header_bars_infos">
-                {% cache 100 counters_activity %}
+                {% cache 100 "counters_activity" %}
                   {% for bar in Counter.objects.filter(type="BAR").all() %}
                       <li>
                       <a href="{{ url('counter:activity', counter_id=bar.id) }}" style="padding: 0px">

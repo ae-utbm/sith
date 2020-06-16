@@ -43,7 +43,7 @@
           <div id="birthdays_content">
             {% if user.is_subscribed %}
               {# Cache request for 1 hour #}
-              {% cache 3600 birthdays %}
+              {% cache 3600 "birthdays" %}
               <ul class="birthdays_year">
                 {% for d in birthdays.dates('date_of_birth', 'year', 'DESC') %}
                   <li>
