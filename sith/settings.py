@@ -505,6 +505,7 @@ SITH_SUBSCRIPTIONS = {
         "duration": 0.23,
     },
     "un-jour": {"name": _("One day"), "price": 0, "duration": 0.00555333},
+    "membre-staff-ga": {"name": _("GA staff member"), "price": 1, "duration": 0.076},
     # Discount subscriptions
     "un-semestre-reduction": {
         "name": _("One semester (-20%)"),
