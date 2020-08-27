@@ -344,19 +344,19 @@ class QuickNotifMixin:
 
 class DetailFormView(SingleObjectMixin, FormView):
     """
-        Class that allow both a detail view and a form view
+    Class that allow both a detail view and a form view
     """
 
     def get_object(self):
         """
-            Get current group from id in url
+        Get current group from id in url
         """
         return self.cached_object
 
     @cached_property
     def cached_object(self):
         """
-            Optimisation on group retrieval
+        Optimisation on group retrieval
         """
         return super(DetailFormView, self).get_object()
 

@@ -252,8 +252,8 @@ class ClubMemberForm(forms.Form):
 
     def clean_users(self):
         """
-            Check that the user is not trying to add an user already in the club
-            Also check that the user is valid and has a valid subscription
+        Check that the user is not trying to add an user already in the club
+        Also check that the user is valid and has a valid subscription
         """
         cleaned_data = super(ClubMemberForm, self).clean()
         users = []
@@ -276,7 +276,7 @@ class ClubMemberForm(forms.Form):
 
     def clean(self):
         """
-            Check user rights for adding an user
+        Check user rights for adding an user
         """
         cleaned_data = super(ClubMemberForm, self).clean()
 

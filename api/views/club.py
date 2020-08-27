@@ -43,7 +43,7 @@ class ClubSerializer(serializers.ModelSerializer):
 
 class ClubViewSet(RightModelViewSet):
     """
-        Manage Clubs (api/v1/club/)
+    Manage Clubs (api/v1/club/)
     """
 
     serializer_class = ClubSerializer

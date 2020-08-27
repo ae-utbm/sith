@@ -24,8 +24,8 @@ from ajax_select import make_ajax_field
 
 class LimitedCheckboxField(forms.ModelMultipleChoiceField):
     """
-        Used to replace ModelMultipleChoiceField but with
-        automatic backend verification
+    Used to replace ModelMultipleChoiceField but with
+    automatic backend verification
     """
 
     def __init__(self, queryset, max_choice, **kwargs):
@@ -308,7 +308,7 @@ class VoteFormView(CanCreateMixin, FormView):
 
     def form_valid(self, form):
         """
-            Verify that the user is part in a vote group
+        Verify that the user is part in a vote group
         """
         data = form.clean()
         res = super(FormView, self).form_valid(form)
@@ -360,7 +360,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-            Verify that the selected user is in candidate group
+        Verify that the selected user is in candidate group
         """
         obj = form.instance
         obj.election = Election.objects.get(id=self.election.id)
@@ -391,8 +391,8 @@ class ElectionCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-            Allow every users that had passed the dispatch
-            to create an election
+        Allow every users that had passed the dispatch
+        to create an election
         """
         return super(CreateView, self).form_valid(form)
 
@@ -418,7 +418,7 @@ class RoleCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-            Verify that the user can edit proprely
+        Verify that the user can edit proprely
         """
         obj = form.instance
         if obj.election:
@@ -461,7 +461,7 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-            Verify that the user can vote on this election
+        Verify that the user can vote on this election
         """
         obj = form.instance
         if obj.election:

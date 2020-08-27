@@ -120,8 +120,7 @@ class ShoppingList(models.Model):
 
 
 class ShoppingListItem(models.Model):
-    """
-    """
+    """"""
 
     shopping_lists = models.ManyToManyField(
         ShoppingList,

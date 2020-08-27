@@ -290,7 +290,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
 
     def form_valid(self, form):
         """
-            Check user rights
+        Check user rights
         """
         resp = super(ClubMembersView, self).form_valid(form)
 

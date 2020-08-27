@@ -31,7 +31,7 @@ from django.conf import settings
 
 class Command(BaseCommand):
     """
-        Compiles scss in static folder for production
+    Compiles scss in static folder for production
     """
 
     help = "Compile scss files from static folder"

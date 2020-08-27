@@ -89,9 +89,9 @@ class Customer(models.Model):
 
     def save(self, allow_negative=False, is_selling=False, *args, **kwargs):
         """
-            is_selling : tell if the current action is a selling
-            allow_negative : ignored if not a selling. Allow a selling to put the account in negative
-            Those two parameters avoid blocking the save method of a customer if his account is negative
+        is_selling : tell if the current action is a selling
+        allow_negative : ignored if not a selling. Allow a selling to put the account in negative
+        Those two parameters avoid blocking the save method of a customer if his account is negative
         """
         if self.amount < 0 and (is_selling and not allow_negative):
             raise ValidationError(_("Not enough money"))
@@ -527,7 +527,7 @@ class Selling(models.Model):
 
     def save(self, allow_negative=False, *args, **kwargs):
         """
-            allow_negative : Allow this selling to use more money than available for this user
+        allow_negative : Allow this selling to use more money than available for this user
         """
         if not self.date:
             self.date = timezone.now()
