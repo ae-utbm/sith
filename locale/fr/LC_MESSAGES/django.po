@@ -21,7 +21,7 @@ msgstr ""
 #: com/models.py:294 counter/models.py:121 counter/models.py:149
 #: counter/models.py:213 forum/models.py:58 launderette/models.py:38
 #: launderette/models.py:93 launderette/models.py:131 stock/models.py:40
-#: stock/models.py:63 stock/models.py:105 stock/models.py:134
+#: stock/models.py:63 stock/models.py:105 stock/models.py:133
 msgid "name"
 msgstr "nom"
 
@@ -1169,7 +1169,7 @@ msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
 
 #: club/templates/club/club_members.jinja:78
-#: core/templates/core/file_detail.jinja:19 core/views/forms.py:337
+#: core/templates/core/file_detail.jinja:19 core/views/forms.py:331
 #: launderette/views.py:226 trombi/templates/trombi/detail.jinja:19
 msgid "Add"
 msgstr "Ajouter"
@@ -1378,7 +1378,7 @@ msgid "History"
 msgstr "Historique"
 
 #: club/views.py:125 core/templates/core/base.jinja:118 core/views/user.py:219
-#: sas/templates/sas/picture.jinja:95 trombi/views.py:61
+#: sas/templates/sas/picture.jinja:95 trombi/views.py:63
 msgid "Tools"
 msgstr "Outils"
 
@@ -1444,7 +1444,7 @@ msgstr "contenu"
 
 #: com/models.py:72 core/models.py:1432 launderette/models.py:101
 #: launderette/models.py:139 launderette/models.py:196 stock/models.py:80
-#: stock/models.py:138
+#: stock/models.py:137
 msgid "type"
 msgstr "type"
 
@@ -3543,7 +3543,7 @@ msgstr "Ajouter un nouveau dossier"
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py:121 core/views/forms.py:305 core/views/forms.py:312
+#: core/views/files.py:121 core/views/forms.py:299 core/views/forms.py:306
 #: sas/views.py:94
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
@@ -3625,19 +3625,19 @@ msgstr "Activer le plein écran"
 msgid "Markdown guide"
 msgstr "Guide markdown"
 
-#: core/views/forms.py:121 core/views/forms.py:129
+#: core/views/forms.py:119 core/views/forms.py:126
 msgid "Choose file"
 msgstr "Choisir un fichier"
 
-#: core/views/forms.py:145 core/views/forms.py:153
+#: core/views/forms.py:140 core/views/forms.py:147
 msgid "Choose user"
 msgstr "Choisir un utilisateur"
 
-#: core/views/forms.py:185
+#: core/views/forms.py:179
 msgid "Username, email, or account number"
 msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
-#: core/views/forms.py:251
+#: core/views/forms.py:245
 msgid ""
 "Profile: you need to be visible on the picture, in order to be recognized (e."
 "g. by the barmen)"
@@ -3645,36 +3645,36 @@ msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
 
-#: core/views/forms.py:253
+#: core/views/forms.py:247
 msgid "Avatar: used on the forum"
 msgstr "Avatar : utilisé sur le forum"
 
-#: core/views/forms.py:254
+#: core/views/forms.py:248
 msgid "Scrub: let other know how your scrub looks like!"
 msgstr "Blouse : montrez aux autres à quoi ressemble votre blouse !"
 
-#: core/views/forms.py:316
+#: core/views/forms.py:310
 msgid "Bad image format, only jpeg, png, and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, et gif sont acceptés"
 
-#: core/views/forms.py:336
+#: core/views/forms.py:330
 msgid "Godfather"
 msgstr "Parrain"
 
-#: core/views/forms.py:336
+#: core/views/forms.py:330
 msgid "Godchild"
 msgstr "Fillot"
 
-#: core/views/forms.py:340 counter/views.py:154 trombi/views.py:158
+#: core/views/forms.py:334 counter/views.py:154 trombi/views.py:158
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
-#: core/views/forms.py:353 core/views/forms.py:371 election/models.py:24
+#: core/views/forms.py:347 core/views/forms.py:365 election/models.py:24
 #: election/views.py:154
 msgid "edit groups"
 msgstr "groupe d'édition"
 
-#: core/views/forms.py:356 core/views/forms.py:374 election/models.py:31
+#: core/views/forms.py:350 core/views/forms.py:368 election/models.py:31
 #: election/views.py:157
 msgid "view groups"
 msgstr "groupe de vue"
@@ -4760,7 +4760,7 @@ msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:593
+#: sith/settings.py:594
 msgid "Drying"
 msgstr "Séchage"
 
@@ -5432,19 +5432,19 @@ msgstr "Suppression de rechargement"
 
 #: sith/settings.py:480
 msgid "One semester"
-msgstr "Un semestre, 15 €"
+msgstr "Un semestre, 20 €"
 
 #: sith/settings.py:481
 msgid "Two semesters"
-msgstr "Deux semestres, 28 €"
+msgstr "Deux semestres, 35 €"
 
 #: sith/settings.py:483
 msgid "Common core cursus"
-msgstr "Cursus tronc commun, 45 €"
+msgstr "Cursus tronc commun, 60 €"
 
 #: sith/settings.py:487
 msgid "Branch cursus"
-msgstr "Cursus branche, 45 €"
+msgstr "Cursus branche, 60 €"
 
 #: sith/settings.py:488
 msgid "Alternating cursus"
@@ -5472,25 +5472,29 @@ msgstr "Membres du CROUS, 0 €"
 
 #: sith/settings.py:494
 msgid "Sbarro/ESTA member"
-msgstr "Membre de Sbarro ou de l'ESTA, 15 €"
+msgstr "Membre de Sbarro ou de l'ESTA, 20 €"
 
 #: sith/settings.py:496
 msgid "One semester Welcome Week"
 msgstr "Un semestre Welcome Week"
 
 #: sith/settings.py:500
+msgid "One month for free"
+msgstr "Un mois gratuit"
+
+#: sith/settings.py:501
 msgid "Two months for free"
 msgstr "Deux mois gratuits"
 
-#: sith/settings.py:501
-msgid "Eurok's volunteer"
+#: sith/settings.py:502
+msgid "Eurock's volunteer"
 msgstr "Bénévole Eurockéennes"
 
-#: sith/settings.py:503
+#: sith/settings.py:504
 msgid "Six weeks for free"
 msgstr "6 semaines gratuites"
 
-#: sith/settings.py:507
+#: sith/settings.py:508
 msgid "One day"
 msgstr "Un jour"
 
@@ -5562,40 +5566,40 @@ msgstr "Une nouvelle affiche a besoin d'être modérée"
 msgid "A new mailing list needs to be moderated"
 msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
-#: sith/settings.py:601
+#: sith/settings.py:602
 msgid "A new pedagogy comment has been signaled for moderation"
 msgstr ""
 "Un nouveau commentaire de la pédagogie a été signalé pour la modération"
 
-#: sith/settings.py:603
+#: sith/settings.py:604
 #, python-format
 msgid "There are %s fresh news to be moderated"
 msgstr "Il y a %s nouvelles toutes fraîches à modérer"
 
-#: sith/settings.py:604
+#: sith/settings.py:605
 msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
-#: sith/settings.py:605
+#: sith/settings.py:606
 #, python-format
 msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
-#: sith/settings.py:606
+#: sith/settings.py:607
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:607
+#: sith/settings.py:608
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s€"
 
-#: sith/settings.py:608
+#: sith/settings.py:609
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:609
+#: sith/settings.py:610
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
@@ -5655,23 +5659,23 @@ msgstr ""
 msgid "todo"
 msgstr "à faire"
 
-#: stock/models.py:128
+#: stock/models.py:127
 msgid "shopping lists"
 msgstr "listes de courses"
 
-#: stock/models.py:144
+#: stock/models.py:143
 msgid "quantity to buy"
 msgstr "quantité à acheter"
 
-#: stock/models.py:146
+#: stock/models.py:145
 msgid "quantity to buy during the next shopping session"
 msgstr "quantité à acheter pendant les prochaines courses"
 
-#: stock/models.py:149
+#: stock/models.py:148
 msgid "quantity bought"
 msgstr "quantité achetée"
 
-#: stock/models.py:151
+#: stock/models.py:150
 msgid "quantity bought during the last shopping session"
 msgstr "quantité achetée pendant les dernières courses"
 

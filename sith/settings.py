@@ -477,14 +477,14 @@ SITH_SUBSCRIPTION_END = 10
 # Subscription durations are in semestres
 # Be careful, modifying this parameter will need a migration to be applied
 SITH_SUBSCRIPTIONS = {
-    "un-semestre": {"name": _("One semester"), "price": 15, "duration": 1},
-    "deux-semestres": {"name": _("Two semesters"), "price": 28, "duration": 2},
+    "un-semestre": {"name": _("One semester"), "price": 20, "duration": 1},
+    "deux-semestres": {"name": _("Two semesters"), "price": 35, "duration": 2},
     "cursus-tronc-commun": {
         "name": _("Common core cursus"),
-        "price": 45,
+        "price": 60,
         "duration": 4,
     },
-    "cursus-branche": {"name": _("Branch cursus"), "price": 45, "duration": 6},
+    "cursus-branche": {"name": _("Branch cursus"), "price": 60, "duration": 6},
     "cursus-alternant": {"name": _("Alternating cursus"), "price": 30, "duration": 6},
     "membre-honoraire": {"name": _("Honorary member"), "price": 0, "duration": 666},
     "assidu": {"name": _("Assidu member"), "price": 0, "duration": 2},
@@ -497,6 +497,7 @@ SITH_SUBSCRIPTIONS = {
         "price": 0,
         "duration": 1,
     },
+    "un-mois-essai": {"name": _("One month for free"), "price": 0, "duration": 0.166},
     "deux-mois-essai": {"name": _("Two months for free"), "price": 0, "duration": 0.33},
     "benevoles-euroks": {"name": _("Eurok's volunteer"), "price": 5, "duration": 0.1},
     "six-semaines-essai": {
