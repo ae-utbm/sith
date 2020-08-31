@@ -114,6 +114,18 @@ class SubscriptionIntegrationTest(TestCase):
         call_command("populate")
         self.user = User.objects.filter(username="public").first()
 
+    def test_duration_one_month(self):
+
+        s = Subscription(
+            member=User.objects.filter(pk=self.user.pk).first(),
+            subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+        )
+        s.subscription_start = date(2017, 8, 29)
+        s.subscription_end = s.compute_end(duration=0.166, start=s.subscription_start)
+        s.save()
+        self.assertTrue(s.subscription_end == date(2017, 9, 29))
+
     def test_duration_two_months(self):
 
         s = Subscription(
@@ -122,11 +134,11 @@ class SubscriptionIntegrationTest(TestCase):
             payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
         )
         s.subscription_start = date(2017, 8, 29)
-        s.subscription_end = s.compute_end(duration=0.33, start=s.subscription_start)
+        s.subscription_end = s.compute_end(duration=0.333, start=s.subscription_start)
         s.save()
         self.assertTrue(s.subscription_end == date(2017, 10, 29))
 
-    def test_duration_two_months(self):
+    def test_duration_one_day(self):
 
         s = Subscription(
             member=User.objects.filter(pk=self.user.pk).first(),
