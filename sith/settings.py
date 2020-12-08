@@ -533,6 +533,12 @@ SITH_SUBSCRIPTIONS = {
         "name": _("Alternating cursus (-20%)"),
         "price": 24,
         "duration": 6,
+    },
+    # CA special offer
+    "un-an-offert-CA": {
+        "name": _("One year for free(CA offer)"),
+        "price": 0,
+        "duration": 2,
     }
     # To be completed....
 }
