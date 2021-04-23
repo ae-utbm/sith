@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-15 19:39+0200\n"
+"POT-Creation-Date: 2021-04-23 11:35+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -921,16 +921,12 @@ msgid "Search users to add (one or more)."
 msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
 
 #: club/forms.py:70
-#, fuzzy
-#| msgid "New mailing"
 msgid "New Mailing"
 msgstr "Nouvelle mailing liste"
 
 #: club/forms.py:71
-#, fuzzy
-#| msgid "Unsubscribe"
 msgid "Subscribe"
-msgstr "Se désabonner"
+msgstr "S'abonner"
 
 #: club/forms.py:72 club/forms.py:85 com/templates/com/news_admin_list.jinja:40
 #: com/templates/com/news_admin_list.jinja:116
@@ -944,29 +940,23 @@ msgstr "Retirer"
 msgid "Action"
 msgstr "Action"
 
-#: club/forms.py:115 club/tests.py:575
-#, fuzzy
-#| msgid "This field is required."
+#: club/forms.py:115 club/tests.py:576
 msgid "This field is required"
-msgstr "Ce champ est obligatoire."
+msgstr "Ce champ est obligatoire"
 
-#: club/forms.py:127 club/forms.py:264 club/tests.py:587
+#: club/forms.py:127 club/forms.py:264 club/tests.py:588
 msgid "One of the selected users doesn't exist"
 msgstr "Un des utilisateurs sélectionné n'existe pas"
 
-#: club/forms.py:131 club/tests.py:605
-#, fuzzy
-#| msgid "One of the selected users doesn't exist"
+#: club/forms.py:131 club/tests.py:606
 msgid "One of the selected users doesn't have an email address"
-msgstr "Un des utilisateurs sélectionné n'existe pas"
+msgstr "Un des utilisateurs sélectionnés n'a pas d'adresse email"
 
 #: club/forms.py:142
-#, fuzzy
-#| msgid "This field is required."
 msgid "An action is required"
-msgstr "Ce champ est obligatoire."
+msgstr "Une action est requise"
 
-#: club/forms.py:153 club/tests.py:564
+#: club/forms.py:153 club/tests.py:565
 msgid "You must specify at least an user or an email address"
 msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 
@@ -1111,7 +1101,7 @@ msgstr "Liste de diffusion"
 msgid "At least user or email is required"
 msgstr "Au moins un utilisateur ou un email est nécessaire"
 
-#: club/models.py:459 club/tests.py:633
+#: club/models.py:459 club/tests.py:634
 msgid "This email is already suscribed in this mailing"
 msgstr "Cet email est déjà abonné à cette mailing"
 
@@ -2602,7 +2592,7 @@ msgstr "Éditer %(obj)s"
 
 #: core/templates/core/file.jinja:7 core/templates/core/file_list.jinja:6
 msgid "File list"
-msgstr "Liste des fichiers"
+msgstr "Liste de fichiers"
 
 #: core/templates/core/file.jinja:9
 msgid "New file"
@@ -2876,7 +2866,7 @@ msgstr "Retourner à la gestion du club"
 
 #: core/templates/core/page.jinja:49
 msgid "Page does not exist"
-msgstr "La page n'existe pas."
+msgstr "La page n'existe pas"
 
 #: core/templates/core/page.jinja:51
 msgid "Create it?"
@@ -4755,7 +4745,7 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:593
+#: sith/settings.py:594
 msgid "Washing"
 msgstr "Lavage"
 
@@ -4969,16 +4959,12 @@ msgid "UV Guide"
 msgstr "Guide des UVs"
 
 #: pedagogy/templates/pedagogy/guide.jinja:34
-#, fuzzy, python-format
-#| msgid "display time"
 msgid "%(display_name)s"
-msgstr "temps d'affichage"
+msgstr "%(display_name)s"
 
 #: pedagogy/templates/pedagogy/guide.jinja:41
-#, fuzzy, python-format
-#| msgid "credit type"
 msgid "%(credit_type)s"
-msgstr "type de crédit"
+msgstr "%(credit_type)s"
 
 #: pedagogy/templates/pedagogy/guide.jinja:59
 #: pedagogy/templates/pedagogy/moderation.jinja:12
@@ -5487,7 +5473,7 @@ msgid "Two months for free"
 msgstr "Deux mois gratuits"
 
 #: sith/settings.py:502
-msgid "Eurock's volunteer"
+msgid "Eurok's volunteer"
 msgstr "Bénévole Eurockéennes"
 
 #: sith/settings.py:504
@@ -5498,71 +5484,71 @@ msgstr "6 semaines gratuites"
 msgid "One day"
 msgstr "Un jour"
 
-#: sith/settings.py:508
+#: sith/settings.py:509
 msgid "GA staff member"
 msgstr "Membre staff GA (2 semaines), 1 €"
 
-#: sith/settings.py:511
+#: sith/settings.py:512
 msgid "One semester (-20%)"
 msgstr "Un semestre (-20%), 12 €"
 
-#: sith/settings.py:516
+#: sith/settings.py:517
 msgid "Two semesters (-20%)"
 msgstr "Deux semestres (-20%), 22 €"
 
-#: sith/settings.py:521
+#: sith/settings.py:522
 msgid "Common core cursus (-20%)"
 msgstr "Cursus tronc commun (-20%), 36 €"
 
-#: sith/settings.py:526
+#: sith/settings.py:527
 msgid "Branch cursus (-20%)"
 msgstr "Cursus branche (-20%), 36 €"
 
-#: sith/settings.py:531
+#: sith/settings.py:532
 msgid "Alternating cursus (-20%)"
 msgstr "Cursus alternant (-20%), 24 €"
 
-#: sith/settings.py:553
+#: sith/settings.py:554
 msgid "President"
 msgstr "Président"
 
-#: sith/settings.py:554
+#: sith/settings.py:555
 msgid "Vice-President"
 msgstr "Vice-Président"
 
-#: sith/settings.py:555
+#: sith/settings.py:556
 msgid "Treasurer"
 msgstr "Trésorier"
 
-#: sith/settings.py:556
+#: sith/settings.py:557
 msgid "Communication supervisor"
 msgstr "Responsable communication"
 
-#: sith/settings.py:557
+#: sith/settings.py:558
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:558
+#: sith/settings.py:559
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:559
+#: sith/settings.py:560
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:560
+#: sith/settings.py:561
 msgid "Active member"
 msgstr "Membre actif"
 
-#: sith/settings.py:561
+#: sith/settings.py:562
 msgid "Curious"
 msgstr "Curieux"
 
-#: sith/settings.py:597
+#: sith/settings.py:598
 msgid "A new poster needs to be moderated"
 msgstr "Une nouvelle affiche a besoin d'être modérée"
 
-#: sith/settings.py:598
+#: sith/settings.py:599
 msgid "A new mailing list needs to be moderated"
 msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
@@ -5603,27 +5589,27 @@ msgstr "Vous avez acheté %s"
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:621
+#: sith/settings.py:622
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:622
+#: sith/settings.py:623
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:623
+#: sith/settings.py:624
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:624
+#: sith/settings.py:625
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:625
+#: sith/settings.py:626
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
-#: sith/settings.py:633
+#: sith/settings.py:634
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 
@@ -6175,14 +6161,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
 
-#~ msgid "ENERGIE"
-#~ msgstr "ENERGIE"
-
-#~ msgid "HUMA"
-#~ msgstr "HUMA"
-
-#~ msgid "Former website"
-#~ msgstr "Ancien site"
-
-#~ msgid "Help on the syntax"
-#~ msgstr "Aide sur la syntaxe"
