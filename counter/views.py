@@ -370,7 +370,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                 )
                 or len(obj.get_barmen_list()) < 1
             ):
-                raise PermissionDenied
+                return HttpResponseRedirect(
+                    reverse_lazy("counter:details", kwargs={"counter_id": obj.id})
+                )
         else:
             if not request.user.is_authenticated:
                 raise PermissionDenied
