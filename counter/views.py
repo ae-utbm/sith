@@ -38,7 +38,7 @@ from django.views.generic.edit import (
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.urls import reverse_lazy, reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.utils import timezone
 from django import forms
 from django.utils.translation import ugettext_lazy as _
@@ -48,6 +48,7 @@ from django.db import DataError, transaction, models
 import re
 import pytz
 from datetime import date, timedelta, datetime
+from http import HTTPStatus
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from ajax_select import make_ajax_field
 
@@ -356,6 +357,34 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     template_name = "counter/counter_click.jinja"
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
+
+    def render_to_response(self, *args, **kwargs):
+        if self.request.is_ajax():  # JSON response for AJAX requests
+            response = {"errors": []}
+            status = HTTPStatus.OK
+
+            if self.request.session["too_young"]:
+                response["errors"].append(_("Too young for that product"))
+                status = HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS
+            if self.request.session["not_allowed"]:
+                response["errors"].append(_("Not allowed for that product"))
+                status = HTTPStatus.FORBIDDEN
+            if self.request.session["no_age"]:
+                response["errors"].append(_("No date of birth provided"))
+                status = HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS
+            if self.request.session["not_enough"]:
+                response["errors"].append(_("Not enough money"))
+                status = HTTPStatus.PAYMENT_REQUIRED
+
+            if len(response["errors"]) > 1:
+                status = HTTPStatus.BAD_REQUEST
+
+            response["basket"] = self.request.session["basket"]
+
+            return JsonResponse(response, status=status)
+
+        else:  # Standard HTML page
+            return super().render_to_response(*args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, user__id=self.kwargs["user_id"])

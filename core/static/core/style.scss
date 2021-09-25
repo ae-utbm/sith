@@ -191,7 +191,7 @@ header {
     display: flex;
     flex: auto;
     width: 80%;
-    
+
     a {
       text-decoration: none;
       margin: 0em 1em;
@@ -350,7 +350,7 @@ header {
       font-style: normal;
       font-weight: bolder;
       text-decoration: none;
-      
+
       &:hover {
         background: $secondary-neutral-color;
         color: $white-color;
@@ -1125,7 +1125,7 @@ u, .underline {
   overflow: auto;
 }
 
-#bar_ui {
+#click_form {
   float: left;
   min-width: 57%;
 }
