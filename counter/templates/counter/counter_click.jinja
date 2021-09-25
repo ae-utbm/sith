@@ -160,7 +160,8 @@
 {{ super() }}
 <script>
 $( function() {
-    var products = [
+    /* Autocompletion in the code field */
+    var products_autocomplete = [
     {% for p in products -%}
         {
             value: "{{ p.code }}",
@@ -169,6 +170,7 @@ $( function() {
         },
     {%- endfor %}
     ];
+
     var quantity = "";
     var search = "";
     var pattern = /^(\d+x)?(.*)/i;
@@ -186,14 +188,14 @@ $( function() {
             quantity = res[1] || "";
             search = res[2];
             var matcher = new RegExp( $.ui.autocomplete.escapeRegex( search ), "i" );
-            response($.grep( products, function( value ) {
+            response($.grep( products_autocomplete, function( value ) {
                 value = value.tags;
                 return matcher.test( value );
             }));
         },
     });
-});
-$( function() {
+
+    /* Accordion UI between basket and refills */
     $("#bar_ui").accordion({
         heightStyle: "content",
         activate: function(event, ui){
@@ -201,6 +203,7 @@ $( function() {
         }
         });
     $("#products").tabs();
+
     $("#code_field").focus();
 });
 </script>
