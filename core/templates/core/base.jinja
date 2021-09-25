@@ -126,17 +126,19 @@
         </header>
 
         <div id="info_boxes">
-            {% set sith = get_sith() %}
-            {% if sith.alert_msg %}
-            <div id="alert_box">
-                {{ sith.alert_msg|markdown }}
-            </div>
-            {% endif %}
-            {% if sith.info_msg %}
-            <div id="info_box">
-                {{ sith.info_msg|markdown }}
-            </div>
-            {% endif %}
+            {% block info_boxes %}
+                {% set sith = get_sith() %}
+                {% if sith.alert_msg %}
+                <div id="alert_box">
+                    {{ sith.alert_msg|markdown }}
+                </div>
+                {% endif %}
+                {% if sith.info_msg %}
+                <div id="info_box">
+                    {{ sith.info_msg|markdown }}
+                </div>
+                {% endif %}
+            {% endblock %}
         </div>
 
         {% else %}{# if not popup #}

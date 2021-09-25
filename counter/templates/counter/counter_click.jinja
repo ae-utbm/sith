@@ -22,6 +22,12 @@
 {{ counter }}
 {% endblock %}
 
+{% block info_boxes %}
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
 {% block content %}
 <h4 id="click_interface">{{ counter }}</h4>
 
@@ -151,9 +157,6 @@
 {% endblock %}
 
 {% block script %}
-<script>
-document.getElementById("click_interface").scrollIntoView();
-</script>
 {{ super() }}
 <script>
 $( function() {
