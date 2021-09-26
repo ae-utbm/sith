@@ -496,7 +496,7 @@ class OperationCreateView(CanCreateMixin, CreateView):
         return ret
 
     def get_context_data(self, **kwargs):
-        """ Add journal to the context """
+        """Add journal to the context"""
         kwargs = super(OperationCreateView, self).get_context_data(**kwargs)
         if self.journal:
             kwargs["object"] = self.journal
@@ -514,7 +514,7 @@ class OperationEditView(CanEditMixin, UpdateView):
     template_name = "accounting/operation_edit.jinja"
 
     def get_context_data(self, **kwargs):
-        """ Add journal to the context """
+        """Add journal to the context"""
         kwargs = super(OperationEditView, self).get_context_data(**kwargs)
         kwargs["object"] = self.object.journal
         return kwargs
@@ -735,7 +735,7 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         return statement
 
     def get_context_data(self, **kwargs):
-        """ Add infos to the context """
+        """Add infos to the context"""
         kwargs = super(JournalNatureStatementView, self).get_context_data(**kwargs)
         kwargs["statement"] = self.big_statement()
         return kwargs
@@ -774,7 +774,7 @@ class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         return sum(self.statement(movement_type).values())
 
     def get_context_data(self, **kwargs):
-        """ Add journal to the context """
+        """Add journal to the context"""
         kwargs = super(JournalPersonStatementView, self).get_context_data(**kwargs)
         kwargs["credit_statement"] = self.statement("CREDIT")
         kwargs["debit_statement"] = self.statement("DEBIT")
@@ -804,7 +804,7 @@ class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView)
         return statement
 
     def get_context_data(self, **kwargs):
-        """ Add journal to the context """
+        """Add journal to the context"""
         kwargs = super(JournalAccountingStatementView, self).get_context_data(**kwargs)
         kwargs["statement"] = self.statement()
         return kwargs

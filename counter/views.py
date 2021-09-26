@@ -425,7 +425,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return ret
 
     def post(self, request, *args, **kwargs):
-        """ Handle the many possibilities of the post request """
+        """Handle the many possibilities of the post request"""
         self.object = self.get_object()
         self.refill_form = None
         if (self.object.type != "BAR" and not request.user.is_authenticated) or (
@@ -621,7 +621,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return True
 
     def del_product(self, request):
-        """ Delete a product from the basket """
+        """Delete a product from the basket"""
         pid = str(request.POST["product_id"])
         product = self.get_product(pid)
         if pid in request.session["basket"]:
@@ -663,7 +663,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return self.render_to_response(context)
 
     def finish(self, request):
-        """ Finish the click session, and validate the basket """
+        """Finish the click session, and validate the basket"""
         with transaction.atomic():
             request.session["last_basket"] = []
             if self.sum_basket(request) > self.customer.amount:
@@ -715,7 +715,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             )
 
     def cancel(self, request):
-        """ Cancel the click session """
+        """Cancel the click session"""
         kwargs = {"counter_id": self.object.id}
         request.session.pop("basket", None)
         return HttpResponseRedirect(
@@ -737,7 +737,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             raise PermissionDenied
 
     def get_context_data(self, **kwargs):
-        """ Add customer to the context """
+        """Add customer to the context"""
         kwargs = super(CounterClick, self).get_context_data(**kwargs)
         kwargs["products"] = self.object.products.select_related("product_type")
         kwargs["categories"] = {}
@@ -1391,7 +1391,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
         )
 
     def get_context_data(self, **kwargs):
-        """Add form to the context """
+        """Add form to the context"""
         kwargs = super(CounterLastOperationsView, self).get_context_data(**kwargs)
         threshold = timezone.now() - timedelta(
             minutes=settings.SITH_LAST_OPERATIONS_LIMIT
@@ -1453,7 +1453,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
         return reverse_lazy("counter:details", kwargs={"counter_id": self.object.id})
 
     def get_context_data(self, **kwargs):
-        """ Add form to the context """
+        """Add form to the context"""
         kwargs = super(CounterCashSummaryView, self).get_context_data(**kwargs)
         kwargs["form"] = self.form
         return kwargs
@@ -1479,7 +1479,7 @@ class CounterStatView(DetailView, CounterAdminMixin):
     template_name = "counter/stats.jinja"
 
     def get_context_data(self, **kwargs):
-        """ Add stats to the context """
+        """Add stats to the context"""
         from django.db.models import Sum, Case, When, F, DecimalField
 
         kwargs = super(CounterStatView, self).get_context_data(**kwargs)
@@ -1609,7 +1609,7 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     paginate_by = settings.SITH_COUNTER_CASH_SUMMARY_LENGTH
 
     def get_context_data(self, **kwargs):
-        """ Add sums to the context """
+        """Add sums to the context"""
         kwargs = super(CashSummaryListView, self).get_context_data(**kwargs)
         form = CashSummaryFormBase(self.request.GET)
         kwargs["form"] = form
@@ -1660,7 +1660,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
     current_tab = "invoices_call"
 
     def get_context_data(self, **kwargs):
-        """ Add sums to the context """
+        """Add sums to the context"""
         kwargs = super(InvoiceCallView, self).get_context_data(**kwargs)
         kwargs["months"] = Selling.objects.datetimes("date", "month", order="DESC")
         start_date = None
