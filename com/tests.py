@@ -79,9 +79,11 @@ class ComTest(TestCase):
         )
         r = self.client.get(reverse("core:index"))
         self.assertTrue(r.status_code == 200)
-        self.assertTrue(
-            """<div id="alert_box">\\n                <div class="markdown"><h3>ALERTE!</h3>\\n<p><strong>Caaaataaaapuuuulte!!!!</strong></p>"""
-            in str(r.content)
+        self.assertContains(
+            r,
+            """<div id="alert_box">
+                    <div class="markdown"><h3>ALERTE!</h3>
+<p><strong>Caaaataaaapuuuulte!!!!</strong></p>""",
         )
 
     def test_info_msg(self):
@@ -95,9 +97,10 @@ class ComTest(TestCase):
         )
         r = self.client.get(reverse("core:index"))
         self.assertTrue(r.status_code == 200)
-        self.assertTrue(
-            """<div id="info_box">\\n                <div class="markdown"><h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>"""
-            in str(r.content)
+        self.assertContains(
+            r,
+            """<div id="info_box">
+                    <div class="markdown"><h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>""",
         )
 
     def test_birthday_non_subscribed_user(self):

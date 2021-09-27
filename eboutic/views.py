@@ -82,7 +82,7 @@ class EbouticMain(TemplateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def add_product(self, request):
-        """ Add a product to the basket """
+        """Add a product to the basket"""
         try:
             p = self.object.products.filter(id=int(request.POST["product_id"])).first()
             if not p.buying_groups.exists():
@@ -95,7 +95,7 @@ class EbouticMain(TemplateView):
             pass
 
     def del_product(self, request):
-        """ Delete a product from the basket """
+        """Delete a product from the basket"""
         try:
             p = self.object.products.filter(id=int(request.POST["product_id"])).first()
             self.basket.del_product(p)

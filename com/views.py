@@ -534,7 +534,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
         return super(WeekmailEditView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        """Add orphan articles """
+        """Add orphan articles"""
         kwargs = super(WeekmailEditView, self).get_context_data(**kwargs)
         kwargs["orphans"] = WeekmailArticle.objects.filter(weekmail=None)
         return kwargs

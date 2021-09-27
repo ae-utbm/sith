@@ -38,7 +38,7 @@ from django.views.generic.edit import (
 from django.forms.models import modelform_factory
 from django.forms import CheckboxSelectMultiple
 from django.urls import reverse_lazy, reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.utils import timezone
 from django import forms
 from django.utils.translation import ugettext_lazy as _
@@ -48,6 +48,7 @@ from django.db import DataError, transaction, models
 import re
 import pytz
 from datetime import date, timedelta, datetime
+from http import HTTPStatus
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from ajax_select import make_ajax_field
 
@@ -357,6 +358,34 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
 
+    def render_to_response(self, *args, **kwargs):
+        if self.request.is_ajax():  # JSON response for AJAX requests
+            response = {"errors": []}
+            status = HTTPStatus.OK
+
+            if self.request.session["too_young"]:
+                response["errors"].append(_("Too young for that product"))
+                status = HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS
+            if self.request.session["not_allowed"]:
+                response["errors"].append(_("Not allowed for that product"))
+                status = HTTPStatus.FORBIDDEN
+            if self.request.session["no_age"]:
+                response["errors"].append(_("No date of birth provided"))
+                status = HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS
+            if self.request.session["not_enough"]:
+                response["errors"].append(_("Not enough money"))
+                status = HTTPStatus.PAYMENT_REQUIRED
+
+            if len(response["errors"]) > 1:
+                status = HTTPStatus.BAD_REQUEST
+
+            response["basket"] = self.request.session["basket"]
+
+            return JsonResponse(response, status=status)
+
+        else:  # Standard HTML page
+            return super().render_to_response(*args, **kwargs)
+
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, user__id=self.kwargs["user_id"])
         obj = self.get_object()
@@ -370,7 +399,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                 )
                 or len(obj.get_barmen_list()) < 1
             ):
-                raise PermissionDenied
+                return HttpResponseRedirect(
+                    reverse_lazy("counter:details", kwargs={"counter_id": obj.id})
+                )
         else:
             if not request.user.is_authenticated:
                 raise PermissionDenied
@@ -394,7 +425,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return ret
 
     def post(self, request, *args, **kwargs):
-        """ Handle the many possibilities of the post request """
+        """Handle the many possibilities of the post request"""
         self.object = self.get_object()
         self.refill_form = None
         if (self.object.type != "BAR" and not request.user.is_authenticated) or (
@@ -590,7 +621,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return True
 
     def del_product(self, request):
-        """ Delete a product from the basket """
+        """Delete a product from the basket"""
         pid = str(request.POST["product_id"])
         product = self.get_product(pid)
         if pid in request.session["basket"]:
@@ -632,7 +663,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return self.render_to_response(context)
 
     def finish(self, request):
-        """ Finish the click session, and validate the basket """
+        """Finish the click session, and validate the basket"""
         with transaction.atomic():
             request.session["last_basket"] = []
             if self.sum_basket(request) > self.customer.amount:
@@ -684,7 +715,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             )
 
     def cancel(self, request):
-        """ Cancel the click session """
+        """Cancel the click session"""
         kwargs = {"counter_id": self.object.id}
         request.session.pop("basket", None)
         return HttpResponseRedirect(
@@ -706,7 +737,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             raise PermissionDenied
 
     def get_context_data(self, **kwargs):
-        """ Add customer to the context """
+        """Add customer to the context"""
         kwargs = super(CounterClick, self).get_context_data(**kwargs)
         kwargs["products"] = self.object.products.select_related("product_type")
         kwargs["categories"] = {}
@@ -1360,7 +1391,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
         )
 
     def get_context_data(self, **kwargs):
-        """Add form to the context """
+        """Add form to the context"""
         kwargs = super(CounterLastOperationsView, self).get_context_data(**kwargs)
         threshold = timezone.now() - timedelta(
             minutes=settings.SITH_LAST_OPERATIONS_LIMIT
@@ -1422,7 +1453,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
         return reverse_lazy("counter:details", kwargs={"counter_id": self.object.id})
 
     def get_context_data(self, **kwargs):
-        """ Add form to the context """
+        """Add form to the context"""
         kwargs = super(CounterCashSummaryView, self).get_context_data(**kwargs)
         kwargs["form"] = self.form
         return kwargs
@@ -1448,7 +1479,7 @@ class CounterStatView(DetailView, CounterAdminMixin):
     template_name = "counter/stats.jinja"
 
     def get_context_data(self, **kwargs):
-        """ Add stats to the context """
+        """Add stats to the context"""
         from django.db.models import Sum, Case, When, F, DecimalField
 
         kwargs = super(CounterStatView, self).get_context_data(**kwargs)
@@ -1578,7 +1609,7 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     paginate_by = settings.SITH_COUNTER_CASH_SUMMARY_LENGTH
 
     def get_context_data(self, **kwargs):
-        """ Add sums to the context """
+        """Add sums to the context"""
         kwargs = super(CashSummaryListView, self).get_context_data(**kwargs)
         form = CashSummaryFormBase(self.request.GET)
         kwargs["form"] = form
@@ -1629,7 +1660,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
     current_tab = "invoices_call"
 
     def get_context_data(self, **kwargs):
-        """ Add sums to the context """
+        """Add sums to the context"""
         kwargs = super(InvoiceCallView, self).get_context_data(**kwargs)
         kwargs["months"] = Selling.objects.datetimes("date", "month", order="DESC")
         start_date = None

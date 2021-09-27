@@ -49,7 +49,7 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
 
 
 class CandidateForm(forms.ModelForm):
-    """ Form to candidate """
+    """Form to candidate"""
 
     class Meta:
         model = Candidature
@@ -95,7 +95,7 @@ class VoteForm(forms.Form):
 
 
 class RoleForm(forms.ModelForm):
-    """ Form for creating a role """
+    """Form for creating a role"""
 
     class Meta:
         model = Role
@@ -261,7 +261,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
         return r
 
     def get_context_data(self, **kwargs):
-        """ Add additionnal data to the template """
+        """Add additionnal data to the template"""
         kwargs = super(ElectionDetailView, self).get_context_data(**kwargs)
         kwargs["election_form"] = VoteForm(self.object, self.request.user)
         kwargs["election_results"] = self.object.results
@@ -322,7 +322,7 @@ class VoteFormView(CanCreateMixin, FormView):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
 
     def get_context_data(self, **kwargs):
-        """ Add additionnal data to the template """
+        """Add additionnal data to the template"""
         kwargs = super(VoteFormView, self).get_context_data(**kwargs)
         kwargs["object"] = self.election
         kwargs["election"] = self.election
