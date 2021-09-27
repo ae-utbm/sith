@@ -133,3 +133,14 @@ Pour lancer les tests il suffit d'utiliser la commande intégrée à django.
 
     # Lancer une méthode en particulier de cette même classe
     ./manage.py test core.tests.UserRegistrationTest.test_register_user_form_ok
+
+Vérifier les dépendances Javascript
+-----------------------------------
+
+Une commande a été écrite pour vérifier les éventuelles mises à jour à faire sur les librairies Javascript utilisées.
+N'oubliez pas de mettre à jour à la fois le fichier de la librairie, mais également sa version dans `sith/settings.py`.
+
+.. code-block:: bash
+
+    # Vérifier les mises à jour
+    ./manage.py check_front

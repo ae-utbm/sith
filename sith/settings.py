@@ -280,7 +280,8 @@ SITH_NAME = "Sith website"
 SITH_TWITTER = "@ae_utbm"
 
 # AE configuration
-SITH_MAIN_CLUB_ID = 1  # TODO: keep only that first setting, with the ID, and do the same for the other clubs
+# TODO: keep only that first setting, with the ID, and do the same for the other clubs
+SITH_MAIN_CLUB_ID = 1
 SITH_MAIN_CLUB = {
     "name": "AE",
     "unix_name": "ae",
@@ -667,3 +668,17 @@ if "test" in sys.argv:
 if SENTRY_DSN:
     # Connection to sentry
     sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()])
+
+
+SITH_FRONT_DEP_VERSIONS = {
+    "https://github.com/chartjs/Chart.js/": "2.6.0",
+    "https://github.com/xdan/datetimepicker/": "2.5.21",
+    "https://github.com/Ionaru/easy-markdown-editor/": "2.7.0",
+    "https://github.com/FortAwesome/Font-Awesome/": "4.7.0",
+    "https://github.com/jquery/jquery/": "3.1.0",
+    "https://github.com/sethmcl/jquery-ui/": "1.11.1",
+    "https://github.com/viralpatel/jquery.shorten/": "",
+    "https://github.com/getsentry/sentry-javascript/": "4.0.6",
+    "https://github.com/jhuckaby/webcamjs/": "1.0.0",
+    "https://github.com/vuejs/vue-next": "3.2.18",
+}
