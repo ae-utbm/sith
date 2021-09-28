@@ -1,3 +1,13 @@
-{{ object.first_name }}
-{{ object.last_name }}
-{{ object.nick_name }}
+{% load search_helpers %}
+
+{% with first=object.first_name|safe|slugify last=object.last_name|safe|slugify nick=object.nick_name|default_if_none:""|safe|slugify %}
+
+{{ first|replace:"|-| " }}
+{{ last|replace:"|-| " }}
+{{ nick|replace:"|-| " }}
+{% if first|count:"-" != 0 %}{{ first|cut:"-" }}{% endif %}
+{% if last|count:"-" != 0 %}{{ last|cut:"-" }}{% endif %}
+{% if nick|count:"-" != 0 %}{{ nick|cut:"-" }}{% endif %}
+{{ first|cut:"-" }}{{ last|cut:"-" }}
+
+{% endwith %}
