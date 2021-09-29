@@ -225,8 +225,9 @@ class User(AbstractBaseUser):
     sex = models.CharField(
         _("sex"),
         max_length=10,
+        null=True,
+        blank=True,
         choices=[("MAN", _("Man")), ("WOMAN", _("Woman"))],
-        default="MAN",
     )
     tshirt_size = models.CharField(
         _("tshirt size"),
