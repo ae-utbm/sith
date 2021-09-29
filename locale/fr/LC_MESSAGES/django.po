@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-28 01:10+0200\n"
+"POT-Creation-Date: 2021-09-29 16:08+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -660,7 +660,7 @@ msgid "Target"
 msgstr "Cible"
 
 #: accounting/templates/accounting/journal_details.jinja:38
-#: core/views/forms.py:94
+#: core/views/forms.py:98
 msgid "Code"
 msgstr "Code"
 
@@ -674,7 +674,7 @@ msgid "Done"
 msgstr "Effectuées"
 
 #: accounting/templates/accounting/journal_details.jinja:41
-#: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:1199
+#: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:1200
 #: pedagogy/templates/pedagogy/moderation.jinja:13
 #: pedagogy/templates/pedagogy/uv_detail.jinja:138
 #: trombi/templates/trombi/comment.jinja:4
@@ -911,97 +911,97 @@ msgstr "Opérations sans étiquette"
 msgid "Refound this account"
 msgstr "Rembourser ce compte"
 
-#: club/forms.py:60 club/forms.py:202
+#: club/forms.py:61 club/forms.py:194
 msgid "Users to add"
 msgstr "Utilisateurs à ajouter"
 
-#: club/forms.py:61 club/forms.py:203 core/views/group.py:63
+#: club/forms.py:62 club/forms.py:195 core/views/group.py:63
 msgid "Search users to add (one or more)."
 msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
 
-#: club/forms.py:70
+#: club/forms.py:71
 msgid "New Mailing"
 msgstr "Nouvelle mailing liste"
 
-#: club/forms.py:71
+#: club/forms.py:72
 msgid "Subscribe"
 msgstr "S'abonner"
 
-#: club/forms.py:72 club/forms.py:85 com/templates/com/news_admin_list.jinja:40
+#: club/forms.py:73 club/forms.py:86 com/templates/com/news_admin_list.jinja:40
 #: com/templates/com/news_admin_list.jinja:116
 #: com/templates/com/news_admin_list.jinja:198
 #: com/templates/com/news_admin_list.jinja:274
 msgid "Remove"
 msgstr "Retirer"
 
-#: club/forms.py:75 launderette/views.py:228
+#: club/forms.py:76 launderette/views.py:228
 #: pedagogy/templates/pedagogy/moderation.jinja:15
 msgid "Action"
 msgstr "Action"
 
-#: club/forms.py:115 club/tests.py:575
+#: club/forms.py:116 club/tests.py:575
 msgid "This field is required"
 msgstr "Ce champ est obligatoire"
 
-#: club/forms.py:127 club/forms.py:264 club/tests.py:587
+#: club/forms.py:128 club/forms.py:256 club/tests.py:587
 msgid "One of the selected users doesn't exist"
 msgstr "Un des utilisateurs sélectionné n'existe pas"
 
-#: club/forms.py:131 club/tests.py:605
+#: club/forms.py:132 club/tests.py:605
 msgid "One of the selected users doesn't have an email address"
 msgstr "Un des utilisateurs sélectionnés n'a pas d'adresse email"
 
-#: club/forms.py:142
+#: club/forms.py:143
 msgid "An action is required"
 msgstr "Une action est requise"
 
-#: club/forms.py:153 club/tests.py:564
+#: club/forms.py:154 club/tests.py:564
 msgid "You must specify at least an user or an email address"
 msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 
-#: club/forms.py:163 counter/views.py:1589
+#: club/forms.py:162 counter/views.py:1588
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py:169 com/views.py:85 com/views.py:210 counter/views.py:1595
-#: election/views.py:178 subscription/views.py:52
+#: club/forms.py:163 com/views.py:83 com/views.py:198 counter/views.py:1589
+#: election/views.py:172 subscription/views.py:49
 msgid "End date"
 msgstr "Date de fin"
 
-#: club/forms.py:174 club/templates/club/club_sellings.jinja:21
+#: club/forms.py:166 club/templates/club/club_sellings.jinja:21
 #: core/templates/core/user_account_detail.jinja:18
 #: core/templates/core/user_account_detail.jinja:51
-#: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:215
+#: counter/templates/counter/cash_summary_list.jinja:33 counter/views.py:216
 msgid "Counter"
 msgstr "Comptoir"
 
-#: club/forms.py:182 counter/views.py:828
+#: club/forms.py:174 counter/views.py:829
 msgid "Products"
 msgstr "Produits"
 
-#: club/forms.py:187 counter/views.py:833
+#: club/forms.py:179 counter/views.py:834
 msgid "Archived products"
 msgstr "Produits archivés"
 
-#: club/forms.py:246 club/templates/club/club_members.jinja:21
+#: club/forms.py:238 club/templates/club/club_members.jinja:21
 #: club/templates/club/club_members.jinja:46
 #: core/templates/core/user_clubs.jinja:29
 msgid "Mark as old"
 msgstr "Marquer comme ancien"
 
-#: club/forms.py:268
+#: club/forms.py:260
 msgid "User must be subscriber to take part to a club"
 msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
 
-#: club/forms.py:272 core/views/group.py:82
+#: club/forms.py:264 core/views/group.py:82
 msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
-#: club/forms.py:293
+#: club/forms.py:285
 msgid "You should specify a role"
 msgstr "Vous devez choisir un rôle"
 
-#: club/forms.py:304 sas/views.py:130 sas/views.py:202 sas/views.py:301
+#: club/forms.py:296 sas/views.py:130 sas/views.py:202 sas/views.py:301
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
@@ -1158,7 +1158,7 @@ msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
 
 #: club/templates/club/club_members.jinja:78
-#: core/templates/core/file_detail.jinja:19 core/views/forms.py:331
+#: core/templates/core/file_detail.jinja:19 core/views/forms.py:335
 #: launderette/views.py:226 trombi/templates/trombi/detail.jinja:19
 msgid "Add"
 msgstr "Ajouter"
@@ -1379,7 +1379,7 @@ msgstr "Éditer la page de club"
 msgid "Mailing list"
 msgstr "Listes de diffusion"
 
-#: club/views.py:170 com/views.py:138
+#: club/views.py:170 com/views.py:133
 msgid "Posters list"
 msgstr "Liste d'affiches"
 
@@ -1494,7 +1494,7 @@ msgstr "temps d'affichage"
 msgid "Begin date should be before end date"
 msgstr "La date de début doit être avant celle de fin"
 
-#: com/templates/com/mailing_admin.jinja:4 com/views.py:131
+#: com/templates/com/mailing_admin.jinja:4 com/views.py:126
 #: core/templates/core/user_tools.jinja:90
 msgid "Mailing lists administration"
 msgstr "Administration des mailing listes"
@@ -1806,7 +1806,7 @@ msgid "Slideshow"
 msgstr "Diaporama"
 
 #: com/templates/com/weekmail.jinja:5 com/templates/com/weekmail.jinja:9
-#: com/views.py:108 core/templates/core/user_tools.jinja:83
+#: com/views.py:103 core/templates/core/user_tools.jinja:83
 msgid "Weekmail"
 msgstr "Weekmail"
 
@@ -1895,56 +1895,60 @@ msgstr "Astuce"
 msgid "Final word"
 msgstr "Le mot de la fin"
 
-#: com/views.py:78 com/views.py:204 election/views.py:172
+#: com/views.py:76
+msgid "Format: 16:9 | Resolution: 1920x1080"
+msgstr "Format : 16:9 | Résolution : 1920x1080"
+
+#: com/views.py:79 com/views.py:197 election/views.py:171
 #: subscription/views.py:46
 msgid "Start date"
 msgstr "Date de début"
 
-#: com/views.py:103
+#: com/views.py:98
 msgid "Communication administration"
 msgstr "Administration de la communication"
 
-#: com/views.py:114 core/templates/core/user_tools.jinja:84
+#: com/views.py:109 core/templates/core/user_tools.jinja:84
 msgid "Weekmail destinations"
 msgstr "Destinataires du Weekmail"
 
-#: com/views.py:118
+#: com/views.py:113
 msgid "Info message"
 msgstr "Message d'info"
 
-#: com/views.py:124
+#: com/views.py:119
 msgid "Alert message"
 msgstr "Message d'alerte"
 
-#: com/views.py:145
+#: com/views.py:140
 msgid "Screens list"
 msgstr "Liste d'écrans"
 
-#: com/views.py:216
+#: com/views.py:199
 msgid "Until"
 msgstr "Jusqu'à"
 
-#: com/views.py:220
+#: com/views.py:201
 msgid "Automoderation"
 msgstr "Automodération"
 
-#: com/views.py:227 com/views.py:231 com/views.py:245
+#: com/views.py:208 com/views.py:212 com/views.py:226
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-#: com/views.py:241
+#: com/views.py:222
 msgid "You crazy? You can not finish an event before starting it."
 msgstr "T'es fou? Un événement ne peut pas finir avant même de commencer."
 
-#: com/views.py:470
+#: com/views.py:451
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour regénérer"
 
-#: com/views.py:485
+#: com/views.py:466
 msgid "Weekmail of the "
 msgstr "Weekmail du "
 
-#: com/views.py:595
+#: com/views.py:576
 msgid ""
 "You must be a board member of the selected club to post in the Weekmail."
 msgstr ""
@@ -3057,7 +3061,7 @@ msgid "Eboutic invoices"
 msgstr "Facture eboutic"
 
 #: core/templates/core/user_account.jinja:57
-#: core/templates/core/user_tools.jinja:37 counter/views.py:853
+#: core/templates/core/user_tools.jinja:37 counter/views.py:854
 msgid "Etickets"
 msgstr "Etickets"
 
@@ -3353,7 +3357,7 @@ msgstr "Achats"
 msgid "Product top 10"
 msgstr "Top 10 produits"
 
-#: core/templates/core/user_stats.jinja:27 counter/views.py:1743
+#: core/templates/core/user_stats.jinja:27 counter/views.py:1734
 msgid "Product"
 msgstr "Produit"
 
@@ -3398,8 +3402,8 @@ msgstr "Cotisations"
 msgid "Subscription stats"
 msgstr "Statistiques de cotisation"
 
-#: core/templates/core/user_tools.jinja:29 counter/views.py:823
-#: counter/views.py:1031
+#: core/templates/core/user_tools.jinja:29 counter/views.py:824
+#: counter/views.py:1032
 msgid "Counters"
 msgstr "Comptoirs"
 
@@ -3416,12 +3420,12 @@ msgid "Product types management"
 msgstr "Gestion des types de produit"
 
 #: core/templates/core/user_tools.jinja:35
-#: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:843
+#: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:844
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
 
 #: core/templates/core/user_tools.jinja:36
-#: counter/templates/counter/invoices_call.jinja:4 counter/views.py:848
+#: counter/templates/counter/invoices_call.jinja:4 counter/views.py:849
 msgid "Invoices call"
 msgstr "Appels à facture"
 
@@ -3532,7 +3536,7 @@ msgstr "Ajouter un nouveau dossier"
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py:121 core/views/forms.py:299 core/views/forms.py:306
+#: core/views/files.py:121 core/views/forms.py:303 core/views/forms.py:310
 #: sas/views.py:94
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
@@ -3542,91 +3546,91 @@ msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
-#: core/views/forms.py:87
+#: core/views/forms.py:91
 msgid "Heading"
 msgstr "Titre"
 
-#: core/views/forms.py:88
+#: core/views/forms.py:92
 msgid "Italic"
 msgstr "Italique"
 
-#: core/views/forms.py:89
+#: core/views/forms.py:93
 msgid "Bold"
 msgstr "Gras"
 
-#: core/views/forms.py:90
+#: core/views/forms.py:94
 msgid "Strikethrough"
 msgstr "Barré"
 
-#: core/views/forms.py:91
+#: core/views/forms.py:95
 msgid "Underline"
 msgstr "Souligné"
 
-#: core/views/forms.py:92
+#: core/views/forms.py:96
 msgid "Superscript"
 msgstr "Exposant"
 
-#: core/views/forms.py:93
+#: core/views/forms.py:97
 msgid "Subscript"
 msgstr "Indice"
 
-#: core/views/forms.py:95
+#: core/views/forms.py:99
 msgid "Quote"
 msgstr "Citation"
 
-#: core/views/forms.py:96
+#: core/views/forms.py:100
 msgid "Unordered list"
 msgstr "Liste non ordonnée"
 
-#: core/views/forms.py:97
+#: core/views/forms.py:101
 msgid "Ordered list"
 msgstr "Liste ordonnée"
 
-#: core/views/forms.py:98
+#: core/views/forms.py:102
 msgid "Insert image"
 msgstr "Insérer image"
 
-#: core/views/forms.py:99
+#: core/views/forms.py:103
 msgid "Insert link"
 msgstr "Insérer lien"
 
-#: core/views/forms.py:100
+#: core/views/forms.py:104
 msgid "Insert table"
 msgstr "Insérer tableau"
 
-#: core/views/forms.py:101
+#: core/views/forms.py:105
 msgid "Clean block"
 msgstr "Nettoyer bloc"
 
-#: core/views/forms.py:102
+#: core/views/forms.py:106
 msgid "Toggle preview"
 msgstr "Activer la prévisualisation"
 
-#: core/views/forms.py:103
+#: core/views/forms.py:107
 msgid "Toggle side by side"
 msgstr "Activer la vue côte à côte"
 
-#: core/views/forms.py:104
+#: core/views/forms.py:108
 msgid "Toggle fullscreen"
 msgstr "Activer le plein écran"
 
-#: core/views/forms.py:105
+#: core/views/forms.py:109
 msgid "Markdown guide"
 msgstr "Guide markdown"
 
-#: core/views/forms.py:119 core/views/forms.py:126
+#: core/views/forms.py:123 core/views/forms.py:130
 msgid "Choose file"
 msgstr "Choisir un fichier"
 
-#: core/views/forms.py:140 core/views/forms.py:147
+#: core/views/forms.py:144 core/views/forms.py:151
 msgid "Choose user"
 msgstr "Choisir un utilisateur"
 
-#: core/views/forms.py:179
+#: core/views/forms.py:183
 msgid "Username, email, or account number"
 msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
-#: core/views/forms.py:245
+#: core/views/forms.py:249
 msgid ""
 "Profile: you need to be visible on the picture, in order to be recognized (e."
 "g. by the barmen)"
@@ -3634,37 +3638,37 @@ msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
 
-#: core/views/forms.py:247
+#: core/views/forms.py:251
 msgid "Avatar: used on the forum"
 msgstr "Avatar : utilisé sur le forum"
 
-#: core/views/forms.py:248
+#: core/views/forms.py:252
 msgid "Scrub: let other know how your scrub looks like!"
 msgstr "Blouse : montrez aux autres à quoi ressemble votre blouse !"
 
-#: core/views/forms.py:310
+#: core/views/forms.py:314
 msgid "Bad image format, only jpeg, png, and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, et gif sont acceptés"
 
-#: core/views/forms.py:330
+#: core/views/forms.py:334
 msgid "Godfather"
 msgstr "Parrain"
 
-#: core/views/forms.py:330
+#: core/views/forms.py:334
 msgid "Godchild"
 msgstr "Fillot"
 
-#: core/views/forms.py:334 counter/views.py:155 trombi/views.py:158
+#: core/views/forms.py:338 counter/views.py:156 trombi/views.py:158
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
-#: core/views/forms.py:347 core/views/forms.py:365 election/models.py:24
-#: election/views.py:154
+#: core/views/forms.py:351 core/views/forms.py:369 election/models.py:24
+#: election/views.py:155
 msgid "edit groups"
 msgstr "groupe d'édition"
 
-#: core/views/forms.py:350 core/views/forms.py:368 election/models.py:31
-#: election/views.py:157
+#: core/views/forms.py:354 core/views/forms.py:372 election/models.py:31
+#: election/views.py:158
 msgid "view groups"
 msgstr "groupe de vue"
 
@@ -3714,7 +3718,7 @@ msgstr "client"
 msgid "customers"
 msgstr "clients"
 
-#: counter/models.py:97 counter/views.py:376
+#: counter/models.py:97 counter/views.py:377
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
@@ -3944,7 +3948,7 @@ msgstr "Liste des relevés de caisse"
 msgid "Theoric sums"
 msgstr "Sommes théoriques"
 
-#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:1200
+#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:1201
 msgid "Emptied"
 msgstr "Coffre vidé"
 
@@ -4003,11 +4007,11 @@ msgstr "Terminer"
 msgid "Refilling"
 msgstr "Rechargement"
 
-#: counter/templates/counter/counter_click.jinja:188 counter/views.py:645
+#: counter/templates/counter/counter_click.jinja:188 counter/views.py:646
 msgid "END"
 msgstr "FIN"
 
-#: counter/templates/counter/counter_click.jinja:188 counter/views.py:647
+#: counter/templates/counter/counter_click.jinja:188 counter/views.py:648
 msgid "CAN"
 msgstr "ANN"
 
@@ -4173,125 +4177,125 @@ msgstr "Temps"
 msgid "Top 100 barman %(counter_name)s (all semesters)"
 msgstr "Top 100 barman %(counter_name)s (tous les semestres)"
 
-#: counter/views.py:119
+#: counter/views.py:120
 msgid "This UID is invalid"
 msgstr "Cet UID est invalide"
 
-#: counter/views.py:177
+#: counter/views.py:178
 msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
-#: counter/views.py:234
+#: counter/views.py:235
 msgid "Cash summary"
 msgstr "Relevé de caisse"
 
-#: counter/views.py:248
+#: counter/views.py:249
 msgid "Last operations"
 msgstr "Dernières opérations"
 
-#: counter/views.py:263
+#: counter/views.py:264
 msgid "Take items from stock"
 msgstr "Prendre des éléments du stock"
 
-#: counter/views.py:316
+#: counter/views.py:317
 msgid "Bad credentials"
 msgstr "Mauvais identifiants"
 
-#: counter/views.py:318
+#: counter/views.py:319
 msgid "User is not barman"
 msgstr "L'utilisateur n'est pas barman."
 
-#: counter/views.py:323
+#: counter/views.py:324
 msgid "Bad location, someone is already logged in somewhere else"
 msgstr "Mauvais comptoir, quelqu'un est déjà connecté ailleurs"
 
-#: counter/views.py:367
+#: counter/views.py:368
 msgid "Too young for that product"
 msgstr "Trop jeune pour ce produit"
 
-#: counter/views.py:370
+#: counter/views.py:371
 msgid "Not allowed for that product"
 msgstr "Non autorisé pour ce produit"
 
-#: counter/views.py:373
+#: counter/views.py:374
 msgid "No date of birth provided"
 msgstr "Pas de date de naissance renseignée"
 
-#: counter/views.py:670
+#: counter/views.py:671
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: counter/views.py:817
+#: counter/views.py:818
 msgid "Counter administration"
 msgstr "Administration des comptoirs"
 
-#: counter/views.py:819
+#: counter/views.py:820
 msgid "Stocks"
 msgstr "Stocks"
 
-#: counter/views.py:838
+#: counter/views.py:839
 msgid "Product types"
 msgstr "Types de produit"
 
-#: counter/views.py:1017
+#: counter/views.py:1018
 msgid "Parent product"
 msgstr "Produit parent"
 
-#: counter/views.py:1023
+#: counter/views.py:1024
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
-#: counter/views.py:1157
+#: counter/views.py:1158
 msgid "10 cents"
 msgstr "10 centimes"
 
-#: counter/views.py:1158
+#: counter/views.py:1159
 msgid "20 cents"
 msgstr "20 centimes"
 
-#: counter/views.py:1159
+#: counter/views.py:1160
 msgid "50 cents"
 msgstr "50 centimes"
 
-#: counter/views.py:1160
+#: counter/views.py:1161
 msgid "1 euro"
 msgstr "1 €"
 
-#: counter/views.py:1161
+#: counter/views.py:1162
 msgid "2 euros"
 msgstr "2 €"
 
-#: counter/views.py:1162
+#: counter/views.py:1163
 msgid "5 euros"
 msgstr "5 €"
 
-#: counter/views.py:1163
+#: counter/views.py:1164
 msgid "10 euros"
 msgstr "10 €"
 
-#: counter/views.py:1164
+#: counter/views.py:1165
 msgid "20 euros"
 msgstr "20 €"
 
-#: counter/views.py:1165
+#: counter/views.py:1166
 msgid "50 euros"
 msgstr "50 €"
 
-#: counter/views.py:1167
+#: counter/views.py:1168
 msgid "100 euros"
 msgstr "100 €"
 
-#: counter/views.py:1170 counter/views.py:1176 counter/views.py:1182
-#: counter/views.py:1188 counter/views.py:1194
+#: counter/views.py:1171 counter/views.py:1177 counter/views.py:1183
+#: counter/views.py:1189 counter/views.py:1195
 msgid "Check amount"
 msgstr "Montant du chèque"
 
-#: counter/views.py:1173 counter/views.py:1179 counter/views.py:1185
-#: counter/views.py:1191 counter/views.py:1197
+#: counter/views.py:1174 counter/views.py:1180 counter/views.py:1186
+#: counter/views.py:1192 counter/views.py:1198
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
-#: counter/views.py:1837
+#: counter/views.py:1828
 msgid "people(s)"
 msgstr "personne(s)"
 
@@ -4381,11 +4385,11 @@ msgstr "début des candidatures"
 msgid "end candidature"
 msgstr "fin des candidatures"
 
-#: election/models.py:38 election/views.py:160
+#: election/models.py:38 election/views.py:161
 msgid "vote groups"
 msgstr "groupe de vote"
 
-#: election/models.py:45 election/views.py:167
+#: election/models.py:45 election/views.py:168
 msgid "candidature groups"
 msgstr "groupe de candidature"
 
@@ -4449,7 +4453,7 @@ msgstr "Vous avez déjà soumis votre vote."
 msgid "You have voted in this election."
 msgstr "Vous avez déjà voté pour cette élection."
 
-#: election/templates/election/election_detail.jinja:266 election/views.py:93
+#: election/templates/election/election_detail.jinja:266 election/views.py:94
 msgid "Blank vote"
 msgstr "Vote blanc"
 
@@ -4518,23 +4522,23 @@ msgstr "au"
 msgid "Polls open from"
 msgstr "Votes ouverts du"
 
-#: election/views.py:44
+#: election/views.py:45
 msgid "You have selected too much candidates."
 msgstr "Vous avez sélectionné trop de candidats."
 
-#: election/views.py:60
+#: election/views.py:61
 msgid "User to candidate"
 msgstr "Utilisateur se présentant"
 
-#: election/views.py:118
+#: election/views.py:119
 msgid "This role already exists for this election"
 msgstr "Ce rôle existe déjà pour cette élection"
 
-#: election/views.py:184
+#: election/views.py:174
 msgid "Start candidature"
 msgstr "Début des candidatures"
 
-#: election/views.py:190
+#: election/views.py:176
 msgid "End candidature"
 msgstr "Fin des candidatures"
 
@@ -5853,11 +5857,11 @@ msgid "Eboutic is reserved to specific users. In doubt, don't use it."
 msgstr ""
 "Eboutic est réservé à des cas particuliers. Dans le doute, ne l'utilisez pas."
 
-#: subscription/views.py:101
+#: subscription/views.py:96
 msgid "A user with that email address already exists"
 msgstr "Un utilisateur avec cette adresse email existe déjà"
 
-#: subscription/views.py:124
+#: subscription/views.py:119
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, soit en créer un proprement"
