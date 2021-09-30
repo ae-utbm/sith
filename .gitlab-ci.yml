@@ -4,6 +4,7 @@ stages:
 test:
   stage: test
   script:
+  - env
   - apt-get update
   - apt-get install -y gettext python3-xapian libgraphviz-dev
   - pushd /usr/lib/python3/dist-packages/xapian && ln -s _xapian* _xapian.so && popd
@@ -11,6 +12,8 @@ test:
   - python -c 'import xapian' # Fail immediately if there is a problem with xapian
   - pip install -r requirements.txt
   - pip install coverage
+  - mkdir -p /dev/shm/search_indexes
+  - ln -s /dev/shm/search_indexes sith/search_indexes
   - ./manage.py compilemessages
   - coverage run ./manage.py test
   - coverage html
