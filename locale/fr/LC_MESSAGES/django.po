@@ -2061,7 +2061,7 @@ msgstr "blouse"
 
 #: core/models.py:203
 msgid "sex"
-msgstr "sexe"
+msgstr "Genre"
 
 #: core/models.py:205 matmat/views.py:74
 msgid "Man"
@@ -2070,6 +2070,10 @@ msgstr "Homme"
 #: core/models.py:205 matmat/views.py:75
 msgid "Woman"
 msgstr "Femme"
+
+#:core/models.py:232
+msgid "Pronouns"
+msgstr "Pronoms"
 
 #: core/models.py:209
 msgid "tshirt size"

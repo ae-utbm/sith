@@ -44,6 +44,7 @@ def merge_users(u1, u2):
     u1.date_of_birth = u1.date_of_birth or u2.date_of_birth
     u1.home = u1.home or u2.home
     u1.sex = u1.sex or u2.sex
+    u1.pronouns = u1.pronouns or u2.pronouns
     u1.tshirt_size = u1.tshirt_size or u2.tshirt_size
     u1.role = u1.role or u2.role
     u1.department = u1.department or u2.department

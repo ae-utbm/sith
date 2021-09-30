@@ -227,8 +227,9 @@ class User(AbstractBaseUser):
         max_length=10,
         null=True,
         blank=True,
-        choices=[("MAN", _("Man")), ("WOMAN", _("Woman"))],
+        choices=[("MAN", _("Man")), ("WOMAN", _("Woman")), ("OTHER", _("Other"))],
     )
+    pronouns = models.CharField(_("pronouns"), max_length=64, default='')
     tshirt_size = models.CharField(
         _("tshirt size"),
         max_length=5,
