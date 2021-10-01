@@ -3,6 +3,7 @@
     <head>
         {% block head %}
         <title>{% block title %}{% trans %}Welcome!{% endtrans %}{% endblock %} - Association des Étudiants UTBM</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
         <link rel="stylesheet" href="{{ static('core/base.css') }}">
         <link rel="stylesheet" href="{{ static('core/jquery.datetimepicker.min.css') }}">
@@ -27,6 +28,7 @@
         <!-- BEGIN HEADER -->
         {% block header %}
         {% if not popup %}
+        <header>
         <div id="header_language_chooser">
             {% for language in LANGUAGES %}
             <form action="{{ url('set_language') }}" method="post">{% csrf_token %}
@@ -37,10 +39,11 @@
             {% endfor %}
         </div>
 
-        <header>
             {% if not user.is_authenticated %}
-            <div id="header_logo" style="background-image: url('{{ static('core/img/logo.png') }}'); width: 185px; height: 100px;">
-                <a href="{{ url('core:index') }}"></a>
+            <div id="header_logo">
+                <a href="{{ url('core:index') }}">
+                    <img src="{{ static('core/img/logo.png') }}" alt="AE logo">
+                </a>
             </div>
             <div id="header_connect_links">
                 <form method="post" action="{{ url('core:login') }}">
@@ -54,8 +57,10 @@
                 <a href="{{ url('core:register') }}"><button type="button">{% trans %}Register{% endtrans %}</button></a>
             </div>
             {% else %}
-            <div id="header_logo" style="background-image: url('{{ static('core/img/logo.png') }}'); width: 92px; height: 52px;">
-                <a href="{{ url('core:index') }}"></a>
+            <div id="header_logo">
+                <a href="{{ url('core:index') }}">
+                    <img src="{{ static('core/img/logo.png') }}" alt="AE logo">
+                </a>
             </div>
             <div id="header_bar">
                 <ul id="header_bars_infos">
@@ -85,7 +90,7 @@
                       <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
                     </div>
                     <div>
-                      <a href="#" onclick="display_notif()"><i class="fa fa-bell-o"></i> ({{ user.notifications.filter(viewed=False).count() }})</a>
+                      <a href="#" onclick="display_notif()" style="white-space: nowrap;"><i class="fa fa-bell-o"></i> ({{ user.notifications.filter(viewed=False).count() }})</a>
                       <ul id="header_notif">
                           {% for n in user.notifications.filter(viewed=False).order_by('-date') %}
                           <li>
