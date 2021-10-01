@@ -14,36 +14,38 @@
 {% block content %}
 <h4 id="click_interface">{{ counter }}</h4>
 
-<div id="user_info">
-    <h5>{% trans %}Customer{% endtrans %}</h5>
-    {{ user_mini_profile(customer.user) }}
-    {{ user_subscription(customer.user) }}
-    <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
-    <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="add_student_card">
-        {% trans %}Add a student card{% endtrans %}
-        <input type="input" name="student_card_uid" />
-        {% if request.session['not_valid_student_card_uid'] %}
-            <p><strong>{% trans %}This is not a valid student card UID{% endtrans %}</strong></p>
-        {% endif %}
-        <input type="submit" value="{% trans %}Go{% endtrans %}" />
-    </form>
-    <h6>{% trans %}Registered cards{% endtrans %}</h6>
-    {% if customer.student_cards.exists() %}
-        <ul>
-            {% for card in customer.student_cards.all() %}
-                <li>{{ card.uid }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        {% trans %}No card registered{% endtrans %}
-    {% endif %}
-</div>
 <div id="bar_ui">
     <noscript>
         <p class="important">Javascript is required for the counter UI.</p>
     </noscript>
+
+    <div id="user_info">
+        <h5>{% trans %}Customer{% endtrans %}</h5>
+        {{ user_mini_profile(customer.user) }}
+        {{ user_subscription(customer.user) }}
+        <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
+        <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_student_card">
+            {% trans %}Add a student card{% endtrans %}
+            <input type="input" name="student_card_uid" />
+            {% if request.session['not_valid_student_card_uid'] %}
+                <p><strong>{% trans %}This is not a valid student card UID{% endtrans %}</strong></p>
+            {% endif %}
+            <input type="submit" value="{% trans %}Go{% endtrans %}" />
+        </form>
+        <h6>{% trans %}Registered cards{% endtrans %}</h6>
+        {% if customer.student_cards.exists() %}
+            <ul>
+                {% for card in customer.student_cards.all() %}
+                    <li>{{ card.uid }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {% trans %}No card registered{% endtrans %}
+        {% endif %}
+    </div>
+
     <div id="click_form">
         <h5>{% trans %}Selling{% endtrans %}</h5>
         <div>
@@ -115,6 +117,7 @@
         </div>
         {% endif %}
     </div>
+
     <div id="products">
         <ul>
             {% for category in categories.keys() -%}
