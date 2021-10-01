@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
+# Copyright 2016,2017,2021
 # - Sli <antoine@bartuccio.fr>
+# - Skia <skia@hya.sk>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -27,7 +28,10 @@ from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
 
 class TemplatesPanel(BaseTemplatesPanel):
     def generate_stats(self, *args):
-        template = self.templates[0]["template"]
-        if not hasattr(template, "engine") and hasattr(template, "backend"):
-            template.engine = template.backend
+        try:
+            template = self.templates[0]["template"]
+            if not hasattr(template, "engine") and hasattr(template, "backend"):
+                template.engine = template.backend
+        except IndexError:  # No template
+            pass
         return super().generate_stats(*args)
