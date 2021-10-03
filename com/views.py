@@ -39,6 +39,7 @@ from django.core.exceptions import PermissionDenied
 from django import forms
 
 from datetime import timedelta
+from smtplib import SMTPRecipientsRefused
 
 from com.models import Sith, News, NewsDate, Weekmail, WeekmailArticle, Screen, Poster
 from core.views import (
@@ -414,22 +415,35 @@ class NewsDetailView(CanViewMixin, DetailView):
 # Weekmail
 
 
-class WeekmailPreviewView(ComTabsMixin, CanEditPropMixin, DetailView):
+class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, DetailView):
     model = Weekmail
     template_name = "com/weekmail_preview.jinja"
     success_url = reverse_lazy("com:weekmail")
     current_tab = "weekmail"
 
+    def dispatch(self, request, *args, **kwargs):
+        self.bad_recipients = []
+        return super(WeekmailPreviewView, self).dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        try:
-            if request.POST["send"] == "validate":
+        if request.POST["send"] == "validate":
+            try:
                 self.object.send()
                 return HttpResponseRedirect(
                     reverse("com:weekmail") + "?qn_weekmail_send_success"
                 )
-        except:
-            pass
+            except SMTPRecipientsRefused as e:
+                self.bad_recipients = e.recipients
+        elif request.POST["send"] == "clean":
+            try:
+                self.object.send()  # This should fail
+            except SMTPRecipientsRefused as e:
+                users = User.objects.filter(email__in=e.recipients.keys())
+                for u in users:
+                    u.preferences.receive_weekmail = False
+                    u.preferences.save()
+                self.quick_notif_list += ["qn_success"]
         return super(WeekmailPreviewView, self).get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
@@ -439,6 +453,7 @@ class WeekmailPreviewView(ComTabsMixin, CanEditPropMixin, DetailView):
         """Add rendered weekmail"""
         kwargs = super(WeekmailPreviewView, self).get_context_data(**kwargs)
         kwargs["weekmail_rendered"] = self.object.render_html()
+        kwargs["bad_recipients"] = self.bad_recipients
         return kwargs
 
 
