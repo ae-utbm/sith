@@ -6,13 +6,13 @@
 {% endblock %}
 
 {% block content %}
-<div id="news">
-    {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
-    <div id="news_admin">
-      <a href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
-    </div>
-    {% endif  %}
+{% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+<div id="news_admin">
+  <a href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
+</div>
+{% endif  %}
 
+<div id="news">
     <div id="left_column" class="news_column">
 
         {% for news in object_list.filter(type="NOTICE") %}
