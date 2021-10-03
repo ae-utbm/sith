@@ -214,7 +214,6 @@ header {
     }
 
     #header_bars_infos {
-      width: 35ch;
       flex: initial;
       list-style-type: none;
       margin: 0.2em 0.2em;
@@ -225,13 +224,12 @@ header {
       flex: auto;
       margin: 0.8em 0em;
       input {
-          width: 12ch;
+          width: 14ch;
       }
     }
 
     #header_user_links {
       display: flex;
-      // width: 120ch;
       flex: initial;
       flex-wrap: wrap;
       text-align: right;
