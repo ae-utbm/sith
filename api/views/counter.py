@@ -45,7 +45,7 @@ class CounterSerializer(serializers.ModelSerializer):
 
 class CounterViewSet(RightModelViewSet):
     """
-        Manage Counters (api/v1/counter/)
+    Manage Counters (api/v1/counter/)
     """
 
     serializer_class = CounterSerializer
@@ -54,7 +54,7 @@ class CounterViewSet(RightModelViewSet):
     @action(detail=False)
     def bar(self, request):
         """
-            Return all bars (api/v1/counter/bar/)
+        Return all bars (api/v1/counter/bar/)
         """
         self.queryset = self.queryset.filter(type="BAR")
         serializer = self.get_serializer(self.queryset, many=True)

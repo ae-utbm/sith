@@ -36,22 +36,17 @@ from subscription.models import Subscription
 from core.views.forms import SelectDateTime
 from core.models import User
 from core.views.forms import SelectDate
+from core.views.forms import TzAwareDateTimeField
 
 
 class SelectionDateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(SelectionDateForm, self).__init__(*args, **kwargs)
-        self.fields["start_date"] = forms.DateTimeField(
-            input_formats=["%Y-%m-%d %H:%M:%S"],
-            label=_("Start date"),
-            widget=SelectDateTime,
-            required=True,
+        self.fields["start_date"] = TzAwareDateTimeField(
+            label=_("Start date"), required=True
         )
-        self.fields["end_date"] = forms.DateTimeField(
-            input_formats=["%Y-%m-%d %H:%M:%S"],
-            label=_("End date"),
-            widget=SelectDateTime,
-            required=True,
+        self.fields["end_date"] = TzAwareDateTimeField(
+            label=_("End date"), required=True
         )
 
 

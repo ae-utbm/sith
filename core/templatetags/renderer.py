@@ -94,7 +94,7 @@ def datetime_format_python_to_PHP(python_format_string):
 @register.simple_tag()
 def scss(path):
     """
-        Return path of the corresponding css file after compilation
+    Return path of the corresponding css file after compilation
     """
     processor = ScssProcessor(path)
     return processor.get_converted_scss()

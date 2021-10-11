@@ -25,7 +25,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.core.management import call_command
-from datetime import date
+from datetime import date, timedelta
 
 from core.models import User
 from accounting.models import (
@@ -110,6 +110,9 @@ class JournalTest(TestCase):
 class OperationTest(TestCase):
     def setUp(self):
         call_command("populate")
+        self.tomorrow_formatted = (date.today() + timedelta(days=1)).strftime(
+            "%d/%m/%Y"
+        )
         self.journal = GeneralJournal.objects.filter(id=1).first()
         self.skia = User.objects.filter(username="skia").first()
         at = AccountingType(
@@ -158,7 +161,7 @@ class OperationTest(TestCase):
                 "target_type": "OTHER",
                 "target_id": "",
                 "target_label": "Le fantome de la nuit",
-                "date": "04/12/2020",
+                "date": self.tomorrow_formatted,
                 "mode": "CASH",
                 "cheque_number": "",
                 "invoice": "",
@@ -191,7 +194,7 @@ class OperationTest(TestCase):
                 "target_type": "OTHER",
                 "target_id": "",
                 "target_label": "Le fantome de la nuit",
-                "date": "04/12/2020",
+                "date": self.tomorrow_formatted,
                 "mode": "CASH",
                 "cheque_number": "",
                 "invoice": "",
@@ -218,7 +221,7 @@ class OperationTest(TestCase):
                 "target_type": "OTHER",
                 "target_id": "",
                 "target_label": "Le fantome du jour",
-                "date": "04/12/2020",
+                "date": self.tomorrow_formatted,
                 "mode": "CASH",
                 "cheque_number": "",
                 "invoice": "",
@@ -245,7 +248,7 @@ class OperationTest(TestCase):
                 "target_type": "OTHER",
                 "target_id": "",
                 "target_label": "Le fantome de l'aurore",
-                "date": "04/12/2020",
+                "date": self.tomorrow_formatted,
                 "mode": "CASH",
                 "cheque_number": "",
                 "invoice": "",

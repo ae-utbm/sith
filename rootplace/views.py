@@ -94,10 +94,10 @@ def merge_users(u1, u2):
 
 def delete_all_forum_user_messages(user, moderator, verbose=False):
     """
-        Create a ForumMessageMeta that says a forum
-            message is deleted on every forum message of an user
-        user: the user to delete messages from
-        moderator: the one marked as the moderator
+    Create a ForumMessageMeta that says a forum
+        message is deleted on every forum message of an user
+    user: the user to delete messages from
+    moderator: the one marked as the moderator
     """
     for message in user.forum_messages.all():
         if message.is_deleted():
@@ -145,9 +145,9 @@ class MergeUsersView(FormView):
 
 class DeleteAllForumUserMessagesView(FormView):
     """
-        Delete all forum messages from an user
-        Messages are soft deleted and are still visible from admins
-        GUI frontend to the dedicated command
+    Delete all forum messages from an user
+    Messages are soft deleted and are still visible from admins
+    GUI frontend to the dedicated command
     """
 
     template_name = "rootplace/delete_user_messages.jinja"

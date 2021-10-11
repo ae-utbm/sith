@@ -14,6 +14,7 @@ from core.views import CanViewMixin, CanEditMixin, CanCreateMixin
 from django.db.models.query import QuerySet
 from core.views.forms import SelectDateTime, MarkdownInput
 from election.models import Election, Role, Candidature, ElectionList, Vote
+from core.views.forms import TzAwareDateTimeField
 
 from ajax_select.fields import AutoCompleteSelectField
 from ajax_select import make_ajax_field
@@ -24,8 +25,8 @@ from ajax_select import make_ajax_field
 
 class LimitedCheckboxField(forms.ModelMultipleChoiceField):
     """
-        Used to replace ModelMultipleChoiceField but with
-        automatic backend verification
+    Used to replace ModelMultipleChoiceField but with
+    automatic backend verification
     """
 
     def __init__(self, queryset, max_choice, **kwargs):
@@ -49,7 +50,7 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
 
 
 class CandidateForm(forms.ModelForm):
-    """ Form to candidate """
+    """Form to candidate"""
 
     class Meta:
         model = Candidature
@@ -95,7 +96,7 @@ class VoteForm(forms.Form):
 
 
 class RoleForm(forms.ModelForm):
-    """ Form for creating a role """
+    """Form for creating a role"""
 
     class Meta:
         model = Role
@@ -167,30 +168,12 @@ class ElectionForm(forms.ModelForm):
         label=_("candidature groups"),
     )
 
-    start_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Start date"),
-        widget=SelectDateTime,
-        required=True,
+    start_date = TzAwareDateTimeField(label=_("Start date"), required=True)
+    end_date = TzAwareDateTimeField(label=_("End date"), required=True)
+    start_candidature = TzAwareDateTimeField(
+        label=_("Start candidature"), required=True
     )
-    end_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End date"),
-        widget=SelectDateTime,
-        required=True,
-    )
-    start_candidature = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Start candidature"),
-        widget=SelectDateTime,
-        required=True,
-    )
-    end_candidature = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End candidature"),
-        widget=SelectDateTime,
-        required=True,
-    )
+    end_candidature = TzAwareDateTimeField(label=_("End candidature"), required=True)
 
 
 # Display elections
@@ -261,7 +244,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
         return r
 
     def get_context_data(self, **kwargs):
-        """ Add additionnal data to the template """
+        """Add additionnal data to the template"""
         kwargs = super(ElectionDetailView, self).get_context_data(**kwargs)
         kwargs["election_form"] = VoteForm(self.object, self.request.user)
         kwargs["election_results"] = self.object.results
@@ -308,7 +291,7 @@ class VoteFormView(CanCreateMixin, FormView):
 
     def form_valid(self, form):
         """
-            Verify that the user is part in a vote group
+        Verify that the user is part in a vote group
         """
         data = form.clean()
         res = super(FormView, self).form_valid(form)
@@ -322,7 +305,7 @@ class VoteFormView(CanCreateMixin, FormView):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
 
     def get_context_data(self, **kwargs):
-        """ Add additionnal data to the template """
+        """Add additionnal data to the template"""
         kwargs = super(VoteFormView, self).get_context_data(**kwargs)
         kwargs["object"] = self.election
         kwargs["election"] = self.election
@@ -360,7 +343,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-            Verify that the selected user is in candidate group
+        Verify that the selected user is in candidate group
         """
         obj = form.instance
         obj.election = Election.objects.get(id=self.election.id)
@@ -391,8 +374,8 @@ class ElectionCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-            Allow every users that had passed the dispatch
-            to create an election
+        Allow every users that had passed the dispatch
+        to create an election
         """
         return super(CreateView, self).form_valid(form)
 
@@ -418,7 +401,7 @@ class RoleCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-            Verify that the user can edit proprely
+        Verify that the user can edit proprely
         """
         obj = form.instance
         if obj.election:
@@ -461,7 +444,7 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-            Verify that the user can vote on this election
+        Verify that the user can vote on this election
         """
         obj = form.instance
         if obj.election:

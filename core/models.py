@@ -1492,7 +1492,9 @@ class OperationLog(models.Model):
         User, related_name="logs", on_delete=models.SET_NULL, null=True
     )
     operation_type = models.CharField(
-        _("operation type"), max_length=40, choices=settings.SITH_LOG_OPERATION_TYPE,
+        _("operation type"),
+        max_length=40,
+        choices=settings.SITH_LOG_OPERATION_TYPE,
     )
 
     def is_owned_by(self, user):

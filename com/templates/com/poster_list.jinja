@@ -36,8 +36,8 @@
                     <div class="name">{{ poster.name }}</div>
                     <div class="image"><img src="{{ poster.file.url }}"></img></div>
                     <div class="dates">
-                        <div class="begin">{{ poster.date_begin | date("d/M/Y H:m") }}</div>
-                        <div class="end">{{ poster.date_end | date("d/M/Y H:m") }}</div>
+                        <div class="begin">{{ poster.date_begin | localtime | date("d/M/Y H:m") }}</div>
+                        <div class="end">{{ poster.date_end | localtime | date("d/M/Y H:m") }}</div>
                     </div>
                     {% if app == "com" %}
                         <a class="edit" href="{{ url(app + ":poster_edit", poster.id) }}">{% trans %}Edit{% endtrans %}</a>

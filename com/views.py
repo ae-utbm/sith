@@ -39,6 +39,7 @@ from django.core.exceptions import PermissionDenied
 from django import forms
 
 from datetime import timedelta
+from smtplib import SMTPRecipientsRefused
 
 from com.models import Sith, News, NewsDate, Weekmail, WeekmailArticle, Screen, Poster
 from core.views import (
@@ -52,6 +53,7 @@ from core.views import (
 from core.views.forms import SelectDateTime, MarkdownInput
 from core.models import Notification, RealGroup, User
 from club.models import Club, Mailing
+from core.views.forms import TzAwareDateTimeField
 
 
 # Sith object
@@ -72,20 +74,14 @@ class PosterForm(forms.ModelForm):
             "display_time",
         ]
         widgets = {"screens": forms.CheckboxSelectMultiple}
+        help_texts = {"file": _("Format: 16:9 | Resolution: 1920x1080")}
 
-    date_begin = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
+    date_begin = TzAwareDateTimeField(
         label=_("Start date"),
-        widget=SelectDateTime,
         required=True,
         initial=timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
-    date_end = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End date"),
-        widget=SelectDateTime,
-        required=False,
-    )
+    date_end = TzAwareDateTimeField(label=_("End date"), required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
@@ -199,24 +195,10 @@ class NewsForm(forms.ModelForm):
             "content": MarkdownInput,
         }
 
-    start_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Start date"),
-        widget=SelectDateTime,
-        required=False,
-    )
-    end_date = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("End date"),
-        widget=SelectDateTime,
-        required=False,
-    )
-    until = forms.DateTimeField(
-        input_formats=["%Y-%m-%d %H:%M:%S"],
-        label=_("Until"),
-        widget=SelectDateTime,
-        required=False,
-    )
+    start_date = TzAwareDateTimeField(label=_("Start date"), required=False)
+    end_date = TzAwareDateTimeField(label=_("End date"), required=False)
+    until = TzAwareDateTimeField(label=_("Until"), required=False)
+
     automoderation = forms.BooleanField(label=_("Automoderation"), required=False)
 
     def clean(self):
@@ -433,22 +415,35 @@ class NewsDetailView(CanViewMixin, DetailView):
 # Weekmail
 
 
-class WeekmailPreviewView(ComTabsMixin, CanEditPropMixin, DetailView):
+class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, DetailView):
     model = Weekmail
     template_name = "com/weekmail_preview.jinja"
     success_url = reverse_lazy("com:weekmail")
     current_tab = "weekmail"
 
+    def dispatch(self, request, *args, **kwargs):
+        self.bad_recipients = []
+        return super(WeekmailPreviewView, self).dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        try:
-            if request.POST["send"] == "validate":
+        if request.POST["send"] == "validate":
+            try:
                 self.object.send()
                 return HttpResponseRedirect(
                     reverse("com:weekmail") + "?qn_weekmail_send_success"
                 )
-        except:
-            pass
+            except SMTPRecipientsRefused as e:
+                self.bad_recipients = e.recipients
+        elif request.POST["send"] == "clean":
+            try:
+                self.object.send()  # This should fail
+            except SMTPRecipientsRefused as e:
+                users = User.objects.filter(email__in=e.recipients.keys())
+                for u in users:
+                    u.preferences.receive_weekmail = False
+                    u.preferences.save()
+                self.quick_notif_list += ["qn_success"]
         return super(WeekmailPreviewView, self).get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
@@ -458,6 +453,7 @@ class WeekmailPreviewView(ComTabsMixin, CanEditPropMixin, DetailView):
         """Add rendered weekmail"""
         kwargs = super(WeekmailPreviewView, self).get_context_data(**kwargs)
         kwargs["weekmail_rendered"] = self.object.render_html()
+        kwargs["bad_recipients"] = self.bad_recipients
         return kwargs
 
 
@@ -534,7 +530,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
         return super(WeekmailEditView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        """Add orphan articles """
+        """Add orphan articles"""
         kwargs = super(WeekmailEditView, self).get_context_data(**kwargs)
         kwargs["orphans"] = WeekmailArticle.objects.filter(weekmail=None)
         return kwargs

@@ -55,7 +55,9 @@ def write_log(instance, operation_type):
         return None
 
     log = OperationLog(
-        label=str(instance), operator=get_user(), operation_type=operation_type,
+        label=str(instance),
+        operator=get_user(),
+        operation_type=operation_type,
     ).save()
 
 

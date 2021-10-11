@@ -28,7 +28,7 @@ $twitblue: hsl(206, 82%, 63%);
 
 $shadow-color: rgb(223, 223, 223);
 
-$background-bouton-color: hsl(0, 0%, 90%);
+$background-button-color: hsl(0, 0%, 95%);
 
 /*--------------------------MEDIA QUERY HELPERS------------------------*/
 $small-devices: 576px;
@@ -47,10 +47,11 @@ body {
 input[type=button], input[type=submit], input[type=reset],input[type=file] {
   border: none;
   text-decoration: none;
-  background-color: $background-bouton-color;
-  padding: 10px;
+  background-color: $background-button-color;
+  padding: 0.4em;
+  margin: 0.1em;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 1.2em;
   border-radius: 5px;
   cursor: pointer;
   box-shadow: $shadow-color 0px 0px 1px;
@@ -62,9 +63,10 @@ input[type=button], input[type=submit], input[type=reset],input[type=file] {
 button{
   border: none;
   text-decoration: none;
-  background-color: $background-bouton-color;
-  padding: 10px;
-  font-size: 14px;
+  background-color: $background-button-color;
+  padding: 0.4em;
+  margin: 0.1em;
+  font-size: 1.18em;
   border-radius: 5px;
   box-shadow: $shadow-color 0px 0px 1px;
   cursor: pointer;
@@ -75,24 +77,26 @@ button{
 input,textarea[type=text],[type=number]{
   border: none;
   text-decoration: none;
-  background-color: $background-bouton-color;
-  padding: 7px;
-  font-size: 16px;
+  background-color: $background-button-color;
+  padding: 0.4em;
+  margin: 0.1em;
+  font-size: 1.2em;
   border-radius: 5px;
+  max-width: 95%;
 }
 textarea{
   border: none;
   text-decoration: none;
-  background-color: $background-bouton-color;
+  background-color: $background-button-color;
   padding: 7px;
-  font-size: 16px;
+  font-size: 1.2em;
   border-radius: 5px;
 }
 select{
   border: none;
   text-decoration: none;
-  font-size: 15px;
-  background-color: $background-bouton-color;
+  font-size: 1.2em;
+  background-color: $background-button-color;
   padding: 10px;
   border-radius: 5px;
   cursor: pointer;
@@ -130,9 +134,10 @@ a {
 
 #header_language_chooser {
   position: absolute;
-  top: 0.2em;
-  right: 0.5em;
+  top: 2em;
+  left: 0.5em;
   width: 3%;
+  min-width: 2.2em;
   text-align: center;
   input {
     display: block;
@@ -157,9 +162,6 @@ header {
   border-radius: 0px 0px 10px 10px;
 
   #header_logo {
-    display: inline-block;
-    flex: none;
-    background-size: 100% 100%;
     background-color: $white-color;
     padding: 0.2em;
     border-radius: 0px 0px 0px 9px;
@@ -169,11 +171,19 @@ header {
       margin: 0px;
       width: 100%;
       height: 100%;
+
+      img {
+          max-width: 70%;
+          max-height: 100%;
+          margin: auto;
+          display: block;
+      }
     }
   }
 
   #header_connect_links {
     margin: 0.6em 0.6em 0em auto;
+    padding: 0.2em;
     color: $white-color;
     form {
       display: inline;
@@ -190,8 +200,9 @@ header {
   #header_bar {
     display: flex;
     flex: auto;
+    flex-wrap: wrap;
     width: 80%;
-    
+
     a {
       text-decoration: none;
       margin: 0em 1em;
@@ -203,7 +214,6 @@ header {
     }
 
     #header_bars_infos {
-      width: 35ch;
       flex: initial;
       list-style-type: none;
       margin: 0.2em 0.2em;
@@ -213,12 +223,15 @@ header {
       display: inline-block;
       flex: auto;
       margin: 0.8em 0em;
+      input {
+          width: 14ch;
+      }
     }
 
     #header_user_links {
       display: flex;
-      width: 120ch;
       flex: initial;
+      flex-wrap: wrap;
       text-align: right;
       margin: 0em;
       div {
@@ -287,42 +300,34 @@ header {
 
 #info_boxes {
   display: flex;
+  flex-wrap: wrap;
   width: 90%;
   margin: 1em auto;
-  p {
-    margin: 0px;
-    padding: 7px;
-  }
   #alert_box, #info_box {
-    font-size: 14px;
-    display: inline-block;
-    flex: auto;
-    padding: 2px;
-    margin: 0.2em 1.5%;
-    min-width: 10%;
-    max-width: 46%;
-    min-height: 20px;
+    flex: 49%;
+    font-size: 0.9em;
+    margin: 0.2em;
+    border-radius: 0.6em;
+    .markdown {
+        margin: 0.5em;
+    }
     &:before {
-      float: left;
+      font-family: FontAwesome;
+      font-size: 4em;
+      float: right;
       margin: 0.2em;
     }
   }
   #info_box {
-    border-radius: 10px;
     background: $primary-neutral-light-color;
     &:before {
-      font-family: FontAwesome;
-      font-size: 4em;
       content: "\f05a";
       color: hsl(210, 100%, 56%);
     }
   }
   #alert_box {
-    border-radius: 10px;
     background: $second-color;
     &:before {
-      font-family: FontAwesome;
-      font-size: 4em;
       content: "\f06a";
       color: $white-color;
     }
@@ -345,12 +350,12 @@ header {
     a {
       flex: auto;
       text-align: center;
-      padding: 20px;
+      padding: 1.5em;
       color: $white-color;
       font-style: normal;
       font-weight: bolder;
       text-decoration: none;
-      
+
       &:hover {
         background: $secondary-neutral-color;
         color: $white-color;
@@ -458,6 +463,8 @@ header {
 
 /*---------------------------------NEWS--------------------------------*/
   #news {
+    display: flex;
+    flex-wrap: wrap;
     .news_column {
       display: inline-block;
       margin: 0px;
@@ -467,11 +474,13 @@ header {
       margin-bottom: 1em;
     }
     #right_column {
-      width: 20%;
+      flex: 20%;
       float: right;
+      margin: 0.2em;
     }
     #left_column {
-      width: 79%;
+      flex: 79%;
+      margin: 0.2em;
       h3 {
         background: $second-color;
         box-shadow: $shadow-color 1px 1px 1px;
@@ -482,6 +491,11 @@ header {
         &:not(:first-of-type) {
           margin: 2em 0em 1em 0em;
         }
+      }
+    }
+    @media screen and (max-width: $small-devices){
+      #left_column, #right_column {
+        flex: 100%;
       }
     }
 
@@ -691,6 +705,12 @@ header {
   }
 }
 
+@media screen and (max-width: $small-devices){
+  #page {
+    width: 98%;
+  }
+}
+
 #news_details {
   display: inline-block;
   margin-top: 20px;
@@ -723,7 +743,7 @@ header {
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
+    font-size: 1.2em;
     border-radius: 2px;
     float: right;
     display: block;
@@ -1111,33 +1131,36 @@ u, .underline {
   text-decoration: underline;
 }
 
-#basket {
-  width: 40%;
-  background: $primary-neutral-light-color;
-  float: right;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-#products {
-  width: 90%;
-  margin: 0px auto;
-  overflow: auto;
-}
-
 #bar_ui {
-  float: left;
-  min-width: 57%;
-}
+    padding: 0.4em;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row-reverse;
 
-#user_info_container {}
+    #products {
+      flex-basis: 100%;
+      margin: 0.2em;
+      overflow: auto;
+    }
 
-#user_info {
-  float: right;
-  padding: 5px;
-  width: 40%;
-  margin: 0px auto;
-  background: $secondary-neutral-light-color;
+    #click_form {
+      flex: auto;
+      margin: 0.2em;
+    }
+
+    #user_info {
+      flex: auto;
+      padding: 0.5em;
+      margin: 0.2em;
+      height: 100%;
+      background: $secondary-neutral-light-color;
+      img {
+          max-width: 70%;
+      }
+      input {
+          background: white;
+      }
+    }
 }
 
 /*-----------------------------USER PROFILE----------------------------*/
@@ -1210,6 +1233,11 @@ u, .underline {
                     margin: 0.1em;
                     width: 50px;
                 }
+            }
+        }
+        @media screen and (max-width: $small-devices){
+            #user_profile_infos, #user_profile_pictures {
+                flex-basis: 50%;
             }
         }
     }
@@ -1412,6 +1440,7 @@ textarea {
   .search_bar {
     margin: 10px 0px;
     display: flex;
+    flex-wrap: wrap;
     height: 20p;
     align-items: center;
   }
@@ -1551,6 +1580,7 @@ footer {
     color: $white-color;
     border-radius: 5px;
     display: flex;
+    flex-wrap: wrap;
     background-color: $primary-neutral-dark-color;
     box-shadow: $shadow-color 0px 0px 15px;
     a {

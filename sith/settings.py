@@ -280,7 +280,8 @@ SITH_NAME = "Sith website"
 SITH_TWITTER = "@ae_utbm"
 
 # AE configuration
-SITH_MAIN_CLUB_ID = 1  # TODO: keep only that first setting, with the ID, and do the same for the other clubs
+# TODO: keep only that first setting, with the ID, and do the same for the other clubs
+SITH_MAIN_CLUB_ID = 1
 SITH_MAIN_CLUB = {
     "name": "AE",
     "unix_name": "ae",
@@ -477,14 +478,14 @@ SITH_SUBSCRIPTION_END = 10
 # Subscription durations are in semestres
 # Be careful, modifying this parameter will need a migration to be applied
 SITH_SUBSCRIPTIONS = {
-    "un-semestre": {"name": _("One semester"), "price": 15, "duration": 1},
-    "deux-semestres": {"name": _("Two semesters"), "price": 28, "duration": 2},
+    "un-semestre": {"name": _("One semester"), "price": 20, "duration": 1},
+    "deux-semestres": {"name": _("Two semesters"), "price": 35, "duration": 2},
     "cursus-tronc-commun": {
         "name": _("Common core cursus"),
-        "price": 45,
+        "price": 60,
         "duration": 4,
     },
-    "cursus-branche": {"name": _("Branch cursus"), "price": 45, "duration": 6},
+    "cursus-branche": {"name": _("Branch cursus"), "price": 60, "duration": 6},
     "cursus-alternant": {"name": _("Alternating cursus"), "price": 30, "duration": 6},
     "membre-honoraire": {"name": _("Honorary member"), "price": 0, "duration": 666},
     "assidu": {"name": _("Assidu member"), "price": 0, "duration": 2},
@@ -497,6 +498,7 @@ SITH_SUBSCRIPTIONS = {
         "price": 0,
         "duration": 1,
     },
+    "un-mois-essai": {"name": _("One month for free"), "price": 0, "duration": 0.166},
     "deux-mois-essai": {"name": _("Two months for free"), "price": 0, "duration": 0.33},
     "benevoles-euroks": {"name": _("Eurok's volunteer"), "price": 5, "duration": 0.1},
     "six-semaines-essai": {
@@ -505,6 +507,7 @@ SITH_SUBSCRIPTIONS = {
         "duration": 0.23,
     },
     "un-jour": {"name": _("One day"), "price": 0, "duration": 0.00555333},
+    "membre-staff-ga": {"name": _("GA staff member"), "price": 1, "duration": 0.076},
     # Discount subscriptions
     "un-semestre-reduction": {
         "name": _("One semester (-20%)"),
@@ -530,6 +533,12 @@ SITH_SUBSCRIPTIONS = {
         "name": _("Alternating cursus (-20%)"),
         "price": 24,
         "duration": 6,
+    },
+    # CA special offer
+    "un-an-offert-CA": {
+        "name": _("One year for free(CA offer)"),
+        "price": 0,
+        "duration": 2,
     }
     # To be completed....
 }
@@ -665,3 +674,17 @@ if "test" in sys.argv:
 if SENTRY_DSN:
     # Connection to sentry
     sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()])
+
+
+SITH_FRONT_DEP_VERSIONS = {
+    "https://github.com/chartjs/Chart.js/": "2.6.0",
+    "https://github.com/xdan/datetimepicker/": "2.5.21",
+    "https://github.com/Ionaru/easy-markdown-editor/": "2.7.0",
+    "https://github.com/FortAwesome/Font-Awesome/": "4.7.0",
+    "https://github.com/jquery/jquery/": "3.1.0",
+    "https://github.com/sethmcl/jquery-ui/": "1.11.1",
+    "https://github.com/viralpatel/jquery.shorten/": "",
+    "https://github.com/getsentry/sentry-javascript/": "4.0.6",
+    "https://github.com/jhuckaby/webcamjs/": "1.0.0",
+    "https://github.com/vuejs/vue-next": "3.2.18",
+}

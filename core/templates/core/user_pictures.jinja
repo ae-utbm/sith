@@ -12,7 +12,7 @@
     {% for picture in pictures[a.id] %}
         <div class="picture">
             <a href="{{ url("sas:picture", picture_id=picture.id) }}#pict">
-                <img src="{{ picture.get_download_thumb_url() }}" alt="{{ picture.get_display_name() }}" style="max-width: 100%"/>
+                <img src="{{ picture.get_download_thumb_url() }}" alt="{{ picture.get_display_name() }}" style="max-width: 100%" loading="lazy"/>
             </a>
         </div>
     {% endfor %}

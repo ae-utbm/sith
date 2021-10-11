@@ -33,7 +33,7 @@ from core.templatetags.renderer import markdown
 @renderer_classes((StaticHTMLRenderer,))
 def RenderMarkdown(request):
     """
-        Render Markdown
+    Render Markdown
     """
     try:
         data = markdown(request.POST["text"])

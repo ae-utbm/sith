@@ -52,7 +52,7 @@ class LaunderetteMainView(TemplateView):
     template_name = "launderette/launderette_main.jinja"
 
     def get_context_data(self, **kwargs):
-        """ Add page to the context """
+        """Add page to the context"""
         kwargs = super(LaunderetteMainView, self).get_context_data(**kwargs)
         kwargs["page"] = Page.objects.filter(name="launderette").first()
         return kwargs
@@ -142,7 +142,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
             currentDate += delta
 
     def get_context_data(self, **kwargs):
-        """ Add page to the context """
+        """Add page to the context"""
         kwargs = super(LaunderetteBookView, self).get_context_data(**kwargs)
         kwargs["planning"] = OrderedDict()
         kwargs["slot_type"] = self.slot_type
@@ -481,7 +481,7 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
         return super(LaunderetteClickView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        """ Handle the many possibilities of the post request """
+        """Handle the many possibilities of the post request"""
         self.object = self.get_object()
         self.customer = Customer.objects.filter(user__id=self.kwargs["user_id"]).first()
         self.subscriber = self.customer.user
