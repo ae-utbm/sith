@@ -50,9 +50,11 @@
         <h5>{% trans %}Selling{% endtrans %}</h5>
         <div>
 
+            {% raw %}
             <div class="important">
                 <p v-for="error in errors"><strong>{{ error }}</strong></p>
             </div>
+            {% endraw %}
 
             <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}" class="code_form" @submit.prevent="handle_code">
                 {% csrf_token %}
@@ -88,11 +90,11 @@
             <p>
                 <strong>Total: {{ sum_basket().toLocaleString(undefined, { minimumFractionDigits: 2 }) }} €</strong>
             </p>
-            {% endraw %}
 
             <div class="important">
                 <p v-for="error in errors"><strong>{{ error }}</strong></p>
             </div>
+            {% endraw %}
 
             <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
                 {% csrf_token %}
