@@ -5,20 +5,24 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('core', '0035_auto_20200216_1743'),
-    ]
+    dependencies = [("core", "0035_auto_20200216_1743")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='pronouns',
-            field=models.CharField(default='', max_length=64, verbose_name='pronouns'),
+            model_name="user",
+            name="pronouns",
+            field=models.CharField(default="", max_length=64, verbose_name="pronouns"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='user',
-            name='sex',
-            field=models.CharField(blank=True, choices=[('MAN', 'Man'), ('WOMAN', 'Woman'), ('OTHER', 'Other')], max_length=10, null=True, verbose_name='sex'),
+            model_name="user",
+            name="sex",
+            field=models.CharField(
+                blank=True,
+                choices=[("MAN", "Man"), ("WOMAN", "Woman"), ("OTHER", "Other")],
+                max_length=10,
+                null=True,
+                verbose_name="sex",
+            ),
         ),
     ]
