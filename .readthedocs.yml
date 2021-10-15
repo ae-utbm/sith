@@ -4,6 +4,11 @@
 # Required
 version: 2
 
+# Allow installing xapian-bindings in pip
+build:
+  apt_packages:
+    - libxapian-dev
+
 # Build documentation in the doc/ directory with Sphinx
 sphinx:
   configuration: doc/conf.py
@@ -13,6 +18,9 @@ formats: all
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
-  version: 3.6
+  version: 3.8
   install:
-    - requirements: requirements.txt
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs

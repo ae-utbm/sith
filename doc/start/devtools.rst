@@ -22,7 +22,7 @@ VsCode
 
 .. warning::
 
-	Il faut installer black dans son virtualenv pour cet éditeur
+	Il faut installer black dans son environement virtuel pour cet éditeur
 
 Black est directement pris en charge par l'extension pour le Python de VsCode, il suffit de rentrer la configuration suivante :
 

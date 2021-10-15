@@ -4,6 +4,9 @@ db.sqlite3
 *.mo
 *__pycache__*
 .DS_Store
+pyrightconfig.json
+poetry.lock
+dist/
 .vscode/
 env/
 doc/html
