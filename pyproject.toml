@@ -1,0 +1,65 @@
+[tool.poetry]
+name = "Sith"
+version = "1"
+description = "Le web Sith de l'AE"
+authors = [
+	"Skia <skia@hya.sk>",
+	"klmp200 <antoine@bartuccio.fr>",
+	"Krophil <pierre.brunet@krophil.fr>",
+	"Och <francescowitz68@gmail.com>",
+	"tleb <tleb@openmailbox.org>",
+	"Soldat <ryan-68@live.fr>",
+	"Nabos <gnikwo@hotmail.com>",
+	"Terre <jbaptiste.lenglet+git@gmail.com>",
+	"Lo-J <renaudg779@gmail.com>",
+	"Vial <robin.trioux@utbm.fr>"
+]
+documentation = "https://sith-ae.readthedocs.io/"
+homepage = "https://ae.utbm.fr/"
+license = "GPL-3.0-only"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+Django = "^2.2"
+Pillow = "^8.3.2"
+mistune = "^0.8.4"
+django-jinja = "^2.9.1"
+pyOpenSSL = "^21.0.0"
+pytz = "^2021.1"
+djangorestframework = "^3.12.4"
+django-phonenumber-field = "^5.2.0"
+phonenumbers = "^8.12.33"
+django-ajax-selects = "^2.1.0"
+reportlab = "^3.6.1"
+django-haystack = "^3.1.1"
+xapian-haystack = "^2.1.1"
+xapian-bindings = "^0.1.0"
+libsass = "^0.21.0"
+django-ordered-model = "^3.4.3"
+django-simple-captcha = "^0.5.14"
+python-dateutil = "^2.8.2"
+sentry-sdk = "^1.4.3"
+graphviz = "^0.17"
+
+# Extra optional dependencies
+mysqlclient = { version = "^2.0.3", optional = true }
+coverage = {version = "^5.5", optional = true}
+
+# Docs extra dependencies
+Sphinx = {version = "^4.2.0", optional = true}
+sphinx-rtd-theme = {version = "^1.0.0", optional = true}
+sphinx-copybutton = {version = "^0.4.0", optional = true}
+
+[tool.poetry.extras]
+testing = ["coverage"]
+migration = ["mysqlclient"]
+docs = ["Sphinx", "sphinx-rtd-theme", "sphinx-copybutton"]
+
+[tool.poetry.dev-dependencies]
+django-debug-toolbar = "^3.2.2"
+ipython = "^7.28.0"
+black = "^21.9b0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
