@@ -3244,8 +3244,8 @@ msgstr "Voir une image de la famille"
 
 #: core/templates/core/user_godfathers.jinja:12 core/views/user.py:205
 #: core/views/user.py:477
-msgid "Godfathers"
-msgstr "Parrains"
+msgid "Family"
+msgstr "Famille"
 
 #: core/templates/core/user_godfathers.jinja:20
 msgid "Show ancestors tree"
