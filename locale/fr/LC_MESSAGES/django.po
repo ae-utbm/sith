@@ -3243,7 +3243,7 @@ msgid "Show family picture"
 msgstr "Voir une image de la famille"
 
 #: core/templates/core/user_godfathers.jinja:12 core/views/user.py:205
-#: core/views/user.py:477
+#: core/views/user.py:477 core/views/user.py:479
 msgid "Family"
 msgstr "Famille"
 
@@ -3692,10 +3692,6 @@ msgstr "Utilisateurs à ajouter au groupe"
 #: trombi/templates/trombi/user_profile.jinja:11
 msgid "Pictures"
 msgstr "Photos"
-
-#: core/views/user.py:479
-msgid "Family"
-msgstr "Famille"
 
 #: core/views/user.py:621
 msgid "User already has a profile picture"
