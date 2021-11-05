@@ -6,11 +6,11 @@ Dépendances du système
 
 Certaines dépendances sont nécessaires niveau système :
 
-* virtualenv
+* poetry
 * libmysqlclient
 * libssl
 * libjpeg
-* python3-xapian
+* libxapian-dev
 * zlib1g-dev
 * python3
 * gettext
@@ -22,8 +22,11 @@ Sur Ubuntu
 
 .. sourcecode:: bash
 
-    sudo apt install libmysqlclient-dev libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config python3-xapian gettext git
-    sudo pip3 install virtualenv
+    sudo apt install libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config libxapian-dev gettext git
+    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+
+    # To include mysql for importing old bdd
+    sudo apt install libmysqlclient-dev
 
 Sur MacOS
 ~~~~~~~~~
@@ -32,7 +35,7 @@ Pour installer les dépendances, il est fortement recommandé d'installer le ges
 
 .. sourcecode:: bash
 
-    brew install git python xapian graphviz
+    brew install git python xapian graphviz poetry
 
     # Si vous aviez une version de python ne venant pas de homebrew
     brew link --overwrite python
@@ -41,8 +44,8 @@ Pour installer les dépendances, il est fortement recommandé d'installer le ges
     # Pour bien configurer gettext
     brew link gettext # (suivez bien les instructions supplémentaires affichées)
 
-    # Pour installer virtualenv
-    pip3 install virtualenv
+    # Pour installer poetry
+    pip3 install poetry
 
 .. note::
 
@@ -56,15 +59,11 @@ Installer le projet
     git clone https://ae-dev.utbm.fr/ae/Sith.git
     cd Sith
 
-    # Prépare et active l'environnement du projet
-    virtualenv --system-site-packages --python=python3 env
-    source env/bin/activate
+    # Création de l'environnement et installation des dépendances
+    poetry install
 
-    # Installe les dépendances du projet
-    pip install -r requirements.txt
-
-    # Si vous avez des problèmes avec graphiviz
-    pip install pygraphviz --install-option="--include-path=/usr/include/graphviz" --install-option="--library-path=/usr/lib/graphviz/"
+    # Activation de l'environnement virtuel
+    poetry shell
 
     # Prépare la base de donnée
     ./manage.py setup
@@ -74,7 +73,7 @@ Installer le projet
 
 .. note::
 
-    Pour éviter d'avoir à utiliser la commande source sur le virtualenv systématiquement, il est possible de consulter :ref:`direnv`.
+    Pour éviter d'avoir à utiliser la commande poetry shell systématiquement, il est possible de consulter :ref:`direnv`.
 
 Configuration pour le développement
 -----------------------------------

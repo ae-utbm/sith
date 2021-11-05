@@ -6,20 +6,14 @@ test:
   script:
   - env
   - apt-get update
-  - apt-get install -y gettext python3-xapian libgraphviz-dev
-  - pushd /usr/lib/python3/dist-packages/xapian && ln -s _xapian* _xapian.so && popd
-  - export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
-  - python -c 'import xapian' # Fail immediately if there is a problem with xapian
-  - pip install -U -r requirements.txt
-  - pip install -U coverage
+  - apt-get install -y gettext libxapian-dev libgraphviz-dev
+  - pip install .[testing]
   - mkdir -p /dev/shm/search_indexes
   - ln -s /dev/shm/search_indexes sith/search_indexes
   - ./manage.py compilemessages
   - coverage run ./manage.py test
   - coverage html
   - coverage report
-  - cd doc
-  - make html # Make documentation
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip_tests"
   cache:

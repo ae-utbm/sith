@@ -160,12 +160,13 @@ Sentry
 
 Sentry est une plate-forme libre qui permet de se tenir informer des bugs qui ont lieu sur le site. À chaque crash du logiciel (erreur 500), une erreur est envoyée sur la plate-forme et est indiqué précisément à quelle ligne de code celle-ci a eu lieu, à quelle heure, combien de fois, avec quel navigateur la page a été visitée et même éventuellement un commentaire de l'utilisateur qui a rencontré le bug.
 
-Virtualenv
+Poetry
 ~~~~~~~~~~
 
-`Utiliser virtualenv <https://python-guide-pt-br.readthedocs.io/fr/latest/dev/virtualenvs.html>`__
+`Utiliser Poetry <https://python-poetry.org/docs/basic-usage/>`__
 
-Virtualenv est un utilitaire permettant d'installer un environnement Python de manière locale sans avoir besoin des droits root pour y installer des dépendances. Il est très utilisé pour gérer plusieurs projets différents en parallèles puisqu'il permet d'avoir sur sa machine plusieurs environnements différents et donc plusieurs versions d'une même dépendance dans plusieurs projets différent sans impacter le système sur lequel le tout est installé.
+Poetry est un utilitaire qui permet de créer et gérer des environements Python de manière simple et intuitive. Il permet également de gérer et mettre à jour le fichier de dépendances.
+L'avantage d'utiliser poetry (et les environnements virtuels en général) est de pouvoir gérer plusieurs projets différents en parallèles puisqu'il permet d'avoir sur sa machine plusieurs environnements différents et donc plusieurs versions d'une même dépendance dans plusieurs projets différent sans impacter le système sur lequel le tout est installé.
 
 Black
 ~~~~~
