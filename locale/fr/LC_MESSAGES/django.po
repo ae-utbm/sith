@@ -2071,8 +2071,8 @@ msgid "Woman"
 msgstr "Femme"
 
 #:core/models.py:232
-msgid "Pronouns"
-msgstr "Pronoms"
+msgid "pronouns"
+msgstr "pronoms"
 
 #: core/models.py:209
 msgid "tshirt size"
@@ -3111,6 +3111,10 @@ msgstr "Profil de %(user_name)s"
 #: core/templates/core/user_detail.jinja:27
 msgid "Born: "
 msgstr "Né le : "
+
+#: core/templates/core/user_detail.jinja:27
+msgid "Pronouns: "
+msgstr "Pronoms : "
 
 #: core/templates/core/user_detail.jinja:34
 msgid "Department: "

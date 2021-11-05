@@ -26,7 +26,7 @@
             <div id="user_profile_infos_items">
             	{% if profile.pronouns %}
                 	<div>
-                	    <span class="user_profile_infos_item"> </span>
+                	    <span class="user_profile_infos_item">{% trans %}Pronouns: {% endtrans %}</span>
                 	    <span class="user_profile_infos_item_value">{{ profile.pronouns }}</span>
                 	</div>
             	{% endif %}
