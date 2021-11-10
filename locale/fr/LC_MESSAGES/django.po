@@ -2060,7 +2060,7 @@ msgstr "blouse"
 
 #: core/models.py:226
 msgid "sex"
-msgstr "sexe"
+msgstr "Genre"
 
 #: core/models.py:228 matmat/views.py:74
 msgid "Man"
@@ -2070,7 +2070,11 @@ msgstr "Homme"
 msgid "Woman"
 msgstr "Femme"
 
-#: core/models.py:232
+#:core/models.py:232
+msgid "pronouns"
+msgstr "pronoms"
+
+#: core/models.py:209
 msgid "tshirt size"
 msgstr "taille de tshirt"
 
@@ -3108,6 +3112,10 @@ msgstr "Profil de %(user_name)s"
 msgid "Born: "
 msgstr "Né le : "
 
+#: core/templates/core/user_detail.jinja:27
+msgid "Pronouns: "
+msgstr "Pronoms : "
+
 #: core/templates/core/user_detail.jinja:34
 msgid "Department: "
 msgstr "Département : "
@@ -3235,9 +3243,9 @@ msgid "Show family picture"
 msgstr "Voir une image de la famille"
 
 #: core/templates/core/user_godfathers.jinja:12 core/views/user.py:205
-#: core/views/user.py:477
-msgid "Godfathers"
-msgstr "Parrains"
+#: core/views/user.py:477 core/views/user.py:479
+msgid "Family"
+msgstr "Famille"
 
 #: core/templates/core/user_godfathers.jinja:20
 msgid "Show ancestors tree"
@@ -3684,10 +3692,6 @@ msgstr "Utilisateurs à ajouter au groupe"
 #: trombi/templates/trombi/user_profile.jinja:11
 msgid "Pictures"
 msgstr "Photos"
-
-#: core/views/user.py:479
-msgid "Family"
-msgstr "Famille"
 
 #: core/views/user.py:621
 msgid "User already has a profile picture"

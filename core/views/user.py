@@ -202,7 +202,7 @@ class UserTabsMixin(TabedViewMixin):
                     "core:user_godfathers", kwargs={"user_id": self.object.id}
                 ),
                 "slug": "godfathers",
-                "name": _("Godfathers"),
+                "name": _("Family"),
             }
         )
         tab_list.append(
@@ -474,7 +474,7 @@ class UserGodfathersTreePictureView(CanViewMixin, DetailView):
         if self.param == "godchildren":
             self.graph.graph_attr["label"] = _("Godchildren")
         elif self.param == "godfathers":
-            self.graph.graph_attr["label"] = _("Godfathers")
+            self.graph.graph_attr["label"] = _("Family")
         else:
             self.graph.graph_attr["label"] = _("Family")
         img = self.graph.draw(format="png", prog="dot")

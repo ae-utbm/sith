@@ -220,6 +220,7 @@ class UserProfileForm(forms.ModelForm):
             "avatar_pict",
             "scrub_pict",
             "sex",
+            "pronouns",
             "second_email",
             "address",
             "parent_address",

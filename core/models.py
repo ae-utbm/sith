@@ -227,8 +227,9 @@ class User(AbstractBaseUser):
         max_length=10,
         null=True,
         blank=True,
-        choices=[("MAN", _("Man")), ("WOMAN", _("Woman"))],
+        choices=[("MAN", _("Man")), ("WOMAN", _("Woman")), ("OTHER", _("Other"))],
     )
+    pronouns = models.CharField(_("pronouns"), max_length=64, default="")
     tshirt_size = models.CharField(
         _("tshirt size"),
         max_length=5,
@@ -1491,9 +1492,7 @@ class OperationLog(models.Model):
         User, related_name="logs", on_delete=models.SET_NULL, null=True
     )
     operation_type = models.CharField(
-        _("operation type"),
-        max_length=40,
-        choices=settings.SITH_LOG_OPERATION_TYPE,
+        _("operation type"), max_length=40, choices=settings.SITH_LOG_OPERATION_TYPE
     )
 
     def is_owned_by(self, user):

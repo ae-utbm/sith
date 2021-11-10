@@ -55,6 +55,9 @@
             {% if user.nick_name %}
             <div class="user_mini_profile_nick">&laquo; {{ user.nick_name }} &raquo;</div>
             {% endif %}
+            {% if user.pronouns %}
+            <div class="user_mini_profile_pronouns">{{ user.pronouns }}</div>
+            {% endif %}
             {% if user.date_of_birth %}
             <div class="user_mini_profile_dob">
                 {{ user.date_of_birth|date("d/m/Y") }} ({{ user.get_age() }})
