@@ -410,9 +410,10 @@ class TzAwareDateTimeField(forms.DateTimeField):
         if isinstance(value, str):
             # convert it into a naive datetime (no timezone attached)
             value = parse_datetime(value)
-            # attach it to the UTC timezone (so that to_current_timezone()
+            # attach it to the UTC timezone (so that to_current_timezone()) if not None
             # converts it to the local timezone)
-            value = timezone.make_aware(value, timezone.utc)
+            if value is not None:
+                value = timezone.make_aware(value, timezone.utc)
 
         if isinstance(value, datetime.datetime):
             value = to_current_timezone(value)
