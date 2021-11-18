@@ -332,7 +332,10 @@ class UserPropForm(forms.ModelForm):
 
 class UserGodfathersForm(forms.Form):
     type = forms.ChoiceField(
-        choices=[("godfather", _("Godfather")), ("godchild", _("Godchild"))],
+        choices=[
+            ("godfather", _("Godfather / Godmother")),
+            ("godchild", _("Godchild")),
+        ],
         label=_("Add"),
     )
     user = AutoCompleteSelectField(

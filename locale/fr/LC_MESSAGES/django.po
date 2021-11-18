@@ -3233,17 +3233,24 @@ msgid "Change user password"
 msgstr "Changer le mot de passe"
 
 #: core/templates/core/user_godfathers.jinja:5
-#: core/templates/core/user_godfathers_tree.jinja:7
 #, python-format
+msgid "%(user_name)s's family"
+msgstr "Famille de %(user_name)s"
+
+#: core/templates/core/user_godfathers_tree.jinja:7
 msgid "%(user_name)s's godfathers"
-msgstr "Parrains de %(user_name)s"
+msgstr "Parrains/Marraines de %(user_name)s"
 
 #: core/templates/core/user_godfathers.jinja:10
 msgid "Show family picture"
 msgstr "Voir une image de la famille"
 
-#: core/templates/core/user_godfathers.jinja:12 core/views/user.py:205
+#: core/templates/core/user_godfathers.jinja:12 
+msgid "Godfathers / Godmothers"
+msgstr "Parrains / Marraines"
+
 #: core/views/user.py:477 core/views/user.py:479
+#: core/views/user.py:205
 msgid "Family"
 msgstr "Famille"
 
@@ -3253,12 +3260,12 @@ msgstr "Voir l'arbre des ancêtres"
 
 #: core/templates/core/user_godfathers.jinja:22
 #: core/templates/core/user_godfathers_tree.jinja:50
-msgid "No godfathers"
-msgstr "Pas de parrains"
+msgid "No godfathers / godmothers"
+msgstr "Pas de famille"
 
 #: core/templates/core/user_godfathers.jinja:25 core/views/user.py:475
 msgid "Godchildren"
-msgstr "Fillots"
+msgstr "Fillots / Fillotes"
 
 #: core/templates/core/user_godfathers.jinja:33
 msgid "Show descent tree"
@@ -3267,12 +3274,12 @@ msgstr "Voir l'arbre de la descendance"
 #: core/templates/core/user_godfathers.jinja:35
 #: core/templates/core/user_godfathers_tree.jinja:48
 msgid "No godchildren"
-msgstr "Pas de fillots"
+msgstr "Pas de fillots / fillotes"
 
 #: core/templates/core/user_godfathers_tree.jinja:5
 #, python-format
 msgid "%(user_name)s's godchildren"
-msgstr "Fillots de %(user_name)s"
+msgstr "Fillots/Fillotes de %(user_name)s"
 
 #: core/templates/core/user_godfathers_tree.jinja:20
 msgid "Already seen (check above)"
@@ -3659,12 +3666,12 @@ msgid "Bad image format, only jpeg, png, and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, et gif sont acceptés"
 
 #: core/views/forms.py:334
-msgid "Godfather"
-msgstr "Parrain"
+msgid "Godfather / Godmother"
+msgstr "Parrain / Marraine"
 
 #: core/views/forms.py:334
 msgid "Godchild"
-msgstr "Fillot"
+msgstr "Fillot / Fillote"
 
 #: core/views/forms.py:338 counter/views.py:156 trombi/views.py:158
 msgid "Select user"
