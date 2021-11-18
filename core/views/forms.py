@@ -167,17 +167,14 @@ class LoginForm(AuthenticationForm):
             try:
                 if account_code.match(data["username"]):
                     user = (
-                        Customer.objects.filter(
-                            account_id__iexact=data["username"])
+                        Customer.objects.filter(account_id__iexact=data["username"])
                         .first()
                         .user
                     )
                 elif "@" in data["username"]:
-                    user = User.objects.filter(
-                        email__iexact=data["username"]).first()
+                    user = User.objects.filter(email__iexact=data["username"]).first()
                 else:
-                    user = User.objects.filter(
-                        username=data["username"]).first()
+                    user = User.objects.filter(username=data["username"]).first()
                 data["username"] = user.username
             except:
                 pass
@@ -282,8 +279,7 @@ class UserProfileForm(forms.ModelForm):
                     new_file = SithFile(
                         parent=parent,
                         name=self.generate_name(field, f),
-                        file=resize_image(
-                            im, 400, f.content_type.split("/")[-1]),
+                        file=resize_image(im, 400, f.content_type.split("/")[-1]),
                         owner=self.instance,
                         is_folder=False,
                         mime_type=f.content_type,
@@ -350,8 +346,7 @@ class PagePropForm(forms.ModelForm):
 
     class Meta:
         model = Page
-        fields = ["parent", "name", "owner_group",
-                  "edit_groups", "view_groups"]
+        fields = ["parent", "name", "owner_group", "edit_groups", "view_groups"]
 
     edit_groups = make_ajax_field(
         Page, "edit_groups", "groups", help_text="", label=_("edit groups")
@@ -369,8 +364,7 @@ class PagePropForm(forms.ModelForm):
 class PageForm(forms.ModelForm):
     class Meta:
         model = Page
-        fields = ["parent", "name", "owner_group",
-                  "edit_groups", "view_groups"]
+        fields = ["parent", "name", "owner_group", "edit_groups", "view_groups"]
 
     edit_groups = make_ajax_field(
         Page, "edit_groups", "groups", help_text="", label=_("edit groups")
