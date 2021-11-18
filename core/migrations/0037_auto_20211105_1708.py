@@ -5,14 +5,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("core", "0036_auto_20211001_0248"),
-    ]
+    dependencies = [("core", "0036_auto_20211001_0248")]
 
     operations = [
         migrations.AlterField(
             model_name="user",
             name="pronouns",
-            field=models.CharField(default="", max_length=64, verbose_name="pronouns"),
-        ),
+            field=models.CharField(
+                blank=True, default="", max_length=64, verbose_name="pronouns"
+            ),
+        )
     ]
