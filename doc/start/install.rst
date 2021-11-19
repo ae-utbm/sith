@@ -22,11 +22,11 @@ Sur Ubuntu
 
 .. sourcecode:: bash
 
-    sudo apt install libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config libxapian-dev gettext git
-    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+    $ sudo apt install libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config libxapian-dev gettext git
+    $ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
 
     # To include mysql for importing old bdd
-    sudo apt install libmysqlclient-dev
+    $ sudo apt install libmysqlclient-dev
 
 Sur MacOS
 ~~~~~~~~~
@@ -35,41 +35,83 @@ Pour installer les dépendances, il est fortement recommandé d'installer le ges
 
 .. sourcecode:: bash
 
-    brew install git python xapian graphviz poetry
+    $ brew install git python xapian graphviz poetry
 
     # Si vous aviez une version de python ne venant pas de homebrew
-    brew link --overwrite python
+    $ brew link --overwrite python
 
 
     # Pour bien configurer gettext
-    brew link gettext # (suivez bien les instructions supplémentaires affichées)
+    $ brew link gettext # (suivez bien les instructions supplémentaires affichées)
 
     # Pour installer poetry
-    pip3 install poetry
+    $ pip3 install poetry
 
 .. note::
 
     Si vous rencontrez des erreurs lors de votre configuration, n'hésitez pas à vérifier l'état de votre installation homebrew avec :code:`brew doctor`
 
-Installer le projet
--------------------
+Sur Windows avec WSL
+~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    Comme certaines dépendances sont uniquement disponible dans un environnement Unix, il est obligatoire de passer par WSL pour installer le projet.
 
 .. sourcecode:: bash
 
-    git clone https://ae-dev.utbm.fr/ae/Sith.git
-    cd Sith
+    # dans un shell Windows
+    > wsl --install
+
+    # afficher la liste des distribution disponible avec WSL
+    > wsl -l -o
+
+    # installer WSL avec une distro choisie
+    > wsl --install -d <nom_distro>
+
+.. note::
+
+  Si vous rencontrez le code d'erreur ``0x80370102``, regardez les réponses de ce post https://askubuntu.com/questions/1264102/wsl-2-wont-run-ubuntu-error-0x80370102
+
+Une fois WSL installé, mettez à jour votre distro & installez les dépendances:
+
+.. sourcecode:: bash
+
+  # dans un shell Unix
+  $ sudo apt update
+  
+  # libs
+  $ sudo apt install libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config libxapian-dev gettext
+  $ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+
+Vous devez **impérativement cloner le repo depuis Windows** car git ne fonctionne pas exactement de la même manière sous Unix (cf ce lien: https://stackoverflow.com/questions/62245016/how-to-git-clone-in-wsl). 
+Pour accéder à un disque externe à WSL, il suffit simplement d'utiliser la commande suivante:
+
+.. sourcecode:: bash
+  
+  # oui c'est beau, simple et efficace
+  $ cd /mnt/<lettre_disque>
+
+Installer le projet
+-----------------------------------
+
+.. sourcecode:: bash
+
+    # ! A faire sous Windows pour ceux utilisant WSL
+    $ git clone https://ae-dev.utbm.fr/ae/Sith.git
+    $ cd Sith
 
     # Création de l'environnement et installation des dépendances
-    poetry install
+    $ poetry install
 
     # Activation de l'environnement virtuel
-    poetry shell
+    $ poetry shell
 
     # Prépare la base de donnée
-    ./manage.py setup
+    $ python3 manage.py setup
 
     # Installe les traductions
-    ./manage compilemessages
+    $ python3 manage.py compilemessages
 
 .. note::
 
@@ -82,8 +124,8 @@ Lorsqu'on souhaite développer pour le site, il est nécessaire de passer le log
 
 .. sourcecode:: bash
 
-    echo "DEBUG=True" > sith/settings_custom.py
-    echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
+    $ echo "DEBUG=True" > sith/settings_custom.py
+    $ echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
 
 Démarrer le serveur de développement
 ------------------------------------
@@ -92,7 +134,7 @@ Il faut toujours avoir préalablement activé l'environnement virtuel comme fait
 
 .. sourcecode:: bash
 
-    ./manage.py runserver
+    $ python3 manage.py runserver
 
 .. note::
 
@@ -102,17 +144,15 @@ Générer la documentation
 ------------------------
 
 La documentation est automatiquement mise en ligne sur readthedocs à chaque envoi de code sur GitLab.
-
 Pour l'utiliser en local ou globalement pour la modifier, il existe une commande du site qui génère la documentation et lance un serveur la rendant accessible à l'adresse http://localhost:8080.
-
 Cette commande génère la documentation à chacune de ses modifications, inutile de relancer le serveur à chaque fois.
 
 .. sourcecode:: bash
 
-    ./manage.py documentation
+    $ python3 manage.py documentation
 
     # Il est possible de spécifier un port et une adresse d'écoute différente
-    ./manage.py documentation adresse:port
+    $ python3 manage.py documentation adresse:port
 
 Lancer les tests
 ----------------
@@ -122,16 +162,16 @@ Pour lancer les tests il suffit d'utiliser la commande intégrée à django.
 .. code-block:: bash
 
     # Lancer tous les tests
-    ./manage.py test
+    $ python3 manage.py test
 
     # Lancer les tests de l'application core
-    ./manage.py test core
+    $ python3 manage.py test core
 
     # Lancer les tests de la classe UserRegistrationTest de core
-    ./manage.py test core.tests.UserRegistrationTest
+    $ python3 manage.py test core.tests.UserRegistrationTest
 
     # Lancer une méthode en particulier de cette même classe
-    ./manage.py test core.tests.UserRegistrationTest.test_register_user_form_ok
+    $ python3 manage.py test core.tests.UserRegistrationTest.test_register_user_form_ok
 
 Vérifier les dépendances Javascript
 -----------------------------------
@@ -142,4 +182,4 @@ N'oubliez pas de mettre à jour à la fois le fichier de la librairie, mais éga
 .. code-block:: bash
 
     # Vérifier les mises à jour
-    ./manage.py check_front
+    $ python3 manage.py check_front
