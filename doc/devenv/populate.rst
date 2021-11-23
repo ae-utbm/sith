@@ -15,7 +15,7 @@ Utilisations :
 Les données générées du site dev
 ================================
 
-Par défaut, la base de données du site de prod contient des données nécessaires au fonctionnement du site comme les groupes (voir :ref:`groups-list`), un utilisateur root, les clubs de base et quelques autres instances indispensables. En plus de ces données par défaut, la base de données du site de dev contient des fixtures pour remplir le site et le rendre exploitable. 
+Par défaut, la base de données du site de prod contient des données nécessaires au fonctionnement du site comme les groupes (voir :ref:`groups-list`), un utilisateur root, les clubs de base et quelques autres instances indispensables. En plus de ces données par défaut, la base de données du site de dev contient des données de test (*fixtures*) pour remplir le site et le rendre exploitable. 
 
 **Voici les clubs générés pour le site de dev :**
 
@@ -73,7 +73,7 @@ Pour ajouter une fixtures, il faut :
     # [...]
     
     # Création de l'objet
-    test = User(
+    jesus = User(
         username="jc",
         last_name="Jesus",
         first_name="Christ",
@@ -82,6 +82,6 @@ Pour ajouter une fixtures, il faut :
         is_superuser=False,
         is_staff=True,
     )
-    comptable.set_password("plop")
+    jesus.set_password("plop")
     # Enregistrement dans la base de donnée
-    comptable.save()
+    jesus.save()
