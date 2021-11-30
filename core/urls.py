@@ -73,7 +73,7 @@ urlpatterns = [
     re_path(r"^register$", register, name="register"),
     # Group handling
     re_path(r"^group/$", GroupListView.as_view(), name="group_list"),
-    re_path(r"^group/new$", GroupCreateView.as_view(), name="group_new"),
+    re_path(r"^group/new/$", GroupCreateView.as_view(), name="group_new"),
     re_path(
         r"^group/(?P<group_id>[0-9]+)/$", GroupEditView.as_view(), name="group_edit"
     ),

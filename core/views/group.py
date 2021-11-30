@@ -37,7 +37,7 @@ from django import forms
 from ajax_select.fields import AutoCompleteSelectMultipleField
 
 from core.models import RealGroup, User
-from core.views import CanEditMixin, DetailFormView
+from core.views import CanCreateMixin, CanEditMixin, DetailFormView
 
 # Forms
 
@@ -109,13 +109,13 @@ class GroupEditView(CanEditMixin, UpdateView):
     fields = ["name", "description"]
 
 
-class GroupCreateView(CanEditMixin, CreateView):
+class GroupCreateView(CanCreateMixin, CreateView):
     """
     Add a new Group
     """
 
     model = RealGroup
-    template_name = "core/group_edit.jinja"
+    template_name = "core/create.jinja"
     fields = ["name", "description"]
 
 
