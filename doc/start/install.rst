@@ -12,7 +12,7 @@ Certaines dépendances sont nécessaires niveau système :
 * libjpeg
 * libxapian-dev
 * zlib1g-dev
-* python3
+* python
 * gettext
 * graphviz
 * mysql-client (pour migrer de l'ancien site)
@@ -22,8 +22,8 @@ Sur Ubuntu
 
 .. sourcecode:: bash
 
-    sudo apt install libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config libxapian-dev gettext git
-    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+    sudo apt install libssl-dev libjpeg-dev zlib1g-dev python-dev libffi-dev python-dev libgraphviz-dev pkg-config libxapian-dev gettext git
+    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
     # To include mysql for importing old bdd
     sudo apt install libmysqlclient-dev
@@ -114,10 +114,10 @@ Installer le projet
     poetry shell
 
     # Prépare la base de donnée
-    python3 manage.py setup
+    python manage.py setup
 
     # Installe les traductions
-    python3 manage.py compilemessages
+    python manage.py compilemessages
 
 .. note::
 
@@ -140,7 +140,7 @@ Il faut toujours avoir préalablement activé l'environnement virtuel comme fait
 
 .. sourcecode:: bash
 
-    python3 manage.py runserver
+    python manage.py runserver
 
 .. note::
 
@@ -155,10 +155,10 @@ Cette commande génère la documentation à chacune de ses modifications, inutil
 
 .. sourcecode:: bash
 
-    python3 manage.py documentation
+    python manage.py documentation
 
     # Il est possible de spécifier un port et une adresse d'écoute différente
-    python3 manage.py documentation adresse:port
+    python manage.py documentation adresse:port
 
 Lancer les tests
 ----------------
@@ -168,16 +168,16 @@ Pour lancer les tests il suffit d'utiliser la commande intégrée à django.
 .. code-block:: bash
 
     # Lancer tous les tests
-    python3 manage.py test
+    python manage.py test
 
     # Lancer les tests de l'application core
-    python3 manage.py test core
+    python manage.py test core
 
     # Lancer les tests de la classe UserRegistrationTest de core
-    python3 manage.py test core.tests.UserRegistrationTest
+    python manage.py test core.tests.UserRegistrationTest
 
     # Lancer une méthode en particulier de cette même classe
-    python3 manage.py test core.tests.UserRegistrationTest.test_register_user_form_ok
+    python manage.py test core.tests.UserRegistrationTest.test_register_user_form_ok
 
 Vérifier les dépendances Javascript
 -----------------------------------
@@ -188,4 +188,4 @@ N'oubliez pas de mettre à jour à la fois le fichier de la librairie, mais éga
 .. code-block:: bash
 
     # Vérifier les mises à jour
-    python3 manage.py check_front
+    python manage.py check_front
