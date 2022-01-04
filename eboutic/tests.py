@@ -191,10 +191,10 @@ class EbouticTest(TestCase):
         )
 
         response = self.generate_bank_valid_answer_from_page_content(response.content)
-        self.assertTrue(response.status_code == 400)
-        self.assertTrue(
-            "Payment failed with error: SuspiciousOperation('Basket total and amount do not match'"
-            in response.content.decode("utf-8")
+        self.assertEqual(response.status_code, 500)
+        self.assertIn(
+            "Basket processing failed with error: SuspiciousOperation('Basket total and amount do not match'",
+            response.content.decode("utf-8"),
         )
 
     def test_buy_refill_product_with_credit_card(self):

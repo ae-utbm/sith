@@ -301,9 +301,11 @@ class EtransactionAutoAnswer(View):
                     i.validate()
                     b.delete()
             except Exception as e:
-                return HttpResponse("Payment failed with error: " + repr(e), status=400)
+                return HttpResponse(
+                    "Basket processing failed with error: " + repr(e), status=500
+                )
             return HttpResponse()
         else:
             return HttpResponse(
-                "Payment failed with error: " + request.GET["Error"], status=400
+                "Payment failed with error: " + request.GET["Error"], status=202
             )
