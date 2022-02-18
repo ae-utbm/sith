@@ -5526,15 +5526,15 @@ msgstr "Une année offerte (Offre CA)"
 
 #: sith/settings.py:561
 msgid "President"
-msgstr "Président"
+msgstr "Président⸱e"
 
 #: sith/settings.py:562
 msgid "Vice-President"
-msgstr "Vice-Président"
+msgstr "Vice-Président⸱e"
 
 #: sith/settings.py:563
 msgid "Treasurer"
-msgstr "Trésorier"
+msgstr "Trésorier⸱e"
 
 #: sith/settings.py:564
 msgid "Communication supervisor"
@@ -5554,11 +5554,11 @@ msgstr "Membre du bureau"
 
 #: sith/settings.py:568
 msgid "Active member"
-msgstr "Membre actif"
+msgstr "Membre actif⸱ve"
 
 #: sith/settings.py:569
 msgid "Curious"
-msgstr "Curieux"
+msgstr "Curieux⸱euse"
 
 #: sith/settings.py:605
 msgid "A new poster needs to be moderated"
