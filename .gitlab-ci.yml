@@ -7,13 +7,14 @@ test:
   - env
   - apt-get update
   - apt-get install -y gettext libxapian-dev libgraphviz-dev
-  - pip install .[testing]
+  - pip install poetry
+  - poetry install -E testing
   - mkdir -p /dev/shm/search_indexes
   - ln -s /dev/shm/search_indexes sith/search_indexes
-  - ./manage.py compilemessages
-  - coverage run ./manage.py test
-  - coverage html
-  - coverage report
+  - poetry run ./manage.py compilemessages
+  - poetry run coverage run ./manage.py test
+  - poetry run coverage html
+  - poetry run coverage report
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip_tests"
   cache:
