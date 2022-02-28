@@ -252,8 +252,6 @@ class EtransactionAutoAnswer(View):
         if (
             not "Amount" in request.GET.keys()
             or not "BasketID" in request.GET.keys()
-            or not "Auto"
-            in request.GET.keys()  # If not in the request it means the payment has been refused
             or not "Error" in request.GET.keys()
             or not "Sig" in request.GET.keys()
         ):
@@ -271,7 +269,10 @@ class EtransactionAutoAnswer(View):
             )
         except:
             return HttpResponse("Bad signature", status=400)
-        if request.GET["Error"] == "00000":
+        # Payment authorized:
+        # * 'Error' is '00000'
+        # * 'Auto' is in the request
+        if request.GET["Error"] == "00000" and "Auto" in request.GET.keys():
             try:
                 with transaction.atomic():
                     b = (
