@@ -161,10 +161,10 @@ class ClubTest(TestCase):
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
         )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue(
-            """Richard Batsbak</a></td>\\n                    <td>Vice-Pr\\xc3\\xa9sident</td>"""
-            in str(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            """Richard Batsbak</a></td>\n                    <td>Vice-Président⸱e</td>""",
+            response.content.decode(),
         )
 
     def test_create_add_user_to_club_from_richard_fail(self):
@@ -369,14 +369,15 @@ class ClubTest(TestCase):
         response = self.client.get(
             reverse("club:club_members", kwargs={"club_id": self.bdf.id})
         )
-        self.assertTrue(response.status_code == 200)
-        content = str(response.content)
-        self.assertTrue(
-            "Richard Batsbak</a></td>\\n                    <td>Curieux</td>" in content
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertIn(
+            "Richard Batsbak</a></td>\n                    <td>Curieux⸱euse</td>",
+            content,
         )
-        self.assertTrue(
-            "S&#39; Kia</a></td>\\n                    <td>Responsable info</td>"
-            in content
+        self.assertIn(
+            "S&#39; Kia</a></td>\n                    <td>Responsable info</td>",
+            content,
         )
 
 
