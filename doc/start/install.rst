@@ -12,7 +12,7 @@ Certaines dépendances sont nécessaires niveau système :
 * libjpeg
 * libxapian-dev
 * zlib1g-dev
-* python3
+* python
 * gettext
 * graphviz
 * mysql-client (pour migrer de l'ancien site)
@@ -22,8 +22,8 @@ Sur Ubuntu
 
 .. sourcecode:: bash
 
-    sudo apt install libssl-dev libjpeg-dev zlib1g-dev python3-dev libffi-dev python3-dev libgraphviz-dev pkg-config libxapian-dev gettext git
-    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3 -
+    sudo apt install libssl-dev libjpeg-dev zlib1g-dev python-dev libffi-dev python-dev libgraphviz-dev pkg-config libxapian-dev gettext git
+    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
     # To include mysql for importing old bdd
     sudo apt install libmysqlclient-dev
@@ -51,11 +51,59 @@ Pour installer les dépendances, il est fortement recommandé d'installer le ges
 
     Si vous rencontrez des erreurs lors de votre configuration, n'hésitez pas à vérifier l'état de votre installation homebrew avec :code:`brew doctor`
 
+Sur Windows avec :code:`WSL`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    Comme certaines dépendances sont uniquement disponible dans un environnement Unix, il est obligatoire de passer par :code:`WSL` pour installer le projet.
+
+- **Prérequis:** vous devez exécuter Windows 10 versions 2004 et ultérieures (build 19041 & versions ultérieures) ou Windows 11.
+- **Plus d'info:** `docs.microsoft.com <https://docs.microsoft.com/fr-fr/windows/wsl/install>`_
+  
+.. sourcecode:: bash
+
+    # dans un shell Windows
+    wsl --install
+
+    # afficher la liste des distribution disponible avec WSL
+    wsl -l -o
+
+    # installer WSL avec une distro
+    wsl --install -d <nom_distro>
+
+.. note::
+
+  Si vous rencontrez le code d'erreur ``0x80370102``, regardez les réponses de ce `post <https://askubuntu.com/questions/1264102/wsl-2-wont-run-ubuntu-error-0x80370102>`_.
+
+Une fois :code:`WSL` installé, mettez à jour votre distro & installez les dépendances **(voir la partie installation sous Ubuntu)**.
+
+.. note::
+
+    Comme `git` ne fonctionne pas de la même manière entre Windows & Unix, il est nécessaire de cloner le repository depuis Windows.
+    (cf: `stackoverflow.com <https://stackoverflow.com/questions/62245016/how-to-git-clone-in-wsl>`_)
+
+Pour accéder au contenu d'un répertoire externe à :code:`WSL`, il suffit simplement d'utiliser la commande suivante:
+
+.. sourcecode:: bash
+  
+  # oui c'est beau, simple et efficace
+  cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
+
+.. note::
+
+    Une fois l'installation des dépendances terminée (juste en dessous), il vous suffira, pour commencer à dev, d'ouvrir votre plus bel IDE et d'avoir 2 consoles:
+    1 console :code:`WSL` pour lancer le projet & 1 console pour utiliser :code:`git`
+
 Installer le projet
--------------------
+-----------------------------------
 
 .. sourcecode:: bash
 
+    # Sait-on jamais
+    sudo apt update
+
+    # Les commandes git doivent se faire depuis le terminal de Windows si on utilise WSL !
     git clone https://ae-dev.utbm.fr/ae/Sith.git
     cd Sith
 
@@ -66,10 +114,10 @@ Installer le projet
     poetry shell
 
     # Prépare la base de donnée
-    ./manage.py setup
+    python manage.py setup
 
     # Installe les traductions
-    ./manage compilemessages
+    python manage.py compilemessages
 
 .. note::
 
@@ -92,7 +140,7 @@ Il faut toujours avoir préalablement activé l'environnement virtuel comme fait
 
 .. sourcecode:: bash
 
-    ./manage.py runserver
+    python manage.py runserver
 
 .. note::
 
@@ -102,17 +150,15 @@ Générer la documentation
 ------------------------
 
 La documentation est automatiquement mise en ligne sur readthedocs à chaque envoi de code sur GitLab.
-
 Pour l'utiliser en local ou globalement pour la modifier, il existe une commande du site qui génère la documentation et lance un serveur la rendant accessible à l'adresse http://localhost:8080.
-
 Cette commande génère la documentation à chacune de ses modifications, inutile de relancer le serveur à chaque fois.
 
 .. sourcecode:: bash
 
-    ./manage.py documentation
+    python manage.py documentation
 
     # Il est possible de spécifier un port et une adresse d'écoute différente
-    ./manage.py documentation adresse:port
+    python manage.py documentation adresse:port
 
 Lancer les tests
 ----------------
@@ -122,16 +168,16 @@ Pour lancer les tests il suffit d'utiliser la commande intégrée à django.
 .. code-block:: bash
 
     # Lancer tous les tests
-    ./manage.py test
+    python manage.py test
 
     # Lancer les tests de l'application core
-    ./manage.py test core
+    python manage.py test core
 
     # Lancer les tests de la classe UserRegistrationTest de core
-    ./manage.py test core.tests.UserRegistrationTest
+    python manage.py test core.tests.UserRegistrationTest
 
     # Lancer une méthode en particulier de cette même classe
-    ./manage.py test core.tests.UserRegistrationTest.test_register_user_form_ok
+    python manage.py test core.tests.UserRegistrationTest.test_register_user_form_ok
 
 Vérifier les dépendances Javascript
 -----------------------------------
@@ -142,4 +188,4 @@ N'oubliez pas de mettre à jour à la fois le fichier de la librairie, mais éga
 .. code-block:: bash
 
     # Vérifier les mises à jour
-    ./manage.py check_front
+    python manage.py check_front
