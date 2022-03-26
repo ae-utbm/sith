@@ -1,20 +1,30 @@
 stages:
   - test
 
-test:
+# Installs and launch unittests
+unittests:
   stage: test
   script:
-  - env
+  # Install dependencies
   - apt-get update
   - apt-get install -y gettext libxapian-dev libgraphviz-dev
   - pip install poetry
-  - poetry install -E testing
+  # Check pyproject.toml validity
+  - poetry check
+  # Install project
+  - poetry install -E testing -E docs
+  # Setup xapian index
   - mkdir -p /dev/shm/search_indexes
   - ln -s /dev/shm/search_indexes sith/search_indexes
+  # Setup project
   - poetry run ./manage.py compilemessages
+  # Run tests and export report
   - poetry run coverage run ./manage.py test
   - poetry run coverage html
   - poetry run coverage report
+  # Build documentation
+  - cd doc
+  - poetry run make html
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip_tests"
   cache:
@@ -23,11 +33,14 @@ test:
   artifacts:
     paths:
       - coverage_report/
+      - docs/_build
 
+# Check black
 black:
   stage: test
   script:
-    - pip install -U black
+    - version=$(cat pyproject.toml | grep --color=never black | grep --color=never -oE '[0-9]([0-9.a-z]+)')
+    - pip install black==$version
     - black --check .
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip_black"
