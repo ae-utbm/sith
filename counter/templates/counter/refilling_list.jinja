@@ -13,6 +13,7 @@
     <th>{% trans %}Amount{% endtrans %}</th>
     <th>{% trans %}Payment method{% endtrans %}</th>
     <th>{% trans %}Seller{% endtrans %}</th>
+    <th>{% trans %}Date{% endtrans %}
     <th>{% trans %}Actions{% endtrans %}</th>
   </tr>
     {%- for refilling in object_list %}
@@ -21,6 +22,7 @@
     <td>{{ refilling.amount }}</td>
     <td>{{ refilling.payment_method }}</td>
     <td>{{ refilling.operator }}</td>
+    <td>{{ refilling.date }}</td>
     <td><a href="{{ url('counter:refilling_delete', refilling_id=refilling.id)}}">Delete</a></td>
   </tr>  
   {%- endfor %}
