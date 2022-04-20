@@ -483,7 +483,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         ]:
             return True
         else:
-            return False
+            return False     
 
     def get_product(self, pid):
         return Product.objects.filter(pk=int(pid)).first()
@@ -751,6 +751,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         kwargs["basket_total"] = self.sum_basket(self.request)
         kwargs["refill_form"] = self.refill_form or RefillForm()
         kwargs["student_card_max_uid_size"] = StudentCard.UID_SIZE
+        kwargs["barmens_can_refill"] = self.object.can_refill()
         return kwargs
 
 

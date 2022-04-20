@@ -107,7 +107,7 @@
                 <input type="submit" value="{% trans %}Cancel{% endtrans %}" />
             </form>
         </div>
-        {% if counter.type == 'BAR' %}
+        {% if (counter.type == 'BAR' and barmens_can_refill) %}
         <h5>{% trans %}Refilling{% endtrans %}</h5>
         <div>
             <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">

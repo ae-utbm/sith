@@ -39,7 +39,7 @@ import os
 import base64
 import datetime
 
-from club.models import Club
+from club.models import Club, Membership
 from accounting.models import CurrencyField
 from core.models import Group, User, Notification
 from subscription.models import Subscription
@@ -341,6 +341,14 @@ class Counter(models.Model):
         Returns the barman id list
         """
         return [b.id for b in self.get_barmen_list()]
+
+    def can_refill(self):
+        is_ae_member = False
+        ae = Club.objects.get(unix_name="ae")
+        for barman in self.get_barmen_list():
+            if Membership.objects.filter(club=ae, user=barman):
+                is_ae_member = True
+        return is_ae_member
 
 
 class Refilling(models.Model):
