@@ -118,14 +118,11 @@ class SelectFile(TextInput):
             attrs["class"] = "select_file"
         else:
             attrs = {"class": "select_file"}
-        output = (
-            '%(content)s<div name="%(name)s" class="choose_file_widget" title="%(title)s"></div>'
-            % {
-                "content": super(SelectFile, self).render(name, value, attrs, renderer),
-                "title": _("Choose file"),
-                "name": name,
-            }
-        )
+        output = '%(content)s<div name="%(name)s" class="choose_file_widget" title="%(title)s"></div>' % {
+            "content": super(SelectFile, self).render(name, value, attrs, renderer),
+            "title": _("Choose file"),
+            "name": name,
+        }
         output += (
             '<span name="'
             + name
@@ -142,14 +139,11 @@ class SelectUser(TextInput):
             attrs["class"] = "select_user"
         else:
             attrs = {"class": "select_user"}
-        output = (
-            '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>'
-            % {
-                "content": super(SelectUser, self).render(name, value, attrs, renderer),
-                "title": _("Choose user"),
-                "name": name,
-            }
-        )
+        output = '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>' % {
+            "content": super(SelectUser, self).render(name, value, attrs, renderer),
+            "title": _("Choose user"),
+            "name": name,
+        }
         output += (
             '<span name="'
             + name

@@ -483,7 +483,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         ]:
             return True
         else:
-            return False     
+            return False
 
     def get_product(self, pid):
         return Product.objects.filter(pk=int(pid)).first()
