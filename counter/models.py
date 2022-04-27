@@ -22,6 +22,7 @@
 #
 #
 
+from sith.settings import SITH_MAIN_CLUB
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -344,7 +345,7 @@ class Counter(models.Model):
 
     def can_refill(self):
         is_ae_member = False
-        ae = Club.objects.get(unix_name="ae")
+        ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
         for barman in self.get_barmen_list():
             if Membership.objects.filter(club=ae, user=barman):
                 is_ae_member = True
