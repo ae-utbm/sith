@@ -725,7 +725,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def refill(self, request):
         """Refill the customer's account"""
-        if self.get_object().type == "BAR":
+        if self.get_object().type == "BAR" and self.object.can_refill():
             form = RefillForm(request.POST)
             if form.is_valid():
                 form.instance.counter = self.object
