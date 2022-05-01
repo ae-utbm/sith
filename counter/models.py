@@ -347,7 +347,7 @@ class Counter(models.Model):
         is_ae_member = False
         ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
         for barman in self.get_barmen_list():
-            if Membership.objects.filter(club=ae, user=barman):
+            if ae.get_membership_for(barman):
                 is_ae_member = True
         return is_ae_member
 
