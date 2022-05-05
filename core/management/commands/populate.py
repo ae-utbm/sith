@@ -611,6 +611,7 @@ Welcome to the wiki page!
             mde.products.add(cons)
             mde.products.add(dcons)
             mde.sellers.add(skia)
+
             mde.save()
 
             eboutic = Counter.objects.filter(name="Eboutic").first()
@@ -935,6 +936,7 @@ Welcome to the wiki page!
             # Add barman to counter
             c = Counter.objects.get(id=2)
             c.sellers.add(User.objects.get(pk=krophil.pk))
+            mde.sellers.add(sli)
             c.save()
 
             # Create an election

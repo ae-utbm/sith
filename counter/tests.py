@@ -36,7 +36,10 @@ class CounterTest(TestCase):
     def setUp(self):
         call_command("populate")
         self.skia = User.objects.filter(username="skia").first()
+        self.sli = User.objects.filter(username="sli").first()
+        self.krophil = User.objects.filter(username="krophil").first()
         self.mde = Counter.objects.filter(name="MDE").first()
+        self.foyer = Counter.objects.get(id=2)
 
     def test_full_click(self):
         response = self.client.post(
@@ -92,6 +95,51 @@ class CounterTest(TestCase):
             "<p>Client : Richard Batsbak - Nouveau montant : 3.60"
             in str(response_content)
         )
+
+        response = self.client.post(
+            reverse("counter:login", kwargs={"counter_id": self.mde.id}),
+            {"username": self.sli.username, "password": "plop"},
+        )
+
+        response = self.client.post(
+            location,
+            {
+                "action": "refill",
+                "amount": "5",
+                "payment_method": "CASH",
+                "bank": "OTHER",
+            },
+        )
+
+        response = self.client.post(
+            reverse("counter:login", kwargs={"counter_id": self.foyer.id}),
+            {"username": self.krophil.username, "password": "plop"},
+        )
+
+        response = self.client.get(
+            reverse("counter:details", kwargs={"counter_id": self.foyer.id})
+        )
+
+        counter_token = re.search(
+            r'name="counter_token" value="([^"]*)"', str(response.content)
+        ).group(1)
+
+        response = self.client.post(
+            reverse("counter:details", kwargs={"counter_id": self.foyer.id}),
+            {"code": "4000k", "counter_token": counter_token},
+        )
+        location = response.get("location")
+
+        response = self.client.post(
+            location,
+            {
+                "action": "refill",
+                "amount": "5",
+                "payment_method": "CASH",
+                "bank": "OTHER",
+            },
+        )
+        self.assertTrue(response.status_code == 403)
 
 
 class CounterStatsTest(TestCase):
