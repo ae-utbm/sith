@@ -45,7 +45,7 @@ Par défaut, la base de données du site de prod contient des données nécessai
     * **comptable** -> administrateur comptabilité
     * **guy** -> utilisateur non cotisant et sans groupe
     * **rbatsbak** -> utilisateur non cotisant et sans groupe
-    * **sli** -> cotisant avec carte étudiante attachée au compte
+    * **sli** -> cotisant avec carte étudiante attachée au compte, barmen MDE
     * **krophil** -> cotisant avec des plein d'écocups, barmen foyer
     * **comunity** -> administrateur communication
     * **tutu** -> administrateur pédagogie
