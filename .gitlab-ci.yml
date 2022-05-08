@@ -21,7 +21,7 @@ unittests:
   - poetry run ./manage.py compilemessages
   # Run tests and export report
   - poetry run coverage run ./manage.py test
-  - poetry run coverage html
+  - poetry run coverage xml
   - poetry run coverage report
   # Build documentation
   - cd doc
@@ -32,9 +32,13 @@ unittests:
     paths:
       - .cache/pip_tests
   artifacts:
+    when: always
     paths:
+      - coverage.xml
       - coverage_report/
       - docs/_build
+    reports:
+      junit: coverage.xml
 
 # Check black
 black:
