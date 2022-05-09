@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-29 16:08+0200\n"
-"PO-Revision-Date: 2022-05-09 22:29\n"
+"PO-Revision-Date: 2022-05-09 23:30\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -24,7 +24,7 @@ msgstr ""
 #: launderette/models.py:93 launderette/models.py:131 stock/models.py:40
 #: stock/models.py:63 stock/models.py:105 stock/models.py:133
 msgid "name"
-msgstr ""
+msgstr "nom"
 
 #: accounting/models.py:62
 msgid "street"
@@ -32,53 +32,53 @@ msgstr ""
 
 #: accounting/models.py:63
 msgid "city"
-msgstr ""
+msgstr "ville"
 
 #: accounting/models.py:64
 msgid "postcode"
-msgstr ""
+msgstr "code postal"
 
 #: accounting/models.py:65
 msgid "country"
-msgstr ""
+msgstr "pays"
 
 #: accounting/models.py:66 core/models.py:281
 msgid "phone"
-msgstr ""
+msgstr "téléphone"
 
 #: accounting/models.py:67
 msgid "email"
-msgstr ""
+msgstr "email"
 
 #: accounting/models.py:68
 msgid "website"
-msgstr ""
+msgstr "site"
 
 #: accounting/models.py:71
 msgid "company"
-msgstr ""
+msgstr "entreprise"
 
 #: accounting/models.py:111
 msgid "iban"
-msgstr ""
+msgstr "IBAN"
 
 #: accounting/models.py:112
 msgid "account number"
-msgstr ""
+msgstr "numéro de compte"
 
 #: accounting/models.py:116 accounting/models.py:147 club/models.py:275
 #: com/models.py:75 com/models.py:264 com/models.py:300 counter/models.py:167
 #: counter/models.py:215 trombi/models.py:217
 msgid "club"
-msgstr ""
+msgstr "club"
 
 #: accounting/models.py:121
 msgid "Bank account"
-msgstr ""
+msgstr "Compte bancaire"
 
 #: accounting/models.py:153
 msgid "bank account"
-msgstr ""
+msgstr "compte bancaire"
 
 #: accounting/models.py:158
 msgid "Club account"
