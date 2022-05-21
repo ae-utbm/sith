@@ -352,7 +352,7 @@ class Counter(models.Model):
             self.id in SITH_COUNTER_OFFICES
         ):  # If the counter is the counters 'AE' or 'BdF', the refiling are authorized
             return True
-            
+
         is_ae_member = False
         ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
         for barman in self.get_barmen_list():
