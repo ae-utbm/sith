@@ -389,7 +389,7 @@ SITH_SUBSCRIPTION_LOCATIONS = [
 
 SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]
 
-SITH_COUNTER_OFFICES = [(17, "BdF"), (19, "AE")]
+SITH_COUNTER_OFFICES = {17: "BdF", 19: "AE"}
 
 SITH_COUNTER_PAYMENT_METHOD = [
     ("CHECK", _("Check")),
