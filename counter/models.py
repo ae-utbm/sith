@@ -22,7 +22,7 @@
 #
 #
 
-from sith.settings import SITH_MAIN_CLUB
+from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -344,6 +344,15 @@ class Counter(models.Model):
         return [b.id for b in self.get_barmen_list()]
 
     def can_refill(self):
+        """
+        Show if the counter authorize the refilling with physic money
+        """
+
+        if (
+            self.id in SITH_COUNTER_OFFICES
+        ):  # If the counter is the counters 'AE' or 'BdF', the refiling are authorized
+            return True
+
         is_ae_member = False
         ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
         for barman in self.get_barmen_list():
