@@ -227,13 +227,13 @@ class Weekmail(models.Model):
         """
         Return an absolute link to the banner.
         """
-        return "http://" + settings.SITH_URL + static("com/img/weekmail_bannerA19.jpg")
+        return "http://" + settings.SITH_URL + static("com/img/invitation_bannerP22.png")
 
     def get_footer(self):
         """
         Return an absolute link to the footer.
         """
-        return "http://" + settings.SITH_URL + static("com/img/weekmail_footerA19.jpg")
+        return "http://" + settings.SITH_URL + static("com/img/weekmail_footerP22.png")
 
     def __str__(self):
         return "Weekmail %s (sent: %s) - %s" % (self.id, self.sent, self.title)
