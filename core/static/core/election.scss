@@ -1,0 +1,263 @@
+$padding: 15px;
+
+.error {
+    color: red !important;
+}
+
+.radio-btn {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+
+    > input,
+    > label {
+        margin: 0;
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.election_table {
+    width: 100%;
+
+    >.lists {
+        display: flex;
+        flex-direction: row;
+
+        >tr {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+
+            >.column {
+                display: flex;
+                flex-direction: column-reverse;
+                align-items: center;
+                justify-content: space-between;
+                padding: $padding;
+                border: 0.5px solid black;
+                border-collapse: collapse;
+
+                >a{
+                    margin-left: $padding;
+                    width: 20px;
+                    height: 20px;
+                    text-align: center;
+                    padding: 5px;
+                    border-radius: 25%;
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                
+                    &:hover {
+                        background-color: #ddd;
+                    }
+                }
+            }
+        }
+    }
+
+    >.role {
+        display: flex;
+        flex-direction: column;
+
+        >tr {
+            display: flex;
+            flex-direction: row;
+            background-color: lightgrey;
+            
+            &:hover {
+                background-color: lightgrey;
+            }
+
+            >.role_title {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                margin: 0;
+                padding: $padding;
+                width: 100%;
+
+
+                >.role_text {
+                    >h4 {
+                        margin: 0;
+                    }
+                    >p {
+                        margin-top: .5em;
+                    }
+                }
+
+                >.role_buttons {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 5px;
+                    
+                    > button,
+                    > button > i,
+                    > a {
+                        width: 20px;
+                        height: 20px;
+                        background-color: #e9e9e9;
+                        text-align: center;
+                        padding: 5px;
+                        border-radius: 25%;
+                        margin: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        &:hover,
+                        &:hover > i {
+                            background-color: #fff;
+                        }
+                    }
+                    
+                    > button {
+                        width: 30px;
+                        height: 30px;
+                    }
+
+                    > button[disabled] {
+                        background-color: #eee;
+                        cursor: not-allowed;
+
+                        >i,
+                        &:hover,
+                        &:hover > i {
+                            background-color: #eee;
+                        }
+                    }
+                }
+            }
+
+            >.list_per_role {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                border: 0.5px solid black;
+                border-collapse: collapse;
+                background-color: #fff;
+                padding: $padding;
+                margin: 0;
+
+                >.candidates {
+                    margin: 0;
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 10px;
+
+                    >.candidate {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+
+                        list-style-type: none;
+                        gap: 10px;
+
+                        >input[type="radio"]:checked + label,
+                        >input[type="checkbox"]:checked + label {
+                            background-color: lightgray;
+                            border-radius: 10px;
+                        }
+
+                        >label>figure,
+                        >figure {
+                            position: relative;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            gap: 10px;
+                            padding: 10px;
+
+                            >img {
+                                max-width: 100%;
+                            }
+
+                            >figcaption {
+                                h5 {
+                                    margin: 0;
+                                    text-align: center;
+                                }
+                                q {
+                                    margin: 5px 0;
+                                }
+                            }
+
+                            >.edit_btns {
+                                position: absolute;
+                                display: flex;
+                                flex-direction: column;
+                                top: 5px;
+                                right: 5px;
+                                gap: 5px;
+                                
+                                > a {
+                                    width: 20px;
+                                    height: 20px;
+                                    background-color: #e9e9e9;
+                                    text-align: center;
+                                    padding: 5px;
+                                    border-radius: 25%;
+                                    margin: 0;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+
+                                    &:hover {
+                                        background-color: #fff;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.election_details {
+    margin: .5em 0;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.button {
+    border: none;
+    color: black;
+    text-decoration: none;
+    background-color: #f2f2f2;
+    padding: 0.4em;
+    margin: 0.1em;
+    font-size: 1.18em;
+    border-radius: 5px;
+    box-shadow: #dfdfdf 0px 0px 1px;
+    cursor: pointer;
+
+    &:hover {
+        color: black;
+        background: #d4d4d4;
+    }
+
+    &_send {
+        background-color: #59aee2;
+        &:hover {
+            background-color: rgb(130, 186, 235);
+        }
+    }
+}
