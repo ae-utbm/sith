@@ -1,0 +1,281 @@
+$padding: 1.5rem;
+$padding_smaller: .5rem;
+$gap: .25rem;
+$border: .01rem solid black;
+$min_col_width: 100px;
+
+.error {
+    color: red !important;
+}
+
+.radio-btn {
+    display: flex;
+    flex-direction: row;
+    gap: $gap;
+
+    > input,
+    > label {
+        margin: 0;
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.election_vote {
+    overflow-x: scroll !important;
+}
+
+.election_table {
+    width: 100%;
+
+    >.lists {
+        display: flex;
+        flex-direction: row;
+
+        >tr {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+
+            >.column {
+                display: flex;
+                flex-direction: column-reverse;
+                align-items: center;
+                justify-content: center;
+                padding: $padding;
+                border: $border;
+                border-collapse: collapse;
+                position: relative;
+                min-width: $min_col_width;
+
+                >a{
+                    margin-left: $padding;
+                    width: 20px;
+                    height: 20px;
+                    text-align: center;
+                    padding: 5px;
+                    border-radius: 25%;
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: absolute;
+                    right: $gap;
+                    top: $gap;
+                
+                    &:hover {
+                        background-color: #ddd;
+                    }
+                }
+            }
+        }
+    }
+
+    >.role {
+        display: flex;
+        flex-direction: column;
+
+        >tr {
+            display: flex;
+            flex-direction: row;
+            background-color: lightgrey;
+
+            &:hover {
+                background-color: lightgrey;
+            }
+
+            >.role_title {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                margin: 0;
+                padding: $padding;
+                width: 100%;
+
+
+                >.role_text {
+                    >h4 {
+                        margin: 0;
+                    }
+                    >p {
+                        margin-top: .5em;
+                    }
+                }
+
+                >.role_buttons {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: $gap;
+                    
+                    > button,
+                    > button > i,
+                    > a {
+                        width: 20px;
+                        height: 20px;
+                        background-color: #e9e9e9;
+                        text-align: center;
+                        padding: 5px;
+                        border-radius: 25%;
+                        margin: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+
+                        &:hover,
+                        &:hover > i {
+                            background-color: #fff;
+                        }
+                    }
+                    
+                    > button {
+                        width: 30px;
+                        height: 30px;
+                    }
+
+                    > button[disabled] {
+                        background-color: #eee;
+                        cursor: not-allowed;
+
+                        >i,
+                        &:hover,
+                        &:hover > i {
+                            background-color: #eee;
+                        }
+                    }
+                }
+            }
+
+            >.list_per_role {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                border: $border;
+                border-collapse: collapse;
+                background-color: #fff;
+                padding: $padding_smaller;
+                margin: 0;
+                min-width: $min_col_width;
+
+                >.candidates {
+                    margin: 0;
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: $gap;
+
+                    >.candidate {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+
+                        list-style-type: none;
+                        gap: $gap;
+
+                        >input[type="radio"]:checked + label,
+                        >input[type="checkbox"]:checked + label {
+                            background-color: lightgray;
+                            border-radius: 10px;
+
+                            >figure>.edit_btns>a:hover{
+                                background-color: #fff;
+                            }
+                        }
+
+                        >label>figure,
+                        >figure {
+                            position: relative;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            gap: $gap;
+                            padding: 10px;
+
+                            >img {
+                                max-width: 100%;
+                            }
+
+                            >figcaption {
+                                h5 {
+                                    margin: 0;
+                                    text-align: center;
+                                }
+                                q {
+                                    margin: 5px 0;
+                                }
+                            }
+
+                            >.edit_btns {
+                                position: absolute;
+                                display: flex;
+                                flex-direction: column;
+                                top: $gap;
+                                right: $gap;
+                                gap: $gap;
+                                
+                                > a {
+                                    width: 20px;
+                                    height: 20px;
+                                    background-color: #e9e9e9;
+                                    text-align: center;
+                                    padding: 5px;
+                                    border-radius: 25%;
+                                    margin: 0;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+
+                                    &:hover {
+                                        background-color: #d8d8d8;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.election_details {
+    margin: .5em 0;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: $gap;
+}
+
+.button {
+    border: none;
+    color: black;
+    text-decoration: none;
+    background-color: #f2f2f2;
+    padding: 0.4em;
+    margin: 0.1em;
+    font-size: 1.18em;
+    border-radius: 5px;
+    box-shadow: #dfdfdf 0px 0px 1px;
+    cursor: pointer;
+
+    &:hover {
+        color: black;
+        background: #d4d4d4;
+    }
+
+    &_send {
+        background-color: #59aee2;
+        &:hover {
+            background-color: rgb(130, 186, 235);
+        }
+    }
+}

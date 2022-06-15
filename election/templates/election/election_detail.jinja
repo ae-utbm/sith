@@ -6,232 +6,14 @@
 
 {% block head %}
 {{ super() -}}
-<style type="text/css">
-time {
-    font-weight: bolder;
-}
-
-th {
-    padding: 5px;
-    margin: 5px;
-    border: solid 1px darkgrey;
-    border-collapse: collapse;
-    vertical-align: top;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.election__title {
-    margin: 0;
-    margin-bottom: 5px;
-}
-
-.election__description {
-    margin: 0;
-}
-
-.election__details {
-    margin-bottom: 5px;
-}
-
-.election__details p {
-    margin: 0;
-}
-
-.election__details p:not(:last-child) {
-    margin-bottom: 5px;
-}
-
-.election__elector-infos {
-    font-weight: bolder;
-    color: darkgreen;
-}
-
-.election__vote {
-    margin-bottom: 5px;
-}
-
-.election__vote-form {
-    width: auto;
-}
-
-.role {
-
-}
-
-.role .role__title {
-    background: lightgrey;
-}
-
-.role__multiple-choices-label {
-    color: darkgreen;
-}
-
-.role__error {
-    color: darkred;
-}
-
-.role .role_candidates {
-    background: white;
-}
-
-.list-per-role {
-    padding: 5px;
-    max-width: 310px;
-
-}
-
-.list-per-role__candidates {
-    list-style: none;
-    margin: 0;
-}
-
-.list-per-role__candidate:not(:last-child) {
-    margin-bottom: 15px;
-}
-
-.candidate__infos {
-    display: flex;
-    flex-flow: row nowrap;
-}
-
-.candidate__infos:not(:last-child) {
-    margin-bottom: 5px;
-}
-
-.candidate__picture-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    width: 150px;
-    height: 150px;
-    min-width: 150px;
-    min-height: 150px;
-
-    background-color: lightgrey;
-}
-
-.candidate__picture {
-    max-width: 150px;
-    max-height: 150px;
-}
-
-.candidate__details {
-    margin-left: 5px;
-}
-
-.candidate__full-name {
-    display: block;
-
-    font-weight: bolder;
-}
-
-.candidate__nick-name {
-    font-style: italic;
-}
-
-.candidate__program {
-    display: block;
-    margin-top: 5px;
-}
-
-.candidate__vote-input {
-    position: absolute;
-    border: 0;
-    height: 1px;
-    width: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-}
-
-.candidate__vote-choice {
-    margin-top: 5px;
-    padding: 15px;
-
-    border: solid 1px darkgrey;
-
-    color: dimgray;
-    text-align: center;
-    font-weight: bolder;
-}
-
-.candidate__vote-input:not(:checked):not(:disabled) + .candidate__vote-choice:hover,
-.candidate__vote-input:not(:checked):not(:disabled) + .candidate__vote-choice:focus {
-    background: lightgrey;
-}
-
-.candidate__vote-input:checked + .candidate__vote-choice {
-    padding: 14px;
-    border-width: 2px;
-    border-color: darkgreen;
-    color: darkgreen;
-}
-
-.candidate__vote-input:not(:disabled) + .candidate__vote-choice {
-    cursor: pointer;
-}
-
-.candidate__vote-input:checked:not(:disabled) + .candidate__vote-choice:hover,
-.candidate__vote-input:checked:not(:disabled) + .candidate__vote-choice:focus {
-    background: palegreen;
-}
-
-.role_error .candidate__vote-input:checked + .candidate__vote-choice {
-    border-color: darkred;
-    color: darkred;
-}
-
-.role_error .candidate__vote-input:checked:not(:disabled) + .candidate__vote-choice:hover,
-.role_error .candidate__vote-input:checked:not(:disabled) + .candidate__vote-choice:focus {
-    background: indianred;
-}
-
-.election__results {
-    text-align: center;
-}
-
-.election__sumbit-section {
-    margin-bottom: 5px;
-}
-
-.election__sumbit-button {
-    display: block;
-    width: 100%;
-    padding: 20px;
-    background: white;
-    border: solid 15px #4081cb;
-    text-align: center;
-    font-size: 200%;
-    font-weight: bolder;
-    cursor: pointer;
-}
-
-.election__sumbit-button:hover,
-.election__sumbit-button:focus {
-    background-color: lightskyblue;
-}
-
-.election__add-elements {
-    margin-bottom: 5px;
-}
-
-.election__add-elements a {
-    display: inline-block;
-    border: solid 1px darkgrey;
-    height: 20px;
-    line-height: 20px;
-    padding: 10px;
-}
-</style>
+<link rel="stylesheet" href="{{ scss('election/election.scss') }}">
 {%- endblock %}
 
 {% block content %}
     <h3 class="election__title">{{ election.title }}</h3>
     <p class="election__description">{{ election.description }}</p>
     <hr>
-    <section class="election__details">
+    <section class="election_details">
         <p>
             {%- if election.is_vote_active %}
             {% trans %}Polls close {% endtrans %}
@@ -256,35 +38,49 @@ th {
         </p>
         {%- endif %}
     </section>
-    <section class="election__vote">
+    <section class="election_vote">
         <form action="{{ url('election:vote', election.id) }}" method="post" class="election__vote-form" name="vote-form" id="vote-form">
             {% csrf_token %}
-            <table>
+            <table class="election_table">
                 {%- set election_lists = election.election_lists.all() -%}
                 <caption></caption>
-                <thead>
-                    <th>{% trans %}Blank vote{% endtrans %}</th>
-                    {%- for election_list in election_lists %}
-                    <th>
-                        {{ election_list.title }}
-                        {% if user.can_edit(election_list) and election.is_vote_editable -%}
-                            - <a href="{{ url('election:delete_list', list_id=election_list.id) }}">{% trans %}Delete{% endtrans %}</a>
-                        {% endif %}
-                    </th>
-                    {%- endfor %}
+                <thead class="lists">
+                    <tr>
+                        <th class="column" style="width: {{ 100 / (election_lists.count() + 1) }}%">{% trans %}Blank vote{% endtrans %}</th>
+                        {%- for election_list in election_lists %}
+                        <th class="column" style="width: {{ 100 / (election_lists.count() + 1) }}%">
+                            <span>{{ election_list.title }}</span>
+                            {% if user.can_edit(election_list) and election.is_vote_editable -%}
+                            <a href="{{ url('election:delete_list', list_id=election_list.id) }}">❌</a>
+                            {% endif %}
+                        </th>
+                        {%- endfor %}
+                    </tr>
                 </thead>
                 {%- set role_list = election.roles.order_by('order').all() %}
                 {%- for role in role_list %}
                 {%- set count = [0] %}
                 {%- set role_data = election_form.data.getlist(role.title) if role.title in election_form.data else [] %}
                 <tbody data-max-choice="{{role.max_choice}}" class="role{{ ' role_error' if role.title in election_form.errors else '' }}{{ ' role__multiple-choices' if role.max_choice > 1 else ''}}">
-                    <tr class="role__title">
-                        <td colspan="{{ election_lists.count() + 1 }}">
-                            <span><b>{{ role.title }}</b></span>
+                    <tr>
+                        <td class="role_title">
+                            <div class="role_text">
+                                <h4>{{ role.title }}</h4>
+                                <p class="role_description">{{ role.description }}</p>
+                                {%- if role.max_choice > 1 and not election.has_voted(user) and election.can_vote(user) %}
+                                <strong>{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
+                                {%- endif %}
+
+                                {%- if election_form.errors[role.title] is defined %}
+                                    {%- for error in election_form.errors.as_data()[role.title] %}
+                                        <strong class="error">{{ error.message }}</strong>
+                                    {%- endfor %}
+                                {%- endif %}
+                            </div>
                             {% if user.can_edit(role) and election.is_vote_editable -%}
-                                <a href="{{url('election:update_role', role_id=role.id)}}">{% trans %}Edit{% endtrans %}</a>
-                                <a href="{{url('election:delete_role', role_id=role.id)}}">{% trans %}Delete{% endtrans %}</a>
-                                <span style="float:right">
+                                <div class="role_buttons">
+                                    <a href="{{url('election:update_role', role_id=role.id)}}">✏️</a>
+                                    <a href="{{url('election:delete_role', role_id=role.id)}}">❌</a>
                                     {%- if role == role_list.last() %}
                                     <button disabled><i class="fa fa-arrow-down"></i></button>
                                     <button disabled><i class="fa fa-caret-down"></i></button>
@@ -299,27 +95,19 @@ th {
                                     <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=up');"><i class="fa fa-caret-up"></i></button>
                                     <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=top');"><i class="fa fa-arrow-up"></i></button>
                                     {% endif %}
-                                </span>
+                                </div>
                             {%- endif -%}
-                            <br><span class='role__description'><p>{{ role.description }}</p></span>
-                            {%- if role.max_choice > 1 and not election.has_voted(user) and election.can_vote(user) %}
-                            <br>
-                            <strong class="role__multiple-choices-label">{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
-                            {%- endif %}
-                            {%- if election_form.errors[role.title] is defined %}
-                            {%- for error in election_form.errors.as_data()[role.title] %}
-                            <strong class="role__error">{{ error.message }}</strong>
-                            {%- endfor %}
-                            {%- endif %}
                         </td>
                     </tr>
                     <tr class="role_candidates">
-                        <td class="list-per-role">
+                        <td class="list_per_role" style="width: {{ 100 / (election_lists.count() + 1) }}%">
                             {%- if role.max_choice == 1 and election.can_vote(user) %}
-                            <input id="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-input" type="radio" name="{{ role.title }}" value {{ '' if role_data in election_form else 'checked' }} {{ 'disabled' if election.has_voted(user) else '' }}>
-                            <label for="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-choice">
-                                <span>{% trans %}Choose blank vote{% endtrans %}</span>
-                            </label>
+                            <div class="radio-btn">
+                                <input id="id_{{ role.title }}_{{ count[0] }}" type="radio" name="{{ role.title }}" value {{ '' if role_data in election_form else 'checked' }} {{ 'disabled' if election.has_voted(user) else '' }}>
+                                <label for="id_{{ role.title }}_{{ count[0] }}">
+                                    <span>{% trans %}Choose blank vote{% endtrans %}</span>
+                                </label>
+                            </div>
                             {%- set _ = count.append(count.pop() + 1) %}
                             {%- endif %}
                             {%- if election.is_vote_finished %}
@@ -330,36 +118,39 @@ th {
                             {%- endif %}
                         </td>
                         {%- for election_list in election_lists %}
-                        <td class="list-per-role">
-                            <ul class="list-per-role__candidates">
+                        <td class="list_per_role" style="width: {{ 100 / (election_lists.count() + 1) }}%">
+                            <ul class="candidates">
                                 {%- for candidature in election_list.candidatures.filter(role=role) %}
-                                <li class="list-per-role__candidate candidate">
-                                    <figure class="candidate__infos">
-                                        <div class="candidate__picture-wrapper">
-                                            {%- if candidature.user.profile_pict and user.is_subscriber_viewable %}
-                                            <img class="candidate__picture" src="{{ candidature.user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}">
-                                            {%- endif %}
-                                        </div>
-                                        <figcaption class="candidate__details">
-                                            <cite class="candidate__full-name">{{ candidature.user.first_name }} <em class="candidate__nick-name">{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</cite>
-                                            {%- if user.can_edit(candidature) -%}
-                                            {% if election.is_vote_editable %}
-                                            <a href="{{url('election:update_candidate', candidature_id=candidature.id)}}">{% trans %}Edit{% endtrans %}</a>
-                                            {% endif %}
-                                            {% if election.is_vote_editable -%}
-                                            <a href="{{url('election:delete_candidate', candidature_id=candidature.id)}}">{% trans %}Delete{% endtrans %}</a>
-                                            {%- endif -%}
-                                            {%- endif -%}
-                                            {%- if not election.is_vote_finished %}
-                                            <q class="candidate__program">{{ candidature.program | markdown or '' }}</q>
-                                            {%- endif %}
-                                        </figcaption>
-                                    </figure>
+                                <li class="candidate">
                                     {%- if election.can_vote(user) %}
-                                    <input id="id_{{ role.title }}_{{ count[0] }}" type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}" {{ 'checked' if candidature.id|string in role_data else '' }} {{ 'disabled' if election.has_voted(user) else '' }} name="{{ role.title }}" value="{{ candidature.id }}" class="candidate__vote-input">
-                                    <label for="id_{{ role.title }}_{{ count[0] }}" class="candidate__vote-choice">
-                                        <span>{% trans %}Choose{% endtrans %} {{ candidature.user.nick_name or candidature.user.first_name }}</span>
-                                    </label>
+                                        <input id="id_{{ role.title }}_{{ count[0] }}" type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}" {{ 'checked' if candidature.id|string in role_data else '' }} {{ 'disabled' if election.has_voted(user) else '' }} name="{{ role.title }}" value="{{ candidature.id }}">
+                                        <label for="id_{{ role.title }}_{{ count[0] }}">
+                                    {%- endif %}
+                                            <figure>
+                                                {%- if user.is_subscriber_viewable %}
+                                                    {% if candidature.user.profile_pict %}
+                                                        <img class="candidate__picture" src="{{ candidature.user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}">
+                                                    {% else %}
+                                                        <img class="candidate__picture" src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}">
+                                                    {% endif %}
+                                                {%- endif %}
+                                                <figcaption class="candidate__details">
+                                                    <h5>{{ candidature.user.first_name }} <em>{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</h5>
+                                                    {%- if not election.is_vote_finished %}
+                                                    <q class="candidate_program">{{ candidature.program | markdown or '' }}</q>
+                                                    {%- endif %}
+                                                </figcaption>
+                                                {%- if user.can_edit(candidature) -%}
+                                                {% if election.is_vote_editable %}
+                                                    <div class="edit_btns">
+                                                        <a href="{{url('election:update_candidate', candidature_id=candidature.id)}}">{% trans %}✏️{% endtrans %}</a>
+                                                        <a href="{{url('election:delete_candidate', candidature_id=candidature.id)}}">{% trans %}❌{% endtrans %}</a>
+                                                    </div>
+                                                {%- endif -%}
+                                                {%- endif -%}
+                                            </figure>
+                                    {%- if election.can_vote(user) %}
+                                        </label>
                                     {%- set _ = count.append(count.pop() + 1) %}
                                     {%- endif %}
                                     {%- if election.is_vote_finished %}
@@ -379,39 +170,40 @@ th {
             </table>
         </form>
     </section>
-    {%- if not election.has_voted(user) and election.can_vote(user) %}
-    <section class="election__sumbit-section">
-        <button class="election__sumbit-button" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
-    </section>
-    {%- endif %}
-    <section class="election__add-elements">
+    <section class="buttons">
     {%- if (election.can_candidate(user) and election.is_candidature_active) or (user.can_edit(election) and election.is_vote_editable) %}
-        <a href="{{ url('election:candidate', election_id=object.id) }}">{% trans %}Candidate{% endtrans %}</a>
+        <a class="button" href="{{ url('election:candidate', election_id=object.id) }}">{% trans %}Candidate{% endtrans %}</a>
     {%- endif %}
     {%- if election.is_vote_editable %}
-        <a href="{{ url('election:create_list', election_id=object.id) }}">{% trans %}Add a new list{% endtrans %}</a>
+        <a class="button" href="{{ url('election:create_list', election_id=object.id) }}">{% trans %}Add a new list{% endtrans %}</a>
     {%- endif %}
     {%- if user.can_edit(election) %}
         {% if election.is_vote_editable %}
-        <a href="{{ url('election:create_role', election_id=object.id) }}">{% trans %}Add a new role{% endtrans %}</a>
+        <a  class="button" href="{{ url('election:create_role', election_id=object.id) }}">{% trans %}Add a new role{% endtrans %}</a>
         {% endif %}
-        <a href="{{ url('election:update', election_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
+        <a  class="button" href="{{ url('election:update', election_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
     {%- endif %}
     {%- if user.is_root %}
-        <a href="{{ url('election:delete', election_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
+        <a  class="button" href="{{ url('election:delete', election_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
     {%- endif %}
     </section>
+    {%- if not election.has_voted(user) and election.can_vote(user) %}
+    <section class="buttons">
+        <button class="button button_send" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
+    </section>
+    {%- endif %}
 {% endblock %}
 
 {% block script %}
 {{ super() }}
 <script src="{{ static('core/js/shorten.min.js') }}"></script>
 <script type="text/javascript">
-$('.role__description').shorten({
+$('.role_description').shorten({
     moreText: "{% trans %}Show more{% endtrans %}",
-    lessText: "{% trans %}Show less{% endtrans %}"
+    lessText: "{% trans %}Show less{% endtrans %}",
+    showChars: 50
 });
-$('.candidate__program').shorten({
+$('.candidate_program').shorten({
     moreText: "{% trans %}Show more{% endtrans %}",
     lessText: "{% trans %}Show less{% endtrans %}",
     showChars: 200
