@@ -1,4 +1,8 @@
-$padding: 15px;
+$padding: 1.5rem;
+$padding_smaller: .5rem;
+$gap: .25rem;
+$border: .01rem solid black;
+$min_col_width: 100px;
 
 .error {
     color: red !important;
@@ -7,7 +11,7 @@ $padding: 15px;
 .radio-btn {
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    gap: $gap;
 
     > input,
     > label {
@@ -17,6 +21,10 @@ $padding: 15px;
     &:hover {
         cursor: pointer;
     }
+}
+
+.election_vote {
+    overflow-x: scroll !important;
 }
 
 .election_table {
@@ -35,10 +43,12 @@ $padding: 15px;
                 display: flex;
                 flex-direction: column-reverse;
                 align-items: center;
-                justify-content: space-between;
+                justify-content: center;
                 padding: $padding;
-                border: 0.5px solid black;
+                border: $border;
                 border-collapse: collapse;
+                position: relative;
+                min-width: $min_col_width;
 
                 >a{
                     margin-left: $padding;
@@ -51,6 +61,9 @@ $padding: 15px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    position: absolute;
+                    right: $gap;
+                    top: $gap;
                 
                     &:hover {
                         background-color: #ddd;
@@ -68,7 +81,7 @@ $padding: 15px;
             display: flex;
             flex-direction: row;
             background-color: lightgrey;
-            
+
             &:hover {
                 background-color: lightgrey;
             }
@@ -96,7 +109,7 @@ $padding: 15px;
                     display: flex;
                     flex-direction: row;
                     align-items: center;
-                    gap: 5px;
+                    gap: $gap;
                     
                     > button,
                     > button > i,
@@ -140,11 +153,12 @@ $padding: 15px;
                 display: flex;
                 flex-direction: row;
                 justify-content: center;
-                border: 0.5px solid black;
+                border: $border;
                 border-collapse: collapse;
                 background-color: #fff;
-                padding: $padding;
+                padding: $padding_smaller;
                 margin: 0;
+                min-width: $min_col_width;
 
                 >.candidates {
                     margin: 0;
@@ -152,7 +166,7 @@ $padding: 15px;
                     flex-direction: row;
                     flex-wrap: wrap;
                     justify-content: center;
-                    gap: 10px;
+                    gap: $gap;
 
                     >.candidate {
                         display: flex;
@@ -160,12 +174,16 @@ $padding: 15px;
                         align-items: center;
 
                         list-style-type: none;
-                        gap: 10px;
+                        gap: $gap;
 
                         >input[type="radio"]:checked + label,
                         >input[type="checkbox"]:checked + label {
                             background-color: lightgray;
                             border-radius: 10px;
+
+                            >figure>.edit_btns>a:hover{
+                                background-color: #fff;
+                            }
                         }
 
                         >label>figure,
@@ -174,7 +192,7 @@ $padding: 15px;
                             display: flex;
                             flex-direction: column;
                             align-items: center;
-                            gap: 10px;
+                            gap: $gap;
                             padding: 10px;
 
                             >img {
@@ -195,9 +213,9 @@ $padding: 15px;
                                 position: absolute;
                                 display: flex;
                                 flex-direction: column;
-                                top: 5px;
-                                right: 5px;
-                                gap: 5px;
+                                top: $gap;
+                                right: $gap;
+                                gap: $gap;
                                 
                                 > a {
                                     width: 20px;
@@ -212,7 +230,7 @@ $padding: 15px;
                                     justify-content: center;
 
                                     &:hover {
-                                        background-color: #fff;
+                                        background-color: #d8d8d8;
                                     }
                                 }
                             }
@@ -234,7 +252,7 @@ $padding: 15px;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: $gap;
 }
 
 .button {

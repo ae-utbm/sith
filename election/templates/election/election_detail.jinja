@@ -6,7 +6,7 @@
 
 {% block head %}
 {{ super() -}}
-<link rel="stylesheet" href="{{ scss('core/election.scss') }}">
+<link rel="stylesheet" href="{{ scss('election/election.scss') }}">
 {%- endblock %}
 
 {% block content %}
@@ -38,7 +38,7 @@
         </p>
         {%- endif %}
     </section>
-    <section class="election__vote">
+    <section class="election_vote">
         <form action="{{ url('election:vote', election.id) }}" method="post" class="election__vote-form" name="vote-form" id="vote-form">
             {% csrf_token %}
             <table class="election_table">
