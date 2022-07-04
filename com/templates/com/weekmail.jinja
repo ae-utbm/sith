@@ -10,6 +10,7 @@
 <p><a href="{{ url('com:weekmail_preview') }}">{% trans %}Preview{% endtrans %}</a></p>
 <p><a href="{{ url('com:weekmail_preview') }}?send=true">{% trans %}Send{% endtrans %}</a></p>
 <p><a href="{{ url('com:weekmail_article') }}">{% trans %}New article{% endtrans %}</a></p>
+<p><a href="{{ url('com:weekmail') }}" onclick="{{weekmail.switch_type()}}">{% trans %}Switch invitation/weekmail{% endtrans %}</a></p>
 <h4>{% trans %}Articles in no weekmail yet{% endtrans %}</h4>
 <table>
     <thead>
