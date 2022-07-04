@@ -61,6 +61,10 @@ NEWS_TYPES = [
     ("CALL", _("Call")),
 ]
 
+WEEKMAIL_TYPE = [
+    ("WEEKMAIL", _("Weekmail")),
+    ("INVITATION", _("Invitation")),
+]
 
 class News(models.Model):
     """The news class"""
@@ -178,6 +182,9 @@ class Weekmail(models.Model):
     protip = models.TextField(_("protip"), blank=True)
     conclusion = models.TextField(_("conclusion"), blank=True)
     sent = models.BooleanField(_("sent"), default=False)
+    type = models.CharField(
+        _("type"), max_length=16, choices=WEEKMAIL_TYPE, default="WEEKMAIL"
+    )
 
     class Meta:
         ordering = ["-id"]
@@ -222,14 +229,30 @@ class Weekmail(models.Model):
         return render(
             None, "com/weekmail_renderer_html.jinja", context={"weekmail": self}
         ).content.decode("utf-8")
+    
+    def switch_type(self):
+        """
+        Switch the type of weekmail we are sending :
+            - a simple weekmail
+            - or an invitation
+        """
+        if self.type == "INVITATION":
+            self.type = "WEEKMAIL"
+        else:
+            self.type = "INVITATION"
 
     def get_banner(self):
         """
         Return an absolute link to the banner.
         """
+        if self.type == "INVITATION":
+            return (
+                "http://" + settings.SITH_URL + static("com/img/invitation_bannerP22.png")
+            )
         return (
-            "http://" + settings.SITH_URL + static("com/img/invitation_bannerP22.png")
+            "http://" + settings.SITH_URL + static("com/img/weekmail_footerP22.png")
         )
+        
 
     def get_footer(self):
         """
