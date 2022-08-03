@@ -402,32 +402,32 @@ class UserToolsTest(TestCase):
 
     def test_anonymous_user_unauthorized(self):
         response = self.client.get(reverse("core:user_tools"))
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_page_is_working(self):
         # Test for simple user
         self.client.login(username="guy", password="plop")
         response = self.client.get(reverse("core:user_tools"))
-        self.assertNotEquals(response.status_code, 500)
-        self.assertEquals(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 200)
 
         # Test for root
         self.client.login(username="root", password="plop")
         response = self.client.get(reverse("core:user_tools"))
-        self.assertNotEquals(response.status_code, 500)
-        self.assertEquals(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 200)
 
         # Test for skia
         self.client.login(username="skia", password="plop")
         response = self.client.get(reverse("core:user_tools"))
-        self.assertNotEquals(response.status_code, 500)
-        self.assertEquals(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 200)
 
         # Test for comunity
         self.client.login(username="comunity", password="plop")
         response = self.client.get(reverse("core:user_tools"))
-        self.assertNotEquals(response.status_code, 500)
-        self.assertEquals(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 200)
 
 
 # TODO: many tests on the pages:

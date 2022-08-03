@@ -264,7 +264,7 @@ class EtransactionAutoAnswer(View):
             crypto.verify(
                 cert,
                 sig,
-                "&".join(request.META["QUERY_STRING"].split("&")[:-1]),
+                "&".join(request.META["QUERY_STRING"].split("&")[:-1]).encode("utf-8"),
                 "sha1",
             )
         except:

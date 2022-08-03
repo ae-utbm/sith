@@ -14,11 +14,11 @@ with open("./private_key.pem") as f:
 with open("./public_key.pem") as f:
     PUBKEY = f.read()
 
-string = "Amount=400&BasketID=4000&Auto=42&Error=00000\n"
+data = "Amount=400&BasketID=4000&Auto=42&Error=00000\n".encode("utf-8")
 
 # Sign
 prvkey = crypto.load_privatekey(crypto.FILETYPE_PEM, PRVKEY)
-sig = crypto.sign(prvkey, string, "sha1")
+sig = crypto.sign(prvkey, data, "sha1")
 b64sig = base64.b64encode(sig)
 print(b64sig)
 
@@ -28,7 +28,7 @@ cert = crypto.X509()
 cert.set_pubkey(pubkey)
 sig = base64.b64decode(b64sig)
 try:
-    crypto.verify(cert, sig, string, "sha1")
+    crypto.verify(cert, sig, data, "sha1")
     print("Verify OK")
 except:
     print("Verify failed")

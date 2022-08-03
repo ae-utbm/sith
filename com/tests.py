@@ -40,8 +40,8 @@ class ComAlertTest(TestCase):
     def test_page_is_working(self):
         self.client.login(username="comunity", password="plop")
         response = self.client.get(reverse("com:alert_edit"))
-        self.assertNotEquals(response.status_code, 500)
-        self.assertEquals(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 200)
 
 
 class ComInfoTest(TestCase):
@@ -51,8 +51,8 @@ class ComInfoTest(TestCase):
     def test_page_is_working(self):
         self.client.login(username="comunity", password="plop")
         response = self.client.get(reverse("com:info_edit"))
-        self.assertNotEquals(response.status_code, 500)
-        self.assertEquals(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 200)
 
 
 class ComTest(TestCase):
