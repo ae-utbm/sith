@@ -37,7 +37,7 @@ from django.views.generic.edit import (
     FormMixin,
     BaseFormView,
 )
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from django.forms.models import modelform_factory

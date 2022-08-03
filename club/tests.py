@@ -25,7 +25,7 @@
 from django.conf import settings
 from django.test import TestCase
 from django.utils import timezone, html
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.urls import reverse
 from django.core.management import call_command
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS

@@ -27,7 +27,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, RedirectView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from django.utils import timezone, html
 from django.conf import settings

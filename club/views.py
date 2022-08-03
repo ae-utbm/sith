@@ -39,8 +39,8 @@ from django.http import (
 )
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext as _t
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _t
 from django.core.exceptions import PermissionDenied, ValidationError, NON_FIELD_ERRORS
 from django.core.paginator import Paginator, InvalidPage
 from django.shortcuts import get_object_or_404, redirect

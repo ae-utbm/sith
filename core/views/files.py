@@ -29,7 +29,7 @@ from django.views.generic.edit import UpdateView, FormMixin, DeleteView
 from django.views.generic.detail import SingleObjectMixin
 from django.forms.models import modelform_factory
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 from django.urls import reverse
@@ -147,7 +147,7 @@ class FileListView(ListView):
     def get_context_data(self, **kwargs):
         kwargs = super(FileListView, self).get_context_data(**kwargs)
         kwargs["popup"] = ""
-        if self.kwargs["popup"]:
+        if self.kwargs.get("popup") is not None:
             kwargs["popup"] = "popup"
         return kwargs
 
@@ -165,7 +165,7 @@ class FileEditView(CanEditMixin, UpdateView):
         return modelform_factory(SithFile, fields=fields)
 
     def get_success_url(self):
-        if self.kwargs["popup"]:
+        if self.kwargs.get("popup") is not None:
             return reverse(
                 "core:file_detail", kwargs={"file_id": self.object.id, "popup": "popup"}
             )
@@ -176,7 +176,7 @@ class FileEditView(CanEditMixin, UpdateView):
     def get_context_data(self, **kwargs):
         kwargs = super(FileEditView, self).get_context_data(**kwargs)
         kwargs["popup"] = ""
-        if self.kwargs["popup"]:
+        if self.kwargs.get("popup") is not None:
             kwargs["popup"] = "popup"
         return kwargs
 
@@ -217,13 +217,13 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
     def get_success_url(self):
         return reverse(
             "core:file_detail",
-            kwargs={"file_id": self.object.id, "popup": self.kwargs["popup"] or ""},
+            kwargs={"file_id": self.object.id, "popup": self.kwargs.get("popup", "")},
         )
 
     def get_context_data(self, **kwargs):
         kwargs = super(FileEditPropView, self).get_context_data(**kwargs)
         kwargs["popup"] = ""
-        if self.kwargs["popup"]:
+        if self.kwargs.get("popup") is not None:
             kwargs["popup"] = "popup"
         return kwargs
 
@@ -301,14 +301,14 @@ class FileView(CanViewMixin, DetailView, FormMixin):
     def get_success_url(self):
         return reverse(
             "core:file_detail",
-            kwargs={"file_id": self.object.id, "popup": self.kwargs["popup"] or ""},
+            kwargs={"file_id": self.object.id, "popup": self.kwargs.get("popup", "")},
         )
 
     def get_context_data(self, **kwargs):
         kwargs = super(FileView, self).get_context_data(**kwargs)
         kwargs["popup"] = ""
         kwargs["form"] = self.form
-        if self.kwargs["popup"]:
+        if self.kwargs.get("popup") is not None:
             kwargs["popup"] = "popup"
         kwargs["clipboard"] = SithFile.objects.filter(
             id__in=self.request.session["clipboard"]
@@ -328,20 +328,20 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
             return self.request.GET["next"]
         if self.object.parent is None:
             return reverse(
-                "core:file_list", kwargs={"popup": self.kwargs["popup"] or ""}
+                "core:file_list", kwargs={"popup": self.kwargs.get("popup", "")}
             )
         return reverse(
             "core:file_detail",
             kwargs={
                 "file_id": self.object.parent.id,
-                "popup": self.kwargs["popup"] or "",
+                "popup": self.kwargs.get("popup", ""),
             },
         )
 
     def get_context_data(self, **kwargs):
         kwargs = super(FileDeleteView, self).get_context_data(**kwargs)
         kwargs["popup"] = ""
-        if self.kwargs["popup"]:
+        if self.kwargs.get("popup") is not None:
             kwargs["popup"] = "popup"
         return kwargs
 

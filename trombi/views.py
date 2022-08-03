@@ -28,7 +28,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, RedirectView, TemplateView, View
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django import forms
 from django.conf import settings
 from django.forms.models import modelform_factory

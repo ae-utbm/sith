@@ -33,7 +33,7 @@ from django.views.generic import TemplateView, View
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import SuspiciousOperation
 from django.db import transaction, DataError
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.conf import settings
 
 from counter.models import Customer, Counter, ProductType, Selling

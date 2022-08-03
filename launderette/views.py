@@ -28,7 +28,7 @@ import pytz
 
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, DeleteView, BaseFormView
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils import dateparse, timezone
 from django.urls import reverse_lazy
 from django.conf import settings

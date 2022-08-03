@@ -37,8 +37,8 @@ from django.forms import (
     DateTimeInput,
     Textarea,
 )
-from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext
 from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from ajax_select.fields import AutoCompleteSelectField
 from ajax_select import make_ajax_field
@@ -118,19 +118,16 @@ class SelectFile(TextInput):
             attrs["class"] = "select_file"
         else:
             attrs = {"class": "select_file"}
-        output = (
-            '%(content)s<div name="%(name)s" class="choose_file_widget" title="%(title)s"></div>'
-            % {
-                "content": super(SelectFile, self).render(name, value, attrs, renderer),
-                "title": _("Choose file"),
-                "name": name,
-            }
-        )
+        output = '%(content)s<div name="%(name)s" class="choose_file_widget" title="%(title)s"></div>' % {
+            "content": super(SelectFile, self).render(name, value, attrs, renderer),
+            "title": _("Choose file"),
+            "name": name,
+        }
         output += (
             '<span name="'
             + name
             + '" class="choose_file_button">'
-            + ugettext("Choose file")
+            + gettext("Choose file")
             + "</span>"
         )
         return output
@@ -142,19 +139,16 @@ class SelectUser(TextInput):
             attrs["class"] = "select_user"
         else:
             attrs = {"class": "select_user"}
-        output = (
-            '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>'
-            % {
-                "content": super(SelectUser, self).render(name, value, attrs, renderer),
-                "title": _("Choose user"),
-                "name": name,
-            }
-        )
+        output = '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>' % {
+            "content": super(SelectUser, self).render(name, value, attrs, renderer),
+            "title": _("Choose user"),
+            "name": name,
+        }
         output += (
             '<span name="'
             + name
             + '" class="choose_user_button">'
-            + ugettext("Choose user")
+            + gettext("Choose user")
             + "</span>"
         )
         return output

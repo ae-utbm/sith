@@ -20,7 +20,7 @@ Nous allons présenter ici les deux techniques. Dans un premier temps nous allon
 
     from django.db import models
     from django.conf import settings
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     from core.views import *
     from core.models import User, Group
@@ -63,7 +63,7 @@ Voici maintenant comment faire en définissant des fonctions personnalisées. Ce
 .. code-block:: python
 
     from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     from core.views import *
     from core.models import User, Group

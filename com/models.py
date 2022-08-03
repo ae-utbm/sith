@@ -26,11 +26,11 @@
 from django.shortcuts import render
 from django.db import models, transaction
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ValidationError
 

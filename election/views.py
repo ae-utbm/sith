@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.edit import DeleteView, FormView
 from django.urls import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.forms import CheckboxSelectMultiple

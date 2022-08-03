@@ -41,7 +41,7 @@ import sys
 import binascii
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -132,9 +132,7 @@ TEMPLATES = [
             "extensions": [
                 "jinja2.ext.do",
                 "jinja2.ext.loopcontrols",
-                "jinja2.ext.with_",
                 "jinja2.ext.i18n",
-                "jinja2.ext.autoescape",
                 "django_jinja.builtins.extensions.CsrfExtension",
                 "django_jinja.builtins.extensions.CacheExtension",
                 "django_jinja.builtins.extensions.TimezoneExtension",

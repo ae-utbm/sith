@@ -26,7 +26,7 @@ from enum import Enum
 
 from django.views.generic import ListView, View
 from django.views.generic.edit import FormView
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import SingleObjectMixin
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
