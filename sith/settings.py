@@ -62,6 +62,8 @@ ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 SITE_ID = 4000
 
 INSTALLED_APPS = (
