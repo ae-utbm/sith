@@ -110,6 +110,7 @@ class CounterTest(TestCase):
                 "bank": "OTHER",
             },
         )
+        self.assertTrue(response.status_code == 200)
 
         response = self.client.post(
             reverse("counter:login", kwargs={"counter_id": self.foyer.id}),
@@ -139,7 +140,7 @@ class CounterTest(TestCase):
                 "bank": "OTHER",
             },
         )
-        self.assertTrue(response.status_code == 403)
+        self.assertTrue(response.status_code == 200)
 
 
 class CounterStatsTest(TestCase):
