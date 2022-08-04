@@ -45,7 +45,7 @@
             </thead>
             <tbody>
                 {% for widget in form_mailing_removal.subwidgets %}
-                {% set user = ms[widget.data.value][0] %}
+                {% set user = ms[widget.data.value.value][0] %}
                 <tr>
                     <td>{{ user.get_username }}</td>
                     <td>{{ user.get_email }}</td>

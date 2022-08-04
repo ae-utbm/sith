@@ -180,7 +180,7 @@ class ClubTest(TestCase):
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(
-            "<li>Vous n&#39;avez pas la permission de faire cela</li>"
+            "<li>Vous n&#x27;avez pas la permission de faire cela</li>"
             in str(response.content)
         )
 

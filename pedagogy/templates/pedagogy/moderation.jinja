@@ -18,7 +18,7 @@
 	<tbody>
 		{% set queryset = form.accepted_reports.field.queryset %}
 		{% for widget in form.accepted_reports.subwidgets %}
-		{% set report = queryset.get(id=widget.data.value) %}
+		{% set report = queryset.get(id=widget.data.value.value) %}
 		<form action="{{ url('pedagogy:moderation') }}" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 			<tr>
