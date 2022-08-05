@@ -27,7 +27,7 @@ from django.core.exceptions import ValidationError
 from django.core import validators
 from django.db import models
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.template import defaultfilters
 
 from phonenumber_field.modelfields import PhoneNumberField

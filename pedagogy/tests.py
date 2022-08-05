@@ -25,7 +25,7 @@
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.core.management import call_command
 
 from core.models import User, Notification
@@ -95,7 +95,7 @@ class UVCreation(TestCase):
         response = self.client.post(
             reverse("pedagogy:uv_create"), create_uv_template(self.bibou.id)
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.assertTrue(UV.objects.filter(code="IFC1").exists())
 
     def test_create_uv_pedagogy_admin_success(self):
@@ -103,7 +103,7 @@ class UVCreation(TestCase):
         response = self.client.post(
             reverse("pedagogy:uv_create"), create_uv_template(self.tutu.id)
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.assertTrue(UV.objects.filter(code="IFC1").exists())
 
     def test_create_uv_unauthorized_fail(self):
@@ -111,21 +111,21 @@ class UVCreation(TestCase):
         response = self.client.post(
             reverse("pedagogy:uv_create"), create_uv_template(0)
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Test with subscribed user
         self.client.login(username="sli", password="plop")
         response = self.client.post(
             reverse("pedagogy:uv_create"), create_uv_template(self.sli.id)
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Test with non subscribed user
         self.client.login(username="guy", password="plop")
         response = self.client.post(
             reverse("pedagogy:uv_create"), create_uv_template(self.guy.id)
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Check that the UV has never been created
         self.assertFalse(UV.objects.filter(code="IFC1").exists())
@@ -137,16 +137,16 @@ class UVCreation(TestCase):
         response = self.client.post(
             reverse("pedagogy:uv_create"), create_uv_template(self.bibou.id)
         )
-        self.assertNotEquals(response.status_code, 302)
-        self.assertEquals(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         # Remove a required field
         response = self.client.post(
             reverse("pedagogy:uv_create"),
             create_uv_template(self.tutu.id, exclude_list=["title"]),
         )
-        self.assertNotEquals(response.status_code, 302)
-        self.assertEquals(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         # Check that the UV hase never been created
         self.assertFalse(UV.objects.filter(code="IFC1").exists())
@@ -179,12 +179,12 @@ class UVListTest(TestCase):
     def test_uv_list_display_fail(self):
         # Don't display for anonymous user
         response = self.client.get(reverse("pedagogy:guide"))
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Don't display for none subscribed users
         self.client.login(username="guy", password="plop")
         response = self.client.get(reverse("pedagogy:guide"))
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
 
 class UVDeleteTest(TestCase):
@@ -220,7 +220,7 @@ class UVDeleteTest(TestCase):
                 "pedagogy:uv_delete", kwargs={"uv_id": UV.objects.get(code="PA00").id}
             )
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Not subscribed user
         self.client.login(username="guy", password="plop")
@@ -229,7 +229,7 @@ class UVDeleteTest(TestCase):
                 "pedagogy:uv_delete", kwargs={"uv_id": UV.objects.get(code="PA00").id}
             )
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Simply subscribed user
         self.client.login(username="sli", password="plop")
@@ -238,7 +238,7 @@ class UVDeleteTest(TestCase):
                 "pedagogy:uv_delete", kwargs={"uv_id": UV.objects.get(code="PA00").id}
             )
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Check that the UV still exists
         self.assertTrue(UV.objects.filter(code="PA00").exists())
@@ -262,7 +262,7 @@ class UVUpdateTest(TestCase):
             create_uv_template(self.bibou.id, code="PA00"),
         )
         self.uv.refresh_from_db()
-        self.assertEquals(self.uv.credit_type, "TM")
+        self.assertEqual(self.uv.credit_type, "TM")
 
     def test_uv_update_pedagogy_admin_success(self):
         self.client.login(username="tutu", password="plop")
@@ -271,7 +271,7 @@ class UVUpdateTest(TestCase):
             create_uv_template(self.bibou.id, code="PA00"),
         )
         self.uv.refresh_from_db()
-        self.assertEquals(self.uv.credit_type, "TM")
+        self.assertEqual(self.uv.credit_type, "TM")
 
     def test_uv_update_original_author_does_not_change(self):
         self.client.login(username="tutu", password="plop")
@@ -281,8 +281,8 @@ class UVUpdateTest(TestCase):
         )
 
         self.uv.refresh_from_db()
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(self.uv.author, self.bibou)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.uv.author, self.bibou)
 
     def test_uv_update_pedagogy_unauthorized_fail(self):
         # Anonymous user
@@ -290,7 +290,7 @@ class UVUpdateTest(TestCase):
             reverse("pedagogy:uv_update", kwargs={"uv_id": self.uv.id}),
             create_uv_template(self.bibou.id, code="PA00"),
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Not subscribed user
         self.client.login(username="guy", password="plop")
@@ -298,7 +298,7 @@ class UVUpdateTest(TestCase):
             reverse("pedagogy:uv_update", kwargs={"uv_id": self.uv.id}),
             create_uv_template(self.bibou.id, code="PA00"),
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Simply subscribed user
         self.client.login(username="sli", password="plop")
@@ -306,11 +306,11 @@ class UVUpdateTest(TestCase):
             reverse("pedagogy:uv_update", kwargs={"uv_id": self.uv.id}),
             create_uv_template(self.bibou.id, code="PA00"),
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Check that the UV has not changed
         self.uv.refresh_from_db()
-        self.assertEquals(self.uv.credit_type, "OM")
+        self.assertEqual(self.uv.credit_type, "OM")
 
 
 # UVComment class tests
@@ -355,7 +355,7 @@ class UVCommentCreationAndDisplay(TestCase):
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
             create_uv_comment_template(self.bibou.id),
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         response = self.client.get(
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
         )
@@ -367,7 +367,7 @@ class UVCommentCreationAndDisplay(TestCase):
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
             create_uv_comment_template(self.tutu.id),
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         response = self.client.get(
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
         )
@@ -379,7 +379,7 @@ class UVCommentCreationAndDisplay(TestCase):
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
             create_uv_comment_template(self.sli.id),
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         response = self.client.get(
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
         )
@@ -391,7 +391,7 @@ class UVCommentCreationAndDisplay(TestCase):
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
             create_uv_comment_template(0),
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Test with non subscribed user
         self.client.login(username="guy", password="plop")
@@ -399,7 +399,7 @@ class UVCommentCreationAndDisplay(TestCase):
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
             create_uv_comment_template(self.guy.id),
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Check that the comment has never been created
         self.client.login(username="root", password="plop")
@@ -415,7 +415,7 @@ class UVCommentCreationAndDisplay(TestCase):
             create_uv_comment_template(self.bibou.id, exclude_list=["grade_global"]),
         )
 
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         response = self.client.get(
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id})
@@ -442,7 +442,7 @@ class UVCommentCreationAndDisplay(TestCase):
         response = self.client.post(
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}), comment
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(
             UVComment.objects.filter(comment__contains="Superbe UV").exists()
         )
@@ -459,12 +459,12 @@ class UVCommentCreationAndDisplay(TestCase):
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
             create_uv_comment_template(self.bibou.id, exclude_list=["uv"]),
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.client.post(
             reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv.id}),
             create_uv_comment_template(self.bibou.id, exclude_list=["author"]),
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
 
 class UVCommentDeleteTest(TestCase):
@@ -508,21 +508,21 @@ class UVCommentDeleteTest(TestCase):
         response = self.client.post(
             reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Unsbscribed user
         self.client.login(username="guy", password="plop")
         response = self.client.post(
             reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Subscribed user (not author of the comment)
         self.client.login(username="sli", password="plop")
         response = self.client.post(
             reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Check that the comment still exists
         self.assertTrue(UVComment.objects.filter(id=self.comment.id).exists())
@@ -555,9 +555,9 @@ class UVCommentUpdateTest(TestCase):
             reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
             self.comment_edit,
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.comment.refresh_from_db()
-        self.assertEquals(self.comment.comment, self.comment_edit["comment"])
+        self.assertEqual(self.comment.comment, self.comment_edit["comment"])
 
     def test_uv_comment_update_pedagogy_admin_success(self):
         self.client.login(username="tutu", password="plop")
@@ -565,9 +565,9 @@ class UVCommentUpdateTest(TestCase):
             reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
             self.comment_edit,
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.comment.refresh_from_db()
-        self.assertEquals(self.comment.comment, self.comment_edit["comment"])
+        self.assertEqual(self.comment.comment, self.comment_edit["comment"])
 
     def test_uv_comment_update_author_success(self):
         self.client.login(username="krophil", password="plop")
@@ -575,9 +575,9 @@ class UVCommentUpdateTest(TestCase):
             reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
             self.comment_edit,
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.comment.refresh_from_db()
-        self.assertEquals(self.comment.comment, self.comment_edit["comment"])
+        self.assertEqual(self.comment.comment, self.comment_edit["comment"])
 
     def test_uv_comment_update_unauthorized_fail(self):
         # Anonymous user
@@ -585,25 +585,25 @@ class UVCommentUpdateTest(TestCase):
             reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
             self.comment_edit,
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Unsbscribed user
         response = self.client.post(
             reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
             self.comment_edit,
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Subscribed user (not author of the comment)
         response = self.client.post(
             reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
             self.comment_edit,
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Check that the comment hasn't change
         self.comment.refresh_from_db()
-        self.assertNotEquals(self.comment.comment, self.comment_edit["comment"])
+        self.assertNotEqual(self.comment.comment, self.comment_edit["comment"])
 
     def test_uv_comment_update_original_author_does_not_change(self):
         self.client.login(username="root", password="plop")
@@ -613,8 +613,8 @@ class UVCommentUpdateTest(TestCase):
             reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
             self.comment_edit,
         )
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(self.comment.author, self.krophil)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.comment.author, self.krophil)
 
 
 class UVSearchTest(TestCase):
@@ -631,27 +631,27 @@ class UVSearchTest(TestCase):
         # Test with root user
         self.client.login(username="root", password="plop")
         response = self.client.get(reverse("pedagogy:guide"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         # Test with pedagogy admin
         self.client.login(username="tutu", password="plop")
         response = self.client.get(reverse("pedagogy:guide"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         # Test with subscribed user
         self.client.login(username="sli", password="plop")
         response = self.client.get(reverse("pedagogy:guide"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_get_page_unauthorized_fail(self):
         # Test with anonymous user
         response = self.client.get(reverse("pedagogy:guide"))
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Test with not subscribed user
         self.client.login(username="guy", password="plop")
         response = self.client.get(reverse("pedagogy:guide"))
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_search_pa00_success(self):
         self.client.login(username="sli", password="plop")
@@ -833,32 +833,32 @@ class UVModerationFormTest(TestCase):
         # Test with root
         self.client.login(username="root", password="plop")
         response = self.client.get(reverse("pedagogy:moderation"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         # Test with pedagogy admin
         self.client.login(username="tutu", password="plop")
         response = self.client.get(reverse("pedagogy:moderation"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_access_unauthorized_fail(self):
         # Test with anonymous user
         response = self.client.get(reverse("pedagogy:moderation"))
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Test with unsubscribed user
         self.client.login(username="guy", password="plop")
         response = self.client.get(reverse("pedagogy:moderation"))
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
         # Test with subscribed user
         self.client.login(username="sli", password="plop")
         response = self.client.get(reverse("pedagogy:moderation"))
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_do_nothing(self):
         self.client.login(username="root", password="plop")
         response = self.client.post(reverse("pedagogy:moderation"))
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Test that nothing has changed
         self.assertTrue(UVCommentReport.objects.filter(id=self.report_1.id).exists())
@@ -874,7 +874,7 @@ class UVModerationFormTest(TestCase):
         response = self.client.post(
             reverse("pedagogy:moderation"), {"accepted_reports": [self.report_1.id]}
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Test that the comment and it's associated report has been deleted
         self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
@@ -894,7 +894,7 @@ class UVModerationFormTest(TestCase):
             reverse("pedagogy:moderation"),
             {"accepted_reports": [self.report_1.id, self.report_2.id]},
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Test that comments and their associated reports has been deleted
         self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
@@ -913,7 +913,7 @@ class UVModerationFormTest(TestCase):
             reverse("pedagogy:moderation"),
             {"accepted_reports": [self.report_1.id, self.report_1_bis.id]},
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Test that the comment and it's associated report has been deleted
         self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
@@ -928,7 +928,7 @@ class UVModerationFormTest(TestCase):
         response = self.client.post(
             reverse("pedagogy:moderation"), {"denied_reports": [self.report_1.id]}
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Test that the report has been deleted and that the comment still exists
         self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
@@ -954,7 +954,7 @@ class UVModerationFormTest(TestCase):
                 ]
             },
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Test that every reports has been deleted
         self.assertFalse(UVCommentReport.objects.filter(id=self.report_1.id).exists())
@@ -976,7 +976,7 @@ class UVModerationFormTest(TestCase):
                 "denied_reports": [self.report_1.id],
             },
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Test that report 2 and his comment has been deleted
         self.assertFalse(UVCommentReport.objects.filter(id=self.report_2.id).exists())
@@ -1000,7 +1000,7 @@ class UVModerationFormTest(TestCase):
                 "denied_reports": [self.report_1_bis.id],
             },
         )
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # Test that report 1 and 1 bis has been deleted
         self.assertFalse(
@@ -1047,10 +1047,10 @@ class UVCommentReportCreateTest(TestCase):
             },
         )
         if success:
-            self.assertEquals(response.status_code, 302)
+            self.assertEqual(response.status_code, 302)
         else:
-            self.assertEquals(response.status_code, 403)
-        self.assertEquals(UVCommentReport.objects.all().exists(), success)
+            self.assertEqual(response.status_code, 403)
+        self.assertEqual(UVCommentReport.objects.all().exists(), success)
 
     def test_create_report_root_success(self):
         self.create_report_test("root", True)
@@ -1069,7 +1069,7 @@ class UVCommentReportCreateTest(TestCase):
             reverse("pedagogy:comment_report", kwargs={"comment_id": self.comment.id}),
             {"comment": self.comment.id, "reporter": 0, "reason": "C'est moche"},
         )
-        self.assertEquals(response.status_code, 403)
+        self.assertEqual(response.status_code, 403)
         self.assertFalse(UVCommentReport.objects.all().exists())
 
     def test_notifications(self):
@@ -1092,7 +1092,7 @@ class UVCommentReportCreateTest(TestCase):
 
         # Check that notifications are not duplicated if not viewed
         self.create_report_test("tutu", True)
-        self.assertEquals(
+        self.assertEqual(
             self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").count(), 1
         )
 
@@ -1103,6 +1103,6 @@ class UVCommentReportCreateTest(TestCase):
 
         self.create_report_test("tutu", True)
 
-        self.assertEquals(
+        self.assertEqual(
             self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").count(), 2
         )

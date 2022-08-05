@@ -59,7 +59,7 @@ class EbouticTest(TestCase):
         with open("./eboutic/tests/public_key.pem") as f:
             settings.SITH_EBOUTIC_PUB_KEY = f.read()
         privkey = crypto.load_privatekey(crypto.FILETYPE_PEM, PRIVKEY)
-        sig = crypto.sign(privkey, query, "sha1")
+        sig = crypto.sign(privkey, query.encode("utf-8"), "sha1")
         b64sig = base64.b64encode(sig).decode("ascii")
 
         url = reverse("eboutic:etransation_autoanswer") + "?%s&Sig=%s" % (

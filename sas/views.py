@@ -28,7 +28,7 @@ from django.urls import reverse_lazy, reverse
 from core.views.forms import SelectDate
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import UpdateView, FormMixin, FormView
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django import forms
 from django.core.exceptions import PermissionDenied

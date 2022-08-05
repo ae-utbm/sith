@@ -41,7 +41,7 @@ import sys
 import binascii
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -61,6 +61,8 @@ ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
+
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 SITE_ID = 4000
 
@@ -132,9 +134,7 @@ TEMPLATES = [
             "extensions": [
                 "jinja2.ext.do",
                 "jinja2.ext.loopcontrols",
-                "jinja2.ext.with_",
                 "jinja2.ext.i18n",
-                "jinja2.ext.autoescape",
                 "django_jinja.builtins.extensions.CsrfExtension",
                 "django_jinja.builtins.extensions.CacheExtension",
                 "django_jinja.builtins.extensions.TimezoneExtension",
@@ -389,7 +389,7 @@ SITH_SUBSCRIPTION_LOCATIONS = [
 
 SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]
 
-SITH_COUNTER_OFFICES = {17: "BdF", 19: "AE"}
+SITH_COUNTER_OFFICES = {2: "BdF", 1: "AE"}
 
 SITH_COUNTER_PAYMENT_METHOD = [
     ("CHECK", _("Check")),

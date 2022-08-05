@@ -37,12 +37,14 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.urls import include, re_path
+from django.urls import include, path
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.i18n import JavaScriptCatalog
 from ajax_select import urls as ajax_select_urls
+
+import core.urls
 
 js_info_dict = {"packages": ("sith",)}
 
@@ -51,43 +53,37 @@ handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
 
 urlpatterns = [
-    re_path(r"^", include(("core.urls", "core"), namespace="core")),
-    re_path(
-        r"^rootplace/", include(("rootplace.urls", "rootplace"), namespace="rootplace")
-    ),
-    re_path(
-        r"^subscription/",
+    path("", include(("core.urls", "core"), namespace="core")),
+    path("rootplace/", include(("rootplace.urls", "rootplace"), namespace="rootplace")),
+    path(
+        "subscription/",
         include(("subscription.urls", "subscription"), namespace="subscription"),
     ),
-    re_path(r"^com/", include(("com.urls", "com"), namespace="com")),
-    re_path(r"^club/", include(("club.urls", "club"), namespace="club")),
-    re_path(r"^counter/", include(("counter.urls", "counter"), namespace="counter")),
-    re_path(r"^stock/", include(("stock.urls", "stock"), namespace="stock")),
-    re_path(
-        r"^accounting/",
+    path("com/", include(("com.urls", "com"), namespace="com")),
+    path("club/", include(("club.urls", "club"), namespace="club")),
+    path("counter/", include(("counter.urls", "counter"), namespace="counter")),
+    path("stock/", include(("stock.urls", "stock"), namespace="stock")),
+    path(
+        "accounting/",
         include(("accounting.urls", "accounting"), namespace="accounting"),
     ),
-    re_path(r"^eboutic/", include(("eboutic.urls", "eboutic"), namespace="eboutic")),
-    re_path(
-        r"^launderette/",
+    path("eboutic/", include(("eboutic.urls", "eboutic"), namespace="eboutic")),
+    path(
+        "launderette/",
         include(("launderette.urls", "launderette"), namespace="launderette"),
     ),
-    re_path(r"^sas/", include(("sas.urls", "sas"), namespace="sas")),
-    re_path(r"^api/v1/", include(("api.urls", "api"), namespace="api")),
-    re_path(
-        r"^election/", include(("election.urls", "election"), namespace="election")
-    ),
-    re_path(r"^forum/", include(("forum.urls", "forum"), namespace="forum")),
-    re_path(r"^trombi/", include(("trombi.urls", "trombi"), namespace="trombi")),
-    re_path(r"^matmatronch/", include(("matmat.urls", "matmat"), namespace="matmat")),
-    re_path(
-        r"^pedagogy/", include(("pedagogy.urls", "pedagogy"), namespace="pedagogy")
-    ),
-    re_path(r"^admin/", admin.site.urls),
-    re_path(r"^ajax_select/", include(ajax_select_urls)),
-    re_path(r"^i18n/", include("django.conf.urls.i18n")),
-    re_path(r"^jsi18n/$", JavaScriptCatalog.as_view(), name="javascript-catalog"),
-    re_path(r"^captcha/", include("captcha.urls")),
+    path("sas/", include(("sas.urls", "sas"), namespace="sas")),
+    path("api/v1/", include(("api.urls", "api"), namespace="api")),
+    path("election/", include(("election.urls", "election"), namespace="election")),
+    path("forum/", include(("forum.urls", "forum"), namespace="forum")),
+    path("trombi/", include(("trombi.urls", "trombi"), namespace="trombi")),
+    path("matmatronch/", include(("matmat.urls", "matmat"), namespace="matmat")),
+    path("pedagogy/", include(("pedagogy.urls", "pedagogy"), namespace="pedagogy")),
+    path("admin/", admin.site.urls),
+    path("ajax_select/", include(ajax_select_urls)),
+    path("i18n/", include("django.conf.urls.i18n")),
+    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
+    path("captcha/", include("captcha.urls")),
 ]
 
 if settings.DEBUG:
@@ -95,4 +91,4 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     import debug_toolbar
 
-    urlpatterns += [re_path(r"^__debug__/", include(debug_toolbar.urls))]
+    urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
