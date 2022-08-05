@@ -10,20 +10,21 @@
         <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
         <link rel="stylesheet" href="{{ scss('core/style.scss') }}">
         <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
-        <link rel="stylesheet" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}">
-        <script href="{{ static('core/font-awesome/js/fontawesone.min.js') }}"></script>
+        <link rel="preload" as="style" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}"></noscript>
+        <script defer href="{{ static('core/font-awesome/js/fontawesone.min.js') }}"></script>
 
         <!-- Jquery declared here to be accessible in every django widgets -->
-        <script src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>
+        <script defer src="{{ static('core/js/jquery-3.1.0.min.js') }}"></script>
         <!-- Put here to always have acces to those functions on django widgets -->
-        <script src="{{ static('core/js/script.js') }}"></script>
+        <script defer src="{{ static('core/js/script.js') }}"></script>
         {% endblock %}
     </head>
 
     <body>
 
-        <!-- The token is always passed here to be accessible from the dom -->
-        <!-- See this workaround https://docs.djangoproject.com/en/2.0/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-is-true -->
+        {# The token is always passed here to be accessible from the dom #}
+        {# See this workaround https://docs.djangoproject.com/en/2.0/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-is-true #}
         {% csrf_token %}
         <!-- BEGIN HEADER -->
         {% block header %}
