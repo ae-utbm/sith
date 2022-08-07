@@ -6,7 +6,7 @@
 
 {% block content %}
 {% for a in albums %}
-    <button id="download_all_pictures", onclick=download_pictures()>{% trans %} Download all my pictures {% endtrans %}</button>
+    <button id="download_all_pictures", onclick=download_pictures()>{% trans %}Download all my pictures{% endtrans %}</button>
     <div style="padding: 10px">
         <h4>{{ a.name }}</h4>
         <hr>
@@ -78,7 +78,7 @@
                 },
                 error: function(data){
                     console.log("Error retrieving data from url: " + data);
-                    $("#download_all_pictures").text("{% trans %} Error downloading your pictures {% endtrans %}");
+                    $("#download_all_pictures").text("{% trans %}Error downloading your pictures{% endtrans %}");
                 }
             });
         }
