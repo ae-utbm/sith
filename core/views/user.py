@@ -48,6 +48,7 @@ from django.views.generic.dates import YearMixin, MonthMixin
 
 from datetime import timedelta, date
 import logging
+from api.views.sas import all_pictures_of_user
 
 from core.views import (
     CanViewMixin,
@@ -325,19 +326,15 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
         kwargs = super(UserPicturesView, self).get_context_data(**kwargs)
         kwargs["albums"] = []
         kwargs["pictures"] = {}
-        picture_qs = (
-            self.object.pictures.exclude(picture=None)
-            .order_by("-picture__parent__date", "id")
-            .select_related("picture__parent")
-        )
+        picture_qs = all_pictures_of_user(self.object)
         last_album = None
-        for pict_relation in picture_qs:
-            album = pict_relation.picture.parent
+        for picture in picture_qs:
+            album = picture.parent
             if album.id != last_album:
                 kwargs["albums"].append(album)
                 kwargs["pictures"][album.id] = []
                 last_album = album.id
-            kwargs["pictures"][album.id].append(pict_relation.picture)
+            kwargs["pictures"][album.id].append(picture)
         return kwargs
 
 

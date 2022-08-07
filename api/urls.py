@@ -22,7 +22,7 @@
 #
 #
 
-from django.urls import re_path, include
+from django.urls import re_path, path, include
 
 from api.views import *
 from rest_framework import routers
@@ -54,4 +54,5 @@ urlpatterns = [
     re_path(r"^markdown$", RenderMarkdown, name="api_markdown"),
     re_path(r"^mailings$", FetchMailingLists, name="mailings_fetch"),
     re_path(r"^uv$", uv_endpoint, name="uv_endpoint"),
+    path("sas/<int:user>", all_pictures_of_user_endpoint, name="all_pictures_of_user"),
 ]

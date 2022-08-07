@@ -6,6 +6,7 @@
 
 {% block content %}
 {% for a in albums %}
+    <button id="download_all_pictures", onclick=download_pictures()>{% trans %} Download all my pictures {% endtrans %}</button>
     <div style="padding: 10px">
         <h4>{{ a.name }}</h4>
         <hr>
@@ -18,5 +19,69 @@
     {% endfor %}
     </div>
 {% endfor %}
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script type="text/javascript">
+        /**
+         * Download a list of files.
+         * @author speedplane
+         */
+        function download_files(files) {
+          function download_next(i) {
+            if (i >= files.length) {
+              return;
+            }
+            var a = document.createElement('a');
+            a.href = files[i].download;
+            a.target = '_parent';
+            // Use a.download if available, it prevents plugins from opening.
+            if ('download' in a) {
+              a.download = files[i].filename;
+            }
+            // Add a to the doc for click to work.
+            (document.body || document.documentElement).appendChild(a);
+            if (a.click) {
+              a.click(); // The click method is supported by most browsers.
+            } else {
+              $(a).click(); // Backup using jquery
+            }
+            // Delete the temporary link.
+            a.parentNode.removeChild(a);
+            // Download the next file with a small timeout. The timeout is necessary
+            // for IE, which will otherwise only download the first file.
+            setTimeout(function() {
+              download_next(i + 1);
+            }, 500);
+          }
+          // Initiate the first download.
+          download_next(0);
+        }
+        function download_pictures() {
+            $("#download_all_pictures").prop("disabled", true);
+            var xhr = new XMLHttpRequest();
+            $.ajax({
+                type: "GET",
+                url: "{{ url('api:all_pictures_of_user', user=object.id) }}",
+                tryCount: 0,
+                xhr: function(){
+                     return xhr;
+                },
+                success: function(data){
+                    $("#download_all_pictures").prop("disabled", false);
+                    to_download = [];
+                    data.forEach(picture => 
+                        to_download.push({ download: picture["full_size_url"], filename: picture["name"] })
+                    );
+                    download_files(to_download);
+                },
+                error: function(data){
+                    console.log("Error retrieving data from url: " + data);
+                    $("#download_all_pictures").text("{% trans %} Error downloading your pictures {% endtrans %}");
+                }
+            });
+        }
+    </script>
 {% endblock %}
 

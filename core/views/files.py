@@ -24,6 +24,7 @@
 
 # This file contains all the views that concern the page model
 from django.shortcuts import redirect, get_object_or_404
+from django.utils.http import http_date
 from django.views.generic import ListView, DetailView, TemplateView
 from django.views.generic.edit import UpdateView, FormMixin, DeleteView
 from django.views.generic.detail import SingleObjectMixin
@@ -68,6 +69,7 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
     with open(filepath.encode("utf-8"), "rb") as filename:
         wrapper = FileWrapper(filename)
         response = HttpResponse(wrapper, content_type=f.mime_type)
+        response["Last-Modified"] = http_date(f.date.timestamp())
         response["Content-Length"] = os.path.getsize(filepath.encode("utf-8"))
         response["Content-Disposition"] = ('inline; filename="%s"' % f.name).encode(
             "utf-8"
