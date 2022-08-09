@@ -39,7 +39,7 @@ La traduction se fait en trois étapes. Il faut d'abord générer un fichier de 
 
 .. sourcecode:: bash
 
-	./manage.py makemessages --ignore "env/*" -e py,jinja
+	./manage.py makemessages --locale=fr --ignore "env/*" -e py,jinja
 
 Éditer le fichier django.po
 ---------------------------
