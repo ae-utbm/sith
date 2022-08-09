@@ -5,8 +5,10 @@
 {% endblock %}
 
 {% block content %}
+    {% if can_edit(profile, user) %}
+        <button id="download_all_pictures", onclick=download_pictures()>{% trans %}Download all my pictures{% endtrans %}</button>
+    {% endif %}
 {% for a in albums %}
-    <button id="download_all_pictures", onclick=download_pictures()>{% trans %}Download all my pictures{% endtrans %}</button>
     <div style="padding: 10px">
         <h4>{{ a.name }}</h4>
         <hr>

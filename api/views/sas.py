@@ -6,7 +6,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from core.views import can_edit_prop
+from core.views import can_edit
 from core.models import User
 from sas.models import Picture
 
@@ -24,7 +24,7 @@ def all_pictures_of_user(user: User) -> List[Picture]:
 @renderer_classes((JSONRenderer,))
 def all_pictures_of_user_endpoint(request: Request, user: int):
     requested_user: User = get_object_or_404(User, pk=user)
-    if not can_edit_prop(requested_user, request.user):
+    if not can_edit(requested_user, request.user):
         raise PermissionDenied
 
     return Response(
