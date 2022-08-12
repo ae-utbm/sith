@@ -964,17 +964,16 @@ class SithFile(models.Model):
 
     def direct_children(self, only_folders=False) -> models.QuerySet['SithFile']:
         """
-        Retourne les objets SithFile qui sont les enfants directs de celui-ci
+        Return the direct children of this SithFile object
         """
         children = self.children.all()
         if only_folders:
             children = children.filter(is_folder=True)
         return children
 
-
     def apply_rights_recursively(self, only_folders=False) -> None:
         """
-        Applique à tous les descendants de cet élément les mêmes droits
+        Apply to all descendants of this SithFile element the same rights.
         """
         children = list(self.direct_children(only_folders))
         while len(children) > 0:
