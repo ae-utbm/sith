@@ -962,7 +962,7 @@ class SithFile(models.Model):
                     param="1",
                 ).save()
 
-    def direct_children(self, only_folders=False) -> models.Queryset['SithFile']:
+    def direct_children(self, only_folders=False) -> models.QuerySet['SithFile']:
         """
         Retourne les objets SithFile qui sont les enfants directs de celui-ci
         """
