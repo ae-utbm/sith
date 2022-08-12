@@ -962,13 +962,25 @@ class SithFile(models.Model):
                     param="1",
                 ).save()
 
-    def apply_rights_recursively(self, only_folders=False):
+    def direct_children(self, only_folders=False) -> models.Queryset['SithFile']:
+        """
+        Retourne les objets SithFile qui sont les enfants directs de celui-ci
+        """
         children = self.children.all()
         if only_folders:
             children = children.filter(is_folder=True)
-        for c in children:
-            c.copy_rights()
-            c.apply_rights_recursively(only_folders)
+        return children
+
+
+    def apply_rights_recursively(self, only_folders=False) -> None:
+        """
+        Applique à tous les descendants de cet élément les mêmes droits
+        """
+        children = list(self.direct_children(only_folders))
+        while len(children) > 0:
+            current = children.pop(-1)
+            current.copy_rights()
+            children.extend(current.direct_children(only_folders))
 
     def copy_rights(self):
         """Copy, if possible, the rights of the parent folder"""
