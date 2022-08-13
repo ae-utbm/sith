@@ -8,7 +8,7 @@ C'est un projet bénévole qui tire ses origines des années 2000. Il s'agit de 
 Pourquoi réécrire le site
 -------------------------
 
-L'ancienne version du site, sobrement baptisée `ae2 <https://ae-dev.utbm.fr/ae/ae2>`_ présentait un nombre impressionnant de fonctionnalités. Il avait été écrit en PHP et se basait sur son propre framework maison.
+L'ancienne version du site, sobrement baptisée `ae2 <https://github.com/ae-utbm/sith2>`_ présentait un nombre impressionnant de fonctionnalités. Il avait été écrit en PHP et se basait sur son propre framework maison.
 
 Malheureusement, son entretiens était plus ou moins hasardeux et son framework reposait sur des principes assez différents de ce qui se fait aujourd'hui, rendant la maintenance difficile. De plus, la version de PHP qu'il utilisait était plus que déprécié et à l'heure de l'arrivée de PHP 7 et de sa non rétrocompatibilité il était vital de faire quelque chose. Il a donc été décidé de le réécrire.
 
