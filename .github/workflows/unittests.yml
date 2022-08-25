@@ -1,8 +1,8 @@
-name: Unit Testing Action
+name: Unit Testing
 
 on: [push]
 jobs:
-  unittest:
+  unittests:
     runs-on: ubuntu-latest
 
     steps:
