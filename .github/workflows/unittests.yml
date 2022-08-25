@@ -1,0 +1,17 @@
+name: Unit Testing
+
+on: [push]
+jobs:
+  unittests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo 'Dry test'
+  
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+     - run: echo 'Dry lint'
+
+
