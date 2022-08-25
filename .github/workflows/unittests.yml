@@ -58,6 +58,6 @@ jobs:
           python -m pip install black==22.6.0
 
       - name: Check linting
-        run: black check .
+        run: black --check .
 
 
