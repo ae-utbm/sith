@@ -5,7 +5,7 @@ on:
     workflows: [Unit Testing]
     types: [completed]
     branches:
-      - master
+      - actions
 
 jobs:
   on-success:
