@@ -15,8 +15,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt-get update
-          apt-get install gettext libxapian-dev libgraphviz-dev
+          sudo apt-get update
+          sudo apt-get install gettext libxapian-dev libgraphviz-dev
 
       - name: Install poetry
         run: |
