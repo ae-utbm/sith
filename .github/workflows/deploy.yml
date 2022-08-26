@@ -4,16 +4,11 @@ concurrency: production
 on:
   push:
     branches: [master]
-  workflow_run:
-    workflows: [Sith3 CI]
-    types: [completed]
   workflow_dispatch:
 
 jobs:
-  # Runs only if Unit tests are successful
   deployment:
     runs-on: ubuntu-latest
-    if: ${{github.event.workflow_run.conclusion == 'success'}}
     environment: production
     timeout-minutes: 30
   
@@ -41,7 +36,6 @@ jobs:
           export PATH="$HOME/.poetry/bin:$PATH"
           pushd ${{secrets.SITH_PATH}}
 
-          VERSION_LAST=$(git rev-parse HEAD)
           git pull
           poetry update
           poetry run ./manage.py migrate
@@ -50,3 +44,15 @@ jobs:
           poetry run ./manage.py compilemessages
 
           sudo systemctl restart uwsgi
+
+  sentry-release:
+    - uses: actions/checkout@v2
+    - name: Create Sentry release
+      uses: getsentry/action-release@v1
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        SENTRY_URL: ${{ secrets.SENTRY_URL }}
+      with:
+        environment: production
