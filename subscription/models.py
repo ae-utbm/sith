@@ -73,8 +73,15 @@ class Subscription(models.Model):
         verbose_name=_("location"),
     )
 
+
+
+
     class Meta:
         ordering = ["subscription_start"]
+
+
+
+
 
     def clean(self):
         try:
