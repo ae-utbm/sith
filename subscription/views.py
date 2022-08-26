@@ -68,9 +68,17 @@ class SubscriptionForm(forms.ModelForm):
         )
         self.fields["email"] = forms.EmailField()
         self.fields["date_of_birth"] = forms.DateTimeField(widget=SelectDate)
-        self.fields.move_to_end("subscription_type")
-        self.fields.move_to_end("payment_method")
-        self.fields.move_to_end("location")
+
+        self.field_order = [
+            "member",
+            "last_name",
+            "first_name",
+            "email",
+            "date_of_birth",
+            "subscription_type",
+            "payment_method",
+            "location",
+        ]
 
     def clean_member(self):
         subscriber = self.cleaned_data.get("member")
