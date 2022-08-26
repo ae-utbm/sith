@@ -76,6 +76,8 @@ class Subscription(models.Model):
     class Meta:
         ordering = ["subscription_start"]
 
+
+
     def clean(self):
         try:
             for s in (
@@ -96,6 +98,8 @@ class Subscription(models.Model):
             # calls the model validation :'(
             # TODO see SubscriptionForm's clean method
             raise ValidationError(_("Subscription error"))
+
+
 
     def save(self):
         super(Subscription, self).save()
