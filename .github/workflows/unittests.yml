@@ -12,36 +12,51 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # Skip unit testing if no diff on .py files
+      - name: Check file diff
+        uses: technote-space/get-diff-action@v6
+        id: git-diff
+        with:
+          PATTERNS: +**/*.+(py)
+
       - name: Set up python
+        if: steps.git-diff.outputs.diff
         uses: actions/setup-python@v4
         with:
           python-version: '3.8'
 
       - name: Install dependencies
+        if: steps.git-diff.outputs.diff
         run: |
           sudo apt-get update
           sudo apt-get install gettext libxapian-dev libgraphviz-dev
 
       - name: Install poetry
+        if: steps.git-diff.outputs.diff
         run: |
           python -m pip install --upgrade pip
           python -m pip install poetry
 
       - name: Checking pyproject.toml syntax
+        if: steps.git-diff.outputs.diff
         run: poetry check
 
       - name: Install project
+        if: steps.git-diff.outputs.diff
         run: poetry install -E testing
 
       - name: Setup xapian index
+        if: steps.git-diff.outputs.diff
         run: |
           mkdir -p /dev/shm/search_indexes
           ln -s /dev/shm/search_indexes sith/search_indexes
 
       - name: Setup project
+        if: steps.git-diff.outputs.diff
         run: poetry run ./manage.py compilemessages
       
       - name: Launch tests and generate coverage report
+        if: steps.git-diff.outputs.diff
         run: |
           poetry run coverage run ./manage.py test
           poetry run coverage report
