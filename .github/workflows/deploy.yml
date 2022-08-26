@@ -1,21 +1,46 @@
 name: Deploy to production
+concurrency: production
 
 on:
-  workflow_run:
-    workflows: [Unit Testing]
-    types: [completed]
-    branches:
-      - master
+  push:
+    branches: [master]
+  workflow_dispatch:
 
 jobs:
-  on-success:
+  deployment:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: production
+    timeout-minutes: 30
+  
     steps:
-      - run: echo 'The triggering workflow passed'
+    - name: SSH Remote Commands
+      uses: appleboy/ssh-action@dce9d565de8d876c11d93fa4fe677c0285a66d78
+      with:
+        # Proxy
+        proxy_host : ${{secrets.PROXY_HOST}}
+        proxy_port : ${{secrets.PROXY_PORT}}
+        proxy_username : ${{secrets.PROXY_USER}}
+        proxy_passphrase: ${{secrets.PROXY_PASSPHRASE}}
+        proxy_key: ${{secrets.PROXY_KEY}}
+        
+        # Serveur web
+        host: ${{secrets.HOST}}
+        port : ${{secrets.PORT}}
+        username : ${{secrets.USER}}
+        key: ${{secrets.KEY}}
 
-  on-failure:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-    steps:
-      - run: echo 'The triggering workflow failed'
+        # See https://github.com/ae-utbm/sith3/wiki/GitHub-Actions#deployment-action
+        script: |
+          BASE_DIR="$(dirname "$(realpath "$0")")"
+          export PATH="$HOME/.poetry/bin:$PATH"
+          pushd $BASE_DIR
+
+          VERSION_LAST=$(git rev-parse HEAD)
+          git pull
+          poetry update
+          poetry run ./manage.py migrate
+          echo "yes" | poetry run ./manage.py collectstatic
+          poetry run ./manage.py compilestatic
+          poetry run ./manage.py compilemessages
+
+          sudo systemctl restart uwsgi
