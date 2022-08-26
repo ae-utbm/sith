@@ -1,14 +1,16 @@
 name: Deploy to production
+concurrency: production
 
 on:
   push:
-    branches: [ actions ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
   deployment:
     runs-on: ubuntu-latest
     environment: production
+    timeout-minutes: 30
   
     steps:
     - name: SSH Remote Commands
@@ -27,6 +29,18 @@ jobs:
         username : ${{secrets.USER}}
         key: ${{secrets.KEY}}
 
+        # See https://github.com/ae-utbm/sith3/wiki/GitHub-Actions#deployment-action
         script: |
-          whoami
-          ls -al
+          BASE_DIR="$(dirname "$(realpath "$0")")"
+          export PATH="$HOME/.poetry/bin:$PATH"
+          pushd $BASE_DIR
+
+          VERSION_LAST=$(git rev-parse HEAD)
+          git pull
+          poetry update
+          poetry run ./manage.py migrate
+          echo "yes" | poetry run ./manage.py collectstatic
+          poetry run ./manage.py compilestatic
+          poetry run ./manage.py compilemessages
+
+          sudo systemctl restart uwsgi
