@@ -27,4 +27,6 @@ jobs:
         username : ${{secrets.USER}}
         key: ${{secrets.KEY}}
 
+        debug: true
+
         script: whoami
