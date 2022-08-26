@@ -104,7 +104,7 @@ Installer le projet
     sudo apt update
 
     # Les commandes git doivent se faire depuis le terminal de Windows si on utilise WSL !
-    git clone https://ae-dev.utbm.fr/ae/Sith.git
+    git clone https://github.com/ae-utbm/sith3.git
     cd Sith
 
     # Création de l'environnement et installation des dépendances

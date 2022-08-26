@@ -146,7 +146,7 @@ GitLab
 ~~~~~~
 
 | `Site officiel <https://about.gitlab.com/>`__
-| `Instance de l'AE <https://ae-dev.utbm.fr/>`__
+| `Instance de l'AE <https://github.com/ae-utbm/>`__
 
 GitLab est une alternative libre à GitHub. C'est une plate-forme avec interface web permettant de déposer du code géré avec Git offrant également de l'intégration continue et du déploiement automatique.
 
