@@ -19,7 +19,7 @@ jobs:
         uses: technote-space/get-diff-action@v6
         id: git-diff
         with:
-          PATTERNS: +**/*.+(py)
+          PATTERNS: /**/*.py
 
       - name: Set up python
         if: steps.git-diff.outputs.diff
