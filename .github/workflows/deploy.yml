@@ -12,7 +12,7 @@ jobs:
   
     steps:
     - name: SSH Remote Commands
-      uses: appleboy/ssh-action@v0.1.5
+      uses: appleboy/ssh-action@dce9d565de8d876c11d93fa4fe677c0285a66d78
       with:
         # Proxy
         proxy_host : ${{secrets.PROXY_HOST}}
