@@ -31,9 +31,8 @@ jobs:
 
         # See https://github.com/ae-utbm/sith3/wiki/GitHub-Actions#deployment-action
         script: |
-          BASE_DIR="$(dirname "$(realpath "$0")")"
           export PATH="$HOME/.poetry/bin:$PATH"
-          pushd $BASE_DIR
+          pushd ${{secrets.SITH_PATH}}
 
           VERSION_LAST=$(git rev-parse HEAD)
           git pull

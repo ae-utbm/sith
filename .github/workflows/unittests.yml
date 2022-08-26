@@ -1,8 +1,6 @@
 name: Unit Testing
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
     
@@ -65,5 +63,3 @@ jobs:
 
       - name: Check linting
         run: black --check .
-
-
