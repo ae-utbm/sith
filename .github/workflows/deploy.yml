@@ -17,14 +17,14 @@ jobs:
         # Proxy
         proxy_host : ${{secrets.PROXY_HOST}}
         proxy_port : ${{secrets.PROXY_PORT}}
-        proxy_username : ${{secrets.PROXY_USERNAME}}
+        proxy_username : ${{secrets.PROXY_USER}}
         proxy_passphrase: ${{secrets.PROXY_PASSPHRASE}}
         proxy_key: ${{secrets.PROXY_KEY}}
         
         # Serveur web
         host: ${{secrets.HOST}}
         port : ${{secrets.PORT}}
-        username : ${{secrets.USERNAME}}
+        username : ${{secrets.USER}}
         key: ${{secrets.KEY}}
 
         script: whoami
