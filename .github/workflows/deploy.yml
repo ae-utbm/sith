@@ -15,19 +15,18 @@ jobs:
       uses: appleboy/ssh-action@v0.1.5
       with:
         # Proxy
-        # proxy_host : ${{secrets.PROXY_HOST}}
-        # proxy_port : ${{secrets.PROXY_PORT}}
-        # proxy_username : ${{secrets.PROXY_USER}}
-        # proxy_passphrase: ${{secrets.PROXY_PASSPHRASE}}
-        # proxy_key: ${{secrets.PROXY_KEY}}
+        proxy_host : ${{secrets.PROXY_HOST}}
+        proxy_port : ${{secrets.PROXY_PORT}}
+        proxy_username : ${{secrets.PROXY_USER}}
+        proxy_passphrase: ${{secrets.PROXY_PASSPHRASE}}
+        proxy_key: ${{secrets.PROXY_KEY}}
         
         # Serveur web
-        host: ${{secrets.PROXY_HOST}}
-        port : ${{secrets.PROXY_PORT}}
-        username : ${{secrets.PROXY_USER}}
-        key: ${{secrets.PROXY_KEY}}
-        passphrase: ${{secrets.PROXY_PASSPHRASE}}
+        host: ${{secrets.HOST}}
+        port : ${{secrets.PORT}}
+        username : ${{secrets.USER}}
+        key: ${{secrets.KEY}}
 
-        debug: true
-
-        script: whoami
+        script: |
+          whoami
+          ls -al
