@@ -4,11 +4,16 @@ concurrency: production
 on:
   push:
     branches: [master]
+  workflow_run:
+    workflows: [Sith3 CI]
+    types: [completed]
   workflow_dispatch:
 
 jobs:
+  # Runs only if Unit tests are successful
   deployment:
     runs-on: ubuntu-latest
+    if: ${{github.event.workflow_run.conclusion == 'success'}}
     environment: production
     timeout-minutes: 30
   
@@ -28,6 +33,8 @@ jobs:
         port : ${{secrets.PORT}}
         username : ${{secrets.USER}}
         key: ${{secrets.KEY}}
+
+        script_stop: true
 
         # See https://github.com/ae-utbm/sith3/wiki/GitHub-Actions#deployment-action
         script: |
