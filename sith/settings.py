@@ -675,7 +675,11 @@ if "test" in sys.argv:
 
 if SENTRY_DSN:
     # Connection to sentry
-    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()])
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        environment="production",
+    )
 
 
 SITH_FRONT_DEP_VERSIONS = {
