@@ -106,7 +106,7 @@ if settings.DEBUG:
     NOTE : you need to specify the SENTRY_DSN setting in settings_custom.py
     """
 
-    def trigger_error(request):
+    def raise_exception(request):
         division_by_zero = 1 / 0
 
-    urlpatterns += [path("sentry-debug/", trigger_error)]
+    urlpatterns += [path("sentry-debug/", raise_exception)]
