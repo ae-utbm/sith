@@ -52,13 +52,6 @@ handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
 
-# Sentry Test case
-if settings.DEBUG:
-
-    def trigger_error(request):
-        division_by_zero = 1 / 0
-
-
 urlpatterns = [
     path("", include(("core.urls", "core"), namespace="core")),
     path("rootplace/", include(("rootplace.urls", "rootplace"), namespace="rootplace")),
@@ -101,5 +94,19 @@ if settings.DEBUG:
 
     urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
 
-    # Sentry test case
+    """Sentry debug endpoint
+    
+    This function always crash and allows us to test
+    the sentry configuration and the modal popup 
+    displayed to users on production
+    
+    The error will be displayed on Sentry
+    inside the "development" environment
+    
+    NOTE : you need to specify the SENTRY_DSN setting in settings_custom.py
+    """
+
+    def trigger_error(request):
+        division_by_zero = 1 / 0
+
     urlpatterns += [path("sentry-debug/", trigger_error)]
