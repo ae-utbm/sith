@@ -52,6 +52,11 @@ handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
 
+# Sentry Test case
+if settings.DEBUG:
+    def trigger_error(request):
+        division_by_zero = 1 / 0
+
 urlpatterns = [
     path("", include(("core.urls", "core"), namespace="core")),
     path("rootplace/", include(("rootplace.urls", "rootplace"), namespace="rootplace")),
@@ -86,9 +91,14 @@ urlpatterns = [
     path("captcha/", include("captcha.urls")),
 ]
 
+
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     import debug_toolbar
 
     urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
+    
+    # Sentry test case
+    urlpatterns += [path("sentry-debug/", trigger_error)]
