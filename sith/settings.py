@@ -643,6 +643,7 @@ SITH_MAILING_FETCH_KEY = "IloveMails"
 SITH_GIFT_LIST = [("AE Tee-shirt", _("AE tee-shirt"))]
 
 SENTRY_DSN = ""
+SENTRY_ENV = "production"
 
 try:
     from .settings_custom import *
@@ -678,7 +679,7 @@ if SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
-        environment="production",
+        environment=SENTRY_ENV,
     )
 
 
