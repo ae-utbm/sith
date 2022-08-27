@@ -643,6 +643,7 @@ SITH_MAILING_FETCH_KEY = "IloveMails"
 SITH_GIFT_LIST = [("AE Tee-shirt", _("AE tee-shirt"))]
 
 SENTRY_DSN = ""
+SENTRY_ENV = "production"
 
 try:
     from .settings_custom import *
@@ -669,13 +670,18 @@ if DEBUG:
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
     SASS_INCLUDE_FOLDERS = ["core/static/"]
+    SENTRY_ENV = "development"
 
 if "test" in sys.argv:
     CAPTCHA_TEST_MODE = True
 
 if SENTRY_DSN:
     # Connection to sentry
-    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()])
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        environment=SENTRY_ENV,
+    )
 
 
 SITH_FRONT_DEP_VERSIONS = {

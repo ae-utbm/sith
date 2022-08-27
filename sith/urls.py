@@ -86,9 +86,27 @@ urlpatterns = [
     path("captcha/", include("captcha.urls")),
 ]
 
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     import debug_toolbar
 
     urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
+
+    """Sentry debug endpoint
+    
+    This function always crash and allows us to test
+    the sentry configuration and the modal popup 
+    displayed to users on production
+    
+    The error will be displayed on Sentry
+    inside the "development" environment
+    
+    NOTE : you need to specify the SENTRY_DSN setting in settings_custom.py
+    """
+
+    def raise_exception(request):
+        division_by_zero = 1 / 0
+
+    urlpatterns += [path("sentry-debug/", raise_exception)]

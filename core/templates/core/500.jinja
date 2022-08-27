@@ -1,7 +1,11 @@
 {% extends "core/base.jinja" %}
 {% block head %}
 {{ super() }}
-	<script src="{{ static('core/js/sentry/bundle.min.js') }}" crossorigin="anonymous"></script>
+	<script
+	src="https://browser.sentry-cdn.com/7.11.1/bundle.min.js"
+	integrity="sha384-qcYSo5+/E8hEkPmHFa79GRDsGT84SRhBJHRw3+dbQyh0UwueiFP1jCsRBClEREcs"
+	crossorigin="anonymous"
+	></script>
 {% endblock head %}
 
 {% block content %}
@@ -9,7 +13,15 @@
 	{% if settings.SENTRY_DSN %}
 	<script>
 		Sentry.init({ dsn: '{{ settings.SENTRY_DSN }}' });
-		Sentry.showReportDialog({ eventId: '{{ request.sentry_last_event_id() }}' })
+		Sentry.showReportDialog({ 
+			eventId: '{{ request.sentry_last_event_id() }}',
+			{% if user.is_authenticated %}
+			user: {
+				'name': '{{user.first_name}} {{user.last_name}}',
+				'email': '{{user.email}}'
+			}
+			{% endif %}
+		})
 	</script>
 {% endif %}
 {% endblock content %}
