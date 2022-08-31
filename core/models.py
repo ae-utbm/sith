@@ -416,10 +416,11 @@ class User(AbstractBaseUser):
 
     @cached_property
     def can_read_subscription_history(self):
-        if(not (self.is_root or self.is_board_member)):
+        if not (self.is_root or self.is_board_member):
             return False
-        
+
         from club.models import Club
+
         for club in Club.objects.filter(
             id__in=settings.SITH_CAN_READ_SUBSCRIPTION_HISTORY
         ).all():
