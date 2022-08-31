@@ -415,13 +415,13 @@ class User(AbstractBaseUser):
         )
 
     @cached_property
-    def can_read_subscription(self):
+    def can_read_subscription_history(self):
         from club.models import Club
 
         for club in Club.objects.filter(
-            id__in=settings.SITH_CAN_READ_SUBSCRIPTIONS
+            id__in=settings.SITH_CAN_READ_SUBSCRIPTION_HISTORY
         ).all():
-            if club.has_rights_in_club(self):
+            if club.has_rights_in_club(self) and self.is_root and self.is_board_member:
                 return True
         return False
 
@@ -703,7 +703,7 @@ class AnonymousUser(AuthAnonymousUser):
         return False
 
     @property
-    def can_read_subscription(self):
+    def can_read_subscription_history(self):
         return False
 
     @property

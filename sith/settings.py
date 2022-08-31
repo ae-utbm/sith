@@ -472,9 +472,11 @@ SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER = 1
 SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS = 2
 SITH_PRODUCTTYPE_SUBSCRIPTION = 2
 
+# Defines which club lets its member the ability to make subscriptions
 SITH_CAN_CREATE_SUBSCRIPTIONS = [1]
 
-SITH_CAN_READ_SUBSCRIPTIONS = [85]
+# Defines which club lets its members the ability to see users subscription history
+SITH_CAN_READ_SUBSCRIPTION_HISTORY = []
 
 # Number of weeks before the end of a subscription when the subscriber can resubscribe
 SITH_SUBSCRIPTION_END = 10
