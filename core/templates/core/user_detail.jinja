@@ -145,7 +145,7 @@
         {% endif %}
         </div>
     {% endif %}
-    {% if profile.was_subscribed and (user == profile or user.is_root or user.is_board_member or user.can_read_subscription)%}
+    {% if profile.was_subscribed and (user == profile or user.can_read_subscription_history)%}
         <div id="drop_subscriptions">
             <h5>{% trans %}Subscription history{% endtrans %}</h5>
             <table>
