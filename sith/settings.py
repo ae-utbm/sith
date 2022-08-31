@@ -474,6 +474,8 @@ SITH_PRODUCTTYPE_SUBSCRIPTION = 2
 
 SITH_CAN_CREATE_SUBSCRIPTIONS = [1]
 
+SITH_CAN_READ_SUBSCRIPTIONS = [85]
+
 # Number of weeks before the end of a subscription when the subscriber can resubscribe
 SITH_SUBSCRIPTION_END = 10
 
