@@ -228,7 +228,7 @@ class Weekmail(models.Model):
         Return an absolute link to the banner.
         """
         return (
-            "http://" + settings.SITH_URL + static("com/img/weekmail_bannerV2P22.png")
+            "http://" + settings.SITH_URL + static("com/img/invitation_bannerP22.png")
         )
 
     def get_footer(self):
