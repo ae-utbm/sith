@@ -4,13 +4,15 @@
 <h3>{% trans %}Eboutic{% endtrans %}</h3>
 
 <div>
-    {% if not_enough %}
-    {% trans %}Payment failed{% endtrans %}
-    {% else %}
+    {% if success %}
     {% trans %}Payment successful{% endtrans %}
+    {% else %}
+    {% trans %}Payment failed{% endtrans %}
     {% endif %}
     <p><a href="{{ url('eboutic:main') }}">{% trans %}Return to eboutic{% endtrans %}</a></p>
 </div>
+
+
 
 {% endblock %}
 

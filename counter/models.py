@@ -31,7 +31,6 @@ from django.urls import reverse
 from django.core.validators import MinLengthValidator
 from django.forms import ValidationError
 from django.utils.functional import cached_property
-from django.core.exceptions import PermissionDenied
 
 from datetime import timedelta, date
 import random
@@ -73,7 +72,16 @@ class Customer(models.Model):
         return self.recorded_products - number >= -settings.SITH_ECOCUP_LIMIT
 
     @property
-    def can_buy(self):
+    def can_buy(self) -> bool:
+        """
+        Check if whether this customer has the right to
+        purchase any item.
+        This must be not confused with the Product.can_be_sold_to(user)
+        method as the present method returns an information
+        about a customer whereas the other tells something
+        about the relation between a User (not a Customer,
+        don't mix them) and a Product.
+        """
         return self.user.subscriptions.last() and (
             date.today()
             - self.user.subscriptions.order_by("subscription_end")
@@ -81,6 +89,7 @@ class Customer(models.Model):
             .subscription_end
         ) < timedelta(days=90)
 
+    @staticmethod
     def generate_account_id(number):
         number = str(number)
         letter = random.choice(string.ascii_lowercase)
@@ -203,11 +212,31 @@ class Product(models.Model):
             return True
         return False
 
-    def __str__(self):
-        return "%s (%s)" % (self.name, self.code)
-
     def get_absolute_url(self):
         return reverse("counter:product_list")
+
+    def can_be_sold_to(self, user: User) -> bool:
+        """
+        Check if whether the user given in parameter has the right to buy
+        this product or not.
+
+        This must be not confused with the Customer.can_buy()
+        method as the present method returns an information
+        about the relation between a User and a Product,
+        whereas the other tells something about a Customer
+        (and not a user, they are not the same model).
+
+        :return: True if the user can buy this product else False
+        """
+        if not self.buying_groups.exists():
+            return True
+        for group in self.buying_groups.all():
+            if user.is_in_group(group.name):
+                return True
+        return False
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.code)
 
 
 class Counter(models.Model):

@@ -21,15 +21,29 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import typing
+from typing import List
 
-from django.db import models, DataError
-from django.utils.translation import gettext_lazy as _
-from django.utils.functional import cached_property
 from django.conf import settings
+from django.db import models, DataError
+from django.db.models import Sum, F
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 
 from accounting.models import CurrencyField
+from core.models import Group, User
 from counter.models import Counter, Product, Selling, Refilling
-from core.models import User
+
+
+def get_eboutic_products(user: User) -> List[Product]:
+    products = (
+        Counter.objects.get(type="EBOUTIC")
+        .products.filter(product_type__isnull=False)
+        .filter(archived=False)
+        .filter(limit_age__lte=user.age)
+        .annotate(category=F("product_type__name"))
+    )
+    return [p for p in products if p.can_be_sold_to(user)]
 
 
 class Basket(models.Model):
@@ -46,7 +60,13 @@ class Basket(models.Model):
     )
     date = models.DateTimeField(_("date"), auto_now=True)
 
-    def add_product(self, p, q=1):
+    def add_product(self, p: Product, q: int = 1):
+        """
+        Given p an object of the Product model and q an integer,
+        add q items corresponding to this Product from the basket.
+
+        If this function is called with a product not in the basket, no error will be raised
+        """
         item = self.items.filter(product_id=p.id).first()
         if item is None:
             BasketItem(
@@ -61,25 +81,52 @@ class Basket(models.Model):
             item.quantity += q
             item.save()
 
-    def del_product(self, p, q=1):
-        item = self.items.filter(product_id=p.id).first()
-        if item is not None:
-            item.quantity -= q
-            item.save()
+    def del_product(self, p: Product, q: int = 1):
+        """
+        Given p an object of the Product model and q an integer,
+        remove q items corresponding to this Product from the basket.
+
+        If this function is called with a product not in the basket, no error will be raised
+        """
+        try:
+            item = self.items.get(product_id=p.id)
+        except BasketItem.DoesNotExist:
+            return
+        item.quantity -= q
+        item.save()
         if item.quantity <= 0:
             item.delete()
 
+    def clear(self) -> None:
+        """
+        Remove all items from this basket without deleting the basket
+        """
+        BasketItem.objects.filter(basket=self).delete()
+
     @cached_property
-    def contains_refilling_item(self):
+    def contains_refilling_item(self) -> bool:
         return self.items.filter(
             type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
         ).exists()
 
-    def get_total(self):
-        total = 0
-        for i in self.items.all():
-            total += i.quantity * i.product_unit_price
-        return total
+    def get_total(self) -> float:
+        total = self.items.aggregate(
+            total=Sum(F("quantity") * F("product_unit_price"))
+        )["total"]
+        return float(total) if total is not None else 0
+
+    @classmethod
+    def from_session(cls, session) -> typing.Union["Basket", None]:
+        """
+        Given an HttpRequest django object, return the basket used in the current session
+        if it exists else create a new one and return it
+        """
+        if "basket_id" in session:
+            try:
+                return cls.objects.get(id=session["basket_id"])
+            except cls.DoesNotExist:
+                return None
+        return None
 
     def __str__(self):
         return "%s's basket (%d items)" % (self.user, self.items.all().count())
@@ -100,14 +147,11 @@ class Invoice(models.Model):
     date = models.DateTimeField(_("date"), auto_now=True)
     validated = models.BooleanField(_("validated"), default=False)
 
-    def __str__(self):
-        return "%s - %s - %s" % (self.user, self.get_total(), self.date)
-
-    def get_total(self):
-        total = 0
-        for i in self.items.all():
-            total += i.quantity * i.product_unit_price
-        return total
+    def get_total(self) -> float:
+        total = self.items.aggregate(
+            total=Sum(F("quantity") * F("product_unit_price"))
+        )["total"]
+        return float(total) if total is not None else 0
 
     def validate(self, *args, **kwargs):
         if self.validated:
@@ -153,13 +197,16 @@ class Invoice(models.Model):
         self.validated = True
         self.save()
 
+    def __str__(self):
+        return "%s - %s - %s" % (self.user, self.get_total(), self.date)
+
 
 class AbstractBaseItem(models.Model):
     product_id = models.IntegerField(_("product id"))
     product_name = models.CharField(_("product name"), max_length=255)
     type_id = models.IntegerField(_("product type id"))
     product_unit_price = CurrencyField(_("unit price"))
-    quantity = models.IntegerField(_("quantity"))
+    quantity = models.PositiveIntegerField(_("quantity"))
 
     class Meta:
         abstract = True

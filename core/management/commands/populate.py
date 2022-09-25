@@ -505,6 +505,8 @@ Welcome to the wiki page!
             refound.save()
 
             # Counters
+            subscribers = Group.objects.get(name="Subscribers")
+            old_subscribers = Group.objects.get(name="Old subscribers")
             Customer(user=skia, account_id="6568j", amount=0).save()
             Customer(user=r, account_id="4000k", amount=0).save()
             p = ProductType(name="Bières bouteilles")
@@ -525,6 +527,9 @@ Welcome to the wiki page!
                 club=main_club,
             )
             cotis.save()
+            cotis.buying_groups.add(subscribers)
+            cotis.buying_groups.add(old_subscribers)
+            cotis.save()
             cotis2 = Product(
                 name="Cotis 2 semestres",
                 code="2SCOTIZ",
@@ -534,6 +539,9 @@ Welcome to the wiki page!
                 special_selling_price="28",
                 club=main_club,
             )
+            cotis2.save()
+            cotis2.buying_groups.add(subscribers)
+            cotis2.buying_groups.add(old_subscribers)
             cotis2.save()
             refill = Product(
                 name="Rechargement 15 €",
@@ -545,6 +553,8 @@ Welcome to the wiki page!
                 club=main_club,
             )
             refill.save()
+            refill.buying_groups.add(subscribers)
+            refill.save()
             barb = Product(
                 name="Barbar",
                 code="BARB",
@@ -553,7 +563,10 @@ Welcome to the wiki page!
                 selling_price="1.7",
                 special_selling_price="1.6",
                 club=main_club,
+                limit_age=18,
             )
+            barb.save()
+            barb.buying_groups.add(subscribers)
             barb.save()
             cble = Product(
                 name="Chimay Bleue",
@@ -563,7 +576,10 @@ Welcome to the wiki page!
                 selling_price="1.7",
                 special_selling_price="1.6",
                 club=main_club,
+                limit_age=18,
             )
+            cble.save()
+            cble.buying_groups.add(subscribers)
             cble.save()
             cons = Product(
                 name="Consigne Eco-cup",
@@ -574,7 +590,6 @@ Welcome to the wiki page!
                 special_selling_price="1",
                 club=main_club,
             )
-            cons.id = 1152
             cons.save()
             dcons = Product(
                 name="Déconsigne Eco-cup",
@@ -585,9 +600,8 @@ Welcome to the wiki page!
                 special_selling_price="-1",
                 club=main_club,
             )
-            dcons.id = 1151
             dcons.save()
-            Product(
+            cors = Product(
                 name="Corsendonk",
                 code="CORS",
                 product_type=p,
@@ -595,8 +609,12 @@ Welcome to the wiki page!
                 selling_price="1.7",
                 special_selling_price="1.6",
                 club=main_club,
-            ).save()
-            Product(
+                limit_age=18,
+            )
+            cors.save()
+            cors.buying_groups.add(subscribers)
+            cors.save()
+            carolus = Product(
                 name="Carolus",
                 code="CARO",
                 product_type=p,
@@ -604,7 +622,11 @@ Welcome to the wiki page!
                 selling_price="1.7",
                 special_selling_price="1.6",
                 club=main_club,
-            ).save()
+                limit_age=18,
+            )
+            carolus.save()
+            carolus.buying_groups.add(subscribers)
+            carolus.save()
             mde = Counter.objects.filter(name="MDE").first()
             mde.products.add(barb)
             mde.products.add(cble)
