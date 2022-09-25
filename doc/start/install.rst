@@ -23,7 +23,7 @@ Sur Ubuntu
 .. sourcecode:: bash
 
     sudo apt install libssl-dev libjpeg-dev zlib1g-dev python-dev libffi-dev python-dev libgraphviz-dev pkg-config libxapian-dev gettext git
-    curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+    curl -sSL https://install.python-poetry.org | python -
 
     # To include mysql for importing old bdd
     sudo apt install libmysqlclient-dev
