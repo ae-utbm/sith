@@ -25,6 +25,8 @@ $black-color: hsl(0, 0%, 17%);
 
 $faceblue: hsl(221, 44%, 41%);
 $twitblue: hsl(206, 82%, 63%);
+$pinktober: hsl(313, 88%, 76%);
+$pinktober-border: hsl(318, 83%, 63%);
 
 $shadow-color: rgb(223, 223, 223);
 
@@ -158,13 +160,16 @@ header {
   display: flex;
   box-shadow: $shadow-color 0px 0px 15px;
   border-top: none;
-  background-color: $primary-neutral-dark-color;
+  background-color: $pinktober;
   border-radius: 0px 0px 10px 10px;
+  border-bottom: 5px solid $pinktober-border;
 
   #header_logo {
     background-color: $white-color;
     padding: 0.2em;
+    border-bottom: 5px solid $shadow-color;
     border-radius: 0px 0px 0px 9px;
+    margin-bottom: -5px;
 
     a {
       display: inline-block;
@@ -201,6 +206,7 @@ header {
     display: flex;
     flex: auto;
     flex-wrap: wrap;
+    align-items: center;
     width: 80%;
 
     a {
