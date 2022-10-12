@@ -39,13 +39,12 @@
             </form>
             {% endfor %}
         </div>
-
-            {% if not user.is_authenticated %}
             <div id="header_logo">
                 <a href="{{ url('core:index') }}">
-                    <img src="{{ static('core/img/logo.png') }}" alt="AE logo">
+                    <img src="{{ static('core/img/ae-pinktober.png') }}" alt="AE logo">
                 </a>
             </div>
+            {% if not user.is_authenticated %}
             <div id="header_connect_links">
                 <form method="post" action="{{ url('core:login') }}">
                 {% csrf_token %}
@@ -58,11 +57,6 @@
                 <a href="{{ url('core:register') }}"><button type="button">{% trans %}Register{% endtrans %}</button></a>
             </div>
             {% else %}
-            <div id="header_logo">
-                <a href="{{ url('core:index') }}">
-                    <img src="{{ static('core/img/ae-pinktober.png') }}" alt="AE logo">
-                </a>
-            </div>
             <div id="header_bar">
                 <ul id="header_bars_infos">
                 {% cache 100 "counters_activity" %}
