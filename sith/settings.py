@@ -35,13 +35,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
+import binascii
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
-import binascii
+
 import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 from django.utils.translation import gettext_lazy as _
+from sentry_sdk.integrations.django import DjangoIntegration
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -58,7 +60,6 @@ DEBUG = False
 INTERNAL_IPS = ["127.0.0.1"]
 
 ALLOWED_HOSTS = ["*"]
-
 
 # Application definition
 
@@ -199,7 +200,6 @@ WSGI_APPLICATION = "sith.wsgi.application"
 
 REST_FRAMEWORK = {}
 
-
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
@@ -209,7 +209,6 @@ DATABASES = {
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -264,17 +263,6 @@ EMAIL_PORT = 25
 
 # Below this line, only Sith-specific variables are defined
 
-IS_OLD_MYSQL_PRESENT = False
-OLD_MYSQL_INFOS = {
-    "host": "ae-db",
-    "user": "my_user",
-    "passwd": "password",
-    "db": "ae2-db",
-    "charset": "utf8",
-    "use_unicode": True,
-}
-
-
 SITH_URL = "my.url.git.an"
 SITH_NAME = "Sith website"
 SITH_TWITTER = "@ae_utbm"
@@ -325,7 +313,6 @@ SITH_GROUP_BANNED_SUBSCRIPTION_ID = 10
 SITH_GROUP_SAS_ADMIN_ID = 11
 SITH_GROUP_FORUM_ADMIN_ID = 12
 SITH_GROUP_PEDAGOGY_ADMIN_ID = 13
-
 
 SITH_CLUB_REFOUND_ID = 89
 SITH_COUNTER_REFOUND_ID = 38
