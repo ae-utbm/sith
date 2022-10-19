@@ -119,58 +119,6 @@ class Subscription(models.Model):
                     from_email="ae@utbm.fr",
                 )
         self.member.make_home()
-        if settings.IS_OLD_MYSQL_PRESENT:
-            import MySQLdb
-
-            try:  # Create subscription on the old site: TODO remove me!
-                LOCATION = {"SEVENANS": 5, "BELFORT": 6, "MONTBELIARD": 9, "EBOUTIC": 5}
-                TYPE = {
-                    "un-semestre": 0,
-                    "deux-semestres": 1,
-                    "cursus-tronc-commun": 2,
-                    "cursus-branche": 3,
-                    "membre-honoraire": 4,
-                    "assidu": 5,
-                    "amicale/doceo": 6,
-                    "reseau-ut": 7,
-                    "crous": 8,
-                    "sbarro/esta": 9,
-                    "cursus-alternant": 10,
-                    "welcome-semestre": 11,
-                    "deux-mois-essai": 12,
-                }
-                PAYMENT = {
-                    "CHECK": 1,
-                    "CARD": 2,
-                    "CASH": 3,
-                    "OTHER": 4,
-                    "EBOUTIC": 5,
-                    "OTHER": 0,
-                }
-
-                db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
-                c = db.cursor()
-                c.execute(
-                    """INSERT INTO ae_cotisations (id_utilisateur, date_cotis, date_fin_cotis, mode_paiement_cotis,
-                type_cotis, id_comptoir) VALUES (%s, %s, %s, %s, %s, %s)""",
-                    (
-                        self.member.id,
-                        self.subscription_start,
-                        self.subscription_end,
-                        PAYMENT[self.payment_method],
-                        TYPE[self.subscription_type],
-                        LOCATION[self.location],
-                    ),
-                )
-                db.commit()
-            except Exception as e:
-                with open(settings.BASE_DIR + "/subscription_fail.log", "a") as f:
-                    print(
-                        "FAIL to add subscription to %s to old site" % (self.member),
-                        file=f,
-                    )
-                    print("Reason: %s" % (repr(e)), file=f)
-                db.rollback()
 
     def get_absolute_url(self):
         return reverse("core:user_edit", kwargs={"user_id": self.member.pk})

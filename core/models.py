@@ -469,36 +469,6 @@ class User(AbstractBaseUser):
             else:
                 create = True
             super(User, self).save(*args, **kwargs)
-            if (
-                create and settings.IS_OLD_MYSQL_PRESENT
-            ):  # Create user on the old site: TODO remove me!
-                import MySQLdb
-
-                try:
-                    db = MySQLdb.connect(**settings.OLD_MYSQL_INFOS)
-                    c = db.cursor()
-                    c.execute(
-                        """INSERT INTO utilisateurs (id_utilisateur, nom_utl, prenom_utl, email_utl, hash_utl, ae_utl) VALUES
-                    (%s, %s, %s, %s, %s, %s)""",
-                        (
-                            self.id,
-                            self.last_name,
-                            self.first_name,
-                            self.email,
-                            "valid",
-                            "0",
-                        ),
-                    )
-                    db.commit()
-                except Exception as e:
-                    with open(settings.BASE_DIR + "/user_fail.log", "a") as f:
-                        print(
-                            "FAIL to add user %s (%s %s - %s) to old site"
-                            % (self.id, self.first_name, self.last_name, self.email),
-                            file=f,
-                        )
-                        print("Reason: %s" % (repr(e)), file=f)
-                    db.rollback()
 
     def make_home(self):
         if self.home is None:
