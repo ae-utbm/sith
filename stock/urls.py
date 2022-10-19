@@ -23,67 +23,65 @@
 #
 #
 
-from django.urls import include, re_path
+from django.urls import include, path
 
 from stock.views import *
 
 urlpatterns = [
     # Stock re_paths
-    re_path(
-        r"^new/counter/(?P<counter_id>[0-9]+)$", StockCreateView.as_view(), name="new"
-    ),
-    re_path(r"^edit/(?P<stock_id>[0-9]+)$", StockEditView.as_view(), name="edit"),
-    re_path(r"^list$", StockListView.as_view(), name="list"),
+    path("new/counter/<int:counter_id>/", StockCreateView.as_view(), name="new"),
+    path("edit/<int:stock_id>/", StockEditView.as_view(), name="edit"),
+    path("list/", StockListView.as_view(), name="list"),
     # StockItem re_paths
-    re_path(r"^(?P<stock_id>[0-9]+)$", StockItemList.as_view(), name="items_list"),
-    re_path(
-        r"^(?P<stock_id>[0-9]+)/stock_item/new_item$",
+    path("<int:stock_id>/", StockItemList.as_view(), name="items_list"),
+    path(
+        "<int:stock_id>/stock_item/new_item/",
         StockItemCreateView.as_view(),
         name="new_item",
     ),
-    re_path(
-        r"^stock_item/(?P<item_id>[0-9]+)/edit$",
+    path(
+        "stock_item/(?P<item_id>[0-9]+)/edit/",
         StockItemEditView.as_view(),
         name="edit_item",
     ),
-    re_path(
-        r"^(?P<stock_id>[0-9]+)/stock_item/take_items$",
+    path(
+        "<int:stock_id>/stock_item/take_items/",
         StockTakeItemsBaseFormView.as_view(),
         name="take_items",
     ),
     # ShoppingList re_paths
-    re_path(
-        r"^(?P<stock_id>[0-9]+)/shopping_list/list$",
+    path(
+        "<int:stock_id>/shopping_list/list/",
         StockShoppingListView.as_view(),
         name="shoppinglist_list",
     ),
-    re_path(
-        r"^(?P<stock_id>[0-9]+)/shopping_list/create$",
+    path(
+        "<int:stock_id>/shopping_list/create/",
         StockItemQuantityBaseFormView.as_view(),
         name="shoppinglist_create",
     ),
-    re_path(
-        r"^(?P<stock_id>[0-9]+)/shopping_list/(?P<shoppinglist_id>[0-9]+)/items$",
+    path(
+        "<int:stock_id>/shopping_list/<int:shoppinglist_id>/items/",
         StockShoppingListItemListView.as_view(),
         name="shoppinglist_items",
     ),
-    re_path(
-        r"^(?P<stock_id>[0-9]+)/shopping_list/(?P<shoppinglist_id>[0-9]+)/delete$",
+    path(
+        "<int:stock_id>/shopping_list/<int:shoppinglist_id>/delete/",
         StockShoppingListDeleteView.as_view(),
         name="shoppinglist_delete",
     ),
-    re_path(
-        r"^(?P<stock_id>[0-9]+)/shopping_list/(?P<shoppinglist_id>[0-9]+)/set_done$",
+    path(
+        "<int:stock_id>/shopping_list/<int:shoppinglist_id>/set_done/",
         StockShopppingListSetDone.as_view(),
         name="shoppinglist_set_done",
     ),
-    re_path(
-        r"^(?P<stock_id>[0-9]+)/shopping_list/(?P<shoppinglist_id>[0-9]+)/set_todo$",
+    path(
+        "<int:stock_id>/shopping_list/<int:shoppinglist_id>/set_todo/",
         StockShopppingListSetTodo.as_view(),
         name="shoppinglist_set_todo",
     ),
-    re_path(
-        r"^(?P<stock_id>[0-9]+)/shopping_list/(?P<shoppinglist_id>[0-9]+)/update_stock$",
+    path(
+        "<int:stock_id>/shopping_list/<int:shoppinglist_id>/update_stock/",
         StockUpdateAfterShopppingBaseFormView.as_view(),
         name="update_after_shopping",
     ),

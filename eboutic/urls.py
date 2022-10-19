@@ -22,17 +22,17 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path
 
 from eboutic.views import *
 
 urlpatterns = [
     # Subscription views
-    re_path(r"^$", EbouticMain.as_view(), name="main"),
-    re_path(r"^command$", EbouticCommand.as_view(), name="command"),
-    re_path(r"^pay$", EbouticPayWithSith.as_view(), name="pay_with_sith"),
-    re_path(
-        r"^et_autoanswer$",
+    path("", EbouticMain.as_view(), name="main"),
+    path("command/", EbouticCommand.as_view(), name="command"),
+    path("pay/", EbouticPayWithSith.as_view(), name="pay_with_sith"),
+    path(
+        "et_autoanswer/",
         EtransactionAutoAnswer.as_view(),
         name="etransation_autoanswer",
     ),

@@ -338,7 +338,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
         return kwargs
 
 
-def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
+def delete_user_godfather(request, user_id, godfather_id, is_father):
     user = User.objects.get(id=user_id)
     if (user == request.user) or request.user.is_root or request.user.is_board_member:
         ud = get_object_or_404(User, id=godfather_id)
