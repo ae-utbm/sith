@@ -2,9 +2,9 @@ name: Sith3 CI
 
 on:
   pull_request:
-    branches: [ master, taiste ]
+    branches: [ master ]
   push:
-    branches: [ master, taiste ]
+    branches: [ master ]
     
 jobs:
   unittests:
