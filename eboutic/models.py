@@ -93,9 +93,10 @@ class Basket(models.Model):
         except BasketItem.DoesNotExist:
             return
         item.quantity -= q
-        item.save()
         if item.quantity <= 0:
             item.delete()
+        else:
+            item.save()
 
     def clear(self) -> None:
         """
