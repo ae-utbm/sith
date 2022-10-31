@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
-# - Skia <skia@libskia.so>
+# Copyright 2022
+# - Maréchal <thgirod@hotmail.com
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -19,13 +19,21 @@
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
-#
-#
 
-from django.contrib import admin
 
-from eboutic.models import *
+class PaymentResultConverter:
+    """
+    Converter used for url mapping of the ``eboutic.views.payment_result``
+    view.
+    It's meant to build an url that can match
+    either ``/eboutic/pay/success/`` or ``/eboutic/pay/failure/``
+    but nothing else.
+    """
 
-admin.site.register(Basket)
-admin.site.register(Invoice)
-admin.site.register(BasketItem)
+    regex = "(success|failure)"
+
+    def to_python(self, value):
+        return str(value)
+
+    def to_url(self, value):
+        return str(value)

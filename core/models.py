@@ -325,6 +325,13 @@ class User(AbstractBaseUser):
         )
         return s.exists()
 
+    @cached_property
+    def account_balance(self):
+        if hasattr(self, "customer"):
+            return self.customer.amount
+        else:
+            return 0
+
     _club_memberships = {}
     _group_names = {}
     _group_ids = {}
@@ -458,6 +465,20 @@ class User(AbstractBaseUser):
     @cached_property
     def is_banned_counter(self):
         return self.is_in_group(settings.SITH_GROUP_BANNED_COUNTER_ID)
+
+    @cached_property
+    def age(self) -> int:
+        """
+        Return the age this user has the day the method is called.
+        """
+        today = timezone.now()
+        age = today.year - self.date_of_birth.year
+        # remove a year if this year's birthday is yet to come
+        age -= (today.month, today.day) < (
+            self.date_of_birth.month,
+            self.date_of_birth.day,
+        )
+        return age
 
     def save(self, *args, **kwargs):
         create = False

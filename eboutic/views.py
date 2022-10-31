@@ -22,134 +22,99 @@
 #
 #
 
+import base64
+import hmac
+import json
 from collections import OrderedDict
 from datetime import datetime
-import hmac
-import base64
+import sentry_sdk
+
+
 from OpenSSL import crypto
-
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView, View
-from django.http import HttpResponse, HttpResponseRedirect
-from django.core.exceptions import SuspiciousOperation
-from django.db import transaction, DataError
-from django.utils.translation import gettext as _
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import SuspiciousOperation
+from django.db import transaction, DatabaseError
+from django.http import HttpResponse, HttpRequest
+from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_GET, require_POST
+from django.views.generic import TemplateView, View
 
-from counter.models import Customer, Counter, ProductType, Selling
-from eboutic.models import Basket, Invoice, InvoiceItem
+from counter.models import Customer, Counter, Selling
+from eboutic.forms import BasketForm
+from eboutic.models import Basket, Invoice, InvoiceItem, get_eboutic_products
 
 
-class EbouticMain(TemplateView):
-    template_name = "eboutic/eboutic_main.jinja"
+@login_required
+@require_GET
+def eboutic_main(request: HttpRequest) -> HttpResponse:
+    """
+    Main view of the eboutic application.
+    Return an Http response whose content is of type text/html.
+    The latter represents the page from which a user can see
+    the catalogue of products that he can buy and fill
+    his shopping cart.
 
-    def make_basket(self, request):
-        if "basket_id" not in request.session.keys():  # Init the basket session entry
-            self.basket = Basket(user=request.user)
-            self.basket.save()
-        else:
-            self.basket = Basket.objects.filter(id=request.session["basket_id"]).first()
-            if self.basket is None:
-                self.basket = Basket(user=request.user)
-                self.basket.save()
-        request.session["basket_id"] = self.basket.id
-        request.session.modified = True
+    The purchasable products are those of the eboutic which
+    belong to a category of products of a product category
+    (orphan products are inaccessible).
 
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(
-                reverse_lazy("core:login", args=self.args, kwargs=kwargs)
-                + "?next="
-                + request.path
-            )
-        self.object = Counter.objects.filter(type="EBOUTIC").first()
-        self.make_basket(request)
-        return super(EbouticMain, self).get(request, *args, **kwargs)
+    If the session contains a key-value pair that associates "errors"
+    with a list of strings, this pair is removed from the session
+    and its value displayed to the user when the page is rendered.
+    """
+    errors = request.session.pop("errors", None)
+    products = get_eboutic_products(request.user)
+    context = {
+        "errors": errors,
+        "products": products,
+        "customer_amount": request.user.account_balance,
+    }
+    return render(request, "eboutic/eboutic_main.jinja", context)
 
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(
-                reverse_lazy("core:login", args=self.args, kwargs=kwargs)
-                + "?next="
-                + request.path
-            )
-        self.object = Counter.objects.filter(type="EBOUTIC").first()
-        self.make_basket(request)
-        if "add_product" in request.POST["action"]:
-            self.add_product(request)
-        elif "del_product" in request.POST["action"]:
-            self.del_product(request)
-        return self.render_to_response(self.get_context_data(**kwargs))
 
-    def add_product(self, request):
-        """Add a product to the basket"""
-        try:
-            p = self.object.products.filter(id=int(request.POST["product_id"])).first()
-            if not p.buying_groups.exists():
-                self.basket.add_product(p)
-            for g in p.buying_groups.all():
-                if request.user.is_in_group(g.name):
-                    self.basket.add_product(p)
-                    break
-        except:
-            pass
-
-    def del_product(self, request):
-        """Delete a product from the basket"""
-        try:
-            p = self.object.products.filter(id=int(request.POST["product_id"])).first()
-            self.basket.del_product(p)
-        except:
-            pass
-
-    def get_context_data(self, **kwargs):
-        kwargs = super(EbouticMain, self).get_context_data(**kwargs)
-        kwargs["basket"] = self.basket
-        kwargs["eboutic"] = Counter.objects.filter(type="EBOUTIC").first()
-        kwargs["categories"] = ProductType.objects.all()
-        if hasattr(self.request.user, "customer"):
-            kwargs["customer_amount"] = self.request.user.customer.amount
-        else:
-            kwargs["customer_amount"] = None
-        if not self.request.user.was_subscribed:
-            kwargs["categories"] = kwargs["categories"].exclude(
-                id=settings.SITH_PRODUCTTYPE_SUBSCRIPTION
-            )
-        return kwargs
+@require_GET
+@login_required
+def payment_result(request, result: str) -> HttpResponse:
+    context = {"success": result == "success"}
+    return render(request, "eboutic/eboutic_payment_result.jinja", context)
 
 
 class EbouticCommand(TemplateView):
     template_name = "eboutic/eboutic_makecommand.jinja"
 
+    @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(
-                reverse_lazy("core:login", args=self.args, kwargs=kwargs)
-                + "?next="
-                + request.path
-            )
-        return HttpResponseRedirect(
-            reverse_lazy("eboutic:main", args=self.args, kwargs=kwargs)
-        )
+        return redirect("eboutic:main")
 
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseRedirect(
-                reverse_lazy("core:login", args=self.args, kwargs=kwargs)
-                + "?next="
-                + request.path
+    @method_decorator(login_required)
+    def post(self, request: HttpRequest, *args, **kwargs):
+        form = BasketForm(request)
+        if not form.is_valid():
+            request.session["errors"] = form.get_error_messages()
+            request.session.modified = True
+            res = redirect("eboutic:main")
+            res.set_cookie("basket_items", form.get_cleaned_cookie(), path="/eboutic")
+            return res
+
+        if "basket_id" in request.session:
+            basket, _ = Basket.objects.get_or_create(
+                id=request.session["basket_id"], user=request.user
             )
-        if "basket_id" not in request.session.keys():
-            return HttpResponseRedirect(
-                reverse_lazy("eboutic:main", args=self.args, kwargs=kwargs)
-            )
-        self.basket = Basket.objects.filter(id=request.session["basket_id"]).first()
-        if self.basket is None:
-            return HttpResponseRedirect(
-                reverse_lazy("eboutic:main", args=self.args, kwargs=kwargs)
-            )
+            basket.clear()
         else:
-            kwargs["basket"] = self.basket
+            basket = Basket.objects.create(user=request.user)
+
+        basket.save()
+        eboutique = Counter.objects.get(type="EBOUTIC")
+        for item in json.loads(request.COOKIES["basket_items"]):
+            basket.add_product(
+                eboutique.products.get(id=(item["id"])), item["quantity"]
+            )
+        request.session["basket_id"] = basket.id
+        request.session.modified = True
+        kwargs["basket"] = basket
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
@@ -162,12 +127,12 @@ class EbouticCommand(TemplateView):
         kwargs["et_request"]["PBX_SITE"] = settings.SITH_EBOUTIC_PBX_SITE
         kwargs["et_request"]["PBX_RANG"] = settings.SITH_EBOUTIC_PBX_RANG
         kwargs["et_request"]["PBX_IDENTIFIANT"] = settings.SITH_EBOUTIC_PBX_IDENTIFIANT
-        kwargs["et_request"]["PBX_TOTAL"] = int(self.basket.get_total() * 100)
+        kwargs["et_request"]["PBX_TOTAL"] = int(kwargs["basket"].get_total() * 100)
         kwargs["et_request"][
             "PBX_DEVISE"
         ] = 978  # This is Euro. ET support only this value anyway
-        kwargs["et_request"]["PBX_CMD"] = self.basket.id
-        kwargs["et_request"]["PBX_PORTEUR"] = self.basket.user.email
+        kwargs["et_request"]["PBX_CMD"] = kwargs["basket"].id
+        kwargs["et_request"]["PBX_PORTEUR"] = kwargs["basket"].user.email
         kwargs["et_request"]["PBX_RETOUR"] = "Amount:M;BasketID:R;Auto:A;Error:E;Sig:K"
         kwargs["et_request"]["PBX_HASH"] = "SHA512"
         kwargs["et_request"]["PBX_TYPEPAIEMENT"] = "CARTE"
@@ -192,62 +157,53 @@ class EbouticCommand(TemplateView):
         return kwargs
 
 
-class EbouticPayWithSith(TemplateView):
-    template_name = "eboutic/eboutic_payment_result.jinja"
-
-    def post(self, request, *args, **kwargs):
+@login_required
+@require_POST
+def pay_with_sith(request):
+    basket = Basket.from_session(request.session)
+    refilling = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
+    if basket is None or basket.items.filter(type_id=refilling).exists():
+        return redirect("eboutic:main")
+    c = Customer.objects.filter(user__id=basket.user.id).first()
+    if c is None:
+        return redirect("eboutic:main")
+    if c.amount < basket.get_total():
+        res = redirect("eboutic:payment_result", "failure")
+    else:
+        eboutic = Counter.objects.filter(type="EBOUTIC").first()
         try:
             with transaction.atomic():
-                if (
-                    "basket_id" not in request.session.keys()
-                    or not request.user.is_authenticated
-                ):
-                    return HttpResponseRedirect(
-                        reverse_lazy("eboutic:main", args=self.args, kwargs=kwargs)
-                    )
-                b = Basket.objects.filter(id=request.session["basket_id"]).first()
-                if (
-                    b is None
-                    or b.items.filter(
-                        type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
-                    ).exists()
-                ):
-                    return HttpResponseRedirect(
-                        reverse_lazy("eboutic:main", args=self.args, kwargs=kwargs)
-                    )
-                c = Customer.objects.filter(user__id=b.user.id).first()
-                if c is None:
-                    return HttpResponseRedirect(
-                        reverse_lazy("eboutic:main", args=self.args, kwargs=kwargs)
-                    )
-                kwargs["not_enough"] = True
-                if c.amount < b.get_total():
-                    raise DataError(_("You do not have enough money to buy the basket"))
-                else:
-                    eboutic = Counter.objects.filter(type="EBOUTIC").first()
-                    for it in b.items.all():
-                        product = eboutic.products.filter(id=it.product_id).first()
-                        Selling(
-                            label=it.product_name,
-                            counter=eboutic,
-                            club=product.club,
-                            product=product,
-                            seller=c.user,
-                            customer=c,
-                            unit_price=it.product_unit_price,
-                            quantity=it.quantity,
-                            payment_method="SITH_ACCOUNT",
-                        ).save()
-                    b.delete()
-                    kwargs["not_enough"] = False
-                    request.session.pop("basket_id", None)
-        except DataError as e:
-            kwargs["not_enough"] = True
-        return self.render_to_response(self.get_context_data(**kwargs))
+                for it in basket.items.all():
+                    product = eboutic.products.get(id=it.product_id)
+                    Selling(
+                        label=it.product_name,
+                        counter=eboutic,
+                        club=product.club,
+                        product=product,
+                        seller=c.user,
+                        customer=c,
+                        unit_price=it.product_unit_price,
+                        quantity=it.quantity,
+                        payment_method="SITH_ACCOUNT",
+                    ).save()
+                basket.delete()
+                request.session.pop("basket_id", None)
+                res = redirect("eboutic:payment_result", "success")
+        except DatabaseError as e:
+            with sentry_sdk.push_scope() as scope:
+                scope.user = {"username": request.user.username}
+                scope.set_extra("someVariable", e.__repr__())
+                sentry_sdk.capture_message(
+                    f"Erreur le {datetime.now()} dans eboutic.pay_with_sith"
+                )
+            res = redirect("eboutic:payment_result", "failure")
+    res.delete_cookie("basket_items", "/eboutic")
+    return res
 
 
 class EtransactionAutoAnswer(View):
-    # Response documentation http://www1.paybox.com/espace-integrateur-documentation/la-solution-paybox-system/gestion-de-la-reponse/
+    # Response documentation http://www1.paybox.com/espace-integrateur-documentation
+    # /la-solution-paybox-system/gestion-de-la-reponse/
     def get(self, request, *args, **kwargs):
         if (
             not "Amount" in request.GET.keys()
@@ -305,7 +261,7 @@ class EtransactionAutoAnswer(View):
                 return HttpResponse(
                     "Basket processing failed with error: " + repr(e), status=500
                 )
-            return HttpResponse()
+            return HttpResponse("Payment successful", status=200)
         else:
             return HttpResponse(
                 "Payment failed with error: " + request.GET["Error"], status=202

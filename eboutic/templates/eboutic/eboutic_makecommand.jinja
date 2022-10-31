@@ -37,7 +37,8 @@
 
             {% if not basket.contains_refilling_item %}
             <br>
-            {% trans %}Remaining account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount - basket.get_total()) }} €</strong>
+            {% trans %}Remaining account amount: {% endtrans %}
+                <strong>{{ "%0.2f"|format(customer_amount|float - basket.get_total()) }} €</strong>
             {% endif %}
         {% endif %}
     </p>
@@ -61,7 +62,6 @@
     </form>
     {% endif %}
 </div>
-
 {% endblock %}
 
 

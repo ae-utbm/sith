@@ -1,80 +1,110 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Eboutic{% endtrans %}
+    {% trans %}Eboutic{% endtrans %}
 {% endblock %}
 
-{% macro add_product(id, content, class="") %}
-<form method="post" action="{{ url('eboutic:main') }}" class="inline {{ class }}">
-    {% csrf_token %}
-    <input type="hidden" name="action" value="add_product">
-    <button type="submit" name="product_id" value="{{ id }}"> {{ content|safe }} </button>
-</form>
-{% endmacro %}
+{% block jquery_css %}
+    {#  Remove jquery css  #}
+{% endblock %}
 
-{% macro del_product(id, content) %}
-<form method="post" action="{{ url('eboutic:main') }}" class="inline" style="display:inline">
-    {% csrf_token %}
-    <input type="hidden" name="action" value="del_product">
-    <button type="submit" name="product_id" value="{{ id }}"> {{ content }} </button>
-</form>
-{% endmacro %}
+{% block additional_js %}
+    {# This script contains the code to perform requests to manipulate the
+    user basket without having to reload the page #}
+    <script src="{{ static('eboutic/js/eboutic.js') }}"></script>
+    <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
+{% endblock %}
+
+{% block additional_css %}
+    <link rel="stylesheet" href="{{ static('eboutic/css/eboutic.css') }}">
+{% endblock %}
 
 {% block content %}
-<h3>{% trans %}Eboutic{% endtrans %}</h3>
-
-<div id="basket">
-    <p>{% trans %}Basket: {% endtrans %}</p>
-    <ul>
-        {% for i in basket.items.all()|sort(attribute='id') %}
-        <li>{{ del_product(i.product_id, '-') }} {{ i.quantity }}
-        {{ add_product(i.product_id, '+') }} {{ i.product_name }}: {{ "%0.2f"|format(i.product_unit_price*i.quantity) }} €</li>
-        {% endfor %}
-    </ul>
-    <p>
-        <strong>{% trans %}Basket amount: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong>
-
-        {% if customer_amount != None %}
-            <br>
-            {% trans %}Current account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
-
-            {% if not basket.contains_refilling_item %}
-            <br>
-            {% trans %}Remaining account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount - basket.get_total()) }} €</strong>
+    <h1 id="eboutic-title">{% trans %}Eboutic{% endtrans %}</h1>
+    <div id="eboutic" x-data="basket">
+        <div id="basket">
+            <h3>Panier</h3>
+            {% if errors %}
+                <div class="error-message">
+                    {% for error in errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                {% trans %}Your basket has been cleaned accordingly to those errors.{% endtrans %}
+                </div>
             {% endif %}
-        {% endif %}
-    </p>
-
-    <form method="post" action="{{ url('eboutic:command') }}">
-        {% csrf_token %}
-        <p>
-        <input type="submit" value="{% trans %}Proceed to command{% endtrans %}" />
-        </p>
-    </form>
-</div>
-<div>
-    {% for t in categories %}
-    {% if eboutic.products.filter(product_type=t).exists() %}
-        <h5>{{ t }}</h5>
-        {% if t.comment %}
-        <p>{{ t.comment }}</p>
-        {% endif %}
-        <br />
-        {% for p in eboutic.products.filter(product_type=t).all() %}
-            {% set file = None %}
-            {% if p.icon %}
-                {% set file = p.icon.url %}
-            {% else %}
-                {% set file = static('core/img/na.gif') %}
-            {% endif %}
-            {% set prod = '<strong>%s</strong><hr><img src="%s" /><span>%s €</span>' % (p.name, file, p.selling_price) %}
-        {{ add_product(p.id, prod, "form_button") }}
-        {% endfor %}
-    {% endif %}
-    {% endfor %}
-</div>
-
+            <ul class="item-list">
+                {# Starting money #}
+                <li>
+                    <span class="item-name">
+                        <strong>{% trans %}Current account amount: {% endtrans %}</strong>
+                    </span>
+                    <span class="item-price">
+                        <strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
+                    </span>
+                </li>
+                <template x-for="item in items" :key="item.id">
+                    <li class="item-row" x-show="item.quantity > 0">
+                        <span class="item-name" x-text="item.name"></span>
+                        <div class="item-quantity">
+                            <i class="fa fa-minus fa-xs" @click="remove(item.id)"></i>
+                            <span x-text="item.quantity"></span>
+                            <i class="fa fa-plus" @click="add(item)"></i>
+                        </div>
+                        <span class="item-price" x-text="(item.unit_price * item.quantity).toFixed(2) + ' €'"></span>
+                    </li>
+                </template>
+                {# Total price #}
+                <li style="margin-top: 20px">
+                    <span class="item-name"><strong>{% trans %}Basket amount: {% endtrans %}</strong></span>
+                    <span x-text="get_total().toFixed(2) + ' €'" class="item-price"></span>
+                </li>
+            </ul>
+            <div class="catalog-buttons">
+                <button @click="clear_basket()" class="clear">
+                    <i class="fa fa-trash"></i>
+                    {% trans %}Clear{% endtrans %}
+                </button>
+                <form method="post" action="{{ url('eboutic:command') }}">
+                    {% csrf_token %}
+                    <button class="validate">
+                        <i class="fa fa-check"></i>
+                        <input type="submit" value="{% trans %}Validate{% endtrans %}"/>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div id="catalog">
+            {% for category, items in products|groupby('category') %}
+                {% if items|count > 0 %}
+                    <section>
+                        {# I would have wholeheartedly directly used the header element instead
+                        but it has already been made messy in core/style.scss #}
+                        <div class="category-header">
+                            <h3>{{ category }}</h3>
+                            {% if category.comment %}
+                                <p>{{ category.comment }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="product-group">
+                            {% for p in items %}
+                                <button class="product-button"
+                                        @click="add_from_catalog({{ p.id }}, '{{ p.name }}', {{ p.selling_price }})">
+                                    {% if p.icon %}
+                                        <img src="{{ p.icon.url }}" alt="image de {{ p.product_name }}" width="40px"
+                                             height="40px">
+                                    {% else %}
+                                        <i class="fa fa-2x fa-picture-o"></i>
+                                    {% endif %}
+                                    <p><strong>{{ p.name }}</strong></p>
+                                    <p>{{ p.selling_price }} €</p>
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endif %}
+                {% else %}
+                <p>{% trans %}There are no items available for sale{% endtrans %}</p>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
-
-
-
