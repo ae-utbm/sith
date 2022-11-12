@@ -45,10 +45,12 @@ from accounting.models import CurrencyField
 from core.models import Group, User, Notification
 from subscription.models import Subscription
 
+from django_countries.fields import CountryField
+
 
 class Customer(models.Model):
     """
-    This class extends a user to make a customer. It adds some basic customers informations, such as the accound ID, and
+    This class extends a user to make a customer. It adds some basic customers' information, such as the account ID, and
     is used by other accounting classes as reference to the customer, rather than using User
     """
 
@@ -56,6 +58,13 @@ class Customer(models.Model):
     account_id = models.CharField(_("account id"), max_length=10, unique=True)
     amount = CurrencyField(_("amount"))
     recorded_products = models.IntegerField(_("recorded product"), default=0)
+
+    # Customer's billing information
+    billing_address_1 = models.CharField(_("address line 1"), max_length=50, null=True)
+    billing_address_2 = models.CharField(_("address line 2"), max_length=50, null=True)
+    billing_zip_code = models.CharField(_("zip code"), max_length=16, null=True)
+    billing_city = models.CharField(_("city"), max_length=50, null=True)
+    billing_country = CountryField(blank_label=_("country"), null=True)
 
     class Meta:
         verbose_name = _("customer")
@@ -111,6 +120,24 @@ class Customer(models.Model):
 
     def get_full_url(self):
         return "".join(["https://", settings.SITH_URL, self.get_absolute_url()])
+
+    def get_billing_info(self):
+        billing_data = {
+            "Billing": {
+                "Address": {
+                    "FirstName": self.user.first_name[:30],
+                    "LastName": self.user.last_name[:30],
+                    "Address1": self.billing_address_1,
+                    "ZipCode": self.billing_zip_code,
+                    "City": self.billing_city,
+                    "CountryCode": self.billing_country.code,
+                }
+            }
+        }
+        if self.billing_address_2:
+            billing_data["Billing"]["Address"]["Address2"] = self.billing_address_2
+
+        return billing_data
 
 
 class ProductType(models.Model):

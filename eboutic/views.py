@@ -27,6 +27,7 @@ from datetime import datetime
 import hmac
 import base64
 from OpenSSL import crypto
+from dict2xml import dict2xml
 
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, View
@@ -174,6 +175,20 @@ class EbouticCommand(TemplateView):
         kwargs["et_request"]["PBX_TYPECARTE"] = "CB"
         kwargs["et_request"]["PBX_TIME"] = str(
             datetime.now().replace(microsecond=0).isoformat("T")
+        )
+        kwargs["et_request"]["PBX_BILLING"] = dict2xml(
+            self.basket.user.customer.get_billing_info()
+        )
+        kwargs["et_request"]["PBX_SHOPPINGCART"] = dict2xml(
+            {
+                "shoppingcart": {
+                    "total": {
+                        "totalQuantity": 99
+                        if self.basket.items.count() > 99
+                        else self.basket.items.count()
+                    }
+                }
+            }
         )
         kwargs["et_request"]["PBX_HMAC"] = (
             hmac.new(
