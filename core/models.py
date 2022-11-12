@@ -470,7 +470,10 @@ class User(AbstractBaseUser):
     def age(self) -> int:
         """
         Return the age this user has the day the method is called.
+        If the user has not filled his age, return 0
         """
+        if self.date_of_birth is None:
+            return 0
         today = timezone.now()
         age = today.year - self.date_of_birth.year
         # remove a year if this year's birthday is yet to come
