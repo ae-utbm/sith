@@ -163,21 +163,24 @@ header {
   display: flex;
   box-shadow: $shadow-color 0px 0px 15px;
   border-top: none;
-  //background-color: $primary-neutral-dark-color;
+  background-color: $primary-neutral-dark-color;
   border-radius: 0px 0px 10px 10px;
 
   // PINKTOBER
-  background-color: $pinktober;
-  border-bottom: 5px solid $pinktober-secondary;
-  margin-bottom: -5px;
-  border-radius: 0 0 5px 7px;
+  // background-color: $pinktober;
+  // border-bottom: 5px solid $pinktober-secondary;
+  // margin-bottom: -5px;
+  // border-radius: 0 0 5px 7px;
 
   #header_logo {
     background-color: $white-color;
     padding: 0.2em;
-    border-bottom: 5px solid $shadow-color;
-    border-radius: 0px 0px 0px 5px;
-    margin-bottom: -5px;
+    border-radius: 0px 0px 0px 9px;
+
+    //PINKTOBER
+    // border-bottom: 5px solid $shadow-color;
+    // border-radius: 0px 0px 0px 5px;
+    // margin-bottom: -5px;
 
     a {
       display: flex;
@@ -204,7 +207,9 @@ header {
       width: 100%;
       label {
         display: inline;
-        color: $pinktober-primary-text;
+
+        // PINKTOBER
+        // color: $pinktober-primary-text;
       }
     }
     a {
@@ -225,7 +230,7 @@ header {
       font-weight: bold;
       color: $white-color;
       &:hover {
-        color: $pinktober-primary-text;
+        color: $secondary-color;
         text-decoration: underline;
       }
     }
@@ -235,13 +240,15 @@ header {
       list-style-type: none;
       margin: 0.2em 0.2em;
 
+      /*
+      PINKTOBER
       & .fa.fa-times {
         color: $pinktober-bar-closed !important;
       }
 
       & .fa.fa-check {
         color: $pinktober-bar-opened !important;
-      }
+      }*/
     }
 
     #header_search {
