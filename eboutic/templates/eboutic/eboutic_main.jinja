@@ -74,6 +74,20 @@
             </div>
         </div>
         <div id="catalog">
+            {% if not request.user.date_of_birth %}
+                <div class="alert" x-data="{show_alert: true}" x-show="show_alert" x-transition>
+                    <span class="alert-main">
+                        {% trans %}You have not filled in your date of birth. As a result, you may not have access to all the products in the online shop. To fill in your date of birth, you can go to{% endtrans %}
+                        <a href="{{ url("core:user_edit", user_id=request.user.id) }}">
+                            {% trans %}this page{% endtrans %}
+                        </a>
+                    </span>
+                    <span class="clickable" @click="show_alert = false">
+                        <i class="fa fa-close"></i>
+                    </span>
+                </div>
+            {% endif %}
+
             {% for category, items in products|groupby('category') %}
                 {% if items|count > 0 %}
                     <section>

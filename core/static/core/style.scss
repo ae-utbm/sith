@@ -135,6 +135,10 @@ a {
   width: 23%;
 }
 
+.clickable:hover {
+  cursor: pointer;
+}
+
 /*--------------------------------HEADER-------------------------------*/
 
 #header_language_chooser {
@@ -450,6 +454,24 @@ header {
     box-shadow: $shadow-color 0 5px 10px;
     background: $white-color;
     overflow: auto;
+  }
+
+  .alert {
+    margin: 10px;
+    border: #fc8181 1px solid;
+    background-color: rgb(255,245,245);
+    border-radius: 4px;
+    color: #c53030;
+    padding: 12px 16px;
+    display: flex;
+    gap: 16px;
+    max-width: 100%;
+    align-items: center;
+    text-align: justify;
+
+    .alert-main {
+      flex: 2;
+    }
   }
 
   .tool_bar {
