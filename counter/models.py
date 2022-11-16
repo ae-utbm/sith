@@ -133,8 +133,13 @@ class ProductType(models.Model):
     comment = models.TextField(_("comment"), null=True, blank=True)
     icon = models.ImageField(upload_to="products", null=True, blank=True)
 
+    # priority holds no real backend logic but helps to handle the order in which
+    # the items are to be shown to the user
+    priority = models.PositiveIntegerField(default=0)
+
     class Meta:
         verbose_name = _("product type")
+        ordering = ["-priority", "name"]
 
     def is_owned_by(self, user):
         """

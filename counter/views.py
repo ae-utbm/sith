@@ -954,7 +954,7 @@ class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView
     """
 
     model = ProductType
-    fields = ["name", "description", "comment", "icon"]
+    fields = ["name", "description", "comment", "icon", "priority"]
     template_name = "core/create.jinja"
     current_tab = "products"
 
@@ -966,7 +966,7 @@ class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
     model = ProductType
     template_name = "core/edit.jinja"
-    fields = ["name", "description", "comment", "icon"]
+    fields = ["name", "description", "comment", "icon", "priority"]
     pk_url_kwarg = "type_id"
     current_tab = "products"
 
