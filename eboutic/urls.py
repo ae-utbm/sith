@@ -37,7 +37,7 @@ urlpatterns = [
     path("pay/", pay_with_sith, name="pay_with_sith"),
     path("pay/<res:result>/", payment_result, name="payment_result"),
     path(
-        "et_autoanswer/",
+        "et_autoanswer",
         EtransactionAutoAnswer.as_view(),
         name="etransation_autoanswer",
     ),
