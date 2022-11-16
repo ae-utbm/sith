@@ -42,16 +42,16 @@
             {% endif %}
         {% endif %}
     </p>
-    {% if settings.SITH_EBOUTIC_CB_ENABLED %}
-    <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}">
-        <p>
-        {% for (field_name,field_value) in et_request.items() -%}
-        <input type="hidden" name="{{ field_name }}" value="{{ field_value }}">
-        {% endfor %}
-        <input type="submit" value="{% trans %}Pay with credit card{% endtrans %}" />
-        </p>
-    </form>
-    {% endif %}
+{#    {% if settings.SITH_EBOUTIC_CB_ENABLED %}#}
+{#    <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}">#}
+{#        <p>#}
+{#        {% for (field_name,field_value) in et_request.items() -%}#}
+{#        <input type="hidden" name="{{ field_name }}" value="{{ field_value }}">#}
+{#        {% endfor %}#}
+{#        <input type="submit" value="{% trans %}Pay with credit card{% endtrans %}" />#}
+{#        </p>#}
+{#    </form>#}
+{#    {% endif %}#}
     {% if basket.contains_refilling_item %}
     <p>{% trans %}AE account payment disabled because your basket contains refilling items.{% endtrans %}</p>
     {% else %}
