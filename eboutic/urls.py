@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
+# Copyright 2016,2017, 2022
 # - Skia <skia@libskia.so>
+# - Maréchal <thgirod@hotmail.com>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -22,17 +23,21 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path, register_converter
 
 from eboutic.views import *
+from eboutic.converters import PaymentResultConverter
+
+register_converter(PaymentResultConverter, "res")
 
 urlpatterns = [
     # Subscription views
-    re_path(r"^$", EbouticMain.as_view(), name="main"),
-    re_path(r"^command$", EbouticCommand.as_view(), name="command"),
-    re_path(r"^pay$", EbouticPayWithSith.as_view(), name="pay_with_sith"),
-    re_path(
-        r"^et_autoanswer$",
+    path("", eboutic_main, name="main"),
+    path("command/", EbouticCommand.as_view(), name="command"),
+    path("pay/", pay_with_sith, name="pay_with_sith"),
+    path("pay/<res:result>/", payment_result, name="payment_result"),
+    path(
+        "et_autoanswer/",
         EtransactionAutoAnswer.as_view(),
         name="etransation_autoanswer",
     ),

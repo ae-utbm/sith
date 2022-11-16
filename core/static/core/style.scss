@@ -135,6 +135,10 @@ a {
   width: 23%;
 }
 
+.clickable:hover {
+  cursor: pointer;
+}
+
 /*--------------------------------HEADER-------------------------------*/
 
 #header_language_chooser {
@@ -159,9 +163,9 @@ a {
 
 header {
   width: 90%;
-  margin: 0px auto;
+  margin: 0 auto;
   display: flex;
-  box-shadow: $shadow-color 0px 0px 15px;
+  box-shadow: $shadow-color 0 0 15px;
   border-top: none;
   background-color: $primary-neutral-dark-color;
   border-radius: 0px 0px 10px 10px;
@@ -199,7 +203,7 @@ header {
   }
 
   #header_connect_links {
-    margin: 0.6em 0.6em 0em auto;
+    margin: 0.6em 0.6em 0 auto;
     padding: 0.2em;
     color: $white-color;
     form {
@@ -226,7 +230,7 @@ header {
 
     a {
       text-decoration: none;
-      margin: 0em 1em;
+      margin: 0 1em;
       font-weight: bold;
       color: $white-color;
       &:hover {
@@ -254,7 +258,7 @@ header {
     #header_search {
       display: inline-block;
       flex: auto;
-      margin: 0.8em 0em;
+      margin: 0.8em 0;
       input {
           width: 14ch;
       }
@@ -265,10 +269,10 @@ header {
       flex: initial;
       flex-wrap: wrap;
       text-align: right;
-      margin: 0em;
+      margin: 0;
       div {
         display: inline;
-        padding: 1.2em 0em;
+        padding: 1.2em 0;
         &:first-child {
           flex: auto;
         }
@@ -290,7 +294,7 @@ header {
         background: white;
         text-align: left;
         font-size: 80%;
-        margin: 1.5em 0em 0em -14em;
+        margin: 1.5em 0 0em -14em;
         .header_notif_date {
           font-weight: bold;
         }
@@ -298,7 +302,7 @@ header {
           color: grey;
         }
         a {
-          margin: 0em;
+          margin: 0;
           color: $black-color;
           &:hover {
             color: $primary-dark-color;
@@ -326,7 +330,7 @@ header {
 
 #popupheader {
   width: 88%;
-  margin: 0px auto;
+  margin: 0 auto;
   padding: 0.3em 1%;
 }
 
@@ -369,15 +373,15 @@ header {
 
 #page {
   width: 90%;
-  margin: 0em auto;
-/*---------------------------------NAV---------------------------------*/
+  margin: 20px auto 0;
+  /*---------------------------------NAV---------------------------------*/
   nav {
     display: flex;
     flex-wrap: wrap;
     background-color: $primary-dark-color;
     color: $white-color;
-    border-radius: 6px 6px 0px 0px;
-    box-shadow: $shadow-color 0px 0px 15px;
+    border-radius: 6px 6px 0 0;
+    box-shadow: $shadow-color 0 0 15px;
 
     a {
       flex: auto;
@@ -392,10 +396,10 @@ header {
         background: $secondary-neutral-color;
         color: $white-color;
         &:first-of-type {
-          border-radius: 6px 0px 0px 0px;
+          border-radius: 6px 0 0 0;
         }
         &:last-of-type {
-          border-radius: 0px 6px 0px 0px;
+          border-radius: 0 6px 0 0;
         }
       }
     }
@@ -418,7 +422,7 @@ header {
       overflow: auto;
       width: 100%;
       background-color: #f9f9f9;
-      box-shadow: 3px 3px 3px 0px $shadow-color;
+      box-shadow: 3px 3px 3px 0 $shadow-color;
       z-index: 1;
     }
 
@@ -443,7 +447,7 @@ header {
 /*--------------------------------CONTENT------------------------------*/
   #quick_notif {
     width: 100%;
-    margin: 0px auto;
+    margin: 0 auto;
     list-style-type: none;
     background: $second-color;
     li {
@@ -454,9 +458,27 @@ header {
 
   #content {
     padding: 1em 1%;
-    box-shadow: $shadow-color 0px 5px 10px;
+    box-shadow: $shadow-color 0 5px 10px;
     background: $white-color;
     overflow: auto;
+  }
+
+  .alert {
+    margin: 10px;
+    border: #fc8181 1px solid;
+    background-color: rgb(255,245,245);
+    border-radius: 4px;
+    color: #c53030;
+    padding: 12px 16px;
+    display: flex;
+    gap: 16px;
+    max-width: 100%;
+    align-items: center;
+    text-align: justify;
+
+    .alert-main {
+      flex: 2;
+    }
   }
 
   .tool_bar {
@@ -499,7 +521,7 @@ header {
     flex-wrap: wrap;
     .news_column {
       display: inline-block;
-      margin: 0px;
+      margin: 0;
       vertical-align: top;
     }
     #news_admin {
@@ -540,7 +562,7 @@ header {
       margin-bottom: 1em;
       #agenda_title,#birthdays_title {
         margin: 0em;
-        border-radius: 5px 5px 0px 0px;
+        border-radius: 5px 5px 0 0;
         box-shadow: $shadow-color 1px 1px 1px;
         padding: 0.5em;
         font-weight: bold;
@@ -609,10 +631,10 @@ header {
         font-weight: bold;
         font-family: monospace;
         font-size: 1.4em;
-        border-radius: 7px 0px 0px 7px;
+        border-radius: 7px 0 0 7px;
 
         div {
-          margin: 0px auto;
+          margin: 0 auto;
           .day {
             font-size: 1.5em;
           }
@@ -697,7 +719,7 @@ header {
       padding: 0.4em;
       padding-left: 1em;
       background: $secondary-neutral-light-color;
-      box-shadow: $shadow-color 0px 0px 2px;
+      box-shadow: $shadow-color 0 0 2px;
       border-radius: 18px 5px 18px 5px;
       h4 {
         margin: 0em;
@@ -1030,7 +1052,7 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: 160%;
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 h2 {
@@ -1060,7 +1082,7 @@ h6 {
 
 p, pre {
   margin-top: 0.8em;
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 ul, ol, dl {
@@ -1118,7 +1140,7 @@ td {
   overflow: hidden;
   text-overflow: ellipsis;
   > ul {
-    margin-top: 0px;
+    margin-top: 0;
   }
 }
 
@@ -1471,7 +1493,7 @@ textarea {
   }
 
   .search_bar {
-    margin: 10px 0px;
+    margin: 10px 0;
     display: flex;
     flex-wrap: wrap;
     height: 20p;
@@ -1487,7 +1509,7 @@ textarea {
     margin-top: 5px;
     background: $secondary-color;
     color: white;
-    border-radius: 10px 10px 0px 0px;
+    border-radius: 10px 10px 0 0;
     .title {
       text-transform: uppercase;
     }
@@ -1527,7 +1549,7 @@ textarea {
     text-align: center;
     img {
       max-width: 70%;
-      margin: 0px auto;
+      margin: 0 auto;
     }
   }
 
@@ -1615,7 +1637,7 @@ footer {
     display: flex;
     flex-wrap: wrap;
     background-color: $primary-neutral-dark-color;
-    box-shadow: $shadow-color 0px 0px 15px;
+    box-shadow: $shadow-color 0 0 15px;
     a {
       padding: 0.8em;
       flex: 1;
@@ -1631,7 +1653,7 @@ footer {
 /*---------------------------------FORMS-------------------------------*/
 
 form {
-  margin: 0px auto;
+  margin: 0 auto;
   margin-bottom: 10px;
 }
 
@@ -1645,7 +1667,7 @@ label {
 }
 
 .ui-dialog .ui-dialog-buttonpane {
-  bottom: 0px;
+  bottom: 0;
   position: absolute;
   width: 97%;
 }
@@ -1690,8 +1712,8 @@ label {
 /*-------------------------------MARKDOWN------------------------------*/
 
 .markdown {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   code {
     font-family: monospace;
     color: $white-color;
@@ -1722,7 +1744,7 @@ label {
 }
 .ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-top,
 .ui-corner-left {
-  border-radius: 0px;
+  border-radius: 0;
 }
 
 #club_detail {
@@ -1748,13 +1770,13 @@ $pedagogy-white-text: #f0f0f0;
 .pedagogy {
     &.star-not-checked {
       color : #f7f7f7;
-      margin-bottom: 0px;
-      margin-top: 0px;
+      margin-bottom: 0;
+      margin-top: 0;
     }
     &.star-checked {
       color: $pedagogy-orange;
-      margin-bottom: 0px;
-      margin-top: 0px;
+      margin-bottom: 0;
+      margin-top: 0;
     }
 
     &.grade-without-star {
@@ -2126,8 +2148,8 @@ $pedagogy-white-text: #f0f0f0;
           grid-area: markdown;
 
           min-height: 139px;
-          margin-top: 0px;
-          margin-right: 0px;
+          margin-top: 0;
+          margin-right: 0;
           padding: 10px;
           text-align: justify;
           overflow: auto;
@@ -2173,7 +2195,7 @@ $pedagogy-white-text: #f0f0f0;
             "report"
             "date"
             "author";
-          margin-top: 0px;
+          margin-top: 0;
           text-align: center;
         }
 
@@ -2188,7 +2210,7 @@ $pedagogy-white-text: #f0f0f0;
 
           @media screen and (max-width: $large-devices){
             clip-path: none;
-            padding: 0px;
+            padding: 0;
             padding-bottom: 7px;
           }
 
