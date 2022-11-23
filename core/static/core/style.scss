@@ -1198,18 +1198,38 @@ blockquote h5:first-child {
 }
 
 table {
-  width: 100%;
-  font-size: 0.9em;
+  width: 90%;
+  margin: 15px auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  overflow: hidden;
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
+@media screen and (max-width: 500px){
+  table {
+    width: 100%;
+  }
 }
 
 th {
   padding: 4px;
 }
 
+td, th {
+  vertical-align: middle;
+  text-align: center;
+  padding: 5px 10px;
+  > ul {
+    margin-top: 0;
+  }
+}
+
 td {
   padding: 4px;
   margin: 5px;
-  border: solid 1px $primary-neutral-color;
   border-collapse: collapse;
   vertical-align: top;
   overflow: hidden;
@@ -1219,17 +1239,28 @@ td {
   }
 }
 
+th, thead td {
+  text-align: center;
+  border-top: none;
+}
+
 thead {
-  font-weight: bold;
+  background-color: #354a5f;
+  color: white;
 }
 
 tbody > tr {
   &:nth-child(even) {
     background: $primary-neutral-light-color;
   }
-  &:hover {
+  &.clickable:hover {
+    cursor: pointer;
     background: $secondary-neutral-light-color;
     width: 100%;
+  }
+  &.highlight {
+    color: $primary-dark-color;
+    font-style: italic;
   }
 }
 

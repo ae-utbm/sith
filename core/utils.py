@@ -31,7 +31,6 @@ from datetime import date
 
 from PIL import ExifTags
 
-# from exceptions import IOError
 import PIL
 
 from django.conf import settings
@@ -52,14 +51,12 @@ def get_start_of_semester(d=date.today()):
     year = today.year
     start = date(year, settings.SITH_START_DATE[0], settings.SITH_START_DATE[1])
     start2 = start.replace(month=(start.month + 6) % 12)
-    if start > start2:
-        start, start2 = start2, start
-    if today < start:
-        return start2.replace(year=year - 1)
-    elif today < start2:
-        return start
-    else:
-        return start2
+    spring, autumn = min(start, start2), max(start, start2)
+    if today > autumn:  # autumn semester
+        return autumn
+    if today > spring:  # spring semester
+        return spring
+    return autumn.replace(year=year - 1)  # autumn semester of last year
 
 
 def get_semester(d=date.today()):

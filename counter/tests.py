@@ -28,9 +28,13 @@ import string
 from django.test import TestCase
 from django.urls import reverse
 from django.core.management import call_command
+from django.utils import timezone
+from django.utils.timezone import timedelta
 
+from club.models import Club
 from core.models import User
-from counter.models import Counter, Customer, BillingInfo
+from counter.models import Counter, Customer, BillingInfo, Permanency, Selling, Product
+from sith.settings import SITH_MAIN_CLUB
 
 
 class CounterTest(TestCase):
@@ -164,14 +168,210 @@ class CounterTest(TestCase):
 
 
 class CounterStatsTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
         call_command("populate")
-        self.counter = Counter.objects.filter(id=2).first()
+        cls.counter = Counter.objects.filter(id=2).first()
+        cls.krophil = User.objects.get(username="krophil")
+        cls.skia = User.objects.get(username="skia")
+        cls.sli = User.objects.get(username="sli")
+        cls.root = User.objects.get(username="root")
+        cls.subscriber = User.objects.get(username="subscriber")
+        cls.old_subscriber = User.objects.get(username="old_subscriber")
+        cls.counter.sellers.add(cls.sli)
+        cls.counter.sellers.add(cls.root)
+        cls.counter.sellers.add(cls.skia)
+        cls.counter.sellers.add(cls.krophil)
 
-    def test_unauthorised_user_fail(self):
+        barbar = Product.objects.get(code="BARB")
+
+        # remove everything to make sure the fixtures bring no side effect
+        Permanency.objects.all().delete()
+        Selling.objects.all().delete()
+
+        now = timezone.now()
+        # total of sli : 5 hours
+        Permanency.objects.create(
+            user=cls.sli, start=now, end=now + timedelta(hours=1), counter=cls.counter
+        )
+        Permanency.objects.create(
+            user=cls.sli,
+            start=now + timedelta(hours=4),
+            end=now + timedelta(hours=6),
+            counter=cls.counter,
+        )
+        Permanency.objects.create(
+            user=cls.sli,
+            start=now + timedelta(hours=7),
+            end=now + timedelta(hours=9),
+            counter=cls.counter,
+        )
+
+        # total of skia : 16 days, 2 hours, 35 minutes and 54 seconds
+        Permanency.objects.create(
+            user=cls.skia, start=now, end=now + timedelta(hours=1), counter=cls.counter
+        )
+        Permanency.objects.create(
+            user=cls.skia,
+            start=now + timedelta(days=4, hours=1),
+            end=now + timedelta(days=20, hours=2, minutes=35, seconds=54),
+            counter=cls.counter,
+        )
+
+        # total of root : 1 hour + 20 hours (but the 20 hours were on last year)
+        Permanency.objects.create(
+            user=cls.root,
+            start=now + timedelta(days=5),
+            end=now + timedelta(days=5, hours=1),
+            counter=cls.counter,
+        )
+        Permanency.objects.create(
+            user=cls.root,
+            start=now - timedelta(days=300, hours=20),
+            end=now - timedelta(days=300),
+            counter=cls.counter,
+        )
+
+        # total of krophil : 0 hour
+        s = Selling(
+            label=barbar.name,
+            product=barbar,
+            club=Club.objects.get(name=SITH_MAIN_CLUB["name"]),
+            counter=cls.counter,
+            unit_price=2,
+            seller=cls.skia,
+        )
+
+        krophil_customer = Customer.get_or_create(cls.krophil)[0]
+        sli_customer = Customer.get_or_create(cls.sli)[0]
+        skia_customer = Customer.get_or_create(cls.skia)[0]
+        root_customer = Customer.get_or_create(cls.root)[0]
+
+        # moderate drinker. Total : 100 €
+        s.quantity = 50
+        s.customer = krophil_customer
+        s.save(allow_negative=True)
+
+        # Sli is a drunkard. Total : 2000 €
+        s.quantity = 100
+        s.customer = sli_customer
+        for _ in range(10):
+            # little trick to make sure the instance is duplicated in db
+            s.pk = None
+            s.save(allow_negative=True)  # save ten different sales
+
+        # Skia is a heavy drinker too. Total : 1000 €
+        s.customer = skia_customer
+        for _ in range(5):
+            s.pk = None
+            s.save(allow_negative=True)
+
+        # Root is quite an abstemious one. Total : 2 €
+        s.pk = None
+        s.quantity = 1
+        s.customer = root_customer
+        s.save(allow_negative=True)
+
+    def test_not_authenticated_user_fail(self):
         # Test with not login user
         response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
         self.assertTrue(response.status_code == 403)
+
+    def test_unauthorized_user_fails(self):
+        user = User.objects.get(username="public")
+        self.client.login(username=user.username, password="plop")
+        response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
+        self.assertTrue(response.status_code == 403)
+
+    def test_get_total_sales(self):
+        """
+        Test the result of the Counter.get_total_sales() method
+        """
+        total = self.counter.get_total_sales()
+        self.assertEqual(total, 3102)
+
+    def test_top_barmen(self):
+        """
+        Test the result of Counter.get_top_barmen() is correct
+        """
+        top = iter(self.counter.get_top_barmen())
+        self.assertEqual(
+            next(top),
+            {
+                "user": self.skia.id,
+                "name": f"{self.skia.first_name} {self.skia.last_name}",
+                "promo": self.skia.promo,
+                "nickname": self.skia.nick_name,
+                "perm_sum": timedelta(days=16, hours=2, minutes=35, seconds=54),
+            },
+        )
+        self.assertEqual(
+            next(top),
+            {
+                "user": self.root.id,
+                "name": f"{self.root.first_name} {self.root.last_name}",
+                "promo": self.root.promo,
+                "nickname": self.root.nick_name,
+                "perm_sum": timedelta(hours=21),
+            },
+        )
+        self.assertEqual(
+            next(top),
+            {
+                "user": self.sli.id,
+                "name": f"{self.sli.first_name} {self.sli.last_name}",
+                "promo": self.sli.promo,
+                "nickname": self.sli.nick_name,
+                "perm_sum": timedelta(hours=5),
+            },
+        )
+        self.assertIsNone(
+            next(top, None), msg="barmen with no office hours should not be in the top"
+        )
+
+    def test_top_customer(self):
+        """
+        Test the result of Counter.get_top_customers() is correct
+        """
+        top = iter(self.counter.get_top_customers())
+        self.assertEqual(
+            next(top),
+            {
+                "customer__user": self.sli.id,
+                "name": f"{self.sli.first_name} {self.sli.last_name}",
+                "nickname": self.sli.nick_name,
+                "selling_sum": 2000,
+            },
+        )
+        self.assertEqual(
+            next(top),
+            {
+                "customer__user": self.skia.id,
+                "name": f"{self.skia.first_name} {self.skia.last_name}",
+                "nickname": self.skia.nick_name,
+                "selling_sum": 1000,
+            },
+        )
+        self.assertEqual(
+            next(top),
+            {
+                "customer__user": self.krophil.id,
+                "name": f"{self.krophil.first_name} {self.krophil.last_name}",
+                "nickname": self.krophil.nick_name,
+                "selling_sum": 100,
+            },
+        )
+        self.assertEqual(
+            next(top),
+            {
+                "customer__user": self.root.id,
+                "name": f"{self.root.first_name} {self.root.last_name}",
+                "nickname": self.root.nick_name,
+                "selling_sum": 2,
+            },
+        )
+        self.assertIsNone(next(top, None))
 
 
 class BillingInfoTest(TestCase):
