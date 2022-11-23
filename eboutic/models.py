@@ -245,12 +245,13 @@ class Invoice(models.Model):
     def validate(self):
         if self.validated:
             raise DataError(_("Invoice already validated"))
+        customer, created = Customer.get_or_create(user=self.user)
         eboutic = Counter.objects.filter(type="EBOUTIC").first()
         for i in self.items.all():
             if i.type_id == settings.SITH_COUNTER_PRODUCTTYPE_REFILLING:
                 new = Refilling(
                     counter=eboutic,
-                    customer=self.user.customer,
+                    customer=customer,
                     operator=self.user,
                     amount=i.product_unit_price * i.quantity,
                     payment_method="CARD",
@@ -266,7 +267,7 @@ class Invoice(models.Model):
                     club=product.club,
                     product=product,
                     seller=self.user,
-                    customer=self.user.customer,
+                    customer=customer,
                     unit_price=i.product_unit_price,
                     quantity=i.quantity,
                     payment_method="CARD",
