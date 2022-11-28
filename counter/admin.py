@@ -36,6 +36,11 @@ class CustomerAdmin(SearchModelAdmin):
     search_fields = ["account_id"]
 
 
+@admin.register(BillingInfo)
+class BillingInfoAdmin(admin.ModelAdmin):
+    list_display = ("first_name", "last_name", "address_1", "city", "country")
+
+
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductType)

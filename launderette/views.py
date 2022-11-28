@@ -41,7 +41,8 @@ from club.models import Club
 from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 from launderette.models import Launderette, Token, Machine, Slot
 from counter.models import Counter, Customer, Selling
-from counter.views import GetUserForm
+from counter.forms import GetUserForm
+
 
 # For users
 

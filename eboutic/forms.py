@@ -138,7 +138,7 @@ class BasketForm:
                 continue
             if type(item["quantity"]) is not int or item["quantity"] < 0:
                 self.error_messages.add(
-                    _("You cannot buy %(nbr)d %(name)%s.")
+                    _("You cannot buy %(nbr)d %(name)s.")
                     % {"nbr": item["quantity"], "name": item["name"]}
                 )
                 continue
@@ -166,7 +166,6 @@ class BasketForm:
         return True
 
     def get_error_messages(self) -> typing.List[str]:
-        # return [msg for msg in self.error_messages]
         return list(self.error_messages)
 
     def get_cleaned_cookie(self) -> str:

@@ -41,20 +41,6 @@
     }
 }
 
-#eboutic #basket .error-message {
-    margin-top: 5px;
-    background-color: #f8d7da;
-    border: #f5c6cb 1px solid;
-    border-radius: 4px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    row-gap: 7px;
-}
-#eboutic #basket .error-message p {
-    margin: 0;
-}
-
 #eboutic .item-list {
     margin-left: 0;
     list-style: none;
@@ -162,7 +148,7 @@
 }
 
 #eboutic .catalog-buttons button {
-    font-size: 15px;
+    font-size: 15px!important;
     font-weight: normal;
     color: white;
     min-width: 60px;

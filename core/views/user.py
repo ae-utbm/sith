@@ -67,7 +67,7 @@ from core.views.forms import (
 )
 from core.models import User, SithFile, Preferences, Gift
 from subscription.models import Subscription
-from counter.views import StudentCardForm
+from counter.forms import StudentCardForm
 from trombi.views import UserTrombiForm
 
 

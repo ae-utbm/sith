@@ -22,7 +22,7 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import re_path, path
 
 from counter.views import *
 
@@ -65,6 +65,16 @@ urlpatterns = [
         r"^customer/(?P<customer_id>[0-9]+)/card/delete/(?P<card_id>[0-9]+)/$",
         StudentCardDeleteView.as_view(),
         name="delete_student_card",
+    ),
+    path(
+        "customer/<int:user_id>/billing_info/create",
+        create_billing_info,
+        name="create_billing_info",
+    ),
+    path(
+        "customer/<int:user_id>/billing_info/edit",
+        edit_billing_info,
+        name="edit_billing_info",
     ),
     re_path(r"^admin/(?P<counter_id>[0-9]+)$", CounterEditView.as_view(), name="admin"),
     re_path(

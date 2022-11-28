@@ -1,69 +1,143 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Basket state{% endtrans %}
+    {% trans %}Basket state{% endtrans %}
+{% endblock %}
+
+{% block jquery_css %}
+    {#  Remove jquery css  #}
+{% endblock %}
+
+{% block additional_js %}
+    <script src="{{ static('eboutic/js/makecommand.js') }}" defer></script>
+    <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
-<h3>{% trans %}Eboutic{% endtrans %}</h3>
+    <h3>{% trans %}Eboutic{% endtrans %}</h3>
 
-<div>
-    <p>{% trans %}Basket: {% endtrans %}</p>
-    <table>
-        <thead>
+    <div>
+        <p>{% trans %}Basket: {% endtrans %}</p>
+        <table>
+            <thead>
             <tr>
                 <td>Article</td>
                 <td>Quantity</td>
                 <td>Unit price</td>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for item in basket.items.all() %}
-            <tr>
-                <td>{{ item.product_name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.product_unit_price }} €</td>
-            </tr>
+                <tr>
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.product_unit_price }} €</td>
+                </tr>
             {% endfor %}
-        <tbody>
-    </table>
+            <tbody>
+        </table>
 
-    <p>
-        <strong>{% trans %}Basket amount: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong>
-
-        {% if customer_amount != None %}
-            <br>
-            {% trans %}Current account amount: {% endtrans %}<strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
-
-            {% if not basket.contains_refilling_item %}
-            <br>
-            {% trans %}Remaining account amount: {% endtrans %}
-                <strong>{{ "%0.2f"|format(customer_amount|float - basket.get_total()) }} €</strong>
-            {% endif %}
-        {% endif %}
-    </p>
-    {% if settings.SITH_EBOUTIC_CB_ENABLED %}
-    <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}">
         <p>
-        {% for (field_name,field_value) in et_request.items() -%}
-        <input type="hidden" name="{{ field_name }}" value="{{ field_value }}">
-        {% endfor %}
-        <input type="submit" value="{% trans %}Pay with credit card{% endtrans %}" />
+            <strong>{% trans %}Basket amount: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong>
+
+            {% if customer_amount != None %}
+                <br>
+                {% trans %}Current account amount: {% endtrans %}
+                <strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
+
+                {% if not basket.contains_refilling_item %}
+                    <br>
+                    {% trans %}Remaining account amount: {% endtrans %}
+                    <strong>{{ "%0.2f"|format(customer_amount|float - basket.get_total()) }} €</strong>
+                {% endif %}
+            {% endif %}
         </p>
-    </form>
-    {% endif %}
-    {% if basket.contains_refilling_item %}
-    <p>{% trans %}AE account payment disabled because your basket contains refilling items.{% endtrans %}</p>
-    {% else %}
-    <form method="post" action="{{ url('eboutic:pay_with_sith') }}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="pay_with_sith_account">
-        <input type="submit" value="{% trans %}Pay with Sith account{% endtrans %}" />
-    </form>
-    {% endif %}
-</div>
+        <br>
+        {% if settings.SITH_EBOUTIC_CB_ENABLED %}
+            <div class="collapse" :class="{'shadow': collapsed}" x-data="{collapsed: false}" x-cloak>
+                <div class="collapse-header clickable" @click="collapsed = !collapsed">
+                    <span class="collapse-header-text">
+                        {% trans %}Edit billing information{% endtrans %}
+                    </span>
+                    <span class="collapse-header-icon" :class="{'reverse': collapsed}">
+                        <i class="fa fa-caret-down"></i>
+                    </span>
+                </div>
+                <form class="collapse-body" id="billing_info_form" method="post"
+                      x-show="collapsed" x-data="billing_infos"
+                      x-transition.scale.origin.top
+                      @submit.prevent="send_form()">
+                    {% csrf_token %}
+                    {{ billing_form }}
+                    <br>
+                    <br>
+                    <div x-show="errors.length > 0" class="alert alert-red" x-transition>
+                        <div class="alert-main">
+                            <template x-for="error in errors">
+                                <div x-text="error.field + ' : ' + error.messages.join(', ')"></div>
+                            </template>
+                        </div>
+                        <div class="clickable" @click="errors = []">
+                            <i class="fa fa-close"></i>
+                        </div>
+                    </div>
+                    <div x-show="successful" class="alert alert-green" x-transition>
+                        <div class="alert-main">
+                            Informations de facturation enregistrées
+                        </div>
+                        <div class="clickable" @click="successful = false">
+                            <i class="fa fa-close"></i>
+                        </div>
+                    </div>
+                    <input type="submit" class="btn btn-blue clickable"
+                           value="{% trans %}Validate{% endtrans %}">
+                </form>
+            </div>
+            <br>
+            {% if must_fill_billing_infos %}
+                <p>
+                    <i>
+                        {% trans %}You must fill your billing infos if you want to pay with your credit
+                            card{% endtrans %}
+                    </i>
+                </p>
+            {% endif %}
+            <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}" name="bank-pay-form">
+                {% csrf_token %}
+                <template x-data x-for="input in $store.billing_inputs.data">
+                    <input type="hidden" :name="input['key']" :value="input['value']">
+                </template>
+                <input type="submit" id="bank-submit-button"
+                       {% if must_fill_billing_infos %}disabled="disabled"{% endif %}
+                       value="{% trans %}Pay with credit card{% endtrans %}"/>
+            </form>
+        {% endif %}
+        {% if basket.contains_refilling_item %}
+            <p>{% trans %}AE account payment disabled because your basket contains refilling items.{% endtrans %}</p>
+        {% else %}
+            <form method="post" action="{{ url('eboutic:pay_with_sith') }}" name="sith-pay-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="pay_with_sith_account">
+                <input type="submit" value="{% trans %}Pay with Sith account{% endtrans %}"/>
+            </form>
+        {% endif %}
+    </div>
 {% endblock %}
 
+{% block script %}
+    <script>
+        const create_billing_info_url = '{{ url("counter:create_billing_info", user_id=request.user.id) }}'
+        const edit_billing_info_url = '{{ url("counter:edit_billing_info", user_id=request.user.id) }}';
+        const et_data_url = '{{ url("eboutic:et_data") }}'
+        let billing_info_exist =
+        {{ "true" if billing_infos else "false" }}
 
-
+        {% if billing_infos %}
+            const et_data = {{ billing_infos|tojson }}
+        {% else %}
+            const et_data = '{"data": []}'
+        {% endif %}
+    </script>
+    {{ super() }}
+{% endblock %}
 
