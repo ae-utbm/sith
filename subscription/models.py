@@ -97,19 +97,12 @@ class Subscription(models.Model):
             # TODO see SubscriptionForm's clean method
             raise ValidationError(_("Subscription error"))
 
-    def save(self):
+    def save(self, *args, **kwargs):
         super(Subscription, self).save()
         from counter.models import Customer
 
         if not Customer.objects.filter(user=self.member).exists():
-            last_id = (
-                Customer.objects.count() + 1504
-            )  # Number to keep a continuity with the old site
-            Customer(
-                user=self.member,
-                account_id=Customer.generate_account_id(last_id + 1),
-                amount=0,
-            ).save()
+            Customer.new_for_user(self.member).save()
             form = PasswordResetForm({"email": self.member.email})
             if form.is_valid():
                 form.save(

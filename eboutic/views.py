@@ -23,13 +23,10 @@
 #
 
 import base64
-import hmac
 import json
-from collections import OrderedDict
 from datetime import datetime
+
 import sentry_sdk
-
-
 from OpenSSL import crypto
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -41,7 +38,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView, View
 
-from counter.models import Customer, Counter, Selling
+from counter.forms import BillingInfoForm
+from counter.models import Customer, Counter, Product
 from eboutic.forms import BasketForm
 from eboutic.models import Basket, Invoice, InvoiceItem, get_eboutic_products
 
@@ -85,11 +83,11 @@ class EbouticCommand(TemplateView):
     template_name = "eboutic/eboutic_makecommand.jinja"
 
     @method_decorator(login_required)
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         return redirect("eboutic:main")
 
     @method_decorator(login_required)
-    def post(self, request: HttpRequest, *args, **kwargs):
+    def get(self, request: HttpRequest, *args, **kwargs):
         form = BasketForm(request)
         if not form.is_valid():
             request.session["errors"] = form.get_error_messages()
@@ -98,63 +96,54 @@ class EbouticCommand(TemplateView):
             res.set_cookie("basket_items", form.get_cleaned_cookie(), path="/eboutic")
             return res
 
-        if "basket_id" in request.session:
-            basket, _ = Basket.objects.get_or_create(
-                id=request.session["basket_id"], user=request.user
-            )
+        basket = Basket.from_session(request.session)
+        if basket is not None:
             basket.clear()
         else:
             basket = Basket.objects.create(user=request.user)
+            request.session["basket_id"] = basket.id
+            request.session.modified = True
 
-        basket.save()
-        eboutique = Counter.objects.get(type="EBOUTIC")
-        for item in json.loads(request.COOKIES["basket_items"]):
-            basket.add_product(
-                eboutique.products.get(id=(item["id"])), item["quantity"]
-            )
-        request.session["basket_id"] = basket.id
-        request.session.modified = True
+        items = json.loads(request.COOKIES["basket_items"])
+        items.sort(key=lambda item: item["id"])
+        ids = [item["id"] for item in items]
+        quantities = [item["quantity"] for item in items]
+        products = Product.objects.filter(id__in=ids)
+        for product, qty in zip(products, quantities):
+            basket.add_product(product, qty)
         kwargs["basket"] = basket
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
-        kwargs = super(EbouticCommand, self).get_context_data(**kwargs)
+        # basket is already in kwargs when the method is called
+        default_billing_info = None
         if hasattr(self.request.user, "customer"):
-            kwargs["customer_amount"] = self.request.user.customer.amount
+            customer = self.request.user.customer
+            kwargs["customer_amount"] = customer.amount
+            if hasattr(customer, "billing_infos"):
+                default_billing_info = customer.billing_infos
         else:
             kwargs["customer_amount"] = None
-        kwargs["et_request"] = OrderedDict()
-        kwargs["et_request"]["PBX_SITE"] = settings.SITH_EBOUTIC_PBX_SITE
-        kwargs["et_request"]["PBX_RANG"] = settings.SITH_EBOUTIC_PBX_RANG
-        kwargs["et_request"]["PBX_IDENTIFIANT"] = settings.SITH_EBOUTIC_PBX_IDENTIFIANT
-        kwargs["et_request"]["PBX_TOTAL"] = int(kwargs["basket"].get_total() * 100)
-        kwargs["et_request"][
-            "PBX_DEVISE"
-        ] = 978  # This is Euro. ET support only this value anyway
-        kwargs["et_request"]["PBX_CMD"] = kwargs["basket"].id
-        kwargs["et_request"]["PBX_PORTEUR"] = kwargs["basket"].user.email
-        kwargs["et_request"]["PBX_RETOUR"] = "Amount:M;BasketID:R;Auto:A;Error:E;Sig:K"
-        kwargs["et_request"]["PBX_HASH"] = "SHA512"
-        kwargs["et_request"]["PBX_TYPEPAIEMENT"] = "CARTE"
-        kwargs["et_request"]["PBX_TYPECARTE"] = "CB"
-        kwargs["et_request"]["PBX_TIME"] = str(
-            datetime.now().replace(microsecond=0).isoformat("T")
-        )
-        kwargs["et_request"]["PBX_HMAC"] = (
-            hmac.new(
-                settings.SITH_EBOUTIC_HMAC_KEY,
-                bytes(
-                    "&".join(
-                        ["%s=%s" % (k, v) for k, v in kwargs["et_request"].items()]
-                    ),
-                    "utf-8",
-                ),
-                "sha512",
-            )
-            .hexdigest()
-            .upper()
-        )
+        kwargs["must_fill_billing_infos"] = default_billing_info is None
+        if not kwargs["must_fill_billing_infos"]:
+            # the user has already filled its billing_infos, thus we can
+            # get it without expecting an error
+            data = kwargs["basket"].get_e_transaction_data()
+            data = {"data": [{"key": key, "value": val} for key, val in data]}
+            kwargs["billing_infos"] = json.dumps(data)
+        kwargs["billing_form"] = BillingInfoForm(instance=default_billing_info)
         return kwargs
+
+
+@login_required
+@require_GET
+def e_transaction_data(request):
+    basket = Basket.from_session(request.session)
+    if basket is None:
+        return HttpResponse(status=404, content=json.dumps({"data": []}))
+    data = basket.get_e_transaction_data()
+    data = {"data": [{"key": key, "value": val} for key, val in data]}
+    return HttpResponse(status=200, content=json.dumps(data))
 
 
 @login_required
@@ -171,24 +160,14 @@ def pay_with_sith(request):
         res = redirect("eboutic:payment_result", "failure")
     else:
         eboutic = Counter.objects.filter(type="EBOUTIC").first()
+        sales = basket.generate_sales(eboutic, c.user, "SITH_ACCOUNT")
         try:
             with transaction.atomic():
-                for it in basket.items.all():
-                    product = eboutic.products.get(id=it.product_id)
-                    Selling(
-                        label=it.product_name,
-                        counter=eboutic,
-                        club=product.club,
-                        product=product,
-                        seller=c.user,
-                        customer=c,
-                        unit_price=it.product_unit_price,
-                        quantity=it.quantity,
-                        payment_method="SITH_ACCOUNT",
-                    ).save()
+                for sale in sales:
+                    sale.save()
                 basket.delete()
-                request.session.pop("basket_id", None)
-                res = redirect("eboutic:payment_result", "success")
+            request.session.pop("basket_id", None)
+            res = redirect("eboutic:payment_result", "success")
         except DatabaseError as e:
             with sentry_sdk.push_scope() as scope:
                 scope.user = {"username": request.user.username}
@@ -205,12 +184,8 @@ class EtransactionAutoAnswer(View):
     # Response documentation http://www1.paybox.com/espace-integrateur-documentation
     # /la-solution-paybox-system/gestion-de-la-reponse/
     def get(self, request, *args, **kwargs):
-        if (
-            not "Amount" in request.GET.keys()
-            or not "BasketID" in request.GET.keys()
-            or not "Error" in request.GET.keys()
-            or not "Sig" in request.GET.keys()
-        ):
+        required = {"Amount", "BasketID", "Error", "Sig"}
+        if not required.issubset(set(request.GET.keys())):
             return HttpResponse("Bad arguments", status=400)
         key = crypto.load_publickey(crypto.FILETYPE_PEM, settings.SITH_EBOUTIC_PUB_KEY)
         cert = crypto.X509()

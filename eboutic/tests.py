@@ -24,7 +24,6 @@
 #
 import base64
 import json
-import re
 import urllib
 
 from OpenSSL import crypto
@@ -40,18 +39,19 @@ from eboutic.models import Basket
 
 
 class EbouticTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         call_command("populate")
-        self.skia = User.objects.filter(username="skia").first()
-        self.subscriber = User.objects.filter(username="subscriber").first()
-        self.old_subscriber = User.objects.filter(username="old_subscriber").first()
-        self.public = User.objects.filter(username="public").first()
-        self.barbar = Product.objects.filter(code="BARB").first()
-        self.refill = Product.objects.filter(code="15REFILL").first()
-        self.cotis = Product.objects.filter(code="1SCOTIZ").first()
-        self.eboutic = Counter.objects.filter(name="Eboutic").first()
+        cls.barbar = Product.objects.filter(code="BARB").first()
+        cls.refill = Product.objects.filter(code="15REFILL").first()
+        cls.cotis = Product.objects.filter(code="1SCOTIZ").first()
+        cls.eboutic = Counter.objects.filter(name="Eboutic").first()
+        cls.skia = User.objects.filter(username="skia").first()
+        cls.subscriber = User.objects.filter(username="subscriber").first()
+        cls.old_subscriber = User.objects.filter(username="old_subscriber").first()
+        cls.public = User.objects.filter(username="public").first()
 
-    def get_busy_basket(self, user):
+    def get_busy_basket(self, user) -> Basket:
         """
         Create and return a basket with 3 barbar and 1 cotis in it.
         Edit the client session to store the basket id in it
@@ -64,11 +64,11 @@ class EbouticTest(TestCase):
         basket.add_product(self.cotis)
         return basket
 
-    def generate_bank_valid_answer_from_page_content(self, content):
-        content = str(content)
-        basket_id = re.search(r"PBX_CMD\" value=\"(\d*)\"", content).group(1)
-        amount = re.search(r"PBX_TOTAL\" value=\"(\d*)\"", content).group(1)
-        query = "Amount=%s&BasketID=%s&Auto=42&Error=00000" % (amount, basket_id)
+    def generate_bank_valid_answer(self) -> str:
+        basket = Basket.from_session(self.client.session)
+        basket_id = basket.id
+        amount = int(basket.get_total() * 100)
+        query = f"Amount={amount}&BasketID={basket_id}&Auto=42&Error=00000"
         with open("./eboutic/tests/private_key.pem") as f:
             PRIVKEY = f.read()
         with open("./eboutic/tests/public_key.pem") as f:
@@ -81,8 +81,7 @@ class EbouticTest(TestCase):
             query,
             urllib.parse.quote_plus(b64sig),
         )
-        response = self.client.get(url)
-        return response
+        return url
 
     def test_buy_with_sith_account(self):
         self.client.login(username="subscriber", password="plop")
@@ -102,7 +101,7 @@ class EbouticTest(TestCase):
     def test_buy_with_sith_account_no_money(self):
         self.client.login(username="subscriber", password="plop")
         basket = self.get_busy_basket(self.subscriber)
-        initial = basket.get_total() - 1
+        initial = basket.get_total() - 1  # just not enough to complete the sale
         self.subscriber.customer.amount = initial
         self.subscriber.customer.save()
         response = self.client.post(reverse("eboutic:pay_with_sith"))
@@ -122,7 +121,7 @@ class EbouticTest(TestCase):
             {"id": 2, "name": "Cotis 2 semestres", "quantity": 1, "unit_price": 28},
             {"id": 4, "name": "Barbar", "quantity": 3, "unit_price": 1.7}
         ]"""
-        response = self.client.post(reverse("eboutic:command"))
+        response = self.client.get(reverse("eboutic:command"))
         self.assertEqual(response.status_code, 200)
         self.assertInHTML(
             "<tr><td>Cotis 2 semestres</td><td>1</td><td>28.00 €</td></tr>",
@@ -146,7 +145,7 @@ class EbouticTest(TestCase):
     def test_submit_empty_basket(self):
         self.client.login(username="subscriber", password="plop")
         self.client.cookies["basket_items"] = "[]"
-        response = self.client.post(reverse("eboutic:command"))
+        response = self.client.get(reverse("eboutic:command"))
         self.assertRedirects(response, "/eboutic/")
 
     def test_submit_invalid_basket(self):
@@ -157,7 +156,7 @@ class EbouticTest(TestCase):
         ] = f"""[
             {{"id": {max_id + 1}, "name": "", "quantity": 1, "unit_price": 28}}
         ]"""
-        response = self.client.post(reverse("eboutic:command"))
+        response = self.client.get(reverse("eboutic:command"))
         self.assertIn(
             'basket_items=""',
             self.client.cookies["basket_items"].OutputString(),
@@ -175,7 +174,7 @@ class EbouticTest(TestCase):
         ] = """[
             {"id": 4, "name": "Barbar", "quantity": -1, "unit_price": 1.7}
         ]"""
-        response = self.client.post(reverse("eboutic:command"))
+        response = self.client.get(reverse("eboutic:command"))
         self.assertRedirects(response, "/eboutic/")
 
     def test_buy_subscribe_product_with_credit_card(self):
@@ -189,14 +188,14 @@ class EbouticTest(TestCase):
         ] = """[
             {"id": 2, "name": "Cotis 2 semestres", "quantity": 1, "unit_price": 28}
         ]"""
-        response = self.client.post(reverse("eboutic:command"))
+        response = self.client.get(reverse("eboutic:command"))
         self.assertInHTML(
             "<tr><td>Cotis 2 semestres</td><td>1</td><td>28.00 €</td></tr>",
             response.content.decode(),
         )
         basket = Basket.objects.get(id=self.client.session["basket_id"])
         self.assertEqual(basket.items.count(), 1)
-        response = self.generate_bank_valid_answer_from_page_content(response.content)
+        response = self.client.get(self.generate_bank_valid_answer())
         self.assertTrue(response.status_code == 200)
         self.assertTrue(response.content.decode("utf-8") == "Payment successful")
 
@@ -215,9 +214,10 @@ class EbouticTest(TestCase):
             [{"id": 3, "name": "Rechargement 15 €", "quantity": 1, "unit_price": 15}]
         )
         initial_balance = self.subscriber.customer.amount
-        response = self.client.post(reverse("eboutic:command"))
+        self.client.get(reverse("eboutic:command"))
 
-        response = self.generate_bank_valid_answer_from_page_content(response.content)
+        url = self.generate_bank_valid_answer()
+        response = self.client.get(url)
         self.assertTrue(response.status_code == 200)
         self.assertTrue(response.content.decode() == "Payment successful")
         new_balance = Customer.objects.get(user=self.subscriber).amount
@@ -228,14 +228,15 @@ class EbouticTest(TestCase):
         self.client.cookies["basket_items"] = json.dumps(
             [{"id": 4, "name": "Barbar", "quantity": 1, "unit_price": 1.7}]
         )
-        response = self.client.post(reverse("eboutic:command"))
+        self.client.get(reverse("eboutic:command"))
+        et_answer_url = self.generate_bank_valid_answer()
         self.client.cookies["basket_items"] = json.dumps(
             [  # alter basket
                 {"id": 4, "name": "Barbar", "quantity": 3, "unit_price": 1.7}
             ]
         )
-        self.client.post(reverse("eboutic:command"))
-        response = self.generate_bank_valid_answer_from_page_content(response.content)
+        self.client.get(reverse("eboutic:command"))
+        response = self.client.get(et_answer_url)
         self.assertEqual(response.status_code, 500)
         self.assertIn(
             "Basket processing failed with error: SuspiciousOperation('Basket total and amount do not match'",
@@ -247,8 +248,9 @@ class EbouticTest(TestCase):
         self.client.cookies["basket_items"] = json.dumps(
             [{"id": 4, "name": "Barbar", "quantity": 1, "unit_price": 1.7}]
         )
-        response = self.client.post(reverse("eboutic:command"))
-        response = self.generate_bank_valid_answer_from_page_content(response.content)
+        self.client.get(reverse("eboutic:command"))
+        et_answer_url = self.generate_bank_valid_answer()
+        response = self.client.get(et_answer_url)
         self.assertTrue(response.status_code == 200)
         self.assertTrue(response.content.decode("utf-8") == "Payment successful")
 

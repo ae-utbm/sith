@@ -34,8 +34,9 @@ urlpatterns = [
     # Subscription views
     path("", eboutic_main, name="main"),
     path("command/", EbouticCommand.as_view(), name="command"),
-    path("pay/", pay_with_sith, name="pay_with_sith"),
+    path("pay/sith/", pay_with_sith, name="pay_with_sith"),
     path("pay/<res:result>/", payment_result, name="payment_result"),
+    path("et_data/", e_transaction_data, name="et_data"),
     path(
         "et_autoanswer",
         EtransactionAutoAnswer.as_view(),
