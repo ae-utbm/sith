@@ -33,6 +33,8 @@ from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from core.models import User
 from club.models import Club, Membership, Mailing
 from club.forms import MailingForm
+from sith.settings import SITH_BAR_MANAGER
+
 
 # Create your tests here.
 
@@ -43,7 +45,7 @@ class ClubTest(TestCase):
         self.skia = User.objects.filter(username="skia").first()
         self.rbatsbak = User.objects.filter(username="rbatsbak").first()
         self.guy = User.objects.filter(username="guy").first()
-        self.bdf = Club.objects.filter(unix_name="bdf").first()
+        self.bdf = Club.objects.filter(unix_name=SITH_BAR_MANAGER["unix_name"]).first()
 
     def test_create_add_user_to_club_from_root_ok(self):
         self.client.login(username="root", password="plop")
@@ -390,7 +392,7 @@ class MailingFormTest(TestCase):
         self.rbatsbak = User.objects.filter(username="rbatsbak").first()
         self.krophil = User.objects.filter(username="krophil").first()
         self.comunity = User.objects.filter(username="comunity").first()
-        self.bdf = Club.objects.filter(unix_name="bdf").first()
+        self.bdf = Club.objects.filter(unix_name=SITH_BAR_MANAGER["unix_name"]).first()
         Membership(
             user=self.rbatsbak,
             club=self.bdf,
