@@ -278,8 +278,8 @@ SITH_MAIN_CLUB = {
 
 # Bar managers
 SITH_BAR_MANAGER = {
-    "name": "BdF",
-    "unix_name": "bdf",
+    "name": "Pdf",
+    "unix_name": "pdfesti",
     "address": "6 Boulevard Anatole France, 90000 Belfort",
 }
 
