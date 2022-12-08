@@ -28,6 +28,7 @@ import typing
 
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
+from sentry_sdk import capture_message
 
 from eboutic.models import get_eboutic_products
 
@@ -104,6 +105,12 @@ class BasketForm:
         # check that the json is not nested before parsing it to make sure
         # malicious user can't ddos the server with deeply nested json
         if not BasketForm.json_cookie_re.match(basket):
+            # As the validation of the cookie goes through a rather boring regex,
+            # we can regularly have to deal with subtle errors that we hadn't forecasted,
+            # so we explicitly lay a Sentry message capture here.
+            capture_message(
+                f"Eboutic basket regex checking failed to validate current json : {basket}"
+            )
             self.error_messages.add(_("The request was badly formatted."))
             return
         try:
