@@ -22,6 +22,7 @@
 #
 #
 import hmac
+import html
 import typing
 from datetime import datetime
 from typing import List
@@ -197,29 +198,21 @@ class Basket(models.Model):
             ("PBX_TYPEPAIEMENT", "CARTE"),
             ("PBX_TYPECARTE", "CB"),
             ("PBX_TIME", datetime.now().replace(microsecond=0).isoformat("T")),
-            ("PBX_BILLING", customer.billing_infos.to_3dsv2_xml()),
-            (
-                "PBX_SHOPPINGCART",
-                dict2xml({"shoppingcart": {"total": {min(self.items.count(), 99)}}}),
-            ),
         ]
-        data.append(
-            (
-                "PBX_HMAC",
-                (
-                    hmac.new(
-                        settings.SITH_EBOUTIC_HMAC_KEY,
-                        bytes("&".join("=".join(d) for d in data), "utf-8"),
-                        "sha512",
-                    )
-                    .hexdigest()
-                    .upper()
-                ),
-            )
+        cart = {"shoppingcart": {"total": min(self.items.count(), 99)}}
+        cart = dict2xml(cart, newlines=False)
+        cart = '<?xml version="1.0" encoding="UTF-8" ?>' + cart
+        data += [
+            ("PBX_SHOPPINGCART", html.escape(cart)),
+            ("PBX_BILLING", html.escape(customer.billing_infos.to_3dsv2_xml())),
+        ]
+        pbx_hmac = hmac.new(
+            settings.SITH_EBOUTIC_HMAC_KEY,
+            bytes("&".join("=".join(d) for d in data), "utf-8"),
+            "sha512",
         )
+        data.append(("PBX_HMAC", pbx_hmac.hexdigest().upper()))
         return data
-
-    # def validate(self, exclude=None):
 
     def __str__(self):
         return "%s's basket (%d items)" % (self.user, self.items.all().count())
