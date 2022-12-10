@@ -21,10 +21,9 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-from django.db.models.functions import Length
 
-from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
 from django.db import models
+from django.db.models.functions import Length
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
@@ -41,6 +40,7 @@ import base64
 import datetime
 from dict2xml import dict2xml
 
+from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
 from club.models import Club, Membership
 from accounting.models import CurrencyField
 from core.models import Group, User, Notification
@@ -166,23 +166,22 @@ class BillingInfo(models.Model):
         """
         Convert the data from this model into a xml usable
         by the online paying service of the Crédit Agricole bank.
-        see : `https://www.ca-moncommerce.com/espace-client-mon-commerce/up2pay-e-transactions/ma-documentation/manuel-dintegration-focus-3ds-v2/principes-generaux/#boutique-cms-utilisation-des-modules-up2pay-e-transactions-mise-a-jour-module`
+        see : `https://www.ca-moncommerce.com/espace-client-mon-commerce/up2pay-e-transactions/ma-documentation/manuel-dintegration-focus-3ds-v2/principes-generaux/#integration-3dsv2-developpeur-webmaster`
         """
         data = {
-            "Billing": {
-                "Address": {
-                    "FirstName": self.first_name,
-                    "LastName": self.last_name,
-                    "Address1": self.address_1,
-                    "ZipCode": self.zip_code,
-                    "City": self.city,
-                    "CountryCode": self.country,
-                }
+            "Address": {
+                "FirstName": self.first_name,
+                "LastName": self.last_name,
+                "Address1": self.address_1,
+                "ZipCode": self.zip_code,
+                "City": self.city,
+                "CountryCode": self.country,
             }
         }
         if self.address_2:
-            data["Billing"]["Address"]["Address2"] = self.address_2
-        return dict2xml(data)
+            data["Address"]["Address2"] = self.address_2
+        xml = dict2xml(data, wrap="Billing", newlines=False)
+        return '<?xml version="1.0" encoding="UTF-8" ?>' + xml
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
