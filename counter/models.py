@@ -166,7 +166,7 @@ class BillingInfo(models.Model):
         """
         Convert the data from this model into a xml usable
         by the online paying service of the Crédit Agricole bank.
-        see : `https://www.ca-moncommerce.com/espace-client-mon-commerce/up2pay-e-transactions/ma-documentation/manuel-dintegration-focus-3ds-v2/principes-generaux/#boutique-cms-utilisation-des-modules-up2pay-e-transactions-mise-a-jour-module`
+        see : `https://www.ca-moncommerce.com/espace-client-mon-commerce/up2pay-e-transactions/ma-documentation/manuel-dintegration-focus-3ds-v2/principes-generaux/#integration-3dsv2-developpeur-webmaster`
         """
         data = {
             "Address": {
