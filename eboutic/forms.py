@@ -110,7 +110,7 @@ class BasketForm:
             # so we explicitly lay a Sentry message capture here.
             capture_message(
                 "Eboutic basket regex checking failed to validate basket json",
-                level="error"
+                level="error",
             )
             self.error_messages.add(_("The request was badly formatted."))
             return
