@@ -175,13 +175,13 @@ class BillingInfo(models.Model):
                 "Address1": self.address_1,
                 "ZipCode": self.zip_code,
                 "City": self.city,
-                "CountryCode": self.country,
+                "CountryCode": self.country.numeric,  # ISO-3166-1 numeric code
             }
         }
         if self.address_2:
             data["Address"]["Address2"] = self.address_2
         xml = dict2xml(data, wrap="Billing", newlines=False)
-        return '<?xml version="1.0" encoding="UTF-8" ?>' + xml
+        return '<?xml version="1.0" encoding="UTF-8" ?>\n' + xml
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
