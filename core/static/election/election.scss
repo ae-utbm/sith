@@ -199,6 +199,7 @@ $min_col_width: 100px;
                             align-items: center;
                             gap: $gap;
                             padding: 10px;
+                            max-width: 100%;
 
                             >img {
                                 max-width: 100% !important;
