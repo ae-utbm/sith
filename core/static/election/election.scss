@@ -166,14 +166,15 @@ $min_col_width: 100px;
                     flex-direction: row;
                     flex-wrap: wrap;
                     justify-content: center;
+                    width: 100%;                    
                     gap: $gap;
 
                     >.candidate {
                         display: flex;
                         flex-direction: column;
                         align-items: center;
-
                         list-style-type: none;
+                        width: 100%;
                         gap: $gap;
 
                         >input[type="radio"]:checked + label,
@@ -186,6 +187,10 @@ $min_col_width: 100px;
                             }
                         }
 
+                        >label {
+                            width: 100%;
+                        }
+
                         >label>figure,
                         >figure {
                             position: relative;
@@ -196,15 +201,19 @@ $min_col_width: 100px;
                             padding: 10px;
 
                             >img {
-                                max-width: 100%;
+                                max-width: 100% !important;
                             }
 
                             >figcaption {
+                                width: 100%;
+                                max-width: inherit !important;
+                                overflow: hidden;
+                                
                                 h5 {
                                     margin: 0;
                                     text-align: center;
                                 }
-                                q {
+                                .candidate_program {
                                     margin: 5px 0;
                                 }
                             }
