@@ -202,7 +202,7 @@ $min_col_width: 100px;
                             max-width: 100%;
 
                             >img {
-                                max-width: 100%;
+                                max-width: 100% !important;
                             }
 
                             >figcaption {
