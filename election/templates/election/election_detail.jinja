@@ -100,7 +100,7 @@
                         </td>
                     </tr>
                     <tr class="role_candidates">
-                        <td class="list_per_role" style="width: {{ 100 / (election_lists.count() + 1) }}%">
+                        <td class="list_per_role" style="width: 100%; max-width: {{ 100 / (election_lists.count() + 1) }}%">
                             {%- if role.max_choice == 1 and election.can_vote(user) %}
                             <div class="radio-btn">
                                 <input id="id_{{ role.title }}_{{ count[0] }}" type="radio" name="{{ role.title }}" value {{ '' if role_data in election_form else 'checked' }} {{ 'disabled' if election.has_voted(user) else '' }}>
@@ -118,7 +118,7 @@
                             {%- endif %}
                         </td>
                         {%- for election_list in election_lists %}
-                        <td class="list_per_role" style="width: {{ 100 / (election_lists.count() + 1) }}%">
+                        <td class="list_per_role" style="width: 100%; max-width: {{ 100 / (election_lists.count() + 1) }}%">
                             <ul class="candidates">
                                 {%- for candidature in election_list.candidatures.filter(role=role) %}
                                 <li class="candidate">
@@ -141,7 +141,7 @@
                                                     {%- endif %}
                                                 </figcaption>
                                                 {%- if user.can_edit(candidature) -%}
-                                                {% if election.is_vote_editable %}
+                                                {%- if election.is_vote_editable -%}
                                                     <div class="edit_btns">
                                                         <a href="{{url('election:update_candidate', candidature_id=candidature.id)}}">{% trans %}✏️{% endtrans %}</a>
                                                         <a href="{{url('election:delete_candidate', candidature_id=candidature.id)}}">{% trans %}❌{% endtrans %}</a>
