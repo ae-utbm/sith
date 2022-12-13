@@ -25,11 +25,13 @@
         <div id="basket">
             <h3>Panier</h3>
             {% if errors %}
-                <div class="error-message">
-                    {% for error in errors %}
-                        <p>{{ error }}</p>
-                    {% endfor %}
-                    {% trans %}Your basket has been cleaned accordingly to those errors.{% endtrans %}
+                <div class="alert alert-red">
+                    <div class="alert-main">
+                        {% for error in errors %}
+                            <p style="margin: 0">{{ error }}</p>
+                        {% endfor %}
+                        {% trans %}Your basket has been cleaned accordingly to those errors.{% endtrans %}
+                    </div>
                 </div>
             {% endif %}
             <ul class="item-list">
@@ -64,7 +66,7 @@
                     <i class="fa fa-trash"></i>
                     {% trans %}Clear{% endtrans %}
                 </button>
-                <form method="post" action="{{ url('eboutic:command') }}">
+                <form method="get" action="{{ url('eboutic:command') }}">
                     {% csrf_token %}
                     <button class="validate">
                         <i class="fa fa-check"></i>
@@ -75,7 +77,7 @@
         </div>
         <div id="catalog">
             {% if not request.user.date_of_birth %}
-                <div class="alert" x-data="{show_alert: true}" x-show="show_alert" x-transition>
+                <div class="alert alert-red" x-data="{show_alert: true}" x-show="show_alert" x-transition>
                     <span class="alert-main">
                         {% trans %}You have not filled in your date of birth. As a result, you may not have access to all the products in the online shop. To fill in your date of birth, you can go to{% endtrans %}
                         <a href="{{ url("core:user_edit", user_id=request.user.id) }}">

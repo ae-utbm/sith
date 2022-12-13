@@ -21,7 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
+import json
 import re
 
 from django.test import TestCase
@@ -29,7 +29,7 @@ from django.urls import reverse
 from django.core.management import call_command
 
 from core.models import User
-from counter.models import Counter
+from counter.models import Counter, Customer, BillingInfo
 
 
 class CounterTest(TestCase):
@@ -67,7 +67,7 @@ class CounterTest(TestCase):
         response = self.client.get(response.get("location"))
         self.assertTrue(">Richard Batsbak</" in str(response.content))
 
-        response = self.client.post(
+        self.client.post(
             location,
             {
                 "action": "refill",
@@ -76,15 +76,11 @@ class CounterTest(TestCase):
                 "bank": "OTHER",
             },
         )
-        response = self.client.post(location, {"action": "code", "code": "BARB"})
-        response = self.client.post(
-            location, {"action": "add_product", "product_id": "4"}
-        )
-        response = self.client.post(
-            location, {"action": "del_product", "product_id": "4"}
-        )
-        response = self.client.post(location, {"action": "code", "code": "2xdeco"})
-        response = self.client.post(location, {"action": "code", "code": "1xbarb"})
+        self.client.post(location, {"action": "code", "code": "BARB"})
+        self.client.post(location, {"action": "add_product", "product_id": "4"})
+        self.client.post(location, {"action": "del_product", "product_id": "4"})
+        self.client.post(location, {"action": "code", "code": "2xdeco"})
+        self.client.post(location, {"action": "code", "code": "1xbarb"})
         response = self.client.post(location, {"action": "code", "code": "fin"})
 
         response_get = self.client.get(response.get("location"))
@@ -96,7 +92,7 @@ class CounterTest(TestCase):
             in str(response_content)
         )
 
-        response = self.client.post(
+        self.client.post(
             reverse("counter:login", kwargs={"counter_id": self.mde.id}),
             {"username": self.sli.username, "password": "plop"},
         )
@@ -152,6 +148,234 @@ class CounterStatsTest(TestCase):
         # Test with not login user
         response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
         self.assertTrue(response.status_code == 403)
+
+
+class BillingInfoTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.payload_1 = {
+            "first_name": "Subscribed",
+            "last_name": "User",
+            "address_1": "1 rue des Huns",
+            "zip_code": "90000",
+            "city": "Belfort",
+            "country": "FR",
+        }
+        cls.payload_2 = {
+            "first_name": "Subscribed",
+            "last_name": "User",
+            "address_1": "3, rue de Troyes",
+            "zip_code": "34301",
+            "city": "Sète",
+            "country": "FR",
+        }
+        super().setUpClass()
+        call_command("populate")
+
+    def test_edit_infos(self):
+        user = User.objects.get(username="subscriber")
+        BillingInfo.objects.get_or_create(
+            customer=user.customer, defaults=self.payload_1
+        )
+        self.client.login(username=user.username, password="plop")
+        response = self.client.post(
+            reverse("counter:edit_billing_info", args=[user.id]),
+            json.dumps(self.payload_2),
+            content_type="application/json",
+        )
+        user = User.objects.get(username="subscriber")
+        infos = BillingInfo.objects.get(customer__user=user)
+        self.assertEqual(200, response.status_code)
+        self.assertJSONEqual(response.content, {"errors": None})
+        self.assertTrue(hasattr(user.customer, "billing_infos"))
+        self.assertEqual(user.customer, infos.customer)
+        self.assertEqual("Subscribed", infos.first_name)
+        self.assertEqual("User", infos.last_name)
+        self.assertEqual("3, rue de Troyes", infos.address_1)
+        self.assertEqual(None, infos.address_2)
+        self.assertEqual("34301", infos.zip_code)
+        self.assertEqual("Sète", infos.city)
+        self.assertEqual("FR", infos.country)
+
+    def test_create_infos_for_user_with_account(self):
+        user = User.objects.get(username="subscriber")
+        if hasattr(user.customer, "billing_infos"):
+            user.customer.billing_infos.delete()
+        self.client.login(username=user.username, password="plop")
+        response = self.client.post(
+            reverse("counter:create_billing_info", args=[user.id]),
+            json.dumps(self.payload_1),
+            content_type="application/json",
+        )
+        user = User.objects.get(username="subscriber")
+        infos = BillingInfo.objects.get(customer__user=user)
+        self.assertEqual(200, response.status_code)
+        self.assertJSONEqual(response.content, {"errors": None})
+        self.assertTrue(hasattr(user.customer, "billing_infos"))
+        self.assertEqual(user.customer, infos.customer)
+        self.assertEqual("Subscribed", infos.first_name)
+        self.assertEqual("User", infos.last_name)
+        self.assertEqual("1 rue des Huns", infos.address_1)
+        self.assertEqual(None, infos.address_2)
+        self.assertEqual("90000", infos.zip_code)
+        self.assertEqual("Belfort", infos.city)
+        self.assertEqual("FR", infos.country)
+
+    def test_create_infos_for_user_without_account(self):
+        user = User.objects.get(username="subscriber")
+        if hasattr(user, "customer"):
+            user.customer.delete()
+        self.client.login(username=user.username, password="plop")
+        response = self.client.post(
+            reverse("counter:create_billing_info", args=[user.id]),
+            json.dumps(self.payload_1),
+            content_type="application/json",
+        )
+        user = User.objects.get(username="subscriber")
+        self.assertTrue(hasattr(user, "customer"))
+        self.assertTrue(hasattr(user.customer, "billing_infos"))
+        self.assertEqual(200, response.status_code)
+        self.assertJSONEqual(response.content, {"errors": None})
+        infos = BillingInfo.objects.get(customer__user=user)
+        self.assertEqual(user.customer, infos.customer)
+        self.assertEqual("Subscribed", infos.first_name)
+        self.assertEqual("User", infos.last_name)
+        self.assertEqual("1 rue des Huns", infos.address_1)
+        self.assertEqual(None, infos.address_2)
+        self.assertEqual("90000", infos.zip_code)
+        self.assertEqual("Belfort", infos.city)
+        self.assertEqual("FR", infos.country)
+
+    def test_create_invalid(self):
+        user = User.objects.get(username="subscriber")
+        if hasattr(user.customer, "billing_infos"):
+            user.customer.billing_infos.delete()
+        self.client.login(username=user.username, password="plop")
+        # address_1, zip_code and country are missing
+        payload = {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "city": "Belfort",
+        }
+        response = self.client.post(
+            reverse("counter:create_billing_info", args=[user.id]),
+            json.dumps(payload),
+            content_type="application/json",
+        )
+        user = User.objects.get(username="subscriber")
+        self.assertEqual(400, response.status_code)
+        self.assertFalse(hasattr(user.customer, "billing_infos"))
+        expected_errors = {
+            "errors": [
+                {"field": "Adresse 1", "messages": ["Ce champ est obligatoire."]},
+                {"field": "Code postal", "messages": ["Ce champ est obligatoire."]},
+                {"field": "Country", "messages": ["Ce champ est obligatoire."]},
+            ]
+        }
+        self.assertJSONEqual(response.content, expected_errors)
+
+    def test_edit_invalid(self):
+        user = User.objects.get(username="subscriber")
+        BillingInfo.objects.get_or_create(
+            customer=user.customer, defaults=self.payload_1
+        )
+        self.client.login(username=user.username, password="plop")
+        # address_1, zip_code and country are missing
+        payload = {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "city": "Belfort",
+        }
+        response = self.client.post(
+            reverse("counter:edit_billing_info", args=[user.id]),
+            json.dumps(payload),
+            content_type="application/json",
+        )
+        user = User.objects.get(username="subscriber")
+        self.assertEqual(400, response.status_code)
+        self.assertTrue(hasattr(user.customer, "billing_infos"))
+        expected_errors = {
+            "errors": [
+                {"field": "Adresse 1", "messages": ["Ce champ est obligatoire."]},
+                {"field": "Code postal", "messages": ["Ce champ est obligatoire."]},
+                {"field": "Country", "messages": ["Ce champ est obligatoire."]},
+            ]
+        }
+        self.assertJSONEqual(response.content, expected_errors)
+
+    def test_edit_other_user(self):
+        user = User.objects.get(username="sli")
+        self.client.login(username="subscriber", password="plop")
+        BillingInfo.objects.get_or_create(
+            customer=user.customer, defaults=self.payload_1
+        )
+        response = self.client.post(
+            reverse("counter:edit_billing_info", args=[user.id]),
+            json.dumps(self.payload_2),
+            content_type="application/json",
+        )
+        self.assertEqual(403, response.status_code)
+
+    def test_edit_not_existing_infos(self):
+        user = User.objects.get(username="subscriber")
+        if hasattr(user.customer, "billing_infos"):
+            user.customer.billing_infos.delete()
+        self.client.login(username=user.username, password="plop")
+        response = self.client.post(
+            reverse("counter:edit_billing_info", args=[user.id]),
+            json.dumps(self.payload_2),
+            content_type="application/json",
+        )
+        self.assertEqual(404, response.status_code)
+
+    def test_edit_by_root(self):
+        user = User.objects.get(username="subscriber")
+        BillingInfo.objects.get_or_create(
+            customer=user.customer, defaults=self.payload_1
+        )
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("counter:edit_billing_info", args=[user.id]),
+            json.dumps(self.payload_2),
+            content_type="application/json",
+        )
+        self.assertEqual(200, response.status_code)
+        user = User.objects.get(username="subscriber")
+        infos = BillingInfo.objects.get(customer__user=user)
+        self.assertJSONEqual(response.content, {"errors": None})
+        self.assertTrue(hasattr(user.customer, "billing_infos"))
+        self.assertEqual(user.customer, infos.customer)
+        self.assertEqual("Subscribed", infos.first_name)
+        self.assertEqual("User", infos.last_name)
+        self.assertEqual("3, rue de Troyes", infos.address_1)
+        self.assertEqual(None, infos.address_2)
+        self.assertEqual("34301", infos.zip_code)
+        self.assertEqual("Sète", infos.city)
+        self.assertEqual("FR", infos.country)
+
+    def test_create_by_root(self):
+        user = User.objects.get(username="subscriber")
+        if hasattr(user.customer, "billing_infos"):
+            user.customer.billing_infos.delete()
+        self.client.login(username="root", password="plop")
+        response = self.client.post(
+            reverse("counter:create_billing_info", args=[user.id]),
+            json.dumps(self.payload_2),
+            content_type="application/json",
+        )
+        self.assertEqual(200, response.status_code)
+        user = User.objects.get(username="subscriber")
+        infos = BillingInfo.objects.get(customer__user=user)
+        self.assertJSONEqual(response.content, {"errors": None})
+        self.assertTrue(hasattr(user.customer, "billing_infos"))
+        self.assertEqual(user.customer, infos.customer)
+        self.assertEqual("Subscribed", infos.first_name)
+        self.assertEqual("User", infos.last_name)
+        self.assertEqual("3, rue de Troyes", infos.address_1)
+        self.assertEqual(None, infos.address_2)
+        self.assertEqual("34301", infos.zip_code)
+        self.assertEqual("Sète", infos.city)
+        self.assertEqual("FR", infos.country)
 
 
 class BarmanConnectionTest(TestCase):
@@ -519,3 +743,20 @@ class StudentCardTest(TestCase):
             {"uid": "8B90734A802A8F"},
         )
         self.assertEqual(response.status_code, 403)
+
+
+class AccountIdTest(TestCase):
+    def setUp(self):
+        user_a = User.objects.create(username="a", password="plop", email="a.a@a.fr")
+        user_b = User.objects.create(username="b", password="plop", email="b.b@b.fr")
+        user_c = User.objects.create(username="c", password="plop", email="c.c@c.fr")
+        Customer.objects.create(user=user_a, amount=0, account_id="1111a")
+        Customer.objects.create(user=user_b, amount=0, account_id="9999z")
+        Customer.objects.create(user=user_c, amount=0, account_id="12345f")
+
+    def test_create_customer(self):
+        user_d = User.objects.create(username="d", password="plop")
+        customer_d = Customer.new_for_user(user_d)
+        customer_d.save()
+        number = customer_d.account_id[:-1]
+        self.assertEqual(number, "12346")
