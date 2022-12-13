@@ -105,7 +105,7 @@ class EbouticCommand(TemplateView):
             request.session["basket_id"] = basket.id
             request.session.modified = True
 
-        items = json.loads(request.COOKIES["basket_items"])
+        items = json.loads(unquote(request.COOKIES["basket_items"]))
         items.sort(key=lambda item: item["id"])
         ids = [item["id"] for item in items]
         quantities = [item["quantity"] for item in items]
