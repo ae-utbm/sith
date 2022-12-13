@@ -103,7 +103,7 @@ class BasketForm:
         if basket is None or basket in ("[]", ""):
             self.error_messages.add(_("You have no basket."))
             return
-        
+
         # check that the json is not nested before parsing it to make sure
         # malicious user can't DDoS the server with deeply nested json
         if not BasketForm.json_cookie_re.match(basket):
@@ -116,17 +116,17 @@ class BasketForm:
             )
             self.error_messages.add(_("The request was badly formatted."))
             return
-        
+
         try:
             basket = json.loads(basket)
         except json.JSONDecodeError:
             self.error_messages.add(_("The basket cookie was badly formatted."))
             return
-        
+
         if type(basket) is not list or len(basket) == 0:
             self.error_messages.add(_("Your basket is empty."))
             return
-        
+
         for item in basket:
             expected_keys = {"id", "quantity", "name", "unit_price"}
             if type(item) is not dict or set(item.keys()) != expected_keys:
