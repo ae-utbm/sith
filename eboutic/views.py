@@ -27,6 +27,7 @@ import hmac
 import json
 from collections import OrderedDict
 from datetime import datetime
+from urllib.parse import unquote
 import sentry_sdk
 
 
@@ -108,7 +109,7 @@ class EbouticCommand(TemplateView):
 
         basket.save()
         eboutique = Counter.objects.get(type="EBOUTIC")
-        for item in json.loads(request.COOKIES["basket_items"]):
+        for item in json.loads(unquote(request.COOKIES["basket_items"])):
             basket.add_product(
                 eboutique.products.get(id=(item["id"])), item["quantity"]
             )

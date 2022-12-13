@@ -63,7 +63,8 @@ document.addEventListener('alpine:init', () => {
 
         edit_cookies() {
             // a cookie survives an hour
-            document.cookie = "basket_items=" + JSON.stringify(this.items) + ";Max-Age=3600";
+            console.log(encodeURIComponent(JSON.stringify(this.items)));
+            document.cookie = "basket_items=" + encodeURIComponent(JSON.stringify(this.items)) + ";Max-Age=3600";
         },
 
         /**

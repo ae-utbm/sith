@@ -26,6 +26,7 @@ import json
 import re
 import typing
 
+from urllib.parse import unquote
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from sentry_sdk import capture_message
@@ -98,12 +99,13 @@ class BasketForm:
             - all the ids refer to products the user is allowed to buy
             - all the quantities are positive integers
         """
-        basket = self.cookies.get("basket_items", None)
+        basket = unquote(self.cookies.get("basket_items", None))
         if basket is None or basket in ("[]", ""):
             self.error_messages.add(_("You have no basket."))
             return
+        
         # check that the json is not nested before parsing it to make sure
-        # malicious user can't ddos the server with deeply nested json
+        # malicious user can't DDoS the server with deeply nested json
         if not BasketForm.json_cookie_re.match(basket):
             # As the validation of the cookie goes through a rather boring regex,
             # we can regularly have to deal with subtle errors that we hadn't forecasted,
@@ -114,14 +116,17 @@ class BasketForm:
             )
             self.error_messages.add(_("The request was badly formatted."))
             return
+        
         try:
             basket = json.loads(basket)
         except json.JSONDecodeError:
             self.error_messages.add(_("The basket cookie was badly formatted."))
             return
+        
         if type(basket) is not list or len(basket) == 0:
             self.error_messages.add(_("Your basket is empty."))
             return
+        
         for item in basket:
             expected_keys = {"id", "quantity", "name", "unit_price"}
             if type(item) is not dict or set(item.keys()) != expected_keys:
