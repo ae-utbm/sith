@@ -278,8 +278,8 @@ SITH_MAIN_CLUB = {
 
 # Bar managers
 SITH_BAR_MANAGER = {
-    "name": "BdF",
-    "unix_name": "bdf",
+    "name": "Pdf",
+    "unix_name": "pdfesti",
     "address": "6 Boulevard Anatole France, 90000 Belfort",
 }
 
@@ -376,7 +376,7 @@ SITH_SUBSCRIPTION_LOCATIONS = [
 
 SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]
 
-SITH_COUNTER_OFFICES = {2: "BdF", 1: "AE"}
+SITH_COUNTER_OFFICES = {2: "PdF", 1: "AE"}
 
 SITH_COUNTER_PAYMENT_METHOD = [
     ("CHECK", _("Check")),

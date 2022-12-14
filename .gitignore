@@ -7,7 +7,7 @@ db.sqlite3
 pyrightconfig.json
 dist/
 .vscode/
-.idea
+.idea/
 env/
 doc/html
 data/

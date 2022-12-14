@@ -24,9 +24,10 @@
 
 import base64
 import json
-from datetime import datetime
-
 import sentry_sdk
+
+from datetime import datetime
+from urllib.parse import unquote
 from OpenSSL import crypto
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -104,7 +105,7 @@ class EbouticCommand(TemplateView):
             request.session["basket_id"] = basket.id
             request.session.modified = True
 
-        items = json.loads(request.COOKIES["basket_items"])
+        items = json.loads(unquote(request.COOKIES["basket_items"]))
         items.sort(key=lambda item: item["id"])
         ids = [item["id"] for item in items]
         quantities = [item["quantity"] for item in items]
