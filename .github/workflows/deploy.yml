@@ -37,7 +37,7 @@ jobs:
           pushd ${{secrets.SITH_PATH}}
 
           git pull
-          poetry update
+          poetry install
           poetry run ./manage.py migrate
           echo "yes" | poetry run ./manage.py collectstatic
           poetry run ./manage.py compilestatic
