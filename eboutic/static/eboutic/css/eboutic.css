@@ -192,6 +192,11 @@
     line-height: 80px;
 }
 
+#eboutic i.product-image {
+    background-color: rgba(173, 173, 173, 0.2);
+    border-radius: 50%;
+}
+
 #eboutic .product-description h4 {
     font-size: .75em;
     word-break: break-word;
