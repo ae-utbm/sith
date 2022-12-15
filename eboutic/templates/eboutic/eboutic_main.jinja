@@ -46,12 +46,12 @@
                 </li>
                 <template x-for="item in items" :key="item.id">
                     <li class="item-row" x-show="item.quantity > 0">
-                        <span class="item-name" x-text="item.name"></span>
                         <div class="item-quantity">
                             <i class="fa fa-minus fa-xs" @click="remove(item.id)"></i>
                             <span x-text="item.quantity"></span>
                             <i class="fa fa-plus" @click="add(item)"></i>
                         </div>
+                        <span class="item-name" x-text="item.name"></span>
                         <span class="item-price" x-text="(item.unit_price * item.quantity).toFixed(2) + ' €'"></span>
                     </li>
                 </template>
@@ -104,16 +104,16 @@
                             </div>
                             <div class="product-group">
                                 {% for p in items %}
-                                    <button class="product-button"
-                                            @click='add_from_catalog({{ p.id }}, {{ p.name|tojson }}, {{ p.selling_price }})'>
+                                    <button id="{{ p.id }}" class="product-button" @click='add_from_catalog({{ p.id }}, {{ p.name|tojson }}, {{ p.selling_price }})'>
                                         {% if p.icon %}
-                                            <img src="{{ p.icon.url }}" alt="image de {{ p.name }}"
-                                                 width="40px" height="40px">
+                                            <img class="product-image" src="{{ p.icon.url }}" alt="image de {{ p.name }}">
                                         {% else %}
-                                            <i class="fa fa-2x fa-picture-o"></i>
+                                            <i class="fa fa-2x fa-picture-o product-image" ></i>
                                         {% endif %}
-                                        <p><strong>{{ p.name }}</strong></p>
-                                        <p>{{ p.selling_price }} €</p>
+                                        <div class="product-description">
+                                            <h4>{{ p.name }}</strong></h4>
+                                            <p>{{ p.selling_price }} €</p>
+                                        </div>
                                     </button>
                                 {% endfor %}
                             </div>
