@@ -28,7 +28,7 @@
 
 @media screen and (max-width: 765px) {
     #eboutic {
-        flex-direction: column;
+        flex-direction: column-reverse;
         align-items: center;
         margin: 10px;
         row-gap: 20px;
