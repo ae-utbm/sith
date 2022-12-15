@@ -99,8 +99,11 @@ class BasketForm:
             - all the ids refer to products the user is allowed to buy
             - all the quantities are positive integers
         """
-        basket = unquote(self.cookies.get("basket_items", None))
-        if basket is None or basket in ("[]", ""):
+        # replace escaped double quotes by single quotes, as the RegEx used to check the json
+        # does not support escaped double quotes
+        basket = unquote(self.cookies.get("basket_items", "")).replace('\\"', "'")
+
+        if basket in ("[]", ""):
             self.error_messages.add(_("You have no basket."))
             return
 
