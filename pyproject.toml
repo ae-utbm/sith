@@ -50,15 +50,9 @@ setuptools = "^65.6.3"
 mysqlclient = { version = "^2.0.3", optional = true }
 coverage = {version = "^5.5", optional = true}
 
-# Docs extra dependencies
-Sphinx = {version = "^4.2.0", optional = true}
-sphinx-rtd-theme = {version = "^1.0.0", optional = true}
-sphinx-copybutton = {version = "^0.4.0", optional = true}
-
 [tool.poetry.extras]
 testing = ["coverage"]
 migration = ["mysqlclient"]
-docs = ["Sphinx", "sphinx-rtd-theme", "sphinx-copybutton"]
 
 [tool.poetry.dev-dependencies]
 django-debug-toolbar = "^3.2.2"
