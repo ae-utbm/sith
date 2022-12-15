@@ -1,0 +1,206 @@
+/* CSS Document */
+
+/* feuille de style par d?faut pour les pages 
+de choix de paiement et de paiement 
+paybox system*/
+
+th { /* headers de tables (dans choix paiement les ent?tes de table en bleu )*/
+	color: black;
+	background-color: #2890D6;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+td {/* cellules */
+	font-size: 13px;
+}
+
+h2 {/*le texte 'paiement de' et '?'*/
+	margin:0;
+	padding: 0;
+}
+
+.pbx_table_logo    td  {/*les cellules de la table logo (la table a la classe "pbx_table_logo")*/
+	background-color: #FFFFFF;
+	text-align: center;
+}
+
+.pbx_h1{/* le premier bloc de texte dans choixpaiement */
+	font-size: 14px;
+	font-family: verdana;
+	font-weight:normal;
+}
+
+
+.pbx_h2{/* le second bloc de texte dans choixpaiement (choisisseze un moyen...)*/
+	font-family: verdana;
+	font-size:12px;
+	font-weight:bold;
+}
+
+.pbx_h3{/* l'ent?te reprenant  le libell? du type de moyen de paiement*/
+	font-family: verdana;
+	font-size:12;
+	font-weight:normal;
+}
+
+.pbx_h4{/* nom d'enseigne, en page de paiement*/
+	color:#444;
+	display: block;
+	margin: 8px 0 0 0;
+	padding: 0;
+	border-top: 1px solid #ccc;
+	padding: 5px;
+	display: block;
+	background-color: #f5f5f5;
+	height: 35px;
+	line-height: 35px;
+	font-size: 12px;
+	font-weight: normal;
+	text-shadow: none;
+}
+
+.pbx_copyright h5{/*mention paybox en bas de page (choix et paiement)*/
+	font-size:10px;
+	font-weight: normal;
+}
+
+a {
+	text-decoration: none;
+	color : gray;
+	font-weight: bold;
+	font-style: italic;
+	padding: 0 5px;
+}
+
+#tabledevises {
+	color: #AAA;
+}
+
+a:hover {
+	color : #222;
+}
+
+body {    color: #555555;
+    font-family: arial,verdana,sans-serif;
+	padding : 0px;
+	margin: 0;
+}
+
+
+#idframe_pay {
+    border-color: #CCCCCC;
+    border-radius: 6px 6px 6px 6px;
+    border-style: solid;
+    border-width: 1px;
+	margin: 20px;
+	position: relative;
+}
+
+#idframe_pay table {
+  border-spacing:0;
+  border-collapse:collapse;
+  width: 100%;
+}
+
+#idframe_pay h2 {
+	width: 100%;
+	background: url("main_header_background.png") repeat scroll 0 0 transparent;
+    border-color: #CCCCCC;
+    border-radius: 5px 5px 0 0;
+    border-style: solid;
+    border-width: 0 0 1px 0;
+    box-shadow: 1px 1px 0 0 #888888 inset;
+    color: #EEEEEE;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px #444444;
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+	padding: 8px 0 0 0;
+}
+/*
+#idframe_pay td {
+	vertical-align: top;
+}
+*/
+.pbx-align-center {
+	text-align: center;
+	padding: 20px 10px;
+	width: 50%;
+}
+
+.pbx-align-right {
+	text-align: right;
+	padding: 2px 10px;
+	width: 50%;
+	white-space: nowrap;
+}
+
+.pbx-align-button-right img {
+
+vertical-align:middle;
+}
+
+.pbx-align-left {
+	text-align: left;
+	padding: 2px 10px;
+	width: 50%;
+}
+
+.pbx-align-left img {
+
+vertical-align:middle;
+}
+
+.pbx-align-very-left {
+	text-align: left;
+	padding: 2px 10px;
+	width: 100%;
+}
+
+.pbx-no-padding {
+	padding: 0;
+}
+
+.pbx-align-button-right {
+	text-align: right;
+	padding: 2px 10px;
+	width: 50%;
+}
+
+.pbx-align-button-left {
+	text-align: left;
+	padding: 2px 10px;
+	width: 50%;
+}
+
+
+#Devises{
+		left:0px;
+		top:0px;
+}
+
+#pbx-numero-carte, #pbx-numero-carte-input {
+	padding-top: 30px
+}
+
+#pbx-maxicheque-vide {
+    display: none;
+}
+
+#pbx-maxicheque-frame {
+    padding: 0 220px;
+}
+
+#blocCarte1 {
+    display: inline-block;
+}
+
+#zoneResultConsult {
+    border: 1px solid #CCCCCC;
+    border-radius: 10px 10px 10px 10px;
+    display: block;
+    margin: 20px;
+    padding: 20px;
+}
