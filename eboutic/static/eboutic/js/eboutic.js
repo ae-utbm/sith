@@ -30,15 +30,22 @@ function getCookie(name) {
  */
 function get_starting_items() {
     const cookie = getCookie(BASKET_ITEMS_COOKIE_NAME);
+    let output = [];
+
     try {
         // Django cookie backend does an utter mess on non-trivial data types
         // so we must perform a conversion of our own
         const biscuit = JSON.parse(cookie.replace(/\\054/g, ','));
-        return Array.isArray(biscuit) ? biscuit : [];
+        output = Array.isArray(biscuit) ? biscuit : [];
 
-    } catch (e) {
-        return [];
-    }
+    } catch (e) {}
+
+    output.forEach(item => {
+        let el = document.getElementById(item.id);
+        el.classList.add("selected");
+    });
+
+    return output;
 }
 
 document.addEventListener('alpine:init', () => {
