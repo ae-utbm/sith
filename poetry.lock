@@ -681,7 +681,7 @@ tornado = ["tornado (>=5)"]
 name = "setuptools"
 version = "65.6.3"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -935,7 +935,7 @@ testing = ["coverage"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "9c89ca48ac2c25c25c0f4fb5e0db50d7dfbc1193fd4d9b6f72ef89c9839dc9d6"
+content-hash = "08911593e7e5f4267de94d632be1332f4ef01a22b37a827f557eb15f0dba340b"
 
 [metadata.files]
 alabaster = [
