@@ -38,6 +38,7 @@
         margin-top: 4px;
     }
     #basket {
+        width: -webkit-fill-available;
     }
 }
 
@@ -140,7 +141,8 @@
     }
 
     #eboutic .product-description h4{
-        text-align: left;   
+        text-align: left;
+        max-width: 90%;
     }
 }
 
