@@ -101,9 +101,9 @@ class BasketForm:
         """
         # replace escaped double quotes by single quotes, as the RegEx used to check the json
         # does not support escaped double quotes
-        basket = unquote(self.cookies.get("basket_items", None)).replace('\\"', "'")
+        basket = unquote(self.cookies.get("basket_items", "")).replace('\\"', "'")
 
-        if basket is None or basket in ("[]", ""):
+        if basket in ("[]", ""):
             self.error_messages.add(_("You have no basket."))
             return
 
