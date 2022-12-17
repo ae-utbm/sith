@@ -138,6 +138,20 @@ class CounterTest(TestCase):
         )
         self.assertTrue(response.status_code == 200)
 
+    def test_annotate_has_barman_queryset(self):
+        """
+        Test if the custom queryset method ``annotate_has_barman``
+        works as intended
+        """
+        self.sli.counters.clear()
+        self.sli.counters.add(self.foyer, self.mde)
+        counters = Counter.objects.annotate_has_barman(self.sli)
+        for counter in counters:
+            if counter.name in ("Foyer", "MDE"):
+                self.assertTrue(counter.has_annotated_barman)
+            else:
+                self.assertFalse(counter.has_annotated_barman)
+
 
 class CounterStatsTest(TestCase):
     def setUp(self):

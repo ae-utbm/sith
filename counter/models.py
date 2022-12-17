@@ -22,7 +22,9 @@
 #
 #
 
+from __future__ import annotations
 from django.db import models
+from django.db.models import OuterRef, Exists, QuerySet
 from django.db.models.functions import Length
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -309,6 +311,32 @@ class Product(models.Model):
         return "%s (%s)" % (self.name, self.code)
 
 
+class CounterQuerySet(models.QuerySet):
+    def annotate_has_barman(self, user: User) -> CounterQuerySet:
+        """
+        Annotate the queryset with the `user_is_barman` field.
+        For each counter, this field has value True if the user
+        is a barman of this counter, else False.
+
+        :param user: the user we want to check if he is a barman
+
+        Example::
+
+            sli = User.objects.get(username="sli")
+            counters = (
+                Counter.objects
+                .annotate_has_barman(sli)  # add the user_has_barman boolean field
+                .filter(has_annotated_barman=True)  # keep only counters where this user is barman
+            )
+            print("Sli est barman dans les comptoirs suivants :")
+            for counter in counters:
+                print(f"- {counter.name}")
+        """
+        subquery = user.counters.filter(pk=OuterRef("pk"))
+        # noinspection PyTypeChecker
+        return self.annotate(has_annotated_barman=Exists(subquery))
+
+
 class Counter(models.Model):
     name = models.CharField(_("name"), max_length=30)
     club = models.ForeignKey(
@@ -332,6 +360,8 @@ class Counter(models.Model):
         Group, related_name="viewable_counters", blank=True
     )
     token = models.CharField(_("token"), max_length=30, null=True, blank=True)
+
+    objects = CounterQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("counter")
