@@ -22,104 +22,98 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path
 
-from com.views import *
 from club.views import MailingDeleteView
+from com.views import *
 
 urlpatterns = [
-    re_path(r"^sith/edit/alert$", AlertMsgEditView.as_view(), name="alert_edit"),
-    re_path(r"^sith/edit/info$", InfoMsgEditView.as_view(), name="info_edit"),
-    re_path(
-        r"^sith/edit/weekmail_destinations$",
+    path("sith/edit/alert/", AlertMsgEditView.as_view(), name="alert_edit"),
+    path("sith/edit/info/", InfoMsgEditView.as_view(), name="info_edit"),
+    path(
+        "sith/edit/weekmail_destinations/",
         WeekmailDestinationEditView.as_view(),
         name="weekmail_destinations",
     ),
-    re_path(r"^weekmail$", WeekmailEditView.as_view(), name="weekmail"),
-    re_path(
-        r"^weekmail/preview$", WeekmailPreviewView.as_view(), name="weekmail_preview"
-    ),
-    re_path(
-        r"^weekmail/new_article$",
+    path("weekmail/", WeekmailEditView.as_view(), name="weekmail"),
+    path("weekmail/preview/", WeekmailPreviewView.as_view(), name="weekmail_preview"),
+    path(
+        "weekmail/new_article/",
         WeekmailArticleCreateView.as_view(),
         name="weekmail_article",
     ),
-    re_path(
-        r"^weekmail/article/(?P<article_id>[0-9]+)/delete$",
+    path(
+        "weekmail/article/<int:article_id>/delete/",
         WeekmailArticleDeleteView.as_view(),
         name="weekmail_article_delete",
     ),
-    re_path(
-        r"^weekmail/article/(?P<article_id>[0-9]+)/edit$",
+    path(
+        "weekmail/article/<int:article_id>/edit/",
         WeekmailArticleEditView.as_view(),
         name="weekmail_article_edit",
     ),
-    re_path(r"^news$", NewsListView.as_view(), name="news_list"),
-    re_path(r"^news/admin$", NewsAdminListView.as_view(), name="news_admin_list"),
-    re_path(r"^news/create$", NewsCreateView.as_view(), name="news_new"),
-    re_path(
-        r"^news/(?P<news_id>[0-9]+)/delete$",
+    path("news/", NewsListView.as_view(), name="news_list"),
+    path("news/admin/", NewsAdminListView.as_view(), name="news_admin_list"),
+    path("news/create/", NewsCreateView.as_view(), name="news_new"),
+    path(
+        "news/<int:news_id>/delete/",
         NewsDeleteView.as_view(),
         name="news_delete",
     ),
-    re_path(
-        r"^news/(?P<news_id>[0-9]+)/moderate$",
+    path(
+        "news/<int:news_id>/moderate/",
         NewsModerateView.as_view(),
         name="news_moderate",
     ),
-    re_path(
-        r"^news/(?P<news_id>[0-9]+)/edit$", NewsEditView.as_view(), name="news_edit"
-    ),
-    re_path(
-        r"^news/(?P<news_id>[0-9]+)$", NewsDetailView.as_view(), name="news_detail"
-    ),
-    re_path(r"^mailings$", MailingListAdminView.as_view(), name="mailing_admin"),
-    re_path(
-        r"^mailings/(?P<mailing_id>[0-9]+)/moderate$",
+    path("news/<int:news_id>/edit/", NewsEditView.as_view(), name="news_edit"),
+    path("news/<int:news_id>/", NewsDetailView.as_view(), name="news_detail"),
+    path("mailings/", MailingListAdminView.as_view(), name="mailing_admin"),
+    path(
+        "mailings/<int:mailing_id>/moderate/",
         MailingModerateView.as_view(),
         name="mailing_moderate",
     ),
-    re_path(
-        r"^mailings/(?P<mailing_id>[0-9]+)/delete$",
+    path(
+        "mailings/<int:mailing_id>/delete/",
         MailingDeleteView.as_view(redirect_page="com:mailing_admin"),
         name="mailing_delete",
     ),
-    re_path(r"^poster$", PosterListView.as_view(), name="poster_list"),
-    re_path(r"^poster/create$", PosterCreateView.as_view(), name="poster_create"),
-    re_path(
-        r"^poster/(?P<poster_id>[0-9]+)/edit$",
+    path("poster/", PosterListView.as_view(), name="poster_list"),
+    path("poster/create/", PosterCreateView.as_view(), name="poster_create"),
+    path(
+        "poster/<int:poster_id>/edit/",
         PosterEditView.as_view(),
         name="poster_edit",
     ),
-    re_path(
-        r"^poster/(?P<poster_id>[0-9]+)/delete$",
+    path(
+        "poster/<int:poster_id>/delete/",
         PosterDeleteView.as_view(),
         name="poster_delete",
     ),
-    re_path(
-        r"^poster/moderate$",
+    path(
+        "poster/moderate/",
         PosterModerateListView.as_view(),
         name="poster_moderate_list",
     ),
-    re_path(
-        r"^poster/(?P<object_id>[0-9]+)/moderate$",
+    path(
+        "poster/<int:object_id>/moderate/",
         PosterModerateView.as_view(),
         name="poster_moderate",
     ),
-    re_path(r"^screen$", ScreenListView.as_view(), name="screen_list"),
-    re_path(r"^screen/create$", ScreenCreateView.as_view(), name="screen_create"),
-    re_path(
-        r"^screen/(?P<screen_id>[0-9]+)/slideshow$",
+    path("screen/", ScreenListView.as_view(), name="screen_list"),
+    path("screen/create/", ScreenCreateView.as_view(), name="screen_create"),
+    path(
+        "screen/<int:screen_id>/slideshow/",
         ScreenSlideshowView.as_view(),
         name="screen_slideshow",
     ),
-    re_path(
-        r"^screen/(?P<screen_id>[0-9]+)/edit$",
+    path(
+        "screen/<int:screen_id>/edit/",
         ScreenEditView.as_view(),
         name="screen_edit",
     ),
-    re_path(
-        r"^screen/(?P<screen_id>[0-9]+)/delete$",
+    path(
+        "screen/<int:screen_id>/delete/",
         ScreenDeleteView.as_view(),
         name="screen_delete",
     ),

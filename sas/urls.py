@@ -22,40 +22,36 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path
 
 from sas.views import *
 
 urlpatterns = [
-    re_path(r"^$", SASMainView.as_view(), name="main"),
-    re_path(r"^moderation$", ModerationView.as_view(), name="moderation"),
-    re_path(r"^album/(?P<album_id>[0-9]+)$", AlbumView.as_view(), name="album"),
-    re_path(
-        r"^album/(?P<album_id>[0-9]+)/upload$",
+    path("", SASMainView.as_view(), name="main"),
+    path("moderation/", ModerationView.as_view(), name="moderation"),
+    path("album/<int:album_id>/", AlbumView.as_view(), name="album"),
+    path(
+        "album/<int:album_id>/upload/",
         AlbumUploadView.as_view(),
         name="album_upload",
     ),
-    re_path(
-        r"^album/(?P<album_id>[0-9]+)/edit$", AlbumEditView.as_view(), name="album_edit"
-    ),
-    re_path(r"^album/(?P<album_id>[0-9]+)/preview$", send_album, name="album_preview"),
-    re_path(r"^picture/(?P<picture_id>[0-9]+)$", PictureView.as_view(), name="picture"),
-    re_path(
-        r"^picture/(?P<picture_id>[0-9]+)/edit$",
+    path("album/<int:album_id>/edit/", AlbumEditView.as_view(), name="album_edit"),
+    path("album/<int:album_id>/preview/", send_album, name="album_preview"),
+    path("picture/<int:picture_id>/", PictureView.as_view(), name="picture"),
+    path(
+        "picture/<int:picture_id>/edit/",
         PictureEditView.as_view(),
         name="picture_edit",
     ),
-    re_path(r"^picture/(?P<picture_id>[0-9]+)/download$", send_pict, name="download"),
-    re_path(
-        r"^picture/(?P<picture_id>[0-9]+)/download/compressed$",
+    path("picture/<int:picture_id>/download/", send_pict, name="download"),
+    path(
+        "picture/<int:picture_id>/download/compressed/",
         send_compressed,
         name="download_compressed",
     ),
-    re_path(
-        r"^picture/(?P<picture_id>[0-9]+)/download/thumb$",
+    path(
+        "picture/<int:picture_id>/download/thumb/",
         send_thumb,
         name="download_thumb",
     ),
-    # re_path(r'^album/new$', AlbumCreateView.as_view(), name='album_new'),
-    # re_path(r'^(?P<club_id>[0-9]+)/$', ClubView.as_view(), name='club_view'),
 ]

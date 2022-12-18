@@ -732,9 +732,9 @@ class UVSearchTest(TestCase):
             [
                 {
                     "id": 1,
-                    "absolute_url": "/pedagogy/uv/1",
-                    "update_url": "/pedagogy/uv/1/edit",
-                    "delete_url": "/pedagogy/uv/1/delete",
+                    "absolute_url": "/pedagogy/uv/1/",
+                    "update_url": "/pedagogy/uv/1/edit/",
+                    "delete_url": "/pedagogy/uv/1/delete/",
                     "code": "PA00",
                     "author": 0,
                     "credit_type": "OM",

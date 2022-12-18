@@ -290,33 +290,40 @@ class MarkdownTest(TestCase):
 
 class PageHandlingTest(TestCase):
     def setUp(self):
-        try:
-            Group.objects.create(name="root")
-            u = User(
-                username="root",
-                last_name="",
-                first_name="Bibou",
-                email="ae.info@utbm.fr",
-                date_of_birth="1942-06-12",
-                is_superuser=True,
-                is_staff=True,
-            )
-            u.set_password("plop")
-            u.save()
-            self.client.login(username="root", password="plop")
-        except Exception as e:
-            print(e)
+        self.root_group = Group.objects.create(name="root")
+        u = User(
+            username="root",
+            last_name="",
+            first_name="Bibou",
+            email="ae.info@utbm.fr",
+            date_of_birth="1942-06-12",
+            is_superuser=True,
+            is_staff=True,
+        )
+        u.set_password("plop")
+        u.save()
+        self.client.login(username="root", password="plop")
 
     def test_create_page_ok(self):
         """
         Should create a page correctly
         """
-        self.client.post(
-            reverse("core:page_new"), {"parent": "", "name": "guy", "owner_group": 1}
+
+        response = self.client.post(
+            reverse("core:page_new"),
+            {"parent": "", "name": "guy", "owner_group": self.root_group.id},
         )
+        self.assertRedirects(
+            response, reverse("core:page", kwargs={"page_name": "guy"})
+        )
+        self.assertTrue(Page.objects.filter(name="guy").exists())
+
         response = self.client.get(reverse("core:page", kwargs={"page_name": "guy"}))
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue('<a href="/page/guy/hist">' in str(response.content))
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode()
+        self.assertIn('<a href="/page/guy/hist/">', html)
+        self.assertIn('<a href="/page/guy/edit/">', html)
+        self.assertIn('<a href="/page/guy/prop/">', html)
 
     def test_create_child_page_ok(self):
         """
@@ -339,29 +346,25 @@ class PageHandlingTest(TestCase):
         """
         Should display a page correctly
         """
-        parent = Page(name="guy", owner_group=Group.objects.filter(id=1).first())
+        parent = Page(name="guy", owner_group=self.root_group)
         parent.save(force_lock=True)
-        page = Page(
-            name="bibou", owner_group=Group.objects.filter(id=1).first(), parent=parent
-        )
+        page = Page(name="bibou", owner_group=self.root_group, parent=parent)
         page.save(force_lock=True)
         response = self.client.get(
             reverse("core:page", kwargs={"page_name": "guy/bibou"})
         )
         self.assertTrue(response.status_code == 200)
-        self.assertTrue(
-            '<a href="/page/guy/bibou/edit">\\xc3\\x89diter</a>'
-            in str(response.content)
-        )
+        html = response.content.decode()
+        self.assertIn('<a href="/page/guy/bibou/edit/">', html)
 
     def test_access_page_not_found(self):
         """
         Should not display a page correctly
         """
         response = self.client.get(reverse("core:page", kwargs={"page_name": "swagg"}))
-        response = self.client.get("/page/swagg/")
         self.assertTrue(response.status_code == 200)
-        self.assertTrue('<a href="/page/create?page=swagg">' in str(response.content))
+        html = response.content.decode()
+        self.assertIn('<a href="/page/create/?page=swagg">', html)
 
     def test_create_page_markdown_safe(self):
         """

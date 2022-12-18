@@ -23,40 +23,46 @@
 #
 #
 
-from django.urls import re_path, path
+from django.urls import path, re_path, register_converter
 
 from core.views import *
+from core.converters import (
+    FourDigitYearConverter,
+    TwoDigitMonthConverter,
+    BooleanStringConverter,
+)
+
+register_converter(FourDigitYearConverter, "yyyy")
+register_converter(TwoDigitMonthConverter, "mm")
+register_converter(BooleanStringConverter, "bool")
+
 
 urlpatterns = [
-    re_path(r"^$", index, name="index"),
-    re_path(r"^to_markdown$", ToMarkdownView.as_view(), name="to_markdown"),
-    re_path(r"^notifications$", NotificationList.as_view(), name="notification_list"),
-    re_path(r"^notification/(?P<notif_id>[0-9]+)$", notification, name="notification"),
+    path("", index, name="index"),
+    path("to_markdown/", ToMarkdownView.as_view(), name="to_markdown"),
+    path("notifications/", NotificationList.as_view(), name="notification_list"),
+    path("notification/<int:notif_id>/", notification, name="notification"),
     # Search
-    re_path(r"^search/$", search_view, name="search"),
-    re_path(r"^search_json/$", search_json, name="search_json"),
-    re_path(r"^search_user/$", search_user_json, name="search_user"),
+    path("search/", search_view, name="search"),
+    path("search_json/", search_json, name="search_json"),
+    path("search_user/", search_user_json, name="search_user"),
     # Login and co
-    re_path(r"^login/$", SithLoginView.as_view(), name="login"),
-    re_path(r"^logout/$", logout, name="logout"),
-    re_path(
-        r"^password_change/$", SithPasswordChangeView.as_view(), name="password_change"
-    ),
-    re_path(
-        r"^password_change/(?P<user_id>[0-9]+)$",
+    path("login/", SithLoginView.as_view(), name="login"),
+    path("logout/", logout, name="logout"),
+    path("password_change/", SithPasswordChangeView.as_view(), name="password_change"),
+    path(
+        "password_change/<int:user_id>/",
         password_root_change,
         name="password_root_change",
     ),
-    re_path(
-        r"^password_change/done$",
+    path(
+        "password_change/done/",
         SithPasswordChangeDoneView.as_view(),
         name="password_change_done",
     ),
-    re_path(
-        r"^password_reset/$", SithPasswordResetView.as_view(), name="password_reset"
-    ),
-    re_path(
-        r"^password_reset/done$",
+    path("password_reset/", SithPasswordResetView.as_view(), name="password_reset"),
+    path(
+        "password_reset/done/",
         SithPasswordResetDoneView.as_view(),
         name="password_reset_done",
     ),
@@ -65,110 +71,103 @@ urlpatterns = [
         SithPasswordResetConfirmView.as_view(),
         name="password_reset_confirm",
     ),
-    re_path(
-        r"^reset/done/$",
+    path(
+        "reset/done/",
         SithPasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-    re_path(r"^register$", register, name="register"),
+    path("register/", register, name="register"),
     # Group handling
-    re_path(r"^group/$", GroupListView.as_view(), name="group_list"),
-    re_path(r"^group/new/$", GroupCreateView.as_view(), name="group_new"),
-    re_path(
-        r"^group/(?P<group_id>[0-9]+)/$", GroupEditView.as_view(), name="group_edit"
-    ),
-    re_path(
-        r"^group/(?P<group_id>[0-9]+)/delete$",
+    path("group/", GroupListView.as_view(), name="group_list"),
+    path("group/new/", GroupCreateView.as_view(), name="group_new"),
+    path("group/<int:group_id>/", GroupEditView.as_view(), name="group_edit"),
+    path(
+        "group/<int:group_id>/delete/",
         GroupDeleteView.as_view(),
         name="group_delete",
     ),
-    re_path(
-        r"^group/(?P<group_id>[0-9]+)/detail$",
+    path(
+        "group/<int:group_id>/detail/",
         GroupTemplateView.as_view(),
         name="group_detail",
     ),
     # User views
-    re_path(r"^user/$", UserListView.as_view(), name="user_list"),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/mini$",
+    path("user/", UserListView.as_view(), name="user_list"),
+    path(
+        "user/<int:user_id>/mini/",
         UserMiniView.as_view(),
         name="user_profile_mini",
     ),
-    re_path(r"^user/(?P<user_id>[0-9]+)/$", UserView.as_view(), name="user_profile"),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/pictures$",
+    path("user/<int:user_id>/", UserView.as_view(), name="user_profile"),
+    path(
+        "user/<int:user_id>/pictures/",
         UserPicturesView.as_view(),
         name="user_pictures",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/godfathers$",
+    path(
+        "user/<int:user_id>/godfathers/",
         UserGodfathersView.as_view(),
         name="user_godfathers",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/godfathers/tree$",
+    path(
+        "user/<int:user_id>/godfathers/tree/",
         UserGodfathersTreeView.as_view(),
         name="user_godfathers_tree",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/godfathers/tree/pict$",
+    path(
+        "user/<int:user_id>/godfathers/tree/pict/",
         UserGodfathersTreePictureView.as_view(),
         name="user_godfathers_tree_pict",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/godfathers/(?P<godfather_id>[0-9]+)/(?P<is_father>(True)|(False))/delete$",
-        DeleteUserGodfathers,
+    path(
+        "user/<int:user_id>/godfathers/<int:godfather_id>/<bool:is_father>/delete/",
+        delete_user_godfather,
         name="user_godfathers_delete",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/edit$",
+    path(
+        "user/<int:user_id>/edit/",
         UserUpdateProfileView.as_view(),
         name="user_edit",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/profile_upload$",
+    path(
+        "user/<int:user_id>/profile_upload/",
         UserUploadProfilePictView.as_view(),
         name="user_profile_upload",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/clubs$", UserClubView.as_view(), name="user_clubs"
-    ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/prefs$",
+    path("user/<int:user_id>/clubs/", UserClubView.as_view(), name="user_clubs"),
+    path(
+        "user/<int:user_id>/prefs/",
         UserPreferencesView.as_view(),
         name="user_prefs",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/groups$",
+    path(
+        "user/<int:user_id>/groups/",
         UserUpdateGroupView.as_view(),
         name="user_groups",
     ),
-    re_path(r"^user/tools/$", UserToolsView.as_view(), name="user_tools"),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/account$",
+    path("user/tools/", UserToolsView.as_view(), name="user_tools"),
+    path(
+        "user/<int:user_id>/account/",
         UserAccountView.as_view(),
         name="user_account",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/account/(?P<year>[0-9]+)/(?P<month>[0-9]+)$",
+    path(
+        "user/<int:user_id>/account/<yyyy:year>/<mm:month>/",
         UserAccountDetailView.as_view(),
         name="user_account_detail",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/stats$", UserStatsView.as_view(), name="user_stats"
-    ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/gift/create$",
+    path("user/<int:user_id>/stats/", UserStatsView.as_view(), name="user_stats"),
+    path(
+        "user/<int:user_id>/gift/create/",
         GiftCreateView.as_view(),
         name="user_gift_create",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/gift/delete/(?P<gift_id>[0-9]+)/$",
+    path(
+        "user/<int:user_id>/gift/delete/<int:gift_id>/",
         GiftDeleteView.as_view(),
         name="user_gift_delete",
     ),
     # File views
-    # re_path(r'^file/add/(?P<popup>popup)?$', FileCreateView.as_view(), name='file_new'),
     re_path(r"^file/(?P<popup>popup)?$", FileListView.as_view(), name="file_list"),
     re_path(
         r"^file/(?P<file_id>[0-9]+)/(?P<popup>popup)?$",
@@ -190,43 +189,43 @@ urlpatterns = [
         FileDeleteView.as_view(),
         name="file_delete",
     ),
-    re_path(r"^file/moderation$", FileModerationView.as_view(), name="file_moderation"),
-    re_path(
-        r"^file/(?P<file_id>[0-9]+)/moderate$",
+    path("file/moderation/", FileModerationView.as_view(), name="file_moderation"),
+    path(
+        "file/<int:file_id>/moderate/",
         FileModerateView.as_view(),
         name="file_moderate",
     ),
-    re_path(r"^file/(?P<file_id>[0-9]+)/download$", send_file, name="download"),
+    path("file/<int:file_id>/download/", send_file, name="download"),
     # Page views
-    re_path(r"^page/$", PageListView.as_view(), name="page_list"),
-    re_path(r"^page/create$", PageCreateView.as_view(), name="page_new"),
-    re_path(
-        r"^page/(?P<page_id>[0-9]*)/delete$",
+    path("page/", PageListView.as_view(), name="page_list"),
+    path("page/create/", PageCreateView.as_view(), name="page_new"),
+    path(
+        "page/<int:page_id>/delete/",
         PageDeleteView.as_view(),
         name="page_delete",
     ),
-    re_path(
-        r"^page/(?P<page_name>([/a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9])+)/edit$",
+    path(
+        "page/<path:page_name>/edit/",
         PageEditView.as_view(),
         name="page_edit",
     ),
-    re_path(
-        r"^page/(?P<page_name>([/a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9])+)/prop$",
+    path(
+        "page/<path:page_name>/prop/",
         PagePropView.as_view(),
         name="page_prop",
     ),
-    re_path(
-        r"^page/(?P<page_name>([/a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9])+)/hist$",
+    path(
+        "page/<path:page_name>/hist/",
         PageHistView.as_view(),
         name="page_hist",
     ),
-    re_path(
-        r"^page/(?P<page_name>([/a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9])+)/rev/(?P<rev>[0-9]+)/",
+    path(
+        "page/<path:page_name>/rev/<int:rev>/",
         PageRevView.as_view(),
         name="page_rev",
     ),
-    re_path(
-        r"^page/(?P<page_name>([/a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9])+)/$",
+    path(
+        "page/<path:page_name>/",
         PageView.as_view(),
         name="page",
     ),

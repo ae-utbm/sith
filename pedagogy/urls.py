@@ -22,33 +22,33 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path
 
 from pedagogy.views import *
 
 urlpatterns = [
     # Urls displaying the actual application for visitors
-    re_path(r"^$", UVListView.as_view(), name="guide"),
-    re_path(r"^uv/(?P<uv_id>[0-9]+)$", UVDetailFormView.as_view(), name="uv_detail"),
-    re_path(
-        r"^comment/(?P<comment_id>[0-9]+)/edit$",
+    path("", UVListView.as_view(), name="guide"),
+    path("uv/<int:uv_id>/", UVDetailFormView.as_view(), name="uv_detail"),
+    path(
+        "comment/<int:comment_id>/edit/",
         UVCommentUpdateView.as_view(),
         name="comment_update",
     ),
-    re_path(
-        r"^comment/(?P<comment_id>[0-9]+)/delete$",
+    path(
+        "comment/<int:comment_id>/delete/",
         UVCommentDeleteView.as_view(),
         name="comment_delete",
     ),
-    re_path(
-        r"^comment/(?P<comment_id>[0-9]+)/report$",
+    path(
+        "comment/<int:comment_id>/report/",
         UVCommentReportCreateView.as_view(),
         name="comment_report",
     ),
     # Moderation
-    re_path(r"^moderation$", UVModerationFormView.as_view(), name="moderation"),
+    path("moderation/", UVModerationFormView.as_view(), name="moderation"),
     # Administration : Create Update Delete Edit
-    re_path(r"^uv/create$", UVCreateView.as_view(), name="uv_create"),
-    re_path(r"^uv/(?P<uv_id>[0-9]+)/delete$", UVDeleteView.as_view(), name="uv_delete"),
-    re_path(r"^uv/(?P<uv_id>[0-9]+)/edit$", UVUpdateView.as_view(), name="uv_update"),
+    path("uv/create/", UVCreateView.as_view(), name="uv_create"),
+    path("uv/<int:uv_id>/delete/", UVDeleteView.as_view(), name="uv_delete"),
+    path("uv/<int:uv_id>/edit/", UVUpdateView.as_view(), name="uv_update"),
 ]
