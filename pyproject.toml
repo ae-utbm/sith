@@ -47,7 +47,6 @@ django-countries = "^7.4.2"
 dict2xml = "^1.7.2"
 
 # Extra optional dependencies
-mysqlclient = { version = "^2.0.3", optional = true }
 coverage = {version = "^5.5", optional = true}
 
 # Docs extra dependencies
@@ -57,7 +56,6 @@ sphinx-copybutton = {version = "^0.4.0", optional = true}
 
 [tool.poetry.extras]
 testing = ["coverage"]
-migration = ["mysqlclient"]
 docs = ["Sphinx", "sphinx-rtd-theme", "sphinx-copybutton"]
 
 [tool.poetry.dev-dependencies]

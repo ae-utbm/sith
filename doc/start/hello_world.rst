@@ -32,13 +32,13 @@ Enfin, on vas inclure les URLs de cette application dans le projet sous le préf
     # sith/urls.py
     urlpatterns = [
         ...
-        url(r"^hello/", include("hello.urls", namespace="hello", app_name="hello")),
+        path("hello/", include("hello.urls", namespace="hello", app_name="hello")),
     ]
 
 Un Hello World simple
 ---------------------
 
-Dans un premier temps, nous allons créer une vue qui vas charger un template en utilisant le système de vues basées sur les classes de Django.
+Dans un premier temps, nous allons créer une vue qui va charger un template en utilisant le système de vues basé sur les classes de Django.
 
 .. code-block:: python
 
@@ -63,26 +63,26 @@ On vas ensuite créer le template.
     {# On remplis la partie titre du template étendu #}
     {# Il s'agit du titre qui sera affiché dans l'onglet du navigateur #}
     {% block title %}
-    Hello World
-    {% endblock title %}
+        Hello World
+    {% endblock %}
 
     {# On remplis le contenu de la page #}
     {% block content %}
-    <p>Hello World !</p>
-    {% endblock content %}
+        <p>Hello World !</p>
+    {% endblock %}
 
 Enfin, on crée l'URL. On veut pouvoir appeler la page depuis https://localhost:8000/hello, le préfixe indiqué précédemment suffit donc.
 
 .. code-block:: python
 
     # hello/urls.py
-    from django.conf.urls import url
+    from django.urls import path
     from hello.views import HelloView
 
     urlpatterns = [
        # Le préfixe étant retiré lors du passage du routeur d'URL
        # dans le fichier d'URL racine du projet, l'URL à matcher ici est donc vide
-       url(r"^$", HelloView.as_view(), name="hello"),
+       path("", HelloView.as_view(), name="hello"),
     ]
 
 Et voilà, c'est fini, il ne reste plus qu'à lancer le serveur et à se rendre sur la page.
@@ -95,13 +95,12 @@ Dans cette partie, on cherche à détecter les numéros passés dans l'URL pour 
 .. code-block:: python
 
     # hello/urls.py
-    from django.conf.urls import url
+    from django.urls import path
     from hello.views import HelloView
 
     urlpatterns = [
-       url(r"^$", HelloView.as_view(), name="hello"),
-       # On utilise un regex pour matcher un numéro
-       url(r"^(?P<hello_id>[0-9]+)$", HelloView.as_view(), name="hello"),
+       path("", HelloView.as_view(), name="hello"),
+       path("<int:hello_id>", HelloView.as_view(), name="hello"),
     ]
 
 Cette deuxième URL vas donc appeler la classe crée tout à l'heure en lui passant une variable *hello_id* dans ses *kwargs*, nous allons la récupérer et la passer dans le contexte du template en allant modifier la vue.
@@ -143,16 +142,16 @@ Enfin, on modifie le template en rajoutant une petite condition sur la présence
     {% extends "core/base.jinja" %}
 
     {% block title %}
-    Hello World
+        Hello World
     {% endblock title %}
 
     {% block content %}
-    <p>
-        Hello World !
-        {% if hello_id -%}
-        {{ hello_id }}
-        {%- endif -%}
-    </p>
+        <p>
+            Hello World !
+            {% if hello_id -%}
+                {{ hello_id }}
+            {%- endif -%}
+        </p>
     {% endblock content %}
 
 .. note::
@@ -162,7 +161,7 @@ Enfin, on modifie le template en rajoutant une petite condition sur la présence
 À l'assaut des modèles
 ----------------------
 
-Pour cette dernière partie, nous allons ajouter une entrée dans la base de donnée et l'afficher dans un template. Nous allons ainsi créer un modèle nommé *Article* qui contiendra une entrée de texte pour le titre et une autre pour le contenu.
+Pour cette dernière partie, nous allons ajouter une entrée dans la base de données et l'afficher dans un template. Nous allons ainsi créer un modèle nommé *Article* qui contiendra une entrée de texte pour le titre et une autre pour le contenu.
 
 Commençons par le modèle en lui même.
 
@@ -203,7 +202,7 @@ On n'oublie pas l'URL.
 
     urlpatterns = [
         ...
-        url(r"^articles$", ArticlesListView.as_view(), name="articles_list")
+        path("articles/", ArticlesListView.as_view(), name="articles_list")
     ]
 
 Et enfin le template.
@@ -227,7 +226,7 @@ Et enfin le template.
 
 Maintenant que toute la logique de récupération et d'affichage est terminée, la page est accessible à l'adresse https://localhost:8000/hello/articles.
 
-Mais, j'ai une erreur ! Il se passe quoi ?! Et bien c'est simple, nous avons crée le modèle mais il n'existe pas dans la base de données. Il est dans un premier temps important de créer un fichier de migrations qui contiens des instructions pour la génération de celle-ci. Ce sont les fichiers qui sont enregistrés dans le dossier migration. Pour les générer à partir des classes de modèles qu'on viens de manipuler il suffit d'une seule commande.
+Mais, j'ai une erreur ! Il se passe quoi ?! Et bien c'est simple, nous avons créé le modèle mais il n'existe pas dans la base de données. Il est dans un premier temps important de créer un fichier de migrations qui contient des instructions pour la génération de celles-ci. Ce sont les fichiers qui sont enregistrés dans le dossier migration. Pour les générer à partir des classes de modèles qu'on vient de manipuler il suffit d'une seule commande.
 
 .. code-block:: bash
 
@@ -245,7 +244,7 @@ J'ai toujours une erreur ! Mais oui, c'est pas fini, faut pas aller trop vite. M
 
     ./manage.py migrate
 
-Et voilà, là il n'y a plus d'erreur. Tout fonctionne et on a une superbe page vide puisque aucun contenu pour cette table n'est dans la base. Nous allons en rajouter. Pour cela nous allons utiliser le fichier *core/management/commands/populate.py* qui contiens la commande qui initialise les données de la base de données de test. C'est un fichier très important qu'on viendra à modifier assez souvent. Nous allons y ajouter quelques articles.
+Et voilà, là il n'y a plus d'erreur. Tout fonctionne et on a une superbe page vide puisque aucun contenu pour cette table n'est dans la base. Nous allons en rajouter. Pour cela nous allons utiliser le fichier *core/management/commands/populate.py* qui contient la commande qui initialise les données de la base de données de test. C'est un fichier très important qu'on viendra à modifier assez souvent. Nous allons y ajouter quelques articles.
 
 .. code-block:: python
 
@@ -262,14 +261,15 @@ Et voilà, là il n'y a plus d'erreur. Tout fonctionne et on a une superbe page 
 
             ...
 
+            # les deux syntaxes ci-dessous sont correctes et donnent le même résultat
             Article(title="First hello", content="Bonjour tout le monde").save()
-            Article(title="Tutorial", content="C'était un super tutoriel").save()
+            Article.objects.create(title="Tutorial", content="C'était un super tutoriel")
 
 
-On regénère enfin les données de test en lançant la commande que l'on viens de modifier.
+On regénère enfin les données de test en lançant la commande que l'on vient de modifier.
 
 .. code-block:: bash
 
     ./manage.py setup
 
-On reviens sur https://localhost:8000/hello/articles et cette fois-ci nos deux articles apparaissent correctement.
+On revient sur https://localhost:8000/hello/articles et cette fois-ci nos deux articles apparaissent correctement.
