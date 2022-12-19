@@ -21,11 +21,32 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
+from ajax_select import make_ajax_form
 from django.contrib import admin
 
 from eboutic.models import *
 
-admin.site.register(Basket)
-admin.site.register(Invoice)
-admin.site.register(BasketItem)
+
+@admin.register(Basket)
+class BasketAdmin(admin.ModelAdmin):
+    list_display = ("user", "date", "get_total")
+    form = make_ajax_form(Basket, {"user": "users"})
+
+
+@admin.register(BasketItem)
+class BasketItemAdmin(admin.ModelAdmin):
+    list_display = ("basket", "product_name", "product_unit_price", "quantity")
+    search_fields = ("product_name",)
+
+
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = ("user", "date", "validated")
+    search_fields = ("user__username", "user__first_name", "user__last_name")
+    form = make_ajax_form(Invoice, {"user": "users"})
+
+
+@admin.register(InvoiceItem)
+class InvoiceItemAdmin(admin.ModelAdmin):
+    list_display = ("invoice", "product_name", "product_unit_price", "quantity")
+    search_fields = ("product_name",)
