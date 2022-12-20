@@ -202,7 +202,7 @@ C'est au travers de cette plate-forme que le Sith de l'AE est géré.
 
 Depuis le 1er Octobre 2022, GitHub remplace GitLab dans un soucis de facilité d'entretien,
 les machines sur lesquelles tournent le site étant de plus en plus vielles, il devenait très
-difficile d'effectuer les mise à jours de sécurité du GitLab sans avoir de soucis matériel.
+difficile d'effectuer les mise à jours de sécurité du GitLab sans avoir de soucis matériel
 pour l'hébergement et la gestion des projets informatiques de l'AE.
 
 Sentry
