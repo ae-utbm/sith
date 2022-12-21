@@ -28,8 +28,9 @@ from ajax_select import register, LookupChannel
 from core.views.site import search_user
 from core.models import User, Group, SithFile
 from club.models import Club
-from counter.models import Product, Counter
+from counter.models import Product, Counter, Customer
 from accounting.models import ClubAccount, Company
+from eboutic.models import BasketItem
 
 
 def check_token(request):
@@ -58,6 +59,21 @@ class UsersLookup(RightManagedLookupChannel):
 
     def format_item_display(self, item):
         return item.get_display_name()
+
+
+@register("customers")
+class CustomerLookup(RightManagedLookupChannel):
+    model = Customer
+
+    def get_query(self, q, request):
+        users = search_user(q)
+        return [user.customer for user in users]
+
+    def format_match(self, obj):
+        return obj.user.get_mini_item()
+
+    def format_item_display(self, obj):
+        return f"{obj.user.get_display_name()} ({obj.account_id})"
 
 
 @register("groups")

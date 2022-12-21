@@ -21,7 +21,39 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
+from ajax_select import make_ajax_form
 from django.contrib import admin
+from haystack.admin import SearchModelAdmin
 
-# Register your models here.
+from pedagogy.models import UV, UVComment, UVCommentReport
+
+
+@admin.register(UV)
+class UVAdmin(admin.ModelAdmin):
+    list_display = ("code", "title", "credit_type", "credits", "department")
+    search_fields = ("code", "title", "department")
+    form = make_ajax_form(UV, {"author": "users"})
+
+
+@admin.register(UVComment)
+class UVCommentAdmin(admin.ModelAdmin):
+    list_display = ("author", "uv", "grade_global", "publish_date")
+    search_fields = (
+        "author__username",
+        "author__first_name",
+        "author__last_name",
+        "uv__code",
+    )
+    form = make_ajax_form(UVComment, {"author": "users"})
+
+
+@admin.register(UVCommentReport)
+class UVCommentReportAdmin(SearchModelAdmin):
+    list_display = ("reporter", "uv")
+    search_fields = (
+        "reporter__username",
+        "reporter__first_name",
+        "reporter__last_name",
+        "comment__uv__code",
+    )
+    form = make_ajax_form(UVCommentReport, {"reporter": "users"})

@@ -21,20 +21,25 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
+from ajax_select import make_ajax_form
 from django.contrib import admin
 
 from subscription.models import Subscription
-from haystack.admin import SearchModelAdmin
 
 
-class SubscriptionAdmin(SearchModelAdmin):
-    search_fields = [
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = (
+        "member",
+        "subscription_type",
+        "subscription_start",
+        "subscription_end",
+        "location",
+    )
+    search_fields = (
         "member__username",
         "subscription_start",
         "subscription_end",
         "subscription_type",
-    ]
-
-
-admin.site.register(Subscription, SubscriptionAdmin)
+    )
+    form = make_ajax_form(Subscription, {"member": "users"})

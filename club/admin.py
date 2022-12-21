@@ -21,11 +21,24 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
+from ajax_select import make_ajax_form
 from django.contrib import admin
 
 from club.models import Club, Membership
 
 
-admin.site.register(Club)
-admin.site.register(Membership)
+@admin.register(Club)
+class ClubAdmin(admin.ModelAdmin):
+    list_display = ("name", "unix_name", "parent", "is_active")
+
+
+@admin.register(Membership)
+class MembershipAdmin(admin.ModelAdmin):
+    list_display = ("user", "club", "role", "start_date", "end_date")
+    search_fields = (
+        "user__username",
+        "user__first_name",
+        "user__last_name",
+        "club__name",
+    )
+    form = make_ajax_form(Membership, {"user": "users"})

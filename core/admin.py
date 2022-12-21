@@ -24,17 +24,19 @@
 
 from django.contrib import admin
 from ajax_select import make_ajax_form
-from core.models import User, Page, RealGroup, SithFile
+from core.models import User, Page, RealGroup, MetaGroup, SithFile
 from django.contrib.auth.models import Group as AuthGroup
 from haystack.admin import SearchModelAdmin
 
 
 admin.site.unregister(AuthGroup)
+admin.site.register(MetaGroup)
 admin.site.register(RealGroup)
 
 
+@admin.register(User)
 class UserAdmin(SearchModelAdmin):
-    list_display = ["first_name", "last_name", "username", "email", "nick_name"]
+    list_display = ("first_name", "last_name", "username", "email", "nick_name")
     form = make_ajax_form(
         User,
         {
@@ -48,11 +50,9 @@ class UserAdmin(SearchModelAdmin):
     search_fields = ["first_name", "last_name", "username"]
 
 
-admin.site.register(User, UserAdmin)
-
-
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
+    list_display = ("name", "_full_name", "owner_group")
     form = make_ajax_form(
         Page,
         {
@@ -66,4 +66,12 @@ class PageAdmin(admin.ModelAdmin):
 
 @admin.register(SithFile)
 class SithFileAdmin(admin.ModelAdmin):
-    form = make_ajax_form(SithFile, {"parent": "files"})  # ManyToManyField
+    list_display = ("name", "owner", "size", "date", "is_in_sas")
+    form = make_ajax_form(
+        SithFile,
+        {
+            "parent": "files",
+            "owner": "users",
+            "moderator": "users",
+        },
+    )  # ManyToManyField

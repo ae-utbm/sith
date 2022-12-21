@@ -305,6 +305,10 @@ class Product(models.Model):
                 return True
         return False
 
+    @property
+    def profit(self):
+        return self.selling_price - self.purchase_price
+
     def __str__(self):
         return "%s (%s)" % (self.name, self.code)
 
@@ -761,6 +765,12 @@ class Permanency(models.Model):
             self.activity.strftime("%Y-%m-%d %H:%M:%S"),
             self.end.strftime("%Y-%m-%d %H:%M:%S") if self.end else "",
         )
+
+    @property
+    def duration(self):
+        if self.end is None:
+            return self.activity - self.start
+        return self.end - self.start
 
 
 class CashRegisterSummary(models.Model):
