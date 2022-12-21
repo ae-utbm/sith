@@ -28,75 +28,76 @@ Le découpage en applications
 ----------------------------
 
 | /projet
-| 	**sith/**
-| 		Application principale du projet.
-| 	**accounting/**
-| 		Ajoute un système de comptabilité.
-| 	**api/**
-| 		Application où mettre les endpoints publiques d'API.
-| 	**club/**
-| 		Contiens les modèles liés aux clubs associatifs et ajoute leur gestion.
-| 	**com/**
-| 		Fournis des outils de communications aux clubs (weekmail, affiches…).
-| 	**core/**
-| 		Application la plus importante. Contiens les principales surcouches
-| 		liées au projet comme la gestion des droits et les templates de base.
-| 	**counter/**
-| 		Ajoute des comptoirs de vente pour les clubs et gère les ventes sur les lieux de vie.
-| 	**data/**
-| 		Contiens les fichiers statiques ajoutées par les utilisateurs.
-| 		N'est pas suivit par Git.
-| 	**doc/**
-| 		Contiens la documentation du projet.
-| 	**eboutic/**
-| 		Ajoute le comptoir de vente en ligne. Permet d'acheter en carte bancaire.
-| 	**election/**
-| 		Ajoute un système d'élection permettant d'élire les représentants étudiants.
-| 	**forum/**
-| 		Ajoute un forum de discutions.
-| 	**launderette/**
-| 		Permet la gestion des laveries.
-| 	**locale/**
-| 		Contiens les fichiers de traduction.
-| 	**matmat/**
-| 		Système de recherche de membres.
-| 	**pedagogy/**
-| 		Contiens le guide des UVs.
-| 	**rootplace/**
-| 		Ajoute des outils destinés aux administrateurs.
-| 	**static/**
-| 		Contiens l'ensemble des fichiers statiques ajoutés par les développeurs.
-| 		Ce dossier est généré par le framework, il est surtout utile en production.
-| 		Ce dossier n'es pas suivit par Git.
-| 	**stock/**
-| 		Système de gestion des stocks.
-| 	**subscription/**
-| 		Ajoute la gestion des cotisations des membres.
-| 	**trombi/**
-| 		Permet la génération du trombinoscope des élèves en fin de cursus.
-| 	**.coveragec**
-| 		Configure l'outil permettant de calculer la couverture des tests sur le projet.
-| 	**.gitignore**
-| 		Permet de définir quels fichiers sont suivis ou non par Git.
-| 	**.gitlab-ci.yml**
-| 		Permet de configurer la pipeline automatique de GitLab.
-| 	**.readthedocs.yml**
-| 		Permet de configurer la génération de documentation sur Readthedocs.
-| 	**.db.sqlite3**
-| 		Base de données de développement par défaut. Est automatiquement généré
-| 		lors de la configuration du projet en local. N'est pas suivis par Git.
-| 	**LICENSE**
-| 		Licence du projet.
-| 	**LICENSE.old**
-| 		Ancienne licence du projet.
-| 	**manage.py**
-| 		Permet de lancer les commandes liées au framework Django.
-| 	**migrate.py**
-| 		Contiens des scripts de migration à exécuter pour importer les données de l'ancien site.
-| 	**README.rst**
-| 		Fichier de README. À lire pour avoir des informations sur le projet.
-| 	**requirements.txt**
-| 		Contiens les dépendances Python du projet.
+|    **sith/**
+|    	Application principale du projet.
+|    **accounting/**
+|    	Ajoute un système de comptabilité.
+|    **api/**
+|    	Application où mettre les endpoints publiques d'API.
+|    **club/**
+|    	Contient les modèles liés aux clubs et assos et ajoute leur gestion.
+|    **com/**
+|    	Fournis des outils de communications aux clubs (weekmail, affiches…).
+|    **core/**
+|    	Application la plus importante. Contient les principales surcouches
+|    	liées au projet comme la gestion des droits et les templates de base.
+|    **counter/**
+|    	Ajoute des comptoirs de vente pour les clubs et gère les ventes sur les lieux de vie.
+|    **data/**
+|    	Contient les fichiers statiques ajoutés par les utilisateurs.
+|    	N'est pas suivi par Git.
+|    **doc/**
+|    	Contient la documentation du projet.
+|    **eboutic/**
+|    	Ajoute le comptoir de vente en ligne. Permet d'acheter en carte bancaire.
+|    **election/**
+|    	Ajoute un système d'élection permettant d'élire les représentants étudiants.
+|    **forum/**
+|    	Ajoute un forum de discussion.
+|    **launderette/**
+|    	Permet la gestion des laveries.
+|    **locale/**
+|    	Contient les fichiers de traduction.
+|    **matmat/**
+|    	Système de recherche de membres.
+|    **pedagogy/**
+|    	Contient le guide des UVs.
+|    **rootplace/**
+|    	Ajoute des outils destinés aux administrateurs.
+|    **static/**
+|    	Contient l'ensemble des fichiers statiques ajoutés par les développeurs.
+|    	Ce dossier est généré par le framework, il est surtout utile en production ;
+|        évitez d'y toucher pendant le développement.
+|    	Ce dossier n'est pas suivi par Git.
+|    **stock/**
+|    	Système de gestion des stocks.
+|    **subscription/**
+|    	Ajoute la gestion des cotisations des membres.
+|    **trombi/**
+|    	Permet la génération du trombinoscope des élèves en fin de cursus.
+|    **.coveragec**
+|    	Configure l'outil permettant de calculer la couverture des tests sur le projet.
+|    **.gitignore**
+|    	Permet de définir quels fichiers sont suivis ou non par Git.
+|    **.github/**
+|        Contient les fichiers de configuration des actions github.
+|    **.readthedocs.yml**
+|    	Permet de configurer la génération de documentation sur Readthedocs.
+|    **.db.sqlite3**
+|    	Base de données de développement par défaut. Est automatiquement généré
+|    	lors de la configuration du projet en local. N'est pas suivie par Git.
+|    **LICENSE**
+|    	Licence du projet.
+|    **LICENSE.old**
+|    	Ancienne licence du projet.
+|    **manage.py**
+|    	Permet de lancer les commandes liées au framework Django.
+|    **migrate.py**
+|    	Contiens des scripts de migration à exécuter pour importer les données de l'ancien site.
+|    **README.md**
+|    	Fichier de README. À lire pour avoir des informations sur le projet.
+|    **pyproject.toml**
+|    	Contient les dépendances Python du projet.
 
 
 L'application principale
@@ -107,16 +108,20 @@ L'application principale
 | 		Permet de définir le dossier comme un package Python.
 | 		Ce fichier est vide.
 | 	**settings.py**
-| 		Contiens les paramètres par défaut du projet.
+| 		Contient les paramètres par défaut du projet.
 | 		Ce fichier est versionné et fait partie intégrant de celui-ci.
-| 	**settings_curtom.py**
-| 		Contiens les paramètres spécifiques à l'installation courante.
-| 		Ce fichier n'est pas versionné et surcharges les paramètres par défaut.
+| 		Notez que les informations sensibles qui se trouvent dans ce fichier
+| 		ne sont pas celles utilisées en production.
+| 		Ce sont des paramètres factices préremplies pour faciliter la mise en place
+| 		du projet qui sont surchargés en production par les vrais paramètres.
+| 	**settings_custom.py**
+| 		Contient les paramètres spécifiques à l'installation courante.
+| 		Ce fichier n'est pas versionné et surcharge les paramètres par défaut.
 | 	**urls.py**
-| 		Contiens les routes d'URLs racines du projet.
-| 		On y inclus les autres fichiers d'URLs et leur namespace.
+| 		Contient les routes d'URLs racines du projet.
+| 		On y inclut les autres fichiers d'URLs et leur namespace.
 | 	**toolbar_debug.py**
-| 		Contiens la configuration de la barre de debug à gauche à destination
+| 		Contient la configuration de la barre de debug à gauche à destination
 | 		du site de développement.
 | 	**et_keys/**
 | 		Contiens la clef publique du système de paiement E-Transactions.
@@ -131,23 +136,22 @@ Le contenu d'une application
 | /app1
 | 	**__init__.py**
 | 		Permet de définir le dossier comme un package Python.
-| 		Ce fichier est généralement vide.
 | 	**models.py**
 | 		C'est là que les modèles sont définis. Ces classes définissent
-| 		les tables dans la base de donnée.
+| 		les tables dans la base de données.
 | 	**views.py**
 | 		C'est là où les vues sont définies.
 | 	**admin.py**
 | 		C'est là que l'on déclare quels modèles doivent apparaître
 | 		dans l'interface du module d'administration de Django.
 | 	**tests.py**
-| 		Ce fichier contiens les tests fonctionnels, unitaires
-| 		mais aussi d'intégrations qui sont lancés par la pipeline.
+| 		Ce fichier contient les tests fonctionnels, unitaires
+| 		et d'intégrations qui sont lancés par la pipeline.
 | 	**urls.py**
-| 		On y défini les URLs de l'application et on les lies aux vues.
+| 		On y définit les URLs de l'application et on les lie aux vues.
 | 	**migrations/**
 | 		Ce dossier sert à stocker les fichiers de migration de la base
-| 		de données générées par la commande *makemigrations*.
+| 		de données générés par la commande *makemigrations*.
 | 	**templates/**
-| 		Ce dossier ci contiens généralement des sous dossiers et sert
+| 		Ce dossier-ci contient généralement des sous-dossiers et sert
 | 		à accueillir les templates. Les sous dossiers servent de namespace.

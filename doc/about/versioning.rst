@@ -3,11 +3,11 @@ Le versioning
 
 Dans le monde du développement, nous faisons face à un problème relativement étrange pour un domaine aussi avancé : on est brouillon.
 
-On teste, on envoie, ça marche pas, on reteste, c'est ok. Par contre, on a oublie plein d'exceptions. Et on refactor. Ça marche mieux mais c'est moins rapide, etc, etc.
+On teste, on envoie, ça marche pas, on reteste, c'est ok. Par contre, on a oublié plein d'exceptions. Et on refactor. Ça marche mieux mais c'est moins rapide, etc.
 
 Et derrière tout ça, on fait des trucs qui marchent puis on se retrouve dans la mouise parce qu'on a effacé un morceau de code qui nous aurait servi plus tard.
 
-Pour palier à ce problème, le programmeur a créé un principe révolutionnaire (ouais... à mon avis, on s'est inspiré d'autres trucs, mais on va dire que c'est nous les créateurs) : le Versioning (*Apparition inexpliquée*).
+Pour pallier ce problème, le programmeur a créé un principe révolutionnaire (ouais... à mon avis, on s'est inspiré d'autres trucs, mais on va dire que c'est nous les créateurs) : le Versioning (*Apparition inexpliquée*).
 
 D'après projet-isika (c'est pas wikipedia ouais, ils étaient pas clairs eux), le versioning (ou versionnage en français mais c'est quand même vachement dégueu comme mot) consiste à travailler directement sur le code source d'un projet, en gardant toutes les versions précédentes. Les outils du versioning aident les développeurs à travailler parallèlement sur différentes parties du projet et à revenir facilement aux étapes précédentes de leur travail en cas de besoin. L’utilisation d’un logiciel de versioning est devenue quasi-indispensable pour tout développeur, même s’il travaille seul.
 
