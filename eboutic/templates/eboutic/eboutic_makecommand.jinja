@@ -103,7 +103,6 @@
                 </p>
             {% endif %}
             <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}" name="bank-pay-form">
-                {% csrf_token %}
                 <template x-data x-for="input in $store.billing_inputs.data">
                     <input type="hidden" :name="input['key']" :value="input['value']">
                 </template>
@@ -129,8 +128,7 @@
         const create_billing_info_url = '{{ url("counter:create_billing_info", user_id=request.user.id) }}'
         const edit_billing_info_url = '{{ url("counter:edit_billing_info", user_id=request.user.id) }}';
         const et_data_url = '{{ url("eboutic:et_data") }}'
-        let billing_info_exist =
-        {{ "true" if billing_infos else "false" }}
+        let billing_info_exist = {{ "true" if billing_infos else "false" }}
 
         {% if billing_infos %}
             const et_data = {{ billing_infos|tojson }}
