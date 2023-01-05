@@ -102,8 +102,8 @@
                     </i>
                 </p>
             {% endif %}
+            {% csrf_token %}
             <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}" name="bank-pay-form">
-                {% csrf_token %}
                 <template x-data x-for="input in $store.billing_inputs.data">
                     <input type="hidden" :name="input['key']" :value="input['value']">
                 </template>
