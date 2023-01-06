@@ -199,9 +199,12 @@ class Basket(models.Model):
             ("PBX_TYPECARTE", "CB"),
             ("PBX_TIME", datetime.now().replace(microsecond=0).isoformat("T")),
         ]
-        cart = {"shoppingcart": {"total": min(self.items.count(), 99)}}
-        cart = dict2xml(cart, newlines=False)
-        cart = '<?xml version="1.0" encoding="UTF-8" ?>' + cart
+        cart = {
+            "shoppingcart": {"total": {"totalQuantity": min(self.items.count(), 99)}}
+        }
+        cart = '<?xml version="1.0" encoding="UTF-8" ?>' + dict2xml(
+            cart, newlines=False
+        )
         data += [
             ("PBX_SHOPPINGCART", html.escape(cart)),
             ("PBX_BILLING", html.escape(customer.billing_infos.to_3dsv2_xml())),
