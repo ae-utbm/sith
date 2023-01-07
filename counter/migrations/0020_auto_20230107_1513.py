@@ -6,42 +6,44 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('counter', '0019_billinginfo'),
+        ("counter", "0019_billinginfo"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='producttype',
-            options={'ordering': ['-priority', 'name'], 'verbose_name': 'product type'},
+            name="producttype",
+            options={"ordering": ["-priority", "name"], "verbose_name": "product type"},
         ),
         migrations.AlterField(
-            model_name='billinginfo',
-            name='address_1',
-            field=models.CharField(max_length=50, verbose_name='Address 1'),
+            model_name="billinginfo",
+            name="address_1",
+            field=models.CharField(max_length=50, verbose_name="Address 1"),
         ),
         migrations.AlterField(
-            model_name='billinginfo',
-            name='address_2',
-            field=models.CharField(blank=True, max_length=50, null=True, verbose_name='Address 2'),
+            model_name="billinginfo",
+            name="address_2",
+            field=models.CharField(
+                blank=True, max_length=50, null=True, verbose_name="Address 2"
+            ),
         ),
         migrations.AlterField(
-            model_name='billinginfo',
-            name='city',
-            field=models.CharField(max_length=50, verbose_name='City'),
+            model_name="billinginfo",
+            name="city",
+            field=models.CharField(max_length=50, verbose_name="City"),
         ),
         migrations.AlterField(
-            model_name='billinginfo',
-            name='first_name',
-            field=models.CharField(max_length=22, verbose_name='First name'),
+            model_name="billinginfo",
+            name="first_name",
+            field=models.CharField(max_length=22, verbose_name="First name"),
         ),
         migrations.AlterField(
-            model_name='billinginfo',
-            name='last_name',
-            field=models.CharField(max_length=22, verbose_name='Last name'),
+            model_name="billinginfo",
+            name="last_name",
+            field=models.CharField(max_length=22, verbose_name="Last name"),
         ),
         migrations.AlterField(
-            model_name='billinginfo',
-            name='zip_code',
-            field=models.CharField(max_length=16, verbose_name='Zip code'),
+            model_name="billinginfo",
+            name="zip_code",
+            field=models.CharField(max_length=16, verbose_name="Zip code"),
         ),
     ]
