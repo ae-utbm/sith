@@ -26,6 +26,7 @@ import os
 from datetime import date, datetime, timedelta
 from io import StringIO, BytesIO
 
+from django.contrib.auth.models import Permission
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.conf import settings
@@ -73,7 +74,7 @@ class Command(BaseCommand):
         root_path = os.path.dirname(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         )
-        Group(name="Root").save()
+        root_group, _ = Group.objects.get_or_create(name="Root")
         Group(name="Public").save()
         Group(name="Subscribers").save()
         Group(name="Old subscribers").save()
@@ -87,6 +88,11 @@ class Command(BaseCommand):
         Group(name="Forum admin").save()
         Group(name="Pedagogy admin").save()
         self.reset_index("core", "auth")
+
+        change_billing = Permission.objects.get(codename="change_billinginfo")
+        add_billing = Permission.objects.get(codename="add_billinginfo")
+        root_group.permissions.add(change_billing, add_billing)
+
         root = User(
             id=0,
             username="root",

@@ -97,19 +97,12 @@ class Subscription(models.Model):
             # TODO see SubscriptionForm's clean method
             raise ValidationError(_("Subscription error"))
 
-    def save(self):
+    def save(self, *args, **kwargs):
         super(Subscription, self).save()
         from counter.models import Customer
 
         if not Customer.objects.filter(user=self.member).exists():
-            last_id = (
-                Customer.objects.count() + 1504
-            )  # Number to keep a continuity with the old site
-            Customer(
-                user=self.member,
-                account_id=Customer.generate_account_id(last_id + 1),
-                amount=0,
-            ).save()
+            Customer.new_for_user(self.member).save()
             form = PasswordResetForm({"email": self.member.email})
             if form.is_valid():
                 form.save(
@@ -177,69 +170,3 @@ class Subscription(models.Model):
             self.subscription_start <= date.today()
             and date.today() <= self.subscription_end
         )
-
-
-def guy_test(date, duration=4):
-    print(
-        str(date)
-        + " - "
-        + str(duration)
-        + " -> "
-        + str(Subscription.compute_start(date, duration))
-    )
-
-
-def bibou_test(duration, date=date.today()):
-    print(
-        str(date)
-        + " - "
-        + str(duration)
-        + " -> "
-        + str(
-            Subscription.compute_end(
-                duration, Subscription.compute_start(date, duration)
-            )
-        )
-    )
-
-
-def guy():
-    guy_test(date(2015, 7, 11))
-    guy_test(date(2015, 8, 11))
-    guy_test(date(2015, 2, 17))
-    guy_test(date(2015, 3, 17))
-    guy_test(date(2015, 1, 11))
-    guy_test(date(2015, 2, 11))
-    guy_test(date(2015, 8, 17))
-    guy_test(date(2015, 9, 17))
-    print("=" * 80)
-    guy_test(date(2015, 7, 11), 1)
-    guy_test(date(2015, 8, 11), 2)
-    guy_test(date(2015, 2, 17), 3)
-    guy_test(date(2015, 3, 17), 4)
-    guy_test(date(2015, 1, 11), 1)
-    guy_test(date(2015, 2, 11), 2)
-    guy_test(date(2015, 8, 17), 3)
-    guy_test(date(2015, 9, 17), 4)
-    print("=" * 80)
-    bibou_test(1, date(2015, 2, 18))
-    bibou_test(2, date(2015, 2, 18))
-    bibou_test(3, date(2015, 2, 18))
-    bibou_test(4, date(2015, 2, 18))
-    bibou_test(1, date(2015, 9, 18))
-    bibou_test(2, date(2015, 9, 18))
-    bibou_test(3, date(2015, 9, 18))
-    bibou_test(4, date(2015, 9, 18))
-    print("=" * 80)
-    bibou_test(1, date(2000, 2, 29))
-    bibou_test(2, date(2000, 2, 29))
-    bibou_test(1, date(2000, 5, 31))
-    bibou_test(1, date(2000, 7, 31))
-    bibou_test(1)
-    bibou_test(2)
-    bibou_test(3)
-    bibou_test(4)
-
-
-if __name__ == "__main__":
-    guy()

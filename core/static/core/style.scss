@@ -49,36 +49,27 @@ body {
   font-family: sans-serif;
 }
 
-input[type=button], input[type=submit], input[type=reset],input[type=file] {
+button, input[type=button], input[type=submit], input[type=reset],input[type=file] {
   border: none;
   text-decoration: none;
   background-color: $background-button-color;
   padding: 0.4em;
   margin: 0.1em;
-  font-weight: bold;
   font-size: 1.2em;
   border-radius: 5px;
-  cursor: pointer;
-  box-shadow: $shadow-color 0px 0px 1px;
+  &:hover {
+    background: hsl(0, 0%, 83%);
+  }
+}
 
-  &:hover {
-    background: hsl(0, 0%, 83%);
-  }
+input[type=button], input[type=submit], input[type=reset],input[type=file] {
+  font-weight: bold;
 }
-button{
-  border: none;
-  text-decoration: none;
-  background-color: $background-button-color;
-  padding: 0.4em;
-  margin: 0.1em;
-  font-size: 1.18em;
-  border-radius: 5px;
-  box-shadow: $shadow-color 0px 0px 1px;
+
+button:not(:disabled), input[type=button]:not(:disabled), input[type=submit]:not(:disabled), input[type=reset]:not(:disabled),input[type=file]:not(:disabled) {
   cursor: pointer;
-  &:hover {
-    background: hsl(0, 0%, 83%);
-  }
 }
+
 input,textarea[type=text],[type=number]{
   border: none;
   text-decoration: none;
@@ -123,6 +114,38 @@ a {
   margin: 1px;
 }
 
+.collapse {
+  border-radius: 5px;
+  overflow: hidden;
+
+  .collapse-header {
+    color: white;
+    background-color: #354a5f;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .collapse-header-text {
+      flex: 2;
+    }
+
+    .collapse-header-icon {
+      transition: all ease-in-out 150ms;
+      &.reverse {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  .collapse-body {
+    padding: 10px;
+  }
+}
+
+.shadow {
+  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+}
+
 .w_big {
   width: 75%;
 }
@@ -135,9 +158,11 @@ a {
   width: 23%;
 }
 
-.clickable:hover {
+.clickable:not(:disabled):hover {
   cursor: pointer;
 }
+
+[x-cloak] { display: none !important; }
 
 /*--------------------------------HEADER-------------------------------*/
 
@@ -170,21 +195,11 @@ header {
   background-color: $primary-neutral-dark-color;
   border-radius: 0px 0px 10px 10px;
 
-  // PINKTOBER
-  // background-color: $pinktober;
-  // border-bottom: 5px solid $pinktober-secondary;
-  // margin-bottom: -5px;
-  // border-radius: 0 0 5px 7px;
 
   #header_logo {
     background-color: $white-color;
     padding: 0.2em;
-    border-radius: 0px 0px 0px 9px;
-
-    //PINKTOBER
-    // border-bottom: 5px solid $shadow-color;
-    // border-radius: 0px 0px 0px 5px;
-    // margin-bottom: -5px;
+    border-radius: 0 0 0 9px;
 
     a {
       display: flex;
@@ -211,13 +226,7 @@ header {
       width: 100%;
       label {
         display: inline;
-
-        // PINKTOBER
-        // color: $pinktober-primary-text;
       }
-    }
-    a {
-      display: button;
     }
   }
 
@@ -243,16 +252,6 @@ header {
       flex: initial;
       list-style-type: none;
       margin: 0.2em 0.2em;
-
-      /*
-      PINKTOBER
-      & .fa.fa-times {
-        color: $pinktober-bar-closed !important;
-      }
-
-      & .fa.fa-check {
-        color: $pinktober-bar-opened !important;
-      }*/
     }
 
     #header_search {
@@ -445,6 +444,36 @@ header {
     }
   }
 
+  .btn {
+    font-size: 15px;
+    font-weight: normal;
+    color: white;
+    min-width: 60px;
+    padding: 5px 10px;
+    border: none;
+    text-decoration: none;
+
+    &.btn-blue {
+      background-color: #354a5f;
+    }
+
+    &.btn-blue:disabled {
+      background-color: rgba(70, 90, 126, 0.4);
+    }
+
+    &.btn-blue.clickable:not(:disabled):hover {
+      background-color: #2c3646;
+    }
+
+    &.btn-grey {
+      background-color: grey;
+    }
+
+    &.btn-grey.clickable:not(:disabled):hover {
+      background-color:hsl(210,5%,30%);
+    }
+  }
+
 /*--------------------------------CONTENT------------------------------*/
   #quick_notif {
     width: 100%;
@@ -466,16 +495,25 @@ header {
 
   .alert {
     margin: 10px;
-    border: #fc8181 1px solid;
-    background-color: rgb(255,245,245);
     border-radius: 4px;
-    color: #c53030;
     padding: 12px 16px;
     display: flex;
     gap: 16px;
     max-width: 100%;
     align-items: center;
     text-align: justify;
+
+    &.alert-green {
+      background-color: rgb(245, 255, 245);
+      color: rgb(3, 84, 63);
+      border: rgb(14, 159, 110) 1px solid;
+    }
+
+    &.alert-red {
+      background-color: rgb(255,245,245);
+      color: #c53030;
+      border: #fc8181 1px solid;
+    }
 
     .alert-main {
       flex: 2;
@@ -1497,7 +1535,7 @@ textarea {
     margin: 10px 0;
     display: flex;
     flex-wrap: wrap;
-    height: 20p;
+    height: 20px;
     align-items: center;
   }
   .search_check {

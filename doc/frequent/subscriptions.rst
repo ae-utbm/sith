@@ -8,7 +8,7 @@ Il arrive régulièrement que le type de cotisation proposé varie en prix et en
 Comprendre la configuration
 ---------------------------
 
-Pour modifier les cotisations disponnibles, tout se gère dans la configuration avec la variable *SITH_SUBSCRIPTIONS*. Dans cet exemple, nous allons ajouter une nouvelle cotisation d'un mois.
+Pour modifier les cotisations disponibles, tout se gère dans la configuration avec la variable *SITH_SUBSCRIPTIONS*. Dans cet exemple, nous allons ajouter une nouvelle cotisation d'un mois.
 
 .. code-block:: python
 

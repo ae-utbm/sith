@@ -21,10 +21,13 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import json
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
+from django.views.decorators.http import require_POST
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.base import View
 from django.views.generic.edit import (
@@ -49,12 +52,20 @@ import re
 import pytz
 from datetime import date, timedelta, datetime
 from http import HTTPStatus
-from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
-from ajax_select import make_ajax_field
 
 from core.views import CanViewMixin, TabedViewMixin, CanEditMixin
-from core.views.forms import LoginForm, SelectDate, SelectDateTime
+from core.views.forms import LoginForm
 from core.models import User
+from counter.forms import (
+    BillingInfoForm,
+    StudentCardForm,
+    GetUserForm,
+    RefillForm,
+    CounterEditForm,
+    ProductEditForm,
+    CashSummaryFormBase,
+    EticketForm,
+)
 from subscription.models import Subscription
 from counter.models import (
     Counter,
@@ -68,9 +79,9 @@ from counter.models import (
     CashRegisterSummaryItem,
     Eticket,
     Permanency,
+    BillingInfo,
 )
 from accounting.models import CurrencyField
-from core.views.forms import TzAwareDateTimeField
 
 
 class CounterAdminMixin(View):
@@ -103,24 +114,6 @@ class CounterAdminMixin(View):
         return super(CounterAdminMixin, self).dispatch(request, *args, **kwargs)
 
 
-class StudentCardForm(forms.ModelForm):
-    """
-    Form for adding student cards
-    Only used for user profile since CounterClick is to complicated
-    """
-
-    class Meta:
-        model = StudentCard
-        fields = ["uid"]
-
-    def clean(self):
-        cleaned_data = super(StudentCardForm, self).clean()
-        uid = cleaned_data.get("uid", None)
-        if not uid or not StudentCard.is_valid(uid):
-            raise forms.ValidationError(_("This UID is invalid"), code="invalid")
-        return cleaned_data
-
-
 class StudentCardDeleteView(DeleteView, CanEditMixin):
     """
     View used to delete a card from a user
@@ -138,59 +131,6 @@ class StudentCardDeleteView(DeleteView, CanEditMixin):
         return reverse_lazy(
             "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
         )
-
-
-class GetUserForm(forms.Form):
-    """
-    The Form class aims at providing a valid user_id field in its cleaned data, in order to pass it to some view,
-    reverse function, or any other use.
-
-    The Form implements a nice JS widget allowing the user to type a customer account id, or search the database with
-    some nickname, first name, or last name (TODO)
-    """
-
-    code = forms.CharField(
-        label="Code", max_length=StudentCard.UID_SIZE, required=False
-    )
-    id = AutoCompleteSelectField(
-        "users", required=False, label=_("Select user"), help_text=None
-    )
-
-    def as_p(self):
-        self.fields["code"].widget.attrs["autofocus"] = True
-        return super(GetUserForm, self).as_p()
-
-    def clean(self):
-        cleaned_data = super(GetUserForm, self).clean()
-        cus = None
-        if cleaned_data["code"] != "":
-            if len(cleaned_data["code"]) == StudentCard.UID_SIZE:
-                card = StudentCard.objects.filter(uid=cleaned_data["code"])
-                if card.exists():
-                    cus = card.first().customer
-            if cus is None:
-                cus = Customer.objects.filter(
-                    account_id__iexact=cleaned_data["code"]
-                ).first()
-        elif cleaned_data["id"] is not None:
-            cus = Customer.objects.filter(user=cleaned_data["id"]).first()
-        if cus is None or not cus.can_buy:
-            raise forms.ValidationError(_("User not found"))
-        cleaned_data["user_id"] = cus.user.id
-        cleaned_data["user"] = cus.user
-        return cleaned_data
-
-
-class RefillForm(forms.ModelForm):
-    error_css_class = "error"
-    required_css_class = "required"
-    amount = forms.FloatField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "focus"})
-    )
-
-    class Meta:
-        model = Refilling
-        fields = ["amount", "payment_method", "bank"]
 
 
 class CounterTabsMixin(TabedViewMixin):
@@ -867,15 +807,6 @@ class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
     current_tab = "counters"
 
 
-class CounterEditForm(forms.ModelForm):
-    class Meta:
-        model = Counter
-        fields = ["sellers", "products"]
-
-    sellers = make_ajax_field(Counter, "sellers", "users", help_text="")
-    products = make_ajax_field(Counter, "products", "products", help_text="")
-
-
 class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """
     Edit a counter's main informations (for the counter's manager)
@@ -993,66 +924,6 @@ class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     queryset = Product.objects.filter(archived=False)
     ordering = ["name"]
     current_tab = "products"
-
-
-class ProductEditForm(forms.ModelForm):
-    class Meta:
-        model = Product
-        fields = [
-            "name",
-            "description",
-            "product_type",
-            "code",
-            "parent_product",
-            "buying_groups",
-            "purchase_price",
-            "selling_price",
-            "special_selling_price",
-            "icon",
-            "club",
-            "limit_age",
-            "tray",
-            "archived",
-        ]
-
-    parent_product = AutoCompleteSelectField(
-        "products", show_help_text=False, label=_("Parent product"), required=False
-    )
-    buying_groups = AutoCompleteSelectMultipleField(
-        "groups",
-        show_help_text=False,
-        help_text="",
-        label=_("Buying groups"),
-        required=True,
-    )
-    club = AutoCompleteSelectField("clubs", show_help_text=False)
-    counters = AutoCompleteSelectMultipleField(
-        "counters",
-        show_help_text=False,
-        help_text="",
-        label=_("Counters"),
-        required=False,
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(ProductEditForm, self).__init__(*args, **kwargs)
-        if self.instance.id:
-            self.fields["counters"].initial = [
-                str(c.id) for c in self.instance.counters.all()
-            ]
-
-    def save(self, *args, **kwargs):
-        ret = super(ProductEditForm, self).save(*args, **kwargs)
-        if self.fields["counters"].initial:
-            for cid in self.fields["counters"].initial:
-                c = Counter.objects.filter(id=int(cid)).first()
-                c.products.remove(self.instance)
-                c.save()
-        for cid in self.cleaned_data["counters"]:
-            c = Counter.objects.filter(id=int(cid)).first()
-            c.products.add(self.instance)
-            c.save()
-        return ret
 
 
 class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
@@ -1482,7 +1353,7 @@ class CounterStatView(DetailView, CounterAdminMixin):
 
     def get_context_data(self, **kwargs):
         """Add stats to the context"""
-        from django.db.models import Sum, Case, When, F, DecimalField
+        from django.db.models import Sum, Case, When, F
 
         kwargs = super(CounterStatView, self).get_context_data(**kwargs)
         kwargs["Customer"] = Customer
@@ -1585,11 +1456,6 @@ class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
         return reverse("counter:cash_summary_list")
 
 
-class CashSummaryFormBase(forms.Form):
-    begin_date = TzAwareDateTimeField(label=_("Begin date"), required=False)
-    end_date = TzAwareDateTimeField(label=_("End date"), required=False)
-
-
 class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """Display a list of cash summaries"""
 
@@ -1669,7 +1535,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         end_date = (start_date + timedelta(days=32)).replace(
             day=1, hour=0, minute=0, microsecond=0
         )
-        from django.db.models import Sum, Case, When, F, DecimalField
+        from django.db.models import Sum, Case, When, F
 
         kwargs["sum_cb"] = sum(
             [
@@ -1723,17 +1589,6 @@ class EticketListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     template_name = "counter/eticket_list.jinja"
     ordering = ["id"]
     current_tab = "etickets"
-
-
-class EticketForm(forms.ModelForm):
-    class Meta:
-        model = Eticket
-        fields = ["product", "banner", "event_title", "event_date"]
-        widgets = {"event_date": SelectDate}
-
-    product = AutoCompleteSelectField(
-        "products", show_help_text=False, label=_("Product"), required=True
-    )
 
 
 class EticketCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
@@ -1895,3 +1750,55 @@ class StudentCardFormView(FormView):
         return reverse_lazy(
             "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
         )
+
+
+def __manage_billing_info_req(request, user_id, delete_if_fail=False):
+    data = json.loads(request.body)
+    form = BillingInfoForm(data)
+    if not form.is_valid():
+        if delete_if_fail:
+            Customer.objects.get(user__id=user_id).billing_infos.delete()
+        errors = [
+            {"field": str(form.fields[k].label), "messages": v}
+            for k, v in form.errors.items()
+        ]
+        content = json.dumps({"errors": errors})
+        return HttpResponse(status=400, content=content)
+    if form.is_valid():
+        infos = Customer.objects.get(user__id=user_id).billing_infos
+        for field in form.fields:
+            infos.__dict__[field] = form[field].value()
+        infos.save()
+        content = json.dumps({"errors": None})
+        return HttpResponse(status=200, content=content)
+
+
+@login_required
+@require_POST
+def create_billing_info(request, user_id):
+    user = request.user
+    if user.id != user_id and not user.has_perm("counter:add_billinginfo"):
+        raise PermissionDenied()
+    user = get_object_or_404(User, pk=user_id)
+    if not hasattr(user, "customer"):
+        customer = Customer.new_for_user(user)
+        customer.save()
+    else:
+        customer = get_object_or_404(Customer, user_id=user_id)
+    BillingInfo.objects.create(customer=customer)
+    return __manage_billing_info_req(request, user_id, True)
+
+
+@login_required
+@require_POST
+def edit_billing_info(request, user_id):
+    user = request.user
+    if user.id != user_id and not user.has_perm("counter:change_billinginfo"):
+        raise PermissionDenied()
+    user = get_object_or_404(User, pk=user_id)
+    if not hasattr(user, "customer"):
+        raise Http404
+    if not hasattr(user.customer, "billing_infos"):
+        raise Http404
+
+    return __manage_billing_info_req(request, user_id)

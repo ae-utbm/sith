@@ -325,6 +325,10 @@ class UVCommentReport(models.Model):
     )
     reason = models.TextField(_("reason"))
 
+    @cached_property
+    def uv(self):
+        return self.comment.uv
+
     def is_owned_by(self, user):
         """
         Can be created by a pedagogy admin, a superuser or a subscriber

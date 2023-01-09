@@ -21,9 +21,13 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import hmac
+import html
 import typing
+from datetime import datetime
 from typing import List
 
+from dict2xml import dict2xml
 from django.conf import settings
 from django.db import models, DataError
 from django.db.models import Sum, F
@@ -32,7 +36,7 @@ from django.utils.translation import gettext_lazy as _
 
 from accounting.models import CurrencyField
 from core.models import Group, User
-from counter.models import Counter, Product, Selling, Refilling
+from counter.models import Counter, Product, Selling, Refilling, BillingInfo, Customer
 
 
 def get_eboutic_products(user: User) -> List[Product]:
@@ -104,7 +108,7 @@ class Basket(models.Model):
         """
         Remove all items from this basket without deleting the basket
         """
-        BasketItem.objects.filter(basket=self).delete()
+        self.items.all().delete()
 
     @cached_property
     def contains_refilling_item(self) -> bool:
@@ -122,7 +126,7 @@ class Basket(models.Model):
     def from_session(cls, session) -> typing.Union["Basket", None]:
         """
         Given an HttpRequest django object, return the basket used in the current session
-        if it exists else create a new one and return it
+        if it exists else None
         """
         if "basket_id" in session:
             try:
@@ -130,6 +134,88 @@ class Basket(models.Model):
             except cls.DoesNotExist:
                 return None
         return None
+
+    def generate_sales(self, counter, seller: User, payment_method: str):
+        """
+        Generate a list of sold items corresponding to the items
+        of this basket WITHOUT saving them NOR deleting the basket
+
+        Example:
+            ::
+
+                counter = Counter.objects.get(name="Eboutic")
+                sales = basket.generate_sales(counter, "SITH_ACCOUNT")
+                # here the basket is in the same state as before the method call
+
+                with transaction.atomic():
+                    for sale in sales:
+                        sale.save()
+                    basket.delete()
+                    # all the basket items are deleted by the on_delete=CASCADE relation
+                    # thus only the sales remain
+        """
+        # I must proceed with two distinct requests instead of
+        # only one with a join because the AbstractBaseItem model has been
+        # poorly designed. If you refactor the model, please refactor this too.
+        items = self.items.order_by("product_id")
+        ids = [item.product_id for item in items]
+        products = Product.objects.filter(id__in=ids).order_by("id")
+        # items and products are sorted in the same order
+        sales = []
+        for item, product in zip(items, products):
+            sales.append(
+                Selling(
+                    label=product.name,
+                    counter=counter,
+                    club=product.club,
+                    product=product,
+                    seller=seller,
+                    customer=self.user.customer,
+                    unit_price=item.product_unit_price,
+                    quantity=item.quantity,
+                    payment_method=payment_method,
+                )
+            )
+        return sales
+
+    def get_e_transaction_data(self):
+        user = self.user
+        if not hasattr(user, "customer"):
+            raise Customer.DoesNotExist
+        customer = user.customer
+        if not hasattr(user.customer, "billing_infos"):
+            raise BillingInfo.DoesNotExist
+        data = [
+            ("PBX_SITE", settings.SITH_EBOUTIC_PBX_SITE),
+            ("PBX_RANG", settings.SITH_EBOUTIC_PBX_RANG),
+            ("PBX_IDENTIFIANT", settings.SITH_EBOUTIC_PBX_IDENTIFIANT),
+            ("PBX_TOTAL", str(int(self.get_total() * 100))),
+            ("PBX_DEVISE", "978"),  # This is Euro
+            ("PBX_CMD", str(self.id)),
+            ("PBX_PORTEUR", user.email),
+            ("PBX_RETOUR", "Amount:M;BasketID:R;Auto:A;Error:E;Sig:K"),
+            ("PBX_HASH", "SHA512"),
+            ("PBX_TYPEPAIEMENT", "CARTE"),
+            ("PBX_TYPECARTE", "CB"),
+            ("PBX_TIME", datetime.now().replace(microsecond=0).isoformat("T")),
+        ]
+        cart = {
+            "shoppingcart": {"total": {"totalQuantity": min(self.items.count(), 99)}}
+        }
+        cart = '<?xml version="1.0" encoding="UTF-8" ?>' + dict2xml(
+            cart, newlines=False
+        )
+        data += [
+            ("PBX_SHOPPINGCART", cart),
+            ("PBX_BILLING", customer.billing_infos.to_3dsv2_xml()),
+        ]
+        pbx_hmac = hmac.new(
+            settings.SITH_EBOUTIC_HMAC_KEY,
+            bytes("&".join("=".join(d) for d in data), "utf-8"),
+            "sha512",
+        )
+        data.append(("PBX_HMAC", pbx_hmac.hexdigest().upper()))
+        return data
 
     def __str__(self):
         return "%s's basket (%d items)" % (self.user, self.items.all().count())
@@ -156,18 +242,9 @@ class Invoice(models.Model):
         )["total"]
         return float(total) if total is not None else 0
 
-    def validate(self, *args, **kwargs):
+    def validate(self):
         if self.validated:
             raise DataError(_("Invoice already validated"))
-        from counter.models import Customer
-
-        if not Customer.objects.filter(user=self.user).exists():
-            number = Customer.objects.count() + 1
-            Customer(
-                user=self.user,
-                account_id=Customer.generate_account_id(number),
-                amount=0,
-            ).save()
         eboutic = Counter.objects.filter(type="EBOUTIC").first()
         for i in self.items.all():
             if i.type_id == settings.SITH_COUNTER_PRODUCTTYPE_REFILLING:
@@ -226,6 +303,22 @@ class BasketItem(AbstractBaseItem):
     basket = models.ForeignKey(
         Basket, related_name="items", verbose_name=_("basket"), on_delete=models.CASCADE
     )
+
+    @classmethod
+    def from_product(cls, product: Product, quantity: int):
+        """
+        Create a BasketItem with the same characteristics as the
+        product passed in parameters, with the specified quantity
+        WARNING : the basket field is not filled, so you must set
+        it yourself before saving the model
+        """
+        return cls(
+            product_id=product.id,
+            product_name=product.name,
+            type_id=product.product_type.id,
+            quantity=quantity,
+            product_unit_price=product.selling_price,
+        )
 
 
 class InvoiceItem(AbstractBaseItem):

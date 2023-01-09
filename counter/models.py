@@ -22,8 +22,8 @@
 #
 #
 
-from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
 from django.db import models
+from django.db.models.functions import Length
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
@@ -38,16 +38,20 @@ import string
 import os
 import base64
 import datetime
+from dict2xml import dict2xml
 
+from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
 from club.models import Club, Membership
 from accounting.models import CurrencyField
 from core.models import Group, User, Notification
 from subscription.models import Subscription
 
+from django_countries.fields import CountryField
+
 
 class Customer(models.Model):
     """
-    This class extends a user to make a customer. It adds some basic customers informations, such as the accound ID, and
+    This class extends a user to make a customer. It adds some basic customers' information, such as the account ID, and
     is used by other accounting classes as reference to the customer, rather than using User
     """
 
@@ -89,13 +93,28 @@ class Customer(models.Model):
             .subscription_end
         ) < timedelta(days=90)
 
-    @staticmethod
-    def generate_account_id(number):
-        number = str(number)
-        letter = random.choice(string.ascii_lowercase)
-        while Customer.objects.filter(account_id=number + letter).exists():
-            letter = random.choice(string.ascii_lowercase)
-        return number + letter
+    @classmethod
+    def new_for_user(cls, user: User):
+        """
+        Create a new Customer instance for the user given in parameter without saving it
+        The account if is automatically generated and the amount set at 0
+        """
+        # account_id are number with a letter appended
+        account_id = (
+            Customer.objects.order_by(Length("account_id"), "account_id")
+            .values("account_id")
+            .last()
+        )
+        if account_id is None:
+            # legacy from the old site
+            return cls(user=user, account_id="1504a", amount=0)
+        account_id = account_id["account_id"]
+        num = int(account_id[:-1])
+        while Customer.objects.filter(account_id=account_id).exists():
+            num += 1
+            account_id = str(num) + random.choice(string.ascii_lowercase)
+
+        return cls(user=user, account_id=account_id, amount=0)
 
     def save(self, allow_negative=False, is_selling=False, *args, **kwargs):
         """
@@ -120,6 +139,52 @@ class Customer(models.Model):
 
     def get_full_url(self):
         return "".join(["https://", settings.SITH_URL, self.get_absolute_url()])
+
+
+class BillingInfo(models.Model):
+    """
+    Represent the billing information of a user, which are required
+    by the 3D-Secure v2 system used by the etransaction module
+    """
+
+    customer = models.OneToOneField(
+        Customer, related_name="billing_infos", on_delete=models.CASCADE
+    )
+
+    # declaring surname and name even though they are already defined
+    # in User add some redundancy, but ensures that the billing infos
+    # shall stay correct, whatever shenanigans the user commits on its profile
+    first_name = models.CharField(_("First name"), max_length=22)
+    last_name = models.CharField(_("Last name"), max_length=22)
+    address_1 = models.CharField(_("Address 1"), max_length=50)
+    address_2 = models.CharField(_("Address 2"), max_length=50, blank=True, null=True)
+    zip_code = models.CharField(_("Zip code"), max_length=16)  # code postal
+    city = models.CharField(_("City"), max_length=50)
+    country = CountryField(blank_label=_("Country"))
+
+    def to_3dsv2_xml(self) -> str:
+        """
+        Convert the data from this model into a xml usable
+        by the online paying service of the Crédit Agricole bank.
+        see : `https://www.ca-moncommerce.com/espace-client-mon-commerce/up2pay-e-transactions/ma-documentation/manuel-dintegration-focus-3ds-v2/principes-generaux/#integration-3dsv2-developpeur-webmaster`
+        """
+        data = {
+            "Address": {
+                "FirstName": self.first_name,
+                "LastName": self.last_name,
+                "Address1": self.address_1,
+                "ZipCode": self.zip_code,
+                "City": self.city,
+                "CountryCode": self.country.numeric,  # ISO-3166-1 numeric code
+            }
+        }
+        if self.address_2:
+            data["Address"]["Address2"] = self.address_2
+        xml = dict2xml(data, wrap="Billing", newlines=False)
+        return '<?xml version="1.0" encoding="UTF-8" ?>' + xml
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
 
 
 class ProductType(models.Model):
@@ -239,6 +304,10 @@ class Product(models.Model):
             if user.is_in_group(group.name):
                 return True
         return False
+
+    @property
+    def profit(self):
+        return self.selling_price - self.purchase_price
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.code)
@@ -696,6 +765,12 @@ class Permanency(models.Model):
             self.activity.strftime("%Y-%m-%d %H:%M:%S"),
             self.end.strftime("%Y-%m-%d %H:%M:%S") if self.end else "",
         )
+
+    @property
+    def duration(self):
+        if self.end is None:
+            return self.activity - self.start
+        return self.end - self.start
 
 
 class CashRegisterSummary(models.Model):
