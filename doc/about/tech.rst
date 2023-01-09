@@ -193,7 +193,7 @@ GitHub
 ~~~~~~
 
 | `Site officiel <https://github.com>`__
-| `Page github d'AE-Dev <https://github.com/ae-utbm/>`__
+| `Page github du Pôle Informatique de l'AE <https://github.com/ae-utbm/>`__
 
 Github est un service web d'hébergement et de gestion de développement de logiciel.
 C'est une plate-forme avec interface web permettant de déposer du code géré avec Git
