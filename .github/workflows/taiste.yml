@@ -34,9 +34,8 @@ jobs:
           export PATH="$HOME/.poetry/bin:$PATH"
           pushd ${{secrets.SITH_PATH}}
 
-          git fetch
-          git reset --hard origin/taiste
-          poetry update
+          git pull
+          poetry install
           poetry run ./manage.py migrate
           echo "yes" | poetry run ./manage.py collectstatic
           poetry run ./manage.py compilestatic
