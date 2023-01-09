@@ -170,7 +170,7 @@ Il faut toujours avoir préalablement activé l'environnement virtuel comme fait
 Générer la documentation
 ------------------------
 
-La documentation est automatiquement mise en ligne sur readthedocs à chaque envoi de code sur Github.
+La documentation est automatiquement mise en ligne sur readthedocs à chaque envoi de code sur GitHub.
 Pour l'utiliser en local ou globalement pour la modifier, il existe une commande du site qui génère la documentation et lance un serveur la rendant accessible à l'adresse http://localhost:8080.
 Cette commande génère la documentation à chacune de ses modifications, inutile de relancer le serveur à chaque fois.
 
