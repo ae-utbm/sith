@@ -22,54 +22,54 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path
 
 from launderette.views import *
 
 urlpatterns = [
     # views
-    re_path(r"^$", LaunderetteMainView.as_view(), name="launderette_main"),
-    re_path(
-        r"^slot/(?P<slot_id>[0-9]+)/delete$",
+    path("", LaunderetteMainView.as_view(), name="launderette_main"),
+    path(
+        "slot/<int:slot_id>/delete/",
         SlotDeleteView.as_view(),
         name="delete_slot",
     ),
-    re_path(r"^book$", LaunderetteBookMainView.as_view(), name="book_main"),
-    re_path(
-        r"^book/(?P<launderette_id>[0-9]+)$",
+    path("book/", LaunderetteBookMainView.as_view(), name="book_main"),
+    path(
+        "book/<int:launderette_id>/",
         LaunderetteBookView.as_view(),
         name="book_slot",
     ),
-    re_path(
-        r"^(?P<launderette_id>[0-9]+)/click$",
+    path(
+        "<int:launderette_id>/click/",
         LaunderetteMainClickView.as_view(),
         name="main_click",
     ),
-    re_path(
-        r"^(?P<launderette_id>[0-9]+)/click/(?P<user_id>[0-9]+)$",
+    path(
+        "<int:launderette_id>/click/<int:user_id>/",
         LaunderetteClickView.as_view(),
         name="click",
     ),
-    re_path(r"^admin$", LaunderetteListView.as_view(), name="launderette_list"),
-    re_path(
-        r"^admin/(?P<launderette_id>[0-9]+)$",
+    path("admin/", LaunderetteListView.as_view(), name="launderette_list"),
+    path(
+        "admin/<int:launderette_id>/",
         LaunderetteAdminView.as_view(),
         name="launderette_admin",
     ),
-    re_path(
-        r"^admin/(?P<launderette_id>[0-9]+)/edit$",
+    path(
+        "admin/<int:launderette_id>/edit/",
         LaunderetteEditView.as_view(),
         name="launderette_edit",
     ),
-    re_path(r"^admin/new$", LaunderetteCreateView.as_view(), name="launderette_new"),
-    re_path(r"^admin/machine/new$", MachineCreateView.as_view(), name="machine_new"),
-    re_path(
-        r"^admin/machine/(?P<machine_id>[0-9]+)/edit$",
+    path("admin/new/", LaunderetteCreateView.as_view(), name="launderette_new"),
+    path("admin/machine/new/", MachineCreateView.as_view(), name="machine_new"),
+    path(
+        "admin/machine/<int:machine_id>/edit/",
         MachineEditView.as_view(),
         name="machine_edit",
     ),
-    re_path(
-        r"^admin/machine/(?P<machine_id>[0-9]+)/delete$",
+    path(
+        "admin/machine/<int:machine_id>/delete/",
         MachineDeleteView.as_view(),
         name="machine_delete",
     ),

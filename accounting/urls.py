@@ -22,133 +22,127 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path
 
 from accounting.views import *
 
 urlpatterns = [
     # Accounting types
-    re_path(
-        r"^simple_type$",
+    path(
+        "simple_type/",
         SimplifiedAccountingTypeListView.as_view(),
         name="simple_type_list",
     ),
-    re_path(
-        r"^simple_type/create$",
+    path(
+        "simple_type/create/",
         SimplifiedAccountingTypeCreateView.as_view(),
         name="simple_type_new",
     ),
-    re_path(
-        r"^simple_type/(?P<type_id>[0-9]+)/edit$",
+    path(
+        "simple_type/<int:type_id>/edit/",
         SimplifiedAccountingTypeEditView.as_view(),
         name="simple_type_edit",
     ),
     # Accounting types
-    re_path(r"^type$", AccountingTypeListView.as_view(), name="type_list"),
-    re_path(r"^type/create$", AccountingTypeCreateView.as_view(), name="type_new"),
-    re_path(
-        r"^type/(?P<type_id>[0-9]+)/edit$",
+    path("type/", AccountingTypeListView.as_view(), name="type_list"),
+    path("type/create/", AccountingTypeCreateView.as_view(), name="type_new"),
+    path(
+        "type/<int:type_id>/edit/",
         AccountingTypeEditView.as_view(),
         name="type_edit",
     ),
     # Bank accounts
-    re_path(r"^$", BankAccountListView.as_view(), name="bank_list"),
-    re_path(r"^bank/create$", BankAccountCreateView.as_view(), name="bank_new"),
-    re_path(
-        r"^bank/(?P<b_account_id>[0-9]+)$",
+    path("", BankAccountListView.as_view(), name="bank_list"),
+    path("bank/create", BankAccountCreateView.as_view(), name="bank_new"),
+    path(
+        "bank/<int:b_account_id>/",
         BankAccountDetailView.as_view(),
         name="bank_details",
     ),
-    re_path(
-        r"^bank/(?P<b_account_id>[0-9]+)/edit$",
+    path(
+        "bank/<int:b_account_id>/edit/",
         BankAccountEditView.as_view(),
         name="bank_edit",
     ),
-    re_path(
-        r"^bank/(?P<b_account_id>[0-9]+)/delete$",
+    path(
+        "bank/<int:b_account_id>/delete/",
         BankAccountDeleteView.as_view(),
         name="bank_delete",
     ),
     # Club accounts
-    re_path(r"^club/create$", ClubAccountCreateView.as_view(), name="club_new"),
-    re_path(
-        r"^club/(?P<c_account_id>[0-9]+)$",
+    path("club/create/", ClubAccountCreateView.as_view(), name="club_new"),
+    path(
+        "club/<int:c_account_id>/",
         ClubAccountDetailView.as_view(),
         name="club_details",
     ),
-    re_path(
-        r"^club/(?P<c_account_id>[0-9]+)/edit$",
+    path(
+        "club/<int:c_account_id>/edit/",
         ClubAccountEditView.as_view(),
         name="club_edit",
     ),
-    re_path(
-        r"^club/(?P<c_account_id>[0-9]+)/delete$",
+    path(
+        "club/<int:c_account_id>/delete/",
         ClubAccountDeleteView.as_view(),
         name="club_delete",
     ),
     # Journals
-    re_path(r"^journal/create$", JournalCreateView.as_view(), name="journal_new"),
-    re_path(
-        r"^journal/(?P<j_id>[0-9]+)$",
+    path("journal/create/", JournalCreateView.as_view(), name="journal_new"),
+    path(
+        "journal/<int:j_id>/",
         JournalDetailView.as_view(),
         name="journal_details",
     ),
-    re_path(
-        r"^journal/(?P<j_id>[0-9]+)/edit$",
+    path(
+        "journal/<int:j_id>/edit/",
         JournalEditView.as_view(),
         name="journal_edit",
     ),
-    re_path(
-        r"^journal/(?P<j_id>[0-9]+)/delete$",
+    path(
+        "journal/<int:j_id>/delete/",
         JournalDeleteView.as_view(),
         name="journal_delete",
     ),
-    re_path(
-        r"^journal/(?P<j_id>[0-9]+)/statement/nature$",
+    path(
+        "journal/<int:j_id>/statement/nature/",
         JournalNatureStatementView.as_view(),
         name="journal_nature_statement",
     ),
-    re_path(
-        r"^journal/(?P<j_id>[0-9]+)/statement/person$",
+    path(
+        "journal/<int:j_id>/statement/person/",
         JournalPersonStatementView.as_view(),
         name="journal_person_statement",
     ),
-    re_path(
-        r"^journal/(?P<j_id>[0-9]+)/statement/accounting$",
+    path(
+        "journal/<int:j_id>/statement/accounting/",
         JournalAccountingStatementView.as_view(),
         name="journal_accounting_statement",
     ),
     # Operations
-    re_path(
-        r"^operation/create/(?P<j_id>[0-9]+)$",
+    path(
+        "operation/create/<int:j_id>/",
         OperationCreateView.as_view(),
         name="op_new",
     ),
-    re_path(
-        r"^operation/(?P<op_id>[0-9]+)$", OperationEditView.as_view(), name="op_edit"
-    ),
-    re_path(
-        r"^operation/(?P<op_id>[0-9]+)/pdf$", OperationPDFView.as_view(), name="op_pdf"
-    ),
+    path("operation/<int:op_id>/", OperationEditView.as_view(), name="op_edit"),
+    path("operation/<int:op_id>/pdf/", OperationPDFView.as_view(), name="op_pdf"),
     # Companies
-    re_path(r"^company/list$", CompanyListView.as_view(), name="co_list"),
-    re_path(r"^company/create$", CompanyCreateView.as_view(), name="co_new"),
-    re_path(r"^company/(?P<co_id>[0-9]+)$", CompanyEditView.as_view(), name="co_edit"),
+    path("company/list/", CompanyListView.as_view(), name="co_list"),
+    path("company/create/", CompanyCreateView.as_view(), name="co_new"),
+    path("company/<int:co_id>/", CompanyEditView.as_view(), name="co_edit"),
     # Labels
-    re_path(r"^label/new$", LabelCreateView.as_view(), name="label_new"),
-    re_path(
-        r"^label/(?P<clubaccount_id>[0-9]+)$",
+    path("label/new/", LabelCreateView.as_view(), name="label_new"),
+    path(
+        "label/<int:clubaccount_id>/",
         LabelListView.as_view(),
         name="label_list",
     ),
-    re_path(
-        r"^label/(?P<label_id>[0-9]+)/edit$", LabelEditView.as_view(), name="label_edit"
-    ),
-    re_path(
-        r"^label/(?P<label_id>[0-9]+)/delete$",
+    path("label/<int:label_id>/edit/", LabelEditView.as_view(), name="label_edit"),
+    path(
+        "label/<int:label_id>/delete/",
         LabelDeleteView.as_view(),
         name="label_delete",
     ),
     # User account
-    re_path(r"^refound/account$", RefoundAccountView.as_view(), name="refound_account"),
+    path("refound/account/", RefoundAccountView.as_view(), name="refound_account"),
 ]

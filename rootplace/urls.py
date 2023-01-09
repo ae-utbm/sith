@@ -23,16 +23,16 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path
 
 from rootplace.views import *
 
 urlpatterns = [
-    re_path(r"^merge$", MergeUsersView.as_view(), name="merge"),
-    re_path(
-        r"^forum/messages/delete$",
+    path("merge/", MergeUsersView.as_view(), name="merge"),
+    path(
+        "forum/messages/delete/",
         DeleteAllForumUserMessagesView.as_view(),
         name="delete_forum_messages",
     ),
-    re_path(r"^logs$", OperationLogListView.as_view(), name="operation_logs"),
+    path("logs/", OperationLogListView.as_view(), name="operation_logs"),
 ]

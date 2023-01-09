@@ -22,47 +22,47 @@
 #
 #
 
-from django.urls import re_path, path
+from django.urls import path
 
 from counter.views import *
 
 urlpatterns = [
-    re_path(r"^(?P<counter_id>[0-9]+)$", CounterMain.as_view(), name="details"),
-    re_path(
-        r"^(?P<counter_id>[0-9]+)/click/(?P<user_id>[0-9]+)$",
+    path("<int:counter_id>/", CounterMain.as_view(), name="details"),
+    path(
+        "<int:counter_id>/click/<int:user_id>/",
         CounterClick.as_view(),
         name="click",
     ),
-    re_path(
-        r"^(?P<counter_id>[0-9]+)/last_ops$",
+    path(
+        "<int:counter_id>/last_ops/",
         CounterLastOperationsView.as_view(),
         name="last_ops",
     ),
-    re_path(
-        r"^(?P<counter_id>[0-9]+)/cash_summary$",
+    path(
+        "<int:counter_id>/cash_summary/",
         CounterCashSummaryView.as_view(),
         name="cash_summary",
     ),
-    re_path(
-        r"^(?P<counter_id>[0-9]+)/activity$",
+    path(
+        "<int:counter_id>/activity/",
         CounterActivityView.as_view(),
         name="activity",
     ),
-    re_path(r"^(?P<counter_id>[0-9]+)/stats$", CounterStatView.as_view(), name="stats"),
-    re_path(r"^(?P<counter_id>[0-9]+)/login$", CounterLogin.as_view(), name="login"),
-    re_path(r"^(?P<counter_id>[0-9]+)/logout$", CounterLogout.as_view(), name="logout"),
-    re_path(
-        r"^eticket/(?P<selling_id>[0-9]+)/pdf$",
+    path("<int:counter_id>/stats/", CounterStatView.as_view(), name="stats"),
+    path("<int:counter_id>/login/", CounterLogin.as_view(), name="login"),
+    path("<int:counter_id>/logout/", CounterLogout.as_view(), name="logout"),
+    path(
+        "eticket/<int:selling_id>/pdf/",
         EticketPDFView.as_view(),
         name="eticket_pdf",
     ),
-    re_path(
-        r"^customer/(?P<customer_id>[0-9]+)/card/add$",
+    path(
+        "customer/<int:customer_id>/card/add/",
         StudentCardFormView.as_view(),
         name="add_student_card",
     ),
-    re_path(
-        r"^customer/(?P<customer_id>[0-9]+)/card/delete/(?P<card_id>[0-9]+)/$",
+    path(
+        "customer/<int:customer_id>/card/delete/<int:card_id>/",
         StudentCardDeleteView.as_view(),
         name="delete_student_card",
     ),
@@ -76,76 +76,76 @@ urlpatterns = [
         edit_billing_info,
         name="edit_billing_info",
     ),
-    re_path(r"^admin/(?P<counter_id>[0-9]+)$", CounterEditView.as_view(), name="admin"),
-    re_path(
-        r"^admin/(?P<counter_id>[0-9]+)/prop$",
+    path("admin/<int:counter_id>/", CounterEditView.as_view(), name="admin"),
+    path(
+        "admin/<int:counter_id>/prop/",
         CounterEditPropView.as_view(),
         name="prop_admin",
     ),
-    re_path(r"^admin$", CounterListView.as_view(), name="admin_list"),
-    re_path(r"^admin/new$", CounterCreateView.as_view(), name="new"),
-    re_path(
-        r"^admin/delete/(?P<counter_id>[0-9]+)$",
+    path("admin/", CounterListView.as_view(), name="admin_list"),
+    path("admin/new/", CounterCreateView.as_view(), name="new"),
+    path(
+        "admin/delete/<int:counter_id>/",
         CounterDeleteView.as_view(),
         name="delete",
     ),
-    re_path(r"^admin/invoices_call$", InvoiceCallView.as_view(), name="invoices_call"),
-    re_path(
-        r"^admin/cash_summary/list$",
+    path("admin/invoices_call/", InvoiceCallView.as_view(), name="invoices_call"),
+    path(
+        "admin/cash_summary/list/",
         CashSummaryListView.as_view(),
         name="cash_summary_list",
     ),
-    re_path(
-        r"^admin/cash_summary/(?P<cashsummary_id>[0-9]+)$",
+    path(
+        "admin/cash_summary/<int:cashsummary_id>/",
         CashSummaryEditView.as_view(),
         name="cash_summary_edit",
     ),
-    re_path(r"^admin/product/list$", ProductListView.as_view(), name="product_list"),
-    re_path(
-        r"^admin/product/list_archived$",
+    path("admin/product/list/", ProductListView.as_view(), name="product_list"),
+    path(
+        "admin/product/list_archived/",
         ProductArchivedListView.as_view(),
         name="product_list_archived",
     ),
-    re_path(r"^admin/product/create$", ProductCreateView.as_view(), name="new_product"),
-    re_path(
-        r"^admin/product/(?P<product_id>[0-9]+)$",
+    path("admin/product/create/", ProductCreateView.as_view(), name="new_product"),
+    path(
+        "admin/product/<int:product_id>/",
         ProductEditView.as_view(),
         name="product_edit",
     ),
-    re_path(
-        r"^admin/producttype/list$",
+    path(
+        "admin/producttype/list/",
         ProductTypeListView.as_view(),
         name="producttype_list",
     ),
-    re_path(
-        r"^admin/producttype/create$",
+    path(
+        "admin/producttype/create/",
         ProductTypeCreateView.as_view(),
         name="new_producttype",
     ),
-    re_path(
-        r"^admin/producttype/(?P<type_id>[0-9]+)$",
+    path(
+        "admin/producttype/<int:type_id>/",
         ProductTypeEditView.as_view(),
         name="producttype_edit",
     ),
-    re_path(r"^admin/eticket/list$", EticketListView.as_view(), name="eticket_list"),
-    re_path(r"^admin/eticket/new$", EticketCreateView.as_view(), name="new_eticket"),
-    re_path(
-        r"^admin/eticket/(?P<eticket_id>[0-9]+)$",
+    path("admin/eticket/list/", EticketListView.as_view(), name="eticket_list"),
+    path("admin/eticket/new/", EticketCreateView.as_view(), name="new_eticket"),
+    path(
+        "admin/eticket/<int:eticket_id>/",
         EticketEditView.as_view(),
         name="edit_eticket",
     ),
-    re_path(
-        r"^admin/selling/(?P<selling_id>[0-9]+)/delete$",
+    path(
+        "admin/selling/<int:selling_id>/delete/",
         SellingDeleteView.as_view(),
         name="selling_delete",
     ),
-    re_path(
-        r"^admin/refilling/(?P<refilling_id>[0-9]+)/delete$",
+    path(
+        "admin/refilling/<int:refilling_id>/delete/",
         RefillingDeleteView.as_view(),
         name="refilling_delete",
     ),
-    re_path(
-        r"^admin/(?P<counter_id>[0-9]+)/refillings$",
+    path(
+        "admin/<int:counter_id>/refillings/",
         CounterRefillingListView.as_view(),
         name="refilling_list",
     ),
