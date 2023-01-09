@@ -206,8 +206,8 @@ class Basket(models.Model):
             cart, newlines=False
         )
         data += [
-            ("PBX_SHOPPINGCART", html.escape(cart)),
-            ("PBX_BILLING", html.escape(customer.billing_infos.to_3dsv2_xml())),
+            ("PBX_SHOPPINGCART", cart),
+            ("PBX_BILLING", customer.billing_infos.to_3dsv2_xml()),
         ]
         pbx_hmac = hmac.new(
             settings.SITH_EBOUTIC_HMAC_KEY,

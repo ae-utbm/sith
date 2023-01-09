@@ -154,8 +154,8 @@ class BillingInfo(models.Model):
     # declaring surname and name even though they are already defined
     # in User add some redundancy, but ensures that the billing infos
     # shall stay correct, whatever shenanigans the user commits on its profile
-    first_name = models.CharField(_("First name"), max_length=30)
-    last_name = models.CharField(_("Last name"), max_length=30)
+    first_name = models.CharField(_("First name"), max_length=22)
+    last_name = models.CharField(_("Last name"), max_length=22)
     address_1 = models.CharField(_("Address 1"), max_length=50)
     address_2 = models.CharField(_("Address 2"), max_length=50, blank=True, null=True)
     zip_code = models.CharField(_("Zip code"), max_length=16)  # code postal
