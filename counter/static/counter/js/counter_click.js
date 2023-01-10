@@ -12,6 +12,15 @@ document.addEventListener('alpine:init', () => {
             return total / 100;
         },
 
+        async handle_code(event) {
+            const code = $(event.target).find("#code_field").val().toUpperCase();
+            if(["FIN", "ANN"].includes(code)) {
+                $(event.target).submit();
+            } else {
+                await this.handle_action(event);
+            }
+        },
+
         async handle_action(event) {
             const payload = $(event.target).serialize();
             let request = new Request(click_api_url, {

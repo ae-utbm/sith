@@ -56,14 +56,17 @@
             <h5>{% trans %}Selling{% endtrans %}</h5>
             <div>
                 {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user.id) %}
+
+                {# Formulaire pour rechercher un produit en tapant son code dans une barre de recherche #}
                 <form method="post" action=""
-                      class="code_form" @submit.prevent="handle_action">
+                      class="code_form" @submit.prevent="handle_code">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="code">
                     <label for="code_field"></label>
                     <input type="text" name="code" value="" class="focus" id="code_field"/>
                     <input type="submit" value="{% trans %}Go{% endtrans %}"/>
                 </form>
+
                 <template x-for="error in errors">
                     <div class="alert alert-red" x-text="error">
                     </div>
@@ -71,7 +74,7 @@
                 <p>{% trans %}Basket: {% endtrans %}</p>
 
                 <ul>
-                    <template x-for="[id, item] in Object.entries(basket)">
+                    <template x-for="[id, item] in Object.entries(basket)" :key="id">
                         <div>
                             <form method="post" action="" class="inline del_product_form"
                                   @submit.prevent="handle_action">

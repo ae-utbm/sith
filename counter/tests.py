@@ -62,12 +62,12 @@ class CounterTest(TestCase):
             reverse("counter:details", kwargs={"counter_id": self.mde.id}),
             {"code": "4000k", "counter_token": counter_token},
         )
-        location = response.get("location")
+        counter_url = response.get("location")
         response = self.client.get(response.get("location"))
         self.assertTrue(">Richard Batsbak</" in str(response.content))
 
         self.client.post(
-            location,
+            counter_url,
             {
                 "action": "refill",
                 "amount": "5",
@@ -75,14 +75,14 @@ class CounterTest(TestCase):
                 "bank": "OTHER",
             },
         )
-        self.client.post(location, {"action": "code", "code": "BARB"})
-        self.client.post(location, {"action": "add_product", "product_id": "4"})
-        self.client.post(location, {"action": "del_product", "product_id": "4"})
-        self.client.post(location, {"action": "code", "code": "2xdeco"})
-        self.client.post(location, {"action": "code", "code": "1xbarb"})
-        response = self.client.post(location, {"action": "finish"})
+        self.client.post(counter_url, "action=code&code=BARB", content_type="text/xml")
+        self.client.post(counter_url, "action=add_product&product_id=4", content_type="text/xml")
+        self.client.post(counter_url, "action=del_product&product_id=4", content_type="text/xml")
+        self.client.post(counter_url, "action=code&code=2xdeco", content_type="text/xml")
+        self.client.post(counter_url, "action=code&code=1xbarb", content_type="text/xml")
+        response = self.client.post(counter_url, "action=code&code=fin", content_type="text/xml")
 
-        response_get = self.client.get(location)
+        response_get = self.client.get(response.get("location"))
         response_content = response_get.content.decode("utf-8")
         self.assertTrue("2 x Barbar" in str(response_content))
         self.assertTrue("2 x Déconsigne Eco-cup" in str(response_content))
@@ -97,7 +97,7 @@ class CounterTest(TestCase):
         )
 
         response = self.client.post(
-            location,
+            counter_url,
             {
                 "action": "refill",
                 "amount": "5",
@@ -107,7 +107,7 @@ class CounterTest(TestCase):
         )
         self.assertTrue(response.status_code == 200)
 
-        response = self.client.post(
+        self.client.post(
             reverse("counter:login", kwargs={"counter_id": self.foyer.id}),
             {"username": self.krophil.username, "password": "plop"},
         )
@@ -124,10 +124,10 @@ class CounterTest(TestCase):
             reverse("counter:details", kwargs={"counter_id": self.foyer.id}),
             {"code": "4000k", "counter_token": counter_token},
         )
-        location = response.get("location")
+        counter_url = response.get("location")
 
         response = self.client.post(
-            location,
+            counter_url,
             {
                 "action": "refill",
                 "amount": "5",
@@ -143,7 +143,7 @@ class CounterStatsTest(TestCase):
         call_command("populate")
         self.counter = Counter.objects.filter(id=2).first()
 
-    def test_unothorized_user_fail(self):
+    def test_unauthorised_user_fail(self):
         # Test with not login user
         response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
         self.assertTrue(response.status_code == 403)

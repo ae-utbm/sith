@@ -302,10 +302,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     current_tab = "counter"
 
     def render_to_response(self, *args, **kwargs):
-        if len(self.request.POST) == 0 and len(self.request.body) != 0:
-            # when using the fetch API, the django request.POST dict is empty
-            # this is but a wretched contrivance which must be replaced as soon as possible
-            # by a proper separation between the api endpoints of the counter
+        if self.is_ajax(self.request):
             response = {"errors": []}
             status = HTTPStatus.OK
 
@@ -404,8 +401,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             self.operator = self.customer.user
         else:
             self.operator = self.object.get_random_barman()
-        action = parse_qs(request.body.decode()).get("action", [""])[0]
-
+        action = self.request.POST.get("action", None)
+        if action is None:
+            action = parse_qs(request.body.decode()).get("action", [""])[0]
         if action == "add_product":
             self.add_product(request)
         elif action == "add_student_card":
@@ -476,6 +474,16 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return self.customer.can_record_more(
             self.compute_record_product(request, product)
         )
+
+    @staticmethod
+    def is_ajax(request):
+        # when using the fetch API, the django request.POST dict is empty
+        # this is but a wretched contrivance which strive to replace
+        # the deprecated django is_ajax() method
+        # and which must be replaced as soon as possible
+        # by a proper separation between the api endpoints of the counter
+        return len(request.POST) == 0 and len(request.body) != 0
+
 
     def add_product(self, request, q=1, p=None):
         """
@@ -578,8 +586,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                 request.session["basket"][pid]["qty"] -= 1
             if request.session["basket"][pid]["qty"] <= 0:
                 del request.session["basket"][pid]
-        else:
-            request.session["basket"][pid] = None
         request.session.modified = True
 
     def parse_code(self, request):
@@ -590,6 +596,10 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             - <int>X<str>, where the integer is the quantity and str the code
         """
         string = parse_qs(request.body.decode())["code"][0].upper()
+        if string == "FIN":
+            return self.finish(request)
+        elif string == "ANN":
+            return self.cancel(request)
         regex = re.compile(r"^((?P<nb>[0-9]+)X)?(?P<code>[A-Z0-9]+)$")
         m = regex.match(string)
         if m is not None:
@@ -664,17 +674,16 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def refill(self, request):
         """Refill the customer's account"""
-        if self.get_object().type == "BAR" and self.object.can_refill():
-            form = RefillForm(request.POST)
-            if form.is_valid():
-                form.instance.counter = self.object
-                form.instance.operator = self.operator
-                form.instance.customer = self.customer
-                form.instance.save()
-            else:
-                self.refill_form = form
-        else:
+        if not self.object.can_refill():
             raise PermissionDenied
+        form = RefillForm(request.POST)
+        if form.is_valid():
+            form.instance.counter = self.object
+            form.instance.operator = self.operator
+            form.instance.customer = self.customer
+            form.instance.save()
+        else:
+            self.refill_form = form
 
     def get_context_data(self, **kwargs):
         """Add customer to the context"""
