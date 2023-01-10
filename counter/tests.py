@@ -76,11 +76,21 @@ class CounterTest(TestCase):
             },
         )
         self.client.post(counter_url, "action=code&code=BARB", content_type="text/xml")
-        self.client.post(counter_url, "action=add_product&product_id=4", content_type="text/xml")
-        self.client.post(counter_url, "action=del_product&product_id=4", content_type="text/xml")
-        self.client.post(counter_url, "action=code&code=2xdeco", content_type="text/xml")
-        self.client.post(counter_url, "action=code&code=1xbarb", content_type="text/xml")
-        response = self.client.post(counter_url, "action=code&code=fin", content_type="text/xml")
+        self.client.post(
+            counter_url, "action=add_product&product_id=4", content_type="text/xml"
+        )
+        self.client.post(
+            counter_url, "action=del_product&product_id=4", content_type="text/xml"
+        )
+        self.client.post(
+            counter_url, "action=code&code=2xdeco", content_type="text/xml"
+        )
+        self.client.post(
+            counter_url, "action=code&code=1xbarb", content_type="text/xml"
+        )
+        response = self.client.post(
+            counter_url, "action=code&code=fin", content_type="text/xml"
+        )
 
         response_get = self.client.get(response.get("location"))
         response_content = response_get.content.decode("utf-8")

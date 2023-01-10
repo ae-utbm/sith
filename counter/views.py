@@ -484,7 +484,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         # by a proper separation between the api endpoints of the counter
         return len(request.POST) == 0 and len(request.body) != 0
 
-
     def add_product(self, request, q=1, p=None):
         """
         Add a product to the basket
