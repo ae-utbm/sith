@@ -404,7 +404,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             self.operator = self.customer.user
         else:
             self.operator = self.object.get_random_barman()
-        action = parse_qs(request.body.decode())["action"][0]
+        action = parse_qs(request.body.decode()).get("action", [""])[0]
 
         if action == "add_product":
             self.add_product(request)

@@ -42,7 +42,7 @@ class CounterTest(TestCase):
         self.foyer = Counter.objects.get(id=2)
 
     def test_full_click(self):
-        response = self.client.post(
+        self.client.post(
             reverse("counter:login", kwargs={"counter_id": self.mde.id}),
             {"username": self.skia.username, "password": "plop"},
         )
@@ -63,7 +63,6 @@ class CounterTest(TestCase):
             {"code": "4000k", "counter_token": counter_token},
         )
         location = response.get("location")
-
         response = self.client.get(response.get("location"))
         self.assertTrue(">Richard Batsbak</" in str(response.content))
 
@@ -81,12 +80,12 @@ class CounterTest(TestCase):
         self.client.post(location, {"action": "del_product", "product_id": "4"})
         self.client.post(location, {"action": "code", "code": "2xdeco"})
         self.client.post(location, {"action": "code", "code": "1xbarb"})
-        response = self.client.post(location, {"action": "code", "code": "fin"})
+        response = self.client.post(location, {"action": "finish"})
 
-        response_get = self.client.get(response.get("location"))
+        response_get = self.client.get(location)
         response_content = response_get.content.decode("utf-8")
-        self.assertTrue("<li>2 x Barbar" in str(response_content))
-        self.assertTrue("<li>2 x Déconsigne Eco-cup" in str(response_content))
+        self.assertTrue("2 x Barbar" in str(response_content))
+        self.assertTrue("2 x Déconsigne Eco-cup" in str(response_content))
         self.assertTrue(
             "<p>Client : Richard Batsbak - Nouveau montant : 3.60"
             in str(response_content)
