@@ -689,6 +689,5 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/viralpatel/jquery.shorten/": "",
     "https://github.com/getsentry/sentry-javascript/": "4.0.6",
     "https://github.com/jhuckaby/webcamjs/": "1.0.0",
-    "https://github.com/vuejs/vue-next": "3.2.18",
     "https://github.com/alpinejs/alpine": "3.10.5",
 }

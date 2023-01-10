@@ -22,8 +22,10 @@
 #
 #
 import json
+from urllib.parse import parse_qs
 
 from django.contrib.auth.decorators import login_required
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
@@ -300,7 +302,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     current_tab = "counter"
 
     def render_to_response(self, *args, **kwargs):
-        if self.request.is_ajax():  # JSON response for AJAX requests
+        if self.is_ajax(self.request):
             response = {"errors": []}
             status = HTTPStatus.OK
 
@@ -395,42 +397,40 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session["not_valid_student_card_uid"] = False
         if self.object.type != "BAR":
             self.operator = request.user
-        elif self.is_barman_price():
+        elif self.customer_is_barman():
             self.operator = self.customer.user
         else:
             self.operator = self.object.get_random_barman()
-
-        if "add_product" in request.POST["action"]:
+        action = self.request.POST.get("action", None)
+        if action is None:
+            action = parse_qs(request.body.decode()).get("action", [""])[0]
+        if action == "add_product":
             self.add_product(request)
-        elif "add_student_card" in request.POST["action"]:
+        elif action == "add_student_card":
             self.add_student_card(request)
-        elif "del_product" in request.POST["action"]:
+        elif action == "del_product":
             self.del_product(request)
-        elif "refill" in request.POST["action"]:
+        elif action == "refill":
             self.refill(request)
-        elif "code" in request.POST["action"]:
+        elif action == "code":
             return self.parse_code(request)
-        elif "cancel" in request.POST["action"]:
+        elif action == "cancel":
             return self.cancel(request)
-        elif "finish" in request.POST["action"]:
+        elif action == "finish":
             return self.finish(request)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
-    def is_barman_price(self):
-        if self.object.type == "BAR" and self.customer.user.id in [
-            s.id for s in self.object.get_barmen_list()
-        ]:
-            return True
-        else:
-            return False
+    def customer_is_barman(self) -> bool:
+        barmen = self.object.barmen_list
+        return self.object.type == "BAR" and self.customer.user in barmen
 
     def get_product(self, pid):
         return Product.objects.filter(pk=int(pid)).first()
 
     def get_price(self, pid):
         p = self.get_product(pid)
-        if self.is_barman_price():
+        if self.customer_is_barman():
             price = p.special_selling_price
         else:
             price = p.selling_price
@@ -475,13 +475,22 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             self.compute_record_product(request, product)
         )
 
+    @staticmethod
+    def is_ajax(request):
+        # when using the fetch API, the django request.POST dict is empty
+        # this is but a wretched contrivance which strive to replace
+        # the deprecated django is_ajax() method
+        # and which must be replaced as soon as possible
+        # by a proper separation between the api endpoints of the counter
+        return len(request.POST) == 0 and len(request.body) != 0
+
     def add_product(self, request, q=1, p=None):
         """
         Add a product to the basket
         q is the quantity passed as integer
         p is the product id, passed as an integer
         """
-        pid = p or request.POST["product_id"]
+        pid = p or parse_qs(request.body.decode())["product_id"][0]
         pid = str(pid)
         price = self.get_price(pid)
         total = self.sum_basket(request)
@@ -563,7 +572,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def del_product(self, request):
         """Delete a product from the basket"""
-        pid = str(request.POST["product_id"])
+        pid = parse_qs(request.body.decode())["product_id"][0]
         product = self.get_product(pid)
         if pid in request.session["basket"]:
             if (
@@ -576,30 +585,29 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                 request.session["basket"][pid]["qty"] -= 1
             if request.session["basket"][pid]["qty"] <= 0:
                 del request.session["basket"][pid]
-        else:
-            request.session["basket"][pid] = None
         request.session.modified = True
 
     def parse_code(self, request):
-        """Parse the string entered by the barman"""
-        string = str(request.POST["code"]).upper()
-        if string == _("END"):
+        """
+        Parse the string entered by the barman
+        This can be of two forms :
+            - <str>, where the string is the code of the product
+            - <int>X<str>, where the integer is the quantity and str the code
+        """
+        string = parse_qs(request.body.decode())["code"][0].upper()
+        if string == "FIN":
             return self.finish(request)
-        elif string == _("CAN"):
+        elif string == "ANN":
             return self.cancel(request)
         regex = re.compile(r"^((?P<nb>[0-9]+)X)?(?P<code>[A-Z0-9]+)$")
         m = regex.match(string)
         if m is not None:
             nb = m.group("nb")
             code = m.group("code")
-            if nb is None:
-                nb = 1
-            else:
-                nb = int(nb)
+            nb = int(nb) if nb is not None else 1
             p = self.object.products.filter(code=code).first()
             if p is not None:
-                while nb > 0 and not self.add_product(request, nb, p.id):
-                    nb -= 1
+                self.add_product(request, nb, p.id)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
@@ -613,7 +621,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             for pid, infos in request.session["basket"].items():
                 # This duplicates code for DB optimization (prevent to load many times the same object)
                 p = Product.objects.filter(pk=pid).first()
-                if self.is_barman_price():
+                if self.customer_is_barman():
                     uprice = p.special_selling_price
                 else:
                     uprice = p.selling_price
@@ -665,22 +673,26 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def refill(self, request):
         """Refill the customer's account"""
-        if self.get_object().type == "BAR" and self.object.can_refill():
-            form = RefillForm(request.POST)
-            if form.is_valid():
-                form.instance.counter = self.object
-                form.instance.operator = self.operator
-                form.instance.customer = self.customer
-                form.instance.save()
-            else:
-                self.refill_form = form
-        else:
+        if not self.object.can_refill():
             raise PermissionDenied
+        form = RefillForm(request.POST)
+        if form.is_valid():
+            form.instance.counter = self.object
+            form.instance.operator = self.operator
+            form.instance.customer = self.customer
+            form.instance.save()
+        else:
+            self.refill_form = form
 
     def get_context_data(self, **kwargs):
         """Add customer to the context"""
         kwargs = super(CounterClick, self).get_context_data(**kwargs)
-        kwargs["products"] = self.object.products.select_related("product_type")
+        products = self.object.products.select_related("product_type")
+        if self.customer_is_barman():
+            products = products.annotate(price=F("special_selling_price"))
+        else:
+            products = products.annotate(price=F("selling_price"))
+        kwargs["products"] = products
         kwargs["categories"] = {}
         for product in kwargs["products"]:
             if product.product_type:
