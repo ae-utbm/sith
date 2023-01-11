@@ -6,8 +6,15 @@ from django.core.management.base import BaseCommand
 
 # see https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
 # added "v?"
+# Please note that this does not match the version of the three.js library.
+# Hence, you shall have to check this one by yourself
 semver_regex = re.compile(
-    """^v?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"""
+    r"^v?"
+    r"(?P<major>\d+)"
+    r"\.(?P<minor>\d+)"
+    r"\.(?P<patch>\d+)"
+    r"(?:-(?P<prerelease>(?:\d+|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:\d+|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?"
+    r"(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"
 )
 
 

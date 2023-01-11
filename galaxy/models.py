@@ -25,12 +25,18 @@
 import math
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Case, F, Value, When
+from django.db.models.functions import Concat
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from typing import List, TypedDict
 
 from core.models import User
-from club.models import Membership
+from club.models import Membership, Club
+from sas.models import PeoplePictureRelation, Picture
+from subscription.models import Subscription
+
+# TODO : retirer tous les print sauvages et les remplacer par de vrais tests
 
 
 class GalaxyStar(models.Model):
@@ -60,7 +66,8 @@ class GalaxyStar(models.Model):
 
 class GalaxyLane(models.Model):
     """
-    This class defines a lane (edge -> link between galaxy citizen) in the galaxy map, storing a reference to both its
+    This class defines a lane (edge -> link between galaxy citizen)
+    in the galaxy map, storing a reference to both its
     ends and the distance it covers.
     Score details between citizen owning the stars is also stored here.
     """
@@ -96,138 +103,142 @@ class GalaxyLane(models.Model):
     )
 
 
+class StarDict(TypedDict):
+    id: int
+    name: str
+
+
+class GalaxyDict(TypedDict):
+    nodes: List[StarDict]
+    links: List
+
+
 class Galaxy:
     GALAXY_SCALE_FACTOR = 2_000
     FAMILY_LINK_POINTS = 366  # Equivalent to a leap year together in a club, because.
     PICTURE_POINTS = 2  # Equivalent to two days as random members of a club.
     CLUBS_POINTS = 1  # One day together as random members in a club is one point.
 
-    def as_dict(self):
+    @staticmethod
+    def as_dict() -> GalaxyDict:
         """
         Compute JSON structure to send to 3d-force-graph: https://github.com/vasturiano/3d-force-graph/
         """
-        json = {
-            "nodes": [
-                {"id": star.owner.id, "name": star.owner.get_display_name()}
-                for star in GalaxyStar.objects.all()
-            ],
-            "links": [],
-        }
-
+        without_nickname = Concat(
+            F("owner__first_name"), Value(" "), F("owner__last_name")
+        )
+        with_nickname = Concat(
+            F("owner__first_name"),
+            Value(" "),
+            F("owner__last_name"),
+            Value(" ("),
+            F("owner__nick_name"),
+            Value(")"),
+        )
+        stars = GalaxyStar.objects.annotate(
+            owner_name=Case(
+                When(owner__nick_name=None, then=without_nickname),
+                default=with_nickname,
+            )
+        )
+        lanes = GalaxyLane.objects.annotate(
+            star1_owner=F("star1__owner__id"),
+            star2_owner=F("star2__owner__id"),
+        )
+        json = GalaxyDict(
+            nodes=[StarDict(id=star.owner_id, name=star.owner_name) for star in stars],
+            links=[],
+        )
         # Make bidirectional links
         # TODO: see if this impacts performance with a big graph
-        for path in GalaxyLane.objects.all():
+        for path in lanes:
             json["links"].append(
                 {
-                    "source": path.star1.owner.id,
-                    "target": path.star2.owner.id,
+                    "source": path.star1_owner,
+                    "target": path.star2_owner,
                     "value": path.distance,
                 }
             )
             json["links"].append(
                 {
-                    "source": path.star2.owner.id,
-                    "target": path.star1.owner.id,
+                    "source": path.star2_owner,
+                    "target": path.star1_owner,
                     "value": path.distance,
                 }
             )
         return json
 
-    ###################
-    # User self score #
-    ###################
-
-    def compute_user_score(self, user):
-        user_score = 0
-        user_score += self.compute_user_family_score(user)
-        user_score += self.compute_user_pictures_score(user)
-        user_score += self.compute_user_clubs_score(user)
-        return user_score
-
-    def compute_user_family_score(self, user):
-        user_family_score = (
-            user.godfathers.count() + user.godchildren.count()
-        ) * self.FAMILY_LINK_POINTS
-        return user_family_score
-
-    def compute_user_pictures_score(self, user):
-        user_pictures_score = user.pictures.count() * self.PICTURE_POINTS
-        return user_pictures_score
-
-    def compute_user_clubs_score(self, user):
-        user_clubs_score = user.memberships.count() * self.CLUBS_POINTS
-        return user_clubs_score
-
     ####################
     # Inter-user score #
     ####################
 
-    def compute_users_score(self, user1, user2):
-        family = self.compute_users_family_score(user1, user2)
-        pictures = self.compute_users_pictures_score(user1, user2)
-        clubs = self.compute_users_clubs_score(user1, user2)
+    @classmethod
+    def compute_users_score(cls, user1, user2):
+        family = cls.compute_users_family_score(user1, user2)
+        pictures = cls.compute_users_pictures_score(user1, user2)
+        clubs = cls.compute_users_clubs_score(user1, user2)
         score = family + pictures + clubs
         return score, family, pictures, clubs
 
-    def compute_users_family_score(self, user1, user2):
-        score = 0
+    @classmethod
+    def compute_users_family_score(cls, user1, user2):
         link_count = User.objects.filter(
             Q(id=user1.id, godfathers=user2) | Q(id=user2.id, godfathers=user1)
         ).count()
         if link_count > 0:
-            score += link_count * self.FAMILY_LINK_POINTS
+            score = link_count * cls.FAMILY_LINK_POINTS
             print(
                 "    - '%s' and '%s' have %s direct family link"
                 % (user1, user2, link_count)
             )
-        return score
+            return score
+        return 0
 
-    def compute_users_pictures_score(self, user1, user2):
+    @classmethod
+    def compute_users_pictures_score(cls, user1, user2):
+        score = (
+            Picture.objects.filter(people__user__in=(user1,))
+            .filter(people__user__in=(user2,))
+            .count()
+        )
+        for _ in range(score):
+            print("    - '%s' was pictured with '%s'" % (user1, user2))
+        return score * cls.PICTURE_POINTS
+
+    @classmethod
+    def compute_users_clubs_score(cls, user1, user2):
+        common_clubs = Club.objects.filter(members__in=user1.memberships.all()).filter(
+            members__in=user2.memberships.all()
+        )
+        user1_memberships = user1.memberships.filter(club__in=common_clubs)
+        user2_memberships = user2.memberships.filter(club__in=common_clubs)
+
         score = 0
-        for picture_relation in user1.pictures.all():
-            try:
-                picture_relation.picture.people.get(user=user2)
-                print("    - '%s' was pictured with '%s'" % (user1, user2))
-                score += self.PICTURE_POINTS
-            except picture_relation.__class__.DoesNotExist:
-                pass
-        return score
-
-    def compute_users_clubs_score(self, user1, user2):
-        score = 0
-        common_clubs = user1.memberships.values("club").distinct()
-        user1_memberships = Membership.objects.filter(
-            club__in=common_clubs, user=user1
-        ).distinct()
-        user2_memberships = Membership.objects.filter(
-            club__in=common_clubs, user=user2
-        ).distinct()
-
         for user1_membership in user1_memberships:
             if user1_membership.end_date is None:
                 user1_membership.end_date = timezone.now().date()
             print(
-                "    - Checking range [%s, %s] for club %s"
+                "\t- Checking range [%s, %s] for club %s"
                 % (
                     user1_membership.start_date,
                     user1_membership.end_date,
                     user1_membership.club,
                 )
             )
-            query = Q(  # Memberships where the range contains s1
+            query = Q(  # start2 <= start1 <= end2
                 start_date__lte=user1_membership.start_date,
                 end_date__gte=user1_membership.start_date,
             )
-            query |= Q(  # Memberships starting before s1 and still unfinished
+            query |= Q(  # start2 <= start1 <= now
                 start_date__lte=user1_membership.start_date, end_date=None
             )
-            query |= Q(  # Memberships starting in [s1, e1]
+            query |= Q(  # start1 <= start2 <= end2
                 start_date__gte=user1_membership.start_date,
                 start_date__lte=user1_membership.end_date,
             )
             for user2_membership in user2_memberships.filter(
                 query, club=user1_membership.club
-            ).all():
+            ):
                 if user2_membership.end_date is None:
                     user2_membership.end_date = timezone.now().date()
                 latest_start = max(
@@ -245,47 +256,53 @@ class Galaxy:
                         (earliest_end - latest_start).days,
                     )
                 )
-                score += self.CLUBS_POINTS * (earliest_end - latest_start).days
+                score += cls.CLUBS_POINTS * (earliest_end - latest_start).days
         return score
 
     ###################
     # Rule the galaxy #
     ###################
 
-    def is_user_rulable(self, user):
-        """
-        Computing simple incomplete self scores is useless for now, but avoids ruling too many citizen against each other
-        """
-        return self.compute_user_score(user) > 0
-
-    def rule(self):
+    @classmethod
+    def recompute(cls):
         GalaxyStar.objects.all().delete()
         GalaxyLane.objects.all().delete()
-        ruled_users = []
-        for user1 in User.objects.all():
-            ruled_users.append(user1.id)
-            if self.is_user_rulable(user1):
-                for user2 in User.objects.exclude(id__in=ruled_users):
-                    if not self.is_user_rulable(user2):
-                        ruled_users.append(user2.id)  # Ban citizen from further ruling
-                    else:
-                        print("\n  > Ruling '{}' against '{}'".format(user1, user2))
-                        star1, _ = GalaxyStar.objects.get_or_create(owner=user1)
-                        star2, _ = GalaxyStar.objects.get_or_create(owner=user2)
-                        users_score, family, pictures, clubs = self.compute_users_score(
-                            user1, user2
-                        )
-                        if users_score > 0:
-                            GalaxyLane(
-                                star1=star1,
-                                star2=star2,
-                                distance=self.scale_distance(users_score),
-                                family=family,
-                                pictures=pictures,
-                                clubs=clubs,
-                            ).save()
+        rulable_users = (
+            User.objects.filter(subscriptions__isnull=False)
+            .filter(
+                Q(godchildren__isnull=False)
+                | Q(godfathers__isnull=False)
+                | Q(pictures__isnull=False)
+                | Q(memberships__isnull=False)
+            )
+            .distinct()
+        )
+        # force fetch of the whole query to make sure there won't
+        # be any more db hits
+        # this is memory expensive but prevents a lot of db hits, therefore
+        # is far more time efficient
+        rulable_users = list(rulable_users)
+        while len(rulable_users) > 0:
+            user1 = rulable_users.pop()
+            for user2 in rulable_users:
+                print(f"\n  > Ruling '{user1}' against '{user2}'")
+                star1, _ = GalaxyStar.objects.get_or_create(owner=user1)
+                star2, _ = GalaxyStar.objects.get_or_create(owner=user2)
+                users_score, family, pictures, clubs = cls.compute_users_score(
+                    user1, user2
+                )
+                if users_score > 0:
+                    GalaxyLane(
+                        star1=star1,
+                        star2=star2,
+                        distance=cls.scale_distance(users_score),
+                        family=family,
+                        pictures=pictures,
+                        clubs=clubs,
+                    ).save()
 
-    def scale_distance(self, value):
+    @classmethod
+    def scale_distance(cls, value):
         # TODO: this will need adjustements with the real, typical data on Taiste
 
         print("    > Score:", value)
@@ -298,8 +315,8 @@ class Galaxy:
         value *= (  # Scale that value with a magic number to accommodate to typical data
             # Really close galaxy citizen after 5 years typically have a score of about XXX
             # Citizen that were in the same year without being really friends typically have a score of about XXX
-            # Citizen that have met once or twice have only have a couple of pictures together typically score about XXX
-            self.GALAXY_SCALE_FACTOR
+            # Citizen that have met once or twice only have a couple of pictures together typically score about XXX
+            cls.GALAXY_SCALE_FACTOR
         )
         print("    > Scaled distance:", value)
         return int(value)

@@ -16,20 +16,10 @@
           <th>Pictures</th>
           <th>Clubs</th>
         </tr>
-    {% for path in object.galaxy_user.lanes1.all() %}
+    {% for path in object.galaxy_user.lanes1.select_related("star2") %}
         <tr>
           <td><a onclick="focus_node(get_node_from_id('{{ path.star2.owner.id }}'))">Locate</a></td>
           <td><a href="{{ url("galaxy:user", user_id=path.star2.owner.id) }}">{{ path.star2 }}</a></td>
-          <td>{{ path.distance }}</td>
-          <td>{{ path.family }}</td>
-          <td>{{ path.pictures }}</td>
-          <td>{{ path.clubs }}</td>
-        </tr>
-    {% endfor %}
-    {% for path in object.galaxy_user.lanes2.all() %}
-        <tr>
-          <td><a onclick="focus_node(get_node_from_id('{{ path.star1.owner.id }}'))">Locate</a></td>
-          <td><a href="{{ url("galaxy:user", user_id=path.star1.owner.id) }}">{{ path.star1 }}</a></td>
           <td>{{ path.distance }}</td>
           <td>{{ path.family }}</td>
           <td>{{ path.pictures }}</td>
@@ -48,13 +38,14 @@
 {% block script %}
   {{ super() }}
 
-  <script src="{{ static('galaxy/js/three.min.js') }}"></script>
-  <script src="{{ static('galaxy/js/three-spritetext.min.js') }}"></script>
-  <script src="{{ static('galaxy/js/3d-force-graph.min.js') }}"></script>
+  <script src="{{ static('galaxy/js/three.min.js') }}" defer></script>
+  <script src="{{ static('galaxy/js/three-spritetext.min.js') }}" defer></script>
+  <script src="{{ static('galaxy/js/3d-force-graph.min.js') }}" defer></script>
 
   <script>
+  document.addEventListener("DOMContentLoaded", () => {
     function get_node_from_id(id) {
-        return Graph.graphData().nodes.find(n => n.id == id);
+        return Graph.graphData().nodes.find(n => n.id === id);
     }
 
     function focus_node(node) {
@@ -98,6 +89,7 @@
 
     // Focus current user
     setTimeout(() => focus_node(get_node_from_id('{{ object.id }}')), 1000);
+  })
   </script>
 {% endblock %}
 
