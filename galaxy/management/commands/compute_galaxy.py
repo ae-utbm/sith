@@ -28,13 +28,14 @@ from galaxy.models import Galaxy
 
 
 class Command(BaseCommand):
-    help = """Rule the galaxy.
-
-This commands calls all the heavy processing to compute the galaxy, so that requests to display it only have to load
-a cached data.
-    """
+    help = (
+        "Reset the whole galaxy and compute once again all the relation scores of all users. "
+        "As the sith's users are rather numerous, this command might be quite expensive in memory "
+        "as well as in CPU time. Please remind this fact and never call this command more than once "
+        "a day outside of a test environment."
+    )
 
     def handle(self, *args, **options):
         print("The Galaxy is being ruled by the Sith")
 
-        Galaxy().rule()
+        Galaxy.recompute()

@@ -693,6 +693,6 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/vuejs/vue-next": "3.2.18",
     "https://github.com/alpinejs/alpine": "3.10.5",
     "https://github.com/mrdoob/three.js/": "r148",
-    "https://github.com/vasturiano/three-spritetext": "v1.6.5",
-    "https://github.com/vasturiano/3d-force-graph/": "v1.70.19",
+    "https://github.com/vasturiano/three-spritetext": "1.6.5",
+    "https://github.com/vasturiano/3d-force-graph/": "1.70.19",
 }
