@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
-# - Skia <skia@libskia.so>
+# Copyright 2016,2017,2023
+# - Skia <skia@hya.sk>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -25,6 +25,7 @@
 import os
 from datetime import date, datetime, timedelta
 from io import StringIO, BytesIO
+from pathlib import Path
 
 from django.contrib.auth.models import Permission
 from django.core.management.base import BaseCommand
@@ -54,6 +55,7 @@ from com.models import Sith, Weekmail, News, NewsDate
 from election.models import Election, Role, Candidature, ElectionList
 from forum.models import Forum, ForumTopic
 from pedagogy.models import UV
+from sas.models import Album, Picture, PeoplePictureRelation
 
 
 class Command(BaseCommand):
@@ -71,9 +73,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         os.environ["DJANGO_COLORS"] = "nocolor"
         Site(id=4000, domain=settings.SITH_URL, name=settings.SITH_NAME).save()
-        root_path = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        )
+        root_path = Path(__file__).parent.parent.parent.parent
         root_group, _ = Group.objects.get_or_create(name="Root")
         Group(name="Public").save()
         Group(name="Subscribers").save()
@@ -84,7 +84,7 @@ class Command(BaseCommand):
         Group(name="Banned from buying alcohol").save()
         Group(name="Banned from counters").save()
         Group(name="Banned to subscribe").save()
-        Group(name="SAS admin").save()
+        sas_admin, _ = Group.objects.get_or_create(name="SAS admin")
         Group(name="Forum admin").save()
         Group(name="Pedagogy admin").save()
         self.reset_index("core", "auth")
@@ -119,7 +119,8 @@ class Command(BaseCommand):
 
         club_root = SithFile(parent=None, name="clubs", is_folder=True, owner=root)
         club_root.save()
-        SithFile(parent=None, name="SAS", is_folder=True, owner=root).save()
+        sas = SithFile(parent=None, name="SAS", is_folder=True, owner=root)
+        sas.save()
         main_club = Club(
             id=1,
             name=settings.SITH_MAIN_CLUB["name"],
@@ -223,7 +224,15 @@ Welcome to the wiki page!
                 Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
             ]
             skia.save()
-            skia_profile_path = os.path.join(root_path, "core/fixtures/images/3.jpg")
+            skia_profile_path = (
+                root_path
+                / "core"
+                / "fixtures"
+                / "images"
+                / "sas"
+                / "Family"
+                / "skia.jpg"
+            )
             with open(skia_profile_path, "rb") as f:
                 name = str(skia.id) + "_profile.jpg"
                 skia_profile = SithFile(
@@ -233,7 +242,7 @@ Welcome to the wiki page!
                     owner=skia,
                     is_folder=False,
                     mime_type="image/jpeg",
-                    size=os.path.getsize(skia_profile_path),
+                    size=skia_profile_path.stat().st_size,
                 )
                 skia_profile.file.name = name
                 skia_profile.save()
@@ -351,23 +360,48 @@ Welcome to the wiki page!
             ]
             u.save()
             # Adding user Richard Batsbak
-            r = User(
+            richard = User(
                 username="rbatsbak",
                 last_name="Batsbak",
                 first_name="Richard",
                 email="richard@git.an",
                 date_of_birth="1982-06-12",
             )
-            r.set_password("plop")
-            r.save()
-            r.view_groups = [
+            richard.set_password("plop")
+            richard.save()
+            richard.godfathers.add(comptable)
+            richard_profile_path = (
+                root_path
+                / "core"
+                / "fixtures"
+                / "images"
+                / "sas"
+                / "Family"
+                / "richard.jpg"
+            )
+            with open(richard_profile_path, "rb") as f:
+                name = f"{richard.id}_profile.jpg"
+                richard_profile = SithFile(
+                    parent=profiles_root,
+                    name=name,
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, "JPEG"),
+                    owner=richard,
+                    is_folder=False,
+                    mime_type="image/jpeg",
+                    size=richard_profile_path.stat().st_size,
+                )
+                richard_profile.file.name = name
+                richard_profile.save()
+                richard.profile_pict = richard_profile
+                richard.save()
+            richard.view_groups = [
                 Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
             ]
-            r.save()
+            richard.save()
             # Adding syntax help page
             p = Page(name="Aide_sur_la_syntaxe")
             p.save(force_lock=True)
-            with open(os.path.join(root_path) + "/doc/SYNTAX.md", "r") as rm:
+            with open(root_path / "doc" / "SYNTAX.md", "r") as rm:
                 PageRev(
                     page=p, title="Aide sur la syntaxe", author=skia, content=rm.read()
                 ).save()
@@ -442,7 +476,7 @@ Welcome to the wiki page!
             s.save()
             # Richard
             s = Subscription(
-                member=User.objects.filter(pk=r.pk).first(),
+                member=User.objects.filter(pk=richard.pk).first(),
                 subscription_type=default_subscription,
                 payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
@@ -514,7 +548,7 @@ Welcome to the wiki page!
             subscribers = Group.objects.get(name="Subscribers")
             old_subscribers = Group.objects.get(name="Old subscribers")
             Customer(user=skia, account_id="6568j", amount=0).save()
-            Customer(user=r, account_id="4000k", amount=0).save()
+            Customer(user=richard, account_id="4000k", amount=0).save()
             p = ProductType(name="Bières bouteilles")
             p.save()
             c = ProductType(name="Cotisations")
@@ -825,7 +859,15 @@ Welcome to the wiki page!
                 Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
             ]
             sli.save()
-            sli_profile_path = os.path.join(root_path, "core/fixtures/images/5.jpg")
+            sli_profile_path = (
+                root_path
+                / "core"
+                / "fixtures"
+                / "images"
+                / "sas"
+                / "Family"
+                / "sli.jpg"
+            )
             with open(sli_profile_path, "rb") as f:
                 name = str(sli.id) + "_profile.jpg"
                 sli_profile = SithFile(
@@ -835,7 +877,7 @@ Welcome to the wiki page!
                     owner=sli,
                     is_folder=False,
                     mime_type="image/jpeg",
-                    size=os.path.getsize(sli_profile_path),
+                    size=sli_profile_path.stat().st_size,
                 )
                 sli_profile.file.name = name
                 sli_profile.save()
@@ -851,7 +893,15 @@ Welcome to the wiki page!
             )
             krophil.set_password("plop")
             krophil.save()
-            krophil_profile_path = os.path.join(root_path, "core/fixtures/images/6.jpg")
+            krophil_profile_path = (
+                root_path
+                / "core"
+                / "fixtures"
+                / "images"
+                / "sas"
+                / "Family"
+                / "krophil.jpg"
+            )
             with open(krophil_profile_path, "rb") as f:
                 name = str(krophil.id) + "_profile.jpg"
                 krophil_profile = SithFile(
@@ -861,7 +911,7 @@ Welcome to the wiki page!
                     owner=krophil,
                     is_folder=False,
                     mime_type="image/jpeg",
-                    size=os.path.getsize(krophil_profile_path),
+                    size=krophil_profile_path.stat().st_size,
                 )
                 krophil_profile.file.name = name
                 krophil_profile.save()
@@ -1163,4 +1213,103 @@ Welcome to the wiki page!
 * Gestion de projet""",
                 hours_THE=121,
                 hours_TE=4,
+            ).save()
+
+            # SAS
+            skia.groups.add(sas_admin.id)
+            sas_fixtures_path = root_path / "core" / "fixtures" / "images" / "sas"
+            for f in sas_fixtures_path.glob("*"):
+                if f.is_dir():
+                    album = Album(
+                        parent=sas,
+                        name=f.name,
+                        owner=root,
+                        is_folder=True,
+                        is_in_sas=True,
+                        is_moderated=True,
+                    )
+                    album.clean()
+                    album.save()
+                    for p in f.iterdir():
+                        pict = Picture(
+                            parent=album,
+                            name=p.name,
+                            file=resize_image(
+                                Image.open(BytesIO(p.read_bytes())), 1000, "JPEG"
+                            ),
+                            owner=root,
+                            is_folder=False,
+                            is_in_sas=True,
+                            is_moderated=True,
+                            mime_type="image/jpeg",
+                            size=p.stat().st_size,
+                        )
+                        pict.file.name = p.name
+                        pict.clean()
+                        pict.generate_thumbnails()
+                        pict.save()
+
+            p = Picture.objects.get(name="skia.jpg")
+            PeoplePictureRelation(user=skia, picture=p).save()
+            p = Picture.objects.get(name="sli.jpg")
+            PeoplePictureRelation(user=sli, picture=p).save()
+            p = Picture.objects.get(name="krophil.jpg")
+            PeoplePictureRelation(user=kropphil, picture=p).save()
+            p = Picture.objects.get(name="skia_sli.jpg")
+            PeoplePictureRelation(user=skia, picture=p).save()
+            PeoplePictureRelation(user=sli, picture=p).save()
+            p = Picture.objects.get(name="skia_sli_krophil.jpg")
+            PeoplePictureRelation(user=skia, picture=p).save()
+            PeoplePictureRelation(user=sli, picture=p).save()
+            PeoplePictureRelation(user=krophil, picture=p).save()
+            p = Picture.objects.get(name="richard.jpg")
+            PeoplePictureRelation(user=richard, picture=p).save()
+
+            with open(skia_profile_path, "rb") as f:
+                name = str(skia.id) + "_profile.jpg"
+                skia_profile = SithFile(
+                    parent=profiles_root,
+                    name=name,
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, "JPEG"),
+                    owner=skia,
+                    is_folder=False,
+                    mime_type="image/jpeg",
+                    size=skia_profile_path.stat().st_size,
+                )
+                skia_profile.file.name = name
+                skia_profile.save()
+                skia.profile_pict = skia_profile
+                skia.save()
+
+            # Create some additional data for galaxy to work with
+            sli.godfathers.add(skia)
+            Membership(
+                user=sli,
+                club=troll,
+                role=9,
+                description="Padawan Troll",
+                start_date=timezone.now() - timedelta(days=17),
+            ).save()
+            Membership(
+                user=krophil,
+                club=troll,
+                role=10,
+                description="Maitre Troll",
+                start_date=timezone.now() - timedelta(days=200),
+            ).save()
+            Membership(
+                user=skia,
+                club=troll,
+                role=2,
+                description="Grand Ancien Troll",
+                start_date=timezone.now() - timedelta(days=400),
+                end_date=timezone.now() - timedelta(days=86),
+            ).save()
+            Membership(
+                user=richard,
+                club=troll,
+                role=2,
+                description="",
+                start_date=timezone.now() - timedelta(days=200),
+                end_date=timezone.now() - timedelta(days=100),
             ).save()
