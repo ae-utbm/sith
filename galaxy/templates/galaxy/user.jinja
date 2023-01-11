@@ -1,0 +1,104 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans user_name=user.get_display_name() %}{{ user_name }}'s Galaxy{% endtrans %}
+{% endblock %}
+
+{% block content %}
+{% if object.galaxy_user %}
+    <p><a onclick="focus_node(get_node_from_id('{{ object.id }}'))">Reset on {{ object.get_display_name() }}</a></p>
+    <table style="width: initial;">
+        <tr>
+          <th></th>
+          <th>Citizen</th>
+          <th>Distance</th>
+          <th>Family</th>
+          <th>Pictures</th>
+          <th>Clubs</th>
+        </tr>
+    {% for path in object.galaxy_user.lanes1.all() %}
+        <tr>
+          <td><a onclick="focus_node(get_node_from_id('{{ path.star2.owner.id }}'))">Locate</a></td>
+          <td><a href="{{ url("galaxy:user", user_id=path.star2.owner.id) }}">{{ path.star2 }}</a></td>
+          <td>{{ path.distance }}</td>
+          <td>{{ path.family }}</td>
+          <td>{{ path.pictures }}</td>
+          <td>{{ path.clubs }}</td>
+        </tr>
+    {% endfor %}
+    {% for path in object.galaxy_user.lanes2.all() %}
+        <tr>
+          <td><a onclick="focus_node(get_node_from_id('{{ path.star1.owner.id }}'))">Locate</a></td>
+          <td><a href="{{ url("galaxy:user", user_id=path.star1.owner.id) }}">{{ path.star1 }}</a></td>
+          <td>{{ path.distance }}</td>
+          <td>{{ path.family }}</td>
+          <td>{{ path.pictures }}</td>
+          <td>{{ path.clubs }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+  <div id="3d-graph" style="margin: 1em;"></div>
+{% else %}
+  <p>This citizen has not yet joined the galaxy</p>
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+  {{ super() }}
+
+  <script src="{{ static('galaxy/js/three.min.js') }}"></script>
+  <script src="{{ static('galaxy/js/three-spritetext.min.js') }}"></script>
+  <script src="{{ static('galaxy/js/3d-force-graph.min.js') }}"></script>
+
+  <script>
+    function get_node_from_id(id) {
+        return Graph.graphData().nodes.find(n => n.id == id);
+    }
+
+    function focus_node(node) {
+        // Aim at node from outside it
+        const distance = 200;
+        const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+
+        const newPos = node.x || node.y || node.z
+          ? { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }
+          : { x: 0, y: 0, z: distance }; // special case if node is in (0,0,0)
+
+        Graph.cameraPosition(
+          newPos, // new position
+          node, // lookAt ({ x, y, z })
+          3000  // ms transition duration
+        );
+    }
+
+    const Graph = ForceGraph3D();
+    Graph(document.getElementById('3d-graph'));
+    Graph
+        .jsonUrl('{{ url("galaxy:data") }}')
+        .width(1000)
+        .height(700)
+        .nodeAutoColorBy('id')
+        .nodeLabel(node => `${node.name}`)
+        .onNodeClick(node => focus_node(node))
+        .linkDirectionalParticles(3)
+        .linkDirectionalParticleWidth(0.8)
+        .linkDirectionalParticleSpeed(0.006)
+        .nodeThreeObject(node => {
+          const sprite = new SpriteText(node.name);
+          sprite.material.depthWrite = false; // make sprite background transparent
+          sprite.color = node.color;
+          sprite.textHeight = 8;
+          return sprite;
+        });
+
+    // Set distance between stars
+    Graph.d3Force('link').distance(link => link.value);
+
+    // Focus current user
+    setTimeout(() => focus_node(get_node_from_id('{{ object.id }}')), 1000);
+  </script>
+{% endblock %}
+
+

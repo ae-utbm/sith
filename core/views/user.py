@@ -215,6 +215,13 @@ class UserTabsMixin(TabedViewMixin):
                 "name": _("Pictures"),
             }
         )
+        tab_list.append(
+            {
+                "url": reverse("galaxy:user", kwargs={"user_id": self.object.id}),
+                "slug": "galaxy",
+                "name": _("Galaxy"),
+            }
+        )
         if self.request.user == self.object:
             tab_list.append(
                 {"url": reverse("core:user_tools"), "slug": "tools", "name": _("Tools")}
