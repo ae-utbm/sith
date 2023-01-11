@@ -23,6 +23,7 @@
 #
 import json
 import re
+import string
 
 from django.test import TestCase
 from django.urls import reverse
@@ -754,18 +755,30 @@ class StudentCardTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-class AccountIdTest(TestCase):
+class CustomerAccountIdTest(TestCase):
     def setUp(self):
-        user_a = User.objects.create(username="a", password="plop", email="a.a@a.fr")
+        self.user_a = User.objects.create(
+            username="a", password="plop", email="a.a@a.fr"
+        )
         user_b = User.objects.create(username="b", password="plop", email="b.b@b.fr")
         user_c = User.objects.create(username="c", password="plop", email="c.c@c.fr")
-        Customer.objects.create(user=user_a, amount=0, account_id="1111a")
+        Customer.objects.create(user=self.user_a, amount=10, account_id="1111a")
         Customer.objects.create(user=user_b, amount=0, account_id="9999z")
         Customer.objects.create(user=user_c, amount=0, account_id="12345f")
 
     def test_create_customer(self):
         user_d = User.objects.create(username="d", password="plop")
-        customer_d = Customer.new_for_user(user_d)
-        customer_d.save()
-        number = customer_d.account_id[:-1]
+        customer, created = Customer.get_or_create(user_d)
+        account_id = customer.account_id
+        number = account_id[:-1]
+        self.assertTrue(created)
         self.assertEqual(number, "12346")
+        self.assertEqual(6, len(account_id))
+        self.assertIn(account_id[-1], string.ascii_lowercase)
+        self.assertEqual(0, customer.amount)
+
+    def test_get_existing_account(self):
+        account, created = Customer.get_or_create(self.user_a)
+        self.assertFalse(created)
+        self.assertEqual(account.account_id, "1111a")
+        self.assertEqual(10, account.amount)

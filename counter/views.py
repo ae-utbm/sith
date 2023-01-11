@@ -1792,11 +1792,7 @@ def create_billing_info(request, user_id):
     if user.id != user_id and not user.has_perm("counter:add_billinginfo"):
         raise PermissionDenied()
     user = get_object_or_404(User, pk=user_id)
-    if not hasattr(user, "customer"):
-        customer = Customer.new_for_user(user)
-        customer.save()
-    else:
-        customer = get_object_or_404(Customer, user_id=user_id)
+    customer, _ = Customer.get_or_create(user)
     BillingInfo.objects.create(customer=customer)
     return __manage_billing_info_req(request, user_id, True)
 
