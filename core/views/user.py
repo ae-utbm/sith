@@ -189,78 +189,70 @@ class UserTabsMixin(TabedViewMixin):
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
-        tab_list = []
-        tab_list.append(
+        user: User = self.object
+        tab_list = [
             {
-                "url": reverse("core:user_profile", kwargs={"user_id": self.object.id}),
+                "url": reverse("core:user_profile", kwargs={"user_id": user.id}),
                 "slug": "infos",
                 "name": _("Infos"),
-            }
-        )
-        tab_list.append(
+            },
             {
-                "url": reverse(
-                    "core:user_godfathers", kwargs={"user_id": self.object.id}
-                ),
+                "url": reverse("core:user_godfathers", kwargs={"user_id": user.id}),
                 "slug": "godfathers",
                 "name": _("Family"),
-            }
-        )
-        tab_list.append(
+            },
             {
-                "url": reverse(
-                    "core:user_pictures", kwargs={"user_id": self.object.id}
-                ),
+                "url": reverse("core:user_pictures", kwargs={"user_id": user.id}),
                 "slug": "pictures",
                 "name": _("Pictures"),
-            }
-        )
-        if self.request.user == self.object:
+            },
+        ]
+        if self.request.user.was_subscribed:
+            tab_list.append(
+                {
+                    "url": reverse("galaxy:user", kwargs={"user_id": user.id}),
+                    "slug": "galaxy",
+                    "name": _("Galaxy"),
+                }
+            )
+        if self.request.user == user:
             tab_list.append(
                 {"url": reverse("core:user_tools"), "slug": "tools", "name": _("Tools")}
             )
-        if self.request.user.can_edit(self.object):
+        if self.request.user.can_edit(user):
             tab_list.append(
                 {
-                    "url": reverse(
-                        "core:user_edit", kwargs={"user_id": self.object.id}
-                    ),
+                    "url": reverse("core:user_edit", kwargs={"user_id": user.id}),
                     "slug": "edit",
                     "name": _("Edit"),
                 }
             )
             tab_list.append(
                 {
-                    "url": reverse(
-                        "core:user_prefs", kwargs={"user_id": self.object.id}
-                    ),
+                    "url": reverse("core:user_prefs", kwargs={"user_id": user.id}),
                     "slug": "prefs",
                     "name": _("Preferences"),
                 }
             )
-        if self.request.user.can_view(self.object):
+        if self.request.user.can_view(user):
             tab_list.append(
                 {
-                    "url": reverse(
-                        "core:user_clubs", kwargs={"user_id": self.object.id}
-                    ),
+                    "url": reverse("core:user_clubs", kwargs={"user_id": user.id}),
                     "slug": "clubs",
                     "name": _("Clubs"),
                 }
             )
-        if self.request.user.is_owner(self.object):
+        if self.request.user.is_owner(user):
             tab_list.append(
                 {
-                    "url": reverse(
-                        "core:user_groups", kwargs={"user_id": self.object.id}
-                    ),
+                    "url": reverse("core:user_groups", kwargs={"user_id": user.id}),
                     "slug": "groups",
                     "name": _("Groups"),
                 }
             )
         try:
-            if self.object.customer and (
-                self.object == self.request.user
+            if user.customer and (
+                user == self.request.user
                 or self.request.user.is_in_group(
                     settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
                 )
@@ -271,9 +263,7 @@ class UserTabsMixin(TabedViewMixin):
             ):
                 tab_list.append(
                     {
-                        "url": reverse(
-                            "core:user_stats", kwargs={"user_id": self.object.id}
-                        ),
+                        "url": reverse("core:user_stats", kwargs={"user_id": user.id}),
                         "slug": "stats",
                         "name": _("Stats"),
                     }
@@ -281,10 +271,10 @@ class UserTabsMixin(TabedViewMixin):
                 tab_list.append(
                     {
                         "url": reverse(
-                            "core:user_account", kwargs={"user_id": self.object.id}
+                            "core:user_account", kwargs={"user_id": user.id}
                         ),
                         "slug": "account",
-                        "name": _("Account") + " (%s €)" % self.object.customer.amount,
+                        "name": _("Account") + " (%s €)" % user.customer.amount,
                     }
                 )
         except:

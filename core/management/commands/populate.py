@@ -1285,6 +1285,8 @@ Welcome to the wiki page!
             root.godfathers.add(skia)
             skia.godfathers.add(root)
             sli.godfathers.add(skia)
+            richard.godchildren.add(subscriber)
+            richard.godchildren.add(public)
             Membership(
                 user=sli,
                 club=troll,
