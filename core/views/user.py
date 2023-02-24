@@ -207,7 +207,9 @@ class UserTabsMixin(TabedViewMixin):
                 "name": _("Pictures"),
             },
         ]
-        if self.request.user.was_subscribed:
+        if (
+            False and self.request.user.was_subscribed
+        ):  # TODO: display galaxy once it's ready
             tab_list.append(
                 {
                     "url": reverse("galaxy:user", kwargs={"user_id": user.id}),
