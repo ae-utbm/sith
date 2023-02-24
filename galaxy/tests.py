@@ -127,3 +127,21 @@ class GalaxyTest(TestCase):
 
         self.maxDiff = None  # Yes, we want to see the diff if any
         self.assertDictEqual(expected_scores, computed_scores)
+
+    def test_page_is_citizen(self):
+        Galaxy.rule()
+        self.client.login(username="root", password="plop")
+        response = self.client.get("/galaxy/1/")
+        self.assertContains(
+            response,
+            '<a onclick="focus_node(get_node_from_id(8))">Locate</a>',
+            status_code=200,
+        )
+
+    def test_page_not_citizen(self):
+        Galaxy.rule()
+        self.client.login(username="root", password="plop")
+        response = self.client.get("/galaxy/2/")
+        self.assertContains(
+            response, "This citizen has not yet joined the galaxy", status_code=404
+        )
