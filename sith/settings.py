@@ -97,6 +97,7 @@ INSTALLED_APPS = (
     "trombi",
     "matmat",
     "pedagogy",
+    "galaxy",
 )
 
 MIDDLEWARE = (
@@ -208,6 +209,29 @@ DATABASES = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
+}
+
+# Logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "%(levelname)s %(message)s"},
+    },
+    "handlers": {
+        "log_to_stdout": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "main": {
+            "handlers": ["log_to_stdout"],
+            "level": "INFO",
+            "propagate": True,
+        }
+    },
 }
 
 # Internationalization
@@ -691,4 +715,8 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/jhuckaby/webcamjs/": "1.0.0",
     "https://github.com/vuejs/vue-next": "3.2.18",
     "https://github.com/alpinejs/alpine": "3.10.5",
+    "https://github.com/mrdoob/three.js/": "r148",
+    "https://github.com/vasturiano/three-spritetext": "1.6.5",
+    "https://github.com/vasturiano/3d-force-graph/": "1.70.19",
+    "https://github.com/vasturiano/d3-force-3d": "3.0.3",
 }
