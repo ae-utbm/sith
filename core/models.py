@@ -271,7 +271,7 @@ class User(AbstractBaseUser):
         _("dpt option"), max_length=32, blank=True, default=""
     )
     semester = models.CharField(_("semester"), max_length=5, blank=True, default="")
-    quote = models.CharField(_("quote"), max_length=256, blank=True, default="")
+    quote = models.TextField(_("quote"), max_length=256, blank=True, default="")
     school = models.CharField(_("school"), max_length=80, blank=True, default="")
     promo = models.IntegerField(
         _("promo"), validators=[validate_promo], null=True, blank=True
