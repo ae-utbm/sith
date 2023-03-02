@@ -143,5 +143,7 @@ class GalaxyTest(TestCase):
         self.client.login(username="root", password="plop")
         response = self.client.get("/galaxy/2/")
         self.assertContains(
-            response, "This citizen has not yet joined the galaxy", status_code=404
+            response,
+            "Ce citoyen n&#39;a pas encore rejoint la galaxie",
+            status_code=404,
         )
