@@ -1,5 +1,9 @@
 {% extends "core/base.jinja" %}
 
+{%- block additional_css -%}
+<link rel="stylesheet" href="{{ scss('core/override.scss') }}">
+{%- endblock -%}
+
 {% block title %}
 {% trans user_name=user.get_display_name() %}{{ user_name }}'s tools{% endtrans %}
 {% endblock %}
@@ -7,14 +11,15 @@
 {% block content %}
 <h3>{% trans %}User Tools{% endtrans %}</h3>
 
-<hr>
+{% if user.can_create_subscription or user.is_root or user.is_board_member %}
 <h4>{% trans %}Sith management{% endtrans %}</h4>
 <ul>
     {% if user.is_root %}
     <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
     <li><a href="{{ url('rootplace:merge') }}">{% trans %}Merge users{% endtrans %}</a></li>
     <li><a href="{{ url('rootplace:operation_logs') }}">{% trans %}Operation logs{% endtrans %}</a></li>
-    <li><a href="{{ url('rootplace:delete_forum_messages') }}">{% trans %}Delete user's forum messages{% endtrans %}</a></li>
+    <li><a href="{{ url('rootplace:delete_forum_messages') }}">{% trans %}Delete user's forum messages{% endtrans %}</a>
+    </li>
     {% endif %}
     {% if user.can_create_subscription or user.is_root %}
     <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
@@ -24,8 +29,8 @@
     <li><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></li>
     {% endif %}
 </ul>
+{% endif %}
 
-<hr>
 <h4>{% trans %}Counters{% endtrans %}</h4>
 <ul>
     {% if user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID) or user.is_root %}
@@ -54,7 +59,6 @@
     {% endfor %}
 </ul>
 
-<hr>
 <h4>{% trans %}Accounting{% endtrans %}</h4>
 <ul>
     {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) or user.is_root %}
@@ -62,20 +66,28 @@
     <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
     <li><a href="{{ url('accounting:co_list') }}">{% trans %}Company list{% endtrans %}</a></li>
     {% endif %}
+
     {% for m in user.memberships.filter(end_date=None).filter(role__gte=7).all() -%}
     {%- for b in m.club.bank_accounts.all() %}
-    <li><strong>{% trans %}Bank account: {% endtrans %}</strong>
-        <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b }}</a></li>
+    <li>
+        <strong>{% trans %}Bank account: {% endtrans %}</strong>
+        <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b }}</a>
+    </li>
     {%- endfor %}
+
     {% if m.club.club_account.exists() -%}
-        {% for ca in m.club.club_account.all() %}
-        <li><strong>{% trans %}Club account: {% endtrans %}</strong> <a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca }}</a></li>
-        {%- endfor %}
+    {% for ca in m.club.club_account.all() %}
+    <li>
+        <strong>{% trans %}Club account: {% endtrans %}</strong>
+        <a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca }}</a>
+    </li>
+    {%- endfor %}
     {%- endif -%}
     {%- endfor %}
 </ul>
 
-<hr>
+{% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or
+user.is_root %}
 <h4>{% trans %}Communication{% endtrans %}</h4>
 <ul>
     {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user.is_root %}
@@ -95,26 +107,25 @@
     <li><a href="{{ url('sas:moderation') }}">{% trans %}Moderate pictures{% endtrans %}</a></li>
     {% endif %}
 </ul>
+{% endif %}
 
-
-<hr>
+{% if user.memberships.filter(end_date=None).all().count() > 0 %}
 <h4>{% trans %}Club tools{% endtrans %}</h4>
 <ul>
     {% for m in user.memberships.filter(end_date=None).all() %}
     <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
     {% endfor %}
 </ul>
+{% endif %}
 
-<hr>
+{% if user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID) or user.is_root %}
 <h4>{% trans %}Pedagogy{% endtrans %}</h4>
 <ul>
-    {% if user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID) or user.is_root %}
     <li><a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a></li>
     <li><a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a></li>
-    {% endif %}
 </ul>
+{% endif %}
 
-<hr>
 <h4>{% trans %}Elections{% endtrans %}</h4>
 <ul>
     <li><a href="{{ url('election:list') }}">{% trans %}See available elections{% endtrans %}</a></li>
@@ -124,14 +135,11 @@
     {%- endif -%}
 </ul>
 
-<hr>
 <h4>{% trans %}Other tools{% endtrans %}</h4>
 <ul>
-    <li><a href="{{ url('core:to_markdown') }}">{% trans %}Convert dokuwiki/BBcode syntax to Markdown{% endtrans %}</a></li>
+    <li><a href="{{ url('core:to_markdown') }}">{% trans %}Convert dokuwiki/BBcode syntax to Markdown{% endtrans %}</a>
+    </li>
     <li><a href="{{ url('trombi:user_tools') }}">{% trans %}Trombi tools{% endtrans %}</a></li>
 </ul>
 
 {% endblock %}
-
-
-

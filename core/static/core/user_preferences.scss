@@ -1,0 +1,41 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &-general {
+    >p {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: left;
+      gap: 5px;
+      align-items: flex-start;
+      margin: 0;
+
+      >label {
+        cursor: pointer
+      }
+    }
+  }
+
+  &-cards,
+  &-trombi {
+    >p {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: justify;
+      gap: 5px;
+
+      >input,
+      >select {
+        min-width: 300px;
+      }
+    }
+  }
+
+  &-submit-btn {
+    margin-top: 10px !important;
+    max-width: 100px;
+  }
+}

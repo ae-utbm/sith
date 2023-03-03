@@ -1,14 +1,21 @@
 {% extends "core/base.jinja" %}
 
+{%- block additional_css -%}
+<link rel="stylesheet" href="{{ scss('core/override.scss') }}">
+<link rel="stylesheet" href="{{ scss('user/user_group.scss') }}">
+{%- endblock -%}
+
 {% block content %}
 <h2>{% trans user_name=profile.get_full_name() %}Edit user groups for {{ user_name }}{% endtrans %}</h2>
 <form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p() }}
-    <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>
+    <main>
+        <h2>{% trans user_name=profile.get_full_name() %}Edit user groups for {{ user_name }}{% endtrans %}</h2>
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form.as_p() }}
+            <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>
+        </form>
+        <input type="submit" value="{% trans %}Update{% endtrans %}" />
 </form>
-{% endblock %}
-
-
-
-
+</main>
+{%- endblock -%}

@@ -271,7 +271,7 @@ class User(AbstractBaseUser):
         _("dpt option"), max_length=32, blank=True, default=""
     )
     semester = models.CharField(_("semester"), max_length=5, blank=True, default="")
-    quote = models.CharField(_("quote"), max_length=256, blank=True, default="")
+    quote = models.TextField(_("quote"), max_length=256, blank=True, default="")
     school = models.CharField(_("school"), max_length=80, blank=True, default="")
     promo = models.IntegerField(
         _("promo"), validators=[validate_promo], null=True, blank=True
@@ -784,7 +784,7 @@ class Preferences(models.Model):
         User, related_name="_preferences", on_delete=models.CASCADE
     )
     receive_weekmail = models.BooleanField(
-        _("do you want to receive the weekmail"), default=False
+        _("Receive the Weekmail"), default=False
     )
     show_my_stats = models.BooleanField(_("show your stats to others"), default=False)
     notify_on_click = models.BooleanField(

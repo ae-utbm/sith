@@ -2214,8 +2214,8 @@ msgid "Visitor"
 msgstr "Visiteur"
 
 #: core/models.py:787
-msgid "do you want to receive the weekmail"
-msgstr "voulez-vous recevoir le Weekmail"
+msgid "receive the Weekmail"
+msgstr "recevoir le Weekmail"
 
 #: core/models.py:789
 msgid "show your stats to others"
@@ -2223,11 +2223,11 @@ msgstr "montrez vos statistiques aux autres"
 
 #: core/models.py:791
 msgid "get a notification for every click"
-msgstr "recevez une notification pour chaque click"
+msgstr "avoir une notification pour chaque click"
 
 #: core/models.py:794
 msgid "get a notification for every refilling"
-msgstr "recevez une notification pour chaque rechargement"
+msgstr "avoir une notification pour chaque rechargement"
 
 #: core/models.py:817
 msgid "file name"
@@ -3361,8 +3361,8 @@ msgstr ""
 "14 caractères de long."
 
 #: core/templates/core/user_preferences.jinja:40
-msgid "No student cards registered."
-msgstr "Aucune cartes étudiante enregistré."
+msgid "No student card registered."
+msgstr "Aucune carte étudiante enregistrée."
 
 #: core/templates/core/user_stats.jinja:4
 #, python-format

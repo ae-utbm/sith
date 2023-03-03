@@ -1,0 +1,13 @@
+#id_groups {
+  margin: 0;
+
+  >li {
+    list-style-type: none;
+    margin: 0;
+    padding-left: 30px;
+
+    >label {
+      cursor: pointer;
+    }
+  }
+}
