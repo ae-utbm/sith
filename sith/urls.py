@@ -76,6 +76,7 @@ urlpatterns = [
     path("api/v1/", include(("api.urls", "api"), namespace="api")),
     path("election/", include(("election.urls", "election"), namespace="election")),
     path("forum/", include(("forum.urls", "forum"), namespace="forum")),
+    path("galaxy/", include(("galaxy.urls", "galaxy"), namespace="galaxy")),
     path("trombi/", include(("trombi.urls", "trombi"), namespace="trombi")),
     path("matmatronch/", include(("matmat.urls", "matmat"), namespace="matmat")),
     path("pedagogy/", include(("pedagogy.urls", "pedagogy"), namespace="pedagogy")),

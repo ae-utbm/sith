@@ -2,7 +2,12 @@
 
 {% block content %}
 
-<h3>{% trans %}404, Not Found{% endtrans %}</h3>
+<div id="page">
+	<h3>{% trans %}404, Not Found{% endtrans %}</h3>
+	<p class="alert alert-red">
+		{{ exception }}
+	</p>
+</div>
 
 {% endblock %}
 

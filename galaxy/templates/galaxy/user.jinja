@@ -1,0 +1,108 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans user_name=user.get_display_name() %}{{ user_name }}'s Galaxy{% endtrans %}
+{% endblock %}
+
+{% block content %}
+{% if object.galaxy_user %}
+    <p><a onclick="focus_node(get_node_from_id({{ object.id }}))">Reset on {{ object.get_display_name() }}</a></p>
+    <p>Self score: {{ object.galaxy_user.mass }}</p>
+    <table style="width: initial;">
+        <tr>
+          <th></th>
+          <th>Citizen</th>
+          <th>Score</th>
+          <th>Distance</th>
+          <th>Family</th>
+          <th>Pictures</th>
+          <th>Clubs</th>
+        </tr>
+    {% for lane in lanes %}
+        <tr>
+          <td><a onclick="focus_node(get_node_from_id({{ lane.other_star_id }}))">Locate</a></td>
+          <td><a href="{{ url("galaxy:user", user_id=lane.other_star_id) }}">{{ lane.other_star_name }}</a></td>
+          <td>{{ lane.other_star_mass }}</td>
+          <td>{{ lane.distance }}</td>
+          <td>{{ lane.family }}</td>
+          <td>{{ lane.pictures }}</td>
+          <td>{{ lane.clubs }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+  <div id="3d-graph" style="margin: 1em;"></div>
+{% else %}
+  <p>This citizen has not yet joined the galaxy</p>
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+  {{ super() }}
+
+  <script src="{{ static('galaxy/js/three.min.js') }}" defer></script>
+  <script src="{{ static('galaxy/js/three-spritetext.min.js') }}" defer></script>
+  <script src="{{ static('galaxy/js/3d-force-graph.min.js') }}" defer></script>
+  <script src="{{ static('galaxy/js/d3-force-3d.min.js') }}" defer></script>
+
+  <script>
+  var Graph;
+
+  function get_node_from_id(id) {
+      return Graph.graphData().nodes.find(n => n.id === id);
+  }
+
+  function focus_node(node) {
+      // Aim at node from outside it
+      const distance = 200;
+      const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+
+      const newPos = node.x || node.y || node.z
+        ? { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }
+        : { x: 0, y: 0, z: distance }; // special case if node is in (0,0,0)
+
+      Graph.cameraPosition(
+        newPos, // new position
+        node, // lookAt ({ x, y, z })
+        3000  // ms transition duration
+      );
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    Graph = ForceGraph3D();
+    Graph(document.getElementById('3d-graph'));
+    Graph
+        .jsonUrl('{{ url("galaxy:data") }}')
+        .width(1000)
+        .height(700)
+        .nodeAutoColorBy('id')
+        .nodeLabel(node => `${node.name}`)
+        .onNodeClick(node => focus_node(node))
+        .linkDirectionalParticles(3)
+        .linkDirectionalParticleWidth(0.8)
+        .linkDirectionalParticleSpeed(0.006)
+        .nodeThreeObject(node => {
+          const sprite = new SpriteText(node.name);
+          sprite.material.depthWrite = false; // make sprite background transparent
+          sprite.color = node.color;
+          sprite.textHeight = 5;
+          return sprite;
+        });
+
+    // Set distance between stars
+    Graph.d3Force('link').distance(link => link.value);
+
+    // Set high masses nearer the center of the galaxy
+    // TODO: quick and dirty strength computation, this will need tuning.
+    Graph.d3Force('positionX', d3.forceX().strength(node => { return 1 - (1 / node.mass); }));
+    Graph.d3Force('positionY', d3.forceY().strength(node => { return 1 - (1 / node.mass); }));
+    Graph.d3Force('positionZ', d3.forceZ().strength(node => { return 1 - (1 / node.mass); }));
+
+    // Focus current user
+    setTimeout(() => focus_node(get_node_from_id({{ object.id }})), 1000);
+  })
+  </script>
+{% endblock %}
+
+
