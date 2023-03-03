@@ -1,0 +1,42 @@
+main {
+  box-sizing: border-box;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+
+
+  >div {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, .05);
+    width: 210px;
+
+    >h4 {
+      text-align: center;
+    }
+
+    >ul {
+      list-style-type: none;
+      margin: 20px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+
+  @media (max-width: 550px) {
+    >div {
+      width: 100%;
+      background-color: transparent;
+
+      >h4 {
+        text-align: left;
+      }
+    }
+  }
+}
