@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             model_name="preferences",
             name="receive_weekmail",
             field=models.BooleanField(
-                default=False, verbose_name="do you want to receive the weekmail"
+                default=False, verbose_name="receive the weekmail"
             ),
         )
     ]

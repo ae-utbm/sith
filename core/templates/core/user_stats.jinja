@@ -1,25 +1,39 @@
 {% extends "core/base.jinja" %}
 
+{%- block additional_css -%}
+<link rel="stylesheet" href="{{ scss('core/override.scss') }}">
+<link rel="stylesheet" href="{{ scss('user/user_stats.scss') }}">
+{%- endblock -%}
+
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s stats{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    {% if profile.permanencies %}
-    <h3>{% trans %}Permanencies{% endtrans %}</h3>
-    <div>
-        <p>Total: {{ total_perm_time }}</p>
-        <p>Foyer: {{ total_foyer_time }}</p>
-        <p>MDE: {{ total_mde_time }}</p>
-        <p>La Gommette: {{ total_gommette_time }}</p>
+    <div class="row">
+        {% if profile.permanencies %}
+        <div>
+            <h3>{% trans %}Permanencies{% endtrans %}</h3>
+            <div class="flexed">
+                <div><span>Foyer :</span><span>{{ total_foyer_time }}</span></div>
+                <div><span>Gommette :</span><span>{{ total_gommette_time }}</span></div>
+                <div><span>MDE :</span><span>{{ total_mde_time }}</span></div>
+                <div><span>Total :</span><span>{{ total_perm_time }}</span></div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div>
+            <h3>{% trans %}Buyings{% endtrans %}</h3>
+            <div class="flexed">
+                <div><span>Foyer :</span><span>{{ total_foyer_buyings }}&nbsp;€</span></div>
+                <div><span>Gommette :</span><span>{{ total_gommette_buyings }}&nbsp;€</span></div>
+                <div><span>MDE :</span><span>{{ total_mde_buyings }}&nbsp;€</span></div>
+                <div><span>Total :</span><span>{{ total_foyer_buyings + total_gommette_buyings + total_mde_buyings }}&nbsp;€</span></div>
+            </div>
+        </div>
     </div>
-    {% endif %}
-    <h3>{% trans %}Buyings{% endtrans %}</h3>
-    <div>
-        <p>Foyer: {{ total_foyer_buyings }} €</p>
-        <p>MDE: {{ total_mde_buyings }} €</p>
-        <p>La Gommette: {{ total_gommette_buyings }} €</p>
-    </div>
+    
     <h3>{% trans %}Product top 10{% endtrans %}</h3>
     <table>
         <thead>

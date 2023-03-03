@@ -784,7 +784,7 @@ class Preferences(models.Model):
         User, related_name="_preferences", on_delete=models.CASCADE
     )
     receive_weekmail = models.BooleanField(
-        _("do you want to receive the weekmail"), default=False
+        _("Receive the Weekmail"), default=False
     )
     show_my_stats = models.BooleanField(_("show your stats to others"), default=False)
     notify_on_click = models.BooleanField(

@@ -1,0 +1,140 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.user-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1080px;
+}
+
+.infos-and-picture {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  max-width: 1080px;
+
+  @media (max-width: 960px) {
+    flex-direction: column-reverse;
+    gap: 20px;
+  }
+
+  > #user_profile_infos {
+    width: 50%;
+
+    @media (max-width: 960px) {
+      width: 100%;
+    }
+
+    @media (min-width: 960px) {
+      padding-right: 20px;
+    }
+
+    > #user_profile_infos_promo {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    > #user_profile_infos_quote {
+      @media (max-width: 960px) {
+        text-align: center !important;
+      }
+    }
+  }
+
+  > #user_profile_pictures {
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+
+    @media (max-width: 960px) {
+      width: 100%;
+      height: 100% !important;
+      flex-direction: column;
+    }
+
+    @media (min-width: 960px) {
+      padding-left: 20px;
+    }
+
+    > #user_profile_pictures_bigone {
+      @media (max-width: 960px) {
+        > img {
+          max-width: 300px !important;
+          width: 100% !important;
+          object-fit: contain;
+        }
+      }
+    }
+
+    > #user_profile_pictures_thumbnails {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      @media (max-width: 960px) {
+        flex-direction: row !important;
+        height: 50%;
+      }
+
+      > img {
+        max-height: calc(100% / 3);
+        width: 100% !important;
+        object-fit: contain;
+
+        @media (max-width: 960px) {
+          max-height: 100%;
+          max-width: calc(100% / 3) !important;
+          height: auto;
+        }
+      }
+    }
+  }
+}
+
+#user_profile_page #user_profile #user_profile_infos {
+  @media (max-width: 960px) {
+    border-right-color: transparent;
+  }
+}
+
+#user_profile_page #user_profile #user_profile_pictures #user_profile_pictures_thumbnails,
+#user_profile_page #user_profile #user_profile_infos,
+#user_profile_page #user_profile #user_profile_pictures {
+  flex-basis: unset !important;
+}
+
+.form-gifts {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 960px) {
+    flex-direction: column;
+  }
+
+  > select,
+  > input {
+    min-width: 300px;
+    max-width: 100%;
+    height: 40px;
+
+    @media (max-width: 960px) {
+      width: 100%;
+    }
+  }
+}

@@ -40,7 +40,7 @@
             <form action="{{ url('set_language') }}" method="post">{% csrf_token %}
                 <input name="next" value="{{ request.path }}" type="hidden" />
                 <input name="language" value="{{ language[0] }}" type="hidden" />
-                <input type="submit" value="{{ language[0]|upper }}" />
+                <input type="submit" value="{{ language[0]|upper }}" />
             </form>
             {% endfor %}
         </div>
@@ -212,7 +212,7 @@
                 <div class="dropdown-content">
                     <a href="{{ url('core:page', page_name='FAQ') }}">{% trans %}FAQ{% endtrans %}</a>
                     <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
-                    <a href="{{ url('core:page', page_name="Index") }}">{% trans %}Wiki{% endtrans %}</a>
+                    <a href="{{ url('core:page', page_name='Index') }}">{% trans %}Wiki{% endtrans %}</a>
                 </div>
               </div>
           </nav>
@@ -226,20 +226,20 @@
           </ul>
 
           <div id="content">
-              {% if list_of_tabs %}
-              <div class="tool_bar">
-                  <div>{{ tabs_title }}</div>
-                  <div class="tools">
-                      {% for t in list_of_tabs -%}
-                      <a href="{{ t.url }}"
-                          {%- if current_tab == t.slug %}
-                              class="selected_tab"
-                          {%- endif -%}
-                      >{{ t.name }}</a>
-                      {%- endfor %}
-                  </div>
-              </div>
-              {% endif %}
+            {% if list_of_tabs %}
+            <div class="tool_bar">
+                {# <div>{{ tabs_title }}</div> #}
+                <div class="tools">
+                    {% for t in list_of_tabs -%}
+                    <a href="{{ t.url }}"
+                        {%- if current_tab == t.slug %}
+                            class="selected_tab"
+                        {%- endif -%}
+                    >{{ t.name }}</a>
+                    {%- endfor %}
+                </div>
+            </div>
+            {% endif %}
 
               {% if error %}
               {{ error }}

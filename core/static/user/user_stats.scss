@@ -1,0 +1,38 @@
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 30px;
+
+  @media (max-width: 535px) {
+    > div,
+    > div > .flexed {
+      width: 100%;
+      align-items: stretch;
+    }
+  }
+}
+
+
+.flexed {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: self-start;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+
+    > span {
+      width: 120px;
+
+      &:last-child {
+        text-align: right;
+      }
+    }
+  }
+}
