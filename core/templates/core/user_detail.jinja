@@ -1,6 +1,11 @@
 {% extends "core/base.jinja" %}
 {% from "core/macros.jinja" import show_slots, show_tokens, user_subscription %}
 
+{%- block additional_css -%}
+<link rel="stylesheet" href="{{ scss('core/override.scss') }}">
+<link rel="stylesheet" href="{{ scss('user/user_detail.scss') }}">
+{%- endblock -%}
+
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s profile{% endtrans %}
 {% endblock %}
@@ -10,166 +15,166 @@
     <div id="user_profile" class="main">
         <!-- Profile -->
         <div class="user-name">
-        <h3>{{ profile.get_full_name() }}</h3>
-        {% if profile.nick_name %}
+            <h3>{{ profile.get_full_name() }}</h3>
+            {% if profile.nick_name %}
             <div id="user_profile_infos_nick">&laquo; {{ profile.nick_name }} &raquo;</div>
-        {% endif %}
+            {% endif %}
         </div>
 
         <div class="infos-and-picture">
             <div id="user_profile_infos">
                 {% if profile.quote %}
-                    <div id="user_profile_infos_quote">
-                        {{ profile.quote }}
-                    </div>
+                <div id="user_profile_infos_quote">
+                    {{ profile.quote }}
+                </div>
                 {% endif %}
 
                 <div id="user_profile_infos_items">
                     {% if profile.pronouns %}
-                        <div>
-                            <span class="user_profile_infos_item">{% trans %}Pronouns: {% endtrans %}</span>
-                            <span class="user_profile_infos_item_value">{{ profile.pronouns }}</span>
-                        </div>
+                    <div>
+                        <span class="user_profile_infos_item">{% trans %}Pronouns: {% endtrans %}</span>
+                        <span class="user_profile_infos_item_value">{{ profile.pronouns }}</span>
+                    </div>
                     {% endif %}
                     {% if profile.date_of_birth %}
-                        <div>
-                            <span class="user_profile_infos_item">{% trans %}Born: {% endtrans %}</span>
-                            <span class="user_profile_infos_item_value">{{ profile.date_of_birth|date("d/m/Y") }}</span>
-                        </div>
+                    <div>
+                        <span class="user_profile_infos_item">{% trans %}Born: {% endtrans %}</span>
+                        <span class="user_profile_infos_item_value">{{ profile.date_of_birth|date("d/m/Y") }}</span>
+                    </div>
                     {% endif %}
 
                     {% if profile.department != "NA" %}
-                        <div>
-                            <span class="user_profile_infos_item">{% trans %}Department: {% endtrans %}</span>
-                            <span class="user_profile_infos_item_value">{{ profile.department }}{{ profile.semester }}</span>
-                        </div>
+                    <div>
+                        <span class="user_profile_infos_item">{% trans %}Department: {% endtrans %}</span>
+                        <span class="user_profile_infos_item_value">{{ profile.department }}{{ profile.semester
+                            }}</span>
+                    </div>
                     {% endif %}
 
                     {% if profile.dpt_option %}
-                        <div>
-                            <span class="user_profile_infos_item">{% trans %}Option: {% endtrans %}</span>
-                            <span class="user_profile_infos_item_value">{{ profile.dpt_option }}</span>
-                        </div>
+                    <div>
+                        <span class="user_profile_infos_item">{% trans %}Option: {% endtrans %}</span>
+                        <span class="user_profile_infos_item_value">{{ profile.dpt_option }}</span>
+                    </div>
                     {% endif %}
 
                     {% if profile.phone %}
-                        <div>
-                            <span class="user_profile_infos_item">{% trans %}Phone: {% endtrans %}</span>
-                            <span class="user_profile_infos_item_value">{{ profile.phone }}</span>
-                        </div>
+                    <div>
+                        <span class="user_profile_infos_item">{% trans %}Phone: {% endtrans %}</span>
+                        <span class="user_profile_infos_item_value">{{ profile.phone }}</span>
+                    </div>
                     {% endif %}
 
                     {% if profile.address %}
-                        <div>
-                            <span class="user_profile_infos_item">{% trans %}Address: {% endtrans %}</span>
-                            <span class="user_profile_infos_item_value">{{ profile.address }}</span>
-                        </div>
+                    <div>
+                        <span class="user_profile_infos_item">{% trans %}Address: {% endtrans %}</span>
+                        <span class="user_profile_infos_item_value">{{ profile.address }}</span>
+                    </div>
                     {% endif %}
 
                     {% if profile.parent_address %}
-                        <div>
-                            <span class="user_profile_infos_item">{% trans %}Parents address: {% endtrans %}</span>
-                            <span class="user_profile_infos_item_value">{{ profile.parent_address }}</span>
-                        </div>
+                    <div>
+                        <span class="user_profile_infos_item">{% trans %}Parents address: {% endtrans %}</span>
+                        <span class="user_profile_infos_item_value">{{ profile.parent_address }}</span>
+                    </div>
                     {% endif %}
                 </div>
 
                 {% if profile.promo %}
-                    <div id="user_profile_infos_promo">
-                        {% trans %}Promo: {% endtrans %}{{ profile.promo }}
-                    <img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}" alt="Promo {{ profile.promo }}" />
-                    <img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}" alt="Promo {{ profile.promo }}" />
+                <div id="user_profile_infos_promo">
                     {% trans %}Promo: {% endtrans %}{{ profile.promo }}
-                        <img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}" alt="Promo {{ profile.promo }}" />
-                    {% trans %}Promo: {% endtrans %}{{ profile.promo }}
-                    </div>
+                    <img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}"
+                        alt="Promo {{ profile.promo }}" />
+                </div>
                 {% endif %}
             </div>
             <!-- Pictures -->
             <div id="user_profile_pictures">
                 <div id="user_profile_pictures_bigone">
                     {% if profile.profile_pict %}
-                        <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}"
-                            title="{% trans %}Profile{% endtrans %}" />
+                    <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}"
+                        title="{% trans %}Profile{% endtrans %}" />
                     {% else %}
-                        <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}"
-                            title="{% trans %}Profile{% endtrans %}" />
+                    <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}"
+                        title="{% trans %}Profile{% endtrans %}" />
                     {% endif %}
                 </div>
                 <div id="user_profile_pictures_thumbnails">
                     {% if profile.profile_pict %}
-                        <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}"
-                            title="{% trans %}Profile{% endtrans %}" />
+                    <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}"
+                        title="{% trans %}Profile{% endtrans %}" />
                     {% else %}
-                        <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}"
-                            title="{% trans %}Profile{% endtrans %}" />
+                    <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}"
+                        title="{% trans %}Profile{% endtrans %}" />
                     {% endif %}
 
                     {% if profile.avatar_pict %}
-                        <img src="{{ profile.avatar_pict.get_download_url() }}" alt="{% trans %}Avatar{% endtrans %}"
-                            title="{% trans %}Avatar{% endtrans %}" />
+                    <img src="{{ profile.avatar_pict.get_download_url() }}" alt="{% trans %}Avatar{% endtrans %}"
+                        title="{% trans %}Avatar{% endtrans %}" />
                     {% else %}
-                        <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Avatar{% endtrans %}"
-                            title="{% trans %}Avatar{% endtrans %}" />
+                    <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Avatar{% endtrans %}"
+                        title="{% trans %}Avatar{% endtrans %}" />
                     {% endif %}
 
                     {% if profile.scrub_pict %}
-                        <img src="{{ profile.scrub_pict.get_download_url() }}" alt="{% trans %}Scrub{% endtrans %}"
-                            title="{% trans %}Scrub{% endtrans %}" />
+                    <img src="{{ profile.scrub_pict.get_download_url() }}" alt="{% trans %}Scrub{% endtrans %}"
+                        title="{% trans %}Scrub{% endtrans %}" />
                     {% else %}
-                        <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Scrub{% endtrans %}"
-                            title="{% trans %}Scrub{% endtrans %}" />
+                    <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Scrub{% endtrans %}"
+                        title="{% trans %}Scrub{% endtrans %}" />
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    {% if user.memberships.filter(end_date=None).exists() or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user == profile or user.is_in_group(settings.SITH_BAR_MANAGER_BOARD_GROUP) %}
+    {% if user.memberships.filter(end_date=None).exists() or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user ==
+    profile or user.is_in_group(settings.SITH_BAR_MANAGER_BOARD_GROUP) %}
     {# if the user is member of a club, he can view the subscription state #}
     <hr>
     {% if profile.is_subscribed %}
-        {% if user == profile or user.is_root or user.is_board_member %}
-        <div>
-            {{ user_subscription(profile) }}
-        </div>
-        {% endif %}
-        {% if user == profile or user.is_root or user.is_board_member or user.is_launderette_manager %}
-        <div>
-            {# Shows tokens bought by the user #}
-            {{ show_tokens(profile) }}
-            {# Shows slots took by the user #}
-            {{ show_slots(profile) }}
-        </div>
-        {% endif %}
+    {% if user == profile or user.is_root or user.is_board_member %}
+    <div>
+        {{ user_subscription(profile) }}
+    </div>
+    {% endif %}
+    {% if user == profile or user.is_root or user.is_board_member or user.is_launderette_manager %}
+    <div>
+        {# Shows tokens bought by the user #}
+        {{ show_tokens(profile) }}
+        {# Shows slots took by the user #}
+        {{ show_slots(profile) }}
+    </div>
+    {% endif %}
     {% else %}
-        <div>
+    <div>
         {% trans %}Not subscribed{% endtrans %}
         {% if user.is_board_member %}
-            <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans %}</a>
-            {% endif %}
+        <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans
+            %}</a>
         {% endif %}
-        </div>
+        {% endif %}
+    </div>
     {% endif %}
     {% if profile.was_subscribed and (user == profile or user.can_read_subscription_history)%}
-        <div id="drop_subscriptions">
-            <h5>{% trans %}Subscription history{% endtrans %}</h5>
-            <table>
-                <tr>
-                    <th>{% trans %}Subscription start{% endtrans %}</th>
-                    <th>{% trans %}Subscription end{% endtrans %}</th>
-                    <th>{% trans %}Subscription type{% endtrans %}</th>
-                    <th>{% trans %}Payment method{% endtrans %}</th>
-                </tr>
+    <div id="drop_subscriptions">
+        <h5>{% trans %}Subscription history{% endtrans %}</h5>
+        <table>
+            <tr>
+                <th>{% trans %}Subscription start{% endtrans %}</th>
+                <th>{% trans %}Subscription end{% endtrans %}</th>
+                <th>{% trans %}Subscription type{% endtrans %}</th>
+                <th>{% trans %}Payment method{% endtrans %}</th>
+            </tr>
             {% for sub in profile.subscriptions.all() %}
-                <tr>
-                    <td>{{ sub.subscription_start }}</td>
-                    <td>{{ sub.subscription_end }}</td>
-                    <td>{{ sub.subscription_type }}</td>
-                    <td>{{ sub.get_payment_method_display() }}</td>
-                </tr>
+            <tr>
+                <td>{{ sub.subscription_start }}</td>
+                <td>{{ sub.subscription_end }}</td>
+                <td>{{ sub.subscription_type }}</td>
+                <td>{{ sub.get_payment_method_display() }}</td>
+            </tr>
             {% endfor %}
-            </table>
-        </div>
+        </table>
+    </div>
     {% endif %}
 
     {% if user.is_root or user.is_board_member %}
@@ -183,18 +188,19 @@
         </form>
         {% if profile.gifts.exists() %}
         <br>
-            <div id="drop_gifts">
-                <h5>{% trans %}Last given gift :{% endtrans %} {{ profile.gifts.order_by('-date').first() }}</h5>
-                <div>
-                    <ul>
+        <div id="drop_gifts">
+            <h5>{% trans %}Last given gift :{% endtrans %} {{ profile.gifts.order_by('-date').first() }}</h5>
+            <div>
+                <ul>
                     {% for gift in profile.gifts.all().order_by('-date') %}
-                        <li>{{ gift }} <a href="{{ url('core:user_gift_delete', user_id=profile.id, gift_id=gift.id) }}">{% trans %}Delete{% endtrans %}</a></li>
+                    <li>{{ gift }} <a href="{{ url('core:user_gift_delete', user_id=profile.id, gift_id=gift.id) }}">{%
+                            trans %}Delete{% endtrans %}</a></li>
                     {% endfor %}
-                    </ul>
-                </div>
+                </ul>
             </div>
+        </div>
         {% else %}
-            <em>{% trans %}No gift given yet{% endtrans %}</em>
+        <em>{% trans %}No gift given yet{% endtrans %}</em>
         {% endif %}
     </div>
     {% endif %}
@@ -206,40 +212,40 @@
 {% block script %}
 {{ super() }}
 <script>
-$( function() {
-    var keys = [];
-    var pattern = "71,85,89,71,85,89";
-    $(document).keydown(function (e) {
-        keys.push(e.keyCode);
-        if (keys.toString()==pattern) {
+    $(function () {
+        var keys = [];
+        var pattern = "71,85,89,71,85,89";
+        $(document).keydown(function (e) {
+            keys.push(e.keyCode);
+            if (keys.toString() == pattern) {
                 keys = [];
                 $("#user_profile_pictures_bigone img").attr("src", "{{ static('core/img/yug.jpg') }}");
-        }
-        if (keys.length==6) {
-            keys.shift();
-        }
+            }
+            if (keys.length == 6) {
+                keys.shift();
+            }
+        });
     });
-} );
-$(function(){
-    $("#user_profile_pictures_thumbnails img").click(function () {
-        $("#user_profile_pictures_bigone img").attr("src", $(this)[0].src);
-        $("#user_profile_pictures_bigone img").attr("alt", $(this)[0].alt);
-        $("#user_profile_pictures_bigone img").attr("title", $(this)[0].title);
-    })
-});
-$(function(){
-    $("#drop_gifts").accordion({
-        heightStyle: "content",
-        collapsible: true,
-        active: false
+    $(function () {
+        $("#user_profile_pictures_thumbnails img").click(function () {
+            $("#user_profile_pictures_bigone img").attr("src", $(this)[0].src);
+            $("#user_profile_pictures_bigone img").attr("alt", $(this)[0].alt);
+            $("#user_profile_pictures_bigone img").attr("title", $(this)[0].title);
+        })
     });
-});
-$(function(){
-    $("#drop_subscriptions").accordion({
-        heightStyle: "content",
-        collapsible: true,
-        active: false
+    $(function () {
+        $("#drop_gifts").accordion({
+            heightStyle: "content",
+            collapsible: true,
+            active: false
+        });
     });
-});
+    $(function () {
+        $("#drop_subscriptions").accordion({
+            heightStyle: "content",
+            collapsible: true,
+            active: false
+        });
+    });
 </script>
 {% endblock %}
