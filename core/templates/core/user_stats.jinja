@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="container">
 <div class="row">
     {% if profile.permanencies %}
     <div>
@@ -35,21 +36,24 @@
     </div>
 </div>
 
-<h3>{% trans %}Product top 10{% endtrans %}</h3>
-<table>
-    <thead>
-        <tr>
-            <td>{% trans %}Product{% endtrans %}</td>
-            <td>{% trans %}Quantity{% endtrans %}</td>
-        </tr>
-    </thead>
-    <tbody>
-        {% for p in top_product %}
-        <tr>
-            <td>{{ p['product__name'] }}</td>
-            <td>{{ p['product_sum'] }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div>
+    <h3>{% trans %}Product top 10{% endtrans %}</h3>
+    <table>
+        <thead>
+            <tr>
+                <td>{% trans %}Product{% endtrans %}</td>
+                <td>{% trans %}Quantity{% endtrans %}</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in top_product %}
+            <tr>
+                <td>{{ p['product__name'] }}</td>
+                <td>{{ p['product_sum'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
 {% endblock %}

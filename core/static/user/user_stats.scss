@@ -1,3 +1,10 @@
+.container {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .row {
   display: flex;
   flex-direction: row;
@@ -8,6 +15,7 @@
   gap: 30px;
 
   @media (max-width: 535px) {
+    gap: 20px;
 
     >div,
     >div>.flexed {
