@@ -22,6 +22,7 @@
 #
 #
 from __future__ import annotations
+from django.db.models import Sum, F
 
 from typing import Tuple
 
@@ -90,12 +91,9 @@ class Customer(models.Model):
         about the relation between a User (not a Customer,
         don't mix them) and a Product.
         """
-        return self.user.subscriptions.last() and (
-            date.today()
-            - self.user.subscriptions.order_by("subscription_end")
-            .last()
-            .subscription_end
-        ) < timedelta(days=90)
+        subscription = self.user.subscriptions.order_by("subscription_end").last()
+        time_diff = date.today() - subscription.subscription_end
+        return subscription is not None and time_diff < timedelta(days=90)
 
     @classmethod
     def get_or_create(cls, user: User) -> Tuple[Customer, bool]:
@@ -151,12 +149,16 @@ class Customer(models.Model):
         super(Customer, self).save(*args, **kwargs)
 
     def recompute_amount(self):
-        self.amount = 0
-        for r in self.refillings.all():
-            self.amount += r.amount
-        for s in self.buyings.filter(payment_method="SITH_ACCOUNT"):
-            self.amount -= s.quantity * s.unit_price
-            self.save()
+        refillings = self.refillings.aggregate(sum=Sum(F("amount")))["sum"]
+        self.amount = refillings if refillings is not None else 0
+        purchases = (
+            self.buyings.filter(payment_method="SITH_ACCOUNT")
+            .annotate(amount=F("quantity") * F("unit_price"))
+            .aggregate(sum=Sum(F("amount")))
+        )["sum"]
+        if purchases is not None:
+            self.amount -= purchases
+        self.save()
 
     def get_absolute_url(self):
         return reverse("core:user_account", kwargs={"user_id": self.user.pk})
