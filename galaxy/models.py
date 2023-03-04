@@ -25,6 +25,7 @@
 import math
 import logging
 
+from typing import Tuple
 from django.db import models
 from django.db.models import Q, Case, F, Value, When, Count
 from django.db.models.functions import Concat
@@ -47,7 +48,7 @@ class GalaxyStar(models.Model):
 
     owner = models.OneToOneField(
         User,
-        verbose_name=_("galaxy user"),
+        verbose_name=_("star owner"),
         related_name="galaxy_user",
         on_delete=models.CASCADE,
     )
@@ -69,13 +70,13 @@ class GalaxyLane(models.Model):
 
     star1 = models.ForeignKey(
         GalaxyStar,
-        verbose_name=_("galaxy lanes 1"),
+        verbose_name=_("galaxy star 1"),
         related_name="lanes1",
         on_delete=models.CASCADE,
     )
     star2 = models.ForeignKey(
         GalaxyStar,
-        verbose_name=_("galaxy lanes 2"),
+        verbose_name=_("galaxy star 2"),
         related_name="lanes2",
         on_delete=models.CASCADE,
     )
@@ -120,7 +121,7 @@ class Galaxy(models.Model):
     state = models.JSONField("current state")
 
     @staticmethod
-    def make_state() -> GalaxyDict:
+    def make_state() -> None:
         """
         Compute JSON structure to send to 3d-force-graph: https://github.com/vasturiano/3d-force-graph/
         """
@@ -177,7 +178,7 @@ class Galaxy(models.Model):
     ###################
 
     @classmethod
-    def compute_user_score(cls, user):
+    def compute_user_score(cls, user) -> int:
         """
         This compute an individual score for each citizen. It will later be used by the graph algorithm to push
         higher scores towards the center of the galaxy.
@@ -202,7 +203,7 @@ class Galaxy(models.Model):
         return user_score
 
     @classmethod
-    def query_user_score(cls, user):
+    def query_user_score(cls, user) -> int:
         score_query = (
             User.objects.filter(id=user.id)
             .annotate(
@@ -229,7 +230,7 @@ class Galaxy(models.Model):
     ####################
 
     @classmethod
-    def compute_users_score(cls, user1, user2):
+    def compute_users_score(cls, user1, user2) -> Tuple[int, int, int, int]:
         family = cls.compute_users_family_score(user1, user2)
         pictures = cls.compute_users_pictures_score(user1, user2)
         clubs = cls.compute_users_clubs_score(user1, user2)
@@ -237,7 +238,7 @@ class Galaxy(models.Model):
         return score, family, pictures, clubs
 
     @classmethod
-    def compute_users_family_score(cls, user1, user2):
+    def compute_users_family_score(cls, user1, user2) -> int:
         link_count = User.objects.filter(
             Q(id=user1.id, godfathers=user2) | Q(id=user2.id, godfathers=user1)
         ).count()
@@ -248,7 +249,7 @@ class Galaxy(models.Model):
         return link_count * cls.FAMILY_LINK_POINTS
 
     @classmethod
-    def compute_users_pictures_score(cls, user1, user2):
+    def compute_users_pictures_score(cls, user1, user2) -> int:
         picture_count = (
             Picture.objects.filter(people__user__in=(user1,))
             .filter(people__user__in=(user2,))
@@ -261,7 +262,7 @@ class Galaxy(models.Model):
         return picture_count * cls.PICTURE_POINTS
 
     @classmethod
-    def compute_users_clubs_score(cls, user1, user2):
+    def compute_users_clubs_score(cls, user1, user2) -> int:
         common_clubs = Club.objects.filter(members__in=user1.memberships.all()).filter(
             members__in=user2.memberships.all()
         )
@@ -311,7 +312,7 @@ class Galaxy(models.Model):
     ###################
 
     @classmethod
-    def rule(cls):
+    def rule(cls) -> None:
         GalaxyStar.objects.all().delete()
         # The following is a no-op thanks to cascading, but in case that changes in the future, better keep it anyway.
         GalaxyLane.objects.all().delete()
@@ -357,7 +358,7 @@ class Galaxy(models.Model):
                     ).save()
 
     @classmethod
-    def scale_distance(cls, value):
+    def scale_distance(cls, value) -> int:
         # TODO: this will need adjustements with the real, typical data on Taiste
 
         cls.logger.debug(f"\t\t> Score: {value}")

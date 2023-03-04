@@ -23,9 +23,10 @@
 #
 
 from django.views.generic import DetailView, View
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.db.models import Q, Case, F, When, Value
 from django.db.models.functions import Concat
+from django.utils.translation import gettext_lazy as _
 
 from core.views import (
     CanViewMixin,
@@ -41,6 +42,12 @@ class GalaxyUserView(CanViewMixin, UserTabsMixin, DetailView):
     pk_url_kwarg = "user_id"
     template_name = "galaxy/user.jinja"
     current_tab = "galaxy"
+
+    def get_object(self, *args, **kwargs):
+        user: User = super(GalaxyUserView, self).get_object(*args, **kwargs)
+        if not hasattr(user, "galaxy_user"):
+            raise Http404(_("This citizen has not yet joined the galaxy"))
+        return user
 
     def get_queryset(self):
         return super(GalaxyUserView, self).get_queryset().select_related("galaxy_user")
