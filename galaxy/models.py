@@ -24,6 +24,7 @@
 
 import math
 import logging
+import time
 
 from typing import Tuple
 from django.db import models
@@ -313,9 +314,12 @@ class Galaxy(models.Model):
 
     @classmethod
     def rule(cls) -> None:
+        cls.logger.info("Eradicating previous Galaxy.")
         GalaxyStar.objects.all().delete()
         # The following is a no-op thanks to cascading, but in case that changes in the future, better keep it anyway.
         GalaxyLane.objects.all().delete()
+        cls.logger.info("Galaxy has been purged.")
+        cls.logger.info("Listing rulable citizen.")
         rulable_users = (
             User.objects.filter(subscriptions__isnull=False)
             .filter(
@@ -326,17 +330,34 @@ class Galaxy(models.Model):
             )
             .distinct()
         )
+
         # force fetch of the whole query to make sure there won't
         # be any more db hits
         # this is memory expensive but prevents a lot of db hits, therefore
         # is far more time efficient
+
         rulable_users = list(rulable_users)
+        rulable_users_count = len(rulable_users)
+        user1_count = 0
+        cls.logger.info(
+            f"{rulable_users_count} citizen have been listed. Starting to rule."
+        )
+
+        # Display current speed every $speed_count_frequency users
+        speed_count_frequency = 100
+        avg_speed = 0
+        avg_speed_count = 0
         while len(rulable_users) > 0:
             user1 = rulable_users.pop()
-            for user2 in rulable_users:
+            user1_count += 1
+            rulable_users_count2 = len(rulable_users)
+
+            tstart = time.time()
+            for user2_count, user2 in enumerate(rulable_users, start=1):
                 cls.logger.debug("")
-                cls.logger.debug(f"\t> Ruling '{user1}' against '{user2}'")
-                star1, _ = GalaxyStar.objects.get_or_create(owner=user1)
+                cls.logger.debug(
+                    f"\t> Examining '{user1}' ({user1_count}/{rulable_users_count}) with '{user2}' ({user2_count}/{rulable_users_count2})"
+                )
                 star2, _ = GalaxyStar.objects.get_or_create(owner=user2)
                 if star1.mass == 0:
                     star1.mass = cls.compute_user_score(user1)
@@ -356,6 +377,29 @@ class Galaxy(models.Model):
                         pictures=pictures,
                         clubs=clubs,
                     ).save()
+
+                if user2_count % speed_count_frequency == 0:
+                    tend = time.time()
+                    delta = tend - tstart
+                    speed = float(speed_count_frequency) / delta
+                    avg_speed += speed
+                    avg_speed_count += 1
+                    cls.logger.info("")
+                    cls.logger.info(
+                        f"\t> Ruling citizen {user1_count}/{rulable_users_count} against citizen {user2_count}/{rulable_users_count2}"
+                    )
+                    cls.logger.info(
+                        f"Speed: {speed:.2f} users per second (delta: {delta:.2f})"
+                    )
+                    eta = (rulable_users_count * rulable_users_count2) / speed / 3600
+                    cls.logger.info(
+                        "Estimated remaining time: {0:.2f} hours ({1:.2f} days)".format(
+                            eta, eta / 24
+                        )
+                    )
+                    tstart = time.time()
+        avg_speed /= avg_speed_count
+        cls.logger.info(f"Average speed: {avg_speed:.2f} users per second")
 
     @classmethod
     def scale_distance(cls, value) -> int:
