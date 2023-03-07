@@ -352,6 +352,11 @@ class Galaxy(models.Model):
             user1_count += 1
             rulable_users_count2 = len(rulable_users)
 
+            star1, _ = GalaxyStar.objects.get_or_create(owner=user1)
+            if star1.mass == 0:
+                star1.mass = cls.compute_user_score(user1)
+                star1.save()
+
             tstart = time.time()
             for user2_count, user2 in enumerate(rulable_users, start=1):
                 cls.logger.debug("")
@@ -359,12 +364,7 @@ class Galaxy(models.Model):
                     f"\t> Examining '{user1}' ({user1_count}/{rulable_users_count}) with '{user2}' ({user2_count}/{rulable_users_count2})"
                 )
                 star2, _ = GalaxyStar.objects.get_or_create(owner=user2)
-                if star1.mass == 0:
-                    star1.mass = cls.compute_user_score(user1)
-                    star1.save()
-                if star2.mass == 0:
-                    star2.mass = cls.compute_user_score(user2)
-                    star2.save()
+
                 users_score, family, pictures, clubs = cls.compute_users_score(
                     user1, user2
                 )
