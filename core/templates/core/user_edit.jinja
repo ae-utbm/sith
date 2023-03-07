@@ -18,7 +18,6 @@
 
     {# User Pictures #}
     <div class="profile-pictures">
-        {# <p>{%- trans -%}Current profile: {%- endtrans -%}</p> #}
         <div class="profile-picture">
             <div class="profile-picture-display">
 
@@ -124,17 +123,17 @@
     </div>
 
     {%- if form.instance == user -%}
-    <p align="center">
+    <p>
         <a href="{{ url('core:password_change') }}">{%- trans -%}Change my password{%- endtrans -%}</a>
     </p>
     {%- elif user.is_root -%}
-    <p align="center">
+    <p>
         <a href="{{ url('core:password_root_change', user_id=form.instance.id) }}">{%- trans -%}Change user password{%-
             endtrans -%}</a>
     </p>
     {%- endif -%}
 
-    <p align="center">
+    <p>
         <input type="submit" value="{%- trans -%}Update{%- endtrans -%}" />
     </p>
 </form>
@@ -153,7 +152,7 @@
 {{ super() }}
 {%- if not form.instance.profile_pict -%}
 <script src="{{ static('core/js/webcam.js') }}"></script>
-<script language="JavaScript">
+<script>
     Webcam.on('error', function (msg) { console.log('Webcam.js error: ' + msg) })
     Webcam.set({
         width: 320,
@@ -166,10 +165,10 @@
     });
     Webcam.attach('#camera_canvas');
     function take_snapshot() {
-        var data_uri = Webcam.snap();
-        var url = "{{ url('core:user_profile_upload', user_id=form.instance.id) }}";
+        const data_uri = Webcam.snap();
+        const url = "{{ url('core:user_profile_upload', user_id=form.instance.id) }}";
         Webcam.upload(data_uri, url, function (code, text) {
-            if (code == 302 || code == 200) {
+            if (code === 302 || code === 200) {
                 $('#new_profile').attr('src', data_uri);
                 $('#take_picture').remove();
                 $('#id_profile_pict').remove();
