@@ -22,6 +22,10 @@
 #
 #
 
+import json
+
+from pathlib import Path
+
 from django.test import TestCase
 from django.core.management import call_command
 
@@ -142,3 +146,18 @@ class GalaxyTest(TestCase):
         self.client.login(username="root", password="plop")
         response = self.client.get("/galaxy/2/")
         self.assertEquals(response.status_code, 404)
+
+    def test_full_galaxy_state(self):
+        Galaxy.rule()
+        Galaxy.make_state()
+        state = Galaxy.objects.first().state
+
+        galaxy_dir = Path(__file__).parent
+
+        # Dump computed state, either for easier debugging, or to copy as new reference if changes are legit
+        (galaxy_dir / "test_galaxy_state.json").write_text(json.dumps(state))
+
+        self.assertEqual(
+            state,
+            json.loads((galaxy_dir / "ref_galaxy_state.json").read_text()),
+        )

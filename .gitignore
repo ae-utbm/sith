@@ -11,6 +11,7 @@ dist/
 env/
 doc/html
 data/
+galaxy/test_galaxy_state.json
 /static/
 sith/settings_custom.py
 sith/search_indexes/
