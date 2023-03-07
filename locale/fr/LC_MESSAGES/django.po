@@ -5282,6 +5282,10 @@ msgstr "photo"
 msgid "SAS"
 msgstr "SAS"
 
+#: sas/templates/sas/album.jinja:102
+msgid "This album does not contain any photos."
+msgstr "Cet album ne contient aucune photo."
+
 #: sas/templates/sas/album.jinja:53 sas/templates/sas/album.jinja:55
 #: sas/templates/sas/main.jinja:13 sas/templates/sas/main.jinja:15
 #: sas/templates/sas/main.jinja:17

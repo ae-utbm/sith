@@ -69,7 +69,6 @@ class Picture(SithFile):
             im = Image.open(BytesIO(f.read()))
             (w, h) = im.size
             return (w / h) < 1
-        return False
 
     def can_be_edited_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
@@ -79,11 +78,16 @@ class Picture(SithFile):
         # Result is cached 4s for this user
         if user.is_anonymous:
             return False
+        
         perm = cache.get("%d_can_view_pictures" % (user.id), False)
-        if perm:
+        
+        # use cache only when user is in SAS Admins or when picture is moderated
+        if perm and (self.is_moderated or self.can_be_edited_by(user)):
             return perm
-        perm = self.is_in_sas and self.is_moderated and user.was_subscribed
+        
+        perm = self.is_in_sas and (self.is_moderated or self.can_be_edited_by(user)) and user.was_subscribed
         cache.set("%d_can_view_pictures" % (user.id), perm, timeout=4)
+        
         return perm
 
     def get_download_url(self):

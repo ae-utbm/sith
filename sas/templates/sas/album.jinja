@@ -58,10 +58,10 @@
         <h4>{% trans %}Albums{% endtrans %}</h4>
         <div class="albums">
             {% for a in album.children_albums.order_by('-date') %}
-                {% if user.can_view(a) %}
-                    <a href="{{ url("sas:album", album_id=a.id) }}">
+                {% if a.can_be_viewed_by(user) %}
+                    <a href="{{ url('sas:album', album_id=a.id) }}">
                         <div
-                            class="album {% if a.is_moderated %}moderated{% endif %}"
+                            class="album{% if not a.is_moderated %} not_moderated{% endif %}"
                             style="background-image: url('{% if a.file %}{{ a.get_download_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
                         >
                             <div>
@@ -69,7 +69,7 @@
                             </div>
                         </div>
                         {% if edit_mode %}
-                        <input type="checkbox" name="file_list" value="{{ a.id }}">
+                            <input type="checkbox" name="file_list" value="{{ a.id }}">
                         {% endif %}
                     </a>
                 {% endif %}
@@ -79,43 +79,51 @@
         <br>
     {% endif %}
 
-    <h4>{% trans %}Photos{% endtrans %}</h4>
+    <h4>{% trans %}Pictures{% endtrans %}</h4>
     {% if pictures | length != 0 %}
-        {% set max = (pictures | length // 6) if pictures | length > 6 else 1 %}
         <div class="photos">
             {% for p in pictures %}
-                <div class="photo{% if not p.is_moderated %} moderation{% endif %}">
-                    <a href="{{ url("sas:picture", picture_id=p.id) }}#pict" style="background-image: url('{{ p.get_download_thumb_url() }}')">
+                {% if p.can_be_viewed_by(user) %}
+                    <a href="{{ url('sas:picture', picture_id=p.id) }}#pict">
+                        <div
+                            class="photo{% if not p.is_moderated %} not_moderated{% endif %}" 
+                            style="background-image: url('{{ p.get_download_thumb_url() }}')"
+                        >
+                            <div>&nbsp;</div>
+                        </div>
                         {% if edit_mode %}
                             <input type="checkbox" name="file_list" value="{{ p.id }}">
                         {% endif %}
-                        &nbsp;
                     </a>
-                </div>
+                {% endif %}
             {% endfor %}
         </div>
     {% else %}
         {% trans %}This album does not contain any photos.{% endtrans %}
     {% endif %}
 
-    <div class="paginator">
-        {{ paginate(pictures, paginator) }}
-    </div>
+    {% if pictures.has_previous() or pictures.has_next() %}
+        <div class="paginator">
+            {{ paginate(pictures, paginator) }}
+        </div>
+    {% endif %}
 
     {% if edit_mode %}
         </form>
     {% endif %}
 
+    {% if edit_mode %}
+        <form class="add-files" id="upload_form" action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="inputs">
+                {{ form.as_p() }}
+
+                <input type="submit" value="{% trans %}Upload{% endtrans %}" />
+            </div>
+        </form>
+    {% endif %}
+
     <hr>
-
-    <form class="add-files" id="upload_form" action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="inputs">
-            {{ form.as_p() }}
-
-            <input type="submit" value="{% trans %}Upload{% endtrans %}" />
-        </div>
-    </form>
 
     <p style="font-size: small; color: #444;">{% trans %}Template generation time: {% endtrans %}
     {{ timezone.now() - start }}
@@ -123,23 +131,7 @@
 {% endblock %}
 
 {% block script %}
-{{ super() }}
-    <script defer>
-    function updateColumns() {
-        const fullWidth = $(".photos").width();
-        const nbColumns = Math.min(Math.floor((fullWidth / 100) - 1), 5);
-
-        const photoWidth = (fullWidth - (nbColumns - 1) * 5) / nbColumns;
-        const photoHeight = (photoWidth * (9/16));
-
-        $(".photo").css("width", photoWidth);
-        $(".photo").css("height", photoHeight);
-    }
-
-    $(window).resize(updateColumns);
-    updateColumns();
-    </script>
-
+    {{ super() }}
     <script>
     $("form#upload_form").submit(function (event) {
         let formData = new FormData($(this)[0]);
