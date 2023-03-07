@@ -1,0 +1,208 @@
+
+.navbar {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+
+  > a,
+  > input {
+    padding: 0.4em;
+    margin: 0.1em;
+    font-size: 1.2em;
+    line-height: 1.2em;
+    color: black;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+    font-weight: bold;
+
+    &:hover {
+      background-color: #d4d4d4;
+    }
+  }
+}
+
+.add-files {
+  display: flex;
+  flex-direction: column;
+
+  > .inputs {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    > p {
+      box-sizing: border-box;
+      max-width: calc(100% / 3);
+      width: 100%;
+
+      @media (max-width: 500px) {
+        max-width: 100%;
+      }
+
+      > input {
+        box-sizing: border-box;
+        max-width: 100%;
+        width: 100%;
+        height: 40px;
+        font-size: 16px;
+      }
+    }
+
+    > input {
+      height: 40px;
+      width: 100%;
+      max-width: calc(100% / 3);
+
+      @media (max-width: 500px) {
+        max-width: 100%;
+      }
+    }
+  }
+
+}
+
+.clipboard {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: rgba(0,0,0,.1);
+  border-radius: 10px;
+}
+
+.paginator {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  background-color: rgba(0,0,0,.1);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px 0 10px auto;
+}
+
+.photos {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+
+  > .photo {
+    background-color: rgba(0, 0, 0, .5);
+    border-radius: 5px;
+
+    > a {
+      display: block;
+      border-radius: 5px;
+
+      background-position: center center;
+      background-size: cover;
+      background-repeat: no-repeat;
+
+      box-sizing: border-box;
+      position: relative;
+      width: 100%;
+      height: 100%;
+
+      > input[type=checkbox] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 20px;
+        width: 20px;
+        margin: 5px;
+
+        cursor: pointer;
+      }
+
+      > img {
+        object-fit: contain;
+      }
+    }
+  }
+}
+
+.albums {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px;
+
+  > a {
+    box-sizing: border-box;
+    position: relative;
+
+    &:hover {
+      background: rgba(0, 0, 0, .5);
+    }
+
+    > input[type=checkbox] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 20px;
+      width: 20px;
+      margin: 5px;
+
+      cursor: pointer;
+    }
+
+    @media (max-width: 500px) {
+      width: 100%;
+    }
+
+    > .album {
+      border-radius: 5px;
+      border: none;
+
+      box-sizing: border-box;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+
+      width: calc(16 / 9 * 128px);
+      height: 128px;
+
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+
+      @media (max-width: 500px) {
+        width: 100%;
+      }
+
+      > div {
+        border-radius: 5px;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: flex-start;
+
+        padding: 10px;
+        color: white;
+
+        background: rgba(0, 0, 0, .3);
+        background: linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, 0) 100%);
+
+        &:hover {
+          background: rgba(0, 0, 0, .5);
+        }
+      }
+    }
+  }
+}
