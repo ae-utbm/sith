@@ -6325,3 +6325,11 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja:127
+msgid "Partnership Eurockéenes 2023"
+msgstr "Partenariat Eurockéenes 2023"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja:137
+msgid "You must be a contributor to access the Eurockéenes ticketing service."
+msgstr "Vous devez être cotisant pour pouvoir accéder à la billetterie des Eurockéenes."
