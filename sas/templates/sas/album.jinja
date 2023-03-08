@@ -37,7 +37,7 @@
                     <a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a>
                     <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}">
                     <input name="cut" type="submit" value="{% trans %}Cut{% endtrans %}">
-                    <input name="paste" type="submit" value="{% trans %}Paste{% endtrans %}">
+                    <input {% if not clipboard %}disabled{% endif %} name="paste" type="submit" value="{% trans %}Paste{% endtrans %}">
                 </div>
             </div>
 
@@ -112,7 +112,7 @@
         </form>
     {% endif %}
 
-    {% if edit_mode %}
+    {% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
         <form class="add-files" id="upload_form" action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="inputs">
