@@ -6331,5 +6331,5 @@ msgid "Partnership Eurockéennes 2023"
 msgstr "Partenariat Eurockéennes 2023"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja:137
-msgid "You must be a contributor to access the Eurockéennes ticketing service."
+msgid "You must be a subscriber to access the Eurockéennes ticketing service."
 msgstr "Vous devez être cotisant pour pouvoir accéder à la billetterie des Eurockéennes."
