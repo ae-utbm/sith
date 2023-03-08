@@ -11,6 +11,7 @@
 .toolbar {
   display: flex;
   align-items: flex-end;
+  flex-wrap: wrap;
   gap: 5px;
 
   > a,
