@@ -64,9 +64,12 @@
                             class="album{% if not a.is_moderated %} not_moderated{% endif %}"
                             style="background-image: url('{% if a.file %}{{ a.get_download_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
                         >
-                            <div>
-                                {{ a.name }}
-                            </div>
+                            {% if not a.is_moderated %}
+                                <div class="overlay">&nbsp;</div>
+                                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+                            {% else %}
+                                <div class="text">{{ a.name }}</div>
+                            {% endif %}
                         </div>
                         {% if edit_mode %}
                             <input type="checkbox" name="file_list" value="{{ a.id }}">
@@ -86,10 +89,15 @@
                 {% if p.can_be_viewed_by(user) %}
                     <a href="{{ url('sas:picture', picture_id=p.id) }}#pict">
                         <div
-                            class="photo{% if not p.is_moderated %} not_moderated{% endif %}" 
+                            class="photo"
                             style="background-image: url('{{ p.get_download_thumb_url() }}')"
                         >
-                            <div>&nbsp;</div>
+                            {% if not p.is_moderated %}
+                                <div class="overlay">&nbsp;</div>
+                                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+                            {% else %}
+                                <div class="text">&nbsp;</div>
+                            {% endif %}
                         </div>
                         {% if edit_mode %}
                             <input type="checkbox" name="file_list" value="{{ p.id }}">
@@ -188,7 +196,7 @@
         let imagePool = [];
 
         while(images.length > 0 && imagePool.length < poolSize) {
-            var image = images.shift();
+            let image = images.shift();
             imagePool.push(image);
             sendImage(image);
         }
@@ -210,20 +218,20 @@
                 .always(next.bind(undefined, image));
         }
 
-        function next(image, status, jqXHR) {
-            let index;
-            if(index = imagePool.indexOf(image) !== -1) {
-                imagePool.splice(index, 1);
-            }
-            let nextImage;
-            if(nextImage = images.shift()) {
-                imagePool.push(nextImage);
+        function next(image, _, __) {
+            let index = imagePool.indexOf(image);
+            let nextImage = images.shift();
 
+            if(index !== -1)
+                imagePool.splice(index, 1);
+
+            if(nextImage) {
+                imagePool.push(nextImage);
                 sendImage(nextImage);
             }
         }
 
-        function onSuccess(image, data, status, jqXHR) {
+        function onSuccess(image, data, _, __) {
             let errors = [];
 
             if ($(data.responseText).find('.errorlist.nonfield')[0])
@@ -234,7 +242,7 @@
 
             progress.value = ++completeCount / imagesCount;
             if(progress.value === 1 && errorList.children.length === 0)
-                document.location.reload(true)
+                document.location.reload()
         }
     });
     </script>

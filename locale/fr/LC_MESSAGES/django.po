@@ -2644,6 +2644,11 @@ msgstr "Coller"
 msgid "Clipboard: "
 msgstr "Presse-papier : "
 
+#: sas/templates/sas/album.jinja:69
+#: sas/templates/sas/album.jinja:97
+msgid "To be moderated"
+msgstr "A modérer"
+
 #: core/templates/core/file_detail.jinja:53
 msgid "Real name: "
 msgstr "Nom réel : "
