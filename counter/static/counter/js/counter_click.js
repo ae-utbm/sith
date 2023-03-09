@@ -45,7 +45,6 @@ $(function () {
     const code_field = $("#code_field");
 
     let quantity = "";
-    // let search = "";
     code_field.autocomplete({
         select: function (event, ui) {
             event.preventDefault();
