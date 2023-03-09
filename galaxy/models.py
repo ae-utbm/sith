@@ -26,7 +26,6 @@ import math
 import logging
 
 from typing import Tuple
-
 from django.db import models
 from django.db.models import Q, Case, F, Value, When, Count
 from django.db.models.functions import Concat

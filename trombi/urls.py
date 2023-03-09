@@ -23,67 +23,65 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path
 
 from trombi.views import *
 
 urlpatterns = [
-    re_path(r"^(?P<club_id>[0-9]+)/new$", TrombiCreateView.as_view(), name="create"),
-    re_path(
-        r"^(?P<trombi_id>[0-9]+)/export$", TrombiExportView.as_view(), name="export"
-    ),
-    re_path(r"^(?P<trombi_id>[0-9]+)/edit$", TrombiEditView.as_view(), name="edit"),
-    re_path(
-        r"^(?P<trombi_id>[0-9]+)/moderate_comments$",
+    path("<int:club_id>/new/", TrombiCreateView.as_view(), name="create"),
+    path("<int:trombi_id>/export/", TrombiExportView.as_view(), name="export"),
+    path("<int:trombi_id>/edit/", TrombiEditView.as_view(), name="edit"),
+    path(
+        "<int:trombi_id>/moderate_comments/",
         TrombiModerateCommentsView.as_view(),
         name="moderate_comments",
     ),
-    re_path(
-        r"^(?P<comment_id>[0-9]+)/moderate$",
+    path(
+        "<int:comment_id>/moderate/",
         TrombiModerateCommentView.as_view(),
         name="moderate_comment",
     ),
-    re_path(
-        r"^user/(?P<user_id>[0-9]+)/delete$",
+    path(
+        "user/<int:user_id>/delete/",
         TrombiDeleteUserView.as_view(),
         name="delete_user",
     ),
-    re_path(r"^(?P<trombi_id>[0-9]+)$", TrombiDetailView.as_view(), name="detail"),
-    re_path(
-        r"^(?P<user_id>[0-9]+)/new_comment$",
+    path("<int:trombi_id>/", TrombiDetailView.as_view(), name="detail"),
+    path(
+        "<int:user_id>/new_comment/",
         TrombiCommentCreateView.as_view(),
         name="new_comment",
     ),
-    re_path(
-        r"^(?P<user_id>[0-9]+)/profile$",
+    path(
+        "<int:user_id>/profile/",
         UserTrombiProfileView.as_view(),
         name="user_profile",
     ),
-    re_path(
-        r"^comment/(?P<comment_id>[0-9]+)/edit$",
+    path(
+        "comment/<int:comment_id>/edit/",
         TrombiCommentEditView.as_view(),
         name="edit_comment",
     ),
-    re_path(r"^tools$", UserTrombiToolsView.as_view(), name="user_tools"),
-    re_path(r"^profile$", UserTrombiEditProfileView.as_view(), name="profile"),
-    re_path(r"^pictures$", UserTrombiEditPicturesView.as_view(), name="pictures"),
-    re_path(
-        r"^reset_memberships$",
+    path("tools/", UserTrombiToolsView.as_view(), name="user_tools"),
+    path("profile/", UserTrombiEditProfileView.as_view(), name="profile"),
+    path("pictures/", UserTrombiEditPicturesView.as_view(), name="pictures"),
+    path(
+        "reset_memberships/",
         UserTrombiResetClubMembershipsView.as_view(),
         name="reset_memberships",
     ),
-    re_path(
-        r"^membership/(?P<membership_id>[0-9]+)/edit$",
+    path(
+        "membership/<int:membership_id>/edit/",
         UserTrombiEditMembershipView.as_view(),
         name="edit_membership",
     ),
-    re_path(
-        r"^membership/(?P<membership_id>[0-9]+)/delete$",
+    path(
+        "membership/<int:membership_id>/delete/",
         UserTrombiDeleteMembershipView.as_view(),
         name="delete_membership",
     ),
-    re_path(
-        r"^membership/(?P<user_id>[0-9]+)/create$",
+    path(
+        "membership/<int:user_id>/create/",
         UserTrombiAddMembershipView.as_view(),
         name="create_membership",
     ),

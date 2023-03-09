@@ -207,9 +207,7 @@ class UserTabsMixin(TabedViewMixin):
                 "name": _("Pictures"),
             },
         ]
-        if (
-            False and self.request.user.was_subscribed
-        ):  # TODO: display galaxy once it's ready
+        if settings.SITH_ENABLE_GALAXY and self.request.user.was_subscribed:
             tab_list.append(
                 {
                     "url": reverse("galaxy:user", kwargs={"user_id": user.id}),
@@ -330,16 +328,16 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
         return kwargs
 
 
-def DeleteUserGodfathers(request, user_id, godfather_id, is_father):
-    user = User.objects.get(id=user_id)
-    if (user == request.user) or request.user.is_root or request.user.is_board_member:
-        ud = get_object_or_404(User, id=godfather_id)
-        if is_father == "True":
-            user.godfathers.remove(ud)
-        else:
-            user.godchildren.remove(ud)
+def delete_user_godfather(request, user_id, godfather_id, is_father):
+    user_is_admin = request.user.is_root or request.user.is_board_member
+    if user_id != request.user.id and not user_is_admin:
+        raise PermissionDenied()
+    user = get_object_or_404(User, id=user_id)
+    to_remove = get_object_or_404(User, id=godfather_id)
+    if is_father:
+        user.godfathers.remove(to_remove)
     else:
-        raise PermissionDenied
+        user.godchildren.remove(to_remove)
     return redirect("core:user_godfathers", user_id=user_id)
 
 

@@ -291,6 +291,10 @@ SITH_URL = "my.url.git.an"
 SITH_NAME = "Sith website"
 SITH_TWITTER = "@ae_utbm"
 
+# Enable experimental features
+# Enable/Disable the galaxy button on user profile (urls stay activated)
+SITH_ENABLE_GALAXY = False
+
 # AE configuration
 # TODO: keep only that first setting, with the ID, and do the same for the other clubs
 SITH_MAIN_CLUB_ID = 1

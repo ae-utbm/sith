@@ -3070,7 +3070,7 @@ msgid "Eboutic invoices"
 msgstr "Facture eboutic"
 
 #: core/templates/core/user_account.jinja:57
-#: core/templates/core/user_tools.jinja:37 counter/views.py:795
+#: core/templates/core/user_tools.jinja:37 counter/views.py:787
 msgid "Etickets"
 msgstr "Etickets"
 
@@ -3381,7 +3381,7 @@ msgstr "Achats"
 msgid "Product top 10"
 msgstr "Top 10 produits"
 
-#: core/templates/core/user_stats.jinja:27 counter/forms.py:176
+#: core/templates/core/user_stats.jinja:27 counter/forms.py:168
 msgid "Product"
 msgstr "Produit"
 
@@ -3717,24 +3717,24 @@ msgstr "Galaxie"
 msgid "User already has a profile picture"
 msgstr "L'utilisateur a déjà une photo de profil"
 
-#: counter/app.py:31 counter/models.py:341 counter/models.py:750
-#: counter/models.py:786 launderette/models.py:41 stock/models.py:43
+#: counter/app.py:31 counter/models.py:340 counter/models.py:749
+#: counter/models.py:779 launderette/models.py:41 stock/models.py:43
 msgid "counter"
 msgstr "comptoir"
 
-#: counter/forms.py:38
+#: counter/forms.py:30
 msgid "This UID is invalid"
 msgstr "Cet UID est invalide"
 
-#: counter/forms.py:77
+#: counter/forms.py:69
 msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
-#: counter/forms.py:125
+#: counter/forms.py:117
 msgid "Parent product"
 msgstr "Produit parent"
 
-#: counter/forms.py:131
+#: counter/forms.py:123
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
@@ -3758,7 +3758,7 @@ msgstr "client"
 msgid "customers"
 msgstr "clients"
 
-#: counter/models.py:126 counter/views.py:317
+#: counter/models.py:126 counter/views.py:309
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
@@ -3774,133 +3774,133 @@ msgstr "Nom de famille"
 msgid "Address 1"
 msgstr "Adresse 1"
 
-#: counter/models.py:160
+#: counter/models.py:161
 msgid "Address 2"
 msgstr "Adresse 2"
 
-#: counter/models.py:161
+#: counter/models.py:163
 msgid "Zip code"
 msgstr "Code postal"
 
-#: counter/models.py:162
+#: counter/models.py:164
 msgid "City"
 msgstr "Ville"
 
-#: counter/models.py:163
+#: counter/models.py:165
 msgid "Country"
 msgstr "Pays"
 
-#: counter/models.py:206 counter/models.py:234
+#: counter/models.py:209 counter/models.py:237
 msgid "product type"
 msgstr "type du produit"
 
-#: counter/models.py:240
+#: counter/models.py:243
 msgid "purchase price"
 msgstr "prix d'achat"
 
-#: counter/models.py:241
+#: counter/models.py:244
 msgid "selling price"
 msgstr "prix de vente"
 
-#: counter/models.py:242
+#: counter/models.py:245
 msgid "special selling price"
 msgstr "prix de vente spécial"
 
-#: counter/models.py:244
+#: counter/models.py:247
 msgid "icon"
 msgstr "icône"
 
-#: counter/models.py:249
+#: counter/models.py:252
 msgid "limit age"
 msgstr "âge limite"
 
-#: counter/models.py:250
+#: counter/models.py:253
 msgid "tray price"
 msgstr "prix plateau"
 
-#: counter/models.py:254
+#: counter/models.py:257
 msgid "parent product"
 msgstr "produit parent"
 
-#: counter/models.py:260
+#: counter/models.py:263
 msgid "buying groups"
 msgstr "groupe d'achat"
 
-#: counter/models.py:262 election/models.py:52
+#: counter/models.py:265 election/models.py:52
 msgid "archived"
 msgstr "archivé"
 
-#: counter/models.py:265 counter/models.py:881
+#: counter/models.py:268 counter/models.py:874
 msgid "product"
 msgstr "produit"
 
-#: counter/models.py:322
+#: counter/models.py:321
 msgid "products"
 msgstr "produits"
 
-#: counter/models.py:325
+#: counter/models.py:324
 msgid "counter type"
 msgstr "type de comptoir"
 
-#: counter/models.py:327
+#: counter/models.py:326
 msgid "Bar"
 msgstr "Bar"
 
-#: counter/models.py:327
+#: counter/models.py:326
 msgid "Office"
 msgstr "Bureau"
 
-#: counter/models.py:330
+#: counter/models.py:329
 msgid "sellers"
 msgstr "vendeurs"
 
-#: counter/models.py:338 launderette/models.py:207
+#: counter/models.py:337 launderette/models.py:207
 msgid "token"
 msgstr "jeton"
 
-#: counter/models.py:493
+#: counter/models.py:492
 msgid "bank"
 msgstr "banque"
 
-#: counter/models.py:495 counter/models.py:585
+#: counter/models.py:494 counter/models.py:584
 msgid "is validated"
 msgstr "est validé"
 
-#: counter/models.py:498
+#: counter/models.py:497
 msgid "refilling"
 msgstr "rechargement"
 
-#: counter/models.py:562 eboutic/models.py:288
+#: counter/models.py:561 eboutic/models.py:292
 msgid "unit price"
 msgstr "prix unitaire"
 
-#: counter/models.py:563 counter/models.py:866 eboutic/models.py:289
+#: counter/models.py:562 counter/models.py:859 eboutic/models.py:293
 msgid "quantity"
 msgstr "quantité"
 
-#: counter/models.py:582
+#: counter/models.py:581
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: counter/models.py:582 sith/settings.py:383 sith/settings.py:388
-#: sith/settings.py:408
+#: counter/models.py:581 sith/settings.py:359 sith/settings.py:364
+#: sith/settings.py:384
 msgid "Credit card"
 msgstr "Carte bancaire"
 
-#: counter/models.py:588
+#: counter/models.py:587
 msgid "selling"
 msgstr "vente"
 
-#: counter/models.py:615
+#: counter/models.py:614
 msgid "Unknown event"
 msgstr "Événement inconnu"
 
-#: counter/models.py:616
+#: counter/models.py:615
 #, python-format
 msgid "Eticket bought for the event %(event)s"
 msgstr "Eticket acheté pour l'événement %(event)s"
 
-#: counter/models.py:618 counter/models.py:641
+#: counter/models.py:617 counter/models.py:640
 #, python-format
 msgid ""
 "You bought an eticket for the event %(event)s.\n"
@@ -3912,59 +3912,59 @@ msgstr ""
 "Vous pouvez également retrouver tous vos e-tickets sur votre page de compte "
 "%(url)s."
 
-#: counter/models.py:755
+#: counter/models.py:754
 msgid "last activity date"
 msgstr "dernière activité"
 
-#: counter/models.py:758
+#: counter/models.py:757
 msgid "permanency"
 msgstr "permanence"
 
-#: counter/models.py:791
+#: counter/models.py:784
 msgid "emptied"
 msgstr "coffre vidée"
 
-#: counter/models.py:794
+#: counter/models.py:787
 msgid "cash register summary"
 msgstr "relevé de caisse"
 
-#: counter/models.py:862
+#: counter/models.py:855
 msgid "cash summary"
 msgstr "relevé"
 
-#: counter/models.py:865
+#: counter/models.py:858
 msgid "value"
 msgstr "valeur"
 
-#: counter/models.py:867
+#: counter/models.py:860
 msgid "check"
 msgstr "chèque"
 
-#: counter/models.py:870
+#: counter/models.py:863
 msgid "cash register summary item"
 msgstr "élément de relevé de caisse"
 
-#: counter/models.py:885
+#: counter/models.py:878
 msgid "banner"
 msgstr "bannière"
 
-#: counter/models.py:887
+#: counter/models.py:880
 msgid "event date"
 msgstr "date de l'événement"
 
-#: counter/models.py:889
+#: counter/models.py:882
 msgid "event title"
 msgstr "titre de l'événement"
 
-#: counter/models.py:891
+#: counter/models.py:884
 msgid "secret"
 msgstr "secret"
 
-#: counter/models.py:947
+#: counter/models.py:940
 msgid "uid"
 msgstr "uid"
 
-#: counter/models.py:952
+#: counter/models.py:945
 msgid "student cards"
 msgstr "cartes étudiante"
 
@@ -4016,7 +4016,7 @@ msgstr "Liste des relevés de caisse"
 msgid "Theoric sums"
 msgstr "Sommes théoriques"
 
-#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:1073
+#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:1065
 msgid "Emptied"
 msgstr "Coffre vidé"
 
@@ -4074,11 +4074,11 @@ msgstr "Terminer"
 msgid "Refilling"
 msgstr "Rechargement"
 
-#: counter/templates/counter/counter_click.jinja:193 counter/views.py:586
+#: counter/templates/counter/counter_click.jinja:193 counter/views.py:578
 msgid "END"
 msgstr "FIN"
 
-#: counter/templates/counter/counter_click.jinja:193 counter/views.py:588
+#: counter/templates/counter/counter_click.jinja:193 counter/views.py:580
 msgid "CAN"
 msgstr "ANN"
 
@@ -4244,109 +4244,109 @@ msgstr "Temps"
 msgid "Top 100 barman %(counter_name)s (all semesters)"
 msgstr "Top 100 barman %(counter_name)s (tous les semestres)"
 
-#: counter/views.py:175
+#: counter/views.py:167
 msgid "Cash summary"
 msgstr "Relevé de caisse"
 
-#: counter/views.py:189
+#: counter/views.py:181
 msgid "Last operations"
 msgstr "Dernières opérations"
 
-#: counter/views.py:204
+#: counter/views.py:196
 msgid "Take items from stock"
 msgstr "Prendre des éléments du stock"
 
-#: counter/views.py:257
+#: counter/views.py:249
 msgid "Bad credentials"
 msgstr "Mauvais identifiants"
 
-#: counter/views.py:259
+#: counter/views.py:251
 msgid "User is not barman"
 msgstr "L'utilisateur n'est pas barman."
 
-#: counter/views.py:264
+#: counter/views.py:256
 msgid "Bad location, someone is already logged in somewhere else"
 msgstr "Mauvais comptoir, quelqu'un est déjà connecté ailleurs"
 
-#: counter/views.py:308
+#: counter/views.py:300
 msgid "Too young for that product"
 msgstr "Trop jeune pour ce produit"
 
-#: counter/views.py:311
+#: counter/views.py:303
 msgid "Not allowed for that product"
 msgstr "Non autorisé pour ce produit"
 
-#: counter/views.py:314
+#: counter/views.py:306
 msgid "No date of birth provided"
 msgstr "Pas de date de naissance renseignée"
 
-#: counter/views.py:611
+#: counter/views.py:603
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: counter/views.py:759
+#: counter/views.py:751
 msgid "Counter administration"
 msgstr "Administration des comptoirs"
 
-#: counter/views.py:761
+#: counter/views.py:753
 msgid "Stocks"
 msgstr "Stocks"
 
-#: counter/views.py:780
+#: counter/views.py:772
 msgid "Product types"
 msgstr "Types de produit"
 
-#: counter/views.py:1030
+#: counter/views.py:1022
 msgid "10 cents"
 msgstr "10 centimes"
 
-#: counter/views.py:1031
+#: counter/views.py:1023
 msgid "20 cents"
 msgstr "20 centimes"
 
-#: counter/views.py:1032
+#: counter/views.py:1024
 msgid "50 cents"
 msgstr "50 centimes"
 
-#: counter/views.py:1033
+#: counter/views.py:1025
 msgid "1 euro"
 msgstr "1 €"
 
-#: counter/views.py:1034
+#: counter/views.py:1026
 msgid "2 euros"
 msgstr "2 €"
 
-#: counter/views.py:1035
+#: counter/views.py:1027
 msgid "5 euros"
 msgstr "5 €"
 
-#: counter/views.py:1036
+#: counter/views.py:1028
 msgid "10 euros"
 msgstr "10 €"
 
-#: counter/views.py:1037
+#: counter/views.py:1029
 msgid "20 euros"
 msgstr "20 €"
 
-#: counter/views.py:1038
+#: counter/views.py:1030
 msgid "50 euros"
 msgstr "50 €"
 
-#: counter/views.py:1040
+#: counter/views.py:1032
 msgid "100 euros"
 msgstr "100 €"
 
-#: counter/views.py:1043 counter/views.py:1049 counter/views.py:1055
-#: counter/views.py:1061 counter/views.py:1067
+#: counter/views.py:1035 counter/views.py:1041 counter/views.py:1047
+#: counter/views.py:1053 counter/views.py:1059
 msgid "Check amount"
 msgstr "Montant du chèque"
 
-#: counter/views.py:1046 counter/views.py:1052 counter/views.py:1058
-#: counter/views.py:1064 counter/views.py:1070
+#: counter/views.py:1038 counter/views.py:1044 counter/views.py:1050
+#: counter/views.py:1056 counter/views.py:1062
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
-#: counter/views.py:1684
+#: counter/views.py:1676
 msgid "people(s)"
 msgstr "personne(s)"
 
@@ -4371,37 +4371,37 @@ msgstr "Votre panier est vide"
 msgid "%(name)s : this product does not exist."
 msgstr "%(name)s : ce produit n'existe pas."
 
-#: eboutic/forms.py:150
+#: eboutic/forms.py:134
 #, python-format
 msgid "%(name)s : this product does not exist or may no longer be available."
 msgstr "%(name)s : ce produit n'existe pas ou n'est peut-être plus disponible."
 
-#: eboutic/forms.py:157
+#: eboutic/forms.py:141
 #, python-format
 msgid "You cannot buy %(nbr)d %(name)s."
 msgstr "Vous ne pouvez pas acheter %(nbr)d %(name)s."
 
-#: eboutic/models.py:237
+#: eboutic/models.py:241
 msgid "validated"
 msgstr "validé"
 
-#: eboutic/models.py:247
+#: eboutic/models.py:251
 msgid "Invoice already validated"
 msgstr "Facture déjà validée"
 
-#: eboutic/models.py:285
+#: eboutic/models.py:289
 msgid "product id"
 msgstr "ID du produit"
 
-#: eboutic/models.py:286
+#: eboutic/models.py:290
 msgid "product name"
 msgstr "nom du produit"
 
-#: eboutic/models.py:287
+#: eboutic/models.py:291
 msgid "product type id"
 msgstr "id du type du produit"
 
-#: eboutic/models.py:304
+#: eboutic/models.py:308
 msgid "basket"
 msgstr "panier"
 
@@ -4467,18 +4467,18 @@ msgstr ""
 "Vous devez renseigner vos coordonnées de facturation si vous voulez payer "
 "par carte bancaire"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:111
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:112
 msgid "Pay with credit card"
 msgstr "Payer avec une carte bancaire"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:115
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:116
 msgid ""
 "AE account payment disabled because your basket contains refilling items."
 msgstr ""
 "Paiement par compte AE désactivé parce que votre panier contient des bons de "
 "rechargement."
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:120
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:121
 msgid "Pay with Sith account"
 msgstr "Payer avec un compte AE"
 

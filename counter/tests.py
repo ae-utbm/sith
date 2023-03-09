@@ -23,6 +23,7 @@
 #
 import json
 import re
+import string
 
 from django.test import TestCase
 from django.urls import reverse
@@ -42,7 +43,7 @@ class CounterTest(TestCase):
         self.foyer = Counter.objects.get(id=2)
 
     def test_full_click(self):
-        response = self.client.post(
+        self.client.post(
             reverse("counter:login", kwargs={"counter_id": self.mde.id}),
             {"username": self.skia.username, "password": "plop"},
         )
@@ -62,13 +63,12 @@ class CounterTest(TestCase):
             reverse("counter:details", kwargs={"counter_id": self.mde.id}),
             {"code": "4000k", "counter_token": counter_token},
         )
-        location = response.get("location")
-
+        counter_url = response.get("location")
         response = self.client.get(response.get("location"))
         self.assertTrue(">Richard Batsbak</" in str(response.content))
 
         self.client.post(
-            location,
+            counter_url,
             {
                 "action": "refill",
                 "amount": "5",
@@ -76,17 +76,27 @@ class CounterTest(TestCase):
                 "bank": "OTHER",
             },
         )
-        self.client.post(location, {"action": "code", "code": "BARB"})
-        self.client.post(location, {"action": "add_product", "product_id": "4"})
-        self.client.post(location, {"action": "del_product", "product_id": "4"})
-        self.client.post(location, {"action": "code", "code": "2xdeco"})
-        self.client.post(location, {"action": "code", "code": "1xbarb"})
-        response = self.client.post(location, {"action": "code", "code": "fin"})
+        self.client.post(counter_url, "action=code&code=BARB", content_type="text/xml")
+        self.client.post(
+            counter_url, "action=add_product&product_id=4", content_type="text/xml"
+        )
+        self.client.post(
+            counter_url, "action=del_product&product_id=4", content_type="text/xml"
+        )
+        self.client.post(
+            counter_url, "action=code&code=2xdeco", content_type="text/xml"
+        )
+        self.client.post(
+            counter_url, "action=code&code=1xbarb", content_type="text/xml"
+        )
+        response = self.client.post(
+            counter_url, "action=code&code=fin", content_type="text/xml"
+        )
 
         response_get = self.client.get(response.get("location"))
         response_content = response_get.content.decode("utf-8")
-        self.assertTrue("<li>2 x Barbar" in str(response_content))
-        self.assertTrue("<li>2 x Déconsigne Eco-cup" in str(response_content))
+        self.assertTrue("2 x Barbar" in str(response_content))
+        self.assertTrue("2 x Déconsigne Eco-cup" in str(response_content))
         self.assertTrue(
             "<p>Client : Richard Batsbak - Nouveau montant : 3.60"
             in str(response_content)
@@ -98,7 +108,7 @@ class CounterTest(TestCase):
         )
 
         response = self.client.post(
-            location,
+            counter_url,
             {
                 "action": "refill",
                 "amount": "5",
@@ -108,7 +118,7 @@ class CounterTest(TestCase):
         )
         self.assertTrue(response.status_code == 200)
 
-        response = self.client.post(
+        self.client.post(
             reverse("counter:login", kwargs={"counter_id": self.foyer.id}),
             {"username": self.krophil.username, "password": "plop"},
         )
@@ -125,10 +135,10 @@ class CounterTest(TestCase):
             reverse("counter:details", kwargs={"counter_id": self.foyer.id}),
             {"code": "4000k", "counter_token": counter_token},
         )
-        location = response.get("location")
+        counter_url = response.get("location")
 
         response = self.client.post(
-            location,
+            counter_url,
             {
                 "action": "refill",
                 "amount": "5",
@@ -138,13 +148,27 @@ class CounterTest(TestCase):
         )
         self.assertTrue(response.status_code == 200)
 
+    def test_annotate_has_barman_queryset(self):
+        """
+        Test if the custom queryset method ``annotate_has_barman``
+        works as intended
+        """
+        self.sli.counters.clear()
+        self.sli.counters.add(self.foyer, self.mde)
+        counters = Counter.objects.annotate_has_barman(self.sli)
+        for counter in counters:
+            if counter.name in ("Foyer", "MDE"):
+                self.assertTrue(counter.has_annotated_barman)
+            else:
+                self.assertFalse(counter.has_annotated_barman)
+
 
 class CounterStatsTest(TestCase):
     def setUp(self):
         call_command("populate")
         self.counter = Counter.objects.filter(id=2).first()
 
-    def test_unothorized_user_fail(self):
+    def test_unauthorised_user_fail(self):
         # Test with not login user
         response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
         self.assertTrue(response.status_code == 403)
@@ -745,18 +769,30 @@ class StudentCardTest(TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-class AccountIdTest(TestCase):
+class CustomerAccountIdTest(TestCase):
     def setUp(self):
-        user_a = User.objects.create(username="a", password="plop", email="a.a@a.fr")
+        self.user_a = User.objects.create(
+            username="a", password="plop", email="a.a@a.fr"
+        )
         user_b = User.objects.create(username="b", password="plop", email="b.b@b.fr")
         user_c = User.objects.create(username="c", password="plop", email="c.c@c.fr")
-        Customer.objects.create(user=user_a, amount=0, account_id="1111a")
+        Customer.objects.create(user=self.user_a, amount=10, account_id="1111a")
         Customer.objects.create(user=user_b, amount=0, account_id="9999z")
         Customer.objects.create(user=user_c, amount=0, account_id="12345f")
 
     def test_create_customer(self):
         user_d = User.objects.create(username="d", password="plop")
-        customer_d = Customer.new_for_user(user_d)
-        customer_d.save()
-        number = customer_d.account_id[:-1]
+        customer, created = Customer.get_or_create(user_d)
+        account_id = customer.account_id
+        number = account_id[:-1]
+        self.assertTrue(created)
         self.assertEqual(number, "12346")
+        self.assertEqual(6, len(account_id))
+        self.assertIn(account_id[-1], string.ascii_lowercase)
+        self.assertEqual(0, customer.amount)
+
+    def test_get_existing_account(self):
+        account, created = Customer.get_or_create(self.user_a)
+        self.assertFalse(created)
+        self.assertEqual(account.account_id, "1111a")
+        self.assertEqual(10, account.amount)

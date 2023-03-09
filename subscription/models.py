@@ -24,7 +24,6 @@
 
 from datetime import date, timedelta
 from django.db import models
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -101,8 +100,8 @@ class Subscription(models.Model):
         super(Subscription, self).save()
         from counter.models import Customer
 
-        if not Customer.objects.filter(user=self.member).exists():
-            Customer.new_for_user(self.member).save()
+        _, created = Customer.get_or_create(self.member)
+        if created:
             form = PasswordResetForm({"email": self.member.email})
             if form.is_valid():
                 form.save(
@@ -166,7 +165,4 @@ class Subscription(models.Model):
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
 
     def is_valid_now(self):
-        return (
-            self.subscription_start <= date.today()
-            and date.today() <= self.subscription_end
-        )
+        return self.subscription_start <= date.today() <= self.subscription_end

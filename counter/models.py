@@ -21,8 +21,13 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from __future__ import annotations
+from django.db.models import Sum, F
+
+from typing import Tuple
 
 from django.db import models
+from django.db.models import OuterRef, Exists
 from django.db.models.functions import Length
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -57,7 +62,7 @@ class Customer(models.Model):
 
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     account_id = models.CharField(_("account id"), max_length=10, unique=True)
-    amount = CurrencyField(_("amount"))
+    amount = CurrencyField(_("amount"), default=0)
     recorded_products = models.IntegerField(_("recorded product"), default=0)
 
     class Meta:
@@ -86,20 +91,32 @@ class Customer(models.Model):
         about the relation between a User (not a Customer,
         don't mix them) and a Product.
         """
-        return self.user.subscriptions.last() and (
-            date.today()
-            - self.user.subscriptions.order_by("subscription_end")
-            .last()
-            .subscription_end
-        ) < timedelta(days=90)
+        subscription = self.user.subscriptions.order_by("subscription_end").last()
+        time_diff = date.today() - subscription.subscription_end
+        return subscription is not None and time_diff < timedelta(days=90)
 
     @classmethod
-    def new_for_user(cls, user: User):
+    def get_or_create(cls, user: User) -> Tuple[Customer, bool]:
         """
-        Create a new Customer instance for the user given in parameter without saving it
-        The account if is automatically generated and the amount set at 0
+        Work in pretty much the same way as the usual get_or_create method,
+        but with the default field replaced by some under the hood.
+
+        If the user has an account, return it as is.
+        Else create a new account with no money on it and a new unique account id
+
+        Example : ::
+
+            user = User.objects.get(pk=1)
+            account, created = Customer.get_or_create(user)
+            if created:
+                print(f"created a new account with id {account.id}")
+            else:
+                print(f"user has already an account, with {account.id} € on it"
         """
-        # account_id are number with a letter appended
+        if hasattr(user, "customer"):
+            return user.customer, False
+
+        # account_id are always a number with a letter appended
         account_id = (
             Customer.objects.order_by(Length("account_id"), "account_id")
             .values("account_id")
@@ -107,14 +124,19 @@ class Customer(models.Model):
         )
         if account_id is None:
             # legacy from the old site
-            return cls(user=user, account_id="1504a", amount=0)
-        account_id = account_id["account_id"]
-        num = int(account_id[:-1])
-        while Customer.objects.filter(account_id=account_id).exists():
-            num += 1
-            account_id = str(num) + random.choice(string.ascii_lowercase)
+            account = cls.objects.create(user=user, account_id="1504a")
+            return account, True
 
-        return cls(user=user, account_id=account_id, amount=0)
+        account_id = account_id["account_id"]
+        account_num = int(account_id[:-1])
+        while Customer.objects.filter(account_id=account_id).exists():
+            # when entering the first iteration, we are using an already existing account id
+            # so the loop should always execute at least one time
+            account_num += 1
+            account_id = f"{account_num}{random.choice(string.ascii_lowercase)}"
+
+        account = cls.objects.create(user=user, account_id=account_id)
+        return account, True
 
     def save(self, allow_negative=False, is_selling=False, *args, **kwargs):
         """
@@ -127,12 +149,16 @@ class Customer(models.Model):
         super(Customer, self).save(*args, **kwargs)
 
     def recompute_amount(self):
-        self.amount = 0
-        for r in self.refillings.all():
-            self.amount += r.amount
-        for s in self.buyings.filter(payment_method="SITH_ACCOUNT"):
-            self.amount -= s.quantity * s.unit_price
-            self.save()
+        refillings = self.refillings.aggregate(sum=Sum(F("amount")))["sum"]
+        self.amount = refillings if refillings is not None else 0
+        purchases = (
+            self.buyings.filter(payment_method="SITH_ACCOUNT")
+            .annotate(amount=F("quantity") * F("unit_price"))
+            .aggregate(sum=Sum(F("amount")))
+        )["sum"]
+        if purchases is not None:
+            self.amount -= purchases
+        self.save()
 
     def get_absolute_url(self):
         return reverse("core:user_account", kwargs={"user_id": self.user.pk})
@@ -313,6 +339,32 @@ class Product(models.Model):
         return "%s (%s)" % (self.name, self.code)
 
 
+class CounterQuerySet(models.QuerySet):
+    def annotate_has_barman(self, user: User) -> CounterQuerySet:
+        """
+        Annotate the queryset with the `user_is_barman` field.
+        For each counter, this field has value True if the user
+        is a barman of this counter, else False.
+
+        :param user: the user we want to check if he is a barman
+
+        Example::
+
+            sli = User.objects.get(username="sli")
+            counters = (
+                Counter.objects
+                .annotate_has_barman(sli)  # add the user_has_barman boolean field
+                .filter(has_annotated_barman=True)  # keep only counters where this user is barman
+            )
+            print("Sli est barman dans les comptoirs suivants :")
+            for counter in counters:
+                print(f"- {counter.name}")
+        """
+        subquery = user.counters.filter(pk=OuterRef("pk"))
+        # noinspection PyTypeChecker
+        return self.annotate(has_annotated_barman=Exists(subquery))
+
+
 class Counter(models.Model):
     name = models.CharField(_("name"), max_length=30)
     club = models.ForeignKey(
@@ -336,6 +388,8 @@ class Counter(models.Model):
         Group, related_name="viewable_counters", blank=True
     )
     token = models.CharField(_("token"), max_length=30, null=True, blank=True)
+
+    objects = CounterQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("counter")
@@ -451,11 +505,11 @@ class Counter(models.Model):
         Show if the counter authorize the refilling with physic money
         """
 
-        if (
-            self.id in SITH_COUNTER_OFFICES
-        ):  # If the counter is the counters 'AE' or 'BdF', the refiling are authorized
+        if self.type != "BAR":
+            return False
+        if self.id in SITH_COUNTER_OFFICES:
+            # If the counter is either 'AE' or 'BdF', refills are authorized
             return True
-
         is_ae_member = False
         ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
         for barman in self.get_barmen_list():

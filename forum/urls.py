@@ -22,69 +22,62 @@
 #
 #
 
-from django.urls import re_path
+from django.urls import path
 
 from forum.views import *
 
-
 urlpatterns = [
-    re_path(r"^$", ForumMainView.as_view(), name="main"),
-    re_path(r"^search/$", ForumSearchView.as_view(), name="search"),
-    re_path(r"^new_forum$", ForumCreateView.as_view(), name="new_forum"),
-    re_path(
-        r"^mark_all_as_read$", ForumMarkAllAsRead.as_view(), name="mark_all_as_read"
-    ),
-    re_path(r"^last_unread$", ForumLastUnread.as_view(), name="last_unread"),
-    re_path(
-        r"^favorite_topics$", ForumFavoriteTopics.as_view(), name="favorite_topics"
-    ),
-    re_path(r"^(?P<forum_id>[0-9]+)$", ForumDetailView.as_view(), name="view_forum"),
-    re_path(r"^(?P<forum_id>[0-9]+)/edit$", ForumEditView.as_view(), name="edit_forum"),
-    re_path(
-        r"^(?P<forum_id>[0-9]+)/delete$", ForumDeleteView.as_view(), name="delete_forum"
-    ),
-    re_path(
-        r"^(?P<forum_id>[0-9]+)/new_topic$",
+    path("", ForumMainView.as_view(), name="main"),
+    path("search/", ForumSearchView.as_view(), name="search"),
+    path("new_forum/", ForumCreateView.as_view(), name="new_forum"),
+    path("mark_all_as_read/", ForumMarkAllAsRead.as_view(), name="mark_all_as_read"),
+    path("last_unread/", ForumLastUnread.as_view(), name="last_unread"),
+    path("favorite_topics/", ForumFavoriteTopics.as_view(), name="favorite_topics"),
+    path("<int:forum_id>/", ForumDetailView.as_view(), name="view_forum"),
+    path("<int:forum_id>/edit/", ForumEditView.as_view(), name="edit_forum"),
+    path("<int:forum_id>/delete/", ForumDeleteView.as_view(), name="delete_forum"),
+    path(
+        "<int:forum_id>/new_topic/",
         ForumTopicCreateView.as_view(),
         name="new_topic",
     ),
-    re_path(
-        r"^topic/(?P<topic_id>[0-9]+)$",
+    path(
+        "topic/<int:topic_id>/",
         ForumTopicDetailView.as_view(),
         name="view_topic",
     ),
-    re_path(
-        r"^topic/(?P<topic_id>[0-9]+)/edit$",
+    path(
+        "topic/<int:topic_id>/edit/",
         ForumTopicEditView.as_view(),
         name="edit_topic",
     ),
-    re_path(
-        r"^topic/(?P<topic_id>[0-9]+)/new_message$",
+    path(
+        "topic/<int:topic_id>/new_message/",
         ForumMessageCreateView.as_view(),
         name="new_message",
     ),
-    re_path(
-        r"^topic/(?P<topic_id>[0-9]+)/toggle_subscribe$",
+    path(
+        "topic/<int:topic_id>/toggle_subscribe/",
         ForumTopicSubscribeView.as_view(),
         name="toggle_subscribe_topic",
     ),
-    re_path(
-        r"^message/(?P<message_id>[0-9]+)$",
+    path(
+        "message/<int:message_id>/",
         ForumMessageView.as_view(),
         name="view_message",
     ),
-    re_path(
-        r"^message/(?P<message_id>[0-9]+)/edit$",
+    path(
+        "message/<int:message_id>/edit/",
         ForumMessageEditView.as_view(),
         name="edit_message",
     ),
-    re_path(
-        r"^message/(?P<message_id>[0-9]+)/delete$",
+    path(
+        "message/<int:message_id>/delete/",
         ForumMessageDeleteView.as_view(),
         name="delete_message",
     ),
-    re_path(
-        r"^message/(?P<message_id>[0-9]+)/undelete$",
+    path(
+        "message/<int:message_id>/undelete/",
         ForumMessageUndeleteView.as_view(),
         name="undelete_message",
     ),
