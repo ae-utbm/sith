@@ -45,7 +45,6 @@ $(function () {
     const code_field = $("#code_field");
 
     let quantity = "";
-    let search = "";
     code_field.autocomplete({
         select: function (event, ui) {
             event.preventDefault();
@@ -56,13 +55,13 @@ $(function () {
             code_field.val(quantity + ui.item.value);
         },
         source: function (request, response) {
-            // by the dark magic of JS, parseInt("123abc") === 123
-            quantity = parseInt(request.term);
-            search = request.term.slice(quantity.toString().length)
-            let matcher = new RegExp($.ui.autocomplete.escapeRegex(search), "i");
-            response($.grep(products_autocomplete, function (value) {
+            const res = /^(\d+x)?(.*)/i.exec(request.term);
+            quantity = res[1] || "";
+            const search = res[2];
+            const matcher = new RegExp($.ui.autocomplete.escapeRegex(search), "i" );
+            response($.grep(products_autocomplete, function(value) {
                 value = value.tags;
-                return matcher.test(value);
+                return matcher.test( value );
             }));
         },
     });
