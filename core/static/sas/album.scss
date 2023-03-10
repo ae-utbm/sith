@@ -118,6 +118,12 @@
   flex-wrap: wrap;
   gap: 5px;
 
+  > div {
+    background: rgba(0, 0, 0, .5);
+    cursor: not-allowed;
+  }
+
+  > div,
   > a {
     box-sizing: border-box;
     position: relative;

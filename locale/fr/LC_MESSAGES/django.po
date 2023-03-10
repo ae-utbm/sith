@@ -3332,6 +3332,10 @@ msgstr "Télécharger toutes mes photos"
 msgid "Error downloading your pictures"
 msgstr "Erreur de téléchargement de vos photos"
 
+#: core/templates/core/user_picture.jinja:
+msgid "Picture Unavailable"
+msgstr "Photo Indisponible"
+
 #: core/templates/core/user_preferences.jinja:4
 #: core/templates/core/user_preferences.jinja:8 core/views/user.py:238
 msgid "Preferences"
