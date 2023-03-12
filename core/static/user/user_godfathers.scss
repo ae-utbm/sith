@@ -1,0 +1,104 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+
+  > form {
+    margin: 0;
+  }
+}
+
+.users {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  list-style-type: none;
+  margin: 0;
+  gap: 10px
+}
+
+.users-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 150px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, .05);
+  border-radius: 10px;
+
+  @media (max-width: 375px) {
+    width: 100%;
+  }
+
+  // Django moment
+  > div.mini_profile_link {
+    position: relative;
+
+    > a {
+      &.mini_profile_link {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+
+        @media (max-width: 375px) {
+          flex-direction: row;
+          justify-content: flex-start;
+          align-items: flex-start;
+        }
+    
+        > span {
+          height: 150px;
+          width: 100%;
+
+          @media (max-width: 375px) {
+            height: 80px;
+            width: 80px;
+          }
+
+          > img {
+            width: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            height: auto;
+            object-fit: contain;
+        
+            @media (max-width: 375px) {
+              max-width: 100%;
+              max-height: 80px;
+            }
+          }
+        }
+    
+        >em {
+          text-align: center;
+
+          @media (max-width: 375px) {
+            margin-top: 10px;
+          }
+        }
+      }
+
+      &:last-of-type {
+        margin-top: 10px;
+        display: block;
+        text-align: center;
+        color: orangered;
+
+        @media (max-width: 375px) {
+          position: absolute;
+          bottom: 0%;
+          right: 0;
+        }
+      }
+    }
+  }
+
+  // Django moment
+  > a.mini_profile_link {
+    display: none;
+  }
+}
