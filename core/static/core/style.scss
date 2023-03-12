@@ -353,6 +353,12 @@ header {
   flex-wrap: wrap;
   width: 90%;
   margin: 1em auto;
+
+  @media (max-width: 500px) {
+    margin: 0;
+    width: 100%;
+  }
+
   #alert_box,
   #info_box {
     flex: 49%;
