@@ -1717,6 +1717,7 @@ footer {
     border-radius: 5px;
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     background-color: $primary-neutral-dark-color;
     box-shadow: $shadow-color 0 0 15px;
     a {
