@@ -1,35 +1,65 @@
 {% extends "core/base.jinja" %}
 
+{%- block additional_css -%}
+    <link rel="stylesheet" href="{{ scss('core/override.scss') }}">
+    <link rel="stylesheet" href="{{ scss('user/login.scss') }}">
+{%- endblock -%}
+
 {% block title %}
-{% trans %}Login{% endtrans %}
+    {% trans %}Login{% endtrans %}
 {% endblock %}
 
 {% block content %}
 
-{% if form.errors %}
-<p>{% trans %}Your username and password didn't match. Please try again.{% endtrans %}</p>
-{% endif %}
 
-{% if next %}
-    {% if user.is_authenticated %}
-    <p>{% trans %}Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.{% endtrans %}</p>
-    {% else %}
-    <p>{% trans %}Please login or create an account to see this page.{% endtrans %}</p>
+    {% if next %}
+        {% if user.is_authenticated %}
+        <p>{% trans %}Your account doesn't have access to this page. To proceed,
+        please login with an account that has access.{% endtrans %}</p>
+        {% else %}
+        <p>{% trans %}Please login or create an account to see this page.{% endtrans %}</p>
+        {% endif %}
     {% endif %}
-{% endif %}
 
-<form method="post" action="{{ url('core:login') }}">
-{% csrf_token %}
-<p>{{ form.username.errors }}<label for="{{ form.username.name }}">{{ form.username.label }}
-</label><input id="id_username" maxlength="254" name="username" type="text" autofocus="autofocus" /></p>
-<p>{{ form.password.errors }}<label for="{{ form.password.name }}">{{ form.password.label }}</label>{{ form.password }}</p>
-<input type="hidden" name="next" value="{{ next }}">
-<p><input type="submit" value="{% trans %}login{% endtrans %}"></p>
-</form>
+    <form method="post" action="{{ url('core:login') }}">
+        {% if form.errors %}
+            <p class="danger">{% trans %}Your username and password didn't match. Please try again.{% endtrans %}</p>
+            <br>
+        {% endif %}
 
-{# Assumes you setup the password_reset view in your URLconf #}
-<p><a href="{{ url('core:password_reset') }}">{% trans %}Lost password?{% endtrans %}</a></p>
-<p><a href="{{ url('core:register') }}">{% trans %}Create account{% endtrans %}</a></p>
+        {% csrf_token %}
 
+        <div>
+            <label for="{{ form.username.name }}">{{ form.username.label }}</label>
+            <input id="id_username" maxlength="254" name="username" type="text" autofocus="autofocus" />
+            {{ form.username.errors }}
+        </div>
+
+        <div>
+            <label for="{{ form.password.name }}">{{ form.password.label }}</label>
+            {{ form.password }}
+            {{ form.password.errors }}
+        </div>
+
+        <input type="hidden" name="next" value="{{ next }}">
+        <input type="submit" value="{% trans %}Login{% endtrans %}">
+
+
+        {# Assumes you setup the password_reset view in your URLconf #}
+        <p>
+            <a href="{{ url('core:password_reset') }}">{% trans %}Lost password?{% endtrans %}</a>
+            &nbsp;&nbsp;
+            <a href="{{ url('core:register') }}">{% trans %}Create account{% endtrans %}</a>
+        </p>
+    </form>
+{% endblock %}
+
+{% block additional_js %}
+    <script defer>
+    $(() => {
+        $("#info_boxes").remove();
+        $("#page > nav").remove();
+        $("#quick_notif").remove();
+    })
+    </script>
 {% endblock %}

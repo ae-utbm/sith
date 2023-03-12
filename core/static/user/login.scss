@@ -1,0 +1,78 @@
+html,
+body {
+  box-sizing: border-box;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#quick_notif,
+#info_boxes,
+#page > nav {
+  display: none !important;
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+  padding: 10px !important;
+  box-shadow: none !important;
+  background-color: white !important;
+  margin: 0;
+
+  > div,
+  > form {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 500px;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+
+      > label {
+        width: 100%;
+
+        @media (min-width: 500px) {
+          width: 300px;
+        }
+      }
+    }
+
+    > input,
+    > div > input {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 500px;
+
+      @media (min-width: 500px) {
+        max-width: 300px;
+      }
+    }
+
+    > .danger,
+    > div > error {
+      color: red;
+      text-align: center;
+    }
+  }
+}
