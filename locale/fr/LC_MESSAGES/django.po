@@ -5301,6 +5301,10 @@ msgstr "Cet album ne contient aucune photo."
 msgid "preview"
 msgstr "miniature"
 
+#: sas/templates/sas/main.jinja:42
+msgid "You must be logged in to see the SAS."
+msgstr "Vous devez être connecté pour voir les photos."
+
 #: sas/templates/sas/album.jinja:89
 msgid "Upload"
 msgstr "Envoyer"

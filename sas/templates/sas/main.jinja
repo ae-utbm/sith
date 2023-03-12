@@ -37,67 +37,73 @@
 
 {% block content %}
     <h3>{% trans %}SAS{% endtrans %}</h3>
-    <br>
-    <h4>{% trans %}Latest albums{% endtrans %}</h4>
-    <div class="albums">
-        {% for a in latest %}
-            {{ display_album(a) }}
-        {% endfor %}
-    </div>
 
-    <br>
-
-    {% if edit_mode %}
-        <form action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="navbar">
-                <h4>{% trans %}All categories{% endtrans %}</h4>
-            
-                {# <div class="toolbar">
-                    <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}">
-                </div> #}
-            </div>
-
-            {% if clipboard %}
-                <div class="clipboard">
-                    {% trans %}Clipboard: {% endtrans %}
-                    <ul>
-                        {% for f in clipboard %}
-                        <li>{{ f.get_full_path() }}</li>
-                        {% endfor %}
-                    </ul>
-                    <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}">
-                </div>
-            {% endif %}
+    {% if not user.is_authenticated %}
+        <p>{% trans %}You must be logged in to see the SAS.{% endtrans %}</p>
     {% else %}
-        <h4>{% trans %}All categories{% endtrans %}</h4>
-    {% endif %}
+        <br>
+        <h4>{% trans %}Latest albums{% endtrans %}</h4>
 
-    <div class="albums">
-        {% for a in categories %}
-            {{ display_album(a, true) }}
-        {% endfor %}
-    </div>
-
-    {% if edit_mode %}
-        </form>
+        <div class="albums">
+            {% for a in latest %}
+                {{ display_album(a) }}
+            {% endfor %}
+        </div>
 
         <br>
 
-        <form class="add-files" action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
+        {% if edit_mode %}
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
 
-            <div class="inputs">
-                <div>
-                    <label for="{{ form.album_name.name }}">{{ form.album_name.label }}</label>
-                    {{ form.album_name }}
+                <div class="navbar">
+                    <h4>{% trans %}All categories{% endtrans %}</h4>
+                
+                    {# <div class="toolbar">
+                        <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}">
+                    </div> #}
                 </div>
-                <input type="submit" value="{% trans %}Create{% endtrans %}" />
-            </div>
-            
-            {{ form.non_field_errors() }}
-            {{ form.album_name.errors }}
-        </form>
+
+                {% if clipboard %}
+                    <div class="clipboard">
+                        {% trans %}Clipboard: {% endtrans %}
+                        <ul>
+                            {% for f in clipboard %}
+                            <li>{{ f.get_full_path() }}</li>
+                            {% endfor %}
+                        </ul>
+                        <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}">
+                    </div>
+                {% endif %}
+        {% else %}
+            <h4>{% trans %}All categories{% endtrans %}</h4>
+        {% endif %}
+
+        <div class="albums">
+            {% for a in categories %}
+                {{ display_album(a, true) }}
+            {% endfor %}
+        </div>
+
+        {% if edit_mode %}
+            </form>
+
+            <br>
+
+            <form class="add-files" action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="inputs">
+                    <div>
+                        <label for="{{ form.album_name.name }}">{{ form.album_name.label }}</label>
+                        {{ form.album_name }}
+                    </div>
+                    <input type="submit" value="{% trans %}Create{% endtrans %}" />
+                </div>
+                
+                {{ form.non_field_errors() }}
+                {{ form.album_name.errors }}
+            </form>
+        {% endif %}
     {% endif %}
 {% endblock %}
