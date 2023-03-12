@@ -2402,7 +2402,7 @@ msgstr "Connexion"
 
 #: core/templates/core/base.jinja:62 core/templates/core/register.jinja:18
 msgid "Register"
-msgstr "S'enregister"
+msgstr "Inscription"
 
 #: core/templates/core/base.jinja:85 core/templates/core/base.jinja:86
 #: forum/templates/forum/macros.jinja:171
