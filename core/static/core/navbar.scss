@@ -4,7 +4,6 @@
   box-shadow: 3px 3px 3px 0 #dfdfdf;
   border-radius: 0;
   width: 100%;
-  min-height: 75px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -17,10 +16,6 @@
 
   @media (max-width: 580px) {
     justify-content: space-between;
-  }
-
-  @media (max-width: 400px) {
-    flex-direction: column;
   }
 
   &-logo {
