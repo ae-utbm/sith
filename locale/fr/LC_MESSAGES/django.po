@@ -2563,8 +2563,8 @@ msgid "R&D"
 msgstr "R&D"
 
 #: core/templates/core/base.jinja:262
-msgid "Site made by good people"
-msgstr "Site réalisé par des gens bons"
+msgid "Site created by the IT Department of the AE"
+msgstr "Site réalisé par le Pôle Informatique de l'AE"
 
 #: core/templates/core/create.jinja:4 core/templates/core/create.jinja:8
 #, python-format
