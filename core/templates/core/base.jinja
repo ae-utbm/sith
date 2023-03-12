@@ -43,10 +43,10 @@
                         <a class="header-logo-picture" href="{{ url('core:index') }}" style="background-image: url('{{ static('core/img/logo_no_text.png') }}')">
                             &nbsp;
                         </a>
-                        <div class="header-logo-text">
+                        <a class="header-logo-text" href="{{ url('core:index') }}">
                             <span>Association des Étudiants</span>
                             <span>de l'Université de Technologie de Belfort-Montbéliard</span>
-                        </div>
+                        </a>
                     </div>
                     {% if not user.is_authenticated %}
                         <div class="header-disconnected">

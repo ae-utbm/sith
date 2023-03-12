@@ -28,6 +28,10 @@
     flex-direction: row;
     gap: 10px;
 
+    &:hover > a {
+      color: #aaa;
+    }
+
     @media (max-width: 607px) {
       width: 100%;
       justify-content: center;
@@ -84,13 +88,15 @@
 
       > input[type=submit] {
         border-radius: 0;
-        z-index: 10;
         margin: 0;
         box-sizing: border-box;
         background-color: #354a5f;
         width: 45px;
         height: 25px;
         padding: 0;
+        color: white;
+        font-weight: normal;
+        line-height: 1.3em;
 
         &:hover {
           background-color: #283747;
