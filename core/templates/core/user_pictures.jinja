@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block content %}
+    <div class="main">
     {% if can_edit(profile, user) %}
         <button id="download_all_pictures", onclick=download_pictures()>{% trans %}Download all my pictures{% endtrans %}</button>
     {% endif %}
@@ -41,6 +42,7 @@
         </div>
         <br>
     {% endfor %}
+    </div>
 {% endblock %}
 
 {% block script %}

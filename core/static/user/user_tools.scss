@@ -1,5 +1,6 @@
 main {
   box-sizing: border-box;
+  padding: 10px;
 }
 
 .container {
@@ -9,9 +10,7 @@ main {
   justify-content: center;
   gap: 10px;
 
-
-  >div {
-    padding: 10px;
+  > div {
     border-radius: 10px;
     background-color: rgba(0, 0, 0, .05);
     width: 210px;
