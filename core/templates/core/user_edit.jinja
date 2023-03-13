@@ -31,9 +31,10 @@
             <div class="profile-picture-edit">
                 <p>{{ form["profile_pict"].label }}</p>
                 {{ form["profile_pict"] }}
-                {%- if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) -%}
-                <a href="{{ url('core:file_delete', file_id=form.instance.profile_pict.id, popup='') }}">{%- trans
-                    -%}Delete{%- endtrans -%}</a>
+                {%- if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) and form.instance.profile_pict.id -%}
+                    <a href="{{ url('core:file_delete', file_id=form.instance.profile_pict.id, popup='') }}">
+                        {%- trans -%}Delete{%- endtrans -%}
+                    </a>
                 {%- endif -%}
             </div>
         </div>
@@ -50,9 +51,10 @@
             <div class="profile-picture-edit">
                 <p>{{ form["avatar_pict"].label }}</p>
                 {{ form["avatar_pict"] }}
-                {%- if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) -%}
-                <a href="{{ url('core:file_delete', file_id=form.instance.avatar_pict.id, popup='') }}">{%- trans
-                    -%}Delete{%- endtrans -%}</a>
+                {%- if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) and form.instance.avatar_pict.id -%}
+                    <a href="{{ url('core:file_delete', file_id=form.instance.avatar_pict.id, popup='') }}">
+                        {%- trans -%}Delete{%- endtrans -%}
+                    </a>
                 {%- endif -%}
             </div>
         </div>
@@ -69,10 +71,10 @@
             <div class="profile-picture-edit">
                 <p>{{ form["scrub_pict"].label }}</p>
                 {{ form["scrub_pict"] }}
-                {%- if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) -%}
-                <a href="{{ url('core:file_delete', file_id=form.instance.scrub_pict.id, popup='') }}">{%- trans
-                    -%}Delete{%-
-                    endtrans -%}</a>
+                {%- if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) and form.instance.scrub_pict.id -%}
+                    <a href="{{ url('core:file_delete', file_id=form.instance.scrub_pict.id, popup='') }}">
+                        {%- trans -%}Delete{%-endtrans -%}
+                    </a>
                 {%- endif -%}
             </div>
         </div>

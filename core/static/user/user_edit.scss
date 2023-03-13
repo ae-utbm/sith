@@ -72,17 +72,21 @@
     &-edit {
       display: flex;
       flex-direction: column-reverse;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
       width: 100%;
 
-      >input {
+      > a {
+        margin-bottom: 15px;
+      }
+
+      > input {
         font-size: .8em;
         font-weight: normal;
         cursor: pointer;
       }
 
-      >p {
+      > p {
         margin-bottom: 0;
         text-align: left !important;
         min-height: 50px;
