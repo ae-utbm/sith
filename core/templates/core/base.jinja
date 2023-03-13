@@ -61,7 +61,7 @@
                                     <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />
                                </form>
                                 <ul class="bars">
-                                    {% cache 0 "counters_activity" %}
+                                    {% cache 100 "counters_activity" %}
                                         {% for bar in Counter.objects.annotate_has_barman(user).filter(type="BAR") %}
                                             <li>
                                                 {# If the user is a barman, we redirect him directly to the barman page
