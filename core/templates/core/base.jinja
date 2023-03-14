@@ -269,20 +269,24 @@
         </div>
 
         {% if not popup %}
-        <footer>
-            {% block footer %}
-            <div>
-                <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
-                <a href="{{ url('core:page', 'legals') }}">{% trans %}Legal notices{% endtrans %}</a>
-                <a href="{{ url('core:page', 'copyright_agent') }}">{% trans %}Intellectual property{% endtrans %}</a>
-                <a href="{{ url('core:page', 'docs') }}">{% trans %}Help & Documentation{% endtrans %}</a>
-                <a href="{{ url('core:page', 'rd') }}">{% trans %}R&D{% endtrans %}</a>
-            </div>
-            <a href="https://discord.gg/XK9WfPsUFm" target="_link">
-                {% trans %}Site created by the IT Department of the AE{% endtrans %}
-            </a>
-            {% endblock %}
-        </footer>
+            <footer>
+                {% block footer %}
+                    <div>
+                        <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
+                        <a href="{{ url('core:page', 'legals') }}">{% trans %}Legal notices{% endtrans %}</a>
+                        <a href="{{ url('core:page', 'copyright_agent') }}">{% trans %}Intellectual property{% endtrans %}</a>
+                        <a href="{{ url('core:page', 'docs') }}">{% trans %}Help & Documentation{% endtrans %}</a>
+                        <a href="{{ url('core:page', 'rd') }}">{% trans %}R&D{% endtrans %}</a>
+                    </div>
+                    <a href="https://discord.gg/XK9WfPsUFm" target="_link">
+                        {% trans %}Site created by the IT Department of the AE{% endtrans %}
+                    </a>
+                {% endblock %}
+                <br>
+                <code class="version">
+                    {% trans %}Sith version:{% endtrans %}&nbsp;{{ get_sith().version }}
+                </code>
+            </footer>
         {% endif %}
         <!--
             {% block tests %}

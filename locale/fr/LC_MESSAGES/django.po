@@ -1644,6 +1644,10 @@ msgstr "Appels affichés"
 msgid "Calls to moderate"
 msgstr "Appels à modérer"
 
+#: core/templates/core/base.jinja
+msgid "Site version:"
+msgstr "Version du site :"
+
 #: com/templates/com/news_admin_list.jinja:242
 #: core/templates/core/base.jinja:177
 msgid "Events"

@@ -36,6 +36,7 @@ from django.core.exceptions import ValidationError
 
 from django.utils import timezone
 
+from core import utils
 from core.models import User, Preferences, RealGroup, Notification, SithFile
 from club.models import Club
 
@@ -46,6 +47,7 @@ class Sith(models.Model):
     alert_msg = models.TextField(_("alert message"), default="", blank=True)
     info_msg = models.TextField(_("info message"), default="", blank=True)
     weekmail_destinations = models.TextField(_("weekmail destinations"), default="")
+    version = utils.get_git_revision_short_hash()
 
     def is_owned_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
