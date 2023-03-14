@@ -304,6 +304,11 @@
                   font-size: .8em;
                 }
               }
+
+              &.empty-notification {
+                text-align: center;
+                font-style: italic;
+              }
             }
           }
 

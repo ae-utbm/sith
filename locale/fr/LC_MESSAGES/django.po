@@ -5723,6 +5723,10 @@ msgstr "Vous avez acheté %s"
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
+#: core/templates/core/base.jinja
+msgid "You do not have any unread notification"
+msgstr "Vous n'avez aucune notification non lue"
+
 #: sith/settings.py:624
 msgid "Success!"
 msgstr "Succès !"
