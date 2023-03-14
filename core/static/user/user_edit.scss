@@ -5,6 +5,22 @@
   }
 }
 
+.field-error {
+  height: auto !important;
+
+  > ul {
+    list-style-type: none;
+    margin: 0;
+    color: indianred;
+
+    > li {
+      text-align: left !important;
+      line-height: normal;
+      margin-top: 5px;
+    }
+  }
+}
+
 .profile {
   &-visible {
     display: flex;
