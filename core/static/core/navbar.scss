@@ -181,46 +181,43 @@
 
       > .user {
         display: flex;
-        flex-direction: column;
-        gap: 5px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
 
-        @media (max-width: 400px) {
+        @media (max-width: 1200px) {
           width: 100%;
+          flex-direction: row-reverse;
         }
 
-        > .options,
-        > .name {
-          > a {
-            color: white;
-            &:hover {
-              color: #1a78b3;
-            }
-          }
-        }
-
-        > .name {
-          color: white;
-          max-width: 250px;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden;
-
-          @media (max-width: 400px) {
-            max-width: 100%;
-          }
-
-          &:hover {
-            color: #1a78b3;
-          }
+        > a > img {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
         }
 
         > .options {
           width: 100%;
           display: flex;
-          gap: 20px;
           justify-content: flex-end;
+          flex-direction: column;
+          gap: 5px;
+
+          @media (max-width: 1200px) {
+            justify-content: flex-start;
+            flex-direction: row;
+            gap: 15px;
+          }
 
           > a {
+            text-align: right;
+            color: white;
+
+            &:hover {
+              color: #1a78b3;
+            }
+
             &:last-child {
               color: #eb2f06;
 
@@ -228,10 +225,6 @@
                 color: #cc2804;
               }
             }
-          }
-
-          @media (max-width: 1200px) {
-            justify-content: flex-start;
           }
         }
       }
