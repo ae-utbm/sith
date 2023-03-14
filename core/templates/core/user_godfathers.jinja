@@ -15,8 +15,8 @@
         {% trans %}Show family picture{% endtrans %}
     </a>
 
+    <h4>{% trans %}Godfathers / Godmothers{% endtrans %}</h4>
     {% if profile.godfathers.exists() %}
-        <h4>{% trans %}Godfathers / Godmothers{% endtrans %}</h4>
         <ul class="users">
             {% for u in profile.godfathers.all() %}
                 <li class="users-card">
@@ -35,9 +35,8 @@
         <p>{% trans %}No godfathers / godmothers{% endtrans %}
     {% endif %}
 
-
+    <h4>{% trans %}Godchildren{% endtrans %}</h4>
     {% if profile.godchildren.exists() %}
-        <h4>{% trans %}Godchildren{% endtrans %}</h4>
         <ul class="users">
             {% for u in profile.godchildren.all() %}
                 <li class="users-card">
