@@ -72,7 +72,9 @@ def forbidden(request, exception):
 
 
 def not_found(request, exception):
-    return HttpResponseNotFound(render(request, "core/404.jinja"))
+    return HttpResponseNotFound(
+        render(request, "core/404.jinja", context={"exception": exception})
+    )
 
 
 def internal_servor_error(request):

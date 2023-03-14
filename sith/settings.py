@@ -291,6 +291,10 @@ SITH_URL = "my.url.git.an"
 SITH_NAME = "Sith website"
 SITH_TWITTER = "@ae_utbm"
 
+# Enable experimental features
+# Enable/Disable the galaxy button on user profile (urls stay activated)
+SITH_ENABLE_GALAXY = False
+
 # AE configuration
 # TODO: keep only that first setting, with the ID, and do the same for the other clubs
 SITH_MAIN_CLUB_ID = 1
@@ -713,6 +717,7 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/viralpatel/jquery.shorten/": "",
     "https://github.com/getsentry/sentry-javascript/": "4.0.6",
     "https://github.com/jhuckaby/webcamjs/": "1.0.0",
+    "https://github.com/vuejs/vue-next": "3.2.18",
     "https://github.com/alpinejs/alpine": "3.10.5",
     "https://github.com/mrdoob/three.js/": "r148",
     "https://github.com/vasturiano/three-spritetext": "1.6.5",
