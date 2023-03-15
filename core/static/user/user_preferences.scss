@@ -1,19 +1,21 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  margin: 10px 0;
+  gap: 5px;
 
   &-general {
     > p {
       display: flex;
       flex-direction: row-reverse;
       justify-content: left;
+      align-items: center;
       gap: 5px;
-      align-items: flex-start;
       margin: 0;
 
-      >label {
-        cursor: pointer
+      > label {
+        cursor: pointer;
+        margin: 0;
       }
     }
   }
@@ -26,6 +28,7 @@
       align-items: flex-start;
       text-align: justify;
       gap: 5px;
+      margin: 0;
 
       >input,
       >select {
@@ -46,4 +49,10 @@
 
 .main {
   padding: 10px;
+}
+
+.no-cards,
+.student-cards {
+  margin-top: 10px;
+  display: block;
 }

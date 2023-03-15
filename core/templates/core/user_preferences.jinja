@@ -39,7 +39,7 @@
             <h3>{% trans %}Student cards{% endtrans %}</h3>
 
             {% if profile.customer.student_cards.exists() %}
-                <ul>
+                <ul class="student-cards">
                     {% for card in profile.customer.student_cards.all() %}
                     <li>
                         {{ card.uid }}
@@ -51,7 +51,7 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <em>{% trans %}No student card registered.{% endtrans %}</em>
+                <em class="no-cards">{% trans %}No student card registered.{% endtrans %}</em>
                 <p class="justify">
                     {% trans %}You can add a card by asking at a counter or add it yourself here. If you want to manually
                     add a student card yourself, you'll need a NFC reader. We store the UID of the card which is 14 characters long.{% endtrans %}
