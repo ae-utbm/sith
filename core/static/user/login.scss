@@ -15,93 +15,93 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
 
-#content {
-  display: flex;
-  flex-direction: column;
-  padding: 10px !important;
-  box-shadow: none !important;
-  background-color: white !important;
-  margin: 0;
-
-  > .title {
-    text-align: center;
-    margin: 0;
-  }
-
-  > div,
-  > form {
-    box-sizing: border-box;
+  #content {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    max-width: 500px;
-    margin-top: 20px;
+    padding: 10px;
+    box-shadow: none;
+    background-color: white;
+    margin: 0;
 
-    > p,
-    > div {
+    > .title {
+      text-align: center;
+      margin: 0;
+    }
+
+    > div,
+    > form {
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      width: 100%;
-      margin: 0;
-
-      > label {
-        width: 100%;
-
-        @media (min-width: 500px) {
-          width: 300px;
-        }
-      }
-    }
-
-    > input,
-    > p > input,
-    > div > input {
-      box-sizing: border-box;
+      justify-content: center;
+      gap: 10px;
       width: 100%;
       max-width: 500px;
+      margin-top: 20px;
 
-      @media (min-width: 500px) {
-        max-width: 300px;
-      }
-    }
-
-    > .errorlist {
-      color: red;
-      text-align: center;
-      margin: 10px 0 0 0;
-      list-style-type: none;
-    }
-
-    > .required > .helptext {
-      text-align: center;
-      font-style: italic;
-    }
-    
-    > .required:last-of-type {
-      box-sizing: border-box;
-      max-width: 300px;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: space-between;
-
-      > label {
+      > p,
+      > div {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         width: 100%;
+        margin: 0;
+
+        > label {
+          width: 100%;
+
+          @media (min-width: 500px) {
+            width: 300px;
+          }
+        }
       }
 
-      > img {
-        width: 70px;
-        object-fit: contain;
+      > input,
+      > p > input,
+      > div > input {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 500px;
+
+        @media (min-width: 500px) {
+          max-width: 300px;
+        }
       }
 
-      > input {
-        width: 200px;
+      > .errorlist {
+        color: red;
+        text-align: center;
+        margin: 10px 0 0 0;
+        list-style-type: none;
+      }
+
+      > .required > .helptext {
+        text-align: center;
+        font-style: italic;
+      }
+
+      > .required:last-of-type {
+        box-sizing: border-box;
+        max-width: 300px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+
+        > label {
+          width: 100%;
+        }
+
+        > img {
+          width: 70px;
+          object-fit: contain;
+        }
+
+        > input {
+          width: 200px;
+        }
       }
     }
   }
