@@ -387,6 +387,7 @@
   }
 
   > li > a {
+    display: flex;
     color: white;
 
     &:hover {
@@ -394,7 +395,14 @@
     }
 
     > span {
-      margin-left: 5px;
+      margin-left: 10px;
+    }
+
+    > i {
+      width: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
 }
