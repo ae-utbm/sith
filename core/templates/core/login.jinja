@@ -28,7 +28,7 @@
 
     <form method="post" action="{{ url('core:login') }}">
         {% if form.errors %}
-            <p class="alert-red">{% trans %}Your username and password didn't match. Please try again.{% endtrans %}</p>
+            <p class="alert alert-red">{% trans %}Your username and password didn't match. Please try again.{% endtrans %}</p>
             <br>
         {% endif %}
 

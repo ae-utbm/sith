@@ -272,7 +272,7 @@ class UserRegistrationTest(TestCase):
         )
         self.assertTrue(response.status_code == 200)
         self.assertTrue(
-            """<p class="alert-red">Votre nom d\\'utilisateur et votre mot de passe ne correspondent pas. Merci de r\\xc3\\xa9essayer.</p>"""
+            """<p class="alert alert-red">Votre nom d\\'utilisateur et votre mot de passe ne correspondent pas. Merci de r\\xc3\\xa9essayer.</p>"""
             in str(response.content)
         )
 
