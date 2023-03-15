@@ -34,14 +34,14 @@
             </div>
         {% endif %}
 
-        {% set isAdminOnACounter = false %}
+        {% set is_admin_on_a_counter = false %}
         {% for b in settings.SITH_COUNTER_BARS if user.is_in_group(b[1] + " admin") %}
-            {% set isAdminOnACounter = true %}
+            {% set is_admin_on_a_counter = true %}
         {% endfor %}
 
         {% if
             user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID) or user.is_root
-            or isAdminOnACounter
+            or is_admin_on_a_counter
         %}
             <div>
                 <h4>{% trans %}Counters{% endtrans %}</h4>
