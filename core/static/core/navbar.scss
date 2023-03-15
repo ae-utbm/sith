@@ -280,12 +280,12 @@
 
           > ul {
             list-style-type: none;
-            margin: 0 0 10px 0;
+            margin: 0;
             display: flex;
             flex-direction: column;
             gap: 10px;
             max-height: 120px;
-            overflow-y: scroll;
+            overflow-y: auto;
 
             > li {
               > a {
@@ -309,6 +309,7 @@
             width: 100%;
             display: flex;
             justify-content: space-between;
+            margin-top: 10px;
 
             > a {
               color: black;
