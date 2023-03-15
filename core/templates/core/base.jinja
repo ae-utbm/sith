@@ -163,8 +163,8 @@
                     </div>
                 </header>
 
-                <div id="info_boxes">
-                    {% block info_boxes %}
+                {% block info_boxes %}
+                    <div id="info_boxes">
                         {% set sith = get_sith() %}
                         {% if sith.alert_msg %}
                         <div id="alert_box">
@@ -176,8 +176,8 @@
                             {{ sith.info_msg|markdown }}
                         </div>
                         {% endif %}
-                    {% endblock %}
-                </div>
+                    </div>
+                {% endblock %}
 
             {% else %}
                 <div id="popupheader">{{ user.get_display_name() }}</div>

@@ -6,6 +6,12 @@
 
 {% block title %}{% trans %}Register{% endtrans %}{% endblock %}
 
+{% block nav %}
+{% endblock %}
+
+{% block info_boxes %}
+{% endblock %}
+
 {% block content %}
     <h1 class="title">{% trans %}Register{% endtrans %}</h1>
 
@@ -23,12 +29,3 @@
     {% endif %}
 {% endblock %}
  
-{% block additional_js %}
-    <script defer>
-        $(() => {
-            $("#info_boxes").remove();
-            $("#page > nav").remove();
-            $("#quick_notif").remove();
-        })
-    </script>
-{% endblock %}

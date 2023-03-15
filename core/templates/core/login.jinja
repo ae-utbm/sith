@@ -8,6 +8,12 @@
     {% trans %}Login{% endtrans %}
 {% endblock %}
 
+{% block info_boxes %}
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
 {% block content %}
     <h1 class="title">{% trans %}Login{% endtrans %}</h1>
 
@@ -53,12 +59,3 @@
     </form>
 {% endblock %}
 
-{% block additional_js %}
-    <script defer>
-    $(() => {
-        $("#info_boxes").remove();
-        $("#page > nav").remove();
-        $("#quick_notif").remove();
-    })
-    </script>
-{% endblock %}

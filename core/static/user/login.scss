@@ -17,12 +17,6 @@ body {
   justify-content: center;
 }
 
-#quick_notif,
-#info_boxes,
-#page > nav {
-  display: none !important;
-}
-
 #content {
   display: flex;
   flex-direction: column;
