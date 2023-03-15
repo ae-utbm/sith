@@ -10,25 +10,25 @@
 {% endblock %}
 
 {% block content %}
-<div id="user_profile_page">
-    <div id="user_profile" class="main">
+<div class="user_profile_page">
+    <main class="user_profile">
         <!-- Profile -->
         <div class="user-name">
             <h3>{{ profile.get_full_name() }}</h3>
             {% if profile.nick_name %}
-            <div id="user_profile_infos_nick">&laquo; {{ profile.nick_name }} &raquo;</div>
+            <div class="user_profile_infos_nick">&laquo; {{ profile.nick_name }} &raquo;</div>
             {% endif %}
         </div>
 
         <div class="infos-and-picture">
-            <div id="user_profile_infos">
+            <div class="user_profile_infos">
                 {% if profile.quote %}
-                <div id="user_profile_infos_quote">
+                <div class="user_profile_infos_quote">
                     {{ profile.quote }}
                 </div>
                 {% endif %}
 
-                <div id="user_profile_infos_items">
+                <div class="user_profile_infos_items">
                     {% if profile.pronouns %}
                     <div>
                         <span class="user_profile_infos_item">{% trans %}Pronouns: {% endtrans %}</span>
@@ -80,7 +80,7 @@
                 </div>
 
                 {% if profile.promo %}
-                <div id="user_profile_infos_promo">
+                <div class="user_profile_infos_promo">
                     {% trans %}Promo: {% endtrans %}{{ profile.promo }}
                     <img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}"
                         alt="Promo {{ profile.promo }}" />
@@ -88,8 +88,8 @@
                 {% endif %}
             </div>
             <!-- Pictures -->
-            <div id="user_profile_pictures">
-                <div id="user_profile_pictures_bigone">
+            <div class="user_profile_pictures">
+                <div class="user_profile_pictures_bigone">
                     {% if profile.profile_pict %}
                     <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}"
                         title="{% trans %}Profile{% endtrans %}" />
@@ -98,7 +98,7 @@
                         title="{% trans %}Profile{% endtrans %}" />
                     {% endif %}
                 </div>
-                <div id="user_profile_pictures_thumbnails">
+                <div class="user_profile_pictures_thumbnails">
                     {% if profile.profile_pict %}
                     <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}"
                         title="{% trans %}Profile{% endtrans %}" />
@@ -125,7 +125,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
     {% if user.memberships.filter(end_date=None).exists() or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user ==
     profile or user.is_in_group(settings.SITH_BAR_MANAGER_BOARD_GROUP) %}
     {# if the user is member of a club, he can view the subscription state #}
