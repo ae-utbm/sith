@@ -102,10 +102,12 @@
                                 <div class="notification">
                                     <a href="#" onclick="display_notif()">
                                         <i class="fa fa-bell-o"></i>
-                                        {% if  user.notifications.filter(viewed=False).count() > 0 %}
+                                        {% set notification_count = user.notifications.filter(viewed=False).count() %}
+
+                                        {% if notification_count > 0 %}
                                         <span>
-                                            {% if  user.notifications.filter(viewed=False).count() < 100 %}
-                                                {{ user.notifications.filter(viewed=False).count() }}
+                                            {% if notification_count < 100 %}
+                                                {{ notification_count }}
                                             {% else %}
                                                 &nbsp;
                                             {% endif %}
