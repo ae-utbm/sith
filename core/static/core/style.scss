@@ -192,8 +192,7 @@ a {
 #info_boxes {
   display: flex;
   flex-wrap: wrap;
-  width: 90%;
-  margin: 1em auto;
+  margin: 1em;
 
   @media (max-width: 500px) {
     margin: 0;
@@ -236,75 +235,6 @@ a {
   width: 90%;
   margin: 20px auto 0;
   /*---------------------------------NAV---------------------------------*/
-  nav {
-    display: flex;
-    flex-wrap: wrap;
-    background-color: $primary-dark-color;
-    color: $white-color;
-    border-radius: 6px 6px 0 0;
-    box-shadow: $shadow-color 0 0 15px;
-    align-items: center;
-
-    a {
-      flex: auto;
-      text-align: center;
-      padding: 1.5em;
-      color: $white-color;
-      font-style: normal;
-      font-weight: bolder;
-      text-decoration: none;
-
-      &:hover {
-        background: $secondary-neutral-color;
-        color: $white-color;
-        &:first-of-type {
-          border-radius: 6px 0 0 0;
-        }
-        &:last-of-type {
-          border-radius: 0 6px 0 0;
-        }
-      }
-    }
-
-    .dropdown {
-      flex: auto;
-      text-align: center;
-      position: relative;
-    }
-
-    .dropbtn {
-      all: unset;
-      padding: 20px;
-      font-weight: bolder;
-    }
-
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      overflow: auto;
-      width: 100%;
-      background-color: #f9f9f9;
-      box-shadow: 3px 3px 3px 0 $shadow-color;
-      z-index: 1;
-    }
-
-    .dropdown-content a {
-      float: none;
-      color: black;
-      padding: 12px 16px;
-      display: block;
-      text-align: center;
-      &:hover {
-        border-radius: unset;
-        color: white;
-        background: $secondary-neutral-color;
-      }
-    }
-
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
-  }
 
   .btn {
     font-size: 15px;
