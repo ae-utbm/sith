@@ -2,43 +2,34 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 
 {% block title %}
-{% trans counter_name=counter %}{{ counter_name }} stats{% endtrans %}
+    {% trans counter_name=counter %}{{ counter_name }} stats{% endtrans %}
+{% endblock %}
+
+{% block jquery_css %}
+    {# Remove jquery_css #}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans counter_name=counter %}{{ counter_name }} stats{% endtrans %}</h3>
+    <h3>{% trans counter_name=counter %}{{ counter_name }} stats{% endtrans %}</h3>
     <h4>{% trans counter_name=counter.name %}Top 100 {{ counter_name }}{% endtrans %}</h4>
     <table>
         <thead>
-            <tr>
-                <td>{% trans %}Nb{% endtrans %}</td>
-                <td>{% trans %}User{% endtrans %}</td>
-                <td>{% trans %}Promo{% endtrans %}</td>
-                <td>{% trans %}Clubs{% endtrans %}</td>
-                <td>{% trans %}Total{% endtrans %}</td>
-                <td>{% trans %}Percentage{% endtrans %}</td>
-            </tr>
+        <tr>
+            <td>N°</td>
+            <td>{% trans %}User{% endtrans %}</td>
+            <td>{% trans %}Promo{% endtrans %}</td>
+            <td>{% trans %}Total{% endtrans %}</td>
+            <td>{% trans %}Percentage{% endtrans %}</td>
+        </tr>
         </thead>
         <tbody>
-        {% for r in top %}
-            {% set customer=Customer.objects.filter(user__id=r.customer__user).first() %}
-            {% if customer.user == user %}
-            <tr class="highlight">
-            {% else %}
-            <tr>
-            {% endif %}
+        {% for customer in top_customers %}
+            <tr class="{% if customer.user == request.user.id %}highlight{% endif %}">
                 <td>{{ loop.index }}</td>
-                <td>{{ customer.user.get_display_name() }}</td>
-                <td>{{ customer.user.promo or '' }}</td>
-                <td>
-                {% for m in customer.user.memberships.filter(club__parent=None, end_date=None,
-                        role__gt=settings.SITH_MAXIMUM_FREE_ROLE).all() -%}
-                    {%- if loop.index>1 -%}, {% endif -%}
-                    {{ m.club.name }}
-                {%- endfor %}
-                </td>
-                <td>{{ r.selling_sum }} €</td>
-                <td>{{ '%.2f'|format(100 * r.selling_sum / total_sellings) }}</td>
+                <td>{{ customer.name }} {% if customer.nickname %} ({{ customer.nickname }}) {% endif %}</td>
+                <td>{{ customer.promo or '' }}</td>
+                <td>{{ "%.2f"|format(customer.selling_sum) }} €</td>
+                <td>{{ '%.2f'|format(100 * customer.selling_sum / total_sellings) }}%</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -47,23 +38,20 @@
     <h4>{% trans counter_name=counter.name %}Top 100 barman {{ counter_name }}{% endtrans %}</h4>
     <table>
         <thead>
-            <tr>
-                <td>{% trans %}Nb{% endtrans %}</td>
-                <td>{% trans %}User{% endtrans %}</td>
-                <td>{% trans %}Time{% endtrans %}</td>
-            </tr>
+        <tr>
+            <td>N°</td>
+            <td>{% trans %}User{% endtrans %}</td>
+            <td>{% trans %}Promo{% endtrans %}</td>
+            <td>{% trans %}Time{% endtrans %}</td>
+        </tr>
         </thead>
         <tbody>
-        {% for r in top_barman_semester %}
-            {% set u=User.objects.filter(id=r.user).first() %}
-            {% if u == user %}
-            <tr class="highlight">
-            {% else %}
-            <tr>
-            {% endif %}
+        {% for barman in top_barman_semester %}
+            <tr {% if barman.user == request.user.id %}class="highlight"{% endif %}>
                 <td>{{ loop.index }}</td>
-                <td>{{ u.get_display_name() }}</td>
-                <td>{{ r.perm_sum }}</td>
+                <td>{{ barman.name }} {% if barman.nickname %}({{ barman.nickname }}){% endif %}</td>
+                <td>{{ barman.promo or '' }}</td>
+                <td>{{ barman.perm_sum|format_timedelta|truncate_time("millis") }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -72,23 +60,20 @@
     <h4>{% trans counter_name=counter.name %}Top 100 barman {{ counter_name }} (all semesters){% endtrans %}</h4>
     <table>
         <thead>
-            <tr>
-                <td>{% trans %}Nb{% endtrans %}</td>
-                <td>{% trans %}User{% endtrans %}</td>
-                <td>{% trans %}Time{% endtrans %}</td>
-            </tr>
+        <tr>
+            <td>N°</td>
+            <td>{% trans %}User{% endtrans %}</td>
+            <td>{% trans %}Promo{% endtrans %}</td>
+            <td>{% trans %}Time{% endtrans %}</td>
+        </tr>
         </thead>
         <tbody>
-        {% for r in top_barman %}
-            {% set u=User.objects.filter(id=r.user).first() %}
-            {% if u == user %}
-            <tr class="highlight">
-            {% else %}
-            <tr>
-            {% endif %}
+        {% for barman in top_barman %}
+            <tr {% if barman.user == request.user.id %}class="highlight"{% endif %}>
                 <td>{{ loop.index }}</td>
-                <td>{{ u.get_display_name() }}</td>
-                <td>{{ r.perm_sum }}</td>
+                <td>{{ barman.name }} {% if barman.nickname %}({{ barman.nickname }}){% endif %}</td>
+                <td>{{ barman.promo or '' }}</td>
+                <td>{{ barman.perm_sum|format_timedelta|truncate_time("millis") }}</td>
             </tr>
         {% endfor %}
         </tbody>
