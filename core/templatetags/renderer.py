@@ -23,11 +23,13 @@
 #
 #
 
+import datetime
 import phonenumbers
 
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
+from django.utils.translation import ngettext
 from core.scss.processor import ScssProcessor
 
 from core.markdown import markdown as md
@@ -54,41 +56,26 @@ def phonenumber(value, country="FR", format=phonenumbers.PhoneNumberFormat.NATIO
         return value
 
 
-@register.filter()
-@stringfilter
-def datetime_format_python_to_PHP(python_format_string):
-    """
-    Given a python datetime format string, attempts to convert it to the nearest PHP datetime format string possible.
-    """
-    python2PHP = {
-        "%a": "D",
-        "%a": "D",
-        "%A": "l",
-        "%b": "M",
-        "%B": "F",
-        "%c": "",
-        "%d": "d",
-        "%H": "H",
-        "%I": "h",
-        "%j": "z",
-        "%m": "m",
-        "%M": "i",
-        "%p": "A",
-        "%S": "s",
-        "%U": "",
-        "%w": "w",
-        "%W": "W",
-        "%x": "",
-        "%X": "",
-        "%y": "y",
-        "%Y": "Y",
-        "%Z": "e",
-    }
+@register.filter(name="truncate_time")
+def truncate_time(value, time_unit):
+    value = str(value)
+    return {
+        "millis": lambda: value.split(".")[0],
+        "seconds": lambda: value.rsplit(":", maxsplit=1)[0],
+        "minutes": lambda: value.split(":", maxsplit=1)[0],
+        "hours": lambda: value.rsplit(" ")[0],
+    }[time_unit]()
 
-    php_format_string = python_format_string
-    for py, php in python2PHP.items():
-        php_format_string = php_format_string.replace(py, php)
-    return php_format_string
+
+@register.filter(name="format_timedelta")
+def format_timedelta(value: datetime.timedelta) -> str:
+    days = value.days
+    if days == 0:
+        return str(value)
+    remainder = value - datetime.timedelta(days=days)
+    return ngettext(
+        "%(nb_days)d day, %(remainder)s", "%(nb_days)d days, %(remainder)s", days
+    ) % {"nb_days": days, "remainder": str(remainder)}
 
 
 @register.simple_tag()
