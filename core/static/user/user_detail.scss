@@ -21,6 +21,7 @@ main {
   align-items: flex-start;
   width: 100%;
   max-width: 1080px;
+  margin: 0 auto;
 }
 
 .infos-and-picture {
@@ -29,6 +30,7 @@ main {
   justify-content: center;
   width: 100%;
   max-width: 1080px;
+  margin: 0 auto;
 
   @media (max-width: 960px) {
     flex-direction: column-reverse;
