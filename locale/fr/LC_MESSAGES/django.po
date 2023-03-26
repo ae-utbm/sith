@@ -3991,6 +3991,10 @@ msgstr "Activité sur %(counter_name)s"
 msgid "Barmen list"
 msgstr "Barmans"
 
+#: counter/templates/counter/activity.jinja:23
+msgid "There is currently no barman connected."
+msgstr "Il n'y a actuellement aucun barman connecté."
+
 #: counter/templates/counter/activity.jinja:19
 msgid "Legend"
 msgstr "Légende"
