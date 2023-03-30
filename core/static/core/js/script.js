@@ -1,5 +1,3 @@
-console.log('Guy');
-
 $( function() {
     buttons = $(".choose_file_button");
     popups = $(".choose_file_widget");

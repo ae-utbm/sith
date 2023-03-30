@@ -82,7 +82,7 @@ class ComTest(TestCase):
         self.assertContains(
             r,
             """<div id="alert_box">
-                    <div class="markdown"><h3>ALERTE!</h3>
+                            <div class="markdown"><h3>ALERTE!</h3>
 <p><strong>Caaaataaaapuuuulte!!!!</strong></p>""",
         )
 
@@ -100,7 +100,7 @@ class ComTest(TestCase):
         self.assertContains(
             r,
             """<div id="info_box">
-                    <div class="markdown"><h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>""",
+                            <div class="markdown"><h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>""",
         )
 
     def test_birthday_non_subscribed_user(self):

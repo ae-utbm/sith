@@ -1,202 +1,248 @@
 {% extends "core/base.jinja" %}
 {% from "core/macros.jinja" import paginate %}
 
+{%- block additional_css -%}
+    <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
+{%- endblock -%}
+
 {% block title %}
-{% trans %}SAS{% endtrans %}
+    {% trans %}SAS{% endtrans %}
 {% endblock %}
 
 {% macro print_path(file) %}
-{% if file and file.parent %}
-{{ print_path(file.parent) }}
-<a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> >
-{% endif %}
+    {% if file and file.parent %}
+        {{ print_path(file.parent) }}
+        <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
+    {% endif %}
 {% endmacro %}
 
 
 {% block content %}
-<a href="{{ url('sas:main') }}">SAS</a> > {{ print_path(album.parent) }} {{ album.get_display_name() }}
-<h3>{{ album.get_display_name() }}</h3>
-<a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a><br>
-{% set start = timezone.now() %}
-<hr>
-{% set edit_mode = user.can_edit(album) %}
-{% if edit_mode %}
-<form action="" method="post" enctype="multipart/form-data" style="width: 100%;">
-    {% csrf_token %}
-    <p>
-        <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}"> |
-        <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}"> |
-        <input name="cut" type="submit" value="{% trans %}Cut{% endtrans %}"> |
-        <input name="paste" type="submit" value="{% trans %}Paste{% endtrans %}">
-    </p>
-    {% if clipboard %}
-    <p>{% trans %}Clipboard: {% endtrans %}
-        <ul>
-        {% for f in clipboard %}
-            <li>{{ f.get_full_path() }}</li>
-        {% endfor %}
-        </ul>
-    </p>
-    {% endif %}
-{% endif %}
-    <div>
-        {% for a in album.children_albums.order_by('-date') %}
-        <div style="display: inline-block;">
-        {% if edit_mode %}
-        <input type="checkbox" name="file_list" value="{{ a.id }}">
-        {% endif %}
-        {% if user.can_view(a) %}
-        <a href="{{ url("sas:album", album_id=a.id) }}" style="display: inline-block">
-            <div class="album{% if not a.is_moderated %} not_moderated{% endif %}">
-            <div>
-            {% if a.file %}
-            <img src="{{ a.get_download_url() }}" alt="{% trans %}preview{% endtrans %}">
-            {% else %}
-            <img src="{{ static('core/img/sas.jpg') }}" alt="{% trans %}preview{% endtrans %}">
-            {% endif %}
+    <code>
+        <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(album.parent) }} {{ album.get_display_name() }}
+    </code>
+
+    {% set edit_mode = user.can_edit(album) %}
+    {% set start = timezone.now() %}
+
+    {% if edit_mode %}
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="navbar">
+                <h3>{{ album.get_display_name() }}</h3>
+
+                <div class="toolbar">
+                    <a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a>
+                    <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}">
+                    <input name="cut" type="submit" value="{% trans %}Cut{% endtrans %}">
+                    <input {% if not clipboard %}disabled{% endif %} name="paste" type="submit" value="{% trans %}Paste{% endtrans %}">
+                </div>
             </div>
-            {{ a.name }}
+
+            {% if clipboard %}
+                <div class="clipboard">
+                    {% trans %}Clipboard: {% endtrans %}
+                    <ul>
+                        {% for f in clipboard %}
+                            <li>{{ f.get_full_path() }}</li>
+                        {% endfor %}
+                    </ul>
+                    <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}">
+                </div>
+            {% endif %}
+    {% endif %}
+
+    {% if album.children_albums.count() > 0 %}
+        <h4>{% trans %}Albums{% endtrans %}</h4>
+        <div class="albums">
+            {% for a in album.children_albums.order_by('-date') %}
+                {% if a.can_be_viewed_by(user) %}
+                    <a href="{{ url('sas:album', album_id=a.id) }}">
+                        <div
+                            class="album{% if not a.is_moderated %} not_moderated{% endif %}"
+                            style="background-image: url('{% if a.file %}{{ a.get_download_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
+                        >
+                            {% if not a.is_moderated %}
+                                <div class="overlay">&nbsp;</div>
+                                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+                            {% else %}
+                                <div class="text">{{ a.name }}</div>
+                            {% endif %}
+                        </div>
+                        {% if edit_mode %}
+                            <input type="checkbox" name="file_list" value="{{ a.id }}">
+                        {% endif %}
+                    </a>
+                {% endif %}
+            {% endfor %}
         </div>
-        </a>
-        {% endif %}
+
+        <br>
+    {% endif %}
+
+    <h4>{% trans %}Pictures{% endtrans %}</h4>
+    {% if pictures | length != 0 %}
+        <div class="photos">
+            {% for p in pictures %}
+                {% if p.can_be_viewed_by(user) %}
+                    <a href="{{ url('sas:picture', picture_id=p.id) }}#pict">
+                        <div
+                            class="photo"
+                            style="background-image: url('{{ p.get_download_thumb_url() }}')"
+                        >
+                            {% if not p.is_moderated %}
+                                <div class="overlay">&nbsp;</div>
+                                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+                            {% else %}
+                                <div class="text">&nbsp;</div>
+                            {% endif %}
+                        </div>
+                        {% if edit_mode %}
+                            <input type="checkbox" name="file_list" value="{{ p.id }}">
+                        {% endif %}
+                    </a>
+                {% endif %}
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    <div>
-        {% for p in pictures %}
-        <div style="display: inline-block;">
-        {% if edit_mode %}
-        <input type="checkbox" name="file_list" value="{{ p.id }}">
-        {% endif %}
-        {% if user.can_view(p) %}
-        <div class="picture{% if not p.is_moderated %} not_moderated{% endif %}">
-            <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
-                <img src="{{ p.get_download_thumb_url() }}" alt="{{ p.get_display_name() }}" />
-            </a>
+    {% else %}
+        {% trans %}This album does not contain any photos.{% endtrans %}
+    {% endif %}
+
+    {% if pictures.has_previous() or pictures.has_next() %}
+        <div class="paginator">
+            {{ paginate(pictures, paginator) }}
         </div>
-        {% endif %}
-        </div>
-        {% endfor %}
-    </div>
-    <br>
-    {{ paginate(pictures, paginator) }}
-{% if edit_mode %}
-</form>
-{% endif %}
-<form id="upload_form" action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p() }}
-    <p><input type="submit" value="{% trans %}Upload{% endtrans %}" /></p>
-</form>
-<p style="font-size: small; color: #444;">{% trans %}Template generation time: {% endtrans %}
-{{ timezone.now() - start }}
-</p>
+    {% endif %}
+
+    {% if edit_mode %}
+        </form>
+    {% endif %}
+
+    {% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
+        <form class="add-files" id="upload_form" action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="inputs">
+                {{ form.as_p() }}
+
+                <input type="submit" value="{% trans %}Upload{% endtrans %}" />
+            </div>
+        </form>
+    {% endif %}
+
+    <hr>
+
+    <p style="font-size: small; color: #444;">{% trans %}Template generation time: {% endtrans %}
+    {{ timezone.now() - start }}
+    </p>
 {% endblock %}
 
 {% block script %}
-{{ super() }}
-<script>
-$("form#upload_form").submit(function (event) {
-    var formData = new FormData($(this)[0]);
+    {{ super() }}
+    <script>
+    $("form#upload_form").submit(function (event) {
+        let formData = new FormData($(this)[0]);
 
-    if(!formData.get('album_name') && !formData.get('images').name)
-        return false;
+        if(!formData.get('album_name') && !formData.get('images').name)
+            return false;
 
-    if(!formData.get('images').name) {
-        return true;
-    }
-
-    event.preventDefault();
-
-    var errorlist;
-    if((errorlist = this.querySelector('#upload_form ul.errorlist.nonfield')) === null) {
-        errorlist = document.createElement('ul');
-        errorlist.classList.add('errorlist', 'nonfield');
-        this.insertBefore(errorlist, this.firstElementChild);
-    }
-
-    while(errorlist.childElementCount > 0)
-        errorlist.removeChild(errorlist.firstElementChild);
-
-    var progress;
-    if((progress = this.querySelector('progress')) === null) {
-        progress = document.createElement('progress');
-        progress.value = 0;
-        var p = document.createElement('p');
-        p.appendChild(progress);
-        this.insertBefore(p, this.lastElementChild);
-    }
-
-    var dataHolder;
-
-    if(formData.get('album_name')) {
-        dataHolder = new FormData();
-        dataHolder.set('csrfmiddlewaretoken', '{{ csrf_token }}');
-        dataHolder.set('album_name', formData.get('album_name'));
-        $.ajax({
-            method: 'POST',
-            url: "{{ url('sas:album_upload', album_id=object.id) }}",
-            data: dataHolder,
-            processData: false,
-            contentType: false,
-            success: onSuccess
-        });
-    }
-
-    var images = formData.getAll('images');
-    var imagesCount = images.length;
-    var completeCount = 0;
-
-    var poolSize = 1;
-    var imagePool = [];
-
-    while(images.length > 0 && imagePool.length < poolSize) {
-        var image = images.shift();
-        imagePool.push(image);
-        sendImage(image);
-    }
-
-    function sendImage(image) {
-        dataHolder = new FormData();
-        dataHolder.set('csrfmiddlewaretoken', '{{ csrf_token }}');
-        dataHolder.set('images', image);
-
-        $.ajax({
-            method: 'POST',
-            url: "{{ url('sas:album_upload', album_id=object.id) }}",
-            data: dataHolder,
-            processData: false,
-            contentType: false,
-        })
-            .fail(onSuccess.bind(undefined, image))
-            .done(onSuccess.bind(undefined, image))
-            .always(next.bind(undefined, image));
-    }
-
-    function next(image, status, jqXHR) {
-        var index;
-        if(index = imagePool.indexOf(image) !== -1) {
-            imagePool.splice(index, 1);
+        if(!formData.get('images').name) {
+            return true;
         }
-        var nextImage;
-        if(nextImage = images.shift()) {
-            imagePool.push(nextImage);
 
-            sendImage(nextImage);
+        event.preventDefault();
+
+        let errorList;
+        if((errorList = this.querySelector('#upload_form ul.errorlist.nonfield')) === null) {
+            errorList = document.createElement('ul');
+            errorList.classList.add('errorlist', 'nonfield');
+            this.insertBefore(errorList, this.firstElementChild);
         }
-    }
 
-    function onSuccess(image, data, status, jqXHR) {
-        if ($(data.responseText).find('.errorlist.nonfield')[0])
-            var errors = Array.from($(data.responseText).find('.errorlist.nonfield')[0].children);
-        else
-            var errors = []
-        while(errors.length > 0)
-            errorlist.appendChild(errors.shift());
-        progress.value = ++completeCount / imagesCount;
-        if(progress.value === 1 && errorlist.children.length === 0)
-            document.location.reload(true)
-    }
-});
-</script>
+        while(errorList.childElementCount > 0)
+            errorList.removeChild(errorList.firstElementChild);
+
+        let progress;
+        if((progress = this.querySelector('progress')) === null) {
+            progress = document.createElement('progress');
+            progress.value = 0;
+            let p = document.createElement('p');
+            p.appendChild(progress);
+            this.insertBefore(p, this.lastElementChild);
+        }
+
+        let dataHolder;
+
+        if(formData.get('album_name')) {
+            dataHolder = new FormData();
+            dataHolder.set('csrfmiddlewaretoken', '{{ csrf_token }}');
+            dataHolder.set('album_name', formData.get('album_name'));
+            $.ajax({
+                method: 'POST',
+                url: "{{ url('sas:album_upload', album_id=object.id) }}",
+                data: dataHolder,
+                processData: false,
+                contentType: false,
+                success: onSuccess
+            });
+        }
+
+        let images = formData.getAll('images');
+        let imagesCount = images.length;
+        let completeCount = 0;
+
+        let poolSize = 1;
+        let imagePool = [];
+
+        while(images.length > 0 && imagePool.length < poolSize) {
+            let image = images.shift();
+            imagePool.push(image);
+            sendImage(image);
+        }
+
+        function sendImage(image) {
+            dataHolder = new FormData();
+            dataHolder.set('csrfmiddlewaretoken', '{{ csrf_token }}');
+            dataHolder.set('images', image);
+
+            $.ajax({
+                method: 'POST',
+                url: "{{ url('sas:album_upload', album_id=object.id) }}",
+                data: dataHolder,
+                processData: false,
+                contentType: false,
+            })
+                .fail(onSuccess.bind(undefined, image))
+                .done(onSuccess.bind(undefined, image))
+                .always(next.bind(undefined, image));
+        }
+
+        function next(image, _, __) {
+            let index = imagePool.indexOf(image);
+            let nextImage = images.shift();
+
+            if(index !== -1)
+                imagePool.splice(index, 1);
+
+            if(nextImage) {
+                imagePool.push(nextImage);
+                sendImage(nextImage);
+            }
+        }
+
+        function onSuccess(image, data, _, __) {
+            let errors = [];
+
+            if ($(data.responseText).find('.errorlist.nonfield')[0])
+                errors = Array.from($(data.responseText).find('.errorlist.nonfield')[0].children);
+
+            while(errors.length > 0)
+                errorList.appendChild(errors.shift());
+
+            progress.value = ++completeCount / imagesCount;
+            if(progress.value === 1 && errorList.children.length === 0)
+                document.location.reload()
+        }
+    });
+    </script>
 {% endblock %}

@@ -250,6 +250,7 @@ class UserProfileForm(forms.ModelForm):
             "scrub_pict": forms.ClearableFileInput,
             "phone": PhoneNumberInternationalFallbackWidget,
             "parent_phone": PhoneNumberInternationalFallbackWidget,
+            "quote": forms.Textarea,
         }
         labels = {
             "profile_pict": _(

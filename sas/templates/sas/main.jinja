@@ -1,56 +1,110 @@
 {% extends "core/base.jinja" %}
 
+{%- block additional_css -%}
+    <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
+{%- endblock -%}
+
 {% block title %}
-{% trans %}SAS{% endtrans %}
+    {% trans %}SAS{% endtrans %}
 {% endblock %}
 
-{% macro display_album(a) %}
-{% if a.is_moderated %}
-<a href="{{ url("sas:album", album_id=a.id) }}">
-<div class="album">
-    <div>
-    {% if a.file %}
-    <img src="{{ a.get_download_url() }}" alt="{% trans %}preview{% endtrans %}">
-    {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
-    <img src="{{ a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() }}" alt="{% trans %}preview{% endtrans %}">
-    {% else %}
-    <img src="{{ static('core/img/sas.jpg') }}" alt="{% trans %}preview{% endtrans %}">
-    {% endif %}
-    </div>
-    {{ a.name }}
-</div>
-</a>
-{% elif user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
-<div style="display: inline-block; border: solid 1px red; text-align: center">
-    <p><a href="{{ url('core:file_moderate', file_id=a.id) }}?next={{ url('sas:moderation') }}">Moderate</a> or <a href="">Delete</a></p>
-    <a href="{{ url("sas:album", album_id=a.id) }}">{{ a.name }}</a>
-</div>
-{% endif %}
+{% set edit_mode = user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
+
+{% macro display_album(a, checkbox) %}
+    <a href="{{ url('sas:album', album_id=a.id) }}">
+        {% if a.file %}
+            {% set img = a.get_download_url() %}
+        {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
+            {% set img = a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() %}
+        {% else %}
+            {% set img = static('core/img/sas.jpg') %}
+        {% endif %}
+
+        <div 
+            class="album"
+            style="background-image: url('{{ img }}');"
+        >
+            <div class="text">
+                {{ a.name }}
+            </div>
+        </div>
+        {# {% if edit_mode and checkbox %}
+            <input type="checkbox" name="file_list" value="{{ a.id }}">
+        {% endif %} #}
+    </a>
 {% endmacro %}
 
 {% block content %}
-<h3>{% trans %}SAS{% endtrans %}</h3>
-<hr>
-<h4>{% trans %}Latest albums{% endtrans %}</h4>
-<div>
-    {% for a in latest %}
-        {{ display_album(a) }}
-    {% endfor %}
-</div>
-<hr>
-<h4>{% trans %}All categories{% endtrans %}</h4>
-<div>
-    {% for a in categories %}
-        {{ display_album(a) }}
-    {% endfor %}
-</div>
-{% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.non_field_errors() }}
-    <p>{{ form.album_name.errors }}<label for="{{ form.album_name.name }}">{{ form.album_name.label }}</label>
-    {{ form.album_name }}</p>
-    <p><input type="submit" value="{% trans %}Create{% endtrans %}" /></p>
-</form>
-{% endif %}
+    <main>
+        <h3>{% trans %}SAS{% endtrans %}</h3>
+
+        {% if not user.is_authenticated %}
+            <p>{% trans %}You must be logged in to see the SAS.{% endtrans %}</p>
+        {% else %}
+            <br>
+            <h4>{% trans %}Latest albums{% endtrans %}</h4>
+
+            <div class="albums">
+                {% for a in latest %}
+                    {{ display_album(a) }}
+                {% endfor %}
+            </div>
+
+            <br>
+
+            {% if edit_mode %}
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="navbar">
+                        <h4>{% trans %}All categories{% endtrans %}</h4>
+
+                        {# <div class="toolbar">
+                            <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}">
+                        </div> #}
+                    </div>
+
+                    {% if clipboard %}
+                        <div class="clipboard">
+                            {% trans %}Clipboard: {% endtrans %}
+                            <ul>
+                                {% for f in clipboard %}
+                                <li>{{ f.get_full_path() }}</li>
+                                {% endfor %}
+                            </ul>
+                            <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}">
+                        </div>
+                    {% endif %}
+            {% else %}
+                <h4>{% trans %}All categories{% endtrans %}</h4>
+            {% endif %}
+
+            <div class="albums">
+                {% for a in categories %}
+                    {{ display_album(a, true) }}
+                {% endfor %}
+            </div>
+
+            {% if edit_mode %}
+                </form>
+
+                <br>
+
+                <form class="add-files" action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="inputs">
+                        <div>
+                            <label for="{{ form.album_name.name }}">{{ form.album_name.label }}</label>
+                            {{ form.album_name }}
+                        </div>
+                        <input type="submit" value="{% trans %}Create{% endtrans %}" />
+                    </div>
+
+                    {{ form.non_field_errors() }}
+                    {{ form.album_name.errors }}
+                </form>
+            {% endif %}
+        {% endif %}
+    </main>
 {% endblock %}

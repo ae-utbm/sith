@@ -22,6 +22,7 @@
 #
 #
 
+import subprocess
 import re
 
 # Image utils
@@ -35,6 +36,17 @@ import PIL
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+
+
+def get_git_revision_short_hash() -> str:
+    """
+    Return the short hash of the current commit
+    """
+    return (
+        subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+        .decode("ascii")
+        .strip()
+    )
 
 
 def get_start_of_semester(d=date.today()):

@@ -1641,6 +1641,10 @@ msgstr "Appels affichés"
 msgid "Calls to moderate"
 msgstr "Appels à modérer"
 
+#: core/templates/core/base.jinja
+msgid "Site version:"
+msgstr "Version du site :"
+
 #: com/templates/com/news_admin_list.jinja:242
 #: core/templates/core/base.jinja:183
 msgid "Events"
@@ -2211,8 +2215,8 @@ msgid "Visitor"
 msgstr "Visiteur"
 
 #: core/models.py:787
-msgid "do you want to receive the weekmail"
-msgstr "voulez-vous recevoir le Weekmail"
+msgid "receive the Weekmail"
+msgstr "recevoir le Weekmail"
 
 #: core/models.py:789
 msgid "show your stats to others"
@@ -2220,11 +2224,11 @@ msgstr "montrez vos statistiques aux autres"
 
 #: core/models.py:791
 msgid "get a notification for every click"
-msgstr "recevez une notification pour chaque click"
+msgstr "avoir une notification pour chaque click"
 
 #: core/models.py:794
 msgid "get a notification for every refilling"
-msgstr "recevez une notification pour chaque rechargement"
+msgstr "avoir une notification pour chaque rechargement"
 
 #: core/models.py:817
 msgid "file name"
@@ -2399,7 +2403,7 @@ msgstr "Connexion"
 
 #: core/templates/core/base.jinja:62 core/templates/core/register.jinja:18
 msgid "Register"
-msgstr "S'enregister"
+msgstr "Inscription"
 
 #: core/templates/core/base.jinja:91 core/templates/core/base.jinja:92
 #: forum/templates/forum/macros.jinja:171
@@ -2559,9 +2563,9 @@ msgstr "Aide & Documentation"
 msgid "R&D"
 msgstr "R&D"
 
-#: core/templates/core/base.jinja:268
-msgid "Site made by good people"
-msgstr "Site réalisé par des gens bons"
+#: core/templates/core/base.jinja:262
+msgid "Site created by the IT Department of the AE"
+msgstr "Site réalisé par le Pôle Informatique de l'AE"
 
 #: core/templates/core/create.jinja:4 core/templates/core/create.jinja:8
 #, python-format
@@ -2640,6 +2644,11 @@ msgstr "Coller"
 #: core/templates/core/file_detail.jinja:31 sas/templates/sas/album.jinja:33
 msgid "Clipboard: "
 msgstr "Presse-papier : "
+
+#: sas/templates/sas/album.jinja:69
+#: sas/templates/sas/album.jinja:97
+msgid "To be moderated"
+msgstr "A modérer"
 
 #: core/templates/core/file_detail.jinja:53
 msgid "Real name: "
@@ -3323,6 +3332,10 @@ msgstr "Télécharger toutes mes photos"
 msgid "Error downloading your pictures"
 msgstr "Erreur de téléchargement de vos photos"
 
+#: core/templates/core/user_picture.jinja:
+msgid "Picture Unavailable"
+msgstr "Photo Indisponible"
+
 #: core/templates/core/user_preferences.jinja:4
 #: core/templates/core/user_preferences.jinja:8 core/views/user.py:234
 msgid "Preferences"
@@ -3357,8 +3370,8 @@ msgstr ""
 "14 caractères de long."
 
 #: core/templates/core/user_preferences.jinja:40
-msgid "No student cards registered."
-msgstr "Aucune cartes étudiante enregistré."
+msgid "No student card registered."
+msgstr "Aucune carte étudiante enregistrée."
 
 #: core/templates/core/user_stats.jinja:4
 #, python-format
@@ -3980,6 +3993,10 @@ msgstr "Activité sur %(counter_name)s"
 #: counter/templates/counter/activity.jinja:11
 msgid "Barmen list"
 msgstr "Barmans"
+
+#: counter/templates/counter/activity.jinja:23
+msgid "There is currently no barman connected."
+msgstr "Il n'y a actuellement aucun barman connecté."
 
 #: counter/templates/counter/activity.jinja:19
 msgid "Legend"
@@ -5328,11 +5345,19 @@ msgstr "photo"
 msgid "SAS"
 msgstr "SAS"
 
+#: sas/templates/sas/album.jinja:102
+msgid "This album does not contain any photos."
+msgstr "Cet album ne contient aucune photo."
+
 #: sas/templates/sas/album.jinja:53 sas/templates/sas/album.jinja:55
 #: sas/templates/sas/main.jinja:13 sas/templates/sas/main.jinja:15
 #: sas/templates/sas/main.jinja:17
 msgid "preview"
 msgstr "miniature"
+
+#: sas/templates/sas/main.jinja:42
+msgid "You must be logged in to see the SAS."
+msgstr "Vous devez être connecté pour voir les photos."
 
 #: sas/templates/sas/album.jinja:89
 msgid "Upload"
@@ -5752,6 +5777,12 @@ msgstr "Vous avez acheté %s"
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
+#: core/templates/core/base.jinja
+msgid "You do not have any unread notification"
+msgstr "Vous n'avez aucune notification non lue"
+
+#: sith/settings.py:624
+#: sith/settings.py:648
 #: sith/settings.py:650
 msgid "Success!"
 msgstr "Succès !"

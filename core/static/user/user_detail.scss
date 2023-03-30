@@ -1,0 +1,200 @@
+main {
+  box-sizing: border-box;
+  display: flex;
+  margin-bottom: 4em;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  width: 100%;
+
+  > .user_profile > .user_profile_infos {
+    @media (max-width: 960px) {
+      border-right-color: transparent;
+    }
+  }
+}
+
+.user-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.infos-and-picture {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+
+  @media (max-width: 960px) {
+    flex-direction: column-reverse;
+    gap: 20px;
+  }
+
+  > .user_profile_infos {
+    width: 50%;
+    border-right: solid 1px grey;
+
+    @media (max-width: 960px) {
+      width: 100%;
+    }
+
+    @media (min-width: 960px) {
+      padding-right: 20px;
+    }
+
+    > .user_profile_infos_promo {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+
+      > img {
+        width: 5em;
+        margin: 0.5em;
+      }
+    }
+
+    > .user_profile_infos_items {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      > div {
+        box-sizing: border-box;
+        display: flex;
+
+        > .user_profile_infos_item,
+        > .user_profile_infos_item_value {
+          vertical-align: top;
+          display: block;
+          width: 50%;
+        }
+
+        > .user_profile_infos_item {
+          color: gray;
+        }
+      }
+    }
+
+    > #user_profile_infos_quote {
+      text-align: right;
+      color: grey;
+      font-style: italic;
+
+      @media (max-width: 960px) {
+        text-align: center;
+      }
+
+      &:after,
+      &:before {
+        vertical-align: middle;
+      }
+
+      &:before {
+        content: "\201C";
+      }
+
+      &:after {
+        content: "\201D";
+      }
+    }
+  }
+
+  > .user_profile_pictures {
+    height: 20em;
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    @media (max-width: 960px) {
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+    }
+
+    @media (min-width: 960px) {
+      padding-left: 20px;
+    }
+
+    > .user_profile_pictures_bigone {
+      flex-grow: 9;
+      flex-basis: 20em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      > img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+
+        @media (max-width: 960px) {
+          max-width: 300px;
+          width: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+
+    > .user_profile_pictures_thumbnails {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      flex-grow: 1;
+
+      @media (max-width: 960px) {
+        flex-direction: row;
+        height: 50%;
+      }
+
+      > img {
+        max-height: calc(100% / 3);
+        width: 100%;
+        object-fit: contain;
+
+        @media (max-width: 960px) {
+          max-height: 100%;
+          max-width: calc(100% / 3) !important;
+          height: auto;
+        }
+      }
+    }
+  }
+}
+
+.form-gifts {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 960px) {
+    flex-direction: column;
+  }
+
+  >select,
+  >input {
+    min-width: 300px;
+    max-width: 100%;
+    height: 40px;
+
+    @media (max-width: 960px) {
+      width: 100%;
+    }
+  }
+}
