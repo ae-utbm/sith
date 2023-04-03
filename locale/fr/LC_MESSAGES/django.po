@@ -1713,6 +1713,10 @@ msgstr "Administrer les news"
 msgid "Events today and the next few days"
 msgstr "Événements aujourd'hui et dans les prochains jours"
 
+#: com/templates/com/news_list.jinja:100
+msgid "All coming events"
+msgstr "Tous les événements à venir"
+
 #: com/templates/com/news_list.jinja:82
 msgid "Nothing to come..."
 msgstr "Rien à venir..."

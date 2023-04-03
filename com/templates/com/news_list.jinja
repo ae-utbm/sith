@@ -8,13 +8,13 @@
 {% block content %}
 {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
 <div id="news_admin">
-  <a href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
+  <a class="button" href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
 </div>
+<br>
 {% endif  %}
 
 <div id="news">
     <div id="left_column" class="news_column">
-
         {% for news in object_list.filter(type="NOTICE") %}
             <section class="news_notice">
                 <h4><a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
@@ -97,6 +97,15 @@
                 </section>
             {% endfor %}
         {% endif %}
+
+        <h3>{% trans %}All coming events{% endtrans %}</h3>
+        <iframe 
+            src="https://embed.styledcalendar.com/#2mF2is8CEXhr4ADcX6qN" 
+            title="Styled Calendar"
+            class="styled-calendar-container" 
+            style="width: 100%; border: none; height: 1060px" 
+            data-cy="calendar-embed-iframe">
+        </iframe>
     </div>
 
     <div id="right_column" class="news_column">
