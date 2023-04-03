@@ -48,6 +48,7 @@ body {
   font-family: sans-serif;
 }
 
+a.button,
 button,
 input[type="button"],
 input[type="submit"],
@@ -60,11 +61,13 @@ input[type="file"] {
   margin: 0.1em;
   font-size: 1.2em;
   border-radius: 5px;
+  color: black;
   &:hover {
     background: hsl(0, 0%, 83%);
   }
 }
 
+a.button,
 input[type="button"],
 input[type="submit"],
 input[type="reset"],
@@ -72,6 +75,7 @@ input[type="file"] {
   font-weight: bold;
 }
 
+a.button:not(:disabled),
 button:not(:disabled),
 input[type="button"]:not(:disabled),
 input[type="submit"]:not(:disabled),
@@ -111,7 +115,8 @@ select {
   border-radius: 5px;
   cursor: pointer;
 }
-a {
+
+a:not(.button) {
   text-decoration: none;
   color: $primary-dark-color;
   &:hover {
@@ -348,7 +353,11 @@ a {
   /*---------------------------------NEWS--------------------------------*/
   #news {
     display: flex;
-    flex-wrap: wrap;
+
+    @media (max-width: 800px) {
+      flex-direction: column;
+    }
+    
     .news_column {
       display: inline-block;
       margin: 0;
@@ -1403,7 +1412,7 @@ footer {
       padding: 0.8em;
       flex: 1;
       font-weight: bold;
-      color: $white-color;
+      color: $white-color !important;
       &:hover {
         color: $primary-dark-color;
       }

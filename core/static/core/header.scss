@@ -23,6 +23,10 @@
     flex-direction: row;
     gap: 10px;
 
+    > a {
+      color: #fff;
+    }
+
     &:hover > a {
       color: #1a78b3;
     }
