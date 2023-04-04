@@ -9,7 +9,7 @@
     <img src="https://img.shields.io/readthedocs/sith-ae?logo=readthedocs&style=for-the-badge">
   </a>
   <a href="https://discord.gg/XK9WfPsUFm">
-    <img src="https://img.shields.io/discord/889796155523874847?label=Discord&logo=discord&style=for-the-badge">
+    <img src="https://img.shields.io/discord/971448179075731476?label=Discord&logo=discord&style=for-the-badge">
   </a>
 </p>
 
@@ -37,5 +37,4 @@
   </li>
 </ul>
 
-> This project is licenced under GNU GPL, see the LICENSE file at the top of the repository for more details.
-
+> This project is licensed under GNU GPL, see the LICENSE file at the top of the repository for more details.
