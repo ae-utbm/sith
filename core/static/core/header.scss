@@ -23,11 +23,11 @@
     flex-direction: row;
     gap: 10px;
 
-    > a {
+    >a {
       color: #fff;
     }
 
-    &:hover > a {
+    &:hover>a {
       color: #1a78b3;
     }
 
@@ -57,11 +57,11 @@
       justify-content: center;
       align-items: flex-start;
 
-      > span:first-child {
+      >span:first-child {
         font-size: 1.43em;
       }
 
-      > span:last-child {
+      >span:last-child {
         font-size: .7em;
       }
     }
@@ -80,12 +80,12 @@
       flex-direction: row;
     }
 
-    > form {
+    >form {
       margin: 0;
       box-sizing: border-box;
       position: relative;
 
-      > input[type=submit] {
+      >input[type=submit] {
         border-radius: 0;
         margin: 0;
         box-sizing: border-box;
@@ -115,7 +115,7 @@
       justify-content: center;
     }
 
-    > .button {
+    >.button {
       box-sizing: border-box;
       height: 35px;
       background-color: transparent;
@@ -137,7 +137,7 @@
     }
   }
 
-  &-disconnected ~ &-lang {
+  &-disconnected~&-lang {
     @media (max-width: 662px) {
       flex-direction: row;
       width: 100%;
@@ -165,8 +165,8 @@
       padding: 0 10px;
     }
 
-    > .right,
-    > .left {
+    >.right,
+    >.left {
       box-sizing: border-box;
       display: flex;
       flex-direction: row;
@@ -179,11 +179,11 @@
       }
     }
 
-    > .right {
+    >.right {
       flex: 1;
       justify-content: flex-end;
 
-      > .user {
+      >.user {
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -193,47 +193,62 @@
         @media (max-width: 1200px) {
           width: 100%;
           flex-direction: row-reverse;
+          justify-content: flex-end;
         }
 
-        > a > img {
+        >a>img {
           width: 40px;
           height: 40px;
           border-radius: 50%;
         }
 
-        > .options {
-          width: 100%;
-          display: flex;
-          justify-content: flex-end;
-          flex-direction: column;
-          gap: 5px;
+        >.options {
+          >.username {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
 
-          @media (max-width: 1200px) {
-            justify-content: flex-start;
-            flex-direction: row;
-            gap: 15px;
-          }
-
-          > a {
-            text-align: right;
-            color: white;
-
-            &:hover {
-              color: #1a78b3;
-            }
-
-            &:last-child {
-              color: #eb2f06;
+            >a {
+              color: white;
 
               &:hover {
-                color: #cc2804;
+                color: #1a78b3;
+              }
+            }
+          }
+
+          >.links {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+
+            @media (max-width: 1200px) {
+              justify-content: flex-start;
+              gap: 15px;
+            }
+
+            >a {
+              text-align: right;
+              color: white;
+
+              &:hover {
+                color: #1a78b3;
+              }
+
+              &:last-child {
+                color: #eb2f06;
+
+                &:hover {
+                  color: #cc2804;
+                }
               }
             }
           }
         }
       }
 
-      > .notification {
+      >.notification {
         height: 100%;
         width: 55px;
         display: flex;
@@ -241,7 +256,7 @@
         align-items: center;
         position: relative;
 
-        > a {
+        >a {
           color: white;
           position: relative;
           font-size: 25px;
@@ -250,7 +265,7 @@
             color: #1a78b3;
           }
 
-          > span {
+          >span {
             color: white;
             font-size: 14px;
             display: flex;
@@ -267,7 +282,7 @@
           }
         }
 
-        > #header_notif {
+        >#header_notif {
           box-sizing: border-box;
           display: none;
           position: absolute;
@@ -282,7 +297,7 @@
           border-radius: 10px;
           box-shadow: 3px 3px 3px 0 #767676;
 
-          > ul {
+          >ul {
             list-style-type: none;
             margin: 0;
             display: flex;
@@ -291,8 +306,8 @@
             max-height: 120px;
             overflow-y: auto;
 
-            > li {
-              > a {
+            >li {
+              >a {
                 .datetime {
                   display: flex;
                   justify-content: flex-start;
@@ -315,7 +330,7 @@
             justify-content: space-between;
             margin-top: 10px;
 
-            > a {
+            >a {
               color: black;
               padding: 5px;
               width: 50%;
@@ -334,7 +349,7 @@
       }
     }
 
-    > .left {
+    >.left {
       gap: 10px;
       display: flex;
 
@@ -346,7 +361,7 @@
         flex-direction: column-reverse;
       }
 
-      > form {
+      >form {
         margin: 0;
         width: 200px;
 
@@ -354,7 +369,7 @@
           width: 100%;
         }
 
-        > input[type=text] {
+        >input[type=text] {
           box-sizing: border-box;
           max-width: 100%;
           width: 100%;
@@ -370,7 +385,7 @@
     }
   }
 
-  &-connected ~ &-lang {
+  &-connected~&-lang {
     @media (max-width: 1200px) {
       flex-direction: row;
       width: 100%;
@@ -390,7 +405,7 @@
     gap: 20px;
   }
 
-  > li > a {
+  >li>a {
     display: flex;
     color: white;
 
@@ -398,11 +413,11 @@
       color: #1a78b3;
     }
 
-    > span {
+    >span {
       margin-left: 10px;
     }
 
-    > i {
+    >i {
       width: 16px;
       display: flex;
       justify-content: center;

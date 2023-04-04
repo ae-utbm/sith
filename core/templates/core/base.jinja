@@ -89,8 +89,13 @@
                             <div class="right">
                                 <div class="user">
                                     <div class="options">
-                                        <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
-                                        <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
+                                        <div class="username">
+                                            <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
+                                        </div>
+                                        <div class="links">
+                                            <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
+                                            <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
+                                        </div>
                                     </div>
                                     <a href="{{ url('core:user_profile', user_id=user.id) }}">
                                          {% if user.profile_pict %}
