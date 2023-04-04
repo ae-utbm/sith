@@ -5,23 +5,41 @@
 {% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}
 {% endblock %}
 
-{% block content %}
-<h3>{% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}</h3>
-    {% if counter.type == 'BAR' %}
-    <h4>{% trans %}Barmen list{% endtrans %}</h4>
-    <ul>
-        {% for b in counter.get_barmen_list() %}
-        <li>{{ user_profile_link(b) }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+{%- block additional_css -%}
+<link rel="stylesheet" href="{{ scss('counter/activity.scss') }}">
+{%- endblock -%}
 
-<h5>{% trans %}Legend{% endtrans %}</h5>
-	<span style="color: green">&#x2713;</span> : {% trans %}counter is open, there's at least one barman connected{% endtrans %}
-	<br>
-    <span style="color: orange">&#x3f;</span> : {% trans  minutes=settings.SITH_COUNTER_MINUTE_INACTIVE %}counter is open but not active, the last sale was done at least {{ minutes }} minutes ago {% endtrans %}
-    <br>
-    <span style="color: red">&#10007;</span> : {% trans %}counter is not open : no one is connected{% endtrans %}
+{% block content %}
+    <h3>{% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}</h3>
+        {% if counter.type == 'BAR' %}
+            <h4>{% trans %}Barmen list{% endtrans %}</h4>
+            <ul>
+                {% set barmans_list = counter.get_barmen_list() %}
+                {% if barmans_list | length > 0 %}
+                    {% for b in barmans_list %}
+                        <li>{{ user_profile_link(b) }}</li>
+                    {% endfor %}
+                {% else %}
+                    {% trans %}There is currently no barman connected.{% endtrans %}
+                {% endif %}
+            </ul>
+        {% endif %}
+
+    <h5>{% trans %}Legend{% endtrans %}</h5>
+    <div class="activity-description">
+        <div>
+            <i class="fa fa-check" style="color: #2ecc71"></i>
+            <span>{% trans %}counter is open, there's at least one barman connected{% endtrans %}</span>
+        </div>
+        <div>
+            <i class="fa fa-question" style="color: #f39c12"></i>
+            <span>{% trans  minutes=settings.SITH_COUNTER_MINUTE_INACTIVE %}counter is open but not active, the last sale was done at least {{ minutes }} minutes ago {% endtrans %}</span>
+        </div>
+        <div>
+            <i class="fa fa-times" style="color: #eb2f06"></i>
+            <span>{% trans %}counter is not open : no one is connected{% endtrans %}</span>
+        </div>
+    </div>
 {% endblock %}
 
 

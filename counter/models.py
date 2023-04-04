@@ -1,34 +1,25 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
-# - Skia <skia@libskia.so>
+# Copyright 2023 © AE UTBM
+# ae@utbm.fr / ae.info@utbm.fr
 #
-# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
-# http://ae.utbm.fr.
+# This file is part of the website of the UTBM Student Association (AE UTBM),
+# https://ae.utbm.fr.
 #
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License a published by the Free Software
-# Foundation; either version 3 of the License, or (at your option) any later
-# version.
+# You can find the source code of the website at https://github.com/ae-utbm/sith3
 #
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
-# Place - Suite 330, Boston, MA 02111-1307, USA.
+# LICENSED UNDER THE GNU GENERAL PUBLIC LICENSE VERSION 3 (GPLv3)
+# SEE : https://raw.githubusercontent.com/ae-utbm/sith3/master/LICENSE
+# OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
 from __future__ import annotations
-from django.db.models import Sum, F
 
 from typing import Tuple
 
 from django.db import models
-from django.db.models import OuterRef, Exists
-from django.db.models.functions import Length
+from django.db.models import F, Value, Sum, QuerySet, OuterRef, Exists
+from django.db.models.functions import Concat, Length
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.conf import settings
@@ -37,14 +28,14 @@ from django.core.validators import MinLengthValidator
 from django.forms import ValidationError
 from django.utils.functional import cached_property
 
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 import random
 import string
 import os
 import base64
-import datetime
 from dict2xml import dict2xml
 
+from core.utils import get_start_of_semester
 from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
 from club.models import Club, Membership
 from accounting.models import CurrencyField
@@ -92,8 +83,9 @@ class Customer(models.Model):
         don't mix them) and a Product.
         """
         subscription = self.user.subscriptions.order_by("subscription_end").last()
-        time_diff = date.today() - subscription.subscription_end
-        return subscription is not None and time_diff < timedelta(days=90)
+        if subscription is None:
+            return False
+        return (date.today() - subscription.subscription_end) < timedelta(days=90)
 
     @classmethod
     def get_or_create(cls, user: User) -> Tuple[Customer, bool]:
@@ -491,7 +483,7 @@ class Counter(models.Model):
         """
         return self.is_open() and (
             (timezone.now() - self.permanencies.order_by("-activity").first().activity)
-            > datetime.timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE)
+            > timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE)
         )
 
     def barman_list(self):
@@ -516,6 +508,77 @@ class Counter(models.Model):
             if ae.get_membership_for(barman):
                 is_ae_member = True
         return is_ae_member
+
+    def get_top_barmen(self) -> QuerySet:
+        """
+        Return a QuerySet querying the office hours stats of all the barmen of all time
+        of this counter, ordered by descending number of hours.
+
+        Each element of the QuerySet corresponds to a barman and has the following data :
+            - the full name (first name + last name) of the barman
+            - the nickname of the barman
+            - the promo of the barman
+            - the total number of office hours the barman did attend
+        """
+        return (
+            self.permanencies.exclude(end=None)
+            .annotate(
+                name=Concat(F("user__first_name"), Value(" "), F("user__last_name"))
+            )
+            .annotate(nickname=F("user__nick_name"))
+            .annotate(promo=F("user__promo"))
+            .values("user", "name", "nickname", "promo")
+            .annotate(perm_sum=Sum(F("end") - F("start")))
+            .exclude(perm_sum=None)
+            .order_by("-perm_sum")
+        )
+
+    def get_top_customers(self, since=get_start_of_semester()) -> QuerySet:
+        """
+        Return a QuerySet querying the money spent by customers of this counter
+        since the specified date, ordered by descending amount of money spent.
+
+        Each element of the QuerySet corresponds to a customer and has the following data :
+            - the full name (first name + last name) of the customer
+            - the nickname of the customer
+            - the amount of money spent by the customer
+        """
+        return (
+            self.sellings.filter(date__gte=since)
+            .annotate(
+                name=Concat(
+                    F("customer__user__first_name"),
+                    Value(" "),
+                    F("customer__user__last_name"),
+                )
+            )
+            .annotate(nickname=F("customer__user__nick_name"))
+            .annotate(promo=F("customer__user__promo"))
+            .values("customer__user", "name", "nickname")
+            .annotate(
+                selling_sum=Sum(
+                    F("unit_price") * F("quantity"), output_field=CurrencyField()
+                )
+            )
+            .filter(selling_sum__gt=0)
+            .order_by("-selling_sum")
+        )
+
+    def get_total_sales(self, since=get_start_of_semester()) -> CurrencyField:
+        """
+        Compute and return the total turnover of this counter
+        since the date specified in parameter (by default, since the start of the current
+        semester)
+        :param since: timestamp from which to perform the calculation
+        :type since: datetime | date
+        :return: Total revenue earned at this counter
+        """
+        if isinstance(since, date):
+            since = datetime.combine(since, datetime.min.time())
+        total = self.sellings.filter(date__gte=since).aggregate(
+            total=Sum(F("quantity") * F("unit_price"), output_field=CurrencyField())
+        )["total"]
+        return total if total is not None else CurrencyField(0)
 
 
 class Refilling(models.Model):

@@ -1,27 +1,20 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2016,2017
-# - Skia <skia@libskia.so>
+# Copyright 2023 © AE UTBM
+# ae@utbm.fr / ae.info@utbm.fr
 #
-# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
-# http://ae.utbm.fr.
+# This file is part of the website of the UTBM Student Association (AE UTBM),
+# https://ae.utbm.fr.
 #
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License a published by the Free Software
-# Foundation; either version 3 of the License, or (at your option) any later
-# version.
+# You can find the source code of the website at https://github.com/ae-utbm/sith3
 #
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
-# Place - Suite 330, Boston, MA 02111-1307, USA.
+# LICENSED UNDER THE GNU GENERAL PUBLIC LICENSE VERSION 3 (GPLv3)
+# SEE : https://raw.githubusercontent.com/ae-utbm/sith3/master/LICENSE
+# OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
 
+import subprocess
 import re
 
 # Image utils
@@ -31,11 +24,21 @@ from datetime import date
 
 from PIL import ExifTags
 
-# from exceptions import IOError
 import PIL
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+
+
+def get_git_revision_short_hash() -> str:
+    """
+    Return the short hash of the current commit
+    """
+    return (
+        subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+        .decode("ascii")
+        .strip()
+    )
 
 
 def get_start_of_semester(d=date.today()):
@@ -52,14 +55,12 @@ def get_start_of_semester(d=date.today()):
     year = today.year
     start = date(year, settings.SITH_START_DATE[0], settings.SITH_START_DATE[1])
     start2 = start.replace(month=(start.month + 6) % 12)
-    if start > start2:
-        start, start2 = start2, start
-    if today < start:
-        return start2.replace(year=year - 1)
-    elif today < start2:
-        return start
-    else:
-        return start2
+    spring, autumn = min(start, start2), max(start, start2)
+    if today > autumn:  # autumn semester
+        return autumn
+    if today > spring:  # spring semester
+        return spring
+    return autumn.replace(year=year - 1)  # autumn semester of last year
 
 
 def get_semester(d=date.today()):

@@ -1,86 +1,184 @@
-{% extends "core/base.jinja" %}
+{%- extends "core/base.jinja" -%}
 
-{% block title %}
-{% trans %}Edit user{% endtrans %}
-{% endblock %}
+{%- block title -%}
+{%- trans -%}Edit user{%- endtrans -%}
+{%- endblock -%}
 
-{% block content %}
-<h2>{% trans %}Edit user profile{% endtrans %}</h2>
+{%- block additional_css -%}
+<link rel="stylesheet" href="{{ scss('user/user_edit.scss') }}">
+{%- endblock -%}
+
+{%- block content -%}
+<h2 class="title">{%- trans -%}Edit user profile{%- endtrans -%}</h2>
 <form action="" method="post" enctype="multipart/form-data" id="user_edit">
-    {% csrf_token %}
+
+    {%- csrf_token -%}
     {{ form.non_field_errors() }}
-    {% for field in form %}
-    <p>{{ field.errors }}<label for="{{ field.name }}">{{ field.label }}
-    {%- if field.name == "profile_pict" -%}
-    <br>{% trans %}Current profile: {% endtrans %}
-    {% if form.instance.profile_pict %}
-    <img src="{{ form.instance.profile_pict.get_download_url() }}" title="{% trans %}Profile{% endtrans %}" /><br>
-    {% if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) %}
-    <a href="{{ url('core:file_delete', file_id=form.instance.profile_pict.id, popup="") }}">{% trans %}Delete{% endtrans %}</a>
-    {% endif %}
-    {% else %}
-    <img src="{{ static('core/img/unknown.jpg') }}" title="-" crossOrigin="Anonymous" id="new_profile"/><br>
-    <div id="take_picture">
-        <div id="camera_canvas" style="width:320; height:240; margin: 0px auto;"></div>
-        <a href="javascript:void(take_snapshot())">{% trans %}Take picture{% endtrans %}</a>
+
+    {# User Pictures #}
+    <div class="profile-pictures">
+        <div class="profile-picture">
+            <div class="profile-picture-display">
+
+                {%- if form.instance.profile_pict -%}
+                <img src="{{ form.instance.profile_pict.get_download_url() }}"
+                    alt="{%- trans -%}Profile{%- endtrans -%}" title="{%- trans -%}Profile{%- endtrans -%}" />
+                {%- else -%}
+                <img src="{{ static('core/img/unknown.jpg') }}" alt="{%- trans -%}Profile{%- endtrans -%}"
+                    title="{%- trans -%}Profile{%- endtrans -%}" />
+                {%- endif -%}
+            </div>
+            <div class="profile-picture-edit">
+                <p>{{ form["profile_pict"].label }}</p>
+                {{ form["profile_pict"] }}
+                {%- if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) and form.instance.profile_pict.id -%}
+                    <a href="{{ url('core:file_delete', file_id=form.instance.profile_pict.id, popup='') }}">
+                        {%- trans -%}Delete{%- endtrans -%}
+                    </a>
+                {%- endif -%}
+            </div>
+        </div>
+        <div class="profile-picture">
+            <div class="profile-picture-display">
+                {%- if form.instance.avatar_pict -%}
+                <img src="{{ form.instance.avatar_pict.get_download_url() }}" alt="{%- trans -%}Profile{%- endtrans -%}"
+                    title="{%- trans -%}Profile{%- endtrans -%}" />
+                {%- else -%}
+                <img src="{{ static('core/img/unknown.jpg') }}" alt="{%- trans -%}Profile{%- endtrans -%}"
+                    title="{%- trans -%}Profile{%- endtrans -%}" />
+                {%- endif -%}
+            </div>
+            <div class="profile-picture-edit">
+                <p>{{ form["avatar_pict"].label }}</p>
+                {{ form["avatar_pict"] }}
+                {%- if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) and form.instance.avatar_pict.id -%}
+                    <a href="{{ url('core:file_delete', file_id=form.instance.avatar_pict.id, popup='') }}">
+                        {%- trans -%}Delete{%- endtrans -%}
+                    </a>
+                {%- endif -%}
+            </div>
+        </div>
+        <div class="profile-picture">
+            <div class="profile-picture-display">
+                {%- if form.instance.scrub_pict -%}
+                <img src="{{ form.instance.scrub_pict.get_download_url() }}" alt="{%- trans -%}Profile{%- endtrans -%}"
+                    title="{%- trans -%}Profile{%- endtrans -%}" />
+                {%- else -%}
+                <img src="{{ static('core/img/unknown.jpg') }}" alt="{%- trans -%}Profile{%- endtrans -%}"
+                    title="{%- trans -%}Profile{%- endtrans -%}" />
+                {%- endif -%}
+            </div>
+            <div class="profile-picture-edit">
+                <p>{{ form["scrub_pict"].label }}</p>
+                {{ form["scrub_pict"] }}
+                {%- if user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) and form.instance.scrub_pict.id -%}
+                    <a href="{{ url('core:file_delete', file_id=form.instance.scrub_pict.id, popup='') }}">
+                        {%- trans -%}Delete{%-endtrans -%}
+                    </a>
+                {%- endif -%}
+            </div>
+        </div>
     </div>
+
+
+    {# All fields #}
+    <div class="profile-fields">
+        {%- for field in form -%}
+        {%-
+        if field.name in ["quote","profile_pict","avatar_pict","scrub_pict","is_subscriber_viewable","forum_signature"]
+        -%}
+        {%- continue -%}
+        {%- endif -%}
+
+        <div class="profile-field">
+            <div class="profile-field-label">{{ field.label }}</div>
+            <div class="profile-field-content">
+                {{ field }}
+                {%- if field.errors -%}
+                <div class="field-error">{{ field.errors }}</div>
+                {%- endif -%}
+            </div>
+        </div>
+        {%- endfor -%}
+    </div>
+
+    {# Textareas #}
+    <div class="profile-fields">
+        {%- for field in [form["quote"], form["forum_signature"]] -%}
+        <div class="profile-field">
+            <div class="profile-field-label">{{ field.label }}</div>
+            <div class="profile-field-content">
+                {{ field }}
+                {%- if field.errors -%}
+                <div class="field-error">{{ field.errors }}</div>
+                {%- endif -%}
+            </div>
+        </div>
+        {%- endfor -%}
+    </div>
+
+    {# Checkboxes #}
+    <div class="profile-visible">
+        {{ form["is_subscriber_viewable"] }}
+        {{ form["is_subscriber_viewable"].label }}
+    </div>
+
+    {%- if form.instance == user -%}
     <p>
-    {% endif %}<br>
-    {%- elif field.name == "avatar_pict" and form.instance.avatar_pict -%}
-    <br>{% trans %}Current avatar: {% endtrans %}
-    <img src="{{ form.instance.avatar_pict.get_download_url() }}" title="{% trans %}Avatar{% endtrans %}" /><br>
-    {%- elif field.name == "scrub_pict" and form.instance.scrub_pict -%}
-    <br>{% trans %}Current scrub: {% endtrans %}
-    <img src="{{ form.instance.scrub_pict.get_download_url() }}" title="{% trans %}Scrub{% endtrans %}" /><br>
-    {%- endif %}</label> {{ field }}</p>
-    {% endfor %}
-    <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>
-    <p>{% trans %}Username: {% endtrans %}{{ form.instance.username }}</p>
-    {% if form.instance.customer %}
-    <p>{% trans %}Account number: {% endtrans %}{{ form.instance.customer.account_id }}</p>
-    {% endif %}
-    {% if form.instance == user %}
-    <p><a href="{{ url('core:password_change') }}">{% trans %}Change my password{% endtrans %}</a></p>
-    {% elif user.is_root %}
-    <p><a href="{{ url('core:password_root_change', user_id=form.instance.id) }}">{% trans %}Change user password{% endtrans %}</a></p>
-    {% endif %}
+        <a href="{{ url('core:password_change') }}">{%- trans -%}Change my password{%- endtrans -%}</a>
+    </p>
+    {%- elif user.is_root -%}
+    <p>
+        <a href="{{ url('core:password_root_change', user_id=form.instance.id) }}">{%- trans -%}Change user password{%-
+            endtrans -%}</a>
+    </p>
+    {%- endif -%}
+
+    <p>
+        <input type="submit" value="{%- trans -%}Update{%- endtrans -%}" />
+    </p>
 </form>
-{% endblock %}
 
-{% block script %}
-    {{ super() }}
-    {% if not form.instance.profile_pict %}
-    <script src="{{ static('core/js/webcam.js') }}"></script>
-    <script language="JavaScript">
-        Webcam.on('error', function(msg) { console.log('Webcam.js error: ' + msg) })
-        Webcam.set({
-                width: 320,
-                height: 240,
-                dest_width: 320,
-                dest_height: 240,
-                image_format: 'jpeg',
-                jpeg_quality: 90,
-                force_flash: false
-            });
-        Webcam.attach( '#camera_canvas' );
+<p>
+    <em>{%- trans -%}Username: {%- endtrans -%}&nbsp;{{ form.instance.username }}</em>
+    <br />
+    {%- if form.instance.customer -%}
+    <em>{%- trans -%}Account number: {%- endtrans -%}&nbsp;{{ form.instance.customer.account_id }}</em>
+    {%- endif -%}
+</p>
 
-        function take_snapshot() {
-            var data_uri = Webcam.snap();
-            var url = "{{ url('core:user_profile_upload', user_id=form.instance.id) }}";
-            Webcam.upload( data_uri, url, function(code, text) {
-                            if (code == 302 || code == 200) {
-                                $('#new_profile').attr('src', data_uri);
-                                $('#take_picture').remove();
-                                $('#id_profile_pict').remove();
-                            } else {
-                                console.log("Unknown error: ");
-                                console.log(text);
-                            }
-                        }, "new_profile_pict", {name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'});
-        }
-    </script>
-    {% endif %}
-{% endblock %}
+{%- endblock -%}
 
-
-
+{%- block script -%}
+{{ super() }}
+{%- if not form.instance.profile_pict -%}
+<script src="{{ static('core/js/webcam.js') }}"></script>
+<script>
+    Webcam.on('error', function (msg) { console.log('Webcam.js error: ' + msg) })
+    Webcam.set({
+        width: 320,
+        height: 240,
+        dest_width: 320,
+        dest_height: 240,
+        image_format: 'jpeg',
+        jpeg_quality: 90,
+        force_flash: false
+    });
+    Webcam.attach('#camera_canvas');
+    function take_snapshot() {
+        const data_uri = Webcam.snap();
+        const url = "{{ url('core:user_profile_upload', user_id=form.instance.id) }}";
+        Webcam.upload(data_uri, url, function (code, text) {
+            if (code === 302 || code === 200) {
+                $('#new_profile').attr('src', data_uri);
+                $('#take_picture').remove();
+                $('#id_profile_pict').remove();
+            } else {
+                console.log("Unknown error: ");
+                console.log(text);
+            }
+        }, "new_profile_pict", { name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}' });
+    }
+</script>
+{%- endif -%}
+{%- endblock -%}

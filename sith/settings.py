@@ -147,6 +147,8 @@ TEMPLATES = [
             "filters": {
                 "markdown": "core.templatetags.renderer.markdown",
                 "phonenumber": "core.templatetags.renderer.phonenumber",
+                "truncate_time": "core.templatetags.renderer.truncate_time",
+                "format_timedelta": "core.templatetags.renderer.format_timedelta",
             },
             "globals": {
                 "can_edit_prop": "core.views.can_edit_prop",
@@ -355,7 +357,7 @@ SITH_FORUM_PAGE_LENGTH = 30
 
 # SAS variables
 SITH_SAS_ROOT_DIR_ID = 4
-SITH_SAS_IMAGES_PER_PAGE = 30
+SITH_SAS_IMAGES_PER_PAGE = 60
 
 SITH_BOARD_SUFFIX = "-bureau"
 SITH_MEMBER_SUFFIX = "-membres"

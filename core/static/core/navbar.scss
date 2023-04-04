@@ -1,0 +1,110 @@
+nav.navbar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  background-color: hsl(203, 75%, 40%);
+  margin: 1em;
+  color: white;
+  border-radius: 0.6em;
+
+  @media (max-width: 500px) {
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    margin: .2em;
+  }
+
+  > .menu,
+  > .link {
+    box-sizing: border-box;
+    width: 130px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    @media (max-width: 500px) {
+      width: 100%;
+      height: auto;
+      justify-content: flex-start;
+
+      &:first-child {
+        border-radius: .6em .6em 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 0 .6em .6em;
+
+        > .content {
+          box-shadow: 3px 3px 3px 0 #dfdfdf;
+        }
+      }
+    }
+  }
+
+  > .menu > .head,
+  > .link {
+    color: white;
+    padding: 10px 20px;
+    box-sizing: border-box;
+
+    @media (max-width: 500px) {
+      padding: 10px;
+    }
+  }
+
+  .link:hover,
+  .menu:hover {
+    background-color: rgba(0, 0, 0, .2);
+  }
+
+  > .menu:hover > .content,
+  > .menu > .head:hover + .content,
+  > .menu > .content:hover {
+    display: flex;
+  }
+
+  > .menu {
+    display: flex;
+    position: relative;
+
+    > .content {
+      z-index: 10;
+      display: none;
+      position: absolute;
+      top: 100%;
+      background-color: white;
+      margin: 0;
+      list-style-type: none;
+      width: 130px;
+      box-shadow: 3px 3px 3px 0 #dfdfdf;
+      flex-direction: column;
+
+      @media (max-width: 500px) {
+        position: absolute;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        box-shadow: inset 3px 3px 3px 0 #dfdfdf;
+      }
+
+      > li > a {
+        display: flex;
+        padding: 15px 20px;
+
+        @media (max-width: 500px) {
+          padding: 10px;
+        }
+
+        &:hover {
+          color: hsl(203, 75%, 40%);
+          background-color: rgba(0, 0, 0, .05);
+        }
+      }
+    }
+  }
+}

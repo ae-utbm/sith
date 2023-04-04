@@ -1,26 +1,48 @@
 {% extends "core/base.jinja" %}
 
+{%- block additional_css -%}
+    <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
+{%- endblock -%}
+
 {% block title %}
 {% trans user_name=profile.get_display_name() %}{{ user_name }}'s pictures{% endtrans %}
 {% endblock %}
 
 {% block content %}
+    <main>
     {% if can_edit(profile, user) %}
         <button id="download_all_pictures", onclick=download_pictures()>{% trans %}Download all my pictures{% endtrans %}</button>
     {% endif %}
-{% for a in albums %}
-    <div style="padding: 10px">
+    {% for a in albums %}
         <h4>{{ a.name }}</h4>
-        <hr>
-    {% for picture in pictures[a.id] %}
-        <div class="picture">
-            <a href="{{ url("sas:picture", picture_id=picture.id) }}#pict">
-                <img src="{{ picture.get_download_thumb_url() }}" alt="{{ picture.get_display_name() }}" style="max-width: 100%" loading="lazy"/>
-            </a>
+        <div class="photos">
+            {% for p in pictures[a.id] %}
+                {% if p.can_be_viewed_by(user) %}
+                    <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
+                        <div
+                            class="photo{% if not p.is_moderated %} not_moderated{% endif %}"
+                            style="background-image: url('{% if p.file %}{{ p.get_download_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
+                        >
+                            {% if not p.is_moderated %}
+                                <div class="overlay">&nbsp;</div>
+                                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+                            {% else %}
+                                <div class="text">&nbsp;</div>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% else %}
+                    <div>
+                        <div class="photo">
+                            <div class="text">{% trans %}Picture Unavailable{% endtrans %}</div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
+        <br>
     {% endfor %}
-    </div>
-{% endfor %}
+    </main>
 {% endblock %}
 
 {% block script %}
