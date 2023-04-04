@@ -3246,6 +3246,10 @@ msgstr "Changer mon mot de passe"
 msgid "Change user password"
 msgstr "Changer le mot de passe"
 
+#: core/templates/core/user_edit.jinja:50
+msgid "To edit your profile picture, ask a member of the AE"
+msgstr "Pour changer votre photo de profil, demandez à un membre de l'AE"
+
 #: core/templates/core/user_godfathers.jinja:5
 #, python-format
 msgid "%(user_name)s's family"
