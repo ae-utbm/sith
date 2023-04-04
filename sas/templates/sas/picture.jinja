@@ -144,7 +144,7 @@
                         <li>
                             <a class="user" href="{{ r.user.get_absolute_url() }}">
                                 {% if r.user.profile_pict %}
-                                <img src="{{ r.user.profile_pict.get_download_url() }}">
+                                <div class="profile-pic" style="background-image: url('{{ r.user.profile_pict.get_download_url() }}');"></div>
                                 {% endif %}
                                 <span>{{ r.user.get_short_name() }}</span>
                             </a>

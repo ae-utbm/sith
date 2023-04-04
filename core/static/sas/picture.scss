@@ -145,6 +145,7 @@
         }
 
         > a {
+          box-sizing: border-box;
           display: flex;
           flex-direction: row;
           align-items: center;
@@ -180,6 +181,16 @@
             max-height: 25px;
             object-fit: contain;
             border-radius: 50%;
+          }
+
+          > .profile-pic {
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            min-width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: block;
           }
         }
       }
