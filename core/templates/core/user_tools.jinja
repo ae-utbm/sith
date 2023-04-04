@@ -54,19 +54,29 @@
                         <li><a href="{{ url('counter:invoices_call') }}">{% trans %}Invoices call{% endtrans %}</a></li>
                         <li><a href="{{ url('counter:eticket_list') }}">{% trans %}Etickets{% endtrans %}</a></li>
                     {% endif %}
+                </ul>
+                <ul>
                     {% for b in settings.SITH_COUNTER_BARS %}
                         {% if user.is_in_group(b[1]+" admin") %}
-                            <li>
-                                <a href="{{ url('counter:details', counter_id=b[0]) }}">{{ b[1] }}</a> -
-                                <a href="{{ url('counter:admin', counter_id=b[0]) }}">{% trans %}Edit{% endtrans %}</a> -
-                                <a href="{{ url('counter:stats', counter_id=b[0]) }}">{% trans %}Stats{% endtrans %}</a> -
-                                {% set c = Counter.objects.filter(id=b[0]).first() %}
-                                {% if c.stock %}
-                                    <a href="{{ url('stock:items_list', stock_id=c.stock.id)}}">Stock</a> -
-                                    <a href="{{ url('stock:shoppinglist_list', stock_id=c.stock.id)}}">{% trans %}Shopping lists{% endtrans %}</a>
-                                {% else %}
-                                    <a href="{{url('stock:new', counter_id=c.id)}}">{% trans %}Create new stock{% endtrans%}</a>
-                                {% endif %}
+                            {% set c = Counter.objects.filter(id=b[0]).first() %}
+
+                            <li class="rows counter">
+                                <a href="{{ url('counter:details', counter_id=b[0]) }}">{{ b[1] }}</a>
+
+                                <span>
+                                    <span>
+                                        <a class="button" href="{{ url('counter:admin', counter_id=b[0]) }}">{% trans %}Edit{% endtrans %}</a>
+                                        <a class="button" href="{{ url('counter:stats', counter_id=b[0]) }}">{% trans %}Stats{% endtrans %}</a>
+                                        {% if c.stock %}
+                                        <a class="button" href="{{ url('stock:items_list', stock_id=c.stock.id)}}">Stock</a>
+                                        {% endif %}
+                                    </span>
+                                    {% if c.stock %}
+                                        <a class="button" href="{{ url('stock:shoppinglist_list', stock_id=c.stock.id)}}">{% trans %}Shopping lists{% endtrans %}</a>
+                                    {% else %}
+                                        <a class="button" href="{{url('stock:new', counter_id=c.id)}}">{% trans %}Create new stock{% endtrans%}</a>
+                                    {% endif %}
+                                </span>
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -89,7 +99,7 @@
 
                     {% for m in user.memberships.filter(end_date=None).filter(role__gte=7).all() -%}
                         {%- for b in m.club.bank_accounts.all() %}
-                            <li>
+                            <li class="rows">
                                 <strong>{% trans %}Bank account: {% endtrans %}</strong>
                                 <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b }}</a>
                             </li>
@@ -97,7 +107,7 @@
 
                         {% if m.club.club_account.exists() -%}
                             {% for ca in m.club.club_account.all() %}
-                                <li>
+                                <li class="rows">
                                     <strong>{% trans %}Club account: {% endtrans %}</strong>
                                     <a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca }}</a>
                                 </li>

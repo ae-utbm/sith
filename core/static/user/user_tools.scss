@@ -8,6 +8,7 @@ main {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 20px;
   gap: 10px;
 
   > div {
@@ -15,16 +16,65 @@ main {
     background-color: rgba(0, 0, 0, .05);
     width: 210px;
 
-    >h4 {
+    > h4 {
       text-align: center;
     }
 
-    >ul {
+    > ul {
       list-style-type: none;
       margin: 20px 10px;
       display: flex;
       flex-direction: column;
       gap: 10px;
+
+      > .rows {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+        > span {
+          margin-top: 5px;
+        }
+      
+        > span > span,
+        > span {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          gap: 5px;
+          width: 100%;
+      
+          >.button {
+            font-size: smaller;
+            width: 100%;
+            margin: 0;
+          }
+
+          > span {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+
+            > .button {
+              width: 100%;
+            }
+          }
+        }
+
+        > span > span {
+          flex-wrap: nowrap;
+        }
+      }
+
+      > .counter {
+        background-color: rgba(0, 0, 0, .05);
+        border-radius: 5px;
+        padding: 10px;
+
+        @media (max-width: 550px) {
+          background-color: rgba(0, 0, 0, .1);
+        }
+      }
     }
   }
 
