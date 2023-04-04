@@ -88,7 +88,7 @@
                 {% if p.can_be_viewed_by(user) %}
                     <a href="{{ url('sas:picture', picture_id=p.id) }}#pict">
                         <div
-                            class="photo"
+                            class="photo {% if p.is_vertical %}vertical{% endif %}"
                             style="background-image: url('{{ p.get_download_thumb_url() }}')"
                         >
                             {% if not p.is_moderated %}
