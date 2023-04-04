@@ -329,6 +329,7 @@
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
+            gap: 5px;
 
             >a {
               color: black;
@@ -339,6 +340,7 @@
               text-align: center;
               align-items: center;
               border-radius: 5px;
+              background-color: #ddd;
 
               &:hover {
                 background-color: rgba(0, 0, 0, .2);
