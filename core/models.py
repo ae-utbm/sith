@@ -46,6 +46,7 @@ from django.utils.html import escape
 from django.utils.functional import cached_property
 
 import os
+from core import utils
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -295,6 +296,9 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = "username"
     # REQUIRED_FIELDS = ['email']
+
+    def promo_has_logo(self):
+        return utils.file_exist("./core/static/core/img/promo_%02d.png" % self.promo)
 
     def has_module_perms(self, package_name):
         return self.is_active

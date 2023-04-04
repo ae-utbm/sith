@@ -97,13 +97,14 @@
                                             <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
                                         </div>
                                     </div>
-                                    <a href="{{ url('core:user_profile', user_id=user.id) }}">
-                                         {% if user.profile_pict %}
-                                            <img src="{{ user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" title="{% trans %}Profile{% endtrans %}" />
+                                    <a 
+                                        href="{{ url('core:user_profile', user_id=user.id) }}"
+                                        {% if user.profile_pict %}
+                                            style="background-image: url('{{ user.profile_pict.get_download_url() }}')"
                                         {% else %}
-                                            <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" title="{% trans %}Profile{% endtrans %}" />
-                                        {% endif %}
-                                    </a>
+                                            style="background-image: url('{{ static('core/img/unknown.jpg') }}')"
+                                        {% endif %}                                  
+                                    ></a>
                                 </div>
                                 <div class="notification">
                                     <a href="#" onclick="display_notif()">
