@@ -203,6 +203,10 @@
         }
 
         >.options {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+
           >.username {
             display: flex;
             justify-content: flex-end;
@@ -225,7 +229,6 @@
 
             @media (max-width: 1200px) {
               justify-content: flex-start;
-              gap: 15px;
             }
 
             >a {
