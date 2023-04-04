@@ -84,10 +84,16 @@
                 </div>
 
                 {% if profile.promo %}
+                <br>
                 <div class="user_profile_infos_promo">
                     {% trans %}Promo: {% endtrans %}{{ profile.promo }}
-                    <img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}"
-                        alt="Promo {{ profile.promo }}" />
+                    {% if profile.promo_has_logo() %}
+                        <img src="{{ static('core/img/promo_%02d.png' % profile.promo) }}" alt="Promo {{ profile.promo }}" />
+                    {% else %}
+                        <div>
+                            <span>¯\_(ツ)_/¯</span>
+                        </div>
+                    {% endif %}
                 </div>
                 {% endif %}
             </div>

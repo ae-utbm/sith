@@ -14,6 +14,7 @@
 #
 #
 
+import os
 import subprocess
 import re
 
@@ -69,6 +70,10 @@ def get_semester(d=date.today()):
         return "P" + str(start.year)[-2:]
     else:
         return "A" + str(start.year)[-2:]
+
+
+def file_exist(path):
+    return os.path.exists(path)
 
 
 def scale_dimension(width, height, long_edge):
