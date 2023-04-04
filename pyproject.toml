@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Sith"
-version = "1"
+version = "3"
 description = "Le web Sith de l'AE"
 authors = [
 	"Skia <skia@hya.sk>",
