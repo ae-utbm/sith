@@ -462,8 +462,10 @@ class UserTrombiProfileView(TrombiTabsMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
+
         if (
-            self.object.trombi.id != request.user.trombi_user.trombi.id
+            request.user.is_anonymous
+            or self.object.trombi.id != request.user.trombi_user.trombi.id
             or self.object.user.id == request.user.id
             or not self.object.trombi.show_profiles
         ):
