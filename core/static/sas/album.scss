@@ -160,12 +160,17 @@ main {
     > .photo,
     > .album {
       box-sizing: border-box;
+      background-color: #333333;
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center center;
 
       width: calc(16 / 9 * 128px);
       height: 128px;
+
+      &.vertical {
+        background-size: contain;
+      }
 
       margin: 0;
       padding: 0;
