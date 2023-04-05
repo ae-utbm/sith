@@ -26,7 +26,6 @@ from django.utils.translation import gettext_lazy as _
 from django.http import Http404, HttpResponse
 from wsgiref.util import FileWrapper
 from django.urls import reverse
-from django.core.exceptions import PermissionDenied
 from django import forms
 
 import os
@@ -60,7 +59,7 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
             ).exists()
         )
     ):
-        raise PermissionDenied
+        return forbidden(request, _("You are not allowed to view this file"))
     name = f.__getattribute__(file_attr).name
     filepath = os.path.join(settings.MEDIA_ROOT, name)
 

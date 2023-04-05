@@ -2519,6 +2519,14 @@ msgstr "Laverie"
 msgid "Files"
 msgstr "Fichiers"
 
+#: core/views/files.py:70
+msgid "File not found"
+msgstr "Fichier introuvable"
+
+#: core/views/files.py:64
+msgid "You are not allowed to view this file"
+msgstr "Vous n'êtes pas autorisé à voir ce fichier"
+
 #: core/templates/core/base.jinja:202 core/templates/core/user_tools.jinja:109
 msgid "Pedagogy"
 msgstr "Pédagogie"
