@@ -219,7 +219,7 @@ $hovered-red-text-color: #ff4d4d;
         >.options {
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          gap: 5px;
 
           >.username {
             display: flex;
@@ -239,7 +239,7 @@ $hovered-red-text-color: #ff4d4d;
             width: 100%;
             display: flex;
             justify-content: flex-end;
-            gap: 5px;
+            gap: 15px;
 
             @media (max-width: 1200px) {
               justify-content: flex-start;
