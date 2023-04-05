@@ -391,6 +391,10 @@
           background-color: #283747;
           padding: 0 10px;
           color: white;
+
+          &::placeholder {
+            color:rgba(255, 255, 255, .5);
+          }
         }
       }
     }
