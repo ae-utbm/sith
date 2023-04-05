@@ -226,6 +226,10 @@ $hovered-red-text-color: #ff4d4d;
             justify-content: flex-end;
             gap: 5px;
 
+            @media (max-width: 500px) {
+              justify-content: flex-start;
+            }
+
             >a {
               color: $text-color;
 
