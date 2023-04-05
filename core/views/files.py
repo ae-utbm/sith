@@ -26,7 +26,6 @@ from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
 from django.urls import reverse
-from django.core.exceptions import PermissionDenied
 from django import forms
 
 import os
@@ -34,7 +33,14 @@ import os
 from ajax_select import make_ajax_field
 
 from core.models import SithFile, RealGroup, Notification
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, can_view, not_found
+from core.views import (
+    CanViewMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    can_view,
+    forbidden,
+    not_found,
+)
 from counter.models import Counter
 
 
@@ -55,9 +61,14 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
             ).exists()
         )
     ):
-        raise PermissionDenied
+        return forbidden(request, _("You are not allowed to view this file"))
     name = f.__getattribute__(file_attr).name
     filepath = os.path.join(settings.MEDIA_ROOT, name)
+
+    # check if file exists on disk
+    if not os.path.exists(filepath.encode("utf-8")):
+        return not_found(request, _("File not found"))
+
     with open(filepath.encode("utf-8"), "rb") as filename:
         wrapper = FileWrapper(filename)
         response = HttpResponse(wrapper, content_type=f.mime_type)
