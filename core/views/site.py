@@ -52,11 +52,15 @@ class NotificationList(ListView):
     template_name = "core/notification_list.jinja"
 
     def get_queryset(self):
+        if self.request.user.is_anonymous:
+            return []
+
         # TODO: Bulk update in django 2.2
         if "see_all" in self.request.GET.keys():
             for n in self.request.user.notifications.filter(viewed=False):
                 n.viewed = True
                 n.save()
+
         return self.request.user.notifications.order_by("-date")[:20]
 
 
