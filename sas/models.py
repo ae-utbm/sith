@@ -63,7 +63,12 @@ class Picture(SithFile):
             return (w / h) < 1
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
+        perm = cache.get("%d_can_edit_pictures" % (user.id), None)
+        if perm is None:
+            perm = user.is_root or user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
+
+        cache.set("%d_can_edit_pictures" % (user.id), perm, timeout=4)
+        return perm
 
     def can_be_viewed_by(self, user):
         # SAS pictures are visible to old subscribers
@@ -72,19 +77,13 @@ class Picture(SithFile):
             return False
 
         perm = cache.get("%d_can_view_pictures" % (user.id), False)
+        if not perm:
+            perm = user.was_subscribed
 
-        # use cache only when user is in SAS Admins or when picture is moderated
-        if perm and (self.is_moderated or self.can_be_edited_by(user)):
-            return perm
-
-        perm = (
-            self.is_in_sas
-            and (self.is_moderated or self.can_be_edited_by(user))
-            and user.was_subscribed
-        )
         cache.set("%d_can_view_pictures" % (user.id), perm, timeout=4)
-
-        return perm
+        return (perm and self.is_moderated and self.is_in_sas) or self.can_be_edited_by(
+            user
+        )
 
     def get_download_url(self):
         return reverse("sas:download", kwargs={"picture_id": self.id})
