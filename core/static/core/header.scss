@@ -1,6 +1,15 @@
+$hovered-text-color: #c2c2c2;
+$text-color: white;
+
+$background-color: #354a5f;
+$background-color-hovered: #283747;
+
+$red-text-color: #eb2f06;
+$hovered-red-text-color: #ff4d4d;
+
 .header {
   box-sizing: border-box;
-  background-color: #354a5f;
+  background-color: $background-color;
   box-shadow: 3px 3px 3px 0 #dfdfdf;
   border-radius: 0;
   width: 100%;
@@ -24,11 +33,11 @@
     gap: 10px;
 
     >a {
-      color: #fff;
+      color: $text-color;
     }
 
     &:hover>a {
-      color: #1a78b3;
+      color: $hovered-text-color;;
     }
 
     @media (max-width: 607px) {
@@ -51,7 +60,7 @@
     }
 
     &-text {
-      color: white;
+      color: $text-color;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -89,16 +98,16 @@
         border-radius: 0;
         margin: 0;
         box-sizing: border-box;
-        background-color: #354a5f;
+        background-color: $background-color;
         width: 45px;
         height: 25px;
         padding: 0;
-        color: white;
+        color: $text-color;
         font-weight: normal;
         line-height: 1.3em;
 
         &:hover {
-          background-color: #283747;
+          background-color: $background-color-hovered;
         }
       }
     }
@@ -126,13 +135,13 @@
       align-items: center;
       text-transform: uppercase;
       text-decoration: none;
-      color: white;
+      color: $text-color;
       margin: 0;
       font-size: .9em;
       width: 120px;
 
       &:hover {
-        background-color: #283747;
+        background-color: $background-color-hovered;
       }
     }
   }
@@ -204,7 +213,7 @@
           background-position: center center;
           background-size: cover;
           background-repeat: no-repeat;
-          background-color: #354a5f;
+          background-color: $background-color;
         }
 
         >.options {
@@ -218,10 +227,10 @@
             gap: 5px;
 
             >a {
-              color: white;
+              color: $text-color;
 
               &:hover {
-                color: #1a78b3;
+                color: $hovered-text-color;
               }
             }
           }
@@ -238,17 +247,17 @@
 
             >a {
               text-align: right;
-              color: white;
+              color: $text-color;
 
               &:hover {
-                color: #1a78b3;
+                color: $hovered-text-color;
               }
 
               &:last-child {
-                color: #eb2f06;
+                color: $red-text-color;
 
                 &:hover {
-                  color: #cc2804;
+                  color: $hovered-red-text-color;
                 }
               }
             }
@@ -265,16 +274,16 @@
         position: relative;
 
         >a {
-          color: white;
+          color: $text-color;
           position: relative;
           font-size: 25px;
 
           &:hover {
-            color: #1a78b3;
+            color: $hovered-text-color;
           }
 
           >span {
-            color: white;
+            color: $text-color;
             font-size: 14px;
             display: flex;
             justify-content: center;
@@ -282,7 +291,7 @@
             width: 10px;
             height: 10px;
             padding: 5px;
-            background-color: #eb2f06;
+            background-color: $red-text-color;
             border-radius: 50%;
             position: absolute;
             top: -50%;
@@ -388,12 +397,12 @@
           border-radius: 5px;
           font-size: .9em;
           margin: 0;
-          background-color: #283747;
+          background-color: $background-color-hovered;
           padding: 0 10px;
-          color: white;
+          color: $text-color;
 
           &::placeholder {
-            color:rgba(255, 255, 255, .5);
+            color: $hovered-text-color;
           }
         }
       }
@@ -422,10 +431,10 @@
 
   >li>a {
     display: flex;
-    color: white;
+    color: $text-color;
 
     &:hover {
-      color: #1a78b3;
+      color: $hovered-text-color;
     }
 
     >span {
