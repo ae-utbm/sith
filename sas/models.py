@@ -67,7 +67,7 @@ class Picture(SithFile):
         if perm is None:
             perm = user.is_root or user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
 
-        cache.set("%d_can_edit_pictures" % (user.id), perm)
+        cache.set("%d_can_edit_pictures" % (user.id), perm, timeout=4)
         return perm
 
     def can_be_viewed_by(self, user):
