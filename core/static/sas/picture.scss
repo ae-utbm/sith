@@ -70,7 +70,7 @@
     > #next {
       width: calc(50% - 5px);
       aspect-ratio: 16/9;
-      background: #aaa;
+      background: #333333;
 
       > a {
         display: flex;
@@ -241,6 +241,7 @@
   > .infos {
     display: flex;
     flex-direction: column;
+    width: 50%;
 
     > div > div {
       display: flex;
@@ -260,7 +261,7 @@
   > .tools {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 50%;
 
     > div  {
       display: flex;

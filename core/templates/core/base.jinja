@@ -16,7 +16,6 @@
                 {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
                 <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
             {% endblock %}
-
             <link rel="preload" as="style" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}" onload="this.onload=null;this.rel='stylesheet'">
             <noscript><link rel="stylesheet" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}"></noscript>
             <script defer href="{{ static('core/font-awesome/js/fontawesone.min.js') }}"></script>
@@ -196,52 +195,55 @@
         {% block nav %}
             {% if not popup %}
                 <nav class="navbar">
-                    <a class="link" href="{{ url('core:index') }}">{% trans %}Main{% endtrans %}</a>
-                    <div class="menu">
-                        <span class="head">{% trans %}Associations & Clubs{% endtrans %}</span>
-                        <ul class="content">
-                            <li><a href="{{ url('core:page', page_name='ae') }}">{% trans %}AE{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', page_name='clubs') }}">{% trans %}AE's clubs{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', page_name='bdf') }}">{% trans %}BdF{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', page_name='bds') }}">{% trans %}BDS{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', page_name='cetu') }}">{% trans %}CETU{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', page_name='clubs/doceo') }}">{% trans %}Doceo{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', page_name='positions') }}">{% trans %}Positions{% endtrans %}</a></li>
-                        </ul>
-                    </div>
-                    <div class="menu">
-                        <span class="head">{% trans %}Events{% endtrans %}</span>
-                        <ul class="content">
-                            <li><a href="{{ url('election:list') }}">{% trans %}Elections{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', page_name='ga') }}">{% trans %}Big event{% endtrans %}</a></li>
-                        </ul>
-                    </div>
-                    <a class="link" href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
-                    <a class="link" href="{{ url('sas:main') }}">{% trans %}Gallery{% endtrans %}</a>
-                    <a class="link" href="{{ url('eboutic:main') }}">{% trans %}Eboutic{% endtrans %}</a>
-                    <div class="menu">
-                        <span class="head">{% trans %}Services{% endtrans %}</span>
-                        <ul class="content">
-                            <li><a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a></li>
-                            <li><a href="/launderette">{% trans %}Launderette{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a></li>
-                            <li><a href="{{ url('pedagogy:guide') }}">{% trans %}Pedagogy{% endtrans %}</a></li>
-                        </ul>
-                    </div>
-                    <div class="menu">
-                        <span class="head">{% trans %}My Benefits{% endtrans %}</span>
-                        <ul class="content">
-                            <li><a href="{{ url('core:page', page_name='partenaires')}}">{% trans %}Sponsors{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', page_name='avantages') }}">{% trans %}Subscriber benefits{% endtrans %}</a></li>
-                        </ul>
-                    </div>
-                    <div class="menu">
-                        <span class="head">{% trans %}Help{% endtrans %}</span>
-                        <ul class="content">
-                            <li><a href="{{ url('core:page', page_name='FAQ') }}">{% trans %}FAQ{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a></li>
-                            <li><a href="{{ url('core:page', page_name='Index') }}">{% trans %}Wiki{% endtrans %}</a></li>
-                        </ul>
+                    <button class="expand-button" onclick="showMenu()"><i class="fa fa-bars"></i></button>
+                    <div id="navbar-content" class="content" style="display: none;">
+                        <a class="link" href="{{ url('core:index') }}">{% trans %}Main{% endtrans %}</a>
+                        <div class="menu">
+                            <span class="head">{% trans %}Associations & Clubs{% endtrans %}</span>
+                            <ul class="content">
+                                <li><a href="{{ url('core:page', page_name='ae') }}">{% trans %}AE{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', page_name='clubs') }}">{% trans %}AE's clubs{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', page_name='bdf') }}">{% trans %}BdF{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', page_name='bds') }}">{% trans %}BDS{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', page_name='cetu') }}">{% trans %}CETU{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', page_name='clubs/doceo') }}">{% trans %}Doceo{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', page_name='positions') }}">{% trans %}Positions{% endtrans %}</a></li>
+                            </ul>
+                        </div>
+                        <div class="menu">
+                            <span class="head">{% trans %}Events{% endtrans %}</span>
+                            <ul class="content">
+                                <li><a href="{{ url('election:list') }}">{% trans %}Elections{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', page_name='ga') }}">{% trans %}Big event{% endtrans %}</a></li>
+                            </ul>
+                        </div>
+                        <a class="link" href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
+                        <a class="link" href="{{ url('sas:main') }}">{% trans %}Gallery{% endtrans %}</a>
+                        <a class="link" href="{{ url('eboutic:main') }}">{% trans %}Eboutic{% endtrans %}</a>
+                        <div class="menu">
+                            <span class="head">{% trans %}Services{% endtrans %}</span>
+                            <ul class="content">
+                                <li><a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a></li>
+                                <li><a href="/launderette">{% trans %}Launderette{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a></li>
+                                <li><a href="{{ url('pedagogy:guide') }}">{% trans %}Pedagogy{% endtrans %}</a></li>
+                            </ul>
+                        </div>
+                        <div class="menu">
+                            <span class="head">{% trans %}My Benefits{% endtrans %}</span>
+                            <ul class="content">
+                                <li><a href="{{ url('core:page', page_name='partenaires')}}">{% trans %}Sponsors{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', page_name='avantages') }}">{% trans %}Subscriber benefits{% endtrans %}</a></li>
+                            </ul>
+                        </div>
+                        <div class="menu">
+                            <span class="head">{% trans %}Help{% endtrans %}</span>
+                            <ul class="content">
+                                <li><a href="{{ url('core:page', page_name='FAQ') }}">{% trans %}FAQ{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a></li>
+                                <li><a href="{{ url('core:page', page_name='Index') }}">{% trans %}Wiki{% endtrans %}</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </nav>
             {% endif %}
@@ -307,6 +309,13 @@
         <script src="{{ static('core/js/jquery.datetimepicker.full.min.js') }}"></script>
         <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
         <script src="{{ url('javascript-catalog') }}"></script>
+        <script>
+            function showMenu() {
+                let navbar = document.getElementById("navbar-content");
+                const current = navbar.style.getPropertyValue("display");
+                navbar.style.setProperty("display", current == "none" ? "block" : "none");
+            }
+        </script>
         <script>
 $('.select_date').datepicker({
     changeMonth: true,

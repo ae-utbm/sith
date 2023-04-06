@@ -38,7 +38,7 @@
         <h3>{{ picture.get_display_name() }}</h3>
         <h4>{{ picture.parent.children.filter(id__lte=picture.id).count() }} / {{ picture.parent.children.count() }}</h4>
     </div>
-
+    <br>
 
     {% if not picture.is_moderated %}
         {% set next = picture.get_next() %}
