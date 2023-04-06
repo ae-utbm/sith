@@ -1,25 +1,21 @@
-# -*- coding:utf-8 -*
+# -*- coding:utf-8 -*-
 #
-# Copyright 2016,2017,2018
-# - Skia <skia@libskia.so>
+# Copyright 2023 © AE UTBM
+# ae@utbm.fr / ae.info@utbm.fr
+# All contributors are listed in the CONTRIBUTORS file.
 #
-# Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
-# http://ae.utbm.fr.
+# This file is part of the website of the UTBM Student Association (AE UTBM),
+# https://ae.utbm.fr.
 #
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU General Public License a published by the Free Software
-# Foundation; either version 3 of the License, or (at your option) any later
-# version.
+# You can find the whole source code at https://github.com/ae-utbm/sith3
 #
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-# details.
+# LICENSED UNDER THE GNU GENERAL PUBLIC LICENSE VERSION 3 (GPLv3)
+# SEE : https://raw.githubusercontent.com/ae-utbm/sith3/master/LICENSE
+# OR WITHIN THE LOCAL FILE "LICENSE"
 #
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
-# Place - Suite 330, Boston, MA 02111-1307, USA.
-#
+# PREVIOUSLY LICENSED UNDER THE MIT LICENSE,
+# SEE : https://raw.githubusercontent.com/ae-utbm/sith3/master/LICENSE.old
+# OR WITHIN THE LOCAL FILE "LICENSE.old"
 #
 
 from datetime import datetime
