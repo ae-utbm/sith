@@ -191,13 +191,157 @@ $hovered-red-text-color: #ff4d4d;
     >.right {
       flex: 1;
       justify-content: flex-end;
+      gap: 10px;
+
+      >.links {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        height: 40px;
+        gap: 10px;
+    
+        @media (max-width: 1200px) {
+          justify-content: flex-start;
+        }
+
+        @media (max-width: 375px) {
+          height: 30px; 
+        }
+
+        > * {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 30px;
+          height: 30px;
+          font-size: 20px;
+
+          > * {
+            font-size: 20px;
+          }
+        }
+
+        >.notification {
+          position: relative;
+      
+          >a {
+            color: $text-color;
+            position: relative;
+      
+            &:hover {
+              color: $hovered-text-color;
+            }
+      
+            >span {
+              color: $text-color;
+              font-size: 14px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              width: 10px;
+              height: 10px;
+              padding: 5px;
+              background-color: $red-text-color;
+              border-radius: 50%;
+              position: absolute;
+              top: -50%;
+              right: -50%;
+            }
+          }
+      
+          >#header_notif {
+            box-sizing: border-box;
+            display: none;
+            position: absolute;
+            margin: 0;
+            background-color: whitesmoke;
+            top: calc(100% + 10px);
+            right: calc(50% - 30px);
+            width: 400px;
+            max-width: calc(100vw - 30px);
+            padding: 10px;
+            z-index: 100;
+            border-radius: 10px;
+            box-shadow: 3px 3px 3px 0 #767676;
+      
+            >ul {
+              list-style-type: none;
+              margin: 0;
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              min-height: 20px;
+              max-height: 120px;
+              overflow-y: auto;
+      
+              >li {
+                >a {
+                  .datetime {
+                    display: flex;
+                    justify-content: flex-start;
+                    gap: 10px;
+                    font-style: italic;
+                    font-size: .8em;
+                  }
+                }
+      
+                &.empty-notification {
+                  text-align: center;
+                  font-style: italic;
+                }
+              }
+            }
+      
+            .options {
+              width: 100%;
+              display: flex;
+              justify-content: space-between;
+              margin-top: 10px;
+              gap: 5px;
+      
+              >a {
+                color: black;
+                padding: 5px;
+                width: 50%;
+                display: flex;
+                justify-content: center;
+                text-align: center;
+                align-items: center;
+                border-radius: 5px;
+                background-color: #ddd;
+      
+                &:hover {
+                  background-color: rgba(0, 0, 0, .2);
+                }
+              }
+            }
+          }
+        }
+    
+        >a {
+          text-align: right;
+          color: $text-color;
+    
+          &:hover {
+            color: $hovered-text-color;
+          }
+    
+          &:last-child {
+            color: $red-text-color;
+    
+            &:hover {
+              color: $hovered-red-text-color;
+            }
+          }
+        }
+      }
 
       >.user {
         display: flex;
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        gap: 15px;
+        gap: 10px;
 
         @media (max-width: 1200px) {
           width: 100%;
@@ -215,162 +359,27 @@ $hovered-red-text-color: #ff4d4d;
           background-repeat: no-repeat;
           background-color: $background-color;
         }
-
-        >.options {
+        
+        >.username {
           display: flex;
-          flex-direction: column;
+          justify-content: flex-end;
           gap: 5px;
 
-          >.username {
-            display: flex;
-            justify-content: flex-end;
-            gap: 5px;
-
-            @media (max-width: 500px) {
-              justify-content: flex-start;
-            }
-
-            >a {
-              color: $text-color;
-
-              &:hover {
-                color: $hovered-text-color;
-              }
-            }
+          @media (max-width: 500px) {
+            justify-content: flex-start;
           }
 
-          >.links {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-
-            @media (max-width: 1200px) {
-              justify-content: flex-start;
-            }
-
-            >a {
-              text-align: right;
-              color: $text-color;
-
-              &:hover {
-                color: $hovered-text-color;
-              }
-
-              &:last-child {
-                color: $red-text-color;
-
-                &:hover {
-                  color: $hovered-red-text-color;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      >.notification {
-        height: 100%;
-        width: 55px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-
-        >a {
-          color: $text-color;
-          position: relative;
-          font-size: 25px;
-
-          &:hover {
-            color: $hovered-text-color;
-          }
-
-          >span {
+          >a {
             color: $text-color;
-            font-size: 14px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 10px;
-            height: 10px;
-            padding: 5px;
-            background-color: $red-text-color;
-            border-radius: 50%;
-            position: absolute;
-            top: -50%;
-            right: -50%;
-          }
-        }
 
-        >#header_notif {
-          box-sizing: border-box;
-          display: none;
-          position: absolute;
-          margin: 0;
-          background-color: whitesmoke;
-          top: calc(100% + 10px);
-          right: calc(50% - 30px);
-          width: 400px;
-          max-width: calc(100vw - 30px);
-          padding: 10px;
-          z-index: 100;
-          border-radius: 10px;
-          box-shadow: 3px 3px 3px 0 #767676;
-
-          >ul {
-            list-style-type: none;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            min-height: 20px;
-            max-height: 120px;
-            overflow-y: auto;
-
-            >li {
-              >a {
-                .datetime {
-                  display: flex;
-                  justify-content: flex-start;
-                  gap: 10px;
-                  font-style: italic;
-                  font-size: .8em;
-                }
-              }
-
-              &.empty-notification {
-                text-align: center;
-                font-style: italic;
-              }
-            }
-          }
-
-          .options {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            gap: 5px;
-
-            >a {
-              color: black;
-              padding: 5px;
-              width: 50%;
-              display: flex;
-              justify-content: center;
-              text-align: center;
-              align-items: center;
-              border-radius: 5px;
-              background-color: #ddd;
-
-              &:hover {
-                background-color: rgba(0, 0, 0, .2);
-              }
+            &:hover {
+              color: $hovered-text-color;
             }
           }
         }
       }
+
+      
     }
 
     >.left {
