@@ -99,7 +99,7 @@
             </div>
             <!-- Pictures -->
             <div class="user_profile_pictures">
-                <div class="user_profile_pictures_bigone">
+                <div class="user_profile_pictures_bigone" id="big_picture">
                     {% if profile.profile_pict %}
                     <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}"
                         title="{% trans %}Profile{% endtrans %}" />
@@ -108,7 +108,7 @@
                         title="{% trans %}Profile{% endtrans %}" />
                     {% endif %}
                 </div>
-                <div class="user_profile_pictures_thumbnails">
+                <div class="user_profile_pictures_thumbnails" id="small_pictures">
                     {% if profile.profile_pict %}
                     <img src="{{ profile.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}"
                         title="{% trans %}Profile{% endtrans %}" />
@@ -249,7 +249,7 @@
             keys.push(e.keyCode);
             if (keys.toString() == pattern) {
                 keys = [];
-                $("#user_profile_pictures_bigone img").attr("src", "{{ static('core/img/yug.jpg') }}");
+                $("#big_picture img").attr("src", "{{ static('core/img/yug.jpg') }}");
             }
             if (keys.length == 6) {
                 keys.shift();
@@ -257,10 +257,10 @@
         });
     });
     $(function () {
-        $("#user_profile_pictures_thumbnails img").click(function () {
-            $("#user_profile_pictures_bigone img").attr("src", $(this)[0].src);
-            $("#user_profile_pictures_bigone img").attr("alt", $(this)[0].alt);
-            $("#user_profile_pictures_bigone img").attr("title", $(this)[0].title);
+        $("#small_pictures img").click(function () {
+            $("#big_picture img").attr("src", $(this)[0].src);
+            $("#big_picture img").attr("alt", $(this)[0].alt);
+            $("#big_picture img").attr("title", $(this)[0].title);
         })
     });
     $(function () {
