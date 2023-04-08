@@ -117,7 +117,7 @@
                                                 {% if user.notifications.filter(viewed=False).count() > 0 %}
                                                 {% for n in user.notifications.filter(viewed=False).order_by('-date') %}
                                                 <li>
-                                                    <a href="{{ url(" core:notification", notif_id=n.id) }}">
+                                                    <a href="{{ url('core:notification', notif_id=n.id) }}">
                                                         <div class="datetime">
                                                             <span class="header_notif_date">
                                                                 {{ n.date|localtime|date(DATE_FORMAT) }}

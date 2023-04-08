@@ -165,17 +165,62 @@
                 <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans
                     %}</a>
                 {% endif %}
-                {% endif %}
-        </div>
+            </div>
         {% endif %}
-        {% if profile.was_subscribed and (user == profile or user.can_read_subscription_history)%}
+    {% endif %}
+    <br>
+    {% if profile.was_subscribed and (user == profile or user.can_read_subscription_history)%}
+        <div class="collapse" :class="{'shadow': collapsed}" x-data="{collapsed: false}" x-cloak>
+            <div class="collapse-header clickable" @click="collapsed = !collapsed">
+                <span class="collapse-header-text">
+                    {% trans %}Subscription history{% endtrans %}
+                </span>
+                <span class="collapse-header-icon" :class="{'reverse': collapsed}">
+                    <i class="fa-sharp fa-solid fa-caret-down"></i>
+                </span>
+            </div>
+            <div class="collapse-body" x-show="collapsed" x-transition.scale.origin.top>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>{% trans %}Subscription start{% endtrans %}</th>
+                            <th>{% trans %}Subscription end{% endtrans %}</th>
+                            <th>{% trans %}Subscription type{% endtrans %}</th>
+                            <th>{% trans %}Payment method{% endtrans %}</th>
+                        </tr>
+                    </thead>
+                    {% for sub in profile.subscriptions.all() %}
+                    <tr>
+                        <td>{{ sub.subscription_start }}</td>
+                        <td>{{ sub.subscription_end }}</td>
+                        <td>{{ sub.subscription_type }}</td>
+                        <td>{{ sub.get_payment_method_display() }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% endif %}
+    <hr>
+    <div>
+    {% if user.is_root or user.is_board_member %}
+        <form class="form-gifts" action="{{ url('core:user_gift_create', user_id=profile.id) }}" method="post">
+            {% csrf_token %}
+            {{ gift_form.label }}
+            {{ gift_form.user }}
+            <input type="submit" value="{% trans %}Give gift{% endtrans %}">
+        </form>
+        {% if profile.gifts.exists() %}
+            {% set gifts = profile.gifts.order_by("-date")|list %}
+            <br>
+            
             <div class="collapse" :class="{'shadow': collapsed}" x-data="{collapsed: false}" x-cloak>
                 <div class="collapse-header clickable" @click="collapsed = !collapsed">
                     <span class="collapse-header-text">
-                        {% trans %}Subscription history{% endtrans %}
+                        {% trans %}Last given gift :{% endtrans %} {{ gifts[0] }}
                     </span>
                     <span class="collapse-header-icon" :class="{'reverse': collapsed}">
-                        <i class="fa-sharp fa-solid fa-caret-down"></i>
+                        <i class="fa-solid fa-caret-down"></i>
                     </span>
                 </div>
                 <div class="collapse-body" x-show="collapsed" x-transition.scale.origin.top>
@@ -199,44 +244,10 @@
                     </table>
                 </div>
             </div>
-        {% endif %}
-
-        <hr>
-        <div>
-        {% if user.is_root or user.is_board_member %}
-            <form class="form-gifts" action="{{ url('core:user_gift_create', user_id=profile.id) }}" method="post">
-                {% csrf_token %}
-                {{ gift_form.label }}
-                {{ gift_form.user }}
-                <input type="submit" value="{% trans %}Give gift{% endtrans %}">
-            </form>
-            {% if profile.gifts.exists() %}
-                {% set gifts = profile.gifts.order_by("-date")|list %}
-                <br>
-                <div class="collapse" :class="{'shadow': collapsed}" x-data="{collapsed: false}" x-cloak>
-                    <div class="collapse-header clickable" @click="collapsed = !collapsed">
-                        <span class="collapse-header-text">
-                            {% trans %}Last given gift :{% endtrans %} {{ gifts[0] }}
-                        </span>
-                        <span class="collapse-header-icon" :class="{'reverse': collapsed}">
-                            <i class="fa fa-caret-down"></i>
-                        </span>
-                    </div>
-                    <div class="collapse-body" x-show="collapsed" x-transition.scale.origin.top>
-                        <ul>
-                        {% for gift in gifts %}
-                            <li>{{ gift }}
-                                <a href="{{ url('core:user_gift_delete', user_id=profile.id, gift_id=gift.id) }}">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-        {% else %}
-            <em>{% trans %}No gift given yet{% endtrans %}</em>
-        {% endif %}
-        </div>
+    {% else %}
+        <em>{% trans %}No gift given yet{% endtrans %}</em>
+    {% endif %}
+    </div>
     {% endif %}
 </div>
 
