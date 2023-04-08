@@ -60,7 +60,7 @@
                         {% trans %}Edit billing information{% endtrans %}
                     </span>
                     <span class="collapse-header-icon" :class="{'reverse': collapsed}">
-                        <i class="fa fa-caret-down"></i>
+                        <i class="fa-sharp fa-solid fa-caret-down"></i>
                     </span>
                 </div>
                 <form class="collapse-body" id="billing_info_form" method="post"
@@ -78,7 +78,7 @@
                             </template>
                         </div>
                         <div class="clickable" @click="errors = []">
-                            <i class="fa fa-close"></i>
+                            <i class="fa-solid fa-xmark"></i>
                         </div>
                     </div>
                     <div x-show="successful" class="alert alert-green" x-transition>
@@ -86,7 +86,7 @@
                             Informations de facturation enregistrées
                         </div>
                         <div class="clickable" @click="successful = false">
-                            <i class="fa fa-close"></i>
+                            <i class="fa-solid fa-xmark"></i>
                         </div>
                     </div>
                     <input type="submit" class="btn btn-blue clickable"

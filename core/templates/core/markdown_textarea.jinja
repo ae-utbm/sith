@@ -40,25 +40,25 @@
 					{
 						name: "heading-smaller",
 						action: EasyMDE.toggleHeadingSmaller,
-						className: "fa fa-header",
+						className: "fa-solid fa-heading",
 						title: "{{ translations.heading_smaller }}"
 					},
 					{
 						name: "italic",
 						action: EasyMDE.toggleItalic,
-						className: "fa fa-italic",
+						className: "fa-solid fa-italic",
 						title: "{{ translations.italic }}"
 					},
 					{
 						name: "bold",
 						action: EasyMDE.toggleBold,
-						className: "fa fa-bold",
+						className: "fa-solid fa-bold",
 						title: "{{ translations.bold }}"
 					},
 					{
 						name: "strikethrough",
 						action: EasyMDE.toggleStrikethrough,
-						className: "fa fa-strikethrough",
+						className: "fa-solid fa-strikethrough",
 						title: "{{ translations.strikethrough }}"
 					},
 					{
@@ -67,7 +67,7 @@
 							let cm = editor.codemirror;
 							cm.replaceSelection('__' + cm.getSelection() + '__');
 						},
-						className: "fa fa-underline",
+						className: "fa-solid fa-underline",
 						title: "{{ translations.underline }}"
 					},
 					{
@@ -76,7 +76,7 @@
 							let cm = editor.codemirror;
 							cm.replaceSelection('<sup>' + cm.getSelection() + '</sup>');
 						},
-						className: "fa fa-superscript",
+						className: "fa-solid fa-superscript",
 						title: "{{ translations.superscript }}"
 					},
 					{
@@ -85,84 +85,84 @@
 							let cm = editor.codemirror;
 							cm.replaceSelection('<sub>' + cm.getSelection() + '</sub>');
 						},
-						className: "fa fa-subscript",
+						className: "fa-solid fa-subscript",
 						title: "{{ translations.subscript }}"
 					},
 					{
 						name: "code",
 						action: EasyMDE.toggleCodeBlock,
-						className: "fa fa-code",
+						className: "fa-solid fa-code",
 						title: "{{ translations.code }}"
 					},
 					"|",
 					{
 						name: "quote",
 						action: EasyMDE.toggleBlockquote,
-						className: "fa fa-quote-left",
+						className: "fa-solid fa-quote-left",
 						title: "{{ translations.quote }}"
 					},
 					{
 						name: "unordered-list",
 						action: EasyMDE.toggleUnorderedList,
-						className: "fa fa-list-ul",
+						className: "fa-solid fa-list-ul",
 						title: "{{ translations.unordered_list }}"
 					},
 					{
 						name: "ordered-list",
 						action: EasyMDE.toggleOrderedList,
-						className: "fa fa-list-ol",
+						className: "fa-solid fa-list-ol",
 						title: "{{ translations.ordered_list }}"
 					},
 					"|",
 					{
 						name: "link",
 						action: EasyMDE.drawLink,
-						className: "fa fa-link",
+						className: "fa-solid fa-link",
 						title: "{{ translations.link }}"
 					},
 					{
 						name: "image",
 						action: EasyMDE.drawImage,
-						className: "fa fa-picture-o",
+						className: "fa-solid fa-image",
 						title: "{{ translations.image }}"
 					},
 					{
 						name: "table",
 						action: EasyMDE.drawTable,
-						className: "fa fa-table",
+						className: "fa-solid fa-table",
 						title: "{{ translations.table }}"
 					},
 					"|",
 					{
 						name: "clean-block",
 						action: EasyMDE.cleanBlock,
-						className: "fa fa-eraser fa-clean-block",
+						className: "fa-solid fa-eraser",
 						title: "{{ translations.clean_block }}"
 					},
 					"|",
 					{
 						name: "preview",
 						action: EasyMDE.togglePreview,
-						className: "fa fa-eye no-disable",
+						className: "fa-solid fa-eye no-disable",
 						title: "{{ translations.preview }}"
 					},
 					{
 						name: "side-by-side",
 						action: EasyMDE.toggleSideBySide,
-						className: "fa fa-columns no-disable no-mobile",
+						className: "fa-solid fa-columns no-disable no-mobile",
 						title: "{{ translations.side_by_side }}"
 					},
 					{
 						name: "fullscreen",
 						action: EasyMDE.toggleFullScreen,
-						className: "fa fa-arrows-alt no-disable no-mobile",
+						className: "fa-solid fa-arrows-alt no-disable no-mobile",
 						title: "{{ translations.fullscreen }}"
 					},
 					"|",
 					{
 						name: "guide",
 						action: "/page/Aide_sur_la_syntaxe",
-						className: "fa fa-question-circle",
+						className: "fa-solid fa-question-circle",
 						title: "{{ translations.guide }}"
 					},
 				]

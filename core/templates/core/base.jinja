@@ -16,9 +16,10 @@
                 {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
                 <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
             {% endblock %}
-            <link rel="preload" as="style" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-            <noscript><link rel="stylesheet" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}"></noscript>
-            <script defer href="{{ static('core/font-awesome/js/fontawesone.min.js') }}"></script>
+            <!-- Font Awesome 6 -->
+            <link rel="preload" as="style" href="{{ static('core/fontawesome/css/all.min.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+            <noscript><link rel="stylesheet" href="{{ static('core/fontawesome/css/all.min.css') }}"></noscript>
+            <script defer href="{{ static('core/fontawesome/js/all.min.js') }}"></script>
 
             <!-- Jquery declared here to be accessible in every django widgets -->
             <script src="{{ static('core/js/jquery-3.6.2.min.js') }}"></script>
@@ -72,11 +73,11 @@
                                                     <a href="{{ url('counter:activity', counter_id=bar.id) }}">
                                                 {% endif %}
                                                 {% if bar.is_inactive() %}
-                                                  <i class="fa fa-question" style="color: #f39c12"></i>
+                                                  <i class="fa-solid fa-question" style="color: #f39c12"></i>
                                                 {% elif bar.is_open(): %}
-                                                  <i class="fa fa-check" style="color: #2ecc71"></i>
+                                                  <i class="fa-solid fa-check" style="color: #2ecc71"></i>
                                                 {% else %}
-                                                  <i class="fa fa-times" style="color: #eb2f06"></i>
+                                                  <i class="fa-solid fa-xmark" style="color: #eb2f06"></i>
                                                 {% endif %}
                                                 <span>{{ bar }}</span>
                                                 </a>
@@ -103,7 +104,7 @@
                                 <div class="links">
                                     <div class="notification">
                                         <a href="#" onclick="display_notif()">
-                                            <i class="fa fa-bell-o"></i>
+                                            <i class="fa-solid fa-bell"></i>
                                             {% set notification_count = user.notifications.filter(viewed=False).count() %}
                                     
                                             {% if notification_count > 0 %}
@@ -145,8 +146,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="{{ url('core:user_tools') }}"><i class="fa fa-wrench" aria-hidden="true"></i></a>
-                                    <a href="{{ url('core:logout') }}"><i class="fa fa-sign-out"></i></a>
+                                    <a href="{{ url('core:user_tools') }}"><i class="fa-solid fa-toolbox"></i></a>
+                                    <a href="{{ url('core:logout') }}"><i class="fa-solid fa-right-from-bracket"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -189,7 +190,7 @@
         {% block nav %}
             {% if not popup %}
                 <nav class="navbar">
-                    <button class="expand-button" onclick="showMenu()"><i class="fa fa-bars"></i></button>
+                    <button class="expand-button" onclick="showMenu()"><i class="fa-solid fa-bars"></i></button>
                     <div id="navbar-content" class="content" style="display: none;">
                         <a class="link" href="{{ url('core:index') }}">{% trans %}Main{% endtrans %}</a>
                         <div class="menu">

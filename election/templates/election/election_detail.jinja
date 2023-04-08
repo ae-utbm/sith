@@ -82,18 +82,18 @@
                                     <a href="{{url('election:update_role', role_id=role.id)}}">✏️</a>
                                     <a href="{{url('election:delete_role', role_id=role.id)}}">❌</a>
                                     {%- if role == role_list.last() %}
-                                    <button disabled><i class="fa fa-arrow-down"></i></button>
-                                    <button disabled><i class="fa fa-caret-down"></i></button>
+                                    <button disabled><i class="fa-solid fa-arrow-down"></i></button>
+                                    <button disabled><i class="fa-sharp fa-solid fa-caret-down"></i></button>
                                     {%- else %}
-                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=bottom');"><i class="fa fa-arrow-down"></i></button>
-                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=down');"><i class="fa fa-caret-down"></i></button>
+                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=bottom');"><i class="fa-solid fa-arrow-down"></i></button>
+                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=down');"><i class="fa-sharp fa-solid fa-caret-down"></i></button>
                                     {%- endif %}
                                     {% if role == role_list.first() %}
-                                    <button disabled><i class="fa fa-caret-up"></i></button>
-                                    <button disabled><i class="fa fa-arrow-up"></i></button>
+                                    <button disabled><i class="fa-solid fa-caret-up"></i></i></button>
+                                    <button disabled><i class="fa-sharp fa-solid fa-arrow-up"></i></i></button>
                                     {% else %}
-                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=up');"><i class="fa fa-caret-up"></i></button>
-                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=top');"><i class="fa fa-arrow-up"></i></button>
+                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=up');"><i class="fa-solid fa-caret-up"></i></i></button>
+                                    <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=top');"><i class="fa-sharp fa-solid fa-arrow-up"></i></i></button>
                                     {% endif %}
                                 </div>
                             {%- endif -%}

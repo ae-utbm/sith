@@ -8,9 +8,9 @@
     {% for f in file_list %}
     <li style="list-style-type: none;">
         {% if f.is_folder %}
-			<i class="fa fa-folder" aria-hidden="true"></i>
+            <i class="fa-solid fa-folder"></i>
         {% else %}
-			<i class="fa fa-file" aria-hidden="true"></i>
+            <i class="fa-solid fa-file"></i>
         {% endif %}
         <a href="{{ url('core:file_detail', file_id=f.id, popup=popup) }}">{{ f.name }}</a></li>
     {% endfor %}

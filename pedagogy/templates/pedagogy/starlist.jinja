@@ -26,7 +26,7 @@
                 stars[i].setAttribute("class", attrs + " unchecked");
             }
         ' checked>
-        <span class="fa fa-times-circle"> {{ translations.do_not_vote }}</span>
+        <span class="fa-solid fa-xmark-circle"> {{ translations.do_not_vote }}</span>
     </label>
 
     {# Star widget #}
@@ -46,7 +46,7 @@
                 }
             }
         '>
-        <i class="{{ widget.name }} fa fa-star unchecked"></i>
+        <i class="{{ widget.name }} fa-solid fa-star unchecked"></i>
     </label>
     {% endfor %}
 

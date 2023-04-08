@@ -714,7 +714,7 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/chartjs/Chart.js/": "2.6.0",
     "https://github.com/xdan/datetimepicker/": "2.5.21",
     "https://github.com/Ionaru/easy-markdown-editor/": "2.18.0",
-    "https://github.com/FortAwesome/Font-Awesome/": "4.7.0",
+    "https://github.com/FortAwesome/Font-Awesome/": "6.4.0",
     "https://github.com/jquery/jquery/": "3.6.2",
     "https://github.com/sethmcl/jquery-ui/": "1.11.1",
     "https://github.com/viralpatel/jquery.shorten/": "",

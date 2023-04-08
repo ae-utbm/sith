@@ -28,15 +28,15 @@
     <h5>{% trans %}Legend{% endtrans %}</h5>
     <div class="activity-description">
         <div>
-            <i class="fa fa-check" style="color: #2ecc71"></i>
+            <i class="fa-solid fa-check" style="color: #2ecc71"></i>
             <span>{% trans %}counter is open, there's at least one barman connected{% endtrans %}</span>
         </div>
         <div>
-            <i class="fa fa-question" style="color: #f39c12"></i>
+            <i class="fa-solid fa-question" style="color: #f39c12"></i>
             <span>{% trans  minutes=settings.SITH_COUNTER_MINUTE_INACTIVE %}counter is open but not active, the last sale was done at least {{ minutes }} minutes ago {% endtrans %}</span>
         </div>
         <div>
-            <i class="fa fa-times" style="color: #eb2f06"></i>
+            <i class="fa-solid fa-xmark" style="color: #eb2f06"></i>
             <span>{% trans %}counter is not open : no one is connected{% endtrans %}</span>
         </div>
     </div>

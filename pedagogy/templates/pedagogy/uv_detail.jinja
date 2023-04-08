@@ -167,7 +167,7 @@
 
 					<div class="comment">
 						<div class="anchor">
-							<a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}#{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
+							<a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}#{{ comment.id }}"><i class="fa-solid fa-paragraph"></i></a>
 						</div>
 						{{ comment.comment|markdown }}
 					</div>
@@ -206,8 +206,8 @@
 	$("#return_noscript").hide();
 	$("#return_js").show();
 	var icons = {
-		header: "fa fa-toggle-right",
-		activeHeader: "fa fa-toggle-down"
+		header: "fa-solid fa-toggle-on",
+		activeHeader: "fa-solid fa-toggle-off"
 	};
 	$(function(){
 		$("#leave_comment").accordion({

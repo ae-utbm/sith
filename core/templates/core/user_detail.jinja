@@ -166,9 +166,8 @@
                     %}</a>
                 {% endif %}
                 {% endif %}
-            </div>
+        </div>
         {% endif %}
-        <br>
         {% if profile.was_subscribed and (user == profile or user.can_read_subscription_history)%}
             <div class="collapse" :class="{'shadow': collapsed}" x-data="{collapsed: false}" x-cloak>
                 <div class="collapse-header clickable" @click="collapsed = !collapsed">
@@ -176,7 +175,7 @@
                         {% trans %}Subscription history{% endtrans %}
                     </span>
                     <span class="collapse-header-icon" :class="{'reverse': collapsed}">
-                        <i class="fa fa-caret-down"></i>
+                        <i class="fa-sharp fa-solid fa-caret-down"></i>
                     </span>
                 </div>
                 <div class="collapse-body" x-show="collapsed" x-transition.scale.origin.top>
@@ -190,12 +189,12 @@
                             </tr>
                         </thead>
                         {% for sub in profile.subscriptions.all() %}
-                            <tr>
-                                <td>{{ sub.subscription_start }}</td>
-                                <td>{{ sub.subscription_end }}</td>
-                                <td>{{ sub.subscription_type }}</td>
-                                <td>{{ sub.get_payment_method_display() }}</td>
-                            </tr>
+                        <tr>
+                            <td>{{ sub.subscription_start }}</td>
+                            <td>{{ sub.subscription_end }}</td>
+                            <td>{{ sub.subscription_type }}</td>
+                            <td>{{ sub.get_payment_method_display() }}</td>
+                        </tr>
                         {% endfor %}
                     </table>
                 </div>

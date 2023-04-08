@@ -45,8 +45,8 @@
 
 			<div class="radio-semester">
 				<div class="radio-guide">
-					<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN"><i class="fa fa-leaf"></i></label>
-					<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING"><i class="fa fa-sun-o"></i></label>
+					<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN"><i class="fa-solid fa-leaf"></i></label>
+					<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING"><i class="fa-solid fa-sun"></i></label>
 					<span><input type="checkbox" name="semester" id="radioAP" value="AUTUMN_AND_SPRING"><label for="radioAP">AP</label></span>
 				</div>
 			</div>
@@ -60,8 +60,8 @@
 				<td>{% trans %}Title{% endtrans %}</td>
 				<td>{% trans %}Department{% endtrans %}</td>
 				<td>{% trans %}Credit type{% endtrans %}</td>
-				<td><i class="fa fa-leaf"></i></td>
-				<td><i class="fa fa-sun-o"></i></td>
+				<td><i class="fa-solid fa-leaf"></i></td>
+				<td><i class="fa-solid fa-sun"></i></td>
 				{% if can_create_uv(user) %}
 				<td>{% trans %}Edit{% endtrans %}</td>
 				<td>{% trans %}Delete{% endtrans %}</td>
@@ -77,12 +77,12 @@
 				<td>{{ uv.credit_type }}</td>
 				<td>
 					{% if uv.semester in ["AUTUMN", "AUTUMN_AND_SPRING"] %}
-						<i class="fa fa-leaf"></i>
+						<i class="fa-solid fa-leaf"></i>
 					{% endif %}
 				</td>
 				<td>
 					{% if uv.semester in ["SPRING", "AUTUMN_AND_SPRING"] %}
-						<i class="fa fa-sun-o"></i>
+						<i class="fa-solid fa-sun"></i>
 					{% endif %}
 				</td>
 				{% if user.is_owner(uv) -%}
@@ -107,9 +107,9 @@
 		var autumn = "";
 		var spring = "";
 		if (uv.semester == "AUTUMN" || uv.semester == "AUTUMN_AND_SPRING")
-			autumn = "<i class='fa fa-leaf'></i>";
+			autumn = "<i class='fa-solid fa-leaf'></i>";
 		if (uv.semester == "SPRING" || uv.semester == "AUTUMN_AND_SPRING")
-			spring = "<i class='fa fa-sun-o'></i>";
+			spring = "<i class='fa-solid fa-sun'></i>";
 
 		var html = `
 			<tr onclick="window.location.href = '${uv.absolute_url}';">

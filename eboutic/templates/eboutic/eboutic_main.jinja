@@ -47,9 +47,9 @@
                 <template x-for="item in items" :key="item.id">
                     <li class="item-row" x-show="item.quantity > 0">
                         <div class="item-quantity">
-                            <i class="fa fa-minus fa-xs" @click="remove(item.id)"></i>
+                            <i class="fa-solid fa-minus"></i>
                             <span x-text="item.quantity"></span>
-                            <i class="fa fa-plus" @click="add(item)"></i>
+                            <i class="fa-solid fa-plus"></i>
                         </div>
                         <span class="item-name" x-text="item.name"></span>
                         <span class="item-price" x-text="(item.unit_price * item.quantity).toFixed(2) + ' €'"></span>
@@ -63,13 +63,13 @@
             </ul>
             <div class="catalog-buttons">
                 <button @click="clear_basket()" class="clear">
-                    <i class="fa fa-trash"></i>
+                    <i class="fa-solid fa-trash"></i>
                     {% trans %}Clear{% endtrans %}
                 </button>
                 <form method="get" action="{{ url('eboutic:command') }}">
                     {% csrf_token %}
                     <button class="validate">
-                        <i class="fa fa-check"></i>
+                        <i class="fa-solid fa-check"></i>
                         <input type="submit" value="{% trans %}Validate{% endtrans %}"/>
                     </button>
                 </form>
@@ -85,7 +85,7 @@
                         </a>
                     </span>
                     <span class="clickable" @click="show_alert = false">
-                        <i class="fa fa-close"></i>
+                        <i class="fa-solid fa-xmark"></i>
                     </span>
                 </div>
             {% endif %}
@@ -108,7 +108,7 @@
                                         {% if p.icon %}
                                             <img class="product-image" src="{{ p.icon.url }}" alt="image de {{ p.name }}">
                                         {% else %}
-                                            <i class="fa fa-2x fa-picture-o product-image" ></i>
+                                            <i class="fa-solid fa-image product-image"></i>
                                         {% endif %}
                                         <div class="product-description">
                                             <h4>{{ p.name }}</h4>

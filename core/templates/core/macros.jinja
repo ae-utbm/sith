@@ -40,11 +40,11 @@
 {%- endmacro %}
 
 {% macro fb_quick(news) -%}
-<a rel="nofollow" target="#" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}" class="fb fa fa-facebook-square fa-2x"></a>
+<a rel="nofollow" target="#" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}" class="fb fa-brands fa-facebook fa-2x"></a>
 {%- endmacro %}
 
 {% macro tweet_quick(news) -%}
-<a rel="nofollow" target="#" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}" class="twitter fa fa-twitter-square fa-2x"></a>
+<a rel="nofollow" target="#" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}" class="twitter fa-brands fa-twitter fa-2x"></a>
 {%- endmacro %}
 
 {% macro user_mini_profile(user) %}
