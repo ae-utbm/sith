@@ -180,6 +180,7 @@ main {
         max-height: calc(100% / 3);
         width: 100%;
         object-fit: contain;
+        cursor: pointer;
 
         @media (max-width: 960px) {
           max-height: 100%;

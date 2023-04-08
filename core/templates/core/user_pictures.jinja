@@ -21,7 +21,7 @@
                     <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
                         <div
                             class="photo{% if not p.is_moderated %} not_moderated{% endif %}"
-                            style="background-image: url('{% if p.file %}{{ p.get_download_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
+                            style="background-image: url('{% if p.file %}{{ p.get_download_thumb_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
                         >
                             {% if not p.is_moderated %}
                                 <div class="overlay">&nbsp;</div>
