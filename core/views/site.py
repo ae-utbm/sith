@@ -31,6 +31,7 @@ from django.utils import html
 from django.views.generic import ListView, TemplateView
 from django.conf import settings
 from django.utils.text import slugify
+from django.db.models.query import QuerySet
 
 import json
 
@@ -51,10 +52,9 @@ class NotificationList(ListView):
     model = Notification
     template_name = "core/notification_list.jinja"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Notification]:
         if self.request.user.is_anonymous:
-            return []
-
+            return Notification.objects.none()
         # TODO: Bulk update in django 2.2
         if "see_all" in self.request.GET.keys():
             for n in self.request.user.notifications.filter(viewed=False):
