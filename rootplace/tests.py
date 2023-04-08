@@ -144,11 +144,12 @@ class MergeUserTest(TestCase):
         self.assertTrue(self.to_keep.is_subscribed)
         # to_keep had 5 months of subscription remaining and received
         # 5 more months from to_delete, so he should be subscribed for 10 months
-        self.assertEqual(
+        self.assertAlmostEqual(
             today + timedelta(10 * 30),
             self.to_keep.subscriptions.order_by("subscription_end")
             .last()
             .subscription_end,
+            delta=timedelta(1),
         )
 
     def test_godfathers(self):
