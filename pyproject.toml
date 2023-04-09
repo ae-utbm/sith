@@ -59,7 +59,7 @@ testing = ["coverage"]
 docs = ["Sphinx", "sphinx-rtd-theme", "sphinx-copybutton"]
 
 [tool.poetry.dev-dependencies]
-django-debug-toolbar = "^3.2.2"
+django-debug-toolbar = "^4.0.0"
 ipython = "^7.28.0"
 black = "^22.6.0"
 
