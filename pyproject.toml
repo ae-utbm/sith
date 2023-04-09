@@ -44,7 +44,7 @@ sentry-sdk = "^1.19.1"
 pygraphviz = "^1.9"
 Jinja2 = "^3.1"
 django-countries = "^7.4.2"
-dict2xml = "^1.7.2"
+dict2xml = "^1.7.3"
 
 # Extra optional dependencies
 coverage = {version = "^5.5", optional = true}
