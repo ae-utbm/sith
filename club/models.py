@@ -127,12 +127,22 @@ class Club(models.Model):
     def clean(self):
         self.check_loop()
 
-    def _change_unixname(self, new_name):
+    def _change_unixname(self, old_name, new_name):
         c = Club.objects.filter(unix_name=new_name).first()
         if c is None:
+            # Update all the groups names
+            Group.objects.filter(name=old_name).update(name=new_name)
+            Group.objects.filter(name=old_name + settings.SITH_BOARD_SUFFIX).update(
+                name=new_name + settings.SITH_BOARD_SUFFIX
+            )
+            Group.objects.filter(name=old_name + settings.SITH_MEMBER_SUFFIX).update(
+                name=new_name + settings.SITH_MEMBER_SUFFIX
+            )
+
             if self.home:
                 self.home.name = new_name
                 self.home.save()
+
         else:
             raise ValidationError(_("A club with that unix_name already exists"))
 
