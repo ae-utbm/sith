@@ -35,11 +35,14 @@ def get_git_revision_short_hash() -> str:
     """
     Return the short hash of the current commit
     """
-    return (
-        subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
-        .decode("ascii")
-        .strip()
-    )
+    try:
+        return (
+            subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+            .decode("ascii")
+            .strip()
+        )
+    except:
+        return ""
 
 
 def get_start_of_semester(d=date.today()):
