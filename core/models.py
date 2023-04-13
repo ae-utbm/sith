@@ -919,6 +919,35 @@ class SithFile(models.Model):
     class Meta:
         verbose_name = _("file")
 
+    def can_be_managed_by(self, user) -> bool:
+        """
+        Tell if the user can manage the file (edit, delete, etc.) or not.
+        Apply the following rules:
+            - If the file is not in the SAS nor in the profiles directory, it can be "managed" by anyone -> return True
+            - If the file is in the SAS, only the SAS admins (or roots) can manage it -> return True if the user is in the SAS admin group or is a root
+            - If the file is in the profiles directory, only the roots can manage it -> return True if the user is a root
+
+        Returns:
+            bool: True if the file is managed by the SAS or within the profiles directory, False otherwise
+        """
+
+        # If the file is not in the SAS nor in the profiles directory, it can be "managed" by anyone
+        profiles_dir = SithFile.objects.filter(name="profiles").first()
+        if not self.is_in_sas and not profiles_dir in self.get_parent_list():
+            return True
+
+        # If the file is in the SAS, only the SAS admins (or roots) can manage it
+        if self.is_in_sas and (
+            user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) or user.is_root
+        ):
+            return True
+
+        # If the file is in the profiles directory, only the roots can manage it
+        if profiles_dir in self.get_parent_list() and user.is_root:
+            return True
+
+        return False
+
     def is_owned_by(self, user):
         if user.is_anonymous:
             return False
