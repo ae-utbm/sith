@@ -1025,7 +1025,7 @@ class SithFile(models.Model):
 
     def save(self, *args, **kwargs):
         sas = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
-        self.is_in_sas = sas in self.get_parent_list()
+        self.is_in_sas = sas in self.get_parent_list() or self == sas
         copy_rights = False
         if self.id is None:
             copy_rights = True
