@@ -452,7 +452,7 @@ SITH_PEDAGOGY_UV_LANGUAGE = [
     ("FR", _("French")),
     ("EN", _("English")),
     ("DE", _("German")),
-    ("SP", _("Spanich")),
+    ("SP", _("Spanish")),
 ]
 
 SITH_PEDAGOGY_UV_RESULT_GRADE = [
