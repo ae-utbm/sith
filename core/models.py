@@ -919,7 +919,7 @@ class SithFile(models.Model):
     class Meta:
         verbose_name = _("file")
 
-    def can_be_managed_by(self, user) -> bool:
+    def can_be_managed_by(self, user: User) -> bool:
         """
         Tell if the user can manage the file (edit, delete, etc.) or not.
         Apply the following rules:
@@ -943,7 +943,9 @@ class SithFile(models.Model):
             return True
 
         # If the file is in the profiles directory, only the roots can manage it
-        if profiles_dir in self.get_parent_list() and user.is_root:
+        if profiles_dir in self.get_parent_list() and (
+            user.is_root or user.is_board_member
+        ):
             return True
 
         return False
