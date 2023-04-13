@@ -1159,12 +1159,6 @@ class SithFile(models.Model):
 
         return Album.objects.filter(id=self.id).first()
 
-    def __str__(self):
-        if self.is_folder:
-            return _("Folder: ") + self.name
-        else:
-            return _("File: ") + self.name
-
     def get_parent_list(self):
         l = []
         p = self.parent
