@@ -26,8 +26,9 @@ import json
 
 from pathlib import Path
 
-from django.test import TestCase
 from django.core.management import call_command
+from django.test import TestCase
+from django.urls import reverse
 
 from core.models import User
 from galaxy.models import Galaxy
@@ -132,9 +133,11 @@ class GalaxyTest(TestCase):
         self.assertDictEqual(expected_scores, computed_scores)
 
     def test_page_is_citizen(self):
-        Galaxy.rule()
+        with self.assertNumQueries(84):
+            galaxy = Galaxy.objects.create()
+            galaxy.rule(0)  # We want all users here
         self.client.login(username="root", password="plop")
-        response = self.client.get("/galaxy/1/")
+        response = self.client.get(reverse("galaxy:user", args=[1]))
         self.assertContains(
             response,
             '<a onclick="focus_node(get_node_from_id(8))">Locate</a>',
@@ -142,15 +145,17 @@ class GalaxyTest(TestCase):
         )
 
     def test_page_not_citizen(self):
-        Galaxy.rule()
+        galaxy = Galaxy.objects.create()
+        galaxy.rule(0)  # We want all users here
         self.client.login(username="root", password="plop")
-        response = self.client.get("/galaxy/2/")
+        response = self.client.get(reverse("galaxy:user", args=[2]))
         self.assertEquals(response.status_code, 404)
 
     def test_full_galaxy_state(self):
-        Galaxy.rule()
-        Galaxy.make_state()
-        state = Galaxy.objects.first().state
+        call_command("generate_galaxy_test_data", "-v", "0")
+        galaxy = Galaxy.objects.create()
+        galaxy.rule(26)  # We want a fast test
+        state = Galaxy.objects.last().state
 
         galaxy_dir = Path(__file__).parent
 
