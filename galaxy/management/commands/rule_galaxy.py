@@ -49,11 +49,10 @@ class Command(BaseCommand):
             logger.setLevel(logging.NOTSET)
 
         logger.info("The Galaxy is being ruled by the Sith.")
-        Galaxy.rule()
-        logger.info(
-            "Caching current Galaxy state for a quicker display of the Empire's power."
-        )
-        Galaxy.make_state()
+        galaxy = Galaxy.objects.create()
+        galaxy.rule()
+        logger.info("Sending old galaxies' remains to garbage.")
+        Galaxy.objects.filter(state__isnull=True).delete()
 
         logger.info("Ruled the galaxy in {} queries.".format(len(connection.queries)))
         if options["verbosity"] > 2:

@@ -1,37 +1,42 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans user_name=user.get_display_name() %}{{ user_name }}'s Galaxy{% endtrans %}
+{% trans user_name=object.get_display_name() %}{{ user_name }}'s Galaxy{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if object.galaxy_user %}
-    <p><a onclick="focus_node(get_node_from_id({{ object.id }}))">Reset on {{ object.get_display_name() }}</a></p>
-    <p>Self score: {{ object.galaxy_user.mass }}</p>
-    <table style="width: initial;">
-        <tr>
-          <th></th>
-          <th>Citizen</th>
-          <th>Score</th>
-          <th>Distance</th>
-          <th>Family</th>
-          <th>Pictures</th>
-          <th>Clubs</th>
-        </tr>
-    {% for lane in lanes %}
-        <tr>
-          <td><a onclick="focus_node(get_node_from_id({{ lane.other_star_id }}))">Locate</a></td>
-          <td><a href="{{ url("galaxy:user", user_id=lane.other_star_id) }}">{{ lane.other_star_name }}</a></td>
-          <td>{{ lane.other_star_mass }}</td>
-          <td>{{ lane.distance }}</td>
-          <td>{{ lane.family }}</td>
-          <td>{{ lane.pictures }}</td>
-          <td>{{ lane.clubs }}</td>
-        </tr>
-    {% endfor %}
-    </table>
+{% if object.current_star %}
+<div style="display: flex; flex-wrap: wrap;">
+    <div id="3d-graph" style="margin: 1em;"></div>
 
-  <div id="3d-graph" style="margin: 1em;"></div>
+    <div>
+        <p><a onclick="focus_node(get_node_from_id({{ object.id }}))">Reset on {{ object.get_display_name() }}</a></p>
+        <p>Self score: {{ object.current_star.mass }}</p>
+        <table style="width: initial;">
+            <tr>
+              <th></th>
+              <th>Citizen</th>
+              <th>Score</th>
+              <th>Distance</th>
+              <th>Family</th>
+              <th>Pictures</th>
+              <th>Clubs</th>
+            </tr>
+        {% for lane in lanes %}
+            <tr>
+              <td><a onclick="focus_node(get_node_from_id({{ lane.other_star_id }}))">Locate</a></td>
+              <td><a href="{{ url("galaxy:user", user_id=lane.other_star_id) }}">{{ lane.other_star_name }}</a></td>
+              <td>{{ lane.other_star_mass }}</td>
+              <td>{{ lane.distance }}</td>
+              <td>{{ lane.family }}</td>
+              <td>{{ lane.pictures }}</td>
+              <td>{{ lane.clubs }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+</div>
+<p>#{{ object.current_star.galaxy }}#</p>
 {% else %}
   <p>This citizen has not yet joined the galaxy</p>
 {% endif %}

@@ -45,32 +45,29 @@ class GalaxyUserView(CanViewMixin, UserTabsMixin, DetailView):
 
     def get_object(self, *args, **kwargs):
         user: User = super(GalaxyUserView, self).get_object(*args, **kwargs)
-        if not hasattr(user, "galaxy_user"):
+        if user.current_star is None:
             raise Http404(_("This citizen has not yet joined the galaxy"))
         return user
-
-    def get_queryset(self):
-        return super(GalaxyUserView, self).get_queryset().select_related("galaxy_user")
 
     def get_context_data(self, **kwargs):
         kwargs = super(GalaxyUserView, self).get_context_data(**kwargs)
         kwargs["lanes"] = (
             GalaxyLane.objects.filter(
-                Q(star1=self.object.galaxy_user) | Q(star2=self.object.galaxy_user)
+                Q(star1=self.object.current_star) | Q(star2=self.object.current_star)
             )
             .order_by("distance")
             .annotate(
                 other_star_id=Case(
-                    When(star1=self.object.galaxy_user, then=F("star2__owner__id")),
+                    When(star1=self.object.current_star, then=F("star2__owner__id")),
                     default=F("star1__owner__id"),
                 ),
                 other_star_mass=Case(
-                    When(star1=self.object.galaxy_user, then=F("star2__mass")),
+                    When(star1=self.object.current_star, then=F("star2__mass")),
                     default=F("star1__mass"),
                 ),
                 other_star_name=Case(
                     When(
-                        star1=self.object.galaxy_user,
+                        star1=self.object.current_star,
                         then=Case(
                             When(
                                 star2__owner__nick_name=None,
@@ -101,4 +98,4 @@ class GalaxyUserView(CanViewMixin, UserTabsMixin, DetailView):
 
 class GalaxyDataView(FormerSubscriberMixin, View):
     def get(self, request, *args, **kwargs):
-        return JsonResponse(Galaxy.objects.first().state)
+        return JsonResponse(Galaxy.objects.filter(state__isnull=False).last().state)
