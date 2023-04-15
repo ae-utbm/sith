@@ -36,12 +36,11 @@ def get_git_revision_short_hash() -> str:
     Return the short hash of the current commit
     """
     try:
-        return (
-            subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
-            .decode("ascii")
-            .strip()
-        )
-    except:
+        output = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+        if isinstance(output, bytes):
+            return output.decode("ascii").strip()
+        return output.strip()
+    except subprocess.CalledProcessError:
         return ""
 
 
