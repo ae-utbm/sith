@@ -321,7 +321,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
         last_album = None
         for picture in picture_qs:
             album = picture.parent
-            if album.id != last_album:
+            if album.id != last_album and album not in kwargs["albums"]:
                 kwargs["albums"].append(album)
                 kwargs["pictures"][album.id] = []
                 last_album = album.id
