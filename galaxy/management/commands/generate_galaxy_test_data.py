@@ -106,32 +106,42 @@ class Command(BaseCommand):
 
     def make_clubs(self):
         """This will create all the clubs and store them in self.clubs for fast access later"""
-        self.clubs = {}
+        self.clubs = []
         for i in range(self.NB_CLUBS):
-            self.clubs[i] = Club.objects.create(
-                unix_name=f"galaxy-club-{i}", name=f"club-{i}"
-            )
+            self.clubs.append(Club(unix_name=f"galaxy-club-{i}", name=f"club-{i}"))
+        # We don't need to create corresponding groups here, as the Galaxy doesn't care about them
+        Club.objects.bulk_create(self.clubs)
+        self.clubs = Club.objects.filter(unix_name__startswith="galaxy-").all()
 
     def make_users(self):
         """This will create all the users and store them in self.users for fast access later"""
-        self.users = {}
+        self.users = []
         for i in range(self.NB_USERS):
-            u = User.objects.create_user(
+            u = User(
                 username=f"galaxy-user-{i}",
                 email=f"{i}@galaxy.test",
                 first_name="Citizen",
                 last_name=f"n°{i}",
             )
-            self.users[i] = u
+            self.logger.info(f"Creating {u}")
+            self.users.append(u)
+        User.objects.bulk_create(self.users)
+        self.users = User.objects.filter(username__startswith="galaxy-").all()
 
+        subs = []
+        for i in range(self.NB_USERS):
+            u = self.users[i]
             self.logger.info(f"Registering {u}")
-            Subscription.objects.create(
-                member=u,
-                subscription_start=Subscription.compute_start(
-                    self.now - timedelta(days=self.NB_USERS - i)
-                ),
-                subscription_end=Subscription.compute_end(duration=2),
+            subs.append(
+                Subscription(
+                    member=u,
+                    subscription_start=Subscription.compute_start(
+                        self.now - timedelta(days=self.NB_USERS - i)
+                    ),
+                    subscription_end=Subscription.compute_end(duration=2),
+                )
             )
+        Subscription.objects.bulk_create(subs)
 
     def make_families(self):
         """
@@ -140,12 +150,14 @@ class Command(BaseCommand):
         heuristic to determine if they should have a family link
         """
         for i in range(200, self.NB_USERS):
+            godfathers = []
             for j in range(i - 200, i, 14):  # this will loop 14 times (14² = 196)
                 if (i / 10) % 10 == (i + j) % 10:
                     u1 = self.users[i]
                     u2 = self.users[j]
                     self.logger.info(f"Making {u2} the godfather of {u1}")
-                    u1.godfathers.add(u2)
+                    godfathers.append(u2)
+                u1.godfathers.set(godfathers)
 
     def make_club_memberships(self):
         """
@@ -154,6 +166,7 @@ class Command(BaseCommand):
         Each pass for each user has a chance to affect her to two different clubs, increasing a bit more the created
         chaos, while remaining purely deterministic.
         """
+        memberships = []
         for i in range(1, 11):  # users can be in up to 20 clubs
             self.logger.info(f"Club membership, pass {i}")
             for uid in range(
@@ -166,16 +179,18 @@ class Command(BaseCommand):
                     days=(((self.NB_USERS - uid) * i) // 110)
                 )  # older users were in clubs before newer users
                 end = start + timedelta(days=180)  # about one semester
-                self.logger.info(
+                self.logger.debug(
                     f"Making {user} a member of club {club} from {start} to {end}"
                 )
-                Membership(
-                    user=user,
-                    club=club,
-                    role=(uid + i) % 10 + 1,  # spread the different roles
-                    start_date=start,
-                    end_date=end,
-                ).save()
+                memberships.append(
+                    Membership(
+                        user=user,
+                        club=club,
+                        role=(uid + i) % 10 + 1,  # spread the different roles
+                        start_date=start,
+                        end_date=end,
+                    )
+                )
 
             for uid in range(
                 10 + i * 2, self.NB_USERS, 10 + i * 2
@@ -187,27 +202,31 @@ class Command(BaseCommand):
                     days=(((self.NB_USERS - uid) * i) // 100)
                 )  # older users were in clubs before newer users
                 end = start + timedelta(days=180)  # about one semester
-                self.logger.info(
+                self.logger.debug(
                     f"Making {user} a member of club {club} from {start} to {end}"
                 )
-                Membership(
-                    user=user,
-                    club=club,
-                    role=((uid // 10) + i) % 10 + 1,  # spread the different roles
-                    start_date=start,
-                    end_date=end,
-                ).save()
+                memberships.append(
+                    Membership(
+                        user=user,
+                        club=club,
+                        role=((uid // 10) + i) % 10 + 1,  # spread the different roles
+                        start_date=start,
+                        end_date=end,
+                    )
+                )
+        Membership.objects.bulk_create(memberships)
 
     def make_pictures(self):
         """This function creates pictures for users to be tagged on later"""
-        self.picts = {}
-        for i in range(self.NB_USERS):
-            u = self.users[i]
-            # Create twice as many pictures as users
-            for j in [i, i**2]:
-                self.picts[j] = Picture.objects.create(
-                    owner=self.users[i],
-                    name=f"galaxy-picture {u} {j}",
+        self.picts = []
+        # Create twice as many pictures as users
+        for i in range(self.NB_USERS * 2):
+            u = self.users[i % self.NB_USERS]
+            self.logger.info(f"Making Picture {i // self.NB_USERS} for {u}")
+            self.picts.append(
+                Picture(
+                    owner=u,
+                    name=f"galaxy-picture {u} {i // self.NB_USERS}",
                     is_moderated=True,
                     is_folder=False,
                     parent=self.galaxy_album,
@@ -218,64 +237,110 @@ class Command(BaseCommand):
                     mime_type="image/png",
                     size=len(RED_PIXEL_PNG),
                 )
-                self.picts[j].file.name = self.picts[j].name
-                self.picts[j].compressed.name = self.picts[j].name
-                self.picts[j].thumbnail.name = self.picts[j].name
-                self.picts[j].save()
+            )
+            self.picts[i].file.name = self.picts[i].name
+            self.picts[i].compressed.name = self.picts[i].name
+            self.picts[i].thumbnail.name = self.picts[i].name
+        Picture.objects.bulk_create(self.picts)
+        self.picts = Picture.objects.filter(name__startswith="galaxy-").all()
 
     def make_pictures_memberships(self):
         """
         This assigns users to pictures, and makes enough of them for our created users to be eligible for promotion as citizen.
         See galaxy.models.Galaxy.rule for details on promotion to citizen.
         """
+        self.pictures_tags = []
 
         # We don't want to handle limits, users in the middle will be far enough
-        def _tag_neighbors(uid, neighbor_dist, pict_power, pict_dist):
+        def _tag_neighbors(uid, neighbor_dist, pict_offset, pict_dist):
             u2 = self.users[uid - neighbor_dist]
             u3 = self.users[uid + neighbor_dist]
-            PeoplePictureRelation(user=u2, picture=self.picts[uid**pict_power]).save()
-            PeoplePictureRelation(user=u3, picture=self.picts[uid**pict_power]).save()
-            PeoplePictureRelation(user=u2, picture=self.picts[uid - pict_dist]).save()
-            PeoplePictureRelation(user=u3, picture=self.picts[uid - pict_dist]).save()
-            PeoplePictureRelation(user=u2, picture=self.picts[uid + pict_dist]).save()
-            PeoplePictureRelation(user=u3, picture=self.picts[uid + pict_dist]).save()
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u2, picture=self.picts[uid + pict_offset])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u3, picture=self.picts[uid + pict_offset])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u2, picture=self.picts[uid - pict_dist])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u3, picture=self.picts[uid - pict_dist])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u2, picture=self.picts[uid + pict_dist])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u3, picture=self.picts[uid + pict_dist])
+            )
 
         for uid in range(200, self.NB_USERS - 200):
             u1 = self.users[uid]
             self.logger.info(f"Pictures of {u1}")
-            PeoplePictureRelation(user=u1, picture=self.picts[uid]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid - 14]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid + 14]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid - 20]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid + 20]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid - 21]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid + 21]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid - 22]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid + 22]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid - 30]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid + 30]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid - 31]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid + 31]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid - 32]).save()
-            PeoplePictureRelation(user=u1, picture=self.picts[uid + 32]).save()
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid - 14])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid + 14])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid - 20])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid + 20])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid - 21])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid + 21])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid - 22])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid + 22])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid - 30])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid + 30])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid - 31])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid + 31])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid - 32])
+            )
+            self.pictures_tags.append(
+                PeoplePictureRelation(user=u1, picture=self.picts[uid + 32])
+            )
 
             if uid % 3 == 0:
-                _tag_neighbors(uid, 1, 1, 40)
+                _tag_neighbors(uid, 1, 0, 40)
             if uid % 5 == 0:
-                _tag_neighbors(uid, 2, 1, 50)
+                _tag_neighbors(uid, 2, 0, 50)
             if uid % 10 == 0:
-                _tag_neighbors(uid, 3, 1, 60)
+                _tag_neighbors(uid, 3, 0, 60)
             if uid % 20 == 0:
-                _tag_neighbors(uid, 5, 1, 70)
+                _tag_neighbors(uid, 5, 0, 70)
             if uid % 25 == 0:
-                _tag_neighbors(uid, 10, 1, 80)
+                _tag_neighbors(uid, 10, 0, 80)
 
             if uid % 2 == 1:
-                _tag_neighbors(uid, 1, 2, 90)
+                _tag_neighbors(uid, 1, self.NB_USERS, 90)
             if uid % 15 == 0:
-                _tag_neighbors(uid, 5, 2, 100)
+                _tag_neighbors(uid, 5, self.NB_USERS, 100)
             if uid % 30 == 0:
-                _tag_neighbors(uid, 4, 2, 110)
+                _tag_neighbors(uid, 4, self.NB_USERS, 110)
+        PeoplePictureRelation.objects.bulk_create(self.pictures_tags)
 
     def make_important_citizen(self, uid):
         """
@@ -285,8 +350,8 @@ class Command(BaseCommand):
         u1 = self.users[uid]
         u2 = self.users[uid - 100]
         u3 = self.users[uid + 100]
-        u1.godfathers.add(u3)
-        u1.godchildren.add(u2)
+        u1.godfathers.add(u2)
+        u1.godchildren.add(u3)
         self.logger.info(f"{u1} will be important and close to {u2} and {u3}")
         for p in range(  # Mix them with other citizen for more chaos
             uid - 400, uid - 200
@@ -296,7 +361,11 @@ class Command(BaseCommand):
                 PeoplePictureRelation(user=u1, picture=self.picts[p]).save()
             if not self.picts[p].people.filter(user=u2).exists():
                 PeoplePictureRelation(user=u2, picture=self.picts[p]).save()
-            if not self.picts[p**2].people.filter(user=u1).exists():
-                PeoplePictureRelation(user=u1, picture=self.picts[p**2]).save()
-            if not self.picts[p**2].people.filter(user=u2).exists():
-                PeoplePictureRelation(user=u2, picture=self.picts[p**2]).save()
+            if not self.picts[p + self.NB_USERS].people.filter(user=u1).exists():
+                PeoplePictureRelation(
+                    user=u1, picture=self.picts[p + self.NB_USERS]
+                ).save()
+            if not self.picts[p + self.NB_USERS].people.filter(user=u2).exists():
+                PeoplePictureRelation(
+                    user=u2, picture=self.picts[p + self.NB_USERS]
+                ).save()
