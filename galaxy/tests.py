@@ -133,7 +133,7 @@ class GalaxyTest(TestCase):
         self.assertDictEqual(expected_scores, computed_scores)
 
     def test_page_is_citizen(self):
-        with self.assertNumQueries(84):
+        with self.assertNumQueries(59):
             galaxy = Galaxy.objects.create()
             galaxy.rule(0)  # We want all users here
         self.client.login(username="root", password="plop")

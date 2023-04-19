@@ -348,8 +348,20 @@ class Galaxy(models.Model):
             f"{rulable_users_count} citizen have been listed. Starting to rule."
         )
 
-        stars = GalaxyStar.objects.filter(galaxy=self)
+        stars = []
+        self.logger.info("Creating stars for all citizen")
+        for user in rulable_users:
+            star = GalaxyStar(
+                owner=user, galaxy=self, mass=self.compute_user_score(user)
+            )
+            stars.append(star)
+        GalaxyStar.objects.bulk_create(stars)
 
+        stars = {}
+        for star in GalaxyStar.objects.filter(galaxy=self):
+            stars[star.owner.id] = star
+
+        self.logger.info("Creating lanes between stars")
         # Display current speed every $speed_count_frequency users
         speed_count_frequency = max(rulable_users_count // 10, 1)  # ten time at most
         global_avg_speed_accumulator = 0
@@ -360,44 +372,36 @@ class Galaxy(models.Model):
             user1_count += 1
             rulable_users_count2 = len(rulable_users)
 
-            star1, created = stars.get_or_create(owner=user1)
-
-            if created:
-                star1.galaxy = self
-                star1.save()
-
-            if star1.mass == 0:
-                star1.mass = self.compute_user_score(user1)
-                star1.save()
+            star1 = stars[user1.id]
 
             user_avg_speed = 0
             user_avg_speed_count = 0
 
             tstart = time.time()
+            lanes = []
             for user2_count, user2 in enumerate(rulable_users, start=1):
                 self.logger.debug("")
                 self.logger.debug(
                     f"\t> Examining '{user1}' ({user1_count}/{rulable_users_count}) with '{user2}' ({user2_count}/{rulable_users_count2})"
                 )
-                star2, created = stars.get_or_create(owner=user2)
 
-                if created:
-                    star2.galaxy = self
-                    star2.save()
+                star2 = stars[user2.id]
 
                 users_score, family, pictures, clubs = Galaxy.compute_users_score(
                     user1, user2
                 )
                 distance = self.scale_distance(users_score)
                 if distance < 30:  # TODO: this needs tuning with real-world data
-                    GalaxyLane(
-                        star1=star1,
-                        star2=star2,
-                        distance=distance,
-                        family=family,
-                        pictures=pictures,
-                        clubs=clubs,
-                    ).save()
+                    lanes.append(
+                        GalaxyLane(
+                            star1=star1,
+                            star2=star2,
+                            distance=distance,
+                            family=family,
+                            pictures=pictures,
+                            clubs=clubs,
+                        )
+                    )
 
                 if user2_count % speed_count_frequency == 0:
                     tend = time.time()
@@ -409,6 +413,8 @@ class Galaxy(models.Model):
                         f"\tSpeed: {speed:.2f} users per second (time for last {speed_count_frequency} citizens: {delta:.2f} second)"
                     )
                     tstart = time.time()
+
+            GalaxyLane.objects.bulk_create(lanes)
 
             self.logger.info("")
 
@@ -480,15 +486,27 @@ class Galaxy(models.Model):
             F("owner__nick_name"),
             Value(")"),
         )
-        stars = GalaxyStar.objects.filter(galaxy=self).annotate(
-            owner_name=Case(
-                When(owner__nick_name=None, then=without_nickname),
-                default=with_nickname,
+        stars = (
+            GalaxyStar.objects.filter(galaxy=self)
+            .order_by(
+                "owner"
+            )  # This helps determinism for the tests and doesn't cost much
+            .annotate(
+                owner_name=Case(
+                    When(owner__nick_name=None, then=without_nickname),
+                    default=with_nickname,
+                )
             )
         )
-        lanes = GalaxyLane.objects.filter(star1__galaxy=self).annotate(
-            star1_owner=F("star1__owner__id"),
-            star2_owner=F("star2__owner__id"),
+        lanes = (
+            GalaxyLane.objects.filter(star1__galaxy=self)
+            .order_by(
+                "star1"
+            )  # This helps determinism for the tests and doesn't cost much
+            .annotate(
+                star1_owner=F("star1__owner__id"),
+                star2_owner=F("star2__owner__id"),
+            )
         )
         json = GalaxyDict(
             nodes=[
