@@ -105,7 +105,7 @@ class Command(BaseCommand):
             self.make_important_citizen(u)
 
     def make_clubs(self):
-        # This will create all the clubs and store them in self.clubs for fast access later
+        """This will create all the clubs and store them in self.clubs for fast access later"""
         self.clubs = {}
         for i in range(self.NB_CLUBS):
             self.clubs[i] = Club.objects.create(
@@ -113,7 +113,7 @@ class Command(BaseCommand):
             )
 
     def make_users(self):
-        # This will create all the users and store them in self.users for fast access later
+        """This will create all the users and store them in self.users for fast access later"""
         self.users = {}
         for i in range(self.NB_USERS):
             u = User.objects.create_user(
@@ -134,8 +134,11 @@ class Command(BaseCommand):
             )
 
     def make_families(self):
-        # This will iterate on all citizen after the 200th.
-        # Then it will take 14 other citizen among the 200 preceding (godfathers are usually older), and apply another heuristic to determine if they should have a family link
+        """
+        This will iterate on all citizen after the 200th.
+        Then it will take 14 other citizen among the 200 preceding (godfathers are usually older), and apply another
+        heuristic to determine if they should have a family link
+        """
         for i in range(200, self.NB_USERS):
             for j in range(i - 200, i, 14):  # this will loop 14 times (14² = 196)
                 if (i / 10) % 10 == (i + j) % 10:
@@ -145,9 +148,12 @@ class Command(BaseCommand):
                     u1.godfathers.add(u2)
 
     def make_club_memberships(self):
-        # This function makes multiple passes on all users to affect them some pseudo-random roles in some clubs.
-        # The multiple passes are useful to get some variations over who goes where.
-        # Each pass for each user has a chance to affect her to two different clubs, increasing a bit more the created chaos, while remaining purely deterministic.
+        """
+        This function makes multiple passes on all users to affect them some pseudo-random roles in some clubs.
+        The multiple passes are useful to get some variations over who goes where.
+        Each pass for each user has a chance to affect her to two different clubs, increasing a bit more the created
+        chaos, while remaining purely deterministic.
+        """
         for i in range(1, 11):  # users can be in up to 20 clubs
             self.logger.info(f"Club membership, pass {i}")
             for uid in range(
@@ -193,7 +199,7 @@ class Command(BaseCommand):
                 ).save()
 
     def make_pictures(self):
-        # This function creates pictures for users to be tagged on later
+        """This function creates pictures for users to be tagged on later"""
         self.picts = {}
         for i in range(self.NB_USERS):
             u = self.users[i]
@@ -218,6 +224,11 @@ class Command(BaseCommand):
                 self.picts[j].save()
 
     def make_pictures_memberships(self):
+        """
+        This assigns users to pictures, and makes enough of them for our created users to be eligible for promotion as citizen.
+        See galaxy.models.Galaxy.rule for details on promotion to citizen.
+        """
+
         # We don't want to handle limits, users in the middle will be far enough
         def _tag_neighbors(uid, neighbor_dist, pict_power, pict_dist):
             u2 = self.users[uid - neighbor_dist]
@@ -267,7 +278,10 @@ class Command(BaseCommand):
                 _tag_neighbors(uid, 4, 2, 110)
 
     def make_important_citizen(self, uid):
-        # These three people will be really close, since they already are in many clubs together!
+        """
+        This will make the user passed in `uid` a more important citizen, that will thus trigger many more connections
+        to other (lanes) and be dragged towards the center of the Galaxy.
+        """
         u1 = self.users[uid]
         u2 = self.users[uid - 100]
         u3 = self.users[uid + 100]
