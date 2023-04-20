@@ -72,6 +72,7 @@ class Club(models.Model):
         _("short description"), max_length=1000, default="", blank=True, null=True
     )
     address = models.CharField(_("address"), max_length=254)
+
     # This function prevents generating migration upon settings change
     def get_default_owner_group():
         return settings.SITH_GROUP_ROOT_ID

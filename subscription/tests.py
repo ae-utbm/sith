@@ -107,7 +107,6 @@ class SubscriptionIntegrationTest(TestCase):
         self.user = User.objects.filter(username="public").first()
 
     def test_duration_one_month(self):
-
         s = Subscription(
             member=User.objects.filter(pk=self.user.pk).first(),
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
@@ -119,7 +118,6 @@ class SubscriptionIntegrationTest(TestCase):
         self.assertTrue(s.subscription_end == date(2017, 9, 29))
 
     def test_duration_two_months(self):
-
         s = Subscription(
             member=User.objects.filter(pk=self.user.pk).first(),
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
@@ -131,7 +129,6 @@ class SubscriptionIntegrationTest(TestCase):
         self.assertTrue(s.subscription_end == date(2017, 10, 29))
 
     def test_duration_one_day(self):
-
         s = Subscription(
             member=User.objects.filter(pk=self.user.pk).first(),
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
@@ -146,7 +143,6 @@ class SubscriptionIntegrationTest(TestCase):
         self.assertTrue(s.subscription_end == date(2017, 8, 30))
 
     def test_duration_three_months(self):
-
         s = Subscription(
             member=User.objects.filter(pk=self.user.pk).first(),
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
@@ -158,7 +154,6 @@ class SubscriptionIntegrationTest(TestCase):
         self.assertTrue(s.subscription_end == date(2017, 11, 29))
 
     def test_duration_four_months(self):
-
         s = Subscription(
             member=User.objects.filter(pk=self.user.pk).first(),
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
@@ -170,7 +165,6 @@ class SubscriptionIntegrationTest(TestCase):
         self.assertTrue(s.subscription_end == date(2017, 12, 30))
 
     def test_duration_six_weeks(self):
-
         s = Subscription(
             member=User.objects.filter(pk=self.user.pk).first(),
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],

@@ -7,7 +7,6 @@ import core.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("core", "0010_sithfile_is_in_sas")]
 
     operations = [

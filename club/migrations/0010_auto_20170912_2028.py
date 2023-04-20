@@ -19,7 +19,6 @@ def generate_club_pages(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("core", "0024_auto_20170906_1317"), ("club", "0010_club_logo")]
 
     operations = [

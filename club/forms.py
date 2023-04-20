@@ -167,7 +167,6 @@ class SellingsForm(forms.Form):
     )
 
     def __init__(self, club, *args, **kwargs):
-
         super(SellingsForm, self).__init__(*args, **kwargs)
         self.fields["products"] = forms.ModelMultipleChoiceField(
             club.products.order_by("name").filter(archived=False).all(),

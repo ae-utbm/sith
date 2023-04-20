@@ -6,7 +6,6 @@ import django_countries.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("counter", "0018_producttype_priority"),
     ]

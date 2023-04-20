@@ -40,7 +40,6 @@ class Command(BaseCommand):
         parser.add_argument("user_id", type=int)
 
     def handle(self, *args, **options):
-
         user = User.objects.filter(id=options["user_id"]).first()
 
         if user is None:

@@ -6,7 +6,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("com", "0005_auto_20180318_2227")]
 
     operations = [migrations.RemoveField(model_name="sith", name="index_page")]

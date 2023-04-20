@@ -100,7 +100,6 @@ class UserIsInATrombiMixin(View):
     """
 
     def dispatch(self, request, *args, **kwargs):
-
         if not hasattr(self.request.user, "trombi_user"):
             raise Http404()
 

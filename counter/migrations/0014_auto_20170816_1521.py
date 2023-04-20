@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("counter", "0013_customer_recorded_products")]
 
     operations = [

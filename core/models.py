@@ -1176,6 +1176,7 @@ class Page(models.Model):
     # Attention: this field may not be valid until you call save(). It's made for fast query, but don't rely on it when
     # playing with a Page object, use get_full_name() instead!
     _full_name = models.CharField(_("page name"), max_length=255, blank=True)
+
     # This function prevents generating migration upon settings change
     def get_default_owner_group():
         return settings.SITH_GROUP_ROOT_ID

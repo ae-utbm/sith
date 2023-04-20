@@ -157,6 +157,7 @@ class Forum(models.Model):
             self.save()
 
     _club_memberships = {}  # This cache is particularly efficient:
+
     # divided by 3 the number of requests on the main forum page
     # after the first load
     def is_owned_by(self, user):
