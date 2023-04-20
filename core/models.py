@@ -927,8 +927,7 @@ class SithFile(models.Model):
             - If the file is in the SAS, only the SAS admins (or roots) can manage it -> return True if the user is in the SAS admin group or is a root
             - If the file is in the profiles directory, only the roots can manage it -> return True if the user is a root
 
-        Returns:
-            bool: True if the file is managed by the SAS or within the profiles directory, False otherwise
+        :returns: True if the file is managed by the SAS or within the profiles directory, False otherwise
         """
 
         # If the file is not in the SAS nor in the profiles directory, it can be "managed" by anyone

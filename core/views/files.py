@@ -23,7 +23,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.forms.models import modelform_factory
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from wsgiref.util import FileWrapper
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
@@ -39,7 +39,6 @@ from core.views import (
     CanEditMixin,
     CanEditPropMixin,
     can_view,
-    not_found,
 )
 from counter.models import Counter
 
@@ -67,7 +66,7 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
 
     # check if file exists on disk
     if not os.path.exists(filepath.encode("utf-8")):
-        return not_found(request, _("File not found"))
+        raise Http404()
 
     with open(filepath.encode("utf-8"), "rb") as filename:
         wrapper = FileWrapper(filename)
