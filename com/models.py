@@ -340,9 +340,10 @@ class Poster(models.Model):
             raise ValidationError(_("Begin date should be before end date"))
 
     def is_owned_by(self, user):
-        return user.is_in_group(
-            settings.SITH_GROUP_COM_ADMIN_ID
-        ) or Club.objects.filter(id__in=user.clubs_with_rights)
+        return (
+            user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+            or len(user.clubs_with_rights) > 0
+        )
 
     def can_be_moderated_by(self, user):
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)

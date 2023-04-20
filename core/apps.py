@@ -33,23 +33,12 @@ class SithConfig(AppConfig):
     verbose_name = "Core app of the Sith"
 
     def ready(self):
-        from core.models import User
-        from club.models import Club
         from forum.models import Forum
 
-        def clear_cached_groups(**kwargs):
-            User._group_ids = {}
-            User._group_name = {}
-
         def clear_cached_memberships(**kwargs):
-            User._club_memberships = {}
-            Club._memberships = {}
             Forum._club_memberships = {}
 
         print("Connecting signals!", file=sys.stderr)
-        request_started.connect(
-            clear_cached_groups, weak=False, dispatch_uid="clear_cached_groups"
-        )
         request_started.connect(
             clear_cached_memberships,
             weak=False,

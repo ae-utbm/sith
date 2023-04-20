@@ -22,10 +22,13 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from typing import Optional
 
+from django.core.cache import cache
 from django.db import models
 from django.core import validators
 from django.conf import settings
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
@@ -229,26 +232,41 @@ class Club(models.Model):
             return False
         return sub.was_subscribed
 
-    _memberships = {}
-
-    def get_membership_for(self, user):
+    def get_membership_for(self, user: User) -> Optional["Membership"]:
         """
-        Returns the current membership the given user
+        Return the current membership the given user.
+        The result is cached.
         """
-        try:
-            return Club._memberships[self.id][user.id]
-        except:
-            m = self.members.filter(user=user.id).filter(end_date=None).first()
-            try:
-                Club._memberships[self.id][user.id] = m
-            except:
-                Club._memberships[self.id] = {}
-                Club._memberships[self.id][user.id] = m
-            return m
+        membership = cache.get(f"membership_{self.id}_{user.id}")
+        if membership == "not_member":
+            return None
+        if membership is None:
+            membership = self.members.filter(user=user, end_date=None).first()
+            if membership is None:
+                cache.set(f"membership_{self.id}_{user.id}", "not_member")
+            else:
+                cache.set(f"membership_{self.id}_{user.id}", membership)
+        return membership
 
     def has_rights_in_club(self, user):
         m = self.get_membership_for(user)
         return m is not None and m.role > settings.SITH_MAXIMUM_FREE_ROLE
+
+
+class MembershipQuerySet(models.QuerySet):
+    def ongoing(self) -> "MembershipQuerySet":
+        """
+        Filter all memberships which are not finished yet
+        """
+        # noinspection PyTypeChecker
+        return self.filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.now()))
+
+    def board(self) -> "MembershipQuerySet":
+        """
+        Filter all memberships where the user is/was in the board
+        """
+        # noinspection PyTypeChecker
+        return self.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
 
 
 class Membership(models.Model):
@@ -289,6 +307,8 @@ class Membership(models.Model):
     description = models.CharField(
         _("description"), max_length=128, null=False, blank=True
     )
+
+    objects = MembershipQuerySet.as_manager()
 
     def __str__(self):
         return (
