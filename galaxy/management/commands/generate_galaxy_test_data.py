@@ -21,6 +21,8 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import warnings
+from typing import Final, Optional
 
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -37,17 +39,28 @@ from subscription.models import Subscription
 from sas.models import Album, Picture, PeoplePictureRelation
 
 
-RED_PIXEL_PNG = b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52"
-RED_PIXEL_PNG += b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90\x77\x53"
-RED_PIXEL_PNG += b"\xde\x00\x00\x00\x0c\x49\x44\x41\x54\x08\xd7\x63\xf8\xcf\xc0\x00"
-RED_PIXEL_PNG += b"\x00\x03\x01\x01\x00\x18\xdd\x8d\xb0\x00\x00\x00\x00\x49\x45\x4e"
-RED_PIXEL_PNG += b"\x44\xae\x42\x60\x82"
+RED_PIXEL_PNG: Final[bytes] = (
+    b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52"
+    b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90\x77\x53"
+    b"\xde\x00\x00\x00\x0c\x49\x44\x41\x54\x08\xd7\x63\xf8\xcf\xc0\x00"
+    b"\x00\x03\x01\x01\x00\x18\xdd\x8d\xb0\x00\x00\x00\x00\x49\x45\x4e"
+    b"\x44\xae\x42\x60\x82"
+)
 
-USER_PACK_SIZE = 1000
+USER_PACK_SIZE: Final[int] = 1000
 
 
 class Command(BaseCommand):
     help = "Procedurally generate representative data for developing the Galaxy"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.now = timezone.now().replace(hour=12)
+
+        self.users: Optional[list[User]] = None
+        self.clubs: Optional[list[Club]] = None
+        self.picts: Optional[list[Picture]] = None
+        self.pictures_tags: Optional[list[PeoplePictureRelation]] = None
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -62,12 +75,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger("main")
-        if options["verbosity"] > 1:
+        if options["verbosity"] < 0 or 2 < options["verbosity"]:
+            warnings.warn("verbosity level should be between 0 and 2 included")
+
+        if options["verbosity"] == 2:
             self.logger.setLevel(logging.DEBUG)
-        elif options["verbosity"] > 0:
+        elif options["verbosity"] == 1:
             self.logger.setLevel(logging.INFO)
         else:
-            self.logger.setLevel(logging.NOTSET)
+            self.logger.setLevel(logging.ERROR)
 
         self.logger.info("The Galaxy is being populated by the Sith.")
 
@@ -83,7 +99,6 @@ class Command(BaseCommand):
         self.NB_USERS = options["user_pack_count"] * USER_PACK_SIZE
         self.NB_CLUBS = options["club_count"]
 
-        self.now = timezone.now().replace(hour=12)
         root = User.objects.filter(username="root").first()
         sas = SithFile.objects.get(id=settings.SITH_SAS_ROOT_DIR_ID)
         self.galaxy_album = Album.objects.create(
@@ -105,7 +120,12 @@ class Command(BaseCommand):
             self.make_important_citizen(u)
 
     def make_clubs(self):
-        """This will create all the clubs and store them in self.clubs for fast access later"""
+        """
+        Create all the clubs (:class:`club.models.Club`)
+        and store them in `self.clubs` for fast access later.
+        Don't create the meta groups (:class:`core.models.MetaGroup`)
+        nor the pages of the clubs (:class:`core.models.Page`)
+        """
         self.clubs = []
         for i in range(self.NB_CLUBS):
             self.clubs.append(Club(unix_name=f"galaxy-club-{i}", name=f"club-{i}"))
@@ -114,7 +134,11 @@ class Command(BaseCommand):
         self.clubs = Club.objects.filter(unix_name__startswith="galaxy-").all()
 
     def make_users(self):
-        """This will create all the users and store them in self.users for fast access later"""
+        """
+        Create all the users and store them in `self.users` for fast access later.
+
+        Also create a subscription for all the generated users.
+        """
         self.users = []
         for i in range(self.NB_USERS):
             u = User(
@@ -128,6 +152,7 @@ class Command(BaseCommand):
         User.objects.bulk_create(self.users)
         self.users = User.objects.filter(username__startswith="galaxy-").all()
 
+        # now that users are created, create their subscription
         subs = []
         for i in range(self.NB_USERS):
             u = self.users[i]
@@ -145,10 +170,19 @@ class Command(BaseCommand):
 
     def make_families(self):
         """
+        Generate the godfather/godchild relations for the users contained in :attr:`self.users`.
+
+        The :meth:`make_users` method must have been called beforehand.
+
         This will iterate on all citizen after the 200th.
-        Then it will take 14 other citizen among the 200 preceding (godfathers are usually older), and apply another
-        heuristic to determine if they should have a family link
+        Then it will take 14 other citizen among the previous 200
+        (godfathers are usually older), and apply another
+        heuristic to determine whether they should have a family link
         """
+        if self.users is None:
+            raise RuntimeError(
+                "The `make_users()` method must be called before `make_families()`"
+            )
         for i in range(200, self.NB_USERS):
             godfathers = []
             for j in range(i - 200, i, 14):  # this will loop 14 times (14² = 196)
@@ -161,11 +195,25 @@ class Command(BaseCommand):
 
     def make_club_memberships(self):
         """
-        This function makes multiple passes on all users to affect them some pseudo-random roles in some clubs.
+        Assign users to clubs and give them a role in a pseudo-random way.
+
+        The :meth:`make_users` and :meth:`make_clubs` methods
+        must have been called beforehand.
+
+        Work by making multiples passes on all users to affect
+        them some pseudo-random roles in some clubs.
         The multiple passes are useful to get some variations over who goes where.
-        Each pass for each user has a chance to affect her to two different clubs, increasing a bit more the created
-        chaos, while remaining purely deterministic.
+        Each pass for each user has a chance to affect her to two different clubs,
+        increasing a bit more the created chaos, while remaining purely deterministic.
         """
+        if self.users is None:
+            raise RuntimeError(
+                "The `make_users()` method must be called before `make_club_memberships()`"
+            )
+        if self.clubs is None:
+            raise RuntimeError(
+                "The `make_clubs()` method must be called before `make_club_memberships()`"
+            )
         memberships = []
         for i in range(1, 11):  # users can be in up to 20 clubs
             self.logger.info(f"Club membership, pass {i}")
@@ -217,7 +265,15 @@ class Command(BaseCommand):
         Membership.objects.bulk_create(memberships)
 
     def make_pictures(self):
-        """This function creates pictures for users to be tagged on later"""
+        """
+        Create pictures for users to be tagged on later.
+
+        The :meth:`make_users` method must have been called beforehand.
+        """
+        if self.users is None:
+            raise RuntimeError(
+                "The `make_users()` method must be called before `make_families()`"
+            )
         self.picts = []
         # Create twice as many pictures as users
         for i in range(self.NB_USERS * 2):
@@ -246,8 +302,10 @@ class Command(BaseCommand):
 
     def make_pictures_memberships(self):
         """
-        This assigns users to pictures, and makes enough of them for our created users to be eligible for promotion as citizen.
-        See galaxy.models.Galaxy.rule for details on promotion to citizen.
+        Assign users to pictures and make enough of them for our
+        created users to be eligible for promotion as citizen.
+
+        See :meth:`galaxy.models.Galaxy.rule` for details on promotion to citizen.
         """
         self.pictures_tags = []
 
@@ -342,10 +400,20 @@ class Command(BaseCommand):
                 _tag_neighbors(uid, 4, self.NB_USERS, 110)
         PeoplePictureRelation.objects.bulk_create(self.pictures_tags)
 
-    def make_important_citizen(self, uid):
+    def make_important_citizen(self, uid: int):
         """
-        This will make the user passed in `uid` a more important citizen, that will thus trigger many more connections
-        to other (lanes) and be dragged towards the center of the Galaxy.
+        Make the user whose uid is given in parameter a more important citizen,
+        thus triggering many more connections to others (lanes)
+        and dragging him towards the center of the Galaxy.
+
+        This promotion is obtained by adding more family links
+        and by tagging the user in more pictures.
+
+        The users chosen to be added to this user's family shall
+        also be tagged in more pictures, thus making them also
+        more important.
+
+        :param uid: the id of the user to make more important
         """
         u1 = self.users[uid]
         u2 = self.users[uid - 100]
