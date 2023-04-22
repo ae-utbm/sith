@@ -23,6 +23,7 @@
 #
 #
 import importlib
+from typing import Tuple
 
 from django.db import models
 from django.core.mail import send_mail
@@ -317,6 +318,14 @@ class User(AbstractBaseUser):
 
     def to_dict(self):
         return self.__dict__
+    
+    @cached_property
+    def last_subscription_date(self) -> date:
+        return self.subscriptions.filter(subscription_end__lte=timezone.now()).order_by('-subscription_end').first().subscription_end
+    
+    def last_subscription_since(self) -> Tuple[int, int, int]:
+        diff = date.today() - self.last_subscription_date
+        return [diff.days // 365, (diff.days % 365) // 30, (diff.days % 365) % 30]
 
     @cached_property
     def was_subscribed(self):
