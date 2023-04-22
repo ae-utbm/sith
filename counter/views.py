@@ -17,7 +17,7 @@ import json
 from urllib.parse import parse_qs
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import F
+from django.db.models import F, Sum, Count
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
@@ -45,9 +45,11 @@ from django.db import DataError, transaction
 import json
 import re
 import pytz
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
+from dateutil.relativedelta import relativedelta
 from http import HTTPStatus
 
+from sith.settings import SITH_ACCOUNTING_DELTA_DUMP as DELTA_DUMP
 from core.utils import get_start_of_semester
 from core.views import CanViewMixin, TabedViewMixin, CanEditMixin
 from core.views.forms import LoginForm
@@ -1505,28 +1507,24 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
             ]
         )
         kwargs["sum_accounts"] = [
-            sum([r.amount for r in Customer.objects.all()]),
+            round(Customer.objects.aggregate(Sum("amount"))["amount__sum"], 2)
+            if Customer.objects.aggregate(Sum("amount"))["amount__sum"] is not None
+            else 0,
             Customer.objects.count(),
         ]
 
-        inactive_accounts = [
-            user.customer.account_id
-            for user in User.objects.all()
-            if user.last_subscription_since()[0]
-            > settings.SITH_ACCOUNTING_YEAR_BEFORE_ACCOUNT_DUMPING
+        inactive_accounts = User.objects.filter(
+            customer__amount__gt=0,
+            subscriptions__subscription_end__lte=date.today()
+            - relativedelta(years=DELTA_DUMP["years"], months=DELTA_DUMP["months"]),
+        ).aggregate(Sum("customer__amount"), Count("customer"))
+        kwargs["sum_inactive_accounts"] = [
+            round(inactive_accounts["customer__amount__sum"], 2)
+            if inactive_accounts["customer__amount__sum"] is not None
+            else 0,
+            inactive_accounts["customer__count"],
         ]
 
-        kwargs["sum_inactive_accounts"] = [
-            sum(
-                [
-                    r.amount
-                    for r in Customer.objects.filter(
-                        amount__gt=0, account_id__in=inactive_accounts
-                    )
-                ]
-            ),
-            len(inactive_accounts),
-        ]
         kwargs["start_date"] = start_date
         kwargs["sums"] = (
             Selling.objects.values("club__name")

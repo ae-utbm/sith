@@ -21,7 +21,7 @@
     {% trans money=sum_accounts[0], users=sum_accounts[1] %}Money accross all users account : {{ money }} € (on {{ users }} account(s)){% endtrans %}
 </p>
 <p>
-    {% trans money=sum_inactive_accounts[0], users=sum_inactive_accounts[1], year=settings.SITH_ACCOUNTING_YEAR_BEFORE_ACCOUNT_DUMPING %}Including those who have not been contributors for at least {{ year }} year(s) : {{ money }} € (on {{ users }} account(s)){% endtrans %}
+    {% trans money=sum_inactive_accounts[0], users=sum_inactive_accounts[1], year=settings.SITH_ACCOUNTING_DELTA_DUMP["years"] %}Including those who have not been contributors for at least {{ year }} year(s) : {{ money }} € (on {{ users }} account(s)){% endtrans %}
 </p>
 <br>
 <table>
