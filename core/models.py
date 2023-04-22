@@ -320,7 +320,7 @@ class User(AbstractBaseUser):
         return self.__dict__
 
     @cached_property
-    def last_subscription_date(self) -> date | None:
+    def last_subscription_date(self) -> typing.Optional[date]:
         latest_subscription = (
             self.subscriptions.filter(subscription_end__lte=timezone.now())
             .order_by("-subscription_end")
