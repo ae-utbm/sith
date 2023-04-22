@@ -3171,9 +3171,13 @@ msgstr "Avatar"
 msgid "Scrub"
 msgstr "Blouse"
 
-#: core/templates/core/user_detail.jinja:141
-msgid "Not subscribed"
-msgstr "Non cotisant"
+#: core/templates/core/user_detail.jinja:160
+msgid "Not subscribed for %(y)s year(s) %(m)s month(s) %(d)s day(s) (%(date)s)"
+msgstr "Non cotisant depuis %(y)s année(s) %(m)s mois %(d)s jour(s) (%(date)s)"
+
+#: core/templates/core/user_detail.jinja:162
+msgid "Never subscribed"
+msgstr "N'a jamais cotisé"
 
 #: core/templates/core/user_detail.jinja:143
 #: subscription/templates/subscription/subscription.jinja:4

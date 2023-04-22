@@ -155,7 +155,12 @@
             {% endif %}
         {% else %}
             <div>
-                {% trans %}Not subscribed{% endtrans %}
+                {% if profile.was_subscribed %}
+                    {% set duration = profile.last_subscription_since() %}
+                    {% trans y=duration[0], m=duration[1], d=duration[2], date=profile.last_subscription_date %}Not subscribed for {{ y }} year(s) {{ m }} month(s) {{ d }} day(s) ({{ date }}){% endtrans %}
+                {% else %}
+                    {% trans %}Never subscribed{% endtrans %}
+                {% endif %}
                 {% if user.is_board_member %}
                 <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans
                     %}</a>
