@@ -318,13 +318,25 @@ class User(AbstractBaseUser):
 
     def to_dict(self):
         return self.__dict__
-    
+
     @cached_property
-    def last_subscription_date(self) -> date:
-        return self.subscriptions.filter(subscription_end__lte=timezone.now()).order_by('-subscription_end').first().subscription_end
-    
+    def last_subscription_date(self) -> date | None:
+        latest_subscription = (
+            self.subscriptions.filter(subscription_end__lte=timezone.now())
+            .order_by("-subscription_end")
+            .first()
+        )
+        if latest_subscription:
+            return latest_subscription.subscription_end
+        else:
+            return None
+
     def last_subscription_since(self) -> Tuple[int, int, int]:
-        diff = date.today() - self.last_subscription_date
+        last_date = self.last_subscription_date
+        if last_date is None:
+            return (0, 0, 0)
+
+        diff = date.today() - last_date
         return [diff.days // 365, (diff.days % 365) // 30, (diff.days % 365) % 30]
 
     @cached_property

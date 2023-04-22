@@ -1504,6 +1504,29 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
                 )
             ]
         )
+        kwargs["sum_accounts"] = [
+            sum([r.amount for r in Customer.objects.all()]),
+            Customer.objects.count(),
+        ]
+
+        inactive_accounts = [
+            user.customer.account_id
+            for user in User.objects.all()
+            if user.last_subscription_since()[0]
+            > settings.SITH_ACCOUNTING_YEAR_BEFORE_ACCOUNT_DUMPING
+        ]
+
+        kwargs["sum_inactive_accounts"] = [
+            sum(
+                [
+                    r.amount
+                    for r in Customer.objects.filter(
+                        amount__gt=0, account_id__in=inactive_accounts
+                    )
+                ]
+            ),
+            len(inactive_accounts),
+        ]
         kwargs["start_date"] = start_date
         kwargs["sums"] = (
             Selling.objects.values("club__name")

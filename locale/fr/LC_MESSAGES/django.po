@@ -4192,7 +4192,15 @@ msgstr "Choisir un autre mois : "
 
 #: counter/templates/counter/invoices_call.jinja:19
 msgid "CB Payments"
-msgstr "Payements en Carte Bancaire"
+msgstr "Paiements en Carte Bancaire"
+
+#: counter/templates/counter/invoices_call.jinja:21
+msgid "Money accross all users account : %(money)s € (on %(users)s account(s))"
+msgstr "Argent sur tous les comptes utilisateurs : %(money)s € (sur %(users)s compte(s))"
+
+#: counter/templates/counter/invoices_call.jinja:26
+msgid "Including those who have not been contributors for at least %(year)s year(s) : %(money)s € (on %(users)s account(s))"
+msgstr "Dont ceux qui n'ont pas été cotisant depuis au moins %(year)s an(s) : %(money)s € (sur %(users)s compte(s))"
 
 #: counter/templates/counter/last_ops.jinja:5
 #: counter/templates/counter/last_ops.jinja:15

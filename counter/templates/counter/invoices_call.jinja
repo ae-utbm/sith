@@ -10,13 +10,19 @@
 <form method="get" action="">
     <select name="month">
         {% for m in months %}
-        <option value="{{ m|date("Y-m") }}">{{ m|date("Y-m") }}</option>
+        <option value="{{ m|date('Y-m') }}">{{ m|date("Y-m") }}</option>
         {% endfor %}
     </select>
     <input type="submit" value="{% trans %}Go{% endtrans %}" />
 </form>
 <br>
 <p>{% trans %}CB Payments{% endtrans %} : {{ sum_cb }} €</p>
+<p>
+    {% trans money=sum_accounts[0], users=sum_accounts[1] %}Money accross all users account : {{ money }} € (on {{ users }} account(s)){% endtrans %}
+</p>
+<p>
+    {% trans money=sum_inactive_accounts[0], users=sum_inactive_accounts[1], year=settings.SITH_ACCOUNTING_YEAR_BEFORE_ACCOUNT_DUMPING %}Including those who have not been contributors for at least {{ year }} year(s) : {{ money }} € (on {{ users }} account(s)){% endtrans %}
+</p>
 <br>
 <table>
     <thead>
