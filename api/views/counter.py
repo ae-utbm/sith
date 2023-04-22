@@ -24,7 +24,6 @@ from api.views import RightModelViewSet
 
 
 class CounterSerializer(serializers.ModelSerializer):
-
     is_open = serializers.BooleanField(read_only=True)
     barman_list = serializers.ListField(
         child=serializers.IntegerField(), read_only=True

@@ -413,6 +413,7 @@ class UserGodfathersTreePictureView(CanViewMixin, DetailView):
             self.graph = pgv.AGraph(strict=False, directed=True)
         family = set()
         self.level = 1
+
         # Since the tree isn't very deep, we can build it recursively
         def crawl_family(user):
             if self.level > self.depth:

@@ -6,7 +6,6 @@ import django.core.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("core", "0019_preferences_receive_weekmail")]
 
     operations = [

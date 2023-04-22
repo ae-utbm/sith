@@ -45,7 +45,6 @@ def remove_multiples_comments_from_same_user(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("pedagogy", "0001_initial")]
 
     operations = [

@@ -6,7 +6,6 @@ import forum.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("forum", "0005_forumtopic_subscribed_users")]
 
     operations = [

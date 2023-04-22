@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
     def compilescss(self, file):
         print("compiling %s" % file)
-        with (open(file.replace(".scss", ".css"), "w")) as newfile:
+        with open(file.replace(".scss", ".css"), "w") as newfile:
             newfile.write(self.compile(file))
 
     def removescss(self, file):
@@ -68,7 +68,6 @@ class Command(BaseCommand):
         os.remove(file)
 
     def handle(self, *args, **options):
-
         if os.path.isdir(settings.STATIC_ROOT):
             print("---- Compiling scss files ---")
             self.exec_on_folder(settings.STATIC_ROOT, self.compilescss)

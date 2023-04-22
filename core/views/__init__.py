@@ -162,7 +162,6 @@ class GenericContentPermissionMixinBuilder(View):
         return cls.permission_function(obj, user)
 
     def dispatch(self, request, *arg, **kwargs):
-
         if hasattr(self, "get_object") and callable(self.get_object):
             self.object = self.get_object()
             if not self.get_permission_function(self.object, request.user):

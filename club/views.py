@@ -443,7 +443,6 @@ class ClubSellingCSVView(ClubSellingView):
         return row
 
     def get(self, request, *args, **kwargs):
-
         self.object = self.get_object()
         kwargs = self.get_context_data(**kwargs)
 
@@ -706,7 +705,6 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
 
 class MailingDeleteView(CanEditMixin, DeleteView):
-
     model = Mailing
     template_name = "core/delete_confirm.jinja"
     pk_url_kwarg = "mailing_id"
@@ -724,7 +722,6 @@ class MailingDeleteView(CanEditMixin, DeleteView):
 
 
 class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):
-
     model = MailingSubscription
     template_name = "core/delete_confirm.jinja"
     pk_url_kwarg = "mailing_subscription_id"

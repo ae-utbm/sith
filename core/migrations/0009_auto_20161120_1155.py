@@ -7,7 +7,6 @@ import core.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("core", "0008_sithfile_asked_for_removal")]
 
     operations = [

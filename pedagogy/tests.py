@@ -758,7 +758,6 @@ class UVSearchTest(TestCase):
         )
 
     def test_search_pa00_fail(self):
-
         # Search with UV code
         response = self.client.get(reverse("pedagogy:guide"), {"search": "IFC"})
         self.assertNotContains(response, text="PA00")
