@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*
 #
-# Copyright 2017
-# - Skia <skia@libskia.so>
+# Copyright 2023
+# - Maréchal <thgirod@hotmail.com>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
 # http://ae.utbm.fr.
@@ -22,26 +22,12 @@
 #
 #
 
-import sys
-
 from django.apps import AppConfig
-from django.core.signals import request_started
 
 
-class SithConfig(AppConfig):
-    name = "core"
-    verbose_name = "Core app of the Sith"
+class ClubConfig(AppConfig):
+    name = "club"
+    verbose_name = "Management of the clubs and of the memberships in these clubs"
 
     def ready(self):
-        from forum.models import Forum
-        import core.signals
-
-        def clear_cached_memberships(**kwargs):
-            Forum._club_memberships = {}
-
-        print("Connecting signals!", file=sys.stderr)
-        request_started.connect(
-            clear_cached_memberships,
-            weak=False,
-            dispatch_uid="clear_cached_memberships",
-        )
+        import club.signals
