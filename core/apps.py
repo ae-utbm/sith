@@ -34,7 +34,6 @@ class SithConfig(AppConfig):
 
     def ready(self):
         from forum.models import Forum
-        import core.signals
 
         def clear_cached_memberships(**kwargs):
             Forum._club_memberships = {}

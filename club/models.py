@@ -175,29 +175,34 @@ class Club(models.Model):
             self.page.parent = self.parent.page
             self.page.save(force_lock=True)
 
+    @transaction.atomic()
     def save(self, *args, **kwargs):
-        with transaction.atomic():
-            creation = False
-            old = Club.objects.filter(id=self.id).first()
-            if not old:
-                creation = True
-            else:
-                if old.unix_name != self.unix_name:
-                    self._change_unixname(self.unix_name)
-            super(Club, self).save(*args, **kwargs)
-            if creation:
-                board = MetaGroup(name=self.unix_name + settings.SITH_BOARD_SUFFIX)
-                board.save()
-                member = MetaGroup(name=self.unix_name + settings.SITH_MEMBER_SUFFIX)
-                member.save()
-                subscribers = Group.objects.filter(
-                    name=settings.SITH_MAIN_MEMBERS_GROUP
-                ).first()
-                self.make_home()
-                self.home.edit_groups.set([board])
-                self.home.view_groups.set([member, subscribers])
-                self.home.save()
-            self.make_page()
+        old = Club.objects.filter(id=self.id).first()
+        creation = old is None
+        if not creation and old.unix_name != self.unix_name:
+            self._change_unixname(self.unix_name)
+        super(Club, self).save(*args, **kwargs)
+        if creation:
+            board = MetaGroup(name=self.unix_name + settings.SITH_BOARD_SUFFIX)
+            board.save()
+            member = MetaGroup(name=self.unix_name + settings.SITH_MEMBER_SUFFIX)
+            member.save()
+            subscribers = Group.objects.filter(
+                name=settings.SITH_MAIN_MEMBERS_GROUP
+            ).first()
+            self.make_home()
+            self.home.edit_groups.set([board])
+            self.home.view_groups.set([member, subscribers])
+            self.home.save()
+        self.make_page()
+        cache.set(f"sith_club_{self.unix_name}", self)
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        # Invalidate the cache of this club and of its memberships
+        for membership in self.members.ongoing().select_related("user"):
+            cache.delete(f"membership_{self.id}_{membership.user.id}")
+        cache.delete(f"sith_club_{self.unix_name}")
 
     def __str__(self):
         return self.name
@@ -241,7 +246,10 @@ class Club(models.Model):
         if membership == "not_member":
             return None
         if membership is None:
+            print(self.members.all())
+            print(user.memberships.all())
             membership = self.members.filter(user=user, end_date=None).first()
+            print("membership", membership)
             if membership is None:
                 cache.set(f"membership_{self.id}_{user.id}", "not_member")
             else:
@@ -342,6 +350,14 @@ class Membership(models.Model):
 
     def get_absolute_url(self):
         return reverse("club:club_members", kwargs={"club_id": self.club.id})
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.set(f"membership_{self.club.id}_{self.user.id}", self)
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        cache.delete(f"membership_{instance.id}_{instance.user.id}")
 
 
 class Mailing(models.Model):

@@ -90,6 +90,16 @@ class Group(AuthGroup):
         """
         return reverse("core:group_list")
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.set(f"sith_group_{self.id}", self)
+        cache.set(f"sith_group_{self.name.replace(' ', '_')}", self)
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        cache.delete(f"sith_group_{self.id}")
+        cache.delete(f"sith_group_{self.name.replace(' ', '_')}")
+
 
 class MetaGroup(Group):
     """
