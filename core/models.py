@@ -415,6 +415,7 @@ class User(AbstractBaseUser):
         elif isinstance(group_name, str):
             group: Optional[Group] = get_group(name=group_name)
         else:
+            print(group_name)
             raise TypeError("group_name must be a string or an int")
         if group is None:
             return False
@@ -912,6 +913,8 @@ class SithFile(models.Model):
         verbose_name = _("file")
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         if hasattr(self, "profile_of") and user.is_in_group(
             settings.SITH_MAIN_BOARD_GROUP
         ):
@@ -1525,6 +1528,8 @@ class Gift(models.Model):
         return self.label
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return user.is_board_member or user.is_root
 
 

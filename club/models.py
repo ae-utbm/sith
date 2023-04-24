@@ -217,6 +217,8 @@ class Club(models.Model):
         """
         Method to see if that object can be super edited by the given user
         """
+        if user.is_anonymous:
+            return False
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
 
     def get_full_logo_url(self):
@@ -242,14 +244,13 @@ class Club(models.Model):
         Return the current membership the given user.
         The result is cached.
         """
+        if user.is_anonymous:
+            return None
         membership = cache.get(f"membership_{self.id}_{user.id}")
         if membership == "not_member":
             return None
         if membership is None:
-            print(self.members.all())
-            print(user.memberships.all())
             membership = self.members.filter(user=user, end_date=None).first()
-            print("membership", membership)
             if membership is None:
                 cache.set(f"membership_{self.id}_{user.id}", "not_member")
             else:
@@ -332,6 +333,8 @@ class Membership(models.Model):
         """
         Method to see if that object can be super edited by the given user
         """
+        if user.is_anonymous:
+            return False
         return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
 
     def can_be_edited_by(self, user, membership=None):
@@ -357,7 +360,7 @@ class Membership(models.Model):
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
-        cache.delete(f"membership_{instance.id}_{instance.user.id}")
+        cache.delete(f"membership_{self.club.id}_{self.user.id}")
 
 
 class Mailing(models.Model):
@@ -413,6 +416,8 @@ class Mailing(models.Model):
         return user.is_root or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return (
             user.is_in_group(self)
             or user.is_root
@@ -500,6 +505,8 @@ class MailingSubscription(models.Model):
         super(MailingSubscription, self).clean()
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return (
             self.mailing.club.has_rights_in_club(user)
             or user.is_root

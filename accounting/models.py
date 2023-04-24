@@ -117,6 +117,8 @@ class BankAccount(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         m = self.club.get_membership_for(user)
@@ -154,6 +156,8 @@ class ClubAccount(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
@@ -225,6 +229,8 @@ class GeneralJournal(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         if self.club_account.can_be_edited_by(user):
@@ -414,6 +420,8 @@ class Operation(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         if self.journal.closed:
@@ -483,6 +491,8 @@ class AccountingType(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
@@ -554,6 +564,8 @@ class Label(models.Model):
         )
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return self.club_account.is_owned_by(user)
 
     def can_be_edited_by(self, user):

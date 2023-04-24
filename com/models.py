@@ -50,6 +50,8 @@ class Sith(models.Model):
     version = utils.get_git_revision_short_hash()
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def __str__(self):
@@ -92,6 +94,8 @@ class News(models.Model):
     )
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user == self.author
 
     def can_be_edited_by(self, user):
@@ -243,6 +247,8 @@ class Weekmail(models.Model):
         return "Weekmail %s (sent: %s) - %s" % (self.id, self.sent, self.title)
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
 
@@ -271,6 +277,8 @@ class WeekmailArticle(models.Model):
     rank = models.IntegerField(_("rank"), default=-1)
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def __str__(self):
@@ -287,6 +295,8 @@ class Screen(models.Model):
         )
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
 
     def __str__(self):
@@ -340,6 +350,8 @@ class Poster(models.Model):
             raise ValidationError(_("Begin date should be before end date"))
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return (
             user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
             or len(user.clubs_with_rights) > 0

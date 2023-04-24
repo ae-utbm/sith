@@ -161,6 +161,8 @@ class Forum(models.Model):
     # divided by 3 the number of requests on the main forum page
     # after the first load
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID):
             return True
         try:
@@ -337,7 +339,10 @@ class ForumMessage(models.Model):
     def is_last_in_topic(self):
         return bool(self.id == self.topic.messages.order_by("date").last().id)
 
-    def is_owned_by(self, user):  # Anyone can create a topic: it's better to
+    def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
+        # Anyone can create a topic: it's better to
         # check the rights at the forum level, since it's more controlled
         return self.topic.forum.is_owned_by(user) or user.id == self.author.id
 

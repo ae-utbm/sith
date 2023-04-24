@@ -42,6 +42,8 @@ class Launderette(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         launderette_club = Club.objects.filter(
             unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
         ).first()
@@ -101,6 +103,8 @@ class Machine(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         launderette_club = Club.objects.filter(
             unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
         ).first()
@@ -155,6 +159,8 @@ class Token(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         launderette_club = Club.objects.filter(
             unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
         ).first()

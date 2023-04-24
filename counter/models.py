@@ -228,6 +228,8 @@ class ProductType(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
@@ -294,6 +296,8 @@ class Product(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         if user.is_in_group(
             settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
         ) or user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID):
@@ -402,6 +406,8 @@ class Counter(models.Model):
         return reverse("counter:details", kwargs={"counter_id": self.id})
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         mem = self.club.get_membership_for(user)
         if mem and mem.role >= 7:
             return True
@@ -621,6 +627,8 @@ class Refilling(models.Model):
         )
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return user.is_owner(self.counter) and self.payment_method != "CARD"
 
     def delete(self, *args, **kwargs):
@@ -713,6 +721,8 @@ class Selling(models.Model):
         )
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return user.is_owner(self.counter) and self.payment_method != "CARD"
 
     def can_be_viewed_by(self, user):
@@ -953,6 +963,8 @@ class CashRegisterSummary(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         if user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID):
             return True
         return False
@@ -1022,6 +1034,8 @@ class Eticket(models.Model):
         """
         Method to see if that object can be edited by the given user
         """
+        if user.is_anonymous:
+            return False
         return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def get_hash(self, string):
