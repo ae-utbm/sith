@@ -25,6 +25,7 @@
 import sys
 
 from django.apps import AppConfig
+from django.core.cache import cache
 from django.core.signals import request_started
 
 
@@ -34,6 +35,9 @@ class SithConfig(AppConfig):
 
     def ready(self):
         from forum.models import Forum
+        import core.signals
+
+        cache.clear()
 
         def clear_cached_memberships(**kwargs):
             Forum._club_memberships = {}

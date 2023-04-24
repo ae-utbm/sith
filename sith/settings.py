@@ -570,8 +570,6 @@ SITH_SUBSCRIPTIONS = {
     # To be completed....
 }
 
-SITH_CLUB_ROLES = {}
-
 SITH_CLUB_ROLES_ID = {
     "President": 10,
     "Vice-President": 9,
@@ -597,7 +595,8 @@ SITH_CLUB_ROLES = {
 }
 
 # This corresponds to the maximum role a user can freely subscribe to
-# In this case, SITH_MAXIMUM_FREE_ROLE=1 means that a user can set himself as "Membre actif" or "Curieux", but not higher
+# In this case, SITH_MAXIMUM_FREE_ROLE=1 means that a user can
+# set himself as "Membre actif" or "Curieux", but not higher
 SITH_MAXIMUM_FREE_ROLE = 1
 
 # Minutes to timeout the logged barmen

@@ -29,6 +29,7 @@ from django.db import models
 from django.core import validators
 from django.conf import settings
 from django.db.models import Q
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
@@ -268,14 +269,58 @@ class MembershipQuerySet(models.QuerySet):
         Filter all memberships which are not finished yet
         """
         # noinspection PyTypeChecker
-        return self.filter(Q(end_date__isnull=True) | Q(end_date__gte=timezone.now()))
+        return self.filter(Q(end_date=None) | Q(end_date__gte=timezone.now()))
 
     def board(self) -> "MembershipQuerySet":
         """
-        Filter all memberships where the user is/was in the board
+        Filter all memberships where the user is/was in the board.
+
+        Be aware that users who were in the board in the past
+        are included, even if there are no more members.
+
+        If you want to get the users who are currently in the board,
+        mind combining this with the :meth:`ongoing` queryset method
         """
         # noinspection PyTypeChecker
         return self.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
+
+    def update(self, **kwargs):
+        """
+        Work just like the default Django's update() method,
+        but add a cache refresh for the elements of the queryset.
+
+        Be aware that this adds a db query to retrieve the updated objects
+        """
+        nb_rows = super().update(**kwargs)
+        if nb_rows > 0:
+            # if at least a row was affected, refresh the cache
+            for membership in self.all():
+                if membership.end_date is not None:
+                    cache.set(
+                        f"membership_{membership.club_id}_{membership.user_id}",
+                        "not_member",
+                    )
+                else:
+                    cache.set(
+                        f"membership_{membership.club_id}_{membership.user_id}",
+                        membership,
+                    )
+
+    def delete(self):
+        """
+        Work just like the default Django's delete() method,
+        but add a cache invalidation for the elements of the queryset
+        before the deletion.
+
+        Be aware that this adds a db query to retrieve the deleted element.
+        As this first query take place before the deletion operation,
+        it will be performed even if the deletion fails.
+        """
+        ids = list(self.values_list("club_id", "user_id"))
+        nb_rows, _ = super().delete()
+        if nb_rows > 0:
+            for club_id, user_id in ids:
+                cache.set(f"membership_{club_id}_{user_id}", "not_member")
 
 
 class Membership(models.Model):
@@ -341,22 +386,26 @@ class Membership(models.Model):
         """
         Check if that object can be edited by the given user
         """
-        if user.memberships:
-            membership = self.club.get_membership_for(user)
-            if membership is not None and membership.role >= self.role:
-                return True
-        return user.is_root or user.is_board_member
+        if user.is_root or user.is_board_member:
+            return True
+        membership = self.club.get_membership_for(user)
+        if membership is not None and membership.role >= self.role:
+            return True
+        return False
 
     def get_absolute_url(self):
-        return reverse("club:club_members", kwargs={"club_id": self.club.id})
+        return reverse("club:club_members", kwargs={"club_id": self.club_id})
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        cache.set(f"membership_{self.club.id}_{self.user.id}", self)
+        if self.end_date is None:
+            cache.set(f"membership_{self.club_id}_{self.user_id}", self)
+        else:
+            cache.set(f"membership_{self.club_id}_{self.user_id}", "not_member")
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
-        cache.delete(f"membership_{self.club.id}_{self.user.id}")
+        cache.delete(f"membership_{self.club_id}_{self.user_id}")
 
 
 class Mailing(models.Model):

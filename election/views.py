@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.edit import DeleteView, FormView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -224,8 +224,8 @@ class ElectionDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "election_id"
 
     def get(self, request, *arg, **kwargs):
-        r = super(ElectionDetailView, self).get(request, *arg, **kwargs)
-        election = self.get_object()
+        response = super(ElectionDetailView, self).get(request, *arg, **kwargs)
+        election: Election = self.get_object()
         if request.user.can_edit(election) and election.is_vote_editable:
             action = request.GET.get("action", None)
             role = request.GET.get("role", None)
@@ -239,9 +239,9 @@ class ElectionDetailView(CanViewMixin, DetailView):
                 elif action == "top":
                     Role.objects.get(id=role).top()
                 return redirect(
-                    reverse_lazy("election:detail", kwargs={"election_id": election.id})
+                    reverse("election:detail", kwargs={"election_id": election.id})
                 )
-        return r
+        return response
 
     def get_context_data(self, **kwargs):
         """Add additionnal data to the template"""

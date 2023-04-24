@@ -421,24 +421,21 @@ class User(AbstractBaseUser):
         :return: True if the user is the group, else False
         """
         if pk is not None:
-            # check some basic cases to avoid as much queries as possible
-            if pk == settings.SITH_GROUP_PUBLIC_ID:
-                return True
-            if pk == settings.SITH_GROUP_SUBSCRIBERS_ID:
-                return self.is_subscribed
-            if pk == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
-                return self.was_subscribed
-            if pk == settings.SITH_GROUP_ROOT_ID:
-                return self.is_root
             group: Optional[Group] = get_group(pk=pk)
         elif name is not None:
-            if name == settings.SITH_MAIN_MEMBERS_GROUP:
-                return self.is_subscribed
             group: Optional[Group] = get_group(name=name)
         else:
             raise ValueError("You must either provide the id or the name of the group")
         if group is None:
             return False
+        if group.id == settings.SITH_GROUP_PUBLIC_ID:
+            return True
+        if group.id == settings.SITH_GROUP_SUBSCRIBERS_ID:
+            return self.is_subscribed
+        if group.id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
+            return self.was_subscribed
+        if group.id == settings.SITH_GROUP_ROOT_ID:
+            return self.is_root
         if group.is_meta:
             # check if this group is associated with a club
             group.__class__ = MetaGroup
@@ -453,12 +450,18 @@ class User(AbstractBaseUser):
             return membership.role > settings.SITH_MAXIMUM_FREE_ROLE
         return group in self.cached_groups
 
-    @cached_property
+    @property
     def cached_groups(self) -> List[Group]:
         """
+        Get the list of groups this user is in.
+        The result is cached for the default duration (should be 5 minutes)
         :return: A list of all the groups this user is in
         """
-        return list(self.groups.all())
+        groups = cache.get(f"user_{self.id}_groups")
+        if groups is None:
+            groups = list(self.groups.all())
+            cache.set(f"user_{self.id}_groups", groups)
+        return groups
 
     @cached_property
     def is_root(self) -> bool:
@@ -672,7 +675,7 @@ class User(AbstractBaseUser):
         if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
             return True
         if hasattr(obj, "view_groups"):
-            for pk in obj.edit_groups.values_list("pk", flat=True):
+            for pk in obj.view_groups.values_list("pk", flat=True):
                 if self.is_in_group(pk=pk):
                     return True
         if self.can_edit(obj):

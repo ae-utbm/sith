@@ -306,9 +306,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
         return resp
 
     def dispatch(self, request, *args, **kwargs):
-        self.members = (
-            self.get_object().members.filter(end_date=None).order_by("-role").all()
-        )
+        self.members = self.get_object().members.ongoing().order_by("-role")
         return super(ClubMembersView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):

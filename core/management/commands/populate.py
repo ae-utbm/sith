@@ -410,7 +410,7 @@ Welcome to the wiki page!
             default_subscription = "un-semestre"
             # Root
             s = Subscription(
-                member=User.objects.filter(pk=root.pk).first(),
+                member=root,
                 subscription_type=default_subscription,
                 payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
@@ -510,7 +510,7 @@ Welcome to the wiki page!
             Club(
                 name="Woenzel'UT", unix_name="woenzel", address="Woenzel", parent=guyut
             ).save()
-            Membership(user=skia, club=main_club, role=3, description="").save()
+            Membership(user=skia, club=main_club, role=3).save()
             troll = Club(
                 name="Troll Penché",
                 unix_name="troll",
@@ -914,7 +914,6 @@ Welcome to the wiki page!
             Membership(
                 user=comunity,
                 club=bar_club,
-                start_date=timezone.now(),
                 role=settings.SITH_CLUB_ROLES_ID["Board member"],
             ).save()
             # Adding user tutu
