@@ -1073,7 +1073,7 @@ class UVCommentReportCreateTest(TestCase):
         # Check that only pedagogy admins recieves this notification
         for notif in Notification.objects.filter(type="PEDAGOGY_MODERATION").all():
             self.assertTrue(
-                notif.user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+                notif.user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
             )
 
         # Check that notifications are not duplicated if not viewed

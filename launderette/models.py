@@ -62,7 +62,7 @@ class Launderette(models.Model):
         return False
 
     def can_be_viewed_by(self, user):
-        return user.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
+        return user.is_subscribed
 
     def __str__(self):
         return self.name

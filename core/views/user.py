@@ -254,10 +254,11 @@ class UserTabsMixin(TabedViewMixin):
             if user.customer and (
                 user == self.request.user
                 or self.request.user.is_in_group(
-                    settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
+                    pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
                 )
                 or self.request.user.is_in_group(
-                    settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
+                    name=settings.SITH_BAR_MANAGER["unix_name"]
+                    + settings.SITH_BOARD_SUFFIX
                 )
                 or self.request.user.is_root
             ):
@@ -488,9 +489,9 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
 
         if not (
             profile == request.user
-            or request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+            or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
             or request.user.is_in_group(
-                settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
+                name=settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
             )
             or request.user.is_root
         ):
@@ -772,9 +773,9 @@ class UserAccountBase(UserTabsMixin, DetailView):
         res = super(UserAccountBase, self).dispatch(request, *arg, **kwargs)
         if (
             self.object == request.user
-            or request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+            or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
             or request.user.is_in_group(
-                settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
+                name=settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
             )
             or request.user.is_root
         ):

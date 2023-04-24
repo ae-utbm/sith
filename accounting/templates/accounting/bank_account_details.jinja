@@ -12,7 +12,7 @@
         </p>
         <hr>
         <h2>{% trans %}Bank account: {% endtrans %}{{ object.name }}</h2>
-        {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) and not object.club_accounts.exists() %}
+        {% if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) and not object.club_accounts.exists() %}
         <a href="{{ url('accounting:bank_delete', b_account_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
         {% endif %}
         <h4>{% trans %}Infos{% endtrans %}</h4>

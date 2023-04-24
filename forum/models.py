@@ -163,7 +163,7 @@ class Forum(models.Model):
     def is_owned_by(self, user):
         if user.is_anonymous:
             return False
-        if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID):
+        if user.is_in_group(pk=settings.SITH_GROUP_FORUM_ADMIN_ID):
             return True
         try:
             m = Forum._club_memberships[self.id][user.id]

@@ -229,9 +229,7 @@ class ClubMemberForm(forms.Form):
                 id__in=[
                     ms.user.id
                     for ms in self.club_members
-                    if ms.can_be_edited_by(
-                        self.request_user, self.request_user_membership
-                    )
+                    if ms.can_be_edited_by(self.request_user)
                 ]
             ).all(),
             label=_("Mark as old"),

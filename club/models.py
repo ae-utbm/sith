@@ -219,7 +219,7 @@ class Club(models.Model):
         """
         if user.is_anonymous:
             return False
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
+        return user.is_board_member
 
     def get_full_logo_url(self):
         return "https://%s%s" % (settings.SITH_URL, self.logo.url)
@@ -335,21 +335,17 @@ class Membership(models.Model):
         """
         if user.is_anonymous:
             return False
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
+        return user.is_board_member
 
-    def can_be_edited_by(self, user, membership=None):
+    def can_be_edited_by(self, user: User) -> bool:
         """
-        Method to see if that object can be edited by the given user
+        Check if that object can be edited by the given user
         """
         if user.memberships:
-            if membership:  # This is for optimisation purpose
-                ms = membership
-            else:
-                ms = user.memberships.filter(club=self.club, end_date=None).first()
-            return (ms and ms.role >= self.role) or user.is_in_group(
-                settings.SITH_MAIN_BOARD_GROUP
-            )
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
+            membership = self.club.get_membership_for(user)
+            if membership is not None and membership.role >= self.role:
+                return True
+        return user.is_root or user.is_board_member
 
     def get_absolute_url(self):
         return reverse("club:club_members", kwargs={"club_id": self.club.id})
@@ -413,16 +409,12 @@ class Mailing(models.Model):
         return self.email + "@" + settings.SITH_MAILING_DOMAIN
 
     def can_moderate(self, user):
-        return user.is_root or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        return user.is_root or user.is_com_admin
 
     def is_owned_by(self, user):
         if user.is_anonymous:
             return False
-        return (
-            user.is_in_group(self)
-            or user.is_root
-            or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
-        )
+        return user.is_root or user.is_com_admin
 
     def can_view(self, user):
         return self.club.has_rights_in_club(user)
@@ -430,9 +422,8 @@ class Mailing(models.Model):
     def can_be_edited_by(self, user):
         return self.club.has_rights_in_club(user)
 
-    def delete(self):
-        for sub in self.subscriptions.all():
-            sub.delete()
+    def delete(self, *args, **kwargs):
+        self.subscriptions.all().delete()
         super(Mailing, self).delete()
 
     def fetch_format(self):
@@ -510,7 +501,7 @@ class MailingSubscription(models.Model):
         return (
             self.mailing.club.has_rights_in_club(user)
             or user.is_root
-            or self.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+            or self.user.is_com_admin
         )
 
     def can_be_edited_by(self, user):

@@ -6,10 +6,10 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.forms import CheckboxSelectMultiple
 from django.shortcuts import redirect
 from django import forms
 
+from core.models import User
 from core.views import CanViewMixin, CanEditMixin, CanCreateMixin
 from django.db.models.query import QuerySet
 from core.views.forms import SelectDateTime, MarkdownInput
@@ -295,8 +295,8 @@ class VoteFormView(CanCreateMixin, FormView):
         """
         data = form.clean()
         res = super(FormView, self).form_valid(form)
-        for grp in self.election.vote_groups.all():
-            if self.request.user.is_in_group(grp):
+        for grp_id in self.election.vote_groups.values_list("pk", flat=True):
+            if self.request.user.is_in_group(pk=grp_id):
                 self.vote(data)
                 return res
         return res
@@ -401,12 +401,13 @@ class RoleCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-        Verify that the user can edit proprely
+        Verify that the user can edit properly
         """
-        obj = form.instance
+        obj: Role = form.instance
+        user: User = self.request.user
         if obj.election:
-            for grp in obj.election.edit_groups.all():
-                if self.request.user.is_in_group(grp):
+            for grp_id in obj.election.edit_groups.values_list("pk", flat=True):
+                if user.is_in_group(pk=grp_id):
                     return super(CreateView, self).form_valid(form)
         raise PermissionDenied
 
@@ -446,13 +447,14 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         """
         Verify that the user can vote on this election
         """
-        obj = form.instance
+        obj: ElectionList = form.instance
+        user: User = self.request.user
         if obj.election:
-            for grp in obj.election.candidature_groups.all():
-                if self.request.user.is_in_group(grp):
+            for grp_id in obj.election.candidature_groups.values_list("pk", flat=True):
+                if user.is_in_group(pk=grp_id):
                     return super(CreateView, self).form_valid(form)
-            for grp in obj.election.edit_groups.all():
-                if self.request.user.is_in_group(grp):
+            for grp_id in obj.election.edit_groups.values_list("pk", flat=True):
+                if user.is_in_group(pk=grp_id):
                     return super(CreateView, self).form_valid(form)
         raise PermissionDenied
 

@@ -230,7 +230,7 @@ class ProductType(models.Model):
         """
         if user.is_anonymous:
             return False
-        if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
+        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
 
@@ -299,8 +299,8 @@ class Product(models.Model):
         if user.is_anonymous:
             return False
         if user.is_in_group(
-            settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
-        ) or user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID):
+            pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
+        ) or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID):
             return True
         return False
 
@@ -322,8 +322,8 @@ class Product(models.Model):
         """
         if not self.buying_groups.exists():
             return True
-        for group in self.buying_groups.all():
-            if user.is_in_group(group.name):
+        for group_id in self.buying_groups.values_list("pk", flat=True):
+            if user.is_in_group(pk=group_id):
                 return True
         return False
 
@@ -411,15 +411,12 @@ class Counter(models.Model):
         mem = self.club.get_membership_for(user)
         if mem and mem.role >= 7:
             return True
-        return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+        return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
         if self.type == "BAR":
             return True
-        return (
-            user.is_in_group(settings.SITH_MAIN_BOARD_GROUP)
-            or user in self.sellers.all()
-        )
+        return user.is_board_member or user in self.sellers.all()
 
     def gen_token(self):
         """Generate a new token for this counter"""
@@ -965,7 +962,7 @@ class CashRegisterSummary(models.Model):
         """
         if user.is_anonymous:
             return False
-        if user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID):
+        if user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID):
             return True
         return False
 
@@ -1036,7 +1033,7 @@ class Eticket(models.Model):
         """
         if user.is_anonymous:
             return False
-        return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+        return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def get_hash(self, string):
         import hashlib

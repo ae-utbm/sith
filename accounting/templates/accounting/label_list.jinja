@@ -13,7 +13,7 @@
         </p>
         <hr>
         <p><a href="{{ url('accounting:club_details', c_account_id=object.id) }}">{% trans %}Back to club account{% endtrans %}</a></p>
-        {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
+        {% if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
         <p><a href="{{ url('accounting:label_new') }}?parent={{ object.id }}">{% trans %}New label{% endtrans %}</a></p>
         {% endif %}
         {% if object.labels.all() %}
@@ -21,7 +21,7 @@
         <ul>
             {% for l in object.labels.all()  %}
             <li><a href="{{ url('accounting:label_edit', label_id=l.id) }}">{{ l }}</a>
-            {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
+            {% if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
              -
                 <a href="{{ url('accounting:label_delete', label_id=l.id) }}">{% trans %}Delete{% endtrans %}</a>
             {% endif %}

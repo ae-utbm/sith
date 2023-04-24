@@ -146,7 +146,7 @@ class ComTabsMixin(TabedViewMixin):
 
 class IsComAdminMixin(View):
     def dispatch(self, request, *args, **kwargs):
-        if not (request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)):
+        if not request.user.is_com_admin:
             raise PermissionDenied
         return super(IsComAdminMixin, self).dispatch(request, *args, **kwargs)
 
@@ -283,9 +283,7 @@ class NewsEditView(CanEditMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        if form.cleaned_data["automoderation"] and self.request.user.is_in_group(
-            settings.SITH_GROUP_COM_ADMIN_ID
-        ):
+        if form.cleaned_data["automoderation"] and self.request.user.is_com_admin:
             self.object.moderator = self.request.user
             self.object.is_moderated = True
             self.object.save()
@@ -333,9 +331,7 @@ class NewsCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        if form.cleaned_data["automoderation"] and self.request.user.is_in_group(
-            settings.SITH_GROUP_COM_ADMIN_ID
-        ):
+        if form.cleaned_data["automoderation"] and self.request.user.is_com_admin:
             self.object.moderator = self.request.user
             self.object.is_moderated = True
             self.object.save()
@@ -617,10 +613,7 @@ class MailingListAdminView(ComTabsMixin, ListView):
     current_tab = "mailings"
 
     def dispatch(self, request, *args, **kwargs):
-        if not (
-            request.user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
-            or request.user.is_root
-        ):
+        if not (request.user.is_com_admin or request.user.is_root):
             raise PermissionDenied
         return super(MailingListAdminView, self).dispatch(request, *args, **kwargs)
 

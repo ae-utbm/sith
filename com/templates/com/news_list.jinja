@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+{% if user.is_com_admin %}
 <div id="news_admin">
   <a class="button" href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
 </div>

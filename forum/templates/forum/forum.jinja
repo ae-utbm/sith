@@ -10,7 +10,11 @@
 <div id="forum">
     <h3>{{ forum.name }}</h3>
     <p>
-    {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user.can_edit(forum) %}
+    {%
+        if user.is_com_admin
+        or user.is_in_group(pk=settings.SITH_GROUP_FORUM_ADMIN_ID)
+        or user.can_edit(forum)
+    %}
         <a class="ib button" href="{{ url('forum:new_forum') }}?parent={{ forum.id }}">{% trans %}New forum{% endtrans %}</a> <br/>
     {% endif %}
     {% if not forum.is_category %}

@@ -6,11 +6,12 @@
 
 {% block content %}
     <div id="accounting">
-        {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) or user.is_root %}
+        {% if user.is_root
+           or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+        %}
         <p><a href="{{ url('accounting:co_new') }}">{% trans %}Create new company{% endtrans %}</a></p>
         {% endif %}
-
-        </br>
+        <br/>
         <table>
             <thead>
             <tr>

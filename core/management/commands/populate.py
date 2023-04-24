@@ -155,12 +155,10 @@ class Command(BaseCommand):
         Counter(name="Eboutic", club=main_club, type="EBOUTIC").save()
         Counter(name="AE", club=main_club, type="OFFICE").save()
 
-        home_root.view_groups.set(
-            [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
-        )
-        club_root.view_groups.set(
-            [Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first()]
-        )
+        ae_members = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)
+
+        home_root.view_groups.set([ae_members])
+        club_root.view_groups.set([ae_members])
         home_root.save()
         club_root.save()
 
@@ -220,9 +218,7 @@ Welcome to the wiki page!
             )
             skia.set_password("plop")
             skia.save()
-            skia.view_groups = [
-                Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
-            ]
+            skia.view_groups = [ae_members.id]
             skia.save()
             skia_profile_path = (
                 root_path
@@ -261,9 +257,7 @@ Welcome to the wiki page!
             )
             public.set_password("plop")
             public.save()
-            public.view_groups = [
-                Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
-            ]
+            public.view_groups = [ae_members.id]
             public.save()
             # Adding user Subscriber
             subscriber = User(
@@ -277,9 +271,7 @@ Welcome to the wiki page!
             )
             subscriber.set_password("plop")
             subscriber.save()
-            subscriber.view_groups = [
-                Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
-            ]
+            subscriber.view_groups = [ae_members.id]
             subscriber.save()
             # Adding user old Subscriber
             old_subscriber = User(
@@ -293,9 +285,7 @@ Welcome to the wiki page!
             )
             old_subscriber.set_password("plop")
             old_subscriber.save()
-            old_subscriber.view_groups = [
-                Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
-            ]
+            old_subscriber.view_groups = [ae_members.id]
             old_subscriber.save()
             # Adding user Counter admin
             counter = User(
@@ -309,9 +299,7 @@ Welcome to the wiki page!
             )
             counter.set_password("plop")
             counter.save()
-            counter.view_groups = [
-                Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
-            ]
+            counter.view_groups = [ae_members.id]
             counter.groups.set(
                 [
                     Group.objects.filter(id=settings.SITH_GROUP_COUNTER_ADMIN_ID)
@@ -332,9 +320,7 @@ Welcome to the wiki page!
             )
             comptable.set_password("plop")
             comptable.save()
-            comptable.view_groups = [
-                Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
-            ]
+            comptable.view_groups = [ae_members.id]
             comptable.groups.set(
                 [
                     Group.objects.filter(id=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
@@ -355,9 +341,7 @@ Welcome to the wiki page!
             )
             u.set_password("plop")
             u.save()
-            u.view_groups = [
-                Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
-            ]
+            u.view_groups = [ae_members.id]
             u.save()
             # Adding user Richard Batsbak
             richard = User(
@@ -394,9 +378,7 @@ Welcome to the wiki page!
                 richard_profile.save()
                 richard.profile_pict = richard_profile
                 richard.save()
-            richard.view_groups = [
-                Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
-            ]
+            richard.view_groups = [ae_members.id]
             richard.save()
             # Adding syntax help page
             p = Page(name="Aide_sur_la_syntaxe")
@@ -855,9 +837,7 @@ Welcome to the wiki page!
             )
             sli.set_password("plop")
             sli.save()
-            sli.view_groups = [
-                Group.objects.filter(name=settings.SITH_MAIN_MEMBERS_GROUP).first().id
-            ]
+            sli.view_groups = [ae_members.id]
             sli.save()
             sli_profile_path = (
                 root_path

@@ -61,7 +61,7 @@
 {% if not file.home_of and not file.home_of_club and file.parent %}
 <p><a href="{{ url('core:file_delete', file_id=file.id, popup=popup) }}">{% trans %}Delete{% endtrans %}</a></p>
 {% endif %}
-{% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+{% if user.is_com_admin %}
 <p><a href="{{ url('core:file_moderate', file_id=file.id) }}">{% trans %}Moderate{% endtrans %}</a></p>
 {% endif %}
 {% endblock %}

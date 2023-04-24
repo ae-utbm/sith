@@ -408,26 +408,39 @@ class User(AbstractBaseUser):
         else:
             return 0
 
-    def is_in_group(self, group_name) -> bool:
-        """If the user is in the group passed in argument (as string or by id)"""
-        if isinstance(group_name, int):
-            group: Optional[Group] = get_group(pk=group_name)
-        elif isinstance(group_name, str):
-            group: Optional[Group] = get_group(name=group_name)
+    def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
+        """
+        Check if this user is in the given group.
+        Either a group id or a group name must be provided.
+        If both are passed, only the id will be considered.
+
+        The group will be fetched using the given parameter.
+        If no group is found, return False.
+        If a group is found, check if this user is in the latter.
+
+        :return: True if the user is the group, else False
+        """
+        if pk is not None:
+            # check some basic cases to avoid as much queries as possible
+            if pk == settings.SITH_GROUP_PUBLIC_ID:
+                return True
+            if pk == settings.SITH_GROUP_SUBSCRIBERS_ID:
+                return self.is_subscribed
+            if pk == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
+                return self.was_subscribed
+            if pk == settings.SITH_GROUP_ROOT_ID:
+                return self.is_root
+            group: Optional[Group] = get_group(pk=pk)
+        elif name is not None:
+            if name == settings.SITH_MAIN_MEMBERS_GROUP:
+                return self.is_subscribed
+            group: Optional[Group] = get_group(name=name)
         else:
-            print(group_name)
-            raise TypeError("group_name must be a string or an int")
+            raise ValueError("You must either provide the id or the name of the group")
         if group is None:
             return False
-        if group.id == settings.SITH_GROUP_PUBLIC_ID:
-            return True
-        if group.id == settings.SITH_GROUP_SUBSCRIBERS_ID:
-            return self.is_subscribed
-        if group.id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
-            return self.was_subscribed
-        if group.name == settings.SITH_MAIN_MEMBERS_GROUP:
-            return self.is_subscribed
         if group.is_meta:
+            # check if this group is associated with a club
             group.__class__ = MetaGroup
             club = group.associated_club
             if club is None:
@@ -438,8 +451,6 @@ class User(AbstractBaseUser):
             if group.name.endswith(settings.SITH_MEMBER_SUFFIX):
                 return True
             return membership.role > settings.SITH_MAXIMUM_FREE_ROLE
-        if group.id == settings.SITH_GROUP_ROOT_ID and self.is_root:
-            return True
         return group in self.cached_groups
 
     @cached_property
@@ -459,7 +470,7 @@ class User(AbstractBaseUser):
     @cached_property
     def is_board_member(self):
         main_club = settings.SITH_MAIN_CLUB["unix_name"]
-        return self.is_in_group(main_club + settings.SITH_BOARD_SUFFIX)
+        return self.is_in_group(name=main_club + settings.SITH_BOARD_SUFFIX)
 
     @cached_property
     def can_read_subscription_history(self):
@@ -498,11 +509,11 @@ class User(AbstractBaseUser):
 
     @cached_property
     def is_banned_alcohol(self):
-        return self.is_in_group(settings.SITH_GROUP_BANNED_ALCOHOL_ID)
+        return self.is_in_group(pk=settings.SITH_GROUP_BANNED_ALCOHOL_ID)
 
     @cached_property
     def is_banned_counter(self):
-        return self.is_in_group(settings.SITH_GROUP_BANNED_COUNTER_ID)
+        return self.is_in_group(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
 
     @cached_property
     def age(self) -> int:
@@ -632,9 +643,9 @@ class User(AbstractBaseUser):
         """
         if hasattr(obj, "is_owned_by") and obj.is_owned_by(self):
             return True
-        if hasattr(obj, "owner_group") and self.is_in_group(obj.owner_group.name):
+        if hasattr(obj, "owner_group") and self.is_in_group(pk=obj.owner_group.id):
             return True
-        if self.is_superuser or self.is_in_group(settings.SITH_GROUP_ROOT_ID):
+        if self.is_root:
             return True
         return False
 
@@ -645,8 +656,8 @@ class User(AbstractBaseUser):
         if hasattr(obj, "can_be_edited_by") and obj.can_be_edited_by(self):
             return True
         if hasattr(obj, "edit_groups"):
-            for g in obj.edit_groups.all():
-                if self.is_in_group(g.name):
+            for pk in obj.edit_groups.values_list("pk", flat=True):
+                if self.is_in_group(pk=pk):
                     return True
         if isinstance(obj, User) and obj == self:
             return True
@@ -661,15 +672,15 @@ class User(AbstractBaseUser):
         if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
             return True
         if hasattr(obj, "view_groups"):
-            for g in obj.view_groups.all():
-                if self.is_in_group(g.name):
+            for pk in obj.edit_groups.values_list("pk", flat=True):
+                if self.is_in_group(pk=pk):
                     return True
         if self.can_edit(obj):
             return True
         return False
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
+        return user.is_root or user.is_board_member
 
     def can_be_viewed_by(self, user):
         return (user.was_subscribed and self.is_subscriber_viewable) or user.is_root
@@ -689,10 +700,6 @@ class User(AbstractBaseUser):
             _("Profile"),
             escape(self.get_display_name()),
         )
-
-    @cached_property
-    def subscribed(self):
-        return self.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
 
     @cached_property
     def preferences(self):
@@ -725,7 +732,7 @@ class User(AbstractBaseUser):
 
     @cached_property
     def is_com_admin(self):
-        return self.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        return self.is_in_group(pk=settings.SITH_GROUP_COM_ADMIN_ID)
 
 
 class AnonymousUser(AuthAnonymousUser):
@@ -780,21 +787,18 @@ class AnonymousUser(AuthAnonymousUser):
     def favorite_topics(self):
         raise PermissionDenied
 
-    def is_in_group(self, group_name_or_id: Union[str, int]) -> bool:
+    def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
         """
         The anonymous user is only in the public group
         """
         allowed_id = settings.SITH_GROUP_PUBLIC_ID
-        if isinstance(group_name_or_id, str):
-            group = get_group(name=group_name_or_id)
+        if pk is not None:
+            return pk == allowed_id
+        elif name is not None:
+            group = get_group(name=name)
             return group is not None and group.id == allowed_id
-        elif isinstance(group_name_or_id, int):
-            return group_name_or_id == allowed_id
         else:
-            raise TypeError(
-                f"group_name_or_id argument must be str or int, "
-                f"not {type(group_name_or_id)}"
-            )
+            raise ValueError("You must either provide the id or the name of the group")
 
     def is_owner(self, obj):
         return False
@@ -915,13 +919,11 @@ class SithFile(models.Model):
     def is_owned_by(self, user):
         if user.is_anonymous:
             return False
-        if hasattr(self, "profile_of") and user.is_in_group(
-            settings.SITH_MAIN_BOARD_GROUP
-        ):
+        if hasattr(self, "profile_of") and user.is_board_member:
             return True
-        if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID):
+        if user.is_com_admin:
             return True
-        if self.is_in_sas and user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
+        if self.is_in_sas and user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return True
         return user.id == self.owner.id
 

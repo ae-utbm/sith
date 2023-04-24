@@ -35,18 +35,21 @@
         {% endif %}
 
         {% set is_admin_on_a_counter = false %}
-        {% for b in settings.SITH_COUNTER_BARS if user.is_in_group(b[1] + " admin") %}
+        {% for b in settings.SITH_COUNTER_BARS if user.is_in_group(name=b[1] + " admin") %}
             {% set is_admin_on_a_counter = true %}
         {% endfor %}
 
         {% if
-            user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID) or user.is_root
-            or is_admin_on_a_counter
+            is_admin_on_a_counter
+            or user.is_root
+            or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
         %}
             <div>
                 <h4>{% trans %}Counters{% endtrans %}</h4>
                 <ul>
-                    {% if user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID) or user.is_root %}
+                    {% if user.is_root
+                       or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
+                    %}
                         <li><a href="{{ url('counter:admin_list') }}">{% trans %}General counters management{% endtrans %}</a></li>
                         <li><a href="{{ url('counter:product_list') }}">{% trans %}Products management{% endtrans %}</a></li>
                         <li><a href="{{ url('counter:producttype_list') }}">{% trans %}Product types management{% endtrans %}</a></li>
@@ -57,7 +60,7 @@
                 </ul>
                 <ul>
                     {% for b in settings.SITH_COUNTER_BARS %}
-                        {% if user.is_in_group(b[1]+" admin") %}
+                        {% if user.is_in_group(name=b[1]+" admin") %}
                             {% set c = Counter.objects.filter(id=b[0]).first() %}
 
                             <li class="rows counter">
@@ -85,13 +88,16 @@
         {% endif %}
 
         {% if
-            user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) or user.is_root
-            or user.memberships.filter(end_date=None).filter(role__gte=7).all() | length > 10
+            user.is_root
+            or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+            or user.memberships.ongoing().filter(role__gte=7).count() > 10
         %}
             <div>
                 <h4>{% trans %}Accounting{% endtrans %}</h4>
                 <ul>
-                    {% if user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) or user.is_root %}
+                    {% if user.is_root
+                       or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+                    %}
                         <li><a href="{{ url('accounting:refound_account') }}">{% trans %}Refound Account{% endtrans %}</a></li>
                         <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
                         <li><a href="{{ url('accounting:co_list') }}">{% trans %}Company list{% endtrans %}</a></li>
@@ -118,11 +124,15 @@
             </div>
         {% endif %}
 
-        {% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user.is_root %}
+        {% if
+            user.is_root
+            or user.is_com_admin
+            or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+        %}
             <div>
                 <h4>{% trans %}Communication{% endtrans %}</h4>
                 <ul>
-                    {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user.is_root %}
+                    {% if user.is_com_admin or user.is_root %}
                         <li><a href="{{ url('com:weekmail_article') }}">{% trans %}Create weekmail article{% endtrans %}</a></li>
                         <li><a href="{{ url('com:weekmail') }}">{% trans %}Weekmail{% endtrans %}</a></li>
                         <li><a href="{{ url('com:weekmail_destinations') }}">{% trans %}Weekmail destinations{% endtrans %}</a></li>
@@ -135,7 +145,7 @@
                         <li><a href="{{ url('com:poster_list') }}">{% trans %}Posters{% endtrans %}</a></li>
                         <li><a href="{{ url('com:screen_list') }}">{% trans %}Screens{% endtrans %}</a></li>
                     {% endif %}
-                    {% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
+                    {% if user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
                         <li><a href="{{ url('sas:moderation') }}">{% trans %}Moderate pictures{% endtrans %}</a></li>
                     {% endif %}
                 </ul>
@@ -153,7 +163,10 @@
             </div>
         {% endif %}
 
-        {% if user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID) or user.is_root %}
+        {% if
+            user.is_root
+            or user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+        %}
             <div>
                 <h4>{% trans %}Pedagogy{% endtrans %}</h4>
                 <ul>
