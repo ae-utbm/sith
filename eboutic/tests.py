@@ -41,7 +41,6 @@ from eboutic.models import Basket
 class EbouticTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command("populate")
         cls.barbar = Product.objects.filter(code="BARB").first()
         cls.refill = Product.objects.filter(code="15REFILL").first()
         cls.cotis = Product.objects.filter(code="1SCOTIZ").first()

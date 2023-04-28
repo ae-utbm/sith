@@ -9,8 +9,6 @@ from election.models import Election
 
 class MainElection(TestCase):
     def setUp(self):
-        call_command("populate")
-
         self.election = Election.objects.all().first()
         self.public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
         self.subscriber_group = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)

@@ -31,7 +31,6 @@ from galaxy.models import Galaxy
 
 class GalaxyTest(TestCase):
     def setUp(self):
-        call_command("populate")
         self.root = User.objects.get(username="root")
         self.skia = User.objects.get(username="skia")
         self.sli = User.objects.get(username="sli")

@@ -102,9 +102,9 @@ class SubscriptionUnitTest(TestCase):
 
 
 class SubscriptionIntegrationTest(TestCase):
-    def setUp(self):
-        call_command("populate")
-        self.user = User.objects.filter(username="public").first()
+    @classmethod
+    def setUp(cls):
+        cls.user = User.objects.filter(username="public").first()
 
     def test_duration_one_month(self):
         s = Subscription(

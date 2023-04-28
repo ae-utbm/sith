@@ -30,11 +30,9 @@ to run these tests :
 
 
 class UserRegistrationTest(TestCase):
-    def setUp(self):
-        try:
-            Group.objects.create(name="root")
-        except Exception as e:
-            print(e)
+    @classmethod
+    def setUpTestData(cls):
+        User.objects.all().delete()
 
     def test_register_user_form_ok(self):
         """
@@ -282,19 +280,8 @@ class MarkdownTest(TestCase):
 
 class PageHandlingTest(TestCase):
     def setUp(self):
-        self.root_group = Group.objects.create(name="root")
-        u = User(
-            username="root",
-            last_name="",
-            first_name="Bibou",
-            email="ae.info@utbm.fr",
-            date_of_birth="1942-06-12",
-            is_superuser=True,
-            is_staff=True,
-        )
-        u.set_password("plop")
-        u.save()
         self.client.login(username="root", password="plop")
+        self.root_group = Group.objects.get(name="Root")
 
     def test_create_page_ok(self):
         """
@@ -321,12 +308,20 @@ class PageHandlingTest(TestCase):
         """
         Should create a page correctly
         """
+        # remove all other pages to make sure there is no side effect
+        Page.objects.all().delete()
         self.client.post(
-            reverse("core:page_new"), {"parent": "", "name": "guy", "owner_group": "1"}
+            reverse("core:page_new"),
+            {"parent": "", "name": "guy", "owner_group": str(self.root_group.id)},
         )
+        page = Page.objects.first()
         response = self.client.post(
             reverse("core:page_new"),
-            {"parent": "1", "name": "bibou", "owner_group": "1"},
+            {
+                "parent": str(page.id),
+                "name": "bibou",
+                "owner_group": str(self.root_group.id),
+            },
         )
         response = self.client.get(
             reverse("core:page", kwargs={"page_name": "guy/bibou"})
@@ -392,9 +387,6 @@ http://git.an
 
 
 class UserToolsTest(TestCase):
-    def setUp(self):
-        call_command("populate")
-
     def test_anonymous_user_unauthorized(self):
         response = self.client.get(reverse("core:user_tools"))
         self.assertEqual(response.status_code, 403)
@@ -432,13 +424,12 @@ class UserToolsTest(TestCase):
 
 
 class FileHandlingTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.subscriber = User.objects.get(username="subscriber")
+
     def setUp(self):
-        try:
-            call_command("populate")
-            self.subscriber = User.objects.filter(username="subscriber").first()
-            self.client.login(username="subscriber", password="plop")
-        except Exception as e:
-            print(e)
+        self.client.login(username="subscriber", password="plop")
 
     def test_create_folder_home(self):
         response = self.client.post(
