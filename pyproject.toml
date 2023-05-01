@@ -60,7 +60,7 @@ docs = ["Sphinx", "sphinx-rtd-theme", "sphinx-copybutton"]
 
 [tool.poetry.dev-dependencies]
 django-debug-toolbar = "^4.0.0"
-ipython = "^7.28.0"
+ipython = "^8.12.1"
 black = "^23.3.0"
 
 [build-system]
