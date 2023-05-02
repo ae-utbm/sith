@@ -164,7 +164,7 @@ class WeekmailArticleTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.com_admin = User.objects.get(username="comunity")
-        author = User.objects.get(username="skia")
+        author = User.objects.get(username="subscriber")
         cls.article = WeekmailArticle.objects.create(
             weekmail=Weekmail.objects.create(),
             author=author,
