@@ -472,7 +472,6 @@ class UserIsInGroupTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        call_command("populate")
         from club.models import Club
 
         cls.root_group = Group.objects.get(name="Root")

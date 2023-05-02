@@ -115,10 +115,6 @@ class ComTest(TestCase):
 
 
 class SithTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        call_command("populate")
-
     def test_sith_owner(self):
         """
         Test that the sith instance is owned by com admins
@@ -139,7 +135,6 @@ class SithTest(TestCase):
 class NewsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command("populate")
         cls.com_admin = User.objects.get(username="comunity")
         new = News.objects.create(
             title="dummy new",
@@ -168,7 +163,6 @@ class NewsTest(TestCase):
 class WeekmailArticleTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command("populate")
         cls.com_admin = User.objects.get(username="comunity")
         author = User.objects.get(username="skia")
         cls.article = WeekmailArticle.objects.create(
@@ -195,7 +189,6 @@ class WeekmailArticleTest(TestCase):
 class PosterTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command("populate")
         cls.com_admin = User.objects.get(username="comunity")
         cls.poster = Poster.objects.create(
             name="dummy",
