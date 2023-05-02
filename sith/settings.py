@@ -77,6 +77,7 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django_jinja",
+    "django_crontab",
     "rest_framework",
     "ajax_select",
     "haystack",
@@ -186,6 +187,16 @@ TEMPLATES = [
             ]
         },
     },
+]
+
+# Liste des tâches cron
+CRONJOBS = [
+    # Tâche effectuant le vidage des comptes AE au bout de 2 ans de non cotisation
+    (
+        "0 6 * * *",
+        "accounting.cron.dump_account_balance",
+        "> /tmp/$(date +%Y-%m-%d).log 2> /tmp/$(date +%Y-%m-%d)-error.log",
+    )
 ]
 
 HAYSTACK_CONNECTIONS = {
@@ -349,6 +360,9 @@ SITH_CLUB_REFOUND_ID = 89
 SITH_COUNTER_REFOUND_ID = 38
 SITH_PRODUCT_REFOUND_ID = 5
 
+SITH_CLUB_DUMP_ID = 90
+SITH_COUNTER_DUMP_ID = 39
+
 # Pages
 SITH_CORE_PAGE_SYNTAX = "Aide_sur_la_syntaxe"
 
@@ -382,6 +396,7 @@ SITH_PROFILE_DEPARTMENTS = [
     ("HUMA", _("Humanities")),
     ("NA", _("N/A")),
 ]
+
 
 SITH_ACCOUNTING_DELTA_NOTIFICATION = {"years": 1, "months": 10}
 SITH_ACCOUNTING_DELTA_DUMP = {"years": 2, "months": 0}

@@ -1,0 +1,33 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+{% trans %}Bank account list{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div id="accounting">
+        <h4>
+        {% trans %}Account dumping{% endtrans %}
+        </h4>
+        <table>
+        <thead>
+            <td>{% trans %}User{% endtrans %}</td>
+            <td>{% trans %}Last subscription{% endtrans %}
+            <td>{% trans %}Balance{% endtrans %}</td>
+        </thead>
+        <tbody>
+            {% for u in user_list %}
+            <tr>
+                <td><a href="{{ u.get_absolute_url() }}">{{ u.get_full_name() }}</a></td>
+                {%set date=u.last_subscription_since() %}
+                <td>{% trans years=date[0], months=date[1], days=date[2] %} {{years}} years, {{months}} months, {{days}} days ago {% endtrans %}</td>
+                <td>{{ u.customer.amount }} €</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+
+

@@ -22,10 +22,11 @@ from django.forms.models import modelform_factory
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.forms import HiddenInput
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Sum, QuerySet
 from django.conf import settings
 from django import forms
 from django.http import HttpResponse
+from typing import Any
 import collections
 
 from ajax_select.fields import AutoCompleteSelectField
@@ -48,7 +49,10 @@ from accounting.models import (
     SimplifiedAccountingType,
     Label,
 )
-from counter.models import Counter, Selling, Product
+from counter.models import Counter, Selling, Product, User
+
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 # Main accounting view
 
@@ -932,3 +936,17 @@ class RefoundAccountView(FormView):
                 product=Product.objects.get(id=settings.SITH_PRODUCT_REFOUND_ID),
             )
             s.save()
+
+
+class AccountDumpingView(CanViewMixin, ListView):
+    model = User
+    template_name = "accounting/account_dumping.jinja"
+    paginate_by = 25
+
+    def get_queryset(self) -> QuerySet[Any]:
+        queryset = User.objects.filter(
+            customer__amount__gt=0,
+            subscriptions__subscription_end__lte=date.today()
+            - relativedelta(years=settings.SITH_ACCOUNTING_DELTA_NOTIFICATION["years"], months=settings.SITH_ACCOUNTING_DELTA_NOTIFICATION["months"]),
+        )
+        return queryset

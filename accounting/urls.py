@@ -137,4 +137,6 @@ urlpatterns = [
     ),
     # User account
     path("refound/account/", RefoundAccountView.as_view(), name="refound_account"),
+    # Account dumping
+    path("accounts/dumping", AccountDumpingView.as_view(), name="account_dumping"),
 ]

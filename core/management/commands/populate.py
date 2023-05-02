@@ -543,6 +543,13 @@ Welcome to the wiki page!
                 parent=main_club,
             )
             refound.save()
+            dump = Club(
+                name="Vidage compte AE",
+                unix_name="vidage-compte-ae",
+                address="Jamais imprimée",
+                parent=main_club,
+            )
+            dump.save()
 
             # Counters
             subscribers = Group.objects.get(name="Subscribers")
@@ -694,6 +701,9 @@ Welcome to the wiki page!
                 club=refound,
             )
             refound_product.save()
+
+            dump_counter = Counter(name="Vidage compte AE", club=dump, type="OFFICE")
+            dump_counter.save()
 
             # Accounting test values:
             BankAccount(name="AE TG", club=main_club).save()
