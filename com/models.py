@@ -50,7 +50,9 @@ class Sith(models.Model):
     version = utils.get_git_revision_short_hash()
 
     def is_owned_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        if user.is_anonymous:
+            return False
+        return user.is_com_admin
 
     def __str__(self):
         return "⛩ Sith ⛩"
@@ -92,13 +94,15 @@ class News(models.Model):
     )
 
     def is_owned_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) or user == self.author
+        if user.is_anonymous:
+            return False
+        return user.is_com_admin or user == self.author
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        return user.is_com_admin
 
     def can_be_viewed_by(self, user):
-        return self.is_moderated or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        return self.is_moderated or user.is_com_admin
 
     def get_absolute_url(self):
         return reverse("com:news_detail", kwargs={"news_id": self.id})
@@ -243,7 +247,9 @@ class Weekmail(models.Model):
         return "Weekmail %s (sent: %s) - %s" % (self.id, self.sent, self.title)
 
     def is_owned_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        if user.is_anonymous:
+            return False
+        return user.is_com_admin
 
 
 class WeekmailArticle(models.Model):
@@ -271,7 +277,9 @@ class WeekmailArticle(models.Model):
     rank = models.IntegerField(_("rank"), default=-1)
 
     def is_owned_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        if user.is_anonymous:
+            return False
+        return user.is_com_admin
 
     def __str__(self):
         return "%s - %s (%s)" % (self.title, self.author, self.club)
@@ -287,7 +295,9 @@ class Screen(models.Model):
         )
 
     def is_owned_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        if user.is_anonymous:
+            return False
+        return user.is_com_admin
 
     def __str__(self):
         return "%s" % (self.name)
@@ -340,12 +350,12 @@ class Poster(models.Model):
             raise ValidationError(_("Begin date should be before end date"))
 
     def is_owned_by(self, user):
-        return user.is_in_group(
-            settings.SITH_GROUP_COM_ADMIN_ID
-        ) or Club.objects.filter(id__in=user.clubs_with_rights)
+        if user.is_anonymous:
+            return False
+        return user.is_com_admin or len(user.clubs_with_rights) > 0
 
     def can_be_moderated_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        return user.is_com_admin
 
     def get_display_name(self):
         return self.club.get_display_name()

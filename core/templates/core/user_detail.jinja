@@ -136,7 +136,12 @@
             </div>
         </div>
     </main>
-    {% if user.memberships.filter(end_date=None).exists() or user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user == profile or user.is_in_group(settings.SITH_BAR_MANAGER_BOARD_GROUP) %}
+    {% if
+        user == profile
+        or user.memberships.ongoing().exists()
+        or user.is_board_member
+        or user.is_in_group(name=settings.SITH_BAR_MANAGER_BOARD_GROUP)
+    %}
         {# if the user is member of a club, he can view the subscription state #}
         <hr>
         {% if profile.is_subscribed %}

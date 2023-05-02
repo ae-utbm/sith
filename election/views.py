@@ -2,14 +2,14 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.edit import DeleteView, FormView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.forms import CheckboxSelectMultiple
 from django.shortcuts import redirect
 from django import forms
 
+from core.models import User
 from core.views import CanViewMixin, CanEditMixin, CanCreateMixin
 from django.db.models.query import QuerySet
 from core.views.forms import SelectDateTime, MarkdownInput
@@ -224,8 +224,8 @@ class ElectionDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "election_id"
 
     def get(self, request, *arg, **kwargs):
-        r = super(ElectionDetailView, self).get(request, *arg, **kwargs)
-        election = self.get_object()
+        response = super(ElectionDetailView, self).get(request, *arg, **kwargs)
+        election: Election = self.get_object()
         if request.user.can_edit(election) and election.is_vote_editable:
             action = request.GET.get("action", None)
             role = request.GET.get("role", None)
@@ -239,9 +239,9 @@ class ElectionDetailView(CanViewMixin, DetailView):
                 elif action == "top":
                     Role.objects.get(id=role).top()
                 return redirect(
-                    reverse_lazy("election:detail", kwargs={"election_id": election.id})
+                    reverse("election:detail", kwargs={"election_id": election.id})
                 )
-        return r
+        return response
 
     def get_context_data(self, **kwargs):
         """Add additionnal data to the template"""
@@ -295,8 +295,8 @@ class VoteFormView(CanCreateMixin, FormView):
         """
         data = form.clean()
         res = super(FormView, self).form_valid(form)
-        for grp in self.election.vote_groups.all():
-            if self.request.user.is_in_group(grp):
+        for grp_id in self.election.vote_groups.values_list("pk", flat=True):
+            if self.request.user.is_in_group(pk=grp_id):
                 self.vote(data)
                 return res
         return res
@@ -401,12 +401,13 @@ class RoleCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         """
-        Verify that the user can edit proprely
+        Verify that the user can edit properly
         """
-        obj = form.instance
+        obj: Role = form.instance
+        user: User = self.request.user
         if obj.election:
-            for grp in obj.election.edit_groups.all():
-                if self.request.user.is_in_group(grp):
+            for grp_id in obj.election.edit_groups.values_list("pk", flat=True):
+                if user.is_in_group(pk=grp_id):
                     return super(CreateView, self).form_valid(form)
         raise PermissionDenied
 
@@ -446,13 +447,14 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         """
         Verify that the user can vote on this election
         """
-        obj = form.instance
+        obj: ElectionList = form.instance
+        user: User = self.request.user
         if obj.election:
-            for grp in obj.election.candidature_groups.all():
-                if self.request.user.is_in_group(grp):
+            for grp_id in obj.election.candidature_groups.values_list("pk", flat=True):
+                if user.is_in_group(pk=grp_id):
                     return super(CreateView, self).form_valid(form)
-            for grp in obj.election.edit_groups.all():
-                if self.request.user.is_in_group(grp):
+            for grp_id in obj.election.edit_groups.values_list("pk", flat=True):
+                if user.is_in_group(pk=grp_id):
                     return super(CreateView, self).form_valid(form)
         raise PermissionDenied
 

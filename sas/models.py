@@ -65,7 +65,7 @@ class Picture(SithFile):
     def can_be_edited_by(self, user):
         perm = cache.get("%d_can_edit_pictures" % (user.id), None)
         if perm is None:
-            perm = user.is_root or user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID)
+            perm = user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
 
         cache.set("%d_can_edit_pictures" % (user.id), perm, timeout=4)
         return perm
@@ -190,10 +190,7 @@ class Album(SithFile):
         return Album.objects.filter(parent=self)
 
     def can_be_edited_by(self, user):
-        # file = SithFile.objects.filter(id=self.id).first()
-        return user.is_in_group(
-            settings.SITH_GROUP_SAS_ADMIN_ID
-        )  # or user.can_edit(file)
+        return user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
         # file = SithFile.objects.filter(id=self.id).first()

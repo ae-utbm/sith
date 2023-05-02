@@ -8,7 +8,7 @@
     {% trans %}SAS{% endtrans %}
 {% endblock %}
 
-{% set edit_mode = user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
+{% set edit_mode = user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
 
 {% macro display_album(a, checkbox) %}
     <a href="{{ url('sas:album', album_id=a.id) }}">

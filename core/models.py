@@ -23,12 +23,12 @@
 #
 #
 import importlib
+from typing import Union, Optional, List
 
-from django.db import models
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.contrib.auth.models import (
     AbstractBaseUser,
-    PermissionsMixin,
     UserManager,
     Group as AuthGroup,
     GroupManager as AuthGroupManager,
@@ -40,7 +40,7 @@ from django.core import validators
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.urls import reverse
 from django.conf import settings
-from django.db import transaction
+from django.db import models, transaction
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.utils.html import escape
 from django.utils.functional import cached_property
@@ -50,7 +50,7 @@ from core import utils
 
 from phonenumber_field.modelfields import PhoneNumberField
 
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 
 import unicodedata
 
@@ -90,14 +90,24 @@ class Group(AuthGroup):
         """
         return reverse("core:group_list")
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        cache.set(f"sith_group_{self.id}", self)
+        cache.set(f"sith_group_{self.name.replace(' ', '_')}", self)
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        cache.delete(f"sith_group_{self.id}")
+        cache.delete(f"sith_group_{self.name.replace(' ', '_')}")
+
 
 class MetaGroup(Group):
     """
     MetaGroups are dynamically created groups.
-    Generaly used with clubs where creating a club creates two groups:
+    Generally used with clubs where creating a club creates two groups:
 
-        * club-SITH_BOARD_SUFFIX
-        * club-SITH_MEMBER_SUFFIX
+    * club-SITH_BOARD_SUFFIX
+    * club-SITH_MEMBER_SUFFIX
     """
 
     #: Assign a manager in a way that MetaGroup.objects only return groups with is_meta=False
@@ -109,6 +119,32 @@ class MetaGroup(Group):
     def __init__(self, *args, **kwargs):
         super(MetaGroup, self).__init__(*args, **kwargs)
         self.is_meta = True
+
+    @cached_property
+    def associated_club(self):
+        """
+        Return the group associated with this meta group
+
+        The result of this function is cached
+
+        :return: The associated club if it exists, else None
+        :rtype: club.models.Club | None
+        """
+        from club.models import Club
+
+        if self.name.endswith(settings.SITH_BOARD_SUFFIX):
+            # replace this with str.removesuffix as soon as Python
+            # is upgraded to 3.10
+            club_name = self.name[: -len(settings.SITH_BOARD_SUFFIX)]
+        elif self.name.endswith(settings.SITH_MEMBER_SUFFIX):
+            club_name = self.name[: -len(settings.SITH_MEMBER_SUFFIX)]
+        else:
+            return None
+        club = cache.get(f"sith_club_{club_name}")
+        if club is None:
+            club = Club.objects.filter(unix_name=club_name).first()
+            cache.set(f"sith_club_{club_name}", club)
+        return club
 
 
 class RealGroup(Group):
@@ -132,6 +168,43 @@ def validate_promo(value):
             _("%(value)s is not a valid promo (between 0 and %(end)s)"),
             params={"value": value, "end": delta},
         )
+
+
+def get_group(*, pk: int = None, name: str = None) -> Optional[Group]:
+    """
+    Search for a group by its primary key or its name.
+    Either one of the two must be set.
+
+    The result is cached for the default duration (should be 5 minutes).
+
+    :param pk: The primary key of the group
+    :param name: The name of the group
+    :return: The group if it exists, else None
+    :raises ValueError: If no group matches the criteria
+    """
+    if pk is None and name is None:
+        raise ValueError("Either pk or name must be set")
+    if name is not None:
+        name = name.replace(" ", "_")  # avoid errors with memcached backend
+    pk_or_name: Union[str, int] = pk if pk is not None else name
+    group = cache.get(f"sith_group_{pk_or_name}")
+    if group == "not_found":
+        # Using None as a cache value is a little bit tricky,
+        # so we use a special string to represent None
+        return None
+    elif group is not None:
+        return group
+    # if this point is reached, the group is not in cache
+    if pk is not None:
+        group = Group.objects.filter(pk=pk).first()
+    else:
+        group = Group.objects.filter(name=name).first()
+    if group is not None:
+        cache.set(f"sith_group_{group.id}", group)
+        cache.set(f"sith_group_{group.name.replace(' ', '_')}", group)
+    else:
+        cache.set(f"sith_group_{pk_or_name}", "not_found")
+    return group
 
 
 class User(AbstractBaseUser):
@@ -295,7 +368,6 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     USERNAME_FIELD = "username"
-    # REQUIRED_FIELDS = ['email']
 
     def promo_has_logo(self):
         return utils.file_exist("./core/static/core/img/promo_%02d.png" % self.promo)
@@ -336,94 +408,72 @@ class User(AbstractBaseUser):
         else:
             return 0
 
-    _club_memberships = {}
-    _group_names = {}
-    _group_ids = {}
+    def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
+        """
+        Check if this user is in the given group.
+        Either a group id or a group name must be provided.
+        If both are passed, only the id will be considered.
 
-    def is_in_group(self, group_name):
-        """If the user is in the group passed in argument (as string or by id)"""
-        group_id = 0
-        g = None
-        if isinstance(group_name, int):  # Handle the case where group_name is an ID
-            if group_name in User._group_ids.keys():
-                g = User._group_ids[group_name]
-            else:
-                g = Group.objects.filter(id=group_name).first()
-                User._group_ids[group_name] = g
+        The group will be fetched using the given parameter.
+        If no group is found, return False.
+        If a group is found, check if this user is in the latter.
+
+        :return: True if the user is the group, else False
+        """
+        if pk is not None:
+            group: Optional[Group] = get_group(pk=pk)
+        elif name is not None:
+            group: Optional[Group] = get_group(name=name)
         else:
-            if group_name in User._group_names.keys():
-                g = User._group_names[group_name]
-            else:
-                g = Group.objects.filter(name=group_name).first()
-                User._group_names[group_name] = g
-        if g:
-            group_name = g.name
-            group_id = g.id
-        else:
+            raise ValueError("You must either provide the id or the name of the group")
+        if group is None:
             return False
-        if group_id == settings.SITH_GROUP_PUBLIC_ID:
+        if group.id == settings.SITH_GROUP_PUBLIC_ID:
             return True
-        if group_id == settings.SITH_GROUP_SUBSCRIBERS_ID:
+        if group.id == settings.SITH_GROUP_SUBSCRIBERS_ID:
             return self.is_subscribed
-        if group_id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
+        if group.id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
             return self.was_subscribed
-        if (
-            group_name == settings.SITH_MAIN_MEMBERS_GROUP
-        ):  # We check the subscription if asked
-            return self.is_subscribed
-        if group_name[-len(settings.SITH_BOARD_SUFFIX) :] == settings.SITH_BOARD_SUFFIX:
-            name = group_name[: -len(settings.SITH_BOARD_SUFFIX)]
-            if name in User._club_memberships.keys():
-                mem = User._club_memberships[name]
-            else:
-                from club.models import Club
-
-                c = Club.objects.filter(unix_name=name).first()
-                mem = c.get_membership_for(self)
-                User._club_memberships[name] = mem
-            if mem:
-                return mem.role > settings.SITH_MAXIMUM_FREE_ROLE
-            return False
-        if (
-            group_name[-len(settings.SITH_MEMBER_SUFFIX) :]
-            == settings.SITH_MEMBER_SUFFIX
-        ):
-            name = group_name[: -len(settings.SITH_MEMBER_SUFFIX)]
-            if name in User._club_memberships.keys():
-                mem = User._club_memberships[name]
-            else:
-                from club.models import Club
-
-                c = Club.objects.filter(unix_name=name).first()
-                mem = c.get_membership_for(self)
-                User._club_memberships[name] = mem
-            if mem:
+        if group.id == settings.SITH_GROUP_ROOT_ID:
+            return self.is_root
+        if group.is_meta:
+            # check if this group is associated with a club
+            group.__class__ = MetaGroup
+            club = group.associated_club
+            if club is None:
+                return False
+            membership = club.get_membership_for(self)
+            if membership is None:
+                return False
+            if group.name.endswith(settings.SITH_MEMBER_SUFFIX):
                 return True
-            return False
-        if group_id == settings.SITH_GROUP_ROOT_ID and self.is_superuser:
+            return membership.role > settings.SITH_MAXIMUM_FREE_ROLE
+        return group in self.cached_groups
+
+    @property
+    def cached_groups(self) -> List[Group]:
+        """
+        Get the list of groups this user is in.
+        The result is cached for the default duration (should be 5 minutes)
+        :return: A list of all the groups this user is in
+        """
+        groups = cache.get(f"user_{self.id}_groups")
+        if groups is None:
+            groups = list(self.groups.all())
+            cache.set(f"user_{self.id}_groups", groups)
+        return groups
+
+    @cached_property
+    def is_root(self) -> bool:
+        if self.is_superuser:
             return True
-        return group_name in self.cached_groups_names
-
-    @cached_property
-    def cached_groups_names(self):
-        return [g.name for g in self.groups.all()]
-
-    @cached_property
-    def is_root(self):
-        return (
-            self.is_superuser
-            or self.groups.filter(id=settings.SITH_GROUP_ROOT_ID).exists()
-        )
+        root_id = settings.SITH_GROUP_ROOT_ID
+        return any(g.id == root_id for g in self.cached_groups)
 
     @cached_property
     def is_board_member(self):
-        from club.models import Club
-
-        return (
-            Club.objects.filter(unix_name=settings.SITH_MAIN_CLUB["unix_name"])
-            .first()
-            .has_rights_in_club(self)
-        )
+        main_club = settings.SITH_MAIN_CLUB["unix_name"]
+        return self.is_in_group(name=main_club + settings.SITH_BOARD_SUFFIX)
 
     @cached_property
     def can_read_subscription_history(self):
@@ -434,8 +484,8 @@ class User(AbstractBaseUser):
 
         for club in Club.objects.filter(
             id__in=settings.SITH_CAN_READ_SUBSCRIPTION_HISTORY
-        ).all():
-            if club.has_rights_in_club(self):
+        ):
+            if club in self.clubs_with_rights:
                 return True
         return False
 
@@ -443,10 +493,8 @@ class User(AbstractBaseUser):
     def can_create_subscription(self):
         from club.models import Club
 
-        for club in Club.objects.filter(
-            id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS
-        ).all():
-            if club.has_rights_in_club(self):
+        for club in Club.objects.filter(id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS):
+            if club in self.clubs_with_rights:
                 return True
         return False
 
@@ -464,11 +512,11 @@ class User(AbstractBaseUser):
 
     @cached_property
     def is_banned_alcohol(self):
-        return self.is_in_group(settings.SITH_GROUP_BANNED_ALCOHOL_ID)
+        return self.is_in_group(pk=settings.SITH_GROUP_BANNED_ALCOHOL_ID)
 
     @cached_property
     def is_banned_counter(self):
-        return self.is_in_group(settings.SITH_GROUP_BANNED_COUNTER_ID)
+        return self.is_in_group(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
 
     @cached_property
     def age(self) -> int:
@@ -598,9 +646,9 @@ class User(AbstractBaseUser):
         """
         if hasattr(obj, "is_owned_by") and obj.is_owned_by(self):
             return True
-        if hasattr(obj, "owner_group") and self.is_in_group(obj.owner_group.name):
+        if hasattr(obj, "owner_group") and self.is_in_group(pk=obj.owner_group.id):
             return True
-        if self.is_superuser or self.is_in_group(settings.SITH_GROUP_ROOT_ID):
+        if self.is_root:
             return True
         return False
 
@@ -611,8 +659,8 @@ class User(AbstractBaseUser):
         if hasattr(obj, "can_be_edited_by") and obj.can_be_edited_by(self):
             return True
         if hasattr(obj, "edit_groups"):
-            for g in obj.edit_groups.all():
-                if self.is_in_group(g.name):
+            for pk in obj.edit_groups.values_list("pk", flat=True):
+                if self.is_in_group(pk=pk):
                     return True
         if isinstance(obj, User) and obj == self:
             return True
@@ -627,15 +675,15 @@ class User(AbstractBaseUser):
         if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
             return True
         if hasattr(obj, "view_groups"):
-            for g in obj.view_groups.all():
-                if self.is_in_group(g.name):
+            for pk in obj.view_groups.values_list("pk", flat=True):
+                if self.is_in_group(pk=pk):
                     return True
         if self.can_edit(obj):
             return True
         return False
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
+        return user.is_root or user.is_board_member
 
     def can_be_viewed_by(self, user):
         return (user.was_subscribed and self.is_subscriber_viewable) or user.is_root
@@ -655,10 +703,6 @@ class User(AbstractBaseUser):
             _("Profile"),
             escape(self.get_display_name()),
         )
-
-    @cached_property
-    def subscribed(self):
-        return self.is_in_group(settings.SITH_MAIN_MEMBERS_GROUP)
 
     @cached_property
     def preferences(self):
@@ -682,17 +726,16 @@ class User(AbstractBaseUser):
 
     @cached_property
     def clubs_with_rights(self):
-        return [
-            m.club.id
-            for m in self.memberships.filter(
-                models.Q(end_date__isnull=True) | models.Q(end_date__gte=timezone.now())
-            ).all()
-            if m.club.has_rights_in_club(self)
-        ]
+        """
+        :return: the list of clubs where the user has rights
+        :rtype: list[club.models.Club]
+        """
+        memberships = self.memberships.ongoing().board().select_related("club")
+        return [m.club for m in memberships]
 
     @cached_property
     def is_com_admin(self):
-        return self.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID)
+        return self.is_in_group(pk=settings.SITH_GROUP_COM_ADMIN_ID)
 
 
 class AnonymousUser(AuthAnonymousUser):
@@ -747,21 +790,18 @@ class AnonymousUser(AuthAnonymousUser):
     def favorite_topics(self):
         raise PermissionDenied
 
-    def is_in_group(self, group_name):
+    def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
         """
-        The anonymous user is only the public group
+        The anonymous user is only in the public group
         """
-        group_id = 0
-        if isinstance(group_name, int):  # Handle the case where group_name is an ID
-            g = Group.objects.filter(id=group_name).first()
-            if g:
-                group_name = g.name
-                group_id = g.id
-            else:
-                return False
-        if group_id == settings.SITH_GROUP_PUBLIC_ID:
-            return True
-        return False
+        allowed_id = settings.SITH_GROUP_PUBLIC_ID
+        if pk is not None:
+            return pk == allowed_id
+        elif name is not None:
+            group = get_group(name=name)
+            return group is not None and group.id == allowed_id
+        else:
+            raise ValueError("You must either provide the id or the name of the group")
 
     def is_owner(self, obj):
         return False
@@ -880,13 +920,13 @@ class SithFile(models.Model):
         verbose_name = _("file")
 
     def is_owned_by(self, user):
-        if hasattr(self, "profile_of") and user.is_in_group(
-            settings.SITH_MAIN_BOARD_GROUP
-        ):
+        if user.is_anonymous:
+            return False
+        if hasattr(self, "profile_of") and user.is_board_member:
             return True
-        if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID):
+        if user.is_com_admin:
             return True
-        if self.is_in_sas and user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
+        if self.is_in_sas and user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return True
         return user.id == self.owner.id
 
@@ -1493,6 +1533,8 @@ class Gift(models.Model):
         return self.label
 
     def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
         return user.is_board_member or user.is_root
 
 

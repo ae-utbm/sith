@@ -49,7 +49,7 @@
     <p>{{ form.club.errors }}<label for="{{ form.club.name }}">{{ form.club.label }}</label> {{ form.club }}</p>
     <p>{{ form.summary.errors }}<label for="{{ form.summary.name }}">{{ form.summary.label }}</label> {{ form.summary }}</p>
     <p>{{ form.content.errors }}<label for="{{ form.content.name }}">{{ form.content.label }}</label> {{ form.content }}</p>
-    {% if user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+    {% if user.is_com_admin %}
     <p>{{ form.automoderation.errors }}<label for="{{ form.automoderation.name }}">{{ form.automoderation.label }}</label>
         {{ form.automoderation }}</p>
     {% endif %}

@@ -17,7 +17,10 @@
         <a class="ib button" href="{{ url('forum:favorite_topics') }}">{% trans %}Favorite topics{% endtrans %}</a>
         {{ display_search_bar(request) }}
     </p>
-    {% if user.is_in_group(settings.SITH_GROUP_FORUM_ADMIN_ID) or user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+    {% if
+        user.is_com_admin
+        or user.is_in_group(pk=settings.SITH_GROUP_FORUM_ADMIN_ID)
+    %}
     <p>
         <a href="{{ url('forum:new_forum') }}">{% trans %}New forum{% endtrans %}</a>
     </p>

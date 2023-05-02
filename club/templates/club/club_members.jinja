@@ -13,13 +13,15 @@
         {% endif %}
         <table>
             <thead>
-                <td>{% trans %}User{% endtrans %}</td>
-                <td>{% trans %}Role{% endtrans %}</td>
-                <td>{% trans %}Description{% endtrans %}</td>
-                <td>{% trans %}Since{% endtrans %}</td>
-                {% if users_old %}
-                    <td>{% trans %}Mark as old{% endtrans %}</td>
-                {% endif %}
+                <tr>
+                    <td>{% trans %}User{% endtrans %}</td>
+                    <td>{% trans %}Role{% endtrans %}</td>
+                    <td>{% trans %}Description{% endtrans %}</td>
+                    <td>{% trans %}Since{% endtrans %}</td>
+                    {% if users_old %}
+                        <td>{% trans %}Mark as old{% endtrans %}</td>
+                    {% endif %}
+                </tr>
             </thead>
             <tbody>
             {% for m in members %}

@@ -891,7 +891,7 @@ class RefoundAccountView(FormView):
     form_class = CloseCustomerAccountForm
 
     def permission(self, user):
-        if user.is_root or user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
+        if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         else:
             raise PermissionDenied

@@ -154,7 +154,7 @@ class Subscription(models.Model):
         )
 
     def can_be_edited_by(self, user):
-        return user.is_in_group(settings.SITH_MAIN_BOARD_GROUP) or user.is_root
+        return user.is_board_member or user.is_root
 
     def is_valid_now(self):
         return self.subscription_start <= date.today() <= self.subscription_end

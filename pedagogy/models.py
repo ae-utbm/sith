@@ -147,7 +147,7 @@ class UV(models.Model):
         """
         Can be created by superuser, root or pedagogy admin user
         """
-        return user.is_in_group(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+        return user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
         """

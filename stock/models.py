@@ -52,7 +52,7 @@ class Stock(models.Model):
         return reverse("stock:list")
 
     def can_be_viewed_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+        return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
 
 class StockItem(models.Model):
@@ -93,7 +93,7 @@ class StockItem(models.Model):
         return reverse("stock:items_list", kwargs={"stock_id": self.stock_owner.id})
 
     def can_be_viewed_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+        return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
 
 class ShoppingList(models.Model):
@@ -116,7 +116,7 @@ class ShoppingList(models.Model):
         return reverse("stock:shoppinglist_list")
 
     def can_be_viewed_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+        return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
 
 class ShoppingListItem(models.Model):
@@ -154,7 +154,7 @@ class ShoppingListItem(models.Model):
         return "%s - %s" % (self.name, self.shopping_lists.first())
 
     def can_be_viewed_by(self, user):
-        return user.is_in_group(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+        return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def get_absolute_url(self):
         return reverse("stock:shoppinglist_list")

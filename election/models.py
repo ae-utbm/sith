@@ -73,16 +73,16 @@ class Election(models.Model):
         return bool(timezone.now() <= self.end_candidature)
 
     def can_candidate(self, user):
-        for group in self.candidature_groups.all():
-            if user.is_in_group(group):
+        for group_id in self.candidature_groups.values_list("pk", flat=True):
+            if user.is_in_group(pk=group_id):
                 return True
         return False
 
     def can_vote(self, user):
         if not self.is_vote_active or self.has_voted(user):
             return False
-        for group in self.vote_groups.all():
-            if user.is_in_group(group):
+        for group_id in self.vote_groups.values_list("pk", flat=True):
+            if user.is_in_group(pk=group_id):
                 return True
         return False
 
@@ -97,10 +97,9 @@ class Election(models.Model):
             results[role.title] = role.results(total_vote)
         return results
 
-    def delete(self):
-        for election_list in self.election_lists.all():
-            election_list.delete()
-        super(Election, self).delete()
+    def delete(self, *args, **kwargs):
+        self.election_lists.all().delete()
+        super(Election, self).delete(*args, **kwargs)
 
     # Permissions
 
