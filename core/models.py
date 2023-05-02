@@ -23,7 +23,7 @@
 #
 #
 import importlib
-from typing import Tuple
+from typing import Optional, Tuple
 
 from django.db import models
 from django.core.mail import send_mail
@@ -320,7 +320,7 @@ class User(AbstractBaseUser):
         return self.__dict__
 
     @cached_property
-    def last_subscription_date(self) -> date | None:
+    def last_subscription_date(self) -> Optional[date]:
         latest_subscription = (
             self.subscriptions.filter(subscription_end__lte=timezone.now())
             .order_by("-subscription_end")
