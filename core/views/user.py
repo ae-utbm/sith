@@ -321,7 +321,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
         last_album = None
         for picture in picture_qs:
             album = picture.parent
-            if album.id != last_album:
+            if album.id != last_album and album not in kwargs["albums"]:
                 kwargs["albums"].append(album)
                 kwargs["pictures"][album.id] = []
                 last_album = album.id
@@ -719,8 +719,12 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserPreferencesView, self).get_context_data(**kwargs)
-        if not hasattr(self.object, "trombi_user"):
+
+        if not (
+            hasattr(self.object, "trombi_user") and self.request.user.trombi_user.trombi
+        ):
             kwargs["trombi_form"] = UserTrombiForm()
+
         if hasattr(self.object, "customer"):
             kwargs["student_card_form"] = StudentCardForm()
         return kwargs

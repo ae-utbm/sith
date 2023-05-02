@@ -583,7 +583,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             - <str>, where the string is the code of the product
             - <int>X<str>, where the integer is the quantity and str the code
         """
-        string = parse_qs(request.body.decode())["code"][0].upper()
+        string = parse_qs(request.body.decode()).get("code", [""])[0].upper()
         if string == "FIN":
             return self.finish(request)
         elif string == "ANN":

@@ -5569,7 +5569,7 @@ msgid "German"
 msgstr "Allemant"
 
 #: sith/settings.py:449
-msgid "Spanich"
+msgid "Spanish"
 msgstr "Espagnol"
 
 #: sith/settings.py:453

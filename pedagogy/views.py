@@ -206,7 +206,9 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
         except TypeError:
             return self.model.objects.none()
 
-        return queryset.filter(id__in=([o.object.id for o in qs]))
+        return queryset.filter(
+            id__in=([o.object.id for o in qs if o.object is not None])
+        )
 
 
 class UVCommentReportCreateView(CanCreateMixin, CreateView):
