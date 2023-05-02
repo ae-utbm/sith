@@ -33,7 +33,6 @@ from sith.settings import SITH_BAR_MANAGER
 
 class ClubTest(TestCase):
     def setUp(self):
-        call_command("populate")
         self.skia = User.objects.filter(username="skia").first()
         self.rbatsbak = User.objects.filter(username="rbatsbak").first()
         self.guy = User.objects.filter(username="guy").first()
@@ -379,7 +378,6 @@ class MailingFormTest(TestCase):
     """Perform validation tests for MailingForm"""
 
     def setUp(self):
-        call_command("populate")
         self.skia = User.objects.filter(username="skia").first()
         self.rbatsbak = User.objects.filter(username="rbatsbak").first()
         self.krophil = User.objects.filter(username="krophil").first()
@@ -699,7 +697,6 @@ class ClubSellingViewTest(TestCase):
     """
 
     def setUp(self):
-        call_command("populate")
         self.ae = Club.objects.filter(unix_name="ae").first()
 
     def test_page_not_internal_error(self):

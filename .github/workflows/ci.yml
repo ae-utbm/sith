@@ -1,0 +1,43 @@
+name: Sith 3 CI
+
+on:
+  push:
+    branches:
+      - master
+      - taiste
+  pull_request:
+    branches:
+      - master
+      - taiste
+
+jobs:
+  black:
+    name: Black format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Setup Project
+        uses: ./.github/actions/setup_project
+      - run: poetry run black --check .
+
+  tests:
+    name: Run tests and generate coverage report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - uses: ./.github/actions/setup_project
+      - uses: ./.github/actions/setup_xapian
+      - uses: ./.github/actions/compile_messages
+      - name: Run tests
+        run: poetry run coverage run ./manage.py test
+      - name: Generate coverage report
+        run: |
+          poetry run coverage report
+          poetry run coverage html
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage_report

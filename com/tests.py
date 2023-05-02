@@ -26,9 +26,6 @@ from core.models import User, RealGroup
 
 
 class ComAlertTest(TestCase):
-    def setUp(self):
-        call_command("populate")
-
     def test_page_is_working(self):
         self.client.login(username="comunity", password="plop")
         response = self.client.get(reverse("com:alert_edit"))
@@ -37,9 +34,6 @@ class ComAlertTest(TestCase):
 
 
 class ComInfoTest(TestCase):
-    def setUp(self):
-        call_command("populate")
-
     def test_page_is_working(self):
         self.client.login(username="comunity", password="plop")
         response = self.client.get(reverse("com:info_edit"))
@@ -48,14 +42,16 @@ class ComInfoTest(TestCase):
 
 
 class ComTest(TestCase):
-    def setUp(self):
-        call_command("populate")
-        self.skia = User.objects.filter(username="skia").first()
-        self.com_group = RealGroup.objects.filter(
+    @classmethod
+    def setUpTestData(cls):
+        cls.skia = User.objects.filter(username="skia").first()
+        cls.com_group = RealGroup.objects.filter(
             id=settings.SITH_GROUP_COM_ADMIN_ID
         ).first()
-        self.skia.groups.set([self.com_group])
-        self.skia.save()
+        cls.skia.groups.set([cls.com_group])
+        cls.skia.save()
+
+    def setUp(self):
         self.client.login(username=self.skia.username, password="plop")
 
     def test_alert_msg(self):

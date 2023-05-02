@@ -18,6 +18,7 @@ from datetime import date, timedelta
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.timezone import localtime, now
 
 from club.models import Club
 from core.models import User, RealGroup
@@ -27,22 +28,21 @@ from subscription.models import Subscription
 
 class MergeUserTest(TestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        call_command("populate")
+    def setUpTestData(cls):
         cls.ae = Club.objects.get(unix_name="ae")
         cls.eboutic = Counter.objects.get(name="Eboutic")
         cls.barbar = Product.objects.get(code="BARB")
         cls.barbar.selling_price = 2
         cls.barbar.save()
         cls.root = User.objects.get(username="root")
+        cls.to_keep = User.objects.create(
+            username="to_keep", password="plop", email="u.1@utbm.fr"
+        )
+        cls.to_delete = User.objects.create(
+            username="to_del", password="plop", email="u.2@utbm.fr"
+        )
 
     def setUp(self) -> None:
-        super().setUp()
-        self.to_keep = User(username="to_keep", password="plop", email="u.1@utbm.fr")
-        self.to_delete = User(username="to_del", password="plop", email="u.2@utbm.fr")
-        self.to_keep.save()
-        self.to_delete.save()
         self.client.login(username="root", password="plop")
 
     def test_simple(self):

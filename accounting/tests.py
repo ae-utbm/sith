@@ -31,7 +31,6 @@ from accounting.models import (
 
 class RefoundAccountTest(TestCase):
     def setUp(self):
-        call_command("populate")
         self.skia = User.objects.filter(username="skia").first()
         # reffil skia's account
         self.skia.customer.amount = 800
@@ -73,7 +72,6 @@ class RefoundAccountTest(TestCase):
 
 class JournalTest(TestCase):
     def setUp(self):
-        call_command("populate")
         self.journal = GeneralJournal.objects.filter(id=1).first()
 
     def test_permission_granted(self):
@@ -101,7 +99,6 @@ class JournalTest(TestCase):
 
 class OperationTest(TestCase):
     def setUp(self):
-        call_command("populate")
         self.tomorrow_formatted = (date.today() + timedelta(days=1)).strftime(
             "%d/%m/%Y"
         )

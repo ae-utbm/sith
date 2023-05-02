@@ -83,12 +83,12 @@ class UVCreation(TestCase):
     Test uv creation
     """
 
-    def setUp(self):
-        call_command("populate")
-        self.bibou = User.objects.filter(username="root").first()
-        self.tutu = User.objects.filter(username="tutu").first()
-        self.sli = User.objects.filter(username="sli").first()
-        self.guy = User.objects.filter(username="guy").first()
+    @classmethod
+    def setUp(cls):
+        cls.bibou = User.objects.get(username="root")
+        cls.tutu = User.objects.get(username="tutu")
+        cls.sli = User.objects.get(username="sli")
+        cls.guy = User.objects.get(username="guy")
 
     def test_create_uv_admin_success(self):
         self.client.login(username="root", password="plop")
@@ -157,9 +157,6 @@ class UVListTest(TestCase):
     Test guide display rights
     """
 
-    def setUp(self):
-        call_command("populate")
-
     def test_uv_list_display_success(self):
         # Display for root
         self.client.login(username="root", password="plop")
@@ -191,9 +188,6 @@ class UVDeleteTest(TestCase):
     """
     Test UV deletion rights
     """
-
-    def setUp(self):
-        call_command("populate")
 
     def test_uv_delete_root_success(self):
         self.client.login(username="root", password="plop")
@@ -250,7 +244,6 @@ class UVUpdateTest(TestCase):
     """
 
     def setUp(self):
-        call_command("populate")
         self.bibou = User.objects.filter(username="root").first()
         self.tutu = User.objects.filter(username="tutu").first()
         self.uv = UV.objects.get(code="PA00")
@@ -341,13 +334,13 @@ class UVCommentCreationAndDisplay(TestCase):
     Display and creation are the same view
     """
 
-    def setUp(self):
-        call_command("populate")
-        self.bibou = User.objects.filter(username="root").first()
-        self.tutu = User.objects.filter(username="tutu").first()
-        self.sli = User.objects.filter(username="sli").first()
-        self.guy = User.objects.filter(username="guy").first()
-        self.uv = UV.objects.get(code="PA00")
+    @classmethod
+    def setUpTestData(cls):
+        cls.bibou = User.objects.get(username="root")
+        cls.tutu = User.objects.get(username="tutu")
+        cls.sli = User.objects.get(username="sli")
+        cls.guy = User.objects.get(username="guy")
+        cls.uv = UV.objects.get(code="PA00")
 
     def test_create_uv_comment_admin_success(self):
         self.client.login(username="root", password="plop")
@@ -473,7 +466,6 @@ class UVCommentDeleteTest(TestCase):
     """
 
     def setUp(self):
-        call_command("populate")
         comment_kwargs = create_uv_comment_template(
             User.objects.get(username="krophil").id
         )
@@ -533,11 +525,11 @@ class UVCommentUpdateTest(TestCase):
     Test UVComment update rights
     """
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.krophil = User.objects.get(username="krophil")
+
     def setUp(self):
-        call_command("populate")
-
-        self.krophil = User.objects.get(username="krophil")
-
         # Prepare a comment
         comment_kwargs = create_uv_comment_template(self.krophil.id)
         comment_kwargs["author"] = self.krophil
@@ -624,7 +616,6 @@ class UVSearchTest(TestCase):
     """
 
     def setUp(self):
-        call_command("populate")
         call_command("update_index", "pedagogy")
 
     def test_get_page_authorized_success(self):
@@ -794,8 +785,6 @@ class UVModerationFormTest(TestCase):
     """
 
     def setUp(self):
-        call_command("populate")
-
         self.krophil = User.objects.get(username="krophil")
 
         # Prepare a comment
@@ -1023,8 +1012,6 @@ class UVCommentReportCreateTest(TestCase):
     """
 
     def setUp(self):
-        call_command("populate")
-
         self.krophil = User.objects.get(username="krophil")
         self.tutu = User.objects.get(username="tutu")
 
