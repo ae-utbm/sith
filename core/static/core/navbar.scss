@@ -85,52 +85,6 @@ nav.navbar {
       background-color: rgba(0, 0, 0, .2);
     }
 
-    > .menu:hover > .content,
-    > .menu > .head:hover + .content,
-    > .menu > .content:hover {
-      display: flex;
-    }
-
-    > .menu {
-      display: flex;
-      position: relative;
-
-      > .content {
-        z-index: 10;
-        display: none;
-        position: absolute;
-        top: 100%;
-        background-color: white;
-        margin: 0;
-        list-style-type: none;
-        width: 130px;
-        box-shadow: 3px 3px 3px 0 #dfdfdf;
-        flex-direction: column;
-
-        @media (max-width: 500px) {
-          position: absolute;
-          flex-direction: row;
-          flex-wrap: wrap;
-          width: 100%;
-          box-shadow: inset 3px 3px 3px 0 #dfdfdf;
-        }
-
-        > li > a {
-          display: flex;
-          padding: 15px 20px;
-
-          @media (max-width: 500px) {
-            padding: 10px;
-          }
-
-          &:hover {
-            color: hsl(203, 75%, 40%);
-            background-color: rgba(0, 0, 0, .05);
-          }
-        }
-      }
-    }
-
     > .menu > .head,
     > .link {
       color: white;
