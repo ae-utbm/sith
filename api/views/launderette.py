@@ -24,7 +24,6 @@ from api.views import RightModelViewSet
 
 
 class LaunderettePlaceSerializer(serializers.ModelSerializer):
-
     machine_list = serializers.ListField(
         child=serializers.IntegerField(), read_only=True
     )

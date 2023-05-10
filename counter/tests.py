@@ -30,13 +30,13 @@ from sith.settings import SITH_MAIN_CLUB
 
 
 class CounterTest(TestCase):
-    def setUp(self):
-        call_command("populate")
-        self.skia = User.objects.filter(username="skia").first()
-        self.sli = User.objects.filter(username="sli").first()
-        self.krophil = User.objects.filter(username="krophil").first()
-        self.mde = Counter.objects.filter(name="MDE").first()
-        self.foyer = Counter.objects.get(id=2)
+    @classmethod
+    def setUpTestData(cls):
+        cls.skia = User.objects.filter(username="skia").first()
+        cls.sli = User.objects.filter(username="sli").first()
+        cls.krophil = User.objects.filter(username="krophil").first()
+        cls.mde = Counter.objects.filter(name="MDE").first()
+        cls.foyer = Counter.objects.get(id=2)
 
     def test_full_click(self):
         self.client.post(
@@ -161,9 +161,7 @@ class CounterTest(TestCase):
 
 class CounterStatsTest(TestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        call_command("populate")
+    def setUpTestData(cls):
         cls.counter = Counter.objects.filter(id=2).first()
         cls.krophil = User.objects.get(username="krophil")
         cls.skia = User.objects.get(username="skia")
@@ -171,10 +169,7 @@ class CounterStatsTest(TestCase):
         cls.root = User.objects.get(username="root")
         cls.subscriber = User.objects.get(username="subscriber")
         cls.old_subscriber = User.objects.get(username="old_subscriber")
-        cls.counter.sellers.add(cls.sli)
-        cls.counter.sellers.add(cls.root)
-        cls.counter.sellers.add(cls.skia)
-        cls.counter.sellers.add(cls.krophil)
+        cls.counter.sellers.add(cls.sli, cls.root, cls.skia, cls.krophil)
 
         barbar = Product.objects.get(code="BARB")
 
@@ -368,7 +363,7 @@ class CounterStatsTest(TestCase):
 
 class BillingInfoTest(TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpTestData(cls):
         cls.payload_1 = {
             "first_name": "Subscribed",
             "last_name": "User",
@@ -385,8 +380,6 @@ class BillingInfoTest(TestCase):
             "city": "Sète",
             "country": "FR",
         }
-        super().setUpClass()
-        call_command("populate")
 
     def test_edit_infos(self):
         user = User.objects.get(username="subscriber")
@@ -596,7 +589,6 @@ class BillingInfoTest(TestCase):
 
 class BarmanConnectionTest(TestCase):
     def setUp(self):
-        call_command("populate")
         self.krophil = User.objects.get(username="krophil")
         self.skia = User.objects.get(username="skia")
         self.skia.customer.account = 800
@@ -662,7 +654,6 @@ class StudentCardTest(TestCase):
     """
 
     def setUp(self):
-        call_command("populate")
         self.krophil = User.objects.get(username="krophil")
         self.sli = User.objects.get(username="sli")
 

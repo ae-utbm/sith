@@ -1,0 +1,53 @@
+name: "Setup project"
+description: "Setup Python and Poetry"
+runs:
+  using: composite
+  steps:
+    - name: Install apt packages
+      uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: gettext libxapian-dev libgraphviz-dev
+        version: 1.0  # increment to reset cache
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install gettext libxapian-dev libgraphviz-dev
+      shell: bash
+
+    - name: Set up python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Load cached Poetry installation
+      id: cached-poetry
+      uses: actions/cache@v3
+      with:
+        path: ~/.local
+        key: poetry-0  # increment to reset cache
+
+    - name: Install Poetry
+      if: steps.cached-poetry.outputs.cache-hit != 'true'
+      shell: bash
+      run: curl -sSL https://install.python-poetry.org | python3 -
+
+    - name: Check pyproject.toml syntax
+      shell: bash
+      run: poetry check
+
+    - name: Load cached dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    - name: Install dependencies
+      run: poetry install -E testing -E docs
+      shell: bash
+
+    - name: Compile gettext messages
+      run: poetry run ./manage.py compilemessages
+      shell: bash

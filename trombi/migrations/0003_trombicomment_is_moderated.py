@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("trombi", "0002_trombi_show_profiles")]
 
     operations = [

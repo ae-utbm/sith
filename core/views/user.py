@@ -254,10 +254,11 @@ class UserTabsMixin(TabedViewMixin):
             if user.customer and (
                 user == self.request.user
                 or self.request.user.is_in_group(
-                    settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
+                    pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
                 )
                 or self.request.user.is_in_group(
-                    settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
+                    name=settings.SITH_BAR_MANAGER["unix_name"]
+                    + settings.SITH_BOARD_SUFFIX
                 )
                 or self.request.user.is_root
             ):
@@ -320,7 +321,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
         last_album = None
         for picture in picture_qs:
             album = picture.parent
-            if album.id != last_album:
+            if album.id != last_album and album not in kwargs["albums"]:
                 kwargs["albums"].append(album)
                 kwargs["pictures"][album.id] = []
                 last_album = album.id
@@ -413,6 +414,7 @@ class UserGodfathersTreePictureView(CanViewMixin, DetailView):
             self.graph = pgv.AGraph(strict=False, directed=True)
         family = set()
         self.level = 1
+
         # Since the tree isn't very deep, we can build it recursively
         def crawl_family(user):
             if self.level > self.depth:
@@ -487,9 +489,9 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
 
         if not (
             profile == request.user
-            or request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+            or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
             or request.user.is_in_group(
-                settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
+                name=settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
             )
             or request.user.is_root
         ):
@@ -717,8 +719,12 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserPreferencesView, self).get_context_data(**kwargs)
-        if not hasattr(self.object, "trombi_user"):
+
+        if not (
+            hasattr(self.object, "trombi_user") and self.request.user.trombi_user.trombi
+        ):
             kwargs["trombi_form"] = UserTrombiForm()
+
         if hasattr(self.object, "customer"):
             kwargs["student_card_form"] = StudentCardForm()
         return kwargs
@@ -771,9 +777,9 @@ class UserAccountBase(UserTabsMixin, DetailView):
         res = super(UserAccountBase, self).dispatch(request, *arg, **kwargs)
         if (
             self.object == request.user
-            or request.user.is_in_group(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+            or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
             or request.user.is_in_group(
-                settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
+                name=settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
             )
             or request.user.is_root
         ):

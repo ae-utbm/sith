@@ -100,7 +100,6 @@ class UserIsInATrombiMixin(View):
     """
 
     def dispatch(self, request, *args, **kwargs):
-
         if not hasattr(self.request.user, "trombi_user"):
             raise Http404()
 
@@ -463,6 +462,10 @@ class UserTrombiProfileView(TrombiTabsMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
+
+        if request.user.is_anonymous:
+            raise PermissionDenied()
+
         if (
             self.object.trombi.id != request.user.trombi_user.trombi.id
             or self.object.user.id == request.user.id

@@ -82,6 +82,11 @@ class PageRevView(CanViewMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         res = super(PageRevView, self).dispatch(request, *args, **kwargs)
+        self.object = self.get_object()
+
+        if self.object is None:
+            return redirect("core:page_create", page_name=self.kwargs["page_name"])
+
         if self.object.need_club_redirection:
             return redirect(
                 "club:club_view_rev", club_id=self.object.club.id, rev_id=kwargs["rev"]

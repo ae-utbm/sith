@@ -6,7 +6,6 @@ import django.core.validators
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("core", "0002_auto_20160831_0144")]
 
     operations = [

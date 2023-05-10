@@ -35,7 +35,7 @@
         <p>{% trans %}Author: {% endtrans %}{{ user_profile_link(news.author) }}</p>
         {% if news.moderator %}
         <p>{% trans %}Moderator: {% endtrans %}{{ user_profile_link(news.moderator) }}</p>
-        {% elif user.is_in_group(settings.SITH_GROUP_COM_ADMIN_ID) %}
+        {% elif user.is_com_admin %}
         <p> <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Moderate{% endtrans %}</a></p>
         {% endif %}
         {% if user.can_edit(news) %}

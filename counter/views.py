@@ -87,8 +87,8 @@ class CounterAdminMixin(View):
     edit_club = []
 
     def _test_group(self, user):
-        for g in self.edit_group:
-            if user.is_in_group(g):
+        for grp_id in self.edit_group:
+            if user.is_in_group(pk=grp_id):
                 return True
         return False
 
@@ -486,14 +486,12 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         pid = str(pid)
         price = self.get_price(pid)
         total = self.sum_basket(request)
-        product = self.get_product(pid)
-        can_buy = False
-        if not product.buying_groups.exists():
-            can_buy = True
-        else:
-            for g in product.buying_groups.all():
-                if self.customer.user.is_in_group(g.name):
-                    can_buy = True
+        product: Product = self.get_product(pid)
+        user: User = self.customer.user
+        buying_groups = list(product.buying_groups.values_list("pk", flat=True))
+        can_buy = len(buying_groups) == 0 or any(
+            user.is_in_group(pk=group_id) for group_id in buying_groups
+        )
         if not can_buy:
             request.session["not_allowed"] = True
             return False
@@ -514,18 +512,17 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         ):
             request.session["not_allowed"] = True
             return False
-        if product.limit_age >= 18 and not self.customer.user.date_of_birth:
+        if product.limit_age >= 18 and not user.date_of_birth:
             request.session["no_age"] = True
             return False
-        if product.limit_age >= 18 and self.customer.user.is_banned_alcohol:
+        if product.limit_age >= 18 and user.is_banned_alcohol:
             request.session["not_allowed"] = True
             return False
-        if self.customer.user.is_banned_counter:
+        if user.is_banned_counter:
             request.session["not_allowed"] = True
             return False
         if (
-            self.customer.user.date_of_birth
-            and self.customer.user.get_age() < product.limit_age
+            user.date_of_birth and self.customer.user.get_age() < product.limit_age
         ):  # Check if affordable
             request.session["too_young"] = True
             return False
@@ -586,7 +583,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             - <str>, where the string is the code of the product
             - <int>X<str>, where the integer is the quantity and str the code
         """
-        string = parse_qs(request.body.decode())["code"][0].upper()
+        string = parse_qs(request.body.decode()).get("code", [""])[0].upper()
         if string == "FIN":
             return self.finish(request)
         elif string == "ANN":

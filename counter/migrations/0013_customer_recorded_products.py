@@ -37,7 +37,6 @@ def balance_ecocups(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("counter", "0012_auto_20170515_2202")]
 
     operations = [

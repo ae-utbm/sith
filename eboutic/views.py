@@ -174,8 +174,8 @@ def pay_with_sith(request):
 
 
 class EtransactionAutoAnswer(View):
-    # Response documentation http://www1.paybox.com/espace-integrateur-documentation
-    # /la-solution-paybox-system/gestion-de-la-reponse/
+    # Response documentation
+    # https://www1.paybox.com/espace-integrateur-documentation/la-solution-paybox-system/gestion-de-la-reponse/
     def get(self, request, *args, **kwargs):
         required = {"Amount", "BasketID", "Error", "Sig"}
         if not required.issubset(set(request.GET.keys())):

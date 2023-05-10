@@ -119,7 +119,7 @@
         </form>
     {% endif %}
 
-    {% if user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) %}
+    {% if user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
         <form class="add-files" id="upload_form" action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="inputs">

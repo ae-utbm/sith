@@ -39,6 +39,5 @@ class Command(compilemessages.Command):
     """
 
     def handle(self, *args, **options):
-
         os.chdir("sith")
         super(Command, self).handle(*args, **options)

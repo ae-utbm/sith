@@ -167,7 +167,6 @@ class SellingsForm(forms.Form):
     )
 
     def __init__(self, club, *args, **kwargs):
-
         super(SellingsForm, self).__init__(*args, **kwargs)
         self.fields["products"] = forms.ModelMultipleChoiceField(
             club.products.order_by("name").filter(archived=False).all(),
@@ -230,9 +229,7 @@ class ClubMemberForm(forms.Form):
                 id__in=[
                     ms.user.id
                     for ms in self.club_members
-                    if ms.can_be_edited_by(
-                        self.request_user, self.request_user_membership
-                    )
+                    if ms.can_be_edited_by(self.request_user)
                 ]
             ).all(),
             label=_("Mark as old"),

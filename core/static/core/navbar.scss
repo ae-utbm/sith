@@ -43,7 +43,7 @@ nav.navbar {
       justify-content: center;
       display: flex !important;
     }
-
+    
     > .menu,
     > .link {
       box-sizing: border-box;
@@ -67,6 +67,22 @@ nav.navbar {
           }
         }
       }
+    }
+
+    > .menu > .head,
+    > .link {
+      color: white;
+      padding: 10px 20px;
+      box-sizing: border-box;
+
+      @media (max-width: 500px) {
+        padding: 10px;
+      }
+    }
+
+    .link:hover,
+    .menu:hover {
+      background-color: rgba(0, 0, 0, .2);
     }
 
     > .menu > .head,
@@ -130,5 +146,5 @@ nav.navbar {
         }
       }
     }
-  }
+  }  
 }

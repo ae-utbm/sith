@@ -6,7 +6,6 @@ import phonenumber_field.modelfields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("accounting", "0002_auto_20160824_2152")]
 
     operations = [

@@ -110,7 +110,7 @@ class SASMainView(FormView):
         files = request.FILES.getlist("images")
         root = User.objects.filter(username="root").first()
         if request.user.is_authenticated and request.user.is_in_group(
-            settings.SITH_GROUP_SAS_ADMIN_ID
+            pk=settings.SITH_GROUP_SAS_ADMIN_ID
         ):
             if self.form.is_valid():
                 self.form.process(
@@ -151,7 +151,7 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
             try:
                 user = User.objects.filter(id=int(request.GET["remove_user"])).first()
                 if user.id == request.user.id or request.user.is_in_group(
-                    settings.SITH_GROUP_SAS_ADMIN_ID
+                    pk=settings.SITH_GROUP_SAS_ADMIN_ID
                 ):
                     PeoplePictureRelation.objects.filter(
                         user=user, picture=self.object
@@ -238,7 +238,7 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
                     owner=request.user,
                     files=files,
                     automodere=request.user.is_in_group(
-                        settings.SITH_GROUP_SAS_ADMIN_ID
+                        pk=settings.SITH_GROUP_SAS_ADMIN_ID
                     ),
                 )
                 if self.form.is_valid():
@@ -284,7 +284,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
                     owner=request.user,
                     files=files,
                     automodere=request.user.is_in_group(
-                        settings.SITH_GROUP_SAS_ADMIN_ID
+                        pk=settings.SITH_GROUP_SAS_ADMIN_ID
                     ),
                 )
                 if self.form.is_valid():
@@ -319,12 +319,12 @@ class ModerationView(TemplateView):
     template_name = "sas/moderation.jinja"
 
     def get(self, request, *args, **kwargs):
-        if request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
+        if request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return super(ModerationView, self).get(request, *args, **kwargs)
         raise PermissionDenied
 
     def post(self, request, *args, **kwargs):
-        if request.user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID):
+        if request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             try:
                 a = Album.objects.filter(id=request.POST["album_id"]).first()
                 if "moderate" in request.POST.keys():

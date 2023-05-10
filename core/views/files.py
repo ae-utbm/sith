@@ -23,7 +23,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.forms.models import modelform_factory
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from wsgiref.util import FileWrapper
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied
@@ -34,7 +34,12 @@ import os
 from ajax_select import make_ajax_field
 
 from core.models import SithFile, RealGroup, Notification
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, can_view, not_found
+from core.views import (
+    CanViewMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    can_view,
+)
 from counter.models import Counter
 
 
@@ -58,6 +63,11 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
         raise PermissionDenied
     name = f.__getattribute__(file_attr).name
     filepath = os.path.join(settings.MEDIA_ROOT, name)
+
+    # check if file exists on disk
+    if not os.path.exists(filepath.encode("utf-8")):
+        raise Http404()
+
     with open(filepath.encode("utf-8"), "rb") as filename:
         wrapper = FileWrapper(filename)
         response = HttpResponse(wrapper, content_type=f.mime_type)
@@ -152,6 +162,13 @@ class FileEditView(CanEditMixin, UpdateView):
     template_name = "core/file_edit.jinja"
     context_object_name = "file"
 
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object.can_be_managed_by(request.user):
+            raise PermissionDenied
+
+        return super(FileEditView, self).get(request, *args, **kwargs)
+
     def get_form_class(self):
         fields = ["name", "is_moderated"]
         if self.object.is_file:
@@ -196,6 +213,13 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
     template_name = "core/file_edit.jinja"
     context_object_name = "file"
     form_class = FileEditPropForm
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object.can_be_managed_by(request.user):
+            raise PermissionDenied
+
+        return super(FileEditPropView, self).get(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
         form = super(FileEditPropView, self).get_form(form_class)
@@ -269,6 +293,9 @@ class FileView(CanViewMixin, DetailView, FormMixin):
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
+        if not self.object.can_be_managed_by(request.user):
+            raise PermissionDenied
+
         if "clipboard" not in request.session.keys():
             request.session["clipboard"] = []
         return super(FileView, self).get(request, *args, **kwargs)
@@ -315,6 +342,13 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
     pk_url_kwarg = "file_id"
     template_name = "core/file_delete_confirm.jinja"
     context_object_name = "file"
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if not self.object.can_be_managed_by(request.user):
+            raise PermissionDenied
+
+        return super(FileDeleteView, self).get(request, *args, **kwargs)
 
     def get_success_url(self):
         self.object.file.delete()  # Doing it here or overloading delete() is the same, so let's do it here
