@@ -990,7 +990,7 @@ class CashRegisterSummaryItem(models.Model):
     )
     value = CurrencyField(_("value"))
     quantity = models.IntegerField(_("quantity"), default=0)
-    check = models.BooleanField(_("check"), default=False)
+    checked = models.BooleanField(_("check"), default=False)
 
     class Meta:
         verbose_name = _("cash register summary item")
@@ -998,7 +998,7 @@ class CashRegisterSummaryItem(models.Model):
 
 class Eticket(models.Model):
     """
-    Eticket can be linked to a product an allows PDF generation
+    Eticket can be linked to a product and allows PDF generation
     """
 
     product = models.OneToOneField(

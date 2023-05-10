@@ -17,6 +17,7 @@
 from django.shortcuts import redirect
 from django.http import HttpResponse, Http404
 from django.urls import reverse_lazy, reverse
+from core import MultipleFileField
 from core.views.forms import SelectDate
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import UpdateView, FormMixin, FormView
@@ -40,11 +41,7 @@ class SASForm(forms.Form):
     album_name = forms.CharField(
         label=_("Add a new album"), max_length=30, required=False
     )
-    images = forms.ImageField(
-        widget=forms.ClearableFileInput(attrs={"multiple": True}),
-        label=_("Upload images"),
-        required=False,
-    )
+    images = MultipleFileField(label=_("Upload images"), required=False)
 
     def process(self, parent, owner, files, automodere=False):
         try:

@@ -1199,35 +1199,35 @@ class CashRegisterSummaryForm(forms.Form):
                 cash_summary=summary,
                 value=cd["check_1_value"],
                 quantity=cd["check_1_quantity"],
-                check=True,
+                checked=True,
             ).save()
         if cd["check_2_quantity"]:
             CashRegisterSummaryItem(
                 cash_summary=summary,
                 value=cd["check_2_value"],
                 quantity=cd["check_2_quantity"],
-                check=True,
+                checked=True,
             ).save()
         if cd["check_3_quantity"]:
             CashRegisterSummaryItem(
                 cash_summary=summary,
                 value=cd["check_3_value"],
                 quantity=cd["check_3_quantity"],
-                check=True,
+                checked=True,
             ).save()
         if cd["check_4_quantity"]:
             CashRegisterSummaryItem(
                 cash_summary=summary,
                 value=cd["check_4_value"],
                 quantity=cd["check_4_quantity"],
-                check=True,
+                checked=True,
             ).save()
         if cd["check_5_quantity"]:
             CashRegisterSummaryItem(
                 cash_summary=summary,
                 value=cd["check_5_value"],
                 quantity=cd["check_5_quantity"],
-                check=True,
+                checked=True,
             ).save()
         if summary.items.count() < 1:
             summary.delete()

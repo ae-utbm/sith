@@ -33,6 +33,7 @@ import os
 
 from ajax_select import make_ajax_field
 
+from core import MultipleFileField
 from core.models import SithFile, RealGroup, Notification
 from core.views import (
     CanViewMixin,
@@ -83,8 +84,7 @@ class AddFilesForm(forms.Form):
     folder_name = forms.CharField(
         label=_("Add a new folder"), max_length=30, required=False
     )
-    file_field = forms.FileField(
-        widget=forms.ClearableFileInput(attrs={"multiple": True}),
+    file_field = MultipleFileField(
         label=_("Files"),
         required=False,
     )
