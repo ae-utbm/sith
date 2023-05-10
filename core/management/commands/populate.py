@@ -208,6 +208,8 @@ Welcome to the wiki page!
 
         # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
         if not options["prod"]:
+            self.now = timezone.now().replace(hour=12)
+
             # Adding user Skia
             skia = User(
                 username="skia",
@@ -914,6 +916,7 @@ Welcome to the wiki page!
             Membership(
                 user=comunity,
                 club=bar_club,
+                start_date=self.now,
                 role=settings.SITH_CLUB_ROLES_ID["Board member"],
             ).save()
             # Adding user tutu
@@ -1072,7 +1075,7 @@ Welcome to the wiki page!
             ForumTopic(forum=hall)
 
             # News
-            friday = timezone.now()
+            friday = self.now
             while friday.weekday() != 4:
                 friday += timedelta(hours=6)
             friday.replace(hour=20, minute=0, second=0)
@@ -1090,8 +1093,8 @@ Welcome to the wiki page!
             n.save()
             NewsDate(
                 news=n,
-                start_date=timezone.now() + timedelta(hours=70),
-                end_date=timezone.now() + timedelta(hours=72),
+                start_date=self.now + timedelta(hours=70),
+                end_date=self.now + timedelta(hours=72),
             ).save()
             n = News(
                 title="Repas barman",
@@ -1107,8 +1110,8 @@ Welcome to the wiki page!
             n.save()
             NewsDate(
                 news=n,
-                start_date=timezone.now() + timedelta(hours=72),
-                end_date=timezone.now() + timedelta(hours=84),
+                start_date=self.now + timedelta(hours=72),
+                end_date=self.now + timedelta(hours=84),
             ).save()
             n = News(
                 title="Repas fromager",
@@ -1123,8 +1126,8 @@ Welcome to the wiki page!
             n.save()
             NewsDate(
                 news=n,
-                start_date=timezone.now() + timedelta(hours=96),
-                end_date=timezone.now() + timedelta(hours=100),
+                start_date=self.now + timedelta(hours=96),
+                end_date=self.now + timedelta(hours=100),
             ).save()
             n = News(
                 title="SdF",
@@ -1140,7 +1143,7 @@ Welcome to the wiki page!
             NewsDate(
                 news=n,
                 start_date=friday + timedelta(hours=24 * 7 + 1),
-                end_date=timezone.now() + timedelta(hours=24 * 7 + 9),
+                end_date=self.now + timedelta(hours=24 * 7 + 9),
             ).save()
             # Weekly
             n = News(
@@ -1271,28 +1274,28 @@ Welcome to the wiki page!
                 club=troll,
                 role=9,
                 description="Padawan Troll",
-                start_date=timezone.now() - timedelta(days=17),
+                start_date=self.now - timedelta(days=17),
             ).save()
             Membership(
                 user=krophil,
                 club=troll,
                 role=10,
                 description="Maitre Troll",
-                start_date=timezone.now() - timedelta(days=200),
+                start_date=self.now - timedelta(days=200),
             ).save()
             Membership(
                 user=skia,
                 club=troll,
                 role=2,
                 description="Grand Ancien Troll",
-                start_date=timezone.now() - timedelta(days=400),
-                end_date=timezone.now() - timedelta(days=86),
+                start_date=self.now - timedelta(days=400),
+                end_date=self.now - timedelta(days=86),
             ).save()
             Membership(
                 user=richard,
                 club=troll,
                 role=2,
                 description="",
-                start_date=timezone.now() - timedelta(days=200),
-                end_date=timezone.now() - timedelta(days=100),
+                start_date=self.now - timedelta(days=200),
+                end_date=self.now - timedelta(days=100),
             ).save()
