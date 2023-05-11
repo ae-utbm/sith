@@ -498,14 +498,14 @@ files = [
 
 [[package]]
 name = "django-phonenumber-field"
-version = "6.4.0"
+version = "7.1.0"
 description = "An international phone number field for django models."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "django-phonenumber-field-6.4.0.tar.gz", hash = "sha256:72a3e7a3e7493bf2a12c07a3bc77ce89813acc16592bf04d0eee3b5a452097ed"},
-    {file = "django_phonenumber_field-6.4.0-py3-none-any.whl", hash = "sha256:a31b4f05ac0ff898661516c84940f83adb5cdcf0ae4b9b1d31bb8ad3ff345b58"},
+    {file = "django-phonenumber-field-7.1.0.tar.gz", hash = "sha256:63721dbdc7424cd594a08d80f550e790cf6e7c903cbc0fb4dd9d86baac8b8c51"},
+    {file = "django_phonenumber_field-7.1.0-py3-none-any.whl", hash = "sha256:4eaab35fe9a163046dc3a47188771385c56a788e0e11b7bbcc662e1e6b7b9104"},
 ]
 
 [package.dependencies]
@@ -1632,4 +1632,4 @@ testing = ["coverage"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "95b9a07660bd8f95a5a90cc273071a675d884424479cd1ed922438dc767d230a"
+content-hash = "07301cd45c7d81ceb43e32da6a037522d9f773bc02e3293b6a38fc5c968410f3"
