@@ -33,7 +33,6 @@ import os
 
 from ajax_select import make_ajax_field
 
-from core import MultipleFileField
 from core.models import SithFile, RealGroup, Notification
 from core.views import (
     CanViewMixin,
@@ -41,6 +40,7 @@ from core.views import (
     CanEditPropMixin,
     can_view,
 )
+from core.views.forms import MultipleFileField
 from counter.models import Counter
 
 

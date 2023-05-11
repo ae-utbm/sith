@@ -17,8 +17,6 @@
 from django.shortcuts import redirect
 from django.http import HttpResponse, Http404
 from django.urls import reverse_lazy, reverse
-from core import MultipleFileField
-from core.views.forms import SelectDate
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import UpdateView, FormMixin, FormView
 from django.utils.translation import gettext_lazy as _
@@ -32,6 +30,7 @@ from ajax_select.fields import AutoCompleteSelectMultipleField
 
 from core.views import CanViewMixin, CanEditMixin
 from core.views.files import send_file, FileView
+from core.views.forms import MultipleFileField, SelectDate
 from core.models import SithFile, User, Notification, RealGroup
 
 from sas.models import Picture, Album, PeoplePictureRelation
