@@ -185,7 +185,7 @@ def get_group(*, pk: int = None, name: str = None) -> Optional[Group]:
     if pk is None and name is None:
         raise ValueError("Either pk or name must be set")
 
-    pk_or_name: Union[str, int] = pk if pk is not None else name
+    pk_or_name: Union[str, int] = pk if pk is not None else name.replace(" ", "_")
     group = cache.get(f"sith_group_{pk_or_name}")
 
     if group == "not_found":
@@ -201,7 +201,7 @@ def get_group(*, pk: int = None, name: str = None) -> Optional[Group]:
         group = Group.objects.filter(name=name).first()
     if group is not None:
         cache.set(f"sith_group_{group.id}", group)
-        cache.set(f"sith_group_{group.name}", group)
+        cache.set(f"sith_group_{group.name.replace(' ', '_')}", group)
     else:
         cache.set(f"sith_group_{pk_or_name}", "not_found")
     return group
