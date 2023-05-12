@@ -180,14 +180,15 @@ def get_group(*, pk: int = None, name: str = None) -> Optional[Group]:
     :param pk: The primary key of the group
     :param name: The name of the group
     :return: The group if it exists, else None
-    :raises ValueError: If no group matches the criteria
+    :raise ValueError: If no group matches the criteria
     """
     if pk is None and name is None:
         raise ValueError("Either pk or name must be set")
-    if name is not None:
-        name = name.replace(" ", "_")  # avoid errors with memcached backend
-    pk_or_name: Union[str, int] = pk if pk is not None else name
+
+    # replace space characters to hide warnings with memcached backend
+    pk_or_name: Union[str, int] = pk if pk is not None else name.replace(" ", "_")
     group = cache.get(f"sith_group_{pk_or_name}")
+
     if group == "not_found":
         # Using None as a cache value is a little bit tricky,
         # so we use a special string to represent None
