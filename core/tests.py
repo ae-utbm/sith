@@ -597,11 +597,19 @@ class UserIsInGroupTest(TestCase):
         Test that when a user is removed from a group,
         the is_in_group_method return False when calling it again
         """
+        # testing with pk
         self.toto.groups.add(self.com_admin.pk)
         self.assertTrue(self.toto.is_in_group(pk=self.com_admin.pk))
 
         self.toto.groups.remove(self.com_admin.pk)
         self.assertFalse(self.toto.is_in_group(pk=self.com_admin.pk))
+
+        # testing with name
+        self.toto.groups.add(self.sas_admin.pk)
+        self.assertTrue(self.toto.is_in_group(name="SAS admin"))
+
+        self.toto.groups.remove(self.sas_admin.pk)
+        self.assertFalse(self.toto.is_in_group(name="SAS admin"))
 
     def test_not_existing_group(self):
         """
