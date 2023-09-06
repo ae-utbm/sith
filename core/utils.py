@@ -43,6 +43,7 @@ def get_git_revision_short_hash() -> str:
     except subprocess.CalledProcessError:
         return ""
 
+
 def get_start_of_semester(today=date.today()) -> date:
     """
     Determine in which semester the given date is and return the start date of
