@@ -1354,7 +1354,7 @@ class CounterStatView(DetailView, CounterAdminMixin):
 
     def get_context_data(self, **kwargs):
         """Add stats to the context"""
-        counter = self.object
+        counter: Counter = self.object
         semester_start = get_start_of_semester()
         office_hours = counter.get_top_barmen()
         kwargs = super(CounterStatView, self).get_context_data(**kwargs)

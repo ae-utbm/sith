@@ -13,6 +13,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from datetime import date, timedelta
 import json
 import re
 import string
@@ -25,7 +26,9 @@ from django.utils.timezone import timedelta
 
 from club.models import Club
 from core.models import User
+from core.utils import get_start_of_semester
 from counter.models import Counter, Customer, BillingInfo, Permanency, Selling, Product
+from django.conf import settings
 from sith.settings import SITH_MAIN_CLUB
 
 
@@ -259,6 +262,29 @@ class CounterStatsTest(TestCase):
         s.quantity = 1
         s.customer = root_customer
         s.save(allow_negative=True)
+
+    def test_get_start_of_semester(self):
+        autumn_month, autumn_day = settings.SITH_SEMESTER_START_AUTUMN
+        spring_month, spring_day = settings.SITH_SEMESTER_START_SPRING
+
+        t1_autumn_day = date(2025, 1, 1)
+        t2_autumn_day = date(2024, 9, 1)
+
+        t1_spring_day = date(2023, 3, 1)
+        t2_spring_day = date(2023, spring_month, spring_day)
+
+        self.assertTrue(
+            get_start_of_semester(t1_autumn_day) == date(2024, autumn_month, autumn_day)
+        )
+        self.assertTrue(
+            get_start_of_semester(t2_autumn_day) == date(2024, autumn_month, autumn_day)
+        )
+        self.assertTrue(
+            get_start_of_semester(t1_spring_day) == date(2023, spring_month, spring_day)
+        )
+        self.assertTrue(
+            get_start_of_semester(t2_spring_day) == date(2023, spring_month, spring_day)
+        )
 
     def test_not_authenticated_user_fail(self):
         # Test with not login user

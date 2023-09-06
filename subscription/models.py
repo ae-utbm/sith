@@ -114,12 +114,12 @@ class Subscription(models.Model):
             return "No user - " + str(self.pk)
 
     @staticmethod
-    def compute_start(d=None, duration=1, user=None):
+    def compute_start(d: date = None, duration: int = 1, user: User = None) -> date:
         """
         This function computes the start date of the subscription with respect to the given date (default is today),
-        and the start date given in settings.SITH_START_DATE.
+        and the start date given in settings.SITH_SEMESTER_START_AUTUMN.
         It takes the nearest past start date.
-        Exemples: with SITH_START_DATE = (8, 15)
+        Exemples: with SITH_SEMESTER_START_AUTUMN = (8, 15)
             Today      -> Start date
             2015-03-17 -> 2015-02-15
             2015-01-11 -> 2014-08-15
@@ -135,9 +135,9 @@ class Subscription(models.Model):
         return get_start_of_semester(d)
 
     @staticmethod
-    def compute_end(duration, start=None, user=None):
+    def compute_end(duration: int, start: date = None, user: User = None) -> date:
         """
-        This function compute the end date of the subscription given a start date and a duration in number of semestre
+        This function compute the end date of the subscription given a start date and a duration in number of semester
         Exemple:
             Start - Duration -> End date
             2015-09-18 - 1 -> 2016-03-18
@@ -153,7 +153,7 @@ class Subscription(models.Model):
             days=math.ceil((6 * duration - round(6 * duration)) * 30),
         )
 
-    def can_be_edited_by(self, user):
+    def can_be_edited_by(self, user: User):
         return user.is_board_member or user.is_root
 
     def is_valid_now(self):

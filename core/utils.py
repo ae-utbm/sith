@@ -43,32 +43,36 @@ def get_git_revision_short_hash() -> str:
     except subprocess.CalledProcessError:
         return ""
 
-
-def get_start_of_semester(today=date.today()):
+def get_start_of_semester(today=date.today()) -> date:
     """
-    This function computes the start date of the semester with respect to the given date (default is today),
-    and the start date given in settings.SITH_START_DATE.
-    It takes the nearest past start date.
-    Exemples: with SITH_START_DATE = (8, 15)
-        Today      -> Start date
-        2015-03-17 -> 2015-02-15
-        2015-01-11 -> 2014-08-15
+    Determine in which semester the given date is and return the start date of
+    the corresponding semester
+
+    Args:
+        today (date, optional): The date to test. Defaults to date.today().
+
+    Returns:
+        date: The start date of the semester where the given date belongs
+
+    Context:
+        - if the date is between 15/08 and 31/12 -> autumn semester
+        - if the date is between 01/01 and 15/02 -> autumn semester where the year is the one before of the given date
+        - else between 15/02 and 15/08 -> spring semester
     """
-    year = today.year
+    autumn_month, autumn_day = settings.SITH_SEMESTER_START_AUTUMN
+    spring_month, spring_day = settings.SITH_SEMESTER_START_SPRING
 
-    # Get the start date of the autumn semester based on settings.SITH_START_DATE
-    autumn_start = date(year, settings.SITH_START_DATE[0], settings.SITH_START_DATE[1])
-    # Get the start date of the spring semester, 6 months from autumn_start
-    spring_start = autumn_start.replace(month=(autumn_start.month + 6) % 12)
+    if today > date(today.year, autumn_month, autumn_day) and today < date(
+        today.year + 1, 1, 1
+    ):
+        return date(today.year, autumn_month, autumn_day)
 
-    # Ensure that spring_start represents the earlier semester start date
-    if autumn_start > spring_start:
-        spring_start, autumn_start = autumn_start, spring_start
+    if today >= date(today.year, 1, 1) and today < date(
+        today.year, spring_month, spring_day
+    ):
+        return date(today.year - 1, autumn_month, autumn_day)
 
-    # Determine the appropriate semester start date based on the current date
-    # If today is earlier than spring_start, return the autumn semester start date of the previous year
-    # Otherwise, return the spring semester start date of the current year
-    return autumn_start.replace(year=year - 1) if today < spring_start else spring_start
+    return date(today.year, spring_month, spring_day)
 
 
 def get_semester(d=date.today()):
