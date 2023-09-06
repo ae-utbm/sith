@@ -44,7 +44,7 @@ def get_git_revision_short_hash() -> str:
         return ""
 
 
-def get_start_of_semester(d=date.today()):
+def get_start_of_semester(today=date.today()):
     """
     This function computes the start date of the semester with respect to the given date (default is today),
     and the start date given in settings.SITH_START_DATE.
@@ -54,16 +54,21 @@ def get_start_of_semester(d=date.today()):
         2015-03-17 -> 2015-02-15
         2015-01-11 -> 2014-08-15
     """
-    today = d
     year = today.year
-    start = date(year, settings.SITH_START_DATE[0], settings.SITH_START_DATE[1])
-    start2 = start.replace(month=(start.month + 6) % 12)
-    spring, autumn = min(start, start2), max(start, start2)
-    if today > autumn:  # autumn semester
-        return autumn
-    if today > spring:  # spring semester
-        return spring
-    return autumn.replace(year=year - 1)  # autumn semester of last year
+
+    # Get the start date of the autumn semester based on settings.SITH_START_DATE
+    autumn_start = date(year, settings.SITH_START_DATE[0], settings.SITH_START_DATE[1])
+    # Get the start date of the spring semester, 6 months from autumn_start
+    spring_start = autumn_start.replace(month=(autumn_start.month + 6) % 12)
+
+    # Ensure that spring_start represents the earlier semester start date
+    if autumn_start > spring_start:
+        spring_start, autumn_start = autumn_start, spring_start
+
+    # Determine the appropriate semester start date based on the current date
+    # If today is earlier than spring_start, return the autumn semester start date of the previous year
+    # Otherwise, return the spring semester start date of the current year
+    return autumn_start.replace(year=year - 1) if today < spring_start else spring_start
 
 
 def get_semester(d=date.today()):
