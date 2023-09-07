@@ -557,7 +557,7 @@ class Counter(models.Model):
             )
             .annotate(nickname=F("customer__user__nick_name"))
             .annotate(promo=F("customer__user__promo"))
-            .values("customer__user", "name", "nickname")
+            .values("customer__user", "promo", "name", "nickname")
             .annotate(
                 selling_sum=Sum(
                     F("unit_price") * F("quantity"), output_field=CurrencyField()
