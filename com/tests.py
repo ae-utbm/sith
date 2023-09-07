@@ -164,7 +164,7 @@ class NewsTest(TestCase):
         Test that moderated news can be viewed by anyone
         and not moderated news only by com admins
         """
-        # by default a new isn't moderated
+        # by default a news isn't moderated
         self.assertTrue(self.new.can_be_viewed_by(self.com_admin))
         self.assertFalse(self.new.can_be_viewed_by(self.sli))
         self.assertFalse(self.new.can_be_viewed_by(self.anonymous))
