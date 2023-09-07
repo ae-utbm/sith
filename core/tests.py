@@ -621,25 +621,24 @@ class UserIsInGroupTest(TestCase):
 
 
 class UtilsTest(TestCase):
-    
     def test_get_semester(self):
         autumn_month, autumn_day = settings.SITH_SEMESTER_START_AUTUMN
         spring_month, spring_day = settings.SITH_SEMESTER_START_SPRING
-        
+
         t1_autumn_day = date(2025, 1, 4)  # between 1st January and 15 February
         t2_autumn_day = date(2024, 9, 1)  # between 15 August and 31 December
         t3_autumn_day = date(2024, autumn_month, autumn_day)  # on 15 August
 
         t1_spring_day = date(2023, 3, 1)  # between 15 February and 15 August
         t2_spring_day = date(2023, spring_month, spring_day)  # on 15 February
-        
+
         self.assertEqual(get_semester(t1_autumn_day), "A24")
         self.assertEqual(get_semester(t2_autumn_day), "A24")
         self.assertEqual(get_semester(t3_autumn_day), "A24")
-        
+
         self.assertEqual(get_semester(t1_spring_day), "P23")
         self.assertEqual(get_semester(t2_spring_day), "P23")
-    
+
     def test_get_start_of_semester(self):
         autumn_month, autumn_day = settings.SITH_SEMESTER_START_AUTUMN
         spring_month, spring_day = settings.SITH_SEMESTER_START_SPRING
