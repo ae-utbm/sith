@@ -327,7 +327,8 @@ SITH_CLUB_ROOT_PAGE = "clubs"
 
 # Define the date in the year serving as reference for the subscriptions calendar
 # (month, day)
-SITH_START_DATE = (8, 15)  # 15th August
+SITH_SEMESTER_START_AUTUMN = (8, 15)  # 15 August
+SITH_SEMESTER_START_SPRING = (2, 15)  # 15 February
 
 # Used to determine the valid promos
 SITH_SCHOOL_START_YEAR = 1999

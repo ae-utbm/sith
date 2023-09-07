@@ -15,17 +15,18 @@
 #
 
 import os
-from datetime import timedelta
+from datetime import date, timedelta
 
+import freezegun
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.core.management import call_command
 from django.utils.timezone import now
 
 from club.models import Membership
-from core.models import User, Group, Page, AnonymousUser
 from core.markdown import markdown
+from core.models import AnonymousUser, Group, Page, User
+from core.utils import get_semester_code, get_start_of_semester
 from sith import settings
 
 """
@@ -617,3 +618,75 @@ class UserIsInGroupTest(TestCase):
         returns False
         """
         self.assertFalse(self.skia.is_in_group(name="This doesn't exist"))
+
+
+class DateUtilsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.autumn_month = settings.SITH_SEMESTER_START_AUTUMN[0]
+        cls.autumn_day = settings.SITH_SEMESTER_START_AUTUMN[1]
+        cls.spring_month = settings.SITH_SEMESTER_START_SPRING[0]
+        cls.spring_day = settings.SITH_SEMESTER_START_SPRING[1]
+
+        cls.autumn_semester_january = date(2025, 1, 4)
+        cls.autumn_semester_september = date(2024, 9, 4)
+        cls.autumn_first_day = date(2024, cls.autumn_month, cls.autumn_day)
+
+        cls.spring_semester_march = date(2023, 3, 4)
+        cls.spring_first_day = date(2023, cls.spring_month, cls.spring_day)
+
+    def test_get_semester(self):
+        """
+        Test that the get_semester function returns the correct semester string
+        """
+        self.assertEqual(get_semester_code(self.autumn_semester_january), "A24")
+        self.assertEqual(get_semester_code(self.autumn_semester_september), "A24")
+        self.assertEqual(get_semester_code(self.autumn_first_day), "A24")
+
+        self.assertEqual(get_semester_code(self.spring_semester_march), "P23")
+        self.assertEqual(get_semester_code(self.spring_first_day), "P23")
+
+    def test_get_start_of_semester_fixed_date(self):
+        """
+        Test that the get_start_of_semester correctly the starting date of the semester.
+        """
+        automn_2024 = date(2024, self.autumn_month, self.autumn_day)
+        self.assertEqual(
+            get_start_of_semester(self.autumn_semester_january), automn_2024
+        )
+        self.assertEqual(
+            get_start_of_semester(self.autumn_semester_september), automn_2024
+        )
+        self.assertEqual(get_start_of_semester(self.autumn_first_day), automn_2024)
+
+        spring_2023 = date(2023, self.spring_month, self.spring_day)
+        self.assertEqual(get_start_of_semester(self.spring_semester_march), spring_2023)
+        self.assertEqual(get_start_of_semester(self.spring_first_day), spring_2023)
+
+    def test_get_start_of_semester_today(self):
+        """
+        Test that the get_start_of_semester returns the start of the current semester
+        when no date is given
+        """
+        with freezegun.freeze_time(self.autumn_semester_september):
+            self.assertEqual(get_start_of_semester(), self.autumn_first_day)
+
+        with freezegun.freeze_time(self.spring_semester_march):
+            self.assertEqual(get_start_of_semester(), self.spring_first_day)
+
+    def test_get_start_of_semester_changing_date(self):
+        """
+        Test that the get_start_of_semester correctly gives the starting date of the semester,
+        even when the semester changes while the server isn't restarted.
+        """
+        spring_2023 = date(2023, self.spring_month, self.spring_day)
+        autumn_2023 = date(2023, self.autumn_month, self.autumn_day)
+        mid_spring = spring_2023 + timedelta(days=45)
+        mid_autumn = autumn_2023 + timedelta(days=45)
+
+        with freezegun.freeze_time(mid_spring) as frozen_time:
+            self.assertEqual(get_start_of_semester(), spring_2023)
+
+            # forward time to the middle of the next semester
+            frozen_time.move_to(mid_autumn)
+            self.assertEqual(get_start_of_semester(), autumn_2023)

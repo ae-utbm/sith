@@ -31,7 +31,7 @@ from django.core.exceptions import ValidationError
 from datetime import timedelta, date
 
 from core.models import User
-from core.utils import get_start_of_semester, get_semester
+from core.utils import get_start_of_semester, get_semester_code
 from club.models import Club
 
 
@@ -164,14 +164,14 @@ class TrombiUser(models.Model):
             if m.description:
                 role += " (%s)" % m.description
             if m.end_date:
-                end_date = get_semester(m.end_date)
+                end_date = get_semester_code(m.end_date)
             else:
                 end_date = ""
             TrombiClubMembership(
                 user=self,
                 club=str(m.club),
                 role=role[:64],
-                start=get_semester(m.start_date),
+                start=get_semester_code(m.start_date),
                 end=end_date,
             ).save()
 
