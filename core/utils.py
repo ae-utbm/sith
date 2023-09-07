@@ -15,20 +15,19 @@
 #
 
 import os
-import subprocess
 import re
-
-# Image utils
-
-from io import BytesIO
+import subprocess
 from datetime import date
 
-from PIL import ExifTags
+# Image utils
+from io import BytesIO
+from typing import Optional
 
 import PIL
-
 from django.conf import settings
 from django.core.files.base import ContentFile
+from PIL import ExifTags
+from django.utils import timezone
 
 
 def get_git_revision_short_hash() -> str:
@@ -44,50 +43,54 @@ def get_git_revision_short_hash() -> str:
         return ""
 
 
-def get_start_of_semester(today=date.today()) -> date:
+def get_start_of_semester(today: Optional[date] = None) -> date:
     """
-    This function determines in which semester the given date falls and returns the start date of the corresponding semester.
-    If no date is given, today's date is used.
+    Return the date of the start of the semester of the given date.
+    If no date is given, return the start date of the current semester.
 
-    Parameters:
-        `today` (date, optional): The date to be tested. Defaults to `date.today()`.
+    The current semester is computed as follows:
 
-    Returns:
-        `date`: The start date of the semester to which the given date belongs.
+    - If the date is between 15/08 and 31/12  => Autumn semester.
+    - If the date is between 01/01 and 15/02  => Autumn semester of the previous year.
+    - If the date is between 15/02 and 15/08  => Spring semester
 
-    Context:
-        - If the date is between 15/08 and 31/12, it belongs to the autumn semester.
-        - If the date is between 01/01 and 15/02, it also belongs to the autumn semester, but for the year before the given date.
-        - Otherwise, if the date is between 15/02 and 15/08, it belongs to the spring semester.
+    :param today: the date to use to compute the semester. If None, use today's date.
+    :return: the date of the start of the semester
     """
-    autumn_month, autumn_day = settings.SITH_SEMESTER_START_AUTUMN
-    spring_month, spring_day = settings.SITH_SEMESTER_START_SPRING
+    if today is None:
+        today = timezone.now().date()
 
-    autumn = date(today.year, autumn_month, autumn_day)
-    spring = date(today.year, spring_month, spring_day)
+    autumn = date(today.year, *settings.SITH_SEMESTER_START_AUTUMN)
+    spring = date(today.year, *settings.SITH_SEMESTER_START_SPRING)
 
-    # between 15/08 (included) and 31/12 -> autumn semester
-    if today >= autumn:
+    if today >= autumn:  # between 15/08 (included) and 31/12 -> autumn semester
         return autumn
-
-    # between 15/02 (included) and 15/08 -> spring semester
-    if today >= spring:
+    if today >= spring:  # between 15/02 (included) and 15/08 -> spring semester
         return spring
-
-    # else : between 01/01 and 15/02 -> autumn semester where the year is the one before of the given date
+    # between 01/01 and 15/02 -> autumn semester of the previous year
     return autumn.replace(year=autumn.year - 1)
 
 
-def get_semester(d=date.today()):
+def get_semester_code(d: Optional[date] = None) -> str:
+    """
+    Return the semester code of the given date.
+    If no date is given, return the semester code of the current semester.
+
+    The semester code is an upper letter (A for autumn, P for spring),
+    followed by the last two digits of the year.
+    For example, the autumn semester of 2018 is "A18".
+
+    :param d: the date to use to compute the semester. If None, use today's date.
+    :return: the semester code corresponding to the given date
+    """
+    if d is None:
+        d = timezone.now().date()
+
     start = get_start_of_semester(d)
 
-    if (
-        start.month == settings.SITH_SEMESTER_START_AUTUMN[0]
-        and start.day == settings.SITH_SEMESTER_START_AUTUMN[1]
-    ):
+    if (start.month, start.day) == settings.SITH_SEMESTER_START_AUTUMN:
         return "A" + str(start.year)[-2:]
-    else:
-        return "P" + str(start.year)[-2:]
+    return "P" + str(start.year)[-2:]
 
 
 def file_exist(path):

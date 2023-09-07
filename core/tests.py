@@ -17,16 +17,16 @@
 import os
 from datetime import date, timedelta
 
+import freezegun
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.core.management import call_command
 from django.utils.timezone import now
 
 from club.models import Membership
-from core.models import User, Group, Page, AnonymousUser
 from core.markdown import markdown
-from core.utils import get_semester, get_start_of_semester
+from core.models import AnonymousUser, Group, Page, User
+from core.utils import get_semester_code, get_start_of_semester
 from sith import settings
 
 """
@@ -620,48 +620,73 @@ class UserIsInGroupTest(TestCase):
         self.assertFalse(self.skia.is_in_group(name="This doesn't exist"))
 
 
-class UtilsTest(TestCase):
+class DateUtilsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.autumn_month = settings.SITH_SEMESTER_START_AUTUMN[0]
+        cls.autumn_day = settings.SITH_SEMESTER_START_AUTUMN[1]
+        cls.spring_month = settings.SITH_SEMESTER_START_SPRING[0]
+        cls.spring_day = settings.SITH_SEMESTER_START_SPRING[1]
+
+        cls.autumn_semester_january = date(2025, 1, 4)
+        cls.autumn_semester_september = date(2024, 9, 4)
+        cls.autumn_first_day = date(2024, cls.autumn_month, cls.autumn_day)
+
+        cls.spring_semester_march = date(2023, 3, 4)
+        cls.spring_first_day = date(2023, cls.spring_month, cls.spring_day)
+
     def test_get_semester(self):
-        autumn_month, autumn_day = settings.SITH_SEMESTER_START_AUTUMN
-        spring_month, spring_day = settings.SITH_SEMESTER_START_SPRING
+        """
+        Test that the get_semester function returns the correct semester string
+        """
+        self.assertEqual(get_semester_code(self.autumn_semester_january), "A24")
+        self.assertEqual(get_semester_code(self.autumn_semester_september), "A24")
+        self.assertEqual(get_semester_code(self.autumn_first_day), "A24")
 
-        t1_autumn_day = date(2025, 1, 4)  # between 1st January and 15 February
-        t2_autumn_day = date(2024, 9, 1)  # between 15 August and 31 December
-        t3_autumn_day = date(2024, autumn_month, autumn_day)  # on 15 August
+        self.assertEqual(get_semester_code(self.spring_semester_march), "P23")
+        self.assertEqual(get_semester_code(self.spring_first_day), "P23")
 
-        t1_spring_day = date(2023, 3, 1)  # between 15 February and 15 August
-        t2_spring_day = date(2023, spring_month, spring_day)  # on 15 February
-
-        self.assertEqual(get_semester(t1_autumn_day), "A24")
-        self.assertEqual(get_semester(t2_autumn_day), "A24")
-        self.assertEqual(get_semester(t3_autumn_day), "A24")
-
-        self.assertEqual(get_semester(t1_spring_day), "P23")
-        self.assertEqual(get_semester(t2_spring_day), "P23")
-
-    def test_get_start_of_semester(self):
-        autumn_month, autumn_day = settings.SITH_SEMESTER_START_AUTUMN
-        spring_month, spring_day = settings.SITH_SEMESTER_START_SPRING
-
-        t1_autumn_day = date(2025, 1, 4)  # between 1st January and 15 February
-        t2_autumn_day = date(2024, 9, 1)  # between 15 August and 31 December
-        t3_autumn_day = date(2024, autumn_month, autumn_day)  # on 15 August
-
-        t1_spring_day = date(2023, 3, 1)  # between 15 February and 15 August
-        t2_spring_day = date(2023, spring_month, spring_day)  # on 15 February
-
+    def test_get_start_of_semester_fixed_date(self):
+        """
+        Test that the get_start_of_semester correctly the starting date of the semester.
+        """
+        automn_2024 = date(2024, self.autumn_month, self.autumn_day)
         self.assertEqual(
-            get_start_of_semester(t1_autumn_day), date(2024, autumn_month, autumn_day)
+            get_start_of_semester(self.autumn_semester_january), automn_2024
         )
         self.assertEqual(
-            get_start_of_semester(t2_autumn_day), date(2024, autumn_month, autumn_day)
+            get_start_of_semester(self.autumn_semester_september), automn_2024
         )
-        self.assertEqual(
-            get_start_of_semester(t3_autumn_day), date(2024, autumn_month, autumn_day)
-        )
-        self.assertEqual(
-            get_start_of_semester(t1_spring_day), date(2023, spring_month, spring_day)
-        )
-        self.assertEqual(
-            get_start_of_semester(t2_spring_day), date(2023, spring_month, spring_day)
-        )
+        self.assertEqual(get_start_of_semester(self.autumn_first_day), automn_2024)
+
+        spring_2023 = date(2023, self.spring_month, self.spring_day)
+        self.assertEqual(get_start_of_semester(self.spring_semester_march), spring_2023)
+        self.assertEqual(get_start_of_semester(self.spring_first_day), spring_2023)
+
+    def test_get_start_of_semester_today(self):
+        """
+        Test that the get_start_of_semester returns the start of the current semester
+        when no date is given
+        """
+        with freezegun.freeze_time(self.autumn_semester_september):
+            self.assertEqual(get_start_of_semester(), self.autumn_first_day)
+
+        with freezegun.freeze_time(self.spring_semester_march):
+            self.assertEqual(get_start_of_semester(), self.spring_first_day)
+
+    def test_get_start_of_semester_changing_date(self):
+        """
+        Test that the get_start_of_semester correctly gives the starting date of the semester,
+        even when the semester changes while the server isn't restarted.
+        """
+        spring_2023 = date(2023, self.spring_month, self.spring_day)
+        autumn_2023 = date(2023, self.autumn_month, self.autumn_day)
+        mid_spring = spring_2023 + timedelta(days=45)
+        mid_autumn = autumn_2023 + timedelta(days=45)
+
+        with freezegun.freeze_time(mid_spring) as frozen_time:
+            self.assertEqual(get_start_of_semester(), spring_2023)
+
+            # forward time to the middle of the next semester
+            frozen_time.move_to(mid_autumn)
+            self.assertEqual(get_start_of_semester(), autumn_2023)

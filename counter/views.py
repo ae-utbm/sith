@@ -48,7 +48,7 @@ import pytz
 from datetime import timedelta, datetime
 from http import HTTPStatus
 
-from core.utils import get_start_of_semester
+from core.utils import get_start_of_semester, get_semester_code
 from core.views import CanViewMixin, TabedViewMixin, CanEditMixin
 from core.views.forms import LoginForm
 from core.models import User
@@ -1361,6 +1361,7 @@ class CounterStatView(DetailView, CounterAdminMixin):
         kwargs.update(
             {
                 "counter": counter,
+                "current_semester": get_semester_code(),
                 "total_sellings": counter.get_total_sales(since=semester_start),
                 "top_customers": counter.get_top_customers(since=semester_start)[:100],
                 "top_barman": office_hours[:100],

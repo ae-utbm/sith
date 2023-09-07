@@ -15,7 +15,7 @@
 #
 from __future__ import annotations
 
-from typing import Tuple
+from typing import Tuple, Optional
 
 from django.db import models
 from django.db.models import F, Value, Sum, QuerySet, OuterRef, Exists
@@ -536,10 +536,7 @@ class Counter(models.Model):
             .order_by("-perm_sum")
         )
 
-    def get_stats_starting_date(self) -> date:
-        return get_start_of_semester()
-
-    def get_top_customers(self, since=get_start_of_semester()) -> QuerySet:
+    def get_top_customers(self, since: Optional[date] = None) -> QuerySet:
         """
         Return a QuerySet querying the money spent by customers of this counter
         since the specified date, ordered by descending amount of money spent.
@@ -549,6 +546,8 @@ class Counter(models.Model):
             - the nickname of the customer
             - the amount of money spent by the customer
         """
+        if since is None:
+            since = get_start_of_semester()
         return (
             self.sellings.filter(date__gte=since)
             .annotate(
@@ -571,15 +570,17 @@ class Counter(models.Model):
             .order_by("-selling_sum")
         )
 
-    def get_total_sales(self, since=get_start_of_semester()) -> CurrencyField:
+    def get_total_sales(self, since=None) -> CurrencyField:
         """
         Compute and return the total turnover of this counter
         since the date specified in parameter (by default, since the start of the current
         semester)
         :param since: timestamp from which to perform the calculation
-        :type since: datetime | date
+        :type since: datetime | date | None
         :return: Total revenue earned at this counter
         """
+        if since is None:
+            since = get_start_of_semester()
         if isinstance(since, date):
             since = datetime.combine(since, datetime.min.time())
         total = self.sellings.filter(date__gte=since).aggregate(
