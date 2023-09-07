@@ -11,7 +11,7 @@
 
 {% block content %}
     <h3>{% trans counter_name=counter %}{{ counter_name }} stats{% endtrans %}</h3>
-    <h4>{% trans counter_name=counter.name %}Top 100 {{ counter_name }}{% endtrans %}</h4>
+    <h4>{% trans counter_name=counter.name %}Top 100 {{ counter_name }}{% endtrans %} ({{ counter.get_stats_starting_date() }})</h4>
     <table>
         <thead>
         <tr>
@@ -35,7 +35,7 @@
         </tbody>
     </table>
 
-    <h4>{% trans counter_name=counter.name %}Top 100 barman {{ counter_name }}{% endtrans %}</h4>
+    <h4>{% trans counter_name=counter.name %}Top 100 barman {{ counter_name }}{% endtrans %} ({{ counter.get_stats_starting_date() }})</h4>
     <table>
         <thead>
         <tr>

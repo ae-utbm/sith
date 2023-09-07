@@ -535,6 +535,9 @@ class Counter(models.Model):
             .exclude(perm_sum=None)
             .order_by("-perm_sum")
         )
+        
+    def get_stats_starting_date(self) -> date:
+        return get_start_of_semester()
 
     def get_top_customers(self, since=get_start_of_semester()) -> QuerySet:
         """
