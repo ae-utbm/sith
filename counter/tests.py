@@ -323,42 +323,49 @@ class CounterStatsTest(TestCase):
         Test the result of Counter.get_top_customers() is correct
         """
         top = iter(self.counter.get_top_customers())
-        self.assertEqual(
-            next(top),
+        expected_results = [
             {
-                "customer__user": self.sli.id,
+                "user": self.sli.id,
                 "name": f"{self.sli.first_name} {self.sli.last_name}",
+                "promo": self.sli.promo,
                 "nickname": self.sli.nick_name,
                 "selling_sum": 2000,
             },
-        )
-        self.assertEqual(
-            next(top),
             {
-                "customer__user": self.skia.id,
+                "user": self.skia.id,
                 "name": f"{self.skia.first_name} {self.skia.last_name}",
+                "promo": self.skia.promo,
                 "nickname": self.skia.nick_name,
                 "selling_sum": 1000,
             },
-        )
-        self.assertEqual(
-            next(top),
             {
-                "customer__user": self.krophil.id,
+                "user": self.krophil.id,
                 "name": f"{self.krophil.first_name} {self.krophil.last_name}",
+                "promo": self.krophil.promo,
                 "nickname": self.krophil.nick_name,
                 "selling_sum": 100,
             },
-        )
-        self.assertEqual(
-            next(top),
             {
-                "customer__user": self.root.id,
+                "user": self.root.id,
                 "name": f"{self.root.first_name} {self.root.last_name}",
+                "promo": self.root.promo,
                 "nickname": self.root.nick_name,
                 "selling_sum": 2,
             },
-        )
+        ]
+
+        for result in expected_results:
+            self.assertEqual(
+                next(top),
+                {
+                    "user": result["user"],
+                    "name": result["name"],
+                    "promo": result["promo"],
+                    "nickname": result["nickname"],
+                    "selling_sum": result["selling_sum"],
+                },
+            )
+
         self.assertIsNone(next(top, None))
 
 
