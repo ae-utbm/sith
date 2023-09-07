@@ -80,10 +80,14 @@ def get_start_of_semester(today=date.today()) -> date:
 
 def get_semester(d=date.today()):
     start = get_start_of_semester(d)
-    if start.month <= 6:
-        return "P" + str(start.year)[-2:]
-    else:
+
+    if (
+        start.month == settings.SITH_SEMESTER_START_AUTUMN[0]
+        and start.day == settings.SITH_SEMESTER_START_AUTUMN[1]
+    ):
         return "A" + str(start.year)[-2:]
+    else:
+        return "P" + str(start.year)[-2:]
 
 
 def file_exist(path):
