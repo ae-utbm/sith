@@ -15,7 +15,7 @@
 #
 
 import os
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.core.cache import cache
 from django.test import Client, TestCase
@@ -26,6 +26,7 @@ from django.utils.timezone import now
 from club.models import Membership
 from core.models import User, Group, Page, AnonymousUser
 from core.markdown import markdown
+from core.utils import get_start_of_semester
 from sith import settings
 
 """
@@ -617,3 +618,28 @@ class UserIsInGroupTest(TestCase):
         returns False
         """
         self.assertFalse(self.skia.is_in_group(name="This doesn't exist"))
+
+
+class UtilsTest(TestCase):
+    def test_get_start_of_semester(self):
+        autumn_month, autumn_day = settings.SITH_SEMESTER_START_AUTUMN
+        spring_month, spring_day = settings.SITH_SEMESTER_START_SPRING
+
+        t1_autumn_day = date(2025, 1, 1)
+        t2_autumn_day = date(2024, 9, 1)
+
+        t1_spring_day = date(2023, 3, 1)
+        t2_spring_day = date(2023, spring_month, spring_day)
+
+        self.assertEqual(
+            get_start_of_semester(t1_autumn_day), date(2024, autumn_month, autumn_day)
+        )
+        self.assertEqual(
+            get_start_of_semester(t2_autumn_day), date(2024, autumn_month, autumn_day)
+        )
+        self.assertEqual(
+            get_start_of_semester(t1_spring_day), date(2023, spring_month, spring_day)
+        )
+        self.assertEqual(
+            get_start_of_semester(t2_spring_day), date(2023, spring_month, spring_day)
+        )
