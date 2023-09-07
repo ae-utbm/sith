@@ -46,34 +46,36 @@ def get_git_revision_short_hash() -> str:
 
 def get_start_of_semester(today=date.today()) -> date:
     """
-    Determine in which semester the given date is and return the start date of
-    the corresponding semester
+    This function determines in which semester the given date falls and returns the start date of the corresponding semester.
+    If no date is given, today's date is used.
 
-    Args:
-        today (date, optional): The date to test. Defaults to date.today().
+    Parameters:
+        `today` (date, optional): The date to be tested. Defaults to `date.today()`.
 
     Returns:
-        date: The start date of the semester where the given date belongs
+        `date`: The start date of the semester to which the given date belongs.
 
     Context:
-        - if the date is between 15/08 and 31/12 -> autumn semester
-        - if the date is between 01/01 and 15/02 -> autumn semester where the year is the one before of the given date
-        - else between 15/02 and 15/08 -> spring semester
+        - If the date is between 15/08 and 31/12, it belongs to the autumn semester.
+        - If the date is between 01/01 and 15/02, it also belongs to the autumn semester, but for the year before the given date.
+        - Otherwise, if the date is between 15/02 and 15/08, it belongs to the spring semester.
     """
     autumn_month, autumn_day = settings.SITH_SEMESTER_START_AUTUMN
     spring_month, spring_day = settings.SITH_SEMESTER_START_SPRING
 
-    if today > date(today.year, autumn_month, autumn_day) and today < date(
-        today.year + 1, 1, 1
-    ):
-        return date(today.year, autumn_month, autumn_day)
+    autumn = date(today.year, autumn_month, autumn_day)
+    spring = date(today.year, spring_month, spring_day)
 
-    if today >= date(today.year, 1, 1) and today < date(
-        today.year, spring_month, spring_day
-    ):
-        return date(today.year - 1, autumn_month, autumn_day)
+    # between 15/08 (included) and 31/12 -> autumn semester
+    if today >= autumn:
+        return autumn
 
-    return date(today.year, spring_month, spring_day)
+    # between 15/02 (included) and 15/08 -> spring semester
+    if today >= spring:
+        return spring
+
+    # else : between 01/01 and 15/02 -> autumn semester where the year is the one before of the given date
+    return autumn.replace(year=autumn.year - 1)
 
 
 def get_semester(d=date.today()):
