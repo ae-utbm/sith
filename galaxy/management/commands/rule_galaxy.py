@@ -21,6 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import warnings
 
 from django.core.management.base import BaseCommand
 from django.db import connection
@@ -41,19 +42,21 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         logger = logging.getLogger("main")
-        if options["verbosity"] > 1:
+        if options["verbosity"] < 0 or 2 < options["verbosity"]:
+            warnings.warn("verbosity level should be between 0 and 2 included")
+
+        if options["verbosity"] == 2:
             logger.setLevel(logging.DEBUG)
-        elif options["verbosity"] > 0:
+        elif options["verbosity"] == 1:
             logger.setLevel(logging.INFO)
         else:
-            logger.setLevel(logging.NOTSET)
+            logger.setLevel(logging.ERROR)
 
         logger.info("The Galaxy is being ruled by the Sith.")
-        Galaxy.rule()
-        logger.info(
-            "Caching current Galaxy state for a quicker display of the Empire's power."
-        )
-        Galaxy.make_state()
+        galaxy = Galaxy.objects.create()
+        galaxy.rule()
+        logger.info("Sending old galaxies' remains to garbage.")
+        Galaxy.objects.filter(state__isnull=True).delete()
 
         logger.info("Ruled the galaxy in {} queries.".format(len(connection.queries)))
         if options["verbosity"] > 2:

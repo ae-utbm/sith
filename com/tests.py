@@ -159,6 +159,33 @@ class NewsTest(TestCase):
         self.assertFalse(self.new.is_owned_by(self.anonymous))
         self.assertFalse(self.new.is_owned_by(self.sli))
 
+    def test_news_viewer(self):
+        """
+        Test that moderated news can be viewed by anyone
+        and not moderated news only by com admins
+        """
+        # by default a news isn't moderated
+        self.assertTrue(self.new.can_be_viewed_by(self.com_admin))
+        self.assertFalse(self.new.can_be_viewed_by(self.sli))
+        self.assertFalse(self.new.can_be_viewed_by(self.anonymous))
+        self.assertFalse(self.new.can_be_viewed_by(self.author))
+
+        self.new.is_moderated = True
+        self.new.save()
+        self.assertTrue(self.new.can_be_viewed_by(self.com_admin))
+        self.assertTrue(self.new.can_be_viewed_by(self.sli))
+        self.assertTrue(self.new.can_be_viewed_by(self.anonymous))
+        self.assertTrue(self.new.can_be_viewed_by(self.author))
+
+    def test_news_editor(self):
+        """
+        Test that only com admins can edit news
+        """
+        self.assertTrue(self.new.can_be_edited_by(self.com_admin))
+        self.assertFalse(self.new.can_be_edited_by(self.sli))
+        self.assertFalse(self.new.can_be_edited_by(self.anonymous))
+        self.assertFalse(self.new.can_be_edited_by(self.author))
+
 
 class WeekmailArticleTest(TestCase):
     @classmethod

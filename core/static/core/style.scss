@@ -1031,7 +1031,7 @@ thead {
 }
 
 tbody > tr {
-  &:nth-child(even) {
+  &:nth-child(even):not(.highlight) {
     background: $primary-neutral-light-color;
   }
   &.clickable:hover {

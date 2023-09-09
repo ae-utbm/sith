@@ -810,6 +810,10 @@ class AnonymousUser(AuthAnonymousUser):
     def can_edit(self, obj):
         return False
 
+    @property
+    def is_com_admin(self):
+        return False
+
     def can_view(self, obj):
         if (
             hasattr(obj, "view_groups")

@@ -48,7 +48,7 @@ import pytz
 from datetime import timedelta, datetime
 from http import HTTPStatus
 
-from core.utils import get_start_of_semester
+from core.utils import get_start_of_semester, get_semester_code
 from core.views import CanViewMixin, TabedViewMixin, CanEditMixin
 from core.views.forms import LoginForm
 from core.models import User
@@ -1354,13 +1354,14 @@ class CounterStatView(DetailView, CounterAdminMixin):
 
     def get_context_data(self, **kwargs):
         """Add stats to the context"""
-        counter = self.object
+        counter: Counter = self.object
         semester_start = get_start_of_semester()
         office_hours = counter.get_top_barmen()
         kwargs = super(CounterStatView, self).get_context_data(**kwargs)
         kwargs.update(
             {
                 "counter": counter,
+                "current_semester": get_semester_code(),
                 "total_sellings": counter.get_total_sales(since=semester_start),
                 "top_customers": counter.get_top_customers(since=semester_start)[:100],
                 "top_barman": office_hours[:100],
