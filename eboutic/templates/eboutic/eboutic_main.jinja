@@ -90,6 +90,24 @@
                 </div>
             {% endif %}
 
+            <section>
+                <div class="category-header">
+                    <h3>Partenariat Eurockéenes</h3>
+                    <br>
+                    {% if user.is_subscribed %}
+                        <a title="Logiciel billetterie en ligne"
+                            href="https://widget.weezevent.com/ticket/6e2917c4-03bf-42b4-aebb-27ee8353b022?id_evenement=1013910&locale=fr-FR&code=11855"
+                            class="weezevent-widget-integration" target="_blank"
+                            data-src="https://widget.weezevent.com/ticket/6e2917c4-03bf-42b4-aebb-27ee8353b022?id_evenement=1013910&locale=fr-FR&code=11855"
+                            data-width="650" data-height="600" data-resize="1" data-nopb="0" data-type="neo" data-width_auto="1"
+                            data-noscroll="0" data-id="1013910">Billetterie Weezevent</a>
+                        <script type="text/javascript" src="https://widget.weezevent.com/weez.js" async defer></script>
+                    {% else %}
+                        <div>Vous devez être cotisant pour accéder à la billeterie des Eurockéennes</div>
+                    {% endif %}
+                </div>
+            </section>
+
             {% for priority_groups in products|groupby('priority')|reverse %}
                 {% for category, items in priority_groups.list|groupby('category') %}
                     {% if items|count > 0 %}
