@@ -2,13 +2,9 @@ name: Sith 3 CI
 
 on:
   push:
-    branches:
-      - master
-      - taiste
+    branches: [master, taiste, refs/heads/master, refs/heads/taiste]
   pull_request:
-    branches:
-      - master
-      - taiste
+    branches: [master, taiste, refs/heads/master, refs/heads/taiste]
 
 jobs:
   black:

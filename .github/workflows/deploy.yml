@@ -3,7 +3,7 @@ concurrency: production
 
 on:
   push:
-    branches: [master]
+    branches: [master, refs/heads/master]
   workflow_dispatch:
 
 jobs:

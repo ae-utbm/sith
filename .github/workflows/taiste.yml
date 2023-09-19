@@ -2,7 +2,8 @@ name: Sith3 taiste
 
 on:
   push:
-    branches: [ taiste ]
+    branches: [taiste, refs/heads/taiste]
+  workflow_dispatch:
 
 jobs:
   deployment:
