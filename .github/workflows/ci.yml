@@ -2,13 +2,10 @@ name: Sith 3 CI
 
 on:
   push:
-    branches:
-      - master
-      - taiste
+    branches: [master, taiste]
   pull_request:
-    branches:
-      - master
-      - taiste
+    branches: [master, taiste]
+  workflow_dispatch:
 
 jobs:
   black:
