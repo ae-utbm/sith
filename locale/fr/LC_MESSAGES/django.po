@@ -2440,33 +2440,17 @@ msgstr "Accueil"
 msgid "Associations & Clubs"
 msgstr "Associations & Clubs"
 
-#: core/templates/core/base.jinja:173
+#: core/templates/core/base.jinja:204
 msgid "AE"
 msgstr "L'AE"
 
-#: core/templates/core/base.jinja:174
+#: core/templates/core/base.jinja:205
 msgid "AE's clubs"
 msgstr "Les clubs de L'AE"
 
-#: core/templates/core/base.jinja:175
-msgid "BdF"
-msgstr "Le BdF"
-
-#: core/templates/core/base.jinja:176
-msgid "BDS"
-msgstr "Le BDS"
-
-#: core/templates/core/base.jinja:177
-msgid "CETU"
-msgstr "Le CETU"
-
-#: core/templates/core/base.jinja:178
-msgid "Doceo"
-msgstr "Doceo"
-
-#: core/templates/core/base.jinja:179
-msgid "Positions"
-msgstr "Postes à pourvoir"
+#: core/templates/core/base.jinja:206
+msgid "Others UTBM's Associations"
+msgstr "Les autres associations de l'UTBM"
 
 #: core/templates/core/base.jinja:187 core/templates/core/user_tools.jinja:118
 msgid "Elections"
