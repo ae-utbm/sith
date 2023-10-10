@@ -21,7 +21,7 @@
 {% block content %}
 <h3>{% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}</h3>
     <div>
-        <h3>{% trans %}Sellings{% endtrans %}</h3>
+        <h3>{% trans %}Sales{% endtrans %}</h3>
         {% if last_basket %}
         <h4>{% trans %}Last selling: {% endtrans %}</h4>
         <p>{% trans %}Client: {% endtrans %}{{ last_customer }} - {% trans %}New amount: {% endtrans %}{{ new_customer_amount }} €.</p>

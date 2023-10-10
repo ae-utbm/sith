@@ -41,11 +41,11 @@
 {% set refilled = customer.refillings.exists() %}
 {% if bought or refilled %}
     {% if bought %}
-    <h5>{% trans %}Account buyings{% endtrans %}</h5>
+    <h5>{% trans %}Account purchases{% endtrans %}</h5>
         {{ monthly(buyings_month) }}
     {% endif %}
     {% if refilled %}
-    <h5>{% trans %}Refillings{% endtrans %}</h5>
+    <h5>{% trans %}Reloads{% endtrans %}</h5>
         {{ monthly(refilling_month) }}
     {% endif %}
 {% endif %}
