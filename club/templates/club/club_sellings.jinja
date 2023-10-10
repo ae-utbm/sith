@@ -2,7 +2,7 @@
 {% from 'core/macros.jinja' import user_profile_link, paginate %}
 
 {% block content %}
-<h3>{% trans %}Sellings{% endtrans %}</h3>
+<h3>{% trans %}Sales{% endtrans %}</h3>
 <form id="form" action="?page=1" method="post">
     {% csrf_token %}
     {{ form }}
