@@ -1,11 +1,11 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Edit UV{% endtrans %}
+{% trans %}Edit UE{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h2>{% trans %}Edit UV{% endtrans %}</h2>
+<h2>{% trans %}Edit UE{% endtrans %}</h2>
 <form action="" method="post" enctype="multipart/form-data" id="uv_edit">
     {% csrf_token %}
     {{ form.non_field_errors() }}
@@ -59,7 +59,7 @@
                 url: url,
                 success: function(data, _, xhr) {
                     if (xhr.status != 200) {
-                        createQuickNotif("{% trans %}Unknown UV code{% endtrans %}")
+                        createQuickNotif("{% trans %}Unknown UE code{% endtrans %}")
                         return
                     }
                     for (let key in data) {
@@ -77,7 +77,7 @@
                     createQuickNotif('{% trans %}Successful autocomplete{% endtrans %}')
                 },
                 error: function(_, _, statusMessage) {
-                    createQuickNotif('{% trans %}An error occured: {% endtrans %}' + statusMessage)
+                    createQuickNotif('{% trans %}An error occurred: {% endtrans %}' + statusMessage)
                 },
             })
         })

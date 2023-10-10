@@ -39,7 +39,7 @@
         <p> <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Moderate{% endtrans %}</a></p>
         {% endif %}
         {% if user.can_edit(news) %}
-        <p> <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit (will be remoderated){% endtrans %}</a></p>
+        <p> <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit (will be moderated again){% endtrans %}</a></p>
         {% endif %}
         </div>
         </div>

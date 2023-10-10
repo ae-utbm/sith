@@ -17,7 +17,7 @@
 
     {% if user_registered %}
         {% trans user_name=user_registered.get_display_name() %}Welcome {{ user_name }}!{% endtrans %}<br>
-        {% trans %}You successfully registred and you will soon receive a confirmation mail.{% endtrans %}<br>
+        {% trans %}You successfully registered and you will soon receive a confirmation mail.{% endtrans %}<br>
         {% trans username=user_registered.username %}Your username is {{ username }}.{% endtrans %}<br>
     
     {% else %}

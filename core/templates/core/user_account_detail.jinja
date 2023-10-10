@@ -10,7 +10,7 @@
 <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 <p><a href="{{ url('core:user_account', user_id=profile.id) }}">{% trans %}Back{% endtrans %}</a></p>
 {% if customer.buyings.exists() %}
-<h4>{% trans %}Account buyings{% endtrans %}</h4>
+<h4>{% trans %}Account purchases{% endtrans %}</h4>
 <table>
     <thead>
         <tr>
@@ -43,7 +43,7 @@
 </table>
 {% endif %}
 {% if customer.refillings.exists() %}
-<h4>{% trans %}Refillings{% endtrans %}</h4>
+<h4>{% trans %}Reloads{% endtrans %}</h4>
 <table>
     <thead>
         <tr>
