@@ -2764,7 +2764,7 @@ msgstr "Cotisant jusqu'au %(subscription_end)s"
 
 #: core/templates/core/macros.jinja:86 core/templates/core/user_edit.jinja:40
 msgid "Account number: "
-msgstr "Numero de compte : "
+msgstr "Numéro de compte : "
 
 #: core/templates/core/macros.jinja:91 launderette/models.py:217
 msgid "Slot"
