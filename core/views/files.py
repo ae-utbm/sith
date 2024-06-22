@@ -79,12 +79,37 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
         return response
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class _MultipleFieldMixin:
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = [single_file_clean(data, initial)]
+        return result
+
+
+class MultipleFileField(_MultipleFieldMixin, forms.FileField):
+    ...
+
+
+class MultipleImageField(_MultipleFieldMixin, forms.ImageField):
+    ...
+
+
 class AddFilesForm(forms.Form):
     folder_name = forms.CharField(
         label=_("Add a new folder"), max_length=30, required=False
     )
-    file_field = forms.FileField(
-        widget=forms.ClearableFileInput(attrs={"multiple": True}),
+    file_field = MultipleFileField(
         label=_("Files"),
         required=False,
     )

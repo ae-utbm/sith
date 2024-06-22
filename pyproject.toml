@@ -20,7 +20,7 @@ homepage = "https://ae.utbm.fr/"
 license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
-python = "^3.10,<3.12"
+python = "^3.10,<3.12" # Version is held back by mistune
 Django = "^3.2"
 Pillow = "^9.2"
 mistune = "^0.8.4"
