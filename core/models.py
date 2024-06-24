@@ -698,9 +698,11 @@ class User(AbstractBaseUser):
     <em>%s</em>
     </a>
     """ % (
-            self.profile_pict.get_download_url()
-            if self.profile_pict
-            else staticfiles_storage.url("core/img/unknown.jpg"),
+            (
+                self.profile_pict.get_download_url()
+                if self.profile_pict
+                else staticfiles_storage.url("core/img/unknown.jpg")
+            ),
             _("Profile"),
             escape(self.get_display_name()),
         )

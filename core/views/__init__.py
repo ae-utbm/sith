@@ -314,9 +314,8 @@ class QuickNotifMixin:
     quick_notif_list = []
 
     def dispatch(self, request, *arg, **kwargs):
-        self.quick_notif_list = (
-            []
-        )  # In some cases, the class can stay instanciated, so we need to reset the list
+        # In some cases, the class can stay instanciated, so we need to reset the list
+        self.quick_notif_list = []
         return super(QuickNotifMixin, self).dispatch(request, *arg, **kwargs)
 
     def get_success_url(self):

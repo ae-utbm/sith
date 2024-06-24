@@ -23,9 +23,9 @@
 #
 
 """
-    This page is useful for custom migration tricks.
-    Sometimes, when you need to have a migration hack and you think it can be
-    useful again, put it there, we never know if we might need the hack again.
+This page is useful for custom migration tricks.
+Sometimes, when you need to have a migration hack and you think it can be
+useful again, put it there, we never know if we might need the hack again.
 """
 
 from django.db import connection, migrations

@@ -114,9 +114,7 @@ class EbouticTest(TestCase):
 
     def test_submit_basket(self):
         self.client.login(username="subscriber", password="plop")
-        self.client.cookies[
-            "basket_items"
-        ] = """[
+        self.client.cookies["basket_items"] = """[
             {"id": 2, "name": "Cotis 2 semestres", "quantity": 1, "unit_price": 28},
             {"id": 4, "name": "Barbar", "quantity": 3, "unit_price": 1.7}
         ]"""
@@ -150,9 +148,7 @@ class EbouticTest(TestCase):
     def test_submit_invalid_basket(self):
         self.client.login(username="subscriber", password="plop")
         max_id = Product.objects.aggregate(res=Max("id"))["res"]
-        self.client.cookies[
-            "basket_items"
-        ] = f"""[
+        self.client.cookies["basket_items"] = f"""[
             {{"id": {max_id + 1}, "name": "", "quantity": 1, "unit_price": 28}}
         ]"""
         response = self.client.get(reverse("eboutic:command"))
@@ -168,9 +164,7 @@ class EbouticTest(TestCase):
 
     def test_submit_basket_illegal_quantity(self):
         self.client.login(username="subscriber", password="plop")
-        self.client.cookies[
-            "basket_items"
-        ] = """[
+        self.client.cookies["basket_items"] = """[
             {"id": 4, "name": "Barbar", "quantity": -1, "unit_price": 1.7}
         ]"""
         response = self.client.get(reverse("eboutic:command"))
@@ -182,9 +176,7 @@ class EbouticTest(TestCase):
             reverse("core:user_profile", kwargs={"user_id": self.old_subscriber.id})
         )
         self.assertTrue("Non cotisant" in str(response.content))
-        self.client.cookies[
-            "basket_items"
-        ] = """[
+        self.client.cookies["basket_items"] = """[
             {"id": 2, "name": "Cotis 2 semestres", "quantity": 1, "unit_price": 28}
         ]"""
         response = self.client.get(reverse("eboutic:command"))

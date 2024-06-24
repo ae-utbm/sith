@@ -141,9 +141,11 @@ class CounterTabsMixin(TabedViewMixin):
                 "url": reverse_lazy(
                     "counter:details",
                     kwargs={
-                        "counter_id": self.object.stock_owner.counter.id
-                        if hasattr(self.object, "stock_owner")
-                        else self.object.id
+                        "counter_id": (
+                            self.object.stock_owner.counter.id
+                            if hasattr(self.object, "stock_owner")
+                            else self.object.id
+                        )
                     },
                 ),
                 "slug": "counter",
@@ -160,9 +162,11 @@ class CounterTabsMixin(TabedViewMixin):
                     "url": reverse_lazy(
                         "counter:cash_summary",
                         kwargs={
-                            "counter_id": self.object.stock_owner.counter.id
-                            if hasattr(self.object, "stock_owner")
-                            else self.object.id
+                            "counter_id": (
+                                self.object.stock_owner.counter.id
+                                if hasattr(self.object, "stock_owner")
+                                else self.object.id
+                            )
                         },
                     ),
                     "slug": "cash_summary",
@@ -174,9 +178,11 @@ class CounterTabsMixin(TabedViewMixin):
                     "url": reverse_lazy(
                         "counter:last_ops",
                         kwargs={
-                            "counter_id": self.object.stock_owner.counter.id
-                            if hasattr(self.object, "stock_owner")
-                            else self.object.id
+                            "counter_id": (
+                                self.object.stock_owner.counter.id
+                                if hasattr(self.object, "stock_owner")
+                                else self.object.id
+                            )
                         },
                     ),
                     "slug": "last_ops",
@@ -189,9 +195,11 @@ class CounterTabsMixin(TabedViewMixin):
                         "url": reverse_lazy(
                             "stock:take_items",
                             kwargs={
-                                "stock_id": self.object.stock.id
-                                if hasattr(self.object, "stock")
-                                else self.object.stock_owner.id
+                                "stock_id": (
+                                    self.object.stock.id
+                                    if hasattr(self.object, "stock")
+                                    else self.object.stock_owner.id
+                                )
                             },
                         ),
                         "slug": "take_items_from_stock",

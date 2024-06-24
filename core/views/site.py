@@ -100,9 +100,8 @@ def search_club(query, as_json=False):
     if query:
         clubs = Club.objects.filter(name__icontains=query).all()
         clubs = clubs[:5]
-        if (
-            as_json
-        ):  # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
+        if as_json:
+            # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
             clubs = json.loads(serializers.serialize("json", clubs, fields=("name")))
         else:
             clubs = list(clubs)

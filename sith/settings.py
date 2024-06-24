@@ -567,7 +567,7 @@ SITH_SUBSCRIPTIONS = {
         "name": _("One year for free(CA offer)"),
         "price": 0,
         "duration": 2,
-    }
+    },
     # To be completed....
 }
 

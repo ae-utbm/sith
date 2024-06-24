@@ -861,8 +861,7 @@ class MailingFormTest(TestCase):
             reverse("club:mailing", kwargs={"club_id": self.bdf.id}),
             {
                 "action": MailingForm.ACTION_REMOVE_SUBSCRIPTION,
-                "removal_%d"
-                % mde.id: [
+                "removal_%d" % mde.id: [
                     user.id
                     for user in mde.subscriptions.filter(
                         user__in=[self.rbatsbak, self.comunity]

@@ -599,7 +599,7 @@ class OperationPDFView(CanViewMixin, DetailView):
         payment_mode = ""
         for m in settings.SITH_ACCOUNTING_PAYMENT_METHOD:
             if m[0] == mode:
-                payment_mode += "[\u00D7]"
+                payment_mode += "[\u00d7]"
             else:
                 payment_mode += "[  ]"
             payment_mode += " %s\n" % (m[1])

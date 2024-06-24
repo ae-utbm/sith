@@ -97,12 +97,10 @@ class _MultipleFieldMixin:
         return result
 
 
-class MultipleFileField(_MultipleFieldMixin, forms.FileField):
-    ...
+class MultipleFileField(_MultipleFieldMixin, forms.FileField): ...
 
 
-class MultipleImageField(_MultipleFieldMixin, forms.ImageField):
-    ...
+class MultipleImageField(_MultipleFieldMixin, forms.ImageField): ...
 
 
 class AddFilesForm(forms.Form):

@@ -15,7 +15,7 @@
 #
 
 """
-    This module contains views to manage Groups
+This module contains views to manage Groups
 """
 
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
