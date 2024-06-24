@@ -23,7 +23,6 @@
 #
 
 import json
-
 from pathlib import Path
 
 from django.core.management import call_command

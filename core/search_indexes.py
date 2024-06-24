@@ -24,7 +24,6 @@
 #
 
 from django.db import models
-
 from haystack import indexes, signals
 
 from core.models import User

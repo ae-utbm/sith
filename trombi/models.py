@@ -22,17 +22,17 @@
 #
 #
 
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.urls import reverse
+from datetime import date
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
-from datetime import timedelta, date
-
-from core.models import User
-from core.utils import get_start_of_semester, get_semester_code
 from club.models import Club
+from core.models import User
+from core.utils import get_semester_code
 
 
 class TrombiManager(models.Manager):

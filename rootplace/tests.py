@@ -15,14 +15,12 @@
 #
 from datetime import date, timedelta
 
-from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.timezone import localtime, now
 
 from club.models import Club
-from core.models import User, RealGroup
-from counter.models import Customer, Product, Selling, Counter, Refilling
+from core.models import RealGroup, User
+from counter.models import Counter, Customer, Product, Refilling, Selling
 from subscription.models import Subscription
 
 

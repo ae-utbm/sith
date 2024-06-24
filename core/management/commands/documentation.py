@@ -24,10 +24,9 @@
 #
 
 import os
-import sys
 import signal
-
-from http.server import test, CGIHTTPRequestHandler
+import sys
+from http.server import CGIHTTPRequestHandler, test
 
 from django.core.management.base import BaseCommand
 from django.utils import autoreload

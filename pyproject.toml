@@ -70,6 +70,9 @@ optional = true
 [tool.xapian]
 version = "1.4.25"
 
+[tool.ruff.lint]
+select = ["I", "F401"]
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

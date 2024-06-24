@@ -25,26 +25,21 @@
 
 import types
 
-from sentry_sdk import last_event_id
-from django.shortcuts import render
+from django.core.exceptions import (
+    ImproperlyConfigured,
+    PermissionDenied,
+)
 from django.http import (
     HttpResponseForbidden,
     HttpResponseNotFound,
     HttpResponseServerError,
 )
-from django.template import RequestContext
-from django.core.exceptions import (
-    PermissionDenied,
-    ObjectDoesNotExist,
-    ImproperlyConfigured,
-)
-from django.views.generic.base import View
-from django.views.generic.edit import FormView
-from django.views.generic.detail import SingleObjectMixin
 from django.utils.functional import cached_property
-from django.db.models import Count
+from django.views.generic.base import View
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import FormView
+from sentry_sdk import last_event_id
 
-from core.models import Group
 from core.views.forms import LoginForm
 
 
@@ -361,8 +356,8 @@ class DetailFormView(SingleObjectMixin, FormView):
         return super(DetailFormView, self).get_object()
 
 
-from .user import *
-from .page import *
 from .files import *
-from .site import *
 from .group import *
+from .page import *
+from .site import *
+from .user import *

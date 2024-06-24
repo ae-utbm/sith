@@ -23,36 +23,39 @@
 #
 #
 import importlib
-from typing import Union, Optional, List
+import os
+import unicodedata
+from datetime import date, timedelta
+from typing import List, Optional, Union
 
-from django.core.cache import cache
-from django.core.mail import send_mail
+from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
     UserManager,
-    Group as AuthGroup,
-    GroupManager as AuthGroupManager,
+)
+from django.contrib.auth.models import (
     AnonymousUser as AuthAnonymousUser,
 )
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from django.core import validators
-from django.core.exceptions import ValidationError, PermissionDenied
-from django.urls import reverse
-from django.conf import settings
-from django.db import models, transaction
+from django.contrib.auth.models import (
+    Group as AuthGroup,
+)
+from django.contrib.auth.models import (
+    GroupManager as AuthGroupManager,
+)
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.utils.html import escape
+from django.core import validators
+from django.core.cache import cache
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.mail import send_mail
+from django.db import models, transaction
+from django.urls import reverse
+from django.utils import timezone
 from django.utils.functional import cached_property
-
-import os
-from core import utils
-
+from django.utils.html import escape
+from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from datetime import timedelta, date
-
-import unicodedata
+from core import utils
 
 
 class RealGroupManager(AuthGroupManager):

@@ -24,12 +24,14 @@
 #
 
 import os
-import sass
 from urllib.parse import urljoin
-from django.utils.encoding import force_bytes, iri_to_uri
+
+import sass
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.templatetags.static import static
-from django.conf import settings
+from django.utils.encoding import force_bytes, iri_to_uri
+
 from core.scss.storage import ScssFileStorage, find_file
 
 

@@ -21,14 +21,13 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import logging
 import warnings
 
 from django.core.management.base import BaseCommand
 from django.db import connection
 
 from galaxy.models import Galaxy
-
-import logging
 
 
 class Command(BaseCommand):

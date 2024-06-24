@@ -17,12 +17,11 @@
 import datetime
 
 from rest_framework import serializers
-from rest_framework.response import Response
 from rest_framework.decorators import action
-
-from core.models import User
+from rest_framework.response import Response
 
 from api.views import RightModelViewSet
+from core.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):

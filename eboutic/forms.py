@@ -25,8 +25,8 @@
 import json
 import re
 import typing
-
 from urllib.parse import unquote
+
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from sentry_sdk import capture_message

@@ -15,12 +15,11 @@
 #
 
 from rest_framework import serializers
-from rest_framework.response import Response
 from rest_framework.decorators import action
-
-from launderette.models import Launderette, Machine, Token
+from rest_framework.response import Response
 
 from api.views import RightModelViewSet
+from launderette.models import Launderette, Machine, Token
 
 
 class LaunderettePlaceSerializer(serializers.ModelSerializer):

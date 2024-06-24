@@ -14,21 +14,20 @@
 #
 #
 import hmac
-import html
 import typing
 from datetime import datetime
 from typing import List
 
 from dict2xml import dict2xml
 from django.conf import settings
-from django.db import models, DataError
-from django.db.models import Sum, F
+from django.db import DataError, models
+from django.db.models import F, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from accounting.models import CurrencyField
-from core.models import Group, User
-from counter.models import Counter, Product, Selling, Refilling, BillingInfo, Customer
+from core.models import User
+from counter.models import BillingInfo, Counter, Customer, Product, Refilling, Selling
 
 
 def get_eboutic_products(user: User) -> List[Product]:

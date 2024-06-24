@@ -24,19 +24,18 @@
 from ast import literal_eval
 from enum import Enum
 
-from django.views.generic import ListView, View
-from django.views.generic.edit import FormView
-from django.utils.translation import gettext_lazy as _
-from django.views.generic.detail import SingleObjectMixin
+from django import forms
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
-from django import forms
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import ListView, View
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import FormView
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 
 from core.models import User
-from core.views import FormerSubscriberMixin
+from core.views import FormerSubscriberMixin, search_user
 from core.views.forms import SelectDate
-from core.views import search_user
-from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 
 # Enum to select search type
 

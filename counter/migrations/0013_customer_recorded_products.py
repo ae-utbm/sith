@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.utils.translation import gettext_lazy as _
-from django.db import migrations, models
 from django.conf import settings
+from django.db import migrations, models
+from django.utils.translation import gettext_lazy as _
 
 from core.models import User
-from counter.models import Customer, Product, Selling, Counter
+from counter.models import Counter, Customer, Product, Selling
 
 
 def balance_ecocups(apps, schema_editor):

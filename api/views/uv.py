@@ -1,11 +1,12 @@
-from rest_framework.response import Response
+import json
+import urllib.request
+
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from rest_framework import serializers
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
-from django.core.exceptions import PermissionDenied
-from django.conf import settings
-from rest_framework import serializers
-import urllib.request
-import json
+from rest_framework.response import Response
 
 from pedagogy.views import CanCreateUVFunctionMixin
 

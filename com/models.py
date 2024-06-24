@@ -23,22 +23,20 @@
 #
 #
 
-from django.shortcuts import render
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.core.mail import EmailMultiAlternatives
 from django.db import models, transaction
 from django.db.models import Q
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from django.urls import reverse
-from django.conf import settings
+from django.shortcuts import render
 from django.templatetags.static import static
-from django.core.mail import EmailMultiAlternatives
-from django.core.exceptions import ValidationError
-
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from core import utils
-from core.models import User, Preferences, RealGroup, Notification, SithFile
 from club.models import Club
+from core import utils
+from core.models import Notification, Preferences, RealGroup, User
 
 
 class Sith(models.Model):

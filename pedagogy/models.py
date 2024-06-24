@@ -22,14 +22,13 @@
 #
 #
 
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from django.core import validators
 from django.conf import settings
-from django.utils.functional import cached_property
+from django.core import validators
+from django.db import models
 from django.urls import reverse
-
+from django.utils import timezone
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from core.models import User

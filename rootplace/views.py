@@ -32,7 +32,7 @@ from django.utils.translation import gettext as _
 from django.views.generic import ListView
 from django.views.generic.edit import FormView
 
-from core.models import User, OperationLog, SithFile
+from core.models import OperationLog, SithFile, User
 from core.views import CanEditPropMixin
 from counter.models import Customer
 from forum.models import ForumMessageMeta

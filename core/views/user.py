@@ -24,50 +24,49 @@
 #
 
 # This file contains all the views that concern the user model
-from django.shortcuts import render, redirect, get_object_or_404
+import logging
+from datetime import date, timedelta
+
+from django.conf import settings
 from django.contrib.auth import views
 from django.contrib.auth.forms import PasswordChangeForm
-from django.utils.translation import gettext as _
-from django.urls import reverse
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.forms import CheckboxSelectMultiple
+from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponse
-from django.views.generic.edit import UpdateView
+from django.shortcuts import get_object_or_404, redirect, render
+from django.template.response import TemplateResponse
+from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext as _
 from django.views.generic import (
-    ListView,
-    DetailView,
-    TemplateView,
     CreateView,
     DeleteView,
+    DetailView,
+    ListView,
+    TemplateView,
 )
-from django.forms.models import modelform_factory
-from django.forms import CheckboxSelectMultiple
-from django.urls import reverse_lazy
-from django.template.response import TemplateResponse
-from django.conf import settings
-from django.views.generic.dates import YearMixin, MonthMixin
+from django.views.generic.dates import MonthMixin, YearMixin
+from django.views.generic.edit import UpdateView
 
-from datetime import timedelta, date
-import logging
 from api.views.sas import all_pictures_of_user
-
+from core.models import Gift, Preferences, SithFile, User
 from core.views import (
-    CanViewMixin,
     CanEditMixin,
     CanEditPropMixin,
-    UserIsLoggedMixin,
-    TabedViewMixin,
+    CanViewMixin,
     QuickNotifMixin,
+    TabedViewMixin,
+    UserIsLoggedMixin,
 )
 from core.views.forms import (
-    RegisteringForm,
-    UserProfileForm,
-    LoginForm,
-    UserGodfathersForm,
     GiftForm,
+    LoginForm,
+    RegisteringForm,
+    UserGodfathersForm,
+    UserProfileForm,
 )
-from core.models import User, SithFile, Preferences, Gift
-from subscription.models import Subscription
 from counter.forms import StudentCardForm
+from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
 
@@ -501,8 +500,9 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super(UserStatsView, self).get_context_data(**kwargs)
-        from counter.models import Counter
         from django.db.models import Sum
+
+        from counter.models import Counter
 
         foyer = Counter.objects.filter(name="Foyer").first()
         mde = Counter.objects.filter(name="MDE").first()
@@ -601,9 +601,11 @@ class UserUploadProfilePictView(CanEditMixin, DetailView):
     template_name = "core/user_edit.jinja"
 
     def post(self, request, *args, **kwargs):
-        from core.utils import resize_image
         from io import BytesIO
+
         from PIL import Image
+
+        from core.utils import resize_image
 
         self.object = self.get_object()
         if self.object.profile_pict:

@@ -18,15 +18,14 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.cache import cache
 from django.test import TestCase
-from django.utils import timezone, html
-from django.utils.timezone import now, localtime
-from django.utils.translation import gettext as _
 from django.urls import reverse
-from django.core.management import call_command
+from django.utils import html, timezone
+from django.utils.timezone import localtime, now
+from django.utils.translation import gettext as _
 
-from core.models import User, AnonymousUser
-from club.models import Club, Membership, Mailing
 from club.forms import MailingForm
+from club.models import Club, Mailing, Membership
+from core.models import AnonymousUser, User
 from sith.settings import SITH_BAR_MANAGER, SITH_MAIN_CLUB_ID
 
 

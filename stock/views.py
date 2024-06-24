@@ -24,36 +24,21 @@
 #
 
 from collections import OrderedDict
-from datetime import datetime, timedelta
 
-from django.utils import timezone
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView, RedirectView, TemplateView
-from django.views.generic.edit import (
-    UpdateView,
-    CreateView,
-    DeleteView,
-    ProcessFormView,
-    FormMixin,
-    BaseFormView,
-)
-from django.utils.translation import gettext_lazy as _
 from django import forms
-from django.http import HttpResponseRedirect, HttpResponse
+from django.db import transaction
 from django.forms.models import modelform_factory
-from django.urls import reverse_lazy, reverse
-from django.db import transaction, DataError
+from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import BaseFormView, CreateView, DeleteView, UpdateView
 
-from core.views import (
-    CanViewMixin,
-    CanEditMixin,
-    CanEditPropMixin,
-    CanCreateMixin,
-    TabedViewMixin,
-)
+from core.views import CanCreateMixin, CanEditMixin, CanEditPropMixin, CanViewMixin
+from counter.models import ProductType
 from counter.views import CounterAdminTabsMixin, CounterTabsMixin
-from counter.models import Counter, ProductType
-from stock.models import Stock, StockItem, ShoppingList, ShoppingListItem
+from stock.models import ShoppingList, ShoppingListItem, Stock, StockItem
 
 
 class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):

@@ -21,40 +21,37 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import datetime
+import re
+from io import BytesIO
+
+from ajax_select import make_ajax_field
+from ajax_select.fields import AutoCompleteSelectField
 from captcha.fields import CaptchaField
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.conf import settings
-from django.db import transaction
-from django.templatetags.static import static
-from django.urls import reverse
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.forms import (
     CheckboxSelectMultiple,
-    Select,
     DateInput,
-    TextInput,
     DateTimeInput,
     Textarea,
+    TextInput,
 )
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import gettext
-from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
-from ajax_select.fields import AutoCompleteSelectField
-from ajax_select import make_ajax_field
-from django.utils.dateparse import parse_datetime
-from django.utils import timezone
-import datetime
 from django.forms.utils import to_current_timezone
-
-import re
-
-from core.models import User, Page, SithFile, Gift
-
-from core.utils import resize_image
-from io import BytesIO
+from django.templatetags.static import static
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
+from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
 from PIL import Image
 
+from core.models import Gift, Page, SithFile, User
+from core.utils import resize_image
 
 # Widgets
 

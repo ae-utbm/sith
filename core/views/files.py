@@ -15,29 +15,28 @@
 #
 
 # This file contains all the views that concern the page model
-from django.shortcuts import redirect, get_object_or_404
-from django.utils.http import http_date
-from django.views.generic import ListView, DetailView, TemplateView
-from django.views.generic.edit import UpdateView, FormMixin, DeleteView
-from django.views.generic.detail import SingleObjectMixin
-from django.forms.models import modelform_factory
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-from django.http import Http404, HttpResponse
-from wsgiref.util import FileWrapper
-from django.urls import reverse
-from django.core.exceptions import PermissionDenied
-from django import forms
-
 import os
+from wsgiref.util import FileWrapper
 
 from ajax_select import make_ajax_field
+from django import forms
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.forms.models import modelform_factory
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
+from django.utils.http import http_date
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import DeleteView, FormMixin, UpdateView
 
-from core.models import SithFile, RealGroup, Notification
+from core.models import Notification, RealGroup, SithFile
 from core.views import (
-    CanViewMixin,
     CanEditMixin,
     CanEditPropMixin,
+    CanViewMixin,
     can_view,
 )
 from counter.models import Counter

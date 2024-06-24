@@ -16,9 +16,8 @@
 
 from rest_framework import serializers
 
-from core.models import RealGroup
-
 from api.views import RightModelViewSet
+from core.models import RealGroup
 
 
 class GroupSerializer(serializers.ModelSerializer):

@@ -15,16 +15,16 @@
 #
 
 # This file contains all the views that concern the page model
-from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.forms.models import modelform_factory
 from django.http import Http404
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from core.models import Page, PageRev, LockError
+from core.models import LockError, Page, PageRev
+from core.views import CanCreateMixin, CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.views.forms import MarkdownInput, PageForm, PagePropForm
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
 
 
 class CanEditPagePropMixin(CanEditPropMixin):

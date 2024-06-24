@@ -24,12 +24,10 @@
 
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from django.conf import settings
 
 from core.middleware import get_signal_request
 from core.models import OperationLog
-
-from counter.models import Selling, Refilling, Counter
+from counter.models import Counter, Refilling, Selling
 
 
 def write_log(instance, operation_type):

@@ -13,18 +13,17 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-from django.conf import settings
 from django.urls import reverse
-from django.core.management import call_command
 from django.utils import html
 from django.utils.timezone import localtime, now
 from django.utils.translation import gettext as _
 
 from club.models import Club, Membership
-from com.models import Sith, News, Weekmail, WeekmailArticle, Poster
-from core.models import User, RealGroup, AnonymousUser
+from com.models import News, Poster, Sith, Weekmail, WeekmailArticle
+from core.models import AnonymousUser, RealGroup, User
 
 
 class ComAlertTest(TestCase):

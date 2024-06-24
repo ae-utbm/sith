@@ -1,24 +1,19 @@
-from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView, CreateView
-from django.views.generic.edit import DeleteView, FormView
-from django.urls import reverse_lazy, reverse
-from django.utils.translation import gettext_lazy as _
+from ajax_select import make_ajax_field
+from ajax_select.fields import AutoCompleteSelectField
+from django import forms
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.shortcuts import redirect
-from django import forms
+from django.db.models.query import QuerySet
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
 from core.models import User
-from core.views import CanViewMixin, CanEditMixin, CanCreateMixin
-from django.db.models.query import QuerySet
-from core.views.forms import SelectDateTime, MarkdownInput
-from election.models import Election, Role, Candidature, ElectionList, Vote
-from core.views.forms import TzAwareDateTimeField
-
-from ajax_select.fields import AutoCompleteSelectField
-from ajax_select import make_ajax_field
-
+from core.views import CanCreateMixin, CanEditMixin, CanViewMixin
+from core.views.forms import MarkdownInput, TzAwareDateTimeField
+from election.models import Candidature, Election, ElectionList, Role, Vote
 
 # Custom form field
 

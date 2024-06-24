@@ -24,20 +24,19 @@
 
 from __future__ import annotations
 
-import math
 import logging
+import math
 import time
-
-from typing import List, TypedDict, NamedTuple, Union, Optional
+from typing import List, NamedTuple, Optional, TypedDict, Union
 
 from django.db import models
-from django.db.models import Q, Case, F, Value, When, Count
+from django.db.models import Case, Count, F, Q, Value, When
 from django.db.models.functions import Concat
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from core.models import User
 from club.models import Club
+from core.models import User
 from sas.models import Picture
 
 

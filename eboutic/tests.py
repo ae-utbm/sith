@@ -26,15 +26,14 @@ import base64
 import json
 import urllib
 
-from OpenSSL import crypto
 from django.conf import settings
-from django.core.management import call_command
 from django.db.models import Max
 from django.test import TestCase
 from django.urls import reverse
+from OpenSSL import crypto
 
 from core.models import User
-from counter.models import Product, Counter, Customer, Selling
+from counter.models import Counter, Customer, Product, Selling
 from eboutic.models import Basket
 
 

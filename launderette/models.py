@@ -14,14 +14,14 @@
 #
 #
 
-from django.db import models, DataError
-from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.db import DataError, models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
-from counter.models import Counter
-from core.models import User
 from club.models import Club
+from core.models import User
+from counter.models import Counter
 
 # Create your models here.
 

@@ -23,7 +23,6 @@
 #
 
 from django.db import models
-
 from haystack import indexes, signals
 
 from core.search_indexes import BigCharFieldIndex

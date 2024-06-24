@@ -14,68 +14,65 @@
 #
 #
 import json
+import re
+from datetime import datetime, timedelta
+from http import HTTPStatus
 from urllib.parse import parse_qs
 
+import pytz
+from django import forms
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import F
-from django.shortcuts import get_object_or_404
-from django.http import Http404
 from django.core.exceptions import PermissionDenied
+from django.db import DataError, transaction
+from django.db.models import F
+from django.forms import CheckboxSelectMultiple
+from django.forms.models import modelform_factory
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
-from django.views.generic import ListView, DetailView, RedirectView, TemplateView
+from django.views.generic import DetailView, ListView, RedirectView, TemplateView
 from django.views.generic.base import View
 from django.views.generic.edit import (
-    UpdateView,
     CreateView,
     DeleteView,
-    ProcessFormView,
     FormMixin,
     FormView,
+    ProcessFormView,
+    UpdateView,
 )
-from django.forms.models import modelform_factory
-from django.forms import CheckboxSelectMultiple
-from django.urls import reverse_lazy, reverse
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
-from django.utils import timezone
-from django import forms
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-from django.db import DataError, transaction
 
-import json
-import re
-import pytz
-from datetime import timedelta, datetime
-from http import HTTPStatus
-
-from core.utils import get_start_of_semester, get_semester_code
-from core.views import CanViewMixin, TabedViewMixin, CanEditMixin
-from core.views.forms import LoginForm
+from accounting.models import CurrencyField
 from core.models import User
+from core.utils import get_semester_code, get_start_of_semester
+from core.views import CanEditMixin, CanViewMixin, TabedViewMixin
+from core.views.forms import LoginForm
 from counter.forms import (
     BillingInfoForm,
-    StudentCardForm,
-    GetUserForm,
-    RefillForm,
-    CounterEditForm,
-    ProductEditForm,
     CashSummaryFormBase,
+    CounterEditForm,
     EticketForm,
+    GetUserForm,
+    ProductEditForm,
+    RefillForm,
+    StudentCardForm,
 )
 from counter.models import (
-    Counter,
-    Customer,
-    StudentCard,
-    Product,
-    Selling,
-    Refilling,
-    ProductType,
+    BillingInfo,
     CashRegisterSummary,
     CashRegisterSummaryItem,
+    Counter,
+    Customer,
     Eticket,
-    BillingInfo,
+    Product,
+    ProductType,
+    Refilling,
+    Selling,
+    StudentCard,
 )
-from accounting.models import CurrencyField
 
 
 class CounterAdminMixin(View):
@@ -1486,7 +1483,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         end_date = (start_date + timedelta(days=32)).replace(
             day=1, hour=0, minute=0, microsecond=0
         )
-        from django.db.models import Sum, Case, When, F
+        from django.db.models import Case, F, Sum, When
 
         kwargs["sum_cb"] = sum(
             [
@@ -1574,12 +1571,12 @@ class EticketPDFView(CanViewMixin, DetailView):
     pk_url_kwarg = "selling_id"
 
     def get(self, request, *args, **kwargs):
-        from reportlab.pdfgen import canvas
-        from reportlab.lib.utils import ImageReader
-        from reportlab.lib.units import cm
-        from reportlab.graphics.shapes import Drawing
-        from reportlab.graphics.barcode.qr import QrCodeWidget
         from reportlab.graphics import renderPDF
+        from reportlab.graphics.barcode.qr import QrCodeWidget
+        from reportlab.graphics.shapes import Drawing
+        from reportlab.lib.units import cm
+        from reportlab.lib.utils import ImageReader
+        from reportlab.pdfgen import canvas
 
         if not (
             hasattr(self.object, "product") and hasattr(self.object.product, "eticket")

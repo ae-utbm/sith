@@ -25,7 +25,7 @@
 
 from django.contrib import admin
 
-from stock.models import Stock, StockItem, ShoppingList, ShoppingListItem
+from stock.models import ShoppingList, ShoppingListItem, Stock, StockItem
 
 # Register your models here.
 admin.site.register(Stock)

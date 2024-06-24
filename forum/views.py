@@ -23,31 +23,30 @@
 #
 #
 
-from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, RedirectView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.views.generic.detail import SingleObjectMixin
-from django.utils.translation import gettext_lazy as _
-from django.urls import reverse_lazy
-from django.utils import timezone, html
-from django.conf import settings
-from django import forms
-from django.core.exceptions import PermissionDenied
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
 from ajax_select import make_ajax_field
+from django import forms
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.utils import html, timezone
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, ListView, RedirectView
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from haystack.query import RelatedSearchQuerySet
 
 from core.views import (
-    CanViewMixin,
+    CanCreateMixin,
     CanEditMixin,
     CanEditPropMixin,
-    CanCreateMixin,
+    CanViewMixin,
     UserIsLoggedMixin,
     can_view,
 )
 from core.views.forms import MarkdownInput
-from forum.models import Forum, ForumMessage, ForumTopic, ForumMessageMeta
-from haystack.query import RelatedSearchQuerySet
+from forum.models import Forum, ForumMessage, ForumMessageMeta, ForumTopic
 
 
 class ForumSearchView(ListView):

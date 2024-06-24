@@ -13,20 +13,18 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from datetime import date, timedelta
 import json
 import re
 import string
 
 from django.test import TestCase
 from django.urls import reverse
-from django.core.management import call_command
 from django.utils import timezone
 from django.utils.timezone import timedelta
 
 from club.models import Club
 from core.models import User
-from counter.models import Counter, Customer, BillingInfo, Permanency, Selling, Product
+from counter.models import BillingInfo, Counter, Customer, Permanency, Product, Selling
 from sith.settings import SITH_MAIN_CLUB
 
 
