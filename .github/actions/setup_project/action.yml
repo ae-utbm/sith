@@ -45,7 +45,7 @@ runs:
           ${{ runner.os }}-poetry-
 
     - name: Install dependencies
-      run: poetry install -E testing -E docs
+      run: poetry install --with docs,tests
       shell: bash
 
     - name: Install xapian

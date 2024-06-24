@@ -179,7 +179,7 @@ Cette commande génère la documentation à chacune de ses modifications, inutil
 
     Les dépendances pour la documentation sont optionnelles.
     Avant de commencer à travailler sur la doc, il faut donc les installer
-    avec la commande :code:`poetry install -E docs`
+    avec la commande :code:`poetry install --with docs`
 
 .. sourcecode:: bash
 
