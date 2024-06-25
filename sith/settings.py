@@ -114,8 +114,6 @@ MIDDLEWARE = (
     "core.middleware.SignalRequestMiddleware",
 )
 
-TEST_RUNNER = "sith.testrunner.SithTestRunner"
-
 ROOT_URLCONF = "sith.urls"
 
 TEMPLATES = [
