@@ -18,10 +18,12 @@ import os
 from datetime import date, timedelta
 
 import freezegun
+import pytest
 from django.core.cache import cache
-from django.test import Client, TestCase
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import now
+from pytest_django.asserts import assertRedirects
 
 from club.models import Membership
 from core.markdown import markdown
@@ -29,270 +31,105 @@ from core.models import AnonymousUser, Group, Page, User
 from core.utils import get_semester_code, get_start_of_semester
 from sith import settings
 
-"""
-to run these tests :
-    python3 manage.py test
-"""
+
+@pytest.mark.django_db
+class TestUserRegistration:
+    @pytest.fixture()
+    def valid_payload(self):
+        return {
+            "first_name": "this user does not exist (yet)",
+            "last_name": "this user does not exist (yet)",
+            "email": "i-dont-exist-yet@git.an",
+            "password1": "plop",
+            "password2": "plop",
+            "captcha_0": "dummy-value",
+            "captcha_1": "PASSED",
+        }
+
+    def test_register_user_form_ok(self, client, valid_payload):
+        """Should register a user correctly."""
+        response = client.post(reverse("core:register"), valid_payload)
+        assert response.status_code == 200
+        assert "TEST_REGISTER_USER_FORM_OK" in str(response.content)
+
+    @pytest.mark.parametrize(
+        "payload_edit",
+        [
+            {"password2": "not the same as password1"},
+            {"email": "not-an-email"},
+            {"first_name": ""},
+            {"last_name": ""},
+            {"captcha_1": "WRONG_CAPTCHA"},
+        ],
+    )
+    def test_register_user_form_fail(self, client, valid_payload, payload_edit):
+        """Should not register a user correctly."""
+        payload = valid_payload | payload_edit
+        response = client.post(reverse("core:register"), payload)
+        assert response.status_code == 200
+        assert "TEST_REGISTER_USER_FORM_FAIL" in str(response.content)
+
+    def test_register_user_form_fail_already_exists(self, client, valid_payload):
+        """Should not register a user correctly if it already exists."""
+        # create the user, then try to create it again
+        client.post(reverse("core:register"), valid_payload)
+        response = client.post(reverse("core:register"), valid_payload)
+        assert response.status_code == 200
+        assert "TEST_REGISTER_USER_FORM_FAIL" in str(response.content)
 
 
-class UserRegistrationTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        User.objects.all().delete()
+@pytest.mark.django_db
+class TestUserLogin:
+    @pytest.fixture()
+    def user(self) -> User:
+        return User.objects.first()
 
-    def test_register_user_form_ok(self):
-        """
-        Should register a user correctly
-        """
-        c = Client()
-        response = c.post(
-            reverse("core:register"),
-            {
-                "first_name": "Guy",
-                "last_name": "Carlier",
-                "email": "guy@git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
-        )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("TEST_REGISTER_USER_FORM_OK" in str(response.content))
-
-    def test_register_user_form_fail_password(self):
-        """
-        Should not register a user correctly
-        """
-        c = Client()
-        response = c.post(
-            reverse("core:register"),
-            {
-                "first_name": "Guy",
-                "last_name": "Carlier",
-                "email": "bibou@git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop2",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
-        )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("TEST_REGISTER_USER_FORM_FAIL" in str(response.content))
-
-    def test_register_user_form_fail_email(self):
-        """
-        Should not register a user correctly
-        """
-        c = Client()
-        response = c.post(
-            reverse("core:register"),
-            {
-                "first_name": "Guy",
-                "last_name": "Carlier",
-                "email": "bibou.git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
-        )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("TEST_REGISTER_USER_FORM_FAIL" in str(response.content))
-
-    def test_register_user_form_fail_missing_name(self):
-        """
-        Should not register a user correctly
-        """
-        c = Client()
-        response = c.post(
-            reverse("core:register"),
-            {
-                "first_name": "Guy",
-                "last_name": "",
-                "email": "bibou@git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
-        )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("TEST_REGISTER_USER_FORM_FAIL" in str(response.content))
-
-    def test_register_user_form_fail_missing_date_of_birth(self):
-        """
-        Should not register a user correctly
-        """
-        c = Client()
-        response = c.post(
-            reverse("core:register"),
-            {
-                "first_name": "",
-                "last_name": "Carlier",
-                "email": "bibou@git.an",
-                "date_of_birth": "",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
-        )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("TEST_REGISTER_USER_FORM_FAIL" in str(response.content))
-
-    def test_register_user_form_fail_missing_first_name(self):
-        """
-        Should not register a user correctly
-        """
-        c = Client()
-        response = c.post(
-            reverse("core:register"),
-            {
-                "first_name": "",
-                "last_name": "Carlier",
-                "email": "bibou@git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
-        )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("TEST_REGISTER_USER_FORM_FAIL" in str(response.content))
-
-    def test_register_user_form_fail_wrong_captcha(self):
-        """
-        Should not register a user correctly
-        """
-        c = Client()
-        response = c.post(
-            reverse("core:register"),
-            {
-                "first_name": "Bibou",
-                "last_name": "Carlier",
-                "email": "bibou@git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "WRONG_CAPTCHA",
-            },
-        )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("TEST_REGISTER_USER_FORM_FAIL" in str(response.content))
-
-    def test_register_user_form_fail_already_exists(self):
-        """
-        Should not register a user correctly
-        """
-        c = Client()
-        c.post(
-            reverse("core:register"),
-            {
-                "first_name": "Guy",
-                "last_name": "Carlier",
-                "email": "bibou@git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
-        )
-        response = c.post(
-            reverse("core:register"),
-            {
-                "first_name": "Bibou",
-                "last_name": "Carlier",
-                "email": "bibou@git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
-        )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("TEST_REGISTER_USER_FORM_FAIL" in str(response.content))
-
-    def test_login_success(self):
-        """
-        Should login a user correctly
-        """
-        c = Client()
-        c.post(
-            reverse("core:register"),
-            {
-                "first_name": "Guy",
-                "last_name": "Carlier",
-                "email": "bibou@git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
-        )
-        response = c.post(
-            reverse("core:login"), {"username": "gcarlier", "password": "plop"}
-        )
-        self.assertTrue(response.status_code == 302)
-        # self.assertTrue('Hello, world' in str(response.content))
-
-    def test_login_fail(self):
+    def test_login_fail(self, client, user):
         """
         Should not login a user correctly
         """
-        c = Client()
-        c.post(
-            reverse("core:register"),
-            {
-                "first_name": "Guy",
-                "last_name": "Carlier",
-                "email": "bibou@git.an",
-                "date_of_birth": "12/6/1942",
-                "password1": "plop",
-                "password2": "plop",
-                "captcha_0": "dummy-value",
-                "captcha_1": "PASSED",
-            },
+
+        response = client.post(
+            reverse("core:login"),
+            {"username": user.username, "password": "wrong-password"},
         )
-        response = c.post(
-            reverse("core:login"), {"username": "gcarlier", "password": "guy"}
+        assert response.status_code == 200
+        assert (
+            '<p class="alert alert-red">Votre nom d\'utilisateur '
+            "et votre mot de passe ne correspondent pas. Merci de réessayer.</p>"
+        ) in str(response.content.decode())
+
+    def test_login_success(self, client, user):
+        """
+        Should login a user correctly
+        """
+        response = client.post(
+            reverse("core:login"), {"username": user.username, "password": "plop"}
         )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue(
-            """<p class="alert alert-red">Votre nom d\\'utilisateur et votre mot de passe ne correspondent pas. Merci de r\\xc3\\xa9essayer.</p>"""
-            in str(response.content)
-        )
+        assertRedirects(response, reverse("core:index"))
 
 
-class MarkdownTest(TestCase):
-    def test_full_markdown_syntax(self):
-        root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        with open(os.path.join(root_path) + "/doc/SYNTAX.md", "r") as md_file:
-            md = md_file.read()
-        with open(os.path.join(root_path) + "/doc/SYNTAX.html", "r") as html_file:
-            html = html_file.read()
-        result = markdown(md)
-        self.assertTrue(result == html)
+def test_full_markdown_syntax():
+    root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(root_path) + "/doc/SYNTAX.md", "r") as md_file:
+        md = md_file.read()
+    with open(os.path.join(root_path) + "/doc/SYNTAX.html", "r") as html_file:
+        html = html_file.read()
+    result = markdown(md)
+    assert result == html
 
 
 class PageHandlingTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.root = User.objects.get(username="root")
+        cls.root_group = Group.objects.get(name="Root")
+
     def setUp(self):
-        self.client.login(username="root", password="plop")
-        self.root_group = Group.objects.get(name="Root")
+        self.client.force_login(self.root)
 
     def test_create_page_ok(self):
-        """
-        Should create a page correctly
-        """
+        """Should create a page correctly."""
 
         response = self.client.post(
             reverse("core:page_new"),
@@ -301,19 +138,17 @@ class PageHandlingTest(TestCase):
         self.assertRedirects(
             response, reverse("core:page", kwargs={"page_name": "guy"})
         )
-        self.assertTrue(Page.objects.filter(name="guy").exists())
+        assert Page.objects.filter(name="guy").exists()
 
         response = self.client.get(reverse("core:page", kwargs={"page_name": "guy"}))
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         html = response.content.decode()
-        self.assertIn('<a href="/page/guy/hist/">', html)
-        self.assertIn('<a href="/page/guy/edit/">', html)
-        self.assertIn('<a href="/page/guy/prop/">', html)
+        assert '<a href="/page/guy/hist/">' in html
+        assert '<a href="/page/guy/edit/">' in html
+        assert '<a href="/page/guy/prop/">' in html
 
     def test_create_child_page_ok(self):
-        """
-        Should create a page correctly
-        """
+        """Should create a page correctly."""
         # remove all other pages to make sure there is no side effect
         Page.objects.all().delete()
         self.client.post(
@@ -321,7 +156,7 @@ class PageHandlingTest(TestCase):
             {"parent": "", "name": "guy", "owner_group": str(self.root_group.id)},
         )
         page = Page.objects.first()
-        response = self.client.post(
+        self.client.post(
             reverse("core:page_new"),
             {
                 "parent": str(page.id),
@@ -332,8 +167,8 @@ class PageHandlingTest(TestCase):
         response = self.client.get(
             reverse("core:page", kwargs={"page_name": "guy/bibou"})
         )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue('<a href="/page/guy/bibou/">' in str(response.content))
+        assert response.status_code == 200
+        assert '<a href="/page/guy/bibou/">' in str(response.content)
 
     def test_access_child_page_ok(self):
         """
@@ -346,7 +181,7 @@ class PageHandlingTest(TestCase):
         response = self.client.get(
             reverse("core:page", kwargs={"page_name": "guy/bibou"})
         )
-        self.assertTrue(response.status_code == 200)
+        assert response.status_code == 200
         html = response.content.decode()
         self.assertIn('<a href="/page/guy/bibou/edit/">', html)
 
@@ -355,7 +190,7 @@ class PageHandlingTest(TestCase):
         Should not display a page correctly
         """
         response = self.client.get(reverse("core:page", kwargs={"page_name": "swagg"}))
-        self.assertTrue(response.status_code == 200)
+        assert response.status_code == 200
         html = response.content.decode()
         self.assertIn('<a href="/page/create/?page=swagg">', html)
 
@@ -383,8 +218,8 @@ http://git.an
             },
         )
         response = self.client.get(reverse("core:page", kwargs={"page_name": "guy"}))
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue(
+        assert response.status_code == 200
+        assert (
             '<p>Guy <em>bibou</em></p>\\n<p><a href="http://git.an">http://git.an</a></p>\\n'
             + "<h1>Swag</h1>\\n&lt;guy&gt;Bibou&lt;/guy&gt;"
             + "&lt;script&gt;alert(\\'Guy\\');&lt;/script&gt;"
@@ -392,35 +227,19 @@ http://git.an
         )
 
 
-class UserToolsTest(TestCase):
-    def test_anonymous_user_unauthorized(self):
-        response = self.client.get(reverse("core:user_tools"))
-        self.assertEqual(response.status_code, 403)
+class UserToolsTest:
+    def test_anonymous_user_unauthorized(self, client):
+        """An anonymous user shouldn't have access to the tools page"""
+        response = client.get(reverse("core:user_tools"))
+        assert response.status_code == 403
 
-    def test_page_is_working(self):
+    @pytest.mark.parametrize("username", ["guy", "root", "skia", "comunity"])
+    def test_page_is_working(self, client, username):
+        """All existing users should be able to see the test page"""
         # Test for simple user
-        self.client.login(username="guy", password="plop")
-        response = self.client.get(reverse("core:user_tools"))
-        self.assertNotEqual(response.status_code, 500)
-        self.assertEqual(response.status_code, 200)
-
-        # Test for root
-        self.client.login(username="root", password="plop")
-        response = self.client.get(reverse("core:user_tools"))
-        self.assertNotEqual(response.status_code, 500)
-        self.assertEqual(response.status_code, 200)
-
-        # Test for skia
-        self.client.login(username="skia", password="plop")
-        response = self.client.get(reverse("core:user_tools"))
-        self.assertNotEqual(response.status_code, 500)
-        self.assertEqual(response.status_code, 200)
-
-        # Test for comunity
-        self.client.login(username="comunity", password="plop")
-        response = self.client.get(reverse("core:user_tools"))
-        self.assertNotEqual(response.status_code, 500)
-        self.assertEqual(response.status_code, 200)
+        client.force_login(User.objects.get(username=username))
+        response = client.get(reverse("core:user_tools"))
+        assert response.status_code == 200
 
 
 # TODO: many tests on the pages:
@@ -442,12 +261,12 @@ class FileHandlingTest(TestCase):
             reverse("core:file_detail", kwargs={"file_id": self.subscriber.home.id}),
             {"folder_name": "GUY_folder_test"},
         )
-        self.assertTrue(response.status_code == 302)
+        assert response.status_code == 302
         response = self.client.get(
             reverse("core:file_detail", kwargs={"file_id": self.subscriber.home.id})
         )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("GUY_folder_test</a>" in str(response.content))
+        assert response.status_code == 200
+        assert "GUY_folder_test</a>" in str(response.content)
 
     def test_upload_file_home(self):
         with open("/bin/ls", "rb") as f:
@@ -457,12 +276,12 @@ class FileHandlingTest(TestCase):
                 ),
                 {"file_field": f},
             )
-        self.assertTrue(response.status_code == 302)
+        assert response.status_code == 302
         response = self.client.get(
             reverse("core:file_detail", kwargs={"file_id": self.subscriber.home.id})
         )
-        self.assertTrue(response.status_code == 200)
-        self.assertTrue("ls</a>" in str(response.content))
+        assert response.status_code == 200
+        assert "ls</a>" in str(response.content)
 
 
 class UserIsInGroupTest(TestCase):
@@ -477,6 +296,10 @@ class UserIsInGroupTest(TestCase):
 
         cls.root_group = Group.objects.get(name="Root")
         cls.public = Group.objects.get(name="Public")
+        cls.skia = User.objects.get(username="skia")
+        cls.toto = User.objects.create(
+            username="toto", first_name="a", last_name="b", email="a.b@toto.fr"
+        )
         cls.subscribers = Group.objects.get(name="Subscribers")
         cls.old_subscribers = Group.objects.get(name="Old subscribers")
         cls.accounting_admin = Group.objects.get(name="Accounting admin")
@@ -493,21 +316,15 @@ class UserIsInGroupTest(TestCase):
         )
         cls.main_club = Club.objects.get(id=1)
 
-    def setUp(self) -> None:
-        self.toto = User.objects.create(
-            username="toto", first_name="a", last_name="b", email="a.b@toto.fr"
-        )
-        self.skia = User.objects.get(username="skia")
-
     def assert_in_public_group(self, user):
-        self.assertTrue(user.is_in_group(pk=self.public.id))
-        self.assertTrue(user.is_in_group(name=self.public.name))
+        assert user.is_in_group(pk=self.public.id)
+        assert user.is_in_group(name=self.public.name)
 
     def assert_in_club_metagroups(self, user, club):
         meta_groups_board = club.unix_name + settings.SITH_BOARD_SUFFIX
         meta_groups_members = club.unix_name + settings.SITH_MEMBER_SUFFIX
-        self.assertFalse(user.is_in_group(name=meta_groups_board))
-        self.assertFalse(user.is_in_group(name=meta_groups_members))
+        assert user.is_in_group(name=meta_groups_board) is False
+        assert user.is_in_group(name=meta_groups_members) is False
 
     def assert_only_in_public_group(self, user):
         self.assert_in_public_group(user)
@@ -519,12 +336,12 @@ class UserIsInGroupTest(TestCase):
             self.subscribers,
             self.old_subscribers,
         ):
-            self.assertFalse(user.is_in_group(pk=group.pk))
-            self.assertFalse(user.is_in_group(name=group.name))
+            assert not user.is_in_group(pk=group.pk)
+            assert not user.is_in_group(name=group.name)
         meta_groups_board = self.club.unix_name + settings.SITH_BOARD_SUFFIX
         meta_groups_members = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
-        self.assertFalse(user.is_in_group(name=meta_groups_board))
-        self.assertFalse(user.is_in_group(name=meta_groups_members))
+        assert user.is_in_group(name=meta_groups_board) is False
+        assert user.is_in_group(name=meta_groups_members) is False
 
     def test_anonymous_user(self):
         """
@@ -583,15 +400,13 @@ class UserIsInGroupTest(TestCase):
         )
         meta_groups_members = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
         cache.clear()
-        self.assertTrue(self.toto.is_in_group(name=meta_groups_members))
-        self.assertEqual(
-            membership, cache.get(f"membership_{self.club.id}_{self.toto.id}")
-        )
+        assert self.toto.is_in_group(name=meta_groups_members) is True
+        assert membership == cache.get(f"membership_{self.club.id}_{self.toto.id}")
         membership.end_date = now() - timedelta(minutes=5)
         membership.save()
         cached_membership = cache.get(f"membership_{self.club.id}_{self.toto.id}")
-        self.assertEqual(cached_membership, "not_member")
-        self.assertFalse(self.toto.is_in_group(name=meta_groups_members))
+        assert cached_membership == "not_member"
+        assert self.toto.is_in_group(name=meta_groups_members) is False
 
     def test_cache_properly_cleared_group(self):
         """
@@ -600,24 +415,24 @@ class UserIsInGroupTest(TestCase):
         """
         # testing with pk
         self.toto.groups.add(self.com_admin.pk)
-        self.assertTrue(self.toto.is_in_group(pk=self.com_admin.pk))
+        assert self.toto.is_in_group(pk=self.com_admin.pk) is True
 
         self.toto.groups.remove(self.com_admin.pk)
-        self.assertFalse(self.toto.is_in_group(pk=self.com_admin.pk))
+        assert self.toto.is_in_group(pk=self.com_admin.pk) is False
 
         # testing with name
         self.toto.groups.add(self.sas_admin.pk)
-        self.assertTrue(self.toto.is_in_group(name="SAS admin"))
+        assert self.toto.is_in_group(name="SAS admin") is True
 
         self.toto.groups.remove(self.sas_admin.pk)
-        self.assertFalse(self.toto.is_in_group(name="SAS admin"))
+        assert self.toto.is_in_group(name="SAS admin") is False
 
     def test_not_existing_group(self):
         """
         Test that searching for a not existing group
         returns False
         """
-        self.assertFalse(self.skia.is_in_group(name="This doesn't exist"))
+        assert self.skia.is_in_group(name="This doesn't exist") is False
 
 
 class DateUtilsTest(TestCase):
@@ -639,29 +454,25 @@ class DateUtilsTest(TestCase):
         """
         Test that the get_semester function returns the correct semester string
         """
-        self.assertEqual(get_semester_code(self.autumn_semester_january), "A24")
-        self.assertEqual(get_semester_code(self.autumn_semester_september), "A24")
-        self.assertEqual(get_semester_code(self.autumn_first_day), "A24")
+        assert get_semester_code(self.autumn_semester_january) == "A24"
+        assert get_semester_code(self.autumn_semester_september) == "A24"
+        assert get_semester_code(self.autumn_first_day) == "A24"
 
-        self.assertEqual(get_semester_code(self.spring_semester_march), "P23")
-        self.assertEqual(get_semester_code(self.spring_first_day), "P23")
+        assert get_semester_code(self.spring_semester_march) == "P23"
+        assert get_semester_code(self.spring_first_day) == "P23"
 
     def test_get_start_of_semester_fixed_date(self):
         """
         Test that the get_start_of_semester correctly the starting date of the semester.
         """
         automn_2024 = date(2024, self.autumn_month, self.autumn_day)
-        self.assertEqual(
-            get_start_of_semester(self.autumn_semester_january), automn_2024
-        )
-        self.assertEqual(
-            get_start_of_semester(self.autumn_semester_september), automn_2024
-        )
-        self.assertEqual(get_start_of_semester(self.autumn_first_day), automn_2024)
+        assert get_start_of_semester(self.autumn_semester_january) == automn_2024
+        assert get_start_of_semester(self.autumn_semester_september) == automn_2024
+        assert get_start_of_semester(self.autumn_first_day) == automn_2024
 
         spring_2023 = date(2023, self.spring_month, self.spring_day)
-        self.assertEqual(get_start_of_semester(self.spring_semester_march), spring_2023)
-        self.assertEqual(get_start_of_semester(self.spring_first_day), spring_2023)
+        assert get_start_of_semester(self.spring_semester_march) == spring_2023
+        assert get_start_of_semester(self.spring_first_day) == spring_2023
 
     def test_get_start_of_semester_today(self):
         """
@@ -669,10 +480,10 @@ class DateUtilsTest(TestCase):
         when no date is given
         """
         with freezegun.freeze_time(self.autumn_semester_september):
-            self.assertEqual(get_start_of_semester(), self.autumn_first_day)
+            assert get_start_of_semester() == self.autumn_first_day
 
         with freezegun.freeze_time(self.spring_semester_march):
-            self.assertEqual(get_start_of_semester(), self.spring_first_day)
+            assert get_start_of_semester() == self.spring_first_day
 
     def test_get_start_of_semester_changing_date(self):
         """
@@ -685,8 +496,8 @@ class DateUtilsTest(TestCase):
         mid_autumn = autumn_2023 + timedelta(days=45)
 
         with freezegun.freeze_time(mid_spring) as frozen_time:
-            self.assertEqual(get_start_of_semester(), spring_2023)
+            assert get_start_of_semester() == spring_2023
 
             # forward time to the middle of the next semester
             frozen_time.move_to(mid_autumn)
-            self.assertEqual(get_start_of_semester(), autumn_2023)
+            assert get_start_of_semester() == autumn_2023

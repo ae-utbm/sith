@@ -46,9 +46,7 @@ class CounterTest(TestCase):
             reverse("counter:details", kwargs={"counter_id": self.mde.id})
         )
 
-        self.assertTrue(
-            'class="link-button">S&#39; Kia</button>' in str(response.content)
-        )
+        assert 'class="link-button">S&#39; Kia</button>' in str(response.content)
 
         counter_token = re.search(
             r'name="counter_token" value="([^"]*)"', str(response.content)
@@ -60,7 +58,7 @@ class CounterTest(TestCase):
         )
         counter_url = response.get("location")
         response = self.client.get(response.get("location"))
-        self.assertTrue(">Richard Batsbak</" in str(response.content))
+        assert ">Richard Batsbak</" in str(response.content)
 
         self.client.post(
             counter_url,
@@ -90,11 +88,10 @@ class CounterTest(TestCase):
 
         response_get = self.client.get(response.get("location"))
         response_content = response_get.content.decode("utf-8")
-        self.assertTrue("2 x Barbar" in str(response_content))
-        self.assertTrue("2 x Déconsigne Eco-cup" in str(response_content))
-        self.assertTrue(
-            "<p>Client : Richard Batsbak - Nouveau montant : 3.60"
-            in str(response_content)
+        assert "2 x Barbar" in str(response_content)
+        assert "2 x Déconsigne Eco-cup" in str(response_content)
+        assert "<p>Client : Richard Batsbak - Nouveau montant : 3.60" in str(
+            response_content
         )
 
         self.client.post(
@@ -111,7 +108,7 @@ class CounterTest(TestCase):
                 "bank": "OTHER",
             },
         )
-        self.assertTrue(response.status_code == 200)
+        assert response.status_code == 200
 
         self.client.post(
             reverse("counter:login", kwargs={"counter_id": self.foyer.id}),
@@ -141,27 +138,26 @@ class CounterTest(TestCase):
                 "bank": "OTHER",
             },
         )
-        self.assertTrue(response.status_code == 200)
+        assert response.status_code == 200
 
     def test_annotate_has_barman_queryset(self):
         """
         Test if the custom queryset method ``annotate_has_barman``
         works as intended
         """
-        self.sli.counters.clear()
-        self.sli.counters.add(self.foyer, self.mde)
+        self.sli.counters.set([self.foyer, self.mde])
         counters = Counter.objects.annotate_has_barman(self.sli)
         for counter in counters:
             if counter.name in ("Foyer", "MDE"):
-                self.assertTrue(counter.has_annotated_barman)
+                assert counter.has_annotated_barman
             else:
-                self.assertFalse(counter.has_annotated_barman)
+                assert not counter.has_annotated_barman
 
 
 class CounterStatsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.counter = Counter.objects.filter(id=2).first()
+        cls.counter = Counter.objects.get(id=2)
         cls.krophil = User.objects.get(username="krophil")
         cls.skia = User.objects.get(username="skia")
         cls.sli = User.objects.get(username="sli")
@@ -262,109 +258,56 @@ class CounterStatsTest(TestCase):
     def test_not_authenticated_user_fail(self):
         # Test with not login user
         response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
-        self.assertTrue(response.status_code == 403)
+        assert response.status_code == 403
 
     def test_unauthorized_user_fails(self):
-        user = User.objects.get(username="public")
-        self.client.login(username=user.username, password="plop")
+        self.client.force_login(User.objects.get(username="public"))
         response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
-        self.assertTrue(response.status_code == 403)
+        assert response.status_code == 403
 
     def test_get_total_sales(self):
         """
         Test the result of the Counter.get_total_sales() method
         """
-        total = self.counter.get_total_sales()
-        self.assertEqual(total, 3102)
+        assert self.counter.get_total_sales() == 3102
 
     def test_top_barmen(self):
         """
         Test the result of Counter.get_top_barmen() is correct
         """
-        top = iter(self.counter.get_top_barmen())
-        self.assertEqual(
-            next(top),
+        users = [self.skia, self.root, self.sli]
+        perm_times = [
+            timedelta(days=16, hours=2, minutes=35, seconds=54),
+            timedelta(hours=21),
+            timedelta(hours=5),
+        ]
+        assert list(self.counter.get_top_barmen()) == [
             {
-                "user": self.skia.id,
-                "name": f"{self.skia.first_name} {self.skia.last_name}",
-                "promo": self.skia.promo,
-                "nickname": self.skia.nick_name,
-                "perm_sum": timedelta(days=16, hours=2, minutes=35, seconds=54),
-            },
-        )
-        self.assertEqual(
-            next(top),
-            {
-                "user": self.root.id,
-                "name": f"{self.root.first_name} {self.root.last_name}",
-                "promo": self.root.promo,
-                "nickname": self.root.nick_name,
-                "perm_sum": timedelta(hours=21),
-            },
-        )
-        self.assertEqual(
-            next(top),
-            {
-                "user": self.sli.id,
-                "name": f"{self.sli.first_name} {self.sli.last_name}",
-                "promo": self.sli.promo,
-                "nickname": self.sli.nick_name,
-                "perm_sum": timedelta(hours=5),
-            },
-        )
-        self.assertIsNone(
-            next(top, None), msg="barmen with no office hours should not be in the top"
-        )
+                "user": user.id,
+                "name": f"{user.first_name} {user.last_name}",
+                "promo": user.promo,
+                "nickname": user.nick_name,
+                "perm_sum": perm_time,
+            }
+            for user, perm_time in zip(users, perm_times)
+        ]
 
     def test_top_customer(self):
         """
         Test the result of Counter.get_top_customers() is correct
         """
-        top = iter(self.counter.get_top_customers())
-        expected_results = [
+        users = [self.sli, self.skia, self.krophil, self.root]
+        sale_amounts = [2000, 1000, 100, 2]
+        assert list(self.counter.get_top_customers()) == [
             {
-                "user": self.sli.id,
-                "name": f"{self.sli.first_name} {self.sli.last_name}",
-                "promo": self.sli.promo,
-                "nickname": self.sli.nick_name,
-                "selling_sum": 2000,
-            },
-            {
-                "user": self.skia.id,
-                "name": f"{self.skia.first_name} {self.skia.last_name}",
-                "promo": self.skia.promo,
-                "nickname": self.skia.nick_name,
-                "selling_sum": 1000,
-            },
-            {
-                "user": self.krophil.id,
-                "name": f"{self.krophil.first_name} {self.krophil.last_name}",
-                "promo": self.krophil.promo,
-                "nickname": self.krophil.nick_name,
-                "selling_sum": 100,
-            },
-            {
-                "user": self.root.id,
-                "name": f"{self.root.first_name} {self.root.last_name}",
-                "promo": self.root.promo,
-                "nickname": self.root.nick_name,
-                "selling_sum": 2,
-            },
+                "user": user.id,
+                "name": f"{user.first_name} {user.last_name}",
+                "promo": user.promo,
+                "nickname": user.nick_name,
+                "selling_sum": sale_amount,
+            }
+            for user, sale_amount in zip(users, sale_amounts)
         ]
-
-        for result in expected_results:
-            self.assertEqual(
-                next(top),
-                {
-                    "user": result["user"],
-                    "name": result["name"],
-                    "promo": result["promo"],
-                    "nickname": result["nickname"],
-                    "selling_sum": result["selling_sum"],
-                },
-            )
-
-        self.assertIsNone(next(top, None))
 
 
 class BillingInfoTest(TestCase):
@@ -386,13 +329,15 @@ class BillingInfoTest(TestCase):
             "city": "Sète",
             "country": "FR",
         }
+        cls.root = User.objects.get(username="root")
+        cls.subscriber = User.objects.get(username="subscriber")
 
     def test_edit_infos(self):
-        user = User.objects.get(username="subscriber")
+        user = self.subscriber
         BillingInfo.objects.get_or_create(
             customer=user.customer, defaults=self.payload_1
         )
-        self.client.login(username=user.username, password="plop")
+        self.client.force_login(user)
         response = self.client.post(
             reverse("counter:edit_billing_info", args=[user.id]),
             json.dumps(self.payload_2),
@@ -400,23 +345,23 @@ class BillingInfoTest(TestCase):
         )
         user = User.objects.get(username="subscriber")
         infos = BillingInfo.objects.get(customer__user=user)
-        self.assertEqual(200, response.status_code)
+        assert response.status_code == 200
         self.assertJSONEqual(response.content, {"errors": None})
-        self.assertTrue(hasattr(user.customer, "billing_infos"))
-        self.assertEqual(user.customer, infos.customer)
-        self.assertEqual("Subscribed", infos.first_name)
-        self.assertEqual("User", infos.last_name)
-        self.assertEqual("3, rue de Troyes", infos.address_1)
-        self.assertEqual(None, infos.address_2)
-        self.assertEqual("34301", infos.zip_code)
-        self.assertEqual("Sète", infos.city)
-        self.assertEqual("FR", infos.country)
+        assert hasattr(user.customer, "billing_infos")
+        assert infos.customer == user.customer
+        assert infos.first_name == "Subscribed"
+        assert infos.last_name == "User"
+        assert infos.address_1 == "3, rue de Troyes"
+        assert infos.address_2 is None
+        assert infos.zip_code == "34301"
+        assert infos.city == "Sète"
+        assert infos.country == "FR"
 
     def test_create_infos_for_user_with_account(self):
         user = User.objects.get(username="subscriber")
         if hasattr(user.customer, "billing_infos"):
             user.customer.billing_infos.delete()
-        self.client.login(username=user.username, password="plop")
+        self.client.force_login(user)
         response = self.client.post(
             reverse("counter:create_billing_info", args=[user.id]),
             json.dumps(self.payload_1),
@@ -424,48 +369,48 @@ class BillingInfoTest(TestCase):
         )
         user = User.objects.get(username="subscriber")
         infos = BillingInfo.objects.get(customer__user=user)
-        self.assertEqual(200, response.status_code)
+        assert response.status_code == 200
         self.assertJSONEqual(response.content, {"errors": None})
-        self.assertTrue(hasattr(user.customer, "billing_infos"))
-        self.assertEqual(user.customer, infos.customer)
-        self.assertEqual("Subscribed", infos.first_name)
-        self.assertEqual("User", infos.last_name)
-        self.assertEqual("1 rue des Huns", infos.address_1)
-        self.assertEqual(None, infos.address_2)
-        self.assertEqual("90000", infos.zip_code)
-        self.assertEqual("Belfort", infos.city)
-        self.assertEqual("FR", infos.country)
+        assert hasattr(user.customer, "billing_infos")
+        assert infos.customer == user.customer
+        assert infos.first_name == "Subscribed"
+        assert infos.last_name == "User"
+        assert infos.address_1 == "1 rue des Huns"
+        assert infos.address_2 is None
+        assert infos.zip_code == "90000"
+        assert infos.city == "Belfort"
+        assert infos.country == "FR"
 
     def test_create_infos_for_user_without_account(self):
         user = User.objects.get(username="subscriber")
         if hasattr(user, "customer"):
             user.customer.delete()
-        self.client.login(username=user.username, password="plop")
+        self.client.force_login(user)
         response = self.client.post(
             reverse("counter:create_billing_info", args=[user.id]),
             json.dumps(self.payload_1),
             content_type="application/json",
         )
         user = User.objects.get(username="subscriber")
-        self.assertTrue(hasattr(user, "customer"))
-        self.assertTrue(hasattr(user.customer, "billing_infos"))
-        self.assertEqual(200, response.status_code)
+        assert hasattr(user, "customer")
+        assert hasattr(user.customer, "billing_infos")
+        assert response.status_code == 200
         self.assertJSONEqual(response.content, {"errors": None})
         infos = BillingInfo.objects.get(customer__user=user)
         self.assertEqual(user.customer, infos.customer)
-        self.assertEqual("Subscribed", infos.first_name)
-        self.assertEqual("User", infos.last_name)
-        self.assertEqual("1 rue des Huns", infos.address_1)
-        self.assertEqual(None, infos.address_2)
-        self.assertEqual("90000", infos.zip_code)
-        self.assertEqual("Belfort", infos.city)
-        self.assertEqual("FR", infos.country)
+        assert infos.first_name == "Subscribed"
+        assert infos.last_name == "User"
+        assert infos.address_1 == "1 rue des Huns"
+        assert infos.address_2 is None
+        assert infos.zip_code == "90000"
+        assert infos.city == "Belfort"
+        assert infos.country == "FR"
 
     def test_create_invalid(self):
         user = User.objects.get(username="subscriber")
         if hasattr(user.customer, "billing_infos"):
             user.customer.billing_infos.delete()
-        self.client.login(username=user.username, password="plop")
+        self.client.force_login(user)
         # address_1, zip_code and country are missing
         payload = {
             "first_name": user.first_name,
@@ -479,7 +424,7 @@ class BillingInfoTest(TestCase):
         )
         user = User.objects.get(username="subscriber")
         self.assertEqual(400, response.status_code)
-        self.assertFalse(hasattr(user.customer, "billing_infos"))
+        assert not hasattr(user.customer, "billing_infos")
         expected_errors = {
             "errors": [
                 {"field": "Adresse 1", "messages": ["Ce champ est obligatoire."]},
@@ -494,7 +439,7 @@ class BillingInfoTest(TestCase):
         BillingInfo.objects.get_or_create(
             customer=user.customer, defaults=self.payload_1
         )
-        self.client.login(username=user.username, password="plop")
+        self.client.force_login(user)
         # address_1, zip_code and country are missing
         payload = {
             "first_name": user.first_name,
@@ -508,7 +453,7 @@ class BillingInfoTest(TestCase):
         )
         user = User.objects.get(username="subscriber")
         self.assertEqual(400, response.status_code)
-        self.assertTrue(hasattr(user.customer, "billing_infos"))
+        assert hasattr(user.customer, "billing_infos")
         expected_errors = {
             "errors": [
                 {"field": "Adresse 1", "messages": ["Ce champ est obligatoire."]},
@@ -535,7 +480,7 @@ class BillingInfoTest(TestCase):
         user = User.objects.get(username="subscriber")
         if hasattr(user.customer, "billing_infos"):
             user.customer.billing_infos.delete()
-        self.client.login(username=user.username, password="plop")
+        self.client.force_login(user)
         response = self.client.post(
             reverse("counter:edit_billing_info", args=[user.id]),
             json.dumps(self.payload_2),
@@ -548,17 +493,17 @@ class BillingInfoTest(TestCase):
         BillingInfo.objects.get_or_create(
             customer=user.customer, defaults=self.payload_1
         )
-        self.client.login(username="root", password="plop")
+        self.client.force_login(self.root)
         response = self.client.post(
             reverse("counter:edit_billing_info", args=[user.id]),
             json.dumps(self.payload_2),
             content_type="application/json",
         )
-        self.assertEqual(200, response.status_code)
+        assert response.status_code == 200
         user = User.objects.get(username="subscriber")
         infos = BillingInfo.objects.get(customer__user=user)
         self.assertJSONEqual(response.content, {"errors": None})
-        self.assertTrue(hasattr(user.customer, "billing_infos"))
+        assert hasattr(user.customer, "billing_infos")
         self.assertEqual(user.customer, infos.customer)
         self.assertEqual("Subscribed", infos.first_name)
         self.assertEqual("User", infos.last_name)
@@ -572,61 +517,55 @@ class BillingInfoTest(TestCase):
         user = User.objects.get(username="subscriber")
         if hasattr(user.customer, "billing_infos"):
             user.customer.billing_infos.delete()
-        self.client.login(username="root", password="plop")
+        self.client.force_login(self.root)
         response = self.client.post(
             reverse("counter:create_billing_info", args=[user.id]),
             json.dumps(self.payload_2),
             content_type="application/json",
         )
-        self.assertEqual(200, response.status_code)
+        assert response.status_code == 200
         user = User.objects.get(username="subscriber")
         infos = BillingInfo.objects.get(customer__user=user)
         self.assertJSONEqual(response.content, {"errors": None})
-        self.assertTrue(hasattr(user.customer, "billing_infos"))
-        self.assertEqual(user.customer, infos.customer)
-        self.assertEqual("Subscribed", infos.first_name)
-        self.assertEqual("User", infos.last_name)
-        self.assertEqual("3, rue de Troyes", infos.address_1)
-        self.assertEqual(None, infos.address_2)
-        self.assertEqual("34301", infos.zip_code)
-        self.assertEqual("Sète", infos.city)
-        self.assertEqual("FR", infos.country)
+        assert hasattr(user.customer, "billing_infos")
+        assert infos.customer == user.customer
+        assert infos.first_name == "Subscribed"
+        assert infos.last_name == "User"
+        assert infos.address_1 == "3, rue de Troyes"
+        assert infos.address_2 is None
+        assert infos.zip_code == "34301"
+        assert infos.city == "Sète"
+        assert infos.country == "FR"
 
 
 class BarmanConnectionTest(TestCase):
-    def setUp(self):
-        self.krophil = User.objects.get(username="krophil")
-        self.skia = User.objects.get(username="skia")
-        self.skia.customer.account = 800
-        self.krophil.customer.save()
-        self.skia.customer.save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.krophil = User.objects.get(username="krophil")
+        cls.skia = User.objects.get(username="skia")
+        cls.skia.customer.account = 800
+        cls.krophil.customer.save()
+        cls.skia.customer.save()
 
-        self.counter = Counter.objects.filter(id=2).first()
+        cls.counter = Counter.objects.get(id=2)
 
     def test_barman_granted(self):
         self.client.post(
             reverse("counter:login", args=[self.counter.id]),
             {"username": "krophil", "password": "plop"},
         )
-        response_get = self.client.get(
-            reverse("counter:details", args=[self.counter.id])
-        )
+        response = self.client.get(reverse("counter:details", args=[self.counter.id]))
 
-        self.assertTrue("<p>Entrez un code client : </p>" in str(response_get.content))
+        assert "<p>Entrez un code client : </p>" in str(response.content)
 
     def test_counters_list_barmen(self):
         self.client.post(
             reverse("counter:login", args=[self.counter.id]),
             {"username": "krophil", "password": "plop"},
         )
-        response_get = self.client.get(
-            reverse("counter:activity", args=[self.counter.id])
-        )
+        response = self.client.get(reverse("counter:activity", args=[self.counter.id]))
 
-        self.assertTrue(
-            '<li><a href="/user/10/">Kro Phil&#39;</a></li>'
-            in str(response_get.content)
-        )
+        assert '<li><a href="/user/10/">Kro Phil&#39;</a></li>' in str(response.content)
 
     def test_barman_denied(self):
         self.client.post(
@@ -637,20 +576,16 @@ class BarmanConnectionTest(TestCase):
             reverse("counter:details", args=[self.counter.id])
         )
 
-        self.assertTrue("<p>Merci de vous identifier</p>" in str(response_get.content))
+        assert "<p>Merci de vous identifier</p>" in str(response_get.content)
 
     def test_counters_list_no_barmen(self):
         self.client.post(
             reverse("counter:login", args=[self.counter.id]),
             {"username": "krophil", "password": "plop"},
         )
-        response_get = self.client.get(
-            reverse("counter:activity", args=[self.counter.id])
-        )
+        response = self.client.get(reverse("counter:activity", args=[self.counter.id]))
 
-        self.assertFalse(
-            '<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response_get.content)
-        )
+        assert not '<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response.content)
 
 
 class StudentCardTest(TestCase):
@@ -659,12 +594,16 @@ class StudentCardTest(TestCase):
     Test that an user can be found with it's student card
     """
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.krophil = User.objects.get(username="krophil")
+        cls.sli = User.objects.get(username="sli")
+        cls.skia = User.objects.get(username="skia")
+        cls.root = User.objects.get(username="root")
+
+        cls.counter = Counter.objects.get(id=2)
+
     def setUp(self):
-        self.krophil = User.objects.get(username="krophil")
-        self.sli = User.objects.get(username="sli")
-
-        self.counter = Counter.objects.filter(id=2).first()
-
         # Auto login on counter
         self.client.post(
             reverse("counter:login", args=[self.counter.id]),
@@ -677,12 +616,9 @@ class StudentCardTest(TestCase):
             {"code": "9A89B82018B0A0"},
         )
 
-        self.assertEqual(
-            response.url,
-            reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
-            ),
+        assert response.url == reverse(
+            "counter:click",
+            kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
         )
 
     def test_add_student_card_from_counter(self):
@@ -778,7 +714,7 @@ class StudentCardTest(TestCase):
         )
 
     def test_delete_student_card_with_owner(self):
-        self.client.login(username="sli", password="plop")
+        self.client.force_login(self.sli)
         self.client.post(
             reverse(
                 "counter:delete_student_card",
@@ -788,10 +724,10 @@ class StudentCardTest(TestCase):
                 },
             )
         )
-        self.assertFalse(self.sli.customer.student_cards.exists())
+        assert not self.sli.customer.student_cards.exists()
 
     def test_delete_student_card_with_board_member(self):
-        self.client.login(username="skia", password="plop")
+        self.client.force_login(self.skia)
         self.client.post(
             reverse(
                 "counter:delete_student_card",
@@ -801,10 +737,10 @@ class StudentCardTest(TestCase):
                 },
             )
         )
-        self.assertFalse(self.sli.customer.student_cards.exists())
+        assert not self.sli.customer.student_cards.exists()
 
     def test_delete_student_card_with_root(self):
-        self.client.login(username="root", password="plop")
+        self.client.force_login(self.root)
         self.client.post(
             reverse(
                 "counter:delete_student_card",
@@ -814,10 +750,10 @@ class StudentCardTest(TestCase):
                 },
             )
         )
-        self.assertFalse(self.sli.customer.student_cards.exists())
+        assert not self.sli.customer.student_cards.exists()
 
     def test_delete_student_card_fail(self):
-        self.client.login(username="krophil", password="plop")
+        self.client.force_login(self.krophil)
         response = self.client.post(
             reverse(
                 "counter:delete_student_card",
@@ -827,12 +763,12 @@ class StudentCardTest(TestCase):
                 },
             )
         )
-        self.assertEqual(response.status_code, 403)
-        self.assertTrue(self.sli.customer.student_cards.exists())
+        assert response.status_code == 403
+        assert self.sli.customer.student_cards.exists()
 
     def test_add_student_card_from_user_preferences(self):
         # Test with owner of the card
-        self.client.login(username="sli", password="plop")
+        self.client.force_login(self.sli)
         self.client.post(
             reverse(
                 "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
@@ -846,7 +782,7 @@ class StudentCardTest(TestCase):
         self.assertContains(response, text="8B90734A802A8F")
 
         # Test with board member
-        self.client.login(username="skia", password="plop")
+        self.client.force_login(self.skia)
         self.client.post(
             reverse(
                 "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
@@ -884,7 +820,7 @@ class StudentCardTest(TestCase):
         self.assertContains(response, text="ABCAAAFAAFAAAB")
 
         # Test with root
-        self.client.login(username="root", password="plop")
+        self.client.force_login(self.root)
         self.client.post(
             reverse(
                 "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
@@ -898,7 +834,7 @@ class StudentCardTest(TestCase):
         self.assertContains(response, text="8B90734A802A8B")
 
     def test_add_student_card_from_user_preferences_fail(self):
-        self.client.login(username="sli", password="plop")
+        self.client.force_login(self.sli)
         # UID too short
         response = self.client.post(
             reverse(
@@ -943,29 +879,30 @@ class StudentCardTest(TestCase):
             reverse(
                 "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
             ),
-            {"uid": "              "},
+            {"uid": " " * 14},
         )
         self.assertContains(response, text="Cet UID est invalide")
 
         # Test with unauthorized user
-        self.client.login(username="krophil", password="plop")
+        self.client.force_login(self.krophil)
         response = self.client.post(
             reverse(
                 "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
             ),
             {"uid": "8B90734A802A8F"},
         )
-        self.assertEqual(response.status_code, 403)
+        assert response.status_code == 403
 
 
 class CustomerAccountIdTest(TestCase):
-    def setUp(self):
-        self.user_a = User.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_a = User.objects.create(
             username="a", password="plop", email="a.a@a.fr"
         )
         user_b = User.objects.create(username="b", password="plop", email="b.b@b.fr")
         user_c = User.objects.create(username="c", password="plop", email="c.c@c.fr")
-        Customer.objects.create(user=self.user_a, amount=10, account_id="1111a")
+        Customer.objects.create(user=cls.user_a, amount=10, account_id="1111a")
         Customer.objects.create(user=user_b, amount=0, account_id="9999z")
         Customer.objects.create(user=user_c, amount=0, account_id="12345f")
 
@@ -974,14 +911,14 @@ class CustomerAccountIdTest(TestCase):
         customer, created = Customer.get_or_create(user_d)
         account_id = customer.account_id
         number = account_id[:-1]
-        self.assertTrue(created)
-        self.assertEqual(number, "12346")
-        self.assertEqual(6, len(account_id))
-        self.assertIn(account_id[-1], string.ascii_lowercase)
-        self.assertEqual(0, customer.amount)
+        assert created is True
+        assert number == "12346"
+        assert 6 == len(account_id)
+        assert account_id[-1] in string.ascii_lowercase
+        assert customer.amount == 0
 
     def test_get_existing_account(self):
         account, created = Customer.get_or_create(self.user_a)
-        self.assertFalse(created)
-        self.assertEqual(account.account_id, "1111a")
-        self.assertEqual(10, account.amount)
+        assert created is False
+        assert account.account_id == "1111a"
+        assert account.amount == 10

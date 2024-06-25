@@ -603,7 +603,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         }
         return kwargs
 
-    def add_new_mailing(self, cleaned_data) -> ValidationError:
+    def add_new_mailing(self, cleaned_data) -> ValidationError | None:
         """
         Create a new mailing list from the form
         """
@@ -620,7 +620,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         mailing.save()
         return None
 
-    def add_new_subscription(self, cleaned_data) -> ValidationError:
+    def add_new_subscription(self, cleaned_data) -> ValidationError | None:
         """
         Add mailing subscriptions for each user given and/or for the specified email in form
         """

@@ -11,4 +11,4 @@ def django_db_setup(django_db_setup, django_db_blocker):
 
 @pytest.fixture(scope="session", autouse=True)
 def set_default_language():
-    activate('fr')
+    activate("fr")
