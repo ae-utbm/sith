@@ -14,17 +14,16 @@
 #
 #
 
+import math
 from datetime import date, timedelta
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.urls import reverse
-from django.contrib.auth.forms import PasswordResetForm
 
 from dateutil.relativedelta import relativedelta
-
-import math
+from django.conf import settings
+from django.contrib.auth.forms import PasswordResetForm
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from core.models import User
 from core.utils import get_start_of_semester

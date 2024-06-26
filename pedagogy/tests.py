@@ -23,13 +23,12 @@
 #
 
 from django.conf import settings
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.core.management import call_command
 
-from core.models import User, Notification
-
+from core.models import Notification, User
 from pedagogy.models import UV, UVComment, UVCommentReport
 
 

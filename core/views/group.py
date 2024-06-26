@@ -15,18 +15,15 @@
 #
 
 """
-    This module contains views to manage Groups
+This module contains views to manage Groups
 """
 
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.views.generic import ListView
-from django.views.generic.edit import FormView
-from django.urls import reverse_lazy
-from django.shortcuts import get_object_or_404
-from django.utils.translation import gettext_lazy as _
-from django import forms
-
 from ajax_select.fields import AutoCompleteSelectMultipleField
+from django import forms
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from core.models import RealGroup, User
 from core.views import CanCreateMixin, CanEditMixin, DetailFormView

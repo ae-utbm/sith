@@ -14,21 +14,19 @@
 #
 #
 
-from django.views.generic.edit import CreateView, FormView
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import PermissionDenied, ValidationError
-from django.urls import reverse_lazy
-from django import forms
-from django.conf import settings
-
-from ajax_select.fields import AutoCompleteSelectField
 import random
 
-from subscription.models import Subscription
-from core.views.forms import SelectDateTime
+from ajax_select.fields import AutoCompleteSelectField
+from django import forms
+from django.conf import settings
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.views.generic.edit import CreateView, FormView
+
 from core.models import User
-from core.views.forms import SelectDate
-from core.views.forms import TzAwareDateTimeField
+from core.views.forms import SelectDate, TzAwareDateTimeField
+from subscription.models import Subscription
 
 
 class SelectionDateForm(forms.Form):

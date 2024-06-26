@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import django.db.models.deletion
 from django.db import migrations, models
 
 from club.models import Club
 from core.operations import PsqlRunOnly
-import django.db.models.deletion
 
 
 def generate_club_pages(apps, schema_editor):

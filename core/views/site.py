@@ -23,23 +23,22 @@
 #
 #
 
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from django.core import serializers
-from django.contrib.auth.decorators import login_required
-from django.utils import html
-from django.views.generic import ListView, TemplateView
-from django.conf import settings
-from django.utils.text import slugify
-from django.db.models.query import QuerySet
-
 import json
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core import serializers
+from django.db.models.query import QuerySet
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+from django.utils import html
+from django.utils.text import slugify
+from django.views.generic import ListView, TemplateView
 from haystack.query import SearchQuerySet
 
-from core.models import User, Notification
-from core.utils import doku_to_markdown, bbcode_to_markdown
 from club.models import Club
+from core.models import Notification, User
+from core.utils import bbcode_to_markdown, doku_to_markdown
 
 
 def index(request, context=None):
@@ -100,9 +99,8 @@ def search_club(query, as_json=False):
     if query:
         clubs = Club.objects.filter(name__icontains=query).all()
         clubs = clubs[:5]
-        if (
-            as_json
-        ):  # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
+        if as_json:
+            # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
             clubs = json.loads(serializers.serialize("json", clubs, fields=("name")))
         else:
             clubs = list(clubs)

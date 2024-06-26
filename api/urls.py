@@ -14,10 +14,10 @@
 #
 #
 
-from django.urls import re_path, path, include
+from django.urls import include, path, re_path
+from rest_framework import routers
 
 from api.views import *
-from rest_framework import routers
 
 # Router config
 router = routers.DefaultRouter()

@@ -16,12 +16,11 @@
 from datetime import date
 from unittest import mock
 
-from django.test import TestCase
-from subscription.models import Subscription
-from core.models import User
 from django.conf import settings
-from datetime import datetime
-from django.core.management import call_command
+from django.test import TestCase
+
+from core.models import User
+from subscription.models import Subscription
 
 
 class FakeDate(date):

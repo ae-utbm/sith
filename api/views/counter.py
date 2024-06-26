@@ -15,12 +15,11 @@
 #
 
 from rest_framework import serializers
-from rest_framework.response import Response
 from rest_framework.decorators import action
-
-from counter.models import Counter
+from rest_framework.response import Response
 
 from api.views import RightModelViewSet
+from counter.models import Counter
 
 
 class CounterSerializer(serializers.ModelSerializer):

@@ -1,9 +1,8 @@
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
-from django.core.management import call_command
-from django.conf import settings
 
-from core.models import User, Group
+from core.models import Group, User
 from election.models import Election
 
 

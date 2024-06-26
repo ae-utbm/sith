@@ -8,15 +8,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  black:
-    name: Black format
+  ruff:
+    name: Ruff lint & format
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-      - name: Setup Project
-        uses: ./.github/actions/setup_project
-      - run: poetry run black --check .
+      - uses: actions/checkout@v4
+      - name: ruff format
+        uses: chartboost/ruff-action@v1  # format
+        with:
+          args: format --diff
+      - name: ruff check
+        uses: chartboost/ruff-action@v1  # lint
 
   tests:
     name: Run tests and generate coverage report

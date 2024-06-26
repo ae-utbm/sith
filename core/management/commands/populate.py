@@ -24,38 +24,37 @@
 
 import os
 from datetime import date, datetime, timedelta
-from io import StringIO, BytesIO
+from io import BytesIO, StringIO
 from pathlib import Path
 
-from django.contrib.auth.models import Permission
-from django.core.management.base import BaseCommand
-from django.core.management import call_command
 from django.conf import settings
-from django.db import connection
+from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
+from django.core.management import call_command
+from django.core.management.base import BaseCommand
+from django.db import connection
 from django.utils import timezone
-
 from PIL import Image
 
-from core.models import Group, User, Page, PageRev, SithFile
 from accounting.models import (
-    GeneralJournal,
+    AccountingType,
     BankAccount,
     ClubAccount,
-    Operation,
-    AccountingType,
-    SimplifiedAccountingType,
     Company,
+    GeneralJournal,
+    Operation,
+    SimplifiedAccountingType,
 )
-from core.utils import resize_image
 from club.models import Club, Membership
-from subscription.models import Subscription
-from counter.models import Customer, ProductType, Product, Counter, Selling, StudentCard
-from com.models import Sith, Weekmail, News, NewsDate
-from election.models import Election, Role, Candidature, ElectionList
+from com.models import News, NewsDate, Sith, Weekmail
+from core.models import Group, Page, PageRev, SithFile, User
+from core.utils import resize_image
+from counter.models import Counter, Customer, Product, ProductType, Selling, StudentCard
+from election.models import Candidature, Election, ElectionList, Role
 from forum.models import Forum, ForumTopic
 from pedagogy.models import UV
-from sas.models import Album, Picture, PeoplePictureRelation
+from sas.models import Album, PeoplePictureRelation, Picture
+from subscription.models import Subscription
 
 
 class Command(BaseCommand):

@@ -7,6 +7,7 @@
 #
 
 import base64
+
 from OpenSSL import crypto
 
 with open("./private_key.pem") as f:

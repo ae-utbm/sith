@@ -16,23 +16,23 @@
 
 import base64
 import json
-import sentry_sdk
-
 from datetime import datetime
 from urllib.parse import unquote
-from OpenSSL import crypto
+
+import sentry_sdk
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
-from django.db import transaction, DatabaseError
-from django.http import HttpResponse, HttpRequest
-from django.shortcuts import render, redirect
+from django.db import DatabaseError, transaction
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView, View
+from OpenSSL import crypto
 
 from counter.forms import BillingInfoForm
-from counter.models import Customer, Counter, Product
+from counter.models import Counter, Customer, Product
 from eboutic.forms import BasketForm
 from eboutic.models import Basket, Invoice, InvoiceItem, get_eboutic_products
 

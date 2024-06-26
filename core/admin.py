@@ -14,12 +14,12 @@
 #
 #
 
-from django.contrib import admin
 from ajax_select import make_ajax_form
-from core.models import User, Page, RealGroup, MetaGroup, SithFile
+from django.contrib import admin
 from django.contrib.auth.models import Group as AuthGroup
 from haystack.admin import SearchModelAdmin
 
+from core.models import MetaGroup, Page, RealGroup, SithFile, User
 
 admin.site.unregister(AuthGroup)
 admin.site.register(MetaGroup)

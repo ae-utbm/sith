@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
-import accounting.models
 import django.db.models.deletion
 from django.conf import settings
-import django.db.models.deletion
+from django.db import migrations, models
+
+import accounting.models
 
 
 class Migration(migrations.Migration):

@@ -14,19 +14,19 @@
 #
 #
 
-from django.test import TestCase
-from django.urls import reverse
-from django.core.management import call_command
 from datetime import date, timedelta
 
-from core.models import User
+from django.test import TestCase
+from django.urls import reverse
+
 from accounting.models import (
-    GeneralJournal,
-    Operation,
-    Label,
     AccountingType,
+    GeneralJournal,
+    Label,
+    Operation,
     SimplifiedAccountingType,
 )
+from core.models import User
 
 
 class RefoundAccountTest(TestCase):

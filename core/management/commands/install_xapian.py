@@ -15,10 +15,11 @@
 #
 
 import os
-import tomli
 import subprocess
-from django.core.management.base import BaseCommand, CommandParser
 from pathlib import Path
+
+import tomli
+from django.core.management.base import BaseCommand, CommandParser
 
 
 class Command(BaseCommand):

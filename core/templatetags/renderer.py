@@ -24,15 +24,15 @@
 #
 
 import datetime
-import phonenumbers
 
+import phonenumbers
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
 from django.utils.translation import ngettext
-from core.scss.processor import ScssProcessor
 
 from core.markdown import markdown as md
+from core.scss.processor import ScssProcessor
 
 register = template.Library()
 

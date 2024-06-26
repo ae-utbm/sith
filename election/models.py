@@ -1,9 +1,9 @@
 from django.db import models
-from ordered_model.models import OrderedModel
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from ordered_model.models import OrderedModel
 
-from core.models import User, Group
+from core.models import Group, User
 
 
 class Election(models.Model):

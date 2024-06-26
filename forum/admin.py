@@ -17,7 +17,6 @@
 from django.contrib import admin
 from haystack.admin import SearchModelAdmin
 
-
 from forum.models import *
 
 

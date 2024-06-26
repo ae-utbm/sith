@@ -31,4 +31,4 @@ class CounterConfig(AppConfig):
     verbose_name = _("counter")
 
     def ready(self):
-        import counter.signals
+        import counter.signals  # noqa F401

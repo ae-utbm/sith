@@ -24,21 +24,19 @@
 #
 from typing import Optional
 
-from django.core.cache import cache
-from django.db import models
-from django.core import validators
 from django.conf import settings
+from django.core import validators
+from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.validators import RegexValidator, validate_email
+from django.db import models, transaction
 from django.db.models import Q
-from django.utils.timezone import now
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
-from django.core.validators import RegexValidator, validate_email
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 
-from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification, Page
+from core.models import Group, MetaGroup, Notification, Page, RealGroup, SithFile, User
 
 # Create your models here.
 

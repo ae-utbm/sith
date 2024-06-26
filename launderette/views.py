@@ -14,27 +14,26 @@
 #
 #
 
-from datetime import datetime, timedelta
 from collections import OrderedDict
+from datetime import datetime, timedelta
+
 import pytz
-
-from django.views.generic import ListView, DetailView, TemplateView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView, BaseFormView
-from django.utils.translation import gettext as _
-from django.utils import dateparse, timezone
-from django.urls import reverse_lazy
-from django.conf import settings
-from django.db import transaction, DataError
 from django import forms
+from django.conf import settings
+from django.db import DataError, transaction
 from django.template import defaultfilters
+from django.urls import reverse_lazy
+from django.utils import dateparse, timezone
+from django.utils.translation import gettext as _
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import BaseFormView, CreateView, DeleteView, UpdateView
 
-from core.models import Page, User
 from club.models import Club
-from core.views import CanViewMixin, CanEditMixin, CanEditPropMixin, CanCreateMixin
-from launderette.models import Launderette, Token, Machine, Slot
-from counter.models import Counter, Customer, Selling
+from core.models import Page, User
+from core.views import CanCreateMixin, CanEditMixin, CanEditPropMixin, CanViewMixin
 from counter.forms import GetUserForm
-
+from counter.models import Counter, Customer, Selling
+from launderette.models import Launderette, Machine, Slot, Token
 
 # For users
 

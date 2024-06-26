@@ -15,34 +15,32 @@
 #
 from __future__ import annotations
 
-from typing import Tuple, Optional
-
-from django.db import models
-from django.db.models import F, Value, Sum, QuerySet, OuterRef, Exists
-from django.db.models.functions import Concat, Length
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from django.conf import settings
-from django.urls import reverse
-from django.core.validators import MinLengthValidator
-from django.forms import ValidationError
-from django.utils.functional import cached_property
-
-from datetime import timedelta, date, datetime
+import base64
+import os
 import random
 import string
-import os
-import base64
-from dict2xml import dict2xml
+from datetime import date, datetime, timedelta
+from typing import Optional, Tuple
 
+from dict2xml import dict2xml
+from django.conf import settings
+from django.core.validators import MinLengthValidator
+from django.db import models
+from django.db.models import Exists, F, OuterRef, QuerySet, Sum, Value
+from django.db.models.functions import Concat, Length
+from django.forms import ValidationError
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+from django_countries.fields import CountryField
+
+from accounting.models import CurrencyField
+from club.models import Club
+from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
 from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
-from club.models import Club, Membership
-from accounting.models import CurrencyField
-from core.models import Group, User, Notification
 from subscription.models import Subscription
-
-from django_countries.fields import CountryField
 
 
 class Customer(models.Model):

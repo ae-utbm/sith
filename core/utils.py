@@ -26,8 +26,8 @@ from typing import Optional
 import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
-from PIL import ExifTags
 from django.utils import timezone
+from PIL import ExifTags
 
 
 def get_git_revision_short_hash() -> str:

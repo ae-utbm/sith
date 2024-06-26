@@ -1,7 +1,7 @@
 from ajax_select import make_ajax_form
 from django.contrib import admin
 
-from election.models import Election, Role, ElectionList, Candidature
+from election.models import Candidature, Election, ElectionList, Role
 
 
 @admin.register(Election)

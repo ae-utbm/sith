@@ -21,7 +21,9 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import logging
 import warnings
+from datetime import timedelta
 from typing import Final, Optional
 
 from django.conf import settings
@@ -29,15 +31,10 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from datetime import timedelta
-
-import logging
-
 from club.models import Club, Membership
-from core.models import User, Group, Page, SithFile
+from core.models import Group, Page, SithFile, User
+from sas.models import Album, PeoplePictureRelation, Picture
 from subscription.models import Subscription
-from sas.models import Album, Picture, PeoplePictureRelation
-
 
 RED_PIXEL_PNG: Final[bytes] = (
     b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52"

@@ -25,8 +25,8 @@
 
 from django.urls import path, register_converter
 
-from eboutic.views import *
 from eboutic.converters import PaymentResultConverter
+from eboutic.views import *
 
 register_converter(PaymentResultConverter, "res")
 

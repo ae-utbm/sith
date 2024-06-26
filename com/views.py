@@ -23,38 +23,35 @@
 #
 #
 
-from django.shortcuts import redirect, get_object_or_404
-from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView, View
-from django.views.generic.edit import UpdateView, CreateView, DeleteView
-from django.views.generic.detail import SingleObjectMixin
-from django.utils.translation import gettext_lazy as _
-from django.urls import reverse, reverse_lazy
-from django.core.exceptions import ValidationError
-from django.utils import timezone
-from django.conf import settings
-from django.db.models import Max
-from django.forms.models import modelform_factory
-from django.core.exceptions import PermissionDenied
-from django import forms
-
 from datetime import timedelta
 from smtplib import SMTPRecipientsRefused
 
-from com.models import Sith, News, NewsDate, Weekmail, WeekmailArticle, Screen, Poster
+from django import forms
+from django.conf import settings
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import Max
+from django.forms.models import modelform_factory
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, ListView, View
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+
+from club.models import Club, Mailing
+from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail, WeekmailArticle
+from core.models import Notification, RealGroup, User
 from core.views import (
-    CanViewMixin,
+    CanCreateMixin,
     CanEditMixin,
     CanEditPropMixin,
-    TabedViewMixin,
-    CanCreateMixin,
+    CanViewMixin,
     QuickNotifMixin,
+    TabedViewMixin,
 )
-from core.views.forms import SelectDateTime, MarkdownInput
-from core.models import Notification, RealGroup, User
-from club.models import Club, Mailing
-from core.views.forms import TzAwareDateTimeField
-
+from core.views.forms import MarkdownInput, TzAwareDateTimeField
 
 # Sith object
 

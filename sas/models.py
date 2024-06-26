@@ -14,19 +14,19 @@
 #
 #
 
+import os
+from io import BytesIO
+
+from django.conf import settings
+from django.core.cache import cache
 from django.db import models
 from django.urls import reverse
-from django.core.cache import cache
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-
+from django.utils.translation import gettext_lazy as _
 from PIL import Image
-from io import BytesIO
-import os
 
 from core.models import SithFile, User
-from core.utils import resize_image, exif_auto_rotate
+from core.utils import exif_auto_rotate, resize_image
 
 
 class SASPictureManager(models.Manager):
