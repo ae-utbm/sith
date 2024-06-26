@@ -57,6 +57,7 @@ SECRET_KEY = "(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+TESTING = "pytest" in sys.modules
 INTERNAL_IPS = ["127.0.0.1"]
 
 ALLOWED_HOSTS = ["*"]
@@ -112,8 +113,6 @@ MIDDLEWARE = (
     "core.middleware.AuthenticationMiddleware",
     "core.middleware.SignalRequestMiddleware",
 )
-
-TEST_RUNNER = "sith.testrunner.SithTestRunner"
 
 ROOT_URLCONF = "sith.urls"
 
@@ -697,7 +696,7 @@ if DEBUG:
     SASS_INCLUDE_FOLDERS = ["core/static/"]
     SENTRY_ENV = "development"
 
-if "test" in sys.argv:
+if TESTING:
     CAPTCHA_TEST_MODE = True
 
 if SENTRY_DSN:

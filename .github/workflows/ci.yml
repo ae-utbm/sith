@@ -25,12 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: ./.github/actions/setup_project
       - uses: ./.github/actions/setup_xapian
       - uses: ./.github/actions/compile_messages
       - name: Run tests
-        run: poetry run coverage run ./manage.py test
+        run: poetry run coverage run -m pytest
       - name: Generate coverage report
         run: |
           poetry run coverage report

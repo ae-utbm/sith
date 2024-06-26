@@ -13,10 +13,11 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.timezone import localtime, now
 
 from club.models import Club
 from core.models import RealGroup, User
@@ -41,7 +42,7 @@ class MergeUserTest(TestCase):
         )
 
     def setUp(self) -> None:
-        self.client.login(username="root", password="plop")
+        self.client.force_login(self.root)
 
     def test_simple(self):
         self.to_delete.first_name = "Biggus"
@@ -66,15 +67,15 @@ class MergeUserTest(TestCase):
         self.to_keep = User.objects.get(pk=self.to_keep.pk)
         # fields of to_delete should be assigned to to_keep
         # if they were not set beforehand
-        self.assertEqual("Biggus", self.to_keep.first_name)
-        self.assertEqual("Dickus", self.to_keep.last_name)
-        self.assertEqual("B'ian", self.to_keep.nick_name)
-        self.assertEqual("Jerusalem", self.to_keep.address)
-        self.assertEqual("Rome", self.to_keep.parent_address)
-        self.assertEqual(3, self.to_keep.groups.count())
-        groups = list(self.to_keep.groups.all())
-        expected = [subscribers, mde_admin, sas_admin]
-        self.assertCountEqual(groups, expected)
+        assert "Biggus" == self.to_keep.first_name
+        assert "Dickus" == self.to_keep.last_name
+        assert "B'ian" == self.to_keep.nick_name
+        assert "Jerusalem" == self.to_keep.address
+        assert "Rome" == self.to_keep.parent_address
+        assert (3, self.to_keep.groups.count())
+        groups = sorted(self.to_keep.groups.all(), key=lambda i: i.id)
+        expected = sorted([subscribers, mde_admin, sas_admin], key=lambda i: i.id)
+        assert groups == expected
 
     def test_both_subscribers_and_with_account(self):
         Customer(user=self.to_keep, account_id="11000l", amount=0).save()
@@ -113,7 +114,7 @@ class MergeUserTest(TestCase):
             quantity=4,
             payment_method="SITH_ACCOUNT",
         ).save()
-        today = date.today()
+        today = localtime(now()).date()
         # both subscriptions began last month and shall end in 5 months
         Subscription(
             member=self.to_keep,
@@ -137,9 +138,9 @@ class MergeUserTest(TestCase):
         # to_delete had 20€ and bought 4 barbar
         # total should be 10 - 4 + 20 - 8 = 18
         self.assertAlmostEqual(18, self.to_keep.customer.amount, delta=0.0001)
-        self.assertEqual(2, self.to_keep.customer.buyings.count())
-        self.assertEqual(2, self.to_keep.customer.refillings.count())
-        self.assertTrue(self.to_keep.is_subscribed)
+        assert self.to_keep.customer.buyings.count() == 2
+        assert self.to_keep.customer.refillings.count() == 2
+        assert self.to_keep.is_subscribed
         # to_keep had 5 months of subscription remaining and received
         # 5 more months from to_delete, so he should be subscribed for 10 months
         self.assertAlmostEqual(
@@ -191,7 +192,7 @@ class MergeUserTest(TestCase):
         self.assertRedirects(res, self.to_keep.get_absolute_url())
         # to_delete had 20€ and bought 4 barbar worth 2€ each
         # total should be 20 - 8 = 12
-        self.assertTrue(hasattr(self.to_keep, "customer"))
+        assert hasattr(self.to_keep, "customer")
         self.assertAlmostEqual(12, self.to_keep.customer.amount, delta=0.0001)
 
     def test_delete_has_no_account(self):
@@ -219,5 +220,5 @@ class MergeUserTest(TestCase):
         self.assertRedirects(res, self.to_keep.get_absolute_url())
         # to_keep had 20€ and bought 4 barbar worth 2€ each
         # total should be 20 - 8 = 12
-        self.assertTrue(hasattr(self.to_keep, "customer"))
+        assert hasattr(self.to_keep, "customer")
         self.assertAlmostEqual(12, self.to_keep.customer.amount, delta=0.0001)
