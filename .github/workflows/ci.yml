@@ -8,17 +8,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  ruff:
-    name: Ruff lint & format
+  pre-commit:
+    name: Launch pre-commits checks (ruff)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: ruff format
-        uses: chartboost/ruff-action@v1  # format
-        with:
-          args: format --diff
-      - name: ruff check
-        uses: chartboost/ruff-action@v1  # lint
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+    - uses: pre-commit/action@v3.0.1
+      with:
+        extra_args: --all-files --show-diff-on-failure
 
   tests:
     name: Run tests and generate coverage report
