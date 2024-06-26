@@ -927,25 +927,25 @@ class CashRegisterSummary(models.Model):
         if name[:5] == "check":
             checks = self.items.filter(check=True).order_by("value").all()
         if name == "ten_cents":
-            return self.items.filter(value=0.1, check=False).first()
+            return self.items.filter(value=0.1, is_check=False).first()
         elif name == "twenty_cents":
-            return self.items.filter(value=0.2, check=False).first()
+            return self.items.filter(value=0.2, is_check=False).first()
         elif name == "fifty_cents":
-            return self.items.filter(value=0.5, check=False).first()
+            return self.items.filter(value=0.5, is_check=False).first()
         elif name == "one_euro":
-            return self.items.filter(value=1, check=False).first()
+            return self.items.filter(value=1, is_check=False).first()
         elif name == "two_euros":
-            return self.items.filter(value=2, check=False).first()
+            return self.items.filter(value=2, is_check=False).first()
         elif name == "five_euros":
-            return self.items.filter(value=5, check=False).first()
+            return self.items.filter(value=5, is_check=False).first()
         elif name == "ten_euros":
-            return self.items.filter(value=10, check=False).first()
+            return self.items.filter(value=10, is_check=False).first()
         elif name == "twenty_euros":
-            return self.items.filter(value=20, check=False).first()
+            return self.items.filter(value=20, is_check=False).first()
         elif name == "fifty_euros":
-            return self.items.filter(value=50, check=False).first()
+            return self.items.filter(value=50, is_check=False).first()
         elif name == "hundred_euros":
-            return self.items.filter(value=100, check=False).first()
+            return self.items.filter(value=100, is_check=False).first()
         elif name == "check_1":
             return checks[0] if 0 < len(checks) else None
         elif name == "check_2":
@@ -993,7 +993,11 @@ class CashRegisterSummaryItem(models.Model):
     )
     value = CurrencyField(_("value"))
     quantity = models.IntegerField(_("quantity"), default=0)
-    check = models.BooleanField(_("check"), default=False)
+    is_check = models.BooleanField(
+        _("check"),
+        default=False,
+        help_text=_("True if this is a bank check, else False"),
+    )
 
     class Meta:
         verbose_name = _("cash register summary item")
