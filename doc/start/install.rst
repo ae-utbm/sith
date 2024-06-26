@@ -196,16 +196,16 @@ Pour lancer les tests il suffit d'utiliser la commande intégrée à django.
 .. code-block:: bash
 
     # Lancer tous les tests
-    python manage.py test
+    pytest
 
     # Lancer les tests de l'application core
-    python manage.py test core
+    pytest core
 
     # Lancer les tests de la classe UserRegistrationTest de core
-    python manage.py test core.tests.UserRegistrationTest
+    pytest core.tests.UserRegistrationTest
 
     # Lancer une méthode en particulier de cette même classe
-    python manage.py test core.tests.UserRegistrationTest.test_register_user_form_ok
+    pytest core.tests.UserRegistrationTest.test_register_user_form_ok
 
 Vérifier les dépendances Javascript
 -----------------------------------
