@@ -46,6 +46,8 @@ class ClubTest(TestCase):
     def setUpTestData(cls):
         # subscribed users - initial members
         cls.skia = User.objects.get(username="skia")
+        # by default, Skia is in the AE, which creates side effect
+        cls.skia.memberships.all().delete()
         cls.richard = User.objects.get(username="rbatsbak")
         cls.comptable = User.objects.get(username="comptable")
         cls.sli = User.objects.get(username="sli")
@@ -62,38 +64,34 @@ class ClubTest(TestCase):
         cls.public = User.objects.get(username="public")
 
         cls.ae = Club.objects.filter(pk=SITH_MAIN_CLUB_ID)[0]
-
-    def setUp(self):
-        # by default, Skia is in the AE, which creates side effect
-        self.skia.memberships.all().delete()
-
-        # create a fake club
-        self.club = Club.objects.create(
+        cls.club = Club.objects.create(
             name="Fake Club",
             unix_name="fake-club",
             address="5 rue de la République, 90000 Belfort",
         )
-        self.members_url = reverse(
-            "club:club_members", kwargs={"club_id": self.club.id}
+        cls.members_url = reverse(
+            "club:club_members", kwargs={"club_id": cls.club.id}
         )
         a_month_ago = now() - timedelta(days=30)
         yesterday = now() - timedelta(days=1)
         Membership.objects.create(
-            club=self.club, user=self.skia, start_date=a_month_ago, role=3
+            club=cls.club, user=cls.skia, start_date=a_month_ago, role=3
         )
-        Membership.objects.create(club=self.club, user=self.richard, role=1)
+        Membership.objects.create(club=cls.club, user=cls.richard, role=1)
         Membership.objects.create(
-            club=self.club, user=self.comptable, start_date=a_month_ago, role=10
+            club=cls.club, user=cls.comptable, start_date=a_month_ago, role=10
         )
 
         # sli was a member but isn't anymore
         Membership.objects.create(
-            club=self.club,
-            user=self.sli,
+            club=cls.club,
+            user=cls.sli,
             start_date=a_month_ago,
             end_date=yesterday,
             role=2,
         )
+
+    def setUp(self):
         cache.clear()
 
 
