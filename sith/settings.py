@@ -187,6 +187,7 @@ TEMPLATES = [
         },
     },
 ]
+FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
 
 HAYSTACK_CONNECTIONS = {
     "default": {
@@ -247,8 +248,6 @@ LANGUAGES = [("en", _("English")), ("fr", _("French"))]
 TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
@@ -690,7 +689,6 @@ if DEBUG:
         "sith.toolbar_debug.TemplatesPanel",
         "debug_toolbar.panels.cache.CachePanel",
         "debug_toolbar.panels.signals.SignalsPanel",
-        "debug_toolbar.panels.logging.LoggingPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
     SASS_INCLUDE_FOLDERS = ["core/static/"]

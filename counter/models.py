@@ -19,8 +19,8 @@ import base64
 import os
 import random
 import string
-from datetime import date, datetime, timedelta
-from typing import Optional, Tuple
+from datetime import date, datetime, timedelta, timezone
+from typing import Tuple
 
 from dict2xml import dict2xml
 from django.conf import settings
@@ -534,7 +534,7 @@ class Counter(models.Model):
             .order_by("-perm_sum")
         )
 
-    def get_top_customers(self, since: Optional[date] = None) -> QuerySet:
+    def get_top_customers(self, since: datetime | date | None = None) -> QuerySet:
         """
         Return a QuerySet querying the money spent by customers of this counter
         since the specified date, ordered by descending amount of money spent.
@@ -543,9 +543,13 @@ class Counter(models.Model):
             - the full name (first name + last name) of the customer
             - the nickname of the customer
             - the amount of money spent by the customer
+
+        :param since: timestamp from which to perform the calculation
         """
         if since is None:
             since = get_start_of_semester()
+        if isinstance(since, date):
+            since = datetime(since.year, since.month, since.day, tzinfo=timezone.utc)
         return (
             self.sellings.filter(date__gte=since)
             .annotate(
@@ -568,19 +572,18 @@ class Counter(models.Model):
             .order_by("-selling_sum")
         )
 
-    def get_total_sales(self, since=None) -> CurrencyField:
+    def get_total_sales(self, since: datetime | date | None = None) -> CurrencyField:
         """
         Compute and return the total turnover of this counter
         since the date specified in parameter (by default, since the start of the current
         semester)
         :param since: timestamp from which to perform the calculation
-        :type since: datetime | date | None
         :return: Total revenue earned at this counter
         """
         if since is None:
             since = get_start_of_semester()
         if isinstance(since, date):
-            since = datetime.combine(since, datetime.min.time())
+            since = datetime(since.year, since.month, since.day, tzinfo=timezone.utc)
         total = self.sellings.filter(date__gte=since).aggregate(
             total=Sum(F("quantity") * F("unit_price"), output_field=CurrencyField())
         )["total"]

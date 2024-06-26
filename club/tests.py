@@ -69,9 +69,7 @@ class ClubTest(TestCase):
             unix_name="fake-club",
             address="5 rue de la République, 90000 Belfort",
         )
-        cls.members_url = reverse(
-            "club:club_members", kwargs={"club_id": cls.club.id}
-        )
+        cls.members_url = reverse("club:club_members", kwargs={"club_id": cls.club.id})
         a_month_ago = now() - timedelta(days=30)
         yesterday = now() - timedelta(days=1)
         Membership.objects.create(
@@ -174,14 +172,11 @@ class MembershipQuerySetTest(ClubTest):
         # should delete the subscriptions of skia and comptable
         self.club.members.ongoing().board().delete()
 
-        assert (
-            cache.get(f"membership_{mem_skia.club_id}_{mem_skia.user_id}")
-            == "not_member"
-        )
-        assert (
-            cache.get(f"membership_{mem_comptable.club_id}_{mem_comptable.user_id}")
-            == "not_member",
-        )
+        for membership in (mem_skia, mem_comptable):
+            cached_mem = cache.get(
+                f"membership_{membership.club_id}_{membership.user_id}"
+            )
+            assert cached_mem == "not_member"
 
 
 class ClubModelTest(ClubTest):
