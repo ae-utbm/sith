@@ -30,7 +30,7 @@ from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectMultipleField
 
 from core.views import CanViewMixin, CanEditMixin
-from core.views.files import send_file, FileView
+from core.views.files import send_file, FileView, MultipleImageField
 from core.models import SithFile, User, Notification, RealGroup
 
 from sas.models import Picture, Album, PeoplePictureRelation
@@ -40,8 +40,7 @@ class SASForm(forms.Form):
     album_name = forms.CharField(
         label=_("Add a new album"), max_length=30, required=False
     )
-    images = forms.ImageField(
-        widget=forms.ClearableFileInput(attrs={"multiple": True}),
+    images = MultipleImageField(
         label=_("Upload images"),
         required=False,
     )

@@ -9,7 +9,6 @@ Certaines dépendances sont nécessaires niveau système :
 * poetry
 * libssl
 * libjpeg
-* libxapian-dev
 * zlib1g-dev
 * python
 * gettext
@@ -76,13 +75,13 @@ Sur Ubuntu
     # Sait-on jamais
     sudo apt update
 
-    sudo apt install python-is-python3 # Permet d'utiliser python au lieu de python3, c'est optionel
+    sudo apt install python-is-python3 # Permet d'utiliser python au lieu de python3, c'est optionnel
 
     sudo apt install build-essentials libssl-dev libjpeg-dev zlib1g-dev python-dev \
-                     libffi-dev python-dev-is-python3 libgraphviz-dev pkg-config libxapian-dev \
-                     gettext git
+                     libffi-dev python-dev-is-python3 libgraphviz-dev pkg-config \
+                     gettext git pipx
 
-    curl -sSL https://install.python-poetry.org | python -
+    pipx install poetry
 
 .. note::
 
@@ -92,21 +91,20 @@ Sur Ubuntu
 Sur MacOS
 ~~~~~~~~~
 
-Pour installer les dépendances, il est fortement recommandé d'installer le gestionnaire de paquets `homebrew <https://brew.sh/index_fr>`_.
+Pour installer les dépendances, il est fortement recommandé d'installer le gestionnaire de paquets `homebrew <https://brew.sh/index_fr>`_.  
+Il est également nécessaire d'avoir installé xcode
 
 .. sourcecode:: bash
 
-    brew install git python xapian graphviz poetry
+    echo 'export PATH="$(brew --prefix graphviz)/bin:$PATH"' >> ~/.zshrc
+    echo 'export CFLAGS="-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I $(brew --prefix graphviz)/include"' >> ~/.zshrc
+    echo 'export LDFLAGS="-L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -L $(brew --prefix graphviz)/lib"' >> ~/.zshrc
 
-    # Si vous aviez une version de python ne venant pas de homebrew
-    brew link --overwrite python
-
+    brew install git python graphviz pipx
+    pipx install poetry
 
     # Pour bien configurer gettext
     brew link gettext # (suivez bien les instructions supplémentaires affichées)
-
-    # Pour installer poetry
-    pip3 install poetry
 
 .. note::
 
@@ -133,6 +131,9 @@ Finaliser l'installation
 
     # Activation de l'environnement virtuel
     poetry shell
+
+    # Installe xapian
+    python manage.py install_xapian
 
     # Prépare la base de données
     python manage.py setup
