@@ -8,28 +8,33 @@
 
 import base64
 
-from OpenSSL import crypto
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from cryptography.hazmat.primitives.hashes import SHA1
+from cryptography.hazmat.primitives.serialization import (
+    load_pem_private_key,
+    load_pem_public_key,
+)
 
-with open("./private_key.pem") as f:
-    PRVKEY = f.read()
-with open("./public_key.pem") as f:
+with open("./private_key.pem", "br") as f:
+    PRIVKEY = f.read()
+with open("./public_key.pem", "br") as f:
     PUBKEY = f.read()
 
 data = "Amount=400&BasketID=4000&Auto=42&Error=00000\n".encode("utf-8")
 
 # Sign
-prvkey = crypto.load_privatekey(crypto.FILETYPE_PEM, PRVKEY)
-sig = crypto.sign(prvkey, data, "sha1")
-b64sig = base64.b64encode(sig)
+privkey: RSAPrivateKey = load_pem_private_key(PRIVKEY, None)
+signature = privkey.sign(data, PKCS1v15(), SHA1())
+b64sig = base64.b64encode(signature)
 print(b64sig)
 
 # Verify
-pubkey = crypto.load_publickey(crypto.FILETYPE_PEM, PUBKEY)
-cert = crypto.X509()
-cert.set_pubkey(pubkey)
-sig = base64.b64decode(b64sig)
+pubkey = load_pem_public_key(PUBKEY)
+signature = base64.b64decode(b64sig)
 try:
-    crypto.verify(cert, sig, data, "sha1")
+    pubkey.verify(signature, data, PKCS1v15(), SHA1())
     print("Verify OK")
-except:
+except InvalidSignature as e:
     print("Verify failed")
