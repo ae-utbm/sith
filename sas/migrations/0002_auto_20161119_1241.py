@@ -45,6 +45,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AlterUniqueTogether(
-            name="peoplepicturerelation", unique_together=set([("user", "picture")])
+            name="peoplepicturerelation", unique_together={("user", "picture")}
         ),
     ]

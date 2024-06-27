@@ -24,11 +24,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         deps = settings.SITH_FRONT_DEP_VERSIONS
 
-        processes = dict(
-            (url, create_process(url))
+        processes = {
+            url: create_process(url)
             for url in deps.keys()
             if parse_semver(deps[url]) is not None
-        )
+        }
 
         for url, process in processes.items():
             try:

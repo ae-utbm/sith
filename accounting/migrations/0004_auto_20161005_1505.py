@@ -45,6 +45,6 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="label", unique_together=set([("name", "club_account")])
+            name="label", unique_together={("name", "club_account")}
         ),
     ]

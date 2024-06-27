@@ -100,6 +100,6 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="operation", unique_together=set([("number", "journal")])
+            name="operation", unique_together={("number", "journal")}
         ),
     ]

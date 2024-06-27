@@ -109,6 +109,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="mailingsubscription",
-            unique_together=set([("user", "email", "mailing")]),
+            unique_together={("user", "email", "mailing")},
         ),
     ]
