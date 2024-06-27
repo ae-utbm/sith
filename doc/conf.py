@@ -23,10 +23,10 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = "Sith AE UTBM"
-copyright = (
-    "2019, Bartuccio Antoine (Sli), Brunet Pierre (Krohpil), Jacquet Florent (Skia)"
+copyright = (  # noqa A001
+    "2019, Bartuccio Antoine (Sli), Brunet Pierre (Krophil), Jacquet Florent (Skia)"
 )
-author = "Bartuccio Antoine (Sli), Brunet Pierre (Krohpil), Jacquet Florent (Skia)"
+author = "Bartuccio Antoine (Sli), Brunet Pierre (Krophil), Jacquet Florent (Skia)"
 
 
 # -- General configuration ---------------------------------------------------

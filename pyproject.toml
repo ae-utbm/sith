@@ -70,7 +70,7 @@ optional = true
 version = "1.4.25"
 
 [tool.ruff.lint]
-select = ["I", "F401"]
+select = ["I", "A", "F401", "E722"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "sith.settings"

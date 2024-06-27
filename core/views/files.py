@@ -277,7 +277,8 @@ class FileView(CanViewMixin, DetailView, FormMixin):
     context_object_name = "file"
     form_class = AddFilesForm
 
-    def handle_clipboard(request, object):
+    @staticmethod
+    def handle_clipboard(request, obj):
         """
         This method handles the clipboard in the view.
         This method can fail, since it does not catch the exceptions coming from
@@ -286,8 +287,8 @@ class FileView(CanViewMixin, DetailView, FormMixin):
 
             FileView.handle_clipboard(request, self.object)
 
-        `request` is usually the self.request object in your view
-        `object` is the SithFile object you want to put in the clipboard, or
+        `request` is usually the self.request obj in your view
+        `obj` is the SithFile object you want to put in the clipboard, or
                  where you want to paste the clipboard
         """
         if "delete" in request.POST.keys():
@@ -301,7 +302,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
             for f_id in request.POST.getlist("file_list"):
                 f_id = int(f_id)
                 if (
-                    f_id in [c.id for c in object.children.all()]
+                    f_id in [c.id for c in obj.children.all()]
                     and f_id not in request.session["clipboard"]
                 ):
                     request.session["clipboard"].append(f_id)
@@ -309,7 +310,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
             for f_id in request.session["clipboard"]:
                 sf = SithFile.objects.filter(id=f_id).first()
                 if sf:
-                    sf.move_to(object)
+                    sf.move_to(obj)
             request.session["clipboard"] = []
         request.session.modified = True
 
@@ -328,7 +329,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
             request.session["clipboard"] = []
         if request.user.can_edit(self.object):
             # XXX this call can fail!
-            FileView.handle_clipboard(request, self.object)
+            self.handle_clipboard(request, self.object)
         self.form = self.get_form()  # The form handle only the file upload
         files = request.FILES.getlist("file_field")
         if (

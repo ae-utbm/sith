@@ -116,13 +116,13 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                             ).save()
         return super(LaunderetteBookView, self).get(request, *args, **kwargs)
 
-    def check_slot(self, type, date=None):
+    def check_slot(self, machine_type, date=None):
         if date is None:
             date = self.date
-        for m in self.object.machines.filter(is_working=True, type=type).all():
+        for m in self.object.machines.filter(is_working=True, type=machine_type):
             slot = Slot.objects.filter(start_date=date, machine=m).first()
             if slot is None:
-                self.machines[type] = m
+                self.machines[machine_type] = m
                 return True
         return False
 

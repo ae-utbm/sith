@@ -683,16 +683,16 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         for sat in [None] + list(
             SimplifiedAccountingType.objects.order_by("label").all()
         ):
-            sum = queryset.filter(
+            amount = queryset.filter(
                 accounting_type__movement_type=movement_type, simpleaccounting_type=sat
             ).aggregate(amount_sum=Sum("amount"))["amount_sum"]
             if sat:
                 sat = sat.label
             else:
                 sat = ""
-            if sum:
-                total_sum += sum
-                statement[sat] = sum
+            if amount:
+                total_sum += amount
+                statement[sat] = amount
         ret[movement_type] = statement
         ret[movement_type + "_sum"] = total_sum
         return ret

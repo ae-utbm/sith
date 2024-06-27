@@ -44,14 +44,14 @@ def markdown(text):
 
 
 @register.filter(name="phonenumber")
-def phonenumber(value, country="FR", format=phonenumbers.PhoneNumberFormat.NATIONAL):
+def phonenumber(value, country="FR", number_format=phonenumbers.PhoneNumberFormat.NATIONAL):
     """
     This filter is kindly borrowed from https://github.com/foundertherapy/django-phonenumber-filter
     """
     value = str(value)
     try:
         parsed = phonenumbers.parse(value, country)
-        return phonenumbers.format_number(parsed, format)
+        return phonenumbers.format_number(parsed, number_format)
     except phonenumbers.NumberParseException as e:
         return value
 
