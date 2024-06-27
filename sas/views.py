@@ -42,7 +42,7 @@ class SASForm(forms.Form):
         required=False,
     )
 
-    def process(self, parent, owner, files, automodere=False):
+    def process(self, parent, owner, files, *, automodere=False):
         try:
             if self.cleaned_data["album_name"] != "":
                 album = Album(
@@ -376,5 +376,5 @@ class AlbumEditView(CanEditMixin, UpdateView):
     def form_valid(self, form):
         ret = super().form_valid(form)
         if form.cleaned_data["recursive"]:
-            self.object.apply_rights_recursively(True)
+            self.object.apply_rights_recursively(only_folders=True)
         return ret

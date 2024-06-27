@@ -88,7 +88,7 @@ class Picture(SithFile):
     def get_absolute_url(self):
         return reverse("sas:picture", kwargs={"picture_id": self.id})
 
-    def generate_thumbnails(self, overwrite=False):
+    def generate_thumbnails(self, *, overwrite=False):
         im = Image.open(BytesIO(self.file.read()))
         try:
             im = exif_auto_rotate(im)

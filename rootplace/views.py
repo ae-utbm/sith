@@ -133,7 +133,7 @@ def merge_users(u1: User, u2: User) -> User:
     return u1
 
 
-def delete_all_forum_user_messages(user, moderator, verbose=False):
+def delete_all_forum_user_messages(user, moderator, *, verbose=False):
     """
     Create a ForumMessageMeta that says a forum
         message is deleted on every forum message of an user

@@ -1695,7 +1695,7 @@ class StudentCardFormView(FormView):
         )
 
 
-def __manage_billing_info_req(request, user_id, delete_if_fail=False):
+def __manage_billing_info_req(request, user_id, *, delete_if_fail=False):
     data = json.loads(request.body)
     form = BillingInfoForm(data)
     if not form.is_valid():
@@ -1725,7 +1725,7 @@ def create_billing_info(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     customer, _ = Customer.get_or_create(user)
     BillingInfo.objects.create(customer=customer)
-    return __manage_billing_info_req(request, user_id, True)
+    return __manage_billing_info_req(request, user_id, delete_if_fail=True)
 
 
 @login_required

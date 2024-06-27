@@ -983,7 +983,7 @@ class UVCommentReportCreateTest(TestCase):
         self.comment = UVComment(**comment_kwargs)
         self.comment.save()
 
-    def create_report_test(self, username, success):
+    def create_report_test(self, username: str, *, success: bool):
         self.client.login(username=username, password="plop")
         response = self.client.post(
             reverse("pedagogy:comment_report", kwargs={"comment_id": self.comment.id}),
@@ -1000,16 +1000,16 @@ class UVCommentReportCreateTest(TestCase):
         self.assertEqual(UVCommentReport.objects.all().exists(), success)
 
     def test_create_report_root_success(self):
-        self.create_report_test("root", True)
+        self.create_report_test("root", success=True)
 
     def test_create_report_pedagogy_admin_success(self):
-        self.create_report_test("tutu", True)
+        self.create_report_test("tutu", success=True)
 
     def test_create_report_subscriber_success(self):
-        self.create_report_test("sli", True)
+        self.create_report_test("sli", success=True)
 
     def test_create_report_unsubscribed_fail(self):
-        self.create_report_test("guy", False)
+        self.create_report_test("guy", success=False)
 
     def test_create_report_anonymous_fail(self):
         response = self.client.post(
@@ -1022,7 +1022,7 @@ class UVCommentReportCreateTest(TestCase):
     def test_notifications(self):
         assert not self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").exists()
         # Create a comment report
-        self.create_report_test("tutu", True)
+        self.create_report_test("tutu", success=True)
 
         # Check that a notification has been created for pedagogy admins
         assert self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").exists()
@@ -1032,7 +1032,7 @@ class UVCommentReportCreateTest(TestCase):
             assert notif.user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
 
         # Check that notifications are not duplicated if not viewed
-        self.create_report_test("tutu", True)
+        self.create_report_test("tutu", success=True)
         assert self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").count() == 1
 
         # Check that a new notification is created when the old one has been viewed
@@ -1040,6 +1040,6 @@ class UVCommentReportCreateTest(TestCase):
         notif.viewed = True
         notif.save()
 
-        self.create_report_test("tutu", True)
+        self.create_report_test("tutu", success=True)
 
         assert self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").count() == 2

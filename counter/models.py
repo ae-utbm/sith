@@ -128,7 +128,7 @@ class Customer(models.Model):
         account = cls.objects.create(user=user, account_id=account_id)
         return account, True
 
-    def save(self, allow_negative=False, is_selling=False, *args, **kwargs):
+    def save(self, *args, allow_negative=False, is_selling=False, **kwargs):
         """
         is_selling : tell if the current action is a selling
         allow_negative : ignored if not a selling. Allow a selling to put the account in negative
@@ -776,7 +776,7 @@ class Selling(models.Model):
         }
         self.customer.user.email_user(subject, message_txt, html_message=message_html)
 
-    def save(self, allow_negative=False, *args, **kwargs):
+    def save(self, *args, allow_negative=False, **kwargs):
         """
         allow_negative : Allow this selling to use more money than available for this user
         """

@@ -74,7 +74,7 @@ def notification(request, notif_id):
     return redirect("/")
 
 
-def search_user(query, as_json=False):
+def search_user(query):
     try:
         # slugify turns everything into ascii and every whitespace into -
         # it ends by removing duplicate - (so ' - ' will turn into '-')
@@ -93,7 +93,7 @@ def search_user(query, as_json=False):
         return []
 
 
-def search_club(query, as_json=False):
+def search_club(query,* , as_json=False):
     clubs = []
     if query:
         clubs = Club.objects.filter(name__icontains=query).all()
@@ -117,15 +117,15 @@ def search_view(request):
 
 @login_required
 def search_user_json(request):
-    result = {"users": search_user(request.GET.get("query", ""), True)}
+    result = {"users": search_user(request.GET.get("query", ""))}
     return JsonResponse(result)
 
 
 @login_required
 def search_json(request):
     result = {
-        "users": search_user(request.GET.get("query", ""), True),
-        "clubs": search_club(request.GET.get("query", ""), True),
+        "users": search_user(request.GET.get("query", "")),
+        "clubs": search_club(request.GET.get("query", ""), as_json=True),
     }
     return JsonResponse(result)
 

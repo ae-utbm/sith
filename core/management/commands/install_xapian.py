@@ -46,7 +46,7 @@ class Command(BaseCommand):
             pyproject = tomli.load(f)
             return pyproject["tool"]["xapian"]["version"]
 
-    def handle(self, force: bool, *args, **options):
+    def handle(self, *args, force: bool, **options):
         if not os.environ.get("VIRTUAL_ENV", None):
             print("No virtual environment detected, this command can't be used")
             return
