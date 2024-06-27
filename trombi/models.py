@@ -83,6 +83,9 @@ class Trombi(models.Model):
     def __str__(self):
         return str(self.club.name)
 
+    def get_absolute_url(self):
+        return reverse("trombi:detail", kwargs={"trombi_id": self.id})
+
     def clean(self):
         if self.subscription_deadline > self.comments_deadline:
             raise ValidationError(
@@ -91,9 +94,6 @@ class Trombi(models.Model):
                     "comments is definitively not a good idea."
                 )
             )
-
-    def get_absolute_url(self):
-        return reverse("trombi:detail", kwargs={"trombi_id": self.id})
 
     def is_owned_by(self, user):
         return user.can_edit(self.club)
@@ -192,6 +192,9 @@ class TrombiComment(models.Model):
     content = models.TextField(_("content"), default="")
     is_moderated = models.BooleanField(_("is the comment moderated"), default=False)
 
+    def __str__(self):
+        return f"{self.author} : {self.content}"
+
     def can_be_viewed_by(self, user):
         if user.id == self.target.user.id:
             return False
@@ -220,8 +223,8 @@ class TrombiClubMembership(models.Model):
     def __str__(self):
         return "%s - %s - %s (%s)" % (self.user, self.club, self.role, self.start)
 
-    def can_be_edited_by(self, user):
-        return user.id == self.user.user.id or user.can_edit(self.user.trombi)
-
     def get_absolute_url(self):
         return reverse("trombi:profile")
+
+    def can_be_edited_by(self, user):
+        return user.id == self.user.user.id or user.can_edit(self.user.trombi)

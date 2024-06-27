@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
                 verbose_name="owner group",
-                default=core.models.Page.get_default_owner_group,
+                default=core.models.get_default_owner_group,
                 related_name="owned_page",
                 to="core.Group",
             ),

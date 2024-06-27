@@ -62,6 +62,19 @@ class Customer(models.Model):
     def __str__(self):
         return "%s - %s" % (self.user.username, self.account_id)
 
+    def save(self, *args, allow_negative=False, is_selling=False, **kwargs):
+        """
+        is_selling : tell if the current action is a selling
+        allow_negative : ignored if not a selling. Allow a selling to put the account in negative
+        Those two parameters avoid blocking the save method of a customer if his account is negative
+        """
+        if self.amount < 0 and (is_selling and not allow_negative):
+            raise ValidationError(_("Not enough money"))
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("core:user_account", kwargs={"user_id": self.user.pk})
+
     @property
     def can_record(self):
         return self.recorded_products > -settings.SITH_ECOCUP_LIMIT
@@ -128,16 +141,6 @@ class Customer(models.Model):
         account = cls.objects.create(user=user, account_id=account_id)
         return account, True
 
-    def save(self, *args, allow_negative=False, is_selling=False, **kwargs):
-        """
-        is_selling : tell if the current action is a selling
-        allow_negative : ignored if not a selling. Allow a selling to put the account in negative
-        Those two parameters avoid blocking the save method of a customer if his account is negative
-        """
-        if self.amount < 0 and (is_selling and not allow_negative):
-            raise ValidationError(_("Not enough money"))
-        super().save(*args, **kwargs)
-
     def recompute_amount(self):
         refillings = self.refillings.aggregate(sum=Sum(F("amount")))["sum"]
         self.amount = refillings if refillings is not None else 0
@@ -149,9 +152,6 @@ class Customer(models.Model):
         if purchases is not None:
             self.amount -= purchases
         self.save()
-
-    def get_absolute_url(self):
-        return reverse("core:user_account", kwargs={"user_id": self.user.pk})
 
     def get_full_url(self):
         return "".join(["https://", settings.SITH_URL, self.get_absolute_url()])
@@ -178,6 +178,9 @@ class BillingInfo(models.Model):
     city = models.CharField(_("City"), max_length=50)
     country = CountryField(blank_label=_("Country"))
 
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
     def to_3dsv2_xml(self) -> str:
         """
         Convert the data from this model into a xml usable
@@ -199,9 +202,6 @@ class BillingInfo(models.Model):
         xml = dict2xml(data, wrap="Billing", newlines=False)
         return '<?xml version="1.0" encoding="UTF-8" ?>' + xml
 
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
-
 
 class ProductType(models.Model):
     """
@@ -222,6 +222,12 @@ class ProductType(models.Model):
         verbose_name = _("product type")
         ordering = ["-priority", "name"]
 
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("counter:producttype_list")
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -231,12 +237,6 @@ class ProductType(models.Model):
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse("counter:producttype_list")
 
 
 class Product(models.Model):
@@ -282,6 +282,12 @@ class Product(models.Model):
     class Meta:
         verbose_name = _("product")
 
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.code)
+
+    def get_absolute_url(self):
+        return reverse("counter:product_list")
+
     @property
     def is_record_product(self):
         return settings.SITH_ECOCUP_CONS == self.id
@@ -301,9 +307,6 @@ class Product(models.Model):
         ) or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID):
             return True
         return False
-
-    def get_absolute_url(self):
-        return reverse("counter:product_list")
 
     def can_be_sold_to(self, user: User) -> bool:
         """
@@ -328,9 +331,6 @@ class Product(models.Model):
     @property
     def profit(self):
         return self.selling_price - self.purchase_price
-
-    def __str__(self):
-        return "%s (%s)" % (self.name, self.code)
 
 
 class CounterQuerySet(models.QuerySet):
@@ -388,13 +388,6 @@ class Counter(models.Model):
     class Meta:
         verbose_name = _("counter")
 
-    def __getattribute__(self, name):
-        if name == "edit_groups":
-            return Group.objects.filter(
-                name=self.club.unix_name + settings.SITH_BOARD_SUFFIX
-            ).all()
-        return object.__getattribute__(self, name)
-
     def __str__(self):
         return self.name
 
@@ -402,6 +395,13 @@ class Counter(models.Model):
         if self.type == "EBOUTIC":
             return reverse("eboutic:main")
         return reverse("counter:details", kwargs={"counter_id": self.id})
+
+    def __getattribute__(self, name):
+        if name == "edit_groups":
+            return Group.objects.filter(
+                name=self.club.unix_name + settings.SITH_BOARD_SUFFIX
+            ).all()
+        return object.__getattribute__(self, name)
 
     def is_owned_by(self, user):
         if user.is_anonymous:
@@ -629,16 +629,6 @@ class Refilling(models.Model):
             self.customer.user.get_display_name(),
         )
 
-    def is_owned_by(self, user):
-        if user.is_anonymous:
-            return False
-        return user.is_owner(self.counter) and self.payment_method != "CARD"
-
-    def delete(self, *args, **kwargs):
-        self.customer.amount -= self.amount
-        self.customer.save()
-        super().delete(*args, **kwargs)
-
     def save(self, *args, **kwargs):
         if not self.date:
             self.date = timezone.now()
@@ -662,6 +652,16 @@ class Refilling(models.Model):
                 type="REFILLING",
             ).save()
         super().save(*args, **kwargs)
+
+    def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
+        return user.is_owner(self.counter) and self.payment_method != "CARD"
+
+    def delete(self, *args, **kwargs):
+        self.customer.amount -= self.amount
+        self.customer.save()
+        super().delete(*args, **kwargs)
 
 
 class Selling(models.Model):
@@ -722,59 +722,6 @@ class Selling(models.Model):
             self.quantity * self.unit_price,
             self.customer.user.get_display_name(),
         )
-
-    def is_owned_by(self, user):
-        if user.is_anonymous:
-            return False
-        return user.is_owner(self.counter) and self.payment_method != "CARD"
-
-    def can_be_viewed_by(self, user):
-        if (
-            not hasattr(self, "customer") or self.customer is None
-        ):  # Customer can be set to Null
-            return False
-        return user == self.customer.user
-
-    def delete(self, *args, **kwargs):
-        if self.payment_method == "SITH_ACCOUNT":
-            self.customer.amount += self.quantity * self.unit_price
-            self.customer.save()
-        super().delete(*args, **kwargs)
-
-    def send_mail_customer(self):
-        event = self.product.eticket.event_title or _("Unknown event")
-        subject = _("Eticket bought for the event %(event)s") % {"event": event}
-        message_html = _(
-            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
-        ) % {
-            "event": event,
-            "url": "".join(
-                (
-                    '<a href="',
-                    self.customer.get_full_url(),
-                    '">',
-                    self.customer.get_full_url(),
-                    "</a>",
-                )
-            ),
-            "eticket": "".join(
-                (
-                    '<a href="',
-                    self.get_eticket_full_url(),
-                    '">',
-                    self.get_eticket_full_url(),
-                    "</a>",
-                )
-            ),
-        }
-        message_txt = _(
-            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
-        ) % {
-            "event": event,
-            "url": self.customer.get_full_url(),
-            "eticket": self.get_eticket_full_url(),
-        }
-        self.customer.user.email_user(subject, message_txt, html_message=message_html)
 
     def save(self, *args, allow_negative=False, **kwargs):
         """
@@ -858,6 +805,59 @@ class Selling(models.Model):
         except:
             pass
 
+    def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
+        return user.is_owner(self.counter) and self.payment_method != "CARD"
+
+    def can_be_viewed_by(self, user):
+        if (
+            not hasattr(self, "customer") or self.customer is None
+        ):  # Customer can be set to Null
+            return False
+        return user == self.customer.user
+
+    def delete(self, *args, **kwargs):
+        if self.payment_method == "SITH_ACCOUNT":
+            self.customer.amount += self.quantity * self.unit_price
+            self.customer.save()
+        super().delete(*args, **kwargs)
+
+    def send_mail_customer(self):
+        event = self.product.eticket.event_title or _("Unknown event")
+        subject = _("Eticket bought for the event %(event)s") % {"event": event}
+        message_html = _(
+            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
+        ) % {
+            "event": event,
+            "url": "".join(
+                (
+                    '<a href="',
+                    self.customer.get_full_url(),
+                    '">',
+                    self.customer.get_full_url(),
+                    "</a>",
+                )
+            ),
+            "eticket": "".join(
+                (
+                    '<a href="',
+                    self.get_eticket_full_url(),
+                    '">',
+                    self.get_eticket_full_url(),
+                    "</a>",
+                )
+            ),
+        }
+        message_txt = _(
+            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
+        ) % {
+            "event": event,
+            "url": self.customer.get_full_url(),
+            "eticket": self.get_eticket_full_url(),
+        }
+        self.customer.user.email_user(subject, message_txt, html_message=message_html)
+
     def get_eticket_full_url(self):
         eticket_url = reverse("counter:eticket_pdf", kwargs={"selling_id": self.id})
         return "".join(["https://", settings.SITH_URL, eticket_url])
@@ -926,6 +926,14 @@ class CashRegisterSummary(models.Model):
     def __str__(self):
         return "At %s by %s - Total: %s €" % (self.counter, self.user, self.get_total())
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.date = timezone.now()
+        return super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("counter:cash_summary_list")
+
     def __getattribute__(self, name):
         if name[:5] == "check":
             checks = self.items.filter(check=True).order_by("value").all()
@@ -978,14 +986,6 @@ class CashRegisterSummary(models.Model):
             t += it.quantity * it.value
         return t
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.date = timezone.now()
-        return super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        return reverse("counter:cash_summary_list")
-
 
 class CashRegisterSummaryItem(models.Model):
     cash_summary = models.ForeignKey(
@@ -1004,6 +1004,9 @@ class CashRegisterSummaryItem(models.Model):
 
     class Meta:
         verbose_name = _("cash register summary item")
+
+    def __str__(self):
+        return str(self.value)
 
 
 class Eticket(models.Model):
@@ -1027,15 +1030,15 @@ class Eticket(models.Model):
     secret = models.CharField(_("secret"), max_length=64, unique=True)
 
     def __str__(self):
-        return "%s" % (self.product.name)
-
-    def get_absolute_url(self):
-        return reverse("counter:eticket_list")
+        return self.product.name
 
     def save(self, *args, **kwargs):
         if not self.id:
             self.secret = base64.b64encode(os.urandom(32))
         return super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("counter:eticket_list")
 
     def is_owned_by(self, user):
         """
@@ -1064,6 +1067,21 @@ class StudentCard(models.Model):
 
     UID_SIZE = 14
 
+    uid = models.CharField(
+        _("uid"), max_length=UID_SIZE, unique=True, validators=[MinLengthValidator(4)]
+    )
+    customer = models.ForeignKey(
+        Customer,
+        related_name="student_cards",
+        verbose_name=_("student cards"),
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return self.uid
+
     @staticmethod
     def is_valid(uid):
         return (
@@ -1080,15 +1098,3 @@ class StudentCard(models.Model):
         if isinstance(obj, User):
             return StudentCard.can_create(self.customer, obj)
         return False
-
-    uid = models.CharField(
-        _("uid"), max_length=14, unique=True, validators=[MinLengthValidator(4)]
-    )
-    customer = models.ForeignKey(
-        Customer,
-        related_name="student_cards",
-        verbose_name=_("student cards"),
-        null=False,
-        blank=False,
-        on_delete=models.CASCADE,
-    )

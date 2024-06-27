@@ -22,6 +22,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
@@ -65,26 +66,11 @@ class Subscription(models.Model):
     class Meta:
         ordering = ["subscription_start"]
 
-    def clean(self):
-        try:
-            for s in (
-                Subscription.objects.filter(member=self.member)
-                .exclude(pk=self.pk)
-                .all()
-            ):
-                if (
-                    s.is_valid_now()
-                    and s.subscription_end
-                    - timedelta(weeks=settings.SITH_SUBSCRIPTION_END)
-                    > date.today()
-                ):
-                    raise ValidationError(
-                        _("You can not subscribe many time for the same period")
-                    )
-        except:  # This should not happen, because the form should have handled the data before, but sadly, it still
-            # calls the model validation :'(
-            # TODO see SubscriptionForm's clean method
-            raise ValidationError(_("Subscription error"))
+    def __str__(self):
+        if hasattr(self, "member") and self.member is not None:
+            return f"{self.member.username} - {self.pk}"
+        else:
+            return f"No user - {self.pk}"
 
     def save(self, *args, **kwargs):
         super().save()
@@ -105,11 +91,20 @@ class Subscription(models.Model):
     def get_absolute_url(self):
         return reverse("core:user_edit", kwargs={"user_id": self.member.pk})
 
-    def __str__(self):
-        if hasattr(self, "member") and self.member is not None:
-            return self.member.username + " - " + str(self.pk)
-        else:
-            return "No user - " + str(self.pk)
+    def clean(self):
+        today = timezone.now().date()
+        active_subscriptions = Subscription.objects.exclude(pk=self.pk).filter(
+            subscription_start__gte=today, subscription_end__lte=today
+        )
+        for s in active_subscriptions:
+            if (
+                s.is_valid_now()
+                and s.subscription_end - timedelta(weeks=settings.SITH_SUBSCRIPTION_END)
+                > date.today()
+            ):
+                raise ValidationError(
+                    _("You can not subscribe many time for the same period")
+                )
 
     @staticmethod
     def compute_start(d: date = None, duration: int = 1, user: User = None) -> date:

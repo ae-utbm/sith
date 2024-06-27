@@ -93,7 +93,7 @@ def search_user(query):
         return []
 
 
-def search_club(query,* , as_json=False):
+def search_club(query, *, as_json=False):
     clubs = []
     if query:
         clubs = Club.objects.filter(name__icontains=query).all()

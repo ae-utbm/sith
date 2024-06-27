@@ -163,16 +163,16 @@ class ElectionList(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def __str__(self):
+        return self.title
+
     def can_be_edited_by(self, user):
         return user.can_edit(self.election)
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         for candidature in self.candidatures.all():
             candidature.delete()
-        super().delete()
-
-    def __str__(self):
-        return self.title
+        super().delete(*args, **kwargs)
 
 
 class Candidature(models.Model):
@@ -201,6 +201,9 @@ class Candidature(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def __str__(self):
+        return f"{self.role.title} : {self.user.username}"
+
     def delete(self):
         for vote in self.votes.all():
             vote.delete()
@@ -208,9 +211,6 @@ class Candidature(models.Model):
 
     def can_be_edited_by(self, user):
         return (user == self.user) or user.can_edit(self.role.election)
-
-    def __str__(self):
-        return "%s : %s" % (self.role.title, self.user.username)
 
 
 class Vote(models.Model):

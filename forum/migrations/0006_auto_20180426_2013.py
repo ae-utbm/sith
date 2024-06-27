@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             name="edit_groups",
             field=models.ManyToManyField(
                 blank=True,
-                default=forum.models.Forum.get_default_edit_group,
+                default=forum.models.get_default_edit_group,
                 related_name="editable_forums",
                 to="core.Group",
             ),
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
             name="view_groups",
             field=models.ManyToManyField(
                 blank=True,
-                default=forum.models.Forum.get_default_view_group,
+                default=forum.models.get_default_view_group,
                 related_name="viewable_forums",
                 to="core.Group",
             ),

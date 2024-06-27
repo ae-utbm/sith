@@ -18,7 +18,15 @@ from counter.models import (
 class BillingInfoForm(forms.ModelForm):
     class Meta:
         model = BillingInfo
-        exclude = ["customer"]
+        fields = [
+            "first_name",
+            "last_name",
+            "address_1",
+            "address_2",
+            "zip_code",
+            "city",
+            "country",
+        ]
 
 
 class StudentCardForm(forms.ModelForm):

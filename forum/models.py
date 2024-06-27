@@ -20,6 +20,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from __future__ import annotations
 
 from datetime import datetime
 from itertools import chain
@@ -37,6 +38,15 @@ from club.models import Club
 from core.models import Group, User
 
 
+# Those functions prevent generating migration upon settings changes
+def get_default_edit_group():
+    return [settings.SITH_GROUP_OLD_SUBSCRIBERS_ID]
+
+
+def get_default_view_group():
+    return [settings.SITH_GROUP_PUBLIC_ID]
+
+
 class Forum(models.Model):
     """
     The Forum class, made as a tree to allow nice tidy organization
@@ -45,13 +55,6 @@ class Forum(models.Model):
     edit_groups allows to put any group as a forum admin
     view_groups allows some groups to view a forum
     """
-
-    # Those functions prevent generating migration upon settings changes
-    def get_default_edit_group():
-        return [settings.SITH_GROUP_OLD_SUBSCRIBERS_ID]
-
-    def get_default_view_group():
-        return [settings.SITH_GROUP_PUBLIC_ID]
 
     id = models.AutoField(primary_key=True, db_index=True)
     name = models.CharField(_("name"), max_length=64)
@@ -98,8 +101,8 @@ class Forum(models.Model):
     class Meta:
         ordering = ["number"]
 
-    def clean(self):
-        self.check_loop()
+    def __str__(self):
+        return self.name
 
     def save(self, *args, **kwargs):
         copy_rights = False
@@ -108,6 +111,12 @@ class Forum(models.Model):
         super().save(*args, **kwargs)
         if copy_rights:
             self.copy_rights()
+
+    def get_absolute_url(self):
+        return reverse("forum:view_forum", kwargs={"forum_id": self.id})
+
+    def clean(self):
+        self.check_loop()
 
     def set_topic_number(self):
         self._topic_number = self.get_topic_number()
@@ -166,11 +175,11 @@ class Forum(models.Model):
             return True
         try:
             m = Forum._club_memberships[self.id][user.id]
-        except:
+        except KeyError:
             m = self.owner_club.get_membership_for(user)
             try:
                 Forum._club_memberships[self.id][user.id] = m
-            except:
+            except KeyError:
                 Forum._club_memberships[self.id] = {}
                 Forum._club_memberships[self.id][user.id] = m
         if m:
@@ -187,18 +196,12 @@ class Forum(models.Model):
             objs.append(cur)
             cur = cur.parent
 
-    def __str__(self):
-        return "%s" % (self.name)
-
     def get_full_name(self):
         return "/".join(
             chain.from_iterable(
                 [[parent.name for parent in self.get_parent_list()], [self.name]]
             )
         )
-
-    def get_absolute_url(self):
-        return reverse("forum:view_forum", kwargs={"forum_id": self.id})
 
     @cached_property
     def parent_list(self):
@@ -256,10 +259,16 @@ class ForumTopic(models.Model):
     class Meta:
         ordering = ["-_last_message__date"]
 
+    def __str__(self):
+        return self.title
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.forum.set_topic_number()  # Recompute the cached value
         self.forum.set_last_message()
+
+    def get_absolute_url(self):
+        return reverse("forum:view_topic", kwargs={"topic_id": self.id})
 
     def is_owned_by(self, user):
         return self.forum.is_owned_by(user)
@@ -270,23 +279,15 @@ class ForumTopic(models.Model):
     def can_be_viewed_by(self, user):
         return user.can_view(self.forum)
 
-    def __str__(self):
-        return "%s" % (self.title)
-
-    def get_absolute_url(self):
-        return reverse("forum:view_topic", kwargs={"topic_id": self.id})
-
-    def get_first_unread_message(self, user):
-        try:
-            msg = (
-                self.messages.exclude(readers=user)
-                .filter(date__gte=user.forum_infos.last_read_date)
-                .order_by("id")
-                .first()
-            )
-            return msg
-        except:
+    def get_first_unread_message(self, user: User) -> ForumMessage | None:
+        if not hasattr(user, "forum_infos"):
             return None
+        return (
+            self.messages.exclude(readers=user)
+            .filter(date__gte=user.forum_infos.last_read_date)
+            .order_by("id")
+            .first()
+        )
 
     @cached_property
     def last_message(self):
@@ -332,6 +333,9 @@ class ForumMessage(models.Model):
         self.topic._message_number = self.topic.messages.count()
         self.topic.save()
 
+    def get_absolute_url(self):
+        return reverse("forum:view_message", kwargs={"message_id": self.id})
+
     def is_first_in_topic(self):
         return bool(self.id == self.topic.messages.order_by("date").first().id)
 
@@ -356,9 +360,6 @@ class ForumMessage(models.Model):
     def can_be_moderated_by(self, user):
         return self.topic.forum.is_owned_by(user) or user.id == self.author.id
 
-    def get_absolute_url(self):
-        return reverse("forum:view_message", kwargs={"message_id": self.id})
-
     def get_url(self):
         return (
             self.topic.get_absolute_url()
@@ -378,11 +379,10 @@ class ForumMessage(models.Model):
         )
 
     def mark_as_read(self, user):
-        try:  # Need the try/except because of AnonymousUser
-            if not self.is_read(user):
-                self.readers.add(user)
-        except:
-            pass
+        if user.is_anonymous:
+            return
+        if not self.is_read(user):
+            self.readers.add(user)
 
     def is_read(self, user):
         return (self.date < user.forum_infos.last_read_date) or (
@@ -412,6 +412,9 @@ class ForumMessageMeta(models.Model):
     )
     date = models.DateTimeField(_("date"), default=timezone.now)
     action = models.CharField(_("action"), choices=MESSAGE_META_ACTIONS, max_length=16)
+
+    def __str__(self):
+        return f"{self.user.nick_name} ({self.date})"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

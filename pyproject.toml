@@ -70,7 +70,19 @@ optional = true
 version = "1.4.25"
 
 [tool.ruff.lint]
-select = ["I", "A", "F401", "UP008", "UP009"]
+select = [
+	"I",  # isort
+	"B",
+	"A",  # shadowing of Python builtins
+	"F401",  # unused import
+	"DJ",  # django-specific rules,
+    "UP008",  # Use super() instead of super(__class__, self)
+    "UP009"  # utf-8 encoding declaration is unnecessary
+]
+
+ignore = [
+	"DJ001",  # null=True in CharField/TextField. this one would require a migration
+]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "sith.settings"

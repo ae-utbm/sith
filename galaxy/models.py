@@ -127,6 +127,9 @@ class GalaxyLane(models.Model):
         default=0,
     )
 
+    def __str__(self):
+        return f"{self.star1} -> {self.star2} ({self.distance})"
+
 
 class StarDict(TypedDict):
     id: int

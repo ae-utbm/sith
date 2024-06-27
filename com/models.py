@@ -46,13 +46,13 @@ class Sith(models.Model):
     weekmail_destinations = models.TextField(_("weekmail destinations"), default="")
     version = utils.get_git_revision_short_hash()
 
+    def __str__(self):
+        return "⛩ Sith ⛩"
+
     def is_owned_by(self, user):
         if user.is_anonymous:
             return False
         return user.is_com_admin
-
-    def __str__(self):
-        return "⛩ Sith ⛩"
 
 
 NEWS_TYPES = [
@@ -90,23 +90,6 @@ class News(models.Model):
         on_delete=models.CASCADE,
     )
 
-    def is_owned_by(self, user):
-        if user.is_anonymous:
-            return False
-        return user.is_com_admin or user == self.author
-
-    def can_be_edited_by(self, user):
-        return user.is_com_admin
-
-    def can_be_viewed_by(self, user):
-        return self.is_moderated or user.is_com_admin
-
-    def get_absolute_url(self):
-        return reverse("com:news_detail", kwargs={"news_id": self.id})
-
-    def get_full_url(self):
-        return "https://%s%s" % (settings.SITH_URL, self.get_absolute_url())
-
     def __str__(self):
         return "%s: %s" % (self.type, self.title)
 
@@ -123,6 +106,23 @@ class News(models.Model):
                 type="NEWS_MODERATION",
                 param="1",
             ).save()
+
+    def get_absolute_url(self):
+        return reverse("com:news_detail", kwargs={"news_id": self.id})
+
+    def get_full_url(self):
+        return "https://%s%s" % (settings.SITH_URL, self.get_absolute_url())
+
+    def is_owned_by(self, user):
+        if user.is_anonymous:
+            return False
+        return user.is_com_admin or user == self.author
+
+    def can_be_edited_by(self, user):
+        return user.is_com_admin
+
+    def can_be_viewed_by(self, user):
+        return self.is_moderated or user.is_com_admin
 
 
 def news_notification_callback(notif):
@@ -185,6 +185,9 @@ class Weekmail(models.Model):
     class Meta:
         ordering = ["-id"]
 
+    def __str__(self):
+        return f"Weekmail {self.id} (sent: {self.sent}) - {self.title}"
+
     def send(self):
         """
         Send the weekmail to all users with the receive weekmail option opt-in.
@@ -240,9 +243,6 @@ class Weekmail(models.Model):
         """
         return "http://" + settings.SITH_URL + static("com/img/weekmail_footerP22.png")
 
-    def __str__(self):
-        return "Weekmail %s (sent: %s) - %s" % (self.id, self.sent, self.title)
-
     def is_owned_by(self, user):
         if user.is_anonymous:
             return False
@@ -273,17 +273,20 @@ class WeekmailArticle(models.Model):
     )
     rank = models.IntegerField(_("rank"), default=-1)
 
+    def __str__(self):
+        return "%s - %s (%s)" % (self.title, self.author, self.club)
+
     def is_owned_by(self, user):
         if user.is_anonymous:
             return False
         return user.is_com_admin
 
-    def __str__(self):
-        return "%s - %s (%s)" % (self.title, self.author, self.club)
-
 
 class Screen(models.Model):
     name = models.CharField(_("name"), max_length=128)
+
+    def __str__(self):
+        return self.name
 
     def active_posters(self):
         now = timezone.now()
@@ -295,9 +298,6 @@ class Screen(models.Model):
         if user.is_anonymous:
             return False
         return user.is_com_admin
-
-    def __str__(self):
-        return "%s" % (self.name)
 
 
 class Poster(models.Model):
@@ -327,6 +327,9 @@ class Poster(models.Model):
         blank=True,
         on_delete=models.CASCADE,
     )
+
+    def __str__(self):
+        return self.name
 
     def save(self, *args, **kwargs):
         if not self.is_moderated:
@@ -360,6 +363,3 @@ class Poster(models.Model):
     @property
     def page(self):
         return self.club.page
-
-    def __str__(self):
-        return self.name

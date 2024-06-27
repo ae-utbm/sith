@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="owner_group",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                default=club.models.Club.get_default_owner_group,
+                default=club.models.get_default_owner_group,
                 related_name="owned_club",
                 to="core.Group",
             ),

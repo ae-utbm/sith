@@ -149,10 +149,10 @@ class ShoppingListItem(models.Model):
     )
 
     def __str__(self):
-        return "%s - %s" % (self.name, self.shopping_lists.first())
-
-    def can_be_viewed_by(self, user):
-        return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
+        return f"{self.name} - {self.shopping_lists.first()}"
 
     def get_absolute_url(self):
         return reverse("stock:shoppinglist_list")
+
+    def can_be_viewed_by(self, user):
+        return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
