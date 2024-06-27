@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -88,7 +87,7 @@ class Subscription(models.Model):
             raise ValidationError(_("Subscription error"))
 
     def save(self, *args, **kwargs):
-        super(Subscription, self).save()
+        super().save()
         from counter.models import Customer
 
         _, created = Customer.get_or_create(self.member)

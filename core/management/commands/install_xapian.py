@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2024 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr

@@ -99,7 +99,7 @@ class Election(models.Model):
 
     def delete(self, *args, **kwargs):
         self.election_lists.all().delete()
-        super(Election, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
 
     # Permissions
 
@@ -169,7 +169,7 @@ class ElectionList(models.Model):
     def delete(self):
         for candidature in self.candidatures.all():
             candidature.delete()
-        super(ElectionList, self).delete()
+        super().delete()
 
     def __str__(self):
         return self.title
@@ -204,7 +204,7 @@ class Candidature(models.Model):
     def delete(self):
         for vote in self.votes.all():
             vote.delete()
-        super(Candidature, self).delete()
+        super().delete()
 
     def can_be_edited_by(self, user):
         return (user == self.user) or user.can_edit(self.role.election)

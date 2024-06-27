@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -51,13 +50,11 @@ class SithRenderer(Renderer):
                 if not width.endswith("%"):
                     width += "px"
                 style = "width: %s; " % width
-                try:
-                    height = m.group(3)
+                height = m.group(3)
+                if height is not None:
                     if not height.endswith("%"):
                         height += "px"
                     style += "height: %s; " % height
-                except:
-                    pass
         else:
             params = None
             src = original_src
@@ -163,7 +160,7 @@ class SithInlineLexer(InlineLexer):
             link = reverse("core:file_detail", kwargs={"file_id": id}) + suffix
         except:
             pass
-        return super(SithInlineLexer, self)._process_link(m, link, title)
+        return super()._process_link(m, link, title)
 
 
 renderer = SithRenderer(escape=True)

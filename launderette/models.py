@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -153,7 +152,7 @@ class Token(models.Model):
         if self.name == "":
             raise DataError(_("Token name can not be blank"))
         else:
-            super(Token, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
     def is_owned_by(self, user):
         """

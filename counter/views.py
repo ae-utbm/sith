@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -102,7 +101,7 @@ class CounterAdminMixin(View):
             or self._test_club(request.user)
         ):
             raise PermissionDenied
-        return super(CounterAdminMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class StudentCardDeleteView(DeleteView, CanEditMixin):
@@ -116,7 +115,7 @@ class StudentCardDeleteView(DeleteView, CanEditMixin):
 
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
-        return super(StudentCardDeleteView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy(
@@ -237,7 +236,7 @@ class CounterMain(
                 )
                 + "?bad_location"
             )
-        return super(CounterMain, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """
@@ -246,7 +245,7 @@ class CounterMain(
         if self.request.method == "POST":
             self.object = self.get_object()
         self.object.update_activity()
-        kwargs = super(CounterMain, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["login_form"] = LoginForm()
         kwargs["login_form"].fields["username"].widget.attrs["autofocus"] = True
         kwargs[
@@ -280,7 +279,7 @@ class CounterMain(
         We handle here the redirection, passing the user id of the asked customer
         """
         self.kwargs["user_id"] = form.cleaned_data["user_id"]
-        return super(CounterMain, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy("counter:click", args=self.args, kwargs=self.kwargs)
@@ -345,7 +344,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         else:
             if not request.user.is_authenticated:
                 raise PermissionDenied
-        return super(CounterClick, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         """Simple get view"""
@@ -357,7 +356,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session["not_allowed"] = False
         request.session["no_age"] = False
         self.refill_form = None
-        ret = super(CounterClick, self).get(request, *args, **kwargs)
+        ret = super().get(request, *args, **kwargs)
         if (self.object.type != "BAR" and not request.user.is_authenticated) or (
             self.object.type == "BAR" and len(self.object.get_barmen_list()) < 1
         ):  # Check that at least one barman is logged in
@@ -680,7 +679,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """Add customer to the context"""
-        kwargs = super(CounterClick, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         products = self.object.products.select_related("product_type")
         if self.customer_is_barman():
             products = products.annotate(price=F("special_selling_price"))
@@ -732,7 +731,7 @@ class CounterLogin(RedirectView):
                 self.errors += ["sellers"]
         else:
             self.errors += ["credentials"]
-        return super(CounterLogin, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         return (
@@ -752,7 +751,7 @@ class CounterLogout(RedirectView):
         self.counter = Counter.objects.filter(id=kwargs["counter_id"]).first()
         user = User.objects.filter(id=request.POST["user_id"]).first()
         self.counter.del_barman(user)
-        return super(CounterLogout, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         return reverse_lazy("counter:details", args=args, kwargs=kwargs)
@@ -827,7 +826,7 @@ class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
         self.edit_club.append(obj.club)
-        return super(CounterEditView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse_lazy("counter:admin", kwargs={"counter_id": self.object.id})
@@ -981,12 +980,12 @@ class RefillingDeleteView(DeleteView):
             self.success_url = reverse(
                 "counter:details", kwargs={"counter_id": self.object.counter.id}
             )
-            return super(RefillingDeleteView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         elif self.object.is_owned_by(request.user):
             self.success_url = reverse(
                 "core:user_account", kwargs={"user_id": self.object.customer.user.id}
             )
-            return super(RefillingDeleteView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
 
@@ -1016,12 +1015,12 @@ class SellingDeleteView(DeleteView):
             self.success_url = reverse(
                 "counter:details", kwargs={"counter_id": self.object.counter.id}
             )
-            return super(SellingDeleteView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         elif self.object.is_owned_by(request.user):
             self.success_url = reverse(
                 "core:user_account", kwargs={"user_id": self.object.customer.user.id}
             )
-            return super(SellingDeleteView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
 
@@ -1080,7 +1079,7 @@ class CashRegisterSummaryForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         instance = kwargs.pop("instance", None)
-        super(CashRegisterSummaryForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if instance:
             self.fields["ten_cents"].initial = (
                 instance.ten_cents.quantity if instance.ten_cents else 0
@@ -1261,9 +1260,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
                 token=request.session["counter_token"]
             ).exists()
         ):
-            return super(CounterLastOperationsView, self).dispatch(
-                request, *args, **kwargs
-            )
+            return super().dispatch(request, *args, **kwargs)
         return HttpResponseRedirect(
             reverse("counter:details", kwargs={"counter_id": self.object.id})
             + "?bad_location"
@@ -1271,7 +1268,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """Add form to the context"""
-        kwargs = super(CounterLastOperationsView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         threshold = timezone.now() - timedelta(
             minutes=settings.SITH_LAST_OPERATIONS_LIMIT
         )
@@ -1307,9 +1304,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
                 token=request.session["counter_token"]
             ).exists()
         ):
-            return super(CounterCashSummaryView, self).dispatch(
-                request, *args, **kwargs
-            )
+            return super().dispatch(request, *args, **kwargs)
         return HttpResponseRedirect(
             reverse("counter:details", kwargs={"counter_id": self.object.id})
             + "?bad_location"
@@ -1318,7 +1313,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = CashRegisterSummaryForm()
-        return super(CounterCashSummaryView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -1326,14 +1321,14 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
         if self.form.is_valid():
             self.form.save(self.object)
             return HttpResponseRedirect(self.get_success_url())
-        return super(CounterCashSummaryView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse_lazy("counter:details", kwargs={"counter_id": self.object.id})
 
     def get_context_data(self, **kwargs):
         """Add form to the context"""
-        kwargs = super(CounterCashSummaryView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["form"] = self.form
         return kwargs
 
@@ -1362,7 +1357,7 @@ class CounterStatView(DetailView, CounterAdminMixin):
         counter: Counter = self.object
         semester_start = get_start_of_semester()
         office_hours = counter.get_top_barmen()
-        kwargs = super(CounterStatView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs.update(
             {
                 "counter": counter,
@@ -1379,7 +1374,7 @@ class CounterStatView(DetailView, CounterAdminMixin):
 
     def dispatch(self, request, *args, **kwargs):
         try:
-            return super(CounterStatView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         except PermissionDenied:
             if (
                 request.user.is_root
@@ -1416,7 +1411,7 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
 
     def get_context_data(self, **kwargs):
         """Add sums to the context"""
-        kwargs = super(CashSummaryListView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         form = CashSummaryFormBase(self.request.GET)
         kwargs["form"] = form
         kwargs["summaries_sums"] = {}
@@ -1467,7 +1462,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         """Add sums to the context"""
-        kwargs = super(InvoiceCallView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["months"] = Selling.objects.datetimes("date", "month", order="DESC")
         start_date = None
         end_date = None
@@ -1666,10 +1661,10 @@ class CounterRefillingListView(CounterAdminTabsMixin, CounterAdminMixin, ListVie
     def dispatch(self, request, *args, **kwargs):
         self.counter = get_object_or_404(Counter, pk=kwargs["counter_id"])
         self.queryset = Refilling.objects.filter(counter__id=self.counter.id)
-        return super(CounterRefillingListView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(CounterRefillingListView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["counter"] = self.counter
         return kwargs
 
@@ -1686,7 +1681,7 @@ class StudentCardFormView(FormView):
         self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
         if not StudentCard.can_create(self.customer, request.user):
             raise PermissionDenied
-        return super(StudentCardFormView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         data = form.clean()

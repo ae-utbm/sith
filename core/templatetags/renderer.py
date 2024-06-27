@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -44,7 +43,9 @@ def markdown(text):
 
 
 @register.filter(name="phonenumber")
-def phonenumber(value, country="FR", number_format=phonenumbers.PhoneNumberFormat.NATIONAL):
+def phonenumber(
+    value, country="FR", number_format=phonenumbers.PhoneNumberFormat.NATIONAL
+):
     """
     This filter is kindly borrowed from https://github.com/foundertherapy/django-phonenumber-filter
     """

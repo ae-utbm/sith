@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2019
 # - Sli <antoine@bartuccio.fr>
@@ -272,7 +271,7 @@ class UVComment(models.Model):
     def save(self, *args, **kwargs):
         if self.publish_date is None:
             self.publish_date = timezone.now()
-        super(UVComment, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class UVResult(models.Model):

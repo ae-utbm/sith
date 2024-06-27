@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023
 # - Skia <skia@hya.sk>
@@ -44,13 +43,13 @@ class GalaxyUserView(CanViewMixin, UserTabsMixin, DetailView):
     current_tab = "galaxy"
 
     def get_object(self, *args, **kwargs):
-        user: User = super(GalaxyUserView, self).get_object(*args, **kwargs)
+        user: User = super().get_object(*args, **kwargs)
         if user.current_star is None:
             raise Http404(_("This citizen has not yet joined the galaxy"))
         return user
 
     def get_context_data(self, **kwargs):
-        kwargs = super(GalaxyUserView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["lanes"] = (
             GalaxyLane.objects.filter(
                 Q(star1=self.object.current_star) | Q(star2=self.object.current_star)

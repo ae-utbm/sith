@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2017
 # - Skia <skia@libskia.so>
@@ -37,16 +36,12 @@ from core.utils import get_semester_code
 
 class TrombiManager(models.Manager):
     def get_queryset(self):
-        return super(TrombiManager, self).get_queryset()
+        return super().get_queryset()
 
 
 class AvailableTrombiManager(models.Manager):
     def get_queryset(self):
-        return (
-            super(AvailableTrombiManager, self)
-            .get_queryset()
-            .filter(subscription_deadline__gte=date.today())
-        )
+        return super().get_queryset().filter(subscription_deadline__gte=date.today())
 
 
 class Trombi(models.Model):

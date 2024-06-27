@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -112,7 +111,7 @@ class News(models.Model):
         return "%s: %s" % (self.type, self.title)
 
     def save(self, *args, **kwargs):
-        super(News, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         for u in (
             RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
             .first()
@@ -341,7 +340,7 @@ class Poster(models.Model):
                     url=reverse("com:poster_moderate_list"),
                     type="POSTER_MODERATION",
                 ).save()
-        return super(Poster, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
         if self.date_end and self.date_begin > self.date_end:

@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -137,7 +136,7 @@ class Customer(models.Model):
         """
         if self.amount < 0 and (is_selling and not allow_negative):
             raise ValidationError(_("Not enough money"))
-        super(Customer, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def recompute_amount(self):
         refillings = self.refillings.aggregate(sum=Sum(F("amount")))["sum"]
@@ -638,7 +637,7 @@ class Refilling(models.Model):
     def delete(self, *args, **kwargs):
         self.customer.amount -= self.amount
         self.customer.save()
-        super(Refilling, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         if not self.date:
@@ -662,7 +661,7 @@ class Refilling(models.Model):
                 param=str(self.amount),
                 type="REFILLING",
             ).save()
-        super(Refilling, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class Selling(models.Model):
@@ -740,7 +739,7 @@ class Selling(models.Model):
         if self.payment_method == "SITH_ACCOUNT":
             self.customer.amount += self.quantity * self.unit_price
             self.customer.save()
-        super(Selling, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
 
     def send_mail_customer(self):
         event = self.product.eticket.event_title or _("Unknown event")
@@ -851,7 +850,7 @@ class Selling(models.Model):
                 param="%d x %s" % (self.quantity, self.label),
                 type="SELLING",
             ).save()
-        super(Selling, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         try:
             # The product has no id until it's saved
             if self.product.eticket:
@@ -982,7 +981,7 @@ class CashRegisterSummary(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             self.date = timezone.now()
-        return super(CashRegisterSummary, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("counter:cash_summary_list")
@@ -1036,7 +1035,7 @@ class Eticket(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             self.secret = base64.b64encode(os.urandom(32))
-        return super(Eticket, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def is_owned_by(self, user):
         """

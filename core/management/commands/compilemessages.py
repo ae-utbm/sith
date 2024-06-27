@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding:utf-8 -*
 #
 # Copyright 2019
 # - Sli <antoine@bartuccio.fr>
@@ -41,4 +40,4 @@ class Command(compilemessages.Command):
 
     def handle(self, *args, **options):
         os.chdir("sith")
-        super(Command, self).handle(*args, **options)
+        super().handle(*args, **options)

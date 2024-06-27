@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -190,7 +189,7 @@ class Club(models.Model):
         creation = old is None
         if not creation and old.unix_name != self.unix_name:
             self._change_unixname(self.unix_name)
-        super(Club, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         if creation:
             board = MetaGroup(name=self.unix_name + settings.SITH_BOARD_SUFFIX)
             board.save()
@@ -459,7 +458,7 @@ class Mailing(models.Model):
             self.is_moderated = True
         else:
             self.moderator = None
-        super(Mailing, self).clean()
+        super().clean()
 
     @property
     def email_full(self):
@@ -481,7 +480,7 @@ class Mailing(models.Model):
 
     def delete(self, *args, **kwargs):
         self.subscriptions.all().delete()
-        super(Mailing, self).delete()
+        super().delete()
 
     def fetch_format(self):
         resp = self.email + ": "
@@ -504,7 +503,7 @@ class Mailing(models.Model):
                         url=reverse("com:mailing_admin"),
                         type="MAILING_MODERATION",
                     ).save()
-        super(Mailing, self).save()
+        super().save()
 
     def __str__(self):
         return "%s - %s" % (self.club, self.email_full)
@@ -550,7 +549,7 @@ class MailingSubscription(models.Model):
                     )
         except ObjectDoesNotExist:
             pass
-        super(MailingSubscription, self).clean()
+        super().clean()
 
     def is_owned_by(self, user):
         if user.is_anonymous:

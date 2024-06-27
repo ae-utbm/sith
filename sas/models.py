@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -31,20 +30,12 @@ from core.utils import exif_auto_rotate, resize_image
 
 class SASPictureManager(models.Manager):
     def get_queryset(self):
-        return (
-            super(SASPictureManager, self)
-            .get_queryset()
-            .filter(is_in_sas=True, is_folder=False)
-        )
+        return super().get_queryset().filter(is_in_sas=True, is_folder=False)
 
 
 class SASAlbumManager(models.Manager):
     def get_queryset(self):
-        return (
-            super(SASAlbumManager, self)
-            .get_queryset()
-            .filter(is_in_sas=True, is_folder=True)
-        )
+        return super().get_queryset().filter(is_in_sas=True, is_folder=True)
 
 
 class Picture(SithFile):

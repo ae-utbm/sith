@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -294,7 +293,7 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
     current_tab = "infos"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["gift_form"] = GiftForm(
             user_id=self.object.id, initial={"user": self.object}
         )
@@ -313,7 +312,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
     current_tab = "pictures"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserPicturesView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["albums"] = []
         kwargs["pictures"] = {}
         picture_qs = all_pictures_of_user(self.object)
@@ -363,10 +362,10 @@ class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
                 self.object.godchildren.add(self.form.cleaned_data["user"])
                 self.object.save()
             self.form = UserGodfathersForm()
-        return super(UserGodfathersView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserGodfathersView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         try:
             kwargs["form"] = self.form
         except:
@@ -386,7 +385,7 @@ class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
     current_tab = "godfathers"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserGodfathersTreeView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if "descent" in self.request.GET:
             kwargs["param"] = "godchildren"
         else:
@@ -496,10 +495,10 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
         ):
             raise PermissionDenied
 
-        return super(UserStatsView, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserStatsView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         from django.db.models import Sum
 
         from counter.models import Counter
@@ -673,11 +672,11 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):
-            return super(UserUpdateProfileView, self).form_valid(self.form)
+            return super().form_valid(self.form)
         return self.form_invalid(self.form)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserUpdateProfileView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["profile"] = self.form.instance
         kwargs["form"] = self.form
         return kwargs
@@ -714,13 +713,13 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
         return user
 
     def get_form_kwargs(self):
-        kwargs = super(UserPreferencesView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         pref = self.object.preferences
         kwargs.update({"instance": pref})
         return kwargs
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserPreferencesView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
 
         if not (
             hasattr(self.object, "trombi_user") and self.request.user.trombi_user.trombi
@@ -759,7 +758,7 @@ class UserToolsView(QuickNotifMixin, UserTabsMixin, UserIsLoggedMixin, TemplateV
         self.object = self.request.user
         from launderette.models import Launderette
 
-        kwargs = super(UserToolsView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["launderettes"] = Launderette.objects.all()
         kwargs["profile"] = self.request.user
         kwargs["object"] = self.request.user
@@ -776,7 +775,7 @@ class UserAccountBase(UserTabsMixin, DetailView):
     current_tab = "account"
 
     def dispatch(self, request, *arg, **kwargs):  # Manually validates the rights
-        res = super(UserAccountBase, self).dispatch(request, *arg, **kwargs)
+        res = super().dispatch(request, *arg, **kwargs)
         if (
             self.object == request.user
             or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
@@ -817,7 +816,7 @@ class UserAccountView(UserAccountBase):
         return t
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserAccountView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["profile"] = self.object
         try:
             kwargs["customer"] = self.object.customer
@@ -846,7 +845,7 @@ class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
     template_name = "core/user_account_detail.jinja"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserAccountDetailView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["profile"] = self.object
         kwargs["year"] = self.get_year()
         kwargs["month"] = self.get_month()
@@ -866,13 +865,13 @@ class GiftCreateView(CreateView):
         if not (request.user.is_board_member or request.user.is_root):
             raise PermissionDenied
         self.user = get_object_or_404(User, pk=kwargs["user_id"])
-        return super(GiftCreateView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
         return {"user": self.user}
 
     def get_form_kwargs(self):
-        kwargs = super(GiftCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["user_id"] = self.user.id
         return kwargs
 
@@ -887,7 +886,7 @@ class GiftDeleteView(CanEditPropMixin, DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         self.user = get_object_or_404(User, pk=kwargs["user_id"])
-        return super(GiftDeleteView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse_lazy("core:user_profile", kwargs={"user_id": self.user.id})

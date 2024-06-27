@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding:utf-8 -*
 #
 # Copyright 2017
 # - Sli <antoine@bartuccio.fr>
@@ -34,7 +33,7 @@ class ScssFileStorage(FileSystemStorage):
             location = settings.STATIC_ROOT
         if base_url is None:
             base_url = settings.STATIC_URL
-        super(ScssFileStorage, self).__init__(location, base_url, *args, **kwargs)
+        super().__init__(location, base_url, *args, **kwargs)
 
 
 def find_file(path):

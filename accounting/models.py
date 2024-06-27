@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -37,11 +36,11 @@ class CurrencyField(models.DecimalField):
     def __init__(self, *args, **kwargs):
         kwargs["max_digits"] = 12
         kwargs["decimal_places"] = 2
-        super(CurrencyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_python(self, value):
         try:
-            return super(CurrencyField, self).to_python(value).quantize(Decimal("0.01"))
+            return super().to_python(value).quantize(Decimal("0.01"))
         except AttributeError:
             return None
 
@@ -364,7 +363,7 @@ class Operation(models.Model):
             return object.__getattribute__(self, attr)
 
     def clean(self):
-        super(Operation, self).clean()
+        super().clean()
         if self.date is None:
             raise ValidationError(_("The date must be set."))
         elif self.date < self.journal.start_date:
@@ -413,7 +412,7 @@ class Operation(models.Model):
     def save(self):
         if self.number is None:
             self.number = self.journal.operations.count() + 1
-        super(Operation, self).save()
+        super().save()
         self.journal.update_amounts()
 
     def is_owned_by(self, user):

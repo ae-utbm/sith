@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -50,7 +49,7 @@ class ManageModelMixin:
 
 class RightModelViewSet(ManageModelMixin, viewsets.ModelViewSet):
     def dispatch(self, request, *arg, **kwargs):
-        res = super(RightModelViewSet, self).dispatch(request, *arg, **kwargs)
+        res = super().dispatch(request, *arg, **kwargs)
         obj = self.queryset
         user = self.request.user
         try:

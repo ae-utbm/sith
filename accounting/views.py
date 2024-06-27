@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -210,7 +209,7 @@ class ClubAccountCreateView(CanCreateMixin, CreateView):
     template_name = "core/create.jinja"
 
     def get_initial(self):
-        ret = super(ClubAccountCreateView, self).get_initial()
+        ret = super().get_initial()
         if "parent" in self.request.GET.keys():
             obj = BankAccount.objects.filter(id=int(self.request.GET["parent"])).first()
             if obj is not None:
@@ -296,7 +295,7 @@ class JournalCreateView(CanCreateMixin, CreateView):
     template_name = "core/create.jinja"
 
     def get_initial(self):
-        ret = super(JournalCreateView, self).get_initial()
+        ret = super().get_initial()
         if "parent" in self.request.GET.keys():
             obj = ClubAccount.objects.filter(id=int(self.request.GET["parent"])).first()
             if obj is not None:
@@ -339,7 +338,7 @@ class JournalDeleteView(CanEditPropMixin, DeleteView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
         if self.object.operations.count() == 0:
-            return super(JournalDeleteView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         else:
             raise PermissionDenied
 
@@ -387,7 +386,7 @@ class OperationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         club_account = kwargs.pop("club_account", None)
-        super(OperationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if club_account:
             self.fields["label"].queryset = club_account.labels.order_by("name").all()
         if self.instance.target_type == "USER":
@@ -400,7 +399,7 @@ class OperationForm(forms.ModelForm):
             self.fields["company"].initial = self.instance.target_id
 
     def clean(self):
-        self.cleaned_data = super(OperationForm, self).clean()
+        self.cleaned_data = super().clean()
         if "target_type" in self.cleaned_data.keys():
             if (
                 self.cleaned_data.get("user") is None
@@ -430,7 +429,7 @@ class OperationForm(forms.ModelForm):
         return self.cleaned_data
 
     def save(self):
-        ret = super(OperationForm, self).save()
+        ret = super().save()
         if (
             self.instance.target_type == "ACCOUNT"
             and not self.instance.linked_operation
@@ -482,14 +481,14 @@ class OperationCreateView(CanCreateMixin, CreateView):
         return self.form_class(club_account=ca, **self.get_form_kwargs())
 
     def get_initial(self):
-        ret = super(OperationCreateView, self).get_initial()
+        ret = super().get_initial()
         if self.journal is not None:
             ret["journal"] = self.journal.id
         return ret
 
     def get_context_data(self, **kwargs):
         """Add journal to the context"""
-        kwargs = super(OperationCreateView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if self.journal:
             kwargs["object"] = self.journal
         return kwargs
@@ -507,7 +506,7 @@ class OperationEditView(CanEditMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         """Add journal to the context"""
-        kwargs = super(OperationEditView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["object"] = self.object.journal
         return kwargs
 
@@ -728,7 +727,7 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """Add infos to the context"""
-        kwargs = super(JournalNatureStatementView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["statement"] = self.big_statement()
         return kwargs
 
@@ -767,7 +766,7 @@ class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """Add journal to the context"""
-        kwargs = super(JournalPersonStatementView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["credit_statement"] = self.statement("CREDIT")
         kwargs["debit_statement"] = self.statement("DEBIT")
         kwargs["total_credit"] = self.total("CREDIT")
@@ -797,7 +796,7 @@ class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView)
 
     def get_context_data(self, **kwargs):
         """Add journal to the context"""
-        kwargs = super(JournalAccountingStatementView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["statement"] = self.statement()
         return kwargs
 
@@ -852,7 +851,7 @@ class LabelCreateView(
     template_name = "core/create.jinja"
 
     def get_initial(self):
-        ret = super(LabelCreateView, self).get_initial()
+        ret = super().get_initial()
         if "parent" in self.request.GET.keys():
             obj = ClubAccount.objects.filter(id=int(self.request.GET["parent"])).first()
             if obj is not None:
@@ -897,19 +896,19 @@ class RefoundAccountView(FormView):
             raise PermissionDenied
 
     def dispatch(self, request, *arg, **kwargs):
-        res = super(RefoundAccountView, self).dispatch(request, *arg, **kwargs)
+        res = super().dispatch(request, *arg, **kwargs)
         if self.permission(request.user):
             return res
 
     def post(self, request, *arg, **kwargs):
         self.operator = request.user
         if self.permission(request.user):
-            return super(RefoundAccountView, self).post(self, request, *arg, **kwargs)
+            return super().post(self, request, *arg, **kwargs)
 
     def form_valid(self, form):
         self.customer = form.cleaned_data["user"]
         self.create_selling()
-        return super(RefoundAccountView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse("accounting:refound_account")

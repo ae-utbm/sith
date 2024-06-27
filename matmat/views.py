@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2017
 # - Sli <antoine@bartuccio.fr>
@@ -71,7 +70,7 @@ class SearchForm(forms.ModelForm):
     quick = forms.CharField(label=_("Last/First name or nickname"), max_length=255)
 
     def __init__(self, *args, **kwargs):
-        super(SearchForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         for key in self.fields.keys():
             self.fields[key].required = False
 
@@ -110,14 +109,14 @@ class SearchFormListView(FormerSubscriberMixin, SingleObjectMixin, ListView):
             self.can_see_hidden = False
             self.init_query = self.init_query.exclude(is_subscriber_viewable=False)
 
-        return super(SearchFormListView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         self.object = None
-        kwargs = super(SearchFormListView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["form"] = self.form_class
         kwargs["result_exists"] = self.result_exists
         return kwargs
@@ -167,7 +166,7 @@ class SearchFormView(FormerSubscriberMixin, FormView):
         self.init_query = User.objects
         kwargs["form"] = self.get_form()
         kwargs["search_type"] = self.search_type
-        return super(SearchFormView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         view = SearchFormListView.as_view()
@@ -206,7 +205,7 @@ class SearchClearFormView(FormerSubscriberMixin, View):
     """
 
     def dispatch(self, request, *args, **kwargs):
-        super(SearchClearFormView, self).dispatch(request, *args, **kwargs)
+        super().dispatch(request, *args, **kwargs)
         if "matmat_search_form" in request.session.keys():
             request.session.pop("matmat_search_form")
         if "matmat_search_result" in request.session.keys():

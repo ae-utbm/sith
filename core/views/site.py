@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -144,7 +143,7 @@ class ToMarkdownView(TemplateView):
         return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ToMarkdownView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         try:
             kwargs["text"] = self.text
             kwargs["text_md"] = self.text_md

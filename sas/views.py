@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -21,7 +20,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, TemplateView
@@ -114,13 +113,13 @@ class SASMainView(FormView):
                     parent=parent, owner=root, files=files, automodere=True
                 )
                 if self.form.is_valid():
-                    return super(SASMainView, self).form_valid(self.form)
+                    return super().form_valid(self.form)
         else:
             self.form.add_error(None, _("You do not have the permission to do that"))
         return self.form_invalid(self.form)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(SASMainView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["categories"] = Album.objects.filter(
             parent__id=settings.SITH_SAS_ROOT_DIR_ID
         ).order_by("id")
@@ -140,27 +139,22 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.form = self.get_form()
-        if "rotate_right" in request.GET.keys():
+        if "rotate_right" in request.GET:
             self.object.rotate(270)
-        if "rotate_left" in request.GET.keys():
+        if "rotate_left" in request.GET:
             self.object.rotate(90)
-        if "remove_user" in request.GET.keys():
-            try:
-                user = User.objects.filter(id=int(request.GET["remove_user"])).first()
-                if user.id == request.user.id or request.user.is_in_group(
-                    pk=settings.SITH_GROUP_SAS_ADMIN_ID
-                ):
-                    PeoplePictureRelation.objects.filter(
-                        user=user, picture=self.object
-                    ).delete()
-            except:
-                pass
+        if "remove_user" in request.GET:
+            user = get_object_or_404(User, pk=int(request.GET["remove_user"]))
+            if user.id == request.user.id or request.user.is_in_group(
+                pk=settings.SITH_GROUP_SAS_ADMIN_ID
+            ):
+                user.picture.filter(picture=self.object).delete()
         if "ask_removal" in request.GET.keys():
             self.object.is_moderated = False
             self.object.asked_for_removal = True
             self.object.save()
             return redirect("sas:album", album_id=self.object.parent.id)
-        return super(PictureView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -186,13 +180,13 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
                             url=reverse("core:user_pictures", kwargs={"user_id": u.id}),
                             type="NEW_PICTURES",
                         ).save()
-                return super(PictureView, self).form_valid(self.form)
+                return super().form_valid(self.form)
         else:
             self.form.add_error(None, _("You do not have the permission to do that"))
         return self.form_invalid(self.form)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PictureView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["form"] = self.form
         return kwargs
 
@@ -253,15 +247,15 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
     def dispatch(self, request, *args, **kwargs):
         try:
             self.asked_page = int(request.GET.get("page", 1))
-        except ValueError:
-            raise Http404
-        return super(AlbumView, self).dispatch(request, *args, **kwargs)
+        except ValueError as e:
+            raise Http404 from e
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
         if "clipboard" not in request.session.keys():
             request.session["clipboard"] = []
-        return super(AlbumView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -285,7 +279,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
                     ),
                 )
                 if self.form.is_valid():
-                    return super(AlbumView, self).form_valid(self.form)
+                    return super().form_valid(self.form)
         else:
             self.form.add_error(None, _("You do not have the permission to do that"))
         return self.form_invalid(self.form)
@@ -294,14 +288,14 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         return reverse("sas:album", kwargs={"album_id": self.object.id})
 
     def get_context_data(self, **kwargs):
-        kwargs = super(AlbumView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["paginator"] = Paginator(
             self.object.children_pictures.order_by("id"), self.paginate_by
         )
         try:
             kwargs["pictures"] = kwargs["paginator"].page(self.asked_page)
-        except InvalidPage:
-            raise Http404
+        except InvalidPage as e:
+            raise Http404 from e
         kwargs["form"] = self.form
         kwargs["clipboard"] = SithFile.objects.filter(
             id__in=self.request.session["clipboard"]
@@ -317,25 +311,24 @@ class ModerationView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
-            return super(ModerationView, self).get(request, *args, **kwargs)
+            return super().get(request, *args, **kwargs)
         raise PermissionDenied
 
     def post(self, request, *args, **kwargs):
+        if "album_id" not in request.POST:
+            raise Http404
         if request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
-            try:
-                a = Album.objects.filter(id=request.POST["album_id"]).first()
-                if "moderate" in request.POST.keys():
-                    a.moderator = request.user
-                    a.is_moderated = True
-                    a.save()
-                elif "delete" in request.POST.keys():
-                    a.delete()
-            except:
-                pass
-        return super(ModerationView, self).get(request, *args, **kwargs)
+            album = get_object_or_404(Album, pk=request.POST["album_id"])
+            if "moderate" in request.POST:
+                album.moderator = request.user
+                album.is_moderated = True
+                album.save()
+            elif "delete" in request.POST:
+                album.delete()
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ModerationView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["albums_to_moderate"] = Album.objects.filter(
             is_moderated=False, is_in_sas=True, is_folder=True
         ).order_by("id")
@@ -381,7 +374,7 @@ class AlbumEditView(CanEditMixin, UpdateView):
     pk_url_kwarg = "album_id"
 
     def form_valid(self, form):
-        ret = super(AlbumEditView, self).form_valid(form)
+        ret = super().form_valid(form)
         if form.cleaned_data["recursive"]:
             self.object.apply_rights_recursively(True)
         return ret

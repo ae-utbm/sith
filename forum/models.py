@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017,2018
 # - Skia <skia@libskia.so>
@@ -106,7 +105,7 @@ class Forum(models.Model):
         copy_rights = False
         if self.id is None:
             copy_rights = True
-        super(Forum, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         if copy_rights:
             self.copy_rights()
 
@@ -258,7 +257,7 @@ class ForumTopic(models.Model):
         ordering = ["-_last_message__date"]
 
     def save(self, *args, **kwargs):
-        super(ForumTopic, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         self.forum.set_topic_number()  # Recompute the cached value
         self.forum.set_last_message()
 
@@ -325,7 +324,7 @@ class ForumMessage(models.Model):
 
     def save(self, *args, **kwargs):
         self._deleted = self.is_deleted()  # Recompute the cached value
-        super(ForumMessage, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         if self.is_last_in_topic():
             self.topic._last_message_id = self.id
         if self.is_first_in_topic() and self.title:
@@ -415,7 +414,7 @@ class ForumMessageMeta(models.Model):
     action = models.CharField(_("action"), choices=MESSAGE_META_ACTIONS, max_length=16)
 
     def save(self, *args, **kwargs):
-        super(ForumMessageMeta, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         self.message._deleted = self.message.is_deleted()
         self.message.save()
 
