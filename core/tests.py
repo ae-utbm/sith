@@ -13,8 +13,8 @@
 #
 #
 
-import os
 from datetime import date, timedelta
+from pathlib import Path
 
 import freezegun
 import pytest
@@ -22,7 +22,7 @@ from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import now
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertInHTML, assertRedirects
 
 from club.models import Membership
 from core.markdown import markdown
@@ -108,12 +108,51 @@ class TestUserLogin:
         assertRedirects(response, reverse("core:index"))
 
 
+@pytest.mark.parametrize(
+    ("md", "html"),
+    [
+        (
+            "[nom du lien](page://nomDeLaPage)",
+            '<a href="/page/nomDeLaPage/">nom du lien</a>',
+        ),
+        ("__texte__", "<u>texte</u>"),
+        ("~~***__texte__***~~", "<del><em><strong><u>texte</u></strong></em></del>"),
+        (
+            '![tst_alt](/img.png?50% "tst_title")',
+            '<img src="/img.png" alt="tst_alt" title="tst_title" style="width:50%;" />',
+        ),
+        (
+            "[texte](page://tst-page)",
+            '<a href="/page/tst-page/">texte</a>',
+        ),
+        (
+            "![](/img.png?50x450)",
+            '<img src="/img.png" alt="" style="width:50px;height:450px;" />',
+        ),
+        ("![](/img.png)", '<img src="/img.png" alt="" />'),
+        (
+            "![](/img.png?50%x120%)",
+            '<img src="/img.png" alt="" style="width:50%;height:120%;" />',
+        ),
+        ("![](/img.png?50px)", '<img src="/img.png" alt="" style="width:50px;" />'),
+        (
+            "![](/img.png?50pxx120%)",
+            '<img src="/img.png" alt="" style="width:50px;height:120%;" />',
+        ),
+        # when the image dimension has a wrong format, don't touch the url
+        ("![](/img.png?50pxxxxxxxx)", '<img src="/img.png?50pxxxxxxxx" alt="" />'),
+        ("![](/img.png?azerty)", '<img src="/img.png?azerty" alt="" />'),
+    ],
+)
+def test_custom_markdown_syntax(md, html):
+    """Test the homemade markdown syntax"""
+    assert markdown(md) == f"<p>{html}</p>\n"
+
+
 def test_full_markdown_syntax():
-    root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    with open(os.path.join(root_path) + "/doc/SYNTAX.md", "r") as md_file:
-        md = md_file.read()
-    with open(os.path.join(root_path) + "/doc/SYNTAX.html", "r") as html_file:
-        html = html_file.read()
+    doc_path = Path(settings.BASE_DIR) / "doc"
+    md = (doc_path / "SYNTAX.md").read_text()
+    html = (doc_path / "SYNTAX.html").read_text()
     result = markdown(md)
     assert result == html
 
@@ -218,12 +257,15 @@ http://git.an
         )
         response = self.client.get(reverse("core:page", kwargs={"page_name": "guy"}))
         assert response.status_code == 200
-        assert (
-            '<p>Guy <em>bibou</em></p>\\n<p><a href="http://git.an">http://git.an</a></p>\\n'
-            + "<h1>Swag</h1>\\n&lt;guy&gt;Bibou&lt;/guy&gt;"
-            + "&lt;script&gt;alert(\\'Guy\\');&lt;/script&gt;"
-            in str(response.content)
-        )
+        print(response.content.decode())
+        expected = """
+            <p>Guy <em>bibou</em></p>
+            <p><a href="http://git.an">http://git.an</a></p>
+            <h1>Swag</h1>
+            <p>&lt;guy&gt;Bibou&lt;/guy&gt;</p>
+            <p>&lt;script&gt;alert('Guy');&lt;/script&gt;</p>
+            """
+        assertInHTML(expected, response.content.decode())
 
 
 class UserToolsTest:
