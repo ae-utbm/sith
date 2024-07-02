@@ -3,8 +3,8 @@ repos:
     # Ruff version.
     rev: v0.4.10
     hooks:
-      # Run the linter.
-      - id: ruff
-        args: ["--fix"]
+      - id: ruff  # just check the code, and print the errors
+      - id: ruff  # actually fix the fixable errors, but print nothing
+        args: ["--fix", "--silent"]
       # Run the formatter.
       - id: ruff-format
