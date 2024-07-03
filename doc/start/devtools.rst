@@ -8,6 +8,36 @@ Pour donner une idée, Skia a écrit une énorme partie de projet avec l'éditeu
 alors que Sli a utilisé *Sublime Text* sur MacOS et que Maréchal travaille avec PyCharm
 sur ~~Windows muni de WSL~~ Arch Linux btw.
 
+Configurer les pre-commit hooks
+--------------------------------
+
+La procédure habituelle pour contribuer au projet consiste à commit des modifications, puis à les push sur le dépôt distant et à ouvrir une pull request. Cette PR va faire tourner les outils de vérification de la qualité de code. Si la vérification échoue, la PR est bloquée, et il faut réparer le problème (ce qui implique de push un micro-commit ou de push force sur la branche).
+
+Dans l'idéal, on aimerait donc qu'il soit impossible d'oublier de faire tourner ces vérification. Pour ça, il existe un mécanisme : les pre-commits hooks. Ce sont des actions qui tournent automatiquement lorsque vous effectuez un `git commit`. Ces dernières vont analyser et éventuellement modifier le code, avant que Git n'ajoute effectivement le commit sur l'arbre git. Voyez ça comme une micro-CI qui tourne en local.
+
+Les git hooks sont une fonctionnalité par défaut de Git. Cependant, leur configuration peut-être un peu embêtante si vous le faites manuellement. Pour gérer ça plus simplement, nous utilisons le logiciel python [pre-commit](https://pre-commit.com/) qui permet de contrôler leur installation via un seul fichier de configuration, placé à la racine du projet (plus précisément, il s'agit du fichier `.pre-commit-config.yaml`).
+
+.. note::
+
+    Les pre-commits sont également utilisés dans la CI. Si ces derniers fonctionnent localement, vous avez la garantie que la pipeline ne sera pas fachée. ;)
+
+C'est une fonctionnalité de git lui même mais c'est assez embêtant à gérer manuellement. Pour gérer ça plus simplement, nous utilisons le logiciel python [pre-commit](https://pre-commit.com/) qui permet de contrôller leur installation via un fichier yaml.
+
+Les pre-commits sont également utilisés dans la CI, si les pre-commits fonctionnent localement, vous avez la garantie que la pipeline ne sera pas fachée ;).
+
+Le logiciel est installé par défaut par poetry. Il suffit ensuite de lancer :
+
+.. code-block::
+
+    pre-commit install
+
+Tout se fait ensuite automatiquement lorsqu'on utilise git normalement pour commit. Pour appliquer les pre-commits manuellement, il est possible d'appeler soi même les pre-commits
+
+.. code-block::
+
+    pre-commit run --all-files
+
+
 Configurer Ruff pour son éditeur
 ---------------------------------
 
@@ -59,6 +89,22 @@ Sublime Text
 
 Vous devez installer ce plugin : https://packagecontrol.io/packages/LSP-ruff.
 Suivez ensuite les instructions données dans la description du plugin.
+
+Dans la configuration de votre projet, ajoutez ceci:
+
+.. sourcecode:: json
+
+    {
+        "settings": {
+            "lsp_format_on_save": true,
+            "LSP": { 
+                "LSP-ruff": {
+                    "enabled": true,
+                }
+            }
+        }
+    }
+
 
 Si vous utilisez le plugin `anaconda <http://damnwidget.github.io/anaconda/>`__, pensez à modifier les paramètres du linter pep8 pour éviter de recevoir des warnings dans le formatage de ruff comme ceci :
 
