@@ -21,7 +21,7 @@ license = "GPL-3.0-only"
 [tool.poetry.dependencies]
 python = "^3.8"
 Django = "^3.2"
-Pillow = "^9.2"
+Pillow = "^10.3"
 mistune = "^0.8.4"
 django-jinja = "^2.10"
 cryptography = "^40.0"
