@@ -207,11 +207,11 @@ class Club(models.Model):
         cache.set(f"sith_club_{self.unix_name}", self)
 
     def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
         # Invalidate the cache of this club and of its memberships
         for membership in self.members.ongoing().select_related("user"):
             cache.delete(f"membership_{self.id}_{membership.user.id}")
         cache.delete(f"sith_club_{self.unix_name}")
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return self.name

@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 
 import datetime
+from datetime import timezone
 
 from django.db import migrations, models
-from django.utils.timezone import utc
 
 
 class Migration(migrations.Migration):
@@ -17,7 +17,9 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(
                 verbose_name="activity time",
                 auto_now=True,
-                default=datetime.datetime(2016, 8, 26, 17, 5, 31, 202824, tzinfo=utc),
+                default=datetime.datetime(
+                    2016, 8, 26, 17, 5, 31, 202824, tzinfo=timezone.utc
+                ),
             ),
             preserve_default=False,
         )
