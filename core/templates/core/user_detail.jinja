@@ -162,8 +162,9 @@
             <div>
                 {% trans %}Not subscribed{% endtrans %}
                 {% if user.is_board_member %}
-                <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">{% trans %}New subscription{% endtrans
-                    %}</a>
+                <a href="{{ url('subscription:subscription') }}?member={{ profile.id }}">
+                    {% trans %}New subscription{% endtrans %}
+                </a>
                 {% endif %}
                 {% endif %}
             </div>
