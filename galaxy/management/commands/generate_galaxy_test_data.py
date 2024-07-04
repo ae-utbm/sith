@@ -128,7 +128,7 @@ class Command(BaseCommand):
             self.clubs.append(Club(unix_name=f"galaxy-club-{i}", name=f"club-{i}"))
         # We don't need to create corresponding groups here, as the Galaxy doesn't care about them
         Club.objects.bulk_create(self.clubs)
-        self.clubs = Club.objects.filter(unix_name__startswith="galaxy-").all()
+        self.clubs = list(Club.objects.filter(unix_name__startswith="galaxy-").all())
 
     def make_users(self):
         """
@@ -175,20 +175,22 @@ class Command(BaseCommand):
         Then it will take 14 other citizen among the previous 200
         (godfathers are usually older), and apply another
         heuristic to determine whether they should have a family link
+        It will result in approximately 40% of users having at least one godchild
+        and 70% having at least one godfather.
         """
         if self.users is None:
             raise RuntimeError(
                 "The `make_users()` method must be called before `make_families()`"
             )
+        godfathers = []
         for i in range(200, self.NB_USERS):
-            godfathers = []
             for j in range(i - 200, i, 14):  # this will loop 14 times (14² = 196)
-                if (i / 10) % 10 == (i + j) % 10:
+                if (i // 10) % 10 == (i + j) % 10:
                     u1 = self.users[i]
                     u2 = self.users[j]
+                    godfathers.append(User.godfathers.through(from_user=u1, to_user=u2))
                     self.logger.info(f"Making {u2} the godfather of {u1}")
-                    godfathers.append(u2)
-                u1.godfathers.set(godfathers)
+        User.godfathers.through.objects.bulk_create(godfathers)
 
     def make_club_memberships(self):
         """
@@ -295,7 +297,7 @@ class Command(BaseCommand):
             self.picts[i].compressed.name = self.picts[i].name
             self.picts[i].thumbnail.name = self.picts[i].name
         Picture.objects.bulk_create(self.picts)
-        self.picts = Picture.objects.filter(name__startswith="galaxy-").all()
+        self.picts = list(Picture.objects.filter(name__startswith="galaxy-").all())
 
     def make_pictures_memberships(self):
         """
@@ -377,8 +379,13 @@ class Command(BaseCommand):
         u1 = self.users[uid]
         u2 = self.users[uid - 100]
         u3 = self.users[uid + 100]
-        u1.godfathers.add(u2)
-        u1.godchildren.add(u3)
+        User.godfathers.through.objects.bulk_create(
+            [
+                User.godfathers.through(from_user=u1, to_user=u2),
+                User.godfathers.through(from_user=u3, to_user=u2),
+            ],
+            ignore_conflicts=True,  # in case a relationship has already been created
+        )
         self.logger.info(f"{u1} will be important and close to {u2} and {u3}")
         pictures_tags = []
         for p in range(uid - 400, uid - 200):
