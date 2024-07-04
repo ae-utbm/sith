@@ -25,6 +25,7 @@
 import json
 from pathlib import Path
 
+import pytest
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
@@ -147,6 +148,7 @@ class GalaxyTestModel(TestCase):
             galaxy.rule(0)  # We want everybody here
 
 
+@pytest.mark.slow
 class GalaxyTestView(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -196,6 +198,4 @@ class GalaxyTestView(TestCase):
         # Dump computed state, either for easier debugging, or to copy as new reference if changes are legit
         (galaxy_dir / "test_galaxy_state.json").write_text(json.dumps(state))
 
-        assert (
-            state == json.loads((galaxy_dir / "ref_galaxy_state.json").read_text()),
-        )
+        assert state == json.loads((galaxy_dir / "ref_galaxy_state.json").read_text())

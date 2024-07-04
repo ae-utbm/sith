@@ -72,7 +72,7 @@ class MergeUserTest(TestCase):
         assert "B'ian" == self.to_keep.nick_name
         assert "Jerusalem" == self.to_keep.address
         assert "Rome" == self.to_keep.parent_address
-        assert (3, self.to_keep.groups.count())
+        assert self.to_keep.groups.count() == 3
         groups = sorted(self.to_keep.groups.all(), key=lambda i: i.id)
         expected = sorted([subscribers, mde_admin, sas_admin], key=lambda i: i.id)
         assert groups == expected

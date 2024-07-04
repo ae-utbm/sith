@@ -147,20 +147,20 @@ class Command(BaseCommand):
             self.logger.info(f"Creating {u}")
             self.users.append(u)
         User.objects.bulk_create(self.users)
-        self.users = User.objects.filter(username__startswith="galaxy-").all()
+        self.users = list(User.objects.filter(username__startswith="galaxy-").all())
 
         # now that users are created, create their subscription
         subs = []
-        for i in range(self.NB_USERS):
-            u = self.users[i]
-            self.logger.info(f"Registering {u}")
+        end = Subscription.compute_end(duration=2)
+        for i, user in enumerate(self.users):
+            self.logger.info(f"Registering {user}")
             subs.append(
                 Subscription(
-                    member=u,
+                    member=user,
                     subscription_start=Subscription.compute_start(
                         self.now - timedelta(days=self.NB_USERS - i)
                     ),
-                    subscription_end=Subscription.compute_end(duration=2),
+                    subscription_end=end,
                 )
             )
         Subscription.objects.bulk_create(subs)
@@ -381,28 +381,15 @@ class Command(BaseCommand):
         u1.godchildren.add(u3)
         self.logger.info(f"{u1} will be important and close to {u2} and {u3}")
         pictures_tags = []
-        for p in range(  # Mix them with other citizen for more chaos
-            uid - 400, uid - 200
-        ):
-            # users may already be on the pictures
-            if not self.picts[p].people.filter(user=u1).exists():
-                pictures_tags.append(
-                    PeoplePictureRelation(user=u1, picture=self.picts[p])
-                )
-            if not self.picts[p].people.filter(user=u2).exists():
-                pictures_tags.append(
-                    PeoplePictureRelation(user=u2, picture=self.picts[p])
-                )
-            if not self.picts[p + self.NB_USERS].people.filter(user=u1).exists():
-                pictures_tags.append(
-                    PeoplePictureRelation(
-                        user=u1, picture=self.picts[p + self.NB_USERS]
-                    )
-                )
-            if not self.picts[p + self.NB_USERS].people.filter(user=u2).exists():
-                pictures_tags.append(
-                    PeoplePictureRelation(
-                        user=u2, picture=self.picts[p + self.NB_USERS]
-                    )
-                )
-        PeoplePictureRelation.objects.bulk_create(pictures_tags)
+        for p in range(uid - 400, uid - 200):
+            # Mix them with other citizen for more chaos
+            pictures_tags += [
+                PeoplePictureRelation(user=u1, picture=self.picts[p]),
+                PeoplePictureRelation(user=u2, picture=self.picts[p]),
+                PeoplePictureRelation(user=u1, picture=self.picts[p + self.NB_USERS]),
+                PeoplePictureRelation(user=u2, picture=self.picts[p + self.NB_USERS]),
+            ]
+        # users may already be on the pictures.
+        # In this case the conflict will just be ignored
+        # and nothing will happen for this entry
+        PeoplePictureRelation.objects.bulk_create(pictures_tags, ignore_conflicts=True)

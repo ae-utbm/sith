@@ -19,7 +19,8 @@ import base64
 import os
 import random
 import string
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
+from datetime import timezone as tz
 from typing import Tuple
 
 from dict2xml import dict2xml
@@ -549,7 +550,7 @@ class Counter(models.Model):
         if since is None:
             since = get_start_of_semester()
         if isinstance(since, date):
-            since = datetime(since.year, since.month, since.day, tzinfo=timezone.utc)
+            since = datetime(since.year, since.month, since.day, tzinfo=tz.utc)
         return (
             self.sellings.filter(date__gte=since)
             .annotate(
@@ -583,7 +584,7 @@ class Counter(models.Model):
         if since is None:
             since = get_start_of_semester()
         if isinstance(since, date):
-            since = datetime(since.year, since.month, since.day, tzinfo=timezone.utc)
+            since = datetime(since.year, since.month, since.day, tzinfo=tz.utc)
         total = self.sellings.filter(date__gte=since).aggregate(
             total=Sum(F("quantity") * F("unit_price"), output_field=CurrencyField())
         )["total"]

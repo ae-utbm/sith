@@ -76,6 +76,7 @@ select = ["I", "F401"]
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "sith.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
+markers = ["slow"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

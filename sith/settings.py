@@ -696,6 +696,17 @@ if DEBUG:
 
 if TESTING:
     CAPTCHA_TEST_MODE = True
+    PASSWORD_HASHERS = [  # not secure, but faster password hasher
+        "django.contrib.auth.hashers.MD5PasswordHasher",
+    ]
+    STORAGES = {  # store files in memory rather than using the hard drive
+        "default": {
+            "BACKEND": "django.core.files.storage.InMemoryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 if SENTRY_DSN:
     # Connection to sentry

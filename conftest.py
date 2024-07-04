@@ -6,7 +6,7 @@ from django.utils.translation import activate
 @pytest.fixture(scope="session")
 def django_db_setup(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
-        call_command("setup")
+        call_command("populate")
 
 
 @pytest.fixture(scope="session", autouse=True)
