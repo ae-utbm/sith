@@ -51,7 +51,7 @@ tomli = "^2.0.1"
 django-debug-toolbar = "^4.0.0"
 ipython = "^8.26.0"
 pre-commit = "^3.7.1"
-ruff = "^0.4.10" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
+ruff = "^0.5.0" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
 
 [tool.poetry.group.tests.dependencies]
 freezegun = "^1.2.2"  # used to test time-dependent code
