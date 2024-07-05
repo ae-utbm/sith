@@ -20,6 +20,11 @@ from datetime import datetime
 from urllib.parse import unquote
 
 import sentry_sdk
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+from cryptography.hazmat.primitives.hashes import SHA1
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
@@ -29,7 +34,6 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView, View
-from OpenSSL import crypto
 
 from counter.forms import BillingInfoForm
 from counter.models import Counter, Customer, Product
@@ -180,18 +184,14 @@ class EtransactionAutoAnswer(View):
         required = {"Amount", "BasketID", "Error", "Sig"}
         if not required.issubset(set(request.GET.keys())):
             return HttpResponse("Bad arguments", status=400)
-        key = crypto.load_publickey(crypto.FILETYPE_PEM, settings.SITH_EBOUTIC_PUB_KEY)
-        cert = crypto.X509()
-        cert.set_pubkey(key)
-        sig = base64.b64decode(request.GET["Sig"])
+        pubkey: RSAPublicKey = load_pem_public_key(
+            settings.SITH_EBOUTIC_PUB_KEY.encode("utf-8")
+        )
+        signature = base64.b64decode(request.GET["Sig"])
         try:
-            crypto.verify(
-                cert,
-                sig,
-                "&".join(request.META["QUERY_STRING"].split("&")[:-1]).encode("utf-8"),
-                "sha1",
-            )
-        except:
+            data = "&".join(request.META["QUERY_STRING"].split("&")[:-1])
+            pubkey.verify(signature, data.encode("utf-8"), PKCS1v15(), SHA1())
+        except InvalidSignature:
             return HttpResponse("Bad signature", status=400)
         # Payment authorized:
         # * 'Error' is '00000'

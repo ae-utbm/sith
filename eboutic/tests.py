@@ -26,11 +26,14 @@ import base64
 import json
 import urllib
 
+from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from cryptography.hazmat.primitives.hashes import SHA1
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from django.conf import settings
 from django.db.models import Max
 from django.test import TestCase
 from django.urls import reverse
-from OpenSSL import crypto
 
 from core.models import User
 from counter.models import Counter, Customer, Product, Selling
@@ -67,12 +70,12 @@ class EbouticTest(TestCase):
         basket_id = basket.id
         amount = int(basket.get_total() * 100)
         query = f"Amount={amount}&BasketID={basket_id}&Auto=42&Error=00000"
-        with open("./eboutic/tests/private_key.pem") as f:
+        with open("./eboutic/tests/private_key.pem", "br") as f:
             PRIVKEY = f.read()
         with open("./eboutic/tests/public_key.pem") as f:
             settings.SITH_EBOUTIC_PUB_KEY = f.read()
-        privkey = crypto.load_privatekey(crypto.FILETYPE_PEM, PRIVKEY)
-        sig = crypto.sign(privkey, query.encode("utf-8"), "sha1")
+        key: RSAPrivateKey = load_pem_private_key(PRIVKEY, None)
+        sig = key.sign(query.encode("utf-8"), PKCS1v15(), SHA1())
         b64sig = base64.b64encode(sig).decode("ascii")
 
         url = reverse("eboutic:etransation_autoanswer") + "?%s&Sig=%s" % (
