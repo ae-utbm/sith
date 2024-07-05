@@ -1098,8 +1098,10 @@ Welcome to the wiki page!
             n = News(
                 title="Repas barman",
                 summary="Enjoy la fin du semestre!",
-                content="Viens donc t'enjailler avec les autres barmans aux "
-                "frais du BdF! \o/",
+                content=(
+                    "Viens donc t'enjailler avec les autres barmans aux "
+                    "frais du BdF! \\o/"
+                ),
                 type="EVENT",
                 club=bar_club,
                 author=subscriber,

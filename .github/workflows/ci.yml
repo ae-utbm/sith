@@ -21,6 +21,10 @@ jobs:
   tests:
     name: Run tests and generate coverage report
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # don't interrupt the other test processes
+      matrix:
+        pytest-mark: [slow, not slow]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -28,7 +32,7 @@ jobs:
       - uses: ./.github/actions/setup_xapian
       - uses: ./.github/actions/compile_messages
       - name: Run tests
-        run: poetry run coverage run -m pytest
+        run: poetry run coverage run -m pytest -m "${{ matrix.pytest-mark }}"
       - name: Generate coverage report
         run: |
           poetry run coverage report

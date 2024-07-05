@@ -220,10 +220,11 @@ class EbouticTest(TestCase):
         self.client.get(reverse("eboutic:command"))
         response = self.client.get(et_answer_url)
         assert response.status_code == 500
-        assert (
-            "Basket processing failed with error: SuspiciousOperation('Basket total and amount do not match'"
-            in response.content.decode("utf-8"),
+        msg = (
+            "Basket processing failed with error: "
+            "SuspiciousOperation('Basket total and amount do not match'"
         )
+        assert msg in response.content.decode("utf-8")
 
     def test_buy_simple_product_with_credit_card(self):
         self.client.force_login(self.subscriber)

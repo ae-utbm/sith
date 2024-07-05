@@ -207,6 +207,29 @@ Pour lancer les tests il suffit d'utiliser la commande intégrée à django.
     # Lancer une méthode en particulier de cette même classe
     pytest core.tests.UserRegistrationTest.test_register_user_form_ok
 
+.. note::
+
+    Certains tests sont un peu longs à tourner.
+    Pour ne faire tourner que les tests les plus rapides,
+    vous pouvez exécutez pytest ainsi :
+
+    .. code-block:: bash
+
+        pytest -m "not slow"
+
+        # vous pouvez toujours faire comme au-dessus
+        pytest core -m "not slow"
+
+    A l'inverse, vous pouvez ne faire tourner que les tests
+    lents en remplaçant `-m "not slow"` par `-m slow`.
+
+    De cette manière, votre processus de développement
+    devrait être un peu plus fluide.
+    Cependant, n'oubliez pas de bien faire tourner
+    tous les tests avant de push un commit.
+
+
+
 Vérifier les dépendances Javascript
 -----------------------------------
 
