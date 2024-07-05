@@ -37,6 +37,7 @@ jobs:
 
           git pull
           poetry install
+          poetry run ./manage.py install_xapian
           poetry run ./manage.py migrate
           echo "yes" | poetry run ./manage.py collectstatic
           poetry run ./manage.py compilestatic
