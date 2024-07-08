@@ -86,7 +86,7 @@ def current_star(self) -> Optional[GalaxyStar]:
 
 
 # Adding a shortcut to User class for getting its star belonging to the latest ruled Galaxy
-setattr(User, "current_star", current_star)
+User.current_star = current_star
 
 
 class GalaxyLane(models.Model):

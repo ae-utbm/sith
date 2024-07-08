@@ -68,5 +68,5 @@ class SignalRequestMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        setattr(_threadlocal, "request", request)
+        _threadlocal.request = request
         return self.get_response(request)

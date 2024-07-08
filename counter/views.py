@@ -434,7 +434,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def sum_basket(self, request):
         total = 0
-        for pid, infos in request.session["basket"].items():
+        for infos in request.session["basket"].values():
             total += infos["price"] * infos["qty"]
         return total / 100
 

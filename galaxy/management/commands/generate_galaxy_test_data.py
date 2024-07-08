@@ -72,7 +72,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.logger = logging.getLogger("main")
         if options["verbosity"] < 0 or 2 < options["verbosity"]:
-            warnings.warn("verbosity level should be between 0 and 2 included")
+            warnings.warn(
+                "verbosity level should be between 0 and 2 included", stacklevel=2
+            )
 
         if options["verbosity"] == 2:
             self.logger.setLevel(logging.DEBUG)
