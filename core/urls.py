@@ -25,12 +25,12 @@
 
 from django.urls import path, re_path, register_converter
 
-from core.views import *
 from core.converters import (
+    BooleanStringConverter,
     FourDigitYearConverter,
     TwoDigitMonthConverter,
-    BooleanStringConverter,
 )
+from core.views import *
 
 register_converter(FourDigitYearConverter, "yyyy")
 register_converter(TwoDigitMonthConverter, "mm")

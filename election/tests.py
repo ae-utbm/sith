@@ -1,62 +1,49 @@
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
-from django.core.management import call_command
-from django.conf import settings
 
-from core.models import User, Group
+from core.models import Group, User
 from election.models import Election
 
 
-class MainElection(TestCase):
-    def setUp(self):
-        self.election = Election.objects.all().first()
-        self.public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
-        self.subscriber_group = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)
-        self.ae_board_group = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
-        self.sli = User.objects.get(username="sli")
-        self.subscriber = User.objects.get(username="subscriber")
-        self.public = User.objects.get(username="public")
+class ElectionTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.election = Election.objects.first()
+        cls.public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
+        cls.subscriber_group = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)
+        cls.ae_board_group = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
+        cls.sli = User.objects.get(username="sli")
+        cls.subscriber = User.objects.get(username="subscriber")
+        cls.public = User.objects.get(username="public")
 
 
-class ElectionDetailTest(MainElection):
+class ElectionDetailTest(ElectionTest):
     def test_permission_denied(self):
         self.election.view_groups.remove(self.public_group)
-        self.election.view_groups.add(self.subscriber_group)
-        self.election.save()
-        self.client.login(username=self.public.username, password="plop")
-        response_get = self.client.get(
+        self.client.force_login(self.public)
+        response = self.client.get(
             reverse("election:detail", args=str(self.election.id))
         )
-        response_post = self.client.get(
-            reverse("election:detail", args=str(self.election.id))
-        )
-        self.assertTrue(response_get.status_code == 403)
-        self.assertTrue(response_post.status_code == 403)
-        self.election.view_groups.remove(self.subscriber_group)
-        self.election.view_groups.add(self.public_group)
-        self.election.save()
+        assert response.status_code == 403
 
     def test_permisson_granted(self):
-        self.client.login(username=self.public.username, password="plop")
-        response_get = self.client.get(
+        self.client.force_login(self.public)
+        response = self.client.get(
             reverse("election:detail", args=str(self.election.id))
         )
-        response_post = self.client.post(
-            reverse("election:detail", args=str(self.election.id))
-        )
-        self.assertFalse(response_get.status_code == 403)
-        self.assertFalse(response_post.status_code == 403)
-        self.assertTrue("La roue tourne" in str(response_get.content))
+        assert response.status_code == 200
+        assert "La roue tourne" in str(response.content)
 
 
-class ElectionUpdateView(MainElection):
+class ElectionUpdateView(ElectionTest):
     def test_permission_denied(self):
-        self.client.login(username=self.subscriber.username, password="plop")
-        response_get = self.client.get(
+        self.client.force_login(self.subscriber)
+        response = self.client.get(
             reverse("election:update", args=str(self.election.id))
         )
-        response_post = self.client.post(
+        assert response.status_code == 403
+        response = self.client.post(
             reverse("election:update", args=str(self.election.id))
         )
-        self.assertTrue(response_get.status_code == 403)
-        self.assertTrue(response_post.status_code == 403)
+        assert response.status_code == 403

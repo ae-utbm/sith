@@ -25,6 +25,7 @@
 
 import os
 from collections import OrderedDict
+
 from django.conf import settings
 from django.contrib.staticfiles.finders import FileSystemFinder
 from django.core.files.storage import FileSystemStorage

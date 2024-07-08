@@ -23,9 +23,9 @@
 #
 
 import json
-
 from pathlib import Path
 
+import pytest
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
@@ -35,29 +35,30 @@ from galaxy.models import Galaxy
 
 
 class GalaxyTestModel(TestCase):
-    def setUp(self):
-        self.root = User.objects.get(username="root")
-        self.skia = User.objects.get(username="skia")
-        self.sli = User.objects.get(username="sli")
-        self.krophil = User.objects.get(username="krophil")
-        self.richard = User.objects.get(username="rbatsbak")
-        self.subscriber = User.objects.get(username="subscriber")
-        self.public = User.objects.get(username="public")
-        self.com = User.objects.get(username="comunity")
+    @classmethod
+    def setUpTestData(cls):
+        cls.root = User.objects.get(username="root")
+        cls.skia = User.objects.get(username="skia")
+        cls.sli = User.objects.get(username="sli")
+        cls.krophil = User.objects.get(username="krophil")
+        cls.richard = User.objects.get(username="rbatsbak")
+        cls.subscriber = User.objects.get(username="subscriber")
+        cls.public = User.objects.get(username="public")
+        cls.com = User.objects.get(username="comunity")
 
     def test_user_self_score(self):
         """
         Test that individual user scores are correct
         """
         with self.assertNumQueries(8):
-            self.assertEqual(Galaxy.compute_user_score(self.root), 9)
-            self.assertEqual(Galaxy.compute_user_score(self.skia), 10)
-            self.assertEqual(Galaxy.compute_user_score(self.sli), 8)
-            self.assertEqual(Galaxy.compute_user_score(self.krophil), 2)
-            self.assertEqual(Galaxy.compute_user_score(self.richard), 10)
-            self.assertEqual(Galaxy.compute_user_score(self.subscriber), 8)
-            self.assertEqual(Galaxy.compute_user_score(self.public), 8)
-            self.assertEqual(Galaxy.compute_user_score(self.com), 1)
+            assert Galaxy.compute_user_score(self.root) == 9
+            assert Galaxy.compute_user_score(self.skia) == 10
+            assert Galaxy.compute_user_score(self.sli) == 8
+            assert Galaxy.compute_user_score(self.krophil) == 2
+            assert Galaxy.compute_user_score(self.richard) == 10
+            assert Galaxy.compute_user_score(self.subscriber) == 8
+            assert Galaxy.compute_user_score(self.public) == 8
+            assert Galaxy.compute_user_score(self.com) == 1
 
     def test_users_score(self):
         """
@@ -147,6 +148,7 @@ class GalaxyTestModel(TestCase):
             galaxy.rule(0)  # We want everybody here
 
 
+@pytest.mark.slow
 class GalaxyTestView(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -156,12 +158,13 @@ class GalaxyTestView(TestCase):
         call_command("generate_galaxy_test_data", "-v", "0")
         galaxy = Galaxy.objects.create()
         galaxy.rule(26)  # We want a fast test
+        cls.root = User.objects.get(username="root")
 
     def test_page_is_citizen(self):
         """
         Test that users can access the galaxy page of users who are citizens
         """
-        self.client.login(username="root", password="plop")
+        self.client.force_login(self.root)
         user = User.objects.get(last_name="n°500")
         response = self.client.get(reverse("galaxy:user", args=[user.id]))
         self.assertContains(
@@ -175,10 +178,10 @@ class GalaxyTestView(TestCase):
         Test that trying to access the galaxy page of a user who is not
         citizens return a 404
         """
-        self.client.login(username="root", password="plop")
+        self.client.force_login(self.root)
         user = User.objects.get(last_name="n°1")
         response = self.client.get(reverse("galaxy:user", args=[user.id]))
-        self.assertEquals(response.status_code, 404)
+        assert response.status_code == 404
 
     def test_full_galaxy_state(self):
         """
@@ -186,7 +189,7 @@ class GalaxyTestView(TestCase):
         command that the relation scores are correct, and that the view exposes the
         right data.
         """
-        self.client.login(username="root", password="plop")
+        self.client.force_login(self.root)
         response = self.client.get(reverse("galaxy:data"))
         state = response.json()
 
@@ -195,7 +198,4 @@ class GalaxyTestView(TestCase):
         # Dump computed state, either for easier debugging, or to copy as new reference if changes are legit
         (galaxy_dir / "test_galaxy_state.json").write_text(json.dumps(state))
 
-        self.assertEqual(
-            state,
-            json.loads((galaxy_dir / "ref_galaxy_state.json").read_text()),
-        )
+        assert state == json.loads((galaxy_dir / "ref_galaxy_state.json").read_text())

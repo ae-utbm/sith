@@ -21,7 +21,9 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import logging
 import warnings
+from datetime import timedelta
 from typing import Final, Optional
 
 from django.conf import settings
@@ -29,15 +31,10 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from datetime import timedelta
-
-import logging
-
 from club.models import Club, Membership
-from core.models import User, Group, Page, SithFile
+from core.models import Group, Page, SithFile, User
+from sas.models import Album, PeoplePictureRelation, Picture
 from subscription.models import Subscription
-from sas.models import Album, Picture, PeoplePictureRelation
-
 
 RED_PIXEL_PNG: Final[bytes] = (
     b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52"
@@ -131,7 +128,7 @@ class Command(BaseCommand):
             self.clubs.append(Club(unix_name=f"galaxy-club-{i}", name=f"club-{i}"))
         # We don't need to create corresponding groups here, as the Galaxy doesn't care about them
         Club.objects.bulk_create(self.clubs)
-        self.clubs = Club.objects.filter(unix_name__startswith="galaxy-").all()
+        self.clubs = list(Club.objects.filter(unix_name__startswith="galaxy-").all())
 
     def make_users(self):
         """
@@ -150,20 +147,20 @@ class Command(BaseCommand):
             self.logger.info(f"Creating {u}")
             self.users.append(u)
         User.objects.bulk_create(self.users)
-        self.users = User.objects.filter(username__startswith="galaxy-").all()
+        self.users = list(User.objects.filter(username__startswith="galaxy-").all())
 
         # now that users are created, create their subscription
         subs = []
-        for i in range(self.NB_USERS):
-            u = self.users[i]
-            self.logger.info(f"Registering {u}")
+        end = Subscription.compute_end(duration=2)
+        for i, user in enumerate(self.users):
+            self.logger.info(f"Registering {user}")
             subs.append(
                 Subscription(
-                    member=u,
+                    member=user,
                     subscription_start=Subscription.compute_start(
                         self.now - timedelta(days=self.NB_USERS - i)
                     ),
-                    subscription_end=Subscription.compute_end(duration=2),
+                    subscription_end=end,
                 )
             )
         Subscription.objects.bulk_create(subs)
@@ -178,20 +175,22 @@ class Command(BaseCommand):
         Then it will take 14 other citizen among the previous 200
         (godfathers are usually older), and apply another
         heuristic to determine whether they should have a family link
+        It will result in approximately 40% of users having at least one godchild
+        and 70% having at least one godfather.
         """
         if self.users is None:
             raise RuntimeError(
                 "The `make_users()` method must be called before `make_families()`"
             )
+        godfathers = []
         for i in range(200, self.NB_USERS):
-            godfathers = []
             for j in range(i - 200, i, 14):  # this will loop 14 times (14² = 196)
-                if (i / 10) % 10 == (i + j) % 10:
+                if (i // 10) % 10 == (i + j) % 10:
                     u1 = self.users[i]
                     u2 = self.users[j]
+                    godfathers.append(User.godfathers.through(from_user=u1, to_user=u2))
                     self.logger.info(f"Making {u2} the godfather of {u1}")
-                    godfathers.append(u2)
-                u1.godfathers.set(godfathers)
+        User.godfathers.through.objects.bulk_create(godfathers)
 
     def make_club_memberships(self):
         """
@@ -298,7 +297,7 @@ class Command(BaseCommand):
             self.picts[i].compressed.name = self.picts[i].name
             self.picts[i].thumbnail.name = self.picts[i].name
         Picture.objects.bulk_create(self.picts)
-        self.picts = Picture.objects.filter(name__startswith="galaxy-").all()
+        self.picts = list(Picture.objects.filter(name__startswith="galaxy-").all())
 
     def make_pictures_memberships(self):
         """
@@ -380,32 +379,24 @@ class Command(BaseCommand):
         u1 = self.users[uid]
         u2 = self.users[uid - 100]
         u3 = self.users[uid + 100]
-        u1.godfathers.add(u2)
-        u1.godchildren.add(u3)
+        User.godfathers.through.objects.bulk_create(
+            [
+                User.godfathers.through(from_user=u1, to_user=u2),
+                User.godfathers.through(from_user=u3, to_user=u2),
+            ],
+            ignore_conflicts=True,  # in case a relationship has already been created
+        )
         self.logger.info(f"{u1} will be important and close to {u2} and {u3}")
         pictures_tags = []
-        for p in range(  # Mix them with other citizen for more chaos
-            uid - 400, uid - 200
-        ):
-            # users may already be on the pictures
-            if not self.picts[p].people.filter(user=u1).exists():
-                pictures_tags.append(
-                    PeoplePictureRelation(user=u1, picture=self.picts[p])
-                )
-            if not self.picts[p].people.filter(user=u2).exists():
-                pictures_tags.append(
-                    PeoplePictureRelation(user=u2, picture=self.picts[p])
-                )
-            if not self.picts[p + self.NB_USERS].people.filter(user=u1).exists():
-                pictures_tags.append(
-                    PeoplePictureRelation(
-                        user=u1, picture=self.picts[p + self.NB_USERS]
-                    )
-                )
-            if not self.picts[p + self.NB_USERS].people.filter(user=u2).exists():
-                pictures_tags.append(
-                    PeoplePictureRelation(
-                        user=u2, picture=self.picts[p + self.NB_USERS]
-                    )
-                )
-        PeoplePictureRelation.objects.bulk_create(pictures_tags)
+        for p in range(uid - 400, uid - 200):
+            # Mix them with other citizen for more chaos
+            pictures_tags += [
+                PeoplePictureRelation(user=u1, picture=self.picts[p]),
+                PeoplePictureRelation(user=u2, picture=self.picts[p]),
+                PeoplePictureRelation(user=u1, picture=self.picts[p + self.NB_USERS]),
+                PeoplePictureRelation(user=u2, picture=self.picts[p + self.NB_USERS]),
+            ]
+        # users may already be on the pictures.
+        # In this case the conflict will just be ignored
+        # and nothing will happen for this entry
+        PeoplePictureRelation.objects.bulk_create(pictures_tags, ignore_conflicts=True)

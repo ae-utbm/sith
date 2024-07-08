@@ -26,8 +26,9 @@ from typing import Optional
 import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
-from PIL import ExifTags
 from django.utils import timezone
+from PIL import ExifTags
+from PIL.Image import Resampling
 
 
 def get_git_revision_short_hash() -> str:
@@ -109,7 +110,8 @@ def resize_image(im, edge, format):
     (w, h) = im.size
     (width, height) = scale_dimension(w, h, long_edge=edge)
     content = BytesIO()
-    im = im.resize((width, height), PIL.Image.ANTIALIAS)
+    # use the lanczos filter for antialiasing
+    im = im.resize((width, height), Resampling.LANCZOS)
     try:
         im.save(
             fp=content,

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
 import django.contrib.auth.models
-import django.db.models.deletion
 import django.core.validators
-import core.models
+import django.db.models.deletion
 import phonenumber_field.modelfields
 from django.conf import settings
-import django.db.models.deletion
+from django.db import migrations, models
+
+import core.models
 
 
 class Migration(migrations.Migration):

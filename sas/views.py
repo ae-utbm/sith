@@ -14,34 +14,31 @@
 #
 #
 
-from django.shortcuts import redirect
-from django.http import HttpResponse, Http404
-from django.urls import reverse_lazy, reverse
-from core.views.forms import SelectDate
-from django.views.generic import DetailView, TemplateView
-from django.views.generic.edit import UpdateView, FormMixin, FormView
-from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-from django import forms
-from django.core.exceptions import PermissionDenied
-from django.core.paginator import Paginator, InvalidPage
-
 from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectMultipleField
+from django import forms
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import InvalidPage, Paginator
+from django.http import Http404, HttpResponse
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, TemplateView
+from django.views.generic.edit import FormMixin, FormView, UpdateView
 
-from core.views import CanViewMixin, CanEditMixin
-from core.views.files import send_file, FileView
-from core.models import SithFile, User, Notification, RealGroup
-
-from sas.models import Picture, Album, PeoplePictureRelation
+from core.models import Notification, SithFile, User
+from core.views import CanEditMixin, CanViewMixin
+from core.views.files import FileView, MultipleImageField, send_file
+from core.views.forms import SelectDate
+from sas.models import Album, PeoplePictureRelation, Picture
 
 
 class SASForm(forms.Form):
     album_name = forms.CharField(
         label=_("Add a new album"), max_length=30, required=False
     )
-    images = forms.ImageField(
-        widget=forms.ClearableFileInput(attrs={"multiple": True}),
+    images = MultipleImageField(
         label=_("Upload images"),
         required=False,
     )

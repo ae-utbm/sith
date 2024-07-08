@@ -1,6 +1,6 @@
-from django.template.exceptions import TemplateSyntaxError
 from django import template
 from django.template.defaultfilters import stringfilter
+from django.template.exceptions import TemplateSyntaxError
 
 register = template.Library()
 

@@ -14,15 +14,14 @@
 #
 #
 
+from ajax_select import LookupChannel, register
 from django.core.exceptions import PermissionDenied
-from ajax_select import register, LookupChannel
 
-from core.views.site import search_user
-from core.models import User, Group, SithFile
-from club.models import Club
-from counter.models import Product, Counter, Customer
 from accounting.models import ClubAccount, Company
-from eboutic.models import BasketItem
+from club.models import Club
+from core.models import Group, SithFile, User
+from core.views.site import search_user
+from counter.models import Counter, Customer, Product
 
 
 def check_token(request):

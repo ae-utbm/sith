@@ -1,6 +1,3 @@
-from core.models import Page
-
-
 class FourDigitYearConverter:
     regex = "[0-9]{4}"
 

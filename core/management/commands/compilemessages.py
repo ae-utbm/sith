@@ -25,6 +25,7 @@
 
 
 import os
+
 from django.core.management.commands import compilemessages
 
 

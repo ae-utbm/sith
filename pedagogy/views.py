@@ -22,38 +22,35 @@
 #
 #
 
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.urls import reverse, reverse_lazy
+from django.utils import html
 from django.views.generic import (
     CreateView,
     DeleteView,
-    UpdateView,
-    ListView,
     FormView,
+    ListView,
+    UpdateView,
     View,
 )
-from django.utils import html
-from django.http import HttpResponse
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.urls import reverse_lazy, reverse
-from django.shortcuts import get_object_or_404
-from django.conf import settings
-
 from haystack.query import SearchQuerySet
 from rest_framework.renderers import JSONRenderer
 
+from core.models import Notification, RealGroup
 from core.views import (
-    DetailFormView,
     CanCreateMixin,
-    CanEditMixin,
-    CanViewMixin,
     CanEditPropMixin,
+    CanViewMixin,
+    DetailFormView,
 )
-from core.models import RealGroup, Notification
-
 from pedagogy.forms import (
-    UVForm,
     UVCommentForm,
-    UVCommentReportForm,
     UVCommentModerationForm,
+    UVCommentReportForm,
+    UVForm,
 )
 from pedagogy.models import UV, UVComment, UVCommentReport, UVSerializer
 

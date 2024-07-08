@@ -6,13 +6,13 @@ runs:
     - name: Install apt packages
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: gettext libxapian-dev libgraphviz-dev
+        packages: gettext libgraphviz-dev
         version: 1.0  # increment to reset cache
 
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install gettext libxapian-dev libgraphviz-dev
+        sudo apt install gettext libgraphviz-dev
       shell: bash
 
     - name: Set up python
@@ -45,7 +45,11 @@ runs:
           ${{ runner.os }}-poetry-
 
     - name: Install dependencies
-      run: poetry install -E testing -E docs
+      run: poetry install --with docs,tests
+      shell: bash
+
+    - name: Install xapian
+      run: poetry run ./manage.py install_xapian
       shell: bash
 
     - name: Compile gettext messages

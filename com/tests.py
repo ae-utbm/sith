@@ -13,51 +13,53 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+import pytest
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-from django.conf import settings
 from django.urls import reverse
-from django.core.management import call_command
 from django.utils import html
 from django.utils.timezone import localtime, now
 from django.utils.translation import gettext as _
 
 from club.models import Club, Membership
-from com.models import Sith, News, Weekmail, WeekmailArticle, Poster
-from core.models import User, RealGroup, AnonymousUser
+from com.models import News, Poster, Sith, Weekmail, WeekmailArticle
+from core.models import AnonymousUser, RealGroup, User
 
 
-class ComAlertTest(TestCase):
-    def test_page_is_working(self):
-        self.client.login(username="comunity", password="plop")
-        response = self.client.get(reverse("com:alert_edit"))
-        self.assertNotEqual(response.status_code, 500)
-        self.assertEqual(response.status_code, 200)
+@pytest.fixture()
+def user_community():
+    return User.objects.get(username="comunity")
 
 
-class ComInfoTest(TestCase):
-    def test_page_is_working(self):
-        self.client.login(username="comunity", password="plop")
-        response = self.client.get(reverse("com:info_edit"))
-        self.assertNotEqual(response.status_code, 500)
-        self.assertEqual(response.status_code, 200)
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url",
+    [
+        reverse("com:alert_edit"),
+        reverse("com:info_edit"),
+    ],
+)
+def test_com_page_is_working(client, url, user_community):
+    client.force_login(user_community)
+    response = client.get(url)
+    assert response.status_code == 200
 
 
 class ComTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.skia = User.objects.filter(username="skia").first()
+        cls.skia = User.objects.get(username="skia")
         cls.com_group = RealGroup.objects.filter(
             id=settings.SITH_GROUP_COM_ADMIN_ID
         ).first()
         cls.skia.groups.set([cls.com_group])
-        cls.skia.save()
 
     def setUp(self):
-        self.client.login(username=self.skia.username, password="plop")
+        self.client.force_login(self.skia)
 
     def test_alert_msg(self):
-        response = self.client.post(
+        self.client.post(
             reverse("com:alert_edit"),
             {
                 "alert_msg": """
@@ -68,7 +70,6 @@ class ComTest(TestCase):
             },
         )
         r = self.client.get(reverse("core:index"))
-        self.assertTrue(r.status_code == 200)
         self.assertContains(
             r,
             """<div id="alert_box">
@@ -77,7 +78,7 @@ class ComTest(TestCase):
         )
 
     def test_info_msg(self):
-        response = self.client.post(
+        self.client.post(
             reverse("com:info_edit"),
             {
                 "info_msg": """
@@ -86,7 +87,6 @@ class ComTest(TestCase):
             },
         )
         r = self.client.get(reverse("core:index"))
-        self.assertTrue(r.status_code == 200)
         self.assertContains(
             r,
             """<div id="info_box">
@@ -94,7 +94,7 @@ class ComTest(TestCase):
         )
 
     def test_birthday_non_subscribed_user(self):
-        self.client.login(username="guy", password="plop")
+        self.client.force_login(User.objects.get(username="guy"))
         response = self.client.get(reverse("core:index"))
         self.assertContains(
             response,
@@ -123,13 +123,13 @@ class SithTest(TestCase):
         sith: Sith = Sith.objects.first()
 
         com_admin = User.objects.get(username="comunity")
-        self.assertTrue(sith.is_owned_by(com_admin))
+        assert sith.is_owned_by(com_admin)
 
         anonymous = AnonymousUser()
-        self.assertFalse(sith.is_owned_by(anonymous))
+        assert not sith.is_owned_by(anonymous)
 
         sli = User.objects.get(username="sli")
-        self.assertFalse(sith.is_owned_by(sli))
+        assert not sith.is_owned_by(sli)
 
 
 class NewsTest(TestCase):
@@ -154,10 +154,10 @@ class NewsTest(TestCase):
         or by their author but nobody else
         """
 
-        self.assertTrue(self.new.is_owned_by(self.com_admin))
-        self.assertTrue(self.new.is_owned_by(self.author))
-        self.assertFalse(self.new.is_owned_by(self.anonymous))
-        self.assertFalse(self.new.is_owned_by(self.sli))
+        assert self.new.is_owned_by(self.com_admin)
+        assert self.new.is_owned_by(self.author)
+        assert not self.new.is_owned_by(self.anonymous)
+        assert not self.new.is_owned_by(self.sli)
 
     def test_news_viewer(self):
         """
@@ -165,26 +165,26 @@ class NewsTest(TestCase):
         and not moderated news only by com admins
         """
         # by default a news isn't moderated
-        self.assertTrue(self.new.can_be_viewed_by(self.com_admin))
-        self.assertFalse(self.new.can_be_viewed_by(self.sli))
-        self.assertFalse(self.new.can_be_viewed_by(self.anonymous))
-        self.assertFalse(self.new.can_be_viewed_by(self.author))
+        assert self.new.can_be_viewed_by(self.com_admin)
+        assert not self.new.can_be_viewed_by(self.sli)
+        assert not self.new.can_be_viewed_by(self.anonymous)
+        assert not self.new.can_be_viewed_by(self.author)
 
         self.new.is_moderated = True
         self.new.save()
-        self.assertTrue(self.new.can_be_viewed_by(self.com_admin))
-        self.assertTrue(self.new.can_be_viewed_by(self.sli))
-        self.assertTrue(self.new.can_be_viewed_by(self.anonymous))
-        self.assertTrue(self.new.can_be_viewed_by(self.author))
+        assert self.new.can_be_viewed_by(self.com_admin)
+        assert self.new.can_be_viewed_by(self.sli)
+        assert self.new.can_be_viewed_by(self.anonymous)
+        assert self.new.can_be_viewed_by(self.author)
 
     def test_news_editor(self):
         """
         Test that only com admins can edit news
         """
-        self.assertTrue(self.new.can_be_edited_by(self.com_admin))
-        self.assertFalse(self.new.can_be_edited_by(self.sli))
-        self.assertFalse(self.new.can_be_edited_by(self.anonymous))
-        self.assertFalse(self.new.can_be_edited_by(self.author))
+        assert self.new.can_be_edited_by(self.com_admin)
+        assert not self.new.can_be_edited_by(self.sli)
+        assert not self.new.can_be_edited_by(self.anonymous)
+        assert not self.new.can_be_edited_by(self.author)
 
 
 class WeekmailArticleTest(TestCase):
@@ -207,10 +207,10 @@ class WeekmailArticleTest(TestCase):
         """
         Test that weekmails are owned only by com admins
         """
-        self.assertTrue(self.article.is_owned_by(self.com_admin))
-        self.assertFalse(self.article.is_owned_by(self.author))
-        self.assertFalse(self.article.is_owned_by(self.anonymous))
-        self.assertFalse(self.article.is_owned_by(self.sli))
+        assert self.article.is_owned_by(self.com_admin)
+        assert not self.article.is_owned_by(self.author)
+        assert not self.article.is_owned_by(self.anonymous)
+        assert not self.article.is_owned_by(self.sli)
 
 
 class PosterTest(TestCase):
@@ -233,8 +233,8 @@ class PosterTest(TestCase):
         """
         Test that poster are owned by com admins and board members in clubs
         """
-        self.assertTrue(self.poster.is_owned_by(self.com_admin))
-        self.assertFalse(self.poster.is_owned_by(self.anonymous))
+        assert self.poster.is_owned_by(self.com_admin)
+        assert not self.poster.is_owned_by(self.anonymous)
 
-        self.assertFalse(self.poster.is_owned_by(self.susbcriber))
-        self.assertTrue(self.poster.is_owned_by(self.sli))
+        assert not self.poster.is_owned_by(self.susbcriber)
+        assert self.poster.is_owned_by(self.sli)

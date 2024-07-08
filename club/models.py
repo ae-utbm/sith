@@ -24,21 +24,19 @@
 #
 from typing import Optional
 
-from django.core.cache import cache
-from django.db import models
-from django.core import validators
 from django.conf import settings
+from django.core import validators
+from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.validators import RegexValidator, validate_email
+from django.db import models, transaction
 from django.db.models import Q
-from django.utils.timezone import now
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
-from django.core.validators import RegexValidator, validate_email
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 
-from core.models import User, MetaGroup, Group, SithFile, RealGroup, Notification, Page
+from core.models import Group, MetaGroup, Notification, Page, RealGroup, SithFile, User
 
 # Create your models here.
 
@@ -209,11 +207,11 @@ class Club(models.Model):
         cache.set(f"sith_club_{self.unix_name}", self)
 
     def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
         # Invalidate the cache of this club and of its memberships
         for membership in self.members.ongoing().select_related("user"):
             cache.delete(f"membership_{self.id}_{membership.user.id}")
         cache.delete(f"sith_club_{self.unix_name}")
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return self.name

@@ -34,8 +34,8 @@ class SithConfig(AppConfig):
     verbose_name = "Core app of the Sith"
 
     def ready(self):
+        import core.signals  # noqa F401
         from forum.models import Forum
-        import core.signals
 
         cache.clear()
 

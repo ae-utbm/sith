@@ -6,6 +6,7 @@ authors = [
 	"Skia <skia@hya.sk>",
 	"klmp200 <antoine@bartuccio.fr>",
 	"Krophil <pierre.brunet@krophil.fr>",
+	"Maréchal <thgirod@hotmail.com>",
 	"Och <francescowitz68@gmail.com>",
 	"tleb <tleb@openmailbox.org>",
 	"Soldat <ryan-68@live.fr>",
@@ -19,50 +20,62 @@ homepage = "https://ae.utbm.fr/"
 license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-Django = "^3.2"
-Pillow = "^9.2"
+python = "^3.10,<3.12" # Version is held back by mistune
+Django = "^4.2.13"
+Pillow = "^10.4.0"
 mistune = "^0.8.4"
-django-jinja = "^2.10"
-cryptography = "^40.0"
-pyOpenSSL = "^23.1.1"
+django-jinja = "^2.11"
+cryptography = "^42.0.8"
 pytz = "^2021.1"
 djangorestframework = "^3.13"
 django-phonenumber-field = "^6.3"
 phonenumbers = "^8.12"
 django-ajax-selects = "^2.1.0"
-reportlab = "^3.6"
+reportlab = "^4.2"
 django-haystack = "^3.2.1"
 xapian-haystack = "^3.0.1"
-xapian-bindings = "^0.1.0"
 libsass = "^0.22"
 django-ordered-model = "^3.7"
 django-simple-captcha = "^0.5.17"
 python-dateutil = "^2.8.2"
-psycopg2-binary = "2.9.3"
+psycopg2-binary = "^2.9"
 sentry-sdk = "^1.21.0"
-pygraphviz = "^1.9"
+pygraphviz = "^1.1"
 Jinja2 = "^3.1"
 django-countries = "^7.5.1"
 dict2xml = "^1.7.3"
+Sphinx = "^5" # Needed for building xapian
+tomli = "^2.0.1"
 
-# Extra optional dependencies
-coverage = {version = "^5.5", optional = true}
-
-# Docs extra dependencies
-Sphinx = {version = "^4.2.0", optional = true}
-sphinx-rtd-theme = {version = "^1.0.0", optional = true}
-sphinx-copybutton = {version = "^0.4.0", optional = true}
-
-[tool.poetry.extras]
-testing = ["coverage"]
-docs = ["Sphinx", "sphinx-rtd-theme", "sphinx-copybutton"]
-
-[tool.poetry.dev-dependencies]
-freezegun = "^1.2.2"  # used to test time-dependent code
+[tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.0.0"
-ipython = "^7.28.0"
-black = "^23.3.0"
+ipython = "^8.26.0"
+pre-commit = "^3.7.1"
+ruff = "^0.4.10" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
+
+[tool.poetry.group.tests.dependencies]
+freezegun = "^1.2.2"  # used to test time-dependent code
+pytest = "^8.2.2"
+pytest-cov = "^5.0.0"
+pytest-django = "^4.8.0"
+
+[tool.poetry.group.docs.dependencies]
+sphinx-rtd-theme = "^1.0.0"
+sphinx-copybutton = "^0.4.0"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.xapian]
+version = "1.4.25"
+
+[tool.ruff.lint]
+select = ["I", "F401"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "sith.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+markers = ["slow"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -57,6 +57,7 @@ SECRET_KEY = "(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+TESTING = "pytest" in sys.modules
 INTERNAL_IPS = ["127.0.0.1"]
 
 ALLOWED_HOSTS = ["*"]
@@ -112,8 +113,6 @@ MIDDLEWARE = (
     "core.middleware.AuthenticationMiddleware",
     "core.middleware.SignalRequestMiddleware",
 )
-
-TEST_RUNNER = "sith.testrunner.SithTestRunner"
 
 ROOT_URLCONF = "sith.urls"
 
@@ -188,6 +187,7 @@ TEMPLATES = [
         },
     },
 ]
+FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
 
 HAYSTACK_CONNECTIONS = {
     "default": {
@@ -248,8 +248,6 @@ LANGUAGES = [("en", _("English")), ("fr", _("French"))]
 TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
@@ -567,7 +565,7 @@ SITH_SUBSCRIPTIONS = {
         "name": _("One year for free(CA offer)"),
         "price": 0,
         "duration": 2,
-    }
+    },
     # To be completed....
 }
 
@@ -691,14 +689,24 @@ if DEBUG:
         "sith.toolbar_debug.TemplatesPanel",
         "debug_toolbar.panels.cache.CachePanel",
         "debug_toolbar.panels.signals.SignalsPanel",
-        "debug_toolbar.panels.logging.LoggingPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
     SASS_INCLUDE_FOLDERS = ["core/static/"]
     SENTRY_ENV = "development"
 
-if "test" in sys.argv:
+if TESTING:
     CAPTCHA_TEST_MODE = True
+    PASSWORD_HASHERS = [  # not secure, but faster password hasher
+        "django.contrib.auth.hashers.MD5PasswordHasher",
+    ]
+    STORAGES = {  # store files in memory rather than using the hard drive
+        "default": {
+            "BACKEND": "django.core.files.storage.InMemoryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 if SENTRY_DSN:
     # Connection to sentry

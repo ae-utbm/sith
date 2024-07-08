@@ -23,18 +23,15 @@
 #
 #
 
-from django.conf import settings
+from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
-
-from club.models import Mailing, MailingSubscription, Club, Membership
-
+from club.models import Club, Mailing, MailingSubscription, Membership
 from core.models import User
-from core.views.forms import SelectDate, SelectDateTime
+from core.views.forms import SelectDate, TzAwareDateTimeField
 from counter.models import Counter
-from core.views.forms import TzAwareDateTimeField
 
 
 class ClubEditForm(forms.ModelForm):

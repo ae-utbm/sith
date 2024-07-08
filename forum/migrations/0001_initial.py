@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
-from django.utils.timezone import utc
-from django.conf import settings
-import django.utils.timezone
 import datetime
+from datetime import timezone
+
 import django.db.models.deletion
+import django.utils.timezone
+from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -225,7 +226,9 @@ class Migration(migrations.Migration):
                     "last_read_date",
                     models.DateTimeField(
                         verbose_name="last read date",
-                        default=datetime.datetime(1999, 1, 1, 0, 0, tzinfo=utc),
+                        default=datetime.datetime(
+                            1999, 1, 1, 0, 0, tzinfo=timezone.utc
+                        ),
                     ),
                 ),
                 (

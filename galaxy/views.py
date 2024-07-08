@@ -22,18 +22,18 @@
 #
 #
 
-from django.views.generic import DetailView, View
-from django.http import JsonResponse, Http404
-from django.db.models import Q, Case, F, When, Value
+from django.db.models import Case, F, Q, Value, When
 from django.db.models.functions import Concat
+from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, View
 
+from core.models import User
 from core.views import (
     CanViewMixin,
     FormerSubscriberMixin,
+    UserTabsMixin,
 )
-from core.models import User
-from core.views import UserTabsMixin
 from galaxy.models import Galaxy, GalaxyLane
 
 

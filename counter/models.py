@@ -15,34 +15,33 @@
 #
 from __future__ import annotations
 
-from typing import Tuple, Optional
-
-from django.db import models
-from django.db.models import F, Value, Sum, QuerySet, OuterRef, Exists
-from django.db.models.functions import Concat, Length
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
-from django.conf import settings
-from django.urls import reverse
-from django.core.validators import MinLengthValidator
-from django.forms import ValidationError
-from django.utils.functional import cached_property
-
-from datetime import timedelta, date, datetime
+import base64
+import os
 import random
 import string
-import os
-import base64
-from dict2xml import dict2xml
+from datetime import date, datetime, timedelta
+from datetime import timezone as tz
+from typing import Tuple
 
+from dict2xml import dict2xml
+from django.conf import settings
+from django.core.validators import MinLengthValidator
+from django.db import models
+from django.db.models import Exists, F, OuterRef, QuerySet, Sum, Value
+from django.db.models.functions import Concat, Length
+from django.forms import ValidationError
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+from django_countries.fields import CountryField
+
+from accounting.models import CurrencyField
+from club.models import Club
+from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
 from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
-from club.models import Club, Membership
-from accounting.models import CurrencyField
-from core.models import Group, User, Notification
 from subscription.models import Subscription
-
-from django_countries.fields import CountryField
 
 
 class Customer(models.Model):
@@ -536,7 +535,7 @@ class Counter(models.Model):
             .order_by("-perm_sum")
         )
 
-    def get_top_customers(self, since: Optional[date] = None) -> QuerySet:
+    def get_top_customers(self, since: datetime | date | None = None) -> QuerySet:
         """
         Return a QuerySet querying the money spent by customers of this counter
         since the specified date, ordered by descending amount of money spent.
@@ -545,9 +544,13 @@ class Counter(models.Model):
             - the full name (first name + last name) of the customer
             - the nickname of the customer
             - the amount of money spent by the customer
+
+        :param since: timestamp from which to perform the calculation
         """
         if since is None:
             since = get_start_of_semester()
+        if isinstance(since, date):
+            since = datetime(since.year, since.month, since.day, tzinfo=tz.utc)
         return (
             self.sellings.filter(date__gte=since)
             .annotate(
@@ -570,19 +573,18 @@ class Counter(models.Model):
             .order_by("-selling_sum")
         )
 
-    def get_total_sales(self, since=None) -> CurrencyField:
+    def get_total_sales(self, since: datetime | date | None = None) -> CurrencyField:
         """
         Compute and return the total turnover of this counter
         since the date specified in parameter (by default, since the start of the current
         semester)
         :param since: timestamp from which to perform the calculation
-        :type since: datetime | date | None
         :return: Total revenue earned at this counter
         """
         if since is None:
             since = get_start_of_semester()
         if isinstance(since, date):
-            since = datetime.combine(since, datetime.min.time())
+            since = datetime(since.year, since.month, since.day, tzinfo=tz.utc)
         total = self.sellings.filter(date__gte=since).aggregate(
             total=Sum(F("quantity") * F("unit_price"), output_field=CurrencyField())
         )["total"]
@@ -929,25 +931,25 @@ class CashRegisterSummary(models.Model):
         if name[:5] == "check":
             checks = self.items.filter(check=True).order_by("value").all()
         if name == "ten_cents":
-            return self.items.filter(value=0.1, check=False).first()
+            return self.items.filter(value=0.1, is_check=False).first()
         elif name == "twenty_cents":
-            return self.items.filter(value=0.2, check=False).first()
+            return self.items.filter(value=0.2, is_check=False).first()
         elif name == "fifty_cents":
-            return self.items.filter(value=0.5, check=False).first()
+            return self.items.filter(value=0.5, is_check=False).first()
         elif name == "one_euro":
-            return self.items.filter(value=1, check=False).first()
+            return self.items.filter(value=1, is_check=False).first()
         elif name == "two_euros":
-            return self.items.filter(value=2, check=False).first()
+            return self.items.filter(value=2, is_check=False).first()
         elif name == "five_euros":
-            return self.items.filter(value=5, check=False).first()
+            return self.items.filter(value=5, is_check=False).first()
         elif name == "ten_euros":
-            return self.items.filter(value=10, check=False).first()
+            return self.items.filter(value=10, is_check=False).first()
         elif name == "twenty_euros":
-            return self.items.filter(value=20, check=False).first()
+            return self.items.filter(value=20, is_check=False).first()
         elif name == "fifty_euros":
-            return self.items.filter(value=50, check=False).first()
+            return self.items.filter(value=50, is_check=False).first()
         elif name == "hundred_euros":
-            return self.items.filter(value=100, check=False).first()
+            return self.items.filter(value=100, is_check=False).first()
         elif name == "check_1":
             return checks[0] if 0 < len(checks) else None
         elif name == "check_2":
@@ -995,7 +997,11 @@ class CashRegisterSummaryItem(models.Model):
     )
     value = CurrencyField(_("value"))
     quantity = models.IntegerField(_("quantity"), default=0)
-    check = models.BooleanField(_("check"), default=False)
+    is_check = models.BooleanField(
+        _("check"),
+        default=False,
+        help_text=_("True if this is a bank check, else False"),
+    )
 
     class Meta:
         verbose_name = _("cash register summary item")

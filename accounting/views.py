@@ -14,41 +14,41 @@
 #
 #
 
-from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView, CreateView, DeleteView, FormView
-from django.urls import reverse_lazy, reverse
-from django.utils.translation import gettext_lazy as _
-from django.forms.models import modelform_factory
-from django.core.exceptions import PermissionDenied, ValidationError
-from django.forms import HiddenInput
-from django.db import transaction
-from django.db.models import Sum
-from django.conf import settings
-from django import forms
-from django.http import HttpResponse
 import collections
 
 from ajax_select.fields import AutoCompleteSelectField
+from django import forms
+from django.conf import settings
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import transaction
+from django.db.models import Sum
+from django.forms import HiddenInput
+from django.forms.models import modelform_factory
+from django.http import HttpResponse
+from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from core.views import (
-    CanViewMixin,
-    CanEditMixin,
-    CanEditPropMixin,
-    CanCreateMixin,
-    TabedViewMixin,
-)
-from core.views.forms import SelectFile, SelectDate
 from accounting.models import (
+    AccountingType,
     BankAccount,
     ClubAccount,
-    GeneralJournal,
-    Operation,
-    AccountingType,
     Company,
-    SimplifiedAccountingType,
+    GeneralJournal,
     Label,
+    Operation,
+    SimplifiedAccountingType,
 )
-from counter.models import Counter, Selling, Product
+from core.views import (
+    CanCreateMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    CanViewMixin,
+    TabedViewMixin,
+)
+from core.views.forms import SelectDate, SelectFile
+from counter.models import Counter, Product, Selling
 
 # Main accounting view
 
@@ -521,14 +521,14 @@ class OperationPDFView(CanViewMixin, DetailView):
     pk_url_kwarg = "op_id"
 
     def get(self, request, *args, **kwargs):
-        from reportlab.pdfgen import canvas
-        from reportlab.lib.units import cm
-        from reportlab.platypus import Table, TableStyle
         from reportlab.lib import colors
         from reportlab.lib.pagesizes import letter
+        from reportlab.lib.units import cm
         from reportlab.lib.utils import ImageReader
-        from reportlab.pdfbase.ttfonts import TTFont
         from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.pdfgen import canvas
+        from reportlab.platypus import Table, TableStyle
 
         pdfmetrics.registerFont(TTFont("DejaVu", "DejaVuSerif.ttf"))
 
@@ -599,7 +599,7 @@ class OperationPDFView(CanViewMixin, DetailView):
         payment_mode = ""
         for m in settings.SITH_ACCOUNTING_PAYMENT_METHOD:
             if m[0] == mode:
-                payment_mode += "[\u00D7]"
+                payment_mode += "[\u00d7]"
             else:
                 payment_mode += "[  ]"
             payment_mode += " %s\n" % (m[1])

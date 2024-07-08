@@ -26,50 +26,42 @@
 import csv
 
 from django.conf import settings
-from django import forms
-from django.views.generic import ListView, DetailView, TemplateView, View
-from django.views.generic.edit import DeleteView
-from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import UpdateView, CreateView
+from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
+from django.core.paginator import InvalidPage, Paginator
+from django.db.models import Sum
 from django.http import (
-    HttpResponseRedirect,
-    HttpResponse,
     Http404,
+    HttpResponseRedirect,
     StreamingHttpResponse,
 )
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django.utils.translation import gettext as _t
-from django.core.exceptions import PermissionDenied, ValidationError, NON_FIELD_ERRORS
-from django.core.paginator import Paginator, InvalidPage
-from django.shortcuts import get_object_or_404, redirect
-from django.db.models import Sum
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, ListView, TemplateView, View
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-
-from core.views import (
-    CanCreateMixin,
-    CanViewMixin,
-    CanEditMixin,
-    CanEditPropMixin,
-    UserIsRootMixin,
-    TabedViewMixin,
-    PageEditViewBase,
-    DetailFormView,
+from club.forms import ClubEditForm, ClubMemberForm, MailingForm, SellingsForm
+from club.models import Club, Mailing, MailingSubscription, Membership
+from com.views import (
+    PosterCreateBaseView,
+    PosterDeleteBaseView,
+    PosterEditBaseView,
+    PosterListBaseView,
 )
 from core.models import PageRev
-
-from counter.models import Selling
-
-from com.views import (
-    PosterListBaseView,
-    PosterCreateBaseView,
-    PosterEditBaseView,
-    PosterDeleteBaseView,
+from core.views import (
+    CanCreateMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    CanViewMixin,
+    DetailFormView,
+    PageEditViewBase,
+    TabedViewMixin,
+    UserIsRootMixin,
 )
-
-from club.models import Club, Membership, Mailing, MailingSubscription
-from club.forms import MailingForm, ClubEditForm, ClubMemberForm, SellingsForm
+from counter.models import Selling
 
 
 class ClubTabsMixin(TabedViewMixin):
@@ -611,7 +603,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         }
         return kwargs
 
-    def add_new_mailing(self, cleaned_data) -> ValidationError:
+    def add_new_mailing(self, cleaned_data) -> ValidationError | None:
         """
         Create a new mailing list from the form
         """
@@ -628,7 +620,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         mailing.save()
         return None
 
-    def add_new_subscription(self, cleaned_data) -> ValidationError:
+    def add_new_subscription(self, cleaned_data) -> ValidationError | None:
         """
         Add mailing subscriptions for each user given and/or for the specified email in form
         """

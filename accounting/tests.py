@@ -14,87 +14,82 @@
 #
 #
 
-from django.test import TestCase
-from django.urls import reverse
-from django.core.management import call_command
 from datetime import date, timedelta
 
-from core.models import User
+from django.test import TestCase
+from django.urls import reverse
+
 from accounting.models import (
-    GeneralJournal,
-    Operation,
-    Label,
     AccountingType,
+    GeneralJournal,
+    Label,
+    Operation,
     SimplifiedAccountingType,
 )
+from core.models import User
 
 
 class RefoundAccountTest(TestCase):
-    def setUp(self):
-        self.skia = User.objects.filter(username="skia").first()
+    @classmethod
+    def setUpTestData(cls):
+        cls.skia = User.objects.get(username="skia")
         # reffil skia's account
-        self.skia.customer.amount = 800
-        self.skia.customer.save()
+        cls.skia.customer.amount = 800
+        cls.skia.customer.save()
+        cls.refound_account_url = reverse("accounting:refound_account")
 
     def test_permission_denied(self):
-        self.client.login(username="guy", password="plop")
+        self.client.force_login(User.objects.get(username="guy"))
         response_post = self.client.post(
-            reverse("accounting:refound_account"), {"user": self.skia.id}
+            self.refound_account_url, {"user": self.skia.id}
         )
-        response_get = self.client.get(reverse("accounting:refound_account"))
-        self.assertTrue(response_get.status_code == 403)
-        self.assertTrue(response_post.status_code == 403)
+        response_get = self.client.get(self.refound_account_url)
+        assert response_get.status_code == 403
+        assert response_post.status_code == 403
 
     def test_root_granteed(self):
-        self.client.login(username="root", password="plop")
-        response_post = self.client.post(
-            reverse("accounting:refound_account"), {"user": self.skia.id}
-        )
-        self.skia = User.objects.filter(username="skia").first()
-        response_get = self.client.get(reverse("accounting:refound_account"))
-        self.assertFalse(response_get.status_code == 403)
-        self.assertTrue('<form action="" method="post">' in str(response_get.content))
-        self.assertFalse(response_post.status_code == 403)
-        self.assertTrue(self.skia.customer.amount == 0)
+        self.client.force_login(User.objects.get(username="root"))
+        response = self.client.post(self.refound_account_url, {"user": self.skia.id})
+        self.assertRedirects(response, self.refound_account_url)
+        self.skia.refresh_from_db()
+        response = self.client.get(self.refound_account_url)
+        assert response.status_code == 200
+        assert '<form action="" method="post">' in str(response.content)
+        assert self.skia.customer.amount == 0
 
     def test_comptable_granteed(self):
-        self.client.login(username="comptable", password="plop")
-        response_post = self.client.post(
-            reverse("accounting:refound_account"), {"user": self.skia.id}
-        )
-        self.skia = User.objects.filter(username="skia").first()
-        response_get = self.client.get(reverse("accounting:refound_account"))
-        self.assertFalse(response_get.status_code == 403)
-        self.assertTrue('<form action="" method="post">' in str(response_get.content))
-        self.assertFalse(response_post.status_code == 403)
-        self.assertTrue(self.skia.customer.amount == 0)
+        self.client.force_login(User.objects.get(username="comptable"))
+        response = self.client.post(self.refound_account_url, {"user": self.skia.id})
+        self.assertRedirects(response, self.refound_account_url)
+        self.skia.refresh_from_db()
+        response = self.client.get(self.refound_account_url)
+        assert response.status_code == 200
+        assert '<form action="" method="post">' in str(response.content)
+        assert self.skia.customer.amount == 0
 
 
 class JournalTest(TestCase):
-    def setUp(self):
-        self.journal = GeneralJournal.objects.filter(id=1).first()
+    @classmethod
+    def setUpTestData(cls):
+        cls.journal = GeneralJournal.objects.get(id=1)
 
     def test_permission_granted(self):
-        self.client.login(username="comptable", password="plop")
+        self.client.force_login(User.objects.get(username="comptable"))
         response_get = self.client.get(
             reverse("accounting:journal_details", args=[self.journal.id])
         )
 
-        self.assertTrue(response_get.status_code == 200)
-        self.assertTrue(
-            "<td>M\\xc3\\xa9thode de paiement</td>" in str(response_get.content)
-        )
+        assert response_get.status_code == 200
+        assert "<td>M\\xc3\\xa9thode de paiement</td>" in str(response_get.content)
 
     def test_permission_not_granted(self):
-        self.client.login(username="skia", password="plop")
+        self.client.force_login(User.objects.get(username="skia"))
         response_get = self.client.get(
             reverse("accounting:journal_details", args=[self.journal.id])
         )
 
-        self.assertTrue(response_get.status_code == 403)
-        self.assertFalse(
-            "<td>M\xc3\xa9thode de paiement</td>" in str(response_get.content)
-        )
+        assert response_get.status_code == 403
+        assert "<td>M\xc3\xa9thode de paiement</td>" not in str(response_get.content)
 
 
 class OperationTest(TestCase):
@@ -108,9 +103,8 @@ class OperationTest(TestCase):
             code="443", label="Ce code n'existe pas", movement_type="CREDIT"
         )
         at.save()
-        l = Label(club_account=self.journal.club_account, name="bob")
-        l.save()
-        self.client.login(username="comptable", password="plop")
+        l = Label.objects.create(club_account=self.journal.club_account, name="bob")
+        self.client.force_login(User.objects.get(username="comptable"))
         self.op1 = Operation(
             journal=self.journal,
             date=date.today(),
@@ -139,8 +133,7 @@ class OperationTest(TestCase):
         self.op2.save()
 
     def test_new_operation(self):
-        self.client.login(username="comptable", password="plop")
-        at = AccountingType.objects.filter(code="604").first()
+        at = AccountingType.objects.get(code="604")
         response = self.client.post(
             reverse("accounting:op_new", args=[self.journal.id]),
             {
@@ -172,8 +165,7 @@ class OperationTest(TestCase):
         self.assertTrue("<td>Le fantome de la nuit</td>" in str(response_get.content))
 
     def test_bad_new_operation(self):
-        self.client.login(username="comptable", password="plop")
-        AccountingType.objects.filter(code="604").first()
+        AccountingType.objects.get(code="604")
         response = self.client.post(
             reverse("accounting:op_new", args=[self.journal.id]),
             {
@@ -199,7 +191,7 @@ class OperationTest(TestCase):
         )
 
     def test_new_operation_not_authorized(self):
-        self.client.login(username="skia", password="plop")
+        self.client.force_login(self.skia)
         at = AccountingType.objects.filter(code="604").first()
         response = self.client.post(
             reverse("accounting:op_new", args=[self.journal.id]),
@@ -226,7 +218,6 @@ class OperationTest(TestCase):
         )
 
     def test__operation_simple_accounting(self):
-        self.client.login(username="comptable", password="plop")
         sat = SimplifiedAccountingType.objects.all().first()
         response = self.client.post(
             reverse("accounting:op_new", args=[self.journal.id]),
@@ -263,14 +254,12 @@ class OperationTest(TestCase):
         )
 
     def test_nature_statement(self):
-        self.client.login(username="comptable", password="plop")
         response = self.client.get(
             reverse("accounting:journal_nature_statement", args=[self.journal.id])
         )
         self.assertContains(response, "bob (Troll Penché) : 3.00", status_code=200)
 
     def test_person_statement(self):
-        self.client.login(username="comptable", password="plop")
         response = self.client.get(
             reverse("accounting:journal_person_statement", args=[self.journal.id])
         )
@@ -292,7 +281,6 @@ class OperationTest(TestCase):
         )
 
     def test_accounting_statement(self):
-        self.client.login(username="comptable", password="plop")
         response = self.client.get(
             reverse("accounting:journal_accounting_statement", args=[self.journal.id])
         )

@@ -8,27 +8,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  black:
-    name: Black format
+  pre-commit:
+    name: Launch pre-commits checks (ruff)
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-      - name: Setup Project
-        uses: ./.github/actions/setup_project
-      - run: poetry run black --check .
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+    - uses: pre-commit/action@v3.0.1
+      with:
+        extra_args: --all-files
 
   tests:
     name: Run tests and generate coverage report
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # don't interrupt the other test processes
+      matrix:
+        pytest-mark: [slow, not slow]
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - uses: ./.github/actions/setup_project
       - uses: ./.github/actions/setup_xapian
       - uses: ./.github/actions/compile_messages
       - name: Run tests
-        run: poetry run coverage run ./manage.py test
+        run: poetry run coverage run -m pytest -m "${{ matrix.pytest-mark }}"
       - name: Generate coverage report
         run: |
           poetry run coverage report
