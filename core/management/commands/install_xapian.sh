@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Originates from https://gist.github.com/jorgecarleitao/ab6246c86c936b9c55fd
 # first argument of the script is Xapian version (e.g. 1.2.19)
-VERSION=$1
+VERSION="$1"
 
 # Cleanup env vars for auto discovery mechanism
 export CPATH=

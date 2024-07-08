@@ -1,29 +1,22 @@
 <p>Cette page vise à documenter la syntaxe <em>Markdown</em> utilisée sur le site.</p>
 <h1>Markdown-AE Documentation</h1>
 <p>Le Markdown le plus standard se trouve documenté ici:
-<a href="https://daringfireball.net/projects/markdown/syntax">https://daringfireball.net/projects/markdown/syntax</a> .<br>
+<a href="https://www.markdownguide.org/basic-syntax">https://www.markdownguide.org/basic-syntax</a>.<br />
 Si cette page n'est pas exhaustive vis à vis de la syntaxe du site AE,
 elle a au moins le mérite de bien documenter le Markdown original.</p>
-<p>Le réel parseur du site AE est une version tunée de <a href="https://github.com/lepture/mistune">mistune</a>.<br>
+<p>Le réel parseur du site AE est une version tunée de <a href="https://github.com/lepture/mistune">mistune</a>.<br />
 Les plus aventureux pourront aller lire ses <a href="https://github.com/lepture/mistune/blob/master/tests/fixtures">tests</a>
-afin d'en connaître la syntaxe le plus finement possible.<br>
+afin d'en connaître la syntaxe le plus finement possible.<br />
 En pratique, cette page devrait déjà résumer une bonne partie.</p>
 <h2>Basique</h2>
 <ul>
-<li><p>Mettre le texte en <strong>gras</strong> : <code>**texte**</code></p>
-</li>
-<li><p>Mettre le texte en <em>italique</em> : <code>*texte*</code></p>
-</li>
-<li><p><u>Souligner</u> le texte : <code>__texte__</code></p>
-</li>
-<li><p><del>Barrer du texte</del> : <code>~~texte~~</code></p>
-</li>
-<li><p>On peut bien sûr tout <del><strong><em><u>combiner</u></em></strong></del> : <code>~~***__texte__***~~</code></p>
-</li>
-<li><p><sup>Mettre du texte</sup> en exposant : <code>&lt;sup&gt;texte&lt;/sup&gt;</code></p>
-</li>
-<li><p><sub>Mettre du texte</sub> en indice : <code>&lt;sub&gt;texte&lt;/sub&gt;</code></p>
-</li>
+<li>Mettre le texte en <strong>gras</strong> : <code>**texte**</code></li>
+<li>Mettre le texte en <em>italique</em> : <code>*texte*</code></li>
+<li><u>Souligner</u> le texte : <code>__texte__</code></li>
+<li><del>Barrer du texte</del> : <code>~~texte~~</code></li>
+<li>On peut bien sûr tout <del><em><strong><u>combiner</u></strong></em></del> : <code>~~***__texte__***~~</code></li>
+<li>Mettre du texte^en exposant^ : <code>&lt;sup&gt;texte&lt;/sup&gt;</code></li>
+<li>Mettre du texte~en indice~ : <code>&lt;sub&gt;texte&lt;/sub&gt;</code></li>
 </ul>
 <h2>Liens</h2>
 <ul>
@@ -43,7 +36,7 @@ l'adresse complète d'une page : <code>[nom du lien](page://nomDeLaPage)</code><
 <li>On peut également utiliser une image pour les liens :
 <code>[nom du lien]![images/imageDuSiteAE.png](/chemin/vers/image.png titre optionnel)(options)</code></li>
 </ul>
-<p>[nom du lien]<img src="/chemin/vers/image.png titre optionnel" alt="images/imageDuSiteAE.png">(options)</p>
+<p>[nom du lien]![images/imageDuSiteAE.png](/chemin/vers/image.png titre optionnel)(options)</p>
 <h2>Titres</h2>
 <ul>
 <li>Plusieurs niveaux de titres sont possibles</li>
@@ -56,17 +49,12 @@ etc...
 <h1>Titre de niveau 1</h1>
 <h2>Titre de niveau 2</h2>
 <h3>Titre de niveau 3</h3>
-<p>Si le titre de votre section commence par un tilde (~) alors le texte sous la section est
-affiché par défaut caché et il est consultable grace à un bouton +/-</p>
-<h2>~Test</h2>
 <h2>Paragraphes et sauts de ligne</h2>
 <p>Un nouveau paragraphe se fait avec deux retours à la ligne.</p>
 <p>Un saut de ligne se force avec au moins deux espaces en fin de ligne.</p>
 <h2>Listes</h2>
 <p>Il est possible de créer des listes :</p>
-<ul>
-<li>ordonnées :</li>
-</ul>
+<h3>ordonnées :</h3>
 <pre><code>1. élément
 2. élément
 3. élément
@@ -86,12 +74,10 @@ affiché par défaut caché et il est consultable grace à un bouton +/-</p>
 <li>élément</li>
 <li>élément</li>
 </ol>
-<ul>
-<li>non ordonnées :</li>
-</ul>
-<pre><code> * élément
- * élément
- * élément
+<h3>non ordonnées :</h3>
+<pre><code>- élément
+- élément
+- élément
 </code></pre>
 <ul>
 <li>élément</li>
@@ -106,22 +92,23 @@ affiché par défaut caché et il est consultable grace à un bouton +/-</p>
 | test  | test   |   test |
 </code></pre>
 <table>
-<thead><tr>
-<th>Titre</th>
-<th>Titre2</th>
-<th>Titre3</th>
+<thead>
+<tr>
+  <th>Titre</th>
+  <th>Titre2</th>
+  <th>Titre3</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>test</td>
-<td>test</td>
-<td>test</td>
+  <td>test</td>
+  <td>test</td>
+  <td>test</td>
 </tr>
 <tr>
-<td>test</td>
-<td>test</td>
-<td>test</td>
+  <td>test</td>
+  <td>test</td>
+  <td>test</td>
 </tr>
 </tbody>
 </table>
@@ -131,76 +118,70 @@ affiché par défaut caché et il est consultable grace à un bouton +/-</p>
 | gauche | centre | droite |
 </code></pre>
 <table>
-<thead><tr>
-<th style="text-align:left">Titre</th>
-<th style="text-align:center">Titre2</th>
-<th style="text-align:right">Titre3</th>
+<thead>
+<tr>
+  <th style="text-align:left">Titre</th>
+  <th style="text-align:center">Titre2</th>
+  <th style="text-align:right">Titre3</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">gauche</td>
-<td style="text-align:center">centre</td>
-<td style="text-align:right">droite</td>
+  <td style="text-align:left">gauche</td>
+  <td style="text-align:center">centre</td>
+  <td style="text-align:right">droite</td>
 </tr>
 </tbody>
 </table>
 <h2>Images et contenus</h2>
-<p>Une image est insérée ainsi : <code>![texte alternatif](/chemin/vers/image.png "titre optionnel")</code>
-<img src="/static/core/img/logo.png" alt="texte alternatif" title="titre optionnel"></p>
-<p>On peut lui spécifier ses dimensions de plusieurs manières:</p>
-<pre><code>![image à 50%](/static/core/img/logo.png?50% "Image à 50%")
-![image de  350 pixels de large](/static/core/img/logo.png?350 "Image de 350 pixels")
-![image de 350x100 pixels](/static/core/img/logo.png?350x100 "Image de 350x100 pixels")
+<p>Une image est insérée ainsi : <code>![texte alternatif](/chemin/vers/image.png &quot;titre optionnel&quot;)</code>
+<img src="/static/core/img/logo.png" alt="texte alternatif" title="titre optionnel" /></p>
+<p>On peut lui spécifier ses dimensions de plusieurs manières :</p>
+<pre><code>![image à 50%](/static/core/img/logo.png?50% &quot;Image à 50%&quot;)
+![image de 350 pixels de large](/static/core/img/logo.png?350 &quot;Image de 350 pixels&quot;)
+![image de 350x100 pixels](/static/core/img/logo.png?350x100 &quot;Image de 350x100 pixels&quot;)
 </code></pre>
-<p><img src="/static/core/img/logo.png" alt="image à 50%" title="Image à 50%" style="width: 50%; "><br>
+<p><img src="/static/core/img/logo.png" alt="image à 50%" title="Image à 50%" style="width:50%;" /><br />
 Image à 50% de la largeur de la page.</p>
-<p><img src="/static/core/img/logo.png" alt="image de 350 pixels de large" title="Image de 350 pixels" style="width: 350px; "><br>
+<p><img src="/static/core/img/logo.png" alt="image de 350 pixels de large" title="Image de 350 pixels" style="width:350px;" /><br />
 Image de 350 pixels de large.</p>
-<p><img src="/static/core/img/logo.png" alt="image de 350x100 pixels" title="Image de 350x100 pixels" style="width: 350px; height: 100px; "><br>
+<p><img src="/static/core/img/logo.png" alt="image de 350x100 pixels" title="Image de 350x100 pixels" style="width:350px;height:100px;" /><br />
 Image de 350x100 pixels.</p>
-<p>( devrait pouvoir détecter si vidéo ou non )</p>
+<p>(devrait pouvoir détecter si vidéo ou non)</p>
 <h2>Blocs de citations</h2>
 <p>Un bloc de citation se crée ainsi :</p>
 <pre><code>&gt; Ceci est
 &gt; un bloc de
 &gt; citation
 </code></pre>
-<blockquote><p>Ceci est
+<blockquote>
+<p>Ceci est
 un bloc de
 citation</p>
 </blockquote>
 <p>Il est possible d'intégrer de la syntaxe Markdown-AE dans un tel bloc.</p>
 <h2>Note de bas de page</h2>
-<p>On les créer comme ça<sup class="footnote-ref" id="fnref-key"><a href="#fn-key">1</a></sup>:</p>
-<h2>échapper des caractères</h2>
+<p>On les crée comme ça<sup class="footnote-ref" id="fnref-1"><a href="#fn-1">1</a></sup>:</p>
+<pre><code>Je fais une note[^clef].
+
+[^clef]: je note ensuite où je veux le contenu de ma clef qui apparaîtra quand même en bas
+</code></pre>
+<p>Vous pouvez aussi utiliser des numéros pour nommer vos clefs.</p>
+<pre><code>Note plus complexe[^1]
+
+[^1]:
+    je peux même faire des blocs
+    sur plusieurs lignes, comme d'habitude!
+</code></pre>
+<h2>Échapper des caractères</h2>
 <ul>
 <li>Il est possible d'ignorer un caractère spécial en l'échappant à l'aide d'un \</li>
 <li>L'échappement de blocs de codes complet se fera à l'aide de balises &lt;nosyntax&gt;&lt;/nosyntax&gt;</li>
 </ul>
-<h2>Autres ( hérité de l'ancien wiki )</h2>
-<ul>
-<li>Une ligne peut être crée avec une ligne contenant 4 tirets ( - ).</li>
-<li>Une barre de progression est crée ainsi :<blockquote><p>[[[70]]]</p>
-</blockquote>
-</li>
-<li>Notes en pied de page :<blockquote><p>((note))</p>
-</blockquote>
-</li>
-</ul>
-<div class="footnotes">
-<hr>
-<ol><li id="fn-key"><p>ceci est le contenu de ma clef</p>
-<pre><code>Je fais une note[^clef].
-
-[^clef]: je note ensuite ou je veux le contenu de ma clef qui apparaîtra quand même en bas
-</code></pre>
-<p>Vous pouvez utiliser des numéros pour nommer vos clef si vous avez la flemme.</p>
-<pre><code>Note plus complexe[^1]
-
-[^1]:
-    je peux même faire des blocks   
-    sur plusieurs lignes, comme d'habitude!
-</code></pre><p><a href="#fnref-key" class="footnote">&#8617;</a></p></li>
+<h2>Autres (hérité de l'ancien wiki)</h2>
+<p>Une ligne peut être créée avec une ligne contenant 4 tirets (<code>----</code>).</p>
+<section class="footnotes">
+<ol>
+<li id="fn-1"><p>ceci est le contenu de ma clef<a href="#fnref-1" class="footnote">&#8617;</a></p></li>
 </ol>
-</div>
+</section>
