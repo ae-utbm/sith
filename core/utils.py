@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -106,7 +105,7 @@ def scale_dimension(width, height, long_edge):
     return int(width * ratio), int(height * ratio)
 
 
-def resize_image(im, edge, format):
+def resize_image(im, edge, img_format):
     (w, h) = im.size
     (width, height) = scale_dimension(w, h, long_edge=edge)
     content = BytesIO()
@@ -115,7 +114,7 @@ def resize_image(im, edge, format):
     try:
         im.save(
             fp=content,
-            format=format.upper(),
+            format=img_format.upper(),
             quality=90,
             optimize=True,
             progressive=True,
@@ -124,7 +123,7 @@ def resize_image(im, edge, format):
         PIL.ImageFile.MAXBLOCK = im.size[0] * im.size[1]
         im.save(
             fp=content,
-            format=format.upper(),
+            format=img_format.upper(),
             quality=90,
             optimize=True,
             progressive=True,
@@ -203,14 +202,14 @@ def doku_to_markdown(text):
     quote_level = 0
     for line in text.splitlines():  # Tables and quotes
         enter = re.finditer(r"\[quote(=(.+?))?\]", line)
-        quit = re.finditer(r"\[/quote\]", line)
+        quit_ = re.finditer(r"\[/quote\]", line)
         if re.search(r"\A\s*\^(([^\^]*?)\^)*", line):  # Table part
             line = line.replace("^", "|")
             new_text.append("> " * quote_level + line)
             new_text.append(
                 "> " * quote_level + "|---|"
             )  # Don't keep the text alignement in tables it's really too complex for what it's worth
-        elif enter or quit:  # Quote part
+        elif enter or quit_:  # Quote part
             for quote in enter:  # Enter quotes (support multiple at a time)
                 quote_level += 1
                 try:
@@ -218,9 +217,9 @@ def doku_to_markdown(text):
                 except:
                     new_text.append("> " * quote_level)
                 line = line.replace(quote.group(0), "")
-            final_quote_level = quote_level  # Store quote_level to use at the end, since it will be modified during quit iteration
+            final_quote_level = quote_level  # Store quote_level to use at the end, since it will be modified during quit_ iteration
             final_newline = False
-            for quote in quit:  # Quit quotes (support multiple at a time)
+            for quote in quit_:  # Quit quotes (support multiple at a time)
                 line = line.replace(quote.group(0), "")
                 quote_level -= 1
                 final_newline = True
@@ -258,8 +257,8 @@ def bbcode_to_markdown(text):
     quote_level = 0
     for line in text.splitlines():  # Tables and quotes
         enter = re.finditer(r"\[quote(=(.+?))?\]", line)
-        quit = re.finditer(r"\[/quote\]", line)
-        if enter or quit:  # Quote part
+        quit_ = re.finditer(r"\[/quote\]", line)
+        if enter or quit_:  # Quote part
             for quote in enter:  # Enter quotes (support multiple at a time)
                 quote_level += 1
                 try:
@@ -267,9 +266,9 @@ def bbcode_to_markdown(text):
                 except:
                     new_text.append("> " * quote_level)
                 line = line.replace(quote.group(0), "")
-            final_quote_level = quote_level  # Store quote_level to use at the end, since it will be modified during quit iteration
+            final_quote_level = quote_level  # Store quote_level to use at the end, since it will be modified during quit_ iteration
             final_newline = False
-            for quote in quit:  # Quit quotes (support multiple at a time)
+            for quote in quit_:  # Quit quotes (support multiple at a time)
                 line = line.replace(quote.group(0), "")
                 quote_level -= 1
                 final_newline = True

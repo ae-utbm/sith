@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -85,14 +84,10 @@ class IndexSignalProcessor(signals.BaseSignalProcessor):
         )
 
     def handle_forum_message_meta_save(self, sender, instance, **kwargs):
-        super(IndexSignalProcessor, self).handle_save(
-            ForumMessage, instance.message, **kwargs
-        )
+        super().handle_save(ForumMessage, instance.message, **kwargs)
 
     def handle_forum_message_meta_delete(self, sender, instance, **kwargs):
-        super(IndexSignalProcessor, self).handle_delete(
-            ForumMessage, instance.message, **kwargs
-        )
+        super().handle_delete(ForumMessage, instance.message, **kwargs)
 
 
 class BigCharFieldIndex(indexes.CharField):
@@ -102,9 +97,9 @@ class BigCharFieldIndex(indexes.CharField):
     """
 
     def prepare(self, term):
-        return bytes(super(BigCharFieldIndex, self).prepare(term), "utf-8")[
-            :245
-        ].decode("utf-8", errors="ignore")
+        return bytes(super().prepare(term), "utf-8")[:245].decode(
+            "utf-8", errors="ignore"
+        )
 
 
 class ForumMessageIndex(indexes.SearchIndex, indexes.Indexable):

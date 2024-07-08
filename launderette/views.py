@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -45,7 +44,7 @@ class LaunderetteMainView(TemplateView):
 
     def get_context_data(self, **kwargs):
         """Add page to the context"""
-        kwargs = super(LaunderetteMainView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["page"] = Page.objects.filter(name="launderette").first()
         return kwargs
 
@@ -67,7 +66,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
     def get(self, request, *args, **kwargs):
         self.slot_type = "BOTH"
         self.machines = {}
-        return super(LaunderetteBookView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.slot_type = "BOTH"
@@ -114,15 +113,15 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                                 machine=self.machines["DRYING"],
                                 type="DRYING",
                             ).save()
-        return super(LaunderetteBookView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
-    def check_slot(self, type, date=None):
+    def check_slot(self, machine_type, date=None):
         if date is None:
             date = self.date
-        for m in self.object.machines.filter(is_working=True, type=type).all():
+        for m in self.object.machines.filter(is_working=True, type=machine_type):
             slot = Slot.objects.filter(start_date=date, machine=m).first()
             if slot is None:
-                self.machines[type] = m
+                self.machines[machine_type] = m
                 return True
         return False
 
@@ -135,7 +134,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """Add page to the context"""
-        kwargs = super(LaunderetteBookView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["planning"] = OrderedDict()
         kwargs["slot_type"] = self.slot_type
         start_date = datetime.now().replace(
@@ -210,7 +209,7 @@ class LaunderetteCreateView(CanCreateMixin, CreateView):
         c = Counter(name=form.instance.name, club=club, type="OFFICE")
         c.save()
         form.instance.counter = c
-        return super(LaunderetteCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class ManageTokenForm(forms.Form):
@@ -285,12 +284,12 @@ class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(LaunderetteAdminView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = self.get_form()
-        return super(LaunderetteAdminView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
         form.launderette = self.object
         if form.is_valid():
             return self.form_valid(form)
@@ -303,15 +302,15 @@ class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
         """
         form.process(self.object)
         if form.is_valid():
-            return super(LaunderetteAdminView, self).form_valid(form)
+            return super().form_valid(form)
         else:
-            return super(LaunderetteAdminView, self).form_invalid(form)
+            return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         """
         We handle here the login form for the barman
         """
-        kwargs = super(LaunderetteAdminView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if self.request.method == "GET":
             kwargs["form"] = self.get_form()
         return kwargs
@@ -324,7 +323,7 @@ class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
 
 class GetLaunderetteUserForm(GetUserForm):
     def clean(self):
-        cleaned_data = super(GetLaunderetteUserForm, self).clean()
+        cleaned_data = super().clean()
         sub = cleaned_data["user"]
         if sub.slots.all().count() <= 0:
             raise forms.ValidationError(_("User has booked no slot"))
@@ -341,24 +340,24 @@ class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(LaunderetteMainClickView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(LaunderetteMainClickView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         """
         We handle here the redirection, passing the user id of the asked customer
         """
         self.kwargs["user_id"] = form.cleaned_data["user_id"]
-        return super(LaunderetteMainClickView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         """
         We handle here the login form for the barman
         """
-        kwargs = super(LaunderetteMainClickView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["counter"] = self.object.counter
         kwargs["form"] = self.get_form()
         kwargs["barmen"] = [self.request.user]
@@ -470,7 +469,7 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
         self.customer = Customer.objects.filter(user__id=self.kwargs["user_id"]).first()
         self.subscriber = self.customer.user
         self.operator = request.user
-        return super(LaunderetteClickView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """Handle the many possibilities of the post request"""
@@ -478,20 +477,20 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
         self.customer = Customer.objects.filter(user__id=self.kwargs["user_id"]).first()
         self.subscriber = self.customer.user
         self.operator = request.user
-        return super(LaunderetteClickView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         """
         We handle here the redirection, passing the user id of the asked customer
         """
         self.request.session.update(form.last_basket)
-        return super(LaunderetteClickView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         """
         We handle here the login form for the barman
         """
-        kwargs = super(LaunderetteClickView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if "form" not in kwargs.keys():
             kwargs["form"] = self.get_form()
         kwargs["counter"] = self.object.counter
@@ -531,7 +530,7 @@ class MachineCreateView(CanCreateMixin, CreateView):
     template_name = "core/create.jinja"
 
     def get_initial(self):
-        ret = super(MachineCreateView, self).get_initial()
+        ret = super().get_initial()
         if "launderette" in self.request.GET.keys():
             obj = Launderette.objects.filter(
                 id=int(self.request.GET["launderette"])

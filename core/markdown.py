@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -22,8 +21,8 @@ from mistune import InlineGrammar, InlineLexer, Markdown, Renderer, escape, esca
 
 
 class SithRenderer(Renderer):
-    def file_link(self, id, suffix):
-        return reverse("core:file_detail", kwargs={"file_id": id}) + suffix
+    def file_link(self, pk, suffix):
+        return reverse("core:file_detail", kwargs={"file_id": pk}) + suffix
 
     def exposant(self, text):
         return """<sup>%s</sup>""" % text
@@ -51,13 +50,11 @@ class SithRenderer(Renderer):
                 if not width.endswith("%"):
                     width += "px"
                 style = "width: %s; " % width
-                try:
-                    height = m.group(3)
+                height = m.group(3)
+                if height is not None:
                     if not height.endswith("%"):
                         height += "px"
                     style += "height: %s; " % height
-                except:
-                    pass
         else:
             params = None
             src = original_src
@@ -158,12 +155,12 @@ class SithInlineLexer(InlineLexer):
         try:  # Add file:// support for links
             file_link = re.compile(r"^file://(\d*)/?(\S*)?")  # file://4000/download
             match = file_link.search(link)
-            id = match.group(1)
+            pk = match.group(1)
             suffix = match.group(2) or ""
             link = reverse("core:file_detail", kwargs={"file_id": id}) + suffix
         except:
             pass
-        return super(SithInlineLexer, self)._process_link(m, link, title)
+        return super()._process_link(m, link, title)
 
 
 renderer = SithRenderer(escape=True)

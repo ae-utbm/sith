@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2019
 # - Sli <antoine@bartuccio.fr>
@@ -66,7 +65,7 @@ class UVForm(forms.ModelForm):
         }
 
     def __init__(self, author_id, *args, **kwargs):
-        super(UVForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["author"].queryset = User.objects.filter(id=author_id).all()
         self.fields["author"].initial = author_id
 
@@ -75,11 +74,11 @@ class StarList(forms.NumberInput):
     template_name = "pedagogy/starlist.jinja"
 
     def __init__(self, nubmer_of_stars=0):
-        super(StarList, self).__init__(None)
+        super().__init__(None)
         self.number_of_stars = nubmer_of_stars
 
     def get_context(self, name, value, attrs):
-        context = super(StarList, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context["number_of_stars"] = range(0, self.number_of_stars)
         context["translations"] = {"do_not_vote": _("Do not vote")}
         return context
@@ -114,7 +113,7 @@ class UVCommentForm(forms.ModelForm):
         }
 
     def __init__(self, author_id, uv_id, is_creation, *args, **kwargs):
-        super(UVCommentForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["author"].queryset = User.objects.filter(id=author_id).all()
         self.fields["author"].initial = author_id
         self.fields["uv"].queryset = UV.objects.filter(id=uv_id).all()
@@ -122,7 +121,7 @@ class UVCommentForm(forms.ModelForm):
         self.is_creation = is_creation
 
     def clean(self):
-        self.cleaned_data = super(UVCommentForm, self).clean()
+        self.cleaned_data = super().clean()
         uv = self.cleaned_data.get("uv")
         author = self.cleaned_data.get("author")
 
@@ -152,7 +151,7 @@ class UVCommentReportForm(forms.ModelForm):
         }
 
     def __init__(self, reporter_id, comment_id, *args, **kwargs):
-        super(UVCommentReportForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["reporter"].queryset = User.objects.filter(id=reporter_id).all()
         self.fields["reporter"].initial = reporter_id
         self.fields["comment"].queryset = UVComment.objects.filter(id=comment_id).all()

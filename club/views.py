@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -195,7 +194,7 @@ class ClubView(ClubTabsMixin, DetailView):
     current_tab = "infos"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ClubView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if self.object.page and self.object.page.revisions.exists():
             kwargs["page_revision"] = self.object.page.revisions.last().content
         return kwargs
@@ -209,10 +208,10 @@ class ClubRevView(ClubView):
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
         self.revision = get_object_or_404(PageRev, pk=kwargs["rev_id"], page__club=obj)
-        return super(ClubRevView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ClubRevView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["page_revision"] = self.revision.content
         return kwargs
 
@@ -225,7 +224,7 @@ class ClubPageEditView(ClubTabsMixin, PageEditViewBase):
         self.club = get_object_or_404(Club, pk=kwargs["club_id"])
         if not self.club.page:
             raise Http404
-        return super(ClubPageEditView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_object(self):
         self.page = self.club.page
@@ -269,14 +268,14 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
     current_tab = "members"
 
     def get_form_kwargs(self):
-        kwargs = super(ClubMembersView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["request_user"] = self.request.user
         kwargs["club"] = self.get_object()
         kwargs["club_members"] = self.members
         return kwargs
 
     def get_context_data(self, *args, **kwargs):
-        kwargs = super(ClubMembersView, self).get_context_data(*args, **kwargs)
+        kwargs = super().get_context_data(*args, **kwargs)
         kwargs["members"] = self.members
         return kwargs
 
@@ -284,7 +283,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
         """
         Check user rights
         """
-        resp = super(ClubMembersView, self).form_valid(form)
+        resp = super().form_valid(form)
 
         data = form.clean()
         users = data.pop("users", [])
@@ -299,7 +298,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.members = self.get_object().members.ongoing().order_by("-role")
-        return super(ClubMembersView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy(
@@ -333,12 +332,12 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     def dispatch(self, request, *args, **kwargs):
         try:
             self.asked_page = int(request.GET.get("page", 1))
-        except ValueError:
-            raise Http404
-        return super(ClubSellingView, self).dispatch(request, *args, **kwargs)
+        except ValueError as e:
+            raise Http404 from e
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(ClubSellingView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["club"] = self.object
         return kwargs
 
@@ -346,7 +345,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ClubSellingView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         qs = Selling.objects.filter(club=self.object)
 
         kwargs["result"] = qs[:0]
@@ -390,8 +389,8 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         kwargs["paginator"] = Paginator(kwargs["result"], self.paginate_by)
         try:
             kwargs["paginated_result"] = kwargs["paginator"].page(self.asked_page)
-        except InvalidPage:
-            raise Http404
+        except InvalidPage as e:
+            raise Http404 from e
 
         return kwargs
 
@@ -558,7 +557,7 @@ class ClubStatView(TemplateView):
     template_name = "club/stats.jinja"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ClubStatView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["club_list"] = Club.objects.all()
         return kwargs
 
@@ -575,7 +574,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     current_tab = "mailing"
 
     def get_form_kwargs(self):
-        kwargs = super(ClubMailingView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["club_id"] = self.get_object().id
         kwargs["user_id"] = self.request.user.id
         kwargs["mailings"] = self.mailings
@@ -583,10 +582,10 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.mailings = Mailing.objects.filter(club_id=self.get_object().id).all()
-        return super(ClubMailingView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ClubMailingView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["club"] = self.get_object()
         kwargs["user"] = self.request.user
         kwargs["mailings"] = self.mailings
@@ -670,7 +669,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
                 sub.delete()
 
     def form_valid(self, form):
-        resp = super(ClubMailingView, self).form_valid(form)
+        resp = super().form_valid(form)
 
         cleaned_data = form.clean()
         error = None
@@ -702,7 +701,7 @@ class MailingDeleteView(CanEditMixin, DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         self.club_id = self.get_object().club.id
-        return super(MailingDeleteView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
         if self.redirect_page:
@@ -718,9 +717,7 @@ class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         self.club_id = self.get_object().mailing.club.id
-        return super(MailingSubscriptionDeleteView, self).dispatch(
-            request, *args, **kwargs
-        )
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("club:mailing", kwargs={"club_id": self.club_id})
@@ -731,7 +728,7 @@ class MailingAutoGenerationView(View):
         self.mailing = get_object_or_404(Mailing, pk=kwargs["mailing_id"])
         if not request.user.can_edit(self.mailing):
             raise PermissionDenied
-        return super(MailingAutoGenerationView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         club = self.mailing.club
@@ -751,7 +748,7 @@ class PosterListView(ClubTabsMixin, PosterListBaseView, CanViewMixin):
         return self.club
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PosterListView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["app"] = "club"
         kwargs["club"] = self.club
         return kwargs
@@ -763,7 +760,7 @@ class PosterCreateView(PosterCreateBaseView, CanCreateMixin):
     pk_url_kwarg = "club_id"
 
     def get_object(self):
-        obj = super(PosterCreateView, self).get_object()
+        obj = super().get_object()
         if not obj:
             return self.club
         return obj
@@ -779,7 +776,7 @@ class PosterEditView(ClubTabsMixin, PosterEditBaseView, CanEditMixin):
         return reverse_lazy("club:poster_list", kwargs={"club_id": self.club.id})
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PosterEditView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["app"] = "club"
         return kwargs
 

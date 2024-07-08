@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -56,6 +55,9 @@ class Basket(models.Model):
         on_delete=models.CASCADE,
     )
     date = models.DateTimeField(_("date"), auto_now=True)
+
+    def __str__(self):
+        return f"{self.user}'s basket ({self.items.all().count()} items)"
 
     def add_product(self, p: Product, q: int = 1):
         """
@@ -208,9 +210,6 @@ class Basket(models.Model):
         data.append(("PBX_HMAC", pbx_hmac.hexdigest().upper()))
         return data
 
-    def __str__(self):
-        return "%s's basket (%d items)" % (self.user, self.items.all().count())
-
 
 class Invoice(models.Model):
     """
@@ -226,6 +225,9 @@ class Invoice(models.Model):
     )
     date = models.DateTimeField(_("date"), auto_now=True)
     validated = models.BooleanField(_("validated"), default=False)
+
+    def __str__(self):
+        return f"{self.user} - {self.get_total()} - {self.date}"
 
     def get_total(self) -> float:
         total = self.items.aggregate(
@@ -268,9 +270,6 @@ class Invoice(models.Model):
                 new.save()
         self.validated = True
         self.save()
-
-    def __str__(self):
-        return "%s - %s - %s" % (self.user, self.get_total(), self.date)
 
 
 class AbstractBaseItem(models.Model):

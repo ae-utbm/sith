@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017,2018
 # - Skia <skia@libskia.so>

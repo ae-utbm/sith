@@ -27,10 +27,10 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
     def __init__(self, queryset, max_choice, **kwargs):
         self.max_choice = max_choice
         widget = forms.CheckboxSelectMultiple()
-        super(LimitedCheckboxField, self).__init__(queryset, **kwargs)
+        super().__init__(queryset, **kwargs)
 
     def clean(self, value):
-        qs = super(LimitedCheckboxField, self).clean(value)
+        qs = super().clean(value)
         self.validate(qs)
         return qs
 
@@ -59,7 +59,7 @@ class CandidateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop("election_id", None)
         can_edit = kwargs.pop("can_edit", False)
-        super(CandidateForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if election_id:
             self.fields["role"].queryset = Role.objects.filter(
                 election__id=election_id
@@ -73,7 +73,7 @@ class CandidateForm(forms.ModelForm):
 
 class VoteForm(forms.Form):
     def __init__(self, election, user, *args, **kwargs):
-        super(VoteForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not election.has_voted(user):
             for role in election.roles.all():
                 cand = role.candidatures
@@ -99,14 +99,14 @@ class RoleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop("election_id", None)
-        super(RoleForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if election_id:
             self.fields["election"].queryset = Election.objects.filter(
                 id=election_id
             ).all()
 
     def clean(self):
-        cleaned_data = super(RoleForm, self).clean()
+        cleaned_data = super().clean()
         title = cleaned_data.get("title")
         election = cleaned_data.get("election")
         if Role.objects.filter(title=title, election=election).exists():
@@ -122,7 +122,7 @@ class ElectionListForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop("election_id", None)
-        super(ElectionListForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if election_id:
             self.fields["election"].queryset = Election.objects.filter(
                 id=election_id
@@ -185,9 +185,7 @@ class ElectionsListView(CanViewMixin, ListView):
     template_name = "election/election_list.jinja"
 
     def get_queryset(self):
-        return (
-            super(ElectionsListView, self).get_queryset().filter(archived=False).all()
-        )
+        return super().get_queryset().filter(archived=False).all()
 
 
 class ElectionListArchivedView(CanViewMixin, ListView):
@@ -201,12 +199,7 @@ class ElectionListArchivedView(CanViewMixin, ListView):
     template_name = "election/election_list.jinja"
 
     def get_queryset(self):
-        return (
-            super(ElectionListArchivedView, self)
-            .get_queryset()
-            .filter(archived=True)
-            .all()
-        )
+        return super().get_queryset().filter(archived=True).all()
 
 
 class ElectionDetailView(CanViewMixin, DetailView):
@@ -219,7 +212,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "election_id"
 
     def get(self, request, *arg, **kwargs):
-        response = super(ElectionDetailView, self).get(request, *arg, **kwargs)
+        response = super().get(request, *arg, **kwargs)
         election: Election = self.get_object()
         if request.user.can_edit(election) and election.is_vote_editable:
             action = request.GET.get("action", None)
@@ -240,7 +233,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         """Add additionnal data to the template"""
-        kwargs = super(ElectionDetailView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["election_form"] = VoteForm(self.object, self.request.user)
         kwargs["election_results"] = self.object.results
         return kwargs
@@ -259,7 +252,7 @@ class VoteFormView(CanCreateMixin, FormView):
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs["election_id"])
-        return super(VoteFormView, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def vote(self, election_data):
         with transaction.atomic():
@@ -279,7 +272,7 @@ class VoteFormView(CanCreateMixin, FormView):
             self.election.voters.add(self.request.user)
 
     def get_form_kwargs(self):
-        kwargs = super(VoteFormView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["election"] = self.election
         kwargs["user"] = self.request.user
         return kwargs
@@ -301,7 +294,7 @@ class VoteFormView(CanCreateMixin, FormView):
 
     def get_context_data(self, **kwargs):
         """Add additionnal data to the template"""
-        kwargs = super(VoteFormView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["object"] = self.election
         kwargs["election"] = self.election
         kwargs["election_form"] = self.get_form()
@@ -322,7 +315,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs["election_id"])
-        return super(CandidatureCreateView, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
         init = {}
@@ -331,7 +324,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
         return init
 
     def get_form_kwargs(self):
-        kwargs = super(CandidatureCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["election_id"] = self.election.id
         kwargs["can_edit"] = self.can_edit
         return kwargs
@@ -349,7 +342,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
         raise PermissionDenied
 
     def get_context_data(self, **kwargs):
-        kwargs = super(CandidatureCreateView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["election"] = self.election
         return kwargs
 
@@ -365,7 +358,7 @@ class ElectionCreateView(CanCreateMixin, CreateView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_subscribed:
             raise PermissionDenied
-        return super(ElectionCreateView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         """
@@ -387,7 +380,7 @@ class RoleCreateView(CanCreateMixin, CreateView):
         self.election = get_object_or_404(Election, pk=kwargs["election_id"])
         if not self.election.is_vote_editable:
             raise PermissionDenied
-        return super(RoleCreateView, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
         init = {}
@@ -407,7 +400,7 @@ class RoleCreateView(CanCreateMixin, CreateView):
         raise PermissionDenied
 
     def get_form_kwargs(self):
-        kwargs = super(RoleCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["election_id"] = self.election.id
         return kwargs
 
@@ -426,7 +419,7 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         self.election = get_object_or_404(Election, pk=kwargs["election_id"])
         if not self.election.is_vote_editable:
             raise PermissionDenied
-        return super(ElectionListCreateView, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
         init = {}
@@ -434,7 +427,7 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         return init
 
     def get_form_kwargs(self):
-        kwargs = super(ElectionListCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["election_id"] = self.election.id
         return kwargs
 
@@ -506,7 +499,7 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
         self.object = self.get_object()
         if not self.object.role.election.is_vote_editable:
             raise PermissionDenied
-        return super(CandidatureUpdateView, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def remove_fields(self):
         self.form.fields.pop("role", None)
@@ -524,11 +517,11 @@ class CandidatureUpdateView(CanEditMixin, UpdateView):
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):
-            return super(CandidatureUpdateView, self).form_valid(self.form)
+            return super().form_valid(self.form)
         return self.form_invalid(self.form)
 
     def get_form_kwargs(self):
-        kwargs = super(CandidatureUpdateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["election_id"] = self.object.role.election.id
         return kwargs
 
@@ -548,7 +541,7 @@ class RoleUpdateView(CanEditMixin, UpdateView):
         self.object = self.get_object()
         if not self.object.election.is_vote_editable:
             raise PermissionDenied
-        return super(RoleUpdateView, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def remove_fields(self):
         self.form.fields.pop("election", None)
@@ -568,11 +561,11 @@ class RoleUpdateView(CanEditMixin, UpdateView):
             and request.user.can_edit(self.object)
             and self.form.is_valid()
         ):
-            return super(RoleUpdateView, self).form_valid(self.form)
+            return super().form_valid(self.form)
         return self.form_invalid(self.form)
 
     def get_form_kwargs(self):
-        kwargs = super(RoleUpdateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["election_id"] = self.object.election.id
         return kwargs
 
@@ -592,7 +585,7 @@ class ElectionDeleteView(DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_root:
-            return super(ElectionDeleteView, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
     def get_success_url(self, **kwargs):
@@ -609,7 +602,7 @@ class CandidatureDeleteView(CanEditMixin, DeleteView):
         self.election = self.object.role.election
         if not self.election.can_candidate or not self.election.is_vote_editable:
             raise PermissionDenied
-        return super(CandidatureDeleteView, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
@@ -625,7 +618,7 @@ class RoleDeleteView(CanEditMixin, DeleteView):
         self.election = self.object.election
         if not self.election.is_vote_editable:
             raise PermissionDenied
-        return super(RoleDeleteView, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
@@ -641,7 +634,7 @@ class ElectionListDeleteView(CanEditMixin, DeleteView):
         self.election = self.object.election
         if not self.election.is_vote_editable:
             raise PermissionDenied
-        return super(ElectionListDeleteView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})

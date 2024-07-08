@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -75,7 +74,7 @@ def notification(request, notif_id):
     return redirect("/")
 
 
-def search_user(query, as_json=False):
+def search_user(query):
     try:
         # slugify turns everything into ascii and every whitespace into -
         # it ends by removing duplicate - (so ' - ' will turn into '-')
@@ -94,7 +93,7 @@ def search_user(query, as_json=False):
         return []
 
 
-def search_club(query, as_json=False):
+def search_club(query, *, as_json=False):
     clubs = []
     if query:
         clubs = Club.objects.filter(name__icontains=query).all()
@@ -118,15 +117,15 @@ def search_view(request):
 
 @login_required
 def search_user_json(request):
-    result = {"users": search_user(request.GET.get("query", ""), True)}
+    result = {"users": search_user(request.GET.get("query", ""))}
     return JsonResponse(result)
 
 
 @login_required
 def search_json(request):
     result = {
-        "users": search_user(request.GET.get("query", ""), True),
-        "clubs": search_club(request.GET.get("query", ""), True),
+        "users": search_user(request.GET.get("query", "")),
+        "clubs": search_club(request.GET.get("query", ""), as_json=True),
     }
     return JsonResponse(result)
 
@@ -144,7 +143,7 @@ class ToMarkdownView(TemplateView):
         return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ToMarkdownView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         try:
             kwargs["text"] = self.text
             kwargs["text_md"] = self.text_md

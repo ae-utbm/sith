@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -37,11 +36,11 @@ class CurrencyField(models.DecimalField):
     def __init__(self, *args, **kwargs):
         kwargs["max_digits"] = 12
         kwargs["decimal_places"] = 2
-        super(CurrencyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_python(self, value):
         try:
-            return super(CurrencyField, self).to_python(value).quantize(Decimal("0.01"))
+            return super().to_python(value).quantize(Decimal("0.01"))
         except AttributeError:
             return None
 
@@ -61,6 +60,15 @@ class Company(models.Model):
 
     class Meta:
         verbose_name = _("company")
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("accounting:co_edit", kwargs={"co_id": self.id})
+
+    def get_display_name(self):
+        return self.name
 
     def is_owned_by(self, user):
         """
@@ -88,15 +96,6 @@ class Company(models.Model):
                 return True
         return False
 
-    def get_absolute_url(self):
-        return reverse("accounting:co_edit", kwargs={"co_id": self.id})
-
-    def get_display_name(self):
-        return self.name
-
-    def __str__(self):
-        return self.name
-
 
 class BankAccount(models.Model):
     name = models.CharField(_("name"), max_length=30)
@@ -113,6 +112,12 @@ class BankAccount(models.Model):
         verbose_name = _("Bank account")
         ordering = ["club", "name"]
 
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("accounting:bank_details", kwargs={"b_account_id": self.id})
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -125,12 +130,6 @@ class BankAccount(models.Model):
         if m is not None and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]:
             return True
         return False
-
-    def get_absolute_url(self):
-        return reverse("accounting:bank_details", kwargs={"b_account_id": self.id})
-
-    def __str__(self):
-        return self.name
 
 
 class ClubAccount(models.Model):
@@ -151,6 +150,12 @@ class ClubAccount(models.Model):
     class Meta:
         verbose_name = _("Club account")
         ordering = ["bank_account", "name"]
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("accounting:club_details", kwargs={"c_account_id": self.id})
 
     def is_owned_by(self, user):
         """
@@ -189,12 +194,6 @@ class ClubAccount(models.Model):
     def get_open_journal(self):
         return self.journals.filter(closed=False).first()
 
-    def get_absolute_url(self):
-        return reverse("accounting:club_details", kwargs={"c_account_id": self.id})
-
-    def __str__(self):
-        return self.name
-
     def get_display_name(self):
         return _("%(club_account)s on %(bank_account)s") % {
             "club_account": self.name,
@@ -225,6 +224,12 @@ class GeneralJournal(models.Model):
         verbose_name = _("General journal")
         ordering = ["-start_date"]
 
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("accounting:journal_details", kwargs={"j_id": self.id})
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -249,12 +254,6 @@ class GeneralJournal(models.Model):
 
     def can_be_viewed_by(self, user):
         return self.club_account.can_be_viewed_by(user)
-
-    def get_absolute_url(self):
-        return reverse("accounting:journal_details", kwargs={"j_id": self.id})
-
-    def __str__(self):
-        return self.name
 
     def update_amounts(self):
         self.amount = 0
@@ -357,6 +356,18 @@ class Operation(models.Model):
         unique_together = ("number", "journal")
         ordering = ["-number"]
 
+    def __str__(self):
+        return f"{self.amount} € | {self.date} | {self.accounting_type} | {self.done}"
+
+    def save(self, *args, **kwargs):
+        if self.number is None:
+            self.number = self.journal.operations.count() + 1
+        super().save(*args, **kwargs)
+        self.journal.update_amounts()
+
+    def get_absolute_url(self):
+        return reverse("accounting:journal_details", kwargs={"j_id": self.journal.id})
+
     def __getattribute__(self, attr):
         if attr == "target":
             return self.get_target()
@@ -364,7 +375,7 @@ class Operation(models.Model):
             return object.__getattribute__(self, attr)
 
     def clean(self):
-        super(Operation, self).clean()
+        super().clean()
         if self.date is None:
             raise ValidationError(_("The date must be set."))
         elif self.date < self.journal.start_date:
@@ -410,12 +421,6 @@ class Operation(models.Model):
             tar = Company.objects.filter(id=self.target_id).first()
         return tar
 
-    def save(self):
-        if self.number is None:
-            self.number = self.journal.operations.count() + 1
-        super(Operation, self).save()
-        self.journal.update_amounts()
-
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -443,17 +448,6 @@ class Operation(models.Model):
         if m is not None and m.role == settings.SITH_CLUB_ROLES_ID["Treasurer"]:
             return True
         return False
-
-    def get_absolute_url(self):
-        return reverse("accounting:journal_details", kwargs={"j_id": self.journal.id})
-
-    def __str__(self):
-        return "%d € | %s | %s | %s" % (
-            self.amount,
-            self.date,
-            self.accounting_type,
-            self.done,
-        )
 
 
 class AccountingType(models.Model):
@@ -487,6 +481,12 @@ class AccountingType(models.Model):
         verbose_name = _("accounting type")
         ordering = ["movement_type", "code"]
 
+    def __str__(self):
+        return self.code + " - " + self.get_movement_type_display() + " - " + self.label
+
+    def get_absolute_url(self):
+        return reverse("accounting:type_list")
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -496,12 +496,6 @@ class AccountingType(models.Model):
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
-
-    def get_absolute_url(self):
-        return reverse("accounting:type_list")
-
-    def __str__(self):
-        return self.code + " - " + self.get_movement_type_display() + " - " + self.label
 
 
 class SimplifiedAccountingType(models.Model):
@@ -521,24 +515,21 @@ class SimplifiedAccountingType(models.Model):
         verbose_name = _("simplified type")
         ordering = ["accounting_type__movement_type", "accounting_type__code"]
 
+    def __str__(self):
+        return (
+            f"{self.get_movement_type_display()} "
+            f"- {self.accounting_type.code} - {self.label}"
+        )
+
+    def get_absolute_url(self):
+        return reverse("accounting:simple_type_list")
+
     @property
     def movement_type(self):
         return self.accounting_type.movement_type
 
     def get_movement_type_display(self):
         return self.accounting_type.get_movement_type_display()
-
-    def get_absolute_url(self):
-        return reverse("accounting:simple_type_list")
-
-    def __str__(self):
-        return (
-            self.get_movement_type_display()
-            + " - "
-            + self.accounting_type.code
-            + " - "
-            + self.label
-        )
 
 
 class Label(models.Model):

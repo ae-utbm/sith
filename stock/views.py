@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Guillaume "Lo-J" Renaud <renaudg779@gmail.com>
@@ -52,7 +51,7 @@ class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):
     current_tab = "stocks"
 
     def get_context_data(self):
-        ret = super(StockItemList, self).get_context_data()
+        ret = super().get_context_data()
         if "stock_id" in self.kwargs.keys():
             ret["stock"] = Stock.objects.filter(id=self.kwargs["stock_id"]).first()
         return ret
@@ -78,10 +77,10 @@ class StockEditForm(forms.ModelForm):
         fields = ["name", "counter"]
 
     def __init__(self, *args, **kwargs):
-        super(StockEditForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        return super(StockEditForm, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
 class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
@@ -131,7 +130,7 @@ class StockCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
     success_url = reverse_lazy("stock:list")
 
     def get_initial(self):
-        ret = super(StockCreateView, self).get_initial()
+        ret = super().get_initial()
         if "counter_id" in self.kwargs.keys():
             ret["counter"] = self.kwargs["counter_id"]
         return ret
@@ -159,7 +158,7 @@ class StockItemCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
     current_tab = "stocks"
 
     def get_initial(self):
-        ret = super(StockItemCreateView, self).get_initial()
+        ret = super().get_initial()
         if "stock_id" in self.kwargs.keys():
             ret["stock_owner"] = self.kwargs["stock_id"]
         return ret
@@ -181,7 +180,7 @@ class StockShoppingListView(CounterAdminTabsMixin, CanViewMixin, ListView):
     current_tab = "stocks"
 
     def get_context_data(self):
-        ret = super(StockShoppingListView, self).get_context_data()
+        ret = super().get_context_data()
         if "stock_id" in self.kwargs.keys():
             ret["stock"] = Stock.objects.filter(id=self.kwargs["stock_id"]).first()
         return ret
@@ -271,7 +270,7 @@ class StockItemQuantityBaseFormView(
         Simple get view
         """
         self.stock = Stock.objects.filter(id=self.kwargs["stock_id"]).first()
-        return super(StockItemQuantityBaseFormView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """
@@ -279,13 +278,13 @@ class StockItemQuantityBaseFormView(
         """
         self.object = self.get_object()
         self.stock = Stock.objects.filter(id=self.kwargs["stock_id"]).first()
-        return super(StockItemQuantityBaseFormView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        return super(StockItemQuantityBaseFormView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(StockItemQuantityBaseFormView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if "form" not in kwargs.keys():
             kwargs["form"] = self.get_form()
         kwargs["stock"] = self.stock
@@ -306,7 +305,7 @@ class StockShoppingListItemListView(CounterAdminTabsMixin, CanViewMixin, ListVie
     current_tab = "stocks"
 
     def get_context_data(self):
-        ret = super(StockShoppingListItemListView, self).get_context_data()
+        ret = super().get_context_data()
         if "shoppinglist_id" in self.kwargs.keys():
             ret["shoppinglist"] = ShoppingList.objects.filter(
                 id=self.kwargs["shoppinglist_id"]
@@ -451,9 +450,7 @@ class StockUpdateAfterShopppingBaseFormView(
         self.shoppinglist = ShoppingList.objects.filter(
             id=self.kwargs["shoppinglist_id"]
         ).first()
-        return super(StockUpdateAfterShopppingBaseFormView, self).get(
-            request, *args, **kwargs
-        )
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """
@@ -463,21 +460,17 @@ class StockUpdateAfterShopppingBaseFormView(
         self.shoppinglist = ShoppingList.objects.filter(
             id=self.kwargs["shoppinglist_id"]
         ).first()
-        return super(StockUpdateAfterShopppingBaseFormView, self).post(
-            request, *args, **kwargs
-        )
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         """
         We handle here the redirection
         """
-        return super(StockUpdateAfterShopppingBaseFormView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(StockUpdateAfterShopppingBaseFormView, self).get_context_data(
-            **kwargs
-        )
-        if "form" not in kwargs.keys():
+        kwargs = super().get_context_data(**kwargs)
+        if "form" not in kwargs:
             kwargs["form"] = self.get_form()
         kwargs["shoppinglist"] = self.shoppinglist
         kwargs["stock"] = self.shoppinglist.stock_owner
@@ -546,7 +539,7 @@ class StockTakeItemsBaseFormView(
         Simple get view
         """
         self.stock = Stock.objects.filter(id=self.kwargs["stock_id"]).first()
-        return super(StockTakeItemsBaseFormView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         """
@@ -566,13 +559,13 @@ class StockTakeItemsBaseFormView(
                 )
                 + "?bad_location"
             )
-        return super(StockTakeItemsBaseFormView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        return super(StockTakeItemsBaseFormView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(StockTakeItemsBaseFormView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if "form" not in kwargs.keys():
             kwargs["form"] = self.get_form()
         kwargs["stock"] = self.stock

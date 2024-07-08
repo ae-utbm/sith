@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -40,7 +39,7 @@ class ClubEditForm(forms.ModelForm):
         fields = ["address", "logo", "short_description"]
 
     def __init__(self, *args, **kwargs):
-        super(ClubEditForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["short_description"].widget = forms.Textarea()
 
 
@@ -61,7 +60,7 @@ class MailingForm(forms.Form):
     )
 
     def __init__(self, club_id, user_id, mailings, *args, **kwargs):
-        super(MailingForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.fields["action"] = forms.TypedChoiceField(
             choices=(
@@ -116,7 +115,7 @@ class MailingForm(forms.Form):
         """
         Convert given users into real users and check their validity
         """
-        cleaned_data = super(MailingForm, self).clean()
+        cleaned_data = super().clean()
         users = []
         for user in cleaned_data["subscription_users"]:
             user = User.objects.filter(id=user).first()
@@ -133,7 +132,7 @@ class MailingForm(forms.Form):
         return users
 
     def clean(self):
-        cleaned_data = super(MailingForm, self).clean()
+        cleaned_data = super().clean()
 
         if not "action" in cleaned_data:
             # If there is no action provided, we can stop here
@@ -164,7 +163,7 @@ class SellingsForm(forms.Form):
     )
 
     def __init__(self, club, *args, **kwargs):
-        super(SellingsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["products"] = forms.ModelMultipleChoiceField(
             club.products.order_by("name").filter(archived=False).all(),
             label=_("Products"),
@@ -201,7 +200,7 @@ class ClubMemberForm(forms.Form):
                 self.club.members.filter(end_date=None).order_by("-role").all()
             )
         self.request_user_membership = self.club.get_membership_for(self.request_user)
-        super(ClubMemberForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # Using a ModelForm binds too much the form with the model and we don't want that
         # We want the view to process the model creation since they are multiple users
@@ -241,7 +240,7 @@ class ClubMemberForm(forms.Form):
         Check that the user is not trying to add an user already in the club
         Also check that the user is valid and has a valid subscription
         """
-        cleaned_data = super(ClubMemberForm, self).clean()
+        cleaned_data = super().clean()
         users = []
         for user_id in cleaned_data["users"]:
             user = User.objects.filter(id=user_id).first()
@@ -264,7 +263,7 @@ class ClubMemberForm(forms.Form):
         """
         Check user rights for adding an user
         """
-        cleaned_data = super(ClubMemberForm, self).clean()
+        cleaned_data = super().clean()
 
         if "start_date" in cleaned_data and not cleaned_data["start_date"]:
             # Drop start_date if allowed to edition but not specified

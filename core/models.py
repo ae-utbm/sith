@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017,2018
 # - Skia <skia@libskia.so>
@@ -60,12 +59,12 @@ from core import utils
 
 class RealGroupManager(AuthGroupManager):
     def get_queryset(self):
-        return super(RealGroupManager, self).get_queryset().filter(is_meta=False)
+        return super().get_queryset().filter(is_meta=False)
 
 
 class MetaGroupManager(AuthGroupManager):
     def get_queryset(self):
-        return super(MetaGroupManager, self).get_queryset().filter(is_meta=True)
+        return super().get_queryset().filter(is_meta=True)
 
 
 class Group(AuthGroup):
@@ -120,7 +119,7 @@ class MetaGroup(Group):
         proxy = True
 
     def __init__(self, *args, **kwargs):
-        super(MetaGroup, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.is_meta = True
 
     @cached_property
@@ -548,7 +547,7 @@ class User(AbstractBaseUser):
                     self._change_username(self.username)
             else:
                 create = True
-            super(User, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
     def make_home(self):
         if self.home is None:
@@ -746,7 +745,7 @@ class User(AbstractBaseUser):
 
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self):
-        super(AnonymousUser, self).__init__()
+        super().__init__()
 
     @property
     def can_create_subscription(self):
@@ -846,11 +845,14 @@ class Preferences(models.Model):
         _("get a notification for every refilling"), default=False
     )
 
-    def get_display_name(self):
-        return self.user.get_display_name()
+    def __str__(self):
+        return f"Preferences of {self.user}"
 
     def get_absolute_url(self):
         return self.user.get_absolute_url()
+
+    def get_display_name(self):
+        return self.user.get_display_name()
 
 
 def get_directory(instance, filename):
@@ -929,6 +931,31 @@ class SithFile(models.Model):
     class Meta:
         verbose_name = _("file")
 
+    def __str__(self):
+        return self.get_parent_path() + "/" + self.name
+
+    def save(self, *args, **kwargs):
+        sas = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
+        self.is_in_sas = sas in self.get_parent_list() or self == sas
+        copy_rights = False
+        if self.id is None:
+            copy_rights = True
+        super().save(*args, **kwargs)
+        if copy_rights:
+            self.copy_rights()
+        if self.is_in_sas:
+            for u in (
+                RealGroup.objects.filter(id=settings.SITH_GROUP_SAS_ADMIN_ID)
+                .first()
+                .users.all()
+            ):
+                Notification(
+                    user=u,
+                    url=reverse("sas:moderation"),
+                    type="SAS_MODERATION",
+                    param="1",
+                ).save()
+
     def can_be_managed_by(self, user: User) -> bool:
         """
         Tell if the user can manage the file (edit, delete, etc.) or not.
@@ -987,13 +1014,13 @@ class SithFile(models.Model):
             self.compressed.delete()
         if self.thumbnail:
             self.thumbnail.delete()
-        return super(SithFile, self).delete()
+        return super().delete()
 
     def clean(self):
         """
         Cleans up the file
         """
-        super(SithFile, self).clean()
+        super().clean()
         if "/" in self.name:
             raise ValidationError(_("Character '/' not authorized in name"))
         if self == self.parent:
@@ -1034,35 +1061,13 @@ class SithFile(models.Model):
         if self.is_file and (self.file is None or self.file == ""):
             raise ValidationError(_("You must provide a file"))
 
-    def save(self, *args, **kwargs):
-        sas = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
-        self.is_in_sas = sas in self.get_parent_list() or self == sas
-        copy_rights = False
-        if self.id is None:
-            copy_rights = True
-        super(SithFile, self).save(*args, **kwargs)
-        if copy_rights:
-            self.copy_rights()
-        if self.is_in_sas:
-            for u in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_SAS_ADMIN_ID)
-                .first()
-                .users.all()
-            ):
-                Notification(
-                    user=u,
-                    url=reverse("sas:moderation"),
-                    type="SAS_MODERATION",
-                    param="1",
-                ).save()
-
-    def apply_rights_recursively(self, only_folders=False):
+    def apply_rights_recursively(self, *, only_folders=False):
         children = self.children.all()
         if only_folders:
             children = children.filter(is_folder=True)
         for c in children:
             c.copy_rights()
-            c.apply_rights_recursively(only_folders)
+            c.apply_rights_recursively(only_folders=only_folders)
 
     def copy_rights(self):
         """Copy, if possible, the rights of the parent folder"""
@@ -1156,7 +1161,7 @@ class SithFile(models.Model):
         if attr == "is_file":
             return not self.is_folder
         else:
-            return super(SithFile, self).__getattribute__(attr)
+            return super().__getattribute__(attr)
 
     @cached_property
     def as_picture(self):
@@ -1190,9 +1195,6 @@ class SithFile(models.Model):
     def get_download_url(self):
         return reverse("core:download", kwargs={"file_id": self.id})
 
-    def __str__(self):
-        return self.get_parent_path() + "/" + self.name
-
 
 class LockError(Exception):
     """There was a lock error on the object"""
@@ -1210,6 +1212,11 @@ class NotLocked(LockError):
     """The object is not locked"""
 
     pass
+
+
+# This function prevents generating migration upon settings change
+def get_default_owner_group():
+    return settings.SITH_GROUP_ROOT_ID
 
 
 class Page(models.Model):
@@ -1251,10 +1258,6 @@ class Page(models.Model):
     # playing with a Page object, use get_full_name() instead!
     _full_name = models.CharField(_("page name"), max_length=255, blank=True)
 
-    # This function prevents generating migration upon settings change
-    def get_default_owner_group():
-        return settings.SITH_GROUP_ROOT_ID
-
     owner_group = models.ForeignKey(
         Group,
         related_name="owned_page",
@@ -1287,15 +1290,44 @@ class Page(models.Model):
             ("change_prop_page", "Can change the page's properties (groups, ...)"),
         )
 
+    def __str__(self):
+        return self.get_full_name()
+
+    def save(self, *args, **kwargs):
+        """
+        Performs some needed actions before and after saving a page in database
+        """
+        locked = kwargs.pop("force_lock", False)
+        if not locked:
+            locked = self.is_locked()
+        if not locked:
+            raise NotLocked("The page is not locked and thus can not be saved")
+        self.full_clean()
+        if not self.id:
+            super().save(
+                *args, **kwargs
+            )  # Save a first time to correctly set _full_name
+        # This reset the _full_name just before saving to maintain a coherent field quicker for queries than the
+        # recursive method
+        # It also update all the children to maintain correct names
+        self._full_name = self.get_full_name()
+        for c in self.children.all():
+            c.save()
+        super().save(*args, **kwargs)
+        self.unset_lock()
+
+    def get_absolute_url(self):
+        """
+        This is needed for black magic powered UpdateView's children
+        """
+        return reverse("core:page", kwargs={"page_name": self._full_name})
+
     @staticmethod
     def get_page_by_full_name(name):
         """
         Quicker to get a page with that method rather than building the request every time
         """
         return Page.objects.filter(_full_name=name).first()
-
-    def __init__(self, *args, **kwargs):
-        super(Page, self).__init__(*args, **kwargs)
 
     def clean(self):
         """
@@ -1309,7 +1341,7 @@ class Page(models.Model):
             .exists()
         ):
             raise ValidationError(_("Duplicate page"), code="duplicate")
-        super(Page, self).clean()
+        super().clean()
         if self.parent is not None and self in self.get_parent_list():
             raise ValidationError(_("Loop in page tree"), code="loop")
 
@@ -1333,29 +1365,6 @@ class Page(models.Model):
             l.append(p)
             p = p.parent
         return l
-
-    def save(self, *args, **kwargs):
-        """
-        Performs some needed actions before and after saving a page in database
-        """
-        locked = kwargs.pop("force_lock", False)
-        if not locked:
-            locked = self.is_locked()
-        if not locked:
-            raise NotLocked("The page is not locked and thus can not be saved")
-        self.full_clean()
-        if not self.id:
-            super(Page, self).save(
-                *args, **kwargs
-            )  # Save a first time to correctly set _full_name
-        # This reset the _full_name just before saving to maintain a coherent field quicker for queries than the
-        # recursive method
-        # It also update all the children to maintain correct names
-        self._full_name = self.get_full_name()
-        for c in self.children.all():
-            c.save()
-        super(Page, self).save(*args, **kwargs)
-        self.unset_lock()
 
     def is_locked(self):
         """
@@ -1382,7 +1391,7 @@ class Page(models.Model):
             raise AlreadyLocked("The page is already locked by someone else")
         self.lock_user = user
         self.lock_timeout = timezone.now()
-        super(Page, self).save()
+        super().save()
         # print("Locking page")
 
     def set_lock_recursive(self, user):
@@ -1405,7 +1414,7 @@ class Page(models.Model):
         """Always try to unlock, even if there is no lock"""
         self.lock_user = None
         self.lock_timeout = None
-        super(Page, self).save()
+        super().save()
         # print("Unlocking page")
 
     def get_lock(self):
@@ -1415,15 +1424,6 @@ class Page(models.Model):
         if self.lock_user:
             return self.lock_user
         raise NotLocked("The page is not locked and thus can not return its user")
-
-    def get_absolute_url(self):
-        """
-        This is needed for black magic powered UpdateView's children
-        """
-        return reverse("core:page", kwargs={"page_name": self._full_name})
-
-    def __str__(self):
-        return self.get_full_name()
 
     def get_full_name(self):
         """
@@ -1459,7 +1459,7 @@ class Page(models.Model):
             child.parent = self.parent
             child.save()
             child.unset_lock_recursive()
-        super(Page, self).delete()
+        super().delete()
 
 
 class PageRev(models.Model):
@@ -1481,14 +1481,21 @@ class PageRev(models.Model):
     class Meta:
         ordering = ["date"]
 
+    def __str__(self):
+        return str(self.__dict__)
+
+    def save(self, *args, **kwargs):
+        if self.revision is None:
+            self.revision = self.page.revisions.all().count() + 1
+        super().save(*args, **kwargs)
+        # Don't forget to unlock, otherwise, people will have to wait for the page's timeout
+        self.page.unset_lock()
+
     def get_absolute_url(self):
         """
         This is needed for black magic powered UpdateView's children
         """
         return reverse("core:page", kwargs={"page_name": self.page._full_name})
-
-    def __str__(self):
-        return str(self.__dict__)
 
     def __getattribute__(self, attr):
         if attr == "owner_group":
@@ -1504,13 +1511,6 @@ class PageRev(models.Model):
 
     def can_be_edited_by(self, user):
         return self.page.can_be_edited_by(user)
-
-    def save(self, *args, **kwargs):
-        if self.revision is None:
-            self.revision = self.page.revisions.all().count() + 1
-        super(PageRev, self).save(*args, **kwargs)
-        # Don't forget to unlock, otherwise, people will have to wait for the page's timeout
-        self.page.unset_lock()
 
 
 class Notification(models.Model):
@@ -1530,6 +1530,15 @@ class Notification(models.Model):
             return self.get_type_display() % self.param
         return self.get_type_display()
 
+    def save(self, *args, **kwargs):
+        if not self.id and self.type in settings.SITH_PERMANENT_NOTIFICATIONS:
+            old_notif = self.user.notifications.filter(type=self.type).last()
+            if old_notif:
+                old_notif.callback()
+                old_notif.save()
+                return
+        super().save(*args, **kwargs)
+
     def callback(self):
         # Get the callback defined in settings to update existing
         # notifications
@@ -1538,15 +1547,6 @@ class Notification(models.Model):
         )
         mod = importlib.import_module(mod_name)
         getattr(mod, func_name)(self)
-
-    def save(self, *args, **kwargs):
-        if not self.id and self.type in settings.SITH_PERMANENT_NOTIFICATIONS:
-            old_notif = self.user.notifications.filter(type=self.type).last()
-            if old_notif:
-                old_notif.callback()
-                old_notif.save()
-                return
-        super(Notification, self).save(*args, **kwargs)
 
 
 class Gift(models.Model):
@@ -1586,8 +1586,8 @@ class OperationLog(models.Model):
         _("operation type"), max_length=40, choices=settings.SITH_LOG_OPERATION_TYPE
     )
 
-    def is_owned_by(self, user):
-        return user.is_root
-
     def __str__(self):
         return "%s - %s - %s" % (self.operation_type, self.label, self.operator)
+
+    def is_owned_by(self, user):
+        return user.is_root

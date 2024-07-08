@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023
 # - Skia <skia@hya.sk>
@@ -87,7 +86,7 @@ def current_star(self) -> Optional[GalaxyStar]:
 
 
 # Adding a shortcut to User class for getting its star belonging to the latest ruled Galaxy
-setattr(User, "current_star", current_star)
+User.current_star = current_star
 
 
 class GalaxyLane(models.Model):
@@ -127,6 +126,9 @@ class GalaxyLane(models.Model):
         _("clubs score"),
         default=0,
     )
+
+    def __str__(self):
+        return f"{self.star1} -> {self.star2} ({self.distance})"
 
 
 class StarDict(TypedDict):

@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -38,7 +37,7 @@ class EditMembersForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.current_users = kwargs.pop("users", [])
-        super(EditMembersForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["users_removed"] = forms.ModelMultipleChoiceField(
             User.objects.filter(id__in=self.current_users).all(),
             label=_("Users to remove from group"),
@@ -57,7 +56,7 @@ class EditMembersForm(forms.Form):
         """
         Check that the user is not trying to add an user already in the group
         """
-        cleaned_data = super(EditMembersForm, self).clean()
+        cleaned_data = super().clean()
         users_added = cleaned_data.get("users_added", None)
         if not users_added:
             return users_added
@@ -120,7 +119,7 @@ class GroupTemplateView(CanEditMixin, DetailFormView):
     template_name = "core/group_detail.jinja"
 
     def form_valid(self, form):
-        resp = super(GroupTemplateView, self).form_valid(form)
+        resp = super().form_valid(form)
 
         data = form.clean()
         group = self.get_object()
@@ -138,7 +137,7 @@ class GroupTemplateView(CanEditMixin, DetailFormView):
         )
 
     def get_form_kwargs(self):
-        kwargs = super(GroupTemplateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["users"] = self.get_object().users.all()
         return kwargs
 

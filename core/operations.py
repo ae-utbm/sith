@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Sli <antoine@bartuccio.fr>
@@ -47,4 +46,4 @@ class PsqlRunOnly(migrations.RunSQL):
 
     def _run_sql(self, schema_editor, sqls):
         if connection.vendor == "postgresql":
-            super(PsqlRunOnly, self)._run_sql(schema_editor, sqls)
+            super()._run_sql(schema_editor, sqls)

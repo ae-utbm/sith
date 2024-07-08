@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -44,26 +43,10 @@ from core.views.forms import LoginForm
 
 
 def forbidden(request, exception):
-    try:
-        return HttpResponseForbidden(
-            render(
-                request,
-                "core/403.jinja",
-                context={
-                    "next": request.path,
-                    "form": LoginForm(),
-                    "popup": request.resolver_match.kwargs["popup"] or "",
-                },
-            )
-        )
-    except:
-        return HttpResponseForbidden(
-            render(
-                request,
-                "core/403.jinja",
-                context={"next": request.path, "form": LoginForm()},
-            )
-        )
+    context = {"next": request.path, "form": LoginForm()}
+    if popup := request.resolver_match.kwargs.get("popup"):
+        context["popup"] = popup
+    return HttpResponseForbidden(render(request, "core/403.jinja", context=context))
 
 
 def not_found(request, exception):
@@ -161,9 +144,7 @@ class GenericContentPermissionMixinBuilder(View):
             self.object = self.get_object()
             if not self.get_permission_function(self.object, request.user):
                 raise self.raised_error
-            return super(GenericContentPermissionMixinBuilder, self).dispatch(
-                request, *arg, **kwargs
-            )
+            return super().dispatch(request, *arg, **kwargs)
 
         # If we get here, it's a ListView
 
@@ -177,9 +158,7 @@ class GenericContentPermissionMixinBuilder(View):
             return self2._get_queryset().filter(id__in=l_id)
 
         self.get_queryset = types.MethodType(get_qs, self)
-        return super(GenericContentPermissionMixinBuilder, self).dispatch(
-            request, *arg, **kwargs
-        )
+        return super().dispatch(request, *arg, **kwargs)
 
 
 class CanCreateMixin(View):
@@ -191,7 +170,7 @@ class CanCreateMixin(View):
     """
 
     def dispatch(self, request, *arg, **kwargs):
-        res = super(CanCreateMixin, self).dispatch(request, *arg, **kwargs)
+        res = super().dispatch(request, *arg, **kwargs)
         if not request.user.is_authenticated:
             raise PermissionDenied
         return res
@@ -199,7 +178,7 @@ class CanCreateMixin(View):
     def form_valid(self, form):
         obj = form.instance
         if can_edit_prop(obj, self.request.user):
-            return super(CanCreateMixin, self).form_valid(form)
+            return super().form_valid(form)
         raise PermissionDenied
 
 
@@ -258,7 +237,7 @@ class FormerSubscriberMixin(View):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.was_subscribed:
             raise PermissionDenied
-        return super(FormerSubscriberMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class UserIsLoggedMixin(View):
@@ -271,7 +250,7 @@ class UserIsLoggedMixin(View):
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_anonymous:
             raise PermissionDenied
-        return super(UserIsLoggedMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class TabedViewMixin(View):
@@ -280,25 +259,22 @@ class TabedViewMixin(View):
     """
 
     def get_tabs_title(self):
-        try:
+        if hasattr(self, "tabs_title"):
             return self.tabs_title
-        except:
-            raise ImproperlyConfigured("tabs_title is required")
+        raise ImproperlyConfigured("tabs_title is required")
 
     def get_current_tab(self):
-        try:
+        if hasattr(self, "current_tab"):
             return self.current_tab
-        except:
-            raise ImproperlyConfigured("current_tab is required")
+        raise ImproperlyConfigured("current_tab is required")
 
     def get_list_of_tabs(self):
-        try:
+        if hasattr(self, "list_of_tabs"):
             return self.list_of_tabs
-        except:
-            raise ImproperlyConfigured("list_of_tabs is required")
+        raise ImproperlyConfigured("list_of_tabs is required")
 
     def get_context_data(self, **kwargs):
-        kwargs = super(TabedViewMixin, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["tabs_title"] = self.get_tabs_title()
         kwargs["current_tab"] = self.get_current_tab()
         kwargs["list_of_tabs"] = self.get_list_of_tabs()
@@ -311,22 +287,20 @@ class QuickNotifMixin:
     def dispatch(self, request, *arg, **kwargs):
         # In some cases, the class can stay instanciated, so we need to reset the list
         self.quick_notif_list = []
-        return super(QuickNotifMixin, self).dispatch(request, *arg, **kwargs)
+        return super().dispatch(request, *arg, **kwargs)
 
     def get_success_url(self):
-        ret = super(QuickNotifMixin, self).get_success_url()
-        try:
+        ret = super().get_success_url()
+        if hasattr(self, "quick_notif_url_arg"):
             if "?" in ret:
                 ret += "&" + self.quick_notif_url_arg
             else:
                 ret += "?" + self.quick_notif_url_arg
-        except:
-            pass
         return ret
 
     def get_context_data(self, **kwargs):
         """Add quick notifications to context"""
-        kwargs = super(QuickNotifMixin, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["quick_notifs"] = []
         for n in self.quick_notif_list:
             kwargs["quick_notifs"].append(settings.SITH_QUICK_NOTIF[n])
@@ -353,7 +327,7 @@ class DetailFormView(SingleObjectMixin, FormView):
         """
         Optimisation on group retrieval
         """
-        return super(DetailFormView, self).get_object()
+        return super().get_object()
 
 
 from .files import *
