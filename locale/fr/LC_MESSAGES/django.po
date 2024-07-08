@@ -2454,7 +2454,7 @@ msgstr "Les clubs de L'AE"
 msgid "Others UTBM's Associations"
 msgstr "Les autres associations de l'UTBM"
 
-#: core/templates/core/base.jinja:212 core/templates/core/user_tools.jinja:180
+#: core/templates/core/base.jinja:187 core/templates/core/user_tools.jinja:118
 msgid "Elections"
 msgstr "Élections"
 
