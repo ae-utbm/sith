@@ -390,6 +390,8 @@ class ForumMessage(models.Model):
         )
 
     def is_deleted(self):
+        if self.id is None:
+            return False
         meta = self.metas.exclude(action="EDIT").order_by("-date").first()
         if meta:
             return meta.action == "DELETE"
