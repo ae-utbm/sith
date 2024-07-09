@@ -13,4 +13,27 @@
 #
 #
 
-# Create your tests here.
+import pytest
+from django.test import Client
+from django.urls import reverse
+
+from core.models import User
+from forum.models import Forum, ForumTopic
+
+
+@pytest.mark.django_db
+class TestTopicCreation:
+    def test_topic_creation(self, client: Client):
+        user: User = User.objects.get(username="root")
+        forum = Forum.objects.get(name="AE")
+        client.force_login(user)
+        payload = {
+            "title": "Hello IT.",
+            "message": "Have you tried turning it off and on again ?",
+        }
+        assert not ForumTopic.objects.filter(_title=payload["title"]).first()
+        response = client.post(reverse("forum:new_topic", args=str(forum.id)), payload)
+        assert response.status_code == 302
+        topic = ForumTopic.objects.filter(_title=payload["title"]).first()
+        assert topic
+        assert topic.last_message.message == payload["message"]
