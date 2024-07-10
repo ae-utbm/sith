@@ -33,6 +33,7 @@
         {% endif %}
 
         {% csrf_token %}
+        {% render_honeypot_field %}
 
         <div>
             <label for="{{ form.username.name }}">{{ form.username.label }}</label>

@@ -23,6 +23,7 @@
     {% else %}
         <form action="{{ url('core:register') }}" method="post">
             {% csrf_token %}
+            {% render_honeypot_field %}
             {{ form }}
             <input type="submit" value="{% trans %}Register{% endtrans %}" />
         </form>

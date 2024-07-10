@@ -36,6 +36,7 @@ class TestUserRegistration:
     @pytest.fixture()
     def valid_payload(self):
         return {
+            settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE,
             "first_name": "this user does not exist (yet)",
             "last_name": "this user does not exist (yet)",
             "email": "i-dont-exist-yet@git.an",
@@ -68,6 +69,13 @@ class TestUserRegistration:
         assert response.status_code == 200
         assert "TEST_REGISTER_USER_FORM_FAIL" in str(response.content)
 
+    def test_register_honeypot_fail(self, client, valid_payload):
+        payload = valid_payload | {
+            settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE + "random"
+        }
+        response = client.post(reverse("core:register"), payload)
+        assert response.status_code == 400
+
     def test_register_user_form_fail_already_exists(self, client, valid_payload):
         """Should not register a user correctly if it already exists."""
         # create the user, then try to create it again
@@ -90,7 +98,11 @@ class TestUserLogin:
 
         response = client.post(
             reverse("core:login"),
-            {"username": user.username, "password": "wrong-password"},
+            {
+                "username": user.username,
+                "password": "wrong-password",
+                settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE,
+            },
         )
         assert response.status_code == 200
         assert (
@@ -98,12 +110,28 @@ class TestUserLogin:
             "et votre mot de passe ne correspondent pas. Merci de réessayer.</p>"
         ) in str(response.content.decode())
 
+    def test_login_honeypot(self, client, user):
+        response = client.post(
+            reverse("core:login"),
+            {
+                "username": user.username,
+                "password": "wrong-password",
+                settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE + "incorrect",
+            },
+        )
+        assert response.status_code == 400
+
     def test_login_success(self, client, user):
         """
         Should login a user correctly
         """
         response = client.post(
-            reverse("core:login"), {"username": user.username, "password": "plop"}
+            reverse("core:login"),
+            {
+                "username": user.username,
+                "password": "plop",
+                settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE,
+            },
         )
         assertRedirects(response, reverse("core:index"))
 

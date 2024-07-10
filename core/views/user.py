@@ -36,6 +36,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.generic import (
     CreateView,
@@ -46,6 +47,7 @@ from django.views.generic import (
 )
 from django.views.generic.dates import MonthMixin, YearMixin
 from django.views.generic.edit import UpdateView
+from honeypot.decorators import check_honeypot
 
 from api.views.sas import all_pictures_of_user
 from core.models import Gift, Preferences, SithFile, User
@@ -69,6 +71,7 @@ from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
 
+@method_decorator(check_honeypot, name="post")
 class SithLoginView(views.LoginView):
     """
     The login View
@@ -124,9 +127,10 @@ def password_root_change(request, user_id):
     )
 
 
+@method_decorator(check_honeypot, name="post")
 class SithPasswordResetView(views.PasswordResetView):
     """
-    Allows someone to enter an email adresse for resetting password
+    Allows someone to enter an email address for resetting password
     """
 
     template_name = "core/password_reset.jinja"
@@ -153,12 +157,13 @@ class SithPasswordResetConfirmView(views.PasswordResetConfirmView):
 
 class SithPasswordResetCompleteView(views.PasswordResetCompleteView):
     """
-    Confirm the password has sucessfully been reset
+    Confirm the password has successfully been reset
     """
 
     template_name = "core/password_reset_complete.jinja"
 
 
+@check_honeypot
 def register(request):
     context = {}
     if request.method == "POST":

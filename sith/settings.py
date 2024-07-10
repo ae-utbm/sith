@@ -1,5 +1,5 @@
 #
-# Copyright 2016,2017
+# Copyright 2016,2017,2024
 # - Skia <skia@libskia.so>
 # - Sli <antoine@bartuccio.fr>
 #
@@ -17,7 +17,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -54,6 +54,10 @@ os.environ["HTTPS"] = "off"
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2"
 
+# Those values are to be changed in production to be more effective
+HONEYPOT_FIELD_NAME = "body2"
+HONEYPOT_VALUE = "content"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 TESTING = "pytest" in sys.modules
@@ -75,6 +79,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "honeypot",
     "django_jinja",
     "rest_framework",
     "ajax_select",
@@ -143,6 +148,7 @@ TEMPLATES = [
                 "django_jinja.builtins.extensions.UrlsExtension",
                 "django_jinja.builtins.extensions.StaticFilesExtension",
                 "django_jinja.builtins.extensions.DjangoFiltersExtension",
+                "core.templatetags.extensions.HoneypotExtension",
             ],
             "filters": {
                 "markdown": "core.templatetags.renderer.markdown",
