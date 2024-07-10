@@ -16,9 +16,10 @@
 import pytest
 from django.test import Client
 from django.urls import reverse
+from pytest_django.asserts import assertRedirects
 
 from core.models import User
-from forum.models import Forum, ForumTopic
+from forum.models import Forum, ForumMessage, ForumTopic
 
 
 @pytest.mark.django_db
@@ -33,7 +34,13 @@ class TestTopicCreation:
         }
         assert not ForumTopic.objects.filter(_title=payload["title"]).first()
         response = client.post(reverse("forum:new_topic", args=str(forum.id)), payload)
-        assert response.status_code == 302
+        assertRedirects(
+            response,
+            expected_url=reverse(
+                "forum:view_message", args=str(ForumMessage.objects.all().count())
+            ),  # Get the last created message id
+            target_status_code=302,
+        )
         topic = ForumTopic.objects.filter(_title=payload["title"]).first()
         assert topic
         assert topic.last_message.message == payload["message"]
