@@ -24,7 +24,7 @@ from forum.models import Forum, ForumMessage, ForumTopic
 
 @pytest.mark.django_db
 class TestTopicCreation:
-    def test_topic_creation(self, client: Client):
+    def test_topic_creation_success(self, client: Client):
         user: User = User.objects.get(username="root")
         forum = Forum.objects.get(name="AE")
         client.force_login(user)
@@ -32,15 +32,29 @@ class TestTopicCreation:
             "title": "Hello IT.",
             "message": "Have you tried turning it off and on again ?",
         }
-        assert not ForumTopic.objects.filter(_title=payload["title"]).first()
+        assert not ForumTopic.objects.filter(_title=payload["title"]).exists()
         response = client.post(reverse("forum:new_topic", args=str(forum.id)), payload)
         assertRedirects(
             response,
             expected_url=reverse(
-                "forum:view_message", args=str(ForumMessage.objects.all().count())
+                "forum:view_message",
+                args=str(ForumMessage.objects.order_by("date").last().id),
             ),  # Get the last created message id
             target_status_code=302,
         )
         topic = ForumTopic.objects.filter(_title=payload["title"]).first()
         assert topic
         assert topic.last_message.message == payload["message"]
+
+    def test_topic_creation_failure(self, client: Client):
+        user: User = User.objects.get(username="krophil")
+        forum = Forum.objects.get(name="AE")
+        client.force_login(user)
+        payload = {
+            "title": "You shall",
+            "message": "Not pass !",
+        }
+        assert not ForumTopic.objects.filter(_title=payload["title"]).exists()
+        response = client.post(reverse("forum:new_topic", args=str(forum.id)), payload)
+        assert response.status_code == 403
+        assert not ForumTopic.objects.filter(_title=payload["title"]).exists()
