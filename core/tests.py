@@ -80,13 +80,15 @@ class TestUserRegistration:
         assert response.status_code == 200
         error_html = f'<ul class="errorlist"><li>{expected_error}</li></ul>'
         assertInHTML(error_html, str(response.content.decode()))
+        assert not User.objects.filter(email=payload["email"]).exists()
 
-    def test_register_honeypot_fail(self, client, valid_payload):
+    def test_register_honeypot_fail(self, client: Client, valid_payload):
         payload = valid_payload | {
             settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE + "random"
         }
         response = client.post(reverse("core:register"), payload)
-        assert response.status_code == 400
+        assert response.status_code == 200
+        assert not User.objects.filter(email=payload["email"]).exists()
 
     def test_register_user_form_fail_already_exists(
         self, client: Client, valid_payload
@@ -152,7 +154,8 @@ class TestUserLogin:
                 settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE + "incorrect",
             },
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
+        assert response.wsgi_request.user.is_anonymous
 
     def test_login_success(self, client, user):
         """
@@ -167,6 +170,7 @@ class TestUserLogin:
             },
         )
         assertRedirects(response, reverse("core:index"))
+        assert response.wsgi_request.user == user
 
 
 @pytest.mark.parametrize(

@@ -41,6 +41,7 @@ import os
 import sys
 
 import sentry_sdk
+from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -57,6 +58,12 @@ SECRET_KEY = "(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2"
 # Those values are to be changed in production to be more effective
 HONEYPOT_FIELD_NAME = "body2"
 HONEYPOT_VALUE = "content"
+
+# Make honeypot errors less suspicious
+# Since the app is not loaded yet, we wrap the import_string function in a lambda call to lazy load it
+HONEYPOT_RESPONDER = lambda request, context: import_string(
+    "core.middleware.custom_honeypot_error"
+)(request, context)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
