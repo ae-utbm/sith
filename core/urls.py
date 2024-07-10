@@ -75,7 +75,7 @@ urlpatterns = [
         SithPasswordResetCompleteView.as_view(),
         name="password_reset_complete",
     ),
-    path("register/", register, name="register"),
+    path("register/", UserCreationView.as_view(), name="register"),
     # Group handling
     path("group/", GroupListView.as_view(), name="group_list"),
     path("group/new/", GroupCreateView.as_view(), name="group_new"),
