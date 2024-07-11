@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import django.contrib.auth.models
@@ -574,7 +573,7 @@ class Migration(migrations.Migration):
             managers=[("objects", core.models.RealGroupManager())],
         ),
         migrations.AlterUniqueTogether(
-            name="page", unique_together=set([("name", "parent")])
+            name="page", unique_together={("name", "parent")}
         ),
         migrations.AddField(
             model_name="user",

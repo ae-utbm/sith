@@ -18,7 +18,15 @@ from counter.models import (
 class BillingInfoForm(forms.ModelForm):
     class Meta:
         model = BillingInfo
-        exclude = ["customer"]
+        fields = [
+            "first_name",
+            "last_name",
+            "address_1",
+            "address_2",
+            "zip_code",
+            "city",
+            "country",
+        ]
 
 
 class StudentCardForm(forms.ModelForm):
@@ -32,7 +40,7 @@ class StudentCardForm(forms.ModelForm):
         fields = ["uid"]
 
     def clean(self):
-        cleaned_data = super(StudentCardForm, self).clean()
+        cleaned_data = super().clean()
         uid = cleaned_data.get("uid", None)
         if not uid or not StudentCard.is_valid(uid):
             raise forms.ValidationError(_("This UID is invalid"), code="invalid")
@@ -57,10 +65,10 @@ class GetUserForm(forms.Form):
 
     def as_p(self):
         self.fields["code"].widget.attrs["autofocus"] = True
-        return super(GetUserForm, self).as_p()
+        return super().as_p()
 
     def clean(self):
-        cleaned_data = super(GetUserForm, self).clean()
+        cleaned_data = super().clean()
         cus = None
         if cleaned_data["code"] != "":
             if len(cleaned_data["code"]) == StudentCard.UID_SIZE:
@@ -141,14 +149,14 @@ class ProductEditForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(ProductEditForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.instance.id:
             self.fields["counters"].initial = [
                 str(c.id) for c in self.instance.counters.all()
             ]
 
     def save(self, *args, **kwargs):
-        ret = super(ProductEditForm, self).save(*args, **kwargs)
+        ret = super().save(*args, **kwargs)
         if self.fields["counters"].initial:
             for cid in self.fields["counters"].initial:
                 c = Counter.objects.filter(id=int(cid)).first()

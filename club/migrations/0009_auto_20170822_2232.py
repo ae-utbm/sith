@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import re
@@ -110,6 +109,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="mailingsubscription",
-            unique_together=set([("user", "email", "mailing")]),
+            unique_together={("user", "email", "mailing")},
         ),
     ]

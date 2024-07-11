@@ -15,17 +15,11 @@
 {% block content %}
     <h1 class="title">{% trans %}Register{% endtrans %}</h1>
 
-    {% if user_registered %}
-        {% trans user_name=user_registered.get_display_name() %}Welcome {{ user_name }}!{% endtrans %}<br>
-        {% trans %}You successfully registered and you will soon receive a confirmation mail.{% endtrans %}<br>
-        {% trans username=user_registered.username %}Your username is {{ username }}.{% endtrans %}<br>
-    
-    {% else %}
-        <form action="{{ url('core:register') }}" method="post">
-            {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="{% trans %}Register{% endtrans %}" />
-        </form>
-    {% endif %}
+    <form action="{{ url('core:register') }}" method="post">
+        {% csrf_token %}
+        {% render_honeypot_field %}
+        {{ form }}
+        <input type="submit" value="{% trans %}Register{% endtrans %}" />
+    </form>
 {% endblock %}
  

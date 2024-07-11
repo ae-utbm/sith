@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import django.db.models.deletion
@@ -177,6 +176,6 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="token", unique_together=set([("name", "launderette", "type")])
+            name="token", unique_together={("name", "launderette", "type")}
         ),
     ]

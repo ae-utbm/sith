@@ -1,0 +1,75 @@
+.markdown {
+  --bg-lightgrey: rgb(240, 241, 245);
+  --border-lightgrey: rgb(215, 216, 220);
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    padding-top: 20px;
+  }
+
+  ul,
+  ol,
+  p {
+    line-height: 22px;
+  }
+
+  code {
+    overflow: auto;
+    max-width: 100%;
+    font-family: Consolas;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid var(--border-lightgrey);
+    background-color: var(--bg-lightgrey);
+    padding: 1px 2px;
+  }
+
+  pre code {
+    // code that is not inlined
+    margin: 15px;
+    padding: 10px;
+    display: block;
+    border-radius: 5px;
+    font-size: 1em;
+
+    @media screen and (max-width: 500px) {
+      margin: 10px 0;
+    }
+  }
+
+  blockquote {
+    background-color: var(--bg-lightgrey);
+    border: unset;
+    border-left: 5px solid #ccc;
+    border-radius: 4px;
+    margin: 15px;
+    padding: 10px 15px;
+    display: block;
+    width: fit-content;
+
+    p:first-of-type {
+      margin-top: 0;
+    }
+
+    @media screen and (max-width: 500px) {
+      margin: 10px 0;
+      padding: 8px 10px;
+    }
+  }
+
+  table {
+    width: auto;
+    min-width: 30%;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+  .footnotes {
+    font-size: 85%;
+  }
+}

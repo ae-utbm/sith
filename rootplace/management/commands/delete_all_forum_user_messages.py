@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding:utf-8 -*
 #
 # Copyright 2017
 # - Sli <antoine@bartuccio.fr>
@@ -55,4 +54,4 @@ class Command(BaseCommand):
             print("Operation aborted")
             exit(1)
 
-        delete_all_forum_user_messages(user, User.objects.get(id=0), True)
+        delete_all_forum_user_messages(user, User.objects.get(id=0), verbose=True)

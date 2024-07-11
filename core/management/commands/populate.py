@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017,2023
 # - Skia <skia@hya.sk>

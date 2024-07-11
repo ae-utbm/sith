@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -171,7 +170,7 @@ class FileListView(ListView):
         return SithFile.objects.filter(parent=None)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(FileListView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["popup"] = ""
         if self.kwargs.get("popup") is not None:
             kwargs["popup"] = "popup"
@@ -189,7 +188,7 @@ class FileEditView(CanEditMixin, UpdateView):
         if not self.object.can_be_managed_by(request.user):
             raise PermissionDenied
 
-        return super(FileEditView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_form_class(self):
         fields = ["name", "is_moderated"]
@@ -207,7 +206,7 @@ class FileEditView(CanEditMixin, UpdateView):
         )
 
     def get_context_data(self, **kwargs):
-        kwargs = super(FileEditView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["popup"] = ""
         if self.kwargs.get("popup") is not None:
             kwargs["popup"] = "popup"
@@ -241,15 +240,15 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
         if not self.object.can_be_managed_by(request.user):
             raise PermissionDenied
 
-        return super(FileEditPropView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
-        form = super(FileEditPropView, self).get_form(form_class)
+        form = super().get_form(form_class)
         form.fields["parent"].queryset = SithFile.objects.filter(is_folder=True)
         return form
 
     def form_valid(self, form):
-        ret = super(FileEditPropView, self).form_valid(form)
+        ret = super().form_valid(form)
         if form.cleaned_data["recursive"]:
             self.object.apply_rights_recursively()
         return ret
@@ -261,7 +260,7 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
         )
 
     def get_context_data(self, **kwargs):
-        kwargs = super(FileEditPropView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["popup"] = ""
         if self.kwargs.get("popup") is not None:
             kwargs["popup"] = "popup"
@@ -277,7 +276,8 @@ class FileView(CanViewMixin, DetailView, FormMixin):
     context_object_name = "file"
     form_class = AddFilesForm
 
-    def handle_clipboard(request, object):
+    @staticmethod
+    def handle_clipboard(request, obj):
         """
         This method handles the clipboard in the view.
         This method can fail, since it does not catch the exceptions coming from
@@ -286,8 +286,8 @@ class FileView(CanViewMixin, DetailView, FormMixin):
 
             FileView.handle_clipboard(request, self.object)
 
-        `request` is usually the self.request object in your view
-        `object` is the SithFile object you want to put in the clipboard, or
+        `request` is usually the self.request obj in your view
+        `obj` is the SithFile object you want to put in the clipboard, or
                  where you want to paste the clipboard
         """
         if "delete" in request.POST.keys():
@@ -301,7 +301,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
             for f_id in request.POST.getlist("file_list"):
                 f_id = int(f_id)
                 if (
-                    f_id in [c.id for c in object.children.all()]
+                    f_id in [c.id for c in obj.children.all()]
                     and f_id not in request.session["clipboard"]
                 ):
                     request.session["clipboard"].append(f_id)
@@ -309,7 +309,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
             for f_id in request.session["clipboard"]:
                 sf = SithFile.objects.filter(id=f_id).first()
                 if sf:
-                    sf.move_to(object)
+                    sf.move_to(obj)
             request.session["clipboard"] = []
         request.session.modified = True
 
@@ -320,7 +320,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
 
         if "clipboard" not in request.session.keys():
             request.session["clipboard"] = []
-        return super(FileView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -328,7 +328,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
             request.session["clipboard"] = []
         if request.user.can_edit(self.object):
             # XXX this call can fail!
-            FileView.handle_clipboard(request, self.object)
+            self.handle_clipboard(request, self.object)
         self.form = self.get_form()  # The form handle only the file upload
         files = request.FILES.getlist("file_field")
         if (
@@ -338,7 +338,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         ):
             self.form.process(parent=self.object, owner=request.user, files=files)
             if self.form.is_valid():
-                return super(FileView, self).form_valid(self.form)
+                return super().form_valid(self.form)
         return self.form_invalid(self.form)
 
     def get_success_url(self):
@@ -348,7 +348,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         )
 
     def get_context_data(self, **kwargs):
-        kwargs = super(FileView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["popup"] = ""
         kwargs["form"] = self.form
         if self.kwargs.get("popup") is not None:
@@ -370,7 +370,7 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
         if not self.object.can_be_managed_by(request.user):
             raise PermissionDenied
 
-        return super(FileDeleteView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
         self.object.file.delete()  # Doing it here or overloading delete() is the same, so let's do it here
@@ -389,7 +389,7 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
         )
 
     def get_context_data(self, **kwargs):
-        kwargs = super(FileDeleteView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["popup"] = ""
         if self.kwargs.get("popup") is not None:
             kwargs["popup"] = "popup"
@@ -400,7 +400,7 @@ class FileModerationView(TemplateView):
     template_name = "core/file_moderation.jinja"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(FileModerationView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["files"] = SithFile.objects.filter(is_moderated=False)[:100]
         return kwargs
 

@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -29,7 +28,7 @@ from core.views.forms import MarkdownInput, PageForm, PagePropForm
 
 class CanEditPagePropMixin(CanEditPropMixin):
     def dispatch(self, request, *args, **kwargs):
-        res = super(CanEditPagePropMixin, self).dispatch(request, *args, **kwargs)
+        res = super().dispatch(request, *args, **kwargs)
         if self.object.is_club_page:
             raise Http404
         return res
@@ -45,7 +44,7 @@ class PageView(CanViewMixin, DetailView):
     template_name = "core/page_detail.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        res = super(PageView, self).dispatch(request, *args, **kwargs)
+        res = super().dispatch(request, *args, **kwargs)
         if self.object and self.object.need_club_redirection:
             return redirect("club:club_view", club_id=self.object.club.id)
         return res
@@ -55,7 +54,7 @@ class PageView(CanViewMixin, DetailView):
         return self.page
 
     def get_context_data(self, **kwargs):
-        context = super(PageView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         if "page" not in context.keys():
             context["new_page"] = self.kwargs["page_name"]
         return context
@@ -66,7 +65,7 @@ class PageHistView(CanViewMixin, DetailView):
     template_name = "core/page_hist.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        res = super(PageHistView, self).dispatch(request, *args, **kwargs)
+        res = super().dispatch(request, *args, **kwargs)
         if self.object.need_club_redirection:
             return redirect("club:club_hist", club_id=self.object.club.id)
         return res
@@ -81,7 +80,7 @@ class PageRevView(CanViewMixin, DetailView):
     template_name = "core/page_detail.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        res = super(PageRevView, self).dispatch(request, *args, **kwargs)
+        res = super().dispatch(request, *args, **kwargs)
         self.object = self.get_object()
 
         if self.object is None:
@@ -98,7 +97,7 @@ class PageRevView(CanViewMixin, DetailView):
         return self.page
 
     def get_context_data(self, **kwargs):
-        context = super(PageRevView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         if self.page is not None:
             context["page"] = self.page
             try:
@@ -129,13 +128,13 @@ class PageCreateView(CanCreateMixin, CreateView):
         return init
 
     def get_context_data(self, **kwargs):
-        context = super(PageCreateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["new_page"] = True
         return context
 
     def form_valid(self, form):
         form.instance.set_lock(self.request.user)
-        ret = super(PageCreateView, self).form_valid(form)
+        ret = super().form_valid(form)
         return ret
 
 
@@ -147,7 +146,7 @@ class PagePropView(CanEditPagePropMixin, UpdateView):
     slug_url_kwarg = "page_name"
 
     def get_object(self):
-        o = super(PagePropView, self).get_object()
+        o = super().get_object()
         # Create the page if it does not exists
         # if p == None:
         #    parent_name = '/'.join(page_name.split('/')[:-1])
@@ -191,7 +190,7 @@ class PageEditViewBase(CanEditMixin, UpdateView):
         return None
 
     def get_context_data(self, **kwargs):
-        context = super(PageEditViewBase, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         if self.page is not None:
             context["page"] = self.page
         else:
@@ -205,12 +204,12 @@ class PageEditViewBase(CanEditMixin, UpdateView):
         new_rev.author = self.request.user
         new_rev.page = self.page
         form.instance = new_rev
-        return super(PageEditViewBase, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class PageEditView(PageEditViewBase):
     def dispatch(self, request, *args, **kwargs):
-        res = super(PageEditView, self).dispatch(request, *args, **kwargs)
+        res = super().dispatch(request, *args, **kwargs)
         if self.object and self.object.page.need_club_redirection:
             return redirect("club:club_edit_page", club_id=self.object.page.club.id)
         return res

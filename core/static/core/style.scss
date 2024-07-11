@@ -357,7 +357,7 @@ a:not(.button) {
     @media (max-width: 800px) {
       flex-direction: column;
     }
-    
+
     .news_column {
       display: inline-block;
       margin: 0;
@@ -947,22 +947,6 @@ dt {
   margin-top: 25px;
 }
 
-code {
-  font-family: monospace;
-  overflow: auto;
-  max-width: 100%;
-}
-
-blockquote {
-  margin: 5px;
-  padding: 2px;
-  border: solid 1px $black-color;
-}
-
-blockquote h5:first-child {
-  font-size: 100%;
-}
-
 .edit-bar {
   display: block;
   margin: 4px;
@@ -979,17 +963,18 @@ blockquote h5:first-child {
 }
 
 table {
-  width: 100%;
+  width: 90%;
   margin: 15px auto;
   border-collapse: collapse;
   border-spacing: 0;
   border-radius: 5px;
   -moz-border-radius: 5px;
   overflow: hidden;
-  box-shadow: rgba(60, 64, 67, .3) 0 1px 3px 0, rgba(60, 64, 67, .15) 0 4px 8px 3px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
+    rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
 }
 
-@media screen and (max-width: 500px){
+@media screen and (max-width: 500px) {
   table {
     width: 100%;
   }
@@ -999,7 +984,8 @@ th {
   padding: 4px;
 }
 
-td, th {
+td,
+th {
   vertical-align: middle;
   text-align: center;
   padding: 5px 10px;
@@ -1009,7 +995,6 @@ td, th {
 }
 
 td {
-  padding: 4px;
   margin: 5px;
   border-collapse: collapse;
   vertical-align: top;
@@ -1020,7 +1005,8 @@ td {
   }
 }
 
-th, thead td {
+th,
+thead td {
   text-align: center;
   border-top: none;
 }
@@ -1421,7 +1407,7 @@ footer {
 
   > .version {
     margin-top: 3px;
-    color: rgba(0, 0, 0, .3)
+    color: rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -1482,31 +1468,6 @@ label {
   }
   button {
     vertical-align: middle;
-  }
-}
-
-/*-------------------------------MARKDOWN------------------------------*/
-
-.markdown {
-  margin: 0;
-  padding: 0;
-  code {
-    font-family: monospace;
-    color: $white-color;
-    background: $black-color;
-    display: inline-block;
-    padding: 4px;
-    line-height: 120%;
-    vertical-align: middle;
-  }
-  a {
-    color: $primary-dark-color;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-  .footnotes {
-    font-size: 85%;
   }
 }
 

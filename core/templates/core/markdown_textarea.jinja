@@ -74,7 +74,7 @@
 						name: "superscript",
 						action: function customFunction(editor){
 							let cm = editor.codemirror;
-							cm.replaceSelection('<sup>' + cm.getSelection() + '</sup>');
+							cm.replaceSelection('^' + cm.getSelection() + '^');
 						},
 						className: "fa fa-superscript",
 						title: "{{ translations.superscript }}"
@@ -83,7 +83,7 @@
 						name: "subscript",
 						action: function customFunction(editor){
 							let cm = editor.codemirror;
-							cm.replaceSelection('<sub>' + cm.getSelection() + '</sub>');
+							cm.replaceSelection('~' + cm.getSelection() + '~');
 						},
 						className: "fa fa-subscript",
 						title: "{{ translations.subscript }}"

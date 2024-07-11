@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2017,2020
 # - Skia <skia@libskia.so>
@@ -28,6 +27,7 @@ from datetime import date
 from ajax_select.fields import AutoCompleteSelectField
 from django import forms
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponseRedirect
@@ -102,7 +102,7 @@ class UserIsInATrombiMixin(View):
         if not hasattr(self.request.user, "trombi_user"):
             raise Http404()
 
-        return super(UserIsInATrombiMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class TrombiForm(forms.ModelForm):
@@ -148,7 +148,7 @@ class TrombiEditView(CanEditPropMixin, TrombiTabsMixin, UpdateView):
     current_tab = "admin_tools"
 
     def get_success_url(self):
-        return super(TrombiEditView, self).get_success_url() + "?qn_success"
+        return super().get_success_url() + "?qn_success"
 
 
 class AddUserForm(forms.Form):
@@ -172,10 +172,10 @@ class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailVie
                 self.quick_notif_list.append("qn_success")
             except:  # We don't care about duplicate keys
                 self.quick_notif_list.append("qn_fail")
-        return super(TrombiDetailView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(TrombiDetailView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["form"] = AddUserForm()
         return kwargs
 
@@ -209,7 +209,7 @@ class TrombiModerateCommentsView(
     current_tab = "admin_tools"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(TrombiModerateCommentsView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["comments"] = TrombiComment.objects.filter(
             is_moderated=False, author__trombi__id=self.object.id
         ).exclude(target__user__id=self.request.user.id)
@@ -230,7 +230,7 @@ class TrombiModerateCommentView(DetailView):
         self.object = self.get_object()
         if not request.user.is_owner(self.object.author.trombi):
             raise Http404()
-        return super(TrombiModerateCommentView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         if "action" in request.POST:
@@ -245,9 +245,7 @@ class TrombiModerateCommentView(DetailView):
                     + "?qn_success"
                 )
             elif request.POST["action"] == "reject":
-                return super(TrombiModerateCommentView, self).get(
-                    request, *args, **kwargs
-                )
+                return super().get(request, *args, **kwargs)
             elif request.POST["action"] == "delete" and "reason" in request.POST.keys():
                 self.object.author.user.email_user(
                     subject="[%s] %s" % (settings.SITH_NAME, _("Rejected comment")),
@@ -274,7 +272,7 @@ class TrombiModerateCommentView(DetailView):
         raise Http404
 
     def get_context_data(self, **kwargs):
-        kwargs = super(TrombiModerateCommentView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["form"] = TrombiModerateForm()
         return kwargs
 
@@ -325,10 +323,10 @@ class UserTrombiToolsView(
                 )
             trombi_user.save()
             self.quick_notif_list += ["qn_success"]
-        return super(UserTrombiToolsView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(UserTrombiToolsView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["user"] = self.request.user
         if not (
             hasattr(self.request.user, "trombi_user")
@@ -404,10 +402,7 @@ class UserTrombiDeleteMembershipView(TrombiTabsMixin, CanEditMixin, DeleteView):
     current_tab = "profile"
 
     def get_success_url(self):
-        return (
-            super(UserTrombiDeleteMembershipView, self).get_success_url()
-            + "?qn_success"
-        )
+        return super().get_success_url() + "?qn_success"
 
 
 # Used by admins when someone does not have every club in his list
@@ -423,9 +418,7 @@ class UserTrombiAddMembershipView(TrombiTabsMixin, CreateView):
         if not self.trombi_user.trombi.is_owned_by(request.user):
             raise PermissionDenied()
 
-        return super(UserTrombiAddMembershipView, self).dispatch(
-            request, *arg, **kwargs
-        )
+        return super().dispatch(request, *arg, **kwargs)
 
     def form_valid(self, form):
         membership = form.save(commit=False)
@@ -447,9 +440,7 @@ class UserTrombiEditMembershipView(CanEditMixin, TrombiTabsMixin, UpdateView):
     current_tab = "profile"
 
     def get_success_url(self):
-        return (
-            super(UserTrombiEditMembershipView, self).get_success_url() + "?qn_success"
-        )
+        return super().get_success_url() + "?qn_success"
 
 
 class UserTrombiProfileView(TrombiTabsMixin, DetailView):
@@ -471,10 +462,10 @@ class UserTrombiProfileView(TrombiTabsMixin, DetailView):
             or not self.object.trombi.show_profiles
         ):
             raise Http404()
-        return super(UserTrombiProfileView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
 
-class TrombiCommentFormView(UserIsLoggedMixin):
+class TrombiCommentFormView(LoginRequiredMixin, View):
     """
     Create/edit a trombi comment
     """
@@ -517,7 +508,7 @@ class TrombiCommentFormView(UserIsLoggedMixin):
         return reverse("trombi:user_tools") + "?qn_success"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(TrombiCommentFormView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if "user_id" in self.kwargs.keys():
             kwargs["target"] = get_object_or_404(TrombiUser, id=self.kwargs["user_id"])
         else:
@@ -537,7 +528,7 @@ class TrombiCommentCreateView(TrombiCommentFormView, CreateView):
             old.content = form.instance.content
             old.save()
             return HttpResponseRedirect(self.get_success_url())
-        return super(TrombiCommentCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class TrombiCommentEditView(TrombiCommentFormView, CanViewMixin, UpdateView):
@@ -545,4 +536,4 @@ class TrombiCommentEditView(TrombiCommentFormView, CanViewMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.is_moderated = False
-        return super(TrombiCommentEditView, self).form_valid(form)
+        return super().form_valid(form)

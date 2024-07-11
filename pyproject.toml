@@ -20,10 +20,10 @@ homepage = "https://ae.utbm.fr/"
 license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
-python = "^3.10,<3.12" # Version is held back by mistune
+python = "^3.10"
 Django = "^4.2.13"
 Pillow = "^10.4.0"
-mistune = "^0.8.4"
+mistune = "^3.0.2"
 django-jinja = "^2.11"
 cryptography = "^42.0.8"
 pytz = "^2021.1"
@@ -46,12 +46,13 @@ django-countries = "^7.5.1"
 dict2xml = "^1.7.3"
 Sphinx = "^5" # Needed for building xapian
 tomli = "^2.0.1"
+django-honeypot = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.0.0"
 ipython = "^8.26.0"
 pre-commit = "^3.7.1"
-ruff = "^0.4.10" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
+ruff = "^0.5.1" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
 
 [tool.poetry.group.tests.dependencies]
 freezegun = "^1.2.2"  # used to test time-dependent code
@@ -69,8 +70,25 @@ optional = true
 [tool.xapian]
 version = "1.4.25"
 
+[tool.ruff]
+output-format = "concise" # makes ruff error logs easier to read
+
 [tool.ruff.lint]
-select = ["I", "F401"]
+select = [
+	"A",  # shadowing of Python builtins
+	"B",
+	"C4",  # use comprehensions when possible
+	"I",  # isort
+	"DJ",  # django-specific rules,
+	"F401",  # unused import
+	"FBT",  # boolean trap
+    "UP008",  # Use super() instead of super(__class__, self)
+    "UP009",  # utf-8 encoding declaration is unnecessary
+]
+
+ignore = [
+	"DJ001",  # null=True in CharField/TextField. this one would require a migration
+]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "sith.settings"

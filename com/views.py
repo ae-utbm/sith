@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -82,7 +81,7 @@ class PosterForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        super(PosterForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.user:
             if not self.user.is_com_admin:
                 self.fields["club"].queryset = Club.objects.filter(
@@ -145,7 +144,7 @@ class IsComAdminMixin(View):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_com_admin:
             raise PermissionDenied
-        return super(IsComAdminMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class ComEditView(ComTabsMixin, CanEditPropMixin, UpdateView):
@@ -199,7 +198,7 @@ class NewsForm(forms.ModelForm):
     automoderation = forms.BooleanField(label=_("Automoderation"), required=False)
 
     def clean(self):
-        self.cleaned_data = super(NewsForm, self).clean()
+        self.cleaned_data = super().clean()
         if self.cleaned_data["type"] != "NOTICE":
             if not self.cleaned_data["start_date"]:
                 self.add_error(
@@ -225,7 +224,7 @@ class NewsForm(forms.ModelForm):
         return self.cleaned_data
 
     def save(self):
-        ret = super(NewsForm, self).save()
+        ret = super().save()
         self.instance.dates.all().delete()
         if self.instance.type == "EVENT" or self.instance.type == "CALL":
             NewsDate(
@@ -252,24 +251,10 @@ class NewsEditView(CanEditMixin, UpdateView):
     pk_url_kwarg = "news_id"
 
     def get_initial(self):
-        init = {}
-        try:
-            init["start_date"] = (
-                self.object.dates.order_by("id")
-                .first()
-                .start_date.strftime("%Y-%m-%d %H:%M:%S")
-            )
-        except:
-            pass
-        try:
-            init["end_date"] = (
-                self.object.dates.order_by("id")
-                .first()
-                .end_date.strftime("%Y-%m-%d %H:%M:%S")
-            )
-        except:
-            pass
-        return init
+        news_date: NewsDate = self.object.dates.order_by("id").first()
+        if news_date is None:
+            return {"start_date": None, "end_date": None}
+        return {"start_date": news_date.start_date, "end_date": news_date.end_date}
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -302,7 +287,7 @@ class NewsEditView(CanEditMixin, UpdateView):
                         ),
                         type="NEWS_MODERATION",
                     ).save()
-        return super(NewsEditView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class NewsCreateView(CanCreateMixin, CreateView):
@@ -312,10 +297,9 @@ class NewsCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         init = {"author": self.request.user}
-        try:
-            init["club"] = Club.objects.filter(id=self.request.GET["club"]).first()
-        except:
-            pass
+        if "club" not in self.request.GET:
+            return init
+        init["club"] = Club.objects.filter(id=self.request.GET["club"]).first()
         return init
 
     def post(self, request, *args, **kwargs):
@@ -346,7 +330,7 @@ class NewsCreateView(CanCreateMixin, CreateView):
                         url=reverse("com:news_admin_list"),
                         type="NEWS_MODERATION",
                     ).save()
-        return super(NewsCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class NewsDeleteView(CanEditMixin, DeleteView):
@@ -385,7 +369,7 @@ class NewsListView(CanViewMixin, ListView):
     queryset = News.objects.filter(is_moderated=True)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(NewsListView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["NewsDate"] = NewsDate
         kwargs["timedelta"] = timedelta
         kwargs["birthdays"] = (
@@ -416,7 +400,7 @@ class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, Detai
 
     def dispatch(self, request, *args, **kwargs):
         self.bad_recipients = []
-        return super(WeekmailPreviewView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -437,14 +421,14 @@ class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, Detai
                     u.preferences.receive_weekmail = False
                     u.preferences.save()
                 self.quick_notif_list += ["qn_success"]
-        return super(WeekmailPreviewView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
         return self.model.objects.filter(sent=False).order_by("-id").first()
 
     def get_context_data(self, **kwargs):
         """Add rendered weekmail"""
-        kwargs = super(WeekmailPreviewView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["weekmail_rendered"] = self.object.render_html()
         kwargs["bad_recipients"] = self.bad_recipients
         return kwargs
@@ -520,11 +504,11 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
             art.rank = -1
             art.save()
             self.quick_notif_list += ["qn_success"]
-        return super(WeekmailEditView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Add orphan articles"""
-        kwargs = super(WeekmailEditView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["orphans"] = WeekmailArticle.objects.filter(weekmail=None)
         return kwargs
 
@@ -561,22 +545,16 @@ class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
     quick_notif_url_arg = "qn_weekmail_new_article"
 
     def get_initial(self):
-        init = {}
-        try:
-            init["club"] = Club.objects.filter(id=self.request.GET["club"]).first()
-        except:
-            pass
-        return init
+        if "club" not in self.request.GET:
+            return {}
+        return {"club": Club.objects.filter(id=self.request.GET.get("club")).first()}
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         self.object = form.instance
-        form.is_valid()  #  Valid a first time to populate club field
-        try:
-            m = form.instance.club.get_membership_for(request.user)
-            if m.role <= settings.SITH_MAXIMUM_FREE_ROLE:
-                raise
-        except:
+        form.is_valid()  # Valid a first time to populate club field
+        m = form.instance.club.get_membership_for(request.user)
+        if m is None or m.role <= settings.SITH_MAXIMUM_FREE_ROLE:
             form.add_error(
                 "club",
                 ValidationError(
@@ -592,7 +570,7 @@ class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super(WeekmailArticleCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class WeekmailArticleDeleteView(CanEditPropMixin, DeleteView):
@@ -612,10 +590,10 @@ class MailingListAdminView(ComTabsMixin, ListView):
     def dispatch(self, request, *args, **kwargs):
         if not (request.user.is_com_admin or request.user.is_root):
             raise PermissionDenied
-        return super(MailingListAdminView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(MailingListAdminView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["moderated"] = self.get_queryset().filter(is_moderated=True).all()
         kwargs["unmoderated"] = self.get_queryset().filter(is_moderated=False).all()
         kwargs["has_moderated"] = len(kwargs["moderated"]) > 0
@@ -647,7 +625,7 @@ class PosterListBaseView(ListView):
         self.club = None
         if club_id:
             self.club = get_object_or_404(Club, pk=club_id)
-        return super(PosterListBaseView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         if self.request.user.is_com_admin:
@@ -656,7 +634,7 @@ class PosterListBaseView(ListView):
             return Poster.objects.filter(club=self.club.id)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PosterListBaseView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if not self.request.user.is_com_admin:
             kwargs["club"] = self.club
         return kwargs
@@ -675,15 +653,15 @@ class PosterCreateBaseView(CreateView):
     def dispatch(self, request, *args, **kwargs):
         if "club_id" in kwargs:
             self.club = get_object_or_404(Club, pk=kwargs["club_id"])
-        return super(PosterCreateBaseView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(PosterCreateBaseView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({"user": self.request.user})
         return kwargs
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PosterCreateBaseView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if not self.request.user.is_com_admin:
             kwargs["club"] = self.club
         return kwargs
@@ -691,7 +669,7 @@ class PosterCreateBaseView(CreateView):
     def form_valid(self, form):
         if self.request.user.is_com_admin:
             form.instance.is_moderated = True
-        return super(PosterCreateBaseView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class PosterEditBaseView(UpdateView):
@@ -718,20 +696,20 @@ class PosterEditBaseView(UpdateView):
         if "club_id" in kwargs and kwargs["club_id"]:
             try:
                 self.club = Club.objects.get(pk=kwargs["club_id"])
-            except Club.DoesNotExist:
-                raise PermissionDenied
-        return super(PosterEditBaseView, self).dispatch(request, *args, **kwargs)
+            except Club.DoesNotExist as e:
+                raise PermissionDenied from e
+        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         return Poster.objects.all()
 
     def get_form_kwargs(self):
-        kwargs = super(PosterEditBaseView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({"user": self.request.user})
         return kwargs
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PosterEditBaseView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         if hasattr(self, "club"):
             kwargs["club"] = self.club
         return kwargs
@@ -739,7 +717,7 @@ class PosterEditBaseView(UpdateView):
     def form_valid(self, form):
         if self.request.user.is_com_admin:
             form.instance.is_moderated = False
-        return super(PosterEditBaseView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class PosterDeleteBaseView(DeleteView):
@@ -754,16 +732,16 @@ class PosterDeleteBaseView(DeleteView):
         if "club_id" in kwargs and kwargs["club_id"]:
             try:
                 self.club = Club.objects.get(pk=kwargs["club_id"])
-            except Club.DoesNotExist:
-                raise PermissionDenied
-        return super(PosterDeleteBaseView, self).dispatch(request, *args, **kwargs)
+            except Club.DoesNotExist as e:
+                raise PermissionDenied from e
+        return super().dispatch(request, *args, **kwargs)
 
 
 class PosterListView(IsComAdminMixin, ComTabsMixin, PosterListBaseView):
     """List communication posters"""
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PosterListView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["app"] = "com"
         return kwargs
 
@@ -774,7 +752,7 @@ class PosterCreateView(IsComAdminMixin, ComTabsMixin, PosterCreateBaseView):
     success_url = reverse_lazy("com:poster_list")
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PosterCreateView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["app"] = "com"
         return kwargs
 
@@ -785,7 +763,7 @@ class PosterEditView(IsComAdminMixin, ComTabsMixin, PosterEditBaseView):
     success_url = reverse_lazy("com:poster_list")
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PosterEditView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["app"] = "com"
         return kwargs
 
@@ -805,7 +783,7 @@ class PosterModerateListView(IsComAdminMixin, ComTabsMixin, ListView):
     queryset = Poster.objects.filter(is_moderated=False).all()
 
     def get_context_data(self, **kwargs):
-        kwargs = super(PosterModerateListView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["app"] = "com"
         return kwargs
 
@@ -844,7 +822,7 @@ class ScreenSlideshowView(DetailView):
     template_name = "com/screen_slideshow.jinja"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ScreenSlideshowView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["posters"] = self.object.active_posters()
         return kwargs
 

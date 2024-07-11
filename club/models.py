@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -41,6 +40,11 @@ from core.models import Group, MetaGroup, Notification, Page, RealGroup, SithFil
 # Create your models here.
 
 
+# This function prevents generating migration upon settings change
+def get_default_owner_group():
+    return settings.SITH_GROUP_ROOT_ID
+
+
 class Club(models.Model):
     """
     The Club class, made as a tree to allow nice tidy organization
@@ -75,10 +79,6 @@ class Club(models.Model):
     )
     address = models.CharField(_("address"), max_length=254)
 
-    # This function prevents generating migration upon settings change
-    def get_default_owner_group():
-        return settings.SITH_GROUP_ROOT_ID
-
     owner_group = models.ForeignKey(
         Group,
         related_name="owned_club",
@@ -105,6 +105,34 @@ class Club(models.Model):
 
     class Meta:
         ordering = ["name", "unix_name"]
+
+    def __str__(self):
+        return self.name
+
+    @transaction.atomic()
+    def save(self, *args, **kwargs):
+        old = Club.objects.filter(id=self.id).first()
+        creation = old is None
+        if not creation and old.unix_name != self.unix_name:
+            self._change_unixname(self.unix_name)
+        super().save(*args, **kwargs)
+        if creation:
+            board = MetaGroup(name=self.unix_name + settings.SITH_BOARD_SUFFIX)
+            board.save()
+            member = MetaGroup(name=self.unix_name + settings.SITH_MEMBER_SUFFIX)
+            member.save()
+            subscribers = Group.objects.filter(
+                name=settings.SITH_MAIN_MEMBERS_GROUP
+            ).first()
+            self.make_home()
+            self.home.edit_groups.set([board])
+            self.home.view_groups.set([member, subscribers])
+            self.home.save()
+        self.make_page()
+        cache.set(f"sith_club_{self.unix_name}", self)
+
+    def get_absolute_url(self):
+        return reverse("club:club_view", kwargs={"club_id": self.id})
 
     @cached_property
     def president(self):
@@ -184,40 +212,12 @@ class Club(models.Model):
             self.page.parent = self.parent.page
             self.page.save(force_lock=True)
 
-    @transaction.atomic()
-    def save(self, *args, **kwargs):
-        old = Club.objects.filter(id=self.id).first()
-        creation = old is None
-        if not creation and old.unix_name != self.unix_name:
-            self._change_unixname(self.unix_name)
-        super(Club, self).save(*args, **kwargs)
-        if creation:
-            board = MetaGroup(name=self.unix_name + settings.SITH_BOARD_SUFFIX)
-            board.save()
-            member = MetaGroup(name=self.unix_name + settings.SITH_MEMBER_SUFFIX)
-            member.save()
-            subscribers = Group.objects.filter(
-                name=settings.SITH_MAIN_MEMBERS_GROUP
-            ).first()
-            self.make_home()
-            self.home.edit_groups.set([board])
-            self.home.view_groups.set([member, subscribers])
-            self.home.save()
-        self.make_page()
-        cache.set(f"sith_club_{self.unix_name}", self)
-
     def delete(self, *args, **kwargs):
         # Invalidate the cache of this club and of its memberships
         for membership in self.members.ongoing().select_related("user"):
             cache.delete(f"membership_{self.id}_{membership.user.id}")
         cache.delete(f"sith_club_{self.unix_name}")
         super().delete(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse("club:club_view", kwargs={"club_id": self.id})
 
     def get_display_name(self):
         return self.name
@@ -374,13 +374,20 @@ class Membership(models.Model):
 
     def __str__(self):
         return (
-            self.club.name
-            + " - "
-            + self.user.username
-            + " - "
-            + str(settings.SITH_CLUB_ROLES[self.role])
-            + str(" - " + str(_("past member")) if self.end_date is not None else "")
+            f"{self.club.name} - {self.user.username} "
+            f"- {settings.SITH_CLUB_ROLES[self.role]} "
+            f"- {str(_('past member')) if self.end_date is not None else ''}"
         )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.end_date is None:
+            cache.set(f"membership_{self.club_id}_{self.user_id}", self)
+        else:
+            cache.set(f"membership_{self.club_id}_{self.user_id}", "not_member")
+
+    def get_absolute_url(self):
+        return reverse("club:club_members", kwargs={"club_id": self.club_id})
 
     def is_owned_by(self, user):
         """
@@ -400,16 +407,6 @@ class Membership(models.Model):
         if membership is not None and membership.role >= self.role:
             return True
         return False
-
-    def get_absolute_url(self):
-        return reverse("club:club_members", kwargs={"club_id": self.club_id})
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.end_date is None:
-            cache.set(f"membership_{self.club_id}_{self.user_id}", self)
-        else:
-            cache.set(f"membership_{self.club_id}_{self.user_id}", "not_member")
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
@@ -452,6 +449,26 @@ class Mailing(models.Model):
         on_delete=models.CASCADE,
     )
 
+    def __str__(self):
+        return "%s - %s" % (self.club, self.email_full)
+
+    def save(self, *args, **kwargs):
+        if not self.is_moderated:
+            for user in (
+                RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
+                .first()
+                .users.all()
+            ):
+                if not user.notifications.filter(
+                    type="MAILING_MODERATION", viewed=False
+                ).exists():
+                    Notification(
+                        user=user,
+                        url=reverse("com:mailing_admin"),
+                        type="MAILING_MODERATION",
+                    ).save(*args, **kwargs)
+        super().save(*args, **kwargs)
+
     def clean(self):
         if Mailing.objects.filter(email=self.email).exists():
             raise ValidationError(_("This mailing list already exists."))
@@ -459,7 +476,7 @@ class Mailing(models.Model):
             self.is_moderated = True
         else:
             self.moderator = None
-        super(Mailing, self).clean()
+        super().clean()
 
     @property
     def email_full(self):
@@ -481,33 +498,13 @@ class Mailing(models.Model):
 
     def delete(self, *args, **kwargs):
         self.subscriptions.all().delete()
-        super(Mailing, self).delete()
+        super().delete()
 
     def fetch_format(self):
         resp = self.email + ": "
         for sub in self.subscriptions.all():
             resp += sub.fetch_format()
         return resp
-
-    def save(self):
-        if not self.is_moderated:
-            for user in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
-                .first()
-                .users.all()
-            ):
-                if not user.notifications.filter(
-                    type="MAILING_MODERATION", viewed=False
-                ).exists():
-                    Notification(
-                        user=user,
-                        url=reverse("com:mailing_admin"),
-                        type="MAILING_MODERATION",
-                    ).save()
-        super(Mailing, self).save()
-
-    def __str__(self):
-        return "%s - %s" % (self.club, self.email_full)
 
 
 class MailingSubscription(models.Model):
@@ -536,6 +533,9 @@ class MailingSubscription(models.Model):
     class Meta:
         unique_together = (("user", "email", "mailing"),)
 
+    def __str__(self):
+        return "(%s) - %s : %s" % (self.mailing, self.get_username, self.email)
+
     def clean(self):
         if not self.user and not self.email:
             raise ValidationError(_("At least user or email is required"))
@@ -550,7 +550,7 @@ class MailingSubscription(models.Model):
                     )
         except ObjectDoesNotExist:
             pass
-        super(MailingSubscription, self).clean()
+        super().clean()
 
     def is_owned_by(self, user):
         if user.is_anonymous:
@@ -578,6 +578,3 @@ class MailingSubscription(models.Model):
 
     def fetch_format(self):
         return self.get_email + " "
-
-    def __str__(self):
-        return "(%s) - %s : %s" % (self.mailing, self.get_username, self.email)

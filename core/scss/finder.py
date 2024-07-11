@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Sli <antoine@bartuccio.fr>
@@ -48,7 +47,7 @@ class ScssFinder(FileSystemFinder):
         filesystem_storage.prefix = self.locations[0][0]
         self.storages[location] = filesystem_storage
 
-    def find(self, path, all=False):
+    def find(self, path, all=False):  # noqa A002 (shadows the builtin `all` function)
         if path.endswith(".css"):
-            return super(ScssFinder, self).find(path, all)
+            return super().find(path, all)
         return []

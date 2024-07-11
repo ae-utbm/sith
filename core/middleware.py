@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -69,5 +68,5 @@ class SignalRequestMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        setattr(_threadlocal, "request", request)
+        _threadlocal.request = request
         return self.get_response(request)

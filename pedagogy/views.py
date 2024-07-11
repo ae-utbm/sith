@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2019
 # - Sli <antoine@bartuccio.fr>
@@ -73,7 +72,7 @@ class CanCreateUVFunctionMixin(View):
         """
         Pass the function to the template
         """
-        kwargs = super(CanCreateUVFunctionMixin, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["can_create_uv"] = self.can_create_uv
         return kwargs
 
@@ -93,7 +92,7 @@ class UVDetailFormView(CanViewMixin, CanCreateUVFunctionMixin, DetailFormView):
     form_class = UVCommentForm
 
     def get_form_kwargs(self):
-        kwargs = super(UVDetailFormView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["author_id"] = self.request.user.id
         kwargs["uv_id"] = self.get_object().id
         kwargs["is_creation"] = True
@@ -101,7 +100,7 @@ class UVDetailFormView(CanViewMixin, CanCreateUVFunctionMixin, DetailFormView):
 
     def form_valid(self, form):
         form.save()
-        return super(UVDetailFormView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy(
@@ -120,7 +119,7 @@ class UVCommentUpdateView(CanEditPropMixin, UpdateView):
     template_name = "core/edit.jinja"
 
     def get_form_kwargs(self):
-        kwargs = super(UVCommentUpdateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         obj = self.get_object()
         kwargs["author_id"] = obj.author.id
         kwargs["uv_id"] = obj.uv.id
@@ -159,7 +158,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
     def get(self, *args, **kwargs):
         if not self.request.GET.get("json", None):
             # Return normal full template response
-            return super(UVListView, self).get(*args, **kwargs)
+            return super().get(*args, **kwargs)
 
         # Return serialized response
         return HttpResponse(
@@ -168,7 +167,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
         )
 
     def get_queryset(self):
-        queryset = super(UVListView, self).get_queryset()
+        queryset = super().get_queryset()
         search = self.request.GET.get("search", None)
 
         additional_filters = {}
@@ -219,16 +218,16 @@ class UVCommentReportCreateView(CanCreateMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.uv_comment = get_object_or_404(UVComment, pk=kwargs["comment_id"])
-        return super(UVCommentReportCreateView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(UVCommentReportCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["reporter_id"] = self.request.user.id
         kwargs["comment_id"] = self.uv_comment.id
         return kwargs
 
     def form_valid(self, form):
-        resp = super(UVCommentReportCreateView, self).form_valid(form)
+        resp = super().form_valid(form)
 
         # Send a message to moderation admins
         for user in (
@@ -264,7 +263,7 @@ class UVModerationFormView(FormView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_owner(UV()):
             raise PermissionDenied
-        return super(UVModerationFormView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         form_clean = form.clean()
@@ -280,7 +279,7 @@ class UVModerationFormView(FormView):
             except ObjectDoesNotExist:
                 # To avoid errors when two reports points the same comment
                 pass
-        return super(UVModerationFormView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy("pedagogy:moderation")
@@ -296,7 +295,7 @@ class UVCreateView(CanCreateMixin, CreateView):
     template_name = "pedagogy/uv_edit.jinja"
 
     def get_form_kwargs(self):
-        kwargs = super(UVCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs["author_id"] = self.request.user.id
         return kwargs
 
@@ -328,7 +327,7 @@ class UVUpdateView(CanEditPropMixin, UpdateView):
     template_name = "pedagogy/uv_edit.jinja"
 
     def get_form_kwargs(self):
-        kwargs = super(UVUpdateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         obj = self.get_object()
         kwargs["author_id"] = obj.author.id
         return kwargs

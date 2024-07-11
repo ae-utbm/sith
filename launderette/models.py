@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -38,6 +37,12 @@ class Launderette(models.Model):
     class Meta:
         verbose_name = _("Launderette")
 
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("launderette:launderette_list")
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -63,12 +68,6 @@ class Launderette(models.Model):
 
     def can_be_viewed_by(self, user):
         return user.is_subscribed
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse("launderette:launderette_list")
 
     def get_machine_list(self):
         return Machine.objects.filter(launderette_id=self.id)
@@ -99,6 +98,15 @@ class Machine(models.Model):
     class Meta:
         verbose_name = _("Machine")
 
+    def __str__(self):
+        return "%s %s" % (self._meta.verbose_name, self.name)
+
+    def get_absolute_url(self):
+        return reverse(
+            "launderette:launderette_admin",
+            kwargs={"launderette_id": self.launderette.id},
+        )
+
     def is_owned_by(self, user):
         """
         Method to see if that object can be edited by the given user
@@ -112,15 +120,6 @@ class Machine(models.Model):
         if m and m.role >= 9:
             return True
         return False
-
-    def __str__(self):
-        return "%s %s" % (self._meta.verbose_name, self.name)
-
-    def get_absolute_url(self):
-        return reverse(
-            "launderette:launderette_admin",
-            kwargs={"launderette_id": self.launderette.id},
-        )
 
 
 class Token(models.Model):
@@ -149,11 +148,17 @@ class Token(models.Model):
         unique_together = ("name", "launderette", "type")
         ordering = ["type", "name"]
 
+    def __str__(self):
+        return (
+            f"{self.__class__._meta.verbose_name} {self.get_type_display()} "
+            f"#{self.name} ({self.launderette.name})"
+        )
+
     def save(self, *args, **kwargs):
         if self.name == "":
             raise DataError(_("Token name can not be blank"))
         else:
-            super(Token, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
     def is_owned_by(self, user):
         """
@@ -168,18 +173,6 @@ class Token(models.Model):
         if m and m.role >= 9:
             return True
         return False
-
-    def __str__(self):
-        return (
-            self.__class__._meta.verbose_name
-            + " "
-            + self.get_type_display()
-            + " #"
-            + self.name
-            + " ("
-            + self.launderette.name
-            + ")"
-        )
 
     def is_avaliable(self):
         if not self.borrow_date and not self.user:
@@ -215,9 +208,6 @@ class Slot(models.Model):
         verbose_name = _("Slot")
         ordering = ["start_date"]
 
-    def is_owned_by(self, user):
-        return user == self.user
-
     def __str__(self):
         return "User: %s - Date: %s - Type: %s - Machine: %s - Token: %s" % (
             self.user,
@@ -226,3 +216,6 @@ class Slot(models.Model):
             self.machine.name,
             self.token,
         )
+
+    def is_owned_by(self, user):
+        return user == self.user

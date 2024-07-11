@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -13,163 +12,125 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from __future__ import annotations
 
 import os
 import re
+from typing import TYPE_CHECKING
 
+import mistune
 from django.urls import reverse
-from mistune import InlineGrammar, InlineLexer, Markdown, Renderer, escape, escape_link
+from mistune import HTMLRenderer, Markdown
+
+if TYPE_CHECKING:
+    from mistune import InlineParser, InlineState
+
+# match __text__, without linebreak in the text, nor backslash prepending an underscore
+# Examples :
+#   - "__text__" : OK
+#   - "__te xt__" : OK
+#   - "__te_xt__" : nope (underscore in the middle)
+#   - "__te\_xt__" : Ok (the middle underscore is escaped)
+#   - "__te\nxt__" : nope (there is a linebreak in the text)
+#   - "\__text__" : nope (one of the underscores have a backslash prepended)
+#   - "\\__text__" : Ok (the backslash is ignored, because there is another backslash before)
+UNDERLINED_RE = (
+    r"(?<!\\)(?:\\{2})*"  # ignore if there is an odd number of backslashes before
+    r"_{2}"  # two underscores
+    r"(?P<underlined>([^\\_]|\\.)+)"  # the actual text
+    r"_{2}"  # closing underscores
+)
+
+SITH_LINK_RE = (
+    r"\[(?P<page_name>[\w\s]+)\]"  #  [nom du lien]
+    r"\(page:\/\/"  #  (page://
+    r"(?P<page_slug>[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9])"  # actual page name
+    r"\)"  # )
+)
+
+CUSTOM_DIMENSIONS_IMAGE_RE = (
+    r"\[(?P<img_name>[\w\s]+)\]"  # [nom du lien]
+    r"\(img:\/\/"  # (img://
+    r"(?P<img_slug>[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9])"  # actual page name
+    r"\)"  # )
+)
 
 
-class SithRenderer(Renderer):
-    def file_link(self, id, suffix):
-        return reverse("core:file_detail", kwargs={"file_id": id}) + suffix
-
-    def exposant(self, text):
-        return """<sup>%s</sup>""" % text
-
-    def indice(self, text):
-        return """<sub>%s</sub>""" % text
-
-    def underline(self, text):
-        return """<u>%s</u>""" % text
-
-    def image(self, original_src, title, text):
-        """Rendering a image with title and text.
-        :param src: source link of the image.
-        :param title: title text of the image.
-        :param text: alt text of the image.
-        """
-        style = None
-        if "?" in original_src:
-            src, params = original_src.rsplit("?", maxsplit=1)
-            m = re.search(r"(\d+%?)(x(\d+%?))?", params)
-            if not m:
-                src = original_src
-            else:
-                width = m.group(1)
-                if not width.endswith("%"):
-                    width += "px"
-                style = "width: %s; " % width
-                try:
-                    height = m.group(3)
-                    if not height.endswith("%"):
-                        height += "px"
-                    style += "height: %s; " % height
-                except:
-                    pass
-        else:
-            params = None
-            src = original_src
-        src = escape_link(src)
-        text = escape(text, quote=True)
-        if title:
-            title = escape(title, quote=True)
-            html = '<img src="%s" alt="%s" title="%s"' % (src, text, title)
-        else:
-            html = '<img src="%s" alt="%s"' % (src, text)
-        if style:
-            html = '%s style="%s"' % (html, style)
-        if self.options.get("use_xhtml"):
-            return "%s />" % html
-        return "%s>" % html
+def parse_underline(_inline: InlineParser, m: re.Match, state: InlineState):
+    state.append_token({"type": "underline", "raw": m.group("underlined")})
+    return m.end()
 
 
-class SithInlineGrammar(InlineGrammar):
-    double_emphasis = re.compile(r"^\*{2}([\s\S]+?)\*{2}(?!\*)")  # **word**
-    emphasis = re.compile(r"^\*((?:\*\*|[^\*])+?)\*(?!\*)")  # *word*
-    underline = re.compile(r"^_{2}([\s\S]+?)_{2}(?!_)")  # __word__
-    exposant = re.compile(r"^<sup>([\s\S]+?)</sup>")  # <sup>text</sup>
-    indice = re.compile(r"^<sub>([\s\S]+?)</sub>")  # <sub>text</sub>
-
-
-class SithInlineLexer(InlineLexer):
-    grammar_class = SithInlineGrammar
-
-    default_rules = [
-        "escape",
-        # 'inline_html',
-        "autolink",
-        "url",
-        "footnote",
-        "link",
-        "reflink",
-        "nolink",
-        "exposant",
-        "double_emphasis",
-        "emphasis",
+def underline(md_instance: Markdown):
+    md_instance.inline.register(
         "underline",
-        "indice",
-        "code",
-        "linebreak",
+        UNDERLINED_RE,
+        parse_underline,
+        before="emphasis",
+    )
+    md_instance.renderer.register("underline", lambda _, text: f"<u>{text}</u>")
+
+
+def parse_sith_link(_inline: InlineParser, m: re.Match, state: InlineState):
+    page_name = m.group("page_name")
+    page_slug = m.group("page_slug")
+    state.append_token(
+        {
+            "type": "link",
+            "children": [{"type": "text", "raw": page_name}],
+            "attrs": {"url": reverse("core:page", kwargs={"page_name": page_slug})},
+        }
+    )
+    return m.end()
+
+
+def sith_link(md_instance: Markdown):
+    md_instance.inline.register(
+        "sith_link",
+        SITH_LINK_RE,
+        parse_sith_link,
+        before="emphasis",
+    )
+    # no custom renderer here.
+    # we just add another parsing rule, but render it as if it was
+    # a regular markdown link
+
+
+class SithRenderer(HTMLRenderer):
+    def image(self, text: str, url: str, title=None) -> str:
+        if "?" not in url:
+            return super().image(text, url, title)
+
+        new_url, params = url.rsplit("?", maxsplit=1)
+        m = re.match(r"^(?P<width>\d+(%|px)?)(x(?P<height>\d+(%|px)?))?$", params)
+        if not m:
+            return super().image(text, url, title)
+
+        width, height = m.group("width"), m.group("height")
+        if not width.endswith(("%", "px")):
+            width += "px"
+        style = f"width:{width};"
+        if height is not None:
+            if not height.endswith(("%", "px")):
+                height += "px"
+            style += f"height:{height};"
+        return super().image(text, new_url, title).replace("/>", f'style="{style}" />')
+
+
+markdown = mistune.create_markdown(
+    renderer=SithRenderer(escape=True),
+    plugins=[
+        underline,
+        sith_link,
         "strikethrough",
-        "text",
-    ]
-    inline_html_rules = [
-        "escape",
-        "autolink",
+        "footnotes",
+        "table",
+        "spoiler",
+        "subscript",
+        "superscript",
         "url",
-        "link",
-        "reflink",
-        "nolink",
-        "exposant",
-        "double_emphasis",
-        "emphasis",
-        "underline",
-        "indice",
-        "code",
-        "linebreak",
-        "strikethrough",
-        "text",
-    ]
-
-    def output_underline(self, m):
-        text = m.group(1)
-        return self.renderer.underline(text)
-
-    def output_exposant(self, m):
-        text = m.group(1)
-        return self.renderer.exposant(text)
-
-    def output_indice(self, m):
-        text = m.group(1)
-        return self.renderer.indice(text)
-
-    # Double emphasis rule changed
-    def output_double_emphasis(self, m):
-        text = m.group(1)
-        text = self.output(text)
-        return self.renderer.double_emphasis(text)
-
-    # Emphasis rule changed
-    def output_emphasis(self, m):
-        text = m.group(1)
-        text = self.output(text)
-        return self.renderer.emphasis(text)
-
-    def _process_link(self, m, link, title=None):
-        try:  # Add page:// support for links
-            page = re.compile(r"^page://(\S*)")  # page://nom_de_ma_page
-            match = page.search(link)
-            page = match.group(1) or ""
-            link = reverse("core:page", kwargs={"page_name": page})
-        except:
-            pass
-        try:  # Add file:// support for links
-            file_link = re.compile(r"^file://(\d*)/?(\S*)?")  # file://4000/download
-            match = file_link.search(link)
-            id = match.group(1)
-            suffix = match.group(2) or ""
-            link = reverse("core:file_detail", kwargs={"file_id": id}) + suffix
-        except:
-            pass
-        return super(SithInlineLexer, self)._process_link(m, link, title)
-
-
-renderer = SithRenderer(escape=True)
-inline = SithInlineLexer(renderer)
-
-markdown = Markdown(renderer, inline=inline)
+    ],
+)
 
 if __name__ == "__main__":
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

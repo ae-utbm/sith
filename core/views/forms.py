@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -62,7 +61,7 @@ class SelectDateTime(DateTimeInput):
             attrs["class"] = "select_datetime"
         else:
             attrs = {"class": "select_datetime"}
-        return super(SelectDateTime, self).render(name, value, attrs, renderer)
+        return super().render(name, value, attrs, renderer)
 
 
 class SelectDate(DateInput):
@@ -71,14 +70,14 @@ class SelectDate(DateInput):
             attrs["class"] = "select_date"
         else:
             attrs = {"class": "select_date"}
-        return super(SelectDate, self).render(name, value, attrs, renderer)
+        return super().render(name, value, attrs, renderer)
 
 
 class MarkdownInput(Textarea):
     template_name = "core/markdown_textarea.jinja"
 
     def get_context(self, name, value, attrs):
-        context = super(MarkdownInput, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
 
         context["statics"] = {
             "js": static("core/easymde/easymde.min.js"),
@@ -118,7 +117,7 @@ class SelectFile(TextInput):
         output = (
             '%(content)s<div name="%(name)s" class="choose_file_widget" title="%(title)s"></div>'
             % {
-                "content": super(SelectFile, self).render(name, value, attrs, renderer),
+                "content": super().render(name, value, attrs, renderer),
                 "title": _("Choose file"),
                 "name": name,
             }
@@ -142,7 +141,7 @@ class SelectUser(TextInput):
         output = (
             '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>'
             % {
-                "content": super(SelectUser, self).render(name, value, attrs, renderer),
+                "content": super().render(name, value, attrs, renderer),
                 "title": _("Choose user"),
                 "name": name,
             }
@@ -182,7 +181,7 @@ class LoginForm(AuthenticationForm):
             except:
                 pass
             kwargs["data"] = data
-        super(LoginForm, self).__init__(*arg, **kwargs)
+        super().__init__(*arg, **kwargs)
         self.fields["username"].label = _("Username, email, or account number")
 
 
@@ -194,14 +193,6 @@ class RegisteringForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email")
-
-    def save(self, commit=True):
-        user = super(RegisteringForm, self).save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
-        user.generate_username()
-        if commit:
-            user.save()
-        return user
 
 
 class UserProfileForm(forms.ModelForm):
@@ -258,10 +249,10 @@ class UserProfileForm(forms.ModelForm):
         }
 
     def __init__(self, *arg, **kwargs):
-        super(UserProfileForm, self).__init__(*arg, **kwargs)
+        super().__init__(*arg, **kwargs)
 
     def full_clean(self):
-        super(UserProfileForm, self).full_clean()
+        super().full_clean()
 
     def generate_name(self, field_name, f):
         field_name = field_name[:-4]
@@ -363,7 +354,7 @@ class PagePropForm(forms.ModelForm):
     )
 
     def __init__(self, *arg, **kwargs):
-        super(PagePropForm, self).__init__(*arg, **kwargs)
+        super().__init__(*arg, **kwargs)
         self.fields["edit_groups"].required = False
         self.fields["view_groups"].required = False
 
@@ -381,7 +372,7 @@ class PageForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(PageForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["parent"].queryset = (
             self.fields["parent"]
             .queryset.exclude(name=settings.SITH_CLUB_ROOT_PAGE)
@@ -398,7 +389,7 @@ class GiftForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user_id = kwargs.pop("user_id", None)
-        super(GiftForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if user_id:
             self.fields["user"].queryset = self.fields["user"].queryset.filter(
                 id=user_id
@@ -407,9 +398,9 @@ class GiftForm(forms.ModelForm):
 
 
 class TzAwareDateTimeField(forms.DateTimeField):
-    def __init__(
-        self, input_formats=["%Y-%m-%d %H:%M:%S"], widget=SelectDateTime, **kwargs
-    ):
+    def __init__(self, input_formats=None, widget=SelectDateTime, **kwargs):
+        if input_formats is None:
+            input_formats = ["%Y-%m-%d %H:%M:%S"]
         super().__init__(input_formats=input_formats, widget=widget, **kwargs)
 
     def prepare_value(self, value):
@@ -420,7 +411,7 @@ class TzAwareDateTimeField(forms.DateTimeField):
             # attach it to the UTC timezone (so that to_current_timezone()) if not None
             # converts it to the local timezone)
             if value is not None:
-                value = timezone.make_aware(value, timezone.utc)
+                value = timezone.make_aware(value, datetime.timezone.utc)
 
         if isinstance(value, datetime.datetime):
             value = to_current_timezone(value)

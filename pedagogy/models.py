@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2019
 # - Sli <antoine@bartuccio.fr>
@@ -142,6 +141,12 @@ class UV(models.Model):
         default=0,
     )
 
+    def __str__(self):
+        return self.code
+
+    def get_absolute_url(self):
+        return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
+
     def is_owned_by(self, user):
         """
         Can be created by superuser, root or pedagogy admin user
@@ -160,9 +165,6 @@ class UV(models.Model):
             return -1
 
         return int(sum(comments.values_list(field, flat=True)) / comments.count())
-
-    def get_absolute_url(self):
-        return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
 
     def has_user_already_commented(self, user):
         """
@@ -194,9 +196,6 @@ class UV(models.Model):
     @cached_property
     def grade_work_load_average(self):
         return self.__grade_average_generic("grade_work_load")
-
-    def __str__(self):
-        return self.code
 
 
 class UVComment(models.Model):
@@ -253,6 +252,14 @@ class UVComment(models.Model):
     )
     publish_date = models.DateTimeField(_("publish date"), blank=True)
 
+    def __str__(self):
+        return f"{self.uv} - {self.author}"
+
+    def save(self, *args, **kwargs):
+        if self.publish_date is None:
+            self.publish_date = timezone.now()
+        super().save(*args, **kwargs)
+
     def is_owned_by(self, user):
         """
         Is owned by a pedagogy admin, a superuser or the author himself
@@ -265,14 +272,6 @@ class UVComment(models.Model):
         Return True if someone reported this UV
         """
         return self.reports.exists()
-
-    def __str__(self):
-        return "%s - %s" % (self.uv, self.author)
-
-    def save(self, *args, **kwargs):
-        if self.publish_date is None:
-            self.publish_date = timezone.now()
-        super(UVComment, self).save(*args, **kwargs)
 
 
 class UVResult(models.Model):
@@ -304,6 +303,9 @@ class UVResult(models.Model):
         validators=[validators.RegexValidator("[AP][0-9]{3}")],
     )
 
+    def __str__(self):
+        return f"{self.user.username} ; {self.uv.code} ; {self.grade}"
+
 
 class UVCommentReport(models.Model):
     """
@@ -323,6 +325,9 @@ class UVCommentReport(models.Model):
         on_delete=models.CASCADE,
     )
     reason = models.TextField(_("reason"))
+
+    def __str__(self):
+        return f"{self.reporter.username} : {self.reason}"
 
     @cached_property
     def uv(self):

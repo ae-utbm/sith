@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017
 # - Skia <skia@libskia.so>
@@ -134,7 +133,7 @@ def merge_users(u1: User, u2: User) -> User:
     return u1
 
 
-def delete_all_forum_user_messages(user, moderator, verbose=False):
+def delete_all_forum_user_messages(user, moderator, *, verbose=False):
     """
     Create a ForumMessageMeta that says a forum
         message is deleted on every forum message of an user
@@ -178,7 +177,7 @@ class MergeUsersView(FormView):
         self.final_user = merge_users(
             form.cleaned_data["user1"], form.cleaned_data["user2"]
         )
-        return super(MergeUsersView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return self.final_user.get_absolute_url()
@@ -195,9 +194,7 @@ class DeleteAllForumUserMessagesView(FormView):
     form_class = SelectUserForm
 
     def dispatch(self, request, *args, **kwargs):
-        res = super(DeleteAllForumUserMessagesView, self).dispatch(
-            request, *args, **kwargs
-        )
+        res = super().dispatch(request, *args, **kwargs)
         if request.user.is_root:
             return res
         raise PermissionDenied
@@ -205,7 +202,7 @@ class DeleteAllForumUserMessagesView(FormView):
     def form_valid(self, form):
         self.user = form.cleaned_data["user"]
         delete_all_forum_user_messages(self.user, self.request.user)
-        return super(DeleteAllForumUserMessagesView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse("core:user_profile", kwargs={"user_id": self.user.id})

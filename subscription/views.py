@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2023 © AE UTBM
 # ae@utbm.fr / ae.info@utbm.fr
@@ -31,7 +30,7 @@ from subscription.models import Subscription
 
 class SelectionDateForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        super(SelectionDateForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["start_date"] = TzAwareDateTimeField(
             label=_("Start date"), required=True
         )
@@ -48,7 +47,7 @@ class SubscriptionForm(forms.ModelForm):
     member = AutoCompleteSelectField("users", required=False, help_text=None)
 
     def __init__(self, *args, **kwargs):
-        super(SubscriptionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Add fields to allow basic user creation
         self.fields["last_name"] = forms.CharField(
             max_length=User._meta.get_field("last_name").max_length
@@ -77,7 +76,7 @@ class SubscriptionForm(forms.ModelForm):
         return subscriber
 
     def clean(self):
-        cleaned_data = super(SubscriptionForm, self).clean()
+        cleaned_data = super().clean()
         if (
             cleaned_data.get("member") is None
             and "last_name" not in self.errors.as_data()
@@ -125,7 +124,7 @@ class NewSubscription(CreateView):
     form_class = SubscriptionForm
 
     def dispatch(self, request, *arg, **kwargs):
-        res = super(NewSubscription, self).dispatch(request, *arg, **kwargs)
+        res = super().dispatch(request, *arg, **kwargs)
         if request.user.can_create_subscription:
             return res
         raise PermissionDenied
@@ -152,7 +151,7 @@ class NewSubscription(CreateView):
             start=form.instance.subscription_start,
             user=form.instance.member,
         )
-        return super(NewSubscription, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class SubscriptionsStatsView(FormView):
@@ -164,7 +163,7 @@ class SubscriptionsStatsView(FormView):
 
         self.start_date = datetime.datetime.today()
         self.end_date = self.start_date
-        res = super(SubscriptionsStatsView, self).dispatch(request, *arg, **kwargs)
+        res = super().dispatch(request, *arg, **kwargs)
         if request.user.is_root or request.user.is_board_member:
             return res
         raise PermissionDenied
@@ -173,7 +172,7 @@ class SubscriptionsStatsView(FormView):
         self.form = self.get_form()
         self.start_date = self.form["start_date"]
         self.end_date = self.form["end_date"]
-        res = super(SubscriptionsStatsView, self).post(request, *args, **kwargs)
+        res = super().post(request, *args, **kwargs)
         if request.user.is_root or request.user.is_board_member:
             return res
         raise PermissionDenied
@@ -188,7 +187,7 @@ class SubscriptionsStatsView(FormView):
     def get_context_data(self, **kwargs):
         from subscription.models import Subscription
 
-        kwargs = super(SubscriptionsStatsView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["subscriptions_total"] = Subscription.objects.filter(
             subscription_end__gte=self.end_date, subscription_start__lte=self.start_date
         )

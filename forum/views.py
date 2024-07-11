@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*
 #
 # Copyright 2016,2017,2018
 # - Skia <skia@libskia.so>
@@ -22,12 +21,14 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import math
 
 from ajax_select import make_ajax_field
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.utils import html, timezone
@@ -104,15 +105,15 @@ class ForumMarkAllAsRead(RedirectView):
     url = reverse_lazy("forum:last_unread")
 
     def get(self, request, *args, **kwargs):
+        fi = request.user.forum_infos
+        fi.last_read_date = timezone.now()
+        fi.save()
         try:
-            fi = request.user.forum_infos
-            fi.last_read_date = timezone.now()
-            fi.save()
             for m in request.user.read_messages.filter(date__lt=fi.last_read_date):
                 m.readers.remove(request.user)  # Clean up to keep table low in data
-        except:
+        except IntegrityError:
             pass
-        return super(ForumMarkAllAsRead, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
 
 class ForumFavoriteTopics(ListView):
@@ -172,15 +173,13 @@ class ForumCreateView(CanCreateMixin, CreateView):
     template_name = "core/create.jinja"
 
     def get_initial(self):
-        init = super(ForumCreateView, self).get_initial()
-        try:
-            parent = Forum.objects.filter(id=self.request.GET["parent"]).first()
+        init = super().get_initial()
+        parent = Forum.objects.filter(id=self.request.GET["parent"]).first()
+        if parent is not None:
             init["parent"] = parent
             init["owner_club"] = parent.owner_club
             init["edit_groups"] = parent.edit_groups.all()
             init["view_groups"] = parent.view_groups.all()
-        except:
-            pass
         return init
 
 
@@ -198,7 +197,7 @@ class ForumEditView(CanEditPropMixin, UpdateView):
     success_url = reverse_lazy("forum:main")
 
     def form_valid(self, form):
-        ret = super(ForumEditView, self).form_valid(form)
+        ret = super().form_valid(form)
         if form.cleaned_data["recursive"]:
             self.object.apply_rights_recursively()
         return ret
@@ -217,7 +216,7 @@ class ForumDetailView(CanViewMixin, DetailView):
     pk_url_kwarg = "forum_id"
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ForumDetailView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         qs = (
             self.object.topics.order_by("-_last_message__date")
             .select_related("_last_message__author", "author")
@@ -254,7 +253,7 @@ class ForumTopicCreateView(CanCreateMixin, CreateView):
         )
         if not request.user.can_view(self.forum):
             raise PermissionDenied
-        return super(ForumTopicCreateView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         topic = ForumTopic(
@@ -263,7 +262,7 @@ class ForumTopicCreateView(CanCreateMixin, CreateView):
         topic.save()
         form.instance.topic = topic
         form.instance.author = self.request.user
-        return super(ForumTopicCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class ForumTopicEditView(CanEditMixin, UpdateView):
@@ -300,12 +299,12 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
     queryset = ForumTopic.objects.select_related("forum__parent")
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ForumTopicDetailView, self).get_context_data(**kwargs)
-        try:
-            msg = self.object.get_first_unread_message(self.request.user)
+        kwargs = super().get_context_data(**kwargs)
+        msg = self.object.get_first_unread_message(self.request.user)
+        if msg is None:
+            kwargs["first_unread_message_id"] = math.inf
+        else:
             kwargs["first_unread_message_id"] = msg.id
-        except:
-            kwargs["first_unread_message_id"] = float("inf")
         paginator = Paginator(
             self.object.messages.select_related("author__avatar_pict")
             .prefetch_related("topic__forum__edit_groups", "readers")
@@ -346,10 +345,10 @@ class ForumMessageEditView(CanEditMixin, UpdateView):
         ForumMessageMeta(
             message=self.object, user=self.request.user, action="EDIT"
         ).save()
-        return super(ForumMessageEditView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ForumMessageEditView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["topic"] = self.object.topic
         return kwargs
 
@@ -395,10 +394,10 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
         self.topic = get_object_or_404(ForumTopic, id=self.kwargs["topic_id"])
         if not request.user.can_view(self.topic):
             raise PermissionDenied
-        return super(ForumMessageCreateView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
-        init = super(ForumMessageCreateView, self).get_initial()
+        init = super().get_initial()
         try:
             message = (
                 ForumMessage.objects.select_related("author")
@@ -419,9 +418,9 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
     def form_valid(self, form):
         form.instance.topic = self.topic
         form.instance.author = self.request.user
-        return super(ForumMessageCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        kwargs = super(ForumMessageCreateView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         kwargs["topic"] = self.topic
         return kwargs
