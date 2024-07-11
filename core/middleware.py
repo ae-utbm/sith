@@ -21,7 +21,6 @@ from django.contrib.auth import get_user
 from django.contrib.auth.middleware import (
     AuthenticationMiddleware as DjangoAuthenticationMiddleware,
 )
-from django.http import HttpResponse
 from django.utils.functional import SimpleLazyObject
 
 module, klass = settings.AUTH_ANONYMOUS_MODEL.rsplit(".", 1)
@@ -71,7 +70,3 @@ class SignalRequestMiddleware:
     def __call__(self, request):
         _threadlocal.request = request
         return self.get_response(request)
-
-
-def custom_honeypot_error(request, context):
-    return HttpResponse("Upon reading this, the http client was enlightened.")
