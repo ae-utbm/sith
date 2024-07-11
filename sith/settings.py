@@ -1,5 +1,5 @@
 #
-# Copyright 2016,2017
+# Copyright 2016,2017,2024
 # - Skia <skia@libskia.so>
 # - Sli <antoine@bartuccio.fr>
 #
@@ -17,7 +17,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -43,6 +43,8 @@ import sys
 import sentry_sdk
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
+
+from .honeypot import custom_honeypot_error
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -75,6 +77,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "honeypot",
     "django_jinja",
     "rest_framework",
     "ajax_select",
@@ -143,6 +146,7 @@ TEMPLATES = [
                 "django_jinja.builtins.extensions.UrlsExtension",
                 "django_jinja.builtins.extensions.StaticFilesExtension",
                 "django_jinja.builtins.extensions.DjangoFiltersExtension",
+                "core.templatetags.extensions.HoneypotExtension",
             ],
             "filters": {
                 "markdown": "core.templatetags.renderer.markdown",
@@ -280,6 +284,11 @@ LOGIN_REDIRECT_URL = "/"
 DEFAULT_FROM_EMAIL = "bibou@git.an"
 SITH_COM_EMAIL = "bibou_com@git.an"
 REST_FRAMEWORK["UNAUTHENTICATED_USER"] = "core.models.AnonymousUser"
+# Those values are to be changed in production to be more effective
+HONEYPOT_FIELD_NAME = "body2"
+HONEYPOT_VALUE = "content"
+HONEYPOT_RESPONDER = custom_honeypot_error  # Make honeypot errors less suspicious
+
 
 # Email
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

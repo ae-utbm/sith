@@ -15,11 +15,14 @@
 
 from datetime import date, timedelta
 from pathlib import Path
+from smtplib import SMTPException
 
 import freezegun
 import pytest
+from django.core import mail
 from django.core.cache import cache
-from django.test import TestCase
+from django.core.mail import EmailMessage
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import now
 from pytest_django.asserts import assertInHTML, assertRedirects
@@ -36,6 +39,7 @@ class TestUserRegistration:
     @pytest.fixture()
     def valid_payload(self):
         return {
+            settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE,
             "first_name": "this user does not exist (yet)",
             "last_name": "this user does not exist (yet)",
             "email": "i-dont-exist-yet@git.an",
@@ -47,34 +51,73 @@ class TestUserRegistration:
 
     def test_register_user_form_ok(self, client, valid_payload):
         """Should register a user correctly."""
+        assert not User.objects.filter(email=valid_payload["email"]).exists()
         response = client.post(reverse("core:register"), valid_payload)
-        assert response.status_code == 200
-        assert "TEST_REGISTER_USER_FORM_OK" in str(response.content)
+        assertRedirects(response, reverse("core:index"))
+        assert len(mail.outbox) == 1
+        assert mail.outbox[0].subject == "Création de votre compte AE"
+        assert User.objects.filter(email=valid_payload["email"]).exists()
 
     @pytest.mark.parametrize(
-        "payload_edit",
+        ("payload_edit", "expected_error"),
         [
-            {"password2": "not the same as password1"},
-            {"email": "not-an-email"},
-            {"first_name": ""},
-            {"last_name": ""},
-            {"captcha_1": "WRONG_CAPTCHA"},
+            (
+                {"password2": "not the same as password1"},
+                "Les deux mots de passe ne correspondent pas.",
+            ),
+            ({"email": "not-an-email"}, "Saisissez une adresse e-mail valide."),
+            ({"first_name": ""}, "Ce champ est obligatoire."),
+            ({"last_name": ""}, "Ce champ est obligatoire."),
+            ({"captcha_1": "WRONG_CAPTCHA"}, "CAPTCHA invalide"),
         ],
     )
-    def test_register_user_form_fail(self, client, valid_payload, payload_edit):
+    def test_register_user_form_fail(
+        self, client, valid_payload, payload_edit, expected_error
+    ):
         """Should not register a user correctly."""
         payload = valid_payload | payload_edit
         response = client.post(reverse("core:register"), payload)
         assert response.status_code == 200
-        assert "TEST_REGISTER_USER_FORM_FAIL" in str(response.content)
+        error_html = f'<ul class="errorlist"><li>{expected_error}</li></ul>'
+        assertInHTML(error_html, str(response.content.decode()))
+        assert not User.objects.filter(email=payload["email"]).exists()
 
-    def test_register_user_form_fail_already_exists(self, client, valid_payload):
+    def test_register_honeypot_fail(self, client: Client, valid_payload):
+        payload = valid_payload | {
+            settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE + "random"
+        }
+        response = client.post(reverse("core:register"), payload)
+        assert response.status_code == 200
+        assert not User.objects.filter(email=payload["email"]).exists()
+
+    def test_register_user_form_fail_already_exists(
+        self, client: Client, valid_payload
+    ):
         """Should not register a user correctly if it already exists."""
         # create the user, then try to create it again
         client.post(reverse("core:register"), valid_payload)
         response = client.post(reverse("core:register"), valid_payload)
+
         assert response.status_code == 200
-        assert "TEST_REGISTER_USER_FORM_FAIL" in str(response.content)
+        error_html = "<li>Un objet User avec ce champ Adresse email existe déjà.</li>"
+        assertInHTML(error_html, str(response.content.decode()))
+
+    def test_register_fail_with_not_existing_email(
+        self, client: Client, valid_payload, monkeypatch
+    ):
+        """Test that, when email is valid but doesn't actually exist, registration fails"""
+
+        def always_fail(*_args, **_kwargs):
+            raise SMTPException
+
+        monkeypatch.setattr(EmailMessage, "send", always_fail)
+
+        response = client.post(reverse("core:register"), valid_payload)
+        assert response.status_code == 200
+        error_html = (
+            "<li>Nous n'avons pas réussi à vérifier que cette adresse mail existe.</li>"
+        )
+        assertInHTML(error_html, str(response.content.decode()))
 
 
 @pytest.mark.django_db
@@ -90,7 +133,11 @@ class TestUserLogin:
 
         response = client.post(
             reverse("core:login"),
-            {"username": user.username, "password": "wrong-password"},
+            {
+                "username": user.username,
+                "password": "wrong-password",
+                settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE,
+            },
         )
         assert response.status_code == 200
         assert (
@@ -98,14 +145,32 @@ class TestUserLogin:
             "et votre mot de passe ne correspondent pas. Merci de réessayer.</p>"
         ) in str(response.content.decode())
 
+    def test_login_honeypot(self, client, user):
+        response = client.post(
+            reverse("core:login"),
+            {
+                "username": user.username,
+                "password": "wrong-password",
+                settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE + "incorrect",
+            },
+        )
+        assert response.status_code == 200
+        assert response.wsgi_request.user.is_anonymous
+
     def test_login_success(self, client, user):
         """
         Should login a user correctly
         """
         response = client.post(
-            reverse("core:login"), {"username": user.username, "password": "plop"}
+            reverse("core:login"),
+            {
+                "username": user.username,
+                "password": "plop",
+                settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE,
+            },
         )
         assertRedirects(response, reverse("core:index"))
+        assert response.wsgi_request.user == user
 
 
 @pytest.mark.parametrize(

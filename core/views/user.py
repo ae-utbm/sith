@@ -23,19 +23,21 @@
 #
 
 # This file contains all the views that concern the user model
-import logging
 from datetime import date, timedelta
+from smtplib import SMTPException
 
 from django.conf import settings
-from django.contrib.auth import views
+from django.contrib.auth import login, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.generic import (
     CreateView,
@@ -45,7 +47,8 @@ from django.views.generic import (
     TemplateView,
 )
 from django.views.generic.dates import MonthMixin, YearMixin
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import FormView, UpdateView
+from honeypot.decorators import check_honeypot
 
 from api.views.sas import all_pictures_of_user
 from core.models import Gift, Preferences, SithFile, User
@@ -69,6 +72,7 @@ from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
 
+@method_decorator(check_honeypot, name="post")
 class SithLoginView(views.LoginView):
     """
     The login View
@@ -77,6 +81,7 @@ class SithLoginView(views.LoginView):
     template_name = "core/login.jinja"
     authentication_form = LoginForm
     form_class = PasswordChangeForm
+    redirect_authenticated_user = True
 
 
 class SithPasswordChangeView(views.PasswordChangeView):
@@ -124,9 +129,10 @@ def password_root_change(request, user_id):
     )
 
 
+@method_decorator(check_honeypot, name="post")
 class SithPasswordResetView(views.PasswordResetView):
     """
-    Allows someone to enter an email adresse for resetting password
+    Allows someone to enter an email address for resetting password
     """
 
     template_name = "core/password_reset.jinja"
@@ -153,33 +159,47 @@ class SithPasswordResetConfirmView(views.PasswordResetConfirmView):
 
 class SithPasswordResetCompleteView(views.PasswordResetCompleteView):
     """
-    Confirm the password has sucessfully been reset
+    Confirm the password has successfully been reset
     """
 
     template_name = "core/password_reset_complete.jinja"
 
 
-def register(request):
-    context = {}
-    if request.method == "POST":
-        form = RegisteringForm(request.POST)
-        if form.is_valid():
-            logging.debug(
-                "Registering "
-                + form.cleaned_data["first_name"]
-                + form.cleaned_data["last_name"]
+@method_decorator(check_honeypot, name="post")
+class UserCreationView(FormView):
+    success_url = reverse_lazy("core:index")
+    form_class = RegisteringForm
+    template_name = "core/register.jinja"
+
+    def form_valid(self, form):
+        # Just knowing that the user gave sound data isn't enough,
+        # we must also know if the given email actually exists.
+        # This step must happen after the whole validation has been made,
+        # but before saving the user, while being tightly coupled
+        # to the request/response cycle.
+        # Thus this is here.
+        user: User = form.save(commit=False)
+        username = user.generate_username()
+        try:
+            user.email_user(
+                "Création de votre compte AE",
+                render_to_string(
+                    "core/register_confirm_mail.jinja", context={"username": username}
+                ),
             )
-            u = form.save()
-            context["user_registered"] = u
-            context["tests"] = "TEST_REGISTER_USER_FORM_OK"
-            form = RegisteringForm()
-        else:
-            context["error"] = "Erreur"
-            context["tests"] = "TEST_REGISTER_USER_FORM_FAIL"
-    else:
-        form = RegisteringForm()
-    context["form"] = form.as_p()
-    return render(request, "core/register.jinja", context)
+        except SMTPException:
+            # if the email couldn't be sent, it's likely to be
+            # that the given email doesn't exist (which means it's either a typo or a bot).
+            # It may also be a genuine bug, but that's less likely to happen
+            # and wouldn't be critical as the favoured way to create an account
+            # is to contact an AE board member
+            form.add_error(
+                "email", _("We couldn't verify that this email actually exists")
+            )
+            return super().form_invalid(form)
+        user = form.save()
+        login(self.request, user)
+        return super().form_valid(form)
 
 
 class UserTabsMixin(TabedViewMixin):

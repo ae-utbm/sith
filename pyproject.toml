@@ -46,6 +46,7 @@ django-countries = "^7.5.1"
 dict2xml = "^1.7.3"
 Sphinx = "^5" # Needed for building xapian
 tomli = "^2.0.1"
+django-honeypot = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.0.0"

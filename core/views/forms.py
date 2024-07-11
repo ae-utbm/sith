@@ -194,14 +194,6 @@ class RegisteringForm(UserCreationForm):
         model = User
         fields = ("first_name", "last_name", "email")
 
-    def save(self, *, commit=True):
-        user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password1"])
-        user.generate_username()
-        if commit:
-            user.save()
-        return user
-
 
 class UserProfileForm(forms.ModelForm):
     """
