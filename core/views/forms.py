@@ -196,10 +196,9 @@ class RegisteringForm(UserCreationForm):
 
 
 class UserProfileForm(forms.ModelForm):
-    """
-    Form handling the user profile, managing the files
+    """Form handling the user profile, managing the files
     This form is actually pretty bad and was made in the rush before the migration. It should be refactored.
-    TODO: refactor this form
+    TODO: refactor this form.
     """
 
     class Meta:

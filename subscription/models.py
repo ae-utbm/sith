@@ -108,14 +108,15 @@ class Subscription(models.Model):
 
     @staticmethod
     def compute_start(d: date = None, duration: int = 1, user: User = None) -> date:
-        """
-        This function computes the start date of the subscription with respect to the given date (default is today),
+        """Computes the start date of the subscription.
+
+        The computation is done with respect to the given date (default is today)
         and the start date given in settings.SITH_SEMESTER_START_AUTUMN.
         It takes the nearest past start date.
         Exemples: with SITH_SEMESTER_START_AUTUMN = (8, 15)
             Today      -> Start date
             2015-03-17 -> 2015-02-15
-            2015-01-11 -> 2014-08-15
+            2015-01-11 -> 2014-08-15.
         """
         if not d:
             d = date.today()
@@ -129,14 +130,21 @@ class Subscription(models.Model):
 
     @staticmethod
     def compute_end(duration: int, start: date = None, user: User = None) -> date:
-        """
-        This function compute the end date of the subscription given a start date and a duration in number of semester
-        Exemple:
+        """Compute the end date of the subscription.
+
+        Args:
+            duration:
+                the duration of the subscription, in semester
+                (for example, 2 => 2 semesters => 1 year)
+            start: The start date of the subscription
+            user: the user which is (or will be) subscribed
+
+        Exemples:
             Start - Duration -> End date
             2015-09-18 - 1 -> 2016-03-18
             2015-09-18 - 2 -> 2016-09-18
             2015-09-18 - 3 -> 2017-03-18
-            2015-09-18 - 4 -> 2017-09-18
+            2015-09-18 - 4 -> 2017-09-18.
         """
         if start is None:
             start = Subscription.compute_start(duration=duration, user=user)

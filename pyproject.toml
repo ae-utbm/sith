@@ -100,6 +100,9 @@ ignore = [
 	"DJ001",  # null=True in CharField/TextField. this one would require a migration
 ]
 
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "sith.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]

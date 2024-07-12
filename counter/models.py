@@ -44,9 +44,10 @@ from subscription.models import Subscription
 
 
 class Customer(models.Model):
-    """
-    This class extends a user to make a customer. It adds some basic customers' information, such as the account ID, and
-    is used by other accounting classes as reference to the customer, rather than using User
+    """Customer data of a User.
+
+    It adds some basic customers' information, such as the account ID, and
+    is used by other accounting classes as reference to the customer, rather than using User.
     """
 
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
@@ -63,10 +64,9 @@ class Customer(models.Model):
         return "%s - %s" % (self.user.username, self.account_id)
 
     def save(self, *args, allow_negative=False, is_selling=False, **kwargs):
-        """
-        is_selling : tell if the current action is a selling
+        """is_selling : tell if the current action is a selling
         allow_negative : ignored if not a selling. Allow a selling to put the account in negative
-        Those two parameters avoid blocking the save method of a customer if his account is negative
+        Those two parameters avoid blocking the save method of a customer if his account is negative.
         """
         if self.amount < 0 and (is_selling and not allow_negative):
             raise ValidationError(_("Not enough money"))
@@ -84,9 +84,8 @@ class Customer(models.Model):
 
     @property
     def can_buy(self) -> bool:
-        """
-        Check if whether this customer has the right to
-        purchase any item.
+        """Check if whether this customer has the right to purchase any item.
+
         This must be not confused with the Product.can_be_sold_to(user)
         method as the present method returns an information
         about a customer whereas the other tells something
@@ -100,8 +99,7 @@ class Customer(models.Model):
 
     @classmethod
     def get_or_create(cls, user: User) -> Tuple[Customer, bool]:
-        """
-        Work in pretty much the same way as the usual get_or_create method,
+        """Work in pretty much the same way as the usual get_or_create method,
         but with the default field replaced by some under the hood.
 
         If the user has an account, return it as is.
@@ -158,9 +156,8 @@ class Customer(models.Model):
 
 
 class BillingInfo(models.Model):
-    """
-    Represent the billing information of a user, which are required
-    by the 3D-Secure v2 system used by the etransaction module
+    """Represent the billing information of a user, which are required
+    by the 3D-Secure v2 system used by the etransaction module.
     """
 
     customer = models.OneToOneField(
@@ -182,10 +179,9 @@ class BillingInfo(models.Model):
         return f"{self.first_name} {self.last_name}"
 
     def to_3dsv2_xml(self) -> str:
-        """
-        Convert the data from this model into a xml usable
+        """Convert the data from this model into a xml usable
         by the online paying service of the Crédit Agricole bank.
-        see : `https://www.ca-moncommerce.com/espace-client-mon-commerce/up2pay-e-transactions/ma-documentation/manuel-dintegration-focus-3ds-v2/principes-generaux/#integration-3dsv2-developpeur-webmaster`
+        see : `https://www.ca-moncommerce.com/espace-client-mon-commerce/up2pay-e-transactions/ma-documentation/manuel-dintegration-focus-3ds-v2/principes-generaux/#integration-3dsv2-developpeur-webmaster`.
         """
         data = {
             "Address": {
@@ -204,9 +200,9 @@ class BillingInfo(models.Model):
 
 
 class ProductType(models.Model):
-    """
-    This describes a product type
-    Useful only for categorizing, changes are made at the product level for now
+    """A product type.
+
+    Useful only for categorizing.
     """
 
     name = models.CharField(_("name"), max_length=30)
@@ -229,9 +225,7 @@ class ProductType(models.Model):
         return reverse("counter:producttype_list")
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
@@ -240,9 +234,7 @@ class ProductType(models.Model):
 
 
 class Product(models.Model):
-    """
-    This describes a product, with all its related informations
-    """
+    """A product, with all its related information."""
 
     name = models.CharField(_("name"), max_length=64)
     description = models.TextField(_("description"), blank=True)
@@ -297,9 +289,7 @@ class Product(models.Model):
         return settings.SITH_ECOCUP_DECO == self.id
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         if user.is_in_group(
@@ -309,8 +299,7 @@ class Product(models.Model):
         return False
 
     def can_be_sold_to(self, user: User) -> bool:
-        """
-        Check if whether the user given in parameter has the right to buy
+        """Check if whether the user given in parameter has the right to buy
         this product or not.
 
         This must be not confused with the Customer.can_buy()
@@ -319,7 +308,8 @@ class Product(models.Model):
         whereas the other tells something about a Customer
         (and not a user, they are not the same model).
 
-        :return: True if the user can buy this product else False
+        Returns:
+            True if the user can buy this product else False
         """
         if not self.buying_groups.exists():
             return True
@@ -335,15 +325,16 @@ class Product(models.Model):
 
 class CounterQuerySet(models.QuerySet):
     def annotate_has_barman(self, user: User) -> CounterQuerySet:
-        """
-        Annotate the queryset with the `user_is_barman` field.
+        """Annotate the queryset with the `user_is_barman` field.
+
         For each counter, this field has value True if the user
         is a barman of this counter, else False.
 
-        :param user: the user we want to check if he is a barman
+        Args:
+            user: the user we want to check if he is a barman
 
-        Example::
-
+        Examples:
+            ```python
             sli = User.objects.get(username="sli")
             counters = (
                 Counter.objects
@@ -353,6 +344,7 @@ class CounterQuerySet(models.QuerySet):
             print("Sli est barman dans les comptoirs suivants :")
             for counter in counters:
                 print(f"- {counter.name}")
+            ```
         """
         subquery = user.counters.filter(pk=OuterRef("pk"))
         # noinspection PyTypeChecker
@@ -417,23 +409,21 @@ class Counter(models.Model):
         return user.is_board_member or user in self.sellers.all()
 
     def gen_token(self):
-        """Generate a new token for this counter"""
+        """Generate a new token for this counter."""
         self.token = "".join(
             random.choice(string.ascii_letters + string.digits) for x in range(30)
         )
         self.save()
 
     def add_barman(self, user):
-        """
-        Logs a barman in to the given counter
-        A user is stored as a tuple with its login time
+        """Logs a barman in to the given counter.
+
+        A user is stored as a tuple with its login time.
         """
         Permanency(user=user, counter=self, start=timezone.now(), end=None).save()
 
     def del_barman(self, user):
-        """
-        Logs a barman out and store its permanency
-        """
+        """Logs a barman out and store its permanency."""
         perm = Permanency.objects.filter(counter=self, user=user, end=None).all()
         for p in perm:
             p.end = p.activity
@@ -444,8 +434,7 @@ class Counter(models.Model):
         return self.get_barmen_list()
 
     def get_barmen_list(self):
-        """
-        Returns the barman list as list of User
+        """Returns the barman list as list of User.
 
         Also handle the timeout of the barmen
         """
@@ -462,16 +451,12 @@ class Counter(models.Model):
         return bl
 
     def get_random_barman(self):
-        """
-        Return a random user being currently a barman
-        """
+        """Return a random user being currently a barman."""
         bl = self.get_barmen_list()
         return bl[random.randrange(0, len(bl))]
 
     def update_activity(self):
-        """
-        Update the barman activity to prevent timeout
-        """
+        """Update the barman activity to prevent timeout."""
         for p in Permanency.objects.filter(counter=self, end=None).all():
             p.save()  # Update activity
 
@@ -479,25 +464,18 @@ class Counter(models.Model):
         return len(self.barmen_list) > 0
 
     def is_inactive(self):
-        """
-        Returns True if the counter self is inactive from SITH_COUNTER_MINUTE_INACTIVE's value minutes, else False
-        """
+        """Returns True if the counter self is inactive from SITH_COUNTER_MINUTE_INACTIVE's value minutes, else False."""
         return self.is_open() and (
             (timezone.now() - self.permanencies.order_by("-activity").first().activity)
             > timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE)
         )
 
     def barman_list(self):
-        """
-        Returns the barman id list
-        """
+        """Returns the barman id list."""
         return [b.id for b in self.get_barmen_list()]
 
     def can_refill(self):
-        """
-        Show if the counter authorize the refilling with physic money
-        """
-
+        """Show if the counter authorize the refilling with physic money."""
         if self.type != "BAR":
             return False
         if self.id in SITH_COUNTER_OFFICES:
@@ -511,8 +489,7 @@ class Counter(models.Model):
         return is_ae_member
 
     def get_top_barmen(self) -> QuerySet:
-        """
-        Return a QuerySet querying the office hours stats of all the barmen of all time
+        """Return a QuerySet querying the office hours stats of all the barmen of all time
         of this counter, ordered by descending number of hours.
 
         Each element of the QuerySet corresponds to a barman and has the following data :
@@ -535,16 +512,17 @@ class Counter(models.Model):
         )
 
     def get_top_customers(self, since: datetime | date | None = None) -> QuerySet:
-        """
-        Return a QuerySet querying the money spent by customers of this counter
+        """Return a QuerySet querying the money spent by customers of this counter
         since the specified date, ordered by descending amount of money spent.
 
         Each element of the QuerySet corresponds to a customer and has the following data :
-            - the full name (first name + last name) of the customer
-            - the nickname of the customer
-            - the amount of money spent by the customer
 
-        :param since: timestamp from which to perform the calculation
+        - the full name (first name + last name) of the customer
+        - the nickname of the customer
+        - the amount of money spent by the customer
+
+        Args:
+            since: timestamp from which to perform the calculation
         """
         if since is None:
             since = get_start_of_semester()
@@ -573,12 +551,15 @@ class Counter(models.Model):
         )
 
     def get_total_sales(self, since: datetime | date | None = None) -> CurrencyField:
-        """
-        Compute and return the total turnover of this counter
-        since the date specified in parameter (by default, since the start of the current
-        semester)
-        :param since: timestamp from which to perform the calculation
-        :return: Total revenue earned at this counter
+        """Compute and return the total turnover of this counter since the given date.
+
+        By default, the date is the start of the current semester.
+
+        Args:
+            since: timestamp from which to perform the calculation
+
+        Returns:
+            Total revenue earned at this counter.
         """
         if since is None:
             since = get_start_of_semester()
@@ -591,9 +572,7 @@ class Counter(models.Model):
 
 
 class Refilling(models.Model):
-    """
-    Handle the refilling
-    """
+    """Handle the refilling."""
 
     counter = models.ForeignKey(
         Counter, related_name="refillings", blank=False, on_delete=models.CASCADE
@@ -665,9 +644,7 @@ class Refilling(models.Model):
 
 
 class Selling(models.Model):
-    """
-    Handle the sellings
-    """
+    """Handle the sellings."""
 
     label = models.CharField(_("label"), max_length=64)
     product = models.ForeignKey(
@@ -724,9 +701,7 @@ class Selling(models.Model):
         )
 
     def save(self, *args, allow_negative=False, **kwargs):
-        """
-        allow_negative : Allow this selling to use more money than available for this user
-        """
+        """allow_negative : Allow this selling to use more money than available for this user."""
         if not self.date:
             self.date = timezone.now()
         self.full_clean()
@@ -864,8 +839,10 @@ class Selling(models.Model):
 
 
 class Permanency(models.Model):
-    """
-    This class aims at storing a traceability of who was barman where and when
+    """A permanency of a barman, on a counter.
+
+    This aims at storing a traceability of who was barman where and when.
+    Mainly for ~~dick size contest~~ establishing the top 10 barmen of the semester.
     """
 
     user = models.ForeignKey(
@@ -971,9 +948,7 @@ class CashRegisterSummary(models.Model):
             return object.__getattribute__(self, name)
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         if user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID):
@@ -1010,9 +985,7 @@ class CashRegisterSummaryItem(models.Model):
 
 
 class Eticket(models.Model):
-    """
-    Eticket can be linked to a product an allows PDF generation
-    """
+    """Eticket can be linked to a product an allows PDF generation."""
 
     product = models.OneToOneField(
         Product,
@@ -1041,9 +1014,7 @@ class Eticket(models.Model):
         return reverse("counter:eticket_list")
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
@@ -1058,11 +1029,11 @@ class Eticket(models.Model):
 
 
 class StudentCard(models.Model):
-    """
-    Alternative way to connect a customer into a counter
+    """Alternative way to connect a customer into a counter.
+
     We are using Mifare DESFire EV1 specs since it's used for izly cards
     https://www.nxp.com/docs/en/application-note/AN10927.pdf
-    UID is 7 byte long that means 14 hexa characters
+    UID is 7 byte long that means 14 hexa characters.
     """
 
     UID_SIZE = 14

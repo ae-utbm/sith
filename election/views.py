@@ -19,10 +19,7 @@ from election.models import Candidature, Election, ElectionList, Role, Vote
 
 
 class LimitedCheckboxField(forms.ModelMultipleChoiceField):
-    """
-    Used to replace ModelMultipleChoiceField but with
-    automatic backend verification
-    """
+    """A `ModelMultipleChoiceField`, with a max limit of selectable inputs."""
 
     def __init__(self, queryset, max_choice, **kwargs):
         self.max_choice = max_choice
@@ -45,7 +42,7 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
 
 
 class CandidateForm(forms.ModelForm):
-    """Form to candidate"""
+    """Form to candidate."""
 
     class Meta:
         model = Candidature
@@ -91,7 +88,7 @@ class VoteForm(forms.Form):
 
 
 class RoleForm(forms.ModelForm):
-    """Form for creating a role"""
+    """Form for creating a role."""
 
     class Meta:
         model = Role
@@ -175,9 +172,7 @@ class ElectionForm(forms.ModelForm):
 
 
 class ElectionsListView(CanViewMixin, ListView):
-    """
-    A list of all non archived elections visible
-    """
+    """A list of all non archived elections visible."""
 
     model = Election
     ordering = ["-id"]
@@ -189,9 +184,7 @@ class ElectionsListView(CanViewMixin, ListView):
 
 
 class ElectionListArchivedView(CanViewMixin, ListView):
-    """
-    A list of all archived elections visible
-    """
+    """A list of all archived elections visible."""
 
     model = Election
     ordering = ["-id"]
@@ -203,9 +196,7 @@ class ElectionListArchivedView(CanViewMixin, ListView):
 
 
 class ElectionDetailView(CanViewMixin, DetailView):
-    """
-    Details an election responsability by responsability
-    """
+    """Details an election responsability by responsability."""
 
     model = Election
     template_name = "election/election_detail.jinja"
@@ -232,7 +223,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
         return response
 
     def get_context_data(self, **kwargs):
-        """Add additionnal data to the template"""
+        """Add additionnal data to the template."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["election_form"] = VoteForm(self.object, self.request.user)
         kwargs["election_results"] = self.object.results
@@ -243,9 +234,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
 
 
 class VoteFormView(CanCreateMixin, FormView):
-    """
-    Alows users to vote
-    """
+    """Alows users to vote."""
 
     form_class = VoteForm
     template_name = "election/election_detail.jinja"
@@ -278,9 +267,7 @@ class VoteFormView(CanCreateMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        """
-        Verify that the user is part in a vote group
-        """
+        """Verify that the user is part in a vote group."""
         data = form.clean()
         res = super(FormView, self).form_valid(form)
         for grp_id in self.election.vote_groups.values_list("pk", flat=True):
@@ -293,7 +280,7 @@ class VoteFormView(CanCreateMixin, FormView):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
 
     def get_context_data(self, **kwargs):
-        """Add additionnal data to the template"""
+        """Add additionnal data to the template."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["object"] = self.election
         kwargs["election"] = self.election
@@ -305,9 +292,7 @@ class VoteFormView(CanCreateMixin, FormView):
 
 
 class CandidatureCreateView(CanCreateMixin, CreateView):
-    """
-    View dedicated to a cundidature creation
-    """
+    """View dedicated to a cundidature creation."""
 
     form_class = CandidateForm
     model = Candidature
@@ -330,9 +315,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        """
-        Verify that the selected user is in candidate group
-        """
+        """Verify that the selected user is in candidate group."""
         obj = form.instance
         obj.election = Election.objects.get(id=self.election.id)
         if (obj.election.can_candidate(obj.user)) and (
@@ -361,10 +344,7 @@ class ElectionCreateView(CanCreateMixin, CreateView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        """
-        Allow every users that had passed the dispatch
-        to create an election
-        """
+        """Allow every user that had passed the dispatch to create an election."""
         return super(CreateView, self).form_valid(form)
 
     def get_success_url(self, **kwargs):
@@ -388,9 +368,7 @@ class RoleCreateView(CanCreateMixin, CreateView):
         return init
 
     def form_valid(self, form):
-        """
-        Verify that the user can edit properly
-        """
+        """Verify that the user can edit properly."""
         obj: Role = form.instance
         user: User = self.request.user
         if obj.election:
@@ -432,9 +410,7 @@ class ElectionListCreateView(CanCreateMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        """
-        Verify that the user can vote on this election
-        """
+        """Verify that the user can vote on this election."""
         obj: ElectionList = form.instance
         user: User = self.request.user
         if obj.election:

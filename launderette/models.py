@@ -44,9 +44,7 @@ class Launderette(models.Model):
         return reverse("launderette:launderette_list")
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         launderette_club = Club.objects.filter(
@@ -108,9 +106,7 @@ class Machine(models.Model):
         )
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         launderette_club = Club.objects.filter(
@@ -161,9 +157,7 @@ class Token(models.Model):
             super().save(*args, **kwargs)
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         launderette_club = Club.objects.filter(

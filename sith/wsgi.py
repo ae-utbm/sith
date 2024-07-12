@@ -13,8 +13,7 @@
 #
 #
 
-"""
-WSGI config for sith project.
+"""WSGI config for sith project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

@@ -29,9 +29,7 @@ from django.core.management.commands import compilemessages
 
 
 class Command(compilemessages.Command):
-    """
-    Wrap call to compilemessages to avoid building whole env
-    """
+    """Wrap call to compilemessages to avoid building whole env."""
 
     help = """
         The usage is the same as the real compilemessages

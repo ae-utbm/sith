@@ -23,6 +23,7 @@
 #
 
 import types
+from typing import Any
 
 from django.core.exceptions import (
     ImproperlyConfigured,
@@ -39,6 +40,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView
 from sentry_sdk import last_event_id
 
+from core.models import User
 from core.views.forms import LoginForm
 
 
@@ -60,60 +62,63 @@ def internal_servor_error(request):
     return HttpResponseServerError(render(request, "core/500.jinja"))
 
 
-def can_edit_prop(obj, user):
-    """
-    :param obj: Object to test for permission
-    :param user: core.models.User to test permissions against
-    :return: if user is authorized to edit object properties
-    :rtype: bool
+def can_edit_prop(obj: Any, user: User) -> bool:
+    """Can the user edit the properties of the object.
 
-    :Example:
+    Args:
+        obj: Object to test for permission
+        user: core.models.User to test permissions against
 
-    .. code-block:: python
+    Returns:
+        True if user is authorized to edit object properties else False
 
+    Examples:
+        ```python
         if not can_edit_prop(self.object ,request.user):
             raise PermissionDenied
-
+        ```
     """
     if obj is None or user.is_owner(obj):
         return True
     return False
 
 
-def can_edit(obj, user):
-    """
-    :param obj: Object to test for permission
-    :param user: core.models.User to test permissions against
-    :return: if user is authorized to edit object
-    :rtype: bool
+def can_edit(obj: Any, user: User):
+    """Can the user edit the object.
 
-    :Example:
+    Args:
+        obj: Object to test for permission
+        user: core.models.User to test permissions against
 
-    .. code-block:: python
+    Returns:
+        True if user is authorized to edit object else False
 
-        if not can_edit(self.object ,request.user):
+    Examples:
+        ```python
+        if not can_edit(self.object, request.user):
             raise PermissionDenied
-
+        ```
     """
     if obj is None or user.can_edit(obj):
         return True
     return can_edit_prop(obj, user)
 
 
-def can_view(obj, user):
-    """
-    :param obj: Object to test for permission
-    :param user: core.models.User to test permissions against
-    :return: if user is authorized to see object
-    :rtype: bool
+def can_view(obj: Any, user: User):
+    """Can the user see the object.
 
-    :Example:
+    Args:
+        obj: Object to test for permission
+        user: core.models.User to test permissions against
 
-    .. code-block:: python
+    Returns:
+        True if user is authorized to see object else False
 
+    Examples:
+        ```python
         if not can_view(self.object ,request.user):
             raise PermissionDenied
-
+        ```
     """
     if obj is None or user.can_view(obj):
         return True
@@ -121,19 +126,21 @@ def can_view(obj, user):
 
 
 class GenericContentPermissionMixinBuilder(View):
-    """
-    Used to build permission mixins
+    """Used to build permission mixins.
+
     This view protect any child view that would be showing an object that is restricted based
-      on two properties
+      on two properties.
 
-    :prop permission_function: function to test permission with, takes an object and an user an return a bool
-    :prop raised_error: permission to be raised
-
-    :raises: raised_error
+    Attributes:
+        raised_error: permission to be raised
     """
 
-    permission_function = lambda obj, user: False
     raised_error = PermissionDenied
+
+    @staticmethod
+    def permission_function(obj: Any, user: User) -> bool:
+        """Function to test permission with."""
+        return False
 
     @classmethod
     def get_permission_function(cls, obj, user):
@@ -162,11 +169,12 @@ class GenericContentPermissionMixinBuilder(View):
 
 
 class CanCreateMixin(View):
-    """
-    This view is made to protect any child view that would create an object, and thus, that can not be protected by any
-    of the following mixin
+    """Protect any child view that would create an object.
 
-    :raises: PermissionDenied
+    Raises:
+        PermissionDenied:
+            If the user has not the necessary permission
+            to create the object of the view.
     """
 
     def dispatch(self, request, *arg, **kwargs):
@@ -183,55 +191,54 @@ class CanCreateMixin(View):
 
 
 class CanEditPropMixin(GenericContentPermissionMixinBuilder):
-    """
-    This view is made to protect any child view that would be showing some properties of an object that are restricted
-    to only the owner group of the given object.
-    In other word, you can make a view with this view as parent, and it would be retricted to the users that are in the
-    object's owner_group
+    """Ensure the user has owner permissions on the child view object.
 
-    :raises: PermissionDenied
+    In other word, you can make a view with this view as parent,
+    and it will be retricted to the users that are in the
+    object's owner_group or that pass the `obj.can_be_viewed_by` test.
+
+    Raises:
+        PermissionDenied: If the user cannot see the object
     """
 
     permission_function = can_edit_prop
 
 
 class CanEditMixin(GenericContentPermissionMixinBuilder):
-    """
-    This view makes exactly the same thing as its direct parent, but checks the group on the edit_groups field of the
-    object
+    """Ensure the user has permission to edit this view's object.
 
-    :raises: PermissionDenied
+    Raises:
+        PermissionDenied: if the user cannot edit this view's object.
     """
 
     permission_function = can_edit
 
 
 class CanViewMixin(GenericContentPermissionMixinBuilder):
-    """
-    This view still makes exactly the same thing as its direct parent, but checks the group on the view_groups field of
-    the object
+    """Ensure the user has permission to view this view's object.
 
-    :raises: PermissionDenied
+    Raises:
+        PermissionDenied: if the user cannot edit this view's object.
     """
 
     permission_function = can_view
 
 
 class UserIsRootMixin(GenericContentPermissionMixinBuilder):
-    """
-    This view check if the user is root
+    """Allow only root admins.
 
-    :raises: PermissionDenied
+    Raises:
+        PermissionDenied: if the user isn't root
     """
 
     permission_function = lambda obj, user: user.is_root
 
 
 class FormerSubscriberMixin(View):
-    """
-    This view check if the user was at least an old subscriber
+    """Check if the user was at least an old subscriber.
 
-    :raises: PermissionDenied
+    Raises:
+        PermissionDenied: if the user never subscribed.
     """
 
     def dispatch(self, request, *args, **kwargs):
@@ -241,10 +248,10 @@ class FormerSubscriberMixin(View):
 
 
 class UserIsLoggedMixin(View):
-    """
-    This view check if the user is logged
+    """Check if the user is logged.
 
-    :raises: PermissionDenied
+    Raises:
+        PermissionDenied:
     """
 
     def dispatch(self, request, *args, **kwargs):
@@ -254,9 +261,7 @@ class UserIsLoggedMixin(View):
 
 
 class TabedViewMixin(View):
-    """
-    This view provide the basic functions for displaying tabs in the template
-    """
+    """Basic functions for displaying tabs in the template."""
 
     def get_tabs_title(self):
         if hasattr(self, "tabs_title"):
@@ -299,7 +304,7 @@ class QuickNotifMixin:
         return ret
 
     def get_context_data(self, **kwargs):
-        """Add quick notifications to context"""
+        """Add quick notifications to context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["quick_notifs"] = []
         for n in self.quick_notif_list:
@@ -312,21 +317,15 @@ class QuickNotifMixin:
 
 
 class DetailFormView(SingleObjectMixin, FormView):
-    """
-    Class that allow both a detail view and a form view
-    """
+    """Class that allow both a detail view and a form view."""
 
     def get_object(self):
-        """
-        Get current group from id in url
-        """
+        """Get current group from id in url."""
         return self.cached_object
 
     @cached_property
     def cached_object(self):
-        """
-        Optimisation on group retrieval
-        """
+        """Optimisation on group retrieval."""
         return super().get_object()
 
 

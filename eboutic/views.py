@@ -43,8 +43,8 @@ from eboutic.models import Basket, Invoice, InvoiceItem, get_eboutic_products
 @login_required
 @require_GET
 def eboutic_main(request: HttpRequest) -> HttpResponse:
-    """
-    Main view of the eboutic application.
+    """Main view of the eboutic application.
+
     Return an Http response whose content is of type text/html.
     The latter represents the page from which a user can see
     the catalogue of products that he can buy and fill

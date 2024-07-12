@@ -30,11 +30,11 @@ from jinja2.parser import Parser
 
 
 class HoneypotExtension(Extension):
-    """
-    Wrapper around the honeypot extension tag
-    Known limitation: doesn't support arguments
+    """Wrapper around the honeypot extension tag.
 
-    Usage: {% render_honeypot_field %}
+    Known limitation: doesn't support arguments.
+
+    Usage: `{% render_honeypot_field %}`
     """
 
     tags = {"render_honeypot_field"}

@@ -29,9 +29,7 @@ from core.models import SithFile, User
 
 
 class CurrencyField(models.DecimalField):
-    """
-    This is a custom database field used for currency
-    """
+    """Custom database field used for currency."""
 
     def __init__(self, *args, **kwargs):
         kwargs["max_digits"] = 12
@@ -71,30 +69,22 @@ class Company(models.Model):
         return self.name
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         return False
 
     def can_be_edited_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
-        for club in user.memberships.filter(end_date=None).all():
-            if club and club.role == settings.SITH_CLUB_ROLES_ID["Treasurer"]:
-                return True
-        return False
+        """Check if that object can be edited by the given user."""
+        return user.memberships.filter(
+            end_date=None, club__role=settings.SITH_CLUB_ROLES_ID["Treasurer"]
+        ).exists()
 
     def can_be_viewed_by(self, user):
-        """
-        Method to see if that object can be viewed by the given user
-        """
-        for club in user.memberships.filter(end_date=None).all():
-            if club and club.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]:
-                return True
-        return False
+        """Check if that object can be viewed by the given user."""
+        return user.memberships.filter(
+            end_date=None, club__role_gte=settings.SITH_CLUB_ROLES_ID["Treasurer"]
+        ).exists()
 
 
 class BankAccount(models.Model):
@@ -119,9 +109,7 @@ class BankAccount(models.Model):
         return reverse("accounting:bank_details", kwargs={"b_account_id": self.id})
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
@@ -158,9 +146,7 @@ class ClubAccount(models.Model):
         return reverse("accounting:club_details", kwargs={"c_account_id": self.id})
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
@@ -168,18 +154,14 @@ class ClubAccount(models.Model):
         return False
 
     def can_be_edited_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         m = self.club.get_membership_for(user)
         if m and m.role == settings.SITH_CLUB_ROLES_ID["Treasurer"]:
             return True
         return False
 
     def can_be_viewed_by(self, user):
-        """
-        Method to see if that object can be viewed by the given user
-        """
+        """Check if that object can be viewed by the given user."""
         m = self.club.get_membership_for(user)
         if m and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]:
             return True
@@ -202,9 +184,7 @@ class ClubAccount(models.Model):
 
 
 class GeneralJournal(models.Model):
-    """
-    Class storing all the operations for a period of time
-    """
+    """Class storing all the operations for a period of time."""
 
     start_date = models.DateField(_("start date"))
     end_date = models.DateField(_("end date"), null=True, blank=True, default=None)
@@ -231,9 +211,7 @@ class GeneralJournal(models.Model):
         return reverse("accounting:journal_details", kwargs={"j_id": self.id})
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
@@ -243,9 +221,7 @@ class GeneralJournal(models.Model):
         return False
 
     def can_be_edited_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         if self.club_account.can_be_edited_by(user):
@@ -271,9 +247,7 @@ class GeneralJournal(models.Model):
 
 
 class Operation(models.Model):
-    """
-    An operation is a line in the journal, a debit or a credit
-    """
+    """An operation is a line in the journal, a debit or a credit."""
 
     number = models.IntegerField(_("number"))
     journal = models.ForeignKey(
@@ -422,9 +396,7 @@ class Operation(models.Model):
         return tar
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
@@ -437,9 +409,7 @@ class Operation(models.Model):
         return False
 
     def can_be_edited_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         if self.journal.closed:
@@ -451,10 +421,9 @@ class Operation(models.Model):
 
 
 class AccountingType(models.Model):
-    """
-    Class describing the accounting types.
+    """Accounting types.
 
-    Thoses are numbers used in accounting to classify operations
+    Those are numbers used in accounting to classify operations
     """
 
     code = models.CharField(
@@ -488,9 +457,7 @@ class AccountingType(models.Model):
         return reverse("accounting:type_list")
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
@@ -499,9 +466,7 @@ class AccountingType(models.Model):
 
 
 class SimplifiedAccountingType(models.Model):
-    """
-    Class describing the simplified accounting types.
-    """
+    """Simplified version of `AccountingType`."""
 
     label = models.CharField(_("label"), max_length=128)
     accounting_type = models.ForeignKey(
@@ -533,7 +498,7 @@ class SimplifiedAccountingType(models.Model):
 
 
 class Label(models.Model):
-    """Label allow a club to sort its operations"""
+    """Label allow a club to sort its operations."""
 
     name = models.CharField(_("label"), max_length=64)
     club_account = models.ForeignKey(

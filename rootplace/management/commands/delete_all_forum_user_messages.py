@@ -29,9 +29,7 @@ from rootplace.views import delete_all_forum_user_messages
 
 
 class Command(BaseCommand):
-    """
-    Delete all forum messages from a user
-    """
+    """Delete all forum messages from a user."""
 
     help = "Delete all user's forum message"
 

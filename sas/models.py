@@ -221,10 +221,7 @@ def sas_notification_callback(notif):
 
 
 class PeoplePictureRelation(models.Model):
-    """
-    The PeoplePictureRelation class makes the connection between User and Picture
-
-    """
+    """The PeoplePictureRelation class makes the connection between User and Picture."""
 
     user = models.ForeignKey(
         User,

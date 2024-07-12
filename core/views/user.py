@@ -74,9 +74,7 @@ from trombi.views import UserTrombiForm
 
 @method_decorator(check_honeypot, name="post")
 class SithLoginView(views.LoginView):
-    """
-    The login View
-    """
+    """The login View."""
 
     template_name = "core/login.jinja"
     authentication_form = LoginForm
@@ -85,33 +83,25 @@ class SithLoginView(views.LoginView):
 
 
 class SithPasswordChangeView(views.PasswordChangeView):
-    """
-    Allows a user to change its password
-    """
+    """Allows a user to change its password."""
 
     template_name = "core/password_change.jinja"
     success_url = reverse_lazy("core:password_change_done")
 
 
 class SithPasswordChangeDoneView(views.PasswordChangeDoneView):
-    """
-    Allows a user to change its password
-    """
+    """Allows a user to change its password."""
 
     template_name = "core/password_change_done.jinja"
 
 
 def logout(request):
-    """
-    The logout view
-    """
+    """The logout view."""
     return views.logout_then_login(request)
 
 
 def password_root_change(request, user_id):
-    """
-    Allows a root user to change someone's password
-    """
+    """Allows a root user to change someone's password."""
     if not request.user.is_root:
         raise PermissionDenied
     user = User.objects.filter(id=user_id).first()
@@ -131,9 +121,7 @@ def password_root_change(request, user_id):
 
 @method_decorator(check_honeypot, name="post")
 class SithPasswordResetView(views.PasswordResetView):
-    """
-    Allows someone to enter an email address for resetting password
-    """
+    """Allows someone to enter an email address for resetting password."""
 
     template_name = "core/password_reset.jinja"
     email_template_name = "core/password_reset_email.jinja"
@@ -141,26 +129,20 @@ class SithPasswordResetView(views.PasswordResetView):
 
 
 class SithPasswordResetDoneView(views.PasswordResetDoneView):
-    """
-    Confirm that the reset email has been sent
-    """
+    """Confirm that the reset email has been sent."""
 
     template_name = "core/password_reset_done.jinja"
 
 
 class SithPasswordResetConfirmView(views.PasswordResetConfirmView):
-    """
-    Provide a reset password form
-    """
+    """Provide a reset password form."""
 
     template_name = "core/password_reset_confirm.jinja"
     success_url = reverse_lazy("core:password_reset_complete")
 
 
 class SithPasswordResetCompleteView(views.PasswordResetCompleteView):
-    """
-    Confirm the password has successfully been reset
-    """
+    """Confirm the password has successfully been reset."""
 
     template_name = "core/password_reset_complete.jinja"
 
@@ -302,9 +284,7 @@ class UserTabsMixin(TabedViewMixin):
 
 
 class UserView(UserTabsMixin, CanViewMixin, DetailView):
-    """
-    Display a user's profile
-    """
+    """Display a user's profile."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -321,9 +301,7 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
 
 
 class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
-    """
-    Display a user's pictures
-    """
+    """Display a user's pictures."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -361,9 +339,7 @@ def delete_user_godfather(request, user_id, godfather_id, is_father):
 
 
 class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
-    """
-    Display a user's godfathers
-    """
+    """Display a user's godfathers."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -394,9 +370,7 @@ class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
 
 
 class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
-    """
-    Display a user's family tree
-    """
+    """Display a user's family tree."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -415,9 +389,7 @@ class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
 
 
 class UserGodfathersTreePictureView(CanViewMixin, DetailView):
-    """
-    Display a user's tree as a picture
-    """
+    """Display a user's tree as a picture."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -489,9 +461,7 @@ class UserGodfathersTreePictureView(CanViewMixin, DetailView):
 
 
 class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
-    """
-    Display a user's stats
-    """
+    """Display a user's stats."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -591,9 +561,7 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
 
 
 class UserMiniView(CanViewMixin, DetailView):
-    """
-    Display a user's profile
-    """
+    """Display a user's profile."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -602,18 +570,14 @@ class UserMiniView(CanViewMixin, DetailView):
 
 
 class UserListView(ListView, CanEditPropMixin):
-    """
-    Displays the user list
-    """
+    """Displays the user list."""
 
     model = User
     template_name = "core/user_list.jinja"
 
 
 class UserUploadProfilePictView(CanEditMixin, DetailView):
-    """
-    Handle the upload of the profile picture taken with webcam in navigator
-    """
+    """Handle the upload of the profile picture taken with webcam in navigator."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -650,9 +614,7 @@ class UserUploadProfilePictView(CanEditMixin, DetailView):
 
 
 class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
-    """
-    Edit a user's profile
-    """
+    """Edit a user's profile."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -663,9 +625,7 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     board_only = []
 
     def remove_restricted_fields(self, request):
-        """
-        Removes edit_once and board_only fields
-        """
+        """Removes edit_once and board_only fields."""
         for i in self.edit_once:
             if getattr(self.form.instance, i) and not (
                 request.user.is_board_member or request.user.is_root
@@ -703,9 +663,7 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
 
 
 class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
-    """
-    Display the user's club(s)
-    """
+    """Display the user's club(s)."""
 
     model = User
     context_object_name = "profile"
@@ -715,9 +673,7 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
 
 
 class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
-    """
-    Edit a user's preferences
-    """
+    """Edit a user's preferences."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -752,9 +708,7 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
 
 
 class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
-    """
-    Edit a user's groups
-    """
+    """Edit a user's groups."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -767,9 +721,7 @@ class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
 
 
 class UserToolsView(QuickNotifMixin, UserTabsMixin, UserIsLoggedMixin, TemplateView):
-    """
-    Displays the logged user's tools
-    """
+    """Displays the logged user's tools."""
 
     template_name = "core/user_tools.jinja"
     current_tab = "tools"
@@ -786,9 +738,7 @@ class UserToolsView(QuickNotifMixin, UserTabsMixin, UserIsLoggedMixin, TemplateV
 
 
 class UserAccountBase(UserTabsMixin, DetailView):
-    """
-    Base class for UserAccount
-    """
+    """Base class for UserAccount."""
 
     model = User
     pk_url_kwarg = "user_id"
@@ -809,9 +759,7 @@ class UserAccountBase(UserTabsMixin, DetailView):
 
 
 class UserAccountView(UserAccountBase):
-    """
-    Display a user's account
-    """
+    """Display a user's account."""
 
     template_name = "core/user_account.jinja"
 
@@ -858,9 +806,7 @@ class UserAccountView(UserAccountBase):
 
 
 class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
-    """
-    Display a user's account for month
-    """
+    """Display a user's account for month."""
 
     template_name = "core/user_account_detail.jinja"
 

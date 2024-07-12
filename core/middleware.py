@@ -53,13 +53,14 @@ _threadlocal = threading.local()
 
 
 def get_signal_request():
-    """
-    !!! Do not use if your operation is asynchronus !!!
-    Allow to access current request in signals
-    This is a hack that looks into the thread
-    Mainly used for log purpose
-    """
+    """Allow to access current request in signals.
 
+    This is a hack that looks into the thread
+    Mainly used for log purpose.
+
+    !!!danger
+        Do not use if your operation is asynchronous.
+    """
     return getattr(_threadlocal, "request", None)
 
 

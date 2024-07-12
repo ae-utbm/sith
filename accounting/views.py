@@ -53,9 +53,7 @@ from counter.models import Counter, Product, Selling
 
 
 class BankAccountListView(CanViewMixin, ListView):
-    """
-    A list view for the admins
-    """
+    """A list view for the admins."""
 
     model = BankAccount
     template_name = "accounting/bank_account_list.jinja"
@@ -66,18 +64,14 @@ class BankAccountListView(CanViewMixin, ListView):
 
 
 class SimplifiedAccountingTypeListView(CanViewMixin, ListView):
-    """
-    A list view for the admins
-    """
+    """A list view for the admins."""
 
     model = SimplifiedAccountingType
     template_name = "accounting/simplifiedaccountingtype_list.jinja"
 
 
 class SimplifiedAccountingTypeEditView(CanViewMixin, UpdateView):
-    """
-    An edit view for the admins
-    """
+    """An edit view for the admins."""
 
     model = SimplifiedAccountingType
     pk_url_kwarg = "type_id"
@@ -86,9 +80,7 @@ class SimplifiedAccountingTypeEditView(CanViewMixin, UpdateView):
 
 
 class SimplifiedAccountingTypeCreateView(CanCreateMixin, CreateView):
-    """
-    Create an accounting type (for the admins)
-    """
+    """Create an accounting type (for the admins)."""
 
     model = SimplifiedAccountingType
     fields = ["label", "accounting_type"]
@@ -99,18 +91,14 @@ class SimplifiedAccountingTypeCreateView(CanCreateMixin, CreateView):
 
 
 class AccountingTypeListView(CanViewMixin, ListView):
-    """
-    A list view for the admins
-    """
+    """A list view for the admins."""
 
     model = AccountingType
     template_name = "accounting/accountingtype_list.jinja"
 
 
 class AccountingTypeEditView(CanViewMixin, UpdateView):
-    """
-    An edit view for the admins
-    """
+    """An edit view for the admins."""
 
     model = AccountingType
     pk_url_kwarg = "type_id"
@@ -119,9 +107,7 @@ class AccountingTypeEditView(CanViewMixin, UpdateView):
 
 
 class AccountingTypeCreateView(CanCreateMixin, CreateView):
-    """
-    Create an accounting type (for the admins)
-    """
+    """Create an accounting type (for the admins)."""
 
     model = AccountingType
     fields = ["code", "label", "movement_type"]
@@ -132,9 +118,7 @@ class AccountingTypeCreateView(CanCreateMixin, CreateView):
 
 
 class BankAccountEditView(CanViewMixin, UpdateView):
-    """
-    An edit view for the admins
-    """
+    """An edit view for the admins."""
 
     model = BankAccount
     pk_url_kwarg = "b_account_id"
@@ -143,9 +127,7 @@ class BankAccountEditView(CanViewMixin, UpdateView):
 
 
 class BankAccountDetailView(CanViewMixin, DetailView):
-    """
-    A detail view, listing every club account
-    """
+    """A detail view, listing every club account."""
 
     model = BankAccount
     pk_url_kwarg = "b_account_id"
@@ -153,9 +135,7 @@ class BankAccountDetailView(CanViewMixin, DetailView):
 
 
 class BankAccountCreateView(CanCreateMixin, CreateView):
-    """
-    Create a bank account (for the admins)
-    """
+    """Create a bank account (for the admins)."""
 
     model = BankAccount
     fields = ["name", "club", "iban", "number"]
@@ -165,9 +145,7 @@ class BankAccountCreateView(CanCreateMixin, CreateView):
 class BankAccountDeleteView(
     CanEditPropMixin, DeleteView
 ):  # TODO change Delete to Close
-    """
-    Delete a bank account (for the admins)
-    """
+    """Delete a bank account (for the admins)."""
 
     model = BankAccount
     pk_url_kwarg = "b_account_id"
@@ -179,9 +157,7 @@ class BankAccountDeleteView(
 
 
 class ClubAccountEditView(CanViewMixin, UpdateView):
-    """
-    An edit view for the admins
-    """
+    """An edit view for the admins."""
 
     model = ClubAccount
     pk_url_kwarg = "c_account_id"
@@ -190,9 +166,7 @@ class ClubAccountEditView(CanViewMixin, UpdateView):
 
 
 class ClubAccountDetailView(CanViewMixin, DetailView):
-    """
-    A detail view, listing every journal
-    """
+    """A detail view, listing every journal."""
 
     model = ClubAccount
     pk_url_kwarg = "c_account_id"
@@ -200,9 +174,7 @@ class ClubAccountDetailView(CanViewMixin, DetailView):
 
 
 class ClubAccountCreateView(CanCreateMixin, CreateView):
-    """
-    Create a club account (for the admins)
-    """
+    """Create a club account (for the admins)."""
 
     model = ClubAccount
     fields = ["name", "club", "bank_account"]
@@ -220,9 +192,7 @@ class ClubAccountCreateView(CanCreateMixin, CreateView):
 class ClubAccountDeleteView(
     CanEditPropMixin, DeleteView
 ):  # TODO change Delete to Close
-    """
-    Delete a club account (for the admins)
-    """
+    """Delete a club account (for the admins)."""
 
     model = ClubAccount
     pk_url_kwarg = "c_account_id"
@@ -282,9 +252,7 @@ class JournalTabsMixin(TabedViewMixin):
 
 
 class JournalCreateView(CanCreateMixin, CreateView):
-    """
-    Create a general journal
-    """
+    """Create a general journal."""
 
     model = GeneralJournal
     form_class = modelform_factory(
@@ -304,9 +272,7 @@ class JournalCreateView(CanCreateMixin, CreateView):
 
 
 class JournalDetailView(JournalTabsMixin, CanViewMixin, DetailView):
-    """
-    A detail view, listing every operation
-    """
+    """A detail view, listing every operation."""
 
     model = GeneralJournal
     pk_url_kwarg = "j_id"
@@ -315,9 +281,7 @@ class JournalDetailView(JournalTabsMixin, CanViewMixin, DetailView):
 
 
 class JournalEditView(CanEditMixin, UpdateView):
-    """
-    Update a general journal
-    """
+    """Update a general journal."""
 
     model = GeneralJournal
     pk_url_kwarg = "j_id"
@@ -326,9 +290,7 @@ class JournalEditView(CanEditMixin, UpdateView):
 
 
 class JournalDeleteView(CanEditPropMixin, DeleteView):
-    """
-    Delete a club account (for the admins)
-    """
+    """Delete a club account (for the admins)."""
 
     model = GeneralJournal
     pk_url_kwarg = "j_id"
@@ -467,9 +429,7 @@ class OperationForm(forms.ModelForm):
 
 
 class OperationCreateView(CanCreateMixin, CreateView):
-    """
-    Create an operation
-    """
+    """Create an operation."""
 
     model = Operation
     form_class = OperationForm
@@ -487,7 +447,7 @@ class OperationCreateView(CanCreateMixin, CreateView):
         return ret
 
     def get_context_data(self, **kwargs):
-        """Add journal to the context"""
+        """Add journal to the context."""
         kwargs = super().get_context_data(**kwargs)
         if self.journal:
             kwargs["object"] = self.journal
@@ -495,9 +455,7 @@ class OperationCreateView(CanCreateMixin, CreateView):
 
 
 class OperationEditView(CanEditMixin, UpdateView):
-    """
-    An edit view, working as detail for the moment
-    """
+    """An edit view, working as detail for the moment."""
 
     model = Operation
     pk_url_kwarg = "op_id"
@@ -505,16 +463,14 @@ class OperationEditView(CanEditMixin, UpdateView):
     template_name = "accounting/operation_edit.jinja"
 
     def get_context_data(self, **kwargs):
-        """Add journal to the context"""
+        """Add journal to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["object"] = self.object.journal
         return kwargs
 
 
 class OperationPDFView(CanViewMixin, DetailView):
-    """
-    Display the PDF of a given operation
-    """
+    """Display the PDF of a given operation."""
 
     model = Operation
     pk_url_kwarg = "op_id"
@@ -666,9 +622,7 @@ class OperationPDFView(CanViewMixin, DetailView):
 
 
 class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
-    """
-    Display a statement sorted by labels
-    """
+    """Display a statement sorted by labels."""
 
     model = GeneralJournal
     pk_url_kwarg = "j_id"
@@ -726,16 +680,14 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         return statement
 
     def get_context_data(self, **kwargs):
-        """Add infos to the context"""
+        """Add infos to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["statement"] = self.big_statement()
         return kwargs
 
 
 class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
-    """
-    Calculate a dictionary with operation target and sum of operations
-    """
+    """Calculate a dictionary with operation target and sum of operations."""
 
     model = GeneralJournal
     pk_url_kwarg = "j_id"
@@ -765,7 +717,7 @@ class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         return sum(self.statement(movement_type).values())
 
     def get_context_data(self, **kwargs):
-        """Add journal to the context"""
+        """Add journal to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["credit_statement"] = self.statement("CREDIT")
         kwargs["debit_statement"] = self.statement("DEBIT")
@@ -775,9 +727,7 @@ class JournalPersonStatementView(JournalTabsMixin, CanViewMixin, DetailView):
 
 
 class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView):
-    """
-    Calculate a dictionary with operation type and sum of operations
-    """
+    """Calculate a dictionary with operation type and sum of operations."""
 
     model = GeneralJournal
     pk_url_kwarg = "j_id"
@@ -795,7 +745,7 @@ class JournalAccountingStatementView(JournalTabsMixin, CanViewMixin, DetailView)
         return statement
 
     def get_context_data(self, **kwargs):
-        """Add journal to the context"""
+        """Add journal to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["statement"] = self.statement()
         return kwargs
@@ -810,9 +760,7 @@ class CompanyListView(CanViewMixin, ListView):
 
 
 class CompanyCreateView(CanCreateMixin, CreateView):
-    """
-    Create a company
-    """
+    """Create a company."""
 
     model = Company
     fields = ["name"]
@@ -821,9 +769,7 @@ class CompanyCreateView(CanCreateMixin, CreateView):
 
 
 class CompanyEditView(CanCreateMixin, UpdateView):
-    """
-    Edit a company
-    """
+    """Edit a company."""
 
     model = Company
     pk_url_kwarg = "co_id"
@@ -882,9 +828,7 @@ class CloseCustomerAccountForm(forms.Form):
 
 
 class RefoundAccountView(FormView):
-    """
-    Create a selling with the same amount than the current user money
-    """
+    """Create a selling with the same amount than the current user money."""
 
     template_name = "accounting/refound_account.jinja"
     form_class = CloseCustomerAccountForm

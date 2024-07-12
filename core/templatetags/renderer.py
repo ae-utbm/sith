@@ -46,9 +46,7 @@ def markdown(text):
 def phonenumber(
     value, country="FR", number_format=phonenumbers.PhoneNumberFormat.NATIONAL
 ):
-    """
-    This filter is kindly borrowed from https://github.com/foundertherapy/django-phonenumber-filter
-    """
+    # collectivised from https://github.com/foundertherapy/django-phonenumber-filter.
     value = str(value)
     try:
         parsed = phonenumbers.parse(value, country)
@@ -59,6 +57,12 @@ def phonenumber(
 
 @register.filter(name="truncate_time")
 def truncate_time(value, time_unit):
+    """Remove everything in the time format lower than the specified unit.
+
+    Args:
+        value: the value to truncate
+        time_unit: the lowest unit to display
+    """
     value = str(value)
     return {
         "millis": lambda: value.split(".")[0],
@@ -81,8 +85,6 @@ def format_timedelta(value: datetime.timedelta) -> str:
 
 @register.simple_tag()
 def scss(path):
-    """
-    Return path of the corresponding css file after compilation
-    """
+    """Return path of the corresponding css file after compilation."""
     processor = ScssProcessor(path)
     return processor.get_converted_scss()

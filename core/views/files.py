@@ -42,8 +42,7 @@ from counter.models import Counter
 
 
 def send_file(request, file_id, file_class=SithFile, file_attr="file"):
-    """
-    Send a file through Django without loading the whole file into
+    """Send a file through Django without loading the whole file into
     memory at once. The FileWrapper will turn the file object into an
     iterator for chunks of 8KB.
     """
@@ -268,7 +267,7 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
 
 
 class FileView(CanViewMixin, DetailView, FormMixin):
-    """This class handle the upload of new files into a folder"""
+    """Handle the upload of new files into a folder."""
 
     model = SithFile
     pk_url_kwarg = "file_id"
@@ -278,8 +277,8 @@ class FileView(CanViewMixin, DetailView, FormMixin):
 
     @staticmethod
     def handle_clipboard(request, obj):
-        """
-        This method handles the clipboard in the view.
+        """Handle the clipboard in the view.
+
         This method can fail, since it does not catch the exceptions coming from
         below, allowing proper handling in the calling view.
         Use this method like this:
