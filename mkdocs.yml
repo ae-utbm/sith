@@ -48,6 +48,9 @@ plugins:
             show_inherited_members: true
             merge_init_into_class: true
             show_root_toc_entry: false
+  - include-markdown:
+      opening_tag: "{!"
+      closing_tag: "!}"
   - search
 nav:
   - Accueil: index.md
@@ -55,6 +58,7 @@ nav:
     - Accueil: explanation/index.md
     - Technologies utilisées: explanation/technos.md
     - Conventions: explanation/conventions.md
+    - Archives: explanation/archives.md
   - Tutoriels:
     - Installer le projet: tutorial/install.md
     - Configurer son éditeur: tutorial/devtools.md
