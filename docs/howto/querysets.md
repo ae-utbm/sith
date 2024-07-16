@@ -27,7 +27,7 @@ Django est dans ce deuxième cas.
 C'est pourquoi nous ne parlerons pas ici
 de son fonctionnement exact ni de toutes les fonctions
 que l'on peut utiliser 
-(la doc officielle fait déjà ça mieux que nous),
+(la [doc officielle](https://docs.djangoproject.com/fr/stable/topics/db/queries/) fait déjà ça mieux que nous),
 mais plutôt des pièges courants
 et des astuces pour les éviter.
 

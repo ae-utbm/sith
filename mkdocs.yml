@@ -63,14 +63,15 @@ nav:
     - Gestion des groupes: tutorial/groups.md
     - Etransactions: tutorial/etransaction.md
   - How-to:
-    - Terminal: howto/terminal.md
-    - Direnv: howto/direnv.md
     - L'ORM de Django: howto/querysets.md
     - Gérer les migrations: howto/migrations.md
     - Gérer les traductions: howto/translation.md
     - Configurer pour la production: howto/prod.md
+    - Ajouter un logo de promo: howto/logo.md
     - Ajouter une cotisation: howto/subscriptions.md
     - Modifier le weekmail: howto/weekmail.md
+    - Terminal: howto/terminal.md
+    - Direnv: howto/direnv.md
   - Reference:
     - accounting:
       - reference/accounting/models.md
