@@ -109,7 +109,7 @@ for user in richest.select_related("customer")[:100]:
 
 Le code ci-dessus effectue une seule requête.
 Chaque fois qu'on veut accéder à `customer`, c'est bon,
-ça a déjà été récupéré à travers le `annotate`.
+ça a déjà été récupéré à travers le `select_related`.
 
 ### `prefetch_related`
 
@@ -276,5 +276,135 @@ total_amount = (
 En effectuant cette requête, la base de données nous renverra exactement
 l'information dont nous avons besoin.
 Et de notre côté, nous n'aurons pas à faire de traitement en plus.
+
+
+## Benchmark
+
+### Ce qu'il faut mesurer
+
+Quand on parle d'interaction avec une base de données,
+la question de la performance est cruciale.
+Et quand on parle de performance, on en vient
+forcément à parler d'optimisation.
+
+Or, pour optimiser, il faut savoir quoi optimiser.
+C'est-à-dire qu'il nous faut un benchmark pour
+étudier les performances réelles de notre code.
+En ce qui concerne des requêtes à une base de données,
+deux aspects sont étudiables :
+
+- le nombre de requêtes qu'une vue ou une fonction
+  effectue pour son fonctionnement.
+- le temps d'exécution individuel des requêtes les plus longues.
+
+Le premier aspect est celui qui nous intéresse le plus,
+puisqu'il est relié au problème le plus fréquent
+et le plus facile à mesurer.
+Le second aspect, au contraire, est bien moins fréquent
+(dans 99% des cas, une requête complexe prendra
+moins de temps que deux requêtes, même simples)
+et bien plus dur à mesurer (il faut réussir à faire des mesures fiables,
+dans un environnement proche de celui de la prod, avec les données de la prod).
+
+Nous considérerons donc que dans la quasi-totalité des cas,
+le problème vient du nombre de requêtes, pas du temps d'exécution
+d'une requête en particulier.
+Partez du principe que moins vous faites de requêtes, mieux c'est,
+sans prêter attention au temps d'exécution des requêtes.
+
+Pour quantifier de manière fiables les requêtes effectuées,
+il y a quelques outils.
+
+### `django-debug-toolbar`
+
+La `django-debug-toolbar` est une interface disponible
+sur toutes les pages quand vous êtes en mode debug.
+Elle s'affiche à droite et vous permet de voir toutes sortes
+d'informations, parmi lesquelles le nombre de requêtes effectuées.
+
+Cette interface est très pratique, puisqu'elle va plus loin
+que simplement compter les requêtes,
+elle vous donne également le SQL qui a été utilisé,
+l'endroit du code, avec fichier et numéro de ligne,
+où cette requête a été faite et, encore mieux,
+elle vous indique quelles requêtes semblent dupliquées.
+
+Quand `django-debug-toolbar` vous indique qu'une requête
+a été dupliquée quatre fois, cinq fois, ou même deux cent fois
+(le chiffre peut sembler énorme, mais c'est déjà arrivé),
+vous pouvez être sûr qu'il y a là quelque chose à optimiser.
+
+!!!warning
+
+    Le widget de `django-debug-toolbar` ne s'affiche
+    que sur les pages html.
+    Si vous voulez étudier autre chose,
+    comme une simple fonction,
+    ou bien comme une vue retournant du JSON,
+    vous n'aurez donc pas `django-debug-toolbar`.
+
+
+### `connection.queries`
+
+Quand vous voulez examiner les requêtes d'un bout de code
+en particulier, Django met à disposition un mécanisme
+permettant d'examiner toutes les requêtes qui sont faites :
+`connection.queries`
+
+C'est un historique de toutes les requêtes effectuées,
+qui est assez simple à utiliser :
+
+```python
+from django.db import connection
+from core.models import User
+
+print(len(connection.queries))  # 0
+
+nb_users = User.objects.count()
+
+print(len(connection.queries))  # 1
+print(connection.queries)  # affiche toutes les requêtes effectuées
+```
+
+### `assertNumQueries`
+
+Quand on a mis en place une fonctionnalité,
+ou qu'on en a amélioré les performances,
+on veut absolument éviter la régression.
+
+Or, une régression ne se manifeste pas forcément
+dans l'apparition d'un bug : ça peut aussi
+être une augmentation du temps d'exécution, possiblement
+causé par une augmentation du nombre de requêtes.
+
+C'est pour ça que django met à disposition un moyen
+de tester automatiquement le nombre de requêtes :
+`assertNumQueries`.
+
+Il s'agit d'un gestionnaire de contexte accessible
+dans les tests, qui teste le nombre de requêtes
+effectuées en son sein.
+
+Par exemple :
+
+```python
+from django.test import TestCase
+from django.shortcuts import reverse
+
+
+class FooTest(TestCase):
+    def test_nb_queries(self):
+        """Test that the number of db queries is stable."""
+        with self.assertNumQueries(6):
+            self.client.get(reverse("foo:bar"))
+```
+
+Si l'exécution de la route nécessite plus ou moins de six requêtes,
+alors le test échoue.
+S'il y a eu moins que le nombre de requête attendu, alors tant
+mieux, modifiez le test pour coller au nouveau nombre
+(sous réserve que tous les autres tests passent, bien sûr).
+Si par contre il y a eu plus, alors désolé, vous avez sans doute
+introduit une régression.
 
 
