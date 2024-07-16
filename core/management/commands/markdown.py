@@ -21,20 +21,19 @@
 #
 #
 
-import os
+from pathlib import Path
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from core.markdown import markdown
 
 
 class Command(BaseCommand):
-    help = "Output the fully rendered doc/SYNTAX.md file"
+    help = "Output the fully rendered SYNTAX.md file"
 
     def handle(self, *args, **options):
-        root_path = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        )
-        with open(os.path.join(root_path) + "/doc/SYNTAX.md", "r") as md:
+        root_path = Path(settings.BASE_DIR)
+        with open(root_path / "core/fixtures/SYNTAX.md", "r") as md:
             result = markdown(md.read())
         print(result, end="")

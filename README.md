@@ -5,8 +5,8 @@
   <a href="#">
     <img src="https://img.shields.io/github/checks-status/ae-utbm/sith3/master?logo=github&style=for-the-badge&label=BUILD">
   </a>
-  <a href="https://sith-ae.readthedocs.io/">
-    <img src="https://img.shields.io/readthedocs/sith-ae?logo=readthedocs&style=for-the-badge">
+  <a href="https://ae-utbm.github.io/sith3">
+    <img src="https://img.shields.io/badge/Documentation?style=for-the-badge&logo=MaterialForMkDocs">
   </a>
   <a href="https://discord.gg/XK9WfPsUFm">
     <img src="https://img.shields.io/discord/971448179075731476?label=Discord&logo=discord&style=for-the-badge">

@@ -215,9 +215,9 @@ def test_custom_markdown_syntax(md, html):
 
 
 def test_full_markdown_syntax():
-    doc_path = Path(settings.BASE_DIR) / "doc"
-    md = (doc_path / "SYNTAX.md").read_text()
-    html = (doc_path / "SYNTAX.html").read_text()
+    syntax_path = Path(settings.BASE_DIR) / "core" / "fixtures"
+    md = (syntax_path / "SYNTAX.md").read_text()
+    html = (syntax_path / "SYNTAX.html").read_text()
     result = markdown(md)
     assert result == html
 
