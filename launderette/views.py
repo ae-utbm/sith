@@ -15,8 +15,8 @@
 
 from collections import OrderedDict
 from datetime import datetime, timedelta
+from datetime import timezone as tz
 
-import pytz
 from django import forms
 from django.conf import settings
 from django.db import DataError, transaction
@@ -79,7 +79,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                 self.subscriber = request.user
                 if self.subscriber.is_subscribed:
                     self.date = dateparse.parse_datetime(request.POST["slot"]).replace(
-                        tzinfo=pytz.UTC
+                        tzinfo=tz.utc
                     )
                     if self.slot_type == "WASHING":
                         if self.check_slot(self.slot_type):
@@ -138,7 +138,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
         kwargs["planning"] = OrderedDict()
         kwargs["slot_type"] = self.slot_type
         start_date = datetime.now().replace(
-            hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.UTC
+            hour=0, minute=0, second=0, microsecond=0, tzinfo=tz.utc
         )
         for date in LaunderetteBookView.date_iterator(
             start_date, start_date + timedelta(days=6), timedelta(days=1)
@@ -158,7 +158,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                     free = True
                 elif self.slot_type == "DRYING" and self.check_slot("DRYING", h):
                     free = True
-                if free and datetime.now().replace(tzinfo=pytz.UTC) < h:
+                if free and datetime.now().replace(tzinfo=tz.utc) < h:
                     kwargs["planning"][date].append(h)
                 else:
                     kwargs["planning"][date].append(None)
@@ -393,7 +393,7 @@ class ClickTokenForm(forms.BaseForm):
                     slot.token = t
                     slot.save()
                     t.user = subscriber
-                    t.borrow_date = datetime.now().replace(tzinfo=pytz.UTC)
+                    t.borrow_date = datetime.now().replace(tzinfo=tz.utc)
                     t.save()
                     price = settings.SITH_LAUNDERETTE_PRICES[t.type]
                     s = Selling(

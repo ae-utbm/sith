@@ -15,10 +15,10 @@
 import json
 import re
 from datetime import datetime, timedelta
+from datetime import timezone as tz
 from http import HTTPStatus
 from urllib.parse import parse_qs
 
-import pytz
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -1439,10 +1439,10 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
                     )
                 else:
                     refillings = refillings.filter(
-                        date__gte=datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC)
+                        date__gte=datetime(year=1994, month=5, day=17, tzinfo=tz.utc)
                     )  # My birth date should be old enough
                     cashredistersummaries = cashredistersummaries.filter(
-                        date__gte=datetime(year=1994, month=5, day=17, tzinfo=pytz.UTC)
+                        date__gte=datetime(year=1994, month=5, day=17, tzinfo=tz.utc)
                     )
             if form.is_valid() and form.cleaned_data["end_date"]:
                 refillings = refillings.filter(date__lte=form.cleaned_data["end_date"])
@@ -1464,17 +1464,15 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         """Add sums to the context"""
         kwargs = super().get_context_data(**kwargs)
         kwargs["months"] = Selling.objects.datetimes("date", "month", order="DESC")
-        start_date = None
-        end_date = None
-        try:
+        if "month" in self.request.GET:
             start_date = datetime.strptime(self.request.GET["month"], "%Y-%m")
-        except:
+        else:
             start_date = datetime(
                 year=timezone.now().year,
                 month=(timezone.now().month + 10) % 12 + 1,
                 day=1,
             )
-        start_date = start_date.replace(tzinfo=pytz.UTC)
+        start_date = start_date.replace(tzinfo=tz.utc)
         end_date = (start_date + timedelta(days=32)).replace(
             day=1, hour=0, minute=0, microsecond=0
         )

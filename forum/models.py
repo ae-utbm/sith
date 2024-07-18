@@ -23,9 +23,9 @@
 from __future__ import annotations
 
 from datetime import datetime
+from datetime import timezone as tz
 from itertools import chain
 
-import pytz
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -437,7 +437,7 @@ class ForumUserInfo(models.Model):
     last_read_date = models.DateTimeField(
         _("last read date"),
         default=datetime(
-            year=settings.SITH_SCHOOL_START_YEAR, month=1, day=1, tzinfo=pytz.UTC
+            year=settings.SITH_SCHOOL_START_YEAR, month=1, day=1, tzinfo=tz.utc
         ),
     )
 
