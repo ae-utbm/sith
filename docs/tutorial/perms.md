@@ -1,8 +1,10 @@
 
 ## Les permissions
 
-Le site n'utilise pas le système de permissions intégré de Django,
-mais un système de conception maison.
+Le fonctionnement de l'AE ne permet pas d'utiliser le système de permissions
+intégré à Django tel quel. Lors de la conception du Sith, ce qui paraissait le
+plus simple à l'époque était de concevoir un système maison afin de se calquer
+sur ce que faisais l'ancien site.
 
 ### Protéger un modèle
 
@@ -181,7 +183,7 @@ Les mixins suivants sont implémentés :
 
 !!!danger "Performance"
 
-    Ce système maison de permissions ne rend pas trop mal, d'un point de vue esthétique.  
+    Ce système maison de permissions fonctionne et répond aux attentes de l'époque de sa conception.  
     Mais d'un point de vue performance, il est souvent plus que problématique.
     En effet, toutes les permissions sont dynamiquement calculées et
     nécessitent plusieurs appels en base de données qui ne se résument pas à
@@ -194,7 +196,4 @@ Les mixins suivants sont implémentés :
     Sur une vue où on manipule un seul objet, passe encore.
     Mais sur les `ListView`, on peut arriver à des temps
     de réponse extrêmement élevés.
-
-    Faites donc doublement, triplement, quadruplement attention,
-    quand vous manipulez le système de permissions.
 
