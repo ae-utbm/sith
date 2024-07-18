@@ -65,7 +65,7 @@ class TestUserRegistration:
                 {"password2": "not the same as password1"},
                 "Les deux mots de passe ne correspondent pas.",
             ),
-            ({"email": "not-an-email"}, "Saisissez une adresse e-mail valide."),
+            ({"email": "not-an-email"}, "Saisissez une adresse de courriel valide."),
             ({"first_name": ""}, "Ce champ est obligatoire."),
             ({"last_name": ""}, "Ce champ est obligatoire."),
             ({"captcha_1": "WRONG_CAPTCHA"}, "CAPTCHA invalide"),
@@ -310,7 +310,6 @@ http://git.an
         )
         response = self.client.get(reverse("core:page", kwargs={"page_name": "guy"}))
         assert response.status_code == 200
-        print(response.content.decode())
         expected = """
             <p>Guy <em>bibou</em></p>
             <p><a href="http://git.an">http://git.an</a></p>

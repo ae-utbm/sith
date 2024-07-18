@@ -26,6 +26,7 @@ import math
 from ajax_select import make_ajax_field
 from django import forms
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import IntegrityError
@@ -43,7 +44,6 @@ from core.views import (
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
-    UserIsLoggedMixin,
     can_view,
 )
 from core.views.forms import MarkdownInput
@@ -273,7 +273,7 @@ class ForumTopicEditView(CanEditMixin, UpdateView):
 
 
 class ForumTopicSubscribeView(
-    CanViewMixin, UserIsLoggedMixin, SingleObjectMixin, RedirectView
+    LoginRequiredMixin, CanViewMixin, SingleObjectMixin, RedirectView
 ):
     model = ForumTopic
     pk_url_kwarg = "topic_id"

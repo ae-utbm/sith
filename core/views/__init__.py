@@ -25,6 +25,7 @@
 import types
 from typing import Any
 
+from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import (
     ImproperlyConfigured,
     PermissionDenied,
@@ -234,7 +235,7 @@ class UserIsRootMixin(GenericContentPermissionMixinBuilder):
     permission_function = lambda obj, user: user.is_root
 
 
-class FormerSubscriberMixin(View):
+class FormerSubscriberMixin(AccessMixin):
     """Check if the user was at least an old subscriber.
 
     Raises:
@@ -247,16 +248,10 @@ class FormerSubscriberMixin(View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class UserIsLoggedMixin(View):
-    """Check if the user is logged.
-
-    Raises:
-        PermissionDenied:
-    """
-
+class SubscriberMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_anonymous:
-            raise PermissionDenied
+        if not request.user.is_subscribed:
+            return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
 
 

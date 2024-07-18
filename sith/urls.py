@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
+from ninja_extra import NinjaExtraAPI
 
 js_info_dict = {"packages": ("sith",)}
 
@@ -26,8 +27,12 @@ handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
 
+api = NinjaExtraAPI(version="0.2.0", urls_namespace="api")
+api.auto_discover_controllers()
+
 urlpatterns = [
     path("", include(("core.urls", "core"), namespace="core")),
+    path("api/", api.urls),
     path("rootplace/", include(("rootplace.urls", "rootplace"), namespace="rootplace")),
     path(
         "subscription/",
@@ -47,7 +52,6 @@ urlpatterns = [
         include(("launderette.urls", "launderette"), namespace="launderette"),
     ),
     path("sas/", include(("sas.urls", "sas"), namespace="sas")),
-    path("api/v1/", include(("api.urls", "api"), namespace="api")),
     path("election/", include(("election.urls", "election"), namespace="election")),
     path("forum/", include(("forum.urls", "forum"), namespace="forum")),
     path("galaxy/", include(("galaxy.urls", "galaxy"), namespace="galaxy")),
@@ -60,7 +64,6 @@ urlpatterns = [
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
     path("captcha/", include("captcha.urls")),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

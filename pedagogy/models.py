@@ -28,7 +28,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
 from core.models import User
 
@@ -327,30 +326,3 @@ class UVCommentReport(models.Model):
     def is_owned_by(self, user):
         """Can be created by a pedagogy admin, a superuser or a subscriber."""
         return user.is_subscribed or user.is_owner(self.comment.uv)
-
-
-# Custom serializers
-
-
-class UVSerializer(serializers.ModelSerializer):
-    """Custom seralizer for UVs.
-
-    Allow adding more informations like absolute_url.
-    """
-
-    class Meta:
-        model = UV
-        fields = "__all__"
-
-    absolute_url = serializers.SerializerMethodField()
-    update_url = serializers.SerializerMethodField()
-    delete_url = serializers.SerializerMethodField()
-
-    def get_absolute_url(self, obj):
-        return obj.get_absolute_url()
-
-    def get_update_url(self, obj):
-        return reverse("pedagogy:uv_update", kwargs={"uv_id": obj.id})
-
-    def get_delete_url(self, obj):
-        return reverse("pedagogy:uv_delete", kwargs={"uv_id": obj.id})

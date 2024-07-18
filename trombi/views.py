@@ -46,7 +46,6 @@ from core.views import (
     CanViewMixin,
     QuickNotifMixin,
     TabedViewMixin,
-    UserIsLoggedMixin,
 )
 from core.views.forms import SelectDate
 from trombi.models import Trombi, TrombiClubMembership, TrombiComment, TrombiUser
@@ -296,7 +295,7 @@ class UserTrombiForm(forms.Form):
 
 
 class UserTrombiToolsView(
-    QuickNotifMixin, TrombiTabsMixin, UserIsLoggedMixin, TemplateView
+    LoginRequiredMixin, QuickNotifMixin, TrombiTabsMixin, TemplateView
 ):
     """Display a user's trombi tools."""
 

@@ -84,10 +84,10 @@
         }
         function download_pictures() {
             $("#download_all_pictures").prop("disabled", true);
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             $.ajax({
                 type: "GET",
-                url: "{{ url('api:all_pictures_of_user', user=object.id) }}",
+                url: "{{ url('api:pictures') }}?users_identified={{ object.id }}",
                 tryCount: 0,
                 xhr: function(){
                      return xhr;
