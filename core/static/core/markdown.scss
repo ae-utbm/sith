@@ -20,8 +20,12 @@
   code {
     overflow: auto;
     max-width: 100%;
-    font-family: Consolas;
+    font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console",
+      "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono",
+      "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier,
+      monospace;
     font-size: 14px;
+    tab-size: 4;
     border-radius: 4px;
     border: 1px solid var(--border-lightgrey);
     background-color: var(--bg-lightgrey);
@@ -34,7 +38,6 @@
     padding: 10px;
     display: block;
     border-radius: 5px;
-    font-size: 1em;
 
     @media screen and (max-width: 500px) {
       margin: 10px 0;
@@ -43,7 +46,6 @@
 
   blockquote {
     background-color: var(--bg-lightgrey);
-    border: unset;
     border-left: 5px solid #ccc;
     border-radius: 4px;
     margin: 15px;
