@@ -36,9 +36,7 @@ from core.models import User
 
 
 class UV(models.Model):
-    """
-    Contains infos about an UV (course)
-    """
+    """Contains infos about an UV (course)."""
 
     code = models.CharField(
         _("code"),
@@ -148,15 +146,11 @@ class UV(models.Model):
         return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
 
     def is_owned_by(self, user):
-        """
-        Can be created by superuser, root or pedagogy admin user
-        """
+        """Can be created by superuser, root or pedagogy admin user."""
         return user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
 
     def can_be_viewed_by(self, user):
-        """
-        Only visible by subscribers
-        """
+        """Only visible by subscribers."""
         return user.is_subscribed
 
     def __grade_average_generic(self, field):
@@ -166,14 +160,13 @@ class UV(models.Model):
 
         return int(sum(comments.values_list(field, flat=True)) / comments.count())
 
-    def has_user_already_commented(self, user):
-        """
-        Help prevent multiples comments from the same user
-        This function checks that no other comment has been posted by a specified user
+    def has_user_already_commented(self, user: User) -> bool:
+        """Help prevent multiples comments from the same user.
 
-        :param user: core.models.User
-        :return: if the user has already posted a comment on this UV
-        :rtype: bool
+        This function checks that no other comment has been posted by a specified user.
+
+        Returns:
+            True if the user has already posted a comment on this UV, else False.
         """
         return self.comments.filter(author=user).exists()
 
@@ -199,9 +192,7 @@ class UV(models.Model):
 
 
 class UVComment(models.Model):
-    """
-    A comment about an UV
-    """
+    """A comment about an UV."""
 
     author = models.ForeignKey(
         User,
@@ -261,28 +252,30 @@ class UVComment(models.Model):
         super().save(*args, **kwargs)
 
     def is_owned_by(self, user):
-        """
-        Is owned by a pedagogy admin, a superuser or the author himself
-        """
+        """Is owned by a pedagogy admin, a superuser or the author himself."""
         return self.author == user or user.is_owner(self.uv)
 
     @cached_property
     def is_reported(self):
-        """
-        Return True if someone reported this UV
-        """
+        """Return True if someone reported this UV."""
         return self.reports.exists()
 
 
+# TODO : it seems that some views were meant to be implemented
+#        to use this model.
+#        However, it seems that the implementation finally didn't happen.
+#        It should be discussed, when possible, of what to do with that :
+#        - go on and finally implement the UV results features ?
+#        - or fuck go back and remove this model ?
 class UVResult(models.Model):
-    """
-    Results got to an UV
+    """Results got to an UV.
+
     Views will be implemented after the first release
     Will list every UV done by an user
     Linked to user
               uv
     Contains a grade settings.SITH_PEDAGOGY_UV_RESULT_GRADE
-             a semester (P/A)20xx
+             a semester (P/A)20xx.
     """
 
     uv = models.ForeignKey(
@@ -308,9 +301,7 @@ class UVResult(models.Model):
 
 
 class UVCommentReport(models.Model):
-    """
-    Report an inapropriate comment
-    """
+    """Report an inapropriate comment."""
 
     comment = models.ForeignKey(
         UVComment,
@@ -334,9 +325,7 @@ class UVCommentReport(models.Model):
         return self.comment.uv
 
     def is_owned_by(self, user):
-        """
-        Can be created by a pedagogy admin, a superuser or a subscriber
-        """
+        """Can be created by a pedagogy admin, a superuser or a subscriber."""
         return user.is_subscribed or user.is_owner(self.comment.uv)
 
 
@@ -344,9 +333,9 @@ class UVCommentReport(models.Model):
 
 
 class UVSerializer(serializers.ModelSerializer):
-    """
-    Custom seralizer for UVs
-    Allow adding more informations like absolute_url
+    """Custom seralizer for UVs.
+
+    Allow adding more informations like absolute_url.
     """
 
     class Meta:

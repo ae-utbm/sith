@@ -25,9 +25,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class GroupViewSet(RightModelViewSet):
-    """
-    Manage Groups (api/v1/group/)
-    """
+    """Manage Groups (api/v1/group/)."""
 
     serializer_class = GroupSerializer
     queryset = RealGroup.objects.all()

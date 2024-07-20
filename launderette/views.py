@@ -38,26 +38,26 @@ from launderette.models import Launderette, Machine, Slot, Token
 
 
 class LaunderetteMainView(TemplateView):
-    """Main presentation view"""
+    """Main presentation view."""
 
     template_name = "launderette/launderette_main.jinja"
 
     def get_context_data(self, **kwargs):
-        """Add page to the context"""
+        """Add page to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["page"] = Page.objects.filter(name="launderette").first()
         return kwargs
 
 
 class LaunderetteBookMainView(CanViewMixin, ListView):
-    """Choose which launderette to book"""
+    """Choose which launderette to book."""
 
     model = Launderette
     template_name = "launderette/launderette_book_choose.jinja"
 
 
 class LaunderetteBookView(CanViewMixin, DetailView):
-    """Display the launderette schedule"""
+    """Display the launderette schedule."""
 
     model = Launderette
     pk_url_kwarg = "launderette_id"
@@ -133,7 +133,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
             currentDate += delta
 
     def get_context_data(self, **kwargs):
-        """Add page to the context"""
+        """Add page to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["planning"] = OrderedDict()
         kwargs["slot_type"] = self.slot_type
@@ -166,7 +166,7 @@ class LaunderetteBookView(CanViewMixin, DetailView):
 
 
 class SlotDeleteView(CanEditPropMixin, DeleteView):
-    """Delete a slot"""
+    """Delete a slot."""
 
     model = Slot
     pk_url_kwarg = "slot_id"
@@ -180,14 +180,14 @@ class SlotDeleteView(CanEditPropMixin, DeleteView):
 
 
 class LaunderetteListView(CanEditPropMixin, ListView):
-    """Choose which launderette to administer"""
+    """Choose which launderette to administer."""
 
     model = Launderette
     template_name = "launderette/launderette_list.jinja"
 
 
 class LaunderetteEditView(CanEditPropMixin, UpdateView):
-    """Edit a launderette"""
+    """Edit a launderette."""
 
     model = Launderette
     pk_url_kwarg = "launderette_id"
@@ -196,7 +196,7 @@ class LaunderetteEditView(CanEditPropMixin, UpdateView):
 
 
 class LaunderetteCreateView(CanCreateMixin, CreateView):
-    """Create a new launderette"""
+    """Create a new launderette."""
 
     model = Launderette
     fields = ["name"]
@@ -275,7 +275,7 @@ class ManageTokenForm(forms.Form):
 
 
 class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
-    """The admin page of the launderette"""
+    """The admin page of the launderette."""
 
     model = Launderette
     pk_url_kwarg = "launderette_id"
@@ -297,9 +297,7 @@ class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        """
-        We handle here the redirection, passing the user id of the asked customer
-        """
+        """We handle here the redirection, passing the user id of the asked customer."""
         form.process(self.object)
         if form.is_valid():
             return super().form_valid(form)
@@ -307,9 +305,7 @@ class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
             return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
-        """
-        We handle here the login form for the barman
-        """
+        """We handle here the login form for the barman."""
         kwargs = super().get_context_data(**kwargs)
         if self.request.method == "GET":
             kwargs["form"] = self.get_form()
@@ -331,7 +327,7 @@ class GetLaunderetteUserForm(GetUserForm):
 
 
 class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
-    """The click page of the launderette"""
+    """The click page of the launderette."""
 
     model = Launderette
     pk_url_kwarg = "launderette_id"
@@ -347,16 +343,12 @@ class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        """
-        We handle here the redirection, passing the user id of the asked customer
-        """
+        """We handle here the redirection, passing the user id of the asked customer."""
         self.kwargs["user_id"] = form.cleaned_data["user_id"]
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        """
-        We handle here the login form for the barman
-        """
+        """We handle here the login form for the barman."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["counter"] = self.object.counter
         kwargs["form"] = self.get_form()
@@ -417,7 +409,7 @@ class ClickTokenForm(forms.BaseForm):
 
 
 class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
-    """The click page of the launderette"""
+    """The click page of the launderette."""
 
     model = Launderette
     pk_url_kwarg = "launderette_id"
@@ -465,14 +457,14 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
         return type("ClickForm", (ClickTokenForm,), kwargs)
 
     def get(self, request, *args, **kwargs):
-        """Simple get view"""
+        """Simple get view."""
         self.customer = Customer.objects.filter(user__id=self.kwargs["user_id"]).first()
         self.subscriber = self.customer.user
         self.operator = request.user
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        """Handle the many possibilities of the post request"""
+        """Handle the many possibilities of the post request."""
         self.object = self.get_object()
         self.customer = Customer.objects.filter(user__id=self.kwargs["user_id"]).first()
         self.subscriber = self.customer.user
@@ -480,16 +472,12 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        """
-        We handle here the redirection, passing the user id of the asked customer
-        """
+        """We handle here the redirection, passing the user id of the asked customer."""
         self.request.session.update(form.last_basket)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        """
-        We handle here the login form for the barman
-        """
+        """We handle here the login form for the barman."""
         kwargs = super().get_context_data(**kwargs)
         if "form" not in kwargs.keys():
             kwargs["form"] = self.get_form()
@@ -505,7 +493,7 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
 
 
 class MachineEditView(CanEditPropMixin, UpdateView):
-    """Edit a machine"""
+    """Edit a machine."""
 
     model = Machine
     pk_url_kwarg = "machine_id"
@@ -514,7 +502,7 @@ class MachineEditView(CanEditPropMixin, UpdateView):
 
 
 class MachineDeleteView(CanEditPropMixin, DeleteView):
-    """Edit a machine"""
+    """Edit a machine."""
 
     model = Machine
     pk_url_kwarg = "machine_id"
@@ -523,7 +511,7 @@ class MachineDeleteView(CanEditPropMixin, DeleteView):
 
 
 class MachineCreateView(CanCreateMixin, CreateView):
-    """Create a new machine"""
+    """Create a new machine."""
 
     model = Machine
     fields = ["name", "launderette", "type"]

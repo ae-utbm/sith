@@ -39,7 +39,7 @@ from core.models import Notification, Preferences, RealGroup, User
 
 
 class Sith(models.Model):
-    """A one instance class storing all the modifiable infos"""
+    """A one instance class storing all the modifiable infos."""
 
     alert_msg = models.TextField(_("alert message"), default="", blank=True)
     info_msg = models.TextField(_("info message"), default="", blank=True)
@@ -64,7 +64,7 @@ NEWS_TYPES = [
 
 
 class News(models.Model):
-    """The news class"""
+    """The news class."""
 
     title = models.CharField(_("title"), max_length=64)
     summary = models.TextField(_("summary"))
@@ -143,8 +143,7 @@ def news_notification_callback(notif):
 
 
 class NewsDate(models.Model):
-    """
-    A date class, useful for weekly events, or for events that just have no date
+    """A date class, useful for weekly events, or for events that just have no date.
 
     This class allows more flexibilty managing the dates related to a news, particularly when this news is weekly, since
     we don't have to make copies
@@ -164,8 +163,7 @@ class NewsDate(models.Model):
 
 
 class Weekmail(models.Model):
-    """
-    The weekmail class
+    """The weekmail class.
 
     :ivar title: Title of the weekmail
     :ivar intro: Introduction of the weekmail
@@ -189,8 +187,8 @@ class Weekmail(models.Model):
         return f"Weekmail {self.id} (sent: {self.sent}) - {self.title}"
 
     def send(self):
-        """
-        Send the weekmail to all users with the receive weekmail option opt-in.
+        """Send the weekmail to all users with the receive weekmail option opt-in.
+
         Also send the weekmail to the mailing list in settings.SITH_COM_EMAIL.
         """
         dest = [
@@ -214,33 +212,25 @@ class Weekmail(models.Model):
             Weekmail().save()
 
     def render_text(self):
-        """
-        Renders a pure text version of the mail for readers without HTML support.
-        """
+        """Renders a pure text version of the mail for readers without HTML support."""
         return render(
             None, "com/weekmail_renderer_text.jinja", context={"weekmail": self}
         ).content.decode("utf-8")
 
     def render_html(self):
-        """
-        Renders an HTML version of the mail with images and fancy CSS.
-        """
+        """Renders an HTML version of the mail with images and fancy CSS."""
         return render(
             None, "com/weekmail_renderer_html.jinja", context={"weekmail": self}
         ).content.decode("utf-8")
 
     def get_banner(self):
-        """
-        Return an absolute link to the banner.
-        """
+        """Return an absolute link to the banner."""
         return (
             "http://" + settings.SITH_URL + static("com/img/weekmail_bannerV2P22.png")
         )
 
     def get_footer(self):
-        """
-        Return an absolute link to the footer.
-        """
+        """Return an absolute link to the footer."""
         return "http://" + settings.SITH_URL + static("com/img/weekmail_footerP22.png")
 
     def is_owned_by(self, user):

@@ -41,9 +41,7 @@ from stock.models import ShoppingList, ShoppingListItem, Stock, StockItem
 
 
 class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):
-    """
-    The stockitems list view for the counter owner
-    """
+    """The stockitems list view for the counter owner."""
 
     model = Stock
     template_name = "stock/stock_item_list.jinja"
@@ -58,9 +56,7 @@ class StockItemList(CounterAdminTabsMixin, CanCreateMixin, ListView):
 
 
 class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
-    """
-    A list view for the admins
-    """
+    """A list view for the admins."""
 
     model = Stock
     template_name = "stock/stock_list.jinja"
@@ -68,9 +64,7 @@ class StockListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 
 
 class StockEditForm(forms.ModelForm):
-    """
-    A form to change stock's characteristics
-    """
+    """A form to change stock's characteristics."""
 
     class Meta:
         model = Stock
@@ -84,9 +78,7 @@ class StockEditForm(forms.ModelForm):
 
 
 class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
-    """
-    An edit view for the stock
-    """
+    """An edit view for the stock."""
 
     model = Stock
     form_class = modelform_factory(Stock, fields=["name", "counter"])
@@ -96,9 +88,7 @@ class StockEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
 
 
 class StockItemEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
-    """
-    An edit view for a stock item
-    """
+    """An edit view for a stock item."""
 
     model = StockItem
     form_class = modelform_factory(
@@ -118,9 +108,7 @@ class StockItemEditView(CounterAdminTabsMixin, CanEditPropMixin, UpdateView):
 
 
 class StockCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
-    """
-    A create view for a new Stock
-    """
+    """A create view for a new Stock."""
 
     model = Stock
     form_class = modelform_factory(Stock, fields=["name", "counter"])
@@ -137,9 +125,7 @@ class StockCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
 
 
 class StockItemCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
-    """
-    A create view for a new StockItem
-    """
+    """A create view for a new StockItem."""
 
     model = StockItem
     form_class = modelform_factory(
@@ -170,9 +156,7 @@ class StockItemCreateView(CounterAdminTabsMixin, CanCreateMixin, CreateView):
 
 
 class StockShoppingListView(CounterAdminTabsMixin, CanViewMixin, ListView):
-    """
-    A list view for the people to know the item to buy
-    """
+    """A list view for the people to know the item to buy."""
 
     model = Stock
     template_name = "stock/stock_shopping_list.jinja"
@@ -225,9 +209,7 @@ class StockItemQuantityForm(forms.BaseForm):
 class StockItemQuantityBaseFormView(
     CounterAdminTabsMixin, CanEditMixin, DetailView, BaseFormView
 ):
-    """
-    docstring for StockItemOutList
-    """
+    """docstring for StockItemOutList."""
 
     model = StockItem
     template_name = "stock/shopping_list_quantity.jinja"
@@ -266,16 +248,12 @@ class StockItemQuantityBaseFormView(
         return type("StockItemQuantityForm", (StockItemQuantityForm,), kwargs)
 
     def get(self, request, *args, **kwargs):
-        """
-        Simple get view
-        """
+        """Simple get view."""
         self.stock = Stock.objects.filter(id=self.kwargs["stock_id"]).first()
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        """
-        Handle the many possibilities of the post request
-        """
+        """Handle the many possibilities of the post request."""
         self.object = self.get_object()
         self.stock = Stock.objects.filter(id=self.kwargs["stock_id"]).first()
         return super().post(request, *args, **kwargs)
@@ -297,7 +275,7 @@ class StockItemQuantityBaseFormView(
 
 
 class StockShoppingListItemListView(CounterAdminTabsMixin, CanViewMixin, ListView):
-    """docstring for StockShoppingListItemListView"""
+    """docstring for StockShoppingListItemListView."""
 
     model = ShoppingList
     template_name = "stock/shopping_list_items.jinja"
@@ -314,9 +292,7 @@ class StockShoppingListItemListView(CounterAdminTabsMixin, CanViewMixin, ListVie
 
 
 class StockShoppingListDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteView):
-    """
-    Delete a ShoppingList (for the resonsible account)
-    """
+    """Delete a ShoppingList (for the resonsible account)."""
 
     model = ShoppingList
     pk_url_kwarg = "shoppinglist_id"
@@ -330,9 +306,7 @@ class StockShoppingListDeleteView(CounterAdminTabsMixin, CanEditMixin, DeleteVie
 
 
 class StockShopppingListSetDone(CanEditMixin, DetailView):
-    """
-    Set a ShoppingList as done
-    """
+    """Set a ShoppingList as done."""
 
     model = ShoppingList
     pk_url_kwarg = "shoppinglist_id"
@@ -361,9 +335,7 @@ class StockShopppingListSetDone(CanEditMixin, DetailView):
 
 
 class StockShopppingListSetTodo(CanEditMixin, DetailView):
-    """
-    Set a ShoppingList as done
-    """
+    """Set a ShoppingList as done."""
 
     model = ShoppingList
     pk_url_kwarg = "shoppinglist_id"
@@ -415,9 +387,7 @@ class StockUpdateAfterShopppingForm(forms.BaseForm):
 class StockUpdateAfterShopppingBaseFormView(
     CounterAdminTabsMixin, CanEditMixin, DetailView, BaseFormView
 ):
-    """
-    docstring for StockUpdateAfterShopppingBaseFormView
-    """
+    """docstring for StockUpdateAfterShopppingBaseFormView."""
 
     model = ShoppingList
     template_name = "stock/update_after_shopping.jinja"
@@ -453,9 +423,7 @@ class StockUpdateAfterShopppingBaseFormView(
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        """
-        Handle the many possibilities of the post request
-        """
+        """Handle the many possibilities of the post request."""
         self.object = self.get_object()
         self.shoppinglist = ShoppingList.objects.filter(
             id=self.kwargs["shoppinglist_id"]
@@ -463,9 +431,7 @@ class StockUpdateAfterShopppingBaseFormView(
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
-        """
-        We handle here the redirection
-        """
+        """We handle here the redirection."""
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -484,9 +450,7 @@ class StockUpdateAfterShopppingBaseFormView(
 
 
 class StockTakeItemsForm(forms.BaseForm):
-    """
-    docstring for StockTakeItemsFormView
-    """
+    """docstring for StockTakeItemsFormView."""
 
     def clean(self):
         with transaction.atomic():
@@ -502,9 +466,7 @@ class StockTakeItemsForm(forms.BaseForm):
 class StockTakeItemsBaseFormView(
     CounterTabsMixin, CanEditMixin, DetailView, BaseFormView
 ):
-    """
-    docstring for StockTakeItemsBaseFormView
-    """
+    """docstring for StockTakeItemsBaseFormView."""
 
     model = StockItem
     template_name = "stock/stock_take_items.jinja"
@@ -535,16 +497,11 @@ class StockTakeItemsBaseFormView(
         return type("StockTakeItemsForm", (StockTakeItemsForm,), kwargs)
 
     def get(self, request, *args, **kwargs):
-        """
-        Simple get view
-        """
         self.stock = Stock.objects.filter(id=self.kwargs["stock_id"]).first()
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        """
-        Handle the many possibilities of the post request
-        """
+        """Handle the many possibilities of the post request."""
         self.object = self.get_object()
         self.stock = Stock.objects.filter(id=self.kwargs["stock_id"]).first()
         if self.stock.counter.type == "BAR" and not (

@@ -57,21 +57,15 @@ from pedagogy.models import UV, UVComment, UVCommentReport, UVSerializer
 
 
 class CanCreateUVFunctionMixin(View):
-    """
-    Add the function can_create_uv(user) into the template
-    """
+    """Add the function can_create_uv(user) into the template."""
 
     @staticmethod
     def can_create_uv(user):
-        """
-        Creates a dummy instance of UV and test is_owner
-        """
+        """Creates a dummy instance of UV and test is_owner."""
         return user.is_owner(UV())
 
     def get_context_data(self, **kwargs):
-        """
-        Pass the function to the template
-        """
+        """Pass the function to the template."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["can_create_uv"] = self.can_create_uv
         return kwargs
@@ -81,9 +75,9 @@ class CanCreateUVFunctionMixin(View):
 
 
 class UVDetailFormView(CanViewMixin, CanCreateUVFunctionMixin, DetailFormView):
-    """
-    Dispaly every comment of an UV and detailed infos about it
-    Allow to comment the UV
+    """Display every comment of an UV and detailed infos about it.
+
+    Allow to comment the UV.
     """
 
     model = UV
@@ -109,9 +103,7 @@ class UVDetailFormView(CanViewMixin, CanCreateUVFunctionMixin, DetailFormView):
 
 
 class UVCommentUpdateView(CanEditPropMixin, UpdateView):
-    """
-    Allow edit of a given comment
-    """
+    """Allow edit of a given comment."""
 
     model = UVComment
     form_class = UVCommentForm
@@ -132,9 +124,7 @@ class UVCommentUpdateView(CanEditPropMixin, UpdateView):
 
 
 class UVCommentDeleteView(CanEditPropMixin, DeleteView):
-    """
-    Allow delete of a given comment
-    """
+    """Allow delete of a given comment."""
 
     model = UVComment
     pk_url_kwarg = "comment_id"
@@ -145,9 +135,7 @@ class UVCommentDeleteView(CanEditPropMixin, DeleteView):
 
 
 class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
-    """
-    UV guide main page
-    """
+    """UV guide main page."""
 
     # This is very basic and is prone to changment
 
@@ -208,9 +196,7 @@ class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
 
 
 class UVCommentReportCreateView(CanCreateMixin, CreateView):
-    """
-    Create a new report for an inapropriate comment
-    """
+    """Create a new report for an inapropriate comment."""
 
     model = UVCommentReport
     form_class = UVCommentReportForm
@@ -253,9 +239,7 @@ class UVCommentReportCreateView(CanCreateMixin, CreateView):
 
 
 class UVModerationFormView(FormView):
-    """
-    Moderation interface (Privileged)
-    """
+    """Moderation interface (Privileged)."""
 
     form_class = UVCommentModerationForm
     template_name = "pedagogy/moderation.jinja"
@@ -286,9 +270,7 @@ class UVModerationFormView(FormView):
 
 
 class UVCreateView(CanCreateMixin, CreateView):
-    """
-    Add a new UV (Privileged)
-    """
+    """Add a new UV (Privileged)."""
 
     model = UV
     form_class = UVForm
@@ -304,9 +286,7 @@ class UVCreateView(CanCreateMixin, CreateView):
 
 
 class UVDeleteView(CanEditPropMixin, DeleteView):
-    """
-    Allow to delete an UV (Privileged)
-    """
+    """Allow to delete an UV (Privileged)."""
 
     model = UV
     pk_url_kwarg = "uv_id"
@@ -317,9 +297,7 @@ class UVDeleteView(CanEditPropMixin, DeleteView):
 
 
 class UVUpdateView(CanEditPropMixin, UpdateView):
-    """
-    Allow to edit an UV (Privilegied)
-    """
+    """Allow to edit an UV (Privilegied)."""
 
     model = UV
     form_class = UVForm

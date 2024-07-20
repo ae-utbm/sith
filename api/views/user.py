@@ -39,9 +39,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserViewSet(RightModelViewSet):
-    """
-    Manage Users (api/v1/user/)
-    Only show active users
+    """Manage Users (api/v1/user/).
+
+    Only show active users.
     """
 
     serializer_class = UserSerializer
@@ -49,9 +49,7 @@ class UserViewSet(RightModelViewSet):
 
     @action(detail=False)
     def birthday(self, request):
-        """
-        Return all users born today (api/v1/user/birstdays)
-        """
+        """Return all users born today (api/v1/user/birstdays)."""
         date = datetime.datetime.today()
         self.queryset = self.queryset.filter(date_of_birth=date)
         serializer = self.get_serializer(self.queryset, many=True)

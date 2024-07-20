@@ -7,9 +7,7 @@ from core.models import User
 
 @receiver(m2m_changed, sender=User.groups.through, dispatch_uid="user_groups_changed")
 def user_groups_changed(sender, instance: User, **kwargs):
-    """
-    Clear the cached groups of the user
-    """
+    """Clear the cached groups of the user."""
     # As a m2m relationship doesn't live within the model
     # but rather on an intermediary table, there is no
     # model method to override, meaning we must use

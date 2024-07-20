@@ -30,9 +30,7 @@ from pedagogy.models import UV, UVComment, UVCommentReport
 
 
 class UVForm(forms.ModelForm):
-    """
-    Form handeling creation and edit of an UV
-    """
+    """Form handeling creation and edit of an UV."""
 
     class Meta:
         model = UV
@@ -85,9 +83,7 @@ class StarList(forms.NumberInput):
 
 
 class UVCommentForm(forms.ModelForm):
-    """
-    Form handeling creation and edit of an UVComment
-    """
+    """Form handeling creation and edit of an UVComment."""
 
     class Meta:
         model = UVComment
@@ -137,9 +133,7 @@ class UVCommentForm(forms.ModelForm):
 
 
 class UVCommentReportForm(forms.ModelForm):
-    """
-    Form handeling creation and edit of an UVReport
-    """
+    """Form handeling creation and edit of an UVReport."""
 
     class Meta:
         model = UVCommentReport
@@ -159,9 +153,7 @@ class UVCommentReportForm(forms.ModelForm):
 
 
 class UVCommentModerationForm(forms.Form):
-    """
-    Form handeling bulk comment deletion
-    """
+    """Form handeling bulk comment deletion."""
 
     accepted_reports = forms.ModelMultipleChoiceField(
         UVCommentReport.objects.all(),

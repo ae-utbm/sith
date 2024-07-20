@@ -30,9 +30,8 @@ class BillingInfoForm(forms.ModelForm):
 
 
 class StudentCardForm(forms.ModelForm):
-    """
-    Form for adding student cards
-    Only used for user profile since CounterClick is to complicated
+    """Form for adding student cards
+    Only used for user profile since CounterClick is to complicated.
     """
 
     class Meta:
@@ -48,8 +47,7 @@ class StudentCardForm(forms.ModelForm):
 
 
 class GetUserForm(forms.Form):
-    """
-    The Form class aims at providing a valid user_id field in its cleaned data, in order to pass it to some view,
+    """The Form class aims at providing a valid user_id field in its cleaned data, in order to pass it to some view,
     reverse function, or any other use.
 
     The Form implements a nice JS widget allowing the user to type a customer account id, or search the database with

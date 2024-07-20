@@ -44,9 +44,7 @@ class ClubEditForm(forms.ModelForm):
 
 
 class MailingForm(forms.Form):
-    """
-    Form handling mailing lists right
-    """
+    """Form handling mailing lists right."""
 
     ACTION_NEW_MAILING = 1
     ACTION_NEW_SUBSCRIPTION = 2
@@ -105,16 +103,12 @@ class MailingForm(forms.Form):
         )
 
     def check_required(self, cleaned_data, field):
-        """
-        If the given field doesn't exist or has no value, add a required error on it
-        """
+        """If the given field doesn't exist or has no value, add a required error on it."""
         if not cleaned_data.get(field, None):
             self.add_error(field, _("This field is required"))
 
     def clean_subscription_users(self):
-        """
-        Convert given users into real users and check their validity
-        """
+        """Convert given users into real users and check their validity."""
         cleaned_data = super().clean()
         users = []
         for user in cleaned_data["subscription_users"]:
@@ -177,9 +171,7 @@ class SellingsForm(forms.Form):
 
 
 class ClubMemberForm(forms.Form):
-    """
-    Form handling the members of a club
-    """
+    """Form handling the members of a club."""
 
     error_css_class = "error"
     required_css_class = "required"
@@ -236,9 +228,9 @@ class ClubMemberForm(forms.Form):
             self.fields.pop("start_date")
 
     def clean_users(self):
-        """
-        Check that the user is not trying to add an user already in the club
-        Also check that the user is valid and has a valid subscription
+        """Check that the user is not trying to add an user already in the club.
+
+        Also check that the user is valid and has a valid subscription.
         """
         cleaned_data = super().clean()
         users = []
@@ -260,9 +252,7 @@ class ClubMemberForm(forms.Form):
         return users
 
     def clean(self):
-        """
-        Check user rights for adding an user
-        """
+        """Check user rights for adding an user."""
         cleaned_data = super().clean()
 
         if "start_date" in cleaned_data and not cleaned_data["start_date"]:

@@ -1,0 +1,162 @@
+site_name: Site AE UTBM
+site_description: Le site de l'association des étudiants de l'UTBM
+dev_addr: 127.0.0.1:8080
+
+repo_name: sith3
+repo_url: https://github.com/ae-utbm/sith3
+site_url: https://ae-utbm.github.io/sith3
+
+theme:
+  features:
+    - navigation.footer
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deeppurple
+      accent: deeppurple
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to light mode
+
+  language: fr
+  icon:
+    repo: fontawesome/brands/git-alt
+  favicon: img/favicon.png
+
+
+plugins:
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            members: true
+            members_order: source
+            show_source: true
+            show_inherited_members: true
+            merge_init_into_class: true
+            show_root_toc_entry: false
+  - include-markdown:
+      opening_tag: "{!"
+      closing_tag: "!}"
+  - search
+nav:
+  - Accueil: index.md
+  - Explications:
+    - Accueil: explanation/index.md
+    - Technologies utilisées: explanation/technos.md
+    - Conventions: explanation/conventions.md
+    - Archives: explanation/archives.md
+  - Tutoriels:
+    - Installer le projet: tutorial/install.md
+    - Configurer son éditeur: tutorial/devtools.md
+    - Structure du projet: tutorial/structure.md
+    - Gestion des permissions: tutorial/perms.md
+    - Gestion des groupes: tutorial/groups.md
+    - Etransactions: tutorial/etransaction.md
+  - How-to:
+    - L'ORM de Django: howto/querysets.md
+    - Gérer les migrations: howto/migrations.md
+    - Gérer les traductions: howto/translation.md
+    - Configurer pour la production: howto/prod.md
+    - Ajouter un logo de promo: howto/logo.md
+    - Ajouter une cotisation: howto/subscriptions.md
+    - Modifier le weekmail: howto/weekmail.md
+    - Terminal: howto/terminal.md
+    - Direnv: howto/direnv.md
+  - Reference:
+    - accounting:
+      - reference/accounting/models.md
+      - reference/accounting/views.md
+    - club:
+      - reference/club/models.md
+      - reference/club/views.md
+    - com:
+      - reference/com/models.md
+      - reference/com/views.md
+    - core:
+      - reference/core/models.md
+      - reference/core/views.md
+    - counter:
+      - reference/counter/models.md
+      - reference/counter/views.md
+    - eboutic:
+      - reference/eboutic/models.md
+      - reference/eboutic/views.md
+    - election:
+      - reference/election/models.md
+      - reference/election/views.md
+    - forum:
+      - reference/forum/models.md
+      - reference/forum/views.md
+    - galaxy:
+      - reference/galaxy/models.md
+      - reference/galaxy/views.md
+    - launderette:
+      - reference/launderette/models.md
+      - reference/launderette/views.md
+    - matmat:
+      - reference/matmat/models.md
+      - reference/matmat/views.md
+    - pedagogy:
+      - reference/pedagogy/models.md
+      - reference/pedagogy/views.md
+    - rootplace:
+      - reference/rootplace/models.md
+      - reference/rootplace/views.md
+    - sas:
+      - reference/sas/models.md
+      - reference/sas/views.md
+    - stock:
+      - reference/stock/models.md
+      - reference/stock/views.md
+    - subscription:
+      - reference/subscription/models.md
+      - reference/subscription/views.md
+    - trombi:
+      - reference/trombi/models.md
+      - reference/trombi/views.md
+
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      clickable_checkbox: true
+  - pymdownx.tilde:
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+extra_css:
+  - stylesheets/extra.css

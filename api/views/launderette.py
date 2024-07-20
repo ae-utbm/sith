@@ -60,54 +60,42 @@ class LaunderetteTokenSerializer(serializers.ModelSerializer):
 
 
 class LaunderettePlaceViewSet(RightModelViewSet):
-    """
-    Manage Launderette (api/v1/launderette/place/)
-    """
+    """Manage Launderette (api/v1/launderette/place/)."""
 
     serializer_class = LaunderettePlaceSerializer
     queryset = Launderette.objects.all()
 
 
 class LaunderetteMachineViewSet(RightModelViewSet):
-    """
-    Manage Washing Machines (api/v1/launderette/machine/)
-    """
+    """Manage Washing Machines (api/v1/launderette/machine/)."""
 
     serializer_class = LaunderetteMachineSerializer
     queryset = Machine.objects.all()
 
 
 class LaunderetteTokenViewSet(RightModelViewSet):
-    """
-    Manage Launderette's tokens (api/v1/launderette/token/)
-    """
+    """Manage Launderette's tokens (api/v1/launderette/token/)."""
 
     serializer_class = LaunderetteTokenSerializer
     queryset = Token.objects.all()
 
     @action(detail=False)
     def washing(self, request):
-        """
-        Return all washing tokens (api/v1/launderette/token/washing)
-        """
+        """Return all washing tokens (api/v1/launderette/token/washing)."""
         self.queryset = self.queryset.filter(type="WASHING")
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
 
     @action(detail=False)
     def drying(self, request):
-        """
-        Return all drying tokens (api/v1/launderette/token/drying)
-        """
+        """Return all drying tokens (api/v1/launderette/token/drying)."""
         self.queryset = self.queryset.filter(type="DRYING")
         serializer = self.get_serializer(self.queryset, many=True)
         return Response(serializer.data)
 
     @action(detail=False)
     def avaliable(self, request):
-        """
-        Return all avaliable tokens (api/v1/launderette/token/avaliable)
-        """
+        """Return all avaliable tokens (api/v1/launderette/token/avaliable)."""
         self.queryset = self.queryset.filter(
             borrow_date__isnull=True, user__isnull=True
         )
@@ -116,9 +104,7 @@ class LaunderetteTokenViewSet(RightModelViewSet):
 
     @action(detail=False)
     def unavaliable(self, request):
-        """
-        Return all unavaliable tokens (api/v1/launderette/token/unavaliable)
-        """
+        """Return all unavaliable tokens (api/v1/launderette/token/unavaliable)."""
         self.queryset = self.queryset.filter(
             borrow_date__isnull=False, user__isnull=False
         )

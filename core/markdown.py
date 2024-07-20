@@ -14,7 +14,6 @@
 #
 from __future__ import annotations
 
-import os
 import re
 from typing import TYPE_CHECKING
 
@@ -131,9 +130,3 @@ markdown = mistune.create_markdown(
         "url",
     ],
 )
-
-if __name__ == "__main__":
-    root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    with open(os.path.join(root_path) + "/doc/SYNTAX.md", "r") as md:
-        result = markdown(md.read())
-    print(result, end="")

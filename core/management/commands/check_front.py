@@ -90,12 +90,15 @@ def list_tags(s):
             yield parts[1][len(tag_prefix) :]
 
 
-def parse_semver(s):
-    """
-    Turns a semver string into a 3-tuple or None if the parsing failed, it is a
-    prerelease or it has build metadata.
+def parse_semver(s) -> tuple[int, int, int] | None:
+    """Parse a semver string.
 
     See https://semver.org
+
+    Returns:
+        A tuple, if the parsing was successful, else None.
+        In the latter case, it must probably be a prerelease
+        or include build metadata.
     """
     m = semver_regex.match(s)
 
@@ -106,7 +109,7 @@ def parse_semver(s):
     ):
         return None
 
-    return (int(m.group("major")), int(m.group("minor")), int(m.group("patch")))
+    return int(m.group("major")), int(m.group("minor")), int(m.group("patch"))
 
 
 def semver_to_s(t):

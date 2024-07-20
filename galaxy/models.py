@@ -26,7 +26,7 @@ from __future__ import annotations
 import logging
 import math
 import time
-from typing import List, NamedTuple, Optional, TypedDict, Union
+from typing import NamedTuple, TypedDict
 
 from django.db import models
 from django.db.models import Case, Count, F, Q, Value, When
@@ -40,9 +40,9 @@ from sas.models import Picture
 
 
 class GalaxyStar(models.Model):
-    """
-    Define a star (vertex -> user) in the galaxy graph,
-    storing a reference to its owner citizen.
+    """Define a star (vertex -> user) in the galaxy graph.
+
+    Store a reference to its owner citizen.
 
     Stars are linked to each others through the :class:`GalaxyLane` model.
 
@@ -74,13 +74,14 @@ class GalaxyStar(models.Model):
 
 
 @property
-def current_star(self) -> Optional[GalaxyStar]:
-    """
-    The star of this user in the :class:`Galaxy`.
+def current_star(self) -> GalaxyStar | None:
+    """The star of this user in the :class:`Galaxy`.
+
     Only take into account the most recent active galaxy.
 
-    :return: The star of this user if there is an active Galaxy
-             and this user is a citizen of it, else ``None``
+    Returns:
+        The star of this user if there is an active Galaxy
+        and this user is a citizen of it, else `None`
     """
     return self.stars.filter(galaxy=Galaxy.get_current_galaxy()).last()
 
@@ -90,10 +91,9 @@ User.current_star = current_star
 
 
 class GalaxyLane(models.Model):
-    """
-    Define a lane (edge -> link between galaxy citizen)
-    in the galaxy map, storing a reference to both its
-    ends and the distance it covers.
+    """Define a lane (edge -> link between galaxy citizen) in the galaxy map.
+
+    Store a reference to both its ends and the distance it covers.
     Score details between citizen owning the stars is also stored here.
     """
 
@@ -138,8 +138,8 @@ class StarDict(TypedDict):
 
 
 class GalaxyDict(TypedDict):
-    nodes: List[StarDict]
-    links: List
+    nodes: list[StarDict]
+    links: list
 
 
 class RelationScore(NamedTuple):
@@ -149,8 +149,8 @@ class RelationScore(NamedTuple):
 
 
 class Galaxy(models.Model):
-    """
-    The Galaxy, a graph linking the active users between each others.
+    """The Galaxy, a graph linking the active users between each others.
+
     The distance between two users is given by a relation score which takes
     into account a few parameter like the number of pictures they are both tagged on,
     the time during which they were in the same clubs and whether they are
@@ -204,8 +204,8 @@ class Galaxy(models.Model):
 
     @classmethod
     def compute_user_score(cls, user: User) -> int:
-        """
-        Compute an individual score for each citizen.
+        """Compute an individual score for each citizen.
+
         It will later be used by the graph algorithm to push
         higher scores towards the center of the galaxy.
 
@@ -231,10 +231,7 @@ class Galaxy(models.Model):
 
     @classmethod
     def query_user_score(cls, user: User) -> int:
-        """
-        Perform the db query to get the  individual score
-        of the given user in the galaxy.
-        """
+        """Get the individual score of the given user in the galaxy."""
         score_query = (
             User.objects.filter(id=user.id)
             .annotate(
@@ -262,9 +259,9 @@ class Galaxy(models.Model):
 
     @classmethod
     def compute_users_score(cls, user1: User, user2: User) -> RelationScore:
-        """
-        Compute the relationship scores of the two given users
-        in the following fields :
+        """Compute the relationship scores of the two given users.
+
+        The computation is done with the following fields :
 
         - family: if they have some godfather/godchild relation
         - pictures: in how many pictures are both tagged
@@ -277,11 +274,12 @@ class Galaxy(models.Model):
 
     @classmethod
     def compute_users_family_score(cls, user1: User, user2: User) -> int:
-        """
-        Compute the family score of the relation between the given users.
+        """Compute the family score of the relation between the given users.
+
         This takes into account mutual godfathers.
 
-        :return: 366 if user1 is the godfather of user2 (or vice versa) else 0
+        Returns:
+             366 if user1 is the godfather of user2 (or vice versa) else 0
         """
         link_count = User.objects.filter(
             Q(id=user1.id, godfathers=user2) | Q(id=user2.id, godfathers=user1)
@@ -294,14 +292,14 @@ class Galaxy(models.Model):
 
     @classmethod
     def compute_users_pictures_score(cls, user1: User, user2: User) -> int:
-        """
-        Compute the pictures score of the relation between the given users.
+        """Compute the pictures score of the relation between the given users.
 
         The pictures score is obtained by counting the number
         of :class:`Picture` in which they have been both identified.
         This score is then multiplied by 2.
 
-        :return: The number of pictures both users have in common, times 2
+        Returns:
+             The number of pictures both users have in common, times 2
         """
         picture_count = (
             Picture.objects.filter(people__user__in=(user1,))
@@ -316,8 +314,7 @@ class Galaxy(models.Model):
 
     @classmethod
     def compute_users_clubs_score(cls, user1: User, user2: User) -> int:
-        """
-        Compute the clubs score of the relation between the given users.
+        """Compute the clubs score of the relation between the given users.
 
         The club score is obtained by counting the number of days
         during which the memberships (see :class:`club.models.Membership`)
@@ -328,7 +325,8 @@ class Galaxy(models.Model):
         31/12/2022 (also two years, but with an offset of one year), then their
         club score is 365.
 
-        :return: the number of days during which both users were in the same club
+        Returns:
+            the number of days during which both users were in the same club
         """
         common_clubs = Club.objects.filter(members__in=user1.memberships.all()).filter(
             members__in=user2.memberships.all()
@@ -380,13 +378,13 @@ class Galaxy(models.Model):
     ###################
 
     @classmethod
-    def scale_distance(cls, value: Union[int, float]) -> int:
-        """
-        Given a numeric value, return a scaled value which can
+    def scale_distance(cls, value: int | float) -> int:
+        """Given a numeric value, return a scaled value which can
         be used in the Galaxy's graphical interface to set the distance
-        between two stars
+        between two stars.
 
-        :return: the scaled value usable in the Galaxy's 3d graph
+        Returns:
+            the scaled value usable in the Galaxy's 3d graph
         """
         # TODO: this will need adjustements with the real, typical data on Taiste
         if value == 0:
@@ -409,8 +407,8 @@ class Galaxy(models.Model):
         return int(value)
 
     def rule(self, picture_count_threshold=10) -> None:
-        """
-        Main function of the Galaxy.
+        """Main function of the Galaxy.
+
         Iterate over all the rulable users to promote them to citizens.
         A citizen is a user who has a corresponding star in the Galaxy.
         Also build up the lanes, which are the links between the different citizen.
@@ -566,9 +564,7 @@ class Galaxy(models.Model):
         )
 
     def make_state(self) -> None:
-        """
-        Compute JSON structure to send to 3d-force-graph: https://github.com/vasturiano/3d-force-graph/
-        """
+        """Compute JSON structure to send to 3d-force-graph: https://github.com/vasturiano/3d-force-graph/."""
         self.logger.info(
             "Caching current Galaxy state for a quicker display of the Empire's power."
         )

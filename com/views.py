@@ -427,7 +427,7 @@ class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, Detai
         return self.model.objects.filter(sent=False).order_by("-id").first()
 
     def get_context_data(self, **kwargs):
-        """Add rendered weekmail"""
+        """Add rendered weekmail."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["weekmail_rendered"] = self.object.render_html()
         kwargs["bad_recipients"] = self.bad_recipients
@@ -507,7 +507,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        """Add orphan articles"""
+        """Add orphan articles."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["orphans"] = WeekmailArticle.objects.filter(weekmail=None)
         return kwargs
@@ -516,7 +516,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
 class WeekmailArticleEditView(
     ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateView
 ):
-    """Edit an article"""
+    """Edit an article."""
 
     model = WeekmailArticle
     form_class = modelform_factory(
@@ -532,7 +532,7 @@ class WeekmailArticleEditView(
 
 
 class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
-    """Post an article"""
+    """Post an article."""
 
     model = WeekmailArticle
     form_class = modelform_factory(
@@ -574,7 +574,7 @@ class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
 
 
 class WeekmailArticleDeleteView(CanEditPropMixin, DeleteView):
-    """Delete an article"""
+    """Delete an article."""
 
     model = WeekmailArticle
     template_name = "core/delete_confirm.jinja"
@@ -614,7 +614,7 @@ class MailingModerateView(View):
 
 
 class PosterListBaseView(ListView):
-    """List communication posters"""
+    """List communication posters."""
 
     current_tab = "posters"
     model = Poster
@@ -641,7 +641,7 @@ class PosterListBaseView(ListView):
 
 
 class PosterCreateBaseView(CreateView):
-    """Create communication poster"""
+    """Create communication poster."""
 
     current_tab = "posters"
     form_class = PosterForm
@@ -673,7 +673,7 @@ class PosterCreateBaseView(CreateView):
 
 
 class PosterEditBaseView(UpdateView):
-    """Edit communication poster"""
+    """Edit communication poster."""
 
     pk_url_kwarg = "poster_id"
     current_tab = "posters"
@@ -721,7 +721,7 @@ class PosterEditBaseView(UpdateView):
 
 
 class PosterDeleteBaseView(DeleteView):
-    """Edit communication poster"""
+    """Edit communication poster."""
 
     pk_url_kwarg = "poster_id"
     current_tab = "posters"
@@ -738,7 +738,7 @@ class PosterDeleteBaseView(DeleteView):
 
 
 class PosterListView(IsComAdminMixin, ComTabsMixin, PosterListBaseView):
-    """List communication posters"""
+    """List communication posters."""
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
@@ -747,7 +747,7 @@ class PosterListView(IsComAdminMixin, ComTabsMixin, PosterListBaseView):
 
 
 class PosterCreateView(IsComAdminMixin, ComTabsMixin, PosterCreateBaseView):
-    """Create communication poster"""
+    """Create communication poster."""
 
     success_url = reverse_lazy("com:poster_list")
 
@@ -758,7 +758,7 @@ class PosterCreateView(IsComAdminMixin, ComTabsMixin, PosterCreateBaseView):
 
 
 class PosterEditView(IsComAdminMixin, ComTabsMixin, PosterEditBaseView):
-    """Edit communication poster"""
+    """Edit communication poster."""
 
     success_url = reverse_lazy("com:poster_list")
 
@@ -769,13 +769,13 @@ class PosterEditView(IsComAdminMixin, ComTabsMixin, PosterEditBaseView):
 
 
 class PosterDeleteView(IsComAdminMixin, ComTabsMixin, PosterDeleteBaseView):
-    """Delete communication poster"""
+    """Delete communication poster."""
 
     success_url = reverse_lazy("com:poster_list")
 
 
 class PosterModerateListView(IsComAdminMixin, ComTabsMixin, ListView):
-    """Moderate list communication poster"""
+    """Moderate list communication poster."""
 
     current_tab = "posters"
     model = Poster
@@ -789,7 +789,7 @@ class PosterModerateListView(IsComAdminMixin, ComTabsMixin, ListView):
 
 
 class PosterModerateView(IsComAdminMixin, ComTabsMixin, View):
-    """Moderate communication poster"""
+    """Moderate communication poster."""
 
     def get(self, request, *args, **kwargs):
         obj = get_object_or_404(Poster, pk=kwargs["object_id"])
@@ -807,7 +807,7 @@ class PosterModerateView(IsComAdminMixin, ComTabsMixin, View):
 
 
 class ScreenListView(IsComAdminMixin, ComTabsMixin, ListView):
-    """List communication screens"""
+    """List communication screens."""
 
     current_tab = "screens"
     model = Screen
@@ -815,7 +815,7 @@ class ScreenListView(IsComAdminMixin, ComTabsMixin, ListView):
 
 
 class ScreenSlideshowView(DetailView):
-    """Slideshow of actives posters"""
+    """Slideshow of actives posters."""
 
     pk_url_kwarg = "screen_id"
     model = Screen
@@ -828,7 +828,7 @@ class ScreenSlideshowView(DetailView):
 
 
 class ScreenCreateView(IsComAdminMixin, ComTabsMixin, CreateView):
-    """Create communication screen"""
+    """Create communication screen."""
 
     current_tab = "screens"
     model = Screen
@@ -838,7 +838,7 @@ class ScreenCreateView(IsComAdminMixin, ComTabsMixin, CreateView):
 
 
 class ScreenEditView(IsComAdminMixin, ComTabsMixin, UpdateView):
-    """Edit communication screen"""
+    """Edit communication screen."""
 
     pk_url_kwarg = "screen_id"
     current_tab = "screens"
@@ -849,7 +849,7 @@ class ScreenEditView(IsComAdminMixin, ComTabsMixin, UpdateView):
 
 
 class ScreenDeleteView(IsComAdminMixin, ComTabsMixin, DeleteView):
-    """Delete communication screen"""
+    """Delete communication screen."""
 
     pk_url_kwarg = "screen_id"
     current_tab = "screens"

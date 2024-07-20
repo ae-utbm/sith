@@ -34,9 +34,8 @@ from eboutic.models import get_eboutic_products
 
 
 class BasketForm:
-    """
-    Class intended to perform checks on the request sended to the server when
-    the user submits his basket from /eboutic/
+    """Class intended to perform checks on the request sended to the server when
+    the user submits his basket from /eboutic/.
 
     Because it must check an unknown number of fields, coming from a cookie
     and needing some databases checks to be performed, inheriting from forms.Form
@@ -45,6 +44,7 @@ class BasketForm:
     However, it still tries to share some similarities with a standard django Form.
 
     Example:
+    -------
         ::
 
             def my_view(request):
@@ -62,6 +62,7 @@ class BasketForm:
     You can also use a little shortcut by directly calling `form.is_valid()`
     without calling `form.clean()`. In this case, the latter method shall be
     implicitly called.
+
     """
 
     # check the json is an array containing non-nested objects.
@@ -85,8 +86,7 @@ class BasketForm:
         self.correct_cookie = []
 
     def clean(self) -> None:
-        """
-        Perform all the checks, but return nothing.
+        """Perform all the checks, but return nothing.
         To know if the form is valid, the `is_valid()` method must be used.
 
         The form shall be considered as valid if it meets all the following conditions :
@@ -170,9 +170,9 @@ class BasketForm:
         # the form is invalid
 
     def is_valid(self) -> bool:
-        """
-        return True if the form is correct else False.
-        If the `clean()` method has not been called beforehand, call it
+        """Return True if the form is correct else False.
+
+        If the `clean()` method has not been called beforehand, call it.
         """
         if self.error_messages == set() and self.correct_cookie == []:
             self.clean()

@@ -21,11 +21,13 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from __future__ import annotations
+
 import importlib
 import os
 import unicodedata
 from datetime import date, timedelta
-from typing import List, Optional, Union
+from typing import TYPE_CHECKING, Optional
 
 from django.conf import settings
 from django.contrib.auth.models import (
@@ -56,6 +58,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from core import utils
 
+if TYPE_CHECKING:
+    from club.models import Club
+
 
 class RealGroupManager(AuthGroupManager):
     def get_queryset(self):
@@ -68,8 +73,7 @@ class MetaGroupManager(AuthGroupManager):
 
 
 class Group(AuthGroup):
-    """
-    Implement both RealGroups and Meta groups
+    """Implement both RealGroups and Meta groups.
 
     Groups are sorted by their is_meta property
     """
@@ -87,9 +91,6 @@ class Group(AuthGroup):
         ordering = ["name"]
 
     def get_absolute_url(self):
-        """
-        This is needed for black magic powered UpdateView's children
-        """
         return reverse("core:group_list")
 
     def save(self, *args, **kwargs):
@@ -104,8 +105,8 @@ class Group(AuthGroup):
 
 
 class MetaGroup(Group):
-    """
-    MetaGroups are dynamically created groups.
+    """MetaGroups are dynamically created groups.
+
     Generally used with clubs where creating a club creates two groups:
 
     * club-SITH_BOARD_SUFFIX
@@ -123,14 +124,14 @@ class MetaGroup(Group):
         self.is_meta = True
 
     @cached_property
-    def associated_club(self):
-        """
-        Return the group associated with this meta group
+    def associated_club(self) -> Club | None:
+        """Return the group associated with this meta group.
 
         The result of this function is cached
 
-        :return: The associated club if it exists, else None
-        :rtype: club.models.Club | None
+
+        Returns:
+            The associated club if it exists, else None
         """
         from club.models import Club
 
@@ -150,8 +151,8 @@ class MetaGroup(Group):
 
 
 class RealGroup(Group):
-    """
-    RealGroups are created by the developer.
+    """RealGroups are created by the developer.
+
     Most of the time they match a number in settings to be easily used for permissions.
     """
 
@@ -173,22 +174,26 @@ def validate_promo(value):
 
 
 def get_group(*, pk: int = None, name: str = None) -> Optional[Group]:
-    """
-    Search for a group by its primary key or its name.
+    """Search for a group by its primary key or its name.
     Either one of the two must be set.
 
     The result is cached for the default duration (should be 5 minutes).
 
-    :param pk: The primary key of the group
-    :param name: The name of the group
-    :return: The group if it exists, else None
-    :raise ValueError: If no group matches the criteria
+    Args:
+        pk: The primary key of the group
+        name: The name of the group
+
+    Returns:
+        The group if it exists, else None
+
+    Raises:
+        ValueError: If no group matches the criteria
     """
     if pk is None and name is None:
         raise ValueError("Either pk or name must be set")
 
     # replace space characters to hide warnings with memcached backend
-    pk_or_name: Union[str, int] = pk if pk is not None else name.replace(" ", "_")
+    pk_or_name: str | int = pk if pk is not None else name.replace(" ", "_")
     group = cache.get(f"sith_group_{pk_or_name}")
 
     if group == "not_found":
@@ -211,8 +216,7 @@ def get_group(*, pk: int = None, name: str = None) -> Optional[Group]:
 
 
 class User(AbstractBaseUser):
-    """
-    Defines the base user class, useable in every app
+    """Defines the base user class, useable in every app.
 
     This is almost the same as the auth module AbstractUser since it inherits from it,
     but some fields are required, and the username is generated automatically with the
@@ -382,9 +386,6 @@ class User(AbstractBaseUser):
         return self.is_active and self.is_superuser
 
     def get_absolute_url(self):
-        """
-        This is needed for black magic powered UpdateView's children
-        """
         return reverse("core:user_profile", kwargs={"user_id": self.pk})
 
     def __str__(self):
@@ -412,8 +413,7 @@ class User(AbstractBaseUser):
             return 0
 
     def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
-        """
-        Check if this user is in the given group.
+        """Check if this user is in the given group.
         Either a group id or a group name must be provided.
         If both are passed, only the id will be considered.
 
@@ -421,7 +421,8 @@ class User(AbstractBaseUser):
         If no group is found, return False.
         If a group is found, check if this user is in the latter.
 
-        :return: True if the user is the group, else False
+        Returns:
+             True if the user is the group, else False
         """
         if pk is not None:
             group: Optional[Group] = get_group(pk=pk)
@@ -454,11 +455,12 @@ class User(AbstractBaseUser):
         return group in self.cached_groups
 
     @property
-    def cached_groups(self) -> List[Group]:
-        """
-        Get the list of groups this user is in.
+    def cached_groups(self) -> list[Group]:
+        """Get the list of groups this user is in.
+
         The result is cached for the default duration (should be 5 minutes)
-        :return: A list of all the groups this user is in
+
+        Returns: A list of all the groups this user is in.
         """
         groups = cache.get(f"user_{self.id}_groups")
         if groups is None:
@@ -523,9 +525,8 @@ class User(AbstractBaseUser):
 
     @cached_property
     def age(self) -> int:
-        """
-        Return the age this user has the day the method is called.
-        If the user has not filled his age, return 0
+        """Return the age this user has the day the method is called.
+        If the user has not filled his age, return 0.
         """
         if self.date_of_birth is None:
             return 0
@@ -576,31 +577,27 @@ class User(AbstractBaseUser):
         }
 
     def get_full_name(self):
-        """
-        Returns the first_name plus the last_name, with a space in between.
-        """
+        """Returns the first_name plus the last_name, with a space in between."""
         full_name = "%s %s" % (self.first_name, self.last_name)
         return full_name.strip()
 
     def get_short_name(self):
-        "Returns the short name for the user."
+        """Returns the short name for the user."""
         if self.nick_name:
             return self.nick_name
         return self.first_name + " " + self.last_name
 
-    def get_display_name(self):
-        """
-        Returns the display name of the user.
-        A nickname if possible, otherwise, the full name
+    def get_display_name(self) -> str:
+        """Returns the display name of the user.
+
+        A nickname if possible, otherwise, the full name.
         """
         if self.nick_name:
             return "%s (%s)" % (self.get_full_name(), self.nick_name)
         return self.get_full_name()
 
     def get_age(self):
-        """
-        Returns the age
-        """
+        """Returns the age."""
         today = timezone.now()
         born = self.date_of_birth
         return (
@@ -608,18 +605,18 @@ class User(AbstractBaseUser):
         )
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-        """
-        Sends an email to this User.
-        """
+        """Sends an email to this User."""
         if from_email is None:
             from_email = settings.DEFAULT_FROM_EMAIL
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
-    def generate_username(self):
-        """
-        Generates a unique username based on the first and last names.
-        For example: Guy Carlier gives gcarlier, and gcarlier1 if the first one exists
-        Returns the generated username
+    def generate_username(self) -> str:
+        """Generates a unique username based on the first and last names.
+
+        For example: Guy Carlier gives gcarlier, and gcarlier1 if the first one exists.
+
+        Returns:
+            The generated username.
         """
 
         def remove_accents(data):
@@ -644,9 +641,7 @@ class User(AbstractBaseUser):
         return user_name
 
     def is_owner(self, obj):
-        """
-        Determine if the object is owned by the user
-        """
+        """Determine if the object is owned by the user."""
         if hasattr(obj, "is_owned_by") and obj.is_owned_by(self):
             return True
         if hasattr(obj, "owner_group") and self.is_in_group(pk=obj.owner_group.id):
@@ -656,9 +651,7 @@ class User(AbstractBaseUser):
         return False
 
     def can_edit(self, obj):
-        """
-        Determine if the object can be edited by the user
-        """
+        """Determine if the object can be edited by the user."""
         if hasattr(obj, "can_be_edited_by") and obj.can_be_edited_by(self):
             return True
         if hasattr(obj, "edit_groups"):
@@ -672,9 +665,7 @@ class User(AbstractBaseUser):
         return False
 
     def can_view(self, obj):
-        """
-        Determine if the object can be viewed by the user
-        """
+        """Determine if the object can be viewed by the user."""
         if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
             return True
         if hasattr(obj, "view_groups"):
@@ -730,11 +721,8 @@ class User(AbstractBaseUser):
             return infos
 
     @cached_property
-    def clubs_with_rights(self):
-        """
-        :return: the list of clubs where the user has rights
-        :rtype: list[club.models.Club]
-        """
+    def clubs_with_rights(self) -> list[Club]:
+        """The list of clubs where the user has rights"""
         memberships = self.memberships.ongoing().board().select_related("club")
         return [m.club for m in memberships]
 
@@ -796,9 +784,7 @@ class AnonymousUser(AuthAnonymousUser):
         raise PermissionDenied
 
     def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
-        """
-        The anonymous user is only in the public group
-        """
+        """The anonymous user is only in the public group."""
         allowed_id = settings.SITH_GROUP_PUBLIC_ID
         if pk is not None:
             return pk == allowed_id
@@ -957,16 +943,15 @@ class SithFile(models.Model):
                 ).save()
 
     def can_be_managed_by(self, user: User) -> bool:
-        """
-        Tell if the user can manage the file (edit, delete, etc.) or not.
+        """Tell if the user can manage the file (edit, delete, etc.) or not.
         Apply the following rules:
             - If the file is not in the SAS nor in the profiles directory, it can be "managed" by anyone -> return True
             - If the file is in the SAS, only the SAS admins (or roots) can manage it -> return True if the user is in the SAS admin group or is a root
-            - If the file is in the profiles directory, only the roots can manage it -> return True if the user is a root
+            - If the file is in the profiles directory, only the roots can manage it -> return True if the user is a root.
 
-        :returns: True if the file is managed by the SAS or within the profiles directory, False otherwise
+        Returns:
+            True if the file is managed by the SAS or within the profiles directory, False otherwise
         """
-
         # If the file is not in the SAS nor in the profiles directory, it can be "managed" by anyone
         profiles_dir = SithFile.objects.filter(name="profiles").first()
         if not self.is_in_sas and not profiles_dir in self.get_parent_list():
@@ -1017,9 +1002,7 @@ class SithFile(models.Model):
         return super().delete()
 
     def clean(self):
-        """
-        Cleans up the file
-        """
+        """Cleans up the file."""
         super().clean()
         if "/" in self.name:
             raise ValidationError(_("Character '/' not authorized in name"))
@@ -1070,15 +1053,14 @@ class SithFile(models.Model):
             c.apply_rights_recursively(only_folders=only_folders)
 
     def copy_rights(self):
-        """Copy, if possible, the rights of the parent folder"""
+        """Copy, if possible, the rights of the parent folder."""
         if self.parent is not None:
             self.edit_groups.set(self.parent.edit_groups.all())
             self.view_groups.set(self.parent.view_groups.all())
             self.save()
 
     def move_to(self, parent):
-        """
-        Move a file to a new parent.
+        """Move a file to a new parent.
         `parent` must be a SithFile with the `is_folder=True` property. Otherwise, this function doesn't change
         anything.
         This is done only at the DB level, so that it's very fast for the user. Indeed, this function doesn't modify
@@ -1091,10 +1073,7 @@ class SithFile(models.Model):
         self.save()
 
     def _repair_fs(self):
-        """
-        This function rebuilds recursively the filesystem as it should be
-        regarding the DB tree.
-        """
+        """Rebuilds recursively the filesystem as it should be regarding the DB tree."""
         if self.is_folder:
             for c in self.children.all():
                 c._repair_fs()
@@ -1197,19 +1176,19 @@ class SithFile(models.Model):
 
 
 class LockError(Exception):
-    """There was a lock error on the object"""
+    """There was a lock error on the object."""
 
     pass
 
 
 class AlreadyLocked(LockError):
-    """The object is already locked"""
+    """The object is already locked."""
 
     pass
 
 
 class NotLocked(LockError):
-    """The object is not locked"""
+    """The object is not locked."""
 
     pass
 
@@ -1220,12 +1199,11 @@ def get_default_owner_group():
 
 
 class Page(models.Model):
-    """
-    The page class to build a Wiki
+    """The page class to build a Wiki
     Each page may have a parent and it's URL is of the form my.site/page/<grd_pa>/<parent>/<mypage>
     It has an ID field, but don't use it, since it's only there for DB part, and because compound primary key is
     awkward!
-    Prefere querying pages with Page.get_page_by_full_name()
+    Prefere querying pages with Page.get_page_by_full_name().
 
     Be careful with the _full_name attribute: this field may not be valid until you call save(). It's made for fast
     query, but don't rely on it when playing with a Page object, use get_full_name() instead!
@@ -1294,9 +1272,7 @@ class Page(models.Model):
         return self.get_full_name()
 
     def save(self, *args, **kwargs):
-        """
-        Performs some needed actions before and after saving a page in database
-        """
+        """Performs some needed actions before and after saving a page in database."""
         locked = kwargs.pop("force_lock", False)
         if not locked:
             locked = self.is_locked()
@@ -1317,22 +1293,15 @@ class Page(models.Model):
         self.unset_lock()
 
     def get_absolute_url(self):
-        """
-        This is needed for black magic powered UpdateView's children
-        """
         return reverse("core:page", kwargs={"page_name": self._full_name})
 
     @staticmethod
     def get_page_by_full_name(name):
-        """
-        Quicker to get a page with that method rather than building the request every time
-        """
+        """Quicker to get a page with that method rather than building the request every time."""
         return Page.objects.filter(_full_name=name).first()
 
     def clean(self):
-        """
-        Cleans up only the name for the moment, but this can be used to make any treatment before saving the object
-        """
+        """Cleans up only the name for the moment, but this can be used to make any treatment before saving the object."""
         if "/" in self.name:
             self.name = self.name.split("/")[-1]
         if (
@@ -1367,10 +1336,11 @@ class Page(models.Model):
         return l
 
     def is_locked(self):
-        """
-        Is True if the page is locked, False otherwise
-        This is where the timeout is handled, so a locked page for which the timeout is reach will be unlocked and this
-        function will return False
+        """Is True if the page is locked, False otherwise.
+
+        This is where the timeout is handled,
+        so a locked page for which the timeout is reach will be unlocked and this
+        function will return False.
         """
         if self.lock_timeout and (
             timezone.now() - self.lock_timeout > timedelta(minutes=5)
@@ -1384,9 +1354,7 @@ class Page(models.Model):
         )
 
     def set_lock(self, user):
-        """
-        Sets a lock on the current page or raise an AlreadyLocked exception
-        """
+        """Sets a lock on the current page or raise an AlreadyLocked exception."""
         if self.is_locked() and self.get_lock() != user:
             raise AlreadyLocked("The page is already locked by someone else")
         self.lock_user = user
@@ -1395,41 +1363,34 @@ class Page(models.Model):
         # print("Locking page")
 
     def set_lock_recursive(self, user):
-        """
-        Locks recursively all the child pages for editing properties
-        """
+        """Locks recursively all the child pages for editing properties."""
         for p in self.children.all():
             p.set_lock_recursive(user)
         self.set_lock(user)
 
     def unset_lock_recursive(self):
-        """
-        Unlocks recursively all the child pages
-        """
+        """Unlocks recursively all the child pages."""
         for p in self.children.all():
             p.unset_lock_recursive()
         self.unset_lock()
 
     def unset_lock(self):
-        """Always try to unlock, even if there is no lock"""
+        """Always try to unlock, even if there is no lock."""
         self.lock_user = None
         self.lock_timeout = None
         super().save()
         # print("Unlocking page")
 
     def get_lock(self):
-        """
-        Returns the page's mutex containing the time and the user in a dict
-        """
+        """Returns the page's mutex containing the time and the user in a dict."""
         if self.lock_user:
             return self.lock_user
         raise NotLocked("The page is not locked and thus can not return its user")
 
     def get_full_name(self):
-        """
-        Computes the real full_name of the page based on its name and its parent's name
+        """Computes the real full_name of the page based on its name and its parent's name
         You can and must rely on this function when working on a page object that is not freshly fetched from the DB
-        (For example when treating a Page object coming from a form)
+        (For example when treating a Page object coming from a form).
         """
         if self.parent is None:
             return self.name
@@ -1463,8 +1424,8 @@ class Page(models.Model):
 
 
 class PageRev(models.Model):
-    """
-    This is the true content of the page.
+    """True content of the page.
+
     Each page object has a revisions field that is a list of PageRev, ordered by date.
     my_page.revisions.last() gives the PageRev object that is the most up-to-date, and thus,
     is the real content of the page.
@@ -1492,9 +1453,6 @@ class PageRev(models.Model):
         self.page.unset_lock()
 
     def get_absolute_url(self):
-        """
-        This is needed for black magic powered UpdateView's children
-        """
         return reverse("core:page", kwargs={"page_name": self.page._full_name})
 
     def __getattribute__(self, attr):
@@ -1573,9 +1531,7 @@ class Gift(models.Model):
 
 
 class OperationLog(models.Model):
-    """
-    General purpose log object to register operations
-    """
+    """General purpose log object to register operations."""
 
     date = models.DateTimeField(_("date"), auto_now_add=True)
     label = models.CharField(_("label"), max_length=255)

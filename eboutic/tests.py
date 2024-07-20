@@ -52,9 +52,9 @@ class EbouticTest(TestCase):
         cls.public = User.objects.get(username="public")
 
     def get_busy_basket(self, user) -> Basket:
-        """
-        Create and return a basket with 3 barbar and 1 cotis in it.
-        Edit the client session to store the basket id in it
+        """Create and return a basket with 3 barbar and 1 cotis in it.
+
+        Edit the client session to store the basket id in it.
         """
         session = self.client.session
         basket = Basket.objects.create(user=user)

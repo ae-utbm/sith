@@ -21,7 +21,7 @@ license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-Django = "^4.2.13"
+Django = "^4.2.14"
 Pillow = "^10.4.0"
 mistune = "^3.0.2"
 django-jinja = "^2.11"
@@ -37,7 +37,6 @@ libsass = "^0.22"
 django-ordered-model = "^3.7"
 django-simple-captcha = "^0.5.17"
 python-dateutil = "^2.8.2"
-psycopg2-binary = "^2.9"
 sentry-sdk = "^1.21.0"
 pygraphviz = "^1.1"
 Jinja2 = "^3.1"
@@ -47,21 +46,34 @@ Sphinx = "^5" # Needed for building xapian
 tomli = "^2.0.1"
 django-honeypot = "^1.2.0"
 
+# deps used in prod, but unnecessary for development
+[tool.poetry.group.prod.dependencies]
+psycopg2-binary = "^2.9"
+
+[tool.poetry.group.prod]
+optional = true
+
+# deps used for development purposes, but unneeded in prod
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.0.0"
 ipython = "^8.26.0"
 pre-commit = "^3.7.1"
 ruff = "^0.5.1" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
 
+# deps used for testing purposes
 [tool.poetry.group.tests.dependencies]
 freezegun = "^1.2.2"  # used to test time-dependent code
 pytest = "^8.2.2"
 pytest-cov = "^5.0.0"
 pytest-django = "^4.8.0"
 
+# deps used to work on the documentation
 [tool.poetry.group.docs.dependencies]
-sphinx-rtd-theme = "^1.0.0"
-sphinx-copybutton = "^0.4.0"
+mkdocs = "^1.6.0"
+mkdocs-material = "^9.5.28"
+mkdocstrings = "^0.25.1"
+mkdocstrings-python = "^1.10.5"
+mkdocs-include-markdown-plugin = "^6.2.1"
 
 [tool.poetry.group.docs]
 optional = true
@@ -88,6 +100,9 @@ select = [
 ignore = [
 	"DJ001",  # null=True in CharField/TextField. this one would require a migration
 ]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "sith.settings"

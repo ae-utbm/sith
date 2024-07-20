@@ -19,9 +19,7 @@ class TwoDigitMonthConverter:
 
 
 class BooleanStringConverter:
-    """
-    Converter whose regex match either True or False
-    """
+    """Converter whose regex match either True or False."""
 
     regex = r"(True)|(False)"
 

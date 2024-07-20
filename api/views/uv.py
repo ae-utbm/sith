@@ -28,10 +28,10 @@ def uv_endpoint(request):
     return Response(make_clean_uv(short_uv, full_uv))
 
 
-def find_uv(lang, year, code):
-    """
-    Uses the UTBM API to find an UV.
-    short_uv is the UV entry in the UV list. It is returned as it contains
+def find_uv(lang: str, year: int | str, code: str) -> tuple[dict | None, dict | None]:
+    """Uses the UTBM API to find an UV.
+
+    Short_uv is the UV entry in the UV list. It is returned as it contains
     information which are not in full_uv.
     full_uv is the detailed representation of an UV.
     """
@@ -44,7 +44,7 @@ def find_uv(lang, year, code):
         # find the first UV which matches the code
         short_uv = next(uv for uv in uvs if uv["code"] == code)
     except StopIteration:
-        return (None, None)
+        return None, None
 
     # get detailed information about the UV
     uv_url = settings.SITH_PEDAGOGY_UTBM_API + "/uv/{}/{}/{}/{}".format(
@@ -53,13 +53,11 @@ def find_uv(lang, year, code):
     response = urllib.request.urlopen(uv_url)
     full_uv = json.loads(response.read().decode("utf-8"))
 
-    return (short_uv, full_uv)
+    return short_uv, full_uv
 
 
-def make_clean_uv(short_uv, full_uv):
-    """
-    Cleans the data up so that it corresponds to our data representation.
-    """
+def make_clean_uv(short_uv: dict, full_uv: dict):
+    """Cleans the data up so that it corresponds to our data representation."""
     res = {}
 
     res["credit_type"] = short_uv["codeCategorie"]

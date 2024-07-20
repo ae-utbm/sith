@@ -32,9 +32,7 @@ from pedagogy.models import UV, UVComment, UVCommentReport
 
 
 def create_uv_template(user_id, code="IFC1", exclude_list=None):
-    """
-    Factory to help UV creation/update in post requests
-    """
+    """Factory to help UV creation/update in post requests."""
     if exclude_list is None:
         exclude_list = []
     uv = {
@@ -79,9 +77,7 @@ def create_uv_template(user_id, code="IFC1", exclude_list=None):
 
 
 class UVCreation(TestCase):
-    """
-    Test uv creation
-    """
+    """Test uv creation."""
 
     @classmethod
     def setUpTestData(cls):
@@ -291,9 +287,7 @@ class UVUpdateTest(TestCase):
 
 
 def create_uv_comment_template(user_id, uv_code="PA00", exclude_list=None):
-    """
-    Factory to help UVComment creation/update in post requests
-    """
+    """Factory to help UVComment creation/update in post requests."""
     if exclude_list is None:
         exclude_list = []
     comment = {
@@ -312,9 +306,9 @@ def create_uv_comment_template(user_id, uv_code="PA00", exclude_list=None):
 
 
 class UVCommentCreationAndDisplay(TestCase):
-    """
-    Test UVComment creation and it's display
-    Display and creation are the same view
+    """Test UVComment creation and its display.
+
+    Display and creation are the same view.
     """
 
     @classmethod
@@ -575,10 +569,7 @@ class UVCommentUpdateTest(TestCase):
 
 
 class UVSearchTest(TestCase):
-    """
-    Test UV guide rights for view and API
-    Test that the API is working well
-    """
+    """Test UV guide rights for view and API."""
 
     @classmethod
     def setUpTestData(cls):
@@ -751,10 +742,7 @@ class UVSearchTest(TestCase):
 
 
 class UVModerationFormTest(TestCase):
-    """
-    Test moderation view
-    Assert access rights and if the form works well
-    """
+    """Assert access rights and if the form works well."""
 
     @classmethod
     def setUpTestData(cls):
@@ -967,9 +955,9 @@ class UVModerationFormTest(TestCase):
 
 
 class UVCommentReportCreateTest(TestCase):
-    """
-    Test report creation view view
-    Assert access rights and if you can create with it
+    """Test report creation view.
+
+    Assert access rights and if you can create with it.
     """
 
     def setUp(self):

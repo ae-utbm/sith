@@ -23,9 +23,9 @@ from core.views import can_edit, can_view
 
 
 def check_if(obj, user, test):
-    """
-    Detect if it's a single object or a queryset
-    aply a given test on individual object and return global permission
+    """Detect if it's a single object or a queryset.
+
+    Apply a given test on individual object and return global permission.
     """
     if isinstance(obj, QuerySet):
         for o in obj:
@@ -39,9 +39,7 @@ def check_if(obj, user, test):
 class ManageModelMixin:
     @action(detail=True)
     def id(self, request, pk=None):
-        """
-        Get by id (api/v1/router/{pk}/id/)
-        """
+        """Get by id (api/v1/router/{pk}/id/)."""
         self.queryset = get_object_or_404(self.queryset.filter(id=pk))
         serializer = self.get_serializer(self.queryset)
         return Response(serializer.data)

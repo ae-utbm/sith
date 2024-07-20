@@ -94,9 +94,7 @@ class TrombiTabsMixin(TabedViewMixin):
 
 
 class UserIsInATrombiMixin(View):
-    """
-    This view check if the requested user has a trombi_user attribute
-    """
+    """Check if the requested user has a trombi_user attribute."""
 
     def dispatch(self, request, *args, **kwargs):
         if not hasattr(self.request.user, "trombi_user"):
@@ -118,18 +116,14 @@ class TrombiForm(forms.ModelForm):
 
 
 class TrombiCreateView(CanCreateMixin, CreateView):
-    """
-    Create a trombi for a club
-    """
+    """Create a trombi for a club."""
 
     model = Trombi
     form_class = TrombiForm
     template_name = "core/create.jinja"
 
     def post(self, request, *args, **kwargs):
-        """
-        Affect club
-        """
+        """Affect club."""
         form = self.get_form()
         if form.is_valid():
             club = get_object_or_404(Club, id=self.kwargs["club_id"])
@@ -304,9 +298,7 @@ class UserTrombiForm(forms.Form):
 class UserTrombiToolsView(
     QuickNotifMixin, TrombiTabsMixin, UserIsLoggedMixin, TemplateView
 ):
-    """
-    Display a user's trombi tools
-    """
+    """Display a user's trombi tools."""
 
     template_name = "trombi/user_tools.jinja"
     current_tab = "tools"
@@ -466,9 +458,7 @@ class UserTrombiProfileView(TrombiTabsMixin, DetailView):
 
 
 class TrombiCommentFormView(LoginRequiredMixin, View):
-    """
-    Create/edit a trombi comment
-    """
+    """Create/edit a trombi comment."""
 
     model = TrombiComment
     fields = ["content"]

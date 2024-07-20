@@ -75,9 +75,7 @@ from counter.models import (
 
 
 class CounterAdminMixin(View):
-    """
-    This view is made to protect counter admin section
-    """
+    """Protect counter admin section."""
 
     edit_group = [settings.SITH_GROUP_COUNTER_ADMIN_ID]
     edit_club = []
@@ -105,9 +103,7 @@ class CounterAdminMixin(View):
 
 
 class StudentCardDeleteView(DeleteView, CanEditMixin):
-    """
-    View used to delete a card from a user
-    """
+    """View used to delete a card from a user."""
 
     model = StudentCard
     template_name = "core/delete_confirm.jinja"
@@ -210,9 +206,7 @@ class CounterTabsMixin(TabedViewMixin):
 class CounterMain(
     CounterTabsMixin, CanViewMixin, DetailView, ProcessFormView, FormMixin
 ):
-    """
-    The public (barman) view
-    """
+    """The public (barman) view."""
 
     model = Counter
     template_name = "counter/counter_main.jinja"
@@ -239,9 +233,7 @@ class CounterMain(
         return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        """
-        We handle here the login form for the barman
-        """
+        """We handle here the login form for the barman."""
         if self.request.method == "POST":
             self.object = self.get_object()
         self.object.update_activity()
@@ -275,9 +267,7 @@ class CounterMain(
         return kwargs
 
     def form_valid(self, form):
-        """
-        We handle here the redirection, passing the user id of the asked customer
-        """
+        """We handle here the redirection, passing the user id of the asked customer."""
         self.kwargs["user_id"] = form.cleaned_data["user_id"]
         return super().form_valid(form)
 
@@ -286,10 +276,9 @@ class CounterMain(
 
 
 class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
-    """
-    The click view
+    """The click view
     This is a detail view not to have to worry about loading the counter
-    Everything is made by hand in the post method
+    Everything is made by hand in the post method.
     """
 
     model = Counter
@@ -347,7 +336,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        """Simple get view"""
+        """Simple get view."""
         if "basket" not in request.session.keys():  # Init the basket session entry
             request.session["basket"] = {}
             request.session["basket_total"] = 0
@@ -364,7 +353,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return ret
 
     def post(self, request, *args, **kwargs):
-        """Handle the many possibilities of the post request"""
+        """Handle the many possibilities of the post request."""
         self.object = self.get_object()
         self.refill_form = None
         if (self.object.type != "BAR" and not request.user.is_authenticated) or (
@@ -481,10 +470,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return len(request.POST) == 0 and len(request.body) != 0
 
     def add_product(self, request, q=1, p=None):
-        """
-        Add a product to the basket
+        """Add a product to the basket
         q is the quantity passed as integer
-        p is the product id, passed as an integer
+        p is the product id, passed as an integer.
         """
         pid = p or parse_qs(request.body.decode())["product_id"][0]
         pid = str(pid)
@@ -543,9 +531,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return True
 
     def add_student_card(self, request):
-        """
-        Add a new student card on the customer account
-        """
+        """Add a new student card on the customer account."""
         uid = request.POST["student_card_uid"]
         uid = str(uid)
         if not StudentCard.is_valid(uid):
@@ -564,7 +550,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return True
 
     def del_product(self, request):
-        """Delete a product from the basket"""
+        """Delete a product from the basket."""
         pid = parse_qs(request.body.decode())["product_id"][0]
         product = self.get_product(pid)
         if pid in request.session["basket"]:
@@ -581,11 +567,11 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session.modified = True
 
     def parse_code(self, request):
-        """
-        Parse the string entered by the barman
+        """Parse the string entered by the barman.
+
         This can be of two forms :
-            - <str>, where the string is the code of the product
-            - <int>X<str>, where the integer is the quantity and str the code
+            - `<str>`, where the string is the code of the product
+            - `<int>X<str>`, where the integer is the quantity and str the code.
         """
         string = parse_qs(request.body.decode()).get("code", [""])[0].upper()
         if string == "FIN":
@@ -605,7 +591,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return self.render_to_response(context)
 
     def finish(self, request):
-        """Finish the click session, and validate the basket"""
+        """Finish the click session, and validate the basket."""
         with transaction.atomic():
             request.session["last_basket"] = []
             if self.sum_basket(request) > self.customer.amount:
@@ -657,7 +643,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             )
 
     def cancel(self, request):
-        """Cancel the click session"""
+        """Cancel the click session."""
         kwargs = {"counter_id": self.object.id}
         request.session.pop("basket", None)
         return HttpResponseRedirect(
@@ -665,7 +651,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         )
 
     def refill(self, request):
-        """Refill the customer's account"""
+        """Refill the customer's account."""
         if not self.object.can_refill():
             raise PermissionDenied
         form = RefillForm(request.POST)
@@ -678,7 +664,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             self.refill_form = form
 
     def get_context_data(self, **kwargs):
-        """Add customer to the context"""
+        """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
         products = self.object.products.select_related("product_type")
         if self.customer_is_barman():
@@ -701,8 +687,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
 
 class CounterLogin(RedirectView):
-    """
-    Handle the login of a barman
+    """Handle the login of a barman.
 
     Logged barmen are stored in the Permanency model
     """
@@ -710,9 +695,7 @@ class CounterLogin(RedirectView):
     permanent = False
 
     def post(self, request, *args, **kwargs):
-        """
-        Register the logged user as barman for this counter
-        """
+        """Register the logged user as barman for this counter."""
         self.counter_id = kwargs["counter_id"]
         self.counter = Counter.objects.filter(id=kwargs["counter_id"]).first()
         form = LoginForm(request, data=request.POST)
@@ -745,9 +728,7 @@ class CounterLogout(RedirectView):
     permanent = False
 
     def post(self, request, *args, **kwargs):
-        """
-        Unregister the user from the barman
-        """
+        """Unregister the user from the barman."""
         self.counter = Counter.objects.filter(id=kwargs["counter_id"]).first()
         user = User.objects.filter(id=request.POST["user_id"]).first()
         self.counter.del_barman(user)
@@ -803,9 +784,7 @@ class CounterAdminTabsMixin(TabedViewMixin):
 
 
 class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
-    """
-    A list view for the admins
-    """
+    """A list view for the admins."""
 
     model = Counter
     template_name = "counter/counter_list.jinja"
@@ -813,9 +792,7 @@ class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
 
 
 class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
-    """
-    Edit a counter's main informations (for the counter's manager)
-    """
+    """Edit a counter's main informations (for the counter's manager)."""
 
     model = Counter
     form_class = CounterEditForm
@@ -833,9 +810,7 @@ class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 
 class CounterEditPropView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
-    """
-    Edit a counter's main informations (for the counter's admin)
-    """
+    """Edit a counter's main informations (for the counter's admin)."""
 
     model = Counter
     form_class = modelform_factory(Counter, fields=["name", "club", "type"])
@@ -845,9 +820,7 @@ class CounterEditPropView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 
 class CounterCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
-    """
-    Create a counter (for the admins)
-    """
+    """Create a counter (for the admins)."""
 
     model = Counter
     form_class = modelform_factory(
@@ -860,9 +833,7 @@ class CounterCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
 
 
 class CounterDeleteView(CounterAdminTabsMixin, CounterAdminMixin, DeleteView):
-    """
-    Delete a counter (for the admins)
-    """
+    """Delete a counter (for the admins)."""
 
     model = Counter
     pk_url_kwarg = "counter_id"
@@ -875,9 +846,7 @@ class CounterDeleteView(CounterAdminTabsMixin, CounterAdminMixin, DeleteView):
 
 
 class ProductTypeListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
-    """
-    A list view for the admins
-    """
+    """A list view for the admins."""
 
     model = ProductType
     template_name = "counter/producttype_list.jinja"
@@ -885,9 +854,7 @@ class ProductTypeListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
 
 
 class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
-    """
-    A create view for the admins
-    """
+    """A create view for the admins."""
 
     model = ProductType
     fields = ["name", "description", "comment", "icon", "priority"]
@@ -896,9 +863,7 @@ class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView
 
 
 class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
-    """
-    An edit view for the admins
-    """
+    """An edit view for the admins."""
 
     model = ProductType
     template_name = "core/edit.jinja"
@@ -908,9 +873,7 @@ class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 
 class ProductArchivedListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
-    """
-    A list view for the admins
-    """
+    """A list view for the admins."""
 
     model = Product
     template_name = "counter/product_list.jinja"
@@ -920,9 +883,7 @@ class ProductArchivedListView(CounterAdminTabsMixin, CounterAdminMixin, ListView
 
 
 class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
-    """
-    A list view for the admins
-    """
+    """A list view for the admins."""
 
     model = Product
     template_name = "counter/product_list.jinja"
@@ -932,9 +893,7 @@ class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
 
 
 class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
-    """
-    A create view for the admins
-    """
+    """A create view for the admins."""
 
     model = Product
     form_class = ProductEditForm
@@ -943,9 +902,7 @@ class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
 
 
 class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
-    """
-    An edit view for the admins
-    """
+    """An edit view for the admins."""
 
     model = Product
     form_class = ProductEditForm
@@ -955,18 +912,14 @@ class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 
 class RefillingDeleteView(DeleteView):
-    """
-    Delete a refilling (for the admins)
-    """
+    """Delete a refilling (for the admins)."""
 
     model = Refilling
     pk_url_kwarg = "refilling_id"
     template_name = "core/delete_confirm.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        """
-        We have here a very particular right handling, we can't inherit from CanEditPropMixin
-        """
+        """We have here a very particular right handling, we can't inherit from CanEditPropMixin."""
         self.object = self.get_object()
         if (
             timezone.now() - self.object.date
@@ -990,18 +943,14 @@ class RefillingDeleteView(DeleteView):
 
 
 class SellingDeleteView(DeleteView):
-    """
-    Delete a selling (for the admins)
-    """
+    """Delete a selling (for the admins)."""
 
     model = Selling
     pk_url_kwarg = "selling_id"
     template_name = "core/delete_confirm.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        """
-        We have here a very particular right handling, we can't inherit from CanEditPropMixin
-        """
+        """We have here a very particular right handling, we can't inherit from CanEditPropMixin."""
         self.object = self.get_object()
         if (
             timezone.now() - self.object.date
@@ -1028,9 +977,7 @@ class SellingDeleteView(DeleteView):
 
 
 class CashRegisterSummaryForm(forms.Form):
-    """
-    Provide the cash summary form
-    """
+    """Provide the cash summary form."""
 
     ten_cents = forms.IntegerField(label=_("10 cents"), required=False, min_value=0)
     twenty_cents = forms.IntegerField(label=_("20 cents"), required=False, min_value=0)
@@ -1238,9 +1185,7 @@ class CashRegisterSummaryForm(forms.Form):
 
 
 class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
-    """
-    Provide the last operations to allow barmen to delete them
-    """
+    """Provide the last operations to allow barmen to delete them."""
 
     model = Counter
     pk_url_kwarg = "counter_id"
@@ -1248,9 +1193,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
     current_tab = "last_ops"
 
     def dispatch(self, request, *args, **kwargs):
-        """
-        We have here again a very particular right handling
-        """
+        """We have here again a very particular right handling."""
         self.object = self.get_object()
         if (
             self.object.get_barmen_list()
@@ -1267,7 +1210,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
         )
 
     def get_context_data(self, **kwargs):
-        """Add form to the context"""
+        """Add form to the context."""
         kwargs = super().get_context_data(**kwargs)
         threshold = timezone.now() - timedelta(
             minutes=settings.SITH_LAST_OPERATIONS_LIMIT
@@ -1282,9 +1225,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
 
 
 class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
-    """
-    Provide the cash summary form
-    """
+    """Provide the cash summary form."""
 
     model = Counter
     pk_url_kwarg = "counter_id"
@@ -1292,9 +1233,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
     current_tab = "cash_summary"
 
     def dispatch(self, request, *args, **kwargs):
-        """
-        We have here again a very particular right handling
-        """
+        """We have here again a very particular right handling."""
         self.object = self.get_object()
         if (
             self.object.get_barmen_list()
@@ -1327,16 +1266,14 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
         return reverse_lazy("counter:details", kwargs={"counter_id": self.object.id})
 
     def get_context_data(self, **kwargs):
-        """Add form to the context"""
+        """Add form to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["form"] = self.form
         return kwargs
 
 
 class CounterActivityView(DetailView):
-    """
-    Show the bar activity
-    """
+    """Show the bar activity."""
 
     model = Counter
     pk_url_kwarg = "counter_id"
@@ -1344,16 +1281,14 @@ class CounterActivityView(DetailView):
 
 
 class CounterStatView(DetailView, CounterAdminMixin):
-    """
-    Show the bar stats
-    """
+    """Show the bar stats."""
 
     model = Counter
     pk_url_kwarg = "counter_id"
     template_name = "counter/stats.jinja"
 
     def get_context_data(self, **kwargs):
-        """Add stats to the context"""
+        """Add stats to the context."""
         counter: Counter = self.object
         semester_start = get_start_of_semester()
         office_hours = counter.get_top_barmen()
@@ -1386,7 +1321,7 @@ class CounterStatView(DetailView, CounterAdminMixin):
 
 
 class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
-    """Edit cash summaries"""
+    """Edit cash summaries."""
 
     model = CashRegisterSummary
     template_name = "counter/cash_register_summary.jinja"
@@ -1400,7 +1335,7 @@ class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 
 class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
-    """Display a list of cash summaries"""
+    """Display a list of cash summaries."""
 
     model = CashRegisterSummary
     template_name = "counter/cash_summary_list.jinja"
@@ -1410,7 +1345,7 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     paginate_by = settings.SITH_COUNTER_CASH_SUMMARY_LENGTH
 
     def get_context_data(self, **kwargs):
-        """Add sums to the context"""
+        """Add sums to the context."""
         kwargs = super().get_context_data(**kwargs)
         form = CashSummaryFormBase(self.request.GET)
         kwargs["form"] = form
@@ -1461,7 +1396,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
     current_tab = "invoices_call"
 
     def get_context_data(self, **kwargs):
-        """Add sums to the context"""
+        """Add sums to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["months"] = Selling.objects.datetimes("date", "month", order="DESC")
         if "month" in self.request.GET:
@@ -1522,9 +1457,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
 
 
 class EticketListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
-    """
-    A list view for the admins
-    """
+    """A list view for the admins."""
 
     model = Eticket
     template_name = "counter/eticket_list.jinja"
@@ -1533,9 +1466,7 @@ class EticketListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
 
 
 class EticketCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
-    """
-    Create an eticket
-    """
+    """Create an eticket."""
 
     model = Eticket
     template_name = "core/create.jinja"
@@ -1544,9 +1475,7 @@ class EticketCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
 
 
 class EticketEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
-    """
-    Edit an eticket
-    """
+    """Edit an eticket."""
 
     model = Eticket
     template_name = "core/edit.jinja"
@@ -1556,9 +1485,7 @@ class EticketEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 
 class EticketPDFView(CanViewMixin, DetailView):
-    """
-    Display the PDF of an eticket
-    """
+    """Display the PDF of an eticket."""
 
     model = Selling
     pk_url_kwarg = "selling_id"
@@ -1647,9 +1574,7 @@ class EticketPDFView(CanViewMixin, DetailView):
 
 
 class CounterRefillingListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
-    """
-    List of refillings on a counter
-    """
+    """List of refillings on a counter."""
 
     model = Refilling
     template_name = "counter/refilling_list.jinja"
@@ -1668,9 +1593,7 @@ class CounterRefillingListView(CounterAdminTabsMixin, CounterAdminMixin, ListVie
 
 
 class StudentCardFormView(FormView):
-    """
-    Add a new student card
-    """
+    """Add a new student card."""
 
     form_class = StudentCardForm
     template_name = "core/create.jinja"

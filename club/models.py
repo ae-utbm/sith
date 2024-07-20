@@ -21,7 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-from typing import Optional
+from __future__ import annotations
 
 from django.conf import settings
 from django.core import validators
@@ -46,9 +46,7 @@ def get_default_owner_group():
 
 
 class Club(models.Model):
-    """
-    The Club class, made as a tree to allow nice tidy organization
-    """
+    """The Club class, made as a tree to allow nice tidy organization."""
 
     id = models.AutoField(primary_key=True, db_index=True)
     name = models.CharField(_("name"), max_length=64)
@@ -141,7 +139,7 @@ class Club(models.Model):
         ).first()
 
     def check_loop(self):
-        """Raise a validation error when a loop is found within the parent list"""
+        """Raise a validation error when a loop is found within the parent list."""
         objs = []
         cur = self
         while cur.parent is not None:
@@ -223,9 +221,7 @@ class Club(models.Model):
         return self.name
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be super edited by the given user
-        """
+        """Method to see if that object can be super edited by the given user."""
         if user.is_anonymous:
             return False
         return user.is_board_member
@@ -234,24 +230,21 @@ class Club(models.Model):
         return "https://%s%s" % (settings.SITH_URL, self.logo.url)
 
     def can_be_edited_by(self, user):
-        """
-        Method to see if that object can be edited by the given user
-        """
+        """Method to see if that object can be edited by the given user."""
         return self.has_rights_in_club(user)
 
     def can_be_viewed_by(self, user):
-        """
-        Method to see if that object can be seen by the given user
-        """
+        """Method to see if that object can be seen by the given user."""
         sub = User.objects.filter(pk=user.pk).first()
         if sub is None:
             return False
         return sub.was_subscribed
 
-    def get_membership_for(self, user: User) -> Optional["Membership"]:
-        """
-        Return the current membership the given user.
-        The result is cached.
+    def get_membership_for(self, user: User) -> Membership | None:
+        """Return the current membership the given user.
+
+        Note:
+            The result is cached.
         """
         if user.is_anonymous:
             return None
@@ -273,15 +266,12 @@ class Club(models.Model):
 
 class MembershipQuerySet(models.QuerySet):
     def ongoing(self) -> "MembershipQuerySet":
-        """
-        Filter all memberships which are not finished yet
-        """
+        """Filter all memberships which are not finished yet."""
         # noinspection PyTypeChecker
         return self.filter(Q(end_date=None) | Q(end_date__gte=timezone.now()))
 
     def board(self) -> "MembershipQuerySet":
-        """
-        Filter all memberships where the user is/was in the board.
+        """Filter all memberships where the user is/was in the board.
 
         Be aware that users who were in the board in the past
         are included, even if there are no more members.
@@ -293,9 +283,9 @@ class MembershipQuerySet(models.QuerySet):
         return self.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
 
     def update(self, **kwargs):
-        """
-        Work just like the default Django's update() method,
-        but add a cache refresh for the elements of the queryset.
+        """Refresh the cache for the elements of the queryset.
+
+        Besides that, does the same job as a regular update method.
 
         Be aware that this adds a db query to retrieve the updated objects
         """
@@ -315,8 +305,7 @@ class MembershipQuerySet(models.QuerySet):
                     )
 
     def delete(self):
-        """
-        Work just like the default Django's delete() method,
+        """Work just like the default Django's delete() method,
         but add a cache invalidation for the elements of the queryset
         before the deletion.
 
@@ -332,8 +321,7 @@ class MembershipQuerySet(models.QuerySet):
 
 
 class Membership(models.Model):
-    """
-    The Membership class makes the connection between User and Clubs
+    """The Membership class makes the connection between User and Clubs.
 
     Both Users and Clubs can have many Membership objects:
        - a user can be a member of many clubs at a time
@@ -390,17 +378,13 @@ class Membership(models.Model):
         return reverse("club:club_members", kwargs={"club_id": self.club_id})
 
     def is_owned_by(self, user):
-        """
-        Method to see if that object can be super edited by the given user
-        """
+        """Method to see if that object can be super edited by the given user."""
         if user.is_anonymous:
             return False
         return user.is_board_member
 
     def can_be_edited_by(self, user: User) -> bool:
-        """
-        Check if that object can be edited by the given user
-        """
+        """Check if that object can be edited by the given user."""
         if user.is_root or user.is_board_member:
             return True
         membership = self.club.get_membership_for(user)
@@ -414,9 +398,10 @@ class Membership(models.Model):
 
 
 class Mailing(models.Model):
-    """
-    This class correspond to a mailing list
-    Remember that mailing lists should be validated by UTBM
+    """A Mailing list for a club.
+
+    Warning:
+        Remember that mailing lists should be validated by UTBM.
     """
 
     club = models.ForeignKey(
@@ -508,9 +493,7 @@ class Mailing(models.Model):
 
 
 class MailingSubscription(models.Model):
-    """
-    This class makes the link between user and mailing list
-    """
+    """Link between user and mailing list."""
 
     mailing = models.ForeignKey(
         Mailing,
