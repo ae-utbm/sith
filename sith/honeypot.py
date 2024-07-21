@@ -1,12 +1,15 @@
 import logging
+from time import localtime, strftime
 from typing import Any
 
-from django.http import HttpResponse
-from django.test.client import WSGIRequest
+from django.http import HttpRequest, HttpResponse
 
 
 def custom_honeypot_error(
-    request: WSGIRequest, context: dict[str, Any]
+    request: HttpRequest, context: dict[str, Any]
 ) -> HttpResponse:
-    logging.warning(f"HoneyPot blocked user with ip {request.META.get('REMOTE_ADDR')}")
+    logging.warning(
+        f"[{strftime('%c', localtime())}] "
+        f"HoneyPot blocked user with ip {request.META.get('X-Forwarded-For')}"
+    )
     return HttpResponse("Upon reading this, the http client was enlightened.")
