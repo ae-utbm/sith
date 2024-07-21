@@ -50,7 +50,7 @@ from core.views import (
     QuickNotifMixin,
     TabedViewMixin,
 )
-from core.views.forms import MarkdownInput, TzAwareDateTimeField
+from core.views.forms import MarkdownInput, SelectDateTime
 
 # Sith object
 
@@ -72,12 +72,15 @@ class PosterForm(forms.ModelForm):
         widgets = {"screens": forms.CheckboxSelectMultiple}
         help_texts = {"file": _("Format: 16:9 | Resolution: 1920x1080")}
 
-    date_begin = TzAwareDateTimeField(
+    date_begin = forms.DateTimeField(
         label=_("Start date"),
+        widget=SelectDateTime,
         required=True,
         initial=timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
-    date_end = TzAwareDateTimeField(label=_("End date"), required=False)
+    date_end = forms.DateTimeField(
+        label=_("End date"), widget=SelectDateTime, required=False
+    )
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
@@ -191,9 +194,13 @@ class NewsForm(forms.ModelForm):
             "content": MarkdownInput,
         }
 
-    start_date = TzAwareDateTimeField(label=_("Start date"), required=False)
-    end_date = TzAwareDateTimeField(label=_("End date"), required=False)
-    until = TzAwareDateTimeField(label=_("Until"), required=False)
+    start_date = forms.DateTimeField(
+        label=_("Start date"), widget=SelectDateTime, required=False
+    )
+    end_date = forms.DateTimeField(
+        label=_("End date"), widget=SelectDateTime, required=False
+    )
+    until = forms.DateTimeField(label=_("Until"), widget=SelectDateTime, required=False)
 
     automoderation = forms.BooleanField(label=_("Automoderation"), required=False)
 
@@ -258,7 +265,7 @@ class NewsEditView(CanEditMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
-        if form.is_valid() and "preview" not in request.POST.keys():
+        if form.is_valid() and "preview" not in request.POST:
             return self.form_valid(form)
         else:
             return self.form_invalid(form)

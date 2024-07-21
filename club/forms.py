@@ -29,7 +29,7 @@ from django.utils.translation import gettext_lazy as _
 
 from club.models import Club, Mailing, MailingSubscription, Membership
 from core.models import User
-from core.views.forms import SelectDate, TzAwareDateTimeField
+from core.views.forms import SelectDate, SelectDateTime
 from counter.models import Counter
 
 
@@ -155,8 +155,12 @@ class MailingForm(forms.Form):
 
 
 class SellingsForm(forms.Form):
-    begin_date = TzAwareDateTimeField(label=_("Begin date"), required=False)
-    end_date = TzAwareDateTimeField(label=_("End date"), required=False)
+    begin_date = forms.DateTimeField(
+        label=_("Begin date"), widget=SelectDateTime, required=False
+    )
+    end_date = forms.DateTimeField(
+        label=_("End date"), widget=SelectDateTime, required=False
+    )
 
     counters = forms.ModelMultipleChoiceField(
         Counter.objects.order_by("name").all(), label=_("Counter"), required=False
