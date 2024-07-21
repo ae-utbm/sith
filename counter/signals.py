@@ -41,7 +41,7 @@ def write_log(instance, operation_type):
         session_token = session.get("counter_token", None)
         if session_token:
             counter = Counter.objects.filter(token=session_token).first()
-            if counter and len(counter.get_barmen_list()) > 0:
+            if counter and len(counter.barmen_list) > 0:
                 return counter.get_random_barman()
 
         # Get the current logged user if not from a counter

@@ -40,8 +40,8 @@ urlpatterns = [
         name="activity",
     ),
     path("<int:counter_id>/stats/", CounterStatView.as_view(), name="stats"),
-    path("<int:counter_id>/login/", CounterLogin.as_view(), name="login"),
-    path("<int:counter_id>/logout/", CounterLogout.as_view(), name="logout"),
+    path("<int:counter_id>/login/", counter_login, name="login"),
+    path("<int:counter_id>/logout/", counter_logout, name="logout"),
     path(
         "eticket/<int:selling_id>/pdf/",
         EticketPDFView.as_view(),
