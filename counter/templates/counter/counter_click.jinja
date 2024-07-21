@@ -41,9 +41,10 @@
                 <input type="submit" value="{% trans %}Go{% endtrans %}"/>
             </form>
             <h6>{% trans %}Registered cards{% endtrans %}</h6>
-            {% if customer.student_cards.exists() %}
+            {% if student_cards %}
+                <p>{{ student_cards }}</p>
                 <ul>
-                    {% for card in customer.student_cards.all() %}
+                    {% for card in student_cards %}
                         <li>{{ card.uid }}</li>
                     {% endfor %}
                 </ul>
@@ -55,7 +56,7 @@
         <div id="click_form">
             <h5>{% trans %}Selling{% endtrans %}</h5>
             <div>
-                {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user.id) %}
+                {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
 
                 {# Formulaire pour rechercher un produit en tapant son code dans une barre de recherche #}
                 <form method="post" action=""
@@ -166,7 +167,7 @@
             {%- endfor %}
         </div>
     </div>
-{% endblock %}
+{% endblock content %}
 
 {% block script %}
     {{ super() }}
@@ -193,4 +194,4 @@
             {%- endfor %}
         ];
     </script>
-{% endblock %}
+{% endblock script %}

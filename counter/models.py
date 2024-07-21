@@ -383,19 +383,19 @@ class Counter(models.Model):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         if self.type == "EBOUTIC":
             return reverse("eboutic:main")
         return reverse("counter:details", kwargs={"counter_id": self.id})
 
-    def __getattribute__(self, name):
+    def __getattribute__(self, name: str):
         if name == "edit_groups":
             return Group.objects.filter(
                 name=self.club.unix_name + settings.SITH_BOARD_SUFFIX
             ).all()
         return object.__getattribute__(self, name)
 
-    def is_owned_by(self, user):
+    def is_owned_by(self, user: User) -> bool:
         if user.is_anonymous:
             return False
         mem = self.club.get_membership_for(user)
@@ -403,90 +403,68 @@ class Counter(models.Model):
             return True
         return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
-    def can_be_viewed_by(self, user):
+    def can_be_viewed_by(self, user: User) -> bool:
         if self.type == "BAR":
             return True
         return user.is_board_member or user in self.sellers.all()
 
-    def gen_token(self):
+    def gen_token(self) -> None:
         """Generate a new token for this counter."""
         self.token = "".join(
-            random.choice(string.ascii_letters + string.digits) for x in range(30)
+            random.choice(string.ascii_letters + string.digits) for _ in range(30)
         )
         self.save()
 
-    def add_barman(self, user):
-        """Logs a barman in to the given counter.
-
-        A user is stored as a tuple with its login time.
-        """
-        Permanency(user=user, counter=self, start=timezone.now(), end=None).save()
-
-    def del_barman(self, user):
-        """Logs a barman out and store its permanency."""
-        perm = Permanency.objects.filter(counter=self, user=user, end=None).all()
-        for p in perm:
-            p.end = p.activity
-            p.save()
-
     @cached_property
-    def barmen_list(self):
+    def barmen_list(self) -> list[User]:
         return self.get_barmen_list()
 
-    def get_barmen_list(self):
+    def get_barmen_list(self) -> list[User]:
         """Returns the barman list as list of User.
 
         Also handle the timeout of the barmen
         """
-        pl = Permanency.objects.filter(counter=self, end=None).all()
-        bl = []
-        for p in pl:
-            if timezone.now() - p.activity < timedelta(
-                minutes=settings.SITH_BARMAN_TIMEOUT
-            ):
-                bl.append(p.user)
-            else:
-                p.end = p.activity
-                p.save()
-        return bl
+        perms = self.permanencies.filter(end=None)
 
-    def get_random_barman(self):
+        # disconnect barmen who are inactive
+        timeout = timezone.now() - timedelta(minutes=settings.SITH_BARMAN_TIMEOUT)
+        perms.filter(activity__lte=timeout).update(end=F("activity"))
+
+        return [p.user for p in perms.select_related("user")]
+
+    def get_random_barman(self) -> User:
         """Return a random user being currently a barman."""
-        bl = self.get_barmen_list()
-        return bl[random.randrange(0, len(bl))]
+        return random.choice(self.barmen_list)
 
-    def update_activity(self):
+    def update_activity(self) -> None:
         """Update the barman activity to prevent timeout."""
-        for p in Permanency.objects.filter(counter=self, end=None).all():
-            p.save()  # Update activity
+        self.permanencies.filter(end=None).update(activity=timezone.now())
 
-    def is_open(self):
+    @property
+    def is_open(self) -> bool:
         return len(self.barmen_list) > 0
 
-    def is_inactive(self):
+    def is_inactive(self) -> bool:
         """Returns True if the counter self is inactive from SITH_COUNTER_MINUTE_INACTIVE's value minutes, else False."""
-        return self.is_open() and (
+        return self.is_open and (
             (timezone.now() - self.permanencies.order_by("-activity").first().activity)
             > timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE)
         )
 
-    def barman_list(self):
+    def barman_list(self) -> list[int]:
         """Returns the barman id list."""
-        return [b.id for b in self.get_barmen_list()]
+        return [b.id for b in self.barmen_list]
 
-    def can_refill(self):
+    def can_refill(self) -> bool:
         """Show if the counter authorize the refilling with physic money."""
         if self.type != "BAR":
             return False
         if self.id in SITH_COUNTER_OFFICES:
             # If the counter is either 'AE' or 'BdF', refills are authorized
             return True
-        is_ae_member = False
+        # at least one of the barmen is in the AE board
         ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
-        for barman in self.get_barmen_list():
-            if ae.get_membership_for(barman):
-                is_ae_member = True
-        return is_ae_member
+        return any(ae.get_membership_for(barman) for barman in self.barmen_list)
 
     def get_top_barmen(self) -> QuerySet:
         """Return a QuerySet querying the office hours stats of all the barmen of all time
@@ -565,10 +543,13 @@ class Counter(models.Model):
             since = get_start_of_semester()
         if isinstance(since, date):
             since = datetime(since.year, since.month, since.day, tzinfo=tz.utc)
-        total = self.sellings.filter(date__gte=since).aggregate(
-            total=Sum(F("quantity") * F("unit_price"), output_field=CurrencyField())
+        return self.sellings.filter(date__gte=since).aggregate(
+            total=Sum(
+                F("quantity") * F("unit_price"),
+                default=0,
+                output_field=CurrencyField(),
+            )
         )["total"]
-        return total if total is not None else CurrencyField(0)
 
 
 class Refilling(models.Model):

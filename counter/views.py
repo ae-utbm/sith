@@ -27,13 +27,19 @@ from django.db import DataError, transaction
 from django.db.models import F
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
-from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.http import (
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+)
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView, ListView, RedirectView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.base import View
 from django.views.generic.edit import (
     CreateView,
@@ -66,6 +72,7 @@ from counter.models import (
     Counter,
     Customer,
     Eticket,
+    Permanency,
     Product,
     ProductType,
     Refilling,
@@ -254,7 +261,7 @@ class CounterMain(
                 None, _("Bad location, someone is already logged in somewhere else")
             )
         if self.object.type == "BAR":
-            kwargs["barmen"] = self.object.get_barmen_list()
+            kwargs["barmen"] = self.object.barmen_list
         elif self.request.user.is_authenticated:
             kwargs["barmen"] = [self.request.user]
         if "last_basket" in self.request.session.keys():
@@ -316,23 +323,17 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, user__id=self.kwargs["user_id"])
-        obj = self.get_object()
+        obj: Counter = self.get_object()
         if not self.customer.can_buy:
             raise Http404
-        if obj.type == "BAR":
-            if (
-                not (
-                    "counter_token" in request.session.keys()
-                    and request.session["counter_token"] == obj.token
-                )
-                or len(obj.get_barmen_list()) < 1
-            ):
-                return HttpResponseRedirect(
-                    reverse_lazy("counter:details", kwargs={"counter_id": obj.id})
-                )
-        else:
-            if not request.user.is_authenticated:
-                raise PermissionDenied
+        if obj.type != "BAR" and not request.user.is_authenticated:
+            raise PermissionDenied
+        if (
+            "counter_token" not in request.session
+            or request.session["counter_token"] != obj.token
+            or len(obj.barmen_list) == 0
+        ):
+            return redirect(obj)
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -347,7 +348,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         self.refill_form = None
         ret = super().get(request, *args, **kwargs)
         if (self.object.type != "BAR" and not request.user.is_authenticated) or (
-            self.object.type == "BAR" and len(self.object.get_barmen_list()) < 1
+            self.object.type == "BAR" and len(self.object.barmen_list) == 0
         ):  # Check that at least one barman is logged in
             ret = self.cancel(request)  # Otherwise, go to main view
         return ret
@@ -357,7 +358,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         self.object = self.get_object()
         self.refill_form = None
         if (self.object.type != "BAR" and not request.user.is_authenticated) or (
-            self.object.type == "BAR" and len(self.object.get_barmen_list()) < 1
+            self.object.type == "BAR" and len(self.object.barmen_list) < 1
         ):  # Check that at least one barman is logged in
             return self.cancel(request)
         if self.object.type == "BAR" and not (
@@ -532,20 +533,18 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def add_student_card(self, request):
         """Add a new student card on the customer account."""
-        uid = request.POST["student_card_uid"]
-        uid = str(uid)
+        uid = str(request.POST["student_card_uid"])
         if not StudentCard.is_valid(uid):
             request.session["not_valid_student_card_uid"] = True
             return False
 
         if not (
             self.object.type == "BAR"
-            and "counter_token" in request.session.keys()
+            and "counter_token" in request.session
             and request.session["counter_token"] == self.object.token
-            and len(self.object.get_barmen_list()) > 0
+            and self.object.is_open
         ):
             raise PermissionDenied
-
         StudentCard(customer=self.customer, uid=uid).save()
         return True
 
@@ -679,6 +678,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                     product
                 )
         kwargs["customer"] = self.customer
+        kwargs["student_cards"] = self.customer.student_cards.all()
         kwargs["basket_total"] = self.sum_basket(self.request)
         kwargs["refill_form"] = self.refill_form or RefillForm()
         kwargs["student_card_max_uid_size"] = StudentCard.UID_SIZE
@@ -686,56 +686,34 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         return kwargs
 
 
-class CounterLogin(RedirectView):
-    """Handle the login of a barman.
+@require_POST
+def counter_login(request: HttpRequest, counter_id: int) -> HttpResponseRedirect:
+    """Log a user in a counter.
 
-    Logged barmen are stored in the Permanency model
+    A successful login will result in the beginning of a counter duty
+    for the user.
     """
-
-    permanent = False
-
-    def post(self, request, *args, **kwargs):
-        """Register the logged user as barman for this counter."""
-        self.counter_id = kwargs["counter_id"]
-        self.counter = Counter.objects.filter(id=kwargs["counter_id"]).first()
-        form = LoginForm(request, data=request.POST)
-        self.errors = []
-        if form.is_valid():
-            user = User.objects.filter(username=form.cleaned_data["username"]).first()
-            if (
-                user in self.counter.sellers.all()
-                and not user in self.counter.get_barmen_list()
-            ):
-                if len(self.counter.get_barmen_list()) <= 0:
-                    self.counter.gen_token()
-                request.session["counter_token"] = self.counter.token
-                self.counter.add_barman(user)
-            else:
-                self.errors += ["sellers"]
-        else:
-            self.errors += ["credentials"]
-        return super().post(request, *args, **kwargs)
-
-    def get_redirect_url(self, *args, **kwargs):
-        return (
-            reverse_lazy("counter:details", args=args, kwargs=kwargs)
-            + "?"
-            + "&".join(self.errors)
-        )
+    counter = get_object_or_404(Counter, pk=counter_id)
+    form = LoginForm(request, data=request.POST)
+    if not form.is_valid():
+        return redirect(counter.get_absolute_url() + "?credentials")
+    user = form.get_user()
+    if not counter.sellers.contains(user) or user in counter.barmen_list:
+        return redirect(counter.get_absolute_url() + "?sellers")
+    if len(counter.barmen_list) == 0:
+        counter.gen_token()
+    request.session["counter_token"] = counter.token
+    counter.permanencies.create(user=user, start=timezone.now())
+    return redirect(counter)
 
 
-class CounterLogout(RedirectView):
-    permanent = False
-
-    def post(self, request, *args, **kwargs):
-        """Unregister the user from the barman."""
-        self.counter = Counter.objects.filter(id=kwargs["counter_id"]).first()
-        user = User.objects.filter(id=request.POST["user_id"]).first()
-        self.counter.del_barman(user)
-        return super().post(request, *args, **kwargs)
-
-    def get_redirect_url(self, *args, **kwargs):
-        return reverse_lazy("counter:details", args=args, kwargs=kwargs)
+@require_POST
+def counter_logout(request: HttpRequest, counter_id: int) -> HttpResponseRedirect:
+    """End the permanency of a user in this counter."""
+    Permanency.objects.filter(counter=counter_id, user=request.POST["user_id"]).update(
+        end=F("activity")
+    )
+    return redirect("counter:details", counter_id=counter_id)
 
 
 # Counter admin views
@@ -1196,7 +1174,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
         """We have here again a very particular right handling."""
         self.object = self.get_object()
         if (
-            self.object.get_barmen_list()
+            self.object.barmen_list
             and "counter_token" in request.session.keys()
             and request.session["counter_token"]
             and Counter.objects.filter(  # check if not null for counters that have no token set
@@ -1236,7 +1214,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
         """We have here again a very particular right handling."""
         self.object = self.get_object()
         if (
-            self.object.get_barmen_list()
+            self.object.barmen_list
             and "counter_token" in request.session.keys()
             and request.session["counter_token"]
             and Counter.objects.filter(  # check if not null for counters that have no token set
