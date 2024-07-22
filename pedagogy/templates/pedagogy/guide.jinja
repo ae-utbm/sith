@@ -73,9 +73,9 @@
 			<div class="radio-semester">
 				<div class="radio-guide">
 					<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN" x-model="semester"/>
-                    <label for="radioAUTUMN"><i class="fa fa-sun-o"></i></label>
+                    <label for="radioAUTUMN"><i class="fa fa-leaf"></i></label>
 					<input type="checkbox" name="semester" id="radioSPRING" value="SPRING" x-model="semester"/>
-                    <label for="radioSPRING"><i class="fa fa-leaf"></i></label>
+                    <label for="radioSPRING"><i class="fa fa-sun-o"></i></label>
 				</div>
 			</div>
 		</div>
@@ -96,22 +96,29 @@
 			</tr>
 		</thead>
 		<tbody id="dynamic_view_content">
-            <template x-for="uv in uvs" :key="uv.id">
+            <template x-for="uv in uvs.results" :key="uv.id">
                 <tr @click="window.location.href = `/pedagogy/uv/${uv.id}`">
                     <td><a :href="`/pedagogy/uv/${uv.id}`" x-text="uv.code"></a></td>
                     <td x-text="uv.title"></td>
                     <td x-text="uv.department"></td>
                     <td x-text="uv.credit_type"></td>
-                    <td><i :class="[uv.semester].includes('AUTUMN') && 'fa fa-leaf'"></i></td>
-                    <td><i :class="[uv.semester].includes('SPRING') && 'fa fa-sun-o'"></i></td>
+                    <td><i :class="uv.semester.includes('AUTUMN') && 'fa fa-leaf'"></i></td>
+                    <td><i :class="uv.semester.includes('SPRING') && 'fa fa-sun-o'"></i></td>
                     {% if can_create_uv -%}
-                        <td><a :href="`/pedagogy/uv/${uv.id}/update`">{% trans %}Edit{% endtrans %}</a></td>
+                        <td><a :href="`/pedagogy/uv/${uv.id}/edit`">{% trans %}Edit{% endtrans %}</a></td>
                         <td><a :href="`/pedagogy/uv/${uv.id}/delete`">{% trans %}Delete{% endtrans %}</a></td>
                     {%- endif -%}
                 </tr>
             </template>
 		</tbody>
 	</table>
+    <nav id="pagination" class="hidden" :style="max_page() == 0 && 'display: none;'">
+        <button @click="page--" :disabled="page == 1">{% trans %}Previous{% endtrans %}</button>
+        <template x-for="i in max_page()">
+            <button x-text="i" @click="page = i" :class="i == page && 'active'"></button>
+        </template>
+        <button @click="page++" :disabled="page == max_page()">{% trans %}Next{% endtrans %}</button>
+    </nav>
 </div>
 <script>
     const initialUrlParams = new URLSearchParams(window.location.search);
@@ -140,9 +147,13 @@
     then fetch the corresponding data from the API.
     This data will then be displayed on the result part of the page.
     #}
+    const page_default = 1;
+    const page_size_default = 100;
     document.addEventListener("alpine:init", () => {
         Alpine.data("uv_search", () => ({
             uvs: [],
+            page: initialUrlParams.get("page") || page_default,
+            page_size: initialUrlParams.get("page_size") || page_size_default,
             search: initialUrlParams.get("search") || "",
             department: initialUrlParams.getAll("department"),
             credit_type: initialUrlParams.getAll("credit_type"),
@@ -153,18 +164,31 @@
                 initialUrlParams.get("semester").split("_AND_") : [],
 
             async init() {
-                ["search", "department", "credit_type", "semester"].forEach((param) => {
+                let search_params = ["search", "department", "credit_type", "semester"];
+                let pagination_params = ["semester", "page"];
+                search_params.forEach((param) => {
+                    this.$watch(param, async () => {
+                        {# Reset pagination on search #}
+                        this.page = page_default;
+                        this.page_size = page_size_default;
+                    });
+                });
+                search_params.concat(pagination_params).forEach((param) => {
                     this.$watch(param, async (value) => {
                         update_query_string(param, value);
                         await this.fetch_data();  {# reload data on form change #}
                     });
-                })
+                });
                 await this.fetch_data();  {# load initial data #}
             },
 
             async fetch_data() {
                 const url = "{{ url("api:fetch_uvs") }}" + window.location.search;
                 this.uvs = await (await fetch(url)).json();
+            },
+
+            max_page() {
+                return Math.round(this.uvs.count / this.page_size);
             }
         }))
     })

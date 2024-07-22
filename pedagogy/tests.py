@@ -617,39 +617,47 @@ class UVSearchTest(TestCase):
         res = self.client.get(self.url + "?search=PA00")
         uv = UV.objects.get(code="PA00")
         assert res.status_code == 200
-        assert json.loads(res.content) == [
-            {
-                "id": uv.id,
-                "title": uv.title,
-                "code": uv.code,
-                "credit_type": uv.credit_type,
-                "semester": uv.semester,
-                "department": uv.department,
-            }
-        ]
+        assert json.loads(res.content) == {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [
+                {
+                    "id": uv.id,
+                    "title": uv.title,
+                    "code": uv.code,
+                    "credit_type": uv.credit_type,
+                    "semester": uv.semester,
+                    "department": uv.department,
+                }
+            ],
+        }
 
     def test_search_by_code(self):
         self.client.force_login(self.bibou)
         res = self.client.get(self.url + "?search=MT")
         assert res.status_code == 200
-        assert {uv["code"] for uv in json.loads(res.content)} == {"MT01", "MT10"}
+        assert {uv["code"] for uv in json.loads(res.content)["results"]} == {
+            "MT01",
+            "MT10",
+        }
 
     def test_search_by_credit_type(self):
         self.client.force_login(self.bibou)
         res = self.client.get(self.url + "?credit_type=CS")
         assert res.status_code == 200
-        codes = [uv["code"] for uv in json.loads(res.content)]
+        codes = [uv["code"] for uv in json.loads(res.content)["results"]]
         assert codes == ["AP4A", "MT01", "PHYS11"]
         res = self.client.get(self.url + "?credit_type=CS&credit_type=OM")
         assert res.status_code == 200
-        codes = {uv["code"] for uv in json.loads(res.content)}
+        codes = {uv["code"] for uv in json.loads(res.content)["results"]}
         assert codes == {"AP4A", "MT01", "PHYS11", "PA00"}
 
     def test_search_by_semester(self):
         self.client.force_login(self.bibou)
         res = self.client.get(self.url + "?semester=SPRING")
         assert res.status_code == 200
-        codes = {uv["code"] for uv in json.loads(res.content)}
+        codes = {uv["code"] for uv in json.loads(res.content)["results"]}
         assert codes == {"DA50", "TNEV", "PA00"}
 
     def test_search_multiple_filters(self):
@@ -658,14 +666,14 @@ class UVSearchTest(TestCase):
             self.url + "?semester=AUTUMN&credit_type=CS&department=TC"
         )
         assert res.status_code == 200
-        codes = {uv["code"] for uv in json.loads(res.content)}
+        codes = {uv["code"] for uv in json.loads(res.content)["results"]}
         assert codes == {"MT01", "PHYS11"}
 
     def test_search_fails(self):
         self.client.force_login(self.bibou)
         res = self.client.get(self.url + "?credit_type=CS&search=DA")
         assert res.status_code == 200
-        assert json.loads(res.content) == []
+        assert json.loads(res.content)["results"] == []
 
     def test_search_pa00_fail(self):
         self.client.force_login(self.bibou)

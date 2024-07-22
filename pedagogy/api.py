@@ -3,8 +3,9 @@ from typing import Annotated
 from annotated_types import Ge
 from django.conf import settings
 from ninja import Query
-from ninja_extra import ControllerBase, api_controller, route
+from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound
+from ninja_extra.pagination import PageNumberPaginationExtra, PaginatedResponseSchema
 
 from core.api_permissions import IsInGroup, IsRoot, IsSubscriber
 from pedagogy.models import UV
@@ -29,8 +30,9 @@ class UvController(ControllerBase):
             raise NotFound
         return res
 
-    @route.get("", response=list[SimpleUvSchema], url_name="fetch_uvs")
+    @route.get(
+        "", response=PaginatedResponseSchema[SimpleUvSchema], url_name="fetch_uvs"
+    )
+    @paginate(PageNumberPaginationExtra, page_size=100)
     def fetch_uv_list(self, search: Query[UvFilterSchema]):
-        # le `[:50]`, c'est de la pagination eco+
-        # si quelqu'un est motivé, il peut faire une vraie pagination
-        return search.filter(UV.objects.all())[:50]
+        return search.filter(UV.objects.all())
