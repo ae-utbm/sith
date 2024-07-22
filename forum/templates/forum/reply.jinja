@@ -29,6 +29,7 @@
 {% endif %}
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        {% render_honeypot_field settings.HONEYPOT_FIELD_NAME_FORUM %}
         {{ form.as_p() }}
         <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
     </form>

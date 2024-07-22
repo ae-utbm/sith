@@ -287,6 +287,7 @@ REST_FRAMEWORK["UNAUTHENTICATED_USER"] = "core.models.AnonymousUser"
 HONEYPOT_FIELD_NAME = "body2"
 HONEYPOT_VALUE = "content"
 HONEYPOT_RESPONDER = custom_honeypot_error  # Make honeypot errors less suspicious
+HONEYPOT_FIELD_NAME_FORUM = "message2"  # Only used on forum
 
 
 # Email
