@@ -13,7 +13,7 @@ from pedagogy.schemas import SimpleUvSchema, UvFilterSchema, UvSchema
 from pedagogy.utbm_api import find_uv
 
 
-@api_controller("/uv", permissions=[IsSubscriber])
+@api_controller("/uv")
 class UvController(ControllerBase):
     @route.get(
         "/{year}/{code}",
@@ -31,7 +31,10 @@ class UvController(ControllerBase):
         return res
 
     @route.get(
-        "", response=PaginatedResponseSchema[SimpleUvSchema], url_name="fetch_uvs"
+        "",
+        response=PaginatedResponseSchema[SimpleUvSchema],
+        url_name="fetch_uvs",
+        permissions=[IsSubscriber | IsInGroup(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)],
     )
     @paginate(PageNumberPaginationExtra, page_size=100)
     def fetch_uv_list(self, search: Query[UvFilterSchema]):

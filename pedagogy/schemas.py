@@ -123,7 +123,7 @@ class UvFilterSchema(FilterSchema):
     def filter_semester(self, value: set[str] | None) -> Q:
         """Special filter for the semester.
 
-        If both "SPRING" and "AUTUMN" are given, UV that are available
+        If either "SPRING" or "AUTUMN" is given, UV that are available
         during "AUTUMN_AND_SPRING" will be filtered.
         """
         if not value:

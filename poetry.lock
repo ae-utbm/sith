@@ -1226,6 +1226,24 @@ griffe = ">=0.47"
 mkdocstrings = ">=0.25"
 
 [[package]]
+name = "model-bakery"
+version = "1.18.2"
+description = "Smart object creation facility for Django."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "model_bakery-1.18.2-py3-none-any.whl", hash = "sha256:fd13a251d20db78b790d80f75350a73af5d199e5151227b5dd35cb76f2f08fe8"},
+    {file = "model_bakery-1.18.2.tar.gz", hash = "sha256:8f8ab4ba26a206ed848da9b1740b5006b5eeca8a67389efb28dbff37b362e802"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+
+[package.extras]
+docs = ["myst-parser", "sphinx", "sphinx-rtd-theme"]
+test = ["black", "coverage", "mypy", "pillow", "pytest", "pytest-django", "ruff"]
+
+[[package]]
 name = "nodeenv"
 version = "1.9.1"
 description = "Node.js virtual environment builder"
@@ -2454,4 +2472,4 @@ filelock = ">=3.4"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ee0b881719f6834880266d72272429708e781b3ccd34a0fbf3e8b4119dcb95fd"
+content-hash = "f8e48947d004d61d63a345d36d7b42777030e1ac3687bb27f97b2c51318fcc8d"

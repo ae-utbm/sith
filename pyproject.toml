@@ -67,6 +67,7 @@ freezegun = "^1.2.2"  # used to test time-dependent code
 pytest = "^8.2.2"
 pytest-cov = "^5.0.0"
 pytest-django = "^4.8.0"
+model-bakery = "^1.18.2"
 
 # deps used to work on the documentation
 [tool.poetry.group.docs.dependencies]

@@ -125,8 +125,6 @@
 
     function update_query_string(key, value) {
         const url = new URL(window.location.href);
-        console.log(value)
-        console.log(!!value)
         if (!value) {
             url.searchParams.delete(key)
         } else if (Array.isArray(value)) {

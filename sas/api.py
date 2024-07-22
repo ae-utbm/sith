@@ -33,8 +33,12 @@ class SasController(ControllerBase):
             # User can view any moderated picture if he/she is subscribed.
             # If not, he/she can view only the one he/she has been identified on
             raise PermissionDenied
-        pictures = filters.filter(
-            Picture.objects.filter(is_moderated=True, asked_for_removal=False)
+        pictures = list(
+            filters.filter(
+                Picture.objects.filter(is_moderated=True, asked_for_removal=False)
+            )
+            .distinct()
+            .order_by("-date")
         )
         for picture in pictures:
             picture.full_size_url = picture.get_download_url()
