@@ -14,6 +14,7 @@
 #
 
 import pytest
+from django.conf import settings
 from django.test import Client
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
@@ -24,13 +25,14 @@ from forum.models import Forum, ForumMessage, ForumTopic
 
 @pytest.mark.django_db
 class TestTopicCreation:
-    def test_topic_creation_success(self, client: Client):
+    def test_topic_creation_ok(self, client: Client):
         user: User = User.objects.get(username="root")
         forum = Forum.objects.get(name="AE")
         client.force_login(user)
         payload = {
             "title": "Hello IT.",
             "message": "Have you tried turning it off and on again ?",
+            settings.HONEYPOT_FIELD_NAME_FORUM: settings.HONEYPOT_VALUE,
         }
         assert not ForumTopic.objects.filter(_title=payload["title"]).exists()
         response = client.post(reverse("forum:new_topic", args=str(forum.id)), payload)
@@ -46,13 +48,28 @@ class TestTopicCreation:
         assert topic
         assert topic.last_message.message == payload["message"]
 
-    def test_topic_creation_failure(self, client: Client):
+    def test_topic_creation_honeypot_fail(self, client: Client):
+        user: User = User.objects.get(username="root")
+        forum = Forum.objects.get(name="AE")
+        client.force_login(user)
+        payload = {
+            "title": "You shall",
+            "message": "Not pass !",
+            settings.HONEYPOT_FIELD_NAME_FORUM: settings.HONEYPOT_VALUE + "random",
+        }
+        assert not ForumTopic.objects.filter(_title=payload["title"]).exists()
+        response = client.post(reverse("forum:new_topic", args=str(forum.id)), payload)
+        assert response.status_code == 200
+        assert not ForumTopic.objects.filter(_title=payload["title"]).exists()
+
+    def test_topic_creation_fail(self, client: Client):
         user: User = User.objects.get(username="krophil")
         forum = Forum.objects.get(name="AE")
         client.force_login(user)
         payload = {
             "title": "You shall",
             "message": "Not pass !",
+            settings.HONEYPOT_FIELD_NAME_FORUM: settings.HONEYPOT_VALUE,
         }
         assert not ForumTopic.objects.filter(_title=payload["title"]).exists()
         response = client.post(reverse("forum:new_topic", args=str(forum.id)), payload)

@@ -25,6 +25,7 @@ from typing import Optional
 import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.http import HttpRequest
 from django.utils import timezone
 from PIL import ExifTags
 from PIL.Image import Resampling
@@ -297,3 +298,16 @@ def bbcode_to_markdown(text):
             new_text.append(line)
 
     return "\n".join(new_text)
+
+
+def get_client_ip(request: HttpRequest) -> str | None:
+    headers = (
+        "X_FORWARDED_FOR",  # Common header for proixes
+        "FORWARDED",  # Standard header defined by RFC 7239.
+        "REMOTE_ADDR",  # Default IP Address (direct connection)
+    )
+    for header in headers:
+        if (ip := request.META.get(header)) is not None:
+            return ip
+
+    return None

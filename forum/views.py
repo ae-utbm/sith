@@ -22,6 +22,7 @@
 #
 #
 import math
+from functools import partial
 
 from ajax_select import make_ajax_field
 from django import forms
@@ -32,11 +33,13 @@ from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.utils import html, timezone
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, RedirectView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from haystack.query import RelatedSearchQuerySet
+from honeypot.decorators import check_honeypot
 
 from core.views import (
     CanCreateMixin,
@@ -242,6 +245,9 @@ class TopicForm(forms.ModelForm):
     title = forms.CharField(required=True, label=_("Title"))
 
 
+@method_decorator(
+    partial(check_honeypot, field_name=settings.HONEYPOT_FIELD_NAME_FORUM), name="post"
+)
 class ForumTopicCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
     form_class = TopicForm
@@ -331,6 +337,9 @@ class ForumMessageView(SingleObjectMixin, RedirectView):
         return self.object.get_url()
 
 
+@method_decorator(
+    partial(check_honeypot, field_name=settings.HONEYPOT_FIELD_NAME_FORUM), name="post"
+)
 class ForumMessageEditView(CanEditMixin, UpdateView):
     model = ForumMessage
     form_class = forms.modelform_factory(
@@ -381,6 +390,9 @@ class ForumMessageUndeleteView(SingleObjectMixin, RedirectView):
         return self.object.get_absolute_url()
 
 
+@method_decorator(
+    partial(check_honeypot, field_name=settings.HONEYPOT_FIELD_NAME_FORUM), name="post"
+)
 class ForumMessageCreateView(CanCreateMixin, CreateView):
     model = ForumMessage
     form_class = forms.modelform_factory(
