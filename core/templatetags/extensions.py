@@ -47,12 +47,23 @@ class HoneypotExtension(Extension):
 
     def parse(self, parser: Parser) -> nodes.Output:
         lineno = parser.stream.expect("name:render_honeypot_field").lineno
+        key = nodes.Name("render_honeypot_field", "load", lineno=lineno)
+        if parser.stream.current.type != "block_end":
+            field_name = parser.parse_expression()
+        else:
+            field_name = nodes.Const(None)
         call = self.call_method(
             "_render",
-            [nodes.Name("render_honeypot_field", "load", lineno=lineno)],
+            [key, field_name],
             lineno=lineno,
         )
         return nodes.Output([nodes.MarkSafe(call)])
 
-    def _render(self, render_honeypot_field: Callable[[str | None], str]):
-        return render_to_string("honeypot/honeypot_field.html", render_honeypot_field())
+    def _render(
+        self,
+        render_honeypot_field: Callable[[str | None], str],
+        field_name: str | None = None,
+    ):
+        return render_to_string(
+            "honeypot/honeypot_field.html", render_honeypot_field(field_name=field_name)
+        )
