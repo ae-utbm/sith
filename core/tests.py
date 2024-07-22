@@ -217,7 +217,7 @@ def test_full_markdown_syntax():
     assert result == html
 
 
-class PageHandlingTest(TestCase):
+class TestPageHandling(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root = User.objects.get(username="root")
@@ -320,11 +320,16 @@ http://git.an
         assertInHTML(expected, response.content.decode())
 
 
-class UserToolsTest:
+@pytest.mark.django_db
+class TestUserTools:
     def test_anonymous_user_unauthorized(self, client):
         """An anonymous user shouldn't have access to the tools page."""
         response = client.get(reverse("core:user_tools"))
-        assert response.status_code == 403
+        assertRedirects(
+            response,
+            expected_url=f"/login?next=%2Fuser%2Ftools%2F",
+            target_status_code=301,
+        )
 
     @pytest.mark.parametrize("username", ["guy", "root", "skia", "comunity"])
     def test_page_is_working(self, client, username):
@@ -335,13 +340,47 @@ class UserToolsTest:
         assert response.status_code == 200
 
 
+@pytest.mark.django_db
+class TestUserPicture:
+    def test_anonymous_user_unauthorized(self, client):
+        """An anonymous user shouldn't have access to an user's photo page."""
+        response = client.get(
+            reverse(
+                "core:user_pictures",
+                kwargs={"user_id": User.objects.get(username="sli").pk},
+            )
+        )
+        assert response.status_code == 403
+
+    @pytest.mark.parametrize(
+        ("username", "status"),
+        [
+            ("guy", 403),
+            ("root", 200),
+            ("skia", 200),
+            ("sli", 200),
+        ],
+    )
+    def test_page_is_working(self, client, username, status):
+        """Only user that subscribed (or admins) should be able to see the page."""
+        # Test for simple user
+        client.force_login(User.objects.get(username=username))
+        response = client.get(
+            reverse(
+                "core:user_pictures",
+                kwargs={"user_id": User.objects.get(username="sli").pk},
+            )
+        )
+        assert response.status_code == status
+
+
 # TODO: many tests on the pages:
 #   - renaming a page
 #   - changing a page's parent --> check that page's children's full_name
 #   - changing the different groups of the page
 
 
-class FileHandlingTest(TestCase):
+class TestFileHandling(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.subscriber = User.objects.get(username="subscriber")
@@ -377,7 +416,7 @@ class FileHandlingTest(TestCase):
         assert "ls</a>" in str(response.content)
 
 
-class UserIsInGroupTest(TestCase):
+class TestUserIsInGroup(TestCase):
     """Test that the User.is_in_group() and AnonymousUser.is_in_group()
     work as intended.
     """
@@ -518,7 +557,7 @@ class UserIsInGroupTest(TestCase):
         assert self.skia.is_in_group(name="This doesn't exist") is False
 
 
-class DateUtilsTest(TestCase):
+class TestDateUtils(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.autumn_month = settings.SITH_SEMESTER_START_AUTUMN[0]

@@ -14,26 +14,21 @@
 				document.head.innerHTML += '<link rel="stylesheet" href="' + css + '">';
 			}
 
-			// Custom markdown parser
-			function customMarkdownParser(plainText, cb) {
-				$.ajax({
-					url: "{{ markdown_api_url }}",
-					method: "POST",
-					data: { text: plainText, csrfmiddlewaretoken: getCSRFToken() },
-				}).done(cb);
-			}
-
 			// Pretty markdown input
 			const easymde = new EasyMDE({
 				element: document.getElementById("{{ widget.attrs.id }}"),
 				spellChecker: false,
 				autoDownloadFontAwesome: false,
-				previewRender: function(plainText, preview) { // Async method
+				previewRender: function (plainText, preview) {
 					clearTimeout(lastAPICall);
-					lastAPICall = setTimeout(() => {
-						customMarkdownParser(plainText, (msg) => preview.innerHTML = msg);
+					lastAPICall = setTimeout(async () => {
+                        const res = await fetch("{{ markdown_api_url }}", {
+                            method: "POST",
+                            body: JSON.stringify({ text: plainText }),
+                        });
+                        preview.innerHTML = await res.text();
 					}, 300);
-					return preview.innerHTML;
+                    return null;
 				},
 				forceSync: true, // Avoid validation error on generic create view
 				toolbar: [
