@@ -33,7 +33,7 @@ from core.models import User
 from galaxy.models import Galaxy
 
 
-class GalaxyTestModel(TestCase):
+class TestGalaxyModel(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root = User.objects.get(username="root")
@@ -144,7 +144,7 @@ class GalaxyTestModel(TestCase):
 
 
 @pytest.mark.slow
-class GalaxyTestView(TestCase):
+class TestGalaxyView(TestCase):
     @classmethod
     def setUpTestData(cls):
         """Generate a plausible Galaxy once for every test."""

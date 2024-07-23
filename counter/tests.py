@@ -27,7 +27,7 @@ from counter.models import BillingInfo, Counter, Customer, Permanency, Product, 
 from sith.settings import SITH_MAIN_CLUB
 
 
-class CounterTest(TestCase):
+class TestCounter(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.skia = User.objects.filter(username="skia").first()
@@ -150,7 +150,7 @@ class CounterTest(TestCase):
                 assert not counter.has_annotated_barman
 
 
-class CounterStatsTest(TestCase):
+class TestCounterStats(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.counter = Counter.objects.get(id=2)
@@ -300,7 +300,7 @@ class CounterStatsTest(TestCase):
         ]
 
 
-class BillingInfoTest(TestCase):
+class TestBillingInfo(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.payload_1 = {
@@ -528,7 +528,7 @@ class BillingInfoTest(TestCase):
         assert infos.country == "FR"
 
 
-class BarmanConnectionTest(TestCase):
+class TestBarmanConnection(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.krophil = User.objects.get(username="krophil")
@@ -578,7 +578,7 @@ class BarmanConnectionTest(TestCase):
         assert not '<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response.content)
 
 
-class StudentCardTest(TestCase):
+class TestStudentCard(TestCase):
     """Tests for adding and deleting Stundent Cards
     Test that an user can be found with it's student card.
     """
@@ -883,7 +883,7 @@ class StudentCardTest(TestCase):
         assert response.status_code == 403
 
 
-class CustomerAccountIdTest(TestCase):
+class TestCustomerAccountId(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user_a = User.objects.create(

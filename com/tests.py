@@ -45,7 +45,7 @@ def test_com_page_is_working(client, url, user_community):
     assert response.status_code == 200
 
 
-class ComTest(TestCase):
+class TestCom(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.skia = User.objects.get(username="skia")
@@ -113,7 +113,7 @@ class ComTest(TestCase):
         )
 
 
-class SithTest(TestCase):
+class TestSith(TestCase):
     def test_sith_owner(self):
         """Test that the sith instance is owned by com admins and nobody else."""
         sith: Sith = Sith.objects.first()
@@ -128,7 +128,7 @@ class SithTest(TestCase):
         assert not sith.is_owned_by(sli)
 
 
-class NewsTest(TestCase):
+class TestNews(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.com_admin = User.objects.get(username="comunity")
@@ -178,7 +178,7 @@ class NewsTest(TestCase):
         assert not self.new.can_be_edited_by(self.author)
 
 
-class WeekmailArticleTest(TestCase):
+class TestWeekmailArticle(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.com_admin = User.objects.get(username="comunity")
@@ -202,7 +202,7 @@ class WeekmailArticleTest(TestCase):
         assert not self.article.is_owned_by(self.sli)
 
 
-class PosterTest(TestCase):
+class TestPoster(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.com_admin = User.objects.get(username="comunity")

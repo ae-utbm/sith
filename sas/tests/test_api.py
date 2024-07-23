@@ -8,7 +8,7 @@ from core.models import User
 from sas.models import Album, PeoplePictureRelation, Picture
 
 
-class SasTest(TestCase):
+class TestSas(TestCase):
     @classmethod
     def setUpTestData(cls):
         Picture.objects.all().delete()

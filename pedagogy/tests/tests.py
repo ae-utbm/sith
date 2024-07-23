@@ -76,7 +76,7 @@ def create_uv_template(user_id, code="IFC1", exclude_list=None):
 # UV class tests
 
 
-class UVCreation(TestCase):
+class TestUVCreation(TestCase):
     """Test uv creation."""
 
     @classmethod
@@ -164,7 +164,7 @@ def test_guide_anonymous_permission_denied(client: Client):
     assert res.status_code == 302
 
 
-class UVDeleteTest(TestCase):
+class TestUVDelete(TestCase):
     """Test UV deletion rights."""
 
     @classmethod
@@ -205,7 +205,7 @@ class UVDeleteTest(TestCase):
         assert UV.objects.filter(pk=self.uv.pk).exists()
 
 
-class UVUpdateTest(TestCase):
+class TestUVUpdate(TestCase):
     """Test UV update rights."""
 
     @classmethod
@@ -291,7 +291,7 @@ def create_uv_comment_template(user_id, uv_code="PA00", exclude_list=None):
     return comment
 
 
-class UVCommentCreationAndDisplay(TestCase):
+class TestUVCommentCreationAndDisplay(TestCase):
     """Test UVComment creation and its display.
 
     Display and creation are the same view.
@@ -397,7 +397,7 @@ class UVCommentCreationAndDisplay(TestCase):
         assert response.status_code == 200
 
 
-class UVCommentDeleteTest(TestCase):
+class TestUVCommentDelete(TestCase):
     """Test UVComment deletion rights."""
 
     @classmethod
@@ -463,7 +463,7 @@ class UVCommentDeleteTest(TestCase):
         assert UVComment.objects.filter(id=self.comment.id).exists()
 
 
-class UVCommentUpdateTest(TestCase):
+class TestUVCommentUpdate(TestCase):
     """Test UVComment update rights."""
 
     @classmethod
@@ -554,7 +554,7 @@ class UVCommentUpdateTest(TestCase):
         self.assertEqual(self.comment.author, self.krophil)
 
 
-class UVModerationFormTest(TestCase):
+class TestUVModerationForm(TestCase):
     """Assert access rights and if the form works well."""
 
     @classmethod
@@ -767,7 +767,7 @@ class UVModerationFormTest(TestCase):
         assert UVComment.objects.filter(id=self.comment_2.id).exists()
 
 
-class UVCommentReportCreateTest(TestCase):
+class TestUVCommentReportCreate(TestCase):
     """Test report creation view.
 
     Assert access rights and if you can create with it.

@@ -39,7 +39,7 @@ from counter.models import Counter, Customer, Product, Selling
 from eboutic.models import Basket
 
 
-class EbouticTest(TestCase):
+class TestEboutic(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.barbar = Product.objects.get(code="BARB")

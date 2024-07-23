@@ -79,7 +79,7 @@ def test_subscription_compute_end(start_date, duration, expected_end):
     assert Subscription.compute_end(duration, start_date) == expected_end
 
 
-class SubscriptionIntegrationTest(TestCase):
+class TestSubscriptionIntegration(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.get(username="public")
