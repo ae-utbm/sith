@@ -38,6 +38,7 @@ import binascii
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
+from pathlib import Path
 
 import sentry_sdk
 from django.utils.translation import gettext_lazy as _
@@ -45,7 +46,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .honeypot import custom_honeypot_error
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(".").parent.parent
 
 os.environ["HTTPS"] = "off"
 
@@ -212,7 +213,7 @@ REST_FRAMEWORK = {}
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -252,19 +253,19 @@ USE_I18N = True
 
 USE_TZ = True
 
-LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
 PHONENUMBER_DEFAULT_REGION = "FR"
 
 # Medias
-MEDIA_ROOT = "./data/"
 MEDIA_URL = "/data/"
+MEDIA_ROOT = BASE_DIR / "data"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = "./static/"
+STATIC_ROOT = BASE_DIR / "static"
 
 # Static files finders which allow to see static folder in all apps
 STATICFILES_FINDERS = [
@@ -287,7 +288,6 @@ HONEYPOT_FIELD_NAME = "body2"
 HONEYPOT_VALUE = "content"
 HONEYPOT_RESPONDER = custom_honeypot_error  # Make honeypot errors less suspicious
 HONEYPOT_FIELD_NAME_FORUM = "message2"  # Only used on forum
-
 
 # Email
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -724,7 +724,6 @@ if SENTRY_DSN:
         send_default_pii=True,
         environment=SENTRY_ENV,
     )
-
 
 SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/Stuk/jszip-utils": "0.1.0",
