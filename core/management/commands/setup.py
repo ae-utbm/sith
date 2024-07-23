@@ -13,28 +13,34 @@
 #
 #
 
-import os
+from pathlib import Path
 
+from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = "Set up a new instance of the Sith AE"
+    help = "Set up the development environment."
 
     def handle(self, *args, **options):
-        root_path = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        )
-        try:
-            os.mkdir(os.path.join(root_path) + "/data")
-            print("Data dir created")
-        except Exception as e:
-            repr(e)
-        try:
-            os.remove(os.path.join(root_path, "db.sqlite3"))
-            print("db.sqlite3 deleted")
-        except Exception as e:
-            repr(e)
+        if not settings.DEBUG:
+            raise Exception("Never call this command in prod. Never.")
+        data_dir = Path(settings.BASE_DIR) / "data"
+        settings.EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
+        if not data_dir.is_dir():
+            data_dir.mkdir()
+        db_path = Path(settings.BASE_DIR) / "db.sqlite3"
+        if db_path.exists():
+            call_command("flush", "--noinput")
+            self.stdout.write("Existing database reset")
         call_command("migrate")
+        self.stdout.write("Add the base fixtures.")
         call_command("populate")
+        self.stdout.write("Generate additional random fixtures")
+        call_command("populate_more")
+        self.stdout.write("Build the xapian index")
+        call_command("rebuild_index", "--noinput")
+
+        settings.EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+        self.stdout.write("Setup complete!")

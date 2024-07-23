@@ -63,6 +63,7 @@ ruff = "^0.5.1" # Version used in pipeline is controlled by pre-commit hooks in 
 djhtml = "^3.0.6"
 
 # deps used for testing purposes
+faker = "^26.0.0"
 [tool.poetry.group.tests.dependencies]
 freezegun = "^1.2.2"  # used to test time-dependent code
 pytest = "^8.2.2"
