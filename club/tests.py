@@ -28,7 +28,7 @@ from core.models import AnonymousUser, User
 from sith.settings import SITH_BAR_MANAGER, SITH_MAIN_CLUB_ID
 
 
-class ClubTest(TestCase):
+class TestClub(TestCase):
     """Set up data for test cases related to clubs and membership.
 
     The generated dataset is the one created by the populate command,
@@ -92,7 +92,7 @@ class ClubTest(TestCase):
         cache.clear()
 
 
-class MembershipQuerySetTest(ClubTest):
+class TestMembershipQuerySet(TestClub):
     def test_ongoing(self):
         """Test that the ongoing queryset method returns the memberships that
         are not ended.
@@ -170,7 +170,7 @@ class MembershipQuerySetTest(ClubTest):
             assert cached_mem == "not_member"
 
 
-class ClubModelTest(ClubTest):
+class TestClubModel(TestClub):
     def assert_membership_started_today(self, user: User, role: int):
         """Assert that the given membership is active and started today."""
         membership = user.memberships.ongoing().filter(club=self.club).first()
@@ -506,7 +506,7 @@ class ClubModelTest(ClubTest):
         assert self.club.is_owned_by(self.sli)
 
 
-class MailingFormTest(TestCase):
+class TestMailingForm(TestCase):
     """Perform validation tests for MailingForm."""
 
     @classmethod
@@ -822,7 +822,7 @@ class MailingFormTest(TestCase):
         assert "krophil@git.an" not in content
 
 
-class ClubSellingViewTest(TestCase):
+class TestClubSellingView(TestCase):
     """Perform basics tests to ensure that the page is available."""
 
     @classmethod

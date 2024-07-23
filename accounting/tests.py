@@ -28,7 +28,7 @@ from accounting.models import (
 from core.models import User
 
 
-class RefoundAccountTest(TestCase):
+class TestRefoundAccount(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.skia = User.objects.get(username="skia")
@@ -67,7 +67,7 @@ class RefoundAccountTest(TestCase):
         assert self.skia.customer.amount == 0
 
 
-class JournalTest(TestCase):
+class TestJournal(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.journal = GeneralJournal.objects.get(id=1)
@@ -91,7 +91,7 @@ class JournalTest(TestCase):
         assert "<td>M\xc3\xa9thode de paiement</td>" not in str(response_get.content)
 
 
-class OperationTest(TestCase):
+class TestOperation(TestCase):
     def setUp(self):
         self.tomorrow_formatted = (date.today() + timedelta(days=1)).strftime(
             "%d/%m/%Y"

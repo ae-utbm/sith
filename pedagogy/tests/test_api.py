@@ -11,7 +11,7 @@ from core.models import RealGroup, User
 from pedagogy.models import UV
 
 
-class UVSearchTest(TestCase):
+class TestUVSearch(TestCase):
     """Test UV guide rights for view and API."""
 
     @classmethod
