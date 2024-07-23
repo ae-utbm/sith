@@ -1,46 +1,46 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-<h3>{% trans %}Club tools{% endtrans %}</h3>
-<div>
+  <h3>{% trans %}Club tools{% endtrans %}</h3>
+  <div>
     <h4>{% trans %}Communication:{% endtrans %}</h4>
     <ul>
-        <li> <a href="{{ url('com:news_new') }}?club={{ object.id }}">{% trans %}Create a news{% endtrans %}</a></li>
-        <li> <a href="{{ url('com:weekmail_article') }}?club={{ object.id }}">{% trans %}Post in the Weekmail{% endtrans %}</a></li>
-        {% if object.trombi %}
+      <li> <a href="{{ url('com:news_new') }}?club={{ object.id }}">{% trans %}Create a news{% endtrans %}</a></li>
+      <li> <a href="{{ url('com:weekmail_article') }}?club={{ object.id }}">{% trans %}Post in the Weekmail{% endtrans %}</a></li>
+      {% if object.trombi %}
         <li> <a href="{{ url('trombi:detail', trombi_id=object.trombi.id) }}">{% trans %}Edit Trombi{% endtrans %}</a></li>
-        {% else %}
+      {% else %}
         <li> <a href="{{ url('trombi:create', club_id=object.id) }}">{% trans %}New Trombi{% endtrans %}</a></li>
         <li> <a href="{{ url('club:poster_list', club_id=object.id) }}">{% trans %}Posters{% endtrans %}</a></li>
-        {% endif %}
+      {% endif %}
     </ul>
     <h4>{% trans %}Counters:{% endtrans %}</h4>
     <ul>
-    {% if object.unix_name == settings.SITH_LAUNDERETTE_MANAGER['unix_name'] %}
-    {% for l in Launderette.objects.all() %}
-        <li><a href="{{ url('launderette:main_click', launderette_id=l.id) }}">{{ l }}</a></li>
-    {% endfor %}
-    {% elif object.counters.filter(type="OFFICE")|count > 0 %}
+      {% if object.unix_name == settings.SITH_LAUNDERETTE_MANAGER['unix_name'] %}
+        {% for l in Launderette.objects.all() %}
+          <li><a href="{{ url('launderette:main_click', launderette_id=l.id) }}">{{ l }}</a></li>
+        {% endfor %}
+      {% elif object.counters.filter(type="OFFICE")|count > 0 %}
         {% for c in object.counters.filter(type="OFFICE") %}
-        <li>{{ c }}:
+          <li>{{ c }}:
             <a href="{{ url('counter:details', counter_id=c.id) }}">View</a>
             <a href="{{ url('counter:admin', counter_id=c.id) }}">Edit</a>
-        </li>
+          </li>
         {% endfor %}
-    {% endif %}
+      {% endif %}
     </ul>
     {% if object.club_account.exists() %}
-        <h4>{% trans %}Accounting: {% endtrans %}</h4>
-        <ul>
+      <h4>{% trans %}Accounting: {% endtrans %}</h4>
+      <ul>
         {% for ca in object.club_account.all() %}
-            <li><a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca.get_display_name() }}</a></li>
+          <li><a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca.get_display_name() }}</a></li>
         {% endfor %}
-        </ul>
+      </ul>
     {% endif %}
     {% if object.unix_name == settings.SITH_LAUNDERETTE_MANAGER['unix_name'] %}
-    <li><a href="{{ url('launderette:launderette_list') }}">{% trans %}Manage launderettes{% endtrans %}</a></li>
+      <li><a href="{{ url('launderette:launderette_list') }}">{% trans %}Manage launderettes{% endtrans %}</a></li>
     {% endif %}
-</div>
+  </div>
 {% endblock %}
 
 

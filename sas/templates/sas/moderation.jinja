@@ -1,34 +1,34 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}SAS moderation{% endtrans %}
+  {% trans %}SAS moderation{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans %}SAS moderation{% endtrans %}</h3>
-<div id="moderation">
+  <h3>{% trans %}SAS moderation{% endtrans %}</h3>
+  <div id="moderation">
     <h4>{% trans %}Albums{% endtrans %}</h4>
     <ul>
-    {% for a in albums_to_moderate %}
+      {% for a in albums_to_moderate %}
         <li>{{ a }}:
-        <form action="" method="POST">
+          <form action="" method="POST">
             {% csrf_token %}
             <input type="hidden" name="album_id" value="{{ a.id }}" />
             <input type="submit" name="moderate" value="{% trans %}Moderate{% endtrans %}" />
             <input type="submit" name="delete" value="{% trans %}Delete{% endtrans %}" />
-        </form>
-    </li>
-    {% endfor %}
+          </form>
+        </li>
+      {% endfor %}
     </ul>
     {% for a in albums %}
-        <h4>{{ a.get_display_name() }}</h4>
-    {% for p in pictures.filter(parent=a).order_by('id') %}
-    <div class="picture">
-        <a href="{{ url("sas:picture", picture_id=p.id) }}">
+      <h4>{{ a.get_display_name() }}</h4>
+      {% for p in pictures.filter(parent=a).order_by('id') %}
+        <div class="picture">
+          <a href="{{ url("sas:picture", picture_id=p.id) }}">
             <img src="{{ p.get_download_thumb_url() }}" alt="{{ p.name }}">
-        </a>
-    </div>
+          </a>
+        </div>
+      {% endfor %}
     {% endfor %}
-    {% endfor %}
-</div>
+  </div>
 {% endblock %}

@@ -2,107 +2,107 @@
 {% from 'core/macros.jinja' import select_all_checkbox %}
 
 {% block title %}
-{% trans %}Mailing lists{% endtrans %}
+  {% trans %}Mailing lists{% endtrans %}
 {% endblock %}
 
 {% block content %}
 
-    <b>{% trans %}Remember : mailing lists need to be moderated, if your new created list is not shown wait until moderation takes action{% endtrans %}</b>
+  <b>{% trans %}Remember : mailing lists need to be moderated, if your new created list is not shown wait until moderation takes action{% endtrans %}</b>
 
-    {% if mailings_not_moderated %}
-        <p>{% trans %}Mailing lists waiting for moderation{% endtrans %}</p>
-        <ul>
-            {% for mailing in mailings_not_moderated %}
-                <li>{{ mailing.email_full }}<a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a></li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+  {% if mailings_not_moderated %}
+    <p>{% trans %}Mailing lists waiting for moderation{% endtrans %}</p>
+    <ul>
+      {% for mailing in mailings_not_moderated %}
+        <li>{{ mailing.email_full }}<a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
-    {% if mailings_moderated %}
+  {% if mailings_moderated %}
     {% for mailing in mailings_moderated %}
-    <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email_full }}
+      <h2>{% trans %}Mailing{% endtrans %} {{ mailing.email_full }}
         {%- if user.is_owner(mailing) -%}
-        <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a>
+          <a href="{{ url('club:mailing_delete', mailing_id=mailing.id) }}"> - {% trans %}Delete{% endtrans %}</a>
         {%- endif -%}
-    </h2>
-    <form method="GET" action="{{ url('club:mailing_generate', mailing_id=mailing.id) }}" style="display:inline-block;">
+      </h2>
+      <form method="GET" action="{{ url('club:mailing_generate', mailing_id=mailing.id) }}" style="display:inline-block;">
         <input type="submit" name="generateMalingList" value="{% trans %}Generate mailing list{% endtrans %}">
-    </form>
-    {% set form_mailing_removal = form["removal_" + mailing.id|string] %}
-    {% if form_mailing_removal.field.choices %}
-    {% set ms = dict(mailing.subscriptions.all() | groupby('id')) %}
-    <form action="{{ url('club:mailing', club_id=club.id) }}" id="{{ form_mailing_removal.auto_id }}" method="post" enctype="multipart/form-data">
-        <p style="margin-bottom: 1em;">{{ select_all_checkbox(form_mailing_removal.auto_id) }}</p>
-        {% csrf_token %}
-        <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.REMOVE_SUBSCRIPTION }}" />
-        <table>
+      </form>
+      {% set form_mailing_removal = form["removal_" + mailing.id|string] %}
+      {% if form_mailing_removal.field.choices %}
+        {% set ms = dict(mailing.subscriptions.all() | groupby('id')) %}
+        <form action="{{ url('club:mailing', club_id=club.id) }}" id="{{ form_mailing_removal.auto_id }}" method="post" enctype="multipart/form-data">
+          <p style="margin-bottom: 1em;">{{ select_all_checkbox(form_mailing_removal.auto_id) }}</p>
+          {% csrf_token %}
+          <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.REMOVE_SUBSCRIPTION }}" />
+          <table>
             <thead>
-                <tr>
-                    <td>{% trans %}User{% endtrans %}</td>
-                    <td>{% trans %}Email{% endtrans %}</td>
-                    <td>{% trans %}Delete{% endtrans %}</td>
-                </tr>
+              <tr>
+                <td>{% trans %}User{% endtrans %}</td>
+                <td>{% trans %}Email{% endtrans %}</td>
+                <td>{% trans %}Delete{% endtrans %}</td>
+              </tr>
             </thead>
             <tbody>
-                {% for widget in form_mailing_removal.subwidgets %}
+              {% for widget in form_mailing_removal.subwidgets %}
                 {% set user = ms[widget.data.value.value][0] %}
                 <tr>
-                    <td>{{ user.get_username }}</td>
-                    <td>{{ user.get_email }}</td>
-                    <td>{{ widget.tag() }}</td>
+                  <td>{{ user.get_username }}</td>
+                  <td>{{ user.get_email }}</td>
+                  <td>{{ widget.tag() }}</td>
                 </tr>
-                {% endfor %}
+              {% endfor %}
             </tbody>
-        </table>
-        {{ form_mailing_removal.errors }}
-        <p><input type="submit" value="{% trans %}Remove from mailing list{% endtrans %}" /></p>
-    </form>
+          </table>
+          {{ form_mailing_removal.errors }}
+          <p><input type="submit" value="{% trans %}Remove from mailing list{% endtrans %}" /></p>
+        </form>
 
-    {% else %}
+      {% else %}
         <p><b>{% trans %}There is no subscriber for this mailing list{% endtrans %}</b></p>
-    {% endif %}
+      {% endif %}
     {% endfor %}
 
-    {% else %}
+  {% else %}
     <p>{% trans %}No mailing list existing for this club{% endtrans %}</p>
-    {% endif %}
+  {% endif %}
 
-    <p>{{ form.non_field_errors() }}</p>
-    {% if mailings_moderated %}
-        <h2>{% trans %}New member{% endtrans %}</h2>
-        <form action="{{ url('club:mailing', club_id=club.id) }}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <p>
-                {{ form.subscription_mailing.errors }}
-                <label for="{{ form.subscription_mailing.id_for_label }}">{{ form.subscription_mailing.label }}</label>
-                {{ form.subscription_mailing }}
-            </p>
-            <p>
-                {{ form.subscription_users.errors }}
-                <label for="{{ form.subscription_users.id_for_label }}">{{ form.subscription_users.label }}</label>
-                {{ form.subscription_users }}
-                <span class="helptext">{{ form.subscription_users.help_text }}</span>
-            </p>
-            <p>
-                {{ form.subscription_email.errors }}
-                <label for="{{ form.subscription_email.id_for_label }}">{{ form.subscription_email.label }}</label>
-                {{ form.subscription_email }}
-            </p>
-            <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.NEW_SUBSCRIPTION }}" />
-            <p><input type="submit" value="{% trans %}Add to mailing list{% endtrans %}" /></p>
-        </form>
-    {% endif %}
-
-    <h2>{% trans %}New mailing{% endtrans %}</h2>
+  <p>{{ form.non_field_errors() }}</p>
+  {% if mailings_moderated %}
+    <h2>{% trans %}New member{% endtrans %}</h2>
     <form action="{{ url('club:mailing', club_id=club.id) }}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <p>
-            {{ form.mailing_email.errors }}
-            <label for="{{ form.mailing_email.id_for_label }}">{{ form.mailing_email.label }}</label>
-            {{ form.mailing_email }}
-        </p>
-        <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.NEW_MALING }}" />
-        <p><input type="submit" value="{% trans %}Create mailing list{% endtrans %}" /></p>
+      {% csrf_token %}
+      <p>
+        {{ form.subscription_mailing.errors }}
+        <label for="{{ form.subscription_mailing.id_for_label }}">{{ form.subscription_mailing.label }}</label>
+        {{ form.subscription_mailing }}
+      </p>
+      <p>
+        {{ form.subscription_users.errors }}
+        <label for="{{ form.subscription_users.id_for_label }}">{{ form.subscription_users.label }}</label>
+        {{ form.subscription_users }}
+        <span class="helptext">{{ form.subscription_users.help_text }}</span>
+      </p>
+      <p>
+        {{ form.subscription_email.errors }}
+        <label for="{{ form.subscription_email.id_for_label }}">{{ form.subscription_email.label }}</label>
+        {{ form.subscription_email }}
+      </p>
+      <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.NEW_SUBSCRIPTION }}" />
+      <p><input type="submit" value="{% trans %}Add to mailing list{% endtrans %}" /></p>
     </form>
+  {% endif %}
+
+  <h2>{% trans %}New mailing{% endtrans %}</h2>
+  <form action="{{ url('club:mailing', club_id=club.id) }}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p>
+      {{ form.mailing_email.errors }}
+      <label for="{{ form.mailing_email.id_for_label }}">{{ form.mailing_email.label }}</label>
+      {{ form.mailing_email }}
+    </p>
+    <input hidden type="number" name="{{ form.action.name }}" value="{{ form_actions.NEW_MALING }}" />
+    <p><input type="submit" value="{% trans %}Create mailing list{% endtrans %}" /></p>
+  </form>
 
 {% endblock %}

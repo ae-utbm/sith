@@ -2,31 +2,31 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 
 {% block title %}
-{{ stock }}
+  {{ stock }}
 {% endblock %}
 
 {% block content %}
-{% if current_tab == "stocks" %}
-	<p><a href="{{ url('stock:new_item', stock_id=stock.id)}}">{% trans %}New item{% endtrans %}</a></p>
-	<h5><a href="{{ url('stock:shoppinglist_list', stock_id=stock.id)}}">{% trans %}Shopping lists{% endtrans %}</a></h5>
-{% endif %}
-{% if stock %}
-<h3>{{ stock }}</h3>
-{% for t in ProductType.objects.order_by('name') %}
-	<h4>{{ t }}</h4>
-	<ul>
-    {% for i in stock.items.filter(type=t).order_by('name') %}
-    	<li><a href="{{ url('stock:edit_item', item_id=i.id)}}">{{ i }} ({{ i.effective_quantity }} {% trans %}left{% endtrans %})</a></li>
+  {% if current_tab == "stocks" %}
+    <p><a href="{{ url('stock:new_item', stock_id=stock.id)}}">{% trans %}New item{% endtrans %}</a></p>
+    <h5><a href="{{ url('stock:shoppinglist_list', stock_id=stock.id)}}">{% trans %}Shopping lists{% endtrans %}</a></h5>
+  {% endif %}
+  {% if stock %}
+    <h3>{{ stock }}</h3>
+    {% for t in ProductType.objects.order_by('name') %}
+      <h4>{{ t }}</h4>
+      <ul>
+        {% for i in stock.items.filter(type=t).order_by('name') %}
+          <li><a href="{{ url('stock:edit_item', item_id=i.id)}}">{{ i }} ({{ i.effective_quantity }} {% trans %}left{% endtrans %})</a></li>
+        {% endfor %}
+      </ul>
     {% endfor %}
-	</ul>
-{% endfor %}
-<h4>{% trans %}Others{% endtrans %}</h4>
-	<ul>
-    {% for i in stock.items.filter(type=None).order_by('name') %}
-    	<li><a href="{{ url('stock:edit_item', item_id=i.id)}}">{{ i }} ({{ i.effective_quantity }} {% trans %}left{% endtrans %})</a></li>
-    {% endfor %}
-	</ul>
-{% else %}
-{% trans %}There is no items in this stock.{% endtrans %}
-{% endif %}
+    <h4>{% trans %}Others{% endtrans %}</h4>
+    <ul>
+      {% for i in stock.items.filter(type=None).order_by('name') %}
+        <li><a href="{{ url('stock:edit_item', item_id=i.id)}}">{{ i }} ({{ i.effective_quantity }} {% trans %}left{% endtrans %})</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    {% trans %}There is no items in this stock.{% endtrans %}
+  {% endif %}
 {% endblock %}

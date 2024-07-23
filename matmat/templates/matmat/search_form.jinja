@@ -2,62 +2,62 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Search user{% endtrans %}
+  {% trans %}Search user{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if result_exists %}
-<h2>{% trans %}Results{% endtrans %}</h2>
-<div class="matmat_results">
-{% for user in object_list %}
-    <div class="matmat_user">
-        <a href="{{ url("core:user_profile", user_id=user.id) }}">
+  {% if result_exists %}
+    <h2>{% trans %}Results{% endtrans %}</h2>
+    <div class="matmat_results">
+      {% for user in object_list %}
+        <div class="matmat_user">
+          <a href="{{ url("core:user_profile", user_id=user.id) }}">
             {{ user_mini_profile(user) }}
-        </a>
-    </div>
+          </a>
+        </div>
 
-{% endfor %}
-</div>
-{{ paginate(page_obj, paginator) }}
-<hr>
-{% endif %}
-<h2>{% trans %}Search user{% endtrans %}</h2>
-<h3>{% trans %}Search by profile{% endtrans %}</h3>
-<form action="{{ url('matmat:search') }}" method="post" enctype="multipart/form-data">
+      {% endfor %}
+    </div>
+    {{ paginate(page_obj, paginator) }}
+    <hr>
+  {% endif %}
+  <h2>{% trans %}Search user{% endtrans %}</h2>
+  <h3>{% trans %}Search by profile{% endtrans %}</h3>
+  <form action="{{ url('matmat:search') }}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {% for field in form %}
-    {% if field.name not in ('phone', 'quick') %}
-    <p>
-    {{ field.errors }}
-    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-    {{ field }}
-    </p>
-    {% endif %}
+      {% if field.name not in ('phone', 'quick') %}
+        <p>
+          {{ field.errors }}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        </p>
+      {% endif %}
     {% endfor %}
     <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
-</form>
-<h3>{% trans %}Inverted search{% endtrans %}</h3>
-<form action="{{ url('matmat:search_reverse') }}" method="post" enctype="multipart/form-data">
+  </form>
+  <h3>{% trans %}Inverted search{% endtrans %}</h3>
+  <form action="{{ url('matmat:search_reverse') }}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <p>
-    {{ form.phone.errors }}
-    <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
-    {{ form.phone }}
-    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+      {{ form.phone.errors }}
+      <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+      {{ form.phone }}
+      <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
     </p>
-</form>
-<h3>{% trans %}Quick search{% endtrans %}</h3>
-<form action="{{ url('matmat:search_quick') }}" method="post">
+  </form>
+  <h3>{% trans %}Quick search{% endtrans %}</h3>
+  <form action="{{ url('matmat:search_quick') }}" method="post">
     {% csrf_token %}
     <p>
-        {{ form.quick.errors }}
-        <label for="{{ form.quick.id_for_label }}">{{ form.quick.label }}</label>
-        {{ form.quick }}
-        <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+      {{ form.quick.errors }}
+      <label for="{{ form.quick.id_for_label }}">{{ form.quick.label }}</label>
+      {{ form.quick }}
+      <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
     </p>
-</form>
+  </form>
 {% endblock %}
 
 {% block script %}
-{{ super() }}
+  {{ super() }}
 {% endblock %}

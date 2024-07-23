@@ -1,155 +1,155 @@
 {% macro user_profile_link(user) -%}
-<a href="{{ url("core:user_profile", user_id=user.id) }}">{{ user.get_display_name() }}</a>
+  <a href="{{ url("core:user_profile", user_id=user.id) }}">{{ user.get_display_name() }}</a>
 {%- endmacro %}
 
 {% macro user_profile_link_short_name(user) -%}
-<a href="{{ url("core:user_profile", user_id=user.id) }}">{{ user.get_short_name() }}</a>
+  <a href="{{ url("core:user_profile", user_id=user.id) }}">{{ user.get_short_name() }}</a>
 {%- endmacro %}
 
 {% macro user_link_with_pict(user) -%}
-<a href="{{ url("core:user_profile", user_id=user.id) }}" class="mini_profile_link" >
+  <a href="{{ url("core:user_profile", user_id=user.id) }}" class="mini_profile_link" >
     {{ user.get_mini_item()|safe }}
-</a>
+  </a>
 {%- endmacro %}
 
 {% macro link_news_logo(news) -%}
-    {% if news.club.logo -%}
-        {{ news.club.logo.url }}
-    {% else -%}
-        {{ static("com/img/news.png") }}
-    {% endif %}
+  {% if news.club.logo -%}
+    {{ news.club.logo.url }}
+  {% else -%}
+    {{ static("com/img/news.png") }}
+  {% endif %}
 {%- endmacro %}
 
 {% macro gen_news_metatags(news) -%}
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:site" content="{{ settings.SITH_TWITTER }}" />
-<meta name="twitter:creator" content= "{{ settings.SITH_TWITTER }}" />
-<meta property="og:url"                content="{{ news.get_full_url() }}" />
-<meta property="og:type"               content="article" />
-<meta property="og:title"              content="{{ news.title }}" />
-<meta property="og:description"        content="{{ news.summary }}" />
-<meta property="og:image"              content="{{ "https://%s%s" % (settings.SITH_URL, link_news_logo(news)) }}" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="{{ settings.SITH_TWITTER }}" />
+  <meta name="twitter:creator" content= "{{ settings.SITH_TWITTER }}" />
+  <meta property="og:url"                content="{{ news.get_full_url() }}" />
+  <meta property="og:type"               content="article" />
+  <meta property="og:title"              content="{{ news.title }}" />
+  <meta property="og:description"        content="{{ news.summary }}" />
+  <meta property="og:image"              content="{{ "https://%s%s" % (settings.SITH_URL, link_news_logo(news)) }}" />
 {%- endmacro %}
 
 {% macro facebook_share(news) -%}
-<a rel="nofollow" target="#" class="share_button facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}">{% trans %}Share on Facebook{% endtrans %}</a>
+  <a rel="nofollow" target="#" class="share_button facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}">{% trans %}Share on Facebook{% endtrans %}</a>
 {%- endmacro %}
 
 {% macro tweet(news) -%}
-<a rel="nofollow" target="#" class="share_button twitter" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}">{% trans %}Tweet{% endtrans %}</a>
+  <a rel="nofollow" target="#" class="share_button twitter" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}">{% trans %}Tweet{% endtrans %}</a>
 {%- endmacro %}
 
 {% macro fb_quick(news) -%}
-<a rel="nofollow" target="#" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}" class="fb fa fa-facebook-square fa-2x"></a>
+  <a rel="nofollow" target="#" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}" class="fb fa fa-facebook-square fa-2x"></a>
 {%- endmacro %}
 
 {% macro tweet_quick(news) -%}
-<a rel="nofollow" target="#" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}" class="twitter fa fa-twitter-square fa-2x"></a>
+  <a rel="nofollow" target="#" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}" class="twitter fa fa-twitter-square fa-2x"></a>
 {%- endmacro %}
 
 {% macro user_mini_profile(user) %}
-<div class="user_mini_profile">
+  <div class="user_mini_profile">
     <div class="user_mini_profile_infos">
-        <div class="user_mini_profile_infos_text">
-            <div class="user_mini_profile_name">{{ user.get_full_name() }}</div>
-            {% if user.nick_name %}
-            <div class="user_mini_profile_nick">&laquo; {{ user.nick_name }} &raquo;</div>
-            {% endif %}
-            {% if user.pronouns %}
-            <div class="user_mini_profile_pronouns">{{ user.pronouns }}</div>
-            {% endif %}
-            {% if user.date_of_birth %}
-            <div class="user_mini_profile_dob">
-                {{ user.date_of_birth|date("d/m/Y") }} ({{ user.get_age() }})
-            </div>
-            {% endif %}
-        </div>
-        {% if user.promo %}
-        <div class="user_mini_profile_promo">
-            <img src="{{ static('core/img/promo_%02d.png' % user.promo) }}" title="Promo {{ user.promo }}" alt="Promo {{ user.promo }}" class="promo_pict" />
-        </div>
+      <div class="user_mini_profile_infos_text">
+        <div class="user_mini_profile_name">{{ user.get_full_name() }}</div>
+        {% if user.nick_name %}
+          <div class="user_mini_profile_nick">&laquo; {{ user.nick_name }} &raquo;</div>
         {% endif %}
+        {% if user.pronouns %}
+          <div class="user_mini_profile_pronouns">{{ user.pronouns }}</div>
+        {% endif %}
+        {% if user.date_of_birth %}
+          <div class="user_mini_profile_dob">
+            {{ user.date_of_birth|date("d/m/Y") }} ({{ user.get_age() }})
+          </div>
+        {% endif %}
+      </div>
+      {% if user.promo %}
+        <div class="user_mini_profile_promo">
+          <img src="{{ static('core/img/promo_%02d.png' % user.promo) }}" title="Promo {{ user.promo }}" alt="Promo {{ user.promo }}" class="promo_pict" />
+        </div>
+      {% endif %}
     </div>
     <div class="user_mini_profile_picture">
-    {% if user.profile_pict %}
+      {% if user.profile_pict %}
         <img src="{{ user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" />
-    {% else %}
+      {% else %}
         <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}"
-            title="{% trans %}Profile{% endtrans %}" />
-    {% endif %}
+             title="{% trans %}Profile{% endtrans %}" />
+      {% endif %}
     </div>
-</div>
+  </div>
 {%- endmacro %}
 
 {% macro user_subscription(user) %}
-        {% trans subscription_end=user.subscriptions.order_by('subscription_end').last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
-        {% trans %}Account number: {% endtrans %}{{ user.customer.account_id }}<br/>
+  {% trans subscription_end=user.subscriptions.order_by('subscription_end').last().subscription_end %}Subscribed until {{ subscription_end }}{% endtrans %}<br/>
+  {% trans %}Account number: {% endtrans %}{{ user.customer.account_id }}<br/>
 {%- endmacro %}
 
 {% macro show_slots(user) %}
-    {% if user.slots.filter(start_date__gte=timezone.now()).exists() %}
-        <h5>{% trans %}Slot{% endtrans %}</h5>
-        <ul>
-        {% for i in user.slots.filter(start_date__gte=timezone.now().replace(tzinfo=None)).all() %}
-            <li>{{ i.get_type_display() }} - {{i.machine.launderette }}, {{ i.start_date|date("l j") }} :
-            {{ i.start_date|time(DATETIME_FORMAT) }} |
-            <a href="{{ url('launderette:delete_slot', slot_id=i.id) }}">{% trans %}Delete{% endtrans %}</a></li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+  {% if user.slots.filter(start_date__gte=timezone.now()).exists() %}
+    <h5>{% trans %}Slot{% endtrans %}</h5>
+    <ul>
+      {% for i in user.slots.filter(start_date__gte=timezone.now().replace(tzinfo=None)).all() %}
+        <li>{{ i.get_type_display() }} - {{i.machine.launderette }}, {{ i.start_date|date("l j") }} :
+          {{ i.start_date|time(DATETIME_FORMAT) }} |
+          <a href="{{ url('launderette:delete_slot', slot_id=i.id) }}">{% trans %}Delete{% endtrans %}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 {% endmacro %}
 
 {% macro show_tokens(user) %}
-    {% if user.tokens.exists() %}
-        <h5>{% trans %}Tokens{% endtrans %}</h5>
-        <ul>
-        {% for i in user.tokens.all() %}
-            <li>{{ i }}</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
+  {% if user.tokens.exists() %}
+    <h5>{% trans %}Tokens{% endtrans %}</h5>
+    <ul>
+      {% for i in user.tokens.all() %}
+        <li>{{ i }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 {% endmacro %}
 
 {% macro delete_godfather(user, profile, godfather, is_father) %}
-    {% if user == profile or user.is_root or user.is_board_member %}
+  {% if user == profile or user.is_root or user.is_board_member %}
     <a href="{{ url("core:user_godfathers_delete", user_id=profile.id, godfather_id=godfather.id, is_father=is_father) }}">{% trans %}Delete{% endtrans %}</a>
-    {% endif %}
+  {% endif %}
 {% endmacro %}
 
 {% macro paginate(page_obj, paginator, js_action) %}
-    {% set js = js_action|default('') %}
-    {% if page_obj.has_previous() or page_obj.has_next() %}
-        {% if page_obj.has_previous() %}
-            <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.previous_page_number() }}">{% trans %}Previous{% endtrans %}</a>
-        {% else %}
-            <span class="disabled">{% trans %}Previous{% endtrans %}</span>
-        {% endif %}
-        {% for i in paginator.page_range %}
-            {% if page_obj.number == i %}
-                <span class="active">{{ i }} <span class="sr-only">({% trans %}current{% endtrans %})</span></span>
-            {% else %}
-                <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ i }}">{{ i }}</a>
-            {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next() %}
-            <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.next_page_number() }}">{% trans %}Next{% endtrans %}</a>
-        {% else %}
-            <span class="disabled">{% trans %}Next{% endtrans %}</span>
-        {% endif %}
+  {% set js = js_action|default('') %}
+  {% if page_obj.has_previous() or page_obj.has_next() %}
+    {% if page_obj.has_previous() %}
+      <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.previous_page_number() }}">{% trans %}Previous{% endtrans %}</a>
+    {% else %}
+      <span class="disabled">{% trans %}Previous{% endtrans %}</span>
     {% endif %}
+    {% for i in paginator.page_range %}
+      {% if page_obj.number == i %}
+        <span class="active">{{ i }} <span class="sr-only">({% trans %}current{% endtrans %})</span></span>
+      {% else %}
+        <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ i }}">{{ i }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next() %}
+      <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.next_page_number() }}">{% trans %}Next{% endtrans %}</a>
+    {% else %}
+      <span class="disabled">{% trans %}Next{% endtrans %}</span>
+    {% endif %}
+  {% endif %}
 {% endmacro %}
 
 {% macro select_all_checkbox(form_id) %}
-    <script type="text/javascript">
-        function checkbox_{{form_id}}(value) {
-            list = document.getElementById("{{ form_id }}").getElementsByTagName("input");
-            for (let element of list){
-              if (element.type == "checkbox"){
-                element.checked = value;
-              }
-            }
+  <script type="text/javascript">
+    function checkbox_{{form_id}}(value) {
+      list = document.getElementById("{{ form_id }}").getElementsByTagName("input");
+      for (let element of list){
+        if (element.type == "checkbox"){
+          element.checked = value;
         }
-    </script>
-    <button type="button" onclick="checkbox_{{form_id}}(true);">{% trans %}Select All{% endtrans %}</button>
-    <button type="button" onclick="checkbox_{{form_id}}(false);">{% trans %}Unselect All{% endtrans %}</button>
+      }
+    }
+  </script>
+  <button type="button" onclick="checkbox_{{form_id}}(true);">{% trans %}Select All{% endtrans %}</button>
+  <button type="button" onclick="checkbox_{{form_id}}(false);">{% trans %}Unselect All{% endtrans %}</button>
 {% endmacro %}

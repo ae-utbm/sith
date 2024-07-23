@@ -2,31 +2,31 @@
 {% from 'forum/macros.jinja' import display_topic %}
 
 {% block title %}
-{% trans %}Favorite topics{% endtrans %}
+  {% trans %}Favorite topics{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<p>
+  <p>
     <a href="{{ url('forum:main') }}">Forum</a> >
     <a href="{{ url('forum:favorite_topics') }}">{% trans %}Favorite topics{% endtrans %}</a>
-</p>
-<div id="forum">
+  </p>
+  <div id="forum">
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <h4>{% trans %}Favorite topics{% endtrans %}</h4>
     {% for t in page_obj.object_list %}
-    {% if user.can_view(t) %}
-    {{ display_topic(t, user) }}
-    {% endif %}
+      {% if user.can_view(t) %}
+        {{ display_topic(t, user) }}
+      {% endif %}
     {% endfor %}
 
     <p style="text-align: right; background: #d8e7f3;">
-    {% for p in paginator.page_range %}
+      {% for p in paginator.page_range %}
         <span class="ib" style="background: {% if p == paginator.number %}white{% endif %}; margin: 0;">
-            <a href="?page={{ p }}">{{ p }}</a>
+          <a href="?page={{ p }}">{{ p }}</a>
         </span>
-    {% endfor %}
+      {% endfor %}
     </p>
-</div>
+  </div>
 {% endblock %}
 
 

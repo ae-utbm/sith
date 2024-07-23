@@ -1,58 +1,58 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-<link rel="stylesheet" href="{{ scss('user/user_stats.scss') }}">
+  <link rel="stylesheet" href="{{ scss('user/user_stats.scss') }}">
 {%- endblock -%}
 
 {% block title %}
-{% trans user_name=profile.get_display_name() %}{{ user_name }}'s stats{% endtrans %}
+  {% trans user_name=profile.get_display_name() %}{{ user_name }}'s stats{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<div class="container">
-<div class="row">
-    {% if profile.permanencies %}
-    <div>
-        <h3>{% trans %}Permanencies{% endtrans %}</h3>
-        <div class="flexed">
+  <div class="container">
+    <div class="row">
+      {% if profile.permanencies %}
+        <div>
+          <h3>{% trans %}Permanencies{% endtrans %}</h3>
+          <div class="flexed">
             <div><span>Foyer :</span><span>{{ total_foyer_time }}</span></div>
             <div><span>Gommette :</span><span>{{ total_gommette_time }}</span></div>
             <div><span>MDE :</span><span>{{ total_mde_time }}</span></div>
             <div><b>Total :</b><b>{{ total_perm_time }}</b></div>
+          </div>
         </div>
-    </div>
-    {% endif %}
+      {% endif %}
 
-    <div>
+      <div>
         <h3>{% trans %}Buyings{% endtrans %}</h3>
         <div class="flexed">
-            <div><span>Foyer :</span><span>{{ total_foyer_buyings }}&nbsp;€</span></div>
-            <div><span>Gommette :</span><span>{{ total_gommette_buyings }}&nbsp;€</span></div>
-            <div><span>MDE :</span><span>{{ total_mde_buyings }}&nbsp;€</span></div>
-            <div><b>Total :</b><b>{{ total_foyer_buyings + total_gommette_buyings + total_mde_buyings }}&nbsp;€</b>
-            </div>
+          <div><span>Foyer :</span><span>{{ total_foyer_buyings }}&nbsp;€</span></div>
+          <div><span>Gommette :</span><span>{{ total_gommette_buyings }}&nbsp;€</span></div>
+          <div><span>MDE :</span><span>{{ total_mde_buyings }}&nbsp;€</span></div>
+          <div><b>Total :</b><b>{{ total_foyer_buyings + total_gommette_buyings + total_mde_buyings }}&nbsp;€</b>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
-<div>
-    <h3>{% trans %}Product top 10{% endtrans %}</h3>
-    <table>
+    <div>
+      <h3>{% trans %}Product top 10{% endtrans %}</h3>
+      <table>
         <thead>
-            <tr>
-                <td>{% trans %}Product{% endtrans %}</td>
-                <td>{% trans %}Quantity{% endtrans %}</td>
-            </tr>
+          <tr>
+            <td>{% trans %}Product{% endtrans %}</td>
+            <td>{% trans %}Quantity{% endtrans %}</td>
+          </tr>
         </thead>
         <tbody>
-            {% for p in top_product %}
+          {% for p in top_product %}
             <tr>
-                <td>{{ p['product__name'] }}</td>
-                <td>{{ p['product_sum'] }}</td>
+              <td>{{ p['product__name'] }}</td>
+              <td>{{ p['product_sum'] }}</td>
             </tr>
-            {% endfor %}
+          {% endfor %}
         </tbody>
-    </table>
-</div>
-</div>
+      </table>
+    </div>
+  </div>
 {% endblock %}

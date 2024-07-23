@@ -1,177 +1,177 @@
 {% from 'core/macros.jinja' import user_profile_link_short_name %}
 
 {% macro display_forum(forum, user, is_root=False) %}
-<div class="forum {% if is_root %}category{% endif %}">
+  <div class="forum {% if is_root %}category{% endif %}">
     <div class="ib w_big">
-        {% if not is_root %}
+      {% if not is_root %}
         <a class="ib w_big" href="{{ url('forum:view_forum', forum_id=forum.id) }}">
-        {% else %}
+      {% else %}
         <div class="ib w_big">
-        {% endif %}
-            <div class="title">{{ forum.name }}</div>
-            <p>{{ forum.description }}</p>
-        {% if not is_root %}
+      {% endif %}
+      <div class="title">{{ forum.name }}</div>
+      <p>{{ forum.description }}</p>
+      {% if not is_root %}
         </a>
-        {% else %}
+      {% else %}
         </div>
-        {% endif %}
-        {% if user.is_owner(forum) %}
+      {% endif %}
+      {% if user.is_owner(forum) %}
         <div class="tools">
-        <a class="ib" href="{{ url('forum:edit_forum', forum_id=forum.id) }}">{% trans %}Edit{% endtrans %}</a>
-        <a class="ib" href="{{ url('forum:delete_forum', forum_id=forum.id) }}">{% trans %}Delete{% endtrans %}</a>
+          <a class="ib" href="{{ url('forum:edit_forum', forum_id=forum.id) }}">{% trans %}Edit{% endtrans %}</a>
+          <a class="ib" href="{{ url('forum:delete_forum', forum_id=forum.id) }}">{% trans %}Delete{% endtrans %}</a>
         </div>
-        {% endif %}
+      {% endif %}
     </div>
     {% if not is_root %}
-    <div class="ib w_small">
+      <div class="ib w_small">
         <p class="ib w_medium">
-            {{ forum.topic_number }}
+          {{ forum.topic_number }}
         </p>
         <div class="ib w_medium last_message" style="font-size: x-small; text-align: center">
-            {% if forum.last_message %}
+          {% if forum.last_message %}
             {{ user_profile_link_short_name(forum.last_message.author) }} <br/>
             <a href="{{ forum.last_message.get_absolute_url() }}">
-                <date>
+              <date>
                 {{ forum.last_message.date|localtime|date(DATETIME_FORMAT) }}
                 {{ forum.last_message.date|localtime|time(DATETIME_FORMAT) }}
-                </date><br>
-                <span>
+              </date><br>
+              <span>
                 {{ forum.last_message.topic }}
-                </span>
+              </span>
             </a>
-            {% endif %}
+          {% endif %}
         </div>
-    </div>
+      </div>
     {% endif %}
-</div>
+  </div>
 {% endmacro %}
 
 {% macro display_topic(topic, user, first_unread=False) %}
-<div class="topic">
+  <div class="topic">
     <div class="ib w_medium">
-        {% if first_unread %}
+      {% if first_unread %}
         <a class="ib w_big" href="{{ topic.get_first_unread_message(user).get_absolute_url() }}">
-        {% else %}
+      {% else %}
         <a class="ib w_big" href="{{ url('forum:view_topic', topic_id=topic.id) }}">
-        {% endif %}
-            <div class="title">{{ topic.title or topic.messages.first().title }}</div>
-            <p>{{ topic.description }}</p>
+      {% endif %}
+      <div class="title">{{ topic.title or topic.messages.first().title }}</div>
+      <p>{{ topic.description }}</p>
+    </a>
+    {% if user.can_edit(topic) %}
+      <div class="ib tools" style="text-align: center;">
+        <a href="{{ url('forum:edit_topic', topic_id=topic.id) }}">{% trans %}Edit{% endtrans %}</a>
+      </div>
+    {% endif %}
+  </div>
+  <div class="ib w_medium last_message">
+    <div class="ib w_medium">
+      <p class="ib w_medium" style="text-align: center;">
+        {{ user_profile_link_short_name(topic.author) }}
+      </p>
+      <p class="ib w_medium" style="text-align: center;">
+        {{ topic._message_number }}
+      </p>
+    </div>
+    <p class="ib w_medium" style="text-align: center;">
+      {% set last_msg = topic.last_message %}
+      {% if last_msg %}
+        {{ user_profile_link_short_name(last_msg.author) }} <br/>
+        <a href="{{ last_msg.get_absolute_url() }}">
+          <date>{{ last_msg.date|localtime|date(DATETIME_FORMAT) }} {{ last_msg.date|localtime|time(DATETIME_FORMAT) }}</date>
         </a>
-        {% if user.can_edit(topic) %}
-        <div class="ib tools" style="text-align: center;">
-            <a href="{{ url('forum:edit_topic', topic_id=topic.id) }}">{% trans %}Edit{% endtrans %}</a>
-        </div>
-        {% endif %}
-    </div>
-    <div class="ib w_medium last_message">
-        <div class="ib w_medium">
-            <p class="ib w_medium" style="text-align: center;">
-                {{ user_profile_link_short_name(topic.author) }}
-            </p>
-            <p class="ib w_medium" style="text-align: center;">
-                {{ topic._message_number }}
-            </p>
-        </div>
-        <p class="ib w_medium" style="text-align: center;">
-            {% set last_msg = topic.last_message %}
-            {% if last_msg %}
-            {{ user_profile_link_short_name(last_msg.author) }} <br/>
-            <a href="{{ last_msg.get_absolute_url() }}">
-                <date>{{ last_msg.date|localtime|date(DATETIME_FORMAT) }} {{ last_msg.date|localtime|time(DATETIME_FORMAT) }}</date>
-            </a>
-            {% endif %}
-        </p>
-    </div>
-</div>
+      {% endif %}
+    </p>
+  </div>
+  </div>
 {% endmacro %}
 
 {% macro display_breadcrumb(forum, topic="") %}
-<p>
+  <p>
     <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
     {% for f in forum.get_parent_list()|reverse %}
-    > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
+      > <a href="{{ f.get_absolute_url() }}">{{ f }}</a>
     {% endfor %}
     > <a href="{{ forum.get_absolute_url() }}">{{ forum }}</a>
     {% if topic != "" %} > <a href="{{ topic.get_absolute_url() }}">{{ topic }}</a>{%- endif -%}
-</p>
+  </p>
 {% endmacro %}
 
 {% macro display_message(m, user, unread=False) %}
-{% if user.can_view(m) %}
-<div id="msg_{{ m.id }}" class="message {% if unread %}unread{% endif %}">
-    <div class="msg_author {% if m.deleted %}deleted{% endif %}">
-            {% if m.author.avatar_pict %}
-        <img src="{{ m.author.avatar_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
+  {% if user.can_view(m) %}
+    <div id="msg_{{ m.id }}" class="message {% if unread %}unread{% endif %}">
+      <div class="msg_author {% if m.deleted %}deleted{% endif %}">
+        {% if m.author.avatar_pict %}
+          <img src="{{ m.author.avatar_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
         {% else %}
-        <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
+          <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}" id="picture" />
         {% endif %}
         <br/>
         <strong><a href="{{ m.author.get_absolute_url() }}">{{ m.author.get_short_name() }}</a></strong>
-    </div>
-    <div class="msg_content  {% if m.deleted %}deleted{% endif %}" {% if m.id == first_unread_message_id %}id="first_unread"{% endif %}>
+      </div>
+      <div class="msg_content  {% if m.deleted %}deleted{% endif %}" {% if m.id == first_unread_message_id %}id="first_unread"{% endif %}>
         <div class="msg_header">
-            <div class="ib w_big title">
-                <a href="{{ m.get_absolute_url() }}">
-                {{ m.date|localtime|date(DATETIME_FORMAT) }}
-                {{ m.date|localtime|time(DATETIME_FORMAT) }}
-                {%- if m.title -%}
-                    - {{ m.title }}
-                {%- endif -%}
-                </a>
-            </div>
-            <div class="ib w_small">
-                <span><a href="{{ m.get_absolute_url() }}">#{{ m.id }}</a></span>
-                <br/>
-                <span><a href="{{ url('forum:new_message', topic_id=m.topic.id) }}?quote_id={{ m.id }}">
-                        {% trans %}Reply as quote{% endtrans %}</a></span>
-                {% if user.can_edit(m) %}
-                <span> <a href="{{ url('forum:edit_message', message_id=m.id) }}">{% trans %}Edit{% endtrans %}</a></span>
-                {% endif %}
-                {% if m.can_be_moderated_by(user) %}
-                {% if m.deleted %}
+          <div class="ib w_big title">
+            <a href="{{ m.get_absolute_url() }}">
+              {{ m.date|localtime|date(DATETIME_FORMAT) }}
+              {{ m.date|localtime|time(DATETIME_FORMAT) }}
+              {%- if m.title -%}
+                - {{ m.title }}
+              {%- endif -%}
+            </a>
+          </div>
+          <div class="ib w_small">
+            <span><a href="{{ m.get_absolute_url() }}">#{{ m.id }}</a></span>
+            <br/>
+            <span><a href="{{ url('forum:new_message', topic_id=m.topic.id) }}?quote_id={{ m.id }}">
+              {% trans %}Reply as quote{% endtrans %}</a></span>
+            {% if user.can_edit(m) %}
+              <span> <a href="{{ url('forum:edit_message', message_id=m.id) }}">{% trans %}Edit{% endtrans %}</a></span>
+            {% endif %}
+            {% if m.can_be_moderated_by(user) %}
+              {% if m.deleted %}
                 <span> <a href="{{ url('forum:undelete_message', message_id=m.id) }}">{% trans %}Undelete{% endtrans %}</a></span>
-                {% else %}
+              {% else %}
                 <span> <a href="{{ url('forum:delete_message', message_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></span>
-                {% endif %}
-                {% endif %}
-            </div>
+              {% endif %}
+            {% endif %}
+          </div>
         </div>
         <hr>
         <div>
-        {{ m.message|markdown }}
+          {{ m.message|markdown }}
         </div>
         {% if m.can_be_moderated_by(user) %}
-        <ul class="msg_meta">
-        {% for meta in m.metas.select_related('user').order_by('id') %}
-            <li style="background: {% if m.author == meta.user %}#bfffbf{% else %}#ffffbf{% endif %}">
+          <ul class="msg_meta">
+            {% for meta in m.metas.select_related('user').order_by('id') %}
+              <li style="background: {% if m.author == meta.user %}#bfffbf{% else %}#ffffbf{% endif %}">
                 {{ meta.get_action_display() }} {{ meta.user.get_short_name() }}
                 {% trans %} at {% endtrans %}{{ meta.date|localtime|time(DATETIME_FORMAT) }}
                 {% trans %} the {% endtrans %}{{ meta.date|localtime|date(DATETIME_FORMAT)}}</li>
-        {% endfor %}
-        </ul>
+            {% endfor %}
+          </ul>
         {% endif %}
         <div class="forum_signature">{{ m.author.forum_signature|markdown }}</div>
-    </div>
-</div>
+      </div>
+  </div>
 {% else %}
-<div id="msg_{{ m.id }}" class="message">
+  <div id="msg_{{ m.id }}" class="message">
     <div class="msg_author deleted">
     </div>
     <div class="msg_content deleted">
-        <p class="ib w_big">{% trans %}Deleted or unreadable message.{% endtrans %}</p>
-        <p class="ib w_small">{{ m.date|localtime|date(DATETIME_FORMAT) }} {{ m.date|localtime|time(DATETIME_FORMAT) }}</p>
+      <p class="ib w_big">{% trans %}Deleted or unreadable message.{% endtrans %}</p>
+      <p class="ib w_small">{{ m.date|localtime|date(DATETIME_FORMAT) }} {{ m.date|localtime|time(DATETIME_FORMAT) }}</p>
     </div>
-</div>
+  </div>
 {% endif %}
 {{ m.mark_as_read(user) or "" }}
 {% endmacro %}
 
 {% macro display_search_bar(request) %}
-<form class="search_bar" action="{{ url('forum:search') }}" method="GET">
+  <form class="search_bar" action="{{ url('forum:search') }}" method="GET">
     <input type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" value="{{ request.GET.query|default('') }}"/>
     <input type="checkbox" class="search_check" name="order" value="date" {% if request.GET.order|default("") == "date" or (request.GET.order|default("") == "" and request.GET.query|default("") == "") -%}
-        checked
-    {%- endif -%}> {% trans %}Order by date{% endtrans %}<br>
+             checked
+           {%- endif -%}> {% trans %}Order by date{% endtrans %}<br>
     <input type="submit" class="search_bouton" value="{% trans %}Search{% endtrans %}"/>
-</form>
+  </form>
 {% endmacro %}

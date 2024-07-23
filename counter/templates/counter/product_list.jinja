@@ -1,32 +1,32 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Product list{% endtrans %}
+  {% trans %}Product list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if current_tab == "products" %}
-<p><a href="{{ url('counter:new_product') }}">{% trans %}New product{% endtrans %}</a></p>
-{% endif %}
-{% if product_list %}
-<h3>{% trans %}Product list{% endtrans %}</h3>
-{% for t in ProductType.objects.all().order_by('name') %}
-<h4>{{ t }}</h4>
-<ul>
-    {% for p in product_list.filter(product_type=t).all().order_by('name') %}
-    <li><a href="{{ url('counter:product_edit', product_id=p.id) }}">{{ p }} ({{ p.code }})</a></li>
+  {% if current_tab == "products" %}
+    <p><a href="{{ url('counter:new_product') }}">{% trans %}New product{% endtrans %}</a></p>
+  {% endif %}
+  {% if product_list %}
+    <h3>{% trans %}Product list{% endtrans %}</h3>
+    {% for t in ProductType.objects.all().order_by('name') %}
+      <h4>{{ t }}</h4>
+      <ul>
+        {% for p in product_list.filter(product_type=t).all().order_by('name') %}
+          <li><a href="{{ url('counter:product_edit', product_id=p.id) }}">{{ p }} ({{ p.code }})</a></li>
+        {% endfor %}
+      </ul>
     {% endfor %}
-</ul>
-{% endfor %}
-<h4>{% trans %}Uncategorized{% endtrans %}</h4>
-<ul>
-    {% for p in product_list.filter(product_type=None).all().order_by('name') %}
-    <li><a href="{{ url('counter:product_edit', product_id=p.id) }}">{{ p }} ({{ p.code }})</a></li>
-    {% endfor %}
-</ul>
-{% else %}
-{% trans %}There is no products in this website.{% endtrans %}
-{% endif %}
+    <h4>{% trans %}Uncategorized{% endtrans %}</h4>
+    <ul>
+      {% for p in product_list.filter(product_type=None).all().order_by('name') %}
+        <li><a href="{{ url('counter:product_edit', product_id=p.id) }}">{{ p }} ({{ p.code }})</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    {% trans %}There is no products in this website.{% endtrans %}
+  {% endif %}
 {% endblock %}
 
 

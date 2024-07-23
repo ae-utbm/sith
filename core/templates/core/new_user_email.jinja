@@ -1,17 +1,17 @@
 {% autoescape off %}
-{% trans %}You're receiving this email because you subscribed to the UTBM student association.{% endtrans %}
+  {% trans %}You're receiving this email because you subscribed to the UTBM student association.{% endtrans %}
 
-{% trans %}Please go to the following page and choose a new password:{% endtrans %}
-{% block reset_link %}
-{{ protocol }}://{{ domain }}{{ url('core:password_reset_confirm', uidb64=uid, token=token) }}
-{% endblock %}
-{% trans %}Your username, in case it was not given to you: {% endtrans %} {{ user.get_username() }}
-{% trans %}You also got a new account that will be useful to purchase products in the living areas and on the Eboutic.{% endtrans %}
-{% trans account=user.customer.account_id %}Here is your account number: {{ account }}{% endtrans %}
+  {% trans %}Please go to the following page and choose a new password:{% endtrans %}
+  {% block reset_link %}
+    {{ protocol }}://{{ domain }}{{ url('core:password_reset_confirm', uidb64=uid, token=token) }}
+  {% endblock %}
+  {% trans %}Your username, in case it was not given to you: {% endtrans %} {{ user.get_username() }}
+  {% trans %}You also got a new account that will be useful to purchase products in the living areas and on the Eboutic.{% endtrans %}
+  {% trans account=user.customer.account_id %}Here is your account number: {{ account }}{% endtrans %}
 
-{% trans %}Thanks for subscribing! {% endtrans %}
+  {% trans %}Thanks for subscribing! {% endtrans %}
 
-{% trans %}The AE team{% endtrans %}
+  {% trans %}The AE team{% endtrans %}
 
 {% endautoescape %}
 

@@ -264,33 +264,26 @@ class TestOperation(TestCase):
         )
         self.assertContains(response, "Total : 5575.72", status_code=200)
         self.assertContains(response, "Total : 71.42")
-        self.assertContains(
-            response,
-            """
-                <td><a href="/user/1/">S&#39; Kia</a></td>
-                
-                <td>3.00</td>""",
+        content = response.content.decode()
+        self.assertInHTML(
+            """<td><a href="/user/1/">S&#39; Kia</a></td><td>3.00</td>""", content
         )
-        self.assertContains(
-            response,
-            """
-                <td><a href="/user/1/">S&#39; Kia</a></td>
-                
-                <td>823.00</td>""",
+        self.assertInHTML(
+            """<td><a href="/user/1/">S&#39; Kia</a></td><td>823.00</td>""", content
         )
 
     def test_accounting_statement(self):
         response = self.client.get(
             reverse("accounting:journal_accounting_statement", args=[self.journal.id])
         )
-        self.assertContains(
-            response,
+        assert response.status_code == 200
+        self.assertInHTML(
             """
             <tr>
                 <td>443 - Crédit - Ce code n&#39;existe pas</td>
                 <td>3.00</td>
             </tr>""",
-            status_code=200,
+            response.content.decode(),
         )
         self.assertContains(
             response,

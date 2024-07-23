@@ -1,28 +1,28 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans user_name=object.get_display_name() %}{{ user_name }}'s Galaxy{% endtrans %}
+  {% trans user_name=object.get_display_name() %}{{ user_name }}'s Galaxy{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if object.current_star %}
-<div style="display: flex; flex-wrap: wrap;">
-    <div id="3d-graph"></div>
+  {% if object.current_star %}
+    <div style="display: flex; flex-wrap: wrap;">
+      <div id="3d-graph"></div>
 
-    <div style="margin: 1em;">
+      <div style="margin: 1em;">
         <p><a onclick="focus_node(get_node_from_id({{ object.id }}))">Reset on {{ object.get_display_name() }}</a></p>
         <p>Self score: {{ object.current_star.mass }}</p>
         <table style="width: initial;">
-            <tr>
-              <th></th>
-              <th>Citizen</th>
-              <th>Score</th>
-              <th>Distance</th>
-              <th>Family</th>
-              <th>Pictures</th>
-              <th>Clubs</th>
-            </tr>
-        {% for lane in lanes %}
+          <tr>
+            <th></th>
+            <th>Citizen</th>
+            <th>Score</th>
+            <th>Distance</th>
+            <th>Family</th>
+            <th>Pictures</th>
+            <th>Clubs</th>
+          </tr>
+          {% for lane in lanes %}
             <tr>
               <td><a onclick="focus_node(get_node_from_id({{ lane.other_star_id }}))">Locate</a></td>
               <td><a href="{{ url("galaxy:user", user_id=lane.other_star_id) }}">{{ lane.other_star_name }}</a></td>
@@ -32,14 +32,14 @@
               <td>{{ lane.pictures }}</td>
               <td>{{ lane.clubs }}</td>
             </tr>
-        {% endfor %}
+          {% endfor %}
         </table>
+      </div>
     </div>
-</div>
-<p>#{{ object.current_star.galaxy }}#</p>
-{% else %}
-  <p>This citizen has not yet joined the galaxy</p>
-{% endif %}
+    <p>#{{ object.current_star.galaxy }}#</p>
+  {% else %}
+    <p>This citizen has not yet joined the galaxy</p>
+  {% endif %}
 
 {% endblock %}
 
@@ -52,17 +52,17 @@
   <script src="{{ static('galaxy/js/d3-force-3d.min.js') }}" defer></script>
 
   <script>
-  var Graph;
+    var Graph;
 
-  function get_node_from_id(id) {
+    function get_node_from_id(id) {
       return Graph.graphData().nodes.find(n => n.id === id);
-  }
+    }
 
-  function get_links_from_node_id(id) {
+    function get_links_from_node_id(id) {
       return Graph.graphData().links.filter(l => l.source.id === id || l.target.id === id);
-  }
+    }
 
-  function focus_node(node) {
+    function focus_node(node) {
       highlightNodes.clear();
       highlightLinks.clear();
 
@@ -94,28 +94,28 @@
         node, // lookAt ({ x, y, z })
         3000  // ms transition duration
       );
-  }
+    }
 
-  const highlightNodes = new Set();
-  const highlightLinks = new Set();
-  let hoverNode = null;
+    const highlightNodes = new Set();
+    const highlightLinks = new Set();
+    let hoverNode = null;
 
-  document.addEventListener("DOMContentLoaded", () => {
-    var graph_div = document.getElementById('3d-graph');
-    Graph = ForceGraph3D();
-    Graph(graph_div);
-    Graph
+    document.addEventListener("DOMContentLoaded", () => {
+      var graph_div = document.getElementById('3d-graph');
+      Graph = ForceGraph3D();
+      Graph(graph_div);
+      Graph
         .jsonUrl('{{ url("galaxy:data") }}')
         .width(graph_div.parentElement.clientWidth > 1200 ? 1200 : graph_div.parentElement.clientWidth) // Not perfect at all. JS-fu master from the future, please fix this :-)
         .height(1000)
         .enableNodeDrag(false) // allow easier navigation
         .onNodeClick(node => {
-             camera = Graph.cameraPosition();
-             var distance = Math.sqrt(Math.pow(node.x - camera.x, 2) + Math.pow(node.y - camera.y, 2) + Math.pow(node.z - camera.z, 2))
-             if (distance < 120 || highlightNodes.has(node)) {
-                 focus_node(node);
-             }
-         })
+          camera = Graph.cameraPosition();
+          var distance = Math.sqrt(Math.pow(node.x - camera.x, 2) + Math.pow(node.y - camera.y, 2) + Math.pow(node.z - camera.z, 2))
+          if (distance < 120 || highlightNodes.has(node)) {
+            focus_node(node);
+          }
+        })
         .linkWidth(link => highlightLinks.has(link) ? 0.4 : 0.0)
         .linkColor(link => highlightLinks.has(link) ? 'rgba(255,160,0,1)' : 'rgba(128,255,255,0.6)')
         .linkVisibility(link => highlightLinks.has(link))
@@ -137,14 +137,14 @@
         });
 
     // Set distance between stars
-    Graph.d3Force('link').distance(link => link.value);
+      Graph.d3Force('link').distance(link => link.value);
 
     // Set high masses nearer the center of the galaxy
     // TODO: quick and dirty strength computation, this will need tuning.
-    Graph.d3Force('positionX', d3.forceX().strength(node => { return 1 - (1 / node.mass); }));
-    Graph.d3Force('positionY', d3.forceY().strength(node => { return 1 - (1 / node.mass); }));
-    Graph.d3Force('positionZ', d3.forceZ().strength(node => { return 1 - (1 / node.mass); }));
-  })
+      Graph.d3Force('positionX', d3.forceX().strength(node => { return 1 - (1 / node.mass); }));
+      Graph.d3Force('positionY', d3.forceY().strength(node => { return 1 - (1 / node.mass); }));
+      Graph.d3Force('positionZ', d3.forceZ().strength(node => { return 1 - (1 / node.mass); }));
+    })
   </script>
 {% endblock %}
 

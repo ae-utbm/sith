@@ -1,80 +1,80 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-	{% trans user_name=profile.get_display_name() %}{{ user_name }}'s club(s){% endtrans %}
+  {% trans user_name=profile.get_display_name() %}{{ user_name }}'s club(s){% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans%}Club(s){% endtrans %}</h3>
-<br>
-<h4>{% trans%}Current club(s) :{% endtrans %}</h4>
-<br>
-<table>
+  <h3>{% trans%}Club(s){% endtrans %}</h3>
+  <br>
+  <h4>{% trans%}Current club(s) :{% endtrans %}</h4>
+  <br>
+  <table>
     <thead>
-    	<tr>
-            <td>{% trans %}Club{% endtrans %}</td>
-	        <td>{% trans %}Role{% endtrans %}</td>
-	        <td>{% trans %}Description{% endtrans %}</td>
-	        <td>{% trans %}Since{% endtrans %}</td>
-            <td></td>
-            <td></td>
-    	</tr>
+      <tr>
+        <td>{% trans %}Club{% endtrans %}</td>
+        <td>{% trans %}Role{% endtrans %}</td>
+        <td>{% trans %}Description{% endtrans %}</td>
+        <td>{% trans %}Since{% endtrans %}</td>
+        <td></td>
+        <td></td>
+      </tr>
     </thead>
     <tbody>
-	    {% for m in profile.memberships.filter(end_date=None).all() %}
+      {% for m in profile.memberships.filter(end_date=None).all() %}
         <tr>
-            <td><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></td>
-            <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
-            <td>{{ m.description }}</td>
-            <td>{{ m.start_date }}</td>
-            {% if m.can_be_edited_by(user) %}
+          <td><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></td>
+          <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+          <td>{{ m.description }}</td>
+          <td>{{ m.start_date }}</td>
+          {% if m.can_be_edited_by(user) %}
             <td><a href="{{ url('club:membership_set_old', membership_id=m.id) }}">{% trans %}Mark as old{% endtrans %}</a></td>
-            {% endif %}
-            {% if user.is_root %}
-                <td><a href="{{ url('club:membership_delete', membership_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></td>
-            {% endif %}
+          {% endif %}
+          {% if user.is_root %}
+            <td><a href="{{ url('club:membership_delete', membership_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+          {% endif %}
         </tr>
-    	{% endfor %}
+      {% endfor %}
     </tbody>
-</table>
-<br>
-<h4>{% trans%}Old club(s) :{% endtrans %}</h4>
-<br>
-<table>
+  </table>
+  <br>
+  <h4>{% trans%}Old club(s) :{% endtrans %}</h4>
+  <br>
+  <table>
     <thead>
-    	<tr>
-            <td>{% trans %}Club{% endtrans %}</td>
-	        <td>{% trans %}Role{% endtrans %}</td>
-	        <td>{% trans %}Description{% endtrans %}</td>
-	        <td>{% trans %}From{% endtrans %}</td>
-	        <td>{% trans %}To{% endtrans %}</td>
+      <tr>
+        <td>{% trans %}Club{% endtrans %}</td>
+        <td>{% trans %}Role{% endtrans %}</td>
+        <td>{% trans %}Description{% endtrans %}</td>
+        <td>{% trans %}From{% endtrans %}</td>
+        <td>{% trans %}To{% endtrans %}</td>
 
-    	</tr>
+      </tr>
     </thead>
     <tbody>
-	    {% for m in profile.memberships.exclude(end_date=None).all() %}
+      {% for m in profile.memberships.exclude(end_date=None).all() %}
         <tr>
-            <td><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></td>
-            <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
-            <td>{{ m.description }}</td>
-            <td>{{ m.start_date }}</td>
-            <td>{{ m.end_date }}</td>
-            {% if user.is_root %}
-                <td><a href="{{ url('club:membership_delete', membership_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></td>
-            {% endif %}
+          <td><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></td>
+          <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+          <td>{{ m.description }}</td>
+          <td>{{ m.start_date }}</td>
+          <td>{{ m.end_date }}</td>
+          {% if user.is_root %}
+            <td><a href="{{ url('club:membership_delete', membership_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+          {% endif %}
         </tr>
-    	{% endfor %}
+      {% endfor %}
     </tbody>
-</table>
+  </table>
 
-{% if
-    profile.mailing_subscriptions.exists()
-    and (profile.id == user.id or user.is_root or user.is_com_admin)
-%}
-    <h4>{% trans %}Subscribed mailing lists{% endtrans %}</h4>
-    {% for sub in profile.mailing_subscriptions.all() %}
-        <p>{{ sub.mailing.email }} <a href="{{ url('club:mailing_subscription_delete', mailing_subscription_id=sub.id) }}">{% trans %}Unsubscribe{% endtrans %}</a></p>
-    {% endfor %}
+  {% if
+  profile.mailing_subscriptions.exists()
+  and (profile.id == user.id or user.is_root or user.is_com_admin)
+  %}
+  <h4>{% trans %}Subscribed mailing lists{% endtrans %}</h4>
+  {% for sub in profile.mailing_subscriptions.all() %}
+    <p>{{ sub.mailing.email }} <a href="{{ url('club:mailing_subscription_delete', mailing_subscription_id=sub.id) }}">{% trans %}Unsubscribe{% endtrans %}</a></p>
+  {% endfor %}
 {% endif %}
 {% endblock %}
 

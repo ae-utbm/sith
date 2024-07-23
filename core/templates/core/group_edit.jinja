@@ -1,13 +1,13 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-<p><a href="{{ url('core:group_list') }}">{% trans %}Back to list{% endtrans %}</a></p>
-<h2>{% trans %}Edit group{% endtrans %}</h2>
-<form action="" method="post">
+  <p><a href="{{ url('core:group_list') }}">{% trans %}Back to list{% endtrans %}</a></p>
+  <h2>{% trans %}Edit group{% endtrans %}</h2>
+  <form action="" method="post">
     {% csrf_token %}
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>
-</form>
+  </form>
 {% endblock %}
 
 

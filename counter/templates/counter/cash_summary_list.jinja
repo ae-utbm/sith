@@ -2,66 +2,66 @@
 {% from 'core/macros.jinja' import user_profile_link, paginate %}
 
 {% block title %}
-{% trans %}Cash register summary list{% endtrans %}
+  {% trans %}Cash register summary list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if cashsummary_list %}
-<h3>{% trans %}Cash register summary list{% endtrans %}</h3>
-<h5>{% trans %}Theoric sums{% endtrans %}</h5>
-<form action="" method="get">
-    {% csrf_token %}
-    {{ form }}
-    <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>
-</form>
-<h6>{% trans %}Reloads{% endtrans %}</h6>
-<p>
-{% for b,s in refilling_sums.items() %}
-    {{ b }}: {{ s }} €<br/>
-{% endfor %}
-</p>
-<h6>{% trans %}Cash register summaries{% endtrans %}</h6>
-<p>
-{% for b,s in summaries_sums.items() %}
-    {{ b }}: {{ s }} €<br/>
-{% endfor %}
-</p>
-<table>
-    <thead>
+  {% if cashsummary_list %}
+    <h3>{% trans %}Cash register summary list{% endtrans %}</h3>
+    <h5>{% trans %}Theoric sums{% endtrans %}</h5>
+    <form action="" method="get">
+      {% csrf_token %}
+      {{ form }}
+      <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>
+    </form>
+    <h6>{% trans %}Reloads{% endtrans %}</h6>
+    <p>
+      {% for b,s in refilling_sums.items() %}
+        {{ b }}: {{ s }} €<br/>
+      {% endfor %}
+    </p>
+    <h6>{% trans %}Cash register summaries{% endtrans %}</h6>
+    <p>
+      {% for b,s in summaries_sums.items() %}
+        {{ b }}: {{ s }} €<br/>
+      {% endfor %}
+    </p>
+    <table>
+      <thead>
         <tr>
-            <td>{% trans %}User{% endtrans %}</td>
-            <td>{% trans %}Counter{% endtrans %}</td>
-            <td>{% trans %}Date{% endtrans %}</td>
-            <td>{% trans %}Total{% endtrans %}</td>
-            <td>{% trans %}Emptied{% endtrans %}</td>
-            <td>{% trans %}Comment{% endtrans %}</td>
+          <td>{% trans %}User{% endtrans %}</td>
+          <td>{% trans %}Counter{% endtrans %}</td>
+          <td>{% trans %}Date{% endtrans %}</td>
+          <td>{% trans %}Total{% endtrans %}</td>
+          <td>{% trans %}Emptied{% endtrans %}</td>
+          <td>{% trans %}Comment{% endtrans %}</td>
         </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
         {% for c in cashsummary_list  %}
-        <tr>
-        <td>{{ user_profile_link(c.user) }}</td>
-        <td>{{ c.counter }}</td>
-        <td>{{ c.date|localtime|date(DATETIME_FORMAT) }} - {{ c.date|localtime|time(DATETIME_FORMAT) }}</td>
-        <td>{{ c.get_total() }} €</td>
-        {% if c.emptied %}
-        <td>{% trans %}yes{% endtrans %}</td>
-        {% else %}
-        <td></td>
-        {% endif %}
-        <td>{{ c.comment }}</td>
-        <td><a href="{{ url('counter:cash_summary_edit', cashsummary_id=c.id) }}">{% trans %}Edit{% endtrans %}</td>
-        </tr>
+          <tr>
+            <td>{{ user_profile_link(c.user) }}</td>
+            <td>{{ c.counter }}</td>
+            <td>{{ c.date|localtime|date(DATETIME_FORMAT) }} - {{ c.date|localtime|time(DATETIME_FORMAT) }}</td>
+            <td>{{ c.get_total() }} €</td>
+            {% if c.emptied %}
+              <td>{% trans %}yes{% endtrans %}</td>
+            {% else %}
+              <td></td>
+            {% endif %}
+            <td>{{ c.comment }}</td>
+            <td><a href="{{ url('counter:cash_summary_edit', cashsummary_id=c.id) }}">{% trans %}Edit{% endtrans %}</td>
+            </tr>
         {% endfor %}
-    </tbody>
-</table>
-<br>
-{% if is_paginated %}
-    {{ paginate(page_obj, paginator) }}
-{% endif %}
-{% else %}
-{% trans %}There is no cash register summary in this website.{% endtrans %}
-{% endif %}
+      </tbody>
+    </table>
+    <br>
+    {% if is_paginated %}
+      {{ paginate(page_obj, paginator) }}
+    {% endif %}
+  {% else %}
+    {% trans %}There is no cash register summary in this website.{% endtrans %}
+  {% endif %}
 {% endblock %}
 
 

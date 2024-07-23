@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-    <link rel="stylesheet" href="{{ scss('user/login.scss') }}">
+  <link rel="stylesheet" href="{{ scss('user/login.scss') }}">
 {%- endblock -%}
 
 {% block title %}{% trans %}Register{% endtrans %}{% endblock %}
@@ -13,13 +13,12 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="title">{% trans %}Register{% endtrans %}</h1>
+  <h1 class="title">{% trans %}Register{% endtrans %}</h1>
 
-    <form action="{{ url('core:register') }}" method="post">
-        {% csrf_token %}
-        {% render_honeypot_field %}
-        {{ form }}
-        <input type="submit" value="{% trans %}Register{% endtrans %}" />
-    </form>
+  <form action="{{ url('core:register') }}" method="post">
+    {% csrf_token %}
+    {% render_honeypot_field %}
+    {{ form }}
+    <input type="submit" value="{% trans %}Register{% endtrans %}" />
+  </form>
 {% endblock %}
- 

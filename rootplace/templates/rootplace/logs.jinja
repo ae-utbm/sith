@@ -2,31 +2,31 @@
 {% from 'core/macros.jinja' import paginate %}
 
 {% block title %}
-{% trans %}Operation logs{% endtrans %}
+  {% trans %}Operation logs{% endtrans %}
 {% endblock %}
 
 {% block content %}
-	<table>
-		<thead>
-			<tr>
-				<th>{% trans %}Date{% endtrans %}</th>
-				<th>{% trans %}Operation type{% endtrans %}</th>
-				<th>{% trans %}Label{% endtrans %}</th>
-				<th>{% trans %}Operator{% endtrans %}</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for log in object_list %}
-			<tr>
-				<td>{{ log.date }} </td>
-				<td>{{ log.get_operation_type_display() }}</td>
-				<td>{{ log.label }}</td>
-				<td>{{ log.operator }}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+  <table>
+    <thead>
+      <tr>
+        <th>{% trans %}Date{% endtrans %}</th>
+        <th>{% trans %}Operation type{% endtrans %}</th>
+        <th>{% trans %}Label{% endtrans %}</th>
+        <th>{% trans %}Operator{% endtrans %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for log in object_list %}
+        <tr>
+          <td>{{ log.date }} </td>
+          <td>{{ log.get_operation_type_display() }}</td>
+          <td>{{ log.label }}</td>
+          <td>{{ log.operator }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-    <br>
-    {{ paginate(page_obj, paginator) }}
+  <br>
+  {{ paginate(page_obj, paginator) }}
 {% endblock content %}

@@ -1,17 +1,17 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Launderette{% endtrans %}
+  {% trans %}Launderette{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if request.user.is_subscribed %}
-<ul>
-    {% for l in launderette_list  %}
-    <li><a href="{{ url('launderette:book_slot', launderette_id=l.id) }}">{{ l }}</a></li>
-    {% endfor %}
-</ul>
-{% endif %}
+  {% if request.user.is_subscribed %}
+    <ul>
+      {% for l in launderette_list  %}
+        <li><a href="{{ url('launderette:book_slot', launderette_id=l.id) }}">{{ l }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 {% endblock %}
 
 

@@ -1,16 +1,16 @@
 {% extends "core/base.jinja" %}
 
 {% block content %}
-<h3>{% trans %}Eboutic{% endtrans %}</h3>
+  <h3>{% trans %}Eboutic{% endtrans %}</h3>
 
-<div>
+  <div>
     {% if success %}
-    {% trans %}Payment successful{% endtrans %}
+      {% trans %}Payment successful{% endtrans %}
     {% else %}
-    {% trans %}Payment failed{% endtrans %}
+      {% trans %}Payment failed{% endtrans %}
     {% endif %}
     <p><a href="{{ url('eboutic:main') }}">{% trans %}Return to eboutic{% endtrans %}</a></p>
-</div>
+  </div>
 
 
 

@@ -2,11 +2,11 @@
 {% from 'core/macros_pages.jinja' import page_history %}
 
 {% block content %}
-	{% if club.page %}
-	{{ page_history(club.page) }}
-	{% else %}
-	    {% trans %}No page existing for this club{% endtrans %}
-	{% endif %}
+  {% if club.page %}
+    {{ page_history(club.page) }}
+  {% else %}
+    {% trans %}No page existing for this club{% endtrans %}
+  {% endif %}
 {% endblock %}
 
 

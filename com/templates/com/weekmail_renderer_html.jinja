@@ -1,52 +1,52 @@
 <style type="text/css" media="all">
-h1, h2, h3, h4, h5, h6, p {
+  h1, h2, h3, h4, h5, h6, p {
     padding: 5px ;
     margin: 5px;
-}
-img {
+  }
+  img {
     margin: 5px ;
     width: 95%;
-}
+  }
 </style>
 <div style="background: #CBD1DD; padding: 0px 5%;">
-    <div style="background: #F9FAFB;">
-        <h2 style="background: #000; color: #f9fafb">{{ weekmail.title }}</h2>
-        <img src="{{ weekmail.get_banner() }}"
-        id="OWATemporaryImageDivContainerBannerForOutlook"
-        >
-        {% if weekmail.intro %}
-        <h3 style="background: #000; color: #f9fafb">{% trans %}Intro{% endtrans %}</h3>
-        {{ weekmail.intro|markdown }}
-        {% endif %}
+  <div style="background: #F9FAFB;">
+    <h2 style="background: #000; color: #f9fafb">{{ weekmail.title }}</h2>
+    <img src="{{ weekmail.get_banner() }}"
+         id="OWATemporaryImageDivContainerBannerForOutlook"
+    >
+    {% if weekmail.intro %}
+      <h3 style="background: #000; color: #f9fafb">{% trans %}Intro{% endtrans %}</h3>
+      {{ weekmail.intro|markdown }}
+    {% endif %}
 
-        <h3 style="background: #000; color: #f9fafb">{% trans %}Table of content{% endtrans %}</h3>
-        <ul>
-            {% for a in weekmail.articles.all() %}
-            <li>[{{ a.club }}] {{ a.title }}</li>
-            {%- endfor %}
-        </ul>
+    <h3 style="background: #000; color: #f9fafb">{% trans %}Table of content{% endtrans %}</h3>
+    <ul>
+      {% for a in weekmail.articles.all() %}
+        <li>[{{ a.club }}] {{ a.title }}</li>
+      {%- endfor %}
+    </ul>
 
-        {%- for a in weekmail.articles.all() %}
-        <h3 style="background: #000; color: #f9fafb">[{{ a.club }}] {{ a.title }}</h3>
-        {{ a.content|markdown }}
-        {%- endfor -%}
+    {%- for a in weekmail.articles.all() %}
+      <h3 style="background: #000; color: #f9fafb">[{{ a.club }}] {{ a.title }}</h3>
+      {{ a.content|markdown }}
+    {%- endfor -%}
 
-        {%- if weekmail.joke %}
-        <h3 style="background: #000; color: #f9fafb">{% trans %}Joke{% endtrans %}</h3>
-        {{ weekmail.joke|markdown }}
-        {% endif -%}
+    {%- if weekmail.joke %}
+      <h3 style="background: #000; color: #f9fafb">{% trans %}Joke{% endtrans %}</h3>
+      {{ weekmail.joke|markdown }}
+    {% endif -%}
 
-        {%- if weekmail.protip %}
-        <h3 style="background: #000; color: #f9fafb">{% trans %}Pro tip{% endtrans %}</h3>
-        {{ weekmail.protip|markdown }}
-        {% endif -%}
+    {%- if weekmail.protip %}
+      <h3 style="background: #000; color: #f9fafb">{% trans %}Pro tip{% endtrans %}</h3>
+      {{ weekmail.protip|markdown }}
+    {% endif -%}
 
-        {%- if weekmail.conclusion %}
-        <h3 style="background: #000; color: #f9fafb">{% trans %}Final word{% endtrans %}</h3>
-        {{ weekmail.conclusion|markdown }}
-        {% endif -%}
-        <img src="{{ weekmail.get_footer() }}"
-    </div>
+    {%- if weekmail.conclusion %}
+      <h3 style="background: #000; color: #f9fafb">{% trans %}Final word{% endtrans %}</h3>
+      {{ weekmail.conclusion|markdown }}
+    {% endif -%}
+    <img src="{{ weekmail.get_footer() }}"
+         </div>
 
-</div>
+  </div>
 

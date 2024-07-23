@@ -1,27 +1,27 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Simplified type list{% endtrans %}
+  {% trans %}Simplified type list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <div id="accounting">
-        <p>
-        <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
-        {% trans %}Simplified types{% endtrans %}
-        </p>
-        <hr>
-        <p><a href="{{ url('accounting:simple_type_new') }}">{% trans %}New simplified type{% endtrans %}</a></p>
-        {% if simplifiedaccountingtype_list %}
-        <h3>{% trans %}Simplified type list{% endtrans %}</h3>
-        <ul>
-            {% for a in simplifiedaccountingtype_list  %}
-            <li><a href="{{ url('accounting:simple_type_edit', type_id=a.id) }}">{{ a }}</a></li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        {% trans %}There is no types in this website.{% endtrans %}
-        {% endif %}
-    </div>
+  <div id="accounting">
+    <p>
+      <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
+      {% trans %}Simplified types{% endtrans %}
+    </p>
+    <hr>
+    <p><a href="{{ url('accounting:simple_type_new') }}">{% trans %}New simplified type{% endtrans %}</a></p>
+    {% if simplifiedaccountingtype_list %}
+      <h3>{% trans %}Simplified type list{% endtrans %}</h3>
+      <ul>
+        {% for a in simplifiedaccountingtype_list  %}
+          <li><a href="{{ url('accounting:simple_type_edit', type_id=a.id) }}">{{ a }}</a></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {% trans %}There is no types in this website.{% endtrans %}
+    {% endif %}
+  </div>
 {% endblock %}
 

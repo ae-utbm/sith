@@ -1,136 +1,136 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-    {% trans %}Subscription stats{% endtrans %}
+  {% trans %}Subscription stats{% endtrans %}
 {% endblock %}
 
 {% block head %}
-{{ super() }}
-<script type="text/javascript" src="{{ static('core/js/Chart.bundle.min.js') }}"></script>
+  {{ super() }}
+  <script type="text/javascript" src="{{ static('core/js/Chart.bundle.min.js') }}"></script>
 {% endblock %}
 
 {% block content %}
 
-<p>
+  <p>
     {{ form.start_date.label }}<br>
     {{ form.start_date }}<br><br>
     {{ form.end_date.label }}<br>
     {{ form.end_date }}<br>
     <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
-</p>
+  </p>
 
-<canvas id="statsChart" width="400" height="200"></canvas>
+  <canvas id="statsChart" width="400" height="200"></canvas>
 
-<p>
+  <p>
     {% trans %}Total subscriptions{% endtrans %} : {{ subscriptions_total.count() }}<br><br>
     {% trans %}Subscriptions by type{% endtrans %}<br><br>
     {% for location in locations %}
-        {{ location[1] }} : <i class="nb">{{ subscriptions_total.filter(location=location[0]).count() }}</i><br>
+      {{ location[1] }} : <i class="nb">{{ subscriptions_total.filter(location=location[0]).count() }}</i><br>
     {% endfor %}
-<p>
+    <p>
 
-<br>
+      <br>
 
-<table>
-    <tr>
-        <th>{% trans %}Subscription type{% endtrans %}</th>
-        {% for location in locations %}
-            <th>{{ location[1] }}</th>
-        {% endfor %}
-        <th id="graphLabel">{% trans %}Total{% endtrans %}</th>
-        {% for type in subscriptions_types %}
+      <table>
         <tr>
-            <td><i class="types" >{{ subscriptions_types[type]['name'] }}</i></td>
-            {% set subscriptions_total_type = subscriptions_total.filter(subscription_type=type) %}
-            {% for location in locations %}
+          <th>{% trans %}Subscription type{% endtrans %}</th>
+          {% for location in locations %}
+            <th>{{ location[1] }}</th>
+          {% endfor %}
+          <th id="graphLabel">{% trans %}Total{% endtrans %}</th>
+          {% for type in subscriptions_types %}
+            <tr>
+              <td><i class="types" >{{ subscriptions_types[type]['name'] }}</i></td>
+              {% set subscriptions_total_type = subscriptions_total.filter(subscription_type=type) %}
+              {% for location in locations %}
                 <td>
-                {% set subscriptions_total_type_location = subscriptions_total_type.filter(location=location[0]) %}
-                {% trans %}Total{% endtrans %} : {{ subscriptions_total_type_location.count()}}<br>
-                {% for p_type in payment_types %}
-                {{ p_type[1] }} : <i class="nb">{{ subscriptions_total_type_location.filter(payment_method=p_type[0]).count()}}</i><br>
-                {% endfor %}
+                  {% set subscriptions_total_type_location = subscriptions_total_type.filter(location=location[0]) %}
+                  {% trans %}Total{% endtrans %} : {{ subscriptions_total_type_location.count()}}<br>
+                  {% for p_type in payment_types %}
+                    {{ p_type[1] }} : <i class="nb">{{ subscriptions_total_type_location.filter(payment_method=p_type[0]).count()}}</i><br>
+                  {% endfor %}
                 </td>
-            {% endfor %}
-            <td class="total"><i class="nb">{{subscriptions_total_type.count()}}</i>
-        </tr>
-        {% endfor %}
-</table>
+              {% endfor %}
+              <td class="total"><i class="nb">{{subscriptions_total_type.count()}}</i>
+              </tr>
+          {% endfor %}
+        </table>
 
 {% endblock %}
 
 {% block script %}
-{{ super() }}
-<script>
-function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
+  {{ super() }}
+  <script>
+    function getRandomColor() {
+      var letters = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++ ) {
         color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
     }
-    return color;
-}
-function getRandomColorUniq(list) {
-    var color = getRandomColor();
-    while (list.includes(color)){
+    function getRandomColorUniq(list) {
+      var color = getRandomColor();
+      while (list.includes(color)){
         color = getRandomColor();
+      }
+      return color;
     }
-    return color;
-}
-function hexToRgb(hex) {
+    function hexToRgb(hex) {
     // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+      var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+      hex = hex.replace(shorthandRegex, function(m, r, g, b) {
         return r + r + g + g + b + b;
-    });
+      });
 
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
         b: parseInt(result[3], 16)
-    } : null;
-}
+      } : null;
+    }
 
-var ctx = document.getElementById("statsChart").getContext('2d');
-var labels = [];
-var total = [];
-var colors = [];
-var colors_dimmed = [];
-Array.from(document.getElementsByClassName("types")).forEach(function(element){
-    labels.push(element.childNodes[0].data);
-});
-Array.from(document.getElementsByClassName("total")).forEach(function(element){
-    total.push(element.childNodes[0].childNodes[0].data);
-});
-labels.forEach(function(element){
-    colors.push(getRandomColorUniq(colors));
-});
-colors.forEach(function(element){
-    var rgb_color = hexToRgb(element);
-    colors_dimmed.push('rgba(' + rgb_color.r + ', ' + rgb_color.g + ', ' + rgb_color.b + ', 0.2)');
-});
-console.log(colors);console.log(colors_dimmed);
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
+    var ctx = document.getElementById("statsChart").getContext('2d');
+    var labels = [];
+    var total = [];
+    var colors = [];
+    var colors_dimmed = [];
+    Array.from(document.getElementsByClassName("types")).forEach(function(element){
+      labels.push(element.childNodes[0].data);
+    });
+    Array.from(document.getElementsByClassName("total")).forEach(function(element){
+      total.push(element.childNodes[0].childNodes[0].data);
+    });
+    labels.forEach(function(element){
+      colors.push(getRandomColorUniq(colors));
+    });
+    colors.forEach(function(element){
+      var rgb_color = hexToRgb(element);
+      colors_dimmed.push('rgba(' + rgb_color.r + ', ' + rgb_color.g + ', ' + rgb_color.b + ', 0.2)');
+    });
+    console.log(colors);console.log(colors_dimmed);
+    var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
         labels: labels,
         datasets: [{
-            label: document.getElementById("graphLabel").childNodes[0].data,
-            data: total,
-            backgroundColor: colors_dimmed,
-            borderColor: colors,
-            borderWidth: 1
+          label: document.getElementById("graphLabel").childNodes[0].data,
+          data: total,
+          backgroundColor: colors_dimmed,
+          borderColor: colors,
+          borderWidth: 1
         }]
-    },
-    options: {
+      },
+      options: {
         scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
+          yAxes: [{
+            ticks: {
+              beginAtZero:true
+            }
+          }]
         }
-    }
-});
-</script>
+      }
+    });
+  </script>
 {% endblock %}

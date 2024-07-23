@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
+  <head>
     <title>{% trans %}Slideshow{% endtrans %}</title>
     <link href="{{ scss('com/slideshow.scss') }}" rel="stylesheet" type="text/css" />
-</head>
-<body>
+  </head>
+  <body>
     <div id="slideshow">
 
-        <div id="slides">
+      <div id="slides">
         {% for poster in posters %}
-        <div class="slide {% if loop.first %}center{% else %}right{% endif %}" display_time="{{ poster.display_time }}">
-                <img src="{{ poster.file.url }}"></img>
-            </div>
+          <div class="slide {% if loop.first %}center{% else %}right{% endif %}" display_time="{{ poster.display_time }}">
+            <img src="{{ poster.file.url }}"></img>
+          </div>
         {% endfor %}
-        </div>
+      </div>
 
-        <div id="progress_bullets">
+      <div id="progress_bullets">
         {% for poster in posters %}
-            <div class="bullet {% if loop.first %}active{% endif %}"></div>
+          <div class="bullet {% if loop.first %}active{% endif %}"></div>
         {% endfor %}
-        </div>
+      </div>
 
-        <div id="progress_bar"></div>
+      <div id="progress_bar"></div>
 
     </div>
     <script src="{{ static('core/js/jquery-3.6.2.min.js') }}"></script>
     <script src="{{ static('com/js/slideshow.js') }}"></script>
-</body>
+  </body>
 </html>

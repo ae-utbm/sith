@@ -1,21 +1,21 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Eticket list{% endtrans %}
+  {% trans %}Eticket list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<p><a href="{{ url('counter:new_eticket') }}">{% trans %}New eticket{% endtrans %}</a></p>
-{% if eticket_list %}
-<h3>{% trans %}Eticket list{% endtrans %}</h3>
-<ul>
-    {% for t in eticket_list  %}
-    <li><a href="{{ url('counter:edit_eticket', eticket_id=t.id) }}">{{ t }}</a> (ID: {{ t.product.id }} | Hash: <code>{{ t.secret }}</code>)</li>
-    {% endfor %}
-</ul>
-{% else %}
-{% trans %}There is no eticket in this website.{% endtrans %}
-{% endif %}
+  <p><a href="{{ url('counter:new_eticket') }}">{% trans %}New eticket{% endtrans %}</a></p>
+  {% if eticket_list %}
+    <h3>{% trans %}Eticket list{% endtrans %}</h3>
+    <ul>
+      {% for t in eticket_list  %}
+        <li><a href="{{ url('counter:edit_eticket', eticket_id=t.id) }}">{{ t }}</a> (ID: {{ t.product.id }} | Hash: <code>{{ t.secret }}</code>)</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    {% trans %}There is no eticket in this website.{% endtrans %}
+  {% endif %}
 {% endblock %}
 
 
