@@ -727,6 +727,9 @@ if SENTRY_DSN:
 
 
 SITH_FRONT_DEP_VERSIONS = {
+    "https://github.com/Stuk/jszip-utils": "0.1.0",
+    "https://github.com/Stuk/jszip": "3.10.1",
+    "https://github.com/jimmywarting/native-file-system-adapter": "3.0.1",
     "https://github.com/chartjs/Chart.js/": "2.6.0",
     "https://github.com/xdan/datetimepicker/": "2.5.21",
     "https://github.com/Ionaru/easy-markdown-editor/": "2.18.0",
@@ -736,7 +739,6 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/viralpatel/jquery.shorten/": "",
     "https://github.com/getsentry/sentry-javascript/": "4.0.6",
     "https://github.com/jhuckaby/webcamjs/": "1.0.0",
-    "https://github.com/vuejs/vue-next": "3.2.18",
     "https://github.com/alpinejs/alpine": "3.10.5",
     "https://github.com/mrdoob/three.js/": "r148",
     "https://github.com/vasturiano/three-spritetext": "1.6.5",
