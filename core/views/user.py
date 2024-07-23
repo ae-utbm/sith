@@ -29,6 +29,7 @@ from smtplib import SMTPException
 from django.conf import settings
 from django.contrib.auth import login, views
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
@@ -50,7 +51,6 @@ from django.views.generic.dates import MonthMixin, YearMixin
 from django.views.generic.edit import FormView, UpdateView
 from honeypot.decorators import check_honeypot
 
-from api.views.sas import all_pictures_of_user
 from core.models import Gift, Preferences, SithFile, User
 from core.views import (
     CanEditMixin,
@@ -58,7 +58,6 @@ from core.views import (
     CanViewMixin,
     QuickNotifMixin,
     TabedViewMixin,
-    UserIsLoggedMixin,
 )
 from core.views.forms import (
     GiftForm,
@@ -68,6 +67,7 @@ from core.views.forms import (
     UserProfileForm,
 )
 from counter.forms import StudentCardForm
+from sas.models import Picture
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
@@ -313,7 +313,11 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
         kwargs = super().get_context_data(**kwargs)
         kwargs["albums"] = []
         kwargs["pictures"] = {}
-        picture_qs = all_pictures_of_user(self.object)
+        picture_qs = (
+            Picture.objects.filter(people__user_id=self.object.id)
+            .order_by("parent__date", "id")
+            .all()
+        )
         last_album = None
         for picture in picture_qs:
             album = picture.parent
@@ -720,7 +724,7 @@ class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     current_tab = "groups"
 
 
-class UserToolsView(QuickNotifMixin, UserTabsMixin, UserIsLoggedMixin, TemplateView):
+class UserToolsView(LoginRequiredMixin, QuickNotifMixin, UserTabsMixin, TemplateView):
     """Displays the logged user's tools."""
 
     template_name = "core/user_tools.jinja"

@@ -78,7 +78,7 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "honeypot",
     "django_jinja",
-    "rest_framework",
+    "ninja_extra",
     "ajax_select",
     "haystack",
     "captcha",
@@ -89,7 +89,6 @@ INSTALLED_APPS = (
     "counter",
     "eboutic",
     "launderette",
-    "api",
     "rootplace",
     "sas",
     "com",
@@ -474,8 +473,8 @@ SITH_PEDAGOGY_UV_RESULT_GRADE = [
 ]
 
 SITH_LOG_OPERATION_TYPE = [
-    (("SELLING_DELETION"), _("Selling deletion")),
-    (("REFILLING_DELETION"), _("Refilling deletion")),
+    ("SELLING_DELETION", _("Selling deletion")),
+    ("REFILLING_DELETION", _("Refilling deletion")),
 ]
 
 SITH_PEDAGOGY_UTBM_API = "https://extranet1.utbm.fr/gpedago/api/guide"

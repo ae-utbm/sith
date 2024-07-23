@@ -486,10 +486,8 @@ class Mailing(models.Model):
         super().delete()
 
     def fetch_format(self):
-        resp = self.email + ": "
-        for sub in self.subscriptions.all():
-            resp += sub.fetch_format()
-        return resp
+        destination = "".join(s.fetch_format() for s in self.subscriptions.all())
+        return f"{self.email}: {destination}"
 
 
 class MailingSubscription(models.Model):

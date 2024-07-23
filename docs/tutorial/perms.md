@@ -197,3 +197,22 @@ Les mixins suivants sont implémentés :
     Mais sur les `ListView`, on peut arriver à des temps
     de réponse extrêmement élevés.
 
+## API
+
+L'API utilise son propre système de permissions.
+Ce n'est pas encore un autre système en parallèle, mais un wrapper
+autour de notre système de permissions, afin de l'adapter aux besoins
+de l'API.
+
+En effet, l'interface attendue pour manipuler le plus aisément
+possible les permissions des routes d'API avec la librairie que nous
+utilisons est différente de notre système, tout en restant adaptable.
+(Pour plus de détail, 
+[voir la doc de la lib](https://eadwincode.github.io/django-ninja-extra/api_controller/api_controller_permission/)).
+
+Si vous avez bien suivi ce qui a été dit plus haut,
+vous ne devriez pas être perdu, étant donné
+que le système de permissions de l'API utilise
+des noms assez similaires : `IsInGroup`, `IsRoot`, `IsSubscriber`...
+Vous pouvez trouver des exemples d'utilisation de ce système
+dans [cette partie](../reference/core/api_permissions.md).

@@ -21,9 +21,9 @@
 #
 #
 
+import pytest
 from django.conf import settings
-from django.core.management import call_command
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -141,41 +141,27 @@ class UVCreation(TestCase):
         assert not UV.objects.filter(code="IFC1").exists()
 
 
-class UVListTest(TestCase):
-    """Test guide display rights."""
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("username", "expected_code"),
+    [
+        ("root", 200),
+        ("tutu", 200),
+        ("sli", 200),
+        ("old_subscriber", 200),
+        ("public", 403),
+    ],
+)
+def test_guide_permissions(client: Client, username: str, expected_code: int):
+    client.force_login(User.objects.get(username=username))
+    res = client.get(reverse("pedagogy:guide"))
+    assert res.status_code == expected_code
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.bibou = User.objects.get(username="root")
-        cls.tutu = User.objects.get(username="tutu")
-        cls.sli = User.objects.get(username="sli")
-        cls.guy = User.objects.get(username="guy")
 
-    def test_uv_list_display_success(self):
-        # Display for root
-        self.client.force_login(self.bibou)
-        response = self.client.get(reverse("pedagogy:guide"))
-        self.assertContains(response, text="PA00")
-
-        # Display for pedagogy admin
-        self.client.force_login(self.tutu)
-        response = self.client.get(reverse("pedagogy:guide"))
-        self.assertContains(response, text="PA00")
-
-        # Display for simple subscriber
-        self.client.force_login(self.sli)
-        response = self.client.get(reverse("pedagogy:guide"))
-        self.assertContains(response, text="PA00")
-
-    def test_uv_list_display_fail(self):
-        # Don't display for anonymous user
-        response = self.client.get(reverse("pedagogy:guide"))
-        assert response.status_code == 403
-
-        # Don't display for none subscribed users
-        self.client.force_login(self.guy)
-        response = self.client.get(reverse("pedagogy:guide"))
-        assert response.status_code == 403
+@pytest.mark.django_db
+def test_guide_anonymous_permission_denied(client: Client):
+    res = client.get(reverse("pedagogy:guide"))
+    assert res.status_code == 302
 
 
 class UVDeleteTest(TestCase):
@@ -566,179 +552,6 @@ class UVCommentUpdateTest(TestCase):
         )
         assert response.status_code == 200
         self.assertEqual(self.comment.author, self.krophil)
-
-
-class UVSearchTest(TestCase):
-    """Test UV guide rights for view and API."""
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.bibou = User.objects.get(username="root")
-        cls.tutu = User.objects.get(username="tutu")
-        cls.sli = User.objects.get(username="sli")
-        cls.guy = User.objects.get(username="guy")
-
-    def setUp(self):
-        call_command("update_index", "pedagogy")
-
-    def test_get_page_authorized_success(self):
-        # Test with root user
-        self.client.force_login(self.bibou)
-        response = self.client.get(reverse("pedagogy:guide"))
-        assert response.status_code == 200
-
-        # Test with pedagogy admin
-        self.client.force_login(self.tutu)
-        response = self.client.get(reverse("pedagogy:guide"))
-        assert response.status_code == 200
-
-        # Test with subscribed user
-        self.client.force_login(self.sli)
-        response = self.client.get(reverse("pedagogy:guide"))
-        assert response.status_code == 200
-
-    def test_get_page_unauthorized_fail(self):
-        # Test with anonymous user
-        response = self.client.get(reverse("pedagogy:guide"))
-        assert response.status_code == 403
-
-        # Test with not subscribed user
-        self.client.force_login(self.guy)
-        response = self.client.get(reverse("pedagogy:guide"))
-        assert response.status_code == 403
-
-    def test_search_pa00_success(self):
-        self.client.force_login(self.sli)
-
-        # Search with UV code
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "PA00"})
-        self.assertContains(response, text="PA00")
-
-        # Search with first letter of UV code
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "P"})
-        self.assertContains(response, text="PA00")
-
-        # Search with first letter of UV code in lowercase
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "p"})
-        self.assertContains(response, text="PA00")
-
-        # Search with UV title
-        response = self.client.get(
-            reverse("pedagogy:guide"), {"search": "participation"}
-        )
-        self.assertContains(response, text="PA00")
-
-        # Search with UV manager
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "HEYBERGER"})
-        self.assertContains(response, text="PA00")
-
-        # Search with department
-        response = self.client.get(reverse("pedagogy:guide"), {"department": "HUMA"})
-        self.assertContains(response, text="PA00")
-
-        # Search with semester
-        response = self.client.get(reverse("pedagogy:guide"), {"semester": "AUTUMN"})
-        self.assertContains(response, text="PA00")
-
-        response = self.client.get(reverse("pedagogy:guide"), {"semester": "SPRING"})
-        self.assertContains(response, text="PA00")
-
-        response = self.client.get(
-            reverse("pedagogy:guide"), {"semester": "AUTUMN_AND_SPRING"}
-        )
-        self.assertContains(response, text="PA00")
-
-        # Search with language
-        response = self.client.get(reverse("pedagogy:guide"), {"language": "FR"})
-        self.assertContains(response, text="PA00")
-
-        # Search with credit type
-        response = self.client.get(reverse("pedagogy:guide"), {"credit_type": "OM"})
-        self.assertContains(response, text="PA00")
-
-        # Search with combinaison of all
-        response = self.client.get(
-            reverse("pedagogy:guide"),
-            {
-                "search": "P",
-                "department": "HUMA",
-                "semester": "AUTUMN",
-                "language": "FR",
-                "credit_type": "OM",
-            },
-        )
-        self.assertContains(response, text="PA00")
-
-        # Test json briefly
-        response = self.client.get(
-            reverse("pedagogy:guide"),
-            {
-                "json": "t",
-                "search": "P",
-                "department": "HUMA",
-                "semester": "AUTUMN",
-                "language": "FR",
-                "credit_type": "OM",
-            },
-        )
-        self.assertJSONEqual(
-            response.content,
-            [
-                {
-                    "id": 1,
-                    "absolute_url": "/pedagogy/uv/1/",
-                    "update_url": "/pedagogy/uv/1/edit/",
-                    "delete_url": "/pedagogy/uv/1/delete/",
-                    "code": "PA00",
-                    "author": 0,
-                    "credit_type": "OM",
-                    "semester": "AUTUMN_AND_SPRING",
-                    "language": "FR",
-                    "credits": 5,
-                    "department": "HUMA",
-                    "title": "Participation dans une association \u00e9tudiante",
-                    "manager": "Laurent HEYBERGER",
-                    "objectives": "* Permettre aux \u00e9tudiants de r\u00e9aliser, pendant un semestre, un projet culturel ou associatif et de le valoriser.",
-                    "program": "* Semestre pr\u00e9c\u00e9dent proposition d'un projet et d'un cahier des charges\n* Evaluation par un jury de six membres\n* Si accord r\u00e9alisation dans le cadre de l'UV\n* Compte-rendu de l'exp\u00e9rience\n* Pr\u00e9sentation",
-                    "skills": "* G\u00e9rer un projet associatif ou une action \u00e9ducative en autonomie:\n* en produisant un cahier des charges qui -d\u00e9finit clairement le contexte du projet personnel -pose les jalons de ce projet -estime de mani\u00e8re r\u00e9aliste les moyens et objectifs du projet -d\u00e9finit exactement les livrables attendus\n    * en \u00e9tant capable de respecter ce cahier des charges ou, le cas \u00e9ch\u00e9ant, de r\u00e9viser le cahier des charges de mani\u00e8re argument\u00e9e.\n* Relater son exp\u00e9rience dans un rapport:\n* qui permettra \u00e0 d'autres \u00e9tudiants de poursuivre les actions engag\u00e9es\n* qui montre la capacit\u00e9 \u00e0 s'auto-\u00e9valuer et \u00e0 adopter une distance critique sur son action.",
-                    "key_concepts": "* Autonomie\n* Responsabilit\u00e9\n* Cahier des charges\n* Gestion de projet",
-                    "hours_CM": 0,
-                    "hours_TD": 0,
-                    "hours_TP": 0,
-                    "hours_THE": 121,
-                    "hours_TE": 4,
-                }
-            ],
-        )
-
-    def test_search_pa00_fail(self):
-        # Search with UV code
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "IFC"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with first letter of UV code
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "I"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with UV manager
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "GILLES"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with department
-        response = self.client.get(reverse("pedagogy:guide"), {"department": "TC"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with semester
-        response = self.client.get(reverse("pedagogy:guide"), {"semester": "CLOSED"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with language
-        response = self.client.get(reverse("pedagogy:guide"), {"language": "EN"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with credit type
-        response = self.client.get(reverse("pedagogy:guide"), {"credit_type": "TM"})
-        self.assertNotContains(response, text="PA00")
 
 
 class UVModerationFormTest(TestCase):

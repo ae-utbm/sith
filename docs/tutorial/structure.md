@@ -26,57 +26,55 @@ sith3/
 │   └── workflows/ (2)
 ├── accounting/ (3)
 │   └── ...
-├── api/ (4)
+├── club/ (4)
 │   └── ...
-├── club/ (5)
+├── com/ (5)
 │   └── ...
-├── com/ (6)
+├── core/ (6)
 │   └── ...
-├── core/ (7)
+├── counter/ (7)
 │   └── ...
-├── counter/ (8)
+├── docs/ (8)
 │   └── ...
-├── docs/ (9)
+├── eboutic/ (9)
 │   └── ...
-├── eboutic/ (10)
+├── election/ (10)
 │   └── ...
-├── election/ (11)
+├── forum/ (11)
 │   └── ...
-├── forum/ (12)
+├── galaxy/ (12)
 │   └── ...
-├── galaxy/ (13)
+├── launderette/ (13)
 │   └── ...
-├── launderette/ (14)
+├── locale/ (14)
 │   └── ...
-├── locale/ (15)
+├── matmat/ (15)
 │   └── ...
-├── matmat/ (16)
+├── pedagogy/ (16)
 │   └── ...
-├── pedagogy/ (17)
+├── rootplace/ (17)
 │   └── ...
-├── rootplace/ (18)
+├── sas/ (18)
 │   └── ...
-├── sas/ (19)
+├── sith/ (19)
 │   └── ...
-├── sith/ (20)
+├── stock/ (20)
 │   └── ...
-├── stock/ (21)
+├── subscription/ (21)
 │   └── ...
-├── subscription/ (22)
-│   └── ...
-├── trombi/ (23)
+├── trombi/ (22)
 │   └── ...
 │
-├── .coveragerc (24)
-├── .envrc (25)
+├── .coveragerc (23)
+├── .envrc (24)
 ├── .gitattributes
 ├── .gitignore
 ├── .mailmap
 ├── .env.exemple
-├── manage.py (26)
-├── mkdocs.yml (27)
+├── manage.py (25)
+├── mkdocs.yml (26)
 ├── poetry.lock
-├── pyproject.toml (28)
+├── pyproject.toml (27)
 └── README.md
 ```
 </div>
@@ -90,40 +88,39 @@ sith3/
    Par exemple, le workflow `docs.yml` compile
    et publie la documentation à chaque push sur la branche `master`.
 3. Application de gestion de la comptabilité.
-4. Application contenant des routes d'API.
-5. Application de gestion des clubs et de leurs membres.
-6. Application contenant les fonctionnalités 
+4. Application de gestion des clubs et de leurs membres.
+5. Application contenant les fonctionnalités 
    destinées aux responsables communication de l'AE.
-7. Application contenant la modélisation centrale du site.
+6. Application contenant la modélisation centrale du site.
    On en reparle plus loin sur cette page.
-8. Application de gestion des comptoirs, des permanences
+7. Application de gestion des comptoirs, des permanences
    sur ces comptoirs et des transactions qui y sont effectuées.
-9. Dossier contenant la documentation.
-10. Application de gestion de la boutique en ligne.
-11. Application de gestion des élections.
-12. Application de gestion du forum
-13. Application de gestion de la galaxie ; la galaxie
+8. Dossier contenant la documentation.
+9. Application de gestion de la boutique en ligne.
+10. Application de gestion des élections.
+11. Application de gestion du forum
+12. Application de gestion de la galaxie ; la galaxie
     est un graphe des niveaux de proximité entre les différents
     étudiants.
-14. Gestion des machines à laver de l'AE
-15. Dossier contenant les fichiers de traduction.
-16. Fonctionnalités de recherche d'utilisateurs.
-17. Le guide des UEs du site, sur lequel les utilisateurs
+13. Gestion des machines à laver de l'AE
+14. Dossier contenant les fichiers de traduction.
+15. Fonctionnalités de recherche d'utilisateurs.
+16. Le guide des UEs du site, sur lequel les utilisateurs
     peuvent également laisser leurs avis.
-18. Fonctionnalités utiles aux utilisateurs root.
-19. Le SAS, où l'on trouve toutes les photos de l'AE.
-20. Application principale du projet, contenant sa configuration.
-21. Gestion des stocks des comptoirs.
-22. Gestion des cotisations des utilisateurs du site.
-23. Gestion des trombinoscopes.
-24. Fichier de configuration de coverage.
-25. Fichier de configuration de direnv.
-26. Fichier généré automatiquement par Django. C'est lui
+17. Fonctionnalités utiles aux utilisateurs root.
+18. Le SAS, où l'on trouve toutes les photos de l'AE.
+19. Application principale du projet, contenant sa configuration.
+20. Gestion des stocks des comptoirs.
+21. Gestion des cotisations des utilisateurs du site.
+22. Gestion des trombinoscopes.
+23. Fichier de configuration de coverage.
+24. Fichier de configuration de direnv.
+25. Fichier généré automatiquement par Django. C'est lui
     qui permet d'appeler des commandes de gestion du projet
     avec la syntaxe `python ./manage.py <nom de la commande>`
-27. Le fichier de configuration de la documentation,
+26. Le fichier de configuration de la documentation,
     avec ses plugins et sa table des matières.
-28. Le fichier où sont déclarés les dépendances et la configuration
+27. Le fichier où sont déclarés les dépendances et la configuration
     de certaines d'entre elles.
     
 
@@ -175,11 +172,13 @@ comme suit :
 │   └── ...
 ├── templates/ (2)
 │   └── ...
-├── admin.py (3)
-├── models.py (4)
-├── tests.py (5)
-├── urls.py (6)
-└── views.py (7)
+├── api.py (3)
+├── admin.py (4)
+├── models.py (5)
+├── tests.py (6)
+├── schemas.py (7)
+├── urls.py (8)
+└── views.py (9)
 ```
 </div>
 
@@ -188,15 +187,17 @@ comme suit :
    de mettre à jour la base de données.
    cf. [Gestion des migrations](../howto/migrations.md)
 2. Dossier contenant les templates jinja utilisés par cette application.
-3. Fichier de configuration de l'interface d'administration.
+3. Fichier contenant les routes d'API liées à cette application
+4. Fichier de configuration de l'interface d'administration.
    Ce fichier permet de déclarer les modèles de l'application
    dans l'interface d'administration.
-4. Fichier contenant les modèles de l'application.
+5. Fichier contenant les modèles de l'application.
    Les modèles sont des classes Python qui représentent
    les tables de la base de données.
-5. Fichier contenant les tests de l'application.
-6. Configuration des urls de l'application.
-7. Fichier contenant les vues de l'application.
+6. Fichier contenant les tests de l'application.
+7. Schémas de validation de données utilisés principalement dans l'API.
+8. Configuration des urls de l'application.
+9. Fichier contenant les vues de l'application.
    Dans les plus grosses applications,
    ce fichier peut être remplacé par un package
    `views` dans lequel les vues sont réparties entre

@@ -104,7 +104,7 @@ class MarkdownInput(Textarea):
             "fullscreen": _("Toggle fullscreen"),
             "guide": _("Markdown guide"),
         }
-        context["markdown_api_url"] = reverse("api:api_markdown")
+        context["markdown_api_url"] = reverse("api:markdown")
         return context
 
 
