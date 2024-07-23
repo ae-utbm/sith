@@ -17,7 +17,7 @@ class PictureFilterSchema(FilterSchema):
 class PictureSchema(ModelSchema):
     class Meta:
         model = Picture
-        fields = ["id", "name", "date"]
+        fields = ["id", "name", "date", "size"]
 
     author: SimpleUserSchema = Field(validation_alias="owner")
     full_size_url: str
