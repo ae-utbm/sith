@@ -1,39 +1,9 @@
-$first-color: hsl(220, 100%, 50%);
-$second-color: hsl(48, 100%, 67%);
-$primary-color: hsl(219.9, 53.7%, 50%);
-$secondary-color: hsl(204, 64%, 44%);
-$primary-color-text: hsl(0, 0%, 100%);
-$secondary-color-text: hsla(0, 0%, 0%, 0.87);
-
-$primary-light-color: hsl(219.8, 46.4%, 64.9%);
-$primary-dark-color: hsl(203, 75%, 40%);
-
-$secondary-light-color: hsl(40, 68%, 65%);
-$secondary-dark-color: hsl(40, 68%, 35%);
-
-$primary-neutral-color: hsl(219.6, 20.8%, 50%);
-$primary-neutral-light-color: hsl(0, 0%, 94%);
-$primary-neutral-dark-color: hsl(210, 29%, 29%);
-
-$secondary-neutral-color: hsl(204, 64%, 44%);
-$secondary-neutral-light-color: hsl(0, 0%, 91%);
-$secondary-neutral-dark-color: hsl(40, 57.6%, 17%);
-
-$white-color: hsl(219.6, 20.8%, 98%);
-$black-color: hsl(0, 0%, 17%);
-
-$faceblue: hsl(221, 44%, 41%);
-$twitblue: hsl(206, 82%, 63%);
-
-$shadow-color: rgb(223, 223, 223);
-
-$background-button-color: hsl(0, 0%, 95%);
+@import "colors";
 
 /*--------------------------MEDIA QUERY HELPERS------------------------*/
 $small-devices: 576px;
 $medium-devices: 768px;
 $large-devices: 992px;
-$extra-large-devices: 1200px;
 
 /*--------------------------------GENERAL------------------------------*/
 
@@ -43,17 +13,6 @@ body {
   font-family: sans-serif;
 }
 
-button:disabled,
-button:disabled:hover {
-  color: #fff;
-  background-color: #6c757d;
-}
-
-button.active,
-button.active:hover {
-  color: #fff;
-  background-color: $secondary-color;
-}
 
 a.button,
 button,

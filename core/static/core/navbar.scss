@@ -1,5 +1,7 @@
+@import "colors";
+
 nav.navbar {
-  background-color: hsl(203, 75%, 40%);
+  background-color: $primary-dark-color;
   margin: 1em;
   color: white;
   border-radius: 0.6em;
