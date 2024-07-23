@@ -89,9 +89,12 @@ nav:
     - core:
       - reference/core/models.md
       - reference/core/views.md
+      - reference/core/schemas.md
+      - reference/core/api_permissions.md
     - counter:
       - reference/counter/models.md
       - reference/counter/views.md
+      - reference/counter/schemas.md
     - eboutic:
       - reference/eboutic/models.md
       - reference/eboutic/views.md
@@ -113,12 +116,14 @@ nav:
     - pedagogy:
       - reference/pedagogy/models.md
       - reference/pedagogy/views.md
+      - reference/pedagogy/schemas.md
     - rootplace:
       - reference/rootplace/models.md
       - reference/rootplace/views.md
     - sas:
       - reference/sas/models.md
       - reference/sas/views.md
+      - reference/sas/schemas.md
     - stock:
       - reference/stock/models.md
       - reference/stock/views.md

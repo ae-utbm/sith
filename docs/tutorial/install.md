@@ -170,7 +170,14 @@ python manage.py runserver
 !!!note
 
     Le serveur est alors accessible à l'adresse
-    [http://localhost:8000](http://localhost:8000) ou bien [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
+    [http://localhost:8000](http://localhost:8000) 
+    ou bien [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
+
+!!!tip
+
+    Vous trouverez également, à l'adresse
+    [http://localhost:8000/api/docs](http://localhost:8000/api/docs),
+    une interface swagger, avec toutes les routes de l'API.
 
 ## Générer la documentation
 

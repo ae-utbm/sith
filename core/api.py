@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.http import HttpResponse
-from ninja import Form
 from ninja_extra import ControllerBase, api_controller, route
 from ninja_extra.exceptions import PermissionDenied
 

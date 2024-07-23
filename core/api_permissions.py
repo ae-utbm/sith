@@ -4,7 +4,7 @@ Some permissions are global (like `IsInGroup` or `IsRoot`),
 and some others are per-object (like `CanView` or `CanEdit`).
 
 Examples:
-    ```python
+
     # restrict all the routes of this controller
     # to subscribed users
     @api_controller("/foo", permissions=[IsSubscriber])
@@ -44,6 +44,8 @@ from ninja_extra.permissions import BasePermission
 
 
 class IsInGroup(BasePermission):
+    """Check that the user is in the group whose primary key is given."""
+
     def __init__(self, group_pk: int):
         self._group_pk = group_pk
 
@@ -52,21 +54,33 @@ class IsInGroup(BasePermission):
 
 
 class IsRoot(BasePermission):
+    """Check that the user is root."""
+
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
         return request.user.is_root
 
 
 class IsSubscriber(BasePermission):
+    """Check that the user is currently subscribed."""
+
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
         return request.user.is_subscribed
 
 
 class IsOldSubscriber(BasePermission):
+    """Check that the user has at least one subscription in its history."""
+
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
         return request.user.was_subscribed
 
 
 class CanView(BasePermission):
+    """Check that this user has the permission to view the object of this route.
+
+    Wrap the `user.can_view(obj)` method.
+    To see an example, look at the exemple in the module docstring.
+    """
+
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
         return True
 
@@ -77,6 +91,12 @@ class CanView(BasePermission):
 
 
 class CanEdit(BasePermission):
+    """Check that this user has the permission to edit the object of this route.
+
+    Wrap the `user.can_edit(obj)` method.
+    To see an example, look at the exemple in the module docstring.
+    """
+
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
         return True
 
@@ -87,6 +107,12 @@ class CanEdit(BasePermission):
 
 
 class IsOwner(BasePermission):
+    """Check that this user owns the object of this route.
+
+    Wrap the `user.is_owner(obj)` method.
+    To see an example, look at the exemple in the module docstring.
+    """
+
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
         return True
 
