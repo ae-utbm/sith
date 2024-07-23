@@ -2,43 +2,43 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 
 {% block title %}
-{% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}
+  {% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}
 {% endblock %}
 
 {%- block additional_css -%}
-<link rel="stylesheet" href="{{ scss('counter/activity.scss') }}">
+  <link rel="stylesheet" href="{{ scss('counter/activity.scss') }}">
 {%- endblock -%}
 
 {% block content %}
-    <h3>{% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}</h3>
-        {% if counter.type == 'BAR' %}
-            <h4>{% trans %}Barmen list{% endtrans %}</h4>
-            <ul>
-                {% if counter.barmen_list | length > 0 %}
-                    {% for b in counter.barmen_list %}
-                        <li>{{ user_profile_link(b) }}</li>
-                    {% endfor %}
-                {% else %}
-                    {% trans %}There is currently no barman connected.{% endtrans %}
-                {% endif %}
-            </ul>
-        {% endif %}
+  <h3>{% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}</h3>
+  {% if counter.type == 'BAR' %}
+    <h4>{% trans %}Barmen list{% endtrans %}</h4>
+    <ul>
+      {% if counter.barmen_list | length > 0 %}
+        {% for b in counter.barmen_list %}
+          <li>{{ user_profile_link(b) }}</li>
+        {% endfor %}
+      {% else %}
+        {% trans %}There is currently no barman connected.{% endtrans %}
+      {% endif %}
+    </ul>
+  {% endif %}
 
-    <h5>{% trans %}Legend{% endtrans %}</h5>
-    <div class="activity-description">
-        <div>
-            <i class="fa fa-check" style="color: #2ecc71"></i>
-            <span>{% trans %}counter is open, there's at least one barman connected{% endtrans %}</span>
-        </div>
-        <div>
-            <i class="fa fa-question" style="color: #f39c12"></i>
-            <span>{% trans  minutes=settings.SITH_COUNTER_MINUTE_INACTIVE %}counter is open but not active, the last sale was done at least {{ minutes }} minutes ago {% endtrans %}</span>
-        </div>
-        <div>
-            <i class="fa fa-times" style="color: #eb2f06"></i>
-            <span>{% trans %}counter is not open : no one is connected{% endtrans %}</span>
-        </div>
+  <h5>{% trans %}Legend{% endtrans %}</h5>
+  <div class="activity-description">
+    <div>
+      <i class="fa fa-check" style="color: #2ecc71"></i>
+      <span>{% trans %}counter is open, there's at least one barman connected{% endtrans %}</span>
     </div>
+    <div>
+      <i class="fa fa-question" style="color: #f39c12"></i>
+      <span>{% trans  minutes=settings.SITH_COUNTER_MINUTE_INACTIVE %}counter is open but not active, the last sale was done at least {{ minutes }} minutes ago {% endtrans %}</span>
+    </div>
+    <div>
+      <i class="fa fa-times" style="color: #eb2f06"></i>
+      <span>{% trans %}counter is not open : no one is connected{% endtrans %}</span>
+    </div>
+  </div>
 {% endblock %}
 
 

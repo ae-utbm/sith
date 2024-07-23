@@ -1,19 +1,19 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Candidate{% endtrans %}
+  {% trans %}Candidate{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    {%- if (election.can_candidate(user) and election.is_candidature_active) or (user.can_edit(election) and election.is_vote_editable) %}
+  {%- if (election.can_candidate(user) and election.is_candidature_active) or (user.can_edit(election) and election.is_vote_editable) %}
     <section class="election__add-candidature">
-        <form action="{{ url('election:candidate', election_id=election.id) }}" method="post">
-            {% csrf_token %}
-            {{ form.as_p() }}
-            <p><input type="submit" value="{% trans %}Candidate{% endtrans %}" /></p>
-        </form>
+      <form action="{{ url('election:candidate', election_id=election.id) }}" method="post">
+        {% csrf_token %}
+        {{ form.as_p() }}
+        <p><input type="submit" value="{% trans %}Candidate{% endtrans %}" /></p>
+      </form>
     </section>
-    {%- else -%}
+  {%- else -%}
     {% trans %}Candidature are closed for this election{% endtrans %}
-    {%- endif %}
+  {%- endif %}
 {% endblock content %}

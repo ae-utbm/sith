@@ -3,68 +3,68 @@
 {% from 'forum/macros.jinja' import display_message, display_breadcrumb, display_search_bar %}
 
 {% block title %}
-{{ topic }}
+  {{ topic }}
 {% endblock %}
 
 {% block head %}
-{{ super() }}
-<style type="text/css" media="all">
-.topic {
-    border: solid skyblue 1px;
-    padding: 2px;
-    margin: 2px;
-}
-.forum {
-    background: lightblue;
-    padding: 2px;
-    margin: 2px;
-}
-.category {
-    background: skyblue;
-}
-</style>
+  {{ super() }}
+  <style type="text/css" media="all">
+    .topic {
+      border: solid skyblue 1px;
+      padding: 2px;
+      margin: 2px;
+    }
+    .forum {
+      background: lightblue;
+      padding: 2px;
+      margin: 2px;
+    }
+    .category {
+      background: skyblue;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
-{{ display_breadcrumb(topic.forum, topic) }}
-<h3>{{ topic.title }}</h3>
-<div id="forum">
+  {{ display_breadcrumb(topic.forum, topic) }}
+  <h3>{{ topic.title }}</h3>
+  <div id="forum">
     <p>{{ topic.description }}</p>
     <p>
-    <a class="ib button" href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a>
-    {% if user in topic.subscribed_users.all() %}
-    <a class="ib button" href="{{ url('forum:toggle_subscribe_topic', topic_id=topic.id) }}">{% trans %}Unmark as favorite{% endtrans %}</a>
-    {% else %}
-    <a class="ib button" href="{{ url('forum:toggle_subscribe_topic', topic_id=topic.id) }}">{% trans %}Mark as favorite{% endtrans %}</a>
-    {% endif %}
+      <a class="ib button" href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a>
+      {% if user in topic.subscribed_users.all() %}
+        <a class="ib button" href="{{ url('forum:toggle_subscribe_topic', topic_id=topic.id) }}">{% trans %}Unmark as favorite{% endtrans %}</a>
+      {% else %}
+        <a class="ib button" href="{{ url('forum:toggle_subscribe_topic', topic_id=topic.id) }}">{% trans %}Mark as favorite{% endtrans %}</a>
+      {% endif %}
     </p>
 
     {{ display_search_bar(request) }}
     <p style="text-align: right; background: #d8e7f3;">
-    {% for p in msgs.paginator.page_range %}
+      {% for p in msgs.paginator.page_range %}
         <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
-    {% endfor %}
+      {% endfor %}
     </p>
 
     {% for m in msgs %}
-        {% if m.id == first_unread_message_id %}
+      {% if m.id == first_unread_message_id %}
         <span id="first_unread"></span>
-        {% endif %}
-        {% if m.id >= first_unread_message_id %}
+      {% endif %}
+      {% if m.id >= first_unread_message_id %}
         {{ display_message(m, user, True) }}
-        {% else %}
+      {% else %}
         {{ display_message(m, user, False) }}
-        {% endif %}
+      {% endif %}
     {% endfor %}
 
     <p><a class="ib button" href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
 
     <p style="text-align: right; background: #d8e7f3;">
-    {% for p in msgs.paginator.page_range %}
+      {% for p in msgs.paginator.page_range %}
         <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
-    {% endfor %}
+      {% endfor %}
     </p>
-</div>
+  </div>
 {% endblock %}
 
 

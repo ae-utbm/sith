@@ -1,16 +1,16 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-<link rel="stylesheet" href="{{ scss('user/user_group.scss') }}">
+  <link rel="stylesheet" href="{{ scss('user/user_group.scss') }}">
 {%- endblock -%}
 
 {% block content %}
-<main>
+  <main>
     <h2>{% trans user_name=profile.get_full_name() %}Edit user groups for {{ user_name }}{% endtrans %}</h2>
     <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p() }}
-        <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>
+      {% csrf_token %}
+      {{ form.as_p() }}
+      <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>
     </form>
-</main>
+  </main>
 {%- endblock -%}

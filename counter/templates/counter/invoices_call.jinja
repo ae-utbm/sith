@@ -1,37 +1,37 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Invoices call{% endtrans %}
+  {% trans %}Invoices call{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans date=start_date|date("F Y") %}Invoices call for {{ date }}{% endtrans %}</h3>
-<p>{% trans %}Choose another month: {% endtrans %}</p>
-<form method="get" action="">
+  <h3>{% trans date=start_date|date("F Y") %}Invoices call for {{ date }}{% endtrans %}</h3>
+  <p>{% trans %}Choose another month: {% endtrans %}</p>
+  <form method="get" action="">
     <select name="month">
-        {% for m in months %}
+      {% for m in months %}
         <option value="{{ m|date("Y-m") }}">{{ m|date("Y-m") }}</option>
-        {% endfor %}
+      {% endfor %}
     </select>
     <input type="submit" value="{% trans %}Go{% endtrans %}" />
-</form>
-<br>
-<p>{% trans %}CB Payments{% endtrans %} : {{ sum_cb }} €</p>
-<br>
-<table>
+  </form>
+  <br>
+  <p>{% trans %}CB Payments{% endtrans %} : {{ sum_cb }} €</p>
+  <br>
+  <table>
     <thead>
-        <td>{% trans %}Club{% endtrans %}</td>
-        <td>{% trans %}Sum{% endtrans %}</td>
+      <td>{% trans %}Club{% endtrans %}</td>
+      <td>{% trans %}Sum{% endtrans %}</td>
     </thead>
     <tbody>
-    {% for i in sums %}
+      {% for i in sums %}
         <tr>
-            <td>{{ i['club__name'] }}</td>
-            <td>{{ i['selling_sum'] }} €</td>
+          <td>{{ i['club__name'] }}</td>
+          <td>{{ i['selling_sum'] }} €</td>
         </tr>
-    {% endfor %}
+      {% endfor %}
     </tbody>
-</table>
+  </table>
 {% endblock %}
 
 

@@ -8,3 +8,14 @@ repos:
         args: ["--fix", "--silent"]
       # Run the formatter.
       - id: ruff-format
+  - repo: https://github.com/rtts/djhtml
+    rev: 3.0.6
+    hooks:
+      - id: djhtml
+        name: format templates
+        entry: djhtml --tabwidth 2
+        types: ["jinja"]
+      - id: djcss
+        name: format scss files
+        entry: djcss --tabwidth 2
+        types: ["scss"]

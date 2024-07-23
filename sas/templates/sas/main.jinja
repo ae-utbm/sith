@@ -1,110 +1,110 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-    <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
+  <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
 {%- endblock -%}
 
 {% block title %}
-    {% trans %}SAS{% endtrans %}
+  {% trans %}SAS{% endtrans %}
 {% endblock %}
 
 {% set edit_mode = user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
 
 {% macro display_album(a, checkbox) %}
-    <a href="{{ url('sas:album', album_id=a.id) }}">
-        {% if a.file %}
-            {% set img = a.get_download_url() %}
-        {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
-            {% set img = a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() %}
-        {% else %}
-            {% set img = static('core/img/sas.jpg') %}
-        {% endif %}
+  <a href="{{ url('sas:album', album_id=a.id) }}">
+    {% if a.file %}
+      {% set img = a.get_download_url() %}
+    {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
+      {% set img = a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() %}
+    {% else %}
+      {% set img = static('core/img/sas.jpg') %}
+    {% endif %}
 
-        <div 
-            class="album"
-            style="background-image: url('{{ img }}');"
-        >
-            <div class="text">
-                {{ a.name }}
-            </div>
-        </div>
+    <div
+      class="album"
+      style="background-image: url('{{ img }}');"
+    >
+      <div class="text">
+        {{ a.name }}
+      </div>
+    </div>
         {# {% if edit_mode and checkbox %}
             <input type="checkbox" name="file_list" value="{{ a.id }}">
         {% endif %} #}
-    </a>
+  </a>
 {% endmacro %}
 
 {% block content %}
-    <main>
-        <h3>{% trans %}SAS{% endtrans %}</h3>
+  <main>
+    <h3>{% trans %}SAS{% endtrans %}</h3>
 
-        {% if not user.is_authenticated %}
-            <p>{% trans %}You must be logged in to see the SAS.{% endtrans %}</p>
-        {% else %}
-            <br>
-            <h4>{% trans %}Latest albums{% endtrans %}</h4>
+    {% if not user.is_authenticated %}
+      <p>{% trans %}You must be logged in to see the SAS.{% endtrans %}</p>
+    {% else %}
+      <br>
+      <h4>{% trans %}Latest albums{% endtrans %}</h4>
 
-            <div class="albums">
-                {% for a in latest %}
-                    {{ display_album(a) }}
-                {% endfor %}
-            </div>
+      <div class="albums">
+        {% for a in latest %}
+          {{ display_album(a) }}
+        {% endfor %}
+      </div>
 
-            <br>
+      <br>
 
-            {% if edit_mode %}
-                <form action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
+      {% if edit_mode %}
+        <form action="" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
 
-                    <div class="navbar">
-                        <h4>{% trans %}All categories{% endtrans %}</h4>
+          <div class="navbar">
+            <h4>{% trans %}All categories{% endtrans %}</h4>
 
                         {# <div class="toolbar">
                             <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}">
                         </div> #}
-                    </div>
+          </div>
 
-                    {% if clipboard %}
-                        <div class="clipboard">
-                            {% trans %}Clipboard: {% endtrans %}
-                            <ul>
-                                {% for f in clipboard %}
-                                <li>{{ f.get_full_path() }}</li>
-                                {% endfor %}
-                            </ul>
-                            <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}">
-                        </div>
-                    {% endif %}
-            {% else %}
-                <h4>{% trans %}All categories{% endtrans %}</h4>
-            {% endif %}
-
-            <div class="albums">
-                {% for a in categories %}
-                    {{ display_album(a, true) }}
+          {% if clipboard %}
+            <div class="clipboard">
+              {% trans %}Clipboard: {% endtrans %}
+              <ul>
+                {% for f in clipboard %}
+                  <li>{{ f.get_full_path() }}</li>
                 {% endfor %}
+              </ul>
+              <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}">
             </div>
+          {% endif %}
+      {% else %}
+        <h4>{% trans %}All categories{% endtrans %}</h4>
+      {% endif %}
 
-            {% if edit_mode %}
-                </form>
+      <div class="albums">
+        {% for a in categories %}
+          {{ display_album(a, true) }}
+        {% endfor %}
+      </div>
 
-                <br>
+      {% if edit_mode %}
+        </form>
 
-                <form class="add-files" action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
+        <br>
 
-                    <div class="inputs">
-                        <div>
-                            <label for="{{ form.album_name.name }}">{{ form.album_name.label }}</label>
-                            {{ form.album_name }}
-                        </div>
-                        <input type="submit" value="{% trans %}Create{% endtrans %}" />
-                    </div>
+        <form class="add-files" action="" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
 
-                    {{ form.non_field_errors() }}
-                    {{ form.album_name.errors }}
-                </form>
-            {% endif %}
-        {% endif %}
-    </main>
+          <div class="inputs">
+            <div>
+              <label for="{{ form.album_name.name }}">{{ form.album_name.label }}</label>
+              {{ form.album_name }}
+            </div>
+            <input type="submit" value="{% trans %}Create{% endtrans %}" />
+          </div>
+
+          {{ form.non_field_errors() }}
+          {{ form.album_name.errors }}
+        </form>
+      {% endif %}
+    {% endif %}
+  </main>
 {% endblock %}

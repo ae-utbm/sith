@@ -2,35 +2,35 @@
 {% from 'forum/macros.jinja' import display_topic %}
 
 {% block title %}
-{% trans %}Last unread messages{% endtrans %}
+  {% trans %}Last unread messages{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<p>
+  <p>
     <a href="{{ url('forum:main') }}">Forum</a> >
     <a href="{{ url('forum:last_unread') }}">{% trans %}Last unread messages{% endtrans %}</a>
-</p>
-<div id="forum">
+  </p>
+  <div id="forum">
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <h4>{% trans %}Last unread messages{% endtrans %}</h4>
     <p>
-        <a class="ib button" href="{{ url('forum:mark_all_as_read') }}">{% trans %}Mark all as read{% endtrans %}</a>
-        <a class="ib button" href="{{ url('forum:last_unread') }}">{% trans %}Refresh{% endtrans %}</a>
+      <a class="ib button" href="{{ url('forum:mark_all_as_read') }}">{% trans %}Mark all as read{% endtrans %}</a>
+      <a class="ib button" href="{{ url('forum:last_unread') }}">{% trans %}Refresh{% endtrans %}</a>
     </p>
     {% for t in page_obj.object_list %}
-    {% if user.can_view(t) %}
-    {{ display_topic(t, user, True) }}
-    {% endif %}
+      {% if user.can_view(t) %}
+        {{ display_topic(t, user, True) }}
+      {% endif %}
     {% endfor %}
 
     <p style="text-align: right; background: #d8e7f3;">
-    {% for p in paginator.page_range %}
+      {% for p in paginator.page_range %}
         <span class="ib" style="background: {% if p == paginator.number %}white{% endif %}; margin: 0;">
-            <a href="?page={{ p }}">{{ p }}</a>
+          <a href="?page={{ p }}">{{ p }}</a>
         </span>
-    {% endfor %}
+      {% endfor %}
     </p>
-</div>
+  </div>
 {% endblock %}
 
 

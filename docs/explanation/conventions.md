@@ -148,12 +148,14 @@ Ces règles sont automatiquement appliquées quand
 vous faites tourner Ruff, donc vous n'avez pas à trop
 vous poser de questions de ce côté-là.
 
-En ce qui concerne les autres langages utilisés
-(Jinja, SCSS, Javascript), nous n'avons pas fixé
-de convention à suivre.
-Pour SCSS et Javascript, vous pouvez utiliser
+En ce qui concerne les templates Jinja
+et les fichiers SCSS, la norme de formatage
+est celle par défaut de `djHTML`.
+
+Pour Javascript, vous pouvez utiliser
 Prettier, avec sa configuration par défaut,
-qui est plutôt bonne.
+qui est plutôt bonne,
+mais nous n'avons pas de norme établie pour le projet.
 
 ### Qualité du code
 

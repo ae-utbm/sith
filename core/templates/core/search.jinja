@@ -3,24 +3,24 @@
 {% from "core/macros.jinja" import user_link_with_pict %}
 
 {% block title %}
-    {% trans %}Search result{% endtrans %}
+  {% trans %}Search result{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <h4>{% trans %}Users{% endtrans %}</h4>
-    <ul>
+  <h4>{% trans %}Users{% endtrans %}</h4>
+  <ul>
     {% for i in result.users %}
-        <li>
+      <li>
         {{ user_link_with_pict(i) }}
-        </li>
+      </li>
     {% endfor %}
-    </ul>
-    <h4>{% trans %}Clubs{% endtrans %}</h4>
-    <ul>
+  </ul>
+  <h4>{% trans %}Clubs{% endtrans %}</h4>
+  <ul>
     {% for i in result.clubs %}
-        <li>
+      <li>
         <a href="{{ url("club:club_view", club_id=i.id) }}">{{ i }}</a>
-        </li>
+      </li>
     {% endfor %}
-    </ul>
+  </ul>
 {% endblock %}

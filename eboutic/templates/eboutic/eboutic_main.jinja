@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-    {% trans %}Eboutic{% endtrans %}
+  {% trans %}Eboutic{% endtrans %}
 {% endblock %}
 
 {% block jquery_css %}
@@ -11,120 +11,120 @@
 {% block additional_js %}
     {# This script contains the code to perform requests to manipulate the
     user basket without having to reload the page #}
-    <script src="{{ static('eboutic/js/eboutic.js') }}"></script>
-    <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
+  <script src="{{ static('eboutic/js/eboutic.js') }}"></script>
+  <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
 {% endblock %}
 
 {% block additional_css %}
-    <link rel="stylesheet" href="{{ static('eboutic/css/eboutic.css') }}">
+  <link rel="stylesheet" href="{{ static('eboutic/css/eboutic.css') }}">
 {% endblock %}
 
 {% block content %}
-    <h1 id="eboutic-title">{% trans %}Eboutic{% endtrans %}</h1>
-    <div id="eboutic" x-data="basket">
-        <div id="basket">
-            <h3>Panier</h3>
-            {% if errors %}
-                <div class="alert alert-red">
-                    <div class="alert-main">
-                        {% for error in errors %}
-                            <p style="margin: 0">{{ error }}</p>
-                        {% endfor %}
-                        {% trans %}Your basket has been cleaned accordingly to those errors.{% endtrans %}
-                    </div>
-                </div>
-            {% endif %}
-            <ul class="item-list">
-                {# Starting money #}
-                <li>
-                    <span class="item-name">
-                        <strong>{% trans %}Current account amount: {% endtrans %}</strong>
-                    </span>
-                    <span class="item-price">
-                        <strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
-                    </span>
-                </li>
-                <template x-for="item in items" :key="item.id">
-                    <li class="item-row" x-show="item.quantity > 0">
-                        <div class="item-quantity">
-                            <i class="fa fa-minus fa-xs" @click="remove(item.id)"></i>
-                            <span x-text="item.quantity"></span>
-                            <i class="fa fa-plus" @click="add(item)"></i>
-                        </div>
-                        <span class="item-name" x-text="item.name"></span>
-                        <span class="item-price" x-text="(item.unit_price * item.quantity).toFixed(2) + ' €'"></span>
-                    </li>
-                </template>
-                {# Total price #}
-                <li style="margin-top: 20px">
-                    <span class="item-name"><strong>{% trans %}Basket amount: {% endtrans %}</strong></span>
-                    <span x-text="get_total().toFixed(2) + ' €'" class="item-price"></span>
-                </li>
-            </ul>
-            <div class="catalog-buttons">
-                <button @click="clear_basket()" class="clear">
-                    <i class="fa fa-trash"></i>
-                    {% trans %}Clear{% endtrans %}
-                </button>
-                <form method="get" action="{{ url('eboutic:command') }}">
-                    {% csrf_token %}
-                    <button class="validate">
-                        <i class="fa fa-check"></i>
-                        <input type="submit" value="{% trans %}Validate{% endtrans %}"/>
-                    </button>
-                </form>
-            </div>
+  <h1 id="eboutic-title">{% trans %}Eboutic{% endtrans %}</h1>
+  <div id="eboutic" x-data="basket">
+    <div id="basket">
+      <h3>Panier</h3>
+      {% if errors %}
+        <div class="alert alert-red">
+          <div class="alert-main">
+            {% for error in errors %}
+              <p style="margin: 0">{{ error }}</p>
+            {% endfor %}
+            {% trans %}Your basket has been cleaned accordingly to those errors.{% endtrans %}
+          </div>
         </div>
-        <div id="catalog">
-            {% if not request.user.date_of_birth %}
-                <div class="alert alert-red" x-data="{show_alert: true}" x-show="show_alert" x-transition>
-                    <span class="alert-main">
-                        {% trans %}You have not filled in your date of birth. As a result, you may not have access to all the products in the online shop. To fill in your date of birth, you can go to{% endtrans %}
-                        <a href="{{ url("core:user_edit", user_id=request.user.id) }}">
-                            {% trans %}this page{% endtrans %}
-                        </a>
-                    </span>
-                    <span class="clickable" @click="show_alert = false">
-                        <i class="fa fa-close"></i>
-                    </span>
-                </div>
-            {% endif %}
+      {% endif %}
+      <ul class="item-list">
+                {# Starting money #}
+        <li>
+          <span class="item-name">
+            <strong>{% trans %}Current account amount: {% endtrans %}</strong>
+          </span>
+          <span class="item-price">
+            <strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
+          </span>
+        </li>
+        <template x-for="item in items" :key="item.id">
+          <li class="item-row" x-show="item.quantity > 0">
+            <div class="item-quantity">
+              <i class="fa fa-minus fa-xs" @click="remove(item.id)"></i>
+              <span x-text="item.quantity"></span>
+              <i class="fa fa-plus" @click="add(item)"></i>
+            </div>
+            <span class="item-name" x-text="item.name"></span>
+            <span class="item-price" x-text="(item.unit_price * item.quantity).toFixed(2) + ' €'"></span>
+          </li>
+        </template>
+                {# Total price #}
+        <li style="margin-top: 20px">
+          <span class="item-name"><strong>{% trans %}Basket amount: {% endtrans %}</strong></span>
+          <span x-text="get_total().toFixed(2) + ' €'" class="item-price"></span>
+        </li>
+      </ul>
+      <div class="catalog-buttons">
+        <button @click="clear_basket()" class="clear">
+          <i class="fa fa-trash"></i>
+          {% trans %}Clear{% endtrans %}
+        </button>
+        <form method="get" action="{{ url('eboutic:command') }}">
+          {% csrf_token %}
+          <button class="validate">
+            <i class="fa fa-check"></i>
+            <input type="submit" value="{% trans %}Validate{% endtrans %}"/>
+          </button>
+        </form>
+      </div>
+    </div>
+    <div id="catalog">
+      {% if not request.user.date_of_birth %}
+        <div class="alert alert-red" x-data="{show_alert: true}" x-show="show_alert" x-transition>
+          <span class="alert-main">
+            {% trans %}You have not filled in your date of birth. As a result, you may not have access to all the products in the online shop. To fill in your date of birth, you can go to{% endtrans %}
+            <a href="{{ url("core:user_edit", user_id=request.user.id) }}">
+              {% trans %}this page{% endtrans %}
+            </a>
+          </span>
+          <span class="clickable" @click="show_alert = false">
+            <i class="fa fa-close"></i>
+          </span>
+        </div>
+      {% endif %}
 
-            {% for priority_groups in products|groupby('priority')|reverse %}
-                {% for category, items in priority_groups.list|groupby('category') %}
-                    {% if items|count > 0 %}
-                        <section>
+      {% for priority_groups in products|groupby('priority')|reverse %}
+        {% for category, items in priority_groups.list|groupby('category') %}
+          {% if items|count > 0 %}
+            <section>
                             {# I would have wholeheartedly directly used the header element instead
                             but it has already been made messy in core/style.scss #}
-                            <div class="category-header">
-                                <h3>{{ category }}</h3>
-                                {% if items[0].category_comment %}
-                                    <p><i>{{ items[0].category_comment }}</i></p>
-                                {% endif %}
-                            </div>
-                            <div class="product-group">
-                                {% for p in items %}
-                                    <button id="{{ p.id }}" class="product-button"
-                                            @click='add_from_catalog({{ p.id }}, {{ p.name|tojson }}, {{ p.selling_price }})'>
-                                        {% if p.icon %}
-                                            <img class="product-image" src="{{ p.icon.url }}"
-                                                 alt="image de {{ p.name }}">
-                                        {% else %}
-                                            <i class="fa fa-2x fa-picture-o product-image"></i>
-                                        {% endif %}
-                                        <div class="product-description">
-                                            <h4>{{ p.name }}</h4>
-                                            <p>{{ p.selling_price }} €</p>
-                                        </div>
-                                    </button>
-                                {% endfor %}
-                            </div>
-                        </section>
+              <div class="category-header">
+                <h3>{{ category }}</h3>
+                {% if items[0].category_comment %}
+                  <p><i>{{ items[0].category_comment }}</i></p>
+                {% endif %}
+              </div>
+              <div class="product-group">
+                {% for p in items %}
+                  <button id="{{ p.id }}" class="product-button"
+                          @click='add_from_catalog({{ p.id }}, {{ p.name|tojson }}, {{ p.selling_price }})'>
+                    {% if p.icon %}
+                      <img class="product-image" src="{{ p.icon.url }}"
+                           alt="image de {{ p.name }}">
+                    {% else %}
+                      <i class="fa fa-2x fa-picture-o product-image"></i>
                     {% endif %}
+                    <div class="product-description">
+                      <h4>{{ p.name }}</h4>
+                      <p>{{ p.selling_price }} €</p>
+                    </div>
+                  </button>
                 {% endfor %}
-            {% else %}
-                <p>{% trans %}There are no items available for sale{% endtrans %}</p>
-            {% endfor %}
-        </div>
+              </div>
+            </section>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <p>{% trans %}There are no items available for sale{% endtrans %}</p>
+      {% endfor %}
     </div>
+  </div>
 {% endblock %}

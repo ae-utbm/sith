@@ -1,199 +1,199 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-<link rel="stylesheet" href="{{ scss('user/user_tools.scss') }}">
+  <link rel="stylesheet" href="{{ scss('user/user_tools.scss') }}">
 {%- endblock -%}
 
 {% block title %}
-{% trans user_name=user.get_display_name() %}{{ user_name }}'s tools{% endtrans %}
+  {% trans user_name=user.get_display_name() %}{{ user_name }}'s tools{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<main>
+  <main>
     <h3>{% trans %}User Tools{% endtrans %}</h3>
 
     <div class="container">
-        {% if user.can_create_subscription or user.is_root or user.is_board_member %}
-            <div>
-                <h4>{% trans %}Sith management{% endtrans %}</h4>
-                <ul>
-                    {% if user.is_root %}
-                    <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
-                    <li><a href="{{ url('rootplace:merge') }}">{% trans %}Merge users{% endtrans %}</a></li>
-                    <li><a href="{{ url('rootplace:operation_logs') }}">{% trans %}Operation logs{% endtrans %}</a></li>
-                    <li><a href="{{ url('rootplace:delete_forum_messages') }}">{% trans %}Delete user's forum messages{% endtrans %}</a></li>
-                    {% endif %}
-                    {% if user.can_create_subscription or user.is_root %}
-                    <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
-                    {% endif %}
-                    {% if user.is_board_member or user.is_root %}
-                    <li><a href="{{ url('subscription:stats') }}">{% trans %}Subscription stats{% endtrans %}</a></li>
-                    <li><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        {% endif %}
-
-        {% set is_admin_on_a_counter = false %}
-        {% for b in settings.SITH_COUNTER_BARS if user.is_in_group(name=b[1] + " admin") %}
-            {% set is_admin_on_a_counter = true %}
-        {% endfor %}
-
-        {% if
-            is_admin_on_a_counter
-            or user.is_root
-            or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
-        %}
-            <div>
-                <h4>{% trans %}Counters{% endtrans %}</h4>
-                <ul>
-                    {% if user.is_root
-                       or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
-                    %}
-                        <li><a href="{{ url('counter:admin_list') }}">{% trans %}General counters management{% endtrans %}</a></li>
-                        <li><a href="{{ url('counter:product_list') }}">{% trans %}Products management{% endtrans %}</a></li>
-                        <li><a href="{{ url('counter:producttype_list') }}">{% trans %}Product types management{% endtrans %}</a></li>
-                        <li><a href="{{ url('counter:cash_summary_list') }}">{% trans %}Cash register summaries{% endtrans %}</a></li>
-                        <li><a href="{{ url('counter:invoices_call') }}">{% trans %}Invoices call{% endtrans %}</a></li>
-                        <li><a href="{{ url('counter:eticket_list') }}">{% trans %}Etickets{% endtrans %}</a></li>
-                    {% endif %}
-                </ul>
-                <ul>
-                    {% for b in settings.SITH_COUNTER_BARS %}
-                        {% if user.is_in_group(name=b[1]+" admin") %}
-                            {% set c = Counter.objects.filter(id=b[0]).first() %}
-
-                            <li class="rows counter">
-                                <a href="{{ url('counter:details', counter_id=b[0]) }}">{{ b[1] }}</a>
-
-                                <span>
-                                    <span>
-                                        <a class="button" href="{{ url('counter:admin', counter_id=b[0]) }}">{% trans %}Edit{% endtrans %}</a>
-                                        <a class="button" href="{{ url('counter:stats', counter_id=b[0]) }}">{% trans %}Stats{% endtrans %}</a>
-                                        {% if c.stock %}
-                                        <a class="button" href="{{ url('stock:items_list', stock_id=c.stock.id)}}">Stock</a>
-                                        {% endif %}
-                                    </span>
-                                    {% if c.stock %}
-                                        <a class="button" href="{{ url('stock:shoppinglist_list', stock_id=c.stock.id)}}">{% trans %}Shopping lists{% endtrans %}</a>
-                                    {% else %}
-                                        <a class="button" href="{{url('stock:new', counter_id=c.id)}}">{% trans %}Create new stock{% endtrans%}</a>
-                                    {% endif %}
-                                </span>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
-        {% if
-            user.is_root
-            or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-            or user.memberships.ongoing().filter(role__gte=7).count() > 10
-        %}
-            <div>
-                <h4>{% trans %}Accounting{% endtrans %}</h4>
-                <ul>
-                    {% if user.is_root
-                       or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-                    %}
-                        <li><a href="{{ url('accounting:refound_account') }}">{% trans %}Refound Account{% endtrans %}</a></li>
-                        <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
-                        <li><a href="{{ url('accounting:co_list') }}">{% trans %}Company list{% endtrans %}</a></li>
-                    {% endif %}
-
-                    {% for m in user.memberships.filter(end_date=None).filter(role__gte=7).all() -%}
-                        {%- for b in m.club.bank_accounts.all() %}
-                            <li class="rows">
-                                <strong>{% trans %}Bank account: {% endtrans %}</strong>
-                                <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b }}</a>
-                            </li>
-                        {%- endfor %}
-
-                        {% if m.club.club_account.exists() -%}
-                            {% for ca in m.club.club_account.all() %}
-                                <li class="rows">
-                                    <strong>{% trans %}Club account: {% endtrans %}</strong>
-                                    <a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca }}</a>
-                                </li>
-                            {%- endfor %}
-                        {%- endif -%}
-                    {%- endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
-        {% if
-            user.is_root
-            or user.is_com_admin
-            or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
-        %}
-            <div>
-                <h4>{% trans %}Communication{% endtrans %}</h4>
-                <ul>
-                    {% if user.is_com_admin or user.is_root %}
-                        <li><a href="{{ url('com:weekmail_article') }}">{% trans %}Create weekmail article{% endtrans %}</a></li>
-                        <li><a href="{{ url('com:weekmail') }}">{% trans %}Weekmail{% endtrans %}</a></li>
-                        <li><a href="{{ url('com:weekmail_destinations') }}">{% trans %}Weekmail destinations{% endtrans %}</a></li>
-                        <li><a href="{{ url('com:news_new') }}">{% trans %}Create news{% endtrans %}</a></li>
-                        <li><a href="{{ url('com:news_admin_list') }}">{% trans %}Moderate news{% endtrans %}</a></li>
-                        <li><a href="{{ url('com:alert_edit') }}">{% trans %}Edit alert message{% endtrans %}</a></li>
-                        <li><a href="{{ url('com:info_edit') }}">{% trans %}Edit information message{% endtrans %}</a></li>
-                        <li><a href="{{ url('core:file_moderation') }}">{% trans %}Moderate files{% endtrans %}</a></li>
-                        <li><a href="{{ url('com:mailing_admin') }}">{% trans %}Mailing lists administration{% endtrans %}</a></li>
-                        <li><a href="{{ url('com:poster_list') }}">{% trans %}Posters{% endtrans %}</a></li>
-                        <li><a href="{{ url('com:screen_list') }}">{% trans %}Screens{% endtrans %}</a></li>
-                    {% endif %}
-                    {% if user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
-                        <li><a href="{{ url('sas:moderation') }}">{% trans %}Moderate pictures{% endtrans %}</a></li>
-                    {% endif %}
-                </ul>
-            </div>
-        {% endif %}
-
-        {% if user.memberships.filter(end_date=None).all().count() > 0 %}
-            <div>
-                <h4>{% trans %}Club tools{% endtrans %}</h4>
-                <ul>
-                    {% for m in user.memberships.filter(end_date=None).all() %}
-                    <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
-        {% if
-            user.is_root
-            or user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
-        %}
-            <div>
-                <h4>{% trans %}Pedagogy{% endtrans %}</h4>
-                <ul>
-                    <li><a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a></li>
-                    <li><a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a></li>
-                </ul>
-            </div>
-        {% endif %}
-
+      {% if user.can_create_subscription or user.is_root or user.is_board_member %}
         <div>
-            <h4>{% trans %}Elections{% endtrans %}</h4>
-            <ul>
-                <li><a href="{{ url('election:list') }}">{% trans %}See available elections{% endtrans %}</a></li>
-                <li><a href="{{ url('election:list_archived') }}">{% trans %}See archived elections{% endtrans %}</a></li>
-                {%- if user.is_subscribed -%}
-                    <li><a href="{{ url('election:create') }}">{% trans %}Create a new election{% endtrans %}</a></li>
-                {%- endif -%}
-            </ul>
+          <h4>{% trans %}Sith management{% endtrans %}</h4>
+          <ul>
+            {% if user.is_root %}
+              <li><a href="{{ url('core:group_list') }}">{% trans %}Groups{% endtrans %}</a></li>
+              <li><a href="{{ url('rootplace:merge') }}">{% trans %}Merge users{% endtrans %}</a></li>
+              <li><a href="{{ url('rootplace:operation_logs') }}">{% trans %}Operation logs{% endtrans %}</a></li>
+              <li><a href="{{ url('rootplace:delete_forum_messages') }}">{% trans %}Delete user's forum messages{% endtrans %}</a></li>
+            {% endif %}
+            {% if user.can_create_subscription or user.is_root %}
+              <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
+            {% endif %}
+            {% if user.is_board_member or user.is_root %}
+              <li><a href="{{ url('subscription:stats') }}">{% trans %}Subscription stats{% endtrans %}</a></li>
+              <li><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></li>
+            {% endif %}
+          </ul>
         </div>
+      {% endif %}
 
-        <div>
-            <h4>{% trans %}Other tools{% endtrans %}</h4>
-            <ul>
-                <li><a href="{{ url('core:to_markdown') }}">{% trans %}Convert dokuwiki/BBcode syntax to Markdown{% endtrans %}</a></li>
-                <li><a href="{{ url('trombi:user_tools') }}">{% trans %}Trombi tools{% endtrans %}</a></li>
-            </ul>
-        </div>
-    </div>
+      {% set is_admin_on_a_counter = false %}
+      {% for b in settings.SITH_COUNTER_BARS if user.is_in_group(name=b[1] + " admin") %}
+        {% set is_admin_on_a_counter = true %}
+      {% endfor %}
+
+      {% if
+      is_admin_on_a_counter
+      or user.is_root
+      or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
+      %}
+      <div>
+        <h4>{% trans %}Counters{% endtrans %}</h4>
+        <ul>
+          {% if user.is_root
+          or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
+          %}
+          <li><a href="{{ url('counter:admin_list') }}">{% trans %}General counters management{% endtrans %}</a></li>
+          <li><a href="{{ url('counter:product_list') }}">{% trans %}Products management{% endtrans %}</a></li>
+          <li><a href="{{ url('counter:producttype_list') }}">{% trans %}Product types management{% endtrans %}</a></li>
+          <li><a href="{{ url('counter:cash_summary_list') }}">{% trans %}Cash register summaries{% endtrans %}</a></li>
+          <li><a href="{{ url('counter:invoices_call') }}">{% trans %}Invoices call{% endtrans %}</a></li>
+          <li><a href="{{ url('counter:eticket_list') }}">{% trans %}Etickets{% endtrans %}</a></li>
+{% endif %}
+</ul>
+<ul>
+  {% for b in settings.SITH_COUNTER_BARS %}
+    {% if user.is_in_group(name=b[1]+" admin") %}
+      {% set c = Counter.objects.filter(id=b[0]).first() %}
+
+      <li class="rows counter">
+        <a href="{{ url('counter:details', counter_id=b[0]) }}">{{ b[1] }}</a>
+
+        <span>
+          <span>
+            <a class="button" href="{{ url('counter:admin', counter_id=b[0]) }}">{% trans %}Edit{% endtrans %}</a>
+            <a class="button" href="{{ url('counter:stats', counter_id=b[0]) }}">{% trans %}Stats{% endtrans %}</a>
+            {% if c.stock %}
+              <a class="button" href="{{ url('stock:items_list', stock_id=c.stock.id)}}">Stock</a>
+            {% endif %}
+          </span>
+          {% if c.stock %}
+            <a class="button" href="{{ url('stock:shoppinglist_list', stock_id=c.stock.id)}}">{% trans %}Shopping lists{% endtrans %}</a>
+          {% else %}
+            <a class="button" href="{{url('stock:new', counter_id=c.id)}}">{% trans %}Create new stock{% endtrans%}</a>
+          {% endif %}
+        </span>
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+</div>
+{% endif %}
+
+{% if
+user.is_root
+or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+or user.memberships.ongoing().filter(role__gte=7).count() > 10
+%}
+<div>
+  <h4>{% trans %}Accounting{% endtrans %}</h4>
+  <ul>
+    {% if user.is_root
+    or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+    %}
+    <li><a href="{{ url('accounting:refound_account') }}">{% trans %}Refound Account{% endtrans %}</a></li>
+    <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
+    <li><a href="{{ url('accounting:co_list') }}">{% trans %}Company list{% endtrans %}</a></li>
+    {% endif %}
+
+    {% for m in user.memberships.filter(end_date=None).filter(role__gte=7).all() -%}
+      {%- for b in m.club.bank_accounts.all() %}
+        <li class="rows">
+          <strong>{% trans %}Bank account: {% endtrans %}</strong>
+          <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b }}</a>
+        </li>
+      {%- endfor %}
+
+      {% if m.club.club_account.exists() -%}
+        {% for ca in m.club.club_account.all() %}
+          <li class="rows">
+            <strong>{% trans %}Club account: {% endtrans %}</strong>
+            <a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca }}</a>
+          </li>
+        {%- endfor %}
+      {%- endif -%}
+    {%- endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if
+user.is_root
+or user.is_com_admin
+or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+%}
+<div>
+  <h4>{% trans %}Communication{% endtrans %}</h4>
+  <ul>
+    {% if user.is_com_admin or user.is_root %}
+      <li><a href="{{ url('com:weekmail_article') }}">{% trans %}Create weekmail article{% endtrans %}</a></li>
+      <li><a href="{{ url('com:weekmail') }}">{% trans %}Weekmail{% endtrans %}</a></li>
+      <li><a href="{{ url('com:weekmail_destinations') }}">{% trans %}Weekmail destinations{% endtrans %}</a></li>
+      <li><a href="{{ url('com:news_new') }}">{% trans %}Create news{% endtrans %}</a></li>
+      <li><a href="{{ url('com:news_admin_list') }}">{% trans %}Moderate news{% endtrans %}</a></li>
+      <li><a href="{{ url('com:alert_edit') }}">{% trans %}Edit alert message{% endtrans %}</a></li>
+      <li><a href="{{ url('com:info_edit') }}">{% trans %}Edit information message{% endtrans %}</a></li>
+      <li><a href="{{ url('core:file_moderation') }}">{% trans %}Moderate files{% endtrans %}</a></li>
+      <li><a href="{{ url('com:mailing_admin') }}">{% trans %}Mailing lists administration{% endtrans %}</a></li>
+      <li><a href="{{ url('com:poster_list') }}">{% trans %}Posters{% endtrans %}</a></li>
+      <li><a href="{{ url('com:screen_list') }}">{% trans %}Screens{% endtrans %}</a></li>
+    {% endif %}
+    {% if user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
+      <li><a href="{{ url('sas:moderation') }}">{% trans %}Moderate pictures{% endtrans %}</a></li>
+    {% endif %}
+  </ul>
+</div>
+{% endif %}
+
+{% if user.memberships.filter(end_date=None).all().count() > 0 %}
+  <div>
+    <h4>{% trans %}Club tools{% endtrans %}</h4>
+    <ul>
+      {% for m in user.memberships.filter(end_date=None).all() %}
+        <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if
+user.is_root
+or user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+%}
+<div>
+  <h4>{% trans %}Pedagogy{% endtrans %}</h4>
+  <ul>
+    <li><a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a></li>
+    <li><a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a></li>
+  </ul>
+</div>
+{% endif %}
+
+<div>
+  <h4>{% trans %}Elections{% endtrans %}</h4>
+  <ul>
+    <li><a href="{{ url('election:list') }}">{% trans %}See available elections{% endtrans %}</a></li>
+    <li><a href="{{ url('election:list_archived') }}">{% trans %}See archived elections{% endtrans %}</a></li>
+    {%- if user.is_subscribed -%}
+      <li><a href="{{ url('election:create') }}">{% trans %}Create a new election{% endtrans %}</a></li>
+    {%- endif -%}
+  </ul>
+</div>
+
+<div>
+  <h4>{% trans %}Other tools{% endtrans %}</h4>
+  <ul>
+    <li><a href="{{ url('core:to_markdown') }}">{% trans %}Convert dokuwiki/BBcode syntax to Markdown{% endtrans %}</a></li>
+    <li><a href="{{ url('trombi:user_tools') }}">{% trans %}Trombi tools{% endtrans %}</a></li>
+  </ul>
+</div>
+</div>
 </main>
 {% endblock %}

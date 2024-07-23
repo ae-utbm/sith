@@ -42,6 +42,7 @@
       </form>
       <h6>{% trans %}Registered cards{% endtrans %}</h6>
       {% if student_cards %}
+
         <ul>
           {% for card in student_cards %}
             <li>{{ card.uid }}</li>

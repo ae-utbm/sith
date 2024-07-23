@@ -2,65 +2,65 @@
 {% from 'core/macros.jinja' import user_profile_link, paginate %}
 
 {% block content %}
-<h3>{% trans %}Sales{% endtrans %}</h3>
-<form id="form" action="?page=1" method="post">
+  <h3>{% trans %}Sales{% endtrans %}</h3>
+  <form id="form" action="?page=1" method="post">
     {% csrf_token %}
     {{ form }}
     <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>
     <p><input type="submit" value="{% trans %}Download as cvs{% endtrans %}" formaction="{{ url('club:sellings_csv', club_id=object.id) }}"/></p>
-</form>
-<p>
-{% trans %}Quantity: {% endtrans %}{{ total_quantity }} {% trans %}units{% endtrans %}<br/>
-{% trans %}Total: {% endtrans %}{{ total }} €<br/>
-{% trans %}Benefit: {% endtrans %}{{ benefit }} €
-</p>
-<table>
+  </form>
+  <p>
+    {% trans %}Quantity: {% endtrans %}{{ total_quantity }} {% trans %}units{% endtrans %}<br/>
+    {% trans %}Total: {% endtrans %}{{ total }} €<br/>
+    {% trans %}Benefit: {% endtrans %}{{ benefit }} €
+  </p>
+  <table>
     <thead>
-        <tr>
-            <td>{% trans %}Date{% endtrans %}</td>
-            <td>{% trans %}Counter{% endtrans %}</td>
-            <td>{% trans %}Barman{% endtrans %}</td>
-            <td>{% trans %}Customer{% endtrans %}</td>
-            <td>{% trans %}Label{% endtrans %}</td>
-            <td>{% trans %}Quantity{% endtrans %}</td>
-            <td>{% trans %}Total{% endtrans %}</td>
-            <td>{% trans %}Payment method{% endtrans %}</td>
-        </tr>
+      <tr>
+        <td>{% trans %}Date{% endtrans %}</td>
+        <td>{% trans %}Counter{% endtrans %}</td>
+        <td>{% trans %}Barman{% endtrans %}</td>
+        <td>{% trans %}Customer{% endtrans %}</td>
+        <td>{% trans %}Label{% endtrans %}</td>
+        <td>{% trans %}Quantity{% endtrans %}</td>
+        <td>{% trans %}Total{% endtrans %}</td>
+        <td>{% trans %}Payment method{% endtrans %}</td>
+      </tr>
     </thead>
     <tbody>
-    {% for s in paginated_result %}
+      {% for s in paginated_result %}
         <tr>
-            <td>{{ s.date|localtime|date(DATETIME_FORMAT) }} {{ s.date|localtime|time(DATETIME_FORMAT) }}</td>
-            <td>{{ s.counter }}</td>
-            {% if s.seller %}
+          <td>{{ s.date|localtime|date(DATETIME_FORMAT) }} {{ s.date|localtime|time(DATETIME_FORMAT) }}</td>
+          <td>{{ s.counter }}</td>
+          {% if s.seller %}
             <td><a href="{{ s.seller.get_absolute_url() }}">{{ s.seller.get_display_name() }}</a></td>
-            {% else %}
+          {% else %}
             <td></td>
-            {% endif %}
-            {% if s.customer %}
+          {% endif %}
+          {% if s.customer %}
             <td><a href="{{ s.customer.user.get_absolute_url() }}">{{ s.customer.user.get_display_name() }}</a></td>
-            {% else %}
+          {% else %}
             <td></td>
-            {% endif %}
-            <td>{{ s.label }}</td>
-            <td>{{ s.quantity }}</td>
-            <td>{{ s.quantity * s.unit_price }} €</td>
-            <td>{{ s.get_payment_method_display() }}</td>
-            {% if s.is_owned_by(user) %}
-                <td><a href="{{ url('counter:selling_delete', selling_id=s.id) }}">{% trans %}Delete{% endtrans %}</a></td>
-            {% endif %}
+          {% endif %}
+          <td>{{ s.label }}</td>
+          <td>{{ s.quantity }}</td>
+          <td>{{ s.quantity * s.unit_price }} €</td>
+          <td>{{ s.get_payment_method_display() }}</td>
+          {% if s.is_owned_by(user) %}
+            <td><a href="{{ url('counter:selling_delete', selling_id=s.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+          {% endif %}
         </tr>
-    {% endfor %}
+      {% endfor %}
     </tbody>
-</table>
-<script type="text/javascript">
+  </table>
+  <script type="text/javascript">
     function formPagination(link){
-        $("form").attr("action", link.href);
-        link.href = "javascript:void(0)"; // block link action
-        $("form").submit();
+      $("form").attr("action", link.href);
+      link.href = "javascript:void(0)"; // block link action
+      $("form").submit();
     }
-</script>
-{{ paginate(paginated_result, paginator, "formPagination(this)") }}
+  </script>
+  {{ paginate(paginated_result, paginator, "formPagination(this)") }}
 {% endblock %}
 
 

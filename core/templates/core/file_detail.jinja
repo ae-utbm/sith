@@ -2,78 +2,78 @@
 
 
 {% block file %}
-<h3>
-{% if file.is_folder %}
-<i class="fa fa-folder fa-3x" aria-hidden="true"></i>
-{% else %}
-<i class="fa fa-file fa-3x" aria-hidden="true"></i>
-{% endif %}
-{{ file.get_display_name() }}
-</h3>
-<p>{% trans %}Owner: {% endtrans %}{{ file.owner.get_display_name() }}</p>
-{% if file.is_folder %}
-{% if user.can_edit(file) %}
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p() }}
-    <p><input type="submit" value="{% trans %}Add{% endtrans %}"></p>
-</form>
-{% endif %}
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <p>
+  <h3>
+    {% if file.is_folder %}
+      <i class="fa fa-folder fa-3x" aria-hidden="true"></i>
+    {% else %}
+      <i class="fa fa-file fa-3x" aria-hidden="true"></i>
+    {% endif %}
+    {{ file.get_display_name() }}
+  </h3>
+  <p>{% trans %}Owner: {% endtrans %}{{ file.owner.get_display_name() }}</p>
+  {% if file.is_folder %}
+    {% if user.can_edit(file) %}
+      <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p() }}
+        <p><input type="submit" value="{% trans %}Add{% endtrans %}"></p>
+      </form>
+    {% endif %}
+    <form action="" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <p>
         <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}"> |
         <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}"> |
         <input name="cut" type="submit" value="{% trans %}Cut{% endtrans %}"> |
         <input name="paste" type="submit" value="{% trans %}Paste{% endtrans %}">
-    </p>
-    {% if clipboard %}
-    <p>{% trans %}Clipboard: {% endtrans %}
-        <ul>
-        {% for f in clipboard %}
-            <li>{{ f.get_full_path() }}</li>
-        {% endfor %}
-        </ul>
-    </p>
-    {% endif %}
-    <ul>
+      </p>
+      {% if clipboard %}
+        <p>{% trans %}Clipboard: {% endtrans %}
+          <ul>
+            {% for f in clipboard %}
+              <li>{{ f.get_full_path() }}</li>
+            {% endfor %}
+          </ul>
+        </p>
+      {% endif %}
+      <ul>
         {% for f in file.children.order_by('-is_folder', 'name').all() %}
-        <li style="list-style-type: none;">
+          <li style="list-style-type: none;">
             <input type="checkbox" name="file_list" value="{{ f.id }}">
             {% if f.is_folder %}
-                <i class="fa fa-folder" aria-hidden="true"></i>
+              <i class="fa fa-folder" aria-hidden="true"></i>
             {% else %}
-                <i class="fa fa-file" aria-hidden="true"></i>
+              <i class="fa fa-file" aria-hidden="true"></i>
             {% endif %}
             <a href="{{ url('core:file_detail', file_id=f.id, popup=popup) }}">{{ f.get_display_name() }}</a></li>
         {% endfor %}
-    </ul>
-</form>
-{% else %}
-<p>{% trans %}Real name: {% endtrans %}{{ file.file.name.split('/')[-1] }}</p>
-<p>{% trans %}Date: {% endtrans %}{{ file.date|localtime|date(DATETIME_FORMAT) }} -
-{{ file.date|localtime|time(DATETIME_FORMAT) }}</p>
-<p>{% trans %}Type: {% endtrans %}{{ file.mime_type }}</p>
-<p>{% trans %}Size: {% endtrans %}{{ file.size }} {% trans %}bytes{% endtrans %}</p>
+      </ul>
+    </form>
+  {% else %}
+    <p>{% trans %}Real name: {% endtrans %}{{ file.file.name.split('/')[-1] }}</p>
+    <p>{% trans %}Date: {% endtrans %}{{ file.date|localtime|date(DATETIME_FORMAT) }} -
+      {{ file.date|localtime|time(DATETIME_FORMAT) }}</p>
+    <p>{% trans %}Type: {% endtrans %}{{ file.mime_type }}</p>
+    <p>{% trans %}Size: {% endtrans %}{{ file.size }} {% trans %}bytes{% endtrans %}</p>
 
-<p><a href="{{ url('core:download', file_id=file.id) }}">{% trans %}Download{% endtrans %}</a></p>
-{% endif %}
-{% if not file.home_of and not file.home_of_club and file.parent %}
-<p><a href="{{ url('core:file_delete', file_id=file.id, popup=popup) }}">{% trans %}Delete{% endtrans %}</a></p>
-{% endif %}
-{% if user.is_com_admin %}
-<p><a href="{{ url('core:file_moderate', file_id=file.id) }}">{% trans %}Moderate{% endtrans %}</a></p>
-{% endif %}
+    <p><a href="{{ url('core:download', file_id=file.id) }}">{% trans %}Download{% endtrans %}</a></p>
+  {% endif %}
+  {% if not file.home_of and not file.home_of_club and file.parent %}
+    <p><a href="{{ url('core:file_delete', file_id=file.id, popup=popup) }}">{% trans %}Delete{% endtrans %}</a></p>
+  {% endif %}
+  {% if user.is_com_admin %}
+    <p><a href="{{ url('core:file_moderate', file_id=file.id) }}">{% trans %}Moderate{% endtrans %}</a></p>
+  {% endif %}
 {% endblock %}
 
 {% block script %}
-{{ super() }}
-<script>
-{% if popup and file.is_file %}
-parent.$("#file_id").replaceWith('<div id="file_id" value="{{ file.id }}">{{ file.name }}</div>');
-parent.$(".ui-dialog-buttonpane button").button("option", "disabled", false);
-{% endif %}
-</script>
+  {{ super() }}
+  <script>
+    {% if popup and file.is_file %}
+      parent.$("#file_id").replaceWith('<div id="file_id" value="{{ file.id }}">{{ file.name }}</div>');
+      parent.$(".ui-dialog-buttonpane button").button("option", "disabled", false);
+    {% endif %}
+  </script>
 {% endblock %}
 
 

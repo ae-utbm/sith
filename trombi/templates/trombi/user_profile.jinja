@@ -1,62 +1,62 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans user_name=trombi_user.user.get_display_name() %}{{ user_name }}'s Trombi profile{% endtrans %}
+  {% trans user_name=trombi_user.user.get_display_name() %}{{ user_name }}'s Trombi profile{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans user_name=trombi_user.user.get_display_name() %}{{ user_name }}'s Trombi profile{% endtrans %}</h3>
-<p> <a href="{{ url('trombi:user_tools') }}">{% trans %}Back to tools{% endtrans %}</a></p>
-<div>
+  <h3>{% trans user_name=trombi_user.user.get_display_name() %}{{ user_name }}'s Trombi profile{% endtrans %}</h3>
+  <p> <a href="{{ url('trombi:user_tools') }}">{% trans %}Back to tools{% endtrans %}</a></p>
+  <div>
     <h4>{% trans %}Pictures{% endtrans %}</h4>
     {% set profile_file = None %}
     {% set scrub_file = None %}
     {% if trombi_user.profile_pict %}
-        {% set profile_file = trombi_user.profile_pict.url %}
+      {% set profile_file = trombi_user.profile_pict.url %}
     {% else %}
-        {% set profile_file = static('core/img/na.gif') %}
+      {% set profile_file = static('core/img/na.gif') %}
     {% endif %}
     {% if trombi_user.scrub_pict %}
-        {% set scrub_file = trombi_user.scrub_pict.url %}
+      {% set scrub_file = trombi_user.scrub_pict.url %}
     {% else %}
-        {% set scrub_file = static('core/img/na.gif') %}
+      {% set scrub_file = static('core/img/na.gif') %}
     {% endif %}
     <div style="max-width: 410px; margin: auto; text-align: center;">
-        <div>
-            <img src="{{ profile_file }}" alt="" style="max-width: 200px">
-            <img src="{{ scrub_file }}" alt="" style="max-width: 200px">
-        </div>
-        <div>
-            <em>{{ trombi_user.user.get_short_name() }}</em>
-        </div>
+      <div>
+        <img src="{{ profile_file }}" alt="" style="max-width: 200px">
+        <img src="{{ scrub_file }}" alt="" style="max-width: 200px">
+      </div>
+      <div>
+        <em>{{ trombi_user.user.get_short_name() }}</em>
+      </div>
     </div>
     {% if trombi_user.memberships.exists() %}
-    <h4>{% trans %}Club{% endtrans %}</h4>
-    <table style="max-width: 70%; margin: auto;">
+      <h4>{% trans %}Club{% endtrans %}</h4>
+      <table style="max-width: 70%; margin: auto;">
         <thead>
-            <tr>
-                <td>{% trans %}Club{% endtrans %}</td>
-                <td>{% trans %}Role{% endtrans %}</td>
-                <td>{% trans %}Date{% endtrans %}</td>
-            </tr>
+          <tr>
+            <td>{% trans %}Club{% endtrans %}</td>
+            <td>{% trans %}Role{% endtrans %}</td>
+            <td>{% trans %}Date{% endtrans %}</td>
+          </tr>
         </thead>
         <tbody>
-            {% for m in trombi_user.memberships.all() %}
+          {% for m in trombi_user.memberships.all() %}
             <tr>
-                <td>{{ m.club }}</td>
-                <td>{{ m.role }}</td>
-                <td>{{ m.start }} - {{ m.end }}</td>
+              <td>{{ m.club }}</td>
+              <td>{{ m.role }}</td>
+              <td>{{ m.start }} - {{ m.end }}</td>
             </tr>
-            {% endfor %}
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
     {% endif %}
     <dl>
-    {% for c in trombi_user.received_comments.filter(is_moderated=True) %}
+      {% for c in trombi_user.received_comments.filter(is_moderated=True) %}
         <dt style="font-weight: bold; font-size: 110%">{{ c.author.user.get_display_name() }}</dt>
         <dd><pre>{{ c.content }}</pre></dd>
-    {% endfor %}
+      {% endfor %}
     </dl>
-</div>
+  </div>
 {% endblock %}
 

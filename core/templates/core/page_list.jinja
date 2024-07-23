@@ -1,20 +1,20 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Page list{% endtrans %}
+  {% trans %}Page list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if page_list %}
-<h3>{% trans %}Page list{% endtrans %}</h3>
-<ul>
-    {% for p in page_list %}
-    <li><a href="{{ p.get_absolute_url() }}">{{ p.get_display_name() }}</a></li>
-    {% endfor %}
-</ul>
-{% else %}
-{% trans %}There is no page in this website.{% endtrans %}
-{% endif %}
+  {% if page_list %}
+    <h3>{% trans %}Page list{% endtrans %}</h3>
+    <ul>
+      {% for p in page_list %}
+        <li><a href="{{ p.get_absolute_url() }}">{{ p.get_display_name() }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    {% trans %}There is no page in this website.{% endtrans %}
+  {% endif %}
 {% endblock %}
 
 

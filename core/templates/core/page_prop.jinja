@@ -1,18 +1,18 @@
 {% extends "core/page.jinja" %}
 
 {% block content %}
-{% if page %}
-{{ super() }}
-{% endif %}
-<h2>{% trans %}Page properties{% endtrans %}</h2>
-<form action="" method="post">
+  {% if page %}
+    {{ super() }}
+  {% endif %}
+  <h2>{% trans %}Page properties{% endtrans %}</h2>
+  <form action="" method="post">
     {% csrf_token %}
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
-</form>
-{% if page %}
-<a href="{{ url('core:page_delete', page_id=page.id)}}">{% trans %}Delete{% endtrans %}</a>
-{% endif %}
+  </form>
+  {% if page %}
+    <a href="{{ url('core:page_delete', page_id=page.id)}}">{% trans %}Delete{% endtrans %}</a>
+  {% endif %}
 {% endblock %}
 
 

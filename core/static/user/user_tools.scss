@@ -35,7 +35,7 @@ main {
         > span {
           margin-top: 5px;
         }
-      
+
         > span > span,
         > span {
           display: flex;
@@ -43,7 +43,7 @@ main {
           flex-wrap: wrap;
           gap: 5px;
           width: 100%;
-      
+
           >.button {
             font-size: smaller;
             width: 100%;

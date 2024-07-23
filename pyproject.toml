@@ -60,6 +60,7 @@ django-debug-toolbar = "^4.0.0"
 ipython = "^8.26.0"
 pre-commit = "^3.7.1"
 ruff = "^0.5.1" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
+djhtml = "^3.0.6"
 
 # deps used for testing purposes
 [tool.poetry.group.tests.dependencies]
