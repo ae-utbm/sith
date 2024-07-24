@@ -51,29 +51,31 @@
             if (today.getMonth() < 7) {  // student year starts in september
                 year--
             }
-            const url = "{{ url('api:uv_endpoint') }}?year=" + year + "&code=" + codeInput.value
+            const url = `/api/uv/${year}/${codeInput.value}`;
             deleteQuickNotifs()
 
             $.ajax({
                 dataType: "json",
                 url: url,
                 success: function(data, _, xhr) {
-                    if (xhr.status != 200) {
+                    if (xhr.status !== 200) {
                         createQuickNotif("{% trans %}Unknown UE code{% endtrans %}")
                         return
                     }
-                    for (let key in data) {
-                        if (data.hasOwnProperty(key)) {
-                            const el = document.querySelector('[name="' + key + '"]')
-                            if (el.tagName == 'TEXTAREA') {
-                                el.parentNode.querySelector('.CodeMirror').CodeMirror.setValue(data[key])
+                    Object.entries(data)
+                        .filter(([_, val]) => !!val)  // skip entries with null or undefined value
+                        .map(([key, val]) => {  // convert keys to DOM elements
+                            return [document.querySelector('[name="' + key + '"]'), val];
+                        })
+                        .filter(([elem, _]) => !!elem)  // skip non-existing DOM elements
+                        .forEach(([elem, val]) => {  // write the value in the form field
+                            if (elem.tagName === 'TEXTAREA') {
+                                // MD editor text input
+                                elem.parentNode.querySelector('.CodeMirror').CodeMirror.setValue(val);
                             } else {
-                                el.value = data[key]
+                                elem.value = val;
                             }
-
-                        }
-                    }
-
+                        });
                     createQuickNotif('{% trans %}Successful autocomplete{% endtrans %}')
                 },
                 error: function(_, _, statusMessage) {

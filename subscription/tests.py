@@ -57,7 +57,7 @@ def test_subscription_compute_start_explicit(start_date, duration, expected_star
         (date(2020, 9, 18), 1, date(2021, 3, 18)),
         (date(2020, 9, 18), 2, date(2021, 9, 18)),
         (date(2020, 9, 18), 3, date(2022, 2, 15)),
-        (date(2020, 5, 17), 4, date(2022, 8, 15)),
+        (date(2020, 5, 17), 4, date(2022, 2, 15)),
         (date(2020, 9, 18), 0.33, date(2020, 11, 18)),
         (date(2020, 9, 18), 0.67, date(2021, 1, 19)),
         (date(2020, 9, 18), 0.5, date(2020, 12, 18)),
@@ -75,11 +75,11 @@ def test_subscription_compute_end_from_today(today, duration, expected_end):
         (date(2020, 9, 18), 4, date(2022, 9, 18)),
     ],
 )
-def test_subscription_compute_end_from_today(start_date, duration, expected_end):
+def test_subscription_compute_end(start_date, duration, expected_end):
     assert Subscription.compute_end(duration, start_date) == expected_end
 
 
-class SubscriptionIntegrationTest(TestCase):
+class TestSubscriptionIntegration(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.get(username="public")

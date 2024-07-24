@@ -23,9 +23,9 @@
 from __future__ import annotations
 
 from datetime import datetime
+from datetime import timezone as tz
 from itertools import chain
 
-import pytz
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -48,8 +48,7 @@ def get_default_view_group():
 
 
 class Forum(models.Model):
-    """
-    The Forum class, made as a tree to allow nice tidy organization
+    """The Forum class, made as a tree to allow nice tidy organization.
 
     owner_club allows club members to moderate there own topics
     edit_groups allows to put any group as a forum admin
@@ -157,7 +156,7 @@ class Forum(models.Model):
             c.apply_rights_recursively()
 
     def copy_rights(self):
-        """Copy, if possible, the rights of the parent folder"""
+        """Copy, if possible, the rights of the parent folder."""
         if self.parent is not None:
             self.owner_club = self.parent.owner_club
             self.edit_groups.set(self.parent.edit_groups.all())
@@ -187,7 +186,7 @@ class Forum(models.Model):
         return False
 
     def check_loop(self):
-        """Raise a validation error when a loop is found within the parent list"""
+        """Raise a validation error when a loop is found within the parent list."""
         objs = []
         cur = self
         while cur.parent is not None:
@@ -299,9 +298,7 @@ class ForumTopic(models.Model):
 
 
 class ForumMessage(models.Model):
-    """
-    "A ForumMessage object represents a message in the forum" -- Cpt. Obvious
-    """
+    """A message in the forum (thx Cpt. Obvious.)."""
 
     topic = models.ForeignKey(
         ForumTopic, related_name="messages", on_delete=models.CASCADE
@@ -390,6 +387,8 @@ class ForumMessage(models.Model):
         )
 
     def is_deleted(self):
+        if self._state.adding:
+            return False
         meta = self.metas.exclude(action="EDIT").order_by("-date").first()
         if meta:
             return meta.action == "DELETE"
@@ -423,7 +422,8 @@ class ForumMessageMeta(models.Model):
 
 
 class ForumUserInfo(models.Model):
-    """
+    """The forum infos of a user.
+
     This currently stores only the last date a user clicked "Mark all as read".
     However, this can be extended with lot of user preferences dedicated to a
     user, such as the favourite topics, the signature, and so on...
@@ -435,7 +435,7 @@ class ForumUserInfo(models.Model):
     last_read_date = models.DateTimeField(
         _("last read date"),
         default=datetime(
-            year=settings.SITH_SCHOOL_START_YEAR, month=1, day=1, tzinfo=pytz.UTC
+            year=settings.SITH_SCHOOL_START_YEAR, month=1, day=1, tzinfo=tz.utc
         ),
     )
 

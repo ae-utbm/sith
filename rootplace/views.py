@@ -38,8 +38,8 @@ from forum.models import ForumMessageMeta
 
 
 def __merge_subscriptions(u1: User, u2: User):
-    """
-    Give all the subscriptions of the second user to first one
+    """Give all the subscriptions of the second user to first one.
+
     If some subscriptions are still active, update their end date
     to increase the overall subscription time of the first user.
 
@@ -87,8 +87,8 @@ def __merge_pictures(u1: User, u2: User) -> None:
 
 
 def merge_users(u1: User, u2: User) -> User:
-    """
-    Merge u2 into u1
+    """Merge u2 into u1.
+
     This means that u1 shall receive everything that belonged to u2 :
 
         - pictures
@@ -134,11 +134,12 @@ def merge_users(u1: User, u2: User) -> User:
 
 
 def delete_all_forum_user_messages(user, moderator, *, verbose=False):
-    """
-    Create a ForumMessageMeta that says a forum
-        message is deleted on every forum message of an user
-    user: the user to delete messages from
-    moderator: the one marked as the moderator
+    """Soft delete all messages of a user.
+
+    Args:
+        user: the user to delete messages from
+        moderator: the one marked as the moderator.
+        verbose: it True, print the deleted messages
     """
     for message in user.forum_messages.all():
         if message.is_deleted():
@@ -184,10 +185,10 @@ class MergeUsersView(FormView):
 
 
 class DeleteAllForumUserMessagesView(FormView):
-    """
-    Delete all forum messages from an user
+    """Delete all forum messages from an user.
+
     Messages are soft deleted and are still visible from admins
-    GUI frontend to the dedicated command
+    GUI frontend to the dedicated command.
     """
 
     template_name = "rootplace/delete_user_messages.jinja"
@@ -209,9 +210,7 @@ class DeleteAllForumUserMessagesView(FormView):
 
 
 class OperationLogListView(ListView, CanEditPropMixin):
-    """
-    List all logs
-    """
+    """List all logs."""
 
     model = OperationLog
     template_name = "rootplace/logs.jinja"

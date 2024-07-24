@@ -175,18 +175,14 @@ class ClubTabsMixin(TabedViewMixin):
 
 
 class ClubListView(ListView):
-    """
-    List the Clubs
-    """
+    """List the Clubs."""
 
     model = Club
     template_name = "club/club_list.jinja"
 
 
 class ClubView(ClubTabsMixin, DetailView):
-    """
-    Front page of a Club
-    """
+    """Front page of a Club."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -201,9 +197,7 @@ class ClubView(ClubTabsMixin, DetailView):
 
 
 class ClubRevView(ClubView):
-    """
-    Display a specific page revision
-    """
+    """Display a specific page revision."""
 
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -235,9 +229,7 @@ class ClubPageEditView(ClubTabsMixin, PageEditViewBase):
 
 
 class ClubPageHistView(ClubTabsMixin, CanViewMixin, DetailView):
-    """
-    Modification hostory of the page
-    """
+    """Modification hostory of the page."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -246,9 +238,7 @@ class ClubPageHistView(ClubTabsMixin, CanViewMixin, DetailView):
 
 
 class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
-    """
-    Tools page of a Club
-    """
+    """Tools page of a Club."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -257,9 +247,7 @@ class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
 
 
 class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
-    """
-    View of a club's members
-    """
+    """View of a club's members."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -280,9 +268,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
         return kwargs
 
     def form_valid(self, form):
-        """
-        Check user rights
-        """
+        """Check user rights."""
         resp = super().form_valid(form)
 
         data = form.clean()
@@ -307,9 +293,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
 
 
 class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
-    """
-    Old members of a club
-    """
+    """Old members of a club."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -318,9 +302,7 @@ class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
 
 
 class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
-    """
-    Sellings of a club
-    """
+    """Sellings of a club."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -396,12 +378,10 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
 
 class ClubSellingCSVView(ClubSellingView):
-    """
-    Generate sellings in csv for a given period
-    """
+    """Generate sellings in csv for a given period."""
 
     class StreamWriter:
-        """Implements a file-like interface for streaming the CSV"""
+        """Implements a file-like interface for streaming the CSV."""
 
         def write(self, value):
             """Write the value by returning it, instead of storing in a buffer."""
@@ -475,9 +455,7 @@ class ClubSellingCSVView(ClubSellingView):
 
 
 class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
-    """
-    Edit a Club's main informations (for the club's members)
-    """
+    """Edit a Club's main informations (for the club's members)."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -487,9 +465,7 @@ class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
 
 
 class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
-    """
-    Edit the properties of a Club object (for the Sith admins)
-    """
+    """Edit the properties of a Club object (for the Sith admins)."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -499,9 +475,7 @@ class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
 
 
 class ClubCreateView(CanCreateMixin, CreateView):
-    """
-    Create a club (for the Sith admin)
-    """
+    """Create a club (for the Sith admin)."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -510,9 +484,7 @@ class ClubCreateView(CanCreateMixin, CreateView):
 
 
 class MembershipSetOldView(CanEditMixin, DetailView):
-    """
-    Set a membership as beeing old
-    """
+    """Set a membership as beeing old."""
 
     model = Membership
     pk_url_kwarg = "membership_id"
@@ -541,9 +513,7 @@ class MembershipSetOldView(CanEditMixin, DetailView):
 
 
 class MembershipDeleteView(UserIsRootMixin, DeleteView):
-    """
-    Delete a membership (for admins only)
-    """
+    """Delete a membership (for admins only)."""
 
     model = Membership
     pk_url_kwarg = "membership_id"
@@ -563,9 +533,7 @@ class ClubStatView(TemplateView):
 
 
 class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
-    """
-    A list of mailing for a given club
-    """
+    """A list of mailing for a given club."""
 
     model = Club
     form_class = MailingForm
@@ -603,9 +571,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         return kwargs
 
     def add_new_mailing(self, cleaned_data) -> ValidationError | None:
-        """
-        Create a new mailing list from the form
-        """
+        """Create a new mailing list from the form."""
         mailing = Mailing(
             club=self.get_object(),
             email=cleaned_data["mailing_email"],
@@ -620,9 +586,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         return None
 
     def add_new_subscription(self, cleaned_data) -> ValidationError | None:
-        """
-        Add mailing subscriptions for each user given and/or for the specified email in form
-        """
+        """Add mailing subscriptions for each user given and/or for the specified email in form."""
         users_to_save = []
 
         for user in cleaned_data["subscription_users"]:
@@ -656,9 +620,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         return None
 
     def remove_subscription(self, cleaned_data):
-        """
-        Remove specified users from a mailing list
-        """
+        """Remove specified users from a mailing list."""
         fields = [
             cleaned_data[key]
             for key in cleaned_data.keys()
@@ -742,7 +704,7 @@ class MailingAutoGenerationView(View):
 
 
 class PosterListView(ClubTabsMixin, PosterListBaseView, CanViewMixin):
-    """List communication posters"""
+    """List communication posters."""
 
     def get_object(self):
         return self.club
@@ -755,7 +717,7 @@ class PosterListView(ClubTabsMixin, PosterListBaseView, CanViewMixin):
 
 
 class PosterCreateView(PosterCreateBaseView, CanCreateMixin):
-    """Create communication poster"""
+    """Create communication poster."""
 
     pk_url_kwarg = "club_id"
 
@@ -770,7 +732,7 @@ class PosterCreateView(PosterCreateBaseView, CanCreateMixin):
 
 
 class PosterEditView(ClubTabsMixin, PosterEditBaseView, CanEditMixin):
-    """Edit communication poster"""
+    """Edit communication poster."""
 
     def get_success_url(self):
         return reverse_lazy("club:poster_list", kwargs={"club_id": self.club.id})
@@ -782,7 +744,7 @@ class PosterEditView(ClubTabsMixin, PosterEditBaseView, CanEditMixin):
 
 
 class PosterDeleteView(PosterDeleteBaseView, ClubTabsMixin, CanEditMixin):
-    """Delete communication poster"""
+    """Delete communication poster."""
 
     def get_success_url(self):
         return reverse_lazy("club:poster_list", kwargs={"club_id": self.club.id})

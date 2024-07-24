@@ -13,28 +13,13 @@
 #
 #
 
-"""sith URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.8/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
-Including another URLconf
-    1. Add an import:  from blog import urls as blog_urls
-    2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
-"""
-
 from ajax_select import urls as ajax_select_urls
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
+from ninja_extra import NinjaExtraAPI
 
 js_info_dict = {"packages": ("sith",)}
 
@@ -42,8 +27,12 @@ handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
 
+api = NinjaExtraAPI(version="0.2.0", urls_namespace="api")
+api.auto_discover_controllers()
+
 urlpatterns = [
     path("", include(("core.urls", "core"), namespace="core")),
+    path("api/", api.urls),
     path("rootplace/", include(("rootplace.urls", "rootplace"), namespace="rootplace")),
     path(
         "subscription/",
@@ -63,7 +52,6 @@ urlpatterns = [
         include(("launderette.urls", "launderette"), namespace="launderette"),
     ),
     path("sas/", include(("sas.urls", "sas"), namespace="sas")),
-    path("api/v1/", include(("api.urls", "api"), namespace="api")),
     path("election/", include(("election.urls", "election"), namespace="election")),
     path("forum/", include(("forum.urls", "forum"), namespace="forum")),
     path("galaxy/", include(("galaxy.urls", "galaxy"), namespace="galaxy")),
@@ -76,7 +64,6 @@ urlpatterns = [
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
     path("captcha/", include("captcha.urls")),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

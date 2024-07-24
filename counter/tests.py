@@ -27,7 +27,7 @@ from counter.models import BillingInfo, Counter, Customer, Permanency, Product, 
 from sith.settings import SITH_MAIN_CLUB
 
 
-class CounterTest(TestCase):
+class TestCounter(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.skia = User.objects.filter(username="skia").first()
@@ -140,10 +140,7 @@ class CounterTest(TestCase):
         assert response.status_code == 200
 
     def test_annotate_has_barman_queryset(self):
-        """
-        Test if the custom queryset method ``annotate_has_barman``
-        works as intended
-        """
+        """Test if the custom queryset method `annotate_has_barman` works as intended."""
         self.sli.counters.set([self.foyer, self.mde])
         counters = Counter.objects.annotate_has_barman(self.sli)
         for counter in counters:
@@ -153,7 +150,7 @@ class CounterTest(TestCase):
                 assert not counter.has_annotated_barman
 
 
-class CounterStatsTest(TestCase):
+class TestCounterStats(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.counter = Counter.objects.get(id=2)
@@ -265,15 +262,11 @@ class CounterStatsTest(TestCase):
         assert response.status_code == 403
 
     def test_get_total_sales(self):
-        """
-        Test the result of the Counter.get_total_sales() method
-        """
+        """Test the result of the Counter.get_total_sales() method."""
         assert self.counter.get_total_sales() == 3102
 
     def test_top_barmen(self):
-        """
-        Test the result of Counter.get_top_barmen() is correct
-        """
+        """Test the result of Counter.get_top_barmen() is correct."""
         users = [self.skia, self.root, self.sli]
         perm_times = [
             timedelta(days=16, hours=2, minutes=35, seconds=54),
@@ -292,9 +285,7 @@ class CounterStatsTest(TestCase):
         ]
 
     def test_top_customer(self):
-        """
-        Test the result of Counter.get_top_customers() is correct
-        """
+        """Test the result of Counter.get_top_customers() is correct."""
         users = [self.sli, self.skia, self.krophil, self.root]
         sale_amounts = [2000, 1000, 100, 2]
         assert list(self.counter.get_top_customers()) == [
@@ -309,7 +300,7 @@ class CounterStatsTest(TestCase):
         ]
 
 
-class BillingInfoTest(TestCase):
+class TestBillingInfo(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.payload_1 = {
@@ -537,7 +528,7 @@ class BillingInfoTest(TestCase):
         assert infos.country == "FR"
 
 
-class BarmanConnectionTest(TestCase):
+class TestBarmanConnection(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.krophil = User.objects.get(username="krophil")
@@ -587,10 +578,9 @@ class BarmanConnectionTest(TestCase):
         assert not '<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response.content)
 
 
-class StudentCardTest(TestCase):
-    """
-    Tests for adding and deleting Stundent Cards
-    Test that an user can be found with it's student card
+class TestStudentCard(TestCase):
+    """Tests for adding and deleting Stundent Cards
+    Test that an user can be found with it's student card.
     """
 
     @classmethod
@@ -893,7 +883,7 @@ class StudentCardTest(TestCase):
         assert response.status_code == 403
 
 
-class CustomerAccountIdTest(TestCase):
+class TestCustomerAccountId(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user_a = User.objects.create(

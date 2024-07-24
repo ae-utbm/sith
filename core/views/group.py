@@ -13,9 +13,7 @@
 #
 #
 
-"""
-This module contains views to manage Groups
-"""
+"""Views to manage Groups."""
 
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
@@ -31,9 +29,7 @@ from core.views import CanCreateMixin, CanEditMixin, DetailFormView
 
 
 class EditMembersForm(forms.Form):
-    """
-    Add and remove members from a Group
-    """
+    """Add and remove members from a Group."""
 
     def __init__(self, *args, **kwargs):
         self.current_users = kwargs.pop("users", [])
@@ -53,9 +49,7 @@ class EditMembersForm(forms.Form):
     )
 
     def clean_users_added(self):
-        """
-        Check that the user is not trying to add an user already in the group
-        """
+        """Check that the user is not trying to add an user already in the group."""
         cleaned_data = super().clean()
         users_added = cleaned_data.get("users_added", None)
         if not users_added:
@@ -77,9 +71,7 @@ class EditMembersForm(forms.Form):
 
 
 class GroupListView(CanEditMixin, ListView):
-    """
-    Displays the Group list
-    """
+    """Displays the Group list."""
 
     model = RealGroup
     ordering = ["name"]
@@ -87,9 +79,7 @@ class GroupListView(CanEditMixin, ListView):
 
 
 class GroupEditView(CanEditMixin, UpdateView):
-    """
-    Edit infos of a Group
-    """
+    """Edit infos of a Group."""
 
     model = RealGroup
     pk_url_kwarg = "group_id"
@@ -98,9 +88,7 @@ class GroupEditView(CanEditMixin, UpdateView):
 
 
 class GroupCreateView(CanCreateMixin, CreateView):
-    """
-    Add a new Group
-    """
+    """Add a new Group."""
 
     model = RealGroup
     template_name = "core/create.jinja"
@@ -108,9 +96,8 @@ class GroupCreateView(CanCreateMixin, CreateView):
 
 
 class GroupTemplateView(CanEditMixin, DetailFormView):
-    """
-    Display all users in a given Group
-    Allow adding and removing users from it
+    """Display all users in a given Group
+    Allow adding and removing users from it.
     """
 
     model = RealGroup
@@ -143,9 +130,7 @@ class GroupTemplateView(CanEditMixin, DetailFormView):
 
 
 class GroupDeleteView(CanEditMixin, DeleteView):
-    """
-    Delete a Group
-    """
+    """Delete a Group."""
 
     model = RealGroup
     pk_url_kwarg = "group_id"

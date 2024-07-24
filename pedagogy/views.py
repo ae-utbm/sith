@@ -22,21 +22,17 @@
 #
 
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
-from django.utils import html
 from django.views.generic import (
     CreateView,
     DeleteView,
     FormView,
-    ListView,
+    TemplateView,
     UpdateView,
-    View,
 )
-from haystack.query import SearchQuerySet
-from rest_framework.renderers import JSONRenderer
 
 from core.models import Notification, RealGroup
 from core.views import (
@@ -44,6 +40,7 @@ from core.views import (
     CanEditPropMixin,
     CanViewMixin,
     DetailFormView,
+    FormerSubscriberMixin,
 )
 from pedagogy.forms import (
     UVCommentForm,
@@ -51,39 +48,15 @@ from pedagogy.forms import (
     UVCommentReportForm,
     UVForm,
 )
-from pedagogy.models import UV, UVComment, UVCommentReport, UVSerializer
-
-# Some mixins
-
-
-class CanCreateUVFunctionMixin(View):
-    """
-    Add the function can_create_uv(user) into the template
-    """
-
-    @staticmethod
-    def can_create_uv(user):
-        """
-        Creates a dummy instance of UV and test is_owner
-        """
-        return user.is_owner(UV())
-
-    def get_context_data(self, **kwargs):
-        """
-        Pass the function to the template
-        """
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["can_create_uv"] = self.can_create_uv
-        return kwargs
-
+from pedagogy.models import UV, UVComment, UVCommentReport
 
 # Acutal views
 
 
-class UVDetailFormView(CanViewMixin, CanCreateUVFunctionMixin, DetailFormView):
-    """
-    Dispaly every comment of an UV and detailed infos about it
-    Allow to comment the UV
+class UVDetailFormView(CanViewMixin, DetailFormView):
+    """Display every comment of an UV and detailed infos about it.
+
+    Allow to comment the UV.
     """
 
     model = UV
@@ -107,11 +80,18 @@ class UVDetailFormView(CanViewMixin, CanCreateUVFunctionMixin, DetailFormView):
             "pedagogy:uv_detail", kwargs={"uv_id": self.get_object().id}
         )
 
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        return super().get_context_data(**kwargs) | {
+            "can_create_uv": (
+                user.is_root
+                or user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
+            )
+        }
+
 
 class UVCommentUpdateView(CanEditPropMixin, UpdateView):
-    """
-    Allow edit of a given comment
-    """
+    """Allow edit of a given comment."""
 
     model = UVComment
     form_class = UVCommentForm
@@ -132,9 +112,7 @@ class UVCommentUpdateView(CanEditPropMixin, UpdateView):
 
 
 class UVCommentDeleteView(CanEditPropMixin, DeleteView):
-    """
-    Allow delete of a given comment
-    """
+    """Allow delete of a given comment."""
 
     model = UVComment
     pk_url_kwarg = "comment_id"
@@ -144,73 +122,23 @@ class UVCommentDeleteView(CanEditPropMixin, DeleteView):
         return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.uv.id})
 
 
-class UVListView(CanViewMixin, CanCreateUVFunctionMixin, ListView):
-    """
-    UV guide main page
-    """
+class UVGuideView(LoginRequiredMixin, FormerSubscriberMixin, TemplateView):
+    """UV guide main page."""
 
-    # This is very basic and is prone to changment
-
-    model = UV
-    ordering = ["code"]
     template_name = "pedagogy/guide.jinja"
 
-    def get(self, *args, **kwargs):
-        if not self.request.GET.get("json", None):
-            # Return normal full template response
-            return super().get(*args, **kwargs)
-
-        # Return serialized response
-        return HttpResponse(
-            JSONRenderer().render(UVSerializer(self.get_queryset(), many=True).data),
-            content_type="application/json",
-        )
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        search = self.request.GET.get("search", None)
-
-        additional_filters = {}
-
-        for filter_type in ["credit_type", "language", "department"]:
-            arg = self.request.GET.get(filter_type, None)
-            if arg:
-                additional_filters[filter_type] = arg
-
-        semester = self.request.GET.get("semester", None)
-        if semester:
-            if semester in ["AUTUMN", "SPRING"]:
-                additional_filters["semester__in"] = [semester, "AUTUMN_AND_SPRING"]
-            else:
-                additional_filters["semester"] = semester
-
-        queryset = queryset.filter(**additional_filters)
-        if not search:
-            return queryset
-
-        if len(search) == 1:
-            # It's a search with only one letter
-            # Haystack doesn't work well with only one letter
-            return queryset.filter(code__istartswith=search)
-
-        try:
-            qs = (
-                SearchQuerySet()
-                .models(self.model)
-                .autocomplete(auto=html.escape(search))
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        return super().get_context_data(**kwargs) | {
+            "can_create_uv": (
+                user.is_root
+                or user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
             )
-        except TypeError:
-            return self.model.objects.none()
-
-        return queryset.filter(
-            id__in=([o.object.id for o in qs if o.object is not None])
-        )
+        }
 
 
 class UVCommentReportCreateView(CanCreateMixin, CreateView):
-    """
-    Create a new report for an inapropriate comment
-    """
+    """Create a new report for an inapropriate comment."""
 
     model = UVCommentReport
     form_class = UVCommentReportForm
@@ -253,9 +181,7 @@ class UVCommentReportCreateView(CanCreateMixin, CreateView):
 
 
 class UVModerationFormView(FormView):
-    """
-    Moderation interface (Privileged)
-    """
+    """Moderation interface (Privileged)."""
 
     form_class = UVCommentModerationForm
     template_name = "pedagogy/moderation.jinja"
@@ -286,9 +212,7 @@ class UVModerationFormView(FormView):
 
 
 class UVCreateView(CanCreateMixin, CreateView):
-    """
-    Add a new UV (Privileged)
-    """
+    """Add a new UV (Privileged)."""
 
     model = UV
     form_class = UVForm
@@ -304,9 +228,7 @@ class UVCreateView(CanCreateMixin, CreateView):
 
 
 class UVDeleteView(CanEditPropMixin, DeleteView):
-    """
-    Allow to delete an UV (Privileged)
-    """
+    """Allow to delete an UV (Privileged)."""
 
     model = UV
     pk_url_kwarg = "uv_id"
@@ -317,9 +239,7 @@ class UVDeleteView(CanEditPropMixin, DeleteView):
 
 
 class UVUpdateView(CanEditPropMixin, UpdateView):
-    """
-    Allow to edit an UV (Privilegied)
-    """
+    """Allow to edit an UV (Privilegied)."""
 
     model = UV
     form_class = UVForm

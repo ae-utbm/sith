@@ -21,11 +21,10 @@
 
 
 class PaymentResultConverter:
-    """
-    Converter used for url mapping of the ``eboutic.views.payment_result``
-    view.
+    """Converter used for url mapping of the `eboutic.views.payment_result` view.
+
     It's meant to build an url that can match
-    either ``/eboutic/pay/success/`` or ``/eboutic/pay/failure/``
+    either `/eboutic/pay/success/` or `/eboutic/pay/failure/`
     but nothing else.
     """
 

@@ -383,7 +383,7 @@ Welcome to the wiki page!
             # Adding syntax help page
             p = Page(name="Aide_sur_la_syntaxe")
             p.save(force_lock=True)
-            with open(root_path / "doc" / "SYNTAX.md", "r") as rm:
+            with open(root_path / "core" / "fixtures" / "SYNTAX.md", "r") as rm:
                 PageRev(
                     page=p, title="Aide sur la syntaxe", author=skia, content=rm.read()
                 ).save()

@@ -31,9 +31,7 @@ from counter.models import Counter, ProductType
 
 
 class Stock(models.Model):
-    """
-    The Stock class, this one is used to know how many products are left for a specific counter
-    """
+    """The Stock class, this one is used to know how many products are left for a specific counter."""
 
     name = models.CharField(_("name"), max_length=64)
     counter = models.OneToOneField(
@@ -54,9 +52,7 @@ class Stock(models.Model):
 
 
 class StockItem(models.Model):
-    """
-    The StockItem class, element of the stock
-    """
+    """The StockItem class, element of the stock."""
 
     name = models.CharField(_("name"), max_length=64)
     unit_quantity = models.IntegerField(
@@ -95,9 +91,7 @@ class StockItem(models.Model):
 
 
 class ShoppingList(models.Model):
-    """
-    The ShoppingList class, used to make an history of the shopping lists
-    """
+    """The ShoppingList class, used to make an history of the shopping lists."""
 
     date = models.DateTimeField(_("date"))
     name = models.CharField(_("name"), max_length=64)
@@ -118,7 +112,7 @@ class ShoppingList(models.Model):
 
 
 class ShoppingListItem(models.Model):
-    """"""
+    """An Item on a shopping list."""
 
     shopping_lists = models.ManyToManyField(
         ShoppingList,

@@ -29,9 +29,7 @@ from pedagogy.models import UV
 
 
 class IndexSignalProcessor(signals.BaseSignalProcessor):
-    """
-    Auto update index on CRUD operations
-    """
+    """Auto update index on CRUD operations."""
 
     def setup(self):
         # Listen only to the ``UV`` model.
@@ -45,9 +43,7 @@ class IndexSignalProcessor(signals.BaseSignalProcessor):
 
 
 class UVIndex(indexes.SearchIndex, indexes.Indexable):
-    """
-    Indexer class for UVs
-    """
+    """Indexer class for UVs."""
 
     text = BigCharFieldIndex(document=True, use_template=True)
     auto = indexes.EdgeNgramField(use_template=True)

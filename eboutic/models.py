@@ -12,10 +12,10 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from __future__ import annotations
+
 import hmac
-import typing
 from datetime import datetime
-from typing import List
 
 from dict2xml import dict2xml
 from django.conf import settings
@@ -29,7 +29,7 @@ from core.models import User
 from counter.models import BillingInfo, Counter, Customer, Product, Refilling, Selling
 
 
-def get_eboutic_products(user: User) -> List[Product]:
+def get_eboutic_products(user: User) -> list[Product]:
     products = (
         Counter.objects.get(type="EBOUTIC")
         .products.filter(product_type__isnull=False)
@@ -43,9 +43,7 @@ def get_eboutic_products(user: User) -> List[Product]:
 
 
 class Basket(models.Model):
-    """
-    Basket is built when the user connects to an eboutic page
-    """
+    """Basket is built when the user connects to an eboutic page."""
 
     user = models.ForeignKey(
         User,
@@ -60,8 +58,7 @@ class Basket(models.Model):
         return f"{self.user}'s basket ({self.items.all().count()} items)"
 
     def add_product(self, p: Product, q: int = 1):
-        """
-        Given p an object of the Product model and q an integer,
+        """Given p an object of the Product model and q an integer,
         add q items corresponding to this Product from the basket.
 
         If this function is called with a product not in the basket, no error will be raised
@@ -81,8 +78,7 @@ class Basket(models.Model):
             item.save()
 
     def del_product(self, p: Product, q: int = 1):
-        """
-        Given p an object of the Product model and q an integer,
+        """Given p an object of the Product model and q an integer
         remove q items corresponding to this Product from the basket.
 
         If this function is called with a product not in the basket, no error will be raised
@@ -98,9 +94,7 @@ class Basket(models.Model):
             item.save()
 
     def clear(self) -> None:
-        """
-        Remove all items from this basket without deleting the basket
-        """
+        """Remove all items from this basket without deleting the basket."""
         self.items.all().delete()
 
     @cached_property
@@ -116,11 +110,8 @@ class Basket(models.Model):
         return float(total) if total is not None else 0
 
     @classmethod
-    def from_session(cls, session) -> typing.Union["Basket", None]:
-        """
-        Given an HttpRequest django object, return the basket used in the current session
-        if it exists else None
-        """
+    def from_session(cls, session) -> Basket | None:
+        """The basket stored in the session object, if it exists."""
         if "basket_id" in session:
             try:
                 return cls.objects.get(id=session["basket_id"])
@@ -129,23 +120,22 @@ class Basket(models.Model):
         return None
 
     def generate_sales(self, counter, seller: User, payment_method: str):
-        """
-        Generate a list of sold items corresponding to the items
-        of this basket WITHOUT saving them NOR deleting the basket
+        """Generate a list of sold items corresponding to the items
+        of this basket WITHOUT saving them NOR deleting the basket.
 
         Example:
-            ::
+            ```python
+            counter = Counter.objects.get(name="Eboutic")
+            sales = basket.generate_sales(counter, "SITH_ACCOUNT")
+            # here the basket is in the same state as before the method call
 
-                counter = Counter.objects.get(name="Eboutic")
-                sales = basket.generate_sales(counter, "SITH_ACCOUNT")
-                # here the basket is in the same state as before the method call
-
-                with transaction.atomic():
-                    for sale in sales:
-                        sale.save()
-                    basket.delete()
-                    # all the basket items are deleted by the on_delete=CASCADE relation
-                    # thus only the sales remain
+            with transaction.atomic():
+                for sale in sales:
+                    sale.save()
+                basket.delete()
+                # all the basket items are deleted by the on_delete=CASCADE relation
+                # thus only the sales remain
+            ```
         """
         # I must proceed with two distinct requests instead of
         # only one with a join because the AbstractBaseItem model has been
@@ -212,9 +202,7 @@ class Basket(models.Model):
 
 
 class Invoice(models.Model):
-    """
-    Invoices are generated once the payment has been validated
-    """
+    """Invoices are generated once the payment has been validated."""
 
     user = models.ForeignKey(
         User,
@@ -297,11 +285,12 @@ class BasketItem(AbstractBaseItem):
 
     @classmethod
     def from_product(cls, product: Product, quantity: int):
-        """
-        Create a BasketItem with the same characteristics as the
-        product passed in parameters, with the specified quantity
-        WARNING : the basket field is not filled, so you must set
-        it yourself before saving the model
+        """Create a BasketItem with the same characteristics as the
+        product passed in parameters, with the specified quantity.
+
+        Warnings:
+            the basket field is not filled, so you must set
+            it yourself before saving the model.
         """
         return cls(
             product_id=product.id,

@@ -31,9 +31,7 @@ from django.core.files.storage import FileSystemStorage
 
 
 class ScssFinder(FileSystemFinder):
-    """
-    Find static *.css files compiled on the fly
-    """
+    """Find static *.css files compiled on the fly."""
 
     locations = []
 

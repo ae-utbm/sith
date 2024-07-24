@@ -24,7 +24,7 @@ from counter.models import Counter, Customer, Product, Refilling, Selling
 from subscription.models import Subscription
 
 
-class MergeUserTest(TestCase):
+class TestMergeUser(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.ae = Club.objects.get(unix_name="ae")

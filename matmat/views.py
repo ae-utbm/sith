@@ -155,9 +155,7 @@ class SearchFormListView(FormerSubscriberMixin, SingleObjectMixin, ListView):
 
 
 class SearchFormView(FormerSubscriberMixin, FormView):
-    """
-    Allows users to search inside the user list
-    """
+    """Allows users to search inside the user list."""
 
     form_class = SearchForm
 
@@ -200,9 +198,7 @@ class SearchQuickFormView(SearchFormView):
 
 
 class SearchClearFormView(FormerSubscriberMixin, View):
-    """
-    Clear SearchFormView and redirect to it
-    """
+    """Clear SearchFormView and redirect to it."""
 
     def dispatch(self, request, *args, **kwargs):
         super().dispatch(request, *args, **kwargs)

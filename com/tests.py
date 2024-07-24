@@ -45,7 +45,7 @@ def test_com_page_is_working(client, url, user_community):
     assert response.status_code == 200
 
 
-class ComTest(TestCase):
+class TestCom(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.skia = User.objects.get(username="skia")
@@ -113,12 +113,9 @@ class ComTest(TestCase):
         )
 
 
-class SithTest(TestCase):
+class TestSith(TestCase):
     def test_sith_owner(self):
-        """
-        Test that the sith instance is owned by com admins
-        and nobody else
-        """
+        """Test that the sith instance is owned by com admins and nobody else."""
         sith: Sith = Sith.objects.first()
 
         com_admin = User.objects.get(username="comunity")
@@ -131,7 +128,7 @@ class SithTest(TestCase):
         assert not sith.is_owned_by(sli)
 
 
-class NewsTest(TestCase):
+class TestNews(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.com_admin = User.objects.get(username="comunity")
@@ -148,20 +145,17 @@ class NewsTest(TestCase):
         cls.anonymous = AnonymousUser()
 
     def test_news_owner(self):
+        """Test that news are owned by com admins
+        or by their author but nobody else.
         """
-        Test that news are owned by com admins
-        or by their author but nobody else
-        """
-
         assert self.new.is_owned_by(self.com_admin)
         assert self.new.is_owned_by(self.author)
         assert not self.new.is_owned_by(self.anonymous)
         assert not self.new.is_owned_by(self.sli)
 
     def test_news_viewer(self):
-        """
-        Test that moderated news can be viewed by anyone
-        and not moderated news only by com admins
+        """Test that moderated news can be viewed by anyone
+        and not moderated news only by com admins.
         """
         # by default a news isn't moderated
         assert self.new.can_be_viewed_by(self.com_admin)
@@ -177,16 +171,14 @@ class NewsTest(TestCase):
         assert self.new.can_be_viewed_by(self.author)
 
     def test_news_editor(self):
-        """
-        Test that only com admins can edit news
-        """
+        """Test that only com admins can edit news."""
         assert self.new.can_be_edited_by(self.com_admin)
         assert not self.new.can_be_edited_by(self.sli)
         assert not self.new.can_be_edited_by(self.anonymous)
         assert not self.new.can_be_edited_by(self.author)
 
 
-class WeekmailArticleTest(TestCase):
+class TestWeekmailArticle(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.com_admin = User.objects.get(username="comunity")
@@ -203,16 +195,14 @@ class WeekmailArticleTest(TestCase):
         cls.anonymous = AnonymousUser()
 
     def test_weekmail_owner(self):
-        """
-        Test that weekmails are owned only by com admins
-        """
+        """Test that weekmails are owned only by com admins."""
         assert self.article.is_owned_by(self.com_admin)
         assert not self.article.is_owned_by(self.author)
         assert not self.article.is_owned_by(self.anonymous)
         assert not self.article.is_owned_by(self.sli)
 
 
-class PosterTest(TestCase):
+class TestPoster(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.com_admin = User.objects.get(username="comunity")
@@ -229,9 +219,7 @@ class PosterTest(TestCase):
         cls.anonymous = AnonymousUser()
 
     def test_poster_owner(self):
-        """
-        Test that poster are owned by com admins and board members in clubs
-        """
+        """Test that poster are owned by com admins and board members in clubs."""
         assert self.poster.is_owned_by(self.com_admin)
         assert not self.poster.is_owned_by(self.anonymous)
 

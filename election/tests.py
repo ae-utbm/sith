@@ -6,7 +6,7 @@ from core.models import Group, User
 from election.models import Election
 
 
-class ElectionTest(TestCase):
+class TestElection(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.election = Election.objects.first()
@@ -18,7 +18,7 @@ class ElectionTest(TestCase):
         cls.public = User.objects.get(username="public")
 
 
-class ElectionDetailTest(ElectionTest):
+class TestElectionDetail(TestElection):
     def test_permission_denied(self):
         self.election.view_groups.remove(self.public_group)
         self.client.force_login(self.public)
@@ -36,7 +36,7 @@ class ElectionDetailTest(ElectionTest):
         assert "La roue tourne" in str(response.content)
 
 
-class ElectionUpdateView(ElectionTest):
+class TestElectionUpdateView(TestElection):
     def test_permission_denied(self):
         self.client.force_login(self.subscriber)
         response = self.client.get(

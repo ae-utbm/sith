@@ -5,52 +5,79 @@
 {% trans %}UV Guide{% endtrans %}
 {% endblock %}
 
+{% block additional_js %}
+    <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
+{% endblock %}
+
 {% block head %}
     {{ super() }}
     <meta name="viewport" content="width=device-width, initial-scale=0.6, maximum-scale=2">
 {% endblock head %}
 
 {% block content %}
-<div class="pedagogy">
-	<form id="search_form" action="{{ url('pedagogy:guide') }}" method="get">
+{% if can_create_uv %}
+<div class="action-bar">
+    <p>
+        <a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
+    </p>
+    <p>
+        <a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a>
+    </p>
+</div>
+<br/>
+{% endif %}
+<div class="pedagogy" x-data="uv_search" x-cloak>
+	<form id="search_form">
 		<div class="search-form-container">
-			{% if can_create_uv(user) %}
-			<div class="action-bar">
-				<p>
-					<a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
-				</p>
-				<p>
-					<a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a>
-				</p>
-			</div>
-			{% endif %}
 			<div class="search-bar">
-				<input id="search_input" class="search-bar-input" type="text" name="search">
-				<button class="search-bar-button">{% trans %}Search{% endtrans %}</button>
+				<input
+                    id="search_input"
+                    class="search-bar-input"
+                    type="text"
+                    name="search"
+                    x-model.debounce.500ms="search"
+                />
 			</div>
 			<div class="radio-department">
 				<div class="radio-guide">
-					{% for (display_name, real_name) in [("EDIM", "EDIM"), ("ENERGIE", "EE"), ("IMSI", "IMSI"), ("INFO", "GI"), ("GMC", "MC"), ("HUMA", "HUMA"), ("TC", "TC")] %}
-						<input type="radio" name="department" id="radio{{ real_name }}" value="{{ real_name }}"><label for="radio{{ real_name }}">{% trans %}{{ display_name }}{% endtrans %}</label>
+					{% for (display_name, real_name) in [
+					    ("EDIM", "EDIM"), ("ENERGIE", "EE"), ("IMSI", "IMSI"),
+					    ("INFO", "GI"), ("GMC", "MC"), ("HUMA", "HUMA"), ("TC", "TC")
+					] %}
+						<input
+                            type="checkbox"
+                            name="department"
+                            id="radio{{ real_name }}"
+                            value="{{ real_name }}"
+                            x-model="department"
+                        />
+                        <label for="radio{{ real_name }}">{% trans %}{{ display_name }}{% endtrans %}</label>
 					{% endfor %}
 				</div>
 			</div>
 			<div class="radio-credit-type">
 				<div class="radio-guide">
 					{% for credit_type in ["CS", "TM", "EC", "QC", "OM"] %}
-						<input type="radio" name="credit_type" id="radio{{ credit_type }}" value="{{ credit_type }}"><label for="radio{{ credit_type }}">{% trans %}{{ credit_type }}{% endtrans %}</label>
+						<input
+                            type="checkbox"
+                            name="credit_type"
+                            id="radio{{ credit_type }}"
+                            value="{{ credit_type }}"
+                            x-model="credit_type"
+                        />
+                        <label for="radio{{ credit_type }}">{% trans %}{{ credit_type }}{% endtrans %}</label>
 					{% endfor %}
 				</div>
 			</div>
 
 			<div class="radio-semester">
 				<div class="radio-guide">
-					<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN"><label for="radioAUTUMN"><i class="fa fa-leaf"></i></label>
-					<input type="checkbox" name="semester" id="radioSPRING" value="SPRING"><label for="radioSPRING"><i class="fa fa-sun-o"></i></label>
-					<span><input type="checkbox" name="semester" id="radioAP" value="AUTUMN_AND_SPRING"><label for="radioAP">AP</label></span>
+					<input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN" x-model="semester"/>
+                    <label for="radioAUTUMN"><i class="fa fa-leaf"></i></label>
+					<input type="checkbox" name="semester" id="radioSPRING" value="SPRING" x-model="semester"/>
+                    <label for="radioSPRING"><i class="fa fa-sun-o"></i></label>
 				</div>
 			</div>
-			<input type="text" name="json" hidden>
 		</div>
 	</form>
 	<table id="dynamic_view">
@@ -62,185 +89,106 @@
 				<td>{% trans %}Credit type{% endtrans %}</td>
 				<td><i class="fa fa-leaf"></i></td>
 				<td><i class="fa fa-sun-o"></i></td>
-				{% if can_create_uv(user) %}
-				<td>{% trans %}Edit{% endtrans %}</td>
-				<td>{% trans %}Delete{% endtrans %}</td>
+				{% if can_create_uv %}
+                    <td>{% trans %}Edit{% endtrans %}</td>
+                    <td>{% trans %}Delete{% endtrans %}</td>
 				{% endif %}
 			</tr>
 		</thead>
 		<tbody id="dynamic_view_content">
-			{% for uv in object_list %}
-			<tr onclick="window.location.href = `{{ url('pedagogy:uv_detail', uv_id=uv.id) }}`">
-				<td><a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}">{{ uv.code }}</a></td>
-				<td>{{ uv.title }}</td>
-				<td>{{ uv.department }}</td>
-				<td>{{ uv.credit_type }}</td>
-				<td>
-					{% if uv.semester in ["AUTUMN", "AUTUMN_AND_SPRING"] %}
-						<i class="fa fa-leaf"></i>
-					{% endif %}
-				</td>
-				<td>
-					{% if uv.semester in ["SPRING", "AUTUMN_AND_SPRING"] %}
-						<i class="fa fa-sun-o"></i>
-					{% endif %}
-				</td>
-				{% if user.is_owner(uv) -%}
-				<td><a href="{{ url('pedagogy:uv_update', uv_id=uv.id) }}">{% trans %}Edit{% endtrans %}</a></td>
-				<td><a href="{{ url('pedagogy:uv_delete', uv_id=uv.id) }}">{% trans %}Delete{% endtrans %}</a></td>
-				{%- endif -%}
-			</tr>
-			{% endfor %}
+            <template x-for="uv in uvs.results" :key="uv.id">
+                <tr @click="window.location.href = `/pedagogy/uv/${uv.id}`">
+                    <td><a :href="`/pedagogy/uv/${uv.id}`" x-text="uv.code"></a></td>
+                    <td x-text="uv.title"></td>
+                    <td x-text="uv.department"></td>
+                    <td x-text="uv.credit_type"></td>
+                    <td><i :class="uv.semester.includes('AUTUMN') && 'fa fa-leaf'"></i></td>
+                    <td><i :class="uv.semester.includes('SPRING') && 'fa fa-sun-o'"></i></td>
+                    {% if can_create_uv -%}
+                        <td><a :href="`/pedagogy/uv/${uv.id}/edit`">{% trans %}Edit{% endtrans %}</a></td>
+                        <td><a :href="`/pedagogy/uv/${uv.id}/delete`">{% trans %}Delete{% endtrans %}</a></td>
+                    {%- endif -%}
+                </tr>
+            </template>
 		</tbody>
 	</table>
+    <nav id="pagination" class="hidden" :style="max_page() == 0 && 'display: none;'">
+        <button @click="page--" :disabled="page == 1">{% trans %}Previous{% endtrans %}</button>
+        <template x-for="i in max_page()">
+            <button x-text="i" @click="page = i" :class="i == page && 'active'"></button>
+        </template>
+        <button @click="page++" :disabled="page == max_page()">{% trans %}Next{% endtrans %}</button>
+    </nav>
 </div>
 <script>
-	function autofillCheckboxRadio(name){
-			if (urlParams.has(name)){ $("input[name='" + name + "']").each(function(){
-				if ($(this).attr("value") == urlParams.get(name))
-					$(this).prop("checked", true);
-			});
-		}
-	}
+    const initialUrlParams = new URLSearchParams(window.location.search);
 
-	function uvJSONToHTML(uv){
-		var autumn = "";
-		var spring = "";
-		if (uv.semester == "AUTUMN" || uv.semester == "AUTUMN_AND_SPRING")
-			autumn = "<i class='fa fa-leaf'></i>";
-		if (uv.semester == "SPRING" || uv.semester == "AUTUMN_AND_SPRING")
-			spring = "<i class='fa fa-sun-o'></i>";
-
-		var html = `
-			<tr onclick="window.location.href = '${uv.absolute_url}';">
-				<td><a href="${uv.absolute_url}">${uv.code}</a></td>
-				<td>${uv.title}</td>
-				<td>${uv.department}</td>
-				<td>${uv.credit_type}</td>
-				<td>${autumn}</td>
-				<td>${spring}</td>
-		`;
-		{% if can_create_uv(user) %}
-		html += `
-			<td><a href="${uv.update_url}">{% trans %}Edit{% endtrans %}</a></td>
-			<td><a href="${uv.delete_url}">{% trans %}Delete{% endtrans %}</a></td>
-		`;
-		{% endif %}
-		return html + "</td>";
-	}
-
-	var lastTypedLetter;
-	$("#search_input").on("keyup", function(){
-		// Auto submit when user pauses it's typing
-		clearTimeout(lastTypedLetter);
-		lastTypedLetter = setTimeout(function (){
-			$("#search_form").submit();
-		}, 300);
-	});
-	$("#search_input").on("change", function(e){
-		// Don't send request when leaving the text area
-		// It has already been send by the keypress event
-		e.preventDefault();
-	});
-
-	// Auto fill from get arguments
-	var urlParams = new URLSearchParams(window.location.search);
-	if (urlParams.has("search"))
-		$("input[name='search']").first().prop("value", urlParams.get("search"));
-	autofillCheckboxRadio("department");
-	autofillCheckboxRadio("credit_type");
-	autofillCheckboxRadio("semester");
-
-	// Allow unchecking a radio button when we click on it
-	// Keep a state of what is checked
-	var formStates = {};
-	function radioCheckToggle(e){
-		if (formStates[this.name] == this.value){
-			this.checked = false;
-			formStates[this.name] = "";
-			// Fire an update since the browser does not do it in this situation
-			$("#search_form").submit();
-			return;
-		}
-		formStates[this.name] = this.value;
-	}
-
-	$("input[type='radio']").each(function() {
-		$(this).on("click", radioCheckToggle);
-    	// Get current state
-    	if ($(this).prop("checked")){
-    		formStates[$(this).attr("name")] = $(this).attr("value");
-    	}
-    });
-
-	var autumn_and_spring = $("input[value='AUTUMN_AND_SPRING']").first();
-	var autumn = $("input[value='AUTUMN']").first();
-	var spring = $("input[value='SPRING']").first();
-
-    // Make autumn and spring hidden if js is enabled
-    autumn_and_spring.parent().hide();
-
-    // Fill json field if js is enabled
-    $("input[name='json']").first().prop("value", "true");
-
-    // Set correctly state of what is checked
-    if (autumn_and_spring.prop("checked")){
-    	autumn.prop("checked", true);
-    	spring.prop("checked", true);
-    	autumn_and_spring.prop("checked", false);
+    function update_query_string(key, value) {
+        const url = new URL(window.location.href);
+        if (!value) {
+            url.searchParams.delete(key)
+        } else if (Array.isArray(value)) {
+            url.searchParams.delete(key)
+            value.forEach((v) => url.searchParams.append(key, v))
+        } else {
+            url.searchParams.set(key, value);
+        }
+        history.pushState(null, document.title, url.toString());
     }
 
-    // Handle submit here and modify autumn and spring here
-	$("#search_form").submit(function(e) {
-		e.preventDefault();
-		if (autumn.prop("checked") && spring.prop("checked")){
-			autumn_and_spring.prop("checked", true);
-			autumn.prop("checked", false);
-			spring.prop("checked", false);
-		}
+    {#
+    How does this work :
 
-		// Do query
-		var xhr = new XMLHttpRequest();
-		$.ajax({
-			type: "GET",
-			url: "{{ url('pedagogy:guide') }}",
-			data: $(this).serialize(),
-			tryCount: 0,
-			retryLimit: 10,
-			xhr: function(){
-				 return xhr;
-			},
-			success: function(data){
-				// Update URL
-				history.pushState({}, null, xhr.responseURL.replace("&json=true", ""));
-				// Update content
-				$("#dynamic_view_content").html("");
-				for (key in data){
-					$("#dynamic_view_content").append(uvJSONToHTML(data[key]));
-				}
-			},
-			error: function(){
-				console.log(`try ${this.tryCount}`);
-				if (this.tryCount++ <= this.retryLimit){
-					$("dynamic_view_content").html("");
-					$.ajax(this);
-					return;
-				}
-				$("#dynamic_view_content").html("<tr><td></td><td>{% trans %}Error connecting to the server{% endtrans %}</td></tr>");
-			}
-		});
+    The page contains two main elements : the form and the results.
+    The form contains multiple inputs, allowing the user to apply the filter of its choice.
+    Each modification of those filters will modify the GET parameters of the URL,
+    then fetch the corresponding data from the API.
+    This data will then be displayed on the result part of the page.
+    #}
+    const page_default = 1;
+    const page_size_default = 100;
+    document.addEventListener("alpine:init", () => {
+        Alpine.data("uv_search", () => ({
+            uvs: [],
+            page: initialUrlParams.get("page") || page_default,
+            page_size: initialUrlParams.get("page_size") || page_size_default,
+            search: initialUrlParams.get("search") || "",
+            department: initialUrlParams.getAll("department"),
+            credit_type: initialUrlParams.getAll("credit_type"),
+            {# The semester is easier to use on the backend as an enum (spring/autumn/both/none)
+            and easier to use on the frontend as an array ([spring, autumn]).
+            Thus there is some conversion involved when both communicate together #}
+            semester: initialUrlParams.has("semester") ?
+                initialUrlParams.get("semester").split("_AND_") : [],
 
-		// Restore autumn and spring for perfect illusion
-		if (autumn_and_spring.prop("checked")){
-			autumn_and_spring.prop("checked", false);
-			autumn.prop("checked", true);
-			spring.prop("checked", true);
-		}
-    });
+            async init() {
+                let search_params = ["search", "department", "credit_type", "semester"];
+                let pagination_params = ["semester", "page"];
+                search_params.forEach((param) => {
+                    this.$watch(param, async () => {
+                        {# Reset pagination on search #}
+                        this.page = page_default;
+                        this.page_size = page_size_default;
+                    });
+                });
+                search_params.concat(pagination_params).forEach((param) => {
+                    this.$watch(param, async (value) => {
+                        update_query_string(param, value);
+                        await this.fetch_data();  {# reload data on form change #}
+                    });
+                });
+                await this.fetch_data();  {# load initial data #}
+            },
 
-    // Auto send on change
-    $("#search_form").on("change", function(e){
-    	$(this).submit();
-    });
+            async fetch_data() {
+                const url = "{{ url("api:fetch_uvs") }}" + window.location.search;
+                this.uvs = await (await fetch(url)).json();
+            },
+
+            max_page() {
+                return Math.round(this.uvs.count / this.page_size);
+            }
+        }))
+    })
 </script>
 {% endblock content %}

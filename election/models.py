@@ -7,9 +7,7 @@ from core.models import Group, User
 
 
 class Election(models.Model):
-    """
-    This class allows to create a new election
-    """
+    """This class allows to create a new election."""
 
     title = models.CharField(_("title"), max_length=255)
     description = models.TextField(_("description"), null=True, blank=True)
@@ -105,9 +103,7 @@ class Election(models.Model):
 
 
 class Role(OrderedModel):
-    """
-    This class allows to create a new role avaliable for a candidature
-    """
+    """This class allows to create a new role avaliable for a candidature."""
 
     election = models.ForeignKey(
         Election,
@@ -151,9 +147,7 @@ class Role(OrderedModel):
 
 
 class ElectionList(models.Model):
-    """
-    To allow per list vote
-    """
+    """To allow per list vote."""
 
     title = models.CharField(_("title"), max_length=255)
     election = models.ForeignKey(
@@ -176,9 +170,7 @@ class ElectionList(models.Model):
 
 
 class Candidature(models.Model):
-    """
-    This class is a component of responsability
-    """
+    """This class is a component of responsability."""
 
     role = models.ForeignKey(
         Role,
@@ -214,9 +206,7 @@ class Candidature(models.Model):
 
 
 class Vote(models.Model):
-    """
-    This class allows to vote for candidates
-    """
+    """This class allows to vote for candidates."""
 
     role = models.ForeignKey(
         Role, related_name="votes", verbose_name=_("role"), on_delete=models.CASCADE

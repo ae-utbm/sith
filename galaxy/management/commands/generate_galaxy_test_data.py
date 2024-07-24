@@ -118,11 +118,11 @@ class Command(BaseCommand):
             self.make_important_citizen(u)
 
     def make_clubs(self):
-        """
-        Create all the clubs (:class:`club.models.Club`)
-        and store them in `self.clubs` for fast access later.
+        """Create all the clubs (:class:`club.models.Club`).
+
+        After creation, the clubs are stored in `self.clubs` for fast access later.
         Don't create the meta groups (:class:`core.models.MetaGroup`)
-        nor the pages of the clubs (:class:`core.models.Page`)
+        nor the pages of the clubs (:class:`core.models.Page`).
         """
         self.clubs = []
         for i in range(self.NB_CLUBS):
@@ -132,8 +132,7 @@ class Command(BaseCommand):
         self.clubs = list(Club.objects.filter(unix_name__startswith="galaxy-").all())
 
     def make_users(self):
-        """
-        Create all the users and store them in `self.users` for fast access later.
+        """Create all the users and store them in `self.users` for fast access later.
 
         Also create a subscription for all the generated users.
         """
@@ -167,8 +166,7 @@ class Command(BaseCommand):
         Subscription.objects.bulk_create(subs)
 
     def make_families(self):
-        """
-        Generate the godfather/godchild relations for the users contained in :attr:`self.users`.
+        """Generate the godfather/godchild relations for the users contained in :attr:`self.users`.
 
         The :meth:`make_users` method must have been called beforehand.
 
@@ -194,8 +192,7 @@ class Command(BaseCommand):
         User.godfathers.through.objects.bulk_create(godfathers)
 
     def make_club_memberships(self):
-        """
-        Assign users to clubs and give them a role in a pseudo-random way.
+        """Assign users to clubs and give them a role in a pseudo-random way.
 
         The :meth:`make_users` and :meth:`make_clubs` methods
         must have been called beforehand.
@@ -265,8 +262,7 @@ class Command(BaseCommand):
         Membership.objects.bulk_create(memberships)
 
     def make_pictures(self):
-        """
-        Create pictures for users to be tagged on later.
+        """Create pictures for users to be tagged on later.
 
         The :meth:`make_users` method must have been called beforehand.
         """
@@ -301,11 +297,10 @@ class Command(BaseCommand):
         self.picts = list(Picture.objects.filter(name__startswith="galaxy-").all())
 
     def make_pictures_memberships(self):
-        """
-        Assign users to pictures and make enough of them for our
+        """Assign users to pictures and make enough of them for our
         created users to be eligible for promotion as citizen.
 
-        See :meth:`galaxy.models.Galaxy.rule` for details on promotion to citizen.
+        See `galaxy.models.Galaxy.rule` for details on promotion to citizen.
         """
         self.pictures_tags = []
 
@@ -363,9 +358,9 @@ class Command(BaseCommand):
         PeoplePictureRelation.objects.bulk_create(self.pictures_tags)
 
     def make_important_citizen(self, uid: int):
-        """
-        Make the user whose uid is given in parameter a more important citizen,
-        thus triggering many more connections to others (lanes)
+        """Make the user whose uid is given in parameter a more important citizen.
+
+        This will trigger many more connections to others (lanes)
         and dragging him towards the center of the Galaxy.
 
         This promotion is obtained by adding more family links
@@ -375,7 +370,8 @@ class Command(BaseCommand):
         also be tagged in more pictures, thus making them also
         more important.
 
-        :param uid: the id of the user to make more important
+        Args:
+            uid: the id of the user to make more important
         """
         u1 = self.users[uid]
         u2 = self.users[uid - 100]

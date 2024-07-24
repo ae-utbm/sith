@@ -21,23 +21,25 @@
 #
 #
 
-"""
-This page is useful for custom migration tricks.
-Sometimes, when you need to have a migration hack and you think it can be
-useful again, put it there, we never know if we might need the hack again.
+"""Collection of utils for custom migration tricks.
+
+Sometimes, when you need to have a migration hack,
+ and you think it can be useful again,
+put it there, we never know if we might need the hack again.
 """
 
 from django.db import connection, migrations
 
 
 class PsqlRunOnly(migrations.RunSQL):
-    """
-    This is an SQL runner that will launch the given command only if
-    the used DBMS is PostgreSQL.
+    """SQL runner for PostgreSQL-only queries.
+
     It may be useful to run Postgres' specific SQL, or to take actions
     that would be non-senses with backends other than Postgre, such
     as disabling particular constraints that would prevent the migration
     to run successfully.
+
+    If used on another DBMS than Postgres, it will be a noop.
 
     See `club/migrations/0010_auto_20170912_2028.py` as an example.
     Some explanations can be found here too:

@@ -25,15 +25,14 @@ from typing import Optional
 import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.http import HttpRequest
 from django.utils import timezone
 from PIL import ExifTags
 from PIL.Image import Resampling
 
 
 def get_git_revision_short_hash() -> str:
-    """
-    Return the short hash of the current commit
-    """
+    """Return the short hash of the current commit."""
     try:
         output = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
         if isinstance(output, bytes):
@@ -44,8 +43,7 @@ def get_git_revision_short_hash() -> str:
 
 
 def get_start_of_semester(today: Optional[date] = None) -> date:
-    """
-    Return the date of the start of the semester of the given date.
+    """Return the date of the start of the semester of the given date.
     If no date is given, return the start date of the current semester.
 
     The current semester is computed as follows:
@@ -54,8 +52,11 @@ def get_start_of_semester(today: Optional[date] = None) -> date:
     - If the date is between 01/01 and 15/02  => Autumn semester of the previous year.
     - If the date is between 15/02 and 15/08  => Spring semester
 
-    :param today: the date to use to compute the semester. If None, use today's date.
-    :return: the date of the start of the semester
+    Args:
+        today: the date to use to compute the semester. If None, use today's date.
+
+    Returns:
+        the date of the start of the semester
     """
     if today is None:
         today = timezone.now().date()
@@ -72,16 +73,18 @@ def get_start_of_semester(today: Optional[date] = None) -> date:
 
 
 def get_semester_code(d: Optional[date] = None) -> str:
-    """
-    Return the semester code of the given date.
+    """Return the semester code of the given date.
     If no date is given, return the semester code of the current semester.
 
     The semester code is an upper letter (A for autumn, P for spring),
     followed by the last two digits of the year.
     For example, the autumn semester of 2018 is "A18".
 
-    :param d: the date to use to compute the semester. If None, use today's date.
-    :return: the semester code corresponding to the given date
+    Args:
+        d: the date to use to compute the semester. If None, use today's date.
+
+    Returns:
+        the semester code corresponding to the given date
     """
     if d is None:
         d = timezone.now().date()
@@ -147,8 +150,15 @@ def exif_auto_rotate(image):
     return image
 
 
-def doku_to_markdown(text):
-    """This is a quite correct doku translator"""
+def doku_to_markdown(text: str) -> str:
+    """Convert doku text to the corresponding markdown.
+
+    Args:
+        text: the doku text to convert
+
+    Returns:
+        The converted markdown text
+    """
     text = re.sub(
         r"([^:]|^)\/\/(.*?)\/\/", r"*\2*", text
     )  # Italic (prevents protocol:// conflict)
@@ -235,7 +245,14 @@ def doku_to_markdown(text):
 
 
 def bbcode_to_markdown(text):
-    """This is a very basic BBcode translator"""
+    """Convert bbcode text to the corresponding markdown.
+
+    Args:
+        text: the bbcode text to convert
+
+    Returns:
+        The converted markdown text
+    """
     text = re.sub(r"\[b\](.*?)\[\/b\]", r"**\1**", text, flags=re.DOTALL)  # Bold
     text = re.sub(r"\[i\](.*?)\[\/i\]", r"*\1*", text, flags=re.DOTALL)  # Italic
     text = re.sub(r"\[u\](.*?)\[\/u\]", r"__\1__", text, flags=re.DOTALL)  # Underline
@@ -281,3 +298,16 @@ def bbcode_to_markdown(text):
             new_text.append(line)
 
     return "\n".join(new_text)
+
+
+def get_client_ip(request: HttpRequest) -> str | None:
+    headers = (
+        "X_FORWARDED_FOR",  # Common header for proixes
+        "FORWARDED",  # Standard header defined by RFC 7239.
+        "REMOTE_ADDR",  # Default IP Address (direct connection)
+    )
+    for header in headers:
+        if (ip := request.META.get(header)) is not None:
+            return ip
+
+    return None

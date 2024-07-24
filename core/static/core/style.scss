@@ -24,11 +24,6 @@ $black-color: hsl(0, 0%, 17%);
 
 $faceblue: hsl(221, 44%, 41%);
 $twitblue: hsl(206, 82%, 63%);
-$pinktober: #ff5674;
-$pinktober-secondary: #8a2536;
-$pinktober-primary-text: white;
-$pinktober-bar-closed: $pinktober-secondary;
-$pinktober-bar-opened: #388e3c;
 
 $shadow-color: rgb(223, 223, 223);
 
@@ -46,6 +41,18 @@ body {
   position: relative;
   width: 100%;
   font-family: sans-serif;
+}
+
+button:disabled,
+button:disabled:hover {
+  color: #fff;
+  background-color: #6c757d;
+}
+
+button.active,
+button.active:hover {
+  color: #fff;
+  background-color: $secondary-color;
 }
 
 a.button,
@@ -1510,6 +1517,10 @@ $pedagogy-light-blue: #caf0ff;
 $pedagogy-white-text: #f0f0f0;
 
 .pedagogy {
+  #pagination {
+    text-align: center;
+  }
+
   &.star-not-checked {
     color: #f7f7f7;
     margin-bottom: 0;

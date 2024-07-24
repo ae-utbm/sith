@@ -28,9 +28,9 @@ from core.models import AnonymousUser, User
 from sith.settings import SITH_BAR_MANAGER, SITH_MAIN_CLUB_ID
 
 
-class ClubTest(TestCase):
-    """
-    Set up data for test cases related to clubs and membership
+class TestClub(TestCase):
+    """Set up data for test cases related to clubs and membership.
+
     The generated dataset is the one created by the populate command,
     plus the following modifications :
 
@@ -92,10 +92,9 @@ class ClubTest(TestCase):
         cache.clear()
 
 
-class MembershipQuerySetTest(ClubTest):
+class TestMembershipQuerySet(TestClub):
     def test_ongoing(self):
-        """
-        Test that the ongoing queryset method returns the memberships that
+        """Test that the ongoing queryset method returns the memberships that
         are not ended.
         """
         current_members = list(self.club.members.ongoing().order_by("id"))
@@ -108,9 +107,8 @@ class MembershipQuerySetTest(ClubTest):
         assert current_members == expected
 
     def test_board(self):
-        """
-        Test that the board queryset method returns the memberships
-        of user in the club board
+        """Test that the board queryset method returns the memberships
+        of user in the club board.
         """
         board_members = list(self.club.members.board().order_by("id"))
         expected = [
@@ -123,9 +121,8 @@ class MembershipQuerySetTest(ClubTest):
         assert board_members == expected
 
     def test_ongoing_board(self):
-        """
-        Test that combining ongoing and board returns users
-        who are currently board members of the club
+        """Test that combining ongoing and board returns users
+        who are currently board members of the club.
         """
         members = list(self.club.members.ongoing().board().order_by("id"))
         expected = [
@@ -136,9 +133,7 @@ class MembershipQuerySetTest(ClubTest):
         assert members == expected
 
     def test_update_invalidate_cache(self):
-        """
-        Test that the `update` queryset method properly invalidate cache
-        """
+        """Test that the `update` queryset method properly invalidate cache."""
         mem_skia = self.skia.memberships.get(club=self.club)
         cache.set(f"membership_{mem_skia.club_id}_{mem_skia.user_id}", mem_skia)
         self.skia.memberships.update(end_date=localtime(now()).date())
@@ -157,10 +152,7 @@ class MembershipQuerySetTest(ClubTest):
         assert new_mem.role == 5
 
     def test_delete_invalidate_cache(self):
-        """
-        Test that the `delete` queryset properly invalidate cache
-        """
-
+        """Test that the `delete` queryset properly invalidate cache."""
         mem_skia = self.skia.memberships.get(club=self.club)
         mem_comptable = self.comptable.memberships.get(club=self.club)
         cache.set(f"membership_{mem_skia.club_id}_{mem_skia.user_id}", mem_skia)
@@ -178,11 +170,9 @@ class MembershipQuerySetTest(ClubTest):
             assert cached_mem == "not_member"
 
 
-class ClubModelTest(ClubTest):
+class TestClubModel(TestClub):
     def assert_membership_started_today(self, user: User, role: int):
-        """
-        Assert that the given membership is active and started today
-        """
+        """Assert that the given membership is active and started today."""
         membership = user.memberships.ongoing().filter(club=self.club).first()
         assert membership is not None
         assert localtime(now()).date() == membership.start_date
@@ -195,17 +185,14 @@ class ClubModelTest(ClubTest):
         assert user.is_in_group(name=board_group)
 
     def assert_membership_ended_today(self, user: User):
-        """
-        Assert that the given user have a membership which ended today
-        """
+        """Assert that the given user have a membership which ended today."""
         today = localtime(now()).date()
         assert user.memberships.filter(club=self.club, end_date=today).exists()
         assert self.club.get_membership_for(user) is None
 
     def test_access_unauthorized(self):
-        """
-        Test that users who never subscribed and anonymous users
-        cannot see the page
+        """Test that users who never subscribed and anonymous users
+        cannot see the page.
         """
         response = self.client.post(self.members_url)
         assert response.status_code == 403
@@ -215,8 +202,7 @@ class ClubModelTest(ClubTest):
         assert response.status_code == 403
 
     def test_display(self):
-        """
-        Test that a GET request return a page where the requested
+        """Test that a GET request return a page where the requested
         information are displayed.
         """
         self.client.force_login(self.skia)
@@ -251,9 +237,7 @@ class ClubModelTest(ClubTest):
         self.assertInHTML(expected_html, response.content.decode())
 
     def test_root_add_one_club_member(self):
-        """
-        Test that root users can add members to clubs, one at a time
-        """
+        """Test that root users can add members to clubs, one at a time."""
         self.client.force_login(self.root)
         response = self.client.post(
             self.members_url,
@@ -264,9 +248,7 @@ class ClubModelTest(ClubTest):
         self.assert_membership_started_today(self.subscriber, role=3)
 
     def test_root_add_multiple_club_member(self):
-        """
-        Test that root users can add multiple members at once to clubs
-        """
+        """Test that root users can add multiple members at once to clubs."""
         self.client.force_login(self.root)
         response = self.client.post(
             self.members_url,
@@ -281,8 +263,7 @@ class ClubModelTest(ClubTest):
         self.assert_membership_started_today(self.krophil, role=3)
 
     def test_add_unauthorized_members(self):
-        """
-        Test that users who are not currently subscribed
+        """Test that users who are not currently subscribed
         cannot be members of clubs.
         """
         self.client.force_login(self.root)
@@ -302,9 +283,8 @@ class ClubModelTest(ClubTest):
         assert '<ul class="errorlist"><li>' in response.content.decode()
 
     def test_add_members_already_members(self):
-        """
-        Test that users who are already members of a club
-        cannot be added again to this club
+        """Test that users who are already members of a club
+        cannot be added again to this club.
         """
         self.client.force_login(self.root)
         current_membership = self.skia.memberships.ongoing().get(club=self.club)
@@ -320,8 +300,7 @@ class ClubModelTest(ClubTest):
         assert self.club.get_membership_for(self.skia) == new_membership
 
     def test_add_not_existing_users(self):
-        """
-        Test that not existing users cannot be added in clubs.
+        """Test that not existing users cannot be added in clubs.
         If one user in the request is invalid, no membership creation at all
         can take place.
         """
@@ -349,9 +328,7 @@ class ClubModelTest(ClubTest):
         assert self.club.members.count() == nb_memberships
 
     def test_president_add_members(self):
-        """
-        Test that the president of the club can add members
-        """
+        """Test that the president of the club can add members."""
         president = self.club.members.get(role=10).user
         nb_club_membership = self.club.members.count()
         nb_subscriber_memberships = self.subscriber.memberships.count()
@@ -368,8 +345,7 @@ class ClubModelTest(ClubTest):
         self.assert_membership_started_today(self.subscriber, role=9)
 
     def test_add_member_greater_role(self):
-        """
-        Test that a member of the club member cannot create
+        """Test that a member of the club member cannot create
         a membership with a greater role than its own.
         """
         self.client.force_login(self.skia)
@@ -388,9 +364,7 @@ class ClubModelTest(ClubTest):
         assert not self.subscriber.memberships.filter(club=self.club).exists()
 
     def test_add_member_without_role(self):
-        """
-        Test that trying to add members without specifying their role fails
-        """
+        """Test that trying to add members without specifying their role fails."""
         self.client.force_login(self.root)
         response = self.client.post(
             self.members_url,
@@ -402,9 +376,7 @@ class ClubModelTest(ClubTest):
         )
 
     def test_end_membership_self(self):
-        """
-        Test that a member can end its own membership
-        """
+        """Test that a member can end its own membership."""
         self.client.force_login(self.skia)
         self.client.post(
             self.members_url,
@@ -414,9 +386,8 @@ class ClubModelTest(ClubTest):
         self.assert_membership_ended_today(self.skia)
 
     def test_end_membership_lower_role(self):
-        """
-        Test that board members of the club can end memberships
-        of users with lower roles
+        """Test that board members of the club can end memberships
+        of users with lower roles.
         """
         # remainder : skia has role 3, comptable has role 10, richard has role 1
         self.client.force_login(self.skia)
@@ -429,9 +400,8 @@ class ClubModelTest(ClubTest):
         self.assert_membership_ended_today(self.richard)
 
     def test_end_membership_higher_role(self):
-        """
-        Test that board members of the club cannot end memberships
-        of users with higher roles
+        """Test that board members of the club cannot end memberships
+        of users with higher roles.
         """
         membership = self.comptable.memberships.filter(club=self.club).first()
         self.client.force_login(self.skia)
@@ -448,9 +418,8 @@ class ClubModelTest(ClubTest):
         assert membership.end_date is None
 
     def test_end_membership_as_main_club_board(self):
-        """
-        Test that board members of the main club can end the membership
-        of anyone
+        """Test that board members of the main club can end the membership
+        of anyone.
         """
         # make subscriber a board member
         self.subscriber.memberships.all().delete()
@@ -467,9 +436,7 @@ class ClubModelTest(ClubTest):
         assert self.club.members.ongoing().count() == nb_memberships - 1
 
     def test_end_membership_as_root(self):
-        """
-        Test that root users can end the membership of anyone
-        """
+        """Test that root users can end the membership of anyone."""
         nb_memberships = self.club.members.count()
         self.client.force_login(self.root)
         response = self.client.post(
@@ -482,9 +449,7 @@ class ClubModelTest(ClubTest):
         assert self.club.members.count() == nb_memberships
 
     def test_end_membership_as_foreigner(self):
-        """
-        Test that users who are not in this club cannot end its memberships
-        """
+        """Test that users who are not in this club cannot end its memberships."""
         nb_memberships = self.club.members.count()
         membership = self.richard.memberships.filter(club=self.club).first()
         self.client.force_login(self.subscriber)
@@ -498,9 +463,8 @@ class ClubModelTest(ClubTest):
         assert membership == new_mem
 
     def test_delete_remove_from_meta_group(self):
-        """
-        Test that when a club is deleted, all its members are removed from the
-        associated metagroup
+        """Test that when a club is deleted, all its members are removed from the
+        associated metagroup.
         """
         memberships = self.club.members.select_related("user")
         users = [membership.user for membership in memberships]
@@ -511,9 +475,7 @@ class ClubModelTest(ClubTest):
             assert not user.is_in_group(name=meta_group)
 
     def test_add_to_meta_group(self):
-        """
-        Test that when a membership begins, the user is added to the meta group
-        """
+        """Test that when a membership begins, the user is added to the meta group."""
         group_members = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
         board_members = self.club.unix_name + settings.SITH_BOARD_SUFFIX
         assert not self.subscriber.is_in_group(name=group_members)
@@ -523,9 +485,7 @@ class ClubModelTest(ClubTest):
         assert self.subscriber.is_in_group(name=board_members)
 
     def test_remove_from_meta_group(self):
-        """
-        Test that when a membership ends, the user is removed from meta group
-        """
+        """Test that when a membership ends, the user is removed from meta group."""
         group_members = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
         board_members = self.club.unix_name + settings.SITH_BOARD_SUFFIX
         assert self.comptable.is_in_group(name=group_members)
@@ -535,9 +495,7 @@ class ClubModelTest(ClubTest):
         assert not self.comptable.is_in_group(name=board_members)
 
     def test_club_owner(self):
-        """
-        Test that a club is owned only by board members of the main club
-        """
+        """Test that a club is owned only by board members of the main club."""
         anonymous = AnonymousUser()
         assert not self.club.is_owned_by(anonymous)
         assert not self.club.is_owned_by(self.subscriber)
@@ -548,8 +506,8 @@ class ClubModelTest(ClubTest):
         assert self.club.is_owned_by(self.sli)
 
 
-class MailingFormTest(TestCase):
-    """Perform validation tests for MailingForm"""
+class TestMailingForm(TestCase):
+    """Perform validation tests for MailingForm."""
 
     @classmethod
     def setUpTestData(cls):
@@ -864,10 +822,8 @@ class MailingFormTest(TestCase):
         assert "krophil@git.an" not in content
 
 
-class ClubSellingViewTest(TestCase):
-    """
-    Perform basics tests to ensure that the page is available
-    """
+class TestClubSellingView(TestCase):
+    """Perform basics tests to ensure that the page is available."""
 
     @classmethod
     def setUpTestData(cls):
@@ -875,9 +831,7 @@ class ClubSellingViewTest(TestCase):
         cls.skia = User.objects.get(username="skia")
 
     def test_page_not_internal_error(self):
-        """
-        Test that the page does not return and internal error
-        """
+        """Test that the page does not return and internal error."""
         self.client.force_login(self.skia)
         response = self.client.get(
             reverse("club:club_sellings", kwargs={"club_id": self.ae.id})

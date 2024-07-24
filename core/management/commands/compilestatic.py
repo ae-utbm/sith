@@ -30,9 +30,7 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    """
-    Compiles scss in static folder for production
-    """
+    """Compiles scss in static folder for production."""
 
     help = "Compile scss files from static folder"
 

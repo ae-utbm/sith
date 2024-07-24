@@ -91,9 +91,9 @@ class IndexSignalProcessor(signals.BaseSignalProcessor):
 
 
 class BigCharFieldIndex(indexes.CharField):
-    """
-    Workaround to avoid xapian.InvalidArgument: Term too long (> 245)
-    See https://groups.google.com/forum/#!topic/django-haystack/hRJKcPNPXqw/discussion
+    """Workaround to avoid xapian.InvalidArgument: Term too long (> 245).
+
+    See https://groups.google.com/forum/#!topic/django-haystack/hRJKcPNPXqw/discussion.
     """
 
     def prepare(self, term):

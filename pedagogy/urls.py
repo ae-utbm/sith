@@ -27,7 +27,7 @@ from pedagogy.views import *
 
 urlpatterns = [
     # Urls displaying the actual application for visitors
-    path("", UVListView.as_view(), name="guide"),
+    path("", UVGuideView.as_view(), name="guide"),
     path("uv/<int:uv_id>/", UVDetailFormView.as_view(), name="uv_detail"),
     path(
         "comment/<int:comment_id>/edit/",

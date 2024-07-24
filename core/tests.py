@@ -65,7 +65,7 @@ class TestUserRegistration:
                 {"password2": "not the same as password1"},
                 "Les deux mots de passe ne correspondent pas.",
             ),
-            ({"email": "not-an-email"}, "Saisissez une adresse e-mail valide."),
+            ({"email": "not-an-email"}, "Saisissez une adresse de courriel valide."),
             ({"first_name": ""}, "Ce champ est obligatoire."),
             ({"last_name": ""}, "Ce champ est obligatoire."),
             ({"captcha_1": "WRONG_CAPTCHA"}, "CAPTCHA invalide"),
@@ -105,7 +105,7 @@ class TestUserRegistration:
     def test_register_fail_with_not_existing_email(
         self, client: Client, valid_payload, monkeypatch
     ):
-        """Test that, when email is valid but doesn't actually exist, registration fails"""
+        """Test that, when email is valid but doesn't actually exist, registration fails."""
 
         def always_fail(*_args, **_kwargs):
             raise SMTPException
@@ -127,10 +127,7 @@ class TestUserLogin:
         return User.objects.first()
 
     def test_login_fail(self, client, user):
-        """
-        Should not login a user correctly
-        """
-
+        """Should not login a user correctly."""
         response = client.post(
             reverse("core:login"),
             {
@@ -158,9 +155,7 @@ class TestUserLogin:
         assert response.wsgi_request.user.is_anonymous
 
     def test_login_success(self, client, user):
-        """
-        Should login a user correctly
-        """
+        """Should login a user correctly."""
         response = client.post(
             reverse("core:login"),
             {
@@ -210,19 +205,19 @@ class TestUserLogin:
     ],
 )
 def test_custom_markdown_syntax(md, html):
-    """Test the homemade markdown syntax"""
+    """Test the homemade markdown syntax."""
     assert markdown(md) == f"<p>{html}</p>\n"
 
 
 def test_full_markdown_syntax():
-    doc_path = Path(settings.BASE_DIR) / "doc"
-    md = (doc_path / "SYNTAX.md").read_text()
-    html = (doc_path / "SYNTAX.html").read_text()
+    syntax_path = Path(settings.BASE_DIR) / "core" / "fixtures"
+    md = (syntax_path / "SYNTAX.md").read_text()
+    html = (syntax_path / "SYNTAX.html").read_text()
     result = markdown(md)
     assert result == html
 
 
-class PageHandlingTest(TestCase):
+class TestPageHandling(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root = User.objects.get(username="root")
@@ -233,7 +228,6 @@ class PageHandlingTest(TestCase):
 
     def test_create_page_ok(self):
         """Should create a page correctly."""
-
         response = self.client.post(
             reverse("core:page_new"),
             {"parent": "", "name": "guy", "owner_group": self.root_group.id},
@@ -274,9 +268,7 @@ class PageHandlingTest(TestCase):
         assert '<a href="/page/guy/bibou/">' in str(response.content)
 
     def test_access_child_page_ok(self):
-        """
-        Should display a page correctly
-        """
+        """Should display a page correctly."""
         parent = Page(name="guy", owner_group=self.root_group)
         parent.save(force_lock=True)
         page = Page(name="bibou", owner_group=self.root_group, parent=parent)
@@ -289,18 +281,14 @@ class PageHandlingTest(TestCase):
         self.assertIn('<a href="/page/guy/bibou/edit/">', html)
 
     def test_access_page_not_found(self):
-        """
-        Should not display a page correctly
-        """
+        """Should not display a page correctly."""
         response = self.client.get(reverse("core:page", kwargs={"page_name": "swagg"}))
         assert response.status_code == 200
         html = response.content.decode()
         self.assertIn('<a href="/page/create/?page=swagg">', html)
 
     def test_create_page_markdown_safe(self):
-        """
-        Should format the markdown and escape html correctly
-        """
+        """Should format the markdown and escape html correctly."""
         self.client.post(
             reverse("core:page_new"), {"parent": "", "name": "guy", "owner_group": "1"}
         )
@@ -322,7 +310,6 @@ http://git.an
         )
         response = self.client.get(reverse("core:page", kwargs={"page_name": "guy"}))
         assert response.status_code == 200
-        print(response.content.decode())
         expected = """
             <p>Guy <em>bibou</em></p>
             <p><a href="http://git.an">http://git.an</a></p>
@@ -333,19 +320,58 @@ http://git.an
         assertInHTML(expected, response.content.decode())
 
 
-class UserToolsTest:
+@pytest.mark.django_db
+class TestUserTools:
     def test_anonymous_user_unauthorized(self, client):
-        """An anonymous user shouldn't have access to the tools page"""
+        """An anonymous user shouldn't have access to the tools page."""
         response = client.get(reverse("core:user_tools"))
-        assert response.status_code == 403
+        assertRedirects(
+            response,
+            expected_url=f"/login?next=%2Fuser%2Ftools%2F",
+            target_status_code=301,
+        )
 
     @pytest.mark.parametrize("username", ["guy", "root", "skia", "comunity"])
     def test_page_is_working(self, client, username):
-        """All existing users should be able to see the test page"""
+        """All existing users should be able to see the test page."""
         # Test for simple user
         client.force_login(User.objects.get(username=username))
         response = client.get(reverse("core:user_tools"))
         assert response.status_code == 200
+
+
+@pytest.mark.django_db
+class TestUserPicture:
+    def test_anonymous_user_unauthorized(self, client):
+        """An anonymous user shouldn't have access to an user's photo page."""
+        response = client.get(
+            reverse(
+                "core:user_pictures",
+                kwargs={"user_id": User.objects.get(username="sli").pk},
+            )
+        )
+        assert response.status_code == 403
+
+    @pytest.mark.parametrize(
+        ("username", "status"),
+        [
+            ("guy", 403),
+            ("root", 200),
+            ("skia", 200),
+            ("sli", 200),
+        ],
+    )
+    def test_page_is_working(self, client, username, status):
+        """Only user that subscribed (or admins) should be able to see the page."""
+        # Test for simple user
+        client.force_login(User.objects.get(username=username))
+        response = client.get(
+            reverse(
+                "core:user_pictures",
+                kwargs={"user_id": User.objects.get(username="sli").pk},
+            )
+        )
+        assert response.status_code == status
 
 
 # TODO: many tests on the pages:
@@ -354,7 +380,7 @@ class UserToolsTest:
 #   - changing the different groups of the page
 
 
-class FileHandlingTest(TestCase):
+class TestFileHandling(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.subscriber = User.objects.get(username="subscriber")
@@ -390,10 +416,9 @@ class FileHandlingTest(TestCase):
         assert "ls</a>" in str(response.content)
 
 
-class UserIsInGroupTest(TestCase):
-    """
-    Test that the User.is_in_group() and AnonymousUser.is_in_group()
-    work as intended
+class TestUserIsInGroup(TestCase):
+    """Test that the User.is_in_group() and AnonymousUser.is_in_group()
+    work as intended.
     """
 
     @classmethod
@@ -450,30 +475,24 @@ class UserIsInGroupTest(TestCase):
         assert user.is_in_group(name=meta_groups_members) is False
 
     def test_anonymous_user(self):
-        """
-        Test that anonymous users are only in the public group
-        """
+        """Test that anonymous users are only in the public group."""
         user = AnonymousUser()
         self.assert_only_in_public_group(user)
 
     def test_not_subscribed_user(self):
-        """
-        Test that users who never subscribed are only in the public group
-        """
+        """Test that users who never subscribed are only in the public group."""
         self.assert_only_in_public_group(self.toto)
 
     def test_wrong_parameter_fail(self):
-        """
-        Test that when neither the pk nor the name argument is given,
-        the function raises a ValueError
+        """Test that when neither the pk nor the name argument is given,
+        the function raises a ValueError.
         """
         with self.assertRaises(ValueError):
             self.toto.is_in_group()
 
     def test_number_queries(self):
-        """
-        Test that the number of db queries is stable
-        and that less queries are made when making a new call
+        """Test that the number of db queries is stable
+        and that less queries are made when making a new call.
         """
         # make sure Skia is in at least one group
         self.skia.groups.add(Group.objects.first().pk)
@@ -497,9 +516,8 @@ class UserIsInGroupTest(TestCase):
             self.skia.is_in_group(pk=group_not_in.id)
 
     def test_cache_properly_cleared_membership(self):
-        """
-        Test that when the membership of a user end,
-        the cache is properly invalidated
+        """Test that when the membership of a user end,
+        the cache is properly invalidated.
         """
         membership = Membership.objects.create(
             club=self.club, user=self.toto, end_date=None
@@ -515,9 +533,8 @@ class UserIsInGroupTest(TestCase):
         assert self.toto.is_in_group(name=meta_groups_members) is False
 
     def test_cache_properly_cleared_group(self):
-        """
-        Test that when a user is removed from a group,
-        the is_in_group_method return False when calling it again
+        """Test that when a user is removed from a group,
+        the is_in_group_method return False when calling it again.
         """
         # testing with pk
         self.toto.groups.add(self.com_admin.pk)
@@ -534,14 +551,13 @@ class UserIsInGroupTest(TestCase):
         assert self.toto.is_in_group(name="SAS admin") is False
 
     def test_not_existing_group(self):
-        """
-        Test that searching for a not existing group
-        returns False
+        """Test that searching for a not existing group
+        returns False.
         """
         assert self.skia.is_in_group(name="This doesn't exist") is False
 
 
-class DateUtilsTest(TestCase):
+class TestDateUtils(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.autumn_month = settings.SITH_SEMESTER_START_AUTUMN[0]
@@ -557,9 +573,7 @@ class DateUtilsTest(TestCase):
         cls.spring_first_day = date(2023, cls.spring_month, cls.spring_day)
 
     def test_get_semester(self):
-        """
-        Test that the get_semester function returns the correct semester string
-        """
+        """Test that the get_semester function returns the correct semester string."""
         assert get_semester_code(self.autumn_semester_january) == "A24"
         assert get_semester_code(self.autumn_semester_september) == "A24"
         assert get_semester_code(self.autumn_first_day) == "A24"
@@ -568,9 +582,7 @@ class DateUtilsTest(TestCase):
         assert get_semester_code(self.spring_first_day) == "P23"
 
     def test_get_start_of_semester_fixed_date(self):
-        """
-        Test that the get_start_of_semester correctly the starting date of the semester.
-        """
+        """Test that the get_start_of_semester correctly the starting date of the semester."""
         automn_2024 = date(2024, self.autumn_month, self.autumn_day)
         assert get_start_of_semester(self.autumn_semester_january) == automn_2024
         assert get_start_of_semester(self.autumn_semester_september) == automn_2024
@@ -581,9 +593,8 @@ class DateUtilsTest(TestCase):
         assert get_start_of_semester(self.spring_first_day) == spring_2023
 
     def test_get_start_of_semester_today(self):
-        """
-        Test that the get_start_of_semester returns the start of the current semester
-        when no date is given
+        """Test that the get_start_of_semester returns the start of the current semester
+        when no date is given.
         """
         with freezegun.freeze_time(self.autumn_semester_september):
             assert get_start_of_semester() == self.autumn_first_day
@@ -592,8 +603,7 @@ class DateUtilsTest(TestCase):
             assert get_start_of_semester() == self.spring_first_day
 
     def test_get_start_of_semester_changing_date(self):
-        """
-        Test that the get_start_of_semester correctly gives the starting date of the semester,
+        """Test that the get_start_of_semester correctly gives the starting date of the semester,
         even when the semester changes while the server isn't restarted.
         """
         spring_2023 = date(2023, self.spring_month, self.spring_day)

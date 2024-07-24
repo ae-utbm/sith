@@ -45,8 +45,8 @@ class AvailableTrombiManager(models.Manager):
 
 
 class Trombi(models.Model):
-    """
-    This is the main class, the Trombi itself.
+    """Main class of the trombi, the Trombi itself.
+
     It contains the deadlines for the users, and the link to the club that makes
     its Trombi.
     """
@@ -103,10 +103,10 @@ class Trombi(models.Model):
 
 
 class TrombiUser(models.Model):
-    """
-    This class is only here to avoid cross references between the core, club,
-    and trombi modules. It binds a User to a Trombi without needing to import
-    Trombi into the core.
+    """Bound between a `User` and a `Trombi`.
+
+    This class is here to avoid cross-references between the core, club,
+    and trombi modules.
     It also adds the pictures to the profile without needing all the security
     like the other SithFiles.
     """
@@ -172,10 +172,7 @@ class TrombiUser(models.Model):
 
 
 class TrombiComment(models.Model):
-    """
-    This represent a comment given by someone to someone else in the same Trombi
-    instance.
-    """
+    """A comment given by someone to someone else in the same Trombi instance."""
 
     author = models.ForeignKey(
         TrombiUser,
@@ -202,9 +199,7 @@ class TrombiComment(models.Model):
 
 
 class TrombiClubMembership(models.Model):
-    """
-    This represent a membership to a club
-    """
+    """A membership in a club."""
 
     user = models.ForeignKey(
         TrombiUser,

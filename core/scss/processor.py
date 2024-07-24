@@ -35,10 +35,9 @@ from core.scss.storage import ScssFileStorage, find_file
 
 
 class ScssProcessor(object):
-    """
-    If DEBUG mode enabled : compile the scss file
+    """If DEBUG mode enabled : compile the scss file
     Else : give the path of the corresponding css supposed to already be compiled
-    Don't forget to use compilestatics to compile scss for production
+    Don't forget to use compilestatics to compile scss for production.
     """
 
     prefix = iri_to_uri(getattr(settings, "STATIC_URL", "/static/"))
