@@ -6,7 +6,6 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
             <link rel="stylesheet" href="{{ static('core/base.css') }}">
-            <link rel="stylesheet" href="{{ static('core/jquery.datetimepicker.min.css') }}">
             <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
             <link rel="stylesheet" href="{{ scss('core/style.scss') }}">
             <link rel="stylesheet" href="{{ scss('core/markdown.scss') }}">
@@ -295,47 +294,25 @@
                 </code>
             </footer>
         {% endif %}
-        <!--
-            {% block tests %}
-            {{ tests }}
-            {% endblock %}
-        -->
         {% block script %}
         <script src="{{ static('core/js/ui/jquery-ui.min.js') }}"></script>
-        <script src="{{ static('core/js/ui/i18n/datepicker-fr.js') }}"></script>
-        <script src="{{ static('core/js/jquery.datetimepicker.full.min.js') }}"></script>
         <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
         <script src="{{ url('javascript-catalog') }}"></script>
         <script>
-            function showMenu() {
-                let navbar = document.getElementById("navbar-content");
-                const current = navbar.style.getPropertyValue("display");
-                navbar.style.setProperty("display", current == "none" ? "block" : "none");
-            }
-        </script>
-        <script>
-$('.select_date').datepicker({
-    changeMonth: true,
-    changeYear: true,
-    dayNamesShort: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].dayNamesShort,
-    dayNames: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].dayNames,
-    monthNamesShort: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].monthNamesShort,
-    monthNames: $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"  ].monthNames,
-}).datepicker( $.datepicker.regional[ "{{ request.LANGUAGE_CODE }}"] );
+function showMenu() {
+    let navbar = document.getElementById("navbar-content");
+    const current = navbar.style.getPropertyValue("display");
+    navbar.style.setProperty("display", current === "none" ? "block" : "none");
+}
 $(document).keydown(function (e) {
     if ($(e.target).is('input')) { return }
     if ($(e.target).is('textarea')) { return }
     if ($(e.target).is('select')) { return }
-    if (e.keyCode == 83) {
+    if (e.keyCode === 83) {
         $("#search").focus();
         return false;
     }
 });
-jQuery.datetimepicker.setLocale('{{ request.LANGUAGE_CODE|lower }}');
-$('.select_datetime').datetimepicker({
-        format: 'Y-m-d H:i:s',
-});
-
         </script>
         {% endblock %}
     </body>

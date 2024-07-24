@@ -12,7 +12,7 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 
 from core.models import User
 from core.views import CanCreateMixin, CanEditMixin, CanViewMixin
-from core.views.forms import MarkdownInput, TzAwareDateTimeField
+from core.views.forms import MarkdownInput, SelectDateTime
 from election.models import Candidature, Election, ElectionList, Role, Vote
 
 # Custom form field
@@ -160,12 +160,18 @@ class ElectionForm(forms.ModelForm):
         label=_("candidature groups"),
     )
 
-    start_date = TzAwareDateTimeField(label=_("Start date"), required=True)
-    end_date = TzAwareDateTimeField(label=_("End date"), required=True)
-    start_candidature = TzAwareDateTimeField(
-        label=_("Start candidature"), required=True
+    start_date = forms.DateTimeField(
+        label=_("Start date"), widget=SelectDateTime, required=True
     )
-    end_candidature = TzAwareDateTimeField(label=_("End candidature"), required=True)
+    end_date = forms.DateTimeField(
+        label=_("End date"), widget=SelectDateTime, required=True
+    )
+    start_candidature = forms.DateTimeField(
+        label=_("Start candidature"), widget=SelectDateTime, required=True
+    )
+    end_candidature = forms.DateTimeField(
+        label=_("End candidature"), widget=SelectDateTime, required=True
+    )
 
 
 # Display elections
