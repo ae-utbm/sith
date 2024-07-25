@@ -14,7 +14,7 @@ from sas.schemas import (
 )
 
 
-@api_controller("/sas/pictures")
+@api_controller("/sas/picture")
 class PicturesController(ControllerBase):
     @route.get(
         "",
