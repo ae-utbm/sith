@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from ninja import FilterSchema, ModelSchema
-from pydantic import Field
+from ninja import FilterSchema, ModelSchema, Schema
+from pydantic import Field, NonNegativeInt
 
 from core.schemas import SimpleUserSchema
-from sas.models import Picture
+from sas.models import PeoplePictureRelation, Picture
 
 
 class PictureFilterSchema(FilterSchema):
@@ -23,3 +23,14 @@ class PictureSchema(ModelSchema):
     full_size_url: str
     compressed_url: str
     thumb_url: str
+
+
+class PictureCreateRelationSchema(Schema):
+    user_id: NonNegativeInt
+    picture_id: NonNegativeInt
+
+
+class CreatedPictureRelationSchema(ModelSchema):
+    class Meta:
+        model = PeoplePictureRelation
+        fields = ["id", "user", "picture"]

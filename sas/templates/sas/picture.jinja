@@ -4,11 +4,19 @@
   <link rel="stylesheet" href="{{ scss('sas/picture.scss') }}">
 {%- endblock -%}
 
+{%- block additional_js -%}
+  <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
+{%- endblock -%}
+
 {% block head %}
   {{ super() }}
 
   {% if picture.get_previous() %}
-    <link rel="preload" as="image" href="{{ url("sas:download_compressed", picture_id=picture.get_previous().id) }}">
+    <link
+      rel="preload"
+      as="image"
+      href="{{ url("sas:download_compressed", picture_id=picture.get_previous().id) }}"
+    >
   {% endif %}
   {% if picture.get_next() %}
     <link rel="preload" as="image" href="{{ url("sas:download_compressed", picture_id=picture.get_next().id) }}">
@@ -36,7 +44,8 @@
 
   <div class="title">
     <h3>{{ picture.get_display_name() }}</h3>
-    <h4>{{ picture.parent.children.filter(id__lte=picture.id).count() }} / {{ picture.parent.children.count() }}</h4>
+    <h4>{{ picture.parent.children.filter(id__lte=picture.id).count() }}
+      / {{ picture.parent.children.count() }}</h4>
   </div>
   <br>
 
@@ -100,7 +109,9 @@
           <h5>{% trans %}Tools{% endtrans %}</h5>
           <div>
             <div>
-              <a class="text" href="{{ picture.get_download_url() }}">{% trans %}HD version{% endtrans %}</a>
+              <a class="text" href="{{ picture.get_download_url() }}">
+                {% trans %}HD version{% endtrans %}
+              </a>
               <br>
               <a class="text danger" href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
             </div>
@@ -139,20 +150,18 @@
           {{ form.as_p() }}
           <input type="submit" value="{% trans %}Go{% endtrans %}" />
         </form>
-        <ul>
-          {% for r in picture.people.all() %}
+        <ul x-data="user_identification">
+          <template x-for="item in items" :key="item.id">
             <li>
-              <a class="user" href="{{ r.user.get_absolute_url() }}">
-                {% if r.user.profile_pict %}
-                  <div class="profile-pic" style="background-image: url('{{ r.user.profile_pict.get_download_url() }}');"></div>
-                {% endif %}
-                <span>{{ r.user.get_short_name() }}</span>
+              <a class="user" :href="item.user.url">
+                <img class="profile-pic" :src="item.user.picture" alt="image de profil"/>
+                <span x-text="item.user.name"></span>
               </a>
-              {% if user == r.user or user.can_edit(picture) %}
-                <a class="delete" href="?remove_user={{ r.user.id }}">❌</a>
-              {% endif %}
+              <template x-if="can_be_removed(item)">
+                <a class="delete clickable" @click="remove(item)">❌</a>
+              </template>
             </li>
-          {% endfor %}
+          </template>
         </ul>
       </div>
     </div>
@@ -162,6 +171,42 @@
 {% block script %}
   {{ super() }}
   <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("user_identification", () => ({
+        items: [
+          {%- for r in picture.people.select_related("user", "user__profile_pict") -%}
+            {
+              id: {{ r.id }},
+              user: {
+                id: {{ r.user.id }},
+                name: "{{ r.user.get_short_name()|safe }}",
+                url: "{{ r.user.get_absolute_url() }}",
+                {% if r.user.profile_pict %}
+                  picture: "{{ r.user.profile_pict.get_download_url() }}",
+                {% else %}
+                  picture: "{{ static('core/img/unknown.jpg') }}",
+                {% endif %}
+              },
+            },
+          {%- endfor -%}
+        ],
+        can_be_removed(item) {
+          {# If user is root or sas admin, he has the right, at "compile" time.
+             If not, he can delete only its own identification. #}
+          {% if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
+            return true;
+          {% else %}
+            return item.user.id === {{ user.id }};
+          {% endif %}
+        },
+        async remove(item) {
+          const res = await fetch(`/api/sas/relation/${item.id}`, {method: "DELETE"});
+          if (res.ok) {
+            this.items = this.items.filter((i) => i.id !== item.id)
+          }
+        },
+      }))
+    });
     $(() => {
       $(document).keydown((e) => {
         switch (e.keyCode) {

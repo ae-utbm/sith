@@ -199,12 +199,6 @@
     > form {
       > p {
         box-sizing: border-box;
-
-        > input {
-          width: 100%;
-          max-width: 100%;
-          box-sizing: border-box;
-        }
       }
 
       > .results_on_deck > div {
@@ -219,11 +213,14 @@
           right: 0;
         }
       }
-
-      > input {
-        width: 100%;
+      input {
+        min-width: 100%;
         max-width: 100%;
         box-sizing: border-box;
+      }
+
+      button {
+        font-weight: bold;
       }
     }
   }

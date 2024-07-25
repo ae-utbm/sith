@@ -143,12 +143,6 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
             self.object.rotate(270)
         if "rotate_left" in request.GET:
             self.object.rotate(90)
-        if "remove_user" in request.GET:
-            user = get_object_or_404(User, pk=int(request.GET["remove_user"]))
-            if user.id == request.user.id or request.user.is_in_group(
-                pk=settings.SITH_GROUP_SAS_ADMIN_ID
-            ):
-                user.picture.filter(picture=self.object).delete()
         if "ask_removal" in request.GET.keys():
             self.object.is_moderated = False
             self.object.asked_for_removal = True

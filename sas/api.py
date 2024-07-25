@@ -1,17 +1,23 @@
+from django.conf import settings
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, route
 from ninja_extra.exceptions import PermissionDenied
 from ninja_extra.permissions import IsAuthenticated
+from pydantic import NonNegativeInt
 
+from core.api_permissions import IsOldSubscriber
 from core.models import User
-from sas.models import Picture
-from sas.schemas import PictureFilterSchema, PictureSchema
+from sas.models import PeoplePictureRelation, Picture
+from sas.schemas import (
+    PictureFilterSchema,
+    PictureSchema,
+)
 
 
-@api_controller("/sas")
-class SasController(ControllerBase):
+@api_controller("/sas/pictures")
+class PicturesController(ControllerBase):
     @route.get(
-        "/picture",
+        "",
         response=list[PictureSchema],
         permissions=[IsAuthenticated],
         url_name="pictures",
@@ -45,3 +51,20 @@ class SasController(ControllerBase):
             picture.compressed_url = picture.get_download_compressed_url()
             picture.thumb_url = picture.get_download_thumb_url()
         return pictures
+
+
+@api_controller("/sas/relation")
+class UsersIdentifiedController(ControllerBase):
+    @route.delete("/{relation_id}", permissions=[IsOldSubscriber])
+    def delete_relation(self, relation_id: NonNegativeInt):
+        relation: PeoplePictureRelation = self.get_object_or_exception(
+            PeoplePictureRelation, pk=relation_id
+        )
+        user = self.context.request.user
+        if (
+            relation.user_id != user.id
+            and not user.is_root
+            and not user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+        ):
+            raise PermissionDenied
+        relation.delete()
