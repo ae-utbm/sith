@@ -21,6 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import itertools
 
 # This file contains all the views that concern the user model
 from datetime import date, timedelta
@@ -312,11 +313,15 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["pictures"] = list(
+        pictures = list(
             Picture.objects.filter(people__user_id=self.object.id)
             .order_by("-parent__date", "-date")
             .annotate(album=F("parent__name"))
         )
+        kwargs["albums"] = {
+            album: list(picts)
+            for album, picts in itertools.groupby(pictures, lambda i: i.album)
+        }
         return kwargs
 
 

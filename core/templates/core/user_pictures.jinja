@@ -22,10 +22,10 @@
     {% if can_edit(profile, user) %}
       <button disabled id="download" onclick="download('{{ url('api:pictures') }}?users_identified={{ object.id }}')">{% trans %}Download all my pictures{% endtrans %}</button>
     {% endif %}
-    {% for album, album_pictures in pictures|groupby("album") %}
+    {% for album, pictures in albums|items %}
       <h4>{{ album }}</h4>
       <div class="photos">
-        {% for picture in album_pictures %}
+        {% for picture in pictures %}
           {% if picture.can_be_viewed_by(user) %}
             <a href="{{ url("sas:picture", picture_id=picture.id) }}#pict">
               <div
