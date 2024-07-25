@@ -314,7 +314,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
         kwargs = super().get_context_data(**kwargs)
         kwargs["pictures"] = list(
             Picture.objects.filter(people__user_id=self.object.id)
-            .order_by("-parent__date", "id")
+            .order_by("-parent__date", "-date")
             .annotate(album=F("parent__name"))
         )
         return kwargs
