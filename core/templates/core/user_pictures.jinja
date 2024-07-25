@@ -22,17 +22,17 @@
     {% if can_edit(profile, user) %}
       <button disabled id="download" onclick="download('{{ url('api:pictures') }}?users_identified={{ object.id }}')">{% trans %}Download all my pictures{% endtrans %}</button>
     {% endif %}
-    {% for a in albums %}
-      <h4>{{ a.name }}</h4>
+    {% for album, album_pictures in pictures|groupby("album") %}
+      <h4>{{ album }}</h4>
       <div class="photos">
-        {% for p in pictures[a.id] %}
-          {% if p.can_be_viewed_by(user) %}
-            <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
+        {% for picture in album_pictures %}
+          {% if picture.can_be_viewed_by(user) %}
+            <a href="{{ url("sas:picture", picture_id=picture.id) }}#pict">
               <div
-                class="photo{% if not p.is_moderated %} not_moderated{% endif %}"
-                style="background-image: url('{% if p.file %}{{ p.get_download_thumb_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
+                class="photo{% if not picture.is_moderated %} not_moderated{% endif %}"
+                style="background-image: url('{% if picture.file %}{{ picture.get_download_thumb_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
               >
-                {% if not p.is_moderated %}
+                {% if not picture.is_moderated %}
                   <div class="overlay">&nbsp;</div>
                   <div class="text">{% trans %}To be moderated{% endtrans %}</div>
                 {% else %}

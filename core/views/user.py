@@ -31,6 +31,7 @@ from django.contrib.auth import login, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import F
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponse
@@ -311,21 +312,11 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["albums"] = []
-        kwargs["pictures"] = {}
-        picture_qs = (
+        kwargs["pictures"] = list(
             Picture.objects.filter(people__user_id=self.object.id)
-            .order_by("parent__date", "id")
-            .all()
+            .order_by("-parent__date", "id")
+            .annotate(album=F("parent__name"))
         )
-        last_album = None
-        for picture in picture_qs:
-            album = picture.parent
-            if album.id != last_album and album not in kwargs["albums"]:
-                kwargs["albums"].append(album)
-                kwargs["pictures"][album.id] = []
-                last_album = album.id
-            kwargs["pictures"][album.id].append(picture)
         return kwargs
 
 
