@@ -66,7 +66,7 @@ class SelectDate(DateInput):
 
 
 class MarkdownInput(Textarea):
-    template_name = "core/markdown_textarea.jinja"
+    template_name = "core/widgets/markdown_textarea.jinja"
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -97,6 +97,15 @@ class MarkdownInput(Textarea):
             "guide": _("Markdown guide"),
         }
         context["markdown_api_url"] = reverse("api:markdown")
+        return context
+
+
+class NFCTextInput(TextInput):
+    template_name = "core/widgets/nfc.jinja"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["translations"] = {"unsupported": _("Unsupported NFC card")}
         return context
 
 

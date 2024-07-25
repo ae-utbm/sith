@@ -1,0 +1,33 @@
+<span>
+  <input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+	<!-- NFC icon not available in fontawesome 4.7 --> 
+  <button type="button" id="{{ widget.attrs.id }}_button"><i class="fa fa-tag"></i></button>
+</span>
+<script>
+  document.addEventListener("DOMContentLoaded", function(event) {
+    let button = document.getElementById("{{ widget.attrs.id }}_button");
+    button.addEventListener("click", async () => {
+      let input = document.getElementById("{{ widget.attrs.id }}");
+      const ndef = new NDEFReader();
+      await ndef.scan();
+
+      ndef.addEventListener("readingerror", () => {
+        alert("{{ translations.unsupported }}")
+      });
+
+      ndef.addEventListener("reading", ({ message, serialNumber }) => {
+        input.value = serialNumber.replaceAll(":", "").toUpperCase();
+				/* Auto submit form */
+        b = document.createElement("button");
+        input.appendChild(b)
+        b.click()
+        b.remove()
+      });
+
+    });
+		/* Disable feature if browser is not supported or if not HTTPS */
+    if (typeof NDEFReader === "undefined") {
+      button.remove();
+    }
+  });
+</script>
