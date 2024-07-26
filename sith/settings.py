@@ -46,7 +46,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .honeypot import custom_honeypot_error
 
-BASE_DIR = Path(".").parent.parent
+BASE_DIR = Path(__file__).parent.parent
 
 os.environ["HTTPS"] = "off"
 

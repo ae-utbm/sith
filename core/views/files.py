@@ -59,17 +59,17 @@ def send_file(request, file_id, file_class=SithFile, file_attr="file"):
     ):
         raise PermissionDenied
     name = f.__getattribute__(file_attr).name
-    filepath = os.path.join(settings.MEDIA_ROOT, name)
+    filepath = settings.MEDIA_ROOT / name
 
     # check if file exists on disk
-    if not os.path.exists(filepath.encode("utf-8")):
-        raise Http404()
+    if not filepath.exists():
+        raise Http404
 
-    with open(filepath.encode("utf-8"), "rb") as filename:
+    with open(filepath, "rb") as filename:
         wrapper = FileWrapper(filename)
         response = HttpResponse(wrapper, content_type=f.mime_type)
         response["Last-Modified"] = http_date(f.date.timestamp())
-        response["Content-Length"] = os.path.getsize(filepath.encode("utf-8"))
+        response["Content-Length"] = filepath.stat().st_size
         response["Content-Disposition"] = ('inline; filename="%s"' % f.name).encode(
             "utf-8"
         )

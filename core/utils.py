@@ -13,7 +13,6 @@
 #
 #
 
-import os
 import re
 import subprocess
 from datetime import date
@@ -94,10 +93,6 @@ def get_semester_code(d: Optional[date] = None) -> str:
     if (start.month, start.day) == settings.SITH_SEMESTER_START_AUTUMN:
         return "A" + str(start.year)[-2:]
     return "P" + str(start.year)[-2:]
-
-
-def file_exist(path):
-    return os.path.exists(path)
 
 
 def scale_dimension(width, height, long_edge):

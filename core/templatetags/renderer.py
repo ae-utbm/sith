@@ -23,15 +23,17 @@
 #
 
 import datetime
+from pathlib import Path
 
 import phonenumbers
 from django import template
+from django.template import TemplateSyntaxError
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
 from django.utils.translation import ngettext
 
 from core.markdown import markdown as md
-from core.scss.processor import ScssProcessor
+from core.scss.processor import process_scss_path
 
 register = template.Library()
 
@@ -86,5 +88,7 @@ def format_timedelta(value: datetime.timedelta) -> str:
 @register.simple_tag()
 def scss(path):
     """Return path of the corresponding css file after compilation."""
-    processor = ScssProcessor(path)
-    return processor.get_converted_scss()
+    path = Path(path)
+    if path.suffix != ".scss":
+        raise TemplateSyntaxError("`scss` tag has been called with a non-scss file")
+    return process_scss_path(path)
