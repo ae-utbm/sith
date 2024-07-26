@@ -8,11 +8,7 @@ updates:
   - package-ecosystem: "pip" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "daily"
-    # Raise pull requests for version updates
-    # to pip against the `develop` branch
+      interval: "weekly"
     target-branch: "taiste"
-    reviewers:
-      - "ae-utbm/developpers-v3"
     commit-message:
       prefix: "[UPDATE] "
