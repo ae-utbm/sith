@@ -13,8 +13,6 @@
 #
 #
 
-from pathlib import Path
-
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -26,11 +24,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if not settings.DEBUG:
             raise Exception("Never call this command in prod. Never.")
-        data_dir = Path(settings.BASE_DIR) / "data"
+        data_dir = settings.BASE_DIR / "data"
         settings.EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
         if not data_dir.is_dir():
             data_dir.mkdir()
-        db_path = Path(settings.BASE_DIR) / "db.sqlite3"
+        db_path = settings.BASE_DIR / "db.sqlite3"
         if db_path.exists():
             call_command("flush", "--noinput")
             self.stdout.write("Existing database reset")

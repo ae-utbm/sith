@@ -14,7 +14,6 @@
 #
 
 # This file contains all the views that concern the page model
-import os
 from wsgiref.util import FileWrapper
 
 from ajax_select import make_ajax_field

@@ -21,8 +21,6 @@
 #
 #
 
-import os
-
 from django.core.management.base import BaseCommand
 
 from core.models import SithFile
@@ -37,9 +35,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        root_path = os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        )
         files = SithFile.objects.filter(id__in=options["ids"]).all()
         for f in files:
             f._check_fs()

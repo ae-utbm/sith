@@ -34,8 +34,6 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 import binascii
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import sys
 from pathlib import Path
@@ -46,7 +44,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .honeypot import custom_honeypot_error
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent.parent.resolve()
 
 os.environ["HTTPS"] = "off"
 
