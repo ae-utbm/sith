@@ -504,13 +504,17 @@ bcrypt = ["bcrypt"]
 
 [[package]]
 name = "django-ajax-selects"
-version = "2.2.1"
+version = "3.0.2"
 description = "Edit ForeignKey, ManyToManyField and CharField in Django Admin using jQuery UI AutoComplete."
 optional = false
-python-versions = "*"
+python-versions = ">=3.10,<4.0"
 files = [
-    {file = "django-ajax-selects-2.2.1.tar.gz", hash = "sha256:996ffb38dff1a621b358613afdf2681dbf261e5976da3c30a75e9b08fd81a887"},
+    {file = "django_ajax_selects-3.0.2-py3-none-any.whl", hash = "sha256:83da065b3fe6bdee5996662734eb18ee70fee510171c179a02f1ce45dcaa2870"},
+    {file = "django_ajax_selects-3.0.2.tar.gz", hash = "sha256:8554659f5c7da50cfe1f0d0e14c6f360d0f2ab2d94b24e3203cc4fe974bd945a"},
 ]
+
+[package.dependencies]
+Django = ">=3.2"
 
 [[package]]
 name = "django-countries"
@@ -968,6 +972,7 @@ files = [
     {file = "libsass-0.22.0-cp37-abi3-macosx_10_15_x86_64.whl", hash = "sha256:081e256ab3c5f3f09c7b8dea3bf3bf5e64a97c6995fd9eea880639b3f93a9f9a"},
     {file = "libsass-0.22.0-cp37-abi3-win32.whl", hash = "sha256:89c5ce497fcf3aba1dd1b19aae93b99f68257e5f2026b731b00a872f13324c7f"},
     {file = "libsass-0.22.0-cp37-abi3-win_amd64.whl", hash = "sha256:65455a2728b696b62100eb5932604aa13a29f4ac9a305d95773c14aaa7200aaf"},
+    {file = "libsass-0.22.0-cp38-abi3-macosx_14_0_arm64.whl", hash = "sha256:5fb2297a4754a6c8e25cfe5c015a3b51a2b6b9021b333f989bb8ce9d60eb5828"},
     {file = "libsass-0.22.0.tar.gz", hash = "sha256:3ab5ad18e47db560f4f0c09e3d28cf3bb1a44711257488ac2adad69f4f7f8425"},
 ]
 
@@ -1892,6 +1897,7 @@ files = [
     {file = "PyYAML-6.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:bf07ee2fef7014951eeb99f56f39c9bb4af143d8aa3c21b1677805985307da34"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:855fb52b0dc35af121542a76b9a84f8d1cd886ea97c84703eaa6d88e37a2ad28"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:40df9b996c2b73138957fe23a16a4f0ba614f4c0efce1e9406a184b6d07fa3a9"},
+    {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a08c6f0fe150303c1c6b71ebcd7213c2858041a7e01975da3a99aed1e7a378ef"},
     {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6c22bec3fbe2524cde73d7ada88f6566758a8f7227bfbf93a408a9d86bcc12a0"},
     {file = "PyYAML-6.0.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:8d4e9c88387b0f5c7d5f281e55304de64cf7f9c0021a3525bd3b1c542da3b0e4"},
     {file = "PyYAML-6.0.1-cp312-cp312-win32.whl", hash = "sha256:d483d2cdf104e7c9fa60c544d92981f12ad66a457afae824d146093b8c294c54"},
@@ -2513,4 +2519,4 @@ filelock = ">=3.4"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "0d24af6ab0db065a0eefb6315220d1c2e71c8e49ae8093c3b64fece4ebdabe20"
+content-hash = "42bc427ff8758326541c0c845ec4004add642625cad0fc31ae3a8b5a22e8c806"
