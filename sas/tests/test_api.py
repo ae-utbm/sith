@@ -1,10 +1,12 @@
+from django.conf import settings
+from django.db import transaction
 from django.test import TestCase
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
-from core.models import User
+from core.models import RealGroup, User
 from sas.models import Album, PeoplePictureRelation, Picture
 
 
@@ -32,6 +34,8 @@ class TestSas(TestCase):
             baker.make(PeoplePictureRelation, picture=pictures[4], user=cls.user_b)
             baker.make(PeoplePictureRelation, picture=pictures[4], user=cls.user_c)
 
+
+class TestPictureSearch(TestSas):
     def test_anonymous_user_forbidden(self):
         res = self.client.get(reverse("api:pictures"))
         assert res.status_code == 403
@@ -101,3 +105,49 @@ class TestSas(TestCase):
             + f"?users_identified={self.user_a.id}&users_identified={self.user_b.id}"
         )
         assert res.status_code == 403
+
+
+class TestPictureRelation(TestSas):
+    def test_delete_relation_route_forbidden(self):
+        """Test that unauthorized users are properly 403ed"""
+        # take a picture where user_a isn't identified
+        relation = PeoplePictureRelation.objects.exclude(user=self.user_a).first()
+
+        res = self.client.delete(f"/api/sas/relation/{relation.id}")
+        assert res.status_code == 403
+
+        for user in baker.make(User), self.user_a:
+            self.client.force_login(user)
+            res = self.client.delete(f"/api/sas/relation/{relation.id}")
+            assert res.status_code == 403
+
+    def test_delete_relation_with_authorized_users(self):
+        """Test that deletion works as intended when called by an authorized user."""
+        relation: PeoplePictureRelation = self.user_a.pictures.first()
+        sas_admin_group = RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+        sas_admin = baker.make(User, groups=[sas_admin_group])
+        root = baker.make(User, is_superuser=True)
+        for user in sas_admin, root, self.user_a:
+            with transaction.atomic():
+                self.client.force_login(user)
+                res = self.client.delete(f"/api/sas/relation/{relation.id}")
+                assert res.status_code == 200
+                assert not PeoplePictureRelation.objects.filter(pk=relation.id).exists()
+                transaction.set_rollback(True)
+        public = baker.make(User)
+        relation = public.pictures.create(picture=relation.picture)
+        self.client.force_login(public)
+        res = self.client.delete(f"/api/sas/relation/{relation.id}")
+        assert res.status_code == 200
+        assert not PeoplePictureRelation.objects.filter(pk=relation.id).exists()
+
+    def test_delete_twice(self):
+        """Test a duplicate call on the delete route."""
+        self.client.force_login(baker.make(User, is_superuser=True))
+        relation = PeoplePictureRelation.objects.first()
+        res = self.client.delete(f"/api/sas/relation/{relation.id}")
+        assert res.status_code == 200
+        relation_count = PeoplePictureRelation.objects.count()
+        res = self.client.delete(f"/api/sas/relation/{relation.id}")
+        assert res.status_code == 404
+        assert PeoplePictureRelation.objects.count() == relation_count
