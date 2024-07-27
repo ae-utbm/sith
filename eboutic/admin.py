@@ -19,8 +19,19 @@ from eboutic.models import *
 
 @admin.register(Basket)
 class BasketAdmin(admin.ModelAdmin):
-    list_display = ("user", "date", "get_total")
+    list_display = ("user", "date", "total")
     autocomplete_fields = ("user",)
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(
+                total=Sum(
+                    F("items__quantity") * F("items__product_unit_price"), default=0
+                )
+            )
+        )
 
 
 @admin.register(BasketItem)

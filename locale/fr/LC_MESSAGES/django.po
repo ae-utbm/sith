@@ -4481,10 +4481,6 @@ msgstr "id du type du produit"
 msgid "basket"
 msgstr "panier"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:33
-msgid "Your basket has been cleaned accordingly to those errors."
-msgstr "Votre panier a été nettoyé en fonction de ces erreurs."
-
 #: eboutic/templates/eboutic/eboutic_main.jinja:41
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:45
 msgid "Current account amount: "
@@ -4531,9 +4527,17 @@ msgstr "État du panier"
 msgid "Remaining account amount: "
 msgstr "Solde restant : "
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:60
-msgid "Edit billing information"
-msgstr "Éditer les informations de facturation"
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:65
+msgid "Billing information"
+msgstr "Informations de facturation"
+
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:138
+msgid "Billing info registration success"
+msgstr "Informations de facturation enregistrées"
+
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:139
+msgid "Billing info registration failure"
+msgstr "Echec de l'enregistrement des informations de facturation."
 
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:100
 #, fuzzy

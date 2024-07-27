@@ -57,16 +57,6 @@ urlpatterns = [
         StudentCardDeleteView.as_view(),
         name="delete_student_card",
     ),
-    path(
-        "customer/<int:user_id>/billing_info/create",
-        create_billing_info,
-        name="create_billing_info",
-    ),
-    path(
-        "customer/<int:user_id>/billing_info/edit",
-        edit_billing_info,
-        name="edit_billing_info",
-    ),
     path("admin/<int:counter_id>/", CounterEditView.as_view(), name="admin"),
     path(
         "admin/<int:counter_id>/prop/",

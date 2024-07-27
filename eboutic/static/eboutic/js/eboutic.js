@@ -33,13 +33,16 @@ function get_starting_items() {
     let output = [];
 
     try {
-        // Django cookie backend does an utter mess on non-trivial data types
-        // so we must perform a conversion of our own
-        const biscuit = JSON.parse(cookie.replace(/\\054/g, ','));
-        output = Array.isArray(biscuit) ? biscuit : [];
-
-    } catch (e) {}
-
+        // Django cookie backend converts `,` to `\054`
+        let parsed = JSON.parse(cookie.replace(/\\054/g, ','));
+        if (typeof parsed === "string") {
+            // In some conditions, a second parsing is needed
+            parsed = JSON.parse(parsed);
+        }
+        output = Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        console.error(e);
+    }
     output.forEach(item => {
         let el = document.getElementById(item.id);
         el.classList.add("selected");
@@ -63,7 +66,7 @@ document.addEventListener('alpine:init', () => {
 
         /**
          * Add 1 to the quantity of an item in the basket
-         * @param {BasketItem} item 
+         * @param {BasketItem} item
          */
         add(item) {
             item.quantity++;
@@ -72,11 +75,11 @@ document.addEventListener('alpine:init', () => {
 
         /**
          * Remove 1 to the quantity of an item in the basket
-         * @param {BasketItem} item_id 
+         * @param {BasketItem} item_id
          */
         remove(item_id) {
             const index = this.items.findIndex(e => e.id === item_id);
-            
+
             if (index < 0) return;
             this.items[index].quantity -= 1;
 
