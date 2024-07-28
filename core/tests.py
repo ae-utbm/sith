@@ -14,7 +14,6 @@
 #
 
 from datetime import date, timedelta
-from pathlib import Path
 from smtplib import SMTPException
 
 import freezegun
@@ -210,7 +209,7 @@ def test_custom_markdown_syntax(md, html):
 
 
 def test_full_markdown_syntax():
-    syntax_path = Path(settings.BASE_DIR) / "core" / "fixtures"
+    syntax_path = settings.BASE_DIR / "core" / "fixtures"
     md = (syntax_path / "SYNTAX.md").read_text()
     html = (syntax_path / "SYNTAX.html").read_text()
     result = markdown(md)

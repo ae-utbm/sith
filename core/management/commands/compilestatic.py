@@ -22,7 +22,7 @@
 #
 #
 
-import os
+import sys
 
 import sass
 from django.conf import settings
@@ -34,44 +34,36 @@ class Command(BaseCommand):
 
     help = "Compile scss files from static folder"
 
-    def compile(self, filename):
-        args = {"filename": filename, "include_paths": settings.STATIC_ROOT}
+    def compile(self, filename: str):
+        args = {
+            "filename": filename,
+            "include_paths": settings.STATIC_ROOT.name,
+            "output_style": "compressed",
+        }
         if settings.SASS_PRECISION:
             args["precision"] = settings.SASS_PRECISION
         return sass.compile(**args)
 
-    def is_compilable(self, file, ext_list):
-        path, ext = os.path.splitext(file)
-        return ext in ext_list
-
-    def exec_on_folder(self, folder, func):
-        to_exec = []
-        for file in os.listdir(folder):
-            file = os.path.join(folder, file)
-            if os.path.isdir(file):
-                self.exec_on_folder(file, func)
-            elif self.is_compilable(file, [".scss"]):
-                to_exec.append(file)
-
-        for file in to_exec:
-            func(file)
-
-    def compilescss(self, file):
-        print("compiling %s" % file)
-        with open(file.replace(".scss", ".css"), "w") as newfile:
-            newfile.write(self.compile(file))
-
-    def removescss(self, file):
-        print("removing %s" % file)
-        os.remove(file)
-
     def handle(self, *args, **options):
-        if os.path.isdir(settings.STATIC_ROOT):
-            print("---- Compiling scss files ---")
-            self.exec_on_folder(settings.STATIC_ROOT, self.compilescss)
-            print("---- Removing scss files ----")
-            self.exec_on_folder(settings.STATIC_ROOT, self.removescss)
-        else:
-            print(
-                "No static folder avalaible, please use collectstatic before compiling scss"
+        if not settings.STATIC_ROOT.is_dir():
+            raise Exception(
+                "No static folder availaible, please use collectstatic before compiling scss"
             )
+        to_exec = list(settings.STATIC_ROOT.rglob("*.scss"))
+        if len(to_exec) == 0:
+            self.stdout.write("Nothing to compile.")
+            sys.exit(0)
+        self.stdout.write("---- Compiling scss files ---")
+        for file in to_exec:
+            # remove existing css files that will be replaced
+            # keeping them while compiling the scss would break
+            # import statements resolution
+            css_file = file.with_suffix(".css")
+            if css_file.exists():
+                css_file.unlink()
+        compiled_files = {file: self.compile(str(file.resolve())) for file in to_exec}
+        for file, scss in compiled_files.items():
+            file.replace(file.with_suffix(".css")).write_text(scss)
+        self.stdout.write(
+            "Files compiled : \n" + "\n- ".join(str(f) for f in compiled_files)
+        )
