@@ -1,0 +1,37 @@
+@import "colors";
+
+.pagination {
+  text-align: center;
+  gap: 10px;
+
+  button {
+    background-color: $secondary-neutral-light-color;
+    min-width: 37px;
+
+    &:hover {
+      background-color: darken($secondary-neutral-light-color, 10%);
+    }
+
+    &:disabled {
+      color: #fff;
+      background-color: darken($secondary-neutral-light-color, 5%);
+    }
+
+    &.active,
+    &.active:hover {
+      background-color: $primary-neutral-color;
+      color: white;
+      border-radius: 50%;
+    }
+
+    &:first-of-type,
+    &:last-of-type {
+      // previous and next buttons
+      &:disabled {
+        // Hide the arrows when they are disabled, without
+        // changing the layout of the navigation
+        opacity: 0;
+      }
+    }
+  }
+}
