@@ -21,6 +21,7 @@
   <main>
     {% if can_edit(profile, user) %}
       <button disabled id="download" onclick="download('{{ url('api:pictures') }}?users_identified={{ object.id }}')">{% trans %}Download all my pictures{% endtrans %}</button>
+      <progress id="download_progress" max="100" hidden></progress>
     {% endif %}
     {% for album, pictures in albums|items %}
       <h4>{{ album }}</h4>
@@ -59,14 +60,21 @@
       async function download(url) {
 
         let zip = new JSZip();
-        let size = 0;
         let pictures = await (await fetch(url)).json();
+        let progressBar = document.getElementById("download_progress");
+        let picturesDownloaded = 0;
+        let button = document.getElementById("download");
+
+        button.disabled = true;
+        progressBar.value = picturesDownloaded;
+        progressBar.hidden = false;
+
         pictures.forEach(async (picture) => {
-          size += picture.size;
           zip.file(
-            "IMG_" + picture.date + picture.name.slice(picture.name.lastIndexOf(".")),
+            "IMG_" + picture.date.replaceAll(":", "_").replaceAll("-", "_") + picture.name.slice(picture.name.lastIndexOf(".")),
             new Promise(function (resolve, reject) {
               JSZipUtils.getBinaryContent(picture.full_size_url, (err, data) => {
+                progressBar.value = picturesDownloaded++ * 100 / (pictures.length - 1);
                 if (err) {
                   reject(err);
                   return;
@@ -96,6 +104,9 @@
           .on("error", (err) => console.error(err))
           .on("end", () => writeStream.close())
           .resume();
+
+        button.disabled = false;
+        progressBar.hidden = true;
       }
     </script>
   </main>
