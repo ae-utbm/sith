@@ -42,7 +42,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
-from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
+from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
 from core.models import Gift, Page, SithFile, User
@@ -236,8 +236,8 @@ class UserProfileForm(forms.ModelForm):
             "profile_pict": forms.ClearableFileInput,
             "avatar_pict": forms.ClearableFileInput,
             "scrub_pict": forms.ClearableFileInput,
-            "phone": PhoneNumberInternationalFallbackWidget,
-            "parent_phone": PhoneNumberInternationalFallbackWidget,
+            "phone": RegionalPhoneNumberWidget,
+            "parent_phone": RegionalPhoneNumberWidget,
             "quote": forms.Textarea,
         }
         labels = {

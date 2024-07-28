@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView
-from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
+from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from core.models import User
 from core.views import FormerSubscriberMixin, search_user
@@ -64,7 +64,7 @@ class SearchForm(forms.ModelForm):
         ]
         widgets = {
             "date_of_birth": SelectDate,
-            "phone": PhoneNumberInternationalFallbackWidget,
+            "phone": RegionalPhoneNumberWidget,
         }
 
     quick = forms.CharField(label=_("Last/First name or nickname"), max_length=255)
