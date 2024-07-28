@@ -1,123 +1,123 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Edit operation{% endtrans %}
+  {% trans %}Edit operation{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<div id="accounting">
+  <div id="accounting">
     <p>
-    <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
-    <a href="{{ url('accounting:bank_details', b_account_id=object.club_account.bank_account.id) }}">{{object.club_account.bank_account }}</a> >
-    <a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object.club_account }}</a> >
-    <a href="{{ url('accounting:journal_details', j_id=object.id) }}">{{ object.name }}</a> >
-    {% trans %}Edit operation{% endtrans %}
+      <a href="{{ url('accounting:bank_list') }}">{% trans %}Accounting{% endtrans %}</a> >
+      <a href="{{ url('accounting:bank_details', b_account_id=object.club_account.bank_account.id) }}">{{object.club_account.bank_account }}</a> >
+      <a href="{{ url('accounting:club_details', c_account_id=object.club_account.id) }}">{{ object.club_account }}</a> >
+      <a href="{{ url('accounting:journal_details', j_id=object.id) }}">{{ object.name }}</a> >
+      {% trans %}Edit operation{% endtrans %}
     </p>
     <hr>
     <h2>{% trans %}Edit operation{% endtrans %}</h2>
     <form action="" method="post">
-        {% csrf_token %}
-        {{ form.non_field_errors() }}
-        {{ form.journal }}
-        {{ form.target_id }}
-        <p>{{ form.amount.errors }}<label for="{{ form.amount.name }}">{{ form.amount.label }}</label> {{ form.amount }}</p>
-        <p>{{ form.remark.errors }}<label for="{{ form.remark.name }}">{{ form.remark.label }}</label> {{ form.remark }}</p>
-        <br />
-        <strong>{% trans %}Warning: if you select <em>Account</em>, the opposite operation will be created in the target account. If you don't want that, select <em>Club</em> instead of <em>Account</em>.{% endtrans %}</strong>
-        <p>{{ form.target_type.errors }}<label for="{{ form.target_type.name }}">{{ form.target_type.label }}</label> {{ form.target_type }}</p>
-            {{ form.user }}
-            {{ form.club }}
-            {{ form.club_account }}
-            {{ form.company }}
-            {{ form.target_label }}
-            <span id="id_need_link_full"><label>{{ form.need_link.label }}</label> {{ form.need_link }}</span>
-        <p>{{ form.date.errors }}<label for="{{ form.date.name }}">{{ form.date.label }}</label> {{ form.date }}</p>
-        <p>{{ form.mode.errors }}<label for="{{ form.mode.name }}">{{ form.mode.label }}</label> {{ form.mode }}</p>
-        <p>{{ form.cheque_number.errors }}<label for="{{ form.cheque_number.name }}">{{ form.cheque_number.label }}</label> {{
+      {% csrf_token %}
+      {{ form.non_field_errors() }}
+      {{ form.journal }}
+      {{ form.target_id }}
+      <p>{{ form.amount.errors }}<label for="{{ form.amount.name }}">{{ form.amount.label }}</label> {{ form.amount }}</p>
+      <p>{{ form.remark.errors }}<label for="{{ form.remark.name }}">{{ form.remark.label }}</label> {{ form.remark }}</p>
+      <br />
+      <strong>{% trans %}Warning: if you select <em>Account</em>, the opposite operation will be created in the target account. If you don't want that, select <em>Club</em> instead of <em>Account</em>.{% endtrans %}</strong>
+      <p>{{ form.target_type.errors }}<label for="{{ form.target_type.name }}">{{ form.target_type.label }}</label> {{ form.target_type }}</p>
+      {{ form.user }}
+      {{ form.club }}
+      {{ form.club_account }}
+      {{ form.company }}
+      {{ form.target_label }}
+      <span id="id_need_link_full"><label>{{ form.need_link.label }}</label> {{ form.need_link }}</span>
+      <p>{{ form.date.errors }}<label for="{{ form.date.name }}">{{ form.date.label }}</label> {{ form.date }}</p>
+      <p>{{ form.mode.errors }}<label for="{{ form.mode.name }}">{{ form.mode.label }}</label> {{ form.mode }}</p>
+      <p>{{ form.cheque_number.errors }}<label for="{{ form.cheque_number.name }}">{{ form.cheque_number.label }}</label> {{
         form.cheque_number }}</p>
-        <p>{{ form.invoice.errors }}<label for="{{ form.invoice.name }}">{{ form.invoice.label }}</label> {{ form.invoice }}</p>
-        <p>{{ form.simpleaccounting_type.errors }}<label for="{{ form.simpleaccounting_type.name }}">{{
-            form.simpleaccounting_type.label }}</label> {{ form.simpleaccounting_type }}</p>
-        <p>{{ form.accounting_type.errors }}<label for="{{ form.accounting_type.name }}">{{ form.accounting_type.label }}</label> {{
+      <p>{{ form.invoice.errors }}<label for="{{ form.invoice.name }}">{{ form.invoice.label }}</label> {{ form.invoice }}</p>
+      <p>{{ form.simpleaccounting_type.errors }}<label for="{{ form.simpleaccounting_type.name }}">{{
+        form.simpleaccounting_type.label }}</label> {{ form.simpleaccounting_type }}</p>
+      <p>{{ form.accounting_type.errors }}<label for="{{ form.accounting_type.name }}">{{ form.accounting_type.label }}</label> {{
         form.accounting_type }}</p>
-        <p>{{ form.label.errors }}<label for="{{ form.label.name }}">{{ form.label.label }}</label> {{ form.label }}</p>
-        <p>{{ form.done.errors }}<label for="{{ form.done.name }}">{{ form.done.label }}</label> {{ form.done }}</p>
-        {% if form.instance.linked_operation %}
+      <p>{{ form.label.errors }}<label for="{{ form.label.name }}">{{ form.label.label }}</label> {{ form.label }}</p>
+      <p>{{ form.done.errors }}<label for="{{ form.done.name }}">{{ form.done.label }}</label> {{ form.done }}</p>
+      {% if form.instance.linked_operation %}
         {% set obj = form.instance.linked_operation %}
         <p><strong>{% trans %}Linked operation:{% endtrans %}</strong><br>
-        <a href="{{ url('accounting:bank_details', b_account_id=obj.journal.club_account.bank_account.id) }}">
-                {{obj.journal.club_account.bank_account }}</a> >
-        <a href="{{ url('accounting:club_details', c_account_id=obj.journal.club_account.id) }}">{{ obj.journal.club_account }}</a> >
-        <a href="{{ url('accounting:journal_details', j_id=obj.journal.id) }}">{{ obj.journal }}</a> >
-        n°{{ obj.number }}
+          <a href="{{ url('accounting:bank_details', b_account_id=obj.journal.club_account.bank_account.id) }}">
+            {{obj.journal.club_account.bank_account }}</a> >
+          <a href="{{ url('accounting:club_details', c_account_id=obj.journal.club_account.id) }}">{{ obj.journal.club_account }}</a> >
+          <a href="{{ url('accounting:journal_details', j_id=obj.journal.id) }}">{{ obj.journal }}</a> >
+          n°{{ obj.number }}
         </p>
-        {% endif %}
-        <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+      {% endif %}
+      <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
     </form>
-    {% endblock %}
+{% endblock %}
 
-    {% block script %}
-        {{ super() }}
-    <script>
+{% block script %}
+  {{ super() }}
+  <script>
     $( function() {
-            var target_type = $('#id_target_type');
-            var user = $('#id_user_wrapper');
-            var club = $('#id_club_wrapper');
-            var club_account = $('#id_club_account_wrapper');
-            var company = $('#id_company_wrapper');
-            var other = $('#id_target_label');
-            var need_link = $('#id_need_link_full');
-            function update_targets () {
-                if (target_type.val() == "USER") {
-                    console.log(user);
-                    user.show();
-                    club.hide();
-                    club_account.hide();
-                    company.hide();
-                    other.hide();
-                    need_link.hide();
-                } else if (target_type.val() == "ACCOUNT") {
-                    club_account.show();
-                    need_link.show();
-                    user.hide();
-                    club.hide();
-                    company.hide();
-                    other.hide();
-                } else if (target_type.val() == "CLUB") {
-                    club.show();
-                    user.hide();
-                    club_account.hide();
-                    company.hide();
-                    other.hide();
-                    need_link.hide();
-                } else if (target_type.val() == "COMPANY") {
-                    company.show();
-                    user.hide();
-                    club_account.hide();
-                    club.hide();
-                    other.hide();
-                    need_link.hide();
-                } else if (target_type.val() == "OTHER") {
-                    other.show();
-                    user.hide();
-                    club.hide();
-                    club_account.hide();
-                    company.hide();
-                    need_link.hide();
-                } else {
-                    company.hide();
-                    user.hide();
-                    club_account.hide();
-                    club.hide();
-                    other.hide();
-                    need_link.hide();
-                }
-            }
-            update_targets();
-            target_type.change(update_targets);
-            } );
-    </script>
-</div>
+      var target_type = $('#id_target_type');
+      var user = $('#id_user_wrapper');
+      var club = $('#id_club_wrapper');
+      var club_account = $('#id_club_account_wrapper');
+      var company = $('#id_company_wrapper');
+      var other = $('#id_target_label');
+      var need_link = $('#id_need_link_full');
+      function update_targets () {
+        if (target_type.val() == "USER") {
+          console.log(user);
+          user.show();
+          club.hide();
+          club_account.hide();
+          company.hide();
+          other.hide();
+          need_link.hide();
+        } else if (target_type.val() == "ACCOUNT") {
+          club_account.show();
+          need_link.show();
+          user.hide();
+          club.hide();
+          company.hide();
+          other.hide();
+        } else if (target_type.val() == "CLUB") {
+          club.show();
+          user.hide();
+          club_account.hide();
+          company.hide();
+          other.hide();
+          need_link.hide();
+        } else if (target_type.val() == "COMPANY") {
+          company.show();
+          user.hide();
+          club_account.hide();
+          club.hide();
+          other.hide();
+          need_link.hide();
+        } else if (target_type.val() == "OTHER") {
+          other.show();
+          user.hide();
+          club.hide();
+          club_account.hide();
+          company.hide();
+          need_link.hide();
+        } else {
+          company.hide();
+          user.hide();
+          club_account.hide();
+          club.hide();
+          other.hide();
+          need_link.hide();
+        }
+      }
+      update_targets();
+      target_type.change(update_targets);
+    } );
+  </script>
+  </div>
 {% endblock %}
 
 

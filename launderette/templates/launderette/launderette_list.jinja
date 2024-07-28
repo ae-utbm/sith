@@ -1,24 +1,24 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Launderette admin list{% endtrans %}
+  {% trans %}Launderette admin list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if user.is_root %}
-<p><a href="{{ url('launderette:launderette_new') }}">{% trans %}New launderette{% endtrans %}</a></p>
-{% endif %}
-{% if launderette_list %}
-<h3>{% trans %}Launderette admin list{% endtrans %}</h3>
-<ul>
-    {% for l in launderette_list  %}
-    <li><a href="{{ url('launderette:launderette_admin', launderette_id=l.id) }}">{{ l }}</a> -
-        <a href="{{ url('launderette:launderette_edit', launderette_id=l.id) }}">{% trans %}Edit{% endtrans %}</a></li>
-    {% endfor %}
-</ul>
-{% else %}
-{% trans %}There is no launderette in this website.{% endtrans %}
-{% endif %}
+  {% if user.is_root %}
+    <p><a href="{{ url('launderette:launderette_new') }}">{% trans %}New launderette{% endtrans %}</a></p>
+  {% endif %}
+  {% if launderette_list %}
+    <h3>{% trans %}Launderette admin list{% endtrans %}</h3>
+    <ul>
+      {% for l in launderette_list  %}
+        <li><a href="{{ url('launderette:launderette_admin', launderette_id=l.id) }}">{{ l }}</a> -
+          <a href="{{ url('launderette:launderette_edit', launderette_id=l.id) }}">{% trans %}Edit{% endtrans %}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    {% trans %}There is no launderette in this website.{% endtrans %}
+  {% endif %}
 {% endblock %}
 
 

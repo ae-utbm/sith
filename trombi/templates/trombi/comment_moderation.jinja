@@ -1,33 +1,33 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Moderate Trombi comments{% endtrans %}
+  {% trans %}Moderate Trombi comments{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans %}Moderate Trombi comments{% endtrans %}</h3>
-<h4>{{ trombi }}</h4>
-<a href="{{ url('trombi:detail', trombi_id=object.id) }}">{% trans %}Back{% endtrans %}</a>
-<hr>
-<dl>
-{% for c in comments %}
-    <dt>{% trans author=c.author.user.get_display_name(),
-            target=c.target.user.get_display_name() %}Author: {{ author }} - Target: {{ target }}{% endtrans %}</dt>
-    <dd>
+  <h3>{% trans %}Moderate Trombi comments{% endtrans %}</h3>
+  <h4>{{ trombi }}</h4>
+  <a href="{{ url('trombi:detail', trombi_id=object.id) }}">{% trans %}Back{% endtrans %}</a>
+  <hr>
+  <dl>
+    {% for c in comments %}
+      <dt>{% trans author=c.author.user.get_display_name(),
+        target=c.target.user.get_display_name() %}Author: {{ author }} - Target: {{ target }}{% endtrans %}</dt>
+  <dd>
         <pre>
         {{ c.content }}
         </pre>
-        <form action="{{ url('trombi:moderate_comment', comment_id=c.id )}}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="action" id="action" value="accept" />
-            <p><input type="submit" value="{% trans %}Accept{% endtrans %}" /></p>
-        </form>
-        <form action="{{ url('trombi:moderate_comment', comment_id=c.id )}}" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="action" id="action" value="reject" />
-            <p><input type="submit" value="{% trans %}Reject{% endtrans %}" /></p>
-        </form>
-    </dd>
+    <form action="{{ url('trombi:moderate_comment', comment_id=c.id )}}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" id="action" value="accept" />
+      <p><input type="submit" value="{% trans %}Accept{% endtrans %}" /></p>
+    </form>
+    <form action="{{ url('trombi:moderate_comment', comment_id=c.id )}}" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" id="action" value="reject" />
+      <p><input type="submit" value="{% trans %}Reject{% endtrans %}" /></p>
+    </form>
+  </dd>
 {% endfor %}
 </dl>
 

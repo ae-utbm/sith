@@ -2,41 +2,41 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 
 {% block title %}
-{{ weekmail.title }}
+  {{ weekmail.title }}
 {% endblock %}
 
 {% block content %}
-<a href="{{ url('com:weekmail') }}">{% trans %}Back{% endtrans %}</a>
-{% if bad_recipients %}
+  <a href="{{ url('com:weekmail') }}">{% trans %}Back{% endtrans %}</a>
+  {% if bad_recipients %}
     <p>
-    <span class="important">
+      <span class="important">
         {% trans %}The following recipients were refused by the SMTP:{% endtrans %}
-    </span>
-    <ul>
-    {% for r in bad_recipients.keys() %}
-        <li>{{ r }}</li>
-    {% endfor %}
-    </ul>
+      </span>
+      <ul>
+        {% for r in bad_recipients.keys() %}
+          <li>{{ r }}</li>
+        {% endfor %}
+      </ul>
     </p>
 
     <form method="post" action="">
-        {% csrf_token %}
-        <button type="submit" name="send" value="clean">{% trans %}Clean subscribers{% endtrans %}</button>
+      {% csrf_token %}
+      <button type="submit" name="send" value="clean">{% trans %}Clean subscribers{% endtrans %}</button>
     </form>
-{% else %}
+  {% else %}
     {% if request.GET['send'] %}
-        <p>{% trans %}Are you sure you want to send this weekmail?{% endtrans %}</p>
-        {% if request.LANGUAGE_CODE != settings.LANGUAGE_CODE[:2] %}
-            <p><strong>{% trans %}Warning: you are sending the weekmail in another language than the default one!{% endtrans %}</strong></p>
-        {% endif %}
-        <form method="post" action="">
-            {% csrf_token %}
-            <button type="submit" name="send" value="validate">{% trans %}Send{% endtrans %}</button>
-        </form>
+      <p>{% trans %}Are you sure you want to send this weekmail?{% endtrans %}</p>
+      {% if request.LANGUAGE_CODE != settings.LANGUAGE_CODE[:2] %}
+        <p><strong>{% trans %}Warning: you are sending the weekmail in another language than the default one!{% endtrans %}</strong></p>
+      {% endif %}
+      <form method="post" action="">
+        {% csrf_token %}
+        <button type="submit" name="send" value="validate">{% trans %}Send{% endtrans %}</button>
+      </form>
     {% endif %}
-{% endif %}
-<hr>
-{{ weekmail_rendered|safe }}
+  {% endif %}
+  <hr>
+  {{ weekmail_rendered|safe }}
 {% endblock %}
 
 

@@ -3,50 +3,50 @@
 {% from 'forum/macros.jinja' import display_forum, display_search_bar %}
 
 {% block title %}
-{% trans %}Forum{% endtrans %}
+  {% trans %}Forum{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<p>
-<a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a> >
-</p>
-<div id="forum">
+  <p>
+    <a href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a> >
+  </p>
+  <div id="forum">
     <h3>{% trans %}Forum{% endtrans %}</h3>
     <p>
-        <a class="ib button" href="{{ url('forum:last_unread') }}">{% trans %}View last unread messages{% endtrans %}</a>
-        <a class="ib button" href="{{ url('forum:favorite_topics') }}">{% trans %}Favorite topics{% endtrans %}</a>
-        {{ display_search_bar(request) }}
+      <a class="ib button" href="{{ url('forum:last_unread') }}">{% trans %}View last unread messages{% endtrans %}</a>
+      <a class="ib button" href="{{ url('forum:favorite_topics') }}">{% trans %}Favorite topics{% endtrans %}</a>
+      {{ display_search_bar(request) }}
     </p>
     {% if
-        user.is_com_admin
-        or user.is_in_group(pk=settings.SITH_GROUP_FORUM_ADMIN_ID)
+    user.is_com_admin
+    or user.is_in_group(pk=settings.SITH_GROUP_FORUM_ADMIN_ID)
     %}
     <p>
-        <a href="{{ url('forum:new_forum') }}">{% trans %}New forum{% endtrans %}</a>
+      <a href="{{ url('forum:new_forum') }}">{% trans %}New forum{% endtrans %}</a>
     </p>
-    {% endif %}
-    <div>
-        <div class="ib w_big">
-            {% trans %}Title{% endtrans %}
-        </div>
-        <div class="ib w_small">
-            <div class="ib w_medium">
-                {% trans %}Topics{% endtrans %}
-            </div>
-            <div class="ib w_small">
-                {% trans %}Last message{% endtrans %}
-            </div>
-        </div>
+{% endif %}
+<div>
+  <div class="ib w_big">
+    {% trans %}Title{% endtrans %}
+  </div>
+  <div class="ib w_small">
+    <div class="ib w_medium">
+      {% trans %}Topics{% endtrans %}
     </div>
+    <div class="ib w_small">
+      {% trans %}Last message{% endtrans %}
+    </div>
+  </div>
+</div>
 
-    {% for f in forum_list %}
-    <div>
+{% for f in forum_list %}
+  <div>
     {{ display_forum(f, user, True) }}
-        {% for c in f.children.all() %}
-        {{ display_forum(c, user) }}
-        {% endfor %}
-    </div>
+    {% for c in f.children.all() %}
+      {{ display_forum(c, user) }}
     {% endfor %}
+  </div>
+{% endfor %}
 </div>
 {% endblock %}
 

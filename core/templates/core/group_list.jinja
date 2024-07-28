@@ -1,31 +1,31 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Group list{% endtrans %}
+  {% trans %}Group list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans %}Group list{% endtrans %}</h3>
-<p><a href="{{ url('core:group_new') }}">{% trans %}New group{% endtrans %}</a></p>
-<table>
-	<thead>
-		<tr>
-			<td>{% trans %}ID{% endtrans %}</td>
-			<td>{% trans %}Group{% endtrans %}</td>
-			<td>{% trans %}Description{% endtrans %}</td>
-		</tr>
-	</thead>
-	<tbody>
-		{% for group in object_list %}
-		<tr>
-			<td>{{ group.id }}</td>
-			<td><a href="{{ url('core:group_detail', group.id) }}">{{ group }}</a></td>
-			<td>{{ group.description }}</td>
-			<td><a href="{{ url('core:group_edit', group.id) }}">{% trans %}Edit{% endtrans %}</a></td>
-			<td><a href="{{ url('core:group_delete', group.id) }}">{% trans %}Delete{% endtrans %}</a></td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
+  <h3>{% trans %}Group list{% endtrans %}</h3>
+  <p><a href="{{ url('core:group_new') }}">{% trans %}New group{% endtrans %}</a></p>
+  <table>
+    <thead>
+      <tr>
+        <td>{% trans %}ID{% endtrans %}</td>
+        <td>{% trans %}Group{% endtrans %}</td>
+        <td>{% trans %}Description{% endtrans %}</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for group in object_list %}
+        <tr>
+          <td>{{ group.id }}</td>
+          <td><a href="{{ url('core:group_detail', group.id) }}">{{ group }}</a></td>
+          <td>{{ group.description }}</td>
+          <td><a href="{{ url('core:group_edit', group.id) }}">{% trans %}Edit{% endtrans %}</a></td>
+          <td><a href="{{ url('core:group_delete', group.id) }}">{% trans %}Delete{% endtrans %}</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}
 

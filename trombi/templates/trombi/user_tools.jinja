@@ -1,60 +1,60 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-	{% trans user_name=user.get_display_name() %}{{ user_name }}'s Trombi{% endtrans %}
+  {% trans user_name=user.get_display_name() %}{{ user_name }}'s Trombi{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans%}Trombi'{% endtrans %}</h3>
-{% if subscribe_form %}
-<form action="" method="post">
-    {% csrf_token %}
-    {{ subscribe_form.as_p() }}
-    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
-</form>
-{% endif %}
-{% if trombi %}
-<p>{% trans trombi = user.trombi_user.trombi %}You are subscribed to the Trombi {{ trombi }}{% endtrans %}</p>
-<hr>
-{% set can_comment = trombi.subscription_deadline < date.today() and
+  <h3>{% trans%}Trombi'{% endtrans %}</h3>
+  {% if subscribe_form %}
+    <form action="" method="post">
+      {% csrf_token %}
+      {{ subscribe_form.as_p() }}
+      <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+    </form>
+  {% endif %}
+  {% if trombi %}
+    <p>{% trans trombi = user.trombi_user.trombi %}You are subscribed to the Trombi {{ trombi }}{% endtrans %}</p>
+    <hr>
+    {% set can_comment = trombi.subscription_deadline < date.today() and
     date.today() <= trombi.comments_deadline %}
-{% if not can_comment %}
-<p>{% trans %}You can not write comments at this date.{% endtrans %}</p>
-<p>
-{% trans start=trombi.subscription_deadline|date(DATE_FORMAT), end=trombi.comments_deadline|date(DATE_FORMAT) %}Comments are only allowed between {{ start }} (excluded) and {{ end }} (included){% endtrans %}</p>
-<hr>
-{% endif %}
-<div>
-{% for u in user.trombi_user.trombi.users.exclude(id=user.trombi_user.id).order_by('user__nick_name') %}
-    <div class="ib" style="border: solid 1px grey; text-align: center">
-        {% set file = None %}
-        {% if u.profile_pict %}
+    {% if not can_comment %}
+      <p>{% trans %}You can not write comments at this date.{% endtrans %}</p>
+      <p>
+        {% trans start=trombi.subscription_deadline|date(DATE_FORMAT), end=trombi.comments_deadline|date(DATE_FORMAT) %}Comments are only allowed between {{ start }} (excluded) and {{ end }} (included){% endtrans %}</p>
+      <hr>
+    {% endif %}
+    <div>
+      {% for u in user.trombi_user.trombi.users.exclude(id=user.trombi_user.id).order_by('user__nick_name') %}
+        <div class="ib" style="border: solid 1px grey; text-align: center">
+          {% set file = None %}
+          {% if u.profile_pict %}
             {% set file = u.profile_pict.url %}
-        {% else %}
+          {% else %}
             {% set file = static('core/img/na.gif') %}
-        {% endif %}
-        <div style="max-width: 100px; margin: auto;">
+          {% endif %}
+          <div style="max-width: 100px; margin: auto;">
             <img src="{{ file }}" alt="" style="max-width: 100px">
-        </div>
-        <div>{{ u.user.get_display_name() }}</div>
-        {% if trombi.show_profiles %}
+          </div>
+          <div>{{ u.user.get_display_name() }}</div>
+          {% if trombi.show_profiles %}
             <div>
-                <a href="{{ url('trombi:user_profile', user_id=u.id) }}">{% trans %}Profile{% endtrans %}</a>
+              <a href="{{ url('trombi:user_profile', user_id=u.id) }}">{% trans %}Profile{% endtrans %}</a>
             </div>
-        {% endif %}
-        <div>
+          {% endif %}
+          <div>
             {% if can_comment %}
-                {% set comment = u.received_comments.filter(author__id=user.trombi_user.id).first() %}
-                {% if comment %}
-                    <a href="{{ url('trombi:edit_comment', comment_id=comment.id) }}">{% trans %}Edit comment{% endtrans %}</a>
-                {% else %}
-                    <a href="{{ url('trombi:new_comment', user_id=u.id) }}">{% trans %}Comment{% endtrans %}</a>
-                {% endif %}
+              {% set comment = u.received_comments.filter(author__id=user.trombi_user.id).first() %}
+              {% if comment %}
+                <a href="{{ url('trombi:edit_comment', comment_id=comment.id) }}">{% trans %}Edit comment{% endtrans %}</a>
+              {% else %}
+                <a href="{{ url('trombi:new_comment', user_id=u.id) }}">{% trans %}Comment{% endtrans %}</a>
+              {% endif %}
             {% endif %}
+          </div>
         </div>
+      {% endfor %}
     </div>
-{% endfor %}
-</div>
-{% endif %}
+  {% endif %}
 {% endblock %}
 

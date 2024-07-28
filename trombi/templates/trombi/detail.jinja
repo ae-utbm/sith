@@ -1,40 +1,40 @@
 {% extends 'core/base.jinja' %}
 
 {% block title %}
-{% trans club=object.club %}{{ club }}'s Trombi{% endtrans %}
+  {% trans club=object.club %}{{ club }}'s Trombi{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <h2>{% trans club=object.club %}{{ club }}'s Trombi{% endtrans %}</h2>
-    <a href="{{ url('trombi:edit', trombi_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
-    <a href="{{ url('trombi:moderate_comments', trombi_id=object.id) }}">{% trans %}Moderate comments{% endtrans %}</a>
-    <p>{% trans %}Subscription deadline: {% endtrans %}{{ object.subscription_deadline|date(DATETIME_FORMAT) }}</p>
-    <p>{% trans %}Comment deadline: {% endtrans %}{{ object.comments_deadline|date(DATETIME_FORMAT) }}</p>
-    <a href="{{ url('trombi:export', trombi_id=object.id) }}">{% trans %}Export{% endtrans %}</a>
-    <hr>
-    <h4>{% trans %}Add user{% endtrans %}</h4>
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p() }}
-        <input type="submit" value="{% trans %}Add{% endtrans %}" />
-    </form>
-    <hr>
-    <div>
+  <h2>{% trans club=object.club %}{{ club }}'s Trombi{% endtrans %}</h2>
+  <a href="{{ url('trombi:edit', trombi_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
+  <a href="{{ url('trombi:moderate_comments', trombi_id=object.id) }}">{% trans %}Moderate comments{% endtrans %}</a>
+  <p>{% trans %}Subscription deadline: {% endtrans %}{{ object.subscription_deadline|date(DATETIME_FORMAT) }}</p>
+  <p>{% trans %}Comment deadline: {% endtrans %}{{ object.comments_deadline|date(DATETIME_FORMAT) }}</p>
+  <a href="{{ url('trombi:export', trombi_id=object.id) }}">{% trans %}Export{% endtrans %}</a>
+  <hr>
+  <h4>{% trans %}Add user{% endtrans %}</h4>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <input type="submit" value="{% trans %}Add{% endtrans %}" />
+  </form>
+  <hr>
+  <div>
     {% for u in object.users.order_by('user__nick_name') %}
-        <div class="ib" style="border: solid 1px grey; text-align: center">
-            {% set file = None %}
-            {% if u.profile_pict %}
-                {% set file = u.profile_pict.url %}
-            {% else %}
-                {% set file = static('core/img/na.gif') %}
-            {% endif %}
-            <div style="max-width: 100px; margin: auto;">
-                <img src="{{ file }}" alt="" style="max-width: 100px">
-            </div>
-            <div>{{ u.user.get_display_name() }}</div>
-            <div><a href="{{ url('trombi:delete_user', user_id=u.id) }}">{% trans %}Delete{% endtrans %}</a></div>
-            <div><a href="{{ url('trombi:create_membership', user_id=u.id) }}">{% trans %}Add club membership{% endtrans %}</a></div>
+      <div class="ib" style="border: solid 1px grey; text-align: center">
+        {% set file = None %}
+        {% if u.profile_pict %}
+          {% set file = u.profile_pict.url %}
+        {% else %}
+          {% set file = static('core/img/na.gif') %}
+        {% endif %}
+        <div style="max-width: 100px; margin: auto;">
+          <img src="{{ file }}" alt="" style="max-width: 100px">
         </div>
+        <div>{{ u.user.get_display_name() }}</div>
+        <div><a href="{{ url('trombi:delete_user', user_id=u.id) }}">{% trans %}Delete{% endtrans %}</a></div>
+        <div><a href="{{ url('trombi:create_membership', user_id=u.id) }}">{% trans %}Add club membership{% endtrans %}</a></div>
+      </div>
     {% endfor %}
-    </div>
+  </div>
 {% endblock %}

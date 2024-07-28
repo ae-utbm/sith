@@ -21,6 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import itertools
 
 # This file contains all the views that concern the user model
 from datetime import date, timedelta
@@ -31,6 +32,7 @@ from django.contrib.auth import login, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import F
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponse
@@ -311,21 +313,15 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["albums"] = []
-        kwargs["pictures"] = {}
-        picture_qs = (
+        pictures = list(
             Picture.objects.filter(people__user_id=self.object.id)
-            .order_by("parent__date", "id")
-            .all()
+            .order_by("-parent__date", "-date")
+            .annotate(album=F("parent__name"))
         )
-        last_album = None
-        for picture in picture_qs:
-            album = picture.parent
-            if album.id != last_album and album not in kwargs["albums"]:
-                kwargs["albums"].append(album)
-                kwargs["pictures"][album.id] = []
-                last_album = album.id
-            kwargs["pictures"][album.id].append(picture)
+        kwargs["albums"] = {
+            album: list(picts)
+            for album, picts in itertools.groupby(pictures, lambda i: i.album)
+        }
         return kwargs
 
 

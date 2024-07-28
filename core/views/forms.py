@@ -20,7 +20,6 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-import datetime
 import re
 from io import BytesIO
 
@@ -39,14 +38,11 @@ from django.forms import (
     Textarea,
     TextInput,
 )
-from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.urls import reverse
-from django.utils import timezone
-from django.utils.dateparse import parse_datetime
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
-from phonenumber_field.widgets import PhoneNumberInternationalFallbackWidget
+from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
 from core.models import Gift, Page, SithFile, User
@@ -56,25 +52,21 @@ from core.utils import resize_image
 
 
 class SelectDateTime(DateTimeInput):
-    def render(self, name, value, attrs=None, renderer=None):
-        if attrs:
-            attrs["class"] = "select_datetime"
-        else:
-            attrs = {"class": "select_datetime"}
-        return super().render(name, value, attrs, renderer)
+    def __init__(self, attrs=None, format=None):  # noqa A002
+        default = {"type": "datetime-local"}
+        attrs = default if attrs is None else default | attrs
+        super().__init__(attrs=attrs, format=format or "%Y-%m-%d %H:%M")
 
 
 class SelectDate(DateInput):
-    def render(self, name, value, attrs=None, renderer=None):
-        if attrs:
-            attrs["class"] = "select_date"
-        else:
-            attrs = {"class": "select_date"}
-        return super().render(name, value, attrs, renderer)
+    def __init__(self, attrs=None, format=None):  # noqa A002
+        default = {"type": "date"}
+        attrs = default if attrs is None else default | attrs
+        super().__init__(attrs=attrs, format=format or "%Y-%m-%d")
 
 
 class MarkdownInput(Textarea):
-    template_name = "core/markdown_textarea.jinja"
+    template_name = "core/widgets/markdown_textarea.jinja"
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -105,6 +97,15 @@ class MarkdownInput(Textarea):
             "guide": _("Markdown guide"),
         }
         context["markdown_api_url"] = reverse("api:markdown")
+        return context
+
+
+class NFCTextInput(TextInput):
+    template_name = "core/widgets/nfc.jinja"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["translations"] = {"unsupported": _("Unsupported NFC card")}
         return context
 
 
@@ -235,8 +236,8 @@ class UserProfileForm(forms.ModelForm):
             "profile_pict": forms.ClearableFileInput,
             "avatar_pict": forms.ClearableFileInput,
             "scrub_pict": forms.ClearableFileInput,
-            "phone": PhoneNumberInternationalFallbackWidget,
-            "parent_phone": PhoneNumberInternationalFallbackWidget,
+            "phone": RegionalPhoneNumberWidget,
+            "parent_phone": RegionalPhoneNumberWidget,
             "quote": forms.Textarea,
         }
         labels = {
@@ -246,12 +247,6 @@ class UserProfileForm(forms.ModelForm):
             "avatar_pict": _("Avatar: used on the forum"),
             "scrub_pict": _("Scrub: let other know how your scrub looks like!"),
         }
-
-    def __init__(self, *arg, **kwargs):
-        super().__init__(*arg, **kwargs)
-
-    def full_clean(self):
-        super().full_clean()
 
     def generate_name(self, field_name, f):
         field_name = field_name[:-4]
@@ -394,27 +389,3 @@ class GiftForm(forms.ModelForm):
                 id=user_id
             )
             self.fields["user"].widget = forms.HiddenInput()
-
-
-class TzAwareDateTimeField(forms.DateTimeField):
-    def __init__(self, input_formats=None, widget=SelectDateTime, **kwargs):
-        if input_formats is None:
-            input_formats = ["%Y-%m-%d %H:%M:%S"]
-        super().__init__(input_formats=input_formats, widget=widget, **kwargs)
-
-    def prepare_value(self, value):
-        # the db value is a datetime as a string in UTC
-        if isinstance(value, str):
-            # convert it into a naive datetime (no timezone attached)
-            value = parse_datetime(value)
-            # attach it to the UTC timezone (so that to_current_timezone()) if not None
-            # converts it to the local timezone)
-            if value is not None:
-                value = timezone.make_aware(value, datetime.timezone.utc)
-
-        if isinstance(value, datetime.datetime):
-            value = to_current_timezone(value)
-            # otherwise it is formatted according to locale (in french)
-            value = str(value)
-
-        return value

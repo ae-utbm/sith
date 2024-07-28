@@ -69,11 +69,11 @@ class TestCom(TestCase):
             },
         )
         r = self.client.get(reverse("core:index"))
-        self.assertContains(
-            r,
-            """<div id="alert_box">
-                            <div class="markdown"><h3>ALERTE!</h3>
-<p><strong>Caaaataaaapuuuulte!!!!</strong></p>""",
+        assert r.status_code == 200
+        self.assertInHTML(
+            """<div id="alert_box"><div class="markdown"><h3>ALERTE!</h3>
+            <p><strong>Caaaataaaapuuuulte!!!!</strong></p>""",
+            r.content.decode(),
         )
 
     def test_info_msg(self):
@@ -86,10 +86,12 @@ class TestCom(TestCase):
             },
         )
         r = self.client.get(reverse("core:index"))
-        self.assertContains(
-            r,
-            """<div id="info_box">
-                            <div class="markdown"><h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>""",
+
+        assert r.status_code == 200
+        self.assertInHTML(
+            """<div id="info_box"><div class="markdown">
+            <h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>""",
+            r.content.decode(),
         )
 
     def test_birthday_non_subscribed_user(self):

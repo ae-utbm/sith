@@ -1,10 +1,21 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.5.1
+    rev: v0.5.5
     hooks:
       - id: ruff  # just check the code, and print the errors
       - id: ruff  # actually fix the fixable errors, but print nothing
         args: ["--fix", "--silent"]
       # Run the formatter.
       - id: ruff-format
+  - repo: https://github.com/rtts/djhtml
+    rev: 3.0.6
+    hooks:
+      - id: djhtml
+        name: format templates
+        entry: djhtml --tabwidth 2
+        types: ["jinja"]
+      - id: djcss
+        name: format scss files
+        entry: djcss --tabwidth 2
+        types: ["scss"]

@@ -24,18 +24,18 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView, FormView
 
 from core.models import User
-from core.views.forms import SelectDate, TzAwareDateTimeField
+from core.views.forms import SelectDate, SelectDateTime
 from subscription.models import Subscription
 
 
 class SelectionDateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["start_date"] = TzAwareDateTimeField(
-            label=_("Start date"), required=True
+        self.fields["start_date"] = forms.DateTimeField(
+            label=_("Start date"), widget=SelectDateTime, required=True
         )
-        self.fields["end_date"] = TzAwareDateTimeField(
-            label=_("End date"), required=True
+        self.fields["end_date"] = forms.DateTimeField(
+            label=_("End date"), widget=SelectDateTime, required=True
         )
 
 
@@ -56,7 +56,7 @@ class SubscriptionForm(forms.ModelForm):
             max_length=User._meta.get_field("first_name").max_length
         )
         self.fields["email"] = forms.EmailField()
-        self.fields["date_of_birth"] = forms.DateTimeField(widget=SelectDate)
+        self.fields["date_of_birth"] = forms.DateField(widget=SelectDate)
 
         self.field_order = [
             "member",

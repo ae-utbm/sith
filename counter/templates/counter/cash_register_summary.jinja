@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans obj=object %}Edit {{ obj }}{% endtrans %}
+  {% trans obj=object %}Edit {{ obj }}{% endtrans %}
 {% endblock %}
 
 {% block info_boxes %}
@@ -11,22 +11,22 @@
 {% endblock %}
 
 {% block content %}
-<h2>{% trans %}Make a cash register summary{% endtrans %}</h2>
-<form action="" method="post" id="cash_summary_form">
+  <h2>{% trans %}Make a cash register summary{% endtrans %}</h2>
+  <form action="" method="post" id="cash_summary_form">
     {% csrf_token %}
     {% for field in form %}
-    <p>
-    {% if field.name[:5] == "check" and field.name[8:] == "value" %}
-        {% set name = field.name[:7] + "_quantity" %}
-    {{ field.errors }}<label for="{{ field.name }}">{{ field.label }}</label> {{ field }}
-    {{ form[name].errors }}<label for="{{ form[name].name }}">{{ form[name].label }}</label> {{ form[name] }}
-    {% elif field.name[:5] != "check" %}
-    {{ field.errors }}<label for="{{ field.name }}">{{ field.label }}</label> {{ field }}
-    {% endif %}
-    </p>
+      <p>
+        {% if field.name[:5] == "check" and field.name[8:] == "value" %}
+          {% set name = field.name[:7] + "_quantity" %}
+          {{ field.errors }}<label for="{{ field.name }}">{{ field.label }}</label> {{ field }}
+          {{ form[name].errors }}<label for="{{ form[name].name }}">{{ form[name].label }}</label> {{ form[name] }}
+        {% elif field.name[:5] != "check" %}
+          {{ field.errors }}<label for="{{ field.name }}">{{ field.label }}</label> {{ field }}
+        {% endif %}
+      </p>
     {% endfor %}
     <p><input type="submit" name="submit" value="{% trans %}Save{% endtrans %}" onclick="return confirm('{% trans %}Are you sure ?{% endtrans %}');return false;" /></p>
-</form>
+  </form>
 {% endblock %}
 
 

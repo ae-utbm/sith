@@ -61,6 +61,7 @@ from counter.forms import (
     CounterEditForm,
     EticketForm,
     GetUserForm,
+    NFCCardForm,
     ProductEditForm,
     RefillForm,
     StudentCardForm,
@@ -679,6 +680,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                 )
         kwargs["customer"] = self.customer
         kwargs["student_cards"] = self.customer.student_cards.all()
+        kwargs["student_card_input"] = NFCCardForm()
         kwargs["basket_total"] = self.sum_basket(self.request)
         kwargs["refill_form"] = self.refill_form or RefillForm()
         kwargs["student_card_max_uid_size"] = StudentCard.UID_SIZE

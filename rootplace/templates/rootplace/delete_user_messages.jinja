@@ -1,15 +1,15 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Delete user's forum messages{% endtrans %}
+  {% trans %}Delete user's forum messages{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <h3>{% trans %}Delete all forum messages from an user{% endtrans %}</h3>
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p() }}
-        <p><input type="submit" value="{% trans %}Delete messages{% endtrans %}" /></p>
-    </form>
-    <p><strong>{% trans %}If you have trouble using this utility (timeout error, 500 error), try using the command line utility. Use ./manage.py delete_all_forum_user_messages ID.{% endtrans %}</strong></p>
+  <h3>{% trans %}Delete all forum messages from an user{% endtrans %}</h3>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Delete messages{% endtrans %}" /></p>
+  </form>
+  <p><strong>{% trans %}If you have trouble using this utility (timeout error, 500 error), try using the command line utility. Use ./manage.py delete_all_forum_user_messages ID.{% endtrans %}</strong></p>
 {% endblock %}

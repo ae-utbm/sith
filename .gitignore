@@ -17,4 +17,6 @@ sith/settings_custom.py
 sith/search_indexes/
 .coverage
 coverage_report/
-doc/_build
+
+# compiled documentation
+site/

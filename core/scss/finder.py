@@ -22,7 +22,6 @@
 #
 #
 
-import os
 from collections import OrderedDict
 
 from django.conf import settings
@@ -37,7 +36,7 @@ class ScssFinder(FileSystemFinder):
 
     def __init__(self, apps=None, *args, **kwargs):
         location = settings.STATIC_ROOT
-        if not os.path.isdir(location):
+        if not location.is_dir():
             return
         self.locations = [("", location)]
         self.storages = OrderedDict()

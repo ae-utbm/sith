@@ -1,15 +1,15 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}User list{% endtrans %}
+  {% trans %}User list{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans %}User list{% endtrans %}</h3>
-<ul>
-{% for u in user_list %}
-<li><a href="{{ url('core:user_profile', user_id=u.id) }}">{{ u.get_display_name() }}</a></li>
-{% endfor %}
-</ul>
+  <h3>{% trans %}User list{% endtrans %}</h3>
+  <ul>
+    {% for u in user_list %}
+      <li><a href="{{ url('core:user_profile', user_id=u.id) }}">{{ u.get_display_name() }}</a></li>
+    {% endfor %}
+  </ul>
 {% endblock %}
 

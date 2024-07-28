@@ -27,6 +27,7 @@ import importlib
 import os
 import unicodedata
 from datetime import date, timedelta
+from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
 from django.conf import settings
@@ -55,8 +56,6 @@ from django.utils.functional import cached_property
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-
-from core import utils
 
 if TYPE_CHECKING:
     from club.models import Club
@@ -377,7 +376,9 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = "username"
 
     def promo_has_logo(self):
-        return utils.file_exist("./core/static/core/img/promo_%02d.png" % self.promo)
+        return Path(
+            settings.BASE_DIR / f"core/static/core/img/promo_{self.promo}.png"
+        ).exists()
 
     def has_module_perms(self, package_name):
         return self.is_active

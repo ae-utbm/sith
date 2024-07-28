@@ -2,7 +2,7 @@
 {% from 'core/macros_pages.jinja' import page_edit_form %}
 
 {% block content %}
-{{ page_edit_form(page, form, url('club:club_edit_page', club_id=page.club.id), csrf_token) }}
+  {{ page_edit_form(page, form, url('club:club_edit_page', club_id=page.club.id), csrf_token) }}
 {% endblock %}
 
 

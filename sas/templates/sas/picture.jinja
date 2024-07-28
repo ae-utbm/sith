@@ -1,178 +1,223 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-    <link rel="stylesheet" href="{{ scss('sas/picture.scss') }}">
+  <link rel="stylesheet" href="{{ scss('sas/picture.scss') }}">
+{%- endblock -%}
+
+{%- block additional_js -%}
+  <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
 {%- endblock -%}
 
 {% block head %}
-    {{ super() }}
+  {{ super() }}
 
-    {% if picture.get_previous() %}
-        <link rel="preload" as="image" href="{{ url("sas:download_compressed", picture_id=picture.get_previous().id) }}">
-    {% endif %}
-    {% if picture.get_next() %}
-        <link rel="preload" as="image" href="{{ url("sas:download_compressed", picture_id=picture.get_next().id) }}">
-    {% endif %}
+  {% if picture.get_previous() %}
+    <link
+      rel="preload"
+      as="image"
+      href="{{ url("sas:download_compressed", picture_id=picture.get_previous().id) }}"
+    >
+  {% endif %}
+  {% if picture.get_next() %}
+    <link rel="preload" as="image" href="{{ url("sas:download_compressed", picture_id=picture.get_next().id) }}">
+  {% endif %}
 
 {% endblock %}
 
 {% block title %}
-    {% trans %}SAS{% endtrans %}
+  {% trans %}SAS{% endtrans %}
 {% endblock %}
 
 {% macro print_path(file) %}
-    {% if file and file.parent %}
-        {{ print_path(file.parent) }}
-        <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
-    {% endif %}
+  {% if file and file.parent %}
+    {{ print_path(file.parent) }}
+    <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
+  {% endif %}
 {% endmacro %}
 
 {% block content %}
-    <code>
-        <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(picture.parent) }} {{ picture.get_display_name() }}
-    </code>
+  <code>
+    <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(picture.parent) }} {{ picture.get_display_name() }}
+  </code>
 
-    <br>
+  <br>
 
-    <div class="title">
-        <h3>{{ picture.get_display_name() }}</h3>
-        <h4>{{ picture.parent.children.filter(id__lte=picture.id).count() }} / {{ picture.parent.children.count() }}</h4>
-    </div>
-    <br>
+  <div class="title">
+    <h3>{{ picture.get_display_name() }}</h3>
+    <h4>{{ picture.parent.children.filter(id__lte=picture.id).count() }}
+      / {{ picture.parent.children.count() }}</h4>
+  </div>
+  <br>
 
-    {% if not picture.is_moderated %}
-        {% set next = picture.get_next() %}
-        {% if not next %}
-            {% set next = url('sas:moderation') %}
-        {% else %}
-            {% set next = next.get_absolute_url() + "#pict" %}
-        {% endif %}
-
-        <div class="moderation">
-            <div>
-                {% if picture.asked_for_removal %}
-                    <span class="important">{% trans %}Asked for removal{% endtrans %}</span>
-                {% else %}
-                    &nbsp;
-                {% endif %}
-            </div>
-            <div>
-                <a href="{{ url('core:file_moderate', file_id=picture.id) }}?next={{ next }}">
-                    {% trans %}Moderate{% endtrans %}
-                </a>
-                <a href="{{ url('core:file_delete', file_id=picture.id) }}?next={{ next }}">
-                    {% trans %}Delete{% endtrans %}
-                </a>
-            </div>
-        </div>
+  {% if not picture.is_moderated %}
+    {% set next = picture.get_next() %}
+    {% if not next %}
+      {% set next = url('sas:moderation') %}
+    {% else %}
+      {% set next = next.get_absolute_url() + "#pict" %}
     {% endif %}
 
-    <div class="container">
-        <div class="main">
-
-            <div class="photo">
-                <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}"/>
-            </div>
-
-            <div class="general">
-                <div class="infos">
-                    <h5>{% trans %}Infos{% endtrans %}</h5>
-                    <div>
-                        <div>
-                            <span>{% trans %}Date: {% endtrans %}</span>
-                            <span>{{ picture.date|date(DATETIME_FORMAT) }}</span>
-                        </div>
-                        <div>
-                            <span>{% trans %}Owner: {% endtrans %}</span>
-                            <a href="{{ picture.owner.get_absolute_url() }}">{{ picture.owner.get_short_name() }}</a>
-                        </div>
-
-                        {% if picture.moderator %}
-                            <div>
-                                <span>{% trans %}Moderator: {% endtrans %}</span>
-                                <a href="{{ picture.moderator.get_absolute_url() }}">{{ picture.moderator.get_short_name() }}</a>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="tools">
-                    <h5>{% trans %}Tools{% endtrans %}</h5>
-                    <div>
-                        <div>
-                            <a class="text" href="{{ picture.get_download_url() }}">{% trans %}HD version{% endtrans %}</a>
-                            <br>
-                            <a class="text danger" href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
-                        </div>
-                        <div class="buttons">
-                            <a class="button" href="{{ url('sas:picture_edit', picture_id=picture.id) }}">✏️</a>
-                            <a class="button" href="?rotate_left">↺</a>
-                            <a class="button" href="?rotate_right">↻</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="subsection">
-            <div class="navigation">
-                <div id="prev">
-                    {% if picture.get_previous() %}
-                        <a href="{{ url( 'sas:picture', picture_id=picture.get_previous().id) }}#pict">
-                            <div style="background-image: url('{{ picture.get_previous().as_picture.get_download_thumb_url() }}');"></div>
-                        </a>
-                    {% endif %}
-                </div>
-                <div id="next">
-                    {% if picture.get_next() %}
-                        <a href="{{ url( 'sas:picture', picture_id=picture.get_next().id) }}#pict">
-                            <div style="background-image: url('{{ picture.get_next().as_picture.get_download_thumb_url() }}');"></div>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="tags">
-                <h5>{% trans %}People{% endtrans %}</h5>
-                <form action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.as_p() }}
-                    <input type="submit" value="{% trans %}Go{% endtrans %}" />
-                </form>
-                <ul>
-                    {% for r in picture.people.all() %}
-                        <li>
-                            <a class="user" href="{{ r.user.get_absolute_url() }}">
-                                {% if r.user.profile_pict %}
-                                <div class="profile-pic" style="background-image: url('{{ r.user.profile_pict.get_download_url() }}');"></div>
-                                {% endif %}
-                                <span>{{ r.user.get_short_name() }}</span>
-                            </a>
-                            {% if user == r.user or user.can_edit(picture) %}
-                                <a class="delete" href="?remove_user={{ r.user.id }}">❌</a>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+    <div class="moderation">
+      <div>
+        {% if picture.asked_for_removal %}
+          <span class="important">{% trans %}Asked for removal{% endtrans %}</span>
+        {% else %}
+          &nbsp;
+        {% endif %}
+      </div>
+      <div>
+        <a href="{{ url('core:file_moderate', file_id=picture.id) }}?next={{ next }}">
+          {% trans %}Moderate{% endtrans %}
+        </a>
+        <a href="{{ url('core:file_delete', file_id=picture.id) }}?next={{ next }}">
+          {% trans %}Delete{% endtrans %}
+        </a>
+      </div>
     </div>
+  {% endif %}
+
+  <div class="container">
+    <div class="main">
+
+      <div class="photo">
+        <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}"/>
+      </div>
+
+      <div class="general">
+        <div class="infos">
+          <h5>{% trans %}Infos{% endtrans %}</h5>
+          <div>
+            <div>
+              <span>{% trans %}Date: {% endtrans %}</span>
+              <span>{{ picture.date|date(DATETIME_FORMAT) }}</span>
+            </div>
+            <div>
+              <span>{% trans %}Owner: {% endtrans %}</span>
+              <a href="{{ picture.owner.get_absolute_url() }}">{{ picture.owner.get_short_name() }}</a>
+            </div>
+
+            {% if picture.moderator %}
+              <div>
+                <span>{% trans %}Moderator: {% endtrans %}</span>
+                <a href="{{ picture.moderator.get_absolute_url() }}">{{ picture.moderator.get_short_name() }}</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="tools">
+          <h5>{% trans %}Tools{% endtrans %}</h5>
+          <div>
+            <div>
+              <a class="text" href="{{ picture.get_download_url() }}">
+                {% trans %}HD version{% endtrans %}
+              </a>
+              <br>
+              <a class="text danger" href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
+            </div>
+            <div class="buttons">
+              <a class="button" href="{{ url('sas:picture_edit', picture_id=picture.id) }}">✏️</a>
+              <a class="button" href="?rotate_left">↺</a>
+              <a class="button" href="?rotate_right">↻</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <div class="navigation">
+        <div id="prev">
+          {% if picture.get_previous() %}
+            <a href="{{ url( 'sas:picture', picture_id=picture.get_previous().id) }}#pict">
+              <div style="background-image: url('{{ picture.get_previous().as_picture.get_download_thumb_url() }}');"></div>
+            </a>
+          {% endif %}
+        </div>
+        <div id="next">
+          {% if picture.get_next() %}
+            <a href="{{ url( 'sas:picture', picture_id=picture.get_next().id) }}#pict">
+              <div style="background-image: url('{{ picture.get_next().as_picture.get_download_thumb_url() }}');"></div>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="tags">
+        <h5>{% trans %}People{% endtrans %}</h5>
+        <form action="" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p() }}
+          <input type="submit" value="{% trans %}Go{% endtrans %}" />
+        </form>
+        <ul x-data="user_identification">
+          <template x-for="item in items" :key="item.id">
+            <li>
+              <a class="user" :href="item.user.url">
+                <img class="profile-pic" :src="item.user.picture" alt="image de profil"/>
+                <span x-text="item.user.name"></span>
+              </a>
+              <template x-if="can_be_removed(item)">
+                <a class="delete clickable" @click="remove(item)">❌</a>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block script %}
-    {{ super() }}
-    <script>
-    $(() => {
-        $(document).keydown((e) => {
-            switch (e.keyCode) {
-                case 37:
-                    $('#prev a')[0].click();
-                    break;
-                case 39:
-                    $('#next a')[0].click();
-                    break;
-            }
-        });
+  {{ super() }}
+  <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("user_identification", () => ({
+        items: [
+          {%- for r in picture.people.select_related("user", "user__profile_pict") -%}
+            {
+              id: {{ r.id }},
+              user: {
+                id: {{ r.user.id }},
+                name: "{{ r.user.get_short_name()|safe }}",
+                url: "{{ r.user.get_absolute_url() }}",
+                {% if r.user.profile_pict %}
+                  picture: "{{ r.user.profile_pict.get_download_url() }}",
+                {% else %}
+                  picture: "{{ static('core/img/unknown.jpg') }}",
+                {% endif %}
+              },
+            },
+          {%- endfor -%}
+        ],
+        can_be_removed(item) {
+          {# If user is root or sas admin, he has the right, at "compile" time.
+             If not, he can delete only its own identification. #}
+          {% if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
+            return true;
+          {% else %}
+            return item.user.id === {{ user.id }};
+          {% endif %}
+        },
+        async remove(item) {
+          const res = await fetch(`/api/sas/relation/${item.id}`, {method: "DELETE"});
+          if (res.ok) {
+            this.items = this.items.filter((i) => i.id !== item.id)
+          }
+        },
+      }))
     });
-    </script>
+    $(() => {
+      $(document).keydown((e) => {
+        switch (e.keyCode) {
+          case 37:
+            $('#prev a')[0].click();
+            break;
+          case 39:
+            $('#next a')[0].click();
+            break;
+        }
+      });
+    });
+  </script>
 {% endblock %}

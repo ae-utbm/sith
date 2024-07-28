@@ -3,7 +3,7 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from core.views.forms import SelectDate, TzAwareDateTimeField
+from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
 from counter.models import (
     BillingInfo,
     Counter,
@@ -37,6 +37,9 @@ class StudentCardForm(forms.ModelForm):
     class Meta:
         model = StudentCard
         fields = ["uid"]
+        widgets = {
+            "uid": NFCTextInput,
+        }
 
     def clean(self):
         cleaned_data = super().clean()
@@ -55,7 +58,10 @@ class GetUserForm(forms.Form):
     """
 
     code = forms.CharField(
-        label="Code", max_length=StudentCard.UID_SIZE, required=False
+        label="Code",
+        max_length=StudentCard.UID_SIZE,
+        required=False,
+        widget=NFCTextInput,
     )
     id = AutoCompleteSelectField(
         "users", required=False, label=_("Select user"), help_text=None
@@ -84,6 +90,14 @@ class GetUserForm(forms.Form):
         cleaned_data["user_id"] = cus.user.id
         cleaned_data["user"] = cus.user
         return cleaned_data
+
+
+class NFCCardForm(forms.Form):
+    student_card_uid = forms.CharField(
+        max_length=StudentCard.UID_SIZE,
+        required=False,
+        widget=NFCTextInput,
+    )
 
 
 class RefillForm(forms.ModelForm):
@@ -168,8 +182,12 @@ class ProductEditForm(forms.ModelForm):
 
 
 class CashSummaryFormBase(forms.Form):
-    begin_date = TzAwareDateTimeField(label=_("Begin date"), required=False)
-    end_date = TzAwareDateTimeField(label=_("End date"), required=False)
+    begin_date = forms.DateTimeField(
+        label=_("Begin date"), widget=SelectDateTime, required=False
+    )
+    end_date = forms.DateTimeField(
+        label=_("End date"), widget=SelectDateTime, required=False
+    )
 
 
 class EticketForm(forms.ModelForm):

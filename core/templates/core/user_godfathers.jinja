@@ -2,66 +2,66 @@
 {% from "core/macros.jinja" import user_link_with_pict, delete_godfather %}
 
 {%- block additional_css -%}
-<link rel="stylesheet" href="{{ scss('user/user_godfathers.scss') }}">
+  <link rel="stylesheet" href="{{ scss('user/user_godfathers.scss') }}">
 {%- endblock -%}
 
 {% block title %}
-{% trans user_name=profile.get_display_name() %}{{ user_name }}'s family{% endtrans %}
+  {% trans user_name=profile.get_display_name() %}{{ user_name }}'s family{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<div class="container">
+  <div class="container">
     <a href="{{ url('core:user_godfathers_tree_pict', user_id=profile.id) }}?family">
-        {% trans %}Show family picture{% endtrans %}
+      {% trans %}Show family picture{% endtrans %}
     </a>
 
     <h4>{% trans %}Godfathers / Godmothers{% endtrans %}</h4>
     {% if profile.godfathers.exists() %}
-        <ul class="users">
-            {% for u in profile.godfathers.all() %}
-                <li class="users-card">
-                    <a href="{{ url('core:user_godfathers', user_id=u.id) }}" class="mini_profile_link">
-                        {{ u.get_mini_item() | safe }}
-                    </a>
-                    {{ delete_godfather(user, profile, u, True) }}
-                </li>
-            {% endfor %}
-        </ul>
+      <ul class="users">
+        {% for u in profile.godfathers.all() %}
+          <li class="users-card">
+            <a href="{{ url('core:user_godfathers', user_id=u.id) }}" class="mini_profile_link">
+              {{ u.get_mini_item() | safe }}
+            </a>
+            {{ delete_godfather(user, profile, u, True) }}
+          </li>
+        {% endfor %}
+      </ul>
 
-        <a href="{{ url('core:user_godfathers_tree', user_id=profile.id) }}">
-            {% trans %}Show ancestors tree{% endtrans %}
-        </a>
+      <a href="{{ url('core:user_godfathers_tree', user_id=profile.id) }}">
+        {% trans %}Show ancestors tree{% endtrans %}
+      </a>
     {% else %}
-        <p>{% trans %}No godfathers / godmothers{% endtrans %}
+      <p>{% trans %}No godfathers / godmothers{% endtrans %}
     {% endif %}
 
     <h4>{% trans %}Godchildren{% endtrans %}</h4>
     {% if profile.godchildren.exists() %}
-        <ul class="users">
-            {% for u in profile.godchildren.all() %}
-                <li class="users-card">
-                    <a href="{{ url('core:user_godfathers', user_id=u.id) }}" class="mini_profile_link">
-                        {{ u.get_mini_item()|safe }} 
-                    </a>
-                    {{ delete_godfather(user, profile, u, False) }}
-                </li>
-            {% endfor %}
-        </ul>
-        
-        <a href="{{ url('core:user_godfathers_tree', user_id=profile.id) }}?descent">
-            {% trans %}Show descent tree{% endtrans %}
-        </a>
+      <ul class="users">
+        {% for u in profile.godchildren.all() %}
+          <li class="users-card">
+            <a href="{{ url('core:user_godfathers', user_id=u.id) }}" class="mini_profile_link">
+              {{ u.get_mini_item()|safe }}
+            </a>
+            {{ delete_godfather(user, profile, u, False) }}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <a href="{{ url('core:user_godfathers_tree', user_id=profile.id) }}?descent">
+        {% trans %}Show descent tree{% endtrans %}
+      </a>
     {% else %}
-        <p>{% trans %}No godchildren{% endtrans %}
+      <p>{% trans %}No godchildren{% endtrans %}
     {% endif %}
 
     {% if profile == user or user.is_root %}
-    <form action="" method="post">
+      <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p() }}
         <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
-    </form>
+      </form>
     {% endif %}
-</div>
+  </div>
 {% endblock %}
 

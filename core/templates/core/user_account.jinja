@@ -1,83 +1,83 @@
 {% extends "core/base.jinja" %}
 
 {% macro monthly(obj) %}
-<div>
+  <div>
     <table>
-        <thead>
-            <tr>
-                <td>{% trans %}Year{% endtrans %}</td>
-                <td>{% trans %}Month{% endtrans %}</td>
-                <td>{% trans %}Total{% endtrans %}</td>
-            </tr>
-        </thead>
-        <tbody>
+      <thead>
+        <tr>
+          <td>{% trans %}Year{% endtrans %}</td>
+          <td>{% trans %}Month{% endtrans %}</td>
+          <td>{% trans %}Total{% endtrans %}</td>
+        </tr>
+      </thead>
+      <tbody>
         {% for array in obj %}
-            {% for dict in array %}
-                {% if dict['sum'] != 0 %}
-                {% set link=url('core:user_account_detail', user_id=profile.id, year=dict['date'].year, month=dict['date'].month) %}
-                <tr>
-                    <td><a href="{{ link }}">{{ dict['date'].year }}</a></td>
-                    <td><a href="{{ link }}">{{ dict['date']|date("E") }}</a></td>
-                    <td><a href="{{ link }}">{{ dict['sum'] }} €</a></td>
-                </tr>
-                {% endif %}
-            {% endfor %}
+          {% for dict in array %}
+            {% if dict['sum'] != 0 %}
+              {% set link=url('core:user_account_detail', user_id=profile.id, year=dict['date'].year, month=dict['date'].month) %}
+              <tr>
+                <td><a href="{{ link }}">{{ dict['date'].year }}</a></td>
+                <td><a href="{{ link }}">{{ dict['date']|date("E") }}</a></td>
+                <td><a href="{{ link }}">{{ dict['sum'] }} €</a></td>
+              </tr>
+            {% endif %}
+          {% endfor %}
         {% endfor %}
-        </tbody>
+      </tbody>
     </table>
-</div>
+  </div>
 {% endmacro %}
 
 {% block title %}
-{% trans user_name=profile.get_display_name() %}{{ user_name }}'s account{% endtrans %}
+  {% trans user_name=profile.get_display_name() %}{{ user_name }}'s account{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if customer %}
-<h3>{% trans %}User account{% endtrans %}</h3>
-<p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
-<div id="drop">
-{% set bought = customer.buyings.exists() %}
-{% set refilled = customer.refillings.exists() %}
-{% if bought or refilled %}
-    {% if bought %}
-    <h5>{% trans %}Account purchases{% endtrans %}</h5>
-        {{ monthly(buyings_month) }}
-    {% endif %}
-    {% if refilled %}
-    <h5>{% trans %}Reloads{% endtrans %}</h5>
-        {{ monthly(refilling_month) }}
-    {% endif %}
-{% endif %}
-    {% if customer.user.invoices.exists() %}
-    <h5>{% trans %}Eboutic invoices{% endtrans %}</h5>
+  {% if customer %}
+    <h3>{% trans %}User account{% endtrans %}</h3>
+    <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
+    <div id="drop">
+      {% set bought = customer.buyings.exists() %}
+      {% set refilled = customer.refillings.exists() %}
+      {% if bought or refilled %}
+        {% if bought %}
+          <h5>{% trans %}Account purchases{% endtrans %}</h5>
+          {{ monthly(buyings_month) }}
+        {% endif %}
+        {% if refilled %}
+          <h5>{% trans %}Reloads{% endtrans %}</h5>
+          {{ monthly(refilling_month) }}
+        {% endif %}
+      {% endif %}
+      {% if customer.user.invoices.exists() %}
+        <h5>{% trans %}Eboutic invoices{% endtrans %}</h5>
         {{ monthly(invoices_month) }}
-    {% endif %}
-    {% if etickets %}
-    <h4>{% trans %}Etickets{% endtrans %}</h4>
-    <div>
-        <ul>
-        {% for s in etickets %}
-        <li><a href="{{ url('counter:eticket_pdf', selling_id=s.id) }}">{{ s.quantity }} x {{ s.product.eticket }}</a></li>
-        {% endfor %}
-        </ul>
+      {% endif %}
+      {% if etickets %}
+        <h4>{% trans %}Etickets{% endtrans %}</h4>
+        <div>
+          <ul>
+            {% for s in etickets %}
+              <li><a href="{{ url('counter:eticket_pdf', selling_id=s.id) }}">{{ s.quantity }} x {{ s.product.eticket }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
     </div>
-    {% endif %}
-</div>
-{% else %}
-<p>{% trans %}User has no account{% endtrans %}</p>
-{% endif %}
+  {% else %}
+    <p>{% trans %}User has no account{% endtrans %}</p>
+  {% endif %}
 {% endblock %}
 
 {% block script %}
-{{ super() }}
-<script>
-$(function(){
-    $("#drop").accordion({
+  {{ super() }}
+  <script>
+    $(function(){
+      $("#drop").accordion({
         heightStyle: "content"
+      });
     });
-});
-</script>
+  </script>
 {% endblock %}
 
 

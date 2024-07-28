@@ -21,7 +21,6 @@
 #
 #
 
-from pathlib import Path
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -33,7 +32,7 @@ class Command(BaseCommand):
     help = "Output the fully rendered SYNTAX.md file"
 
     def handle(self, *args, **options):
-        root_path = Path(settings.BASE_DIR)
+        root_path = settings.BASE_DIR
         with open(root_path / "core/fixtures/SYNTAX.md", "r") as md:
             result = markdown(md.read())
         print(result, end="")

@@ -1,16 +1,16 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans s = stock %}{{ s }}'s quantity to buy{% endtrans %}
+  {% trans s = stock %}{{ s }}'s quantity to buy{% endtrans %}
 {% endblock %}
 
 {% block content %}
-<h3>{% trans s = stock %}{{ s }}'s quantity to buy{% endtrans %}</h3>
-    <div>
-    	<form method="post" action="" class="inline" style="display:inline">
-        	{% csrf_token %}
-        	{{ form.as_p() }}
-            <p><input type="submit" value="{% trans %}Create shopping list{% endtrans %}" /></p>
-        </form>
-    </div>
+  <h3>{% trans s = stock %}{{ s }}'s quantity to buy{% endtrans %}</h3>
+  <div>
+    <form method="post" action="" class="inline" style="display:inline">
+      {% csrf_token %}
+      {{ form.as_p() }}
+      <p><input type="submit" value="{% trans %}Create shopping list{% endtrans %}" /></p>
+    </form>
+  </div>
 {% endblock %}

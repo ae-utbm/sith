@@ -1,18 +1,18 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% trans %}Launderette{% endtrans %}
+  {% trans %}Launderette{% endtrans %}
 {% endblock %}
 
 {% block content %}
-{% if request.user.can_edit(page) %}
-<p><a href="{{ url('core:page_edit', page_name=page.get_full_name()) }}">{% trans %}Edit presentation page{% endtrans %}</a></p>
-{% endif %}
-{% if request.user.is_subscribed %}
-<p><a href="{{ url('launderette:book_main') }}">{% trans %}Book launderette slot{% endtrans %}</a></p>
-{% endif %}
+  {% if request.user.can_edit(page) %}
+    <p><a href="{{ url('core:page_edit', page_name=page.get_full_name()) }}">{% trans %}Edit presentation page{% endtrans %}</a></p>
+  {% endif %}
+  {% if request.user.is_subscribed %}
+    <p><a href="{{ url('launderette:book_main') }}">{% trans %}Book launderette slot{% endtrans %}</a></p>
+  {% endif %}
 
-{{ page.revisions.last().content|markdown }}
+  {{ page.revisions.last().content|markdown }}
 {% endblock %}
 
 

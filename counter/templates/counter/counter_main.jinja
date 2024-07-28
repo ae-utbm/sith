@@ -1,15 +1,15 @@
 {% extends "core/base.jinja" %}
 
 {% macro barman_logout_link(user) %}
-<form method="post" action="{{ url('counter:logout', counter_id=counter.id) }}" class="inline">
+  <form method="post" action="{{ url('counter:logout', counter_id=counter.id) }}" class="inline">
     {% csrf_token %}
     <input type="hidden" name="user_id" value="{{ user.id }}">
     <button type="submit" name="submit_param" value="submit_value" class="link-button">{{ user.get_display_name() }}</button>
-</form>
+  </form>
 {% endmacro %}
 
 {% block title %}
-{% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}
+  {% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}
 {% endblock %}
 
 {% block info_boxes %}
@@ -19,44 +19,44 @@
 {% endblock %}
 
 {% block content %}
-<h3>{% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}</h3>
-    <div>
-        <h3>{% trans %}Sales{% endtrans %}</h3>
-        {% if last_basket %}
-        <h4>{% trans %}Last selling: {% endtrans %}</h4>
-        <p>{% trans %}Client: {% endtrans %}{{ last_customer }} - {% trans %}New amount: {% endtrans %}{{ new_customer_amount }} €.</p>
-            <ul>
-            {% for s in last_basket %}
-                <li>{{ s }}</li>
-            {% endfor %}
-            </ul>
-            <p><strong>{% trans %}Total: {% endtrans %}{{ last_total }} €</strong></p>
-        {% endif %}
-        {% if barmen %}
-        <p>{% trans %}Enter client code:{% endtrans %}</p>
-        <form method="post" action="">
-            {% csrf_token %}
-            <input type="hidden" name="counter_token" value="{{ counter.token }}" />
-            {{ form.as_p() }}
-            <p><input type="submit" value="{% trans %}validate{% endtrans %}" /></p>
-        </form>
-        {% else %}
-        <p>{% trans %}Please, login{% endtrans %}</p>
-        {% endif %}
-    </div>
-    {% if counter.type == 'BAR' %}
-    <div>
-        <h3>{% trans %}Barman: {% endtrans %}</h3>
-        {% for b in barmen %}
-        <p>{{ barman_logout_link(b) }}</p>
+  <h3>{% trans counter_name=counter %}{{ counter_name }} counter{% endtrans %}</h3>
+  <div>
+    <h3>{% trans %}Sales{% endtrans %}</h3>
+    {% if last_basket %}
+      <h4>{% trans %}Last selling: {% endtrans %}</h4>
+      <p>{% trans %}Client: {% endtrans %}{{ last_customer }} - {% trans %}New amount: {% endtrans %}{{ new_customer_amount }} €.</p>
+      <ul>
+        {% for s in last_basket %}
+          <li>{{ s }}</li>
         {% endfor %}
-        <form method="post" action="{{ url('counter:login', counter_id=counter.id) }}">
-            {% csrf_token %}
-            {{ login_form.as_p() }}
-            <p><input type="submit" value="{% trans %}login{% endtrans %}" /></p>
-        </form>
-    </div>
+      </ul>
+      <p><strong>{% trans %}Total: {% endtrans %}{{ last_total }} €</strong></p>
     {% endif %}
+    {% if barmen %}
+      <p>{% trans %}Enter client code:{% endtrans %}</p>
+      <form method="post" action="">
+        {% csrf_token %}
+        <input type="hidden" name="counter_token" value="{{ counter.token }}" />
+        {{ form.as_p() }}
+        <p><input type="submit" value="{% trans %}validate{% endtrans %}" /></p>
+      </form>
+    {% else %}
+      <p>{% trans %}Please, login{% endtrans %}</p>
+    {% endif %}
+  </div>
+  {% if counter.type == 'BAR' %}
+    <div>
+      <h3>{% trans %}Barman: {% endtrans %}</h3>
+      {% for b in barmen %}
+        <p>{{ barman_logout_link(b) }}</p>
+      {% endfor %}
+      <form method="post" action="{{ url('counter:login', counter_id=counter.id) }}">
+        {% csrf_token %}
+        {{ login_form.as_p() }}
+        <p><input type="submit" value="{% trans %}login{% endtrans %}" /></p>
+      </form>
+    </div>
+  {% endif %}
 {% endblock %}
 
 

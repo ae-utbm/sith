@@ -353,3 +353,16 @@ sans que l'utilisateur ait à s'en soucier.
 Bien installé, il peut effectuer ce travail
 à chaque sauvegarde d'un fichier dans son éditeur,
 ce qui est très agréable pour travailler.
+
+### DjHTML
+
+[Site officiel](https://github.com/rtts/djhtml)
+
+Ruff permet de formater les fichiers Python,
+mais il ne formatte pas les templates et les feuilles de style.
+Pour ça, il faut un autre outil, aisément intégrable
+dans la CI : `djHTML`.
+
+En utilisant conjointement Ruff et djHTML,
+on arrive donc à la fois à formater les fichiers
+Python et les fichiers relatifs au frontend.

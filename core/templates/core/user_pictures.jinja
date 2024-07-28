@@ -1,111 +1,102 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-    <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
+  <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
 {%- endblock -%}
 
+{% block additional_js %}
+  <script defer src="{{ static('core/js/jszip/jszip.min.js') }}"></script>
+  <script defer src="{{ static('core/js/jszip/jszip-utils.min.js') }}"></script>
+  <script defer type="module">
+    import { showSaveFilePicker } from "{{ static('core/js/native-file-system-adapter/mod.js') }}";
+    window.showSaveFilePicker = showSaveFilePicker; /* Export function to normal javascript */
+  </script>
+{% endblock %}
+
 {% block title %}
-{% trans user_name=profile.get_display_name() %}{{ user_name }}'s pictures{% endtrans %}
+  {% trans user_name=profile.get_display_name() %}{{ user_name }}'s pictures{% endtrans %}
 {% endblock %}
 
 {% block content %}
-    <main>
+  <main>
     {% if can_edit(profile, user) %}
-        <button id="download_all_pictures", onclick=download_pictures()>{% trans %}Download all my pictures{% endtrans %}</button>
+      <button disabled id="download" onclick="download('{{ url('api:pictures') }}?users_identified={{ object.id }}')">{% trans %}Download all my pictures{% endtrans %}</button>
     {% endif %}
-    {% for a in albums %}
-        <h4>{{ a.name }}</h4>
-        <div class="photos">
-            {% for p in pictures[a.id] %}
-                {% if p.can_be_viewed_by(user) %}
-                    <a href="{{ url("sas:picture", picture_id=p.id) }}#pict">
-                        <div
-                            class="photo{% if not p.is_moderated %} not_moderated{% endif %}"
-                            style="background-image: url('{% if p.file %}{{ p.get_download_thumb_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
-                        >
-                            {% if not p.is_moderated %}
-                                <div class="overlay">&nbsp;</div>
-                                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
-                            {% else %}
-                                <div class="text">&nbsp;</div>
-                            {% endif %}
-                        </div>
-                    </a>
+    {% for album, pictures in albums|items %}
+      <h4>{{ album }}</h4>
+      <div class="photos">
+        {% for picture in pictures %}
+          {% if picture.can_be_viewed_by(user) %}
+            <a href="{{ url("sas:picture", picture_id=picture.id) }}#pict">
+              <div
+                class="photo{% if not picture.is_moderated %} not_moderated{% endif %}"
+                style="background-image: url('{% if picture.file %}{{ picture.get_download_thumb_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
+              >
+                {% if not picture.is_moderated %}
+                  <div class="overlay">&nbsp;</div>
+                  <div class="text">{% trans %}To be moderated{% endtrans %}</div>
                 {% else %}
-                    <div>
-                        <div class="photo">
-                            <div class="text">{% trans %}Picture Unavailable{% endtrans %}</div>
-                        </div>
-                    </div>
+                  <div class="text">&nbsp;</div>
                 {% endif %}
-            {% endfor %}
-        </div>
-        <br>
+              </div>
+            </a>
+          {% else %}
+            <div>
+              <div class="photo">
+                <div class="text">{% trans %}Picture Unavailable{% endtrans %}</div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <br>
     {% endfor %}
-    </main>
-{% endblock %}
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        /* Enable button once everything is loaded and if JSZip is supported */
+        document.getElementById("download").disabled = !JSZip.support.blob;
+      });
+      async function download(url) {
 
-{% block script %}
-    {{ super() }}
-    <script type="text/javascript">
-        /**
-         * Download a list of files.
-         * @author speedplane
-         */
-        function download_files(files) {
-          function download_next(i) {
-            if (i >= files.length) {
-              return;
-            }
-            var a = document.createElement('a');
-            a.href = files[i].download;
-            a.target = '_parent';
-            // Use a.download if available, it prevents plugins from opening.
-            if ('download' in a) {
-              a.download = files[i].filename;
-            }
-            // Add a to the doc for click to work.
-            (document.body || document.documentElement).appendChild(a);
-            if (a.click) {
-              a.click(); // The click method is supported by most browsers.
-            } else {
-              $(a).click(); // Backup using jquery
-            }
-            // Delete the temporary link.
-            a.parentNode.removeChild(a);
-            // Download the next file with a small timeout. The timeout is necessary
-            // for IE, which will otherwise only download the first file.
-            setTimeout(function() {
-              download_next(i + 1);
-            }, 500);
-          }
-          // Initiate the first download.
-          download_next(0);
-        }
-        function download_pictures() {
-            $("#download_all_pictures").prop("disabled", true);
-            const xhr = new XMLHttpRequest();
-            $.ajax({
-                type: "GET",
-                url: "{{ url('api:pictures') }}?users_identified={{ object.id }}",
-                tryCount: 0,
-                xhr: function(){
-                     return xhr;
-                },
-                success: function(data){
-                    $("#download_all_pictures").prop("disabled", false);
-                    to_download = [];
-                    data.forEach(picture => 
-                        to_download.push({ download: picture["full_size_url"], filename: picture["name"] })
-                    );
-                    download_files(to_download);
-                },
-                error: function(data){
-                    console.log("Error retrieving data from url: " + data);
-                    $("#download_all_pictures").text("{% trans %}Error downloading your pictures{% endtrans %}");
+        let zip = new JSZip();
+        let size = 0;
+        let pictures = await (await fetch(url)).json();
+        pictures.forEach(async (picture) => {
+          size += picture.size;
+          zip.file(
+            "IMG_" + picture.date + picture.name.slice(picture.name.lastIndexOf(".")),
+            new Promise(function (resolve, reject) {
+              JSZipUtils.getBinaryContent(picture.full_size_url, (err, data) => {
+                if (err) {
+                  reject(err);
+                  return;
                 }
-            });
-        }
-    </script>
-{% endblock %}
+                resolve(data);
+              })
+            }),
+            { binary: true }
+          );
+        });
 
+        let fileHandle = await window.showSaveFilePicker({
+          _preferPolyfill: false,
+          suggestedName: "{%- trans -%} pictures {%- endtrans -%}.zip",
+          types: {},
+          excludeAcceptAllOption: false,
+        })
+        let writeStream = await fileHandle.createWritable();
+
+        await zip.generateInternalStream({
+          type: "uint8array",
+          streamFiles: true,
+          compression: "DEFLATE",
+          compressionOptions: { level: 9 }
+        })
+          .on("data", (data) => writeStream.write(data))
+          .on("error", (err) => console.error(err))
+          .on("end", () => writeStream.close())
+          .resume();
+      }
+    </script>
+  </main>
+{% endblock %}

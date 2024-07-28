@@ -1,58 +1,58 @@
 <div>
-    <style>
-        .checked {
-            color : orange;
-        }
-        .unchecked {
-            color : gray;
-        }
-        .star input[type="radio"] {
-            display : none;
-        }
-        .star {
-            display: inline;
-        }
+  <style>
+    .checked {
+      color : orange;
+    }
+    .unchecked {
+      color : gray;
+    }
+    .star input[type="radio"] {
+      display : none;
+    }
+    .star {
+      display: inline;
+    }
 
-    </style>
+  </style>
 
     {# Do not vote button #}
-    <label class="star">
-        <input type="radio" name="{{ widget.name }}" value="-1" onclick='
-            var stars = document.getElementsByClassName("{{ widget.name }}");
-            for (var i = 0; i < stars.length; i++){
-                var attrs = stars[i].getAttribute("class");
-                attrs = attrs.replace("unchecked", "");
-                attrs = attrs.replace("checked", "");
-                stars[i].setAttribute("class", attrs + " unchecked");
-            }
-        ' checked>
-        <span class="fa fa-times-circle"> {{ translations.do_not_vote }}</span>
-    </label>
+  <label class="star">
+    <input type="radio" name="{{ widget.name }}" value="-1" onclick='
+                                                                     var stars = document.getElementsByClassName("{{ widget.name }}");
+                                                                     for (var i = 0; i < stars.length; i++){
+                                                                     var attrs = stars[i].getAttribute("class");
+                                                                     attrs = attrs.replace("unchecked", "");
+                                                                     attrs = attrs.replace("checked", "");
+                                                                     stars[i].setAttribute("class", attrs + " unchecked");
+                                                                     }
+                                                                    ' checked>
+    <span class="fa fa-times-circle"> {{ translations.do_not_vote }}</span>
+  </label>
 
     {# Star widget #}
-    {% for i in number_of_stars %}
+  {% for i in number_of_stars %}
     <label class="star">
-        <input type="radio" name="{{ widget.name }}" value="{{ forloop.counter0 }}" onclick='
-            var stars = document.getElementsByClassName("{{ widget.name }}");
+      <input type="radio" name="{{ widget.name }}" value="{{ forloop.counter0 }}" onclick='
+                                                                                           var stars = document.getElementsByClassName("{{ widget.name }}");
 
-            for (var i = 0; i < stars.length; i++){
-                var attrs = stars[i].getAttribute("class");
-                attrs = attrs.replace("unchecked", "");
-                attrs = attrs.replace("checked", "");
-                if (i > {{ forloop.counter0 }}){
-                    stars[i].setAttribute("class", attrs + " unchecked");
-                } else {
-                    stars[i].setAttribute("class", attrs + " checked");
-                }
-            }
-        '>
-        <i class="{{ widget.name }} fa fa-star unchecked"></i>
+                                                                                           for (var i = 0; i < stars.length; i++){
+                                                                                           var attrs = stars[i].getAttribute("class");
+                                                                                           attrs = attrs.replace("unchecked", "");
+                                                                                           attrs = attrs.replace("checked", "");
+                                                                                           if (i > {{ forloop.counter0 }}){
+                                                                                           stars[i].setAttribute("class", attrs + " unchecked");
+                                                                                           } else {
+                                                                                           stars[i].setAttribute("class", attrs + " checked");
+                                                                                           }
+                                                                                           }
+                                                                                          '>
+      <i class="{{ widget.name }} fa fa-star unchecked"></i>
     </label>
-    {% endfor %}
+  {% endfor %}
 
     {# Restaure previous (-1 is default) #}
-    <script type="text/javascript">
-        document.querySelector("input[name='{{ widget.name }}'][value='{{ widget.value }}']").click()
-    </script>
+  <script type="text/javascript">
+    document.querySelector("input[name='{{ widget.name }}'][value='{{ widget.value }}']").click()
+  </script>
 
 </div>

@@ -1,62 +1,62 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-{% if file %}
-{{ file.get_display_name() }}
-{% elif file_list %}
-{% trans %}File list{% endtrans %}
-{% elif new_file %}
-{% trans %}New file{% endtrans %}
-{% else %}
-{% trans %}Not found{% endtrans %}
-{% endif %}
+  {% if file %}
+    {{ file.get_display_name() }}
+  {% elif file_list %}
+    {% trans %}File list{% endtrans %}
+  {% elif new_file %}
+    {% trans %}New file{% endtrans %}
+  {% else %}
+    {% trans %}Not found{% endtrans %}
+  {% endif %}
 {% endblock %}
 
 {% macro print_file_name(file) %}
-{% if file %}
-{{ print_file_name(file.parent) }} >
-<a href="{{ url('core:file_detail', file_id=file.id, popup=popup) }}">{{ file.get_display_name() }}</a>
-{% else %}
-<a href="{{ url('core:file_list', popup) }}">{% trans %}Files{% endtrans %}</a>
-{% endif %}
+  {% if file %}
+    {{ print_file_name(file.parent) }} >
+    <a href="{{ url('core:file_detail', file_id=file.id, popup=popup) }}">{{ file.get_display_name() }}</a>
+  {% else %}
+    <a href="{{ url('core:file_list', popup) }}">{% trans %}Files{% endtrans %}</a>
+  {% endif %}
 {% endmacro %}
 
 {% block content %}
-{{ print_file_name(file) }}
+  {{ print_file_name(file) }}
 
-<div class="tool_bar">
+  <div class="tool_bar">
     <div class="tools">
-        <div>
-            {% set home = user.home %}
-            {% if home %}
-            <a href="{{ url('core:file_detail', home.id, popup) }}">{% trans %}My files{% endtrans %}</a>
-            {% endif %}
-        </div>
-        {% if file %}
+      <div>
+        {% set home = user.home %}
+        {% if home %}
+          <a href="{{ url('core:file_detail', home.id, popup) }}">{% trans %}My files{% endtrans %}</a>
+        {% endif %}
+      </div>
+      {% if file %}
         <a href="{{ url('core:file_detail', file.id, popup) }}">{% trans %}View{% endtrans %}</a>
         {% if can_edit(file, user) %}
-        <a href="{{ url('core:file_edit', file_id=file.id, popup=popup) }}">{% trans %}Edit{% endtrans %}</a>
+          <a href="{{ url('core:file_edit', file_id=file.id, popup=popup) }}">{% trans %}Edit{% endtrans %}</a>
         {% endif %}
         {% if can_edit_prop(file, user) %}
-        <a href="{{ url('core:file_prop', file_id=file.id, popup=popup) }}">{% trans %}Prop{% endtrans %}</a>
+          <a href="{{ url('core:file_prop', file_id=file.id, popup=popup) }}">{% trans %}Prop{% endtrans %}</a>
         {% endif %}
-        {% endif %}
+      {% endif %}
     </div>
-</div>
-<hr>
+  </div>
+  <hr>
 
-{% if file %}
-{% block file %}
-{% endblock %}
-{% endif %}
+  {% if file %}
+    {% block file %}
+    {% endblock %}
+  {% endif %}
 
-{% block script %}
-{{ super() }}
-{% if popup %}
-<script>
-parent.$(".choose_file_widget").css("height", "75%");
-</script>
-{% endif %}
-{% endblock %}
+  {% block script %}
+    {{ super() }}
+    {% if popup %}
+      <script>
+        parent.$(".choose_file_widget").css("height", "75%");
+      </script>
+    {% endif %}
+  {% endblock %}
 
 {% endblock %}
