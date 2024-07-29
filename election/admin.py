@@ -1,4 +1,3 @@
-from ajax_select import make_ajax_form
 from django.contrib import admin
 
 from election.models import Candidature, Election, ElectionList, Role
@@ -13,7 +12,7 @@ class ElectionAdmin(admin.ModelAdmin):
         "is_vote_finished",
         "archived",
     )
-    form = make_ajax_form(Election, {"voters": "users"})
+    autocomplete_fields = ("voters",)
 
 
 @admin.register(Role)
@@ -31,7 +30,7 @@ class ElectionListAdmin(admin.ModelAdmin):
 @admin.register(Candidature)
 class CandidatureAdmin(admin.ModelAdmin):
     list_display = ("user", "role", "election_list")
-    form = make_ajax_form(Candidature, {"user": "users"})
+    autocomplete_fields = ("user",)
 
 
 # Votes must stay fully anonymous, so no ModelAdmin for Vote model
