@@ -2,6 +2,7 @@ import json
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.testcases import call_command
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -21,16 +22,31 @@ class TestUVSearch(TestCase):
         uv_recipe = Recipe(UV, author=cls.root)
         uvs = [
             uv_recipe.prepare(
-                code="AP4A", credit_type="CS", semester="AUTUMN", department="GI"
+                code="AP4A",
+                credit_type="CS",
+                semester="AUTUMN",
+                department="GI",
+                manager="francky",
+                title="Programmation Orientée Objet: Concepts fondamentaux et mise en pratique avec le langage C++",
             ),
             uv_recipe.prepare(
-                code="MT01", credit_type="CS", semester="AUTUMN", department="TC"
+                code="MT01",
+                credit_type="CS",
+                semester="AUTUMN",
+                department="TC",
+                manager="ben",
+                title="Intégration1. Algèbre linéaire - Fonctions de deux variables",
             ),
             uv_recipe.prepare(
                 code="PHYS11", credit_type="CS", semester="AUTUMN", department="TC"
             ),
             uv_recipe.prepare(
-                code="TNEV", credit_type="TM", semester="SPRING", department="TC"
+                code="TNEV",
+                credit_type="TM",
+                semester="SPRING",
+                department="TC",
+                manager="moss",
+                title="tnetennba",
             ),
             uv_recipe.prepare(
                 code="MT10", credit_type="TM", semester="AUTUMN", department="IMSI"
@@ -40,9 +56,11 @@ class TestUVSearch(TestCase):
                 credit_type="TM",
                 semester="AUTUMN_AND_SPRING",
                 department="GI",
+                manager="francky",
             ),
         ]
         UV.objects.bulk_create(uvs)
+        call_command("update_index")
 
     def test_permissions(self):
         # Test with anonymous user
@@ -92,14 +110,22 @@ class TestUVSearch(TestCase):
             ],
         }
 
-    def test_search_by_code(self):
+    def test_search_by_text(self):
         self.client.force_login(self.root)
-        res = self.client.get(self.url + "?search=MT")
-        assert res.status_code == 200
-        assert {uv["code"] for uv in json.loads(res.content)["results"]} == {
-            "MT01",
-            "MT10",
-        }
+        for query, expected in (
+            # UV code search case insensitive
+            ("m", {"MT01", "MT10"}),
+            ("M", {"MT01", "MT10"}),
+            ("mt", {"MT01", "MT10"}),
+            ("MT", {"MT01", "MT10"}),
+            ("algèbre", {"MT01"}),  #  Title search case insensitive
+            # Manager search
+            ("moss", {"TNEV"}),
+            ("francky", {"DA50", "AP4A"}),
+        ):
+            res = self.client.get(self.url + f"?search={query}")
+            assert res.status_code == 200
+            assert {uv["code"] for uv in json.loads(res.content)["results"]} == expected
 
     def test_search_by_credit_type(self):
         self.client.force_login(self.root)
