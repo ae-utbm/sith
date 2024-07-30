@@ -105,7 +105,7 @@ a:not(.button) {
 
   .collapse-header {
     color: white;
-    background-color: #354a5f;
+    background-color: $deepblue;
     padding: 5px 10px;
     display: flex;
     align-items: center;
@@ -206,34 +206,36 @@ a:not(.button) {
   width: 90%;
   margin: 20px auto 0;
 /*---------------------------------NAV---------------------------------*/
-
   .btn {
     font-size: 15px;
     font-weight: normal;
     color: white;
-    min-width: 60px;
-    padding: 5px 10px;
+    padding: 9px 13px;
     border: none;
     text-decoration: none;
 
     &.btn-blue {
-      background-color: #354a5f;
-    }
-
-    &.btn-blue:disabled {
-      background-color: rgba(70, 90, 126, 0.4);
-    }
-
-    &.btn-blue.clickable:not(:disabled):hover {
-      background-color: #2c3646;
+      background-color: $deepblue;
+      &:not(:disabled):hover {
+        background-color: darken($deepblue, 10%);
+      }
+      &:disabled {
+        background-color: rgba(70, 90, 126, 0.4);
+      }
     }
 
     &.btn-grey {
       background-color: grey;
+      &:not(:disabled):hover {
+        background-color: darken(gray, 15%);
+      }
+      &:disabled {
+        background-color: lighten(gray, 15%);
+      }
     }
 
-    &.btn-grey.clickable:not(:disabled):hover {
-      background-color: hsl(210, 5%, 30%);
+    i {
+      margin-right: 4px;
     }
   }
 
@@ -977,7 +979,7 @@ thead td {
 }
 
 thead {
-  background-color: #354a5f;
+  background-color: $deepblue;
   color: white;
 }
 

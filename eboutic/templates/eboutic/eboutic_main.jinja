@@ -62,13 +62,13 @@
         </li>
       </ul>
       <div class="catalog-buttons">
-        <button @click="clear_basket()" class="clear">
+        <button @click="clear_basket()" class="btn btn-grey">
           <i class="fa fa-trash"></i>
           {% trans %}Clear{% endtrans %}
         </button>
         <form method="get" action="{{ url('eboutic:command') }}">
           {% csrf_token %}
-          <button class="validate">
+          <button class="btn btn-blue">
             <i class="fa fa-check"></i>
             <input type="submit" value="{% trans %}Validate{% endtrans %}"/>
           </button>

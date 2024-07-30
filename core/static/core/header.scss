@@ -1,7 +1,8 @@
+@import "colors";
+
 $hovered-text-color: #c2c2c2;
 $text-color: white;
 
-$background-color: #354a5f;
 $background-color-hovered: #283747;
 
 $red-text-color: #eb2f06;
@@ -9,7 +10,7 @@ $hovered-red-text-color: #ff4d4d;
 
 .header {
   box-sizing: border-box;
-  background-color: $background-color;
+  background-color: $deepblue;
   box-shadow: 3px 3px 3px 0 #dfdfdf;
   border-radius: 0;
   width: 100%;
@@ -98,7 +99,7 @@ $hovered-red-text-color: #ff4d4d;
         border-radius: 0;
         margin: 0;
         box-sizing: border-box;
-        background-color: $background-color;
+        background-color: $deepblue;
         width: 45px;
         height: 25px;
         padding: 0;
@@ -213,7 +214,7 @@ $hovered-red-text-color: #ff4d4d;
           background-position: center center;
           background-size: cover;
           background-repeat: no-repeat;
-          background-color: $background-color;
+          background-color: $deepblue;
         }
 
         >.options {
