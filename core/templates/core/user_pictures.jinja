@@ -5,12 +5,11 @@
 {%- endblock -%}
 
 {% block additional_js %}
-  <script defer src="{{ static('core/js/jszip/jszip.min.js') }}"></script>
-  <script defer src="{{ static('core/js/jszip/jszip-utils.min.js') }}"></script>
   <script defer type="module">
     import { showSaveFilePicker } from "{{ static('core/js/native-file-system-adapter/mod.js') }}";
     window.showSaveFilePicker = showSaveFilePicker; /* Export function to normal javascript */
   </script>
+  <script defer type="text/javascript" src="{{ static('core/js/zipjs/zip-fs-full.min.js') }}"></script>
 {% endblock %}
 
 {% block title %}
@@ -54,37 +53,19 @@
     {% endfor %}
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        /* Enable button once everything is loaded and if JSZip is supported */
-        document.getElementById("download").disabled = !JSZip.support.blob;
+        document.getElementById("download").disabled = false;
       });
       async function download(url) {
 
-        let zip = new JSZip();
         let pictures = await (await fetch(url)).json();
+
         let progressBar = document.getElementById("download_progress");
-        let picturesDownloaded = 0;
         let button = document.getElementById("download");
+        let picturesDownloaded = 0;
 
         button.disabled = true;
         progressBar.value = picturesDownloaded;
         progressBar.hidden = false;
-
-        pictures.forEach(async (picture) => {
-          zip.file(
-            "IMG_" + picture.date.replaceAll(":", "_").replaceAll("-", "_") + picture.name.slice(picture.name.lastIndexOf(".")),
-            new Promise(function (resolve, reject) {
-              JSZipUtils.getBinaryContent(picture.full_size_url, (err, data) => {
-                progressBar.value = picturesDownloaded++ * 100 / (pictures.length - 1);
-                if (err) {
-                  reject(err);
-                  return;
-                }
-                resolve(data);
-              })
-            }),
-            { binary: true }
-          );
-        });
 
         let fileHandle = await window.showSaveFilePicker({
           _preferPolyfill: false,
@@ -94,16 +75,22 @@
         })
         let writeStream = await fileHandle.createWritable();
 
-        await zip.generateInternalStream({
-          type: "uint8array",
-          streamFiles: true,
-          compression: "DEFLATE",
-          compressionOptions: { level: 9 }
-        })
-          .on("data", (data) => writeStream.write(data))
-          .on("error", (err) => console.error(err))
-          .on("end", () => writeStream.close())
-          .resume();
+        let zipWriter = new zip.ZipWriter(writeStream);
+
+        async function progress() {
+          progressBar.value = picturesDownloaded++ * 100 / (pictures.length - 1);
+        }
+
+        await Promise.all(pictures.map(picture =>
+          zipWriter.add(
+            "IMG_" + picture.date.replaceAll(":", "_").replaceAll("-", "_") + picture.name.slice(picture.name.lastIndexOf(".")),
+            new zip.HttpReader(picture.full_size_url),
+            { level: 9, lastModDate: new Date(picture.date), onstart: progress }
+          )
+        )
+        )
+
+        await zipWriter.close();
 
         button.disabled = false;
         progressBar.hidden = true;
