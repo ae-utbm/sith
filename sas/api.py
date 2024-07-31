@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import F
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, route
 from ninja_extra.exceptions import PermissionDenied
@@ -47,6 +48,7 @@ class PicturesController(ControllerBase):
             )
             .distinct()
             .order_by("-date")
+            .annotate(album=F("parent__name"))
         )
         for picture in pictures:
             picture.full_size_url = picture.get_download_url()
