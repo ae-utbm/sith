@@ -136,7 +136,7 @@
     right: 5px;
     padding: 5px;
     border-radius: 50%;
-    box-shadow: 0px 0px 12px 2px rgb(0 0 0 / 14%);
+    box-shadow: 0 0 12px 2px rgb(0 0 0 / 14%);
     background-color: white;
     width: 20px;
     height: 20px;
@@ -186,29 +186,7 @@
 }
 
 #eboutic .catalog-buttons button {
-    font-size: 15px!important;
-    font-weight: normal;
-    color: white;
     min-width: 60px;
-    padding: 10px 15px;
-}
-
-#eboutic .catalog-buttons .validate {
-    background-color: #354a5f;
-}
-#eboutic .catalog-buttons .clear {
-    background-color: gray;
-}
-#eboutic .catalog-buttons button i {
-    margin-right: 4px;
-}
-
-#eboutic .catalog-buttons button.validate:hover {
-    background-color: #2c3646;
-}
-
-#eboutic .catalog-buttons button.clear:hover {
-    background-color:hsl(210,5%,30%);
 }
 
 #eboutic .catalog-buttons form {
@@ -252,7 +230,7 @@
     }
 
     #eboutic .product-image {
-        margin-bottom: 0px;
+        margin-bottom: 0;
         max-width: 70px;
     }
 }

@@ -724,8 +724,7 @@ if SENTRY_DSN:
     )
 
 SITH_FRONT_DEP_VERSIONS = {
-    "https://github.com/Stuk/jszip-utils": "0.1.0",
-    "https://github.com/Stuk/jszip": "3.10.1",
+    "https://github.com/gildas-lormeau/zip.js": "2.7.47",
     "https://github.com/jimmywarting/native-file-system-adapter": "3.0.1",
     "https://github.com/chartjs/Chart.js/": "2.6.0",
     "https://github.com/Ionaru/easy-markdown-editor/": "2.18.0",
