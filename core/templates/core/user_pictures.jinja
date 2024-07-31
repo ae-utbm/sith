@@ -80,6 +80,7 @@
      * @property {string} full_size_url
      * @property {string} compressed_url
      * @property {string} thumb_url
+     * @property {string} album
      */
 
       document.addEventListener("alpine:init", () => {
@@ -104,7 +105,7 @@
             const zipWriter = new zip.ZipWriter(await fileHandle.createWritable());
 
             await Promise.all(pictures.map(p => {
-              const img_name = "IMG_" + p.date.replaceAll(/[:\-]/g, "_") + p.name.slice(p.name.lastIndexOf("."));
+              const img_name = p.album + "/IMG_" + p.date.replaceAll(/[:\-]/g, "_") + p.name.slice(p.name.lastIndexOf("."));
               return zipWriter.add(
                 img_name,
                 new zip.HttpReader(p.full_size_url),
