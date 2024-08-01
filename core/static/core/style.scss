@@ -576,6 +576,38 @@ a:not(.button) {
   }
 }
 
+
+  .select2 {
+    margin: 0;
+    max-width: 100%;
+    min-width: 100%;
+
+    ul {
+      margin: 0;
+    }
+
+    textarea {
+      background-color: inherit;
+    }
+
+    .select2-container--default {
+      color: black;
+    }
+  }
+  .select2-results {
+    .select-item {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: center;
+
+      img {
+        max-height: 40px;
+        border-radius: 50%;
+      }
+    }
+  }
+
 #news_details {
   display: inline-block;
   margin-top: 20px;
@@ -1131,13 +1163,6 @@ u,
   }
 }
 
-/* XXX This seems to be used in the SAS */
-#pict {
-  display: inline-block;
-  width: 80%;
-  background: hsl(0, 0%, 20%);
-  border: solid hsl(0, 0%, 20%) 2px;
-}
 /*--------------------------------MATMAT-------------------------------*/
 .matmat_results {
   display: flex;
