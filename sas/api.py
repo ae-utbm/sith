@@ -1,16 +1,22 @@
 from django.conf import settings
 from django.db.models import F
+from django.urls import reverse
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
-from ninja_extra.exceptions import PermissionDenied
+from ninja_extra.exceptions import NotFound, PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
-from core.models import User
+from core.api_permissions import CanView
+from core.models import Notification, User
 from sas.models import PeoplePictureRelation, Picture
-from sas.schemas import PictureFilterSchema, PictureSchema
+from sas.schemas import (
+    IdentifiedUserSchema,
+    PictureFilterSchema,
+    PictureSchema,
+)
 
 
 @api_controller("/sas/picture")
@@ -47,6 +53,40 @@ class PicturesController(ControllerBase):
             .order_by("-parent__date", "date")
             .annotate(album=F("parent__name"))
         )
+
+    @route.get(
+        "/{picture_id}/identified",
+        permissions=[IsAuthenticated, CanView],
+        response=list[IdentifiedUserSchema],
+    )
+    def fetch_identifications(self, picture_id: int):
+        """Fetch the users that have been identified on the given picture."""
+        picture = self.get_object_or_exception(Picture, pk=picture_id)
+        return picture.people.select_related("user")
+
+    @route.put("/{picture_id}/identified", permissions=[IsAuthenticated, CanView])
+    def identify_users(self, picture_id: NonNegativeInt, users: set[NonNegativeInt]):
+        picture = self.get_object_or_exception(Picture, pk=picture_id)
+        db_users = list(User.objects.filter(id__in=users))
+        if len(users) != len(db_users):
+            raise NotFound
+        already_identified = set(
+            picture.people.filter(user_id__in=users).values_list("user_id", flat=True)
+        )
+        identified = [u for u in db_users if u.pk not in already_identified]
+        relations = [
+            PeoplePictureRelation(user=u, picture_id=picture_id) for u in identified
+        ]
+        PeoplePictureRelation.objects.bulk_create(relations)
+        for u in identified:
+            Notification.objects.get_or_create(
+                user=u,
+                viewed=False,
+                type="NEW_PICTURES",
+                defaults={
+                    "url": reverse("core:user_pictures", kwargs={"user_id": u.id})
+                },
+            )
 
 
 @api_controller("/sas/relation", tags="User identification on SAS pictures")

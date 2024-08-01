@@ -3,7 +3,8 @@ from datetime import datetime
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import Field, NonNegativeInt
 
-from sas.models import PeoplePictureRelation, Picture
+from core.schemas import UserProfileSchema
+from sas.models import Picture
 
 
 class PictureFilterSchema(FilterSchema):
@@ -36,12 +37,11 @@ class PictureSchema(ModelSchema):
         return obj.get_download_thumb_url()
 
 
-class PictureCreateRelationSchema(Schema):
-    user_id: NonNegativeInt
-    picture_id: NonNegativeInt
+class PictureRelationCreationSchema(Schema):
+    picture: NonNegativeInt
+    users: list[NonNegativeInt]
 
 
-class CreatedPictureRelationSchema(ModelSchema):
-    class Meta:
-        model = PeoplePictureRelation
-        fields = ["id", "user", "picture"]
+class IdentifiedUserSchema(Schema):
+    id: int
+    user: UserProfileSchema

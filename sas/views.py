@@ -25,7 +25,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import FormMixin, FormView, UpdateView
 
-from core.models import Notification, SithFile, User
+from core.models import SithFile, User
 from core.views import CanEditMixin, CanViewMixin
 from core.views.files import FileView, MultipleImageField, send_file
 from core.views.forms import SelectDate
@@ -127,18 +127,13 @@ class SASMainView(FormView):
         return kwargs
 
 
-class PictureView(CanViewMixin, DetailView, FormMixin):
+class PictureView(CanViewMixin, DetailView):
     model = Picture
-    form_class = RelationForm
     pk_url_kwarg = "picture_id"
     template_name = "sas/picture.jinja"
 
-    def get_initial(self):
-        return {"picture": self.object}
-
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.form = self.get_form()
         if "rotate_right" in request.GET:
             self.object.rotate(270)
         if "rotate_left" in request.GET:
@@ -150,41 +145,11 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
             return redirect("sas:album", album_id=self.object.parent.id)
         return super().get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.form = self.get_form()
-        if request.user.is_authenticated and request.user.was_subscribed:
-            if self.form.is_valid():
-                for uid in self.form.cleaned_data["users"]:
-                    u = User.objects.filter(id=uid).first()
-                    if not u:  # Don't use a non existing user
-                        continue
-                    if PeoplePictureRelation.objects.filter(
-                        user=u, picture=self.form.cleaned_data["picture"]
-                    ).exists():  # Avoid existing relation
-                        continue
-                    PeoplePictureRelation(
-                        user=u, picture=self.form.cleaned_data["picture"]
-                    ).save()
-                    if not u.notifications.filter(
-                        type="NEW_PICTURES", viewed=False
-                    ).exists():
-                        Notification(
-                            user=u,
-                            url=reverse("core:user_pictures", kwargs={"user_id": u.id}),
-                            type="NEW_PICTURES",
-                        ).save()
-                return super().form_valid(self.form)
-        else:
-            self.form.add_error(None, _("You do not have the permission to do that"))
-        return self.form_invalid(self.form)
-
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         pictures_qs = Picture.objects.filter(
             parent_id=self.object.parent_id
         ).viewable_by(self.request.user)
-        kwargs["form"] = self.form
         kwargs["next_pict"] = (
             pictures_qs.filter(id__gt=self.object.id).order_by("id").first()
         )
@@ -192,9 +157,6 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
             pictures_qs.filter(id__lt=self.object.id).order_by("-id").first()
         )
         return kwargs
-
-    def get_success_url(self):
-        return reverse("sas:picture", kwargs={"picture_id": self.object.id})
 
 
 def send_album(request, album_id):
