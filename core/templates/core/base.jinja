@@ -11,6 +11,7 @@
       <link rel="stylesheet" href="{{ scss('core/markdown.scss') }}">
       <link rel="stylesheet" href="{{ scss('core/header.scss') }}">
       <link rel="stylesheet" href="{{ scss('core/navbar.scss') }}">
+      <link rel="stylesheet" href="{{ static('core/select2/select2.min.css') }}">
 
       {% block jquery_css %}
                 {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
@@ -24,6 +25,9 @@
       <script src="{{ static('vendored/jquery/jquery-3.6.2.min.js') }}"></script>
             <!-- Put here to always have acces to those functions on django widgets -->
       <script src="{{ static('core/js/script.js') }}"></script>
+      <script defer src="{{ static('core/select2/select2.min.js') }}"></script>
+      <script defer src="{{ static('core/js/sith-select2.js') }}"></script>
+
 
       {% block additional_css %}{% endblock %}
       {% block additional_js %}{% endblock %}
