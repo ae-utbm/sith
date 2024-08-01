@@ -227,7 +227,6 @@ function remote_data_source(source, options) {
   if (!!options.overrides) {
     Object.assign(params, options.overrides);
   }
-  console.log(params);
   return { ajax: params };
 }
 

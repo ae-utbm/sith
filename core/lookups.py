@@ -56,8 +56,7 @@ class CustomerLookup(RightManagedLookupChannel):
     model = Customer
 
     def get_query(self, q, request):
-        users = search_user(q)
-        return [user.customer for user in users]
+        return list(Customer.objects.filter(user__in=search_user(q)))
 
     def format_match(self, obj):
         return obj.user.get_mini_item()
