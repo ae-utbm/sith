@@ -16,12 +16,15 @@ import json
 import re
 import string
 
+from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import timedelta
+from model_bakery import baker
 
-from club.models import Club
+from club.models import Club, Membership
+from core.baker_recipes import subscriber_user
 from core.models import User
 from counter.models import BillingInfo, Counter, Customer, Permanency, Product, Selling
 from sith.settings import SITH_MAIN_CLUB
@@ -911,3 +914,47 @@ class TestCustomerAccountId(TestCase):
         assert created is False
         assert account.account_id == "1111a"
         assert account.amount == 10
+
+
+class TestClubCounterClickAccess(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.counter = baker.make(Counter, type="OFFICE")
+        cls.customer = subscriber_user.make()
+        cls.counter_url = reverse(
+            "counter:details", kwargs={"counter_id": cls.counter.id}
+        )
+        cls.click_url = reverse(
+            "counter:click",
+            kwargs={"counter_id": cls.counter.id, "user_id": cls.customer.id},
+        )
+
+        cls.user = subscriber_user.make()
+
+    def setUp(self):
+        cache.clear()
+
+    def test_anonymous(self):
+        res = self.client.get(self.click_url)
+        assert res.status_code == 403
+
+    def test_logged_in_without_rights(self):
+        self.client.force_login(self.user)
+        res = self.client.get(self.click_url)
+        assert res.status_code == 403
+        # being a member of the club, without being in the board, isn't enough
+        baker.make(Membership, club=self.counter.club, user=self.user, role=1)
+        res = self.client.get(self.click_url)
+        assert res.status_code == 403
+
+    def test_board_member(self):
+        baker.make(Membership, club=self.counter.club, user=self.user, role=3)
+        self.client.force_login(self.user)
+        res = self.client.get(self.click_url)
+        assert res.status_code == 200
+
+    def test_barman(self):
+        self.counter.sellers.add(self.user)
+        self.client.force_login(self.user)
+        res = self.client.get(self.click_url)
+        assert res.status_code == 200
