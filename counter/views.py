@@ -329,7 +329,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             raise Http404
         if obj.type != "BAR" and not request.user.is_authenticated:
             raise PermissionDenied
-        if (
+        if obj.type == "BAR" and (
             "counter_token" not in request.session
             or request.session["counter_token"] != obj.token
             or len(obj.barmen_list) == 0
