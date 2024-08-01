@@ -12,7 +12,6 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from ajax_select import make_ajax_form
 from django.contrib import admin
 
 from subscription.models import Subscription
@@ -33,4 +32,4 @@ class SubscriptionAdmin(admin.ModelAdmin):
         "subscription_end",
         "subscription_type",
     )
-    form = make_ajax_form(Subscription, {"member": "users"})
+    autocomplete_fields = ("member",)

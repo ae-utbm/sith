@@ -15,8 +15,20 @@
 
 from django.contrib import admin
 
-from sas.models import *
+from sas.models import Album, PeoplePictureRelation, Picture
+
+
+@admin.register(Picture)
+class PictureAdmin(admin.ModelAdmin):
+    list_display = ("name", "parent", "date", "size", "is_moderated")
+    search_fields = ("name",)
+    autocomplete_fields = ("owner", "parent", "edit_groups", "view_groups", "moderator")
+
+
+@admin.register(PeoplePictureRelation)
+class PeoplePictureRelationAdmin(admin.ModelAdmin):
+    list_display = ("picture", "user")
+    autocomplete_fields = ("picture", "user")
+
 
 admin.site.register(Album)
-# admin.site.register(Picture)
-admin.site.register(PeoplePictureRelation)

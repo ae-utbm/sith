@@ -12,7 +12,6 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from ajax_select import make_ajax_form
 from django.contrib import admin
 from haystack.admin import SearchModelAdmin
 
@@ -41,7 +40,7 @@ class CustomerAdmin(SearchModelAdmin):
         "user__first_name",
         "user__last_name",
     )
-    form = make_ajax_form(Customer, {"user": "users"})
+    autocomplete_fields = ("user",)
 
 
 @admin.register(BillingInfo)
@@ -52,31 +51,19 @@ class BillingInfoAdmin(admin.ModelAdmin):
 @admin.register(Counter)
 class CounterAdmin(admin.ModelAdmin):
     list_display = ("name", "club", "type")
-    form = make_ajax_form(
-        Counter,
-        {
-            "products": "products",
-            "sellers": "users",
-        },
-    )
+    autocomplete_fields = ("products", "sellers")
 
 
 @admin.register(Refilling)
 class RefillingAdmin(SearchModelAdmin):
     list_display = ("customer", "amount", "counter", "payment_method", "date")
+    autocomplete_fields = ("customer", "operator")
     search_fields = (
         "customer__user__username",
         "customer__user__first_name",
         "customer__user__last_name",
         "customer__account_id",
         "counter__name",
-    )
-    form = make_ajax_form(
-        Refilling,
-        {
-            "customer": "customers",
-            "operator": "users",
-        },
     )
 
 
@@ -90,13 +77,7 @@ class SellingAdmin(SearchModelAdmin):
         "customer__account_id",
         "counter__name",
     )
-    form = make_ajax_form(
-        Selling,
-        {
-            "customer": "customers",
-            "seller": "users",
-        },
-    )
+    autocomplete_fields = ("customer", "seller")
 
 
 @admin.register(Permanency)
@@ -108,7 +89,7 @@ class PermanencyAdmin(SearchModelAdmin):
         "user__last_name",
         "counter__name",
     )
-    form = make_ajax_form(Permanency, {"user": "users"})
+    autocomplete_fields = ("user",)
 
 
 @admin.register(ProductType)
@@ -125,7 +106,7 @@ class CashRegisterSummaryAdmin(SearchModelAdmin):
         "user__last_name",
         "counter__name",
     )
-    form = make_ajax_form(CashRegisterSummary, {"user": "users"})
+    autocomplete_fields = ("user",)
 
 
 @admin.register(Eticket)

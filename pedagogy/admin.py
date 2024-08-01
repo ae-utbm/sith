@@ -20,7 +20,6 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-from ajax_select import make_ajax_form
 from django.contrib import admin
 from haystack.admin import SearchModelAdmin
 
@@ -31,7 +30,7 @@ from pedagogy.models import UV, UVComment, UVCommentReport
 class UVAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "credit_type", "credits", "department")
     search_fields = ("code", "title", "department")
-    form = make_ajax_form(UV, {"author": "users"})
+    autocomplete_fields = ("author",)
 
 
 @admin.register(UVComment)
@@ -43,7 +42,7 @@ class UVCommentAdmin(admin.ModelAdmin):
         "author__last_name",
         "uv__code",
     )
-    form = make_ajax_form(UVComment, {"author": "users"})
+    autocomplete_fields = ("author",)
 
 
 @admin.register(UVCommentReport)
@@ -55,4 +54,4 @@ class UVCommentReportAdmin(SearchModelAdmin):
         "reporter__last_name",
         "comment__uv__code",
     )
-    form = make_ajax_form(UVCommentReport, {"reporter": "users"})
+    autocomplete_fields = ("reporter",)

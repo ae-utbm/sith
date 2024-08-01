@@ -12,7 +12,6 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from ajax_select import make_ajax_form
 from django.contrib import admin
 
 from launderette.models import *
@@ -31,10 +30,10 @@ class MachineAdmin(admin.ModelAdmin):
 @admin.register(Token)
 class TokenAdmin(admin.ModelAdmin):
     list_display = ("name", "launderette", "type", "user")
-    form = make_ajax_form(Token, {"user": "users"})
+    autocomplete_fields = ("user",)
 
 
 @admin.register(Slot)
 class SlotAdmin(admin.ModelAdmin):
     list_display = ("machine", "user", "start_date")
-    form = make_ajax_form(Slot, {"user": "users"})
+    autocomplete_fields = ("user",)
