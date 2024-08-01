@@ -50,6 +50,7 @@ django-honeypot = "^1.2.0"
 [tool.poetry.group.prod.dependencies]
 # deps used in prod, but unnecessary for development
 psycopg2-binary = "^2.9"
+redis = {extras = ["hiredis"], version = "^5.0.8"}
 
 [tool.poetry.group.prod]
 optional = true
