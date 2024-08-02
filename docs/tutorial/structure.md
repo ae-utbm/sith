@@ -64,17 +64,19 @@ sith3/
 │   └── ...
 ├── trombi/ (22)
 │   └── ...
+├── antispam/ (23)
+│   └── ...
 │
-├── .coveragerc (23)
-├── .envrc (24)
+├── .coveragerc (24)
+├── .envrc (25)
 ├── .gitattributes
 ├── .gitignore
 ├── .mailmap
 ├── .env.exemple
-├── manage.py (25)
-├── mkdocs.yml (26)
+├── manage.py (26)
+├── mkdocs.yml (27)
 ├── poetry.lock
-├── pyproject.toml (27)
+├── pyproject.toml (28)
 └── README.md
 ```
 </div>
@@ -112,15 +114,16 @@ sith3/
 19. Application principale du projet, contenant sa configuration.
 20. Gestion des stocks des comptoirs.
 21. Gestion des cotisations des utilisateurs du site.
-22. Gestion des trombinoscopes.
-23. Fichier de configuration de coverage.
-24. Fichier de configuration de direnv.
-25. Fichier généré automatiquement par Django. C'est lui
+22. Fonctionalitées pour gérer le spam.
+23. Gestion des trombinoscopes.
+24. Fichier de configuration de coverage.
+25. Fichier de configuration de direnv.
+26. Fichier généré automatiquement par Django. C'est lui
     qui permet d'appeler des commandes de gestion du projet
     avec la syntaxe `python ./manage.py <nom de la commande>`
-26. Le fichier de configuration de la documentation,
+27. Le fichier de configuration de la documentation,
     avec ses plugins et sa table des matières.
-27. Le fichier où sont déclarés les dépendances et la configuration
+28. Le fichier où sont déclarés les dépendances et la configuration
     de certaines d'entre elles.
     
 
