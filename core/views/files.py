@@ -21,7 +21,7 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.forms.models import modelform_factory
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.http import http_date
@@ -37,27 +37,23 @@ from core.views import (
     CanViewMixin,
     can_view,
 )
-from counter.models import Counter
+from counter.utils import sent_from_logged_counter
 
 
-def send_file(request, file_id, file_class=SithFile, file_attr="file"):
+def send_file(
+    request: HttpRequest,
+    file_id: int,
+    file_class: type[SithFile] = SithFile,
+    file_attr: str = "file",
+):
     """Send a file through Django without loading the whole file into
     memory at once. The FileWrapper will turn the file object into an
     iterator for chunks of 8KB.
     """
     f = get_object_or_404(file_class, id=file_id)
-    if not (
-        can_view(f, request.user)
-        or (
-            "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        )
-    ):
+    if not can_view(f, request.user) and not sent_from_logged_counter(request):
         raise PermissionDenied
-    name = f.__getattribute__(file_attr).name
+    name = getattr(f, file_attr).name
     filepath = settings.MEDIA_ROOT / name
 
     # check if file exists on disk
