@@ -61,12 +61,12 @@ nav:
     - Archives: explanation/archives.md
   - Tutoriels:
     - Installer le projet: tutorial/install.md
+    - Installer le projet (avancé): tutorial/install-advanced.md
     - Configurer son éditeur: tutorial/devtools.md
     - Structure du projet: tutorial/structure.md
     - Gestion des permissions: tutorial/perms.md
     - Gestion des groupes: tutorial/groups.md
     - Etransactions: tutorial/etransaction.md
-    - Installer le projet (Avancé): tutorial/install_advanced.md
   - How-to:
     - L'ORM de Django: howto/querysets.md
     - Gérer les migrations: howto/migrations.md

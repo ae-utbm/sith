@@ -49,7 +49,10 @@ django-honeypot = "^1.2.0"
 
 [tool.poetry.group.prod.dependencies]
 # deps used in prod, but unnecessary for development
-psycopg2-binary = "^2.9"
+
+# The C extra triggers compilation against sytem libs during install.
+# Removing it would switch psycopg to a slower full-python implementation
+psycopg = {extras = ["c"], version = "^3.2.1"}
 redis = {extras = ["hiredis"], version = "^5.0.8"}
 
 [tool.poetry.group.prod]
