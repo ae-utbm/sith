@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from urllib.parse import quote
 
 # This file contains all the views that concern the page model
 from wsgiref.util import FileWrapper
@@ -45,10 +46,13 @@ def send_file(
     file_id: int,
     file_class: type[SithFile] = SithFile,
     file_attr: str = "file",
-):
-    """Send a file through Django without loading the whole file into
-    memory at once. The FileWrapper will turn the file object into an
-    iterator for chunks of 8KB.
+) -> HttpResponse:
+    """Send a protected file, if the user can see it.
+
+    In prod, the server won't handle the download itself,
+    but set the appropriate headers in the response to make the reverse-proxy
+    deal with it.
+    In debug mode, the server will directly send the file.
     """
     f = get_object_or_404(file_class, id=file_id)
     if not can_view(f, request.user) and not sent_from_logged_counter(request):
@@ -59,6 +63,16 @@ def send_file(
     # check if file exists on disk
     if not filepath.exists():
         raise Http404
+
+    if not settings.DEBUG:
+        # When receiving a response with the Accel-Redirect header,
+        # the reverse proxy will automatically handle the file sending.
+        # This is really hard to test (thus isn't tested)
+        # so please do not mess with this.
+        response = HttpResponse(status=200)
+        response["Content-Type"] = ""
+        response["X-Accel-Redirect"] = f"/data/{quote(name)}"
+        return response
 
     with open(filepath, "rb") as filename:
         wrapper = FileWrapper(filename)
