@@ -1,6 +1,8 @@
 from typing import Literal
 
 from django.db.models import Q
+from django.utils import html
+from haystack.query import SearchQuerySet
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import AliasPath, ConfigDict, Field, TypeAdapter
 from pydantic.alias_generators import to_camel
@@ -119,6 +121,27 @@ class UvFilterSchema(FilterSchema):
     )
     language: str = "FR"
     department: set[str] | None = Field(None, q="department__in")
+
+    def filter_search(self, value: str | None) -> Q:
+        """Special filter for the search text.
+
+        It does a full text search if available.
+        """
+        if not value:
+            return Q()
+
+        if len(value) < 3 or (len(value) < 5 and any(c.isdigit() for c in value)):
+            # Likely to be an UV code
+            return Q(code__istartswith=value)
+
+        qs = list(
+            SearchQuerySet()
+            .models(UV)
+            .autocomplete(auto=html.escape(value))
+            .values_list("pk", flat=True)
+        )
+
+        return Q(id__in=qs)
 
     def filter_semester(self, value: set[str] | None) -> Q:
         """Special filter for the semester.

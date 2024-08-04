@@ -13,30 +13,30 @@
 #
 #
 
-from ajax_select import make_ajax_form
 from django.contrib import admin
 from django.contrib.auth.models import Group as AuthGroup
-from haystack.admin import SearchModelAdmin
 
-from core.models import MetaGroup, Page, RealGroup, SithFile, User
+from core.models import Group, Page, SithFile, User
 
 admin.site.unregister(AuthGroup)
-admin.site.register(MetaGroup)
-admin.site.register(RealGroup)
+
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    list_display = ("name", "description", "is_meta")
+    list_filter = ("is_meta",)
+    search_fields = ("name",)
 
 
 @admin.register(User)
-class UserAdmin(SearchModelAdmin):
+class UserAdmin(admin.ModelAdmin):
     list_display = ("first_name", "last_name", "username", "email", "nick_name")
-    form = make_ajax_form(
-        User,
-        {
-            "godfathers": "users",
-            "home": "files",  # ManyToManyField
-            "profile_pict": "files",  # ManyToManyField
-            "avatar_pict": "files",  # ManyToManyField
-            "scrub_pict": "files",  # ManyToManyField
-        },
+    autocomplete_fields = (
+        "godfathers",
+        "home",
+        "profile_pict",
+        "avatar_pict",
+        "scrub_pict",
     )
     search_fields = ["first_name", "last_name", "username"]
 
@@ -44,25 +44,12 @@ class UserAdmin(SearchModelAdmin):
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
     list_display = ("name", "_full_name", "owner_group")
-    form = make_ajax_form(
-        Page,
-        {
-            "lock_user": "users",
-            "owner_group": "groups",
-            "edit_groups": "groups",
-            "view_groups": "groups",
-        },
-    )
+    search_fields = ("name",)
+    autocomplete_fields = ("lock_user", "owner_group", "edit_groups", "view_groups")
 
 
 @admin.register(SithFile)
 class SithFileAdmin(admin.ModelAdmin):
     list_display = ("name", "owner", "size", "date", "is_in_sas")
-    form = make_ajax_form(
-        SithFile,
-        {
-            "parent": "files",
-            "owner": "users",
-            "moderator": "users",
-        },
-    )  # ManyToManyField
+    autocomplete_fields = ("parent", "owner", "moderator")
+    search_fields = ("name", "parent__name")

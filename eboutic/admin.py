@@ -12,7 +12,6 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from ajax_select import make_ajax_form
 from django.contrib import admin
 
 from eboutic.models import *
@@ -21,7 +20,7 @@ from eboutic.models import *
 @admin.register(Basket)
 class BasketAdmin(admin.ModelAdmin):
     list_display = ("user", "date", "get_total")
-    form = make_ajax_form(Basket, {"user": "users"})
+    autocomplete_fields = ("user",)
 
 
 @admin.register(BasketItem)
@@ -34,7 +33,7 @@ class BasketItemAdmin(admin.ModelAdmin):
 class InvoiceAdmin(admin.ModelAdmin):
     list_display = ("user", "date", "validated")
     search_fields = ("user__username", "user__first_name", "user__last_name")
-    form = make_ajax_form(Invoice, {"user": "users"})
+    autocomplete_fields = ("user",)
 
 
 @admin.register(InvoiceItem)

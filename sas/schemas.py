@@ -23,6 +23,7 @@ class PictureSchema(ModelSchema):
     full_size_url: str
     compressed_url: str
     thumb_url: str
+    album: str
 
 
 class PictureCreateRelationSchema(Schema):

@@ -203,8 +203,6 @@ SASS_PRECISION = 8
 
 WSGI_APPLICATION = "sith.wsgi.application"
 
-REST_FRAMEWORK = {}
-
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
@@ -214,6 +212,8 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 # Logging
 LOGGING = {
@@ -280,7 +280,7 @@ LOGOUT_URL = "/logout"
 LOGIN_REDIRECT_URL = "/"
 DEFAULT_FROM_EMAIL = "bibou@git.an"
 SITH_COM_EMAIL = "bibou_com@git.an"
-REST_FRAMEWORK["UNAUTHENTICATED_USER"] = "core.models.AnonymousUser"
+
 # Those values are to be changed in production to be more effective
 HONEYPOT_FIELD_NAME = "body2"
 HONEYPOT_VALUE = "content"
@@ -724,8 +724,7 @@ if SENTRY_DSN:
     )
 
 SITH_FRONT_DEP_VERSIONS = {
-    "https://github.com/Stuk/jszip-utils": "0.1.0",
-    "https://github.com/Stuk/jszip": "3.10.1",
+    "https://github.com/gildas-lormeau/zip.js": "2.7.47",
     "https://github.com/jimmywarting/native-file-system-adapter": "3.0.1",
     "https://github.com/chartjs/Chart.js/": "2.6.0",
     "https://github.com/Ionaru/easy-markdown-editor/": "2.18.0",
