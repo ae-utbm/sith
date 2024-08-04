@@ -66,6 +66,7 @@ nav:
     - Gestion des permissions: tutorial/perms.md
     - Gestion des groupes: tutorial/groups.md
     - Etransactions: tutorial/etransaction.md
+    - Installer le projet (Avancé): tutorial/install_advanced.md
   - How-to:
     - L'ORM de Django: howto/querysets.md
     - Gérer les migrations: howto/migrations.md
@@ -80,6 +81,9 @@ nav:
     - accounting:
       - reference/accounting/models.md
       - reference/accounting/views.md
+    - antispam:
+      - reference/antispam/models.md
+      - reference/antispam/forms.md
     - club:
       - reference/club/models.md
       - reference/club/views.md

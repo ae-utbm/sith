@@ -98,6 +98,7 @@ INSTALLED_APPS = (
     "matmat",
     "pedagogy",
     "galaxy",
+    "antispam",
 )
 
 MIDDLEWARE = (
@@ -204,13 +205,12 @@ SASS_PRECISION = 8
 WSGI_APPLICATION = "sith.wsgi.application"
 
 # Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
-    }
+    },
 }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
@@ -672,6 +672,10 @@ SITH_GIFT_LIST = [("AE Tee-shirt", _("AE tee-shirt"))]
 
 SENTRY_DSN = ""
 SENTRY_ENV = "production"
+
+TOXIC_DOMAINS_PROVIDERS = [
+    "https://www.stopforumspam.com/downloads/toxic_domains_whole.txt",
+]
 
 try:
     from .settings_custom import *
