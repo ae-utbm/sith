@@ -574,17 +574,17 @@ testing = ["coverage", "geopy (==2)", "pysolr (>=3.7)", "python-dateutil", "requ
 
 [[package]]
 name = "django-honeypot"
-version = "1.2.0"
+version = "1.2.1"
 description = "Django honeypot field utilities"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "django_honeypot-1.2.0-py3-none-any.whl", hash = "sha256:53dd5f8dd96ef1bb7e31b5514c0dc2caae9577e78ebdf03ca4e0f304a7422aba"},
-    {file = "django_honeypot-1.2.0.tar.gz", hash = "sha256:25fca02e786aec26649bd13b37a95c846e09ab3cfc10f28db2f7dfaa77b9b9c6"},
+    {file = "django_honeypot-1.2.1-py3-none-any.whl", hash = "sha256:fdabe4ded66b6db25d04af2446de3bf7cb047cb5db097a864c8c97b081ef736f"},
+    {file = "django_honeypot-1.2.1.tar.gz", hash = "sha256:ab5c2aad214d86def2f00f6a79aa14f171db7301ac8712f20dc21a83dd5d6413"},
 ]
 
 [package.dependencies]
-Django = ">=3.2,<5.1"
+Django = ">=3.2,<5.2"
 
 [[package]]
 name = "django-jinja"
@@ -2585,4 +2585,4 @@ filelock = ">=3.4"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f3f8b222cdb1a7d6199c10163c1bee6d5cfd0959af416944caa87a0e85f4d04c"
+content-hash = "a1799f898b83a859b7a58c64f11ca7110e58b4c39b12159d187a1a2450d84c7a"
