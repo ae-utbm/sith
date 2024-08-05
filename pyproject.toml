@@ -65,7 +65,7 @@ ipython = "^8.26.0"
 pre-commit = "^3.8.0"
 ruff = "^0.5.5" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
 djhtml = "^3.0.6"
-faker = "^26.0.0"
+faker = "^26.1.0"
 
 [tool.poetry.group.tests.dependencies]
 # deps used for testing purposes
