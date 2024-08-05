@@ -80,6 +80,7 @@ from counter.models import (
     Selling,
     StudentCard,
 )
+from counter.utils import is_logged_in_counter
 
 
 class CounterAdminMixin(View):
@@ -901,15 +902,9 @@ class RefillingDeleteView(DeleteView):
     def dispatch(self, request, *args, **kwargs):
         """We have here a very particular right handling, we can't inherit from CanEditPropMixin."""
         self.object = self.get_object()
-        if (
-            timezone.now() - self.object.date
-            <= timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT)
-            and "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        ):
+        if timezone.now() - self.object.date <= timedelta(
+            minutes=settings.SITH_LAST_OPERATIONS_LIMIT
+        ) and is_logged_in_counter(request):
             self.success_url = reverse(
                 "counter:details", kwargs={"counter_id": self.object.counter.id}
             )
@@ -932,15 +927,9 @@ class SellingDeleteView(DeleteView):
     def dispatch(self, request, *args, **kwargs):
         """We have here a very particular right handling, we can't inherit from CanEditPropMixin."""
         self.object = self.get_object()
-        if (
-            timezone.now() - self.object.date
-            <= timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT)
-            and "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        ):
+        if timezone.now() - self.object.date <= timedelta(
+            minutes=settings.SITH_LAST_OPERATIONS_LIMIT
+        ) and is_logged_in_counter(request):
             self.success_url = reverse(
                 "counter:details", kwargs={"counter_id": self.object.counter.id}
             )
@@ -1175,14 +1164,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         """We have here again a very particular right handling."""
         self.object = self.get_object()
-        if (
-            self.object.barmen_list
-            and "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        ):
+        if is_logged_in_counter(request) and self.object.barmen_list:
             return super().dispatch(request, *args, **kwargs)
         return HttpResponseRedirect(
             reverse("counter:details", kwargs={"counter_id": self.object.id})
@@ -1215,14 +1197,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         """We have here again a very particular right handling."""
         self.object = self.get_object()
-        if (
-            self.object.barmen_list
-            and "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        ):
+        if is_logged_in_counter(request) and self.object.barmen_list:
             return super().dispatch(request, *args, **kwargs)
         return HttpResponseRedirect(
             reverse("counter:details", kwargs={"counter_id": self.object.id})

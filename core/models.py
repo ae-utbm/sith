@@ -1137,11 +1137,9 @@ class SithFile(models.Model):
         else:
             self._check_path_consistence()
 
-    def __getattribute__(self, attr):
-        if attr == "is_file":
-            return not self.is_folder
-        else:
-            return super().__getattribute__(attr)
+    @property
+    def is_file(self):
+        return not self.is_folder
 
     @cached_property
     def as_picture(self):
