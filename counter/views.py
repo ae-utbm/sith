@@ -80,7 +80,7 @@ from counter.models import (
     Selling,
     StudentCard,
 )
-from counter.utils import sent_from_logged_counter
+from counter.utils import is_logged_in_counter
 
 
 class CounterAdminMixin(View):
@@ -904,7 +904,7 @@ class RefillingDeleteView(DeleteView):
         self.object = self.get_object()
         if timezone.now() - self.object.date <= timedelta(
             minutes=settings.SITH_LAST_OPERATIONS_LIMIT
-        ) and sent_from_logged_counter(request):
+        ) and is_logged_in_counter(request):
             self.success_url = reverse(
                 "counter:details", kwargs={"counter_id": self.object.counter.id}
             )
@@ -929,7 +929,7 @@ class SellingDeleteView(DeleteView):
         self.object = self.get_object()
         if timezone.now() - self.object.date <= timedelta(
             minutes=settings.SITH_LAST_OPERATIONS_LIMIT
-        ) and sent_from_logged_counter(request):
+        ) and is_logged_in_counter(request):
             self.success_url = reverse(
                 "counter:details", kwargs={"counter_id": self.object.counter.id}
             )
@@ -1164,7 +1164,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         """We have here again a very particular right handling."""
         self.object = self.get_object()
-        if sent_from_logged_counter(request) and self.object.barmen_list:
+        if is_logged_in_counter(request) and self.object.barmen_list:
             return super().dispatch(request, *args, **kwargs)
         return HttpResponseRedirect(
             reverse("counter:details", kwargs={"counter_id": self.object.id})
@@ -1197,7 +1197,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         """We have here again a very particular right handling."""
         self.object = self.get_object()
-        if sent_from_logged_counter(request) and self.object.barmen_list:
+        if is_logged_in_counter(request) and self.object.barmen_list:
             return super().dispatch(request, *args, **kwargs)
         return HttpResponseRedirect(
             reverse("counter:details", kwargs={"counter_id": self.object.id})

@@ -12,7 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
 # This file contains all the views that concern the page model
 from wsgiref.util import FileWrapper
@@ -38,7 +38,7 @@ from core.views import (
     CanViewMixin,
     can_view,
 )
-from counter.utils import sent_from_logged_counter
+from counter.utils import is_logged_in_counter
 
 
 def send_file(
@@ -55,7 +55,7 @@ def send_file(
     In debug mode, the server will directly send the file.
     """
     f = get_object_or_404(file_class, id=file_id)
-    if not can_view(f, request.user) and not sent_from_logged_counter(request):
+    if not can_view(f, request.user) and not is_logged_in_counter(request):
         raise PermissionDenied
     name = getattr(f, file_attr).name
     filepath = settings.MEDIA_ROOT / name
@@ -71,7 +71,7 @@ def send_file(
         # so please do not mess with this.
         response = HttpResponse(status=200)
         response["Content-Type"] = ""
-        response["X-Accel-Redirect"] = f"/data/{quote(name)}"
+        response["X-Accel-Redirect"] = quote(urljoin(settings.MEDIA_URL, name))
         return response
 
     with open(filepath, "rb") as filename:

@@ -21,12 +21,12 @@ from club.models import Club
 from core.models import Group, SithFile, User
 from core.views.site import search_user
 from counter.models import Counter, Customer, Product
-from counter.utils import sent_from_logged_counter
+from counter.utils import is_logged_in_counter
 
 
 class RightManagedLookupChannel(LookupChannel):
     def check_auth(self, request):
-        if not request.user.was_subscribed and not sent_from_logged_counter(request):
+        if not request.user.was_subscribed and not is_logged_in_counter(request):
             raise PermissionDenied
 
 

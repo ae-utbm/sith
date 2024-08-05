@@ -6,7 +6,7 @@ from django.urls import resolve
 from counter.models import Counter
 
 
-def sent_from_logged_counter(request: HttpRequest) -> bool:
+def is_logged_in_counter(request: HttpRequest) -> bool:
     """Check if the request is sent from a device logged to a counter.
 
     The request must also be sent within the frame of a counter's activity.
