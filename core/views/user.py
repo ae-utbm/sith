@@ -319,6 +319,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
             .order_by("-parent__date", "-date")
             .annotate(album=F("parent__name"))
         )
+        kwargs["nb_pictures"] = len(pictures)
         kwargs["albums"] = {
             album: list(picts)
             for album, picts in itertools.groupby(pictures, lambda i: i.album)

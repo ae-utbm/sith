@@ -23,7 +23,7 @@
         <button
           :disabled="in_progress"
           class="btn btn-blue"
-          @click="download('{{ url("api:pictures") }}?users_identified={{ object.id }}')"
+          @click="download_zip()"
         >
           <i class="fa fa-download"></i>
           {% trans %}Download all my pictures{% endtrans %}
@@ -86,13 +86,34 @@
         Alpine.data("picture_download", () => ({
           in_progress: false,
 
-          async download(url) {
+          /**
+           * @return {Promise<Picture[]>}
+           */
+          async get_pictures() {
+            {# The API forbids to get more than 199 items at once
+             from paginated routes.
+             In order to download all the user pictures, it may be needed
+             to performs multiple requests #}
+            const max_per_page = 1;
+            const url = "{{ url("api:pictures") }}"
+            + "?users_identified={{ object.id }}"
+            + `&page_size=${max_per_page}`;
+            let promises = [];
+            const nb_pages = Math.ceil({{ nb_pictures }} / max_per_page);
+            for (let i = 1; i <= nb_pages; i++) {
+              promises.push(
+                fetch(url + `&page=${i}`).then(res => res.json().then(json => json.results))
+              );
+            }
+            return (await Promise.all(promises)).flat()
+          },
+
+
+          async download_zip(){
             this.in_progress = true;
             const bar = this.$refs.progress;
             bar.value = 0;
-
-            /** @type Picture[] */
-            const pictures = await (await fetch(url)).json();
+            const pictures = await this.get_pictures();
             bar.max = pictures.length;
 
             const fileHandle = await window.showSaveFilePicker({

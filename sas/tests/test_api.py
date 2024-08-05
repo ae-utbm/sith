@@ -44,12 +44,8 @@ class TestPictureSearch(TestSas):
         self.client.force_login(self.user_b)
         res = self.client.get(reverse("api:pictures") + f"?album_id={self.album_a.id}")
         assert res.status_code == 200
-        expected = list(
-            self.album_a.children_pictures.order_by("-date").values_list(
-                "id", flat=True
-            )
-        )
-        assert [i["id"] for i in res.json()] == expected
+        expected = list(self.album_a.children_pictures.values_list("id", flat=True))
+        assert [i["id"] for i in res.json()["results"]] == expected
 
     def test_filter_by_user(self):
         self.client.force_login(self.user_b)
@@ -58,11 +54,11 @@ class TestPictureSearch(TestSas):
         )
         assert res.status_code == 200
         expected = list(
-            self.user_a.pictures.order_by("-picture__date").values_list(
-                "picture_id", flat=True
-            )
+            self.user_a.pictures.order_by(
+                "-picture__parent__date", "picture__date"
+            ).values_list("picture_id", flat=True)
         )
-        assert [i["id"] for i in res.json()] == expected
+        assert [i["id"] for i in res.json()["results"]] == expected
 
     def test_filter_by_multiple_user(self):
         self.client.force_login(self.user_b)
@@ -73,10 +69,10 @@ class TestPictureSearch(TestSas):
         assert res.status_code == 200
         expected = list(
             self.user_a.pictures.union(self.user_b.pictures.all())
-            .order_by("-picture__date")
+            .order_by("-picture__parent__date", "picture__date")
             .values_list("picture_id", flat=True)
         )
-        assert [i["id"] for i in res.json()] == expected
+        assert [i["id"] for i in res.json()["results"]] == expected
 
     def test_not_subscribed_user(self):
         """Test that a user that is not subscribed can only its own pictures."""
@@ -86,11 +82,11 @@ class TestPictureSearch(TestSas):
         )
         assert res.status_code == 200
         expected = list(
-            self.user_a.pictures.order_by("-picture__date").values_list(
-                "picture_id", flat=True
-            )
+            self.user_a.pictures.order_by(
+                "-picture__parent__date", "picture__date"
+            ).values_list("picture_id", flat=True)
         )
-        assert [i["id"] for i in res.json()] == expected
+        assert [i["id"] for i in res.json()["results"]] == expected
 
         # trying to access the pictures of someone else
         res = self.client.get(
