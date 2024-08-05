@@ -3,7 +3,13 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
+from core.models import User
+from core.views.forms import (
+    AutoCompleteSelectUserWidget,
+    NFCTextInput,
+    SelectDate,
+    SelectDateTime,
+)
 from counter.models import (
     BillingInfo,
     Counter,
@@ -63,8 +69,11 @@ class GetUserForm(forms.Form):
         required=False,
         widget=NFCTextInput,
     )
-    id = AutoCompleteSelectField(
-        "users", required=False, label=_("Select user"), help_text=None
+    user = forms.ModelChoiceField(
+        User.objects.all(),
+        label=_("Select user"),
+        required=False,
+        widget=AutoCompleteSelectUserWidget,
     )
 
     def as_p(self):
@@ -83,8 +92,8 @@ class GetUserForm(forms.Form):
                 cus = Customer.objects.filter(
                     account_id__iexact=cleaned_data["code"]
                 ).first()
-        elif cleaned_data["id"] is not None:
-            cus = Customer.objects.filter(user=cleaned_data["id"]).first()
+        elif (user := cleaned_data["user"]) is not None and hasattr(user, "customer"):
+            cus = user.customer
         if cus is None or not cus.can_buy:
             raise forms.ValidationError(_("User not found"))
         cleaned_data["user_id"] = cus.user.id

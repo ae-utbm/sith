@@ -1,0 +1,29 @@
+<div x-data="select2_{{ widget.name }}">
+  <select x-ref="search" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}></select>
+</div>
+
+{% comment %}
+{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
+  <optgroup label="{{ group_name }}">{% endif %}{% for widget in group_choices %}
+  {% include widget.template_name %}{% endfor %}{% if group_name %}
+  </optgroup>{% endif %}{% endfor %}
+ipt>
+{% endcomment %}
+<script>
+  document.addEventListener("alpine:init", () => {
+    Alpine.data("select2_{{ widget.name }}", () => ({
+      selector: undefined,
+
+      async init () {
+        this.selector = sithSelect2({
+          element: $(this.$refs.search),
+          data_source: remote_data_source("{{ lookup }}", {
+            excluded: {{ excluded }},
+            result_converter: {{ result_converter }},
+          }),
+          picture_getter: {{ picture_getter }},
+        });
+      }
+    }));
+  });
+</script>

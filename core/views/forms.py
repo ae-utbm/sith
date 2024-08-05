@@ -40,6 +40,7 @@ from django.forms import (
 )
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.html import mark_safe
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
@@ -131,6 +132,20 @@ class SelectFile(TextInput):
             + "</span>"
         )
         return output
+
+
+class AutoCompleteSelectUserWidget(forms.Select):
+    template_name = "core/widgets/select2.jinja"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["lookup"] = reverse("api:search_users")
+        context["excluded"] = mark_safe("() => []")
+        context["result_converter"] = mark_safe(
+            "(obj) => Object({ ...obj, text: obj.display_name })"
+        )
+        context["picture_getter"] = mark_safe("(user) => user.profile_pict")
+        return context
 
 
 class SelectUser(TextInput):

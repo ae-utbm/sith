@@ -40,7 +40,11 @@ class UserController(ControllerBase):
     def fetch_profiles(self, pks: Query[set[int]]):
         return User.objects.filter(pk__in=pks)
 
-    @route.get("/search", response=PaginatedResponseSchema[UserProfileSchema])
+    @route.get(
+        "/search",
+        response=PaginatedResponseSchema[UserProfileSchema],
+        url_name="search_users",
+    )
     @paginate(PageNumberPaginationExtra, page_size=20)
     def search_users(self, filters: Query[UserFilterSchema]):
         return filters.filter(User.objects.all())
