@@ -50,7 +50,7 @@ class PicturesController(ControllerBase):
                 Picture.objects.filter(is_moderated=True, asked_for_removal=False)
             )
             .distinct()
-            .order_by("-date")
+            .order_by("-parent__date", "date")
             .annotate(album=F("parent__name"))
         )
 

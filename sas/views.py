@@ -236,7 +236,6 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
     form_class = SASForm
     pk_url_kwarg = "album_id"
     template_name = "sas/album.jinja"
-    paginate_by = settings.SITH_SAS_IMAGES_PER_PAGE
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -283,13 +282,6 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["paginator"] = Paginator(
-            self.object.children_pictures.order_by("id"), self.paginate_by
-        )
-        try:
-            kwargs["pictures"] = kwargs["paginator"].page(self.asked_page)
-        except InvalidPage as e:
-            raise Http404 from e
         kwargs["form"] = self.form
         kwargs["clipboard"] = SithFile.objects.filter(
             id__in=self.request.session["clipboard"]

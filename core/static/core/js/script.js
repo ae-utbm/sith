@@ -65,3 +65,21 @@ function display_notif() {
 function getCSRFToken() {
     return $("[name=csrfmiddlewaretoken]").val();
 }
+
+
+const initialUrlParams = new URLSearchParams(window.location.search);
+
+function update_query_string(key, value) {
+    const url = new URL(window.location.href);
+    if (!value) {
+        // If the value is null, undefined or empty => delete it
+        url.searchParams.delete(key)
+    } else if (Array.isArray(value)) {
+
+        url.searchParams.delete(key)
+        value.forEach((v) => url.searchParams.append(key, v))
+    } else {
+        url.searchParams.set(key, value);
+    }
+    history.pushState(null, document.title, url.toString());
+}
