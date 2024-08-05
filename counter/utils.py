@@ -23,13 +23,12 @@ def is_logged_in_counter(request: HttpRequest) -> bool:
     - The current session has a counter token associated with it.
     - A counter with this token exists.
     """
-    referer = urlparse(request.META["HTTP_REFERER"]).path
-    path_ok = (
-        request.resolver_match.app_name == "counter"
-        or resolve(referer).app_name == "counter"
+    referer_ok = (
+        "HTTP_REFERER" in request.META
+        and resolve(urlparse(request.META["HTTP_REFERER"]).path).app_name == "counter"
     )
     return (
-        path_ok
+        (referer_ok or request.resolver_match.app_name == "counter")
         and "counter_token" in request.session
         and request.session["counter_token"]
         and Counter.objects.filter(token=request.session["counter_token"]).exists()
