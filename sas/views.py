@@ -18,7 +18,6 @@ from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -318,9 +317,7 @@ class ModerationView(TemplateView):
         kwargs["albums_to_moderate"] = Album.objects.filter(
             is_moderated=False, is_in_sas=True, is_folder=True
         ).order_by("id")
-        kwargs["pictures"] = Picture.objects.filter(
-            is_moderated=False, is_in_sas=True, is_folder=False
-        )
+        kwargs["pictures"] = Picture.objects.filter(is_moderated=False)
         kwargs["albums"] = Album.objects.filter(
             id__in=kwargs["pictures"].values("parent").distinct("parent")
         )

@@ -75,7 +75,8 @@ class TestPictureSearch(TestSas):
         assert [i["id"] for i in res.json()["results"]] == expected
 
     def test_not_subscribed_user(self):
-        """Test that a user that is not subscribed can only its own pictures."""
+        """Test that a user that never subscribed can only its own pictures."""
+        self.user_a.subscriptions.all().delete()
         self.client.force_login(self.user_a)
         res = self.client.get(
             reverse("api:pictures") + f"?users_identified={self.user_a.id}"

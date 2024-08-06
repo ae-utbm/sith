@@ -14,6 +14,7 @@
 #
 
 from io import BytesIO
+from typing import Self
 
 from django.conf import settings
 from django.core.cache import cache
@@ -27,9 +28,25 @@ from core.models import SithFile, User
 from core.utils import exif_auto_rotate, resize_image
 
 
+class PictureQuerySet(models.QuerySet):
+    def viewable_by(self, user: User) -> Self:
+        """Filter the pictures that this user can view.
+
+        Warnings:
+            Calling this queryset method may add several additional requests.
+        """
+        if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
+            return self.all()
+        if user.was_subscribed:
+            return self.filter(is_moderated=True)
+        return self.filter(people__user_id=user.id)
+
+
 class SASPictureManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(is_in_sas=True, is_folder=False)
+        return PictureQuerySet(self.model, using=self._db).filter(
+            is_in_sas=True, is_folder=False
+        )
 
 
 class SASAlbumManager(models.Manager):
@@ -41,7 +58,7 @@ class Picture(SithFile):
     class Meta:
         proxy = True
 
-    objects = SASPictureManager()
+    objects = SASPictureManager.from_queryset(PictureQuerySet)()
 
     @property
     def is_vertical(self):
@@ -58,7 +75,7 @@ class Picture(SithFile):
         cache.set("%d_can_edit_pictures" % (user.id), perm, timeout=4)
         return perm
 
-    def can_be_viewed_by(self, user):
+    def can_be_viewed_by(self, user: User) -> bool:
         # SAS pictures are visible to old subscribers
         # Result is cached 4s for this user
         if user.is_anonymous:

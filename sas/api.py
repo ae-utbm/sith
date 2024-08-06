@@ -41,14 +41,12 @@ class PicturesController(ControllerBase):
             cf. https://ae.utbm.fr/user/32663/pictures/)
         """
         user: User = self.context.request.user
-        if not user.is_subscribed and filters.users_identified != {user.id}:
+        if not user.was_subscribed and filters.users_identified != {user.id}:
             # User can view any moderated picture if he/she is subscribed.
             # If not, he/she can view only the one he/she has been identified on
             raise PermissionDenied
         return (
-            filters.filter(
-                Picture.objects.filter(is_moderated=True, asked_for_removal=False)
-            )
+            filters.filter(Picture.objects.viewable_by(user))
             .distinct()
             .order_by("-parent__date", "date")
             .annotate(album=F("parent__name"))
