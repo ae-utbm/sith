@@ -22,6 +22,7 @@
 #
 #
 import itertools
+import logging
 
 # This file contains all the views that concern the user model
 from datetime import date, timedelta
@@ -801,7 +802,7 @@ class UserAccountView(UserAccountBase):
                 product__eticket=None
             ).all()
         except Exception as e:
-            print(repr(e))
+            logging.error(e)
         return kwargs
 
 

@@ -36,11 +36,7 @@ def remove_multiples_comments_from_same_user(apps, schema_editor):
                 .order_by("-publish_date")
                 .first()
             )
-            for comment in (
-                user.uv_comments.filter(uv__id=uv["uv"]).exclude(pk=last.pk).all()
-            ):
-                print("removing : %s" % (comment,))
-                comment.delete()
+            user.uv_comments.filter(uv__id=uv["uv"]).exclude(pk=last.pk).delete()
 
 
 class Migration(migrations.Migration):
