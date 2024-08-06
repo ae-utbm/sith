@@ -24,6 +24,7 @@
 from __future__ import annotations
 
 import importlib
+import logging
 import os
 import unicodedata
 from datetime import date, timedelta
@@ -1085,19 +1086,15 @@ class SithFile(models.Model):
             # file storage
             parent_path = "." + self.parent.get_full_path()
             parent_full_path = settings.MEDIA_ROOT + parent_path
-            print("Parent full path: %s" % parent_full_path)
             os.makedirs(parent_full_path, exist_ok=True)
             old_path = self.file.name  # Should be relative: "./users/skia/bleh.jpg"
             new_path = "." + self.get_full_path()
-            print("Old path: %s " % old_path)
-            print("New path: %s " % new_path)
             try:
                 # Make this atomic, so that a FS problem rolls back the DB change
                 with transaction.atomic():
                     # Set the new filesystem path
                     self.file.name = new_path
                     self.save()
-                    print("New file path: %s " % self.file.path)
                     # Really move at the FS level
                     if os.path.exists(parent_full_path):
                         os.rename(
@@ -1108,25 +1105,22 @@ class SithFile(models.Model):
                         # problem, and that can be solved with a simple shell
                         # command: `find . -type d -empty -delete`
             except Exception as e:
-                print("This file likely had a problem. Here is the exception:")
-                print(repr(e))
-            print("-" * 80)
+                logging.error(e)
 
     def _check_path_consistence(self):
         file_path = str(self.file)
         file_full_path = settings.MEDIA_ROOT + file_path
         db_path = ".%s" % self.get_full_path()
         if not os.path.exists(file_full_path):
-            print("%s: WARNING: real file does not exists!" % self.id)
-            print("file path: %s" % file_path, end="")
-            print("  db path: %s" % db_path)
+            print("%s: WARNING: real file does not exists!" % self.id)  # noqa T201
+            print("file path: %s" % file_path, end="")  # noqa T201
+            print("  db path: %s" % db_path)  # noqa T201
             return False
         if file_path != db_path:
-            print("%s: " % self.id, end="")
-            print("file path: %s" % file_path, end="")
-            print("  db path: %s" % db_path)
+            print("%s: " % self.id, end="")  # noqa T201
+            print("file path: %s" % file_path, end="")  # noqa T201
+            print("  db path: %s" % db_path)  # noqa T201
             return False
-        print("%s OK (%s)" % (self.id, file_path))
         return True
 
     def _check_fs(self):

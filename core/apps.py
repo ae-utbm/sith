@@ -20,8 +20,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
-import sys
+import logging
 
 from django.apps import AppConfig
 from django.core.cache import cache
@@ -41,7 +40,7 @@ class SithConfig(AppConfig):
         def clear_cached_memberships(**kwargs):
             Forum._club_memberships = {}
 
-        print("Connecting signals!", file=sys.stderr)
+        logging.getLogger("django").info("Connecting signals!")
         request_started.connect(
             clear_cached_memberships,
             weak=False,

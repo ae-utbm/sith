@@ -21,6 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import logging
 
 from ajax_select.fields import AutoCompleteSelectField
 from django import forms
@@ -146,7 +147,7 @@ def delete_all_forum_user_messages(user, moderator, *, verbose=False):
             continue
 
         if verbose:
-            print(message)
+            logging.getLogger("django").info(message)
         ForumMessageMeta(message=message, user=moderator, action="DELETE").save()
 
 

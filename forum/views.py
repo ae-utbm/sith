@@ -21,6 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import logging
 import math
 from functools import partial
 
@@ -424,7 +425,7 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
             )
             init["message"] += "\n\n"
         except Exception as e:
-            print(repr(e))
+            logging.error(e)
         return init
 
     def form_valid(self, form):

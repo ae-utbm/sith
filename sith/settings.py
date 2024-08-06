@@ -34,6 +34,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 import binascii
+import logging
 import os
 import sys
 from pathlib import Path
@@ -680,9 +681,9 @@ TOXIC_DOMAINS_PROVIDERS = [
 try:
     from .settings_custom import *
 
-    print("Custom settings imported", file=sys.stderr)
+    logging.getLogger("django").info("Custom settings imported")
 except:
-    print("Custom settings failed", file=sys.stderr)
+    logging.getLogger("django").warning("Custom settings failed")
 
 if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)

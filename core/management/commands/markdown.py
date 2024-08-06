@@ -35,4 +35,4 @@ class Command(BaseCommand):
         root_path = settings.BASE_DIR
         with open(root_path / "core/fixtures/SYNTAX.md", "r") as md:
             result = markdown(md.read())
-        print(result, end="")
+        self.stdout.write(result)
