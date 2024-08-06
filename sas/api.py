@@ -45,12 +45,13 @@ class PicturesController(ControllerBase):
             # User can view any moderated picture if he/she is subscribed.
             # If not, he/she can view only the one he/she has been identified on
             raise PermissionDenied
-        return (
+        pictures = list(
             filters.filter(Picture.objects.viewable_by(user))
             .distinct()
             .order_by("-parent__date", "date")
             .annotate(album=F("parent__name"))
         )
+        return pictures
 
 
 @api_controller("/sas/relation", tags="User identification on SAS pictures")

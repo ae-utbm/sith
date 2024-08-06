@@ -982,7 +982,7 @@ class SithFile(models.Model):
             return True
         if self.is_in_sas and user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return True
-        return user.id == self.owner.id
+        return user.id == self.owner_id
 
     def can_be_viewed_by(self, user):
         if hasattr(self, "profile_of"):

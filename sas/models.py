@@ -13,8 +13,9 @@
 #
 #
 
+from __future__ import annotations
+
 from io import BytesIO
-from typing import Self
 
 from django.conf import settings
 from django.core.cache import cache
@@ -29,7 +30,7 @@ from core.utils import exif_auto_rotate, resize_image
 
 
 class PictureQuerySet(models.QuerySet):
-    def viewable_by(self, user: User) -> Self:
+    def viewable_by(self, user: User) -> PictureQuerySet:
         """Filter the pictures that this user can view.
 
         Warnings:
@@ -39,7 +40,7 @@ class PictureQuerySet(models.QuerySet):
             return self.all()
         if user.was_subscribed:
             return self.filter(is_moderated=True)
-        return self.filter(people__user_id=user.id)
+        return self.filter(people__user_id=user.id, is_moderated=True)
 
 
 class SASPictureManager(models.Manager):
@@ -76,19 +77,19 @@ class Picture(SithFile):
         return perm
 
     def can_be_viewed_by(self, user: User) -> bool:
-        # SAS pictures are visible to old subscribers
-        # Result is cached 4s for this user
         if user.is_anonymous:
             return False
 
-        perm = cache.get("%d_can_view_pictures" % (user.id), False)
-        if not perm:
-            perm = user.was_subscribed
-
-        cache.set("%d_can_view_pictures" % (user.id), perm, timeout=4)
-        return (perm and self.is_moderated and self.is_in_sas) or self.can_be_edited_by(
-            user
-        )
+        cache_key = f"sas:pictures_viewable_by_{user.id}_in_{self.parent_id}"
+        viewable: list[int] | None = cache.get(cache_key)
+        if viewable is None:
+            viewable = list(
+                Picture.objects.filter(parent_id=self.parent_id)
+                .viewable_by(user)
+                .values_list("pk", flat=True)
+            )
+            cache.set(cache_key, viewable, timeout=10)
+        return self.id in viewable
 
     def get_download_url(self):
         return reverse("sas:download", kwargs={"picture_id": self.id})
