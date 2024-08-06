@@ -9,10 +9,6 @@
   {% trans user_name=profile.get_display_name() %}{{ user_name }}'s profile{% endtrans %}
 {% endblock %}
 
-{% block additional_js %}
-  <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
-{% endblock %}
-
 {% block content %}
   <div class="user_profile_page" x-data>
     <div class="user_profile">

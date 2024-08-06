@@ -738,7 +738,7 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/viralpatel/jquery.shorten/": "",
     "https://github.com/getsentry/sentry-javascript/": "4.0.6",
     "https://github.com/jhuckaby/webcamjs/": "1.0.0",
-    "https://github.com/alpinejs/alpine": "3.10.5",
+    "https://github.com/alpinejs/alpine": "3.14.1",
     "https://github.com/mrdoob/three.js/": "r148",
     "https://github.com/vasturiano/three-spritetext": "1.6.5",
     "https://github.com/vasturiano/3d-force-graph/": "1.70.19",
