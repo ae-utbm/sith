@@ -80,7 +80,7 @@
               <br>
               <br>
               <div
-                x-show="!!req_state"
+                x-show="[BillingInfoReqState.SUCCESS, BillingInfoReqState.FAILURE].includes(req_state)"
                 class="alert"
                 :class="'alert-' + get_alert_color()"
                 x-transition
@@ -93,6 +93,7 @@
               <input
                 type="submit" class="btn btn-blue clickable"
                 value="{% trans %}Validate{% endtrans %}"
+                :disabled="req_state === BillingInfoReqState.SENDING"
               >
             </form>
           </div>
@@ -119,6 +120,8 @@
         {% endif %}
         {% if basket.contains_refilling_item %}
           <p>{% trans %}AE account payment disabled because your basket contains refilling items.{% endtrans %}</p>
+        {% elif basket.total > user.account_balance %}
+          <p>{% trans %}AE account payment disabled because you do not have enough money remaining.{% endtrans %}</p>
         {% else %}
           <form method="post" action="{{ url('eboutic:pay_with_sith') }}" name="sith-pay-form">
             {% csrf_token %}
@@ -134,8 +137,8 @@
     const billing_info_url = '{{ url("api:put_billing_info", user_id=request.user.id) }}';
     const et_data_url = '{{ url("api:etransaction_data") }}';
     const billing_info_exist = {{ "true" if billing_infos else "false" }};
-    const billing_info_success_message = '{% trans %}Billing info registration success{% endtrans %}';
-    const billing_info_failure_message = '{% trans %}Billing info registration failure{% endtrans %}';
+    const billing_info_success_message = "{% trans %}Billing info registration success{% endtrans %}";
+    const billing_info_failure_message = "{% trans %}Billing info registration failure{% endtrans %}";
 
     {% if billing_infos %}
       const et_data = {{ billing_infos|safe }}

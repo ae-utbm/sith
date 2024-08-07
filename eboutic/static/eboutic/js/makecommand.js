@@ -4,13 +4,11 @@
  */
 const BillingInfoReqState = {
     SUCCESS: 1,
-    FAILURE: 2
+    FAILURE: 2,
+    SENDING: 3,
 };
 
-
 document.addEventListener("alpine:init", () => {
-    Alpine.store("bank_payment_enabled", false)
-
     Alpine.store("billing_inputs", {
         data: et_data,
 
@@ -21,37 +19,32 @@ document.addEventListener("alpine:init", () => {
                 this.data = await res.json();
                 document.getElementById("bank-submit-button").disabled = false;
             }
-        }
-    })
+        },
+    });
 
     Alpine.data("billing_infos", () => ({
         /** @type {BillingInfoReqState | null} */
         req_state: null,
 
         async send_form() {
+            this.req_state = BillingInfoReqState.SENDING;
             const form = document.getElementById("billing_info_form");
-            const submit_button = form.querySelector("input[type=submit]")
-            submit_button.disabled = true;
             document.getElementById("bank-submit-button").disabled = true;
-            this.req_state = null;
-
-            let payload = form.querySelectorAll("input")
-                .values()
-                .filter((elem) => elem.type === "text" && elem.value)
-                .reduce((acc, curr) => acc[curr.name] = curr.value, {});
-            const country = form.querySelector("select");
-            if (country && country.value) {
-                payload[country.name] = country.value;
-            }
+            let payload = Object.fromEntries(
+                Array.from(form.querySelectorAll("input, select"))
+                    .filter((elem) => elem.type !== "submit" && elem.value)
+                    .map((elem) => [elem.name, elem.value]),
+            );
             const res = await fetch(billing_info_url, {
                 method: "PUT",
                 body: JSON.stringify(payload),
             });
-            this.req_state = res.ok ? BillingInfoReqState.SUCCESS : BillingInfoReqState.FAILURE;
+            this.req_state = res.ok
+                ? BillingInfoReqState.SUCCESS
+                : BillingInfoReqState.FAILURE;
             if (res.ok) {
                 Alpine.store("billing_inputs").fill();
             }
-            submit_button.disabled = false;
         },
 
         get_alert_color() {
@@ -72,8 +65,6 @@ document.addEventListener("alpine:init", () => {
                 return billing_info_failure_message;
             }
             return "";
-        }
-    }))
-})
-
-
+        },
+    }));
+});
