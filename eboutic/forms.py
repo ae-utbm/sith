@@ -20,17 +20,15 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
-import json
-import re
-import typing
+from functools import cached_property
 from urllib.parse import unquote
 
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
-from sentry_sdk import capture_message
+from pydantic import ValidationError
 
 from eboutic.models import get_eboutic_products
+from eboutic.schemas import PurchaseItemList, PurchaseItemSchema
 
 
 class BasketForm:
@@ -43,8 +41,7 @@ class BasketForm:
     Thus this class is a pure standalone and performs its operations by its own means.
     However, it still tries to share some similarities with a standard django Form.
 
-    Example:
-    -------
+    Examples:
         ::
 
             def my_view(request):
@@ -62,28 +59,13 @@ class BasketForm:
     You can also use a little shortcut by directly calling `form.is_valid()`
     without calling `form.clean()`. In this case, the latter method shall be
     implicitly called.
-
     """
-
-    # check the json is an array containing non-nested objects.
-    # values must be strings or numbers
-    # this is matched :
-    # [{"id": 4, "name": "[PROMO 22] badges", "unit_price": 2.3, "quantity": 2}]
-    # but this is not :
-    # [{"id": {"nested_id": 10}, "name": "[PROMO 22] badges", "unit_price": 2.3, "quantity": 2}]
-    # and neither does this :
-    # [{"id": ["nested_id": 10], "name": "[PROMO 22] badges", "unit_price": 2.3, "quantity": 2}]
-    # and neither does that :
-    # [{"id": null, "name": "[PROMO 22] badges", "unit_price": 2.3, "quantity": 2}]
-    json_cookie_re = re.compile(
-        r"^\[\s*(\{\s*(\"[^\"]*\":\s*(\"[^\"]{0,64}\"|\d{0,5}\.?\d+),?\s*)*\},?\s*)*\s*\]$"
-    )
 
     def __init__(self, request: HttpRequest):
         self.user = request.user
         self.cookies = request.COOKIES
         self.error_messages = set()
-        self.correct_cookie = []
+        self.correct_items = []
 
     def clean(self) -> None:
         """Perform all the checks, but return nothing.
@@ -98,70 +80,29 @@ class BasketForm:
             - all the ids refer to products the user is allowed to buy
             - all the quantities are positive integers
         """
-        # replace escaped double quotes by single quotes, as the RegEx used to check the json
-        # does not support escaped double quotes
-        basket = unquote(self.cookies.get("basket_items", "")).replace('\\"', "'")
-
-        if basket in ("[]", ""):
-            self.error_messages.add(_("You have no basket."))
-            return
-
-        # check that the json is not nested before parsing it to make sure
-        # malicious user can't DDoS the server with deeply nested json
-        if not BasketForm.json_cookie_re.match(basket):
-            # As the validation of the cookie goes through a rather boring regex,
-            # we can regularly have to deal with subtle errors that we hadn't forecasted,
-            # so we explicitly lay a Sentry message capture here.
-            capture_message(
-                "Eboutic basket regex checking failed to validate basket json",
-                level="error",
+        try:
+            basket = PurchaseItemList.validate_json(
+                unquote(self.cookies.get("basket_items", "[]"))
             )
+        except ValidationError:
             self.error_messages.add(_("The request was badly formatted."))
             return
-
-        try:
-            basket = json.loads(basket)
-        except json.JSONDecodeError:
-            self.error_messages.add(_("The basket cookie was badly formatted."))
-            return
-
-        if type(basket) is not list or len(basket) == 0:
+        if len(basket) == 0:
             self.error_messages.add(_("Your basket is empty."))
             return
-
+        existing_ids = {product.id for product in get_eboutic_products(self.user)}
         for item in basket:
-            expected_keys = {"id", "quantity", "name", "unit_price"}
-            if type(item) is not dict or set(item.keys()) != expected_keys:
-                self.error_messages.add("One or more items are badly formatted.")
-                continue
-            # check the id field is a positive integer
-            if type(item["id"]) is not int or item["id"] < 0:
-                self.error_messages.add(
-                    _("%(name)s : this product does not exist.")
-                    % {"name": item["name"]}
-                )
-                continue
             # check a product with this id does exist
-            ids = {product.id for product in get_eboutic_products(self.user)}
-            if not item["id"] in ids:
+            if item.product_id in existing_ids:
+                self.correct_items.append(item)
+            else:
                 self.error_messages.add(
                     _(
                         "%(name)s : this product does not exist or may no longer be available."
                     )
-                    % {"name": item["name"]}
+                    % {"name": item.name}
                 )
                 continue
-            if type(item["quantity"]) is not int or item["quantity"] < 0:
-                self.error_messages.add(
-                    _("You cannot buy %(nbr)d %(name)s.")
-                    % {"nbr": item["quantity"], "name": item["name"]}
-                )
-                continue
-
-            # if we arrive here, it means this item has passed all tests
-            self.correct_cookie.append(item)
-        # for loop for item checking ends here
-
         # this function does not return anything.
         # instead, it fills a set containing the collected error messages
         # an empty set means that no error was seen thus everything is ok
@@ -174,16 +115,16 @@ class BasketForm:
 
         If the `clean()` method has not been called beforehand, call it.
         """
-        if self.error_messages == set() and self.correct_cookie == []:
+        if not self.error_messages and not self.correct_items:
             self.clean()
         if self.error_messages:
             return False
         return True
 
-    def get_error_messages(self) -> typing.List[str]:
+    @cached_property
+    def errors(self) -> list[str]:
         return list(self.error_messages)
 
-    def get_cleaned_cookie(self) -> str:
-        if not self.correct_cookie:
-            return ""
-        return json.dumps(self.correct_cookie)
+    @cached_property
+    def cleaned_data(self) -> list[PurchaseItemSchema]:
+        return self.correct_items

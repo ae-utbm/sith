@@ -36,7 +36,7 @@ from django.urls import reverse
 
 from core.models import User
 from counter.models import Counter, Customer, Product, Selling
-from eboutic.models import Basket
+from eboutic.models import Basket, BasketItem
 
 
 class TestEboutic(TestCase):
@@ -60,14 +60,14 @@ class TestEboutic(TestCase):
         basket = Basket.objects.create(user=user)
         session["basket_id"] = basket.id
         session.save()
-        basket.add_product(self.barbar, 3)
-        basket.add_product(self.cotis)
+        BasketItem.from_product(self.barbar, 3, basket).save()
+        BasketItem.from_product(self.cotis, 1, basket).save()
         return basket
 
     def generate_bank_valid_answer(self) -> str:
         basket = Basket.from_session(self.client.session)
         basket_id = basket.id
-        amount = int(basket.get_total() * 100)
+        amount = int(basket.total * 100)
         query = f"Amount={amount}&BasketID={basket_id}&Auto=42&Error=00000"
         with open("./eboutic/tests/private_key.pem", "br") as f:
             PRIVKEY = f.read()
@@ -88,7 +88,7 @@ class TestEboutic(TestCase):
         self.subscriber.customer.amount = 100  # give money before test
         self.subscriber.customer.save()
         basket = self.get_busy_basket(self.subscriber)
-        amount = basket.get_total()
+        amount = basket.total
         response = self.client.post(reverse("eboutic:pay_with_sith"))
         self.assertRedirects(response, "/eboutic/pay/success/")
         new_balance = Customer.objects.get(user=self.subscriber).amount
@@ -99,7 +99,7 @@ class TestEboutic(TestCase):
     def test_buy_with_sith_account_no_money(self):
         self.client.force_login(self.subscriber)
         basket = self.get_busy_basket(self.subscriber)
-        initial = basket.get_total() - 1  # just not enough to complete the sale
+        initial = basket.total - 1  # just not enough to complete the sale
         self.subscriber.customer.amount = initial
         self.subscriber.customer.save()
         response = self.client.post(reverse("eboutic:pay_with_sith"))
@@ -135,7 +135,7 @@ class TestEboutic(TestCase):
         cotis = basket.items.filter(product_name="Cotis 2 semestres").first()
         assert cotis is not None
         assert cotis.quantity == 1
-        assert basket.get_total() == 3 * 1.7 + 28
+        assert basket.total == 3 * 1.7 + 28
 
     def test_submit_empty_basket(self):
         self.client.force_login(self.subscriber)
@@ -151,7 +151,7 @@ class TestEboutic(TestCase):
         ]"""
         response = self.client.get(reverse("eboutic:command"))
         cookie = self.client.cookies["basket_items"].OutputString()
-        assert 'basket_items=""' in cookie
+        assert 'basket_items="[]"' in cookie
         assert "Path=/eboutic" in cookie
         self.assertRedirects(response, "/eboutic/")
 
