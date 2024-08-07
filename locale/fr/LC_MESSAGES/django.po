@@ -1382,8 +1382,6 @@ msgid "Edit club page"
 msgstr "Éditer la page de club"
 
 #: club/views.py:145 club/views.py:451
-#, fuzzy
-#| msgid "Selling"
 msgid "Sellings"
 msgstr "Vente"
 
@@ -2570,8 +2568,6 @@ msgid "Site created by the IT Department of the AE"
 msgstr "Site réalisé par le Pôle Informatique de l'AE"
 
 #: core/templates/core/base.jinja:295
-#, fuzzy
-#| msgid "Site version:"
 msgid "Sith version:"
 msgstr "Version du site :"
 
@@ -2736,10 +2732,6 @@ msgid "Group"
 msgstr "Groupe"
 
 #: core/templates/core/login.jinja:22
-#, fuzzy
-#| msgid ""
-#| "Your account doesn't have access to this page. To proceed,\n"
-#| "    please login with an account that has access."
 msgid ""
 "Your account doesn't have access to this page. To proceed,\n"
 "        please login with an account that has access."
@@ -2954,11 +2946,6 @@ msgid "Password reset sent"
 msgstr "Réinitialisation de mot de passe envoyée"
 
 #: core/templates/core/password_reset_done.jinja:7
-#, fuzzy
-#| msgid ""
-#| "We've emailed you instructions for setting your password, if an account "
-#| "exists with the email you entered. You should\n"
-#| "receive them shortly."
 msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should\n"
@@ -2969,11 +2956,6 @@ msgstr ""
 "Vous devriez les recevoir rapidement."
 
 #: core/templates/core/password_reset_done.jinja:12
-#, fuzzy
-#| msgid ""
-#| "If you don't receive an email, please make sure you've entered the "
-#| "address you registered with, and check your spam\n"
-#| "folder."
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam\n"
@@ -3006,10 +2988,6 @@ msgid "The %(site_name)s team"
 msgstr "L'équipe de %(site_name)s"
 
 #: core/templates/core/register_confirm_mail.jinja:2
-#, fuzzy
-#| msgid ""
-#| "You're receiving this email because you subscribed to the UTBM student "
-#| "association."
 msgid ""
 "You're receiving this email because you created an account on the AE website."
 msgstr ""
@@ -3017,15 +2995,6 @@ msgstr ""
 "de l'Association des Étudiants de l'UTBM."
 
 #: core/templates/core/register_confirm_mail.jinja:6
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "As this is the website of the students of the AE, by the students of the "
-#| "AE,\n"
-#| "for the students of the AE, you won't be able to do many things without "
-#| "subscribing to the AE.\n"
-#| "To make a contribution, contact a member of the association's board, "
-#| "either directly or by email at ae@utbm.fr.\n"
 msgid ""
 "\n"
 "    As this is the website of the students of the AE, by the students of the "
@@ -3041,6 +3010,7 @@ msgstr ""
 "les étudiants de l'AE, vous n'aurez pas accès à tout sans être cotisant. "
 "Pour cotiser, veuillez contacter un membre du bureau de l'AE, soit en "
 "personne, soit par mail à l'adresse ae@utbm.fr.\n"
+"  "
 
 #: core/templates/core/register_confirm_mail.jinja:12
 msgid "Wishing you a good experience among us! "
@@ -3261,14 +3231,10 @@ msgid "Change user password"
 msgstr "Changer le mot de passe"
 
 #: core/templates/core/user_edit.jinja:143
-#, fuzzy
-#| msgid "Username: "
 msgid "Username:"
 msgstr "Nom d'utilisateur : "
 
 #: core/templates/core/user_edit.jinja:146
-#, fuzzy
-#| msgid "Account number: "
 msgid "Account number:"
 msgstr "Numéro de compte : "
 
@@ -3404,11 +3370,6 @@ msgid "No student card registered."
 msgstr "Aucune carte étudiante enregistrée."
 
 #: core/templates/core/user_preferences.jinja:56
-#, fuzzy
-#| msgid ""
-#| "You can add a card by asking at a counter or add it yourself here. If you "
-#| "want to manually add a student card yourself, you'll need a NFC reader. "
-#| "We store the UID of the card which is 14 characters long."
 msgid ""
 "You can add a card by asking at a counter or add it yourself here. If you "
 "want to manually\n"
@@ -4516,10 +4477,6 @@ msgid "Billing information"
 msgstr "Informations de facturation"
 
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:104
-#, fuzzy
-#| msgid ""
-#| "You must fill your billing infos if you want to pay with your credit\n"
-#| "                            card"
 msgid ""
 "You must fill your billing infos if you want to pay with your credit\n"
 "                  card"
