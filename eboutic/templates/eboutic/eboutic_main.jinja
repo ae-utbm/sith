@@ -102,8 +102,12 @@
               </div>
               <div class="product-group">
                 {% for p in items %}
-                  <button id="{{ p.id }}" class="product-button"
-                          @click='add_from_catalog({{ p.id }}, {{ p.name|tojson }}, {{ p.selling_price }})'>
+                  <button
+                    id="{{ p.id }}"
+                    class="product-button"
+                    :class="{selected: items.some((i) => i.id === {{ p.id }})}"
+                    @click='add_from_catalog({{ p.id }}, {{ p.name|tojson }}, {{ p.selling_price }})'
+                  >
                     {% if p.icon %}
                       <img class="product-image" src="{{ p.icon.url }}"
                            alt="image de {{ p.name }}">
