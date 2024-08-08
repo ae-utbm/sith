@@ -229,8 +229,9 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
                     parent=parent,
                     owner=request.user,
                     files=files,
-                    automodere=request.user.is_in_group(
-                        pk=settings.SITH_GROUP_SAS_ADMIN_ID
+                    automodere=(
+                        request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+                        or request.user.is_root
                     ),
                 )
                 if self.form.is_valid():
@@ -292,6 +293,11 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         kwargs["form"] = self.form
         kwargs["clipboard"] = SithFile.objects.filter(
             id__in=self.request.session["clipboard"]
+        )
+        kwargs["children_albums"] = list(
+            Album.objects.viewable_by(self.request.user)
+            .filter(parent_id=self.object.id)
+            .order_by("-date")
         )
         return kwargs
 

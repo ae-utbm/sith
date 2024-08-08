@@ -8,12 +8,7 @@
   {% trans %}SAS{% endtrans %}
 {% endblock %}
 
-{% macro print_path(file) %}
-  {% if file and file.parent %}
-    {{ print_path(file.parent) }}
-    <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
-  {% endif %}
-{% endmacro %}
+{% from "sas/macros.jinja" import print_path %}
 
 {% block content %}
   <code>
@@ -125,11 +120,13 @@
 
       <div class="tags">
         <h5>{% trans %}People{% endtrans %}</h5>
-        <form action="" method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          {{ form.as_p() }}
-          <input type="submit" value="{% trans %}Go{% endtrans %}" />
-        </form>
+        {% if user.was_subscribed %}
+          <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p() }}
+            <input type="submit" value="{% trans %}Go{% endtrans %}" />
+          </form>
+        {% endif %}
         <ul x-data="user_identification">
           <template x-for="item in items" :key="item.id">
             <li>

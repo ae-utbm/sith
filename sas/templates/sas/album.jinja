@@ -10,12 +10,7 @@
   {% trans %}SAS{% endtrans %}
 {% endblock %}
 
-{% macro print_path(file) %}
-  {% if file and file.parent %}
-    {{ print_path(file.parent) }}
-    <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
-  {% endif %}
-{% endmacro %}
+{% from "sas/macros.jinja" import display_album, print_path %}
 
 
 {% block content %}
@@ -23,10 +18,10 @@
     <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(album.parent) }} {{ album.get_display_name() }}
   </code>
 
-  {% set edit_mode = user.can_edit(album) %}
+  {% set is_sas_admin = user.can_edit(album) %}
   {% set start = timezone.now() %}
 
-  {% if edit_mode %}
+  {% if is_sas_admin %}
     <form action="" method="post" enctype="multipart/form-data">
       {% csrf_token %}
 
@@ -54,28 +49,11 @@
       {% endif %}
   {% endif %}
 
-  {% if album.children_albums.count() > 0 %}
+  {% if children_albums|length > 0 %}
     <h4>{% trans %}Albums{% endtrans %}</h4>
     <div class="albums">
-      {% for a in album.children_albums.order_by('-date') %}
-        {% if a.can_be_viewed_by(user) %}
-          <a href="{{ url('sas:album', album_id=a.id) }}">
-            <div
-              class="album{% if not a.is_moderated %} not_moderated{% endif %}"
-              style="background-image: url('{% if a.file %}{{ a.get_download_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
-            >
-              {% if not a.is_moderated %}
-                <div class="overlay">&nbsp;</div>
-                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
-              {% else %}
-                <div class="text">{{ a.name }}</div>
-              {% endif %}
-            </div>
-            {% if edit_mode %}
-              <input type="checkbox" name="file_list" value="{{ a.id }}">
-            {% endif %}
-          </a>
-        {% endif %}
+      {% for a in children_albums %}
+        {{ display_album(a, is_sas_admin) }}
       {% endfor %}
     </div>
 
@@ -96,7 +74,7 @@
               <div class="text">&nbsp;</div>
             </template>
           </div>
-          {% if edit_mode %}
+          {% if is_sas_admin %}
             <input type="checkbox" name="file_list" :value="picture.id">
           {% endif %}
         </a>
@@ -115,7 +93,7 @@
     </nav>
   </div>
 
-  {% if edit_mode %}
+  {% if is_sas_admin %}
     </form>
   {% endif %}
 
