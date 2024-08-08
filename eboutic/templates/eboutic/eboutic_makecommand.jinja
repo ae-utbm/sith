@@ -10,7 +10,6 @@
 
 {% block additional_js %}
   <script src="{{ static('eboutic/js/makecommand.js') }}" defer></script>
-  <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -38,7 +37,7 @@
         </table>
 
         <p>
-          <strong>{% trans %}Basket amount: {% endtrans %}{{ "%0.2f"|format(basket.get_total()) }} €</strong>
+          <strong>{% trans %}Basket amount: {% endtrans %}{{ "%0.2f"|format(basket.total) }} €</strong>
 
           {% if customer_amount != None %}
             <br>
@@ -48,49 +47,54 @@
             {% if not basket.contains_refilling_item %}
               <br>
               {% trans %}Remaining account amount: {% endtrans %}
-              <strong>{{ "%0.2f"|format(customer_amount|float - basket.get_total()) }} €</strong>
+              <strong>{{ "%0.2f"|format(customer_amount|float - basket.total) }} €</strong>
             {% endif %}
           {% endif %}
         </p>
         <br>
         {% if settings.SITH_EBOUTIC_CB_ENABLED %}
-          <div class="collapse" :class="{'shadow': collapsed}" x-data="{collapsed: false}" x-cloak>
+          <div
+            class="collapse"
+            :class="{'shadow': collapsed}"
+            x-data="{collapsed: !billing_info_exist}"
+            x-cloak
+          >
             <div class="collapse-header clickable" @click="collapsed = !collapsed">
               <span class="collapse-header-text">
-                {% trans %}Edit billing information{% endtrans %}
+                {% trans %}Billing information{% endtrans %}
               </span>
               <span class="collapse-header-icon" :class="{'reverse': collapsed}">
                 <i class="fa fa-caret-down"></i>
               </span>
             </div>
-            <form class="collapse-body" id="billing_info_form" method="post"
-                  x-show="collapsed" x-data="billing_infos"
-                  x-transition.scale.origin.top
-                  @submit.prevent="send_form()">
+            <form
+              class="collapse-body"
+              id="billing_info_form"
+              x-data="billing_infos"
+              x-show="collapsed"
+              x-transition.scale.origin.top
+              @submit.prevent="await send_form()"
+            >
               {% csrf_token %}
               {{ billing_form }}
               <br>
               <br>
-              <div x-show="errors.length > 0" class="alert alert-red" x-transition>
-                <div class="alert-main">
-                  <template x-for="error in errors">
-                    <div x-text="error.field + ' : ' + error.messages.join(', ')"></div>
-                  </template>
-                </div>
-                <div class="clickable" @click="errors = []">
+              <div
+                x-show="[BillingInfoReqState.SUCCESS, BillingInfoReqState.FAILURE].includes(req_state)"
+                class="alert"
+                :class="'alert-' + get_alert_color()"
+                x-transition
+              >
+                <div class="alert-main" x-text="get_alert_message()"></div>
+                <div class="clickable" @click="req_state = null">
                   <i class="fa fa-close"></i>
                 </div>
               </div>
-              <div x-show="successful" class="alert alert-green" x-transition>
-                <div class="alert-main">
-                  Informations de facturation enregistrées
-                </div>
-                <div class="clickable" @click="successful = false">
-                  <i class="fa fa-close"></i>
-                </div>
-              </div>
-              <input type="submit" class="btn btn-blue clickable"
-                     value="{% trans %}Validate{% endtrans %}">
+              <input
+                type="submit" class="btn btn-blue clickable"
+                value="{% trans %}Validate{% endtrans %}"
+                :disabled="req_state === BillingInfoReqState.SENDING"
+              >
             </form>
           </div>
           <br>
@@ -103,16 +107,21 @@
             </p>
           {% endif %}
           <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}" name="bank-pay-form">
-            <template x-data x-for="input in $store.billing_inputs.data">
-              <input type="hidden" :name="input['key']" :value="input['value']">
+            <template x-data x-for="[key, value] in Object.entries($store.billing_inputs.data)">
+              <input type="hidden" :name="key" :value="value">
             </template>
-            <input type="submit" id="bank-submit-button"
-                   {% if must_fill_billing_infos %}disabled="disabled"{% endif %}
-                   value="{% trans %}Pay with credit card{% endtrans %}"/>
+            <input
+              type="submit"
+              id="bank-submit-button"
+              {% if must_fill_billing_infos %}disabled="disabled"{% endif %}
+              value="{% trans %}Pay with credit card{% endtrans %}"
+            />
           </form>
         {% endif %}
         {% if basket.contains_refilling_item %}
           <p>{% trans %}AE account payment disabled because your basket contains refilling items.{% endtrans %}</p>
+        {% elif basket.total > user.account_balance %}
+          <p>{% trans %}AE account payment disabled because you do not have enough money remaining.{% endtrans %}</p>
         {% else %}
           <form method="post" action="{{ url('eboutic:pay_with_sith') }}" name="sith-pay-form">
             {% csrf_token %}
@@ -125,15 +134,16 @@
 
 {% block script %}
   <script>
-    const create_billing_info_url = '{{ url("counter:create_billing_info", user_id=request.user.id) }}'
-    const edit_billing_info_url = '{{ url("counter:edit_billing_info", user_id=request.user.id) }}';
-    const et_data_url = '{{ url("eboutic:et_data") }}'
-    let billing_info_exist = {{ "true" if billing_infos else "false" }}
+    const billing_info_url = '{{ url("api:put_billing_info", user_id=request.user.id) }}';
+    const et_data_url = '{{ url("api:etransaction_data") }}';
+    const billing_info_exist = {{ "true" if billing_infos else "false" }};
+    const billing_info_success_message = "{% trans %}Billing info registration success{% endtrans %}";
+    const billing_info_failure_message = "{% trans %}Billing info registration failure{% endtrans %}";
 
     {% if billing_infos %}
-      const et_data = {{ billing_infos|tojson }}
+      const et_data = {{ billing_infos|safe }}
     {% else %}
-      const et_data = '{"data": []}'
+      const et_data = {}
     {% endif %}
   </script>
   {{ super() }}

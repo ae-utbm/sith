@@ -27,6 +27,9 @@
 
       {% block additional_css %}{% endblock %}
       {% block additional_js %}{% endblock %}
+
+      {# Alpine JS must be loaded after scripts that use it. #}
+      <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
     {% endblock %}
   </head>
 

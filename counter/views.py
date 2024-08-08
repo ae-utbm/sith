@@ -12,7 +12,6 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-import json
 import re
 from datetime import datetime, timedelta
 from datetime import timezone as tz
@@ -21,7 +20,6 @@ from urllib.parse import parse_qs
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import DataError, transaction
 from django.db.models import F
@@ -56,7 +54,6 @@ from core.utils import get_semester_code, get_start_of_semester
 from core.views import CanEditMixin, CanViewMixin, TabedViewMixin
 from core.views.forms import LoginForm
 from counter.forms import (
-    BillingInfoForm,
     CashSummaryFormBase,
     CounterEditForm,
     EticketForm,
@@ -67,7 +64,6 @@ from counter.forms import (
     StudentCardForm,
 )
 from counter.models import (
-    BillingInfo,
     CashRegisterSummary,
     CashRegisterSummaryItem,
     Counter,
@@ -80,6 +76,7 @@ from counter.models import (
     Selling,
     StudentCard,
 )
+from counter.utils import is_logged_in_counter
 
 
 class CounterAdminMixin(View):
@@ -901,15 +898,9 @@ class RefillingDeleteView(DeleteView):
     def dispatch(self, request, *args, **kwargs):
         """We have here a very particular right handling, we can't inherit from CanEditPropMixin."""
         self.object = self.get_object()
-        if (
-            timezone.now() - self.object.date
-            <= timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT)
-            and "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        ):
+        if timezone.now() - self.object.date <= timedelta(
+            minutes=settings.SITH_LAST_OPERATIONS_LIMIT
+        ) and is_logged_in_counter(request):
             self.success_url = reverse(
                 "counter:details", kwargs={"counter_id": self.object.counter.id}
             )
@@ -932,15 +923,9 @@ class SellingDeleteView(DeleteView):
     def dispatch(self, request, *args, **kwargs):
         """We have here a very particular right handling, we can't inherit from CanEditPropMixin."""
         self.object = self.get_object()
-        if (
-            timezone.now() - self.object.date
-            <= timedelta(minutes=settings.SITH_LAST_OPERATIONS_LIMIT)
-            and "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        ):
+        if timezone.now() - self.object.date <= timedelta(
+            minutes=settings.SITH_LAST_OPERATIONS_LIMIT
+        ) and is_logged_in_counter(request):
             self.success_url = reverse(
                 "counter:details", kwargs={"counter_id": self.object.counter.id}
             )
@@ -1175,14 +1160,7 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         """We have here again a very particular right handling."""
         self.object = self.get_object()
-        if (
-            self.object.barmen_list
-            and "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        ):
+        if is_logged_in_counter(request) and self.object.barmen_list:
             return super().dispatch(request, *args, **kwargs)
         return HttpResponseRedirect(
             reverse("counter:details", kwargs={"counter_id": self.object.id})
@@ -1215,14 +1193,7 @@ class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         """We have here again a very particular right handling."""
         self.object = self.get_object()
-        if (
-            self.object.barmen_list
-            and "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        ):
+        if is_logged_in_counter(request) and self.object.barmen_list:
             return super().dispatch(request, *args, **kwargs)
         return HttpResponseRedirect(
             reverse("counter:details", kwargs={"counter_id": self.object.id})
@@ -1594,51 +1565,3 @@ class StudentCardFormView(FormView):
         return reverse_lazy(
             "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
         )
-
-
-def __manage_billing_info_req(request, user_id, *, delete_if_fail=False):
-    data = json.loads(request.body)
-    form = BillingInfoForm(data)
-    if not form.is_valid():
-        if delete_if_fail:
-            Customer.objects.get(user__id=user_id).billing_infos.delete()
-        errors = [
-            {"field": str(form.fields[k].label), "messages": v}
-            for k, v in form.errors.items()
-        ]
-        content = json.dumps({"errors": errors})
-        return HttpResponse(status=400, content=content)
-    if form.is_valid():
-        infos = Customer.objects.get(user__id=user_id).billing_infos
-        for field in form.fields:
-            infos.__dict__[field] = form[field].value()
-        infos.save()
-        content = json.dumps({"errors": None})
-        return HttpResponse(status=200, content=content)
-
-
-@login_required
-@require_POST
-def create_billing_info(request, user_id):
-    user = request.user
-    if user.id != user_id and not user.has_perm("counter:add_billinginfo"):
-        raise PermissionDenied()
-    user = get_object_or_404(User, pk=user_id)
-    customer, _ = Customer.get_or_create(user)
-    BillingInfo.objects.create(customer=customer)
-    return __manage_billing_info_req(request, user_id, delete_if_fail=True)
-
-
-@login_required
-@require_POST
-def edit_billing_info(request, user_id):
-    user = request.user
-    if user.id != user_id and not user.has_perm("counter:change_billinginfo"):
-        raise PermissionDenied()
-    user = get_object_or_404(User, pk=user_id)
-    if not hasattr(user, "customer"):
-        raise Http404
-    if not hasattr(user.customer, "billing_infos"):
-        raise Http404
-
-    return __manage_billing_info_req(request, user_id)

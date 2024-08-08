@@ -21,19 +21,12 @@ from club.models import Club
 from core.models import Group, SithFile, User
 from core.views.site import search_user
 from counter.models import Counter, Customer, Product
-
-
-def check_token(request):
-    return (
-        "counter_token" in request.session.keys()
-        and request.session["counter_token"]
-        and Counter.objects.filter(token=request.session["counter_token"]).exists()
-    )
+from counter.utils import is_logged_in_counter
 
 
 class RightManagedLookupChannel(LookupChannel):
     def check_auth(self, request):
-        if not request.user.was_subscribed and not check_token(request):
+        if not request.user.was_subscribed and not is_logged_in_counter(request):
             raise PermissionDenied
 
 

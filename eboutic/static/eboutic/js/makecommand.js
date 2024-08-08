@@ -1,73 +1,70 @@
-document.addEventListener('alpine:init', () => {
-    Alpine.store('bank_payment_enabled', false)
+/**
+ * @readonly
+ * @enum {number}
+ */
+const BillingInfoReqState = {
+    SUCCESS: 1,
+    FAILURE: 2,
+    SENDING: 3,
+};
 
-    Alpine.store('billing_inputs', {
-        data: JSON.parse(et_data)["data"],
+document.addEventListener("alpine:init", () => {
+    Alpine.store("billing_inputs", {
+        data: et_data,
 
         async fill() {
             document.getElementById("bank-submit-button").disabled = true;
-            const request = new Request(et_data_url, {
-                method: "GET",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-            });
-            const res = await fetch(request);
+            const res = await fetch(et_data_url);
             if (res.ok) {
-                const json = await res.json();
-                if (json["data"]) {
-                    this.data = json["data"];
-                }
+                this.data = await res.json();
                 document.getElementById("bank-submit-button").disabled = false;
             }
-        }
-    })
+        },
+    });
 
-    Alpine.data('billing_infos', () => ({
-        errors: [],
-        successful: false,
-        url: billing_info_exist ? edit_billing_info_url : create_billing_info_url,
+    Alpine.data("billing_infos", () => ({
+        /** @type {BillingInfoReqState | null} */
+        req_state: null,
 
         async send_form() {
+            this.req_state = BillingInfoReqState.SENDING;
             const form = document.getElementById("billing_info_form");
-            const submit_button = form.querySelector("input[type=submit]")
-            submit_button.disabled = true;
             document.getElementById("bank-submit-button").disabled = true;
-            this.successful = false
-
-            let payload = {};
-            for (const elem of form.querySelectorAll("input")) {
-                if (elem.type === "text" && elem.value) {
-                    payload[elem.name] = elem.value;
-                }
-            }
-            const country = form.querySelector("select");
-            if (country && country.value) {
-                payload[country.name] = country.value;
-            }
-            const request = new Request(this.url, {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCSRFToken(),
-                },
+            let payload = Object.fromEntries(
+                Array.from(form.querySelectorAll("input, select"))
+                    .filter((elem) => elem.type !== "submit" && elem.value)
+                    .map((elem) => [elem.name, elem.value]),
+            );
+            const res = await fetch(billing_info_url, {
+                method: "PUT",
                 body: JSON.stringify(payload),
             });
-            const res = await fetch(request);
-            const json = await res.json();
-            if (json["errors"]) {
-                this.errors = json["errors"];
-            } else {
-                this.errors = [];
-                this.successful = true;
-                this.url = edit_billing_info_url;
+            this.req_state = res.ok
+                ? BillingInfoReqState.SUCCESS
+                : BillingInfoReqState.FAILURE;
+            if (res.ok) {
                 Alpine.store("billing_inputs").fill();
             }
-            submit_button.disabled = false;
-        }
-    }))
-})
+        },
 
+        get_alert_color() {
+            if (this.req_state === BillingInfoReqState.SUCCESS) {
+                return "green";
+            }
+            if (this.req_state === BillingInfoReqState.FAILURE) {
+                return "red";
+            }
+            return "";
+        },
 
+        get_alert_message() {
+            if (this.req_state === BillingInfoReqState.SUCCESS) {
+                return billing_info_success_message;
+            }
+            if (this.req_state === BillingInfoReqState.FAILURE) {
+                return billing_info_failure_message;
+            }
+            return "";
+        },
+    }));
+});

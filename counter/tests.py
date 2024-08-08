@@ -16,8 +16,9 @@ import json
 import re
 import string
 
+import pytest
 from django.core.cache import cache
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import timedelta
@@ -303,18 +304,11 @@ class TestCounterStats(TestCase):
         ]
 
 
-class TestBillingInfo(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.payload_1 = {
-            "first_name": "Subscribed",
-            "last_name": "User",
-            "address_1": "1 rue des Huns",
-            "zip_code": "90000",
-            "city": "Belfort",
-            "country": "FR",
-        }
-        cls.payload_2 = {
+@pytest.mark.django_db
+class TestBillingInfo:
+    @pytest.fixture
+    def payload(self):
+        return {
             "first_name": "Subscribed",
             "last_name": "User",
             "address_1": "3, rue de Troyes",
@@ -322,213 +316,80 @@ class TestBillingInfo(TestCase):
             "city": "Sète",
             "country": "FR",
         }
-        cls.root = User.objects.get(username="root")
-        cls.subscriber = User.objects.get(username="subscriber")
 
-    def test_edit_infos(self):
-        user = self.subscriber
-        BillingInfo.objects.get_or_create(
-            customer=user.customer, defaults=self.payload_1
-        )
-        self.client.force_login(user)
-        response = self.client.post(
-            reverse("counter:edit_billing_info", args=[user.id]),
-            json.dumps(self.payload_2),
+    def test_edit_infos(self, client: Client, payload: dict):
+        user = subscriber_user.make()
+        baker.make(BillingInfo, customer=user.customer)
+        client.force_login(user)
+        response = client.put(
+            reverse("api:put_billing_info", args=[user.id]),
+            json.dumps(payload),
             content_type="application/json",
         )
-        user = User.objects.get(username="subscriber")
+        user.refresh_from_db()
         infos = BillingInfo.objects.get(customer__user=user)
         assert response.status_code == 200
-        self.assertJSONEqual(response.content, {"errors": None})
         assert hasattr(user.customer, "billing_infos")
         assert infos.customer == user.customer
-        assert infos.first_name == "Subscribed"
-        assert infos.last_name == "User"
-        assert infos.address_1 == "3, rue de Troyes"
-        assert infos.address_2 is None
-        assert infos.zip_code == "34301"
-        assert infos.city == "Sète"
-        assert infos.country == "FR"
+        for key, val in payload.items():
+            assert getattr(infos, key) == val
 
-    def test_create_infos_for_user_with_account(self):
-        user = User.objects.get(username="subscriber")
-        if hasattr(user.customer, "billing_infos"):
-            user.customer.billing_infos.delete()
-        self.client.force_login(user)
-        response = self.client.post(
-            reverse("counter:create_billing_info", args=[user.id]),
-            json.dumps(self.payload_1),
+    @pytest.mark.parametrize(
+        "user_maker", [subscriber_user.make, lambda: baker.make(User)]
+    )
+    @pytest.mark.django_db
+    def test_create_infos(self, client: Client, user_maker, payload):
+        user = user_maker()
+        client.force_login(user)
+        assert not BillingInfo.objects.filter(customer__user=user).exists()
+        response = client.put(
+            reverse("api:put_billing_info", args=[user.id]),
+            json.dumps(payload),
             content_type="application/json",
         )
-        user = User.objects.get(username="subscriber")
-        infos = BillingInfo.objects.get(customer__user=user)
         assert response.status_code == 200
-        self.assertJSONEqual(response.content, {"errors": None})
-        assert hasattr(user.customer, "billing_infos")
-        assert infos.customer == user.customer
-        assert infos.first_name == "Subscribed"
-        assert infos.last_name == "User"
-        assert infos.address_1 == "1 rue des Huns"
-        assert infos.address_2 is None
-        assert infos.zip_code == "90000"
-        assert infos.city == "Belfort"
-        assert infos.country == "FR"
-
-    def test_create_infos_for_user_without_account(self):
-        user = User.objects.get(username="subscriber")
-        if hasattr(user, "customer"):
-            user.customer.delete()
-        self.client.force_login(user)
-        response = self.client.post(
-            reverse("counter:create_billing_info", args=[user.id]),
-            json.dumps(self.payload_1),
-            content_type="application/json",
-        )
-        user = User.objects.get(username="subscriber")
+        user.refresh_from_db()
         assert hasattr(user, "customer")
-        assert hasattr(user.customer, "billing_infos")
-        assert response.status_code == 200
-        self.assertJSONEqual(response.content, {"errors": None})
         infos = BillingInfo.objects.get(customer__user=user)
-        self.assertEqual(user.customer, infos.customer)
-        assert infos.first_name == "Subscribed"
-        assert infos.last_name == "User"
-        assert infos.address_1 == "1 rue des Huns"
-        assert infos.address_2 is None
-        assert infos.zip_code == "90000"
-        assert infos.city == "Belfort"
-        assert infos.country == "FR"
-
-    def test_create_invalid(self):
-        user = User.objects.get(username="subscriber")
-        if hasattr(user.customer, "billing_infos"):
-            user.customer.billing_infos.delete()
-        self.client.force_login(user)
-        # address_1, zip_code and country are missing
-        payload = {
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "city": "Belfort",
-        }
-        response = self.client.post(
-            reverse("counter:create_billing_info", args=[user.id]),
-            json.dumps(payload),
-            content_type="application/json",
-        )
-        user = User.objects.get(username="subscriber")
-        self.assertEqual(400, response.status_code)
-        assert not hasattr(user.customer, "billing_infos")
-        expected_errors = {
-            "errors": [
-                {"field": "Adresse 1", "messages": ["Ce champ est obligatoire."]},
-                {"field": "Code postal", "messages": ["Ce champ est obligatoire."]},
-                {"field": "Country", "messages": ["Ce champ est obligatoire."]},
-            ]
-        }
-        self.assertJSONEqual(response.content, expected_errors)
-
-    def test_edit_invalid(self):
-        user = User.objects.get(username="subscriber")
-        BillingInfo.objects.get_or_create(
-            customer=user.customer, defaults=self.payload_1
-        )
-        self.client.force_login(user)
-        # address_1, zip_code and country are missing
-        payload = {
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "city": "Belfort",
-        }
-        response = self.client.post(
-            reverse("counter:edit_billing_info", args=[user.id]),
-            json.dumps(payload),
-            content_type="application/json",
-        )
-        user = User.objects.get(username="subscriber")
-        self.assertEqual(400, response.status_code)
-        assert hasattr(user.customer, "billing_infos")
-        expected_errors = {
-            "errors": [
-                {"field": "Adresse 1", "messages": ["Ce champ est obligatoire."]},
-                {"field": "Code postal", "messages": ["Ce champ est obligatoire."]},
-                {"field": "Country", "messages": ["Ce champ est obligatoire."]},
-            ]
-        }
-        self.assertJSONEqual(response.content, expected_errors)
-
-    def test_edit_other_user(self):
-        user = User.objects.get(username="sli")
-        self.client.login(username="subscriber", password="plop")
-        BillingInfo.objects.get_or_create(
-            customer=user.customer, defaults=self.payload_1
-        )
-        response = self.client.post(
-            reverse("counter:edit_billing_info", args=[user.id]),
-            json.dumps(self.payload_2),
-            content_type="application/json",
-        )
-        self.assertEqual(403, response.status_code)
-
-    def test_edit_not_existing_infos(self):
-        user = User.objects.get(username="subscriber")
-        if hasattr(user.customer, "billing_infos"):
-            user.customer.billing_infos.delete()
-        self.client.force_login(user)
-        response = self.client.post(
-            reverse("counter:edit_billing_info", args=[user.id]),
-            json.dumps(self.payload_2),
-            content_type="application/json",
-        )
-        self.assertEqual(404, response.status_code)
-
-    def test_edit_by_root(self):
-        user = User.objects.get(username="subscriber")
-        BillingInfo.objects.get_or_create(
-            customer=user.customer, defaults=self.payload_1
-        )
-        self.client.force_login(self.root)
-        response = self.client.post(
-            reverse("counter:edit_billing_info", args=[user.id]),
-            json.dumps(self.payload_2),
-            content_type="application/json",
-        )
-        assert response.status_code == 200
-        user = User.objects.get(username="subscriber")
-        infos = BillingInfo.objects.get(customer__user=user)
-        self.assertJSONEqual(response.content, {"errors": None})
-        assert hasattr(user.customer, "billing_infos")
-        self.assertEqual(user.customer, infos.customer)
-        self.assertEqual("Subscribed", infos.first_name)
-        self.assertEqual("User", infos.last_name)
-        self.assertEqual("3, rue de Troyes", infos.address_1)
-        self.assertEqual(None, infos.address_2)
-        self.assertEqual("34301", infos.zip_code)
-        self.assertEqual("Sète", infos.city)
-        self.assertEqual("FR", infos.country)
-
-    def test_create_by_root(self):
-        user = User.objects.get(username="subscriber")
-        if hasattr(user.customer, "billing_infos"):
-            user.customer.billing_infos.delete()
-        self.client.force_login(self.root)
-        response = self.client.post(
-            reverse("counter:create_billing_info", args=[user.id]),
-            json.dumps(self.payload_2),
-            content_type="application/json",
-        )
-        assert response.status_code == 200
-        user = User.objects.get(username="subscriber")
-        infos = BillingInfo.objects.get(customer__user=user)
-        self.assertJSONEqual(response.content, {"errors": None})
         assert hasattr(user.customer, "billing_infos")
         assert infos.customer == user.customer
-        assert infos.first_name == "Subscribed"
-        assert infos.last_name == "User"
-        assert infos.address_1 == "3, rue de Troyes"
-        assert infos.address_2 is None
-        assert infos.zip_code == "34301"
-        assert infos.city == "Sète"
-        assert infos.country == "FR"
+        for key, val in payload.items():
+            assert getattr(infos, key) == val
+
+    def test_invalid_data(self, client: Client, payload):
+        user = subscriber_user.make()
+        client.force_login(user)
+        # address_1, zip_code and country are missing
+        del payload["city"]
+        response = client.put(
+            reverse("api:put_billing_info", args=[user.id]),
+            json.dumps(payload),
+            content_type="application/json",
+        )
+        assert response.status_code == 422
+        user.customer.refresh_from_db()
+        assert not hasattr(user.customer, "billing_infos")
+
+    @pytest.mark.parametrize(
+        ("operator_maker", "expected_code"),
+        [
+            (subscriber_user.make, 403),
+            (lambda: baker.make(User), 403),
+            (lambda: baker.make(User, is_superuser=True), 200),
+        ],
+    )
+    def test_edit_other_user(
+        self, client: Client, operator_maker, expected_code: int, payload: dict
+    ):
+        user = subscriber_user.make()
+        client.force_login(operator_maker())
+        baker.make(BillingInfo, customer=user.customer)
+        response = client.put(
+            reverse("api:put_billing_info", args=[user.id]),
+            json.dumps(payload),
+            content_type="application/json",
+        )
+        assert response.status_code == expected_code
 
 
 class TestBarmanConnection(TestCase):

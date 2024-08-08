@@ -16,7 +16,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -45,6 +45,7 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
+from antispam.forms import AntiSpamEmailField
 from core.models import Gift, Page, SithFile, User
 from core.utils import resize_image
 
@@ -194,6 +195,9 @@ class RegisteringForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email")
+        field_classes = {
+            "email": AntiSpamEmailField,
+        }
 
 
 class UserProfileForm(forms.ModelForm):
