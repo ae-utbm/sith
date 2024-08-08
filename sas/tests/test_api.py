@@ -89,19 +89,33 @@ class TestPictureSearch(TestSas):
         )
         assert [i["id"] for i in res.json()["results"]] == expected
 
-        # trying to access the pictures of someone else
-        res = self.client.get(
-            reverse("api:pictures") + f"?users_identified={self.user_b.id}"
-        )
-        assert res.status_code == 403
-
-        # trying to access the pictures of someone else shouldn't success,
-        # even if mixed with owned pictures
+        # trying to access the pictures of someone else mixed with owned pictures
+        # should return only owned pictures
         res = self.client.get(
             reverse("api:pictures")
             + f"?users_identified={self.user_a.id}&users_identified={self.user_b.id}"
         )
-        assert res.status_code == 403
+        assert res.status_code == 200
+        assert [i["id"] for i in res.json()["results"]] == expected
+
+        # trying to fetch everything should be the same
+        # as fetching its own pictures for a non-subscriber
+        res = self.client.get(reverse("api:pictures"))
+        assert res.status_code == 200
+        assert [i["id"] for i in res.json()["results"]] == expected
+
+        # trying to access the pictures of someone else should return only
+        # the ones where the non-subscribed user is identified too
+        res = self.client.get(
+            reverse("api:pictures") + f"?users_identified={self.user_b.id}"
+        )
+        assert res.status_code == 200
+        expected = list(
+            self.user_b.pictures.intersection(self.user_a.pictures.all())
+            .order_by("-picture__parent__date", "picture__date")
+            .values_list("picture_id", flat=True)
+        )
+        assert [i["id"] for i in res.json()["results"]] == expected
 
 
 class TestPictureRelation(TestSas):

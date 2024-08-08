@@ -119,10 +119,11 @@ class SASMainView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["categories"] = Album.objects.filter(
-            parent__id=settings.SITH_SAS_ROOT_DIR_ID
-        ).order_by("id")
-        kwargs["latest"] = Album.objects.filter(is_moderated=True).order_by("-id")[:5]
+        albums_qs = Album.objects.viewable_by(self.request.user)
+        kwargs["categories"] = list(
+            albums_qs.filter(parent_id=settings.SITH_SAS_ROOT_DIR_ID).order_by("id")
+        )
+        kwargs["latest"] = list(albums_qs.order_by("-id")[:5])
         return kwargs
 
 
@@ -180,7 +181,14 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
+        pictures_qs = Picture.objects.viewable_by(self.request.user)
         kwargs["form"] = self.form
+        kwargs["next_pict"] = (
+            pictures_qs.filter(id__gt=self.object.id).order_by("id").first()
+        )
+        kwargs["previous_pict"] = (
+            pictures_qs.filter(id__lt=self.object.id).order_by("-id").first()
+        )
         return kwargs
 
     def get_success_url(self):

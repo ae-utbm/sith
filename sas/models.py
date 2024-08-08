@@ -20,6 +20,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -27,6 +28,36 @@ from PIL import Image
 
 from core.models import SithFile, User
 from core.utils import exif_auto_rotate, resize_image
+
+
+class SasFile(SithFile):
+    """Proxy model for any file in the SAS.
+
+    May be used to have logic that should be shared by both
+    [Picture][sas.models.Picture] and [Album][sas.models.Album].
+    """
+
+    class Meta:
+        proxy = True
+
+    def can_be_viewed_by(self, user):
+        if user.is_anonymous:
+            return False
+        cache_key = (
+            f"sas:{self._meta.model_name}_viewable_by_{user.id}_in_{self.parent_id}"
+        )
+        viewable: list[int] | None = cache.get(cache_key)
+        if viewable is None:
+            viewable = list(
+                self.__class__.objects.filter(parent_id=self.parent_id)
+                .viewable_by(user)
+                .values_list("pk", flat=True)
+            )
+            cache.set(cache_key, viewable, timeout=10)
+        return self.id in viewable
+
+    def can_be_edited_by(self, user):
+        return user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
 
 
 class PictureQuerySet(models.QuerySet):
@@ -45,17 +76,10 @@ class PictureQuerySet(models.QuerySet):
 
 class SASPictureManager(models.Manager):
     def get_queryset(self):
-        return PictureQuerySet(self.model, using=self._db).filter(
-            is_in_sas=True, is_folder=False
-        )
+        return super().get_queryset().filter(is_in_sas=True, is_folder=False)
 
 
-class SASAlbumManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_in_sas=True, is_folder=True)
-
-
-class Picture(SithFile):
+class Picture(SasFile):
     class Meta:
         proxy = True
 
@@ -67,29 +91,6 @@ class Picture(SithFile):
             im = Image.open(BytesIO(f.read()))
             (w, h) = im.size
             return (w / h) < 1
-
-    def can_be_edited_by(self, user):
-        perm = cache.get("%d_can_edit_pictures" % (user.id), None)
-        if perm is None:
-            perm = user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
-
-        cache.set("%d_can_edit_pictures" % (user.id), perm, timeout=4)
-        return perm
-
-    def can_be_viewed_by(self, user: User) -> bool:
-        if user.is_anonymous:
-            return False
-
-        cache_key = f"sas:pictures_viewable_by_{user.id}_in_{self.parent_id}"
-        viewable: list[int] | None = cache.get(cache_key)
-        if viewable is None:
-            viewable = list(
-                Picture.objects.filter(parent_id=self.parent_id)
-                .viewable_by(user)
-                .values_list("pk", flat=True)
-            )
-            cache.set(cache_key, viewable, timeout=10)
-        return self.id in viewable
 
     def get_download_url(self):
         return reverse("sas:download", kwargs={"picture_id": self.id})
@@ -142,48 +143,53 @@ class Picture(SithFile):
 
     def get_next(self):
         if self.is_moderated:
-            return (
-                self.parent.children.filter(
-                    is_moderated=True,
-                    asked_for_removal=False,
-                    is_folder=False,
-                    id__gt=self.id,
-                )
-                .order_by("id")
-                .first()
+            pictures_qs = self.parent.children.filter(
+                is_moderated=True,
+                asked_for_removal=False,
+                is_folder=False,
+                id__gt=self.id,
             )
         else:
-            return (
-                Picture.objects.filter(id__gt=self.id, is_moderated=False)
-                .order_by("id")
-                .first()
-            )
+            pictures_qs = Picture.objects.filter(id__gt=self.id, is_moderated=False)
+        return pictures_qs.order_by("id").first()
 
     def get_previous(self):
         if self.is_moderated:
-            return (
-                self.parent.children.filter(
-                    is_moderated=True,
-                    asked_for_removal=False,
-                    is_folder=False,
-                    id__lt=self.id,
-                )
-                .order_by("id")
-                .last()
+            pictures_qs = self.parent.children.filter(
+                is_moderated=True,
+                asked_for_removal=False,
+                is_folder=False,
+                id__lt=self.id,
             )
         else:
-            return (
-                Picture.objects.filter(id__lt=self.id, is_moderated=False)
-                .order_by("-id")
-                .first()
-            )
+            pictures_qs = Picture.objects.filter(id__lt=self.id, is_moderated=False)
+        return pictures_qs.order_by("-id").first()
 
 
-class Album(SithFile):
+class AlbumQuerySet(models.QuerySet):
+    def viewable_by(self, user: User) -> PictureQuerySet:
+        """Filter the albums that this user can view.
+
+        Warnings:
+            Calling this queryset method may add several additional requests.
+        """
+        if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
+            return self.all()
+        return self.filter(
+            Exists(Picture.objects.filter(parent_id=OuterRef("pk")).viewable_by(user))
+        )
+
+
+class SASAlbumManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_in_sas=True, is_folder=True)
+
+
+class Album(SasFile):
     class Meta:
         proxy = True
 
-    objects = SASAlbumManager()
+    objects = SASAlbumManager.from_queryset(AlbumQuerySet)()
 
     @property
     def children_pictures(self):
@@ -192,15 +198,6 @@ class Album(SithFile):
     @property
     def children_albums(self):
         return Album.objects.filter(parent=self)
-
-    def can_be_edited_by(self, user):
-        return user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
-
-    def can_be_viewed_by(self, user):
-        # file = SithFile.objects.filter(id=self.id).first()
-        return self.can_be_edited_by(user) or (
-            self.is_in_sas and self.is_moderated and user.was_subscribed
-        )  # or user.can_view(file)
 
     def get_absolute_url(self):
         return reverse("sas:album", kwargs={"album_id": self.id})
