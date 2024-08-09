@@ -22,6 +22,7 @@
 #
 #
 import itertools
+import logging
 
 # This file contains all the views that concern the user model
 from datetime import date, timedelta
@@ -318,6 +319,7 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
             .order_by("-parent__date", "-date")
             .annotate(album=F("parent__name"))
         )
+        kwargs["nb_pictures"] = len(pictures)
         kwargs["albums"] = {
             album: list(picts)
             for album, picts in itertools.groupby(pictures, lambda i: i.album)
@@ -801,7 +803,7 @@ class UserAccountView(UserAccountBase):
                 product__eticket=None
             ).all()
         except Exception as e:
-            print(repr(e))
+            logging.error(e)
         return kwargs
 
 

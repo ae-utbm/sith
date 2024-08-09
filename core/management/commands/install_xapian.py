@@ -48,20 +48,24 @@ class Command(BaseCommand):
 
     def handle(self, *args, force: bool, **options):
         if not os.environ.get("VIRTUAL_ENV", None):
-            print("No virtual environment detected, this command can't be used")
+            self.stdout.write(
+                "No virtual environment detected, this command can't be used"
+            )
             return
 
         desired = self._desired_version()
         if desired == self._current_version():
             if not force:
-                print(
+                self.stdout.write(
                     f"Version {desired} is already installed, use --force to re-install"
                 )
                 return
-            print(f"Version {desired} is already installed, re-installing")
-        print(f"Installing xapian version {desired} at {os.environ['VIRTUAL_ENV']}")
+            self.stdout.write(f"Version {desired} is already installed, re-installing")
+        self.stdout.write(
+            f"Installing xapian version {desired} at {os.environ['VIRTUAL_ENV']}"
+        )
         subprocess.run(
             [str(Path(__file__).parent / "install_xapian.sh"), desired],
             env=dict(os.environ),
         ).check_returncode()
-        print("Installation success")
+        self.stdout.write("Installation success")

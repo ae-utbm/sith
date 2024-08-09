@@ -16,7 +16,6 @@
 import base64
 import json
 from datetime import datetime
-from urllib.parse import unquote
 
 import sentry_sdk
 from cryptography.exceptions import InvalidSignature
@@ -26,6 +25,7 @@ from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, transaction
 from django.http import HttpRequest, HttpResponse
@@ -37,7 +37,14 @@ from django.views.generic import TemplateView, View
 from counter.forms import BillingInfoForm
 from counter.models import Counter, Customer, Product
 from eboutic.forms import BasketForm
-from eboutic.models import Basket, Invoice, InvoiceItem, get_eboutic_products
+from eboutic.models import (
+    Basket,
+    BasketItem,
+    Invoice,
+    InvoiceItem,
+    get_eboutic_products,
+)
+from eboutic.schemas import PurchaseItemList, PurchaseItemSchema
 
 
 @login_required
@@ -75,43 +82,46 @@ def payment_result(request, result: str) -> HttpResponse:
     return render(request, "eboutic/eboutic_payment_result.jinja", context)
 
 
-class EbouticCommand(TemplateView):
+class EbouticCommand(LoginRequiredMixin, TemplateView):
     template_name = "eboutic/eboutic_makecommand.jinja"
+    basket: Basket
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         return redirect("eboutic:main")
 
-    @method_decorator(login_required)
     def get(self, request: HttpRequest, *args, **kwargs):
         form = BasketForm(request)
         if not form.is_valid():
-            request.session["errors"] = form.get_error_messages()
+            request.session["errors"] = form.errors
             request.session.modified = True
             res = redirect("eboutic:main")
-            res.set_cookie("basket_items", form.get_cleaned_cookie(), path="/eboutic")
+            res.set_cookie(
+                "basket_items",
+                PurchaseItemList.dump_json(form.cleaned_data, by_alias=True).decode(),
+                path="/eboutic",
+            )
             return res
-
         basket = Basket.from_session(request.session)
         if basket is not None:
-            basket.clear()
+            basket.items.all().delete()
         else:
             basket = Basket.objects.create(user=request.user)
             request.session["basket_id"] = basket.id
             request.session.modified = True
 
-        items = json.loads(unquote(request.COOKIES["basket_items"]))
-        items.sort(key=lambda item: item["id"])
-        ids = [item["id"] for item in items]
-        quantities = [item["quantity"] for item in items]
-        products = Product.objects.filter(id__in=ids)
-        for product, qty in zip(products, quantities):
-            basket.add_product(product, qty)
-        kwargs["basket"] = basket
-        return self.render_to_response(self.get_context_data(**kwargs))
+        items: list[PurchaseItemSchema] = form.cleaned_data
+        pks = {item.product_id for item in items}
+        products = {p.pk: p for p in Product.objects.filter(pk__in=pks)}
+        db_items = []
+        for pk in pks:
+            quantity = sum(i.quantity for i in items if i.product_id == pk)
+            db_items.append(BasketItem.from_product(products[pk], quantity, basket))
+        BasketItem.objects.bulk_create(db_items)
+        self.basket = basket
+        return super().get(request)
 
     def get_context_data(self, **kwargs):
-        # basket is already in kwargs when the method is called
         default_billing_info = None
         if hasattr(self.request.user, "customer"):
             customer = self.request.user.customer
@@ -124,9 +134,8 @@ class EbouticCommand(TemplateView):
         if not kwargs["must_fill_billing_infos"]:
             # the user has already filled its billing_infos, thus we can
             # get it without expecting an error
-            data = kwargs["basket"].get_e_transaction_data()
-            data = {"data": [{"key": key, "value": val} for key, val in data]}
-            kwargs["billing_infos"] = json.dumps(data)
+            kwargs["billing_infos"] = dict(self.basket.get_e_transaction_data())
+        kwargs["basket"] = self.basket
         kwargs["billing_form"] = BillingInfoForm(instance=default_billing_info)
         return kwargs
 
@@ -149,29 +158,32 @@ def pay_with_sith(request):
     refilling = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
     if basket is None or basket.items.filter(type_id=refilling).exists():
         return redirect("eboutic:main")
-    c = Customer.objects.filter(user__id=basket.user.id).first()
+    c = Customer.objects.filter(user__id=basket.user_id).first()
     if c is None:
         return redirect("eboutic:main")
-    if c.amount < basket.get_total():
+    if c.amount < basket.total:
         res = redirect("eboutic:payment_result", "failure")
-    else:
-        eboutic = Counter.objects.filter(type="EBOUTIC").first()
-        sales = basket.generate_sales(eboutic, c.user, "SITH_ACCOUNT")
-        try:
-            with transaction.atomic():
-                for sale in sales:
-                    sale.save()
-                basket.delete()
-            request.session.pop("basket_id", None)
-            res = redirect("eboutic:payment_result", "success")
-        except DatabaseError as e:
-            with sentry_sdk.push_scope() as scope:
-                scope.user = {"username": request.user.username}
-                scope.set_extra("someVariable", e.__repr__())
-                sentry_sdk.capture_message(
-                    f"Erreur le {datetime.now()} dans eboutic.pay_with_sith"
-                )
-            res = redirect("eboutic:payment_result", "failure")
+        res.delete_cookie("basket_items", "/eboutic")
+        return res
+    eboutic = Counter.objects.get(type="EBOUTIC")
+    sales = basket.generate_sales(eboutic, c.user, "SITH_ACCOUNT")
+    try:
+        with transaction.atomic():
+            # Selling.save has some important business logic in it.
+            # Do not bulk_create this
+            for sale in sales:
+                sale.save()
+            basket.delete()
+        request.session.pop("basket_id", None)
+        res = redirect("eboutic:payment_result", "success")
+    except DatabaseError as e:
+        with sentry_sdk.push_scope() as scope:
+            scope.user = {"username": request.user.username}
+            scope.set_extra("someVariable", e.__repr__())
+            sentry_sdk.capture_message(
+                f"Erreur le {datetime.now()} dans eboutic.pay_with_sith"
+            )
+        res = redirect("eboutic:payment_result", "failure")
     res.delete_cookie("basket_items", "/eboutic")
     return res
 
@@ -205,7 +217,7 @@ class EtransactionAutoAnswer(View):
                     )
                     if b is None:
                         raise SuspiciousOperation("Basket does not exists")
-                    if int(b.get_total() * 100) != int(request.GET["Amount"]):
+                    if int(b.total * 100) != int(request.GET["Amount"]):
                         raise SuspiciousOperation(
                             "Basket total and amount do not match"
                         )

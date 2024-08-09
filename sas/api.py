@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.db.models import F
 from ninja import Query
-from ninja_extra import ControllerBase, api_controller, route
+from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import PermissionDenied
+from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.permissions import IsAuthenticated
+from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
 from core.models import User
@@ -15,10 +17,11 @@ from sas.schemas import PictureFilterSchema, PictureSchema
 class PicturesController(ControllerBase):
     @route.get(
         "",
-        response=list[PictureSchema],
+        response=PaginatedResponseSchema[PictureSchema],
         permissions=[IsAuthenticated],
         url_name="pictures",
     )
+    @paginate(PageNumberPaginationExtra, page_size=100)
     def fetch_pictures(self, filters: Query[PictureFilterSchema]):
         """Find pictures viewable by the user corresponding to the given filters.
 
@@ -38,23 +41,12 @@ class PicturesController(ControllerBase):
             cf. https://ae.utbm.fr/user/32663/pictures/)
         """
         user: User = self.context.request.user
-        if not user.is_subscribed and filters.users_identified != {user.id}:
-            # User can view any moderated picture if he/she is subscribed.
-            # If not, he/she can view only the one he/she has been identified on
-            raise PermissionDenied
-        pictures = list(
-            filters.filter(
-                Picture.objects.filter(is_moderated=True, asked_for_removal=False)
-            )
+        return (
+            filters.filter(Picture.objects.viewable_by(user))
             .distinct()
-            .order_by("-date")
+            .order_by("-parent__date", "date")
             .annotate(album=F("parent__name"))
         )
-        for picture in pictures:
-            picture.full_size_url = picture.get_download_url()
-            picture.compressed_url = picture.get_download_compressed_url()
-            picture.thumb_url = picture.get_download_thumb_url()
-        return pictures
 
 
 @api_controller("/sas/relation", tags="User identification on SAS pictures")

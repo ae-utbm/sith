@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from urllib.parse import quote, urljoin
 
 # This file contains all the views that concern the page model
 from wsgiref.util import FileWrapper
@@ -21,7 +22,7 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.forms.models import modelform_factory
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.http import http_date
@@ -37,32 +38,41 @@ from core.views import (
     CanViewMixin,
     can_view,
 )
-from counter.models import Counter
+from counter.utils import is_logged_in_counter
 
 
-def send_file(request, file_id, file_class=SithFile, file_attr="file"):
-    """Send a file through Django without loading the whole file into
-    memory at once. The FileWrapper will turn the file object into an
-    iterator for chunks of 8KB.
+def send_file(
+    request: HttpRequest,
+    file_id: int,
+    file_class: type[SithFile] = SithFile,
+    file_attr: str = "file",
+) -> HttpResponse:
+    """Send a protected file, if the user can see it.
+
+    In prod, the server won't handle the download itself,
+    but set the appropriate headers in the response to make the reverse-proxy
+    deal with it.
+    In debug mode, the server will directly send the file.
     """
     f = get_object_or_404(file_class, id=file_id)
-    if not (
-        can_view(f, request.user)
-        or (
-            "counter_token" in request.session.keys()
-            and request.session["counter_token"]
-            and Counter.objects.filter(  # check if not null for counters that have no token set
-                token=request.session["counter_token"]
-            ).exists()
-        )
-    ):
+    if not can_view(f, request.user) and not is_logged_in_counter(request):
         raise PermissionDenied
-    name = f.__getattribute__(file_attr).name
+    name = getattr(f, file_attr).name
     filepath = settings.MEDIA_ROOT / name
 
     # check if file exists on disk
     if not filepath.exists():
         raise Http404
+
+    if not settings.DEBUG:
+        # When receiving a response with the Accel-Redirect header,
+        # the reverse proxy will automatically handle the file sending.
+        # This is really hard to test (thus isn't tested)
+        # so please do not mess with this.
+        response = HttpResponse(status=200)
+        response["Content-Type"] = ""
+        response["X-Accel-Redirect"] = quote(urljoin(settings.MEDIA_URL, name))
+        return response
 
     with open(filepath, "rb") as filename:
         wrapper = FileWrapper(filename)

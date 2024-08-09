@@ -30,22 +30,17 @@ function getCookie(name) {
  */
 function get_starting_items() {
     const cookie = getCookie(BASKET_ITEMS_COOKIE_NAME);
-    let output = [];
-
-    try {
-        // Django cookie backend does an utter mess on non-trivial data types
-        // so we must perform a conversion of our own
-        const biscuit = JSON.parse(cookie.replace(/\\054/g, ','));
-        output = Array.isArray(biscuit) ? biscuit : [];
-
-    } catch (e) {}
-
-    output.forEach(item => {
-        let el = document.getElementById(item.id);
-        el.classList.add("selected");
-    });
-
-    return output;
+    if (!cookie) {
+        return []
+    }
+    // Django cookie backend converts `,` to `\054`
+    let parsed = JSON.parse(cookie.replace(/\\054/g, ','));
+    if (typeof parsed === "string") {
+        // In some conditions, a second parsing is needed
+        parsed = JSON.parse(parsed);
+    }
+    const res = Array.isArray(parsed) ? parsed : [];
+    return res.filter((i) => !!document.getElementById(i.id))
 }
 
 document.addEventListener('alpine:init', () => {
@@ -63,7 +58,7 @@ document.addEventListener('alpine:init', () => {
 
         /**
          * Add 1 to the quantity of an item in the basket
-         * @param {BasketItem} item 
+         * @param {BasketItem} item
          */
         add(item) {
             item.quantity++;
@@ -72,18 +67,15 @@ document.addEventListener('alpine:init', () => {
 
         /**
          * Remove 1 to the quantity of an item in the basket
-         * @param {BasketItem} item_id 
+         * @param {BasketItem} item_id
          */
         remove(item_id) {
             const index = this.items.findIndex(e => e.id === item_id);
-            
+
             if (index < 0) return;
             this.items[index].quantity -= 1;
 
             if (this.items[index].quantity === 0) {
-                let el = document.getElementById(this.items[index].id);
-                el.classList.remove("selected");
-
                 this.items = this.items.filter((e) => e.id !== this.items[index].id);
             }
             this.set_cookies();
@@ -93,12 +85,6 @@ document.addEventListener('alpine:init', () => {
          * Remove all the items from the basket & cleans the catalog CSS classes
          */
         clear_basket() {
-            // We remove the class "selected" from all the items in the catalog
-            this.items.forEach(item => {
-                let el = document.getElementById(item.id);
-                el.classList.remove("selected");
-            })
-
             this.items = [];
             this.set_cookies();
         },
@@ -108,8 +94,11 @@ document.addEventListener('alpine:init', () => {
          * ! the cookie survives an hour
          */
         set_cookies() {
-            if (this.items.length === 0) document.cookie = `${BASKET_ITEMS_COOKIE_NAME}=;Max-Age=0`;
-            else document.cookie = `${BASKET_ITEMS_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(this.items))};Max-Age=3600`;
+            if (this.items.length === 0) {
+                document.cookie = `${BASKET_ITEMS_COOKIE_NAME}=;Max-Age=0`;
+            } else {
+                document.cookie = `${BASKET_ITEMS_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(this.items))};Max-Age=3600`;
+            }
         },
 
         /**
@@ -145,12 +134,10 @@ document.addEventListener('alpine:init', () => {
 
             // if the item is not in the basket, we create it
             // else we add + 1 to it
-            if (item === undefined) item = this.create_item(id, name, price);
-            else this.add(item);
-
-            if (item.quantity > 0) {
-                let el = document.getElementById(item.id);
-                el.classList.add("selected");
+            if (!item) {
+                item = this.create_item(id, name, price);
+            } else {
+                this.add(item);
             }
         },
     }))

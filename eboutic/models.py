@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hmac
 from datetime import datetime
+from typing import Any
 
 from dict2xml import dict2xml
 from django.conf import settings
@@ -38,6 +39,7 @@ def get_eboutic_products(user: User) -> list[Product]:
         .annotate(priority=F("product_type__priority"))
         .annotate(category=F("product_type__name"))
         .annotate(category_comment=F("product_type__comment"))
+        .prefetch_related("buying_groups")  # <-- used in `Product.can_be_sold_to`
     )
     return [p for p in products if p.can_be_sold_to(user)]
 
@@ -57,66 +59,25 @@ class Basket(models.Model):
     def __str__(self):
         return f"{self.user}'s basket ({self.items.all().count()} items)"
 
-    def add_product(self, p: Product, q: int = 1):
-        """Given p an object of the Product model and q an integer,
-        add q items corresponding to this Product from the basket.
-
-        If this function is called with a product not in the basket, no error will be raised
-        """
-        item = self.items.filter(product_id=p.id).first()
-        if item is None:
-            BasketItem(
-                basket=self,
-                product_id=p.id,
-                product_name=p.name,
-                type_id=p.product_type.id,
-                quantity=q,
-                product_unit_price=p.selling_price,
-            ).save()
-        else:
-            item.quantity += q
-            item.save()
-
-    def del_product(self, p: Product, q: int = 1):
-        """Given p an object of the Product model and q an integer
-        remove q items corresponding to this Product from the basket.
-
-        If this function is called with a product not in the basket, no error will be raised
-        """
-        try:
-            item = self.items.get(product_id=p.id)
-        except BasketItem.DoesNotExist:
-            return
-        item.quantity -= q
-        if item.quantity <= 0:
-            item.delete()
-        else:
-            item.save()
-
-    def clear(self) -> None:
-        """Remove all items from this basket without deleting the basket."""
-        self.items.all().delete()
-
     @cached_property
     def contains_refilling_item(self) -> bool:
         return self.items.filter(
             type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
         ).exists()
 
-    def get_total(self) -> float:
-        total = self.items.aggregate(
-            total=Sum(F("quantity") * F("product_unit_price"))
-        )["total"]
-        return float(total) if total is not None else 0
+    @cached_property
+    def total(self) -> float:
+        return float(
+            self.items.aggregate(
+                total=Sum(F("quantity") * F("product_unit_price"), default=0)
+            )["total"]
+        )
 
     @classmethod
     def from_session(cls, session) -> Basket | None:
         """The basket stored in the session object, if it exists."""
         if "basket_id" in session:
-            try:
-                return cls.objects.get(id=session["basket_id"])
-            except cls.DoesNotExist:
-                return None
+            return cls.objects.filter(id=session["basket_id"]).first()
         return None
 
     def generate_sales(self, counter, seller: User, payment_method: str):
@@ -161,18 +122,24 @@ class Basket(models.Model):
             )
         return sales
 
-    def get_e_transaction_data(self):
+    def get_e_transaction_data(self) -> list[tuple[str, Any]]:
         user = self.user
         if not hasattr(user, "customer"):
             raise Customer.DoesNotExist
         customer = user.customer
         if not hasattr(user.customer, "billing_infos"):
             raise BillingInfo.DoesNotExist
+        cart = {
+            "shoppingcart": {"total": {"totalQuantity": min(self.items.count(), 99)}}
+        }
+        cart = '<?xml version="1.0" encoding="UTF-8" ?>' + dict2xml(
+            cart, newlines=False
+        )
         data = [
             ("PBX_SITE", settings.SITH_EBOUTIC_PBX_SITE),
             ("PBX_RANG", settings.SITH_EBOUTIC_PBX_RANG),
             ("PBX_IDENTIFIANT", settings.SITH_EBOUTIC_PBX_IDENTIFIANT),
-            ("PBX_TOTAL", str(int(self.get_total() * 100))),
+            ("PBX_TOTAL", str(int(self.total * 100))),
             ("PBX_DEVISE", "978"),  # This is Euro
             ("PBX_CMD", str(self.id)),
             ("PBX_PORTEUR", user.email),
@@ -181,14 +148,6 @@ class Basket(models.Model):
             ("PBX_TYPEPAIEMENT", "CARTE"),
             ("PBX_TYPECARTE", "CB"),
             ("PBX_TIME", datetime.now().replace(microsecond=0).isoformat("T")),
-        ]
-        cart = {
-            "shoppingcart": {"total": {"totalQuantity": min(self.items.count(), 99)}}
-        }
-        cart = '<?xml version="1.0" encoding="UTF-8" ?>' + dict2xml(
-            cart, newlines=False
-        )
-        data += [
             ("PBX_SHOPPINGCART", cart),
             ("PBX_BILLING", customer.billing_infos.to_3dsv2_xml()),
         ]
@@ -218,10 +177,11 @@ class Invoice(models.Model):
         return f"{self.user} - {self.get_total()} - {self.date}"
 
     def get_total(self) -> float:
-        total = self.items.aggregate(
-            total=Sum(F("quantity") * F("product_unit_price"))
-        )["total"]
-        return float(total) if total is not None else 0
+        return float(
+            self.items.aggregate(
+                total=Sum(F("quantity") * F("product_unit_price"), default=0)
+            )["total"]
+        )
 
     def validate(self):
         if self.validated:
@@ -284,7 +244,7 @@ class BasketItem(AbstractBaseItem):
     )
 
     @classmethod
-    def from_product(cls, product: Product, quantity: int):
+    def from_product(cls, product: Product, quantity: int, basket: Basket):
         """Create a BasketItem with the same characteristics as the
         product passed in parameters, with the specified quantity.
 
@@ -293,9 +253,10 @@ class BasketItem(AbstractBaseItem):
             it yourself before saving the model.
         """
         return cls(
+            basket=basket,
             product_id=product.id,
             product_name=product.name,
-            type_id=product.product_type.id,
+            type_id=product.product_type_id,
             quantity=quantity,
             product_unit_price=product.selling_price,
         )

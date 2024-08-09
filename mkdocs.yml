@@ -61,6 +61,7 @@ nav:
     - Archives: explanation/archives.md
   - Tutoriels:
     - Installer le projet: tutorial/install.md
+    - Installer le projet (avancé): tutorial/install-advanced.md
     - Configurer son éditeur: tutorial/devtools.md
     - Structure du projet: tutorial/structure.md
     - Gestion des permissions: tutorial/perms.md
@@ -80,6 +81,9 @@ nav:
     - accounting:
       - reference/accounting/models.md
       - reference/accounting/views.md
+    - antispam:
+      - reference/antispam/models.md
+      - reference/antispam/forms.md
     - club:
       - reference/club/models.md
       - reference/club/views.md

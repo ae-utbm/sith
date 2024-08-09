@@ -310,11 +310,26 @@ class Product(models.Model):
 
         Returns:
             True if the user can buy this product else False
+
+        Warnings:
+            This performs a db query, thus you can quickly have
+            a N+1 queries problem if you call it in a loop.
+            Hopefully, you can avoid that if you prefetch the buying_groups :
+
+            ```python
+            user = User.objects.get(username="foobar")
+            products = [
+                p
+                for p in Product.objects.prefetch_related("buying_groups")
+                if p.can_be_sold_to(user)
+            ]
+            ```
         """
-        if not self.buying_groups.exists():
+        buying_groups = list(self.buying_groups.all())
+        if not buying_groups:
             return True
-        for group_id in self.buying_groups.values_list("pk", flat=True):
-            if user.is_in_group(pk=group_id):
+        for group in buying_groups:
+            if user.is_in_group(pk=group.id):
                 return True
         return False
 
@@ -690,14 +705,14 @@ class Selling(models.Model):
             self.customer.amount -= self.quantity * self.unit_price
             self.customer.save(allow_negative=allow_negative, is_selling=True)
             self.is_validated = True
-        u = User.objects.filter(id=self.customer.user.id).first()
-        if u.was_subscribed:
+        user = self.customer.user
+        if user.was_subscribed:
             if (
                 self.product
                 and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER
             ):
                 sub = Subscription(
-                    member=u,
+                    member=user,
                     subscription_type="un-semestre",
                     payment_method="EBOUTIC",
                     location="EBOUTIC",
@@ -719,9 +734,8 @@ class Selling(models.Model):
                 self.product
                 and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS
             ):
-                u = User.objects.filter(id=self.customer.user.id).first()
                 sub = Subscription(
-                    member=u,
+                    member=user,
                     subscription_type="deux-semestres",
                     payment_method="EBOUTIC",
                     location="EBOUTIC",
@@ -739,13 +753,13 @@ class Selling(models.Model):
                     start=sub.subscription_start,
                 )
                 sub.save()
-        if self.customer.user.preferences.notify_on_click:
+        if user.preferences.notify_on_click:
             Notification(
-                user=self.customer.user,
+                user=user,
                 url=reverse(
                     "core:user_account_detail",
                     kwargs={
-                        "user_id": self.customer.user.id,
+                        "user_id": user.id,
                         "year": self.date.year,
                         "month": self.date.month,
                     },
@@ -754,19 +768,15 @@ class Selling(models.Model):
                 type="SELLING",
             ).save()
         super().save(*args, **kwargs)
-        try:
-            # The product has no id until it's saved
-            if self.product.eticket:
-                self.send_mail_customer()
-        except:
-            pass
+        if hasattr(self.product, "eticket"):
+            self.send_mail_customer()
 
-    def is_owned_by(self, user):
+    def is_owned_by(self, user: User) -> bool:
         if user.is_anonymous:
             return False
-        return user.is_owner(self.counter) and self.payment_method != "CARD"
+        return self.payment_method != "CARD" and user.is_owner(self.counter)
 
-    def can_be_viewed_by(self, user):
+    def can_be_viewed_by(self, user: User) -> bool:
         if (
             not hasattr(self, "customer") or self.customer is None
         ):  # Customer can be set to Null
@@ -812,7 +822,9 @@ class Selling(models.Model):
             "url": self.customer.get_full_url(),
             "eticket": self.get_eticket_full_url(),
         }
-        self.customer.user.email_user(subject, message_txt, html_message=message_html)
+        self.customer.user.email_user(
+            subject, message_txt, html_message=message_html, fail_silently=True
+        )
 
     def get_eticket_full_url(self):
         eticket_url = reverse("counter:eticket_pdf", kwargs={"selling_id": self.id})

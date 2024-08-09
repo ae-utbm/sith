@@ -93,6 +93,32 @@ a:not(.button) {
   }
 }
 
+[aria-busy] {
+  --loading-size: 50px;
+  --loading-stroke: 5px;
+  --loading-duration: 1s;
+  position: relative;
+}
+
+[aria-busy]:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--loading-size);
+  height: var(--loading-size);
+  margin-top: calc(var(--loading-size) / 2 * -1);
+  margin-left: calc(var(--loading-size) / 2 * -1);
+  border: var(--loading-stroke) solid rgba(0, 0, 0, .15);
+  border-radius: 50%;
+  border-top-color: rgba(0, 0, 0, 0.5);
+  animation: rotate calc(var(--loading-duration)) linear infinite;
+}
+
+@keyframes rotate {
+  100% { transform: rotate(360deg); }
+}
+
 .ib {
   display: inline-block;
   padding: 1px;

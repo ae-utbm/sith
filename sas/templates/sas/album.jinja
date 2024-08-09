@@ -1,20 +1,15 @@
 {% extends "core/base.jinja" %}
-{% from "core/macros.jinja" import paginate %}
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
+  <link rel="stylesheet" href="{{ scss('core/pagination.scss') }}">
 {%- endblock -%}
 
 {% block title %}
   {% trans %}SAS{% endtrans %}
 {% endblock %}
 
-{% macro print_path(file) %}
-  {% if file and file.parent %}
-    {{ print_path(file.parent) }}
-    <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
-  {% endif %}
-{% endmacro %}
+{% from "sas/macros.jinja" import display_album, print_path %}
 
 
 {% block content %}
@@ -22,10 +17,10 @@
     <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(album.parent) }} {{ album.get_display_name() }}
   </code>
 
-  {% set edit_mode = user.can_edit(album) %}
+  {% set is_sas_admin = user.can_edit(album) %}
   {% set start = timezone.now() %}
 
-  {% if edit_mode %}
+  {% if is_sas_admin %}
     <form action="" method="post" enctype="multipart/form-data">
       {% csrf_token %}
 
@@ -53,73 +48,63 @@
       {% endif %}
   {% endif %}
 
-  {% if album.children_albums.count() > 0 %}
+  {% if children_albums|length > 0 %}
     <h4>{% trans %}Albums{% endtrans %}</h4>
     <div class="albums">
-      {% for a in album.children_albums.order_by('-date') %}
-        {% if a.can_be_viewed_by(user) %}
-          <a href="{{ url('sas:album', album_id=a.id) }}">
-            <div
-              class="album{% if not a.is_moderated %} not_moderated{% endif %}"
-              style="background-image: url('{% if a.file %}{{ a.get_download_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
-            >
-              {% if not a.is_moderated %}
-                <div class="overlay">&nbsp;</div>
-                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
-              {% else %}
-                <div class="text">{{ a.name }}</div>
-              {% endif %}
-            </div>
-            {% if edit_mode %}
-              <input type="checkbox" name="file_list" value="{{ a.id }}">
-            {% endif %}
-          </a>
-        {% endif %}
+      {% for a in children_albums %}
+        {{ display_album(a, is_sas_admin) }}
       {% endfor %}
     </div>
 
     <br>
   {% endif %}
 
-  <h4>{% trans %}Pictures{% endtrans %}</h4>
-  {% if pictures | length != 0 %}
-    <div class="photos">
-      {% for p in pictures %}
-        {% if p.can_be_viewed_by(user) %}
-          <a href="{{ url('sas:picture', picture_id=p.id) }}#pict">
-            <div
-              class="photo {% if p.is_vertical %}vertical{% endif %}"
-              style="background-image: url('{{ p.get_download_thumb_url() }}')"
-            >
-              {% if not p.is_moderated %}
-                <div class="overlay">&nbsp;</div>
-                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
-              {% else %}
-                <div class="text">&nbsp;</div>
-              {% endif %}
-            </div>
-            {% if edit_mode %}
-              <input type="checkbox" name="file_list" value="{{ p.id }}">
-            {% endif %}
-          </a>
-        {% endif %}
-      {% endfor %}
+  <div x-data="pictures">
+    <h4>{% trans %}Pictures{% endtrans %}</h4>
+    <div class="photos" :aria-busy="loading">
+      <template x-for="picture in pictures.results">
+        <a :href="`/sas/picture/${picture.id}#pict`">
+          <div class="photo" :style="`background-image: url(${picture.thumb_url})`">
+            <template x-if="!picture.is_moderated">
+              <div class="overlay">&nbsp;</div>
+              <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+            </template>
+            <template x-if="picture.is_moderated">
+              <div class="text">&nbsp;</div>
+            </template>
+          </div>
+          {% if is_sas_admin %}
+            <input type="checkbox" name="file_list" :value="picture.id">
+          {% endif %}
+        </a>
+      </template>
     </div>
-  {% else %}
-    {% trans %}This album does not contain any photos.{% endtrans %}
-  {% endif %}
+    <nav class="pagination" x-show="nb_pages() > 1">
+      {# Adding the prevent here is important, because otherwise,
+      clicking on the pagination buttons could submit the picture management form
+      and reload the page #}
+      <button
+        @click.prevent="page--"
+        :disabled="page <= 1"
+        @keyup.right.window="page = Math.min(nb_pages(), page + 1)"
+      >
+        <i class="fa fa-caret-left"></i>
+      </button>
+      <template x-for="i in nb_pages()">
+        <button x-text="i" @click.prevent="page = i" :class="{active: page === i}"></button>
+      </template>
+      <button
+        @click.prevent="page++"
+        :disabled="page >= nb_pages()"
+        @keyup.left.window="page = Math.max(1, page - 1)"
+      >
+        <i class="fa fa-caret-right"></i>
+      </button>
+    </nav>
+  </div>
 
-  {% if pictures.has_previous() or pictures.has_next() %}
-    <div class="paginator">
-      {{ paginate(pictures, paginator) }}
-    </div>
-  {% endif %}
-
-  {% if edit_mode %}
+  {% if is_sas_admin %}
     </form>
-  {% endif %}
-
-  {% if user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
     <form class="add-files" id="upload_form" action="" method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="inputs">
@@ -140,6 +125,36 @@
 {% block script %}
   {{ super() }}
   <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("pictures", () => ({
+        pictures: {},
+        page: parseInt(initialUrlParams.get("page")) || 1,
+        loading: false,
+
+        async init() {
+          await this.fetch_pictures();
+          this.$watch("page", () => {
+            update_query_string("page", this.page === 1 ? null : this.page);
+            this.fetch_pictures()
+          });
+        },
+
+        async fetch_pictures() {
+          this.loading=true;
+          const url = "{{ url("api:pictures") }}"
+          +"?album_id={{ album.id }}"
+          +`&page=${this.page}`
+          +"&page_size={{ settings.SITH_SAS_IMAGES_PER_PAGE }}";
+          this.pictures = await (await fetch(url)).json();
+          this.loading=false;
+        },
+
+        nb_pages() {
+          return Math.ceil(this.pictures.count / {{ settings.SITH_SAS_IMAGES_PER_PAGE }});
+        }
+      }))
+    })
+
     $("form#upload_form").submit(function (event) {
       let formData = new FormData($(this)[0]);
 

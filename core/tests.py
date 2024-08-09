@@ -24,8 +24,10 @@ from django.core.mail import EmailMessage
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import now
+from model_bakery import baker
 from pytest_django.asserts import assertInHTML, assertRedirects
 
+from antispam.models import ToxicDomain
 from club.models import Membership
 from core.markdown import markdown
 from core.models import AnonymousUser, Group, Page, User
@@ -48,6 +50,10 @@ class TestUserRegistration:
             "captcha_1": "PASSED",
         }
 
+    @pytest.fixture()
+    def scam_domains(self):
+        return [baker.make(ToxicDomain, domain="scammer.spam")]
+
     def test_register_user_form_ok(self, client, valid_payload):
         """Should register a user correctly."""
         assert not User.objects.filter(email=valid_payload["email"]).exists()
@@ -64,14 +70,25 @@ class TestUserRegistration:
                 {"password2": "not the same as password1"},
                 "Les deux mots de passe ne correspondent pas.",
             ),
-            ({"email": "not-an-email"}, "Saisissez une adresse de courriel valide."),
+            (
+                {"email": "not-an-email"},
+                "Saisissez une adresse de courriel valide.",
+            ),
+            (
+                {"email": "not\\an@email.com"},
+                "Saisissez une adresse de courriel valide.",
+            ),
+            (
+                {"email": "legit@scammer.spam"},
+                "Le domaine de l'addresse e-mail n'est pas autorisé.",
+            ),
             ({"first_name": ""}, "Ce champ est obligatoire."),
             ({"last_name": ""}, "Ce champ est obligatoire."),
             ({"captcha_1": "WRONG_CAPTCHA"}, "CAPTCHA invalide"),
         ],
     )
     def test_register_user_form_fail(
-        self, client, valid_payload, payload_edit, expected_error
+        self, client, scam_domains, valid_payload, payload_edit, expected_error
     ):
         """Should not register a user correctly."""
         payload = valid_payload | payload_edit

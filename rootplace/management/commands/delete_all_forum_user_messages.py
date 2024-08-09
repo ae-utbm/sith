@@ -40,7 +40,7 @@ class Command(BaseCommand):
         user = User.objects.filter(id=options["user_id"]).first()
 
         if user is None:
-            print("User with ID %s not found" % (options["user_id"],))
+            self.stderr.write("User with ID %s not found" % (options["user_id"],))
             exit(1)
 
         confirm = input(
@@ -49,7 +49,7 @@ class Command(BaseCommand):
         )
 
         if not confirm.lower().startswith("y"):
-            print("Operation aborted")
+            self.stderr.write("Operation aborted")
             exit(1)
 
         delete_all_forum_user_messages(user, User.objects.get(id=0), verbose=True)

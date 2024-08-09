@@ -29,7 +29,7 @@ mistune = "^3.0.2"
 django-jinja = "^2.11"
 cryptography = "^43.0.0"
 django-phonenumber-field = "^8.0.0"
-phonenumbers = "^8.12"
+phonenumbers = "^8.13"
 django-ajax-selects = "^2.2.1"
 reportlab = "^4.2"
 django-haystack = "^3.2.1"
@@ -38,18 +38,21 @@ libsass = "^0.23"
 django-ordered-model = "^3.7"
 django-simple-captcha = "^0.6.0"
 python-dateutil = "^2.8.2"
-sentry-sdk = "^2.11.0"
+sentry-sdk = "^2.12.0"
 pygraphviz = "^1.1"
 Jinja2 = "^3.1"
 django-countries = "^7.5.1"
 dict2xml = "^1.7.3"
 Sphinx = "^5" # Needed for building xapian
 tomli = "^2.0.1"
-django-honeypot = "^1.2.0"
+django-honeypot = "^1.2.1"
 
 [tool.poetry.group.prod.dependencies]
 # deps used in prod, but unnecessary for development
-psycopg2-binary = "^2.9"
+
+# The C extra triggers compilation against sytem libs during install.
+# Removing it would switch psycopg to a slower full-python implementation
+psycopg = {extras = ["c"], version = "^3.2.1"}
 redis = {extras = ["hiredis"], version = "^5.0.8"}
 
 [tool.poetry.group.prod]
@@ -62,7 +65,7 @@ ipython = "^8.26.0"
 pre-commit = "^3.8.0"
 ruff = "^0.5.5" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
 djhtml = "^3.0.6"
-faker = "^26.0.0"
+faker = "^26.1.0"
 
 [tool.poetry.group.tests.dependencies]
 # deps used for testing purposes
@@ -100,6 +103,7 @@ select = [
 	"FBT",  # boolean trap
     "UP008",  # Use super() instead of super(__class__, self)
     "UP009",  # utf-8 encoding declaration is unnecessary
+	"T2",  # print statements
 ]
 
 ignore = [

@@ -4,10 +4,6 @@
   {% trans %}UV Guide{% endtrans %}
 {% endblock %}
 
-{% block additional_js %}
-  <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
-{% endblock %}
-
 {% block additional_css %}
   <link rel="stylesheet" href="{{ scss('pedagogy/css/pedagogy.scss') }}">
   <link rel="stylesheet" href="{{ scss('core/pagination.scss') }}">
@@ -100,7 +96,7 @@
           {% endif %}
         </tr>
       </thead>
-      <tbody id="dynamic_view_content">
+      <tbody id="dynamic_view_content" :aria-busy="loading">
         <template x-for="uv in uvs.results" :key="uv.id">
           <tr @click="window.location.href = `/pedagogy/uv/${uv.id}`" class="clickable">
             <td><a :href="`/pedagogy/uv/${uv.id}`" x-text="uv.code"></a></td>
@@ -130,22 +126,6 @@
     </nav>
   </div>
   <script>
-    const initialUrlParams = new URLSearchParams(window.location.search);
-
-    function update_query_string(key, value) {
-      const url = new URL(window.location.href);
-      if (!value) {
-            {# If the value is null, undefined or empty => delete it #}
-        url.searchParams.delete(key)
-      } else if (Array.isArray(value)) {
-        url.searchParams.delete(key)
-        value.forEach((v) => url.searchParams.append(key, v))
-      } else {
-        url.searchParams.set(key, value);
-      }
-      history.pushState(null, document.title, url.toString());
-    }
-
     {#
     How does this work :
 
@@ -160,6 +140,7 @@
     document.addEventListener("alpine:init", () => {
       Alpine.data("uv_search", () => ({
         uvs: [],
+        loading: false,
         page: parseInt(initialUrlParams.get("page")) || page_default,
         page_size: parseInt(initialUrlParams.get("page_size")) || page_size_default,
         search: initialUrlParams.get("search") || "",
@@ -191,8 +172,10 @@
         },
 
         async fetch_data() {
+          this.loading = true;
           const url = "{{ url("api:fetch_uvs") }}" + window.location.search;
           this.uvs = await (await fetch(url)).json();
+          this.loading = false;
         },
 
         max_page() {

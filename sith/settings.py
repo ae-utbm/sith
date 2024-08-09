@@ -34,6 +34,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 import binascii
+import logging
 import os
 import sys
 from pathlib import Path
@@ -98,6 +99,7 @@ INSTALLED_APPS = (
     "matmat",
     "pedagogy",
     "galaxy",
+    "antispam",
 )
 
 MIDDLEWARE = (
@@ -204,13 +206,12 @@ SASS_PRECISION = 8
 WSGI_APPLICATION = "sith.wsgi.application"
 
 # Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
-    }
+    },
 }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
@@ -617,11 +618,14 @@ SITH_EBOUTIC_CB_ENABLED = True
 SITH_EBOUTIC_ET_URL = (
     "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
 )
-SITH_EBOUTIC_PBX_SITE = "4000666"
-SITH_EBOUTIC_PBX_RANG = "42"
-SITH_EBOUTIC_PBX_IDENTIFIANT = "123456789"
+SITH_EBOUTIC_PBX_SITE = "1999888"
+SITH_EBOUTIC_PBX_RANG = "32"
+SITH_EBOUTIC_PBX_IDENTIFIANT = "2"
 SITH_EBOUTIC_HMAC_KEY = binascii.unhexlify(
-    "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF"
+    "0123456789ABCDEF0123456789ABCDEF"
+    "0123456789ABCDEF0123456789ABCDEF"
+    "0123456789ABCDEF0123456789ABCDEF"
+    "0123456789ABCDEF0123456789ABCDEF"
 )
 SITH_EBOUTIC_PUB_KEY = ""
 with open(os.path.join(os.path.dirname(__file__), "et_keys/pubkey.pem")) as f:
@@ -673,12 +677,16 @@ SITH_GIFT_LIST = [("AE Tee-shirt", _("AE tee-shirt"))]
 SENTRY_DSN = ""
 SENTRY_ENV = "production"
 
+TOXIC_DOMAINS_PROVIDERS = [
+    "https://www.stopforumspam.com/downloads/toxic_domains_whole.txt",
+]
+
 try:
     from .settings_custom import *
 
-    print("Custom settings imported", file=sys.stderr)
+    logging.getLogger("django").info("Custom settings imported")
 except:
-    print("Custom settings failed", file=sys.stderr)
+    logging.getLogger("django").warning("Custom settings failed")
 
 if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)
@@ -734,7 +742,7 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/viralpatel/jquery.shorten/": "",
     "https://github.com/getsentry/sentry-javascript/": "4.0.6",
     "https://github.com/jhuckaby/webcamjs/": "1.0.0",
-    "https://github.com/alpinejs/alpine": "3.10.5",
+    "https://github.com/alpinejs/alpine": "3.14.1",
     "https://github.com/mrdoob/three.js/": "r148",
     "https://github.com/vasturiano/three-spritetext": "1.6.5",
     "https://github.com/vasturiano/3d-force-graph/": "1.70.19",

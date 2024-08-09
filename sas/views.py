@@ -18,7 +18,6 @@ from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.paginator import InvalidPage, Paginator
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -120,10 +119,11 @@ class SASMainView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["categories"] = Album.objects.filter(
-            parent__id=settings.SITH_SAS_ROOT_DIR_ID
-        ).order_by("id")
-        kwargs["latest"] = Album.objects.filter(is_moderated=True).order_by("-id")[:5]
+        albums_qs = Album.objects.viewable_by(self.request.user)
+        kwargs["categories"] = list(
+            albums_qs.filter(parent_id=settings.SITH_SAS_ROOT_DIR_ID).order_by("id")
+        )
+        kwargs["latest"] = list(albums_qs.order_by("-id")[:5])
         return kwargs
 
 
@@ -181,7 +181,14 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
+        pictures_qs = Picture.objects.viewable_by(self.request.user)
         kwargs["form"] = self.form
+        kwargs["next_pict"] = (
+            pictures_qs.filter(id__gt=self.object.id).order_by("id").first()
+        )
+        kwargs["previous_pict"] = (
+            pictures_qs.filter(id__lt=self.object.id).order_by("-id").first()
+        )
         return kwargs
 
     def get_success_url(self):
@@ -222,8 +229,9 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
                     parent=parent,
                     owner=request.user,
                     files=files,
-                    automodere=request.user.is_in_group(
-                        pk=settings.SITH_GROUP_SAS_ADMIN_ID
+                    automodere=(
+                        request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+                        or request.user.is_root
                     ),
                 )
                 if self.form.is_valid():
@@ -236,7 +244,6 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
     form_class = SASForm
     pk_url_kwarg = "album_id"
     template_name = "sas/album.jinja"
-    paginate_by = settings.SITH_SAS_IMAGES_PER_PAGE
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -283,16 +290,14 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["paginator"] = Paginator(
-            self.object.children_pictures.order_by("id"), self.paginate_by
-        )
-        try:
-            kwargs["pictures"] = kwargs["paginator"].page(self.asked_page)
-        except InvalidPage as e:
-            raise Http404 from e
         kwargs["form"] = self.form
         kwargs["clipboard"] = SithFile.objects.filter(
             id__in=self.request.session["clipboard"]
+        )
+        kwargs["children_albums"] = list(
+            Album.objects.viewable_by(self.request.user)
+            .filter(parent_id=self.object.id)
+            .order_by("-date")
         )
         return kwargs
 
@@ -326,9 +331,7 @@ class ModerationView(TemplateView):
         kwargs["albums_to_moderate"] = Album.objects.filter(
             is_moderated=False, is_in_sas=True, is_folder=True
         ).order_by("id")
-        kwargs["pictures"] = Picture.objects.filter(
-            is_moderated=False, is_in_sas=True, is_folder=False
-        )
+        kwargs["pictures"] = Picture.objects.filter(is_moderated=False)
         kwargs["albums"] = Album.objects.filter(
             id__in=kwargs["pictures"].values("parent").distinct("parent")
         )
