@@ -181,7 +181,9 @@ class PictureView(CanViewMixin, DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        pictures_qs = Picture.objects.viewable_by(self.request.user)
+        pictures_qs = Picture.objects.filter(
+            parent_id=self.object.parent_id
+        ).viewable_by(self.request.user)
         kwargs["form"] = self.form
         kwargs["next_pict"] = (
             pictures_qs.filter(id__gt=self.object.id).order_by("id").first()
