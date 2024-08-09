@@ -1,8 +1,9 @@
 from django.test import TestCase
-from model_bakery import baker, seq
+from model_bakery import baker
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import User
+from sas.baker_recipes import picture_recipe
 from sas.models import Picture
 
 
@@ -10,15 +11,7 @@ class TestPictureQuerySet(TestCase):
     @classmethod
     def setUpTestData(cls):
         Picture.objects.all().delete()
-        cls.pictures = baker.make(
-            Picture,
-            is_moderated=True,
-            is_in_sas=True,
-            is_folder=False,
-            name=seq(""),
-            _quantity=10,
-            _bulk_create=True,
-        )
+        cls.pictures = picture_recipe.make(_quantity=10, _bulk_create=True)
         Picture.objects.filter(pk=cls.pictures[0].id).update(is_moderated=False)
 
     def test_root(self):
