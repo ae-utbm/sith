@@ -175,6 +175,16 @@ class AlbumQuerySet(models.QuerySet):
         """
         if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return self.all()
+        if user.was_subscribed:
+            return self.filter(moderated=True)
+        # known bug : if all children of an album are also albums
+        # then this album is excluded, even if one of the sub-albums should be visible.
+        # The fs-like navigation is likely to be half-broken for non-subscribers,
+        # but that's ok, since non-subscribers are expected to see only the albums
+        # containing pictures on which they have been identified (hence, very few).
+        # Most, if not all, of their albums will be displayed on the
+        # `latest albums` section of the SAS.
+        # Moreover, they will still see all of their picture in their profile.
         return self.filter(
             Exists(Picture.objects.filter(parent_id=OuterRef("pk")).viewable_by(user))
         )
