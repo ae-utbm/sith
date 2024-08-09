@@ -96,10 +96,7 @@ def get_semester_code(d: Optional[date] = None) -> str:
 
 
 def scale_dimension(width, height, long_edge):
-    if width > height:
-        ratio = long_edge * 1.0 / width
-    else:
-        ratio = long_edge * 1.0 / height
+    ratio = long_edge / max(width, height)
     return int(width * ratio), int(height * ratio)
 
 
@@ -107,8 +104,8 @@ def resize_image(im, edge, img_format):
     (w, h) = im.size
     (width, height) = scale_dimension(w, h, long_edge=edge)
     content = BytesIO()
-    # use the lanczos filter for antialiasing
-    im = im.resize((width, height), Resampling.LANCZOS)
+    # use the lanczos filter for antialiasing and discard the alpha channel
+    im = im.resize((width, height), Resampling.LANCZOS).convert("RGB")
     try:
         im.save(
             fp=content,

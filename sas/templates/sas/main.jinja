@@ -8,31 +8,9 @@
   {% trans %}SAS{% endtrans %}
 {% endblock %}
 
-{% set edit_mode = user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
+{% set is_sas_admin = user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
 
-{% macro display_album(a, checkbox) %}
-  <a href="{{ url('sas:album', album_id=a.id) }}">
-    {% if a.file %}
-      {% set img = a.get_download_url() %}
-    {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
-      {% set img = a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() %}
-    {% else %}
-      {% set img = static('core/img/sas.jpg') %}
-    {% endif %}
-
-    <div
-      class="album"
-      style="background-image: url('{{ img }}');"
-    >
-      <div class="text">
-        {{ a.name }}
-      </div>
-    </div>
-        {# {% if edit_mode and checkbox %}
-            <input type="checkbox" name="file_list" value="{{ a.id }}">
-        {% endif %} #}
-  </a>
-{% endmacro %}
+{% from "sas/macros.jinja" import display_album %}
 
 {% block content %}
   <main>
@@ -46,22 +24,18 @@
 
       <div class="albums">
         {% for a in latest %}
-          {{ display_album(a) }}
+          {{ display_album(a, edit_mode=False) }}
         {% endfor %}
       </div>
 
       <br>
 
-      {% if edit_mode %}
+      {% if is_sas_admin %}
         <form action="" method="post" enctype="multipart/form-data">
           {% csrf_token %}
 
           <div class="navbar">
             <h4>{% trans %}All categories{% endtrans %}</h4>
-
-                        {# <div class="toolbar">
-                            <input name="delete" type="submit" value="{% trans %}Delete{% endtrans %}">
-                        </div> #}
           </div>
 
           {% if clipboard %}
@@ -81,11 +55,11 @@
 
       <div class="albums">
         {% for a in categories %}
-          {{ display_album(a, true) }}
+          {{ display_album(a, edit_mode=False) }}
         {% endfor %}
       </div>
 
-      {% if edit_mode %}
+      {% if is_sas_admin %}
         </form>
 
         <br>

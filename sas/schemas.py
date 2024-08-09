@@ -3,7 +3,6 @@ from datetime import datetime
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import Field, NonNegativeInt
 
-from core.schemas import SimpleUserSchema
 from sas.models import PeoplePictureRelation, Picture
 
 
@@ -17,13 +16,24 @@ class PictureFilterSchema(FilterSchema):
 class PictureSchema(ModelSchema):
     class Meta:
         model = Picture
-        fields = ["id", "name", "date", "size"]
+        fields = ["id", "name", "date", "size", "is_moderated"]
 
-    author: SimpleUserSchema = Field(validation_alias="owner")
     full_size_url: str
     compressed_url: str
     thumb_url: str
     album: str
+
+    @staticmethod
+    def resolve_full_size_url(obj: Picture) -> str:
+        return obj.get_download_url()
+
+    @staticmethod
+    def resolve_compressed_url(obj: Picture) -> str:
+        return obj.get_download_compressed_url()
+
+    @staticmethod
+    def resolve_thumb_url(obj: Picture) -> str:
+        return obj.get_download_thumb_url()
 
 
 class PictureCreateRelationSchema(Schema):

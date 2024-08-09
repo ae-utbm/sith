@@ -4,32 +4,11 @@
   <link rel="stylesheet" href="{{ scss('sas/picture.scss') }}">
 {%- endblock -%}
 
-{% block head %}
-  {{ super() }}
-
-  {% if picture.get_previous() %}
-    <link
-      rel="preload"
-      as="image"
-      href="{{ url("sas:download_compressed", picture_id=picture.get_previous().id) }}"
-    >
-  {% endif %}
-  {% if picture.get_next() %}
-    <link rel="preload" as="image" href="{{ url("sas:download_compressed", picture_id=picture.get_next().id) }}">
-  {% endif %}
-
-{% endblock %}
-
 {% block title %}
   {% trans %}SAS{% endtrans %}
 {% endblock %}
 
-{% macro print_path(file) %}
-  {% if file and file.parent %}
-    {{ print_path(file.parent) }}
-    <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
-  {% endif %}
-{% endmacro %}
+{% from "sas/macros.jinja" import print_path %}
 
 {% block content %}
   <code>
@@ -124,16 +103,16 @@
     <div class="subsection">
       <div class="navigation">
         <div id="prev">
-          {% if picture.get_previous() %}
-            <a href="{{ url( 'sas:picture', picture_id=picture.get_previous().id) }}#pict">
-              <div style="background-image: url('{{ picture.get_previous().as_picture.get_download_thumb_url() }}');"></div>
+          {% if previous_pict %}
+            <a href="{{ url( 'sas:picture', picture_id=previous_pict.id) }}#pict">
+              <div style="background-image: url('{{ previous_pict.get_download_thumb_url() }}');"></div>
             </a>
           {% endif %}
         </div>
         <div id="next">
-          {% if picture.get_next() %}
-            <a href="{{ url( 'sas:picture', picture_id=picture.get_next().id) }}#pict">
-              <div style="background-image: url('{{ picture.get_next().as_picture.get_download_thumb_url() }}');"></div>
+          {% if next_pict %}
+            <a href="{{ url( 'sas:picture', picture_id=next_pict.id) }}#pict">
+              <div style="background-image: url('{{ next_pict.get_download_thumb_url() }}');"></div>
             </a>
           {% endif %}
         </div>
@@ -141,11 +120,13 @@
 
       <div class="tags">
         <h5>{% trans %}People{% endtrans %}</h5>
-        <form action="" method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          {{ form.as_p() }}
-          <input type="submit" value="{% trans %}Go{% endtrans %}" />
-        </form>
+        {% if user.was_subscribed %}
+          <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p() }}
+            <input type="submit" value="{% trans %}Go{% endtrans %}" />
+          </form>
+        {% endif %}
         <ul x-data="user_identification">
           <template x-for="item in items" :key="item.id">
             <li>
