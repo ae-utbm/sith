@@ -94,7 +94,7 @@
              from paginated routes.
              In order to download all the user pictures, it may be needed
              to performs multiple requests #}
-            const max_per_page = 1;
+            const max_per_page = 199;
             const url = "{{ url("api:pictures") }}"
             + "?users_identified={{ object.id }}"
             + `&page_size=${max_per_page}`;
