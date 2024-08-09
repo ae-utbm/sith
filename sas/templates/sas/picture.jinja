@@ -128,14 +128,14 @@
         </div>
       </div>
 
-      <div class="tags" x-data="user_identification" x-cloak>
+      <div class="tags" x-data="user_identification">
         <h5>{% trans %}People{% endtrans %}</h5>
         {% if user.was_subscribed %}
-          <form @submit.prevent="submit_identification" >
-          {% csrf_token %}
-          <select x-ref="search" multiple="multiple"></select>
-          <input type="submit" value="{% trans %}Go{% endtrans %}"/>
-        </form>{% endif %}
+          <form @submit.prevent="submit_identification" x-show="!!selector">
+            <select x-ref="search" multiple="multiple"></select>
+            <input type="submit" value="{% trans %}Go{% endtrans %}"/>
+          </form>
+        {% endif %}
         <ul>
           <template x-for="identification in identifications" :key="identification.id">
             <li>
@@ -147,6 +147,9 @@
                 <a class="delete clickable" @click="remove(identification)">❌</a>
               </template>
             </li>
+          </template>
+          <template x-if="loading">
+            <li class="loader" aria-busy="true"></li>
           </template>
         </ul>
       </div>

@@ -4,6 +4,7 @@ document.addEventListener("alpine:init", () => {
     selector: undefined,
 
     async init() {
+      this.loading = true;
       this.identifications = await (
         await fetch(`/api/sas/picture/${picture_id}/identified`)
       ).json();
@@ -15,9 +16,11 @@ document.addEventListener("alpine:init", () => {
         }),
         picture_getter: (user) => user.profile_pict,
       });
+      this.loading = false;
     },
 
     async submit_identification() {
+      this.loading = true;
       const url = `/api/sas/picture/${picture_id}/identified`;
       await fetch(url, {
         method: "PUT",
@@ -26,6 +29,7 @@ document.addEventListener("alpine:init", () => {
       // refresh the identified users list
       this.identifications = await (await fetch(url)).json();
       this.selector.empty().trigger("change");
+      this.loading = false;
     },
 
     can_be_removed(item) {
@@ -33,6 +37,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     async remove(item) {
+      this.loading = true;
       const res = await fetch(`/api/sas/relation/${item.id}`, {
         method: "DELETE",
       });
@@ -41,6 +46,7 @@ document.addEventListener("alpine:init", () => {
           (i) => i.id !== item.id,
         );
       }
+      this.loading = false;
     },
   }));
 });

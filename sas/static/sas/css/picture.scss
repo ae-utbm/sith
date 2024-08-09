@@ -140,6 +140,11 @@
         width: 100%;
         justify-content: space-between;
 
+        &.loader {
+          margin-top: 10px;
+          --loading-size: 20px
+        }
+
         @media (max-width: 1000px) {
           max-width: calc(50% - 5px);
         }
