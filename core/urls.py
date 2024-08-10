@@ -38,7 +38,6 @@ register_converter(BooleanStringConverter, "bool")
 
 urlpatterns = [
     path("", index, name="index"),
-    path("to_markdown/", ToMarkdownView.as_view(), name="to_markdown"),
     path("notifications/", NotificationList.as_view(), name="notification_list"),
     path("notification/<int:notif_id>/", notification, name="notification"),
     # Search

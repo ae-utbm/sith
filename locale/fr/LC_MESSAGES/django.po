@@ -3028,22 +3028,6 @@ msgstr "Utilisateurs"
 msgid "Clubs"
 msgstr "Clubs"
 
-#: core/templates/core/to_markdown.jinja:4
-msgid "To Markdown"
-msgstr "Vers Markdown"
-
-#: core/templates/core/to_markdown.jinja:15
-msgid "Convert"
-msgstr "Convertir"
-
-#: core/templates/core/to_markdown.jinja:18
-msgid "Markdown"
-msgstr "Markdown"
-
-#: core/templates/core/to_markdown.jinja:22
-msgid "Render"
-msgstr "Rendu"
-
 #: core/templates/core/user_account.jinja:8
 msgid "Year"
 msgstr "Année"
