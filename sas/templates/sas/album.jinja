@@ -129,13 +129,25 @@
       Alpine.data("pictures", () => ({
         pictures: {},
         page: parseInt(initialUrlParams.get("page")) || 1,
+        pushstate: true, /* Used to avoid pushing a state on a back action */
         loading: false,
 
         async init() {
           await this.fetch_pictures();
           this.$watch("page", () => {
-            update_query_string("page", this.page === 1 ? null : this.page);
-            this.fetch_pictures()
+            update_query_string("page",
+              this.page === 1 ? null : this.page,
+              this.pushstate
+            );
+            this.pushstate = true;
+            this.fetch_pictures();
+          });
+
+          window.addEventListener("popstate", () => {
+            this.pushstate = false;
+            this.page = parseInt(
+              new URLSearchParams(window.location.search).get("page")
+            ) || 1;
           });
         },
 
@@ -146,7 +158,7 @@
           +`&page=${this.page}`
           +"&page_size={{ settings.SITH_SAS_IMAGES_PER_PAGE }}";
           this.pictures = await (await fetch(url)).json();
-          this.loading=false;
+          this.loading = false;
         },
 
         nb_pages() {

@@ -69,7 +69,7 @@ function getCSRFToken() {
 
 const initialUrlParams = new URLSearchParams(window.location.search);
 
-function update_query_string(key, value) {
+function update_query_string(key, value, push = true) {
     const url = new URL(window.location.href);
     if (!value) {
         // If the value is null, undefined or empty => delete it
@@ -81,5 +81,8 @@ function update_query_string(key, value) {
     } else {
         url.searchParams.set(key, value);
     }
-    history.pushState(null, document.title, url.toString());
+
+    if (push){
+        history.pushState(null, document.title, url.toString());
+    }
 }
