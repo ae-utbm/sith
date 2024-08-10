@@ -17,7 +17,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -32,12 +32,11 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import html
 from django.utils.text import slugify
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView
 from haystack.query import SearchQuerySet
 
 from club.models import Club
 from core.models import Notification, User
-from core.utils import bbcode_to_markdown, doku_to_markdown
 
 
 def index(request, context=None):
@@ -128,26 +127,3 @@ def search_json(request):
         "clubs": search_club(request.GET.get("query", ""), as_json=True),
     }
     return JsonResponse(result)
-
-
-class ToMarkdownView(TemplateView):
-    template_name = "core/to_markdown.jinja"
-
-    def post(self, request, *args, **kwargs):
-        self.text = request.POST["text"]
-        if request.POST["syntax"] == "doku":
-            self.text_md = doku_to_markdown(self.text)
-        else:
-            self.text_md = bbcode_to_markdown(self.text)
-        context = self.get_context_data(**kwargs)
-        return self.render_to_response(context)
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        try:
-            kwargs["text"] = self.text
-            kwargs["text_md"] = self.text_md
-        except:
-            kwargs["text"] = ""
-            kwargs["text_md"] = ""
-        return kwargs
