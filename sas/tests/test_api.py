@@ -3,10 +3,11 @@ from django.db import transaction
 from django.test import TestCase
 from django.urls import reverse
 from model_bakery import baker
-from model_bakery.recipe import Recipe
+from pytest_django.asserts import assertNumQueries
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import RealGroup, User
+from sas.baker_recipes import picture_recipe
 from sas.models import Album, PeoplePictureRelation, Picture
 
 
@@ -19,13 +20,11 @@ class TestSas(TestCase):
         cls.user_a = old_subscriber_user.make()
         cls.user_b, cls.user_c = subscriber_user.make(_quantity=2)
 
-        picture_recipe = Recipe(
-            Picture, is_in_sas=True, is_folder=False, owner=owner, is_moderated=True
-        )
+        picture = picture_recipe.extend(owner=owner)
         cls.album_a = baker.make(Album, is_in_sas=True)
         cls.album_b = baker.make(Album, is_in_sas=True)
         for album in cls.album_a, cls.album_b:
-            pictures = picture_recipe.make(parent=album, _quantity=5, _bulk_create=True)
+            pictures = picture.make(parent=album, _quantity=5, _bulk_create=True)
             baker.make(PeoplePictureRelation, picture=pictures[1], user=cls.user_a)
             baker.make(PeoplePictureRelation, picture=pictures[2], user=cls.user_a)
             baker.make(PeoplePictureRelation, picture=pictures[2], user=cls.user_b)
@@ -36,22 +35,25 @@ class TestSas(TestCase):
 
 
 class TestPictureSearch(TestSas):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.url = reverse("api:pictures")
+
     def test_anonymous_user_forbidden(self):
-        res = self.client.get(reverse("api:pictures"))
+        res = self.client.get(self.url)
         assert res.status_code == 403
 
     def test_filter_by_album(self):
         self.client.force_login(self.user_b)
-        res = self.client.get(reverse("api:pictures") + f"?album_id={self.album_a.id}")
+        res = self.client.get(self.url + f"?album_id={self.album_a.id}")
         assert res.status_code == 200
         expected = list(self.album_a.children_pictures.values_list("id", flat=True))
         assert [i["id"] for i in res.json()["results"]] == expected
 
     def test_filter_by_user(self):
         self.client.force_login(self.user_b)
-        res = self.client.get(
-            reverse("api:pictures") + f"?users_identified={self.user_a.id}"
-        )
+        res = self.client.get(self.url + f"?users_identified={self.user_a.id}")
         assert res.status_code == 200
         expected = list(
             self.user_a.pictures.order_by(
@@ -63,7 +65,7 @@ class TestPictureSearch(TestSas):
     def test_filter_by_multiple_user(self):
         self.client.force_login(self.user_b)
         res = self.client.get(
-            reverse("api:pictures")
+            self.url
             + f"?users_identified={self.user_a.id}&users_identified={self.user_b.id}"
         )
         assert res.status_code == 200
@@ -78,9 +80,7 @@ class TestPictureSearch(TestSas):
         """Test that a user that never subscribed can only its own pictures."""
         self.user_a.subscriptions.all().delete()
         self.client.force_login(self.user_a)
-        res = self.client.get(
-            reverse("api:pictures") + f"?users_identified={self.user_a.id}"
-        )
+        res = self.client.get(f"{self.url}?users_identified={self.user_a.id}")
         assert res.status_code == 200
         expected = list(
             self.user_a.pictures.order_by(
@@ -92,7 +92,7 @@ class TestPictureSearch(TestSas):
         # trying to access the pictures of someone else mixed with owned pictures
         # should return only owned pictures
         res = self.client.get(
-            reverse("api:pictures")
+            self.url
             + f"?users_identified={self.user_a.id}&users_identified={self.user_b.id}"
         )
         assert res.status_code == 200
@@ -100,15 +100,13 @@ class TestPictureSearch(TestSas):
 
         # trying to fetch everything should be the same
         # as fetching its own pictures for a non-subscriber
-        res = self.client.get(reverse("api:pictures"))
+        res = self.client.get(self.url)
         assert res.status_code == 200
         assert [i["id"] for i in res.json()["results"]] == expected
 
         # trying to access the pictures of someone else should return only
         # the ones where the non-subscribed user is identified too
-        res = self.client.get(
-            reverse("api:pictures") + f"?users_identified={self.user_b.id}"
-        )
+        res = self.client.get(f"{self.url}?users_identified={self.user_b.id}")
         assert res.status_code == 200
         expected = list(
             self.user_b.pictures.intersection(self.user_a.pictures.all())
@@ -116,6 +114,16 @@ class TestPictureSearch(TestSas):
             .values_list("picture_id", flat=True)
         )
         assert [i["id"] for i in res.json()["results"]] == expected
+
+    def test_num_queries(self):
+        """Test that the number of queries is stable."""
+        self.client.force_login(subscriber_user.make())
+        with assertNumQueries(5):
+            # 1 request to fetch the user from the db
+            # 2 requests to check the user permissions
+            # 1 request to fetch the pictures
+            # 1 request to count the total number of items in the pagination
+            self.client.get(self.url)
 
 
 class TestPictureRelation(TestSas):
