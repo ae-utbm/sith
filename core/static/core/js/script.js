@@ -69,17 +69,35 @@ function getCSRFToken() {
 
 const initialUrlParams = new URLSearchParams(window.location.search);
 
-function update_query_string(key, value) {
+/**
+ * @readonly
+ * @enum {number}
+ */
+const History = {
+    PUSH: 1,
+    REPLACE: 2,
+};
+
+/**
+ * @param {string} key
+ * @param {string | string[] | null} value
+ * @param {History} action
+ */
+function update_query_string(key, value, action = History.REPLACE) {
     const url = new URL(window.location.href);
     if (!value) {
         // If the value is null, undefined or empty => delete it
         url.searchParams.delete(key)
     } else if (Array.isArray(value)) {
-
         url.searchParams.delete(key)
         value.forEach((v) => url.searchParams.append(key, v))
     } else {
         url.searchParams.set(key, value);
     }
-    history.pushState(null, document.title, url.toString());
+
+    if (action === History.PUSH) {
+        history.pushState(null, document.title, url.toString());
+    } else if (action === History.REPLACE) {
+        history.replaceState(null, document.title, url.toString());
+    }
 }
