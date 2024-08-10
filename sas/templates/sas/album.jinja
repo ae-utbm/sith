@@ -129,7 +129,7 @@
       Alpine.data("pictures", () => ({
         pictures: {},
         page: parseInt(initialUrlParams.get("page")) || 1,
-        pushstate: true, /* Used to avoid pushing a state on a back action */
+        pushstate: History.PUSH, /* Used to avoid pushing a state on a back action */
         loading: false,
 
         async init() {
@@ -139,12 +139,12 @@
               this.page === 1 ? null : this.page,
               this.pushstate
             );
-            this.pushstate = true;
+            this.pushstate = History.PUSH;
             this.fetch_pictures();
           });
 
           window.addEventListener("popstate", () => {
-            this.pushstate = false;
+            this.pushstate = History.REPLACE;
             this.page = parseInt(
               new URLSearchParams(window.location.search).get("page")
             ) || 1;
