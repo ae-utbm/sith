@@ -10,9 +10,11 @@
   <h4>{% trans %}Users{% endtrans %}</h4>
   <ul>
     {% for i in result.users %}
-      <li>
-        {{ user_link_with_pict(i) }}
-      </li>
+      {% if user.can_view(i) %}
+        <li>
+          {{ user_link_with_pict(i) }}
+        </li>
+      {% endif %}
     {% endfor %}
   </ul>
   <h4>{% trans %}Clubs{% endtrans %}</h4>
