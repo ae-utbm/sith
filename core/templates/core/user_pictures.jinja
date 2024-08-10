@@ -10,6 +10,7 @@
     window.showSaveFilePicker = showSaveFilePicker; /* Export function to normal javascript */
   </script>
   <script defer type="text/javascript" src="{{ static('core/js/zipjs/zip-fs-full.min.js') }}"></script>
+  <script defer type="text/javascript" src="{{ static('core/js/alpine/intersect.min.js') }}"></script>
 {% endblock %}
 
 {% block title %}
@@ -17,48 +18,50 @@
 {% endblock %}
 
 {% block content %}
-  <main x-data="user_pictures" :aria-busy="loading">
+  <main x-data="user_pictures">
     {% if user.id == object.id %}
       <div x-show="pictures.length > 0" x-cloak>
         <button
-          :disabled="in_progress"
+          :disabled="is_downloading"
           class="btn btn-blue"
           @click="download_zip()"
         >
           <i class="fa fa-download"></i>
           {% trans %}Download all my pictures{% endtrans %}
         </button>
-        <progress x-ref="progress" x-show="in_progress"></progress>
+        <progress x-ref="progress" x-show="is_downloading"></progress>
       </div>
     {% endif %}
 
-    <template x-for="title in [...Object.keys(albums)]">
-      <section>
-        <h4 x-text="title"></h4>
-        <br />
-        <div class="photos">
-          <template x-for="picture in albums[title]">
-            <a :href="`/sas/picture/${picture.id}#pict`">
-              <div
-                class="photo"
-                :class="{not_moderated: !picture.is_moderated}"
-                :style="`background-image: url(${picture.thumb_url})`"
-              >
-                <template x-if="!picture.is_moderated">
-                  <div class="overlay">&nbsp;</div>
-                  <div class="text">{% trans %}To be moderated{% endtrans %}</div>
-                </template>
-                <template x-if="picture.is_moderated">
-                  <div class="text">&nbsp;</div>
-                </template>
+    <template x-for="[album, pictures] in Object.entries(albums)">
+      <section x-data="{ shown: false }" x-intersect:enter="shown = true">
+        <hgroup x-show="shown" x-transition x-cloak>
+          <br />
+          <h4 x-text="album"></h4>
+          <div class="photos">
+            <template x-for="picture in pictures">
+              <a :href="`/sas/picture/${picture.id}#pict`">
+                <div
+                  class="photo"
+                  :class="{not_moderated: !picture.is_moderated}"
+                  :style="`background-image: url(${picture.thumb_url})`"
+                >
+                  <template x-if="!picture.is_moderated">
+                    <div class="overlay">&nbsp;</div>
+                    <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+                  </template>
+                  <template x-if="picture.is_moderated">
+                    <div class="text">&nbsp;</div>
+                  </template>
+                </div>
               </div>
-
-            </div>
-          </a>
-        </template>
+            </a>
+          </template>
+        </hgroup>
       </div>
     </section>
   </template>
+  <div class="photos" :aria-busy="loading"></div>
   </main>
 {% endblock content %}
 
@@ -81,7 +84,7 @@
 
     document.addEventListener("alpine:init", () => {
       Alpine.data("user_pictures", () => ({
-        in_progress: false,
+        is_downloading: false,
         loading: true,
         pictures: [],
         albums: {},
@@ -121,7 +124,7 @@
 
 
         async download_zip(){
-          this.in_progress = true;
+          this.is_downloading = true;
           const bar = this.$refs.progress;
           bar.value = 0;
           bar.max = this.pictures.length;
@@ -144,7 +147,7 @@
           }));
 
           await zipWriter.close();
-          this.in_progress = false;
+          this.is_downloading = false;
         }
       }))
     });
