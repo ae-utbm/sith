@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import paginate_alpine %}
 
 {% block title %}
   {% trans %}UV Guide{% endtrans %}
@@ -113,29 +114,7 @@
         </template>
       </tbody>
     </table>
-    <nav class="pagination" x-show="max_page() > 1">
-      <button
-        @click="page--"
-        :disabled="page <= 1"
-        @keyup.right.window="page = Math.min(max_page(), page + 1)"
-      >
-        <i class="fa fa-caret-left"></i>
-      </button>
-      <template x-for="i in max_page()">
-        <button
-          x-text="i"
-          @click="page = i"
-          :class="(page === i) && 'active'"
-        ></button>
-      </template>
-      <button
-        @click="page++"
-        :disabled="page >= max_page()"
-        @keyup.left.window="page = Math.max(1, page - 1)"
-      >
-        <i class="fa fa-caret-right"></i>
-      </button>
-    </nav>
+    {{ paginate_alpine("page", "max_page()") }}
   </div>
   <script>
     {#
