@@ -114,13 +114,25 @@
       </tbody>
     </table>
     <nav class="pagination" x-show="max_page() > 1">
-      <button @click="page--" :disabled="page <= 1">
+      <button
+        @click="page--"
+        :disabled="page <= 1"
+        @keyup.right.window="page = Math.min(max_page(), page + 1)"
+      >
         <i class="fa fa-caret-left"></i>
       </button>
       <template x-for="i in max_page()">
-        <button x-text="i" @click="page = i" :class="(page === i) && 'active'"></button>
+        <button
+          x-text="i"
+          @click="page = i"
+          :class="(page === i) && 'active'"
+        ></button>
       </template>
-      <button @click="page++" :disabled="page >= max_page()">
+      <button
+        @click="page++"
+        :disabled="page >= max_page()"
+        @keyup.left.window="page = Math.max(1, page - 1)"
+      >
         <i class="fa fa-caret-right"></i>
       </button>
     </nav>
@@ -141,34 +153,63 @@
       Alpine.data("uv_search", () => ({
         uvs: [],
         loading: false,
-        page: parseInt(initialUrlParams.get("page")) || page_default,
-        page_size: parseInt(initialUrlParams.get("page_size")) || page_size_default,
-        search: initialUrlParams.get("search") || "",
-        department: initialUrlParams.getAll("department"),
-        credit_type: initialUrlParams.getAll("credit_type"),
-            {# The semester is easier to use on the backend as an enum (spring/autumn/both/none)
-            and easier to use on the frontend as an array ([spring, autumn]).
-            Thus there is some conversion involved when both communicate together #}
-        semester: initialUrlParams.has("semester") ?
-        initialUrlParams.get("semester").split("_AND_") : [],
+        page: page_default,
+        page_size: page_size_default,
+        search: "",
+        department: [],
+        credit_type: [],
+        semester: [],
+        pushstate: History.PUSH,
+
+        async initialize_args() {
+          let url = new URLSearchParams(window.location.search);
+          this.pushstate = History.REPLACE;
+
+          this.page = parseInt(url.get("page")) || page_default;;
+          this.page_size = parseInt(url.get("page_size")) || page_size_default;
+          this.search = url.get("search") || "";
+          this.department = url.getAll("department");
+          this.credit_type = url.getAll("credit_type");
+              {# The semester is easier to use on the backend as an enum (spring/autumn/both/none)
+              and easier to use on the frontend as an array ([spring, autumn]).
+              Thus there is some conversion involved when both communicate together #}
+          this.semester = url.has("semester") ?
+          url.get("semester").split("_AND_") : [];
+
+          {# Wait for all watch callbacks to be called #}
+          await (new Promise(resolve => setTimeout(resolve, 100)));
+
+          this.pushstate = History.PUSH;
+        },
 
         async init() {
+          await this.initialize_args();
           let search_params = ["search", "department", "credit_type", "semester"];
-          let pagination_params = ["semester", "page"];
+          let pagination_params = ["page", "page_size"];
+
+          this.fetch_data();  {# load initial data #}
+
           search_params.forEach((param) => {
-            this.$watch(param, async () => {
-                        {# Reset pagination on search #}
+            this.$watch(param, async (value) => {
+              if (this.pushstate != History.PUSH){
+                {# This means that we are doing a mass param edit #}
+                return;
+              }
+              {# Reset pagination on search #}
               this.page = page_default;
               this.page_size = page_size_default;
             });
           });
           search_params.concat(pagination_params).forEach((param) => {
             this.$watch(param, async (value) => {
-              update_query_string(param, value);
+              console.log(param + " " + value)
+              update_query_string(param, value, this.pushstate);
               await this.fetch_data();  {# reload data on form change #}
             });
           });
-          await this.fetch_data();  {# load initial data #}
+          window.addEventListener("popstate", () => {
+            this.initialize_args();
+          });
         },
 
         async fetch_data() {
