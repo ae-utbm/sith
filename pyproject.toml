@@ -21,7 +21,7 @@ license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-Django = "^4.2.14"
+Django = "^5.1"
 django-ninja = "^1.2.2"
 django-ninja-extra = "^0.21.2"
 Pillow = "^10.4.0"
