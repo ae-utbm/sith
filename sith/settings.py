@@ -270,7 +270,7 @@ STATIC_ROOT = BASE_DIR / "static"
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "core.scss.finder.ScssFinder",
+    "sith.finders.ScssFinder",
 ]
 
 # Auth configuration
@@ -704,7 +704,6 @@ if DEBUG:
         "debug_toolbar.panels.signals.SignalsPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
-    SASS_INCLUDE_FOLDERS = ["core/static/"]
     SENTRY_ENV = "development"
 
 if TESTING:
