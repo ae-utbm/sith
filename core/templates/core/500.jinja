@@ -2,8 +2,7 @@
 {% block head %}
   {{ super() }}
   <script
-    src="https://browser.sentry-cdn.com/7.11.1/bundle.min.js"
-    integrity="sha384-qcYSo5+/E8hEkPmHFa79GRDsGT84SRhBJHRw3+dbQyh0UwueiFP1jCsRBClEREcs"
+    src="{{ static('vendored/sentry/bundle.min.js') }}"
     crossorigin="anonymous"
   ></script>
 {% endblock head %}
