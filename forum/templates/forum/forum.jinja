@@ -5,6 +5,10 @@
   {{ forum }}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ scss('forum/css/forum.scss') }}">
+{% endblock %}
+
 {% block content %}
   {{ display_breadcrumb(forum) }}
   <div id="forum">

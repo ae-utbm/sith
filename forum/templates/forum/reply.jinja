@@ -9,6 +9,11 @@
   {% endif %}
 {% endblock %}
 
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ scss('forum/css/forum.scss') }}">
+{% endblock %}
+
 {% block content %}
   {% if topic %}
     {{ display_search_bar(request) }}

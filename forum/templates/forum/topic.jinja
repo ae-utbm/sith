@@ -6,6 +6,11 @@
   {{ topic }}
 {% endblock %}
 
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ scss('forum/css/forum.scss') }}">
+{% endblock %}
+
 {% block head %}
   {{ super() }}
   <style type="text/css" media="all">
