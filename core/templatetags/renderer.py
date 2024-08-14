@@ -107,4 +107,4 @@ def scss(path):
         if storage.exists(css_path):
             storage.delete(css_path)
         storage.save(css_path, ContentFile(content))
-    return static(css_path)
+    return static(str(css_path))

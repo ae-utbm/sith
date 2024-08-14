@@ -273,6 +273,15 @@ STATICFILES_FINDERS = [
     "sith.finders.ScssFinder",
 ]
 
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "sith.storage.SithStorage",
+    },
+}
+
 # Auth configuration
 AUTH_USER_MODEL = "core.User"
 AUTH_ANONYMOUS_MODEL = "core.models.AnonymousUser"
@@ -716,7 +725,7 @@ if TESTING:
             "BACKEND": "django.core.files.storage.InMemoryStorage",
         },
         "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            "BACKEND": "sith.storage.SithStorage",
         },
     }
 
