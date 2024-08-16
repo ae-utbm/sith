@@ -156,6 +156,38 @@
   </nav>
 {% endmacro %}
 
+{% macro paginate_jinja(page, nb_pages) %}
+  <nav class="pagination">
+    {% if page <= 1 %}
+      <button disabled="disabled"><i class="fa fa-caret-left"></i></button>
+    {% else %}
+      <a href="?href={{ page - 1 }}">
+        <button>
+          <i class="fa fa-caret-left"></i>
+        </button>
+      </a>
+    {% endif %}
+    {% for i in range(1, nb_pages + 1) %}
+      {% if i == page %}
+        <button class="active">{{ i }}</button>
+      {% else %}
+        <a href="?page={{ i }}">
+          <button>{{ i }}</button>
+        </a>
+      {% endif %}
+    {% endfor %}
+    {% if page >= nb_pages %}
+      <button disabled="disabled"><i class="fa fa-caret-right"></i></button>
+    {% else %}
+      <a href="?href={{ page - 1 }}">
+        <button>
+          <i class="fa fa-caret-right"></i>
+        </button>
+      </a>
+    {% endif %}
+  </nav>
+{% endmacro %}
+
 {% macro paginate(page_obj, paginator, js_action) %}
   {% set js = js_action|default('') %}
   {% if page_obj.has_previous() or page_obj.has_next() %}

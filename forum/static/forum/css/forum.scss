@@ -6,21 +6,26 @@
     padding: 10px;
     font-weight: bold;
     border-radius: 5px;
+
     &:hover {
       background-color: rgb(211, 211, 211);
     }
   }
+
   .topic {
     border: solid $primary-neutral-color 1px;
     padding: 1px;
     margin: 1px;
+
     p {
       margin: 1px;
       font-size: smaller;
     }
+
     a {
       color: $black-color;
     }
+
     a:hover {
       text-decoration: underline;
     }
@@ -30,6 +35,7 @@
     font-size: x-small;
     border: none;
     font-weight: bold;
+
     a {
       padding: 1px;
     }
@@ -39,10 +45,6 @@
     font-size: small;
     font-weight: bold;
     padding: 2px;
-  }
-
-  .last_message date {
-    white-space: nowrap;
   }
 
   .last_message span {
@@ -57,31 +59,36 @@
     background: $primary-neutral-light-color;
     padding: 1px;
     margin: 1px;
+
     p {
       margin: 1px;
       font-size: smaller;
     }
+
     a {
       color: $black-color;
     }
     a:hover {
       text-decoration: underline;
     }
+
   }
 
   .search_bar {
     margin: 10px 0;
     display: flex;
     flex-wrap: wrap;
-    height: 20px;
     align-items: center;
   }
+
   .search_check {
     margin-left: 10px;
   }
+
   .search_bouton {
     margin-left: 10px;
   }
+
   .category {
     margin-top: 5px;
     background: $secondary-color;
@@ -93,66 +100,67 @@
   }
 
   .message {
-    padding: 1px;
-    margin: 1px;
+    padding: 15px;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     background: $secondary-neutral-light-color;
+    border-radius: 5px;
+    border: 1px darken($secondary-neutral-light-color, 10%) solid;
+
     &:nth-child(odd) {
       background: $primary-neutral-light-color;
     }
-    .title {
-      font-size: 100%;
+
+    .message-header {
+      display: flex;
+      gap: 20px;
+      border-bottom: 0.0625rem grey dotted;
+      padding-bottom: 10px;
+
+      img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+      }
+
+      .message-metadata {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .message-options {
+        flex: 2;
+        display: flex;
+        justify-content: right;
+        gap: 15px;
+      }
     }
+
+    .message-content {
+      padding: 0 20px;
+
+      &.delete > * {
+        margin-top: 0;
+      }
+
+      .markdown blockquote h5 {
+        padding-top: 0;
+        margin-top: 0;
+      }
+    }
+
+    .forum-signature {
+      margin: 0;
+      font-size: small;
+      font-style: italic;
+      border-top: 0.0625rem grey dotted;
+    }
+
     &.unread {
       background: #e9eea1;
-    }
-  }
-
-  .msg_author.deleted {
-    background: #ffcfcf;
-  }
-
-  .msg_content {
-    &.deleted {
-      background: #ffefef;
-    }
-    display: inline-block;
-    width: 80%;
-    vertical-align: top;
-  }
-
-  .msg_author {
-    display: inline-block;
-    width: 19%;
-    text-align: center;
-    img {
-      max-width: 70%;
-      margin: 0 auto;
-    }
-  }
-
-  .msg_header {
-    display: inline-block;
-    width: 100%;
-    font-size: small;
-  }
-
-  .msg_meta {
-    font-size: small;
-    list-style-type: none;
-    li {
-      padding: 1px;
-      margin: 1px;
-    }
-  }
-
-  .forum_signature {
-    color: hsl(0, 0%, 75%);
-    border-top: 1px solid hsl(0, 0%, 75%);
-    a {
-      color: hsl(0, 0%, 75%);
-      &:hover {
-        text-decoration: underline;
-      }
     }
   }
 }

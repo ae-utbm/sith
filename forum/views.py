@@ -306,14 +306,15 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
     queryset = ForumTopic.objects.select_related("forum__parent")
 
     def get_context_data(self, **kwargs):
+        topic: ForumTopic = self.object
         kwargs = super().get_context_data(**kwargs)
-        msg = self.object.get_first_unread_message(self.request.user)
+        msg = topic.get_first_unread_message(self.request.user)
         if msg is None:
             kwargs["first_unread_message_id"] = math.inf
         else:
             kwargs["first_unread_message_id"] = msg.id
         paginator = Paginator(
-            self.object.messages.select_related("author__avatar_pict")
+            topic.messages.select_related("author__avatar_pict", "topic__forum")
             .prefetch_related("topic__forum__edit_groups", "readers")
             .order_by("date"),
             settings.SITH_FORUM_PAGE_LENGTH,

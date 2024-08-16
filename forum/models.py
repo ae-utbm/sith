@@ -170,7 +170,7 @@ class Forum(models.Model):
     def is_owned_by(self, user):
         if user.is_anonymous:
             return False
-        if user.is_in_group(pk=settings.SITH_GROUP_FORUM_ADMIN_ID):
+        if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_FORUM_ADMIN_ID):
             return True
         try:
             m = Forum._club_memberships[self.id][user.id]
@@ -273,10 +273,10 @@ class ForumTopic(models.Model):
         return self.forum.is_owned_by(user)
 
     def can_be_edited_by(self, user):
-        return user.can_edit(self.forum)
+        return user.is_root or user.can_edit(self.forum)
 
     def can_be_viewed_by(self, user):
-        return user.can_view(self.forum)
+        return user.is_root or user.can_view(self.forum)
 
     def get_first_unread_message(self, user: User) -> ForumMessage | None:
         if not hasattr(user, "forum_infos"):
@@ -355,7 +355,7 @@ class ForumMessage(models.Model):
         return not self._deleted
 
     def can_be_moderated_by(self, user):
-        return self.topic.forum.is_owned_by(user) or user.id == self.author.id
+        return self.topic.forum.is_owned_by(user) or user.id == self.author_id
 
     def get_url(self):
         return (
