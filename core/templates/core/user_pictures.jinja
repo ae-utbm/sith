@@ -10,7 +10,6 @@
     window.showSaveFilePicker = showSaveFilePicker; /* Export function to normal javascript */
   </script>
   <script defer type="text/javascript" src="{{ static('core/js/zipjs/zip-fs-full.min.js') }}"></script>
-  <script defer type="text/javascript" src="{{ static('core/js/alpine/intersect.min.js') }}"></script>
 {% endblock %}
 
 {% block title %}
@@ -33,31 +32,29 @@
       </div>
     {% endif %}
 
-    <template x-for="[album, pictures] in Object.entries(albums)">
-      <section x-data="{ shown: false }" x-intersect:enter="shown = true">
-        <hgroup x-show="shown" x-transition x-cloak>
-          <br />
-          <h4 x-text="album"></h4>
-          <div class="photos">
-            <template x-for="picture in pictures">
-              <a :href="`/sas/picture/${picture.id}#pict`">
-                <div
-                  class="photo"
-                  :class="{not_moderated: !picture.is_moderated}"
-                  :style="`background-image: url(${picture.thumb_url})`"
-                >
-                  <template x-if="!picture.is_moderated">
-                    <div class="overlay">&nbsp;</div>
-                    <div class="text">{% trans %}To be moderated{% endtrans %}</div>
-                  </template>
-                  <template x-if="picture.is_moderated">
-                    <div class="text">&nbsp;</div>
-                  </template>
-                </div>
-              </a>
-            </template>
-          </div>
-        </hgroup>
+    <template x-for="[album, pictures] in Object.entries(albums)" x-cloak>
+      <section>
+        <br />
+        <h4 x-text="album"></h4>
+        <div class="photos">
+          <template x-for="picture in pictures">
+            <a :href="`/sas/picture/${picture.id}#pict`">
+              <div
+                class="photo"
+                :class="{not_moderated: !picture.is_moderated}"
+                :style="`background-image: url(${picture.thumb_url})`"
+              >
+                <template x-if="!picture.is_moderated">
+                  <div class="overlay">&nbsp;</div>
+                  <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+                </template>
+                <template x-if="picture.is_moderated">
+                  <div class="text">&nbsp;</div>
+                </template>
+              </div>
+            </a>
+          </template>
+        </div>
       </section>
     </template>
     <div class="photos" :aria-busy="loading"></div>
