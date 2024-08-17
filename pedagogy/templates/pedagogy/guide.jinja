@@ -128,27 +128,6 @@
     #}
     const page_default = 1;
     const page_size_default = 100;
-    function debouncePromise (fn, ms = 0) {
-      let timeoutId;
-      const pending = [];
-      return (...args) =>
-      new Promise((res, rej) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          const currentPending = [...pending];
-          pending.length = 0;
-          Promise.resolve(fn.apply(this, args)).then(
-            data => {
-              currentPending.forEach(({ resolve }) => resolve(data));
-            },
-            error => {
-              currentPending.forEach(({ reject }) => reject(error));
-            }
-          );
-        }, ms);
-        pending.push({ resolve: res, reject: rej });
-      });
-    };
     document.addEventListener("alpine:init", () => {
       Alpine.data("uv_search", () => ({
         uvs: [],
@@ -179,12 +158,11 @@
           this.semester = url.has("semester") ?
           url.get("semester").split("_AND_") : [];
 
-          await this.update()
-          this.pushstate = History.PUSH;
+          this.update()
         },
 
         async init() {
-          this.update = debouncePromise(async () => {
+          this.update = Alpine.debounce(async () => {
             await Promise.all(this.to_change).then(async (data) => {
               {# Create the whole url before changing everything all at once #}
               let first = data.shift();
@@ -195,6 +173,7 @@
               update_query_string(first[0], first[1], this.pushstate, url);
               await this.fetch_data();  {# reload data on form change #}
               this.to_change = [];
+              this.pushstate = History.PUSH;
             })
           }, 50);
 
