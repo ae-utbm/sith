@@ -163,18 +163,16 @@
 
         async init() {
           this.update = Alpine.debounce(async () => {
-            await Promise.all(this.to_change).then(async (data) => {
-              {# Create the whole url before changing everything all at once #}
-              let first = data.shift();
-              let url = update_query_string(first[0], first[1], History.NONE);
-              data.forEach((data) => {
-                url = update_query_string(data[0], data[1], History.NONE, url);
-              })
-              update_query_string(first[0], first[1], this.pushstate, url);
-              await this.fetch_data();  {# reload data on form change #}
-              this.to_change = [];
-              this.pushstate = History.PUSH;
+            {# Create the whole url before changing everything all at once #}
+            let first = this.to_change.shift();
+            let url = update_query_string(first.param, first.value, History.NONE);
+            this.to_change.forEach((value) => {
+              url = update_query_string(value.param, value.value, History.NONE, url);
             })
+            update_query_string(first.param, first.value, this.pushstate, url);
+            await this.fetch_data();  {# reload data on form change #}
+            this.to_change = [];
+            this.pushstate = History.PUSH;
           }, 50);
 
           let search_params = ["search", "department", "credit_type", "semester"];
@@ -193,10 +191,7 @@
           });
           search_params.concat(pagination_params).forEach((param) => {
             this.$watch(param, async (value) => {
-              this.to_change.push(new Promise((resolve) => {
-                resolve([param, value]);
-              })
-              );
+              this.to_change.push({ param: param, value: value })
               this.update();
             });
           });
