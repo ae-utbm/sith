@@ -128,6 +128,27 @@
     #}
     const page_default = 1;
     const page_size_default = 100;
+    function debouncePromise (fn, ms = 0) {
+      let timeoutId;
+      const pending = [];
+      return (...args) =>
+      new Promise((res, rej) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          const currentPending = [...pending];
+          pending.length = 0;
+          Promise.resolve(fn.apply(this, args)).then(
+            data => {
+              currentPending.forEach(({ resolve }) => resolve(data));
+            },
+            error => {
+              currentPending.forEach(({ reject }) => reject(error));
+            }
+          );
+        }, ms);
+        pending.push({ resolve: res, reject: rej });
+      });
+    };
     document.addEventListener("alpine:init", () => {
       Alpine.data("uv_search", () => ({
         uvs: [],
@@ -138,7 +159,10 @@
         department: [],
         credit_type: [],
         semester: [],
+        to_change: [],
         pushstate: History.PUSH,
+
+        update: undefined,
 
         async initialize_args() {
           let url = new URLSearchParams(window.location.search);
@@ -155,18 +179,27 @@
           this.semester = url.has("semester") ?
           url.get("semester").split("_AND_") : [];
 
-          {# Wait for all watch callbacks to be called #}
-          await (new Promise(resolve => setTimeout(resolve, 100)));
-
+          await this.update()
           this.pushstate = History.PUSH;
         },
 
         async init() {
-          await this.initialize_args();
+          this.update = debouncePromise(async () => {
+            await Promise.all(this.to_change).then(async (data) => {
+              {# Create the whole url before changing everything all at once #}
+              let first = data.shift();
+              let url = update_query_string(first[0], first[1], History.NONE);
+              data.forEach((data) => {
+                url = update_query_string(data[0], data[1], History.NONE, url);
+              })
+              update_query_string(first[0], first[1], this.pushstate, url);
+              await this.fetch_data();  {# reload data on form change #}
+              this.to_change = [];
+            })
+          }, 50);
+
           let search_params = ["search", "department", "credit_type", "semester"];
           let pagination_params = ["page", "page_size"];
-
-          this.fetch_data();  {# load initial data #}
 
           search_params.forEach((param) => {
             this.$watch(param, async (value) => {
@@ -181,15 +214,19 @@
           });
           search_params.concat(pagination_params).forEach((param) => {
             this.$watch(param, async (value) => {
-              console.log(param + " " + value)
-              update_query_string(param, value, this.pushstate);
-              await this.fetch_data();  {# reload data on form change #}
+              this.to_change.push(new Promise((resolve) => {
+                resolve([param, value]);
+              })
+              );
+              this.update();
             });
           });
-          window.addEventListener("popstate", () => {
-            this.initialize_args();
+          window.addEventListener("popstate", async (event) => {
+            await this.initialize_args();
           });
+          await this.initialize_args();
         },
+
 
         async fetch_data() {
           this.loading = true;
