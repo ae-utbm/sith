@@ -17,58 +17,54 @@
 {% endblock %}
 
 {% block content %}
-  <main>
-    {% if user.id == object.id and albums|length > 0 %}
-      <div x-data="picture_download" x-cloak>
+  <main x-data="user_pictures">
+    {% if user.id == object.id %}
+      <div x-show="pictures.length > 0" x-cloak>
         <button
-          :disabled="in_progress"
+          :disabled="is_downloading"
           class="btn btn-blue"
           @click="download_zip()"
         >
           <i class="fa fa-download"></i>
           {% trans %}Download all my pictures{% endtrans %}
         </button>
-        <progress x-ref="progress" x-show="in_progress"></progress>
+        <progress x-ref="progress" x-show="is_downloading"></progress>
       </div>
     {% endif %}
-    {% for album, pictures in albums|items %}
-      <h4>{{ album }}</h4>
-      <br />
-      <div class="photos">
-        {% for picture in pictures %}
-          {% if picture.can_be_viewed_by(user) %}
-            <a href="{{ url("sas:picture", picture_id=picture.id) }}#pict">
+
+    <template x-for="[album, pictures] in Object.entries(albums)" x-cloak>
+      <section>
+        <br />
+        <h4 x-text="album"></h4>
+        <div class="photos">
+          <template x-for="picture in pictures">
+            <a :href="`/sas/picture/${picture.id}#pict`">
               <div
-                class="photo{% if not picture.is_moderated %} not_moderated{% endif %}"
-                style="background-image: url('{% if picture.file %}{{ picture.get_download_thumb_url() }}{% else %}{{ static('core/img/sas.jpg') }}{% endif %}');"
+                class="photo"
+                :class="{not_moderated: !picture.is_moderated}"
+                :style="`background-image: url(${picture.thumb_url})`"
               >
-                {% if not picture.is_moderated %}
+                <template x-if="!picture.is_moderated">
                   <div class="overlay">&nbsp;</div>
                   <div class="text">{% trans %}To be moderated{% endtrans %}</div>
-                {% else %}
+                </template>
+                <template x-if="picture.is_moderated">
                   <div class="text">&nbsp;</div>
-                {% endif %}
+                </template>
               </div>
             </a>
-          {% else %}
-            <div>
-              <div class="photo">
-                <div class="text">{% trans %}Picture Unavailable{% endtrans %}</div>
-              </div>
-            </div>
-          {% endif %}
-        {% endfor %}
-      </div>
-      <br>
-    {% endfor %}
+          </template>
+        </div>
+      </section>
+    </template>
+    <div class="photos" :aria-busy="loading"></div>
   </main>
 {% endblock content %}
 
 {% block script %}
 
   {{ super() }}
-  {% if user.id == object.id %}
-    <script>
+  <script>
     /**
      * @typedef Picture
      * @property {number} id
@@ -82,62 +78,74 @@
      * @property {string} album
      */
 
-      document.addEventListener("alpine:init", () => {
-        Alpine.data("picture_download", () => ({
-          in_progress: false,
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("user_pictures", () => ({
+        is_downloading: false,
+        loading: true,
+        pictures: [],
+        albums: {},
 
-          /**
-           * @return {Promise<Picture[]>}
-           */
-          async get_pictures() {
-            {# The API forbids to get more than 199 items at once
-             from paginated routes.
-             In order to download all the user pictures, it may be needed
-             to performs multiple requests #}
-            const max_per_page = 199;
-            const url = "{{ url("api:pictures") }}"
-            + "?users_identified={{ object.id }}"
-            + `&page_size=${max_per_page}`;
-            let promises = [];
-            const nb_pages = Math.ceil({{ nb_pictures }} / max_per_page);
-            for (let i = 1; i <= nb_pages; i++) {
-              promises.push(
-                fetch(url + `&page=${i}`).then(res => res.json().then(json => json.results))
-              );
-            }
-            return (await Promise.all(promises)).flat()
-          },
+        async init() {
+          this.pictures = await this.get_pictures();
+          this.albums = Object.groupBy(this.pictures, ({album}) => album);
+          this.loading = false;
+        },
 
+        /**
+         * @return {Promise<Picture[]>}
+         */
+        async get_pictures() {
+          {# The API forbids to get more than 199 items at once
+           from paginated routes.
+           In order to download all the user pictures, it may be needed
+           to performs multiple requests #}
+          const max_per_page = 199;
+          const url = "{{ url("api:pictures") }}"
+          + "?users_identified={{ object.id }}"
+          + `&page_size=${max_per_page}`;
 
-          async download_zip(){
-            this.in_progress = true;
-            const bar = this.$refs.progress;
-            bar.value = 0;
-            const pictures = await this.get_pictures();
-            bar.max = pictures.length;
+          let first_page = (await ( await fetch(url)).json());
+          let promises = [first_page.results];
 
-            const fileHandle = await window.showSaveFilePicker({
-              _preferPolyfill: false,
-              suggestedName: "{%- trans -%} pictures {%- endtrans -%}.zip",
-              types: {},
-              excludeAcceptAllOption: false,
-            })
-            const zipWriter = new zip.ZipWriter(await fileHandle.createWritable());
+          const nb_pictures = first_page.count
+          const nb_pages = Math.ceil(nb_pictures / max_per_page);
 
-            await Promise.all(pictures.map(p => {
-              const img_name = p.album + "/IMG_" + p.date.replaceAll(/[:\-]/g, "_") + p.name.slice(p.name.lastIndexOf("."));
-              return zipWriter.add(
-                img_name,
-                new zip.HttpReader(p.full_size_url),
-                {level: 9, lastModDate: new Date(p.date), onstart: () => bar.value += 1}
-              );
-            }));
-
-            await zipWriter.close();
-            this.in_progress = false;
+          for (let i = 2; i <= nb_pages; i++) {
+            promises.push(
+              fetch(url + `&page=${i}`).then(res => res.json().then(json => json.results))
+            );
           }
-        }))
-      });
-    </script>
-  {% endif %}
+          return (await Promise.all(promises)).flat()
+        },
+
+
+        async download_zip(){
+          this.is_downloading = true;
+          const bar = this.$refs.progress;
+          bar.value = 0;
+          bar.max = this.pictures.length;
+
+          const fileHandle = await window.showSaveFilePicker({
+            _preferPolyfill: false,
+            suggestedName: "{%- trans -%} pictures {%- endtrans -%}.zip",
+            types: {},
+            excludeAcceptAllOption: false,
+          })
+          const zipWriter = new zip.ZipWriter(await fileHandle.createWritable());
+
+          await Promise.all(this.pictures.map(p => {
+            const img_name = p.album + "/IMG_" + p.date.replaceAll(/[:\-]/g, "_") + p.name.slice(p.name.lastIndexOf("."));
+            return zipWriter.add(
+              img_name,
+              new zip.HttpReader(p.full_size_url),
+              {level: 9, lastModDate: new Date(p.date), onstart: () => bar.value += 1}
+            );
+          }));
+
+          await zipWriter.close();
+          this.is_downloading = false;
+        }
+      }))
+    });
+  </script>
 {% endblock script %}

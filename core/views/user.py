@@ -21,7 +21,6 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-import itertools
 import logging
 
 # This file contains all the views that concern the user model
@@ -33,7 +32,6 @@ from django.contrib.auth import login, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import F
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponse
@@ -70,7 +68,6 @@ from core.views.forms import (
     UserProfileForm,
 )
 from counter.forms import StudentCardForm
-from sas.models import Picture
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
@@ -311,20 +308,6 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_pictures.jinja"
     current_tab = "pictures"
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        pictures = list(
-            Picture.objects.filter(people__user_id=self.object.id)
-            .order_by("-parent__date", "-date")
-            .annotate(album=F("parent__name"))
-        )
-        kwargs["nb_pictures"] = len(pictures)
-        kwargs["albums"] = {
-            album: list(picts)
-            for album, picts in itertools.groupby(pictures, lambda i: i.album)
-        }
-        return kwargs
 
 
 def delete_user_godfather(request, user_id, godfather_id, is_father):
