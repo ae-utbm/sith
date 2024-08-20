@@ -17,21 +17,38 @@
 
     {# User Pictures #}
     <div class="profile-pictures">
-      <div class="profile-picture">
+      <div class="profile-picture" x-data="camera">
         <div class="profile-picture-display">
-
-          {%- if form.instance.profile_pict -%}
-            <img src="{{ form.instance.profile_pict.get_download_url() }}"
-                 alt="{%- trans -%}Profile{%- endtrans -%}" title="{%- trans -%}Profile{%- endtrans -%}" />
-          {%- else -%}
-            <img src="{{ static('core/img/unknown.jpg') }}" alt="{%- trans -%}Profile{%- endtrans -%}"
-                 title="{%- trans -%}Profile{%- endtrans -%}" />
-          {%- endif -%}
+          <img
+            x-show="!is_camera_enabled"
+            :src="get_profile_picture()"
+            alt="{%- trans -%}Profile{%- endtrans -%}" title="{%- trans -%}Profile{%- endtrans -%}"
+          />
+          <video
+            x-show="is_camera_enabled"
+            x-ref="video"
+          ></video>
+          <button
+            x-show="can_edit_picture && !is_camera_enabled"
+            class="btn btn-blue"
+            @click.prevent="enable_camera()"
+          >
+            <i class="fa fa-camera"></i>
+            {% trans %}Enable camera{% endtrans %}
+          </button>
+          <button
+            x-show="is_camera_enabled"
+            class="btn btn-blue"
+            @click.prevent="take_picture()"
+          >
+            <i class="fa fa-camera"></i>
+            {% trans %}Take a picture{% endtrans %}
+          </button>
         </div>
-        <div class="profile-picture-edit">
-          {%- if form["profile_pict"] -%}
-            <p>{{ form["profile_pict"].label }}</p>
-            {{ form["profile_pict"] }}
+        <div x-ref="form" class="profile-picture-edit">
+          {%- if form.profile_pict -%}
+            <p>{{ form.profile_pict.label }}</p>
+            {{ form.profile_pict }}
           {%- else -%}
             <em>{% trans %}To edit your profile picture, ask a member of the AE{% endtrans %}</em>
           {%- endif -%}
@@ -53,8 +70,8 @@
           {%- endif -%}
         </div>
         <div class="profile-picture-edit">
-          <p>{{ form["avatar_pict"].label }}</p>
-          {{ form["avatar_pict"] }}
+          <p>{{ form.avatar_pict.label }}</p>
+          {{ form.avatar_pict }}
           {%- if user.is_board_member and form.instance.avatar_pict.id -%}
             <a href="{{ url('core:file_delete', file_id=form.instance.avatar_pict.id, popup='') }}">
               {%- trans -%}Delete{%- endtrans -%}
@@ -73,8 +90,8 @@
           {%- endif -%}
         </div>
         <div class="profile-picture-edit">
-          <p>{{ form["scrub_pict"].label }}</p>
-          {{ form["scrub_pict"] }}
+          <p>{{ form.scrub_pict.label }}</p>
+          {{ form.scrub_pict }}
           {%- if user.is_board_member and form.instance.scrub_pict.id -%}
             <a href="{{ url('core:file_delete', file_id=form.instance.scrub_pict.id, popup='') }}">
               {%- trans -%}Delete{%-endtrans -%}
@@ -108,7 +125,7 @@
 
     {# Textareas #}
 <div class="profile-fields">
-  {%- for field in [form["quote"], form["forum_signature"]] -%}
+  {%- for field in [form.quote, form.forum_signature] -%}
     <div class="profile-field">
       <div class="profile-field-label">{{ field.label }}</div>
       <div class="profile-field-content">
@@ -123,8 +140,8 @@
 
     {# Checkboxes #}
 <div class="profile-visible">
-  {{ form["is_subscriber_viewable"] }}
-  {{ form["is_subscriber_viewable"].label }}
+  {{ form.is_subscriber_viewable }}
+  {{ form.is_subscriber_viewable.label }}
 </div>
 
 {%- if form.instance == user -%}
@@ -152,38 +169,91 @@
   {%- endif -%}
 </p>
 
+<script>
+  document.addEventListener("alpine:init", () => {
+    Alpine.data("camera", () => ({
+      can_edit_picture: false,
+
+      width: 320,
+      height: 240,
+
+      is_camera_enabled: false,
+      picture: null,
+      video: null,
+      picture_form: null,
+
+      init() {
+        this.video = this.$refs.video;
+        this.picture_form = this.$refs.form.getElementsByTagName("input");
+        if (this.picture_form.length > 0){
+          this.picture_form = this.picture_form[0];
+          this.can_edit_picture = true;
+        }
+      },
+
+      get_profile_picture() {
+        if (this.picture != null) {
+          return this.picture;
+        }
+
+        {%- if form.instance.profile_pict -%}
+          return "{{ form.instance.profile_pict.get_download_url() }}"
+        {%- else -%}
+          return "{{ static('core/img/unknown.jpg') }}"
+        {%- endif -%}
+      },
+
+      enable_camera() {
+        this.picture = null;
+        navigator.mediaDevices
+          .getUserMedia({ video: true, audio: false })
+          .then((stream) => {
+            this.is_camera_enabled = true;
+            this.video.width = this.width;
+            this.video.height = this.height;
+            this.video.srcObject = stream;
+            this.video.play();
+          })
+          .catch((err) => {
+            console.error(`An error occurred: ${err}`);
+          });
+      },
+
+      take_picture() {
+        let canvas = document.createElement("canvas")
+        const context = canvas.getContext("2d");
+        this.video.pause()
+
+        canvas.width = this.width;
+        canvas.height = this.height;
+        context.drawImage(this.video, 0, 0, this.width, this.height);
+        this.picture = canvas.toDataURL("image/png");
+
+        canvas.toBlob((blob) => {
+          let file = new File(
+            [blob],
+            "{% trans %}captured{% endtrans %}.png",
+            { type: "image/jpeg" },
+          );
+
+          let list = new DataTransfer();
+          list.items.add(file);
+          this.picture_form.files = list.files;
+
+        }, "image/jpeg");
+
+
+        canvas.remove();
+        this.is_camera_enabled = false;
+      },
+
+    }));
+  });
+</script>
+
 {%- endblock -%}
 
-{%- block script -%}
-  {{ super() }}
-  {%- if not form.instance.profile_pict -%}
-    <script src="{{ static('core/js/webcam.js') }}"></script>
-    <script>
-      Webcam.on('error', function (msg) { console.log('Webcam.js error: ' + msg) })
-      Webcam.set({
-        width: 320,
-        height: 240,
-        dest_width: 320,
-        dest_height: 240,
-        image_format: 'jpeg',
-        jpeg_quality: 90,
-        force_flash: false
-      });
-      Webcam.attach('#camera_canvas');
-      function take_snapshot() {
-        const data_uri = Webcam.snap();
-        const url = "{{ url('core:user_profile_upload', user_id=form.instance.id) }}";
-        Webcam.upload(data_uri, url, function (code, text) {
-          if (code === 302 || code === 200) {
-            $('#new_profile').attr('src', data_uri);
-            $('#take_picture').remove();
-            $('#id_profile_pict').remove();
-          } else {
-            console.log("Unknown error: ");
-            console.log(text);
-          }
-        }, "new_profile_pict", { name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}' });
-      }
-    </script>
-  {%- endif -%}
-{%- endblock -%}
+{%- if not form.instance.profile_pict -%}
+  {%- block script -%}
+  {%- endblock -%}
+{%- endif -%}
