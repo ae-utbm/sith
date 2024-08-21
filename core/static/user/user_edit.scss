@@ -81,8 +81,8 @@
 
       > img, > video {
         width: 100% !important;
-        object-fit: contain;
-        height: auto;
+        object-fit: cover;
+        height: 100% !important;
         max-height: 100%;
       }
 
@@ -98,23 +98,38 @@
 
     &-edit {
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       width: 100%;
 
-      > a {
-        margin-bottom: 15px;
-      }
+      > div {
+        max-width: 100%;
 
-      > input {
-        font-size: .8em;
-        font-weight: normal;
-        cursor: pointer;
+        > input {
+          font-weight: normal;
+          cursor: pointer;
+        }
+
+        > button {
+          min-width: 30%;
+        }
+
+        @media (min-width: 750px) {
+          height: auto;
+          align-items: center;
+          display: inline-flex;
+          overflow: hidden;
+
+          > input {
+            font-size: .6em;
+          }
+        }
+
       }
 
       > p {
-        margin-bottom: 0;
+        margin-bottom: 10px;
         text-align: left !important;
         min-height: 50px;
       }
