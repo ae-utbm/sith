@@ -68,10 +68,6 @@
       Alpine.data("camera_{{ field_name }}", () => ({
         can_edit_picture: false,
 
-        /* Those values are based on the unknwon.jpg file */
-        width: 417,
-        height: 434,
-
         loading: false,
         is_camera_enabled: false,
         is_camera_error: false,
@@ -110,8 +106,6 @@
               this.loading = false;
               this.is_camera_enabled = true;
               this.video.srcObject = stream;
-              this.video.width = 320;
-              this.video.height = 240;
               this.video.play();
             })
             .catch((err) => {
@@ -125,8 +119,9 @@
           const context = canvas.getContext("2d");
 
           /* Create the image */
-          canvas.width = this.video.width;
-          canvas.height = this.video.height;
+          let settings = this.video.srcObject.getTracks()[0].getSettings();
+          canvas.width = settings.width;
+          canvas.height = settings.height;
           context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
           this.picture = canvas.toDataURL("image/png");
 
