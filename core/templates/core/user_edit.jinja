@@ -12,7 +12,6 @@
   <div class="profile-picture" x-data="camera_{{ field_name }}" >
     <div class="profile-picture-display" :aria-busy="loading" :class="{ 'camera-error': is_camera_error }">
       <img
-        x-ref="img"
         x-show="!is_camera_enabled && !is_camera_error"
         :src="get_picture()"
         alt="{%- trans -%}Profile{%- endtrans -%}" title="{%- trans -%}Profile{%- endtrans -%}"
@@ -48,15 +47,17 @@
     </div>
     <div x-ref="form" class="profile-picture-edit">
       {%- if form[field_name] -%}
+        <div>
+          {{ form[field_name] }}
+          {%- if user.is_root and form.instance[field_name] -%}
+            <button class="btn btn-red" @click.prevent="window.open('{{ url('core:file_delete', file_id=form.instance[field_name].id, popup='') }}', '_self')">
+              {%- trans -%}Delete{%- endtrans -%}
+            </button>
+          {%- endif -%}
+        </div>
         <p>
           {{ form[field_name].label }}
         </p>
-        {{ form[field_name] }}
-        {%- if user.is_root and form.instance[field_name] -%}
-          <button class="btn btn-red" @click.prevent="window.open('{{ url('core:file_delete', file_id=form.instance[field_name].id, popup='') }}')">
-            {%- trans -%}Delete{%- endtrans -%}
-          </button>
-        {%- endif -%}
       {%- else -%}
         <em>{% trans %}To edit your profile picture, ask a member of the AE{% endtrans %}</em>
       {%- endif -%}
@@ -67,17 +68,19 @@
       Alpine.data("camera_{{ field_name }}", () => ({
         can_edit_picture: false,
 
+        /* Those values are based on the unknwon.jpg file */
+        width: 417,
+        height: 434,
+
         loading: false,
         is_camera_enabled: false,
         is_camera_error: false,
         picture: null,
         video: null,
-        img: null,
         picture_form: null,
 
         init() {
           this.video = this.$refs.video;
-          this.img = this.$refs.img;
           this.picture_form = this.$refs.form.getElementsByTagName("input");
           if (this.picture_form.length > 0){
             this.picture_form = this.picture_form[0];
@@ -106,9 +109,9 @@
             .then((stream) => {
               this.loading = false;
               this.is_camera_enabled = true;
-              this.video.width = this.img.width;
-              this.video.height = this.img.height;
               this.video.srcObject = stream;
+              this.video.width = 320;
+              this.video.height = 240;
               this.video.play();
             })
             .catch((err) => {
@@ -121,6 +124,12 @@
           let canvas = document.createElement("canvas")
           const context = canvas.getContext("2d");
 
+          /* Create the image */
+          canvas.width = this.video.width;
+          canvas.height = this.video.height;
+          context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+          this.picture = canvas.toDataURL("image/png");
+
           /* Stop camera */
           this.video.pause()
           this.video.srcObject.getTracks().forEach((track) => {
@@ -128,11 +137,6 @@
               track.stop();
             }
           });
-
-          canvas.width = this.video.width;
-          canvas.height = this.video.height;
-          context.drawImage(this.video, 0, 0, this.video.width, this.video.height);
-          this.picture = canvas.toDataURL("image/png");
 
           canvas.toBlob((blob) => {
             let file = new File(
