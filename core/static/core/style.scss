@@ -260,6 +260,12 @@ a:not(.button) {
       }
     }
 
+    &.btn-red {
+      background-color: #fc8181;
+      color: black;
+      border: #fc8181 1px solid;
+    }
+
     i {
       margin-right: 4px;
     }

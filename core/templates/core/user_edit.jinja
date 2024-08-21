@@ -8,6 +8,155 @@
   <link rel="stylesheet" href="{{ scss('user/user_edit.scss') }}">
 {%- endblock -%}
 
+{% macro profile_picture(field_name) %}
+  <div class="profile-picture" x-data="camera_{{ field_name }}" >
+    <div class="profile-picture-display" :aria-busy="loading" :class="{ 'camera-error': is_camera_error }">
+      <img
+        x-ref="img"
+        x-show="!is_camera_enabled && !is_camera_error"
+        :src="get_picture()"
+        alt="{%- trans -%}Profile{%- endtrans -%}" title="{%- trans -%}Profile{%- endtrans -%}"
+        loading="lazy"
+      />
+      <video
+        x-show="is_camera_enabled"
+        x-ref="video"
+      ></video>
+      <i
+        x-show="is_camera_error"
+        x-cloak
+        class="fa fa-eye-slash"
+      ></i>
+    </div>
+    <div class="profile-picture-buttons" x-show="can_edit_picture">
+      <button
+        x-show="can_edit_picture && !is_camera_enabled"
+        class="btn btn-blue"
+        @click.prevent="enable_camera()"
+      >
+        <i class="fa fa-camera"></i>
+        {% trans %}Enable camera{% endtrans %}
+      </button>
+      <button
+        x-show="is_camera_enabled"
+        class="btn btn-blue"
+        @click.prevent="take_picture()"
+      >
+        <i class="fa fa-camera"></i>
+        {% trans %}Take a picture{% endtrans %}
+      </button>
+    </div>
+    <div x-ref="form" class="profile-picture-edit">
+      {%- if form[field_name] -%}
+        <p>
+          {{ form[field_name].label }}
+        </p>
+        {{ form[field_name] }}
+        {%- if user.is_root and form.instance[field_name] -%}
+          <button class="btn btn-red" @click.prevent="window.open('{{ url('core:file_delete', file_id=form.instance[field_name].id, popup='') }}')">
+            {%- trans -%}Delete{%- endtrans -%}
+          </button>
+        {%- endif -%}
+      {%- else -%}
+        <em>{% trans %}To edit your profile picture, ask a member of the AE{% endtrans %}</em>
+      {%- endif -%}
+    </div>
+  </div>
+  <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("camera_{{ field_name }}", () => ({
+        can_edit_picture: false,
+
+        loading: false,
+        is_camera_enabled: false,
+        is_camera_error: false,
+        picture: null,
+        video: null,
+        img: null,
+        picture_form: null,
+
+        init() {
+          this.video = this.$refs.video;
+          this.img = this.$refs.img;
+          this.picture_form = this.$refs.form.getElementsByTagName("input");
+          if (this.picture_form.length > 0){
+            this.picture_form = this.picture_form[0];
+            this.can_edit_picture = true;
+          }
+        },
+
+        get_picture() {
+          if (this.picture != null) {
+            return this.picture;
+          }
+
+          {%- if form.instance[field_name] -%}
+            return "{{ form.instance[field_name].get_download_url() }}"
+          {%- else -%}
+            return "{{ static('core/img/unknown.jpg') }}"
+          {%- endif -%}
+        },
+
+        enable_camera() {
+          this.picture = null;
+          this.loading = true;
+          this.is_camera_error = false;
+          navigator.mediaDevices
+            .getUserMedia({ video: true, audio: false })
+            .then((stream) => {
+              this.loading = false;
+              this.is_camera_enabled = true;
+              this.video.width = this.img.width;
+              this.video.height = this.img.height;
+              this.video.srcObject = stream;
+              this.video.play();
+            })
+            .catch((err) => {
+              this.is_camera_error = true;
+              this.loading = false;
+            });
+        },
+
+        take_picture() {
+          let canvas = document.createElement("canvas")
+          const context = canvas.getContext("2d");
+
+          /* Stop camera */
+          this.video.pause()
+          this.video.srcObject.getTracks().forEach((track) => {
+            if (track.readyState == 'live') {
+              track.stop();
+            }
+          });
+
+          canvas.width = this.video.width;
+          canvas.height = this.video.height;
+          context.drawImage(this.video, 0, 0, this.video.width, this.video.height);
+          this.picture = canvas.toDataURL("image/png");
+
+          canvas.toBlob((blob) => {
+            let file = new File(
+              [blob],
+              "{% trans %}captured{% endtrans %}.png",
+              { type: "image/jpeg" },
+            );
+
+            let list = new DataTransfer();
+            list.items.add(file);
+            this.picture_form.files = list.files;
+
+          }, "image/jpeg");
+
+
+          canvas.remove();
+          this.is_camera_enabled = false;
+        },
+
+      }));
+    });
+  </script>
+{% endmacro %}
+
 {%- block content -%}
   <h2 class="title">{%- trans -%}Edit user profile{%- endtrans -%}</h2>
   <form action="" method="post" enctype="multipart/form-data" id="user_edit">
@@ -17,88 +166,13 @@
 
     {# User Pictures #}
     <div class="profile-pictures">
-      <div class="profile-picture" x-data="camera">
-        <div class="profile-picture-display">
-          <img
-            x-show="!is_camera_enabled"
-            :src="get_profile_picture()"
-            alt="{%- trans -%}Profile{%- endtrans -%}" title="{%- trans -%}Profile{%- endtrans -%}"
-          />
-          <video
-            x-show="is_camera_enabled"
-            x-ref="video"
-          ></video>
-          <button
-            x-show="can_edit_picture && !is_camera_enabled"
-            class="btn btn-blue"
-            @click.prevent="enable_camera()"
-          >
-            <i class="fa fa-camera"></i>
-            {% trans %}Enable camera{% endtrans %}
-          </button>
-          <button
-            x-show="is_camera_enabled"
-            class="btn btn-blue"
-            @click.prevent="take_picture()"
-          >
-            <i class="fa fa-camera"></i>
-            {% trans %}Take a picture{% endtrans %}
-          </button>
-        </div>
-        <div x-ref="form" class="profile-picture-edit">
-          {%- if form.profile_pict -%}
-            <p>{{ form.profile_pict.label }}</p>
-            {{ form.profile_pict }}
-          {%- else -%}
-            <em>{% trans %}To edit your profile picture, ask a member of the AE{% endtrans %}</em>
-          {%- endif -%}
-          {%- if user.is_board_member and form.instance.profile_pict.id -%}
-            <a href="{{ url('core:file_delete', file_id=form.instance.profile_pict.id, popup='') }}">
-              {%- trans -%}Delete{%- endtrans -%}
-            </a>
-          {%- endif -%}
-        </div>
-      </div>
-      <div class="profile-picture">
-        <div class="profile-picture-display">
-          {%- if form.instance.avatar_pict -%}
-            <img src="{{ form.instance.avatar_pict.get_download_url() }}" alt="{%- trans -%}Profile{%- endtrans -%}"
-                 title="{%- trans -%}Profile{%- endtrans -%}" />
-          {%- else -%}
-            <img src="{{ static('core/img/unknown.jpg') }}" alt="{%- trans -%}Profile{%- endtrans -%}"
-                 title="{%- trans -%}Profile{%- endtrans -%}" />
-          {%- endif -%}
-        </div>
-        <div class="profile-picture-edit">
-          <p>{{ form.avatar_pict.label }}</p>
-          {{ form.avatar_pict }}
-          {%- if user.is_board_member and form.instance.avatar_pict.id -%}
-            <a href="{{ url('core:file_delete', file_id=form.instance.avatar_pict.id, popup='') }}">
-              {%- trans -%}Delete{%- endtrans -%}
-            </a>
-          {%- endif -%}
-        </div>
-      </div>
-      <div class="profile-picture">
-        <div class="profile-picture-display">
-          {%- if form.instance.scrub_pict -%}
-            <img src="{{ form.instance.scrub_pict.get_download_url() }}" alt="{%- trans -%}Profile{%- endtrans -%}"
-                 title="{%- trans -%}Profile{%- endtrans -%}" />
-          {%- else -%}
-            <img src="{{ static('core/img/unknown.jpg') }}" alt="{%- trans -%}Profile{%- endtrans -%}"
-                 title="{%- trans -%}Profile{%- endtrans -%}" />
-          {%- endif -%}
-        </div>
-        <div class="profile-picture-edit">
-          <p>{{ form.scrub_pict.label }}</p>
-          {{ form.scrub_pict }}
-          {%- if user.is_board_member and form.instance.scrub_pict.id -%}
-            <a href="{{ url('core:file_delete', file_id=form.instance.scrub_pict.id, popup='') }}">
-              {%- trans -%}Delete{%-endtrans -%}
-            </a>
-          {%- endif -%}
-        </div>
-      </div>
+
+      {{ profile_picture("profile_pict") }}
+
+      {{ profile_picture("avatar_pict") }}
+
+      {{ profile_picture("scrub_pict") }}
+
     </div>
 
 
@@ -169,91 +243,4 @@
   {%- endif -%}
 </p>
 
-<script>
-  document.addEventListener("alpine:init", () => {
-    Alpine.data("camera", () => ({
-      can_edit_picture: false,
-
-      width: 320,
-      height: 240,
-
-      is_camera_enabled: false,
-      picture: null,
-      video: null,
-      picture_form: null,
-
-      init() {
-        this.video = this.$refs.video;
-        this.picture_form = this.$refs.form.getElementsByTagName("input");
-        if (this.picture_form.length > 0){
-          this.picture_form = this.picture_form[0];
-          this.can_edit_picture = true;
-        }
-      },
-
-      get_profile_picture() {
-        if (this.picture != null) {
-          return this.picture;
-        }
-
-        {%- if form.instance.profile_pict -%}
-          return "{{ form.instance.profile_pict.get_download_url() }}"
-        {%- else -%}
-          return "{{ static('core/img/unknown.jpg') }}"
-        {%- endif -%}
-      },
-
-      enable_camera() {
-        this.picture = null;
-        navigator.mediaDevices
-          .getUserMedia({ video: true, audio: false })
-          .then((stream) => {
-            this.is_camera_enabled = true;
-            this.video.width = this.width;
-            this.video.height = this.height;
-            this.video.srcObject = stream;
-            this.video.play();
-          })
-          .catch((err) => {
-            console.error(`An error occurred: ${err}`);
-          });
-      },
-
-      take_picture() {
-        let canvas = document.createElement("canvas")
-        const context = canvas.getContext("2d");
-        this.video.pause()
-
-        canvas.width = this.width;
-        canvas.height = this.height;
-        context.drawImage(this.video, 0, 0, this.width, this.height);
-        this.picture = canvas.toDataURL("image/png");
-
-        canvas.toBlob((blob) => {
-          let file = new File(
-            [blob],
-            "{% trans %}captured{% endtrans %}.png",
-            { type: "image/jpeg" },
-          );
-
-          let list = new DataTransfer();
-          list.items.add(file);
-          this.picture_form.files = list.files;
-
-        }, "image/jpeg");
-
-
-        canvas.remove();
-        this.is_camera_enabled = false;
-      },
-
-    }));
-  });
-</script>
-
 {%- endblock -%}
-
-{%- if not form.instance.profile_pict -%}
-  {%- block script -%}
-  {%- endblock -%}
-{%- endif -%}
