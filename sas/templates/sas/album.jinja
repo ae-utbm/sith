@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from 'core/macros.jinja' import paginate_alpine %}
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
@@ -83,28 +84,7 @@
         </a>
       </template>
     </div>
-    <nav class="pagination" x-show="nb_pages() > 1">
-      {# Adding the prevent here is important, because otherwise,
-      clicking on the pagination buttons could submit the picture management form
-      and reload the page #}
-      <button
-        @click.prevent="page--"
-        :disabled="page <= 1"
-        @keyup.right.window="page = Math.min(nb_pages(), page + 1)"
-      >
-        <i class="fa fa-caret-left"></i>
-      </button>
-      <template x-for="i in nb_pages()">
-        <button x-text="i" @click.prevent="page = i" :class="{active: page === i}"></button>
-      </template>
-      <button
-        @click.prevent="page++"
-        :disabled="page >= nb_pages()"
-        @keyup.left.window="page = Math.max(1, page - 1)"
-      >
-        <i class="fa fa-caret-right"></i>
-      </button>
-    </nav>
+    {{  paginate_alpine("page", "nb_pages()") }}
   </div>
 
   {% if is_sas_admin %}
