@@ -29,13 +29,3 @@ python ./manage.py collectstatic --clear
 	Le dossier où seront enregistrés ces fichiers
     statiques peut être changé en modifiant la variable
     `STATIC_ROOT` dans les paramètres.
-
-!!!warning
-
-    La minification des fichiers JS nécessite la présence
-    de `uglifyJS` sur la machine.
-    Pour l'installer, faites la commande suivante (nécessite nodeJS) :
-
-    ```bash
-    npm install uglifyjs -g
-    ```

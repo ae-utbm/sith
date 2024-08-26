@@ -1,7 +1,6 @@
 import logging
-import subprocess
-import warnings
 
+import rjsmin
 import sass
 from django.conf import settings
 from django.contrib.staticfiles.storage import (
@@ -44,20 +43,13 @@ class SithStorage(ManifestStaticFilesStorage):
 
     @staticmethod
     def _minify_js():
-        try:
-            subprocess.run(["uglifyjs", "-v"])
-        except FileNotFoundError:
-            warnings.warn(
-                "Couldn't minify JS files. Make sure UglifyJs is installed.",
-                stacklevel=1,
-            )
-            return
         to_exec = [
             p for p in settings.STATIC_ROOT.rglob("*.js") if ".min" not in p.suffixes
         ]
         for path in to_exec:
             p = path.resolve()
-            subprocess.run(["uglifyjs", p, "-o", p])
+            minified = rjsmin.jsmin(p.read_text())
+            p.write_text(minified)
             logging.getLogger("main").info(f"Minified {path}")
 
     def post_process(
