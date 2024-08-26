@@ -49,11 +49,14 @@
       {%- if form[field_name] -%}
         <div>
           {{ form[field_name] }}
-          {%- if user.is_root and form.instance[field_name] -%}
-            <button class="btn btn-red" @click.prevent="window.open('{{ url('core:file_delete', file_id=form.instance[field_name].id, popup='') }}', '_self')">
-              {%- trans -%}Delete{%- endtrans -%}
-            </button>
-          {%- endif -%}
+          <button class="btn btn-red" @click.prevent="delete_picture()"
+                  {%- if not (user.is_root and form.instance[field_name]) -%}
+                    :disabled="picture == null"
+                  {%- endif -%}
+                  x-cloak
+          >
+            {%- trans -%}Delete{%- endtrans -%}
+          </button>
         </div>
         <p>
           {{ form[field_name].label }}
@@ -104,6 +107,28 @@
             return "{{ form.instance[field_name].get_download_url() }}"
           {%- else -%}
             return "{{ static('core/img/unknown.jpg') }}"
+          {%- endif -%}
+        },
+
+        delete_picture() {
+
+          {# Only remove currently displayed picture #}
+          if (this.picture != null){
+            let list = new DataTransfer();
+            this.picture_form.files = list.files;
+            this.picture_form.dispatchEvent(new Event("change"));
+            return;
+          }
+
+          {# Remove user picture if correct rights are available #}
+          {%- if user.is_root and form.instance[field_name] -%}
+            window.open(
+              '{{ url(
+                      'core:file_delete',
+                      file_id=form.instance[field_name].id,
+                      popup=''
+                ) }}',
+              '_self');
           {%- endif -%}
         },
 
