@@ -725,7 +725,7 @@ if TESTING:
             "BACKEND": "django.core.files.storage.InMemoryStorage",
         },
         "staticfiles": {
-            "BACKEND": "sith.storage.SithStorage",
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
 
