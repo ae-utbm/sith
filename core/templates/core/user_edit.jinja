@@ -81,6 +81,17 @@
           if (this.picture_form.length > 0){
             this.picture_form = this.picture_form[0];
             this.can_edit_picture = true;
+
+            {# Link the displayed element to the form input  #}
+            this.picture_form.onchange = (event) => {
+              let files = event.srcElement.files;
+              if (files.length > 0){
+                this.picture = (window.URL || window.webkitURL)
+                  .createObjectURL(event.srcElement.files[0]);
+              } else {
+                this.picture = null;
+              }
+            }
           }
         },
 
@@ -123,7 +134,6 @@
           canvas.width = settings.width;
           canvas.height = settings.height;
           context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
-          this.picture = canvas.toDataURL("image/png");
 
           /* Stop camera */
           this.video.pause()
@@ -144,7 +154,9 @@
             list.items.add(file);
             this.picture_form.files = list.files;
 
-          }, "image/jpeg");
+            {# No change event is triggered, we trigger it manually #}
+            this.picture_form.dispatchEvent(new Event("change"));
+          }, "image/webp");
 
 
           canvas.remove();
