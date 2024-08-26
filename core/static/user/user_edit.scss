@@ -110,6 +110,7 @@
         > input {
           font-weight: normal;
           cursor: pointer;
+          text-align: left !important;
         }
 
         > button {
@@ -123,7 +124,11 @@
           overflow: hidden;
 
           > input {
+            width: 70%;
             font-size: .6em;
+            &::file-selector-button {
+              height: 30px;
+            }
           }
         }
 
