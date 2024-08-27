@@ -26,14 +26,19 @@ import datetime
 from pathlib import Path
 
 import phonenumbers
+import sass
 from django import template
+from django.conf import settings
+from django.contrib.staticfiles.finders import find
+from django.core.files.base import ContentFile
+from django.core.files.storage import storages
 from django.template import TemplateSyntaxError
 from django.template.defaultfilters import stringfilter
+from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 from django.utils.translation import ngettext
 
 from core.markdown import markdown as md
-from core.scss.processor import process_scss_path
 
 register = template.Library()
 
@@ -91,4 +96,15 @@ def scss(path):
     path = Path(path)
     if path.suffix != ".scss":
         raise TemplateSyntaxError("`scss` tag has been called with a non-scss file")
-    return process_scss_path(path)
+
+    css_path = path.with_suffix(".css")
+    if settings.DEBUG:
+        compile_args = {"filename": find(path)}
+        if settings.SASS_PRECISION:
+            compile_args["precision"] = settings.SASS_PRECISION
+        content = sass.compile(**compile_args)
+        storage = storages["staticfiles"]
+        if storage.exists(css_path):
+            storage.delete(css_path)
+        storage.save(css_path, ContentFile(content))
+    return static(str(css_path))

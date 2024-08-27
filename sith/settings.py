@@ -270,8 +270,17 @@ STATIC_ROOT = BASE_DIR / "static"
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "core.scss.finder.ScssFinder",
+    "sith.finders.ScssFinder",
 ]
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "sith.storage.SithStorage",
+    },
+}
 
 # Auth configuration
 AUTH_USER_MODEL = "core.User"
@@ -704,7 +713,6 @@ if DEBUG:
         "debug_toolbar.panels.signals.SignalsPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
-    SASS_INCLUDE_FOLDERS = ["core/static/"]
     SENTRY_ENV = "development"
 
 if TESTING:
@@ -740,7 +748,7 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/jquery/jquery/": "3.6.2",
     "https://github.com/sethmcl/jquery-ui/": "1.11.1",
     "https://github.com/viralpatel/jquery.shorten/": "",
-    "https://github.com/getsentry/sentry-javascript/": "4.0.6",
+    "https://github.com/getsentry/sentry-javascript/": "8.26.0",
     "https://github.com/jhuckaby/webcamjs/": "1.0.0",
     "https://github.com/alpinejs/alpine": "3.14.1",
     "https://github.com/mrdoob/three.js/": "r148",

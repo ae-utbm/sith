@@ -1,15 +1,15 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-  <link rel="stylesheet" href="{{ scss('sas/album.scss') }}">
+  <link rel="stylesheet" href="{{ scss('sas/css/album.scss') }}">
 {%- endblock -%}
 
 {% block additional_js %}
   <script defer type="module">
-    import { showSaveFilePicker } from "{{ static('core/js/native-file-system-adapter/mod.js') }}";
+    import { showSaveFilePicker } from "{{ static('vendored/native-file-system-adapter/mod.js') }}";
     window.showSaveFilePicker = showSaveFilePicker; /* Export function to normal javascript */
   </script>
-  <script defer type="text/javascript" src="{{ static('core/js/zipjs/zip-fs-full.min.js') }}"></script>
+  <script defer type="text/javascript" src="{{ static('vendored/zipjs/zip-fs-full.min.js') }}"></script>
 {% endblock %}
 
 {% block title %}

@@ -39,8 +39,7 @@ jobs:
           poetry install --with prod --without docs,tests
           poetry run ./manage.py install_xapian
           poetry run ./manage.py migrate
-          echo "yes" | poetry run ./manage.py collectstatic
-          poetry run ./manage.py compilestatic
+          poetry run ./manage.py collectstatic --clear --noinput
           poetry run ./manage.py compilemessages
 
           sudo systemctl restart uwsgi
