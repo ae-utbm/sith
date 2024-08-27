@@ -61,6 +61,7 @@
         <p>
           {{ form[field_name].label }}
         </p>
+        {{ form[field_name].errors }}
       {%- else -%}
         <em>{% trans %}To edit your profile picture, ask a member of the AE{% endtrans %}</em>
       {%- endif -%}
