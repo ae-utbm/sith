@@ -87,7 +87,13 @@
 
         async init() {
           this.pictures = await this.get_pictures();
-          this.albums = Object.groupBy(this.pictures, ({album}) => album);
+          this.albums = this.pictures.reduce((acc, picture) => {
+            if (!acc[picture.album]){
+              acc[picture.album] = [];
+            }
+            acc[picture.album].push(picture);
+            return acc;
+          }, {});
           this.loading = false;
         },
 
