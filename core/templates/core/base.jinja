@@ -6,7 +6,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
       <link rel="stylesheet" href="{{ static('core/base.css') }}">
-      <link rel="stylesheet" href="{{  static('ajax_select/css/ajax_select.css') }}">
+      <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
       <link rel="stylesheet" href="{{ scss('core/style.scss') }}">
       <link rel="stylesheet" href="{{ scss('core/markdown.scss') }}">
       <link rel="stylesheet" href="{{ scss('core/header.scss') }}">
@@ -14,14 +14,14 @@
 
       {% block jquery_css %}
                 {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
-        <link rel="stylesheet" href="{{ static('core/js/ui/jquery-ui.min.css') }}">
+        <link rel="stylesheet" href="{{ static('vendored/jquery/ui/jquery-ui.min.css') }}">
       {% endblock %}
-      <link rel="preload" as="style" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-      <noscript><link rel="stylesheet" href="{{ static('core/font-awesome/css/font-awesome.min.css') }}"></noscript>
-      <script defer href="{{ static('core/font-awesome/js/fontawesone.min.js') }}"></script>
+      <link rel="preload" as="style" href="{{ static('vendored/font-awesome/css/font-awesome.min.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+      <noscript><link rel="stylesheet" href="{{ static('vendored/font-awesome/css/font-awesome.min.css') }}"></noscript>
+      <script defer href="{{ static('vendored/font-awesome/js/fontawesome.min.js') }}"></script>
 
             <!-- Jquery declared here to be accessible in every django widgets -->
-      <script src="{{ static('core/js/jquery-3.6.2.min.js') }}"></script>
+      <script src="{{ static('vendored/jquery/jquery-3.6.2.min.js') }}"></script>
             <!-- Put here to always have acces to those functions on django widgets -->
       <script src="{{ static('core/js/script.js') }}"></script>
 
@@ -29,7 +29,7 @@
       {% block additional_js %}{% endblock %}
 
       {# Alpine JS must be loaded after scripts that use it. #}
-      <script src="{{ static('core/js/alpinejs.min.js') }}" defer></script>
+      <script src="{{ static('vendored/alpine/alpinejs.min.js') }}" defer></script>
     {% endblock %}
   </head>
 
@@ -299,7 +299,7 @@
     {% endif %}
 
     {% block script %}
-      <script src="{{ static('core/js/ui/jquery-ui.min.js') }}"></script>
+      <script src="{{ static('vendored/jquery/ui/jquery-ui.min.js') }}"></script>
       <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
       <script src="{{ url('javascript-catalog') }}"></script>
       <script>

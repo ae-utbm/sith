@@ -16,7 +16,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group as AuthGroup
 
-from core.models import Group, Page, SithFile, User
+from core.models import Group, OperationLog, Page, SithFile, User
 
 admin.site.unregister(AuthGroup)
 
@@ -53,3 +53,10 @@ class SithFileAdmin(admin.ModelAdmin):
     list_display = ("name", "owner", "size", "date", "is_in_sas")
     autocomplete_fields = ("parent", "owner", "moderator")
     search_fields = ("name", "parent__name")
+
+
+@admin.register(OperationLog)
+class OperationLogAdmin(admin.ModelAdmin):
+    list_display = ("label", "operator", "operation_type", "date")
+    search_fields = ("label", "date", "operation_type")
+    autocomplete_fields = ("operator",)

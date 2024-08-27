@@ -260,6 +260,18 @@ a:not(.button) {
       }
     }
 
+    &.btn-red {
+      background-color: #fc8181;
+      color: black;
+      &:not(:disabled):hover {
+        background-color: darken(#fc8181, 15%);
+      }
+      &:disabled {
+        background-color: lighten(#fc8181, 15%);
+        color: grey;
+      }
+    }
+
     i {
       margin-right: 4px;
     }

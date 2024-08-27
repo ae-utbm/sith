@@ -176,7 +176,7 @@ class AlbumQuerySet(models.QuerySet):
         if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return self.all()
         if user.was_subscribed:
-            return self.filter(moderated=True)
+            return self.filter(is_moderated=True)
         # known bug : if all children of an album are also albums
         # then this album is excluded, even if one of the sub-albums should be visible.
         # The fs-like navigation is likely to be half-broken for non-subscribers,

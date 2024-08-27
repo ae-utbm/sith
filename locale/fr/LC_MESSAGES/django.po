@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-07 14:16+0200\n"
+"POT-Creation-Date: 2024-08-21 15:30+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -211,7 +211,7 @@ msgstr "Utilisateur"
 msgid "Club"
 msgstr "Club"
 
-#: accounting/models.py:310 core/views/user.py:281
+#: accounting/models.py:310 core/views/user.py:278
 msgid "Account"
 msgstr "Compte"
 
@@ -370,9 +370,7 @@ msgstr "Compte en banque : "
 #: core/templates/core/user_account_detail.jinja:66
 #: core/templates/core/user_clubs.jinja:34
 #: core/templates/core/user_clubs.jinja:63
-#: core/templates/core/user_edit.jinja:39
-#: core/templates/core/user_edit.jinja:58
-#: core/templates/core/user_edit.jinja:77
+#: core/templates/core/user_edit.jinja:53
 #: core/templates/core/user_preferences.jinja:48
 #: counter/templates/counter/last_ops.jinja:35
 #: counter/templates/counter/last_ops.jinja:65
@@ -382,8 +380,8 @@ msgstr "Compte en banque : "
 #: launderette/views.py:217 pedagogy/templates/pedagogy/guide.jinja:95
 #: pedagogy/templates/pedagogy/guide.jinja:110
 #: pedagogy/templates/pedagogy/uv_detail.jinja:185
-#: sas/templates/sas/album.jinja:37 sas/templates/sas/main.jinja:63
-#: sas/templates/sas/moderation.jinja:18 sas/templates/sas/picture.jinja:69
+#: sas/templates/sas/album.jinja:32 sas/templates/sas/moderation.jinja:18
+#: sas/templates/sas/picture.jinja:48
 #: stock/templates/stock/stock_shopping_list.jinja:43
 #: stock/templates/stock/stock_shopping_list.jinja:69
 #: trombi/templates/trombi/detail.jinja:35
@@ -392,7 +390,7 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: accounting/templates/accounting/bank_account_details.jinja:18
-#: club/views.py:79 core/views/user.py:200 sas/templates/sas/picture.jinja:84
+#: club/views.py:79 core/views/user.py:197 sas/templates/sas/picture.jinja:63
 msgid "Infos"
 msgstr "Infos"
 
@@ -426,7 +424,7 @@ msgstr "Nouveau compte club"
 #: com/templates/com/weekmail.jinja:61 core/templates/core/file.jinja:38
 #: core/templates/core/group_list.jinja:24 core/templates/core/page.jinja:35
 #: core/templates/core/poster_list.jinja:40
-#: core/templates/core/user_tools.jinja:71 core/views/user.py:230
+#: core/templates/core/user_tools.jinja:71 core/views/user.py:227
 #: counter/templates/counter/cash_summary_list.jinja:53
 #: counter/templates/counter/counter_list.jinja:17
 #: counter/templates/counter/counter_list.jinja:33
@@ -438,7 +436,7 @@ msgstr "Nouveau compte club"
 #: pedagogy/templates/pedagogy/guide.jinja:94
 #: pedagogy/templates/pedagogy/guide.jinja:109
 #: pedagogy/templates/pedagogy/uv_detail.jinja:184
-#: sas/templates/sas/album.jinja:36 trombi/templates/trombi/detail.jinja:9
+#: sas/templates/sas/album.jinja:31 trombi/templates/trombi/detail.jinja:9
 #: trombi/templates/trombi/edit_profile.jinja:34
 msgid "Edit"
 msgstr "Éditer"
@@ -627,7 +625,7 @@ msgstr "No"
 #: counter/templates/counter/last_ops.jinja:20
 #: counter/templates/counter/last_ops.jinja:45
 #: counter/templates/counter/refilling_list.jinja:16
-#: rootplace/templates/rootplace/logs.jinja:12 sas/views.py:351
+#: rootplace/templates/rootplace/logs.jinja:12 sas/views.py:356
 #: stock/templates/stock/stock_shopping_list.jinja:25
 #: stock/templates/stock/stock_shopping_list.jinja:54
 #: trombi/templates/trombi/user_profile.jinja:40
@@ -1011,7 +1009,7 @@ msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 msgid "You should specify a role"
 msgstr "Vous devez choisir un rôle"
 
-#: club/forms.py:283 sas/views.py:118 sas/views.py:179 sas/views.py:278
+#: club/forms.py:283 sas/views.py:117 sas/views.py:179 sas/views.py:287
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
@@ -1061,7 +1059,7 @@ msgstr "Un club avec ce nom UNIX existe déjà."
 
 #: club/models.py:336 counter/models.py:844 counter/models.py:880
 #: eboutic/models.py:53 eboutic/models.py:169 election/models.py:183
-#: launderette/models.py:136 launderette/models.py:198 sas/models.py:223
+#: launderette/models.py:136 launderette/models.py:198 sas/models.py:248
 #: trombi/models.py:206
 msgid "user"
 msgstr "nom d'utilisateur"
@@ -1372,8 +1370,8 @@ msgstr "Anciens membres"
 msgid "History"
 msgstr "Historique"
 
-#: club/views.py:116 core/templates/core/base.jinja:98 core/views/user.py:223
-#: sas/templates/sas/picture.jinja:105 trombi/views.py:61
+#: club/views.py:116 core/templates/core/base.jinja:98 core/views/user.py:220
+#: sas/templates/sas/picture.jinja:84 trombi/views.py:61
 msgid "Tools"
 msgstr "Outils"
 
@@ -1517,7 +1515,7 @@ msgstr "Administration des mailing listes"
 #: com/templates/com/news_detail.jinja:39
 #: core/templates/core/file_detail.jinja:65
 #: core/templates/core/file_moderation.jinja:23
-#: sas/templates/sas/moderation.jinja:17 sas/templates/sas/picture.jinja:66
+#: sas/templates/sas/moderation.jinja:17 sas/templates/sas/picture.jinja:45
 msgid "Moderate"
 msgstr "Modérer"
 
@@ -1679,7 +1677,7 @@ msgstr "Retour aux nouvelles"
 msgid "Author: "
 msgstr "Auteur : "
 
-#: com/templates/com/news_detail.jinja:37 sas/templates/sas/picture.jinja:97
+#: com/templates/com/news_detail.jinja:37 sas/templates/sas/picture.jinja:76
 msgid "Moderator: "
 msgstr "Modérateur : "
 
@@ -1774,7 +1772,7 @@ msgstr "Affiche - modifier"
 #: com/templates/com/poster_list.jinja:20
 #: com/templates/com/poster_list.jinja:23
 #: com/templates/com/screen_list.jinja:13
-#: core/templates/core/poster_list.jinja:19 sas/templates/sas/main.jinja:101
+#: core/templates/core/poster_list.jinja:19 sas/templates/sas/main.jinja:75
 msgid "Create"
 msgstr "Créer"
 
@@ -2218,17 +2216,7 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/templates/core/user_detail.jinja:110
 #: core/templates/core/user_detail.jinja:112
 #: core/templates/core/user_detail.jinja:113
-#: core/templates/core/user_edit.jinja:24
-#: core/templates/core/user_edit.jinja:26
-#: core/templates/core/user_edit.jinja:27
-#: core/templates/core/user_edit.jinja:46
-#: core/templates/core/user_edit.jinja:47
-#: core/templates/core/user_edit.jinja:49
-#: core/templates/core/user_edit.jinja:50
-#: core/templates/core/user_edit.jinja:65
-#: core/templates/core/user_edit.jinja:66
-#: core/templates/core/user_edit.jinja:68
-#: core/templates/core/user_edit.jinja:69
+#: core/templates/core/user_edit.jinja:16
 #: election/templates/election/election_detail.jinja:132
 #: election/templates/election/election_detail.jinja:134
 #: forum/templates/forum/macros.jinja:104
@@ -2629,25 +2617,25 @@ msgstr "Propriétés"
 
 #: core/templates/core/file_detail.jinja:13
 #: core/templates/core/file_moderation.jinja:20
-#: sas/templates/sas/picture.jinja:91
+#: sas/templates/sas/picture.jinja:70
 msgid "Owner: "
 msgstr "Propriétaire : "
 
-#: core/templates/core/file_detail.jinja:26 sas/templates/sas/album.jinja:51
-#: sas/templates/sas/main.jinja:75
+#: core/templates/core/file_detail.jinja:26 sas/templates/sas/album.jinja:46
+#: sas/templates/sas/main.jinja:49
 msgid "Clear clipboard"
 msgstr "Vider le presse-papier"
 
-#: core/templates/core/file_detail.jinja:27 sas/templates/sas/album.jinja:38
+#: core/templates/core/file_detail.jinja:27 sas/templates/sas/album.jinja:33
 msgid "Cut"
 msgstr "Couper"
 
-#: core/templates/core/file_detail.jinja:28 sas/templates/sas/album.jinja:39
+#: core/templates/core/file_detail.jinja:28 sas/templates/sas/album.jinja:34
 msgid "Paste"
 msgstr "Coller"
 
-#: core/templates/core/file_detail.jinja:31 sas/templates/sas/album.jinja:45
-#: sas/templates/sas/main.jinja:69
+#: core/templates/core/file_detail.jinja:31 sas/templates/sas/album.jinja:40
+#: sas/templates/sas/main.jinja:43
 msgid "Clipboard: "
 msgstr "Presse-papier : "
 
@@ -2657,7 +2645,7 @@ msgstr "Nom réel : "
 
 #: core/templates/core/file_detail.jinja:54
 #: core/templates/core/file_moderation.jinja:21
-#: sas/templates/sas/picture.jinja:87
+#: sas/templates/sas/picture.jinja:66
 msgid "Date: "
 msgstr "Date : "
 
@@ -2708,7 +2696,7 @@ msgid "Edit group"
 msgstr "Éditer le groupe"
 
 #: core/templates/core/group_edit.jinja:9
-#: core/templates/core/user_edit.jinja:138
+#: core/templates/core/user_edit.jinja:235
 #: core/templates/core/user_group.jinja:13
 #: pedagogy/templates/pedagogy/uv_edit.jinja:36
 msgid "Update"
@@ -3024,25 +3012,9 @@ msgstr "Résultat de la recherche"
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: core/templates/core/search.jinja:18 core/views/user.py:245
+#: core/templates/core/search.jinja:20 core/views/user.py:242
 msgid "Clubs"
 msgstr "Clubs"
-
-#: core/templates/core/to_markdown.jinja:4
-msgid "To Markdown"
-msgstr "Vers Markdown"
-
-#: core/templates/core/to_markdown.jinja:15
-msgid "Convert"
-msgstr "Convertir"
-
-#: core/templates/core/to_markdown.jinja:18
-msgid "Markdown"
-msgstr "Markdown"
-
-#: core/templates/core/to_markdown.jinja:22
-msgid "Render"
-msgstr "Rendu"
 
 #: core/templates/core/user_account.jinja:8
 msgid "Year"
@@ -3214,27 +3186,39 @@ msgstr "Aucun cadeau donné pour l'instant"
 msgid "Edit user"
 msgstr "Éditer l'utilisateur"
 
-#: core/templates/core/user_edit.jinja:11
-msgid "Edit user profile"
-msgstr "Éditer le profil de l'utilisateur"
+#: core/templates/core/user_edit.jinja:36
+msgid "Enable camera"
+msgstr "Activer la caméra"
 
-#: core/templates/core/user_edit.jinja:35
+#: core/templates/core/user_edit.jinja:44
+msgid "Take a picture"
+msgstr "Prendre une photo"
+
+#: core/templates/core/user_edit.jinja:60
 msgid "To edit your profile picture, ask a member of the AE"
 msgstr "Pour changer votre photo de profil, demandez à un membre de l'AE"
 
-#: core/templates/core/user_edit.jinja:128
+#: core/templates/core/user_edit.jinja:142
+msgid "captured"
+msgstr "capturé"
+
+#: core/templates/core/user_edit.jinja:163
+msgid "Edit user profile"
+msgstr "Éditer le profil de l'utilisateur"
+
+#: core/templates/core/user_edit.jinja:225
 msgid "Change my password"
 msgstr "Changer mon mot de passe"
 
-#: core/templates/core/user_edit.jinja:133
+#: core/templates/core/user_edit.jinja:230
 msgid "Change user password"
 msgstr "Changer le mot de passe"
 
-#: core/templates/core/user_edit.jinja:143
+#: core/templates/core/user_edit.jinja:240
 msgid "Username:"
 msgstr "Nom d'utilisateur : "
 
-#: core/templates/core/user_edit.jinja:146
+#: core/templates/core/user_edit.jinja:243
 msgid "Account number:"
 msgstr "Numéro de compte : "
 
@@ -3260,7 +3244,7 @@ msgstr "Voir l'arbre des ancêtres"
 msgid "No godfathers / godmothers"
 msgstr "Pas de famille"
 
-#: core/templates/core/user_godfathers.jinja:38 core/views/user.py:455
+#: core/templates/core/user_godfathers.jinja:38 core/views/user.py:439
 msgid "Godchildren"
 msgstr "Fillots / Fillotes"
 
@@ -3324,29 +3308,23 @@ msgstr "Photos de %(user_name)s"
 msgid "Download all my pictures"
 msgstr "Télécharger toutes mes photos"
 
-#: core/templates/core/user_pictures.jinja:47 sas/templates/sas/album.jinja:68
-#: sas/templates/sas/album.jinja:96
+#: core/templates/core/user_pictures.jinja:49 sas/templates/sas/album.jinja:74
+#: sas/templates/sas/macros.jinja:16
 msgid "To be moderated"
 msgstr "A modérer"
 
-#: core/templates/core/user_pictures.jinja:56
-msgid "Picture Unavailable"
-msgstr "Photo Indisponible"
-
-#: core/templates/core/user_pictures.jinja:100
+#: core/templates/core/user_pictures.jinja:130
 msgid "pictures"
 msgstr "photos"
 
 #: core/templates/core/user_preferences.jinja:8
-#: core/templates/core/user_preferences.jinja:13 core/views/user.py:237
+#: core/templates/core/user_preferences.jinja:13 core/views/user.py:234
 msgid "Preferences"
 msgstr "Préférences"
 
 #: core/templates/core/user_preferences.jinja:14
-#, fuzzy
-#| msgid "Generate"
 msgid "General"
-msgstr "Générer"
+msgstr "Général"
 
 #: core/templates/core/user_preferences.jinja:21 trombi/views.py:56
 msgid "Trombi"
@@ -3415,7 +3393,7 @@ msgstr "Outils utilisateurs"
 msgid "Sith management"
 msgstr "Gestion de Sith"
 
-#: core/templates/core/user_tools.jinja:21 core/views/user.py:253
+#: core/templates/core/user_tools.jinja:21 core/views/user.py:250
 msgid "Groups"
 msgstr "Groupes"
 
@@ -3470,7 +3448,7 @@ msgstr "Relevés de caisse"
 msgid "Invoices call"
 msgstr "Appels à facture"
 
-#: core/templates/core/user_tools.jinja:72 core/views/user.py:272
+#: core/templates/core/user_tools.jinja:72 core/views/user.py:269
 #: counter/templates/counter/counter_list.jinja:18
 #: counter/templates/counter/counter_list.jinja:34
 #: counter/templates/counter/counter_list.jinja:56
@@ -3557,10 +3535,6 @@ msgid "Other tools"
 msgstr "Autres outils"
 
 #: core/templates/core/user_tools.jinja:193
-msgid "Convert dokuwiki/BBcode syntax to Markdown"
-msgstr "Convertir de la syntaxe dokuwiki/BBcode vers Markdown"
-
-#: core/templates/core/user_tools.jinja:194
 msgid "Trombi tools"
 msgstr "Outils Trombi"
 
@@ -3581,12 +3555,12 @@ msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
 #: core/views/files.py:154 core/views/forms.py:297 core/views/forms.py:304
-#: sas/views.py:82
+#: sas/views.py:81
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 
-#: core/views/files.py:236 sas/views.py:354
+#: core/views/files.py:236 sas/views.py:359
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
@@ -3728,29 +3702,29 @@ msgstr "Utilisateurs à retirer du groupe"
 msgid "Users to add to group"
 msgstr "Utilisateurs à ajouter au groupe"
 
-#: core/views/user.py:182
+#: core/views/user.py:179
 msgid "We couldn't verify that this email actually exists"
 msgstr "Nous n'avons pas réussi à vérifier que cette adresse mail existe."
 
-#: core/views/user.py:205 core/views/user.py:457 core/views/user.py:459
+#: core/views/user.py:202 core/views/user.py:441 core/views/user.py:443
 msgid "Family"
 msgstr "Famille"
 
-#: core/views/user.py:210 sas/templates/sas/album.jinja:84
+#: core/views/user.py:207 sas/templates/sas/album.jinja:63
 #: trombi/templates/trombi/export.jinja:25
 #: trombi/templates/trombi/user_profile.jinja:11
 msgid "Pictures"
 msgstr "Photos"
 
-#: core/views/user.py:218
+#: core/views/user.py:215
 msgid "Galaxy"
 msgstr "Galaxie"
 
-#: core/views/user.py:596
+#: core/views/user.py:580
 msgid "User already has a profile picture"
 msgstr "L'utilisateur a déjà une photo de profil"
 
-#: counter/app.py:30 counter/models.py:396 counter/models.py:850
+#: counter/apps.py:30 counter/models.py:396 counter/models.py:850
 #: counter/models.py:886 launderette/models.py:32 stock/models.py:39
 msgid "counter"
 msgstr "comptoir"
@@ -4083,7 +4057,7 @@ msgstr "Ce n'est pas un UID de carte étudiante valide"
 #: counter/templates/counter/invoices_call.jinja:16
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
-#: sas/templates/sas/picture.jinja:147
+#: sas/templates/sas/picture.jinja:127
 #: subscription/templates/subscription/stats.jinja:19
 msgid "Go"
 msgstr "Valider"
@@ -4460,7 +4434,7 @@ msgstr ""
 msgid "this page"
 msgstr "cette page"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:124
+#: eboutic/templates/eboutic/eboutic_main.jinja:128
 msgid "There are no items available for sale"
 msgstr "Aucun article n'est disponible à la vente"
 
@@ -4495,19 +4469,21 @@ msgstr ""
 "Paiement par compte AE désactivé parce que votre panier contient des bons de "
 "rechargement."
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:125
-msgid "AE account payment disabled because you do not have enough money remaining."
-msgstr "Paiement par compte AE désactivé parce que votre solde est insuffisant."
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:124
+msgid ""
+"AE account payment disabled because you do not have enough money remaining."
+msgstr ""
+"Paiement par compte AE désactivé parce que votre solde est insuffisant."
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:132
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:129
 msgid "Pay with Sith account"
 msgstr "Payer avec un compte AE"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:143
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:140
 msgid "Billing info registration success"
 msgstr "Informations de facturation enregistrées"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja:144
+#: eboutic/templates/eboutic/eboutic_makecommand.jinja:141
 msgid "Billing info registration failure"
 msgstr "Echec de l'enregistrement des informations de facturation."
 
@@ -5355,40 +5331,36 @@ msgstr "Utilisateur qui sera supprimé"
 msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
-#: sas/models.py:231
+#: sas/models.py:256
 msgid "picture"
 msgstr "photo"
 
 #: sas/templates/sas/album.jinja:9 sas/templates/sas/main.jinja:8
-#: sas/templates/sas/main.jinja:39 sas/templates/sas/picture.jinja:24
+#: sas/templates/sas/main.jinja:17 sas/templates/sas/picture.jinja:8
 msgid "SAS"
 msgstr "SAS"
 
-#: sas/templates/sas/album.jinja:57 sas/templates/sas/moderation.jinja:10
+#: sas/templates/sas/album.jinja:52 sas/templates/sas/moderation.jinja:10
 msgid "Albums"
 msgstr "Albums"
 
-#: sas/templates/sas/album.jinja:109
-msgid "This album does not contain any photos."
-msgstr "Cet album ne contient aucune photo."
-
-#: sas/templates/sas/album.jinja:128
+#: sas/templates/sas/album.jinja:117
 msgid "Upload"
 msgstr "Envoyer"
 
-#: sas/templates/sas/album.jinja:135
+#: sas/templates/sas/album.jinja:124
 msgid "Template generation time: "
 msgstr "Temps de génération du template : "
 
-#: sas/templates/sas/main.jinja:42
+#: sas/templates/sas/main.jinja:20
 msgid "You must be logged in to see the SAS."
 msgstr "Vous devez être connecté pour voir les photos."
 
-#: sas/templates/sas/main.jinja:45
+#: sas/templates/sas/main.jinja:23
 msgid "Latest albums"
 msgstr "Derniers albums"
 
-#: sas/templates/sas/main.jinja:60 sas/templates/sas/main.jinja:79
+#: sas/templates/sas/main.jinja:38 sas/templates/sas/main.jinja:53
 msgid "All categories"
 msgstr "Toutes les catégories"
 
@@ -5396,36 +5368,36 @@ msgstr "Toutes les catégories"
 msgid "SAS moderation"
 msgstr "Modération du SAS"
 
-#: sas/templates/sas/picture.jinja:59
+#: sas/templates/sas/picture.jinja:38
 msgid "Asked for removal"
 msgstr "Retrait demandé"
 
-#: sas/templates/sas/picture.jinja:109
+#: sas/templates/sas/picture.jinja:88
 msgid "HD version"
 msgstr "Version HD"
 
-#: sas/templates/sas/picture.jinja:112
+#: sas/templates/sas/picture.jinja:91
 msgid "Ask for removal"
 msgstr "Demander le retrait"
 
-#: sas/templates/sas/picture.jinja:143
+#: sas/templates/sas/picture.jinja:122
 msgid "People"
 msgstr "Personne(s)"
 
-#: sas/views.py:38
+#: sas/views.py:37
 msgid "Add a new album"
 msgstr "Ajouter un nouvel album"
 
-#: sas/views.py:41
+#: sas/views.py:40
 msgid "Upload images"
 msgstr "Envoyer les images"
 
-#: sas/views.py:59
+#: sas/views.py:58
 #, python-format
 msgid "Error creating album %(album)s: %(msg)s"
 msgstr "Erreur de création de l'album %(album)s : %(msg)s"
 
-#: sas/views.py:94 trombi/templates/trombi/detail.jinja:15
+#: sas/views.py:93 trombi/templates/trombi/detail.jinja:15
 msgid "Add user"
 msgstr "Ajouter une personne"
 
@@ -6350,6 +6322,15 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
 
+#~ msgid "Picture Unavailable"
+#~ msgstr "Photo Indisponible"
+
+#~ msgid "Convert dokuwiki/BBcode syntax to Markdown"
+#~ msgstr "Convertir de la syntaxe dokuwiki/BBcode vers Markdown"
+
+#~ msgid "This album does not contain any photos."
+#~ msgstr "Cet album ne contient aucune photo."
+
 #~ msgid "You have no basket."
 #~ msgstr "Vous n'avez pas de panier."
 
@@ -6407,9 +6388,6 @@ msgstr "Nombre de caractères max: %(max_length)s"
 
 #~ msgid "Current profile: "
 #~ msgstr "Profil actuel : "
-
-#~ msgid "Take picture"
-#~ msgstr "Prendre une photo"
 
 #~ msgid "Current avatar: "
 #~ msgstr "Avatar actuel : "

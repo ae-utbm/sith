@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright 2017
+# Copyright 2016,2017
 # - Sli <antoine@bartuccio.fr>
 #
 # Ce fichier fait partie du site de l'Association des Étudiants de l'UTBM,
@@ -23,21 +23,17 @@
 #
 
 from django.conf import settings
-from django.contrib.staticfiles.finders import get_finders
+from django.contrib.staticfiles.finders import FileSystemFinder
 from django.core.files.storage import FileSystemStorage
 
 
-class ScssFileStorage(FileSystemStorage):
-    def __init__(self, location=None, base_url=None, *args, **kwargs):
-        if location is None:
-            location = settings.STATIC_ROOT
-        if base_url is None:
-            base_url = settings.STATIC_URL
-        super().__init__(location, base_url, *args, **kwargs)
+class ScssFinder(FileSystemFinder):
+    """Find static *.css files compiled on the fly."""
 
-
-def find_file(path):
-    for finder in get_finders():
-        result = finder.find(path)
-        if result:
-            return result
+    def __init__(self, apps=None, *args, **kwargs):
+        location = settings.STATIC_ROOT
+        self.locations = [("", location)]
+        self.storages = {}
+        filesystem_storage = FileSystemStorage(location=location)
+        filesystem_storage.prefix = self.locations[0][0]
+        self.storages[location] = filesystem_storage
