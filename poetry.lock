@@ -465,17 +465,17 @@ files = [
 
 [[package]]
 name = "dict2xml"
-version = "1.7.5"
+version = "1.7.6"
 description = "Small utility to convert a python dictionary into an XML string"
 optional = false
 python-versions = ">=3.5"
 files = [
-    {file = "dict2xml-1.7.5-py3-none-any.whl", hash = "sha256:f5380dcda0039807bff5543801009f36e5bfff355705863628835cb69f4711b6"},
-    {file = "dict2xml-1.7.5.tar.gz", hash = "sha256:e279f4707cf7733f1e56b2cea39e257c727b86f74e449deccc6a712a1cfe4e45"},
+    {file = "dict2xml-1.7.6-py3-none-any.whl", hash = "sha256:841a0c1720e4bfa121e958b805f1062fccf5af2970e7a1f81d7fa056f49e5065"},
+    {file = "dict2xml-1.7.6.tar.gz", hash = "sha256:3e4811f4ef7fca86dede6acf382268ff9bc5735a4aa0e21b465f6eb0c4e81732"},
 ]
 
 [package.extras]
-tests = ["noseofyeti[black] (==2.4.4)", "pytest (==7.4.4)"]
+tests = ["noseofyeti[black] (==2.4.9)", "pytest (==8.3.2)"]
 
 [[package]]
 name = "distlib"
@@ -1955,6 +1955,7 @@ files = [
     {file = "PyYAML-6.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:bf07ee2fef7014951eeb99f56f39c9bb4af143d8aa3c21b1677805985307da34"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:855fb52b0dc35af121542a76b9a84f8d1cd886ea97c84703eaa6d88e37a2ad28"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:40df9b996c2b73138957fe23a16a4f0ba614f4c0efce1e9406a184b6d07fa3a9"},
+    {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a08c6f0fe150303c1c6b71ebcd7213c2858041a7e01975da3a99aed1e7a378ef"},
     {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6c22bec3fbe2524cde73d7ada88f6566758a8f7227bfbf93a408a9d86bcc12a0"},
     {file = "PyYAML-6.0.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:8d4e9c88387b0f5c7d5f281e55304de64cf7f9c0021a3525bd3b1c542da3b0e4"},
     {file = "PyYAML-6.0.1-cp312-cp312-win32.whl", hash = "sha256:d483d2cdf104e7c9fa60c544d92981f12ad66a457afae824d146093b8c294c54"},
@@ -2640,4 +2641,4 @@ filelock = ">=3.4"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "1a75baf1d077dae5ac9d89dce05c9e2cb876064d4968be4f0235faec7b12e0ba"
+content-hash = "5b1e4865b267c4914e29b67daa3b05d78762bb9094b354795fd8e154fac11eba"
