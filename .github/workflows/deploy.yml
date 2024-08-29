@@ -44,21 +44,3 @@ jobs:
           poetry run ./manage.py compilemessages
 
           sudo systemctl restart uwsgi
-  
-  sentry:
-    runs-on: ubuntu-latest
-    environment: production
-    timeout-minutes: 30
-    needs: deployment
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Sentry Release
-        uses: getsentry/action-release@v1.2.0
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-          SENTRY_URL: ${{ secrets.SENTRY_URL }}
-        with:
-          environment: production
