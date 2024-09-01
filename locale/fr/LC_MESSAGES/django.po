@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-01 15:19+0200\n"
+"POT-Creation-Date: 2024-09-01 23:45+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: accounting/models.py:50 accounting/models.py:91 accounting/models.py:124
-#: accounting/models.py:191 club/models.py:52 com/models.py:276
-#: com/models.py:295 counter/models.py:208 counter/models.py:239
+#: accounting/models.py:191 club/models.py:52 com/models.py:274
+#: com/models.py:293 counter/models.py:208 counter/models.py:239
 #: counter/models.py:370 forum/models.py:59 launderette/models.py:29
 #: launderette/models.py:84 launderette/models.py:122 stock/models.py:36
 #: stock/models.py:57 stock/models.py:97 stock/models.py:125
@@ -66,7 +66,7 @@ msgid "account number"
 msgstr "numéro de compte"
 
 #: accounting/models.py:97 accounting/models.py:128 club/models.py:344
-#: com/models.py:76 com/models.py:261 com/models.py:301 counter/models.py:257
+#: com/models.py:74 com/models.py:259 com/models.py:299 counter/models.py:257
 #: counter/models.py:372 trombi/models.py:210
 msgid "club"
 msgstr "club"
@@ -1059,7 +1059,7 @@ msgstr "Un club avec ce nom UNIX existe déjà."
 
 #: club/models.py:336 counter/models.py:844 counter/models.py:880
 #: eboutic/models.py:53 eboutic/models.py:169 election/models.py:183
-#: launderette/models.py:136 launderette/models.py:198 sas/models.py:248
+#: launderette/models.py:136 launderette/models.py:198 sas/models.py:254
 #: trombi/models.py:206
 msgid "user"
 msgstr "nom d'utilisateur"
@@ -1084,11 +1084,11 @@ msgid "Enter a valid address. Only the root of the address is needed."
 msgstr ""
 "Entrez une adresse valide. Seule la racine de l'adresse est nécessaire."
 
-#: club/models.py:428 com/models.py:84 com/models.py:311 core/models.py:905
+#: club/models.py:428 com/models.py:82 com/models.py:309 core/models.py:905
 msgid "is moderated"
 msgstr "est modéré"
 
-#: club/models.py:432 com/models.py:88 com/models.py:315
+#: club/models.py:432 com/models.py:86 com/models.py:313
 msgid "moderator"
 msgstr "modérateur"
 
@@ -1162,7 +1162,7 @@ msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
 
 #: club/templates/club/club_members.jinja:80
-#: core/templates/core/file_detail.jinja:19 core/views/forms.py:339
+#: core/templates/core/file_detail.jinja:19 core/views/forms.py:335
 #: launderette/views.py:217 trombi/templates/trombi/detail.jinja:19
 msgid "Add"
 msgstr "Ajouter"
@@ -1397,108 +1397,108 @@ msgstr "Liste d'affiches"
 msgid "Props"
 msgstr "Propriétés"
 
-#: com/models.py:44
+#: com/models.py:43
 msgid "alert message"
 msgstr "message d'alerte"
 
-#: com/models.py:45
+#: com/models.py:44
 msgid "info message"
 msgstr "message d'info"
 
-#: com/models.py:46
+#: com/models.py:45
 msgid "weekmail destinations"
 msgstr "destinataires du weekmail"
 
-#: com/models.py:59
+#: com/models.py:57
 msgid "Notice"
 msgstr "Information"
 
-#: com/models.py:60
+#: com/models.py:58
 msgid "Event"
 msgstr "Événement"
 
-#: com/models.py:61
+#: com/models.py:59
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: com/models.py:62
+#: com/models.py:60
 msgid "Call"
 msgstr "Appel"
 
-#: com/models.py:69 com/models.py:176 com/models.py:250 election/models.py:12
+#: com/models.py:67 com/models.py:174 com/models.py:248 election/models.py:12
 #: election/models.py:114 election/models.py:152 forum/models.py:255
 #: forum/models.py:309 pedagogy/models.py:96
 msgid "title"
 msgstr "titre"
 
-#: com/models.py:70
+#: com/models.py:68
 msgid "summary"
 msgstr "résumé"
 
-#: com/models.py:71 com/models.py:251 trombi/models.py:189
+#: com/models.py:69 com/models.py:249 trombi/models.py:189
 msgid "content"
 msgstr "contenu"
 
-#: com/models.py:73 core/models.py:1474 launderette/models.py:92
+#: com/models.py:71 core/models.py:1474 launderette/models.py:92
 #: launderette/models.py:130 launderette/models.py:181 stock/models.py:74
 #: stock/models.py:129
 msgid "type"
 msgstr "type"
 
-#: com/models.py:81 com/models.py:255 pedagogy/models.py:56
+#: com/models.py:79 com/models.py:253 pedagogy/models.py:56
 #: pedagogy/models.py:199 trombi/models.py:179
 msgid "author"
 msgstr "auteur"
 
-#: com/models.py:155
+#: com/models.py:153
 msgid "news_date"
 msgstr "date de la nouvelle"
 
-#: com/models.py:158
+#: com/models.py:156
 msgid "start_date"
 msgstr "date de début"
 
-#: com/models.py:159
+#: com/models.py:157
 msgid "end_date"
 msgstr "date de fin"
 
-#: com/models.py:177
+#: com/models.py:175
 msgid "intro"
 msgstr "intro"
 
-#: com/models.py:178
+#: com/models.py:176
 msgid "joke"
 msgstr "blague"
 
-#: com/models.py:179
+#: com/models.py:177
 msgid "protip"
 msgstr "astuce"
 
-#: com/models.py:180
+#: com/models.py:178
 msgid "conclusion"
 msgstr "conclusion"
 
-#: com/models.py:181
+#: com/models.py:179
 msgid "sent"
 msgstr "envoyé"
 
-#: com/models.py:246
+#: com/models.py:244
 msgid "weekmail"
 msgstr "weekmail"
 
-#: com/models.py:264
+#: com/models.py:262
 msgid "rank"
 msgstr "rang"
 
-#: com/models.py:297 core/models.py:870 core/models.py:920
+#: com/models.py:295 core/models.py:870 core/models.py:920
 msgid "file"
 msgstr "fichier"
 
-#: com/models.py:309
+#: com/models.py:307
 msgid "display time"
 msgstr "temps d'affichage"
 
-#: com/models.py:340
+#: com/models.py:338
 msgid "Begin date should be before end date"
 msgstr "La date de début doit être avant celle de fin"
 
@@ -2265,11 +2265,11 @@ msgstr "miniature"
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:896 core/models.py:1240 core/views/files.py:229
+#: core/models.py:896 core/models.py:1240 core/views/files.py:230
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:899 core/models.py:1243 core/views/files.py:232
+#: core/models.py:899 core/models.py:1243 core/views/files.py:233
 msgid "view group"
 msgstr "groupe de vue"
 
@@ -2499,7 +2499,7 @@ msgid "Launderette"
 msgstr "Laverie"
 
 #: core/templates/core/base.jinja:227 core/templates/core/file.jinja:20
-#: core/views/files.py:115
+#: core/views/files.py:116
 msgid "Files"
 msgstr "Fichiers"
 
@@ -2554,10 +2554,6 @@ msgstr "R&D"
 #: core/templates/core/base.jinja:289
 msgid "Site created by the IT Department of the AE"
 msgstr "Site réalisé par le Pôle Informatique de l'AE"
-
-#: core/templates/core/base.jinja:295
-msgid "Sith version:"
-msgstr "Version du site :"
 
 #: core/templates/core/create.jinja:4 core/templates/core/create.jinja:8
 #, python-format
@@ -3545,22 +3541,22 @@ msgid_plural "%(nb_days)d days, %(remainder)s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/views/files.py:112
+#: core/views/files.py:113
 msgid "Add a new folder"
 msgstr "Ajouter un nouveau dossier"
 
-#: core/views/files.py:132
+#: core/views/files.py:133
 #, python-format
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py:152 core/views/forms.py:304 core/views/forms.py:311
+#: core/views/files.py:153 core/views/forms.py:300 core/views/forms.py:307
 #: sas/views.py:81
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 
-#: core/views/files.py:234 sas/views.py:359
+#: core/views/files.py:235 sas/views.py:359
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
@@ -3652,7 +3648,7 @@ msgstr "Choisir un utilisateur"
 msgid "Username, email, or account number"
 msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
-#: core/views/forms.py:254
+#: core/views/forms.py:250
 msgid ""
 "Profile: you need to be visible on the picture, in order to be recognized (e."
 "g. by the barmen)"
@@ -3660,36 +3656,36 @@ msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
 
-#: core/views/forms.py:259
+#: core/views/forms.py:255
 msgid "Avatar: used on the forum"
 msgstr "Avatar : utilisé sur le forum"
 
-#: core/views/forms.py:263
+#: core/views/forms.py:259
 msgid "Scrub: let other know how your scrub looks like!"
 msgstr "Blouse : montrez aux autres à quoi ressemble votre blouse !"
 
-#: core/views/forms.py:315
+#: core/views/forms.py:311
 msgid "Bad image format, only jpeg, png, webp and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, webp et gif sont acceptés"
 
-#: core/views/forms.py:336
+#: core/views/forms.py:332
 msgid "Godfather / Godmother"
 msgstr "Parrain / Marraine"
 
-#: core/views/forms.py:337
+#: core/views/forms.py:333
 msgid "Godchild"
 msgstr "Fillot / Fillote"
 
-#: core/views/forms.py:342 counter/forms.py:67 trombi/views.py:149
+#: core/views/forms.py:338 counter/forms.py:67 trombi/views.py:149
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
-#: core/views/forms.py:355 core/views/forms.py:373 election/models.py:22
+#: core/views/forms.py:351 core/views/forms.py:369 election/models.py:22
 #: election/views.py:147
 msgid "edit groups"
 msgstr "groupe d'édition"
 
-#: core/views/forms.py:358 core/views/forms.py:376 election/models.py:29
+#: core/views/forms.py:354 core/views/forms.py:372 election/models.py:29
 #: election/views.py:150
 msgid "view groups"
 msgstr "groupe de vue"
@@ -3719,10 +3715,6 @@ msgstr "Photos"
 #: core/views/user.py:215
 msgid "Galaxy"
 msgstr "Galaxie"
-
-#: core/views/user.py:580
-msgid "User already has a profile picture"
-msgstr "L'utilisateur a déjà une photo de profil"
 
 #: counter/apps.py:30 counter/models.py:396 counter/models.py:850
 #: counter/models.py:886 launderette/models.py:32 stock/models.py:39
@@ -5331,7 +5323,7 @@ msgstr "Utilisateur qui sera supprimé"
 msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
-#: sas/models.py:256
+#: sas/models.py:262
 msgid "picture"
 msgstr "photo"
 
