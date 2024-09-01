@@ -20,7 +20,7 @@ homepage = "https://ae.utbm.fr/"
 license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.12"
 Django = "^4.2.14"
 django-ninja = "^1.2.2"
 django-ninja-extra = "^0.21.2"
