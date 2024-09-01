@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-27 17:02+0200\n"
+"POT-Creation-Date: 2024-09-01 15:19+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -2265,11 +2265,11 @@ msgstr "miniature"
 msgid "owner"
 msgstr "propriétaire"
 
-#: core/models.py:896 core/models.py:1240 core/views/files.py:231
+#: core/models.py:896 core/models.py:1240 core/views/files.py:229
 msgid "edit group"
 msgstr "groupe d'édition"
 
-#: core/models.py:899 core/models.py:1243 core/views/files.py:234
+#: core/models.py:899 core/models.py:1243 core/views/files.py:232
 msgid "view group"
 msgstr "groupe de vue"
 
@@ -2499,7 +2499,7 @@ msgid "Launderette"
 msgstr "Laverie"
 
 #: core/templates/core/base.jinja:227 core/templates/core/file.jinja:20
-#: core/views/files.py:117
+#: core/views/files.py:115
 msgid "Files"
 msgstr "Fichiers"
 
@@ -3545,22 +3545,22 @@ msgid_plural "%(nb_days)d days, %(remainder)s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: core/views/files.py:114
+#: core/views/files.py:112
 msgid "Add a new folder"
 msgstr "Ajouter un nouveau dossier"
 
-#: core/views/files.py:134
+#: core/views/files.py:132
 #, python-format
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py:154 core/views/forms.py:304 core/views/forms.py:311
+#: core/views/files.py:152 core/views/forms.py:304 core/views/forms.py:311
 #: sas/views.py:81
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 
-#: core/views/files.py:236 sas/views.py:359
+#: core/views/files.py:234 sas/views.py:359
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
@@ -6013,11 +6013,11 @@ msgid "Eboutic is reserved to specific users. In doubt, don't use it."
 msgstr ""
 "Eboutic est réservé à des cas particuliers. Dans le doute, ne l'utilisez pas."
 
-#: subscription/views.py:93
+#: subscription/views.py:78
 msgid "A user with that email address already exists"
 msgstr "Un utilisateur avec cette adresse email existe déjà"
 
-#: subscription/views.py:116
+#: subscription/views.py:101
 msgid "You must either choose an existing user or create a new one properly"
 msgstr ""
 "Vous devez soit choisir un utilisateur existant, soit en créer un proprement"

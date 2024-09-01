@@ -48,26 +48,11 @@ class SubscriptionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add fields to allow basic user creation
-        self.fields["last_name"] = forms.CharField(
-            max_length=User._meta.get_field("last_name").max_length
+        self.fields |= forms.fields_for_model(
+            User,
+            fields=["first_name", "last_name", "email", "date_of_birth"],
+            widgets={"date_of_birth": SelectDate},
         )
-        self.fields["first_name"] = forms.CharField(
-            max_length=User._meta.get_field("first_name").max_length
-        )
-        self.fields["email"] = forms.EmailField()
-        self.fields["date_of_birth"] = forms.DateField(widget=SelectDate)
-
-        self.field_order = [
-            "member",
-            "last_name",
-            "first_name",
-            "email",
-            "date_of_birth",
-            "subscription_type",
-            "payment_method",
-            "location",
-        ]
 
     def clean_member(self):
         subscriber = self.cleaned_data.get("member")
@@ -124,9 +109,8 @@ class NewSubscription(CreateView):
     form_class = SubscriptionForm
 
     def dispatch(self, request, *arg, **kwargs):
-        res = super().dispatch(request, *arg, **kwargs)
         if request.user.can_create_subscription:
-            return res
+            return super().dispatch(request, *arg, **kwargs)
         raise PermissionDenied
 
     def get_initial(self):
