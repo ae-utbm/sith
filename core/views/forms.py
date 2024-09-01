@@ -239,10 +239,6 @@ class UserProfileForm(forms.ModelForm):
             "quote": forms.Textarea,
         }
 
-    def generate_name(self, field_name, f):
-        field_name = field_name[:-4]
-        return field_name + str(self.instance.id) + "." + f.content_type.split("/")[-1]
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -278,11 +274,11 @@ class UserProfileForm(forms.ModelForm):
                     im = Image.open(BytesIO(f.read()))
                     new_file = SithFile(
                         parent=parent,
-                        name=self.generate_name(field, f),
-                        file=resize_image(im, 400, f.content_type.split("/")[-1]),
+                        name=f"{field.removesuffix('_pict')}_{self.instance.id}.webp",
+                        file=resize_image(im, 400, "webp"),
                         owner=self.instance,
                         is_folder=False,
-                        mime_type=f.content_type,
+                        mime_type="image/wepb",
                         size=f.size,
                         moderator=self.instance,
                         is_moderated=True,
