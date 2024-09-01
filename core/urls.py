@@ -127,11 +127,6 @@ urlpatterns = [
         UserUpdateProfileView.as_view(),
         name="user_edit",
     ),
-    path(
-        "user/<int:user_id>/profile_upload/",
-        UserUploadProfilePictView.as_view(),
-        name="user_profile_upload",
-    ),
     path("user/<int:user_id>/clubs/", UserClubView.as_view(), name="user_clubs"),
     path(
         "user/<int:user_id>/prefs/",
