@@ -102,13 +102,17 @@ def scale_dimension(width, height, long_edge):
 def resize_image(im, edge, img_format):
     (w, h) = im.size
     (width, height) = scale_dimension(w, h, long_edge=edge)
+    img_format = img_format.upper()
     content = BytesIO()
     # use the lanczos filter for antialiasing and discard the alpha channel
-    im = im.resize((width, height), Resampling.LANCZOS).convert("RGB")
+    im = im.resize((width, height), Resampling.LANCZOS)
+    if img_format == "JPEG":
+        # converting an image with an alpha channel to jpeg would cause a crash
+        im = im.convert("RGB")
     try:
         im.save(
             fp=content,
-            format=img_format.upper(),
+            format=img_format,
             quality=90,
             optimize=True,
             progressive=True,
@@ -117,7 +121,7 @@ def resize_image(im, edge, img_format):
         PIL.ImageFile.MAXBLOCK = im.size[0] * im.size[1]
         im.save(
             fp=content,
-            format=img_format.upper(),
+            format=img_format,
             quality=90,
             optimize=True,
             progressive=True,

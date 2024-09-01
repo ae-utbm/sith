@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+import mimetypes
 from urllib.parse import quote, urljoin
 
 # This file contains all the views that concern the page model
@@ -77,7 +78,7 @@ def send_file(
         raise Http404
     with open(filepath, "rb") as filename:
         response.content = FileWrapper(filename)
-        response["Content-Type"] = f.mime_type
+        response["Content-Type"] = mimetypes.guess_type(filepath)[0]
         response["Last-Modified"] = http_date(f.date.timestamp())
         response["Content-Length"] = filepath.stat().st_size
         return response
