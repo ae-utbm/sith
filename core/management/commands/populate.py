@@ -234,10 +234,10 @@ Welcome to the wiki page!
                 skia_profile = SithFile(
                     parent=profiles_root,
                     name=name,
-                    file=resize_image(Image.open(BytesIO(f.read())), 400, "JPEG"),
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, "WEBP"),
                     owner=skia,
                     is_folder=False,
-                    mime_type="image/jpeg",
+                    mime_type="image/webp",
                     size=skia_profile_path.stat().st_size,
                 )
                 skia_profile.file.name = name
@@ -368,10 +368,10 @@ Welcome to the wiki page!
                 richard_profile = SithFile(
                     parent=profiles_root,
                     name=name,
-                    file=resize_image(Image.open(BytesIO(f.read())), 400, "JPEG"),
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, "WEBP"),
                     owner=richard,
                     is_folder=False,
-                    mime_type="image/jpeg",
+                    mime_type="image/webp",
                     size=richard_profile_path.stat().st_size,
                 )
                 richard_profile.file.name = name
@@ -853,10 +853,10 @@ Welcome to the wiki page!
                 sli_profile = SithFile(
                     parent=profiles_root,
                     name=name,
-                    file=resize_image(Image.open(BytesIO(f.read())), 400, "JPEG"),
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, "WEBP"),
                     owner=sli,
                     is_folder=False,
-                    mime_type="image/jpeg",
+                    mime_type="image/webp",
                     size=sli_profile_path.stat().st_size,
                 )
                 sli_profile.file.name = name
@@ -887,10 +887,10 @@ Welcome to the wiki page!
                 krophil_profile = SithFile(
                     parent=profiles_root,
                     name=name,
-                    file=resize_image(Image.open(BytesIO(f.read())), 400, "JPEG"),
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, "WEBP"),
                     owner=krophil,
                     is_folder=False,
-                    mime_type="image/jpeg",
+                    mime_type="image/webp",
                     size=krophil_profile_path.stat().st_size,
                 )
                 krophil_profile.file.name = name
@@ -1217,13 +1217,13 @@ Welcome to the wiki page!
                             parent=album,
                             name=p.name,
                             file=resize_image(
-                                Image.open(BytesIO(p.read_bytes())), 1000, "JPEG"
+                                Image.open(BytesIO(p.read_bytes())), 1000, "WEBP"
                             ),
                             owner=root,
                             is_folder=False,
                             is_in_sas=True,
                             is_moderated=True,
-                            mime_type="image/jpeg",
+                            mime_type="image/webp",
                             size=p.stat().st_size,
                         )
                         pict.file.name = p.name
@@ -1252,10 +1252,10 @@ Welcome to the wiki page!
                 skia_profile = SithFile(
                     parent=profiles_root,
                     name=name,
-                    file=resize_image(Image.open(BytesIO(f.read())), 400, "JPEG"),
+                    file=resize_image(Image.open(BytesIO(f.read())), 400, "WEBP"),
                     owner=skia,
                     is_folder=False,
-                    mime_type="image/jpeg",
+                    mime_type="image/webp",
                     size=skia_profile_path.stat().st_size,
                 )
                 skia_profile.file.name = name

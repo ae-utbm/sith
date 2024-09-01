@@ -64,7 +64,7 @@
           </div>
         {% endif %}
       </div>
-      {% if user.promo %}
+      {% if user.promo and user.promo_has_logo() %}
         <div class="user_mini_profile_promo">
           <img src="{{ static('core/img/promo_%02d.png' % user.promo) }}" title="Promo {{ user.promo }}" alt="Promo {{ user.promo }}" class="promo_pict" />
         </div>

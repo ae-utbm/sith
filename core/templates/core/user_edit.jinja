@@ -61,6 +61,7 @@
         <p>
           {{ form[field_name].label }}
         </p>
+        {{ form[field_name].errors }}
       {%- else -%}
         <em>{% trans %}To edit your profile picture, ask a member of the AE{% endtrans %}</em>
       {%- endif -%}
@@ -163,7 +164,7 @@
           /* Stop camera */
           this.video.pause()
           this.video.srcObject.getTracks().forEach((track) => {
-            if (track.readyState == 'live') {
+            if (track.readyState === 'live') {
               track.stop();
             }
           });
@@ -171,8 +172,8 @@
           canvas.toBlob((blob) => {
             let file = new File(
               [blob],
-              "{% trans %}captured{% endtrans %}.png",
-              { type: "image/jpeg" },
+              "{% trans %}captured{% endtrans %}.webp",
+              { type: "image/webp" },
             );
 
             let list = new DataTransfer();

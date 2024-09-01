@@ -201,10 +201,7 @@ class RegisteringForm(UserCreationForm):
 
 
 class UserProfileForm(forms.ModelForm):
-    """Form handling the user profile, managing the files
-    This form is actually pretty bad and was made in the rush before the migration. It should be refactored.
-    TODO: refactor this form.
-    """
+    """Form handling the user profile, managing the files"""
 
     class Meta:
         model = User
@@ -237,24 +234,30 @@ class UserProfileForm(forms.ModelForm):
         ]
         widgets = {
             "date_of_birth": SelectDate,
-            "profile_pict": forms.ClearableFileInput,
-            "avatar_pict": forms.ClearableFileInput,
-            "scrub_pict": forms.ClearableFileInput,
             "phone": RegionalPhoneNumberWidget,
             "parent_phone": RegionalPhoneNumberWidget,
             "quote": forms.Textarea,
         }
-        labels = {
-            "profile_pict": _(
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Image fields are injected here to override the file field provided by the model
+        # This would be better if we could have a SithImage sort of model input instead of a generic SithFile
+        self.fields["profile_pict"] = forms.ImageField(
+            required=False,
+            label=_(
                 "Profile: you need to be visible on the picture, in order to be recognized (e.g. by the barmen)"
             ),
-            "avatar_pict": _("Avatar: used on the forum"),
-            "scrub_pict": _("Scrub: let other know how your scrub looks like!"),
-        }
-
-    def generate_name(self, field_name, f):
-        field_name = field_name[:-4]
-        return field_name + str(self.instance.id) + "." + f.content_type.split("/")[-1]
+        )
+        self.fields["avatar_pict"] = forms.ImageField(
+            required=False,
+            label=_("Avatar: used on the forum"),
+        )
+        self.fields["scrub_pict"] = forms.ImageField(
+            required=False,
+            label=_("Scrub: let other know how your scrub looks like!"),
+        )
 
     def process(self, files):
         avatar = self.instance.avatar_pict
@@ -271,11 +274,11 @@ class UserProfileForm(forms.ModelForm):
                     im = Image.open(BytesIO(f.read()))
                     new_file = SithFile(
                         parent=parent,
-                        name=self.generate_name(field, f),
-                        file=resize_image(im, 400, f.content_type.split("/")[-1]),
+                        name=f"{field.removesuffix('_pict')}_{self.instance.id}.webp",
+                        file=resize_image(im, 400, "webp"),
                         owner=self.instance,
                         is_folder=False,
-                        mime_type=f.content_type,
+                        mime_type="image/wepb",
                         size=f.size,
                         moderator=self.instance,
                         is_moderated=True,
@@ -305,7 +308,7 @@ class UserProfileForm(forms.ModelForm):
                         % {
                             "file_name": f,
                             "msg": _(
-                                "Bad image format, only jpeg, png, and gif are accepted"
+                                "Bad image format, only jpeg, png, webp and gif are accepted"
                             ),
                         },
                     )

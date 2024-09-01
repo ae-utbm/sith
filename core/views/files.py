@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+import mimetypes
 from urllib.parse import quote, urljoin
 
 # This file contains all the views that concern the page model
@@ -58,30 +59,28 @@ def send_file(
     if not can_view(f, request.user) and not is_logged_in_counter(request):
         raise PermissionDenied
     name = getattr(f, file_attr).name
-    filepath = settings.MEDIA_ROOT / name
 
-    # check if file exists on disk
-    if not filepath.exists():
-        raise Http404
-
+    response = HttpResponse(
+        headers={"Content-Disposition": f'inline; filename="{quote(name)}"'}
+    )
     if not settings.DEBUG:
         # When receiving a response with the Accel-Redirect header,
         # the reverse proxy will automatically handle the file sending.
         # This is really hard to test (thus isn't tested)
         # so please do not mess with this.
-        response = HttpResponse(status=200)
-        response["Content-Type"] = ""
+        response["Content-Type"] = ""  # automatically set by nginx
         response["X-Accel-Redirect"] = quote(urljoin(settings.MEDIA_URL, name))
         return response
 
+    filepath = settings.MEDIA_ROOT / name
+    # check if file exists on disk
+    if not filepath.exists():
+        raise Http404
     with open(filepath, "rb") as filename:
-        wrapper = FileWrapper(filename)
-        response = HttpResponse(wrapper, content_type=f.mime_type)
+        response.content = FileWrapper(filename)
+        response["Content-Type"] = mimetypes.guess_type(filepath)[0]
         response["Last-Modified"] = http_date(f.date.timestamp())
         response["Content-Length"] = filepath.stat().st_size
-        response["Content-Disposition"] = ('inline; filename="%s"' % f.name).encode(
-            "utf-8"
-        )
         return response
 
 

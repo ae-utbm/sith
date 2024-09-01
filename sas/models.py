@@ -110,19 +110,25 @@ class Picture(SasFile):
             im = exif_auto_rotate(im)
         except:
             pass
-        file = resize_image(im, max(im.size), self.mime_type.split("/")[-1])
-        thumb = resize_image(im, 200, self.mime_type.split("/")[-1])
-        compressed = resize_image(im, 1200, self.mime_type.split("/")[-1])
+        # convert the compressed image and the thumbnail into webp
+        # The original image keeps its original type, because it's not
+        # meant to be shown on the website, but rather to keep the real image
+        # for less frequent cases (like downloading the pictures of an user)
+        extension = self.mime_type.split("/")[-1]
+        file = resize_image(im, max(im.size), extension)
+        thumb = resize_image(im, 200, "webp")
+        compressed = resize_image(im, 1200, "webp")
         if overwrite:
             self.file.delete()
             self.thumbnail.delete()
             self.compressed.delete()
+        new_extension_name = self.name.removesuffix(extension) + "webp"
         self.file = file
         self.file.name = self.name
         self.thumbnail = thumb
-        self.thumbnail.name = self.name
+        self.thumbnail.name = new_extension_name
         self.compressed = compressed
-        self.compressed.name = self.name
+        self.compressed.name = new_extension_name
         self.save()
 
     def rotate(self, degree):
@@ -224,9 +230,9 @@ class Album(SasFile):
             .first()
         )
         if p and p.file:
-            im = Image.open(BytesIO(p.file.read()))
-            self.file = resize_image(im, 200, "jpeg")
-            self.file.name = self.name + "/thumb.jpg"
+            image = resize_image(Image.open(BytesIO(p.file.read())), 200, "webp")
+            self.file = image
+            self.file.name = f"{self.name}/thumb.webp"
             self.save()
 
 
