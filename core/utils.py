@@ -13,7 +13,6 @@
 #
 #
 
-import subprocess
 from datetime import date
 
 # Image utils
@@ -27,17 +26,6 @@ from django.http import HttpRequest
 from django.utils import timezone
 from PIL import ExifTags
 from PIL.Image import Resampling
-
-
-def get_git_revision_short_hash() -> str:
-    """Return the short hash of the current commit."""
-    try:
-        output = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
-        if isinstance(output, bytes):
-            return output.decode("ascii").strip()
-        return output.strip()
-    except subprocess.CalledProcessError:
-        return ""
 
 
 def get_start_of_semester(today: Optional[date] = None) -> date:

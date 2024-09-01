@@ -34,7 +34,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Club
-from core import utils
 from core.models import Notification, Preferences, RealGroup, User
 
 
@@ -44,7 +43,6 @@ class Sith(models.Model):
     alert_msg = models.TextField(_("alert message"), default="", blank=True)
     info_msg = models.TextField(_("info message"), default="", blank=True)
     weekmail_destinations = models.TextField(_("weekmail destinations"), default="")
-    version = utils.get_git_revision_short_hash()
 
     def __str__(self):
         return "⛩ Sith ⛩"

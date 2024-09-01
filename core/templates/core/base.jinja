@@ -290,11 +290,6 @@
           </a>
         {% endblock %}
         <br>
-        <code class="version">
-          {% cache 1000 "sith_version" %}
-            {% trans %}Sith version:{% endtrans %}&nbsp;{{ get_sith().version }}
-          {% endcache %}
-        </code>
       </footer>
     {% endif %}
 
