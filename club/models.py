@@ -23,6 +23,8 @@
 #
 from __future__ import annotations
 
+from typing import Self
+
 from django.conf import settings
 from django.core import validators
 from django.core.cache import cache
@@ -265,12 +267,11 @@ class Club(models.Model):
 
 
 class MembershipQuerySet(models.QuerySet):
-    def ongoing(self) -> "MembershipQuerySet":
+    def ongoing(self) -> Self:
         """Filter all memberships which are not finished yet."""
-        # noinspection PyTypeChecker
         return self.filter(Q(end_date=None) | Q(end_date__gte=timezone.now()))
 
-    def board(self) -> "MembershipQuerySet":
+    def board(self) -> Self:
         """Filter all memberships where the user is/was in the board.
 
         Be aware that users who were in the board in the past
@@ -279,7 +280,6 @@ class MembershipQuerySet(models.QuerySet):
         If you want to get the users who are currently in the board,
         mind combining this with the :meth:`ongoing` queryset method
         """
-        # noinspection PyTypeChecker
         return self.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
 
     def update(self, **kwargs):

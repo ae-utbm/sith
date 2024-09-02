@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 from io import BytesIO
+from typing import Self
 
 from django.conf import settings
 from django.core.cache import cache
@@ -61,7 +62,7 @@ class SasFile(SithFile):
 
 
 class PictureQuerySet(models.QuerySet):
-    def viewable_by(self, user: User) -> PictureQuerySet:
+    def viewable_by(self, user: User) -> Self:
         """Filter the pictures that this user can view.
 
         Warnings:
@@ -173,7 +174,7 @@ class Picture(SasFile):
 
 
 class AlbumQuerySet(models.QuerySet):
-    def viewable_by(self, user: User) -> PictureQuerySet:
+    def viewable_by(self, user: User) -> Self:
         """Filter the albums that this user can view.
 
         Warnings:
