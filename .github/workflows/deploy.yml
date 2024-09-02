@@ -36,7 +36,8 @@ jobs:
           export PATH="/home/sith/.local/bin:$PATH"
           pushd ${{secrets.SITH_PATH}}
 
-          git pull
+          git fetch
+          git reset --hard origin/master
           poetry install --with prod --without docs,tests
           poetry run ./manage.py install_xapian
           poetry run ./manage.py migrate
