@@ -146,17 +146,9 @@ class PictureView(CanViewMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        pictures_qs = Picture.objects.filter(
-            parent_id=self.object.parent_id
-        ).viewable_by(self.request.user)
-        kwargs["next_pict"] = (
-            pictures_qs.filter(id__gt=self.object.id).order_by("id").first()
-        )
-        kwargs["previous_pict"] = (
-            pictures_qs.filter(id__lt=self.object.id).order_by("-id").first()
-        )
-        return kwargs
+        return super().get_context_data(**kwargs) | {
+            "album": Album.objects.get(children=self.object)
+        }
 
 
 def send_album(request, album_id):

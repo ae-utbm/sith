@@ -65,17 +65,29 @@
 
   {{ super() }}
   <script>
+      /**
+       * @typedef UserProfile
+       * @property {number} id
+       * @property {string} first_name
+       * @property {string} last_name
+       * @property {string} nick_name
+       * @property {string} display_name
+       * @property {string} profile_url
+       * @property {string} profile_pict
+       */
     /**
      * @typedef Picture
      * @property {number} id
      * @property {string} name
      * @property {number} size
      * @property {string} date
-     * @property {Object} author
+     * @property {UserProfile} owner
      * @property {string} full_size_url
      * @property {string} compressed_url
      * @property {string} thumb_url
      * @property {string} album
+     * @property {boolean} is_moderated
+     * @property {boolean} asked_for_removal
      */
 
     document.addEventListener("alpine:init", () => {
@@ -86,7 +98,7 @@
         albums: {},
 
         async init() {
-          this.pictures = await this.get_pictures();
+          this.pictures = await fetch_paginated("{{ url("api:pictures") }}" + "?users_identified={{ object.id }}");
           this.albums = this.pictures.reduce((acc, picture) => {
             if (!acc[picture.album]){
               acc[picture.album] = [];
@@ -96,34 +108,6 @@
           }, {});
           this.loading = false;
         },
-
-        /**
-         * @return {Promise<Picture[]>}
-         */
-        async get_pictures() {
-          {# The API forbids to get more than 199 items at once
-           from paginated routes.
-           In order to download all the user pictures, it may be needed
-           to performs multiple requests #}
-          const max_per_page = 199;
-          const url = "{{ url("api:pictures") }}"
-          + "?users_identified={{ object.id }}"
-          + `&page_size=${max_per_page}`;
-
-          let first_page = (await ( await fetch(url)).json());
-          let promises = [first_page.results];
-
-          const nb_pictures = first_page.count
-          const nb_pages = Math.ceil(nb_pictures / max_per_page);
-
-          for (let i = 2; i <= nb_pages; i++) {
-            promises.push(
-              fetch(url + `&page=${i}`).then(res => res.json().then(json => json.results))
-            );
-          }
-          return (await Promise.all(promises)).flat()
-        },
-
 
         async download_zip(){
           this.is_downloading = true;

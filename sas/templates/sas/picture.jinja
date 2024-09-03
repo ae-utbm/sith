@@ -5,7 +5,7 @@
 {%- endblock -%}
 
 {%- block additional_js -%}
-  <script src="{{ static("sas/js/relation.js") }}"></script>
+  <script defer src="{{ static("sas/js/picture.js") }}"></script>
 {%- endblock -%}
 
 {% block title %}
@@ -15,152 +15,157 @@
 {% from "sas/macros.jinja" import print_path %}
 
 {% block content %}
-  <code>
-    <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(picture.parent) }} {{ picture.get_display_name() }}
-  </code>
+  <main x-data="picture_viewer">
+    <code>
+      <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(album) }} <span x-text="current_picture.name"></span>
+    </code>
 
-  <br>
+    <br>
 
-  <div class="title">
-    <h3>{{ picture.get_display_name() }}</h3>
-    <h4>{{ picture.parent.children.filter(id__lte=picture.id).count() }}
-      / {{ picture.parent.children.count() }}</h4>
-  </div>
-  <br>
-
-  {% if not picture.is_moderated %}
-    {% set next = picture.get_next() %}
-    {% if not next %}
-      {% set next = url('sas:moderation') %}
-    {% else %}
-      {% set next = next.get_absolute_url() + "#pict" %}
-    {% endif %}
-
-    <div class="moderation">
-      <div>
-        {% if picture.asked_for_removal %}
-          <span class="important">{% trans %}Asked for removal{% endtrans %}</span>
-        {% else %}
-          &nbsp;
-        {% endif %}
-      </div>
-      <div>
-        <a href="{{ url('core:file_moderate', file_id=picture.id) }}?next={{ next }}">
-          {% trans %}Moderate{% endtrans %}
-        </a>
-        <a href="{{ url('core:file_delete', file_id=picture.id) }}?next={{ next }}">
-          {% trans %}Delete{% endtrans %}
-        </a>
-      </div>
+    <div class="title">
+      <h3 x-text="current_picture.name"></h3>
+      <h4 x-text="`${pictures.indexOf(current_picture)} / ${pictures.length}`"></h4>
     </div>
-  {% endif %}
+    <br>
 
-  <div class="container" id="pict">
-    <div class="main">
-
-      <div class="photo">
-        <img src="{{ picture.get_download_compressed_url() }}" alt="{{ picture.get_display_name() }}"/>
-      </div>
-
-      <div class="general">
-        <div class="infos">
-          <h5>{% trans %}Infos{% endtrans %}</h5>
+    <template x-if="!current_picture.is_moderated">
+      <div class="alert alert-red">
+        <div class="alert-main">
+          <template x-if="current_picture.asked_for_removal">
+            <span class="important">{% trans %}Asked for removal{% endtrans %}</span>
+          </template>
+          <p>
+            {% trans trimmed %}
+              This picture can be viewed only by root users and by SAS admins.
+              It will be hidden to other users until it has been moderated.
+            {% endtrans %}
+          </p>
+        </div>
+        <div>
           <div>
-            <div>
-              <span>{% trans %}Date: {% endtrans %}</span>
-              <span>{{ picture.date|date(DATETIME_FORMAT) }}</span>
-            </div>
-            <div>
-              <span>{% trans %}Owner: {% endtrans %}</span>
-              <a href="{{ picture.owner.get_absolute_url() }}">{{ picture.owner.get_short_name() }}</a>
-            </div>
+            <button class="btn btn-blue" @click="moderate_picture()">
+              {% trans %}Moderate{% endtrans %}
+            </button>
+            <button class="btn btn-red" @click.prevent="delete_picture()">
+              {% trans %}Delete{% endtrans %}
+            </button>
+          </div>
+          <p x-show="!!moderation_error" x-text="moderation_error"></p>
+        </div>
+      </div>
+    </template>
 
-            {% if picture.moderator %}
+    <div class="container" id="pict">
+      <div class="main">
+
+        <div class="photo" :aria-busy="loading">
+          <img :src="current_picture.compressed_url" :alt="current_picture.name"/>
+        </div>
+
+        <div class="general">
+          <div class="infos">
+            <h5>{% trans %}Infos{% endtrans %}</h5>
+            <div>
               <div>
-                <span>{% trans %}Moderator: {% endtrans %}</span>
-                <a href="{{ picture.moderator.get_absolute_url() }}">{{ picture.moderator.get_short_name() }}</a>
+                <span>{% trans %}Date: {% endtrans %}</span>
+                <span
+                  x-text="Intl.DateTimeFormat(
+                          '{{ LANGUAGE_CODE }}', {dateStyle: 'long'}
+                          ).format(new Date(current_picture.date))"
+                >
+                </span>
               </div>
-            {% endif %}
+              <div>
+                <span>{% trans %}Owner: {% endtrans %}</span>
+                <a :href="current_picture.owner.profile_url" x-text="current_picture.owner.display_name"></a>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="tools">
-          <h5>{% trans %}Tools{% endtrans %}</h5>
-          <div>
+          <div class="tools">
+            <h5>{% trans %}Tools{% endtrans %}</h5>
             <div>
-              <a class="text" href="{{ picture.get_download_url() }}">
-                {% trans %}HD version{% endtrans %}
-              </a>
-              <br>
-              <a class="text danger" href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
-            </div>
-            <div class="buttons">
-              <a class="button" href="{{ url('sas:picture_edit', picture_id=picture.id) }}">✏️</a>
-              <a class="button" href="?rotate_left">↺</a>
-              <a class="button" href="?rotate_right">↻</a>
+              <div>
+                <a class="text" :href="current_picture.full_size_url">
+                  {% trans %}HD version{% endtrans %}
+                </a>
+                <br>
+                <a class="text danger" href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
+              </div>
+              <div class="buttons">
+                <a class="button" :href="`/sas/picture/${current_picture.id}/edit/`">✏️</a>
+                <a class="button" href="?rotate_left">↺</a>
+                <a class="button" href="?rotate_right">↻</a>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="subsection">
-      <div class="navigation" x-data>
-        <div id="prev">
-          {% if previous_pict %}
-            <a
-              href="{{ url( 'sas:picture', picture_id=previous_pict.id) }}#pict"
-              @keyup.left.window="$el.click()"
-            >
-              <div style="background-image: url('{{ previous_pict.get_download_thumb_url() }}');"></div>
-            </a>
-          {% endif %}
+      <div class="subsection">
+        <div class="navigation">
+          <div id="prev" class="clickable">
+            <template x-if="previous_picture">
+              <div
+                @keyup.left.window="current_picture = previous_picture"
+                @click="current_picture = previous_picture"
+              >
+                <img :src="previous_picture.thumb_url" alt="{% trans %}Previous picture{% endtrans %}"/>
+                <div class="overlay">←</div>
+              </div>
+            </template>
+          </div>
+          <div id="next" class="clickable">
+            <template x-if="next_picture">
+              <div
+                @keyup.right.window="current_picture = next_picture"
+                @click="current_picture = next_picture"
+              >
+                <img :src="next_picture.thumb_url" alt="{% trans %}Previous picture{% endtrans %}"/>
+                <div class="overlay">→</div>
+              </div>
+            </template>
+          </div>
         </div>
-        <div id="next">
-          {% if next_pict %}
-            <a
-              href="{{ url( 'sas:picture', picture_id=next_pict.id) }}#pict"
-              @keyup.right.window="$el.click()"
-            >
-              <div style="background-image: url('{{ next_pict.get_download_thumb_url() }}');"></div>
-            </a>
+
+        <div class="tags">
+          <h5>{% trans %}People{% endtrans %}</h5>
+          {% if user.was_subscribed %}
+            <form @submit.prevent="submit_identification" x-show="!!selector">
+              <select x-ref="search" multiple="multiple"></select>
+              <input type="submit" value="{% trans %}Go{% endtrans %}"/>
+            </form>
           {% endif %}
+          <ul>
+            <template x-for="identification in identifications" :key="identification.id">
+              <li>
+                <a class="user" :href="identification.user.profile_url">
+                  <img class="profile-pic" :src="identification.user.profile_pict" alt="image de profil"/>
+                  <span x-text="identification.user.display_name"></span>
+                </a>
+                <template x-if="can_be_removed(identification)">
+                  <a class="delete clickable" @click="remove_identification(identification)">❌</a>
+                </template>
+              </li>
+            </template>
+            <template x-if="loading">
+                {# shadow element that exists only to put the loading wheel below
+                the list of identified people #}
+              <li class="loader" aria-busy="true"></li>
+            </template>
+          </ul>
         </div>
       </div>
-
-      <div class="tags" x-data="user_identification">
-        <h5>{% trans %}People{% endtrans %}</h5>
-        {% if user.was_subscribed %}
-          <form @submit.prevent="submit_identification" x-show="!!selector">
-            <select x-ref="search" multiple="multiple"></select>
-            <input type="submit" value="{% trans %}Go{% endtrans %}"/>
-          </form>
-        {% endif %}
-        <ul>
-          <template x-for="identification in identifications" :key="identification.id">
-            <li>
-              <a class="user" :href="identification.user.profile_url">
-                <img class="profile-pic" :src="identification.user.profile_pict" alt="image de profil"/>
-                <span x-text="identification.user.display_name"></span>
-              </a>
-              <template x-if="can_be_removed(identification)">
-                <a class="delete clickable" @click="remove(identification)">❌</a>
-              </template>
-            </li>
-          </template>
-          <template x-if="loading">
-            <li class="loader" aria-busy="true"></li>
-          </template>
-        </ul>
-      </div>
     </div>
-  </div>
+  </main>
 {% endblock %}
 
 {% block script %}
   {{ super() }}
   <script>
-    const picture_id = {{ picture.id }};
+    const picture_endpoint = "{{ url("api:pictures") + "?album_id=" + album.id|string }}";
+    const album_url = "{{ album.get_absolute_url() }}";
+    const first_picture_id = {{ picture.id }};  {# id of the first picture to show after page load #}
     const user_id = {{ user.id }};
     const user_is_sas_admin = {{ (user.is_root or user.is_in_group(pk = settings.SITH_GROUP_SAS_ADMIN_ID))|tojson }}
   </script>

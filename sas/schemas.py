@@ -17,8 +17,9 @@ class PictureFilterSchema(FilterSchema):
 class PictureSchema(ModelSchema):
     class Meta:
         model = Picture
-        fields = ["id", "name", "date", "size", "is_moderated"]
+        fields = ["id", "name", "date", "size", "is_moderated", "asked_for_removal"]
 
+    owner: UserProfileSchema
     full_size_url: str
     compressed_url: str
     thumb_url: str

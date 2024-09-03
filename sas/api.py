@@ -9,14 +9,10 @@ from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
-from core.api_permissions import CanView
+from core.api_permissions import CanView, IsOwner
 from core.models import Notification, User
 from sas.models import PeoplePictureRelation, Picture
-from sas.schemas import (
-    IdentifiedUserSchema,
-    PictureFilterSchema,
-    PictureSchema,
-)
+from sas.schemas import IdentifiedUserSchema, PictureFilterSchema, PictureSchema
 
 
 @api_controller("/sas/picture")
@@ -51,6 +47,7 @@ class PicturesController(ControllerBase):
             filters.filter(Picture.objects.viewable_by(user))
             .distinct()
             .order_by("-parent__date", "date")
+            .select_related("owner")
             .annotate(album=F("parent__name"))
         )
 
@@ -87,6 +84,18 @@ class PicturesController(ControllerBase):
                     "url": reverse("core:user_pictures", kwargs={"user_id": u.id})
                 },
             )
+
+    @route.delete("/{picture_id}", permissions=[IsOwner])
+    def delete_picture(self, picture_id: int):
+        self.get_object_or_exception(Picture, pk=picture_id).delete()
+
+    @route.patch("/{picture_id}/moderate", permissions=[IsOwner])
+    def moderate_picture(self, picture_id: int):
+        picture = self.get_object_or_exception(Picture, pk=picture_id)
+        picture.is_moderated = True
+        picture.moderator = self.context.request.user
+        picture.asked_for_removal = False
+        picture.save()
 
 
 @api_controller("/sas/relation", tags="User identification on SAS pictures")
