@@ -24,6 +24,7 @@ from django.utils.translation import gettext as _
 
 from club.forms import MailingForm
 from club.models import Club, Mailing, Membership
+from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, User
 from sith.settings import SITH_BAR_MANAGER, SITH_MAIN_CLUB_ID
 
@@ -102,6 +103,18 @@ class TestMembershipQuerySet(TestClub):
             self.skia.memberships.get(club=self.club),
             self.comptable.memberships.get(club=self.club),
             self.richard.memberships.get(club=self.club),
+        ]
+        expected.sort(key=lambda i: i.id)
+        assert current_members == expected
+
+    def test_ongoing_with_membership_ending_today(self):
+        """Test that a membership ending the present day is considered as ended."""
+        today = timezone.now().date()
+        self.richard.memberships.filter(club=self.club).update(end_date=today)
+        current_members = list(self.club.members.ongoing().order_by("id"))
+        expected = [
+            self.skia.memberships.get(club=self.club),
+            self.comptable.memberships.get(club=self.club),
         ]
         expected.sort(key=lambda i: i.id)
         assert current_members == expected
@@ -422,11 +435,11 @@ class TestClubModel(TestClub):
         of anyone.
         """
         # make subscriber a board member
-        self.subscriber.memberships.all().delete()
-        Membership.objects.create(club=self.ae, user=self.subscriber, role=3)
+        subscriber = subscriber_user.make()
+        Membership.objects.create(club=self.ae, user=subscriber, role=3)
 
-        nb_memberships = self.club.members.count()
-        self.client.force_login(self.subscriber)
+        nb_memberships = self.club.members.ongoing().count()
+        self.client.force_login(subscriber)
         response = self.client.post(
             self.members_url,
             {"users_old": self.comptable.id},
@@ -437,7 +450,7 @@ class TestClubModel(TestClub):
 
     def test_end_membership_as_root(self):
         """Test that root users can end the membership of anyone."""
-        nb_memberships = self.club.members.count()
+        nb_memberships = self.club.members.ongoing().count()
         self.client.force_login(self.root)
         response = self.client.post(
             self.members_url,
@@ -446,7 +459,6 @@ class TestClubModel(TestClub):
         self.assertRedirects(response, self.members_url)
         self.assert_membership_ended_today(self.comptable)
         assert self.club.members.ongoing().count() == nb_memberships - 1
-        assert self.club.members.count() == nb_memberships
 
     def test_end_membership_as_foreigner(self):
         """Test that users who are not in this club cannot end its memberships."""

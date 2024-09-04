@@ -269,7 +269,7 @@ class Club(models.Model):
 class MembershipQuerySet(models.QuerySet):
     def ongoing(self) -> Self:
         """Filter all memberships which are not finished yet."""
-        return self.filter(Q(end_date=None) | Q(end_date__gte=timezone.now()))
+        return self.filter(Q(end_date=None) | Q(end_date__gt=timezone.now().date()))
 
     def board(self) -> Self:
         """Filter all memberships where the user is/was in the board.
