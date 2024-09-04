@@ -10,41 +10,47 @@ document.addEventListener("alpine:init", () => {
     /**
      * All the pictures that can be displayed on this picture viewer
      * @type Picture[]
-     * */
+     **/
     pictures: [],
     /**
      * The users identified on the currently displayed picture
      * @type PictureIdentification[]
-     */
+     **/
     identifications: [],
     /**
      * The currently displayed picture
      * @type Picture
-     * */
+     **/
     current_picture: undefined,
     /**
      * The picture which will be displayed next if the user press the "next" button
      * @type ?Picture
-     * */
+     **/
     next_picture: null,
     /**
-     * The picture which will be dispalyed next if the user press the "previous" button
+     * The picture which will be displayed next if the user press the "previous" button
      * @type ?Picture
-     * */
+     **/
     previous_picture: null,
     /**
      * The select2 component used to identify users
-     */
+     **/
     selector: undefined,
     /**
      * true if the page is in a loading state, else false
-     */
+     **/
     loading: true,
     /**
      * Error message when a moderation operation fails
      * @type string
-     */
+     **/
     moderation_error: "",
+    /**
+     * Method of pushing new url to the browser history
+     * Used by popstate event and always reset to it's default value when used
+     * @type History
+     **/
+    pushstate: History.PUSH,
 
     async init() {
       this.pictures = await fetch_paginated(picture_endpoint);
@@ -60,6 +66,16 @@ document.addEventListener("alpine:init", () => {
         (i) => i.id === first_picture_id,
       );
       this.$watch("current_picture", () => this.update_picture());
+      window.addEventListener("popstate", async (event) => {
+        if (!event.state || event.state.sas_picture_id === undefined){
+          return;
+        }
+        this.pushstate = History.REPLACE;
+        this.current_picture = this.pictures.find(
+          (i) => i.id === parseInt(event.state.sas_picture_id),
+        );
+      });
+      this.pushstate = History.REPLACE; /* Avoid first url push */
       await this.update_picture();
     },
 
@@ -73,11 +89,19 @@ document.addEventListener("alpine:init", () => {
      */
     async update_picture() {
       this.loading = true;
-      window.history.pushState(
-        {},
+
+      const update_args = [
+        {sas_picture_id: this.current_picture.id},
         "",
         `/sas/picture/${this.current_picture.id}/`,
-      );
+      ];
+      if (this.pushstate === History.REPLACE){
+        window.history.replaceState(...update_args);
+        this.pushstate = History.PUSH;
+      } else {
+        window.history.pushState(...update_args);
+      }
+
       this.moderation_error = "";
       const index = this.pictures.indexOf(this.current_picture);
       this.previous_picture = this.pictures[index - 1] || null;
