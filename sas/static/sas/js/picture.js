@@ -19,9 +19,21 @@ document.addEventListener("alpine:init", () => {
     identifications: [],
     /**
      * The currently displayed picture
+     * Default dummy data are pre-loaded to avoid javascript error
+     * when loading the page at the beginning
      * @type Picture
      **/
-    current_picture: undefined,
+    current_picture: {
+      is_moderated: true,
+      id: null,
+      name: "",
+      display_name: "",
+      compressed_url: "",
+      profile_url: "",
+      full_size_url: "",
+      owner: "",
+      date: new Date(),
+    },
     /**
      * The picture which will be displayed next if the user press the "next" button
      * @type ?Picture
