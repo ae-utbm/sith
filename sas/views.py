@@ -34,7 +34,7 @@ from sas.models import Album, PeoplePictureRelation, Picture
 
 class SASForm(forms.Form):
     album_name = forms.CharField(
-        label=_("Add a new album"), max_length=30, required=False
+        label=_("Add a new album"), max_length=Album.NAME_MAX_LENGTH, required=False
     )
     images = MultipleImageField(
         label=_("Upload images"),
@@ -353,6 +353,7 @@ class AlbumEditForm(forms.ModelForm):
         model = Album
         fields = ["name", "date", "file", "parent", "edit_groups"]
 
+    name = forms.CharField(max_length=Album.NAME_MAX_LENGTH, label=_("file name"))
     date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
     parent = make_ajax_field(Album, "parent", "files", help_text="")
     edit_groups = make_ajax_field(Album, "edit_groups", "groups", help_text="")
