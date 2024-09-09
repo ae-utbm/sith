@@ -333,10 +333,9 @@ class ModerationView(TemplateView):
         kwargs["albums_to_moderate"] = Album.objects.filter(
             is_moderated=False, is_in_sas=True, is_folder=True
         ).order_by("id")
-        kwargs["pictures"] = Picture.objects.filter(is_moderated=False)
-        kwargs["albums"] = Album.objects.filter(
-            id__in=kwargs["pictures"].values("parent").distinct("parent")
-        )
+        pictures = Picture.objects.filter(is_moderated=False).select_related("parent")
+        kwargs["pictures"] = pictures
+        kwargs["albums"] = [p.parent for p in pictures]
         return kwargs
 
 

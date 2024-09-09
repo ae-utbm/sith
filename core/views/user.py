@@ -561,6 +561,8 @@ class UserListView(ListView, CanEditPropMixin):
     template_name = "core/user_list.jinja"
 
 
+# FIXME: the edit_once fields aren't displayed to the user (as expected).
+#  However, if the user re-add them manually in the form, they are saved.
 class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     """Edit a user's profile."""
 

@@ -190,13 +190,6 @@ class FileEditView(CanEditMixin, UpdateView):
     template_name = "core/file_edit.jinja"
     context_object_name = "file"
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self.object.can_be_managed_by(request.user):
-            raise PermissionDenied
-
-        return super().get(request, *args, **kwargs)
-
     def get_form_class(self):
         fields = ["name", "is_moderated"]
         if self.object.is_file:
@@ -241,13 +234,6 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
     template_name = "core/file_edit.jinja"
     context_object_name = "file"
     form_class = FileEditPropForm
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self.object.can_be_managed_by(request.user):
-            raise PermissionDenied
-
-        return super().get(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -322,9 +308,6 @@ class FileView(CanViewMixin, DetailView, FormMixin):
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
-        if not self.object.can_be_managed_by(request.user):
-            raise PermissionDenied
-
         if "clipboard" not in request.session.keys():
             request.session["clipboard"] = []
         return super().get(request, *args, **kwargs)
@@ -372,13 +355,6 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
     template_name = "core/file_delete_confirm.jinja"
     context_object_name = "file"
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self.object.can_be_managed_by(request.user):
-            raise PermissionDenied
-
-        return super().get(request, *args, **kwargs)
-
     def get_success_url(self):
         self.object.file.delete()  # Doing it here or overloading delete() is the same, so let's do it here
         if "next" in self.request.GET.keys():
@@ -416,6 +392,7 @@ class FileModerateView(CanEditPropMixin, SingleObjectMixin):
     model = SithFile
     pk_url_kwarg = "file_id"
 
+    # FIXME : wrong http method. This should be a POST or a DELETE request
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         self.object.is_moderated = True

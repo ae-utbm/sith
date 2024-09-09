@@ -944,40 +944,15 @@ class SithFile(models.Model):
                     param="1",
                 ).save()
 
-    def can_be_managed_by(self, user: User) -> bool:
-        """Tell if the user can manage the file (edit, delete, etc.) or not.
-        Apply the following rules:
-            - If the file is not in the SAS nor in the profiles directory, it can be "managed" by anyone -> return True
-            - If the file is in the SAS, only the SAS admins (or roots) can manage it -> return True if the user is in the SAS admin group or is a root
-            - If the file is in the profiles directory, only the roots can manage it -> return True if the user is a root.
-
-        Returns:
-            True if the file is managed by the SAS or within the profiles directory, False otherwise
-        """
-        # If the file is not in the SAS nor in the profiles directory, it can be "managed" by anyone
-        profiles_dir = SithFile.objects.filter(name="profiles").first()
-        if not self.is_in_sas and not profiles_dir in self.get_parent_list():
-            return True
-
-        # If the file is in the SAS, only the SAS admins (or roots) can manage it
-        if self.is_in_sas and (
-            user.is_in_group(settings.SITH_GROUP_SAS_ADMIN_ID) or user.is_root
-        ):
-            return True
-
-        # If the file is in the profiles directory, only the roots can manage it
-        if profiles_dir in self.get_parent_list() and (
-            user.is_root or user.is_board_member
-        ):
-            return True
-
-        return False
-
     def is_owned_by(self, user):
         if user.is_anonymous:
             return False
-        if hasattr(self, "profile_of") and user.is_board_member:
+        if user.is_root:
             return True
+        if hasattr(self, "profile_of"):
+            # if the `profile_of` attribute is set, this file is a profile picture
+            # and profile pictures may only be edited by board members
+            return user.is_board_member
         if user.is_com_admin:
             return True
         if self.is_in_sas and user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
@@ -993,7 +968,7 @@ class SithFile(models.Model):
             return user.can_view(self.scrub_of)
         return False
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         for c in self.children.all():
             c.delete()
         self.file.delete()
