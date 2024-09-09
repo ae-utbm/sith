@@ -113,11 +113,6 @@ urlpatterns = [
         name="user_godfathers_tree",
     ),
     path(
-        "user/<int:user_id>/godfathers/tree/pict/",
-        UserGodfathersTreePictureView.as_view(),
-        name="user_godfathers_tree_pict",
-    ),
-    path(
         "user/<int:user_id>/godfathers/<int:godfather_id>/<bool:is_father>/delete/",
         delete_user_godfather,
         name="user_godfathers_delete",

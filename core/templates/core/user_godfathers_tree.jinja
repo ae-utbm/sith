@@ -1,5 +1,13 @@
 {% extends "core/base.jinja" %}
 
+{%- block additional_css -%}
+  <link rel="stylesheet" href="{{ scss('user/user_godfathers.scss') }}">
+{%- endblock -%}
+
+{% block additional_js %}
+  <script src="{{ static('vendored/cytoscape/cytoscape.min.js') }}" defer></script>
+{% endblock %}
+
 {% block title %}
   {% if param == "godchildren" %}
     {% trans user_name=profile.get_display_name() %}{{ user_name }}'s godchildren{% endtrans %}
@@ -8,47 +16,137 @@
   {% endif %}
 {% endblock %}
 
-{% macro display_members_list(user) %}
-  {% if user.__getattribute__(param).exists() %}
-    <ul>
-      {% for u in user.__getattribute__(param).all() %}
-        <li>
-          <a href="{{ url("core:user_godfathers", user_id=u.id) }}">
-            {{ u.get_short_name() }}
-          </a>
-          {% if u in members_set %}
-            {% trans %}Already seen (check above){% endtrans %}
-          {% else %}
-            {{ members_set.add(u) or "" }}
-            {{ display_members_list(u) }}
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endmacro %}
-
 {% block content %}
-  <p><a href="{{ url("core:user_godfathers", user_id=profile.id) }}">
-    {% trans %}Back to family{% endtrans %}</a></p>
-  {% if profile.__getattribute__(param).exists() %}
-    {% if param == "godchildren" %}
-      <p><a href="{{ url("core:user_godfathers_tree_pict", user_id=profile.id) }}?descent">
-        {% trans %}Show a picture of the tree{% endtrans %}</a></p>
-      <h4>{% trans u=profile.get_short_name() %}Descent tree of {{ u }}{% endtrans %}</h4>
-    {% else %}
-      <p><a href="{{ url("core:user_godfathers_tree_pict", user_id=profile.id) }}?ancestors">
-        {% trans %}Show a picture of the tree{% endtrans %}</a></p>
-      <h4>{% trans u=profile.get_short_name() %}Ancestors tree of {{ u }}{% endtrans %}</h4>
-    {% endif %}
-    {{ members_set.add(profile) or "" }}
-    {{ display_members_list(profile) }}
-  {% else %}
-    {% if param == "godchildren" %}
-      <p>{% trans %}No godchildren{% endtrans %}
-    {% else %}
-      <p>{% trans %}No godfathers / godmothers{% endtrans %}
-    {% endif %}
-  {% endif %}
+
+  <style type="text/css">
+    .graph {
+      min-width: 300px;
+      min-height: 300px;
+      display: block;
+    }
+  </style>
+
+  <h2>Family</h2>
+  <button id="family_graph_capture"><i class="fa fa-camera"></i></button>
+  <div class="graph" id="family_graph"></div>
+
+  <h2>Descent</h2>
+  <button id="descent_graph_capture"><i class="fa fa-camera"></i></button>
+  <div class="graph" id="descent_graph"></div>
+
+  <h2>Ancestor</h2>
+  <button id="ancestor_graph_capture"><i class="fa fa-camera"></i></button>
+  <div class="graph" id="ancestor_graph"></div>
+
+  {{ family_graph|json_script("family_graph_data") }}
+  {{ descent_graph|json_script("descent_graph_data") }}
+  {{ ancestor_graph|json_script("ancestor_graph_data") }}
+
+  <script type="text/javascript">
+    function display_graph(
+      container,
+      data,
+      reversed=false,
+      screenshot_button=undefined,
+    ){
+      let cy = cytoscape({
+
+        boxSelectionEnabled: false,
+        autounselectify: true,
+
+        container: container,
+        elements: data,
+        minZoom: 0.5,
+
+        style: [ // the stylesheet for the graph
+          {
+            selector: 'node',
+            style: {
+              'label': 'data(name)',
+              'background-image': 'data(pict_url)',
+              'width': '100%',
+              'height': '100%',
+              'background-fit': 'cover',
+              'background-repeat': 'no-repeat',
+              'shape': 'data(shape)'
+            }
+          },
+
+          {
+            selector: 'edge',
+            style: {
+              'width': 5,
+              'line-color': '#ccc',
+              'target-arrow-color': '#ccc',
+              'target-arrow-shape': 'triangle',
+              'curve-style': 'bezier'
+            }
+          }
+        ],
+
+        layout: {
+          name: 'breadthfirst',
+          directed: true,
+          padding: 4,
+          fit: true,
+          grid: true,
+          transform: (node, position) => {
+            if (!reversed){
+              return position;
+            }
+            return {
+              x: -position.x,
+              y: -position.y
+            };
+          }
+        }
+      });
+      cy.on('tap', 'node', (tapped) => {
+        console.log(tapped.target.data().profile_url);
+      });
+      if (screenshot_button){
+        screenshot_button.onclick = () => {
+          const link = document.createElement('a');
+          link.href = cy.jpg();
+          link.download = "output.jpg";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+    }
+    window.addEventListener('load', () => {
+      display_graph(
+        document.getElementById('family_graph'),
+        JSON.parse(
+          JSON.parse(
+            document.getElementById('family_graph_data').textContent
+          )
+        ),
+        false,
+        document.getElementById('family_graph_capture')
+      );
+      display_graph(
+        document.getElementById('descent_graph'),
+        JSON.parse(
+          JSON.parse(
+            document.getElementById('descent_graph_data').textContent
+          )
+        ),
+        false,
+        document.getElementById('descent_graph_capture')
+      );
+      display_graph(
+        document.getElementById('ancestor_graph'),
+        JSON.parse(
+          JSON.parse(
+            document.getElementById('ancestor_graph_data').textContent
+          )
+        ),
+        true,
+        document.getElementById('ancestor_graph_capture')
+      );
+    });
+  </script>
 {% endblock %}
 

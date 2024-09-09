@@ -21,11 +21,14 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import json
 import logging
+from dataclasses import asdict, dataclass, field
 
 # This file contains all the views that concern the user model
 from datetime import date, timedelta
 from smtplib import SMTPException
+from typing import Self
 
 from django.conf import settings
 from django.contrib.auth import login, views
@@ -34,10 +37,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
+from django.templatetags.static import static
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -354,6 +358,65 @@ class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
         return kwargs
 
 
+NodeDict = dict[str, dict[str, str]]
+EdgeDict = dict[str, dict[str, str]]
+
+
+@dataclass(frozen=True)
+class Node:
+    id: str
+    name: str
+    pict_url: str
+    profile_url: str
+    shape: str
+
+    @staticmethod
+    def get_profile_pict(user: User) -> str:
+        if user.profile_pict:
+            return user.profile_pict.get_download_url()
+        return static("core/img/unknown.jpg")
+
+    @classmethod
+    def from_user(cls, user: User, *, is_current: bool = False) -> Self:
+        return cls(
+            id=str(user.id),
+            name=user.get_short_name(),
+            pict_url=cls.get_profile_pict(user),
+            profile_url=user.get_absolute_url(),
+            shape="rectangle" if is_current else "ellipse",
+        )
+
+    def to_dict(self) -> NodeDict:
+        return {"data": {**asdict(self)}}
+
+
+@dataclass(frozen=True)
+class Edge:
+    source: str
+    target: str
+
+    @classmethod
+    def from_user(cls, source: User, target: User) -> Self:
+        return cls(source=str(source.id), target=str(target.id))
+
+    def to_dict(self) -> EdgeDict:
+        return {"data": {**asdict(self)}}
+
+
+@dataclass
+class Graph:
+    _elements: set[Node | Edge] = field(default_factory=set)
+
+    def add_node(self, user: User, *, is_current: bool = False) -> None:
+        self._elements.add(Node.from_user(user, is_current=is_current))
+
+    def add_edge(self, *, source: User, target: User) -> None:
+        self._elements.add(Edge.from_user(source=source, target=target))
+
+    def to_list(self) -> list[NodeDict | EdgeDict]:
+        return [n.to_dict() for n in self._elements]
+
+
 class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
     """Display a user's family tree."""
 
@@ -363,86 +426,61 @@ class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
     template_name = "core/user_godfathers_tree.jinja"
     current_tab = "godfathers"
 
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        if "descent" in self.request.GET:
-            kwargs["param"] = "godchildren"
-        else:
-            kwargs["param"] = "godfathers"
-        kwargs["members_set"] = set()
-        return kwargs
+    def build_family_graph(self) -> Graph:
+        graph = Graph()
+        graph.add_node(self.object, is_current=True)
+        for u in self.object.godfathers.all():
+            graph.add_node(u)
+            graph.add_edge(
+                source=u,
+                target=self.object,
+            )
+        for u in self.object.godchildren.all():
+            graph.add_node(u)
+            graph.add_edge(
+                source=self.object,
+                target=u,
+            )
 
+        return graph
 
-class UserGodfathersTreePictureView(CanViewMixin, DetailView):
-    """Display a user's tree as a picture."""
-
-    model = User
-    pk_url_kwarg = "user_id"
-
-    def build_complex_graph(self):
-        import pygraphviz as pgv
-
-        self.depth = int(self.request.GET.get("depth", 4))
-        if self.param == "godfathers":
-            self.graph = pgv.AGraph(strict=False, directed=True, rankdir="BT")
-        else:
-            self.graph = pgv.AGraph(strict=False, directed=True)
-        family = set()
+    def build_complex_graph(self, param) -> Graph:
+        depth = int(self.request.GET.get("depth", 4))
+        graph = Graph()
+        family = {}
         self.level = 1
 
         # Since the tree isn't very deep, we can build it recursively
-        def crawl_family(user):
-            if self.level > self.depth:
+        def crawl_family(user: User):
+            if self.level > depth:
                 return
             self.level += 1
-            for u in user.__getattribute__(self.param).all():
-                self.graph.add_edge(user.get_short_name(), u.get_short_name())
-                if u not in family:
-                    family.add(u)
+            for u in user.__getattribute__(param).all():
+                graph.add_node(user=u)
+                graph.add_edge(source=user, target=u)
+                if not family.get(u.id, False):
+                    family[u.id] = True
                     crawl_family(u)
             self.level -= 1
 
-        self.graph.add_node(self.object.get_short_name())
-        family.add(self.object)
+        graph.add_node(self.object, is_current=True)
+        family[self.object.id] = True
         crawl_family(self.object)
+        return graph
 
-    def build_family_graph(self):
-        import pygraphviz as pgv
+    def build_ancestor_graph(self) -> Graph:
+        return self.build_complex_graph("godfathers")
 
-        self.graph = pgv.AGraph(strict=False, directed=True)
-        self.graph.add_node(self.object.get_short_name())
-        for u in self.object.godfathers.all():
-            self.graph.add_edge(u.get_short_name(), self.object.get_short_name())
-        for u in self.object.godchildren.all():
-            self.graph.add_edge(self.object.get_short_name(), u.get_short_name())
+    def build_descent_graph(self) -> Graph:
+        return self.build_complex_graph("godchildren")
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if "descent" in self.request.GET:
-            self.param = "godchildren"
-        elif "ancestors" in self.request.GET:
-            self.param = "godfathers"
-        else:
-            self.param = "family"
-
-        if self.param == "family":
-            self.build_family_graph()
-        else:
-            self.build_complex_graph()
-        # Pimp the graph before display
-        self.graph.node_attr["color"] = "lightblue"
-        self.graph.node_attr["style"] = "filled"
-        main_node = self.graph.get_node(self.object.get_short_name())
-        main_node.attr["color"] = "sandybrown"
-        main_node.attr["shape"] = "rect"
-        if self.param == "godchildren":
-            self.graph.graph_attr["label"] = _("Godchildren")
-        elif self.param == "godfathers":
-            self.graph.graph_attr["label"] = _("Family")
-        else:
-            self.graph.graph_attr["label"] = _("Family")
-        img = self.graph.draw(format="png", prog="dot")
-        return HttpResponse(img, content_type="image/png")
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs["members_set"] = set()
+        kwargs["family_graph"] = json.dumps(self.build_family_graph().to_list())
+        kwargs["descent_graph"] = json.dumps(self.build_descent_graph().to_list())
+        kwargs["ancestor_graph"] = json.dumps(self.build_ancestor_graph().to_list())
+        return kwargs
 
 
 class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
