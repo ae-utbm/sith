@@ -5,148 +5,89 @@
 {%- endblock -%}
 
 {% block additional_js %}
-  <script src="{{ static('vendored/cytoscape/cytoscape.min.js') }}" defer></script>
+  <script src="{{ static("vendored/cytoscape/cytoscape.min.js") }}" defer></script>
+  <script type="module" defer>
+    import cxtmenu from '{{ static("vendored/cytoscape/cytoscape-cxtmenu.min.js") }}';
+  </script>
+  <script src="{{ static("user/js/family_graph.js") }}" defer></script>
 {% endblock %}
 
 {% block title %}
-  {% if param == "godchildren" %}
-    {% trans user_name=profile.get_display_name() %}{{ user_name }}'s godchildren{% endtrans %}
-  {% else %}
-    {% trans user_name=profile.get_display_name() %}{{ user_name }}'s godfathers{% endtrans %}
-  {% endif %}
+  {% trans user_name=profile.get_display_name() %}{{ user_name }}'s family tree{% endtrans %}
 {% endblock %}
 
 {% block content %}
+  <div x-data="graph" :aria-busy="loading">
+    <div class="graph-toolbar">
+      <div class="toolbar-column">
+        <div class="toolbar-input">
+          <label for="godfather-depth-input">
+            {% trans min=0, max=10 %}Max godfather depth between {{ min }} and {{ max }}{% endtrans %}
+          </label>
+          <span class="depth-choice">
+            <i
+              class="fa fa-minus fa-xs clickable"
+              @click="godfathers_depth = Math.max(0, godfathers_depth - 1)"
+            ></i>
+            <input
+              x-model="godfathers_depth"
+              x-ref="godfather_depth_input"
+              type="number"
+              name="godfathers_depth"
+              id="godfather-depth-input"
+              min="0"
+              max="10"
+            />
+            <i class="fa fa-plus clickable"
+               @click="godfathers_depth = Math.min(10, godfathers_depth + 1)"
+            ></i>
+          </span>
+        </div>
 
-  <style type="text/css">
-    .graph {
-      min-width: 300px;
-      min-height: 300px;
-      display: block;
-    }
-  </style>
+        <div class="toolbar-input">
+          <label for="godchild-depth-input">
+            {% trans min=0, max=10 %}Max godchildren depth between {{ min }} and {{ max }}{% endtrans %}
+          </label>
+          <span class="depth-choice">
+            <i
+              class="fa fa-minus fa-xs clickable"
+              @click="godchildren_depth = Math.max(0, godchildren_depth - 1)"
+            ></i>
+            <input
+              x-model="godchildren_depth"
+              type="number"
+              name="godchildren_depth"
+              id="godchild-depth-input"
+              min="0"
+              max="10"
+            />
+            <i class="fa fa-plus clickable"
+               @click="godchildren_depth = Math.min(10, godchildren_depth + 1)"
+            ></i>
+          </span>
+        </div>
+      </div>
 
-  <h2>Family</h2>
-  <button id="family_graph_capture"><i class="fa fa-camera"></i></button>
-  <div class="graph" id="family_graph"></div>
+      <div class="toolbar-column">
+        <div class="toolbar-input">
+          <label for="reverse-checkbox">{% trans %}Reverse{% endtrans %}</label>
+          <input x-model="reverse" type="checkbox" name="reverse" id="reverse-checkbox">
+        </div>
+        <button class="btn btn-grey" @click="reset">
+          {% trans %}Reset{% endtrans %}
+        </button>
+        <button class="btn btn-grey" @click="screenshot">
+          <i class="fa fa-camera"></i>
+          {% trans %}Save{% endtrans %}
+        </button>
+      </div>
+    </div>
+    <div x-ref="graph" class="graph"></div>
+  </div>
 
-  <h2>Descent</h2>
-  <button id="descent_graph_capture"><i class="fa fa-camera"></i></button>
-  <div class="graph" id="descent_graph"></div>
-
-  <h2>Ancestor</h2>
-  <button id="ancestor_graph_capture"><i class="fa fa-camera"></i></button>
-  <div class="graph" id="ancestor_graph"></div>
-
-  {{ family_graph|json_script("family_graph_data") }}
-  {{ descent_graph|json_script("descent_graph_data") }}
-  {{ ancestor_graph|json_script("ancestor_graph_data") }}
-
-  <script type="text/javascript">
-    function display_graph(
-      container,
-      data,
-      reversed=false,
-      screenshot_button=undefined,
-    ){
-      let cy = cytoscape({
-
-        boxSelectionEnabled: false,
-        autounselectify: true,
-
-        container: container,
-        elements: data,
-        minZoom: 0.5,
-
-        style: [ // the stylesheet for the graph
-          {
-            selector: 'node',
-            style: {
-              'label': 'data(name)',
-              'background-image': 'data(pict_url)',
-              'width': '100%',
-              'height': '100%',
-              'background-fit': 'cover',
-              'background-repeat': 'no-repeat',
-              'shape': 'data(shape)'
-            }
-          },
-
-          {
-            selector: 'edge',
-            style: {
-              'width': 5,
-              'line-color': '#ccc',
-              'target-arrow-color': '#ccc',
-              'target-arrow-shape': 'triangle',
-              'curve-style': 'bezier'
-            }
-          }
-        ],
-
-        layout: {
-          name: 'breadthfirst',
-          directed: true,
-          padding: 4,
-          fit: true,
-          grid: true,
-          transform: (node, position) => {
-            if (!reversed){
-              return position;
-            }
-            return {
-              x: -position.x,
-              y: -position.y
-            };
-          }
-        }
-      });
-      cy.on('tap', 'node', (tapped) => {
-        console.log(tapped.target.data().profile_url);
-      });
-      if (screenshot_button){
-        screenshot_button.onclick = () => {
-          const link = document.createElement('a');
-          link.href = cy.jpg();
-          link.download = "output.jpg";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      }
-    }
-    window.addEventListener('load', () => {
-      display_graph(
-        document.getElementById('family_graph'),
-        JSON.parse(
-          JSON.parse(
-            document.getElementById('family_graph_data').textContent
-          )
-        ),
-        false,
-        document.getElementById('family_graph_capture')
-      );
-      display_graph(
-        document.getElementById('descent_graph'),
-        JSON.parse(
-          JSON.parse(
-            document.getElementById('descent_graph_data').textContent
-          )
-        ),
-        false,
-        document.getElementById('descent_graph_capture')
-      );
-      display_graph(
-        document.getElementById('ancestor_graph'),
-        JSON.parse(
-          JSON.parse(
-            document.getElementById('ancestor_graph_data').textContent
-          )
-        ),
-        true,
-        document.getElementById('ancestor_graph_capture')
-      );
-    });
+  <script>
+    const api_url = "{{ api_url }}";
+    const active_user = "{{ object.id }}"
   </script>
 {% endblock %}
 

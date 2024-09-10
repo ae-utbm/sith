@@ -752,6 +752,7 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/jhuckaby/webcamjs/": "1.0.0",
     "https://github.com/alpinejs/alpine": "3.14.1",
     "https://github.com/cytoscape/cytoscape.js": "3.30.2 ",
+    "https://github.com/cytoscape/cytoscape.js-cxtmenu": "3.5.0",
     "https://github.com/mrdoob/three.js/": "r148",
     "https://github.com/vasturiano/three-spritetext": "1.6.5",
     "https://github.com/vasturiano/3d-force-graph/": "1.70.19",

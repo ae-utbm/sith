@@ -21,14 +21,11 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-import json
 import logging
-from dataclasses import asdict, dataclass, field
 
 # This file contains all the views that concern the user model
 from datetime import date, timedelta
 from smtplib import SMTPException
-from typing import Self
 
 from django.conf import settings
 from django.contrib.auth import login, views
@@ -41,7 +38,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
-from django.templatetags.static import static
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -327,7 +323,7 @@ def delete_user_godfather(request, user_id, godfather_id, is_father):
     return redirect("core:user_godfathers", user_id=user_id)
 
 
-class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
+class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView, FormView):
     """Display a user's godfathers."""
 
     model = User
@@ -335,86 +331,23 @@ class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_godfathers.jinja"
     current_tab = "godfathers"
+    form_class = UserGodfathersForm
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.form = UserGodfathersForm(request.POST)
-        if self.form.is_valid() and self.form.cleaned_data["user"] != self.object:
-            if self.form.cleaned_data["type"] == "godfather":
-                self.object.godfathers.add(self.form.cleaned_data["user"])
-                self.object.save()
-            else:
-                self.object.godchildren.add(self.form.cleaned_data["user"])
-                self.object.save()
-            self.form = UserGodfathersForm()
-        return super().get(request, *args, **kwargs)
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"user": self.object}
+
+    def form_valid(self, form):
+        if form.cleaned_data["type"] == "godfather":
+            self.object.godfathers.add(form.cleaned_data["user"])
+        else:
+            self.object.godchildren.add(form.cleaned_data["user"])
+        return redirect("core:user_godfathers", user_id=self.object.id)
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        try:
-            kwargs["form"] = self.form
-        except:
-            kwargs["form"] = UserGodfathersForm()
-        return kwargs
-
-
-NodeDict = dict[str, dict[str, str]]
-EdgeDict = dict[str, dict[str, str]]
-
-
-@dataclass(frozen=True)
-class Node:
-    id: str
-    name: str
-    pict_url: str
-    profile_url: str
-    shape: str
-
-    @staticmethod
-    def get_profile_pict(user: User) -> str:
-        if user.profile_pict:
-            return user.profile_pict.get_download_url()
-        return static("core/img/unknown.jpg")
-
-    @classmethod
-    def from_user(cls, user: User, *, is_current: bool = False) -> Self:
-        return cls(
-            id=str(user.id),
-            name=user.get_short_name(),
-            pict_url=cls.get_profile_pict(user),
-            profile_url=user.get_absolute_url(),
-            shape="rectangle" if is_current else "ellipse",
-        )
-
-    def to_dict(self) -> NodeDict:
-        return {"data": {**asdict(self)}}
-
-
-@dataclass(frozen=True)
-class Edge:
-    source: str
-    target: str
-
-    @classmethod
-    def from_user(cls, source: User, target: User) -> Self:
-        return cls(source=str(source.id), target=str(target.id))
-
-    def to_dict(self) -> EdgeDict:
-        return {"data": {**asdict(self)}}
-
-
-@dataclass
-class Graph:
-    _elements: set[Node | Edge] = field(default_factory=set)
-
-    def add_node(self, user: User, *, is_current: bool = False) -> None:
-        self._elements.add(Node.from_user(user, is_current=is_current))
-
-    def add_edge(self, *, source: User, target: User) -> None:
-        self._elements.add(Edge.from_user(source=source, target=target))
-
-    def to_list(self) -> list[NodeDict | EdgeDict]:
-        return [n.to_dict() for n in self._elements]
+        return super().get_context_data(**kwargs) | {
+            "godfathers": list(self.object.godfathers.select_related("profile_pict")),
+            "godchildren": list(self.object.godchildren.select_related("profile_pict")),
+        }
 
 
 class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
@@ -426,60 +359,11 @@ class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
     template_name = "core/user_godfathers_tree.jinja"
     current_tab = "godfathers"
 
-    def build_family_graph(self) -> Graph:
-        graph = Graph()
-        graph.add_node(self.object, is_current=True)
-        for u in self.object.godfathers.all():
-            graph.add_node(u)
-            graph.add_edge(
-                source=u,
-                target=self.object,
-            )
-        for u in self.object.godchildren.all():
-            graph.add_node(u)
-            graph.add_edge(
-                source=self.object,
-                target=u,
-            )
-
-        return graph
-
-    def build_complex_graph(self, param) -> Graph:
-        depth = int(self.request.GET.get("depth", 4))
-        graph = Graph()
-        family = {}
-        self.level = 1
-
-        # Since the tree isn't very deep, we can build it recursively
-        def crawl_family(user: User):
-            if self.level > depth:
-                return
-            self.level += 1
-            for u in user.__getattribute__(param).all():
-                graph.add_node(user=u)
-                graph.add_edge(source=user, target=u)
-                if not family.get(u.id, False):
-                    family[u.id] = True
-                    crawl_family(u)
-            self.level -= 1
-
-        graph.add_node(self.object, is_current=True)
-        family[self.object.id] = True
-        crawl_family(self.object)
-        return graph
-
-    def build_ancestor_graph(self) -> Graph:
-        return self.build_complex_graph("godfathers")
-
-    def build_descent_graph(self) -> Graph:
-        return self.build_complex_graph("godchildren")
-
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["members_set"] = set()
-        kwargs["family_graph"] = json.dumps(self.build_family_graph().to_list())
-        kwargs["descent_graph"] = json.dumps(self.build_descent_graph().to_list())
-        kwargs["ancestor_graph"] = json.dumps(self.build_ancestor_graph().to_list())
+        kwargs["api_url"] = reverse(
+            "api:family_graph", kwargs={"user_id": self.object.id}
+        )
         return kwargs
 
 

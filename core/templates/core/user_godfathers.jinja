@@ -11,14 +11,20 @@
 
 {% block content %}
   <div class="container">
-    <a href="{{ url('core:user_godfathers_tree_pict', user_id=profile.id) }}?family">
-      {% trans %}Show family picture{% endtrans %}
-    </a>
+    {% if godchildren or godfathers %}
+      <a
+        href="{{ url('core:user_godfathers_tree', user_id=profile.id) }}"
+        class="btn btn-blue"
+        id="family-tree-link"
+      >
+        {% trans %}Show family tree{% endtrans %}
+      </a>
+    {% endif %}
 
     <h4>{% trans %}Godfathers / Godmothers{% endtrans %}</h4>
-    {% if profile.godfathers.exists() %}
+    {% if godfathers %}
       <ul class="users">
-        {% for u in profile.godfathers.all() %}
+        {% for u in godfathers %}
           <li class="users-card">
             <a href="{{ url('core:user_godfathers', user_id=u.id) }}" class="mini_profile_link">
               {{ u.get_mini_item() | safe }}
@@ -28,17 +34,14 @@
         {% endfor %}
       </ul>
 
-      <a href="{{ url('core:user_godfathers_tree', user_id=profile.id) }}">
-        {% trans %}Show ancestors tree{% endtrans %}
-      </a>
     {% else %}
       <p>{% trans %}No godfathers / godmothers{% endtrans %}
     {% endif %}
 
     <h4>{% trans %}Godchildren{% endtrans %}</h4>
-    {% if profile.godchildren.exists() %}
+    {% if godchildren %}
       <ul class="users">
-        {% for u in profile.godchildren.all() %}
+        {% for u in godchildren %}
           <li class="users-card">
             <a href="{{ url('core:user_godfathers', user_id=u.id) }}" class="mini_profile_link">
               {{ u.get_mini_item()|safe }}
@@ -47,10 +50,6 @@
           </li>
         {% endfor %}
       </ul>
-
-      <a href="{{ url('core:user_godfathers_tree', user_id=profile.id) }}?descent">
-        {% trans %}Show descent tree{% endtrans %}
-      </a>
     {% else %}
       <p>{% trans %}No godchildren{% endtrans %}
     {% endif %}
