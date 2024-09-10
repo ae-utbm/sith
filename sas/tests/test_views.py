@@ -17,14 +17,15 @@ from typing import Callable
 import pytest
 from django.conf import settings
 from django.core.cache import cache
-from django.test import Client
+from django.test import Client, TestCase
 from django.urls import reverse
 from model_bakery import baker
+from pytest_django.asserts import assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import RealGroup, User
 from sas.baker_recipes import picture_recipe
-from sas.models import Album
+from sas.models import Album, Picture
 
 # Create your tests here.
 
@@ -64,3 +65,70 @@ def test_album_access_non_subscriber(client: Client):
     cache.clear()
     res = client.get(reverse("sas:album", kwargs={"album_id": album.id}))
     assert res.status_code == 200
+
+
+class TestSasModeration(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        album = baker.make(Album, parent_id=settings.SITH_SAS_ROOT_DIR_ID)
+        cls.pictures = picture_recipe.make(
+            parent=album, _quantity=10, _bulk_create=True
+        )
+        cls.to_moderate = cls.pictures[0]
+        cls.to_moderate.is_moderated = False
+        cls.to_moderate.save()
+        cls.moderator = baker.make(
+            User, groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
+        )
+        cls.simple_user = subscriber_user.make()
+
+    def test_moderation_page_sas_admin(self):
+        """Test that a moderator can see the pictures needing moderation."""
+        self.client.force_login(self.moderator)
+        res = self.client.get(reverse("sas:moderation"))
+        assert res.status_code == 200
+        assert len(res.context_data["pictures"]) == 1
+        assert res.context_data["pictures"][0] == self.to_moderate
+
+        res = self.client.post(
+            reverse("sas:moderation"),
+            data={"album_id": self.to_moderate.id, "picture_id": self.to_moderate.id},
+        )
+
+    def test_moderation_page_forbidden(self):
+        self.client.force_login(self.simple_user)
+        res = self.client.get(reverse("sas:moderation"))
+        assert res.status_code == 403
+
+    def test_moderate_picture(self):
+        self.client.force_login(self.moderator)
+        res = self.client.get(
+            reverse("core:file_moderate", kwargs={"file_id": self.to_moderate.id}),
+            data={"next": self.pictures[1].get_absolute_url()},
+        )
+        assertRedirects(res, self.pictures[1].get_absolute_url())
+        self.to_moderate.refresh_from_db()
+        assert self.to_moderate.is_moderated
+
+    def test_delete_picture(self):
+        self.client.force_login(self.moderator)
+        res = self.client.post(
+            reverse("core:file_delete", kwargs={"file_id": self.to_moderate.id})
+        )
+        assert res.status_code == 302
+        assert not Picture.objects.filter(pk=self.to_moderate.id).exists()
+
+    def test_moderation_action_non_authorized_user(self):
+        """Test that a non-authorized user cannot moderate a picture."""
+        self.client.force_login(self.simple_user)
+        res = self.client.post(
+            reverse("core:file_moderate", kwargs={"file_id": self.to_moderate.id}),
+        )
+        assert res.status_code == 403
+        self.to_moderate.refresh_from_db()
+        assert not self.to_moderate.is_moderated
+        res = self.client.post(
+            reverse("core:file_delete", kwargs={"file_id": self.to_moderate.id}),
+        )
+        assert res.status_code == 403
+        assert Picture.objects.filter(pk=self.to_moderate.id).exists()
