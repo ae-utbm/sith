@@ -4,7 +4,6 @@
  * @property {UserProfile} user The identified user
  */
 
-
 document.addEventListener("alpine:init", () => {
   Alpine.data("picture_viewer", () => ({
     /**
@@ -79,7 +78,7 @@ document.addEventListener("alpine:init", () => {
       );
       this.$watch("current_picture", () => this.update_picture());
       window.addEventListener("popstate", async (event) => {
-        if (!event.state || event.state.sas_picture_id === undefined){
+        if (!event.state || event.state.sas_picture_id === undefined) {
           return;
         }
         this.pushstate = History.REPLACE;
@@ -103,11 +102,11 @@ document.addEventListener("alpine:init", () => {
       this.loading = true;
 
       const update_args = [
-        {sas_picture_id: this.current_picture.id},
+        { sas_picture_id: this.current_picture.id },
         "",
         `/sas/picture/${this.current_picture.id}/`,
       ];
-      if (this.pushstate === History.REPLACE){
+      if (this.pushstate === History.REPLACE) {
         window.history.replaceState(...update_args);
         this.pushstate = History.PUSH;
       } else {
@@ -141,7 +140,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     async delete_picture() {
-      const res = await fetch(`/api/sas/picture/${this.current_picture}/`, {
+      const res = await fetch(`/api/sas/picture/${this.current_picture.id}/`, {
         method: "DELETE",
       });
       if (!res.ok) {

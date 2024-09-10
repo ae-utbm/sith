@@ -246,7 +246,11 @@ function select_item_builder(picture_getter) {
     const picture =
       typeof picture_getter === "function" ? picture_getter(item) : null;
     const img_html = picture
-      ? `<img src="${picture_getter(item)}" alt="item.text"/>`
+      ? `<img 
+          src="${picture_getter(item)}" 
+          alt="${item.text}" 
+          onerror="this.src = '/static/core/img/unknown.jpg'" 
+        />`
       : "";
 
     return $(`<div class="select-item">
