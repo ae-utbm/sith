@@ -362,7 +362,6 @@ class CounterQuerySet(models.QuerySet):
             ```
         """
         subquery = user.counters.filter(pk=OuterRef("pk"))
-        # noinspection PyTypeChecker
         return self.annotate(has_annotated_barman=Exists(subquery))
 
 

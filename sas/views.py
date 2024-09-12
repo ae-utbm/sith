@@ -34,7 +34,7 @@ from sas.models import Album, PeoplePictureRelation, Picture
 
 class SASForm(forms.Form):
     album_name = forms.CharField(
-        label=_("Add a new album"), max_length=30, required=False
+        label=_("Add a new album"), max_length=Album.NAME_MAX_LENGTH, required=False
     )
     images = MultipleImageField(
         label=_("Upload images"),
@@ -333,10 +333,9 @@ class ModerationView(TemplateView):
         kwargs["albums_to_moderate"] = Album.objects.filter(
             is_moderated=False, is_in_sas=True, is_folder=True
         ).order_by("id")
-        kwargs["pictures"] = Picture.objects.filter(is_moderated=False)
-        kwargs["albums"] = Album.objects.filter(
-            id__in=kwargs["pictures"].values("parent").distinct("parent")
-        )
+        pictures = Picture.objects.filter(is_moderated=False).select_related("parent")
+        kwargs["pictures"] = pictures
+        kwargs["albums"] = [p.parent for p in pictures]
         return kwargs
 
 
@@ -353,6 +352,7 @@ class AlbumEditForm(forms.ModelForm):
         model = Album
         fields = ["name", "date", "file", "parent", "edit_groups"]
 
+    name = forms.CharField(max_length=Album.NAME_MAX_LENGTH, label=_("file name"))
     date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
     parent = make_ajax_field(Album, "parent", "files", help_text="")
     edit_groups = make_ajax_field(Album, "edit_groups", "groups", help_text="")

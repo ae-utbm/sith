@@ -32,13 +32,13 @@ tar xf "${BINDINGS}.tar.xz"
 # install
 echo "Installing Xapian-core..."
 cd "$VIRTUAL_ENV/packages/${CORE}" || exit 1
-./configure --prefix="$VIRTUAL_ENV" && make && make install
+./configure --prefix="$VIRTUAL_ENV" && make -j"$(nproc)" && make install
 
 PYTHON_FLAG=--with-python3
 
 echo "Installing Xapian-bindings..."
 cd "$VIRTUAL_ENV/packages/${BINDINGS}" || exit 1
-./configure --prefix="$VIRTUAL_ENV" $PYTHON_FLAG XAPIAN_CONFIG="$VIRTUAL_ENV/bin/xapian-config" && make && make install
+./configure --prefix="$VIRTUAL_ENV" $PYTHON_FLAG XAPIAN_CONFIG="$VIRTUAL_ENV/bin/xapian-config" && make -j"$(nproc)" && make install
 
 # clean
 rm -rf "$VIRTUAL_ENV/packages"
