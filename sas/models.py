@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 from io import BytesIO
+from pathlib import Path
 from typing import ClassVar, Self
 
 from django.conf import settings
@@ -123,7 +124,7 @@ class Picture(SasFile):
             self.file.delete()
             self.thumbnail.delete()
             self.compressed.delete()
-        new_extension_name = self.name.removesuffix(extension) + "webp"
+        new_extension_name = str(Path(self.name).with_suffix(".webp"))
         self.file = file
         self.file.name = self.name
         self.thumbnail = thumb
