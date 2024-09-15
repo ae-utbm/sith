@@ -46,7 +46,7 @@ class ResizedImageFieldFile(ImageFieldFile):
             extension = formats[new_format]
         else:
             raise ValueError(f"Unknown format {new_format}")
-        return str(Path(self.file.name).with_suffix(f".{extension}"))
+        return str(Path(self.file.name).with_suffix(extension))
 
     def save(self, name, content, save=True):  # noqa FBT002
         content.file.seek(0)

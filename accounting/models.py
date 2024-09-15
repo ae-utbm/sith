@@ -43,6 +43,18 @@ class CurrencyField(models.DecimalField):
             return None
 
 
+if settings.TESTING:
+    from model_bakery import baker
+
+    baker.generators.add(
+        CurrencyField,
+        lambda: baker.random_gen.gen_decimal(max_digits=8, decimal_places=2),
+    )
+else:  # pragma: no cover
+    # baker is only used in tests, so we don't need coverage for this part
+    pass
+
+
 # Accounting classes
 
 
