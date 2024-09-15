@@ -25,7 +25,7 @@ from django.core.files.base import ContentFile
 from django.http import HttpRequest
 from django.utils import timezone
 from PIL import ExifTags
-from PIL.Image import Resampling
+from PIL.Image import Image, Resampling
 
 
 def get_start_of_semester(today: Optional[date] = None) -> date:
@@ -82,18 +82,20 @@ def get_semester_code(d: Optional[date] = None) -> str:
     return "P" + str(start.year)[-2:]
 
 
-def scale_dimension(width, height, long_edge):
-    ratio = long_edge / max(width, height)
-    return int(width * ratio), int(height * ratio)
-
-
-def resize_image(im, edge, img_format):
+def resize_image(im: Image, edge: int, img_format: str):
+    """Resize an image to fit the given edge length and format."""
     (w, h) = im.size
-    (width, height) = scale_dimension(w, h, long_edge=edge)
+    ratio = edge / max(w, h)
+    (width, height) = int(w * ratio), int(h * ratio)
+    return resize_image_explicit(im, (width, height), img_format)
+
+
+def resize_image_explicit(im: Image, size: tuple[int, int], img_format: str):
+    """Resize an image to the given size and format."""
     img_format = img_format.upper()
     content = BytesIO()
     # use the lanczos filter for antialiasing and discard the alpha channel
-    im = im.resize((width, height), Resampling.LANCZOS)
+    im = im.resize((size[0], size[1]), Resampling.LANCZOS)
     if img_format == "JPEG":
         # converting an image with an alpha channel to jpeg would cause a crash
         im = im.convert("RGB")

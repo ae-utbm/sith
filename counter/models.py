@@ -37,6 +37,7 @@ from django_countries.fields import CountryField
 
 from accounting.models import CurrencyField
 from club.models import Club
+from core.fields import ResizedImageField
 from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
 from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
@@ -208,7 +209,9 @@ class ProductType(models.Model):
     name = models.CharField(_("name"), max_length=30)
     description = models.TextField(_("description"), null=True, blank=True)
     comment = models.TextField(_("comment"), null=True, blank=True)
-    icon = models.ImageField(upload_to="products", null=True, blank=True)
+    icon = ResizedImageField(
+        height=70, force_format="WEBP", upload_to="products", null=True, blank=True
+    )
 
     # priority holds no real backend logic but helps to handle the order in which
     # the items are to be shown to the user
@@ -250,8 +253,13 @@ class Product(models.Model):
     purchase_price = CurrencyField(_("purchase price"))
     selling_price = CurrencyField(_("selling price"))
     special_selling_price = CurrencyField(_("special selling price"))
-    icon = models.ImageField(
-        upload_to="products", null=True, blank=True, verbose_name=_("icon")
+    icon = ResizedImageField(
+        height=70,
+        force_format="WEBP",
+        upload_to="products",
+        null=True,
+        blank=True,
+        verbose_name=_("icon"),
     )
     club = models.ForeignKey(
         Club, related_name="products", verbose_name=_("club"), on_delete=models.CASCADE
