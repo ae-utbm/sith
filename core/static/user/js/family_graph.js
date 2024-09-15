@@ -160,9 +160,25 @@ function create_graph(container, data, active_user_id) {
 }
 
 document.addEventListener("alpine:init", () => {
-  const depth_min = 0;
-  const depth_max = 10;
+  /*
+    This needs some constants to be set before the document has been loaded
+
+    api_url:     base url for fetching the tree as a string
+    active_user: id of the user to fetch the tree from
+    depth_min:   minimum tree depth for godfathers and godchildren as an int
+    depth_max:   maximum tree depth for godfathers and godchildren as an int
+  */
   const default_depth = 2;
+
+  if (
+    typeof api_url === "undefined" ||
+    typeof active_user === "undefined" ||
+    typeof depth_min === "undefined" ||
+    typeof depth_max === "undefined"
+  ) {
+    console.error("Some constants are not set before using the family_graph script, please look at the documentation");
+    return;
+  }
 
   function get_initial_depth(prop) {
     let value = parseInt(initialUrlParams.get(prop));
@@ -216,6 +232,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     async reset() {
+      this.reverse = false;
       this.godfathers_depth = default_depth;
       this.godchildren_depth = default_depth;
     },

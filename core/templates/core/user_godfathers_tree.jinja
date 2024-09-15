@@ -1,4 +1,6 @@
 {% extends "core/base.jinja" %}
+{% set depth_min=0 %}
+{% set depth_max=10 %}
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ scss('user/user_godfathers.scss') }}">
@@ -22,48 +24,54 @@
       <div class="toolbar-column">
         <div class="toolbar-input">
           <label for="godfather-depth-input">
-            {% trans min=0, max=10 %}Max godfather depth between {{ min }} and {{ max }}{% endtrans %}
+            {% trans min=depth_min, max=depth_max %}Max godfather depth between {{ min }} and {{ max }}{% endtrans %}
           </label>
           <span class="depth-choice">
-            <i
-              class="fa fa-minus fa-xs clickable"
-              @click="godfathers_depth = Math.max(0, godfathers_depth - 1)"
-            ></i>
+            <button
+              @click="godfathers_depth--"
+              :disabled="godfathers_depth <= {{ depth_min }}"
+            ><i class="fa fa-minus fa-xs"></i></button>
             <input
               x-model="godfathers_depth"
               x-ref="godfather_depth_input"
               type="number"
               name="godfathers_depth"
               id="godfather-depth-input"
-              min="0"
-              max="10"
+              min="{{ depth_min }}"
+              max="{{ depth_max }}"
             />
-            <i class="fa fa-plus clickable"
-               @click="godfathers_depth = Math.min(10, godfathers_depth + 1)"
-            ></i>
+            <button
+              @click="godfathers_depth++"
+              :disabled="godfathers_depth >= {{ depth_max }}"
+            ><i class="fa fa-plus"
+              ></i></button>
           </span>
         </div>
 
         <div class="toolbar-input">
           <label for="godchild-depth-input">
-            {% trans min=0, max=10 %}Max godchildren depth between {{ min }} and {{ max }}{% endtrans %}
+            {% trans min=depth_min, max=depth_max %}Max godchildren depth between {{ min }} and {{ max }}{% endtrans %}
           </label>
           <span class="depth-choice">
-            <i
-              class="fa fa-minus fa-xs clickable"
-              @click="godchildren_depth = Math.max(0, godchildren_depth - 1)"
-            ></i>
+            <button
+              @click="godchildren_depth--"
+              :disabled="godchildren_depth <= {{ depth_min }}"
+            ><i
+              class="fa fa-minus fa-xs"
+            ></i></button>
             <input
               x-model="godchildren_depth"
               type="number"
               name="godchildren_depth"
               id="godchild-depth-input"
-              min="0"
-              max="10"
+              min="{{ depth_min }}"
+              max="{{ depth_max }}"
             />
-            <i class="fa fa-plus clickable"
-               @click="godchildren_depth = Math.min(10, godchildren_depth + 1)"
-            ></i>
+            <button
+              @click="godchildren_depth++"
+              :disabled="godchildren_depth >= {{ depth_max }}"
+            ><i class="fa fa-plus"
+              ></i></button>
           </span>
         </div>
       </div>
@@ -88,6 +96,8 @@
   <script>
     const api_url = "{{ api_url }}";
     const active_user = "{{ object.id }}"
+    const depth_min = {{ depth_min }};
+    const depth_max = {{ depth_max }};
   </script>
 {% endblock %}
 

@@ -34,19 +34,40 @@
 
     .depth-choice {
       white-space: nowrap;
+      input[type="number"] {
+        -webkit-appearance: textfield;
+        -moz-appearance: textfield;
+        appearance: textfield;
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+        }
+      }
+      button {
+        background: none;
+        & > .fa {
+          border-radius: 50%;
+          font-size: 12px;
+          padding: 5px;
+        }
+        &:enabled > .fa {
+          background-color: #354a5f;
+          color: white;
+        }
+        &:enabled:hover > .fa {
+          color: white;
+          background-color: #35405f; // just a bit darker
+        }
+        &:disabled > .fa {
+          background-color: gray;
+          color: white;
+        }
+      }
     }
 
     input {
       align-self: center;
       max-width: 40px;
-    }
-
-    .fa-minus, .fa-plus {
-      border-radius: 50%;
-      background-color: #354a5f;
-      color: white;
-      font-size: 12px;
-      padding: 5px;
     }
   }
 

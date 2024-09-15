@@ -89,7 +89,7 @@ function update_query_string(key, value, action = History.REPLACE, url = null) {
     if (!url){
         url = new URL(window.location.href);
     }
-    if (!value) {
+    if (value === null || value === "") {
         // If the value is null, undefined or empty => delete it
         url.searchParams.delete(key)
     } else if (Array.isArray(value)) {
