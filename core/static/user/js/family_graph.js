@@ -192,7 +192,7 @@ document.addEventListener("alpine:init", () => {
     loading: false,
     godfathers_depth: get_initial_depth("godfathers_depth"),
     godchildren_depth: get_initial_depth("godchildren_depth"),
-    reverse: !!initialUrlParams.get("reverse"),
+    reverse: initialUrlParams.get("reverse")?.toLowerCase?.() === 'true',
     graph: undefined,
     graph_data: {},
 
