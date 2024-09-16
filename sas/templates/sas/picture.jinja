@@ -58,8 +58,13 @@
     <div class="container" id="pict">
       <div class="main">
 
-        <div class="photo" :aria-busy="loading">
-          <img :src="current_picture.compressed_url" :alt="current_picture.name"/>
+        <div class="photo" :aria-busy="current_picture.image_loading">
+          <img
+            :src="current_picture.compressed_url"
+            :alt="current_picture.name"
+            id="main-picture"
+            x-ref="main_picture"
+          />
         </div>
 
         <div class="general">
@@ -137,7 +142,10 @@
             </form>
           {% endif %}
           <ul>
-            <template x-for="identification in identifications" :key="identification.id">
+            <template
+              x-for="identification in (current_picture.identifications || [])"
+              :key="identification.id"
+            >
               <li>
                 <a class="user" :href="identification.user.profile_url">
                   <img class="profile-pic" :src="identification.user.profile_pict" alt="image de profil"/>
@@ -148,7 +156,7 @@
                 </template>
               </li>
             </template>
-            <template x-if="loading">
+            <template x-if="current_picture.identifications_loading">
                 {# shadow element that exists only to put the loading wheel below
                 the list of identified people #}
               <li class="loader" aria-busy="true"></li>
