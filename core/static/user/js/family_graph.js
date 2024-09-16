@@ -72,14 +72,16 @@ function create_graph(container, data, active_user_id) {
       },
     ],
     layout: {
-      name: "breadthfirst",
-      directed: false,
-      padding: 10,
-      grid: true,
-      circle: false,
-      avoidOverlap: true,
-      roots: `#${active_user_id}`,
-    },
+      name: "klay",
+      nodeDimensionsIncludeLabels: true,
+      fit: true,
+      klay: {
+        addUnnecessaryBendpoints: true,
+        direction: 'DOWN',
+        nodePlacement: 'INTERACTIVE',
+        layoutHierarchy: true
+      }
+    }
   });
   let active_user = cy
     .getElementById(active_user_id)
