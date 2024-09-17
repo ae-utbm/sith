@@ -227,7 +227,7 @@ document.addEventListener("alpine:init", () => {
     async screenshot() {
       const link = document.createElement("a");
       link.href = this.graph.jpg();
-      link.download = "output.jpg";
+      link.download = gettext("family_tree.%(extension)s", "jpg");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

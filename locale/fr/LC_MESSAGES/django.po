@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-15 18:17+0200\n"
+"POT-Creation-Date: 2024-09-17 11:24+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -781,7 +781,7 @@ msgstr "Opération liée : "
 #: core/templates/core/macros_pages.jinja:25
 #: core/templates/core/page_prop.jinja:11
 #: core/templates/core/user_godfathers.jinja:61
-#: core/templates/core/user_godfathers_tree.jinja:79
+#: core/templates/core/user_godfathers_tree.jinja:91
 #: core/templates/core/user_preferences.jinja:18
 #: core/templates/core/user_preferences.jinja:27
 #: core/templates/core/user_preferences.jinja:65
@@ -2907,7 +2907,7 @@ msgstr "Vous avez correctement changé votre mot de passe !"
 
 #: core/templates/core/password_reset.jinja:8
 #: core/templates/core/password_reset_confirm.jinja:8
-#: core/templates/core/user_godfathers_tree.jinja:77
+#: core/templates/core/user_godfathers_tree.jinja:87
 msgid "Reset"
 msgstr "Réinitialiser"
 
@@ -3245,22 +3245,22 @@ msgstr "Fillots / Fillotes"
 msgid "No godchildren"
 msgstr "Pas de fillots / fillotes"
 
-#: core/templates/core/user_godfathers_tree.jinja:16
+#: core/templates/core/user_godfathers_tree.jinja:20
 #, python-format
 msgid "%(user_name)s's family tree"
 msgstr "Arbre généalogique de %(user_name)s"
 
-#: core/templates/core/user_godfathers_tree.jinja:25
+#: core/templates/core/user_godfathers_tree.jinja:29
 #, python-format
 msgid "Max godfather depth between %(min)s and %(max)s"
 msgstr "Maximum de profondeur pour les parrains entre %(min)s et %(max)s"
 
-#: core/templates/core/user_godfathers_tree.jinja:49
+#: core/templates/core/user_godfathers_tree.jinja:55
 #, python-format
 msgid "Max godchildren depth between %(min)s and %(max)s"
 msgstr "Maximum de profondeur pour les fillots entre %(min)s et %(max)s"
 
-#: core/templates/core/user_godfathers_tree.jinja:74
+#: core/templates/core/user_godfathers_tree.jinja:83
 msgid "Reverse"
 msgstr "Inverser"
 
