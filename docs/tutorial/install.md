@@ -70,7 +70,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         Puis installez les autres dépendances :
         
         ```bash
-        sudo apt install build-essentials libssl-dev libjpeg-dev zlib1g-dev python-dev \
+        sudo apt install build-essential libssl-dev libjpeg-dev zlib1g-dev python-dev \
                  libffi-dev python-dev-is-python3 pkg-config \
                  gettext git pipx
 
