@@ -74,7 +74,7 @@ INSTALLED_APPS = (
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
+    "staticfiles",
     "django.contrib.sites",
     "honeypot",
     "django_jinja",
@@ -163,7 +163,6 @@ TEMPLATES = [
                 "ProductType": "counter.models.ProductType",
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
-                "scss": "core.templatetags.renderer.scss",
             },
             "bytecode_cache": {
                 "name": "default",
@@ -268,9 +267,8 @@ STATIC_ROOT = BASE_DIR / "static"
 
 # Static files finders which allow to see static folder in all apps
 STATICFILES_FINDERS = [
-    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "staticfiles.finders.GeneratedFilesFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "sith.finders.ScssFinder",
 ]
 
 STORAGES = {
@@ -278,7 +276,7 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "sith.storage.SithStorage",
+        "BACKEND": "staticfiles.storage.ManifestPostProcessingStorage",
     },
 }
 
@@ -743,14 +741,8 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/gildas-lormeau/zip.js": "2.7.47",
     "https://github.com/jimmywarting/native-file-system-adapter": "3.0.1",
     "https://github.com/chartjs/Chart.js/": "2.6.0",
-    "https://github.com/Ionaru/easy-markdown-editor/": "2.18.0",
     "https://github.com/FortAwesome/Font-Awesome/": "4.7.0",
-    "https://github.com/jquery/jquery/": "3.6.2",
-    "https://github.com/sethmcl/jquery-ui/": "1.11.1",
-    "https://github.com/viralpatel/jquery.shorten/": "",
     "https://github.com/getsentry/sentry-javascript/": "8.26.0",
-    "https://github.com/jhuckaby/webcamjs/": "1.0.0",
-    "https://github.com/alpinejs/alpine": "3.14.1",
     "https://github.com/cytoscape/cytoscape.js": "3.30.2 ",
     "https://github.com/cytoscape/cytoscape.js-cxtmenu": "3.5.0",
     "https://github.com/cytoscape/cytoscape.js-klay": "3.1.4",

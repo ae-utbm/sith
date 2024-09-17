@@ -66,17 +66,19 @@ sith3/
 │   └── ...
 ├── antispam/ (23)
 │   └── ...
+├── staticfiles/ (24)
+│   └── ...
 │
-├── .coveragerc (24)
-├── .envrc (25)
+├── .coveragerc (25)
+├── .envrc (26)
 ├── .gitattributes
 ├── .gitignore
 ├── .mailmap
 ├── .env.exemple
-├── manage.py (26)
-├── mkdocs.yml (27)
+├── manage.py (27)
+├── mkdocs.yml (28)
 ├── poetry.lock
-├── pyproject.toml (28)
+├── pyproject.toml (29)
 └── README.md
 ```
 </div>
@@ -114,16 +116,19 @@ sith3/
 19. Application principale du projet, contenant sa configuration.
 20. Gestion des stocks des comptoirs.
 21. Gestion des cotisations des utilisateurs du site.
-22. Fonctionalitées pour gérer le spam.
-23. Gestion des trombinoscopes.
-24. Fichier de configuration de coverage.
-25. Fichier de configuration de direnv.
-26. Fichier généré automatiquement par Django. C'est lui
+22. Outil pour faciliter la fabrication des trombinoscopes de promo.
+23. Fonctionnalités pour gérer le spam.
+24. Gestion des statics du site. Override le système de statics de Django.
+    Ajoute l'intégration du scss et de webpack
+    de manière transparente pour l'utilisateur.
+25. Fichier de configuration de coverage.
+26. Fichier de configuration de direnv.
+27. Fichier généré automatiquement par Django. C'est lui
     qui permet d'appeler des commandes de gestion du projet
     avec la syntaxe `python ./manage.py <nom de la commande>`
-27. Le fichier de configuration de la documentation,
+28. Le fichier de configuration de la documentation,
     avec ses plugins et sa table des matières.
-28. Le fichier où sont déclarés les dépendances et la configuration
+29. Le fichier où sont déclarés les dépendances et la configuration
     de certaines d'entre elles.
     
 
@@ -175,13 +180,16 @@ comme suit :
 │   └── ...
 ├── templates/ (2)
 │   └── ...
-├── api.py (3)
-├── admin.py (4)
-├── models.py (5)
-├── tests.py (6)
-├── schemas.py (7)
-├── urls.py (8)
-└── views.py (9)
+├── static/ (3)
+│   └── webpack/ (4)
+│   └── ...
+├── api.py (5)
+├── admin.py (6)
+├── models.py (7)
+├── tests.py (8)
+├── schemas.py (9)
+├── urls.py (10)
+└── views.py (11)
 ```
 </div>
 
@@ -190,17 +198,19 @@ comme suit :
    de mettre à jour la base de données.
    cf. [Gestion des migrations](../howto/migrations.md)
 2. Dossier contenant les templates jinja utilisés par cette application.
-3. Fichier contenant les routes d'API liées à cette application
-4. Fichier de configuration de l'interface d'administration.
+3. Dossier contenant les fichiers statics (js, css, scss) qui sont récpérée par Django.
+4. Dossier contenant du js qui sera process avec webpack. Le contenu sera automatiquement process et accessible comme si ça avait été placé dans le dossier `static/webpack`.
+5. Fichier contenant les routes d'API liées à cette application
+6. Fichier de configuration de l'interface d'administration.
    Ce fichier permet de déclarer les modèles de l'application
    dans l'interface d'administration.
-5. Fichier contenant les modèles de l'application.
+7. Fichier contenant les modèles de l'application.
    Les modèles sont des classes Python qui représentent
    les tables de la base de données.
-6. Fichier contenant les tests de l'application.
-7. Schémas de validation de données utilisés principalement dans l'API.
-8. Configuration des urls de l'application.
-9. Fichier contenant les vues de l'application.
+8. Fichier contenant les tests de l'application.
+9. Schémas de validation de données utilisés principalement dans l'API.
+10. Configuration des urls de l'application.
+11. Fichier contenant les vues de l'application.
    Dans les plus grosses applications,
    ce fichier peut être remplacé par un package
    `views` dans lequel les vues sont réparties entre
