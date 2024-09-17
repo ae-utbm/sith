@@ -239,6 +239,7 @@ a:not(.button) {
     padding: 9px 13px;
     border: none;
     text-decoration: none;
+    border-radius: 5px;
 
     &.btn-blue {
       background-color: $deepblue;

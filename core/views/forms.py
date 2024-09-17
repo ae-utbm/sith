@@ -335,8 +335,39 @@ class UserGodfathersForm(forms.Form):
         label=_("Add"),
     )
     user = AutoCompleteSelectField(
-        "users", required=True, label=_("Select user"), help_text=None
+        "users", required=True, label=_("Select user"), help_text=""
     )
+
+    def __init__(self, *args, user: User, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.target_user = user
+
+    def clean_user(self):
+        other_user = self.cleaned_data.get("user")
+        if not other_user:
+            raise ValidationError(_("This user does not exist"))
+        if other_user == self.target_user:
+            raise ValidationError(_("You cannot be related to yourself"))
+        return other_user
+
+    def clean(self):
+        super().clean()
+        if not self.is_valid():
+            return self.cleaned_data
+        other_user = self.cleaned_data["user"]
+        if self.cleaned_data["type"] == "godfather":
+            if self.target_user.godfathers.contains(other_user):
+                self.add_error(
+                    "user",
+                    _("%s is already your godfather") % (other_user.get_short_name()),
+                )
+        else:
+            if self.target_user.godchildren.contains(other_user):
+                self.add_error(
+                    "user",
+                    _("%s is already your godchild") % (other_user.get_short_name()),
+                )
+        return self.cleaned_data
 
 
 class PagePropForm(forms.ModelForm):

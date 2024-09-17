@@ -8,7 +8,6 @@ Certaines dépendances sont nécessaires niveau système :
 - zlib1g-dev
 - python
 - gettext
-- graphviz
 
 ### Installer WSL
 
@@ -71,8 +70,8 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         Puis installez les autres dépendances :
         
         ```bash
-        sudo apt install build-essentials libssl-dev libjpeg-dev zlib1g-dev python-dev \
-                 libffi-dev python-dev-is-python3 libgraphviz-dev pkg-config \
+        sudo apt install build-essential libssl-dev libjpeg-dev zlib1g-dev python-dev \
+                 libffi-dev python-dev-is-python3 pkg-config \
                  gettext git pipx
 
         pipx install poetry
@@ -85,7 +84,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 
         sudo pacman -S python
         
-        sudo pacman -S gcc git graphviz gettext graphviz pkgconf python-poetry
+        sudo pacman -S gcc git gettext pkgconf python-poetry
         ```
 
 === "macOS"
@@ -93,12 +92,8 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     Pour installer les dépendances, il est fortement recommandé d'installer le gestionnaire de paquets `homebrew <https://brew.sh/index_fr>`_.  
     Il est également nécessaire d'avoir installé xcode
     
-    ```bash
-    echo 'export PATH="$(brew --prefix graphviz)/bin:$PATH"' >> ~/.zshrc
-    echo 'export CFLAGS="-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -I $(brew --prefix graphviz)/include"' >> ~/.zshrc
-    echo 'export LDFLAGS="-L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -L $(brew --prefix graphviz)/lib"' >> ~/.zshrc
-    
-    brew install git python graphviz pipx
+    ```bash    
+    brew install git python pipx
     pipx install poetry
     
     # Pour bien configurer gettext

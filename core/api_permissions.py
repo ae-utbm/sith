@@ -78,7 +78,7 @@ class CanView(BasePermission):
     """Check that this user has the permission to view the object of this route.
 
     Wrap the `user.can_view(obj)` method.
-    To see an example, look at the exemple in the module docstring.
+    To see an example, look at the example in the module docstring.
     """
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
@@ -94,7 +94,7 @@ class CanEdit(BasePermission):
     """Check that this user has the permission to edit the object of this route.
 
     Wrap the `user.can_edit(obj)` method.
-    To see an example, look at the exemple in the module docstring.
+    To see an example, look at the example in the module docstring.
     """
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
@@ -110,7 +110,7 @@ class IsOwner(BasePermission):
     """Check that this user owns the object of this route.
 
     Wrap the `user.is_owner(obj)` method.
-    To see an example, look at the exemple in the module docstring.
+    To see an example, look at the example in the module docstring.
     """
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:

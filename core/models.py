@@ -57,6 +57,7 @@ from django.utils.functional import cached_property
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+from pydantic.v1 import NonNegativeInt
 
 if TYPE_CHECKING:
     from club.models import Club
@@ -605,6 +606,41 @@ class User(AbstractBaseUser):
         return (
             today.year - born.year - ((today.month, today.day) < (born.month, born.day))
         )
+
+    def get_family(
+        self,
+        godfathers_depth: NonNegativeInt = 4,
+        godchildren_depth: NonNegativeInt = 4,
+    ) -> set[User.godfathers.through]:
+        """Get the family of the user, with the given depth.
+
+        Args:
+            godfathers_depth: The number of generations of godfathers to fetch
+            godchildren_depth: The number of generations of godchildren to fetch
+
+        Returns:
+            A list of family relationships in this user's family
+        """
+        res = []
+        for depth, key, reverse_key in [
+            (godfathers_depth, "from_user_id", "to_user_id"),
+            (godchildren_depth, "to_user_id", "from_user_id"),
+        ]:
+            if depth == 0:
+                continue
+            links = list(User.godfathers.through.objects.filter(**{key: self.id}))
+            res.extend(links)
+            for _ in range(1, depth):
+                ids = [getattr(c, reverse_key) for c in links]
+                links = list(
+                    User.godfathers.through.objects.filter(
+                        **{f"{key}__in": ids}
+                    ).exclude(id__in=[r.id for r in res])
+                )
+                if not links:
+                    break
+                res.extend(links)
+        return set(res)
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Sends an email to this User."""
