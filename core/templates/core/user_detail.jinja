@@ -225,7 +225,7 @@
             {% for gift in gifts %}
               <li>{{ gift }}
                 <a href="{{ url('core:user_gift_delete', user_id=profile.id, gift_id=gift.id) }}">
-                  <i class="fa fa-trash"></i>
+                  <i class="fa-solid fa-trash-can delete-action"></i>
                 </a>
               </li>
             {% endfor %}

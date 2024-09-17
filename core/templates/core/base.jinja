@@ -18,9 +18,8 @@
                 {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
         <link rel="stylesheet" href="{{ static('webpack/jquery-index.css') }}">
       {% endblock %}
-      <link rel="preload" as="style" href="{{ static('vendored/font-awesome/css/font-awesome.min.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-      <noscript><link rel="stylesheet" href="{{ static('vendored/font-awesome/css/font-awesome.min.css') }}"></noscript>
-      <script defer href="{{ static('vendored/font-awesome/js/fontawesome.min.js') }}"></script>
+      <link rel="preload" as="style" href="{{ static('webpack/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+      <noscript><link rel="stylesheet" href="{{ static('webpack/fontawesome-index.css') }}"></noscript>
 
       <script src="{{ static('webpack/alpine-index.js') }}" defer></script>
             <!-- Jquery declared here to be accessible in every django widgets -->
@@ -114,7 +113,7 @@
                 </div>
                 <div class="notification">
                   <a href="#" onclick="display_notif()">
-                    <i class="fa fa-bell-o"></i>
+                    <i class="fa-regular fa-bell"></i>
                     {% set notification_count = user.notifications.filter(viewed=False).count() %}
 
                     {% if notification_count > 0 %}
