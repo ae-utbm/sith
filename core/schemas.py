@@ -54,7 +54,7 @@ class UserFilterSchema(FilterSchema):
     def filter_search(self, value: str | None) -> Q:
         if not value:
             return Q()
-        if len(value) < 4:
+        if len(value) < 3:
             # For small queries, full text search isn't necessary
             return (
                 Q(first_name__istartswith=value)
