@@ -171,3 +171,17 @@ class TestFetchFamilyApi(TestCase):
                 {"godfather": self.users[10].id, "godchild": self.users[2].id},
             ],
         )
+
+    def test_nb_queries(self):
+        # The number of queries should be 1 per level of existing depth.
+        with self.assertNumQueries(0):
+            self.main_user.get_family(godfathers_depth=0, godchildren_depth=0)
+        with self.assertNumQueries(3):
+            self.main_user.get_family(godfathers_depth=3, godchildren_depth=0)
+        with self.assertNumQueries(3):
+            self.main_user.get_family(godfathers_depth=0, godchildren_depth=3)
+        with self.assertNumQueries(6):
+            self.main_user.get_family(godfathers_depth=3, godchildren_depth=3)
+        with self.assertNumQueries(4):
+            # If a level is empty, the next ones should not be queried.
+            self.main_user.get_family(godfathers_depth=0, godchildren_depth=10)
