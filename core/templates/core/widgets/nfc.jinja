@@ -1,7 +1,7 @@
 <span>
   <input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
 	<!-- NFC icon not available in fontawesome 4.7 --> 
-  <button type="button" id="{{ widget.attrs.id }}_button"><i class="fa fa-tag"></i></button>
+  <button type="button" id="{{ widget.attrs.id }}_button"><i class="fa-brands fa-nfc-symbol"></i></button>
 </span>
 <script>
   document.addEventListener("DOMContentLoaded", function(event) {

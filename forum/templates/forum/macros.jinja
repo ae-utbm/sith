@@ -123,7 +123,7 @@
           </a>
           {% if user.can_edit(m) %}
             <a href="{{ url('forum:edit_message', message_id=m.id) }}">
-              <i class="fa fa-pencil"></i>
+              <i class="fa fa-pencil edit-action"></i>
             </a>
           {% endif %}
 
@@ -137,7 +137,7 @@
           {% if not m._deleted and (user_is_admin or user.id == m.author_id) %}
             <span>
               <a href="{{ url('forum:delete_message', message_id=m.id) }}">
-                <i class="fa fa-trash"></i>
+                <i class="fa fa-trash-can delete-action"></i>
               </a>
             </span>
           {% endif %}

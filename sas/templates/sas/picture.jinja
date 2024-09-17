@@ -98,9 +98,9 @@
                 <a class="text danger" href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
               </div>
               <div class="buttons">
-                <a class="button" :href="`/sas/picture/${current_picture.id}/edit/`">✏️</a>
-                <a class="button" href="?rotate_left">↺</a>
-                <a class="button" href="?rotate_right">↻</a>
+                <a class="button" :href="`/sas/picture/${current_picture.id}/edit/`"><i class="fa-regular fa-pen-to-square edit-action"></i></a>
+                <a class="button" href="?rotate_left"><i class="fa-solid fa-rotate-left"></i></a>
+                <a class="button" href="?rotate_right"><i class="fa-solid fa-rotate-right"></i></a>
               </div>
             </div>
           </div>
@@ -152,7 +152,7 @@
                   <span x-text="identification.user.display_name"></span>
                 </a>
                 <template x-if="can_be_removed(identification)">
-                  <a class="delete clickable" @click="remove_identification(identification)">❌</a>
+                  <a class="delete clickable" @click="remove_identification(identification)"><i class="fa fa-times fa-xl delete-action"></i></a>
                 </template>
               </li>
             </template>

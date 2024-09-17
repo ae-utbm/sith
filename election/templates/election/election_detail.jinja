@@ -51,7 +51,7 @@
               <th class="column" style="width: {{ 100 / (election_lists.count() + 1) }}%">
                 <span>{{ election_list.title }}</span>
                 {% if user.can_edit(election_list) and election.is_vote_editable -%}
-                  <a href="{{ url('election:delete_list', list_id=election_list.id) }}">❌</a>
+                  <a href="{{ url('election:delete_list', list_id=election_list.id) }}"><i class="fa-regular fa-trash-can delete-action"></i></a>
                 {% endif %}
               </th>
             {%- endfor %}
@@ -79,8 +79,8 @@
                 </div>
                 {% if user.can_edit(role) and election.is_vote_editable -%}
                   <div class="role_buttons">
-                    <a href="{{url('election:update_role', role_id=role.id)}}">✏️</a>
-                    <a href="{{url('election:delete_role', role_id=role.id)}}">❌</a>
+                    <a href="{{url('election:update_role', role_id=role.id)}}">️<i class="fa-regular fa-pen-to-square edit-action"></i></a>
+                    <a href="{{url('election:delete_role', role_id=role.id)}}"><i class="fa-regular fa-trash-can delete-action"></i></a>
                     {%- if role == role_list.last() %}
                       <button disabled><i class="fa fa-arrow-down"></i></button>
                       <button disabled><i class="fa fa-caret-down"></i></button>
@@ -143,8 +143,8 @@
                           {%- if user.can_edit(candidature) -%}
                             {%- if election.is_vote_editable -%}
                               <div class="edit_btns">
-                                <a href="{{url('election:update_candidate', candidature_id=candidature.id)}}">{% trans %}✏️{% endtrans %}</a>
-                                <a href="{{url('election:delete_candidate', candidature_id=candidature.id)}}">{% trans %}❌{% endtrans %}</a>
+                                <a href="{{url('election:update_candidate', candidature_id=candidature.id)}}"><i class="fa-regular fa-pen-to-square edit-action"></i>️</a>
+                                <a href="{{url('election:delete_candidate', candidature_id=candidature.id)}}"><i class="fa-regular fa-trash-can delete-action"></i></a>
                               </div>
                             {%- endif -%}
                           {%- endif -%}

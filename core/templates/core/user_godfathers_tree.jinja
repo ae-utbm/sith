@@ -32,7 +32,7 @@
             <button
               @click="godfathers_depth--"
               :disabled="godfathers_depth <= {{ depth_min }}"
-            ><i class="fa fa-minus fa-xs"></i></button>
+            ><i class="fa fa-minus"></i></button>
             <input
               x-model="godfathers_depth"
               x-ref="godfather_depth_input"
@@ -59,7 +59,7 @@
               @click="godchildren_depth--"
               :disabled="godchildren_depth <= {{ depth_min }}"
             ><i
-              class="fa fa-minus fa-xs"
+              class="fa fa-minus"
             ></i></button>
             <input
               x-model="godchildren_depth"
