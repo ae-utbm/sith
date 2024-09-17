@@ -45,7 +45,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 
 !!!note
 
-    A ce stade, si vous avez réussi votre installation de `WSL` ou bien qu'il
+    À ce stade, si vous avez réussi votre installation de `WSL` ou bien qu'il
     était déjà installé, vous pouvez effectuer la mise en place du projet en suivant
     les instructions pour votre distribution.
 
@@ -70,7 +70,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         Puis installez les autres dépendances :
         
         ```bash
-        sudo apt install build-essential libssl-dev libjpeg-dev zlib1g-dev python-dev \
+        sudo apt install build-essential libssl-dev libjpeg-dev zlib1g-dev python-dev npm \
                  libffi-dev python-dev-is-python3 pkg-config \
                  gettext git pipx
 
@@ -84,7 +84,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 
         sudo pacman -S python
         
-        sudo pacman -S gcc git gettext pkgconf python-poetry
+        sudo pacman -S gcc git gettext pkgconf python-poetry npm
         ```
 
 === "macOS"
@@ -93,7 +93,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     Il est également nécessaire d'avoir installé xcode
     
     ```bash    
-    brew install git python pipx
+    brew install git python pipx npm
     pipx install poetry
     
     # Pour bien configurer gettext
@@ -113,6 +113,9 @@ cd sith3
 
 # Création de l'environnement et installation des dépendances
 poetry install
+
+# Configuration du frontend
+npm install
 
 # Activation de l'environnement virtuel
 poetry shell

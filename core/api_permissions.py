@@ -4,7 +4,6 @@ Some permissions are global (like `IsInGroup` or `IsRoot`),
 and some others are per-object (like `CanView` or `CanEdit`).
 
 Examples:
-
     # restrict all the routes of this controller
     # to subscribed users
     @api_controller("/foo", permissions=[IsSubscriber])

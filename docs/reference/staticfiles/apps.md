@@ -1,0 +1,1 @@
+::: staticfiles.apps.StaticFilesConfig

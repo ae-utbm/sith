@@ -330,7 +330,7 @@ class Product(models.Model):
         Returns:
             True if the user can buy this product else False
 
-        Warnings:
+        Warning:
             This performs a db query, thus you can quickly have
             a N+1 queries problem if you call it in a loop.
             Hopefully, you can avoid that if you prefetch the buying_groups :
