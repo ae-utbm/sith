@@ -42,6 +42,8 @@ from django.http import HttpRequest
 from ninja_extra import ControllerBase
 from ninja_extra.permissions import BasePermission
 
+from counter.models import Counter
+
 
 class IsInGroup(BasePermission):
     """Check that the user is in the group whose primary key is given."""
@@ -78,7 +80,7 @@ class CanView(BasePermission):
     """Check that this user has the permission to view the object of this route.
 
     Wrap the `user.can_view(obj)` method.
-    To see an example, look at the exemple in the module docstring.
+    To see an example, look at the example in the module docstring.
     """
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
@@ -94,7 +96,7 @@ class CanEdit(BasePermission):
     """Check that this user has the permission to edit the object of this route.
 
     Wrap the `user.can_edit(obj)` method.
-    To see an example, look at the exemple in the module docstring.
+    To see an example, look at the example in the module docstring.
     """
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
@@ -110,7 +112,7 @@ class IsOwner(BasePermission):
     """Check that this user owns the object of this route.
 
     Wrap the `user.is_owner(obj)` method.
-    To see an example, look at the exemple in the module docstring.
+    To see an example, look at the example in the module docstring.
     """
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
@@ -120,3 +122,15 @@ class IsOwner(BasePermission):
         self, request: HttpRequest, controller: ControllerBase, obj: Any
     ) -> bool:
         return request.user.is_owner(obj)
+
+
+class IsLoggedInCounter(BasePermission):
+    """Check that a user is logged in a counter."""
+
+    def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
+        if "/counter/" not in request.META["HTTP_REFERER"]:
+            return False
+        token = request.session.get("counter_token")
+        if not token:
+            return False
+        return Counter.objects.filter(token=token).exists()

@@ -288,7 +288,7 @@ class Command(BaseCommand):
                 since=Subquery(
                     Subscription.objects.filter(member__customer=OuterRef("pk"))
                     .annotate(res=Min("subscription_start"))
-                    .values("res")
+                    .values("res")[:1]
                 )
             )
         )

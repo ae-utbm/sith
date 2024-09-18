@@ -1,0 +1,24 @@
+# Sith AE french frontend translation file
+# Copyright (C) 2024
+# This file is distributed under the same license as the Sith package.
+# ae@utbm.fr / ae.info@utbm.fr
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-03 15:22+0200\n"
+"PO-Revision-Date: 2024-09-17 11:54+0200\n"
+"Last-Translator: Sli <antoine@bartuccio.fr>\n"
+"Language-Team: AE info <ae.info@utbm.fr>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+#: core/static/user/js/family_graph.js:230
+msgid "family_tree.%(extension)s"
+msgstr "arbre_genealogique.%(extension)s"
+#: sas/static/sas/js/picture.js:52
+msgid "Couldn't delete picture"
+msgstr "Echec de la suppression de la photo"

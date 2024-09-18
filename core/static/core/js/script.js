@@ -89,7 +89,7 @@ function update_query_string(key, value, action = History.REPLACE, url = null) {
     if (!url){
         url = new URL(window.location.href);
     }
-    if (!value) {
+    if (value === undefined || value === null || value === "") {
         // If the value is null, undefined or empty => delete it
         url.searchParams.delete(key)
     } else if (Array.isArray(value)) {
@@ -106,4 +106,36 @@ function update_query_string(key, value, action = History.REPLACE, url = null) {
     }
 
     return url;
+}
+
+
+/**
+ * Given a paginated endpoint, fetch all the items of this endpoint,
+ * performing multiple API calls if necessary.
+ * @param {string} url The paginated endpoint to fetch
+ * @return {Promise<Object[]>}
+ */
+async function fetch_paginated(url) {
+  const max_per_page = 199;
+  const paginated_url = new URL(url, document.location.origin);
+  paginated_url.searchParams.set("page_size", max_per_page.toString());
+  paginated_url.searchParams.set("page", "1");
+
+  let first_page = (await ( await fetch(paginated_url)).json());
+  let results = first_page.results;
+
+  const nb_pictures = first_page.count
+  const nb_pages = Math.ceil(nb_pictures / max_per_page);
+
+  if (nb_pages > 1) {
+      let promises = [];
+      for (let i = 2; i <= nb_pages; i++) {
+        paginated_url.searchParams.set("page", i.toString());
+        promises.push(
+          fetch(paginated_url).then(res => res.json().then(json => json.results))
+        );
+      }
+      results.push(...await Promise.all(promises))
+  }
+  return results;
 }

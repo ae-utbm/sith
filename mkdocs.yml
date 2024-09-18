@@ -92,6 +92,7 @@ nav:
       - reference/com/views.md
     - core:
       - reference/core/models.md
+      - Champs de modèle: reference/core/model_fields.md
       - reference/core/views.md
       - reference/core/schemas.md
       - reference/core/api_permissions.md

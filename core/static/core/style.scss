@@ -239,6 +239,7 @@ a:not(.button) {
     padding: 9px 13px;
     border: none;
     text-decoration: none;
+    border-radius: 5px;
 
     &.btn-blue {
       background-color: $deepblue;
@@ -611,6 +612,38 @@ a:not(.button) {
 @media screen and (max-width: $small-devices) {
   #page {
     width: 98%;
+  }
+}
+
+
+.select2 {
+  margin: 10px 0!important;
+  max-width: 100%;
+  min-width: 100%;
+
+  ul {
+    margin: 0;
+  }
+
+  textarea {
+    background-color: inherit;
+  }
+
+  .select2-container--default {
+    color: black;
+  }
+}
+.select2-results {
+  .select-item {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+
+    img {
+      max-height: 40px;
+      border-radius: 50%;
+    }
   }
 }
 
@@ -1169,13 +1202,6 @@ u,
   }
 }
 
-/* XXX This seems to be used in the SAS */
-#pict {
-  display: inline-block;
-  width: 80%;
-  background: hsl(0, 0%, 20%);
-  border: solid hsl(0, 0%, 20%) 2px;
-}
 /*--------------------------------MATMAT-------------------------------*/
 .matmat_results {
   display: flex;

@@ -751,8 +751,13 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/getsentry/sentry-javascript/": "8.26.0",
     "https://github.com/jhuckaby/webcamjs/": "1.0.0",
     "https://github.com/alpinejs/alpine": "3.14.1",
+    "https://github.com/cytoscape/cytoscape.js": "3.30.2 ",
+    "https://github.com/cytoscape/cytoscape.js-cxtmenu": "3.5.0",
+    "https://github.com/cytoscape/cytoscape.js-klay": "3.1.4",
+    "https://github.com/kieler/klayjs": "0.4.1",  # Deprecated, elk should be used but cytoscape-elk is broken
     "https://github.com/mrdoob/three.js/": "r148",
     "https://github.com/vasturiano/three-spritetext": "1.6.5",
     "https://github.com/vasturiano/3d-force-graph/": "1.70.19",
     "https://github.com/vasturiano/d3-force-3d": "3.0.3",
+    "https://github.com/select2/select2/": "4.0.13",
 }

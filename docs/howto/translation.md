@@ -31,7 +31,8 @@ Il faut d'abord générer un fichier de traductions,
 l'éditer et enfin le compiler au format binaire pour qu'il soit lu par le serveur.
 
 ```bash
-./manage.py makemessages --locale=fr --ignore "env/*" -e py,jinja
+./manage.py makemessages --locale=fr -e py,jinja # Pour le backend
+./manage.py makemessages --locale=fr -d djangojs # Pour le frontend
 ```
 
 ## Éditer le fichier django.po

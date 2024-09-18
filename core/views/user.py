@@ -34,7 +34,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
@@ -323,7 +323,7 @@ def delete_user_godfather(request, user_id, godfather_id, is_father):
     return redirect("core:user_godfathers", user_id=user_id)
 
 
-class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
+class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView, FormView):
     """Display a user's godfathers."""
 
     model = User
@@ -331,27 +331,23 @@ class UserGodfathersView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_godfathers.jinja"
     current_tab = "godfathers"
+    form_class = UserGodfathersForm
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.form = UserGodfathersForm(request.POST)
-        if self.form.is_valid() and self.form.cleaned_data["user"] != self.object:
-            if self.form.cleaned_data["type"] == "godfather":
-                self.object.godfathers.add(self.form.cleaned_data["user"])
-                self.object.save()
-            else:
-                self.object.godchildren.add(self.form.cleaned_data["user"])
-                self.object.save()
-            self.form = UserGodfathersForm()
-        return super().get(request, *args, **kwargs)
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"user": self.object}
+
+    def form_valid(self, form):
+        if form.cleaned_data["type"] == "godfather":
+            self.object.godfathers.add(form.cleaned_data["user"])
+        else:
+            self.object.godchildren.add(form.cleaned_data["user"])
+        return redirect("core:user_godfathers", user_id=self.object.id)
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        try:
-            kwargs["form"] = self.form
-        except:
-            kwargs["form"] = UserGodfathersForm()
-        return kwargs
+        return super().get_context_data(**kwargs) | {
+            "godfathers": list(self.object.godfathers.select_related("profile_pict")),
+            "godchildren": list(self.object.godchildren.select_related("profile_pict")),
+        }
 
 
 class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
@@ -365,84 +361,10 @@ class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        if "descent" in self.request.GET:
-            kwargs["param"] = "godchildren"
-        else:
-            kwargs["param"] = "godfathers"
-        kwargs["members_set"] = set()
+        kwargs["api_url"] = reverse(
+            "api:family_graph", kwargs={"user_id": self.object.id}
+        )
         return kwargs
-
-
-class UserGodfathersTreePictureView(CanViewMixin, DetailView):
-    """Display a user's tree as a picture."""
-
-    model = User
-    pk_url_kwarg = "user_id"
-
-    def build_complex_graph(self):
-        import pygraphviz as pgv
-
-        self.depth = int(self.request.GET.get("depth", 4))
-        if self.param == "godfathers":
-            self.graph = pgv.AGraph(strict=False, directed=True, rankdir="BT")
-        else:
-            self.graph = pgv.AGraph(strict=False, directed=True)
-        family = set()
-        self.level = 1
-
-        # Since the tree isn't very deep, we can build it recursively
-        def crawl_family(user):
-            if self.level > self.depth:
-                return
-            self.level += 1
-            for u in user.__getattribute__(self.param).all():
-                self.graph.add_edge(user.get_short_name(), u.get_short_name())
-                if u not in family:
-                    family.add(u)
-                    crawl_family(u)
-            self.level -= 1
-
-        self.graph.add_node(self.object.get_short_name())
-        family.add(self.object)
-        crawl_family(self.object)
-
-    def build_family_graph(self):
-        import pygraphviz as pgv
-
-        self.graph = pgv.AGraph(strict=False, directed=True)
-        self.graph.add_node(self.object.get_short_name())
-        for u in self.object.godfathers.all():
-            self.graph.add_edge(u.get_short_name(), self.object.get_short_name())
-        for u in self.object.godchildren.all():
-            self.graph.add_edge(self.object.get_short_name(), u.get_short_name())
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if "descent" in self.request.GET:
-            self.param = "godchildren"
-        elif "ancestors" in self.request.GET:
-            self.param = "godfathers"
-        else:
-            self.param = "family"
-
-        if self.param == "family":
-            self.build_family_graph()
-        else:
-            self.build_complex_graph()
-        # Pimp the graph before display
-        self.graph.node_attr["color"] = "lightblue"
-        self.graph.node_attr["style"] = "filled"
-        main_node = self.graph.get_node(self.object.get_short_name())
-        main_node.attr["color"] = "sandybrown"
-        main_node.attr["shape"] = "rect"
-        if self.param == "godchildren":
-            self.graph.graph_attr["label"] = _("Godchildren")
-        elif self.param == "godfathers":
-            self.graph.graph_attr["label"] = _("Family")
-        else:
-            self.graph.graph_attr["label"] = _("Family")
-        img = self.graph.draw(format="png", prog="dot")
-        return HttpResponse(img, content_type="image/png")
 
 
 class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):

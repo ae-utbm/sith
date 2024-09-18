@@ -6,13 +6,13 @@ runs:
     - name: Install apt packages
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: gettext libgraphviz-dev
+        packages: gettext
         version: 1.0  # increment to reset cache
 
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install gettext libgraphviz-dev
+        sudo apt install gettext
       shell: bash
 
     - name: Set up python
