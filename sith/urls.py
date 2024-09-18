@@ -41,7 +41,6 @@ urlpatterns = [
     path("com/", include(("com.urls", "com"), namespace="com")),
     path("club/", include(("club.urls", "club"), namespace="club")),
     path("counter/", include(("counter.urls", "counter"), namespace="counter")),
-    path("stock/", include(("stock.urls", "stock"), namespace="stock")),
     path(
         "accounting/",
         include(("accounting.urls", "accounting"), namespace="accounting"),
