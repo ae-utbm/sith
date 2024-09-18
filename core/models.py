@@ -991,8 +991,8 @@ class SithFile(models.Model):
             return user.is_board_member
         if user.is_com_admin:
             return True
-        if self.is_in_sas and user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
-            return True
+        if self.is_in_sas:
+            return user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
         return user.id == self.owner_id
 
     def can_be_viewed_by(self, user):

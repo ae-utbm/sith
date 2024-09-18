@@ -759,4 +759,5 @@ SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/vasturiano/three-spritetext": "1.6.5",
     "https://github.com/vasturiano/3d-force-graph/": "1.70.19",
     "https://github.com/vasturiano/d3-force-3d": "3.0.3",
+    "https://github.com/select2/select2/": "4.0.13",
 }

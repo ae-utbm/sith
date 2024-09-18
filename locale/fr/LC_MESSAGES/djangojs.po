@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-17 11:54+0200\n"
+"POT-Creation-Date: 2024-09-03 15:22+0200\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -19,3 +19,6 @@ msgstr ""
 #: core/static/user/js/family_graph.js:230
 msgid "family_tree.%(extension)s"
 msgstr "arbre_genealogique.%(extension)s"
+#: sas/static/sas/js/picture.js:52
+msgid "Couldn't delete picture"
+msgstr "Echec de la suppression de la photo"
