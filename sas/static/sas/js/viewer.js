@@ -201,7 +201,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     async delete_picture() {
-      const res = await fetch(`/api/sas/picture/${this.current_picture.id}/`, {
+      const res = await fetch(`/api/sas/picture/${this.current_picture.id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
