@@ -108,7 +108,8 @@ function update_query_string(key, value, action = History.REPLACE, url = null) {
     return url;
 }
 
-
+// TODO : If one day a test workflow is made for JS in this project
+//  please test this function. A all cost.
 /**
  * Given a paginated endpoint, fetch all the items of this endpoint,
  * performing multiple API calls if necessary.
@@ -135,7 +136,7 @@ async function fetch_paginated(url) {
           fetch(paginated_url).then(res => res.json().then(json => json.results))
         );
       }
-      results.push(...await Promise.all(promises))
+      results.push(...(await Promise.all(promises)).flat())
   }
   return results;
 }
