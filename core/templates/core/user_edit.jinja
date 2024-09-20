@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% macro profile_picture(field_name) %}
-    {% set this_picture = form.instance[field_name] %}
+  {% set this_picture = form.instance[field_name] %}
   <div class="profile-picture" x-data="camera_{{ field_name }}" >
     <div class="profile-picture-display" :aria-busy="loading" :class="{ 'camera-error': is_camera_error }">
       <img
@@ -75,7 +75,10 @@
   <script>
     {%- if this_picture -%}
       {% set default_picture = this_picture.get_download_url()|tojson %}
-      {% set delete_url = url('core:file_delete', file_id=this_picture.id, popup='')|tojson %}
+      {% set delete_url = (
+        url('core:file_delete', file_id=this_picture.id, popup='')
+        +"?next=" + profile.get_absolute_url()
+      )|tojson %}
     {%- else -%}
       {% set default_picture = static('core/img/unknown.jpg')|tojson %}
       {% set delete_url = "null" %}

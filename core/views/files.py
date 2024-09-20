@@ -357,7 +357,7 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
 
     def get_success_url(self):
         self.object.file.delete()  # Doing it here or overloading delete() is the same, so let's do it here
-        if "next" in self.request.GET.keys():
+        if "next" in self.request.GET:
             return self.request.GET["next"]
         if self.object.parent is None:
             return reverse(
