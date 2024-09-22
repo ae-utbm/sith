@@ -3,7 +3,7 @@ site_description: Le site de l'association des étudiants de l'UTBM
 dev_addr: 127.0.0.1:8080
 
 repo_name: sith3
-repo_url: https://github.com/ae-utbm/sith3
+repo_url: https://github.com/ae-utbm/sith
 site_url: https://ae-utbm.github.io/sith3
 
 theme:

@@ -2,8 +2,8 @@
 
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](#)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![CI status](https://github.com/ae-utbm/sith3/actions/workflows/ci.yml/badge.svg)](#)
-[![Docs status](https://github.com/ae-utbm/sith3/actions/workflows/deploy_docs.yml/badge.svg)](https://ae-utbm.github.io/sith3)
+[![CI status](https://github.com/ae-utbm/sith/actions/workflows/ci.yml/badge.svg)](#)
+[![Docs status](https://github.com/ae-utbm/sith/actions/workflows/deploy_docs.yml/badge.svg)](https://ae-utbm.github.io/sith3)
 [![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?style=default&logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
 [![discord](https://img.shields.io/discord/971448179075731476?label=discord&logo=discord&style=default)](https://discord.gg/xk9wfpsufm)
 
