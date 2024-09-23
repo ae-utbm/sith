@@ -78,7 +78,7 @@ model-bakery = "^1.18.2"
 [tool.poetry.group.docs.dependencies]
 # deps used to work on the documentation
 mkdocs = "^1.6.0"
-mkdocs-material = "^9.5.28"
+mkdocs-material = "^9.5.36"
 mkdocstrings = "^0.25.1"
 mkdocstrings-python = "^1.10.5"
 mkdocs-include-markdown-plugin = "^6.2.1"
