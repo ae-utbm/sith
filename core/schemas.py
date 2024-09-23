@@ -66,7 +66,6 @@ class UserFilterSchema(FilterSchema):
                 SearchQuerySet()
                 .models(User)
                 .autocomplete(auto=slugify(value).replace("-", " "))
-                .order_by("-last_update")
                 .values_list("pk", flat=True)
             )
         )
