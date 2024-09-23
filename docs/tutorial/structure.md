@@ -20,7 +20,7 @@ Le code source du projet est organisé comme suit :
 
 <div class="annotate">
 ```
-sith3/
+sith/
 ├── .github/
 │   ├── actions/ (1)
 │   └── workflows/ (2)

@@ -109,7 +109,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 
 ```bash
 git clone https://github.com/ae-utbm/sith.git
-cd sith3
+cd sith
 
 # Création de l'environnement et installation des dépendances
 poetry install
