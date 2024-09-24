@@ -1,4 +1,5 @@
 from io import BytesIO
+from itertools import cycle
 from typing import Callable
 from uuid import uuid4
 
@@ -10,9 +11,10 @@ from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe, foreign_key
 from PIL import Image
+from pytest_django.asserts import assertNumQueries
 
 from core.baker_recipes import board_user, subscriber_user
-from core.models import SithFile, User
+from core.models import Group, SithFile, User
 
 
 @pytest.mark.django_db
@@ -184,3 +186,36 @@ class TestUserProfilePicture:
         assert user.profile_pict is not None
         # uploaded images should be converted to WEBP
         assert Image.open(user.profile_pict.file).format == "WEBP"
+
+
+@pytest.mark.django_db
+def test_apply_rights_recursively():
+    """Test that the apply_rights_recursively method works as intended."""
+    files = [baker.make(SithFile)]
+    files.extend(baker.make(SithFile, _quantity=3, parent=files[0], _bulk_create=True))
+    files.extend(
+        baker.make(SithFile, _quantity=3, parent=iter(files[1:4]), _bulk_create=True)
+    )
+    files.extend(
+        baker.make(SithFile, _quantity=6, parent=cycle(files[4:7]), _bulk_create=True)
+    )
+
+    groups = list(baker.make(Group, _quantity=7))
+    files[0].view_groups.set(groups[:3])
+    files[0].edit_groups.set(groups[2:6])
+
+    # those groups should be erased after the function call
+    files[1].view_groups.set(groups[6:])
+
+    with assertNumQueries(10):
+        # 1 query for each level of depth (here 4)
+        # 1 query to get the view_groups of the first file
+        # 1 query to delete the previous view_groups
+        # 1 query apply the new view_groups
+        # same 3 queries for the edit_groups
+        files[0].apply_rights_recursively()
+    for file in SithFile.objects.filter(pk__in=[f.pk for f in files]).prefetch_related(
+        "view_groups", "edit_groups"
+    ):
+        assert set(file.view_groups.all()) == set(groups[:3])
+        assert set(file.edit_groups.all()) == set(groups[2:6])

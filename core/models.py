@@ -1057,20 +1057,38 @@ class SithFile(models.Model):
         if self.is_file and (self.file is None or self.file == ""):
             raise ValidationError(_("You must provide a file"))
 
-    def apply_rights_recursively(self, *, only_folders=False):
-        children = self.children.all()
-        if only_folders:
-            children = children.filter(is_folder=True)
-        for c in children:
-            c.copy_rights()
-            c.apply_rights_recursively(only_folders=only_folders)
+    def apply_rights_recursively(self, *, only_folders: bool = False) -> None:
+        """Apply the rights of this file to all children recursively.
+
+        Args:
+            only_folders: If True, only apply the rights to SithFiles that are folders.
+        """
+        file_ids = []
+        explored_ids = [self.id]
+        while len(explored_ids) > 0:  # find all children recursively
+            file_ids.extend(explored_ids)
+            next_level = SithFile.objects.filter(parent_id__in=explored_ids)
+            if only_folders:
+                next_level = next_level.filter(is_folder=True)
+            explored_ids = list(next_level.values_list("id", flat=True))
+        for through in (SithFile.view_groups.through, SithFile.edit_groups.through):
+            # force evaluation. Without this, the iterator yields nothing
+            groups = list(
+                through.objects.filter(sithfile_id=self.id).values_list(
+                    "group_id", flat=True
+                )
+            )
+            # delete previous rights
+            through.objects.filter(sithfile_id__in=file_ids).delete()
+            through.objects.bulk_create(  # create new rights
+                [through(sithfile_id=f, group_id=g) for f in file_ids for g in groups]
+            )
 
     def copy_rights(self):
         """Copy, if possible, the rights of the parent folder."""
         if self.parent is not None:
             self.edit_groups.set(self.parent.edit_groups.all())
             self.view_groups.set(self.parent.view_groups.all())
-            self.save()
 
     def move_to(self, parent):
         """Move a file to a new parent.

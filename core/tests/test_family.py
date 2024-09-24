@@ -22,7 +22,7 @@ class TestFetchFamilyApi(TestCase):
         #           <- user5
 
         cls.main_user = baker.make(User)
-        cls.users = baker.make(User, _quantity=17)
+        cls.users = baker.make(User, _quantity=17, _bulk_create=True)
         cls.main_user.godfathers.add(*cls.users[0:3])
         cls.main_user.godchildren.add(*cls.users[3:6])
         cls.users[1].godfathers.add(cls.users[6])
