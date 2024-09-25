@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import paginate %}
+{% from "core/macros.jinja" import paginate_jinja %}
 
 {% block title %}
   {%- trans %}Reloads list{% endtrans %} -- {{ counter.name }}
@@ -28,7 +28,7 @@
       {%- endfor %}
     </table>
     {% if is_paginated %}
-      {{ paginate(page_obj, paginator) }}
+      {{ paginate_jinja(page_obj, paginator) }}
     {% endif %}
 {%- endblock %}
 
