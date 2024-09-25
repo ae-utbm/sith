@@ -28,7 +28,7 @@
     </p>
 
     {{ display_search_bar(request) }}
-    {{ paginate_jinja(msgs.number, msgs.paginator.num_pages) }}
+    {{ paginate_jinja(msgs, msgs.paginator) }}
 
     <main class="message-list">
       {% for m in msgs %}
@@ -45,7 +45,7 @@
 
     <p><a class="ib button" href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
 
-    {{ paginate_jinja(msgs.number, msgs.paginator.num_pages) }}
+    {{ paginate_jinja(msgs, msgs.paginator) }}
   </div>
 {% endblock %}
 

@@ -156,34 +156,36 @@
   </nav>
 {% endmacro %}
 
-{% macro paginate_jinja(page, nb_pages) %}
+{% macro paginate_jinja(current_page, paginator) %}
   <nav class="pagination">
-    {% if page <= 1 %}
-      <button disabled="disabled"><i class="fa fa-caret-left"></i></button>
-    {% else %}
-      <a href="?href={{ page - 1 }}">
+    {% if current_page.has_previous() %}
+      <a href="?page={{ current_page.previous_page_number() }}">
         <button>
           <i class="fa fa-caret-left"></i>
         </button>
       </a>
+    {% else %}
+      <button disabled="disabled"><i class="fa fa-caret-left"></i></button>
     {% endif %}
-    {% for i in range(1, nb_pages + 1) %}
-      {% if i == page %}
+    {% for i in paginator.get_elided_page_range(current_page.number) %}
+      {% if i == current_page.number %}
         <button class="active">{{ i }}</button>
+          {% elif i == paginator.ELLIPSIS %}
+          <strong>{{ paginator.ELLIPSIS }}</strong>
       {% else %}
         <a href="?page={{ i }}">
           <button>{{ i }}</button>
         </a>
       {% endif %}
     {% endfor %}
-    {% if page >= nb_pages %}
-      <button disabled="disabled"><i class="fa fa-caret-right"></i></button>
-    {% else %}
-      <a href="?href={{ page - 1 }}">
+    {% if current_page.has_next() %}
+      <a href="?page={{ current_page.next_page_number() }}">
         <button>
           <i class="fa fa-caret-right"></i>
         </button>
       </a>
+    {% else %}
+      <button disabled="disabled"><i class="fa fa-caret-right"></i></button>
     {% endif %}
   </nav>
 {% endmacro %}
