@@ -2,6 +2,7 @@ from typing import Annotated
 
 import annotated_types
 from django.conf import settings
+from django.db.models import F
 from django.http import HttpResponse
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
@@ -56,7 +57,9 @@ class UserController(ControllerBase):
     )
     @paginate(PageNumberPaginationExtra, page_size=20)
     def search_users(self, filters: Query[UserFilterSchema]):
-        return filters.filter(User.objects.order_by("-last_login"))
+        return filters.filter(
+            User.objects.order_by(F("last_login").desc(nulls_last=True))
+        )
 
 
 DepthValue = Annotated[int, annotated_types.Ge(0), annotated_types.Le(10)]

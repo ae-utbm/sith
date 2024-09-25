@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import now
 from model_bakery import baker, seq
+from model_bakery.recipe import Recipe
 
 from core.baker_recipes import subscriber_user
 from core.models import User
@@ -14,15 +15,20 @@ class TestSearchUsers(TestCase):
     @classmethod
     def setUpTestData(cls):
         User.objects.all().delete()
-        cls.users = baker.make(
+        user_recipe = Recipe(
             User,
-            _quantity=11,
             first_name=seq("First", suffix="Name"),
             last_name=seq("Last", suffix="Name"),
             nick_name=seq("Nick", suffix="Name"),
-            last_login=seq(now() - timedelta(days=30), timedelta(days=1)),
-            _bulk_create=True,
         )
+        cls.users = [
+            user_recipe.make(last_login=None),
+            *user_recipe.make(
+                last_login=seq(now() - timedelta(days=30), timedelta(days=1)),
+                _quantity=10,
+                _bulk_create=True,
+            ),
+        ]
         call_command("update_index", "core", "--remove")
 
     @classmethod
