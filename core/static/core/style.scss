@@ -306,6 +306,12 @@ a:not(.button) {
     align-items: center;
     text-align: justify;
 
+    &.alert-yellow {
+      background-color: rgb(255, 255, 240);
+      color: rgb(99, 87, 6);
+      border: rgb(192, 180, 16) 1px solid;
+    }
+
     &.alert-green {
       background-color: rgb(245, 255, 245);
       color: rgb(3, 84, 63);

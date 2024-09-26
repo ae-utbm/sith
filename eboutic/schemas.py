@@ -31,3 +31,8 @@ class BillingInfoSchema(ModelSchema):
             "country",
         ]
         fields_optional = ["customer"]
+
+    # for reasons described in the model, BillingInfo.phone_number
+    # in nullable, but null values shouldn't be actually allowed,
+    # so we force the field to be required
+    phone_number: str

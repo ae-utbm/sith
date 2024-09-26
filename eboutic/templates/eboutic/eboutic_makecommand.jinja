@@ -98,13 +98,20 @@
             </form>
           </div>
           <br>
-          {% if must_fill_billing_infos %}
-            <p>
-              <i>
-                {% trans %}You must fill your billing infos if you want to pay with your credit
-                  card{% endtrans %}
-              </i>
-            </p>
+          {% if billing_infos_state == BillingInfoState.EMPTY %}
+            <div class="alert alert-yellow">
+              {% trans %}You must fill your billing infos if you want to pay with your credit
+                card{% endtrans %}
+            </div>
+          {% elif billing_infos_state == BillingInfoState.MISSING_PHONE_NUMBER %}
+            <div class="alert alert-yellow">
+              {% trans %}
+                The Crédit Agricole changed its policy related to the billing
+                information that must be provided in order to pay with a credit card.
+                If you want to pay with your credit card, you must add a phone number
+                to the data you already provided.
+              {% endtrans %}
+            </div>
           {% endif %}
           <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}" name="bank-pay-form">
             <template x-data x-for="[key, value] in Object.entries($store.billing_inputs.data)">
@@ -113,7 +120,7 @@
             <input
               type="submit"
               id="bank-submit-button"
-              {% if must_fill_billing_infos %}disabled="disabled"{% endif %}
+              {% if billing_infos_state != BillingInfoState.VALID %}disabled="disabled"{% endif %}
               value="{% trans %}Pay with credit card{% endtrans %}"
             />
           </form>

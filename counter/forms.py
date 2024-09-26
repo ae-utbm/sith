@@ -26,6 +26,7 @@ class BillingInfoForm(forms.ModelForm):
             "zip_code",
             "city",
             "country",
+            "phone_number",
         ]
 
 
