@@ -2,6 +2,7 @@ from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
 from counter.models import (
@@ -28,6 +29,9 @@ class BillingInfoForm(forms.ModelForm):
             "country",
             "phone_number",
         ]
+        widgets = {
+            "phone_number": RegionalPhoneNumberWidget,
+        }
 
 
 class StudentCardForm(forms.ModelForm):

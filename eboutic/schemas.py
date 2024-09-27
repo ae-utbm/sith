@@ -1,5 +1,10 @@
+from typing import Annotated
+
 from ninja import ModelSchema, Schema
 from pydantic import Field, NonNegativeInt, PositiveInt, TypeAdapter
+
+# from phonenumber_field.phonenumber import PhoneNumber
+from pydantic_extra_types.phone_numbers import PhoneNumber, PhoneNumberValidator
 
 from counter.models import BillingInfo
 
@@ -35,4 +40,4 @@ class BillingInfoSchema(ModelSchema):
     # for reasons described in the model, BillingInfo.phone_number
     # in nullable, but null values shouldn't be actually allowed,
     # so we force the field to be required
-    phone_number: str
+    phone_number: Annotated[PhoneNumber, PhoneNumberValidator(default_region="FR")]

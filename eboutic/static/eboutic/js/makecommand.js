@@ -42,7 +42,16 @@ document.addEventListener("alpine:init", () => {
             this.req_state = res.ok
                 ? BillingInfoReqState.SUCCESS
                 : BillingInfoReqState.FAILURE;
-            if (res.ok) {
+            if (res.status === 422) {
+                const errors = (await res.json())["detail"].map((err) => err["loc"]).flat();
+                Array.from(form.querySelectorAll("input"))
+                    .filter((elem) => errors.includes(elem.name))
+                    .forEach((elem) => {
+                        elem.setCustomValidity(gettext("Incorrect value"));
+                        elem.reportValidity();
+                        elem.oninput = () => elem.setCustomValidity("");
+                    });
+            } else if (res.ok) {
                 Alpine.store("billing_inputs").fill();
             }
         },

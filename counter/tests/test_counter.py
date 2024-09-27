@@ -428,6 +428,24 @@ class TestBillingInfo:
         assert infos.phone_number.as_national == "06123 45678"
         assert infos.phone_number.country_code == 49
 
+    @pytest.mark.parametrize(
+        "phone_number", ["061234567a", "06 12 34 56", "061234567879", "azertyuiop"]
+    )
+    def test_invalid_phone_number(
+        self, client: Client, payload: dict, phone_number: str
+    ):
+        """Test that invalid phone numbers are rejected."""
+        user = subscriber_user.make()
+        client.force_login(user)
+        payload["phone_number"] = phone_number
+        response = client.put(
+            reverse("api:put_billing_info", args=[user.id]),
+            json.dumps(payload),
+            content_type="application/json",
+        )
+        assert response.status_code == 422
+        assert not BillingInfo.objects.filter(customer__user=user).exists()
+
 
 class TestBarmanConnection(TestCase):
     @classmethod

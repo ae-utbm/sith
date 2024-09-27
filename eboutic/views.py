@@ -144,7 +144,7 @@ class EbouticCommand(LoginRequiredMixin, TemplateView):
         elif default_billing_info.phone_number is None:
             kwargs["billing_infos_state"] = BillingInfoState.MISSING_PHONE_NUMBER
         else:
-            kwargs["billing_infos_state"] = BillingInfoState.EMPTY
+            kwargs["billing_infos_state"] = BillingInfoState.VALID
         if kwargs["billing_infos_state"] == BillingInfoState.VALID:
             # the user has already filled all of its billing_infos, thus we can
             # get it without expecting an error
