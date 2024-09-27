@@ -199,29 +199,6 @@
   </nav>
 {% endmacro %}
 
-{% macro paginate(page_obj, paginator, js_action) %}
-  {% set js = js_action|default('') %}
-  {% if page_obj.has_previous() or page_obj.has_next() %}
-    {% if page_obj.has_previous() %}
-      <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.previous_page_number() }}">{% trans %}Previous{% endtrans %}</a>
-    {% else %}
-      <span class="disabled">{% trans %}Previous{% endtrans %}</span>
-    {% endif %}
-    {% for i in paginator.page_range %}
-      {% if page_obj.number == i %}
-        <span class="active">{{ i }} <span class="sr-only">({% trans %}current{% endtrans %})</span></span>
-      {% else %}
-        <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ i }}">{{ i }}</a>
-      {% endif %}
-    {% endfor %}
-    {% if page_obj.has_next() %}
-      <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.next_page_number() }}">{% trans %}Next{% endtrans %}</a>
-    {% else %}
-      <span class="disabled">{% trans %}Next{% endtrans %}</span>
-    {% endif %}
-  {% endif %}
-{% endmacro %}
-
 {% macro select_all_checkbox(form_id) %}
   <script type="text/javascript">
     function checkbox_{{form_id}}(value) {
