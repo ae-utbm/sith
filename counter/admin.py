@@ -46,6 +46,7 @@ class CustomerAdmin(SearchModelAdmin):
 @admin.register(BillingInfo)
 class BillingInfoAdmin(admin.ModelAdmin):
     list_display = ("first_name", "last_name", "address_1", "city", "country")
+    autocomplete_fields = ("customer",)
 
 
 @admin.register(Counter)

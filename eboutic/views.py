@@ -16,6 +16,7 @@
 import base64
 import json
 from datetime import datetime
+from enum import Enum
 
 import sentry_sdk
 from cryptography.exceptions import InvalidSignature
@@ -82,6 +83,12 @@ def payment_result(request, result: str) -> HttpResponse:
     return render(request, "eboutic/eboutic_payment_result.jinja", context)
 
 
+class BillingInfoState(Enum):
+    VALID = 1
+    EMPTY = 2
+    MISSING_PHONE_NUMBER = 3
+
+
 class EbouticCommand(LoginRequiredMixin, TemplateView):
     template_name = "eboutic/eboutic_makecommand.jinja"
     basket: Basket
@@ -130,9 +137,16 @@ class EbouticCommand(LoginRequiredMixin, TemplateView):
                 default_billing_info = customer.billing_infos
         else:
             kwargs["customer_amount"] = None
-        kwargs["must_fill_billing_infos"] = default_billing_info is None
-        if not kwargs["must_fill_billing_infos"]:
-            # the user has already filled its billing_infos, thus we can
+        # make the enum available in the template
+        kwargs["BillingInfoState"] = BillingInfoState
+        if default_billing_info is None:
+            kwargs["billing_infos_state"] = BillingInfoState.EMPTY
+        elif default_billing_info.phone_number is None:
+            kwargs["billing_infos_state"] = BillingInfoState.MISSING_PHONE_NUMBER
+        else:
+            kwargs["billing_infos_state"] = BillingInfoState.VALID
+        if kwargs["billing_infos_state"] == BillingInfoState.VALID:
+            # the user has already filled all of its billing_infos, thus we can
             # get it without expecting an error
             kwargs["billing_infos"] = dict(self.basket.get_e_transaction_data())
         kwargs["basket"] = self.basket
