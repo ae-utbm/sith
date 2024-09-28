@@ -83,7 +83,7 @@ model-bakery = "^1.18.2"
 # deps used to work on the documentation
 mkdocs = "^1.6.0"
 mkdocs-material = "^9.5.28"
-mkdocstrings = "^0.25.1"
+mkdocstrings = "^0.26.1"
 mkdocstrings-python = "^1.10.5"
 mkdocs-include-markdown-plugin = "^6.2.1"
 
