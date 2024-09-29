@@ -37,6 +37,8 @@ class TestSearchUsers(TestCase):
         # restore the index
         call_command("update_index", "core", "--remove")
 
+
+class TestSearchUsersAPI(TestSearchUsers):
     def test_order(self):
         """Test that users are ordered by last login date."""
         self.client.force_login(subscriber_user.make())
@@ -83,3 +85,13 @@ class TestSearchUsers(TestCase):
         response = self.client.get(reverse("api:search_users") + "?search=bél")
         assert response.status_code == 200
         assert [r["id"] for r in response.json()["results"]] == [belix.id]
+
+
+class TestSearchUsersView(TestSearchUsers):
+    """Test the search user view (`GET /search`)."""
+
+    def test_page_ok(self):
+        """Just test that the page loads."""
+        self.client.force_login(subscriber_user.make())
+        response = self.client.get(reverse("core:search"))
+        assert response.status_code == 200
