@@ -647,7 +647,9 @@ a:not(.button) {
     align-items: center;
 
     img {
-      max-height: 40px;
+      height: 40px;
+      width: 40px;
+      object-fit: cover;
       border-radius: 50%;
     }
   }
