@@ -156,27 +156,47 @@
   </nav>
 {% endmacro %}
 
-{% macro paginate(page_obj, paginator, js_action) %}
-  {% set js = js_action|default('') %}
-  {% if page_obj.has_previous() or page_obj.has_next() %}
-    {% if page_obj.has_previous() %}
-      <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.previous_page_number() }}">{% trans %}Previous{% endtrans %}</a>
+{% macro paginate_jinja(current_page, paginator) %}
+    {# Add pagination buttons for pages without Alpine.
+
+    This must be coupled with a view that handles pagination
+    with the Django Paginator object.
+
+    Parameters:
+        current_page (django.core.paginator.Page): the current page object
+        paginator (django.core.paginator.Paginator): the paginator object
+    #}
+  <nav class="pagination">
+    {% if current_page.has_previous() %}
+      <a href="?page={{ current_page.previous_page_number() }}">
+        <button>
+          <i class="fa fa-caret-left"></i>
+        </button>
+      </a>
     {% else %}
-      <span class="disabled">{% trans %}Previous{% endtrans %}</span>
+      <button disabled="disabled"><i class="fa fa-caret-left"></i></button>
     {% endif %}
-    {% for i in paginator.page_range %}
-      {% if page_obj.number == i %}
-        <span class="active">{{ i }} <span class="sr-only">({% trans %}current{% endtrans %})</span></span>
+    {% for i in paginator.get_elided_page_range(current_page.number) %}
+      {% if i == current_page.number %}
+        <button class="active">{{ i }}</button>
+      {% elif i == paginator.ELLIPSIS %}
+        <strong>{{ paginator.ELLIPSIS }}</strong>
       {% else %}
-        <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ i }}">{{ i }}</a>
+        <a href="?page={{ i }}">
+          <button>{{ i }}</button>
+        </a>
       {% endif %}
     {% endfor %}
-    {% if page_obj.has_next() %}
-      <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.next_page_number() }}">{% trans %}Next{% endtrans %}</a>
+    {% if current_page.has_next() %}
+      <a href="?page={{ current_page.next_page_number() }}">
+        <button>
+          <i class="fa fa-caret-right"></i>
+        </button>
+      </a>
     {% else %}
-      <span class="disabled">{% trans %}Next{% endtrans %}</span>
+      <button disabled="disabled"><i class="fa fa-caret-right"></i></button>
     {% endif %}
-  {% endif %}
+  </nav>
 {% endmacro %}
 
 {% macro select_all_checkbox(form_id) %}

@@ -5,6 +5,10 @@
   {% trans %}Last unread messages{% endtrans %}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ scss('forum/css/forum.scss') }}">
+{% endblock %}
+
 {% block content %}
   <p>
     <a href="{{ url('forum:main') }}">Forum</a> >
