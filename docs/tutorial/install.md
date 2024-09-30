@@ -55,7 +55,14 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 
     === "Debian/Ubuntu"
 
-        Si ce n'est pas déjà fait, installez Python :    
+        Avant toute chose, assurez-vous que votre système est à jour :
+        
+        ```bash
+        sudo apt update
+        sudo apt upgrade
+        ```
+
+        Puis, si ce n'est pas déjà fait, installez Python :    
         ```bash
         sudo apt install python3
         # on sait jamais
@@ -107,21 +114,42 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 
 ## Finaliser l'installation
 
+Clonez le projet et installez les dépendances :
+
 ```bash
 git clone https://github.com/ae-utbm/sith3.git
 cd sith3
 
 # Création de l'environnement et installation des dépendances
-poetry install
+poetry install # Dépendances backend
+npm install    # Dépendances frontend
+poetry run ./manage.py install_xapian
+```
 
-# Configuration du frontend
-npm install
+!!!note
 
+    La commande `install_xapian` est longue et affiche beaucoup
+    de texte à l'écran.
+    C'est normal, il ne faut pas avoir peur.
+
+Maintenant que les dépendances sont installées, nous
+allons créer la base de données, la remplir avec des données de test,
+et compiler les traductions.
+Cependant, avant de faire cela, il est nécessaire de modifier
+la configuration pour signifier que nous sommes en mode développement.
+Pour cela, nous allons créer un fichier `sith/settings_custom.py`
+et l'utiliser pour surcharger les settings de base.
+
+```bash
+echo "DEBUG=True" > sith/settings_custom.py
+echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
+```
+
+Enfin, nous pouvons lancer les commandes suivantes :
+
+```bash
 # Activation de l'environnement virtuel
 poetry shell
-
-# Installation de Xapian
-python ./manage.py install_xapian
 
 # Prépare la base de données
 python ./manage.py setup
@@ -132,27 +160,8 @@ python ./manage.py compilemessages
 
 !!!note
 
-    La commande `install_xapian` est longue et affiche beaucoup
-    de texte à l'écran.
-    C'est normal, il ne faut pas avoir peur.
-
-!!!note
-
     Pour éviter d'avoir à utiliser la commande `poetry shell`
     systématiquement, il est possible de consulter [direnv](../howto/direnv.md).
-
-## Configuration pour le développement
-
-Lorsqu'on souhaite développer pour le site,
-il est nécessaire de passer le logiciel en mode debug 
-dans les settings_custom. 
-Il est aussi conseillé de définir l'URL du site sur localhost.
-Voici un script rapide pour le faire.
-
-```bash
-echo "DEBUG=True" > sith/settings_custom.py
-echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
-```
 
 ## Démarrer le serveur de développement
 
@@ -211,10 +220,7 @@ pytest
 pytest core
 
 # Lancer les tests de la classe UserRegistrationTest de core
-pytest core.tests.UserRegistrationTest
-
-# Lancer une méthode en particulier de cette même classe
-pytest core.tests.UserRegistrationTest.test_register_user_form_ok
+pytest core/tests/tests_core.py::TestUserRegistration
 ```
 
 !!!note
