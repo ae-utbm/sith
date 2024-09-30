@@ -85,7 +85,8 @@ def search_user(query):
             SearchQuerySet()
             .models(User)
             .autocomplete(auto=query)
-            .order_by("-last_login")[:20]
+            .order_by("-last_login")
+            .load_all()[:20]
         )
         return [r.object for r in res]
     except TypeError:
