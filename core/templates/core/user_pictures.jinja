@@ -38,7 +38,7 @@
         <h4 x-text="album"></h4>
         <div class="photos">
           <template x-for="picture in pictures">
-            <a :href="`/sas/picture/${picture.id}#pict`">
+            <a :href="`/sas/picture/${picture.id}`">
               <div
                 class="photo"
                 :class="{not_moderated: !picture.is_moderated}"
