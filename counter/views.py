@@ -1173,12 +1173,16 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
         threshold = timezone.now() - timedelta(
             minutes=settings.SITH_LAST_OPERATIONS_LIMIT
         )
-        kwargs["last_refillings"] = self.object.refillings.filter(
-            date__gte=threshold
-        ).order_by("-id")[:20]
-        kwargs["last_sellings"] = self.object.sellings.filter(
-            date__gte=threshold
-        ).order_by("-id")[:20]
+        kwargs["last_refillings"] = (
+            self.object.refillings.filter(date__gte=threshold)
+            .select_related("operator", "customer__user")
+            .order_by("-id")[:20]
+        )
+        kwargs["last_sellings"] = (
+            self.object.sellings.filter(date__gte=threshold)
+            .select_related("seller", "customer__user")
+            .order_by("-id")[:20]
+        )
         return kwargs
 
 
