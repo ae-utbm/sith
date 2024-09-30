@@ -315,6 +315,7 @@ class TestBillingInfo:
             "zip_code": "34301",
             "city": "Sète",
             "country": "FR",
+            "phone_number": "0612345678",
         }
 
     def test_edit_infos(self, client: Client, payload: dict):
@@ -356,7 +357,7 @@ class TestBillingInfo:
         for key, val in payload.items():
             assert getattr(infos, key) == val
 
-    def test_invalid_data(self, client: Client, payload):
+    def test_invalid_data(self, client: Client, payload: dict[str, str]):
         user = subscriber_user.make()
         client.force_login(user)
         # address_1, zip_code and country are missing
@@ -390,6 +391,60 @@ class TestBillingInfo:
             content_type="application/json",
         )
         assert response.status_code == expected_code
+
+    @pytest.mark.parametrize(
+        "phone_number",
+        ["+33612345678", "0612345678", "06 12 34 56 78", "06-12-34-56-78"],
+    )
+    def test_phone_number_format(
+        self, client: Client, payload: dict, phone_number: str
+    ):
+        """Test that various formats of phone numbers are accepted."""
+        user = subscriber_user.make()
+        client.force_login(user)
+        payload["phone_number"] = phone_number
+        response = client.put(
+            reverse("api:put_billing_info", args=[user.id]),
+            json.dumps(payload),
+            content_type="application/json",
+        )
+        assert response.status_code == 200
+        infos = BillingInfo.objects.get(customer__user=user)
+        assert infos.phone_number == "0612345678"
+        assert infos.phone_number.country_code == 33
+
+    def test_foreign_phone_number(self, client: Client, payload: dict):
+        """Test that a foreign phone number is accepted."""
+        user = subscriber_user.make()
+        client.force_login(user)
+        payload["phone_number"] = "+49612345678"
+        response = client.put(
+            reverse("api:put_billing_info", args=[user.id]),
+            json.dumps(payload),
+            content_type="application/json",
+        )
+        assert response.status_code == 200
+        infos = BillingInfo.objects.get(customer__user=user)
+        assert infos.phone_number.as_national == "06123 45678"
+        assert infos.phone_number.country_code == 49
+
+    @pytest.mark.parametrize(
+        "phone_number", ["061234567a", "06 12 34 56", "061234567879", "azertyuiop"]
+    )
+    def test_invalid_phone_number(
+        self, client: Client, payload: dict, phone_number: str
+    ):
+        """Test that invalid phone numbers are rejected."""
+        user = subscriber_user.make()
+        client.force_login(user)
+        payload["phone_number"] = phone_number
+        response = client.put(
+            reverse("api:put_billing_info", args=[user.id]),
+            json.dumps(payload),
+            content_type="application/json",
+        )
+        assert response.status_code == 422
+        assert not BillingInfo.objects.filter(customer__user=user).exists()
 
 
 class TestBarmanConnection(TestCase):

@@ -33,6 +33,9 @@ class UserIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     auto = indexes.EdgeNgramField(use_template=True)
     last_update = indexes.DateTimeField(model_attr="last_update")
+    last_login = indexes.DateTimeField(
+        model_attr="last_login", default="1970-01-01T00:00:00Z"
+    )
 
     def get_model(self):
         return User

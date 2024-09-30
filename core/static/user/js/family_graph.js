@@ -77,11 +77,11 @@ function create_graph(container, data, active_user_id) {
       fit: true,
       klay: {
         addUnnecessaryBendpoints: true,
-        direction: 'DOWN',
-        nodePlacement: 'INTERACTIVE',
-        layoutHierarchy: true
-      }
-    }
+        direction: "DOWN",
+        nodePlacement: "INTERACTIVE",
+        layoutHierarchy: true,
+      },
+    },
   });
   let active_user = cy
     .getElementById(active_user_id)
@@ -178,7 +178,9 @@ document.addEventListener("alpine:init", () => {
     typeof depth_min === "undefined" ||
     typeof depth_max === "undefined"
   ) {
-    console.error("Some constants are not set before using the family_graph script, please look at the documentation");
+    console.error(
+      "Some constants are not set before using the family_graph script, please look at the documentation",
+    );
     return;
   }
 
@@ -194,7 +196,7 @@ document.addEventListener("alpine:init", () => {
     loading: false,
     godfathers_depth: get_initial_depth("godfathers_depth"),
     godchildren_depth: get_initial_depth("godchildren_depth"),
-    reverse: initialUrlParams.get("reverse")?.toLowerCase?.() === 'true',
+    reverse: initialUrlParams.get("reverse")?.toLowerCase?.() === "true",
     graph: undefined,
     graph_data: {},
 
@@ -227,7 +229,11 @@ document.addEventListener("alpine:init", () => {
     async screenshot() {
       const link = document.createElement("a");
       link.href = this.graph.jpg();
-      link.download = gettext("family_tree.%(extension)s", "jpg");
+      link.download = interpolate(
+        gettext("family_tree.%(extension)s"),
+        { extension: "jpg" },
+        true,
+      );
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

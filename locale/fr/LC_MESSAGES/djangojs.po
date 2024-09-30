@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-03 15:22+0200\n"
+"POT-Creation-Date: 2024-09-27 22:32+0200\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -16,9 +16,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-#: core/static/user/js/family_graph.js:230
+
+#: core/static/user/js/family_graph.js:233
 msgid "family_tree.%(extension)s"
 msgstr "arbre_genealogique.%(extension)s"
-#: sas/static/sas/js/picture.js:52
+
+#: core/static/user/js/user_edit.js:93
+#, javascript-format
+msgid "captured.%s"
+msgstr "capture.%s"
+
+#: eboutic/static/eboutic/js/makecommand.js:50
+msgid "Incorrect value"
+msgstr "Valeur incorrecte"
+
+#: sas/static/sas/js/viewer.js:196
+msgid "Couldn't moderate picture"
+msgstr "Echec de la suppression de la photo"
+
+#: sas/static/sas/js/viewer.js:209
 msgid "Couldn't delete picture"
 msgstr "Echec de la suppression de la photo"

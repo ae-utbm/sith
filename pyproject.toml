@@ -45,6 +45,10 @@ dict2xml = "^1.7.3"
 Sphinx = "^5" # Needed for building xapian
 tomli = "^2.0.1"
 django-honeypot = "^1.2.1"
+# When I introduced pydantic-extra-types, I needed *right now*
+# the PhoneNumberValidator class which was on the master branch but not released yet.
+# Once it's released, switch this to a regular version.
+pydantic-extra-types = { git = "https://github.com/pydantic/pydantic-extra-types.git", rev = "58db4b0" }
 
 [tool.poetry.group.prod.dependencies]
 # deps used in prod, but unnecessary for development
