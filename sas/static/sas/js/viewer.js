@@ -137,7 +137,12 @@ document.addEventListener("alpine:init", () => {
       this.current_picture = this.pictures.find(
         (i) => i.id === first_picture_id,
       );
-      this.$watch("current_picture", () => this.update_picture());
+      this.$watch("current_picture", (current, previous) => {
+        if (current === previous){ /* Avoid recursive updates */
+          return;
+        }
+        this.update_picture();
+      });
       window.addEventListener("popstate", async (event) => {
         if (!event.state || event.state.sas_picture_id === undefined) {
           return;

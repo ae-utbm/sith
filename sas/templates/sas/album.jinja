@@ -63,7 +63,7 @@
     <h4>{% trans %}Pictures{% endtrans %}</h4>
     <div class="photos" :aria-busy="loading">
       <template x-for="picture in pictures.results">
-        <a :href="`/sas/picture/${picture.id}#pict`">
+        <a :href="`/sas/picture/${picture.id}`">
           <div
             class="photo"
             :class="{not_moderated: !picture.is_moderated}"
