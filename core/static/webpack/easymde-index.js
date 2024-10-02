@@ -1,6 +1,6 @@
-import "codemirror/lib/codemirror.css";
-import "easymde/src/css/easymde.css";
-import EasyMDE from "easymde";
+import 'codemirror/lib/codemirror.css'
+import 'easymde/src/css/easymde.css'
+import EasyMDE from 'easymde'
 
 // This scripts dependens on Alpine but it should be loaded on every page
 

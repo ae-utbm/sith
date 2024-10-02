@@ -1,7 +1,9 @@
-function alpine_webcam_builder(
+/* eslint-disable camelcase */
+/* global DataTransfer */
+function alpine_webcam_builder ( // eslint-disable-line no-unused-vars
   default_picture,
   delete_url,
-  can_delete_picture,
+  can_delete_picture
 ) {
   return () => ({
     can_edit_picture: false,
@@ -13,98 +15,99 @@ function alpine_webcam_builder(
     video: null,
     picture_form: null,
 
-    init() {
-      this.video = this.$refs.video;
-      this.picture_form = this.$refs.form.getElementsByTagName("input");
+    init () {
+      this.video = this.$refs.video
+      this.picture_form = this.$refs.form.getElementsByTagName('input')
       if (this.picture_form.length > 0) {
-        this.picture_form = this.picture_form[0];
-        this.can_edit_picture = true;
+        this.picture_form = this.picture_form[0]
+        this.can_edit_picture = true
 
         // Link the displayed element to the form input
         this.picture_form.onchange = (event) => {
-          let files = event.srcElement.files;
+          const files = event.srcElement.files
           if (files.length > 0) {
             this.picture = (window.URL || window.webkitURL).createObjectURL(
-              event.srcElement.files[0],
-            );
+              event.srcElement.files[0]
+            )
           } else {
-            this.picture = null;
+            this.picture = null
           }
-        };
+        }
       }
     },
 
-    get_picture() {
-      return this.picture || default_picture;
+    get_picture () {
+      return this.picture || default_picture
     },
 
-    delete_picture() {
+    delete_picture () {
       // Only remove currently displayed picture
-      if (!!this.picture) {
-        let list = new DataTransfer();
-        this.picture_form.files = list.files;
-        this.picture_form.dispatchEvent(new Event("change"));
-        return;
+      if (this.picture) {
+        const list = new DataTransfer()
+        this.picture_form.files = list.files
+        this.picture_form.dispatchEvent(new Event('change'))
+        return
       }
       if (!can_delete_picture) {
-        return;
+        return
       }
       // Remove user picture if correct rights are available
-      window.open(delete_url, "_self");
+      window.open(delete_url, '_self')
     },
 
-    enable_camera() {
-      this.picture = null;
-      this.loading = true;
-      this.is_camera_error = false;
+    enable_camera () {
+      this.picture = null
+      this.loading = true
+      this.is_camera_error = false
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: false })
         .then((stream) => {
-          this.loading = false;
-          this.is_camera_enabled = true;
-          this.video.srcObject = stream;
-          this.video.play();
+          this.loading = false
+          this.is_camera_enabled = true
+          this.video.srcObject = stream
+          this.video.play()
         })
         .catch((err) => {
-          this.is_camera_error = true;
-          this.loading = false;
-        });
+          this.is_camera_error = true
+          this.loading = false
+          throw (err)
+        })
     },
 
-    take_picture() {
-      let canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
+    take_picture () {
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
 
       /* Create the image */
-      let settings = this.video.srcObject.getTracks()[0].getSettings();
-      canvas.width = settings.width;
-      canvas.height = settings.height;
-      context.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+      const settings = this.video.srcObject.getTracks()[0].getSettings()
+      canvas.width = settings.width
+      canvas.height = settings.height
+      context.drawImage(this.video, 0, 0, canvas.width, canvas.height)
 
       /* Stop camera */
-      this.video.pause();
+      this.video.pause()
       this.video.srcObject.getTracks().forEach((track) => {
-        if (track.readyState === "live") {
-          track.stop();
+        if (track.readyState === 'live') {
+          track.stop()
         }
-      });
+      })
 
       canvas.toBlob((blob) => {
-        const filename = interpolate(gettext("captured.%s"), ["webp"]);
-        let file = new File([blob], filename, {
-          type: "image/webp",
-        });
+        const filename = interpolate(gettext('captured.%s'), ['webp'])
+        const file = new File([blob], filename, {
+          type: 'image/webp'
+        })
 
-        let list = new DataTransfer();
-        list.items.add(file);
-        this.picture_form.files = list.files;
+        const list = new DataTransfer()
+        list.items.add(file)
+        this.picture_form.files = list.files
 
         // No change event is triggered, we trigger it manually #}
-        this.picture_form.dispatchEvent(new Event("change"));
-      }, "image/webp");
+        this.picture_form.dispatchEvent(new Event('change'))
+      }, 'image/webp')
 
-      canvas.remove();
-      this.is_camera_enabled = false;
-    },
-  });
+      canvas.remove()
+      this.is_camera_enabled = false
+    }
+  })
 }

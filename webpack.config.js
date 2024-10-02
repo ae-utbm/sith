@@ -1,14 +1,13 @@
-const glob = require('glob');
-const path = require('path');
-const webpack = require("webpack");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const TerserPlugin = require("terser-webpack-plugin");
+const glob = require('glob')
+const path = require('path')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = {
   entry: glob.sync('./!(static)/static/webpack/**?(-)index.js').reduce((obj, el) => {
-    obj[path.parse(el).name] = './' + el;
-    return obj;
+    obj[path.parse(el).name] = './' + el
+    return obj
   }, {}),
   output: {
     filename: '[name].js',
@@ -16,24 +15,24 @@ module.exports = {
     clean: true
   },
   plugins: [
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin()
   ],
   optimization: {
     minimizer: [
-      "...",
+      '...',
       new CssMinimizerPlugin({
-        parallel: true,
+        parallel: true
       }),
       new TerserPlugin({
         parallel: true,
         terserOptions: {
           mangle: true,
           compress: {
-            drop_console: true,
-          },
+            drop_console: true
+          }
         }
-      }),
-    ],
+      })
+    ]
   },
   module: {
     rules: [
@@ -42,18 +41,18 @@ module.exports = {
         sideEffects: true,
         use: [
           MiniCssExtractPlugin.loader,
-          "css-loader",
-        ],
+          'css-loader'
+        ]
       },
       {
-        test: /\.(jpe?g|png|gif|woff|woff2|eot|ttf|otf)$/i,
+        test: /\.(jpe?g|png|gif)$/i,
         type: 'asset/resource'
       },
       {
         test: /\.m?js$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env']
           }
@@ -61,12 +60,12 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        enforce: "pre",
-        use: ["source-map-loader"],
+        enforce: 'pre',
+        use: ['source-map-loader']
       },
       {
-        test: require.resolve("jquery"),
-        loader: "expose-loader",
+        test: require.resolve('jquery'),
+        loader: 'expose-loader',
         options: {
           exposes: [
             {
@@ -81,9 +80,9 @@ module.exports = {
               globalName: ['window.jQuery'],
               override: true
             }
-          ],
-        },
-      },
-    ],
-  },
-};
+          ]
+        }
+      }
+    ]
+  }
+}

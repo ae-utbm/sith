@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /**
  * Builders to use Select2 in our templates.
  *
@@ -157,15 +158,15 @@
 /**
  * @param {Select2Options} options
  */
-function sithSelect2(options) {
-  const elem = $(options.element);
+function sithSelect2 (options) { // eslint-disable-line no-unused-vars
+  const elem = $(options.element)
   return elem.select2({
-    theme: elem[0].multiple ? "classic" : "default",
+    theme: elem[0].multiple ? 'classic' : 'default',
     minimumInputLength: 2,
     templateResult: select_item_builder(options.picture_getter),
     ...options.data_source,
-    ...(options.overrides || {}),
-  });
+    ...(options.overrides || {})
+  })
 }
 
 /**
@@ -179,12 +180,12 @@ function sithSelect2(options) {
  * @param {Select2Object[]} source The array containing the data
  * @param {RemoteSourceOptions} options
  */
-function local_data_source(source, options) {
-  if (!!options.excluded) {
-    const ids = options.excluded();
-    return { data: source.filter((i) => !ids.includes(i.id)) };
+function local_data_source (source, options) { // eslint-disable-line no-unused-vars
+  if (options.excluded) {
+    const ids = options.excluded()
+    return { data: source.filter((i) => !ids.includes(i.id)) }
   }
-  return { data: source };
+  return { data: source }
 }
 
 /**
@@ -202,11 +203,11 @@ function local_data_source(source, options) {
  * @param {string} source The url of the endpoint
  * @param {RemoteSourceOptions} options
  */
-function remote_data_source(source, options) {
-  jQuery.ajaxSettings.traditional = true;
-  let params = {
+function remote_data_source (source, options) { // eslint-disable-line no-unused-vars
+  jQuery.ajaxSettings.traditional = true
+  const params = {
     url: source,
-    dataType: "json",
+    dataType: 'json',
     cache: true,
     delay: 250,
     data: function (params) {
@@ -214,25 +215,25 @@ function remote_data_source(source, options) {
         search: params.term,
         exclude: [
           ...(this.val() || []).map((i) => parseInt(i)),
-          ...(options.excluded ? options.excluded() : []),
-        ],
-      };
-    },
-  };
-  if (!!options.result_converter) {
-    params["processResults"] = function (data) {
-      return { results: data.results.map(options.result_converter) };
-    };
+          ...(options.excluded ? options.excluded() : [])
+        ]
+      }
+    }
   }
-  if (!!options.overrides) {
-    Object.assign(params, options.overrides);
+  if (options.result_converter) {
+    params.processResults = function (data) {
+      return { results: data.results.map(options.result_converter) }
+    }
   }
-  return { ajax: params };
+  if (options.overrides) {
+    Object.assign(params, options.overrides)
+  }
+  return { ajax: params }
 }
 
-function item_formatter(user) {
+function item_formatter (user) { // eslint-disable-line no-unused-vars
   if (user.loading) {
-    return user.text;
+    return user.text
   }
 }
 
@@ -241,21 +242,21 @@ function item_formatter(user) {
  * @param {null | function(Object):string} picture_getter
  * @return {function(string): jQuery|HTMLElement}
  */
-function select_item_builder(picture_getter) {
+function select_item_builder (picture_getter) {
   return (item) => {
     const picture =
-      typeof picture_getter === "function" ? picture_getter(item) : null;
+      typeof picture_getter === 'function' ? picture_getter(item) : null
     const img_html = picture
       ? `<img 
           src="${picture_getter(item)}" 
           alt="${item.text}" 
           onerror="this.src = '/static/core/img/unknown.jpg'" 
         />`
-      : "";
+      : ''
 
     return $(`<div class="select-item">
         ${img_html}
          <span class="select-item-text">${item.text}</span>
-         </div>`);
-  };
+         </div>`)
+  }
 }
