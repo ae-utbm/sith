@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-27 22:32+0200\n"
+"POT-Creation-Date: 2024-10-02 17:47+0200\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -26,14 +26,90 @@ msgstr "arbre_genealogique.%(extension)s"
 msgid "captured.%s"
 msgstr "capture.%s"
 
+#: core/static/webpack/easymde-index.js:27
+msgid "Heading"
+msgstr "Titre"
+
+#: core/static/webpack/easymde-index.js:33
+msgid "Italic"
+msgstr "Italique"
+
+#: core/static/webpack/easymde-index.js:39
+msgid "Bold"
+msgstr "Gras"
+
+#: core/static/webpack/easymde-index.js:45
+msgid "Strikethrough"
+msgstr "Barré"
+
+#: core/static/webpack/easymde-index.js:54
+msgid "Underline"
+msgstr "Souligné"
+
+#: core/static/webpack/easymde-index.js:63
+msgid "Superscript"
+msgstr "Exposant"
+
+#: core/static/webpack/easymde-index.js:72
+msgid "Subscript"
+msgstr "Indice"
+
+#: core/static/webpack/easymde-index.js:78
+msgid "Code"
+msgstr "Code"
+
+#: core/static/webpack/easymde-index.js:85
+msgid "Quote"
+msgstr "Citation"
+
+#: core/static/webpack/easymde-index.js:91
+msgid "Unordered list"
+msgstr "Liste non ordonnée"
+
+#: core/static/webpack/easymde-index.js:97
+msgid "Ordered list"
+msgstr "Liste ordonnée"
+
+#: core/static/webpack/easymde-index.js:104
+msgid "Insert link"
+msgstr "Insérer lien"
+
+#: core/static/webpack/easymde-index.js:110
+msgid "Insert image"
+msgstr "Insérer image"
+
+#: core/static/webpack/easymde-index.js:116
+msgid "Insert table"
+msgstr "Insérer tableau"
+
+#: core/static/webpack/easymde-index.js:123
+msgid "Clean block"
+msgstr "Nettoyer bloc"
+
+#: core/static/webpack/easymde-index.js:130
+msgid "Toggle preview"
+msgstr "Activer la prévisualisation"
+
+#: core/static/webpack/easymde-index.js:136
+msgid "Toggle side by side"
+msgstr "Activer la vue côte à côte"
+
+#: core/static/webpack/easymde-index.js:142
+msgid "Toggle fullscreen"
+msgstr "Activer le plein écran"
+
+#: core/static/webpack/easymde-index.js:149
+msgid "Markdown guide"
+msgstr "Guide markdown"
+
 #: eboutic/static/eboutic/js/makecommand.js:50
 msgid "Incorrect value"
 msgstr "Valeur incorrecte"
 
-#: sas/static/sas/js/viewer.js:196
+#: sas/static/sas/js/viewer.js:201
 msgid "Couldn't moderate picture"
-msgstr "Echec de la suppression de la photo"
+msgstr "Il n'a pas été possible de modérer l'image"
 
-#: sas/static/sas/js/viewer.js:209
+#: sas/static/sas/js/viewer.js:214
 msgid "Couldn't delete picture"
-msgstr "Echec de la suppression de la photo"
+msgstr "Il n'a pas été possible de supprimer l'image"
