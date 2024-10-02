@@ -31,7 +31,7 @@ from typing import NamedTuple, TypedDict
 from django.db import models
 from django.db.models import Case, Count, F, Q, Value, When
 from django.db.models.functions import Concat
-from django.utils import timezone
+from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Club
@@ -338,7 +338,7 @@ class Galaxy(models.Model):
         for user1_membership in user1_memberships:
             if user1_membership.end_date is None:
                 # user1_membership.save() is not called in this function, hence this is safe
-                user1_membership.end_date = timezone.now().date()
+                user1_membership.end_date = localdate()
             query = Q(  # start2 <= start1 <= end2
                 start_date__lte=user1_membership.start_date,
                 end_date__gte=user1_membership.start_date,
@@ -354,7 +354,7 @@ class Galaxy(models.Model):
                 query, club=user1_membership.club
             ):
                 if user2_membership.end_date is None:
-                    user2_membership.end_date = timezone.now().date()
+                    user2_membership.end_date = localdate()
                 latest_start = max(
                     user1_membership.start_date, user2_membership.start_date
                 )

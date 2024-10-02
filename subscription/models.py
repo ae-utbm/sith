@@ -22,7 +22,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
-from django.utils import timezone
+from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
@@ -92,7 +92,7 @@ class Subscription(models.Model):
         return reverse("core:user_edit", kwargs={"user_id": self.member.pk})
 
     def clean(self):
-        today = timezone.now().date()
+        today = localdate()
         active_subscriptions = Subscription.objects.exclude(pk=self.pk).filter(
             subscription_start__gte=today, subscription_end__lte=today
         )
