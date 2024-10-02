@@ -114,7 +114,8 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 
 ## Finaliser l'installation
 
-Clonez le projet et installez les dépendances :
+Clonez le projet (depuis votre console WSL, si vous utilisez WSL)
+et installez les dépendances :
 
 ```bash
 git clone https://github.com/ae-utbm/sith.git
