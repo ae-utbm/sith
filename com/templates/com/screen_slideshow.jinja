@@ -2,7 +2,9 @@
 <html lang="fr">
   <head>
     <title>{% trans %}Slideshow{% endtrans %}</title>
-    <link href="{{ static('com/css/slideshow.scss') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ static('css/slideshow.scss') }}" rel="stylesheet" type="text/css" />
+    <script src="{{ static('webpack/jquery-index.js') }}"></script>
+    <script src="{{ static('com/js/slideshow.js') }}"></script>
   </head>
   <body>
     <div id="slideshow">
@@ -10,7 +12,7 @@
       <div id="slides">
         {% for poster in posters %}
           <div class="slide {% if loop.first %}center{% else %}right{% endif %}" display_time="{{ poster.display_time }}">
-            <img src="{{ poster.file.url }}"></img>
+            <img src="{{ poster.file.url }}">
           </div>
         {% endfor %}
       </div>
@@ -24,7 +26,5 @@
       <div id="progress_bar"></div>
 
     </div>
-    <script src="{{ static('core/js/jquery-3.6.2.min.js') }}"></script>
-    <script src="{{ static('com/js/slideshow.js') }}"></script>
   </body>
 </html>
