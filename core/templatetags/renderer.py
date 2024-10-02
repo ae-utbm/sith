@@ -23,18 +23,10 @@
 #
 
 import datetime
-from pathlib import Path
 
 import phonenumbers
-import sass
 from django import template
-from django.conf import settings
-from django.contrib.staticfiles.finders import find
-from django.core.files.base import ContentFile
-from django.core.files.storage import storages
-from django.template import TemplateSyntaxError
 from django.template.defaultfilters import stringfilter
-from django.templatetags.static import static
 from django.utils.safestring import mark_safe
 from django.utils.translation import ngettext
 
@@ -88,23 +80,3 @@ def format_timedelta(value: datetime.timedelta) -> str:
     return ngettext(
         "%(nb_days)d day, %(remainder)s", "%(nb_days)d days, %(remainder)s", days
     ) % {"nb_days": days, "remainder": str(remainder)}
-
-
-@register.simple_tag()
-def scss(path):
-    """Return path of the corresponding css file after compilation."""
-    path = Path(path)
-    if path.suffix != ".scss":
-        raise TemplateSyntaxError("`scss` tag has been called with a non-scss file")
-
-    css_path = path.with_suffix(".css")
-    if settings.DEBUG:
-        compile_args = {"filename": find(path)}
-        if settings.SASS_PRECISION:
-            compile_args["precision"] = settings.SASS_PRECISION
-        content = sass.compile(**compile_args)
-        storage = storages["staticfiles"]
-        if storage.exists(css_path):
-            storage.delete(css_path)
-        storage.save(css_path, ContentFile(content))
-    return static(str(css_path))

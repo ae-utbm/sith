@@ -2,6 +2,11 @@
 
 {% from 'forum/macros.jinja' import display_message, display_breadcrumb, display_search_bar %}
 
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static('forum/css/forum.scss') }}">
+{% endblock %}
+
 {% block content %}
   <div id="forum">
     {{ display_search_bar(request) }}

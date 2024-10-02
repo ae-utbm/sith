@@ -2,8 +2,7 @@
 {% from 'core/macros.jinja' import paginate_alpine %}
 
 {%- block additional_css -%}
-  <link rel="stylesheet" href="{{ scss('sas/css/album.scss') }}">
-  <link rel="stylesheet" href="{{ scss('core/pagination.scss') }}">
+  <link rel="stylesheet" href="{{ static('sas/css/album.scss') }}">
 {%- endblock -%}
 
 {% block title %}
@@ -64,7 +63,7 @@
     <h4>{% trans %}Pictures{% endtrans %}</h4>
     <div class="photos" :aria-busy="loading">
       <template x-for="picture in pictures.results">
-        <a :href="`/sas/picture/${picture.id}#pict`">
+        <a :href="`/sas/picture/${picture.id}`">
           <div
             class="photo"
             :class="{not_moderated: !picture.is_moderated}"

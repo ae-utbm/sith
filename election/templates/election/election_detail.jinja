@@ -6,7 +6,7 @@
 
 {% block head %}
   {{ super() -}}
-  <link rel="stylesheet" href="{{ scss('election/css/election.scss') }}">
+  <link rel="stylesheet" href="{{ static('election/css/election.scss') }}">
 {%- endblock %}
 
 {% block content %}
@@ -196,14 +196,13 @@
 
 {% block script %}
   {{ super() }}
-  <script src="{{ static('core/js/shorten.min.js') }}"></script>
   <script type="text/javascript">
-    $('.role_description').shorten({
+    shorten('.role_description', {
       moreText: "{% trans %}Show more{% endtrans %}",
       lessText: "{% trans %}Show less{% endtrans %}",
       showChars: 50
     });
-    $('.candidate_program').shorten({
+    shorten('.candidate_program', {
       moreText: "{% trans %}Show more{% endtrans %}",
       lessText: "{% trans %}Show less{% endtrans %}",
       showChars: 200

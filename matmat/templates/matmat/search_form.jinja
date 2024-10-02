@@ -1,5 +1,5 @@
-{% from "core/macros.jinja" import user_mini_profile, paginate %}
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import user_mini_profile, paginate_jinja %}
 
 {% block title %}
   {% trans %}Search user{% endtrans %}
@@ -18,7 +18,9 @@
 
       {% endfor %}
     </div>
-    {{ paginate(page_obj, paginator) }}
+    {% if page_obj.has_other_pages() %}
+      {{ paginate_jinja(page_obj, paginator) }}
+    {% endif %}
     <hr>
   {% endif %}
   <h2>{% trans %}Search user{% endtrans %}</h2>

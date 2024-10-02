@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import user_profile_link, paginate %}
+{% from 'core/macros.jinja' import user_profile_link, paginate_jinja %}
 
 {% block title %}
   {% trans %}Cash register summary list{% endtrans %}
@@ -57,7 +57,7 @@
     </table>
     <br>
     {% if is_paginated %}
-      {{ paginate(page_obj, paginator) }}
+      {{ paginate_jinja(page_obj, paginator) }}
     {% endif %}
   {% else %}
     {% trans %}There is no cash register summary in this website.{% endtrans %}

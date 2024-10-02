@@ -1,28 +1,15 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link %}
 {% from 'forum/macros.jinja' import display_message, display_breadcrumb, display_search_bar %}
+{% from 'core/macros.jinja' import paginate_jinja %}
 
 {% block title %}
   {{ topic }}
 {% endblock %}
 
-{% block head %}
-  {{ super() }}
-  <style type="text/css" media="all">
-    .topic {
-      border: solid skyblue 1px;
-      padding: 2px;
-      margin: 2px;
-    }
-    .forum {
-      background: lightblue;
-      padding: 2px;
-      margin: 2px;
-    }
-    .category {
-      background: skyblue;
-    }
-  </style>
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static('forum/css/forum.scss') }}">
 {% endblock %}
 
 {% block content %}
@@ -40,30 +27,24 @@
     </p>
 
     {{ display_search_bar(request) }}
-    <p style="text-align: right; background: #d8e7f3;">
-      {% for p in msgs.paginator.page_range %}
-        <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
-      {% endfor %}
-    </p>
+    {{ paginate_jinja(msgs, msgs.paginator) }}
 
-    {% for m in msgs %}
-      {% if m.id == first_unread_message_id %}
-        <span id="first_unread"></span>
-      {% endif %}
-      {% if m.id >= first_unread_message_id %}
-        {{ display_message(m, user, True) }}
-      {% else %}
-        {{ display_message(m, user, False) }}
-      {% endif %}
-    {% endfor %}
+    <main class="message-list">
+      {% for m in msgs %}
+        {% if m.id == first_unread_message_id %}
+          <span id="first_unread"></span>
+        {% endif %}
+        {% if m.id >= first_unread_message_id %}
+          {{ display_message(m, user, True) }}
+        {% else %}
+          {{ display_message(m, user, False) }}
+        {% endif %}
+      {% endfor %}
+    </main>
 
     <p><a class="ib button" href="{{ url('forum:new_message', topic_id=topic.id) }}">{% trans %}Reply{% endtrans %}</a></p>
 
-    <p style="text-align: right; background: #d8e7f3;">
-      {% for p in msgs.paginator.page_range %}
-        <span class="ib" style="background: {% if p == msgs.number %}white{% endif %}; margin: 0;"><a href="?page={{ p }}">{{ p }}</a></span>
-      {% endfor %}
-    </p>
+    {{ paginate_jinja(msgs, msgs.paginator) }}
   </div>
 {% endblock %}
 

@@ -73,8 +73,8 @@ class MarkdownInput(Textarea):
         context = super().get_context(name, value, attrs)
 
         context["statics"] = {
-            "js": static("vendored/easymde/easymde.min.js"),
-            "css": static("vendored/easymde/easymde.min.css"),
+            "js": static("webpack/easymde-index.js"),
+            "css": static("webpack/easymde-index.css"),
         }
         context["translations"] = {
             "heading_smaller": _("Heading"),

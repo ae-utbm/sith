@@ -248,7 +248,7 @@ class BasketItem(AbstractBaseItem):
         """Create a BasketItem with the same characteristics as the
         product passed in parameters, with the specified quantity.
 
-        Warnings:
+        Warning:
             the basket field is not filled, so you must set
             it yourself before saving the model.
         """

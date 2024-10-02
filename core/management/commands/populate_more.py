@@ -1,12 +1,13 @@
 import random
 from datetime import date, timedelta
+from datetime import timezone as tz
 from decimal import Decimal
 from typing import Iterator
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db.models import Exists, F, Min, OuterRef, Subquery, Sum
+from django.db.models import Count, Exists, F, Min, OuterRef, Subquery, Sum
 from django.db.models.functions import Coalesce
 from django.utils.timezone import make_aware, now
 from faker import Faker
@@ -22,6 +23,7 @@ from counter.models import (
     Refilling,
     Selling,
 )
+from forum.models import Forum, ForumMessage, ForumTopic
 from pedagogy.models import UV
 from subscription.models import Subscription
 
@@ -97,6 +99,8 @@ class Command(BaseCommand):
         self.create_sales(sellers)
         self.stdout.write("Creating permanences...")
         self.create_permanences(sellers)
+        self.stdout.write("Filling the forum...")
+        self.create_forums()
 
         self.stdout.write("Done")
 
@@ -288,7 +292,8 @@ class Command(BaseCommand):
                 since=Subquery(
                     Subscription.objects.filter(member__customer=OuterRef("pk"))
                     .annotate(res=Min("subscription_start"))
-                    .values("res")[:1]
+                    .values("res")
+                    .order_by("res")[:1]
                 )
             )
         )
@@ -381,3 +386,72 @@ class Command(BaseCommand):
                     )
                 )
         Permanency.objects.bulk_create(perms)
+
+    def create_forums(self):
+        forumers = random.sample(list(User.objects.all()), 100)
+        most_actives = random.sample(forumers, 10)
+        categories = list(Forum.objects.filter(is_category=True))
+        new_forums = [
+            Forum(name=self.faker.text(20), parent=random.choice(categories))
+            for _ in range(15)
+        ]
+        Forum.objects.bulk_create(new_forums)
+        forums = list(Forum.objects.filter(is_category=False))
+        new_topics = [
+            ForumTopic(
+                _title=self.faker.text(20),
+                author=random.choice(most_actives),
+                forum=random.choice(forums),
+            )
+            for _ in range(100)
+        ]
+        ForumTopic.objects.bulk_create(new_topics)
+        topics = list(ForumTopic.objects.all())
+
+        def get_author():
+            if random.random() > 0.5:
+                return random.choice(most_actives)
+            return random.choice(forumers)
+
+        messages = []
+        for t in topics:
+            nb_messages = max(1, int(random.normalvariate(mu=90, sigma=50)))
+            dates = sorted(
+                [
+                    self.faker.date_time_between("-15y", "-1d", tzinfo=tz.utc)
+                    for _ in range(nb_messages)
+                ],
+                reverse=True,
+            )
+            messages.extend(
+                [
+                    ForumMessage(
+                        topic=t,
+                        author=get_author(),
+                        date=d,
+                        message="\n\n".join(
+                            self.faker.paragraphs(random.randint(1, 4))
+                        ),
+                    )
+                    for d in dates
+                ]
+            )
+        ForumMessage.objects.bulk_create(messages)
+        ForumTopic.objects.update(
+            _message_number=Subquery(
+                ForumMessage.objects.filter(topic_id=OuterRef("pk"))
+                .values("topic_id")
+                .annotate(res=Count("*"))
+                .values("res")
+            ),
+            _last_message_id=Subquery(
+                ForumMessage.objects.order_by("-date").values("id")[:1]
+            ),
+        )
+        for f in Forum.objects.filter(parent__isnull=False):
+            # this is a N+1 queries, but it's ok,
+            # since there are quite a few forums
+            # and trying to do it with a single query
+            # would result in a big whibbly-woobly hacky queryset
+            f.set_last_message()
+            f.set_topic_number()

@@ -366,3 +366,35 @@ dans la CI : `djHTML`.
 En utilisant conjointement Ruff et djHTML,
 on arrive donc à la fois à formater les fichiers
 Python et les fichiers relatifs au frontend.
+
+### Npm
+
+[Utiliser npm](https://docs.npmjs.com/cli/v6/commands/npm/)
+
+Npm est un gestionnaire de paquets pour Node.js. C'est l'un des gestionnaires les plus répandus sur le marché et est très complet et utilisé.
+
+Npm possède, tout comme Poetry, la capacité de locker les dépendances au moyen d'un fichier `.lock`. Il a également l'avantage de presque toujours être facilement disponible à l'installation.
+
+Nous l'utilisons ici pour gérer les dépendances JavaScript. Celle-ci sont déclarées dans le fichier `package.json` situé à la racine du projet.
+
+### Webpack
+
+[Utiliser webpack](https://webpack.js.org/concepts/)
+
+Webpack est un bundler de fichiers static. Il nous sert ici à mettre à disposition les dépendances frontend gérées par npm.
+
+Il sert également à intégrer les autres outils JavaScript au workflow du Sith de manière transparente.
+
+Webpack a été choisi pour sa versatilité et sa popularité. C'est un des plus anciens bundler et il est là pour rester.
+
+Le logiciel se configure au moyen du fichier `webpack.config.js` à la racine du projet.
+
+### Babel
+
+[Babel](https://babeljs.io/)
+
+Babel est un outil qui offre la promesse de convertir le code JavaScript moderne en code JavaScript plus ancien sans action de la part du développeur. Il permet de ne pas se soucier de la compatibilité avec les navigateurs et de coder comme si on était toujours sur la dernière version du langage.
+
+Babel est intégré dans Webpack et tout code bundlé par celui-ci est automatiquement converti.
+
+Le logiciel se configure au moyen du fichier `babel.config.json` à la racine du projet.

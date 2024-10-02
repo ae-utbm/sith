@@ -5,6 +5,10 @@
   {% trans %}Favorite topics{% endtrans %}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static('forum/css/forum.scss') }}">
+{% endblock %}
+
 {% block content %}
   <p>
     <a href="{{ url('forum:main') }}">Forum</a> >

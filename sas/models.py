@@ -66,7 +66,7 @@ class PictureQuerySet(models.QuerySet):
     def viewable_by(self, user: User) -> Self:
         """Filter the pictures that this user can view.
 
-        Warnings:
+        Warning:
             Calling this queryset method may add several additional requests.
         """
         if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
@@ -178,7 +178,7 @@ class AlbumQuerySet(models.QuerySet):
     def viewable_by(self, user: User) -> Self:
         """Filter the albums that this user can view.
 
-        Warnings:
+        Warning:
             Calling this queryset method may add several additional requests.
         """
         if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):

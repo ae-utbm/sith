@@ -134,13 +134,15 @@ def merge_users(u1: User, u2: User) -> User:
     return u1
 
 
-def delete_all_forum_user_messages(user, moderator, *, verbose=False):
+def delete_all_forum_user_messages(
+    user: User, moderator: User, *, verbose: bool = False
+):
     """Soft delete all messages of a user.
 
     Args:
-        user: the user to delete messages from
-        moderator: the one marked as the moderator.
-        verbose: it True, print the deleted messages
+        user: core.models.User the user to delete messages from
+        moderator: core.models.User the one marked as the moderator.
+        verbose: bool if True, print the deleted messages
     """
     for message in user.forum_messages.all():
         if message.is_deleted():

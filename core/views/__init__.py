@@ -84,7 +84,7 @@ def can_edit_prop(obj: Any, user: User) -> bool:
     return False
 
 
-def can_edit(obj: Any, user: User):
+def can_edit(obj: Any, user: User) -> bool:
     """Can the user edit the object.
 
     Args:
@@ -105,7 +105,7 @@ def can_edit(obj: Any, user: User):
     return can_edit_prop(obj, user)
 
 
-def can_view(obj: Any, user: User):
+def can_view(obj: Any, user: User) -> bool:
     """Can the user see the object.
 
     Args:
