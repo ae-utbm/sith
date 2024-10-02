@@ -33,6 +33,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.utils import timezone
+from django.utils.timezone import localdate
 from PIL import Image
 
 from accounting.models import (
@@ -914,7 +915,7 @@ Welcome to the wiki page!
             Membership(
                 user=comunity,
                 club=bar_club,
-                start_date=self.now,
+                start_date=localdate(),
                 role=settings.SITH_CLUB_ROLES_ID["Board member"],
             ).save()
             # Adding user tutu
@@ -1274,28 +1275,28 @@ Welcome to the wiki page!
                 club=troll,
                 role=9,
                 description="Padawan Troll",
-                start_date=self.now - timedelta(days=17),
+                start_date=localdate() - timedelta(days=17),
             ).save()
             Membership(
                 user=krophil,
                 club=troll,
                 role=10,
                 description="Maitre Troll",
-                start_date=self.now - timedelta(days=200),
+                start_date=localdate() - timedelta(days=200),
             ).save()
             Membership(
                 user=skia,
                 club=troll,
                 role=2,
                 description="Grand Ancien Troll",
-                start_date=self.now - timedelta(days=400),
-                end_date=self.now - timedelta(days=86),
+                start_date=localdate() - timedelta(days=400),
+                end_date=localdate() - timedelta(days=86),
             ).save()
             Membership(
                 user=richard,
                 club=troll,
                 role=2,
                 description="",
-                start_date=self.now - timedelta(days=200),
-                end_date=self.now - timedelta(days=100),
+                start_date=localdate() - timedelta(days=200),
+                end_date=localdate() - timedelta(days=100),
             ).save()

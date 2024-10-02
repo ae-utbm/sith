@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Exists, F, Min, OuterRef, Subquery, Sum
 from django.db.models.functions import Coalesce
-from django.utils.timezone import make_aware, now
+from django.utils.timezone import localdate, make_aware, now
 from faker import Faker
 
 from club.models import Club, Membership
@@ -125,7 +125,7 @@ class Command(BaseCommand):
                     account_id=f"{9900 + i}{self.faker.random_lowercase_letter()}",
                 )
             )
-            while sub.subscription_end < now().date() and random.random() > 0.7:
+            while sub.subscription_end < localdate() and random.random() > 0.7:
                 # 70% chances to subscribe again
                 # (expect if it would make the subscription start after tomorrow)
                 sub = prepare_subscription(
@@ -331,7 +331,7 @@ class Command(BaseCommand):
                         seller=random.choice(sellers),
                         customer=customer,
                         date=make_aware(
-                            self.faker.date_time_between(customer.since, now().date())
+                            self.faker.date_time_between(customer.since, localdate())
                         ),
                     )
                 )
@@ -347,7 +347,7 @@ class Command(BaseCommand):
                         operator=random.choice(sellers),
                         customer=customer,
                         date=make_aware(
-                            self.faker.date_time_between(customer.since, now().date())
+                            self.faker.date_time_between(customer.since, localdate())
                         ),
                         is_validated=True,
                     )
@@ -368,7 +368,7 @@ class Command(BaseCommand):
             active_period_start = self.faker.past_date("-10y")
             active_period_end = self.faker.date_between(
                 active_period_start,
-                min(now().date(), active_period_start + relativedelta(years=5)),
+                min(localdate(), active_period_start + relativedelta(years=5)),
             )
             for _ in range(nb_perms):
                 counter = (

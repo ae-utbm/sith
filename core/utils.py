@@ -23,7 +23,7 @@ import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.http import HttpRequest
-from django.utils import timezone
+from django.utils.timezone import localdate
 from PIL import ExifTags
 from PIL.Image import Image, Resampling
 
@@ -45,7 +45,7 @@ def get_start_of_semester(today: Optional[date] = None) -> date:
         the date of the start of the semester
     """
     if today is None:
-        today = timezone.now().date()
+        today = localdate()
 
     autumn = date(today.year, *settings.SITH_SEMESTER_START_AUTUMN)
     spring = date(today.year, *settings.SITH_SEMESTER_START_SPRING)
@@ -73,7 +73,7 @@ def get_semester_code(d: Optional[date] = None) -> str:
         the semester code corresponding to the given date
     """
     if d is None:
-        d = timezone.now().date()
+        d = localdate()
 
     start = get_start_of_semester(d)
 

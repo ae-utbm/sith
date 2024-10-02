@@ -19,7 +19,7 @@ from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.timezone import localtime, now
+from django.utils.timezone import localdate, localtime, now
 from django.utils.translation import gettext as _
 
 from club.forms import MailingForm
@@ -109,7 +109,7 @@ class TestMembershipQuerySet(TestClub):
 
     def test_ongoing_with_membership_ending_today(self):
         """Test that a membership ending the present day is considered as ended."""
-        today = timezone.now().date()
+        today = localdate()
         self.richard.memberships.filter(club=self.club).update(end_date=today)
         current_members = list(self.club.members.ongoing().order_by("id"))
         expected = [
