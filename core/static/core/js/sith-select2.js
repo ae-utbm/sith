@@ -158,7 +158,7 @@
 /**
  * @param {Select2Options} options
  */
-function sithSelect2 (options) { // eslint-disable-line no-unused-vars
+export function sithSelect2 (options) {
   const elem = $(options.element)
   return elem.select2({
     theme: elem[0].multiple ? 'classic' : 'default',
@@ -180,7 +180,7 @@ function sithSelect2 (options) { // eslint-disable-line no-unused-vars
  * @param {Select2Object[]} source The array containing the data
  * @param {RemoteSourceOptions} options
  */
-function local_data_source (source, options) { // eslint-disable-line no-unused-vars
+export function local_data_source (source, options) {
   if (options.excluded) {
     const ids = options.excluded()
     return { data: source.filter((i) => !ids.includes(i.id)) }
@@ -203,7 +203,7 @@ function local_data_source (source, options) { // eslint-disable-line no-unused-
  * @param {string} source The url of the endpoint
  * @param {RemoteSourceOptions} options
  */
-function remote_data_source (source, options) { // eslint-disable-line no-unused-vars
+export function remote_data_source (source, options) {
   jQuery.ajaxSettings.traditional = true
   const params = {
     url: source,
@@ -231,7 +231,7 @@ function remote_data_source (source, options) { // eslint-disable-line no-unused
   return { ajax: params }
 }
 
-function item_formatter (user) { // eslint-disable-line no-unused-vars
+export function item_formatter (user) {
   if (user.loading) {
     return user.text
   }

@@ -39,21 +39,21 @@ $(function () {
   })
 })
 
-function createQuickNotif (msg) { // eslint-disable-line no-unused-vars
+export function createQuickNotif (msg) {
   const el = document.createElement('li')
   el.textContent = msg
   el.addEventListener('click', () => el.parentNode.removeChild(el))
   document.getElementById('quick_notif').appendChild(el)
 }
 
-function deleteQuickNotifs () { // eslint-disable-line no-unused-vars
+export function deleteQuickNotifs () {
   const el = document.getElementById('quick_notif')
   while (el.firstChild) {
     el.removeChild(el.firstChild)
   }
 }
 
-function display_notif () { // eslint-disable-line no-unused-vars
+export function display_notif () {
   $('#header_notif').toggle().parent().toggleClass('white')
 }
 
@@ -63,11 +63,11 @@ function display_notif () { // eslint-disable-line no-unused-vars
 // Sadly, getting the cookie is not possible with CSRF_COOKIE_HTTPONLY or CSRF_USE_SESSIONS is True
 // So, the true workaround is to get the token from the dom
 // https://docs.djangoproject.com/en/2.0/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-is-true
-function getCSRFToken () { // eslint-disable-line no-unused-vars
+export function getCSRFToken () {
   return $('[name=csrfmiddlewaretoken]').val()
 }
 
-const initialUrlParams = new URLSearchParams(window.location.search) // eslint-disable-line no-unused-vars
+export const initialUrlParams = new URLSearchParams(window.location.search)
 
 /**
  * @readonly
@@ -85,7 +85,7 @@ const History = {
  * @param {History} action
  * @param {URL | null} url
  */
-function update_query_string (key, value, action = History.REPLACE, url = null) { // eslint-disable-line no-unused-vars
+export function update_query_string (key, value, action = History.REPLACE, url = null) {
   if (!url) {
     url = new URL(window.location.href)
   }
@@ -116,7 +116,7 @@ function update_query_string (key, value, action = History.REPLACE, url = null) 
  * @param {string} url The paginated endpoint to fetch
  * @return {Promise<Object[]>}
  */
-async function fetch_paginated (url) { // eslint-disable-line no-unused-vars
+export async function fetch_paginated (url) {
   const max_per_page = 199
   const paginated_url = new URL(url, document.location.origin)
   paginated_url.searchParams.set('page_size', max_per_page.toString())

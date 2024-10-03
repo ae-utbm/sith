@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 /* global DataTransfer */
-function alpine_webcam_builder ( // eslint-disable-line no-unused-vars
+export function alpine_webcam_builder (
   default_picture,
   delete_url,
   can_delete_picture
