@@ -108,8 +108,8 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 ## Finaliser l'installation
 
 ```bash
-git clone https://github.com/ae-utbm/sith3.git
-cd sith3
+git clone https://github.com/ae-utbm/sith.git
+cd sith
 
 # Création de l'environnement et installation des dépendances
 poetry install

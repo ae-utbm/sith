@@ -1,4 +1,4 @@
-name: Sith 3 CI
+name: Sith CI
 
 on:
   push:
