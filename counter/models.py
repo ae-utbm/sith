@@ -20,7 +20,7 @@ import random
 import string
 from datetime import date, datetime, timedelta
 from datetime import timezone as tz
-from typing import Tuple
+from typing import Self, Tuple
 
 from dict2xml import dict2xml
 from django.conf import settings
@@ -585,6 +585,23 @@ class Counter(models.Model):
         )["total"]
 
 
+class RefillingQuerySet(models.QuerySet):
+    def annotate_total(self) -> Self:
+        """Annotate the Queryset with the total amount.
+
+        The total is just the sum of the amounts for each row.
+        If no grouping is involved (like in most queries),
+        this is just the same as doing nothing and fetching the
+        `amount` attribute.
+
+        However, it may be useful when there is a `group by` clause
+        in the query, or when other models are queried and having
+        a common interface is helpful (e.g. `Selling.objects.annotate_total()`
+        and `Refilling.objects.annotate_total()` will both have the `total` field).
+        """
+        return self.annotate(total=Sum("amount"))
+
+
 class Refilling(models.Model):
     """Handle the refilling."""
 
@@ -612,6 +629,8 @@ class Refilling(models.Model):
         _("bank"), max_length=255, choices=settings.SITH_COUNTER_BANK, default="OTHER"
     )
     is_validated = models.BooleanField(_("is validated"), default=False)
+
+    objects = RefillingQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("refilling")
@@ -655,6 +674,15 @@ class Refilling(models.Model):
         self.customer.amount -= self.amount
         self.customer.save()
         super().delete(*args, **kwargs)
+
+
+class SellingQuerySet(models.QuerySet):
+    def annotate_total(self) -> Self:
+        """Annotate the Queryset with the total amount of the sales.
+
+        The total is considered as the sum of (unit_price * quantity).
+        """
+        return self.annotate(total=Sum(F("unit_price") * F("quantity")))
 
 
 class Selling(models.Model):
@@ -702,6 +730,8 @@ class Selling(models.Model):
         default="SITH_ACCOUNT",
     )
     is_validated = models.BooleanField(_("is validated"), default=False)
+
+    objects = SellingQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("selling")
