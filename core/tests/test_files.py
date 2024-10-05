@@ -13,8 +13,57 @@ from model_bakery.recipe import Recipe, foreign_key
 from PIL import Image
 from pytest_django.asserts import assertNumQueries
 
-from core.baker_recipes import board_user, subscriber_user
-from core.models import Group, SithFile, User
+from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
+from core.models import Group, RealGroup, SithFile, User
+from sas.models import Picture
+from sith import settings
+
+
+@pytest.mark.django_db
+class TestImageAccess:
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            lambda: baker.make(User, is_superuser=True),
+            lambda: baker.make(
+                User,
+                groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)],
+            ),
+            lambda: baker.make(
+                User,
+                groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_COM_ADMIN_ID)],
+            ),
+        ],
+    )
+    def test_sas_image_access(self, user_factory: Callable[[], User]):
+        """Test that only authorized users can access the sas image."""
+        user = user_factory()
+        picture: SithFile = baker.make(
+            Picture, parent=SithFile.objects.get(pk=settings.SITH_SAS_ROOT_DIR_ID)
+        )
+        assert picture.is_owned_by(user)
+
+    def test_sas_image_access_owner(self):
+        """Test that the owner of the image can access it."""
+        user = baker.make(User)
+        picture: Picture = baker.make(Picture, owner=user)
+        assert picture.is_owned_by(user)
+
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            lambda: baker.make(User),
+            subscriber_user.make,
+            old_subscriber_user.make,
+            board_user.make,
+        ],
+    )
+    def test_sas_image_access_forbidden(self, user_factory: Callable[[], User]):
+        cache.clear()
+        user = user_factory()
+        owner = baker.make(User)
+        picture: Picture = baker.make(Picture, owner=owner)
+        assert not picture.is_owned_by(user)
 
 
 @pytest.mark.django_db
