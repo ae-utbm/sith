@@ -1,15 +1,18 @@
 from datetime import timedelta
 
 import pytest
+from django.conf import settings
 from django.core.management import call_command
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import now
 from model_bakery import baker, seq
-from model_bakery.recipe import Recipe
+from model_bakery.recipe import Recipe, related
 
-from core.baker_recipes import subscriber_user
+from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import User
+from counter.models import Counter, Refilling, Selling
+from subscription.models import Subscription
 
 
 class TestSearchUsers(TestCase):
@@ -111,3 +114,37 @@ def test_user_account_not_found(client: Client):
         )
     )
     assert res.status_code == 404
+
+
+class TestFilterInactive(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        time_active = now() - settings.SITH_ACCOUNT_INACTIVITY_DELTA + timedelta(days=1)
+        time_inactive = time_active - timedelta(days=3)
+        very_old_subscriber = old_subscriber_user.extend(
+            subscriptions=related(Recipe(Subscription, subscription_end=time_inactive))
+        )
+        counter, seller = baker.make(Counter), baker.make(User)
+        sale_recipe = Recipe(
+            Selling,
+            counter=counter,
+            club=counter.club,
+            seller=seller,
+            is_validated=True,
+        )
+
+        cls.users = [
+            baker.make(User),
+            subscriber_user.make(),
+            old_subscriber_user.make(),
+            *very_old_subscriber.make(_quantity=3),
+        ]
+        sale_recipe.make(customer=cls.users[3].customer, date=time_active)
+        baker.make(
+            Refilling, customer=cls.users[4].customer, date=time_active, counter=counter
+        )
+        sale_recipe.make(customer=cls.users[5].customer, date=time_inactive)
+
+    def test_filter_inactive(self):
+        res = User.objects.filter(id__in=[u.id for u in self.users]).filter_inactive()
+        assert list(res) == [self.users[0], self.users[5]]

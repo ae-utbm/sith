@@ -40,6 +40,7 @@ import sys
 from pathlib import Path
 
 import sentry_sdk
+from dateutil.relativedelta import relativedelta
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -494,6 +495,9 @@ SITH_ECOCUP_LIMIT = 3
 
 # Defines pagination for cash summary
 SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
+
+SITH_ACCOUNT_INACTIVITY_DELTA = relativedelta(years=2)
+"""Time before which a user account is considered inactive"""
 
 # Defines which product type is the refilling type, and thus increases the account amount
 SITH_COUNTER_PRODUCTTYPE_REFILLING = 3

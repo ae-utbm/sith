@@ -27,15 +27,12 @@ import importlib
 import logging
 import os
 import unicodedata
-from datetime import date, timedelta
+from datetime import timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional, Self
 
 from django.conf import settings
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    UserManager,
-)
+from django.contrib.auth.models import AbstractBaseUser, UserManager
 from django.contrib.auth.models import (
     AnonymousUser as AuthAnonymousUser,
 )
@@ -51,15 +48,18 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.mail import send_mail
 from django.db import models, transaction
+from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import escape
+from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-from pydantic.v1 import NonNegativeInt
 
 if TYPE_CHECKING:
+    from pydantic import NonNegativeInt
+
     from club.models import Club
 
 
@@ -91,15 +91,15 @@ class Group(AuthGroup):
     class Meta:
         ordering = ["name"]
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse("core:group_list")
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         super().save(*args, **kwargs)
         cache.set(f"sith_group_{self.id}", self)
         cache.set(f"sith_group_{self.name.replace(' ', '_')}", self)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
         super().delete(*args, **kwargs)
         cache.delete(f"sith_group_{self.id}")
         cache.delete(f"sith_group_{self.name.replace(' ', '_')}")
@@ -164,9 +164,9 @@ class RealGroup(Group):
         proxy = True
 
 
-def validate_promo(value):
+def validate_promo(value: int) -> None:
     start_year = settings.SITH_SCHOOL_START_YEAR
-    delta = (date.today() + timedelta(days=180)).year - start_year
+    delta = (localdate() + timedelta(days=180)).year - start_year
     if value < 0 or delta < value:
         raise ValidationError(
             _("%(value)s is not a valid promo (between 0 and %(end)s)"),
@@ -174,7 +174,7 @@ def validate_promo(value):
         )
 
 
-def get_group(*, pk: int = None, name: str = None) -> Optional[Group]:
+def get_group(*, pk: int = None, name: str = None) -> Group | None:
     """Search for a group by its primary key or its name.
     Either one of the two must be set.
 
@@ -214,6 +214,31 @@ def get_group(*, pk: int = None, name: str = None) -> Optional[Group]:
     else:
         cache.set(f"sith_group_{pk_or_name}", "not_found")
     return group
+
+
+class UserQuerySet(models.QuerySet):
+    def filter_inactive(self) -> Self:
+        from counter.models import Refilling, Selling
+        from subscription.models import Subscription
+
+        threshold = now() - settings.SITH_ACCOUNT_INACTIVITY_DELTA
+        subscriptions = Subscription.objects.filter(
+            member_id=OuterRef("pk"), subscription_end__gt=localdate(threshold)
+        )
+        refills = Refilling.objects.filter(
+            customer__user_id=OuterRef("pk"), date__gt=threshold
+        )
+        purchases = Selling.objects.filter(
+            customer__user_id=OuterRef("pk"), date__gt=threshold
+        )
+        return self.exclude(
+            Q(Exists(subscriptions)) | Q(Exists(refills)) | Q(Exists(purchases))
+        )
+
+
+class CustomUserManager(UserManager.from_queryset(UserQuerySet)):
+    # see https://docs.djangoproject.com/fr/stable/topics/migrations/#model-managers
+    pass
 
 
 class User(AbstractBaseUser):
@@ -373,36 +398,41 @@ class User(AbstractBaseUser):
     )
     godfathers = models.ManyToManyField("User", related_name="godchildren", blank=True)
 
-    objects = UserManager()
+    objects = CustomUserManager()
 
     USERNAME_FIELD = "username"
-
-    def promo_has_logo(self):
-        return Path(
-            settings.BASE_DIR / f"core/static/core/img/promo_{self.promo}.png"
-        ).exists()
-
-    def has_module_perms(self, package_name):
-        return self.is_active
-
-    def has_perm(self, perm, obj=None):
-        return self.is_active and self.is_superuser
-
-    def get_absolute_url(self):
-        return reverse("core:user_profile", kwargs={"user_id": self.pk})
 
     def __str__(self):
         return self.get_display_name()
 
-    def to_dict(self):
-        return self.__dict__
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            if self.id:
+                old = User.objects.filter(id=self.id).first()
+                if old and old.username != self.username:
+                    self._change_username(self.username)
+            super().save(*args, **kwargs)
+
+    def get_absolute_url(self) -> str:
+        return reverse("core:user_profile", kwargs={"user_id": self.pk})
+
+    def promo_has_logo(self) -> bool:
+        return Path(
+            settings.BASE_DIR / f"core/static/core/img/promo_{self.promo}.png"
+        ).exists()
+
+    def has_module_perms(self, package_name: str) -> bool:
+        return self.is_active
+
+    def has_perm(self, perm: str, obj: Any = None) -> bool:
+        return self.is_active and self.is_superuser
 
     @cached_property
-    def was_subscribed(self):
+    def was_subscribed(self) -> bool:
         return self.subscriptions.exists()
 
     @cached_property
-    def is_subscribed(self):
+    def is_subscribed(self) -> bool:
         s = self.subscriptions.filter(
             subscription_start__lte=timezone.now(), subscription_end__gte=timezone.now()
         )
@@ -541,17 +571,6 @@ class User(AbstractBaseUser):
             self.date_of_birth.day,
         )
         return age
-
-    def save(self, *args, **kwargs):
-        create = False
-        with transaction.atomic():
-            if self.id:
-                old = User.objects.filter(id=self.id).first()
-                if old and old.username != self.username:
-                    self._change_username(self.username)
-            else:
-                create = True
-            super().save(*args, **kwargs)
 
     def make_home(self):
         if self.home is None:
