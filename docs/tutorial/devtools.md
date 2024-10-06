@@ -99,52 +99,122 @@ votre éditeur pour que Ruff fasse son travail automatiquement à chaque éditio
 Nous tenterons de vous faire ici un résumé pour deux éditeurs de textes populaires
 que sont VsCode et Sublime Text.
 
-### VsCode
+=== "VsCode"
 
-Installez l'extension Ruff pour VsCode.
-Ensuite, ajoutez ceci dans votre configuration :
+    Installez l'extension Ruff pour VsCode.
+    Ensuite, ajoutez ceci dans votre configuration :
 
-```json
-{
-    "[python]": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "charliermarsh.ruff"
+    ```json
+    {
+        "[python]": {
+            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "charliermarsh.ruff"
+        }
     }
-}
-```
+    ```
 
-### Sublime Text
+=== "Sublime Text"
 
-Vous devez installer ce plugin : https://packagecontrol.io/packages/LSP-ruff.
-Suivez ensuite les instructions données dans la description du plugin.
+    Vous devez installer le plugin [LSP-ruff](https://packagecontrol.io/packages/LSP-ruff).
+    Suivez ensuite les instructions données dans la description du plugin.
 
-Dans la configuration de votre projet, ajoutez ceci:
+    Dans la configuration de votre projet, ajoutez ceci:
 
-```json
-{
-    "settings": {
-        "lsp_format_on_save": true,
-        "LSP": { 
-            "LSP-ruff": {
-                "enabled": true,
+    ```json
+    {
+        "settings": {
+            "lsp_format_on_save": true,
+            "LSP": { 
+                "LSP-ruff": {
+                    "enabled": true,
+                }
             }
         }
     }
-}
+    ```
+
+    Si vous utilisez le plugin [anaconda](http://damnwidget.github.io/anaconda/),
+    pensez à modifier les paramètres du linter pep8
+    pour éviter de recevoir des warnings dans le formatage 
+    de ruff comme ceci :
+
+    ```json
+    {
+        "pep8_ignore": [
+          "E203",
+          "E266",
+          "E501",
+          "W503"
+        ]
+    }
+    ```
+
+## Configurer Standard pour son éditeur
+
+!!!note
+
+    Standard est inclus dans les dépendances du projet.
+    Si vous avez réussi à terminer l'installation, vous n'avez donc pas de configuration
+    supplémentaire à effectuer.
+
+Pour utiliser Standard, placez-vous à la racine du projet et lancer la commande suivante:
+
+```bash
+npx standard --fix # pour formatter le code
+npx standard # pour linter le code
 ```
 
-Si vous utilisez le plugin [anaconda](http://damnwidget.github.io/anaconda/),
-pensez à modifier les paramètres du linter pep8
-pour éviter de recevoir des warnings dans le formatage 
-de ruff comme ceci :
+Standard va alors faire son travail sur l'ensemble du projet puis vous dire
+si des documents ont été reformatés (si vous avez fait `npx standard`)
+ou bien s'il y a des erreurs à réparer (si vous avez faire `npx standard --fix`).
 
-```json
-{
-    "pep8_ignore": [
-      "E203",
-      "E266",
-      "E501",
-      "W503"
-    ]
-}
-```
+Appeler Standard en ligne de commandes avant de pousser votre code sur Github
+est une technique qui marche très bien.
+Cependant, vous risquez de souvent l'oublier.
+Or, lorsque le code ne respecte pas les standards de qualité,
+la pipeline bloque les PR sur les branches protégées.
+
+Pour éviter de vous faire régulièrement avoir, vous pouvez configurer
+votre éditeur pour que Standard fasse son travail automatiquement à chaque édition d'un fichier.
+Nous tenterons de vous faire ici un résumé pour deux éditeurs de textes populaires
+que sont VsCode et Sublime Text.
+
+=== "VsCode"
+
+    Standard est fourni par le plugin [vscode-standard](https://marketplace.visualstudio.com/items?itemName=standard.vscode-standard).
+
+    Ensuite, ajoutez ceci dans votre configuration :
+
+    ```json
+    {
+        standard.autoFixOnSave: true
+    }
+    ```
+
+=== "Sublime Text"
+
+    Pour formatter, il suffit d'installer le plugin [StandardFormat](https://packagecontrol.io/packages/StandardFormat).
+    Aucune configuration supplémentaire n'est nécessaire.
+
+    Pour la partie linter, cela nécessite plus de réglage.
+
+    * Installer [sublimelinter](http://www.sublimelinter.com/en/latest/installation.html)
+    * Installer le plugin pour standard [SublimeLinter-contrib-standard](https://packagecontrol.io/packages/SublimeLinter-contrib-standard)
+
+    Et enfin, dans la configuration de votre projet, ajouter les lignes suivantes :
+
+    ```json
+    {
+        "settings": {
+            "linters": {
+              "standard": {
+                "paths": {
+                    "PATH":"./node_modules/.bin/standard"
+                }
+              }
+            },
+        }
+    }
+    ```
+
+    Pensez à redémarrer le plugin sublimelinter.

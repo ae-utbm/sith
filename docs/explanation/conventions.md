@@ -152,16 +152,24 @@ En ce qui concerne les templates Jinja
 et les fichiers SCSS, la norme de formatage
 est celle par défaut de `djHTML`.
 
-Pour Javascript, vous pouvez utiliser
-Prettier, avec sa configuration par défaut,
-qui est plutôt bonne,
-mais nous n'avons pas de norme établie pour le projet.
+Pour Javascript, nous utilisons [standard](https://github.com/standard/standard).
+C'est à la fois un formateur et un linter avec très peu de configuration,
+un peu comme ruff.
+
+!!!note "Le javascript dans les templates jinja"
+
+    Standard n'est pas capable de lire dans les fichiers jinja,
+    c'est sa principale limitation.
+
+    Il est donc recommandé d'éviter de mettre trop de Javascript
+    directement dans jinja mais de préférer des fichiers dédiés.
+
 
 ### Qualité du code
 
-Pour s'assurer de la qualité du code, Ruff est également utilisé.
+Pour s'assurer de la qualité du code, Ruff et Standard sont également utilisés.
 
-Tout comme pour le format, Ruff doit tourner avant chaque commit.
+Tout comme pour le format, Ruff et Standard ddoivent tourner avant chaque commit.
 
 !!!note "to edit or not to edit"
 
@@ -181,6 +189,14 @@ Tout comme pour le format, Ruff doit tourner avant chaque commit.
     ```bash
     ruff check --fix
     ```
+
+    Standard se comporte d'une manière très similaire
+
+    ```bash
+    npx standard # Liste toutes les erreurs et leurs catégories
+    npx standard --fix # Applique tous les fix considérés safe et formatte le code
+    ```
+
 
 ## Documentation
 
