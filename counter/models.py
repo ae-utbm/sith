@@ -26,7 +26,7 @@ from dict2xml import dict2xml
 from django.conf import settings
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Exists, F, OuterRef, QuerySet, Sum, Value
+from django.db.models import Exists, F, OuterRef, Q, QuerySet, Sum, Value
 from django.db.models.functions import Concat, Length
 from django.forms import ValidationError
 from django.urls import reverse
@@ -209,6 +209,51 @@ class BillingInfo(models.Model):
             data["Address"]["Address2"] = self.address_2
         xml = dict2xml(data, wrap="Billing", newlines=False)
         return '<?xml version="1.0" encoding="UTF-8" ?>' + xml
+
+
+class AccountDumpQuerySet(models.QuerySet):
+    def ongoing(self) -> Self:
+        """Filter dump operations that are not completed yet."""
+        return self.filter(dump_operation=None)
+
+
+class AccountDump(models.Model):
+    """The process of dumping an account."""
+
+    customer = models.ForeignKey(
+        Customer, related_name="dumps", on_delete=models.CASCADE
+    )
+    warning_mail_sent_at = models.DateTimeField(
+        help_text=_(
+            "When the mail warning that the account was about to be dumped was sent."
+        )
+    )
+    warning_mail_error = models.BooleanField(
+        default=False,
+        help_text=_("Set this to True if the warning mail received an error"),
+    )
+    dump_operation = models.OneToOneField(
+        "Selling",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        help_text=_("The operation that emptied the account."),
+    )
+
+    objects = AccountDumpQuerySet.as_manager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["customer"],
+                condition=Q(dump_operation=None),
+                name="unique_ongoing_dump",
+            ),
+        ]
+
+    def __str__(self):
+        status = "ongoing" if self.dump_operation is None else "finished"
+        return f"{self.customer} - {status}"
 
 
 class ProductType(models.Model):

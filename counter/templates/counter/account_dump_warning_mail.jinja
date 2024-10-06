@@ -1,0 +1,43 @@
+<p>
+  Bonjour,
+</p>
+
+<p>
+  {% trans date=last_subscription_date|date(DATETIME_FORMAT) %}
+    You received this email because your last subscription to the
+    Students' association ended on {{ date }}.
+  {% endtrans %}
+</p>
+
+<p>
+  {% trans date=dump_date|date(DATETIME_FORMAT) %}
+    In accordance with the Internal Regulations, the balance of any
+    inactive AE account for more than 2 years automatically goes back
+    to the AE.
+    The money present on your account will therefore be recovered in full
+    on {{ date }}.
+  {% endtrans %}
+</p>
+
+<p>
+  {% trans %}However, if your subscription is renewed by this date,
+    your right to keep the money in your AE account will be renewed.{% endtrans %}
+</p>
+
+{% if balance >= 10 %}
+  <p>
+    {% trans %}You can also request a refund by sending an email to
+      <a href="mailto:ae@utbm.fr">ae@utbm.fr</a>
+      before the aforementioned date.{% endtrans %}
+  </p>
+{% endif %}
+
+<p>
+  {% trans %}Sincerely{% endtrans %},
+</p>
+
+<p>
+  L'association des étudiants de l'UTBM <br>
+  6, Boulevard Anatole France <br>
+  90000 Belfort
+</p>

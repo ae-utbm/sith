@@ -37,6 +37,7 @@ import binascii
 import logging
 import os
 import sys
+from datetime import timedelta
 from pathlib import Path
 
 import sentry_sdk
@@ -229,13 +230,20 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
+        "dump_mail_file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "account_dump_mail.log",
+            "formatter": "simple",
+        },
     },
     "loggers": {
         "main": {
             "handlers": ["log_to_stdout"],
             "level": "INFO",
             "propagate": True,
-        }
+        },
+        "account_dump_mail": {"handlers": ["dump_mail_file", "log_to_stdout"]},
     },
 }
 
@@ -498,6 +506,8 @@ SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
 
 SITH_ACCOUNT_INACTIVITY_DELTA = relativedelta(years=2)
 """Time before which a user account is considered inactive"""
+SITH_ACCOUNT_DUMP_DELTA = timedelta(days=30)
+"""timedelta between the warning mail and the actual account dump"""
 
 # Defines which product type is the refilling type, and thus increases the account amount
 SITH_COUNTER_PRODUCTTYPE_REFILLING = 3
