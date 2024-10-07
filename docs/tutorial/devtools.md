@@ -123,7 +123,7 @@ que sont VsCode et Sublime Text.
     ```json
     {
         "settings": {
-            "lsp_format_on_save": true,
+            "lsp_format_on_save": true, // Commun à ruff et biome
             "LSP": { 
                 "LSP-ruff": {
                     "enabled": true,
@@ -149,72 +149,66 @@ que sont VsCode et Sublime Text.
     }
     ```
 
-## Configurer Standard pour son éditeur
+## Configurer Biome pour son éditeur
 
 !!!note
 
-    Standard est inclus dans les dépendances du projet.
+    Biome est inclus dans les dépendances du projet.
     Si vous avez réussi à terminer l'installation, vous n'avez donc pas de configuration
     supplémentaire à effectuer.
 
-Pour utiliser Standard, placez-vous à la racine du projet et lancer la commande suivante:
+Pour utiliser Biome, placez-vous à la racine du projet et lancer la commande suivante:
 
 ```bash
-npx standard --fix # pour formatter le code
-npx standard # pour linter le code
+    npx @biomejs/biome check # Pour checker le code avec le linter et le formater
+    npx @biomejs/biome check --write # Pour appliquer les changemnts
 ```
 
-Standard va alors faire son travail sur l'ensemble du projet puis vous dire
-si des documents ont été reformatés (si vous avez fait `npx standard`)
-ou bien s'il y a des erreurs à réparer (si vous avez faire `npx standard --fix`).
+Biome va alors faire son travail sur l'ensemble du projet puis vous dire
+si des documents ont été reformatés (si vous avez fait `npx @biomejs/biome format --write`)
+ou bien s'il y a des erreurs à réparer (si vous avez faire `npx @biomejs/biome lint`) ou les deux (si vous avez fait `npx @biomejs/biome check --write`).
 
-Appeler Standard en ligne de commandes avant de pousser votre code sur Github
+Appeler Biome en ligne de commandes avant de pousser votre code sur Github
 est une technique qui marche très bien.
 Cependant, vous risquez de souvent l'oublier.
-Or, lorsque le code ne respecte pas les standards de qualité,
+Or, lorsque le code ne respecte pas les Biomes de qualité,
 la pipeline bloque les PR sur les branches protégées.
 
 Pour éviter de vous faire régulièrement avoir, vous pouvez configurer
-votre éditeur pour que Standard fasse son travail automatiquement à chaque édition d'un fichier.
+votre éditeur pour que Biome fasse son travail automatiquement à chaque édition d'un fichier.
 Nous tenterons de vous faire ici un résumé pour deux éditeurs de textes populaires
 que sont VsCode et Sublime Text.
 
 === "VsCode"
 
-    Standard est fourni par le plugin [vscode-standard](https://marketplace.visualstudio.com/items?itemName=standard.vscode-standard).
+    Biome est fourni par le plugin [Biome](https://marketplace.visualstudio.com/items?itemName=biomejs.biome).
 
     Ensuite, ajoutez ceci dans votre configuration :
 
     ```json
     {
-        standard.autoFixOnSave: true
+      "editor.defaultFormatter": "<other formatter>",
+      "[javascript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+      }
     }
     ```
 
 === "Sublime Text"
 
-    Pour formatter, il suffit d'installer le plugin [StandardFormat](https://packagecontrol.io/packages/StandardFormat).
-    Aucune configuration supplémentaire n'est nécessaire.
-
-    Pour la partie linter, cela nécessite plus de réglage.
-
-    * Installer [sublimelinter](http://www.sublimelinter.com/en/latest/installation.html)
-    * Installer le plugin pour standard [SublimeLinter-contrib-standard](https://packagecontrol.io/packages/SublimeLinter-contrib-standard)
+    Tout comme pour ruff, il suffit d'installer un plugin lsp [LSP-biome](https://packagecontrol.io/packages/LSP-biome).
 
     Et enfin, dans la configuration de votre projet, ajouter les lignes suivantes :
 
     ```json
     {
         "settings": {
-            "linters": {
-              "standard": {
-                "paths": {
-                    "PATH":"./node_modules/.bin/standard"
+            "lsp_format_on_save": true, // Commun à ruff et biome
+            "LSP": { 
+                "LSP-biome": {
+                    "enabled": true,
                 }
-              }
-            },
+            }
         }
     }
     ```
-
-    Pensez à redémarrer le plugin sublimelinter.

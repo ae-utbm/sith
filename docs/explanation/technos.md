@@ -354,25 +354,27 @@ Bien installé, il peut effectuer ce travail
 à chaque sauvegarde d'un fichier dans son éditeur,
 ce qui est très agréable pour travailler.
 
-### Standard
+### Biome
 
-[Site officiel](https://github.com/standard/standard)
+[Site officiel](https://biomejs.dev/)
 
 Puisque Ruff ne fonctionne malheureusement que pour le Python,
-nous utilisons Standard pour le javascript.
+nous utilisons Biome pour le javascript.
 
-Tout comme Ruff, standard fait office de formateur et de linter.
+Biome est également capable d'analyser et formater les fichiers json et css.
+
+Tout comme Ruff, Biome fait office de formateur et de linter.
 
 ### DjHTML
 
 [Site officiel](https://github.com/rtts/djhtml)
 
-Ruff permet de formater les fichiers Python et Standard les fichiers js,
+Ruff permet de formater les fichiers Python et Biome les fichiers js,
 mais ils ne formattent pas les templates et les feuilles de style.
 Pour ça, il faut un autre outil, aisément intégrable
 dans la CI : `djHTML`.
 
-En utilisant conjointement Ruff, Standard et djHTML,
+En utilisant conjointement Ruff, Biome et djHTML,
 on arrive donc à la fois à formater les fichiers
 Python et les fichiers relatifs au frontend.
 
