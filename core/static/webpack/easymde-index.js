@@ -10,7 +10,7 @@ import easyMde from "easymde";
  * @param {HTMLTextAreaElement} textarea to use
  * @param {string} link to the markdown api
  **/
-function easymdeFactory(textarea, markdownApiUrl) {
+window.easymdeFactory = (textarea, markdownApiUrl) => {
   const easymde = new easyMde({
     element: textarea,
     spellChecker: false,
@@ -183,6 +183,4 @@ function easymdeFactory(textarea, markdownApiUrl) {
   for (const submit of submits) {
     submit.addEventListener("click", onSubmitClick);
   }
-}
-
-window.easymdeFactory = easymdeFactory;
+};
