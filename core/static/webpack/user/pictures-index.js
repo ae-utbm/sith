@@ -28,7 +28,7 @@ import { showSaveFilePicker } from "native-file-system-adapter";
 
 /**
  * Load user picture page with a nice download bar
- * @param {String} Link to the api to fetch pictures from the user
+ * @param {string} Url of the api endpoint to fetch pictures from the user
  **/
 window.loadPicturePage = (apiUrl) => {
   document.addEventListener("alpine:init", () => {

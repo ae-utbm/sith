@@ -7,13 +7,7 @@
 {%- endblock -%}
 
 {% block additional_js %}
-  <script src="{{ static("vendored/cytoscape/cytoscape.min.js") }}" defer></script>
-  <script src="{{ static("vendored/cytoscape/cytoscape-cxtmenu.min.js") }}" defer></script>
-
-  <script src="{{ static("vendored/cytoscape/klay.min.js") }}" defer></script>
-  <script src="{{ static("vendored/cytoscape/cytoscape-klay.min.js") }}" defer></script>
-
-  <script src="{{ static("user/js/family_graph.js") }}" defer></script>
+  <script src="{{ static("webpack/user/family-graph-index.js") }}" defer></script>
 {% endblock %}
 
 {% block title %}
@@ -96,10 +90,14 @@
   </div>
 
   <script>
-    const apiUrl = "{{ api_url }}";
-    const activeUser = "{{ object.id }}"
-    const depthMin = {{ depth_min }};
-    const depthMax = {{ depth_max }};
+    window.addEventListener("DOMContentLoaded", () => {
+      loadFamilyGraph(
+        "{{ api_url }}",
+        "{{ object.id }}",
+        {{ depth_min }},
+        {{ depth_max }},
+      );
+    })
   </script>
 {% endblock %}
 
