@@ -158,14 +158,14 @@
  * @param {Select2Options} options
  */
 function sithSelect2(options) {
-	const elem = $(options.element);
-	return elem.select2({
-		theme: elem[0].multiple ? "classic" : "default",
-		minimumInputLength: 2,
-		templateResult: select_item_builder(options.picture_getter),
-		...options.data_source,
-		...(options.overrides || {}),
-	});
+  const elem = $(options.element);
+  return elem.select2({
+    theme: elem[0].multiple ? "classic" : "default",
+    minimumInputLength: 2,
+    templateResult: select_item_builder(options.picture_getter),
+    ...options.data_source,
+    ...(options.overrides || {}),
+  });
 }
 
 /**
@@ -180,11 +180,11 @@ function sithSelect2(options) {
  * @param {RemoteSourceOptions} options
  */
 function local_data_source(source, options) {
-	if (options.excluded) {
-		const ids = options.excluded();
-		return { data: source.filter((i) => !ids.includes(i.id)) };
-	}
-	return { data: source };
+  if (options.excluded) {
+    const ids = options.excluded();
+    return { data: source.filter((i) => !ids.includes(i.id)) };
+  }
+  return { data: source };
 }
 
 /**
@@ -203,37 +203,37 @@ function local_data_source(source, options) {
  * @param {RemoteSourceOptions} options
  */
 function remote_data_source(source, options) {
-	jQuery.ajaxSettings.traditional = true;
-	const params = {
-		url: source,
-		dataType: "json",
-		cache: true,
-		delay: 250,
-		data: function (params) {
-			return {
-				search: params.term,
-				exclude: [
-					...(this.val() || []).map((i) => Number.parseInt(i)),
-					...(options.excluded ? options.excluded() : []),
-				],
-			};
-		},
-	};
-	if (options.result_converter) {
-		params.processResults = (data) => ({
-			results: data.results.map(options.result_converter),
-		});
-	}
-	if (options.overrides) {
-		Object.assign(params, options.overrides);
-	}
-	return { ajax: params };
+  jQuery.ajaxSettings.traditional = true;
+  const params = {
+    url: source,
+    dataType: "json",
+    cache: true,
+    delay: 250,
+    data: function (params) {
+      return {
+        search: params.term,
+        exclude: [
+          ...(this.val() || []).map((i) => Number.parseInt(i)),
+          ...(options.excluded ? options.excluded() : []),
+        ],
+      };
+    },
+  };
+  if (options.result_converter) {
+    params.processResults = (data) => ({
+      results: data.results.map(options.result_converter),
+    });
+  }
+  if (options.overrides) {
+    Object.assign(params, options.overrides);
+  }
+  return { ajax: params };
 }
 
 function item_formatter(user) {
-	if (user.loading) {
-		return user.text;
-	}
+  if (user.loading) {
+    return user.text;
+  }
 }
 
 /**
@@ -242,20 +242,19 @@ function item_formatter(user) {
  * @return {function(string): jQuery|HTMLElement}
  */
 function select_item_builder(picture_getter) {
-	return (item) => {
-		const picture =
-			typeof picture_getter === "function" ? picture_getter(item) : null;
-		const img_html = picture
-			? `<img 
+  return (item) => {
+    const picture = typeof picture_getter === "function" ? picture_getter(item) : null;
+    const img_html = picture
+      ? `<img 
           src="${picture_getter(item)}" 
           alt="${item.text}" 
           onerror="this.src = '/static/core/img/unknown.jpg'" 
         />`
-			: "";
+      : "";
 
-		return $(`<div class="select-item">
+    return $(`<div class="select-item">
         ${img_html}
          <span class="select-item-text">${item.text}</span>
          </div>`);
-	};
+  };
 }

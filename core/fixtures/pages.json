@@ -1,74 +1,74 @@
 [
-	{
-		"pk": 1,
-		"model": "core.page",
-		"fields": {
-			"full_name": "guy2",
-			"owner_group": 1,
-			"parent": null,
-			"edit_groups": [],
-			"name": "guy2",
-			"view_groups": []
-		}
-	},
-	{
-		"pk": 2,
-		"model": "core.page",
-		"fields": {
-			"full_name": "guy2/bibou",
-			"owner_group": 1,
-			"parent": 1,
-			"edit_group": [],
-			"name": "bibou",
-			"view_group": []
-		}
-	},
-	{
-		"pk": 3,
-		"model": "core.page",
-		"fields": {
-			"full_name": "guy2/bibou/troll",
-			"owner_group": 1,
-			"parent": 2,
-			"edit_group": [],
-			"name": "troll",
-			"view_group": []
-		}
-	},
-	{
-		"pk": 4,
-		"model": "core.page",
-		"fields": {
-			"full_name": "guy",
-			"owner_group": 1,
-			"parent": null,
-			"edit_group": [1],
-			"name": "guy",
-			"view_group": [1]
-		}
-	},
-	{
-		"pk": 5,
-		"model": "core.page",
-		"fields": {
-			"full_name": "bibou",
-			"owner_group": 3,
-			"parent": null,
-			"edit_group": [1],
-			"name": "bibou",
-			"view_group": []
-		}
-	},
-	{
-		"pk": 6,
-		"model": "core.page",
-		"fields": {
-			"full_name": "guy2/guy",
-			"owner_group": 1,
-			"parent": 1,
-			"edit_group": [],
-			"name": "guy",
-			"view_group": []
-		}
-	}
+  {
+    "pk": 1,
+    "model": "core.page",
+    "fields": {
+      "full_name": "guy2",
+      "owner_group": 1,
+      "parent": null,
+      "edit_groups": [],
+      "name": "guy2",
+      "view_groups": []
+    }
+  },
+  {
+    "pk": 2,
+    "model": "core.page",
+    "fields": {
+      "full_name": "guy2/bibou",
+      "owner_group": 1,
+      "parent": 1,
+      "edit_group": [],
+      "name": "bibou",
+      "view_group": []
+    }
+  },
+  {
+    "pk": 3,
+    "model": "core.page",
+    "fields": {
+      "full_name": "guy2/bibou/troll",
+      "owner_group": 1,
+      "parent": 2,
+      "edit_group": [],
+      "name": "troll",
+      "view_group": []
+    }
+  },
+  {
+    "pk": 4,
+    "model": "core.page",
+    "fields": {
+      "full_name": "guy",
+      "owner_group": 1,
+      "parent": null,
+      "edit_group": [1],
+      "name": "guy",
+      "view_group": [1]
+    }
+  },
+  {
+    "pk": 5,
+    "model": "core.page",
+    "fields": {
+      "full_name": "bibou",
+      "owner_group": 3,
+      "parent": null,
+      "edit_group": [1],
+      "name": "bibou",
+      "view_group": []
+    }
+  },
+  {
+    "pk": 6,
+    "model": "core.page",
+    "fields": {
+      "full_name": "guy2/guy",
+      "owner_group": 1,
+      "parent": 1,
+      "edit_group": [],
+      "name": "guy",
+      "view_group": []
+    }
+  }
 ]

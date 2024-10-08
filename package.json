@@ -1,38 +1,39 @@
 {
-	"name": "sith",
-	"version": "3",
-	"description": "Le web Sith de l'AE",
-	"main": "index.js",
-	"scripts": {
-		"compile": "webpack --mode production",
-		"compile-dev": "webpack --mode development",
-		"serve": "webpack --mode development --watch"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "GPL-3.0-only",
-	"sideEffects": [".css"],
-	"devDependencies": {
-		"@babel/core": "^7.25.2",
-		"@babel/preset-env": "^7.25.4",
-		"@biomejs/biome": "1.9.3",
-		"babel-loader": "^9.2.1",
-		"css-loader": "^7.1.2",
-		"css-minimizer-webpack-plugin": "^7.0.0",
-		"expose-loader": "^5.0.0",
-		"mini-css-extract-plugin": "^2.9.1",
-		"source-map-loader": "^5.0.0",
-		"terser-webpack-plugin": "^5.3.10",
-		"webpack": "^5.94.0",
-		"webpack-cli": "^5.1.4"
-	},
-	"dependencies": {
-		"@fortawesome/fontawesome-free": "^6.6.0",
-		"alpinejs": "^3.14.1",
-		"easymde": "^2.18.0",
-		"glob": "^11.0.0",
-		"jquery": "^3.7.1",
-		"jquery-ui": "^1.14.0",
-		"jquery.shorten": "^1.0.0"
-	}
+  "name": "sith",
+  "version": "3",
+  "description": "Le web Sith de l'AE",
+  "main": "index.js",
+  "scripts": {
+    "compile": "webpack --mode production",
+    "compile-dev": "webpack --mode development",
+    "serve": "webpack --mode development --watch",
+    "check": "biome check --write"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0-only",
+  "sideEffects": [".css"],
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@biomejs/biome": "1.9.3",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.2",
+    "css-minimizer-webpack-plugin": "^7.0.0",
+    "expose-loader": "^5.0.0",
+    "mini-css-extract-plugin": "^2.9.1",
+    "source-map-loader": "^5.0.0",
+    "terser-webpack-plugin": "^5.3.10",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.6.0",
+    "alpinejs": "^3.14.1",
+    "easymde": "^2.18.0",
+    "glob": "^11.0.0",
+    "jquery": "^3.7.1",
+    "jquery-ui": "^1.14.0",
+    "jquery.shorten": "^1.0.0"
+  }
 }

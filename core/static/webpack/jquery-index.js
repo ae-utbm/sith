@@ -19,7 +19,7 @@ require("jquery-ui/themes/base/all.css");
  * @param {Object} options object to pass to the shorten function
  **/
 function shorten(selector, options) {
-	$(selector).shorten(options);
+  $(selector).shorten(options);
 }
 
 window.shorten = shorten;
