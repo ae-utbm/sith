@@ -632,6 +632,12 @@ class UserAccountBase(UserTabsMixin, DetailView):
             return super().dispatch(request, *arg, **kwargs)
         raise PermissionDenied
 
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if not hasattr(obj, "customer"):
+            raise Http404(_("User has no account"))
+        return obj
+
 
 class UserAccountView(UserAccountBase):
     """Display a user's account."""
@@ -670,11 +676,6 @@ class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
     """Display a user's account for month."""
 
     template_name = "core/user_account_detail.jinja"
-
-    def get(self, request, *args, **kwargs):
-        if not hasattr(self.get_object(), "customer"):
-            raise Http404(_("This user has no account"))
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)

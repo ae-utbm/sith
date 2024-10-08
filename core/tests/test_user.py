@@ -1,7 +1,8 @@
 from datetime import timedelta
 
+import pytest
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import now
 from model_bakery import baker, seq
@@ -95,3 +96,18 @@ class TestSearchUsersView(TestSearchUsers):
         self.client.force_login(subscriber_user.make())
         response = self.client.get(reverse("core:search"))
         assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_user_account_not_found(client: Client):
+    client.force_login(baker.make(User, is_superuser=True))
+    user = baker.make(User)
+    res = client.get(reverse("core:user_account", kwargs={"user_id": user.id}))
+    assert res.status_code == 404
+    res = client.get(
+        reverse(
+            "core:user_account_detail",
+            kwargs={"user_id": user.id, "year": 2024, "month": 10},
+        )
+    )
+    assert res.status_code == 404
