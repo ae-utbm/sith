@@ -1,13 +1,11 @@
 $(document).ready(() => {
-  transition_time = 1000;
+  const transitionTime = 1000;
 
-  i = 0;
-  max = $("#slideshow .slide").length;
-
-  next_trigger = 0;
+  let i = 0;
+  const max = $("#slideshow .slide").length;
 
   function enterFullscreen() {
-    element = document.getElementById("slideshow");
+    const element = document.getElementById("slideshow");
     $(element).addClass("fullscreen");
     if (element.requestFullscreen) {
       element.requestFullscreen();
@@ -21,7 +19,7 @@ $(document).ready(() => {
   }
 
   function exitFullscreen() {
-    element = document.getElementById("slideshow");
+    const element = document.getElementById("slideshow");
     $(element).removeClass("fullscreen");
     if (document.exitFullscreen) {
       document.exitFullscreen();
@@ -34,61 +32,59 @@ $(document).ready(() => {
     }
   }
 
-  function init_progress_bar() {
+  function initProgressBar() {
     $("#slideshow #progress_bar").css("transition", "none");
     $("#slideshow #progress_bar").removeClass("progress");
     $("#slideshow #progress_bar").addClass("init");
   }
 
-  function start_progress_bar(display_time) {
+  function startProgressBar(displayTime) {
     $("#slideshow #progress_bar").removeClass("init");
     $("#slideshow #progress_bar").addClass("progress");
-    $("#slideshow #progress_bar").css("transition", `width ${display_time}s linear`);
+    $("#slideshow #progress_bar").css("transition", `width ${displayTime}s linear`);
   }
 
   function next() {
-    init_progress_bar();
-    slide = $($("#slideshow .slide").get(i % max));
+    initProgressBar();
+    const slide = $($("#slideshow .slide").get(i % max));
     slide.removeClass("center");
     slide.addClass("left");
 
-    next_slide = $($("#slideshow .slide").get((i + 1) % max));
-    next_slide.removeClass("right");
-    next_slide.addClass("center");
-    display_time = next_slide.attr("display_time") || 2;
+    const nextSlide = $($("#slideshow .slide").get((i + 1) % max));
+    nextSlide.removeClass("right");
+    nextSlide.addClass("center");
+    const displayTime = nextSlide.attr("display_time") || 2;
 
     $("#slideshow .bullet").removeClass("active");
-    bullet = $("#slideshow .bullet")[(i + 1) % max];
+    const bullet = $("#slideshow .bullet")[(i + 1) % max];
     $(bullet).addClass("active");
 
     i = (i + 1) % max;
 
     setTimeout(() => {
-      others_left = $("#slideshow .slide.left");
-      others_left.removeClass("left");
-      others_left.addClass("right");
+      const othersLeft = $("#slideshow .slide.left");
+      othersLeft.removeClass("left");
+      othersLeft.addClass("right");
 
-      start_progress_bar(display_time);
-      next_trigger = setTimeout(next, display_time * 1000);
-    }, transition_time);
+      startProgressBar(displayTime);
+      setTimeout(next, displayTime * 1000);
+    }, transitionTime);
   }
 
-  display_time = $("#slideshow .center").attr("display_time");
-  init_progress_bar();
+  const displayTime = $("#slideshow .center").attr("display_time");
+  initProgressBar();
   setTimeout(() => {
     if (max > 1) {
-      start_progress_bar(display_time);
-      setTimeout(next, display_time * 1000);
+      startProgressBar(displayTime);
+      setTimeout(next, displayTime * 1000);
     }
   }, 10);
 
-  $("#slideshow").click((e) => {
-    if (!$("#slideshow").hasClass("fullscreen")) {
-      console.log("Entering fullscreen ...");
-      enterFullscreen();
-    } else {
-      console.log("Exiting fullscreen ...");
+  $("#slideshow").click(() => {
+    if ($("#slideshow").hasClass("fullscreen")) {
       exitFullscreen();
+    } else {
+      enterFullscreen();
     }
   });
 
@@ -96,7 +92,6 @@ $(document).ready(() => {
     if (e.keyCode === 27) {
       // escape key maps to keycode `27`
       e.preventDefault();
-      console.log("Exiting fullscreen ...");
       exitFullscreen();
     }
   });

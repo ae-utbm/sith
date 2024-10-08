@@ -20,7 +20,10 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "all": true
     }
+  },
+  "javascript": {
+    "globals": ["Alpine", "$", "jQuery", "gettext", "interpolate"]
   }
 }

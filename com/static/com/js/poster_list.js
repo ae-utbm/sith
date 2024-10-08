@@ -1,5 +1,5 @@
 $(document).ready(() => {
-  $("#poster_list #view").click((e) => {
+  $("#poster_list #view").click(() => {
     $("#view").removeClass("active");
   });
 

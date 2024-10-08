@@ -13,13 +13,11 @@ $(() => {
         bottom: "5%",
       });
       target.css("height", "300px");
-      console.log(target);
     },
     buttons: [
       {
         text: "Choose",
         click: function () {
-          console.log($("#file_id"));
           $(`input[name=${$(this).attr("name")}]`).attr(
             "value",
             $("#file_id").attr("value"),
@@ -34,7 +32,6 @@ $(() => {
     .button()
     .on("click", function () {
       const popup = popups.filter(`[name=${$(this).attr("name")}]`);
-      console.log(popup);
       popup.html(
         '<iframe src="/file/popup" width="100%" height="95%"></iframe><div id="file_id" value="null" />',
       );
@@ -45,6 +42,7 @@ $(() => {
   });
 });
 
+// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
 function createQuickNotif(msg) {
   const el = document.createElement("li");
   el.textContent = msg;
@@ -52,6 +50,7 @@ function createQuickNotif(msg) {
   document.getElementById("quick_notif").appendChild(el);
 }
 
+// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
 function deleteQuickNotifs() {
   const el = document.getElementById("quick_notif");
   while (el.firstChild) {
@@ -59,7 +58,8 @@ function deleteQuickNotifs() {
   }
 }
 
-function display_notif() {
+// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
+function displayNotif() {
   $("#header_notif").toggle().parent().toggleClass("white");
 }
 
@@ -69,10 +69,13 @@ function display_notif() {
 // Sadly, getting the cookie is not possible with CSRF_COOKIE_HTTPONLY or CSRF_USE_SESSIONS is True
 // So, the true workaround is to get the token from the dom
 // https://docs.djangoproject.com/en/2.0/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-is-true
+// biome-ignore lint/style/useNamingConvention: can't find it used anywhere but I will not play with the devil
+// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
 function getCSRFToken() {
   return $("[name=csrfmiddlewaretoken]").val();
 }
 
+// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
 const initialUrlParams = new URLSearchParams(window.location.search);
 
 /**
@@ -80,8 +83,11 @@ const initialUrlParams = new URLSearchParams(window.location.search);
  * @enum {number}
  */
 const History = {
+  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   NONE: 0,
+  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   PUSH: 1,
+  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   REPLACE: 2,
 };
 
@@ -91,7 +97,8 @@ const History = {
  * @param {History} action
  * @param {URL | null} url
  */
-function update_query_string(key, value, action = History.REPLACE, url = null) {
+// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
+function updateQueryString(key, value, action = History.REPLACE, url = null) {
   let ret = url;
   if (!ret) {
     ret = new URL(window.location.href);
@@ -125,24 +132,25 @@ function update_query_string(key, value, action = History.REPLACE, url = null) {
  * @param {string} url The paginated endpoint to fetch
  * @return {Promise<Object[]>}
  */
-async function fetch_paginated(url) {
-  const max_per_page = 199;
-  const paginated_url = new URL(url, document.location.origin);
-  paginated_url.searchParams.set("page_size", max_per_page.toString());
-  paginated_url.searchParams.set("page", "1");
+// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
+async function fetchPaginated(url) {
+  const maxPerPage = 199;
+  const paginatedUrl = new URL(url, document.location.origin);
+  paginatedUrl.searchParams.set("page_size", maxPerPage.toString());
+  paginatedUrl.searchParams.set("page", "1");
 
-  const first_page = await (await fetch(paginated_url)).json();
-  const results = first_page.results;
+  const firstPage = await (await fetch(paginatedUrl)).json();
+  const results = firstPage.results;
 
-  const nb_pictures = first_page.count;
-  const nb_pages = Math.ceil(nb_pictures / max_per_page);
+  const nbPictures = firstPage.count;
+  const nbPages = Math.ceil(nbPictures / maxPerPage);
 
-  if (nb_pages > 1) {
+  if (nbPages > 1) {
     const promises = [];
-    for (let i = 2; i <= nb_pages; i++) {
-      paginated_url.searchParams.set("page", i.toString());
+    for (let i = 2; i <= nbPages; i++) {
+      paginatedUrl.searchParams.set("page", i.toString());
       promises.push(
-        fetch(paginated_url).then((res) => res.json().then((json) => json.results)),
+        fetch(paginatedUrl).then((res) => res.json().then((json) => json.results)),
       );
     }
     results.push(...(await Promise.all(promises)).flat());

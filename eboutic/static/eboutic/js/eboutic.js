@@ -14,6 +14,7 @@ const BASKET_ITEMS_COOKIE_NAME = "basket_items";
  * @returns {string|null|undefined} the value of the cookie or null if it does not exist, undefined if not found
  */
 function getCookie(name) {
+  // biome-ignore lint/style/useBlockStatements: <explanation>
   if (!document.cookie || document.cookie.length === 0) return null;
 
   const found = document.cookie
@@ -28,7 +29,7 @@ function getCookie(name) {
  * Fetch the basket items from the associated cookie
  * @returns {BasketItem[]|[]} the items in the basket
  */
-function get_starting_items() {
+function getStartingItems() {
   const cookie = getCookie(BASKET_ITEMS_COOKIE_NAME);
   if (!cookie) {
     return [];
@@ -45,13 +46,13 @@ function get_starting_items() {
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("basket", () => ({
-    items: get_starting_items(),
+    items: getStartingItems(),
 
     /**
      * Get the total price of the basket
      * @returns {number} The total price of the basket
      */
-    get_total() {
+    getTotal() {
       return this.items.reduce((acc, item) => acc + item.quantity * item.unit_price, 0);
     },
 
@@ -61,38 +62,40 @@ document.addEventListener("alpine:init", () => {
      */
     add(item) {
       item.quantity++;
-      this.set_cookies();
+      this.setCookies();
     },
 
     /**
      * Remove 1 to the quantity of an item in the basket
      * @param {BasketItem} item_id
      */
-    remove(item_id) {
-      const index = this.items.findIndex((e) => e.id === item_id);
+    remove(itemId) {
+      const index = this.items.findIndex((e) => e.id === itemId);
 
-      if (index < 0) return;
+      if (index < 0) {
+        return;
+      }
       this.items[index].quantity -= 1;
 
       if (this.items[index].quantity === 0) {
         this.items = this.items.filter((e) => e.id !== this.items[index].id);
       }
-      this.set_cookies();
+      this.setCookies();
     },
 
     /**
      * Remove all the items from the basket & cleans the catalog CSS classes
      */
-    clear_basket() {
+    clearBasket() {
       this.items = [];
-      this.set_cookies();
+      this.setCookies();
     },
 
     /**
      * Set the cookie in the browser with the basket items
      * ! the cookie survives an hour
      */
-    set_cookies() {
+    setCookies() {
       if (this.items.length === 0) {
         document.cookie = `${BASKET_ITEMS_COOKIE_NAME}=;Max-Age=0`;
       } else {
@@ -107,18 +110,19 @@ document.addEventListener("alpine:init", () => {
      * @param {number} price The unit price of the product
      * @returns {BasketItem} The created item
      */
-    create_item(id, name, price) {
-      const new_item = {
+    createItem(id, name, price) {
+      const newItem = {
         id,
         name,
         quantity: 0,
+        // biome-ignore lint/style/useNamingConvention: used by django backend
         unit_price: price,
       };
 
-      this.items.push(new_item);
-      this.add(new_item);
+      this.items.push(newItem);
+      this.add(newItem);
 
-      return new_item;
+      return newItem;
     },
 
     /**
@@ -128,15 +132,15 @@ document.addEventListener("alpine:init", () => {
      * @param {string} name The name of the product
      * @param {number} price The unit price of the product
      */
-    add_from_catalog(id, name, price) {
+    addFromCatalog(id, name, price) {
       let item = this.items.find((e) => e.id === id);
 
       // if the item is not in the basket, we create it
       // else we add + 1 to it
-      if (!item) {
-        item = this.create_item(id, name, price);
-      } else {
+      if (item) {
         this.add(item);
+      } else {
+        item = this.createItem(id, name, price);
       }
     },
   }));

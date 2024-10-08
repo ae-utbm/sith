@@ -1,4 +1,5 @@
 const glob = require("glob");
+// biome-ignore lint/correctness/noNodejsModules: this is backend side
 const path = require("node:path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
@@ -26,6 +27,7 @@ module.exports = {
         terserOptions: {
           mangle: true,
           compress: {
+            // biome-ignore lint/style/useNamingConvention: this is how the underlying library wants it
             drop_console: true,
           },
         },

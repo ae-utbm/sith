@@ -112,7 +112,7 @@
                   ></a>
                 </div>
                 <div class="notification">
-                  <a href="#" onclick="display_notif()">
+                  <a href="#" onclick="displayNotif()">
                     <i class="fa-regular fa-bell"></i>
                     {% set notification_count = user.notifications.filter(viewed=False).count() %}
 

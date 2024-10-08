@@ -30,21 +30,21 @@
           </label>
           <span class="depth-choice">
             <button
-              @click="godfathers_depth--"
-              :disabled="godfathers_depth <= {{ depth_min }}"
+              @click="godfathersDepth--"
+              :disabled="godfathersDepth <= {{ depth_min }}"
             ><i class="fa fa-minus"></i></button>
             <input
-              x-model="godfathers_depth"
+              x-model="godfathersDepth"
               x-ref="godfather_depth_input"
               type="number"
-              name="godfathers_depth"
+              name="godfathersDepth"
               id="godfather-depth-input"
               min="{{ depth_min }}"
               max="{{ depth_max }}"
             />
             <button
-              @click="godfathers_depth++"
-              :disabled="godfathers_depth >= {{ depth_max }}"
+              @click="godfathersDepth++"
+              :disabled="godfathersDepth >= {{ depth_max }}"
             ><i class="fa fa-plus"
               ></i></button>
           </span>
@@ -56,22 +56,22 @@
           </label>
           <span class="depth-choice">
             <button
-              @click="godchildren_depth--"
-              :disabled="godchildren_depth <= {{ depth_min }}"
+              @click="godchildrenDepth--"
+              :disabled="godchildrenDepth <= {{ depth_min }}"
             ><i
               class="fa fa-minus"
             ></i></button>
             <input
-              x-model="godchildren_depth"
+              x-model="godchildrenDepth"
               type="number"
-              name="godchildren_depth"
+              name="godchildrenDepth"
               id="godchild-depth-input"
               min="{{ depth_min }}"
               max="{{ depth_max }}"
             />
             <button
-              @click="godchildren_depth++"
-              :disabled="godchildren_depth >= {{ depth_max }}"
+              @click="godchildrenDepth++"
+              :disabled="godchildrenDepth >= {{ depth_max }}"
             ><i class="fa fa-plus"
               ></i></button>
           </span>
@@ -96,10 +96,10 @@
   </div>
 
   <script>
-    const api_url = "{{ api_url }}";
-    const active_user = "{{ object.id }}"
-    const depth_min = {{ depth_min }};
-    const depth_max = {{ depth_max }};
+    const apiUrl = "{{ api_url }}";
+    const activeUser = "{{ object.id }}"
+    const depthMin = {{ depth_min }};
+    const depthMax = {{ depth_max }};
   </script>
 {% endblock %}
 

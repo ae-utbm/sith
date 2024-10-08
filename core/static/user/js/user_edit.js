@@ -1,23 +1,24 @@
-function alpine_webcam_builder(default_picture, delete_url, can_delete_picture) {
+// biome-ignore lint/correctness/noUnusedVariables: used in user_edit.jinja
+function alpineWebcamBuilder(defaultPicture, deleteUrl, canDeletePicture) {
   return () => ({
-    can_edit_picture: false,
+    canEditPicture: false,
 
     loading: false,
-    is_camera_enabled: false,
-    is_camera_error: false,
+    isCameraEnabled: false,
+    isCameraError: false,
     picture: null,
     video: null,
-    picture_form: null,
+    pictureForm: null,
 
     init() {
       this.video = this.$refs.video;
-      this.picture_form = this.$refs.form.getElementsByTagName("input");
-      if (this.picture_form.length > 0) {
-        this.picture_form = this.picture_form[0];
-        this.can_edit_picture = true;
+      this.pictureForm = this.$refs.form.getElementsByTagName("input");
+      if (this.pictureForm.length > 0) {
+        this.pictureForm = this.pictureForm[0];
+        this.canEditPicture = true;
 
         // Link the displayed element to the form input
-        this.picture_form.onchange = (event) => {
+        this.pictureForm.onchange = (event) => {
           const files = event.srcElement.files;
           if (files.length > 0) {
             this.picture = (window.URL || window.webkitURL).createObjectURL(
@@ -30,45 +31,45 @@ function alpine_webcam_builder(default_picture, delete_url, can_delete_picture) 
       }
     },
 
-    get_picture() {
-      return this.picture || default_picture;
+    getPicture() {
+      return this.picture || defaultPicture;
     },
 
-    delete_picture() {
+    deletePicture() {
       // Only remove currently displayed picture
       if (this.picture) {
         const list = new DataTransfer();
-        this.picture_form.files = list.files;
-        this.picture_form.dispatchEvent(new Event("change"));
+        this.pictureForm.files = list.files;
+        this.pictureForm.dispatchEvent(new Event("change"));
         return;
       }
-      if (!can_delete_picture) {
+      if (!canDeletePicture) {
         return;
       }
       // Remove user picture if correct rights are available
-      window.open(delete_url, "_self");
+      window.open(deleteUrl, "_self");
     },
 
-    enable_camera() {
+    enableCamera() {
       this.picture = null;
       this.loading = true;
-      this.is_camera_error = false;
+      this.isCameraError = false;
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: false })
         .then((stream) => {
           this.loading = false;
-          this.is_camera_enabled = true;
+          this.isCameraEnabled = true;
           this.video.srcObject = stream;
           this.video.play();
         })
         .catch((err) => {
-          this.is_camera_error = true;
+          this.isCameraError = true;
           this.loading = false;
           throw err;
         });
     },
 
-    take_picture() {
+    takePicture() {
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
 
@@ -94,14 +95,14 @@ function alpine_webcam_builder(default_picture, delete_url, can_delete_picture) 
 
         const list = new DataTransfer();
         list.items.add(file);
-        this.picture_form.files = list.files;
+        this.pictureForm.files = list.files;
 
         // No change event is triggered, we trigger it manually #}
-        this.picture_form.dispatchEvent(new Event("change"));
+        this.pictureForm.dispatchEvent(new Event("change"));
       }, "image/webp");
 
       canvas.remove();
-      this.is_camera_enabled = false;
+      this.isCameraEnabled = false;
     },
   });
 }

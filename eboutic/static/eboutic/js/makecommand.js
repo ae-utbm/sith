@@ -3,18 +3,23 @@
  * @enum {number}
  */
 const BillingInfoReqState = {
+  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   SUCCESS: 1,
+  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   FAILURE: 2,
+  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   SENDING: 3,
 };
 
 document.addEventListener("alpine:init", () => {
   Alpine.store("billing_inputs", {
-    data: et_data,
+    // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
+    data: etData,
 
     async fill() {
       document.getElementById("bank-submit-button").disabled = true;
-      const res = await fetch(et_data_url);
+      // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
+      const res = await fetch(etDataUrl);
       if (res.ok) {
         this.data = await res.json();
         document.getElementById("bank-submit-button").disabled = false;
@@ -24,10 +29,10 @@ document.addEventListener("alpine:init", () => {
 
   Alpine.data("billing_infos", () => ({
     /** @type {BillingInfoReqState | null} */
-    req_state: null,
+    reqState: null,
 
-    async send_form() {
-      this.req_state = BillingInfoReqState.SENDING;
+    async sendForm() {
+      this.reqState = BillingInfoReqState.SENDING;
       const form = document.getElementById("billing_info_form");
       document.getElementById("bank-submit-button").disabled = true;
       const payload = Object.fromEntries(
@@ -35,11 +40,12 @@ document.addEventListener("alpine:init", () => {
           .filter((elem) => elem.type !== "submit" && elem.value)
           .map((elem) => [elem.name, elem.value]),
       );
-      const res = await fetch(billing_info_url, {
+      // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
+      const res = await fetch(billingInfoUrl, {
         method: "PUT",
         body: JSON.stringify(payload),
       });
-      this.req_state = res.ok
+      this.reqState = res.ok
         ? BillingInfoReqState.SUCCESS
         : BillingInfoReqState.FAILURE;
       if (res.status === 422) {
@@ -56,22 +62,24 @@ document.addEventListener("alpine:init", () => {
       }
     },
 
-    get_alert_color() {
-      if (this.req_state === BillingInfoReqState.SUCCESS) {
+    getAlertColor() {
+      if (this.reqState === BillingInfoReqState.SUCCESS) {
         return "green";
       }
-      if (this.req_state === BillingInfoReqState.FAILURE) {
+      if (this.reqState === BillingInfoReqState.FAILURE) {
         return "red";
       }
       return "";
     },
 
-    get_alert_message() {
-      if (this.req_state === BillingInfoReqState.SUCCESS) {
-        return billing_info_success_message;
+    getAlertMessage() {
+      if (this.reqState === BillingInfoReqState.SUCCESS) {
+        // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
+        return billingInfoSuccessMessage;
       }
-      if (this.req_state === BillingInfoReqState.FAILURE) {
-        return billing_info_failure_message;
+      if (this.reqState === BillingInfoReqState.FAILURE) {
+        // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
+        return billingInfoFailureMessage;
       }
       return "";
     },

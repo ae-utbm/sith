@@ -1,7 +1,7 @@
-async function get_graph_data(url, godfathers_depth, godchildren_depth) {
+async function getGraphData(url, godfathersDepth, godchildrenDepth) {
   const data = await (
     await fetch(
-      `${url}?godfathers_depth=${godfathers_depth}&godchildren_depth=${godchildren_depth}`,
+      `${url}?godfathers_depth=${godfathersDepth}&godchildren_depth=${godchildrenDepth}`,
     )
   ).json();
   return [
@@ -16,7 +16,8 @@ async function get_graph_data(url, godfathers_depth, godchildren_depth) {
   ];
 }
 
-function create_graph(container, data, active_user_id) {
+function createGraph(container, data, activeUserId) {
+  // biome-ignore lint/correctness/noUndeclaredVariables: imported by user_godphaters_tree.jinja
   const cy = cytoscape({
     boxSelectionEnabled: false,
     autounselectify: true,
@@ -83,9 +84,9 @@ function create_graph(container, data, active_user_id) {
       },
     },
   });
-  const active_user = cy.getElementById(active_user_id).style("shape", "rectangle");
+  const activeUser = cy.getElementById(activeUserId).style("shape", "rectangle");
   /* Reset graph */
-  const reset_graph = () => {
+  const resetGraph = () => {
     cy.elements((element) => {
       if (element.hasClass("traversed")) {
         element.removeClass("traversed");
@@ -96,10 +97,10 @@ function create_graph(container, data, active_user_id) {
     });
   };
 
-  const on_node_tap = (el) => {
-    reset_graph();
+  const onNodeTap = (el) => {
+    resetGraph();
     /* Create path on graph if selected isn't the targeted user */
-    if (el === active_user) {
+    if (el === activeUser) {
       return;
     }
     cy.elements((element) => {
@@ -108,7 +109,7 @@ function create_graph(container, data, active_user_id) {
 
     for (const traversed of cy.elements().aStar({
       root: el,
-      goal: active_user,
+      goal: activeUser,
     }).path) {
       traversed.removeClass("not-traversed");
       traversed.addClass("traversed");
@@ -116,14 +117,13 @@ function create_graph(container, data, active_user_id) {
   };
 
   cy.on("tap", "node", (tapped) => {
-    on_node_tap(tapped.target);
+    onNodeTap(tapped.target);
   });
   cy.zoomingEnabled(false);
 
   /* Add context menu */
   if (cy.cxtmenu === undefined) {
-    console.error("ctxmenu isn't loaded, context menu won't be available on graphs");
-    return cy;
+    throw new Error("ctxmenu isn't loaded, context menu won't be available on graphs");
   }
   cy.cxtmenu({
     selector: "node",
@@ -139,14 +139,14 @@ function create_graph(container, data, active_user_id) {
       {
         content: '<span class="fa fa-mouse-pointer fa-2x"></span>',
         select: (el) => {
-          on_node_tap(el);
+          onNodeTap(el);
         },
       },
 
       {
         content: '<i class="fa fa-eraser fa-2x"></i>',
-        select: (el) => {
-          reset_graph();
+        select: (_) => {
+          resetGraph();
         },
       },
     ],
@@ -155,73 +155,81 @@ function create_graph(container, data, active_user_id) {
   return cy;
 }
 
-/* global api_url, active_user, depth_min, depth_max */
 document.addEventListener("alpine:init", () => {
   /*
     This needs some constants to be set before the document has been loaded
 
-    api_url:     base url for fetching the tree as a string
-    active_user: id of the user to fetch the tree from
-    depth_min:   minimum tree depth for godfathers and godchildren as an int
-    depth_max:   maximum tree depth for godfathers and godchildren as an int
+    apiUrl:     base url for fetching the tree as a string
+    activeUser: id of the user to fetch the tree from
+    depthMin:   minimum tree depth for godfathers and godchildren as an int
+    depthMax:   maximum tree depth for godfathers and godchildren as an int
   */
-  const default_depth = 2;
+  const defaultDepth = 2;
 
   if (
-    typeof api_url === "undefined" ||
-    typeof active_user === "undefined" ||
-    typeof depth_min === "undefined" ||
-    typeof depth_max === "undefined"
+    // biome-ignore lint/correctness/noUndeclaredVariables: defined by user_godfathers_tree.jinja
+    typeof apiUrl === "undefined" ||
+    // biome-ignore lint/correctness/noUndeclaredVariables: defined by user_godfathers_tree.jinja
+    typeof activeUser === "undefined" ||
+    // biome-ignore lint/correctness/noUndeclaredVariables: defined by user_godfathers_tree.jinja
+    typeof depthMin === "undefined" ||
+    // biome-ignore lint/correctness/noUndeclaredVariables: defined by user_godfathers_tree.jinja
+    typeof depthMax === "undefined"
   ) {
-    console.error(
+    throw new Error(
       "Some constants are not set before using the family_graph script, please look at the documentation",
     );
-    return;
   }
 
-  function get_initial_depth(prop) {
+  function getInitialDepth(prop) {
+    // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
     const value = Number.parseInt(initialUrlParams.get(prop));
-    if (Number.isNaN(value) || value < depth_min || value > depth_max) {
-      return default_depth;
+    // biome-ignore lint/correctness/noUndeclaredVariables: defined by user_godfathers_tree.jinja
+    if (Number.isNaN(value) || value < depthMin || value > depthMax) {
+      return defaultDepth;
     }
     return value;
   }
 
   Alpine.data("graph", () => ({
     loading: false,
-    godfathers_depth: get_initial_depth("godfathers_depth"),
-    godchildren_depth: get_initial_depth("godchildren_depth"),
+    godfathersDepth: getInitialDepth("godfathersDepth"),
+    godchildrenDepth: getInitialDepth("godchildrenDepth"),
+    // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
     reverse: initialUrlParams.get("reverse")?.toLowerCase?.() === "true",
     graph: undefined,
-    graph_data: {},
+    graphData: {},
 
     async init() {
-      const delayed_fetch = Alpine.debounce(async () => {
-        this.fetch_graph_data();
+      const delayedFetch = Alpine.debounce(async () => {
+        await this.fetchGraphData();
       }, 100);
-      for (const param of ["godfathers_depth", "godchildren_depth"]) {
+      for (const param of ["godfathersDepth", "godchildrenDepth"]) {
         this.$watch(param, async (value) => {
-          if (value < depth_min || value > depth_max) {
+          // biome-ignore lint/correctness/noUndeclaredVariables: defined by user_godfathers_tree.jinja
+          if (value < depthMin || value > depthMax) {
             return;
           }
-          update_query_string(param, value, History.REPLACE);
-          delayed_fetch();
+          // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
+          updateQueryString(param, value, History.REPLACE);
+          await delayedFetch();
         });
       }
       this.$watch("reverse", async (value) => {
-        update_query_string("reverse", value, History.REPLACE);
-        this.reverse_graph();
+        // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
+        updateQueryString("reverse", value, History.REPLACE);
+        await this.reverseGraph();
       });
-      this.$watch("graph_data", async () => {
-        await this.generate_graph();
+      this.$watch("graphData", async () => {
+        await this.generateGraph();
         if (this.reverse) {
-          await this.reverse_graph();
+          await this.reverseGraph();
         }
       });
-      this.fetch_graph_data();
+      await this.fetchGraphData();
     },
 
-    async screenshot() {
+    screenshot() {
       const link = document.createElement("a");
       link.href = this.graph.jpg();
       link.download = interpolate(
@@ -234,30 +242,32 @@ document.addEventListener("alpine:init", () => {
       document.body.removeChild(link);
     },
 
-    async reset() {
+    reset() {
       this.reverse = false;
-      this.godfathers_depth = default_depth;
-      this.godchildren_depth = default_depth;
+      this.godfathersDepth = defaultDepth;
+      this.godchildrenDepth = defaultDepth;
     },
 
-    async reverse_graph() {
+    async reverseGraph() {
       this.graph.elements((el) => {
         el.position({ x: -el.position().x, y: -el.position().y });
       });
       this.graph.center(this.graph.elements());
     },
 
-    async fetch_graph_data() {
-      this.graph_data = await get_graph_data(
-        api_url,
-        this.godfathers_depth,
-        this.godchildren_depth,
+    async fetchGraphData() {
+      this.graphData = await getGraphData(
+        // biome-ignore lint/correctness/noUndeclaredVariables: defined by user_godfathers_tree.jinja
+        apiUrl,
+        this.godfathersDepth,
+        this.godchildrenDepth,
       );
     },
 
-    async generate_graph() {
+    async generateGraph() {
       this.loading = true;
-      this.graph = create_graph($(this.$refs.graph), this.graph_data, active_user);
+      // biome-ignore lint/correctness/noUndeclaredVariables: defined by user_godfathers_tree.jinja
+      this.graph = await createGraph($(this.$refs.graph), this.graphData, activeUser);
       this.loading = false;
     },
   }));

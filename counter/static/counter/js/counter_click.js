@@ -1,9 +1,10 @@
 document.addEventListener("alpine:init", () => {
   Alpine.data("counter", () => ({
-    basket,
+    // biome-ignore lint/correctness/noUndeclaredVariables: defined in counter_click.jinja
+    basket: sessionBasket,
     errors: [],
 
-    sum_basket() {
+    sumBasket() {
       if (!this.basket || Object.keys(this.basket).length === 0) {
         return 0;
       }
@@ -14,23 +15,26 @@ document.addEventListener("alpine:init", () => {
       return total / 100;
     },
 
-    async handle_code(event) {
+    async handleCode(event) {
       const code = $(event.target).find("#code_field").val().toUpperCase();
       if (["FIN", "ANN"].includes(code)) {
         $(event.target).submit();
       } else {
-        await this.handle_action(event);
+        await this.handleAction(event);
       }
     },
 
-    async handle_action(event) {
+    async handleAction(event) {
       const payload = $(event.target).serialize();
-      const request = new Request(click_api_url, {
+      // biome-ignore lint/correctness/noUndeclaredVariables: defined in counter_click.jinja
+      const request = new Request(clickApiUrl, {
         method: "POST",
         body: payload,
         headers: {
+          // biome-ignore lint/style/useNamingConvention: this goes into http headers
           Accept: "application/json",
-          "X-CSRFToken": csrf_token,
+          // biome-ignore lint/correctness/noUndeclaredVariables: defined in counter_click.jinja
+          "X-CSRFToken": csrfToken,
         },
       });
       const response = await fetch(request);
@@ -44,25 +48,27 @@ document.addEventListener("alpine:init", () => {
 
 $(() => {
   /* Autocompletion in the code field */
-  const code_field = $("#code_field");
+  const codeField = $("#code_field");
 
   let quantity = "";
-  code_field.autocomplete({
+  codeField.autocomplete({
     select: (event, ui) => {
       event.preventDefault();
-      code_field.val(quantity + ui.item.value);
+      codeField.val(quantity + ui.item.value);
     },
     focus: (event, ui) => {
       event.preventDefault();
-      code_field.val(quantity + ui.item.value);
+      codeField.val(quantity + ui.item.value);
     },
     source: (request, response) => {
+      // biome-ignore lint/performance/useTopLevelRegex: performance impact is minimal
       const res = /^(\d+x)?(.*)/i.exec(request.term);
       quantity = res[1] || "";
       const search = res[2];
       const matcher = new RegExp($.ui.autocomplete.escapeRegex(search), "i");
       response(
-        $.grep(products_autocomplete, (value) => {
+        // biome-ignore lint/correctness/noUndeclaredVariables: defined in counter_click.jinja
+        $.grep(productsAutocomplete, (value) => {
           return matcher.test(value.tags);
         }),
       );
@@ -76,5 +82,5 @@ $(() => {
   });
   $("#products").tabs();
 
-  code_field.focus();
+  codeField.focus();
 });
