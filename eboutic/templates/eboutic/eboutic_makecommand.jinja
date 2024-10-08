@@ -56,7 +56,7 @@
           <div
             class="collapse"
             :class="{'shadow': collapsed}"
-            x-data="{collapsed: !billing_info_exist}"
+            x-data="{collapsed: !billingInfoExist}"
             x-cloak
           >
             <div class="collapse-header clickable" @click="collapsed = !collapsed">
@@ -73,27 +73,27 @@
               x-data="billing_infos"
               x-show="collapsed"
               x-transition.scale.origin.top
-              @submit.prevent="await send_form()"
+              @submit.prevent="await sendForm()"
             >
               {% csrf_token %}
               {{ billing_form }}
               <br>
               <br>
               <div
-                x-show="[BillingInfoReqState.SUCCESS, BillingInfoReqState.FAILURE].includes(req_state)"
+                x-show="[BillingInfoReqState.SUCCESS, BillingInfoReqState.FAILURE].includes(reqState)"
                 class="alert"
-                :class="'alert-' + get_alert_color()"
+                :class="'alert-' + getAlertColor()"
                 x-transition
               >
-                <div class="alert-main" x-text="get_alert_message()"></div>
-                <div class="clickable" @click="req_state = null">
+                <div class="alert-main" x-text="getAlertMessage()"></div>
+                <div class="clickable" @click="reqState = null">
                   <i class="fa fa-close"></i>
                 </div>
               </div>
               <input
                 type="submit" class="btn btn-blue clickable"
                 value="{% trans %}Validate{% endtrans %}"
-                :disabled="req_state === BillingInfoReqState.SENDING"
+                :disabled="reqState === BillingInfoReqState.SENDING"
               >
             </form>
           </div>
@@ -141,16 +141,16 @@
 
 {% block script %}
   <script>
-    const billing_info_url = '{{ url("api:put_billing_info", user_id=request.user.id) }}';
-    const et_data_url = '{{ url("api:etransaction_data") }}';
-    const billing_info_exist = {{ "true" if billing_infos else "false" }};
-    const billing_info_success_message = "{% trans %}Billing info registration success{% endtrans %}";
-    const billing_info_failure_message = "{% trans %}Billing info registration failure{% endtrans %}";
+    const billingInfoUrl = '{{ url("api:put_billing_info", user_id=request.user.id) }}';
+    const etDataUrl = '{{ url("api:etransaction_data") }}';
+    const billingInfoExist = {{ "true" if billing_infos else "false" }};
+    const billingInfoSuccessMessage = "{% trans %}Billing info registration success{% endtrans %}";
+    const billingInfoFailureMessage = "{% trans %}Billing info registration failure{% endtrans %}";
 
     {% if billing_infos %}
-      const et_data = {{ billing_infos|safe }}
+      const etData = {{ billing_infos|safe }}
     {% else %}
-      const et_data = {}
+      const etData = {}
     {% endif %}
   </script>
   {{ super() }}

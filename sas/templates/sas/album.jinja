@@ -83,7 +83,7 @@
         </a>
       </template>
     </div>
-    {{  paginate_alpine("page", "nb_pages()") }}
+    {{  paginate_alpine("page", "nbPages()") }}
   </div>
 
   {% if is_sas_admin %}
@@ -116,14 +116,14 @@
         loading: false,
 
         async init() {
-          await this.fetch_pictures();
+          await this.fetchPictures();
           this.$watch("page", () => {
-            update_query_string("page",
+            updateQueryString("page",
               this.page === 1 ? null : this.page,
               this.pushstate
             );
             this.pushstate = History.PUSH;
-            this.fetch_pictures();
+            this.fetchPictures();
           });
 
           window.addEventListener("popstate", () => {
@@ -134,7 +134,7 @@
           });
         },
 
-        async fetch_pictures() {
+        async fetchPictures() {
           this.loading=true;
           const url = "{{ url("api:pictures") }}"
           +"?album_id={{ album.id }}"
@@ -144,7 +144,7 @@
           this.loading = false;
         },
 
-        nb_pages() {
+        nbPages() {
           return Math.ceil(this.pictures.count / {{ settings.SITH_SAS_IMAGES_PER_PAGE }});
         }
       }))

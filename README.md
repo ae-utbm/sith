@@ -5,6 +5,7 @@
 [![CI status](https://github.com/ae-utbm/sith/actions/workflows/ci.yml/badge.svg)](#)
 [![Docs status](https://github.com/ae-utbm/sith/actions/workflows/deploy_docs.yml/badge.svg)](https://ae-utbm.github.io/sith)
 [![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?style=default&logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
+[![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
 [![discord](https://img.shields.io/discord/971448179075731476?label=discord&logo=discord&style=default)](https://discord.gg/xk9wfpsufm)
 
 ### This is the source code of the UTBM's student association available at [https://ae.utbm.fr/](https://ae.utbm.fr/).

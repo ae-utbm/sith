@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="{{ statics.css }}" defer>
   <script type="text/javascript">
     addEventListener("DOMContentLoaded", (event) => {
-      easymde_factory(
+      easymdeFactory(
         document.getElementById("{{ widget.attrs.id }}"),
         "{{ markdown_api_url }}",
       );

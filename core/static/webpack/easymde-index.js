@@ -1,6 +1,7 @@
+// biome-ignore lint/correctness/noUndeclaredDependencies: shipped by easymde
 import "codemirror/lib/codemirror.css";
 import "easymde/src/css/easymde.css";
-import EasyMDE from "easymde";
+import easyMde from "easymde";
 
 // This scripts dependens on Alpine but it should be loaded on every page
 
@@ -9,13 +10,13 @@ import EasyMDE from "easymde";
  * @param {HTMLTextAreaElement} textarea to use
  * @param {string} link to the markdown api
  **/
-function easymde_factory (textarea, markdown_api_url) {
-  const easymde = new EasyMDE({
+function easymdeFactory(textarea, markdownApiUrl) {
+  const easymde = new easyMde({
     element: textarea,
     spellChecker: false,
     autoDownloadFontAwesome: false,
     previewRender: Alpine.debounce(async (plainText, preview) => {
-      const res = await fetch(markdown_api_url, {
+      const res = await fetch(markdownApiUrl, {
         method: "POST",
         body: JSON.stringify({ text: plainText }),
       });
@@ -26,33 +27,33 @@ function easymde_factory (textarea, markdown_api_url) {
     toolbar: [
       {
         name: "heading-smaller",
-        action: EasyMDE.toggleHeadingSmaller,
+        action: easyMde.toggleHeadingSmaller,
         className: "fa fa-header",
         title: gettext("Heading"),
       },
       {
         name: "italic",
-        action: EasyMDE.toggleItalic,
+        action: easyMde.toggleItalic,
         className: "fa fa-italic",
         title: gettext("Italic"),
       },
       {
         name: "bold",
-        action: EasyMDE.toggleBold,
+        action: easyMde.toggleBold,
         className: "fa fa-bold",
         title: gettext("Bold"),
       },
       {
         name: "strikethrough",
-        action: EasyMDE.toggleStrikethrough,
+        action: easyMde.toggleStrikethrough,
         className: "fa fa-strikethrough",
         title: gettext("Strikethrough"),
       },
       {
         name: "underline",
         action: function customFunction(editor) {
-          let cm = editor.codemirror;
-          cm.replaceSelection("__" + cm.getSelection() + "__");
+          const cm = editor.codemirror;
+          cm.replaceSelection(`__${cm.getSelection()}__`);
         },
         className: "fa fa-underline",
         title: gettext("Underline"),
@@ -60,8 +61,8 @@ function easymde_factory (textarea, markdown_api_url) {
       {
         name: "superscript",
         action: function customFunction(editor) {
-          let cm = editor.codemirror;
-          cm.replaceSelection("^" + cm.getSelection() + "^");
+          const cm = editor.codemirror;
+          cm.replaceSelection(`^${cm.getSelection()}^`);
         },
         className: "fa fa-superscript",
         title: gettext("Superscript"),
@@ -69,80 +70,80 @@ function easymde_factory (textarea, markdown_api_url) {
       {
         name: "subscript",
         action: function customFunction(editor) {
-          let cm = editor.codemirror;
-          cm.replaceSelection("~" + cm.getSelection() + "~");
+          const cm = editor.codemirror;
+          cm.replaceSelection(`~${cm.getSelection()}~`);
         },
         className: "fa fa-subscript",
         title: gettext("Subscript"),
       },
       {
         name: "code",
-        action: EasyMDE.toggleCodeBlock,
+        action: easyMde.toggleCodeBlock,
         className: "fa fa-code",
         title: gettext("Code"),
       },
       "|",
       {
         name: "quote",
-        action: EasyMDE.toggleBlockquote,
+        action: easyMde.toggleBlockquote,
         className: "fa fa-quote-left",
         title: gettext("Quote"),
       },
       {
         name: "unordered-list",
-        action: EasyMDE.toggleUnorderedList,
+        action: easyMde.toggleUnorderedList,
         className: "fa fa-list-ul",
         title: gettext("Unordered list"),
       },
       {
         name: "ordered-list",
-        action: EasyMDE.toggleOrderedList,
+        action: easyMde.toggleOrderedList,
         className: "fa fa-list-ol",
         title: gettext("Ordered list"),
       },
       "|",
       {
         name: "link",
-        action: EasyMDE.drawLink,
+        action: easyMde.drawLink,
         className: "fa fa-link",
         title: gettext("Insert link"),
       },
       {
         name: "image",
-        action: EasyMDE.drawImage,
+        action: easyMde.drawImage,
         className: "fa-regular fa-image",
         title: gettext("Insert image"),
       },
       {
         name: "table",
-        action: EasyMDE.drawTable,
+        action: easyMde.drawTable,
         className: "fa fa-table",
         title: gettext("Insert table"),
       },
       "|",
       {
         name: "clean-block",
-        action: EasyMDE.cleanBlock,
+        action: easyMde.cleanBlock,
         className: "fa fa-eraser fa-clean-block",
         title: gettext("Clean block"),
       },
       "|",
       {
         name: "preview",
-        action: EasyMDE.togglePreview,
+        action: easyMde.togglePreview,
         className: "fa fa-eye no-disable",
         title: gettext("Toggle preview"),
       },
       {
         name: "side-by-side",
-        action: EasyMDE.toggleSideBySide,
+        action: easyMde.toggleSideBySide,
         className: "fa fa-columns no-disable no-mobile",
         title: gettext("Toggle side by side"),
       },
       {
         name: "fullscreen",
-        action: EasyMDE.toggleFullScreen,
-        className: "fa fa-arrows-alt no-disable no-mobile",
+        action: easyMde.toggleFullScreen,
+        className: "fa fa-expand no-mobile",
         title: gettext("Toggle fullscreen"),
       },
       "|",
@@ -155,18 +156,16 @@ function easymde_factory (textarea, markdown_api_url) {
     ],
   });
 
-  const submits = textarea
-    .closest("form")
-    .querySelectorAll('input[type="submit"]');
+  const submits = textarea.closest("form").querySelectorAll('input[type="submit"]');
   const parentDiv = textarea.parentElement;
   let submitPressed = false;
 
-  function checkMarkdownInput(e) {
+  function checkMarkdownInput() {
     // an attribute is null if it does not exist, else a string
     const required = textarea.getAttribute("required") != null;
     const length = textarea.value.trim().length;
 
-    if (required && length == 0) {
+    if (required && length === 0) {
       parentDiv.style.boxShadow = "red 0px 0px 1.5px 1px";
     } else {
       parentDiv.style.boxShadow = "";
@@ -181,9 +180,9 @@ function easymde_factory (textarea, markdown_api_url) {
     checkMarkdownInput(e);
   }
 
-  submits.forEach((submit) => {
+  for (const submit of submits) {
     submit.addEventListener("click", onSubmitClick);
-  });
-};
+  }
+}
 
-window.easymde_factory = easymde_factory;
+window.easymdeFactory = easymdeFactory;

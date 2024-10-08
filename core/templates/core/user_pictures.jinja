@@ -21,14 +21,14 @@
     {% if user.id == object.id %}
       <div x-show="pictures.length > 0" x-cloak>
         <button
-          :disabled="is_downloading"
+          :disabled="isDownloading"
           class="btn btn-blue"
-          @click="download_zip()"
+          @click="downloadZip()"
         >
           <i class="fa fa-download"></i>
           {% trans %}Download all my pictures{% endtrans %}
         </button>
-        <progress x-ref="progress" x-show="is_downloading"></progress>
+        <progress x-ref="progress" x-show="isDownloading"></progress>
       </div>
     {% endif %}
 
@@ -92,13 +92,13 @@
 
     document.addEventListener("alpine:init", () => {
       Alpine.data("user_pictures", () => ({
-        is_downloading: false,
+        isDownloading: false,
         loading: true,
         pictures: [],
         albums: {},
 
         async init() {
-          this.pictures = await fetch_paginated("{{ url("api:pictures") }}" + "?users_identified={{ object.id }}");
+          this.pictures = await fetchPaginated("{{ url("api:pictures") }}" + "?users_identified={{ object.id }}");
           this.albums = this.pictures.reduce((acc, picture) => {
             if (!acc[picture.album]){
               acc[picture.album] = [];
@@ -109,8 +109,8 @@
           this.loading = false;
         },
 
-        async download_zip(){
-          this.is_downloading = true;
+        async downloadZip(){
+          this.isDownloading = true;
           const bar = this.$refs.progress;
           bar.value = 0;
           bar.max = this.pictures.length;
@@ -124,16 +124,16 @@
           const zipWriter = new zip.ZipWriter(await fileHandle.createWritable());
 
           await Promise.all(this.pictures.map(p => {
-            const img_name = p.album + "/IMG_" + p.date.replaceAll(/[:\-]/g, "_") + p.name.slice(p.name.lastIndexOf("."));
+            const imgName = p.album + "/IMG_" + p.date.replaceAll(/[:\-]/g, "_") + p.name.slice(p.name.lastIndexOf("."));
             return zipWriter.add(
-              img_name,
+              imgName,
               new zip.HttpReader(p.full_size_url),
               {level: 9, lastModDate: new Date(p.date), onstart: () => bar.value += 1}
             );
           }));
 
           await zipWriter.close();
-          this.is_downloading = false;
+          this.isDownloading = false;
         }
       }))
     });

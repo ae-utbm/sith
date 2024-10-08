@@ -1,23 +1,21 @@
-const glob = require('glob');
-const path = require('path');
-const webpack = require("webpack");
+const glob = require("glob");
+// biome-ignore lint/correctness/noNodejsModules: this is backend side
+const path = require("node:path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-  entry: glob.sync('./!(static)/static/webpack/**?(-)index.js').reduce((obj, el) => {
-    obj[path.parse(el).name] = './' + el;
+  entry: glob.sync("./!(static)/static/webpack/**?(-)index.js").reduce((obj, el) => {
+    obj[path.parse(el).name] = `./${el}`;
     return obj;
   }, {}),
   output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, './staticfiles/generated/webpack'),
-    clean: true
+    filename: "[name].js",
+    path: path.resolve(__dirname, "./staticfiles/generated/webpack"),
+    clean: true,
   },
-  plugins: [
-    new MiniCssExtractPlugin(),
-  ],
+  plugins: [new MiniCssExtractPlugin()],
   optimization: {
     minimizer: [
       "...",
@@ -29,9 +27,10 @@ module.exports = {
         terserOptions: {
           mangle: true,
           compress: {
+            // biome-ignore lint/style/useNamingConvention: this is how the underlying library wants it
             drop_console: true,
           },
-        }
+        },
       }),
     ],
   },
@@ -40,14 +39,11 @@ module.exports = {
       {
         test: /\.css$/,
         sideEffects: true,
-        use: [
-          MiniCssExtractPlugin.loader,
-          "css-loader",
-        ],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
-        test: /\.(jpe?g|png|gif|woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource'
+        test: /\.(jpe?g|png|gif)$/i,
+        type: "asset/resource",
       },
       {
         test: /\.m?js$/,
@@ -55,9 +51,9 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ['@babel/preset-env']
-          }
-        }
+            presets: ["@babel/preset-env"],
+          },
+        },
       },
       {
         test: /\.js$/,
@@ -70,17 +66,17 @@ module.exports = {
         options: {
           exposes: [
             {
-              globalName: ['$'],
-              override: true
+              globalName: ["$"],
+              override: true,
             },
             {
-              globalName: ['jQuery'],
-              override: true
+              globalName: ["jQuery"],
+              override: true,
             },
             {
-              globalName: ['window.jQuery'],
-              override: true
-            }
+              globalName: ["window.jQuery"],
+              override: true,
+            },
           ],
         },
       },

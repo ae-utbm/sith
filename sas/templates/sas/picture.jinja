@@ -17,21 +17,21 @@
 {% block content %}
   <main x-data="picture_viewer">
     <code>
-      <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(album) }} <span x-text="current_picture.name"></span>
+      <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(album) }} <span x-text="currentPicture.name"></span>
     </code>
 
     <br>
 
     <div class="title">
-      <h3 x-text="current_picture.name"></h3>
-      <h4 x-text="`${pictures.indexOf(current_picture) + 1 } / ${pictures.length}`"></h4>
+      <h3 x-text="currentPicture.name"></h3>
+      <h4 x-text="`${pictures.indexOf(currentPicture) + 1 } / ${pictures.length}`"></h4>
     </div>
     <br>
 
-    <template x-if="!current_picture.is_moderated">
+    <template x-if="!currentPicture.is_moderated">
       <div class="alert alert-red">
         <div class="alert-main">
-          <template x-if="current_picture.asked_for_removal">
+          <template x-if="currentPicture.askedForRemoval">
             <span class="important">{% trans %}Asked for removal{% endtrans %}</span>
           </template>
           <p>
@@ -43,14 +43,14 @@
         </div>
         <div>
           <div>
-            <button class="btn btn-blue" @click="moderate_picture()">
+            <button class="btn btn-blue" @click="moderatePicture()">
               {% trans %}Moderate{% endtrans %}
             </button>
-            <button class="btn btn-red" @click.prevent="delete_picture()">
+            <button class="btn btn-red" @click.prevent="deletePicture()">
               {% trans %}Delete{% endtrans %}
             </button>
           </div>
-          <p x-show="!!moderation_error" x-text="moderation_error"></p>
+          <p x-show="!!moderationError" x-text="moderationError"></p>
         </div>
       </div>
     </template>
@@ -58,12 +58,12 @@
     <div class="container" id="pict">
       <div class="main">
 
-        <div class="photo" :aria-busy="current_picture.image_loading">
+        <div class="photo" :aria-busy="currentPicture.imageLoading">
           <img
-            :src="current_picture.compressed_url"
-            :alt="current_picture.name"
+            :src="currentPicture.compressed_url"
+            :alt="currentPicture.name"
             id="main-picture"
-            x-ref="main_picture"
+            x-ref="mainPicture"
           />
         </div>
 
@@ -76,13 +76,13 @@
                 <span
                   x-text="Intl.DateTimeFormat(
                           '{{ LANGUAGE_CODE }}', {dateStyle: 'long'}
-                          ).format(new Date(current_picture.date))"
+                          ).format(new Date(currentPicture.date))"
                 >
                 </span>
               </div>
               <div>
                 <span>{% trans %}Owner: {% endtrans %}</span>
-                <a :href="current_picture.owner.profile_url" x-text="current_picture.owner.display_name"></a>
+                <a :href="currentPicture.owner.profile_url" x-text="currentPicture.owner.display_name"></a>
               </div>
             </div>
           </div>
@@ -91,14 +91,14 @@
             <h5>{% trans %}Tools{% endtrans %}</h5>
             <div>
               <div>
-                <a class="text" :href="current_picture.full_size_url">
+                <a class="text" :href="currentPicture.full_size_url">
                   {% trans %}HD version{% endtrans %}
                 </a>
                 <br>
                 <a class="text danger" href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
               </div>
               <div class="buttons">
-                <a class="button" :href="`/sas/picture/${current_picture.id}/edit/`"><i class="fa-regular fa-pen-to-square edit-action"></i></a>
+                <a class="button" :href="`/sas/picture/${currentPicture.id}/edit/`"><i class="fa-regular fa-pen-to-square edit-action"></i></a>
                 <a class="button" href="?rotate_left"><i class="fa-solid fa-rotate-left"></i></a>
                 <a class="button" href="?rotate_right"><i class="fa-solid fa-rotate-right"></i></a>
               </div>
@@ -110,23 +110,23 @@
       <div class="subsection">
         <div class="navigation">
           <div id="prev" class="clickable">
-            <template x-if="previous_picture">
+            <template x-if="previousPicture">
               <div
-                @keyup.left.window="current_picture = previous_picture"
-                @click="current_picture = previous_picture"
+                @keyup.left.window="currentPicture = previousPicture"
+                @click="currentPicture = previousPicture"
               >
-                <img :src="previous_picture.thumb_url" alt="{% trans %}Previous picture{% endtrans %}"/>
+                <img :src="previousPicture.thumb_url" alt="{% trans %}Previous picture{% endtrans %}"/>
                 <div class="overlay">←</div>
               </div>
             </template>
           </div>
           <div id="next" class="clickable">
-            <template x-if="next_picture">
+            <template x-if="nextPicture">
               <div
-                @keyup.right.window="current_picture = next_picture"
-                @click="current_picture = next_picture"
+                @keyup.right.window="currentPicture = nextPicture"
+                @click="currentPicture = nextPicture"
               >
-                <img :src="next_picture.thumb_url" alt="{% trans %}Previous picture{% endtrans %}"/>
+                <img :src="nextPicture.thumb_url" alt="{% trans %}Previous picture{% endtrans %}"/>
                 <div class="overlay">→</div>
               </div>
             </template>
@@ -136,14 +136,14 @@
         <div class="tags">
           <h5>{% trans %}People{% endtrans %}</h5>
           {% if user.was_subscribed %}
-            <form @submit.prevent="submit_identification" x-show="!!selector">
+            <form @submit.prevent="submitIdentification" x-show="!!selector">
               <select x-ref="search" multiple="multiple"></select>
               <input type="submit" value="{% trans %}Go{% endtrans %}"/>
             </form>
           {% endif %}
           <ul>
             <template
-              x-for="identification in (current_picture.identifications || [])"
+              x-for="identification in (currentPicture.identifications || [])"
               :key="identification.id"
             >
               <li>
@@ -151,12 +151,12 @@
                   <img class="profile-pic" :src="identification.user.profile_pict" alt="image de profil"/>
                   <span x-text="identification.user.display_name"></span>
                 </a>
-                <template x-if="can_be_removed(identification)">
-                  <a class="delete clickable" @click="remove_identification(identification)"><i class="fa fa-times fa-xl delete-action"></i></a>
+                <template x-if="canBeRemoved(identification)">
+                  <a class="delete clickable" @click="removeIdentification(identification)"><i class="fa fa-times fa-xl delete-action"></i></a>
                 </template>
               </li>
             </template>
-            <template x-if="current_picture.identifications_loading">
+            <template x-if="currentPicture.identificationsLoading">
                 {# shadow element that exists only to put the loading wheel below
                 the list of identified people #}
               <li class="loader" aria-busy="true"></li>
@@ -171,10 +171,10 @@
 {% block script %}
   {{ super() }}
   <script>
-    const picture_endpoint = "{{ url("api:pictures") + "?album_id=" + album.id|string }}";
-    const album_url = "{{ album.get_absolute_url() }}";
-    const first_picture_id = {{ picture.id }};  {# id of the first picture to show after page load #}
-    const user_id = {{ user.id }};
-    const user_is_sas_admin = {{ (user.is_root or user.is_in_group(pk = settings.SITH_GROUP_SAS_ADMIN_ID))|tojson }}
+    const pictureEndpoint = "{{ url("api:pictures") + "?album_id=" + album.id|string }}";
+    const albumUrl = "{{ album.get_absolute_url() }}";
+    const firstPictureId = {{ picture.id }};  {# id of the first picture to show after page load #}
+    const userId = {{ user.id }};
+    const userIsSasAdmin = {{ (user.is_root or user.is_in_group(pk = settings.SITH_GROUP_SAS_ADMIN_ID))|tojson }}
   </script>
 {% endblock %}

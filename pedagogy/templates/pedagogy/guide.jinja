@@ -125,14 +125,14 @@
     then fetch the corresponding data from the API.
     This data will then be displayed on the result part of the page.
     #}
-    const page_default = 1;
-    const page_size_default = 100;
+    const pageDefault = 1;
+    const pageSizeDefault = 100;
     document.addEventListener("alpine:init", () => {
       Alpine.data("uv_search", () => ({
         uvs: [],
         loading: false,
-        page: page_default,
-        page_size: page_size_default,
+        page: pageDefault,
+        pageSize: pageSizeDefault,
         search: "",
         department: [],
         credit_type: [],
@@ -142,12 +142,12 @@
 
         update: undefined,
 
-        async initialize_args() {
+        async initializeArgs() {
           let url = new URLSearchParams(window.location.search);
           this.pushstate = History.REPLACE;
 
-          this.page = parseInt(url.get("page")) || page_default;;
-          this.page_size = parseInt(url.get("page_size")) || page_size_default;
+          this.page = parseInt(url.get("page")) || pageDefault;;
+          this.pageSize = parseInt(url.get("pageSize")) || pageSizeDefault;
           this.search = url.get("search") || "";
           this.department = url.getAll("department");
           this.credit_type = url.getAll("credit_type");
@@ -164,18 +164,18 @@
           this.update = Alpine.debounce(async () => {
             {# Create the whole url before changing everything all at once #}
             let first = this.to_change.shift();
-            let url = update_query_string(first.param, first.value, History.NONE);
+            let url = updateQueryString(first.param, first.value, History.NONE);
             this.to_change.forEach((value) => {
-              url = update_query_string(value.param, value.value, History.NONE, url);
+              url = updateQueryString(value.param, value.value, History.NONE, url);
             })
-            update_query_string(first.param, first.value, this.pushstate, url);
-            await this.fetch_data();  {# reload data on form change #}
+            updateQueryString(first.param, first.value, this.pushstate, url);
+            await this.fetchData();  {# reload data on form change #}
             this.to_change = [];
             this.pushstate = History.PUSH;
           }, 50);
 
           let search_params = ["search", "department", "credit_type", "semester"];
-          let pagination_params = ["page", "page_size"];
+          let pagination_params = ["page", "pageSize"];
 
           search_params.forEach((param) => {
             this.$watch(param, async (value) => {
@@ -184,8 +184,8 @@
                 return;
               }
               {# Reset pagination on search #}
-              this.page = page_default;
-              this.page_size = page_size_default;
+              this.page = pageDefault;
+              this.pageSize = pageSizeDefault;
             });
           });
           search_params.concat(pagination_params).forEach((param) => {
@@ -195,13 +195,13 @@
             });
           });
           window.addEventListener("popstate", async (event) => {
-            await this.initialize_args();
+            await this.initializeArgs();
           });
-          await this.initialize_args();
+          await this.initializeArgs();
         },
 
 
-        async fetch_data() {
+        async fetchData() {
           this.loading = true;
           const url = "{{ url("api:fetch_uvs") }}" + window.location.search;
           this.uvs = await (await fetch(url)).json();
@@ -209,7 +209,7 @@
         },
 
         max_page() {
-          return Math.ceil(this.uvs.count / this.page_size);
+          return Math.ceil(this.uvs.count / this.pageSize);
         }
       }))
     })
