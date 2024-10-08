@@ -738,8 +738,6 @@ if SENTRY_DSN:
     )
 
 SITH_FRONT_DEP_VERSIONS = {
-    "https://github.com/gildas-lormeau/zip.js": "2.7.47",
-    "https://github.com/jimmywarting/native-file-system-adapter": "3.0.1",
     "https://github.com/chartjs/Chart.js/": "2.6.0",
     "https://github.com/getsentry/sentry-javascript/": "8.26.0",
     "https://github.com/cytoscape/cytoscape.js": "3.30.2 ",

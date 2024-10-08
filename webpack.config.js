@@ -6,8 +6,18 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-  entry: glob.sync("./!(static)/static/webpack/**?(-)index.js").reduce((obj, el) => {
-    obj[path.parse(el).name] = `./${el}`;
+  entry: glob.sync("./!(static)/static/webpack/**/*?(-)index.js").reduce((obj, el) => {
+    // We include the path inside the webpack folder in the name
+    const relativePath = [];
+    const fullPath = path.parse(el);
+    for (const dir of fullPath.dir.split("/").reverse()) {
+      if (dir === "webpack") {
+        break;
+      }
+      relativePath.push(dir);
+    }
+    relativePath.push(fullPath.name);
+    obj[relativePath.join("/")] = `./${el}`;
     return obj;
   }, {}),
   output: {
