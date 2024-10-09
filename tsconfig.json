@@ -9,7 +9,8 @@
     "allowJs": true,
     "moduleResolution": "node",
     "paths": {
-      "#openapi": ["./staticfiles/generated/openapi/index.ts"]
+      "#openapi": ["./staticfiles/generated/openapi/index.ts"],
+      "#core:*": ["./core/static/webpack/*"]
     }
   }
 }

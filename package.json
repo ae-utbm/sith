@@ -14,7 +14,8 @@
   "license": "GPL-3.0-only",
   "sideEffects": [".css"],
   "imports": {
-    "#openapi": "./staticfiles/generated/openapi/index.ts"
+    "#openapi": "./staticfiles/generated/openapi/index.ts",
+    "#core:*": "./core/static/webpack/*"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
