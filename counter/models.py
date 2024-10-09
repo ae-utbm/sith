@@ -473,21 +473,6 @@ class Counter(models.Model):
         """Update the barman activity to prevent timeout."""
         self.permanencies.filter(end=None).update(activity=timezone.now())
 
-    @property
-    def is_open(self) -> bool:
-        return len(self.barmen_list) > 0
-
-    def is_inactive(self) -> bool:
-        """Returns True if the counter self is inactive from SITH_COUNTER_MINUTE_INACTIVE's value minutes, else False."""
-        return self.is_open and (
-            (timezone.now() - self.permanencies.order_by("-activity").first().activity)
-            > timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE)
-        )
-
-    def barman_list(self) -> list[int]:
-        """Returns the barman id list."""
-        return [b.id for b in self.barmen_list]
-
     def can_refill(self) -> bool:
         """Show if the counter authorize the refilling with physic money."""
         if self.type != "BAR":

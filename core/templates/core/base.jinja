@@ -70,16 +70,14 @@
                   {% cache 100 "counters_activity" %}
                     {% for bar in Counter.objects.annotate_has_barman(user).filter(type="BAR") %}
                       <li>
-                                                {# If the user is a barman, we redirect him directly to the barman page
-                                                else we redirect him to the activity page #}
+                        {# If the user is a barman, we redirect him directly to the barman page
+                         else we redirect him to the activity page #}
                         {% if bar.has_annotated_barman %}
                           <a href="{{ url('counter:details', counter_id=bar.id) }}">
                         {% else %}
                           <a href="{{ url('counter:activity', counter_id=bar.id) }}">
                         {% endif %}
-                        {% if bar.is_inactive() %}
-                          <i class="fa fa-question" style="color: #f39c12"></i>
-                        {% elif bar.is_open %}
+                        {% if bar.is_open %}
                           <i class="fa fa-check" style="color: #2ecc71"></i>
                         {% else %}
                           <i class="fa fa-times" style="color: #eb2f06"></i>
