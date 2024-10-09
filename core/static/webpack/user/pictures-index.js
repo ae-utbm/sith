@@ -63,7 +63,11 @@ window.loadPicturePage = (apiUrl) => {
 
         const fileHandle = await showSaveFilePicker({
           _preferPolyfill: false,
-          suggestedName: `${gettext("pictures")}.zip`,
+          suggestedName: interpolate(
+            gettext("pictures.%(extension)s"),
+            { extension: "zip" },
+            true,
+          ),
           types: {},
           excludeAcceptAllOption: false,
         });
