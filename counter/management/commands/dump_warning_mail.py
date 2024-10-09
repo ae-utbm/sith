@@ -4,7 +4,7 @@ from smtplib import SMTPException
 from django.conf import settings
 from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
-from django.db.models import Exists, OuterRef, Subquery
+from django.db.models import Exists, OuterRef, QuerySet, Subquery
 from django.template.loader import render_to_string
 from django.utils.timezone import localdate, now
 from django.utils.translation import gettext as _
@@ -26,23 +26,7 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
 
     def handle(self, *args, **options):
-        ongoing_dump_operation = AccountDump.objects.ongoing().filter(
-            customer__user=OuterRef("pk")
-        )
-        users = list(
-            User.objects
-            .filter_inactive()
-            .filter(customer__amount__gt=0)
-            .exclude(Exists(ongoing_dump_operation))
-            .annotate(
-                last_subscription_date=Subquery(
-                    Subscription.objects.filter(member=OuterRef("pk"))
-                    .order_by("-subscription_end")
-                    .values("subscription_end")[:1]
-                ),
-            )
-            .select_related("customer")
-        )
+        users = list(self._get_users())
         self.stdout.write(f"{len(users)} users will be warned of their account dump")
         dumps = []
         for user in users:
@@ -56,6 +40,25 @@ class Command(BaseCommand):
             )
         AccountDump.objects.bulk_create(dumps)
         self.stdout.write("Finished !")
+
+    @staticmethod
+    def _get_users() -> QuerySet[User]:
+        ongoing_dump_operation = AccountDump.objects.ongoing().filter(
+            customer__user=OuterRef("pk")
+        )
+        return (
+            User.objects.filter_inactive()
+            .filter(customer__amount__gt=0)
+            .exclude(Exists(ongoing_dump_operation))
+            .annotate(
+                last_subscription_date=Subquery(
+                    Subscription.objects.filter(member=OuterRef("pk"))
+                    .order_by("-subscription_end")
+                    .values("subscription_end")[:1]
+                ),
+            )
+            .select_related("customer")
+        )
 
     def _send_mail(self, user: User) -> bool:
         """Send the warning email to the given user.
