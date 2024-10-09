@@ -27,10 +27,15 @@ import { showSaveFilePicker } from "native-file-system-adapter";
  */
 
 /**
- * Load user picture page with a nice download bar
- * @param {string} Url of the api endpoint to fetch pictures from the user
+ * @typedef PicturePageConfig
+ * @param {string} apiUrl Url of the api endpoint to fetch pictures from the user
  **/
-window.loadPicturePage = (apiUrl) => {
+
+/**
+ * Load user picture page with a nice download bar
+ * @param {PicturePageConfig} Configuration
+ **/
+window.loadPicturePage = (config) => {
   document.addEventListener("alpine:init", () => {
     Alpine.data("user_pictures", () => ({
       isDownloading: false,
@@ -40,7 +45,7 @@ window.loadPicturePage = (apiUrl) => {
 
       async init() {
         // biome-ignore lint/correctness/noUndeclaredVariables: imported from script.json
-        this.pictures = await fetchPaginated(apiUrl);
+        this.pictures = await fetchPaginated(config.apiUrl);
         this.albums = this.pictures.reduce((acc, picture) => {
           if (!acc[picture.album]) {
             acc[picture.album] = [];

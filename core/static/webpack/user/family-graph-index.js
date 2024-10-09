@@ -159,20 +159,25 @@ function createGraph(container, data, activeUserId) {
 }
 
 /**
- * Create a family graph of an user
- * @param {string} Base url for fetching the tree as a string
- * @param {string} Id of the user to fetch the tree from
- * @param {number} Minimum tree depth for godfathers and godchildren
- * @param {number} Maximum tree depth for godfathers and godchildren
+ * @typedef FamilyGraphConfig
+ * @param {string} apiUrl Base url for fetching the tree as a string
+ * @param {string} activeUser Id of the user to fetch the tree from
+ * @param {number} depthMin Minimum tree depth for godfathers and godchildren
+ * @param {number} depthMax Maximum tree depth for godfathers and godchildren
  **/
-window.loadFamilyGraph = (apiUrl, activeUser, depthMin, depthMax) => {
+
+/**
+ * Create a family graph of an user
+ * @param {FamilyGraphConfig} Configuration
+ **/
+window.loadFamilyGraph = (config) => {
   document.addEventListener("alpine:init", () => {
     const defaultDepth = 2;
 
     function getInitialDepth(prop) {
       // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
       const value = Number.parseInt(initialUrlParams.get(prop));
-      if (Number.isNaN(value) || value < depthMin || value > depthMax) {
+      if (Number.isNaN(value) || value < config.depthMin || value > config.depthMax) {
         return defaultDepth;
       }
       return value;
@@ -193,7 +198,7 @@ window.loadFamilyGraph = (apiUrl, activeUser, depthMin, depthMax) => {
         }, 100);
         for (const param of ["godfathersDepth", "godchildrenDepth"]) {
           this.$watch(param, async (value) => {
-            if (value < depthMin || value > depthMax) {
+            if (value < config.depthMin || value > config.depthMax) {
               return;
             }
             // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
@@ -207,7 +212,7 @@ window.loadFamilyGraph = (apiUrl, activeUser, depthMin, depthMax) => {
           await this.reverseGraph();
         });
         this.$watch("graphData", async () => {
-          await this.generateGraph();
+          this.generateGraph();
           if (this.reverse) {
             await this.reverseGraph();
           }
@@ -243,15 +248,19 @@ window.loadFamilyGraph = (apiUrl, activeUser, depthMin, depthMax) => {
 
       async fetchGraphData() {
         this.graphData = await getGraphData(
-          apiUrl,
+          config.apiUrl,
           this.godfathersDepth,
           this.godchildrenDepth,
         );
       },
 
-      async generateGraph() {
+      generateGraph() {
         this.loading = true;
-        this.graph = await createGraph($(this.$refs.graph), this.graphData, activeUser);
+        this.graph = createGraph(
+          $(this.$refs.graph),
+          this.graphData,
+          config.activeUser,
+        );
         this.loading = false;
       },
     }));
