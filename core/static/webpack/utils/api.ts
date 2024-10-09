@@ -19,6 +19,8 @@ type PaginatedEndpoint<T> = <ThrowOnError extends boolean = false>(
   options?: Options<PaginatedRequest, ThrowOnError>,
 ) => RequestResult<PaginatedResponse<T>, unknown, ThrowOnError>;
 
+// TODO : If one day a test workflow is made for JS in this project
+//  please test this function. A all cost.
 export const paginated = async <T>(
   endpoint: PaginatedEndpoint<T>,
   options?: PaginatedRequest,

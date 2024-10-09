@@ -123,37 +123,3 @@ function updateQueryString(key, value, action = History.REPLACE, url = null) {
 
   return ret;
 }
-
-// TODO : If one day a test workflow is made for JS in this project
-//  please test this function. A all cost.
-/**
- * Given a paginated endpoint, fetch all the items of this endpoint,
- * performing multiple API calls if necessary.
- * @param {string} url The paginated endpoint to fetch
- * @return {Promise<Object[]>}
- */
-// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
-async function fetchPaginated(url) {
-  const maxPerPage = 199;
-  const paginatedUrl = new URL(url, document.location.origin);
-  paginatedUrl.searchParams.set("page_size", maxPerPage.toString());
-  paginatedUrl.searchParams.set("page", "1");
-
-  const firstPage = await (await fetch(paginatedUrl)).json();
-  const results = firstPage.results;
-
-  const nbPictures = firstPage.count;
-  const nbPages = Math.ceil(nbPictures / maxPerPage);
-
-  if (nbPages > 1) {
-    const promises = [];
-    for (let i = 2; i <= nbPages; i++) {
-      paginatedUrl.searchParams.set("page", i.toString());
-      promises.push(
-        fetch(paginatedUrl).then((res) => res.json().then((json) => json.results)),
-      );
-    }
-    results.push(...(await Promise.all(promises)).flat());
-  }
-  return results;
-}

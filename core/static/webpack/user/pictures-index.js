@@ -37,7 +37,7 @@ import { picturesFetchPictures } from "#openapi";
  * Load user picture page with a nice download bar
  * @param {PicturePageConfig} Configuration
  **/
-window.window.loadPicturePage = (config) => {
+window.loadPicturePage = (config) => {
   document.addEventListener("alpine:init", () => {
     Alpine.data("user_pictures", () => ({
       isDownloading: false,

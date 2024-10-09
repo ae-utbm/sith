@@ -5,7 +5,7 @@
 {%- endblock -%}
 
 {%- block additional_js -%}
-  <script defer src="{{ static("sas/js/viewer.js") }}"></script>
+  <script defer src="{{ static("webpack/sas/viewer-index.js") }}"></script>
 {%- endblock -%}
 
 {% block title %}
@@ -171,10 +171,14 @@
 {% block script %}
   {{ super() }}
   <script>
-    const pictureEndpoint = "{{ url("api:pictures") + "?album_id=" + album.id|string }}";
-    const albumUrl = "{{ album.get_absolute_url() }}";
-    const firstPictureId = {{ picture.id }};  {# id of the first picture to show after page load #}
-    const userId = {{ user.id }};
-    const userIsSasAdmin = {{ (user.is_root or user.is_in_group(pk = settings.SITH_GROUP_SAS_ADMIN_ID))|tojson }}
+    window.addEventListener("DOMContentLoaded", () => {
+      loadViewer({
+        albumId: {{ album.id }} ,
+        albumUrl: "{{ album.get_absolute_url() }}",
+        firstPictureId: {{ picture.id }},  {# id of the first picture to show after page load #}
+        userId: {{ user.id }},
+        userIsSasAdmin: {{ (user.is_root or user.is_in_group(pk = settings.SITH_GROUP_SAS_ADMIN_ID))|tojson }}
+      });
+    })
   </script>
 {% endblock %}
