@@ -5,8 +5,10 @@ from django.contrib.staticfiles.apps import StaticFilesConfig
 GENERATED_ROOT = Path(__file__).parent.resolve() / "generated"
 IGNORE_PATTERNS_WEBPACK = ["webpack/*"]
 IGNORE_PATTERNS_SCSS = ["*.scss"]
+IGNORE_PATTERNS_TYPESCRIPT = ["*.ts"]
 IGNORE_PATTERNS = [
     *StaticFilesConfig.ignore_patterns,
+    *IGNORE_PATTERNS_TYPESCRIPT,
     *IGNORE_PATTERNS_WEBPACK,
     *IGNORE_PATTERNS_SCSS,
 ]
