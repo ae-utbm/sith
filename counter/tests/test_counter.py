@@ -15,20 +15,29 @@
 import json
 import re
 import string
+from datetime import timedelta
 
 import pytest
+from django.conf import settings
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.timezone import timedelta
+from django.utils.timezone import now
+from freezegun import freeze_time
 from model_bakery import baker
 
 from club.models import Club, Membership
 from core.baker_recipes import subscriber_user
 from core.models import User
-from counter.models import BillingInfo, Counter, Customer, Permanency, Product, Selling
-from sith.settings import SITH_MAIN_CLUB
+from counter.models import (
+    BillingInfo,
+    Counter,
+    Customer,
+    Permanency,
+    Product,
+    Selling,
+)
 
 
 class TestCounter(TestCase):
@@ -219,7 +228,7 @@ class TestCounterStats(TestCase):
         s = Selling(
             label=barbar.name,
             product=barbar,
-            club=Club.objects.get(name=SITH_MAIN_CLUB["name"]),
+            club=Club.objects.get(name=settings.SITH_MAIN_CLUB["name"]),
             counter=cls.counter,
             unit_price=2,
             seller=cls.skia,
@@ -495,6 +504,29 @@ class TestBarmanConnection(TestCase):
         response = self.client.get(reverse("counter:activity", args=[self.counter.id]))
 
         assert not '<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response.content)
+
+
+@pytest.mark.django_db
+def test_barman_timeout():
+    """Test that barmen timeout is well managed."""
+    bar = baker.make(Counter, type="BAR")
+    user = baker.make(User)
+    bar.sellers.add(user)
+    baker.make(Permanency, counter=bar, user=user, start=now())
+
+    qs = Counter.objects.annotate_is_open().filter(pk=bar.pk)
+
+    bar = qs[0]
+    assert bar.is_open
+    assert bar.barmen_list == [user]
+    qs.handle_timeout()  # handling timeout before the actual timeout should be no-op
+    assert qs[0].is_open
+    with freeze_time() as frozen_time:
+        frozen_time.tick(timedelta(minutes=settings.SITH_BARMAN_TIMEOUT + 1))
+        qs.handle_timeout()
+        bar = qs[0]
+        assert not bar.is_open
+        assert bar.barmen_list == []
 
 
 class TestStudentCard(TestCase):

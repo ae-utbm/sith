@@ -23,15 +23,17 @@ from counter.schemas import CounterSchema
 class CounterController(ControllerBase):
     @route.get("", response=list[CounterSchema], permissions=[IsRoot])
     def fetch_all(self):
-        return Counter.objects.all()
+        return Counter.objects.annotate_is_open()
 
     @route.get("{counter_id}/", response=CounterSchema, permissions=[CanView])
     def fetch_one(self, counter_id: int):
-        return self.get_object_or_exception(Counter, pk=counter_id)
+        return self.get_object_or_exception(
+            Counter.objects.annotate_is_open(), pk=counter_id
+        )
 
     @route.get("bar/", response=list[CounterSchema], permissions=[CanView])
     def fetch_bars(self):
-        counters = list(Counter.objects.filter(type="BAR"))
+        counters = list(Counter.objects.annotate_is_open().filter(type="BAR"))
         for c in counters:
             self.check_object_permissions(c)
         return counters

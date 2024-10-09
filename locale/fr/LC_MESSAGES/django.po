@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-09 11:48+0200\n"
+"POT-Creation-Date: 2024-10-10 19:37+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Skia <skia@libskia.so>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: accounting/models.py:62 accounting/models.py:103 accounting/models.py:136
 #: accounting/models.py:203 club/models.py:55 com/models.py:274
 #: com/models.py:293 counter/models.py:220 counter/models.py:253
-#: counter/models.py:388 forum/models.py:59 launderette/models.py:29
+#: counter/models.py:411 forum/models.py:59 launderette/models.py:29
 #: launderette/models.py:84 launderette/models.py:122
 msgid "name"
 msgstr "nom"
@@ -66,7 +66,7 @@ msgstr "numéro de compte"
 
 #: accounting/models.py:109 accounting/models.py:140 club/models.py:345
 #: com/models.py:74 com/models.py:259 com/models.py:299 counter/models.py:276
-#: counter/models.py:390 trombi/models.py:210
+#: counter/models.py:413 trombi/models.py:210
 msgid "club"
 msgstr "club"
 
@@ -87,12 +87,12 @@ msgstr "Compte club"
 msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
-#: accounting/models.py:201 club/models.py:351 counter/models.py:901
+#: accounting/models.py:201 club/models.py:351 counter/models.py:899
 #: election/models.py:16 launderette/models.py:179
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:202 club/models.py:352 counter/models.py:902
+#: accounting/models.py:202 club/models.py:352 counter/models.py:900
 #: election/models.py:17
 msgid "end date"
 msgstr "date de fin"
@@ -106,7 +106,7 @@ msgid "club account"
 msgstr "compte club"
 
 #: accounting/models.py:212 accounting/models.py:272 counter/models.py:57
-#: counter/models.py:611
+#: counter/models.py:609
 msgid "amount"
 msgstr "montant"
 
@@ -128,18 +128,18 @@ msgstr "classeur"
 
 #: accounting/models.py:273 core/models.py:940 core/models.py:1460
 #: core/models.py:1505 core/models.py:1534 core/models.py:1558
-#: counter/models.py:621 counter/models.py:725 counter/models.py:937
+#: counter/models.py:619 counter/models.py:723 counter/models.py:935
 #: eboutic/models.py:57 eboutic/models.py:189 forum/models.py:311
 #: forum/models.py:412
 msgid "date"
 msgstr "date"
 
-#: accounting/models.py:274 counter/models.py:222 counter/models.py:938
+#: accounting/models.py:274 counter/models.py:222 counter/models.py:936
 #: pedagogy/models.py:207
 msgid "comment"
 msgstr "commentaire"
 
-#: accounting/models.py:276 counter/models.py:623 counter/models.py:727
+#: accounting/models.py:276 counter/models.py:621 counter/models.py:725
 #: subscription/models.py:56
 msgid "payment method"
 msgstr "méthode de paiement"
@@ -166,7 +166,7 @@ msgstr "type comptable"
 
 #: accounting/models.py:311 accounting/models.py:450 accounting/models.py:483
 #: accounting/models.py:515 core/models.py:1533 core/models.py:1559
-#: counter/models.py:691
+#: counter/models.py:689
 msgid "label"
 msgstr "étiquette"
 
@@ -650,7 +650,7 @@ msgid "Done"
 msgstr "Effectuées"
 
 #: accounting/templates/accounting/journal_details.jinja:41
-#: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:940
+#: counter/templates/counter/cash_summary_list.jinja:37 counter/views.py:941
 #: pedagogy/templates/pedagogy/moderation.jinja:13
 #: pedagogy/templates/pedagogy/uv_detail.jinja:142
 #: trombi/templates/trombi/comment.jinja:4
@@ -971,11 +971,11 @@ msgstr "Date de fin"
 msgid "Counter"
 msgstr "Comptoir"
 
-#: club/forms.py:167 counter/views.py:684
+#: club/forms.py:167 counter/views.py:685
 msgid "Products"
 msgstr "Produits"
 
-#: club/forms.py:172 counter/views.py:689
+#: club/forms.py:172 counter/views.py:690
 msgid "Archived products"
 msgstr "Produits archivés"
 
@@ -1045,7 +1045,7 @@ msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:337 counter/models.py:892 counter/models.py:928
+#: club/models.py:337 counter/models.py:890 counter/models.py:926
 #: eboutic/models.py:53 eboutic/models.py:185 election/models.py:183
 #: launderette/models.py:136 launderette/models.py:198 sas/models.py:274
 #: trombi/models.py:206
@@ -1373,7 +1373,7 @@ msgstr "Anciens membres"
 msgid "History"
 msgstr "Historique"
 
-#: club/views.py:116 core/templates/core/base.jinja:101 core/views/user.py:223
+#: club/views.py:116 core/templates/core/base.jinja:107 core/views/user.py:223
 #: sas/templates/sas/picture.jinja:91 trombi/views.py:61
 msgid "Tools"
 msgstr "Outils"
@@ -1659,7 +1659,7 @@ msgid "Calls to moderate"
 msgstr "Appels à modérer"
 
 #: com/templates/com/news_admin_list.jinja:242
-#: core/templates/core/base.jinja:216
+#: core/templates/core/base.jinja:222
 msgid "Events"
 msgstr "Événements"
 
@@ -2416,52 +2416,52 @@ msgstr "Inscription"
 msgid "Search"
 msgstr "Recherche"
 
-#: core/templates/core/base.jinja:102
+#: core/templates/core/base.jinja:108
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: core/templates/core/base.jinja:150
+#: core/templates/core/base.jinja:156
 msgid "You do not have any unread notification"
 msgstr "Vous n'avez aucune notification non lue"
 
-#: core/templates/core/base.jinja:155
+#: core/templates/core/base.jinja:161
 msgid "View more"
 msgstr "Voir plus"
 
-#: core/templates/core/base.jinja:158
+#: core/templates/core/base.jinja:164
 #: forum/templates/forum/last_unread.jinja:21
 msgid "Mark all as read"
 msgstr "Marquer tout comme lu"
 
-#: core/templates/core/base.jinja:206
+#: core/templates/core/base.jinja:212
 msgid "Main"
 msgstr "Accueil"
 
-#: core/templates/core/base.jinja:208
+#: core/templates/core/base.jinja:214
 msgid "Associations & Clubs"
 msgstr "Associations & Clubs"
 
-#: core/templates/core/base.jinja:210
+#: core/templates/core/base.jinja:216
 msgid "AE"
 msgstr "L'AE"
 
-#: core/templates/core/base.jinja:211
+#: core/templates/core/base.jinja:217
 msgid "AE's clubs"
 msgstr "Les clubs de L'AE"
 
-#: core/templates/core/base.jinja:212
+#: core/templates/core/base.jinja:218
 msgid "Others UTBM's Associations"
 msgstr "Les autres associations de l'UTBM"
 
-#: core/templates/core/base.jinja:218 core/templates/core/user_tools.jinja:172
+#: core/templates/core/base.jinja:224 core/templates/core/user_tools.jinja:172
 msgid "Elections"
 msgstr "Élections"
 
-#: core/templates/core/base.jinja:219
+#: core/templates/core/base.jinja:225
 msgid "Big event"
 msgstr "Grandes Activités"
 
-#: core/templates/core/base.jinja:222
+#: core/templates/core/base.jinja:228
 #: forum/templates/forum/favorite_topics.jinja:18
 #: forum/templates/forum/last_unread.jinja:18
 #: forum/templates/forum/macros.jinja:90 forum/templates/forum/main.jinja:6
@@ -2470,11 +2470,11 @@ msgstr "Grandes Activités"
 msgid "Forum"
 msgstr "Forum"
 
-#: core/templates/core/base.jinja:223
+#: core/templates/core/base.jinja:229
 msgid "Gallery"
 msgstr "Photos"
 
-#: core/templates/core/base.jinja:224 counter/models.py:398
+#: core/templates/core/base.jinja:230 counter/models.py:421
 #: counter/templates/counter/counter_list.jinja:11
 #: eboutic/templates/eboutic/eboutic_main.jinja:4
 #: eboutic/templates/eboutic/eboutic_main.jinja:22
@@ -2484,75 +2484,75 @@ msgstr "Photos"
 msgid "Eboutic"
 msgstr "Eboutic"
 
-#: core/templates/core/base.jinja:226
+#: core/templates/core/base.jinja:232
 msgid "Services"
 msgstr "Services"
 
-#: core/templates/core/base.jinja:228
+#: core/templates/core/base.jinja:234
 msgid "Matmatronch"
 msgstr "Matmatronch"
 
-#: core/templates/core/base.jinja:229 launderette/models.py:38
+#: core/templates/core/base.jinja:235 launderette/models.py:38
 #: launderette/templates/launderette/launderette_book.jinja:5
 #: launderette/templates/launderette/launderette_book_choose.jinja:4
 #: launderette/templates/launderette/launderette_main.jinja:4
 msgid "Launderette"
 msgstr "Laverie"
 
-#: core/templates/core/base.jinja:230 core/templates/core/file.jinja:20
+#: core/templates/core/base.jinja:236 core/templates/core/file.jinja:20
 #: core/views/files.py:116
 msgid "Files"
 msgstr "Fichiers"
 
-#: core/templates/core/base.jinja:231 core/templates/core/user_tools.jinja:163
+#: core/templates/core/base.jinja:237 core/templates/core/user_tools.jinja:163
 msgid "Pedagogy"
 msgstr "Pédagogie"
 
-#: core/templates/core/base.jinja:235
+#: core/templates/core/base.jinja:241
 msgid "My Benefits"
 msgstr "Mes Avantages"
 
-#: core/templates/core/base.jinja:237
+#: core/templates/core/base.jinja:243
 msgid "Sponsors"
 msgstr "Partenaires"
 
-#: core/templates/core/base.jinja:238
+#: core/templates/core/base.jinja:244
 msgid "Subscriber benefits"
 msgstr "Les avantages cotisants"
 
-#: core/templates/core/base.jinja:242
+#: core/templates/core/base.jinja:248
 msgid "Help"
 msgstr "Aide"
 
-#: core/templates/core/base.jinja:244
+#: core/templates/core/base.jinja:250
 msgid "FAQ"
 msgstr "FAQ"
 
-#: core/templates/core/base.jinja:245 core/templates/core/base.jinja:285
+#: core/templates/core/base.jinja:251 core/templates/core/base.jinja:291
 msgid "Contacts"
 msgstr "Contacts"
 
-#: core/templates/core/base.jinja:246
+#: core/templates/core/base.jinja:252
 msgid "Wiki"
 msgstr "Wiki"
 
-#: core/templates/core/base.jinja:286
+#: core/templates/core/base.jinja:292
 msgid "Legal notices"
 msgstr "Mentions légales"
 
-#: core/templates/core/base.jinja:287
+#: core/templates/core/base.jinja:293
 msgid "Intellectual property"
 msgstr "Propriété intellectuelle"
 
-#: core/templates/core/base.jinja:288
+#: core/templates/core/base.jinja:294
 msgid "Help & Documentation"
 msgstr "Aide & Documentation"
 
-#: core/templates/core/base.jinja:289
+#: core/templates/core/base.jinja:295
 msgid "R&D"
 msgstr "R&D"
 
-#: core/templates/core/base.jinja:292
+#: core/templates/core/base.jinja:298
 msgid "Site created by the IT Department of the AE"
 msgstr "Site réalisé par le Pôle Informatique de l'AE"
 
@@ -3039,7 +3039,7 @@ msgid "Eboutic invoices"
 msgstr "Facture eboutic"
 
 #: core/templates/core/user_account.jinja:54
-#: core/templates/core/user_tools.jinja:58 counter/views.py:709
+#: core/templates/core/user_tools.jinja:58 counter/views.py:710
 msgid "Etickets"
 msgstr "Etickets"
 
@@ -3375,7 +3375,7 @@ msgid "Subscription stats"
 msgstr "Statistiques de cotisation"
 
 #: core/templates/core/user_tools.jinja:48 counter/forms.py:164
-#: counter/views.py:679
+#: counter/views.py:680
 msgid "Counters"
 msgstr "Comptoirs"
 
@@ -3392,12 +3392,12 @@ msgid "Product types management"
 msgstr "Gestion des types de produit"
 
 #: core/templates/core/user_tools.jinja:56
-#: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:699
+#: counter/templates/counter/cash_summary_list.jinja:23 counter/views.py:700
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
 
 #: core/templates/core/user_tools.jinja:57
-#: counter/templates/counter/invoices_call.jinja:4 counter/views.py:704
+#: counter/templates/counter/invoices_call.jinja:4 counter/views.py:705
 msgid "Invoices call"
 msgstr "Appels à facture"
 
@@ -3608,8 +3608,8 @@ msgstr "Photos"
 msgid "Galaxy"
 msgstr "Galaxie"
 
-#: counter/apps.py:30 counter/models.py:414 counter/models.py:898
-#: counter/models.py:934 launderette/models.py:32
+#: counter/apps.py:30 counter/models.py:437 counter/models.py:896
+#: counter/models.py:932 launderette/models.py:32
 msgid "counter"
 msgstr "comptoir"
 
@@ -3649,7 +3649,7 @@ msgstr "client"
 msgid "customers"
 msgstr "clients"
 
-#: counter/models.py:74 counter/views.py:261
+#: counter/models.py:74 counter/views.py:262
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
@@ -3725,77 +3725,77 @@ msgstr "groupe d'achat"
 msgid "archived"
 msgstr "archivé"
 
-#: counter/models.py:294 counter/models.py:1034
+#: counter/models.py:294 counter/models.py:1032
 msgid "product"
 msgstr "produit"
 
-#: counter/models.py:393
+#: counter/models.py:416
 msgid "products"
 msgstr "produits"
 
-#: counter/models.py:396
+#: counter/models.py:419
 msgid "counter type"
 msgstr "type de comptoir"
 
-#: counter/models.py:398
+#: counter/models.py:421
 msgid "Bar"
 msgstr "Bar"
 
-#: counter/models.py:398
+#: counter/models.py:421
 msgid "Office"
 msgstr "Bureau"
 
-#: counter/models.py:401
+#: counter/models.py:424
 msgid "sellers"
 msgstr "vendeurs"
 
-#: counter/models.py:409 launderette/models.py:192
+#: counter/models.py:432 launderette/models.py:192
 msgid "token"
 msgstr "jeton"
 
-#: counter/models.py:629
+#: counter/models.py:627
 msgid "bank"
 msgstr "banque"
 
-#: counter/models.py:631 counter/models.py:732
+#: counter/models.py:629 counter/models.py:730
 msgid "is validated"
 msgstr "est validé"
 
-#: counter/models.py:636
+#: counter/models.py:634
 msgid "refilling"
 msgstr "rechargement"
 
-#: counter/models.py:709 eboutic/models.py:245
+#: counter/models.py:707 eboutic/models.py:245
 msgid "unit price"
 msgstr "prix unitaire"
 
-#: counter/models.py:710 counter/models.py:1014 eboutic/models.py:246
+#: counter/models.py:708 counter/models.py:1012 eboutic/models.py:246
 msgid "quantity"
 msgstr "quantité"
 
-#: counter/models.py:729
+#: counter/models.py:727
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: counter/models.py:729 sith/settings.py:403 sith/settings.py:408
+#: counter/models.py:727 sith/settings.py:403 sith/settings.py:408
 #: sith/settings.py:428
 msgid "Credit card"
 msgstr "Carte bancaire"
 
-#: counter/models.py:737
+#: counter/models.py:735
 msgid "selling"
 msgstr "vente"
 
-#: counter/models.py:841
+#: counter/models.py:839
 msgid "Unknown event"
 msgstr "Événement inconnu"
 
-#: counter/models.py:842
+#: counter/models.py:840
 #, python-format
 msgid "Eticket bought for the event %(event)s"
 msgstr "Eticket acheté pour l'événement %(event)s"
 
-#: counter/models.py:844 counter/models.py:867
+#: counter/models.py:842 counter/models.py:865
 #, python-format
 msgid ""
 "You bought an eticket for the event %(event)s.\n"
@@ -3807,63 +3807,63 @@ msgstr ""
 "Vous pouvez également retrouver tous vos e-tickets sur votre page de compte "
 "%(url)s."
 
-#: counter/models.py:903
+#: counter/models.py:901
 msgid "last activity date"
 msgstr "dernière activité"
 
-#: counter/models.py:906
+#: counter/models.py:904
 msgid "permanency"
 msgstr "permanence"
 
-#: counter/models.py:939
+#: counter/models.py:937
 msgid "emptied"
 msgstr "coffre vidée"
 
-#: counter/models.py:942
+#: counter/models.py:940
 msgid "cash register summary"
 msgstr "relevé de caisse"
 
-#: counter/models.py:1010
+#: counter/models.py:1008
 msgid "cash summary"
 msgstr "relevé"
 
-#: counter/models.py:1013
+#: counter/models.py:1011
 msgid "value"
 msgstr "valeur"
 
-#: counter/models.py:1016
+#: counter/models.py:1014
 msgid "check"
 msgstr "chèque"
 
-#: counter/models.py:1018
+#: counter/models.py:1016
 msgid "True if this is a bank check, else False"
 msgstr "Vrai si c'est un chèque, sinon Faux."
 
-#: counter/models.py:1022
+#: counter/models.py:1020
 msgid "cash register summary item"
 msgstr "élément de relevé de caisse"
 
-#: counter/models.py:1038
+#: counter/models.py:1036
 msgid "banner"
 msgstr "bannière"
 
-#: counter/models.py:1040
+#: counter/models.py:1038
 msgid "event date"
 msgstr "date de l'événement"
 
-#: counter/models.py:1042
+#: counter/models.py:1040
 msgid "event title"
 msgstr "titre de l'événement"
 
-#: counter/models.py:1044
+#: counter/models.py:1042
 msgid "secret"
 msgstr "secret"
 
-#: counter/models.py:1083
+#: counter/models.py:1081
 msgid "uid"
 msgstr "uid"
 
-#: counter/models.py:1088
+#: counter/models.py:1086
 msgid "student cards"
 msgstr "cartes étudiante"
 
@@ -3890,15 +3890,6 @@ msgid "counter is open, there's at least one barman connected"
 msgstr "Le comptoir est ouvert, et il y a au moins un barman connecté"
 
 #: counter/templates/counter/activity.jinja:35
-#, python-format
-msgid ""
-"counter is open but not active, the last sale was done at least %(minutes)s "
-"minutes ago "
-msgstr ""
-"Le comptoir est ouvert, mais inactif. La dernière vente a eu lieu il y a "
-"%(minutes)s minutes."
-
-#: counter/templates/counter/activity.jinja:39
 msgid "counter is not open : no one is connected"
 msgstr "Le comptoir est fermé"
 
@@ -3919,7 +3910,7 @@ msgstr "Liste des relevés de caisse"
 msgid "Theoric sums"
 msgstr "Sommes théoriques"
 
-#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:941
+#: counter/templates/counter/cash_summary_list.jinja:36 counter/views.py:942
 msgid "Emptied"
 msgstr "Coffre vidé"
 
@@ -4165,81 +4156,81 @@ msgstr "L'utilisateur n'est pas barman."
 msgid "Bad location, someone is already logged in somewhere else"
 msgstr "Mauvais comptoir, quelqu'un est déjà connecté ailleurs"
 
-#: counter/views.py:252
+#: counter/views.py:253
 msgid "Too young for that product"
 msgstr "Trop jeune pour ce produit"
 
-#: counter/views.py:255
+#: counter/views.py:256
 msgid "Not allowed for that product"
 msgstr "Non autorisé pour ce produit"
 
-#: counter/views.py:258
+#: counter/views.py:259
 msgid "No date of birth provided"
 msgstr "Pas de date de naissance renseignée"
 
-#: counter/views.py:547
+#: counter/views.py:548
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
-#: counter/views.py:674
+#: counter/views.py:675
 msgid "Counter administration"
 msgstr "Administration des comptoirs"
 
-#: counter/views.py:694
+#: counter/views.py:695
 msgid "Product types"
 msgstr "Types de produit"
 
-#: counter/views.py:898
+#: counter/views.py:899
 msgid "10 cents"
 msgstr "10 centimes"
 
-#: counter/views.py:899
+#: counter/views.py:900
 msgid "20 cents"
 msgstr "20 centimes"
 
-#: counter/views.py:900
+#: counter/views.py:901
 msgid "50 cents"
 msgstr "50 centimes"
 
-#: counter/views.py:901
+#: counter/views.py:902
 msgid "1 euro"
 msgstr "1 €"
 
-#: counter/views.py:902
+#: counter/views.py:903
 msgid "2 euros"
 msgstr "2 €"
 
-#: counter/views.py:903
+#: counter/views.py:904
 msgid "5 euros"
 msgstr "5 €"
 
-#: counter/views.py:904
+#: counter/views.py:905
 msgid "10 euros"
 msgstr "10 €"
 
-#: counter/views.py:905
+#: counter/views.py:906
 msgid "20 euros"
 msgstr "20 €"
 
-#: counter/views.py:906
+#: counter/views.py:907
 msgid "50 euros"
 msgstr "50 €"
 
-#: counter/views.py:908
+#: counter/views.py:909
 msgid "100 euros"
 msgstr "100 €"
 
-#: counter/views.py:911 counter/views.py:917 counter/views.py:923
-#: counter/views.py:929 counter/views.py:935
+#: counter/views.py:912 counter/views.py:918 counter/views.py:924
+#: counter/views.py:930 counter/views.py:936
 msgid "Check amount"
 msgstr "Montant du chèque"
 
-#: counter/views.py:914 counter/views.py:920 counter/views.py:926
-#: counter/views.py:932 counter/views.py:938
+#: counter/views.py:915 counter/views.py:921 counter/views.py:927
+#: counter/views.py:933 counter/views.py:939
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
-#: counter/views.py:1507
+#: counter/views.py:1459
 msgid "people(s)"
 msgstr "personne(s)"
 
@@ -4812,12 +4803,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:642
+#: sith/settings.py:639
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:642
+#: sith/settings.py:639
 msgid "Drying"
 msgstr "Séchage"
 
@@ -5609,72 +5600,72 @@ msgstr "Membre actif⸱ve"
 msgid "Curious"
 msgstr "Curieux⸱euse"
 
-#: sith/settings.py:646
+#: sith/settings.py:643
 msgid "A new poster needs to be moderated"
 msgstr "Une nouvelle affiche a besoin d'être modérée"
 
-#: sith/settings.py:647
+#: sith/settings.py:644
 msgid "A new mailing list needs to be moderated"
 msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
-#: sith/settings.py:650
+#: sith/settings.py:647
 msgid "A new pedagogy comment has been signaled for moderation"
 msgstr ""
 "Un nouveau commentaire de la pédagogie a été signalé pour la modération"
 
-#: sith/settings.py:652
+#: sith/settings.py:649
 #, python-format
 msgid "There are %s fresh news to be moderated"
 msgstr "Il y a %s nouvelles toutes fraîches à modérer"
 
-#: sith/settings.py:653
+#: sith/settings.py:650
 msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
-#: sith/settings.py:654
+#: sith/settings.py:651
 #, python-format
 msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
-#: sith/settings.py:655
+#: sith/settings.py:652
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:656
+#: sith/settings.py:653
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s€"
 
-#: sith/settings.py:657
+#: sith/settings.py:654
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:658
+#: sith/settings.py:655
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:670
+#: sith/settings.py:667
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:671
+#: sith/settings.py:668
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:672
+#: sith/settings.py:669
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:673
+#: sith/settings.py:670
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:674
+#: sith/settings.py:671
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
-#: sith/settings.py:682
+#: sith/settings.py:679
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 
