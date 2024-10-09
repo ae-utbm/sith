@@ -91,13 +91,13 @@
 
   <script>
     window.addEventListener("DOMContentLoaded", () => {
-      loadFamilyGraph(
-        "{{ api_url }}",
-        "{{ object.id }}",
-        {{ depth_min }},
-        {{ depth_max }},
-      );
-    })
+      loadFamilyGraph({
+        apiUrl: "{{ api_url }}",
+        activeUser: "{{ object.id }}",
+        depthMin: {{ depth_min }},
+        depthMax: {{ depth_max }},
+      });
+    });
   </script>
 {% endblock %}
 
