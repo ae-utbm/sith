@@ -3,32 +3,32 @@
 </p>
 
 <p>
-  {% trans date=last_subscription_date|date(DATETIME_FORMAT) %}
+  {%- trans date=last_subscription_date|date(DATETIME_FORMAT) -%}
     You received this email because your last subscription to the
     Students' association ended on {{ date }}.
-  {% endtrans %}
+  {%- endtrans -%}
 </p>
 
 <p>
-  {% trans date=dump_date|date(DATETIME_FORMAT) %}
+  {%- trans date=dump_date|date(DATETIME_FORMAT), amount=balance -%}
     In accordance with the Internal Regulations, the balance of any
     inactive AE account for more than 2 years automatically goes back
     to the AE.
     The money present on your account will therefore be recovered in full
-    on {{ date }}.
-  {% endtrans %}
+    on {{ date }}, for a total of {{ amount }} €.
+  {%- endtrans -%}
 </p>
 
 <p>
-  {% trans %}However, if your subscription is renewed by this date,
-    your right to keep the money in your AE account will be renewed.{% endtrans %}
+  {%- trans -%}However, if your subscription is renewed by this date,
+    your right to keep the money in your AE account will be renewed.{%- endtrans -%}
 </p>
 
 {% if balance >= 10 %}
   <p>
-    {% trans %}You can also request a refund by sending an email to
+    {%- trans -%}You can also request a refund by sending an email to
       <a href="mailto:ae@utbm.fr">ae@utbm.fr</a>
-      before the aforementioned date.{% endtrans %}
+      before the aforementioned date.{%- endtrans -%}
   </p>
 {% endif %}
 
