@@ -12,11 +12,12 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from typing import Any
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, TemplateView
@@ -25,7 +26,12 @@ from django.views.generic.edit import FormMixin, FormView, UpdateView
 from core.models import SithFile, User
 from core.views import CanEditMixin, CanViewMixin
 from core.views.files import FileView, send_file
-from sas.forms import AlbumEditForm, PictureEditForm, SASForm
+from sas.forms import (
+    AlbumEditForm,
+    PictureEditForm,
+    PictureModerationRequestForm,
+    SASForm,
+)
 from sas.models import Album, Picture
 
 
@@ -73,11 +79,6 @@ class PictureView(CanViewMixin, DetailView):
             self.object.rotate(270)
         if "rotate_left" in request.GET:
             self.object.rotate(90)
-        if "ask_removal" in request.GET.keys():
-            self.object.is_moderated = False
-            self.object.asked_for_removal = True
-            self.object.save()
-            return redirect("sas:album", album_id=self.object.parent.id)
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -233,6 +234,41 @@ class PictureEditView(CanEditMixin, UpdateView):
     form_class = PictureEditForm
     template_name = "core/edit.jinja"
     pk_url_kwarg = "picture_id"
+
+
+class PictureAskRemovalView(CanViewMixin, DetailView, FormView):
+    """View to allow users to ask pictures to be removed."""
+
+    model = Picture
+    template_name = "sas/ask_picture_removal.jinja"
+    pk_url_kwarg = "picture_id"
+    form_class = PictureModerationRequestForm
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        """Add the user and picture to the form kwargs.
+
+        Those are required to create the PictureModerationRequest,
+        and aren't part of the form itself
+        (picture is a path parameter, and user is the request user).
+        """
+        return super().get_form_kwargs() | {
+            "user": self.request.user,
+            "picture": self.object,
+        }
+
+    def get_success_url(self) -> str:
+        """Return the URL to the album containing the picture."""
+        album = Album.objects.filter(pk=self.object.parent_id).first()
+        if not album:
+            return reverse("sas:main")
+        return album.get_absolute_url()
+
+    def form_valid(self, form: PictureModerationRequestForm) -> HttpResponseRedirect:
+        form.save()
+        self.object.is_moderated = False
+        self.object.asked_for_removal = True
+        self.object.save()
+        return super().form_valid(form)
 
 
 class AlbumEditView(CanEditMixin, UpdateView):

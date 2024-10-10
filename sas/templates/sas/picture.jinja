@@ -96,7 +96,9 @@
                   {% trans %}HD version{% endtrans %}
                 </a>
                 <br>
-                <a class="text danger" href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
+                <a class="text danger" :href="`/sas/picture/${currentPicture.id}/report`">
+                  {% trans %}Ask for removal{% endtrans %}
+                </a>
               </div>
               <div class="buttons">
                 <a class="button" :href="`/sas/picture/${currentPicture.id}/edit/`"><i class="fa-regular fa-pen-to-square edit-action"></i></a>

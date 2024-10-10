@@ -273,16 +273,12 @@ class PeoplePictureRelation(models.Model):
         User,
         verbose_name=_("user"),
         related_name="pictures",
-        null=False,
-        blank=False,
         on_delete=models.CASCADE,
     )
     picture = models.ForeignKey(
         Picture,
         verbose_name=_("picture"),
         related_name="people",
-        null=False,
-        blank=False,
         on_delete=models.CASCADE,
     )
 
@@ -290,4 +286,39 @@ class PeoplePictureRelation(models.Model):
         unique_together = ["user", "picture"]
 
     def __str__(self):
-        return self.user.get_display_name() + " - " + str(self.picture)
+        return f"Moderation request by {self.user.get_short_name()} - {self.picture}"
+
+
+class PictureModerationRequest(models.Model):
+    """A request to remove a Picture from the SAS."""
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(
+        User,
+        verbose_name=_("Author"),
+        related_name="moderation_requests",
+        on_delete=models.CASCADE,
+    )
+    picture = models.ForeignKey(
+        Picture,
+        verbose_name=_("Picture"),
+        related_name="moderation_requests",
+        on_delete=models.CASCADE,
+    )
+    reason = models.TextField(
+        verbose_name=_("Reason"),
+        default="",
+        help_text=_("Why do you want this image to be removed ?"),
+    )
+
+    class Meta:
+        verbose_name = _("Picture moderation request")
+        verbose_name_plural = _("Picture moderation requests")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["author", "picture"], name="one_request_per_user_per_picture"
+            )
+        ]
+
+    def __str__(self):
+        return f"Moderation request by {self.author.get_short_name()}"

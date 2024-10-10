@@ -616,7 +616,7 @@ msgstr "No"
 #: counter/templates/counter/last_ops.jinja:20
 #: counter/templates/counter/last_ops.jinja:45
 #: counter/templates/counter/refilling_list.jinja:16
-#: rootplace/templates/rootplace/logs.jinja:12 sas/views.py:310
+#: rootplace/templates/rootplace/logs.jinja:12 sas/forms.py:90
 #: trombi/templates/trombi/user_profile.jinja:40
 msgid "Date"
 msgstr "Date"
@@ -997,7 +997,7 @@ msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 msgid "You should specify a role"
 msgstr "Vous devez choisir un rôle"
 
-#: club/forms.py:283 sas/views.py:52 sas/views.py:176
+#: club/forms.py:283 sas/views.py:58 sas/views.py:177
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
@@ -1613,7 +1613,7 @@ msgstr "Résumé"
 #: com/templates/com/news_admin_list.jinja:252
 #: com/templates/com/news_admin_list.jinja:289
 #: com/templates/com/weekmail.jinja:17 com/templates/com/weekmail.jinja:46
-#: forum/templates/forum/forum.jinja:55
+#: forum/templates/forum/forum.jinja:55 sas/models.py:298
 msgid "Author"
 msgstr "Auteur"
 
@@ -2246,7 +2246,7 @@ msgstr "avoir une notification pour chaque click"
 msgid "get a notification for every refilling"
 msgstr "avoir une notification pour chaque rechargement"
 
-#: core/models.py:914 sas/forms.py:86
+#: core/models.py:914 sas/forms.py:89
 msgid "file name"
 msgstr "nom du fichier"
 
@@ -2582,6 +2582,7 @@ msgstr "Confirmation"
 #: core/templates/core/delete_confirm.jinja:20
 #: core/templates/core/file_delete_confirm.jinja:14
 #: counter/templates/counter/counter_click.jinja:121
+#: sas/templates/sas/ask_picture_removal.jinja:20
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -3496,12 +3497,12 @@ msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
 #: core/views/files.py:153 core/views/forms.py:277 core/views/forms.py:284
-#: sas/forms.py:57
+#: sas/forms.py:60
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 
-#: core/views/files.py:228 sas/forms.py:90
+#: core/views/files.py:228 sas/forms.py:93
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
@@ -3996,7 +3997,7 @@ msgstr "Ce n'est pas un UID de carte étudiante valide"
 #: counter/templates/counter/invoices_call.jinja:16
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
-#: sas/templates/sas/picture.jinja:141
+#: sas/templates/sas/picture.jinja:143
 #: subscription/templates/subscription/stats.jinja:19
 msgid "Go"
 msgstr "Valider"
@@ -5099,7 +5100,7 @@ msgstr "non noté"
 msgid "UV comment moderation"
 msgstr "Modération des commentaires d'UV"
 
-#: pedagogy/templates/pedagogy/moderation.jinja:14
+#: pedagogy/templates/pedagogy/moderation.jinja:14 sas/models.py:309
 msgid "Reason"
 msgstr "Raison"
 
@@ -5267,26 +5268,46 @@ msgstr "Utilisateur qui sera supprimé"
 msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
-#: sas/forms.py:13
+#: sas/forms.py:16
 msgid "Add a new album"
 msgstr "Ajouter un nouvel album"
 
-#: sas/forms.py:16
+#: sas/forms.py:19
 msgid "Upload images"
 msgstr "Envoyer les images"
 
-#: sas/forms.py:34
+#: sas/forms.py:37
 #, python-format
 msgid "Error creating album %(album)s: %(msg)s"
 msgstr "Erreur de création de l'album %(album)s : %(msg)s"
 
-#: sas/forms.py:69 trombi/templates/trombi/detail.jinja:15
+#: sas/forms.py:72 trombi/templates/trombi/detail.jinja:15
 msgid "Add user"
 msgstr "Ajouter une personne"
 
-#: sas/models.py:282
+#: sas/forms.py:117
+msgid "You already requested moderation for this picture."
+msgstr "Vous avez déjà déposé une demande de retrait pour cette photo."
+
+#: sas/models.py:280
 msgid "picture"
 msgstr "photo"
+
+#: sas/models.py:304
+msgid "Picture"
+msgstr "Photo"
+
+#: sas/models.py:311
+msgid "Why do you want this image to be removed ?"
+msgstr "Pourquoi voulez-vous retirer cette image ?"
+
+#: sas/models.py:315
+msgid "Picture moderation request"
+msgstr "Demande de modération de photo"
+
+#: sas/models.py:316
+msgid "Picture moderation requests"
+msgstr "Demandes de modération de photo"
 
 #: sas/templates/sas/album.jinja:9
 #: sas/templates/sas/ask_picture_removal.jinja:4 sas/templates/sas/main.jinja:8
@@ -5305,6 +5326,14 @@ msgstr "Envoyer"
 #: sas/templates/sas/album.jinja:103
 msgid "Template generation time: "
 msgstr "Temps de génération du template : "
+
+#: sas/templates/sas/ask_picture_removal.jinja:9
+msgid "Image removal request"
+msgstr "Demande de retrait d'image"
+
+#: sas/templates/sas/ask_picture_removal.jinja:25
+msgid "Request removal"
+msgstr "Demander le retrait"
 
 #: sas/templates/sas/main.jinja:20
 msgid "You must be logged in to see the SAS."
@@ -5339,7 +5368,7 @@ msgstr ""
 msgid "HD version"
 msgstr "Version HD"
 
-#: sas/templates/sas/picture.jinja:98
+#: sas/templates/sas/picture.jinja:99
 msgid "Ask for removal"
 msgstr "Demander le retrait"
 
@@ -5347,7 +5376,7 @@ msgstr "Demander le retrait"
 msgid "Previous picture"
 msgstr "Image précédente"
 
-#: sas/templates/sas/picture.jinja:137
+#: sas/templates/sas/picture.jinja:139
 msgid "People"
 msgstr "Personne(s)"
 

@@ -1,11 +1,14 @@
+from typing import Any
+
 from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from core.models import User
 from core.views import MultipleImageField
 from core.views.forms import SelectDate
-from sas.models import Album, PeoplePictureRelation, Picture
+from sas.models import Album, PeoplePictureRelation, Picture, PictureModerationRequest
 
 
 class SASForm(forms.Form):
@@ -88,3 +91,34 @@ class AlbumEditForm(forms.ModelForm):
     parent = make_ajax_field(Album, "parent", "files", help_text="")
     edit_groups = make_ajax_field(Album, "edit_groups", "groups", help_text="")
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
+
+
+class PictureModerationRequestForm(forms.ModelForm):
+    """Form to create a PictureModerationRequest.
+
+    The form only manages the reason field,
+    because the author and the picture are set in the view.
+    """
+
+    class Meta:
+        model = PictureModerationRequest
+        fields = ["reason"]
+
+    def __init__(self, *args, user: User, picture: Picture, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+        self.picture = picture
+
+    def clean(self) -> dict[str, Any]:
+        if PictureModerationRequest.objects.filter(
+            author=self.user, picture=self.picture
+        ).exists():
+            raise forms.ValidationError(
+                _("You already requested moderation for this picture.")
+            )
+        return super().clean()
+
+    def save(self, *, commit=True) -> PictureModerationRequest:
+        self.instance.author = self.user
+        self.instance.picture = self.picture
+        return super().save(commit)
