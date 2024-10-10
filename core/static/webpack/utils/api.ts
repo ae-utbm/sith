@@ -1,4 +1,5 @@
-import type { Options, RequestResult } from "@hey-api/client-fetch";
+import type { Client, Options, RequestResult } from "@hey-api/client-fetch";
+import { client } from "#openapi";
 
 interface PaginatedResponse<T> {
   count: number;
@@ -45,4 +46,36 @@ export const paginated = async <T>(
     results.push(...(await Promise.all(promises)).flat());
   }
   return results;
+};
+
+interface Request {
+  client?: Client;
+}
+
+interface InterceptorOptions {
+  url: string;
+}
+
+type GenericEndpoint = <ThrowOnError extends boolean = false>(
+  options?: Options<Request, ThrowOnError>,
+) => RequestResult<unknown, unknown, ThrowOnError>;
+
+/**
+ * Return the endpoint url of the endpoint
+ **/
+export const makeUrl = async (endpoint: GenericEndpoint) => {
+  let url = "";
+  const interceptor = (_request: undefined, options: InterceptorOptions) => {
+    url = options.url;
+    throw new Error("We don't want to send the request");
+  };
+
+  client.interceptors.request.use(interceptor);
+  try {
+    await endpoint({ client: client });
+  } catch (_error) {
+    /* do nothing */
+  }
+  client.interceptors.request.eject(interceptor);
+  return url;
 };
