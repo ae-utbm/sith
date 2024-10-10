@@ -135,9 +135,6 @@ nav:
       - reference/staticfiles/storage.md
       - reference/staticfiles/finders.md
       - reference/staticfiles/processors.md
-    - stock:
-      - reference/stock/models.md
-      - reference/stock/views.md
     - subscription:
       - reference/subscription/models.md
       - reference/subscription/views.md

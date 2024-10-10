@@ -58,27 +58,25 @@ sith/
 │   └── ...
 ├── sith/ (19)
 │   └── ...
-├── stock/ (20)
+├── subscription/ (20)
 │   └── ...
-├── subscription/ (21)
+├── trombi/ (21)
 │   └── ...
-├── trombi/ (22)
+├── antispam/ (22)
 │   └── ...
-├── antispam/ (23)
-│   └── ...
-├── staticfiles/ (24)
+├── staticfiles/ (23)
 │   └── ...
 │
-├── .coveragerc (25)
-├── .envrc (26)
+├── .coveragerc (24)
+├── .envrc (25)
 ├── .gitattributes
 ├── .gitignore
 ├── .mailmap
 ├── .env.exemple
-├── manage.py (27)
-├── mkdocs.yml (28)
+├── manage.py (26)
+├── mkdocs.yml (27)
 ├── poetry.lock
-├── pyproject.toml (29)
+├── pyproject.toml (28)
 └── README.md
 ```
 </div>
@@ -113,22 +111,21 @@ sith/
     peuvent également laisser leurs avis.
 17. Fonctionnalités utiles aux utilisateurs root.
 18. Le SAS, où l'on trouve toutes les photos de l'AE.
-19. Application principale du projet, contenant sa configuration.
-20. Gestion des stocks des comptoirs.
-21. Gestion des cotisations des utilisateurs du site.
-22. Outil pour faciliter la fabrication des trombinoscopes de promo.
-23. Fonctionnalités pour gérer le spam.
-24. Gestion des statics du site. Override le système de statics de Django.
+19. Application principale du projet, contenant sa configuration. 
+20. Gestion des cotisations des utilisateurs du site. 
+21. Outil pour faciliter la fabrication des trombinoscopes de promo. 
+22. Fonctionnalités pour gérer le spam. 
+23. Gestion des statics du site. Override le système de statics de Django.
     Ajoute l'intégration du scss et de webpack
-    de manière transparente pour l'utilisateur.
-25. Fichier de configuration de coverage.
-26. Fichier de configuration de direnv.
-27. Fichier généré automatiquement par Django. C'est lui
+    de manière transparente pour l'utilisateur. 
+24. Fichier de configuration de coverage. 
+25. Fichier de configuration de direnv. 
+26. Fichier généré automatiquement par Django. C'est lui
     qui permet d'appeler des commandes de gestion du projet
     avec la syntaxe `python ./manage.py <nom de la commande>`
-28. Le fichier de configuration de la documentation,
-    avec ses plugins et sa table des matières.
-29. Le fichier où sont déclarés les dépendances et la configuration
+27. Le fichier de configuration de la documentation,
+    avec ses plugins et sa table des matières. 
+28. Le fichier où sont déclarés les dépendances et la configuration
     de certaines d'entre elles.
     
 
