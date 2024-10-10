@@ -10,7 +10,8 @@
     "moduleResolution": "node",
     "paths": {
       "#openapi": ["./staticfiles/generated/openapi/index.ts"],
-      "#core:*": ["./core/static/webpack/*"]
+      "#core:*": ["./core/static/webpack/*"],
+      "#pedagogy:*": ["./pedagogy/static/webpack/*"]
     }
   }
 }

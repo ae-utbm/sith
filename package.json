@@ -15,7 +15,8 @@
   "sideEffects": [".css"],
   "imports": {
     "#openapi": "./staticfiles/generated/openapi/index.ts",
-    "#core:*": "./core/static/webpack/*"
+    "#core:*": "./core/static/webpack/*",
+    "#pedagogy:*": "./pedagogy/static/webpack/*"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
