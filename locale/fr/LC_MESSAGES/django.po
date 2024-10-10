@@ -997,7 +997,7 @@ msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 msgid "You should specify a role"
 msgstr "Vous devez choisir un rôle"
 
-#: club/forms.py:283 sas/views.py:117 sas/views.py:241
+#: club/forms.py:283 sas/views.py:52 sas/views.py:176
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
@@ -2246,7 +2246,7 @@ msgstr "avoir une notification pour chaque click"
 msgid "get a notification for every refilling"
 msgstr "avoir une notification pour chaque rechargement"
 
-#: core/models.py:914 sas/views.py:309
+#: core/models.py:914 sas/forms.py:86
 msgid "file name"
 msgstr "nom du fichier"
 
@@ -3496,12 +3496,12 @@ msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
 #: core/views/files.py:153 core/views/forms.py:277 core/views/forms.py:284
-#: sas/views.py:81
+#: sas/forms.py:57
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 
-#: core/views/files.py:228 sas/views.py:313
+#: core/views/files.py:228 sas/forms.py:90
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
@@ -5267,11 +5267,29 @@ msgstr "Utilisateur qui sera supprimé"
 msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
+#: sas/forms.py:13
+msgid "Add a new album"
+msgstr "Ajouter un nouvel album"
+
+#: sas/forms.py:16
+msgid "Upload images"
+msgstr "Envoyer les images"
+
+#: sas/forms.py:34
+#, python-format
+msgid "Error creating album %(album)s: %(msg)s"
+msgstr "Erreur de création de l'album %(album)s : %(msg)s"
+
+#: sas/forms.py:69 trombi/templates/trombi/detail.jinja:15
+msgid "Add user"
+msgstr "Ajouter une personne"
+
 #: sas/models.py:282
 msgid "picture"
 msgstr "photo"
 
-#: sas/templates/sas/album.jinja:9 sas/templates/sas/main.jinja:8
+#: sas/templates/sas/album.jinja:9
+#: sas/templates/sas/ask_picture_removal.jinja:4 sas/templates/sas/main.jinja:8
 #: sas/templates/sas/main.jinja:17 sas/templates/sas/picture.jinja:12
 msgid "SAS"
 msgstr "SAS"
@@ -5332,23 +5350,6 @@ msgstr "Image précédente"
 #: sas/templates/sas/picture.jinja:137
 msgid "People"
 msgstr "Personne(s)"
-
-#: sas/views.py:37
-msgid "Add a new album"
-msgstr "Ajouter un nouvel album"
-
-#: sas/views.py:40
-msgid "Upload images"
-msgstr "Envoyer les images"
-
-#: sas/views.py:58
-#, python-format
-msgid "Error creating album %(album)s: %(msg)s"
-msgstr "Erreur de création de l'album %(album)s : %(msg)s"
-
-#: sas/views.py:93 trombi/templates/trombi/detail.jinja:15
-msgid "Add user"
-msgstr "Ajouter une personne"
 
 #: sith/settings.py:255 sith/settings.py:474
 msgid "English"
