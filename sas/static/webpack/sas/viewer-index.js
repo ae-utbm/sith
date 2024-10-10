@@ -89,7 +89,7 @@ class PictureWithIdentifications {
 
 /**
  * Load user picture page with a nice download bar
- * @param {ViewerConfig} Configuration
+ * @param {ViewerConfig} config
  **/
 window.loadViewer = (config) => {
   document.addEventListener("alpine:init", () => {

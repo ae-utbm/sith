@@ -177,7 +177,7 @@ function createGraph(container, data, activeUserId) {
 
 /**
  * Create a family graph of an user
- * @param {FamilyGraphConfig} Configuration
+ * @param {FamilyGraphConfig} config
  **/
 window.loadFamilyGraph = (config) => {
   document.addEventListener("alpine:init", () => {

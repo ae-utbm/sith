@@ -35,7 +35,7 @@ import { picturesFetchPictures } from "#openapi";
 
 /**
  * Load user picture page with a nice download bar
- * @param {PicturePageConfig} Configuration
+ * @param {PicturePageConfig} config
  **/
 window.loadPicturePage = (config) => {
   document.addEventListener("alpine:init", () => {
