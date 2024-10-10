@@ -27,7 +27,7 @@ class ManifestPostProcessingStorage(ManifestStaticFilesStorage):
                 )
             name = str(path.with_suffix(".css"))
 
-        if path.suffix == ".ts":
+        elif path.suffix == ".ts":
             name = str(path.with_suffix(".js"))
 
         return super().url(name, force=force)

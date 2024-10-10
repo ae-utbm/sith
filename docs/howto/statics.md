@@ -48,9 +48,9 @@ Pour accéder au fichier, il faut utiliser `static` comme pour le reste mais en 
 
 ### Les imports au sein des fichiers de webpack
 
-Pour importer au sein de webpack, faut préfixer ses imports de `#app:`.
+Pour importer au sein de webpack, il faut préfixer ses imports de `#app:`.
 
-Example:
+Exemple:
 
 ```js
 import { paginated } from "#core:utils/api";

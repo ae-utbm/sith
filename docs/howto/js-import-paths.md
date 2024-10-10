@@ -8,12 +8,12 @@ D'abord, il faut ajouter dans node via `package.json`:
 
 ```json
 {
-	// ...
-	"imports": {
-		// ...
-		"#mon_app:*": "./mon_app/static/webpack/*"
-	}
-	// ...
+    // ...
+    "imports": {
+        // ...
+        "#mon_app:*": "./mon_app/static/webpack/*"
+    }
+    // ...
 }
 ```
 
@@ -21,13 +21,13 @@ Ensuite, pour faire fonctionne l'auto-complétion, il faut configurer `tsconfig.
 
 ```json
 {
-	"compilerOptions": {
-		// ...
-		"paths": {
-			// ...
-			"#mon_app:*": ["./mon_app/static/webpack/*"]
-		}
-	}
+    "compilerOptions": {
+        // ...
+        "paths": {
+            // ...
+            "#mon_app:*": ["./mon_app/static/webpack/*"]
+        }
+    }
 }
 ```
 

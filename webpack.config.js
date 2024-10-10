@@ -23,7 +23,7 @@ module.exports = {
       return obj;
     }, {}),
   cache: {
-    type: "filesystem", // This reduces typescript compilation time like crazy
+    type: "filesystem", // This reduces typescript compilation time like crazy when you restart the server
   },
   output: {
     filename: "[name].js",

@@ -30,7 +30,7 @@ import { picturesFetchPictures } from "#openapi";
 
 /**
  * @typedef PicturePageConfig
- * @param {number} userId Id of the user to get the pictures from
+ * @property {number} userId Id of the user to get the pictures from
  **/
 
 /**

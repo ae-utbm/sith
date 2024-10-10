@@ -81,10 +81,10 @@ class PictureWithIdentifications {
 
 /**
  * @typedef ViewerConfig
- * @param {number} userId Id of the user to get the pictures from
- * @param {number} albumId Id of the album to displlay
- * @param {number} firstPictureId id of the first picture to load on the page
- * @param {bool} userIsSasAdmin if the user is sas admin
+ * @property {number} userId Id of the user to get the pictures from
+ * @property {number} albumId Id of the album to displlay
+ * @property {number} firstPictureId id of the first picture to load on the page
+ * @property {bool} userIsSasAdmin if the user is sas admin
  **/
 
 /**

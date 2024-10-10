@@ -170,9 +170,9 @@ function createGraph(container, data, activeUserId) {
 
 /**
  * @typedef FamilyGraphConfig
- * @param {number} activeUser Id of the user to fetch the tree from
- * @param {number} depthMin Minimum tree depth for godfathers and godchildren
- * @param {number} depthMax Maximum tree depth for godfathers and godchildren
+ * @property {number} activeUser Id of the user to fetch the tree from
+ * @property {number} depthMin Minimum tree depth for godfathers and godchildren
+ * @property {number} depthMax Maximum tree depth for godfathers and godchildren
  **/
 
 /**
