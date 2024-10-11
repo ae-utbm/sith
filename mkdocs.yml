@@ -72,6 +72,7 @@ nav:
     - Gérer les migrations: howto/migrations.md
     - Gérer les traductions: howto/translation.md
     - Gérer les statics: howto/statics.md
+    - Ajouter un chemin d'import javascript: howto/js-import-paths.md
     - Configurer pour la production: howto/prod.md
     - Ajouter un logo de promo: howto/logo.md
     - Ajouter une cotisation: howto/subscriptions.md

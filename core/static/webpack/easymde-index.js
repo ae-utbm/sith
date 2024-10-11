@@ -2,25 +2,21 @@
 import "codemirror/lib/codemirror.css";
 import "easymde/src/css/easymde.css";
 import easyMde from "easymde";
-
-// This scripts dependens on Alpine but it should be loaded on every page
+import { markdownRenderMarkdown } from "#openapi";
 
 /**
  * Create a new easymde based textarea
  * @param {HTMLTextAreaElement} textarea to use
- * @param {string} link to the markdown api
  **/
-window.easymdeFactory = (textarea, markdownApiUrl) => {
+window.easymdeFactory = (textarea) => {
   const easymde = new easyMde({
     element: textarea,
     spellChecker: false,
     autoDownloadFontAwesome: false,
     previewRender: Alpine.debounce(async (plainText, preview) => {
-      const res = await fetch(markdownApiUrl, {
-        method: "POST",
-        body: JSON.stringify({ text: plainText }),
-      });
-      preview.innerHTML = await res.text();
+      preview.innerHTML = (
+        await markdownRenderMarkdown({ body: { text: plainText } })
+      ).data;
       return null;
     }, 300),
     forceSync: true, // Avoid validation error on generic create view

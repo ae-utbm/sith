@@ -1,16 +1,26 @@
 import cytoscape from "cytoscape";
 import cxtmenu from "cytoscape-cxtmenu";
 import klay from "cytoscape-klay";
+import { familyGetFamilyGraph } from "#openapi";
 
 cytoscape.use(klay);
 cytoscape.use(cxtmenu);
 
-async function getGraphData(url, godfathersDepth, godchildrenDepth) {
-  const data = await (
-    await fetch(
-      `${url}?godfathers_depth=${godfathersDepth}&godchildren_depth=${godchildrenDepth}`,
-    )
-  ).json();
+async function getGraphData(userId, godfathersDepth, godchildrenDepth) {
+  const data = (
+    await familyGetFamilyGraph({
+      path: {
+        // biome-ignore lint/style/useNamingConvention: api is snake_case
+        user_id: userId,
+      },
+      query: {
+        // biome-ignore lint/style/useNamingConvention: api is snake_case
+        godfathers_depth: godfathersDepth,
+        // biome-ignore lint/style/useNamingConvention: api is snake_case
+        godchildren_depth: godchildrenDepth,
+      },
+    })
+  ).data;
   return [
     ...data.users.map((user) => {
       return { data: user };
@@ -160,15 +170,14 @@ function createGraph(container, data, activeUserId) {
 
 /**
  * @typedef FamilyGraphConfig
- * @param {string} apiUrl Base url for fetching the tree as a string
- * @param {string} activeUser Id of the user to fetch the tree from
- * @param {number} depthMin Minimum tree depth for godfathers and godchildren
- * @param {number} depthMax Maximum tree depth for godfathers and godchildren
+ * @property {number} activeUser Id of the user to fetch the tree from
+ * @property {number} depthMin Minimum tree depth for godfathers and godchildren
+ * @property {number} depthMax Maximum tree depth for godfathers and godchildren
  **/
 
 /**
  * Create a family graph of an user
- * @param {FamilyGraphConfig} Configuration
+ * @param {FamilyGraphConfig} config
  **/
 window.loadFamilyGraph = (config) => {
   document.addEventListener("alpine:init", () => {
@@ -248,7 +257,7 @@ window.loadFamilyGraph = (config) => {
 
       async fetchGraphData() {
         this.graphData = await getGraphData(
-          config.apiUrl,
+          config.activeUser,
           this.godfathersDepth,
           this.godchildrenDepth,
         );

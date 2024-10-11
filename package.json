@@ -13,10 +13,16 @@
   "author": "",
   "license": "GPL-3.0-only",
   "sideEffects": [".css"],
+  "imports": {
+    "#openapi": "./staticfiles/generated/openapi/index.ts",
+    "#core:*": "./core/static/webpack/*",
+    "#pedagogy:*": "./pedagogy/static/webpack/*"
+  },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.4",
     "@biomejs/biome": "1.9.3",
+    "@hey-api/openapi-ts": "^0.53.8",
     "babel-loader": "^9.2.1",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.0",
@@ -24,11 +30,14 @@
     "mini-css-extract-plugin": "^2.9.1",
     "source-map-loader": "^5.0.0",
     "terser-webpack-plugin": "^5.3.10",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.3",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
+    "@hey-api/client-fetch": "^0.4.0",
     "@zip.js/zip.js": "^2.7.52",
     "alpinejs": "^3.14.1",
     "cytoscape": "^3.30.2",

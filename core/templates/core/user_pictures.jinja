@@ -62,9 +62,7 @@
   {{ super() }}
   <script>
     window.addEventListener("DOMContentLoaded", () => {
-      loadPicturePage({
-        apiUrl: "{{ url("api:pictures") }}?users_identified={{ object.id }}"
-      });
+      loadPicturePage({ userId: {{ object.id }} });
     })
   </script>
 {% endblock script %}

@@ -92,8 +92,7 @@
   <script>
     window.addEventListener("DOMContentLoaded", () => {
       loadFamilyGraph({
-        apiUrl: "{{ api_url }}",
-        activeUser: "{{ object.id }}",
+        activeUser: {{ object.id }},
         depthMin: {{ depth_min }},
         depthMax: {{ depth_max }},
       });

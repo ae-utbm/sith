@@ -1,5 +1,7 @@
+import { paginated } from "#core:utils/api";
 import { HttpReader, ZipWriter } from "@zip.js/zip.js";
 import { showSaveFilePicker } from "native-file-system-adapter";
+import { picturesFetchPictures } from "#openapi";
 
 /**
  * @typedef UserProfile
@@ -28,12 +30,12 @@ import { showSaveFilePicker } from "native-file-system-adapter";
 
 /**
  * @typedef PicturePageConfig
- * @param {string} apiUrl Url of the api endpoint to fetch pictures from the user
+ * @property {number} userId Id of the user to get the pictures from
  **/
 
 /**
  * Load user picture page with a nice download bar
- * @param {PicturePageConfig} Configuration
+ * @param {PicturePageConfig} config
  **/
 window.loadPicturePage = (config) => {
   document.addEventListener("alpine:init", () => {
@@ -44,8 +46,10 @@ window.loadPicturePage = (config) => {
       albums: {},
 
       async init() {
-        // biome-ignore lint/correctness/noUndeclaredVariables: imported from script.json
-        this.pictures = await fetchPaginated(config.apiUrl);
+        this.pictures = await paginated(picturesFetchPictures, {
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          query: { users_identified: [config.userId] },
+        });
         this.albums = this.pictures.reduce((acc, picture) => {
           if (!acc[picture.album]) {
             acc[picture.album] = [];

@@ -12,7 +12,7 @@ from staticfiles.processors import JS, Scss
 
 class ManifestPostProcessingStorage(ManifestStaticFilesStorage):
     def url(self, name: str, *, force: bool = False) -> str:
-        """Get the URL for a file, convert .scss calls to .css ones"""
+        """Get the URL for a file, convert .scss calls to .css ones and .ts to .js"""
         # This name swap has to be done here
         # Otherwise, the manifest isn't aware of the file and can't work properly
         path = Path(name)
@@ -26,6 +26,9 @@ class ManifestPostProcessingStorage(ManifestStaticFilesStorage):
                     ]
                 )
             name = str(path.with_suffix(".css"))
+
+        elif path.suffix == ".ts":
+            name = str(path.with_suffix(".js"))
 
         return super().url(name, force=force)
 

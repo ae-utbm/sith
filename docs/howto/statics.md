@@ -35,8 +35,9 @@ les fichiers sont à mettre dans un dossier `static/webpack` de l'application à
 Pour accéder au fichier, il faut utiliser `static` comme pour le reste mais en ajouter `webpack/` comme prefix.
 
 ```jinja
-	{# Exemple pour ajouter sith/core/webpack/alpine-index.js #}
+	{# Example pour ajouter sith/core/webpack/alpine-index.js #}
 	<script src="{{ static('webpack/alpine-index.js') }}" defer></script>
+	<script src="{{ static('webpack/other-index.ts') }}" defer></script>
 ```
 
 !!!note
@@ -44,6 +45,16 @@ Pour accéder au fichier, il faut utiliser `static` comme pour le reste mais en 
 	Seuls les fichiers se terminant par `index.js` sont exportés par webpack.
 	Les autres fichiers sont disponibles à l'import dans le JavaScript comme
 	si ils étaient tous au même niveau.
+
+### Les imports au sein des fichiers de webpack
+
+Pour importer au sein de webpack, il faut préfixer ses imports de `#app:`.
+
+Exemple:
+
+```js
+import { paginated } from "#core:utils/api";
+```
 
 ## Comment ça fonctionne le post processing ?
 
