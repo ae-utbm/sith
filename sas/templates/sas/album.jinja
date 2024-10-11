@@ -5,6 +5,10 @@
   <link rel="stylesheet" href="{{ static('sas/css/album.scss') }}">
 {%- endblock -%}
 
+{%- block additional_js -%}
+  <script src="{{ static('webpack/sas/album-index.js') }}" defer></script>
+{%- endblock -%}
+
 {% block title %}
   {% trans %}SAS{% endtrans %}
 {% endblock %}
@@ -108,48 +112,14 @@
 {% block script %}
   {{ super() }}
   <script>
-    document.addEventListener("alpine:init", () => {
-      Alpine.data("pictures", () => ({
-        pictures: {},
-        page: parseInt(initialUrlParams.get("page")) || 1,
-        pushstate: History.PUSH, /* Used to avoid pushing a state on a back action */
-        loading: false,
+    window.addEventListener("DOMContentLoaded", () => {
+      loadAlbum({
+        albumId: {{ album.id }},
+        maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
+      });
+    });
 
-        async init() {
-          await this.fetchPictures();
-          this.$watch("page", () => {
-            updateQueryString("page",
-              this.page === 1 ? null : this.page,
-              this.pushstate
-            );
-            this.pushstate = History.PUSH;
-            this.fetchPictures();
-          });
-
-          window.addEventListener("popstate", () => {
-            this.pushstate = History.REPLACE;
-            this.page = parseInt(
-              new URLSearchParams(window.location.search).get("page")
-            ) || 1;
-          });
-        },
-
-        async fetchPictures() {
-          this.loading=true;
-          const url = "{{ url("api:pictures") }}"
-          +"?album_id={{ album.id }}"
-          +`&page=${this.page}`
-          +"&page_size={{ settings.SITH_SAS_IMAGES_PER_PAGE }}";
-          this.pictures = await (await fetch(url)).json();
-          this.loading = false;
-        },
-
-        nbPages() {
-          return Math.ceil(this.pictures.count / {{ settings.SITH_SAS_IMAGES_PER_PAGE }});
-        }
-      }))
-    })
-
+    // Todo: migrate to alpine.js if we have some time
     $("form#upload_form").submit(function (event) {
       let formData = new FormData($(this)[0]);
 
@@ -255,4 +225,6 @@
       }
     });
   </script>
+
 {% endblock %}
+
