@@ -68,27 +68,33 @@
                 </form>
                 <ul class="bars">
                   {% cache 100 "counters_activity" %}
-                    {% for bar in Counter.objects.annotate_has_barman(user).filter(type="BAR") %}
-                      <li>
-                                                {# If the user is a barman, we redirect him directly to the barman page
-                                                else we redirect him to the activity page #}
-                        {% if bar.has_annotated_barman %}
-                          <a href="{{ url('counter:details', counter_id=bar.id) }}">
-                        {% else %}
-                          <a href="{{ url('counter:activity', counter_id=bar.id) }}">
-                        {% endif %}
-                        {% if bar.is_inactive() %}
-                          <i class="fa fa-question" style="color: #f39c12"></i>
-                        {% elif bar.is_open %}
-                          <i class="fa fa-check" style="color: #2ecc71"></i>
-                        {% else %}
-                          <i class="fa fa-times" style="color: #eb2f06"></i>
-                        {% endif %}
-                        <span>{{ bar }}</span>
-                      </a>
-                      </li>
-                    {% endfor %}
+                      {# The sith has no periodic tasks manager
+                         and using cron jobs would be way too overkill here.
+                         Thus the barmen timeout is handled in the only place that
+                         is loaded on every page : the header bar.
+                         However, let's be clear : this has nothing to do here.
+                         It's' merely a contrived workaround that should
+                         replaced by a proper task manager as soon as possible. #}
+                    {% set _ = Counter.objects.filter(type="BAR").handle_timeout() %}
                   {% endcache %}
+                  {% for bar in Counter.objects.annotate_has_barman(user).annotate_is_open().filter(type="BAR") %}
+                    <li>
+                      {# If the user is a barman, we redirect him directly to the barman page
+                      else we redirect him to the activity page #}
+                      {% if bar.has_annotated_barman %}
+                        <a href="{{ url('counter:details', counter_id=bar.id) }}">
+                      {% else %}
+                        <a href="{{ url('counter:activity', counter_id=bar.id) }}">
+                      {% endif %}
+                      {% if bar.is_open %}
+                        <i class="fa fa-check" style="color: #2ecc71"></i>
+                      {% else %}
+                        <i class="fa fa-times" style="color: #eb2f06"></i>
+                      {% endif %}
+                      <span>{{ bar }}</span>
+                    </a>
+                    </li>
+                  {% endfor %}
                 </ul>
               </div>
               <div class="right">

@@ -358,7 +358,7 @@ class Product(models.Model):
 
 
 class CounterQuerySet(models.QuerySet):
-    def annotate_has_barman(self, user: User) -> CounterQuerySet:
+    def annotate_has_barman(self, user: User) -> Self:
         """Annotate the queryset with the `user_is_barman` field.
 
         For each counter, this field has value True if the user
@@ -382,6 +382,29 @@ class CounterQuerySet(models.QuerySet):
         """
         subquery = user.counters.filter(pk=OuterRef("pk"))
         return self.annotate(has_annotated_barman=Exists(subquery))
+
+    def annotate_is_open(self) -> Self:
+        """Annotate tue queryset with the `is_open` field.
+
+        For each counter, if `is_open=True`, then the counter is currently opened.
+        Else the counter is closed.
+        """
+        return self.annotate(
+            is_open=Exists(
+                Permanency.objects.filter(counter_id=OuterRef("pk"), end=None)
+            )
+        )
+
+    def handle_timeout(self) -> int:
+        """Disconnect the barmen who are inactive in the given counters.
+
+        Returns:
+            The number of affected rows (ie, the number of timeouted permanences)
+        """
+        timeout = timezone.now() - timedelta(minutes=settings.SITH_BARMAN_TIMEOUT)
+        return Permanency.objects.filter(
+            counter__in=self, end=None, activity__lt=timeout
+        ).update(end=F("activity"))
 
 
 class Counter(models.Model):
@@ -450,20 +473,10 @@ class Counter(models.Model):
 
     @cached_property
     def barmen_list(self) -> list[User]:
-        return self.get_barmen_list()
-
-    def get_barmen_list(self) -> list[User]:
-        """Returns the barman list as list of User.
-
-        Also handle the timeout of the barmen
-        """
-        perms = self.permanencies.filter(end=None)
-
-        # disconnect barmen who are inactive
-        timeout = timezone.now() - timedelta(minutes=settings.SITH_BARMAN_TIMEOUT)
-        perms.filter(activity__lte=timeout).update(end=F("activity"))
-
-        return [p.user for p in perms.select_related("user")]
+        """Returns the barman list as list of User."""
+        return [
+            p.user for p in self.permanencies.filter(end=None).select_related("user")
+        ]
 
     def get_random_barman(self) -> User:
         """Return a random user being currently a barman."""
@@ -472,21 +485,6 @@ class Counter(models.Model):
     def update_activity(self) -> None:
         """Update the barman activity to prevent timeout."""
         self.permanencies.filter(end=None).update(activity=timezone.now())
-
-    @property
-    def is_open(self) -> bool:
-        return len(self.barmen_list) > 0
-
-    def is_inactive(self) -> bool:
-        """Returns True if the counter self is inactive from SITH_COUNTER_MINUTE_INACTIVE's value minutes, else False."""
-        return self.is_open and (
-            (timezone.now() - self.permanencies.order_by("-activity").first().activity)
-            > timedelta(minutes=settings.SITH_COUNTER_MINUTE_INACTIVE)
-        )
-
-    def barman_list(self) -> list[int]:
-        """Returns the barman id list."""
-        return [b.id for b in self.barmen_list]
 
     def can_refill(self) -> bool:
         """Show if the counter authorize the refilling with physic money."""

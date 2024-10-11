@@ -239,6 +239,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     """
 
     model = Counter
+    queryset = Counter.objects.annotate_is_open()
     template_name = "counter/counter_click.jinja"
     pk_url_kwarg = "counter_id"
     current_tab = "counter"

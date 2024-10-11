@@ -612,13 +612,10 @@ SITH_CLUB_ROLES = {
 SITH_MAXIMUM_FREE_ROLE = 1
 
 # Minutes to timeout the logged barmen
-SITH_BARMAN_TIMEOUT = 20
+SITH_BARMAN_TIMEOUT = 30
 
 # Minutes to delete the last operations
 SITH_LAST_OPERATIONS_LIMIT = 10
-
-# Minutes for a counter to be inactive
-SITH_COUNTER_MINUTE_INACTIVE = 10
 
 # ET variables
 SITH_EBOUTIC_CB_ENABLED = True
