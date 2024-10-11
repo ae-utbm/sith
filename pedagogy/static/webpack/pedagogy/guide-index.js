@@ -1,3 +1,4 @@
+import { History, getCurrentUrlParams, updateQueryString } from "#core:utils/history";
 import { uvFetchUvList } from "#openapi";
 
 const pageDefault = 1;
@@ -22,13 +23,13 @@ document.addEventListener("alpine:init", () => {
     semester: [],
     // biome-ignore lint/style/useNamingConvention: api is in snake_case
     to_change: [],
-    pushstate: History.PUSH,
+    pushstate: History.Push,
 
     update: undefined,
 
     initializeArgs() {
-      const url = new URLSearchParams(window.location.search);
-      this.pushstate = History.REPLACE;
+      const url = getCurrentUrlParams();
+      this.pushstate = History.Replace;
 
       this.page = Number.parseInt(url.get("page")) || pageDefault;
       this.page_size = Number.parseInt(url.get("page_size")) || pageSizeDefault;
@@ -47,17 +48,14 @@ document.addEventListener("alpine:init", () => {
       this.update = Alpine.debounce(async () => {
         /* Create the whole url before changing everything all at once */
         const first = this.to_change.shift();
-        // biome-ignore lint/correctness/noUndeclaredVariables: defined in script.js
-        let url = updateQueryString(first.param, first.value, History.NONE);
+        let url = updateQueryString(first.param, first.value, History.None);
         for (const value of this.to_change) {
-          // biome-ignore lint/correctness/noUndeclaredVariables: defined in script.js
-          url = updateQueryString(value.param, value.value, History.NONE, url);
+          url = updateQueryString(value.param, value.value, History.None, url);
         }
-        // biome-ignore lint/correctness/noUndeclaredVariables: defined in script.js
         updateQueryString(first.param, first.value, this.pushstate, url);
         await this.fetchData(); /* reload data on form change */
         this.to_change = [];
-        this.pushstate = History.PUSH;
+        this.pushstate = History.Push;
       }, 50);
 
       const searchParams = ["search", "department", "credit_type", "semester"];
@@ -65,7 +63,7 @@ document.addEventListener("alpine:init", () => {
 
       for (const param of searchParams) {
         this.$watch(param, () => {
-          if (this.pushstate !== History.PUSH) {
+          if (this.pushstate !== History.Push) {
             /* This means that we are doing a mass param edit */
             return;
           }
