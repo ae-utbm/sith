@@ -5,10 +5,10 @@
 # This file is part of the website of the UTBM Student Association (AE UTBM),
 # https://ae.utbm.fr.
 #
-# You can find the source code of the website at https://github.com/ae-utbm/sith3
+# You can find the source code of the website at https://github.com/ae-utbm/sith
 #
 # LICENSED UNDER THE GNU GENERAL PUBLIC LICENSE VERSION 3 (GPLv3)
-# SEE : https://raw.githubusercontent.com/ae-utbm/sith3/master/LICENSE
+# SEE : https://raw.githubusercontent.com/ae-utbm/sith/master/LICENSE
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
@@ -126,45 +126,23 @@ class StudentCardDeleteView(DeleteView, CanEditMixin):
 
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
-        if hasattr(self.object, "stock_owner"):
-            return self.object.stock_owner.counter
-        else:
-            return self.object
+        return self.object
 
     def get_list_of_tabs(self):
-        tab_list = []
-        tab_list.append(
+        tab_list = [
             {
                 "url": reverse_lazy(
-                    "counter:details",
-                    kwargs={
-                        "counter_id": (
-                            self.object.stock_owner.counter.id
-                            if hasattr(self.object, "stock_owner")
-                            else self.object.id
-                        )
-                    },
+                    "counter:details", kwargs={"counter_id": self.object.id}
                 ),
                 "slug": "counter",
                 "name": _("Counter"),
             }
-        )
-        if (
-            self.object.stock_owner.counter.type
-            if hasattr(self.object, "stock_owner")
-            else self.object.type == "BAR"
-        ):
+        ]
+        if self.object.type == "BAR":
             tab_list.append(
                 {
                     "url": reverse_lazy(
-                        "counter:cash_summary",
-                        kwargs={
-                            "counter_id": (
-                                self.object.stock_owner.counter.id
-                                if hasattr(self.object, "stock_owner")
-                                else self.object.id
-                            )
-                        },
+                        "counter:cash_summary", kwargs={"counter_id": self.object.id}
                     ),
                     "slug": "cash_summary",
                     "name": _("Cash summary"),
@@ -173,38 +151,12 @@ class CounterTabsMixin(TabedViewMixin):
             tab_list.append(
                 {
                     "url": reverse_lazy(
-                        "counter:last_ops",
-                        kwargs={
-                            "counter_id": (
-                                self.object.stock_owner.counter.id
-                                if hasattr(self.object, "stock_owner")
-                                else self.object.id
-                            )
-                        },
+                        "counter:last_ops", kwargs={"counter_id": self.object.id}
                     ),
                     "slug": "last_ops",
                     "name": _("Last operations"),
                 }
             )
-            try:
-                tab_list.append(
-                    {
-                        "url": reverse_lazy(
-                            "stock:take_items",
-                            kwargs={
-                                "stock_id": (
-                                    self.object.stock.id
-                                    if hasattr(self.object, "stock")
-                                    else self.object.stock_owner.id
-                                )
-                            },
-                        ),
-                        "slug": "take_items_from_stock",
-                        "name": _("Take items from stock"),
-                    }
-                )
-            except:
-                pass  # The counter just have no stock
         return tab_list
 
 
@@ -287,6 +239,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     """
 
     model = Counter
+    queryset = Counter.objects.annotate_is_open()
     template_name = "counter/counter_click.jinja"
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
@@ -721,7 +674,6 @@ def counter_logout(request: HttpRequest, counter_id: int) -> HttpResponseRedirec
 class CounterAdminTabsMixin(TabedViewMixin):
     tabs_title = _("Counter administration")
     list_of_tabs = [
-        {"url": reverse_lazy("stock:list"), "slug": "stocks", "name": _("Stocks")},
         {
             "url": reverse_lazy("counter:admin_list"),
             "slug": "counters",

@@ -5,10 +5,10 @@
 # This file is part of the website of the UTBM Student Association (AE UTBM),
 # https://ae.utbm.fr.
 #
-# You can find the source code of the website at https://github.com/ae-utbm/sith3
+# You can find the source code of the website at https://github.com/ae-utbm/sith
 #
 # LICENSED UNDER THE GNU GENERAL PUBLIC LICENSE VERSION 3 (GPLv3)
-# SEE : https://raw.githubusercontent.com/ae-utbm/sith3/master/LICENSE
+# SEE : https://raw.githubusercontent.com/ae-utbm/sith/master/LICENSE
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
@@ -16,12 +16,12 @@ from __future__ import annotations
 
 import hmac
 from datetime import datetime
-from typing import Any
+from typing import Any, Self
 
 from dict2xml import dict2xml
 from django.conf import settings
 from django.db import DataError, models
-from django.db.models import F, Sum
+from django.db.models import F, OuterRef, Subquery, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -160,6 +160,22 @@ class Basket(models.Model):
         return data
 
 
+class InvoiceQueryset(models.QuerySet):
+    def annotate_total(self) -> Self:
+        """Annotate the queryset with the total amount of each invoice.
+
+        The total amount is the sum of (product_unit_price * quantity)
+        for all items related to the invoice.
+        """
+        return self.annotate(
+            total=Subquery(
+                InvoiceItem.objects.filter(invoice_id=OuterRef("pk"))
+                .annotate(total=Sum(F("product_unit_price") * F("quantity")))
+                .values("total")
+            )
+        )
+
+
 class Invoice(models.Model):
     """Invoices are generated once the payment has been validated."""
 
@@ -172,6 +188,8 @@ class Invoice(models.Model):
     )
     date = models.DateTimeField(_("date"), auto_now=True)
     validated = models.BooleanField(_("validated"), default=False)
+
+    objects = InvoiceQueryset.as_manager()
 
     def __str__(self):
         return f"{self.user} - {self.get_total()} - {self.date}"

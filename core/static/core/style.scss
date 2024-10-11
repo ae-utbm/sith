@@ -228,6 +228,15 @@ a:not(.button) {
   }
 }
 
+.edit-action {
+  color: orange;
+}
+
+.delete-action {
+  color: red;
+}
+
+
 #page {
   width: 90%;
   margin: 20px auto 0;

@@ -39,7 +39,6 @@ from django.forms import (
     TextInput,
 )
 from django.templatetags.static import static
-from django.urls import reverse
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
@@ -76,28 +75,6 @@ class MarkdownInput(Textarea):
             "js": static("webpack/easymde-index.js"),
             "css": static("webpack/easymde-index.css"),
         }
-        context["translations"] = {
-            "heading_smaller": _("Heading"),
-            "italic": _("Italic"),
-            "bold": _("Bold"),
-            "strikethrough": _("Strikethrough"),
-            "underline": _("Underline"),
-            "superscript": _("Superscript"),
-            "subscript": _("Subscript"),
-            "code": _("Code"),
-            "quote": _("Quote"),
-            "unordered_list": _("Unordered list"),
-            "ordered_list": _("Ordered list"),
-            "image": _("Insert image"),
-            "link": _("Insert link"),
-            "table": _("Insert table"),
-            "clean_block": _("Clean block"),
-            "preview": _("Toggle preview"),
-            "side_by_side": _("Toggle side by side"),
-            "fullscreen": _("Toggle fullscreen"),
-            "guide": _("Markdown guide"),
-        }
-        context["markdown_api_url"] = reverse("api:markdown")
         return context
 
 

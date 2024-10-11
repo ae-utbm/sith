@@ -5,10 +5,10 @@
 # This file is part of the website of the UTBM Student Association (AE UTBM),
 # https://ae.utbm.fr.
 #
-# You can find the source code of the website at https://github.com/ae-utbm/sith3
+# You can find the source code of the website at https://github.com/ae-utbm/sith
 #
 # LICENSED UNDER THE GNU GENERAL PUBLIC LICENSE VERSION 3 (GPLv3)
-# SEE : https://raw.githubusercontent.com/ae-utbm/sith3/master/LICENSE
+# SEE : https://raw.githubusercontent.com/ae-utbm/sith/master/LICENSE
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
@@ -23,7 +23,7 @@ import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.http import HttpRequest
-from django.utils import timezone
+from django.utils.timezone import localdate
 from PIL import ExifTags
 from PIL.Image import Image, Resampling
 
@@ -45,7 +45,7 @@ def get_start_of_semester(today: Optional[date] = None) -> date:
         the date of the start of the semester
     """
     if today is None:
-        today = timezone.now().date()
+        today = localdate()
 
     autumn = date(today.year, *settings.SITH_SEMESTER_START_AUTUMN)
     spring = date(today.year, *settings.SITH_SEMESTER_START_SPRING)
@@ -73,7 +73,7 @@ def get_semester_code(d: Optional[date] = None) -> str:
         the semester code corresponding to the given date
     """
     if d is None:
-        d = timezone.now().date()
+        d = localdate()
 
     start = get_start_of_semester(d)
 
@@ -82,40 +82,47 @@ def get_semester_code(d: Optional[date] = None) -> str:
     return "P" + str(start.year)[-2:]
 
 
-def resize_image(im: Image, edge: int, img_format: str):
-    """Resize an image to fit the given edge length and format."""
+def resize_image(
+    im: Image, edge: int, img_format: str, *, optimize: bool = True
+) -> ContentFile:
+    """Resize an image to fit the given edge length and format.
+
+    Args:
+        im: the image to resize
+        edge: the length that the greater side of the resized image should have
+        img_format: the target format of the image ("JPEG", "PNG", "WEBP"...)
+        optimize: Should the resized image be optimized ?
+    """
     (w, h) = im.size
     ratio = edge / max(w, h)
     (width, height) = int(w * ratio), int(h * ratio)
-    return resize_image_explicit(im, (width, height), img_format)
+    return resize_image_explicit(im, (width, height), img_format, optimize=optimize)
 
 
-def resize_image_explicit(im: Image, size: tuple[int, int], img_format: str):
-    """Resize an image to the given size and format."""
+def resize_image_explicit(
+    im: Image, size: tuple[int, int], img_format: str, *, optimize: bool = True
+) -> ContentFile:
+    """Resize an image to the given size and format.
+
+    Args:
+        im: the image to resize
+        size: the target dimension, as a [width, height] tuple
+        img_format: the target format of the image ("JPEG", "PNG", "WEBP"...)
+        optimize: Should the resized image be optimized ?
+    """
     img_format = img_format.upper()
     content = BytesIO()
     # use the lanczos filter for antialiasing and discard the alpha channel
-    im = im.resize((size[0], size[1]), Resampling.LANCZOS)
+    if size != im.size:
+        im = im.resize((size[0], size[1]), Resampling.LANCZOS)
     if img_format == "JPEG":
         # converting an image with an alpha channel to jpeg would cause a crash
         im = im.convert("RGB")
     try:
-        im.save(
-            fp=content,
-            format=img_format,
-            quality=90,
-            optimize=True,
-            progressive=True,
-        )
+        im.save(fp=content, format=img_format, optimize=optimize)
     except IOError:
         PIL.ImageFile.MAXBLOCK = im.size[0] * im.size[1]
-        im.save(
-            fp=content,
-            format=img_format,
-            quality=90,
-            optimize=True,
-            progressive=True,
-        )
+        im.save(fp=content, format=img_format, optimize=optimize)
     return ContentFile(content.getvalue())
 
 

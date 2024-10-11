@@ -21,7 +21,6 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-import logging
 
 # This file contains all the views that concern the user model
 from datetime import date, timedelta
@@ -32,6 +31,8 @@ from django.contrib.auth import login, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import DateField, QuerySet
+from django.db.models.functions import Trunc
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
 from django.http import Http404
@@ -68,6 +69,8 @@ from core.views.forms import (
     UserProfileForm,
 )
 from counter.forms import StudentCardForm
+from counter.models import Refilling, Selling
+from eboutic.models import Invoice
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
@@ -615,19 +618,25 @@ class UserAccountBase(UserTabsMixin, DetailView):
     model = User
     pk_url_kwarg = "user_id"
     current_tab = "account"
+    queryset = User.objects.select_related("customer")
 
     def dispatch(self, request, *arg, **kwargs):  # Manually validates the rights
-        res = super().dispatch(request, *arg, **kwargs)
         if (
-            self.object == request.user
+            kwargs.get("user_id") == request.user.id
             or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
             or request.user.is_in_group(
                 name=settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
             )
             or request.user.is_root
         ):
-            return res
+            return super().dispatch(request, *arg, **kwargs)
         raise PermissionDenied
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        if not hasattr(obj, "customer"):
+            raise Http404(_("User has no account"))
+        return obj
 
 
 class UserAccountView(UserAccountBase):
@@ -635,45 +644,31 @@ class UserAccountView(UserAccountBase):
 
     template_name = "core/user_account.jinja"
 
-    def expense_by_month(self, obj, calc):
-        stats = []
-
-        for year in obj.datetimes("date", "year", order="DESC"):
-            stats.append([])
-            i = 0
-            for month in obj.filter(date__year=year.year).datetimes(
-                "date", "month", order="DESC"
-            ):
-                q = obj.filter(date__year=month.year, date__month=month.month)
-                stats[i].append({"sum": sum([calc(p) for p in q]), "date": month})
-            i += 1
-        return stats
-
-    def invoices_calc(self, query):
-        t = 0
-        for it in query.items.all():
-            t += it.quantity * it.product_unit_price
-        return t
+    @staticmethod
+    def expense_by_month[T](qs: QuerySet[T]) -> QuerySet[T]:
+        month_trunc = Trunc("date", "month", output_field=DateField())
+        return (
+            qs.annotate(grouped_date=month_trunc)
+            .values("grouped_date")
+            .annotate_total()
+            .exclude(total=0)
+            .order_by("-grouped_date")
+        )
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs["profile"] = self.object
-        try:
-            kwargs["customer"] = self.object.customer
-            kwargs["buyings_month"] = self.expense_by_month(
-                self.object.customer.buyings, (lambda q: q.unit_price * q.quantity)
-            )
-            kwargs["invoices_month"] = self.expense_by_month(
-                self.object.customer.user.invoices, self.invoices_calc
-            )
-            kwargs["refilling_month"] = self.expense_by_month(
-                self.object.customer.refillings, (lambda q: q.amount)
-            )
-            kwargs["etickets"] = self.object.customer.buyings.exclude(
-                product__eticket=None
-            ).all()
-        except Exception as e:
-            logging.error(e)
+        kwargs["customer"] = self.object.customer
+        kwargs["buyings_month"] = self.expense_by_month(
+            Selling.objects.filter(customer=self.object.customer)
+        )
+        kwargs["refilling_month"] = self.expense_by_month(
+            Refilling.objects.filter(customer=self.object.customer)
+        )
+        kwargs["invoices_month"] = self.expense_by_month(
+            Invoice.objects.filter(user=self.object)
+        )
+        kwargs["etickets"] = self.object.customer.buyings.exclude(product__eticket=None)
         return kwargs
 
 
@@ -685,13 +680,29 @@ class UserAccountDetailView(UserAccountBase, YearMixin, MonthMixin):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs["profile"] = self.object
-        kwargs["year"] = self.get_year()
-        kwargs["month"] = self.get_month()
-        try:
-            kwargs["customer"] = self.object.customer
-        except:
-            pass
-        kwargs["tab"] = "account"
+        kwargs["customer"] = self.object.customer
+        year, month = self.get_year(), self.get_month()
+        filters = {
+            "customer": self.object.customer,
+            "date__year": year,
+            "date__month": month,
+        }
+        kwargs["purchases"] = list(
+            Selling.objects.filter(**filters)
+            .select_related("counter", "counter__club", "seller")
+            .order_by("-date")
+        )
+        kwargs["refills"] = list(
+            Refilling.objects.filter(**filters)
+            .select_related("counter", "counter__club", "operator")
+            .order_by("-date")
+        )
+        kwargs["invoices"] = list(
+            Invoice.objects.filter(user=self.object, date__year=year, date__month=month)
+            .annotate_total()
+            .prefetch_related("items")
+            .order_by("-date")
+        )
         return kwargs
 
 

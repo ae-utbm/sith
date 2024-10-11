@@ -7,13 +7,7 @@
 {%- endblock -%}
 
 {% block additional_js %}
-  <script src="{{ static("vendored/cytoscape/cytoscape.min.js") }}" defer></script>
-  <script src="{{ static("vendored/cytoscape/cytoscape-cxtmenu.min.js") }}" defer></script>
-
-  <script src="{{ static("vendored/cytoscape/klay.min.js") }}" defer></script>
-  <script src="{{ static("vendored/cytoscape/cytoscape-klay.min.js") }}" defer></script>
-
-  <script src="{{ static("user/js/family_graph.js") }}" defer></script>
+  <script src="{{ static("webpack/user/family-graph-index.js") }}" defer></script>
 {% endblock %}
 
 {% block title %}
@@ -30,21 +24,21 @@
           </label>
           <span class="depth-choice">
             <button
-              @click="godfathers_depth--"
-              :disabled="godfathers_depth <= {{ depth_min }}"
-            ><i class="fa fa-minus fa-xs"></i></button>
+              @click="godfathersDepth--"
+              :disabled="godfathersDepth <= {{ depth_min }}"
+            ><i class="fa fa-minus"></i></button>
             <input
-              x-model="godfathers_depth"
+              x-model="godfathersDepth"
               x-ref="godfather_depth_input"
               type="number"
-              name="godfathers_depth"
+              name="godfathersDepth"
               id="godfather-depth-input"
               min="{{ depth_min }}"
               max="{{ depth_max }}"
             />
             <button
-              @click="godfathers_depth++"
-              :disabled="godfathers_depth >= {{ depth_max }}"
+              @click="godfathersDepth++"
+              :disabled="godfathersDepth >= {{ depth_max }}"
             ><i class="fa fa-plus"
               ></i></button>
           </span>
@@ -56,22 +50,22 @@
           </label>
           <span class="depth-choice">
             <button
-              @click="godchildren_depth--"
-              :disabled="godchildren_depth <= {{ depth_min }}"
+              @click="godchildrenDepth--"
+              :disabled="godchildrenDepth <= {{ depth_min }}"
             ><i
-              class="fa fa-minus fa-xs"
+              class="fa fa-minus"
             ></i></button>
             <input
-              x-model="godchildren_depth"
+              x-model="godchildrenDepth"
               type="number"
-              name="godchildren_depth"
+              name="godchildrenDepth"
               id="godchild-depth-input"
               min="{{ depth_min }}"
               max="{{ depth_max }}"
             />
             <button
-              @click="godchildren_depth++"
-              :disabled="godchildren_depth >= {{ depth_max }}"
+              @click="godchildrenDepth++"
+              :disabled="godchildrenDepth >= {{ depth_max }}"
             ><i class="fa fa-plus"
               ></i></button>
           </span>
@@ -96,10 +90,13 @@
   </div>
 
   <script>
-    const api_url = "{{ api_url }}";
-    const active_user = "{{ object.id }}"
-    const depth_min = {{ depth_min }};
-    const depth_max = {{ depth_max }};
+    window.addEventListener("DOMContentLoaded", () => {
+      loadFamilyGraph({
+        activeUser: {{ object.id }},
+        depthMin: {{ depth_min }},
+        depthMax: {{ depth_max }},
+      });
+    });
   </script>
 {% endblock %}
 

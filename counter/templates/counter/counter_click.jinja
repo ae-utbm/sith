@@ -59,7 +59,7 @@
 
                 {# Formulaire pour rechercher un produit en tapant son code dans une barre de recherche #}
         <form method="post" action=""
-              class="code_form" @submit.prevent="handle_code">
+              class="code_form" @submit.prevent="handleCode">
           {% csrf_token %}
           <input type="hidden" name="action" value="code">
           <label for="code_field"></label>
@@ -77,7 +77,7 @@
           <template x-for="[id, item] in Object.entries(basket)" :key="id">
             <div>
               <form method="post" action="" class="inline del_product_form"
-                    @submit.prevent="handle_action">
+                    @submit.prevent="handleAction">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="del_product">
                 <input type="hidden" name="product_id" :value="id">
@@ -87,7 +87,7 @@
               <span x-text="item['qty'] + item['bonus_qty']"></span>
 
               <form method="post" action="" class="inline add_product_form"
-                    @submit.prevent="handle_action">
+                    @submit.prevent="handleAction">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="add_product">
                 <input type="hidden" name="product_id" :value="id">
@@ -104,7 +104,7 @@
         </ul>
         <p>
           <strong>Total: </strong>
-          <strong x-text="sum_basket().toLocaleString(undefined, { minimumFractionDigits: 2 })"></strong>
+          <strong x-text="sumBasket().toLocaleString(undefined, { minimumFractionDigits: 2 })"></strong>
           <strong> €</strong>
         </p>
 
@@ -147,7 +147,7 @@
           {% for p in categories[category] -%}
             <form method="post"
                   action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}"
-                  class="form_button add_product_form" @submit.prevent="handle_action">
+                  class="form_button add_product_form" @submit.prevent="handleAction">
               {% csrf_token %}
               <input type="hidden" name="action" value="add_product">
               <input type="hidden" name="product_id" value="{{ p.id }}">
@@ -171,9 +171,9 @@
 {% block script %}
   {{ super() }}
   <script>
-    const csrf_token = "{{ csrf_token }}";
-    const click_api_url = "{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}";
-    const basket = {{ request.session["basket"]|tojson }};
+    const csrfToken = "{{ csrf_token }}";
+    const clickApiUrl = "{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}";
+    const sessionBasket = {{ request.session["basket"]|tojson }};
     const products = {
       {%- for p in products -%}
         {{ p.id }}: {
@@ -183,7 +183,7 @@
         },
       {%- endfor -%}
     };
-    const products_autocomplete = [
+    const productsAutocomplete = [
       {% for p in products -%}
         {
           value: "{{ p.code }}",

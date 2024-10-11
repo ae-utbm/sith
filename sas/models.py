@@ -5,10 +5,10 @@
 # This file is part of the website of the UTBM Student Association (AE UTBM),
 # https://ae.utbm.fr.
 #
-# You can find the source code of the website at https://github.com/ae-utbm/sith3
+# You can find the source code of the website at https://github.com/ae-utbm/sith
 #
 # LICENSED UNDER THE GNU GENERAL PUBLIC LICENSE VERSION 3 (GPLv3)
-# SEE : https://raw.githubusercontent.com/ae-utbm/sith3/master/LICENSE
+# SEE : https://raw.githubusercontent.com/ae-utbm/sith/master/LICENSE
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
@@ -117,7 +117,11 @@ class Picture(SasFile):
         # meant to be shown on the website, but rather to keep the real image
         # for less frequent cases (like downloading the pictures of an user)
         extension = self.mime_type.split("/")[-1]
-        file = resize_image(im, max(im.size), extension)
+        # the HD version of the image doesn't need to be optimized, because :
+        # - it isn't frequently queried
+        # - optimizing large images takes a lot time, which greatly hinders the UX
+        # - photographers usually already optimize their images
+        file = resize_image(im, max(im.size), extension, optimize=False)
         thumb = resize_image(im, 200, "webp")
         compressed = resize_image(im, 1200, "webp")
         if overwrite:

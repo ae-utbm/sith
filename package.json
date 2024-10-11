@@ -1,38 +1,53 @@
 {
-    "name": "sith",
-    "version": "3",
-    "description": "Le web Sith de l'AE",
-    "main": "index.js",
-    "scripts": {
-        "compile": "webpack --mode production",
-        "compile-dev": "webpack --mode development",
-        "serve": "webpack --mode development --watch"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "GPL-3.0-only",
-    "sideEffects": [
-        ".css"
-    ],
-    "devDependencies": {
-        "@babel/core": "^7.25.2",
-        "@babel/preset-env": "^7.25.4",
-        "babel-loader": "^9.2.1",
-        "expose-loader": "^5.0.0",
-        "mini-css-extract-plugin": "^2.9.1",
-        "source-map-loader": "^5.0.0",
-        "terser-webpack-plugin": "^5.3.10",
-        "webpack": "^5.94.0",
-        "webpack-cli": "^5.1.4",
-        "css-loader": "^7.1.2",
-        "css-minimizer-webpack-plugin": "^7.0.0"
-    },
-    "dependencies": {
-        "alpinejs": "^3.14.1",
-        "easymde": "^2.18.0",
-        "glob": "^11.0.0",
-        "jquery": "^3.7.1",
-        "jquery-ui": "^1.14.0",
-        "jquery.shorten": "^1.0.0"
-    }
+  "name": "sith",
+  "version": "3",
+  "description": "Le web Sith de l'AE",
+  "main": "index.js",
+  "scripts": {
+    "compile": "webpack --mode production",
+    "compile-dev": "webpack --mode development",
+    "serve": "webpack --mode development --watch",
+    "check": "biome check --write"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0-only",
+  "sideEffects": [".css"],
+  "imports": {
+    "#openapi": "./staticfiles/generated/openapi/index.ts",
+    "#core:*": "./core/static/webpack/*",
+    "#pedagogy:*": "./pedagogy/static/webpack/*"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "@biomejs/biome": "1.9.3",
+    "@hey-api/openapi-ts": "^0.53.8",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.2",
+    "css-minimizer-webpack-plugin": "^7.0.0",
+    "expose-loader": "^5.0.0",
+    "mini-css-extract-plugin": "^2.9.1",
+    "source-map-loader": "^5.0.0",
+    "terser-webpack-plugin": "^5.3.10",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.3",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.6.0",
+    "@hey-api/client-fetch": "^0.4.0",
+    "@zip.js/zip.js": "^2.7.52",
+    "alpinejs": "^3.14.1",
+    "cytoscape": "^3.30.2",
+    "cytoscape-cxtmenu": "^3.5.0",
+    "cytoscape-klay": "^3.1.4",
+    "easymde": "^2.18.0",
+    "glob": "^11.0.0",
+    "jquery": "^3.7.1",
+    "jquery-ui": "^1.14.0",
+    "jquery.shorten": "^1.0.0",
+    "native-file-system-adapter": "^3.0.1"
+  }
 }

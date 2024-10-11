@@ -34,6 +34,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
@@ -381,8 +382,8 @@ class NewsListView(CanViewMixin, ListView):
         kwargs["timedelta"] = timedelta
         kwargs["birthdays"] = (
             User.objects.filter(
-                date_of_birth__month=timezone.now().month,
-                date_of_birth__day=timezone.now().day,
+                date_of_birth__month=localdate().month,
+                date_of_birth__day=localdate().day,
             )
             .filter(role__in=["STUDENT", "FORMER STUDENT"])
             .order_by("-date_of_birth")

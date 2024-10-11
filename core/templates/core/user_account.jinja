@@ -1,6 +1,6 @@
 {% extends "core/base.jinja" %}
 
-{% macro monthly(obj) %}
+{% macro monthly(objects) %}
   <div>
     <table>
       <thead>
@@ -11,17 +11,18 @@
         </tr>
       </thead>
       <tbody>
-        {% for array in obj %}
-          {% for dict in array %}
-            {% if dict['sum'] != 0 %}
-              {% set link=url('core:user_account_detail', user_id=profile.id, year=dict['date'].year, month=dict['date'].month) %}
-              <tr>
-                <td><a href="{{ link }}">{{ dict['date'].year }}</a></td>
-                <td><a href="{{ link }}">{{ dict['date']|date("E") }}</a></td>
-                <td><a href="{{ link }}">{{ dict['sum'] }} €</a></td>
-              </tr>
-            {% endif %}
-          {% endfor %}
+        {% for object in objects %}
+          {% set link=url(
+          'core:user_account_detail',
+          user_id=profile.id,
+          year=object['grouped_date'].year,
+          month=object['grouped_date'].month
+          ) %}
+          <tr>
+            <td><a href="{{ link }}">{{ object["grouped_date"]|date("Y") }}</a></td>
+            <td><a href="{{ link }}">{{ object["grouped_date"]|date("E") }}</a></td>
+            <td><a href="{{ link }}">{{ "%.2f"|format(object["total"]) }} €</a></td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
@@ -37,19 +38,15 @@
     <h3>{% trans %}User account{% endtrans %}</h3>
     <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
     <div id="drop">
-      {% set bought = customer.buyings.exists() %}
-      {% set refilled = customer.refillings.exists() %}
-      {% if bought or refilled %}
-        {% if bought %}
-          <h5>{% trans %}Account purchases{% endtrans %}</h5>
-          {{ monthly(buyings_month) }}
-        {% endif %}
-        {% if refilled %}
-          <h5>{% trans %}Reloads{% endtrans %}</h5>
-          {{ monthly(refilling_month) }}
-        {% endif %}
+      {% if buyings_month %}
+        <h5>{% trans %}Account purchases{% endtrans %}</h5>
+        {{ monthly(buyings_month) }}
       {% endif %}
-      {% if customer.user.invoices.exists() %}
+      {% if refilling_month %}
+        <h5>{% trans %}Reloads{% endtrans %}</h5>
+        {{ monthly(refilling_month) }}
+      {% endif %}
+      {% if invoices_month %}
         <h5>{% trans %}Eboutic invoices{% endtrans %}</h5>
         {{ monthly(invoices_month) }}
       {% endif %}
@@ -58,7 +55,11 @@
         <div>
           <ul>
             {% for s in etickets %}
-              <li><a href="{{ url('counter:eticket_pdf', selling_id=s.id) }}">{{ s.quantity }} x {{ s.product.eticket }}</a></li>
+              <li>
+                <a href="{{ url('counter:eticket_pdf', selling_id=s.id) }}">
+                  {{ s.quantity }} x {{ s.product.eticket }}
+                </a>
+              </li>
             {% endfor %}
           </ul>
         </div>

@@ -5,11 +5,7 @@
 {%- endblock -%}
 
 {% block additional_js %}
-  <script defer type="module">
-    import { showSaveFilePicker } from "{{ static('vendored/native-file-system-adapter/mod.js') }}";
-    window.showSaveFilePicker = showSaveFilePicker; /* Export function to normal javascript */
-  </script>
-  <script defer type="text/javascript" src="{{ static('vendored/zipjs/zip-fs-full.min.js') }}"></script>
+  <script src="{{ static('webpack/user/pictures-index.js') }}" defer></script>
 {% endblock %}
 
 {% block title %}
@@ -21,14 +17,14 @@
     {% if user.id == object.id %}
       <div x-show="pictures.length > 0" x-cloak>
         <button
-          :disabled="is_downloading"
+          :disabled="isDownloading"
           class="btn btn-blue"
-          @click="download_zip()"
+          @click="downloadZip()"
         >
           <i class="fa fa-download"></i>
           {% trans %}Download all my pictures{% endtrans %}
         </button>
-        <progress x-ref="progress" x-show="is_downloading"></progress>
+        <progress x-ref="progress" x-show="isDownloading"></progress>
       </div>
     {% endif %}
 
@@ -65,77 +61,8 @@
 
   {{ super() }}
   <script>
-      /**
-       * @typedef UserProfile
-       * @property {number} id
-       * @property {string} first_name
-       * @property {string} last_name
-       * @property {string} nick_name
-       * @property {string} display_name
-       * @property {string} profile_url
-       * @property {string} profile_pict
-       */
-    /**
-     * @typedef Picture
-     * @property {number} id
-     * @property {string} name
-     * @property {number} size
-     * @property {string} date
-     * @property {UserProfile} owner
-     * @property {string} full_size_url
-     * @property {string} compressed_url
-     * @property {string} thumb_url
-     * @property {string} album
-     * @property {boolean} is_moderated
-     * @property {boolean} asked_for_removal
-     */
-
-    document.addEventListener("alpine:init", () => {
-      Alpine.data("user_pictures", () => ({
-        is_downloading: false,
-        loading: true,
-        pictures: [],
-        albums: {},
-
-        async init() {
-          this.pictures = await fetch_paginated("{{ url("api:pictures") }}" + "?users_identified={{ object.id }}");
-          this.albums = this.pictures.reduce((acc, picture) => {
-            if (!acc[picture.album]){
-              acc[picture.album] = [];
-            }
-            acc[picture.album].push(picture);
-            return acc;
-          }, {});
-          this.loading = false;
-        },
-
-        async download_zip(){
-          this.is_downloading = true;
-          const bar = this.$refs.progress;
-          bar.value = 0;
-          bar.max = this.pictures.length;
-
-          const fileHandle = await window.showSaveFilePicker({
-            _preferPolyfill: false,
-            suggestedName: "{%- trans -%} pictures {%- endtrans -%}.zip",
-            types: {},
-            excludeAcceptAllOption: false,
-          })
-          const zipWriter = new zip.ZipWriter(await fileHandle.createWritable());
-
-          await Promise.all(this.pictures.map(p => {
-            const img_name = p.album + "/IMG_" + p.date.replaceAll(/[:\-]/g, "_") + p.name.slice(p.name.lastIndexOf("."));
-            return zipWriter.add(
-              img_name,
-              new zip.HttpReader(p.full_size_url),
-              {level: 9, lastModDate: new Date(p.date), onstart: () => bar.value += 1}
-            );
-          }));
-
-          await zipWriter.close();
-          this.is_downloading = false;
-        }
-      }))
-    });
+    window.addEventListener("DOMContentLoaded", () => {
+      loadPicturePage({ userId: {{ object.id }} });
+    })
   </script>
 {% endblock script %}

@@ -2,9 +2,9 @@ site_name: Site AE UTBM
 site_description: Le site de l'association des étudiants de l'UTBM
 dev_addr: 127.0.0.1:8080
 
-repo_name: sith3
-repo_url: https://github.com/ae-utbm/sith3
-site_url: https://ae-utbm.github.io/sith3
+repo_name: sith
+repo_url: https://github.com/ae-utbm/sith
+site_url: https://ae-utbm.github.io/sith
 
 theme:
   features:
@@ -72,6 +72,7 @@ nav:
     - Gérer les migrations: howto/migrations.md
     - Gérer les traductions: howto/translation.md
     - Gérer les statics: howto/statics.md
+    - Ajouter un chemin d'import javascript: howto/js-import-paths.md
     - Configurer pour la production: howto/prod.md
     - Ajouter un logo de promo: howto/logo.md
     - Ajouter une cotisation: howto/subscriptions.md
@@ -135,9 +136,6 @@ nav:
       - reference/staticfiles/storage.md
       - reference/staticfiles/finders.md
       - reference/staticfiles/processors.md
-    - stock:
-      - reference/stock/models.md
-      - reference/stock/views.md
     - subscription:
       - reference/subscription/models.md
       - reference/subscription/views.md

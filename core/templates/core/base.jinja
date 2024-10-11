@@ -18,14 +18,13 @@
                 {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
         <link rel="stylesheet" href="{{ static('webpack/jquery-index.css') }}">
       {% endblock %}
-      <link rel="preload" as="style" href="{{ static('vendored/font-awesome/css/font-awesome.min.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-      <noscript><link rel="stylesheet" href="{{ static('vendored/font-awesome/css/font-awesome.min.css') }}"></noscript>
-      <script defer href="{{ static('vendored/font-awesome/js/fontawesome.min.js') }}"></script>
+      <link rel="preload" as="style" href="{{ static('webpack/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+      <noscript><link rel="stylesheet" href="{{ static('webpack/fontawesome-index.css') }}"></noscript>
 
       <script src="{{ static('webpack/alpine-index.js') }}" defer></script>
             <!-- Jquery declared here to be accessible in every django widgets -->
       <script src="{{ static('webpack/jquery-index.js') }}"></script>
-            <!-- Put here to always have acces to those functions on django widgets -->
+            <!-- Put here to always have access to those functions on django widgets -->
       <script src="{{ static('core/js/script.js') }}"></script>
       <script defer src="{{ static('vendored/select2/select2.min.js') }}"></script>
       <script defer src="{{ static('core/js/sith-select2.js') }}"></script>
@@ -69,27 +68,33 @@
                 </form>
                 <ul class="bars">
                   {% cache 100 "counters_activity" %}
-                    {% for bar in Counter.objects.annotate_has_barman(user).filter(type="BAR") %}
-                      <li>
-                                                {# If the user is a barman, we redirect him directly to the barman page
-                                                else we redirect him to the activity page #}
-                        {% if bar.has_annotated_barman %}
-                          <a href="{{ url('counter:details', counter_id=bar.id) }}">
-                        {% else %}
-                          <a href="{{ url('counter:activity', counter_id=bar.id) }}">
-                        {% endif %}
-                        {% if bar.is_inactive() %}
-                          <i class="fa fa-question" style="color: #f39c12"></i>
-                        {% elif bar.is_open %}
-                          <i class="fa fa-check" style="color: #2ecc71"></i>
-                        {% else %}
-                          <i class="fa fa-times" style="color: #eb2f06"></i>
-                        {% endif %}
-                        <span>{{ bar }}</span>
-                      </a>
-                      </li>
-                    {% endfor %}
+                      {# The sith has no periodic tasks manager
+                         and using cron jobs would be way too overkill here.
+                         Thus the barmen timeout is handled in the only place that
+                         is loaded on every page : the header bar.
+                         However, let's be clear : this has nothing to do here.
+                         It's' merely a contrived workaround that should
+                         replaced by a proper task manager as soon as possible. #}
+                    {% set _ = Counter.objects.filter(type="BAR").handle_timeout() %}
                   {% endcache %}
+                  {% for bar in Counter.objects.annotate_has_barman(user).annotate_is_open().filter(type="BAR") %}
+                    <li>
+                      {# If the user is a barman, we redirect him directly to the barman page
+                      else we redirect him to the activity page #}
+                      {% if bar.has_annotated_barman %}
+                        <a href="{{ url('counter:details', counter_id=bar.id) }}">
+                      {% else %}
+                        <a href="{{ url('counter:activity', counter_id=bar.id) }}">
+                      {% endif %}
+                      {% if bar.is_open %}
+                        <i class="fa fa-check" style="color: #2ecc71"></i>
+                      {% else %}
+                        <i class="fa fa-times" style="color: #eb2f06"></i>
+                      {% endif %}
+                      <span>{{ bar }}</span>
+                    </a>
+                    </li>
+                  {% endfor %}
                 </ul>
               </div>
               <div class="right">
@@ -113,8 +118,8 @@
                   ></a>
                 </div>
                 <div class="notification">
-                  <a href="#" onclick="display_notif()">
-                    <i class="fa fa-bell-o"></i>
+                  <a href="#" onclick="displayNotif()">
+                    <i class="fa-regular fa-bell"></i>
                     {% set notification_count = user.notifications.filter(viewed=False).count() %}
 
                     {% if notification_count > 0 %}

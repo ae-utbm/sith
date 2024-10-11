@@ -5,10 +5,10 @@
 # This file is part of the website of the UTBM Student Association (AE UTBM),
 # https://ae.utbm.fr.
 #
-# You can find the source code of the website at https://github.com/ae-utbm/sith3
+# You can find the source code of the website at https://github.com/ae-utbm/sith
 #
 # LICENSED UNDER THE GNU GENERAL PUBLIC LICENSE VERSION 3 (GPLv3)
-# SEE : https://raw.githubusercontent.com/ae-utbm/sith3/master/LICENSE
+# SEE : https://raw.githubusercontent.com/ae-utbm/sith/master/LICENSE
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
@@ -41,7 +41,6 @@ urlpatterns = [
     path("com/", include(("com.urls", "com"), namespace="com")),
     path("club/", include(("club.urls", "club"), namespace="club")),
     path("counter/", include(("counter.urls", "counter"), namespace="counter")),
-    path("stock/", include(("stock.urls", "stock"), namespace="stock")),
     path(
         "accounting/",
         include(("accounting.urls", "accounting"), namespace="accounting"),

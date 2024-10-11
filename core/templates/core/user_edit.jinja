@@ -15,36 +15,36 @@
 {% macro profile_picture(field_name) %}
   {% set this_picture = form.instance[field_name] %}
   <div class="profile-picture" x-data="camera_{{ field_name }}" >
-    <div class="profile-picture-display" :aria-busy="loading" :class="{ 'camera-error': is_camera_error }">
+    <div class="profile-picture-display" :aria-busy="loading" :class="{ 'camera-error': isCameraError }">
       <img
-        x-show="!is_camera_enabled && !is_camera_error"
-        :src="get_picture()"
+        x-show="!isCameraEnabled && !isCameraError"
+        :src="getPicture()"
         alt="{%- trans -%}Profile{%- endtrans -%}" title="{%- trans -%}Profile{%- endtrans -%}"
         loading="lazy"
       />
       <video
-        x-show="is_camera_enabled"
+        x-show="isCameraEnabled"
         x-ref="video"
       ></video>
       <i
-        x-show="is_camera_error"
+        x-show="isCameraError"
         x-cloak
         class="fa fa-eye-slash"
       ></i>
     </div>
-    <div class="profile-picture-buttons" x-show="can_edit_picture">
+    <div class="profile-picture-buttons" x-show="canEditPicture">
       <button
-        x-show="can_edit_picture && !is_camera_enabled"
+        x-show="canEditPicture && !isCameraEnabled"
         class="btn btn-blue"
-        @click.prevent="enable_camera()"
+        @click.prevent="enableCamera()"
       >
         <i class="fa fa-camera"></i>
         {% trans %}Enable camera{% endtrans %}
       </button>
       <button
-        x-show="is_camera_enabled"
+        x-show="isCameraEnabled"
         class="btn btn-blue"
-        @click.prevent="take_picture()"
+        @click.prevent="takePicture()"
       >
         <i class="fa fa-camera"></i>
         {% trans %}Take a picture{% endtrans %}
@@ -54,7 +54,7 @@
       {%- if form[field_name] -%}
         <div>
           {{ form[field_name] }}
-          <button class="btn btn-red" @click.prevent="delete_picture()"
+          <button class="btn btn-red" @click.prevent="deletePicture()"
                   {%- if not (this_picture and this_picture.is_owned_by(user)) -%}
                     :disabled="!picture"
                   {%- endif -%}
@@ -86,7 +86,7 @@
     document.addEventListener("alpine:init", () => {
       Alpine.data(
         "camera_{{ field_name }}",
-        alpine_webcam_builder(
+        alpineWebcamBuilder(
           {{ default_picture }},
           {{ delete_url }},
           {{ (this_picture and this_picture.is_owned_by(user))|tojson }}

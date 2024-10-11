@@ -35,6 +35,7 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 
 from core.models import Group, MetaGroup, Notification, Page, RealGroup, SithFile, User
@@ -269,7 +270,7 @@ class Club(models.Model):
 class MembershipQuerySet(models.QuerySet):
     def ongoing(self) -> Self:
         """Filter all memberships which are not finished yet."""
-        return self.filter(Q(end_date=None) | Q(end_date__gt=timezone.now().date()))
+        return self.filter(Q(end_date=None) | Q(end_date__gt=localdate()))
 
     def board(self) -> Self:
         """Filter all memberships where the user is/was in the board.

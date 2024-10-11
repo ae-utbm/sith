@@ -99,52 +99,116 @@ votre éditeur pour que Ruff fasse son travail automatiquement à chaque éditio
 Nous tenterons de vous faire ici un résumé pour deux éditeurs de textes populaires
 que sont VsCode et Sublime Text.
 
-### VsCode
+=== "VsCode"
 
-Installez l'extension Ruff pour VsCode.
-Ensuite, ajoutez ceci dans votre configuration :
+    Installez l'extension Ruff pour VsCode.
+    Ensuite, ajoutez ceci dans votre configuration :
 
-```json
-{
-    "[python]": {
-        "editor.formatOnSave": true,
-        "editor.defaultFormatter": "charliermarsh.ruff"
+    ```json
+    {
+        "[python]": {
+            "editor.formatOnSave": true,
+            "editor.defaultFormatter": "charliermarsh.ruff"
+        }
     }
-}
-```
+    ```
 
-### Sublime Text
+=== "Sublime Text"
 
-Vous devez installer ce plugin : https://packagecontrol.io/packages/LSP-ruff.
-Suivez ensuite les instructions données dans la description du plugin.
+    Vous devez installer le plugin [LSP-ruff](https://packagecontrol.io/packages/LSP-ruff).
+    Suivez ensuite les instructions données dans la description du plugin.
 
-Dans la configuration de votre projet, ajoutez ceci:
+    Dans la configuration de votre projet, ajoutez ceci:
 
-```json
-{
-    "settings": {
-        "lsp_format_on_save": true,
-        "LSP": { 
-            "LSP-ruff": {
-                "enabled": true,
+    ```json
+    {
+        "settings": {
+            "lsp_format_on_save": true, // Commun à ruff et biome
+            "LSP": { 
+                "LSP-ruff": {
+                    "enabled": true,
+                }
             }
         }
     }
-}
+    ```
+
+    Si vous utilisez le plugin [anaconda](http://damnwidget.github.io/anaconda/),
+    pensez à modifier les paramètres du linter pep8
+    pour éviter de recevoir des warnings dans le formatage 
+    de ruff comme ceci :
+
+    ```json
+    {
+        "pep8_ignore": [
+          "E203",
+          "E266",
+          "E501",
+          "W503"
+        ]
+    }
+    ```
+
+## Configurer Biome pour son éditeur
+
+!!!note
+
+    Biome est inclus dans les dépendances du projet.
+    Si vous avez réussi à terminer l'installation, vous n'avez donc pas de configuration
+    supplémentaire à effectuer.
+
+Pour utiliser Biome, placez-vous à la racine du projet et lancer la commande suivante:
+
+```bash
+    npx @biomejs/biome check # Pour checker le code avec le linter et le formater
+    npx @biomejs/biome check --write # Pour appliquer les changemnts
 ```
 
-Si vous utilisez le plugin [anaconda](http://damnwidget.github.io/anaconda/),
-pensez à modifier les paramètres du linter pep8
-pour éviter de recevoir des warnings dans le formatage 
-de ruff comme ceci :
+Biome va alors faire son travail sur l'ensemble du projet puis vous dire
+si des documents ont été reformatés (si vous avez fait `npx @biomejs/biome format --write`)
+ou bien s'il y a des erreurs à réparer (si vous avez faire `npx @biomejs/biome lint`) ou les deux (si vous avez fait `npx @biomejs/biome check --write`).
 
-```json
-{
-    "pep8_ignore": [
-      "E203",
-      "E266",
-      "E501",
-      "W503"
-    ]
-}
-```
+Appeler Biome en ligne de commandes avant de pousser votre code sur Github
+est une technique qui marche très bien.
+Cependant, vous risquez de souvent l'oublier.
+Or, lorsque le code ne respecte pas les Biomes de qualité,
+la pipeline bloque les PR sur les branches protégées.
+
+Pour éviter de vous faire régulièrement avoir, vous pouvez configurer
+votre éditeur pour que Biome fasse son travail automatiquement à chaque édition d'un fichier.
+Nous tenterons de vous faire ici un résumé pour deux éditeurs de textes populaires
+que sont VsCode et Sublime Text.
+
+=== "VsCode"
+
+    Biome est fourni par le plugin [Biome](https://marketplace.visualstudio.com/items?itemName=biomejs.biome).
+
+    Ensuite, ajoutez ceci dans votre configuration :
+
+    ```json
+    {
+      "editor.defaultFormatter": "<other formatter>",
+      "[javascript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+      }
+    }
+    ```
+
+=== "Sublime Text"
+
+    Tout comme pour ruff, il suffit d'installer un plugin lsp [LSP-biome](https://packagecontrol.io/packages/LSP-biome).
+
+    Et enfin, dans la configuration de votre projet, ajouter les lignes suivantes :
+
+    ```json
+    {
+        "settings": {
+            "lsp_format_on_save": true, // Commun à ruff et biome
+            "LSP": { 
+                "LSP-biome": {
+                    "enabled": true,
+                }
+            }
+        }
+    }
+    ```

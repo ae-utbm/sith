@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "outDir": "./staticfiles/generated/webpack/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "paths": {
+      "#openapi": ["./staticfiles/generated/openapi/index.ts"],
+      "#core:*": ["./core/static/webpack/*"],
+      "#pedagogy:*": ["./pedagogy/static/webpack/*"]
+    }
+  }
+}

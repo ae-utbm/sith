@@ -612,13 +612,10 @@ SITH_CLUB_ROLES = {
 SITH_MAXIMUM_FREE_ROLE = 1
 
 # Minutes to timeout the logged barmen
-SITH_BARMAN_TIMEOUT = 20
+SITH_BARMAN_TIMEOUT = 30
 
 # Minutes to delete the last operations
 SITH_LAST_OPERATIONS_LIMIT = 10
-
-# Minutes for a counter to be inactive
-SITH_COUNTER_MINUTE_INACTIVE = 10
 
 # ET variables
 SITH_EBOUTIC_CB_ENABLED = True
@@ -738,15 +735,8 @@ if SENTRY_DSN:
     )
 
 SITH_FRONT_DEP_VERSIONS = {
-    "https://github.com/gildas-lormeau/zip.js": "2.7.47",
-    "https://github.com/jimmywarting/native-file-system-adapter": "3.0.1",
     "https://github.com/chartjs/Chart.js/": "2.6.0",
-    "https://github.com/FortAwesome/Font-Awesome/": "4.7.0",
     "https://github.com/getsentry/sentry-javascript/": "8.26.0",
-    "https://github.com/cytoscape/cytoscape.js": "3.30.2 ",
-    "https://github.com/cytoscape/cytoscape.js-cxtmenu": "3.5.0",
-    "https://github.com/cytoscape/cytoscape.js-klay": "3.1.4",
-    "https://github.com/kieler/klayjs": "0.4.1",  # Deprecated, elk should be used but cytoscape-elk is broken
     "https://github.com/mrdoob/three.js/": "r148",
     "https://github.com/vasturiano/three-spritetext": "1.6.5",
     "https://github.com/vasturiano/3d-force-graph/": "1.70.19",

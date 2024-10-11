@@ -28,6 +28,7 @@ from django import forms
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.timezone import localdate
 from django.utils.translation import gettext as _
 from django.views.generic import ListView
 from django.views.generic.edit import FormView
@@ -63,8 +64,8 @@ def __merge_subscriptions(u1: User, u2: User):
             subscription_end__gte=timezone.now()
         ):
             subscription.subscription_start = subscription_end
-            if subscription.subscription_start > timezone.now().date():
-                remaining = subscription.subscription_end - timezone.now().date()
+            if subscription.subscription_start > localdate():
+                remaining = subscription.subscription_end - localdate()
             else:
                 remaining = (
                     subscription.subscription_end - subscription.subscription_start
