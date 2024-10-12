@@ -187,8 +187,8 @@ que sont VsCode et Sublime Text.
 
     ```json
     {
-      "editor.defaultFormatter": "<other formatter>",
       "[javascript]": {
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "biomejs.biome"
       }
     }
