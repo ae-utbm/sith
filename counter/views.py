@@ -16,6 +16,7 @@ import re
 from datetime import datetime, timedelta
 from datetime import timezone as tz
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 from urllib.parse import parse_qs
 
 from django import forms
@@ -49,7 +50,6 @@ from django.views.generic.edit import (
 )
 
 from accounting.models import CurrencyField
-from core.models import User
 from core.utils import get_semester_code, get_start_of_semester
 from core.views import CanEditMixin, CanViewMixin, TabedViewMixin
 from core.views.forms import LoginForm
@@ -77,6 +77,9 @@ from counter.models import (
     StudentCard,
 )
 from counter.utils import is_logged_in_counter
+
+if TYPE_CHECKING:
+    from core.models import User
 
 
 class CounterAdminMixin(View):

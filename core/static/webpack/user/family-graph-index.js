@@ -1,3 +1,4 @@
+import { History, initialUrlParams, updateQueryString } from "#core:utils/history";
 import cytoscape from "cytoscape";
 import cxtmenu from "cytoscape-cxtmenu";
 import klay from "cytoscape-klay";
@@ -184,7 +185,6 @@ window.loadFamilyGraph = (config) => {
     const defaultDepth = 2;
 
     function getInitialDepth(prop) {
-      // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
       const value = Number.parseInt(initialUrlParams.get(prop));
       if (Number.isNaN(value) || value < config.depthMin || value > config.depthMax) {
         return defaultDepth;
@@ -196,7 +196,6 @@ window.loadFamilyGraph = (config) => {
       loading: false,
       godfathersDepth: getInitialDepth("godfathersDepth"),
       godchildrenDepth: getInitialDepth("godchildrenDepth"),
-      // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
       reverse: initialUrlParams.get("reverse")?.toLowerCase?.() === "true",
       graph: undefined,
       graphData: {},
@@ -210,14 +209,12 @@ window.loadFamilyGraph = (config) => {
             if (value < config.depthMin || value > config.depthMax) {
               return;
             }
-            // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
-            updateQueryString(param, value, History.REPLACE);
+            updateQueryString(param, value, History.Replace);
             await delayedFetch();
           });
         }
         this.$watch("reverse", async (value) => {
-          // biome-ignore lint/correctness/noUndeclaredVariables: defined by script.js
-          updateQueryString("reverse", value, History.REPLACE);
+          updateQueryString("reverse", value, History.Replace);
           await this.reverseGraph();
         });
         this.$watch("graphData", async () => {

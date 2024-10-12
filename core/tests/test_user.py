@@ -1,15 +1,22 @@
 from datetime import timedelta
 
 import pytest
+from django.conf import settings
 from django.core.management import call_command
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import now
 from model_bakery import baker, seq
-from model_bakery.recipe import Recipe
+from model_bakery.recipe import Recipe, foreign_key
 
-from core.baker_recipes import subscriber_user
+from core.baker_recipes import (
+    old_subscriber_user,
+    subscriber_user,
+    very_old_subscriber_user,
+)
 from core.models import User
+from counter.models import Counter, Refilling, Selling
+from eboutic.models import Invoice, InvoiceItem
 
 
 class TestSearchUsers(TestCase):
@@ -111,3 +118,50 @@ def test_user_account_not_found(client: Client):
         )
     )
     assert res.status_code == 404
+
+
+class TestFilterInactive(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        time_active = now() - settings.SITH_ACCOUNT_INACTIVITY_DELTA + timedelta(days=1)
+        time_inactive = time_active - timedelta(days=3)
+        counter, seller = baker.make(Counter), baker.make(User)
+        sale_recipe = Recipe(
+            Selling,
+            counter=counter,
+            club=counter.club,
+            seller=seller,
+            is_validated=True,
+        )
+
+        cls.users = [
+            baker.make(User),
+            subscriber_user.make(),
+            old_subscriber_user.make(),
+            *very_old_subscriber_user.make(_quantity=3),
+        ]
+        sale_recipe.make(customer=cls.users[3].customer, date=time_active)
+        baker.make(
+            Refilling, customer=cls.users[4].customer, date=time_active, counter=counter
+        )
+        sale_recipe.make(customer=cls.users[5].customer, date=time_inactive)
+
+    def test_filter_inactive(self):
+        res = User.objects.filter(id__in=[u.id for u in self.users]).filter_inactive()
+        assert list(res) == [self.users[0], self.users[5]]
+
+
+@pytest.mark.django_db
+def test_user_invoice_with_multiple_items():
+    """Test that annotate_total() works when invoices contain multiple items."""
+    user: User = subscriber_user.make()
+    item_recipe = Recipe(InvoiceItem, invoice=foreign_key(Recipe(Invoice, user=user)))
+    item_recipe.make(_quantity=3, quantity=1, product_unit_price=5)
+    item_recipe.make(_quantity=1, quantity=1, product_unit_price=5)
+    res = list(
+        Invoice.objects.filter(user=user)
+        .annotate_total()
+        .order_by("-total")
+        .values_list("total", flat=True)
+    )
+    assert res == [15, 5]

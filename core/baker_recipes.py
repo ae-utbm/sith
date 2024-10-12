@@ -1,7 +1,8 @@
 from datetime import timedelta
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.utils.timezone import now
+from django.utils.timezone import localdate, now
 from model_bakery import seq
 from model_bakery.recipe import Recipe, related
 
@@ -11,13 +12,13 @@ from subscription.models import Subscription
 
 active_subscription = Recipe(
     Subscription,
-    subscription_start=now() - timedelta(days=30),
-    subscription_end=now() + timedelta(days=30),
+    subscription_start=localdate() - timedelta(days=30),
+    subscription_end=localdate() + timedelta(days=30),
 )
 ended_subscription = Recipe(
     Subscription,
-    subscription_start=now() - timedelta(days=60),
-    subscription_end=now() - timedelta(days=30),
+    subscription_start=localdate() - timedelta(days=60),
+    subscription_end=localdate() - timedelta(days=30),
 )
 
 subscriber_user = Recipe(
@@ -35,6 +36,17 @@ old_subscriber_user = Recipe(
     subscriptions=related(ended_subscription),
 )
 """A user with an ended subscription."""
+
+__inactivity = localdate() - settings.SITH_ACCOUNT_INACTIVITY_DELTA
+very_old_subscriber_user = old_subscriber_user.extend(
+    subscriptions=related(
+        ended_subscription.extend(
+            subscription_start=__inactivity - relativedelta(months=6, days=1),
+            subscription_end=__inactivity - relativedelta(days=1),
+        )
+    )
+)
+"""A user which subscription ended enough time ago to be considered as inactive."""
 
 ae_board_membership = Recipe(
     Membership,

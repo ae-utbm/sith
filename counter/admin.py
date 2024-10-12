@@ -49,6 +49,18 @@ class BillingInfoAdmin(admin.ModelAdmin):
     autocomplete_fields = ("customer",)
 
 
+@admin.register(AccountDump)
+class AccountDumpAdmin(admin.ModelAdmin):
+    list_display = (
+        "customer",
+        "warning_mail_sent_at",
+        "warning_mail_error",
+        "dump_operation",
+    )
+    autocomplete_fields = ("customer",)
+    list_filter = ("warning_mail_error",)
+
+
 @admin.register(Counter)
 class CounterAdmin(admin.ModelAdmin):
     list_display = ("name", "club", "type")
