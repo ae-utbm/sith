@@ -12,11 +12,16 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from ninja_extra import ControllerBase, api_controller, route
 
-from core.api_permissions import CanView, IsRoot
-from counter.models import Counter
-from counter.schemas import CounterSchema
+from ninja import Query
+from ninja_extra import ControllerBase, api_controller, paginate, route
+from ninja_extra.pagination import PageNumberPaginationExtra
+from ninja_extra.schemas import PaginatedResponseSchema
+
+from core.api_permissions import CanView, IsOldSubscriber, IsRoot
+from core.models import User
+from counter.models import Counter, Permanency
+from counter.schemas import CounterSchema, PermanencyFilterSchema, PermanencySchema
 
 
 @api_controller("/counter")
@@ -37,3 +42,18 @@ class CounterController(ControllerBase):
         for c in counters:
             self.check_object_permissions(c)
         return counters
+    
+@api_controller("/permanency")
+class PermanencyController(ControllerBase):
+    @route.get("", response=PaginatedResponseSchema[PermanencySchema], permissions=[IsOldSubscriber])
+    @paginate(PageNumberPaginationExtra, page_size=100)
+    def fetch_permanancies(self, filters:Query[PermanencyFilterSchema]):
+        user: User = self.context.request.user
+        if not user.is_root:
+            filters.barmen=None
+        resp = filters.filter(Permanency.objects.values()).distinct()
+        breakpoint()
+        if not user.is_root:
+            for perm in resp:
+                perm.user = None
+        return resp
