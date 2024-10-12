@@ -190,6 +190,10 @@ que sont VsCode et Sublime Text.
       "[javascript]": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "biomejs.biome"
+      },
+      "[typescript]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "biomejs.biome"
       }
     }
     ```
