@@ -1,4 +1,5 @@
 import { makeUrl, paginated } from "#core:utils/api";
+import { exportToHtml } from "#core:utils/globals";
 import { History } from "#core:utils/history";
 import {
   type AjaxResponse,
@@ -97,228 +98,223 @@ interface ViewerConfig {
 /**
  * Load user picture page with a nice download bar
  **/
-(window as unknown as { loadViewer: (config: ViewerConfig) => undefined }).loadViewer =
-  (config: ViewerConfig) => {
-    document.addEventListener("alpine:init", () => {
-      Alpine.data("picture_viewer", () => ({
-        /**
-         * All the pictures that can be displayed on this picture viewer
-         * @type PictureWithIdentifications[]
-         **/
-        pictures: [],
-        /**
-         * The currently displayed picture
-         * Default dummy data are pre-loaded to avoid javascript error
-         * when loading the page at the beginning
-         * @type PictureWithIdentifications
-         **/
-        currentPicture: {
-          // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          is_moderated: true,
-          id: null,
-          name: "",
-          // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          display_name: "",
-          // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          compressed_url: "",
-          // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          profile_url: "",
-          // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          full_size_url: "",
-          owner: "",
-          date: new Date(),
-          identifications: [],
-        },
-        /**
-         * The picture which will be displayed next if the user press the "next" button
-         * @type ?PictureWithIdentifications
-         **/
-        nextPicture: null,
-        /**
-         * The picture which will be displayed next if the user press the "previous" button
-         * @type ?PictureWithIdentifications
-         **/
-        previousPicture: null,
-        /**
-         * The select2 component used to identify users
-         **/
-        selector: undefined,
-        /**
-         * true if the page is in a loading state, else false
-         **/
-        /**
-         * Error message when a moderation operation fails
-         * @type string
-         **/
-        moderationError: "",
-        /**
-         * Method of pushing new url to the browser history
-         * Used by popstate event and always reset to it's default value when used
-         * @type History
-         **/
-        pushstate: History.Push,
+exportToHtml("loadViewer", (config: ViewerConfig) => {
+  document.addEventListener("alpine:init", () => {
+    Alpine.data("picture_viewer", () => ({
+      /**
+       * All the pictures that can be displayed on this picture viewer
+       * @type PictureWithIdentifications[]
+       **/
+      pictures: [],
+      /**
+       * The currently displayed picture
+       * Default dummy data are pre-loaded to avoid javascript error
+       * when loading the page at the beginning
+       * @type PictureWithIdentifications
+       **/
+      currentPicture: {
+        // biome-ignore lint/style/useNamingConvention: api is in snake_case
+        is_moderated: true,
+        id: null,
+        name: "",
+        // biome-ignore lint/style/useNamingConvention: api is in snake_case
+        display_name: "",
+        // biome-ignore lint/style/useNamingConvention: api is in snake_case
+        compressed_url: "",
+        // biome-ignore lint/style/useNamingConvention: api is in snake_case
+        profile_url: "",
+        // biome-ignore lint/style/useNamingConvention: api is in snake_case
+        full_size_url: "",
+        owner: "",
+        date: new Date(),
+        identifications: [],
+      },
+      /**
+       * The picture which will be displayed next if the user press the "next" button
+       * @type ?PictureWithIdentifications
+       **/
+      nextPicture: null,
+      /**
+       * The picture which will be displayed next if the user press the "previous" button
+       * @type ?PictureWithIdentifications
+       **/
+      previousPicture: null,
+      /**
+       * The select2 component used to identify users
+       **/
+      selector: undefined,
+      /**
+       * true if the page is in a loading state, else false
+       **/
+      /**
+       * Error message when a moderation operation fails
+       * @type string
+       **/
+      moderationError: "",
+      /**
+       * Method of pushing new url to the browser history
+       * Used by popstate event and always reset to it's default value when used
+       * @type History
+       **/
+      pushstate: History.Push,
 
-        async init() {
-          this.pictures = (
-            await paginated(picturesFetchPictures, {
-              // biome-ignore lint/style/useNamingConvention: api is in snake_case
-              query: { album_id: config.albumId },
-            } as PicturesFetchPicturesData)
-          ).map(PictureWithIdentifications.fromPicture);
-          this.selector = sithSelect2({
-            element: $(this.$refs.search) as unknown as HTMLElement,
-            dataSource: remoteDataSource(await makeUrl(userSearchUsers), {
-              excluded: () => [
-                ...(this.currentPicture.identifications || []).map(
-                  (i: IdentifiedUserSchema) => i.user.id,
-                ),
-              ],
-              resultConverter: (obj: AjaxResponse) => {
-                return { ...obj, text: (obj as UserProfileSchema).display_name };
-              },
-            }),
-            pictureGetter: (user: RemoteResult) => user.profile_pict,
-          });
-          this.currentPicture = this.pictures.find(
-            (i: PictureSchema) => i.id === config.firstPictureId,
-          );
-          this.$watch(
-            "currentPicture",
-            (current: PictureSchema, previous: PictureSchema) => {
-              if (current === previous) {
-                /* Avoid recursive updates */
-                return;
-              }
-              this.updatePicture();
+      async init() {
+        this.pictures = (
+          await paginated(picturesFetchPictures, {
+            // biome-ignore lint/style/useNamingConvention: api is in snake_case
+            query: { album_id: config.albumId },
+          } as PicturesFetchPicturesData)
+        ).map(PictureWithIdentifications.fromPicture);
+        this.selector = sithSelect2({
+          element: $(this.$refs.search) as unknown as HTMLElement,
+          dataSource: remoteDataSource(await makeUrl(userSearchUsers), {
+            excluded: () => [
+              ...(this.currentPicture.identifications || []).map(
+                (i: IdentifiedUserSchema) => i.user.id,
+              ),
+            ],
+            resultConverter: (obj: AjaxResponse) => {
+              return { ...obj, text: (obj as UserProfileSchema).display_name };
             },
-          );
-          window.addEventListener("popstate", async (event) => {
-            if (!event.state || event.state.sasPictureId === undefined) {
+          }),
+          pictureGetter: (user: RemoteResult) => user.profile_pict,
+        });
+        this.currentPicture = this.pictures.find(
+          (i: PictureSchema) => i.id === config.firstPictureId,
+        );
+        this.$watch(
+          "currentPicture",
+          (current: PictureSchema, previous: PictureSchema) => {
+            if (current === previous) {
+              /* Avoid recursive updates */
               return;
             }
-            this.pushstate = History.Replace;
-            this.currentPicture = this.pictures.find(
-              (i: PictureSchema) => i.id === Number.parseInt(event.state.sasPictureId),
-            );
-          });
-          this.pushstate = History.Replace; /* Avoid first url push */
-          await this.updatePicture();
-        },
-
-        /**
-         * Update the page.
-         * Called when the `currentPicture` property changes.
-         *
-         * The url is modified without reloading the page,
-         * and the previous picture, the next picture and
-         * the list of identified users are updated.
-         */
-        async updatePicture() {
-          const updateArgs = {
-            data: { sasPictureId: this.currentPicture.id },
-            unused: "",
-            url: `/sas/picture/${this.currentPicture.id}/`,
-          };
-          if (this.pushstate === History.Replace) {
-            window.history.replaceState(
-              updateArgs.data,
-              updateArgs.unused,
-              updateArgs.url,
-            );
-            this.pushstate = History.Push;
-          } else {
-            window.history.pushState(
-              updateArgs.data,
-              updateArgs.unused,
-              updateArgs.url,
-            );
-          }
-
-          this.moderationError = "";
-          const index = this.pictures.indexOf(this.currentPicture);
-          this.previousPicture = this.pictures[index - 1] || null;
-          this.nextPicture = this.pictures[index + 1] || null;
-          await this.currentPicture.loadIdentifications();
-          this.$refs.mainPicture?.addEventListener("load", () => {
-            // once the current picture is loaded,
-            // start preloading the next and previous pictures
-            this.nextPicture?.preload();
-            this.previousPicture?.preload();
-          });
-        },
-
-        async moderatePicture() {
-          const res = await picturesModeratePicture({
-            // biome-ignore lint/style/useNamingConvention: api is in snake_case
-            path: { picture_id: this.currentPicture.id },
-          });
-          if (res.error) {
-            this.moderationError = `${gettext("Couldn't moderate picture")} : ${(res.error as { detail: string }).detail}`;
+            this.updatePicture();
+          },
+        );
+        window.addEventListener("popstate", async (event) => {
+          if (!event.state || event.state.sasPictureId === undefined) {
             return;
           }
-          this.currentPicture.is_moderated = true;
-          this.currentPicture.askedForRemoval = false;
-        },
+          this.pushstate = History.Replace;
+          this.currentPicture = this.pictures.find(
+            (i: PictureSchema) => i.id === Number.parseInt(event.state.sasPictureId),
+          );
+        });
+        this.pushstate = History.Replace; /* Avoid first url push */
+        await this.updatePicture();
+      },
 
-        async deletePicture() {
-          const res = await picturesDeletePicture({
+      /**
+       * Update the page.
+       * Called when the `currentPicture` property changes.
+       *
+       * The url is modified without reloading the page,
+       * and the previous picture, the next picture and
+       * the list of identified users are updated.
+       */
+      async updatePicture() {
+        const updateArgs = {
+          data: { sasPictureId: this.currentPicture.id },
+          unused: "",
+          url: `/sas/picture/${this.currentPicture.id}/`,
+        };
+        if (this.pushstate === History.Replace) {
+          window.history.replaceState(
+            updateArgs.data,
+            updateArgs.unused,
+            updateArgs.url,
+          );
+          this.pushstate = History.Push;
+        } else {
+          window.history.pushState(updateArgs.data, updateArgs.unused, updateArgs.url);
+        }
+
+        this.moderationError = "";
+        const index = this.pictures.indexOf(this.currentPicture);
+        this.previousPicture = this.pictures[index - 1] || null;
+        this.nextPicture = this.pictures[index + 1] || null;
+        await this.currentPicture.loadIdentifications();
+        this.$refs.mainPicture?.addEventListener("load", () => {
+          // once the current picture is loaded,
+          // start preloading the next and previous pictures
+          this.nextPicture?.preload();
+          this.previousPicture?.preload();
+        });
+      },
+
+      async moderatePicture() {
+        const res = await picturesModeratePicture({
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          path: { picture_id: this.currentPicture.id },
+        });
+        if (res.error) {
+          this.moderationError = `${gettext("Couldn't moderate picture")} : ${(res.error as { detail: string }).detail}`;
+          return;
+        }
+        this.currentPicture.is_moderated = true;
+        this.currentPicture.askedForRemoval = false;
+      },
+
+      async deletePicture() {
+        const res = await picturesDeletePicture({
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          path: { picture_id: this.currentPicture.id },
+        });
+        if (res.error) {
+          this.moderationError = `${gettext("Couldn't delete picture")} : ${(res.error as { detail: string }).detail}`;
+          return;
+        }
+        this.pictures.splice(this.pictures.indexOf(this.currentPicture), 1);
+        if (this.pictures.length === 0) {
+          // The deleted picture was the only one in the list.
+          // As the album is now empty, go back to the parent page
+          document.location.href = config.albumUrl;
+        }
+        this.currentPicture = this.nextPicture || this.previousPicture;
+      },
+
+      /**
+       * Send the identification request and update the list of identified users.
+       */
+      async submitIdentification() {
+        await picturesIdentifyUsers({
+          path: {
             // biome-ignore lint/style/useNamingConvention: api is in snake_case
-            path: { picture_id: this.currentPicture.id },
-          });
-          if (res.error) {
-            this.moderationError = `${gettext("Couldn't delete picture")} : ${(res.error as { detail: string }).detail}`;
-            return;
-          }
-          this.pictures.splice(this.pictures.indexOf(this.currentPicture), 1);
-          if (this.pictures.length === 0) {
-            // The deleted picture was the only one in the list.
-            // As the album is now empty, go back to the parent page
-            document.location.href = config.albumUrl;
-          }
-          this.currentPicture = this.nextPicture || this.previousPicture;
-        },
+            picture_id: this.currentPicture.id,
+          },
+          body: this.selector.val().map((i: string) => Number.parseInt(i)),
+        });
+        // refresh the identified users list
+        await this.currentPicture.loadIdentifications({ forceReload: true });
+        this.selector.empty().trigger("change");
+      },
 
-        /**
-         * Send the identification request and update the list of identified users.
-         */
-        async submitIdentification() {
-          await picturesIdentifyUsers({
-            path: {
-              // biome-ignore lint/style/useNamingConvention: api is in snake_case
-              picture_id: this.currentPicture.id,
-            },
-            body: this.selector.val().map((i: string) => Number.parseInt(i)),
-          });
-          // refresh the identified users list
-          await this.currentPicture.loadIdentifications({ forceReload: true });
-          this.selector.empty().trigger("change");
-        },
+      /**
+       * Check if an identification can be removed by the currently logged user
+       * @param {PictureIdentification} identification
+       * @return {boolean}
+       */
+      canBeRemoved(identification: IdentifiedUserSchema) {
+        return config.userIsSasAdmin || identification.user.id === config.userId;
+      },
 
-        /**
-         * Check if an identification can be removed by the currently logged user
-         * @param {PictureIdentification} identification
-         * @return {boolean}
-         */
-        canBeRemoved(identification: IdentifiedUserSchema) {
-          return config.userIsSasAdmin || identification.user.id === config.userId;
-        },
-
-        /**
-         * Untag a user from the current picture
-         * @param {PictureIdentification} identification
-         */
-        async removeIdentification(identification: IdentifiedUserSchema) {
-          const res = await usersidentifiedDeleteRelation({
-            // biome-ignore lint/style/useNamingConvention: api is in snake_case
-            path: { relation_id: identification.id },
-          });
-          if (!res.error && Array.isArray(this.currentPicture.identifications)) {
-            this.currentPicture.identifications =
-              this.currentPicture.identifications.filter(
-                (i: IdentifiedUserSchema) => i.id !== identification.id,
-              );
-          }
-        },
-      }));
-    });
-  };
+      /**
+       * Untag a user from the current picture
+       * @param {PictureIdentification} identification
+       */
+      async removeIdentification(identification: IdentifiedUserSchema) {
+        const res = await usersidentifiedDeleteRelation({
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          path: { relation_id: identification.id },
+        });
+        if (!res.error && Array.isArray(this.currentPicture.identifications)) {
+          this.currentPicture.identifications =
+            this.currentPicture.identifications.filter(
+              (i: IdentifiedUserSchema) => i.id !== identification.id,
+            );
+        }
+      },
+    }));
+  });
+});
