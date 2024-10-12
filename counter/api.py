@@ -21,11 +21,14 @@ from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from core.api_permissions import CanAccessLookup, CanView, IsRoot
-from counter.models import Counter, Product
+from core.api_permissions import CanAccessLookup, CanView, IsOldSubscriber, IsRoot
+from core.models import User
+from counter.models import Counter, Permanency, Product
 from counter.schemas import (
     CounterFilterSchema,
     CounterSchema,
+    PermanencyFilterSchema,
+    PermanencySchema,
     ProductSchema,
     SimplifiedCounterSchema,
 )
@@ -76,3 +79,23 @@ class ProductController(ControllerBase):
             .filter(archived=False)
             .values()
         )
+
+
+@api_controller("/permanency")
+class PermanencyController(ControllerBase):
+    @route.get(
+        "",
+        response=PaginatedResponseSchema[PermanencySchema],
+        permissions=[IsOldSubscriber],
+    )
+    @paginate(PageNumberPaginationExtra, page_size=100)
+    def fetch_permanancies(self, filters: Query[PermanencyFilterSchema]):
+        user: User = self.context.request.user
+        if not user.is_root:
+            filters.barmen = None
+        resp = filters.filter(Permanency.objects.values()).distinct()
+        breakpoint()
+        if not user.is_root:
+            for perm in resp:
+                perm.user = None
+        return resp
