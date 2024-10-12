@@ -167,10 +167,15 @@ class InvoiceQueryset(models.QuerySet):
         The total amount is the sum of (product_unit_price * quantity)
         for all items related to the invoice.
         """
+        # aggregates within subqueries require a little bit of black magic,
+        # but hopefully, django gives a comprehensive documentation for that :
+        # https://docs.djangoproject.com/en/stable/ref/models/expressions/#using-aggregates-within-a-subquery-expression
         return self.annotate(
             total=Subquery(
                 InvoiceItem.objects.filter(invoice_id=OuterRef("pk"))
-                .annotate(total=Sum(F("product_unit_price") * F("quantity")))
+                .annotate(item_amount=F("product_unit_price") * F("quantity"))
+                .values("item_amount")
+                .annotate(total=Sum("item_amount"))
                 .values("total")
             )
         )
