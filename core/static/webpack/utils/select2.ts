@@ -42,11 +42,13 @@
  * which takes a callback that must return a `Select2Object`.
  *
  * ```js
+ * import { makeUrl } from "#core:utils/api";
+ * import {userSearchUsers } from "#openapi"
  * document.addEventListener("DOMContentLoaded", () => sithSelect2({
  *   element: document.getElementById("select2-input"),
- *   dataSource: remoteDataSource("/api/user/search", {
+ *   dataSource: remoteDataSource(await makeUrl(userSearchUsers), {
  *     excluded: () => [1, 2],  // exclude users 1 and 2 from the search
- *     resultConverter: (user) => Object({id: user.id, text: user.firstName})
+ *     resultConverter: (user: AjaxResponse) => {id: user.id, text: (user.firstName as UserType)}
  *   })
  * }));
  * ```
@@ -60,10 +62,12 @@
  * Select2 documentation.
  *
  * ```js
+ * import { makeUrl } from "#core:utils/api";
+ * import {userSearchUsers } from "#openapi"
  * document.addEventListener("DOMContentLoaded", () => sithSelect2({
  *   element: document.getElementById("select2-input"),
- *   dataSource: remoteDataSource("/api/user/search", {
- *     resultConverter: (user) => Object({id: user.id, text: user.firstName}),
+ *   dataSource: remoteDataSource(await makeUrl(userSearchUsers), {
+ *     resultConverter: (user: AjaxResponse) => {id: user.id, text: (user.firstName as UserType)}
  *     overrides: {
  *      delay: 500
  *     }
@@ -88,10 +92,12 @@
  * In this case, fill the `pictureGetter` option :
  *
  * ```js
+ * import { makeUrl } from "#core:utils/api";
+ * import {userSearchUsers } from "#openapi"
  * document.addEventListener("DOMContentLoaded", () => sithSelect2({
  *   element: document.getElementById("select2-input"),
- *   dataSource: remoteDataSource("/api/user/search", {
- *     resultConverter: (user) => Object({id: user.id, text: user.firstName})
+ *   dataSource: remoteDataSource(await makeUrl(userSearchUsers), {
+ *     resultConverter: (user: AjaxResponse) => {id: user.id, text: (user.firstName as UserType)}
  *   })
  *   pictureGetter: (user) => user.profilePict,
  * }));
@@ -173,7 +179,7 @@ interface Select2Options {
 }
 
 /**
- * @param {Select2Options} options
+ * Create a new select2 with sith presets
  */
 export function sithSelect2(options: Select2Options) {
   const elem: PlainObject = $(options.element);
@@ -192,11 +198,9 @@ interface LocalSourceOptions {
 
 /**
  * Build a data source for a Select2 from a local array
- * @param {Select2Object[]} source The array containing the data
- * @param {RemoteSourceOptions} options
  */
 export function localDataSource(
-  source: Select2Object[],
+  source: Select2Object[] /** Array containing the data */,
   options: LocalSourceOptions,
 ): DataSource {
   if (options.excluded) {
@@ -217,12 +221,9 @@ interface RemoteSourceOptions {
 
 /**
  * Build a data source for a Select2 from a remote url
- * @param {string} source The url of the endpoint
- * @param {RemoteSourceOptions} options
  */
-
 export function remoteDataSource(
-  source: string,
+  source: string /** url of the endpoint */,
   options: RemoteSourceOptions,
 ): DataSource {
   $.ajaxSetup({
@@ -262,8 +263,6 @@ export function itemFormatter(user: { loading: boolean; text: string }) {
 
 /**
  * Build a function to display the results
- * @param {null | function(Object):string} pictureGetter
- * @return {function(string): jQuery|HTMLElement}
  */
 export function selectItemBuilder(pictureGetter?: (item: RemoteResult) => string) {
   return (item: RemoteResult) => {
