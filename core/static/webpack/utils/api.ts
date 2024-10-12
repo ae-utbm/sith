@@ -27,10 +27,12 @@ export const paginated = async <T>(
   options?: PaginatedRequest,
 ) => {
   const maxPerPage = 199;
-  options.query.page_size = maxPerPage;
-  options.query.page = 1;
+  const queryParams = options ?? {};
+  queryParams.query = queryParams.query ?? {};
+  queryParams.query.page_size = maxPerPage;
+  queryParams.query.page = 1;
 
-  const firstPage = (await endpoint(options)).data;
+  const firstPage = (await endpoint(queryParams)).data;
   const results = firstPage.results;
 
   const nbElements = firstPage.count;
@@ -39,7 +41,7 @@ export const paginated = async <T>(
   if (nbPages > 1) {
     const promises: Promise<T[]>[] = [];
     for (let i = 2; i <= nbPages; i++) {
-      const nextPage = structuredClone(options);
+      const nextPage = structuredClone(queryParams);
       nextPage.query.page = i;
       promises.push(endpoint(nextPage).then((res) => res.data.results));
     }
