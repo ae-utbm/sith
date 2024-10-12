@@ -136,52 +136,69 @@
  * </script>
  */
 
-/**
- * @typedef Select2Object
- * @property {number} id
- * @property {string} text
- */
+import "select2";
+import type {
+  AjaxOptions,
+  DataFormat,
+  GroupedDataFormat,
+  LoadingData,
+  Options,
+  PlainObject,
+} from "select2";
+import "select2/dist/css/select2.css";
 
-/**
- * @typedef Select2Options
- * @property {Element} element
- * @property {Object} dataSource
- *      the data source, built with `localDataSource` or `remoteDataSource`
- * @property {number[]} excluded A list of ids to exclude from search
- * @property {undefined | function(Object): string} pictureGetter
- *      A callback to get the picture field from the API response
- * @property {Object | undefined} overrides
- *      Any other select2 parameter to apply on the config
- */
+export interface Select2Object {
+  id: number;
+  text: string;
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: You have to do it at some point
+export type RemoteResult = any;
+export type AjaxResponse = AjaxOptions<DataFormat | GroupedDataFormat, RemoteResult>;
+
+interface DataSource {
+  ajax?: AjaxResponse | undefined;
+  data?: RemoteResult | DataFormat[] | GroupedDataFormat[] | undefined;
+}
+
+interface Select2Options {
+  element: Element;
+  /** the data source, built with `localDataSource` or `remoteDataSource` */
+  dataSource: DataSource;
+  excluded?: number[];
+  /** A callback to get the picture field from the API response */
+  pictureGetter?: (element: LoadingData | DataFormat | GroupedDataFormat) => string;
+  /** Any other select2 parameter to apply on the config */
+  overrides?: Options;
+}
 
 /**
  * @param {Select2Options} options
  */
-// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
-function sithSelect2(options) {
-  const elem = $(options.element);
+export function sithSelect2(options: Select2Options) {
+  const elem: PlainObject = $(options.element);
   return elem.select2({
     theme: elem[0].multiple ? "classic" : "default",
     minimumInputLength: 2,
     templateResult: selectItemBuilder(options.pictureGetter),
     ...options.dataSource,
-    ...(options.overrides || {}),
+    ...(options.overrides ?? {}),
   });
 }
 
-/**
- * @typedef LocalSourceOptions
- * @property {undefined | function(): number[]} excluded
- *        A callback to the ids to exclude from the search
- */
+interface LocalSourceOptions {
+  excluded: () => number[];
+}
 
 /**
  * Build a data source for a Select2 from a local array
  * @param {Select2Object[]} source The array containing the data
  * @param {RemoteSourceOptions} options
  */
-// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
-function localDataSource(source, options) {
+export function localDataSource(
+  source: Select2Object[],
+  options: LocalSourceOptions,
+): DataSource {
   if (options.excluded) {
     const ids = options.excluded();
     return { data: source.filter((i) => !ids.includes(i.id)) };
@@ -189,15 +206,14 @@ function localDataSource(source, options) {
   return { data: source };
 }
 
-/**
- * @typedef RemoteSourceOptions
- * @property {undefined | function(): number[]} excluded
- *     A callback to the ids to exclude from the search
- * @property {undefined | function(): Select2Object} resultConverter
- *     A converter for a value coming from the remote api
- * @property {undefined | Object} overrides
- *     Any other select2 parameter to apply on the config
- */
+interface RemoteSourceOptions {
+  /** A callback to the ids to exclude from the search */
+  excluded?: () => number[];
+  /** A converter for a value coming from the remote api */
+  resultConverter?: ((obj: RemoteResult) => DataFormat | GroupedDataFormat) | undefined;
+  /** Any other select2 parameter to apply on the config */
+  overrides?: AjaxOptions;
+}
 
 /**
  * Build a data source for a Select2 from a remote url
@@ -205,10 +221,14 @@ function localDataSource(source, options) {
  * @param {RemoteSourceOptions} options
  */
 
-// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
-function remoteDataSource(source, options) {
-  jQuery.ajaxSettings.traditional = true;
-  const params = {
+export function remoteDataSource(
+  source: string,
+  options: RemoteSourceOptions,
+): DataSource {
+  $.ajaxSetup({
+    traditional: true,
+  });
+  const params: AjaxOptions = {
     url: source,
     dataType: "json",
     cache: true,
@@ -217,7 +237,7 @@ function remoteDataSource(source, options) {
       return {
         search: params.term,
         exclude: [
-          ...(this.val() || []).map((i) => Number.parseInt(i)),
+          ...(this.val() || []).map((i: string) => Number.parseInt(i)),
           ...(options.excluded ? options.excluded() : []),
         ],
       };
@@ -234,8 +254,7 @@ function remoteDataSource(source, options) {
   return { ajax: params };
 }
 
-// biome-ignore lint/correctness/noUnusedVariables: used in other scripts
-function itemFormatter(user) {
+export function itemFormatter(user: { loading: boolean; text: string }) {
   if (user.loading) {
     return user.text;
   }
@@ -246,8 +265,8 @@ function itemFormatter(user) {
  * @param {null | function(Object):string} pictureGetter
  * @return {function(string): jQuery|HTMLElement}
  */
-function selectItemBuilder(pictureGetter) {
-  return (item) => {
+export function selectItemBuilder(pictureGetter?: (item: RemoteResult) => string) {
+  return (item: RemoteResult) => {
     const picture = typeof pictureGetter === "function" ? pictureGetter(item) : null;
     const imgHtml = picture
       ? `<img 

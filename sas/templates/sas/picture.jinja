@@ -2,10 +2,11 @@
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('sas/css/picture.scss') }}">
+  <link rel="stylesheet" href="{{ static('webpack/sas/viewer-index.css') }}" defer>
 {%- endblock -%}
 
 {%- block additional_js -%}
-  <script defer src="{{ static("webpack/sas/viewer-index.js") }}"></script>
+  <script defer src="{{ static("webpack/sas/viewer-index.ts") }}"></script>
 {%- endblock -%}
 
 {% block title %}
