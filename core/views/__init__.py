@@ -326,6 +326,12 @@ class DetailFormView(SingleObjectMixin, FormView):
         return super().get_object()
 
 
+class AllowFragment:
+    def get_context_data(self, **kwargs):
+        kwargs["is_fragment"] = self.request.headers.get("HX-Request", False)
+        return super().get_context_data(**kwargs)
+
+
 # F403: those star-imports would be hellish to refactor
 # E402: putting those import at the top of the file would also be difficult
 from .files import *  # noqa: F403 E402
