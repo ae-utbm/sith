@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.urls import reverse
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import Field, NonNegativeInt
 
@@ -20,10 +21,15 @@ class PictureSchema(ModelSchema):
         fields = ["id", "name", "date", "size", "is_moderated", "asked_for_removal"]
 
     owner: UserProfileSchema
+    sas_url: str
     full_size_url: str
     compressed_url: str
     thumb_url: str
     album: str
+
+    @staticmethod
+    def resolve_sas_url(obj: Picture) -> str:
+        return reverse("sas:picture", kwargs={"picture_id": obj.id})
 
     @staticmethod
     def resolve_full_size_url(obj: Picture) -> str:

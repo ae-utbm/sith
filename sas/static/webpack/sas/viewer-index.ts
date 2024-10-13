@@ -217,7 +217,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
         const updateArgs = {
           data: { sasPictureId: this.currentPicture.id },
           unused: "",
-          url: `/sas/picture/${this.currentPicture.id}/`,
+          url: this.currentPicture.sas_url,
         };
         if (this.pushstate === History.Replace) {
           window.history.replaceState(
