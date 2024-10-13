@@ -9,10 +9,17 @@ from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
-from core.api_permissions import CanView, IsOwner
+from core.api_permissions import CanView, IsInGroup, IsRoot
 from core.models import Notification, User
 from sas.models import PeoplePictureRelation, Picture
-from sas.schemas import IdentifiedUserSchema, PictureFilterSchema, PictureSchema
+from sas.schemas import (
+    IdentifiedUserSchema,
+    ModerationRequestSchema,
+    PictureFilterSchema,
+    PictureSchema,
+)
+
+IsSasAdmin = IsRoot | IsInGroup(settings.SITH_GROUP_SAS_ADMIN_ID)
 
 
 @api_controller("/sas/picture")
@@ -85,17 +92,34 @@ class PicturesController(ControllerBase):
                 },
             )
 
-    @route.delete("/{picture_id}", permissions=[IsOwner])
+    @route.delete("/{picture_id}", permissions=[IsSasAdmin])
     def delete_picture(self, picture_id: int):
         self.get_object_or_exception(Picture, pk=picture_id).delete()
 
-    @route.patch("/{picture_id}/moderate", permissions=[IsOwner])
+    @route.patch(
+        "/{picture_id}/moderation",
+        permissions=[IsSasAdmin],
+        url_name="picture_moderate",
+    )
     def moderate_picture(self, picture_id: int):
+        """Mark a picture as moderated and remove its pending moderation requests."""
         picture = self.get_object_or_exception(Picture, pk=picture_id)
+        picture.moderation_requests.all().delete()
         picture.is_moderated = True
         picture.moderator = self.context.request.user
         picture.asked_for_removal = False
         picture.save()
+
+    @route.get(
+        "/{picture_id}/moderation",
+        permissions=[IsSasAdmin],
+        response=list[ModerationRequestSchema],
+        url_name="picture_moderation_requests",
+    )
+    def fetch_moderation_requests(self, picture_id: int):
+        """Fetch the moderation requests issued on this picture."""
+        picture = self.get_object_or_exception(Picture, pk=picture_id)
+        return picture.moderation_requests.select_related("author")
 
 
 @api_controller("/sas/relation", tags="User identification on SAS pictures")

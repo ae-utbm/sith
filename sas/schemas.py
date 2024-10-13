@@ -4,8 +4,8 @@ from django.urls import reverse
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import Field, NonNegativeInt
 
-from core.schemas import UserProfileSchema
-from sas.models import Picture
+from core.schemas import SimpleUserSchema, UserProfileSchema
+from sas.models import Picture, PictureModerationRequest
 
 
 class PictureFilterSchema(FilterSchema):
@@ -52,3 +52,11 @@ class PictureRelationCreationSchema(Schema):
 class IdentifiedUserSchema(Schema):
     id: int
     user: UserProfileSchema
+
+
+class ModerationRequestSchema(ModelSchema):
+    author: SimpleUserSchema
+
+    class Meta:
+        model = PictureModerationRequest
+        fields = ["id", "created_at", "reason"]

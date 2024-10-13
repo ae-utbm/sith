@@ -11,10 +11,12 @@ import {
   type IdentifiedUserSchema,
   type PictureSchema,
   type PicturesFetchIdentificationsResponse,
+  type PicturesFetchModerationRequestsResponse,
   type PicturesFetchPicturesData,
   type UserProfileSchema,
   picturesDeletePicture,
   picturesFetchIdentifications,
+  picturesFetchModerationRequests,
   picturesFetchPictures,
   picturesIdentifyUsers,
   picturesModeratePicture,
@@ -27,18 +29,20 @@ import {
  * able to prefetch its data.
  */
 class PictureWithIdentifications {
-  identifications: PicturesFetchIdentificationsResponse | null = null;
+  identifications: PicturesFetchIdentificationsResponse = null;
   imageLoading = false;
   identificationsLoading = false;
+  moderationLoading = false;
   id: number;
   // biome-ignore lint/style/useNamingConvention: api is in snake_case
   compressed_url: string;
+  moderationRequests: PicturesFetchModerationRequestsResponse = null;
 
   constructor(picture: PictureSchema) {
     Object.assign(this, picture);
   }
 
-  static fromPicture(picture: PictureSchema) {
+  static fromPicture(picture: PictureSchema): PictureWithIdentifications {
     return new PictureWithIdentifications(picture);
   }
 
@@ -46,7 +50,7 @@ class PictureWithIdentifications {
    * If not already done, fetch the users identified on this picture and
    * populate the identifications field
    */
-  async loadIdentifications(options?: { forceReload: boolean }) {
+  async loadIdentifications(options?: { forceReload: boolean }): Promise<void> {
     if (this.identificationsLoading) {
       return; // The users are already being fetched.
     }
@@ -65,11 +69,29 @@ class PictureWithIdentifications {
     this.identificationsLoading = false;
   }
 
+  async loadModeration(options?: { forceReload: boolean }): Promise<void> {
+    if (this.moderationLoading) {
+      return; // The moderation requests are already being fetched.
+    }
+    if (!!this.moderationRequests && !options?.forceReload) {
+      // The moderation requests are already fetched
+      // and the user does not want to force the reload
+      return;
+    }
+    this.moderationLoading = true;
+    this.moderationRequests = (
+      await picturesFetchModerationRequests({
+        // biome-ignore lint/style/useNamingConvention: api is in snake_case
+        path: { picture_id: this.id },
+      })
+    ).data;
+    this.moderationLoading = false;
+  }
+
   /**
    * Preload the photo and the identifications
-   * @return {Promise<void>}
    */
-  async preload() {
+  async preload(): Promise<void> {
     const img = new Image();
     img.src = this.compressed_url;
     if (!img.complete) {
@@ -87,12 +109,12 @@ interface ViewerConfig {
   userId: number;
   /** Url of the current album */
   albumUrl: string;
-  /** Id of the album to displlay */
+  /** Id of the album to display */
   albumId: number;
   /** id of the first picture to load on the page */
   firstPictureId: number;
   /** if the user is sas admin */
-  userIsSasAdmin: number;
+  userIsSasAdmin: boolean;
 }
 
 /**
@@ -103,9 +125,8 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
     Alpine.data("picture_viewer", () => ({
       /**
        * All the pictures that can be displayed on this picture viewer
-       * @type PictureWithIdentifications[]
        **/
-      pictures: [],
+      pictures: [] as PictureWithIdentifications[],
       /**
        * The currently displayed picture
        * Default dummy data are pre-loaded to avoid javascript error
@@ -131,14 +152,12 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
       },
       /**
        * The picture which will be displayed next if the user press the "next" button
-       * @type ?PictureWithIdentifications
        **/
-      nextPicture: null,
+      nextPicture: null as PictureWithIdentifications,
       /**
        * The picture which will be displayed next if the user press the "previous" button
-       * @type ?PictureWithIdentifications
        **/
-      previousPicture: null,
+      previousPicture: null as PictureWithIdentifications,
       /**
        * The select2 component used to identify users
        **/
@@ -148,13 +167,11 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
        **/
       /**
        * Error message when a moderation operation fails
-       * @type string
        **/
       moderationError: "",
       /**
        * Method of pushing new url to the browser history
        * Used by popstate event and always reset to it's default value when used
-       * @type History
        **/
       pushstate: History.Push,
 
@@ -166,7 +183,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
           } as PicturesFetchPicturesData)
         ).map(PictureWithIdentifications.fromPicture);
         this.selector = sithSelect2({
-          element: $(this.$refs.search) as unknown as HTMLElement,
+          element: this.$refs.search,
           dataSource: remoteDataSource(await makeUrl(userSearchUsers), {
             excluded: () => [
               ...(this.currentPicture.identifications || []).map(
@@ -213,7 +230,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
        * and the previous picture, the next picture and
        * the list of identified users are updated.
        */
-      async updatePicture() {
+      async updatePicture(): Promise<void> {
         const updateArgs = {
           data: { sasPictureId: this.currentPicture.id },
           unused: "",
@@ -231,16 +248,23 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
         }
 
         this.moderationError = "";
-        const index = this.pictures.indexOf(this.currentPicture);
+        const index: number = this.pictures.indexOf(this.currentPicture);
         this.previousPicture = this.pictures[index - 1] || null;
         this.nextPicture = this.pictures[index + 1] || null;
-        await this.currentPicture.loadIdentifications();
         this.$refs.mainPicture?.addEventListener("load", () => {
           // once the current picture is loaded,
           // start preloading the next and previous pictures
           this.nextPicture?.preload();
           this.previousPicture?.preload();
         });
+        if (this.currentPicture.asked_for_removal && config.userIsSasAdmin) {
+          await Promise.all([
+            this.currentPicture.loadIdentifications(),
+            this.currentPicture.loadModeration(),
+          ]);
+        } else {
+          await this.currentPicture.loadIdentifications();
+        }
       },
 
       async moderatePicture() {
@@ -253,7 +277,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
           return;
         }
         this.currentPicture.is_moderated = true;
-        this.currentPicture.askedForRemoval = false;
+        this.currentPicture.asked_for_removal = false;
       },
 
       async deletePicture() {
@@ -277,7 +301,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
       /**
        * Send the identification request and update the list of identified users.
        */
-      async submitIdentification() {
+      async submitIdentification(): Promise<void> {
         await picturesIdentifyUsers({
           path: {
             // biome-ignore lint/style/useNamingConvention: api is in snake_case
@@ -292,18 +316,15 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
 
       /**
        * Check if an identification can be removed by the currently logged user
-       * @param {PictureIdentification} identification
-       * @return {boolean}
        */
-      canBeRemoved(identification: IdentifiedUserSchema) {
+      canBeRemoved(identification: IdentifiedUserSchema): boolean {
         return config.userIsSasAdmin || identification.user.id === config.userId;
       },
 
       /**
        * Untag a user from the current picture
-       * @param {PictureIdentification} identification
        */
-      async removeIdentification(identification: IdentifiedUserSchema) {
+      async removeIdentification(identification: IdentifiedUserSchema): Promise<void> {
         const res = await usersidentifiedDeleteRelation({
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
           path: { relation_id: identification.id },

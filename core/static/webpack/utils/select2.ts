@@ -148,7 +148,6 @@ import type {
   GroupedDataFormat,
   LoadingData,
   Options,
-  PlainObject,
 } from "select2";
 import "select2/dist/css/select2.css";
 
@@ -181,7 +180,7 @@ interface Select2Options {
  * Create a new select2 with sith presets
  */
 export function sithSelect2(options: Select2Options) {
-  const elem: PlainObject = $(options.element);
+  const elem = $(options.element as HTMLInputElement);
   return elem.select2({
     theme: elem[0].multiple ? "classic" : "default",
     minimumInputLength: 2,
