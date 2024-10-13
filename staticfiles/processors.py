@@ -66,7 +66,10 @@ class JS:
     @staticmethod
     def minify():
         to_exec = [
-            p for p in settings.STATIC_ROOT.rglob("*.js") if ".min" not in p.suffixes
+            p
+            for p in settings.STATIC_ROOT.rglob("*.js")
+            if ".min" not in p.suffixes
+            and (settings.STATIC_ROOT / "webpack") not in p.parents
         ]
         for path in to_exec:
             p = path.resolve()
