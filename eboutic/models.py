@@ -173,9 +173,8 @@ class InvoiceQueryset(models.QuerySet):
         return self.annotate(
             total=Subquery(
                 InvoiceItem.objects.filter(invoice_id=OuterRef("pk"))
-                .annotate(item_amount=F("product_unit_price") * F("quantity"))
-                .values("item_amount")
-                .annotate(total=Sum("item_amount"))
+                .values("invoice_id")
+                .annotate(total=Sum(F("product_unit_price") * F("quantity")))
                 .values("total")
             )
         )
