@@ -71,6 +71,7 @@ if settings.DEBUG:
 
     urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
 
+if settings.SENTRY_ENV == "development":
     """Sentry debug endpoint
     
     This function always crash and allows us to test
