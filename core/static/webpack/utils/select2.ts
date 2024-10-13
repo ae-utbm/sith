@@ -142,7 +142,6 @@
  * </script>
  */
 
-import "select2";
 import type {
   AjaxOptions,
   DataFormat,
