@@ -6,17 +6,19 @@
 
 {% block head %}
   {{ super() }}
-  <script type="text/javascript" src="{{ static('vendored/chart/Chart.bundle.min.js') }}"></script>
+  <script src="{{ static('webpack/subscription/stats-index.ts') }}" defer></script>
 {% endblock %}
 
 {% block content %}
 
   <p>
-    {{ form.start_date.label }}<br>
-    {{ form.start_date }}<br><br>
-    {{ form.end_date.label }}<br>
-    {{ form.end_date }}<br>
-    <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
+    <form>
+      {{ form.start_date.label }}<br>
+      {{ form.start_date }}<br><br>
+      {{ form.end_date.label }}<br>
+      {{ form.end_date }}<br>
+      <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
+    </form>
   </p>
 
   <canvas id="statsChart" width="400" height="200"></canvas>
@@ -56,81 +58,4 @@
           {% endfor %}
         </table>
 
-{% endblock %}
-
-{% block script %}
-  {{ super() }}
-  <script>
-    function getRandomColor() {
-      var letters = '0123456789ABCDEF';
-      var color = '#';
-      for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-    }
-    function getRandomColorUniq(list) {
-      var color = getRandomColor();
-      while (list.includes(color)){
-        color = getRandomColor();
-      }
-      return color;
-    }
-    function hexToRgb(hex) {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-      var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-      hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-        return r + r + g + g + b + b;
-      });
-
-      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-      } : null;
-    }
-
-    var ctx = document.getElementById("statsChart").getContext('2d');
-    var labels = [];
-    var total = [];
-    var colors = [];
-    var colors_dimmed = [];
-    Array.from(document.getElementsByClassName("types")).forEach(function(element){
-      labels.push(element.childNodes[0].data);
-    });
-    Array.from(document.getElementsByClassName("total")).forEach(function(element){
-      total.push(element.childNodes[0].childNodes[0].data);
-    });
-    labels.forEach(function(element){
-      colors.push(getRandomColorUniq(colors));
-    });
-    colors.forEach(function(element){
-      var rgb_color = hexToRgb(element);
-      colors_dimmed.push('rgba(' + rgb_color.r + ', ' + rgb_color.g + ', ' + rgb_color.b + ', 0.2)');
-    });
-    console.log(colors);console.log(colors_dimmed);
-    var myChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: document.getElementById("graphLabel").childNodes[0].data,
-          data: total,
-          backgroundColor: colors_dimmed,
-          borderColor: colors,
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero:true
-            }
-          }]
-        }
-      }
-    });
-  </script>
 {% endblock %}

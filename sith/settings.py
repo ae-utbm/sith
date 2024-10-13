@@ -748,6 +748,4 @@ if SENTRY_DSN:
         environment=SENTRY_ENV,
     )
 
-SITH_FRONT_DEP_VERSIONS = {
-    "https://github.com/chartjs/Chart.js/": "2.6.0",
-}
+SITH_FRONT_DEP_VERSIONS = {}
