@@ -34,6 +34,7 @@ from django.views.generic.edit import DeleteView, FormMixin, UpdateView
 
 from core.models import Notification, RealGroup, SithFile
 from core.views import (
+    AllowFragment,
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
@@ -349,7 +350,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         return kwargs
 
 
-class FileDeleteView(CanEditPropMixin, DeleteView):
+class FileDeleteView(AllowFragment, CanEditPropMixin, DeleteView):
     model = SithFile
     pk_url_kwarg = "file_id"
     template_name = "core/file_delete_confirm.jinja"
@@ -373,13 +374,14 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["popup"] = ""
-        if self.kwargs.get("popup") is not None:
-            kwargs["popup"] = "popup"
+        kwargs["popup"] = "" if self.kwargs.get("popup") is None else "popup"
+        kwargs["next"] = self.request.GET.get("next", None)
+        kwargs["previous"] = self.request.GET.get("previous", None)
+        kwargs["current"] = self.request.path
         return kwargs
 
 
-class FileModerationView(TemplateView):
+class FileModerationView(AllowFragment, TemplateView):
     template_name = "core/file_moderation.jinja"
 
     def get_context_data(self, **kwargs):
