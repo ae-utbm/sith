@@ -12,10 +12,12 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+import itertools
 import re
 from datetime import datetime, timedelta
 from datetime import timezone as tz
 from http import HTTPStatus
+from operator import attrgetter
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs
 
@@ -804,24 +806,40 @@ class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     current_tab = "products"
 
 
-class ProductArchivedListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+    model = Product
+    queryset = Product.objects.annotate(type_name=F("product_type__name"))
+    template_name = "counter/product_list.jinja"
+    ordering = [
+        F("product_type__priority").desc(nulls_last=True),
+        "product_type",
+        "name",
+    ]
+
+    def get_context_data(self, **kwargs):
+        res = super().get_context_data(**kwargs)
+        res["object_list"] = itertools.groupby(
+            res["object_list"], key=attrgetter("type_name")
+        )
+        return res
+
+
+class ArchivedProductListView(ProductListView):
     """A list view for the admins."""
 
-    model = Product
-    template_name = "counter/product_list.jinja"
-    queryset = Product.objects.filter(archived=True)
-    ordering = ["name"]
     current_tab = "archive"
 
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=True)
 
-class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+
+class ActiveProductListView(ProductListView):
     """A list view for the admins."""
 
-    model = Product
-    template_name = "counter/product_list.jinja"
-    queryset = Product.objects.filter(archived=False)
-    ordering = ["name"]
     current_tab = "products"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=False)
 
 
 class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):

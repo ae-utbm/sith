@@ -19,11 +19,7 @@ from counter.views import *
 
 urlpatterns = [
     path("<int:counter_id>/", CounterMain.as_view(), name="details"),
-    path(
-        "<int:counter_id>/click/<int:user_id>/",
-        CounterClick.as_view(),
-        name="click",
-    ),
+    path("<int:counter_id>/click/<int:user_id>/", CounterClick.as_view(), name="click"),
     path(
         "<int:counter_id>/last_ops/",
         CounterLastOperationsView.as_view(),
@@ -34,19 +30,11 @@ urlpatterns = [
         CounterCashSummaryView.as_view(),
         name="cash_summary",
     ),
-    path(
-        "<int:counter_id>/activity/",
-        CounterActivityView.as_view(),
-        name="activity",
-    ),
+    path("<int:counter_id>/activity/", CounterActivityView.as_view(), name="activity"),
     path("<int:counter_id>/stats/", CounterStatView.as_view(), name="stats"),
     path("<int:counter_id>/login/", counter_login, name="login"),
     path("<int:counter_id>/logout/", counter_logout, name="logout"),
-    path(
-        "eticket/<int:selling_id>/pdf/",
-        EticketPDFView.as_view(),
-        name="eticket_pdf",
-    ),
+    path("eticket/<int:selling_id>/pdf/", EticketPDFView.as_view(), name="eticket_pdf"),
     path(
         "customer/<int:customer_id>/card/add/",
         StudentCardFormView.as_view(),
@@ -59,17 +47,11 @@ urlpatterns = [
     ),
     path("admin/<int:counter_id>/", CounterEditView.as_view(), name="admin"),
     path(
-        "admin/<int:counter_id>/prop/",
-        CounterEditPropView.as_view(),
-        name="prop_admin",
+        "admin/<int:counter_id>/prop/", CounterEditPropView.as_view(), name="prop_admin"
     ),
     path("admin/", CounterListView.as_view(), name="admin_list"),
     path("admin/new/", CounterCreateView.as_view(), name="new"),
-    path(
-        "admin/delete/<int:counter_id>/",
-        CounterDeleteView.as_view(),
-        name="delete",
-    ),
+    path("admin/delete/<int:counter_id>/", CounterDeleteView.as_view(), name="delete"),
     path("admin/invoices_call/", InvoiceCallView.as_view(), name="invoices_call"),
     path(
         "admin/cash_summary/list/",
@@ -81,10 +63,10 @@ urlpatterns = [
         CashSummaryEditView.as_view(),
         name="cash_summary_edit",
     ),
-    path("admin/product/list/", ProductListView.as_view(), name="product_list"),
+    path("admin/product/list/", ActiveProductListView.as_view(), name="product_list"),
     path(
         "admin/product/list_archived/",
-        ProductArchivedListView.as_view(),
+        ArchivedProductListView.as_view(),
         name="product_list_archived",
     ),
     path("admin/product/create/", ProductCreateView.as_view(), name="new_product"),
