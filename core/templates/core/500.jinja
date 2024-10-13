@@ -1,26 +1,26 @@
 {% extends "core/base.jinja" %}
-{% block head %}
-  {{ super() }}
-  <script
-    src="{{ static('vendored/sentry/bundle.min.js') }}"
-    crossorigin="anonymous"
-  ></script>
-{% endblock head %}
+{% block additional_js %}
+  {% if settings.SENTRY_DSN %}
+    <script src="{{ static('webpack/sentry-popup-index.ts') }}" defer ></script>
+  {% endif %}
+{% endblock additional_js %}
 
 {% block content %}
   <h3>{% trans %}500, Server Error{% endtrans %}</h3>
   {% if settings.SENTRY_DSN %}
     <script>
-      Sentry.init({ dsn: '{{ settings.SENTRY_DSN }}' });
-      Sentry.showReportDialog({
-        eventId: '{{ request.sentry_last_event_id() }}',
-        {% if user.is_authenticated %}
-          user: {
-            'name': '{{user.first_name}} {{user.last_name}}',
-            'email': '{{user.email}}'
-          }
-        {% endif %}
-      })
+      window.addEventListener("DOMContentLoaded", () => {
+        loadSentryPopup({
+          dsn: "{{ settings.SENTRY_DSN }}",
+          eventId: "{{ request.sentry_last_event_id() }}",
+          {% if user.is_authenticated %}
+            user: {
+              name: '{{user.first_name}} {{user.last_name}}',
+              email: '{{user.email}}'
+            }
+          {% endif %}
+        });
+      });
     </script>
   {% endif %}
 {% endblock content %}
