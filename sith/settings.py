@@ -750,8 +750,4 @@ if SENTRY_DSN:
 
 SITH_FRONT_DEP_VERSIONS = {
     "https://github.com/chartjs/Chart.js/": "2.6.0",
-    "https://github.com/mrdoob/three.js/": "r148",
-    "https://github.com/vasturiano/three-spritetext": "1.6.5",
-    "https://github.com/vasturiano/3d-force-graph/": "1.70.19",
-    "https://github.com/vasturiano/d3-force-3d": "3.0.3",
 }
