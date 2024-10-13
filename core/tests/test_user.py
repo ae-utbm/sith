@@ -158,10 +158,11 @@ def test_user_invoice_with_multiple_items():
     item_recipe = Recipe(InvoiceItem, invoice=foreign_key(Recipe(Invoice, user=user)))
     item_recipe.make(_quantity=3, quantity=1, product_unit_price=5)
     item_recipe.make(_quantity=1, quantity=1, product_unit_price=5)
+    item_recipe.make(_quantity=2, quantity=1, product_unit_price=iter([5, 8]))
     res = list(
         Invoice.objects.filter(user=user)
         .annotate_total()
         .order_by("-total")
         .values_list("total", flat=True)
     )
-    assert res == [15, 5]
+    assert res == [15, 13, 5]
