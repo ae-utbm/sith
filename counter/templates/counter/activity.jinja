@@ -5,9 +5,8 @@
   {% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}
 {% endblock %}
 
-{% block head %}
-  {{ super() }}
-  <script src="{{ static('webpack/graph-index.ts') }}"></script>
+{% block additionnal_js %}
+  <script defer src="{{ static('webpack/graph-index.ts') }}"></script>
 {% endblock %}
 
 {%- block additional_css -%}
@@ -42,4 +41,17 @@
       <span>{% trans %}counter is not open : no one is connected{% endtrans %}</span>
     </div>
   </div>
+{% endblock %}
+
+{% block script %}
+  {{super()}}
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      loadChart({
+        canvas: document.getElementById("activityChart"),
+        startDate: new Date().setDate(new Date().getDate() - 7),
+        counterId: {{ counter.id }},
+      });
+    });
+  </script>
 {% endblock %}
