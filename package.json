@@ -7,6 +7,8 @@
     "compile": "webpack --mode production",
     "compile-dev": "webpack --mode development",
     "serve": "webpack --mode development --watch",
+    "analyse-dev": "webpack --config webpack.analyze.config.js --mode development",
+    "analyse-prod": "webpack --config webpack.analyze.config.js --mode production",
     "check": "biome check --write"
   },
   "keywords": [],
@@ -36,6 +38,7 @@
     "ts-loader": "^9.5.1",
     "typescript": "^5.6.3",
     "webpack": "^5.94.0",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
