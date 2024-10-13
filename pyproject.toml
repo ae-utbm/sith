@@ -108,6 +108,7 @@ select = [
     "UP008",  # Use super() instead of super(__class__, self)
     "UP009",  # utf-8 encoding declaration is unnecessary
 	"T2",  # print statements
+	"T100", # breakpoint()
 ]
 
 ignore = [
