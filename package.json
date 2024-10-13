@@ -48,6 +48,7 @@
     "@zip.js/zip.js": "^2.7.52",
     "3d-force-graph": "^1.73.4",
     "alpinejs": "^3.14.1",
+    "chart.js": "^4.4.4",
     "cytoscape": "^3.30.2",
     "cytoscape-cxtmenu": "^3.5.0",
     "cytoscape-klay": "^3.1.4",
