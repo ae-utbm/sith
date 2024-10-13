@@ -747,5 +747,3 @@ if SENTRY_DSN:
         send_default_pii=True,
         environment=SENTRY_ENV,
     )
-
-SITH_FRONT_DEP_VERSIONS = {}
