@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import paginate_htmx %}
 
 {% block title %}
   {% trans %}File moderation{% endtrans %}
@@ -7,7 +8,7 @@
 {% block content %}
   <h3>{% trans %}File moderation{% endtrans %}</h3>
   <div>
-    {% for f in files %}
+    {% for f in object_list %}
       <div
         id="file-{{ loop.index }}"
         style="margin: 2px; padding: 2px; border: solid 1px red; text-align: center"
@@ -28,12 +29,14 @@
           hx-target="#content"
           hx-swap="outerHtml"
         >{% trans %}Moderate{% endtrans %}</button> -
+          {% set current_page = url('core:file_moderation') + "?page=" + page_obj.number | string %}
           <button
-            hx-get="{{ url('core:file_delete', file_id=f.id) }}?next={{ url('core:file_moderation') }}&previous={{ url('core:file_moderation') }}"
+            hx-get="{{ url('core:file_delete', file_id=f.id) }}?next={{ current_page | urlencode }}&previous={{ current_page | urlencode }}"
             hx-target="#file-{{ loop.index }}"
             hx-swap="outerHtml"
           >{% trans %}Delete{% endtrans %}</button></p>
       </div>
     {% endfor %}
+    {{ paginate_htmx(page_obj, paginator) }}
   </div>
 {% endblock %}

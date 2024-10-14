@@ -28,7 +28,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.http import http_date
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView, FormMixin, UpdateView
 
@@ -381,13 +381,11 @@ class FileDeleteView(AllowFragment, CanEditPropMixin, DeleteView):
         return kwargs
 
 
-class FileModerationView(AllowFragment, TemplateView):
+class FileModerationView(AllowFragment, CanViewMixin, ListView):
+    model = SithFile
     template_name = "core/file_moderation.jinja"
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["files"] = SithFile.objects.filter(is_moderated=False)[:100]
-        return kwargs
+    queryset = SithFile.objects.filter(is_moderated=False)
+    paginate_by = 100
 
 
 class FileModerateView(CanEditPropMixin, SingleObjectMixin):
