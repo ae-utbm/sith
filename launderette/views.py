@@ -73,23 +73,15 @@ class LaunderetteBookView(CanViewMixin, DetailView):
         self.machines = {}
         with transaction.atomic():
             self.object = self.get_object()
-            if "slot_type" in request.POST.keys():
+            if "slot_type" in request.POST:
                 self.slot_type = request.POST["slot_type"]
-            if "slot" in request.POST.keys() and request.user.is_authenticated:
+            if "slot" in request.POST and request.user.is_authenticated:
                 self.subscriber = request.user
                 if self.subscriber.is_subscribed:
                     self.date = dateparse.parse_datetime(request.POST["slot"]).replace(
                         tzinfo=tz.utc
                     )
-                    if self.slot_type == "WASHING":
-                        if self.check_slot(self.slot_type):
-                            Slot(
-                                user=self.subscriber,
-                                start_date=self.date,
-                                machine=self.machines[self.slot_type],
-                                type=self.slot_type,
-                            ).save()
-                    elif self.slot_type == "DRYING":
+                    if self.slot_type in ["WASHING", "DRYING"]:
                         if self.check_slot(self.slot_type):
                             Slot(
                                 user=self.subscriber,
@@ -149,14 +141,16 @@ class LaunderetteBookView(CanViewMixin, DetailView):
             ):
                 free = False
                 if (
-                    self.slot_type == "BOTH"
+                    (
+                        self.slot_type == "BOTH"
+                        and self.check_slot("WASHING", h)
+                        and self.check_slot("DRYING", h + timedelta(hours=1))
+                    )
+                    or self.slot_type == "WASHING"
                     and self.check_slot("WASHING", h)
-                    and self.check_slot("DRYING", h + timedelta(hours=1))
+                    or self.slot_type == "DRYING"
+                    and self.check_slot("DRYING", h)
                 ):
-                    free = True
-                elif self.slot_type == "WASHING" and self.check_slot("WASHING", h):
-                    free = True
-                elif self.slot_type == "DRYING" and self.check_slot("DRYING", h):
                     free = True
                 if free and datetime.now().replace(tzinfo=tz.utc) < h:
                     kwargs["planning"][date].append(h)
@@ -344,7 +338,7 @@ class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
         kwargs["counter"] = self.object.counter
         kwargs["form"] = self.get_form()
         kwargs["barmen"] = [self.request.user]
-        if "last_basket" in self.request.session.keys():
+        if "last_basket" in self.request.session:
             kwargs["last_basket"] = self.request.session.pop("last_basket", None)
             kwargs["last_customer"] = self.request.session.pop("last_customer", None)
             kwargs["last_total"] = self.request.session.pop("last_total", None)
@@ -470,7 +464,7 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
     def get_context_data(self, **kwargs):
         """We handle here the login form for the barman."""
         kwargs = super().get_context_data(**kwargs)
-        if "form" not in kwargs.keys():
+        if "form" not in kwargs:
             kwargs["form"] = self.get_form()
         kwargs["counter"] = self.object.counter
         kwargs["customer"] = self.customer
@@ -510,7 +504,7 @@ class MachineCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         ret = super().get_initial()
-        if "launderette" in self.request.GET.keys():
+        if "launderette" in self.request.GET:
             obj = Launderette.objects.filter(
                 id=int(self.request.GET["launderette"])
             ).first()

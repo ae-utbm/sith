@@ -622,9 +622,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     def remove_subscription(self, cleaned_data):
         """Remove specified users from a mailing list."""
         fields = [
-            cleaned_data[key]
-            for key in cleaned_data.keys()
-            if key.startswith("removal_")
+            val for key, val in cleaned_data.items() if key.startswith("removal_")
         ]
         for field in fields:
             for sub in field:

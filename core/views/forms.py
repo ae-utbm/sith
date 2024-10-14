@@ -140,7 +140,7 @@ class SelectUser(TextInput):
 
 class LoginForm(AuthenticationForm):
     def __init__(self, *arg, **kwargs):
-        if "data" in kwargs.keys():
+        if "data" in kwargs:
             from counter.models import Customer
 
             data = kwargs["data"].copy()

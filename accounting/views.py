@@ -182,7 +182,7 @@ class ClubAccountCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         ret = super().get_initial()
-        if "parent" in self.request.GET.keys():
+        if "parent" in self.request.GET:
             obj = BankAccount.objects.filter(id=int(self.request.GET["parent"])).first()
             if obj is not None:
                 ret["bank_account"] = obj.id
@@ -264,7 +264,7 @@ class JournalCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         ret = super().get_initial()
-        if "parent" in self.request.GET.keys():
+        if "parent" in self.request.GET:
             obj = ClubAccount.objects.filter(id=int(self.request.GET["parent"])).first()
             if obj is not None:
                 ret["club_account"] = obj.id
@@ -362,7 +362,7 @@ class OperationForm(forms.ModelForm):
 
     def clean(self):
         self.cleaned_data = super().clean()
-        if "target_type" in self.cleaned_data.keys():
+        if "target_type" in self.cleaned_data:
             if (
                 self.cleaned_data.get("user") is None
                 and self.cleaned_data.get("club") is None
@@ -639,10 +639,7 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
             amount = queryset.filter(
                 accounting_type__movement_type=movement_type, simpleaccounting_type=sat
             ).aggregate(amount_sum=Sum("amount"))["amount_sum"]
-            if sat:
-                sat = sat.label
-            else:
-                sat = ""
+            sat = sat.label if sat else ""
             if amount:
                 total_sum += amount
                 statement[sat] = amount
@@ -795,7 +792,7 @@ class LabelCreateView(
 
     def get_initial(self):
         ret = super().get_initial()
-        if "parent" in self.request.GET.keys():
+        if "parent" in self.request.GET:
             obj = ClubAccount.objects.filter(id=int(self.request.GET["parent"])).first()
             if obj is not None:
                 ret["club_account"] = obj.id

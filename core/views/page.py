@@ -55,7 +55,7 @@ class PageView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if "page" not in context.keys():
+        if "page" not in context:
             context["new_page"] = self.kwargs["page_name"]
         return context
 
@@ -112,7 +112,7 @@ class PageCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         init = {}
-        if "page" in self.request.GET.keys():
+        if "page" in self.request.GET:
             page_name = self.request.GET["page"]
             parent_name = "/".join(page_name.split("/")[:-1])
             parent = Page.get_page_by_full_name(parent_name)

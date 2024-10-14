@@ -221,7 +221,7 @@ class EtransactionAutoAnswer(View):
         # Payment authorized:
         # * 'Error' is '00000'
         # * 'Auto' is in the request
-        if request.GET["Error"] == "00000" and "Auto" in request.GET.keys():
+        if request.GET["Error"] == "00000" and "Auto" in request.GET:
             try:
                 with transaction.atomic():
                     b = (

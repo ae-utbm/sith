@@ -81,9 +81,7 @@ def can_edit_prop(obj: Any, user: User) -> bool:
             raise PermissionDenied
         ```
     """
-    if obj is None or user.is_owner(obj):
-        return True
-    return False
+    return obj is None or user.is_owner(obj)
 
 
 def can_edit(obj: Any, user: User) -> bool:
@@ -308,10 +306,10 @@ class QuickNotifMixin:
         kwargs["quick_notifs"] = []
         for n in self.quick_notif_list:
             kwargs["quick_notifs"].append(settings.SITH_QUICK_NOTIF[n])
-        for k, v in settings.SITH_QUICK_NOTIF.items():
-            for gk in self.request.GET.keys():
-                if k == gk:
-                    kwargs["quick_notifs"].append(v)
+        for key, val in settings.SITH_QUICK_NOTIF.items():
+            for gk in self.request.GET:
+                if key == gk:
+                    kwargs["quick_notifs"].append(val)
         return kwargs
 
 

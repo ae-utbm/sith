@@ -250,7 +250,7 @@ class VoteFormView(CanCreateMixin, FormView):
 
     def vote(self, election_data):
         with transaction.atomic():
-            for role_title in election_data.keys():
+            for role_title in election_data:
                 # If we have a multiple choice field
                 if isinstance(election_data[role_title], QuerySet):
                     if election_data[role_title].count() > 0:
@@ -443,28 +443,16 @@ class ElectionUpdateView(CanEditMixin, UpdateView):
     pk_url_kwarg = "election_id"
 
     def get_initial(self):
-        init = {}
-        try:
-            init["start_date"] = self.object.start_date.strftime("%Y-%m-%d %H:%M:%S")
-        except Exception:
-            pass
-        try:
-            init["end_date"] = self.object.end_date.strftime("%Y-%m-%d %H:%M:%S")
-        except Exception:
-            pass
-        try:
-            init["start_candidature"] = self.object.start_candidature.strftime(
+        return {
+            "start_date": self.object.start_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "end_date": self.object.end_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "start_candidature": self.object.start_candidature.strftime(
                 "%Y-%m-%d %H:%M:%S"
-            )
-        except Exception:
-            pass
-        try:
-            init["end_candidature"] = self.object.end_candidature.strftime(
+            ),
+            "end_candidature": self.object.end_candidature.strftime(
                 "%Y-%m-%d %H:%M:%S"
-            )
-        except Exception:
-            pass
-        return init
+            ),
+        }
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("election:detail", kwargs={"election_id": self.object.id})

@@ -853,7 +853,7 @@ class TestCustomerAccountId(TestCase):
         number = account_id[:-1]
         assert created is True
         assert number == "12346"
-        assert 6 == len(account_id)
+        assert len(account_id) == 6
         assert account_id[-1] in string.ascii_lowercase
         assert customer.amount == 0
 

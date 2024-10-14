@@ -241,7 +241,7 @@ class TrombiModerateCommentView(DetailView):
                 )
             elif request.POST["action"] == "reject":
                 return super().get(request, *args, **kwargs)
-            elif request.POST["action"] == "delete" and "reason" in request.POST.keys():
+            elif request.POST["action"] == "delete" and "reason" in request.POST:
                 self.object.author.user.email_user(
                     subject="[%s] %s" % (settings.SITH_NAME, _("Rejected comment")),
                     message=_(
@@ -500,7 +500,7 @@ class TrombiCommentFormView(LoginRequiredMixin, View):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        if "user_id" in self.kwargs.keys():
+        if "user_id" in self.kwargs:
             kwargs["target"] = get_object_or_404(TrombiUser, id=self.kwargs["user_id"])
         else:
             kwargs["target"] = self.object.target

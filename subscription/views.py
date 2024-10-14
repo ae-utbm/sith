@@ -116,7 +116,7 @@ class NewSubscription(CreateView):
         raise PermissionDenied
 
     def get_initial(self):
-        if "member" in self.request.GET.keys():
+        if "member" in self.request.GET:
             return {
                 "member": self.request.GET["member"],
                 "subscription_type": "deux-semestres",

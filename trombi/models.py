@@ -160,10 +160,7 @@ class TrombiUser(models.Model):
             role = str(settings.SITH_CLUB_ROLES[m.role])
             if m.description:
                 role += " (%s)" % m.description
-            if m.end_date:
-                end_date = get_semester_code(m.end_date)
-            else:
-                end_date = ""
+            end_date = get_semester_code(m.end_date) if m.end_date else ""
             TrombiClubMembership(
                 user=self,
                 club=str(m.club),

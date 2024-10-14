@@ -30,7 +30,7 @@ from core.utils import get_start_of_semester
 
 
 def validate_type(value):
-    if value not in settings.SITH_SUBSCRIPTIONS.keys():
+    if value not in settings.SITH_SUBSCRIPTIONS:
         raise ValidationError(_("Bad subscription type"))
 
 

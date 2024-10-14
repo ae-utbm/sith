@@ -703,9 +703,7 @@ class User(AbstractBaseUser):
             return True
         if hasattr(obj, "owner_group") and self.is_in_group(pk=obj.owner_group.id):
             return True
-        if self.is_root:
-            return True
-        return False
+        return self.is_root
 
     def can_edit(self, obj):
         """Determine if the object can be edited by the user."""
@@ -717,9 +715,7 @@ class User(AbstractBaseUser):
                     return True
         if isinstance(obj, User) and obj == self:
             return True
-        if self.is_owner(obj):
-            return True
-        return False
+        return self.is_owner(obj)
 
     def can_view(self, obj):
         """Determine if the object can be viewed by the user."""
@@ -729,9 +725,7 @@ class User(AbstractBaseUser):
             for pk in obj.view_groups.values_list("pk", flat=True):
                 if self.is_in_group(pk=pk):
                     return True
-        if self.can_edit(obj):
-            return True
-        return False
+        return self.can_edit(obj)
 
     def can_be_edited_by(self, user):
         return user.is_root or user.is_board_member
@@ -861,9 +855,7 @@ class AnonymousUser(AuthAnonymousUser):
             and obj.view_groups.filter(id=settings.SITH_GROUP_PUBLIC_ID).exists()
         ):
             return True
-        if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
-            return True
-        return False
+        return hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self)
 
     def get_display_name(self):
         return _("Visitor")
@@ -1353,14 +1345,10 @@ class Page(models.Model):
         if hasattr(self, "club") and self.club.can_be_edited_by(user):
             # Override normal behavior for clubs
             return True
-        if self.name == settings.SITH_CLUB_ROOT_PAGE and user.is_board_member:
-            return True
-        return False
+        return self.name == settings.SITH_CLUB_ROOT_PAGE and user.is_board_member
 
     def can_be_viewed_by(self, user):
-        if self.is_club_page:
-            return True
-        return False
+        return self.is_club_page
 
     def get_parent_list(self):
         parents = []

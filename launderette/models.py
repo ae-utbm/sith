@@ -51,18 +51,14 @@ class Launderette(models.Model):
             unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
         ).first()
         m = launderette_club.get_membership_for(user)
-        if m and m.role >= 9:
-            return True
-        return False
+        return bool(m and m.role >= 9)
 
     def can_be_edited_by(self, user):
         launderette_club = Club.objects.filter(
             unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
         ).first()
         m = launderette_club.get_membership_for(user)
-        if m and m.role >= 2:
-            return True
-        return False
+        return bool(m and m.role >= 2)
 
     def can_be_viewed_by(self, user):
         return user.is_subscribed
@@ -113,9 +109,7 @@ class Machine(models.Model):
             unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
         ).first()
         m = launderette_club.get_membership_for(user)
-        if m and m.role >= 9:
-            return True
-        return False
+        return bool(m and m.role >= 9)
 
 
 class Token(models.Model):
@@ -164,9 +158,7 @@ class Token(models.Model):
             unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
         ).first()
         m = launderette_club.get_membership_for(user)
-        if m and m.role >= 9:
-            return True
-        return False
+        return bool(m and m.role >= 9)
 
 
 class Slot(models.Model):
