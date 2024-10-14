@@ -1,13 +1,7 @@
 <div>
-  <textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
+  <textarea is="markdown-input" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
 
   {# The easymde script can be included twice, it's safe in the code #}
   <script src="{{ statics.js }}" defer> </script>
   <link rel="stylesheet" type="text/css" href="{{ statics.css }}" defer>
-  <script type="text/javascript">
-    addEventListener("DOMContentLoaded", (event) => {
-      easymdeFactory(
-        document.getElementById("{{ widget.attrs.id }}"));
-    })
-  </script>
 </div>
