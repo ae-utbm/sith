@@ -139,18 +139,8 @@ class PagePropView(CanEditPagePropMixin, UpdateView):
     slug_field = "_full_name"
     slug_url_kwarg = "page_name"
 
-    def get_object(self):
-        o = super().get_object()
-        # Create the page if it does not exists
-        # if p == None:
-        #    parent_name = '/'.join(page_name.split('/')[:-1])
-        #    name = page_name.split('/')[-1]
-        #    if parent_name == "":
-        #        p = Page(name=name)
-        #    else:
-        #        parent = Page.get_page_by_full_name(parent_name)
-        #        p = Page(name=name, parent=parent)
-        self.page = o
+    def get_object(self, queryset=None):
+        self.page = super().get_object()
         try:
             self.page.set_lock_recursive(self.request.user)
         except LockError as e:

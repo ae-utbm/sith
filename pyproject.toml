@@ -103,9 +103,11 @@ select = [
 	"C4",  # use comprehensions when possible
 	"DJ",  # django-specific rules,
 	"E",  # pycodestyle (https://docs.astral.sh/ruff/rules/#pycodestyle-e-w)
+	"ERA",  # commented code
 	"F",  # pyflakes (https://docs.astral.sh/ruff/rules/#pyflakes-f)
 	"FBT",  # boolean trap
 	"I",  # isort
+	"INT",  # gettext
 	"SIM",  # simplify (https://docs.astral.sh/ruff/rules/#flake8-simplify-sim)
 	"T100", # breakpoint()
 	"T2",  # print statements

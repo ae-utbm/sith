@@ -1368,7 +1368,6 @@ class Page(models.Model):
         if self.lock_timeout and (
             timezone.now() - self.lock_timeout > timedelta(minutes=5)
         ):
-            # print("Lock timed out")
             self.unset_lock()
         return (
             self.lock_user
@@ -1383,7 +1382,6 @@ class Page(models.Model):
         self.lock_user = user
         self.lock_timeout = timezone.now()
         super().save()
-        # print("Locking page")
 
     def set_lock_recursive(self, user):
         """Locks recursively all the child pages for editing properties."""
@@ -1402,7 +1400,6 @@ class Page(models.Model):
         self.lock_user = None
         self.lock_timeout = None
         super().save()
-        # print("Unlocking page")
 
     def get_lock(self):
         """Returns the page's mutex containing the time and the user in a dict."""
