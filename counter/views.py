@@ -386,13 +386,12 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def get_total_quantity_for_pid(self, request, pid):
         pid = str(pid)
-        try:
-            return (
-                request.session["basket"][pid]["qty"]
-                + request.session["basket"][pid]["bonus_qty"]
-            )
-        except:
+        if pid not in request.session["basket"]:
             return 0
+        return (
+            request.session["basket"][pid]["qty"]
+            + request.session["basket"][pid]["bonus_qty"]
+        )
 
     def compute_record_product(self, request, product=None):
         recorded = 0

@@ -110,7 +110,7 @@ class Picture(SasFile):
         im = Image.open(BytesIO(self.file.read()))
         try:
             im = exif_auto_rotate(im)
-        except:
+        except:  # noqa: E722 (bare except) I just don't know what exception can be raised
             pass
         # convert the compressed image and the thumbnail into webp
         # The original image keeps its original type, because it's not

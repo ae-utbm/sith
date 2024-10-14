@@ -759,23 +759,17 @@ class User(AbstractBaseUser):
 
     @cached_property
     def preferences(self):
-        try:
+        if hasattr(self, "_preferences"):
             return self._preferences
-        except:
-            prefs = Preferences(user=self)
-            prefs.save()
-            return prefs
+        return Preferences.objects.create(user=self)
 
     @cached_property
     def forum_infos(self):
-        try:
+        if hasattr(self, "_forum_infos"):
             return self._forum_infos
-        except:
-            from forum.models import ForumUserInfo
+        from forum.models import ForumUserInfo
 
-            infos = ForumUserInfo(user=self)
-            infos.save()
-            return infos
+        return ForumUserInfo.objects.create(user=self)
 
     @cached_property
     def clubs_with_rights(self) -> list[Club]:
@@ -1070,7 +1064,7 @@ class SithFile(models.Model):
                     ]:
                         self.file.delete()
                         self.file = None
-                except:
+                except:  # noqa E722 I don't know the exception that can be raised
                     self.file = None
             self.mime_type = "inode/directory"
         if self.is_file and (self.file is None or self.file == ""):
@@ -1196,12 +1190,12 @@ class SithFile(models.Model):
         return Album.objects.filter(id=self.id).first()
 
     def get_parent_list(self):
-        l = []
-        p = self.parent
-        while p is not None:
-            l.append(p)
-            p = p.parent
-        return l
+        parents = []
+        current = self.parent
+        while current is not None:
+            parents.append(current)
+            current = current.parent
+        return parents
 
     def get_parent_path(self):
         return "/" + "/".join([p.name for p in self.get_parent_list()[::-1]])
@@ -1369,12 +1363,12 @@ class Page(models.Model):
         return False
 
     def get_parent_list(self):
-        l = []
-        p = self.parent
-        while p is not None:
-            l.append(p)
-            p = p.parent
-        return l
+        parents = []
+        current = self.parent
+        while current is not None:
+            parents.append(current)
+            current = current.parent
+        return parents
 
     def is_locked(self):
         """Is True if the page is locked, False otherwise.
@@ -1438,10 +1432,8 @@ class Page(models.Model):
         return "/".join([self.parent.get_full_name(), self.name])
 
     def get_display_name(self):
-        try:
-            return self.revisions.last().title
-        except:
-            return self.name
+        rev = self.revisions.last()
+        return rev.title if rev is not None else self.name
 
     @cached_property
     def is_club_page(self):

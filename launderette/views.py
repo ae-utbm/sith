@@ -236,42 +236,39 @@ class ManageTokenForm(forms.Form):
         token_list = cleaned_data["tokens"].strip(" \n\r").split(" ")
         token_type = cleaned_data["token_type"]
         self.data = {}
+
+        if cleaned_data["action"] not in ["BACK", "ADD", "DEL"]:
+            return
+
+        tokens = list(
+            Token.objects.filter(
+                launderette=launderette, type=token_type, name__in=token_list
+            )
+        )
+        existing_names = {t.name for t in tokens}
+        if cleaned_data["action"] in ["BACK", "DEL"]:
+            for t in set(token_list) - existing_names:
+                self.add_error(
+                    None,
+                    _("Token %(token_name)s does not exists") % {"token_name": t},
+                )
         if cleaned_data["action"] == "BACK":
-            for t in token_list:
-                try:
-                    tok = Token.objects.filter(
-                        launderette=launderette, type=token_type, name=t
-                    ).first()
-                    tok.borrow_date = None
-                    tok.user = None
-                    tok.save()
-                except:
-                    self.add_error(
-                        None,
-                        _("Token %(token_name)s does not exists") % {"token_name": t},
-                    )
+            Token.objects.filter(id__in=[t.id for t in tokens]).update(
+                borrow_date=None, user=None
+            )
+        elif cleaned_data["action"] == "DEL":
+            Token.objects.filter(id__in=[t.id for t in tokens]).delete()
         elif cleaned_data["action"] == "ADD":
+            for name in existing_names:
+                self.add_error(
+                    None,
+                    _("Token %(token_name)s already exists") % {"token_name": name},
+                )
             for t in token_list:
                 try:
                     Token(launderette=launderette, type=token_type, name=t).save()
                 except DataError as e:
                     self.add_error(None, e)
-                except:
-                    self.add_error(
-                        None,
-                        _("Token %(token_name)s already exists") % {"token_name": t},
-                    )
-        elif cleaned_data["action"] == "DEL":
-            for t in token_list:
-                try:
-                    Token.objects.filter(
-                        launderette=launderette, type=token_type, name=t
-                    ).delete()
-                except:
-                    self.add_error(
-                        None,
-                        _("Token %(token_name)s does not exists") % {"token_name": t},
-                    )
 
 
 class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
@@ -288,13 +285,7 @@ class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = self.get_form()
         return super().post(request, *args, **kwargs)
-        form.launderette = self.object
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
 
     def form_valid(self, form):
         """We handle here the redirection, passing the user id of the asked customer."""

@@ -128,7 +128,7 @@ class MailingForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        if not "action" in cleaned_data:
+        if "action" not in cleaned_data:
             # If there is no action provided, we can stop here
             raise forms.ValidationError(_("An action is required"), code="invalid")
 

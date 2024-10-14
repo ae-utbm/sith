@@ -94,11 +94,13 @@ class SubscriptionForm(forms.ModelForm):
             self.errors.pop("email", None)
             self.errors.pop("date_of_birth", None)
         if cleaned_data.get("member") is None:
-            # This should be handled here, but it is done in the Subscription model's clean method
+            # This should be handled here,
+            # but it is done in the Subscription model's clean method
             # TODO investigate why!
             raise ValidationError(
                 _(
-                    "You must either choose an existing user or create a new one properly"
+                    "You must either choose an existing "
+                    "user or create a new one properly"
                 )
             )
         return cleaned_data

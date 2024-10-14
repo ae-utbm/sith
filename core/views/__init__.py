@@ -234,7 +234,9 @@ class UserIsRootMixin(GenericContentPermissionMixinBuilder):
         PermissionDenied: if the user isn't root
     """
 
-    permission_function = lambda obj, user: user.is_root
+    @staticmethod
+    def permission_function(obj: Any, user: User):
+        return user.is_root
 
 
 class FormerSubscriberMixin(AccessMixin):
@@ -327,8 +329,9 @@ class DetailFormView(SingleObjectMixin, FormView):
 
 
 # F403: those star-imports would be hellish to refactor
-from .files import *  # noqa: F403
-from .group import *  # noqa: F403
-from .page import *  # noqa: F403
-from .site import *  # noqa: F403
-from .user import *  # noqa: F403
+# E402: putting those import at the top of the file would also be difficult
+from .files import *  # noqa: F403 E402
+from .group import *  # noqa: F403 E402
+from .page import *  # noqa: F403 E402
+from .site import *  # noqa: F403 E402
+from .user import *  # noqa: F403 E402

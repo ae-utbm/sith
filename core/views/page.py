@@ -92,22 +92,16 @@ class PageRevView(CanViewMixin, DetailView):
             )
         return res
 
-    def get_object(self):
+    def get_object(self, *args, **kwargs):
         self.page = Page.get_page_by_full_name(self.kwargs["page_name"])
         return self.page
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.page is not None:
-            context["page"] = self.page
-            try:
-                rev = self.page.revisions.get(id=self.kwargs["rev"])
-                context["rev"] = rev
-            except:
-                # By passing, the template will just display the normal page without taking revision into account
-                pass
-        else:
-            context["new_page"] = self.kwargs["page_name"]
+        if not self.page:
+            return context | {"new_page": self.kwargs["page_name"]}
+        context["page"] = self.page
+        context["rev"] = self.page.revisions.filter(id=self.kwargs["rev"]).first()
         return context
 
 

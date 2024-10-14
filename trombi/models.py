@@ -55,9 +55,9 @@ class Trombi(models.Model):
         _("subscription deadline"),
         default=date.today,
         help_text=_(
-            "Before this date, users are "
-            "allowed to subscribe to this Trombi. "
-            "After this date, users subscribed will be allowed to comment on each other."
+            "Before this date, users are allowed to subscribe to this Trombi. "
+            "After this date, users subscribed will"
+            " be allowed to comment on each other."
         ),
     )
     comments_deadline = models.DateField(
@@ -131,7 +131,8 @@ class TrombiUser(models.Model):
         null=True,
         blank=True,
         help_text=_(
-            "The profile picture you want in the trombi (warning: this picture may be published)"
+            "The profile picture you want in the trombi "
+            "(warning: this picture may be published)"
         ),
     )
     scrub_pict = models.ImageField(
@@ -140,7 +141,8 @@ class TrombiUser(models.Model):
         null=True,
         blank=True,
         help_text=_(
-            "The scrub picture you want in the trombi (warning: this picture may be published)"
+            "The scrub picture you want in the trombi "
+            "(warning: this picture may be published)"
         ),
     )
 

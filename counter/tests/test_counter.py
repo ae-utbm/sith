@@ -503,7 +503,7 @@ class TestBarmanConnection(TestCase):
         )
         response = self.client.get(reverse("counter:activity", args=[self.counter.id]))
 
-        assert not '<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response.content)
+        assert '<li><a href="/user/1/">S&#39; Kia</a></li>' not in str(response.content)
 
 
 @pytest.mark.django_db

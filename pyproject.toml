@@ -102,6 +102,7 @@ select = [
 	"B",
 	"C4",  # use comprehensions when possible
 	"DJ",  # django-specific rules,
+	"E",  # pycodestyle (https://docs.astral.sh/ruff/rules/#pycodestyle-e-w)
 	"F",  # pyflakes (https://docs.astral.sh/ruff/rules/#pyflakes-f)
 	"FBT",  # boolean trap
 	"I",  # isort
@@ -113,6 +114,7 @@ select = [
 
 ignore = [
 	"DJ001",  # null=True in CharField/TextField. this one would require a migration
+	"E501",  # line too long. The rule is too harsh, and the formatter deals with it in most cases
 ]
 
 [tool.ruff.lint.pydocstyle]

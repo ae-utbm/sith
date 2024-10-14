@@ -168,12 +168,6 @@ class Token(models.Model):
             return True
         return False
 
-    def is_avaliable(self):
-        if not self.borrow_date and not self.user:
-            return True
-        else:
-            return False
-
 
 class Slot(models.Model):
     start_date = models.DateTimeField(_("start date"))

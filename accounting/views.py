@@ -668,15 +668,12 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
             self.statement(self.object.operations.filter(label=None).all(), "DEBIT")
         )
         statement[_("No label operations")] = no_label_statement
-        for l in labels:
+        for label in labels:
             l_stmt = collections.OrderedDict()
-            l_stmt.update(
-                self.statement(self.object.operations.filter(label=l).all(), "CREDIT")
-            )
-            l_stmt.update(
-                self.statement(self.object.operations.filter(label=l).all(), "DEBIT")
-            )
-            statement[l] = l_stmt
+            journals = self.object.operations.filter(label=label).all()
+            l_stmt.update(self.statement(journals, "CREDIT"))
+            l_stmt.update(self.statement(journals, "DEBIT"))
+            statement[label] = l_stmt
         return statement
 
     def get_context_data(self, **kwargs):

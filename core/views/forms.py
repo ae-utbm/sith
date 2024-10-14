@@ -157,7 +157,7 @@ class LoginForm(AuthenticationForm):
                 else:
                     user = User.objects.filter(username=data["username"]).first()
                 data["username"] = user.username
-            except:
+            except:  # noqa E722 I don't what error is supposed to be raised here
                 pass
             kwargs["data"] = data
         super().__init__(*arg, **kwargs)

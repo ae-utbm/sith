@@ -255,8 +255,10 @@ class UserTabsMixin(TabedViewMixin):
                     "name": _("Groups"),
                 }
             )
-        try:
-            if user.customer and (
+        if (
+            hasattr(user, "customer")
+            and user.customer
+            and (
                 user == self.request.user
                 or self.request.user.is_in_group(
                     pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
@@ -266,25 +268,22 @@ class UserTabsMixin(TabedViewMixin):
                     + settings.SITH_BOARD_SUFFIX
                 )
                 or self.request.user.is_root
-            ):
-                tab_list.append(
-                    {
-                        "url": reverse("core:user_stats", kwargs={"user_id": user.id}),
-                        "slug": "stats",
-                        "name": _("Stats"),
-                    }
-                )
-                tab_list.append(
-                    {
-                        "url": reverse(
-                            "core:user_account", kwargs={"user_id": user.id}
-                        ),
-                        "slug": "account",
-                        "name": _("Account") + " (%s €)" % user.customer.amount,
-                    }
-                )
-        except:
-            pass
+            )
+        ):
+            tab_list.append(
+                {
+                    "url": reverse("core:user_stats", kwargs={"user_id": user.id}),
+                    "slug": "stats",
+                    "name": _("Stats"),
+                }
+            )
+            tab_list.append(
+                {
+                    "url": reverse("core:user_account", kwargs={"user_id": user.id}),
+                    "slug": "account",
+                    "name": _("Account") + " (%s €)" % user.customer.amount,
+                }
+            )
         return tab_list
 
 

@@ -571,7 +571,7 @@ class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
                     )
                 ),
             )
-        if form.is_valid() and not "preview" in request.POST.keys():
+        if form.is_valid() and "preview" not in request.POST.keys():
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
