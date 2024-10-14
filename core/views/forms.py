@@ -29,6 +29,7 @@ from captcha.fields import CaptchaField
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import (
@@ -38,7 +39,6 @@ from django.forms import (
     Textarea,
     TextInput,
 )
-from django.templatetags.static import static
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
@@ -72,8 +72,8 @@ class MarkdownInput(Textarea):
         context = super().get_context(name, value, attrs)
 
         context["statics"] = {
-            "js": static("webpack/easymde-index.js"),
-            "css": static("webpack/easymde-index.css"),
+            "js": staticfiles_storage.url("webpack/easymde-index.ts"),
+            "css": staticfiles_storage.url("webpack/easymde-index.css"),
         }
         return context
 
