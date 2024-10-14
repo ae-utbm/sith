@@ -109,6 +109,7 @@ select = [
 	"SIM",  # simplify (https://docs.astral.sh/ruff/rules/#flake8-simplify-sim)
 	"T100", # breakpoint()
 	"T2",  # print statements
+	"TCH",  # type-checking block
     "UP008",  # Use super() instead of super(__class__, self)
     "UP009",  # utf-8 encoding declaration is unnecessary
 ]

@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectField
 from django import forms
@@ -10,10 +12,13 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from core.models import User
 from core.views import CanCreateMixin, CanEditMixin, CanViewMixin
 from core.views.forms import MarkdownInput, SelectDateTime
 from election.models import Candidature, Election, ElectionList, Role, Vote
+
+if TYPE_CHECKING:
+    from core.models import User
+
 
 # Custom form field
 

@@ -20,6 +20,7 @@ from sas.views import (
     AlbumUploadView,
     AlbumView,
     ModerationView,
+    PictureAskRemovalView,
     PictureEditView,
     PictureView,
     SASMainView,
