@@ -107,7 +107,9 @@ class Subscription(models.Model):
                 )
 
     @staticmethod
-    def compute_start(d: date = None, duration: int = 1, user: User = None) -> date:
+    def compute_start(
+        d: date | None = None, duration: int = 1, user: User | None = None
+    ) -> date:
         """Computes the start date of the subscription.
 
         The computation is done with respect to the given date (default is today)
@@ -129,7 +131,9 @@ class Subscription(models.Model):
         return get_start_of_semester(d)
 
     @staticmethod
-    def compute_end(duration: int, start: date = None, user: User = None) -> date:
+    def compute_end(
+        duration: int, start: date | None = None, user: User | None = None
+    ) -> date:
         """Compute the end date of the subscription.
 
         Args:

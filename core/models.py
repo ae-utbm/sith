@@ -174,7 +174,7 @@ def validate_promo(value: int) -> None:
         )
 
 
-def get_group(*, pk: int = None, name: str = None) -> Group | None:
+def get_group(*, pk: int | None = None, name: str | None = None) -> Group | None:
     """Search for a group by its primary key or its name.
     Either one of the two must be set.
 
@@ -445,7 +445,7 @@ class User(AbstractBaseUser):
         else:
             return 0
 
-    def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
+    def is_in_group(self, *, pk: int | None = None, name: str | None = None) -> bool:
         """Check if this user is in the given group.
         Either a group id or a group name must be provided.
         If both are passed, only the id will be considered.
@@ -828,7 +828,7 @@ class AnonymousUser(AuthAnonymousUser):
     def favorite_topics(self):
         raise PermissionDenied
 
-    def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
+    def is_in_group(self, *, pk: int | None = None, name: str | None = None) -> bool:
         """The anonymous user is only in the public group."""
         allowed_id = settings.SITH_GROUP_PUBLIC_ID
         if pk is not None:

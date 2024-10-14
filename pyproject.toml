@@ -107,10 +107,12 @@ select = [
 	"F",  # pyflakes (https://docs.astral.sh/ruff/rules/#pyflakes-f)
 	"FBT",  # boolean trap
 	"FLY",  # f-string instead of str.join
+	"FURB",  # https://docs.astral.sh/ruff/rules/#refurb-furb
 	"I",  # isort
 	"INT",  # gettext
 	"PERF",  # performance
 	"PLW",  # pylint warnings (https://docs.astral.sh/ruff/rules/#pylint-pl)
+	"RUF",  # Ruff specific rules
 	"SIM",  # simplify (https://docs.astral.sh/ruff/rules/#flake8-simplify-sim)
 	"T100", # breakpoint()
 	"T2",  # print statements
@@ -122,6 +124,7 @@ select = [
 ignore = [
 	"DJ001",  # null=True in CharField/TextField. this one would require a migration
 	"E501",  # line too long. The rule is too harsh, and the formatter deals with it in most cases
+	"RUF012"  # mutable class attributes. This rule doesn't integrate well with django
 ]
 
 [tool.ruff.lint.pydocstyle]

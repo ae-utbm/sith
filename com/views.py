@@ -694,7 +694,7 @@ class PosterEditBaseView(UpdateView):
         }
 
     def dispatch(self, request, *args, **kwargs):
-        if "club_id" in kwargs and kwargs["club_id"]:
+        if kwargs.get("club_id"):
             try:
                 self.club = Club.objects.get(pk=kwargs["club_id"])
             except Club.DoesNotExist as e:
@@ -730,7 +730,7 @@ class PosterDeleteBaseView(DeleteView):
     template_name = "core/delete_confirm.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        if "club_id" in kwargs and kwargs["club_id"]:
+        if kwargs.get("club_id"):
             try:
                 self.club = Club.objects.get(pk=kwargs["club_id"])
             except Club.DoesNotExist as e:

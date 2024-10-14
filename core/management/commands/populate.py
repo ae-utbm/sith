@@ -934,7 +934,7 @@ Welcome to the wiki page!
             # Adding subscription for sli
             s = Subscription(
                 member=User.objects.filter(pk=sli.pk).first(),
-                subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                subscription_type=next(iter(settings.SITH_SUBSCRIPTIONS.keys())),
                 payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()
@@ -947,7 +947,7 @@ Welcome to the wiki page!
             # Adding subscription for Krophil
             s = Subscription(
                 member=User.objects.filter(pk=krophil.pk).first(),
-                subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[0],
+                subscription_type=next(iter(settings.SITH_SUBSCRIPTIONS.keys())),
                 payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
             )
             s.subscription_start = s.compute_start()

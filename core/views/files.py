@@ -193,7 +193,7 @@ class FileEditView(CanEditMixin, UpdateView):
     def get_form_class(self):
         fields = ["name", "is_moderated"]
         if self.object.is_file:
-            fields = ["file"] + fields
+            fields = ["file", *fields]
         return modelform_factory(SithFile, fields=fields)
 
     def get_success_url(self):

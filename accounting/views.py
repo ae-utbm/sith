@@ -633,9 +633,10 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         ret = collections.OrderedDict()
         statement = collections.OrderedDict()
         total_sum = 0
-        for sat in [None] + list(
-            SimplifiedAccountingType.objects.order_by("label").all()
-        ):
+        for sat in [
+            None,
+            *list(SimplifiedAccountingType.objects.order_by("label")),
+        ]:
             amount = queryset.filter(
                 accounting_type__movement_type=movement_type, simpleaccounting_type=sat
             ).aggregate(amount_sum=Sum("amount"))["amount_sum"]
