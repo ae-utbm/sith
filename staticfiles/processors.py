@@ -110,4 +110,4 @@ class OpenApi:
         with open(out, "w") as f:
             _ = f.write(schema)
 
-        subprocess.run(["npx", "openapi-ts"]).check_returncode()
+        subprocess.run(["npx", "openapi-ts"], check=True)

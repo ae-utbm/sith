@@ -89,22 +89,21 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                                 machine=self.machines[self.slot_type],
                                 type=self.slot_type,
                             ).save()
-                    else:
-                        if self.check_slot("WASHING") and self.check_slot(
-                            "DRYING", self.date + timedelta(hours=1)
-                        ):
-                            Slot(
-                                user=self.subscriber,
-                                start_date=self.date,
-                                machine=self.machines["WASHING"],
-                                type="WASHING",
-                            ).save()
-                            Slot(
-                                user=self.subscriber,
-                                start_date=self.date + timedelta(hours=1),
-                                machine=self.machines["DRYING"],
-                                type="DRYING",
-                            ).save()
+                    elif self.check_slot("WASHING") and self.check_slot(
+                        "DRYING", self.date + timedelta(hours=1)
+                    ):
+                        Slot(
+                            user=self.subscriber,
+                            start_date=self.date,
+                            machine=self.machines["WASHING"],
+                            type="WASHING",
+                        ).save()
+                        Slot(
+                            user=self.subscriber,
+                            start_date=self.date + timedelta(hours=1),
+                            machine=self.machines["DRYING"],
+                            type="DRYING",
+                        ).save()
         return super().get(request, *args, **kwargs)
 
     def check_slot(self, machine_type, date=None):

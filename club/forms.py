@@ -111,8 +111,8 @@ class MailingForm(forms.Form):
         """Convert given users into real users and check their validity."""
         cleaned_data = super().clean()
         users = []
-        for user in cleaned_data["subscription_users"]:
-            user = User.objects.filter(id=user).first()
+        for user_id in cleaned_data["subscription_users"]:
+            user = User.objects.filter(id=user_id).first()
             if not user:
                 raise forms.ValidationError(
                     _("One of the selected users doesn't exist"), code="invalid"

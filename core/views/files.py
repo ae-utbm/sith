@@ -291,8 +291,8 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         if "clear" in request.POST:
             request.session["clipboard"] = []
         if "cut" in request.POST:
-            for f_id in request.POST.getlist("file_list"):
-                f_id = int(f_id)
+            for f_id_str in request.POST.getlist("file_list"):
+                f_id = int(f_id_str)
                 if (
                     f_id in [c.id for c in obj.children.all()]
                     and f_id not in request.session["clipboard"]
