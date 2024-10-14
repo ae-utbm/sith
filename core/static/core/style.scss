@@ -333,8 +333,17 @@ a:not(.button) {
       border: #fc8181 1px solid;
     }
 
+    .alert-title {
+      margin-top: 0;
+    }
+
     .alert-main {
       flex: 2;
+    }
+
+    .alert-aside {
+      display: flex;
+      flex-direction: column;
     }
   }
 

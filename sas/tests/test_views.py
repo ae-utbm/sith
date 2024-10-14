@@ -20,7 +20,7 @@ from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
 from model_bakery import baker
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertInHTML, assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import RealGroup, User
@@ -70,7 +70,9 @@ def test_album_access_non_subscriber(client: Client):
 class TestSasModeration(TestCase):
     @classmethod
     def setUpTestData(cls):
-        album = baker.make(Album, parent_id=settings.SITH_SAS_ROOT_DIR_ID)
+        album = baker.make(
+            Album, parent_id=settings.SITH_SAS_ROOT_DIR_ID, is_moderated=True
+        )
         cls.pictures = picture_recipe.make(
             parent=album, _quantity=10, _bulk_create=True
         )
@@ -81,6 +83,9 @@ class TestSasModeration(TestCase):
             User, groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
         )
         cls.simple_user = subscriber_user.make()
+
+    def setUp(self):
+        cache.clear()
 
     def test_moderation_page_sas_admin(self):
         """Test that a moderator can see the pictures needing moderation."""
@@ -132,3 +137,37 @@ class TestSasModeration(TestCase):
         )
         assert res.status_code == 403
         assert Picture.objects.filter(pk=self.to_moderate.id).exists()
+
+    def test_request_moderation_form_access(self):
+        """Test that regular can access the form to ask for moderation."""
+        self.client.force_login(self.simple_user)
+        res = self.client.get(
+            reverse(
+                "sas:picture_ask_removal", kwargs={"picture_id": self.pictures[1].id}
+            ),
+        )
+        assert res.status_code == 200
+
+    def test_request_moderation_form_submit(self):
+        """Test that moderation requests are created."""
+        self.client.force_login(self.simple_user)
+        message = "J'aime pas cette photo (ni la Cocarde)."
+        url = reverse(
+            "sas:picture_ask_removal", kwargs={"picture_id": self.pictures[1].id}
+        )
+        res = self.client.post(url, data={"reason": message})
+        assertRedirects(
+            res, reverse("sas:album", kwargs={"album_id": self.pictures[1].parent_id})
+        )
+        assert self.pictures[1].moderation_requests.count() == 1
+        assert self.pictures[1].moderation_requests.first().reason == message
+
+        # test that the user cannot ask for moderation twice
+        res = self.client.post(url, data={"reason": message})
+        assert res.status_code == 200
+        assert self.pictures[1].moderation_requests.count() == 1
+        assertInHTML(
+            '<ul class="errorlist nonfield"><li>'
+            "Vous avez déjà déposé une demande de retrait pour cette photo.</li></ul>",
+            res.content.decode(),
+        )

@@ -12,14 +12,12 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from typing import Any
 
-from ajax_select import make_ajax_field
-from ajax_select.fields import AutoCompleteSelectMultipleField
-from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, TemplateView
@@ -27,71 +25,14 @@ from django.views.generic.edit import FormMixin, FormView, UpdateView
 
 from core.models import SithFile, User
 from core.views import CanEditMixin, CanViewMixin
-from core.views.files import FileView, MultipleImageField, send_file
-from core.views.forms import SelectDate
-from sas.models import Album, PeoplePictureRelation, Picture
-
-
-class SASForm(forms.Form):
-    album_name = forms.CharField(
-        label=_("Add a new album"), max_length=Album.NAME_MAX_LENGTH, required=False
-    )
-    images = MultipleImageField(
-        label=_("Upload images"),
-        required=False,
-    )
-
-    def process(self, parent, owner, files, *, automodere=False):
-        try:
-            if self.cleaned_data["album_name"] != "":
-                album = Album(
-                    parent=parent,
-                    name=self.cleaned_data["album_name"],
-                    owner=owner,
-                    is_moderated=automodere,
-                )
-                album.clean()
-                album.save()
-        except Exception as e:
-            self.add_error(
-                None,
-                _("Error creating album %(album)s: %(msg)s")
-                % {"album": self.cleaned_data["album_name"], "msg": repr(e)},
-            )
-        for f in files:
-            new_file = Picture(
-                parent=parent,
-                name=f.name,
-                file=f,
-                owner=owner,
-                mime_type=f.content_type,
-                size=f.size,
-                is_folder=False,
-                is_moderated=automodere,
-            )
-            if automodere:
-                new_file.moderator = owner
-            try:
-                new_file.clean()
-                new_file.generate_thumbnails()
-                new_file.save()
-            except Exception as e:
-                self.add_error(
-                    None,
-                    _("Error uploading file %(file_name)s: %(msg)s")
-                    % {"file_name": f, "msg": repr(e)},
-                )
-
-
-class RelationForm(forms.ModelForm):
-    class Meta:
-        model = PeoplePictureRelation
-        fields = ["picture"]
-        widgets = {"picture": forms.HiddenInput}
-
-    users = AutoCompleteSelectMultipleField(
-        "users", show_help_text=False, help_text="", label=_("Add user"), required=False
-    )
+from core.views.files import FileView, send_file
+from sas.forms import (
+    AlbumEditForm,
+    PictureEditForm,
+    PictureModerationRequestForm,
+    SASForm,
+)
+from sas.models import Album, Picture
 
 
 class SASMainView(FormView):
@@ -138,11 +79,6 @@ class PictureView(CanViewMixin, DetailView):
             self.object.rotate(270)
         if "rotate_left" in request.GET:
             self.object.rotate(90)
-        if "ask_removal" in request.GET.keys():
-            self.object.is_moderated = False
-            self.object.asked_for_removal = True
-            self.object.save()
-            return redirect("sas:album", album_id=self.object.parent.id)
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -293,31 +229,46 @@ class ModerationView(TemplateView):
         return kwargs
 
 
-class PictureEditForm(forms.ModelForm):
-    class Meta:
-        model = Picture
-        fields = ["name", "parent"]
-
-    parent = make_ajax_field(Picture, "parent", "files", help_text="")
-
-
-class AlbumEditForm(forms.ModelForm):
-    class Meta:
-        model = Album
-        fields = ["name", "date", "file", "parent", "edit_groups"]
-
-    name = forms.CharField(max_length=Album.NAME_MAX_LENGTH, label=_("file name"))
-    date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
-    parent = make_ajax_field(Album, "parent", "files", help_text="")
-    edit_groups = make_ajax_field(Album, "edit_groups", "groups", help_text="")
-    recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
-
-
 class PictureEditView(CanEditMixin, UpdateView):
     model = Picture
     form_class = PictureEditForm
     template_name = "core/edit.jinja"
     pk_url_kwarg = "picture_id"
+
+
+class PictureAskRemovalView(CanViewMixin, DetailView, FormView):
+    """View to allow users to ask pictures to be removed."""
+
+    model = Picture
+    template_name = "sas/ask_picture_removal.jinja"
+    pk_url_kwarg = "picture_id"
+    form_class = PictureModerationRequestForm
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        """Add the user and picture to the form kwargs.
+
+        Those are required to create the PictureModerationRequest,
+        and aren't part of the form itself
+        (picture is a path parameter, and user is the request user).
+        """
+        return super().get_form_kwargs() | {
+            "user": self.request.user,
+            "picture": self.object,
+        }
+
+    def get_success_url(self) -> str:
+        """Return the URL to the album containing the picture."""
+        album = Album.objects.filter(pk=self.object.parent_id).first()
+        if not album:
+            return reverse("sas:main")
+        return album.get_absolute_url()
+
+    def form_valid(self, form: PictureModerationRequestForm) -> HttpResponseRedirect:
+        form.save()
+        self.object.is_moderated = False
+        self.object.asked_for_removal = True
+        self.object.save()
+        return super().form_valid(form)
 
 
 class AlbumEditView(CanEditMixin, UpdateView):

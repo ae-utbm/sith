@@ -34,6 +34,11 @@ urlpatterns = [
         PictureEditView.as_view(),
         name="picture_edit",
     ),
+    path(
+        "picture/<int:picture_id>/report",
+        PictureAskRemovalView.as_view(),
+        name="picture_ask_removal",
+    ),
     path("picture/<int:picture_id>/download/", send_pict, name="download"),
     path(
         "picture/<int:picture_id>/download/compressed/",
