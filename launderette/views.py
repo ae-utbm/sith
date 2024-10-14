@@ -19,7 +19,7 @@ from datetime import timezone as tz
 
 from django import forms
 from django.conf import settings
-from django.db import DataError, transaction
+from django.db import transaction
 from django.template import defaultfilters
 from django.urls import reverse_lazy
 from django.utils import dateparse, timezone
@@ -258,10 +258,10 @@ class ManageTokenForm(forms.Form):
                     _("Token %(token_name)s already exists") % {"token_name": name},
                 )
             for t in token_list:
-                try:
+                if t == "":
+                    self.add_error(None, _("Token name can not be blank"))
+                else:
                     Token(launderette=launderette, type=token_type, name=t).save()
-                except DataError as e:
-                    self.add_error(None, e)
 
 
 class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
