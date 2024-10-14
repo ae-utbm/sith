@@ -23,7 +23,6 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
 
     def __init__(self, queryset, max_choice, **kwargs):
         self.max_choice = max_choice
-        widget = forms.CheckboxSelectMultiple()
         super().__init__(queryset, **kwargs)
 
     def clean(self, value):

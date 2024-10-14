@@ -24,7 +24,25 @@
 
 from django.urls import path
 
-from trombi.views import *
+from trombi.views import (
+    TrombiCommentCreateView,
+    TrombiCommentEditView,
+    TrombiCreateView,
+    TrombiDeleteUserView,
+    TrombiDetailView,
+    TrombiEditView,
+    TrombiExportView,
+    TrombiModerateCommentsView,
+    TrombiModerateCommentView,
+    UserTrombiAddMembershipView,
+    UserTrombiDeleteMembershipView,
+    UserTrombiEditMembershipView,
+    UserTrombiEditPicturesView,
+    UserTrombiEditProfileView,
+    UserTrombiProfileView,
+    UserTrombiResetClubMembershipsView,
+    UserTrombiToolsView,
+)
 
 urlpatterns = [
     path("<int:club_id>/new/", TrombiCreateView.as_view(), name="create"),
@@ -41,9 +59,7 @@ urlpatterns = [
         name="moderate_comment",
     ),
     path(
-        "user/<int:user_id>/delete/",
-        TrombiDeleteUserView.as_view(),
-        name="delete_user",
+        "user/<int:user_id>/delete/", TrombiDeleteUserView.as_view(), name="delete_user"
     ),
     path("<int:trombi_id>/", TrombiDetailView.as_view(), name="detail"),
     path(
@@ -52,9 +68,7 @@ urlpatterns = [
         name="new_comment",
     ),
     path(
-        "<int:user_id>/profile/",
-        UserTrombiProfileView.as_view(),
-        name="user_profile",
+        "<int:user_id>/profile/", UserTrombiProfileView.as_view(), name="user_profile"
     ),
     path(
         "comment/<int:comment_id>/edit/",

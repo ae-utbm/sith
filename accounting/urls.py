@@ -15,7 +15,41 @@
 
 from django.urls import path
 
-from accounting.views import *
+from accounting.views import (
+    AccountingTypeCreateView,
+    AccountingTypeEditView,
+    AccountingTypeListView,
+    BankAccountCreateView,
+    BankAccountDeleteView,
+    BankAccountDetailView,
+    BankAccountEditView,
+    BankAccountListView,
+    ClubAccountCreateView,
+    ClubAccountDeleteView,
+    ClubAccountDetailView,
+    ClubAccountEditView,
+    CompanyCreateView,
+    CompanyEditView,
+    CompanyListView,
+    JournalAccountingStatementView,
+    JournalCreateView,
+    JournalDeleteView,
+    JournalDetailView,
+    JournalEditView,
+    JournalNatureStatementView,
+    JournalPersonStatementView,
+    LabelCreateView,
+    LabelDeleteView,
+    LabelEditView,
+    LabelListView,
+    OperationCreateView,
+    OperationEditView,
+    OperationPDFView,
+    RefoundAccountView,
+    SimplifiedAccountingTypeCreateView,
+    SimplifiedAccountingTypeEditView,
+    SimplifiedAccountingTypeListView,
+)
 
 urlpatterns = [
     # Accounting types

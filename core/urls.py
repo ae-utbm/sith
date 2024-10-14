@@ -29,12 +29,66 @@ from core.converters import (
     FourDigitYearConverter,
     TwoDigitMonthConverter,
 )
-from core.views import *
+from core.views import (
+    FileDeleteView,
+    FileEditPropView,
+    FileEditView,
+    FileListView,
+    FileModerateView,
+    FileModerationView,
+    FileView,
+    GiftCreateView,
+    GiftDeleteView,
+    GroupCreateView,
+    GroupDeleteView,
+    GroupEditView,
+    GroupListView,
+    GroupTemplateView,
+    NotificationList,
+    PageCreateView,
+    PageDeleteView,
+    PageEditView,
+    PageHistView,
+    PageListView,
+    PagePropView,
+    PageRevView,
+    PageView,
+    SithLoginView,
+    SithPasswordChangeDoneView,
+    SithPasswordChangeView,
+    SithPasswordResetCompleteView,
+    SithPasswordResetConfirmView,
+    SithPasswordResetDoneView,
+    SithPasswordResetView,
+    UserAccountDetailView,
+    UserAccountView,
+    UserClubView,
+    UserCreationView,
+    UserGodfathersTreeView,
+    UserGodfathersView,
+    UserListView,
+    UserMiniView,
+    UserPicturesView,
+    UserPreferencesView,
+    UserStatsView,
+    UserToolsView,
+    UserUpdateGroupView,
+    UserUpdateProfileView,
+    UserView,
+    delete_user_godfather,
+    index,
+    logout,
+    notification,
+    password_root_change,
+    search_json,
+    search_user_json,
+    search_view,
+    send_file,
+)
 
 register_converter(FourDigitYearConverter, "yyyy")
 register_converter(TwoDigitMonthConverter, "mm")
 register_converter(BooleanStringConverter, "bool")
-
 
 urlpatterns = [
     path("", index, name="index"),
@@ -80,27 +134,17 @@ urlpatterns = [
     path("group/new/", GroupCreateView.as_view(), name="group_new"),
     path("group/<int:group_id>/", GroupEditView.as_view(), name="group_edit"),
     path(
-        "group/<int:group_id>/delete/",
-        GroupDeleteView.as_view(),
-        name="group_delete",
+        "group/<int:group_id>/delete/", GroupDeleteView.as_view(), name="group_delete"
     ),
     path(
-        "group/<int:group_id>/detail/",
-        GroupTemplateView.as_view(),
-        name="group_detail",
+        "group/<int:group_id>/detail/", GroupTemplateView.as_view(), name="group_detail"
     ),
     # User views
     path("user/", UserListView.as_view(), name="user_list"),
-    path(
-        "user/<int:user_id>/mini/",
-        UserMiniView.as_view(),
-        name="user_profile_mini",
-    ),
+    path("user/<int:user_id>/mini/", UserMiniView.as_view(), name="user_profile_mini"),
     path("user/<int:user_id>/", UserView.as_view(), name="user_profile"),
     path(
-        "user/<int:user_id>/pictures/",
-        UserPicturesView.as_view(),
-        name="user_pictures",
+        "user/<int:user_id>/pictures/", UserPicturesView.as_view(), name="user_pictures"
     ),
     path(
         "user/<int:user_id>/godfathers/",
@@ -117,28 +161,14 @@ urlpatterns = [
         delete_user_godfather,
         name="user_godfathers_delete",
     ),
-    path(
-        "user/<int:user_id>/edit/",
-        UserUpdateProfileView.as_view(),
-        name="user_edit",
-    ),
+    path("user/<int:user_id>/edit/", UserUpdateProfileView.as_view(), name="user_edit"),
     path("user/<int:user_id>/clubs/", UserClubView.as_view(), name="user_clubs"),
+    path("user/<int:user_id>/prefs/", UserPreferencesView.as_view(), name="user_prefs"),
     path(
-        "user/<int:user_id>/prefs/",
-        UserPreferencesView.as_view(),
-        name="user_prefs",
-    ),
-    path(
-        "user/<int:user_id>/groups/",
-        UserUpdateGroupView.as_view(),
-        name="user_groups",
+        "user/<int:user_id>/groups/", UserUpdateGroupView.as_view(), name="user_groups"
     ),
     path("user/tools/", UserToolsView.as_view(), name="user_tools"),
-    path(
-        "user/<int:user_id>/account/",
-        UserAccountView.as_view(),
-        name="user_account",
-    ),
+    path("user/<int:user_id>/account/", UserAccountView.as_view(), name="user_account"),
     path(
         "user/<int:user_id>/account/<yyyy:year>/<mm:month>/",
         UserAccountDetailView.as_view(),
@@ -179,42 +209,18 @@ urlpatterns = [
     ),
     path("file/moderation/", FileModerationView.as_view(), name="file_moderation"),
     path(
-        "file/<int:file_id>/moderate/",
-        FileModerateView.as_view(),
-        name="file_moderate",
+        "file/<int:file_id>/moderate/", FileModerateView.as_view(), name="file_moderate"
     ),
     path("file/<int:file_id>/download/", send_file, name="download"),
     # Page views
     path("page/", PageListView.as_view(), name="page_list"),
     path("page/create/", PageCreateView.as_view(), name="page_new"),
+    path("page/<int:page_id>/delete/", PageDeleteView.as_view(), name="page_delete"),
+    path("page/<path:page_name>/edit/", PageEditView.as_view(), name="page_edit"),
+    path("page/<path:page_name>/prop/", PagePropView.as_view(), name="page_prop"),
+    path("page/<path:page_name>/hist/", PageHistView.as_view(), name="page_hist"),
     path(
-        "page/<int:page_id>/delete/",
-        PageDeleteView.as_view(),
-        name="page_delete",
+        "page/<path:page_name>/rev/<int:rev>/", PageRevView.as_view(), name="page_rev"
     ),
-    path(
-        "page/<path:page_name>/edit/",
-        PageEditView.as_view(),
-        name="page_edit",
-    ),
-    path(
-        "page/<path:page_name>/prop/",
-        PagePropView.as_view(),
-        name="page_prop",
-    ),
-    path(
-        "page/<path:page_name>/hist/",
-        PageHistView.as_view(),
-        name="page_hist",
-    ),
-    path(
-        "page/<path:page_name>/rev/<int:rev>/",
-        PageRevView.as_view(),
-        name="page_rev",
-    ),
-    path(
-        "page/<path:page_name>/",
-        PageView.as_view(),
-        name="page",
-    ),
+    path("page/<path:page_name>/", PageView.as_view(), name="page"),
 ]

@@ -649,7 +649,7 @@ class User(AbstractBaseUser):
                 continue
             links = list(User.godfathers.through.objects.filter(**{key: self.id}))
             res.extend(links)
-            for _ in range(1, depth):
+            for _ in range(1, depth):  # noqa: F402 we don't care about gettext here
                 ids = [getattr(c, reverse_key) for c in links]
                 links = list(
                     User.godfathers.through.objects.filter(

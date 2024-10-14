@@ -25,6 +25,7 @@
 import types
 from typing import Any
 
+from django.conf import settings
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import (
     ImproperlyConfigured,
@@ -35,6 +36,7 @@ from django.http import (
     HttpResponseNotFound,
     HttpResponseServerError,
 )
+from django.shortcuts import render
 from django.utils.functional import cached_property
 from django.views.generic.base import View
 from django.views.generic.detail import SingleObjectMixin
@@ -324,8 +326,9 @@ class DetailFormView(SingleObjectMixin, FormView):
         return super().get_object()
 
 
-from .files import *
-from .group import *
-from .page import *
-from .site import *
-from .user import *
+# F403: those star-imports would be hellish to refactor
+from .files import *  # noqa: F403
+from .group import *  # noqa: F403
+from .page import *  # noqa: F403
+from .site import *  # noqa: F403
+from .user import *  # noqa: F403

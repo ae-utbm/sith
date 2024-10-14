@@ -700,7 +700,7 @@ TOXIC_DOMAINS_PROVIDERS = [
 ]
 
 try:
-    from .settings_custom import *
+    from .settings_custom import *  # noqa F403 (this star-import is actually useful)
 
     logging.getLogger("django").info("Custom settings imported")
 except:

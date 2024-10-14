@@ -101,14 +101,14 @@ select = [
 	"A",  # shadowing of Python builtins
 	"B",
 	"C4",  # use comprehensions when possible
-	"I",  # isort
 	"DJ",  # django-specific rules,
-	"F401",  # unused import
+	"F",  # pyflakes (https://docs.astral.sh/ruff/rules/#pyflakes-f)
 	"FBT",  # boolean trap
+	"I",  # isort
     "UP008",  # Use super() instead of super(__class__, self)
     "UP009",  # utf-8 encoding declaration is unnecessary
-	"T2",  # print statements
 	"T100", # breakpoint()
+	"T2",  # print statements
 ]
 
 ignore = [
