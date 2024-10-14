@@ -1414,7 +1414,7 @@ class Page(models.Model):
         """
         if self.parent is None:
             return self.name
-        return "/".join([self.parent.get_full_name(), self.name])
+        return f"{self.parent.get_full_name()}/{self.name}"
 
     def get_display_name(self):
         rev = self.revisions.last()

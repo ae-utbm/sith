@@ -106,6 +106,7 @@ select = [
 	"ERA",  # commented code
 	"F",  # pyflakes (https://docs.astral.sh/ruff/rules/#pyflakes-f)
 	"FBT",  # boolean trap
+	"FLY",  # f-string instead of str.join
 	"I",  # isort
 	"INT",  # gettext
 	"PLW",  # pylint warnings (https://docs.astral.sh/ruff/rules/#pylint-pl)

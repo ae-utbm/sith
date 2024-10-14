@@ -154,7 +154,7 @@ class Customer(models.Model):
         self.save()
 
     def get_full_url(self):
-        return "".join(["https://", settings.SITH_URL, self.get_absolute_url()])
+        return f"https://{settings.SITH_URL}{self.get_absolute_url()}"
 
 
 class BillingInfo(models.Model):
@@ -880,27 +880,19 @@ class Selling(models.Model):
             "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
         ) % {
             "event": event,
-            "url": "".join(
-                (
-                    '<a href="',
-                    self.customer.get_full_url(),
-                    '">',
-                    self.customer.get_full_url(),
-                    "</a>",
-                )
+            "url": (
+                f'<a href="{self.customer.get_full_url()}">'
+                f"{self.customer.get_full_url()}</a>"
             ),
-            "eticket": "".join(
-                (
-                    '<a href="',
-                    self.get_eticket_full_url(),
-                    '">',
-                    self.get_eticket_full_url(),
-                    "</a>",
-                )
+            "eticket": (
+                f'<a href="{self.get_eticket_full_url()}">'
+                f"{self.get_eticket_full_url()}</a>"
             ),
         }
         message_txt = _(
-            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
+            "You bought an eticket for the event %(event)s.\n"
+            "You can download it directly from this link %(eticket)s.\n"
+            "You can also retrieve all your e-tickets on your account page %(url)s."
         ) % {
             "event": event,
             "url": self.customer.get_full_url(),
@@ -912,7 +904,7 @@ class Selling(models.Model):
 
     def get_eticket_full_url(self):
         eticket_url = reverse("counter:eticket_pdf", kwargs={"selling_id": self.id})
-        return "".join(["https://", settings.SITH_URL, eticket_url])
+        return f"https://{settings.SITH_URL}{eticket_url}"
 
 
 class Permanency(models.Model):
