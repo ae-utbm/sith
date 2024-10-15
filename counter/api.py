@@ -19,9 +19,10 @@ from django.db.models import Q
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
+from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from core.api_permissions import CanAccessLookup, CanView, IsOldSubscriber, IsRoot
+from core.api_permissions import CanAccessLookup, CanView, IsRoot
 from counter.models import Counter, Permanency, Product
 from counter.schemas import (
     CounterFilterSchema,
@@ -50,7 +51,7 @@ class CounterController(ControllerBase):
             self.check_object_permissions(c)
         return counters
 
-@route.get(
+    @route.get(
         "/search",
         response=PaginatedResponseSchema[SimplifiedCounterSchema],
         permissions=[CanAccessLookup],
@@ -77,12 +78,13 @@ class ProductController(ControllerBase):
             .values()
         )
 
+
 @api_controller("/permanency")
 class PermanencyController(ControllerBase):
     @route.get(
         "",
         response=PaginatedResponseSchema[PermanencySchema],
-        permissions=[IsOldSubscriber],
+        permissions=[IsAuthenticated],
         exclude_none=True,
     )
     @paginate(PageNumberPaginationExtra, page_size=100)
