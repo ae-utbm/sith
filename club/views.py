@@ -397,7 +397,8 @@ class ClubSellingCSVView(ClubSellingView):
             row.append(selling.customer.user.get_display_name())
         else:
             row.append("")
-        row = row + [
+        row = [
+            *row,
             selling.label,
             selling.quantity,
             selling.quantity * selling.unit_price,
@@ -408,7 +409,7 @@ class ClubSellingCSVView(ClubSellingView):
             row.append(selling.product.purchase_price)
             row.append(selling.product.selling_price - selling.product.purchase_price)
         else:
-            row = row + ["", "", ""]
+            row = [*row, "", "", ""]
         return row
 
     def get(self, request, *args, **kwargs):
@@ -622,9 +623,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     def remove_subscription(self, cleaned_data):
         """Remove specified users from a mailing list."""
         fields = [
-            cleaned_data[key]
-            for key in cleaned_data.keys()
-            if key.startswith("removal_")
+            val for key, val in cleaned_data.items() if key.startswith("removal_")
         ]
         for field in fields:
             for sub in field:

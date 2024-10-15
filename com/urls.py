@@ -16,7 +16,36 @@
 from django.urls import path
 
 from club.views import MailingDeleteView
-from com.views import *
+from com.views import (
+    AlertMsgEditView,
+    InfoMsgEditView,
+    MailingListAdminView,
+    MailingModerateView,
+    NewsAdminListView,
+    NewsCreateView,
+    NewsDeleteView,
+    NewsDetailView,
+    NewsEditView,
+    NewsListView,
+    NewsModerateView,
+    PosterCreateView,
+    PosterDeleteView,
+    PosterEditView,
+    PosterListView,
+    PosterModerateListView,
+    PosterModerateView,
+    ScreenCreateView,
+    ScreenDeleteView,
+    ScreenEditView,
+    ScreenListView,
+    ScreenSlideshowView,
+    WeekmailArticleCreateView,
+    WeekmailArticleDeleteView,
+    WeekmailArticleEditView,
+    WeekmailDestinationEditView,
+    WeekmailEditView,
+    WeekmailPreviewView,
+)
 
 urlpatterns = [
     path("sith/edit/alert/", AlertMsgEditView.as_view(), name="alert_edit"),
@@ -46,15 +75,9 @@ urlpatterns = [
     path("news/", NewsListView.as_view(), name="news_list"),
     path("news/admin/", NewsAdminListView.as_view(), name="news_admin_list"),
     path("news/create/", NewsCreateView.as_view(), name="news_new"),
+    path("news/<int:news_id>/delete/", NewsDeleteView.as_view(), name="news_delete"),
     path(
-        "news/<int:news_id>/delete/",
-        NewsDeleteView.as_view(),
-        name="news_delete",
-    ),
-    path(
-        "news/<int:news_id>/moderate/",
-        NewsModerateView.as_view(),
-        name="news_moderate",
+        "news/<int:news_id>/moderate/", NewsModerateView.as_view(), name="news_moderate"
     ),
     path("news/<int:news_id>/edit/", NewsEditView.as_view(), name="news_edit"),
     path("news/<int:news_id>/", NewsDetailView.as_view(), name="news_detail"),
@@ -71,11 +94,7 @@ urlpatterns = [
     ),
     path("poster/", PosterListView.as_view(), name="poster_list"),
     path("poster/create/", PosterCreateView.as_view(), name="poster_create"),
-    path(
-        "poster/<int:poster_id>/edit/",
-        PosterEditView.as_view(),
-        name="poster_edit",
-    ),
+    path("poster/<int:poster_id>/edit/", PosterEditView.as_view(), name="poster_edit"),
     path(
         "poster/<int:poster_id>/delete/",
         PosterDeleteView.as_view(),
@@ -98,11 +117,7 @@ urlpatterns = [
         ScreenSlideshowView.as_view(),
         name="screen_slideshow",
     ),
-    path(
-        "screen/<int:screen_id>/edit/",
-        ScreenEditView.as_view(),
-        name="screen_edit",
-    ),
+    path("screen/<int:screen_id>/edit/", ScreenEditView.as_view(), name="screen_edit"),
     path(
         "screen/<int:screen_id>/delete/",
         ScreenDeleteView.as_view(),

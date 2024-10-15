@@ -23,7 +23,7 @@
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -193,18 +193,12 @@ class UVModerationFormView(FormView):
 
     def form_valid(self, form):
         form_clean = form.clean()
-        for report in form_clean.get("accepted_reports", []):
-            try:
-                report.comment.delete()  # Delete the related comment
-            except ObjectDoesNotExist:
-                # To avoid errors when two reports points the same comment
-                pass
-        for report in form_clean.get("denied_reports", []):
-            try:
-                report.delete()  # Delete the report itself
-            except ObjectDoesNotExist:
-                # To avoid errors when two reports points the same comment
-                pass
+        accepted = form_clean.get("accepted_reports", [])
+        if len(accepted) > 0:  # delete the reported comments
+            UVComment.objects.filter(reports__in=accepted).delete()
+        denied = form_clean.get("denied_reports", [])
+        if len(denied) > 0:  # delete the comments themselves
+            UVCommentReport.objects.filter(id__in={d.id for d in denied}).delete()
         return super().form_valid(form)
 
     def get_success_url(self):

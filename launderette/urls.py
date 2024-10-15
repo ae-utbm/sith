@@ -15,22 +15,28 @@
 
 from django.urls import path
 
-from launderette.views import *
+from launderette.views import (
+    LaunderetteAdminView,
+    LaunderetteBookMainView,
+    LaunderetteBookView,
+    LaunderetteClickView,
+    LaunderetteCreateView,
+    LaunderetteEditView,
+    LaunderetteListView,
+    LaunderetteMainClickView,
+    LaunderetteMainView,
+    MachineCreateView,
+    MachineDeleteView,
+    MachineEditView,
+    SlotDeleteView,
+)
 
 urlpatterns = [
     # views
     path("", LaunderetteMainView.as_view(), name="launderette_main"),
-    path(
-        "slot/<int:slot_id>/delete/",
-        SlotDeleteView.as_view(),
-        name="delete_slot",
-    ),
+    path("slot/<int:slot_id>/delete/", SlotDeleteView.as_view(), name="delete_slot"),
     path("book/", LaunderetteBookMainView.as_view(), name="book_main"),
-    path(
-        "book/<int:launderette_id>/",
-        LaunderetteBookView.as_view(),
-        name="book_slot",
-    ),
+    path("book/<int:launderette_id>/", LaunderetteBookView.as_view(), name="book_slot"),
     path(
         "<int:launderette_id>/click/",
         LaunderetteMainClickView.as_view(),

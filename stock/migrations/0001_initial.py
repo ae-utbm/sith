@@ -125,7 +125,10 @@ class Migration(migrations.Migration):
                     "minimal_quantity",
                     models.IntegerField(
                         verbose_name="minimal quantity",
-                        help_text="if the effective quantity is less than the minimal, item is added to the shopping list",
+                        help_text=(
+                            "if the effective quantity is less than the minimal, "
+                            "item is added to the shopping list"
+                        ),
                         default=1,
                     ),
                 ),

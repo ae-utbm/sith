@@ -217,9 +217,9 @@ class Command(BaseCommand):
         UV.objects.bulk_create(uvs, ignore_conflicts=True)
 
     def create_products(self):
-        categories = []
-        for _ in range(10):
-            categories.append(ProductType(name=self.faker.text(max_nb_chars=30)))
+        categories = [
+            ProductType(name=self.faker.text(max_nb_chars=30)) for _ in range(10)
+        ]
         ProductType.objects.bulk_create(categories)
         categories = list(
             ProductType.objects.filter(name__in=[c.name for c in categories])
@@ -254,16 +254,16 @@ class Command(BaseCommand):
                 archived=bool(random.random() > 0.7),
             )
             products.append(product)
-            for group in random.sample(groups, k=random.randint(0, 3)):
-                # there will be products without buying groups
-                # but there are also such products in the real database
-                buying_groups.append(
-                    Product.buying_groups.through(product=product, group=group)
-                )
-            for counter in random.sample(counters, random.randint(0, 4)):
-                selling_places.append(
-                    Counter.products.through(counter=counter, product=product)
-                )
+            # there will be products without buying groups
+            # but there are also such products in the real database
+            buying_groups.extend(
+                Product.buying_groups.through(product=product, group=group)
+                for group in random.sample(groups, k=random.randint(0, 3))
+            )
+            selling_places.extend(
+                Counter.products.through(counter=counter, product=product)
+                for counter in random.sample(counters, random.randint(0, 4))
+            )
         Product.objects.bulk_create(products)
         Product.buying_groups.through.objects.bulk_create(buying_groups)
         Counter.products.through.objects.bulk_create(selling_places)

@@ -30,7 +30,12 @@ class Migration(migrations.Migration):
                     "subscription_deadline",
                     models.DateField(
                         default=datetime.date.today,
-                        help_text="Before this date, users are allowed to subscribe to this Trombi. After this date, users subscribed will be allowed to comment on each other.",
+                        help_text=(
+                            "Before this date, users are allowed "
+                            "to subscribe to this Trombi. "
+                            "After this date, users subscribed will "
+                            "be allowed to comment on each other."
+                        ),
                         verbose_name="subscription deadline",
                     ),
                 ),
@@ -38,7 +43,10 @@ class Migration(migrations.Migration):
                     "comments_deadline",
                     models.DateField(
                         default=datetime.date.today,
-                        help_text="After this date, users won't be able to make comments anymore.",
+                        help_text=(
+                            "After this date, users won't be able "
+                            "to make comments anymore."
+                        ),
                         verbose_name="comments deadline",
                     ),
                 ),
@@ -92,7 +100,10 @@ class Migration(migrations.Migration):
                     models.ImageField(
                         upload_to="trombi",
                         blank=True,
-                        help_text="The profile picture you want in the trombi (warning: this picture may be published)",
+                        help_text=(
+                            "The profile picture you want in the trombi "
+                            "(warning: this picture may be published)"
+                        ),
                         verbose_name="profile pict",
                         null=True,
                     ),
@@ -102,7 +113,10 @@ class Migration(migrations.Migration):
                     models.ImageField(
                         upload_to="trombi",
                         blank=True,
-                        help_text="The scrub picture you want in the trombi (warning: this picture may be published)",
+                        help_text=(
+                            "The scrub picture you want in the trombi "
+                            "(warning: this picture may be published)"
+                        ),
                         verbose_name="scrub pict",
                         null=True,
                     ),

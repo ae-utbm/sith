@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectField
 from django import forms
@@ -10,10 +12,13 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from core.models import User
 from core.views import CanCreateMixin, CanEditMixin, CanViewMixin
 from core.views.forms import MarkdownInput, SelectDateTime
 from election.models import Candidature, Election, ElectionList, Role, Vote
+
+if TYPE_CHECKING:
+    from core.models import User
+
 
 # Custom form field
 
@@ -23,7 +28,6 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
 
     def __init__(self, queryset, max_choice, **kwargs):
         self.max_choice = max_choice
-        widget = forms.CheckboxSelectMultiple()
         super().__init__(queryset, **kwargs)
 
     def clean(self, value):
@@ -251,7 +255,7 @@ class VoteFormView(CanCreateMixin, FormView):
 
     def vote(self, election_data):
         with transaction.atomic():
-            for role_title in election_data.keys():
+            for role_title in election_data:
                 # If we have a multiple choice field
                 if isinstance(election_data[role_title], QuerySet):
                     if election_data[role_title].count() > 0:
@@ -444,28 +448,16 @@ class ElectionUpdateView(CanEditMixin, UpdateView):
     pk_url_kwarg = "election_id"
 
     def get_initial(self):
-        init = {}
-        try:
-            init["start_date"] = self.object.start_date.strftime("%Y-%m-%d %H:%M:%S")
-        except Exception:
-            pass
-        try:
-            init["end_date"] = self.object.end_date.strftime("%Y-%m-%d %H:%M:%S")
-        except Exception:
-            pass
-        try:
-            init["start_candidature"] = self.object.start_candidature.strftime(
+        return {
+            "start_date": self.object.start_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "end_date": self.object.end_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "start_candidature": self.object.start_candidature.strftime(
                 "%Y-%m-%d %H:%M:%S"
-            )
-        except Exception:
-            pass
-        try:
-            init["end_candidature"] = self.object.end_candidature.strftime(
+            ),
+            "end_candidature": self.object.end_candidature.strftime(
                 "%Y-%m-%d %H:%M:%S"
-            )
-        except Exception:
-            pass
-        return init
+            ),
+        }
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("election:detail", kwargs={"election_id": self.object.id})

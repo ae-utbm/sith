@@ -25,6 +25,7 @@
 import types
 from typing import Any
 
+from django.conf import settings
 from django.contrib.auth.mixins import AccessMixin
 from django.core.exceptions import (
     ImproperlyConfigured,
@@ -35,6 +36,7 @@ from django.http import (
     HttpResponseNotFound,
     HttpResponseServerError,
 )
+from django.shortcuts import render
 from django.utils.functional import cached_property
 from django.views.generic.base import View
 from django.views.generic.detail import SingleObjectMixin
@@ -79,9 +81,7 @@ def can_edit_prop(obj: Any, user: User) -> bool:
             raise PermissionDenied
         ```
     """
-    if obj is None or user.is_owner(obj):
-        return True
-    return False
+    return obj is None or user.is_owner(obj)
 
 
 def can_edit(obj: Any, user: User) -> bool:
@@ -232,7 +232,9 @@ class UserIsRootMixin(GenericContentPermissionMixinBuilder):
         PermissionDenied: if the user isn't root
     """
 
-    permission_function = lambda obj, user: user.is_root
+    @staticmethod
+    def permission_function(obj: Any, user: User):
+        return user.is_root
 
 
 class FormerSubscriberMixin(AccessMixin):
@@ -304,10 +306,10 @@ class QuickNotifMixin:
         kwargs["quick_notifs"] = []
         for n in self.quick_notif_list:
             kwargs["quick_notifs"].append(settings.SITH_QUICK_NOTIF[n])
-        for k, v in settings.SITH_QUICK_NOTIF.items():
-            for gk in self.request.GET.keys():
-                if k == gk:
-                    kwargs["quick_notifs"].append(v)
+        for key, val in settings.SITH_QUICK_NOTIF.items():
+            for gk in self.request.GET:
+                if key == gk:
+                    kwargs["quick_notifs"].append(val)
         return kwargs
 
 
@@ -324,8 +326,10 @@ class DetailFormView(SingleObjectMixin, FormView):
         return super().get_object()
 
 
-from .files import *
-from .group import *
-from .page import *
-from .site import *
-from .user import *
+# F403: those star-imports would be hellish to refactor
+# E402: putting those import at the top of the file would also be difficult
+from .files import *  # noqa: F403 E402
+from .group import *  # noqa: F403 E402
+from .page import *  # noqa: F403 E402
+from .site import *  # noqa: F403 E402
+from .user import *  # noqa: F403 E402

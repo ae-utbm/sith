@@ -15,24 +15,33 @@
 
 from django.urls import path
 
-from sas.views import *
+from sas.views import (
+    AlbumEditView,
+    AlbumUploadView,
+    AlbumView,
+    ModerationView,
+    PictureAskRemovalView,
+    PictureEditView,
+    PictureView,
+    SASMainView,
+    send_album,
+    send_compressed,
+    send_pict,
+    send_thumb,
+)
 
 urlpatterns = [
     path("", SASMainView.as_view(), name="main"),
     path("moderation/", ModerationView.as_view(), name="moderation"),
     path("album/<int:album_id>/", AlbumView.as_view(), name="album"),
     path(
-        "album/<int:album_id>/upload/",
-        AlbumUploadView.as_view(),
-        name="album_upload",
+        "album/<int:album_id>/upload/", AlbumUploadView.as_view(), name="album_upload"
     ),
     path("album/<int:album_id>/edit/", AlbumEditView.as_view(), name="album_edit"),
     path("album/<int:album_id>/preview/", send_album, name="album_preview"),
     path("picture/<int:picture_id>/", PictureView.as_view(), name="picture"),
     path(
-        "picture/<int:picture_id>/edit/",
-        PictureEditView.as_view(),
-        name="picture_edit",
+        "picture/<int:picture_id>/edit/", PictureEditView.as_view(), name="picture_edit"
     ),
     path(
         "picture/<int:picture_id>/report",
@@ -45,9 +54,5 @@ urlpatterns = [
         send_compressed,
         name="download_compressed",
     ),
-    path(
-        "picture/<int:picture_id>/download/thumb/",
-        send_thumb,
-        name="download_thumb",
-    ),
+    path("picture/<int:picture_id>/download/thumb/", send_thumb, name="download_thumb"),
 ]

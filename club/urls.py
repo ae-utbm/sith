@@ -24,7 +24,32 @@
 
 from django.urls import path
 
-from club.views import *
+from club.views import (
+    ClubCreateView,
+    ClubEditPropView,
+    ClubEditView,
+    ClubListView,
+    ClubMailingView,
+    ClubMembersView,
+    ClubOldMembersView,
+    ClubPageEditView,
+    ClubPageHistView,
+    ClubRevView,
+    ClubSellingCSVView,
+    ClubSellingView,
+    ClubStatView,
+    ClubToolsView,
+    ClubView,
+    MailingAutoGenerationView,
+    MailingDeleteView,
+    MailingSubscriptionDeleteView,
+    MembershipDeleteView,
+    MembershipSetOldView,
+    PosterCreateView,
+    PosterDeleteView,
+    PosterEditView,
+    PosterListView,
+)
 
 urlpatterns = [
     path("", ClubListView.as_view(), name="club_list"),
@@ -32,32 +57,20 @@ urlpatterns = [
     path("stats/", ClubStatView.as_view(), name="club_stats"),
     path("<int:club_id>/", ClubView.as_view(), name="club_view"),
     path(
-        "<int:club_id>/rev/<int:rev_id>/",
-        ClubRevView.as_view(),
-        name="club_view_rev",
+        "<int:club_id>/rev/<int:rev_id>/", ClubRevView.as_view(), name="club_view_rev"
     ),
     path("<int:club_id>/hist/", ClubPageHistView.as_view(), name="club_hist"),
     path("<int:club_id>/edit/", ClubEditView.as_view(), name="club_edit"),
-    path(
-        "<int:club_id>/edit/page/",
-        ClubPageEditView.as_view(),
-        name="club_edit_page",
-    ),
+    path("<int:club_id>/edit/page/", ClubPageEditView.as_view(), name="club_edit_page"),
     path("<int:club_id>/members/", ClubMembersView.as_view(), name="club_members"),
     path(
         "<int:club_id>/elderlies/",
         ClubOldMembersView.as_view(),
         name="club_old_members",
     ),
+    path("<int:club_id>/sellings/", ClubSellingView.as_view(), name="club_sellings"),
     path(
-        "<int:club_id>/sellings/",
-        ClubSellingView.as_view(),
-        name="club_sellings",
-    ),
-    path(
-        "<int:club_id>/sellings/csv/",
-        ClubSellingCSVView.as_view(),
-        name="sellings_csv",
+        "<int:club_id>/sellings/csv/", ClubSellingCSVView.as_view(), name="sellings_csv"
     ),
     path("<int:club_id>/prop/", ClubEditPropView.as_view(), name="club_prop"),
     path("<int:club_id>/tools/", ClubToolsView.as_view(), name="tools"),
@@ -89,9 +102,7 @@ urlpatterns = [
     ),
     path("<int:club_id>/poster/", PosterListView.as_view(), name="poster_list"),
     path(
-        "<int:club_id>/poster/create/",
-        PosterCreateView.as_view(),
-        name="poster_create",
+        "<int:club_id>/poster/create/", PosterCreateView.as_view(), name="poster_create"
     ),
     path(
         "<int:club_id>/poster/<int:poster_id>/edit/",

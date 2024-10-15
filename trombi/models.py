@@ -55,9 +55,9 @@ class Trombi(models.Model):
         _("subscription deadline"),
         default=date.today,
         help_text=_(
-            "Before this date, users are "
-            "allowed to subscribe to this Trombi. "
-            "After this date, users subscribed will be allowed to comment on each other."
+            "Before this date, users are allowed to subscribe to this Trombi. "
+            "After this date, users subscribed will"
+            " be allowed to comment on each other."
         ),
     )
     comments_deadline = models.DateField(
@@ -131,7 +131,8 @@ class TrombiUser(models.Model):
         null=True,
         blank=True,
         help_text=_(
-            "The profile picture you want in the trombi (warning: this picture may be published)"
+            "The profile picture you want in the trombi "
+            "(warning: this picture may be published)"
         ),
     )
     scrub_pict = models.ImageField(
@@ -140,7 +141,8 @@ class TrombiUser(models.Model):
         null=True,
         blank=True,
         help_text=_(
-            "The scrub picture you want in the trombi (warning: this picture may be published)"
+            "The scrub picture you want in the trombi "
+            "(warning: this picture may be published)"
         ),
     )
 
@@ -158,10 +160,7 @@ class TrombiUser(models.Model):
             role = str(settings.SITH_CLUB_ROLES[m.role])
             if m.description:
                 role += " (%s)" % m.description
-            if m.end_date:
-                end_date = get_semester_code(m.end_date)
-            else:
-                end_date = ""
+            end_date = get_semester_code(m.end_date) if m.end_date else ""
             TrombiClubMembership(
                 user=self,
                 club=str(m.club),

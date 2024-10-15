@@ -71,15 +71,15 @@ class SearchForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for key in self.fields.keys():
+        for key in self.fields:
             self.fields[key].required = False
 
     @property
     def cleaned_data_json(self):
         data = self.cleaned_data
-        for key in data.keys():
-            if key in ("date_of_birth", "phone") and data[key] is not None:
-                data[key] = str(data[key])
+        for key, val in data.items():
+            if key in ("date_of_birth", "phone") and val is not None:
+                data[key] = str(val)
         return data
 
 
@@ -98,10 +98,7 @@ class SearchFormListView(FormerSubscriberMixin, SingleObjectMixin, ListView):
         self.session = request.session
         self.last_search = self.session.get("matmat_search_result", str([]))
         self.last_search = literal_eval(self.last_search)
-        if "valid_form" in kwargs.keys():
-            self.valid_form = kwargs["valid_form"]
-        else:
-            self.valid_form = None
+        self.valid_form = kwargs.get("valid_form")
 
         self.init_query = self.model.objects
         self.can_see_hidden = True
@@ -202,8 +199,8 @@ class SearchClearFormView(FormerSubscriberMixin, View):
 
     def dispatch(self, request, *args, **kwargs):
         super().dispatch(request, *args, **kwargs)
-        if "matmat_search_form" in request.session.keys():
+        if "matmat_search_form" in request.session:
             request.session.pop("matmat_search_form")
-        if "matmat_search_result" in request.session.keys():
+        if "matmat_search_result" in request.session:
             request.session.pop("matmat_search_result")
         return HttpResponseRedirect(reverse("matmat:search"))

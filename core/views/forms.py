@@ -140,7 +140,7 @@ class SelectUser(TextInput):
 
 class LoginForm(AuthenticationForm):
     def __init__(self, *arg, **kwargs):
-        if "data" in kwargs.keys():
+        if "data" in kwargs:
             from counter.models import Customer
 
             data = kwargs["data"].copy()
@@ -157,7 +157,7 @@ class LoginForm(AuthenticationForm):
                 else:
                     user = User.objects.filter(username=data["username"]).first()
                 data["username"] = user.username
-            except:
+            except:  # noqa E722 I don't know what error is supposed to be raised here
                 pass
             kwargs["data"] = data
         super().__init__(*arg, **kwargs)

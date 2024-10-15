@@ -23,17 +23,9 @@
 
 from django.urls import path
 
-from galaxy.views import *
+from galaxy.views import GalaxyDataView, GalaxyUserView
 
 urlpatterns = [
-    path(
-        "<int:user_id>/",
-        GalaxyUserView.as_view(),
-        name="user",
-    ),
-    path(
-        "data.json",
-        GalaxyDataView.as_view(),
-        name="data",
-    ),
+    path("<int:user_id>/", GalaxyUserView.as_view(), name="user"),
+    path("data.json", GalaxyDataView.as_view(), name="data"),
 ]

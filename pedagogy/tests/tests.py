@@ -381,7 +381,9 @@ class TestUVCommentCreationAndDisplay(TestCase):
         self.assertContains(
             response,
             _(
-                "You already posted a comment on this UV. If you want to comment again, please modify or delete your previous comment."
+                "You already posted a comment on this UV. "
+                "If you want to comment again, "
+                "please modify or delete your previous comment."
             ),
         )
 

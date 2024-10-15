@@ -115,19 +115,18 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
         self.form = self.get_form()
         parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist("images")
-        if request.user.is_authenticated and request.user.is_subscribed:
+        if request.user.is_subscribed and self.form.is_valid():
+            self.form.process(
+                parent=parent,
+                owner=request.user,
+                files=files,
+                automodere=(
+                    request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+                    or request.user.is_root
+                ),
+            )
             if self.form.is_valid():
-                self.form.process(
-                    parent=parent,
-                    owner=request.user,
-                    files=files,
-                    automodere=(
-                        request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
-                        or request.user.is_root
-                    ),
-                )
-                if self.form.is_valid():
-                    return HttpResponse(str(self.form.errors), status=200)
+                return HttpResponse(str(self.form.errors), status=200)
         return HttpResponse(str(self.form.errors), status=500)
 
 
@@ -146,7 +145,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
-        if "clipboard" not in request.session.keys():
+        if "clipboard" not in request.session:
             request.session["clipboard"] = []
         return super().get(request, *args, **kwargs)
 
@@ -155,7 +154,7 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         if not self.object.file:
             self.object.generate_thumbnail()
         self.form = self.get_form()
-        if "clipboard" not in request.session.keys():
+        if "clipboard" not in request.session:
             request.session["clipboard"] = []
         if request.user.can_edit(self.object):  # Handle the copy-paste functions
             FileView.handle_clipboard(request, self.object)

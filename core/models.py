@@ -174,7 +174,7 @@ def validate_promo(value: int) -> None:
         )
 
 
-def get_group(*, pk: int = None, name: str = None) -> Group | None:
+def get_group(*, pk: int | None = None, name: str | None = None) -> Group | None:
     """Search for a group by its primary key or its name.
     Either one of the two must be set.
 
@@ -445,7 +445,7 @@ class User(AbstractBaseUser):
         else:
             return 0
 
-    def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
+    def is_in_group(self, *, pk: int | None = None, name: str | None = None) -> bool:
         """Check if this user is in the given group.
         Either a group id or a group name must be provided.
         If both are passed, only the id will be considered.
@@ -649,7 +649,7 @@ class User(AbstractBaseUser):
                 continue
             links = list(User.godfathers.through.objects.filter(**{key: self.id}))
             res.extend(links)
-            for _ in range(1, depth):
+            for _ in range(1, depth):  # noqa: F402 we don't care about gettext here
                 ids = [getattr(c, reverse_key) for c in links]
                 links = list(
                     User.godfathers.through.objects.filter(
@@ -703,9 +703,7 @@ class User(AbstractBaseUser):
             return True
         if hasattr(obj, "owner_group") and self.is_in_group(pk=obj.owner_group.id):
             return True
-        if self.is_root:
-            return True
-        return False
+        return self.is_root
 
     def can_edit(self, obj):
         """Determine if the object can be edited by the user."""
@@ -717,9 +715,7 @@ class User(AbstractBaseUser):
                     return True
         if isinstance(obj, User) and obj == self:
             return True
-        if self.is_owner(obj):
-            return True
-        return False
+        return self.is_owner(obj)
 
     def can_view(self, obj):
         """Determine if the object can be viewed by the user."""
@@ -729,9 +725,7 @@ class User(AbstractBaseUser):
             for pk in obj.view_groups.values_list("pk", flat=True):
                 if self.is_in_group(pk=pk):
                     return True
-        if self.can_edit(obj):
-            return True
-        return False
+        return self.can_edit(obj)
 
     def can_be_edited_by(self, user):
         return user.is_root or user.is_board_member
@@ -759,23 +753,17 @@ class User(AbstractBaseUser):
 
     @cached_property
     def preferences(self):
-        try:
+        if hasattr(self, "_preferences"):
             return self._preferences
-        except:
-            prefs = Preferences(user=self)
-            prefs.save()
-            return prefs
+        return Preferences.objects.create(user=self)
 
     @cached_property
     def forum_infos(self):
-        try:
+        if hasattr(self, "_forum_infos"):
             return self._forum_infos
-        except:
-            from forum.models import ForumUserInfo
+        from forum.models import ForumUserInfo
 
-            infos = ForumUserInfo(user=self)
-            infos.save()
-            return infos
+        return ForumUserInfo.objects.create(user=self)
 
     @cached_property
     def clubs_with_rights(self) -> list[Club]:
@@ -840,7 +828,7 @@ class AnonymousUser(AuthAnonymousUser):
     def favorite_topics(self):
         raise PermissionDenied
 
-    def is_in_group(self, *, pk: int = None, name: str = None) -> bool:
+    def is_in_group(self, *, pk: int | None = None, name: str | None = None) -> bool:
         """The anonymous user is only in the public group."""
         allowed_id = settings.SITH_GROUP_PUBLIC_ID
         if pk is not None:
@@ -867,9 +855,7 @@ class AnonymousUser(AuthAnonymousUser):
             and obj.view_groups.filter(id=settings.SITH_GROUP_PUBLIC_ID).exists()
         ):
             return True
-        if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
-            return True
-        return False
+        return hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self)
 
     def get_display_name(self):
         return _("Visitor")
@@ -1070,7 +1056,7 @@ class SithFile(models.Model):
                     ]:
                         self.file.delete()
                         self.file = None
-                except:
+                except:  # noqa E722 I don't know the exception that can be raised
                     self.file = None
             self.mime_type = "inode/directory"
         if self.is_file and (self.file is None or self.file == ""):
@@ -1196,12 +1182,12 @@ class SithFile(models.Model):
         return Album.objects.filter(id=self.id).first()
 
     def get_parent_list(self):
-        l = []
-        p = self.parent
-        while p is not None:
-            l.append(p)
-            p = p.parent
-        return l
+        parents = []
+        current = self.parent
+        while current is not None:
+            parents.append(current)
+            current = current.parent
+        return parents
 
     def get_parent_path(self):
         return "/" + "/".join([p.name for p in self.get_parent_list()[::-1]])
@@ -1359,22 +1345,18 @@ class Page(models.Model):
         if hasattr(self, "club") and self.club.can_be_edited_by(user):
             # Override normal behavior for clubs
             return True
-        if self.name == settings.SITH_CLUB_ROOT_PAGE and user.is_board_member:
-            return True
-        return False
+        return self.name == settings.SITH_CLUB_ROOT_PAGE and user.is_board_member
 
     def can_be_viewed_by(self, user):
-        if self.is_club_page:
-            return True
-        return False
+        return self.is_club_page
 
     def get_parent_list(self):
-        l = []
-        p = self.parent
-        while p is not None:
-            l.append(p)
-            p = p.parent
-        return l
+        parents = []
+        current = self.parent
+        while current is not None:
+            parents.append(current)
+            current = current.parent
+        return parents
 
     def is_locked(self):
         """Is True if the page is locked, False otherwise.
@@ -1386,7 +1368,6 @@ class Page(models.Model):
         if self.lock_timeout and (
             timezone.now() - self.lock_timeout > timedelta(minutes=5)
         ):
-            # print("Lock timed out")
             self.unset_lock()
         return (
             self.lock_user
@@ -1401,7 +1382,6 @@ class Page(models.Model):
         self.lock_user = user
         self.lock_timeout = timezone.now()
         super().save()
-        # print("Locking page")
 
     def set_lock_recursive(self, user):
         """Locks recursively all the child pages for editing properties."""
@@ -1420,7 +1400,6 @@ class Page(models.Model):
         self.lock_user = None
         self.lock_timeout = None
         super().save()
-        # print("Unlocking page")
 
     def get_lock(self):
         """Returns the page's mutex containing the time and the user in a dict."""
@@ -1435,13 +1414,11 @@ class Page(models.Model):
         """
         if self.parent is None:
             return self.name
-        return "/".join([self.parent.get_full_name(), self.name])
+        return f"{self.parent.get_full_name()}/{self.name}"
 
     def get_display_name(self):
-        try:
-            return self.revisions.last().title
-        except:
-            return self.name
+        rev = self.revisions.last()
+        return rev.title if rev is not None else self.name
 
     @cached_property
     def is_club_page(self):

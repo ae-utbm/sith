@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import contextlib
 from io import BytesIO
 from pathlib import Path
 from typing import ClassVar, Self
@@ -108,10 +109,8 @@ class Picture(SasFile):
 
     def generate_thumbnails(self, *, overwrite=False):
         im = Image.open(BytesIO(self.file.read()))
-        try:
+        with contextlib.suppress(Exception):
             im = exif_auto_rotate(im)
-        except:
-            pass
         # convert the compressed image and the thumbnail into webp
         # The original image keeps its original type, because it's not
         # meant to be shown on the website, but rather to keep the real image

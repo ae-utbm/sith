@@ -13,8 +13,9 @@
 #
 #
 from django.contrib import admin
+from django.db.models import F, Sum
 
-from eboutic.models import *
+from eboutic.models import Basket, BasketItem, Invoice, InvoiceItem
 
 
 @admin.register(Basket)

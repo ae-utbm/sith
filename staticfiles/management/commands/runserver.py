@@ -10,7 +10,7 @@ from staticfiles.processors import OpenApi, Webpack
 
 
 class Command(Runserver):
-    """Light wrapper around the statics runserver that integrates webpack auto bundling"""
+    """Light wrapper around default runserver that integrates webpack auto bundling."""
 
     def run(self, **options):
         # OpenApi generation needs to be before webpack

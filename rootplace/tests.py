@@ -66,11 +66,11 @@ class TestMergeUser(TestCase):
         self.to_keep = User.objects.get(pk=self.to_keep.pk)
         # fields of to_delete should be assigned to to_keep
         # if they were not set beforehand
-        assert "Biggus" == self.to_keep.first_name
-        assert "Dickus" == self.to_keep.last_name
-        assert "B'ian" == self.to_keep.nick_name
-        assert "Jerusalem" == self.to_keep.address
-        assert "Rome" == self.to_keep.parent_address
+        assert self.to_keep.first_name == "Biggus"
+        assert self.to_keep.last_name == "Dickus"
+        assert self.to_keep.nick_name == "B'ian"
+        assert self.to_keep.address == "Jerusalem"
+        assert self.to_keep.parent_address == "Rome"
         assert self.to_keep.groups.count() == 3
         groups = sorted(self.to_keep.groups.all(), key=lambda i: i.id)
         expected = sorted([subscribers, mde_admin, sas_admin], key=lambda i: i.id)

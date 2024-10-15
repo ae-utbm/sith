@@ -1,6 +1,22 @@
 from django.urls import path
 
-from election.views import *
+from election.views import (
+    CandidatureCreateView,
+    CandidatureDeleteView,
+    CandidatureUpdateView,
+    ElectionCreateView,
+    ElectionDeleteView,
+    ElectionDetailView,
+    ElectionListArchivedView,
+    ElectionListCreateView,
+    ElectionListDeleteView,
+    ElectionsListView,
+    ElectionUpdateView,
+    RoleCreateView,
+    RoleDeleteView,
+    RoleUpdateView,
+    VoteFormView,
+)
 
 urlpatterns = [
     path("", ElectionsListView.as_view(), name="list"),
@@ -19,16 +35,10 @@ urlpatterns = [
         name="delete_list",
     ),
     path(
-        "<int:election_id>/role/create/",
-        RoleCreateView.as_view(),
-        name="create_role",
+        "<int:election_id>/role/create/", RoleCreateView.as_view(), name="create_role"
     ),
     path("<int:role_id>/role/edit/", RoleUpdateView.as_view(), name="update_role"),
-    path(
-        "<int:role_id>/role/delete/",
-        RoleDeleteView.as_view(),
-        name="delete_role",
-    ),
+    path("<int:role_id>/role/delete/", RoleDeleteView.as_view(), name="delete_role"),
     path(
         "<int:election_id>/candidate/add/",
         CandidatureCreateView.as_view(),

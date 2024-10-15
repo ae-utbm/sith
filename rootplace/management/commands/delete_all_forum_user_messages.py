@@ -44,8 +44,8 @@ class Command(BaseCommand):
             exit(1)
 
         confirm = input(
-            "User selected: %s\nDo you really want to delete all message from this user ? [y/N] "
-            % (user,)
+            "User selected: %s\nDo you really want "
+            "to delete all message from this user ? [y/N] " % (user,)
         )
 
         if not confirm.lower().startswith("y"):

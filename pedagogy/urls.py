@@ -23,7 +23,17 @@
 
 from django.urls import path
 
-from pedagogy.views import *
+from pedagogy.views import (
+    UVCommentDeleteView,
+    UVCommentReportCreateView,
+    UVCommentUpdateView,
+    UVCreateView,
+    UVDeleteView,
+    UVDetailFormView,
+    UVGuideView,
+    UVModerationFormView,
+    UVUpdateView,
+)
 
 urlpatterns = [
     # Urls displaying the actual application for visitors
