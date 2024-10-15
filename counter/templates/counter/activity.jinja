@@ -5,7 +5,7 @@
   {% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}
 {% endblock %}
 
-{% block additionnal_js %}
+{% block additional_js %}
   <script defer src="{{ static('webpack/graph-index.ts') }}"></script>
 {% endblock %}
 
@@ -27,7 +27,8 @@
       {% endif %}
     </ul>
     <h4>{% trans %}Last Week Activity {% endtrans %}</h4>
-    <canvas id="activityChart" width="400" height="200"></canvas>
+    <div id="activityGraph" width="400" height="200"></div>
+    <br/>
   {% endif %}
 
   <h5>{% trans %}Legend{% endtrans %}</h5>
@@ -48,7 +49,7 @@
   <script>
     window.addEventListener("DOMContentLoaded", () => {
       loadChart({
-        canvas: document.getElementById("activityChart"),
+        canvas: document.getElementById("activityGraph"),
         startDate: new Date().setDate(new Date().getDate() - 7),
         counterId: {{ counter.id }},
       });
