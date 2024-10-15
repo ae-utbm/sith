@@ -33,8 +33,7 @@ jobs:
 
         # See https://github.com/ae-utbm/sith/wiki/GitHub-Actions#deployment-action
         script: |
-          export PATH="/home/sith/.local/bin:$PATH"
-          pushd ${{secrets.SITH_PATH}}
+          cd ${{secrets.SITH_PATH}}
 
           git fetch
           git reset --hard origin/master

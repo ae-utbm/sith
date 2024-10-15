@@ -3,6 +3,8 @@ name: Sith taiste
 on:
   push:
     branches: [taiste]
+  pull_request:  # remove this before actual merge
+      branches: [taiste]
   workflow_dispatch:
 
 jobs:
@@ -32,8 +34,7 @@ jobs:
 
         # See https://github.com/ae-utbm/sith/wiki/GitHub-Actions#deployment-action
         script: |
-          export PATH="$HOME/.poetry/bin:$PATH"
-          pushd ${{secrets.SITH_PATH}}
+          cd ${{secrets.SITH_PATH}}
 
           git fetch
           git reset --hard origin/taiste
