@@ -50,7 +50,7 @@
     window.addEventListener("DOMContentLoaded", () => {
       loadChart({
         canvas: document.getElementById("activityGraph"),
-        startDate: new Date().setDate(new Date().getDate() - 7),
+        startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
         counterId: {{ counter.id }},
       });
     });

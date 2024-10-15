@@ -1,13 +1,12 @@
 import { paginated } from "#core:utils/api";
 import { exportToHtml } from "#core:utils/globals";
+import { Calendar } from "@fullcalendar/core";
+import timeGridPlugin from "@fullcalendar/timegrid";
 import {
   type PermanencyFetchPermananciesData,
   type PermanencySchema,
   permanencyFetchPermanancies,
 } from "#openapi";
-
-import { Calendar } from "@fullcalendar/core";
-import timeGridPlugin from "@fullcalendar/timegrid";
 
 interface ActivityChartConfig {
   canvas: HTMLCanvasElement;
@@ -20,6 +19,14 @@ interface OpeningTime {
   end: Date;
 }
 
+interface EventInput {
+  start: Date;
+  end: Date;
+  backgroundColor: string;
+}
+
+const _15minutes = 15 * 60 * 1000;
+
 exportToHtml("loadChart", loadChart);
 
 async function loadChart(options: ActivityChartConfig) {
@@ -27,7 +34,7 @@ async function loadChart(options: ActivityChartConfig) {
     query: {
       counter: [options.counterId],
       // biome-ignore lint/style/useNamingConvention: backend API uses snake_case
-      start_date: options.startDate.toString(),
+      start_date: options.startDate.toISOString(),
     },
   } as PermanencyFetchPermananciesData);
 
@@ -37,30 +44,14 @@ async function loadChart(options: ActivityChartConfig) {
     plugins: [timeGridPlugin],
     initialView: "timeGridWeek",
     locale: "fr",
-    slotLabelFormat: {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    },
-    dayHeaderFormat: {
-      weekday: "long",
-    },
+    slotLabelFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
+    dayHeaderFormat: { weekday: "long" },
     firstDay: 1,
-    views: {
-      timeGrid: {
-        allDaySlot: false,
-      },
-    },
+    views: { timeGrid: { allDaySlot: false } },
     scrollTime: "09:00:00",
-    headerToolbar: {
-      left: "",
-      center: "",
-      right: "",
-    },
-    //weekends: false,
+    headerToolbar: { left: "", center: "", right: "" },
     events: events,
     nowIndicator: true,
-    //slotDuration: "00:15:00",
     height: 600,
   });
   calendar.render();
@@ -79,10 +70,10 @@ function getOpeningTimes(rawPermanancies: PermanencySchema[]) {
       openingTimes.push(permanancy);
     } else {
       const lastPermanancy = openingTimes[openingTimes.length - 1];
+      // if the new permanancy starts before the 15 minutes following the end of the last one, merge them
       if (
-        // if the new permanancy starts before the 15 minutes following the end of the last one, merge them
-        new Date(permanancy.start).setMinutes(permanancy.start.getMinutes() - 15) <
-        lastPermanancy.end.getTime()
+        new Date(permanancy.start).getTime() <
+        lastPermanancy.end.getTime() + _15minutes
       ) {
         lastPermanancy.end = new Date(
           Math.max(lastPermanancy.end.getTime(), permanancy.end.getTime()),
@@ -96,35 +87,45 @@ function getOpeningTimes(rawPermanancies: PermanencySchema[]) {
 }
 
 function convertPermanancyToOpeningTime(permanancy: PermanencySchema): OpeningTime {
-  return {
-    start: new Date(permanancy.start),
-    end: permanancy.end ? new Date(permanancy.end) : new Date(),
-  };
+  const start = new Date(permanancy.start);
+  let end = new Date(permanancy.end);
+  if (end.getTime() - start.getTime() < _15minutes) {
+    end = new Date(start.getTime() + _15minutes);
+  } else {
+    end = new Date(permanancy.end);
+  }
+  return { start: start, end: end };
 }
 
 function getEvents(permanancies: PermanencySchema[]) {
   const openingTimes = getOpeningTimes(permanancies);
-  const events = [];
+  const events: EventInput[] = [];
   for (const openingTime of openingTimes) {
-    const lastMonday: Date = new Date();
-    lastMonday.setDate(new Date().getDate() - ((new Date().getDay() - 1) % 7));
-    lastMonday.setHours(0, 0, 0);
-
-    // if permanancies took place before monday (last week), display them in lightblue as part of the current week
-    if (openingTime.end < lastMonday) {
-      events.push({
-        start: new Date(openingTime.start).setDate(openingTime.start.getDate() + 7),
-        end: new Date(openingTime.end).setDate(openingTime.end.getDate() + 7),
-        backgroundColor: "lightblue",
-      });
-    } else {
-      events.push({
-        start: openingTime.start,
-        end: openingTime.end,
-        backgroundColor: "green",
-      });
-    }
+    const lastMonday = getLastMonday();
+    const shift = openingTime.end < lastMonday;
+    // if permanancies took place last week (=before monday),
+    // -> display them in lightblue as part of the current week
+    events.push({
+      start: shift ? shiftDateByDays(openingTime.start, 7) : openingTime.start,
+      end: shift ? shiftDateByDays(openingTime.end, 7) : openingTime.end,
+      backgroundColor: shift ? "lightblue" : "green",
+    });
   }
-  //const openingTimesByDay = splitByDay(openingTimes);
   return events;
+}
+
+// Function to get last Monday at 00:00
+function getLastMonday(): Date {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const lastMonday = new Date(now);
+  lastMonday.setDate(now.getDate() - ((dayOfWeek + 6) % 7)); // Adjust for Monday as day 1
+  lastMonday.setHours(0, 0, 0, 0);
+  return lastMonday;
+}
+
+function shiftDateByDays(date: Date, days: number): Date {
+  const newDate = new Date(date);
+  newDate.setDate(date.getDate() + days);
+  return newDate;
 }

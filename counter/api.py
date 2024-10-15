@@ -16,9 +16,10 @@
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
+from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from core.api_permissions import CanView, IsOldSubscriber, IsRoot
+from core.api_permissions import CanView, IsRoot
 from counter.models import Counter, Permanency
 from counter.schemas import CounterSchema, PermanencyFilterSchema, PermanencySchema
 
@@ -46,7 +47,7 @@ class PermanencyController(ControllerBase):
     @route.get(
         "",
         response=PaginatedResponseSchema[PermanencySchema],
-        permissions=[IsOldSubscriber],
+        permissions=[IsAuthenticated],
         exclude_none=True,
     )
     @paginate(PageNumberPaginationExtra, page_size=100)
