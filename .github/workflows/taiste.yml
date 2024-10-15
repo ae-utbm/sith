@@ -3,6 +3,8 @@ name: Sith taiste
 on:
   push:
     branches: [taiste]
+  pull_request:  # remove this before actual merge
+      branches: [taiste]
   workflow_dispatch:
 
 jobs:
@@ -13,7 +15,7 @@ jobs:
 
     steps:
     - name: SSH Remote Commands
-      uses: appleboy/ssh-action@dce9d565de8d876c11d93fa4fe677c0285a66d78
+      uses: appleboy/ssh-action@v1.1.0
       with:
         # Proxy
         proxy_host : ${{secrets.PROXY_HOST}}
@@ -32,8 +34,7 @@ jobs:
 
         # See https://github.com/ae-utbm/sith/wiki/GitHub-Actions#deployment-action
         script: |
-          export PATH="$HOME/.poetry/bin:$PATH"
-          pushd ${{secrets.SITH_PATH}}
+          cd ${{secrets.SITH_PATH}}
 
           git fetch
           git reset --hard origin/taiste
