@@ -1,4 +1,15 @@
-{% extends "core/base.jinja" %}
+{% if is_fragment %}
+  {% extends "core/base_fragment.jinja" %}
+
+  {# Don't display tabs and errors #}
+  {% block tabs %}
+  {% endblock %}
+  {% block errors %}
+  {% endblock %}
+{% else %}
+  {% extends "core/base.jinja" %}
+{% endif %}
+
 {% from "core/macros.jinja" import paginate_htmx %}
 
 {% block title %}

@@ -5,11 +5,13 @@
 {% endblock %}
 
 {% if is_fragment %}
+
   {# Don't display tabs and errors #}
   {% block tabs %}
   {% endblock %}
   {% block errors %}
   {% endblock %}
+
 {% endif %}
 
 {% block file %}

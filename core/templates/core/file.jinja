@@ -1,4 +1,8 @@
-{% extends "core/base.jinja" %}
+{% if is_fragment %}
+  {% extends "core/base_fragment.jinja" %}
+{% else %}
+  {% extends "core/base.jinja" %}
+{% endif %}
 
 {% block title %}
   {% if file %}
