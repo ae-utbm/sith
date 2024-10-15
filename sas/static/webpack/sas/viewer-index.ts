@@ -1,12 +1,7 @@
-import { makeUrl, paginated } from "#core:utils/api";
+import { paginated } from "#core:utils/api";
 import { exportToHtml } from "#core:utils/globals";
 import { History } from "#core:utils/history";
-import {
-  type AjaxResponse,
-  type RemoteResult,
-  remoteDataSource,
-  sithSelect2,
-} from "#core:utils/select2";
+import type TomSelect from "tom-select";
 import {
   type IdentifiedUserSchema,
   type PictureSchema,
@@ -20,7 +15,6 @@ import {
   picturesFetchPictures,
   picturesIdentifyUsers,
   picturesModeratePicture,
-  userSearchUsers,
   usersidentifiedDeleteRelation,
 } from "#openapi";
 
@@ -182,20 +176,21 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
             query: { album_id: config.albumId },
           } as PicturesFetchPicturesData)
         ).map(PictureWithIdentifications.fromPicture);
-        this.selector = sithSelect2({
-          element: this.$refs.search,
-          dataSource: remoteDataSource(await makeUrl(userSearchUsers), {
-            excluded: () => [
-              ...(this.currentPicture.identifications || []).map(
-                (i: IdentifiedUserSchema) => i.user.id,
-              ),
-            ],
-            resultConverter: (obj: AjaxResponse) => {
-              return { ...obj, text: (obj as UserProfileSchema).display_name };
-            },
-          }),
-          pictureGetter: (user: RemoteResult) => user.profile_pict,
-        });
+        this.selector = this.$refs.search;
+        this.selector.filter = (users: UserProfileSchema[]) => {
+          const resp: UserProfileSchema[] = [];
+          const ids = [
+            ...(this.currentPicture.identifications || []).map(
+              (i: IdentifiedUserSchema) => i.user.id,
+            ),
+          ];
+          for (const user of users) {
+            if (!ids.includes(user.id)) {
+              resp.push(user);
+            }
+          }
+          return resp;
+        };
         this.currentPicture = this.pictures.find(
           (i: PictureSchema) => i.id === config.firstPictureId,
         );
@@ -302,16 +297,17 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
        * Send the identification request and update the list of identified users.
        */
       async submitIdentification(): Promise<void> {
+        const widget: TomSelect = this.selector.widget;
         await picturesIdentifyUsers({
           path: {
             // biome-ignore lint/style/useNamingConvention: api is in snake_case
             picture_id: this.currentPicture.id,
           },
-          body: this.selector.val().map((i: string) => Number.parseInt(i)),
+          body: widget.items.map((i: string) => Number.parseInt(i)),
         });
         // refresh the identified users list
         await this.currentPicture.loadIdentifications({ forceReload: true });
-        this.selector.empty().trigger("change");
+        widget.clear(false);
       },
 
       /**

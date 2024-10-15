@@ -28,6 +28,7 @@ input[type="file"] {
   font-size: 1.2em;
   border-radius: 5px;
   color: black;
+
   &:hover {
     background: hsl(0, 0%, 83%);
   }
@@ -63,6 +64,7 @@ textarea[type="text"],
   border-radius: 5px;
   max-width: 95%;
 }
+
 textarea {
   border: none;
   text-decoration: none;
@@ -72,6 +74,7 @@ textarea {
   border-radius: 5px;
   font-family: sans-serif;
 }
+
 select {
   border: none;
   text-decoration: none;
@@ -85,9 +88,11 @@ select {
 a:not(.button) {
   text-decoration: none;
   color: $primary-dark-color;
+
   &:hover {
     color: $primary-light-color;
   }
+
   &:active {
     color: $primary-color;
   }
@@ -116,7 +121,9 @@ a:not(.button) {
 }
 
 @keyframes rotate {
-  100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .ib {
@@ -143,11 +150,13 @@ a:not(.button) {
 
     .collapse-header-icon {
       transition: all ease-in-out 150ms;
+
       &.reverse {
         transform: rotate(180deg);
       }
     }
   }
+
   .collapse-body {
     padding: 10px;
   }
@@ -202,9 +211,11 @@ a:not(.button) {
     font-size: 0.9em;
     margin: 0.2em;
     border-radius: 0.6em;
+
     .markdown {
       margin: 0.5em;
     }
+
     &:before {
       font-family: FontAwesome;
       font-size: 4em;
@@ -212,15 +223,19 @@ a:not(.button) {
       margin: 0.2em;
     }
   }
+
   #info_box {
     background: $primary-neutral-light-color;
+
     &:before {
       content: "\f05a";
       color: hsl(210, 100%, 56%);
     }
   }
+
   #alert_box {
     background: $second-color;
+
     &:before {
       content: "\f06a";
       color: $white-color;
@@ -240,7 +255,8 @@ a:not(.button) {
 #page {
   width: 90%;
   margin: 20px auto 0;
-/*---------------------------------NAV---------------------------------*/
+
+  /*---------------------------------NAV---------------------------------*/
   .btn {
     font-size: 15px;
     font-weight: normal;
@@ -252,9 +268,11 @@ a:not(.button) {
 
     &.btn-blue {
       background-color: $deepblue;
+
       &:not(:disabled):hover {
         background-color: darken($deepblue, 10%);
       }
+
       &:disabled {
         background-color: rgba(70, 90, 126, 0.4);
       }
@@ -262,9 +280,11 @@ a:not(.button) {
 
     &.btn-grey {
       background-color: grey;
+
       &:not(:disabled):hover {
         background-color: darken(gray, 15%);
       }
+
       &:disabled {
         background-color: lighten(gray, 15%);
       }
@@ -273,9 +293,11 @@ a:not(.button) {
     &.btn-red {
       background-color: #fc8181;
       color: black;
+
       &:not(:disabled):hover {
         background-color: darken(#fc8181, 15%);
       }
+
       &:disabled {
         background-color: lighten(#fc8181, 15%);
         color: grey;
@@ -287,12 +309,13 @@ a:not(.button) {
     }
   }
 
-/*--------------------------------CONTENT------------------------------*/
+  /*--------------------------------CONTENT------------------------------*/
   #quick_notif {
     width: 100%;
     margin: 0 auto;
     list-style-type: none;
     background: $second-color;
+
     li {
       padding: 10px;
     }
@@ -350,6 +373,7 @@ a:not(.button) {
   .tool_bar {
     overflow: auto;
     padding: 4px;
+
     .tools {
       display: flex;
       flex-wrap: wrap;
@@ -358,6 +382,7 @@ a:not(.button) {
       padding: 5px;
       border-radius: 6px;
       text-align: center;
+
       a {
         padding: 7px;
         display: inline-block;
@@ -367,11 +392,13 @@ a:not(.button) {
         flex: 1;
         flex-wrap: nowrap;
         white-space: nowrap;
+
         &.selected_tab {
           background: $primary-color;
           color: $white-color;
           border-radius: 6px;
         }
+
         &:hover {
           background: $primary-color;
           color: $white-color;
@@ -381,7 +408,7 @@ a:not(.button) {
     }
   }
 
-/*---------------------------------NEWS--------------------------------*/
+  /*---------------------------------NEWS--------------------------------*/
   #news {
     display: flex;
 
@@ -394,17 +421,21 @@ a:not(.button) {
       margin: 0;
       vertical-align: top;
     }
+
     #news_admin {
       margin-bottom: 1em;
     }
+
     #right_column {
       flex: 20%;
       float: right;
       margin: 0.2em;
     }
+
     #left_column {
       flex: 79%;
       margin: 0.2em;
+
       h3 {
         background: $second-color;
         box-shadow: $shadow-color 1px 1px 1px;
@@ -412,19 +443,22 @@ a:not(.button) {
         margin: 0 0 0.5em 0;
         text-transform: uppercase;
         font-size: 1.1em;
+
         &:not(:first-of-type) {
           margin: 2em 0 1em 0;
         }
       }
     }
+
     @media screen and (max-width: $small-devices) {
+
       #left_column,
       #right_column {
         flex: 100%;
       }
     }
 
-/* AGENDA/BIRTHDAYS */
+    /* AGENDA/BIRTHDAYS */
     #agenda,
     #birthdays {
       display: block;
@@ -432,6 +466,7 @@ a:not(.button) {
       background: white;
       font-size: 70%;
       margin-bottom: 1em;
+
       #agenda_title,
       #birthdays_title {
         margin: 0;
@@ -444,39 +479,48 @@ a:not(.button) {
         text-transform: uppercase;
         background: $second-color;
       }
+
       #agenda_content {
         overflow: auto;
         box-shadow: $shadow-color 1px 1px 1px;
         height: 20em;
       }
+
       #agenda_content,
       #birthdays_content {
         .agenda_item {
           padding: 0.5em;
           margin-bottom: 0.5em;
+
           &:nth-of-type(even) {
             background: $secondary-neutral-light-color;
           }
+
           .agenda_time {
             font-size: 90%;
             color: grey;
           }
+
           .agenda_item_content {
             p {
               margin-top: 0.2em;
             }
           }
         }
+
         ul.birthdays_year {
           margin: 0;
           list-style-type: none;
           font-weight: bold;
-          > li {
+
+          >li {
             padding: 0.5em;
+
             &:nth-child(even) {
               background: $secondary-neutral-light-color;
             }
           }
+
           ul {
             margin: 0;
             margin-left: 1em;
@@ -487,13 +531,15 @@ a:not(.button) {
         }
       }
     }
-/* END AGENDA/BIRTHDAYS */
 
-/* EVENTS TODAY AND NEXT FEW DAYS */
+    /* END AGENDA/BIRTHDAYS */
+
+    /* EVENTS TODAY AND NEXT FEW DAYS */
     .news_events_group {
       box-shadow: $shadow-color 1px 1px 1px;
       margin-left: 1em;
       margin-bottom: 0.5em;
+
       .news_events_group_date {
         display: table-cell;
         padding: 0.6em;
@@ -509,33 +555,42 @@ a:not(.button) {
 
         div {
           margin: 0 auto;
+
           .day {
             font-size: 1.5em;
           }
         }
       }
+
       .news_events_group_items {
         display: table-cell;
         width: 100%;
+
         .news_event:nth-of-type(odd) {
           background: white;
         }
+
         .news_event:nth-of-type(even) {
           background: $primary-neutral-light-color;
         }
+
         .news_event {
           display: block;
           padding: 0.4em;
+
           &:not(:last-child) {
             border-bottom: 1px solid grey;
           }
+
           div {
             margin: 0.2em;
           }
+
           h4 {
             margin-top: 1em;
             text-transform: uppercase;
           }
+
           .club_logo {
             float: left;
             min-width: 7em;
@@ -543,6 +598,7 @@ a:not(.button) {
             margin: 0;
             margin-right: 1em;
             margin-top: 0.8em;
+
             img {
               max-height: 6em;
               max-width: 8em;
@@ -550,16 +606,21 @@ a:not(.button) {
               margin: 0 auto;
             }
           }
+
           .news_date {
             font-size: 100%;
           }
+
           .news_content {
             clear: left;
+
             .button_bar {
               text-align: right;
+
               .fb {
                 color: $faceblue;
               }
+
               .twitter {
                 color: $twitblue;
               }
@@ -568,26 +629,30 @@ a:not(.button) {
         }
       }
     }
-/* END EVENTS TODAY AND NEXT FEW DAYS */
 
-/* COMING SOON */
+    /* END EVENTS TODAY AND NEXT FEW DAYS */
+
+    /* COMING SOON */
     .news_coming_soon {
       display: list-item;
       list-style-type: square;
       list-style-position: inside;
       margin-left: 1em;
       padding-left: 0;
+
       a {
         font-weight: bold;
         text-transform: uppercase;
       }
+
       .news_date {
         font-size: 0.9em;
       }
     }
-/* END COMING SOON */
 
-/* NOTICES */
+    /* END COMING SOON */
+
+    /* NOTICES */
     .news_notice {
       margin: 0 0 1em 1em;
       padding: 0.4em;
@@ -595,16 +660,19 @@ a:not(.button) {
       background: $secondary-neutral-light-color;
       box-shadow: $shadow-color 0 0 2px;
       border-radius: 18px 5px 18px 5px;
+
       h4 {
         margin: 0;
       }
+
       .news_content {
         margin-left: 1em;
       }
     }
-/* END NOTICES */
 
-/* CALLS */
+    /* END NOTICES */
+
+    /* CALLS */
     .news_call {
       margin: 0 0 1em 1em;
       padding: 0.4em;
@@ -612,21 +680,26 @@ a:not(.button) {
       background: $secondary-neutral-light-color;
       border: 1px solid grey;
       box-shadow: $shadow-color 1px 1px 1px;
+
       h4 {
         margin: 0;
       }
+
       .news_date {
         font-size: 0.9em;
       }
+
       .news_content {
         margin-left: 1em;
       }
     }
-/* END CALLS */
+
+    /* END CALLS */
 
     .news_empty {
       margin-left: 1em;
     }
+
     .news_date {
       color: grey;
     }
@@ -640,8 +713,8 @@ a:not(.button) {
 }
 
 
-.select2 {
-  margin: 10px 0!important;
+.tomselected {
+  margin: 10px 0 !important;
   max-width: 100%;
   min-width: 100%;
 
@@ -657,7 +730,9 @@ a:not(.button) {
     color: black;
   }
 }
-.select2-results {
+
+.ts-dropdown {
+
   .select-item {
     display: flex;
     flex-direction: row;
@@ -673,16 +748,39 @@ a:not(.button) {
   }
 }
 
+.ts-control {
+
+  .item {
+    .fa-times {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+
+    cursor: pointer;
+    background-color: #e4e4e4;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    display: inline-block;
+    margin-left: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-right: 10px;
+  }
+
+}
+
 #news_details {
   display: inline-block;
   margin-top: 20px;
   padding: 0.4em;
   width: 80%;
   background: $white-color;
+
   h4 {
     margin-top: 1em;
     text-transform: uppercase;
   }
+
   .club_logo {
     display: inline-block;
     text-align: center;
@@ -690,6 +788,7 @@ a:not(.button) {
     float: left;
     min-width: 15em;
     margin: 0;
+
     img {
       max-height: 15em;
       max-width: 12em;
@@ -698,6 +797,7 @@ a:not(.button) {
       margin-bottom: 10px;
     }
   }
+
   .share_button {
     border: none;
     color: white;
@@ -709,6 +809,7 @@ a:not(.button) {
     float: right;
     display: block;
     margin-left: 0.3em;
+
     &:hover {
       color: lightgrey;
     }
@@ -740,26 +841,32 @@ a:not(.button) {
 #poster_edit,
 #screen_edit {
   position: relative;
+
   #title {
     position: relative;
     padding: 10px;
     margin: 10px;
     border-bottom: 2px solid black;
+
     h3 {
       display: flex;
       justify-content: center;
       align-items: center;
     }
+
     #links {
       position: absolute;
       display: flex;
       bottom: 5px;
+
       &.left {
         left: 0;
       }
+
       &.right {
         right: 0;
       }
+
       .link {
         padding: 5px;
         padding-left: 20px;
@@ -768,27 +875,32 @@ a:not(.button) {
         border-radius: 20px;
         background-color: hsl(40, 100%, 50%);
         color: black;
+
         &:hover {
           color: black;
           background-color: hsl(40, 58%, 50%);
         }
+
         &.delete {
           background-color: hsl(0, 100%, 40%);
         }
       }
     }
   }
+
   #posters,
   #screens {
     position: relative;
     display: flex;
     flex-wrap: wrap;
+
     #no-posters,
     #no-screens {
       display: flex;
       justify-content: center;
       align-items: center;
     }
+
     .poster,
     .screen {
       min-width: 10%;
@@ -800,26 +912,31 @@ a:not(.button) {
       border-radius: 4px;
       padding: 10px;
       background-color: lightgrey;
+
       * {
         display: flex;
         justify-content: center;
         align-items: center;
       }
+
       .name {
         padding-bottom: 5px;
         margin-bottom: 5px;
         border-bottom: 1px solid whitesmoke;
       }
+
       .image {
         flex-grow: 1;
         position: relative;
         padding-bottom: 5px;
         margin-bottom: 5px;
         border-bottom: 1px solid whitesmoke;
+
         img {
           max-height: 20vw;
           max-width: 100%;
         }
+
         &:hover {
           &::before {
             position: absolute;
@@ -838,10 +955,12 @@ a:not(.button) {
           }
         }
       }
+
       .dates {
         padding-bottom: 5px;
         margin-bottom: 5px;
         border-bottom: 1px solid whitesmoke;
+
         * {
           display: flex;
           justify-content: center;
@@ -850,15 +969,18 @@ a:not(.button) {
           margin-left: 5px;
           margin-right: 5px;
         }
+
         .begin,
         .end {
           width: 48%;
         }
+
         .begin {
           border-right: 1px solid whitesmoke;
           padding-right: 2%;
         }
       }
+
       .edit,
       .moderate,
       .slideshow {
@@ -866,15 +988,18 @@ a:not(.button) {
         border-radius: 20px;
         background-color: hsl(40, 100%, 50%);
         color: black;
+
         &:hover {
           color: black;
           background-color: hsl(40, 58%, 50%);
         }
+
         &:nth-child(2n) {
           margin-top: 5px;
           margin-bottom: 5px;
         }
       }
+
       .tooltip {
         visibility: hidden;
         width: 120px;
@@ -885,23 +1010,28 @@ a:not(.button) {
         border-radius: 6px;
         position: absolute;
         z-index: 10;
+
         ul {
           margin-left: 0;
           display: inline-block;
+
           li {
             display: list-item;
             list-style-type: none;
           }
         }
       }
+
       &.not_moderated {
         border: 1px solid red;
       }
+
       &:hover .tooltip {
         visibility: visible;
       }
     }
   }
+
   #view {
     position: fixed;
     width: 100vw;
@@ -915,9 +1045,11 @@ a:not(.button) {
     visibility: hidden;
     background-color: rgba(10, 10, 10, 0.9);
     overflow: hidden;
+
     &.active {
       visibility: visible;
     }
+
     #placeholder {
       width: 80vw;
       height: 80vh;
@@ -926,6 +1058,7 @@ a:not(.button) {
       align-items: center;
       top: 0;
       left: 0;
+
       img {
         max-width: 100%;
         max-height: 100%;
@@ -940,14 +1073,17 @@ a:not(.button) {
     tbody {
       .neg-amount {
         color: red;
+
         &:before {
           font-family: FontAwesome;
           font-size: 1em;
           content: "\f063";
         }
       }
+
       .pos-amount {
         color: green;
+
         &:before {
           font-family: FontAwesome;
           font-size: 1em;
@@ -1014,6 +1150,7 @@ dt {
 .edit-bar {
   display: block;
   margin: 4px;
+
   a {
     display: inline-block;
     margin: 4px;
@@ -1053,7 +1190,8 @@ th {
   vertical-align: middle;
   text-align: center;
   padding: 5px 10px;
-  > ul {
+
+  >ul {
     margin-top: 0;
   }
 }
@@ -1064,7 +1202,8 @@ td {
   vertical-align: top;
   overflow: hidden;
   text-overflow: ellipsis;
-  > ul {
+
+  >ul {
     margin-top: 0;
   }
 }
@@ -1080,15 +1219,17 @@ thead {
   color: white;
 }
 
-tbody > tr {
+tbody>tr {
   &:nth-child(even):not(.highlight) {
     background: $primary-neutral-light-color;
   }
+
   &.clickable:hover {
     cursor: pointer;
     background: $secondary-neutral-light-color;
     width: 100%;
   }
+
   &.highlight {
     color: $primary-dark-color;
     font-style: italic;
@@ -1148,9 +1289,11 @@ u,
     margin: 0.2em;
     height: 100%;
     background: $secondary-neutral-light-color;
+
     img {
       max-width: 70%;
     }
+
     input {
       background: white;
     }
@@ -1162,10 +1305,12 @@ u,
 .user_mini_profile {
   height: 100%;
   width: 100%;
+
   img {
     max-width: 100%;
     max-height: 100%;
   }
+
   .user_mini_profile_infos {
     padding: 0.2em;
     height: 20%;
@@ -1173,16 +1318,20 @@ u,
     flex-wrap: nowrap;
     justify-content: space-around;
     font-size: 0.9em;
+
     div {
       max-height: 100%;
     }
+
     .user_mini_profile_infos_text {
       text-align: center;
+
       .user_mini_profile_nick {
         font-style: italic;
       }
     }
   }
+
   .user_mini_profile_picture {
     height: 80%;
     display: flex;
@@ -1194,14 +1343,17 @@ u,
 .mini_profile_link {
   display: block;
   text-decoration: none;
+
   span {
     display: inline-block;
     width: 50px;
     vertical-align: middle;
   }
+
   em {
     vertical-align: middle;
   }
+
   img {
     max-width: 40px;
     max-height: 60px;
@@ -1223,6 +1375,7 @@ u,
     border: solid 1px red;
     text-align: center;
   }
+
   img {
     width: 500px;
   }
@@ -1232,6 +1385,7 @@ u,
 .matmat_results {
   display: flex;
   flex-wrap: wrap;
+
   .matmat_user {
     flex-basis: 14em;
     align-self: flex-start;
@@ -1240,10 +1394,12 @@ u,
     overflow: hidden;
     border: 1px solid black;
     box-shadow: $shadow-color 1px 1px 1px;
+
     &:hover {
       box-shadow: 1px 1px 5px $second-color;
     }
   }
+
   .matmat_user a {
     color: $primary-neutral-dark-color;
     height: 100%;
@@ -1283,6 +1439,7 @@ footer {
   font-size: 90%;
   text-align: center;
   vertical-align: middle;
+
   div {
     margin: 0.6em 0;
     color: $white-color;
@@ -1292,18 +1449,20 @@ footer {
     align-items: center;
     background-color: $primary-neutral-dark-color;
     box-shadow: $shadow-color 0 0 15px;
+
     a {
       padding: 0.8em;
       flex: 1;
       font-weight: bold;
       color: $white-color !important;
+
       &:hover {
         color: $primary-dark-color;
       }
     }
   }
 
-  > .version {
+  >.version {
     margin-top: 3px;
     color: rgba(0, 0, 0, 0.3);
   }
@@ -1335,6 +1494,7 @@ label {
   * {
     text-align: center;
   }
+
   img {
     width: 100px;
   }
@@ -1351,19 +1511,23 @@ label {
   padding: 2px;
   display: inline-block;
   font-size: 0.8em;
+
   span {
     width: 70px;
     float: right;
   }
+
   img {
     max-width: 50px;
     max-height: 50px;
     float: left;
   }
+
   strong {
     font-weight: bold;
     font-size: 1.2em;
   }
+
   button {
     vertical-align: middle;
   }
@@ -1380,6 +1544,7 @@ a.ui-button:active,
   background: $primary-color;
   border-color: $primary-color;
 }
+
 .ui-corner-all,
 .ui-corner-bottom,
 .ui-corner-right,
@@ -1391,6 +1556,7 @@ a.ui-button:active,
 #club_detail {
   .club_logo {
     float: right;
+
     img {
       display: block;
       max-height: 10em;

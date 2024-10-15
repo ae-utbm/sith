@@ -13,9 +13,6 @@ require("jquery-ui/ui/widgets/tabs.js");
 
 require("jquery-ui/themes/base/all.css");
 
-// We ship select2 here, otherwise it will duplicate jquery everywhere we load it
-import "select2";
-
 /**
  * Simple wrapper to solve shorten not being able on legacy pages
  * @param {string} selector to be passed to jQuery
