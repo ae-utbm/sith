@@ -724,7 +724,8 @@ if DEBUG:
         "debug_toolbar.panels.signals.SignalsPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
-    SENTRY_ENV = "development"
+    if not TESTING:
+        SENTRY_ENV = "development"  # We can't test if it gets overridden in settings
 
 if TESTING:
     CAPTCHA_TEST_MODE = True
