@@ -32,7 +32,7 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView, FormMixin, UpdateView
 
-from core.models import Notification, RealGroup, SithFile
+from core.models import Notification, RealGroup, SithFile, User
 from core.views import (
     AllowFragment,
     CanEditMixin,
@@ -381,11 +381,17 @@ class FileDeleteView(AllowFragment, CanEditPropMixin, DeleteView):
         return kwargs
 
 
-class FileModerationView(AllowFragment, CanViewMixin, ListView):
+class FileModerationView(AllowFragment, ListView):
     model = SithFile
     template_name = "core/file_moderation.jinja"
     queryset = SithFile.objects.filter(is_moderated=False, is_in_sas=False)
     paginate_by = 100
+
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        user: User = request.user
+        if user.is_root:
+            return super().dispatch(request, *args, **kwargs)
+        raise PermissionDenied()
 
 
 class FileModerateView(CanEditPropMixin, SingleObjectMixin):
