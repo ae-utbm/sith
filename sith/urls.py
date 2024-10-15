@@ -70,3 +70,21 @@ if settings.DEBUG:
     import debug_toolbar
 
     urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
+
+if settings.SENTRY_ENV == "development" and settings.SENTRY_DSN:
+    """Sentry debug endpoint
+
+    This function always crash and allows us to test
+    the sentry configuration and the modal popup 
+    displayed to users on production
+
+    The error will be displayed on Sentry
+    inside the "development" environment
+
+    NOTE : you need to specify the SENTRY_DSN setting in settings_custom.py
+    """
+
+    def raise_exception(request):
+        _division_by_zero = 1 / 0
+
+    urlpatterns += [path("sentry-debug/", raise_exception)]
