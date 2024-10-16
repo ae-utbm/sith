@@ -1,6 +1,7 @@
 // biome-ignore lint/correctness/noUndeclaredDependencies: shipped by easymde
 import "codemirror/lib/codemirror.css";
 import "easymde/src/css/easymde.css";
+import { InheritedComponent } from "#core:utils/web-components";
 // biome-ignore lint/correctness/noUndeclaredDependencies: Imported by EasyMDE
 import type CodeMirror from "codemirror";
 // biome-ignore lint/style/useNamingConvention: This is how they called their namespace
@@ -182,23 +183,10 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
   }
 };
 
-class MarkdownInput extends HTMLElement {
-  widget: HTMLTextAreaElement;
-
+class MarkdownInput extends InheritedComponent<"textarea"> {
   constructor() {
-    super();
-    this.widget = document.createElement("textarea");
+    super("textarea");
 
-    const attributes: Attr[] = []; // We need to make a copy to delete while iterating
-    for (const attr of this.attributes) {
-      attributes.push(attr);
-    }
-
-    for (const attr of attributes) {
-      this.removeAttributeNode(attr);
-      this.widget.setAttributeNode(attr);
-    }
-    this.appendChild(this.widget);
     window.addEventListener("DOMContentLoaded", () => loadEasyMde(this.widget));
   }
 }
