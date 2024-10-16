@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-09 11:50+0200\n"
+"POT-Creation-Date: 2024-10-16 02:19+0200\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -22,87 +22,95 @@ msgstr ""
 msgid "captured.%s"
 msgstr "capture.%s"
 
-#: core/static/webpack/easymde-index.js:32
+#: core/static/webpack/ajax-select-index.ts:73
+msgid "You need to type %(number)s more characters"
+msgstr "Vous devez taper %(number)s caractères de plus"
+
+#: core/static/webpack/ajax-select-index.ts:76
+msgid "No results found"
+msgstr "Aucun résultat trouvé"
+
+#: core/static/webpack/easymde-index.ts:31
 msgid "Heading"
 msgstr "Titre"
 
-#: core/static/webpack/easymde-index.js:38
+#: core/static/webpack/easymde-index.ts:37
 msgid "Italic"
 msgstr "Italique"
 
-#: core/static/webpack/easymde-index.js:44
+#: core/static/webpack/easymde-index.ts:43
 msgid "Bold"
 msgstr "Gras"
 
-#: core/static/webpack/easymde-index.js:50
+#: core/static/webpack/easymde-index.ts:49
 msgid "Strikethrough"
 msgstr "Barré"
 
-#: core/static/webpack/easymde-index.js:59
+#: core/static/webpack/easymde-index.ts:58
 msgid "Underline"
 msgstr "Souligné"
 
-#: core/static/webpack/easymde-index.js:68
+#: core/static/webpack/easymde-index.ts:67
 msgid "Superscript"
 msgstr "Exposant"
 
-#: core/static/webpack/easymde-index.js:77
+#: core/static/webpack/easymde-index.ts:76
 msgid "Subscript"
 msgstr "Indice"
 
-#: core/static/webpack/easymde-index.js:83
+#: core/static/webpack/easymde-index.ts:82
 msgid "Code"
 msgstr "Code"
 
-#: core/static/webpack/easymde-index.js:90
+#: core/static/webpack/easymde-index.ts:89
 msgid "Quote"
 msgstr "Citation"
 
-#: core/static/webpack/easymde-index.js:96
+#: core/static/webpack/easymde-index.ts:95
 msgid "Unordered list"
 msgstr "Liste non ordonnée"
 
-#: core/static/webpack/easymde-index.js:102
+#: core/static/webpack/easymde-index.ts:101
 msgid "Ordered list"
 msgstr "Liste ordonnée"
 
-#: core/static/webpack/easymde-index.js:109
+#: core/static/webpack/easymde-index.ts:108
 msgid "Insert link"
 msgstr "Insérer lien"
 
-#: core/static/webpack/easymde-index.js:115
+#: core/static/webpack/easymde-index.ts:114
 msgid "Insert image"
 msgstr "Insérer image"
 
-#: core/static/webpack/easymde-index.js:121
+#: core/static/webpack/easymde-index.ts:120
 msgid "Insert table"
 msgstr "Insérer tableau"
 
-#: core/static/webpack/easymde-index.js:128
+#: core/static/webpack/easymde-index.ts:127
 msgid "Clean block"
 msgstr "Nettoyer bloc"
 
-#: core/static/webpack/easymde-index.js:135
+#: core/static/webpack/easymde-index.ts:134
 msgid "Toggle preview"
 msgstr "Activer la prévisualisation"
 
-#: core/static/webpack/easymde-index.js:141
+#: core/static/webpack/easymde-index.ts:140
 msgid "Toggle side by side"
 msgstr "Activer la vue côte à côte"
 
-#: core/static/webpack/easymde-index.js:147
+#: core/static/webpack/easymde-index.ts:146
 msgid "Toggle fullscreen"
 msgstr "Activer le plein écran"
 
-#: core/static/webpack/easymde-index.js:154
+#: core/static/webpack/easymde-index.ts:153
 msgid "Markdown guide"
 msgstr "Guide markdown"
 
-#: core/static/webpack/user/family-graph-index.js:222
+#: core/static/webpack/user/family-graph-index.js:233
 msgid "family_tree.%(extension)s"
 msgstr "arbre_genealogique.%(extension)s"
 
-#: core/static/webpack/user/pictures-index.js:67
+#: core/static/webpack/user/pictures-index.js:76
 msgid "pictures.%(extension)s"
 msgstr "photos.%(extension)s"
 
@@ -110,10 +118,10 @@ msgstr "photos.%(extension)s"
 msgid "Incorrect value"
 msgstr "Valeur incorrecte"
 
-#: sas/static/sas/js/viewer.js:205
+#: sas/static/webpack/sas/viewer-index.ts:271
 msgid "Couldn't moderate picture"
 msgstr "Il n'a pas été possible de modérer l'image"
 
-#: sas/static/sas/js/viewer.js:217
+#: sas/static/webpack/sas/viewer-index.ts:284
 msgid "Couldn't delete picture"
 msgstr "Il n'a pas été possible de supprimer l'image"

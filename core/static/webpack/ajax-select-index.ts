@@ -1,6 +1,6 @@
 import "tom-select/dist/css/tom-select.css";
 import TomSelect from "tom-select";
-import type { TomItem, TomLoadCallback } from "tom-select/dist/types/types";
+import type { TomItem, TomLoadCallback, TomOption } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
 import { type UserProfileSchema, userSearchUsers } from "#openapi";
 
@@ -17,6 +17,7 @@ export class AjaxSelect extends HTMLSelectElement {
   }
 
   loadTomSelect() {
+    const minCharNumberForsearch = 2;
     let maxItems = 1;
 
     if (this.multiple) {
@@ -25,12 +26,17 @@ export class AjaxSelect extends HTMLSelectElement {
 
     this.widget = new TomSelect(this, {
       hideSelected: true,
+      diacritics: true,
+      duplicates: false,
       maxItems: maxItems,
       loadThrottle: Number.parseInt(this.dataset.delay) ?? null,
       valueField: "id",
       labelField: "display_name",
       searchField: ["display_name", "nick_name", "first_name", "last_name"],
       placeholder: this.dataset.placeholder ?? "",
+      shouldLoad: (query: string) => {
+        return query.length >= minCharNumberForsearch; // Avoid launching search with less than 2 characters
+      },
       load: (query: string, callback: TomLoadCallback) => {
         userSearchUsers({
           query: {
@@ -61,6 +67,14 @@ export class AjaxSelect extends HTMLSelectElement {
         },
         item: (item: UserProfileSchema, sanitize: typeof escape_html) => {
           return `<span><i class="fa fa-times"></i>${sanitize(item.display_name)}</span>`;
+        },
+        // biome-ignore lint/style/useNamingConvention: that's how it's defined
+        not_loading: (data: TomOption, _sanitize: typeof escape_html) => {
+          return `<div class="no-results">${interpolate(gettext("You need to type %(number)s more characters"), { number: minCharNumberForsearch - data.input.length }, true)}</div>`;
+        },
+        // biome-ignore lint/style/useNamingConvention: that's how it's defined
+        no_results: (_data: TomOption, _sanitize: typeof escape_html) => {
+          return `<div class="no-results">${gettext("No results found")}</div>`;
         },
       },
     });
