@@ -25,7 +25,8 @@ interface EventInput {
   backgroundColor: string;
 }
 
-const _15minutes = 15 * 60 * 1000;
+// TODO: Fix du look (bandes blanches dans la table, ...)
+// TODO: Semaines passées
 
 exportToHtml("loadChart", loadChart);
 
@@ -57,6 +58,21 @@ async function loadChart(options: ActivityChartConfig) {
   calendar.render();
 }
 
+function roundToQuarter(date: Date, ceil: boolean) {
+  const result = date;
+  const minutes = date.getMinutes();
+  // removes minutes exceeding the lower quarter and adds 15 minutes if rounded to ceiling
+  result.setMinutes(minutes + +ceil * 15 - (minutes % 15), 0, 0);
+  return result;
+}
+
+function convertPermanancyToOpeningTime(permanancy: PermanencySchema): OpeningTime {
+  return {
+    start: roundToQuarter(new Date(permanancy.start), false),
+    end: roundToQuarter(new Date(permanancy.end ?? Date.now()), true),
+  };
+}
+
 function getOpeningTimes(rawPermanancies: PermanencySchema[]) {
   const permanancies = rawPermanancies
     .map(convertPermanancyToOpeningTime)
@@ -71,10 +87,7 @@ function getOpeningTimes(rawPermanancies: PermanencySchema[]) {
     } else {
       const lastPermanancy = openingTimes[openingTimes.length - 1];
       // if the new permanancy starts before the 15 minutes following the end of the last one, merge them
-      if (
-        new Date(permanancy.start).getTime() <
-        lastPermanancy.end.getTime() + _15minutes
-      ) {
+      if (permanancy.start <= lastPermanancy.end) {
         lastPermanancy.end = new Date(
           Math.max(lastPermanancy.end.getTime(), permanancy.end.getTime()),
         );
@@ -84,17 +97,6 @@ function getOpeningTimes(rawPermanancies: PermanencySchema[]) {
     }
   }
   return openingTimes;
-}
-
-function convertPermanancyToOpeningTime(permanancy: PermanencySchema): OpeningTime {
-  const start = new Date(permanancy.start);
-  let end = new Date(permanancy.end);
-  if (end.getTime() - start.getTime() < _15minutes) {
-    end = new Date(start.getTime() + _15minutes);
-  } else {
-    end = new Date(permanancy.end);
-  }
-  return { start: start, end: end };
 }
 
 function getEvents(permanancies: PermanencySchema[]) {
