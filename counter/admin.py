@@ -63,14 +63,24 @@ class BillingInfoAdmin(admin.ModelAdmin):
 
 @admin.register(AccountDump)
 class AccountDumpAdmin(admin.ModelAdmin):
+    date_hierarchy = "warning_mail_sent_at"
     list_display = (
         "customer",
         "warning_mail_sent_at",
         "warning_mail_error",
         "dump_operation",
+        "amount",
     )
-    autocomplete_fields = ("customer",)
+    autocomplete_fields = ("customer", "dump_operation")
     list_filter = ("warning_mail_error",)
+
+    def get_queryset(self, request):
+        # the `amount` property requires to know the customer and the dump_operation
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("customer", "customer__user", "dump_operation")
+        )
 
 
 @admin.register(Counter)

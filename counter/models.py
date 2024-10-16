@@ -279,6 +279,14 @@ class AccountDump(models.Model):
         status = "ongoing" if self.dump_operation is None else "finished"
         return f"{self.customer} - {status}"
 
+    @cached_property
+    def amount(self):
+        return (
+            self.dump_operation.unit_price
+            if self.dump_operation
+            else self.customer.amount
+        )
+
 
 class ProductType(models.Model):
     """A product type.
