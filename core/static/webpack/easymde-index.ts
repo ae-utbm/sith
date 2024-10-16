@@ -8,7 +8,7 @@ import EasyMDE from "easymde";
 import { markdownRenderMarkdown } from "#openapi";
 
 const loadEasyMde = (textarea: HTMLTextAreaElement) => {
-  new EasyMDE({
+  const easyMde = new EasyMDE({
     element: textarea,
     spellChecker: false,
     autoDownloadFontAwesome: false,
@@ -158,26 +158,22 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
   const submits: HTMLInputElement[] = Array.from(
     textarea.closest("form").querySelectorAll('input[type="submit"]'),
   );
-  const parentDiv = textarea.parentElement;
-  let submitPressed = false;
+  const parentDiv = textarea.parentElement.parentElement;
 
-  function checkMarkdownInput(_event: Event) {
+  function checkMarkdownInput(event: Event) {
     // an attribute is null if it does not exist, else a string
-    const required = this.getAttribute("required") != null;
-    const length = this.value.trim().length;
+    const required = textarea.getAttribute("required") != null;
+    const length = textarea.value.trim().length;
 
     if (required && length === 0) {
       parentDiv.style.boxShadow = "red 0px 0px 1.5px 1px";
+      event.preventDefault();
     } else {
       parentDiv.style.boxShadow = "";
     }
   }
 
   function onSubmitClick(e: Event) {
-    if (!submitPressed) {
-      this.codemirror.on("change", checkMarkdownInput);
-    }
-    submitPressed = true;
     checkMarkdownInput(e);
   }
 
@@ -186,11 +182,25 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
   }
 };
 
-class MarkdownInput extends HTMLTextAreaElement {
+class MarkdownInput extends HTMLElement {
+  widget: HTMLTextAreaElement;
+
   constructor() {
     super();
-    window.addEventListener("DOMContentLoaded", () => loadEasyMde(this));
+    this.widget = document.createElement("textarea");
+
+    const attributes: Attr[] = []; // We need to make a copy to delete while iterating
+    for (const attr of this.attributes) {
+      attributes.push(attr);
+    }
+
+    for (const attr of attributes) {
+      this.removeAttributeNode(attr);
+      this.widget.setAttributeNode(attr);
+    }
+    this.appendChild(this.widget);
+    window.addEventListener("DOMContentLoaded", () => loadEasyMde(this.widget));
   }
 }
 
-window.customElements.define("markdown-input", MarkdownInput, { extends: "textarea" });
+window.customElements.define("markdown-input", MarkdownInput);
