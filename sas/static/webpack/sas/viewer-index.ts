@@ -307,7 +307,10 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
         });
         // refresh the identified users list
         await this.currentPicture.loadIdentifications({ forceReload: true });
+
+        // Clear selection and cache of retrieved user so they can be filtered again
         widget.clear(false);
+        widget.clearOptions();
       },
 
       /**

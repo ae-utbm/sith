@@ -187,7 +187,7 @@ class MarkdownInput extends InheritedComponent<"textarea"> {
   constructor() {
     super("textarea");
 
-    window.addEventListener("DOMContentLoaded", () => loadEasyMde(this.widget));
+    window.addEventListener("DOMContentLoaded", () => loadEasyMde(this.node));
   }
 }
 

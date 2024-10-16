@@ -1,15 +1,16 @@
 import "tom-select/dist/css/tom-select.css";
+import { InheritedComponent } from "#core:utils/web-components";
 import TomSelect from "tom-select";
 import type { TomItem, TomLoadCallback, TomOption } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
 import { type UserProfileSchema, userSearchUsers } from "#openapi";
 
-export class AjaxSelect extends HTMLSelectElement {
+export class AjaxSelect extends InheritedComponent<"select"> {
   widget: TomSelect;
   filter?: <T>(items: T[]) => T[];
 
   constructor() {
-    super();
+    super("select");
 
     window.addEventListener("DOMContentLoaded", () => {
       this.loadTomSelect();
@@ -17,25 +18,25 @@ export class AjaxSelect extends HTMLSelectElement {
   }
 
   loadTomSelect() {
-    const minCharNumberForsearch = 2;
+    const minCharNumberForSearch = 2;
     let maxItems = 1;
 
-    if (this.multiple) {
-      maxItems = Number.parseInt(this.dataset.max) ?? null;
+    if (this.node.multiple) {
+      maxItems = Number.parseInt(this.node.dataset.max) ?? null;
     }
 
-    this.widget = new TomSelect(this, {
+    this.widget = new TomSelect(this.node, {
       hideSelected: true,
       diacritics: true,
       duplicates: false,
       maxItems: maxItems,
-      loadThrottle: Number.parseInt(this.dataset.delay) ?? null,
+      loadThrottle: Number.parseInt(this.node.dataset.delay) ?? null,
       valueField: "id",
       labelField: "display_name",
       searchField: ["display_name", "nick_name", "first_name", "last_name"],
-      placeholder: this.dataset.placeholder ?? "",
+      placeholder: this.node.dataset.placeholder ?? "",
       shouldLoad: (query: string) => {
-        return query.length >= minCharNumberForsearch; // Avoid launching search with less than 2 characters
+        return query.length >= minCharNumberForSearch; // Avoid launching search with less than 2 characters
       },
       load: (query: string, callback: TomLoadCallback) => {
         userSearchUsers({
@@ -70,7 +71,7 @@ export class AjaxSelect extends HTMLSelectElement {
         },
         // biome-ignore lint/style/useNamingConvention: that's how it's defined
         not_loading: (data: TomOption, _sanitize: typeof escape_html) => {
-          return `<div class="no-results">${interpolate(gettext("You need to type %(number)s more characters"), { number: minCharNumberForsearch - data.input.length }, true)}</div>`;
+          return `<div class="no-results">${interpolate(gettext("You need to type %(number)s more characters"), { number: minCharNumberForSearch - data.input.length }, true)}</div>`;
         },
         // biome-ignore lint/style/useNamingConvention: that's how it's defined
         no_results: (_data: TomOption, _sanitize: typeof escape_html) => {
@@ -85,4 +86,4 @@ export class AjaxSelect extends HTMLSelectElement {
   }
 }
 
-window.customElements.define("ajax-select", AjaxSelect, { extends: "select" });
+window.customElements.define("ajax-select", AjaxSelect);
