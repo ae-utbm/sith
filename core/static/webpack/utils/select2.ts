@@ -265,17 +265,22 @@ export function itemFormatter(user: { loading: boolean; text: string }) {
 export function selectItemBuilder(pictureGetter?: (item: RemoteResult) => string) {
   return (item: RemoteResult) => {
     const picture = typeof pictureGetter === "function" ? pictureGetter(item) : null;
-    const imgHtml = picture
-      ? `<img 
-          src="${pictureGetter(item)}" 
-          alt="${item.text}" 
-          onerror="this.src = '/static/core/img/unknown.jpg'" 
-        />`
-      : "";
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("select-item");
+    if (picture) {
+      const img = document.createElement("img");
+      img.src = picture;
+      img.alt = encodeURI(item.text);
+      img.onerror = () => {
+        img.src = "/static/core/img/unknown.jpg";
+      };
+      wrapper.appendChild(img);
+    }
+    const textSpan = document.createElement("span");
+    textSpan.classList.add("select-item-text");
+    textSpan.appendChild(document.createTextNode(item.text));
+    wrapper.appendChild(textSpan);
 
-    return $(`<div class="select-item">
-        ${imgHtml}
-         <span class="select-item-text">${item.text}</span>
-         </div>`);
+    return $(wrapper);
   };
 }
