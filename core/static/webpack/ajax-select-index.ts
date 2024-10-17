@@ -80,8 +80,13 @@ export class AjaxSelect extends InheritedComponent<"select"> {
       },
     });
 
+    // Allow removing selected items by clicking on them
     this.widget.on("item_select", (item: TomItem) => {
       this.widget.removeItem(item);
+    });
+    // Remove typed text once an item has been selected
+    this.widget.on("item_add", () => {
+      this.widget.setTextboxValue("");
     });
   }
 }
