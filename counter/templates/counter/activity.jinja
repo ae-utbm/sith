@@ -5,6 +5,10 @@
   {% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}
 {% endblock %}
 
+{% block additional_js %}
+  <script defer src="{{ static('webpack/graph-index.ts') }}"></script>
+{% endblock %}
+
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('counter/css/activity.scss') }}">
 {%- endblock -%}
@@ -22,6 +26,9 @@
         {% trans %}There is currently no barman connected.{% endtrans %}
       {% endif %}
     </ul>
+    <h4>{% trans %}Last Week Activity {% endtrans %}</h4>
+    <div id="activityGraph" width="400" height="200"></div>
+    <br/>
   {% endif %}
 
   <h5>{% trans %}Legend{% endtrans %}</h5>
@@ -37,5 +44,15 @@
   </div>
 {% endblock %}
 
-
-
+{% block script %}
+  {{super()}}
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      loadChart({
+        canvas: document.getElementById("activityGraph"),
+        startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+        counterId: {{ counter.id }},
+      });
+    });
+  </script>
+{% endblock %}
