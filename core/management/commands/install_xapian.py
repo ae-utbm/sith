@@ -16,6 +16,7 @@
 import hashlib
 import multiprocessing
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -112,6 +113,15 @@ class XapianInstaller:
         self._core = f"xapian-core-{self._version}"
         self._bindings = f"xapian-bindings-{self._version}"
 
+    def _util_download(self, url: str, dest: Path, sha1_hash: str) -> None:
+        resp = urllib3.request("GET", url)
+        if resp.status != 200:
+            raise HTTPException(f"Could not download {url}")
+        if hashlib.sha1(resp.data).hexdigest() != sha1_hash:
+            raise ValueError(f"File downloaded from {url} is compromised")
+        with open(dest, "wb") as f:
+            f.write(resp.data)
+
     def _setup_env(self):
         os.environ.update(
             {
@@ -129,29 +139,45 @@ class XapianInstaller:
         shutil.rmtree(self._dest_dir, ignore_errors=True)
         self._dest_dir.mkdir(parents=True)
 
-    def _download(self):
-        def download(url: str, dest: Path, sha1_hash: str):
-            resp = urllib3.request("GET", url)
-            if resp.status != 200:
-                raise HTTPException(f"Could not download {url}")
-            if hashlib.sha1(resp.data).hexdigest() != sha1_hash:
-                raise ValueError(f"File downloaded from {url} is compromised")
-            with open(dest, "wb") as f:
-                f.write(resp.data)
+    def _setup_windows(self):
+        if "64bit" not in platform.architecture():
+            raise OSError("Only windows 64bit is supported")
 
+        extractor = self._dest_dir / ""
+        installer = self._dest_dir / "w64devkit-x64-2.0.0.exe"
+
+        self._util_download(
+            "https://github.com/ip7z/7zip/releases/download/24.08/7zr.exe",
+            extractor,
+            "d99de792fd08db53bb552cd28f0080137274f897",
+        )
+
+        self._util_download(
+            "https://github.com/skeeto/w64devkit/releases/download/v2.0.0/w64devkit-x64-2.0.0.exe",
+            installer,
+            "b5190c3ca9b06abe2b5cf329d99255a0be3a61ee",
+        )
+
+        subprocess.run(
+            [str(extractor), "x", str(installer), f"-o{self._dest_dir}"], check=False
+        ).check_returncode()
+
+        sys.path.insert(0, str(self._dest_dir / "w64devkit" / "bin"))
+
+    def _download(self):
         self._stdout.write("Downloading source…")
 
         core = self._dest_dir / f"{self._core}.tar.xz"
         bindings = self._dest_dir / f"{self._bindings}.tar.xz"
-        download(
+        self._util_download(
             f"https://oligarchy.co.uk/xapian/{self._version}/{self._core}.tar.xz",
             core,
-            "e2b4b4cf6076873ec9402cab7b9a3b71dcf95e20",
+            self._core_sha1,
         )
-        download(
+        self._util_download(
             f"https://oligarchy.co.uk/xapian/{self._version}/{self._bindings}.tar.xz",
             bindings,
-            "782f568d2ea3ca751c519a2814a35c7dc86df3a4",
+            self._bindings_sha1,
         )
         self._stdout.write("Extracting source …")
         with tarfile.open(core) as tar:
@@ -168,6 +194,7 @@ class XapianInstaller:
             ["./configure", "--prefix", str(self._virtual_env)],
             env=dict(os.environ),
             cwd=self._dest_dir / self._core,
+            check=False,
         ).check_returncode()
         subprocess.run(
             [
@@ -177,11 +204,13 @@ class XapianInstaller:
             ],
             env=dict(os.environ),
             cwd=self._dest_dir / self._core,
+            check=False,
         ).check_returncode()
         subprocess.run(
             ["make", "install"],
             env=dict(os.environ),
             cwd=self._dest_dir / self._core,
+            check=False,
         ).check_returncode()
 
         self._stdout.write("Installing Xapian-bindings")
@@ -195,6 +224,7 @@ class XapianInstaller:
             ],
             env=dict(os.environ),
             cwd=self._dest_dir / self._bindings,
+            check=False,
         ).check_returncode()
         subprocess.run(
             [
@@ -204,22 +234,28 @@ class XapianInstaller:
             ],
             env=dict(os.environ),
             cwd=self._dest_dir / self._bindings,
+            check=False,
         ).check_returncode()
         subprocess.run(
             ["make", "install"],
             env=dict(os.environ),
             cwd=self._dest_dir / self._bindings,
+            check=False,
         ).check_returncode()
 
     def _post_clean(self):
         shutil.rmtree(self._dest_dir, ignore_errors=True)
 
     def _test(self):
-        subprocess.run([sys.executable, "-c", "import xapian"]).check_returncode()
+        subprocess.run(
+            [sys.executable, "-c", "import xapian"], check=False
+        ).check_returncode()
 
     def run(self):
         self._setup_env()
         self._prepare_dest_folder()
+        if platform.system() == "Windows":
+            self._setup_windows()
         self._download()
         self._install()
         self._post_clean()
