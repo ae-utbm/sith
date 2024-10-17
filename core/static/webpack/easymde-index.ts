@@ -1,7 +1,7 @@
 // biome-ignore lint/correctness/noUndeclaredDependencies: shipped by easymde
 import "codemirror/lib/codemirror.css";
 import "easymde/src/css/easymde.css";
-import { InheritedComponent } from "#core:utils/web-components";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 // biome-ignore lint/correctness/noUndeclaredDependencies: Imported by EasyMDE
 import type CodeMirror from "codemirror";
 // biome-ignore lint/style/useNamingConvention: This is how they called their namespace
@@ -9,7 +9,7 @@ import EasyMDE from "easymde";
 import { markdownRenderMarkdown } from "#openapi";
 
 const loadEasyMde = (textarea: HTMLTextAreaElement) => {
-  const easyMde = new EasyMDE({
+  new EasyMDE({
     element: textarea,
     spellChecker: false,
     autoDownloadFontAwesome: false,
@@ -183,12 +183,10 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
   }
 };
 
-class MarkdownInput extends InheritedComponent<"textarea"> {
+@registerComponent("markdown-input")
+class MarkdownInput extends inheritHtmlElement("textarea") {
   constructor() {
-    super("textarea");
-
+    super();
     window.addEventListener("DOMContentLoaded", () => loadEasyMde(this.node));
   }
 }
-
-window.customElements.define("markdown-input", MarkdownInput);

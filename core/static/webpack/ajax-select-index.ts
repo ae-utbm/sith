@@ -1,16 +1,17 @@
 import "tom-select/dist/css/tom-select.css";
-import { InheritedComponent } from "#core:utils/web-components";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import TomSelect from "tom-select";
 import type { TomItem, TomLoadCallback, TomOption } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
 import { type UserProfileSchema, userSearchUsers } from "#openapi";
 
-export class AjaxSelect extends InheritedComponent<"select"> {
-  widget: TomSelect;
-  filter?: <T>(items: T[]) => T[];
+@registerComponent("ajax-select")
+export class AjaxSelect extends inheritHtmlElement("select") {
+  public widget: TomSelect;
+  public filter?: <T>(items: T[]) => T[];
 
   constructor() {
-    super("select");
+    super();
 
     window.addEventListener("DOMContentLoaded", () => {
       this.loadTomSelect();
@@ -90,5 +91,3 @@ export class AjaxSelect extends InheritedComponent<"select"> {
     });
   }
 }
-
-window.customElements.define("ajax-select", AjaxSelect);
