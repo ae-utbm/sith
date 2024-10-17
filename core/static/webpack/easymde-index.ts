@@ -1,6 +1,7 @@
 // biome-ignore lint/correctness/noUndeclaredDependencies: shipped by easymde
 import "codemirror/lib/codemirror.css";
 import "easymde/src/css/easymde.css";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 // biome-ignore lint/correctness/noUndeclaredDependencies: Imported by EasyMDE
 import type CodeMirror from "codemirror";
 // biome-ignore lint/style/useNamingConvention: This is how they called their namespace
@@ -158,26 +159,22 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
   const submits: HTMLInputElement[] = Array.from(
     textarea.closest("form").querySelectorAll('input[type="submit"]'),
   );
-  const parentDiv = textarea.parentElement;
-  let submitPressed = false;
+  const parentDiv = textarea.parentElement.parentElement;
 
-  function checkMarkdownInput(_event: Event) {
+  function checkMarkdownInput(event: Event) {
     // an attribute is null if it does not exist, else a string
-    const required = this.getAttribute("required") != null;
-    const length = this.value.trim().length;
+    const required = textarea.getAttribute("required") != null;
+    const length = textarea.value.trim().length;
 
     if (required && length === 0) {
       parentDiv.style.boxShadow = "red 0px 0px 1.5px 1px";
+      event.preventDefault();
     } else {
       parentDiv.style.boxShadow = "";
     }
   }
 
   function onSubmitClick(e: Event) {
-    if (!submitPressed) {
-      this.codemirror.on("change", checkMarkdownInput);
-    }
-    submitPressed = true;
     checkMarkdownInput(e);
   }
 
@@ -186,11 +183,10 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
   }
 };
 
-class MarkdownInput extends HTMLTextAreaElement {
+@registerComponent("markdown-input")
+class MarkdownInput extends inheritHtmlElement("textarea") {
   constructor() {
     super();
-    window.addEventListener("DOMContentLoaded", () => loadEasyMde(this));
+    window.addEventListener("DOMContentLoaded", () => loadEasyMde(this.node));
   }
 }
-
-window.customElements.define("markdown-input", MarkdownInput, { extends: "textarea" });

@@ -27,7 +27,6 @@
     "@hey-api/openapi-ts": "^0.53.8",
     "@types/alpinejs": "^3.13.10",
     "@types/jquery": "^3.5.31",
-    "@types/select2": "^4.0.63",
     "babel-loader": "^9.2.1",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.0",
@@ -59,8 +58,8 @@
     "jquery-ui": "^1.14.0",
     "jquery.shorten": "^1.0.0",
     "native-file-system-adapter": "^3.0.1",
-    "select2": "^4.1.0-rc.0",
     "three": "^0.169.0",
-    "three-spritetext": "^1.9.0"
+    "three-spritetext": "^1.9.0",
+    "tom-select": "^2.3.1"
   }
 }

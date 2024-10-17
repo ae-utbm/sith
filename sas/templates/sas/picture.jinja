@@ -1,11 +1,12 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
+  <link rel="stylesheet" href="{{ static('webpack/ajax-select-index.css') }}">
   <link rel="stylesheet" href="{{ static('sas/css/picture.scss') }}">
-  <link rel="stylesheet" href="{{ static('webpack/sas/viewer-index.css') }}">
 {%- endblock -%}
 
 {%- block additional_js -%}
+  <script defer src="{{ static('webpack/ajax-select-index.ts') }}"></script>
   <script defer src="{{ static("webpack/sas/viewer-index.ts") }}"></script>
 {%- endblock -%}
 
@@ -156,7 +157,12 @@
           <h5>{% trans %}People{% endtrans %}</h5>
           {% if user.was_subscribed %}
             <form @submit.prevent="submitIdentification" x-show="!!selector">
-              <select x-ref="search" multiple="multiple"></select>
+              <ajax-select
+                x-ref="search"
+                multiple
+                data-delay="300"
+                data-placeholder="{%- trans -%}Identify users on pictures{%- endtrans -%}"
+              ></ajax-select>
               <input type="submit" value="{% trans %}Go{% endtrans %}"/>
             </form>
           {% endif %}
