@@ -6,14 +6,8 @@ runs:
     - name: Install apt packages
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: gettext
+        packages: gettext pipx
         version: 1.0  # increment to reset cache
-
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install gettext
-      shell: bash
 
     - name: Set up python
       uses: actions/setup-python@v5
@@ -30,7 +24,7 @@ runs:
     - name: Install Poetry
       if: steps.cached-poetry.outputs.cache-hit != 'true'
       shell: bash
-      run: curl -sSL https://install.python-poetry.org | python3 -
+      run: pipx install poetry
 
     - name: Check pyproject.toml syntax
       shell: bash
