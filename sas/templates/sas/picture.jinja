@@ -157,12 +157,12 @@
           <h5>{% trans %}People{% endtrans %}</h5>
           {% if user.was_subscribed %}
             <form @submit.prevent="submitIdentification" x-show="!!selector">
-              <ajax-select
+              <user-ajax-select
                 x-ref="search"
                 multiple
-                data-delay="300"
-                data-placeholder="{%- trans -%}Identify users on pictures{%- endtrans -%}"
-              ></ajax-select>
+                delay="300"
+                placeholder="{%- trans -%}Identify users on pictures{%- endtrans -%}"
+              ></user-ajax-select>
               <input type="submit" value="{% trans %}Go{% endtrans %}"/>
             </form>
           {% endif %}
