@@ -19,7 +19,11 @@ abstract class AjaxSelectBase extends inheritHtmlElement("select") {
   private placeholder = "";
   private max: number | null = null;
 
-  attributeChangedCallback(name: string, _oldValue?: string, newValue?: string) {
+  protected attributeChangedCallback(
+    name: string,
+    _oldValue?: string,
+    newValue?: string,
+  ) {
     switch (name) {
       case "delay": {
         this.delay = Number.parseInt(newValue) ?? null;
@@ -73,9 +77,25 @@ abstract class AjaxSelectBase extends inheritHtmlElement("select") {
 @registerComponent("user-ajax-select")
 export class UserAjaxSelect extends AjaxSelectBase {
   public filter?: <T>(items: T[]) => T[];
+  static observedAttributes = [
+    "min-characters-for-search",
+    ...AjaxSelectBase.observedAttributes,
+  ];
+
+  private minCharNumberForSearch = 2;
+
+  protected attributeChangedCallback(
+    name: string,
+    _oldValue?: string,
+    newValue?: string,
+  ) {
+    super.attributeChangedCallback(name, _oldValue, newValue);
+    if (name === "min-characters-for-search") {
+      this.minCharNumberForSearch = Number.parseInt(newValue) ?? 0;
+    }
+  }
 
   configureTomSelect(defaultSettings: RecursivePartial<TomSettings>) {
-    const minCharNumberForSearch = 2;
     this.widget = new TomSelect(this.node, {
       ...defaultSettings,
       hideSelected: true,
@@ -85,7 +105,7 @@ export class UserAjaxSelect extends AjaxSelectBase {
       labelField: "display_name",
       searchField: [], // Disable local search filter and rely on tested backend
       shouldLoad: (query: string) => {
-        return query.length >= minCharNumberForSearch; // Avoid launching search with less than 2 characters
+        return query.length >= this.minCharNumberForSearch; // Avoid launching search with less than 2 characters
       },
       load: (query: string, callback: TomLoadCallback) => {
         userSearchUsers({
@@ -120,7 +140,7 @@ export class UserAjaxSelect extends AjaxSelectBase {
         },
         // biome-ignore lint/style/useNamingConvention: that's how it's defined
         not_loading: (data: TomOption, _sanitize: typeof escape_html) => {
-          return `<div class="no-results">${interpolate(gettext("You need to type %(number)s more characters"), { number: minCharNumberForSearch - data.input.length }, true)}</div>`;
+          return `<div class="no-results">${interpolate(gettext("You need to type %(number)s more characters"), { number: this.minCharNumberForSearch - data.input.length }, true)}</div>`;
         },
         // biome-ignore lint/style/useNamingConvention: that's how it's defined
         no_results: (_data: TomOption, _sanitize: typeof escape_html) => {
