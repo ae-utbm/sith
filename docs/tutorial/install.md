@@ -246,15 +246,3 @@ pytest core/tests/tests_core.py::TestUserRegistration
     tous les tests avant de push un commit.
 
 
-
-## Vérifier les dépendances Javascript
-
-Une commande a été écrite pour vérifier les éventuelles mises
-à jour à faire sur les librairies Javascript utilisées.
-N'oubliez pas de mettre à jour à la fois le fichier
-de la librairie, mais également sa version dans `sith/settings.py`.
-
-```bash
-# Vérifier les mises à jour
-python manage.py check_front
-```

@@ -19,7 +19,7 @@ from datetime import timezone as tz
 
 from django import forms
 from django.conf import settings
-from django.db import DataError, transaction
+from django.db import transaction
 from django.template import defaultfilters
 from django.urls import reverse_lazy
 from django.utils import dateparse, timezone
@@ -73,15 +73,15 @@ class LaunderetteBookView(CanViewMixin, DetailView):
         self.machines = {}
         with transaction.atomic():
             self.object = self.get_object()
-            if "slot_type" in request.POST.keys():
+            if "slot_type" in request.POST:
                 self.slot_type = request.POST["slot_type"]
-            if "slot" in request.POST.keys() and request.user.is_authenticated:
+            if "slot" in request.POST and request.user.is_authenticated:
                 self.subscriber = request.user
                 if self.subscriber.is_subscribed:
                     self.date = dateparse.parse_datetime(request.POST["slot"]).replace(
                         tzinfo=tz.utc
                     )
-                    if self.slot_type == "WASHING":
+                    if self.slot_type in ["WASHING", "DRYING"]:
                         if self.check_slot(self.slot_type):
                             Slot(
                                 user=self.subscriber,
@@ -89,30 +89,21 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                                 machine=self.machines[self.slot_type],
                                 type=self.slot_type,
                             ).save()
-                    elif self.slot_type == "DRYING":
-                        if self.check_slot(self.slot_type):
-                            Slot(
-                                user=self.subscriber,
-                                start_date=self.date,
-                                machine=self.machines[self.slot_type],
-                                type=self.slot_type,
-                            ).save()
-                    else:
-                        if self.check_slot("WASHING") and self.check_slot(
-                            "DRYING", self.date + timedelta(hours=1)
-                        ):
-                            Slot(
-                                user=self.subscriber,
-                                start_date=self.date,
-                                machine=self.machines["WASHING"],
-                                type="WASHING",
-                            ).save()
-                            Slot(
-                                user=self.subscriber,
-                                start_date=self.date + timedelta(hours=1),
-                                machine=self.machines["DRYING"],
-                                type="DRYING",
-                            ).save()
+                    elif self.check_slot("WASHING") and self.check_slot(
+                        "DRYING", self.date + timedelta(hours=1)
+                    ):
+                        Slot(
+                            user=self.subscriber,
+                            start_date=self.date,
+                            machine=self.machines["WASHING"],
+                            type="WASHING",
+                        ).save()
+                        Slot(
+                            user=self.subscriber,
+                            start_date=self.date + timedelta(hours=1),
+                            machine=self.machines["DRYING"],
+                            type="DRYING",
+                        ).save()
         return super().get(request, *args, **kwargs)
 
     def check_slot(self, machine_type, date=None):
@@ -149,14 +140,16 @@ class LaunderetteBookView(CanViewMixin, DetailView):
             ):
                 free = False
                 if (
-                    self.slot_type == "BOTH"
+                    (
+                        self.slot_type == "BOTH"
+                        and self.check_slot("WASHING", h)
+                        and self.check_slot("DRYING", h + timedelta(hours=1))
+                    )
+                    or self.slot_type == "WASHING"
                     and self.check_slot("WASHING", h)
-                    and self.check_slot("DRYING", h + timedelta(hours=1))
+                    or self.slot_type == "DRYING"
+                    and self.check_slot("DRYING", h)
                 ):
-                    free = True
-                elif self.slot_type == "WASHING" and self.check_slot("WASHING", h):
-                    free = True
-                elif self.slot_type == "DRYING" and self.check_slot("DRYING", h):
                     free = True
                 if free and datetime.now().replace(tzinfo=tz.utc) < h:
                     kwargs["planning"][date].append(h)
@@ -236,42 +229,39 @@ class ManageTokenForm(forms.Form):
         token_list = cleaned_data["tokens"].strip(" \n\r").split(" ")
         token_type = cleaned_data["token_type"]
         self.data = {}
+
+        if cleaned_data["action"] not in ["BACK", "ADD", "DEL"]:
+            return
+
+        tokens = list(
+            Token.objects.filter(
+                launderette=launderette, type=token_type, name__in=token_list
+            )
+        )
+        existing_names = {t.name for t in tokens}
+        if cleaned_data["action"] in ["BACK", "DEL"]:
+            for t in set(token_list) - existing_names:
+                self.add_error(
+                    None,
+                    _("Token %(token_name)s does not exists") % {"token_name": t},
+                )
         if cleaned_data["action"] == "BACK":
-            for t in token_list:
-                try:
-                    tok = Token.objects.filter(
-                        launderette=launderette, type=token_type, name=t
-                    ).first()
-                    tok.borrow_date = None
-                    tok.user = None
-                    tok.save()
-                except:
-                    self.add_error(
-                        None,
-                        _("Token %(token_name)s does not exists") % {"token_name": t},
-                    )
-        elif cleaned_data["action"] == "ADD":
-            for t in token_list:
-                try:
-                    Token(launderette=launderette, type=token_type, name=t).save()
-                except DataError as e:
-                    self.add_error(None, e)
-                except:
-                    self.add_error(
-                        None,
-                        _("Token %(token_name)s already exists") % {"token_name": t},
-                    )
+            Token.objects.filter(id__in=[t.id for t in tokens]).update(
+                borrow_date=None, user=None
+            )
         elif cleaned_data["action"] == "DEL":
+            Token.objects.filter(id__in=[t.id for t in tokens]).delete()
+        elif cleaned_data["action"] == "ADD":
+            for name in existing_names:
+                self.add_error(
+                    None,
+                    _("Token %(token_name)s already exists") % {"token_name": name},
+                )
             for t in token_list:
-                try:
-                    Token.objects.filter(
-                        launderette=launderette, type=token_type, name=t
-                    ).delete()
-                except:
-                    self.add_error(
-                        None,
-                        _("Token %(token_name)s does not exists") % {"token_name": t},
-                    )
+                if t == "":
+                    self.add_error(None, _("Token name can not be blank"))
+                else:
+                    Token(launderette=launderette, type=token_type, name=t).save()
 
 
 class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
@@ -288,13 +278,7 @@ class LaunderetteAdminView(CanEditPropMixin, BaseFormView, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = self.get_form()
         return super().post(request, *args, **kwargs)
-        form.launderette = self.object
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
 
     def form_valid(self, form):
         """We handle here the redirection, passing the user id of the asked customer."""
@@ -353,7 +337,7 @@ class LaunderetteMainClickView(CanEditMixin, BaseFormView, DetailView):
         kwargs["counter"] = self.object.counter
         kwargs["form"] = self.get_form()
         kwargs["barmen"] = [self.request.user]
-        if "last_basket" in self.request.session.keys():
+        if "last_basket" in self.request.session:
             kwargs["last_basket"] = self.request.session.pop("last_basket", None)
             kwargs["last_customer"] = self.request.session.pop("last_customer", None)
             kwargs["last_total"] = self.request.session.pop("last_total", None)
@@ -479,7 +463,7 @@ class LaunderetteClickView(CanEditMixin, DetailView, BaseFormView):
     def get_context_data(self, **kwargs):
         """We handle here the login form for the barman."""
         kwargs = super().get_context_data(**kwargs)
-        if "form" not in kwargs.keys():
+        if "form" not in kwargs:
             kwargs["form"] = self.get_form()
         kwargs["counter"] = self.object.counter
         kwargs["customer"] = self.customer
@@ -519,7 +503,7 @@ class MachineCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         ret = super().get_initial()
-        if "launderette" in self.request.GET.keys():
+        if "launderette" in self.request.GET:
             obj = Launderette.objects.filter(
                 id=int(self.request.GET["launderette"])
             ).first()

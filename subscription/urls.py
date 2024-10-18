@@ -15,7 +15,7 @@
 
 from django.urls import path
 
-from subscription.views import *
+from subscription.views import NewSubscription, SubscriptionsStatsView
 
 urlpatterns = [
     # Subscription views

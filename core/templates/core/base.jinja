@@ -5,6 +5,7 @@
       <title>{% block title %}{% trans %}Welcome!{% endtrans %}{% endblock %} - Association des Étudiants UTBM</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
+      <link rel="stylesheet" href="{{ static('user/user_stats.scss') }}">
       <link rel="stylesheet" href="{{ static('core/base.css') }}">
       <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
       <link rel="stylesheet" href="{{ static('core/style.scss') }}">
@@ -12,7 +13,6 @@
       <link rel="stylesheet" href="{{ static('core/header.scss') }}">
       <link rel="stylesheet" href="{{ static('core/navbar.scss') }}">
       <link rel="stylesheet" href="{{ static('core/pagination.scss') }}">
-      <link rel="stylesheet" href="{{ static('vendored/select2/select2.min.css') }}">
 
       {% block jquery_css %}
                 {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
@@ -26,8 +26,6 @@
       <script src="{{ static('webpack/jquery-index.js') }}"></script>
             <!-- Put here to always have access to those functions on django widgets -->
       <script src="{{ static('core/js/script.js') }}"></script>
-      <script defer src="{{ static('vendored/select2/select2.min.js') }}"></script>
-      <script defer src="{{ static('core/js/sith-select2.js') }}"></script>
 
 
 

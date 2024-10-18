@@ -160,7 +160,7 @@ class TestGalaxyView(TestCase):
         response = self.client.get(reverse("galaxy:user", args=[user.id]))
         self.assertContains(
             response,
-            f'<a onclick="focus_node(get_node_from_id({user.id}))">Reset on {user}</a>',
+            f'<a onclick="window.focusNode(window.getNodeFromId({user.id}))">Reset on {user}</a>',
             status_code=200,
         )
 

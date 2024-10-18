@@ -15,7 +15,16 @@
 
 from django.contrib import admin
 
-from accounting.models import *
+from accounting.models import (
+    AccountingType,
+    BankAccount,
+    ClubAccount,
+    Company,
+    GeneralJournal,
+    Label,
+    Operation,
+    SimplifiedAccountingType,
+)
 
 admin.site.register(BankAccount)
 admin.site.register(ClubAccount)

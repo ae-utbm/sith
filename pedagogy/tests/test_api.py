@@ -27,7 +27,10 @@ class TestUVSearch(TestCase):
                 semester="AUTUMN",
                 department="GI",
                 manager="francky",
-                title="Programmation Orientée Objet: Concepts fondamentaux et mise en pratique avec le langage C++",
+                title=(
+                    "Programmation Orientée Objet: "
+                    "Concepts fondamentaux et mise en pratique avec le langage C++"
+                ),
             ),
             uv_recipe.prepare(
                 code="MT01",
@@ -118,7 +121,7 @@ class TestUVSearch(TestCase):
             ("M", {"MT01", "MT10"}),
             ("mt", {"MT01", "MT10"}),
             ("MT", {"MT01", "MT10"}),
-            ("algèbre", {"MT01"}),  #  Title search case insensitive
+            ("algèbre", {"MT01"}),  # Title search case insensitive
             # Manager search
             ("moss", {"TNEV"}),
             ("francky", {"DA50", "AP4A"}),

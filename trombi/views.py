@@ -29,6 +29,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
@@ -75,7 +76,10 @@ class TrombiTabsMixin(TabedViewMixin):
                     "name": _("My pictures"),
                 }
             )
-        try:
+        if (
+            hasattr(self.request.user, "trombi_user")
+            and self.request.user.trombi_user.trombi
+        ):
             trombi = self.request.user.trombi_user.trombi
             if self.request.user.is_owner(trombi):
                 tab_list.append(
@@ -87,8 +91,6 @@ class TrombiTabsMixin(TabedViewMixin):
                         "name": _("Admin tools"),
                     }
                 )
-        except:
-            pass
         return tab_list
 
 
@@ -163,7 +165,7 @@ class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailVie
             try:
                 TrombiUser(user=form.cleaned_data["user"], trombi=self.object).save()
                 self.quick_notif_list.append("qn_success")
-            except:  # We don't care about duplicate keys
+            except IntegrityError:  # We don't care about duplicate keys
                 self.quick_notif_list.append("qn_fail")
         return super().get(request, *args, **kwargs)
 
@@ -239,12 +241,12 @@ class TrombiModerateCommentView(DetailView):
                 )
             elif request.POST["action"] == "reject":
                 return super().get(request, *args, **kwargs)
-            elif request.POST["action"] == "delete" and "reason" in request.POST.keys():
+            elif request.POST["action"] == "delete" and "reason" in request.POST:
                 self.object.author.user.email_user(
                     subject="[%s] %s" % (settings.SITH_NAME, _("Rejected comment")),
                     message=_(
-                        'Your comment to %(target)s on the Trombi "%(trombi)s" was rejected for the following '
-                        "reason: %(reason)s\n\n"
+                        'Your comment to %(target)s on the Trombi "%(trombi)s" '
+                        "was rejected for the following reason: %(reason)s\n\n"
                         "Your comment was:\n\n%(content)s"
                     )
                     % {
@@ -498,7 +500,7 @@ class TrombiCommentFormView(LoginRequiredMixin, View):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        if "user_id" in self.kwargs.keys():
+        if "user_id" in self.kwargs:
             kwargs["target"] = get_object_or_404(TrombiUser, id=self.kwargs["user_id"])
         else:
             kwargs["target"] = self.object.target

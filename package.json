@@ -7,6 +7,8 @@
     "compile": "webpack --mode production",
     "compile-dev": "webpack --mode development",
     "serve": "webpack --mode development --watch",
+    "analyse-dev": "webpack --config webpack.analyze.config.js --mode development",
+    "analyse-prod": "webpack --config webpack.analyze.config.js --mode production",
     "check": "biome check --write"
   },
   "keywords": [],
@@ -23,6 +25,8 @@
     "@babel/preset-env": "^7.25.4",
     "@biomejs/biome": "1.9.3",
     "@hey-api/openapi-ts": "^0.53.8",
+    "@types/alpinejs": "^3.13.10",
+    "@types/jquery": "^3.5.31",
     "babel-loader": "^9.2.1",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.0",
@@ -33,21 +37,29 @@
     "ts-loader": "^9.5.1",
     "typescript": "^5.6.3",
     "webpack": "^5.94.0",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@hey-api/client-fetch": "^0.4.0",
+    "@sentry/browser": "^8.34.0",
     "@zip.js/zip.js": "^2.7.52",
+    "3d-force-graph": "^1.73.4",
     "alpinejs": "^3.14.1",
+    "chart.js": "^4.4.4",
     "cytoscape": "^3.30.2",
     "cytoscape-cxtmenu": "^3.5.0",
     "cytoscape-klay": "^3.1.4",
+    "d3-force-3d": "^3.0.5",
     "easymde": "^2.18.0",
     "glob": "^11.0.0",
     "jquery": "^3.7.1",
     "jquery-ui": "^1.14.0",
     "jquery.shorten": "^1.0.0",
-    "native-file-system-adapter": "^3.0.1"
+    "native-file-system-adapter": "^3.0.1",
+    "three": "^0.169.0",
+    "three-spritetext": "^1.9.0",
+    "tom-select": "^2.3.1"
   }
 }

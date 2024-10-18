@@ -12,10 +12,12 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+import itertools
 import re
 from datetime import datetime, timedelta
 from datetime import timezone as tz
 from http import HTTPStatus
+from operator import attrgetter
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs
 
@@ -89,16 +91,10 @@ class CounterAdminMixin(View):
     edit_club = []
 
     def _test_group(self, user):
-        for grp_id in self.edit_group:
-            if user.is_in_group(pk=grp_id):
-                return True
-        return False
+        return any(user.is_in_group(pk=grp_id) for grp_id in self.edit_group)
 
     def _test_club(self, user):
-        for c in self.edit_club:
-            if c.can_be_edited_by(user):
-                return True
-        return False
+        return any(c.can_be_edited_by(user) for c in self.edit_club)
 
     def dispatch(self, request, *args, **kwargs):
         if not (
@@ -179,7 +175,7 @@ class CounterMain(
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         if self.object.type == "BAR" and not (
-            "counter_token" in self.request.session.keys()
+            "counter_token" in self.request.session
             and self.request.session["counter_token"] == self.object.token
         ):  # Check the token to avoid the bar to be stolen
             return HttpResponseRedirect(
@@ -217,7 +213,7 @@ class CounterMain(
             kwargs["barmen"] = self.object.barmen_list
         elif self.request.user.is_authenticated:
             kwargs["barmen"] = [self.request.user]
-        if "last_basket" in self.request.session.keys():
+        if "last_basket" in self.request.session:
             kwargs["last_basket"] = self.request.session.pop("last_basket")
             kwargs["last_customer"] = self.request.session.pop("last_customer")
             kwargs["last_total"] = self.request.session.pop("last_total")
@@ -292,7 +288,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         """Simple get view."""
-        if "basket" not in request.session.keys():  # Init the basket session entry
+        if "basket" not in request.session:  # Init the basket session entry
             request.session["basket"] = {}
             request.session["basket_total"] = 0
         request.session["not_enough"] = False  # Reset every variable
@@ -316,7 +312,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         ):  # Check that at least one barman is logged in
             return self.cancel(request)
         if self.object.type == "BAR" and not (
-            "counter_token" in self.request.session.keys()
+            "counter_token" in self.request.session
             and self.request.session["counter_token"] == self.object.token
         ):  # Also check the token to avoid the bar to be stolen
             return HttpResponseRedirect(
@@ -327,7 +323,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                 )
                 + "?bad_location"
             )
-        if "basket" not in request.session.keys():
+        if "basket" not in request.session:
             request.session["basket"] = {}
             request.session["basket_total"] = 0
         request.session["not_enough"] = False  # Reset every variable
@@ -384,13 +380,12 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     def get_total_quantity_for_pid(self, request, pid):
         pid = str(pid)
-        try:
-            return (
-                request.session["basket"][pid]["qty"]
-                + request.session["basket"][pid]["bonus_qty"]
-            )
-        except:
+        if pid not in request.session["basket"]:
             return 0
+        return (
+            request.session["basket"][pid]["qty"]
+            + request.session["basket"][pid]["bonus_qty"]
+        )
 
     def compute_record_product(self, request, product=None):
         recorded = 0
@@ -804,24 +799,40 @@ class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     current_tab = "products"
 
 
-class ProductArchivedListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+    model = Product
+    queryset = Product.objects.annotate(type_name=F("product_type__name"))
+    template_name = "counter/product_list.jinja"
+    ordering = [
+        F("product_type__priority").desc(nulls_last=True),
+        "product_type",
+        "name",
+    ]
+
+    def get_context_data(self, **kwargs):
+        res = super().get_context_data(**kwargs)
+        res["object_list"] = itertools.groupby(
+            res["object_list"], key=attrgetter("type_name")
+        )
+        return res
+
+
+class ArchivedProductListView(ProductListView):
     """A list view for the admins."""
 
-    model = Product
-    template_name = "counter/product_list.jinja"
-    queryset = Product.objects.filter(archived=True)
-    ordering = ["name"]
     current_tab = "archive"
 
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=True)
 
-class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+
+class ActiveProductListView(ProductListView):
     """A list view for the admins."""
 
-    model = Product
-    template_name = "counter/product_list.jinja"
-    queryset = Product.objects.filter(archived=False)
-    ordering = ["name"]
     current_tab = "products"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(archived=False)
 
 
 class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):

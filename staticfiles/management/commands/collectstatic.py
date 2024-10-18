@@ -28,10 +28,10 @@ class Command(CollectStatic):
     def collect_scss(self) -> list[Scss.CompileArg]:
         files: list[Scss.CompileArg] = []
         for finder in get_finders():
-            for path, storage in finder.list(
+            for path_str, storage in finder.list(
                 set(self.ignore_patterns) - set(IGNORE_PATTERNS_SCSS)
             ):
-                path = Path(path)
+                path = Path(path_str)
                 if path.suffix != ".scss":
                     continue
                 files.append(

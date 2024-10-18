@@ -182,7 +182,7 @@ class ClubAccountCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         ret = super().get_initial()
-        if "parent" in self.request.GET.keys():
+        if "parent" in self.request.GET:
             obj = BankAccount.objects.filter(id=int(self.request.GET["parent"])).first()
             if obj is not None:
                 ret["bank_account"] = obj.id
@@ -264,7 +264,7 @@ class JournalCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         ret = super().get_initial()
-        if "parent" in self.request.GET.keys():
+        if "parent" in self.request.GET:
             obj = ClubAccount.objects.filter(id=int(self.request.GET["parent"])).first()
             if obj is not None:
                 ret["club_account"] = obj.id
@@ -362,7 +362,7 @@ class OperationForm(forms.ModelForm):
 
     def clean(self):
         self.cleaned_data = super().clean()
-        if "target_type" in self.cleaned_data.keys():
+        if "target_type" in self.cleaned_data:
             if (
                 self.cleaned_data.get("user") is None
                 and self.cleaned_data.get("club") is None
@@ -633,19 +633,17 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
         ret = collections.OrderedDict()
         statement = collections.OrderedDict()
         total_sum = 0
-        for sat in [None] + list(
-            SimplifiedAccountingType.objects.order_by("label").all()
-        ):
+        for sat in [
+            None,
+            *list(SimplifiedAccountingType.objects.order_by("label")),
+        ]:
             amount = queryset.filter(
                 accounting_type__movement_type=movement_type, simpleaccounting_type=sat
             ).aggregate(amount_sum=Sum("amount"))["amount_sum"]
-            if sat:
-                sat = sat.label
-            else:
-                sat = ""
+            label = sat.label if sat is not None else ""
             if amount:
                 total_sum += amount
-                statement[sat] = amount
+                statement[label] = amount
         ret[movement_type] = statement
         ret[movement_type + "_sum"] = total_sum
         return ret
@@ -668,15 +666,12 @@ class JournalNatureStatementView(JournalTabsMixin, CanViewMixin, DetailView):
             self.statement(self.object.operations.filter(label=None).all(), "DEBIT")
         )
         statement[_("No label operations")] = no_label_statement
-        for l in labels:
+        for label in labels:
             l_stmt = collections.OrderedDict()
-            l_stmt.update(
-                self.statement(self.object.operations.filter(label=l).all(), "CREDIT")
-            )
-            l_stmt.update(
-                self.statement(self.object.operations.filter(label=l).all(), "DEBIT")
-            )
-            statement[l] = l_stmt
+            journals = self.object.operations.filter(label=label).all()
+            l_stmt.update(self.statement(journals, "CREDIT"))
+            l_stmt.update(self.statement(journals, "DEBIT"))
+            statement[label] = l_stmt
         return statement
 
     def get_context_data(self, **kwargs):
@@ -798,7 +793,7 @@ class LabelCreateView(
 
     def get_initial(self):
         ret = super().get_initial()
-        if "parent" in self.request.GET.keys():
+        if "parent" in self.request.GET:
             obj = ClubAccount.objects.filter(id=int(self.request.GET["parent"])).first()
             if obj is not None:
                 ret["club_account"] = obj.id

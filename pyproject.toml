@@ -65,7 +65,7 @@ optional = true
 # deps used for development purposes, but unneeded in prod
 django-debug-toolbar = "^4.4.6"
 ipython = "^8.26.0"
-pre-commit = "^3.8.0"
+pre-commit = "^4.0.1"
 ruff = "^0.6.9" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
 djhtml = "^3.0.6"
 faker = "^30.3.0"
@@ -77,14 +77,14 @@ freezegun = "^1.5.1"  # used to test time-dependent code
 pytest = "^8.3.2"
 pytest-cov = "^5.0.0"
 pytest-django = "^4.9.0"
-model-bakery = "^1.19.5"
+model-bakery = "^1.20.0"
 
 [tool.poetry.group.docs.dependencies]
 # deps used to work on the documentation
 mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.39"
-mkdocstrings = "^0.26.1"
-mkdocstrings-python = "^1.11.1"
+mkdocs-material = "^9.5.40"
+mkdocstrings = "^0.26.2"
+mkdocstrings-python = "^1.12.0"
 mkdocs-include-markdown-plugin = "^6.2.2"
 
 [tool.poetry.group.docs]
@@ -101,17 +101,30 @@ select = [
 	"A",  # shadowing of Python builtins
 	"B",
 	"C4",  # use comprehensions when possible
-	"I",  # isort
 	"DJ",  # django-specific rules,
-	"F401",  # unused import
+	"E",  # pycodestyle (https://docs.astral.sh/ruff/rules/#pycodestyle-e-w)
+	"ERA",  # commented code
+	"F",  # pyflakes (https://docs.astral.sh/ruff/rules/#pyflakes-f)
 	"FBT",  # boolean trap
+	"FLY",  # f-string instead of str.join
+	"FURB",  # https://docs.astral.sh/ruff/rules/#refurb-furb
+	"I",  # isort
+	"INT",  # gettext
+	"PERF",  # performance
+	"PLW",  # pylint warnings (https://docs.astral.sh/ruff/rules/#pylint-pl)
+	"RUF",  # Ruff specific rules
+	"SIM",  # simplify (https://docs.astral.sh/ruff/rules/#flake8-simplify-sim)
+	"T100", # breakpoint()
+	"T2",  # print statements
+	"TCH",  # type-checking block
     "UP008",  # Use super() instead of super(__class__, self)
     "UP009",  # utf-8 encoding declaration is unnecessary
-	"T2",  # print statements
 ]
 
 ignore = [
 	"DJ001",  # null=True in CharField/TextField. this one would require a migration
+	"E501",  # line too long. The rule is too harsh, and the formatter deals with it in most cases
+	"RUF012"  # mutable class attributes. This rule doesn't integrate well with django
 ]
 
 [tool.ruff.lint.pydocstyle]

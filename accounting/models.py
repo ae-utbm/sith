@@ -82,9 +82,7 @@ class Company(models.Model):
 
     def is_owned_by(self, user):
         """Check if that object can be edited by the given user."""
-        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        return False
+        return user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
 
     def can_be_edited_by(self, user):
         """Check if that object can be edited by the given user."""
@@ -127,9 +125,7 @@ class BankAccount(models.Model):
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
         m = self.club.get_membership_for(user)
-        if m is not None and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]:
-            return True
-        return False
+        return m is not None and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]
 
 
 class ClubAccount(models.Model):
@@ -161,29 +157,20 @@ class ClubAccount(models.Model):
         """Check if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
-        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        return False
+        return user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
 
     def can_be_edited_by(self, user):
         """Check if that object can be edited by the given user."""
         m = self.club.get_membership_for(user)
-        if m and m.role == settings.SITH_CLUB_ROLES_ID["Treasurer"]:
-            return True
-        return False
+        return m and m.role == settings.SITH_CLUB_ROLES_ID["Treasurer"]
 
     def can_be_viewed_by(self, user):
         """Check if that object can be viewed by the given user."""
         m = self.club.get_membership_for(user)
-        if m and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]:
-            return True
-        return False
+        return m and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]
 
     def has_open_journal(self):
-        for j in self.journals.all():
-            if not j.closed:
-                return True
-        return False
+        return self.journals.filter(closed=False).exists()
 
     def get_open_journal(self):
         return self.journals.filter(closed=False).first()
@@ -228,17 +215,13 @@ class GeneralJournal(models.Model):
             return False
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
-        if self.club_account.can_be_edited_by(user):
-            return True
-        return False
+        return self.club_account.can_be_edited_by(user)
 
     def can_be_edited_by(self, user):
         """Check if that object can be edited by the given user."""
         if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
             return True
-        if self.club_account.can_be_edited_by(user):
-            return True
-        return False
+        return self.club_account.can_be_edited_by(user)
 
     def can_be_viewed_by(self, user):
         return self.club_account.can_be_viewed_by(user)
@@ -416,9 +399,7 @@ class Operation(models.Model):
         if self.journal.closed:
             return False
         m = self.journal.club_account.club.get_membership_for(user)
-        if m is not None and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]:
-            return True
-        return False
+        return m is not None and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]
 
     def can_be_edited_by(self, user):
         """Check if that object can be edited by the given user."""
@@ -427,9 +408,7 @@ class Operation(models.Model):
         if self.journal.closed:
             return False
         m = self.journal.club_account.club.get_membership_for(user)
-        if m is not None and m.role == settings.SITH_CLUB_ROLES_ID["Treasurer"]:
-            return True
-        return False
+        return m is not None and m.role == settings.SITH_CLUB_ROLES_ID["Treasurer"]
 
 
 class AccountingType(models.Model):
@@ -472,9 +451,7 @@ class AccountingType(models.Model):
         """Check if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
-        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        return False
+        return user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
 
 
 class SimplifiedAccountingType(models.Model):

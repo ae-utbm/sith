@@ -17,6 +17,7 @@ from ajax_select import urls as ajax_select_urls
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import Http404
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 from ninja_extra import NinjaExtraAPI
@@ -71,19 +72,22 @@ if settings.DEBUG:
 
     urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
 
+
+def sentry_debug(request):
     """Sentry debug endpoint
-    
+
     This function always crash and allows us to test
-    the sentry configuration and the modal popup 
+    the sentry configuration and the modal popup
     displayed to users on production
-    
+
     The error will be displayed on Sentry
     inside the "development" environment
-    
+
     NOTE : you need to specify the SENTRY_DSN setting in settings_custom.py
     """
+    if settings.SENTRY_ENV != "development" or not settings.SENTRY_DSN:
+        raise Http404
+    _division_by_zero = 1 / 0
 
-    def raise_exception(request):
-        division_by_zero = 1 / 0
 
-    urlpatterns += [path("sentry-debug/", raise_exception)]
+urlpatterns += [path("sentry-debug/", sentry_debug, name="sentry-debug")]

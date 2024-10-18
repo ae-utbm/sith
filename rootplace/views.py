@@ -48,7 +48,8 @@ def __merge_subscriptions(u1: User, u2: User):
     Some examples :
     - if u1 is not subscribed, his subscription end date become the one of u2
     - if u1 is subscribed but not u2, nothing happen
-    - if u1 is subscribed for, let's say, 2 remaining months and u2 is subscribed for 3 remaining months,
+    - if u1 is subscribed for, let's say,
+      2 remaining months and u2 is subscribed for 3 remaining months,
     he shall then be subscribed for 5 months
     """
     last_subscription = (

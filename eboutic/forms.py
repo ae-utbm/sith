@@ -117,9 +117,7 @@ class BasketForm:
         """
         if not self.error_messages and not self.correct_items:
             self.clean()
-        if self.error_messages:
-            return False
-        return True
+        return not self.error_messages
 
     @cached_property
     def errors(self) -> list[str]:

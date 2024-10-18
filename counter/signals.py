@@ -51,7 +51,7 @@ def write_log(instance, operation_type):
         # Return None by default
         return None
 
-    log = OperationLog(
+    OperationLog(
         label=str(instance),
         operator=get_user(),
         operation_type=operation_type,

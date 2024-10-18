@@ -25,7 +25,14 @@
 from django.urls import path, register_converter
 
 from eboutic.converters import PaymentResultConverter
-from eboutic.views import *
+from eboutic.views import (
+    EbouticCommand,
+    EtransactionAutoAnswer,
+    e_transaction_data,
+    eboutic_main,
+    pay_with_sith,
+    payment_result,
+)
 
 register_converter(PaymentResultConverter, "res")
 

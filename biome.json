@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["core/static/vendored", "*.min.*", "staticfiles/generated"]
+    "ignore": ["*.min.*", "staticfiles/generated"]
   },
   "formatter": {
     "enabled": true,

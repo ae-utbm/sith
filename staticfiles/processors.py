@@ -66,7 +66,10 @@ class JS:
     @staticmethod
     def minify():
         to_exec = [
-            p for p in settings.STATIC_ROOT.rglob("*.js") if ".min" not in p.suffixes
+            p
+            for p in settings.STATIC_ROOT.rglob("*.js")
+            if ".min" not in p.suffixes
+            and (settings.STATIC_ROOT / "webpack") not in p.parents
         ]
         for path in to_exec:
             p = path.resolve()
@@ -80,7 +83,7 @@ class OpenApi:
 
     @classmethod
     def compile(cls):
-        """Compile a typescript client for the sith API. Only generates it if it changed"""
+        """Compile a TS client for the sith API. Only generates it if it changed."""
         logging.getLogger("django").info("Compiling open api typescript client")
         out = cls.OPENAPI_DIR / "schema.json"
         cls.OPENAPI_DIR.mkdir(parents=True, exist_ok=True)
@@ -107,4 +110,4 @@ class OpenApi:
         with open(out, "w") as f:
             _ = f.write(schema)
 
-        subprocess.run(["npx", "openapi-ts"]).check_returncode()
+        subprocess.run(["npx", "openapi-ts"], check=True)

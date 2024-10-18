@@ -15,7 +15,19 @@
 from django.contrib import admin
 from haystack.admin import SearchModelAdmin
 
-from counter.models import *
+from counter.models import (
+    AccountDump,
+    BillingInfo,
+    CashRegisterSummary,
+    Counter,
+    Customer,
+    Eticket,
+    Permanency,
+    Product,
+    ProductType,
+    Refilling,
+    Selling,
+)
 
 
 @admin.register(Product)

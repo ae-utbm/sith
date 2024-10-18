@@ -1,11 +1,13 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
+  <link rel="stylesheet" href="{{ static('webpack/ajax-select-index.css') }}">
   <link rel="stylesheet" href="{{ static('sas/css/picture.scss') }}">
 {%- endblock -%}
 
 {%- block additional_js -%}
-  <script defer src="{{ static("webpack/sas/viewer-index.js") }}"></script>
+  <script defer src="{{ static('webpack/ajax-select-index.ts') }}"></script>
+  <script defer src="{{ static("webpack/sas/viewer-index.ts") }}"></script>
 {%- endblock -%}
 
 {% block title %}
@@ -29,10 +31,10 @@
     <br>
 
     <template x-if="!currentPicture.is_moderated">
-      <div class="alert alert-red">
+      <div class="alert alert-red" @click="console.log(currentPicture)">
         <div class="alert-main">
-          <template x-if="currentPicture.askedForRemoval">
-            <span class="important">{% trans %}Asked for removal{% endtrans %}</span>
+          <template x-if="currentPicture.asked_for_removal">
+            <h3 class="alert-title">{% trans %}Asked for removal{% endtrans %}</h3>
           </template>
           <p>
             {% trans trimmed %}
@@ -40,16 +42,33 @@
               It will be hidden to other users until it has been moderated.
             {% endtrans %}
           </p>
+          <template x-if="currentPicture.asked_for_removal">
+            <div>
+              <h5 @click="console.log(currentPicture.moderationRequests)">
+                {% trans %}The following issues have been raised:{% endtrans %}
+              </h5>
+              <template x-for="req in (currentPicture.moderationRequests ?? [])" :key="req.id">
+                <div>
+                  <h6
+                    x-text="`${req.author.first_name} ${req.author.last_name}`"
+                  ></h6>
+                  <i x-text="Intl.DateTimeFormat(
+                             '{{ LANGUAGE_CODE }}',
+                             {dateStyle: 'long', timeStyle: 'short'}
+                             ).format(new Date(req.created_at))"></i>
+                  <blockquote x-text="`> ${req.reason}`"></blockquote>
+                </div>
+              </template>
+            </div>
+          </template>
         </div>
-        <div>
-          <div>
-            <button class="btn btn-blue" @click="moderatePicture()">
-              {% trans %}Moderate{% endtrans %}
-            </button>
-            <button class="btn btn-red" @click.prevent="deletePicture()">
-              {% trans %}Delete{% endtrans %}
-            </button>
-          </div>
+        <div class="alert-aside">
+          <button class="btn btn-blue" @click="moderatePicture()">
+            {% trans %}Moderate{% endtrans %}
+          </button>
+          <button class="btn btn-red" @click.prevent="deletePicture()">
+            {% trans %}Delete{% endtrans %}
+          </button>
           <p x-show="!!moderationError" x-text="moderationError"></p>
         </div>
       </div>
@@ -57,7 +76,6 @@
 
     <div class="container" id="pict">
       <div class="main">
-
         <div class="photo" :aria-busy="currentPicture.imageLoading">
           <img
             :src="currentPicture.compressed_url"
@@ -95,7 +113,9 @@
                   {% trans %}HD version{% endtrans %}
                 </a>
                 <br>
-                <a class="text danger" href="?ask_removal">{% trans %}Ask for removal{% endtrans %}</a>
+                <a class="text danger" :href="`/sas/picture/${currentPicture.id}/report`">
+                  {% trans %}Ask for removal{% endtrans %}
+                </a>
               </div>
               <div class="buttons">
                 <a class="button" :href="`/sas/picture/${currentPicture.id}/edit/`"><i class="fa-regular fa-pen-to-square edit-action"></i></a>
@@ -137,7 +157,12 @@
           <h5>{% trans %}People{% endtrans %}</h5>
           {% if user.was_subscribed %}
             <form @submit.prevent="submitIdentification" x-show="!!selector">
-              <select x-ref="search" multiple="multiple"></select>
+              <ajax-select
+                x-ref="search"
+                multiple
+                data-delay="300"
+                data-placeholder="{%- trans -%}Identify users on pictures{%- endtrans -%}"
+              ></ajax-select>
               <input type="submit" value="{% trans %}Go{% endtrans %}"/>
             </form>
           {% endif %}

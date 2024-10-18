@@ -21,9 +21,11 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import itertools
 
 # This file contains all the views that concern the user model
 from datetime import date, timedelta
+from operator import itemgetter
 from smtplib import SMTPException
 
 from django.conf import settings
@@ -253,8 +255,10 @@ class UserTabsMixin(TabedViewMixin):
                     "name": _("Groups"),
                 }
             )
-        try:
-            if user.customer and (
+        if (
+            hasattr(user, "customer")
+            and user.customer
+            and (
                 user == self.request.user
                 or self.request.user.is_in_group(
                     pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
@@ -264,25 +268,22 @@ class UserTabsMixin(TabedViewMixin):
                     + settings.SITH_BOARD_SUFFIX
                 )
                 or self.request.user.is_root
-            ):
-                tab_list.append(
-                    {
-                        "url": reverse("core:user_stats", kwargs={"user_id": user.id}),
-                        "slug": "stats",
-                        "name": _("Stats"),
-                    }
-                )
-                tab_list.append(
-                    {
-                        "url": reverse(
-                            "core:user_account", kwargs={"user_id": user.id}
-                        ),
-                        "slug": "account",
-                        "name": _("Account") + " (%s €)" % user.customer.amount,
-                    }
-                )
-        except:
-            pass
+            )
+        ):
+            tab_list.append(
+                {
+                    "url": reverse("core:user_stats", kwargs={"user_id": user.id}),
+                    "slug": "stats",
+                    "name": _("Stats"),
+                }
+            )
+            tab_list.append(
+                {
+                    "url": reverse("core:user_account", kwargs={"user_id": user.id}),
+                    "slug": "account",
+                    "name": _("Account") + " (%s €)" % user.customer.amount,
+                }
+            )
         return tab_list
 
 
@@ -665,9 +666,15 @@ class UserAccountView(UserAccountBase):
         kwargs["refilling_month"] = self.expense_by_month(
             Refilling.objects.filter(customer=self.object.customer)
         )
-        kwargs["invoices_month"] = self.expense_by_month(
-            Invoice.objects.filter(user=self.object)
-        )
+        kwargs["invoices_month"] = [
+            # the django ORM removes the `group by` clause in this query,
+            # so a little of post-processing is needed
+            {"grouped_date": key, "total": sum(i["total"] for i in group)}
+            for key, group in itertools.groupby(
+                self.expense_by_month(Invoice.objects.filter(user=self.object)),
+                key=itemgetter("grouped_date"),
+            )
+        ]
         kwargs["etickets"] = self.object.customer.buyings.exclude(product__eticket=None)
         return kwargs
 

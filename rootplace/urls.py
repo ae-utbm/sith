@@ -24,7 +24,11 @@
 
 from django.urls import path
 
-from rootplace.views import *
+from rootplace.views import (
+    DeleteAllForumUserMessagesView,
+    MergeUsersView,
+    OperationLogListView,
+)
 
 urlpatterns = [
     path("merge/", MergeUsersView.as_view(), name="merge"),
