@@ -712,63 +712,6 @@ a:not(.button) {
   }
 }
 
-
-.tomselected {
-  margin: 10px 0 !important;
-  max-width: 100%;
-  min-width: 100%;
-
-  ul {
-    margin: 0;
-  }
-
-  textarea {
-    background-color: inherit;
-  }
-
-  .select2-container--default {
-    color: black;
-  }
-}
-
-.ts-dropdown {
-
-  .select-item {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    align-items: center;
-
-    img {
-      height: 40px;
-      width: 40px;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-  }
-}
-
-.ts-control {
-
-  .item {
-    .fa-times {
-      margin-left: 5px;
-      margin-right: 5px;
-    }
-
-    cursor: pointer;
-    background-color: #e4e4e4;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    display: inline-block;
-    margin-left: 5px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    padding-right: 10px;
-  }
-
-}
-
 #news_details {
   display: inline-block;
   margin-top: 20px;
