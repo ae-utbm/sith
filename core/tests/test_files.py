@@ -143,6 +143,30 @@ class TestFileHandling(TestCase):
 
 
 @pytest.mark.django_db
+class TestFileModerationView:
+    """Test access to file moderation view"""
+
+    @pytest.mark.parametrize(
+        ("user_factory", "status_code"),
+        [
+            (lambda: None, 403),  # Anonymous user
+            (lambda: baker.make(User, is_superuser=True), 200),
+            (lambda: baker.make(User), 403),
+            (lambda: subscriber_user.make(), 403),
+            (lambda: old_subscriber_user.make(), 403),
+            (lambda: board_user.make(), 403),
+        ],
+    )
+    def test_view_access(
+        self, client: Client, user_factory: Callable[[], User | None], status_code: int
+    ):
+        user = user_factory()
+        if user:  # if None, then it's an anonymous user
+            client.force_login(user_factory())
+        assert client.get(reverse("core:file_moderation")).status_code == status_code
+
+
+@pytest.mark.django_db
 class TestUserProfilePicture:
     """Test interactions with user's profile picture."""
 
