@@ -12,11 +12,25 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from ninja_extra import ControllerBase, api_controller, route
+from typing import Annotated
 
-from core.api_permissions import CanView, IsRoot
-from counter.models import Counter
-from counter.schemas import CounterSchema
+from annotated_types import MinLen
+from django.db.models import Q
+from ninja import Query
+from ninja_extra import ControllerBase, api_controller, paginate, route
+from ninja_extra.pagination import PageNumberPaginationExtra
+from ninja_extra.schemas import PaginatedResponseSchema
+
+from core.api_permissions import CanAccessLookup, CanView, IsRoot
+from core.models import Group
+from core.schemas import GroupSchema
+from counter.models import Counter, Product
+from counter.schemas import (
+    CounterFilterSchema,
+    CounterSchema,
+    ProductSchema,
+    SimplifiedCounterSchema,
+)
 
 
 @api_controller("/counter")
@@ -37,3 +51,42 @@ class CounterController(ControllerBase):
         for c in counters:
             self.check_object_permissions(c)
         return counters
+
+    @route.get(
+        "/search",
+        response=PaginatedResponseSchema[SimplifiedCounterSchema],
+        permissions=[CanAccessLookup],
+    )
+    @paginate(PageNumberPaginationExtra, page_size=50)
+    def search_counter(self, filters: Query[CounterFilterSchema]):
+        return filters.filter(Counter.objects.all())
+
+
+@api_controller("/product")
+class ProductController(ControllerBase):
+    @route.get(
+        "/search",
+        response=PaginatedResponseSchema[ProductSchema],
+        permissions=[CanAccessLookup],
+    )
+    @paginate(PageNumberPaginationExtra, page_size=50)
+    def search_products(self, search: Annotated[str, MinLen(1)]):
+        return (
+            Product.objects.filter(
+                Q(name__icontains=search) | Q(code__icontains=search)
+            )
+            .filter(archived=False)
+            .values()
+        )
+
+
+@api_controller("/group")
+class GroupController(ControllerBase):
+    @route.get(
+        "/search",
+        response=PaginatedResponseSchema[GroupSchema],
+        permissions=[CanAccessLookup],
+    )
+    @paginate(PageNumberPaginationExtra, page_size=50)
+    def search_group(self, search: Annotated[str, MinLen(1)]):
+        return Group.objects.filter(name__icontains=search).values()

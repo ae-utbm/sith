@@ -30,7 +30,7 @@ class RightManagedLookupChannel(LookupChannel):
             raise PermissionDenied
 
 
-@register("users")
+@register("users")  # Migrated
 class UsersLookup(RightManagedLookupChannel):
     model = User
 
@@ -44,7 +44,7 @@ class UsersLookup(RightManagedLookupChannel):
         return item.get_display_name()
 
 
-@register("customers")
+@register("customers")  # Never used
 class CustomerLookup(RightManagedLookupChannel):
     model = Customer
 
@@ -58,7 +58,7 @@ class CustomerLookup(RightManagedLookupChannel):
         return f"{obj.user.get_display_name()} ({obj.account_id})"
 
 
-@register("groups")
+@register("groups")  # Migrated
 class GroupsLookup(RightManagedLookupChannel):
     model = Group
 
@@ -72,7 +72,7 @@ class GroupsLookup(RightManagedLookupChannel):
         return item.name
 
 
-@register("clubs")
+@register("clubs")  # Migrated
 class ClubLookup(RightManagedLookupChannel):
     model = Club
 
@@ -86,7 +86,7 @@ class ClubLookup(RightManagedLookupChannel):
         return item.name
 
 
-@register("counters")
+@register("counters")  # Migrated
 class CountersLookup(RightManagedLookupChannel):
     model = Counter
 
@@ -97,7 +97,7 @@ class CountersLookup(RightManagedLookupChannel):
         return item.name
 
 
-@register("products")
+@register("products")  # Migrated
 class ProductsLookup(RightManagedLookupChannel):
     model = Product
 
@@ -111,7 +111,7 @@ class ProductsLookup(RightManagedLookupChannel):
         return "%s (%s)" % (item.name, item.code)
 
 
-@register("files")
+@register("files")  # Migrated
 class SithFileLookup(RightManagedLookupChannel):
     model = SithFile
 
@@ -119,7 +119,7 @@ class SithFileLookup(RightManagedLookupChannel):
         return self.model.objects.filter(name__icontains=q)[:50]
 
 
-@register("club_accounts")
+@register("club_accounts")  # Migrated
 class ClubAccountLookup(RightManagedLookupChannel):
     model = ClubAccount
 
@@ -130,7 +130,7 @@ class ClubAccountLookup(RightManagedLookupChannel):
         return item.name
 
 
-@register("companies")
+@register("companies")  # Migrated
 class CompaniesLookup(RightManagedLookupChannel):
     model = Company
 

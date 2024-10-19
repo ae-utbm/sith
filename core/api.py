@@ -11,11 +11,15 @@ from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from club.models import Mailing
-from core.api_permissions import CanView, IsLoggedInCounter, IsOldSubscriber, IsRoot
-from core.models import User
+from core.api_permissions import (
+    CanAccessLookup,
+    CanView,
+)
+from core.models import SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,
     MarkdownSchema,
+    SithFileSchema,
     UserFamilySchema,
     UserFilterSchema,
     UserProfileSchema,
@@ -44,7 +48,7 @@ class MailingListController(ControllerBase):
         return data
 
 
-@api_controller("/user", permissions=[IsOldSubscriber | IsRoot | IsLoggedInCounter])
+@api_controller("/user", permissions=[CanAccessLookup])
 class UserController(ControllerBase):
     @route.get("", response=list[UserProfileSchema])
     def fetch_profiles(self, pks: Query[set[int]]):
@@ -60,6 +64,18 @@ class UserController(ControllerBase):
         return filters.filter(
             User.objects.order_by(F("last_login").desc(nulls_last=True))
         )
+
+
+@api_controller("/file")
+class SithFileController(ControllerBase):
+    @route.get(
+        "/search",
+        response=PaginatedResponseSchema[SithFileSchema],
+        permissions=[CanAccessLookup],
+    )
+    @paginate(PageNumberPaginationExtra, page_size=50)
+    def search_files(self, query: Annotated[str, annotated_types.MinLen(1)]):
+        return SithFile.objects.filter(is_in_sas=False).filter(name__icontains=query)
 
 
 DepthValue = Annotated[int, annotated_types.Ge(0), annotated_types.Le(10)]

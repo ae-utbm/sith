@@ -8,7 +8,7 @@ from haystack.query import SearchQuerySet
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import AliasChoices, Field
 
-from core.models import User
+from core.models import Group, SithFile, User
 
 
 class SimpleUserSchema(ModelSchema):
@@ -43,6 +43,18 @@ class UserProfileSchema(ModelSchema):
         if obj.profile_pict_id is None:
             return staticfiles_storage.url("core/img/unknown.jpg")
         return obj.profile_pict.get_download_url()
+
+
+class SithFileSchema(ModelSchema):
+    class Meta:
+        model = SithFile
+        fields = ["id", "name"]
+
+
+class GroupSchema(ModelSchema):
+    class Meta:
+        model = Group
+        fields = ["id", "name"]
 
 
 class UserFilterSchema(FilterSchema):
