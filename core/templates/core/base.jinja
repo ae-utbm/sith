@@ -21,6 +21,7 @@
       <link rel="preload" as="style" href="{{ static('webpack/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
       <noscript><link rel="stylesheet" href="{{ static('webpack/fontawesome-index.css') }}"></noscript>
 
+      <script src={{ static("webpack/core/components/include-index.ts") }}></script>
       <script src="{{ static('webpack/alpine-index.js') }}" defer></script>
             <!-- Jquery declared here to be accessible in every django widgets -->
       <script src="{{ static('webpack/jquery-index.js') }}"></script>

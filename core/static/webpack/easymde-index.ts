@@ -185,8 +185,8 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
 
 @registerComponent("markdown-input")
 class MarkdownInput extends inheritHtmlElement("textarea") {
-  constructor() {
-    super();
-    window.addEventListener("DOMContentLoaded", () => loadEasyMde(this.node));
+  connectedCallback() {
+    super.connectedCallback();
+    loadEasyMde(this.node);
   }
 }

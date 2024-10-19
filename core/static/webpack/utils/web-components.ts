@@ -30,8 +30,7 @@ export function inheritHtmlElement<K extends keyof HTMLElementTagNameMap>(tagNam
   return class Inherited extends HTMLElement {
     protected node: HTMLElementTagNameMap[K];
 
-    constructor() {
-      super();
+    connectedCallback(autoAddNode?: boolean) {
       this.node = document.createElement(tagName);
       const attributes: Attr[] = []; // We need to make a copy to delete while iterating
       for (const attr of this.attributes) {
@@ -44,7 +43,10 @@ export function inheritHtmlElement<K extends keyof HTMLElementTagNameMap>(tagNam
         this.removeAttributeNode(attr);
         this.node.setAttributeNode(attr);
       }
-      this.appendChild(this.node);
+      // Atuomatically add node to DOM if autoAddNode is true or unspecified
+      if (autoAddNode === undefined || autoAddNode) {
+        this.appendChild(this.node);
+      }
     }
   };
 }
