@@ -50,7 +50,7 @@ from core.views import (
     CanViewMixin,
     can_view,
 )
-from core.views.forms import MarkdownInput
+from core.views.widgets.markdown import MarkdownInput
 from forum.models import Forum, ForumMessage, ForumMessageMeta, ForumTopic
 
 

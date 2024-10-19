@@ -29,18 +29,14 @@ from captcha.fields import CaptchaField
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import (
     CheckboxSelectMultiple,
     DateInput,
     DateTimeInput,
-    SelectMultiple,
-    Textarea,
     TextInput,
 )
-from django.forms.widgets import Select
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
@@ -65,63 +61,6 @@ class SelectDate(DateInput):
         default = {"type": "date"}
         attrs = default if attrs is None else default | attrs
         super().__init__(attrs=attrs, format=format or "%Y-%m-%d")
-
-
-class MarkdownInput(Textarea):
-    template_name = "core/widgets/markdown_textarea.jinja"
-
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
-
-        context["statics"] = {
-            "js": staticfiles_storage.url("webpack/core/components/easymde-index.ts"),
-            "css": staticfiles_storage.url("webpack/core/components/easymde-index.css"),
-        }
-        return context
-
-
-class AutoCompleteSelectMixin:
-    component_name = "autocomplete-select"
-    template_name = "core/widgets/autocomplete_select.jinja"
-    is_ajax = False
-
-    def optgroups(self, name, value, attrs=None):
-        """Don't create option groups when doing ajax"""
-        if self.is_ajax:
-            return []
-        return super().optgroups(name, value, attrs=attrs)
-
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
-        context["component"] = self.component_name
-        context["statics"] = {
-            "js": staticfiles_storage.url(
-                "webpack/core/components/ajax-select-index.ts"
-            ),
-            "csss": [
-                staticfiles_storage.url(
-                    "webpack/core/components/ajax-select-index.css"
-                ),
-                staticfiles_storage.url("core/components/ajax-select.scss"),
-            ],
-        }
-        return context
-
-
-class AutoCompleteSelect(AutoCompleteSelectMixin, Select): ...
-
-
-class AutoCompleteSelectMultiple(AutoCompleteSelectMixin, SelectMultiple): ...
-
-
-class AutoCompleteSelectUser(AutoCompleteSelectMixin, Select):
-    component_name = "user-ajax-select"
-    is_ajax = True
-
-
-class AutoCompleteSelectMultipleUser(AutoCompleteSelectMixin, SelectMultiple):
-    component_name = "user-ajax-select"
-    is_ajax = True
 
 
 class NFCTextInput(TextInput):

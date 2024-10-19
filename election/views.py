@@ -11,12 +11,12 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
 from core.views import CanCreateMixin, CanEditMixin, CanViewMixin
-from core.views.forms import (
+from core.views.forms import SelectDateTime
+from core.views.widgets.markdown import MarkdownInput
+from core.views.widgets.select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultiple,
     AutoCompleteSelectUser,
-    MarkdownInput,
-    SelectDateTime,
 )
 from election.models import Candidature, Election, ElectionList, Role, Vote
 

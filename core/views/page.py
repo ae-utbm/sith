@@ -23,7 +23,8 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from core.models import LockError, Page, PageRev
 from core.views import CanCreateMixin, CanEditMixin, CanEditPropMixin, CanViewMixin
-from core.views.forms import MarkdownInput, PageForm, PagePropForm
+from core.views.forms import PageForm, PagePropForm
+from core.views.widgets.markdown import MarkdownInput
 
 
 class CanEditPagePropMixin(CanEditPropMixin):

@@ -25,7 +25,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
-from core.views.forms import MarkdownInput
+from core.views.widgets.markdown import MarkdownInput
 from pedagogy.models import UV, UVComment, UVCommentReport
 
 
