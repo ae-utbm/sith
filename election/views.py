@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-from ajax_select.fields import AutoCompleteSelectField
 from django import forms
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -13,7 +12,9 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 
 from core.views import CanCreateMixin, CanEditMixin, CanViewMixin
 from core.views.forms import (
+    AutoCompleteSelect,
     AutoCompleteSelectMultiple,
+    AutoCompleteSelectUser,
     MarkdownInput,
     SelectDateTime,
 )
@@ -54,11 +55,15 @@ class CandidateForm(forms.ModelForm):
     class Meta:
         model = Candidature
         fields = ["user", "role", "program", "election_list"]
-        widgets = {"program": MarkdownInput}
-
-    user = AutoCompleteSelectField(
-        "users", label=_("User to candidate"), help_text=None, required=True
-    )
+        labels = {
+            "user": _("User to candidate"),
+        }
+        widgets = {
+            "program": MarkdownInput,
+            "user": AutoCompleteSelectUser,
+            "role": AutoCompleteSelect,
+            "election_list": AutoCompleteSelect,
+        }
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop("election_id", None)
@@ -100,6 +105,7 @@ class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
         fields = ["title", "election", "description", "max_choice"]
+        widgets = {"election": AutoCompleteSelect}
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop("election_id", None)
@@ -123,6 +129,7 @@ class ElectionListForm(forms.ModelForm):
     class Meta:
         model = ElectionList
         fields = ("title", "election")
+        widgets = {"election": AutoCompleteSelect}
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop("election_id", None)
@@ -320,6 +327,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
         """Verify that the selected user is in candidate group."""
         obj = form.instance
         obj.election = Election.objects.get(id=self.election.id)
+        obj.user = obj.user if hasattr(obj, "user") else self.request.user
         if (obj.election.can_candidate(obj.user)) and (
             obj.user == self.request.user or self.can_edit
         ):

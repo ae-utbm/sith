@@ -3,8 +3,8 @@
   <link-once rel="stylesheet" type="text/css" href="{{ css }}" defer></link-once>
 {% endfor %}
 
-<autocomplete-select name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
+<{{ component }} name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
   <optgroup label="{{ group_name }}">{% endif %}{% for widget in group_choices %}
     {% include widget.template_name %}{% endfor %}{% if group_name %}
       </optgroup>{% endif %}{% endfor %}
-</autocomplete-select>
+</{{ component }}>
