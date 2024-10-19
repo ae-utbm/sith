@@ -11,7 +11,8 @@ import type {
 import type { escape_html } from "tom-select/dist/types/utils";
 import { type UserProfileSchema, userSearchUsers } from "#openapi";
 
-abstract class AjaxSelectBase extends inheritHtmlElement("select") {
+@registerComponent("autocomplete-select")
+class AutocompleteSelect extends inheritHtmlElement("select") {
   static observedAttributes = ["delay", "placeholder", "max"];
   public widget: TomSelect;
 
@@ -47,12 +48,12 @@ abstract class AjaxSelectBase extends inheritHtmlElement("select") {
     super();
 
     window.addEventListener("DOMContentLoaded", () => {
-      this.configureTomSelect(this.defaultTomSelectSettings());
-      this.setDefaultTomSelectBehaviors();
+      this.widget = new TomSelect(this.node, this.tomSelectSettings());
+      this.attachBehaviors();
     });
   }
 
-  private defaultTomSelectSettings(): RecursivePartial<TomSettings> {
+  protected tomSelectSettings(): RecursivePartial<TomSettings> {
     return {
       maxItems: this.max,
       loadThrottle: this.delay,
@@ -60,7 +61,7 @@ abstract class AjaxSelectBase extends inheritHtmlElement("select") {
     };
   }
 
-  private setDefaultTomSelectBehaviors() {
+  protected attachBehaviors() {
     // Allow removing selected items by clicking on them
     this.widget.on("item_select", (item: TomItem) => {
       this.widget.removeItem(item);
@@ -70,16 +71,14 @@ abstract class AjaxSelectBase extends inheritHtmlElement("select") {
       this.widget.setTextboxValue("");
     });
   }
-
-  abstract configureTomSelect(defaultSettings: RecursivePartial<TomSettings>): void;
 }
 
 @registerComponent("user-ajax-select")
-export class UserAjaxSelect extends AjaxSelectBase {
+export class UserAjaxSelect extends AutocompleteSelect {
   public filter?: <T>(items: T[]) => T[];
   static observedAttributes = [
     "min-characters-for-search",
-    ...AjaxSelectBase.observedAttributes,
+    ...AutocompleteSelect.observedAttributes,
   ];
 
   private minCharNumberForSearch = 2;
@@ -95,9 +94,9 @@ export class UserAjaxSelect extends AjaxSelectBase {
     }
   }
 
-  configureTomSelect(defaultSettings: RecursivePartial<TomSettings>) {
-    this.widget = new TomSelect(this.node, {
-      ...defaultSettings,
+  protected tomSelectSettings(): RecursivePartial<TomSettings> {
+    return {
+      ...super.tomSelectSettings(),
       hideSelected: true,
       diacritics: true,
       duplicates: false,
@@ -147,6 +146,6 @@ export class UserAjaxSelect extends AjaxSelectBase {
           return `<div class="no-results">${gettext("No results found")}</div>`;
         },
       },
-    });
+    };
   }
 }
