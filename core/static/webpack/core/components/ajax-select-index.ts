@@ -13,12 +13,18 @@ import { type UserProfileSchema, userSearchUsers } from "#openapi";
 
 @registerComponent("autocomplete-select")
 class AutocompleteSelect extends inheritHtmlElement("select") {
-  static observedAttributes = ["delay", "placeholder", "max"];
+  static observedAttributes = [
+    "delay",
+    "placeholder",
+    "max",
+    "min-characters-for-search",
+  ];
   public widget: TomSelect;
 
-  private delay: number | null = null;
-  private placeholder = "";
-  private max: number | null = null;
+  protected minCharNumberForSearch = 0;
+  protected delay: number | null = null;
+  protected placeholder = "";
+  protected max: number | null = null;
 
   protected attributeChangedCallback(
     name: string,
@@ -38,26 +44,59 @@ class AutocompleteSelect extends inheritHtmlElement("select") {
         this.max = Number.parseInt(newValue) ?? null;
         break;
       }
+      case "min-characters-for-search": {
+        this.minCharNumberForSearch = Number.parseInt(newValue) ?? 0;
+        break;
+      }
       default: {
         return;
       }
     }
   }
 
-  constructor() {
-    super();
-
-    window.addEventListener("DOMContentLoaded", () => {
-      this.widget = new TomSelect(this.node, this.tomSelectSettings());
-      this.attachBehaviors();
-    });
+  connectedCallback() {
+    super.connectedCallback();
+    // Collect all options nodes and put them into the select node
+    const options: Element[] = []; // We need to make a copy to delete while iterating
+    for (const child of this.children) {
+      if (child.tagName.toLowerCase() === "option") {
+        options.push(child);
+      }
+    }
+    for (const option of options) {
+      this.removeChild(option);
+      this.node.appendChild(option);
+    }
+    this.widget = new TomSelect(this.node, this.tomSelectSettings());
+    this.attachBehaviors();
   }
 
   protected tomSelectSettings(): RecursivePartial<TomSettings> {
     return {
-      maxItems: this.max,
+      maxItems: this.node.multiple ? this.max : 1,
       loadThrottle: this.delay,
       placeholder: this.placeholder,
+      shouldLoad: (query: string) => {
+        return query.length >= this.minCharNumberForSearch; // Avoid launching search with less than 2 characters
+      },
+      render: {
+        option: (item: TomOption, sanitize: typeof escape_html) => {
+          return `<div class="select-item">
+            <span class="select-item-text">${sanitize(item.text)}</span>
+          </div>`;
+        },
+        item: (item: TomOption, sanitize: typeof escape_html) => {
+          return `<span><i class="fa fa-times"></i>${sanitize(item.text)}</span>`;
+        },
+        // biome-ignore lint/style/useNamingConvention: that's how it's defined
+        not_loading: (data: TomOption, _sanitize: typeof escape_html) => {
+          return `<div class="no-results">${interpolate(gettext("You need to type %(number)s more characters"), { number: this.minCharNumberForSearch - data.input.length }, true)}</div>`;
+        },
+        // biome-ignore lint/style/useNamingConvention: that's how it's defined
+        no_results: (_data: TomOption, _sanitize: typeof escape_html) => {
+          return `<div class="no-results">${gettext("No results found")}</div>`;
+        },
+      },
     };
   }
 
@@ -76,23 +115,8 @@ class AutocompleteSelect extends inheritHtmlElement("select") {
 @registerComponent("user-ajax-select")
 export class UserAjaxSelect extends AutocompleteSelect {
   public filter?: <T>(items: T[]) => T[];
-  static observedAttributes = [
-    "min-characters-for-search",
-    ...AutocompleteSelect.observedAttributes,
-  ];
 
-  private minCharNumberForSearch = 2;
-
-  protected attributeChangedCallback(
-    name: string,
-    _oldValue?: string,
-    newValue?: string,
-  ) {
-    super.attributeChangedCallback(name, _oldValue, newValue);
-    if (name === "min-characters-for-search") {
-      this.minCharNumberForSearch = Number.parseInt(newValue) ?? 0;
-    }
-  }
+  protected minCharNumberForSearch = 2;
 
   protected tomSelectSettings(): RecursivePartial<TomSettings> {
     return {
@@ -103,9 +127,6 @@ export class UserAjaxSelect extends AutocompleteSelect {
       valueField: "id",
       labelField: "display_name",
       searchField: [], // Disable local search filter and rely on tested backend
-      shouldLoad: (query: string) => {
-        return query.length >= this.minCharNumberForSearch; // Avoid launching search with less than 2 characters
-      },
       load: (query: string, callback: TomLoadCallback) => {
         userSearchUsers({
           query: {
@@ -124,6 +145,7 @@ export class UserAjaxSelect extends AutocompleteSelect {
         });
       },
       render: {
+        ...super.tomSelectSettings().render,
         option: (item: UserProfileSchema, sanitize: typeof escape_html) => {
           return `<div class="select-item">
             <img
@@ -136,14 +158,6 @@ export class UserAjaxSelect extends AutocompleteSelect {
         },
         item: (item: UserProfileSchema, sanitize: typeof escape_html) => {
           return `<span><i class="fa fa-times"></i>${sanitize(item.display_name)}</span>`;
-        },
-        // biome-ignore lint/style/useNamingConvention: that's how it's defined
-        not_loading: (data: TomOption, _sanitize: typeof escape_html) => {
-          return `<div class="no-results">${interpolate(gettext("You need to type %(number)s more characters"), { number: this.minCharNumberForSearch - data.input.length }, true)}</div>`;
-        },
-        // biome-ignore lint/style/useNamingConvention: that's how it's defined
-        no_results: (_data: TomOption, _sanitize: typeof escape_html) => {
-          return `<div class="no-results">${gettext("No results found")}</div>`;
         },
       },
     };

@@ -36,9 +36,11 @@ from django.forms import (
     CheckboxSelectMultiple,
     DateInput,
     DateTimeInput,
+    SelectMultiple,
     Textarea,
     TextInput,
 )
+from django.forms.widgets import Select
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
@@ -72,10 +74,35 @@ class MarkdownInput(Textarea):
         context = super().get_context(name, value, attrs)
 
         context["statics"] = {
-            "js": staticfiles_storage.url("webpack/easymde-index.ts"),
-            "css": staticfiles_storage.url("webpack/easymde-index.css"),
+            "js": staticfiles_storage.url("webpack/core/components/easymde-index.ts"),
+            "css": staticfiles_storage.url("webpack/core/components/easymde-index.css"),
         }
         return context
+
+
+class AutoCompleteSelectMixin:
+    template_name = "core/widgets/autocomplete_select.jinja"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["statics"] = {
+            "js": staticfiles_storage.url(
+                "webpack/core/components/ajax-select-index.ts"
+            ),
+            "csss": [
+                staticfiles_storage.url(
+                    "webpack/core/components/ajax-select-index.css"
+                ),
+                staticfiles_storage.url("core/components/ajax-select.scss"),
+            ],
+        }
+        return context
+
+
+class AutoCompleteSelect(AutoCompleteSelectMixin, Select): ...
+
+
+class AutoCompleteSelectMultiple(AutoCompleteSelectMixin, SelectMultiple): ...
 
 
 class NFCTextInput(TextInput):
