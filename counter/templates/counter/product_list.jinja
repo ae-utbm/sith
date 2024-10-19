@@ -13,7 +13,7 @@
     <h4>{{ product_type or _("Uncategorized") }}</h4>
     <ul>
       {%- for product in products -%}
-        <li><a href="{{ url('counter:product_edit', product_id=product.id) }}">{{ product }} ({{ product.code }})</a></li>
+        <li><a href="{{ url('counter:product_edit', product_id=product.id) }}">{{ product.name }} ({{ product.code }})</a></li>
       {%- endfor -%}
     </ul>
   {%- else -%}
