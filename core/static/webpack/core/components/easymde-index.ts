@@ -13,16 +13,22 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
     element: textarea,
     spellChecker: false,
     autoDownloadFontAwesome: false,
-    previewRender: Alpine.debounce((plainText: string, preview: MarkdownInput) => {
-      const func = async (plainText: string, preview: MarkdownInput): Promise<null> => {
-        preview.innerHTML = (
-          await markdownRenderMarkdown({ body: { text: plainText } })
-        ).data as string;
+    previewRender: (plainText: string, preview: MarkdownInput) => {
+      /* This is wrapped this way to allow time for Alpine to be loaded on the page */
+      return Alpine.debounce((plainText: string, preview: MarkdownInput) => {
+        const func = async (
+          plainText: string,
+          preview: MarkdownInput,
+        ): Promise<null> => {
+          preview.innerHTML = (
+            await markdownRenderMarkdown({ body: { text: plainText } })
+          ).data as string;
+          return null;
+        };
+        func(plainText, preview);
         return null;
-      };
-      func(plainText, preview);
-      return null;
-    }, 300),
+      }, 300)(plainText, preview);
+    },
     forceSync: true, // Avoid validation error on generic create view
     toolbar: [
       {
@@ -187,6 +193,10 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
 class MarkdownInput extends inheritHtmlElement("textarea") {
   connectedCallback() {
     super.connectedCallback();
+    const initialValue = this.querySelector("slot[name='initial']");
+    if (initialValue as HTMLSlotElement) {
+      this.node.textContent = initialValue.textContent;
+    }
     loadEasyMde(this.node);
   }
 }
