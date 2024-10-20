@@ -112,11 +112,34 @@ class AutocompleteSelect extends inheritHtmlElement("select") {
   }
 }
 
-@registerComponent("user-ajax-select")
-export class UserAjaxSelect extends AutocompleteSelect {
-  public filter?: <T>(items: T[]) => T[];
-
+abstract class AjaxSelect extends AutocompleteSelect {
+  protected filter?: (items: TomOption[]) => TomOption[] = null;
   protected minCharNumberForSearch = 2;
+
+  protected abstract valueField: string;
+  protected abstract labelField: string;
+  protected abstract renderOption(
+    item: TomOption,
+    sanitize: typeof escape_html,
+  ): string;
+  protected abstract renderItem(item: TomOption, sanitize: typeof escape_html): string;
+  protected abstract search(query: string): Promise<TomOption[]>;
+
+  public setFilter(filter?: (items: TomOption[]) => TomOption[]) {
+    this.filter = filter;
+  }
+
+  protected getLoadFunction() {
+    // this will be replaced by TomSelect if we don't wrap it that way
+    return async (query: string, callback: TomLoadCallback) => {
+      const resp = await this.search(query);
+      if (this.filter) {
+        callback(this.filter(resp), []);
+      } else {
+        callback(resp, []);
+      }
+    };
+  }
 
   protected tomSelectSettings(): RecursivePartial<TomSettings> {
     return {
@@ -124,30 +147,37 @@ export class UserAjaxSelect extends AutocompleteSelect {
       hideSelected: true,
       diacritics: true,
       duplicates: false,
-      valueField: "id",
-      labelField: "display_name",
+      valueField: this.valueField,
+      labelField: this.labelField,
       searchField: [], // Disable local search filter and rely on tested backend
-      load: (query: string, callback: TomLoadCallback) => {
-        userSearchUsers({
-          query: {
-            search: query,
-          },
-        }).then((response) => {
-          if (response.data) {
-            if (this.filter) {
-              callback(this.filter(response.data.results), []);
-            } else {
-              callback(response.data.results, []);
-            }
-            return;
-          }
-          callback([], []);
-        });
-      },
+      load: this.getLoadFunction(),
       render: {
         ...super.tomSelectSettings().render,
-        option: (item: UserProfileSchema, sanitize: typeof escape_html) => {
-          return `<div class="select-item">
+        option: this.renderOption,
+        item: this.renderItem,
+      },
+    };
+  }
+}
+
+@registerComponent("user-ajax-select")
+export class UserAjaxSelect extends AjaxSelect {
+  protected valueField = "id";
+  protected labelField = "display_name";
+
+  protected async search(query: string): Promise<TomOption[]> {
+    const resp = await userSearchUsers({ query: { search: query } });
+    if (resp.data) {
+      return resp.data.results;
+    }
+    return [];
+  }
+  protected tomSelectSettings(): RecursivePartial<TomSettings> {
+    return super.tomSelectSettings();
+  }
+
+  protected renderOption(item: UserProfileSchema, sanitize: typeof escape_html) {
+    return `<div class="select-item">
             <img
               src="${sanitize(item.profile_pict)}"
               alt="${sanitize(item.display_name)}"
@@ -155,11 +185,9 @@ export class UserAjaxSelect extends AutocompleteSelect {
             />
             <span class="select-item-text">${sanitize(item.display_name)}</span>
           </div>`;
-        },
-        item: (item: UserProfileSchema, sanitize: typeof escape_html) => {
-          return `<span><i class="fa fa-times"></i>${sanitize(item.display_name)}</span>`;
-        },
-      },
-    };
+  }
+
+  protected renderItem(item: UserProfileSchema, sanitize: typeof escape_html) {
+    return `<span><i class="fa fa-times"></i>${sanitize(item.display_name)}</span>`;
   }
 }
