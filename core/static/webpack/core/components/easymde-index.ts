@@ -193,10 +193,6 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
 class MarkdownInput extends inheritHtmlElement("textarea") {
   connectedCallback() {
     super.connectedCallback();
-    const initialValue = this.querySelector("slot[name='initial']");
-    if (initialValue as HTMLSlotElement) {
-      this.node.textContent = initialValue.textContent;
-    }
     loadEasyMde(this.node);
   }
 }

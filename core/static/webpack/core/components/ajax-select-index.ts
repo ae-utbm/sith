@@ -60,12 +60,6 @@ class AutocompleteSelect extends inheritHtmlElement("select") {
 
   connectedCallback() {
     super.connectedCallback();
-    for (const option of Array.from(this.children).filter(
-      (child) => child.tagName.toLowerCase() === "option",
-    )) {
-      this.removeChild(option);
-      this.node.appendChild(option);
-    }
     this.widget = new TomSelect(this.node, this.tomSelectSettings());
     this.attachBehaviors();
   }
@@ -129,6 +123,7 @@ abstract class AjaxSelect extends AutocompleteSelect {
   protected abstract renderItem(item: TomOption, sanitize: typeof escape_html): string;
   protected abstract search(query: string): Promise<TomOption[]>;
 
+  private initialValues: TomOption[] = [];
   public setFilter(filter?: (items: TomOption[]) => TomOption[]) {
     this.filter = filter;
   }
@@ -176,13 +171,20 @@ abstract class AjaxSelect extends AutocompleteSelect {
     };
   }
 
+  connectedCallback() {
+    /* Capture initial values before they get moved to the inner node and overridden by tom-select */
+    this.initialValues = Array.from(this.children)
+      .filter((child) => child.tagName.toLowerCase() === "slot")
+      .map((slot) => JSON.parse(slot.innerHTML));
+
+    super.connectedCallback();
+  }
+
   protected attachBehaviors() {
     super.attachBehaviors();
 
     // Gather selected options, they must be added with slots like `<slot>json</slot>`
-    for (const value of Array.from(this.children)
-      .filter((child) => child.tagName.toLowerCase() === "slot")
-      .map((slot) => JSON.parse(slot.innerHTML))) {
+    for (const value of this.initialValues) {
       this.widget.addOption(value, false);
       this.widget.addItem(value[this.valueField]);
     }

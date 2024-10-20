@@ -2,8 +2,6 @@
   <script-once src="{{ statics.js }}" defer></script-once>
   <link-once rel="stylesheet" type="text/css" href="{{ statics.css }}" defer></link-once>
 
-    <markdown-input name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
-      <slot name="initial" style="display: none">{% if widget.value %}{{ widget.value }}{% endif %}</slot>
-    </markdown-input>
+    <markdown-input name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</markdown-input>
 
   </div>

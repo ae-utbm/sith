@@ -43,7 +43,11 @@ export function inheritHtmlElement<K extends keyof HTMLElementTagNameMap>(tagNam
         this.removeAttributeNode(attr);
         this.node.setAttributeNode(attr);
       }
-      // Atuomatically add node to DOM if autoAddNode is true or unspecified
+
+      this.node.innerHTML = this.innerHTML;
+      this.innerHTML = "";
+
+      // Automatically add node to DOM if autoAddNode is true or unspecified
       if (autoAddNode === undefined || autoAddNode) {
         this.appendChild(this.node);
       }
