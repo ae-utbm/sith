@@ -23,8 +23,6 @@
 import re
 from io import BytesIO
 
-from ajax_select import make_ajax_field
-from ajax_select.fields import AutoCompleteSelectField
 from captcha.fields import CaptchaField
 from django import forms
 from django.conf import settings
@@ -45,6 +43,12 @@ from PIL import Image
 from antispam.forms import AntiSpamEmailField
 from core.models import Gift, Page, SithFile, User
 from core.utils import resize_image
+from core.views.widgets.select import (
+    AutoCompleteSelect,
+    AutoCompleteSelectGroup,
+    AutoCompleteSelectMultipleGroup,
+    AutoCompleteSelectUser,
+)
 
 # Widgets
 
@@ -296,8 +300,12 @@ class UserGodfathersForm(forms.Form):
         ],
         label=_("Add"),
     )
-    user = AutoCompleteSelectField(
-        "users", required=True, label=_("Select user"), help_text=""
+    user = forms.ModelChoiceField(
+        label=_("Select user"),
+        help_text=None,
+        required=True,
+        widget=AutoCompleteSelectUser,
+        queryset=User.objects.all(),
     )
 
     def __init__(self, *args, user: User, **kwargs):
@@ -339,13 +347,12 @@ class PagePropForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = ["parent", "name", "owner_group", "edit_groups", "view_groups"]
-
-    edit_groups = make_ajax_field(
-        Page, "edit_groups", "groups", help_text="", label=_("edit groups")
-    )
-    view_groups = make_ajax_field(
-        Page, "view_groups", "groups", help_text="", label=_("view groups")
-    )
+        widgets = {
+            "parent": AutoCompleteSelect,
+            "owner_group": AutoCompleteSelectGroup,
+            "edit_groups": AutoCompleteSelectMultipleGroup,
+            "view_groups": AutoCompleteSelectMultipleGroup,
+        }
 
     def __init__(self, *arg, **kwargs):
         super().__init__(*arg, **kwargs)
@@ -357,13 +364,12 @@ class PageForm(forms.ModelForm):
     class Meta:
         model = Page
         fields = ["parent", "name", "owner_group", "edit_groups", "view_groups"]
-
-    edit_groups = make_ajax_field(
-        Page, "edit_groups", "groups", help_text="", label=_("edit groups")
-    )
-    view_groups = make_ajax_field(
-        Page, "view_groups", "groups", help_text="", label=_("view groups")
-    )
+        widgets = {
+            "parent": AutoCompleteSelect,
+            "owner_group": AutoCompleteSelectGroup,
+            "edit_groups": AutoCompleteSelectMultipleGroup,
+            "view_groups": AutoCompleteSelectMultipleGroup,
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
