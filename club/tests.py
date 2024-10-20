@@ -254,7 +254,7 @@ class TestClubModel(TestClub):
         self.client.force_login(self.root)
         response = self.client.post(
             self.members_url,
-            {"users": self.subscriber.id, "role": 3},
+            {"users": [self.subscriber.id], "role": 3},
         )
         self.assertRedirects(response, self.members_url)
         self.subscriber.refresh_from_db()
@@ -266,7 +266,7 @@ class TestClubModel(TestClub):
         response = self.client.post(
             self.members_url,
             {
-                "users": f"|{self.subscriber.id}|{self.krophil.id}|",
+                "users": (self.subscriber.id, self.krophil.id),
                 "role": 3,
             },
         )
@@ -330,7 +330,7 @@ class TestClubModel(TestClub):
         response = self.client.post(
             self.members_url,
             {
-                "users": f"|{self.subscriber.id}|{9999}|",
+                "users": (self.subscriber.id, 9999),
                 "start_date": "12/06/2016",
                 "role": 3,
             },
@@ -629,7 +629,7 @@ class TestMailingForm(TestCase):
             self.mail_url,
             {
                 "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
-                "subscription_users": "|%s|%s|" % (self.comunity.id, self.rbatsbak.id),
+                "subscription_users": (self.comunity.id, self.rbatsbak.id),
                 "subscription_mailing": Mailing.objects.get(email="mde").id,
             },
         )
@@ -715,16 +715,17 @@ class TestMailingForm(TestCase):
             self.mail_url,
             {
                 "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
-                "subscription_users": "|789|",
+                "subscription_users": [789],
                 "subscription_mailing": Mailing.objects.get(email="mde").id,
             },
         )
         assert response.status_code == 200
         self.assertInHTML(
-            _("One of the selected users doesn't exist"), response.content.decode()
+            _("You must specify at least an user or an email address"),
+            response.content.decode(),
         )
 
-        # An user has no email adress
+        # An user has no email address
         self.krophil.email = ""
         self.krophil.save()
 
@@ -782,8 +783,11 @@ class TestMailingForm(TestCase):
             self.mail_url,
             {
                 "action": MailingForm.ACTION_NEW_SUBSCRIPTION,
-                "subscription_users": "|%s|%s|%s|"
-                % (self.comunity.id, self.rbatsbak.id, self.krophil.id),
+                "subscription_users": (
+                    self.comunity.id,
+                    self.rbatsbak.id,
+                    self.krophil.id,
+                ),
                 "subscription_mailing": mde.id,
             },
         )
