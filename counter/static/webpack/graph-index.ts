@@ -25,8 +25,8 @@ interface EventInput {
   backgroundColor: string;
 }
 
-// TODO: Fix du look (bandes blanches dans la table, ...)
 // TODO: Semaines passées
+// TODO: Manage locales
 
 exportToHtml("loadChart", loadChart);
 
@@ -35,7 +35,7 @@ async function loadChart(options: ActivityChartConfig) {
     query: {
       counter: [options.counterId],
       // biome-ignore lint/style/useNamingConvention: backend API uses snake_case
-      start_date: options.startDate.toISOString(),
+      end_after: options.startDate.toISOString(),
     },
   } as PermanencyFetchPermananciesData);
 

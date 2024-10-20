@@ -23,8 +23,10 @@ class PermanencySchema(ModelSchema):
 
 
 class PermanencyFilterSchema(FilterSchema):
-    start_date: datetime | None = Field(None, q="start__gte")
-    end_date: datetime | None = Field(None, q="end__lte")
+    start_after: datetime | None = Field(None, q="start__gte")
+    start_before: datetime | None = Field(None, q="start__lte")
+    end_after: datetime | None = Field(None, q="end__gte")
+    end_before: datetime | None = Field(None, q="end__lte")
     counter: set[int] | None = Field(None, q="counter_id__in")
 
 
