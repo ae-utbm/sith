@@ -92,6 +92,8 @@ optional = true
 
 [tool.xapian]
 version = "1.4.25"
+core-sha1 = "e2b4b4cf6076873ec9402cab7b9a3b71dcf95e20"
+bindings-sha1 = "782f568d2ea3ca751c519a2814a35c7dc86df3a4"
 
 [tool.ruff]
 output-format = "concise" # makes ruff error logs easier to read
