@@ -3,7 +3,6 @@ import { inheritHtmlElement, registerComponent } from "#core:utils/web-component
 import TomSelect from "tom-select";
 import type {
   RecursivePartial,
-  TomItem,
   TomLoadCallback,
   TomOption,
   TomSettings,
@@ -71,14 +70,25 @@ class AutocompleteSelect extends inheritHtmlElement("select") {
     this.attachBehaviors();
   }
 
+  protected shouldLoad(query: string) {
+    console.log(this);
+    return query.length >= this.minCharNumberForSearch; // Avoid launching search with less than setup number of characters
+  }
+
   protected tomSelectSettings(): RecursivePartial<TomSettings> {
     return {
+      plugins: {
+        // biome-ignore lint/style/useNamingConvention: this is required by the api
+        remove_button: {
+          title: gettext("Remove"),
+        },
+      },
+      persist: false,
       maxItems: this.node.multiple ? this.max : 1,
+      closeAfterSelect: true,
       loadThrottle: this.delay,
       placeholder: this.placeholder,
-      shouldLoad: (query: string) => {
-        return query.length >= this.minCharNumberForSearch; // Avoid launching search with less than 2 characters
-      },
+      shouldLoad: (query: string) => this.shouldLoad(query), // wraps the method to avoid shadowing `this` by the one from tom-select
       render: {
         option: (item: TomOption, sanitize: typeof escape_html) => {
           return `<div class="select-item">
@@ -86,7 +96,7 @@ class AutocompleteSelect extends inheritHtmlElement("select") {
           </div>`;
         },
         item: (item: TomOption, sanitize: typeof escape_html) => {
-          return `<span><i class="fa fa-times"></i>${sanitize(item.text)}</span>`;
+          return `<span>${sanitize(item.text)}</span>`;
         },
         // biome-ignore lint/style/useNamingConvention: that's how it's defined
         not_loading: (data: TomOption, _sanitize: typeof escape_html) => {
@@ -101,14 +111,7 @@ class AutocompleteSelect extends inheritHtmlElement("select") {
   }
 
   protected attachBehaviors() {
-    // Allow removing selected items by clicking on them
-    this.widget.on("item_select", (item: TomItem) => {
-      this.widget.removeItem(item);
-    });
-    // Remove typed text once an item has been selected
-    this.widget.on("item_add", () => {
-      this.widget.setTextboxValue("");
-    });
+    /* Called once the widget has been initialized */
   }
 }
 
@@ -118,6 +121,8 @@ abstract class AjaxSelect extends AutocompleteSelect {
 
   protected abstract valueField: string;
   protected abstract labelField: string;
+  protected abstract searchField: string[];
+
   protected abstract renderOption(
     item: TomOption,
     sanitize: typeof escape_html,
@@ -129,16 +134,28 @@ abstract class AjaxSelect extends AutocompleteSelect {
     this.filter = filter;
   }
 
-  protected getLoadFunction() {
-    // this will be replaced by TomSelect if we don't wrap it that way
-    return async (query: string, callback: TomLoadCallback) => {
-      const resp = await this.search(query);
-      if (this.filter) {
-        callback(this.filter(resp), []);
-      } else {
-        callback(resp, []);
-      }
-    };
+  protected shouldLoad(query: string) {
+    const resp = super.shouldLoad(query);
+    /* Force order sync with backend if no client side filtering is set */
+    if (!resp && this.searchField.length === 0) {
+      this.widget.clearOptions();
+    }
+    return resp;
+  }
+
+  protected async loadFunction(query: string, callback: TomLoadCallback) {
+    /* Force order sync with backend if no client side filtering is set */
+    if (this.searchField.length === 0) {
+      this.widget.clearOptions();
+    }
+
+    const resp = await this.search(query);
+
+    if (this.filter) {
+      callback(this.filter(resp), []);
+    } else {
+      callback(resp, []);
+    }
   }
 
   protected tomSelectSettings(): RecursivePartial<TomSettings> {
@@ -149,8 +166,9 @@ abstract class AjaxSelect extends AutocompleteSelect {
       duplicates: false,
       valueField: this.valueField,
       labelField: this.labelField,
-      searchField: [], // Disable local search filter and rely on tested backend
-      load: this.getLoadFunction(),
+      searchField: this.searchField,
+      load: (query: string, callback: TomLoadCallback) =>
+        this.loadFunction(query, callback), // wraps the method to avoid shadowing `this` by the one from tom-select
       render: {
         ...super.tomSelectSettings().render,
         option: this.renderOption,
@@ -166,7 +184,7 @@ abstract class AjaxSelect extends AutocompleteSelect {
     for (const value of Array.from(this.children)
       .filter((child) => child.tagName.toLowerCase() === "slot")
       .map((slot) => JSON.parse(slot.innerHTML))) {
-      this.widget.addOption(value, true);
+      this.widget.addOption(value, false);
       this.widget.addItem(value[this.valueField]);
     }
   }
@@ -176,6 +194,7 @@ abstract class AjaxSelect extends AutocompleteSelect {
 export class UserAjaxSelect extends AjaxSelect {
   protected valueField = "id";
   protected labelField = "display_name";
+  protected searchField: string[] = []; // Disable local search filter and rely on tested backend
 
   protected async search(query: string): Promise<TomOption[]> {
     const resp = await userSearchUsers({ query: { search: query } });
@@ -197,7 +216,7 @@ export class UserAjaxSelect extends AjaxSelect {
   }
 
   protected renderItem(item: UserProfileSchema, sanitize: typeof escape_html) {
-    return `<span><i class="fa fa-times"></i>${sanitize(item.display_name)}</span>`;
+    return `<span>${sanitize(item.display_name)}</span>`;
   }
 }
 
@@ -205,6 +224,7 @@ export class UserAjaxSelect extends AjaxSelect {
 export class GroupsAjaxSelect extends AjaxSelect {
   protected valueField = "id";
   protected labelField = "name";
+  protected searchField = ["name"];
 
   protected async search(query: string): Promise<TomOption[]> {
     const resp = await groupSearchGroup({ query: { search: query } });
@@ -221,6 +241,6 @@ export class GroupsAjaxSelect extends AjaxSelect {
   }
 
   protected renderItem(item: GroupSchema, sanitize: typeof escape_html) {
-    return `<span><i class="fa fa-times"></i>${sanitize(item.name)}</span>`;
+    return `<span>${sanitize(item.name)}</span>`;
   }
 }
