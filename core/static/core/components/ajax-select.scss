@@ -1,10 +1,4 @@
 /* This also requires ajax-select-index.css */
-.tomselected {
-  .select2-container--default {
-    color: black;
-  }
-}
-
 .ts-dropdown {
 
   .select-item {
@@ -22,20 +16,22 @@
   }
 }
 
-.ts-control {
+.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove {
+  border-left: 1px solid black;
+}
 
-  .item {
-
-    cursor: pointer;
-    background-color: #e4e4e4;
-    border: 1px solid #aaa;
-    border-radius: 4px;
-    display: inline-block;
-    margin-left: 5px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    padding-right: 10px;
-    padding-left: 10px;
-  }
-
+.ts-wrapper.multi .ts-control [data-value] {
+  background-image: none;
+  cursor: pointer;
+  background-color: #e4e4e4;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  display: inline-block;
+  margin-left: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-right: 10px;
+  padding-left: 10px;
+  text-shadow: none;
+  box-shadow: none;
 }

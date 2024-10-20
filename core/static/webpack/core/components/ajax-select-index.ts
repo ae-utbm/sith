@@ -1,4 +1,4 @@
-import "tom-select/dist/css/tom-select.css";
+import "tom-select/dist/css/tom-select.default.css";
 import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import TomSelect from "tom-select";
 import type {
@@ -71,7 +71,6 @@ class AutocompleteSelect extends inheritHtmlElement("select") {
   }
 
   protected shouldLoad(query: string) {
-    console.log(this);
     return query.length >= this.minCharNumberForSearch; // Avoid launching search with less than setup number of characters
   }
 

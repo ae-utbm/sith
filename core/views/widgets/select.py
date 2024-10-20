@@ -39,6 +39,7 @@ class AutoCompleteSelectMixin:
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
+        context["widget"]["attrs"]["autocomplete"] = "off"
         context["component"] = self.component_name
         context["statics"] = {
             "js": [staticfiles_storage.url(file) for file in self.js],
