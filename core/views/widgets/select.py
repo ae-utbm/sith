@@ -14,6 +14,14 @@ class AutoCompleteSelectMixin:
     schema: ModelSchema | None = None
     pk = "id"
 
+    js = [
+        "webpack/core/components/ajax-select-index.ts",
+    ]
+    css = [
+        "webpack/core/components/ajax-select-index.css",
+        "core/components/ajax-select.scss",
+    ]
+
     def __init__(self, attrs=None, choices=()):
         if self.is_ajax:
             choices = ()  # Avoid computing anything when in ajax mode
@@ -33,15 +41,8 @@ class AutoCompleteSelectMixin:
         context = super().get_context(name, value, attrs)
         context["component"] = self.component_name
         context["statics"] = {
-            "js": staticfiles_storage.url(
-                "webpack/core/components/ajax-select-index.ts"
-            ),
-            "csss": [
-                staticfiles_storage.url(
-                    "webpack/core/components/ajax-select-index.css"
-                ),
-                staticfiles_storage.url("core/components/ajax-select.scss"),
-            ],
+            "js": [staticfiles_storage.url(file) for file in self.js],
+            "css": [staticfiles_storage.url(file) for file in self.css],
         }
         if self.is_ajax:
             context["selected"] = [
