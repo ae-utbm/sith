@@ -15,7 +15,7 @@ from core.views.forms import SelectDateTime
 from core.views.widgets.markdown import MarkdownInput
 from core.views.widgets.select import (
     AutoCompleteSelect,
-    AutoCompleteSelectMultiple,
+    AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectUser,
 )
 from election.models import Candidature, Election, ElectionList, Role, Vote
@@ -157,10 +157,10 @@ class ElectionForm(forms.ModelForm):
             "candidature_groups",
         ]
         widgets = {
-            "edit_groups": AutoCompleteSelectMultiple,
-            "view_groups": AutoCompleteSelectMultiple,
-            "vote_groups": AutoCompleteSelectMultiple,
-            "candidature_groups": AutoCompleteSelectMultiple,
+            "edit_groups": AutoCompleteSelectMultipleGroup,
+            "view_groups": AutoCompleteSelectMultipleGroup,
+            "vote_groups": AutoCompleteSelectMultipleGroup,
+            "candidature_groups": AutoCompleteSelectMultipleGroup,
         }
 
     start_date = forms.DateTimeField(

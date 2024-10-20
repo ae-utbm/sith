@@ -9,7 +9,12 @@ import type {
   TomSettings,
 } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
-import { type UserProfileSchema, userSearchUsers } from "#openapi";
+import {
+  type GroupSchema,
+  type UserProfileSchema,
+  groupSearchGroup,
+  userSearchUsers,
+} from "#openapi";
 
 @registerComponent("autocomplete-select")
 class AutocompleteSelect extends inheritHtmlElement("select") {
@@ -56,14 +61,9 @@ class AutocompleteSelect extends inheritHtmlElement("select") {
 
   connectedCallback() {
     super.connectedCallback();
-    // Collect all options nodes and put them into the select node
-    const options: Element[] = []; // We need to make a copy to delete while iterating
-    for (const child of this.children) {
-      if (child.tagName.toLowerCase() === "option") {
-        options.push(child);
-      }
-    }
-    for (const option of options) {
+    for (const option of Array.from(this.children).filter(
+      (child) => child.tagName.toLowerCase() === "option",
+    )) {
       this.removeChild(option);
       this.node.appendChild(option);
     }
@@ -158,6 +158,18 @@ abstract class AjaxSelect extends AutocompleteSelect {
       },
     };
   }
+
+  protected attachBehaviors() {
+    super.attachBehaviors();
+
+    // Gather selected options, they must be added with slots like `<slot>json</slot>`
+    for (const value of Array.from(this.children)
+      .filter((child) => child.tagName.toLowerCase() === "slot")
+      .map((slot) => JSON.parse(slot.innerHTML))) {
+      this.widget.addOption(value, true);
+      this.widget.addItem(value[this.valueField]);
+    }
+  }
 }
 
 @registerComponent("user-ajax-select")
@@ -171,9 +183,6 @@ export class UserAjaxSelect extends AjaxSelect {
       return resp.data.results;
     }
     return [];
-  }
-  protected tomSelectSettings(): RecursivePartial<TomSettings> {
-    return super.tomSelectSettings();
   }
 
   protected renderOption(item: UserProfileSchema, sanitize: typeof escape_html) {
@@ -189,5 +198,29 @@ export class UserAjaxSelect extends AjaxSelect {
 
   protected renderItem(item: UserProfileSchema, sanitize: typeof escape_html) {
     return `<span><i class="fa fa-times"></i>${sanitize(item.display_name)}</span>`;
+  }
+}
+
+@registerComponent("group-ajax-select")
+export class GroupsAjaxSelect extends AjaxSelect {
+  protected valueField = "id";
+  protected labelField = "name";
+
+  protected async search(query: string): Promise<TomOption[]> {
+    const resp = await groupSearchGroup({ query: { search: query } });
+    if (resp.data) {
+      return resp.data.results;
+    }
+    return [];
+  }
+
+  protected renderOption(item: GroupSchema, sanitize: typeof escape_html) {
+    return `<div class="select-item">
+            <span class="select-item-text">${sanitize(item.name)}</span>
+          </div>`;
+  }
+
+  protected renderItem(item: GroupSchema, sanitize: typeof escape_html) {
+    return `<span><i class="fa fa-times"></i>${sanitize(item.name)}</span>`;
   }
 }

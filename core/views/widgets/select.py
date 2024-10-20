@@ -1,11 +1,27 @@
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.db.models import Model
 from django.forms import Select, SelectMultiple
+from ninja import ModelSchema
+
+from core.models import Group, User
+from core.schemas import GroupSchema, UserProfileSchema
 
 
 class AutoCompleteSelectMixin:
     component_name = "autocomplete-select"
     template_name = "core/widgets/autocomplete_select.jinja"
-    is_ajax = False
+    model: Model | None = None
+    schema: ModelSchema | None = None
+    pk = "id"
+
+    def __init__(self, attrs=None, choices=()):
+        if self.is_ajax:
+            choices = ()  # Avoid computing anything when in ajax mode
+        super().__init__(attrs=attrs, choices=choices)
+
+    @property
+    def is_ajax(self):
+        return self.model and self.schema
 
     def optgroups(self, name, value, attrs=None):
         """Don't create option groups when doing ajax"""
@@ -27,6 +43,13 @@ class AutoCompleteSelectMixin:
                 staticfiles_storage.url("core/components/ajax-select.scss"),
             ],
         }
+        if self.is_ajax:
+            context["selected"] = [
+                self.schema.from_orm(obj).json()
+                for obj in self.model.objects.filter(
+                    **{f"{self.pk}__in": context["widget"]["value"]}
+                ).all()
+            ]
         return context
 
 
@@ -38,9 +61,23 @@ class AutoCompleteSelectMultiple(AutoCompleteSelectMixin, SelectMultiple): ...
 
 class AutoCompleteSelectUser(AutoCompleteSelectMixin, Select):
     component_name = "user-ajax-select"
-    is_ajax = True
+    model = User
+    schema = UserProfileSchema
 
 
 class AutoCompleteSelectMultipleUser(AutoCompleteSelectMixin, SelectMultiple):
     component_name = "user-ajax-select"
-    is_ajax = True
+    model = User
+    schema = UserProfileSchema
+
+
+class AutoCompleteSelectGroup(AutoCompleteSelectMixin, Select):
+    component_name = "group-ajax-select"
+    model = Group
+    schema = GroupSchema
+
+
+class AutoCompleteSelectMultipleGroup(AutoCompleteSelectMixin, SelectMultiple):
+    component_name = "group-ajax-select"
+    model = Group
+    schema = GroupSchema
