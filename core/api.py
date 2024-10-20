@@ -15,9 +15,10 @@ from core.api_permissions import (
     CanAccessLookup,
     CanView,
 )
-from core.models import SithFile, User
+from core.models import Group, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,
+    GroupSchema,
     MarkdownSchema,
     SithFileSchema,
     UserFamilySchema,
@@ -76,6 +77,18 @@ class SithFileController(ControllerBase):
     @paginate(PageNumberPaginationExtra, page_size=50)
     def search_files(self, query: Annotated[str, annotated_types.MinLen(1)]):
         return SithFile.objects.filter(is_in_sas=False).filter(name__icontains=query)
+
+
+@api_controller("/group")
+class GroupController(ControllerBase):
+    @route.get(
+        "/search",
+        response=PaginatedResponseSchema[GroupSchema],
+        permissions=[CanAccessLookup],
+    )
+    @paginate(PageNumberPaginationExtra, page_size=50)
+    def search_group(self, search: Annotated[str, annotated_types.MinLen(1)]):
+        return Group.objects.filter(name__icontains=search).values()
 
 
 DepthValue = Annotated[int, annotated_types.Ge(0), annotated_types.Le(10)]

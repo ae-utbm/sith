@@ -22,8 +22,6 @@ from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from core.api_permissions import CanAccessLookup, CanView, IsRoot
-from core.models import Group
-from core.schemas import GroupSchema
 from counter.models import Counter, Product
 from counter.schemas import (
     CounterFilterSchema,
@@ -78,15 +76,3 @@ class ProductController(ControllerBase):
             .filter(archived=False)
             .values()
         )
-
-
-@api_controller("/group")
-class GroupController(ControllerBase):
-    @route.get(
-        "/search",
-        response=PaginatedResponseSchema[GroupSchema],
-        permissions=[CanAccessLookup],
-    )
-    @paginate(PageNumberPaginationExtra, page_size=50)
-    def search_group(self, search: Annotated[str, MinLen(1)]):
-        return Group.objects.filter(name__icontains=search).values()

@@ -49,7 +49,15 @@ class AutoCompleteSelectMixin:
             context["selected"] = [
                 self.schema.from_orm(obj).json()
                 for obj in self.model.objects.filter(
-                    **{f"{self.pk}__in": context["widget"]["value"]}
+                    **{
+                        f"{self.pk}__in": [
+                            pk
+                            for pk in context["widget"]["value"]
+                            if str(
+                                pk
+                            ).isdigit()  # We filter empty values for create views
+                        ]
+                    }
                 ).all()
             ]
         return context
