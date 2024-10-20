@@ -22,3 +22,20 @@
     }
   }
 }
+
+#activityGraph {
+  th {
+    border: none;
+  }
+
+  .fc-col-header-cell-cushion {
+    color: white;
+  }
+
+  table table {
+    // the JS library puts tables inside the table
+    // Those additional tables must be hidden
+    border: none;
+    box-shadow: none;
+  }
+}
