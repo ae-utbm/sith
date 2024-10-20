@@ -75,8 +75,8 @@ class SithFileController(ControllerBase):
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
-    def search_files(self, query: Annotated[str, annotated_types.MinLen(1)]):
-        return SithFile.objects.filter(is_in_sas=False).filter(name__icontains=query)
+    def search_files(self, search: Annotated[str, annotated_types.MinLen(1)]):
+        return SithFile.objects.filter(is_in_sas=False).filter(name__icontains=search)
 
 
 @api_controller("/group")

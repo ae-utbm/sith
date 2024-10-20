@@ -4,8 +4,10 @@ import type { TomOption } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
 import {
   type GroupSchema,
+  type SithFileSchema,
   type UserProfileSchema,
   groupSearchGroup,
+  sithfileSearchFiles,
   userSearchUsers,
 } from "#openapi";
 
@@ -69,5 +71,30 @@ export class GroupsAjaxSelect extends AjaxSelect {
 
   protected renderItem(item: GroupSchema, sanitize: typeof escape_html) {
     return `<span>${sanitize(item.name)}</span>`;
+  }
+}
+
+@registerComponent("sith-file-ajax-select")
+export class SithFileAjaxSelect extends AjaxSelect {
+  protected valueField = "id";
+  protected labelField = "path";
+  protected searchField = ["path", "name"];
+
+  protected async search(query: string): Promise<TomOption[]> {
+    const resp = await sithfileSearchFiles({ query: { search: query } });
+    if (resp.data) {
+      return resp.data.results;
+    }
+    return [];
+  }
+
+  protected renderOption(item: SithFileSchema, sanitize: typeof escape_html) {
+    return `<div class="select-item">
+            <span class="select-item-text">${sanitize(item.path)}</span>
+          </div>`;
+  }
+
+  protected renderItem(item: SithFileSchema, sanitize: typeof escape_html) {
+    return `<span>${sanitize(item.path)}</span>`;
   }
 }

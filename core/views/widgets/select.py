@@ -3,8 +3,8 @@ from django.db.models import Model
 from django.forms import Select, SelectMultiple
 from ninja import ModelSchema
 
-from core.models import Group, User
-from core.schemas import GroupSchema, UserProfileSchema
+from core.models import Group, SithFile, User
+from core.schemas import GroupSchema, SithFileSchema, UserProfileSchema
 
 
 class AutoCompleteSelectMixin:
@@ -91,3 +91,15 @@ class AutoCompleteSelectMultipleGroup(AutoCompleteSelectMixin, SelectMultiple):
     component_name = "group-ajax-select"
     model = Group
     schema = GroupSchema
+
+
+class AutoCompleteSelectSithFile(AutoCompleteSelectMixin, Select):
+    component_name = "sith-file-ajax-select"
+    model = SithFile
+    schema = SithFileSchema
+
+
+class AutoCompleteSelectMultipleSithFile(AutoCompleteSelectMixin, SelectMultiple):
+    component_name = "sith-file-ajax-select"
+    model = SithFile
+    schema = SithFileSchema

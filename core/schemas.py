@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated
 
 from annotated_types import MinLen
@@ -49,6 +50,12 @@ class SithFileSchema(ModelSchema):
     class Meta:
         model = SithFile
         fields = ["id", "name"]
+
+    path: str
+
+    @staticmethod
+    def resolve_path(obj: SithFile) -> str:
+        return str(Path(obj.get_parent_path()) / obj.name)
 
 
 class GroupSchema(ModelSchema):
