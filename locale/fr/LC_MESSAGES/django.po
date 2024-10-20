@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-20 12:20+0200\n"
+"POT-Creation-Date: 2024-10-20 12:42+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3629,7 +3629,7 @@ msgstr "Produit parent"
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
-#: counter/management/commands/dump_warning_mail.py:112
+#: counter/management/commands/dump_warning_mail.py:113
 msgid "Clearing of your AE account"
 msgstr "Vidange de votre compte AE"
 
@@ -3926,6 +3926,18 @@ msgstr ""
 "l'adresse ae@utbm.fr avant la date susmentionnée."
 
 #: counter/templates/counter/account_dump_warning_mail.jinja:20
+msgid ""
+"Whatever you decide, you won't be expelled from the association, and you "
+"won't lose your rights. You will always be able to renew your subscription "
+"later. If you don't renew your subscription, there will be no consequences "
+"other than the loss of the money currently in your AE account."
+msgstr ""
+"Quel que soit votre décision, vous ne serez pas exclu.e de l'association "
+"et vous ne perdrez pas vos droits. Vous serez toujours en mesure de renouveler "
+"votre cotisation. Si vous ne renouvelez pas votre cotisation, il n'y aura "
+"aucune conséquence autre que le retrait de l'argent de votre compte."
+
+#: counter/templates/counter/account_dump_warning_mail.jinja:26
 msgid "Sincerely"
 msgstr "Cordialement"
 
