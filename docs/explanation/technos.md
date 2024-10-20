@@ -200,6 +200,19 @@ Grâce à son architecture, il est extrêmement
 bien adapté pour un usage dans un site multipage.
 C'est une technologie simple et puissante qui se veut comme le jQuery du web moderne.
 
+### Htmx
+
+[Site officiel](https://htmx.org/)
+
+En plus de AlpineJS, l’interactivité sur le site est augmenté via Htmx.
+C'est une librairie js qui s'utilise également au moyen d'attributs HTML à
+ajouter directement dans les templates.
+
+Son principe est de remplacer certains éléments du html par un fragment de
+HTML renvoyé par le serveur backend. Cela se mari très bien avec le
+fonctionnement de django et en particulier de ses formulaires afin d'éviter
+de doubler le travail pour la vérification des données.
+
 ### Sass
 
 [Site officiel](https://sass-lang.com/)

@@ -1,4 +1,16 @@
-{% extends "core/base.jinja" %}
+{% if is_fragment %}
+  {% extends "core/base_fragment.jinja" %}
+
+  {# Don't display tabs and errors #}
+  {% block tabs %}
+  {% endblock %}
+  {% block errors %}
+  {% endblock %}
+{% else %}
+  {% extends "core/base.jinja" %}
+{% endif %}
+
+{% from "core/macros.jinja" import paginate_htmx %}
 
 {% block title %}
   {% trans %}File moderation{% endtrans %}
@@ -7,8 +19,11 @@
 {% block content %}
   <h3>{% trans %}File moderation{% endtrans %}</h3>
   <div>
-    {% for f in files %}
-      <div style="margin: 2px; padding: 2px; border: solid 1px red; text-align: center">
+    {% for f in object_list %}
+      <div
+        id="file-{{ loop.index }}"
+        style="margin: 2px; padding: 2px; border: solid 1px red; text-align: center"
+      >
         {% if f.is_folder %}
           <strong>Folder</strong>
         {% else %}
@@ -20,9 +35,19 @@
           {% trans %}Owner: {% endtrans %}{{ f.owner.get_display_name() }}<br/>
           {% trans %}Date: {% endtrans %}{{ f.date|date(DATE_FORMAT) }} {{ f.date|time(TIME_FORMAT) }}<br/>
         </p>
-        <p><a href="{{ url('core:file_moderate', file_id=f.id) }}">{% trans %}Moderate{% endtrans %}</a> -
-          <a href="{{ url('core:file_delete', file_id=f.id) }}?next={{ url('core:file_moderation') }}">{% trans %}Delete{% endtrans %}</a></p>
+        <p><button
+          hx-get="{{ url('core:file_moderate', file_id=f.id) }}"
+          hx-target="#content"
+          hx-swap="outerHtml"
+        >{% trans %}Moderate{% endtrans %}</button> -
+          {% set current_page = url('core:file_moderation') + "?page=" + page_obj.number | string %}
+          <button
+            hx-get="{{ url('core:file_delete', file_id=f.id) }}?next={{ current_page | urlencode }}&previous={{ current_page | urlencode }}"
+            hx-target="#file-{{ loop.index }}"
+            hx-swap="outerHtml"
+          >{% trans %}Delete{% endtrans %}</button></p>
       </div>
     {% endfor %}
+    {{ paginate_htmx(page_obj, paginator) }}
   </div>
 {% endblock %}
