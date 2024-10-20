@@ -25,7 +25,6 @@ import logging
 import math
 from functools import partial
 
-from ajax_select import make_ajax_field
 from django import forms
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -43,6 +42,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from haystack.query import RelatedSearchQuerySet
 from honeypot.decorators import check_honeypot
 
+from club.widgets.select import AutoCompleteSelectClub
 from core.views import (
     CanCreateMixin,
     CanEditMixin,
@@ -51,6 +51,10 @@ from core.views import (
     can_view,
 )
 from core.views.widgets.markdown import MarkdownInput
+from core.views.widgets.select import (
+    AutoCompleteSelect,
+    AutoCompleteSelectMultipleGroup,
+)
 from forum.models import Forum, ForumMessage, ForumMessageMeta, ForumTopic
 
 
@@ -165,10 +169,15 @@ class ForumForm(forms.ModelForm):
             "edit_groups",
             "view_groups",
         ]
+        widgets = {
+            "edit_groups": AutoCompleteSelectMultipleGroup,
+            "view_groups": AutoCompleteSelectMultipleGroup,
+            "owner_club": AutoCompleteSelectClub,
+        }
 
-    edit_groups = make_ajax_field(Forum, "edit_groups", "groups", help_text="")
-    view_groups = make_ajax_field(Forum, "view_groups", "groups", help_text="")
-    parent = ForumNameField(Forum.objects.all())
+    parent = ForumNameField(
+        Forum.objects.all(), widget=AutoCompleteSelect, required=False
+    )
 
 
 class ForumCreateView(CanCreateMixin, CreateView):
