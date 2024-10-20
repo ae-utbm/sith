@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-20 11:06+0200\n"
+"POT-Creation-Date: 2024-10-20 12:20+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3629,7 +3629,7 @@ msgstr "Produit parent"
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
-#: counter/management/commands/dump_warning_mail.py:82
+#: counter/management/commands/dump_warning_mail.py:112
 msgid "Clearing of your AE account"
 msgstr "Vidange de votre compte AE"
 
