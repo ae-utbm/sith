@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 01:51+0200\n"
+"POT-Creation-Date: 2024-10-20 12:42+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3629,7 +3629,7 @@ msgstr "Produit parent"
 msgid "Buying groups"
 msgstr "Groupes d'achat"
 
-#: counter/management/commands/dump_warning_mail.py:82
+#: counter/management/commands/dump_warning_mail.py:113
 msgid "Clearing of your AE account"
 msgstr "Vidange de votre compte AE"
 
@@ -3883,48 +3883,61 @@ msgstr "uid"
 msgid "student cards"
 msgstr "cartes étudiante"
 
-#: counter/templates/counter/account_dump_warning_mail.jinja:6
+#: counter/templates/counter/account_dump_warning_mail.jinja:1
+msgid "Hello"
+msgstr "Bonjour"
+
+#: counter/templates/counter/account_dump_warning_mail.jinja:3
 #, python-format
 msgid ""
-"You received this email because your last subscription to the\n"
-"    Students' association ended on %(date)s."
+"You received this email because your last subscription to the Students' "
+"association ended on %(date)s."
 msgstr ""
 "Vous recevez ce mail car votre dernière cotisation à l'assocation des "
 "étudiants de l'UTBM s'est achevée le %(date)s."
 
-#: counter/templates/counter/account_dump_warning_mail.jinja:11
+#: counter/templates/counter/account_dump_warning_mail.jinja:6
 #, python-format
 msgid ""
-"In accordance with the Internal Regulations, the balance of any\n"
-"    inactive AE account for more than 2 years automatically goes back\n"
-"    to the AE.\n"
-"    The money present on your account will therefore be recovered in full\n"
-"    on %(date)s, for a total of %(amount)s €."
+"In accordance with the Internal Regulations, the balance of any inactive AE "
+"account for more than 2 years automatically goes back to the AE. The money "
+"present on your account will therefore be recovered in full on %(date)s, for "
+"a total of %(amount)s €."
 msgstr ""
 "Conformément au Règlement intérieur, le solde de tout compte AE inactif "
 "depuis plus de 2 ans revient de droit à l'AE. L'argent présent sur votre "
 "compte sera donc récupéré en totalité le %(date)s, pour un total de "
 "%(amount)s €. "
 
-#: counter/templates/counter/account_dump_warning_mail.jinja:19
+#: counter/templates/counter/account_dump_warning_mail.jinja:12
 msgid ""
-"However, if your subscription is renewed by this date,\n"
-"    your right to keep the money in your AE account will be renewed."
+"However, if your subscription is renewed by this date, your right to keep "
+"the money in your AE account will be renewed."
 msgstr ""
 "Cependant, si votre cotisation est renouvelée d'ici cette date, votre droit "
 "à conserver l'argent de votre compte AE sera renouvelé."
 
-#: counter/templates/counter/account_dump_warning_mail.jinja:25
+#: counter/templates/counter/account_dump_warning_mail.jinja:16
 msgid ""
-"You can also request a refund by sending an email to\n"
-"      <a href=\"mailto:ae@utbm.fr\">ae@utbm.fr</a>\n"
-"      before the aforementioned date."
+"You can also request a refund by sending an email to ae@utbm.fr before the "
+"aforementioned date."
 msgstr ""
 "Vous pouvez également effectuer une demande de remboursement par mail à "
-"l'adresse <a href=\"mailto:ae@utbm.fr\">ae@utbm.fr</a> avant la date "
-"susmentionnée."
+"l'adresse ae@utbm.fr avant la date susmentionnée."
 
-#: counter/templates/counter/account_dump_warning_mail.jinja:32
+#: counter/templates/counter/account_dump_warning_mail.jinja:20
+msgid ""
+"Whatever you decide, you won't be expelled from the association, and you "
+"won't lose your rights. You will always be able to renew your subscription "
+"later. If you don't renew your subscription, there will be no consequences "
+"other than the loss of the money currently in your AE account."
+msgstr ""
+"Quel que soit votre décision, vous ne serez pas exclu.e de l'association "
+"et vous ne perdrez pas vos droits. Vous serez toujours en mesure de renouveler "
+"votre cotisation. Si vous ne renouvelez pas votre cotisation, il n'y aura "
+"aucune conséquence autre que le retrait de l'argent de votre compte."
+
+#: counter/templates/counter/account_dump_warning_mail.jinja:26
 msgid "Sincerely"
 msgstr "Cordialement"
 
@@ -3997,7 +4010,7 @@ msgstr "Ce n'est pas un UID de carte étudiante valide"
 #: counter/templates/counter/invoices_call.jinja:16
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
-#: sas/templates/sas/picture.jinja:167
+#: sas/templates/sas/picture.jinja:166
 #: subscription/templates/subscription/stats.jinja:20
 msgid "Go"
 msgstr "Valider"
@@ -5384,7 +5397,7 @@ msgstr "Image précédente"
 msgid "People"
 msgstr "Personne(s)"
 
-#: sas/templates/sas/picture.jinja:165
+#: sas/templates/sas/picture.jinja:164
 msgid "Identify users on pictures"
 msgstr "Identifiez les utilisateurs sur les photos"
 
