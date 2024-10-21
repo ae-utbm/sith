@@ -1,3 +1,6 @@
+from typing import Annotated
+
+from annotated_types import MinLen
 from django.conf import settings
 from django.db.models import F
 from django.urls import reverse
@@ -9,10 +12,11 @@ from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
-from core.api_permissions import CanView, IsInGroup, IsRoot
+from core.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
 from core.models import Notification, User
-from sas.models import PeoplePictureRelation, Picture
+from sas.models import Album, PeoplePictureRelation, Picture
 from sas.schemas import (
+    AlbumSchema,
     IdentifiedUserSchema,
     ModerationRequestSchema,
     PictureFilterSchema,
@@ -20,6 +24,18 @@ from sas.schemas import (
 )
 
 IsSasAdmin = IsRoot | IsInGroup(settings.SITH_GROUP_SAS_ADMIN_ID)
+
+
+@api_controller("/sas/album")
+class AlbumController(ControllerBase):
+    @route.get(
+        "/search",
+        response=PaginatedResponseSchema[AlbumSchema],
+        permissions=[CanAccessLookup],
+    )
+    @paginate(PageNumberPaginationExtra, page_size=50)
+    def search_album(self, search: Annotated[str, MinLen(1)]):
+        return Album.objects.filter(name__icontains=search)
 
 
 @api_controller("/sas/picture")
