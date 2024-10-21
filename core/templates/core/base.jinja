@@ -7,7 +7,6 @@
       <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
       <link rel="stylesheet" href="{{ static('user/user_stats.scss') }}">
       <link rel="stylesheet" href="{{ static('core/base.css') }}">
-      <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
       <link rel="stylesheet" href="{{ static('core/style.scss') }}">
       <link rel="stylesheet" href="{{ static('core/markdown.scss') }}">
       <link rel="stylesheet" href="{{ static('core/header.scss') }}">
@@ -303,7 +302,6 @@
     {% endif %}
 
     {% block script %}
-      <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
       <script>
         function showMenu() {
           let navbar = document.getElementById("navbar-content");
