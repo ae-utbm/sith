@@ -15,7 +15,6 @@
 
 import collections
 
-from ajax_select.fields import AutoCompleteSelectField
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -39,6 +38,13 @@ from accounting.models import (
     Operation,
     SimplifiedAccountingType,
 )
+from accounting.widgets.select import (
+    AutoCompleteSelectClubAccount,
+    AutoCompleteSelectCompany,
+)
+from club.models import Club
+from club.widgets.select import AutoCompleteSelectClub
+from core.models import User
 from core.views import (
     CanCreateMixin,
     CanEditMixin,
@@ -47,6 +53,7 @@ from core.views import (
     TabedViewMixin,
 )
 from core.views.forms import SelectDate, SelectFile
+from core.views.widgets.select import AutoCompleteSelectUser
 from counter.models import Counter, Product, Selling
 
 # Main accounting view
@@ -334,12 +341,30 @@ class OperationForm(forms.ModelForm):
             "invoice": SelectFile,
         }
 
-    user = AutoCompleteSelectField("users", help_text=None, required=False)
-    club_account = AutoCompleteSelectField(
-        "club_accounts", help_text=None, required=False
+    user = forms.ModelChoiceField(
+        help_text=None,
+        required=False,
+        widget=AutoCompleteSelectUser,
+        queryset=User.objects.all(),
     )
-    club = AutoCompleteSelectField("clubs", help_text=None, required=False)
-    company = AutoCompleteSelectField("companies", help_text=None, required=False)
+    club_account = forms.ModelChoiceField(
+        help_text=None,
+        required=False,
+        widget=AutoCompleteSelectClubAccount,
+        queryset=ClubAccount.objects.all(),
+    )
+    club = forms.ModelChoiceField(
+        help_text=None,
+        required=False,
+        widget=AutoCompleteSelectClub,
+        queryset=Club.objects.all(),
+    )
+    company = forms.ModelChoiceField(
+        help_text=None,
+        required=False,
+        widget=AutoCompleteSelectCompany,
+        queryset=Company.objects.all(),
+    )
     need_link = forms.BooleanField(
         label=_("Link this operation to the target account"),
         required=False,
@@ -817,8 +842,12 @@ class LabelDeleteView(CanEditMixin, DeleteView):
 
 
 class CloseCustomerAccountForm(forms.Form):
-    user = AutoCompleteSelectField(
-        "users", label=_("Refound this account"), help_text=None, required=True
+    user = forms.ModelChoiceField(
+        label=_("Refound this account"),
+        help_text=None,
+        required=True,
+        widget=AutoCompleteSelectUser,
+        queryset=User.objects.all(),
     )
 
 
