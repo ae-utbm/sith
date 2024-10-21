@@ -47,7 +47,7 @@ class AutoCompleteSelectMixin:
         }
         if self.is_ajax:
             context["selected"] = [
-                self.schema.from_orm(obj).json()
+                self.schema.from_orm(obj).model_dump_json()
                 for obj in self.model.objects.filter(
                     **{
                         f"{self.pk}__in": [
@@ -69,37 +69,37 @@ class AutoCompleteSelect(AutoCompleteSelectMixin, Select): ...
 class AutoCompleteSelectMultiple(AutoCompleteSelectMixin, SelectMultiple): ...
 
 
-class AutoCompleteSelectUser(AutoCompleteSelectMixin, Select):
+class AutoCompleteSelectUser(AutoCompleteSelect):
     component_name = "user-ajax-select"
     model = User
     schema = UserProfileSchema
 
 
-class AutoCompleteSelectMultipleUser(AutoCompleteSelectMixin, SelectMultiple):
+class AutoCompleteSelectMultipleUser(AutoCompleteSelectMultiple):
     component_name = "user-ajax-select"
     model = User
     schema = UserProfileSchema
 
 
-class AutoCompleteSelectGroup(AutoCompleteSelectMixin, Select):
+class AutoCompleteSelectGroup(AutoCompleteSelect):
     component_name = "group-ajax-select"
     model = Group
     schema = GroupSchema
 
 
-class AutoCompleteSelectMultipleGroup(AutoCompleteSelectMixin, SelectMultiple):
+class AutoCompleteSelectMultipleGroup(AutoCompleteSelectMultiple):
     component_name = "group-ajax-select"
     model = Group
     schema = GroupSchema
 
 
-class AutoCompleteSelectSithFile(AutoCompleteSelectMixin, Select):
+class AutoCompleteSelectSithFile(AutoCompleteSelect):
     component_name = "sith-file-ajax-select"
     model = SithFile
     schema = SithFileSchema
 
 
-class AutoCompleteSelectMultipleSithFile(AutoCompleteSelectMixin, SelectMultiple):
+class AutoCompleteSelectMultipleSithFile(AutoCompleteSelectMultiple):
     component_name = "sith-file-ajax-select"
     model = SithFile
     schema = SithFileSchema

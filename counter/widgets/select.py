@@ -1,35 +1,33 @@
-from django.forms import Select, SelectMultiple
-
-from core.views.widgets.select import AutoCompleteSelectMixin
+from core.views.widgets.select import AutoCompleteSelect, AutoCompleteSelectMultiple
 from counter.models import Counter, Product
 from counter.schemas import ProductSchema, SimplifiedCounterSchema
 
-
-class CounterAutoCompleteSelectMixin(AutoCompleteSelectMixin):
-    js = [
-        "webpack/counter/components/ajax-select-index.ts",
-    ]
+_js = ["webpack/counter/components/ajax-select-index.ts"]
 
 
-class AutoCompleteSelectCounter(CounterAutoCompleteSelectMixin, Select):
+class AutoCompleteSelectCounter(AutoCompleteSelect):
     component_name = "counter-ajax-select"
     model = Counter
     schema = SimplifiedCounterSchema
+    js = _js
 
 
-class AutoCompleteSelectMultipleCounter(CounterAutoCompleteSelectMixin, SelectMultiple):
+class AutoCompleteSelectMultipleCounter(AutoCompleteSelectMultiple):
     component_name = "counter-ajax-select"
     model = Counter
     schema = SimplifiedCounterSchema
+    js = _js
 
 
-class AutoCompleteSelectProduct(CounterAutoCompleteSelectMixin, Select):
+class AutoCompleteSelectProduct(AutoCompleteSelect):
     component_name = "product-ajax-select"
     model = Product
     schema = ProductSchema
+    js = _js
 
 
-class AutoCompleteSelectMultipleProduct(CounterAutoCompleteSelectMixin, SelectMultiple):
+class AutoCompleteSelectMultipleProduct(AutoCompleteSelectMultiple):
     component_name = "product-ajax-select"
     model = Product
     schema = ProductSchema
+    js = _js
