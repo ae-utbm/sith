@@ -521,16 +521,6 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
-name = "django-ajax-selects"
-version = "2.2.1"
-description = "Edit ForeignKey, ManyToManyField and CharField in Django Admin using jQuery UI AutoComplete."
-optional = false
-python-versions = "*"
-files = [
-    {file = "django-ajax-selects-2.2.1.tar.gz", hash = "sha256:996ffb38dff1a621b358613afdf2681dbf261e5976da3c30a75e9b08fd81a887"},
-]
-
-[[package]]
 name = "django-countries"
 version = "7.6.1"
 description = "Provides a country field for Django models."
@@ -2691,4 +2681,4 @@ filelock = ">=3.4"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "cb47f6409e629d8369a19d82f44a57dbe9414c79e6e72bd88a6bcb34d78f0bc0"
+content-hash = "e64ed169395d2c32672a2f2ad6a40d0910e4a51941b564fbdc505db6332084d2"

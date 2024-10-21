@@ -1,14 +1,14 @@
 from typing import Any
 
-from ajax_select import make_ajax_field
-from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
 from core.views import MultipleImageField
 from core.views.forms import SelectDate
-from sas.models import Album, PeoplePictureRelation, Picture, PictureModerationRequest
+from core.views.widgets.select import AutoCompleteSelectMultipleGroup
+from sas.models import Album, Picture, PictureModerationRequest
+from sas.widgets.select import AutoCompleteSelectAlbum
 
 
 class SASForm(forms.Form):
@@ -62,34 +62,24 @@ class SASForm(forms.Form):
                 )
 
 
-class RelationForm(forms.ModelForm):
-    class Meta:
-        model = PeoplePictureRelation
-        fields = ["picture"]
-        widgets = {"picture": forms.HiddenInput}
-
-    users = AutoCompleteSelectMultipleField(
-        "users", show_help_text=False, help_text="", label=_("Add user"), required=False
-    )
-
-
 class PictureEditForm(forms.ModelForm):
     class Meta:
         model = Picture
         fields = ["name", "parent"]
-
-    parent = make_ajax_field(Picture, "parent", "files", help_text="")
+        widgets = {"parent": AutoCompleteSelectAlbum}
 
 
 class AlbumEditForm(forms.ModelForm):
     class Meta:
         model = Album
         fields = ["name", "date", "file", "parent", "edit_groups"]
+        widgets = {
+            "parent": AutoCompleteSelectAlbum,
+            "edit_groups": AutoCompleteSelectMultipleGroup,
+        }
 
     name = forms.CharField(max_length=Album.NAME_MAX_LENGTH, label=_("file name"))
     date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
-    parent = make_ajax_field(Album, "parent", "files", help_text="")
-    edit_groups = make_ajax_field(Album, "edit_groups", "groups", help_text="")
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 
 

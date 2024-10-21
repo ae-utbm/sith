@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated
 
 from annotated_types import MinLen
@@ -8,7 +9,7 @@ from haystack.query import SearchQuerySet
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import AliasChoices, Field
 
-from core.models import User
+from core.models import Group, SithFile, User
 
 
 class SimpleUserSchema(ModelSchema):
@@ -43,6 +44,24 @@ class UserProfileSchema(ModelSchema):
         if obj.profile_pict_id is None:
             return staticfiles_storage.url("core/img/unknown.jpg")
         return obj.profile_pict.get_download_url()
+
+
+class SithFileSchema(ModelSchema):
+    class Meta:
+        model = SithFile
+        fields = ["id", "name"]
+
+    path: str
+
+    @staticmethod
+    def resolve_path(obj: SithFile) -> str:
+        return str(Path(obj.get_parent_path()) / obj.name)
+
+
+class GroupSchema(ModelSchema):
+    class Meta:
+        model = Group
+        fields = ["id", "name"]
 
 
 class UserFilterSchema(FilterSchema):

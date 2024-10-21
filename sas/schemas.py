@@ -1,11 +1,24 @@
 from datetime import datetime
+from pathlib import Path
 
 from django.urls import reverse
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import Field, NonNegativeInt
 
 from core.schemas import SimpleUserSchema, UserProfileSchema
-from sas.models import Picture, PictureModerationRequest
+from sas.models import Album, Picture, PictureModerationRequest
+
+
+class AlbumSchema(ModelSchema):
+    class Meta:
+        model = Album
+        fields = ["id", "name"]
+
+    path: str
+
+    @staticmethod
+    def resolve_path(obj: Album) -> str:
+        return str(Path(obj.get_parent_path()) / obj.name)
 
 
 class PictureFilterSchema(FilterSchema):

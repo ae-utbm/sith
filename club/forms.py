@@ -22,7 +22,6 @@
 #
 #
 
-from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -30,6 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from club.models import Club, Mailing, MailingSubscription, Membership
 from core.models import User
 from core.views.forms import SelectDate, SelectDateTime
+from core.views.widgets.select import AutoCompleteSelectMultipleUser
 from counter.models import Counter
 
 
@@ -50,11 +50,12 @@ class MailingForm(forms.Form):
     ACTION_NEW_SUBSCRIPTION = 2
     ACTION_REMOVE_SUBSCRIPTION = 3
 
-    subscription_users = AutoCompleteSelectMultipleField(
-        "users",
+    subscription_users = forms.ModelMultipleChoiceField(
         label=_("Users to add"),
         help_text=_("Search users to add (one or more)."),
         required=False,
+        widget=AutoCompleteSelectMultipleUser,
+        queryset=User.objects.all(),
     )
 
     def __init__(self, club_id, user_id, mailings, *args, **kwargs):
@@ -111,12 +112,7 @@ class MailingForm(forms.Form):
         """Convert given users into real users and check their validity."""
         cleaned_data = super().clean()
         users = []
-        for user_id in cleaned_data["subscription_users"]:
-            user = User.objects.filter(id=user_id).first()
-            if not user:
-                raise forms.ValidationError(
-                    _("One of the selected users doesn't exist"), code="invalid"
-                )
+        for user in cleaned_data["subscription_users"]:
             if not user.email:
                 raise forms.ValidationError(
                     _("One of the selected users doesn't have an email address"),
@@ -180,11 +176,12 @@ class ClubMemberForm(forms.Form):
     error_css_class = "error"
     required_css_class = "required"
 
-    users = AutoCompleteSelectMultipleField(
-        "users",
+    users = forms.ModelMultipleChoiceField(
         label=_("Users to add"),
         help_text=_("Search users to add (one or more)."),
         required=False,
+        widget=AutoCompleteSelectMultipleUser,
+        queryset=User.objects.all(),
     )
 
     def __init__(self, *args, **kwargs):
@@ -238,12 +235,7 @@ class ClubMemberForm(forms.Form):
         """
         cleaned_data = super().clean()
         users = []
-        for user_id in cleaned_data["users"]:
-            user = User.objects.filter(id=user_id).first()
-            if not user:
-                raise forms.ValidationError(
-                    _("One of the selected users doesn't exist"), code="invalid"
-                )
+        for user in cleaned_data["users"]:
             if not user.is_subscribed:
                 raise forms.ValidationError(
                     _("User must be subscriber to take part to a club"), code="invalid"

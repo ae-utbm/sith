@@ -51,7 +51,8 @@ from core.views import (
     QuickNotifMixin,
     TabedViewMixin,
 )
-from core.views.forms import MarkdownInput, SelectDateTime
+from core.views.forms import SelectDateTime
+from core.views.widgets.markdown import MarkdownInput
 
 # Sith object
 

@@ -15,7 +15,6 @@
 
 import random
 
-from ajax_select.fields import AutoCompleteSelectField
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -25,6 +24,7 @@ from django.views.generic.edit import CreateView, FormView
 
 from core.models import User
 from core.views.forms import SelectDate, SelectDateTime
+from core.views.widgets.select import AutoCompleteSelectUser
 from subscription.models import Subscription
 
 
@@ -43,11 +43,11 @@ class SubscriptionForm(forms.ModelForm):
     class Meta:
         model = Subscription
         fields = ["member", "subscription_type", "payment_method", "location"]
-
-    member = AutoCompleteSelectField("users", required=False, help_text=None)
+        widgets = {"member": AutoCompleteSelectUser}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["member"].required = False
         self.fields |= forms.fields_for_model(
             User,
             fields=["first_name", "last_name", "email", "date_of_birth"],

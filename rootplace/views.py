@@ -23,7 +23,6 @@
 #
 import logging
 
-from ajax_select.fields import AutoCompleteSelectField
 from django import forms
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
@@ -35,6 +34,7 @@ from django.views.generic.edit import FormView
 
 from core.models import OperationLog, SithFile, User
 from core.views import CanEditPropMixin
+from core.views.widgets.select import AutoCompleteSelectUser
 from counter.models import Customer
 from forum.models import ForumMessageMeta
 
@@ -156,17 +156,29 @@ def delete_all_forum_user_messages(
 
 
 class MergeForm(forms.Form):
-    user1 = AutoCompleteSelectField(
-        "users", label=_("User that will be kept"), help_text=None, required=True
+    user1 = forms.ModelChoiceField(
+        label=_("User that will be kept"),
+        help_text=None,
+        required=True,
+        widget=AutoCompleteSelectUser,
+        queryset=User.objects.all(),
     )
-    user2 = AutoCompleteSelectField(
-        "users", label=_("User that will be deleted"), help_text=None, required=True
+    user2 = forms.ModelChoiceField(
+        label=_("User that will be deleted"),
+        help_text=None,
+        required=True,
+        widget=AutoCompleteSelectUser,
+        queryset=User.objects.all(),
     )
 
 
 class SelectUserForm(forms.Form):
-    user = AutoCompleteSelectField(
-        "users", label=_("User to be selected"), help_text=None, required=True
+    user = forms.ModelChoiceField(
+        label=_("User to be selected"),
+        help_text=None,
+        required=True,
+        widget=AutoCompleteSelectUser,
+        queryset=User.objects.all(),
     )
 
 

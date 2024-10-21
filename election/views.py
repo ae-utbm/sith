@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING
 
-from ajax_select import make_ajax_field
-from ajax_select.fields import AutoCompleteSelectField
 from django import forms
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -13,7 +11,13 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
 from core.views import CanCreateMixin, CanEditMixin, CanViewMixin
-from core.views.forms import MarkdownInput, SelectDateTime
+from core.views.forms import SelectDateTime
+from core.views.widgets.markdown import MarkdownInput
+from core.views.widgets.select import (
+    AutoCompleteSelect,
+    AutoCompleteSelectMultipleGroup,
+    AutoCompleteSelectUser,
+)
 from election.models import Candidature, Election, ElectionList, Role, Vote
 
 if TYPE_CHECKING:
@@ -51,11 +55,15 @@ class CandidateForm(forms.ModelForm):
     class Meta:
         model = Candidature
         fields = ["user", "role", "program", "election_list"]
-        widgets = {"program": MarkdownInput}
-
-    user = AutoCompleteSelectField(
-        "users", label=_("User to candidate"), help_text=None, required=True
-    )
+        labels = {
+            "user": _("User to candidate"),
+        }
+        widgets = {
+            "program": MarkdownInput,
+            "user": AutoCompleteSelectUser,
+            "role": AutoCompleteSelect,
+            "election_list": AutoCompleteSelect,
+        }
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop("election_id", None)
@@ -97,6 +105,7 @@ class RoleForm(forms.ModelForm):
     class Meta:
         model = Role
         fields = ["title", "election", "description", "max_choice"]
+        widgets = {"election": AutoCompleteSelect}
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop("election_id", None)
@@ -120,6 +129,7 @@ class ElectionListForm(forms.ModelForm):
     class Meta:
         model = ElectionList
         fields = ("title", "election")
+        widgets = {"election": AutoCompleteSelect}
 
     def __init__(self, *args, **kwargs):
         election_id = kwargs.pop("election_id", None)
@@ -146,23 +156,12 @@ class ElectionForm(forms.ModelForm):
             "vote_groups",
             "candidature_groups",
         ]
-
-    edit_groups = make_ajax_field(
-        Election, "edit_groups", "groups", help_text="", label=_("edit groups")
-    )
-    view_groups = make_ajax_field(
-        Election, "view_groups", "groups", help_text="", label=_("view groups")
-    )
-    vote_groups = make_ajax_field(
-        Election, "vote_groups", "groups", help_text="", label=_("vote groups")
-    )
-    candidature_groups = make_ajax_field(
-        Election,
-        "candidature_groups",
-        "groups",
-        help_text="",
-        label=_("candidature groups"),
-    )
+        widgets = {
+            "edit_groups": AutoCompleteSelectMultipleGroup,
+            "view_groups": AutoCompleteSelectMultipleGroup,
+            "vote_groups": AutoCompleteSelectMultipleGroup,
+            "candidature_groups": AutoCompleteSelectMultipleGroup,
+        }
 
     start_date = forms.DateTimeField(
         label=_("Start date"), widget=SelectDateTime, required=True
@@ -328,6 +327,7 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
         """Verify that the selected user is in candidate group."""
         obj = form.instance
         obj.election = Election.objects.get(id=self.election.id)
+        obj.user = obj.user if hasattr(obj, "user") else self.request.user
         if (obj.election.can_candidate(obj.user)) and (
             obj.user == self.request.user or self.can_edit
         ):

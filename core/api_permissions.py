@@ -127,9 +127,12 @@ class IsLoggedInCounter(BasePermission):
     """Check that a user is logged in a counter."""
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
-        if "/counter/" not in request.META["HTTP_REFERER"]:
+        if "/counter/" not in request.META.get("HTTP_REFERER", ""):
             return False
         token = request.session.get("counter_token")
         if not token:
             return False
         return Counter.objects.filter(token=token).exists()
+
+
+CanAccessLookup = IsOldSubscriber | IsRoot | IsLoggedInCounter
