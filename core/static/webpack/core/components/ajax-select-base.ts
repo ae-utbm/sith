@@ -165,9 +165,8 @@ export abstract class AjaxSelect extends AutoCompleteSelectBase {
 
   connectedCallback() {
     /* Capture initial values before they get moved to the inner node and overridden by tom-select */
-    this.initialValues = Array.from(this.children)
-      .filter((child: Element) => child.tagName.toLowerCase() === "slot")
-      .map((slot) => JSON.parse(slot.innerHTML));
+    const initial = this.querySelector("slot[name='initial']")?.textContent;
+    this.initialValues = initial ? JSON.parse(initial) : [];
 
     super.connectedCallback();
   }

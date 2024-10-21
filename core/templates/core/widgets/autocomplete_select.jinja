@@ -9,5 +9,5 @@
   <optgroup label="{{ group_name }}">{% endif %}{% for widget in group_choices %}
     {% include widget.template_name %}{% endfor %}{% if group_name %}
       </optgroup>{% endif %}{% endfor %}
-{% for sel in selected %}<slot style="display: none">{{ sel }}</slot>{% endfor %}
+{% if initial %}<slot style="display:none" name="initial">{{ initial }}</slot>{% endif %}
 </{{ component }}>

@@ -2,6 +2,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models import Model
 from django.forms import Select, SelectMultiple
 from ninja import ModelSchema
+from pydantic import TypeAdapter
 
 from core.models import Group, SithFile, User
 from core.schemas import GroupSchema, SithFileSchema, UserProfileSchema
@@ -46,20 +47,22 @@ class AutoCompleteSelectMixin:
             "css": [staticfiles_storage.url(file) for file in self.css],
         }
         if self.is_ajax:
-            context["selected"] = [
-                self.schema.from_orm(obj).model_dump_json()
-                for obj in self.model.objects.filter(
-                    **{
-                        f"{self.pk}__in": [
-                            pk
-                            for pk in context["widget"]["value"]
-                            if str(
+            adapter = TypeAdapter(list[self.schema])
+            context["initial"] = adapter.dump_json(
+                adapter.validate_python(
+                    self.model.objects.filter(
+                        **{
+                            f"{self.pk}__in": [
                                 pk
-                            ).isdigit()  # We filter empty values for create views
-                        ]
-                    }
-                ).all()
-            ]
+                                for pk in context["widget"]["value"]
+                                if str(
+                                    pk
+                                ).isdigit()  # We filter empty values for create views
+                            ]
+                        }
+                    ).all()
+                )
+            ).decode("utf-8")
         return context
 
 
