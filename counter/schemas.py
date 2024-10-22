@@ -27,6 +27,7 @@ class PermanencyFilterSchema(FilterSchema):
     start_before: datetime | None = Field(None, q="start__lte")
     end_after: datetime | None = Field(None, q="end__gte")
     end_before: datetime | None = Field(None, q="end__lte")
+    took_place_after: datetime | None = Field(None, q=["start__gte", "end__gte"])
     counter: set[int] | None = Field(None, q="counter_id__in")
 
 
