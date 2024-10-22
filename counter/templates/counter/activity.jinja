@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block additional_js %}
-  <script defer src="{{ static('webpack/graph-index.ts') }}"></script>
+  <script defer src="{{ static('webpack/counter/permanencies/time-grid-index.ts') }}"></script>
 {% endblock %}
 
 {%- block additional_css -%}
@@ -27,7 +27,7 @@
       {% endif %}
     </ul>
     <h4>{% trans %}Last weeks opening times{% endtrans %}</h4>
-    <div id="activityGraph"></div>
+    <div id="activityTimeGrid"></div>
     <br/>
     <br/>
   {% endif %}
@@ -49,8 +49,8 @@
   {{super()}}
   <script>
     window.addEventListener("DOMContentLoaded", () => {
-      loadChart({
-        canvas: document.getElementById("activityGraph"),
+      loadActivityTimeGrid({
+        canvas: document.getElementById("activityTimeGrid"),
         // sets the start day to 7 days ago
         startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
         counterId: {{ counter.id }},

@@ -3,12 +3,12 @@ import { exportToHtml } from "#core:utils/globals";
 import { Calendar } from "@fullcalendar/core";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import {
-  type PermanencyFetchPermananciesData,
+  type PermanencyFetchPermanenciesData,
   type PermanencySchema,
-  permanencyFetchPermanancies,
+  permanencyFetchPermanencies,
 } from "#openapi";
 
-interface ActivityChartConfig {
+interface ActivityTimeGridConfig {
   canvas: HTMLCanvasElement;
   startDate: Date;
   counterId: number;
@@ -27,18 +27,18 @@ interface EventInput {
   title?: string;
 }
 
-exportToHtml("loadChart", loadChart);
+exportToHtml("loadActivityTimeGrid", loadActivityTimeGrid);
 
-async function loadChart(options: ActivityChartConfig) {
-  const permanancies = await paginated(permanencyFetchPermanancies, {
+async function loadActivityTimeGrid(options: ActivityTimeGridConfig) {
+  const permanencies = await paginated(permanencyFetchPermanencies, {
     query: {
       counter: [options.counterId],
       // biome-ignore lint/style/useNamingConvention: backend API uses snake_case
       took_place_after: options.startDate.toISOString(),
     },
-  } as PermanencyFetchPermananciesData);
+  } as PermanencyFetchPermanenciesData);
 
-  const events = getEvents(permanancies);
+  const events = getEvents(permanencies);
 
   const calendar = new Calendar(options.canvas, {
     plugins: [timeGridPlugin],
@@ -59,7 +59,7 @@ async function loadChart(options: ActivityChartConfig) {
     if (options.startDate <= info.start) {
       return;
     }
-    const newPerms = await paginated(permanencyFetchPermanancies, {
+    const newPerms = await paginated(permanencyFetchPermanencies, {
       query: {
         counter: [options.counterId],
         // biome-ignore lint/style/useNamingConvention: backend API uses snake_case
@@ -67,10 +67,10 @@ async function loadChart(options: ActivityChartConfig) {
         // biome-ignore lint/style/useNamingConvention: backend API uses snake_case
         start_before: info.endStr,
       },
-    } as PermanencyFetchPermananciesData);
+    } as PermanencyFetchPermanenciesData);
     options.startDate = info.start;
     calendar.addEventSource(getEvents(newPerms, false));
-    permanancies.push(...newPerms);
+    permanencies.push(...newPerms);
     calendar.render();
   });
 }
@@ -83,41 +83,41 @@ function roundToQuarter(date: Date, ceil: boolean) {
   return result;
 }
 
-function convertPermanancyToOpeningTime(permanancy: PermanencySchema): OpeningTime {
+function convertPermanencyToOpeningTime(permanency: PermanencySchema): OpeningTime {
   return {
-    start: roundToQuarter(new Date(permanancy.start), false),
-    end: roundToQuarter(new Date(permanancy.end ?? Date.now()), true),
+    start: roundToQuarter(new Date(permanency.start), false),
+    end: roundToQuarter(new Date(permanency.end ?? Date.now()), true),
   };
 }
 
-function getOpeningTimes(rawPermanancies: PermanencySchema[]) {
-  const permanancies = rawPermanancies
-    .map(convertPermanancyToOpeningTime)
+function getOpeningTimes(rawPermanencies: PermanencySchema[]) {
+  const permanencies = rawPermanencies
+    .map(convertPermanencyToOpeningTime)
     .sort((a, b) => a.start.getTime() - b.start.getTime());
 
   const openingTimes: OpeningTime[] = [];
 
-  for (const permanancy of permanancies) {
+  for (const permanency of permanencies) {
     // if there are no opening times, add the first one
     if (openingTimes.length === 0) {
-      openingTimes.push(permanancy);
+      openingTimes.push(permanency);
     } else {
-      const lastPermanancy = openingTimes[openingTimes.length - 1];
-      // if the new permanancy starts before the 15 minutes following the end of the last one, merge them
-      if (permanancy.start <= lastPermanancy.end) {
-        lastPermanancy.end = new Date(
-          Math.max(lastPermanancy.end.getTime(), permanancy.end.getTime()),
+      const lastPermanency = openingTimes[openingTimes.length - 1];
+      // if the new permanency starts before the 15 minutes following the end of the last one, merge them
+      if (permanency.start <= lastPermanency.end) {
+        lastPermanency.end = new Date(
+          Math.max(lastPermanency.end.getTime(), permanency.end.getTime()),
         );
       } else {
-        openingTimes.push(permanancy);
+        openingTimes.push(permanency);
       }
     }
   }
   return openingTimes;
 }
 
-function getEvents(permanancies: PermanencySchema[], currentWeek = true): EventInput[] {
-  const openingTimes = getOpeningTimes(permanancies);
+function getEvents(permanencies: PermanencySchema[], currentWeek = true): EventInput[] {
+  const openingTimes = getOpeningTimes(permanencies);
   const events: EventInput[] = [];
   for (const openingTime of openingTimes) {
     let shift = false;
@@ -125,7 +125,7 @@ function getEvents(permanancies: PermanencySchema[], currentWeek = true): EventI
       const lastMonday = getLastMonday();
       shift = openingTime.end < lastMonday;
     }
-    // if permanancies took place last week (=before monday),
+    // if permanencies took place last week (=before monday),
     // -> display them in lightblue as part of the current week
     events.push({
       start: shift ? shiftDateByDays(openingTime.start, 7) : openingTime.start,

@@ -88,5 +88,10 @@ class PermanencyController(ControllerBase):
         exclude_none=True,
     )
     @paginate(PageNumberPaginationExtra, page_size=100)
-    def fetch_permanancies(self, filters: Query[PermanencyFilterSchema]):
-        return filters.filter(Permanency.objects.all()).distinct().order_by("-start")
+    def fetch_permanencies(self, filters: Query[PermanencyFilterSchema]):
+        return (
+            filters.filter(Permanency.objects.all())
+            .distinct()
+            .order_by("-start")
+            .select_related("counter")
+        )
