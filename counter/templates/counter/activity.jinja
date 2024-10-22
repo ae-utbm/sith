@@ -5,6 +5,10 @@
   {% trans counter_name=counter %}{{ counter_name }} activity{% endtrans %}
 {% endblock %}
 
+{% block additional_js %}
+  <script defer src="{{ static('webpack/counter/permanencies/time-grid-index.ts') }}"></script>
+{% endblock %}
+
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('counter/css/activity.scss') }}">
 {%- endblock -%}
@@ -22,6 +26,10 @@
         {% trans %}There is currently no barman connected.{% endtrans %}
       {% endif %}
     </ul>
+    <h4>{% trans %}Last weeks opening times{% endtrans %}</h4>
+    <div id="activityTimeGrid"></div>
+    <br/>
+    <br/>
   {% endif %}
 
   <h5>{% trans %}Legend{% endtrans %}</h5>
@@ -37,5 +45,17 @@
   </div>
 {% endblock %}
 
-
-
+{% block script %}
+  {{super()}}
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      loadActivityTimeGrid({
+        canvas: document.getElementById("activityTimeGrid"),
+        // sets the start day to 7 days ago
+        startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+        counterId: {{ counter.id }},
+        locale: {{ get_current_language()|tojson }}
+      });
+    });
+  </script>
+{% endblock %}

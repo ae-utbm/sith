@@ -1,13 +1,29 @@
-from ninja import ModelSchema
+from datetime import datetime
 
-from core.schemas import SimpleUserSchema
-from counter.models import Counter
+from ninja import FilterSchema, ModelSchema
+from pydantic import Field
+
+from counter.models import Counter, Permanency
 
 
 class CounterSchema(ModelSchema):
-    barmen_list: list[SimpleUserSchema]
-    is_open: bool
-
     class Meta:
         model = Counter
-        fields = ["id", "name", "type", "club", "products"]
+        fields = ["id", "name", "type"]
+
+
+class PermanencySchema(ModelSchema):
+    counter: CounterSchema
+
+    class Meta:
+        model = Permanency
+        fields = ["start", "end"]
+
+
+class PermanencyFilterSchema(FilterSchema):
+    start_after: datetime | None = Field(None, q="start__gte")
+    start_before: datetime | None = Field(None, q="start__lte")
+    end_after: datetime | None = Field(None, q="end__gte")
+    end_before: datetime | None = Field(None, q="end__lte")
+    took_place_after: datetime | None = Field(None, q=["start__gte", "end__gte"])
+    counter: set[int] | None = Field(None, q="counter_id__in")

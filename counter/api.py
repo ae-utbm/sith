@@ -12,28 +12,49 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from ninja_extra import ControllerBase, api_controller, route
+
+from ninja import Query
+from ninja_extra import ControllerBase, api_controller, paginate, route
+from ninja_extra.pagination import PageNumberPaginationExtra
+from ninja_extra.permissions import IsAuthenticated
+from ninja_extra.schemas import PaginatedResponseSchema
 
 from core.api_permissions import CanView, IsRoot
-from counter.models import Counter
-from counter.schemas import CounterSchema
+from counter.models import Counter, Permanency
+from counter.schemas import CounterSchema, PermanencyFilterSchema, PermanencySchema
 
 
 @api_controller("/counter")
 class CounterController(ControllerBase):
     @route.get("", response=list[CounterSchema], permissions=[IsRoot])
     def fetch_all(self):
-        return Counter.objects.annotate_is_open()
+        return Counter.objects.all()
 
     @route.get("{counter_id}/", response=CounterSchema, permissions=[CanView])
     def fetch_one(self, counter_id: int):
-        return self.get_object_or_exception(
-            Counter.objects.annotate_is_open(), pk=counter_id
-        )
+        return self.get_object_or_exception(Counter.objects.all(), pk=counter_id)
 
     @route.get("bar/", response=list[CounterSchema], permissions=[CanView])
     def fetch_bars(self):
-        counters = list(Counter.objects.annotate_is_open().filter(type="BAR"))
+        counters = list(Counter.objects.all().filter(type="BAR"))
         for c in counters:
             self.check_object_permissions(c)
         return counters
+
+
+@api_controller("/permanency")
+class PermanencyController(ControllerBase):
+    @route.get(
+        "",
+        response=PaginatedResponseSchema[PermanencySchema],
+        permissions=[IsAuthenticated],
+        exclude_none=True,
+    )
+    @paginate(PageNumberPaginationExtra, page_size=100)
+    def fetch_permanencies(self, filters: Query[PermanencyFilterSchema]):
+        return (
+            filters.filter(Permanency.objects.all())
+            .distinct()
+            .order_by("-start")
+            .select_related("counter")
+        )
