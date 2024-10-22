@@ -73,7 +73,7 @@ class TestFetchFamilyApi(TestCase):
         self.client.force_login(self.main_user)
         response = self.client.get(
             reverse("api:family_graph", args=[self.main_user.id])
-            + f"?godfathers_depth=0&godchildren_depth=0"
+            + "?godfathers_depth=0&godchildren_depth=0"
         )
         assert response.status_code == 200
         assert [u["id"] for u in response.json()["users"]] == [self.main_user.id]
@@ -91,7 +91,7 @@ class TestFetchFamilyApi(TestCase):
         self.client.force_login(self.main_user)
         response = self.client.get(
             reverse("api:family_graph", args=[self.main_user.id])
-            + f"?godfathers_depth=10&godchildren_depth=10"
+            + "?godfathers_depth=10&godchildren_depth=10"
         )
         assert response.status_code == 200
         assert [u["id"] for u in response.json()["users"]] == [
@@ -126,7 +126,7 @@ class TestFetchFamilyApi(TestCase):
         self.client.force_login(self.main_user)
         response = self.client.get(
             reverse("api:family_graph", args=[self.main_user.id])
-            + f"?godfathers_depth=1&godchildren_depth=1"
+            + "?godfathers_depth=1&godchildren_depth=1"
         )
         assert response.status_code == 200
         assert [u["id"] for u in response.json()["users"]] == [
@@ -150,7 +150,7 @@ class TestFetchFamilyApi(TestCase):
         self.client.force_login(self.main_user)
         response = self.client.get(
             reverse("api:family_graph", args=[self.main_user.id])
-            + f"?godfathers_depth=10&godchildren_depth=0"
+            + "?godfathers_depth=10&godchildren_depth=0"
         )
         assert response.status_code == 200
         assert [u["id"] for u in response.json()["users"]] == [

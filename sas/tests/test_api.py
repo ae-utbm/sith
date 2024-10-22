@@ -3,35 +3,45 @@ from django.db import transaction
 from django.test import TestCase
 from django.urls import reverse
 from model_bakery import baker
+from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertNumQueries
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
-from core.models import RealGroup, User
+from core.models import RealGroup, SithFile, User
 from sas.baker_recipes import picture_recipe
-from sas.models import Album, PeoplePictureRelation, Picture
+from sas.models import Album, PeoplePictureRelation, Picture, PictureModerationRequest
 
 
 class TestSas(TestCase):
     @classmethod
     def setUpTestData(cls):
-        Picture.objects.all().delete()
+        sas = SithFile.objects.get(pk=settings.SITH_SAS_ROOT_DIR_ID)
+
+        Picture.objects.exclude(id=sas.id).delete()
         owner = User.objects.get(username="root")
 
         cls.user_a = old_subscriber_user.make()
         cls.user_b, cls.user_c = subscriber_user.make(_quantity=2)
 
         picture = picture_recipe.extend(owner=owner)
-        cls.album_a = baker.make(Album, is_in_sas=True)
-        cls.album_b = baker.make(Album, is_in_sas=True)
+        cls.album_a = baker.make(Album, is_in_sas=True, parent=sas)
+        cls.album_b = baker.make(Album, is_in_sas=True, parent=sas)
+        relation_recipe = Recipe(PeoplePictureRelation)
+        relations = []
         for album in cls.album_a, cls.album_b:
             pictures = picture.make(parent=album, _quantity=5, _bulk_create=True)
-            baker.make(PeoplePictureRelation, picture=pictures[1], user=cls.user_a)
-            baker.make(PeoplePictureRelation, picture=pictures[2], user=cls.user_a)
-            baker.make(PeoplePictureRelation, picture=pictures[2], user=cls.user_b)
-            baker.make(PeoplePictureRelation, picture=pictures[3], user=cls.user_b)
-            baker.make(PeoplePictureRelation, picture=pictures[4], user=cls.user_a)
-            baker.make(PeoplePictureRelation, picture=pictures[4], user=cls.user_b)
-            baker.make(PeoplePictureRelation, picture=pictures[4], user=cls.user_c)
+            relations.extend(
+                [
+                    relation_recipe.prepare(picture=pictures[1], user=cls.user_a),
+                    relation_recipe.prepare(picture=pictures[2], user=cls.user_a),
+                    relation_recipe.prepare(picture=pictures[2], user=cls.user_b),
+                    relation_recipe.prepare(picture=pictures[3], user=cls.user_b),
+                    relation_recipe.prepare(picture=pictures[4], user=cls.user_a),
+                    relation_recipe.prepare(picture=pictures[4], user=cls.user_b),
+                    relation_recipe.prepare(picture=pictures[4], user=cls.user_c),
+                ]
+            )
+        PeoplePictureRelation.objects.bulk_create(relations)
 
 
 class TestPictureSearch(TestSas):
@@ -170,3 +180,49 @@ class TestPictureRelation(TestSas):
         res = self.client.delete(f"/api/sas/relation/{relation.id}")
         assert res.status_code == 404
         assert PeoplePictureRelation.objects.count() == relation_count
+
+
+class TestPictureModeration(TestSas):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.sas_admin = baker.make(
+            User, groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
+        )
+        cls.picture = Picture.objects.filter(parent=cls.album_a)[0]
+        cls.picture.is_moderated = False
+        cls.picture.asked_for_removal = True
+        cls.picture.save()
+        cls.url = reverse("api:picture_moderate", kwargs={"picture_id": cls.picture.id})
+        baker.make(PictureModerationRequest, picture=cls.picture, author=cls.user_a)
+
+    def test_moderation_route_forbidden(self):
+        """Test that basic users (even if owner) cannot moderate a picture."""
+        self.picture.owner = self.user_b
+
+        for user in baker.make(User), subscriber_user.make(), self.user_b:
+            self.client.force_login(user)
+            res = self.client.patch(self.url)
+            assert res.status_code == 403
+
+    def test_moderation_route_authorized(self):
+        """Test that sas admins can moderate a picture."""
+        self.client.force_login(self.sas_admin)
+        res = self.client.patch(self.url)
+        assert res.status_code == 200
+        self.picture.refresh_from_db()
+        assert self.picture.is_moderated
+        assert not self.picture.asked_for_removal
+        assert not self.picture.moderation_requests.exists()
+
+    def test_get_moderation_requests(self):
+        """Test that fetching moderation requests work."""
+
+        url = reverse(
+            "api:picture_moderation_requests", kwargs={"picture_id": self.picture.id}
+        )
+        self.client.force_login(self.sas_admin)
+        res = self.client.get(url)
+        assert res.status_code == 200
+        assert len(res.json()) == 1
+        assert res.json()[0]["author"]["id"] == self.user_a.id

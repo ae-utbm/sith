@@ -67,5 +67,6 @@ class Command(BaseCommand):
         subprocess.run(
             [str(Path(__file__).parent / "install_xapian.sh"), desired],
             env=dict(os.environ),
-        ).check_returncode()
+            check=True,
+        )
         self.stdout.write("Installation success")

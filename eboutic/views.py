@@ -17,11 +17,11 @@ import base64
 import json
 from datetime import datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 
 import sentry_sdk
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
-from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from django.conf import settings
@@ -46,6 +46,9 @@ from eboutic.models import (
     get_eboutic_products,
 )
 from eboutic.schemas import PurchaseItemList, PurchaseItemSchema
+
+if TYPE_CHECKING:
+    from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 
 
 @login_required
@@ -221,7 +224,7 @@ class EtransactionAutoAnswer(View):
         # Payment authorized:
         # * 'Error' is '00000'
         # * 'Auto' is in the request
-        if request.GET["Error"] == "00000" and "Auto" in request.GET.keys():
+        if request.GET["Error"] == "00000" and "Auto" in request.GET:
             try:
                 with transaction.atomic():
                     b = (

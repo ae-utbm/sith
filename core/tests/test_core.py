@@ -343,7 +343,7 @@ class TestUserTools:
         response = client.get(reverse("core:user_tools"))
         assertRedirects(
             response,
-            expected_url=f"/login?next=%2Fuser%2Ftools%2F",
+            expected_url="/login?next=%2Fuser%2Ftools%2F",
             target_status_code=301,
         )
 

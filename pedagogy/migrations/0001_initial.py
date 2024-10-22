@@ -32,7 +32,10 @@ class Migration(migrations.Migration):
                         unique=True,
                         validators=[
                             django.core.validators.RegexValidator(
-                                message="The code of an UV must only contains uppercase characters without accent and numbers",
+                                message=(
+                                    "The code of an UV must only contains "
+                                    "uppercase characters without accent and numbers"
+                                ),
                                 regex="([A-Z0-9]+)",
                             )
                         ],

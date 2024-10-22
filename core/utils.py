@@ -127,7 +127,7 @@ def resize_image_explicit(
 
 
 def exif_auto_rotate(image):
-    for orientation in ExifTags.TAGS.keys():
+    for orientation in ExifTags.TAGS:
         if ExifTags.TAGS[orientation] == "Orientation":
             break
     exif = dict(image._getexif().items())

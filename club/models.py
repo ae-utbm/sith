@@ -389,9 +389,7 @@ class Membership(models.Model):
         if user.is_root or user.is_board_member:
             return True
         membership = self.club.get_membership_for(user)
-        if membership is not None and membership.role >= self.role:
-            return True
-        return False
+        return membership is not None and membership.role >= self.role
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)

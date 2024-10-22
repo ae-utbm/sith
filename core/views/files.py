@@ -193,7 +193,7 @@ class FileEditView(CanEditMixin, UpdateView):
     def get_form_class(self):
         fields = ["name", "is_moderated"]
         if self.object.is_file:
-            fields = ["file"] + fields
+            fields = ["file", *fields]
         return modelform_factory(SithFile, fields=fields)
 
     def get_success_url(self):
@@ -283,38 +283,38 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         `obj` is the SithFile object you want to put in the clipboard, or
                  where you want to paste the clipboard
         """
-        if "delete" in request.POST.keys():
+        if "delete" in request.POST:
             for f_id in request.POST.getlist("file_list"):
-                sf = SithFile.objects.filter(id=f_id).first()
-                if sf:
-                    sf.delete()
-        if "clear" in request.POST.keys():
+                file = SithFile.objects.filter(id=f_id).first()
+                if file:
+                    file.delete()
+        if "clear" in request.POST:
             request.session["clipboard"] = []
-        if "cut" in request.POST.keys():
-            for f_id in request.POST.getlist("file_list"):
-                f_id = int(f_id)
+        if "cut" in request.POST:
+            for f_id_str in request.POST.getlist("file_list"):
+                f_id = int(f_id_str)
                 if (
                     f_id in [c.id for c in obj.children.all()]
                     and f_id not in request.session["clipboard"]
                 ):
                     request.session["clipboard"].append(f_id)
-        if "paste" in request.POST.keys():
+        if "paste" in request.POST:
             for f_id in request.session["clipboard"]:
-                sf = SithFile.objects.filter(id=f_id).first()
-                if sf:
-                    sf.move_to(obj)
+                file = SithFile.objects.filter(id=f_id).first()
+                if file:
+                    file.move_to(obj)
             request.session["clipboard"] = []
         request.session.modified = True
 
     def get(self, request, *args, **kwargs):
         self.form = self.get_form()
-        if "clipboard" not in request.session.keys():
+        if "clipboard" not in request.session:
             request.session["clipboard"] = []
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if "clipboard" not in request.session.keys():
+        if "clipboard" not in request.session:
             request.session["clipboard"] = []
         if request.user.can_edit(self.object):
             # XXX this call can fail!
@@ -398,6 +398,6 @@ class FileModerateView(CanEditPropMixin, SingleObjectMixin):
         self.object.is_moderated = True
         self.object.moderator = request.user
         self.object.save()
-        if "next" in self.request.GET.keys():
+        if "next" in self.request.GET:
             return redirect(self.request.GET["next"])
         return redirect("core:file_moderation")

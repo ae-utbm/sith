@@ -1,4 +1,5 @@
 import logging
+import time
 from smtplib import SMTPException
 
 from django.conf import settings
@@ -25,9 +26,34 @@ class Command(BaseCommand):
         self.logger.setLevel(logging.INFO)
         super().__init__(*args, **kwargs)
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Do not send the mails, just display the number of users concerned",
+        )
+        parser.add_argument(
+            "-d",
+            "--delay",
+            type=float,
+            default=0,
+            help="Delay in seconds between each mail sent",
+        )
+
     def handle(self, *args, **options):
-        users = list(self._get_users())
+        users: list[User] = list(self._get_users())
         self.stdout.write(f"{len(users)} users will be warned of their account dump")
+        if options["verbosity"] > 1:
+            self.stdout.write("Users concerned:\n")
+            self.stdout.write(
+                "\n".join(
+                    f"  - {user.get_display_name()} ({user.email}) : "
+                    f"{user.customer.amount} €"
+                    for user in users
+                )
+            )
+        if options["dry_run"]:
+            return
         dumps = []
         for user in users:
             is_success = self._send_mail(user)
@@ -38,6 +64,10 @@ class Command(BaseCommand):
                     warning_mail_error=not is_success,
                 )
             )
+            if options["delay"]:
+                # avoid spamming the mail server too much
+                time.sleep(options["delay"])
+
         AccountDump.objects.bulk_create(dumps)
         self.stdout.write("Finished !")
 

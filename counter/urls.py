@@ -15,7 +15,40 @@
 
 from django.urls import path
 
-from counter.views import *
+from counter.views import (
+    ActiveProductListView,
+    ArchivedProductListView,
+    CashSummaryEditView,
+    CashSummaryListView,
+    CounterActivityView,
+    CounterCashSummaryView,
+    CounterClick,
+    CounterCreateView,
+    CounterDeleteView,
+    CounterEditPropView,
+    CounterEditView,
+    CounterLastOperationsView,
+    CounterListView,
+    CounterMain,
+    CounterRefillingListView,
+    CounterStatView,
+    EticketCreateView,
+    EticketEditView,
+    EticketListView,
+    EticketPDFView,
+    InvoiceCallView,
+    ProductCreateView,
+    ProductEditView,
+    ProductTypeCreateView,
+    ProductTypeEditView,
+    ProductTypeListView,
+    RefillingDeleteView,
+    SellingDeleteView,
+    StudentCardDeleteView,
+    StudentCardFormView,
+    counter_login,
+    counter_logout,
+)
 
 urlpatterns = [
     path("<int:counter_id>/", CounterMain.as_view(), name="details"),

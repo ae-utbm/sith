@@ -53,11 +53,8 @@ class NotificationList(ListView):
         if self.request.user.is_anonymous:
             return Notification.objects.none()
         # TODO: Bulk update in django 2.2
-        if "see_all" in self.request.GET.keys():
-            for n in self.request.user.notifications.filter(viewed=False):
-                n.viewed = True
-                n.save()
-
+        if "see_all" in self.request.GET:
+            self.request.user.notifications.filter(viewed=False).update(viewed=True)
         return self.request.user.notifications.order_by("-date")[:20]
 
 

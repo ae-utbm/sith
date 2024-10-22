@@ -24,6 +24,12 @@ Si le mot apparaît dans le template Jinja :
 {% trans %}Hello{% endtrans %}
 ```
 
+Si on est dans un fichier javascript ou typescript :
+
+```js
+gettext("Hello");
+```
+
 ## Générer le fichier django.po
 
 La traduction se fait en trois étapes. 
@@ -32,7 +38,7 @@ l'éditer et enfin le compiler au format binaire pour qu'il soit lu par le serve
 
 ```bash
 ./manage.py makemessages --locale=fr -e py,jinja --ignore=node_modules # Pour le backend
-./manage.py makemessages --locale=fr -d djangojs --ignore=node_modules # Pour le frontend
+./manage.py makemessages --locale=fr -d djangojs -e js,ts --ignore=node_modules # Pour le frontend
 ```
 
 ## Éditer le fichier django.po

@@ -15,7 +15,7 @@
 from django.contrib import admin
 from haystack.admin import SearchModelAdmin
 
-from com.models import *
+from com.models import News, Poster, Screen, Sith, Weekmail
 
 
 @admin.register(News)

@@ -86,12 +86,11 @@ class PosterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
-        if self.user:
-            if not self.user.is_com_admin:
-                self.fields["club"].queryset = Club.objects.filter(
-                    id__in=self.user.clubs_with_rights
-                )
-                self.fields.pop("display_time")
+        if self.user and not self.user.is_com_admin:
+            self.fields["club"].queryset = Club.objects.filter(
+                id__in=self.user.clubs_with_rights
+            )
+            self.fields.pop("display_time")
 
 
 class ComTabsMixin(TabedViewMixin):
@@ -312,7 +311,7 @@ class NewsCreateView(CanCreateMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
-        if form.is_valid() and "preview" not in request.POST.keys():
+        if form.is_valid() and "preview" not in request.POST:
             return self.form_valid(form)
         else:
             self.object = form.instance
@@ -354,13 +353,13 @@ class NewsModerateView(CanEditMixin, SingleObjectMixin):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if "remove" in request.GET.keys():
+        if "remove" in request.GET:
             self.object.is_moderated = False
         else:
             self.object.is_moderated = True
         self.object.moderator = request.user
         self.object.save()
-        if "next" in self.request.GET.keys():
+        if "next" in self.request.GET:
             return redirect(self.request.GET["next"])
         return redirect("com:news_admin_list")
 
@@ -424,7 +423,7 @@ class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, Detai
             try:
                 self.object.send()  # This should fail
             except SMTPRecipientsRefused as e:
-                users = User.objects.filter(email__in=e.recipients.keys())
+                users = User.objects.filter(email__in=e.recipients)
                 for u in users:
                     u.preferences.receive_weekmail = False
                     u.preferences.save()
@@ -471,7 +470,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if "up_article" in request.GET.keys():
+        if "up_article" in request.GET:
             art = get_object_or_404(
                 WeekmailArticle, id=request.GET["up_article"], weekmail=self.object
             )
@@ -483,7 +482,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
                 art.save()
                 prev_art.save()
                 self.quick_notif_list += ["qn_success"]
-        if "down_article" in request.GET.keys():
+        if "down_article" in request.GET:
             art = get_object_or_404(
                 WeekmailArticle, id=request.GET["down_article"], weekmail=self.object
             )
@@ -495,7 +494,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
                 art.save()
                 next_art.save()
                 self.quick_notif_list += ["qn_success"]
-        if "add_article" in request.GET.keys():
+        if "add_article" in request.GET:
             art = get_object_or_404(
                 WeekmailArticle, id=request.GET["add_article"], weekmail=None
             )
@@ -504,7 +503,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
             art.rank += 1
             art.save()
             self.quick_notif_list += ["qn_success"]
-        if "del_article" in request.GET.keys():
+        if "del_article" in request.GET:
             art = get_object_or_404(
                 WeekmailArticle, id=request.GET["del_article"], weekmail=self.object
             )
@@ -571,7 +570,7 @@ class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
                     )
                 ),
             )
-        if form.is_valid() and not "preview" in request.POST.keys():
+        if form.is_valid() and "preview" not in request.POST:
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -689,19 +688,13 @@ class PosterEditBaseView(UpdateView):
     template_name = "com/poster_edit.jinja"
 
     def get_initial(self):
-        init = {}
-        try:
-            init["date_begin"] = self.object.date_begin.strftime("%Y-%m-%d %H:%M:%S")
-        except Exception:
-            pass
-        try:
-            init["date_end"] = self.object.date_end.strftime("%Y-%m-%d %H:%M:%S")
-        except Exception:
-            pass
-        return init
+        return {
+            "date_begin": self.object.date_begin.strftime("%Y-%m-%d %H:%M:%S"),
+            "date_end": self.object.date_end.strftime("%Y-%m-%d %H:%M:%S"),
+        }
 
     def dispatch(self, request, *args, **kwargs):
-        if "club_id" in kwargs and kwargs["club_id"]:
+        if kwargs.get("club_id"):
             try:
                 self.club = Club.objects.get(pk=kwargs["club_id"])
             except Club.DoesNotExist as e:
@@ -737,7 +730,7 @@ class PosterDeleteBaseView(DeleteView):
     template_name = "core/delete_confirm.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        if "club_id" in kwargs and kwargs["club_id"]:
+        if kwargs.get("club_id"):
             try:
                 self.club = Club.objects.get(pk=kwargs["club_id"])
             except Club.DoesNotExist as e:

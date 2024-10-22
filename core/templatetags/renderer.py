@@ -50,7 +50,7 @@ def phonenumber(
     try:
         parsed = phonenumbers.parse(value, country)
         return phonenumbers.format_number(parsed, number_format)
-    except phonenumbers.NumberParseException as e:
+    except phonenumbers.NumberParseException:
         return value
 
 

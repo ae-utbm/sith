@@ -23,7 +23,26 @@
 
 from django.urls import path
 
-from forum.views import *
+from forum.views import (
+    ForumCreateView,
+    ForumDeleteView,
+    ForumDetailView,
+    ForumEditView,
+    ForumFavoriteTopics,
+    ForumLastUnread,
+    ForumMainView,
+    ForumMarkAllAsRead,
+    ForumMessageCreateView,
+    ForumMessageDeleteView,
+    ForumMessageEditView,
+    ForumMessageUndeleteView,
+    ForumMessageView,
+    ForumSearchView,
+    ForumTopicCreateView,
+    ForumTopicDetailView,
+    ForumTopicEditView,
+    ForumTopicSubscribeView,
+)
 
 urlpatterns = [
     path("", ForumMainView.as_view(), name="main"),
@@ -35,21 +54,9 @@ urlpatterns = [
     path("<int:forum_id>/", ForumDetailView.as_view(), name="view_forum"),
     path("<int:forum_id>/edit/", ForumEditView.as_view(), name="edit_forum"),
     path("<int:forum_id>/delete/", ForumDeleteView.as_view(), name="delete_forum"),
-    path(
-        "<int:forum_id>/new_topic/",
-        ForumTopicCreateView.as_view(),
-        name="new_topic",
-    ),
-    path(
-        "topic/<int:topic_id>/",
-        ForumTopicDetailView.as_view(),
-        name="view_topic",
-    ),
-    path(
-        "topic/<int:topic_id>/edit/",
-        ForumTopicEditView.as_view(),
-        name="edit_topic",
-    ),
+    path("<int:forum_id>/new_topic/", ForumTopicCreateView.as_view(), name="new_topic"),
+    path("topic/<int:topic_id>/", ForumTopicDetailView.as_view(), name="view_topic"),
+    path("topic/<int:topic_id>/edit/", ForumTopicEditView.as_view(), name="edit_topic"),
     path(
         "topic/<int:topic_id>/new_message/",
         ForumMessageCreateView.as_view(),
@@ -60,11 +67,7 @@ urlpatterns = [
         ForumTopicSubscribeView.as_view(),
         name="toggle_subscribe_topic",
     ),
-    path(
-        "message/<int:message_id>/",
-        ForumMessageView.as_view(),
-        name="view_message",
-    ),
+    path("message/<int:message_id>/", ForumMessageView.as_view(), name="view_message"),
     path(
         "message/<int:message_id>/edit/",
         ForumMessageEditView.as_view(),

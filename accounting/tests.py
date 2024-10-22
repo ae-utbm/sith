@@ -102,7 +102,7 @@ class TestOperation(TestCase):
             code="443", label="Ce code n'existe pas", movement_type="CREDIT"
         )
         at.save()
-        l = Label.objects.create(club_account=self.journal.club_account, name="bob")
+        label = Label.objects.create(club_account=self.journal.club_account, name="bob")
         self.client.force_login(User.objects.get(username="comptable"))
         self.op1 = Operation(
             journal=self.journal,
@@ -111,7 +111,7 @@ class TestOperation(TestCase):
             remark="Test bilan",
             mode="CASH",
             done=True,
-            label=l,
+            label=label,
             accounting_type=at,
             target_type="USER",
             target_id=self.skia.id,
@@ -124,7 +124,7 @@ class TestOperation(TestCase):
             remark="Test bilan",
             mode="CASH",
             done=True,
-            label=l,
+            label=label,
             accounting_type=at,
             target_type="USER",
             target_id=self.skia.id,

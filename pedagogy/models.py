@@ -45,7 +45,8 @@ class UV(models.Model):
             validators.RegexValidator(
                 regex="([A-Z0-9]+)",
                 message=_(
-                    "The code of an UV must only contains uppercase characters without accent and numbers"
+                    "The code of an UV must only contains "
+                    "uppercase characters without accent and numbers"
                 ),
             )
         ],

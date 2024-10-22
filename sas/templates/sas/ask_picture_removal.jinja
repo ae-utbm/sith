@@ -1,0 +1,28 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+  {% trans %}SAS{% endtrans %}
+{% endblock %}
+
+
+{% block content %}
+  <h1>{% trans %}Image removal request{% endtrans %}</h1>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors() }}
+    <div class="helptext">
+      {{ form.reason.help_text }}
+    </div>
+    {{ form.reason }}
+    <br/>
+    <br/>
+    <a class="clickable btn btn-grey" href="{{ object.get_absolute_url() }}">
+      {% trans %}Cancel{% endtrans %}
+    </a>
+    <input
+      class="btn btn-blue"
+      type="submit"
+      value="{% trans %}Request removal{% endtrans %}"
+    >
+  </form>
+{% endblock content %}

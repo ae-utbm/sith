@@ -15,7 +15,7 @@
 
 from django.contrib import admin
 
-from sas.models import Album, PeoplePictureRelation, Picture
+from sas.models import Album, PeoplePictureRelation, Picture, PictureModerationRequest
 
 
 @admin.register(Picture)
@@ -31,4 +31,15 @@ class PeoplePictureRelationAdmin(admin.ModelAdmin):
     autocomplete_fields = ("picture", "user")
 
 
-admin.site.register(Album)
+@admin.register(Album)
+class AlbumAdmin(admin.ModelAdmin):
+    list_display = ("name", "parent", "date", "owner", "is_moderated")
+    search_fields = ("name",)
+    autocomplete_fields = ("owner", "parent", "edit_groups", "view_groups")
+
+
+@admin.register(PictureModerationRequest)
+class PictureModerationRequestAdmin(admin.ModelAdmin):
+    list_display = ("author", "picture", "created_at")
+    search_fields = ("author", "picture")
+    autocomplete_fields = ("author", "picture")

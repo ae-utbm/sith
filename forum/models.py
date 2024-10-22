@@ -25,6 +25,7 @@ from __future__ import annotations
 from datetime import datetime
 from datetime import timezone as tz
 from itertools import chain
+from typing import Self
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -207,12 +208,12 @@ class Forum(models.Model):
         return self.get_parent_list()
 
     def get_parent_list(self):
-        l = []
-        p = self.parent
-        while p is not None:
-            l.append(p)
-            p = p.parent
-        return l
+        parents = []
+        current = self.parent
+        while current is not None:
+            parents.append(current)
+            current = current.parent
+        return parents
 
     @property
     def topic_number(self):
@@ -228,12 +229,12 @@ class Forum(models.Model):
     def last_message(self):
         return self._last_message
 
-    def get_children_list(self):
-        l = [self.id]
+    def get_children_list(self) -> list[Self]:
+        children = [self.id]
         for c in self.children.all():
-            l.append(c.id)
-            l += c.get_children_list()
-        return l
+            children.append(c.id)
+            children.extend(c.get_children_list())
+        return children
 
 
 class ForumTopic(models.Model):

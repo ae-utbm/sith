@@ -14,7 +14,7 @@
 #
 from django.contrib import admin
 
-from launderette.models import *
+from launderette.models import Launderette, Machine, Slot, Token
 
 
 @admin.register(Launderette)

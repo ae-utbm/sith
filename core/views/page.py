@@ -55,7 +55,7 @@ class PageView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if "page" not in context.keys():
+        if "page" not in context:
             context["new_page"] = self.kwargs["page_name"]
         return context
 
@@ -92,22 +92,16 @@ class PageRevView(CanViewMixin, DetailView):
             )
         return res
 
-    def get_object(self):
+    def get_object(self, *args, **kwargs):
         self.page = Page.get_page_by_full_name(self.kwargs["page_name"])
         return self.page
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.page is not None:
-            context["page"] = self.page
-            try:
-                rev = self.page.revisions.get(id=self.kwargs["rev"])
-                context["rev"] = rev
-            except:
-                # By passing, the template will just display the normal page without taking revision into account
-                pass
-        else:
-            context["new_page"] = self.kwargs["page_name"]
+        if not self.page:
+            return context | {"new_page": self.kwargs["page_name"]}
+        context["page"] = self.page
+        context["rev"] = self.page.revisions.filter(id=self.kwargs["rev"]).first()
         return context
 
 
@@ -118,7 +112,7 @@ class PageCreateView(CanCreateMixin, CreateView):
 
     def get_initial(self):
         init = {}
-        if "page" in self.request.GET.keys():
+        if "page" in self.request.GET:
             page_name = self.request.GET["page"]
             parent_name = "/".join(page_name.split("/")[:-1])
             parent = Page.get_page_by_full_name(parent_name)
@@ -145,18 +139,8 @@ class PagePropView(CanEditPagePropMixin, UpdateView):
     slug_field = "_full_name"
     slug_url_kwarg = "page_name"
 
-    def get_object(self):
-        o = super().get_object()
-        # Create the page if it does not exists
-        # if p == None:
-        #    parent_name = '/'.join(page_name.split('/')[:-1])
-        #    name = page_name.split('/')[-1]
-        #    if parent_name == "":
-        #        p = Page(name=name)
-        #    else:
-        #        parent = Page.get_page_by_full_name(parent_name)
-        #        p = Page(name=name, parent=parent)
-        self.page = o
+    def get_object(self, queryset=None):
+        self.page = super().get_object()
         try:
             self.page.set_lock_recursive(self.request.user)
         except LockError as e:

@@ -111,8 +111,8 @@ class MailingForm(forms.Form):
         """Convert given users into real users and check their validity."""
         cleaned_data = super().clean()
         users = []
-        for user in cleaned_data["subscription_users"]:
-            user = User.objects.filter(id=user).first()
+        for user_id in cleaned_data["subscription_users"]:
+            user = User.objects.filter(id=user_id).first()
             if not user:
                 raise forms.ValidationError(
                     _("One of the selected users doesn't exist"), code="invalid"
@@ -128,7 +128,7 @@ class MailingForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        if not "action" in cleaned_data:
+        if "action" not in cleaned_data:
             # If there is no action provided, we can stop here
             raise forms.ValidationError(_("An action is required"), code="invalid")
 

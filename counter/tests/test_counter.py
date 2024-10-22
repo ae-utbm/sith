@@ -503,7 +503,7 @@ class TestBarmanConnection(TestCase):
         )
         response = self.client.get(reverse("counter:activity", args=[self.counter.id]))
 
-        assert not '<li><a href="/user/1/">S&#39; Kia</a></li>' in str(response.content)
+        assert '<li><a href="/user/1/">S&#39; Kia</a></li>' not in str(response.content)
 
 
 @pytest.mark.django_db
@@ -853,7 +853,7 @@ class TestCustomerAccountId(TestCase):
         number = account_id[:-1]
         assert created is True
         assert number == "12346"
-        assert 6 == len(account_id)
+        assert len(account_id) == 6
         assert account_id[-1] in string.ascii_lowercase
         assert customer.amount == 0
 

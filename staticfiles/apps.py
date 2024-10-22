@@ -14,9 +14,12 @@ IGNORE_PATTERNS = [
 ]
 
 
-# We override the original staticfiles app according to https://docs.djangoproject.com/en/4.2/ref/contrib/staticfiles/#customizing-the-ignored-pattern-list
-# However, this is buggy and requires us to have an exact naming of the class like this to be detected
-# Also, it requires to create all commands in management/commands again or they don't get detected by django
+# We override the original staticfiles app according to
+# https://docs.djangoproject.com/en/4.2/ref/contrib/staticfiles/#customizing-the-ignored-pattern-list
+# However, this is buggy and requires us
+# to have an exact naming of the class like this to be detected
+# Also, it requires to create all commands in management/commands again
+# or they don't get detected by django
 # Workaround originates from https://stackoverflow.com/a/78724835/12640533
 class StaticFilesConfig(StaticFilesConfig):
     """

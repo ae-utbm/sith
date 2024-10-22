@@ -154,7 +154,7 @@ class Customer(models.Model):
         self.save()
 
     def get_full_url(self):
-        return "".join(["https://", settings.SITH_URL, self.get_absolute_url()])
+        return f"https://{settings.SITH_URL}{self.get_absolute_url()}"
 
 
 class BillingInfo(models.Model):
@@ -287,9 +287,7 @@ class ProductType(models.Model):
         """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
-        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        return False
+        return user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
 
 
 class Product(models.Model):
@@ -346,21 +344,19 @@ class Product(models.Model):
 
     @property
     def is_record_product(self):
-        return settings.SITH_ECOCUP_CONS == self.id
+        return self.id == settings.SITH_ECOCUP_CONS
 
     @property
     def is_unrecord_product(self):
-        return settings.SITH_ECOCUP_DECO == self.id
+        return self.id == settings.SITH_ECOCUP_DECO
 
     def is_owned_by(self, user):
         """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
-        if user.is_in_group(
+        return user.is_in_group(
             pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
-        ) or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID):
-            return True
-        return False
+        ) or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def can_be_sold_to(self, user: User) -> bool:
         """Check if whether the user given in parameter has the right to buy
@@ -392,10 +388,7 @@ class Product(models.Model):
         buying_groups = list(self.buying_groups.all())
         if not buying_groups:
             return True
-        for group in buying_groups:
-            if user.is_in_group(pk=group.id):
-                return True
-        return False
+        return any(user.is_in_group(pk=group.id) for group in buying_groups)
 
     @property
     def profit(self):
@@ -887,27 +880,19 @@ class Selling(models.Model):
             "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
         ) % {
             "event": event,
-            "url": "".join(
-                (
-                    '<a href="',
-                    self.customer.get_full_url(),
-                    '">',
-                    self.customer.get_full_url(),
-                    "</a>",
-                )
+            "url": (
+                f'<a href="{self.customer.get_full_url()}">'
+                f"{self.customer.get_full_url()}</a>"
             ),
-            "eticket": "".join(
-                (
-                    '<a href="',
-                    self.get_eticket_full_url(),
-                    '">',
-                    self.get_eticket_full_url(),
-                    "</a>",
-                )
+            "eticket": (
+                f'<a href="{self.get_eticket_full_url()}">'
+                f"{self.get_eticket_full_url()}</a>"
             ),
         }
         message_txt = _(
-            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
+            "You bought an eticket for the event %(event)s.\n"
+            "You can download it directly from this link %(eticket)s.\n"
+            "You can also retrieve all your e-tickets on your account page %(url)s."
         ) % {
             "event": event,
             "url": self.customer.get_full_url(),
@@ -919,7 +904,7 @@ class Selling(models.Model):
 
     def get_eticket_full_url(self):
         eticket_url = reverse("counter:eticket_pdf", kwargs={"selling_id": self.id})
-        return "".join(["https://", settings.SITH_URL, eticket_url])
+        return f"https://{settings.SITH_URL}{eticket_url}"
 
 
 class Permanency(models.Model):
@@ -1019,15 +1004,15 @@ class CashRegisterSummary(models.Model):
         elif name == "hundred_euros":
             return self.items.filter(value=100, is_check=False).first()
         elif name == "check_1":
-            return checks[0] if 0 < len(checks) else None
+            return checks[0] if len(checks) > 0 else None
         elif name == "check_2":
-            return checks[1] if 1 < len(checks) else None
+            return checks[1] if len(checks) > 1 else None
         elif name == "check_3":
-            return checks[2] if 2 < len(checks) else None
+            return checks[2] if len(checks) > 2 else None
         elif name == "check_4":
-            return checks[3] if 3 < len(checks) else None
+            return checks[3] if len(checks) > 3 else None
         elif name == "check_5":
-            return checks[4] if 4 < len(checks) else None
+            return checks[4] if len(checks) > 4 else None
         else:
             return object.__getattribute__(self, name)
 
@@ -1035,9 +1020,7 @@ class CashRegisterSummary(models.Model):
         """Method to see if that object can be edited by the given user."""
         if user.is_anonymous:
             return False
-        if user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID):
-            return True
-        return False
+        return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def get_total(self):
         t = 0

@@ -346,8 +346,8 @@ SITH_LAUNDERETTE_MANAGER = {
 # Main root for club pages
 SITH_CLUB_ROOT_PAGE = "clubs"
 
-# Define the date in the year serving as reference for the subscriptions calendar
-# (month, day)
+# Define the date in the year serving as
+# reference for the subscriptions calendar (month, day)
 SITH_SEMESTER_START_AUTUMN = (8, 15)  # 15 August
 SITH_SEMESTER_START_SPRING = (2, 15)  # 15 February
 
@@ -510,10 +510,12 @@ SITH_ACCOUNT_INACTIVITY_DELTA = relativedelta(years=2)
 SITH_ACCOUNT_DUMP_DELTA = timedelta(days=30)
 """timedelta between the warning mail and the actual account dump"""
 
-# Defines which product type is the refilling type, and thus increases the account amount
+# Defines which product type is the refilling type,
+# and thus increases the account amount
 SITH_COUNTER_PRODUCTTYPE_REFILLING = 3
 
-# Defines which product is the one year subscription and which one is the six month subscription
+# Defines which product is the one year subscription
+# and which one is the six month subscription
 SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER = 1
 SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS = 2
 SITH_PRODUCTTYPE_SUBSCRIPTION = 2
@@ -701,15 +703,15 @@ TOXIC_DOMAINS_PROVIDERS = [
 ]
 
 try:
-    from .settings_custom import *
+    from .settings_custom import *  # noqa F403 (this star-import is actually useful)
 
     logging.getLogger("django").info("Custom settings imported")
-except:
+except ImportError:
     logging.getLogger("django").warning("Custom settings failed")
 
 if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)
-    MIDDLEWARE = ("debug_toolbar.middleware.DebugToolbarMiddleware",) + MIDDLEWARE
+    MIDDLEWARE = ("debug_toolbar.middleware.DebugToolbarMiddleware", *MIDDLEWARE)
     DEBUG_TOOLBAR_PANELS = [
         "debug_toolbar.panels.versions.VersionsPanel",
         "debug_toolbar.panels.timer.TimerPanel",
@@ -723,7 +725,8 @@ if DEBUG:
         "debug_toolbar.panels.signals.SignalsPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
-    SENTRY_ENV = "development"
+    if not TESTING:
+        SENTRY_ENV = "development"  # We can't test if it gets overridden in settings
 
 if TESTING:
     CAPTCHA_TEST_MODE = True

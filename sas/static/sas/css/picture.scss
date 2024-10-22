@@ -29,7 +29,7 @@
     width: 100%;
   }
 
-  > .photo {
+  >.photo {
     box-sizing: border-box;
     height: 500px;
     display: flex;
@@ -42,7 +42,7 @@
       height: auto;
     }
 
-    > img {
+    >img {
       height: 100%;
       max-width: 100%;
       object-fit: contain;
@@ -57,7 +57,7 @@
     width: 100%;
   }
 
-  > .navigation {
+  >.navigation {
     display: flex;
     flex-direction: row;
     gap: 10px;
@@ -66,8 +66,8 @@
       width: 100%;
     }
 
-    > #prev,
-    > #next {
+    >#prev,
+    >#next {
       width: calc(50% - 5px);
       aspect-ratio: 16/9;
       background: #333333;
@@ -80,6 +80,7 @@
         object-fit: cover;
         opacity: 70%;
       }
+
       .overlay {
         position: absolute;
         top: 50%;
@@ -89,7 +90,7 @@
         font-size: 40px;
       }
 
-      > div {
+      >div {
         display: flex;
         position: relative;
         width: 100%;
@@ -98,12 +99,12 @@
     }
   }
 
-  > .tags {
+  >.tags {
     @media (min-width: 1001px) {
       margin-right: 5px;
     }
 
-    > ul {
+    >ul {
       list-style-type: none;
       margin: 0;
       display: flex;
@@ -118,7 +119,7 @@
         margin-right: 5px;
       }
 
-      > li {
+      >li {
         box-sizing: border-box;
         display: flex;
         flex-direction: row;
@@ -135,7 +136,7 @@
           max-width: calc(50% - 5px);
         }
 
-        > a {
+        >a {
           box-sizing: border-box;
           display: flex;
           flex-direction: row;
@@ -155,7 +156,7 @@
               background-color: #aaa;
             }
 
-            > span {
+            >span {
               width: 100%;
               text-overflow: ellipsis;
               white-space: nowrap;
@@ -167,14 +168,14 @@
             margin-left: 10px;
           }
 
-          > img {
+          >img {
             width: 25px;
             max-height: 25px;
             object-fit: contain;
             border-radius: 50%;
           }
 
-          > .profile-pic {
+          >.profile-pic {
             background-position: center center;
             background-size: cover;
             background-repeat: no-repeat;
@@ -187,23 +188,24 @@
       }
     }
 
-    > form {
-      > p {
+    >form {
+      >p {
         box-sizing: border-box;
       }
 
-      > .results_on_deck > div {
+      >.results_on_deck>div {
         position: relative;
         display: flex;
         align-items: center;
         word-break: break-word;
 
-        > span {
+        >span {
           position: absolute;
           top: 0;
           right: 0;
         }
       }
+
       input {
         min-width: 100%;
         max-width: 100%;
@@ -226,17 +228,17 @@
     flex-direction: column;
   }
 
-  > .infos {
+  >.infos {
     display: flex;
     flex-direction: column;
     width: 50%;
 
-    > div > div {
+    >div>div {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
 
-      > *:first-child {
+      >*:first-child {
         min-width: 150px;
 
         @media (max-width: 1000px) {
@@ -246,18 +248,18 @@
     }
   }
 
-  > .tools {
+  >.tools {
     display: flex;
     flex-direction: column;
     width: 50%;
 
-    > div  {
+    >div {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
 
-      > div {
-        > a.button {
+      >div {
+        >a.button {
           box-sizing: border-box;
           background-color: #f2f2f2;
           display: flex;
@@ -274,7 +276,7 @@
           }
         }
 
-        > a.text.danger {
+        >a.text.danger {
           color: red;
 
           &:hover {

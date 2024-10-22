@@ -2,8 +2,6 @@ from typing import Annotated
 
 from ninja import ModelSchema, Schema
 from pydantic import Field, NonNegativeInt, PositiveInt, TypeAdapter
-
-# from phonenumber_field.phonenumber import PhoneNumber
 from pydantic_extra_types.phone_numbers import PhoneNumber, PhoneNumberValidator
 
 from counter.models import BillingInfo

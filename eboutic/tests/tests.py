@@ -24,9 +24,9 @@
 import base64
 import json
 import urllib
+from typing import TYPE_CHECKING
 
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
-from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from django.conf import settings
@@ -37,6 +37,9 @@ from django.urls import reverse
 from core.models import User
 from counter.models import Counter, Customer, Product, Selling
 from eboutic.models import Basket, BasketItem
+
+if TYPE_CHECKING:
+    from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 
 
 class TestEboutic(TestCase):
