@@ -34,7 +34,7 @@ async function loadChart(options: ActivityChartConfig) {
     query: {
       counter: [options.counterId],
       // biome-ignore lint/style/useNamingConvention: backend API uses snake_case
-      end_after: options.startDate.toISOString(),
+      took_place_after: options.startDate.toISOString(),
     },
   } as PermanencyFetchPermananciesData);
 
@@ -44,7 +44,6 @@ async function loadChart(options: ActivityChartConfig) {
     plugins: [timeGridPlugin],
     initialView: "timeGridWeek",
     locale: options.locale,
-    slotLabelFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
     dayHeaderFormat: { weekday: "long" },
     firstDay: 1,
     views: { timeGrid: { allDaySlot: false } },
