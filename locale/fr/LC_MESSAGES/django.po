@@ -6143,3 +6143,7 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#: counter/activity.jinja
+msgid "Last weeks opening times"
+msgstr "Heures d'ouverture des dernières semaines"

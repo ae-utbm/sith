@@ -26,8 +26,8 @@
         {% trans %}There is currently no barman connected.{% endtrans %}
       {% endif %}
     </ul>
-    <h4>{% trans %}Last Week Activity {% endtrans %}</h4>
-    <div id="activityGraph" width="400" height="200"></div>
+    <h4>{% trans %}Last weeks opening times{% endtrans %}</h4>
+    <div id="activityGraph"></div>
     <br/>
     <br/>
   {% endif %}
@@ -51,8 +51,10 @@
     window.addEventListener("DOMContentLoaded", () => {
       loadChart({
         canvas: document.getElementById("activityGraph"),
+        // sets the start day to 7 days ago
         startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
         counterId: {{ counter.id }},
+        locale: {{ get_current_language()|tojson }}
       });
     });
   </script>
