@@ -12,6 +12,7 @@ interface ActivityChartConfig {
   canvas: HTMLCanvasElement;
   startDate: Date;
   counterId: number;
+  locale: string;
 }
 
 interface OpeningTime {
@@ -23,10 +24,8 @@ interface EventInput {
   start: Date;
   end: Date;
   backgroundColor: string;
+  title?: string;
 }
-
-// TODO: Semaines passées
-// TODO: Manage locales
 
 exportToHtml("loadChart", loadChart);
 
@@ -44,25 +43,44 @@ async function loadChart(options: ActivityChartConfig) {
   const calendar = new Calendar(options.canvas, {
     plugins: [timeGridPlugin],
     initialView: "timeGridWeek",
-    locale: "fr",
+    locale: options.locale,
     slotLabelFormat: { hour: "2-digit", minute: "2-digit", hour12: false },
     dayHeaderFormat: { weekday: "long" },
     firstDay: 1,
     views: { timeGrid: { allDaySlot: false } },
     scrollTime: "09:00:00",
-    headerToolbar: { left: "", center: "", right: "" },
+    headerToolbar: { left: "prev today", center: "title", right: "" },
     events: events,
     nowIndicator: true,
     height: 600,
   });
   calendar.render();
+
+  calendar.on("datesSet", async (info) => {
+    if (options.startDate <= info.start) {
+      return;
+    }
+    const newPerms = await paginated(permanencyFetchPermanancies, {
+      query: {
+        counter: [options.counterId],
+        // biome-ignore lint/style/useNamingConvention: backend API uses snake_case
+        end_after: info.startStr,
+        // biome-ignore lint/style/useNamingConvention: backend API uses snake_case
+        start_before: info.endStr,
+      },
+    } as PermanencyFetchPermananciesData);
+    options.startDate = info.start;
+    calendar.addEventSource(getEvents(newPerms, false));
+    permanancies.push(...newPerms);
+    calendar.render();
+  });
 }
 
 function roundToQuarter(date: Date, ceil: boolean) {
   const result = date;
   const minutes = date.getMinutes();
   // removes minutes exceeding the lower quarter and adds 15 minutes if rounded to ceiling
-  result.setMinutes(minutes + +ceil * 15 - (minutes % 15), 0, 0);
+  result.setMinutes(minutes - (minutes % 15) + +ceil * 15, 0, 0);
   return result;
 }
 
@@ -99,12 +117,15 @@ function getOpeningTimes(rawPermanancies: PermanencySchema[]) {
   return openingTimes;
 }
 
-function getEvents(permanancies: PermanencySchema[]) {
+function getEvents(permanancies: PermanencySchema[], currentWeek = true): EventInput[] {
   const openingTimes = getOpeningTimes(permanancies);
   const events: EventInput[] = [];
   for (const openingTime of openingTimes) {
-    const lastMonday = getLastMonday();
-    const shift = openingTime.end < lastMonday;
+    let shift = false;
+    if (currentWeek) {
+      const lastMonday = getLastMonday();
+      shift = openingTime.end < lastMonday;
+    }
     // if permanancies took place last week (=before monday),
     // -> display them in lightblue as part of the current week
     events.push({
@@ -117,8 +138,7 @@ function getEvents(permanancies: PermanencySchema[]) {
 }
 
 // Function to get last Monday at 00:00
-function getLastMonday(): Date {
-  const now = new Date();
+function getLastMonday(now = new Date()): Date {
   const dayOfWeek = now.getDay();
   const lastMonday = new Date(now);
   lastMonday.setDate(now.getDate() - ((dayOfWeek + 6) % 7)); // Adjust for Monday as day 1
