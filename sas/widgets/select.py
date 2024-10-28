@@ -1,3 +1,5 @@
+from pydantic import TypeAdapter
+
 from core.views.widgets.select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultiple,
@@ -11,7 +13,7 @@ _js = ["webpack/sas/components/ajax-select-index.ts"]
 class AutoCompleteSelectAlbum(AutoCompleteSelect):
     component_name = "album-ajax-select"
     model = Album
-    schema = AlbumSchema
+    adapter = TypeAdapter(list[AlbumSchema])
 
     js = _js
 
@@ -19,6 +21,6 @@ class AutoCompleteSelectAlbum(AutoCompleteSelect):
 class AutoCompleteSelectMultipleAlbum(AutoCompleteSelectMultiple):
     component_name = "album-ajax-select"
     model = Album
-    schema = AlbumSchema
+    adapter = TypeAdapter(list[AlbumSchema])
 
     js = _js
