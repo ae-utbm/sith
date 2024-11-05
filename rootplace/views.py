@@ -123,7 +123,7 @@ def merge_users(u1: User, u2: User) -> User:
         c_dest, created = Customer.get_or_create(u1)
         c_src.refillings.update(customer=c_dest)
         c_src.buyings.update(customer=c_dest)
-        c_dest.recompute_amount()
+        Customer.objects.filter(pk=c_dest.pk).update_amount()
         if created:
             # swap the account numbers, so that the user keep
             # the id he is accustomed to

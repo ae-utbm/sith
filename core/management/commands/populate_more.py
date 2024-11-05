@@ -1,14 +1,12 @@
 import random
 from datetime import date, timedelta
 from datetime import timezone as tz
-from decimal import Decimal
 from typing import Iterator
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db.models import Count, Exists, F, Min, OuterRef, Subquery, Sum
-from django.db.models.functions import Coalesce
+from django.db.models import Count, Exists, Min, OuterRef, Subquery
 from django.utils.timezone import localdate, make_aware, now
 from faker import Faker
 
@@ -268,24 +266,6 @@ class Command(BaseCommand):
         Product.buying_groups.through.objects.bulk_create(buying_groups)
         Counter.products.through.objects.bulk_create(selling_places)
 
-    @staticmethod
-    def _update_balances():
-        customers = Customer.objects.annotate(
-            money_in=Sum(F("refillings__amount"), default=0),
-            money_out=Coalesce(
-                Subquery(
-                    Selling.objects.filter(customer=OuterRef("pk"))
-                    .values("customer_id")  # group by customer
-                    .annotate(res=Sum(F("unit_price") * F("quantity"), default=0))
-                    .values("res")
-                ),
-                Decimal("0"),
-            ),
-        ).annotate(real_balance=F("money_in") - F("money_out"))
-        for c in customers:
-            c.amount = c.real_balance
-        Customer.objects.bulk_update(customers, fields=["amount"])
-
     def create_sales(self, sellers: list[User]):
         customers = list(
             Customer.objects.annotate(
@@ -355,7 +335,7 @@ class Command(BaseCommand):
             sales.extend(this_customer_sales)
         Refilling.objects.bulk_create(reloads)
         Selling.objects.bulk_create(sales)
-        self._update_balances()
+        Customer.objects.update_amount()
 
     def create_permanences(self, sellers: list[User]):
         counters = list(
