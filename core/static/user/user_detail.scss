@@ -170,6 +170,7 @@ main {
       align-items: center;
       gap: 20px;
       flex-grow: 1;
+      flex-basis: 14em;
 
       @media (max-width: 960px) {
         flex-direction: row;
