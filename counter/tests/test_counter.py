@@ -43,6 +43,7 @@ class TestCounter(TestCase):
         cls.skia = User.objects.filter(username="skia").first()
         cls.sli = User.objects.filter(username="sli").first()
         cls.krophil = User.objects.filter(username="krophil").first()
+        cls.richard = User.objects.filter(username="rbatsbak").first()
         cls.mde = Counter.objects.filter(name="MDE").first()
         cls.foyer = Counter.objects.get(id=2)
 
@@ -63,7 +64,7 @@ class TestCounter(TestCase):
 
         response = self.client.post(
             reverse("counter:details", kwargs={"counter_id": self.mde.id}),
-            {"code": "4000k", "counter_token": counter_token},
+            {"code": self.richard.customer.account_id, "counter_token": counter_token},
         )
         counter_url = response.get("location")
         response = self.client.get(response.get("location"))
@@ -134,7 +135,7 @@ class TestCounter(TestCase):
 
         response = self.client.post(
             reverse("counter:details", kwargs={"counter_id": self.foyer.id}),
-            {"code": "4000k", "counter_token": counter_token},
+            {"code": self.richard.customer.account_id, "counter_token": counter_token},
         )
         counter_url = response.get("location")
 
