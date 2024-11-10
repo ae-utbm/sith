@@ -25,7 +25,6 @@
 }
 
 .ts-wrapper.multi .ts-control {
-
   [data-value],
   [data-value].active {
     background-image: none;
@@ -41,5 +40,12 @@
     padding-left: 10px;
     text-shadow: none;
     box-shadow: none;
+  }
+}
+
+.ts-dropdown {
+  .option.active {
+    background-color: #e5eafa;
+    color: inherit;
   }
 }
