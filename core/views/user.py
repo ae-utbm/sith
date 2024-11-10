@@ -77,7 +77,6 @@ from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
 
-@method_decorator(check_honeypot, name="post")
 class SithLoginView(views.LoginView):
     """The login View."""
 
