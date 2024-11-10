@@ -20,6 +20,10 @@
   margin: 5px;
 }
 
+.ts-wrapper.single {
+  width: 263px; // same length as regular text inputs
+}
+
 .ts-wrapper.plugin-remove_button:not(.rtl) .item .remove {
   border-left: 1px solid #aaa;
 }

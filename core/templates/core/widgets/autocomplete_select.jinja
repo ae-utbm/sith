@@ -5,7 +5,7 @@
   <link-once rel="stylesheet" type="text/css" href="{{ css }}" defer></link-once>
 {% endfor %}
 
-<{{ component }} name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+<{{ component }} name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>
 {% for group_name, group_choices, group_index in widget.optgroups %}
   {% if group_name %}
     <optgroup label="{{ group_name }}">
