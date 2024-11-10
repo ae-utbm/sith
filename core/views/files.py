@@ -18,7 +18,6 @@ from urllib.parse import quote, urljoin
 # This file contains all the views that concern the page model
 from wsgiref.util import FileWrapper
 
-from ajax_select import make_ajax_field
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -38,6 +37,11 @@ from core.views import (
     CanEditPropMixin,
     CanViewMixin,
     can_view,
+)
+from core.views.widgets.select import (
+    AutoCompleteSelectMultipleGroup,
+    AutoCompleteSelectSithFile,
+    AutoCompleteSelectUser,
 )
 from counter.utils import is_logged_in_counter
 
@@ -217,14 +221,13 @@ class FileEditPropForm(forms.ModelForm):
     class Meta:
         model = SithFile
         fields = ["parent", "owner", "edit_groups", "view_groups"]
+        widgets = {
+            "parent": AutoCompleteSelectSithFile,
+            "owner": AutoCompleteSelectUser,
+            "edit_groups": AutoCompleteSelectMultipleGroup,
+            "view_groups": AutoCompleteSelectMultipleGroup,
+        }
 
-    parent = make_ajax_field(SithFile, "parent", "files", help_text="")
-    edit_groups = make_ajax_field(
-        SithFile, "edit_groups", "groups", help_text="", label=_("edit group")
-    )
-    view_groups = make_ajax_field(
-        SithFile, "view_groups", "groups", help_text="", label=_("view group")
-    )
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 
 

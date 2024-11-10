@@ -10,7 +10,7 @@ module.exports = {
     .sync("./!(static)/static/webpack/**/*?(-)index.[j|t]s?(x)")
     .reduce((obj, el) => {
       // We include the path inside the webpack folder in the name
-      const relativePath = [];
+      let relativePath = [];
       const fullPath = path.parse(el);
       for (const dir of fullPath.dir.split("/").reverse()) {
         if (dir === "webpack") {
@@ -18,6 +18,8 @@ module.exports = {
         }
         relativePath.push(dir);
       }
+      // We collected folders in reverse order, we put them back in the original order
+      relativePath = relativePath.reverse();
       relativePath.push(fullPath.name);
       obj[relativePath.join("/")] = `./${el}`;
       return obj;

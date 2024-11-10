@@ -177,7 +177,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
           } as PicturesFetchPicturesData)
         ).map(PictureWithIdentifications.fromPicture);
         this.selector = this.$refs.search;
-        this.selector.filter = (users: UserProfileSchema[]) => {
+        this.selector.setFilter((users: UserProfileSchema[]) => {
           const resp: UserProfileSchema[] = [];
           const ids = [
             ...(this.currentPicture.identifications || []).map(
@@ -190,7 +190,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
             }
           }
           return resp;
-        };
+        });
         this.currentPicture = this.pictures.find(
           (i: PictureSchema) => i.id === config.firstPictureId,
         );

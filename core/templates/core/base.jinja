@@ -7,7 +7,6 @@
       <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
       <link rel="stylesheet" href="{{ static('user/user_stats.scss') }}">
       <link rel="stylesheet" href="{{ static('core/base.css') }}">
-      <link rel="stylesheet" href="{{ static('ajax_select/css/ajax_select.css') }}">
       <link rel="stylesheet" href="{{ static('core/style.scss') }}">
       <link rel="stylesheet" href="{{ static('core/markdown.scss') }}">
       <link rel="stylesheet" href="{{ static('core/header.scss') }}">
@@ -21,6 +20,8 @@
       <link rel="preload" as="style" href="{{ static('webpack/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
       <noscript><link rel="stylesheet" href="{{ static('webpack/fontawesome-index.css') }}"></noscript>
 
+      <script src="{{ url('javascript-catalog') }}"></script>
+      <script src={{ static("webpack/core/components/include-index.ts") }}></script>
       <script src="{{ static('webpack/alpine-index.js') }}" defer></script>
             <!-- Jquery declared here to be accessible in every django widgets -->
       <script src="{{ static('webpack/jquery-index.js') }}"></script>
@@ -301,8 +302,6 @@
     {% endif %}
 
     {% block script %}
-      <script src="{{ static('ajax_select/js/ajax_select.js') }}"></script>
-      <script src="{{ url('javascript-catalog') }}"></script>
       <script>
         function showMenu() {
           let navbar = document.getElementById("navbar-content");

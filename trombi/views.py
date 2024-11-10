@@ -24,7 +24,6 @@
 
 from datetime import date
 
-from ajax_select.fields import AutoCompleteSelectField
 from django import forms
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -49,6 +48,7 @@ from core.views import (
     TabedViewMixin,
 )
 from core.views.forms import SelectDate
+from core.views.widgets.select import AutoCompleteSelectUser
 from trombi.models import Trombi, TrombiClubMembership, TrombiComment, TrombiUser
 
 
@@ -147,8 +147,12 @@ class TrombiEditView(CanEditPropMixin, TrombiTabsMixin, UpdateView):
 
 
 class AddUserForm(forms.Form):
-    user = AutoCompleteSelectField(
-        "users", required=True, label=_("Select user"), help_text=None
+    user = forms.ModelChoiceField(
+        label=_("Select user"),
+        help_text=None,
+        required=True,
+        widget=AutoCompleteSelectUser,
+        queryset=User.objects.all(),
     )
 
 

@@ -81,7 +81,6 @@ INSTALLED_APPS = (
     "honeypot",
     "django_jinja",
     "ninja_extra",
-    "ajax_select",
     "haystack",
     "captcha",
     "core",

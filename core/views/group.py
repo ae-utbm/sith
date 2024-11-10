@@ -15,7 +15,6 @@
 
 """Views to manage Groups."""
 
-from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -24,6 +23,9 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from core.models import RealGroup, User
 from core.views import CanCreateMixin, CanEditMixin, DetailFormView
+from core.views.widgets.select import (
+    AutoCompleteSelectMultipleUser,
+)
 
 # Forms
 
@@ -34,37 +36,21 @@ class EditMembersForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.current_users = kwargs.pop("users", [])
         super().__init__(*args, **kwargs)
+
+        self.fields["users_added"] = forms.ModelMultipleChoiceField(
+            label=_("Users to add to group"),
+            help_text=_("Search users to add (one or more)."),
+            required=False,
+            widget=AutoCompleteSelectMultipleUser,
+            queryset=User.objects.exclude(id__in=self.current_users).all(),
+        )
+
         self.fields["users_removed"] = forms.ModelMultipleChoiceField(
             User.objects.filter(id__in=self.current_users).all(),
             label=_("Users to remove from group"),
             required=False,
             widget=forms.CheckboxSelectMultiple,
         )
-
-    users_added = AutoCompleteSelectMultipleField(
-        "users",
-        label=_("Users to add to group"),
-        help_text=_("Search users to add (one or more)."),
-        required=False,
-    )
-
-    def clean_users_added(self):
-        """Check that the user is not trying to add an user already in the group."""
-        cleaned_data = super().clean()
-        users_added = cleaned_data.get("users_added", None)
-        if not users_added:
-            return users_added
-
-        current_users = [
-            str(id_) for id_ in self.current_users.values_list("id", flat=True)
-        ]
-        for user in users_added:
-            if user in current_users:
-                raise forms.ValidationError(
-                    _("You can not add the same user twice"), code="invalid"
-                )
-
-        return users_added
 
 
 # Views
@@ -110,10 +96,12 @@ class GroupTemplateView(CanEditMixin, DetailFormView):
 
         data = form.clean()
         group = self.get_object()
-        for user in data["users_removed"]:
-            group.users.remove(user)
-        for user in data["users_added"]:
-            group.users.add(user)
+        if data["users_removed"]:
+            for user in data["users_removed"]:
+                group.users.remove(user)
+        if data["users_added"]:
+            for user in data["users_added"]:
+                group.users.add(user)
         group.save()
 
         return resp

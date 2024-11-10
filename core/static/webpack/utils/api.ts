@@ -1,14 +1,14 @@
 import type { Client, Options, RequestResult } from "@hey-api/client-fetch";
 import { client } from "#openapi";
 
-interface PaginatedResponse<T> {
+export interface PaginatedResponse<T> {
   count: number;
   next: string | null;
   previous: string | null;
   results: T[];
 }
 
-interface PaginatedRequest {
+export interface PaginatedRequest {
   query?: {
     page?: number;
     // biome-ignore lint/style/useNamingConvention: api is in snake_case
