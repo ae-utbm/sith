@@ -62,5 +62,5 @@ Le post processing est géré par le module `staticfiles`. Les fichiers sont
 compilés à la volée en mode développement.
 
 Pour la production, ils sont compilés uniquement lors du `./manage.py collectstatic`.
-Les fichiers générés sont ajoutés dans le dossier `sith/generated`. Celui-ci est
+Les fichiers générés sont ajoutés dans le dossier `staticfiles/generated`. Celui-ci est
 ensuite enregistré comme dossier supplémentaire à collecter dans Django.
