@@ -1,0 +1,22 @@
+{% trans %}Hello{% endtrans %},
+
+{% trans trimmed amount=user.customer.amount, date=user.warning_date|date(DATETIME_FORMAT) -%}
+  Following the email we sent you on {{ date }},
+  the money of your AE account ({{ amount }} €) has been recovered by the AE.
+{%- endtrans %}
+
+{% trans trimmed -%}
+  If you think this was a mistake, please mail us at ae@utbm.fr.
+{%- endtrans %}
+
+{% trans trimmed -%}
+  Please mind that this is not a closure of your account.
+  You can still access it via the AE website.
+  You are also still able to renew your subscription.
+{%- endtrans %}
+
+{% trans %}Sincerely{% endtrans %},
+
+L'association des étudiants de l'UTBM
+6, Boulevard Anatole France
+90000 Belfort

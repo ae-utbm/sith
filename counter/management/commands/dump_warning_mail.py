@@ -5,12 +5,12 @@ from smtplib import SMTPException
 from django.conf import settings
 from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
-from django.db.models import Exists, OuterRef, QuerySet, Subquery
+from django.db.models import Exists, OuterRef, Subquery
 from django.template.loader import render_to_string
 from django.utils.timezone import localdate, now
 from django.utils.translation import gettext as _
 
-from core.models import User
+from core.models import User, UserQuerySet
 from counter.models import AccountDump
 from subscription.models import Subscription
 
@@ -72,7 +72,7 @@ class Command(BaseCommand):
         self.stdout.write("Finished !")
 
     @staticmethod
-    def _get_users() -> QuerySet[User]:
+    def _get_users() -> UserQuerySet:
         ongoing_dump_operation = AccountDump.objects.ongoing().filter(
             customer__user=OuterRef("pk")
         )
@@ -97,7 +97,7 @@ class Command(BaseCommand):
             True if the mail was successfully sent, else False
         """
         message = render_to_string(
-            "counter/account_dump_warning_mail.jinja",
+            "counter/mails/account_dump_warning.jinja",
             {
                 "balance": user.customer.amount,
                 "last_subscription_date": user.last_subscription_date,
