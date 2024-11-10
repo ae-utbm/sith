@@ -94,9 +94,13 @@ class GetUserForm(forms.Form):
         cus = None
         if cleaned_data["code"] != "":
             if len(cleaned_data["code"]) == StudentCard.UID_SIZE:
-                card = StudentCard.objects.filter(uid=cleaned_data["code"])
-                if card.exists():
-                    cus = card.first().customer
+                card = (
+                    StudentCard.objects.filter(uid=cleaned_data["code"])
+                    .select_related("customer")
+                    .first()
+                )
+                if card is not None:
+                    cus = card.customer
             if cus is None:
                 cus = Customer.objects.filter(
                     account_id__iexact=cleaned_data["code"]
