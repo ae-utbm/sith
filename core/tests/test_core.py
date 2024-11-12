@@ -146,39 +146,20 @@ class TestUserLogin:
         """Should not login a user correctly."""
         response = client.post(
             reverse("core:login"),
-            {
-                "username": user.username,
-                "password": "wrong-password",
-                settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE,
-            },
+            {"username": user.username, "password": "wrong-password"},
         )
         assert response.status_code == 200
         assert (
             '<p class="alert alert-red">Votre nom d\'utilisateur '
             "et votre mot de passe ne correspondent pas. Merci de réessayer.</p>"
         ) in str(response.content.decode())
-
-    def test_login_honeypot(self, client, user):
-        response = client.post(
-            reverse("core:login"),
-            {
-                "username": user.username,
-                "password": "wrong-password",
-                settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE + "incorrect",
-            },
-        )
-        assert response.status_code == 200
         assert response.wsgi_request.user.is_anonymous
 
     def test_login_success(self, client, user):
         """Should login a user correctly."""
         response = client.post(
             reverse("core:login"),
-            {
-                "username": user.username,
-                "password": "plop",
-                settings.HONEYPOT_FIELD_NAME: settings.HONEYPOT_VALUE,
-            },
+            {"username": user.username, "password": "plop"},
         )
         assertRedirects(response, reverse("core:index"))
         assert response.wsgi_request.user == user

@@ -189,31 +189,11 @@
     }
 
     >form {
-      >p {
-        box-sizing: border-box;
-      }
-
-      >.results_on_deck>div {
-        position: relative;
-        display: flex;
-        align-items: center;
-        word-break: break-word;
-
-        >span {
-          position: absolute;
-          top: 0;
-          right: 0;
-        }
-      }
-
-      input {
+      input, .ts-wrapper {
         min-width: 100%;
         max-width: 100%;
+        margin: 5px;
         box-sizing: border-box;
-      }
-
-      button {
-        font-weight: bold;
       }
     }
   }

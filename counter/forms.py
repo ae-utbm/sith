@@ -1,10 +1,15 @@
-from ajax_select import make_ajax_field
-from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
+from club.widgets.select import AutoCompleteSelectClub
 from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
+from core.views.widgets.select import (
+    AutoCompleteSelect,
+    AutoCompleteSelectMultipleGroup,
+    AutoCompleteSelectMultipleUser,
+    AutoCompleteSelectUser,
+)
 from counter.models import (
     BillingInfo,
     Counter,
@@ -13,6 +18,11 @@ from counter.models import (
     Product,
     Refilling,
     StudentCard,
+)
+from counter.widgets.select import (
+    AutoCompleteSelectMultipleCounter,
+    AutoCompleteSelectMultipleProduct,
+    AutoCompleteSelectProduct,
 )
 
 
@@ -68,8 +78,11 @@ class GetUserForm(forms.Form):
         required=False,
         widget=NFCTextInput,
     )
-    id = AutoCompleteSelectField(
-        "users", required=False, label=_("Select user"), help_text=None
+    id = forms.CharField(
+        label=_("Select user"),
+        help_text=None,
+        widget=AutoCompleteSelectUser,
+        required=False,
     )
 
     def as_p(self):
@@ -81,9 +94,13 @@ class GetUserForm(forms.Form):
         cus = None
         if cleaned_data["code"] != "":
             if len(cleaned_data["code"]) == StudentCard.UID_SIZE:
-                card = StudentCard.objects.filter(uid=cleaned_data["code"])
-                if card.exists():
-                    cus = card.first().customer
+                card = (
+                    StudentCard.objects.filter(uid=cleaned_data["code"])
+                    .select_related("customer")
+                    .first()
+                )
+                if card is not None:
+                    cus = card.customer
             if cus is None:
                 cus = Customer.objects.filter(
                     account_id__iexact=cleaned_data["code"]
@@ -122,8 +139,10 @@ class CounterEditForm(forms.ModelForm):
         model = Counter
         fields = ["sellers", "products"]
 
-    sellers = make_ajax_field(Counter, "sellers", "users", help_text="")
-    products = make_ajax_field(Counter, "products", "products", help_text="")
+        widgets = {
+            "sellers": AutoCompleteSelectMultipleUser,
+            "products": AutoCompleteSelectMultipleProduct,
+        }
 
 
 class ProductEditForm(forms.ModelForm):
@@ -145,44 +164,37 @@ class ProductEditForm(forms.ModelForm):
             "tray",
             "archived",
         ]
+        widgets = {
+            "parent_product": AutoCompleteSelectMultipleProduct,
+            "product_type": AutoCompleteSelect,
+            "buying_groups": AutoCompleteSelectMultipleGroup,
+            "club": AutoCompleteSelectClub,
+        }
 
-    parent_product = AutoCompleteSelectField(
-        "products", show_help_text=False, label=_("Parent product"), required=False
-    )
-    buying_groups = AutoCompleteSelectMultipleField(
-        "groups",
-        show_help_text=False,
-        help_text="",
-        label=_("Buying groups"),
-        required=True,
-    )
-    club = AutoCompleteSelectField("clubs", show_help_text=False)
-    counters = AutoCompleteSelectMultipleField(
-        "counters",
-        show_help_text=False,
-        help_text="",
+    counters = forms.ModelMultipleChoiceField(
+        help_text=None,
         label=_("Counters"),
         required=False,
+        widget=AutoCompleteSelectMultipleCounter,
+        queryset=Counter.objects.all(),
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.id:
-            self.fields["counters"].initial = [
-                str(c.id) for c in self.instance.counters.all()
-            ]
+            self.fields["counters"].initial = self.instance.counters.all()
 
     def save(self, *args, **kwargs):
         ret = super().save(*args, **kwargs)
         if self.fields["counters"].initial:
-            for cid in self.fields["counters"].initial:
-                c = Counter.objects.filter(id=int(cid)).first()
-                c.products.remove(self.instance)
-                c.save()
-        for cid in self.cleaned_data["counters"]:
-            c = Counter.objects.filter(id=int(cid)).first()
-            c.products.add(self.instance)
-            c.save()
+            # Remove the product from all counter it was added to
+            # It will then only be added to selected counters
+            for counter in self.fields["counters"].initial:
+                counter.products.remove(self.instance)
+                counter.save()
+        for counter in self.cleaned_data["counters"]:
+            counter.products.add(self.instance)
+            counter.save()
         return ret
 
 
@@ -199,8 +211,7 @@ class EticketForm(forms.ModelForm):
     class Meta:
         model = Eticket
         fields = ["product", "banner", "event_title", "event_date"]
-        widgets = {"event_date": SelectDate}
-
-    product = AutoCompleteSelectField(
-        "products", show_help_text=False, label=_("Product"), required=True
-    )
+        widgets = {
+            "product": AutoCompleteSelectProduct,
+            "event_date": SelectDate,
+        }

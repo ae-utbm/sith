@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-16 02:19+0200\n"
+"POT-Creation-Date: 2024-11-10 16:00+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -22,87 +22,94 @@ msgstr ""
 msgid "captured.%s"
 msgstr "capture.%s"
 
-#: core/static/webpack/ajax-select-index.ts:73
+#: core/static/webpack/core/components/ajax-select-base.ts:68
+#: staticfiles/generated/webpack/core/static/webpack/core/components/ajax-select-base.js:57
+msgid "Remove"
+msgstr "Retirer"
+
+#: core/static/webpack/core/components/ajax-select-base.ts:88
+#: staticfiles/generated/webpack/core/static/webpack/core/components/ajax-select-base.js:77
 msgid "You need to type %(number)s more characters"
 msgstr "Vous devez taper %(number)s caractères de plus"
 
-#: core/static/webpack/ajax-select-index.ts:76
+#: core/static/webpack/core/components/ajax-select-base.ts:92
+#: staticfiles/generated/webpack/core/static/webpack/core/components/ajax-select-base.js:81
 msgid "No results found"
 msgstr "Aucun résultat trouvé"
 
-#: core/static/webpack/easymde-index.ts:31
+#: core/static/webpack/core/components/easymde-index.ts:38
 msgid "Heading"
 msgstr "Titre"
 
-#: core/static/webpack/easymde-index.ts:37
+#: core/static/webpack/core/components/easymde-index.ts:44
 msgid "Italic"
 msgstr "Italique"
 
-#: core/static/webpack/easymde-index.ts:43
+#: core/static/webpack/core/components/easymde-index.ts:50
 msgid "Bold"
 msgstr "Gras"
 
-#: core/static/webpack/easymde-index.ts:49
+#: core/static/webpack/core/components/easymde-index.ts:56
 msgid "Strikethrough"
 msgstr "Barré"
 
-#: core/static/webpack/easymde-index.ts:58
+#: core/static/webpack/core/components/easymde-index.ts:65
 msgid "Underline"
 msgstr "Souligné"
 
-#: core/static/webpack/easymde-index.ts:67
+#: core/static/webpack/core/components/easymde-index.ts:74
 msgid "Superscript"
 msgstr "Exposant"
 
-#: core/static/webpack/easymde-index.ts:76
+#: core/static/webpack/core/components/easymde-index.ts:83
 msgid "Subscript"
 msgstr "Indice"
 
-#: core/static/webpack/easymde-index.ts:82
+#: core/static/webpack/core/components/easymde-index.ts:89
 msgid "Code"
 msgstr "Code"
 
-#: core/static/webpack/easymde-index.ts:89
+#: core/static/webpack/core/components/easymde-index.ts:96
 msgid "Quote"
 msgstr "Citation"
 
-#: core/static/webpack/easymde-index.ts:95
+#: core/static/webpack/core/components/easymde-index.ts:102
 msgid "Unordered list"
 msgstr "Liste non ordonnée"
 
-#: core/static/webpack/easymde-index.ts:101
+#: core/static/webpack/core/components/easymde-index.ts:108
 msgid "Ordered list"
 msgstr "Liste ordonnée"
 
-#: core/static/webpack/easymde-index.ts:108
+#: core/static/webpack/core/components/easymde-index.ts:115
 msgid "Insert link"
 msgstr "Insérer lien"
 
-#: core/static/webpack/easymde-index.ts:114
+#: core/static/webpack/core/components/easymde-index.ts:121
 msgid "Insert image"
 msgstr "Insérer image"
 
-#: core/static/webpack/easymde-index.ts:120
+#: core/static/webpack/core/components/easymde-index.ts:127
 msgid "Insert table"
 msgstr "Insérer tableau"
 
-#: core/static/webpack/easymde-index.ts:127
+#: core/static/webpack/core/components/easymde-index.ts:134
 msgid "Clean block"
 msgstr "Nettoyer bloc"
 
-#: core/static/webpack/easymde-index.ts:134
+#: core/static/webpack/core/components/easymde-index.ts:141
 msgid "Toggle preview"
 msgstr "Activer la prévisualisation"
 
-#: core/static/webpack/easymde-index.ts:140
+#: core/static/webpack/core/components/easymde-index.ts:147
 msgid "Toggle side by side"
 msgstr "Activer la vue côte à côte"
 
-#: core/static/webpack/easymde-index.ts:146
+#: core/static/webpack/core/components/easymde-index.ts:153
 msgid "Toggle fullscreen"
 msgstr "Activer le plein écran"
 
-#: core/static/webpack/easymde-index.ts:153
+#: core/static/webpack/core/components/easymde-index.ts:160
 msgid "Markdown guide"
 msgstr "Guide markdown"
 
@@ -119,9 +126,11 @@ msgid "Incorrect value"
 msgstr "Valeur incorrecte"
 
 #: sas/static/webpack/sas/viewer-index.ts:271
+#: staticfiles/generated/webpack/sas/static/webpack/sas/viewer-index.js:234
 msgid "Couldn't moderate picture"
 msgstr "Il n'a pas été possible de modérer l'image"
 
 #: sas/static/webpack/sas/viewer-index.ts:284
+#: staticfiles/generated/webpack/sas/static/webpack/sas/viewer-index.js:248
 msgid "Couldn't delete picture"
 msgstr "Il n'a pas été possible de supprimer l'image"

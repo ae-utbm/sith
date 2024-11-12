@@ -17,7 +17,7 @@ import re
 from datetime import datetime, timedelta
 from datetime import timezone as tz
 from http import HTTPStatus
-from operator import attrgetter
+from operator import itemgetter
 from typing import TYPE_CHECKING
 from urllib.parse import parse_qs
 
@@ -801,7 +801,7 @@ class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     model = Product
-    queryset = Product.objects.annotate(type_name=F("product_type__name"))
+    queryset = Product.objects.values("id", "name", "code", "product_type__name")
     template_name = "counter/product_list.jinja"
     ordering = [
         F("product_type__priority").desc(nulls_last=True),
@@ -812,7 +812,7 @@ class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     def get_context_data(self, **kwargs):
         res = super().get_context_data(**kwargs)
         res["object_list"] = itertools.groupby(
-            res["object_list"], key=attrgetter("type_name")
+            res["object_list"], key=itemgetter("product_type__name")
         )
         return res
 

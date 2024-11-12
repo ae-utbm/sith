@@ -1,0 +1,23 @@
+{% for js in statics.js %}
+  <script-once src="{{ js }}" defer></script-once>
+{% endfor %}
+{% for css in statics.css %}
+  <link-once rel="stylesheet" type="text/css" href="{{ css }}" defer></link-once>
+{% endfor %}
+
+<{{ component }} name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>
+{% for group_name, group_choices, group_index in widget.optgroups %}
+  {% if group_name %}
+    <optgroup label="{{ group_name }}">
+  {% endif %}
+  {% for widget in group_choices %}
+    {% include widget.template_name %}
+  {% endfor %}
+  {% if group_name %}
+    </optgroup>
+  {% endif %}
+{% endfor %}
+{% if initial %}
+  <slot style="display:none" name="initial">{{ initial }}</slot>
+{% endif %}
+</{{ component }}>

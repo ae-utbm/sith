@@ -13,7 +13,6 @@
 #
 #
 
-from ajax_select import urls as ajax_select_urls
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -59,7 +58,6 @@ urlpatterns = [
     path("matmatronch/", include(("matmat.urls", "matmat"), namespace="matmat")),
     path("pedagogy/", include(("pedagogy.urls", "pedagogy"), namespace="pedagogy")),
     path("admin/", admin.site.urls),
-    path("ajax_select/", include(ajax_select_urls)),
     path("i18n/", include("django.conf.urls.i18n")),
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
     path("captcha/", include("captcha.urls")),
