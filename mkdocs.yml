@@ -66,6 +66,7 @@ nav:
     - Structure du projet: tutorial/structure.md
     - Gestion des permissions: tutorial/perms.md
     - Gestion des groupes: tutorial/groups.md
+    - Créer des fragments: tutorial/fragments.md
     - Etransactions: tutorial/etransaction.md
   - How-to:
     - L'ORM de Django: howto/querysets.md

@@ -21,9 +21,11 @@ import pytest
 from django.core import mail
 from django.core.cache import cache
 from django.core.mail import EmailMessage
-from django.test import Client, TestCase
+from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 from django.utils.timezone import now
+from django.views.generic import View
+from django.views.generic.base import ContextMixin
 from model_bakery import baker
 from pytest_django.asserts import assertInHTML, assertRedirects
 
@@ -32,6 +34,7 @@ from club.models import Membership
 from core.markdown import markdown
 from core.models import AnonymousUser, Group, Page, User
 from core.utils import get_semester_code, get_start_of_semester
+from core.views import AllowFragment
 from sith import settings
 
 
@@ -538,3 +541,18 @@ class TestDateUtils(TestCase):
             # forward time to the middle of the next semester
             frozen_time.move_to(mid_autumn)
             assert get_start_of_semester() == autumn_2023
+
+
+def test_allow_fragment_mixin():
+    class TestAllowFragmentView(AllowFragment, ContextMixin, View):
+        def get(self, *args, **kwargs):
+            context = self.get_context_data(**kwargs)
+            return context["is_fragment"]
+
+    request = RequestFactory().get("/test")
+    base_headers = request.headers
+    assert not TestAllowFragmentView.as_view()(request)
+    request.headers = {"HX-Request": False, **base_headers}
+    assert not TestAllowFragmentView.as_view()(request)
+    request.headers = {"HX-Request": True, **base_headers}
+    assert TestAllowFragmentView.as_view()(request)

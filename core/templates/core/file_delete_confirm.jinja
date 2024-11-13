@@ -4,15 +4,49 @@
   {% trans %}Delete confirmation{% endtrans %}
 {% endblock %}
 
+{% if is_fragment %}
+
+  {# Don't display tabs and errors #}
+  {% block tabs %}
+  {% endblock %}
+  {% block errors %}
+  {% endblock %}
+
+{% endif %}
+
 {% block file %}
   <h2>{% trans %}Delete confirmation{% endtrans %}</h2>
-  <form action="" method="post">{% csrf_token %}
+
+  {% if next %}
+    {% set action = current + "?next=" + next %}
+  {% else %}
+    {% set action = current %}
+  {% endif %}
+
+  <form action="{{ action }}" method="post">
+    {% csrf_token %}
+
     <p>{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}</p>
-    <input type="submit" value="{% trans %}Confirm{% endtrans %}" />
+    <button
+      {% if is_fragment %}
+        hx-post="{{ action }}"
+        hx-target="#content"
+        hx-swap="outerHtml"
+      {% endif %}
+    >{% trans %}Confirm{% endtrans %}</button>
+
+    <button
+      {% if is_fragment %}
+        hx-get="{{ previous }}"
+        hx-target="#content"
+        hx-swap="outerHtml"
+      {% else %}
+        action="window.history.back()"
+      {% endif %}
+    >{% trans %}Cancel{% endtrans %}</button>
+
   </form>
-  <form method="GET" action="javascript:history.back();">
-    <input type="submit" name="cancel" value="{% trans %}Cancel{% endtrans %}" />
-  </form>
+
 {% endblock %}
 
 
