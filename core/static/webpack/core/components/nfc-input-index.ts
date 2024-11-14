@@ -19,13 +19,16 @@ export class NfcInput extends inheritHtmlElement("input") {
     button.addEventListener("click", async () => {
       // biome-ignore lint/correctness/noUndeclaredVariables: browser API
       const ndef = new NDEFReader();
+      this.setAttribute("scan", "active");
       await ndef.scan();
       ndef.addEventListener("readingerror", () => {
+        this.removeAttribute("scan");
         window.alert(gettext("Unsupported NFC card"));
       });
 
       // biome-ignore lint/correctness/noUndeclaredVariables: browser API
       ndef.addEventListener("reading", (event: NDEFReadingEvent) => {
+        this.removeAttribute("scan");
         this.node.value = event.serialNumber.replace(/:/g, "").toUpperCase();
         /* Auto submit form, we need another button to not trigger our previously defined click event */
         const submit = document.createElement("button");
