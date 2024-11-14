@@ -27,6 +27,9 @@ from captcha.fields import CaptchaField
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.staticfiles.management.commands.collectstatic import (
+    staticfiles_storage,
+)
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import (
@@ -72,7 +75,9 @@ class NFCTextInput(TextInput):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        context["translations"] = {"unsupported": _("Unsupported NFC card")}
+        context["statics"] = {
+            "js": staticfiles_storage.url("webpack/core/components/nfc-input-index.ts")
+        }
         return context
 
 
