@@ -1,5 +1,6 @@
 <script-once src="{{ statics.js }}" defer></script-once>
+<link-once rel="stylesheet" type="text/css" href="{{ statics.css }}" defer></link-once>
 
-<span>
-  <nfc-input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}></nfc-input>
-</span>
+  <span>
+    <nfc-input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}></nfc-input>
+  </span>

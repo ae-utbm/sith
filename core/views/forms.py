@@ -76,7 +76,8 @@ class NFCTextInput(TextInput):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context["statics"] = {
-            "js": staticfiles_storage.url("webpack/core/components/nfc-input-index.ts")
+            "js": staticfiles_storage.url("webpack/core/components/nfc-input-index.ts"),
+            "css": staticfiles_storage.url("core/components/nfc-input.scss"),
         }
         return context
 
