@@ -1,21 +1,24 @@
-/**
- * @typedef {Object} BasketItem An item in the basket
- * @property {number} id The id of the product
- * @property {string} name The name of the product
- * @property {number} quantity The quantity of the product
- * @property {number} unit_price The unit price of the product
- */
+export {};
 
-const BASKET_ITEMS_COOKIE_NAME = "basket_items";
+interface BasketItem {
+  id: number;
+  name: string;
+  quantity: number;
+  // biome-ignore lint/style/useNamingConvention: the python code is snake_case
+  unit_price: number;
+}
+
+const BASKET_ITEMS_COOKIE_NAME: string = "basket_items";
 
 /**
  * Search for a cookie by name
- * @param {string} name Name of the cookie to get
- * @returns {string|null|undefined} the value of the cookie or null if it does not exist, undefined if not found
+ * @param name Name of the cookie to get
+ * @returns the value of the cookie or null if it does not exist, undefined if not found
  */
-function getCookie(name) {
-  // biome-ignore lint/style/useBlockStatements: <explanation>
-  if (!document.cookie || document.cookie.length === 0) return null;
+function getCookie(name: string): string | null | undefined {
+  if (!document.cookie || document.cookie.length === 0) {
+    return null;
+  }
 
   const found = document.cookie
     .split(";")
@@ -27,9 +30,9 @@ function getCookie(name) {
 
 /**
  * Fetch the basket items from the associated cookie
- * @returns {BasketItem[]|[]} the items in the basket
+ * @returns the items in the basket
  */
-function getStartingItems() {
+function getStartingItems(): BasketItem[] {
   const cookie = getCookie(BASKET_ITEMS_COOKIE_NAME);
   if (!cookie) {
     return [];
@@ -46,31 +49,34 @@ function getStartingItems() {
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("basket", () => ({
-    items: getStartingItems(),
+    items: getStartingItems() as BasketItem[],
 
     /**
      * Get the total price of the basket
      * @returns {number} The total price of the basket
      */
     getTotal() {
-      return this.items.reduce((acc, item) => acc + item.quantity * item.unit_price, 0);
+      return this.items.reduce(
+        (acc: number, item: BasketItem) => acc + item.quantity * item.unit_price,
+        0,
+      );
     },
 
     /**
      * Add 1 to the quantity of an item in the basket
      * @param {BasketItem} item
      */
-    add(item) {
+    add(item: BasketItem) {
       item.quantity++;
       this.setCookies();
     },
 
     /**
      * Remove 1 to the quantity of an item in the basket
-     * @param {BasketItem} item_id
+     * @param itemId the id of the item to remove
      */
-    remove(itemId) {
-      const index = this.items.findIndex((e) => e.id === itemId);
+    remove(itemId: number) {
+      const index = this.items.findIndex((e: BasketItem) => e.id === itemId);
 
       if (index < 0) {
         return;
@@ -78,7 +84,9 @@ document.addEventListener("alpine:init", () => {
       this.items[index].quantity -= 1;
 
       if (this.items[index].quantity === 0) {
-        this.items = this.items.filter((e) => e.id !== this.items[index].id);
+        this.items = this.items.filter(
+          (e: BasketItem) => e.id !== this.items[index].id,
+        );
       }
       this.setCookies();
     },
@@ -105,19 +113,19 @@ document.addEventListener("alpine:init", () => {
 
     /**
      * Create an item in the basket if it was not already in
-     * @param {number} id The id of the product to add
-     * @param {string} name The name of the product
-     * @param {number} price The unit price of the product
-     * @returns {BasketItem} The created item
+     * @param id The id of the product to add
+     * @param name The name of the product
+     * @param price The unit price of the product
+     * @returns The created item
      */
-    createItem(id, name, price) {
+    createItem(id: number, name: string, price: number): BasketItem {
       const newItem = {
         id,
         name,
         quantity: 0,
-        // biome-ignore lint/style/useNamingConvention: used by django backend
+        // biome-ignore lint/style/useNamingConvention: the python code is snake_case
         unit_price: price,
-      };
+      } as BasketItem;
 
       this.items.push(newItem);
       this.add(newItem);
@@ -128,12 +136,12 @@ document.addEventListener("alpine:init", () => {
     /**
      * Add an item to the basket.
      * This is called when the user click on a button in the catalog
-     * @param {number} id The id of the product to add
-     * @param {string} name The name of the product
-     * @param {number} price The unit price of the product
+     * @param id The id of the product to add
+     * @param name The name of the product
+     * @param price The unit price of the product
      */
-    addFromCatalog(id, name, price) {
-      let item = this.items.find((e) => e.id === id);
+    addFromCatalog(id: number, name: string, price: number) {
+      let item = this.items.find((e: BasketItem) => e.id === id);
 
       // if the item is not in the basket, we create it
       // else we add + 1 to it
