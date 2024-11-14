@@ -6,7 +6,16 @@
  **/
 export function registerComponent(name: string, options?: ElementDefinitionOptions) {
   return (component: CustomElementConstructor) => {
-    window.customElements.define(name, component, options);
+    try {
+      window.customElements.define(name, component, options);
+    } catch (e) {
+      if (e instanceof DOMException) {
+        // biome-ignore lint/suspicious/noConsole: it's handy to troobleshot
+        console.warn(e.message);
+        return;
+      }
+      throw e;
+    }
   };
 }
 

@@ -168,6 +168,7 @@ class TestStudentCard(TestCase):
         cls.root = User.objects.get(username="root")
 
         cls.counter = Counter.objects.get(id=2)
+        cls.ae_counter = Counter.objects.get(name="AE")
 
     def setUp(self):
         # Auto login on counter
@@ -191,93 +192,143 @@ class TestStudentCard(TestCase):
         # Test card with mixed letters and numbers
         response = self.client.post(
             reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+                "counter:add_student_card_fragment",
+                kwargs={
+                    "counter_id": self.counter.id,
+                    "customer_id": self.sli.customer.pk,
+                },
             ),
-            {"student_card_uid": "8B90734A802A8F", "action": "add_student_card"},
+            {"uid": "8B90734A802A8F"},
         )
-        self.assertContains(response, text="8B90734A802A8F")
+        assert response.status_code == 302
+        self.assertContains(self.client.get(response.url), text="8B90734A802A8F")
 
         # Test card with only numbers
         response = self.client.post(
             reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+                "counter:add_student_card_fragment",
+                kwargs={
+                    "counter_id": self.counter.id,
+                    "customer_id": self.sli.customer.pk,
+                },
             ),
-            {"student_card_uid": "04786547890123", "action": "add_student_card"},
+            {"uid": "04786547890123"},
         )
-        self.assertContains(response, text="04786547890123")
+        assert response.status_code == 302
+        self.assertContains(self.client.get(response.url), text="04786547890123")
 
         # Test card with only letters
         response = self.client.post(
             reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+                "counter:add_student_card_fragment",
+                kwargs={
+                    "counter_id": self.counter.id,
+                    "customer_id": self.sli.customer.pk,
+                },
             ),
-            {"student_card_uid": "ABCAAAFAAFAAAB", "action": "add_student_card"},
+            {"uid": "ABCAAAFAAFAAAB"},
         )
-        self.assertContains(response, text="ABCAAAFAAFAAAB")
+        assert response.status_code == 302
+        self.assertContains(self.client.get(response.url), text="ABCAAAFAAFAAAB")
 
     def test_add_student_card_from_counter_fail(self):
         # UID too short
         response = self.client.post(
             reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+                "counter:add_student_card_fragment",
+                kwargs={
+                    "counter_id": self.counter.id,
+                    "customer_id": self.sli.customer.pk,
+                },
             ),
-            {"student_card_uid": "8B90734A802A8", "action": "add_student_card"},
+            {"uid": "8B90734A802A8"},
         )
-        self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
-        )
+        self.assertContains(response, text="Cet UID est invalide")
 
         # UID too long
         response = self.client.post(
             reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+                "counter:add_student_card_fragment",
+                kwargs={
+                    "counter_id": self.counter.id,
+                    "customer_id": self.sli.customer.pk,
+                },
             ),
-            {"student_card_uid": "8B90734A802A8FA", "action": "add_student_card"},
+            {"uid": "8B90734A802A8FA"},
         )
+        self.assertContains(response, text="Cet UID est invalide")
         self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
+            response,
+            text="Assurez-vous que cette valeur comporte au plus 14 caractères (actuellement 15).",
         )
 
         # Test with already existing card
         response = self.client.post(
             reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+                "counter:add_student_card_fragment",
+                kwargs={
+                    "counter_id": self.counter.id,
+                    "customer_id": self.sli.customer.pk,
+                },
             ),
-            {"student_card_uid": "9A89B82018B0A0", "action": "add_student_card"},
+            {"uid": "9A89B82018B0A0"},
         )
+        self.assertContains(response, text="Cet UID est invalide")
         self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
+            response, text="Un objet Student card avec ce champ Uid existe déjà."
         )
 
         # Test with lowercase
         response = self.client.post(
             reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+                "counter:add_student_card_fragment",
+                kwargs={
+                    "counter_id": self.counter.id,
+                    "customer_id": self.sli.customer.pk,
+                },
             ),
-            {"student_card_uid": "8b90734a802a9f", "action": "add_student_card"},
+            {"uid": "8b90734a802a9f"},
         )
-        self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
-        )
+        self.assertContains(response, text="Cet UID est invalide")
 
         # Test with white spaces
         response = self.client.post(
             reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+                "counter:add_student_card_fragment",
+                kwargs={
+                    "counter_id": self.counter.id,
+                    "customer_id": self.sli.customer.pk,
+                },
             ),
-            {"student_card_uid": "              ", "action": "add_student_card"},
+            {"uid": "              "},
         )
-        self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
+        self.assertContains(response, text="Cet UID est invalide")
+        self.assertContains(response, text="Ce champ est obligatoire.")
+
+    def test_add_student_card_from_counter_unauthorized(self):
+        # Send to a counter where you aren't logged in
+        self.client.post(
+            reverse("counter:logout", args=[self.counter.id]),
+            {"user_id": self.krophil.id},
         )
+
+        def send_valid_request(client, counter_id):
+            return client.post(
+                reverse(
+                    "counter:add_student_card_fragment",
+                    kwargs={
+                        "counter_id": counter_id,
+                        "customer_id": self.sli.customer.pk,
+                    },
+                ),
+                {"uid": "8B90734A802A8F"},
+            )
+
+        assert send_valid_request(self.client, self.counter.id).status_code == 403
+
+        # Send to a non bar counter
+        self.client.force_login(self.skia)
+        assert send_valid_request(self.client, self.ae_counter.id)
 
     def test_delete_student_card_with_owner(self):
         self.client.force_login(self.sli)

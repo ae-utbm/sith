@@ -27,8 +27,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView
 
 from core.views import CanViewMixin
-from counter.forms import NFCCardForm, RefillForm
-from counter.models import Counter, Customer, Product, Selling, StudentCard
+from counter.forms import RefillForm
+from counter.models import Counter, Customer, Product, Selling
 from counter.views.mixins import CounterTabsMixin
 
 if TYPE_CHECKING:
@@ -134,7 +134,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session["too_young"] = False
         request.session["not_allowed"] = False
         request.session["no_age"] = False
-        request.session["not_valid_student_card_uid"] = False
         if self.object.type != "BAR":
             self.operator = request.user
         elif self.customer_is_barman():
@@ -146,8 +145,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             action = parse_qs(request.body.decode()).get("action", [""])[0]
         if action == "add_product":
             self.add_product(request)
-        elif action == "add_student_card":
-            self.add_student_card(request)
         elif action == "del_product":
             self.del_product(request)
         elif action == "refill":
@@ -284,23 +281,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session.modified = True
         return True
 
-    def add_student_card(self, request):
-        """Add a new student card on the customer account."""
-        uid = str(request.POST["student_card_uid"])
-        if not StudentCard.is_valid(uid):
-            request.session["not_valid_student_card_uid"] = True
-            return False
-
-        if not (
-            self.object.type == "BAR"
-            and "counter_token" in request.session
-            and request.session["counter_token"] == self.object.token
-            and self.object.is_open
-        ):
-            raise PermissionDenied
-        StudentCard(customer=self.customer, uid=uid).save()
-        return True
-
     def del_product(self, request):
         """Delete a product from the basket."""
         pid = parse_qs(request.body.decode())["product_id"][0]
@@ -431,10 +411,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                     product
                 )
         kwargs["customer"] = self.customer
-        kwargs["student_cards"] = self.customer.student_cards.all()
-        kwargs["student_card_input"] = NFCCardForm()
         kwargs["basket_total"] = self.sum_basket(self.request)
         kwargs["refill_form"] = self.refill_form or RefillForm()
-        kwargs["student_card_max_uid_size"] = StudentCard.UID_SIZE
         kwargs["barmens_can_refill"] = self.object.can_refill()
         return kwargs

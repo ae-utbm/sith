@@ -1,0 +1,25 @@
+<div id="student_card_form">
+  <h3>{% trans %}Add a student card{% endtrans %}</h3>
+  <form
+    hx-trigger="submit"
+    hx-post="{{ action }}"
+    hx-swap="outerHTML"
+    hx-target="#student_card_form"
+  >
+    {% csrf_token %}
+    {{  form.as_p() }}
+    <button>{% trans %}Go{% endtrans %}</button>
+
+  </form>
+  <h6>{% trans %}Registered cards{% endtrans %}</h6>
+  {% if student_cards %}
+
+    <ul>
+      {% for card in student_cards %}
+        <li>{{ card.uid }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    {% trans %}No card registered{% endtrans %}
+  {% endif %}
+</div>
