@@ -13,19 +13,19 @@ from sith.urls import api
 from staticfiles.apps import GENERATED_ROOT
 
 
-class Webpack:
+class JSBundler:
     @staticmethod
     def compile():
-        """Bundle js files with webpack for production."""
+        """Bundle js files with the javascript bundler for production."""
         process = subprocess.Popen(["npm", "run", "compile"])
         process.wait()
         if process.returncode:
-            raise RuntimeError(f"Webpack failed with returncode {process.returncode}")
+            raise RuntimeError(f"Bundler failed with returncode {process.returncode}")
 
     @staticmethod
     def runserver() -> subprocess.Popen:
         """Bundle js files automatically in background when called in debug mode."""
-        logging.getLogger("django").info("Running webpack server")
+        logging.getLogger("django").info("Running javascript bundling server")
         return subprocess.Popen(["npm", "run", "serve"])
 
 
@@ -69,7 +69,7 @@ class JS:
             p
             for p in settings.STATIC_ROOT.rglob("*.js")
             if ".min" not in p.suffixes
-            and (settings.STATIC_ROOT / "webpack") not in p.parents
+            and (settings.STATIC_ROOT / "bundled") not in p.parents
         ]
         for path in to_exec:
             p = path.resolve()

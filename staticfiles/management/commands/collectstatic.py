@@ -7,11 +7,11 @@ from django.contrib.staticfiles.management.commands.collectstatic import (
 )
 
 from staticfiles.apps import GENERATED_ROOT, IGNORE_PATTERNS_SCSS
-from staticfiles.processors import OpenApi, Scss, Webpack
+from staticfiles.processors import JSBundler, OpenApi, Scss
 
 
 class Command(CollectStatic):
-    """Integrate webpack and css compilation to collectstatic"""
+    """Integrate js bundling and css compilation to collectstatic"""
 
     def add_arguments(self, parser):
         super().add_arguments(parser)
@@ -50,8 +50,8 @@ class Command(CollectStatic):
             return Path(location)
 
         Scss.compile(self.collect_scss())
-        OpenApi.compile()  # This needs to be prior to webpack
-        Webpack.compile()
+        OpenApi.compile()  # This needs to be prior to javascript bundling
+        JSBundler.compile()
 
         collected = super().collect()
 

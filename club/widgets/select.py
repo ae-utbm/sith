@@ -4,7 +4,7 @@ from club.models import Club
 from club.schemas import ClubSchema
 from core.views.widgets.select import AutoCompleteSelect, AutoCompleteSelectMultiple
 
-_js = ["webpack/club/components/ajax-select-index.ts"]
+_js = ["bundled/club/components/ajax-select-index.ts"]
 
 
 class AutoCompleteSelectClub(AutoCompleteSelect):

@@ -1,6 +1,6 @@
 Vous avez ajouté une application et vous voulez y mettre du javascript ?
 
-Vous voulez importer depuis cette nouvelle application dans votre script géré par webpack ?
+Vous voulez importer depuis cette nouvelle application dans votre script géré par le bundler ?
 
 Eh bien il faut manuellement enregistrer dans node où les trouver et c'est très simple.
 
@@ -11,7 +11,7 @@ D'abord, il faut ajouter dans node via `package.json`:
     // ...
     "imports": {
         // ...
-        "#mon_app:*": "./mon_app/static/webpack/*"
+        "#mon_app:*": "./mon_app/static/bundled/*"
     }
     // ...
 }
@@ -25,7 +25,7 @@ Ensuite, pour faire fonctionne l'auto-complétion, il faut configurer `tsconfig.
         // ...
         "paths": {
             // ...
-            "#mon_app:*": ["./mon_app/static/webpack/*"]
+            "#mon_app:*": ["./mon_app/static/bundled/*"]
         }
     }
 }

@@ -27,28 +27,28 @@ le système se débrouille automatiquement pour les transformer en `.css`
     <link rel="stylesheet" href="{{ static('core/style.scss') }}">
 ```
 
-## L'intégration webpack
+## L'intégration avec le bundler javascript
 
-Webpack est intégré un peu différement. Le principe est très similaire mais
-les fichiers sont à mettre dans un dossier `static/webpack` de l'application à la place.
+Le bundler javascript est intégré un peu différement. Le principe est très similaire mais
+les fichiers sont à mettre dans un dossier `static/bundled` de l'application à la place.
 
-Pour accéder au fichier, il faut utiliser `static` comme pour le reste mais en ajouter `webpack/` comme prefix.
+Pour accéder au fichier, il faut utiliser `static` comme pour le reste mais en ajouter `bundled/` comme prefix.
 
 ```jinja
-	{# Example pour ajouter sith/core/webpack/alpine-index.js #}
-	<script src="{{ static('webpack/alpine-index.js') }}" defer></script>
-	<script src="{{ static('webpack/other-index.ts') }}" defer></script>
+	{# Example pour ajouter sith/core/bundled/alpine-index.js #}
+	<script src="{{ static('bundled/alpine-index.js') }}" defer></script>
+	<script src="{{ static('bundled/other-index.ts') }}" defer></script>
 ```
 
 !!!note
 	
-	Seuls les fichiers se terminant par `index.js` sont exportés par webpack.
+	Seuls les fichiers se terminant par `index.js` sont exportés par le bundler.
 	Les autres fichiers sont disponibles à l'import dans le JavaScript comme
 	si ils étaient tous au même niveau.
 
-### Les imports au sein des fichiers de webpack
+### Les imports au sein des fichiers des fichiers javascript bundlés
 
-Pour importer au sein de webpack, il faut préfixer ses imports de `#app:`.
+Pour importer au sein d'un fichier js bundlé, il faut préfixer ses imports de `#app:`.
 
 Exemple:
 

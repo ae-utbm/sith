@@ -19,10 +19,10 @@ class AutoCompleteSelectMixin:
     pk = "id"
 
     js = [
-        "webpack/core/components/ajax-select-index.ts",
+        "bundled/core/components/ajax-select-index.ts",
     ]
     css = [
-        "webpack/core/components/ajax-select-index.css",
+        "bundled/core/components/ajax-select-index.css",
         "core/components/ajax-select.scss",
     ]
 

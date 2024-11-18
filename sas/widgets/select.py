@@ -7,7 +7,7 @@ from core.views.widgets.select import (
 from sas.models import Album
 from sas.schemas import AlbumSchema
 
-_js = ["webpack/sas/components/ajax-select-index.ts"]
+_js = ["bundled/sas/components/ajax-select-index.ts"]
 
 
 class AutoCompleteSelectAlbum(AutoCompleteSelect):
