@@ -1,62 +1,38 @@
 {% extends "core/base.jinja" %}
 
+{% from "core/macros.jinja" import tabs %}
+
 {% block title %}
   {% trans %}New subscription{% endtrans %}
 {% endblock %}
 
-{% block content %}
-  <h3>{% trans %}New subscription{% endtrans %}</h3>
-  <div id="user_info"></div>
-  <form action="" method="post" id="subscription_form">
-    {% csrf_token %}
-    {{ form.non_field_errors() }}
-    <p>{{ form.member.errors }}<label for="{{ form.member.name }}">{{ form.member.label }}</label> {{ form.member }}</p>
-    <div id="new_member">
-      <p>{{ form.first_name.errors }}<label for="{{ form.first_name.name }}">{{ form.first_name.label }}</label> {{ form.first_name }}</p>
-      <p>{{ form.last_name.errors }}<label for="{{ form.last_name.name }}">{{ form.last_name.label }}</label> {{ form.last_name }}</p>
-      <p>{{ form.email.errors }}<label for="{{ form.email.name }}">{{ form.email.label }}</label> {{ form.email }}</p>
-      <p>{{ form.date_of_birth.errors }}<label for="{{ form.date_of_birth.name }}">{{ form.date_of_birth.label}}</label> {{ form.date_of_birth }}</p>
-    </div>
-    <p>{{ form.subscription_type.errors }}<label for="{{ form.subscription_type.name }}">{{ form.subscription_type.label }}</label> {{ form.subscription_type }}</p>
-    <p>{{ form.payment_method.errors }}<label for="{{ form.payment_method.name }}">{{ form.payment_method.label }}</label> {{
-      form.payment_method }}</p>
-    <p>{% trans %}Eboutic is reserved to specific users. In doubt, don't use it.{% endtrans %}</p>
-    <p>{{ form.location.errors }}<label for="{{ form.location.name }}">{{ form.location.label }}</label> {{ form.location }}</p>
-    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
-  </form>
+{# The following statics are bundled with our autocomplete select.
+   However, if one tries to swap a form by another, then the urls in script-once
+   and link-once disappear.
+   So we give them here.
+   If the aforementioned bug is resolved, you can remove this. #}
+{% block additional_js %}
+  <script type="module" defer src="{{ static("bundled/core/components/ajax-select-index.ts") }}"></script>
+{% endblock %}
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
+  <link rel="stylesheet" href="{{ static("core/components/ajax-select.scss") }}">
 {% endblock %}
 
-{% block script %}
-  {{ super() }}
-  <script type="text/javascript" charset="utf-8">
-    $( function() {
-      select = $("#id_member");
-      member_block = $("#subscription_form #new_member");
-      user_info = $("#user_info");
-      function display_new_member() {
-        if (select.val()) {
-          member_block.hide();
-          member_block.children().each(function() {
-            $(this).children().each(function() {
-              $(this).removeAttr('required');
-            });
-          });
-          user_info.load("/user/"+select.val()+"/mini");
-          user_info.show();
-        } else {
-          member_block.show();
-          member_block.children().each(function() {
-            $(this).children().each(function() {
-              $(this).prop('required', true);
-            });
-          });
+{% macro form_fragment(form_object, post_url) %}
+  {# Include the form fragment inside a with block,
+  in order to inject the right form in the right place #}
+  {% with form=form_object, post_url=post_url %}
+    {% include "subscription/fragments/creation_form.jinja" %}
+  {% endwith %}
+{% endmacro %}
 
-          user_info.empty();
-          user_info.hide();
-        }
-      }
-      select.on("change", display_new_member);
-      display_new_member();
-    } );
-  </script>
+{% block content %}
+  <h3>{% trans %}New subscription{% endtrans %}</h3>
+  <div id="subscription-form" hx-ext="response-targets">
+    {{ tabs([
+    (_("Existing member"), form_fragment(existing_user_form, existing_user_post_url)),
+    (_("New member"), form_fragment(new_user_form, new_user_post_url)),
+    ]) }}
+  </div>
 {% endblock %}

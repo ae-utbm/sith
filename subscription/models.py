@@ -93,22 +93,23 @@ class Subscription(models.Model):
 
     def clean(self):
         today = localdate()
-        active_subscriptions = Subscription.objects.exclude(pk=self.pk).filter(
-            subscription_start__gte=today, subscription_end__lte=today
+        threshold = timedelta(weeks=settings.SITH_SUBSCRIPTION_END)
+        # a user may subscribe if :
+        # - he/she is not currently subscribed
+        # - its current subscription ends in less than a few weeks
+        overlapping_subscriptions = Subscription.objects.exclude(pk=self.pk).filter(
+            member=self.member,
+            subscription_start__lte=today,
+            subscription_end__gte=today + threshold,
         )
-        for s in active_subscriptions:
-            if (
-                s.is_valid_now()
-                and s.subscription_end - timedelta(weeks=settings.SITH_SUBSCRIPTION_END)
-                > date.today()
-            ):
-                raise ValidationError(
-                    _("You can not subscribe many time for the same period")
-                )
+        if overlapping_subscriptions.exists():
+            raise ValidationError(
+                _("You can not subscribe many time for the same period")
+            )
 
     @staticmethod
     def compute_start(
-        d: date | None = None, duration: int = 1, user: User | None = None
+        d: date | None = None, duration: int | float = 1, user: User | None = None
     ) -> date:
         """Computes the start date of the subscription.
 
@@ -132,7 +133,7 @@ class Subscription(models.Model):
 
     @staticmethod
     def compute_end(
-        duration: int, start: date | None = None, user: User | None = None
+        duration: int | float, start: date | None = None, user: User | None = None
     ) -> date:
         """Compute the end date of the subscription.
 
@@ -163,3 +164,19 @@ class Subscription(models.Model):
 
     def is_valid_now(self):
         return self.subscription_start <= date.today() <= self.subscription_end
+
+    @property
+    def semester_duration(self) -> float:
+        """Duration of this subscription, in number of semester.
+
+        Notes:
+            The `Subscription` object doesn't have to actually exist
+            in the database to access this property
+
+        Examples:
+            ```py
+            subscription = Subscription(subscription_type="deux-semestres")
+            assert subscription.semester_duration == 2.0
+            ```
+        """
+        return settings.SITH_SUBSCRIPTIONS[self.subscription_type]["duration"]

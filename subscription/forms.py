@@ -1,4 +1,5 @@
-import random
+import secrets
+from typing import Any
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -22,67 +23,90 @@ class SelectionDateForm(forms.Form):
 
 
 class SubscriptionForm(forms.ModelForm):
+    def save(self, *args, **kwargs):
+        if self.errors:
+            # let django deal with the error messages
+            return super().save(*args, **kwargs)
+
+        duration, user = self.instance.semester_duration, self.instance.member
+        self.instance.subscription_start = self.instance.compute_start(
+            duration=duration, user=user
+        )
+        self.instance.subscription_end = self.instance.compute_end(
+            duration=duration, start=self.instance.subscription_start, user=user
+        )
+        return super().save(*args, **kwargs)
+
+
+class SubscriptionNewUserForm(SubscriptionForm):
+    """Form to create subscriptions with the user they belong to.
+
+    Examples:
+        ```py
+        assert not User.objects.filter(email=request.POST.get("email")).exists()
+        form = SubscriptionNewUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+
+        # now the user exists and is subscribed
+        user = User.objects.get(email=request.POST.get("email"))
+        assert user.is_subscribed
+    """
+
+    __user_fields = forms.fields_for_model(
+        User,
+        ["first_name", "last_name", "email", "date_of_birth"],
+        widgets={"date_of_birth": SelectDate},
+    )
+    first_name = __user_fields["first_name"]
+    last_name = __user_fields["last_name"]
+    email = __user_fields["email"]
+    date_of_birth = __user_fields["date_of_birth"]
+
+    class Meta:
+        model = Subscription
+        fields = ["subscription_type", "payment_method", "location"]
+
+    field_order = [
+        "first_name",
+        "last_name",
+        "email",
+        "date_of_birth",
+        "subscription_type",
+        "payment_method",
+        "location",
+    ]
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if User.objects.filter(email=email).exists():
+            raise ValidationError(_("A user with that email address already exists"))
+        return email
+
+    def clean(self) -> dict[str, Any]:
+        member = User(
+            first_name=self.cleaned_data.get("first_name"),
+            last_name=self.cleaned_data.get("last_name"),
+            email=self.cleaned_data.get("email"),
+            date_of_birth=self.cleaned_data.get("date_of_birth"),
+        )
+        member.generate_username()
+        member.set_password(secrets.token_urlsafe(nbytes=10))
+        self.instance.member = member
+        return super().clean()
+
+    def save(self, *args, **kwargs):
+        if self.errors:
+            # let django deal with the error messages
+            return super().save(*args, **kwargs)
+        self.instance.member.save()
+        return super().save(*args, **kwargs)
+
+
+class SubscriptionExistingUserForm(SubscriptionForm):
+    """Form to add a subscription to an existing user."""
+
     class Meta:
         model = Subscription
         fields = ["member", "subscription_type", "payment_method", "location"]
         widgets = {"member": AutoCompleteSelectUser}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["member"].required = False
-        self.fields |= forms.fields_for_model(
-            User,
-            fields=["first_name", "last_name", "email", "date_of_birth"],
-            widgets={"date_of_birth": SelectDate},
-        )
-
-    def clean_member(self):
-        subscriber = self.cleaned_data.get("member")
-        if subscriber:
-            subscriber = User.objects.filter(id=subscriber.id).first()
-        return subscriber
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if (
-            cleaned_data.get("member") is None
-            and "last_name" not in self.errors.as_data()
-            and "first_name" not in self.errors.as_data()
-            and "email" not in self.errors.as_data()
-            and "date_of_birth" not in self.errors.as_data()
-        ):
-            self.errors.pop("member", None)
-            if self.errors:
-                return cleaned_data
-            if User.objects.filter(email=cleaned_data.get("email")).first() is not None:
-                self.add_error(
-                    "email",
-                    ValidationError(_("A user with that email address already exists")),
-                )
-            else:
-                u = User(
-                    last_name=self.cleaned_data.get("last_name"),
-                    first_name=self.cleaned_data.get("first_name"),
-                    email=self.cleaned_data.get("email"),
-                    date_of_birth=self.cleaned_data.get("date_of_birth"),
-                )
-                u.generate_username()
-                u.set_password(str(random.randrange(1000000, 10000000)))
-                u.save()
-                cleaned_data["member"] = u
-        elif cleaned_data.get("member") is not None:
-            self.errors.pop("last_name", None)
-            self.errors.pop("first_name", None)
-            self.errors.pop("email", None)
-            self.errors.pop("date_of_birth", None)
-        if cleaned_data.get("member") is None:
-            # This should be handled here,
-            # but it is done in the Subscription model's clean method
-            # TODO investigate why!
-            raise ValidationError(
-                _(
-                    "You must either choose an existing "
-                    "user or create a new one properly"
-                )
-            )
-        return cleaned_data

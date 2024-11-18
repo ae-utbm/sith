@@ -13,85 +13,94 @@
 #
 #
 
-import secrets
-
-from django import forms
 from django.conf import settings
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, FormView
+from django.urls import reverse, reverse_lazy
+from django.utils.timezone import localdate
+from django.views.generic import CreateView, DetailView, TemplateView
+from django.views.generic.edit import FormView
 
-from subscription.forms import SelectionDateForm, SubscriptionForm
+from subscription.forms import (
+    SelectionDateForm,
+    SubscriptionExistingUserForm,
+    SubscriptionNewUserForm,
+)
 from subscription.models import Subscription
 
 
-class NewSubscription(CreateView):
+class CanCreateSubscriptionMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.can_create_subscription
+
+
+class NewSubscription(CanCreateSubscriptionMixin, TemplateView):
     template_name = "subscription/subscription.jinja"
-    form_class = SubscriptionForm
 
-    def dispatch(self, request, *arg, **kwargs):
-        if request.user.can_create_subscription:
-            return super().dispatch(request, *arg, **kwargs)
-        raise PermissionDenied
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "existing_user_form": SubscriptionExistingUserForm(),
+            "new_user_form": SubscriptionNewUserForm(),
+            "existing_user_post_url": reverse("subscription:fragment-existing-user"),
+            "new_user_post_url": reverse("subscription:fragment-new-user"),
+        }
 
-    def get_initial(self):
-        if "member" in self.request.GET:
-            return {
-                "member": self.request.GET["member"],
-                "subscription_type": "deux-semestres",
-            }
-        return {"subscription_type": "deux-semestres"}
 
-    def form_valid(self, form):
-        form.instance.subscription_start = Subscription.compute_start(
-            duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type][
-                "duration"
-            ],
-            user=form.instance.member,
+class CreateSubscriptionFragment(CanCreateSubscriptionMixin, CreateView):
+    template_name = "subscription/fragments/creation_form.jinja"
+
+    def get_success_url(self):
+        return reverse(
+            "subscription:creation-success", kwargs={"subscription_id": self.object.id}
         )
-        form.instance.subscription_end = Subscription.compute_end(
-            duration=settings.SITH_SUBSCRIPTIONS[form.instance.subscription_type][
-                "duration"
-            ],
-            start=form.instance.subscription_start,
-            user=form.instance.member,
-        )
-        return super().form_valid(form)
+
+
+class CreateSubscriptionExistingUserFragment(CreateSubscriptionFragment):
+    """Create a subscription for a user who already exists."""
+
+    form_class = SubscriptionExistingUserForm
+    extra_context = {"post_url": reverse_lazy("subscription:fragment-existing-user")}
+
+
+class CreateSubscriptionNewUserFragment(CreateSubscriptionFragment):
+    """Create a subscription for a user who already exists."""
+
+    form_class = SubscriptionNewUserForm
+    extra_context = {"post_url": reverse_lazy("subscription:fragment-new-user")}
+
+
+class SubscriptionCreatedFragment(CanCreateSubscriptionMixin, DetailView):
+    template_name = "subscription/fragments/creation_success.jinja"
+    model = Subscription
+    pk_url_kwarg = "subscription_id"
+    context_object_name = "subscription"
 
 
 class SubscriptionsStatsView(FormView):
     template_name = "subscription/stats.jinja"
     form_class = SelectionDateForm
+    success_url = reverse_lazy("subscriptions:stats")
 
     def dispatch(self, request, *arg, **kwargs):
-        import datetime
-
-        self.start_date = datetime.datetime.today()
+        self.start_date = localdate()
         self.end_date = self.start_date
-        res = super().dispatch(request, *arg, **kwargs)
         if request.user.is_root or request.user.is_board_member:
-            return res
+            return super().dispatch(request, *arg, **kwargs)
         raise PermissionDenied
 
     def post(self, request, *args, **kwargs):
         self.form = self.get_form()
         self.start_date = self.form["start_date"]
         self.end_date = self.form["end_date"]
-        res = super().post(request, *args, **kwargs)
-        if request.user.is_root or request.user.is_board_member:
-            return res
-        raise PermissionDenied
+        return super().post(request, *args, **kwargs)
 
     def get_initial(self):
-        init = {
+        return {
             "start_date": self.start_date.strftime("%Y-%m-%d %H:%M:%S"),
             "end_date": self.end_date.strftime("%Y-%m-%d %H:%M:%S"),
         }
-        return init
 
     def get_context_data(self, **kwargs):
-        from subscription.models import Subscription
-
         kwargs = super().get_context_data(**kwargs)
         kwargs["subscriptions_total"] = Subscription.objects.filter(
             subscription_end__gte=self.end_date, subscription_start__lte=self.start_date
@@ -100,6 +109,3 @@ class SubscriptionsStatsView(FormView):
         kwargs["payment_types"] = settings.SITH_COUNTER_PAYMENT_METHOD
         kwargs["locations"] = settings.SITH_SUBSCRIPTION_LOCATIONS
         return kwargs
-
-    def get_success_url(self, **kwargs):
-        return reverse_lazy("subscriptions:stats")

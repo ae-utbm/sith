@@ -262,8 +262,10 @@ a:not(.button) {
     font-weight: normal;
     color: white;
     padding: 9px 13px;
+    margin: 3px;
     border: none;
     text-decoration: none;
+    text-align: center;
     border-radius: 5px;
 
     &.btn-blue {
@@ -367,6 +369,7 @@ a:not(.button) {
     .alert-aside {
       display: flex;
       flex-direction: column;
+      gap: 5px;
     }
   }
 

@@ -1,9 +1,6 @@
 from pydantic import TypeAdapter
 
-from core.views.widgets.select import (
-    AutoCompleteSelect,
-    AutoCompleteSelectMultiple,
-)
+from core.views.widgets.select import AutoCompleteSelect, AutoCompleteSelectMultiple
 from sas.models import Album
 from sas.schemas import AlbumSchema
 
