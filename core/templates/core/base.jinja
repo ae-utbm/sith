@@ -14,17 +14,17 @@
 
       {% block jquery_css %}
         {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
-        <link rel="stylesheet" href="{{ static('webpack/jquery-index.css') }}">
+        <link rel="stylesheet" href="{{ static('bundled/jquery-index.css') }}">
       {% endblock %}
-      <link rel="preload" as="style" href="{{ static('webpack/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-      <noscript><link rel="stylesheet" href="{{ static('webpack/fontawesome-index.css') }}"></noscript>
+      <link rel="preload" as="style" href="{{ static('bundled/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+      <noscript><link rel="stylesheet" href="{{ static('bundled/fontawesome-index.css') }}"></noscript>
 
       <script src="{{ url('javascript-catalog') }}"></script>
-      <script src={{ static("webpack/core/components/include-index.ts") }}></script>
-      <script src="{{ static('webpack/alpine-index.js') }}" defer></script>
-      <script src="{{ static('webpack/htmx-index.js') }}" defer></script>
+      <script src={{ static("bundled/core/components/include-index.ts") }}></script>
+      <script src="{{ static('bundled/alpine-index.js') }}" defer></script>
+      <script src="{{ static('bundled/htmx-index.js') }}" defer></script>
             <!-- Jquery declared here to be accessible in every django widgets -->
-      <script src="{{ static('webpack/jquery-index.js') }}"></script>
+      <script src="{{ static('bundled/jquery-index.js') }}"></script>
             <!-- Put here to always have access to those functions on django widgets -->
       <script src="{{ static('core/js/script.js') }}"></script>
 

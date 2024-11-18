@@ -4,7 +4,7 @@ from core.views.widgets.select import AutoCompleteSelect, AutoCompleteSelectMult
 from counter.models import Counter, Product
 from counter.schemas import ProductSchema, SimplifiedCounterSchema
 
-_js = ["webpack/counter/components/ajax-select-index.ts"]
+_js = ["bundled/counter/components/ajax-select-index.ts"]
 
 
 class AutoCompleteSelectCounter(AutoCompleteSelect):

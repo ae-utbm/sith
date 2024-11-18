@@ -9,7 +9,7 @@ class MarkdownInput(Textarea):
         context = super().get_context(name, value, attrs)
 
         context["statics"] = {
-            "js": staticfiles_storage.url("webpack/core/components/easymde-index.ts"),
-            "css": staticfiles_storage.url("webpack/core/components/easymde-index.css"),
+            "js": staticfiles_storage.url("bundled/core/components/easymde-index.ts"),
+            "css": staticfiles_storage.url("bundled/core/components/easymde-index.css"),
         }
         return context

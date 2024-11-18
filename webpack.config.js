@@ -7,13 +7,13 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
   entry: glob
-    .sync("./!(static)/static/webpack/**/*?(-)index.[j|t]s?(x)")
+    .sync("./!(static)/static/bundled/**/*?(-)index.[j|t]s?(x)")
     .reduce((obj, el) => {
-      // We include the path inside the webpack folder in the name
+      // We include the path inside the bundled folder in the name
       let relativePath = [];
       const fullPath = path.parse(el);
       for (const dir of fullPath.dir.split("/").reverse()) {
-        if (dir === "webpack") {
+        if (dir === "bundled") {
           break;
         }
         relativePath.push(dir);
@@ -29,7 +29,7 @@ module.exports = {
   },
   output: {
     filename: "[name].js",
-    path: path.resolve(__dirname, "./staticfiles/generated/webpack"),
+    path: path.resolve(__dirname, "./staticfiles/generated/bundled"),
     clean: true,
   },
   resolve: {

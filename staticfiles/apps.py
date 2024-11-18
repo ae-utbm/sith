@@ -3,13 +3,13 @@ from pathlib import Path
 from django.contrib.staticfiles.apps import StaticFilesConfig
 
 GENERATED_ROOT = Path(__file__).parent.resolve() / "generated"
-IGNORE_PATTERNS_WEBPACK = ["webpack/*"]
+IGNORE_PATTERNS_BUNDLED = ["bundled/*"]
 IGNORE_PATTERNS_SCSS = ["*.scss"]
 IGNORE_PATTERNS_TYPESCRIPT = ["*.ts"]
 IGNORE_PATTERNS = [
     *StaticFilesConfig.ignore_patterns,
     *IGNORE_PATTERNS_TYPESCRIPT,
-    *IGNORE_PATTERNS_WEBPACK,
+    *IGNORE_PATTERNS_BUNDLED,
     *IGNORE_PATTERNS_SCSS,
 ]
 
@@ -25,7 +25,7 @@ class StaticFilesConfig(StaticFilesConfig):
     """
     Application in charge of processing statics files.
     It replaces the original django staticfiles
-    It integrates scss files and webpack.
+    It integrates scss files and javascript bundling.
     It makes sure that statics are properly collected and that they are automatically
         when using the development server.
     """
