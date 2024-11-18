@@ -15,7 +15,7 @@ from counter.models import AccountDump, Counter, Customer, Selling
 
 
 class Command(BaseCommand):
-    """Effectively the dump the inactive users.
+    """Effectively dump the inactive users.
 
     Users who received a warning mail enough time ago will
     have their account emptied, unless they reactivated their
