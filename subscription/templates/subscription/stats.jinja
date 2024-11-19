@@ -6,7 +6,7 @@
 
 {% block head %}
   {{ super() }}
-  <script src="{{ static('bundled/subscription/stats-index.ts') }}" defer></script>
+  <script type="module" src="{{ static('bundled/subscription/stats-index.ts') }}" defer></script>
 {% endblock %}
 
 {% block content %}

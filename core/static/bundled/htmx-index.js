@@ -1,1 +1,3 @@
-window.htmx = require("htmx.org");
+import htmx from "htmx.org";
+
+Object.assign(window, { htmx });

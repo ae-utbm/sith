@@ -10,6 +10,6 @@ class MarkdownInput(Textarea):
 
         context["statics"] = {
             "js": staticfiles_storage.url("bundled/core/components/easymde-index.ts"),
-            "css": staticfiles_storage.url("bundled/core/components/easymde-index.css"),
+            "css": staticfiles_storage.url("bundled/easymde-index.css"),
         }
         return context

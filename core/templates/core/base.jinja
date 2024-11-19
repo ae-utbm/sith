@@ -14,18 +14,19 @@
 
       {% block jquery_css %}
         {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
-        <link rel="stylesheet" href="{{ static('bundled/jquery-index.css') }}">
+        <link rel="stylesheet" href="{{ static('bundled/jquery-ui-index.css') }}">
       {% endblock %}
       <link rel="preload" as="style" href="{{ static('bundled/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
       <noscript><link rel="stylesheet" href="{{ static('bundled/fontawesome-index.css') }}"></noscript>
 
       <script src="{{ url('javascript-catalog') }}"></script>
-      <script src={{ static("bundled/core/components/include-index.ts") }}></script>
-      <script src="{{ static('bundled/alpine-index.js') }}" defer></script>
-      <script src="{{ static('bundled/htmx-index.js') }}" defer></script>
-            <!-- Jquery declared here to be accessible in every django widgets -->
-      <script src="{{ static('bundled/jquery-index.js') }}"></script>
-            <!-- Put here to always have access to those functions on django widgets -->
+      <script type="module" src={{ static("bundled/core/components/include-index.ts") }}></script>
+      <script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
+      <script type="module" src="{{ static('bundled/htmx-index.js') }}"></script>
+
+      <!-- Jquery declared here to be accessible in every django widgets -->
+      <script src="{{ static('bundled/vendored/jquery.min.js') }}"></script>
+      <script src="{{ static('bundled/vendored/jquery-ui.min.js') }}"></script>
       <script src="{{ static('core/js/script.js') }}"></script>
 
 
