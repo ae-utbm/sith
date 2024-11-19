@@ -1,5 +1,5 @@
 {% for js in statics.js %}
-  <script-once type="module" src="{{ js }}" defer></script-once>
+  <script-once type="module" src="{{ js }}"></script-once>
 {% endfor %}
 {% for css in statics.css %}
   <link-once rel="stylesheet" type="text/css" href="{{ css }}" defer></link-once>
