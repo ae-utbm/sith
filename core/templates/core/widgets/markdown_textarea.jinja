@@ -1,5 +1,5 @@
 <div>
-  <script-once type="module" src="{{ statics.js }}" defer></script-once>
+  <script-once type="module" src="{{ statics.js }}"></script-once>
   <link-once rel="stylesheet" type="text/css" href="{{ statics.css }}" defer></link-once>
 
     <markdown-input name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</markdown-input>

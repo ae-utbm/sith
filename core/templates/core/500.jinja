@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 {% block additional_js %}
   {% if settings.SENTRY_DSN %}
-    <script src="{{ static('bundled/sentry-popup-index.ts') }}" defer ></script>
+    <script type="module" src="{{ static('bundled/sentry-popup-index.ts') }}"></script>
   {% endif %}
 {% endblock additional_js %}
 

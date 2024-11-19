@@ -36,8 +36,8 @@ Pour accéder au fichier, il faut utiliser `static` comme pour le reste mais en 
 
 ```jinja
 	{# Example pour ajouter sith/core/bundled/alpine-index.js #}
-	<script src="{{ static('bundled/alpine-index.js') }}" defer></script>
-	<script src="{{ static('bundled/other-index.ts') }}" defer></script>
+	<script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
+	<script type="module" src="{{ static('bundled/other-index.ts') }}"></script>
 ```
 
 !!!note
@@ -45,6 +45,11 @@ Pour accéder au fichier, il faut utiliser `static` comme pour le reste mais en 
 	Seuls les fichiers se terminant par `index.js` sont exportés par le bundler.
 	Les autres fichiers sont disponibles à l'import dans le JavaScript comme
 	si ils étaient tous au même niveau.
+
+!!!warning
+
+	Le bundler ne génère que des modules javascript.
+	Ajouter `type="module"` n'est pas optionnel !
 
 ### Les imports au sein des fichiers des fichiers javascript bundlés
 
