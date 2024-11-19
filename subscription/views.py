@@ -13,7 +13,7 @@
 #
 #
 
-import random
+import secrets
 
 from django import forms
 from django.conf import settings
@@ -85,7 +85,7 @@ class SubscriptionForm(forms.ModelForm):
                     date_of_birth=self.cleaned_data.get("date_of_birth"),
                 )
                 u.generate_username()
-                u.set_password(str(random.randrange(1000000, 10000000)))
+                u.set_password(secrets.token_urlsafe(nbytes=10))
                 u.save()
                 cleaned_data["member"] = u
         elif cleaned_data.get("member") is not None:
