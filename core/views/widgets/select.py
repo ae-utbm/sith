@@ -22,7 +22,7 @@ class AutoCompleteSelectMixin:
         "bundled/core/components/ajax-select-index.ts",
     ]
     css = [
-        "bundled/core/components/ajax-select-index.css",
+        "bundled/ajax-select-index.css",
         "core/components/ajax-select.scss",
     ]
 

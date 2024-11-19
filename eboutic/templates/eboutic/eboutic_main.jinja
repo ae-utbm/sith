@@ -11,7 +11,7 @@
 {% block additional_js %}
     {# This script contains the code to perform requests to manipulate the
     user basket without having to reload the page #}
-  <script src="{{ static('bundled/eboutic/eboutic-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/eboutic/eboutic-index.ts') }}"></script>
 {% endblock %}
 
 {% block additional_css %}

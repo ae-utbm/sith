@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="{{ static('election/css/election.scss') }}">
 {%- endblock %}
 
+{% block additional_css %}
+  <script src="{{ static('bundled/vendored/jquery.shorten.min.js') }}"></script>
+{% endblock %}
+
 {% block content %}
   <h3 class="election__title">{{ election.title }}</h3>
   <p class="election__description">{{ election.description }}</p>
@@ -197,12 +201,12 @@
 {% block script %}
   {{ super() }}
   <script type="text/javascript">
-    shorten('.role_description', {
+    $('.role_description').shorten({
       moreText: "{% trans %}Show more{% endtrans %}",
       lessText: "{% trans %}Show less{% endtrans %}",
       showChars: 50
     });
-    shorten('.candidate_program', {
+    $('.candidate_program').shorten({
       moreText: "{% trans %}Show more{% endtrans %}",
       lessText: "{% trans %}Show less{% endtrans %}",
       showChars: 200
