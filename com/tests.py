@@ -23,7 +23,7 @@ from django.utils.translation import gettext as _
 
 from club.models import Club, Membership
 from com.models import News, Poster, Sith, Weekmail, WeekmailArticle
-from core.models import AnonymousUser, RealGroup, User
+from core.models import AnonymousUser, Group, User
 
 
 @pytest.fixture()
@@ -49,9 +49,7 @@ class TestCom(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.skia = User.objects.get(username="skia")
-        cls.com_group = RealGroup.objects.filter(
-            id=settings.SITH_GROUP_COM_ADMIN_ID
-        ).first()
+        cls.com_group = Group.objects.get(id=settings.SITH_GROUP_COM_ADMIN_ID)
         cls.skia.groups.set([cls.com_group])
 
     def setUp(self):

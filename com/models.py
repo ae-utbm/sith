@@ -34,7 +34,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Club
-from core.models import Notification, Preferences, RealGroup, User
+from core.models import Notification, Preferences, User
 
 
 class Sith(models.Model):
@@ -108,17 +108,15 @@ class News(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        for u in (
-            RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
-            .first()
-            .users.all()
+        for user in User.objects.filter(
+            groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID]
         ):
-            Notification(
-                user=u,
+            Notification.objects.create(
+                user=user,
                 url=reverse("com:news_admin_list"),
                 type="NEWS_MODERATION",
                 param="1",
-            ).save()
+            )
 
     def get_absolute_url(self):
         return reverse("com:news_detail", kwargs={"news_id": self.id})
@@ -336,16 +334,14 @@ class Poster(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.is_moderated:
-            for u in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
-                .first()
-                .users.all()
+            for user in User.objects.filter(
+                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID]
             ):
-                Notification(
-                    user=u,
+                Notification.objects.create(
+                    user=user,
                     url=reverse("com:poster_moderate_list"),
                     type="POSTER_MODERATION",
-                ).save()
+                )
         return super().save(*args, **kwargs)
 
     def clean(self, *args, **kwargs):

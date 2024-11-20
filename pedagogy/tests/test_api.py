@@ -8,7 +8,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 
 from core.baker_recipes import subscriber_user
-from core.models import RealGroup, User
+from core.models import Group, User
 from pedagogy.models import UV
 
 
@@ -80,9 +80,7 @@ class TestUVSearch(TestCase):
             subscriber_user.make(),
             baker.make(
                 User,
-                groups=[
-                    RealGroup.objects.get(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
-                ],
+                groups=[Group.objects.get(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)],
             ),
         ):
             # users that have right

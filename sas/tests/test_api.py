@@ -7,7 +7,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
-from core.models import RealGroup, SithFile, User
+from core.models import Group, SithFile, User
 from sas.baker_recipes import picture_recipe
 from sas.models import Album, PeoplePictureRelation, Picture, PictureModerationRequest
 
@@ -155,7 +155,7 @@ class TestPictureRelation(TestSas):
     def test_delete_relation_with_authorized_users(self):
         """Test that deletion works as intended when called by an authorized user."""
         relation: PeoplePictureRelation = self.user_a.pictures.first()
-        sas_admin_group = RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+        sas_admin_group = Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
         sas_admin = baker.make(User, groups=[sas_admin_group])
         root = baker.make(User, is_superuser=True)
         for user in sas_admin, root, self.user_a:
@@ -189,7 +189,7 @@ class TestPictureModeration(TestSas):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.sas_admin = baker.make(
-            User, groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
+            User, groups=[Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
         )
         cls.picture = Picture.objects.filter(parent=cls.album_a)[0]
         cls.picture.is_moderated = False
