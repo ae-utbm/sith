@@ -21,6 +21,7 @@ from wsgiref.util import FileWrapper
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db.models import Exists, OuterRef
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -31,7 +32,7 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView, FormMixin, UpdateView
 
-from core.models import Notification, RealGroup, SithFile, User
+from core.models import Notification, SithFile, User
 from core.views import (
     AllowFragment,
     CanEditMixin,
@@ -159,19 +160,18 @@ class AddFilesForm(forms.Form):
                     % {"file_name": f, "msg": repr(e)},
                 )
         if notif:
-            for u in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
-                .first()
-                .users.all()
+            unread_notif_subquery = Notification.objects.filter(
+                user=OuterRef("pk"), type="FILE_MODERATION", viewed=False
+            )
+            for user in User.objects.filter(
+                ~Exists(unread_notif_subquery),
+                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID],
             ):
-                if not u.notifications.filter(
-                    type="FILE_MODERATION", viewed=False
-                ).exists():
-                    Notification(
-                        user=u,
-                        url=reverse("core:file_moderation"),
-                        type="FILE_MODERATION",
-                    ).save()
+                Notification.objects.create(
+                    user=user,
+                    url=reverse("core:file_moderation"),
+                    type="FILE_MODERATION",
+                )
 
 
 class FileListView(ListView):
