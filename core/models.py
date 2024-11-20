@@ -387,14 +387,21 @@ class User(AbstractUser):
 
     @cached_property
     def was_subscribed(self) -> bool:
+        if "is_subscribed" in self.__dict__ and self.is_subscribed:
+            # if the user is currently subscribed, he is an old subscriber too
+            # if the property has already been cached, avoid another request
+            return True
         return self.subscriptions.exists()
 
     @cached_property
     def is_subscribed(self) -> bool:
-        s = self.subscriptions.filter(
+        if "was_subscribed" in self.__dict__ and not self.was_subscribed:
+            # if the user never subscribed, he cannot be a subscriber now.
+            # if the property has already been cached, avoid another request
+            return False
+        return self.subscriptions.filter(
             subscription_start__lte=timezone.now(), subscription_end__gte=timezone.now()
-        )
-        return s.exists()
+        ).exists()
 
     @cached_property
     def account_balance(self):
