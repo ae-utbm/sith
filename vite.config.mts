@@ -2,7 +2,7 @@
 import { parse, resolve } from "node:path";
 import inject from "@rollup/plugin-inject";
 import { glob } from "glob";
-import type { AliasOptions, UserConfig } from "vite";
+import { type AliasOptions, type UserConfig, defineConfig } from "vite";
 import type { Rollup } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import tsconfig from "./tsconfig.json";
@@ -44,65 +44,67 @@ function getRelativeAssetPath(path: string): string {
 }
 
 // biome-ignore lint/style/noDefaultExport: this is recommended by documentation
-export default {
-  base: "/static/bundled/",
-  appType: "custom",
-  build: {
-    outDir: outDir,
-    manifest: true, // goes into .vite/manifest.json in the build folder
-    modulePreload: false, // would require `import 'vite/modulepreload-polyfill'` to always be injected
-    emptyOutDir: true,
-    rollupOptions: {
-      input: collectedFiles,
-      output: {
-        // Mirror architecture of static folders in generated .js and .css
-        entryFileNames: (chunkInfo: Rollup.PreRenderedChunk) => {
-          if (chunkInfo.facadeModuleId !== null) {
-            return `${getRelativeAssetPath(chunkInfo.facadeModuleId)}.[hash].js`;
-          }
-          return "[name].[hash].js";
+export default defineConfig((config: UserConfig) => {
+  return {
+    base: "/static/bundled/",
+    appType: "custom",
+    build: {
+      outDir: outDir,
+      manifest: true, // goes into .vite/manifest.json in the build folder
+      modulePreload: false, // would require `import 'vite/modulepreload-polyfill'` to always be injected
+      emptyOutDir: config.mode === "production", // Avoid rebuilding everything in dev mode
+      rollupOptions: {
+        input: collectedFiles,
+        output: {
+          // Mirror architecture of static folders in generated .js and .css
+          entryFileNames: (chunkInfo: Rollup.PreRenderedChunk) => {
+            if (chunkInfo.facadeModuleId !== null) {
+              return `${getRelativeAssetPath(chunkInfo.facadeModuleId)}.[hash].js`;
+            }
+            return "[name].[hash].js";
+          },
+          assetFileNames: (chunkInfo: Rollup.PreRenderedAsset) => {
+            if (
+              chunkInfo.names?.length === 1 &&
+              chunkInfo.originalFileNames?.length === 1 &&
+              collectedFiles.includes(chunkInfo.originalFileNames[0])
+            ) {
+              return `${getRelativeAssetPath(chunkInfo.originalFileNames[0])}.[hash][extname]`;
+            }
+            return "[name].[hash][extname]";
+          },
+          chunkFileNames: "[name].[hash].js",
         },
-        assetFileNames: (chunkInfo: Rollup.PreRenderedAsset) => {
-          if (
-            chunkInfo.names?.length === 1 &&
-            chunkInfo.originalFileNames?.length === 1 &&
-            collectedFiles.includes(chunkInfo.originalFileNames[0])
-          ) {
-            return `${getRelativeAssetPath(chunkInfo.originalFileNames[0])}.[hash][extname]`;
-          }
-          return "[name].[hash][extname]";
-        },
-        chunkFileNames: "[name].[hash].js",
       },
     },
-  },
-  resolve: {
-    alias: getAliases(),
-  },
+    resolve: {
+      alias: getAliases(),
+    },
 
-  plugins: [
-    inject({
-      // biome-ignore lint/style/useNamingConvention: that's how it's called
-      Alpine: "alpinejs",
-    }),
-    viteStaticCopy({
-      targets: [
-        {
-          src: resolve(nodeModules, "jquery/dist/jquery.min.js"),
-          dest: vendored,
-        },
-        {
-          src: resolve(nodeModules, "jquery-ui/dist/jquery-ui.min.js"),
-          dest: vendored,
-        },
-        {
-          src: resolve(nodeModules, "jquery.shorten/src/jquery.shorten.min.js"),
-          dest: vendored,
-        },
-      ],
-    }),
-  ],
-  optimizeDeps: {
-    include: ["jquery"],
-  },
-} satisfies UserConfig;
+    plugins: [
+      inject({
+        // biome-ignore lint/style/useNamingConvention: that's how it's called
+        Alpine: "alpinejs",
+      }),
+      viteStaticCopy({
+        targets: [
+          {
+            src: resolve(nodeModules, "jquery/dist/jquery.min.js"),
+            dest: vendored,
+          },
+          {
+            src: resolve(nodeModules, "jquery-ui/dist/jquery-ui.min.js"),
+            dest: vendored,
+          },
+          {
+            src: resolve(nodeModules, "jquery.shorten/src/jquery.shorten.min.js"),
+            dest: vendored,
+          },
+        ],
+      }),
+    ],
+    optimizeDeps: {
+      include: ["jquery"],
+    },
+  } satisfies UserConfig;
+});

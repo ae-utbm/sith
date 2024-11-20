@@ -16,9 +16,10 @@ class ManifestPostProcessingStorage(ManifestStaticFilesStorage):
         # This name swap has to be done here
         # Otherwise, the manifest isn't aware of the file and can't work properly
         if settings.DEBUG:
+            # In production, the bundler manifest is used at compile time, we don't need to convert anything
             try:
                 manifest = JSBundler.get_manifest()
-            except Exception as e:
+            except FileNotFoundError as e:
                 raise Exception(
                     "Error loading manifest file, the bundler seems to be busy"
                 ) from e
@@ -27,7 +28,6 @@ class ManifestPostProcessingStorage(ManifestStaticFilesStorage):
                 name = converted
 
         path = Path(name)
-        # Call bundler manifest
         if path.suffix == ".scss":
             # Compile scss files automatically in debug mode
             if settings.DEBUG:
