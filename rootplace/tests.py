@@ -19,7 +19,7 @@ from django.urls import reverse
 from django.utils.timezone import localtime, now
 
 from club.models import Club
-from core.models import RealGroup, User
+from core.models import Group, User
 from counter.models import Counter, Customer, Product, Refilling, Selling
 from subscription.models import Subscription
 
@@ -50,9 +50,9 @@ class TestMergeUser(TestCase):
         self.to_keep.address = "Jerusalem"
         self.to_delete.parent_address = "Rome"
         self.to_delete.address = "Rome"
-        subscribers = RealGroup.objects.get(name="Subscribers")
-        mde_admin = RealGroup.objects.get(name="MDE admin")
-        sas_admin = RealGroup.objects.get(name="SAS admin")
+        subscribers = Group.objects.get(name="Subscribers")
+        mde_admin = Group.objects.get(name="MDE admin")
+        sas_admin = Group.objects.get(name="SAS admin")
         self.to_keep.groups.add(subscribers.id)
         self.to_delete.groups.add(mde_admin.id)
         self.to_keep.groups.add(sas_admin.id)

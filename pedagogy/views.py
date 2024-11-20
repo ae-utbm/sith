@@ -24,6 +24,7 @@
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -34,7 +35,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from core.models import Notification, RealGroup
+from core.models import Notification, User
 from core.views import (
     CanCreateMixin,
     CanEditPropMixin,
@@ -156,21 +157,19 @@ class UVCommentReportCreateView(CanCreateMixin, CreateView):
 
     def form_valid(self, form):
         resp = super().form_valid(form)
-
         # Send a message to moderation admins
-        for user in (
-            RealGroup.objects.filter(id=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
-            .first()
-            .users.all()
+        unread_notif_subquery = Notification.objects.filter(
+            user=OuterRef("pk"), type="PEDAGOGY_MODERATION", viewed=False
+        )
+        for user in User.objects.filter(
+            ~Exists(unread_notif_subquery),
+            groups__id__in=[settings.SITH_GROUP_PEDAGOGY_ADMIN_ID],
         ):
-            if not user.notifications.filter(
-                type="PEDAGOGY_MODERATION", viewed=False
-            ).exists():
-                Notification(
-                    user=user,
-                    url=reverse("pedagogy:moderation"),
-                    type="PEDAGOGY_MODERATION",
-                ).save()
+            Notification.objects.create(
+                user=user,
+                url=reverse("pedagogy:moderation"),
+                type="PEDAGOGY_MODERATION",
+            )
 
         return resp
 
