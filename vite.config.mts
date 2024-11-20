@@ -49,6 +49,7 @@ export default {
   appType: "custom",
   build: {
     outDir: outDir,
+    manifest: true, // goes into .vite/manifest.json in the build folder
     modulePreload: false, // would require `import 'vite/modulepreload-polyfill'` to always be injected
     emptyOutDir: true,
     rollupOptions: {
@@ -57,9 +58,9 @@ export default {
         // Mirror architecture of static folders in generated .js and .css
         entryFileNames: (chunkInfo: Rollup.PreRenderedChunk) => {
           if (chunkInfo.facadeModuleId !== null) {
-            return `${getRelativeAssetPath(chunkInfo.facadeModuleId)}.js`;
+            return `${getRelativeAssetPath(chunkInfo.facadeModuleId)}.[hash].js`;
           }
-          return "[name].js";
+          return "[name].[hash].js";
         },
         assetFileNames: (chunkInfo: Rollup.PreRenderedAsset) => {
           if (
@@ -67,13 +68,11 @@ export default {
             chunkInfo.originalFileNames?.length === 1 &&
             collectedFiles.includes(chunkInfo.originalFileNames[0])
           ) {
-            return (
-              getRelativeAssetPath(chunkInfo.originalFileNames[0]) +
-              parse(chunkInfo.names[0]).ext
-            );
+            return `${getRelativeAssetPath(chunkInfo.originalFileNames[0])}.[hash][extname]`;
           }
-          return "[name].[ext]";
+          return "[name].[hash][extname]";
         },
+        chunkFileNames: "[name].[hash].js",
       },
     },
   },

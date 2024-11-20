@@ -7,15 +7,27 @@ from django.contrib.staticfiles.storage import (
 )
 from django.core.files.storage import Storage
 
-from staticfiles.processors import JS, Scss
+from staticfiles.processors import JS, JSBundler, Scss
 
 
 class ManifestPostProcessingStorage(ManifestStaticFilesStorage):
     def url(self, name: str, *, force: bool = False) -> str:
-        """Get the URL for a file, convert .scss calls to .css ones and .ts to .js"""
+        """Get the URL for a file, convert .scss calls to .css calls to bundled files to their output ones"""
         # This name swap has to be done here
         # Otherwise, the manifest isn't aware of the file and can't work properly
+        if settings.DEBUG:
+            try:
+                manifest = JSBundler.get_manifest()
+            except Exception as e:
+                raise Exception(
+                    "Error loading manifest file, the bundler seems to be busy"
+                ) from e
+            converted = manifest.mapping.get(name, None)
+            if converted:
+                name = converted
+
         path = Path(name)
+        # Call bundler manifest
         if path.suffix == ".scss":
             # Compile scss files automatically in debug mode
             if settings.DEBUG:
@@ -27,10 +39,13 @@ class ManifestPostProcessingStorage(ManifestStaticFilesStorage):
                 )
             name = str(path.with_suffix(".css"))
 
-        elif path.suffix == ".ts":
-            name = str(path.with_suffix(".js"))
-
         return super().url(name, force=force)
+
+    def hashed_name(self, name, content=None, filename=None):
+        # Ignore bundled files since they will be added at post process
+        if JSBundler.is_in_bundle(name):
+            return name
+        return super().hashed_name(name, content, filename)
 
     def post_process(
         self, paths: dict[str, tuple[Storage, str]], *, dry_run: bool = False
@@ -42,3 +57,7 @@ class ManifestPostProcessingStorage(ManifestStaticFilesStorage):
         yield from super().post_process(paths, dry_run)
         if not dry_run:
             JS.minify()
+
+        manifest = JSBundler.get_manifest()
+        self.hashed_files.update(manifest.mapping)
+        self.save_manifest()

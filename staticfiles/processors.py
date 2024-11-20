@@ -1,16 +1,57 @@
+import json
 import logging
 import subprocess
 from dataclasses import dataclass
 from hashlib import sha1
+from itertools import chain
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Self
 
 import rjsmin
 import sass
 from django.conf import settings
 
 from sith.urls import api
-from staticfiles.apps import GENERATED_ROOT
+from staticfiles.apps import BUNDLED_ROOT, GENERATED_ROOT
+
+
+@dataclass
+class JsBundlerManifestEntry:
+    out: str
+    src: str
+
+    @classmethod
+    def from_json_entry(cls, entry: dict[str, any]) -> list[Self]:
+        ret = [
+            cls(
+                out=str(Path("bundled") / entry["file"]),
+                src=str(Path(*Path(entry["src"]).parts[2:])),
+            )
+        ]
+        for css in entry.get("css", []):
+            path = Path("bundled") / css
+            ret.append(
+                cls(
+                    out=str(path),
+                    src=str(path.with_stem(entry["name"])),
+                )
+            )
+        return ret
+
+
+class JSBundlerManifest:
+    def __init__(self, manifest: Path):
+        with open(manifest, "r") as f:
+            self._manifest = json.load(f)
+
+        self._files = chain(
+            *[
+                JsBundlerManifestEntry.from_json_entry(value)
+                for value in self._manifest.values()
+                if value.get("isEntry", False)
+            ]
+        )
+        self.mapping = {file.src: file.out for file in self._files}
 
 
 class JSBundler:
@@ -27,6 +68,16 @@ class JSBundler:
         """Bundle js files automatically in background when called in debug mode."""
         logging.getLogger("django").info("Running javascript bundling server")
         return subprocess.Popen(["npm", "run", "serve"])
+
+    @staticmethod
+    def get_manifest() -> JSBundlerManifest:
+        return JSBundlerManifest(BUNDLED_ROOT / ".vite" / "manifest.json")
+
+    @staticmethod
+    def is_in_bundle(name: str | None) -> bool:
+        if name is None:
+            return False
+        return name.startswith("bundled/")
 
 
 class Scss:

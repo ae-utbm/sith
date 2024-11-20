@@ -3,6 +3,7 @@ from pathlib import Path
 from django.contrib.staticfiles.apps import StaticFilesConfig
 
 GENERATED_ROOT = Path(__file__).parent.resolve() / "generated"
+BUNDLED_ROOT = GENERATED_ROOT / "bundled"
 IGNORE_PATTERNS_BUNDLED = ["bundled/*"]
 IGNORE_PATTERNS_SCSS = ["*.scss"]
 IGNORE_PATTERNS_TYPESCRIPT = ["*.ts"]
