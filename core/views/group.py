@@ -23,9 +23,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from core.models import RealGroup, User
 from core.views import CanCreateMixin, CanEditMixin, DetailFormView
-from core.views.widgets.select import (
-    AutoCompleteSelectMultipleUser,
-)
+from core.views.widgets.select import AutoCompleteSelectMultipleUser
 
 # Forms
 
