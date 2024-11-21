@@ -45,9 +45,11 @@
       {% if not popup %}
         <header class="header">
           <div class="header-logo">
-            <a class="header-logo-picture" href="{{ url('core:index') }}" style="background-image: url('{{ static('core/img/logo_no_text.png') }}')">
-              &nbsp;
-            </a>
+            <a
+              class="header-logo-picture"
+              href="{{ url('core:index') }}"
+              style="background-image: url('{{ static('core/img/badge_pere_200.svg') }}')"
+            ></a>
             <a class="header-logo-text" href="{{ url('core:index') }}">
               <span>Association des Étudiants</span>
               <span>de l'Université de Technologie de Belfort-Montbéliard</span>
@@ -257,7 +259,6 @@
     {% endblock %}
 
     <div id="page">
-
       <ul id="quick_notif">
         {% for n in quick_notifs %}
           <li>{{ n }}</li>
@@ -265,6 +266,11 @@
       </ul>
 
       <div id="content">
+        <img
+          src="{{ static("/core/img/badge_pere_200.svg") }}"
+          alt="badge pere 200"
+          id="pere-200-background"
+        />
         {% if list_of_tabs %}
           <div class="tool_bar">
             <div class="tools">

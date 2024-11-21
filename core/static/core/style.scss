@@ -8,6 +8,15 @@ $large-devices: 992px;
 /*--------------------------------GENERAL------------------------------*/
 
 body {
+  background: url("img/badge_pere_200.svg") repeat space right;
+  // the main content has width: 90%
+  // so a bgc of 5% makes the picture perfectly fit
+  // between the screen border and the main div
+  // However, it's ugly on small screens
+  background-size: 5%;
+  @media (max-width: 700px) {
+    background-size: 100px;
+  }
   position: relative;
   width: 100%;
   font-family: sans-serif;
@@ -319,6 +328,14 @@ a:not(.button) {
     li {
       padding: 10px;
     }
+  }
+
+  #pere-200-background {
+    opacity: 20%;
+    background-size: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   #content {
