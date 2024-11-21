@@ -144,6 +144,7 @@ class Command(BaseCommand):
             ],
             Counter(name="Eboutic", club=main_club, type="EBOUTIC"),
             Counter(name="AE", club=main_club, type="OFFICE"),
+            Counter(name="Vidage comptes AE", club=main_club, type="OFFICE"),
         ]
         Counter.objects.bulk_create(counters)
         bar_groups = []
