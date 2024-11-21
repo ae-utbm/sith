@@ -130,7 +130,7 @@ main {
     width: 50%;
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: space-evenly;
 
     @media (max-width: 960px) {
       width: 100%;
@@ -143,21 +143,14 @@ main {
     }
 
     > .user_profile_pictures_bigone {
-      flex-grow: 9;
-      flex-basis: 20em;
       display: flex;
       justify-content: center;
-      align-items: center;
 
       > img {
         max-height: 100%;
-        max-width: 100%;
-        object-fit: contain;
 
         @media (max-width: 960px) {
-          max-width: 300px;
-          width: 100%;
-          object-fit: contain;
+          width: 300px;
         }
       }
     }
@@ -169,7 +162,6 @@ main {
       justify-content: center;
       align-items: center;
       gap: 20px;
-      flex-grow: 1;
 
       @media (max-width: 960px) {
         flex-direction: row;
