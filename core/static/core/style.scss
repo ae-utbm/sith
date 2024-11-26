@@ -370,6 +370,38 @@ a:not(.button) {
     }
   }
 
+  .tabs {
+    .tab-headers {
+      display: flex;
+      flex-flow: row wrap;
+      .tab-header{
+        margin: 0;
+        flex: 1 1;
+        border-radius: 5px 5px 0 0;
+        font-size: 100%;
+
+        @media (max-width: 800px) {
+          flex-wrap: wrap;
+        }
+        &.active {
+          background-color: $white-color;
+          border: 1px solid $primary-neutral-dark-color;
+          border-bottom: none;
+        }
+        &:not(.active) {
+          background-color: $primary-neutral-dark-color;
+          color: darken($white-color, 5%);
+          &:hover {
+            background-color: lighten($primary-neutral-dark-color, 15%);
+          }
+        }
+      }
+    }
+    section {
+      padding: 20px;
+    }
+  }
+
   .tool_bar {
     overflow: auto;
     padding: 4px;

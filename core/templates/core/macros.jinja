@@ -170,12 +170,12 @@
 {% endmacro %}
 
 {% macro paginate_htmx(current_page, paginator) %}
-    {# Add pagination buttons for pages without Alpine but supporting framgents.
+    {# Add pagination buttons for pages without Alpine but supporting fragments.
 
     This must be coupled with a view that handles pagination
-    with the Django Paginator object and supports framgents.
+    with the Django Paginator object and supports fragments.
 
-    The relpaced fragment will be #content so make sure you are calling this macro inside your content block.
+    The replaced fragment will be #content so make sure you are calling this macro inside your content block.
 
     Parameters:
         current_page (django.core.paginator.Page): the current page object
@@ -247,9 +247,9 @@
 {% macro select_all_checkbox(form_id) %}
   <script type="text/javascript">
     function checkbox_{{form_id}}(value) {
-      list = document.getElementById("{{ form_id }}").getElementsByTagName("input");
-      for (let element of list){
-        if (element.type == "checkbox"){
+      const inputs = document.getElementById("{{ form_id }}").getElementsByTagName("input");
+      for (let element of inputs){
+        if (element.type === "checkbox"){
           element.checked = value;
         }
       }
@@ -257,4 +257,59 @@
   </script>
   <button type="button" onclick="checkbox_{{form_id}}(true);">{% trans %}Select All{% endtrans %}</button>
   <button type="button" onclick="checkbox_{{form_id}}(false);">{% trans %}Unselect All{% endtrans %}</button>
+{% endmacro %}
+
+{% macro tabs(tab_list, attrs = "") %}
+  {# Tab component
+
+  Parameters:
+    tab_list: list[tuple[str, str]] The list of tabs to display.
+        Each element of the list is a tuple which first element
+        is the title of the tab and the second element its content
+    attrs: str Additional attributes to put on the enclosing div
+
+  Example:
+    A basic usage would be as follow :
+
+        {{ tabs([("title 1", "content 1"), ("title 2", "content 2")]) }}
+
+    If you want to display more complex logic, you can define macros
+    and use those macros in parameters :
+
+        {{ tabs([("title", my_macro())]) }}
+
+    It's also possible to get and set the currently selected tab using Alpine.
+    Here, the title of the currently selected tab will be displayed.
+    Moreover, on page load, the tab will be opened on "tab 2".
+
+        <div x-data="{current_tab: 'tab 2'}">
+          <p x-text="current_tab"></p>
+          {{ tabs([("tab 1", "Hello"), ("tab 2", "World")], "x-model=current_tab") }}
+        </div>
+  #}
+  <div
+    class="tabs"
+    x-data="{selected: '{{ tab_list[0][0] }}'}"
+    x-modelable="selected"
+    {{ attrs }}
+  >
+    <div class="tab-headers">
+      {% for title, _ in tab_list %}
+        <button
+          class="tab-header clickable"
+          :class="{active: selected === '{{ title }}'}"
+          @click="selected = '{{ title }}'"
+        >
+          {{ title }}
+        </button>
+      {% endfor %}
+    </div>
+    <div class="tab-content shadow">
+      {% for title, content in tab_list %}
+        <section x-show="selected === '{{ title }}'" class="">
+          {{ content }}
+        </section>
+      {% endfor %}
+    </div>
+  </div>
 {% endmacro %}
