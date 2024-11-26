@@ -12,6 +12,8 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+"""Tests focused on the computing of subscription end, start and duration"""
+
 from datetime import date
 
 import freezegun
