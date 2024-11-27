@@ -21,6 +21,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from core.views import CanViewMixin
 from counter.forms import EticketForm
 from counter.models import Eticket, Selling
+from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin
 
 
 class EticketListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):

@@ -32,6 +32,7 @@ from core.views import CanEditMixin, CanViewMixin
 from counter.forms import CounterEditForm, ProductEditForm
 from counter.models import Counter, Product, ProductType, Refilling, Selling
 from counter.utils import is_logged_in_counter
+from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin
 
 
 class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):

@@ -21,6 +21,7 @@ from django.views.generic import TemplateView
 
 from accounting.models import CurrencyField
 from counter.models import Refilling, Selling
+from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin
 
 
 class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):

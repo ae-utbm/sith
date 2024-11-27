@@ -29,6 +29,7 @@ from django.views.generic import DetailView
 from core.views import CanViewMixin
 from counter.forms import NFCCardForm, RefillForm
 from counter.models import Counter, Customer, Product, Selling, StudentCard
+from counter.views.mixins import CounterTabsMixin
 
 if TYPE_CHECKING:
     from core.models import User

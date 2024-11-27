@@ -32,6 +32,11 @@ from counter.models import (
     Refilling,
 )
 from counter.utils import is_logged_in_counter
+from counter.views.mixins import (
+    CounterAdminMixin,
+    CounterAdminTabsMixin,
+    CounterTabsMixin,
+)
 
 
 class CashRegisterSummaryForm(forms.Form):

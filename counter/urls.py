@@ -15,28 +15,16 @@
 
 from django.urls import path
 
-from counter.views import (
+from counter.views.admin import (
     ActiveProductListView,
     ArchivedProductListView,
-    CashSummaryEditView,
-    CashSummaryListView,
-    CounterActivityView,
-    CounterCashSummaryView,
-    CounterClick,
     CounterCreateView,
     CounterDeleteView,
     CounterEditPropView,
     CounterEditView,
-    CounterLastOperationsView,
     CounterListView,
-    CounterMain,
     CounterRefillingListView,
     CounterStatView,
-    EticketCreateView,
-    EticketEditView,
-    EticketListView,
-    EticketPDFView,
-    InvoiceCallView,
     ProductCreateView,
     ProductEditView,
     ProductTypeCreateView,
@@ -44,6 +32,24 @@ from counter.views import (
     ProductTypeListView,
     RefillingDeleteView,
     SellingDeleteView,
+)
+from counter.views.cash import (
+    CashSummaryEditView,
+    CashSummaryListView,
+    CounterCashSummaryView,
+)
+from counter.views.click import CounterClick
+from counter.views.eticket import (
+    EticketCreateView,
+    EticketEditView,
+    EticketListView,
+    EticketPDFView,
+)
+from counter.views.invoice import InvoiceCallView
+from counter.views.main import (
+    CounterActivityView,
+    CounterLastOperationsView,
+    CounterMain,
     StudentCardDeleteView,
     StudentCardFormView,
     counter_login,

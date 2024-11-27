@@ -12,76 +12,26 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-import itertools
-import re
-from datetime import datetime, timedelta
-from datetime import timezone as tz
-from http import HTTPStatus
-from operator import itemgetter
-from typing import TYPE_CHECKING
-from urllib.parse import parse_qs
+from datetime import timedelta
 
-from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.db import DataError, transaction
 from django.db.models import F
-from django.forms import CheckboxSelectMultiple
-from django.forms.models import modelform_factory
-from django.http import (
-    Http404,
-    HttpRequest,
-    HttpResponse,
-    HttpResponseRedirect,
-    JsonResponse,
-)
+from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.base import View
-from django.views.generic.edit import (
-    CreateView,
-    DeleteView,
-    FormMixin,
-    FormView,
-    ProcessFormView,
-    UpdateView,
-)
+from django.views.generic import DetailView
+from django.views.generic.edit import DeleteView, FormMixin, FormView, ProcessFormView
 
-from accounting.models import CurrencyField
-from core.utils import get_semester_code, get_start_of_semester
-from core.views import CanEditMixin, CanViewMixin, TabedViewMixin
+from core.views import CanEditMixin, CanViewMixin
 from core.views.forms import LoginForm
-from counter.forms import (
-    CashSummaryFormBase,
-    CounterEditForm,
-    EticketForm,
-    GetUserForm,
-    NFCCardForm,
-    ProductEditForm,
-    RefillForm,
-    StudentCardForm,
-)
-from counter.models import (
-    CashRegisterSummary,
-    CashRegisterSummaryItem,
-    Counter,
-    Customer,
-    Eticket,
-    Permanency,
-    Product,
-    ProductType,
-    Refilling,
-    Selling,
-    StudentCard,
-)
+from counter.forms import GetUserForm, StudentCardForm
+from counter.models import Counter, Customer, Permanency, StudentCard
 from counter.utils import is_logged_in_counter
-
-if TYPE_CHECKING:
-    from core.models import User
+from counter.views.mixins import CounterTabsMixin
 
 
 class StudentCardDeleteView(DeleteView, CanEditMixin):
