@@ -3,7 +3,6 @@ from typing import Annotated
 
 from annotated_types import MinLen
 from ninja import Field, FilterSchema, ModelSchema
-from pydantic import Field
 
 from counter.models import Counter, Permanency, Product
 
