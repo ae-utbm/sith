@@ -39,7 +39,9 @@ class NewSubscription(CanCreateSubscriptionMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "existing_user_form": SubscriptionExistingUserForm(),
+            "existing_user_form": SubscriptionExistingUserForm(
+                initial={"member": self.request.GET.get("member")}
+            ),
             "new_user_form": SubscriptionNewUserForm(),
             "existing_user_post_url": reverse("subscription:fragment-existing-user"),
             "new_user_post_url": reverse("subscription:fragment-new-user"),

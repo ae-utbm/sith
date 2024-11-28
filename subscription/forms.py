@@ -23,6 +23,14 @@ class SelectionDateForm(forms.Form):
 
 
 class SubscriptionForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        initial = kwargs.pop("initial", {})
+        if "subscription_type" not in initial:
+            initial["subscription_type"] = "deux-semestres"
+        if "payment_method" not in initial:
+            initial["payment_method"] = "CARD"
+        super().__init__(*args, initial=initial, **kwargs)
+
     def save(self, *args, **kwargs):
         if self.errors:
             # let django deal with the error messages
