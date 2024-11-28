@@ -95,7 +95,6 @@ INSTALLED_APPS = (
     "com",
     "election",
     "forum",
-    "stock",
     "trombi",
     "matmat",
     "pedagogy",
