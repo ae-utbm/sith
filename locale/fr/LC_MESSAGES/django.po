@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-27 15:24+0100\n"
+"POT-Creation-Date: 2024-11-29 18:04+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -362,8 +362,8 @@ msgstr "Compte en banque : "
 #: core/templates/core/file_detail.jinja:62
 #: core/templates/core/file_moderation.jinja:48
 #: core/templates/core/group_detail.jinja:26
-#: core/templates/core/group_list.jinja:25 core/templates/core/macros.jinja:96
-#: core/templates/core/macros.jinja:115 core/templates/core/page_prop.jinja:14
+#: core/templates/core/group_list.jinja:25 core/templates/core/macros.jinja:104
+#: core/templates/core/macros.jinja:123 core/templates/core/page_prop.jinja:14
 #: core/templates/core/user_account_detail.jinja:41
 #: core/templates/core/user_account_detail.jinja:77
 #: core/templates/core/user_clubs.jinja:34
@@ -1334,7 +1334,7 @@ msgid "No mailing list existing for this club"
 msgstr "Aucune mailing liste n'existe pour ce club"
 
 #: club/templates/club/mailing.jinja:72
-#: subscription/templates/subscription/subscription.jinja:34
+#: subscription/templates/subscription/subscription.jinja:39
 msgid "New member"
 msgstr "Nouveau membre"
 
@@ -2204,8 +2204,8 @@ msgstr "profil visible par les cotisants"
 msgid "A user with that username already exists"
 msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 
-#: core/models.py:761 core/templates/core/macros.jinja:75
-#: core/templates/core/macros.jinja:77 core/templates/core/macros.jinja:78
+#: core/models.py:761 core/templates/core/macros.jinja:80
+#: core/templates/core/macros.jinja:84 core/templates/core/macros.jinja:85
 #: core/templates/core/user_detail.jinja:100
 #: core/templates/core/user_detail.jinja:101
 #: core/templates/core/user_detail.jinja:103
@@ -2753,29 +2753,29 @@ msgstr "Partager sur Facebook"
 msgid "Tweet"
 msgstr "Tweeter"
 
-#: core/templates/core/macros.jinja:85
+#: core/templates/core/macros.jinja:93
 #, python-format
 msgid "Subscribed until %(subscription_end)s"
 msgstr "Cotisant jusqu'au %(subscription_end)s"
 
-#: core/templates/core/macros.jinja:86
+#: core/templates/core/macros.jinja:94
 msgid "Account number: "
 msgstr "Numéro de compte : "
 
-#: core/templates/core/macros.jinja:91 launderette/models.py:188
+#: core/templates/core/macros.jinja:99 launderette/models.py:188
 msgid "Slot"
 msgstr "Créneau"
 
-#: core/templates/core/macros.jinja:104
+#: core/templates/core/macros.jinja:112
 #: launderette/templates/launderette/launderette_admin.jinja:20
 msgid "Tokens"
 msgstr "Jetons"
 
-#: core/templates/core/macros.jinja:258
+#: core/templates/core/macros.jinja:266
 msgid "Select All"
 msgstr "Tout sélectionner"
 
-#: core/templates/core/macros.jinja:259
+#: core/templates/core/macros.jinja:267
 msgid "Unselect All"
 msgstr "Tout désélectionner"
 
@@ -3137,7 +3137,7 @@ msgstr "Non cotisant"
 
 #: core/templates/core/user_detail.jinja:162
 #: subscription/templates/subscription/subscription.jinja:6
-#: subscription/templates/subscription/subscription.jinja:31
+#: subscription/templates/subscription/subscription.jinja:37
 msgid "New subscription"
 msgstr "Nouvelle cotisation"
 
@@ -5791,7 +5791,7 @@ msgstr "Weekmail envoyé avec succès"
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 
-#: subscription/forms.py:83
+#: subscription/forms.py:93
 msgid "A user with that email address already exists"
 msgstr "Un utilisateur avec cette adresse email existe déjà"
 
@@ -5841,7 +5841,7 @@ msgstr ""
 msgid "Go to user profile"
 msgstr "Voir le profil de l'utilisateur"
 
-#: subscription/templates/subscription/fragments/creation_success.jinja:25
+#: subscription/templates/subscription/fragments/creation_success.jinja:24
 msgid "Create another subscription"
 msgstr "Créer une nouvelle cotisation"
 

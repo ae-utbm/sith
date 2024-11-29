@@ -1,0 +1,28 @@
+#subscription-form form {
+  .form-content.existing-user {
+    max-height: 100%;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: row;
+
+    @media screen and (max-width: 700px) {
+      flex-direction: column-reverse;
+    }
+
+    /* Make the form fields take exactly the space they need,
+     * then display the user profile right in the middle of the remaining space. */
+    fieldset {
+      flex: 0 1 auto;
+    }
+
+    #subscription-form-user-mini-profile {
+      display: flex;
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+
+    .user_mini_profile {
+      height: 300px;
+    }
+  }
+}

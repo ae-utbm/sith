@@ -13,10 +13,16 @@
    If the aforementioned bug is resolved, you can remove this. #}
 {% block additional_js %}
   <script type="module" defer src="{{ static("bundled/core/components/ajax-select-index.ts") }}"></script>
+  <script
+    type="module"
+    defer
+    src="{{ static("bundled/subscription/creation-form-existing-user-index.ts") }}"
+  ></script>
 {% endblock %}
 {% block additional_css %}
   <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
   <link rel="stylesheet" href="{{ static("core/components/ajax-select.scss") }}">
+  <link rel="stylesheet" href="{{ static("subscription/css/subscription.scss") }}">
 {% endblock %}
 
 {% macro form_fragment(form_object, post_url) %}
@@ -30,9 +36,11 @@
 {% block content %}
   <h3>{% trans %}New subscription{% endtrans %}</h3>
   <div id="subscription-form" hx-ext="response-targets">
-    {{ tabs([
-    (_("Existing member"), form_fragment(existing_user_form, existing_user_post_url)),
-    (_("New member"), form_fragment(new_user_form, new_user_post_url)),
-    ]) }}
+    {% with title1=_("Existing member"), title2=_("New member") %}
+      {{ tabs([
+      (title1, form_fragment(existing_user_form, existing_user_post_url)),
+      (title2, form_fragment(new_user_form, new_user_post_url)),
+      ]) }}
+    {% endwith %}
   </div>
 {% endblock %}

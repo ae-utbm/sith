@@ -5,6 +5,6 @@
   hx-swap="outerHTML"
 >
   {% csrf_token %}
-  {{ form.as_p() }}
+  {{ form }}
   <input type="submit" value="{% trans %}Save{% endtrans %}">
 </form>

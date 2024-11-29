@@ -4,18 +4,21 @@
       {% trans user=subscription.member %}Subscription created for {{ user }}{% endtrans %}
     </h3>
     <p>
-
-      {% trans trimmed user=subscription.member.get_short_name(), type=subscription.subscription_type, end=subscription.subscription_end %}
-        {{ user }} received its new {{ type }} subscription.
-        It will be active until {{ end }} included.
+      {% trans trimmed
+      user=subscription.member.get_short_name(),
+      type=subscription.subscription_type,
+      end=subscription.subscription_end
+      %}
+      {{ user }} received its new {{ type }} subscription.
+      It will be active until {{ end }} included.
       {% endtrans %}
     </p>
   </div>
   <div class="alert-aside">
-    <a  class="btn btn-blue" href="{{ subscription.member.get_absolute_url() }}">
+    <a class="btn btn-blue" href="{{ subscription.member.get_absolute_url() }}">
       {% trans %}Go to user profile{% endtrans %}
     </a>
-    <a  class="btn btn-grey" href="{{ url("subscription:subscription") }}">
+    <a class="btn btn-grey" href="{{ url("subscription:subscription") }}">
       {# We don't know if this fragment is displayed after creating a subscription
       for a previously existing user or for a newly created one.
       Thus, we don't know which form should be used to create another subscription

@@ -61,6 +61,8 @@ class SubscriptionNewUserForm(SubscriptionForm):
         assert user.is_subscribed
     """
 
+    template_name = "subscription/forms/create_new_user.html"
+
     __user_fields = forms.fields_for_model(
         User,
         ["first_name", "last_name", "email", "date_of_birth"],
@@ -113,6 +115,8 @@ class SubscriptionNewUserForm(SubscriptionForm):
 
 class SubscriptionExistingUserForm(SubscriptionForm):
     """Form to add a subscription to an existing user."""
+
+    template_name = "subscription/forms/create_existing_user.html"
 
     class Meta:
         model = Subscription

@@ -66,7 +66,12 @@
       </div>
       {% if user.promo and user.promo_has_logo() %}
         <div class="user_mini_profile_promo">
-          <img src="{{ static('core/img/promo_%02d.png' % user.promo) }}" title="Promo {{ user.promo }}" alt="Promo {{ user.promo }}" class="promo_pict" />
+          <img
+            src="{{ static('core/img/promo_%02d.png' % user.promo) }}"
+            title="Promo {{ user.promo }}"
+            alt="Promo {{ user.promo }}"
+            class="promo_pict"
+          />
         </div>
       {% endif %}
     </div>
@@ -74,8 +79,11 @@
       {% if user.profile_pict %}
         <img src="{{ user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" />
       {% else %}
-        <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}"
-             title="{% trans %}Profile{% endtrans %}" />
+        <img
+          src="{{ static('core/img/unknown.jpg') }}"
+          alt="{% trans %}Profile{% endtrans %}"
+          title="{% trans %}Profile{% endtrans %}"
+        />
       {% endif %}
     </div>
   </div>
@@ -286,6 +294,13 @@
           <p x-text="current_tab"></p>
           {{ tabs([("tab 1", "Hello"), ("tab 2", "World")], "x-model=current_tab") }}
         </div>
+
+    If you want to have translated tab titles, you can enclose the macro call
+    in a with block :
+
+        {% with title=_("title"), content=_("Content") %}
+            {{ tabs([(tab1, content)]) }}
+        {% endwith %}
   #}
   <div
     class="tabs"
