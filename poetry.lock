@@ -704,12 +704,12 @@ test = ["testfixtures"]
 
 [[package]]
 name = "djhtml"
-version = "3.0.6"
+version = "3.0.7"
 description = "Django/Jinja template indenter"
 optional = false
 python-versions = "*"
 files = [
-    {file = "djhtml-3.0.6.tar.gz", hash = "sha256:abfc4d7b4730432ca6a98322fbdf8ae9d6ba254ea57ba3759a10ecb293bc57de"},
+    {file = "djhtml-3.0.7.tar.gz", hash = "sha256:558c905b092a0c8afcbed27dea2f50aa6eb853a658b309e4e0f2bb378bdf6178"},
 ]
 
 [package.extras]
@@ -2681,4 +2681,4 @@ filelock = ">=3.4"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "e64ed169395d2c32672a2f2ad6a40d0910e4a51941b564fbdc505db6332084d2"
+content-hash = "9532a2022ddc1a9f763607fad1f924da20ef92575cda6eaa90359c95291238a4"
