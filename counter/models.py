@@ -532,9 +532,12 @@ class Counter(models.Model):
         return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
     def can_be_viewed_by(self, user: User) -> bool:
-        if self.type == "BAR":
-            return True
-        return user.is_board_member or user in self.sellers.all()
+        return (
+            self.type == "BAR"
+            or user.is_root
+            or user.is_in_group(pk=self.club.board_group_id)
+            or user in self.sellers.all()
+        )
 
     def gen_token(self) -> None:
         """Generate a new token for this counter."""

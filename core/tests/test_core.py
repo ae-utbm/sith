@@ -18,6 +18,7 @@ from smtplib import SMTPException
 
 import freezegun
 import pytest
+from django.contrib.auth.hashers import make_password
 from django.core import mail
 from django.core.cache import cache
 from django.core.mail import EmailMessage
@@ -30,7 +31,7 @@ from model_bakery import baker
 from pytest_django.asserts import assertInHTML, assertRedirects
 
 from antispam.models import ToxicDomain
-from club.models import Membership
+from club.models import Club, Membership
 from core.markdown import markdown
 from core.models import AnonymousUser, Group, Page, User
 from core.utils import get_semester_code, get_start_of_semester
@@ -145,7 +146,7 @@ class TestUserRegistration:
 class TestUserLogin:
     @pytest.fixture()
     def user(self) -> User:
-        return User.objects.first()
+        return baker.make(User, password=make_password("plop"))
 
     def test_login_fail(self, client, user):
         """Should not login a user correctly."""
@@ -349,14 +350,9 @@ class TestUserIsInGroup(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        from club.models import Club
-
         cls.root_group = Group.objects.get(name="Root")
-        cls.public = Group.objects.get(name="Public")
-        cls.skia = User.objects.get(username="skia")
-        cls.toto = User.objects.create(
-            username="toto", first_name="a", last_name="b", email="a.b@toto.fr"
-        )
+        cls.public_group = Group.objects.get(name="Public")
+        cls.public_user = baker.make(User)
         cls.subscribers = Group.objects.get(name="Subscribers")
         cls.old_subscribers = Group.objects.get(name="Old subscribers")
         cls.accounting_admin = Group.objects.get(name="Accounting admin")
@@ -366,22 +362,12 @@ class TestUserIsInGroup(TestCase):
         cls.banned_counters = Group.objects.get(name="Banned from counters")
         cls.banned_subscription = Group.objects.get(name="Banned to subscribe")
         cls.sas_admin = Group.objects.get(name="SAS admin")
-        cls.club = Club.objects.create(
-            name="Fake Club",
-            unix_name="fake-club",
-            address="Fake address",
-        )
+        cls.club = baker.make(Club)
         cls.main_club = Club.objects.get(id=1)
 
     def assert_in_public_group(self, user):
-        assert user.is_in_group(pk=self.public.id)
-        assert user.is_in_group(name=self.public.name)
-
-    def assert_in_club_metagroups(self, user, club):
-        meta_groups_board = club.unix_name + settings.SITH_BOARD_SUFFIX
-        meta_groups_members = club.unix_name + settings.SITH_MEMBER_SUFFIX
-        assert user.is_in_group(name=meta_groups_board) is False
-        assert user.is_in_group(name=meta_groups_members) is False
+        assert user.is_in_group(pk=self.public_group.id)
+        assert user.is_in_group(name=self.public_group.name)
 
     def assert_only_in_public_group(self, user):
         self.assert_in_public_group(user)
@@ -392,13 +378,11 @@ class TestUserIsInGroup(TestCase):
             self.sas_admin,
             self.subscribers,
             self.old_subscribers,
+            self.club.members_group,
+            self.club.board_group,
         ):
             assert not user.is_in_group(pk=group.pk)
             assert not user.is_in_group(name=group.name)
-        meta_groups_board = self.club.unix_name + settings.SITH_BOARD_SUFFIX
-        meta_groups_members = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
-        assert user.is_in_group(name=meta_groups_board) is False
-        assert user.is_in_group(name=meta_groups_members) is False
 
     def test_anonymous_user(self):
         """Test that anonymous users are only in the public group."""
@@ -407,80 +391,80 @@ class TestUserIsInGroup(TestCase):
 
     def test_not_subscribed_user(self):
         """Test that users who never subscribed are only in the public group."""
-        self.assert_only_in_public_group(self.toto)
+        self.assert_only_in_public_group(self.public_user)
 
     def test_wrong_parameter_fail(self):
         """Test that when neither the pk nor the name argument is given,
         the function raises a ValueError.
         """
         with self.assertRaises(ValueError):
-            self.toto.is_in_group()
+            self.public_user.is_in_group()
 
     def test_number_queries(self):
         """Test that the number of db queries is stable
         and that less queries are made when making a new call.
         """
         # make sure Skia is in at least one group
-        self.skia.groups.add(Group.objects.first().pk)
-        skia_groups = self.skia.groups.all()
+        group_in = baker.make(Group)
+        self.public_user.groups.add(group_in)
 
-        group_in = skia_groups.first()
         cache.clear()
         # Test when the user is in the group
         with self.assertNumQueries(2):
-            self.skia.is_in_group(pk=group_in.id)
+            self.public_user.is_in_group(pk=group_in.id)
         with self.assertNumQueries(0):
-            self.skia.is_in_group(pk=group_in.id)
+            self.public_user.is_in_group(pk=group_in.id)
 
-        ids = skia_groups.values_list("pk", flat=True)
-        group_not_in = Group.objects.exclude(pk__in=ids).first()
+        group_not_in = baker.make(Group)
         cache.clear()
         # Test when the user is not in the group
         with self.assertNumQueries(2):
-            self.skia.is_in_group(pk=group_not_in.id)
+            self.public_user.is_in_group(pk=group_not_in.id)
         with self.assertNumQueries(0):
-            self.skia.is_in_group(pk=group_not_in.id)
+            self.public_user.is_in_group(pk=group_not_in.id)
 
     def test_cache_properly_cleared_membership(self):
         """Test that when the membership of a user end,
         the cache is properly invalidated.
         """
-        membership = Membership.objects.create(
-            club=self.club, user=self.toto, end_date=None
-        )
-        meta_groups_members = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
+        membership = baker.make(Membership, club=self.club, user=self.public_user)
         cache.clear()
-        assert self.toto.is_in_group(name=meta_groups_members) is True
-        assert membership == cache.get(f"membership_{self.club.id}_{self.toto.id}")
+        self.club.get_membership_for(self.public_user)  # this should populate the cache
+        assert membership == cache.get(
+            f"membership_{self.club.id}_{self.public_user.id}"
+        )
         membership.end_date = now() - timedelta(minutes=5)
         membership.save()
-        cached_membership = cache.get(f"membership_{self.club.id}_{self.toto.id}")
+        cached_membership = cache.get(
+            f"membership_{self.club.id}_{self.public_user.id}"
+        )
         assert cached_membership == "not_member"
-        assert self.toto.is_in_group(name=meta_groups_members) is False
 
     def test_cache_properly_cleared_group(self):
         """Test that when a user is removed from a group,
         the is_in_group_method return False when calling it again.
         """
         # testing with pk
-        self.toto.groups.add(self.com_admin.pk)
-        assert self.toto.is_in_group(pk=self.com_admin.pk) is True
+        self.public_user.groups.add(self.com_admin.pk)
+        assert self.public_user.is_in_group(pk=self.com_admin.pk) is True
 
-        self.toto.groups.remove(self.com_admin.pk)
-        assert self.toto.is_in_group(pk=self.com_admin.pk) is False
+        self.public_user.groups.remove(self.com_admin.pk)
+        assert self.public_user.is_in_group(pk=self.com_admin.pk) is False
 
         # testing with name
-        self.toto.groups.add(self.sas_admin.pk)
-        assert self.toto.is_in_group(name="SAS admin") is True
+        self.public_user.groups.add(self.sas_admin.pk)
+        assert self.public_user.is_in_group(name="SAS admin") is True
 
-        self.toto.groups.remove(self.sas_admin.pk)
-        assert self.toto.is_in_group(name="SAS admin") is False
+        self.public_user.groups.remove(self.sas_admin.pk)
+        assert self.public_user.is_in_group(name="SAS admin") is False
 
     def test_not_existing_group(self):
         """Test that searching for a not existing group
         returns False.
         """
-        assert self.skia.is_in_group(name="This doesn't exist") is False
+        user = baker.make(User)
+        user.groups.set(list(Group.objects.all()))
+        assert not user.is_in_group(name="This doesn't exist")
 
 
 class TestDateUtils(TestCase):

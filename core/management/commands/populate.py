@@ -47,7 +47,7 @@ from accounting.models import (
 )
 from club.models import Club, Membership
 from com.models import News, NewsDate, Sith, Weekmail
-from core.models import Group, Page, PageRev, RealGroup, SithFile, User
+from core.models import Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
 from counter.models import Counter, Product, ProductType, StudentCard
 from election.models import Candidature, Election, ElectionList, Role
@@ -143,7 +143,9 @@ class Command(BaseCommand):
         Counter.objects.bulk_create(counters)
         bar_groups = []
         for bar_id, bar_name in settings.SITH_COUNTER_BARS:
-            group = RealGroup.objects.create(name=f"{bar_name} admin")
+            group = Group.objects.create(
+                name=f"{bar_name} admin", is_manually_manageable=True
+            )
             bar_groups.append(
                 Counter.edit_groups.through(counter_id=bar_id, group=group)
             )
@@ -366,46 +368,42 @@ Welcome to the wiki page!
             parent=main_club,
         )
 
-        Membership.objects.bulk_create(
-            [
-                Membership(user=skia, club=main_club, role=3),
-                Membership(
-                    user=comunity,
-                    club=bar_club,
-                    start_date=localdate(),
-                    role=settings.SITH_CLUB_ROLES_ID["Board member"],
-                ),
-                Membership(
-                    user=sli,
-                    club=troll,
-                    role=9,
-                    description="Padawan Troll",
-                    start_date=localdate() - timedelta(days=17),
-                ),
-                Membership(
-                    user=krophil,
-                    club=troll,
-                    role=10,
-                    description="Maitre Troll",
-                    start_date=localdate() - timedelta(days=200),
-                ),
-                Membership(
-                    user=skia,
-                    club=troll,
-                    role=2,
-                    description="Grand Ancien Troll",
-                    start_date=localdate() - timedelta(days=400),
-                    end_date=localdate() - timedelta(days=86),
-                ),
-                Membership(
-                    user=richard,
-                    club=troll,
-                    role=2,
-                    description="",
-                    start_date=localdate() - timedelta(days=200),
-                    end_date=localdate() - timedelta(days=100),
-                ),
-            ]
+        Membership.objects.create(user=skia, club=main_club, role=3)
+        Membership.objects.create(
+            user=comunity,
+            club=bar_club,
+            start_date=localdate(),
+            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+        )
+        Membership.objects.create(
+            user=sli,
+            club=troll,
+            role=9,
+            description="Padawan Troll",
+            start_date=localdate() - timedelta(days=17),
+        )
+        Membership.objects.create(
+            user=krophil,
+            club=troll,
+            role=10,
+            description="Maitre Troll",
+            start_date=localdate() - timedelta(days=200),
+        )
+        Membership.objects.create(
+            user=skia,
+            club=troll,
+            role=2,
+            description="Grand Ancien Troll",
+            start_date=localdate() - timedelta(days=400),
+            end_date=localdate() - timedelta(days=86),
+        )
+        Membership.objects.create(
+            user=richard,
+            club=troll,
+            role=2,
+            description="",
+            start_date=localdate() - timedelta(days=200),
+            end_date=localdate() - timedelta(days=100),
         )
 
         p = ProductType.objects.create(name="Bières bouteilles")
@@ -594,7 +592,6 @@ Welcome to the wiki page!
         )
 
         # Create an election
-        ae_board_group = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
         el = Election.objects.create(
             title="Élection 2017",
             description="La roue tourne",
@@ -604,7 +601,7 @@ Welcome to the wiki page!
             end_date="7942-06-12 10:28:45+01",
         )
         el.view_groups.add(groups.public)
-        el.edit_groups.add(ae_board_group)
+        el.edit_groups.add(main_club.board_group)
         el.candidature_groups.add(groups.subscribers)
         el.vote_groups.add(groups.subscribers)
         liste = ElectionList.objects.create(title="Candidature Libre", election=el)
@@ -889,7 +886,7 @@ Welcome to the wiki page!
     def _create_groups(self) -> PopulatedGroups:
         perms = Permission.objects.all()
 
-        root_group = Group.objects.create(name="Root")
+        root_group = Group.objects.create(name="Root", is_manually_manageable=True)
         root_group.permissions.add(*list(perms.values_list("pk", flat=True)))
         # public has no permission.
         # Its purpose is not to link users to permissions,
@@ -911,7 +908,9 @@ Welcome to the wiki page!
                 )
             )
         )
-        accounting_admin = Group.objects.create(name="Accounting admin")
+        accounting_admin = Group.objects.create(
+            name="Accounting admin", is_manually_manageable=True
+        )
         accounting_admin.permissions.add(
             *list(
                 perms.filter(
@@ -931,13 +930,17 @@ Welcome to the wiki page!
                 ).values_list("pk", flat=True)
             )
         )
-        com_admin = Group.objects.create(name="Communication admin")
+        com_admin = Group.objects.create(
+            name="Communication admin", is_manually_manageable=True
+        )
         com_admin.permissions.add(
             *list(
                 perms.filter(content_type__app_label="com").values_list("pk", flat=True)
             )
         )
-        counter_admin = Group.objects.create(name="Counter admin")
+        counter_admin = Group.objects.create(
+            name="Counter admin", is_manually_manageable=True
+        )
         counter_admin.permissions.add(
             *list(
                 perms.filter(
@@ -946,16 +949,20 @@ Welcome to the wiki page!
                 )
             )
         )
-        Group.objects.create(name="Banned from buying alcohol")
-        Group.objects.create(name="Banned from counters")
-        Group.objects.create(name="Banned to subscribe")
-        sas_admin = Group.objects.create(name="SAS admin")
+        Group.objects.create(
+            name="Banned from buying alcohol", is_manually_manageable=True
+        )
+        Group.objects.create(name="Banned from counters", is_manually_manageable=True)
+        Group.objects.create(name="Banned to subscribe", is_manually_manageable=True)
+        sas_admin = Group.objects.create(name="SAS admin", is_manually_manageable=True)
         sas_admin.permissions.add(
             *list(
                 perms.filter(content_type__app_label="sas").values_list("pk", flat=True)
             )
         )
-        forum_admin = Group.objects.create(name="Forum admin")
+        forum_admin = Group.objects.create(
+            name="Forum admin", is_manually_manageable=True
+        )
         forum_admin.permissions.add(
             *list(
                 perms.filter(content_type__app_label="forum").values_list(
@@ -963,7 +970,9 @@ Welcome to the wiki page!
                 )
             )
         )
-        pedagogy_admin = Group.objects.create(name="Pedagogy admin")
+        pedagogy_admin = Group.objects.create(
+            name="Pedagogy admin", is_manually_manageable=True
+        )
         pedagogy_admin.permissions.add(
             *list(
                 perms.filter(content_type__app_label="pedagogy").values_list(

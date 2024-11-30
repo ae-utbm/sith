@@ -563,14 +563,21 @@ class Migration(migrations.Migration):
             fields=[],
             options={"proxy": True},
             bases=("core.group",),
-            managers=[("objects", core.models.MetaGroupManager())],
+            managers=[("objects", django.contrib.auth.models.GroupManager())],
         ),
+        # at first, there existed a RealGroupManager and a RealGroupManager,
+        # which have been since been removed.
+        # However, this removal broke the migrations because it caused an ImportError.
+        # Thus, the managers MetaGroupManager (above) and RealGroupManager (below)
+        # have been replaced by the base django GroupManager to fix the import.
+        # As those managers aren't actually used in migrations,
+        # this replacement doesn't break anything.
         migrations.CreateModel(
             name="RealGroup",
             fields=[],
             options={"proxy": True},
             bases=("core.group",),
-            managers=[("objects", core.models.RealGroupManager())],
+            managers=[("objects", django.contrib.auth.models.GroupManager())],
         ),
         migrations.AlterUniqueTogether(
             name="page", unique_together={("name", "parent")}
