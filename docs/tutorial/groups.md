@@ -128,6 +128,14 @@ Par exemple :
              INNER JOIN "auth_group" ON ("core_group"."group_ptr_id" = "auth_group"."id")
     ```
 
+!!!warning
+
+    Django réussit à abstraire assez bien la logique relationnelle.
+    Cependant, gardez bien en mémoire que ce n'est pas quelque chose
+    de magique et que cette manière de faire a des limitations.
+    Par exemple, il devient impossible de `bulk_create`
+    des groupes.
+
 
 ## La définition d'un groupe
 
