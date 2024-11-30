@@ -121,12 +121,20 @@ class Command(BaseCommand):
         """Create all the clubs [club.models.Club][].
 
         After creation, the clubs are stored in `self.clubs` for fast access later.
-        Don't create the groups associated to the clubs
-        nor the pages of the clubs ([core.models.Page][]).
+        Don't create the pages of the clubs ([core.models.Page][]).
         """
+        # dummy groups.
+        # the galaxy doesn't care about the club groups,
+        # but it's necessary to add them nonetheless in order
+        # not to break the integrity constraints
         self.clubs = Club.objects.bulk_create(
             [
-                Club(unix_name=f"galaxy-club-{i}", name=f"club-{i}")
+                Club(
+                    unix_name=f"galaxy-club-{i}",
+                    name=f"club-{i}",
+                    board_group=Group.objects.create(name=f"board {i}"),
+                    members_group=Group.objects.create(name=f"members {i}"),
+                )
                 for i in range(self.NB_CLUBS)
             ]
         )
