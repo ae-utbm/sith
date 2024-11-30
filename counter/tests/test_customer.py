@@ -349,7 +349,7 @@ class TestStudentCard(TestCase):
 
         # Test with board member
         self.client.force_login(self.skia)
-        self.client.post(
+        response = self.client.post(
             reverse(
                 "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
             ),

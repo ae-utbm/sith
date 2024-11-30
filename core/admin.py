@@ -23,8 +23,8 @@ admin.site.unregister(AuthGroup)
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ("name", "description", "is_meta")
-    list_filter = ("is_meta",)
+    list_display = ("name", "description", "is_manually_manageable")
+    list_filter = ("is_manually_manageable",)
     search_fields = ("name",)
 
 

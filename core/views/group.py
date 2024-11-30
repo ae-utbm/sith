@@ -21,7 +21,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from core.models import RealGroup, User
+from core.models import Group, User
 from core.views import CanCreateMixin, CanEditMixin, DetailFormView
 from core.views.widgets.select import AutoCompleteSelectMultipleUser
 
@@ -57,7 +57,8 @@ class EditMembersForm(forms.Form):
 class GroupListView(CanEditMixin, ListView):
     """Displays the Group list."""
 
-    model = RealGroup
+    model = Group
+    queryset = Group.objects.filter(is_manually_manageable=True)
     ordering = ["name"]
     template_name = "core/group_list.jinja"
 
@@ -65,7 +66,8 @@ class GroupListView(CanEditMixin, ListView):
 class GroupEditView(CanEditMixin, UpdateView):
     """Edit infos of a Group."""
 
-    model = RealGroup
+    model = Group
+    queryset = Group.objects.filter(is_manually_manageable=True)
     pk_url_kwarg = "group_id"
     template_name = "core/group_edit.jinja"
     fields = ["name", "description"]
@@ -74,7 +76,8 @@ class GroupEditView(CanEditMixin, UpdateView):
 class GroupCreateView(CanCreateMixin, CreateView):
     """Add a new Group."""
 
-    model = RealGroup
+    model = Group
+    queryset = Group.objects.filter(is_manually_manageable=True)
     template_name = "core/create.jinja"
     fields = ["name", "description"]
 
@@ -84,7 +87,8 @@ class GroupTemplateView(CanEditMixin, DetailFormView):
     Allow adding and removing users from it.
     """
 
-    model = RealGroup
+    model = Group
+    queryset = Group.objects.filter(is_manually_manageable=True)
     form_class = EditMembersForm
     pk_url_kwarg = "group_id"
     template_name = "core/group_detail.jinja"
@@ -118,7 +122,8 @@ class GroupTemplateView(CanEditMixin, DetailFormView):
 class GroupDeleteView(CanEditMixin, DeleteView):
     """Delete a Group."""
 
-    model = RealGroup
+    model = Group
+    queryset = Group.objects.filter(is_manually_manageable=True)
     pk_url_kwarg = "group_id"
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy("core:group_list")
