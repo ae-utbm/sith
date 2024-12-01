@@ -47,7 +47,6 @@
     "easymde": "^2.18.0",
     "glob": "^11.0.0",
     "htmx.org": "^2.0.3",
-    "htmx-ext-response-targets": "^2.0.1",
     "jquery": "^3.7.1",
     "jquery-ui": "^1.14.0",
     "jquery.shorten": "^1.0.0",

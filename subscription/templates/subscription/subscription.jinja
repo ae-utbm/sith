@@ -12,10 +12,9 @@
    So we give them here.
    If the aforementioned bug is resolved, you can remove this. #}
 {% block additional_js %}
-  <script type="module" defer src="{{ static("bundled/core/components/ajax-select-index.ts") }}"></script>
+  <script type="module" src="{{ static("bundled/core/components/ajax-select-index.ts") }}"></script>
   <script
     type="module"
-    defer
     src="{{ static("bundled/subscription/creation-form-existing-user-index.ts") }}"
   ></script>
 {% endblock %}
@@ -35,7 +34,7 @@
 
 {% block content %}
   <h3>{% trans %}New subscription{% endtrans %}</h3>
-  <div id="subscription-form" hx-ext="response-targets">
+  <div id="subscription-form">
     {% with title1=_("Existing member"), title2=_("New member") %}
       {{ tabs([
       (title1, form_fragment(existing_user_form, existing_user_post_url)),
