@@ -4,9 +4,28 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 from django.db.migrations.state import StateApps
+from django.db.models import Q
+from django.utils.timezone import localdate
 
 
 def migrate_meta_groups(apps: StateApps, schema_editor):
+    """Attach the existing meta groups to the clubs.
+
+    Until now, the meta groups were not attached to the clubs,
+    nor to the users.
+    This creates actual foreign relationships between the clubs
+    and theirs groups and the users and theirs groups.
+
+    Warnings:
+        When the meta groups associated with the clubs aren't found,
+        they are created.
+        Thus the migration shouldn't fail, and all the clubs will
+        have their groups.
+        However, there will probably be some groups that have
+        not been found but exist nonetheless,
+        so there will be duplicates and dangling groups.
+        There must be a manual cleanup after this migration.
+    """
     Group = apps.get_model("core", "Group")
     Club = apps.get_model("club", "Club")
 
@@ -19,7 +38,18 @@ def migrate_meta_groups(apps: StateApps, schema_editor):
         club.members_group = meta_groups.get_or_create(
             name=club.unix_name + settings.SITH_MEMBER_SUFFIX
         )[0]
-    Club.objects.bulk_update(clubs, fields=["board_group", "members_group"])
+        club.save()
+        club.refresh_from_db()
+        memberships = club.members.filter(
+            Q(end_date=None) | Q(end_date__gt=localdate())
+        ).select_related("user")
+        club.members_group.users.set([m.user for m in memberships])
+        club.board_group.users.set(
+            [
+                m.user
+                for m in memberships.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
+            ]
+        )
 
 
 # steps of the migration :
