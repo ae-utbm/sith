@@ -303,7 +303,7 @@
         {% endwith %}
   #}
   <div
-    class="tabs"
+    class="tabs shadow"
     x-data="{selected: '{{ tab_list[0][0] }}'}"
     x-modelable="selected"
     {{ attrs }}
@@ -319,9 +319,9 @@
         </button>
       {% endfor %}
     </div>
-    <div class="tab-content shadow">
+    <div class="tab-content">
       {% for title, content in tab_list %}
-        <section x-show="selected === '{{ title }}'" class="">
+        <section x-show="selected === '{{ title }}'">
           {{ content }}
         </section>
       {% endfor %}
