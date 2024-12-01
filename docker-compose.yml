@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16.6
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    ports:
+      - "5431:5432"
+    environment:
+      POSTGRES_USER: sith
+      POSTGRES_PASSWORD: sith
+      POSTGRES_DB: sith
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    ports:
+      - "6378:6379"
+    command: redis-server
+    volumes:
+      - redis_data:/var/lib/redis/data/
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
