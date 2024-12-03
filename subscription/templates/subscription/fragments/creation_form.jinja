@@ -1,0 +1,10 @@
+<form
+  hx-post="{{ post_url }}"
+  hx-target="this"
+  hx-disabled-elt="find input[type='submit']"
+  hx-swap="outerHTML"
+>
+  {% csrf_token %}
+  {{ form }}
+  <input type="submit" value="{% trans %}Save{% endtrans %}">
+</form>

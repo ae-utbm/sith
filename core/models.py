@@ -529,13 +529,15 @@ class User(AbstractBaseUser):
         return False
 
     @cached_property
-    def can_create_subscription(self):
-        from club.models import Club
+    def can_create_subscription(self) -> bool:
+        from club.models import Membership
 
-        for club in Club.objects.filter(id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS):
-            if club in self.clubs_with_rights:
-                return True
-        return False
+        return (
+            Membership.objects.board()
+            .ongoing()
+            .filter(club_id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS)
+            .exists()
+        )
 
     @cached_property
     def is_launderette_manager(self):

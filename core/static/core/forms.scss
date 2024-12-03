@@ -1,0 +1,89 @@
+@import "colors";
+
+/**
+ * Style related to forms
+ */
+
+a.button,
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="file"] {
+  border: none;
+  text-decoration: none;
+  background-color: $background-button-color;
+  padding: 0.4em;
+  margin: 0.1em;
+  font-size: 1.2em;
+  border-radius: 5px;
+  color: black;
+
+  &:hover {
+    background: hsl(0, 0%, 83%);
+  }
+}
+
+a.button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="file"] {
+  font-weight: bold;
+}
+
+a.button:not(:disabled),
+button:not(:disabled),
+input[type="button"]:not(:disabled),
+input[type="submit"]:not(:disabled),
+input[type="reset"]:not(:disabled),
+input[type="checkbox"]:not(:disabled),
+input[type="file"]:not(:disabled) {
+  cursor: pointer;
+}
+
+input,
+textarea[type="text"],
+[type="number"] {
+  border: none;
+  text-decoration: none;
+  background-color: $background-button-color;
+  padding: 0.4em;
+  margin: 0.1em;
+  font-size: 1.2em;
+  border-radius: 5px;
+  max-width: 95%;
+}
+
+textarea {
+  border: none;
+  text-decoration: none;
+  background-color: $background-button-color;
+  padding: 7px;
+  font-size: 1.2em;
+  border-radius: 5px;
+  font-family: sans-serif;
+}
+
+select {
+  border: none;
+  text-decoration: none;
+  font-size: 1.2em;
+  background-color: $background-button-color;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+a:not(.button) {
+  text-decoration: none;
+  color: $primary-dark-color;
+
+  &:hover {
+    color: $primary-light-color;
+  }
+
+  &:active {
+    color: $primary-color;
+  }
+}

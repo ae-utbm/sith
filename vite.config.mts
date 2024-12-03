@@ -85,6 +85,7 @@ export default defineConfig((config: UserConfig) => {
       inject({
         // biome-ignore lint/style/useNamingConvention: that's how it's called
         Alpine: "alpinejs",
+        htmx: "htmx.org",
       }),
       viteStaticCopy({
         targets: [
