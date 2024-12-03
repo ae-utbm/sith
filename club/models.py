@@ -23,7 +23,7 @@
 #
 from __future__ import annotations
 
-from typing import Self
+from typing import Iterable, Self
 
 from django.conf import settings
 from django.core import validators
@@ -31,7 +31,7 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import RegexValidator, validate_email
 from django.db import models, transaction
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -256,13 +256,6 @@ class Club(models.Model):
 
 
 class MembershipQuerySet(models.QuerySet):
-    @staticmethod
-    def _remove_from_club_groups(users: list[int], clubs: list[int]):
-        groups = Group.objects.filter(Q(club__in=clubs) | Q(club_board__in=clubs))
-        return User.groups.through.objects.filter(
-            Q(group__in=groups) & Q(user__in=users)
-        ).delete()
-
     def ongoing(self) -> Self:
         """Filter all memberships which are not finished yet."""
         return self.filter(Q(end_date=None) | Q(end_date__gt=localdate()))
@@ -279,11 +272,16 @@ class MembershipQuerySet(models.QuerySet):
         return self.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
 
     def update(self, **kwargs) -> int:
-        """Refresh the cache for the elements of the queryset.
+        """Refresh the cache and edit group ownership.
 
-        Besides that, does the same job as a regular update method.
+        Update the cache, when necessary, remove
+        users from club groups they are no more in
+        and add them in the club groups they should be in.
 
-        Be aware that this adds a db query to retrieve the updated objects
+        Be aware that this adds three db queries :
+        one to retrieve the updated memberships,
+        one to perform group removal and one to perform
+        group attribution.
         """
         nb_rows = super().update(**kwargs)
         if nb_rows == 0:
@@ -291,17 +289,18 @@ class MembershipQuerySet(models.QuerySet):
             return 0
 
         cache_memberships = {}
-        to_remove = {"users": [], "clubs": []}
-        for membership in self.all():
-            cache_key = f"membership_{membership.club_id}_{membership.user_id}"
-            if membership.end_date is not None and membership.end_date <= localdate():
-                cache_memberships[cache_key] = "not_member"
-                to_remove["users"].append(membership.user_id)
-                to_remove["clubs"].append(membership.club_id)
+        memberships = set(self.select_related("club"))
+        # delete all User-Group relations and recreate the necessary ones
+        # It's more concise to write and more reliable
+        Membership._remove_club_groups(memberships)
+        Membership._add_club_groups(memberships)
+        for member in memberships:
+            cache_key = f"membership_{member.club_id}_{member.user_id}"
+            if member.end_date is None:
+                cache_memberships[cache_key] = member
             else:
-                cache_memberships[cache_key] = membership
+                cache_memberships[cache_key] = "not_member"
         cache.set_many(cache_memberships)
-        self._remove_from_club_groups(to_remove["users"], to_remove["clubs"])
         return nb_rows
 
     def delete(self) -> tuple[int, dict[str, int]]:
@@ -310,21 +309,24 @@ class MembershipQuerySet(models.QuerySet):
         before the deletion,
         and a removal of the user from the club groups.
 
-        Be aware that this adds a db query to retrieve the deleted element
-        and another to remove users from the groups.
-        As queries take place before the deletion operation,
-        they will be performed even if the deletion fails.
+        Be aware that this adds some db queries :
+
+        - 1 to retrieve the deleted elements in order to perform
+          post-delete operations.
+          As we can't know if a delete will affect rows or not,
+          this query will always happen
+        - 1 query to remove the users from the club groups.
+          If the delete operation affected no row,
+          this query won't happen.
         """
-        ids = list(self.values_list("club_id", "user_id"))
+        memberships = set(self.all())
         nb_rows, rows_counts = super().delete()
         if nb_rows > 0:
-            user_ids = [i[0] for i in ids]
-            club_ids = [i[1] for i in ids]
-            self._remove_from_club_groups(user_ids, club_ids)
+            Membership._remove_club_groups(memberships)
             cache.set_many(
                 {
-                    f"membership_{club_id}_{user_id}": "not_member"
-                    for club_id, user_id in ids
+                    f"membership_{m.club_id}_{m.user_id}": "not_member"
+                    for m in memberships
                 }
             )
         return nb_rows, rows_counts
@@ -370,6 +372,13 @@ class Membership(models.Model):
 
     objects = MembershipQuerySet.as_manager()
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=Q(end_date__gte=F("start_date")), name="end_after_start"
+            ),
+        ]
+
     def __str__(self):
         return (
             f"{self.club.name} - {self.user.username} "
@@ -378,24 +387,15 @@ class Membership(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        # adding must be set before calling super().save()
-        # because the call will switch _state.adding from True to False
-        adding = self._state.adding
         super().save(*args, **kwargs)
-        if adding:
-            groups = [
-                User.groups.through(
-                    user_id=self.user_id, group_id=self.club.members_group_id
-                )
-            ]
-            if self.role > settings.SITH_MAXIMUM_FREE_ROLE:
-                groups.append(
-                    User.groups.through(
-                        user_id=self.user_id, group_id=self.club.board_group_id
-                    )
-                )
-            User.groups.through.objects.bulk_create(groups)
+        # a save may either be an update or a creation
+        # and may result in either an ongoing or an ended membership.
+        # It could also be a retrogradation from the board to being a simple member.
+        # To avoid problems, the user is removed from the club groups beforehand ;
+        # he will be added back if necessary
+        self._remove_club_groups([self])
         if self.end_date is None:
+            self._add_club_groups([self])
             cache.set(f"membership_{self.club_id}_{self.user_id}", self)
         else:
             cache.set(f"membership_{self.club_id}_{self.user_id}", "not_member")
@@ -403,15 +403,11 @@ class Membership(models.Model):
     def get_absolute_url(self):
         return reverse("club:club_members", kwargs={"club_id": self.club_id})
 
-    @property
-    def is_ongoing(self):
-        return self.end_date is None or self.end_date
-
-    def is_owned_by(self, user):
+    def is_owned_by(self, user: User) -> bool:
         """Method to see if that object can be super edited by the given user."""
         if user.is_anonymous:
             return False
-        return user.is_board_member
+        return user.is_root or user.is_board_member
 
     def can_be_edited_by(self, user: User) -> bool:
         """Check if that object can be edited by the given user."""
@@ -421,8 +417,90 @@ class Membership(models.Model):
         return membership is not None and membership.role >= self.role
 
     def delete(self, *args, **kwargs):
+        self._remove_club_groups([self])
         super().delete(*args, **kwargs)
         cache.delete(f"membership_{self.club_id}_{self.user_id}")
+
+    @staticmethod
+    def _remove_club_groups(
+        memberships: Iterable[Membership],
+    ) -> tuple[int, dict[str, int]]:
+        """Remove users of those memberships from the club groups.
+
+        For example, if a user is in the Troll club board,
+        he is in the board group and the members group of the Troll.
+        After calling this function, he will be in neither.
+
+        Returns:
+            The result of the deletion queryset.
+
+        Warnings:
+            If this function isn't used in combination
+            with an actual deletion of the memberships,
+            it will result in an inconsistent state,
+            where users will be in the clubs, without
+            having the associated rights.
+        """
+        clubs = {m.club_id for m in memberships}
+        users = {m.user_id for m in memberships}
+        groups = Group.objects.filter(Q(club__in=clubs) | Q(club_board__in=clubs))
+        return User.groups.through.objects.filter(
+            Q(group__in=groups) & Q(user__in=users)
+        ).delete()
+
+    @staticmethod
+    def _add_club_groups(
+        memberships: Iterable[Membership],
+    ) -> list[User.groups.through]:
+        """Add users of those memberships to the club groups.
+
+        For example, if a user just joined the Troll club board,
+        he will be added in both the members group and the board group
+        of the club.
+
+        Returns:
+            The created User-Group relations.
+
+        Warnings:
+            If this function isn't used in combination
+            with an actual update/creation of the memberships,
+            it will result in an inconsistent state,
+            where users will have the rights associated to the
+            club, without actually being part of it.
+        """
+        # only active membership (i.e. `end_date=None`)
+        # grant the attribution of club groups.
+        memberships = [m for m in memberships if m.end_date is None]
+        if not memberships:
+            return []
+
+        if sum(1 for m in memberships if not hasattr(m, "club")) > 1:
+            # if more than one membership hasn't its `club` attribute set
+            # it's less expensive to reload the whole query with
+            # a select_related than perform a distinct query
+            # to fetch each club.
+            ids = {m.id for m in memberships}
+            memberships = list(
+                Membership.objects.filter(id__in=ids).select_related("club")
+            )
+        club_groups = []
+        for membership in memberships:
+            club_groups.append(
+                User.groups.through(
+                    user_id=membership.user_id,
+                    group_id=membership.club.members_group_id,
+                )
+            )
+            if membership.role > settings.SITH_MAXIMUM_FREE_ROLE:
+                club_groups.append(
+                    User.groups.through(
+                        user_id=membership.user_id,
+                        group_id=membership.club.board_group_id,
+                    )
+                )
+        return User.groups.through.objects.bulk_create(
+            club_groups, ignore_conflicts=True
+        )
 
 
 class Mailing(models.Model):
