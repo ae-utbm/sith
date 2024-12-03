@@ -165,6 +165,27 @@ class TestMembershipQuerySet(TestClub):
         assert new_mem != "not_member"
         assert new_mem.role == 5
 
+    def test_update_change_club_groups(self):
+        """Test that `update` set the user groups accordingly."""
+        user = baker.make(User)
+        membership = baker.make(Membership, end_date=None, user=user, role=5)
+        members_group = membership.club.members_group
+        board_group = membership.club.board_group
+        assert user.groups.contains(members_group)
+        assert user.groups.contains(board_group)
+
+        user.memberships.update(role=1)  # from board to simple member
+        assert user.groups.contains(members_group)
+        assert not user.groups.contains(board_group)
+
+        user.memberships.update(role=5)  # from member to board
+        assert user.groups.contains(members_group)
+        assert user.groups.contains(board_group)
+
+        user.memberships.update(end_date=localdate())  # end the membership
+        assert not user.groups.contains(members_group)
+        assert not user.groups.contains(board_group)
+
     def test_delete_invalidate_cache(self):
         """Test that the `delete` queryset properly invalidate cache."""
         mem_skia = self.skia.memberships.get(club=self.club)
@@ -182,6 +203,19 @@ class TestMembershipQuerySet(TestClub):
                 f"membership_{membership.club_id}_{membership.user_id}"
             )
             assert cached_mem == "not_member"
+
+    def test_delete_remove_from_groups(self):
+        """Test that `delete` removes from club groups"""
+        user = baker.make(User)
+        memberships = baker.make(Membership, role=iter([1, 5]), user=user, _quantity=2)
+        club_groups = {
+            memberships[0].club.members_group,
+            memberships[1].club.members_group,
+            memberships[1].club.board_group,
+        }
+        assert set(user.groups.all()) == club_groups
+        user.memberships.all().delete()
+        assert user.groups.all().count() == 0
 
 
 class TestClubModel(TestClub):
@@ -487,9 +521,21 @@ class TestClubModel(TestClub):
         """Test that when a membership begins, the user is added to the club group."""
         assert not self.subscriber.groups.contains(self.club.members_group)
         assert not self.subscriber.groups.contains(self.club.board_group)
-        Membership.objects.create(club=self.club, user=self.subscriber, role=3)
+        baker.make(Membership, club=self.club, user=self.subscriber, role=3)
         assert self.subscriber.groups.contains(self.club.members_group)
         assert self.subscriber.groups.contains(self.club.board_group)
+
+    def test_change_position_in_club(self):
+        """Test that when moving from board to members, club group change"""
+        membership = baker.make(
+            Membership, club=self.club, user=self.subscriber, role=3
+        )
+        assert self.subscriber.groups.contains(self.club.members_group)
+        assert self.subscriber.groups.contains(self.club.board_group)
+        membership.role = 1
+        membership.save()
+        assert self.subscriber.groups.contains(self.club.members_group)
+        assert not self.subscriber.groups.contains(self.club.board_group)
 
     def test_club_owner(self):
         """Test that a club is owned only by board members of the main club."""
