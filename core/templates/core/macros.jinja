@@ -66,7 +66,12 @@
       </div>
       {% if user.promo and user.promo_has_logo() %}
         <div class="user_mini_profile_promo">
-          <img src="{{ static('core/img/promo_%02d.png' % user.promo) }}" title="Promo {{ user.promo }}" alt="Promo {{ user.promo }}" class="promo_pict" />
+          <img
+            src="{{ static('core/img/promo_%02d.png' % user.promo) }}"
+            title="Promo {{ user.promo }}"
+            alt="Promo {{ user.promo }}"
+            class="promo_pict"
+          />
         </div>
       {% endif %}
     </div>
@@ -74,8 +79,11 @@
       {% if user.profile_pict %}
         <img src="{{ user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}" />
       {% else %}
-        <img src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}"
-             title="{% trans %}Profile{% endtrans %}" />
+        <img
+          src="{{ static('core/img/unknown.jpg') }}"
+          alt="{% trans %}Profile{% endtrans %}"
+          title="{% trans %}Profile{% endtrans %}"
+        />
       {% endif %}
     </div>
   </div>
@@ -166,9 +174,37 @@
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
     #}
+  {{  paginate_server_side(current_page, paginator, False) }}
+{% endmacro %}
+
+{% macro paginate_htmx(current_page, paginator) %}
+    {# Add pagination buttons for pages without Alpine but supporting fragments.
+
+    This must be coupled with a view that handles pagination
+    with the Django Paginator object and supports fragments.
+
+    The replaced fragment will be #content so make sure you are calling this macro inside your content block.
+
+    Parameters:
+        current_page (django.core.paginator.Page): the current page object
+        paginator (django.core.paginator.Paginator): the paginator object
+    #}
+  {{  paginate_server_side(current_page, paginator, True) }}
+{% endmacro %}
+
+{% macro paginate_server_side(current_page, paginator, use_htmx) %}
   <nav class="pagination">
     {% if current_page.has_previous() %}
-      <a href="?page={{ current_page.previous_page_number() }}">
+      <a
+        {% if use_htmx -%}
+          hx-get="?page={{ current_page.previous_page_number() }}"
+          hx-swap="innerHTML"
+          hx-target="#content"
+          hx-push-url="true"
+        {%- else -%}
+          href="?page={{ current_page.previous_page_number() }}"
+        {%- endif -%}
+      >
         <button>
           <i class="fa fa-caret-left"></i>
         </button>
@@ -182,16 +218,33 @@
       {% elif i == paginator.ELLIPSIS %}
         <strong>{{ paginator.ELLIPSIS }}</strong>
       {% else %}
-        <a href="?page={{ i }}">
+        <a
+          {% if use_htmx -%}
+            hx-get="?page={{ i }}"
+            hx-swap="innerHTML"
+            hx-target="#content"
+            hx-push-url="true"
+          {%- else -%}
+            href="?page={{ i }}"
+          {%- endif -%}
+        >
           <button>{{ i }}</button>
         </a>
       {% endif %}
     {% endfor %}
     {% if current_page.has_next() %}
-      <a href="?page={{ current_page.next_page_number() }}">
-        <button>
-          <i class="fa fa-caret-right"></i>
-        </button>
+      <a
+        {% if use_htmx -%}
+          hx-get="?page={{ current_page.next_page_number() }}"
+          hx-swap="innerHTML"
+          hx-target="#content"
+          hx-push-url="true"
+        {%- else -%}
+          href="?page={{ current_page.next_page_number() }}"
+        {%- endif -%}
+      ><button>
+        <i class="fa fa-caret-right"></i>
+      </button>
       </a>
     {% else %}
       <button disabled="disabled"><i class="fa fa-caret-right"></i></button>
@@ -202,9 +255,9 @@
 {% macro select_all_checkbox(form_id) %}
   <script type="text/javascript">
     function checkbox_{{form_id}}(value) {
-      list = document.getElementById("{{ form_id }}").getElementsByTagName("input");
-      for (let element of list){
-        if (element.type == "checkbox"){
+      const inputs = document.getElementById("{{ form_id }}").getElementsByTagName("input");
+      for (let element of inputs){
+        if (element.type === "checkbox"){
           element.checked = value;
         }
       }
@@ -212,4 +265,66 @@
   </script>
   <button type="button" onclick="checkbox_{{form_id}}(true);">{% trans %}Select All{% endtrans %}</button>
   <button type="button" onclick="checkbox_{{form_id}}(false);">{% trans %}Unselect All{% endtrans %}</button>
+{% endmacro %}
+
+{% macro tabs(tab_list, attrs = "") %}
+  {# Tab component
+
+  Parameters:
+    tab_list: list[tuple[str, str]] The list of tabs to display.
+        Each element of the list is a tuple which first element
+        is the title of the tab and the second element its content
+    attrs: str Additional attributes to put on the enclosing div
+
+  Example:
+    A basic usage would be as follow :
+
+        {{ tabs([("title 1", "content 1"), ("title 2", "content 2")]) }}
+
+    If you want to display more complex logic, you can define macros
+    and use those macros in parameters :
+
+        {{ tabs([("title", my_macro())]) }}
+
+    It's also possible to get and set the currently selected tab using Alpine.
+    Here, the title of the currently selected tab will be displayed.
+    Moreover, on page load, the tab will be opened on "tab 2".
+
+        <div x-data="{current_tab: 'tab 2'}">
+          <p x-text="current_tab"></p>
+          {{ tabs([("tab 1", "Hello"), ("tab 2", "World")], "x-model=current_tab") }}
+        </div>
+
+    If you want to have translated tab titles, you can enclose the macro call
+    in a with block :
+
+        {% with title=_("title"), content=_("Content") %}
+            {{ tabs([(tab1, content)]) }}
+        {% endwith %}
+  #}
+  <div
+    class="tabs shadow"
+    x-data="{selected: '{{ tab_list[0][0] }}'}"
+    x-modelable="selected"
+    {{ attrs }}
+  >
+    <div class="tab-headers">
+      {% for title, _ in tab_list %}
+        <button
+          class="tab-header clickable"
+          :class="{active: selected === '{{ title }}'}"
+          @click="selected = '{{ title }}'"
+        >
+          {{ title }}
+        </button>
+      {% endfor %}
+    </div>
+    <div class="tab-content">
+      {% for title, content in tab_list %}
+        <section x-show="selected === '{{ title }}'">
+          {{ content }}
+        </section>
+      {% endfor %}
+    </div>
+  </div>
 {% endmacro %}

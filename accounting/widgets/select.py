@@ -4,7 +4,7 @@ from accounting.models import ClubAccount, Company
 from accounting.schemas import ClubAccountSchema, CompanySchema
 from core.views.widgets.select import AutoCompleteSelect, AutoCompleteSelectMultiple
 
-_js = ["webpack/accounting/components/ajax-select-index.ts"]
+_js = ["bundled/accounting/components/ajax-select-index.ts"]
 
 
 class AutoCompleteSelectClubAccount(AutoCompleteSelect):

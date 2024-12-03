@@ -1,0 +1,14 @@
+{% load static %}
+{% load i18n %}
+
+
+<div x-data="existing_user_subscription_form" class="form-content existing-user">
+  <fieldset>
+    {{ form.as_p }}
+  </fieldset>
+  <div
+    id="subscription-form-user-mini-profile"
+    x-html="profileFragment"
+    :aria-busy="loading"
+  ></div>
+</div>

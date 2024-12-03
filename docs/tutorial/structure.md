@@ -116,7 +116,7 @@ sith/
 21. Outil pour faciliter la fabrication des trombinoscopes de promo. 
 22. Fonctionnalités pour gérer le spam. 
 23. Gestion des statics du site. Override le système de statics de Django.
-    Ajoute l'intégration du scss et de webpack
+    Ajoute l'intégration du scss et du bundler js
     de manière transparente pour l'utilisateur. 
 24. Fichier de configuration de coverage. 
 25. Fichier de configuration de direnv. 
@@ -178,7 +178,7 @@ comme suit :
 ├── templates/ (2)
 │   └── ...
 ├── static/ (3)
-│   └── webpack/ (4)
+│   └── bundled/ (4)
 │   └── ...
 ├── api.py (5)
 ├── admin.py (6)
@@ -196,7 +196,7 @@ comme suit :
    cf. [Gestion des migrations](../howto/migrations.md)
 2. Dossier contenant les templates jinja utilisés par cette application.
 3. Dossier contenant les fichiers statics (js, css, scss) qui sont récpérée par Django.
-4. Dossier contenant du js qui sera process avec webpack. Le contenu sera automatiquement process et accessible comme si ça avait été placé dans le dossier `static/webpack`.
+4. Dossier contenant du js qui sera process avec le bundler javascript. Le contenu sera automatiquement process et accessible comme si ça avait été placé dans le dossier `static/bundled`.
 5. Fichier contenant les routes d'API liées à cette application
 6. Fichier de configuration de l'interface d'administration.
    Ce fichier permet de déclarer les modèles de l'application

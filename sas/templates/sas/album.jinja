@@ -6,7 +6,7 @@
 {%- endblock -%}
 
 {%- block additional_js -%}
-  <script src="{{ static('webpack/sas/album-index.js') }}" defer></script>
+  <script type="module" src="{{ static('bundled/sas/album-index.js') }}"></script>
 {%- endblock -%}
 
 {% block title %}

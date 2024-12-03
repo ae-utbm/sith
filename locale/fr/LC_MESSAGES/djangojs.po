@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-10 16:00+0100\n"
+"POT-Creation-Date: 2024-11-14 10:24+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -23,17 +23,14 @@ msgid "captured.%s"
 msgstr "capture.%s"
 
 #: core/static/webpack/core/components/ajax-select-base.ts:68
-#: staticfiles/generated/webpack/core/static/webpack/core/components/ajax-select-base.js:57
 msgid "Remove"
 msgstr "Retirer"
 
 #: core/static/webpack/core/components/ajax-select-base.ts:88
-#: staticfiles/generated/webpack/core/static/webpack/core/components/ajax-select-base.js:77
 msgid "You need to type %(number)s more characters"
 msgstr "Vous devez taper %(number)s caractères de plus"
 
 #: core/static/webpack/core/components/ajax-select-base.ts:92
-#: staticfiles/generated/webpack/core/static/webpack/core/components/ajax-select-base.js:81
 msgid "No results found"
 msgstr "Aucun résultat trouvé"
 
@@ -113,6 +110,10 @@ msgstr "Activer le plein écran"
 msgid "Markdown guide"
 msgstr "Guide markdown"
 
+#: core/static/webpack/core/components/nfc-input-index.ts:24
+msgid "Unsupported NFC card"
+msgstr "Carte NFC non supportée"
+
 #: core/static/webpack/user/family-graph-index.js:233
 msgid "family_tree.%(extension)s"
 msgstr "arbre_genealogique.%(extension)s"
@@ -126,11 +127,9 @@ msgid "Incorrect value"
 msgstr "Valeur incorrecte"
 
 #: sas/static/webpack/sas/viewer-index.ts:271
-#: staticfiles/generated/webpack/sas/static/webpack/sas/viewer-index.js:234
 msgid "Couldn't moderate picture"
 msgstr "Il n'a pas été possible de modérer l'image"
 
 #: sas/static/webpack/sas/viewer-index.ts:284
-#: staticfiles/generated/webpack/sas/static/webpack/sas/viewer-index.js:248
 msgid "Couldn't delete picture"
 msgstr "Il n'a pas été possible de supprimer l'image"

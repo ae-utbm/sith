@@ -27,12 +27,13 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.http import http_date
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView, FormMixin, UpdateView
 
-from core.models import Notification, RealGroup, SithFile
+from core.models import Notification, RealGroup, SithFile, User
 from core.views import (
+    AllowFragment,
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
@@ -352,7 +353,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
         return kwargs
 
 
-class FileDeleteView(CanEditPropMixin, DeleteView):
+class FileDeleteView(AllowFragment, CanEditPropMixin, DeleteView):
     model = SithFile
     pk_url_kwarg = "file_id"
     template_name = "core/file_delete_confirm.jinja"
@@ -376,19 +377,24 @@ class FileDeleteView(CanEditPropMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["popup"] = ""
-        if self.kwargs.get("popup") is not None:
-            kwargs["popup"] = "popup"
+        kwargs["popup"] = "" if self.kwargs.get("popup") is None else "popup"
+        kwargs["next"] = self.request.GET.get("next", None)
+        kwargs["previous"] = self.request.GET.get("previous", None)
+        kwargs["current"] = self.request.path
         return kwargs
 
 
-class FileModerationView(TemplateView):
+class FileModerationView(AllowFragment, ListView):
+    model = SithFile
     template_name = "core/file_moderation.jinja"
+    queryset = SithFile.objects.filter(is_moderated=False, is_in_sas=False)
+    paginate_by = 100
 
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["files"] = SithFile.objects.filter(is_moderated=False)[:100]
-        return kwargs
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        user: User = request.user
+        if user.is_root:
+            return super().dispatch(request, *args, **kwargs)
+        raise PermissionDenied()
 
 
 class FileModerateView(CanEditPropMixin, SingleObjectMixin):

@@ -20,14 +20,15 @@ import random
 import string
 from datetime import date, datetime, timedelta
 from datetime import timezone as tz
+from decimal import Decimal
 from typing import Self, Tuple
 
 from dict2xml import dict2xml
 from django.conf import settings
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Exists, F, OuterRef, Q, QuerySet, Sum, Value
-from django.db.models.functions import Concat, Length
+from django.db.models import Exists, F, OuterRef, Q, QuerySet, Subquery, Sum, Value
+from django.db.models.functions import Coalesce, Concat, Length
 from django.forms import ValidationError
 from django.urls import reverse
 from django.utils import timezone
@@ -45,6 +46,39 @@ from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
 from subscription.models import Subscription
 
 
+class CustomerQuerySet(models.QuerySet):
+    def update_amount(self) -> int:
+        """Update the amount of all customers selected by this queryset.
+
+        The result is given as the sum of all refills minus the sum of all purchases.
+
+        Returns:
+            The number of updated rows.
+
+        Warnings:
+            The execution time of this query grows really quickly.
+            When updating 500 customers, it may take around a second.
+            If you try to update all customers at once, the execution time
+            goes up to tens of seconds.
+            Use this either on a small subset of the `Customer` table,
+            or execute it inside an independent task
+            (like a Celery task or a management command).
+        """
+        money_in = Subquery(
+            Refilling.objects.filter(customer=OuterRef("pk"))
+            .values("customer_id")  # group by customer
+            .annotate(res=Sum(F("amount"), default=0))
+            .values("res")
+        )
+        money_out = Subquery(
+            Selling.objects.filter(customer=OuterRef("pk"))
+            .values("customer_id")
+            .annotate(res=Sum(F("unit_price") * F("quantity"), default=0))
+            .values("res")
+        )
+        return self.update(amount=Coalesce(money_in - money_out, Decimal("0")))
+
+
 class Customer(models.Model):
     """Customer data of a User.
 
@@ -56,6 +90,8 @@ class Customer(models.Model):
     account_id = models.CharField(_("account id"), max_length=10, unique=True)
     amount = CurrencyField(_("amount"), default=0)
     recorded_products = models.IntegerField(_("recorded product"), default=0)
+
+    objects = CustomerQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("customer")
@@ -140,18 +176,6 @@ class Customer(models.Model):
 
         account = cls.objects.create(user=user, account_id=account_id)
         return account, True
-
-    def recompute_amount(self):
-        refillings = self.refillings.aggregate(sum=Sum(F("amount")))["sum"]
-        self.amount = refillings if refillings is not None else 0
-        purchases = (
-            self.buyings.filter(payment_method="SITH_ACCOUNT")
-            .annotate(amount=F("quantity") * F("unit_price"))
-            .aggregate(sum=Sum(F("amount")))
-        )["sum"]
-        if purchases is not None:
-            self.amount -= purchases
-        self.save()
 
     def get_full_url(self):
         return f"https://{settings.SITH_URL}{self.get_absolute_url()}"
@@ -254,6 +278,14 @@ class AccountDump(models.Model):
     def __str__(self):
         status = "ongoing" if self.dump_operation is None else "finished"
         return f"{self.customer} - {status}"
+
+    @cached_property
+    def amount(self):
+        return (
+            self.dump_operation.unit_price
+            if self.dump_operation
+            else self.customer.amount
+        )
 
 
 class ProductType(models.Model):

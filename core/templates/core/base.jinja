@@ -5,7 +5,6 @@
       <title>{% block title %}{% trans %}Welcome!{% endtrans %}{% endblock %} - Association des Étudiants UTBM</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
-      <link rel="stylesheet" href="{{ static('user/user_stats.scss') }}">
       <link rel="stylesheet" href="{{ static('core/base.css') }}">
       <link rel="stylesheet" href="{{ static('core/style.scss') }}">
       <link rel="stylesheet" href="{{ static('core/markdown.scss') }}">
@@ -14,18 +13,20 @@
       <link rel="stylesheet" href="{{ static('core/pagination.scss') }}">
 
       {% block jquery_css %}
-                {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
-        <link rel="stylesheet" href="{{ static('webpack/jquery-index.css') }}">
+        {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
+        <link rel="stylesheet" href="{{ static('bundled/jquery-ui-index.css') }}">
       {% endblock %}
-      <link rel="preload" as="style" href="{{ static('webpack/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-      <noscript><link rel="stylesheet" href="{{ static('webpack/fontawesome-index.css') }}"></noscript>
+      <link rel="preload" as="style" href="{{ static('bundled/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+      <noscript><link rel="stylesheet" href="{{ static('bundled/fontawesome-index.css') }}"></noscript>
 
       <script src="{{ url('javascript-catalog') }}"></script>
-      <script src={{ static("webpack/core/components/include-index.ts") }}></script>
-      <script src="{{ static('webpack/alpine-index.js') }}" defer></script>
-            <!-- Jquery declared here to be accessible in every django widgets -->
-      <script src="{{ static('webpack/jquery-index.js') }}"></script>
-            <!-- Put here to always have access to those functions on django widgets -->
+      <script type="module" src={{ static("bundled/core/components/include-index.ts") }}></script>
+      <script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
+      <script type="module" src="{{ static('bundled/htmx-index.js') }}"></script>
+
+      <!-- Jquery declared here to be accessible in every django widgets -->
+      <script src="{{ static('bundled/vendored/jquery.min.js') }}"></script>
+      <script src="{{ static('bundled/vendored/jquery-ui.min.js') }}"></script>
       <script src="{{ static('core/js/script.js') }}"></script>
 
 
@@ -37,148 +38,13 @@
 
   <body>
 
-        <!-- The token is always passed here to be accessible from the dom -->
-        <!-- See this workaround https://docs.djangoproject.com/en/2.0/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-is-true -->
+    <!-- The token is always passed here to be accessible from the dom -->
+    <!-- See this workaround https://docs.djangoproject.com/en/2.0/ref/csrf/#acquiring-the-token-if-csrf-use-sessions-is-true -->
     {% csrf_token %}
-        <!-- BEGIN HEADER -->
+
     {% block header %}
       {% if not popup %}
-        <header class="header">
-          <div class="header-logo">
-            <a class="header-logo-picture" href="{{ url('core:index') }}" style="background-image: url('{{ static('core/img/logo_no_text.png') }}')">
-              &nbsp;
-            </a>
-            <a class="header-logo-text" href="{{ url('core:index') }}">
-              <span>Association des Étudiants</span>
-              <span>de l'Université de Technologie de Belfort-Montbéliard</span>
-            </a>
-          </div>
-          {% if not user.is_authenticated %}
-            <div class="header-disconnected">
-              <a class="button" href="{{ url('core:login') }}">{% trans %}Login{% endtrans %}</a>
-              <a class="button" href="{{ url('core:register') }}">{% trans %}Register{% endtrans %}</a>
-            </div>
-          {% else %}
-            <div class="header-connected">
-              <div class="left">
-                <form class="search" action="{{ url('core:search') }}" method="GET" id="header_search">
-                  <input class="header-input" type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" id="search" />
-                  <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />
-                </form>
-                <ul class="bars">
-                  {% cache 100 "counters_activity" %}
-                      {# The sith has no periodic tasks manager
-                         and using cron jobs would be way too overkill here.
-                         Thus the barmen timeout is handled in the only place that
-                         is loaded on every page : the header bar.
-                         However, let's be clear : this has nothing to do here.
-                         It's' merely a contrived workaround that should
-                         replaced by a proper task manager as soon as possible. #}
-                    {% set _ = Counter.objects.filter(type="BAR").handle_timeout() %}
-                  {% endcache %}
-                  {% for bar in Counter.objects.annotate_has_barman(user).annotate_is_open().filter(type="BAR") %}
-                    <li>
-                      {# If the user is a barman, we redirect him directly to the barman page
-                      else we redirect him to the activity page #}
-                      {% if bar.has_annotated_barman %}
-                        <a href="{{ url('counter:details', counter_id=bar.id) }}">
-                      {% else %}
-                        <a href="{{ url('counter:activity', counter_id=bar.id) }}">
-                      {% endif %}
-                      {% if bar.is_open %}
-                        <i class="fa fa-check" style="color: #2ecc71"></i>
-                      {% else %}
-                        <i class="fa fa-times" style="color: #eb2f06"></i>
-                      {% endif %}
-                      <span>{{ bar }}</span>
-                    </a>
-                    </li>
-                  {% endfor %}
-                </ul>
-              </div>
-              <div class="right">
-                <div class="user">
-                  <div class="options">
-                    <div class="username">
-                      <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
-                    </div>
-                    <div class="links">
-                      <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
-                      <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
-                    </div>
-                  </div>
-                  <a
-                    href="{{ url('core:user_profile', user_id=user.id) }}"
-                    {% if user.profile_pict %}
-                      style="background-image: url('{{ user.profile_pict.get_download_url() }}')"
-                    {% else %}
-                      style="background-image: url('{{ static('core/img/unknown.jpg') }}')"
-                    {% endif %}
-                  ></a>
-                </div>
-                <div class="notification">
-                  <a href="#" onclick="displayNotif()">
-                    <i class="fa-regular fa-bell"></i>
-                    {% set notification_count = user.notifications.filter(viewed=False).count() %}
-
-                    {% if notification_count > 0 %}
-                      <span>
-                        {% if notification_count < 100 %}
-                          {{ notification_count }}
-                        {% else %}
-                          &nbsp;
-                        {% endif %}
-                      </span>
-                    {% endif %}
-                  </a>
-                  <div id="header_notif">
-                    <ul>
-                      {% if user.notifications.filter(viewed=False).count() > 0 %}
-                        {% for n in user.notifications.filter(viewed=False).order_by('-date') %}
-                          <li>
-                            <a href="{{ url("core:notification", notif_id=n.id) }}">
-                              <div class="datetime">
-                                <span class="header_notif_date">
-                                  {{ n.date|localtime|date(DATE_FORMAT) }}
-                                </span>
-                                <span class="header_notif_time">
-                                  {{ n.date|localtime|time(DATETIME_FORMAT) }}
-                                </span>
-                              </div>
-                              <div class="reason">
-                                {{ n }}
-                              </div>
-                            </a>
-                          </li>
-                        {% endfor %}
-                      {% else %}
-                        <li class="empty-notification">{% trans %}You do not have any unread notification{% endtrans %}</li>
-                      {% endif %}
-                    </ul>
-                    <div class="options">
-                      <a href="{{ url('core:notification_list') }}">
-                        {% trans %}View more{% endtrans %}
-                      </a>
-                      <a href="{{ url('core:notification_list') }}?see_all">
-                        {% trans %}Mark all as read{% endtrans %}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {% endif %}
-          <div class="header-lang">
-            {% for language in LANGUAGES %}
-              <form action="{{ url('set_language') }}" method="post">
-                {% csrf_token %}
-                <input name="next" value="{{ request.path }}" type="hidden" />
-                <input name="language" value="{{ language[0] }}" type="hidden" />
-                <input type="submit" value="{% if language[0] == 'en' %}🇬🇧{% else %}🇫🇷{% endif %}" />
-              </form>
-            {% endfor %}
-          </div>
-        </header>
+        {% include "core/base/header.jinja" %}
 
         {% block info_boxes %}
           <div id="info_boxes">
@@ -201,58 +67,10 @@
       {% endif %}
 
     {% endblock %}
-        <!-- END HEADER -->
 
     {% block nav %}
       {% if not popup %}
-        <nav class="navbar">
-          <button class="expand-button" onclick="showMenu()"><i class="fa fa-bars"></i></button>
-          <div id="navbar-content" class="content" style="display: none;">
-            <a class="link" href="{{ url('core:index') }}">{% trans %}Main{% endtrans %}</a>
-            <div class="menu">
-              <span class="head">{% trans %}Associations & Clubs{% endtrans %}</span>
-              <ul class="content">
-                <li><a href="{{ url('core:page', page_name='ae') }}">{% trans %}AE{% endtrans %}</a></li>
-                <li><a href="{{ url('core:page', page_name='clubs') }}">{% trans %}AE's clubs{% endtrans %}</a></li>
-                <li><a href="{{ url('core:page', page_name='utbm-associations') }}">{% trans %}Others UTBM's Associations{% endtrans %}</a></li>
-              </ul>
-            </div>
-            <div class="menu">
-              <span class="head">{% trans %}Events{% endtrans %}</span>
-              <ul class="content">
-                <li><a href="{{ url('election:list') }}">{% trans %}Elections{% endtrans %}</a></li>
-                <li><a href="{{ url('core:page', page_name='ga') }}">{% trans %}Big event{% endtrans %}</a></li>
-              </ul>
-            </div>
-            <a class="link" href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
-            <a class="link" href="{{ url('sas:main') }}">{% trans %}Gallery{% endtrans %}</a>
-            <a class="link" href="{{ url('eboutic:main') }}">{% trans %}Eboutic{% endtrans %}</a>
-            <div class="menu">
-              <span class="head">{% trans %}Services{% endtrans %}</span>
-              <ul class="content">
-                <li><a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a></li>
-                <li><a href="/launderette">{% trans %}Launderette{% endtrans %}</a></li>
-                <li><a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a></li>
-                <li><a href="{{ url('pedagogy:guide') }}">{% trans %}Pedagogy{% endtrans %}</a></li>
-              </ul>
-            </div>
-            <div class="menu">
-              <span class="head">{% trans %}My Benefits{% endtrans %}</span>
-              <ul class="content">
-                <li><a href="{{ url('core:page', page_name='partenaires')}}">{% trans %}Sponsors{% endtrans %}</a></li>
-                <li><a href="{{ url('core:page', page_name='avantages') }}">{% trans %}Subscriber benefits{% endtrans %}</a></li>
-              </ul>
-            </div>
-            <div class="menu">
-              <span class="head">{% trans %}Help{% endtrans %}</span>
-              <ul class="content">
-                <li><a href="{{ url('core:page', page_name='FAQ') }}">{% trans %}FAQ{% endtrans %}</a></li>
-                <li><a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a></li>
-                <li><a href="{{ url('core:page', page_name='Index') }}">{% trans %}Wiki{% endtrans %}</a></li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+        {% include "core/base/navbar.jinja" %}
       {% endif %}
     {% endblock %}
 
@@ -265,19 +83,16 @@
       </ul>
 
       <div id="content">
-        {% if list_of_tabs %}
-          <div class="tool_bar">
-            <div class="tools">
-              {% for t in list_of_tabs -%}
-                <a href="{{ t.url }}" {%- if current_tab==t.slug %} class="selected_tab" {%- endif -%}>{{ t.name }}</a>
-              {%- endfor %}
-            </div>
-          </div>
-        {% endif %}
+        {% block tabs %}
+          {% include "core/base/tabs.jinja" %}
+        {% endblock %}
 
-        {% if error %}
-          {{ error }}
-        {% endif %}
+        {% block errors%}
+          {% if error %}
+            {{ error }}
+          {% endif %}
+        {% endblock %}
+
         {% block content %}
         {% endblock %}
       </div>

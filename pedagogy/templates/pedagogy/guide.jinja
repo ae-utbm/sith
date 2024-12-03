@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block additional_js %}
-  <script src="{{ static('webpack/pedagogy/guide-index.js') }}" defer></script>
+  <script type="module" src="{{ static('bundled/pedagogy/guide-index.js') }}"></script>
 {% endblock %}
 
 {% block head %}

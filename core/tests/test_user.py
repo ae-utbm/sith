@@ -166,3 +166,24 @@ def test_user_invoice_with_multiple_items():
         .values_list("total", flat=True)
     )
     assert res == [15, 13, 5]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("first_name", "last_name", "expected"),
+    [
+        ("Auguste", "Bartholdi", "abartholdi2"),  # ville du lion rpz
+        ("Aristide", "Denfert-Rochereau", "adenfertrochereau"),
+        ("John", "Dôe", "jdoe"),  # with an accent
+    ],
+)
+def test_generate_username(first_name: str, last_name: str, expected: str):
+    baker.make(
+        User,
+        username=iter(["abar", "abartholdi", "abartholdi1", "abar1"]),
+        _quantity=4,
+        _bulk_create=True,
+    )
+    new_user = User(first_name=first_name, last_name=last_name, email="a@example.com")
+    new_user.generate_username()
+    assert new_user.username == expected

@@ -95,7 +95,6 @@ INSTALLED_APPS = (
     "com",
     "election",
     "forum",
-    "stock",
     "trombi",
     "matmat",
     "pedagogy",
@@ -369,6 +368,8 @@ SITH_GROUP_PEDAGOGY_ADMIN_ID = 13
 SITH_CLUB_REFOUND_ID = 89
 SITH_COUNTER_REFOUND_ID = 38
 SITH_PRODUCT_REFOUND_ID = 5
+
+SITH_COUNTER_ACCOUNT_DUMP_ID = 39
 
 # Pages
 SITH_CORE_PAGE_SYNTAX = "Aide_sur_la_syntaxe"

@@ -4,7 +4,7 @@ from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.finders import FileSystemFinder
 from django.core.files.storage import FileSystemStorage
 
-from staticfiles.apps import GENERATED_ROOT, IGNORE_PATTERNS_WEBPACK
+from staticfiles.apps import GENERATED_ROOT, IGNORE_PATTERNS_BUNDLED
 
 
 class GeneratedFilesFinder(FileSystemFinder):
@@ -27,9 +27,9 @@ class GeneratedFilesFinder(FileSystemFinder):
                 continue
 
             ignored = ignore_patterns
-            # We don't want to ignore webpack files in the generated folder
+            # We don't want to ignore bundled files in the generated folder
             if root == GENERATED_ROOT:
-                ignored = list(set(ignored) - set(IGNORE_PATTERNS_WEBPACK))
+                ignored = list(set(ignored) - set(IGNORE_PATTERNS_BUNDLED))
 
             storage = self.storages[root]
             for path in utils.get_files(storage, ignored):

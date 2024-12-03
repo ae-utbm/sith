@@ -200,6 +200,19 @@ Grâce à son architecture, il est extrêmement
 bien adapté pour un usage dans un site multipage.
 C'est une technologie simple et puissante qui se veut comme le jQuery du web moderne.
 
+### Htmx
+
+[Site officiel](https://htmx.org/)
+
+En plus de AlpineJS, l’interactivité sur le site est augmentée via Htmx.
+C'est une librairie js qui s'utilise également au moyen d'attributs HTML à
+ajouter directement dans les templates.
+
+Son principe est de remplacer certains éléments du html par un fragment de
+HTML renvoyé par le serveur backend. Cela se marie très bien avec le
+fonctionnement de django et en particulier de ses formulaires afin d'éviter
+de doubler le travail pour la vérification des données.
+
 ### Sass
 
 [Site officiel](https://sass-lang.com/)
@@ -388,24 +401,16 @@ Npm possède, tout comme Poetry, la capacité de locker les dépendances au moye
 
 Nous l'utilisons ici pour gérer les dépendances JavaScript. Celle-ci sont déclarées dans le fichier `package.json` situé à la racine du projet.
 
-### Webpack
+### Vite
 
-[Utiliser webpack](https://webpack.js.org/concepts/)
+[Utiliser vite](https://vite.dev)
 
-Webpack est un bundler de fichiers static. Il nous sert ici à mettre à disposition les dépendances frontend gérées par npm.
+Vite est un bundler de fichiers static. Il nous sert ici à mettre à disposition les dépendances frontend gérées par npm.
 
 Il sert également à intégrer les autres outils JavaScript au workflow du Sith de manière transparente.
 
-Webpack a été choisi pour sa versatilité et sa popularité. C'est un des plus anciens bundler et il est là pour rester.
+Vite a été choisi pour sa versatilité et sa popularité. Il est moderne et très rapide avec un fort soutien de la communauté.
 
-Le logiciel se configure au moyen du fichier `webpack.config.js` à la racine du projet.
+Il intègre aussi tout le nécessaire pour la rétro-compatibilité et le Typescript.
 
-### Babel
-
-[Babel](https://babeljs.io/)
-
-Babel est un outil qui offre la promesse de convertir le code JavaScript moderne en code JavaScript plus ancien sans action de la part du développeur. Il permet de ne pas se soucier de la compatibilité avec les navigateurs et de coder comme si on était toujours sur la dernière version du langage.
-
-Babel est intégré dans Webpack et tout code bundlé par celui-ci est automatiquement converti.
-
-Le logiciel se configure au moyen du fichier `babel.config.json` à la racine du projet.
+Le logiciel se configure au moyen du fichier `vite.config.mts` à la racine du projet.

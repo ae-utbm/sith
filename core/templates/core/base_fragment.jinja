@@ -1,0 +1,20 @@
+{% block additional_css %}{% endblock %}
+{% block additional_js %}{% endblock %}
+
+<div id="fragment-content">
+  {% block tabs %}
+    {% include "core/base/tabs.jinja" %}
+  {% endblock %}
+
+  {% block errors %}
+    {% if error %}
+      {{ error }}
+    {% endif %}
+  {% endblock %}
+
+  {% block content %}
+  {% endblock %}
+</div>
+
+{% block script %}
+{% endblock %}

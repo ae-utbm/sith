@@ -1,4 +1,8 @@
-{% extends "core/base.jinja" %}
+{% if is_fragment %}
+  {% extends "core/base_fragment.jinja" %}
+{% else %}
+  {% extends "core/base.jinja" %}
+{% endif %}
 
 {% block title %}
   {% if file %}
@@ -21,7 +25,7 @@
   {% endif %}
 {% endmacro %}
 
-{% block content %}
+{% block tabs %}
   {{ print_file_name(file) }}
 
   <div class="tool_bar">
@@ -44,6 +48,9 @@
     </div>
   </div>
   <hr>
+{% endblock %}
+
+{% block content %}
 
   {% if file %}
     {% block file %}

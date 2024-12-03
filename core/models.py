@@ -26,6 +26,7 @@ from __future__ import annotations
 import importlib
 import logging
 import os
+import string
 import unicodedata
 from datetime import timedelta
 from pathlib import Path
@@ -528,13 +529,15 @@ class User(AbstractBaseUser):
         return False
 
     @cached_property
-    def can_create_subscription(self):
-        from club.models import Club
+    def can_create_subscription(self) -> bool:
+        from club.models import Membership
 
-        for club in Club.objects.filter(id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS):
-            if club in self.clubs_with_rights:
-                return True
-        return False
+        return (
+            Membership.objects.board()
+            .ongoing()
+            .filter(club_id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS)
+            .exists()
+        )
 
     @cached_property
     def is_launderette_manager(self):
@@ -688,12 +691,20 @@ class User(AbstractBaseUser):
             .encode("ascii", "ignore")
             .decode("utf-8")
         )
-        un_set = [u.username for u in User.objects.all()]
-        if user_name in un_set:
-            i = 1
-            while user_name + str(i) in un_set:
-                i += 1
-            user_name += str(i)
+        # load all usernames which could conflict with the new one.
+        # we need to actually load them, instead of performing a count,
+        # because we cannot be sure that two usernames refer to the
+        # actual same word (eg. tmore and tmoreau)
+        possible_conflicts: list[str] = list(
+            User.objects.filter(username__startswith=user_name).values_list(
+                "username", flat=True
+            )
+        )
+        nb_conflicts = sum(
+            1 for name in possible_conflicts if name.rstrip(string.digits) == user_name
+        )
+        if nb_conflicts > 0:
+            user_name += str(nb_conflicts)  # exemple => exemple1
         self.username = user_name
         return user_name
 

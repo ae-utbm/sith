@@ -1,0 +1,136 @@
+<header class="header">
+  <div class="header-logo">
+    <a class="header-logo-picture" href="{{ url('core:index') }}" style="background-image: url('{{ static('core/img/logo_no_text.png') }}')">
+      &nbsp;
+    </a>
+    <a class="header-logo-text" href="{{ url('core:index') }}">
+      <span>Association des Étudiants</span>
+      <span>de l'Université de Technologie de Belfort-Montbéliard</span>
+    </a>
+  </div>
+  {% if not user.is_authenticated %}
+    <div class="header-disconnected">
+      <a class="button" href="{{ url('core:login') }}">{% trans %}Login{% endtrans %}</a>
+      <a class="button" href="{{ url('core:register') }}">{% trans %}Register{% endtrans %}</a>
+    </div>
+  {% else %}
+    <div class="header-connected">
+      <div class="left">
+        <form class="search" action="{{ url('core:search') }}" method="GET" id="header_search">
+          <input class="header-input" type="text" placeholder="{% trans %}Search{% endtrans %}" name="query" id="search" />
+          <input type="submit" value="{% trans %}Search{% endtrans %}" style="display: none;" />
+        </form>
+        <ul class="bars">
+          {% cache 100 "counters_activity" %}
+                      {# The sith has no periodic tasks manager
+                         and using cron jobs would be way too overkill here.
+                         Thus the barmen timeout is handled in the only place that
+                         is loaded on every page : the header bar.
+                         However, let's be clear : this has nothing to do here.
+                         It's' merely a contrived workaround that should
+                         replaced by a proper task manager as soon as possible. #}
+            {% set _ = Counter.objects.filter(type="BAR").handle_timeout() %}
+          {% endcache %}
+          {% for bar in Counter.objects.annotate_has_barman(user).annotate_is_open().filter(type="BAR") %}
+            <li>
+                      {# If the user is a barman, we redirect him directly to the barman page
+                      else we redirect him to the activity page #}
+              {% if bar.has_annotated_barman %}
+                <a href="{{ url('counter:details', counter_id=bar.id) }}">
+              {% else %}
+                <a href="{{ url('counter:activity', counter_id=bar.id) }}">
+              {% endif %}
+              {% if bar.is_open %}
+                <i class="fa fa-check" style="color: #2ecc71"></i>
+              {% else %}
+                <i class="fa fa-times" style="color: #eb2f06"></i>
+              {% endif %}
+              <span>{{ bar }}</span>
+            </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="right">
+        <div class="user">
+          <div class="options">
+            <div class="username">
+              <a href="{{ url('core:user_profile', user_id=user.id) }}">{{ user.get_display_name() }}</a>
+            </div>
+            <div class="links">
+              <a href="{{ url('core:user_tools') }}">{% trans %}Tools{% endtrans %}</a>
+              <a href="{{ url('core:logout') }}">{% trans %}Logout{% endtrans %}</a>
+            </div>
+          </div>
+          <a
+            href="{{ url('core:user_profile', user_id=user.id) }}"
+            {% if user.profile_pict %}
+              style="background-image: url('{{ user.profile_pict.get_download_url() }}')"
+            {% else %}
+              style="background-image: url('{{ static('core/img/unknown.jpg') }}')"
+            {% endif %}
+          ></a>
+        </div>
+        <div class="notification">
+          <a href="#" onclick="displayNotif()">
+            <i class="fa-regular fa-bell"></i>
+            {% set notification_count = user.notifications.filter(viewed=False).count() %}
+
+            {% if notification_count > 0 %}
+              <span>
+                {% if notification_count < 100 %}
+                  {{ notification_count }}
+                {% else %}
+                  &nbsp;
+                {% endif %}
+              </span>
+            {% endif %}
+          </a>
+          <div id="header_notif">
+            <ul>
+              {% if user.notifications.filter(viewed=False).count() > 0 %}
+                {% for n in user.notifications.filter(viewed=False).order_by('-date') %}
+                  <li>
+                    <a href="{{ url("core:notification", notif_id=n.id) }}">
+                      <div class="datetime">
+                        <span class="header_notif_date">
+                          {{ n.date|localtime|date(DATE_FORMAT) }}
+                        </span>
+                        <span class="header_notif_time">
+                          {{ n.date|localtime|time(DATETIME_FORMAT) }}
+                        </span>
+                      </div>
+                      <div class="reason">
+                        {{ n }}
+                      </div>
+                    </a>
+                  </li>
+                {% endfor %}
+              {% else %}
+                <li class="empty-notification">{% trans %}You do not have any unread notification{% endtrans %}</li>
+              {% endif %}
+            </ul>
+            <div class="options">
+              <a href="{{ url('core:notification_list') }}">
+                {% trans %}View more{% endtrans %}
+              </a>
+              <a href="{{ url('core:notification_list') }}?see_all">
+                {% trans %}Mark all as read{% endtrans %}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+  <div class="header-lang">
+    {% for language in LANGUAGES %}
+      <form action="{{ url('set_language') }}" method="post">
+        {% csrf_token %}
+        <input name="next" value="{{ request.path }}" type="hidden" />
+        <input name="language" value="{{ language[0] }}" type="hidden" />
+        <input type="submit" value="{% if language[0] == 'en' %}🇬🇧{% else %}🇫🇷{% endif %}" />
+      </form>
+    {% endfor %}
+  </div>
+</header>

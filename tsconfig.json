@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./staticfiles/generated/webpack/",
+    "outDir": "./staticfiles/generated/bundled/",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "es6",
@@ -10,11 +10,12 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "types": ["jquery", "alpinejs"],
     "paths": {
       "#openapi": ["./staticfiles/generated/openapi/index.ts"],
-      "#core:*": ["./core/static/webpack/*"],
-      "#pedagogy:*": ["./pedagogy/static/webpack/*"]
+      "#core:*": ["./core/static/bundled/*"],
+      "#pedagogy:*": ["./pedagogy/static/bundled/*"]
     }
   }
 }

@@ -3,7 +3,7 @@
   <head>
     <title>{% trans %}Slideshow{% endtrans %}</title>
     <link href="{{ static('css/slideshow.scss') }}" rel="stylesheet" type="text/css" />
-    <script src="{{ static('webpack/jquery-index.js') }}"></script>
+    <script type="module" src="{{ static('bundled/jquery-index.js') }}"></script>
     <script src="{{ static('com/js/slideshow.js') }}"></script>
   </head>
   <body>

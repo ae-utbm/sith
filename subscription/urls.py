@@ -15,10 +15,31 @@
 
 from django.urls import path
 
-from subscription.views import NewSubscription, SubscriptionsStatsView
+from subscription.views import (
+    CreateSubscriptionExistingUserFragment,
+    CreateSubscriptionNewUserFragment,
+    NewSubscription,
+    SubscriptionCreatedFragment,
+    SubscriptionsStatsView,
+)
 
 urlpatterns = [
     # Subscription views
     path("", NewSubscription.as_view(), name="subscription"),
+    path(
+        "fragment/existing-user/",
+        CreateSubscriptionExistingUserFragment.as_view(),
+        name="fragment-existing-user",
+    ),
+    path(
+        "fragment/new-user/",
+        CreateSubscriptionNewUserFragment.as_view(),
+        name="fragment-new-user",
+    ),
+    path(
+        "fragment/<int:subscription_id>/creation-success",
+        SubscriptionCreatedFragment.as_view(),
+        name="creation-success",
+    ),
     path("stats/", SubscriptionsStatsView.as_view(), name="stats"),
 ]

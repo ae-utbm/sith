@@ -1,4 +1,5 @@
 @import "colors";
+@import "forms";
 
 /*--------------------------MEDIA QUERY HELPERS------------------------*/
 $small-devices: 576px;
@@ -11,91 +12,6 @@ body {
   position: relative;
   width: 100%;
   font-family: sans-serif;
-}
-
-
-a.button,
-button,
-input[type="button"],
-input[type="submit"],
-input[type="reset"],
-input[type="file"] {
-  border: none;
-  text-decoration: none;
-  background-color: $background-button-color;
-  padding: 0.4em;
-  margin: 0.1em;
-  font-size: 1.2em;
-  border-radius: 5px;
-  color: black;
-
-  &:hover {
-    background: hsl(0, 0%, 83%);
-  }
-}
-
-a.button,
-input[type="button"],
-input[type="submit"],
-input[type="reset"],
-input[type="file"] {
-  font-weight: bold;
-}
-
-a.button:not(:disabled),
-button:not(:disabled),
-input[type="button"]:not(:disabled),
-input[type="submit"]:not(:disabled),
-input[type="reset"]:not(:disabled),
-input[type="checkbox"]:not(:disabled),
-input[type="file"]:not(:disabled) {
-  cursor: pointer;
-}
-
-input,
-textarea[type="text"],
-[type="number"] {
-  border: none;
-  text-decoration: none;
-  background-color: $background-button-color;
-  padding: 0.4em;
-  margin: 0.1em;
-  font-size: 1.2em;
-  border-radius: 5px;
-  max-width: 95%;
-}
-
-textarea {
-  border: none;
-  text-decoration: none;
-  background-color: $background-button-color;
-  padding: 7px;
-  font-size: 1.2em;
-  border-radius: 5px;
-  font-family: sans-serif;
-}
-
-select {
-  border: none;
-  text-decoration: none;
-  font-size: 1.2em;
-  background-color: $background-button-color;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-a:not(.button) {
-  text-decoration: none;
-  color: $primary-dark-color;
-
-  &:hover {
-    color: $primary-light-color;
-  }
-
-  &:active {
-    color: $primary-color;
-  }
 }
 
 [aria-busy] {
@@ -262,8 +178,10 @@ a:not(.button) {
     font-weight: normal;
     color: white;
     padding: 9px 13px;
+    margin: 3px;
     border: none;
     text-decoration: none;
+    text-align: center;
     border-radius: 5px;
 
     &.btn-blue {
@@ -367,6 +285,49 @@ a:not(.button) {
     .alert-aside {
       display: flex;
       flex-direction: column;
+      gap: 5px;
+    }
+  }
+
+  .tabs {
+    border-radius: 5px;
+
+    .tab-headers {
+      display: flex;
+      flex-flow: row wrap;
+      background-color: $primary-neutral-light-color;
+      padding: 3px 12px 12px;
+      column-gap: 20px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+
+      .tab-header {
+        border: none;
+        padding-right: 0;
+        padding-left: 0;
+        font-size: 120%;
+        background-color: unset;
+        position: relative;
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          border-bottom: 4px solid darken($primary-neutral-light-color, 10%);
+          border-radius: 2px;
+          transition: all 0.2s ease-in-out;
+        }
+        &:hover:after {
+          border-bottom-color: darken($primary-neutral-light-color, 20%);
+        }
+        &.active:after {
+          border-bottom-color: $primary-dark-color;
+        }
+      }
+    }
+    section {
+      padding: 20px;
     }
   }
 
@@ -1246,25 +1207,25 @@ u,
 /*-----------------------------USER PROFILE----------------------------*/
 
 .user_mini_profile {
-  height: 100%;
-  width: 100%;
+  --gap-size: 1em;
+  max-height: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-size);
 
   img {
-    max-width: 100%;
     max-height: 100%;
+    max-width: 100%;
   }
 
   .user_mini_profile_infos {
     padding: 0.2em;
-    height: 20%;
+    max-height: 20%;
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-around;
     font-size: 0.9em;
-
-    div {
-      max-height: 100%;
-    }
 
     .user_mini_profile_infos_text {
       text-align: center;
@@ -1276,10 +1237,10 @@ u,
   }
 
   .user_mini_profile_picture {
-    height: 80%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    max-height: calc(80% - var(--gap-size));
+    max-width: 100%;
+    display: block;
+    margin: auto;
   }
 }
 
