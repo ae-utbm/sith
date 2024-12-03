@@ -57,7 +57,7 @@ class Command(BaseCommand):
 
         subscribers = random.sample(users, k=int(0.8 * len(users)))
         self.stdout.write("Creating subscriptions...")
-        self.create_subscriptions(users)
+        self.create_subscriptions(subscribers)
         self.stdout.write("Creating club memberships...")
         users_qs = User.objects.filter(id__in=[s.id for s in subscribers])
         subscribers_now = list(
@@ -103,10 +103,10 @@ class Command(BaseCommand):
         self.stdout.write("Done")
 
     def create_subscriptions(self, users: list[User]):
-        def prepare_subscription(user: User, start_date: date) -> Subscription:
+        def prepare_subscription(_user: User, start_date: date) -> Subscription:
             payment_method = random.choice(settings.SITH_SUBSCRIPTION_PAYMENT_METHOD)[0]
             duration = random.randint(1, 4)
-            sub = Subscription(member=user, payment_method=payment_method)
+            sub = Subscription(member=_user, payment_method=payment_method)
             sub.subscription_start = sub.compute_start(d=start_date, duration=duration)
             sub.subscription_end = sub.compute_end(duration)
             return sub
@@ -130,6 +130,10 @@ class Command(BaseCommand):
                     user, self.faker.past_date(sub.subscription_end)
                 )
                 subscriptions.append(sub)
+        old_subscriber_group = Group.objects.get(
+            pk=settings.SITH_GROUP_OLD_SUBSCRIBERS_ID
+        )
+        old_subscriber_group.users.add(*users)
         Subscription.objects.bulk_create(subscriptions)
         Customer.objects.bulk_create(customers, ignore_conflicts=True)
 

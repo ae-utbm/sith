@@ -384,8 +384,6 @@ class User(AbstractUser):
             return True
         if group.id == settings.SITH_GROUP_SUBSCRIBERS_ID:
             return self.is_subscribed
-        if group.id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
-            return self.was_subscribed
         if group.id == settings.SITH_GROUP_ROOT_ID:
             return self.is_root
         return group in self.cached_groups
