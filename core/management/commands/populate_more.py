@@ -11,7 +11,7 @@ from django.utils.timezone import localdate, make_aware, now
 from faker import Faker
 
 from club.models import Club, Membership
-from core.models import RealGroup, User
+from core.models import Group, User
 from counter.models import (
     Counter,
     Customer,
@@ -173,7 +173,8 @@ class Command(BaseCommand):
                     club=club,
                 )
             )
-        Membership.objects.bulk_create(memberships)
+        memberships = Membership.objects.bulk_create(memberships)
+        Membership._add_club_groups(memberships)
 
     def create_uvs(self):
         root = User.objects.get(username="root")
@@ -225,9 +226,7 @@ class Command(BaseCommand):
         ae = Club.objects.get(unix_name="ae")
         other_clubs = random.sample(list(Club.objects.all()), k=3)
         groups = list(
-            RealGroup.objects.filter(
-                name__in=["Subscribers", "Old subscribers", "Public"]
-            )
+            Group.objects.filter(name__in=["Subscribers", "Old subscribers", "Public"])
         )
         counters = list(
             Counter.objects.filter(name__in=["Foyer", "MDE", "La Gommette", "Eboutic"])

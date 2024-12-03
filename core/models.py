@@ -30,19 +30,12 @@ import string
 import unicodedata
 from datetime import timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Self
+from typing import TYPE_CHECKING, Optional, Self
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, UserManager
-from django.contrib.auth.models import (
-    AnonymousUser as AuthAnonymousUser,
-)
-from django.contrib.auth.models import (
-    Group as AuthGroup,
-)
-from django.contrib.auth.models import (
-    GroupManager as AuthGroupManager,
-)
+from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AnonymousUser as AuthAnonymousUser
+from django.contrib.auth.models import Group as AuthGroup
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core import validators
 from django.core.cache import cache
@@ -64,33 +57,16 @@ if TYPE_CHECKING:
     from club.models import Club
 
 
-class RealGroupManager(AuthGroupManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_meta=False)
-
-
-class MetaGroupManager(AuthGroupManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_meta=True)
-
-
 class Group(AuthGroup):
-    """Implement both RealGroups and Meta groups.
+    """Wrapper around django.auth.Group"""
 
-    Groups are sorted by their is_meta property
-    """
-
-    #: If False, this is a RealGroup
-    is_meta = models.BooleanField(
-        _("meta group status"),
+    is_manually_manageable = models.BooleanField(
+        _("Is manually manageable"),
         default=False,
-        help_text=_("Whether a group is a meta group or not"),
+        help_text=_("If False, this shouldn't be shown on group management pages"),
     )
     #: Description of the group
     description = models.CharField(_("description"), max_length=60)
-
-    class Meta:
-        ordering = ["name"]
 
     def get_absolute_url(self) -> str:
         return reverse("core:group_list")
@@ -104,65 +80,6 @@ class Group(AuthGroup):
         super().delete(*args, **kwargs)
         cache.delete(f"sith_group_{self.id}")
         cache.delete(f"sith_group_{self.name.replace(' ', '_')}")
-
-
-class MetaGroup(Group):
-    """MetaGroups are dynamically created groups.
-
-    Generally used with clubs where creating a club creates two groups:
-
-    * club-SITH_BOARD_SUFFIX
-    * club-SITH_MEMBER_SUFFIX
-    """
-
-    #: Assign a manager in a way that MetaGroup.objects only return groups with is_meta=False
-    objects = MetaGroupManager()
-
-    class Meta:
-        proxy = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.is_meta = True
-
-    @cached_property
-    def associated_club(self) -> Club | None:
-        """Return the group associated with this meta group.
-
-        The result of this function is cached
-
-
-        Returns:
-            The associated club if it exists, else None
-        """
-        from club.models import Club
-
-        if self.name.endswith(settings.SITH_BOARD_SUFFIX):
-            # replace this with str.removesuffix as soon as Python
-            # is upgraded to 3.10
-            club_name = self.name[: -len(settings.SITH_BOARD_SUFFIX)]
-        elif self.name.endswith(settings.SITH_MEMBER_SUFFIX):
-            club_name = self.name[: -len(settings.SITH_MEMBER_SUFFIX)]
-        else:
-            return None
-        club = cache.get(f"sith_club_{club_name}")
-        if club is None:
-            club = Club.objects.filter(unix_name=club_name).first()
-            cache.set(f"sith_club_{club_name}", club)
-        return club
-
-
-class RealGroup(Group):
-    """RealGroups are created by the developer.
-
-    Most of the time they match a number in settings to be easily used for permissions.
-    """
-
-    #: Assign a manager in a way that MetaGroup.objects only return groups with is_meta=True
-    objects = RealGroupManager()
-
-    class Meta:
-        proxy = True
 
 
 def validate_promo(value: int) -> None:
@@ -210,8 +127,8 @@ def get_group(*, pk: int | None = None, name: str | None = None) -> Group | None
     else:
         group = Group.objects.filter(name=name).first()
     if group is not None:
-        cache.set(f"sith_group_{group.id}", group)
-        cache.set(f"sith_group_{group.name.replace(' ', '_')}", group)
+        name = group.name.replace(" ", "_")
+        cache.set_many({f"sith_group_{group.id}": group, f"sith_group_{name}": group})
     else:
         cache.set(f"sith_group_{pk_or_name}", "not_found")
     return group
@@ -242,7 +159,7 @@ class CustomUserManager(UserManager.from_queryset(UserQuerySet)):
     pass
 
 
-class User(AbstractBaseUser):
+class User(AbstractUser):
     """Defines the base user class, useable in every app.
 
     This is almost the same as the auth module AbstractUser since it inherits from it,
@@ -253,51 +170,22 @@ class User(AbstractBaseUser):
     Required fields: email, first_name, last_name, date_of_birth
     """
 
-    username = models.CharField(
-        _("username"),
-        max_length=254,
-        unique=True,
-        help_text=_(
-            "Required. 254 characters or fewer. Letters, digits and ./+/-/_ only."
-        ),
-        validators=[
-            validators.RegexValidator(
-                r"^[\w.+-]+$",
-                _(
-                    "Enter a valid username. This value may contain only "
-                    "letters, numbers "
-                    "and ./+/-/_ characters."
-                ),
-            )
-        ],
-        error_messages={"unique": _("A user with that username already exists.")},
-    )
     first_name = models.CharField(_("first name"), max_length=64)
     last_name = models.CharField(_("last name"), max_length=64)
     email = models.EmailField(_("email address"), unique=True)
     date_of_birth = models.DateField(_("date of birth"), blank=True, null=True)
     nick_name = models.CharField(_("nick name"), max_length=64, null=True, blank=True)
-    is_staff = models.BooleanField(
-        _("staff status"),
-        default=False,
-        help_text=_("Designates whether the user can log into this admin site."),
-    )
-    is_active = models.BooleanField(
-        _("active"),
-        default=True,
-        help_text=_(
-            "Designates whether this user should be treated as active. "
-            "Unselect this instead of deleting accounts."
-        ),
-    )
-    date_joined = models.DateField(_("date joined"), auto_now_add=True)
     last_update = models.DateTimeField(_("last update"), auto_now=True)
-    is_superuser = models.BooleanField(
-        _("superuser"),
-        default=False,
-        help_text=_("Designates whether this user is a superuser. "),
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=_("groups"),
+        help_text=_(
+            "The groups this user belongs to. A user will get all permissions "
+            "granted to each of their groups."
+        ),
+        related_name="users",
+        blank=True,
     )
-    groups = models.ManyToManyField(RealGroup, related_name="users", blank=True)
     home = models.OneToOneField(
         "SithFile",
         related_name="home_of",
@@ -401,8 +289,6 @@ class User(AbstractBaseUser):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = "username"
-
     def __str__(self):
         return self.get_display_name()
 
@@ -422,22 +308,23 @@ class User(AbstractBaseUser):
             settings.BASE_DIR / f"core/static/core/img/promo_{self.promo}.png"
         ).exists()
 
-    def has_module_perms(self, package_name: str) -> bool:
-        return self.is_active
-
-    def has_perm(self, perm: str, obj: Any = None) -> bool:
-        return self.is_active and self.is_superuser
-
     @cached_property
     def was_subscribed(self) -> bool:
+        if "is_subscribed" in self.__dict__ and self.is_subscribed:
+            # if the user is currently subscribed, he is an old subscriber too
+            # if the property has already been cached, avoid another request
+            return True
         return self.subscriptions.exists()
 
     @cached_property
     def is_subscribed(self) -> bool:
-        s = self.subscriptions.filter(
+        if "was_subscribed" in self.__dict__ and not self.was_subscribed:
+            # if the user never subscribed, he cannot be a subscriber now.
+            # if the property has already been cached, avoid another request
+            return False
+        return self.subscriptions.filter(
             subscription_start__lte=timezone.now(), subscription_end__gte=timezone.now()
-        )
-        return s.exists()
+        ).exists()
 
     @cached_property
     def account_balance(self):
@@ -470,22 +357,8 @@ class User(AbstractBaseUser):
             return True
         if group.id == settings.SITH_GROUP_SUBSCRIBERS_ID:
             return self.is_subscribed
-        if group.id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
-            return self.was_subscribed
         if group.id == settings.SITH_GROUP_ROOT_ID:
             return self.is_root
-        if group.is_meta:
-            # check if this group is associated with a club
-            group.__class__ = MetaGroup
-            club = group.associated_club
-            if club is None:
-                return False
-            membership = club.get_membership_for(self)
-            if membership is None:
-                return False
-            if group.name.endswith(settings.SITH_MEMBER_SUFFIX):
-                return True
-            return membership.role > settings.SITH_MAXIMUM_FREE_ROLE
         return group in self.cached_groups
 
     @property
@@ -510,12 +383,11 @@ class User(AbstractBaseUser):
         return any(g.id == root_id for g in self.cached_groups)
 
     @cached_property
-    def is_board_member(self):
-        main_club = settings.SITH_MAIN_CLUB["unix_name"]
-        return self.is_in_group(name=main_club + settings.SITH_BOARD_SUFFIX)
+    def is_board_member(self) -> bool:
+        return self.groups.filter(club_board=settings.SITH_MAIN_CLUB_ID).exists()
 
     @cached_property
-    def can_read_subscription_history(self):
+    def can_read_subscription_history(self) -> bool:
         if self.is_root or self.is_board_member:
             return True
 
@@ -598,11 +470,6 @@ class User(AbstractBaseUser):
             "nick_name": self.nick_name,
             "date_of_birth": self.date_of_birth,
         }
-
-    def get_full_name(self):
-        """Returns the first_name plus the last_name, with a space in between."""
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
 
     def get_short_name(self):
         """Returns the short name for the user."""
@@ -982,19 +849,17 @@ class SithFile(models.Model):
         if copy_rights:
             self.copy_rights()
         if self.is_in_sas:
-            for u in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_SAS_ADMIN_ID)
-                .first()
-                .users.all()
+            for user in User.objects.filter(
+                groups__id__in=[settings.SITH_GROUP_SAS_ADMIN_ID]
             ):
                 Notification(
-                    user=u,
+                    user=user,
                     url=reverse("sas:moderation"),
                     type="SAS_MODERATION",
                     param="1",
                 ).save()
 
-    def is_owned_by(self, user):
+    def is_owned_by(self, user: User) -> bool:
         if user.is_anonymous:
             return False
         if user.is_root:
@@ -1009,7 +874,7 @@ class SithFile(models.Model):
             return True
         return user.id == self.owner_id
 
-    def can_be_viewed_by(self, user):
+    def can_be_viewed_by(self, user: User) -> bool:
         if hasattr(self, "profile_of"):
             return user.can_view(self.profile_of)
         if hasattr(self, "avatar_of"):

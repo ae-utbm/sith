@@ -23,7 +23,7 @@ from model_bakery import baker
 from pytest_django.asserts import assertInHTML, assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
-from core.models import RealGroup, User
+from core.models import Group, User
 from sas.baker_recipes import picture_recipe
 from sas.models import Album, Picture
 
@@ -38,7 +38,7 @@ from sas.models import Album, Picture
         old_subscriber_user.make,
         lambda: baker.make(User, is_superuser=True),
         lambda: baker.make(
-            User, groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
+            User, groups=[Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
         ),
         lambda: baker.make(User),
     ],
@@ -80,7 +80,7 @@ class TestSasModeration(TestCase):
         cls.to_moderate.is_moderated = False
         cls.to_moderate.save()
         cls.moderator = baker.make(
-            User, groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
+            User, groups=[Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
         )
         cls.simple_user = subscriber_user.make()
 
