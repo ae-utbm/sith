@@ -55,7 +55,9 @@ class Command(BaseCommand):
             customer__user__in=reactivated_users
         ).delete()
         self._dump_accounts({u.customer for u in users_to_dump})
-        self._send_mails(users_to_dump)
+        self.stdout.write("Accounts dumped")
+        nb_successful_mails = self._send_mails(users_to_dump)
+        self.stdout.write(f"{nb_successful_mails} were successfuly sent.")
         self.stdout.write("Finished !")
 
     @staticmethod
@@ -103,13 +105,14 @@ class Command(BaseCommand):
         if len(pending_dumps) != len(customer_ids):
             raise ValueError("One or more accounts were not engaged in a dump process")
         counter = Counter.objects.get(pk=settings.SITH_COUNTER_ACCOUNT_DUMP_ID)
+        seller = User.objects.get(pk=settings.SITH_ROOT_USER_ID)
         sales = Selling.objects.bulk_create(
             [
                 Selling(
                     label="Vidange compte inactif",
                     club=counter.club,
                     counter=counter,
-                    seller=None,
+                    seller=seller,
                     product=None,
                     customer=account,
                     quantity=1,
@@ -134,8 +137,12 @@ class Command(BaseCommand):
         Customer.objects.filter(pk__in=customer_ids).update(amount=0)
 
     @staticmethod
-    def _send_mails(users: Iterable[User]):
-        """Send the mails informing users that their account has been dumped."""
+    def _send_mails(users: Iterable[User]) -> int:
+        """Send the mails informing users that their account has been dumped.
+
+        Returns:
+            The number of emails successfully sent.
+        """
         mails = [
             (
                 _("Your AE account has been emptied"),
@@ -145,4 +152,4 @@ class Command(BaseCommand):
             )
             for user in users
         ]
-        send_mass_mail(mails)
+        return send_mass_mail(mails, fail_silently=True)

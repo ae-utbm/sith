@@ -351,6 +351,9 @@ SITH_SEMESTER_START_SPRING = (2, 15)  # 15 February
 # Used to determine the valid promos
 SITH_SCHOOL_START_YEAR = 1999
 
+# id of the Root account
+SITH_ROOT_USER_ID = 0
+
 SITH_GROUP_ROOT_ID = 1
 SITH_GROUP_PUBLIC_ID = 2
 SITH_GROUP_SUBSCRIBERS_ID = 3
