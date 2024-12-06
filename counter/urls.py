@@ -33,6 +33,7 @@ from counter.views.admin import (
     RefillingDeleteView,
     SellingDeleteView,
 )
+from counter.views.auth import counter_login, counter_logout
 from counter.views.cash import (
     CashSummaryEditView,
     CashSummaryListView,
@@ -45,16 +46,13 @@ from counter.views.eticket import (
     EticketListView,
     EticketPDFView,
 )
-from counter.views.invoice import InvoiceCallView
-from counter.views.main import (
+from counter.views.home import (
     CounterActivityView,
     CounterLastOperationsView,
     CounterMain,
-    StudentCardDeleteView,
-    StudentCardFormView,
-    counter_login,
-    counter_logout,
 )
+from counter.views.invoice import InvoiceCallView
+from counter.views.student_card import StudentCardDeleteView, StudentCardFormView
 
 urlpatterns = [
     path("<int:counter_id>/", CounterMain.as_view(), name="details"),
