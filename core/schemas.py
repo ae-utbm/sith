@@ -4,6 +4,7 @@ from typing import Annotated
 from annotated_types import MinLen
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.text import slugify
 from haystack.query import SearchQuerySet
 from ninja import FilterSchema, ModelSchema, Schema
@@ -37,13 +38,13 @@ class UserProfileSchema(ModelSchema):
 
     @staticmethod
     def resolve_profile_url(obj: User) -> str:
-        return obj.get_absolute_url()
+        return reverse("core:user_profile", kwargs={"user_id": obj.pk})
 
     @staticmethod
     def resolve_profile_pict(obj: User) -> str:
         if obj.profile_pict_id is None:
             return staticfiles_storage.url("core/img/unknown.jpg")
-        return obj.profile_pict.get_download_url()
+        return reverse("core:download", kwargs={"file_id": obj.profile_pict_id})
 
 
 class SithFileSchema(ModelSchema):
