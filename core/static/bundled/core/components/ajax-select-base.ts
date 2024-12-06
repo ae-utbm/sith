@@ -103,6 +103,12 @@ export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
 export abstract class AjaxSelect extends AutoCompleteSelectBase {
   protected filter?: (items: TomOption[]) => TomOption[] = null;
   protected minCharNumberForSearch = 2;
+  /**
+   * A cache of researches that have been made using this input.
+   * For each record, the key is the user's query and the value
+   * is the list of results sent back by the server.
+   */
+  protected cache = {} as Record<string, TomOption[]>;
 
   protected abstract valueField: string;
   protected abstract labelField: string;
@@ -135,7 +141,13 @@ export abstract class AjaxSelect extends AutoCompleteSelectBase {
       this.widget.clearOptions();
     }
 
-    const resp = await this.search(query);
+    // Check in the cache if this query has already been typed
+    // and do an actual HTTP request only if the result isn't cached
+    let resp = this.cache[query];
+    if (!resp) {
+      resp = await this.search(query);
+      this.cache[query] = resp;
+    }
 
     if (this.filter) {
       callback(this.filter(resp), []);
