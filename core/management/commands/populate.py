@@ -69,7 +69,7 @@ class Command(BaseCommand):
             # sqlite doesn't support this operation
             return
         sqlcmd = StringIO()
-        call_command("sqlsequencereset", *args, stdout=sqlcmd)
+        call_command("sqlsequencereset", "--no-color", *args, stdout=sqlcmd)
         cursor = connection.cursor()
         cursor.execute(sqlcmd.getvalue())
 
@@ -137,16 +137,20 @@ class Command(BaseCommand):
         )
 
         self.reset_index("club")
-        counters = [
-            *[
+        Counter.objects.bulk_create(
+            [
                 Counter(id=bar_id, name=bar_name, club=bar_club, type="BAR")
                 for bar_id, bar_name in settings.SITH_COUNTER_BARS
-            ],
-            Counter(name="Eboutic", club=main_club, type="EBOUTIC"),
-            Counter(name="AE", club=main_club, type="OFFICE"),
-            Counter(name="Vidage comptes AE", club=main_club, type="OFFICE"),
-        ]
-        Counter.objects.bulk_create(counters)
+            ]
+        )
+        self.reset_index("counter")
+        Counter.objects.bulk_create(
+            [
+                Counter(name="Eboutic", club=main_club, type="EBOUTIC"),
+                Counter(name="AE", club=main_club, type="OFFICE"),
+                Counter(name="Vidage comptes AE", club=main_club, type="OFFICE"),
+            ]
+        )
         bar_groups = []
         for bar_id, bar_name in settings.SITH_COUNTER_BARS:
             group = RealGroup.objects.create(name=f"{bar_name} admin")
