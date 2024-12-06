@@ -15,40 +15,19 @@
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
-from django.db.models import F
-from django.http import HttpRequest, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
-from django.views.generic.edit import DeleteView, FormMixin, FormView, ProcessFormView
+from django.views.generic.edit import FormMixin, ProcessFormView
 
-from core.views import CanEditMixin, CanViewMixin
+from core.views import CanViewMixin
 from core.views.forms import LoginForm
-from counter.forms import GetUserForm, StudentCardForm
-from counter.models import Counter, Customer, Permanency, StudentCard
+from counter.forms import GetUserForm
+from counter.models import Counter
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
-
-
-class StudentCardDeleteView(DeleteView, CanEditMixin):
-    """View used to delete a card from a user."""
-
-    model = StudentCard
-    template_name = "core/delete_confirm.jinja"
-    pk_url_kwarg = "card_id"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
-        )
 
 
 class CounterMain(
@@ -123,36 +102,6 @@ class CounterMain(
         return reverse_lazy("counter:click", args=self.args, kwargs=self.kwargs)
 
 
-@require_POST
-def counter_login(request: HttpRequest, counter_id: int) -> HttpResponseRedirect:
-    """Log a user in a counter.
-
-    A successful login will result in the beginning of a counter duty
-    for the user.
-    """
-    counter = get_object_or_404(Counter, pk=counter_id)
-    form = LoginForm(request, data=request.POST)
-    if not form.is_valid():
-        return redirect(counter.get_absolute_url() + "?credentials")
-    user = form.get_user()
-    if not counter.sellers.contains(user) or user in counter.barmen_list:
-        return redirect(counter.get_absolute_url() + "?sellers")
-    if len(counter.barmen_list) == 0:
-        counter.gen_token()
-    request.session["counter_token"] = counter.token
-    counter.permanencies.create(user=user, start=timezone.now())
-    return redirect(counter)
-
-
-@require_POST
-def counter_logout(request: HttpRequest, counter_id: int) -> HttpResponseRedirect:
-    """End the permanency of a user in this counter."""
-    Permanency.objects.filter(counter=counter_id, user=request.POST["user_id"]).update(
-        end=F("activity")
-    )
-    return redirect("counter:details", counter_id=counter_id)
-
-
 class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
     """Provide the last operations to allow barmen to delete them."""
 
@@ -196,27 +145,3 @@ class CounterActivityView(DetailView):
     model = Counter
     pk_url_kwarg = "counter_id"
     template_name = "counter/activity.jinja"
-
-
-class StudentCardFormView(FormView):
-    """Add a new student card."""
-
-    form_class = StudentCardForm
-    template_name = "core/create.jinja"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
-        if not StudentCard.can_create(self.customer, request.user):
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        data = form.clean()
-        res = super(FormView, self).form_valid(form)
-        StudentCard(customer=self.customer, uid=data["uid"]).save()
-        return res
-
-    def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
-        )
