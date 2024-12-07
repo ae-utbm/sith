@@ -1,10 +1,10 @@
 from django.conf import settings
+from django.core.cache import cache
 from django.db import transaction
 from django.test import TestCase
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
-from pytest_django.asserts import assertNumQueries
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import RealGroup, SithFile, User
@@ -128,9 +128,11 @@ class TestPictureSearch(TestSas):
     def test_num_queries(self):
         """Test that the number of queries is stable."""
         self.client.force_login(subscriber_user.make())
-        with assertNumQueries(5):
+        cache.clear()
+        with self.assertNumQueries(7):
+            # 2 requests to create the session
             # 1 request to fetch the user from the db
-            # 2 requests to check the user permissions
+            # 2 requests to check the user permissions, depends on the db engine
             # 1 request to fetch the pictures
             # 1 request to count the total number of items in the pagination
             self.client.get(self.url)
