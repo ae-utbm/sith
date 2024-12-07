@@ -32,7 +32,7 @@
 
       {% if counter.type == 'BAR' %}
         <div
-          hx-get="{{ url('counter:add_student_card_fragment', counter_id=counter.id, customer_id=customer.pk) }}"
+          hx-get="{{ url('counter:add_student_card', customer_id=customer.pk) }}"
           hx-trigger="load"
           hx-swap="outerHTML"
         >

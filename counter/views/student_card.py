@@ -13,14 +13,17 @@
 #
 #
 
+
 from django.core.exceptions import PermissionDenied
+from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView, FormView
 
-from core.views import AllowFragment, CanEditMixin
+from core.views import CanEditMixin
 from counter.forms import StudentCardForm
-from counter.models import Counter, Customer, StudentCard
+from counter.models import Customer, StudentCard
+from counter.utils import is_logged_in_counter
 
 
 class StudentCardDeleteView(DeleteView, CanEditMixin):
@@ -40,16 +43,22 @@ class StudentCardDeleteView(DeleteView, CanEditMixin):
         )
 
 
-class StudentCardFormView(AllowFragment, FormView):
-    """Add a new student card."""
+class StudentCardFormView(FormView):
+    """Add a new student card. This is a fragment view !"""
 
     form_class = StudentCardForm
-    template_name = "core/create.jinja"
+    template_name = "counter/fragments/create_student_card.jinja"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
-        if not StudentCard.can_create(self.customer, request.user):
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
+        self.customer = get_object_or_404(
+            Customer.objects.prefetch_related("student_cards"), pk=kwargs["customer_id"]
+        )
+
+        if not is_logged_in_counter(request) and not StudentCard.can_create(
+            self.customer, request.user
+        ):
             raise PermissionDenied
+
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -58,56 +67,12 @@ class StudentCardFormView(AllowFragment, FormView):
         StudentCard(customer=self.customer, uid=data["uid"]).save()
         return res
 
-    def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
-        )
-
-
-class StudentCardFormFragmentView(FormView):
-    """
-    Add a new student card from a counter
-    This is a fragment only view which integrates with counter_click.jinja
-    """
-
-    form_class = StudentCardForm
-    template_name = "counter/add_student_card_fragment.jinja"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.counter = get_object_or_404(
-            Counter.objects.annotate_is_open(), pk=kwargs["counter_id"]
-        )
-        self.customer = get_object_or_404(
-            Customer.objects.prefetch_related("student_cards"), pk=kwargs["customer_id"]
-        )
-        if not (
-            self.counter.type == "BAR"
-            and "counter_token" in request.session
-            and request.session["counter_token"] == self.counter.token
-            and self.counter.is_open
-        ):
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        data = form.clean()
-        res = super().form_valid(form)
-        StudentCard(customer=self.customer, uid=data["uid"]).save()
-        return res
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["counter"] = self.counter
         context["customer"] = self.customer
         context["action"] = self.request.path
         context["student_cards"] = self.customer.student_cards.all()
         return context
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "counter:add_student_card_fragment",
-            kwargs={
-                "customer_id": self.customer.pk,
-                "counter_id": self.counter.id,
-            },
-        )
+        return self.request.path

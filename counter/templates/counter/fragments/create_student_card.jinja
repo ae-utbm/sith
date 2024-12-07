@@ -1,7 +1,6 @@
 <div id="student_card_form">
   <h3>{% trans %}Add a student card{% endtrans %}</h3>
   <form
-    hx-trigger="submit"
     hx-post="{{ action }}"
     hx-swap="outerHTML"
     hx-target="#student_card_form"
@@ -16,10 +15,15 @@
 
     <ul>
       {% for card in student_cards %}
-        <li>{{ card.uid }}</li>
+        <li>
+          {{ card.uid }}
+          <a href="{{ url('counter:delete_student_card', customer_id=customer.pk, card_id=card.id) }}">
+            {% trans %}Delete{% endtrans %}
+          </a>
+        </li>
       {% endfor %}
     </ul>
   {% else %}
-    {% trans %}No card registered{% endtrans %}
+    <em class="no-cards">{% trans %}No student card registered.{% endtrans %}</em>
   {% endif %}
 </div>

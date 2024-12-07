@@ -54,7 +54,6 @@ from counter.views.home import (
 from counter.views.invoice import InvoiceCallView
 from counter.views.student_card import (
     StudentCardDeleteView,
-    StudentCardFormFragmentView,
     StudentCardFormView,
 )
 
@@ -80,11 +79,6 @@ urlpatterns = [
         "customer/<int:customer_id>/card/add/",
         StudentCardFormView.as_view(),
         name="add_student_card",
-    ),
-    path(
-        "customer/<int:customer_id>/card/add/counter/<int:counter_id>/",
-        StudentCardFormFragmentView.as_view(),
-        name="add_student_card_fragment",
     ),
     path(
         "customer/<int:customer_id>/card/delete/<int:card_id>/",
