@@ -30,6 +30,7 @@ from core.views import CanViewMixin
 from counter.forms import RefillForm
 from counter.models import Counter, Customer, Product, Selling
 from counter.views.mixins import CounterTabsMixin
+from counter.views.student_card import StudentCardFormView
 
 if TYPE_CHECKING:
     from core.models import User
@@ -414,4 +415,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         kwargs["basket_total"] = self.sum_basket(self.request)
         kwargs["refill_form"] = self.refill_form or RefillForm()
         kwargs["barmens_can_refill"] = self.object.can_refill()
+        kwargs["student_card"] = StudentCardFormView.get_template_data(
+            self.request, self.customer
+        ).as_dict()
         return kwargs

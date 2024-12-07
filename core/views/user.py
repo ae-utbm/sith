@@ -71,6 +71,7 @@ from core.views.forms import (
     UserProfileForm,
 )
 from counter.models import Refilling, Selling
+from counter.views.student_card import StudentCardFormView
 from eboutic.models import Invoice
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
@@ -575,6 +576,10 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
             hasattr(self.object, "trombi_user") and self.request.user.trombi_user.trombi
         ):
             kwargs["trombi_form"] = UserTrombiForm()
+        if hasattr(self.object, "customer"):
+            kwargs["student_card"] = StudentCardFormView.get_template_data(
+                self.request, self.object.customer
+            ).as_dict()
         return kwargs
 
 

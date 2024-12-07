@@ -14,6 +14,9 @@
 #
 
 
+from dataclasses import asdict, dataclass
+from typing import Any
+
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
@@ -24,6 +27,16 @@ from core.views import CanEditMixin
 from counter.forms import StudentCardForm
 from counter.models import Customer, StudentCard
 from counter.utils import is_logged_in_counter
+
+
+@dataclass
+class StudentCardTemplateData:
+    form: StudentCardForm
+    template: str
+    context: dict[str, Any]
+
+    def as_dict(self) -> dict[str, Any]:
+        return asdict(self)
 
 
 class StudentCardDeleteView(DeleteView, CanEditMixin):
@@ -49,6 +62,23 @@ class StudentCardFormView(FormView):
     form_class = StudentCardForm
     template_name = "counter/fragments/create_student_card.jinja"
 
+    @classmethod
+    def get_template_data(
+        cls, request: HttpRequest, customer: Customer
+    ) -> StudentCardTemplateData:
+        """Get necessary data to pre-render the fragment"""
+        return StudentCardTemplateData(
+            form=cls.form_class(),
+            template=cls.template_name,
+            context={
+                "action": reverse_lazy(
+                    "counter:add_student_card", kwargs={"customer_id": customer.pk}
+                ),
+                "customer": customer,
+                "student_cards": customer.student_cards.all(),
+            },
+        )
+
     def dispatch(self, request: HttpRequest, *args, **kwargs):
         self.customer = get_object_or_404(
             Customer.objects.prefetch_related("student_cards"), pk=kwargs["customer_id"]
@@ -69,9 +99,8 @@ class StudentCardFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["customer"] = self.customer
-        context["action"] = self.request.path
-        context["student_cards"] = self.customer.student_cards.all()
+        data = self.get_template_data(self.request, self.customer)
+        context.update(data.context)
         return context
 
     def get_success_url(self, **kwargs):
