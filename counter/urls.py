@@ -81,7 +81,7 @@ urlpatterns = [
         name="add_student_card",
     ),
     path(
-        "customer/<int:customer_id>/card/delete/<int:card_id>/",
+        "customer/<int:customer_id>/card/delete/",
         StudentCardDeleteView.as_view(),
         name="delete_student_card",
     ),

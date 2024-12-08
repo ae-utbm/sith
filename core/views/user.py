@@ -571,7 +571,7 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
         if not hasattr(self.object, "trombi_user"):
             kwargs["trombi_form"] = UserTrombiForm()
         if hasattr(self.object, "customer"):
-            kwargs["student_card"] = StudentCardFormView.get_template_data(
+            kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
                 self.object.customer
             ).render(self.request)
         return kwargs
