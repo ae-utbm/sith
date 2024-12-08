@@ -52,11 +52,11 @@ class StudentCardFormView(FormView):
 
     @classmethod
     def get_template_data(
-        cls, customer: Customer
+        cls, customer: Customer, *, form_instance: form_class | None = None
     ) -> FormFragmentTemplateData[form_class]:
         """Get necessary data to pre-render the fragment"""
         return FormFragmentTemplateData[cls.form_class](
-            form=cls.form_class(),
+            form=form_instance if form_instance else cls.form_class(),
             template=cls.template_name,
             context={
                 "action": reverse_lazy(
@@ -80,14 +80,14 @@ class StudentCardFormView(FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        data = form.clean()
         res = super(FormView, self).form_valid(form)
+        data = form.clean()
         StudentCard(customer=self.customer, uid=data["uid"]).save()
         return res
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        data = self.get_template_data(self.customer)
+        data = self.get_template_data(self.customer, form_instance=context["form"])
         context.update(data.context)
         return context
 
