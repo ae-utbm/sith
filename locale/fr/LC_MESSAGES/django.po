@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-09 12:28+0100\n"
+"POT-Creation-Date: 2024-12-11 09:34+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -369,7 +369,7 @@ msgstr "Compte en banque : "
 #: core/templates/core/user_clubs.jinja:34
 #: core/templates/core/user_clubs.jinja:63
 #: core/templates/core/user_edit.jinja:62
-#: counter/templates/counter/fragments/create_student_card.jinja:21
+#: counter/templates/counter/fragments/create_student_card.jinja:18
 #: counter/templates/counter/last_ops.jinja:35
 #: counter/templates/counter/last_ops.jinja:65
 #: election/templates/election/election_detail.jinja:191
@@ -950,11 +950,11 @@ msgstr "Une action est requise"
 msgid "You must specify at least an user or an email address"
 msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 
-#: club/forms.py:149 counter/forms.py:193
+#: club/forms.py:149 counter/forms.py:189
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py:152 com/views.py:84 com/views.py:202 counter/forms.py:196
+#: club/forms.py:152 com/views.py:84 com/views.py:202 counter/forms.py:192
 #: election/views.py:170 subscription/forms.py:21
 msgid "End date"
 msgstr "Date de fin"
@@ -3048,7 +3048,7 @@ msgstr "Facture eboutic"
 msgid "Etickets"
 msgstr "Etickets"
 
-#: core/templates/core/user_account.jinja:69 core/views/user.py:639
+#: core/templates/core/user_account.jinja:69 core/views/user.py:633
 msgid "User has no account"
 msgstr "L'utilisateur n'a pas de compte"
 
@@ -3371,7 +3371,7 @@ msgstr "Cotisations"
 msgid "Subscription stats"
 msgstr "Statistiques de cotisation"
 
-#: core/templates/core/user_tools.jinja:48 counter/forms.py:166
+#: core/templates/core/user_tools.jinja:48 counter/forms.py:162
 #: counter/views/mixins.py:89
 msgid "Counters"
 msgstr "Comptoirs"
@@ -3543,7 +3543,7 @@ msgstr "Parrain / Marraine"
 msgid "Godchild"
 msgstr "Fillot / Fillote"
 
-#: core/views/forms.py:310 counter/forms.py:80 trombi/views.py:151
+#: core/views/forms.py:310 counter/forms.py:78 trombi/views.py:151
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
@@ -3596,11 +3596,11 @@ msgstr "Galaxie"
 msgid "counter"
 msgstr "comptoir"
 
-#: counter/forms.py:61
+#: counter/forms.py:59
 msgid "This UID is invalid"
 msgstr "Cet UID est invalide"
 
-#: counter/forms.py:109
+#: counter/forms.py:107
 msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
@@ -3862,9 +3862,13 @@ msgstr "secret"
 msgid "uid"
 msgstr "uid"
 
-#: counter/models.py:1144
+#: counter/models.py:1144 counter/models.py:1149
+msgid "student card"
+msgstr "carte étudiante"
+
+#: counter/models.py:1150
 msgid "student cards"
-msgstr "cartes étudiante"
+msgstr "cartes étudiantes"
 
 #: counter/templates/counter/activity.jinja:5
 #: counter/templates/counter/activity.jinja:13
@@ -3929,7 +3933,7 @@ msgstr "Vente"
 
 #: counter/templates/counter/counter_click.jinja:50
 #: counter/templates/counter/counter_click.jinja:115
-#: counter/templates/counter/fragments/create_student_card.jinja:10
+#: counter/templates/counter/fragments/create_student_card.jinja:11
 #: counter/templates/counter/invoices_call.jinja:16
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
@@ -4032,16 +4036,16 @@ msgid "There is no eticket in this website."
 msgstr "Il n'y a pas de eticket sur ce site web."
 
 #: counter/templates/counter/fragments/create_student_card.jinja:2
-msgid "Add a student card"
-msgstr "Ajouter une carte étudiante"
+msgid "Student card"
+msgstr "Carte étudiante"
 
 #: counter/templates/counter/fragments/create_student_card.jinja:13
-msgid "Registered cards"
-msgstr "Cartes enregistrées"
-
-#: counter/templates/counter/fragments/create_student_card.jinja:27
 msgid "No student card registered."
 msgstr "Aucune carte étudiante enregistrée."
+
+#: counter/templates/counter/fragments/create_student_card.jinja:16
+msgid "Registered"
+msgstr "Enregistré"
 
 #: counter/templates/counter/invoices_call.jinja:8
 #, python-format
@@ -4312,6 +4316,11 @@ msgstr "Administration des comptoirs"
 #: counter/views/mixins.py:104
 msgid "Product types"
 msgstr "Types de produit"
+
+#: counter/views/student_card.py:44
+#, python-format
+msgid "%(name)s has no registered student card"
+msgstr "%(name)s n'a pas de carte étudiante enregistrée"
 
 #: eboutic/forms.py:88
 msgid "The request was badly formatted."
