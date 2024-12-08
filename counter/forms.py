@@ -45,9 +45,7 @@ class BillingInfoForm(forms.ModelForm):
 
 
 class StudentCardForm(forms.ModelForm):
-    """Form for adding student cards
-    Only used for user profile since CounterClick is to complicated.
-    """
+    """Form for adding student cards"""
 
     class Meta:
         model = StudentCard
@@ -112,14 +110,6 @@ class GetUserForm(forms.Form):
         cleaned_data["user_id"] = cus.user.id
         cleaned_data["user"] = cus.user
         return cleaned_data
-
-
-class NFCCardForm(forms.Form):
-    student_card_uid = forms.CharField(
-        max_length=StudentCard.UID_SIZE,
-        required=False,
-        widget=NFCTextInput,
-    )
 
 
 class RefillForm(forms.ModelForm):

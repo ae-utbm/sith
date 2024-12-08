@@ -29,26 +29,9 @@
       {{ user_mini_profile(customer.user) }}
       {{ user_subscription(customer.user) }}
       <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
-      <form method="post" action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="add_student_card">
-        {% trans %}Add a student card{% endtrans %}
-        {{  student_card_input.student_card_uid }}
-        {% if request.session['not_valid_student_card_uid'] %}
-          <p><strong>{% trans %}This is not a valid student card UID{% endtrans %}</strong></p>
-        {% endif %}
-        <input type="submit" value="{% trans %}Go{% endtrans %}"/>
-      </form>
-      <h6>{% trans %}Registered cards{% endtrans %}</h6>
-      {% if student_cards %}
 
-        <ul>
-          {% for card in student_cards %}
-            <li>{{ card.uid }}</li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        {% trans %}No card registered{% endtrans %}
+      {% if counter.type == 'BAR' %}
+        {{ student_card }}
       {% endif %}
     </div>
 

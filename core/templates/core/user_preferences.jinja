@@ -35,35 +35,12 @@
     {% endif %}
 
 
-    {% if profile.customer %}
-      <h3>{% trans %}Student cards{% endtrans %}</h3>
-
-      {% if profile.customer.student_cards.exists() %}
-        <ul class="student-cards">
-          {% for card in profile.customer.student_cards.all() %}
-            <li>
-              {{ card.uid }}
-              &nbsp;-&nbsp;
-              <a href="{{ url('counter:delete_student_card', customer_id=profile.customer.pk, card_id=card.id) }}">
-                {% trans %}Delete{% endtrans %}
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <em class="no-cards">{% trans %}No student card registered.{% endtrans %}</em>
-        <p class="justify">
-          {% trans %}You can add a card by asking at a counter or add it yourself here. If you want to manually
-            add a student card yourself, you'll need a NFC reader. We store the UID of the card which is 14 characters long.{% endtrans %}
-        </p>
-      {% endif %}
-
-      <form class="form form-cards" action="{{ url('counter:add_student_card', customer_id=profile.customer.pk) }}"
-            method="post">
-        {% csrf_token %}
-        {{ student_card_form.as_p() }}
-        <input class="form-submit-btn" type="submit" value="{% trans %}Save{% endtrans %}" />
-      </form>
+    {% if student_card %}
+      {{ student_card }}
+      <p class="justify">
+        {% trans %}You can add a card by asking at a counter or add it yourself here. If you want to manually
+          add a student card yourself, you'll need a NFC reader. We store the UID of the card which is 14 characters long.{% endtrans %}
+      </p>
     {% endif %}
   </div>
 {% endblock %}

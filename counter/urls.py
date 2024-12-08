@@ -52,7 +52,10 @@ from counter.views.home import (
     CounterMain,
 )
 from counter.views.invoice import InvoiceCallView
-from counter.views.student_card import StudentCardDeleteView, StudentCardFormView
+from counter.views.student_card import (
+    StudentCardDeleteView,
+    StudentCardFormView,
+)
 
 urlpatterns = [
     path("<int:counter_id>/", CounterMain.as_view(), name="details"),
