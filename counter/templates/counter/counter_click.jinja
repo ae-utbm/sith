@@ -31,131 +31,124 @@
       <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 
       {% if counter.type == 'BAR' %}
-        {% with
-        form=student_card.form,
-        action=student_card.context.action,
-        customer=student_card.context.customer,
-        student_cards=student_card.context.student_cards
-        %}
-        {% include student_card.template %}
-      {% endwith %}
-{% endif %}
-</div>
+        {{ student_card }}
+      {% endif %}
+    </div>
 
-<div id="click_form">
-  <h5>{% trans %}Selling{% endtrans %}</h5>
-  <div>
-    {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
+    <div id="click_form">
+      <h5>{% trans %}Selling{% endtrans %}</h5>
+      <div>
+        {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
 
                 {# Formulaire pour rechercher un produit en tapant son code dans une barre de recherche #}
-    <form method="post" action=""
-          class="code_form" @submit.prevent="handleCode">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="code">
-      <label for="code_field"></label>
-      <input type="text" name="code" value="" class="focus" id="code_field"/>
-      <input type="submit" value="{% trans %}Go{% endtrans %}"/>
-    </form>
-
-    <template x-for="error in errors">
-      <div class="alert alert-red" x-text="error">
-      </div>
-    </template>
-    <p>{% trans %}Basket: {% endtrans %}</p>
-
-    <ul>
-      <template x-for="[id, item] in Object.entries(basket)" :key="id">
-        <div>
-          <form method="post" action="" class="inline del_product_form"
-                @submit.prevent="handleAction">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="del_product">
-            <input type="hidden" name="product_id" :value="id">
-            <input type="submit" value="-"/>
-          </form>
-
-          <span x-text="item['qty'] + item['bonus_qty']"></span>
-
-          <form method="post" action="" class="inline add_product_form"
-                @submit.prevent="handleAction">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="add_product">
-            <input type="hidden" name="product_id" :value="id">
-            <input type="submit" value="+">
-          </form>
-
-          <span x-text="products[id].name"></span> :
-          <span x-text="(item['qty'] * item['price'] / 100)
-                        .toLocaleString(undefined, { minimumFractionDigits: 2 })">
-          </span> €
-          <template x-if="item['bonus_qty'] > 0">P</template>
-        </div>
-      </template>
-    </ul>
-    <p>
-      <strong>Total: </strong>
-      <strong x-text="sumBasket().toLocaleString(undefined, { minimumFractionDigits: 2 })"></strong>
-      <strong> €</strong>
-    </p>
-
-    <form method="post"
-          action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="finish">
-      <input type="submit" value="{% trans %}Finish{% endtrans %}"/>
-    </form>
-    <form method="post"
-          action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="cancel">
-      <input type="submit" value="{% trans %}Cancel{% endtrans %}"/>
-    </form>
-  </div>
-  {% if (counter.type == 'BAR' and barmens_can_refill) %}
-    <h5>{% trans %}Refilling{% endtrans %}</h5>
-    <div>
-      <form method="post"
-            action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-        {% csrf_token %}
-        {{ refill_form.as_p() }}
-        <input type="hidden" name="action" value="refill">
-        <input type="submit" value="{% trans %}Go{% endtrans %}"/>
-      </form>
-    </div>
-  {% endif %}
-</div>
-
-<div id="products">
-  <ul>
-    {% for category in categories.keys() -%}
-      <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
-    {%- endfor %}
-  </ul>
-  {% for category in categories.keys() -%}
-    <div id="cat_{{ category|slugify }}">
-      <h5>{{ category }}</h5>
-      {% for p in categories[category] -%}
-        <form method="post"
-              action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}"
-              class="form_button add_product_form" @submit.prevent="handleAction">
+        <form method="post" action=""
+              class="code_form" @submit.prevent="handleCode">
           {% csrf_token %}
-          <input type="hidden" name="action" value="add_product">
-          <input type="hidden" name="product_id" value="{{ p.id }}">
-          <button type="submit">
-            <strong>{{ p.name }}</strong>
-            {% if p.icon %}
-              <img src="{{ p.icon.url }}" alt="image de {{ p.name }}"/>
-            {% else %}
-              <img src="{{ static('core/img/na.gif') }}" alt="image de {{ p.name }}"/>
-            {% endif %}
-            <span>{{ p.price }} €<br>{{ p.code }}</span>
-          </button>
+          <input type="hidden" name="action" value="code">
+          <label for="code_field"></label>
+          <input type="text" name="code" value="" class="focus" id="code_field"/>
+          <input type="submit" value="{% trans %}Go{% endtrans %}"/>
         </form>
+
+        <template x-for="error in errors">
+          <div class="alert alert-red" x-text="error">
+          </div>
+        </template>
+        <p>{% trans %}Basket: {% endtrans %}</p>
+
+        <ul>
+          <template x-for="[id, item] in Object.entries(basket)" :key="id">
+            <div>
+              <form method="post" action="" class="inline del_product_form"
+                    @submit.prevent="handleAction">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="del_product">
+                <input type="hidden" name="product_id" :value="id">
+                <input type="submit" value="-"/>
+              </form>
+
+              <span x-text="item['qty'] + item['bonus_qty']"></span>
+
+              <form method="post" action="" class="inline add_product_form"
+                    @submit.prevent="handleAction">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_product">
+                <input type="hidden" name="product_id" :value="id">
+                <input type="submit" value="+">
+              </form>
+
+              <span x-text="products[id].name"></span> :
+              <span x-text="(item['qty'] * item['price'] / 100)
+                            .toLocaleString(undefined, { minimumFractionDigits: 2 })">
+              </span> €
+              <template x-if="item['bonus_qty'] > 0">P</template>
+            </div>
+          </template>
+        </ul>
+        <p>
+          <strong>Total: </strong>
+          <strong x-text="sumBasket().toLocaleString(undefined, { minimumFractionDigits: 2 })"></strong>
+          <strong> €</strong>
+        </p>
+
+        <form method="post"
+              action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="finish">
+          <input type="submit" value="{% trans %}Finish{% endtrans %}"/>
+        </form>
+        <form method="post"
+              action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="cancel">
+          <input type="submit" value="{% trans %}Cancel{% endtrans %}"/>
+        </form>
+      </div>
+      {% if (counter.type == 'BAR' and barmens_can_refill) %}
+        <h5>{% trans %}Refilling{% endtrans %}</h5>
+        <div>
+          <form method="post"
+                action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
+            {% csrf_token %}
+            {{ refill_form.as_p() }}
+            <input type="hidden" name="action" value="refill">
+            <input type="submit" value="{% trans %}Go{% endtrans %}"/>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+
+    <div id="products">
+      <ul>
+        {% for category in categories.keys() -%}
+          <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
+        {%- endfor %}
+      </ul>
+      {% for category in categories.keys() -%}
+        <div id="cat_{{ category|slugify }}">
+          <h5>{{ category }}</h5>
+          {% for p in categories[category] -%}
+            <form method="post"
+                  action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}"
+                  class="form_button add_product_form" @submit.prevent="handleAction">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="add_product">
+              <input type="hidden" name="product_id" value="{{ p.id }}">
+              <button type="submit">
+                <strong>{{ p.name }}</strong>
+                {% if p.icon %}
+                  <img src="{{ p.icon.url }}" alt="image de {{ p.name }}"/>
+                {% else %}
+                  <img src="{{ static('core/img/na.gif') }}" alt="image de {{ p.name }}"/>
+                {% endif %}
+                <span>{{ p.price }} €<br>{{ p.code }}</span>
+              </button>
+            </form>
+          {%- endfor %}
+        </div>
       {%- endfor %}
     </div>
-  {%- endfor %}
-</div>
-</div>
+  </div>
 {% endblock content %}
 
 {% block script %}

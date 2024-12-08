@@ -7,7 +7,7 @@
   >
     {% csrf_token %}
     {{  form.as_p() }}
-    <button>{% trans %}Go{% endtrans %}</button>
+    <input type="submit" value="{% trans %}Go{% endtrans %}"/>
 
   </form>
   <h6>{% trans %}Registered cards{% endtrans %}</h6>

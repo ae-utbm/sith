@@ -14,29 +14,17 @@
 #
 
 
-from dataclasses import asdict, dataclass
-from typing import Any
-
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView, FormView
 
+from core.utils import FormFragmentTemplateData
 from core.views import CanEditMixin
 from counter.forms import StudentCardForm
 from counter.models import Customer, StudentCard
 from counter.utils import is_logged_in_counter
-
-
-@dataclass
-class StudentCardTemplateData:
-    form: StudentCardForm
-    template: str
-    context: dict[str, Any]
-
-    def as_dict(self) -> dict[str, Any]:
-        return asdict(self)
 
 
 class StudentCardDeleteView(DeleteView, CanEditMixin):
@@ -64,10 +52,10 @@ class StudentCardFormView(FormView):
 
     @classmethod
     def get_template_data(
-        cls, request: HttpRequest, customer: Customer
-    ) -> StudentCardTemplateData:
+        cls, customer: Customer
+    ) -> FormFragmentTemplateData[form_class]:
         """Get necessary data to pre-render the fragment"""
-        return StudentCardTemplateData(
+        return FormFragmentTemplateData[cls.form_class](
             form=cls.form_class(),
             template=cls.template_name,
             context={
@@ -99,7 +87,7 @@ class StudentCardFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        data = self.get_template_data(self.request, self.customer)
+        data = self.get_template_data(self.customer)
         context.update(data.context)
         return context
 

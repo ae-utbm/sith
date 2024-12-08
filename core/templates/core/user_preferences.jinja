@@ -36,19 +36,11 @@
 
 
     {% if student_card %}
-      {% with
-      form=student_card.form,
-      action=student_card.context.action,
-      customer=student_card.context.customer,
-      student_cards=student_card.context.student_cards
-      %}
-      {% include student_card.template %}
-    {% endwith %}
-
-    <p class="justify">
-      {% trans %}You can add a card by asking at a counter or add it yourself here. If you want to manually
-        add a student card yourself, you'll need a NFC reader. We store the UID of the card which is 14 characters long.{% endtrans %}
-    </p>
-{% endif %}
-</div>
+      {{ student_card }}
+      <p class="justify">
+        {% trans %}You can add a card by asking at a counter or add it yourself here. If you want to manually
+          add a student card yourself, you'll need a NFC reader. We store the UID of the card which is 14 characters long.{% endtrans %}
+      </p>
+    {% endif %}
+  </div>
 {% endblock %}

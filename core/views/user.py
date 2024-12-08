@@ -578,8 +578,8 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
             kwargs["trombi_form"] = UserTrombiForm()
         if hasattr(self.object, "customer"):
             kwargs["student_card"] = StudentCardFormView.get_template_data(
-                self.request, self.object.customer
-            ).as_dict()
+                self.object.customer
+            ).render(self.request)
         return kwargs
 
 
