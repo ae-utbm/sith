@@ -326,7 +326,7 @@ class Product(models.Model):
     """A product, with all its related information."""
 
     name = models.CharField(_("name"), max_length=64)
-    description = models.TextField(_("description"), blank=True)
+    description = models.TextField(_("description"), default="")
     product_type = models.ForeignKey(
         ProductType,
         related_name="products",
@@ -336,9 +336,15 @@ class Product(models.Model):
         on_delete=models.SET_NULL,
     )
     code = models.CharField(_("code"), max_length=16, blank=True)
-    purchase_price = CurrencyField(_("purchase price"))
+    purchase_price = CurrencyField(
+        _("purchase price"),
+        help_text=_("Initial cost of purchasing the product"),
+    )
     selling_price = CurrencyField(_("selling price"))
-    special_selling_price = CurrencyField(_("special selling price"))
+    special_selling_price = CurrencyField(
+        _("special selling price"),
+        help_text=_("Price for barmen during their permanence"),
+    )
     icon = ResizedImageField(
         height=70,
         force_format="WEBP",
@@ -352,14 +358,6 @@ class Product(models.Model):
     )
     limit_age = models.IntegerField(_("limit age"), default=0)
     tray = models.BooleanField(_("tray price"), default=False)
-    parent_product = models.ForeignKey(
-        "self",
-        related_name="children_products",
-        verbose_name=_("parent product"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
     buying_groups = models.ManyToManyField(
         Group, related_name="products", verbose_name=_("buying groups"), blank=True
     )
@@ -369,7 +367,7 @@ class Product(models.Model):
         verbose_name = _("product")
 
     def __str__(self):
-        return "%s (%s)" % (self.name, self.code)
+        return f"{self.name} ({self.code})"
 
     def get_absolute_url(self):
         return reverse("counter:product_list")
