@@ -143,7 +143,6 @@ class ProductEditForm(forms.ModelForm):
             "description",
             "product_type",
             "code",
-            "parent_product",
             "buying_groups",
             "purchase_price",
             "selling_price",
@@ -155,7 +154,6 @@ class ProductEditForm(forms.ModelForm):
             "archived",
         ]
         widgets = {
-            "parent_product": AutoCompleteSelectMultipleProduct,
             "product_type": AutoCompleteSelect,
             "buying_groups": AutoCompleteSelectMultipleGroup,
             "club": AutoCompleteSelectClub,
