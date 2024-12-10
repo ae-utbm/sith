@@ -198,8 +198,7 @@ class TestStudentCard(TestCase):
             StudentCard, customer=cls.customer.customer, uid="8A89B82018B0A0"
         )
 
-    def setUp(self):
-        # Auto login on counter
+    def login_in_counter(self):
         self.client.post(
             reverse("counter:login", args=[self.counter.id]),
             {"username": self.barmen.username, "password": "plop"},
@@ -222,6 +221,7 @@ class TestStudentCard(TestCase):
         ]
 
     def test_search_user_with_student_card(self):
+        self.login_in_counter()
         response = self.client.post(
             reverse("counter:details", args=[self.counter.id]),
             {"code": self.valid_card.uid},
@@ -233,6 +233,7 @@ class TestStudentCard(TestCase):
         )
 
     def test_add_student_card_from_counter(self):
+        self.login_in_counter()
         for uid in ["8B90734A802A8F", "ABCAAAFAAFAAAB", "15248196326518"]:
             customer = subscriber_user.make().customer
             response = self.client.post(
@@ -251,6 +252,7 @@ class TestStudentCard(TestCase):
             assert customer.student_card.uid == uid
 
     def test_add_student_card_from_counter_fail(self):
+        self.login_in_counter()
         customer = subscriber_user.make().customer
         for uid, error_msg in self.invalid_uids():
             response = self.client.post(
@@ -269,25 +271,15 @@ class TestStudentCard(TestCase):
             assert not hasattr(customer, "student_card")
 
     def test_add_student_card_from_counter_unauthorized(self):
-        barman = subscriber_user.make()
-        self.counter.sellers.add(barman)
-        customer = self.customer.customer
-        # There is someone logged to a counter
-        # with the client of this TestCase instance,
-        # so we create a new client, in order to check
-        # that using a client not logged to a counter
-        # where another client is logged still isn't authorized.
-        client = Client()
-
         def send_valid_request(counter_id):
-            return client.post(
+            return self.client.post(
                 reverse(
-                    "counter:add_student_card", kwargs={"customer_id": customer.pk}
+                    "counter:add_student_card", kwargs={"customer_id": self.customer.pk}
                 ),
                 {"uid": "8B90734A802A8F"},
                 HTTP_REFERER=reverse(
                     "counter:click",
-                    kwargs={"counter_id": counter_id, "user_id": customer.pk},
+                    kwargs={"counter_id": counter_id, "user_id": self.customer.pk},
                 ),
             )
 
@@ -295,7 +287,7 @@ class TestStudentCard(TestCase):
         assert send_valid_request(self.counter.id).status_code == 403
 
         # Send to a non bar counter
-        client.force_login(self.club_admin)
+        self.client.force_login(self.club_admin)
         assert send_valid_request(self.club_counter.id).status_code == 403
 
     def test_delete_student_card_with_owner(self):
@@ -322,6 +314,24 @@ class TestStudentCard(TestCase):
             self.customer.customer.refresh_from_db()
             assert not hasattr(self.customer.customer, "student_card")
 
+    def test_delete_student_card_from_counter(self):
+        self.login_in_counter()
+        self.client.post(
+            reverse(
+                "counter:delete_student_card",
+                kwargs={"customer_id": self.customer.customer.pk},
+            ),
+            http_referer=reverse(
+                "counter:click",
+                kwargs={
+                    "counter_id": self.counter.id,
+                    "user_id": self.customer.customer.pk,
+                },
+            ),
+        )
+        self.customer.customer.refresh_from_db()
+        assert not hasattr(self.customer.customer, "student_card")
+
     def test_delete_student_card_fail(self):
         """Test that non-admin users cannot delete student cards"""
         self.client.force_login(self.subscriber)
@@ -336,7 +346,7 @@ class TestStudentCard(TestCase):
         assert not hasattr(self.subscriber.customer, "student_card")
 
     def test_add_student_card_from_user_preferences(self):
-        users = [self.subscriber, self.board_admin, self.root]
+        users = [self.customer, self.board_admin, self.root]
         uids = ["8B90734A802A8F", "ABCAAAFAAFAAAB", "15248196326518"]
         for user, uid in itertools.product(users, uids):
             self.customer.customer.student_card.delete()
@@ -353,7 +363,7 @@ class TestStudentCard(TestCase):
 
             self.customer.customer.refresh_from_db()
             assert self.customer.customer.student_card.uid == uid
-            self.assertContains(response, text="Enregistré")
+            self.assertContains(response, text="Carte enregistrée")
 
     def test_add_student_card_from_user_preferences_fail(self):
         customer = subscriber_user.make()

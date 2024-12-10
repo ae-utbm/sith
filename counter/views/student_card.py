@@ -22,21 +22,31 @@ from django.utils.translation import gettext as _
 from django.views.generic.edit import DeleteView, FormView
 
 from core.utils import FormFragmentTemplateData
-from core.views import CanEditMixin
+from core.views import can_edit
 from counter.forms import StudentCardForm
 from counter.models import Customer, StudentCard
 from counter.utils import is_logged_in_counter
 
 
-class StudentCardDeleteView(DeleteView, CanEditMixin):
-    """View used to delete a card from a user."""
+class StudentCardDeleteView(DeleteView):
+    """View used to delete a card from a user. This is a fragment view !"""
 
     model = StudentCard
-    template_name = "core/delete_confirm.jinja"
+    template_name = "counter/fragments/delete_student_card.jinja"
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
         self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
+        if not is_logged_in_counter(request) and not can_edit(
+            self.get_object(), request.user
+        ):
+            raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["action"] = self.request.path
+        context["action_cancel"] = self.get_success_url()
+        return context
 
     def get_object(self, queryset=None):
         if not hasattr(self.customer, "student_card"):
@@ -47,7 +57,9 @@ class StudentCardDeleteView(DeleteView, CanEditMixin):
         return self.customer.student_card
 
     def get_success_url(self, **kwargs):
-        return reverse("core:user_prefs", kwargs={"user_id": self.customer.user_id})
+        return reverse(
+            "counter:add_student_card", kwargs={"customer_id": self.customer.pk}
+        )
 
 
 class StudentCardFormView(FormView):
