@@ -1,0 +1,9 @@
+<form
+  hx-trigger="submit"
+  hx-post="{{ action }}"
+  hx-swap="outerHTML"
+>
+  {% csrf_token %}
+  {{  form.as_p() }}
+  <input type="submit" value="{% trans %}Go{% endtrans %}"/>
+</form>
