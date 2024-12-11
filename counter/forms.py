@@ -50,9 +50,7 @@ class StudentCardForm(forms.ModelForm):
     class Meta:
         model = StudentCard
         fields = ["uid"]
-        widgets = {
-            "uid": NFCTextInput,
-        }
+        widgets = {"uid": NFCTextInput}
 
     def clean(self):
         cleaned_data = super().clean()

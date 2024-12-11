@@ -15,32 +15,50 @@
 
 
 from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.generic.edit import DeleteView, FormView
 
 from core.utils import FormFragmentTemplateData
-from core.views import CanEditMixin
+from core.views import can_edit
 from counter.forms import StudentCardForm
 from counter.models import Customer, StudentCard
 from counter.utils import is_logged_in_counter
 
 
-class StudentCardDeleteView(DeleteView, CanEditMixin):
-    """View used to delete a card from a user."""
+class StudentCardDeleteView(DeleteView):
+    """View used to delete a card from a user. This is a fragment view !"""
 
     model = StudentCard
-    template_name = "core/delete_confirm.jinja"
-    pk_url_kwarg = "card_id"
+    template_name = "counter/fragments/delete_student_card.jinja"
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args, **kwargs):
         self.customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
+        if not is_logged_in_counter(request) and not can_edit(
+            self.get_object(), request.user
+        ):
+            raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["action"] = self.request.path
+        context["action_cancel"] = self.get_success_url()
+        return context
+
+    def get_object(self, queryset=None):
+        if not hasattr(self.customer, "student_card"):
+            raise Http404(
+                _("%(name)s has no registered student card")
+                % {"name": self.customer.user.get_full_name()}
+            )
+        return self.customer.student_card
+
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "core:user_prefs", kwargs={"user_id": self.customer.user.pk}
+        return reverse(
+            "counter:add_student_card", kwargs={"customer_id": self.customer.pk}
         )
 
 
@@ -53,23 +71,22 @@ class StudentCardFormView(FormView):
     @classmethod
     def get_template_data(
         cls, customer: Customer
-    ) -> FormFragmentTemplateData[form_class]:
+    ) -> FormFragmentTemplateData[StudentCardForm]:
         """Get necessary data to pre-render the fragment"""
-        return FormFragmentTemplateData[cls.form_class](
+        return FormFragmentTemplateData(
             form=cls.form_class(),
             template=cls.template_name,
             context={
-                "action": reverse_lazy(
+                "action": reverse(
                     "counter:add_student_card", kwargs={"customer_id": customer.pk}
                 ),
                 "customer": customer,
-                "student_cards": customer.student_cards.all(),
             },
         )
 
     def dispatch(self, request: HttpRequest, *args, **kwargs):
         self.customer = get_object_or_404(
-            Customer.objects.prefetch_related("student_cards"), pk=kwargs["customer_id"]
+            Customer.objects.select_related("student_card"), pk=kwargs["customer_id"]
         )
 
         if not is_logged_in_counter(request) and not StudentCard.can_create(
@@ -79,11 +96,12 @@ class StudentCardFormView(FormView):
 
         return super().dispatch(request, *args, **kwargs)
 
-    def form_valid(self, form):
+    def form_valid(self, form: StudentCardForm) -> HttpResponse:
         data = form.clean()
-        res = super(FormView, self).form_valid(form)
-        StudentCard(customer=self.customer, uid=data["uid"]).save()
-        return res
+        StudentCard.objects.update_or_create(
+            customer=self.customer, defaults={"uid": data["uid"]}
+        )
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
