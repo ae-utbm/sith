@@ -39,9 +39,19 @@
     </form>
     <h3 @click="console.log(totalCount, nbPages())">{% trans %}Product list{% endtrans %}</h3>
 
-    <a href="{{ url('counter:new_product') }}" class="btn btn-blue">
-      {% trans %}New product{% endtrans %} <i class="fa fa-plus"></i>
-    </a>
+    <div class="row">
+      <a href="{{ url('counter:new_product') }}" class="btn btn-blue">
+        {% trans %}New product{% endtrans %} <i class="fa fa-plus"></i>
+      </a>
+      <button
+        class="btn btn-blue"
+        @click="downloadCsv()"
+        :disabled="csvLoading"
+        :aria-busy="csvLoading"
+      >
+        {% trans %}Download as cvs{% endtrans %} <i class="fa fa-file-arrow-down"></i>
+      </button>
+    </div>
     <template x-if="loading">
       <section :aria-busy="loading"></section>
     </template>
