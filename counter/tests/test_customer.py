@@ -271,8 +271,8 @@ class TestStudentCard(TestCase):
             assert not hasattr(customer, "student_card")
 
     def test_add_student_card_from_counter_unauthorized(self):
-        def send_valid_request(counter_id):
-            return self.client.post(
+        def send_valid_request(client, counter_id):
+            return client.post(
                 reverse(
                     "counter:add_student_card", kwargs={"customer_id": self.customer.pk}
                 ),
@@ -284,11 +284,24 @@ class TestStudentCard(TestCase):
             )
 
         # Send to a counter where you aren't logged in
-        assert send_valid_request(self.counter.id).status_code == 403
+        assert send_valid_request(self.client, self.counter.id).status_code == 403
+
+        self.login_in_counter()
+        barman = subscriber_user.make()
+        self.counter.sellers.add(barman)
+        # We want to test sending requests from another counter while
+        # we are currently registered to another counter
+        # so we connect to a counter and
+        # we create a new client, in order to check
+        # that using a client not logged to a counter
+        # where another client is logged still isn't authorized.
+        client = Client()
+        # Send to a counter where you aren't logged in
+        assert send_valid_request(client, self.counter.id).status_code == 403
 
         # Send to a non bar counter
-        self.client.force_login(self.club_admin)
-        assert send_valid_request(self.club_counter.id).status_code == 403
+        client.force_login(self.club_admin)
+        assert send_valid_request(client, self.club_counter.id).status_code == 403
 
     def test_delete_student_card_with_owner(self):
         self.client.force_login(self.customer)

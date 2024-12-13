@@ -13,13 +13,18 @@
     <em class="no-cards">{% trans %}No student card registered.{% endtrans %}</em>
   {% else %}
     <p>
-      {% trans %}Card registered{% endtrans %}</span>
-    <span tooltip="{% trans uid=customer.student_card.uid %}uid: {{ uid }} {% endtrans %}"><i class="fa fa-check" style="color: green"></i></span> &nbsp; - &nbsp;
-    <button
-      hx-get="{{ url('counter:delete_student_card', customer_id=customer.pk) }}"
-      hx-swap="outerHTML"
-      hx-target="#student_card_form"
-    >{% trans %}Delete{% endtrans %}</button>
+      <span tooltip="{% trans uid=customer.student_card.uid %}uid: {{ uid }} {% endtrans %}">
+        {% trans %}Card registered{% endtrans %}
+        <i class="fa fa-check" style="color: green"></i>
+      </span>
+      &nbsp; - &nbsp;
+      <button
+        hx-get="{{ url('counter:delete_student_card', customer_id=customer.pk) }}"
+        hx-swap="outerHTML"
+        hx-target="#student_card_form"
+      >
+        {% trans %}Delete{% endtrans %}
+      </button>
     </p>
   {% endif %}
 </div>
