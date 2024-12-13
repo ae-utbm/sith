@@ -12,21 +12,21 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from typing import Annotated
-
-from annotated_types import MinLen
-from django.db.models import Q
+from django.conf import settings
+from django.db.models import F
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from core.api_permissions import CanAccessLookup, CanView, IsRoot
+from core.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
 from counter.models import Counter, Product
 from counter.schemas import (
     CounterFilterSchema,
     CounterSchema,
+    ProductFilterSchema,
     ProductSchema,
+    SimpleProductSchema,
     SimplifiedCounterSchema,
 )
 
@@ -64,15 +64,39 @@ class CounterController(ControllerBase):
 class ProductController(ControllerBase):
     @route.get(
         "/search",
-        response=PaginatedResponseSchema[ProductSchema],
+        response=PaginatedResponseSchema[SimpleProductSchema],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
-    def search_products(self, search: Annotated[str, MinLen(1)]):
-        return (
-            Product.objects.filter(
-                Q(name__icontains=search) | Q(code__icontains=search)
+    def search_products(self, filters: Query[ProductFilterSchema]):
+        return filters.filter(
+            Product.objects.order_by(
+                F("product_type__priority").desc(nulls_last=True),
+                "product_type",
+                "name",
+            ).values()
+        )
+
+    @route.get(
+        "/search/detailed",
+        response=PaginatedResponseSchema[ProductSchema],
+        permissions=[
+            IsRoot
+            | IsInGroup(settings.SITH_GROUP_COUNTER_ADMIN_ID)
+            | IsInGroup(settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
+        ],
+        url_name="search_products_detailed",
+    )
+    @paginate(PageNumberPaginationExtra, page_size=50)
+    def search_products_detailed(self, filters: Query[ProductFilterSchema]):
+        """Get the detailed information about the products."""
+        return filters.filter(
+            Product.objects.select_related("club")
+            .prefetch_related("buying_groups")
+            .select_related("product_type")
+            .order_by(
+                F("product_type__priority").desc(nulls_last=True),
+                "product_type",
+                "name",
             )
-            .filter(archived=False)
-            .values()
         )
