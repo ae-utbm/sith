@@ -11,8 +11,8 @@
 
 {% block content %}
   <main x-data="productList">
-    <form id="search-form">
-      <h4>{% trans %}Filter products{% endtrans %}</h4>
+    <form id="search-form" class="margin-bottom">
+      <h4 class="margin-bottom">{% trans %}Filter products{% endtrans %}</h4>
       <fieldset>
         <label for="search-input">{% trans %}Product name{% endtrans %}</label>
         <input
@@ -37,9 +37,11 @@
         </div>
       </fieldset>
     </form>
-    <h3 @click="console.log(totalCount, nbPages())">{% trans %}Product list{% endtrans %}</h3>
+    <h3 @click="console.log(totalCount, nbPages())" class="margin-bottom">
+      {% trans %}Product list{% endtrans %}
+    </h3>
 
-    <div class="row">
+    <div class="row margin-bottom">
       <a href="{{ url('counter:new_product') }}" class="btn btn-blue">
         {% trans %}New product{% endtrans %} <i class="fa fa-plus"></i>
       </a>
@@ -52,20 +54,19 @@
         {% trans %}Download as cvs{% endtrans %} <i class="fa fa-file-arrow-down"></i>
       </button>
     </div>
-    <template x-if="loading">
-      <section :aria-busy="loading"></section>
-    </template>
 
-    <template x-for="[category, cat_products] of Object.entries(products)" :key="category">
-      <section>
-        <h4 x-text="category"></h4>
-        <ul>
-          <template x-for="p in cat_products" :key="p.id">
-            <li><a :href="p.url" x-text="`${p.name} (${p.code})`"></a></li>
-          </template>
-        </ul>
-      </section>
-    </template>
+    <div class="aria-busy-grow" :aria-busy="loading">
+      <template x-for="[category, cat_products] of Object.entries(products)" :key="category">
+        <section>
+          <h4 x-text="category"></h4>
+          <ul>
+            <template x-for="p in cat_products" :key="p.id">
+              <li><a :href="p.url" x-text="`${p.name} (${p.code})`"></a></li>
+            </template>
+          </ul>
+        </section>
+      </template>
       {{ paginate_alpine("page", "nbPages") }}
+    </div>
   </main>
 {% endblock %}
