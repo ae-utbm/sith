@@ -198,6 +198,9 @@ body {
   margin: 20px auto 0;
 
   /*---------------------------------NAV---------------------------------*/
+  a.btn {
+    display: inline-block;
+  }
   .btn {
     font-size: 15px;
     font-weight: normal;
@@ -407,6 +410,11 @@ body {
         }
       }
     }
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
   }
 
   /*---------------------------------NEWS--------------------------------*/

@@ -22,10 +22,13 @@ type PaginatedEndpoint<T> = <ThrowOnError extends boolean = false>(
 
 // TODO : If one day a test workflow is made for JS in this project
 //  please test this function. A all cost.
+/**
+ * Load complete dataset from paginated routes.
+ */
 export const paginated = async <T>(
   endpoint: PaginatedEndpoint<T>,
   options?: PaginatedRequest,
-) => {
+): Promise<T[]> => {
   const maxPerPage = 199;
   const queryParams = options ?? {};
   queryParams.query = queryParams.query ?? {};
