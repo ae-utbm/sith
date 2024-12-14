@@ -56,7 +56,7 @@ document.addEventListener("alpine:init", () => {
     /** Total number of elements corresponding to the current query. */
     nbPages: 0,
 
-    isArchived: null as boolean,
+    productStatus: "" as "active" | "archived" | "both",
     search: "",
     pageSize: defaultPageSize,
     page: defaultPage,
@@ -64,14 +64,14 @@ document.addEventListener("alpine:init", () => {
     async init() {
       const url = getCurrentUrlParams();
       this.search = url.get("search") || "";
-      this.isArchived = url.get("isArchived") ?? false;
+      this.productStatus = url.get("productStatus") ?? "active";
       await this.load();
-      for (const param of ["search", "isArchived"]) {
+      for (const param of ["search", "productStatus"]) {
         this.$watch(param, () => {
           this.page = defaultPage;
         });
       }
-      for (const param of ["search", "isArchived", "page"]) {
+      for (const param of ["search", "productStatus", "page"]) {
         this.$watch(param, async (value: string) => {
           updateQueryString(param, value, History.Replace);
           this.nbPages = 0;
@@ -87,8 +87,10 @@ document.addEventListener("alpine:init", () => {
      */
     getQueryParams(): ProductSearchProductsDetailedData {
       const search = this.search.length > 0 ? this.search : null;
-      const archived = ["true", "false"].includes(this.isArchived)
-        ? this.isArchived
+      // If active or archived products must be filtered, put the filter in the request
+      // Else, don't include the filter
+      const isArchived = ["active", "archived"].includes(this.productStatus)
+        ? this.productStatus === "archived"
         : undefined;
       return {
         query: {
@@ -97,7 +99,7 @@ document.addEventListener("alpine:init", () => {
           page_size: this.pageSize,
           search: search,
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          is_archived: archived,
+          is_archived: isArchived,
         },
       };
     },
