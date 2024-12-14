@@ -29,15 +29,15 @@
       </fieldset>
       <fieldset>
         <div class="row">
-          <input type="radio" id="filter-active-products" x-model="isArchived" value="false">
+          <input type="radio" id="filter-active-products" x-model="productStatus" value="active">
           <label for="filter-active-products">{% trans %}Active products{% endtrans %}</label>
         </div>
         <div class="row">
-          <input type="radio" id="filter-inactive-products" x-model="isArchived" value="true">
+          <input type="radio" id="filter-inactive-products" x-model="productStatus" value="archived">
           <label for="filter-inactive-products">{% trans %}Archived products{% endtrans %}</label>
         </div>
         <div class="row">
-          <input type="radio" id="filter-all-products" x-model="isArchived" value="">
+          <input type="radio" id="filter-all-products" x-model="productStatus" value="both">
           <label for="filter-all-products">{% trans %}All products{% endtrans %}</label>
         </div>
       </fieldset>
@@ -64,8 +64,7 @@
       <template x-for="[category, cat_products] of Object.entries(products)" :key="category">
         <section>
           <h4 x-text="category" class="margin-bottom"></h4>
-          <div  class="product-group">
-
+          <div class="product-group">
             <template x-for="p in cat_products" :key="p.id">
               <a class="card card-row shadow clickable" :href="p.url">
                 <template x-if="p.icon">
