@@ -9,6 +9,11 @@
   <script type="module" src="{{ static("bundled/counter/product-list-index.ts") }}"></script>
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
+  <link rel="stylesheet" href="{{ static("counter/css/admin.scss") }}">
+{% endblock %}
+
 {% block content %}
   <main x-data="productList">
     <form id="search-form" class="margin-bottom">
@@ -58,12 +63,24 @@
     <div class="aria-busy-grow" :aria-busy="loading">
       <template x-for="[category, cat_products] of Object.entries(products)" :key="category">
         <section>
-          <h4 x-text="category"></h4>
-          <ul>
+          <h4 x-text="category" class="margin-bottom"></h4>
+          <div  class="product-group">
+
             <template x-for="p in cat_products" :key="p.id">
-              <li><a :href="p.url" x-text="`${p.name} (${p.code})`"></a></li>
+              <a class="card card-row shadow clickable" :href="p.url">
+                <template x-if="p.icon">
+                  <img class="card-image" :src="p.icon" :alt="`icon ${p.name}`">
+                </template>
+                <template x-if="!p.icon">
+                  <i class="fa-regular fa-image fa-2x card-image"></i>
+                </template>
+                <span class="card-content">
+                  <strong class="card-title" x-text="`${p.name} (${p.code})`"></strong>
+                  <p x-text="`${p.selling_price} €`"></p>
+                </span>
+              </a>
             </template>
-          </ul>
+          </div>
         </section>
       </template>
       {{ paginate_alpine("page", "nbPages") }}
