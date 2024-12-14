@@ -108,28 +108,8 @@
   column-gap: 15px;
   row-gap: 15px;
 }
-#eboutic .product-button {
-  position: relative;
-  box-sizing: border-box;
-  min-height: 180px;
-  height: fit-content;
-  width: 150px;
-  padding: 15px;
-  overflow: hidden;
-  box-shadow: rgb(60 64 67 / 30%) 0 1px 3px 0, rgb(60 64 67 / 15%) 0 4px 8px 3px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  row-gap: 5px;
-  justify-content: flex-start;
-}
 
-#eboutic .product-button.selected {
-  animation: bg-in-out 1s ease;
-  background-color: rgb(216, 236, 255);
-}
-
-#eboutic .product-button.selected::after {
+#eboutic .card.selected::after {
   content: "🛒";
   position: absolute;
   top: 5px;
@@ -142,36 +122,6 @@
   height: 20px;
   font-size: 16px;
   line-height: 20px;
-}
-
-#eboutic .product-button:active {
-  box-shadow: none;
-}
-
-#eboutic .product-image {
-  width: 100%;
-  height: 100%;
-  min-height: 70px;
-  max-height: 70px;
-  object-fit: contain;
-  border-radius: 4px;
-  line-height: 70px;
-  margin-bottom: 15px;
-}
-
-#eboutic i.product-image {
-  background-color: rgba(173, 173, 173, 0.2);
-}
-
-#eboutic .product-description h4 {
-  font-size: .75em;
-  word-break: break-word;
-  margin: 0 0 5px 0;
-}
-
-#eboutic .product-button p {
-  font-size: 13px;
-  margin: 0;
 }
 
 #eboutic .catalog-buttons {
@@ -207,39 +157,5 @@
     justify-content: space-around;
     flex-direction: column;
   }
-
-  #eboutic .product-group .product-button {
-    min-height: 100px;
-    width: 100%;
-    max-width: 100%;
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-  }
-
-  #eboutic .product-group .product-description {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  #eboutic .product-description h4 {
-    text-align: left;
-    max-width: 90%;
-  }
-
-  #eboutic .product-image {
-    margin-bottom: 0;
-    max-width: 70px;
-  }
 }
 
-@keyframes bg-in-out {
-  0% {
-    background-color: white;
-  }
-  100% {
-    background-color: rgb(216, 236, 255);
-  }
-}
