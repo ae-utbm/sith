@@ -32,7 +32,7 @@
     </div>
 
     <div id="click_form">
-      <h5>{% trans %}Selling{% endtrans %}</h5>
+      <h5 id="selling-accordion">{% trans %}Selling{% endtrans %}</h5>
       <div>
         {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
 
@@ -103,7 +103,7 @@
       {% if refilling_fragment %}
         <h5>{% trans %}Refilling{% endtrans %}</h5>
         <div
-          @htmx:after-request="updateBalance()"
+          @htmx:after-request="onRefillingSuccess()"
         >
           {{ refilling_fragment }}
         </div>

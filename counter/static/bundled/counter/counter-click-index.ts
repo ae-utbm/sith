@@ -44,6 +44,11 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
         ).data.amount;
       },
 
+      async onRefillingSuccess() {
+        await this.updateBalance();
+        document.getElementById("selling-accordion").click();
+      },
+
       async handleCode(event: SubmitEvent) {
         const code = (
           $(event.target).find("#code_field").val() as string
