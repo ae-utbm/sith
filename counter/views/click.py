@@ -24,11 +24,13 @@ from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView
+from django.views.generic import DetailView, FormView
 
+from core.utils import FormFragmentTemplateData
 from core.views import CanViewMixin
 from counter.forms import RefillForm
 from counter.models import Counter, Customer, Product, Selling
+from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
 from counter.views.student_card import StudentCardFormView
 
@@ -100,7 +102,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session["too_young"] = False
         request.session["not_allowed"] = False
         request.session["no_age"] = False
-        self.refill_form = None
         ret = super().get(request, *args, **kwargs)
         if (self.object.type != "BAR" and not request.user.is_authenticated) or (
             self.object.type == "BAR" and len(self.object.barmen_list) == 0
@@ -111,7 +112,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
     def post(self, request, *args, **kwargs):
         """Handle the many possibilities of the post request."""
         self.object = self.get_object()
-        self.refill_form = None
         if (self.object.type != "BAR" and not request.user.is_authenticated) or (
             self.object.type == "BAR" and len(self.object.barmen_list) < 1
         ):  # Check that at least one barman is logged in
@@ -148,8 +148,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             self.add_product(request)
         elif action == "del_product":
             self.del_product(request)
-        elif action == "refill":
-            self.refill(request)
         elif action == "code":
             return self.parse_code(request)
         elif action == "cancel":
@@ -383,19 +381,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             reverse_lazy("counter:details", args=self.args, kwargs=kwargs)
         )
 
-    def refill(self, request):
-        """Refill the customer's account."""
-        if not self.object.can_refill():
-            raise PermissionDenied
-        form = RefillForm(request.POST)
-        if form.is_valid():
-            form.instance.counter = self.object
-            form.instance.operator = self.operator
-            form.instance.customer = self.customer
-            form.instance.save()
-        else:
-            self.refill_form = form
-
     def get_context_data(self, **kwargs):
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
@@ -413,9 +398,77 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                 )
         kwargs["customer"] = self.customer
         kwargs["basket_total"] = self.sum_basket(self.request)
-        kwargs["refill_form"] = self.refill_form or RefillForm()
-        kwargs["barmens_can_refill"] = self.object.can_refill()
         kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
             self.customer
         ).render(self.request)
+
+        if self.object.can_refill():
+            kwargs["refilling_fragment"] = RefillingCreateView.get_template_data(
+                self.customer
+            ).render(self.request)
         return kwargs
+
+
+class RefillingCreateView(FormView):
+    """This is a fragment only view which integrates with counter_click.jinja"""
+
+    form_class = RefillForm
+    template_name = "counter/fragments/create_refill.jinja"
+
+    @classmethod
+    def get_template_data(
+        cls, customer: Customer, *, form_instance: form_class | None = None
+    ) -> FormFragmentTemplateData[form_class]:
+        return FormFragmentTemplateData[cls.form_class](
+            form=form_instance if form_instance else cls.form_class(),
+            template=cls.template_name,
+            context={
+                "action": reverse_lazy(
+                    "counter:refilling_create", kwargs={"customer_id": customer.pk}
+                ),
+            },
+        )
+
+    def dispatch(self, request, *args, **kwargs):
+        self.customer: Customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
+        if not self.customer.can_buy:
+            raise Http404
+
+        if not is_logged_in_counter(request):
+            raise PermissionDenied
+
+        self.counter: Counter = get_object_or_404(
+            Counter, token=request.session["counter_token"]
+        )
+
+        if not self.counter.can_refill():
+            raise PermissionDenied
+
+        if self.customer_is_barman():
+            self.operator = self.customer.user
+        else:
+            self.operator = self.counter.get_random_barman()
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def customer_is_barman(self) -> bool:
+        barmen = self.counter.barmen_list
+        return self.counter.type == "BAR" and self.customer.user in barmen
+
+    def form_valid(self, form):
+        res = super().form_valid(form)
+        form.clean()
+        form.instance.counter = self.counter
+        form.instance.operator = self.operator
+        form.instance.customer = self.customer
+        form.instance.save()
+        return res
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        data = self.get_template_data(self.customer, form_instance=context["form"])
+        context.update(data.context)
+        return context
+
+    def get_success_url(self, **kwargs):
+        return self.request.path

@@ -39,7 +39,7 @@ from counter.views.cash import (
     CashSummaryListView,
     CounterCashSummaryView,
 )
-from counter.views.click import CounterClick
+from counter.views.click import CounterClick, RefillingCreateView
 from counter.views.eticket import (
     EticketCreateView,
     EticketEditView,
@@ -60,6 +60,11 @@ from counter.views.student_card import (
 urlpatterns = [
     path("<int:counter_id>/", CounterMain.as_view(), name="details"),
     path("<int:counter_id>/click/<int:user_id>/", CounterClick.as_view(), name="click"),
+    path(
+        "refill/<int:customer_id>/",
+        RefillingCreateView.as_view(),
+        name="refilling_create",
+    ),
     path(
         "<int:counter_id>/last_ops/",
         CounterLastOperationsView.as_view(),

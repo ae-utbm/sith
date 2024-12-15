@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block additional_js %}
-  <script src="{{ static('counter/js/counter_click.js') }}" defer></script>
+  <script type="module" src="{{ static('bundled/counter/counter-click-index.ts') }}"></script>
 {% endblock %}
 
 {% block info_boxes %}
@@ -28,7 +28,7 @@
       <h5>{% trans %}Customer{% endtrans %}</h5>
       {{ user_mini_profile(customer.user) }}
       {{ user_subscription(customer.user) }}
-      <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
+      <p>{% trans %}Amount: {% endtrans %}<span x-text="customerBalance"></span> €</p>
 
       {% if counter.type == 'BAR' %}
         <h5>{% trans %}Student card{% endtrans %}</h3>
@@ -105,16 +105,12 @@
           <input type="submit" value="{% trans %}Cancel{% endtrans %}"/>
         </form>
       </div>
-      {% if (counter.type == 'BAR' and barmens_can_refill) %}
+      {% if refilling_fragment %}
         <h5>{% trans %}Refilling{% endtrans %}</h5>
-        <div>
-          <form method="post"
-                action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-            {% csrf_token %}
-            {{ refill_form.as_p() }}
-            <input type="hidden" name="action" value="refill">
-            <input type="submit" value="{% trans %}Go{% endtrans %}"/>
-          </form>
+        <div
+          @htmx:after-request="updateBalance()"
+        >
+          {{ refilling_fragment }}
         </div>
       {% endif %}
     </div>
@@ -155,9 +151,6 @@
 {% block script %}
   {{ super() }}
   <script>
-    const csrfToken = "{{ csrf_token }}";
-    const clickApiUrl = "{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}";
-    const sessionBasket = {{ request.session["basket"]|tojson }};
     const products = {
       {%- for p in products -%}
         {{ p.id }}: {
@@ -176,5 +169,14 @@
         },
       {%- endfor %}
     ];
+    window.addEventListener("DOMContentLoaded", () => {
+      loadCounter({
+        csrfToken: "{{ csrf_token }}",
+        clickApiUrl: "{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}",
+        sessionBasket: {{ request.session["basket"]|tojson }},
+        customerBalance: {{ customer.amount }},
+        customerId: {{ customer.pk }},
+      });
+    });
   </script>
 {% endblock script %}
