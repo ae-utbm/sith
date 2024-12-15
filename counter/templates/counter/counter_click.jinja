@@ -31,6 +31,7 @@
       <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
 
       {% if counter.type == 'BAR' %}
+        <h5>{% trans %}Student card{% endtrans %}</h3>
         {{ student_card_fragment }}
       {% endif %}
     </div>
