@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-11 09:34+0100\n"
+"POT-Creation-Date: 2024-12-16 00:11+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -18,8 +18,8 @@ msgstr ""
 
 #: accounting/models.py:62 accounting/models.py:101 accounting/models.py:132
 #: accounting/models.py:190 club/models.py:55 com/models.py:274
-#: com/models.py:293 counter/models.py:297 counter/models.py:328
-#: counter/models.py:479 forum/models.py:60 launderette/models.py:29
+#: com/models.py:293 counter/models.py:298 counter/models.py:329
+#: counter/models.py:480 forum/models.py:60 launderette/models.py:29
 #: launderette/models.py:80 launderette/models.py:116
 msgid "name"
 msgstr "nom"
@@ -65,8 +65,8 @@ msgid "account number"
 msgstr "numéro de compte"
 
 #: accounting/models.py:107 accounting/models.py:136 club/models.py:345
-#: com/models.py:74 com/models.py:259 com/models.py:299 counter/models.py:357
-#: counter/models.py:481 trombi/models.py:209
+#: com/models.py:74 com/models.py:259 com/models.py:299 counter/models.py:358
+#: counter/models.py:482 trombi/models.py:209
 msgid "club"
 msgstr "club"
 
@@ -87,12 +87,12 @@ msgstr "Compte club"
 msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
-#: accounting/models.py:188 club/models.py:351 counter/models.py:959
+#: accounting/models.py:188 club/models.py:351 counter/models.py:969
 #: election/models.py:16 launderette/models.py:165
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:189 club/models.py:352 counter/models.py:960
+#: accounting/models.py:189 club/models.py:352 counter/models.py:970
 #: election/models.py:17
 msgid "end date"
 msgstr "date de fin"
@@ -105,8 +105,8 @@ msgstr "est fermé"
 msgid "club account"
 msgstr "compte club"
 
-#: accounting/models.py:199 accounting/models.py:255 counter/models.py:91
-#: counter/models.py:677
+#: accounting/models.py:199 accounting/models.py:255 counter/models.py:92
+#: counter/models.py:687
 msgid "amount"
 msgstr "montant"
 
@@ -128,18 +128,18 @@ msgstr "classeur"
 
 #: accounting/models.py:256 core/models.py:956 core/models.py:1467
 #: core/models.py:1512 core/models.py:1541 core/models.py:1565
-#: counter/models.py:687 counter/models.py:791 counter/models.py:995
+#: counter/models.py:697 counter/models.py:801 counter/models.py:1005
 #: eboutic/models.py:57 eboutic/models.py:193 forum/models.py:312
 #: forum/models.py:413
 msgid "date"
 msgstr "date"
 
-#: accounting/models.py:257 counter/models.py:299 counter/models.py:996
+#: accounting/models.py:257 counter/models.py:300 counter/models.py:1006
 #: pedagogy/models.py:208
 msgid "comment"
 msgstr "commentaire"
 
-#: accounting/models.py:259 counter/models.py:689 counter/models.py:793
+#: accounting/models.py:259 counter/models.py:699 counter/models.py:803
 #: subscription/models.py:56
 msgid "payment method"
 msgstr "méthode de paiement"
@@ -166,7 +166,7 @@ msgstr "type comptable"
 
 #: accounting/models.py:294 accounting/models.py:429 accounting/models.py:460
 #: accounting/models.py:492 core/models.py:1540 core/models.py:1566
-#: counter/models.py:757
+#: counter/models.py:767
 msgid "label"
 msgstr "étiquette"
 
@@ -264,7 +264,7 @@ msgstr ""
 "Vous devez fournir soit un type comptable simplifié ou un type comptable "
 "standard"
 
-#: accounting/models.py:421 counter/models.py:338 pedagogy/models.py:41
+#: accounting/models.py:421 counter/models.py:339 pedagogy/models.py:41
 msgid "code"
 msgstr "code"
 
@@ -369,7 +369,7 @@ msgstr "Compte en banque : "
 #: core/templates/core/user_clubs.jinja:34
 #: core/templates/core/user_clubs.jinja:63
 #: core/templates/core/user_edit.jinja:62
-#: counter/templates/counter/fragments/create_student_card.jinja:22
+#: counter/templates/counter/fragments/create_student_card.jinja:25
 #: counter/templates/counter/last_ops.jinja:35
 #: counter/templates/counter/last_ops.jinja:65
 #: election/templates/election/election_detail.jinja:191
@@ -517,7 +517,7 @@ msgid "Effective amount"
 msgstr "Montant effectif"
 
 #: accounting/templates/accounting/club_account_details.jinja:36
-#: sith/settings.py:469
+#: sith/settings.py:463
 msgid "Closed"
 msgstr "Fermé"
 
@@ -950,11 +950,11 @@ msgstr "Une action est requise"
 msgid "You must specify at least an user or an email address"
 msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 
-#: club/forms.py:149 counter/forms.py:189
+#: club/forms.py:149 counter/forms.py:206
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py:152 com/views.py:84 com/views.py:202 counter/forms.py:192
+#: club/forms.py:152 com/views.py:84 com/views.py:202 counter/forms.py:209
 #: election/views.py:170 subscription/forms.py:21
 msgid "End date"
 msgstr "Date de fin"
@@ -1041,7 +1041,7 @@ msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:337 counter/models.py:950 counter/models.py:986
+#: club/models.py:337 counter/models.py:960 counter/models.py:996
 #: eboutic/models.py:53 eboutic/models.py:189 election/models.py:183
 #: launderette/models.py:130 launderette/models.py:184 sas/models.py:273
 #: trombi/models.py:205
@@ -1053,8 +1053,8 @@ msgstr "nom d'utilisateur"
 msgid "role"
 msgstr "rôle"
 
-#: club/models.py:359 core/models.py:90 counter/models.py:298
-#: counter/models.py:329 election/models.py:13 election/models.py:115
+#: club/models.py:359 core/models.py:90 counter/models.py:299
+#: counter/models.py:330 election/models.py:13 election/models.py:115
 #: election/models.py:188 forum/models.py:61 forum/models.py:245
 msgid "description"
 msgstr "description"
@@ -2501,7 +2501,7 @@ msgstr "Forum"
 msgid "Gallery"
 msgstr "Photos"
 
-#: core/templates/core/base/navbar.jinja:22 counter/models.py:489
+#: core/templates/core/base/navbar.jinja:22 counter/models.py:490
 #: counter/templates/counter/counter_list.jinja:11
 #: eboutic/templates/eboutic/eboutic_main.jinja:4
 #: eboutic/templates/eboutic/eboutic_main.jinja:22
@@ -2587,7 +2587,7 @@ msgstr "Confirmation"
 
 #: core/templates/core/delete_confirm.jinja:20
 #: core/templates/core/file_delete_confirm.jinja:46
-#: counter/templates/counter/counter_click.jinja:104
+#: counter/templates/counter/counter_click.jinja:100
 #: counter/templates/counter/fragments/delete_student_card.jinja:12
 #: sas/templates/sas/ask_picture_removal.jinja:20
 msgid "Cancel"
@@ -3300,7 +3300,12 @@ msgstr "Vous avez déjà choisi ce Trombi: %(trombi)s."
 msgid "Go to my Trombi tools"
 msgstr "Allez à mes outils de Trombi"
 
-#: core/templates/core/user_preferences.jinja:41
+#: core/templates/core/user_preferences.jinja:39
+#: counter/templates/counter/counter_click.jinja:112
+msgid "Student card"
+msgstr "Carte étudiante"
+
+#: core/templates/core/user_preferences.jinja:42
 msgid ""
 "You can add a card by asking at a counter or add it yourself here. If you "
 "want to manually\n"
@@ -3374,7 +3379,7 @@ msgstr "Cotisations"
 msgid "Subscription stats"
 msgstr "Statistiques de cotisation"
 
-#: core/templates/core/user_tools.jinja:48 counter/forms.py:162
+#: core/templates/core/user_tools.jinja:48 counter/forms.py:179
 #: counter/views/mixins.py:89
 msgid "Counters"
 msgstr "Comptoirs"
@@ -3594,8 +3599,21 @@ msgstr "Photos"
 msgid "Galaxy"
 msgstr "Galaxie"
 
-#: counter/apps.py:30 counter/models.py:505 counter/models.py:956
-#: counter/models.py:992 launderette/models.py:32
+#: counter/apps.py:28 sith/settings.py:412 sith/settings.py:419
+msgid "Check"
+msgstr "Chèque"
+
+#: counter/apps.py:29 sith/settings.py:413 sith/settings.py:421
+msgid "Cash"
+msgstr "Espèces"
+
+#: counter/apps.py:30 counter/models.py:805 sith/settings.py:415
+#: sith/settings.py:420
+msgid "Credit card"
+msgstr "Carte bancaire"
+
+#: counter/apps.py:36 counter/models.py:506 counter/models.py:966
+#: counter/models.py:1002 launderette/models.py:32
 msgid "counter"
 msgstr "comptoir"
 
@@ -3619,185 +3637,180 @@ msgstr "Vidange de votre compte AE"
 msgid "Ecocup regularization"
 msgstr "Régularization des ecocups"
 
-#: counter/models.py:90
+#: counter/models.py:91
 msgid "account id"
 msgstr "numéro de compte"
 
-#: counter/models.py:92
+#: counter/models.py:93
 msgid "recorded product"
 msgstr "produits consignés"
 
-#: counter/models.py:97
+#: counter/models.py:98
 msgid "customer"
 msgstr "client"
 
-#: counter/models.py:98
+#: counter/models.py:99
 msgid "customers"
 msgstr "clients"
 
-#: counter/models.py:110 counter/views/click.py:66
+#: counter/models.py:111 counter/views/click.py:68
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
-#: counter/models.py:196
+#: counter/models.py:197
 msgid "First name"
 msgstr "Prénom"
 
-#: counter/models.py:197
+#: counter/models.py:198
 msgid "Last name"
 msgstr "Nom de famille"
 
-#: counter/models.py:198
+#: counter/models.py:199
 msgid "Address 1"
 msgstr "Adresse 1"
 
-#: counter/models.py:199
+#: counter/models.py:200
 msgid "Address 2"
 msgstr "Adresse 2"
 
-#: counter/models.py:200
+#: counter/models.py:201
 msgid "Zip code"
 msgstr "Code postal"
 
-#: counter/models.py:201
+#: counter/models.py:202
 msgid "City"
 msgstr "Ville"
 
-#: counter/models.py:202
+#: counter/models.py:203
 msgid "Country"
 msgstr "Pays"
 
-#: counter/models.py:210
+#: counter/models.py:211
 msgid "Phone number"
 msgstr "Numéro de téléphone"
 
-#: counter/models.py:252
+#: counter/models.py:253
 msgid "When the mail warning that the account was about to be dumped was sent."
 msgstr "Quand le mail d'avertissement de la vidange du compte a été envoyé."
 
-#: counter/models.py:257
+#: counter/models.py:258
 msgid "Set this to True if the warning mail received an error"
 msgstr "Mettre à True si le mail a reçu une erreur"
 
-#: counter/models.py:264
+#: counter/models.py:265
 msgid "The operation that emptied the account."
 msgstr "L'opération qui a vidé le compte."
 
-#: counter/models.py:309 counter/models.py:333
+#: counter/models.py:310 counter/models.py:334
 msgid "product type"
 msgstr "type du produit"
 
-#: counter/models.py:340
+#: counter/models.py:341
 msgid "purchase price"
 msgstr "prix d'achat"
 
-#: counter/models.py:341
+#: counter/models.py:342
 msgid "Initial cost of purchasing the product"
 msgstr "Coût initial d'achat du produit"
 
-#: counter/models.py:343
+#: counter/models.py:344
 msgid "selling price"
 msgstr "prix de vente"
 
-#: counter/models.py:345
+#: counter/models.py:346
 msgid "special selling price"
 msgstr "prix de vente spécial"
 
-#: counter/models.py:346
+#: counter/models.py:347
 msgid "Price for barmen during their permanence"
 msgstr "Prix pour les barmen durant leur permanence"
 
-#: counter/models.py:354
+#: counter/models.py:355
 msgid "icon"
 msgstr "icône"
 
-#: counter/models.py:359
+#: counter/models.py:360
 msgid "limit age"
 msgstr "âge limite"
 
-#: counter/models.py:360
+#: counter/models.py:361
 msgid "tray price"
 msgstr "prix plateau"
 
-#: counter/models.py:362
+#: counter/models.py:363
 msgid "buying groups"
 msgstr "groupe d'achat"
 
-#: counter/models.py:364 election/models.py:50
+#: counter/models.py:365 election/models.py:50
 msgid "archived"
 msgstr "archivé"
 
-#: counter/models.py:367 counter/models.py:1090
+#: counter/models.py:368 counter/models.py:1100
 msgid "product"
 msgstr "produit"
 
-#: counter/models.py:484
+#: counter/models.py:485
 msgid "products"
 msgstr "produits"
 
-#: counter/models.py:487
+#: counter/models.py:488
 msgid "counter type"
 msgstr "type de comptoir"
 
-#: counter/models.py:489
+#: counter/models.py:490
 msgid "Bar"
 msgstr "Bar"
 
-#: counter/models.py:489
+#: counter/models.py:490
 msgid "Office"
 msgstr "Bureau"
 
-#: counter/models.py:492
+#: counter/models.py:493
 msgid "sellers"
 msgstr "vendeurs"
 
-#: counter/models.py:500 launderette/models.py:178
+#: counter/models.py:501 launderette/models.py:178
 msgid "token"
 msgstr "jeton"
 
-#: counter/models.py:695
+#: counter/models.py:705
 msgid "bank"
 msgstr "banque"
 
-#: counter/models.py:697 counter/models.py:798
+#: counter/models.py:707 counter/models.py:808
 msgid "is validated"
 msgstr "est validé"
 
-#: counter/models.py:702
+#: counter/models.py:712
 msgid "refilling"
 msgstr "rechargement"
 
-#: counter/models.py:775 eboutic/models.py:249
+#: counter/models.py:785 eboutic/models.py:249
 msgid "unit price"
 msgstr "prix unitaire"
 
-#: counter/models.py:776 counter/models.py:1070 eboutic/models.py:250
+#: counter/models.py:786 counter/models.py:1080 eboutic/models.py:250
 msgid "quantity"
 msgstr "quantité"
 
-#: counter/models.py:795
+#: counter/models.py:805
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: counter/models.py:795 sith/settings.py:415 sith/settings.py:420
-#: sith/settings.py:440
-msgid "Credit card"
-msgstr "Carte bancaire"
-
-#: counter/models.py:803
+#: counter/models.py:813
 msgid "selling"
 msgstr "vente"
 
-#: counter/models.py:907
+#: counter/models.py:917
 msgid "Unknown event"
 msgstr "Événement inconnu"
 
-#: counter/models.py:908
+#: counter/models.py:918
 #, python-format
 msgid "Eticket bought for the event %(event)s"
 msgstr "Eticket acheté pour l'événement %(event)s"
 
-#: counter/models.py:910 counter/models.py:923
+#: counter/models.py:920 counter/models.py:933
 #, python-format
 msgid ""
 "You bought an eticket for the event %(event)s.\n"
@@ -3809,67 +3822,67 @@ msgstr ""
 "Vous pouvez également retrouver tous vos e-tickets sur votre page de compte "
 "%(url)s."
 
-#: counter/models.py:961
+#: counter/models.py:971
 msgid "last activity date"
 msgstr "dernière activité"
 
-#: counter/models.py:964
+#: counter/models.py:974
 msgid "permanency"
 msgstr "permanence"
 
-#: counter/models.py:997
+#: counter/models.py:1007
 msgid "emptied"
 msgstr "coffre vidée"
 
-#: counter/models.py:1000
+#: counter/models.py:1010
 msgid "cash register summary"
 msgstr "relevé de caisse"
 
-#: counter/models.py:1066
+#: counter/models.py:1076
 msgid "cash summary"
 msgstr "relevé"
 
-#: counter/models.py:1069
+#: counter/models.py:1079
 msgid "value"
 msgstr "valeur"
 
-#: counter/models.py:1072
+#: counter/models.py:1082
 msgid "check"
 msgstr "chèque"
 
-#: counter/models.py:1074
+#: counter/models.py:1084
 msgid "True if this is a bank check, else False"
 msgstr "Vrai si c'est un chèque, sinon Faux."
 
-#: counter/models.py:1078
+#: counter/models.py:1088
 msgid "cash register summary item"
 msgstr "élément de relevé de caisse"
 
-#: counter/models.py:1094
+#: counter/models.py:1104
 msgid "banner"
 msgstr "bannière"
 
-#: counter/models.py:1096
+#: counter/models.py:1106
 msgid "event date"
 msgstr "date de l'événement"
 
-#: counter/models.py:1098
+#: counter/models.py:1108
 msgid "event title"
 msgstr "titre de l'événement"
 
-#: counter/models.py:1100
+#: counter/models.py:1110
 msgid "secret"
 msgstr "secret"
 
-#: counter/models.py:1139
+#: counter/models.py:1149
 msgid "uid"
 msgstr "uid"
 
-#: counter/models.py:1144 counter/models.py:1149
+#: counter/models.py:1154 counter/models.py:1159
 msgid "student card"
 msgstr "carte étudiante"
 
-#: counter/models.py:1150
+#: counter/models.py:1160
 msgid "student cards"
 msgstr "cartes étudiantes"
 
@@ -3929,14 +3942,14 @@ msgstr "oui"
 msgid "There is no cash register summary in this website."
 msgstr "Il n'y a pas de relevé de caisse dans ce site web."
 
-#: counter/templates/counter/counter_click.jinja:39
+#: counter/templates/counter/counter_click.jinja:35
 #: launderette/templates/launderette/launderette_admin.jinja:8
 msgid "Selling"
 msgstr "Vente"
 
-#: counter/templates/counter/counter_click.jinja:50
-#: counter/templates/counter/counter_click.jinja:115
-#: counter/templates/counter/fragments/create_student_card.jinja:11
+#: counter/templates/counter/counter_click.jinja:46
+#: counter/templates/counter/fragments/create_refill.jinja:8
+#: counter/templates/counter/fragments/create_student_card.jinja:10
 #: counter/templates/counter/invoices_call.jinja:16
 #: launderette/templates/launderette/launderette_admin.jinja:35
 #: launderette/templates/launderette/launderette_click.jinja:13
@@ -3945,16 +3958,16 @@ msgstr "Vente"
 msgid "Go"
 msgstr "Valider"
 
-#: counter/templates/counter/counter_click.jinja:57
+#: counter/templates/counter/counter_click.jinja:53
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:19
 msgid "Basket: "
 msgstr "Panier : "
 
-#: counter/templates/counter/counter_click.jinja:98
+#: counter/templates/counter/counter_click.jinja:94
 msgid "Finish"
 msgstr "Terminer"
 
-#: counter/templates/counter/counter_click.jinja:108
+#: counter/templates/counter/counter_click.jinja:104
 #: counter/templates/counter/refilling_list.jinja:9
 msgid "Refilling"
 msgstr "Rechargement"
@@ -4038,22 +4051,18 @@ msgstr "Nouveau eticket"
 msgid "There is no eticket in this website."
 msgstr "Il n'y a pas de eticket sur ce site web."
 
-#: counter/templates/counter/fragments/create_student_card.jinja:2
-msgid "Student card"
-msgstr "Carte étudiante"
-
-#: counter/templates/counter/fragments/create_student_card.jinja:13
+#: counter/templates/counter/fragments/create_student_card.jinja:12
 msgid "No student card registered."
 msgstr "Aucune carte étudiante enregistrée."
+
+#: counter/templates/counter/fragments/create_student_card.jinja:15
+#, python-format
+msgid "uid: %(uid)s "
+msgstr "uid: %(uid)s"
 
 #: counter/templates/counter/fragments/create_student_card.jinja:16
 msgid "Card registered"
 msgstr "Carte enregistrée"
-
-#: counter/templates/counter/fragments/create_student_card.jinja:17
-#, python-format
-msgid "uid: %(uid)s "
-msgstr "uid: %(uid)s"
 
 #: counter/templates/counter/invoices_call.jinja:8
 #, python-format
@@ -4277,19 +4286,19 @@ msgstr "Montant du chèque"
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
-#: counter/views/click.py:57
+#: counter/views/click.py:59
 msgid "Too young for that product"
 msgstr "Trop jeune pour ce produit"
 
-#: counter/views/click.py:60
+#: counter/views/click.py:62
 msgid "Not allowed for that product"
 msgstr "Non autorisé pour ce produit"
 
-#: counter/views/click.py:63
+#: counter/views/click.py:65
 msgid "No date of birth provided"
 msgstr "Pas de date de naissance renseignée"
 
-#: counter/views/click.py:331
+#: counter/views/click.py:325
 msgid "You have not enough money to buy all the basket"
 msgstr "Vous n'avez pas assez d'argent pour acheter le panier"
 
@@ -4907,12 +4916,12 @@ msgid "Washing and drying"
 msgstr "Lavage et séchage"
 
 #: launderette/templates/launderette/launderette_book.jinja:27
-#: sith/settings.py:658
+#: sith/settings.py:652
 msgid "Washing"
 msgstr "Lavage"
 
 #: launderette/templates/launderette/launderette_book.jinja:31
-#: sith/settings.py:658
+#: sith/settings.py:652
 msgid "Drying"
 msgstr "Séchage"
 
@@ -5427,11 +5436,11 @@ msgstr "Personne(s)"
 msgid "Identify users on pictures"
 msgstr "Identifiez les utilisateurs sur les photos"
 
-#: sith/settings.py:253 sith/settings.py:477
+#: sith/settings.py:253 sith/settings.py:471
 msgid "English"
 msgstr "Anglais"
 
-#: sith/settings.py:253 sith/settings.py:476
+#: sith/settings.py:253 sith/settings.py:470
 msgid "French"
 msgstr "Français"
 
@@ -5455,7 +5464,7 @@ msgstr "INFO"
 msgid "GI"
 msgstr "GI"
 
-#: sith/settings.py:401 sith/settings.py:487
+#: sith/settings.py:401 sith/settings.py:481
 msgid "E"
 msgstr "E"
 
@@ -5487,14 +5496,6 @@ msgstr "Humanités"
 msgid "N/A"
 msgstr "N/A"
 
-#: sith/settings.py:412 sith/settings.py:419 sith/settings.py:438
-msgid "Check"
-msgstr "Chèque"
-
-#: sith/settings.py:413 sith/settings.py:421 sith/settings.py:439
-msgid "Cash"
-msgstr "Espèces"
-
 #: sith/settings.py:414
 msgid "Transfert"
 msgstr "Virement"
@@ -5511,296 +5512,296 @@ msgstr "Sevenans"
 msgid "Montbéliard"
 msgstr "Montbéliard"
 
-#: sith/settings.py:457
+#: sith/settings.py:451
 msgid "Free"
 msgstr "Libre"
 
-#: sith/settings.py:458
+#: sith/settings.py:452
 msgid "CS"
 msgstr "CS"
 
-#: sith/settings.py:459
+#: sith/settings.py:453
 msgid "TM"
 msgstr "TM"
 
-#: sith/settings.py:460
+#: sith/settings.py:454
 msgid "OM"
 msgstr "OM"
 
-#: sith/settings.py:461
+#: sith/settings.py:455
 msgid "QC"
 msgstr "QC"
 
-#: sith/settings.py:462
+#: sith/settings.py:456
 msgid "EC"
 msgstr "EC"
 
-#: sith/settings.py:463
+#: sith/settings.py:457
 msgid "RN"
 msgstr "RN"
 
-#: sith/settings.py:464
+#: sith/settings.py:458
 msgid "ST"
 msgstr "ST"
 
-#: sith/settings.py:465
+#: sith/settings.py:459
 msgid "EXT"
 msgstr "EXT"
 
-#: sith/settings.py:470
+#: sith/settings.py:464
 msgid "Autumn"
 msgstr "Automne"
 
-#: sith/settings.py:471
+#: sith/settings.py:465
 msgid "Spring"
 msgstr "Printemps"
 
-#: sith/settings.py:472
+#: sith/settings.py:466
 msgid "Autumn and spring"
 msgstr "Automne et printemps"
 
-#: sith/settings.py:478
+#: sith/settings.py:472
 msgid "German"
 msgstr "Allemand"
 
-#: sith/settings.py:479
+#: sith/settings.py:473
 msgid "Spanish"
 msgstr "Espagnol"
 
-#: sith/settings.py:483
+#: sith/settings.py:477
 msgid "A"
 msgstr "A"
 
-#: sith/settings.py:484
+#: sith/settings.py:478
 msgid "B"
 msgstr "B"
 
-#: sith/settings.py:485
+#: sith/settings.py:479
 msgid "C"
 msgstr "C"
 
-#: sith/settings.py:486
+#: sith/settings.py:480
 msgid "D"
 msgstr "D"
 
-#: sith/settings.py:488
+#: sith/settings.py:482
 msgid "FX"
 msgstr "FX"
 
-#: sith/settings.py:489
+#: sith/settings.py:483
 msgid "F"
 msgstr "F"
 
-#: sith/settings.py:490
+#: sith/settings.py:484
 msgid "Abs"
 msgstr "Abs"
 
-#: sith/settings.py:494
+#: sith/settings.py:488
 msgid "Selling deletion"
 msgstr "Suppression de vente"
 
-#: sith/settings.py:495
+#: sith/settings.py:489
 msgid "Refilling deletion"
 msgstr "Suppression de rechargement"
 
-#: sith/settings.py:539
+#: sith/settings.py:533
 msgid "One semester"
 msgstr "Un semestre, 20 €"
 
-#: sith/settings.py:540
+#: sith/settings.py:534
 msgid "Two semesters"
 msgstr "Deux semestres, 35 €"
 
-#: sith/settings.py:542
+#: sith/settings.py:536
 msgid "Common core cursus"
 msgstr "Cursus tronc commun, 60 €"
 
-#: sith/settings.py:546
+#: sith/settings.py:540
 msgid "Branch cursus"
 msgstr "Cursus branche, 60 €"
 
-#: sith/settings.py:547
+#: sith/settings.py:541
 msgid "Alternating cursus"
 msgstr "Cursus alternant, 30 €"
 
-#: sith/settings.py:548
+#: sith/settings.py:542
 msgid "Honorary member"
 msgstr "Membre honoraire, 0 €"
 
-#: sith/settings.py:549
+#: sith/settings.py:543
 msgid "Assidu member"
 msgstr "Membre d'Assidu, 0 €"
 
-#: sith/settings.py:550
+#: sith/settings.py:544
 msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO, 0 €"
 
-#: sith/settings.py:551
+#: sith/settings.py:545
 msgid "UT network member"
 msgstr "Cotisant du réseau UT, 0 €"
 
-#: sith/settings.py:552
+#: sith/settings.py:546
 msgid "CROUS member"
 msgstr "Membres du CROUS, 0 €"
 
-#: sith/settings.py:553
+#: sith/settings.py:547
 msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA, 20 €"
 
-#: sith/settings.py:555
+#: sith/settings.py:549
 msgid "One semester Welcome Week"
 msgstr "Un semestre Welcome Week"
 
-#: sith/settings.py:559
+#: sith/settings.py:553
 msgid "One month for free"
 msgstr "Un mois gratuit"
 
-#: sith/settings.py:560
+#: sith/settings.py:554
 msgid "Two months for free"
 msgstr "Deux mois gratuits"
 
-#: sith/settings.py:561
+#: sith/settings.py:555
 msgid "Eurok's volunteer"
 msgstr "Bénévole Eurockéennes"
 
-#: sith/settings.py:563
+#: sith/settings.py:557
 msgid "Six weeks for free"
 msgstr "6 semaines gratuites"
 
-#: sith/settings.py:567
+#: sith/settings.py:561
 msgid "One day"
 msgstr "Un jour"
 
-#: sith/settings.py:568
+#: sith/settings.py:562
 msgid "GA staff member"
 msgstr "Membre staff GA (2 semaines), 1 €"
 
-#: sith/settings.py:571
+#: sith/settings.py:565
 msgid "One semester (-20%)"
 msgstr "Un semestre (-20%), 12 €"
 
-#: sith/settings.py:576
+#: sith/settings.py:570
 msgid "Two semesters (-20%)"
 msgstr "Deux semestres (-20%), 22 €"
 
-#: sith/settings.py:581
+#: sith/settings.py:575
 msgid "Common core cursus (-20%)"
 msgstr "Cursus tronc commun (-20%), 36 €"
 
-#: sith/settings.py:586
+#: sith/settings.py:580
 msgid "Branch cursus (-20%)"
 msgstr "Cursus branche (-20%), 36 €"
 
-#: sith/settings.py:591
+#: sith/settings.py:585
 msgid "Alternating cursus (-20%)"
 msgstr "Cursus alternant (-20%), 24 €"
 
-#: sith/settings.py:597
+#: sith/settings.py:591
 msgid "One year for free(CA offer)"
 msgstr "Une année offerte (Offre CA)"
 
-#: sith/settings.py:617
+#: sith/settings.py:611
 msgid "President"
 msgstr "Président⸱e"
 
-#: sith/settings.py:618
+#: sith/settings.py:612
 msgid "Vice-President"
 msgstr "Vice-Président⸱e"
 
-#: sith/settings.py:619
+#: sith/settings.py:613
 msgid "Treasurer"
 msgstr "Trésorier⸱e"
 
-#: sith/settings.py:620
+#: sith/settings.py:614
 msgid "Communication supervisor"
 msgstr "Responsable communication"
 
-#: sith/settings.py:621
+#: sith/settings.py:615
 msgid "Secretary"
 msgstr "Secrétaire"
 
-#: sith/settings.py:622
+#: sith/settings.py:616
 msgid "IT supervisor"
 msgstr "Responsable info"
 
-#: sith/settings.py:623
+#: sith/settings.py:617
 msgid "Board member"
 msgstr "Membre du bureau"
 
-#: sith/settings.py:624
+#: sith/settings.py:618
 msgid "Active member"
 msgstr "Membre actif⸱ve"
 
-#: sith/settings.py:625
+#: sith/settings.py:619
 msgid "Curious"
 msgstr "Curieux⸱euse"
 
-#: sith/settings.py:662
+#: sith/settings.py:656
 msgid "A new poster needs to be moderated"
 msgstr "Une nouvelle affiche a besoin d'être modérée"
 
-#: sith/settings.py:663
+#: sith/settings.py:657
 msgid "A new mailing list needs to be moderated"
 msgstr "Une nouvelle mailing list a besoin d'être modérée"
 
-#: sith/settings.py:666
+#: sith/settings.py:660
 msgid "A new pedagogy comment has been signaled for moderation"
 msgstr ""
 "Un nouveau commentaire de la pédagogie a été signalé pour la modération"
 
-#: sith/settings.py:668
+#: sith/settings.py:662
 #, python-format
 msgid "There are %s fresh news to be moderated"
 msgstr "Il y a %s nouvelles toutes fraîches à modérer"
 
-#: sith/settings.py:669
+#: sith/settings.py:663
 msgid "New files to be moderated"
 msgstr "Nouveaux fichiers à modérer"
 
-#: sith/settings.py:670
+#: sith/settings.py:664
 #, python-format
 msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
-#: sith/settings.py:671
+#: sith/settings.py:665
 msgid "You've been identified on some pictures"
 msgstr "Vous avez été identifié sur des photos"
 
-#: sith/settings.py:672
+#: sith/settings.py:666
 #, python-format
 msgid "You just refilled of %s €"
 msgstr "Vous avez rechargé votre compte de %s€"
 
-#: sith/settings.py:673
+#: sith/settings.py:667
 #, python-format
 msgid "You just bought %s"
 msgstr "Vous avez acheté %s"
 
-#: sith/settings.py:674
+#: sith/settings.py:668
 msgid "You have a notification"
 msgstr "Vous avez une notification"
 
-#: sith/settings.py:686
+#: sith/settings.py:680
 msgid "Success!"
 msgstr "Succès !"
 
-#: sith/settings.py:687
+#: sith/settings.py:681
 msgid "Fail!"
 msgstr "Échec !"
 
-#: sith/settings.py:688
+#: sith/settings.py:682
 msgid "You successfully posted an article in the Weekmail"
 msgstr "Article posté avec succès dans le Weekmail"
 
-#: sith/settings.py:689
+#: sith/settings.py:683
 msgid "You successfully edited an article in the Weekmail"
 msgstr "Article édité avec succès dans le Weekmail"
 
-#: sith/settings.py:690
+#: sith/settings.py:684
 msgid "You successfully sent the Weekmail"
 msgstr "Weekmail envoyé avec succès"
 
-#: sith/settings.py:698
+#: sith/settings.py:692
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 

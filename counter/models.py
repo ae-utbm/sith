@@ -42,6 +42,7 @@ from club.models import Club
 from core.fields import ResizedImageField
 from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
+from counter.apps import PAYMENT_METHOD
 from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
 from subscription.models import Subscription
 
@@ -697,8 +698,8 @@ class Refilling(models.Model):
     payment_method = models.CharField(
         _("payment method"),
         max_length=255,
-        choices=settings.SITH_COUNTER_PAYMENT_METHOD,
-        default="CASH",
+        choices=PAYMENT_METHOD,
+        default="CARD",
     )
     bank = models.CharField(
         _("bank"), max_length=255, choices=settings.SITH_COUNTER_BANK, default="OTHER"

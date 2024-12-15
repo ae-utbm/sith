@@ -394,9 +394,11 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                 )
         kwargs["customer"] = self.customer
         kwargs["basket_total"] = self.sum_basket(self.request)
-        kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
-            self.customer
-        ).render(self.request)
+
+        if self.object.type == "BAR":
+            kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
+                self.customer
+            ).render(self.request)
 
         if self.object.can_refill():
             kwargs["refilling_fragment"] = RefillingCreateView.get_template_data(

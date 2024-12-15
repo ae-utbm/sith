@@ -29,11 +29,6 @@
       {{ user_mini_profile(customer.user) }}
       {{ user_subscription(customer.user) }}
       <p>{% trans %}Amount: {% endtrans %}<span x-text="customerBalance"></span> €</p>
-
-      {% if counter.type == 'BAR' %}
-        <h5>{% trans %}Student card{% endtrans %}</h3>
-        {{ student_card_fragment }}
-      {% endif %}
     </div>
 
     <div id="click_form">
@@ -111,6 +106,12 @@
           @htmx:after-request="updateBalance()"
         >
           {{ refilling_fragment }}
+        </div>
+      {% endif %}
+      {% if student_card_fragment %}
+        <h5>{% trans %}Student card{% endtrans %}</h3>
+        <div>
+          {{ student_card_fragment }}
         </div>
       {% endif %}
     </div>
