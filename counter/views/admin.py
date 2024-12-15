@@ -109,7 +109,7 @@ class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView
     """A create view for the admins."""
 
     model = ProductType
-    fields = ["name", "description", "comment", "icon", "priority"]
+    fields = ["name", "description", "comment", "icon"]
     template_name = "core/create.jinja"
     current_tab = "products"
 
@@ -119,7 +119,7 @@ class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
     model = ProductType
     template_name = "core/edit.jinja"
-    fields = ["name", "description", "comment", "icon", "priority"]
+    fields = ["name", "description", "comment", "icon"]
     pk_url_kwarg = "type_id"
     current_tab = "products"
 
@@ -129,7 +129,7 @@ class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     queryset = Product.objects.values("id", "name", "code", "product_type__name")
     template_name = "counter/product_list.jinja"
     ordering = [
-        F("product_type__priority").desc(nulls_last=True),
+        F("product_type__order").asc(nulls_last=True),
         "product_type",
         "name",
     ]

@@ -36,7 +36,7 @@ def get_eboutic_products(user: User) -> list[Product]:
         .products.filter(product_type__isnull=False)
         .filter(archived=False)
         .filter(limit_age__lte=user.age)
-        .annotate(priority=F("product_type__priority"))
+        .annotate(order=F("product_type__order"))
         .annotate(category=F("product_type__name"))
         .annotate(category_comment=F("product_type__comment"))
         .prefetch_related("buying_groups")  # <-- used in `Product.can_be_sold_to`

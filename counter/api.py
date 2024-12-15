@@ -71,7 +71,7 @@ class ProductController(ControllerBase):
     def search_products(self, filters: Query[ProductFilterSchema]):
         return filters.filter(
             Product.objects.order_by(
-                F("product_type__priority").desc(nulls_last=True),
+                F("product_type__order").asc(nulls_last=True),
                 "product_type",
                 "name",
             ).values()
@@ -95,7 +95,7 @@ class ProductController(ControllerBase):
             .prefetch_related("buying_groups")
             .select_related("product_type")
             .order_by(
-                F("product_type__priority").desc(nulls_last=True),
+                F("product_type__order").asc(nulls_last=True),
                 "product_type",
                 "name",
             )

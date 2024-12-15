@@ -35,6 +35,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
+from ordered_model.models import OrderedModel
 from phonenumber_field.modelfields import PhoneNumberField
 
 from accounting.models import CurrencyField
@@ -289,26 +290,26 @@ class AccountDump(models.Model):
         )
 
 
-class ProductType(models.Model):
+class ProductType(OrderedModel):
     """A product type.
 
     Useful only for categorizing.
     """
 
     name = models.CharField(_("name"), max_length=30)
-    description = models.TextField(_("description"), null=True, blank=True)
-    comment = models.TextField(_("comment"), null=True, blank=True)
+    description = models.TextField(_("description"), default="")
+    comment = models.TextField(
+        _("comment"),
+        default="",
+        help_text=_("A text that will be shown on the eboutic."),
+    )
     icon = ResizedImageField(
         height=70, force_format="WEBP", upload_to="products", null=True, blank=True
     )
 
-    # priority holds no real backend logic but helps to handle the order in which
-    # the items are to be shown to the user
-    priority = models.PositiveIntegerField(default=0)
-
     class Meta:
         verbose_name = _("product type")
-        ordering = ["-priority", "name"]
+        ordering = ["order"]
 
     def __str__(self):
         return self.name
