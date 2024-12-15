@@ -559,10 +559,6 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
     context_object_name = "profile"
     current_tab = "prefs"
 
-    def get_object(self, queryset=None):
-        user = get_object_or_404(User, pk=self.kwargs["user_id"])
-        return user
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         pref = self.object.preferences
@@ -572,12 +568,10 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
 
-        if not (
-            hasattr(self.object, "trombi_user") and self.request.user.trombi_user.trombi
-        ):
+        if not hasattr(self.object, "trombi_user"):
             kwargs["trombi_form"] = UserTrombiForm()
         if hasattr(self.object, "customer"):
-            kwargs["student_card"] = StudentCardFormView.get_template_data(
+            kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
                 self.object.customer
             ).render(self.request)
         return kwargs

@@ -1138,20 +1138,22 @@ class StudentCard(models.Model):
     uid = models.CharField(
         _("uid"), max_length=UID_SIZE, unique=True, validators=[MinLengthValidator(4)]
     )
-    customer = models.ForeignKey(
+    customer = models.OneToOneField(
         Customer,
-        related_name="student_cards",
-        verbose_name=_("student cards"),
-        null=False,
-        blank=False,
+        related_name="student_card",
+        verbose_name=_("student card"),
         on_delete=models.CASCADE,
     )
+
+    class Meta:
+        verbose_name = _("student card")
+        verbose_name_plural = _("student cards")
 
     def __str__(self):
         return self.uid
 
     @staticmethod
-    def is_valid(uid):
+    def is_valid(uid: str) -> bool:
         return (
             (uid.isupper() or uid.isnumeric())
             and len(uid) == StudentCard.UID_SIZE
