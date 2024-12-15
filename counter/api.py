@@ -26,7 +26,7 @@ from counter.models import Counter, Customer, Product
 from counter.schemas import (
     CounterFilterSchema,
     CounterSchema,
-    CustomerBalance,
+    CustomerSchema,
     ProductSchema,
     SimplifiedCounterSchema,
 )
@@ -63,8 +63,13 @@ class CounterController(ControllerBase):
 
 @api_controller("/customer")
 class CustomerController(ControllerBase):
-    @route.get("/balance", response=CustomerBalance, permissions=[IsLoggedInCounter])
-    def get_balance(self, customer_id: int):
+    @route.get(
+        "{customer_id}",
+        response=CustomerSchema,
+        permissions=[IsLoggedInCounter],
+        url_name="get_customer",
+    )
+    def get_customer(self, customer_id: int):
         return self.get_object_or_exception(Customer, pk=customer_id)
 
 

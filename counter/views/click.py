@@ -137,7 +137,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         request.session["no_age"] = False
         if self.object.type != "BAR":
             self.operator = request.user
-        elif self.customer_is_barman():
+        elif self.object.customer_is_barman(self.customer):
             self.operator = self.customer.user
         else:
             self.operator = self.object.get_random_barman()
@@ -157,16 +157,12 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
-    def customer_is_barman(self) -> bool:
-        barmen = self.object.barmen_list
-        return self.object.type == "BAR" and self.customer.user in barmen
-
     def get_product(self, pid):
         return Product.objects.filter(pk=int(pid)).first()
 
     def get_price(self, pid):
         p = self.get_product(pid)
-        if self.customer_is_barman():
+        if self.object.customer_is_barman(self.customer):
             price = p.special_selling_price
         else:
             price = p.selling_price
@@ -331,7 +327,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             for pid, infos in request.session["basket"].items():
                 # This duplicates code for DB optimization (prevent to load many times the same object)
                 p = Product.objects.filter(pk=pid).first()
-                if self.customer_is_barman():
+                if self.object.customer_is_barman(self.customer):
                     uprice = p.special_selling_price
                 else:
                     uprice = p.selling_price
@@ -385,7 +381,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
         products = self.object.products.select_related("product_type")
-        if self.customer_is_barman():
+        if self.object.customer_is_barman(self.customer):
             products = products.annotate(price=F("special_selling_price"))
         else:
             products = products.annotate(price=F("selling_price"))
@@ -444,16 +440,12 @@ class RefillingCreateView(FormView):
         if not self.counter.can_refill():
             raise PermissionDenied
 
-        if self.customer_is_barman():
+        if self.counter.customer_is_barman(self.customer):
             self.operator = self.customer.user
         else:
             self.operator = self.counter.get_random_barman()
 
         return super().dispatch(request, *args, **kwargs)
-
-    def customer_is_barman(self) -> bool:
-        barmen = self.counter.barmen_list
-        return self.counter.type == "BAR" and self.customer.user in barmen
 
     def form_valid(self, form):
         res = super().form_valid(form)

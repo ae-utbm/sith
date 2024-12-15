@@ -650,6 +650,15 @@ class Counter(models.Model):
             )
         )["total"]
 
+    def customer_is_barman(self, customer: Customer | User) -> bool:
+        """Check if current counter is a `bar` and that the customer is on the barmen_list
+
+        This is useful to compute special prices"""
+        if isinstance(customer, Customer):
+            customer: User = customer.user
+
+        return self.type == "BAR" and customer in self.barmen_list
+
 
 class RefillingQuerySet(models.QuerySet):
     def annotate_total(self) -> Self:

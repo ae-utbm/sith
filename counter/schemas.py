@@ -16,10 +16,10 @@ class CounterSchema(ModelSchema):
         fields = ["id", "name", "type", "club", "products"]
 
 
-class CustomerBalance(ModelSchema):
+class CustomerSchema(ModelSchema):
     class Meta:
         model = Customer
-        fields = ["amount"]
+        fields = ["user", "account_id", "amount", "recorded_products"]
 
 
 class CounterFilterSchema(FilterSchema):
