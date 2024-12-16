@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import pytest
 from django.conf import settings
+from django.core.cache import cache
 from django.core.management import call_command
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -9,7 +10,9 @@ from django.utils.timezone import now
 from model_bakery import baker, seq
 from model_bakery.recipe import Recipe, foreign_key
 
+from club.models import Membership
 from core.baker_recipes import (
+    board_user,
     old_subscriber_user,
     subscriber_user,
     very_old_subscriber_user,
@@ -187,3 +190,72 @@ def test_generate_username(first_name: str, last_name: str, expected: str):
     new_user = User(first_name=first_name, last_name=last_name, email="a@example.com")
     new_user.generate_username()
     assert new_user.username == expected
+
+
+@pytest.mark.django_db
+class TestUserPreferences:
+    @pytest.fixture
+    def subscriber(self) -> User:
+        return subscriber_user.make()
+
+    @pytest.fixture
+    def non_subscriber(self) -> User:
+        return baker.make(User)
+
+    @pytest.fixture
+    def club_admin(self) -> User:
+        user = baker.make(User)
+        baker.make(
+            Membership,
+            start_date=now() - timedelta(days=30),
+            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+            user=user,
+        )
+        return user
+
+    @pytest.fixture
+    def board_member(self) -> User:
+        return board_user.make()
+
+    @pytest.fixture
+    def admin(self) -> User:
+        return baker.make(User, is_superuser=True)
+
+    @pytest.mark.parametrize(
+        ("tested_user", "accessing_user", "expected_code"),
+        [
+            ("subscriber", None, 403),  # Anonymous user
+            ("subscriber", "non_subscriber", 403),
+            ("subscriber", "club_admin", 403),
+            ("subscriber", "subscriber", 200),
+            ("subscriber", "board_member", 200),
+            ("subscriber", "admin", 200),
+            ("non_subscriber", None, 403),
+            ("non_subscriber", "club_admin", 403),
+            ("non_subscriber", "subscriber", 403),
+            ("non_subscriber", "non_subscriber", 200),
+            ("non_subscriber", "board_member", 200),
+            ("non_subscriber", "admin", 200),
+        ],
+    )
+    @pytest.mark.django_db
+    def test_user_preferences_access(
+        self,
+        client: Client,
+        request: pytest.FixtureRequest,
+        tested_user: str,
+        accessing_user: str | None,
+        expected_code: int,
+    ):
+        cache.clear()
+        if accessing_user is not None:
+            client.force_login(request.getfixturevalue(accessing_user))
+        assert (
+            client.get(
+                reverse(
+                    "core:user_prefs",
+                    kwargs={"user_id": request.getfixturevalue(tested_user).pk},
+                )
+            ).status_code
+            == expected_code
+        )
