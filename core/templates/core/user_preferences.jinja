@@ -28,7 +28,7 @@
       </form>
 
     {% else %}
-      <p>{% trans trombi=user.trombi_user.trombi %}You already choose to be in that Trombi: {{ trombi }}.{% endtrans %}
+      <p>{% trans trombi=profile.trombi_user.trombi %}You already choose to be in that Trombi: {{ trombi }}.{% endtrans %}
         <br />
         <a href="{{ url('trombi:user_tools') }}">{% trans %}Go to my Trombi tools{% endtrans %}</a>
       </p>
