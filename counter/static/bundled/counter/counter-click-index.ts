@@ -1,5 +1,4 @@
 import { exportToHtml } from "#core:utils/globals";
-import { customerGetCustomer } from "#openapi";
 
 interface CounterConfig {
   csrfToken: string;
@@ -33,19 +32,13 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
         return total / 100;
       },
 
-      async updateBalance() {
-        this.customerBalance = (
-          await customerGetCustomer({
-            path: {
-              // biome-ignore lint/style/useNamingConvention: api is in snake_case
-              customer_id: config.customerId,
-            },
-          })
-        ).data.amount;
-      },
-
-      async onRefillingSuccess() {
-        await this.updateBalance();
+      onRefillingSuccess(event: CustomEvent) {
+        if (event.type !== "htmx:after-request" || event.detail.failed) {
+          return;
+        }
+        this.customerBalance += Number.parseFloat(
+          (event.detail.target.querySelector("#id_amount") as HTMLInputElement).value,
+        );
         document.getElementById("selling-accordion").click();
       },
 

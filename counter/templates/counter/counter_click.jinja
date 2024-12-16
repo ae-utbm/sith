@@ -103,7 +103,7 @@
       {% if refilling_fragment %}
         <h5>{% trans %}Refilling{% endtrans %}</h5>
         <div
-          @htmx:after-request="onRefillingSuccess()"
+          @htmx:after-request="onRefillingSuccess"
         >
           {{ refilling_fragment }}
         </div>
