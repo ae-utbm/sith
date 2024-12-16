@@ -62,16 +62,31 @@ NEWS_TYPES = [
 
 
 class News(models.Model):
-    """The news class."""
+    """News about club events."""
 
     title = models.CharField(_("title"), max_length=64)
-    summary = models.TextField(_("summary"))
-    content = models.TextField(_("content"))
+    summary = models.TextField(
+        _("summary"),
+        help_text=_(
+            "A description of the event (what is the activity ? "
+            "is there an associated clic ? is there a inscription form ?)"
+        ),
+    )
+    content = models.TextField(
+        _("content"),
+        blank=True,
+        default="",
+        help_text=_("A more detailed and exhaustive description of the event."),
+    )
     type = models.CharField(
         _("type"), max_length=16, choices=NEWS_TYPES, default="EVENT"
     )
     club = models.ForeignKey(
-        Club, related_name="news", verbose_name=_("club"), on_delete=models.CASCADE
+        Club,
+        related_name="news",
+        verbose_name=_("club"),
+        on_delete=models.CASCADE,
+        help_text=_("The club which organizes the event."),
     )
     author = models.ForeignKey(
         User,
@@ -85,7 +100,7 @@ class News(models.Model):
         related_name="moderated_news",
         verbose_name=_("moderator"),
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
 
     def __str__(self):
